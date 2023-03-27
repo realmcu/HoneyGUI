@@ -1,0 +1,17 @@
+# for module compiling
+import os
+from building import *
+
+cwd  = GetCurrentDir()
+group = []
+list = os.listdir(cwd)
+
+
+if GetDepend('MODULE_USING_RTK_GUI'):
+    for d in list:
+        path = os.path.join(cwd, d)
+        if os.path.isfile(os.path.join(path, 'SConscript')):
+            if not os.path.isfile(os.path.join(path, 'SConstruct')):
+                group = group + SConscript(os.path.join(d, 'SConscript'))
+
+Return('group')

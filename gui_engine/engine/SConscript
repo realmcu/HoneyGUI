@@ -1,0 +1,37 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+#src = Glob('*.c')
+src += ['draw_img.c']
+src += ['gui_matrix.c']
+src += ['draw_font.c']
+src += ['font_mem.c']
+src += ['image_bitmap.c']
+src += ['font_stb.c']
+src += ['acc_sw.c']
+#src += ['acc_arm_2d.c']
+
+src += ['acc_init.c']
+#SrcRemove(src,'font_genitop.c')
+#SrcRemove(src,'image_bmp.c')
+#SrcRemove(src,'image_evo.c')
+#SrcRemove(src,'image_path.c')
+#SrcRemove(src,'image_jpg.c')
+#SrcRemove(src,'image_png.c')
+#SrcRemove(src,'image_svg.c')
+
+if GetDepend(['MODULE_VG_LITE']):
+    src += ['acc_vg_lite.c']
+if GetDepend(['MODULE_RTK_PPE']):
+    src += ['acc_rtk_ppe.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+
+Return('group')

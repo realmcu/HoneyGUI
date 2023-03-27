@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+<remote name="origin"
+          fetch="ssh://cn4soc-slave.rtkbf.com:29418"
+          review="https://cn4soc.rtkbf.com/gerrit"
+/>
+<remote name="origin_slave"
+          fetch="ssh://cn4soc-hc-slave.rtkbf.com:29418"
+          review="https://cn4soc.rtkbf.com/gerrit"
+/>
+  <default remote="origin"   rebase="false"/>
+  <project name="HoneyGUI"  path="gui-engine-dev"  revision="gui-engine-dev" dest-branch="gui-engine-dev" groups="sdk"/>
+  <project name="HoneyRepo/build"  path="build"   revision="v1" dest-branch="v1" groups="script" remote="origin_slave">
+    <copyfile src="build.py" dest="build.py" />
+  </project>
+</manifest>

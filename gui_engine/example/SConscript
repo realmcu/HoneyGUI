@@ -1,0 +1,17 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src += ['app_launcher2.c']
+    
+if GetDepend(['MODULE_VG_LITE']):
+    src += ['vg_lite_demo.c']
+CPPPATH = [cwd,cwd + '/root_image']
+
+group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI_DEMO'], CPPPATH = CPPPATH)
+
+Return('group')

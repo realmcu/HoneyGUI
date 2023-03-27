@@ -1,0 +1,17 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+#src = Glob('*.c')
+# src += ['draw_img.c']
+
+
+CPPPATH = [cwd,cwd + '/nanosvg/src', cwd + '/nanosvg/example']
+
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+
+Return('group')

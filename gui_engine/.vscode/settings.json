@@ -1,0 +1,11 @@
+{
+    "editor.fontSize": 14,
+    "files.associations": {
+        "sdl.h": "c",
+        "sdl_test_common.h": "c",
+        "sdl_test_font.h": "c",
+        "sdl_thread.h": "c",
+        "pthread.h": "c",
+        "draw_img.h": "c"
+    }
+}

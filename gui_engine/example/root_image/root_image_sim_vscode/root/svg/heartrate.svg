@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100"
+   height="100"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg8385"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="heartrate.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview8387"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="false"
+     units="px"
+     inkscape:zoom="2.9611953"
+     inkscape:cx="-57.746952"
+     inkscape:cy="85.776174"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     width="1px"
+     scale-x="1" />
+  <defs
+     id="defs8382">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient11023">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop11019" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop11021" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient11023"
+       id="linearGradient11025"
+       x1="3.0326455"
+       y1="7.9036455"
+       x2="9.6472292"
+       y2="7.9036455"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="scale(5.814658)" />
+  </defs>
+  <g
+     inkscape:label="图层 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#ff2a2a;stroke-width:0.584972;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:0.995169"
+       id="path8468"
+       cx="50"
+       cy="50"
+       r="50" />
+    <circle
+       style="fill:url(#linearGradient11025);fill-opacity:1;stroke-width:2.93913;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:0.995169"
+       id="path8594"
+       cx="36.726803"
+       cy="46.002914"
+       r="19.23077" />
+    <circle
+       style="fill:#ffffff;stroke-width:2.93913;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:0.995169"
+       id="path8594-4"
+       cx="61.62645"
+       cy="46.839771"
+       r="19.23077" />
+    <rect
+       style="fill:#ffffff;stroke-width:2.15881;stroke-linecap:square;stroke-linejoin:round;stroke-opacity:0.995169"
+       id="rect8844"
+       width="38.078819"
+       height="38.078815"
+       x="57.852192"
+       y="-11.468026"
+       transform="rotate(44.186772)" />
+  </g>
+</svg>

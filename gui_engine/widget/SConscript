@@ -1,0 +1,20 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src = Glob('*.c')
+SrcRemove(src,'gui_vg_lite_clock.c')
+
+if GetDepend(['MODULE_VG_LITE']):
+    src += ['gui_vg_lite_clock.c']
+
+
+CPPPATH = [cwd]
+
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+
+Return('group')

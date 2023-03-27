@@ -1,0 +1,16 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src = Glob('*.c')
+src += ['tlsf/tlsf.c']
+
+CPPPATH = [cwd,cwd + '/tlsf']
+
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+
+Return('group')
