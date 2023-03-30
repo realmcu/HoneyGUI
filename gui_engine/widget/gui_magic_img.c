@@ -307,15 +307,27 @@ static void svg_ctor(gui_magic_img_t *this, gui_obj_t *parent,
     if (image == NULL)
     {
         gui_log("Could not open SVG image.\n");
-        return;
+        goto error;
     }
     draw_img->data = image;
 
-    this->scale_x = ((float)w) / image->width;
-    this->scale_y = ((float)h) / image->height;
+    if (!w)
+    {
+        this->scale_x = 1;
+    }
+    else
+    {
+        this->scale_x = ((float)w) / image->width;
+    }
 
-    if (!w) { this->scale_x = 1; }
-    if (!h) { this->scale_y = 1; }
+    if (!h)
+    {
+        this->scale_y = 1;
+    }
+    else
+    {
+        this->scale_y = ((float)h) / image->height;
+    }
 error:
     //obj->not_show = true;
     return;

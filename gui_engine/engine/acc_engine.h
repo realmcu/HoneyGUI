@@ -179,6 +179,7 @@ typedef struct acc_engine
 
 
 struct acc_engine *gui_get_acc(void);
+void gui_acc_init(void);
 
 
 

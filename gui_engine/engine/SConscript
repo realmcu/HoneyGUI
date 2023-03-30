@@ -21,7 +21,6 @@ src += ['acc_init.c']
 #SrcRemove(src,'image_bmp.c')
 #SrcRemove(src,'image_evo.c')
 #SrcRemove(src,'image_path.c')
-#SrcRemove(src,'image_jpg.c')
 #SrcRemove(src,'image_png.c')
 #SrcRemove(src,'image_svg.c')
 

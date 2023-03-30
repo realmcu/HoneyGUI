@@ -323,7 +323,7 @@ static void cpu_matrix_blit_rgb8888_2_argb8888(draw_img_t *image, struct gui_dis
             }
 
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
-//            uint8_t opacity_value = pixel[3];
+            // uint8_t opacity_value = pixel[3];
             canvas_color_t color = {.color.channel.alpha = pixel[3],
                                     .color.channel.blue = pixel[0],
                                     .color.channel.green = pixel[1],

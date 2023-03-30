@@ -11,6 +11,7 @@
 #include <tp_algo.h>
 #include <string.h>
 #include <gui_app.h>
+#include "acc_engine.h"
 
 
 /**
@@ -53,6 +54,8 @@ int rtgui_server_init(void)
 #ifdef RTK_GUI_IMAGE_FS
     gui_port_fs_init();
 #endif
+
+    gui_acc_init();
 
     rtgui_system_image_init();
     rtgui_system_font_init();
