@@ -66,22 +66,22 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
 
 
 }
-//static int to1(int input)
-//{
-//    if (input < 0)
-//    {
-//        return -1;
-//    }
-//    else if (input > 0)
-//    {
-//        return 1;
-//    }
-//    else if (input == 0)
-//    {
-//        return 0;
-//    }
-//    return 0;
-//}
+// static int to1(int input)
+// {
+//     if (input < 0)
+//     {
+//         return -1;
+//     }
+//     else if (input > 0)
+//     {
+//         return 1;
+//     }
+//     else if (input == 0)
+//     {
+//         return 0;
+//     }
+//     return 0;
+// }
 #include "gui_tabview.h"
 static void tab_prepare_scale(gui_obj_t *obj)
 {

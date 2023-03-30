@@ -3,6 +3,11 @@
 #include <gui_matrix.h>
 #include "acc_engine.h"
 
+#ifdef MODULE_VG_LITE
+#elif defined (MODULE_RTK_PPE)
+#include "rtl876x_rcc.h"
+#else
+#endif
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
 extern void sw_draw_circle(canvas_circle_t *c, struct gui_dispdev *dc);
@@ -22,38 +27,41 @@ extern void hw_draw_circle(canvas_circle_t *circle, struct gui_dispdev *dc);
 extern void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
                             float scale);
 
-static struct acc_engine acc =
+static struct acc_engine acc = {0};
+
+void gui_acc_init(void)
 {
 #ifdef MODULE_VG_LITE
-    .blit = hw_acc_blit,
-    .draw_circle = hw_draw_circle,
-    .draw_rectangle = hw_draw_rectangle,
-    //.draw_arc = sw_draw_arc,
-    .draw_arc = hw_draw_arc,
-    .draw_line = hw_draw_line,
-    .draw_path = sw_draw_path,
-    .draw_polyline = sw_draw_polyline,
-    .draw_svg = hw_acc_draw_svg,
+    acc.blit = hw_acc_blit;
+    acc.draw_circle = hw_draw_circle;
+    acc.draw_rectangle = hw_draw_rectangle;
+    //acc.draw_arc = sw_draw_arc;
+    acc.draw_arc = hw_draw_arc;
+    acc.draw_line = hw_draw_line;
+    acc.draw_path = sw_draw_path;
+    acc.draw_polyline = sw_draw_polyline;
+    acc.draw_svg = hw_acc_draw_svg;
 #elif defined (MODULE_RTK_PPE)
-    .blit = sw_acc_blit,
-    .draw_circle = sw_draw_circle,
-    .draw_rectangle = sw_draw_rectangle,
-    .draw_arc = sw_draw_arc,
-    .draw_line = sw_draw_line,
-    .draw_path = sw_draw_path,
-    .draw_polyline = sw_draw_polyline,
-    .draw_svg = sw_draw_svg,
+    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
+    acc.blit = hw_acc_blit;
+    acc.draw_circle = sw_draw_circle;
+    acc.draw_rectangle = sw_draw_rectangle;
+    acc.draw_arc = sw_draw_arc;
+    acc.draw_line = sw_draw_line;
+    acc.draw_path = sw_draw_path;
+    acc.draw_polyline = sw_draw_polyline;
+    acc.draw_svg = sw_draw_svg;
 #else
-    .blit = sw_acc_blit,
-    .draw_circle = sw_draw_circle,
-    .draw_rectangle = sw_draw_rectangle,
-    .draw_arc = sw_draw_arc,
-    .draw_line = sw_draw_line,
-    .draw_path = sw_draw_path,
-    .draw_polyline = sw_draw_polyline,
-    .draw_svg = sw_draw_svg,
+    acc.blit = sw_acc_blit;
+    acc.draw_circle = sw_draw_circle;
+    acc.draw_rectangle = sw_draw_rectangle;
+    acc.draw_arc = sw_draw_arc;
+    acc.draw_line = sw_draw_line;
+    acc.draw_path = sw_draw_path;
+    acc.draw_polyline = sw_draw_polyline;
+    acc.draw_svg = sw_draw_svg;
 #endif
-};
+}
 
 
 

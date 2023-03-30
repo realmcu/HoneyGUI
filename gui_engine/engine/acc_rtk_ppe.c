@@ -52,12 +52,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     {
         if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
         {
-            gui_log("PPE involved");
-            gui_log("mat x %d y %d, rect x %d y %d", (int)image->matrix->m[0][2],
-                    (int)image->matrix->m[1][2], rect->x1, rect->y1);
-            RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
-            if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1) && 1)\
-//                    (image->matrix->m[0][0] != 0) && (image->matrix->m[1][1] != 0))
+            if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1) && 1)
             {
                 float scale_x = image->matrix->m[0][0], scale_y = image->matrix->m[1][1];
                 ppe_buffer_t scaled_img;
@@ -66,7 +61,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 PPE_rect_t scale_rect;
                 memset(&scaled_img, 0, sizeof(ppe_buffer_t));
                 scaled_img.width = image->img_w * scale_x;
-                scaled_img.height = image->img_h * scale_y;
+                scaled_img.height = image->img_h * scale_y > (dc->section.y2 - dc->section.y1) ?
+                                    (dc->section.y2 - dc->section.y1) : image->img_h * scale_y;
+                uint32_t modified_height = image->img_h * scale_y;
                 switch (head->type)
                 {
                 case RGB565:
@@ -89,31 +86,58 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 4);
                     break;
                 default:
-                    //gui_log("tlsf default malloc %d", 0);
                     return;
                 }
                 if (1 || (dc->section.y1 <= rect->y1) && (dc->section.y2 >= rect->y1))
                 {
                     trans.x = (int)image->matrix->m[0][2];
-                    trans.y = (int)image->matrix->m[1][2] - dc->section.y1;
+                    trans.y = 0;
                     range.left = 0;
-                    range.right = target.width > scaled_img.width ? (scaled_img.width - 1) : (target.width - 1);
-                    range.top = 0;
-                    range.bottom = (dc->section.y2 - rect->y1) >= scaled_img.height ? (scaled_img.height - 1) :
-                                   (dc->section.y2 - rect->y1 - 1);
-                    scale_rect.left = 0;
-                    scale_rect.right = (range.right + 1) / scale_x - 1;
-                    scale_rect.top = 0;
-                    scale_rect.bottom = (range.bottom + 1) / scale_y - 1;
-                    PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
+                    range.right = scaled_img.width - 1;
                     range.top = 0;
                     range.bottom = scaled_img.height - 1;
+                    if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
+                    {
+                        scale_rect.top = 0;
+                        if ((rect->y1 + modified_height) <= dc->section.y2)
+                        {
+                            scale_rect.bottom = source.height - 1;
+                        }
+                        else
+                        {
+                            scale_rect.bottom = (scale_rect.top + dc->fb_height) / scale_x - 1;
+                        }
+                        trans.y = (int)image->matrix->m[1][2] - rect->y1;
+                    }
+                    else if ((dc->section.y2 <= (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1))
+                    {
+                        scale_rect.top = (dc->section.y1 - rect->y1) / scale_x;
+                        scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_x - 1;
+                    }
+                    else if ((dc->section.y2 >= (rect->y1 + modified_height)) && (dc->section.y1 >= rect->y1)
+                             && (dc->section.y1 <= (rect->y1 + modified_height)))
+                    {
+                        scale_rect.top = (dc->section.y1 - rect->y1) / scale_x;
+                        scale_rect.bottom = source.height - 1;
+                    }
+                    else
+                    {
+                        if (dc->type == DC_RAMLESS)
+                        {
+                            gui_free(scaled_img.memory);
+                        }
+                        return;
+                    }
+                    scale_rect.left = 0;
+                    scale_rect.right = source.width - 1;
+                    PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
                     PPE_blend(&scaled_img, &target, &trans);
                 }
-                else if ((dc->section.y1 <= (rect->y1 + scaled_img.height)) && (dc->section.y2 >= (rect->y1 + scaled_img.height)))
+                else if ((dc->section.y1 <= (rect->y1 + scaled_img.height)) &&
+                         (dc->section.y2 >= (rect->y1 + scaled_img.height)))
                 {
-                    trans.x = rect->x1;
-                    trans.y = 0;
+                    trans.x = rect->x1,
+                          trans.y = 0;
                     range.left = 0;
                     range.right = target.width > scaled_img.width ? (scaled_img.width - 1) : (target.width - 1);
                     range.top = dc->section.y1 - rect->y1;
@@ -125,16 +149,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
                     range.top = 0;
                     range.bottom = scaled_img.height - 1;
-                    gui_log("%d, %d, %d, %d", range.left, range.right, range.top, range.bottom);
-                    gui_log("s_w %d | s_h %d", scaled_img.width, scaled_img.height);
-                    gui_log("PPE res %d", PPE_blend_rect(&scaled_img, &target, &trans, &range));
-                    gui_log("trans x %d y %d", trans.x, trans.y);
-                    gui_log("bot x %d y %d", rect->x1, rect->y1);
+                    PPE_blend_rect(&scaled_img, &target, &trans, &range);
                 }
                 else if ((dc->section.y1 >= rect->y1) && (dc->section.y2 <= (rect->y1 + scaled_img.height)))
                 {
-                    trans.x = rect->x1;
-                    trans.y = 0;
+                    trans.x = rect->x1,
+                          trans.y = 0;
                     range.left = 0;
                     range.right = target.width > scaled_img.width ? (scaled_img.width - 1) : (target.width - 1);
                     range.top = dc->section.y1 - rect->y1;
@@ -143,15 +163,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scale_rect.right = (range.right + 1) / scale_x - 1;
                     scale_rect.top = (range.top) / scale_y;
                     scale_rect.bottom = (range.bottom + 1) / scale_y - 1;
-                    gui_log("top %d, bot %d", scale_rect.top, scale_rect.bottom);
                     PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
                     range.top = 0;
                     range.bottom = scaled_img.height - 1;
-                    gui_log("%d, %d, %d, %d", range.left, range.right, range.top, range.bottom);
-                    gui_log("s_w %d | s_h %d", scaled_img.width, scaled_img.height);
-                    gui_log("PPE res %d", PPE_blend_rect(&scaled_img, &target, &trans, &range));
-                    gui_log("trans x %d y %d", trans.x, trans.y);
-                    gui_log("middle x %d y %d", rect->x1, rect->y1);
+                    PPE_blend_rect(&scaled_img, &target, &trans, &range);
                 }
                 if (dc->type == DC_SINGLE)
                 {
@@ -159,7 +174,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 }
                 else if (dc->type == DC_RAMLESS)
                 {
-                    gui_log("free %x", scaled_img.memory);
                     gui_free(scaled_img.memory);
                 }
 
@@ -175,7 +189,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = 0,
                                         .bottom = (dc->section.y2 - rect->y1) >= source.height ? (source.height - 1) : (dc->section.y2 - rect->y1 - 1)
                                        };
-                    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
                     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
                     source.memory = (void *)source.address;
                     PPE_blend(&source, &target, &trans);
@@ -185,23 +198,17 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 {
                     PPE_translate_t trans = {.x = rect->x1, .y = 0};
                     PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = dc->section.y1 - rect->y1, .bottom = source.height - 1};
-                    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
                     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
                     source.memory = (void *)source.address;
-                    gui_log("PPE res %d", PPE_blend_rect(&source, &target, &trans, &range));
-                    gui_log("trans x %d y %d", trans.x, trans.y);
-                    gui_log("bot x %d y %d", rect->x1, rect->y1);
+                    PPE_blend_rect(&source, &target, &trans, &range);
                 }
                 else if ((dc->section.y1 >= rect->y1) && (dc->section.y2 <= (rect->y1 + source.height)))
                 {
                     PPE_translate_t trans = {.x = rect->x1, .y = 0};
                     PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = dc->section.y1 - rect->y1, .bottom = dc->section.y2 - rect->y1 - 1};
-                    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
                     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
                     source.memory = (void *)source.address;
-                    gui_log("PPE res %d", PPE_blend_rect(&source, &target, &trans, &range));
-                    gui_log("trans x %d y %d", trans.x, trans.y);
-                    gui_log("middle x %d y %d", rect->x1, rect->y1);
+                    PPE_blend_rect(&source, &target, &trans, &range);
                 }
             }
         }
@@ -225,7 +232,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = 0,
                                 .bottom = (dc->section.y2 - rect->y1) >= source.height ? (source.height - 1) : (dc->section.y2 - rect->y1 - 1)
                                };
-            RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
             PPE_blend(&source, &target, &trans);
         }
         else if ((dc->section.y1 <= (rect->y1 + source.height)) &&
@@ -233,19 +239,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         {
             PPE_translate_t trans = {.x = rect->x1, .y = 0};
             PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = dc->section.y1 - rect->y1, .bottom = source.height - 1};
-            RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
-            gui_log("PPE res %d", PPE_blend_rect(&source, &target, &trans, &range));
-            gui_log("trans x %d y %d", trans.x, trans.y);
-            gui_log("bot x %d y %d", rect->x1, rect->y1);
+            PPE_blend_rect(&source, &target, &trans, &range);
         }
         else if ((dc->section.y1 >= rect->y1) && (dc->section.y2 <= (rect->y1 + source.height)))
         {
             PPE_translate_t trans = {.x = rect->x1, .y = 0};
             PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = dc->section.y1 - rect->y1, .bottom = dc->section.y2 - rect->y1 - 1};
-            RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
-            gui_log("PPE res %d", PPE_blend_rect(&source, &target, &trans, &range));
-            gui_log("trans x %d y %d", trans.x, trans.y);
-            gui_log("middle x %d y %d", rect->x1, rect->y1);
+            PPE_blend_rect(&source, &target, &trans, &range);
         }
     }
 }
