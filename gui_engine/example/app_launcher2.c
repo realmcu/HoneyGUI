@@ -695,17 +695,49 @@ static void create_selector(gui_obj_t *screen)
     island = gui_d_island_create(screen);
 
 }
+#include <math.h>
 static void music_draw(gui_canvas_t *c)
 {
     canvas_arc_t a = {0};
     a.cx = 454 / 2;
     a.cy = 454 / 2;
     a.r = 300 / 2;
-    a.stroke.stroke_width = 3;
-    a.stroke.fill.color_data.rgba = 0xff00ffff;
+    a.stroke.stroke_width = 5;
+    a.stroke.fill.color_data.rgba = 0xe8734cff;
     a.start_angle = 0;
-    a.end_angle = 200;
+    static float angle = 0;
+    a.end_angle = angle++;
+    if (angle >= 360)
+    {
+        angle = 0;
+    }
+
     gui_canvas_api.arc(c, &a);
+    canvas_wave_t w = {0};
+    w.h = 454;
+    w.w = 454;
+    w.point_count = 6;
+    float dx = w.w / 5.0f;
+    float samples[w.point_count];
+    float sx[w.point_count], sy[w.point_count];
+    static float t = 0;
+    t += 0.01f;
+    samples[0] = (1.0f + sinf(t * 1.2345f + cosf(t * 0.33457f) * 0.44f)) * 0.5f;
+    samples[1] = (1.0f + sinf(t * 0.68363f + cosf(t * 1.3f) * 1.55f)) * 0.5f;
+    samples[2] = (1.0f + sinf(t * 1.1642f + cosf(t * 0.33457f) * 1.24f)) * 0.5f;
+    samples[3] = (1.0f + sinf(t * 0.56345f + cosf(t * 1.63f) * 0.14f)) * 0.5f;
+    samples[4] = (1.0f + sinf(t * 1.6245f + cosf(t * 0.254f) * 0.3f)) * 0.5f;
+    samples[5] = (1.0f + sinf(t * 0.345f + cosf(t * 0.03f) * 0.6f)) * 0.5f;
+    int i;
+    for (i = 0; i < w.point_count; i++)
+    {
+        sx[i] = w.x + i * dx;
+        sy[i] = w.y + w.h * samples[i] * 0.8f;
+    }
+    w.point_x = sx;
+    w.point_y = sy;
+    w.fill.color_data.rgba = 0xeab6a2ff;
+    gui_canvas_api.wave(c, &w);
 }
 static void music(gui_obj_t *screen)
 {

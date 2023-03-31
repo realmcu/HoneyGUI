@@ -158,7 +158,26 @@ typedef struct canvas_polyline
 } canvas_polyline_t;
 
 
+typedef struct canvas_path
+{
+    void *data1;
+    void *data2;
+    canvas_fill_t fill;
+    canvas_stroke_t stroke;
+} canvas_path_t;
 
+typedef struct canvas_wave
+{
+    float *point_x;
+    float *point_y;
+    int point_count;
+    float w;
+    float h;
+    float x;
+    float y;
+    canvas_fill_t fill;
+    canvas_stroke_t stroke;
+} canvas_wave_t;
 
 
 typedef struct acc_engine
@@ -170,10 +189,17 @@ typedef struct acc_engine
     void (*draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
     void (*draw_polyline)(canvas_polyline_t *p, struct gui_dispdev *dc);
     void (*draw_path)(draw_path_t *path, struct gui_dispdev *dc);
-
+    void (*draw_wave)(canvas_wave_t *w, struct gui_dispdev *dc);
     //todo
     void (*draw_svg)(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
                      float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);
+
+    //path
+    void (*begin_path)(canvas_path_t *data);
+    void (*move_to)(canvas_path_t *data, float x, float y);
+    void (*bezier_to)(canvas_path_t *data, float c1x, float c1y, float c2x, float c2y, float x,
+                      float y);
+    void (*LineTo)(canvas_path_t *data, float x, float y);
 
 } acc_engine_t;
 

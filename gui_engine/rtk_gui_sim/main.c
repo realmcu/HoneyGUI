@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     rtgui_server_init();
 //#ifdef MODULE_USING_RTK_GUI_DEMO
-#if 0
+#if 1
     extern gui_app_t *get_app_launcher2(void);
     gui_app_startup(get_app_launcher2());
 #else

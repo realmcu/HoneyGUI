@@ -57,6 +57,7 @@ typedef struct gui_api_canvas
     void (*translate)(gui_canvas_t *this, float tx, float ty);
     void (*svg)(gui_canvas_t *this, void *svg, uint32_t data_length, int x, int y, float scale);
     void (*set_animate)(gui_canvas_t *canvas, uint32_t dur, int repeatCount, void *callback, void *p);
+    void (*wave)(gui_canvas_t *this, canvas_wave_t *wave);
 } gui_api_canvas_t;
 
 void (gui_canvas_ctor)(gui_canvas_t *this, gui_obj_t *parent, const char *name, int16_t x,

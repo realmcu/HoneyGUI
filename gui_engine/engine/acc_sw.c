@@ -58,6 +58,101 @@ void (nanovg_draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc)
     nvgDeleteAGGE(vg);
 
 }
+
+void (nanovg_begin_path)(canvas_path_t *data)
+{
+    //nvgBeginPath(data);
+}
+void (nanovg_move_to)(canvas_path_t *data, float x, float y);
+void (nanovg_bezier_to)(canvas_path_t *data, float c1x, float c1y, float c2x, float c2y, float x,
+                        float y);
+void (nanovg_LineTo)(canvas_path_t *data, float x, float y);
+void (nanovg_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
+{
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+    nvgSave(vg);
+    NVGpaint bg;
+    float w = wave->w;
+    float h = wave->h;
+    float x = wave->x;
+    float y = wave->y;
+    float dx = w / 5.0f;
+    float *sx = wave->point_x;
+    float *sy = wave->point_y;
+    // Graph background
+    bg = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(wave->fill.color_data.rgba >> 24,
+                                                       wave->fill.color_data.rgba >> 16, wave->fill.color_data.rgba >> 8, 0),
+                           nvgRGBA(wave->fill.color_data.rgba >> 24, wave->fill.color_data.rgba >> 16,
+                                   wave->fill.color_data.rgba >> 8, wave->fill.color_data.rgba));
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0]);
+    int i;
+    for (i = 1; i < wave->point_count; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
+    }
+    nvgLineTo(vg, x + w, y + h);
+    nvgLineTo(vg, x, y + h);
+    nvgFillPaint(vg, bg);
+    nvgFill(vg);
+
+    // Graph line
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0] + 2);
+    for (i = 1; i < wave->point_count; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1] + 2, sx[i] - dx * 0.5f, sy[i] + 2, sx[i],
+                    sy[i] + 2);
+    }
+    nvgStrokeColor(vg, nvgRGBA(0, 0, 0, 32));
+    nvgStrokeWidth(vg, 3.0f);
+    nvgStroke(vg);
+
+    nvgBeginPath(vg);
+    nvgMoveTo(vg, sx[0], sy[0]);
+    for (i = 1; i < wave->point_count; i++)
+    {
+        nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
+    }
+    nvgStrokeColor(vg, nvgRGBA(wave->fill.color_data.rgba >> 24, wave->fill.color_data.rgba >> 16,
+                               wave->fill.color_data.rgba >> 8, wave->fill.color_data.rgba));
+    nvgStrokeWidth(vg, 3.0f);
+    nvgStroke(vg);
+
+    // Graph sample pos
+    for (i = 0; i < wave->point_count; i++)
+    {
+        bg = nvgRadialGradient(vg, sx[i], sy[i] + 2, 3.0f, 8.0f, nvgRGBA(0, 0, 0, 32), nvgRGBA(0, 0, 0, 0));
+        nvgBeginPath(vg);
+        nvgRect(vg, sx[i] - 10, sy[i] - 10 + 2, 20, 20);
+        nvgFillPaint(vg, bg);
+        nvgFill(vg);
+    }
+
+    nvgBeginPath(vg);
+    for (i = 0; i < wave->point_count; i++)
+    {
+        nvgCircle(vg, sx[i], sy[i], 4.0f);
+    }
+    nvgFillColor(vg, nvgRGBA(0, 160, 192, 255));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    for (i = 0; i < wave->point_count; i++)
+    {
+        nvgCircle(vg, sx[i], sy[i], 2.0f);
+    }
+    nvgFillColor(vg, nvgRGBA(220, 220, 220, 255));
+    nvgFill(vg);
+
+    nvgStrokeWidth(vg, 1.0f);
+
+    nvgRestore(vg);
+    nvgEndFrame(vg);
+
+    nvgDeleteAGGE(vg);
+}
 void (nanovg_draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc)
 {
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),

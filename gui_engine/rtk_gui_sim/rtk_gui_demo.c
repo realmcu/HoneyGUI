@@ -1,4 +1,4 @@
-#if 1
+#if 0
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_magic_img.h"

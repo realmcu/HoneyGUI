@@ -30,7 +30,7 @@ extern void (nanovg_draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
 extern void (nanovg_draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
 extern void (nanovg_draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
 extern void (nanovg_draw_circle)(canvas_circle_t *cc, struct gui_dispdev *dc);
-
+extern void (nanovg_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc);
 static struct acc_engine acc = {0};
 
 void gui_acc_init(void)
@@ -60,6 +60,7 @@ void gui_acc_init(void)
     acc.draw_path = sw_draw_path;
     acc.draw_polyline = sw_draw_polyline;
     acc.draw_svg = sw_draw_svg;
+    acc.draw_wave = nanovg_draw_wave;
 #endif
 }
 
