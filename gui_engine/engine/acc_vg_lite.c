@@ -634,14 +634,14 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
             temp_path_record->path_data = path_data;
             vg_lite_path_append(&temp_path_record->path, cmd_list, data_list, cmd_size);
 
-            ARGB_struct in_color = {.d32 = shape_list->fill.color};
+            ARGB_struct in_color = {.d32 = shape_list->fill.d.color};
             BGRA_struct fill_color = {.d32 = 0};
             fill_color.channel.A = 0xFF * shape_list->opacity;
             fill_color.channel.R = in_color.channel.R * shape_list->opacity;
             fill_color.channel.G = in_color.channel.G * shape_list->opacity;
             fill_color.channel.B = in_color.channel.B * shape_list->opacity;
 
-            in_color.d32 = shape_list->stroke.color;
+            in_color.d32 = shape_list->stroke.d.color;
             BGRA_struct stroke_color = {.d32 = 0};
             stroke_color.channel.A = 0xFF * shape_list->opacity;
             stroke_color.channel.R = in_color.channel.R * shape_list->opacity;
@@ -650,12 +650,12 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
 
             if (shape_list->fill.type == 1)
             {
-                if (shape_list->fill.color != 0)
+                if (shape_list->fill.d.color != 0)
                 {
                     vg_lite_set_draw_path_type(&temp_path_record->path, VG_LITE_DRAW_FILL_PATH);
                     vg_lite_draw(&target, &temp_path_record->path, (vg_lite_fill_t)shape_list->fillRule, &matrix,
                                  VG_LITE_BLEND_SRC_OVER,
-                                 shape_list->fill.color);
+                                 shape_list->fill.d.color);
                 }
             }
             else if (shape_list->fill.type == 2)
@@ -663,10 +663,12 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
                 temp_path_record->p_grad = gui_malloc(sizeof(vg_lite_grad_ptr));
                 memset(temp_path_record->p_grad, 0, sizeof(vg_lite_grad_ptr));
                 vg_lite_init_grad(&temp_path_record->p_grad->grad);
-                temp_path_record->p_grad->colors = gui_malloc(sizeof(uint32_t) * shape_list->fill.gradient->nstops);
-                temp_path_record->p_grad->stops = gui_malloc(sizeof(uint32_t) * shape_list->fill.gradient->nstops);
-                NSVGgradientStop *grad_list = shape_list->fill.gradient->stops;
-                for (int i = 0; i < shape_list->fill.gradient->nstops; i++)
+                temp_path_record->p_grad->colors = gui_malloc(sizeof(uint32_t) *
+                                                              shape_list->fill.d.gradient->nstops);
+                temp_path_record->p_grad->stops = gui_malloc(sizeof(uint32_t) *
+                                                             shape_list->fill.d.gradient->nstops);
+                NSVGgradientStop *grad_list = shape_list->fill.d.gradient->stops;
+                for (int i = 0; i < shape_list->fill.d.gradient->nstops; i++)
                 {
                     BGRA_struct before_transfer = {.d32 = grad_list[i].color};
                     RGBA_struct actual_color = {.d32 = 0};
@@ -677,7 +679,7 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
                     temp_path_record->p_grad->colors[i] = actual_color.d32;
                     temp_path_record->p_grad->stops[i] = grad_list[i].offset * 0xFF;
                 }
-                vg_lite_set_grad(&temp_path_record->p_grad->grad, shape_list->fill.gradient->nstops,
+                vg_lite_set_grad(&temp_path_record->p_grad->grad, shape_list->fill.d.gradient->nstops,
                                  temp_path_record->p_grad->colors, temp_path_record->p_grad->stops);
                 vg_lite_update_grad(&temp_path_record->p_grad->grad);
                 vg_lite_matrix_t *grad_matrix = vg_lite_get_grad_matrix(&temp_path_record->p_grad->grad);
@@ -694,7 +696,7 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
             }
 
             if ((shape_list->strokeWidth > 0) && (shape_list->stroke.type == 1) &&
-                (shape_list->stroke.color != 0))
+                (shape_list->stroke.d.color != 0))
             {
                 vg_lite_set_stroke(&temp_path_record->path, (vg_lite_cap_style_t)shape_list->strokeLineCap,
                                    (vg_lite_join_style_t)shape_list->strokeLineJoin, shape_list->strokeWidth, shape_list->miterLimit,
