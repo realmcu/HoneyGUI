@@ -265,7 +265,7 @@ static void svg_draw_cb(gui_obj_t *obj)
     float scale = img->scale_x;
     uint32_t svg_len = (uint32_t)img->base.draw_img.engine;
     gui_get_acc()->draw_svg(img->base.draw_img.data, svg_len, gui_get_dc(), x, y,
-                            scale);
+                            scale, 0, 0, 0);
 
 }
 static void svg_ctor(gui_magic_img_t *this, gui_obj_t *parent,

@@ -26,9 +26,9 @@ struct gui_d_island
     int target_h;
     int from_w;
     int from_h;
-    gui_round_rect_t *island;
-    gui_round_corner_rect_t *island2;
+    gui_canvas_t *canvas;
     void (*set_island)(gui_d_island_t *this, int w, int h);
+    void (*set_island_color)(gui_d_island_t *this, canvas_fill_t *c);
     void (*ctor)(gui_d_island_t *this, gui_obj_t *parent);
     gui_animate_t *animate;
     void (* set_animate)(gui_d_island_t *d_island, uint32_t dur, int repeatCount, void *callback,

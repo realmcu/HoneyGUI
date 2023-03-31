@@ -23,8 +23,7 @@ struct gui_button
     bool long_flag;
     void *on_pic_addr;
     void *off_pic_addr;
-    gui_win_t *win;
-
+    gui_animate_t *animate;
     void (*ctor)(
         gui_button_t *this,
         gui_obj_t *parent,
@@ -37,6 +36,16 @@ struct gui_button
         char *text
     );
 };
+typedef struct gui_api_button
+{
+    void (*set_animate)(gui_button_t *b, uint32_t dur, int repeatCount, void *callback, void *p);
+    void (*onPress)(gui_button_t *b, void *callback, void *parameter);
+    void (*onRelease)(gui_button_t *b, void *callback, void *parameter);
+    void (*onLong)(gui_button_t *b, void *callback, void *parameter);
+    void (*onClick)(gui_button_t *b, void *callback, void *parameter);
+} gui_api_button_t;
+
+extern gui_api_button_t gui_button_api;
 /**
  * @brief Creat a button widget.
  *
@@ -69,6 +78,10 @@ gui_button_t *gui_button_create(
  * @param event_cb Callback event.
  */
 void gui_button_click(gui_button_t *this, gui_event_cb_t event_cb);
+
+void gui_button_press(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void gui_button_long(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void gui_button_release(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
 /**
  * @brief Set the color of text which belongs to a button.
  *

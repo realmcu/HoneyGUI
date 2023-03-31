@@ -410,7 +410,45 @@ void (draw_arc)(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t 
     }
 
 }
-void set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p)
+#include "gui_server.h"
+static void (obj_update_att)(struct _gui_obj_t *o)
+{
+    gui_canvas_t *obj = (void *)o;
+    if (obj->animate && obj->animate->animate)
+    {
+        size_t frame_count = obj->animate->dur * (1000 / 15) / (1000);
+        obj->animate->callback(obj->animate->p);
+        obj->animate->current_frame++;
+
+        if (obj->animate->current_frame > frame_count)
+        {
+            if (obj->animate->repeatCount == 0)
+            {
+                obj->animate->animate = false;
+            }
+            else if (obj->animate->repeatCount < 0)
+            {
+                obj->animate->current_frame = 0;
+            }
+            else if (obj->animate->repeatCount > 0)
+            {
+                obj->animate->current_repeat_count++;
+                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                {
+                    obj->animate->animate = false;
+                }
+                else
+                {
+                    obj->animate->current_frame = 0;
+                }
+            }
+        }
+        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
+                                                                                       frame_count));
+
+    }
+}
+void set_animate(gui_canvas_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
 {
     gui_animate_t *animate = ((gui_canvas_t *)o)->animate;
     if (!(animate))
@@ -475,6 +513,7 @@ void (gui_canvas_ctor)(gui_canvas_t *this, gui_obj_t *parent, const char *name, 
     GET_BASE(this)->obj_prepare = NULL;
     GET_BASE(this)->obj_end = NULL;
     GET_BASE(this)->obj_draw = obj_draw;
+    GET_BASE(this)->obj_update_att = obj_update_att;
     GET_BASE(this)->type = CANVAS;
     gui_canvas_api.scale(this, 1, 1);
     this->opacity_value = UINT8_MAX;
@@ -502,7 +541,7 @@ static void (svg)(gui_canvas_t *this, void *svg, uint32_t data_length, int x, in
     x += GET_BASE(this)->dx;
     y += GET_BASE(this)->dy;
     scale *= scale * this->sx;
-    gui_get_acc()->draw_svg(svg, data_length, gui_get_dc(), x, y, scale);
+    gui_get_acc()->draw_svg(svg, data_length, gui_get_dc(), x, y, scale, 0, 0, 0);
 }
 
 gui_api_canvas_t gui_canvas_api =
@@ -514,4 +553,5 @@ gui_api_canvas_t gui_canvas_api =
     .scale = scale,
     .translate = translate,
     .svg = svg,
+    .set_animate = set_animate,
 };

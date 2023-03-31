@@ -173,7 +173,7 @@ typedef struct acc_engine
 
     //todo
     void (*draw_svg)(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
-                     float scale);
+                     float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);
 
 } acc_engine_t;
 

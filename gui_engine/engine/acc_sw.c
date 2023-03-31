@@ -3,8 +3,109 @@
 #include <gui_matrix.h>
 #include "acc_engine.h"
 #include "gui_canvas.h"
+#include "nanovg_agge.h"
+void (nanovg_draw_circle)(canvas_circle_t *c, struct gui_dispdev *dc)
+{
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+    nvgSave(vg);
+    nvgBeginPath(vg);
+    float center_y = (float)c->cy;
+    float center_x = (float)c->cx;
+    float radius = (float)c->r;
+    nvgCircle(vg, center_x, center_y, radius);
 
 
+    canvas_color_t cc = {0};
+    //c.color.rgba = r->stroke.fill.color_data.rgba;
+    //nvgStrokeColor(vg, nvgRGBA(c.color.channel.red,c.color.channel.green,c.color.channel.blue,c.color.channel.alpha));
+    //nvgStrokeWidth(vg, a->stroke.stroke_width);
+    //nvgStroke(vg);
+    cc.color.rgba = c->fill.color_data.rgba;
+    nvgFillColor(vg, nvgRGBA(cc.color.channel.red, cc.color.channel.green, cc.color.channel.blue,
+                             cc.color.channel.alpha));
+    nvgFill(vg);
+    nvgRestore(vg);
+    nvgEndFrame(vg);
+
+    nvgDeleteAGGE(vg);
+}
+void (nanovg_draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc)
+{
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+    nvgSave(vg);
+    nvgBeginPath(vg);
+    //nvgCircle(vg, center_x,center_y, radius);
+    //nvgRect(vg, 20,20,w-40,h-40);
+    nvgRoundedRect(vg, r->x, r->y, r->width, r->height, r->rx);
+
+
+    canvas_color_t c = {0};
+    //c.color.rgba = r->stroke.fill.color_data.rgba;
+    //nvgStrokeColor(vg, nvgRGBA(c.color.channel.red,c.color.channel.green,c.color.channel.blue,c.color.channel.alpha));
+    //nvgStrokeWidth(vg, a->stroke.stroke_width);
+    //nvgStroke(vg);
+    c.color.rgba = r->fill.color_data.rgba;
+    nvgFillColor(vg, nvgRGBA(c.color.channel.red, c.color.channel.green, c.color.channel.blue,
+                             c.color.channel.alpha));
+    nvgFill(vg);
+    nvgRestore(vg);
+    nvgEndFrame(vg);
+
+    nvgDeleteAGGE(vg);
+
+}
+void (nanovg_draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc)
+{
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+    nvgSave(vg);
+    nvgBeginPath(vg);
+    //nvgCircle(vg, center_x,center_y, radius);
+    //nvgRect(vg, 20,20,w-40,h-40);
+    //nvgRoundedRect(vg, 20,20,100,50, 25);
+    nvgLineCap(vg, NVG_ROUND);
+    nvgArc(vg, a->cx, a->cy, a->r, (a->start_angle - 90.0F)*NVG_PI / 180.0f,
+           (a->end_angle - 90.0F)*NVG_PI / 180.0f, NVG_CW);
+    canvas_color_t c = {0};
+    c.color.rgba = a->stroke.fill.color_data.rgba;
+    nvgStrokeColor(vg, nvgRGBA(c.color.channel.red, c.color.channel.green, c.color.channel.blue,
+                               c.color.channel.alpha));
+    nvgStrokeWidth(vg, a->stroke.stroke_width);
+    nvgStroke(vg);
+    nvgRestore(vg);
+    nvgEndFrame(vg);
+
+    nvgDeleteAGGE(vg);
+}
+void (nanovg_draw_line)(canvas_line_t *l, struct gui_dispdev *dc)
+{
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+    nvgSave(vg);
+    nvgBeginPath(vg);
+    //nvgCircle(vg, center_x,center_y, radius);
+    //nvgRect(vg, 20,20,w-40,h-40);
+    //nvgRoundedRect(vg, 20,20,100,50, 25);
+    nvgLineCap(vg, NVG_ROUND);
+    nvgMoveTo(vg, l->x1, l->x2);
+    nvgLineTo(vg, l->x2, l->y2);
+    canvas_color_t c = {0};
+    c.color.rgba = l->stroke.fill.color_data.rgba;
+    nvgStrokeColor(vg, nvgRGBA(c.color.channel.red, c.color.channel.green, c.color.channel.blue,
+                               c.color.channel.alpha));
+    nvgStrokeWidth(vg, l->stroke.stroke_width);
+    nvgStroke(vg);
+    nvgRestore(vg);
+    nvgEndFrame(vg);
+
+    nvgDeleteAGGE(vg);
+}
 static void normal_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                         struct rtgui_rect *rect)
 {
@@ -1263,7 +1364,7 @@ void (sw_draw_polyline)(canvas_polyline_t *p, struct gui_dispdev *dc)
 #define NANOSVGRAST_IMPLEMENTATION
 #include "nanosvgrast.h"
 void (sw_draw_svg)(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
-                   float scale)
+                   float scale, float rotate_degree, float rotate_center_x, float rotate_center_y)
 {
     {
         NSVGimage *image = svg;

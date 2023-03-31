@@ -23,10 +23,33 @@ void gui_button_click(gui_button_t *this, gui_event_cb_t event_cb)
 {
     gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 }
-static void press_ani(gui_button_t *this)
+void gui_button_press(gui_button_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_img_scale((void *)(this->img), this->win->animate->progress_percent * (-0.5f) + 1.0f,
-                  this->win->animate->progress_percent * (-0.5f) + 1.0f);
+    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_PRESSED, parameter);
+}
+void gui_button_long(gui_button_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_LONG, parameter);
+}
+void gui_button_release(gui_button_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_RELEASED, parameter);
+}
+static void (onPress)(gui_button_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED, parameter);
+}
+static void (onRelease)(gui_button_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_RELEASED, parameter);
+}
+static void (onLong)(gui_button_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, parameter);
+}
+static void (onClick)(gui_button_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
 static void button_prepare(gui_obj_t *obj)
 {
@@ -37,11 +60,12 @@ static void button_prepare(gui_obj_t *obj)
         (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
     {
 
-        gui_button_t *b = (void *)obj;//gui_log("%d ",tp->type);
+        gui_button_t *b = (void *)obj;
         switch (tp->type)
         {
         case TOUCH_SHORT:
             {
+                gui_log("%s\n", "TOUCH_SHORT");
                 // if (obj->callback.link_cb)
                 {
                     if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
@@ -64,53 +88,99 @@ static void button_prepare(gui_obj_t *obj)
                         {
                             b->long_flag = true;
                             //gui_send_callback_p_to_server(b->long_click_cb, b->long_click_cb_p);
+                            gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
                         }
                     }
                 }
             }
             break;
+
+        default:
+            break;
+        }
+        switch (tp->type)
+        {
+        case TOUCH_INIT:
         case TOUCH_INVALIDE:
+        case TOUCH_LONG:
+        case TOUCH_SHORT:
+
             {
-                if (b->press_flag == false)
+                if (tp->pressed)
                 {
 
-                    if (b->on_pic_addr)
-                        // printf("tp->x %d, tp->y %d, obj->dx %d, obj->dy %d \n",tp->x,tp->y,obj->dx,obj->dy);
+                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
                     {
-                        if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                            (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+
+                        //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+                        if (b->on_pic_addr)
                         {
-                            b->press_flag = true;
-                            b->long_flag = false;
-                            //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
                             gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
                         }
+                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                        b->long_flag = false;
                     }
                 }
-            }
-            break;
-        case TOUCH_INIT:
-            {
-                if (b->press_flag)
+                else if (tp->released)
                 {
-                    b->press_flag = false;
-                    b->long_flag = false;
-                    if (b->off_pic_addr)
+                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
                     {
-                        //gui_send_callback_p_to_server(b->release_cb, b->release_cb_p);
-                        //gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
+                        //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+                        if (b->off_pic_addr)
+                        {
+                            gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
+                        }
+                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+                        b->long_flag = false;
                     }
-
-                    b->win->set_animate(b->win, 1000, 0, press_ani, b);
                 }
             }
             break;
+
         default:
             break;
         }
     }
 }
+static void (obj_update_att)(struct _gui_obj_t *o)
+{
+    gui_button_t *obj = (void *)o;
+    if (obj->animate && obj->animate->animate)
+    {
+        size_t frame_count = obj->animate->dur * (1000 / 15) / (1000);
+        obj->animate->callback(obj->animate->p);
+        obj->animate->current_frame++;
 
+        if (obj->animate->current_frame > frame_count)
+        {
+            if (obj->animate->repeatCount == 0)
+            {
+                obj->animate->animate = false;
+            }
+            else if (obj->animate->repeatCount < 0)
+            {
+                obj->animate->current_frame = 0;
+            }
+            else if (obj->animate->repeatCount > 0)
+            {
+                obj->animate->current_repeat_count++;
+                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                {
+                    obj->animate->animate = false;
+                }
+                else
+                {
+                    obj->animate->current_frame = 0;
+                }
+            }
+        }
+        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
+                                                                                       frame_count));
+
+    }
+}
 static void gui_button_ctor(
     gui_button_t *this,
     gui_obj_t *parent,
@@ -131,12 +201,36 @@ static void gui_button_ctor(
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = BUTTON;
     root->obj_prepare = button_prepare;
+    root->obj_update_att = obj_update_att;
 
     // for self
     this->off_pic_addr = background_pic;
     this->on_pic_addr = highlight_pic;
 }
 
+static void set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
+{
+    gui_animate_t *animate = ((gui_button_t *)o)->animate;
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *))callback;
+    animate->repeatCount = repeatCount;
+    animate->p = p;
+    ((gui_button_t *)o)->animate = animate;
+}
+gui_api_button_t gui_button_api =
+{
+    .onClick = onClick,
+    .onLong = onLong,
+    .onPress = onPress,
+    .onRelease = onRelease,
+    .set_animate = set_animate,
+};
 gui_button_t *gui_button_create(
     void *parent,
     int16_t x,
@@ -162,24 +256,28 @@ gui_button_t *gui_button_create(
         gui_list_insert_before(&((GET_BASE(button)->parent)->child_list),
                                &(GET_BASE(button)->brother_list));
     }
-    button->win = gui_win_create(button, "button_win", 0, 0, 0, 0);
-    switch (image_type)
+    if (background_pic)
     {
-    case 0:
-        button->img = (void *)gui_magic_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
-        break;
-    case 1:
-        button->img = (void *)gui_dynamic_create_from_mem((void *)button, "g", background_pic, count, 0, 0,
-                                                          30, INT32_MAX - 1);
-        break;
-    case 2:
-        button->img = (void *)gui_svg_create_from_mem((void *)button, background_pic, count, 0, 0,
-                                                      w, h);
-        break;
-    default:
-        break;
-    }
+        /* code */
 
+
+        switch (image_type)
+        {
+        case 0:
+            button->img = (void *)gui_magic_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
+            break;
+        case 1:
+            button->img = (void *)gui_dynamic_create_from_mem((void *)button, "g", background_pic, count, 0, 0,
+                                                              30, INT32_MAX - 1);
+            break;
+        case 2:
+            button->img = (void *)gui_svg_create_from_mem((void *)button, background_pic, count, 0, 0,
+                                                          w, h);
+            break;
+        default:
+            break;
+        }
+    }
     if (text)
     {
         gui_img_get_height(button->img);

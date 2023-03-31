@@ -36,7 +36,7 @@ struct gui_canvas
     void (*ctor)(gui_canvas_t *this, gui_obj_t *parent, const char *name, int16_t x, int16_t y,
                  int16_t w, int16_t h, uint32_t color);
     gui_animate_t *animate;
-    void (* set_animate)(gui_canvas_t *canvas, uint32_t dur, int repeatCount, void *callback, void *p);
+
 
     void (*circle)(gui_canvas_t *this, canvas_circle_t *circle_data);
     void (*draw)(gui_canvas_t *this);
@@ -56,6 +56,7 @@ typedef struct gui_api_canvas
     void (*scale)(gui_canvas_t *this, float sx, float sy);
     void (*translate)(gui_canvas_t *this, float tx, float ty);
     void (*svg)(gui_canvas_t *this, void *svg, uint32_t data_length, int x, int y, float scale);
+    void (*set_animate)(gui_canvas_t *canvas, uint32_t dur, int repeatCount, void *callback, void *p);
 } gui_api_canvas_t;
 
 void (gui_canvas_ctor)(gui_canvas_t *this, gui_obj_t *parent, const char *name, int16_t x,

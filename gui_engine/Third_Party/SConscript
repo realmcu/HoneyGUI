@@ -8,9 +8,10 @@ src = Split("""
 
 #src = Glob('*.c')
 # src += ['draw_img.c']
+src += [cwd + '/agge/agge/math.cpp', cwd + '/agge/agge/stroke.cpp', cwd + '/agge/agge/stroke_features.cpp', cwd + '/agge/agge/vector_rasterizer.cpp']
+src += [cwd + '/nanovg/demos/agge_fill.c', cwd + '/nanovg/base/nanovg.c', cwd + '/nanovg/agge/nanovg_agge.cpp', cwd + '/nanovg/agge/nanovg_vertex.cpp']
 
-
-CPPPATH = [cwd,cwd + '/nanosvg/src', cwd + '/nanosvg/example']
+CPPPATH = [cwd,cwd + '/nanosvg/src', cwd + '/nanosvg/example', cwd + '/agge/agge', cwd + '/nanovg/base', cwd + '/nanovg/agge', cwd + '/agge', cwd + '/nanovg']
 
 group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
 
