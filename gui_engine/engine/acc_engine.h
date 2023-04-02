@@ -179,6 +179,14 @@ typedef struct canvas_wave
     canvas_stroke_t stroke;
 } canvas_wave_t;
 
+typedef struct canvas_palette_wave
+{
+    float w;
+    float h;
+    float x;
+    float y;
+    float selector_radian;
+} canvas_palette_wheel_t;
 
 typedef struct acc_engine
 {
@@ -190,6 +198,7 @@ typedef struct acc_engine
     void (*draw_polyline)(canvas_polyline_t *p, struct gui_dispdev *dc);
     void (*draw_path)(draw_path_t *path, struct gui_dispdev *dc);
     void (*draw_wave)(canvas_wave_t *w, struct gui_dispdev *dc);
+    void (*draw_palette_wheel)(canvas_palette_wheel_t *pw, struct gui_dispdev *dc);
     //todo
     void (*draw_svg)(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
                      float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);

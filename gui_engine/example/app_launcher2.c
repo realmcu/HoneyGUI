@@ -742,8 +742,22 @@ static void music_draw(gui_canvas_t *c)
 static void music(gui_obj_t *screen)
 {
     gui_svg_create_from_mem(screen, ACTIVITY_SVG, 5134, (454 - 300) / 2, (454 - 300) / 2, 300, 300);
-    gui_canvas_t *canvas = gui_canvas_create(screen, "c", 0, 0, 0, 0, 0);
+    gui_canvas_t *canvas = gui_canvas_create(screen, "c", 0, 0, 454, 454, 0);
     canvas->draw = music_draw;
+}
+static void palette_wheel_draw(gui_canvas_t *c)
+{
+    canvas_palette_wheel_t pw = {0};
+    pw.selector_radian = 2;
+    pw.w = gui_get_screen_width();
+    pw.h = gui_get_screen_height();
+    gui_canvas_api.palette_wheel(c, &pw);
+}
+static void palette_wheel(gui_obj_t *screen)
+{
+    gui_canvas_t *canvas = gui_canvas_create(screen, "c", 0, 0, 454, 454, 0);
+    canvas->draw = palette_wheel_draw;
+
 }
 #include "draw_font.h"
 static void app_launcher2_ui_design(gui_app_t *app)
@@ -760,6 +774,7 @@ static void app_launcher2_ui_design(gui_app_t *app)
     gui_tab_t *tb4 = gui_tab_create(tv, "tb1", 0, 0, 0, 0, 3, 0);
     gui_tab_t *tb5 = gui_tab_create(tv, "tb1", 0, 0, 0, 0, 4, 0);
     gui_tab_t *tb6 = gui_tab_create(tv, "tb1", 0, 0, 0, 0, 5, 0);
+    gui_tab_t *tb7 = gui_tab_create(tv, "tb1", 0, 0, 0, 0, 6, 0);
     //gui_tab_t *tb3 = gui_tab_create(tv, "tb1", 0, 0, 0, 0, 2, 0);
     gui_curtainview_t *cv = gui_curtainview_create(tb0, "cv", 0, 0, 0, 0);
     gui_curtain_t *c1 = gui_curtain_create(cv, "c1", 0, 0, 0, 0, CURTAIN_MIDDLE, 1);
@@ -771,7 +786,8 @@ static void app_launcher2_ui_design(gui_app_t *app)
     curtain2(c2);
     grid_icon(tb2);
     heart_rate_chart((void *)tb3);
-    read_page(tb6);
+    read_page(tb7);
     create_selector((void *)tb4);
-    music((void *)tb5);
+    music((void *)tb6);
+    palette_wheel((void *)tb5);
 }

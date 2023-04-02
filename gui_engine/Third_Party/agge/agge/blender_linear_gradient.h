@@ -89,7 +89,7 @@ inline bool blender_linear_gradient<PixelT>::get_color(int x, int y, pixel32_rgb
     else
     {
         //https://github.com/SFML/SFML/wiki/Source:-Color-Gradient
-        if (x < _sx || y < _sy)
+        /*if (x < _sx || y < _sy)
         {
             c = _sc;
         }
@@ -97,7 +97,7 @@ inline bool blender_linear_gradient<PixelT>::get_color(int x, int y, pixel32_rgb
         {
             c = _ec;
         }
-        else
+        else*/
         {
             float dot_product = (x - _sx) * _dx + (y - _sy) * _dy;
             float factor = dot_product * _dot_product_1;
@@ -106,7 +106,7 @@ inline bool blender_linear_gradient<PixelT>::get_color(int x, int y, pixel32_rgb
         }
     }
 
-    return true;
+    //return true;
 }
 
 template <typename PixelT>

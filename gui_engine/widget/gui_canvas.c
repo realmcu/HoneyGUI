@@ -543,10 +543,22 @@ static void (svg)(gui_canvas_t *this, void *svg, uint32_t data_length, int x, in
     scale *= scale * this->sx;
     gui_get_acc()->draw_svg(svg, data_length, gui_get_dc(), x, y, scale, 0, 0, 0);
 }
+static void (palette_wheel)(gui_canvas_t *this, canvas_palette_wheel_t *pw)
+{
+    pw->x += GET_BASE(this)->dx;
+    pw->y += GET_BASE(this)->dy;
+    gui_get_acc()->draw_palette_wheel(pw, gui_get_dc());
+}
 static void (wave)(gui_canvas_t *this, canvas_wave_t *wave)
 {
     wave->x += GET_BASE(this)->dx;
     wave->y += GET_BASE(this)->dy;
+    for (size_t i = 0; i < wave->point_count; i++)
+    {
+        wave->point_x[i] += GET_BASE(this)->dx;
+        wave->point_y[i] += GET_BASE(this)->dy;
+    }
+
     gui_get_acc()->draw_wave(wave, gui_get_dc());
 }
 gui_api_canvas_t gui_canvas_api =
@@ -560,4 +572,5 @@ gui_api_canvas_t gui_canvas_api =
     .svg = svg,
     .set_animate = set_animate,
     .wave = wave,
+    .palette_wheel = palette_wheel
 };
