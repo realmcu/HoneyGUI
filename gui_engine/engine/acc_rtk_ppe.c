@@ -3,7 +3,7 @@
 #include <gui_matrix.h>
 #include <rtl876x_ppe.h>
 #include <drv_lcd.h>
-
+#include "trace.h"
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
 
@@ -185,12 +185,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 if (1 || (dc->section.y1 <= rect->y1) && (dc->section.y2 >= rect->y1))
                 {
 
-                    PPE_translate_t trans = {.x = rect->x1, .y = rect->y1 - dc->section.y1};
-                    PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = 0,
-                                        .bottom = (dc->section.y2 - rect->y1) >= source.height ? (source.height - 1) : (dc->section.y2 - rect->y1 - 1)
-                                       };
-                    source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
-                    source.memory = (void *)source.address;
+                    PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
                     PPE_blend(&source, &target, &trans);
                 }
                 else if ((dc->section.y1 <= (rect->y1 + source.height)) &&
@@ -227,11 +222,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 
         if (1 || (dc->section.y1 <= rect->y1) && (dc->section.y2 >= rect->y1))
         {
-
-            PPE_translate_t trans = {.x = rect->x1, .y = rect->y1 - dc->section.y1};
-            PPE_rect_t range = {.left = 0, .right = source.width - 1, .top = 0,
-                                .bottom = (dc->section.y2 - rect->y1) >= source.height ? (source.height - 1) : (dc->section.y2 - rect->y1 - 1)
-                               };
+            PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
             PPE_blend(&source, &target, &trans);
         }
         else if ((dc->section.y1 <= (rect->y1 + source.height)) &&
