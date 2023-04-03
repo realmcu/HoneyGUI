@@ -3,7 +3,6 @@
 #include <gui_matrix.h>
 #include <rtl876x_ppe.h>
 #include <drv_lcd.h>
-#include "trace.h"
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
 
@@ -79,11 +78,25 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     break;
                 case RGB888:
                     scaled_img.format = PPE_BGR888;
-                    //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 3);
+                    if (dc->type == DC_SINGLE)
+                    {
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 3);
+                    }
+                    else if (dc->type == DC_RAMLESS)
+                    {
+                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1) * 3);
+                    }
                     break;
                 case RGBA8888:
                     scaled_img.format = PPE_BGRA8888;
-                    //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 4);
+                    if (dc->type == DC_SINGLE)
+                    {
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 4);
+                    }
+                    else if (dc->type == DC_RAMLESS)
+                    {
+                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1) * 4);
+                    }
                     break;
                 default:
                     return;
@@ -105,19 +118,19 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                         }
                         else
                         {
-                            scale_rect.bottom = (scale_rect.top + dc->fb_height) / scale_x - 1;
+                            scale_rect.bottom = (scale_rect.top + dc->fb_height) / scale_y;
                         }
                         trans.y = (int)image->matrix->m[1][2] - rect->y1;
                     }
                     else if ((dc->section.y2 <= (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1))
                     {
-                        scale_rect.top = (dc->section.y1 - rect->y1) / scale_x;
-                        scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_x - 1;
+                        scale_rect.top = (dc->section.y1 - rect->y1) / scale_y;
+                        scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_y;
                     }
                     else if ((dc->section.y2 >= (rect->y1 + modified_height)) && (dc->section.y1 >= rect->y1)
                              && (dc->section.y1 <= (rect->y1 + modified_height)))
                     {
-                        scale_rect.top = (dc->section.y1 - rect->y1) / scale_x;
+                        scale_rect.top = (dc->section.y1 - rect->y1) / scale_y;
                         scale_rect.bottom = source.height - 1;
                     }
                     else
@@ -176,7 +189,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 {
                     gui_free(scaled_img.memory);
                 }
-
             }
             else
             {
