@@ -85,8 +85,8 @@ inline vector_rasterizer::scanline_cells vector_rasterizer::operator [](int y) c
 {
     histogram::const_iterator offset = _histogram_y.begin() + y - _min_y;
     const const_cells_iterator start = _cells.begin();
-    const scanline_cells sc = { start + *offset++, start + *offset };
-
+    const scanline_cells sc = { start + *offset, start + *(offset + 1) };
+    offset++;
     return sc;
 }
 

@@ -31,7 +31,11 @@ extern "C" {
 #endif
 
 typedef struct NVGcontext NVGcontext;
+#if  defined (__ARMCC_VERSION)
+#ifndef __clang__
 #pragma anon_unions
+#endif
+#endif
 struct NVGcolor
 {
     union
