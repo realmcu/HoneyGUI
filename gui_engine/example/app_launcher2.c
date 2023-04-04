@@ -392,16 +392,18 @@ static int selector_width_begin = 100;
 static int selector_width_end = 418;
 static int selector_width = 100;
 static uint32_t selector_color = 0xd2dbc9ff;
-static int circle_gap = (100 - 50) / (4 - 1);;
-static const int circle_r = 20;
-static const int selector_rx = 25;
-static int circle_cy = selector_rx;
-static int circle_cx = selector_rx;
+static int circle_gap = (100 - 50) / (4 - 1);
+#define APP_LAUNCHER_CIRCLE_R 20
+static const int circle_r = APP_LAUNCHER_CIRCLE_R;
+#define APP_LAUNCHER_SELECTOR_RX 25
+static const int selector_rx = APP_LAUNCHER_SELECTOR_RX;
+static int circle_cy = APP_LAUNCHER_SELECTOR_RX;
+static int circle_cx = APP_LAUNCHER_SELECTOR_RX;
 static const int circle_number = 4;
 static uint32_t circle_color_tab[4] = {0xe67367ff, 0xeab6a2ff, 0x839672ff, 0xe8734cff};
-static uint32_t circle_r_tab[4] = {circle_r, circle_r, circle_r, circle_r};
+static uint32_t circle_r_tab[4] = {APP_LAUNCHER_CIRCLE_R, APP_LAUNCHER_CIRCLE_R, APP_LAUNCHER_CIRCLE_R, APP_LAUNCHER_CIRCLE_R};
 static bool circle_animate;
-static int circle_ani_r_to = selector_rx;
+static int circle_ani_r_to = APP_LAUNCHER_SELECTOR_RX;
 static gui_canvas_t *c1 ;
 static gui_button_t *button_tab[4];
 static gui_d_island_t *island;
