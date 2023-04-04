@@ -1,0 +1,18 @@
+# RTK building script for GuiEngine
+
+import os
+
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Glob('*.c')
+CPPPATH = [cwd]
+
+# CPPDEFINES = ['TEST_DEFINE']
+# group = DefineGroup('vg_lite', src, depend = ['MODULE_VG_LITE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+group = DefineGroup('vg_lite', src, depend = ['VG_LITE_GPU_DEMO'], CPPPATH = CPPPATH)
+
+
+Return('group')

@@ -1,5 +1,4 @@
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanosvg\src\nanosvgrast.h
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanosvg\src\nanosvg.h
+
 *:gui_engine\Third_Party\agge\agge\math.cpp
 *:gui_engine\Third_Party\agge\agge\stroke.cpp
 *:gui_engine\Third_Party\agge\agge\stroke_features.cpp
@@ -16,20 +15,5 @@
 *:gui_engine\Third_Party\nanovg\demos\fill.inc
 *:gui_engine\Third_Party\nanovg\base\stb_image.h
 *:gui_engine\Third_Party\agge\agge\vector_rasterizer.cpp
+*:VGLite\*
 
-*:sdk\src\app\wearable\gui_engine\Third_Party\agge\agge\math.cpp
-*:sdk\src\app\wearable\gui_engine\Third_Party\agge\agge\stroke.cpp
-*:sdk\src\app\wearable\gui_engine\Third_Party\agge\agge\stroke_features.cpp
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\agg\nanovg_agg.cpp
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\agge\nanovg_agge.cpp
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\agge\nanovg_vertex.cpp
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\base\nanovg.c
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\base\fontstash.h
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\base\stb_image.h
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\base\stb_truetype.h
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\bgfx\nanovg_bgfx.cpp
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\demos\agg_draw_image.c
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\demos\agg_fill.c
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\demos\fill.inc
-*:sdk\src\app\wearable\gui_engine\Third_Party\nanovg\base\stb_image.h
-*:sdk\src\app\wearable\gui_engine\Third_Party\agge\agge\vector_rasterizer.cpp
