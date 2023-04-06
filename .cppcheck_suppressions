@@ -16,4 +16,5 @@
 *:gui_engine\Third_Party\nanovg\base\stb_image.h
 *:gui_engine\Third_Party\agge\agge\vector_rasterizer.cpp
 *:VGLite\*
+*:lvgl\*
 
