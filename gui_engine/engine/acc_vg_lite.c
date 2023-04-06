@@ -32,6 +32,19 @@ typedef union
     uint8_t d8[4];
     struct
     {
+        uint8_t A;
+        uint8_t B;
+        uint8_t G;
+        uint8_t R;
+    } channel;
+} ABGR_struct;
+
+typedef union
+{
+    uint32_t d32;
+    uint8_t d8[4];
+    struct
+    {
         uint8_t B;
         uint8_t G;
         uint8_t R;
@@ -52,8 +65,49 @@ typedef union
     } channel;
 } RGBA_struct;
 
+static float clampf(float a, float mn, float mx) { return a < mn ? mn : (a > mx ? mx : a); }
+static float hue(float h, float m1, float m2)
+{
+    if (h < 0) { h += 1; }
+    if (h > 1) { h -= 1; }
+    if (h < 1.0f / 6.0f)
+    {
+        return m1 + (m2 - m1) * h * 6.0f;
+    }
+    else if (h < 3.0f / 6.0f)
+    {
+        return m2;
+    }
+    else if (h < 4.0f / 6.0f)
+    {
+        return m1 + (m2 - m1) * (2.0f / 3.0f - h) * 6.0f;
+    }
+    return m1;
+}
+
+static BGRA_struct HSLA(float h, float s, float l, unsigned char a)
+{
+    float m1, m2;
+    BGRA_struct col;
+    h = fmodf(h, 1.0f);
+    if (h < 0.0f) { h += 1.0f; }
+    s = clampf(s, 0.0f, 1.0f);
+    l = clampf(l, 0.0f, 1.0f);
+    m2 = l <= 0.5f ? (l * (1 + s)) : (l + s - l * s);
+    m1 = 2 * l - m2;
+    col.channel.R = a * clampf(hue(h + 1.0f / 3.0f, m1, m2), 0.0f, 1.0f);
+    col.channel.G = a * clampf(hue(h, m1, m2), 0.0f, 1.0f);
+    col.channel.B = a * clampf(hue(h - 1.0f / 3.0f, m1, m2), 0.0f, 1.0f);
+    col.channel.A = a;
+    return col;
+}
+
 void hw_draw_arc(canvas_arc_t *a, struct gui_dispdev *dc)
 {
+    if (a->start_angle == a->end_angle)
+    {
+        return;
+    }
     vg_lite_buffer_t target;
     memset(&target, 0x00, sizeof(vg_lite_buffer_t));
     vg_lite_blend_t blend_mode = VG_LITE_BLEND_NONE;
@@ -205,14 +259,7 @@ void hw_draw_circle(canvas_circle_t *circle, struct gui_dispdev *dc)
 
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
-//    vg_lite_scale(circle->scale, circle->scale, &matrix);
     vg_lite_scale(scale_ratio, scale_ratio, &matrix);
-
-    vg_lite_translate(227 + 17.197916 * circle->scale, 227 + 17.197916 * circle->scale, &matrix);
-    vg_lite_rotate(90, &matrix);
-    vg_lite_translate(-227 - 17.197916 * circle->scale, -227 - 17.197916 * circle->scale, &matrix);
-    vg_lite_translate(227, 227, &matrix);
-    vg_lite_scale(circle->scale, circle->scale, &matrix);
 
     ARGB_struct in_color = {.d32 = circle->fill.color_data.rgba};
     BGRA_struct fill_color = {.d32 = 0};
@@ -575,6 +622,12 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
 {
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
+    if (rotate_degree != 0)
+    {
+        vg_lite_translate(rotate_center_x, rotate_center_y, &matrix);
+        vg_lite_rotate(rotate_degree, &matrix);
+        vg_lite_translate(-rotate_center_x, -rotate_center_y, &matrix);
+    }
     vg_lite_translate(x, y, &matrix);
     vg_lite_scale(scale, scale, &matrix);
 
@@ -604,6 +657,7 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
     vg_lite_path_ptr *temp_path_record = vg_lite_path_list;
     NSVGimage *image = svg;
     NSVGshape *shape_list = image->shapes;
+
     while (shape_list)
     {
         NSVGpath *path_list = shape_list->paths;
@@ -721,7 +775,6 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
     }
     vg_lite_finish();
     vg_lite_path_ptr *current_ptr;
-    uint32_t i = 0;
     while (vg_lite_path_list)
     {
         current_ptr = vg_lite_path_list;
@@ -748,4 +801,550 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
     //nsvgDelete(image);
 error:
     return;
+}
+
+void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
+{
+    vg_lite_matrix_t matrix;
+    vg_lite_identity(&matrix);
+    vg_lite_translate(wave->x, wave->y, &matrix);
+    vg_lite_buffer_t target;
+
+    memset(&target, 0x00, sizeof(vg_lite_buffer_t));
+
+    vg_lite_blend_t blend_mode = VG_LITE_BLEND_NONE;
+    target.width  = dc->fb_width;
+    target.height = dc->fb_height;
+    if (dc->bit_depth == 16)
+    {
+        target.format = VG_LITE_BGR565;
+        target.stride = target.width * 2;
+    }
+    else
+    {
+        target.format = VG_LITE_BGRA8888;
+        target.stride = target.width * 4;
+    }
+    target.memory = (void *)dc->frame_buf;
+    target.address = (uint32_t)dc->frame_buf;
+    target.tiled = VG_LITE_LINEAR;
+
+    float w = wave->w;
+    float h = wave->h;
+    float x = wave->x;
+    float y = wave->y;
+    float dx = w / 5.0f;
+    float *sx = wave->point_x;
+    float *sy = wave->point_y;
+    // Graph background
+    uint32_t cmd_len = 1;
+    uint32_t data_len = 2;
+    uint8_t *cmd;
+    float *data;
+    cmd = gui_malloc(1);
+    data = gui_malloc(2 * sizeof(float));
+    cmd[0] = VLC_OP_MOVE;
+    data[0] = sx[0];
+    data[1] = sy[0];
+    int i;
+    for (i = 1; i < wave->point_count; i++)
+    {
+        float vals[] = {sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]};
+        gui_realloc(cmd, ++cmd_len);
+        cmd[i] = VLC_OP_CUBIC;
+        gui_realloc(data, sizeof(vals) + data_len * sizeof(float));
+        memcpy(data + data_len, vals, sizeof(vals));
+        data_len += sizeof(vals) / sizeof(float);
+    }
+    gui_realloc(cmd, ++cmd_len);
+    cmd[cmd_len - 1] = VLC_OP_LINE;
+    gui_realloc(data, (data_len + 2) * sizeof(float));
+    data[data_len++] = x + w;
+    data[data_len++] = y + h;
+    gui_realloc(cmd, ++cmd_len);
+    cmd[cmd_len - 1] = VLC_OP_LINE;
+    gui_realloc(data, (data_len + 2) * sizeof(float));
+    data[data_len++] = x;
+    data[data_len++] = y + h;
+    gui_realloc(cmd, ++cmd_len);
+    cmd[cmd_len - 1] = VLC_OP_LINE;
+    gui_realloc(data, (data_len + 2) * sizeof(float));
+    data[data_len++] = sx[0];
+    data[data_len++] = sy[0];
+    gui_realloc(cmd, ++cmd_len);
+    cmd[cmd_len - 1] = VLC_OP_END;
+
+    ABGR_struct in_color = {.d32 = wave->fill.color_data.rgba};
+    BGRA_struct fill_color = {.d32 = 0};
+    fill_color.channel.A = in_color.channel.A;
+    fill_color.channel.R = in_color.channel.R * (in_color.channel.A * 1.0f / 255.0f);
+    fill_color.channel.G = in_color.channel.G * (in_color.channel.A * 1.0f / 255.0f);
+    fill_color.channel.B = in_color.channel.B * (in_color.channel.A * 1.0f / 255.0f);
+    gui_log("input 0x%08x, trans 0x%08x\r\n", in_color.d32, fill_color.d32);
+    uint32_t colors[] = {fill_color.d32, 0};
+    uint32_t stops[] = {0, 255};
+
+    vg_lite_path_t wave_path, stroke_path;
+    vg_lite_linear_gradient_t wave_grad;
+    memset(&wave_grad, 0, sizeof(vg_lite_linear_gradient_t));
+    vg_lite_init_grad(&wave_grad);
+    vg_lite_set_grad(&wave_grad, sizeof(stops) / sizeof(uint32_t), colors, stops);
+    vg_lite_update_grad(&wave_grad);
+    vg_lite_matrix_t *grad_matrix = vg_lite_get_grad_matrix(&wave_grad);
+    vg_lite_identity(grad_matrix);
+    vg_lite_translate(454 / 2.0f, 454 / 2.0f, grad_matrix);
+    vg_lite_rotate(-90, grad_matrix);
+    vg_lite_translate(-454 / 2.0f, -454 / 2.0f, grad_matrix);
+    vg_lite_scale(dc->fb_width / 255.0f, dc->fb_height / 255.0f, grad_matrix);
+
+    memset(&wave_path, 0, sizeof(vg_lite_path_t));
+    memset(&stroke_path, 0, sizeof(vg_lite_path_t));
+
+    uint32_t path_data_len = vg_lite_path_calc_length(cmd, cmd_len, VG_LITE_FP32);
+    vg_lite_init_path(&wave_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
+                      -dc->fb_height, dc->fb_width, dc->fb_height);
+    void *path_data = gui_malloc(path_data_len);
+    wave_path.path = path_data;
+    vg_lite_path_append(&wave_path, cmd, data, cmd_len);
+    vg_lite_draw_gradient(&target, &wave_path, VG_LITE_FILL_NON_ZERO,
+                          &matrix, &wave_grad, VG_LITE_BLEND_SRC_OVER);
+
+    path_data_len = vg_lite_path_calc_length(cmd, cmd_len - 4, VG_LITE_FP32);
+    vg_lite_init_path(&stroke_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
+                      -dc->fb_height, dc->fb_width, dc->fb_height);
+    void *stroke_data = gui_malloc(path_data_len);
+    stroke_path.path = stroke_data;
+    vg_lite_path_append(&stroke_path, cmd, data, cmd_len - 4);
+    vg_lite_set_stroke(&stroke_path, VG_LITE_CAP_ROUND,
+                       VG_LITE_JOIN_ROUND, 2.8, 6,
+                       NULL, 0, 0);
+    vg_lite_update_stroke(&stroke_path);
+    vg_lite_set_draw_path_type(&stroke_path, VG_LITE_DRAW_STROKE_PATH);
+    vg_lite_draw(&target, &stroke_path, VG_LITE_FILL_NON_ZERO, &matrix,
+                 VG_LITE_BLEND_NONE,
+                 fill_color.d32);
+
+    uint8_t circle_cmd[] = {    VLC_OP_MOVE,
+                                VLC_OP_LCWARC,
+                                VLC_OP_LCWARC,
+                                VLC_OP_END,
+                           };
+
+    vg_lite_path_ptr *root_ptr = gui_malloc(sizeof(vg_lite_path_ptr));
+    memset(root_ptr, 0, sizeof(vg_lite_path_ptr));
+    vg_lite_path_ptr *probe = root_ptr;
+    for (i = 0; i < wave->point_count; i++)
+    {
+        float radius = 4.0f;
+        float circle_data[] =
+        {
+            sx[i], sy[i] - radius,
+            radius, radius, 0, 0 + sx[i], radius + sy[i],
+            radius, radius, 0, 0 + sx[i], -radius + sy[i],
+        };
+        uint32_t data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
+        vg_lite_init_path(&probe->path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, dc->fb_width,
+                          dc->fb_height, -dc->fb_width, -dc->fb_height);
+        void *path_data = gui_malloc(data_len);
+        probe->path.path = path_data;
+        probe->path_data = path_data;
+        vg_lite_path_append(&probe->path, circle_cmd, circle_data, sizeof(circle_cmd));
+        vg_lite_draw(&target, &probe->path, VG_LITE_FILL_NON_ZERO, &matrix,
+                     VG_LITE_BLEND_SRC_OVER, 0xFFc0a000);
+        probe->next = gui_malloc(sizeof(vg_lite_path_ptr));
+        probe = probe->next;
+        memset(probe, 0, sizeof(vg_lite_path_ptr));
+
+        radius = 2.0f;
+        float top_circle_data[] =
+        {
+            sx[i], sy[i] - radius,
+            radius, radius, 0, 0 + sx[i], radius + sy[i],
+            radius, radius, 0, 0 + sx[i], -radius + sy[i],
+        };
+        data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
+        vg_lite_init_path(&probe->path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, dc->fb_width,
+                          dc->fb_height, -dc->fb_width, -dc->fb_height);
+        void *top_path_data = gui_malloc(data_len);
+        probe->path.path = top_path_data;
+        probe->path_data = top_path_data;
+        vg_lite_path_append(&probe->path, circle_cmd, top_circle_data, sizeof(circle_cmd));
+        vg_lite_draw(&target, &probe->path, VG_LITE_FILL_NON_ZERO, &matrix,
+                     VG_LITE_BLEND_SRC_OVER, 0xFFDCDCDC);
+        probe->next = gui_malloc(sizeof(vg_lite_path_ptr));
+        probe = probe->next;
+        memset(probe, 0, sizeof(vg_lite_path_ptr));
+    }
+
+    vg_lite_finish();
+    gui_free(path_data);
+    gui_free(data);
+    gui_free(cmd);
+    gui_free(stroke_data);
+    vg_lite_clear_path(&stroke_path);
+    vg_lite_clear_path(&wave_path);
+    vg_lite_clear_grad(&wave_grad);
+    vg_lite_path_ptr *current_ptr;
+    while (root_ptr)
+    {
+        current_ptr = root_ptr;
+        vg_lite_clear_path(&root_ptr->path);
+        if (root_ptr->p_grad)
+        {
+            free(root_ptr->p_grad->colors);
+            free(root_ptr->p_grad->stops);
+            root_ptr->p_grad->colors = NULL;
+            root_ptr->p_grad->stops = NULL;
+            vg_lite_clear_grad(&root_ptr->p_grad->grad);
+            free(root_ptr->p_grad);
+            root_ptr->p_grad = NULL;
+        }
+        if (root_ptr->path_data)
+        {
+            free(root_ptr->path_data);
+            root_ptr->path_data = NULL;
+        }
+        root_ptr = root_ptr->next;
+        free(current_ptr);
+        current_ptr = NULL;
+    }
+}
+
+void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *dc)
+{
+    vg_lite_matrix_t matrix;
+    vg_lite_buffer_t target;
+
+    memset(&target, 0x00, sizeof(vg_lite_buffer_t));
+
+    vg_lite_blend_t blend_mode = VG_LITE_BLEND_NONE;
+    target.width  = dc->fb_width;
+    target.height = dc->fb_height;
+    if (dc->bit_depth == 16)
+    {
+        target.format = VG_LITE_BGR565;
+        target.stride = target.width * 2;
+    }
+    else
+    {
+        target.format = VG_LITE_BGRA8888;
+        target.stride = target.width * 4;
+    }
+    target.memory = (void *)dc->frame_buf;
+    target.address = (uint32_t)dc->frame_buf;
+    target.tiled = VG_LITE_LINEAR;
+
+    int i;
+    float r0, r1, r2, ax, ay, bx, by, cx, cy, aeps, r;
+    float hue = sinf(pw->selector_radian * 0.12f);
+    float rotate_angle = hue * 360.0f;
+
+    cx = pw->x + pw->w * 0.5f;
+    cy = pw->y + pw->h * 0.5f;
+    r1 = (pw->w < pw->h ? pw->w : pw->h) * 0.5f - 15.0f;
+    r0 = r1 - 20.0f;
+    r2 = r1 + 9.0f;
+    aeps = 0.3f / r1;   // half a pixel arc length in radians (2pi cancels out).
+
+    float a0 = aeps;
+    float a1 = 1.0f * PI / 3.0f - aeps;
+
+
+    vg_lite_path_ptr arc_path[6];
+    memset(&arc_path, 0, sizeof(arc_path));
+    for (i = 0; i < 6; i++)
+    {
+        float a0 = (float)i / 6.0f * PI * 2.0f - aeps;
+        float a1 = (float)(i + 1.0f) / 6.0f * PI * 2.0f + aeps;
+
+        ax = cx + cosf(a0) * (r0 + r1) * 0.5f;
+        ay = cy + sinf(a0) * (r0 + r1) * 0.5f;
+        bx = cx + cosf(a1) * (r0 + r1) * 0.5f;
+        by = cy + sinf(a1) * (r0 + r1) * 0.5f;
+
+        uint8_t arc_cmd[] =
+        {
+            VLC_OP_MOVE,
+            VLC_OP_SCWARC,
+            VLC_OP_LINE,
+            VLC_OP_SCCWARC,
+            VLC_OP_LINE,
+            VLC_OP_END
+        };
+
+        float arc_data[] =
+        {
+            cx + cosf(a0) *r1, cy + sinf(a0) *r1,
+            r1, r1, 0, cx + cosf(a1) *r1, cy + sinf(a1) *r1,
+            cx + cosf(a1) *r0, cy + sinf(a1) *r0,
+            r0, r0, 0, cx + cosf(a0) *r0, cy + sinf(a0) *r0,
+            cx + cosf(a0) *r1, cy + sinf(a0) *r1,
+        };
+
+        memset(&arc_path[i].path, 0, sizeof(vg_lite_path_t));
+
+        uint32_t path_data_len = vg_lite_path_calc_length(arc_cmd, sizeof(arc_cmd), VG_LITE_FP32);
+        vg_lite_init_path(&arc_path[i].path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
+                          -dc->fb_height, dc->fb_width, dc->fb_height);
+        void *path_data = gui_malloc(path_data_len);
+        arc_path[i].path.path = path_data;
+        arc_path[i].path_data = path_data;
+        vg_lite_path_append(&arc_path[i].path, arc_cmd, arc_data, sizeof(arc_cmd));
+
+        BGRA_struct from_color = HSLA(a0 / (PI * 2.0f), 1.0f, 0.55f, 255);
+        BGRA_struct to_color = HSLA(a1 / (PI * 2.0f), 1.0f, 0.55f, 255);
+        uint32_t colors[] = {from_color.d32, to_color.d32};
+        uint32_t stops[] = {0, 255};
+        arc_path[i].p_grad = gui_malloc(sizeof(vg_lite_grad_ptr));
+        memset(arc_path[i].p_grad, 0, sizeof(vg_lite_grad_ptr));
+        vg_lite_init_grad(&arc_path[i].p_grad->grad);
+        vg_lite_set_grad(&arc_path[i].p_grad->grad, sizeof(stops) / sizeof(uint32_t), colors, stops);
+        vg_lite_update_grad(&arc_path[i].p_grad->grad);
+        vg_lite_matrix_t *grad_matrix = vg_lite_get_grad_matrix(&arc_path[i].p_grad->grad);
+        vg_lite_identity(grad_matrix);
+        vg_lite_translate(cx + cosf(a0) * r0, cy + sinf(a0) * r0, grad_matrix);
+        vg_lite_rotate(120 + a0 * 180 / PI, grad_matrix);
+        vg_lite_scale(r0 / 256.0f, 1, grad_matrix);
+        vg_lite_identity(&matrix);
+        vg_lite_translate(pw->x, pw->y, &matrix);
+        vg_lite_draw_gradient(&target, &arc_path[i].path, VG_LITE_FILL_EVEN_ODD,
+                              &matrix, &arc_path[i].p_grad->grad, VG_LITE_BLEND_SRC_OVER);
+    }
+
+    r = r0 - 6;
+    ax = cosf(120.0f / 180.0f * PI) * r;
+    ay = sinf(120.0f / 180.0f * PI) * r;
+    bx = cosf(-120.0f / 180.0f * PI) * r;
+    by = sinf(-120.0f / 180.0f * PI) * r;
+    uint8_t tri_cmd[] =
+    {
+        VLC_OP_MOVE,
+        VLC_OP_LINE,
+        VLC_OP_LINE,
+        VLC_OP_END,
+    };
+
+    float tri_data[] =
+    {
+        r, 0,
+        ax, ay,
+        bx, by,
+    };
+    BGRA_struct tri_base = HSLA(hue, 1.0f, 0.5f, 255);
+    uint32_t tri_white_colors[] = {tri_base.d32, 0xFFFFFFFF};
+    uint32_t tri_black_colors[] = {0x00000000, 0xFF000000};
+    uint32_t tri_stops[] = {0, 255};
+
+    vg_lite_linear_gradient_t tri_white_grad, tri_black_grad;
+    memset(&tri_white_grad, 0, sizeof(vg_lite_linear_gradient_t));
+    vg_lite_init_grad(&tri_white_grad);
+    vg_lite_set_grad(&tri_white_grad, sizeof(tri_white_colors) / sizeof(uint32_t), tri_white_colors,
+                     tri_stops);
+    vg_lite_update_grad(&tri_white_grad);
+    vg_lite_matrix_t *tri_white_mat = vg_lite_get_grad_matrix(&tri_white_grad);
+    vg_lite_identity(tri_white_mat);
+    vg_lite_translate(cx + r * cosf(rotate_angle / 180.f * PI), cy + sinf(rotate_angle / 180.f * PI),
+                      tri_white_mat);
+    vg_lite_rotate(150  + rotate_angle, tri_white_mat);
+    vg_lite_scale(r * 1.732051 / 255.0f, 1, tri_white_mat);
+
+
+    memset(&tri_black_grad, 0, sizeof(vg_lite_linear_gradient_t));
+    vg_lite_init_grad(&tri_black_grad);
+    vg_lite_set_grad(&tri_black_grad, sizeof(tri_white_colors) / sizeof(uint32_t), tri_black_colors,
+                     tri_stops);
+    vg_lite_update_grad(&tri_black_grad);
+    vg_lite_matrix_t *tri_black_mat = vg_lite_get_grad_matrix(&tri_black_grad);
+    vg_lite_identity(tri_black_mat);
+    vg_lite_translate(cx + r / 2.0f * cosf((60 + rotate_angle) / 180 * PI),
+                      r / 2.0f * sinf((60 + rotate_angle) / 180 * PI) + cy, tri_black_mat);
+    vg_lite_scale(r * 1.5 / 255.0f, 1, tri_black_mat);
+    vg_lite_rotate(-120 + rotate_angle, tri_black_mat);
+
+    vg_lite_path_t tri_path;
+    memset(&tri_path, 0, sizeof(tri_path));
+    uint32_t path_data_len = vg_lite_path_calc_length(tri_cmd, sizeof(tri_cmd), VG_LITE_FP32);
+    vg_lite_init_path(&tri_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
+                      -dc->fb_height, dc->fb_width, dc->fb_height);
+    void *tri_path_data = gui_malloc(path_data_len);
+    tri_path.path = tri_path_data;
+    vg_lite_path_append(&tri_path, tri_cmd, tri_data, sizeof(tri_cmd));
+    vg_lite_identity(&matrix);
+    vg_lite_translate(cx, cy, &matrix);
+    vg_lite_rotate(rotate_angle, &matrix);
+    vg_lite_draw_gradient(&target, &tri_path, VG_LITE_FILL_NON_ZERO,
+                          &matrix, &tri_white_grad, VG_LITE_BLEND_SRC_OVER);
+    vg_lite_draw_gradient(&target, &tri_path, VG_LITE_FILL_NON_ZERO,
+                          &matrix, &tri_black_grad, VG_LITE_BLEND_SRC_OVER);
+
+    uint8_t rect_cmd[] =
+    {
+        VLC_OP_MOVE,
+        VLC_OP_LINE_REL,
+        VLC_OP_LINE_REL,
+        VLC_OP_LINE_REL,
+        VLC_OP_END,
+    };
+
+    float rect_data[] =
+    {
+        r0 - 1, -3,
+        (r1 - r0 + 2), 0,
+        0, 6,
+        -(r1 - r0 + 2), 0,
+    };
+
+    vg_lite_path_t rect_path;
+    memset(&rect_path, 0, sizeof(rect_path));
+    path_data_len = vg_lite_path_calc_length(rect_cmd, sizeof(rect_cmd), VG_LITE_FP32);
+    vg_lite_init_path(&rect_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
+                      -dc->fb_height, dc->fb_width, dc->fb_height);
+    void *rect_path_data = gui_malloc(path_data_len);
+    rect_path.path = rect_path_data;
+    vg_lite_path_append(&rect_path, rect_cmd, rect_data, sizeof(rect_cmd));
+    vg_lite_set_stroke(&rect_path, VG_LITE_CAP_ROUND,
+                       VG_LITE_JOIN_ROUND, 3.0f, 6,
+                       NULL, 0, 0);
+    vg_lite_update_stroke(&rect_path);
+    vg_lite_set_draw_path_type(&rect_path, VG_LITE_DRAW_STROKE_PATH);
+
+    BGRA_struct rect_color = {.d32 = 0};
+    rect_color.channel.A = 255;
+    rect_color.channel.R = 255 * (rect_color.channel.A / 255.0f);
+    rect_color.channel.G = 255 * (rect_color.channel.A / 255.0f);
+    rect_color.channel.B = 255 * (rect_color.channel.A / 255.0f);
+    vg_lite_draw(&target, &rect_path, VG_LITE_FILL_NON_ZERO, &matrix,
+                 VG_LITE_BLEND_NONE,
+                 rect_color.d32);
+
+
+    uint8_t circle_cmd[] = {    VLC_OP_MOVE,
+                                VLC_OP_LCWARC,
+                                VLC_OP_LCWARC,
+                                VLC_OP_END,
+                           };
+
+    float cpx = cx + (r0 - 6) / 4, cpy = cy + (r0 - 6) / 3;
+    if (((cpx - cx) * (cpx - cx) + (cpy - cy) * (cpy - cy) - (r0 - 6) * (r0 - 6)) >= 0)
+    {
+        cpx = cx;
+        cpy = cy;
+    }
+    float small_circle_data[] =
+    {
+        cpx, cpy - 5,
+        5, 5, 0, 0 + cpx, 5 + cpy,
+        5, 5, 0, 0 + cpx, -5 + cpy,
+    };
+
+    float big_circle_data[] =
+    {
+        cpx, cpy - 7,
+        7, 7, 0, 0 + cpx, 7 + cpy,
+        7, 7, 0, 0 + cpx, -7 + cpy,
+    };
+
+    vg_lite_path_t circle_small_path, circle_big_path, circle_display_path;
+    memset(&circle_small_path, 0, sizeof(vg_lite_path_t));
+    memset(&circle_big_path, 0, sizeof(vg_lite_path_t));
+    vg_lite_identity(&matrix);
+
+    path_data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
+    vg_lite_init_path(&circle_small_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL,
+                      -dc->fb_width,
+                      -dc->fb_height, dc->fb_width, dc->fb_height);
+    void *s_circle_path_data = gui_malloc(path_data_len);
+    circle_small_path.path = s_circle_path_data;
+    vg_lite_path_append(&circle_small_path, circle_cmd, small_circle_data, sizeof(circle_cmd));
+    vg_lite_set_stroke(&circle_small_path, VG_LITE_CAP_ROUND,
+                       VG_LITE_JOIN_ROUND, 2.0f, 6,
+                       NULL, 0, 0);
+    vg_lite_update_stroke(&circle_small_path);
+    vg_lite_set_draw_path_type(&circle_small_path, VG_LITE_DRAW_STROKE_PATH);
+    vg_lite_draw(&target, &circle_small_path, VG_LITE_FILL_NON_ZERO, &matrix,
+                 VG_LITE_BLEND_SRC_OVER,
+                 0xC0C0C0C0);
+
+    vg_lite_init_path(&circle_big_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
+                      -dc->fb_height, dc->fb_width, dc->fb_height);
+    void *b_circle_path_data = gui_malloc(path_data_len);
+    circle_big_path.path = b_circle_path_data;
+    vg_lite_path_append(&circle_big_path, circle_cmd, big_circle_data, sizeof(circle_cmd));
+    vg_lite_set_stroke(&circle_big_path, VG_LITE_CAP_ROUND,
+                       VG_LITE_JOIN_ROUND, 2.0f, 6,
+                       NULL, 0, 0);
+    vg_lite_update_stroke(&circle_big_path);
+    vg_lite_set_draw_path_type(&circle_big_path, VG_LITE_DRAW_STROKE_PATH);
+    vg_lite_draw(&target, &circle_big_path, VG_LITE_FILL_NON_ZERO, &matrix,
+                 VG_LITE_BLEND_SRC_OVER,
+                 0x40000000);
+
+    vg_lite_finish();
+    float display_circle_data[] =
+    {
+        cx, cy - r2 / 3,
+        r2 / 3, r2 / 3, 0, 0 + cx, r2 / 3 + cy,
+        r2 / 3, r2 / 3, 0, 0 + cx, -r2 / 3 + cy,
+    };
+    uint32_t gpu_width = ((dc->fb_width + 15) >> 4) << 4;
+    uint32_t disp_color = 0;
+    if (dc->bit_depth == 16)
+    {
+        uint16_t color = *(uint16_t *)((uint8_t *)dc->frame_buf + ((int)cpx + (int)cpy * gpu_width) * 2);
+    }
+    else
+    {
+        BGRA_struct color = {.d32 = *(uint32_t *)((uint8_t *)dc->frame_buf + ((int)cpx + (int)cpy * gpu_width) * 4)};
+        uint8_t temp = color.channel.R;
+        color.channel.R = color.channel.B;
+        color.channel.B = temp;
+        disp_color = color.d32;
+    }
+    vg_lite_init_path(&circle_display_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL,
+                      -dc->fb_width,
+                      -dc->fb_height, dc->fb_width, dc->fb_height);
+    void *disp_circle_path_data = gui_malloc(path_data_len);
+    circle_display_path.path = disp_circle_path_data;
+    vg_lite_path_append(&circle_display_path, circle_cmd, display_circle_data, sizeof(circle_cmd));
+    vg_lite_set_stroke(&circle_display_path, VG_LITE_CAP_ROUND,
+                       VG_LITE_JOIN_ROUND, 2.5f, 6,
+                       NULL, 0, 0);
+    vg_lite_update_stroke(&circle_display_path);
+    vg_lite_set_draw_path_type(&circle_display_path, VG_LITE_DRAW_STROKE_PATH);
+    vg_lite_identity(&matrix);
+    vg_lite_translate(cx, cy, &matrix);
+    vg_lite_scale(3, 3, &matrix);
+    vg_lite_translate(-cx, -cy, &matrix);
+    vg_lite_draw(&target, &circle_display_path, VG_LITE_FILL_NON_ZERO, &matrix,
+                 VG_LITE_BLEND_SRC_OVER,
+                 disp_color);
+    vg_lite_finish();
+
+    for (i = 0; i < 6; i++)
+    {
+        vg_lite_clear_path(&arc_path[i].path);
+        if (arc_path[i].p_grad)
+        {
+            vg_lite_clear_grad(&arc_path[i].p_grad->grad);
+            free(arc_path[i].p_grad);
+            arc_path[i].p_grad = NULL;
+        }
+        if (arc_path[i].path_data)
+        {
+            free(arc_path[i].path_data);
+            arc_path[i].path_data = NULL;
+        }
+    }
+    vg_lite_clear_path(&tri_path);
+    gui_free(tri_path_data);
+    vg_lite_clear_path(&rect_path);
+    gui_free(rect_path_data);
+    vg_lite_clear_grad(&tri_white_grad);
+    vg_lite_clear_grad(&tri_black_grad);
+    gui_free(s_circle_path_data);
+    gui_free(b_circle_path_data);
+    vg_lite_clear_path(&circle_big_path);
+    vg_lite_clear_path(&circle_small_path);
+    gui_free(disp_circle_path_data);
+    vg_lite_clear_path(&circle_display_path);
 }

@@ -26,6 +26,9 @@ extern void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc);
 extern void hw_draw_circle(canvas_circle_t *circle, struct gui_dispdev *dc);
 extern void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
                             float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);
+extern void hw_acc_draw_wave(canvas_wave_t *wave, struct gui_dispdev *dc);
+extern void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *dc);
+
 extern void (nanovg_draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
 extern void (nanovg_draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
 extern void (nanovg_draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
@@ -46,6 +49,8 @@ void gui_acc_init(void)
     acc.draw_path = sw_draw_path;
     acc.draw_polyline = sw_draw_polyline;
     acc.draw_svg = hw_acc_draw_svg;
+    acc.draw_wave = hw_acc_draw_wave;
+    acc.draw_palette_wheel = hw_acc_draw_palette_wheel;
 #elif defined (MODULE_RTK_PPE)
     RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
     acc.blit = hw_acc_blit;
