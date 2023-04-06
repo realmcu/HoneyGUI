@@ -25,7 +25,7 @@ extern void hw_draw_line(canvas_line_t *l, struct gui_dispdev *dc);
 extern void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc);
 extern void hw_draw_circle(canvas_circle_t *circle, struct gui_dispdev *dc);
 extern void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
-                            float scale);
+                            float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);
 extern void (nanovg_draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
 extern void (nanovg_draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
 extern void (nanovg_draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);

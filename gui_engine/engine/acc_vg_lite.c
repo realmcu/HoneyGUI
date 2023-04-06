@@ -571,7 +571,7 @@ typedef struct vg_lite_path_ptr
 
 
 void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
-                     float scale)
+                     float scale, float rotate_degree, float rotate_center_x, float rotate_center_y)
 {
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
