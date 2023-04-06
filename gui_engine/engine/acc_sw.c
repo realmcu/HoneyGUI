@@ -68,7 +68,8 @@ void (nanovg_bezier_to)(canvas_path_t *data, float c1x, float c1y, float c2x, fl
                         float y);
 void (nanovg_LineTo)(canvas_path_t *data, float x, float y);
 
-void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, float t)
+void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, float t, float point_x,
+                    float point_y)
 {
     int i;
     float r0, r1, ax, ay, bx, by, cx, cy, aeps, r;
@@ -97,31 +98,11 @@ void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, float t)
         nvgBeginPath(vg);
         nvgArc(vg, cx, cy, r0, a0, a1, NVG_CW);
         nvgArc(vg, cx, cy, r1, a1, a0, NVG_CCW);
-        //nvgRect(vg, ax, ay, bx-ax, by-ay);
+
         nvgClosePath(vg);
 
         NVGcolor cfrom = nvgHSLA(a0 / (NVG_PI * 2), 1.0f, 0.55f, 255);
         NVGcolor cto = nvgHSLA(a1 / (NVG_PI * 2), 1.0f, 0.55f, 255);
-        /*
-                if (ax>bx)
-                {
-                    float temp = ax;
-                    ax = bx;
-                    bx = temp;
-                    NVGcolor t = cfrom;
-                    cfrom = cto;
-                    cto = t;
-                }
-                if (ay>by)
-                {
-                    float temp = ay;
-                    ay = by;
-                    by = temp;
-                    NVGcolor t = cfrom;
-                    cfrom = cto;
-                    cto = t;
-                }
-                */
         paint = nvgLinearGradient(vg, ax, ay, bx, by, cfrom, cto);
         //paint = nvgLinearGradient(vg, ax,ay, bx,by, nvgRGBA(255, 0,0,255), nvgRGBA(0, 255,0,255));
         //gui_log("%f, %f, %f, %f,\n", ax, ay, bx, by);
@@ -142,10 +123,10 @@ void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, float t)
     nvgRotate(vg, hue * NVG_PI * 2);
 
     // Marker on
-    nvgStrokeWidth(vg, 2.0f);
+    nvgStrokeWidth(vg, 4.0f);
     nvgBeginPath(vg);
     nvgRect(vg, r0 - 1, -3, r1 - r0 + 2, 6);
-    nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 192));
+    nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 255));
     nvgStroke(vg);
 
     paint = nvgBoxGradient(vg, r0 - 3, -5, r1 - r0 + 6, 10, 2, 4, nvgRGBA(0, 0, 0, 128), nvgRGBA(0, 0,
@@ -206,7 +187,7 @@ void (nanovg_draw_palette_wheel)(canvas_palette_wheel_t *pw, struct gui_dispdev 
                                    (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
     nvgSave(vg);
-    drawColorwheel(vg, pw->x, pw->y, pw->w, pw->h, pw->selector_radian);
+    drawColorwheel(vg, pw->x, pw->y, pw->w, pw->h, pw->selector_radian, pw->point_x, pw->point_y);
     nvgRestore(vg);
     nvgEndFrame(vg);
 
@@ -233,14 +214,16 @@ void (nanovg_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
                            nvgRGBA(wave->fill.color_data.rgba >> 24, wave->fill.color_data.rgba >> 16,
                                    wave->fill.color_data.rgba >> 8, wave->fill.color_data.rgba));
     nvgBeginPath(vg);
-    nvgMoveTo(vg, sx[0], sy[0]);
+    nvgMoveTo(vg, sx[0], sy[0]); gui_log("nvgMoveTo:(%f,%f)\n", sx[0], sy[0]);
     int i;
     for (i = 1; i < wave->point_count; i++)
     {
         nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
+        gui_log("Bezier%d:c1(%f,%f),c2(%f,%f),point(%f,%f)\n", i, sx[i - 1] + dx * 0.5f, sy[i - 1],
+                sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
     }
-    nvgLineTo(vg, x + w, y + h);
-    nvgLineTo(vg, x, y + h);
+    nvgLineTo(vg, x + w, y + h); gui_log("nvgLineTo:(%f,%f)\n", x + w, y + h);
+    nvgLineTo(vg, x, y + h); gui_log("nvgLineTo:(%f,%f)\n", x, y + h);
     nvgFillPaint(vg, bg);
     nvgFill(vg);
 

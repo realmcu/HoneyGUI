@@ -186,6 +186,8 @@ typedef struct canvas_palette_wave
     float x;
     float y;
     float selector_radian;
+    float point_x;
+    float point_y;
 } canvas_palette_wheel_t;
 
 typedef struct acc_engine

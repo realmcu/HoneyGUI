@@ -199,7 +199,8 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 }
 static void island_ctor(gui_d_island_t *this, gui_obj_t *parent)
 {
-    gui_obj_ctor((void *)this, parent, "_island", 0, 0, 0, 0);
+    gui_obj_ctor((void *)this, parent, "_island", 0, 0, gui_get_screen_width(),
+                 gui_get_screen_height());
     this->base.w = 100;
     this->base.h = 50;
     this->base.y = 20;
@@ -224,7 +225,7 @@ gui_d_island_t *gui_d_island_create(void *parent)
                                &(((gui_obj_t *)this)->brother_list));
     }
     this->canvas = gui_canvas_create(this, "_island", 0,
-                                     0, this->base.w, this->base.h, 0xffffffff);
+                                     0, gui_get_screen_width(), gui_get_screen_height(), 0xffffffff);
     this->canvas->draw = draw;
     ((gui_obj_t *)this)->create_done = 1;
     return this;

@@ -545,18 +545,29 @@ static void (svg)(gui_canvas_t *this, void *svg, uint32_t data_length, int x, in
 }
 static void (palette_wheel)(gui_canvas_t *this, canvas_palette_wheel_t *pw)
 {
-    pw->x += GET_BASE(this)->dx;
-    pw->y += GET_BASE(this)->dy;
+    pw->x += GET_BASE(this)->dx + this->tx;
+    pw->y += GET_BASE(this)->dy + this->ty;
+    pw->w = pw->w * this->sx;
+    pw->h = pw->h * this->sx;
     gui_get_acc()->draw_palette_wheel(pw, gui_get_dc());
+}
+static float get_scale_offset_x(float x, float scale_x)
+{
+    /**
+     * @note (1-scale)(center-x)
+     *
+     */
+    return (1.0f - scale_x) * (((float)(gui_get_screen_width() / 2)) - (float)(x));
 }
 static void (wave)(gui_canvas_t *this, canvas_wave_t *wave)
 {
-    wave->x += GET_BASE(this)->dx;
-    wave->y += GET_BASE(this)->dy;
+    wave->x += GET_BASE(this)->dx + this->tx;
+    wave->y += GET_BASE(this)->dy + this->ty; wave->w = wave->w * this->sx;
+    wave->h = wave->h * this->sx;
     for (size_t i = 0; i < wave->point_count; i++)
     {
-        wave->point_x[i] += GET_BASE(this)->dx;
-        wave->point_y[i] += GET_BASE(this)->dy;
+        wave->point_x[i] += GET_BASE(this)->dx + get_scale_offset_x(wave->point_x[i], this->sx);
+        wave->point_y[i] += GET_BASE(this)->dy + get_scale_offset_x(wave->point_y[i], this->sy);
     }
 
     gui_get_acc()->draw_wave(wave, gui_get_dc());

@@ -44,7 +44,7 @@ void gui_img_rotation(gui_magic_img_t *img, float degrees, float c_x, float c_y)
 
 void gui_img_scale(gui_magic_img_t *img, float scale_x, float scale_y);
 void gui_img_translate(gui_magic_img_t *img, float t_x, float t_y);
-
+void gui_img_set_opacity(gui_magic_img_t *this, unsigned char opacity_value);
 void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *dc);
 gui_magic_img_t *gui_svg_create_from_mem(void *parent, void *data, uint32_t data_size,
                                          int16_t x, int16_t y, int16_t w, int16_t h);

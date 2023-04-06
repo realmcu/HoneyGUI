@@ -243,9 +243,9 @@ static void deal_img_in_root(gui_obj_t *object, float xx, float yy)
                 {
                     gui_canvas_t *img = (void *)obj;
                     gui_canvas_api.scale(img, x, y);
-                    gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x) / x,
+                    gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x),
                                              get_scale_offset_y((void *)img,
-                                                                x) / y);
+                                                                x));
                     img->opacity_value = x * UINT8_MAX;
                 }
                 break;

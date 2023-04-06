@@ -264,7 +264,13 @@ static void svg_draw_cb(gui_obj_t *obj)
     int y = obj->dy + img->t_y;
     float scale = img->scale_x;
     uint32_t svg_len = (uint32_t)img->base.draw_img.engine;
-    gui_get_acc()->draw_svg(img->base.draw_img.data, svg_len, gui_get_dc(), x, y,
+    NSVGshape *shape;
+    NSVGimage *image = img->base.draw_img.data;
+    for (shape = image->shapes; shape != NULL; shape = shape->next)
+    {
+        shape->opacity = ((float)(int)(img->base.draw_img.opacity_value)) / 255.0f;
+    }
+    gui_get_acc()->draw_svg(img->base.draw_img.data, svg_len, gui_get_dc(), x + img->t_x, y + img->t_y,
                             scale, 0, 0, 0);
 
 }

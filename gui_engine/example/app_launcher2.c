@@ -15,6 +15,7 @@
 #include "gui_tab.h"
 #include "gui_grid.h"
 #include <gui_dynamic_img.h>
+#include "tp_algo.h"
 #ifdef MODULE_VG_LITE
 #include "gui_vg_lite_clock.h"
 #include "gui_cube.h"
@@ -160,7 +161,7 @@ static void watchface1(void *parent)
     gui_vg_lite_clock_t *path_clock = gui_vg_lite_clock_create(parent,  "path_clock", NULL, 0, 0,
                                                                454, 454);
 #else
-    gui_button_create(parent, 252, 57, 100, 100, ACTIVITY_SVG, NULL, NULL, 2, 5134);
+    //gui_button_create(parent, 252, 57, 100, 100, ACTIVITY_SVG, NULL, NULL, 2, 5134);
 #endif
 
 }
@@ -272,17 +273,17 @@ gui_button_t *cube_button;
 gui_button_t *hr_button;
 gui_tabview_t *tv;
 
-static void text_color_cb(gui_event_t e)
+void text_color_cb(gui_event_t e)
 {
 
     gui_tab_jump(tv, 1, 0);
 }
-static void cube_button_cb(gui_event_t e)
+void cube_button_cb(gui_event_t e)
 {
 
     gui_tab_jump(tv, 0, 1);
 }
-static void hr_button_cb(gui_event_t e)
+void hr_button_cb(gui_event_t e)
 {
 
     gui_tab_jump(tv, 2, 0);
@@ -299,6 +300,153 @@ static void curtain1(void *curtian)
                                                            470 - 120 * 2, 0, 59, 40, INT32_MAX);
     gui_img_scale(charge_img, 2, 2);
 }
+
+static void sport_button_press_ani_cb(gui_button_t *button)
+{
+    float per = (button->animate->progress_percent);
+    float alpha_to = 100;
+    static float alpha_from = 0;
+    static float from = 0;
+    if (per == 0.0f)
+    {
+        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        alpha_from = button->img->draw_img.opacity_value;
+    }
+    from = 1.0f;
+    float scale = (-0.5f * from) * per + from;
+    //circle_color_tab[1] = change_opacity_of_rgba(circle_color_tab[1],
+    //                                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_scale((void *)button->img, scale,  scale);
+    gui_img_translate((void *)button->img, 25.0f * (from - scale),  25.0f * (from - scale));
+    gui_img_set_opacity((void *)button->img,
+                        (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_log("o:%f\n", 25.0f * (from - scale));
+}
+static void sport_button_release_ani_cb(gui_button_t *button)
+{
+    float per = (button->animate->progress_percent);
+    float alpha_to = UINT8_MAX;
+    static float alpha_from = 0;
+    static float from = 0;
+    if (per == 0.0f)
+    {
+        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        alpha_from = button->img->draw_img.opacity_value;
+    }
+    //from = 1.25f;
+    float scale = (1.0f - from) * per + from;
+    //circle_color_tab[1] = change_opacity_of_rgba(circle_color_tab[1],
+    //                                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_set_opacity((void *)button->img,
+                        (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_scale((void *)button->img, scale,  scale);
+    gui_img_translate((void *)button->img, 25.0f * (1.0f - scale),  25.0f * (1.0f - scale));
+}
+static void cube_button_press_ani_cb(gui_button_t *button)
+{
+    float per = (button->animate->progress_percent);
+    float alpha_to = 100;
+    static float alpha_from = 0;
+    static float from = 0;
+    if (per == 0.0f)
+    {
+        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        alpha_from = button->img->draw_img.opacity_value;
+    }
+    from = 2.5f;
+    float scale = (-0.5f * from) * per + from;
+    //circle_color_tab[1] = change_opacity_of_rgba(circle_color_tab[1],
+    //                                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_scale((void *)button->img, scale,  scale);
+    gui_img_translate((void *)button->img, 25.0f * (2.5f - scale),  25.0f * (2.5f - scale));
+    gui_img_set_opacity((void *)button->img,
+                        (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_log("o:%f\n", 25.0f * (2.5f - scale));
+}
+static void cube_button_release_ani_cb(gui_button_t *button)
+{
+    float per = (button->animate->progress_percent);
+    float alpha_to = UINT8_MAX;
+    static float alpha_from = 0;
+    static float from = 0;
+    if (per == 0.0f)
+    {
+        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        alpha_from = button->img->draw_img.opacity_value;
+    }
+    //from = 1.25f;
+    float scale = (2.5f - from) * per + from;
+    //circle_color_tab[1] = change_opacity_of_rgba(circle_color_tab[1],
+    //                                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_set_opacity((void *)button->img,
+                        (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_scale((void *)button->img, scale,  scale);
+    gui_img_translate((void *)button->img, 25.0f * (2.5f - scale),  25.0f * (2.5f - scale));
+}
+static void hr_button_press_ani_cb(gui_button_t *button)
+{
+    float per = (button->animate->progress_percent);
+    float alpha_to = 100;
+    static float alpha_from = 0;
+    static float from = 0;
+    if (per == 0.0f)
+    {
+        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        alpha_from = button->img->draw_img.opacity_value;
+    }
+    from = 1.5f;
+    float scale = (-0.5f * from) * per + from;
+    //circle_color_tab[1] = change_opacity_of_rgba(circle_color_tab[1],
+    //                                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_scale((void *)button->img, scale,  scale);
+    gui_img_translate((void *)button->img, 25.0f * (from - scale),  25.0f * (from - scale));
+    gui_img_set_opacity((void *)button->img,
+                        (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+}
+static void hr_button_release_ani_cb(gui_button_t *button)
+{
+    float per = (button->animate->progress_percent);
+    float alpha_to = UINT8_MAX;
+    static float alpha_from = 0;
+    static float from = 0;
+    if (per == 0.0f)
+    {
+        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        alpha_from = button->img->draw_img.opacity_value;
+    }
+    //from = 1.25f;
+    float scale = (1.5f - from) * per + from;
+    //circle_color_tab[1] = change_opacity_of_rgba(circle_color_tab[1],
+    //                                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_set_opacity((void *)button->img,
+                        (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
+    gui_img_scale((void *)button->img, scale,  scale);
+    gui_img_translate((void *)button->img, 25.0f * (1.5f - scale),  25.0f * (1.5f - scale));
+}
+static void sport_button_press(gui_button_t *b)
+{
+    gui_button_api.set_animate(b, 200, 0, sport_button_press_ani_cb, b);
+}
+static void sport_button_release(gui_button_t *b)
+{
+    gui_button_api.set_animate(b, 200, 0, sport_button_release_ani_cb, b);
+}
+static void cube_button_press(gui_button_t *b)
+{
+    gui_button_api.set_animate(b, 200, 0, cube_button_press_ani_cb, b);
+}
+static void cube_button_release(gui_button_t *b)
+{
+    gui_button_api.set_animate(b, 200, 0, cube_button_release_ani_cb, b);
+}
+static void hr_button_press(gui_button_t *b)
+{
+    gui_button_api.set_animate(b, 200, 0, hr_button_press_ani_cb, b);
+}
+static void hr_button_release(gui_button_t *b)
+{
+    gui_button_api.set_animate(b, 200, 0, hr_button_release_ani_cb, b);
+}
 static void curtain2(void *curtian)
 {
     gui_canvas_t *canvas1 = gui_canvas_create(curtian, "canvas2", 0, 0, 454, 454, 0);
@@ -311,11 +459,15 @@ static void curtain2(void *curtian)
                                   2056);
     cube_button = gui_button_create(curtian, 5, 108, 250, 250, MESSAGE_SVG, NULL, NULL, 2,
                                     2666);
-    gui_button_click(sport_button, (gui_event_cb_t)text_color_cb);
-    gui_button_click(hr_button, (gui_event_cb_t)hr_button_cb);
-    gui_button_click(cube_button, (gui_event_cb_t)cube_button_cb);
-
-
+    //gui_button_click(sport_button, (gui_event_cb_t)text_color_cb);
+    //gui_button_click(hr_button, (gui_event_cb_t)hr_button_cb);
+    //gui_button_click(cube_button, (gui_event_cb_t)cube_button_cb);
+    gui_button_api.onPress(sport_button, sport_button_press, sport_button);
+    gui_button_api.onRelease(sport_button, sport_button_release, sport_button);
+    gui_button_api.onPress(cube_button, cube_button_press, sport_button);
+    gui_button_api.onRelease(cube_button, cube_button_release, sport_button);
+    gui_button_api.onPress(hr_button, hr_button_press, sport_button);
+    gui_button_api.onRelease(hr_button, hr_button_release, sport_button);
 }
 static void grid_icon(void *parent)
 {
@@ -743,14 +895,80 @@ static void music_draw(gui_canvas_t *c)
 }
 static void music(gui_obj_t *screen)
 {
-    gui_svg_create_from_mem(screen, ACTIVITY_SVG, 5134, (454 - 300) / 2, (454 - 300) / 2, 300, 300);
     gui_canvas_t *canvas = gui_canvas_create(screen, "c", 0, 0, 454, 454, 0);
     canvas->draw = music_draw;
 }
 static void palette_wheel_draw(gui_canvas_t *c)
 {
     canvas_palette_wheel_t pw = {0};
-    pw.selector_radian = 2;
+    touch_info_t *tp = (void *)tp_get_info();
+    static bool pressing;
+    static float selector_radian;
+    static float selector_radian_old;
+    if (!pressing && tp->pressed)
+    {
+        pressing = true;
+    }
+    if (pressing && tp->released)
+    {
+        pressing = false;
+    }
+    if (pressing)
+    {
+        //selector_radian += 0.1f;
+        //if(l2&&l1)
+
+        /* code */
+        switch (tp->type)
+        {
+        case TOUCH_HOLD_Y:
+            {
+                float l1 = sqrtf((((int)gui_get_screen_height() / 2 - tp->y - tp->deltaY) * ((
+                        int)gui_get_screen_height() / 2 - tp->y - tp->deltaY) + ((int)gui_get_screen_width() / 2 - tp->x -
+                                                                                 tp->deltaX) * ((int)gui_get_screen_width() / 2 - tp->x - tp->deltaX)));
+                float l2 = sqrtf(((int)gui_get_screen_height() / 2 - tp->y) * ((int)gui_get_screen_height() / 2 -
+                                                                               tp->y) + ((int)gui_get_screen_width() / 2 - tp->x) * ((int)gui_get_screen_width() / 2 - tp->x));
+                if (l1 != 0.0f && l2 != 0.0f)
+                {
+                    float l3 = (float)((int)(int)gui_get_screen_height() / 2 - tp->y - tp->deltaY) / l1;
+                    float l4 = (float)((int)gui_get_screen_height() / 2 - tp->y) / l2;
+                    if (l3 != 0.0f && l4 != 0.0f)
+                    {
+                        /*if (((int)gui_get_screen_width()/2-tp->x-tp->deltaX)<0)
+                        {
+                            selector_radian = acosf(l3) - acosf(l4);
+                        }
+                        else
+                        {
+                            selector_radian = acosf(l4) - acosf(l3);
+                        }
+                        */
+                        pw.selector_radian = acosf(l3) - acosf(l4) + selector_radian_old;
+                        selector_radian = pw.selector_radian;
+                    }
+                }
+                gui_log("%f\n", pw.selector_radian);
+            }
+            break;
+
+        default:
+            pw.selector_radian = selector_radian;
+            break;
+        }
+
+
+    }
+    else
+    {
+        pw.selector_radian = selector_radian;
+        selector_radian_old = selector_radian;
+    }
+
+
+
+
+
+    //pw.selector_radian = 2;
     pw.w = gui_get_screen_width();
     pw.h = gui_get_screen_height();
     gui_canvas_api.palette_wheel(c, &pw);
@@ -768,7 +986,7 @@ static void app_launcher2_ui_design(gui_app_t *app)
     gui_win_t *win = gui_win_create(&(app->screen), "win", 0, 0, 320, 320);
     gui_obj_add_event_cb(win, win_exit_cb, GUI_EVENT_TOUCH_TOUCH_RIGHT_SLIDE, NULL);
     tv = gui_tabview_create(win, "tabview", 0, 0, 0, 0);
-    //tv->style = SLIDE_SCALE_FADE;
+    tv->style = SLIDE_SCALE_FADE;
     gui_tab_t *tb0 = gui_tab_create(tv, "tb0", 0, 0, 0, 0, 0, 0);
     gui_tab_t *tb1 = gui_tab_create(tv, "tb1", 0, 0, 0, 0, 1, 0);
     gui_tab_t *tb2 = gui_tab_create(tv, "tb1", 0, 0, 0, 0, 0, 1);
