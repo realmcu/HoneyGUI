@@ -69,7 +69,7 @@ class CICheck(JenkinsCheckBase):
 
 
     def check_file_encodeing(self, changed_file_list, file_dir=None):
-        ignore_file_list = ignore_check_file.ignore_file
+        ignore_file_list = ignore_check_file.ignore_file_encoding
         for f in changed_file_list:
             if any(ignore_file in f for ignore_file in ignore_file_list):
                 print("Skip {}".format(f))
@@ -87,6 +87,33 @@ class CICheck(JenkinsCheckBase):
                                 f, e.reason, i, e.start + 1)
         print("Check file encoding pass")
         return True, ""
+
+    def get_changed_files(self, repo):
+        ignore_file_list = ignore_check_file.ignore_file_check
+        print("ignore_file_list", " ".join(ignore_file_list))
+        commit_files = repo.git.log('-1', '--pretty=format:', '--name-status').strip('\'')
+        if len(commit_files) > 0:
+            commit_files = commit_files.split('\n')
+        else:
+            commit_files = []
+        commit_files = list(filter(lambda x: x , commit_files))
+    
+        all_files_changed = list()
+        all_files_changed_exclude_delete = list()
+        for f in commit_files:
+            if any(ignore_file in f for ignore_file in ignore_file_list):
+                print(f"skip {f}")
+                continue
+            if f.startswith('A\t') or f.startswith('M\t'):
+                all_files_changed.append(f.split('\t')[1])
+                all_files_changed_exclude_delete.append(f.split('\t')[1])
+            elif f.startswith('C') or f.startswith('R'):
+                all_files_changed.append(f.split('\t')[2])
+                all_files_changed_exclude_delete.append(f.split('\t')[2])
+            elif f.startswith('D\t'):
+                all_files_changed.append(f.split('\t')[1])
+
+        return all_files_changed, all_files_changed_exclude_delete
 
 
     def check_commit_files(self):
