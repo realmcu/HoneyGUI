@@ -14,6 +14,7 @@ extern "C" {
 #define GUI_SERVER_THREAD_NAME "gui_s"
 typedef void (* touch_sync_cb)(void);
 int rtgui_server_init(void);
+void gui_debug_sethook(void (*hook)(void));
 
 void js_run_file_on_server(const char *file, gui_app_t *app);
 

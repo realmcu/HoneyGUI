@@ -13,6 +13,12 @@
 #include <gui_app.h>
 #include "acc_engine.h"
 
+static void (*gui_debug_hook)(void) = NULL;
+
+void gui_debug_sethook(void (*hook)(void))
+{
+    gui_debug_hook = hook;
+}
 
 /**
  * rtgui server thread's entry
@@ -20,7 +26,6 @@
 
 static void rtgui_server_entry(void *parameter)
 {
-
     while (1)
     {
         gui_app_t *app = gui_current_app();
@@ -61,6 +66,12 @@ int rtgui_server_init(void)
     rtgui_system_font_init();
     struct gui_indev *indev = gui_get_indev();
 
+    if (gui_debug_hook != 0)
+    {
+        gui_debug_hook();
+        gui_log("GUI Debug Mode!!");
+        while (1);
+    }
 
     void *gui_server_tid = gui_thread_create(GUI_SERVER_THREAD_NAME,
                                              rtgui_server_entry, NULL,
