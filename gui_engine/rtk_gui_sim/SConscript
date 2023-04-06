@@ -14,6 +14,7 @@ CPPPATH = [cwd,
 #src = Glob('*.c')
 src = ['main.c']
 src += ['rtk_gui_demo.c']
+src += ['nanovg_test.c']
 
 objs = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = CPPPATH)
 

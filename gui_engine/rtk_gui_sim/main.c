@@ -28,6 +28,8 @@ uint8_t resource_root[1024 * 1024 * 20];
 
 int main(int argc, char **argv)
 {
+    //extern int nanosv_main(void);
+    //nanosv_main();
 
     int fd;
     fd = open("./example/root_image/root_image_sim_vscode/root(0x4400000).bin", 0);
