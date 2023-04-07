@@ -8,15 +8,16 @@
 #include <string.h>
 #include <draw_font.h>
 #include "gui_obj.h"
+static uint32_t cur_time_ms;
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
-    gui_scroll_text_t *text = (gui_scroll_text_t *)obj;
-    if (text->base.len == 0)
-    {
-        return;
-    }
-    rtgui_text_create(&text->base);
+    // gui_scroll_text_t *text = (gui_scroll_text_t *)obj;
+    // if (text->base.len == 0)
+    // {
+    //     return;
+    // }
+    // rtgui_text_create(&text->base);
 }
 static void scrolltext_draw(gui_obj_t *obj)
 {
@@ -27,7 +28,6 @@ static void scrolltext_draw(gui_obj_t *obj)
     }
     struct gui_dispdev *dc = gui_get_dc();
     uint32_t offset = text->base.text_offset;
-    uint32_t cur_time_ms = gui_ms_get();
     uint32_t index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
     text->cnt_value = (text->end_value + text->start_value + offset) * index
                       / text->interval_time_ms;
@@ -57,19 +57,28 @@ static void scrolltext_draw(gui_obj_t *obj)
     draw_rect.xboundright = obj->dx + obj->w;
     draw_rect.yboundtop = obj->dy;
     draw_rect.yboundbottom = obj->dy + obj->h;
+    if (dc->section_count == 0)
+    {
+        cur_time_ms = gui_ms_get();
+        rtgui_text_create(&text->base);
+    }
     if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
     {
         rtgui_font_draw(&text->base, &draw_rect);
     }
+    if (dc->section_count == dc->screen_height / dc->fb_height - 1)
+    {
+        rtgui_text_destroy(&text->base);
+    }
 }
 static void scrolltext_end(gui_obj_t *obj)
 {
-    gui_text_t *text = (gui_text_t *)obj;
-    if (text->len == 0)
-    {
-        return;
-    }
-    rtgui_text_destroy(text);
+    // gui_text_t *text = (gui_text_t *)obj;
+    // if (text->len == 0)
+    // {
+    //     return;
+    // }
+    // rtgui_text_destroy(text);
 }
 
 void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
