@@ -172,7 +172,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, struct rtg
     int font_w = chr->w;
     int font_h = chr->h;
     // rt_kprintf("chr->x %d, chr->y %d, chr->w %d, chr->h %d\n",chr->x,chr->y,chr->w,chr->h);
-    int x_start = _UI_MAX(font_x, rect->xboundleft);
+    int x_start = _UI_MAX(_UI_MAX(font_x, rect->xboundleft), 0);
     int x_end;
 
     if (rect->xboundright != 0)

@@ -42,8 +42,8 @@ typedef struct gui_scroll_text
  * @param h The hight of the text box.
  * @return Return the widget object pointer: gui_scroll_text_t*
  */
-gui_scroll_text_t *gui_scrolltextbox_create(void *parent, const char *name, int16_t x,
-                                            int16_t y, int16_t w, int16_t h);
+gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t x,
+                                         int16_t y, int16_t w, int16_t h);
 /**
  * @brief Set the text scroll property of the scroll text box.
  *
