@@ -132,7 +132,7 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         memset(font_shape, 0, sizeof(NSVGshape));
         font_shape->opacity = 1;
         font_shape->fill.type = 1;
-        font_shape->fill.color = text->color;
+        font_shape->fill.d.color = text->color;
         font_shape->flags = 1;
         // font_shape->bounds[0] = 0;
         // font_shape->bounds[1] = 0;
@@ -210,7 +210,8 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         gui_free(path_num);
 
 //svg fill ok
-        gui_get_acc()->draw_svg(font_svg, 1, dc, text->base.x + xpos, text->base.y, 1);
+        gui_get_acc()->draw_svg(font_svg, 1, dc, text->base.x + xpos, text->base.y, 1, 0, 0, 0);
+        extern void nsvgDelete(NSVGimage * image);
         nsvgDelete(font_svg);
         stbtt_FreeShape(&font, stbVertex);
 

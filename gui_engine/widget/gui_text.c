@@ -63,23 +63,30 @@ static void text_draw(gui_obj_t *obj)
     {
         return;
     }
-    rtgui_text_create(text);
     struct gui_dispdev *dc = gui_get_dc();
     rtgui_rect_t draw_rect = {0};
     draw_rect.x1 = obj->dx;
     draw_rect.y1 = obj->dy;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
+    if (dc->section_count == 0)
+    {
+        rtgui_text_create(text);
+    }
     rtgui_font_draw(text, &draw_rect);
+    if (dc->section_count == dc->screen_height / dc->fb_height - 1)
+    {
+        rtgui_text_destroy(text);
+    }
 }
 static void text_end(gui_obj_t *obj)
 {
-    gui_text_t *text = (gui_text_t *)obj;
-    if (text->len == 0)
-    {
-        return;
-    }
-    rtgui_text_destroy(text);
+    // gui_text_t *text = (gui_text_t *)obj;
+    // if (text->len == 0)
+    // {
+    //     return;
+    // }
+    // rtgui_text_destroy(text);
 }
 
 void gui_text_set(gui_text_t *this, const char *text, char *text_type, uint32_t color,
