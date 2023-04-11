@@ -260,8 +260,26 @@ static float cbsize, xoff, yoff, xrot, yrot, zrot, rotstep;
 
 #if 1
 #include "acc_engine.h"
-
-
+static bool full_rank(struct rtgui_matrix *m)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        //gui_log("%f,%f,%f\n", m->m[i][0], m->m[i][1], m->m[i][2]);
+        if (m->m[i][0] == 0 && m->m[i][1] == 0 && m->m[i][2] == 0)
+        {
+            return false;
+        }
+        //gui_log("%f,%f,%f\n", m->m[0][i], m->m[1][i], m->m[2][i]);
+        if ((m->m[0][i] * 10000.0f < 10.0f && m->m[0][i] * 10000.0f > -10.0f) &&
+            (m->m[1][i] * 10000.0f < 10.0f && m->m[1][i] * 10000.0f > -10.0f) &&
+            (m->m[2][i] * 10000.0f < 10.0f && m->m[2][i] * 10000.0f > -10.0f))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+#define CUBE_JUDEG_FULL_RANK(m) if(full_rank(m->matrix))
 static void cube_draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -284,6 +302,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_front.img_y;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
+        CUBE_JUDEG_FULL_RANK(front)
         gui_get_acc()->blit(front, dc, &draw_rect);
     }
 
@@ -293,6 +312,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_back.img_y;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
+        CUBE_JUDEG_FULL_RANK(back)
         gui_get_acc()->blit(back, dc, &draw_rect);
     }
 
@@ -302,6 +322,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_up.img_y;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
+        CUBE_JUDEG_FULL_RANK(up)
         gui_get_acc()->blit(up, dc, &draw_rect);
     }
 
@@ -311,6 +332,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_down.img_y;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
+        CUBE_JUDEG_FULL_RANK(down)
         gui_get_acc()->blit(down, dc, &draw_rect);
     }
 
@@ -320,6 +342,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_left.img_y;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
+        CUBE_JUDEG_FULL_RANK(left)
         gui_get_acc()->blit(left, dc, &draw_rect);
     }
 
@@ -329,6 +352,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_right.img_y;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
+        CUBE_JUDEG_FULL_RANK(right)
         gui_get_acc()->blit(right, dc, &draw_rect);
     }
 #endif

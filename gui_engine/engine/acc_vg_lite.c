@@ -880,7 +880,7 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
     fill_color.channel.R = in_color.channel.R * (in_color.channel.A * 1.0f / 255.0f);
     fill_color.channel.G = in_color.channel.G * (in_color.channel.A * 1.0f / 255.0f);
     fill_color.channel.B = in_color.channel.B * (in_color.channel.A * 1.0f / 255.0f);
-    gui_log("input 0x%08x, trans 0x%08x\r\n", in_color.d32, fill_color.d32);
+    //gui_log("input 0x%08x, trans 0x%08x\r\n", in_color.d32, fill_color.d32);
     uint32_t colors[] = {fill_color.d32, 0};
     uint32_t stops[] = {0, 255};
 

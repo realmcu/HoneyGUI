@@ -329,7 +329,7 @@ static void tab_prepare_scale_fade(gui_obj_t *obj)
 }
 static void tab_prepare(gui_obj_t *this)
 {
-    if (this->parent->type == TABVIEW)
+    if (this->parent->type == TABVIEW && ((gui_tab_t *)this)->id.x != 4)
     {
         switch (((gui_tabview_t *)(this->parent))->style)
         {

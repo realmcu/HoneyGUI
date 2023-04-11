@@ -65,7 +65,7 @@ static void button_prepare(gui_obj_t *obj)
         {
         case TOUCH_SHORT:
             {
-                gui_log("%s\n", "TOUCH_SHORT");
+                //gui_log("%s\n", "TOUCH_SHORT");
                 //
                 bool callback = false;
                 for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
@@ -75,12 +75,14 @@ static void button_prepare(gui_obj_t *obj)
                     {
                         callback = true;
                     }
-                }
+                } gui_log("%d\n", __LINE__);
                 if (callback)
                 {
+                    gui_log("%d\n", __LINE__);
                     if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
                         (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
                     {
+                        gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                     }
                 }
@@ -108,64 +110,59 @@ static void button_prepare(gui_obj_t *obj)
         default:
             break;
         }
-        switch (tp->type)
+
+        if (tp->type != 271)
         {
-        case TOUCH_INIT:
-        case TOUCH_INVALIDE:
-        case TOUCH_LONG:
-        case TOUCH_SHORT:
-
+            gui_log("type2:%d,%d\n", tp->type, tp->released);
+        }
+        {
+            if (tp->pressed)
             {
-                if (tp->pressed)
+
+                if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                    (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
                 {
 
-                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                    //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+                    if (b->on_pic_addr)
                     {
-
-                        //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-                        if (b->on_pic_addr)
-                        {
-                            //gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
-                        }
-                        gui_log("%d\n", __LINE__);
-                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  gui_log("%d\n", __LINE__);
-                        b->long_flag = false;
+                        //gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
                     }
-                }
-                else if (tp->released)
-                {
-                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                    {
-                        //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-                        gui_log("%d\n", __LINE__);
-                        if (b->off_pic_addr)
-                        {
-                            //gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
-                        }
-                        bool callback = false;
-                        for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
-                        {
-                            gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-                            if (event_dsc->filter == GUI_EVENT_TOUCH_RELEASED)
-                            {
-                                callback = true;
-                            }
-                        }
-                        if (callback)
-                        {
-                            gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-                        }  gui_log("%d\n", __LINE__);
-                        b->long_flag = false;
-                    }
+                    gui_log("%d\n", __LINE__);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  gui_log("%d\n", __LINE__);
+                    b->long_flag = false;
+                    b->press_flag = true;
                 }
             }
-            break;
+            if (tp->released && b->press_flag)
+            {
 
-        default:
-            break;
+                {
+                    b->press_flag = false;
+                    //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+                    gui_log("%d\n", __LINE__);
+                    if (b->off_pic_addr)
+                    {
+                        //gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
+                    }
+                    bool callback = false;
+                    for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
+                    {
+                        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+                        if (event_dsc->filter == GUI_EVENT_TOUCH_RELEASED)
+                        {
+                            callback = true;
+                        }
+                    }
+                    if (callback)
+                    {
+                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+                    }  gui_log("%d\n", __LINE__);
+                    b->long_flag = false;
+                }
+            }
         }
+
     }
 }
 static void (obj_update_att)(struct _gui_obj_t *o)

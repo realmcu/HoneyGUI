@@ -271,7 +271,7 @@ static void svg_draw_cb(gui_obj_t *obj)
         shape->opacity = ((float)(int)(img->base.draw_img.opacity_value)) / 255.0f;
     }
     gui_get_acc()->draw_svg(img->base.draw_img.data, svg_len, gui_get_dc(), x + img->t_x, y + img->t_y,
-                            scale, 0, 0, 0);
+                            scale, img->degrees, img->c_x, img->c_y);
 
 }
 static void svg_ctor(gui_magic_img_t *this, gui_obj_t *parent,
