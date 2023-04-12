@@ -38,7 +38,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         source.format = PPE_BGR888;
         break;
     case RGBA8888:
-        source.format = PPE_BGRA8888;
+        source.format = PPE_ABGR8888;
         break;
     default:
         break;
@@ -112,7 +112,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 range.right = scaled_img.width - 1;
                 range.top = 0;
                 range.bottom = scaled_img.height - 1;
-                scaled_img.global_alpha = image->opacity_value << 24;
+                // scaled_img.global_alpha = image->opacity_value << 24;
                 if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
                 {
                     scale_rect.top = 0;
