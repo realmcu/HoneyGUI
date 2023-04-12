@@ -12,6 +12,9 @@
 #define PI                           3.141592653589793238462643383279502f
 #define SINF(x)                      ((vg_lite_float_t) sin(x))
 #define COSF(x)                      ((vg_lite_float_t) cos(x))
+#define _UI_MIN(x, y)                (((x)<(y))?(x):(y))
+#define _UI_MAX(x, y)                (((x)>(y))?(x):(y))
+#define BEZIEL_CIRCLE_FIT_FACTOR     0.552284749831f
 
 typedef union
 {
@@ -417,35 +420,128 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
 
     float scale_ratio = 1;
     float stroke_width = r->stroke.stroke_width * 1.0f;
-    if (r->stroke.stroke_width > 2.5)
-    {
-        scale_ratio = r->stroke.stroke_width * 1.0f / 2.5;
-        stroke_width = 2.5;
-    }
+//    if (r->stroke.stroke_width > 2.5)
+//    {
+//        scale_ratio = r->stroke.stroke_width * 1.0f / 2.5;
+//        stroke_width = 2.5;
+//    }
 
     float x_rel = (r->width) / scale_ratio;
     float y_rel = (r->height) / scale_ratio;
+    uint8_t *rect_cmd = gui_malloc(10);
+    float *rect_data = gui_malloc(10 * 6 * sizeof(float));
+    uint32_t cmd_size = 0, data_size = 0;
 
-    uint8_t rect_cmd[] = {    VLC_OP_MOVE,
-                              VLC_OP_LINE_REL,
-                              VLC_OP_LINE_REL,
-                              VLC_OP_LINE_REL,
-                              VLC_OP_LINE_REL,
-                              VLC_OP_END,
-                         };
-    float rect_data[] =
+    float shortest_side = _UI_MIN(r->width, r->height);
+    float final_radius = _UI_MIN(r->rx, shortest_side / 2);
+    float diagonal = sqrtf(r->width * r->width + r->height * r->height);
+    float grad_angle = r->fill.color_data.linear_gradient.angle;
+    if (r->rx > 0)
     {
-        0, 0,
-        0, y_rel,
-        x_rel, 0,
-        0, -y_rel,
-        -x_rel, 0,
-    };
+        /* Get the control point offset for rounded cases */
+        int32_t cpoff = (int32_t)((float)final_radius * BEZIEL_CIRCLE_FIT_FACTOR);
+
+        /* Rounded rectangle case */
+        /* Starting point */
+        rect_cmd[cmd_size++] = VLC_OP_MOVE;
+        rect_data[data_size++] = 0 + final_radius;
+        rect_data[data_size++] = 0;
+
+        /* Top side */
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = r->width - final_radius;
+        rect_data[data_size++] = 0;
+
+        /* Top-right corner */
+        rect_cmd[cmd_size++] = VLC_OP_CUBIC_REL;
+        rect_data[data_size++] = cpoff;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = final_radius;
+        rect_data[data_size++] = final_radius - cpoff;
+        rect_data[data_size++] = final_radius;
+        rect_data[data_size++] = final_radius;
+
+        /* Right side */
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = r->width;
+        rect_data[data_size++] = r->height - final_radius;
+
+        /* Bottom-right corner*/
+        rect_cmd[cmd_size++] = VLC_OP_CUBIC_REL;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = cpoff;
+        rect_data[data_size++] = cpoff - final_radius;
+        rect_data[data_size++] = final_radius;
+        rect_data[data_size++] = 0 - final_radius;
+        rect_data[data_size++] = final_radius;
+
+        /* Bottom side */
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = 0 + final_radius;
+        rect_data[data_size++] = r->height;
+
+        /* Bottom-left corner */
+        rect_cmd[cmd_size++] = VLC_OP_CUBIC_REL;
+        rect_data[data_size++] = 0 - cpoff;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = 0 - final_radius;
+        rect_data[data_size++] = cpoff - final_radius;
+        rect_data[data_size++] = 0 - final_radius;
+        rect_data[data_size++] = 0 - final_radius;
+
+        /* Left side*/
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = 0 + final_radius;
+
+        /* Top-left corner */
+        rect_cmd[cmd_size++] = VLC_OP_CUBIC_REL;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = 0 - cpoff;
+        rect_data[data_size++] = final_radius - cpoff;
+        rect_data[data_size++] = 0 - final_radius;
+        rect_data[data_size++] = final_radius;
+        rect_data[data_size++] = 0 - final_radius;
+
+        /* Ending point */
+        rect_cmd[cmd_size++] = VLC_OP_END;
+    }
+    else
+    {
+        /* Non-rounded rectangle case */
+        /* Starting point */
+        rect_cmd[cmd_size++] = VLC_OP_MOVE;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = 0;
+
+        /* Top side */
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = r->width;
+        rect_data[data_size++] = 0;
+
+        /* Right side */
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = r->width;
+        rect_data[data_size++] = r->height;
+
+        /* Bottom side */
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = r->height;
+
+        /* Left side*/
+        rect_cmd[cmd_size++] = VLC_OP_LINE;
+        rect_data[data_size++] = 0;
+        rect_data[data_size++] = 0;
+
+        /* Ending point */
+        rect_cmd[cmd_size++] = VLC_OP_END;
+    }
+
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
-    vg_lite_scale(scale_ratio, scale_ratio, &matrix);
-    vg_lite_rotate(r->rotate, &matrix);
     vg_lite_translate(r->x, r->y, &matrix);
+    vg_lite_rotate(r->rotate, &matrix);
 
     ARGB_struct in_color = {.d32 = r->fill.color_data.rgba};
     BGRA_struct fill_color = {.d32 = 0};
@@ -462,38 +558,77 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
     stroke_color.channel.B = in_color.channel.B * (1.0f * in_color.channel.A / 255);
 
     vg_lite_path_t rect_path;
-    uint32_t data_len = vg_lite_path_calc_length(rect_cmd, sizeof(rect_cmd), VG_LITE_FP32);
+    vg_lite_linear_gradient_t rect_grad;
+    uint32_t data_len = vg_lite_path_calc_length(rect_cmd, cmd_size, VG_LITE_FP32);
     vg_lite_init_path(&rect_path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
     void *path_data = gui_malloc(data_len);
     rect_path.path = path_data;
-    vg_lite_path_append(&rect_path, rect_cmd, rect_data, sizeof(rect_cmd));
+    vg_lite_path_append(&rect_path, rect_cmd, rect_data, cmd_size);
     float dash[] = {0, 0};
-    if (((r->stroke.stroke_width == 0) || (r->stroke.fill.color_data.rgba == 0)) &&
-        (r->fill.color_data.rgba != 0))
+    if (r->fill.color_data.linear_gradient.stops_number > 0)
+    {
+        memset(&rect_grad, 0, sizeof(vg_lite_linear_gradient_t));
+        vg_lite_init_grad(&rect_grad);
+        vg_lite_set_grad(&rect_grad, r->fill.color_data.linear_gradient.stops_number,
+                         r->fill.color_data.linear_gradient.colors, r->fill.color_data.linear_gradient.stops);
+        vg_lite_update_grad(&rect_grad);
+        vg_lite_matrix_t *grad_matrix = vg_lite_get_grad_matrix(&rect_grad);
+        vg_lite_identity(grad_matrix);
+        float static_angle = atanf(r->height / r->width) / PI * 180.0f;
+        if ((grad_angle >= 0) && (grad_angle <= 90))
+        {
+            vg_lite_translate(r->x, r->y, grad_matrix);
+            vg_lite_rotate(grad_angle + r->rotate, grad_matrix);
+            vg_lite_scale(diagonal * cosf((grad_angle - static_angle) / 180 * PI) / 256, 1, grad_matrix);
+        }
+        else if ((grad_angle > 90) && (grad_angle <= 180))
+        {
+            vg_lite_translate(r->x + r->width * cosf(r->rotate * PI / 180.0f),
+                              r->y + r->width * sinf(r->rotate * PI / 180.0f), grad_matrix);
+            vg_lite_rotate(grad_angle + r->rotate, grad_matrix);
+            vg_lite_scale(diagonal * cosf((grad_angle + static_angle - 180) / 180 * PI) / 256, 1, grad_matrix);
+        }
+        else if ((grad_angle > 180) && (grad_angle <= 270))
+        {
+            vg_lite_translate(r->x + diagonal * cosf((r->rotate + static_angle) * PI / 180.0f),
+                              r->y + diagonal * sinf((r->rotate + static_angle) * PI / 180.0f), grad_matrix);
+            vg_lite_rotate(grad_angle + r->rotate, grad_matrix);
+            vg_lite_scale(diagonal * cosf((grad_angle - static_angle - 180) / 180 * PI) / 256, 1, grad_matrix);
+        }
+        else if ((grad_angle > 270) && (grad_angle < 360))
+        {
+            vg_lite_translate(r->x + r->height * cosf((r->rotate + 90) * PI / 180.0f),
+                              r->y + r->height * sinf((r->rotate + 90) * PI / 180.0f), grad_matrix);
+            vg_lite_rotate(grad_angle + r->rotate, grad_matrix);
+            vg_lite_scale(diagonal * cosf((grad_angle + static_angle) / 180 * PI) / 256, 1, grad_matrix);
+        }
+        vg_lite_draw_gradient(&target, &rect_path, VG_LITE_FILL_NON_ZERO, &matrix, &rect_grad,
+                              VG_LITE_BLEND_SRC_OVER);
+    }
+    else if (r->fill.color_data.rgba != 0)
     {
         vg_lite_draw(&target, &rect_path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER,
                      fill_color.d32);
     }
-    else if ((r->stroke.stroke_width != 0) && (r->stroke.fill.color_data.rgba != 0))
+
+    if ((r->stroke.stroke_width != 0) && (r->stroke.fill.color_data.rgba != 0))
     {
         vg_lite_set_stroke(&rect_path, (vg_lite_cap_style_t)r->stroke.stroke_linecap,
                            (vg_lite_join_style_t)r->stroke.stroke_linejoin, stroke_width,
                            r->stroke.miter_limit, r->stroke.dash, r->stroke.dash_count, r->stroke.dash_phase);
         vg_lite_update_stroke(&rect_path);
-        if (r->fill.color_data.rgba != 0)
-        {
-            vg_lite_set_draw_path_type(&rect_path, VG_LITE_DRAW_FILL_PATH);
-            vg_lite_draw(&target, &rect_path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER,
-                         fill_color.d32);
-        }
         vg_lite_set_draw_path_type(&rect_path, VG_LITE_DRAW_STROKE_PATH);
         vg_lite_draw(&target, &rect_path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER,
                      stroke_color.d32);
     }
+
     vg_lite_finish();
     vg_lite_clear_path(&rect_path);
+    vg_lite_clear_grad(&rect_grad);
     gui_free(path_data);
+    gui_free(rect_cmd);
+    gui_free(rect_data);
 }
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
@@ -880,7 +1015,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
     fill_color.channel.R = in_color.channel.R * (in_color.channel.A * 1.0f / 255.0f);
     fill_color.channel.G = in_color.channel.G * (in_color.channel.A * 1.0f / 255.0f);
     fill_color.channel.B = in_color.channel.B * (in_color.channel.A * 1.0f / 255.0f);
-    //gui_log("input 0x%08x, trans 0x%08x\r\n", in_color.d32, fill_color.d32);
     uint32_t colors[] = {fill_color.d32, 0};
     uint32_t stops[] = {0, 255};
 
