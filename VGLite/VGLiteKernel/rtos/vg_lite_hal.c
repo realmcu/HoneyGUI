@@ -57,7 +57,7 @@
 #include "../vg_lite_kernel.h"
 #include "../../inc/vg_lite_hal.h"
 #include "vg_lite_hw.h"
-#include "rtl876x_nvic.h"
+#include "rtl_nvic.h"
 
 #if !_BAREMETAL
 //#include "FreeRTOS.h"
