@@ -3,6 +3,7 @@
 #include <gui_matrix.h>
 #include <rtl876x_ppe.h>
 #include <drv_lcd.h>
+#include <trace.h>
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
 
@@ -75,7 +76,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     else if (dc->type == DC_RAMLESS)
                     {
                         scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
-                                                                               scale_y)) * 2);
+                                                                               scale_y) * 2 + 1) * 2);
                     }
                     break;
                 case RGB888:
@@ -87,7 +88,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     else if (dc->type == DC_RAMLESS)
                     {
                         scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
-                                                                               scale_y)) * 3);
+                                                                               scale_y) + 1) * 3);
                     }
                     break;
                 case RGBA8888:
@@ -99,7 +100,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     else if (dc->type == DC_RAMLESS)
                     {
                         scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
-                                                                               scale_y)) * 4);
+                                                                               scale_y) + 1) * 4);
                     }
                     break;
                 default:
@@ -111,6 +112,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 range.right = scaled_img.width - 1;
                 range.top = 0;
                 range.bottom = scaled_img.height - 1;
+                scaled_img.global_alpha = image->opacity_value << 24;
                 if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
                 {
                     scale_rect.top = 0;

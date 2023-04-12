@@ -15,7 +15,7 @@ extern "C" {
 #endif
 typedef struct canvas_gradient_stop
 {
-    float offset;
+    uint32_t offset;
     uint32_t color_rgba;
 } canvas_gradient_stop_t;
 #define CANVAS_LINEAR_GRADIENT_STOPS_MAXMUN 6
@@ -28,8 +28,10 @@ typedef struct canvas_linear_gradient
     float y1;
     float x2;
     float y2;
+    float angle;
     uint32_t stops_number;//to judge if using linear gradient
-    canvas_gradient_stop_t stops[CANVAS_LINEAR_GRADIENT_STOPS_MAXMUN];
+    uint32_t stops[CANVAS_LINEAR_GRADIENT_STOPS_MAXMUN];
+    uint32_t colors[CANVAS_LINEAR_GRADIENT_STOPS_MAXMUN];
 } canvas_linear_gradient_t;
 
 /*https://www.w3schools.com/graphics/svg_grad_radial.asp*/
