@@ -70,7 +70,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scaled_img.format = PPE_BGR565;
                     if (dc->type == DC_SINGLE)
                     {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 2);
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(scale_y)) * 2);
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
@@ -82,22 +82,24 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scaled_img.format = PPE_BGR888;
                     if (dc->type == DC_SINGLE)
                     {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 3);
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(scale_y)) * 3);
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1) * 3);
+                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
+                                                                               scale_y)) * 3);
                     }
                     break;
                 case RGBA8888:
                     scaled_img.format = PPE_BGRA8888;
                     if (dc->type == DC_SINGLE)
                     {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1) * 4);
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(scale_y)) * 4);
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1) * 4);
+                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
+                                                                               scale_y)) * 4);
                     }
                     break;
                 default:
@@ -118,14 +120,28 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     }
                     else
                     {
-                        scale_rect.bottom = (scale_rect.top + dc->fb_height) / scale_y;
+                        scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_y;
                     }
-                    trans.y = (int)image->matrix->m[1][2] - rect->y1;
+                    trans.y = (int)image->matrix->m[1][2] - dc->section.y1;
+                    scale_rect.left = 0;
+                    scale_rect.right = source.width - 1;
+                    PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
+                    if (err == PPE_SUCCESS)
+                    {
+                        PPE_blend(&scaled_img, &target, &trans);
+                    }
                 }
                 else if ((dc->section.y2 < (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1))
                 {
                     scale_rect.top = (dc->section.y1 - rect->y1) / scale_y;
                     scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_y;
+                    scale_rect.left = 0;
+                    scale_rect.right = source.width - 1;
+                    PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
+                    if (err == PPE_SUCCESS)
+                    {
+                        PPE_blend(&scaled_img, &target, &trans);
+                    }
                 }
                 else if ((dc->section.y2 >= (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1)
                          && (dc->section.y1 < (rect->y1 + modified_height)))
@@ -133,21 +149,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scale_rect.top = (dc->section.y1 - rect->y1) / scale_y;
                     scale_rect.bottom = source.height - 1;
                     scaled_img.height = rect->y1 + modified_height - dc->section.y1;
-                }
-                else
-                {
-                    if (dc->type == DC_RAMLESS)
+                    scale_rect.left = 0;
+                    scale_rect.right = source.width - 1;
+                    PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
+                    if (err == PPE_SUCCESS)
                     {
-                        gui_free(scaled_img.memory);
+                        PPE_blend(&scaled_img, &target, &trans);
                     }
-                    return;
-                }
-                scale_rect.left = 0;
-                scale_rect.right = source.width - 1;
-                PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
-                if (err == PPE_SUCCESS)
-                {
-                    PPE_blend(&scaled_img, &target, &trans);
                 }
                 if (dc->type == DC_SINGLE)
                 {
