@@ -625,7 +625,7 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
 
     vg_lite_finish();
     vg_lite_clear_path(&rect_path);
-    vg_lite_clear_grad(&rect_grad);
+    //vg_lite_clear_grad(&rect_grad);//todo
     gui_free(path_data);
     gui_free(rect_cmd);
     gui_free(rect_data);
