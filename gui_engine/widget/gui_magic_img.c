@@ -185,8 +185,58 @@ void gui_img_translate(gui_magic_img_t *img, float t_x, float t_y)
     img->t_x = t_x;
     img->t_y = t_y;
 }
+static void magic_img_update(gui_obj_t *o)
+{
+    gui_magic_img_t *obj = (void *)o;
+    if (obj->animate && obj->animate->animate)
+    {
+        size_t frame_count = obj->animate->dur * 40 / (1000);
+        obj->animate->callback(obj->animate->p);
+        obj->animate->current_frame++;
 
+        if (obj->animate->current_frame > frame_count)
+        {
+            if (obj->animate->repeatCount == 0)
+            {
+                obj->animate->animate = false;
+            }
+            else if (obj->animate->repeatCount < 0)
+            {
+                obj->animate->current_frame = 0;
+            }
+            else if (obj->animate->repeatCount > 0)
+            {
+                obj->animate->current_repeat_count++;
+                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                {
+                    obj->animate->animate = false;
+                }
+                else
+                {
+                    obj->animate->current_frame = 0;
+                }
+            }
+        }
+        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
+                                                                                       frame_count));
+    }
+}
 
+void gui_magicimage_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p)
+{
+    gui_animate_t *animate = ((gui_magic_img_t *)o)->animate;
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *))callback;
+    animate->repeatCount = repeatCount;
+    animate->p = p;
+    ((gui_magic_img_t *)o)->animate = animate;
+}
 
 
 void gui_magic_img_from_mem_ctor(gui_magic_img_t *this, gui_obj_t *parent, const char *name,
@@ -210,6 +260,7 @@ void gui_magic_img_from_mem_ctor(gui_magic_img_t *this, gui_obj_t *parent, const
     obj->obj_prepare = img_prepare;
     obj->obj_draw = img_draw_cb;
     obj->obj_end = img_end;
+    obj->obj_update_att = magic_img_update;
 
     //for self
     this->scale_x = 1.0f;

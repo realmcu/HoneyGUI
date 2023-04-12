@@ -29,6 +29,7 @@ typedef struct gui_magic_img
     float t_y;
     float p_x;
     float p_y;
+    gui_animate_t *animate;
 } gui_magic_img_t;
 
 
@@ -48,7 +49,7 @@ void gui_img_set_opacity(gui_magic_img_t *this, unsigned char opacity_value);
 void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *dc);
 gui_magic_img_t *gui_svg_create_from_mem(void *parent, void *data, uint32_t data_size,
                                          int16_t x, int16_t y, int16_t w, int16_t h);
-
+void gui_magicimage_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p);
 
 #ifdef __cplusplus
 }
