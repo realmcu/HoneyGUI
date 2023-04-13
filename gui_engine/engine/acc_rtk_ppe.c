@@ -56,6 +56,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1) && 1)
             {
                 float scale_x = image->matrix->m[0][0], scale_y = image->matrix->m[1][1];
+                if ((image->img_w == (int)(image->img_w * scale_x)) &&
+                    (image->img_h == (int)(image->img_h * scale_y)))
+                {
+                    PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+                    PPE_blend(&source, &target, &trans);
+                    return;
+                }
                 ppe_buffer_t scaled_img;
                 PPE_translate_t trans;
                 PPE_rect_t range;
