@@ -496,6 +496,10 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
     root->obj_end = cube_end;
     root->obj_destory = cube_destory;
     //for self
+    void **array = (void **)addr;
+
+
+
 
     this->draw_img_front.opacity_value = UINT8_MAX;
     this->draw_img_back.opacity_value = UINT8_MAX;
@@ -506,13 +510,32 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
 
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
+    extern void *vg_lite_hal_alloc(unsigned long size);
 
-    this->draw_img_front.data = addr;
-    this->draw_img_back.data = addr;
-    this->draw_img_up.data = addr;
-    this->draw_img_down.data = addr;
-    this->draw_img_left.data = addr;
-    this->draw_img_right.data = addr;
+#define CUBE_PICTURE_FILE_SIZE 120840
+#if 0
+    {
+        gui_log("VG_LITE_HAL_ALLOC\n");
+        void *temp = vg_lite_hal_alloc(CUBE_PICTURE_FILE_SIZE);
+        memcpy(temp, array[0], CUBE_PICTURE_FILE_SIZE);
+        array[0] = temp;
+        array[1] = temp;
+        temp = vg_lite_hal_alloc(CUBE_PICTURE_FILE_SIZE);
+        memcpy(temp, array[2], CUBE_PICTURE_FILE_SIZE);
+        array[2] = temp;
+        array[3] = temp;
+        temp = vg_lite_hal_alloc(CUBE_PICTURE_FILE_SIZE);
+        memcpy(temp, array[4], CUBE_PICTURE_FILE_SIZE);
+        array[4] = temp;
+        array[5] = temp;
+    }
+#endif
+    this->draw_img_front.data = array[0];
+    this->draw_img_back.data = array[1];
+    this->draw_img_up.data = array[2];
+    this->draw_img_down.data = array[3];
+    this->draw_img_left.data = array[4];
+    this->draw_img_right.data = array[5];
 
     this->draw_img_front.blend_mode = IMG_MAGIC_MATRIX;
     this->draw_img_back.blend_mode = IMG_MAGIC_MATRIX;
@@ -544,10 +567,10 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
 
 
     // Scale the cube to proper size
-    cbsize = dc->fb_height / 6.0;
+    cbsize = dc->fb_height / 4.0;
     // Translate the cube to the center of framebuffer.
-    xoff = (dc->fb_width - cbsize) / 2.0f;
-    yoff = (dc->fb_height - cbsize) / 2.0f;
+    xoff = (dc->fb_width - cbsize) / 2.0f + 60;
+    yoff = (dc->fb_height - cbsize) / 2.0f + 60;
 
 
     scale_cube(&cube_v0, cbsize);

@@ -329,22 +329,30 @@ static void tab_prepare_scale_fade(gui_obj_t *obj)
 }
 static void tab_prepare(gui_obj_t *this)
 {
-    if (this->parent->type == TABVIEW && ((gui_tab_t *)this)->id.x != 4)
+    if (this->parent->type == TABVIEW)
     {
-        switch (((gui_tabview_t *)(this->parent))->style)
+        if (((gui_tab_t *)this)->id.x != 4 && ((gui_tab_t *)this)->id.x != 2)
         {
-        case SLIDE_CLASSIC:
-        case SLIDE_FADE:
-        case SLIDE_WHEEL:
-        case SLIDE_SCALE:
+            switch (((gui_tabview_t *)(this->parent))->style)
+            {
+            case SLIDE_CLASSIC:
+            case SLIDE_FADE:
+            case SLIDE_WHEEL:
+            case SLIDE_SCALE:
+                tab_prepare_classic(this);
+                break;
+            case SLIDE_SCALE_FADE:
+                tab_prepare_scale_fade(this);;
+                break;
+            default:
+                tab_prepare_classic(this);
+                break;
+            }
+        }
+        else
+        {
+
             tab_prepare_classic(this);
-            break;
-        case SLIDE_SCALE_FADE:
-            tab_prepare_scale_fade(this);;
-            break;
-        default:
-            tab_prepare_classic(this);
-            break;
         }
     }
 }

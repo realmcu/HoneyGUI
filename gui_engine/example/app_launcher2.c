@@ -246,7 +246,8 @@ static void sport_chart(gui_obj_t *parent)
 
 static void heart_rate_chart(gui_obj_t *parent)
 {
-    gui_cube_create(parent, "cube", CHARGE20_BIN, 0, 0, 454, 454);
+    void *array[] = {CRAB_LIME_BIN, CRAB_LIME_BIN, RTL_ORIGIN_BIN, RTL_ORIGIN_BIN, WATCH_RED_BIN, WATCH_RED_BIN};
+    gui_cube_create(parent, "cube", array, 0, 0, 454, 454);
 
 }
 static void canvas1_draw(gui_canvas_t *c)
@@ -998,7 +999,7 @@ static void create_selector(gui_obj_t *screen)
 
 }
 
-static gui_img_t *music_album_picture;
+gui_img_t *music_album_picture;
 
 static void music_draw(gui_canvas_t *c)
 {
@@ -1017,8 +1018,8 @@ static void music_draw(gui_canvas_t *c)
     {
         angle += 0.1f;
         t += 0.05f;
-        gui_img_rotation((void *)music_album_picture, angle * 3.0f, gui_get_screen_width() / 2,
-                         gui_get_screen_height() / 2);
+//        gui_img_rotation((void *)music_album_picture, angle * 3.0f, gui_get_screen_width() / 2,
+//                         gui_get_screen_height() / 2);
     }
     if (angle >= 360)
     {
@@ -1131,13 +1132,21 @@ static void music(gui_obj_t *screen)
 //    gui_text_set(text, string, "rtk_font_stb", 0xffffffff, strlen(string),
 //                 RTK_GUI_DEFAULT_FONT_SIZE);
 }
+
+static float angle_to_center(float x0, float y0, float x1, float y1)
+{
+    float vx = x1 - x0;
+    float vy = y1 - y0;
+    float mag_v = sqrt(vx * vx + vy * vy);
+    return acos(vy / mag_v);
+}
+float selector_radian_old;
 static void palette_wheel_draw(gui_canvas_t *c)
 {
     canvas_palette_wheel_t pw = {0};
     touch_info_t *tp = (void *)tp_get_info();
     static bool pressing;
     static float selector_radian;
-    static float selector_radian_old;
     if (!pressing && tp->pressed)
     {
         pressing = true;
@@ -1154,38 +1163,34 @@ static void palette_wheel_draw(gui_canvas_t *c)
         /* code */
         switch (tp->type)
         {
-        case TOUCH_HOLD_Y:
-            {
-                float l1 = sqrtf((((int)gui_get_screen_height() / 2 - tp->y - tp->deltaY) * ((
-                        int)gui_get_screen_height() / 2 - tp->y - tp->deltaY) + ((int)gui_get_screen_width() / 2 - tp->x -
-                                                                                 tp->deltaX) * ((int)gui_get_screen_width() / 2 - tp->x - tp->deltaX)));
-                float l2 = sqrtf(((int)gui_get_screen_height() / 2 - tp->y) * ((int)gui_get_screen_height() / 2 -
-                                                                               tp->y) + ((int)gui_get_screen_width() / 2 - tp->x) * ((int)gui_get_screen_width() / 2 - tp->x));
-                if (l1 != 0.0f && l2 != 0.0f)
-                {
-                    float l3 = (float)((int)(int)gui_get_screen_height() / 2 - tp->y - tp->deltaY) / l1;
-                    float l4 = (float)((int)gui_get_screen_height() / 2 - tp->y) / l2;
-                    if (l3 != 0.0f && l4 != 0.0f)
-                    {
-                        /*if (((int)gui_get_screen_width()/2-tp->x-tp->deltaX)<0)
-                        {
-                            selector_radian = acosf(l3) - acosf(l4);
-                        }
-                        else
-                        {
-                            selector_radian = acosf(l4) - acosf(l3);
-                        }
-                        */
-                        pw.selector_radian = acosf(l3) - acosf(l4) + selector_radian_old;
-                        selector_radian = pw.selector_radian;
-                    }
-                }
-                gui_log("%f\n", pw.selector_radian);
-            }
+        //gui_log("tp->type:%d\n",tp->type);
+        case TOUCH_HOLD_X:
             break;
-
         default:
-            pw.selector_radian = selector_radian;
+            {
+                float degree = angle_to_center((float)(454 / 2), (float)(454 / 2), (float)(tp->x + tp->deltaX),
+                                               (float)(tp->y + tp->deltaY)) * 360.0f / 2.0f / 3.14159f;
+                if (tp->x + tp->deltaX > 454 / 2)
+                {
+                    degree =  -degree + 360.0f;
+                }
+                degree += 90.0f;
+                if (degree > 360.0f)
+                {
+                    degree -= 360.0f;
+                }
+                degree = degree * M_PI / 180.0f * 1.8f;
+                //degree = degree*M_PI/180.0f;
+                pw.selector_radian = degree;
+                selector_radian = pw.selector_radian;
+
+
+                //gui_log("%f,%d,%d\n", degree,  tp->x + tp->deltaX, tp->y + tp->deltaY);
+            }
+
+
+
+
             break;
         }
 
@@ -1240,7 +1245,7 @@ static void app_launcher2_ui_design(gui_app_t *app)
     curtain2(c2);
     grid_icon(tb2);
     heart_rate_chart((void *)tb4);
-    //read_page(tb7);
+    read_page(tb7);
     create_selector((void *)tb6);
     music((void *)tb5);
     palette_wheel((void *)tb3);

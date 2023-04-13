@@ -1245,7 +1245,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
         vg_lite_rotate(120 + a0 * 180 / PI, grad_matrix);
         vg_lite_scale(r0 / 256.0f, 1, grad_matrix);
         vg_lite_identity(&matrix);
-        vg_lite_translate(pw->x, pw->y, &matrix);
+        //vg_lite_translate(pw->x, pw->y, &matrix);
         vg_lite_draw_gradient(&target, &arc_path[i].path, VG_LITE_FILL_EVEN_ODD,
                               &matrix, &arc_path[i].p_grad->grad, VG_LITE_BLEND_SRC_OVER);
     }
