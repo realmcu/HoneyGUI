@@ -420,6 +420,7 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
 
     float scale_ratio = 1;
     float stroke_width = r->stroke.stroke_width * 1.0f;
+    bool has_grad = false;
 //    if (r->stroke.stroke_width > 2.5)
 //    {
 //        scale_ratio = r->stroke.stroke_width * 1.0f / 2.5;
@@ -568,6 +569,7 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
     float dash[] = {0, 0};
     if (r->fill.color_data.linear_gradient.stops_number > 0)
     {
+        has_grad = true;
         memset(&rect_grad, 0, sizeof(vg_lite_linear_gradient_t));
         vg_lite_init_grad(&rect_grad);
         vg_lite_set_grad(&rect_grad, r->fill.color_data.linear_gradient.stops_number,
@@ -625,7 +627,10 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
 
     vg_lite_finish();
     vg_lite_clear_path(&rect_path);
-    //vg_lite_clear_grad(&rect_grad);//todo
+    if (has_grad)
+    {
+        vg_lite_clear_grad(&rect_grad);
+    }
     gui_free(path_data);
     gui_free(rect_cmd);
     gui_free(rect_data);

@@ -3,7 +3,7 @@
 #include <gui_matrix.h>
 #include <rtl876x_ppe.h>
 #include <drv_lcd.h>
-#include <trace.h>
+
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
 
@@ -47,7 +47,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     source.height = image->img_h;
     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
     source.memory = (void *)source.address;
-
+    source.global_alpha_en = true;
+    source.global_alpha = image->opacity_value << 24;
     if (image->blend_mode == IMG_MAGIC_MATRIX)
     {
         if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
@@ -112,7 +113,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 range.right = scaled_img.width - 1;
                 range.top = 0;
                 range.bottom = scaled_img.height - 1;
-                // scaled_img.global_alpha = image->opacity_value << 24;
+                scaled_img.global_alpha_en = true;
+                scaled_img.global_alpha = image->opacity_value << 24;
                 if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
                 {
                     scale_rect.top = 0;
