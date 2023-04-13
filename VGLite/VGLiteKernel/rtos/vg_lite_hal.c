@@ -59,35 +59,19 @@
 #include "vg_lite_hw.h"
 #include "rtl_nvic.h"
 
-#if !_BAREMETAL
-//#include "FreeRTOS.h"
-//#include "semphr.h"
-//#include "task.h"
-#ifdef __RTTHREAD__
-#include "rtthread.h"
-#elif defined GUI_RTK_OSIF
+
 #include "trace.h"
 #include "os_queue.h"
 #include "os_sync.h"
 #include "os_mem.h"
 #include "os_sched.h"
 #include "utils.h"
-#endif
-#else
-#include "xil_cache.h"
-#include "sleep.h"
-#endif
+
 
 #if !_BAREMETAL
 static void sleep(uint32_t msec)
 {
-#ifdef __RTTHREAD__
-    //vTaskDelay((configTICK_RATE_HZ * msec + 999)/ 1000);
-    rt_thread_mdelay(msec);
-#endif
-#ifdef GUI_RTK_OSIF
     os_delay(msec);
-#endif
 }
 
 #endif
@@ -209,12 +193,8 @@ struct vg_lite_device
     int irq_enabled;
     volatile uint32_t int_flags;
     /* wait_queue_head_t int_queue; */
-#ifdef __RTTHREAD__
-    rt_sem_t int_queue;
-#endif
-#ifdef GUI_RTK_OSIF
     void *gpu_sem_handle;
-#endif
+
     void *device;
     int registered;
     int major;
@@ -234,59 +214,22 @@ static struct vg_lite_device Device, * device;
 void *vg_lite_hal_calloc(unsigned long n, unsigned long size)
 {
     /* TODO: Allocate some memory. No more kernel mode in RTOS. */
-#ifdef __RTTHREAD__
-    extern struct rt_memheap ext_data_sram_heap;
-    void *ptr = rt_memheap_alloc(&ext_data_sram_heap, n * size);
-    if (ptr != RT_NULL)
-    {
-        /* clean memory */
-        rt_memset(ptr, 0, n * size);
-    }
-    return ptr;
-#endif
-#ifdef GUI_RTK_OSIF
     return os_mem_zalloc(RAM_TYPE_EXT_DATA_SRAM, n * size);
-#endif
-    return NULL;
 }
 
 void *vg_lite_hal_realloc(void *ptr, unsigned long size)
 {
-#ifdef __RTTHREAD__
-    extern struct rt_memheap ext_data_sram_heap;
-    return rt_memheap_realloc(&ext_data_sram_heap, ptr, size);
-#endif
-#ifdef GUI_RTK_OSIF
-    if (ptr)
-    {
-        os_mem_free(ptr);
-    }
-
-    return os_mem_zalloc(RAM_TYPE_EXT_DATA_SRAM, size);
-#endif
-    return NULL;
+    while (1);
 }
 
 void *vg_lite_hal_alloc(unsigned long size)
 {
-#ifdef __RTTHREAD__
-    extern struct rt_memheap ext_data_sram_heap;
-    return rt_memheap_alloc(&ext_data_sram_heap, size);
-#endif
-#ifdef GUI_RTK_OSIF
     return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
-#endif
-    return NULL;
 }
 
 void vg_lite_hal_free(void *memory)
 {
-#ifdef __RTTHREAD__
-    rt_memheap_free(memory);
-#endif
-#ifdef GUI_RTK_OSIF
     os_mem_free(memory);
-#endif
 }
 
 void vg_lite_hal_delay(uint32_t ms)
@@ -321,12 +264,7 @@ void vg_lite_hal_initialize(void)
 
 void vg_lite_hal_deinitialize(void)
 {
-#ifdef __RTTHREAD__
-    rt_sem_delete(device->int_queue);
-#endif
-#ifdef GUI_RTK_OSIF
     os_sem_delete(device->gpu_sem_handle);
-#endif
     /* TODO: Remove power. */
 }
 
@@ -549,47 +487,15 @@ void GPU_Handler(void)
         device->int_flags |= flags;
 
         /* Wake up any waiters. */
-#ifdef __RTTHREAD__
-        if (device->int_queue)
-        {
-            rt_sem_release(device->int_queue);
-        }
-#endif
-#ifdef GUI_RTK_OSIF
         if (device->gpu_sem_handle)
         {
             os_sem_give(device->gpu_sem_handle);
         }
-#endif
     }
 }
 
 int32_t vg_lite_hal_wait_interrupt(uint32_t timeout, uint32_t mask, uint32_t *value)
 {
-
-#ifdef __RTTHREAD__
-    if (device->int_queue)
-    {
-        if (rt_sem_take(device->int_queue, timeout) == RT_EOK)
-        {
-            if (value != NULL)
-            {
-                *value = device->int_flags & mask;
-                device->int_flags = 0;
-
-                if (IS_AXI_BUS_ERR(*value))
-                {
-                    vg_lite_bus_error_handler();
-                }
-
-                return 1;
-            }
-        }
-    }
-    return 0;
-#endif
-
-#ifdef GUI_RTK_OSIF
     if (device->gpu_sem_handle)
     {
         if (os_sem_take(device->gpu_sem_handle, timeout) == true)
@@ -609,10 +515,6 @@ int32_t vg_lite_hal_wait_interrupt(uint32_t timeout, uint32_t mask, uint32_t *va
         }
     }
     return 0;
-#endif
-    return 0;
-
-
 }
 
 void *vg_lite_hal_map(unsigned long bytes, void *logical, uint32_t physical, uint32_t *gpu)
@@ -712,14 +614,11 @@ static int vg_lite_init(void)
     node->size = device->size;
     node->status = 0;
     add_list(&node->list, &device->heap.list);
-#ifdef __RTTHREAD__
-    device->int_queue = rt_sem_create("vglite", 0, RT_IPC_FLAG_FIFO);
-#endif
-#ifdef GUI_RTK_OSIF
+
     void *handle = 0;
     os_sem_create(&handle, "gpu_sem", 0, 1);
     device->gpu_sem_handle = handle;
-#endif
+
     device->int_flags = 0;
     /* Success. */
     return 0;
