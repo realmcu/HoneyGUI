@@ -135,6 +135,7 @@ void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
     //for self
 
     draw_img->data = addr;
+    draw_img->opacity_value = 255;
 
 }
 
