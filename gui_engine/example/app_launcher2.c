@@ -198,7 +198,7 @@ void static sport_chart_draw(gui_canvas_t *c)
             }
             gui_log("end_angle1:%f,%d,%f\n", end_angle1, end_flag, pro);
         }
-        pro += 0.01f;
+        pro += 0.03f;
     }
 
     int w = gui_get_screen_width();
@@ -495,7 +495,7 @@ static void start_mp3(void)
 {
     gui_log("static void start_mp3(void)\n");
     extern void audio_test_start_mp3(void);
-#ifdef audio_test_start_mp3
+#if defined (GUI_RTL8772F)
     audio_test_start_mp3();
 #endif
 }
@@ -503,7 +503,7 @@ static void stop_mp3(void)
 {
     gui_log("static void stop_mp3(void)\n");
     extern void audio_test_stop_mp3(void);
-#ifdef audio_test_stop_mp3
+#if defined (GUI_RTL8772F)
     audio_test_stop_mp3();
 #endif
 }

@@ -513,18 +513,18 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
     extern void *vg_lite_hal_alloc(unsigned long size);
 
 #define CUBE_PICTURE_FILE_SIZE 120840
-#if 0
+#if 1
     {
         gui_log("VG_LITE_HAL_ALLOC\n");
-        void *temp = vg_lite_hal_alloc(CUBE_PICTURE_FILE_SIZE);
+        void *temp = gui_malloc(CUBE_PICTURE_FILE_SIZE);
         memcpy(temp, array[0], CUBE_PICTURE_FILE_SIZE);
         array[0] = temp;
         array[1] = temp;
-        temp = vg_lite_hal_alloc(CUBE_PICTURE_FILE_SIZE);
+        temp = gui_malloc(CUBE_PICTURE_FILE_SIZE);
         memcpy(temp, array[2], CUBE_PICTURE_FILE_SIZE);
         array[2] = temp;
         array[3] = temp;
-        temp = vg_lite_hal_alloc(CUBE_PICTURE_FILE_SIZE);
+        temp = gui_malloc(CUBE_PICTURE_FILE_SIZE);
         memcpy(temp, array[4], CUBE_PICTURE_FILE_SIZE);
         array[4] = temp;
         array[5] = temp;
