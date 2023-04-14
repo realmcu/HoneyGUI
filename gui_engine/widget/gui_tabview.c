@@ -40,7 +40,7 @@ void tabview_prepare(gui_obj_t *obj)
     cover = cover1 || cover;
     //gui_log("cover = %d\n", cover);
     //gui_log("outer cover=%d,cur_id.x=%d,cur_id.y=%d\n", cover, ext->cur_id.x, ext->cur_id.y);
-    if (cover)
+    if (cover && tabview->cur_id.x == 0)
     {
         return;
     }

@@ -198,7 +198,10 @@ void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->type == target)
         {
-            *rst =  obj->cover;
+            if (!(*rst))
+            {
+                *rst =  obj->cover;
+            }
         }
         gui_tree_get_cover(obj, target, rst);
     }

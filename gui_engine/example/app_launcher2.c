@@ -175,14 +175,14 @@ void static sport_chart_draw(gui_canvas_t *c)
     float  end_angle3 = 0.0f;
     {
         static  float pro  = 0;
-        static bool end_flag;
-        if (pro == 1.0f)
+        static bool end_flag = false;
+        if (pro >= 0.99f)
         {
             end_flag = !end_flag;
             pro = 0;
         }
-        bool temp = (pro == 1.0f || pro == 0.0f);
-        if (!temp)
+        bool temp = (pro >= 0.99f || pro <= 0.01f);
+        //if (!temp)
         {
             if (!end_flag)
             {
@@ -196,6 +196,7 @@ void static sport_chart_draw(gui_canvas_t *c)
                 end_angle2 = (1 - pro) * (330 - 30) * 0.75f + 30;
                 end_angle3 = (1 - pro) * (330 - 30) + 30;
             }
+            gui_log("end_angle1:%f,%d,%f\n", end_angle1, end_flag, pro);
         }
         pro += 0.01f;
     }
@@ -615,6 +616,7 @@ void text_a(gui_text_t *text)
     }
 
 }
+#include "nanovg_agge.h"
 static void read_page_draw(gui_canvas_t *c)
 {
     static float t = 0;
@@ -634,7 +636,7 @@ static void read_page_draw(gui_canvas_t *c)
     samples[3] = (1.0f + sinf(t * 0.56345f + cosf(t * 1.63f) * 0.14f)) * 0.5f;
     samples[4] = (1.0f + sinf(t * 1.6245f + cosf(t * 0.254f) * 0.3f)) * 0.5f;
     samples[5] = (1.0f + sinf(t * 0.345f + cosf(t * 0.03f) * 0.6f)) * 0.5f;
-    t += 0.01f;
+    t += 0.05f;
     int i;
     for (i = 0; i < w.point_count; i++)
     {
@@ -643,7 +645,11 @@ static void read_page_draw(gui_canvas_t *c)
     }
     w.point_x = sx;
     w.point_y = sy;
-    w.fill.color_data.rgba = 0xeab6a2ff;
+    extern NVGcolor nvgHSLA(float h, float s, float l, unsigned char a);
+    NVGcolor color = nvgHSLA(sinf(2.0F * M_PI / 12.0F * 0.12f * (t)), 1.0f, 0.55f, 255);
+    w.fill.color_data.rgba = (uint32_t)((uint32_t)(color.r * 255.0f) << 24) + (uint32_t)((uint32_t)(
+                                 color.g * 255.0f) << 16) + (uint32_t)((uint32_t)(color.b * 255.0f) << 8) + (uint32_t)((uint32_t)(
+                                             color.a * 255.0f));
     gui_canvas_api.wave(c, &w);
 }
 void read_page(void *parent)
@@ -1005,28 +1011,15 @@ static void music_draw(gui_canvas_t *c)
 {
     static float t = 0;
 
-    canvas_arc_t a = {0};
-    a.cx = 454 / 2;
-    a.cy = 454 / 2;
-    a.r = 300 / 2;
-    a.stroke.stroke_width = 5;
-    a.stroke.fill.color_data.rgba = 0xe8734cff;
-    a.start_angle = 0;
-    static float angle = 0;
-    a.end_angle = angle;
+
     if (!music_button_click_pause)
     {
-        angle += 0.1f;
         t += 0.05f;
 //        gui_img_rotation((void *)music_album_picture, angle * 3.0f, gui_get_screen_width() / 2,
 //                         gui_get_screen_height() / 2);
     }
-    if (angle >= 360)
-    {
-        angle = 0;
-    }
 
-    gui_canvas_api.arc(c, &a);
+
     float dx = 454 / 5.0f;
     float samples[6];
     float sx[6], sy[6];
@@ -1043,7 +1036,10 @@ static void music_draw(gui_canvas_t *c)
         sx[i] =  i * dx;
         sy[i] = 454 * samples[i] * 0.8f;
         canvas_rectangle_t r = {0};
-        r.fill.color_data.rgba = 0xe8734caa;
+        NVGcolor color = nvgHSLA(sinf(2.0F * M_PI / 12.0F * 0.12f * i), 1.0f, 0.55f, 255);
+        r.fill.color_data.rgba = (uint32_t)((uint32_t)(color.r * 255.0f) << 24) + (uint32_t)((uint32_t)(
+                                     color.g * 255.0f) << 16) + (uint32_t)((uint32_t)(color.b * 255.0f) << 8) + (uint32_t)((uint32_t)(
+                                                 color.a * 255.0f));
         r.height = 454 - sy[i];
         r.width = 30;
         //r.rx = selector_rx;
@@ -1058,12 +1054,16 @@ static void music_draw(gui_canvas_t *c)
     samples[4] = (1.0f + sinf(t * 0.6245f + cosf(t * 0.254f) * 0.3f)) * 0.5f;
     samples[5] = (1.0f + sinf(t * 1.345f + cosf(t * 0.03f) * 0.6f)) * 0.5f;
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 1; i < 6; i++)
     {
         sx[i] =  i * dx;
         sy[i] = 454 * samples[i] * 0.8f;
         canvas_rectangle_t r = {0};
-        r.fill.color_data.rgba = 0xe8734caa;
+        NVGcolor color = nvgHSLA(sinf(2.0F * M_PI / 12.0F * 0.12f * (i + 6)), 1.0f, 0.55f, 255);
+        r.fill.color_data.rgba = (uint32_t)((uint32_t)(color.r * 255.0f) << 24) + (uint32_t)((uint32_t)(
+                                     color.g * 255.0f) << 16) + (uint32_t)((uint32_t)(color.b * 255.0f) << 8) + (uint32_t)((uint32_t)(
+                                                 color.a * 255.0f));
+
         r.height = 454 - sy[i];
         r.width = 30;
         //r.rx = selector_rx;
@@ -1096,23 +1096,136 @@ static void music_draw(gui_canvas_t *c)
     w.fill.color_data.rgba = 0xeab6a2ff;
     gui_canvas_api.wave(c, &w);*/
 }
+static void music_draw2(gui_canvas_t *c)
+{
+    //static float t = 0;
+
+    canvas_arc_t a = {0};
+    a.cx = 150 / 2;
+    a.cy = 150 / 2;
+    a.r = 150 / 2;
+    a.stroke.stroke_width = 10;
+    a.stroke.fill.color_data.rgba = 0xe8734cff;
+    a.start_angle = 0;
+    static float angle = 0;
+    a.end_angle = angle;
+    if (!music_button_click_pause)
+    {
+        angle += 0.10f;
+    }
+    if (angle >= 360)
+    {
+        angle = 0;
+    }
+
+    gui_canvas_api.arc(c, &a);
+
+
+
+}
+static void music_draw3(gui_canvas_t *c)
+{
+
+
+    static float gap = 10;
+    gap += 0.3f;
+    if (gap >= 20)
+    {
+        gap = 10;
+    }
+    uint32_t color[5] = {0xffffff33, 0xffffff55, 0xffffff99, 0xffffffbb, 0xffffffff};
+    for (size_t i = 0; i < 5; i++)
+    {
+        canvas_circle_t a = {0};
+        a.cx = 454 / 2;
+        a.cy = gap * i;
+        a.r = 5;
+        if (i == 4)
+        {
+            a.r = 5 + 2;
+            a.cy += (5);
+        }
+
+
+        a.fill.color_data.rgba = color[i];
+
+        gui_canvas_api.circle(c, &a);
+    }
+
+
+
+
+}
+static void music_draw4(gui_canvas_t *c)
+{
+
+
+    static float gap = 0;
+    gap += 0.6f;
+    if (gap >= 30)
+    {
+        gap = 0;
+    }
+    static float t = 0;
+    if (!music_button_click_pause)
+    {
+        t += 0.05f;
+//        gui_img_rotation((void *)music_album_picture, angle * 3.0f, gui_get_screen_width() / 2,
+//                         gui_get_screen_height() / 2);
+    }
+    float dx = 50.0f / 6.0f;
+    float samples[6];
+    float sx[6], sy[6];
+
+    samples[0] = (1.0f + sinf(t * 1.2345f + cosf(t * 0.33457f) * 0.44f)) * 0.5f;
+    samples[1] = (1.0f + sinf(t * 0.68363f + cosf(t * 1.3f) * 1.55f)) * 0.5f;
+    samples[2] = (1.0f + sinf(t * 1.1642f + cosf(t * 0.33457f) * 1.24f)) * 0.5f;
+    samples[3] = (1.0f + sinf(t * 0.56345f + cosf(t * 1.63f) * 0.14f)) * 0.5f;
+    samples[4] = (1.0f + sinf(t * 1.6245f + cosf(t * 0.254f) * 0.3f)) * 0.5f;
+    samples[5] = (1.0f + sinf(t * 0.345f + cosf(t * 0.03f) * 0.6f)) * 0.5f;
+
+    for (int i = 0; i < 6; i++)
+    {
+        sx[i] =  i * dx;
+        sy[i] = 50 * samples[i] * 0.8f;
+        canvas_rectangle_t r = {0};
+        r.fill.color_data.rgba = 0xffffffff;
+        r.height = 50 - sy[i];
+        r.width = 3;
+        //r.rx = selector_rx;
+        r.x = sx[i] / 2 + 454 / 2 - 15;
+        r.y = sy[i] + 454 - 50 - gap;
+        gui_canvas_api.rectangle(c, &r);
+    }
+}
 static void music(gui_obj_t *screen)
 {
-    music_album_picture = (void *)gui_svg_create_from_mem(screen, MUSIC_SVG, 2746, (454 - 300) / 2,
-                                                          (454 - 300) / 2, 300, 300);
+    gui_curtainview_t *cv = gui_curtainview_create(screen, "cvmusic", 0, 0, 0, 0);
+    gui_curtain_t *c1 = gui_curtain_create(cv, "c1", 0, 0, 0, 0, CURTAIN_MIDDLE, 1);
+    gui_curtain_t *c2 = gui_curtain_create(cv, "c2", 0, 0, 0, 0, CURTAIN_UP, 1);
+    gui_curtain_t *c3 = gui_curtain_create(cv, "c3", 0, 0, 0, 0, CURTAIN_DOWN, 1);
+
+    music_album_picture = (void *)gui_svg_create_from_mem(c2, MUSIC_SVG, 2746, (454 - 150) / 2,
+                                                          20, 150, 150);
     //music_album_picture = (void *)gui_magic_img_create_from_mem(screen, "1", CHARGE52_BIN,
     //                                                            (454 - 300) / 2, (454 - 300) / 2, 300, 300);
     //gui_img_scale((void *)music_album_picture, 300.0f / 112.0f, 300.0f / 200.0f);
-    gui_canvas_t *canvas = gui_canvas_create(screen, "c", 0, 0, 454, 454, 0);
+    gui_canvas_t *canvas = gui_canvas_create(c3, "c", 0, 0, 454, 454, 0);
     canvas->draw = music_draw;
+    gui_canvas_t *canvas2 = gui_canvas_create(music_album_picture, "c", 0, 0, 454, 454, 0);
+    canvas2->draw = music_draw2;
+    gui_canvas_t *canvas3 = gui_canvas_create(c2, "c", 0, 454, 454, 454, 0);
+    canvas3->draw = music_draw3;
+    gui_canvas_t *canvas4 = gui_canvas_create(c3, "c", 0, -454, 454, 454, 0);
+    canvas4->draw = music_draw4;
     gui_button_t *music_button, *music_button_previous, *music_button_next;
-    music_button_previous = gui_button_create(canvas, 38 + 0 * (100 + 38), 454 / 2 - 50, 100, 100,
+    music_button_previous = gui_button_create(screen, 38 + 0 * (100 + 38), 454 / 2 - 50, 100, 100,
                                               BACK_SVG, NULL, NULL, 2,
                                               966);
-    music_button = gui_button_create(canvas, 38 + 1 * (100 + 38), 454 / 2 - 50, 100, 100, PALY2_SVG,
+    music_button = gui_button_create(screen, 38 + 1 * (100 + 38), 454 / 2 - 50, 100, 100, PALY2_SVG,
                                      NULL, NULL, 2,
                                      610);
-    music_button_next = gui_button_create(canvas, 38 + 2 * (100 + 38), 454 / 2 - 50, 100, 100,
+    music_button_next = gui_button_create(screen, 38 + 2 * (100 + 38), 454 / 2 - 50, 100, 100,
                                           NEXT2_SVG,
                                           NULL, NULL, 2,
                                           1048);
