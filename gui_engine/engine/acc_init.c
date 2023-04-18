@@ -5,7 +5,7 @@
 
 #ifdef MODULE_VG_LITE
 #elif defined (MODULE_RTK_PPE)
-#include "rtl876x_rcc.h"
+#include "rtl_rcc.h"
 #else
 #endif
 
