@@ -29,8 +29,8 @@
 #define _vg_lite_options_h_
 
 #define CHIPID          0x265
-#define REVISION        0x2001
-#define CID             0x41E
+#define REVISION        0x2000
+#define CID             0x415
 
 #define gcFEATURE_VG_IM_INDEX_FORMAT    1
 #define gcFEATURE_VG_PE_PREMULTIPLY    0
