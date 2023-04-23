@@ -1,0 +1,87 @@
+Vivante VGLite API Driver Release Notes
+
+This file includes a list of high level updates for each driver release.
+
+OVERVIEW
+========
+
+Vivante VGLite Graphics API is designed to support2D vector and 2D raster-based operations for rendering
+interactive user interface that may include menus, fonts, curves, and images. The VGLite API allows users
+to develop customized applications for mobile or IOT devices that include Vivante Vector Graphics IP.
+
+Please refer to
+
+    Vivante.Programming.VGLite.Vector.Graphics.API-<version>-<date>.pdf
+
+document for the VGLite API functions.
+
+LIMITATION
+==========
+
+    1. Currently VGLite API driver only supports 32-bit OS/RTOS, as VGLite HW/SW is designed for embedded devices.
+    2. VGLite driver only support single thread, single context rendering, it does not support multi-thread rendering.
+    3. VGLite GPU does not include MMU, so VGLite driver programs GPU hardware with system memory physical addresses directly.
+
+
+CHANGES
+=======
+
+October 2022: vglite_4_0_0
+--------------------------
+
+    1. Major VGLite API update to version 3.0 which includes some API changes and new APIs to support GC555 new features.
+    2. Add vg_lite_set_pixel_matrix(...) API to support pixel matrix transfermation.
+    3. Add vg_lite_gaussian_filter(...) API to support 3x3 gaussian blur.
+    4. Add vg_lite_set_color_transform(...) API and enable/disable APIs to support pixel color transfrom.
+    5. Add masklayer APIs vg_lite_create_masklayer, vg_lite_render_masklayer, etc. to support VG masklayer functions.
+    6. Add VSI FLEXA interface support for VG IPs that include FLEXA feature.
+    7. Update vg_lite_blit_rect() API to use "vg_lite_rectangle_t *rect" as the rectangle area input parameter.
+    8. Change runtime feature check to compile time feature selection with build flags in vg_lite_options.h.
+
+
+August 2022: vglite_3_1_17
+--------------------------
+
+    1. Set default command buffer size to 64K.
+    2. Add feature global alpha.
+    3. Add feature ETC2.
+    4. Add feature color key.
+    5. Add driver support for arc path.
+    6. Add double image feature.
+    7. Add driver support for 24 bit feature.
+    8. Add APIs for dither.
+    9. Add the AHB bus configuration for alpha blending.
+    10. Add vg_lite_kernel_flexa_info_t information.
+    11. Add free path data memory allocated by driver.
+    12. Support vg_lite_flush and vg_lite_finish call order.
+    13. Add API vg_lite_set_command_buffer and vg_lite_set_ts_buffer.
+    14. Support bounding box for path.
+    15. Add API vg_lite_path_append support arc path and fix clockwise and counterclockwise order errors.
+    16. Add gcFEATURE_BIT_VG_IM_INPUT check in function.
+    17. Add feature DECNano compress and decompress.
+    18. Add API vg_lite_get_transform_matrix.
+    19. Add API to set stoke color.
+    20. Add LVGL feature recolor.
+    21. Add feature index endian.
+    22. Add format A8RGB565_PLANAR.
+    23. Add ts buffer block processing.
+    24. Add feature pixel matrix.
+    25. Add blend modes VG_LITE_BLEND_NORMAL_LVGL, VG_LITE_BLEND_MULTIPLY_LVGL,
+        VG_LITE_BLEND_ADDITIVE_LVGL, VG_LITE_BLEND_SUBTRACT_LVGL.
+    26. Add stripe mode API.
+    27. Add vg_lite_set_premultiply API.
+    28. Add limit parallel path feature.
+    29. Add vg_lite_scissor_rects API.
+
+June 2022: vglite_3_1_16
+------------------------
+
+    1. Enable vg_lite_path_append API to support arc paths.
+    2. Skip when the length or width of the rectangle area is 0.
+    3. Add support for the path bounding box.
+
+January 2022: vglite_3_1_15
+---------------------------
+    1. Turn off PE clear by default.
+    2. Fix the build issue caused by undefined types u32 and s32 for FreeRTOS.
+    3. Add support for all path data formats in the vg_lite_path_append API.

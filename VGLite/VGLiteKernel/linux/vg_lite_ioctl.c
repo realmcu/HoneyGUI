@@ -52,39 +52,65 @@
 *
 *****************************************************************************/
 
-#ifndef _vg_lite_hw_h
-#define _vg_lite_hw_h
+#include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include "vg_lite_kernel.h"
+#include "vg_lite_ioctl.h"
 
-#define VG_LITE_HW_CLOCK_CONTROL    0x000
-#define VG_LITE_HW_IDLE             0x004
-#define VG_LITE_INTR_STATUS         0x010
-#define VG_LITE_INTR_ENABLE         0x014
-#define VG_LITE_HW_CHIP_ID          0x020
-#define VG_LITE_HW_CMDBUF_ADDRESS   0x500
-#define VG_LITE_HW_CMDBUF_SIZE      0x504
+static int device = 0;
+static uint32_t length = 0;
+static void * mapped = NULL;
 
-#define VG_LITE_EXT_WORK_CONTROL    0x520
-#define VG_LITE_EXT_VIDEO_SIZE      0x524
-#define VG_LITE_EXT_CLEAR_VALUE     0x528
+vg_lite_error_t vg_lite_kernel(vg_lite_kernel_command_t command, void * data)
+{
+    struct ioctl_data to_kernel;
+    static const uint32_t bytes[] = {
+        sizeof(vg_lite_kernel_initialize_t),
+        sizeof(vg_lite_kernel_terminate_t),
+        sizeof(vg_lite_kernel_allocate_t),
+        sizeof(vg_lite_kernel_free_t),
+        sizeof(vg_lite_kernel_submit_t),
+        sizeof(vg_lite_kernel_wait_t),
+        sizeof(vg_lite_kernel_reset_t),
+        sizeof(vg_lite_kernel_debug_t),
+        sizeof(vg_lite_kernel_map_t),
+        sizeof(vg_lite_kernel_unmap_t),
+        sizeof(vg_lite_kernel_info_t),
+        sizeof(vg_lite_kernel_mem_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_map_memory_t),
+        sizeof(vg_lite_kernel_unmap_memory_t),
+    };
 
-#define VG_LITE_EXT_VIDEO_CONTROL   0x51C
+    if (device == 0) {
+        device = open("/dev/vg_lite", O_RDWR);
+        if (device == -1)
+            return VG_LITE_GENERIC_IO;
 
-typedef struct clock_control {
-    uint32_t reserved0 : 1;
-    uint32_t clock_gate : 1;
-    uint32_t scale : 7;
-    uint32_t scale_load : 1;
-    uint32_t reserved10 : 2;
-    uint32_t soft_reset : 1;
-    uint32_t reserved13 : 6;
-    uint32_t isolate : 1;
-} clock_control_t;
+        /* Default contiguous mapping size. */
+        length = MAX_CONTIGUOUS_SIZE;
 
-typedef union vg_lite_hw_clock_control {
-    clock_control_t control;
-    uint32_t        data;
-} vg_lite_hw_clock_control_t;
+        mapped = mmap(NULL, length, PROT_READ | PROT_WRITE, MAP_SHARED, device, 0);
+        if ((mapped == NULL) ||
+            (mapped == (char *)-1)) {
+            close(device);
+            device = 0;
+            return VG_LITE_GENERIC_IO;
+        }
+    }
 
-#define VG_LITE_HW_IDLE_STATE       0x0B05
+    to_kernel.command = command;
+    to_kernel.buffer = data;
+    to_kernel.bytes = bytes[command];
 
-#endif /* defined(_vg_lite_hw_h) */
+    if (ioctl(device, VG_LITE_IOCTL, &to_kernel) < 0)
+        return VG_LITE_GENERIC_IO;
+
+    return to_kernel.error;
+}
