@@ -20,9 +20,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     {
         target.format = PPE_BGR565;
     }
-    else
+    else if (dc->bit_depth == 32)
     {
-        target.format = PPE_BGRA8888;
+        target.format = PPE_ABGR8888;
+    }
+    else if (dc->bit_depth == 24)
+    {
+        target.format = PPE_BGR888;
     }
     target.memory = (void *)dc->frame_buf;
     target.address = (uint32_t)dc->frame_buf;

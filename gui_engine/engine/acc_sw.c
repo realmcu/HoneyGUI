@@ -909,7 +909,7 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     {
         if ((img_type == RGB888) && (dc_bytes_per_pixel == 4))
         {
-            //no_blending_blit_rgb888_2_argb8888(image, dc, rect);
+            normal_blit_rgb888_2_argb8888(image, dc, rect);
         }
         else if ((img_type == RGB565) && (dc_bytes_per_pixel == 4))
         {
