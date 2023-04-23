@@ -4,7 +4,6 @@
 // #define ALLOW_UNALIGNED_TRUETYPE
 #include "stb_truetype.h"
 #include "acc_engine.h"
-#define RTK_GUI_TTF_SVG
 
 static stbtt_fontinfo font;
 
@@ -17,7 +16,7 @@ static void rtgui_font_stb_load(gui_text_t *text)
     }
     uint16_t unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
     text->font_len = unicode_len;
-    uint32_t all_char_w = 0;
+    float all_char_w = 0;
     float scale = 0;
     int ch = 0, advance = 0, lsb = 0;
     scale = stbtt_ScaleForPixelHeight(&font, text->font_height);
@@ -41,10 +40,10 @@ static void rtgui_font_stb_load(gui_text_t *text)
             // text->text_offset = all_char_w / text->base.w + 1 + line_flag;
             break;
         case SCROLL_X:
-            text->text_offset = all_char_w;
+            text->text_offset = (int)(all_char_w + 1);
             break;
         case SCROLL_Y:
-        // text->text_offset = (all_char_w / text->base.w + 1 + line_flag)*text->font_height;
+            text->text_offset = (all_char_w / text->base.w + 1) * text->font_height;
         default:
             break;
         }
@@ -63,7 +62,7 @@ gui_inline uint32_t blend_b_and_f_with_a(uint32_t b, uint32_t f, uint8_t a)
     gui_color_t color_b = {.rgba = b};
     gui_color_t color_f = {.rgba = f};
     color_f.channel.alpha = a;
-    gui_color_t color_r;
+    gui_color_msb_t color_r;
     color_b.channel.alpha = 0xff - color_f.channel.alpha;
     color_r.channel.blue = _b_and_f(color_b, color_f, blue)
                            color_r.channel.green = _b_and_f(color_b, color_f, green)
@@ -120,8 +119,8 @@ static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_cou
 #endif
 static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
 {
-    int ascent = 0, descent = 0, lineGap = 0, ch = 0;
-    float scale = 0, xpos = 0, baseline = 0;
+    int ascent = 0, descent = 0, lineGap = 0, ch = 0, line_num = 0;
+    float scale = 0, xpos = 0, ypos = 0, baseline = 0;
     scale = stbtt_ScaleForPixelHeight(&font, text->font_height);
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     baseline = ascent * scale;
@@ -140,7 +139,7 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         int glyph_index = stbtt_FindGlyphIndex(&font, p_buf[ch]);
         int advance, lsb, x0, y0, x1, y1;
         stbtt_GetGlyphHMetrics(&font, glyph_index, &advance, &lsb);
-        gui_log("unicode : %c\n", p_buf[ch]);
+        // gui_log("unicode : %c\n", p_buf[ch]);
         if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
         {
             if (xpos + advance * scale > text->base.w)
@@ -154,11 +153,11 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         }
         else if (text->mode == SCROLL_X)
         {
-            if (rect->x1 + xpos + advance * scale >= rect->xboundright)
+            if (rect->x1 + xpos + advance * scale >= text->base.dx + text->base.w)
             {
                 break;
             }
-            if (rect->x1 + xpos < rect->xboundleft)
+            if (rect->x1 + xpos < text->base.dx)
             {
                 xpos += (advance * scale);
                 ch++;
@@ -191,7 +190,16 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         memset(font_shape, 0, sizeof(NSVGshape));
         font_shape->opacity = 1;
         font_shape->fill.type = 1;
-        font_shape->fill.d.color = text->color;
+        //font_shape->fill.d.color = text->color;
+        gui_color_t color_r = {0};
+        color_r.rgba = text->color;
+        gui_color_msb_t color_f = {0};
+        color_f.channel.alpha = color_r.channel.alpha;
+        color_f.channel.red = color_r.channel.blue;
+        color_f.channel.blue = color_r.channel.red;
+        color_f.channel.green = color_r.channel.green;
+
+        font_shape->fill.d.color = color_f.rgba;
         font_shape->flags = 1;
         // font_shape->bounds[0] = 0;
         // font_shape->bounds[1] = 0;
@@ -269,6 +277,7 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         gui_free(path_num);
 
 //svg fill ok
+        gui_log("fill ok stb \n");
         gui_get_acc()->draw_svg(font_svg, 1, dc, rect->x1 + xpos, rect->y1, 1, 0, 0, 0);
         extern void nsvgDelete(NSVGimage * image);
         nsvgDelete(font_svg);
@@ -278,8 +287,33 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         ++ch;
     }
 #else
-    int width = rect->x2 - rect->x1;
-    int height = rect->y2 - rect->y1;
+    int width = 0;
+    int height = 0;
+    if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
+    {
+        width = _UI_MIN(rect->x2 - rect->x1, text->base.w - text->text_offset * 2);
+        height = rect->y2 - rect->y1;
+    }
+    else if (text->mode == MUTI_LEFT || text->mode == MUTI_CENTER || text->mode == MUTI_RIGHT)
+    {
+        /* code */
+    }
+    else if (text->mode == SCROLL_X)
+    {
+        width =  rect->x2 - rect->x1;
+        height = rect->y2 - rect->y1;
+    }
+    else if (text->mode == SCROLL_Y)
+    {
+        width =  rect->x2 - rect->x1;
+        height = rect->y2 - rect->y1;
+    }
+    if (width == 0 || height == 0)
+    {
+        return;
+    }
+    GUI_ASSERT(width > 0);
+    GUI_ASSERT(height > 0);
     uint8_t *screen = gui_malloc((width) * (height) * sizeof(uint8_t));
     if (screen == NULL)
     {
@@ -288,22 +322,52 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
     memset(screen, 0, (width) * (height)*sizeof(uint8_t));
     while (ch < unicode_len)
     {
+        int glyph_index = stbtt_FindGlyphIndex(&font, p_buf[ch]);
         int advance, lsb, x0, y0, x1, y1;
         float x_shift = xpos - (float) floor(xpos);
-        stbtt_GetCodepointHMetrics(&font, p_buf[ch], &advance, &lsb);
-        stbtt_GetCodepointBitmapBoxSubpixel(&font, p_buf[ch], scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
-        // if ((baseline + y0) >= height || ((int) xpos + x0) >= width)
-        // {
-        //     printf("baseline + y0 %d,  ((int) xpos + x0) %d\n",baseline + y0, ((int) xpos + x0));
-        // }
-        stbtt_MakeCodepointBitmapSubpixel(&font, &screen[((int)baseline + y0)*width + (int) xpos + x0],
-                                          x1 - x0, y1 - y0, width, scale, scale, x_shift, 0, p_buf[ch]);
-        xpos += (advance * scale);
-        if (ch < unicode_len - 1)
+        stbtt_GetGlyphHMetrics(&font, glyph_index, &advance, &lsb);
+        stbtt_GetGlyphBitmapBoxSubpixel(&font, glyph_index, scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
+        if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
         {
-            xpos += scale * stbtt_GetCodepointKernAdvance(&font, p_buf[ch], p_buf[ch + 1]);
+            if (xpos + advance * scale > width)
+            {
+                break;
+            }
         }
+        else if (text->mode == MUTI_LEFT || text->mode == MUTI_CENTER || text->mode == MUTI_RIGHT)
+        {
+            if (xpos + advance * scale > width)
+            {
+                ypos += scale * (ascent - descent + lineGap);
+            }
+        }
+        else if (text->mode == SCROLL_X)
+        {
+            if (rect->x1 + xpos > text->base.dx + text->base.w)
+            {
+                break;
+            }
+            if (rect->x1 + xpos + advance * scale < text->base.dx)
+            {
+                xpos += (advance * scale);
+                ch++;
+                continue;
+            }
+        }
+        else if (text->mode == SCROLL_Y)
+        {
+            if (xpos + advance * scale > width * (line_num + 1))
+            {
+                line_num ++;
+            }
+        }
+        // gui_log("unicode %x \n",p_buf[ch]);
+        ypos = line_num * scale * (ascent - descent + lineGap);
+        stbtt_MakeCodepointBitmapSubpixel(&font,
+                                          &screen[((int)baseline + y0 + (int)ypos)*width + (int) xpos + x0],
+                                          x1 - x0, y1 - y0, width, scale, scale, x_shift, 0, p_buf[ch]);
         ++ch;
+        xpos += (advance * scale);
     }
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 
@@ -311,10 +375,12 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
     {
         uint32_t *writebuf = (uint32_t *)dc->frame_buf + (rect->y1) * dc->fb_width + rect->x1;
         uint32_t color_back;
-        for (uint32_t i = 0; i < height && (i + rect->y1 <= dc->fb_height); i++)
+        for (int32_t i  = _UI_MAX(text->base.dy - rect->y1, 0); i < height &&
+             (i + rect->y1 <= text->base.dy + text->base.h); i++)
         {
             int write_off = (i + dc->section.y1) * dc->fb_width;
-            for (uint32_t j = 0; j < width && (j + rect->x1 <= dc->fb_width); j++)
+            for (int32_t j = _UI_MAX(text->base.dx - rect->x1, 0); j < width &&
+                 (j + rect->x1 <= text->base.dx + text->base.w); j++)
             {
                 if (screen[i * width + j] != 0)
                 {
@@ -328,10 +394,12 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
     {
         uint16_t *writebuf = (uint16_t *)dc->frame_buf + (rect->y1) * dc->fb_width + rect->x1;
         uint16_t color_back;
-        for (uint32_t i = 0; i < height && (i + rect->y1 <= dc->fb_height); i++)
+        for (int32_t i  = _UI_MAX(text->base.dy - rect->y1, 0); i < height &&
+             (i + rect->y1 <= text->base.dy + text->base.h); i++)
         {
             int write_off = (i + dc->section.y1) * dc->fb_width;
-            for (uint32_t j = 0; j < width && (j + rect->x1 <= dc->fb_width); j++)
+            for (int32_t j = _UI_MAX(text->base.dx - rect->x1, 0); j < width &&
+                 (j + rect->x1 <= text->base.dx + text->base.w); j++)
             {
                 if (screen[i * width + j] != 0)
                 {

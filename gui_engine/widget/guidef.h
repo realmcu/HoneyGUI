@@ -103,6 +103,17 @@ typedef union gui_color
         unsigned char red;
     } channel;
 } gui_color_t;
+typedef union gui_color_msb
+{
+    unsigned long rgba;
+    struct
+    {
+        unsigned char blue;
+        unsigned char green;
+        unsigned char red;
+        unsigned char alpha;
+    } channel;
+} gui_color_msb_t;
 
 
 

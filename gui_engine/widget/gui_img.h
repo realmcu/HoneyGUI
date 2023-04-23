@@ -34,7 +34,7 @@ void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
 /**
  * @brief set x,y and file path
  *
- * @param obj image widget
+ * @param img image widget
  * @param filename change filename if using filesystem picture
  * @param addr change picture address
  * @param x X-axis coordinate
@@ -44,21 +44,34 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
                            int16_t y);
 
 /**
- * @brief load the image to read it's width and hight
+ * @brief load the image to read it's width
  *
- * @param obj image widget
+ * @param img the image widget pointer.
+ * @return uint16_t image's width
  */
-
 uint16_t gui_img_get_width(gui_img_t *img);
 
+/**
+ * @brief load the image to read it's hight
+ *
+ * @param img the image widget pointer.
+ * @return uint16_t image's height
+ */
 uint16_t gui_img_get_height(gui_img_t *img);
 
+/**
+ * @brief set the image's location
+ *
+ * @param img the image widget pointer.
+ * @param x the x coordinate
+ * @param y the y coordinate
+ */
 void gui_img_set_location(gui_img_t *img, uint16_t x, uint16_t y);
 
 /**
  * @brief set the image's mode.
  *
- * @param obj the image widget pointer.
+ * @param img the image widget pointer.
  * @param mode the enumeration value of the mode is IMAGE_MODE.
  * @return void
  *

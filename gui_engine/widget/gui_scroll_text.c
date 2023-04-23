@@ -27,6 +27,11 @@ static void scrolltext_draw(gui_obj_t *obj)
         return;
     }
     struct gui_dispdev *dc = gui_get_dc();
+    if (dc->section_count == 0)
+    {
+        cur_time_ms = gui_ms_get();
+        rtgui_text_create(&text->base);
+    }
     uint32_t offset = text->base.text_offset;
     uint32_t index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
     text->cnt_value = (text->end_value + text->start_value + offset) * index
@@ -57,11 +62,6 @@ static void scrolltext_draw(gui_obj_t *obj)
     draw_rect.xboundright = obj->dx + obj->w;
     draw_rect.yboundtop = obj->dy;
     draw_rect.yboundbottom = obj->dy + obj->h;
-    if (dc->section_count == 0)
-    {
-        cur_time_ms = gui_ms_get();
-        rtgui_text_create(&text->base);
-    }
     if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
     {
         rtgui_font_draw(&text->base, &draw_rect);
