@@ -7,6 +7,7 @@ from building import *
 cwd = GetCurrentDir()
 
 src = Glob('*.c')
+src += Glob('rtos/*.c')
 SrcRemove(src,'vg_lite_dump.c')
 CPPPATH = [cwd]
 
