@@ -331,7 +331,8 @@ static void tab_prepare(gui_obj_t *this)
 {
     if (this->parent->type == TABVIEW)
     {
-        if (((gui_tab_t *)this)->id.x != 4 && ((gui_tab_t *)this)->id.x != 2)
+        if (((gui_tab_t *)this)->id.x != 4 && ((gui_tab_t *)this)->id.x != 2 &&
+            ((gui_tab_t *)this)->id.x != 6)
         {
             switch (((gui_tabview_t *)(this->parent))->style)
             {

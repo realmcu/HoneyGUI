@@ -264,19 +264,22 @@ static bool full_rank(struct rtgui_matrix *m)
 {
     for (int i = 0; i < 3; i++)
     {
-        //gui_log("%f,%f,%f\n", m->m[i][0], m->m[i][1], m->m[i][2]);
+        gui_log("%f, %f, %f, ", m->m[0][i], m->m[1][i], m->m[2][i]);
+        //gui_log("%f,%f,%f,", m->m[i][0], m->m[i][1], m->m[i][2]);
         if (m->m[i][0] == 0 && m->m[i][1] == 0 && m->m[i][2] == 0)
         {
+            gui_log("\n");
             return false;
         }
-        //gui_log("%f,%f,%f\n", m->m[0][i], m->m[1][i], m->m[2][i]);
-        if ((m->m[0][i] * 10000.0f < 10.0f && m->m[0][i] * 10000.0f > -10.0f) &&
-            (m->m[1][i] * 10000.0f < 10.0f && m->m[1][i] * 10000.0f > -10.0f) &&
-            (m->m[2][i] * 10000.0f < 10.0f && m->m[2][i] * 10000.0f > -10.0f))
+        //
+        if ((m->m[0][i] * 10000.0f < 1000.0f && m->m[0][i] * 10000.0f > -1000.0f) &&
+            (m->m[1][i] * 10000.0f < 1000.0f && m->m[1][i] * 10000.0f > -1000.0f) &&
+            (m->m[2][i] * 10000.0f < 1000.0f && m->m[2][i] * 10000.0f > -1000.0f))
         {
+            gui_log("\n");
             return false;
         }
-    }
+    } gui_log("\n");
     return true;
 }
 #define CUBE_JUDEG_FULL_RANK(m) if(full_rank(m->matrix))

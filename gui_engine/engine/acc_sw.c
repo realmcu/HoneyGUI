@@ -214,16 +214,14 @@ void (nanovg_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
                            nvgRGBA(wave->fill.color_data.rgba >> 24, wave->fill.color_data.rgba >> 16,
                                    wave->fill.color_data.rgba >> 8, wave->fill.color_data.rgba));
     nvgBeginPath(vg);
-    nvgMoveTo(vg, sx[0], sy[0]); gui_log("nvgMoveTo:(%f,%f)\n", sx[0], sy[0]);
+    nvgMoveTo(vg, sx[0], sy[0]);
     int i;
     for (i = 1; i < wave->point_count; i++)
     {
         nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
-        gui_log("Bezier%d:c1(%f,%f),c2(%f,%f),point(%f,%f)\n", i, sx[i - 1] + dx * 0.5f, sy[i - 1],
-                sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
     }
-    nvgLineTo(vg, x + w, y + h); gui_log("nvgLineTo:(%f,%f)\n", x + w, y + h);
-    nvgLineTo(vg, x, y + h); gui_log("nvgLineTo:(%f,%f)\n", x, y + h);
+    nvgLineTo(vg, x + w, y + h);
+    nvgLineTo(vg, x, y + h);
     nvgFillPaint(vg, bg);
     nvgFill(vg);
 

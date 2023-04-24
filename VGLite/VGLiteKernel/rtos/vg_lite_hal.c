@@ -308,12 +308,14 @@ vg_lite_error_t vg_lite_hal_allocate_contiguous(unsigned long size, void **logic
     {
         return VG_LITE_OUT_OF_MEMORY;
     }
-
+    int count = 0;
     /* Walk the heap backwards. */
     for (pos = (heap_node_t *)device->heap.list.prev;
          &pos->list != &device->heap.list;
          pos = (heap_node_t *) pos->list.prev)
     {
+        rt_kprintf("%x,%x,%x\n", &pos->list, pos->list.next, count);
+        count++;
         /* Check if the current node is free and is big enough. */
         if (pos->status == 0 && pos->size >= aligned_size)
         {
@@ -331,7 +333,7 @@ vg_lite_error_t vg_lite_hal_allocate_contiguous(unsigned long size, void **logic
             *physical = gpuMemBase + (uint32_t)(*logical);/* device->physical + pos->offset; */
             device->heap.free -= aligned_size;
 
-            *node = pos;
+            *node = pos; rt_kprintf("%x\n", pos);
             return VG_LITE_SUCCESS;
         }
     }

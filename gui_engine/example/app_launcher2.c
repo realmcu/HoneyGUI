@@ -673,6 +673,8 @@ void read_page(void *parent)
     text = gui_text_create(parent, "icon_text", 200, 200-50, RTK_GUI_DEFAULT_FONT_SIZE*6, RTK_GUI_DEFAULT_FONT_SIZE*6);
         gui_text_set(text, t, "rtk_font_stb", BUTTON_COLOR, strlen(t),
                      RTK_GUI_DEFAULT_FONT_SIZE*6);  */
+    gui_svg_create_from_mem(parent, HEARTRATE_SVG, 2890, 445, 445, 10, 10);
+    //gui_svg_create_from_mem(parent, MUSIC_SVG, 2746, 450,450, 5, 5);
     gui_canvas_t *canvas = gui_canvas_create(parent, "c", 0, 0, 454, 454, 0);
     canvas->draw = read_page_draw;
 //    gui_text_t *text = gui_text_create(parent, "icon_text", 150, 200, RTK_GUI_DEFAULT_FONT_SIZE * 7,
@@ -1117,7 +1119,7 @@ static void music_draw2(gui_canvas_t *c)
     {
         angle = 0;
     }
-
+    a.stroke.stroke_linecap = ROUND;
     gui_canvas_api.arc(c, &a);
 
 
@@ -1212,7 +1214,7 @@ static void music(gui_obj_t *screen)
     //gui_img_scale((void *)music_album_picture, 300.0f / 112.0f, 300.0f / 200.0f);
     gui_canvas_t *canvas = gui_canvas_create(c3, "c", 0, 0, 454, 454, 0);
     canvas->draw = music_draw;
-    gui_canvas_t *canvas2 = gui_canvas_create(music_album_picture, "c", 0, 0, 454, 454, 0);
+    gui_canvas_t *canvas2 = gui_canvas_create(music_album_picture, "c", 0, 0, 200, 200, 0);
     canvas2->draw = music_draw2;
     gui_canvas_t *canvas3 = gui_canvas_create(c2, "c", 0, 454, 454, 454, 0);
     canvas3->draw = music_draw3;
