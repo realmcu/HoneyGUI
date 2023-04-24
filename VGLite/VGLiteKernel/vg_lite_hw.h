@@ -2,7 +2,7 @@
 *
 *    The MIT License (MIT)
 *
-*    Copyright (c) 2014 - 2022 Vivante Corporation
+*    Copyright (c) 2014 - 2020 Vivante Corporation
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 *
 *    The GPL License (GPL)
 *
-*    Copyright (C) 2014 - 2022 Vivante Corporation
+*    Copyright (C) 2014 - 2020 Vivante Corporation
 *
 *    This program is free software; you can redistribute it and/or
 *    modify it under the terms of the GNU General Public License
@@ -69,7 +69,8 @@
 
 #define VG_LITE_EXT_VIDEO_CONTROL   0x51C
 
-typedef struct clock_control {
+typedef struct clock_control
+{
     uint32_t reserved0 : 1;
     uint32_t clock_gate : 1;
     uint32_t scale : 7;
@@ -80,7 +81,8 @@ typedef struct clock_control {
     uint32_t isolate : 1;
 } clock_control_t;
 
-typedef union vg_lite_hw_clock_control {
+typedef union vg_lite_hw_clock_control
+{
     clock_control_t control;
     uint32_t        data;
 } vg_lite_hw_clock_control_t;

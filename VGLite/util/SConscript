@@ -1,0 +1,19 @@
+# RTK building script for GuiEngine
+
+import os
+
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Glob('*.c')
+src += Glob('libpng-1.6.1/*.c')
+src += Glob('zlib-1.2.7/*.c')
+CPPPATH = [cwd, 
+           cwd + '/libpng-1.6.1',
+           cwd + '/zlib-1.2.7']
+
+group = DefineGroup('vg_lite', src, depend = ['MODULE_VG_LITE_UTIL'], CPPPATH = CPPPATH)
+
+
+Return('group')

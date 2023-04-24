@@ -1,7 +1,0 @@
-{
-    global:
-        vg_lite_*;
-
-    local:
-        *;
-};

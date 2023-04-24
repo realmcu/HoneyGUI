@@ -1,21 +1,14 @@
-# RTK building script for GuiEngine
-
+# for module compiling
 import os
-
 from building import *
 
-cwd = GetCurrentDir()
+cwd  = GetCurrentDir()
+objs = []
 list = os.listdir(cwd)
-
-src = Glob('*.c')
-SrcRemove(src,'vg_lite_dump.c')
-CPPPATH = [cwd,cwd + '/inc']
-
-group = DefineGroup('vg_lite', src, depend = ['MODULE_VG_LITE'], CPPPATH = CPPPATH)
 
 for d in list:
     path = os.path.join(cwd, d)
     if os.path.isfile(os.path.join(path, 'SConscript')):
-        group = group + SConscript(os.path.join(d, 'SConscript'))
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
 
-Return('group')
+Return('objs')

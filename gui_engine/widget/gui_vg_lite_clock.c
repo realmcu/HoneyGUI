@@ -583,7 +583,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_minute.path = path_minute_data;
     (vg_lite_path_append(&path_minute, line_cmd, minutes_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_minute, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 4, 24, dash, 0,
-                        0, 0xdeadbeef));
+                        0));
     (vg_lite_update_stroke(&path_minute));
     (vg_lite_set_draw_path_type(&path_minute, VG_LITE_DRAW_STROKE_PATH));
 
@@ -593,7 +593,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_sec.path = path_sec_data;
     (vg_lite_path_append(&path_sec, second_cmd, second_data, sizeof(second_cmd)));
     (vg_lite_set_stroke(&path_sec, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 1.5, 12, dash, 0,
-                        0, 0xdeadbeef));
+                        0));
     (vg_lite_update_stroke(&path_sec));
     (vg_lite_set_draw_path_type(&path_sec, VG_LITE_DRAW_STROKE_PATH));
 
@@ -604,7 +604,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_hour_1.path = path_hour_1_data;
     (vg_lite_path_append(&path_hour_1, line_cmd, hour_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_hour_1, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 9, 18, dash, 0,
-                        0, 0xdeadbeef));
+                        0));
     (vg_lite_update_stroke(&path_hour_1));
     (vg_lite_set_draw_path_type(&path_hour_1, VG_LITE_DRAW_STROKE_PATH));
 
@@ -615,7 +615,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_hour_2.path = path_hour_2_data;
     (vg_lite_path_append(&path_hour_2, line_cmd, hour_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_hour_2, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 6, 10, dash, 0,
-                        0, 0xdeadbeef));
+                        0));
     (vg_lite_update_stroke(&path_hour_2));
     (vg_lite_set_draw_path_type(&path_hour_2, VG_LITE_DRAW_STROKE_PATH));
 
@@ -625,7 +625,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_sunshine.path = path_sunshine_data;
     (vg_lite_path_append(&path_sunshine, line_cmd, sunshine_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_sunshine, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 2, 18, dash, 0,
-                        0, 0xdeadbeef));
+                        0));
     (vg_lite_update_stroke(&path_sunshine));
     (vg_lite_set_draw_path_type(&path_sunshine, VG_LITE_DRAW_STROKE_PATH));
 
@@ -648,7 +648,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
                       -50, 50, 50);
     (vg_lite_path_append(&path_c_letter, c_letter_cmd, c_letter_data, sizeof(c_letter_cmd)));
     (vg_lite_set_stroke(&path_c_letter, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 4, 18, dash, 0,
-                        0, 0xdeadbeef));
+                        0));
     (vg_lite_update_stroke(&path_c_letter));
     (vg_lite_set_draw_path_type(&path_c_letter, VG_LITE_DRAW_STROKE_PATH));
 
@@ -659,7 +659,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     (vg_lite_path_append(&path_mark, out_circle_cmd, mark_data,
                          sizeof(out_circle_cmd)));
     (vg_lite_set_stroke(&path_mark, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 2, 18, dash, 0,
-                        0, 0xdeadbeef));
+                        0));
     (vg_lite_update_stroke(&path_mark));
     (vg_lite_set_draw_path_type(&path_mark, VG_LITE_DRAW_STROKE_PATH));
 

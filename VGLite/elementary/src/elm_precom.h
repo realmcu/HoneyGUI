@@ -1,6 +1,6 @@
-****************************************************************************
-* 
-*    Copyright 2012 - 2022 Vivante Corporation, Santa Clara, California.
+/****************************************************************************
+*
+*    Copyright 2012 - 2020 Vivante Corporation, Santa Clara, California.
 *    All Rights Reserved.
 *
 *    Permission is hereby granted, free of charge, to any person obtaining
@@ -23,4 +23,24 @@
 *    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *
-****************************************************************************
+*****************************************************************************/
+
+#ifndef elm_precom_h
+#define elm_precom_h
+
+/* System headers. */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* VGLite hdaders. */
+#include "vg_lite.h"
+
+/* Project headers. */
+#include "Elm.h"
+#include "velm.h"
+
+#define JUMP_IF_NON_ZERO_VALUE(x, label) { int ret = x; if ( (ret) != 1 ) { goto label; }  }
+#define JUMP_IF_NULL(x, label) { if (x == NULL) { goto label;} }
+
+#endif /* elm_precom_h */
