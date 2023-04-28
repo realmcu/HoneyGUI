@@ -43,7 +43,7 @@ typedef struct NSVGrasterizer NSVGrasterizer;
     // Create rasterizer (can be used to render multiple images).
     struct NSVGrasterizer* rast = nsvgCreateRasterizer();
     // Allocate memory for image
-    unsigned char* img = malloc(w*h*4);
+    unsigned char* img = gui_malloc(w*h*4);
     // Rasterize
     nsvgRasterize(rast, image, 0,0,1, img, w, h, w*4);
 */
@@ -157,7 +157,7 @@ struct NSVGrasterizer
 
 NSVGrasterizer *nsvgCreateRasterizer(void)
 {
-    NSVGrasterizer *r = (NSVGrasterizer *)malloc(sizeof(NSVGrasterizer));
+    NSVGrasterizer *r = (NSVGrasterizer *)gui_malloc(sizeof(NSVGrasterizer));
     if (r == NULL) { goto error; }
     memset(r, 0, sizeof(NSVGrasterizer));
 
@@ -204,7 +204,7 @@ static NSVGmemPage *nsvg__nextPage(NSVGrasterizer *r, NSVGmemPage *cur)
     }
 
     // Alloc new page
-    newp = (NSVGmemPage *)malloc(sizeof(NSVGmemPage));
+    newp = (NSVGmemPage *)gui_malloc(sizeof(NSVGmemPage));
     if (newp == NULL) { return NULL; }
     memset(newp, 0, sizeof(NSVGmemPage));
 
