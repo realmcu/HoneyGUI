@@ -32,9 +32,8 @@ from repo_helper import *
 from jenkins_base import JenkinsCheckBase
 from keil_build import *
 
-Keil_path = r'D:\Keil_v5_536\UV4\uv4.exe'
-if not os.path.exists(Keil_path):
-    Keil_path = r'C:\Keil_v5.36\UV4\uv4.exe'
+Keil_path = os.environ.get("Keil_Path")
+
 def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     global Keil_path
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
