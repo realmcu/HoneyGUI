@@ -380,7 +380,7 @@ static GLNVGtexture *glnvg__allocTexture(GLNVGcontext *gl)
         {
             GLNVGtexture *textures;
             int ctextures = glnvg__maxi(gl->ntextures + 1, 4) +  gl->ctextures / 2; // 1.5x Overallocate
-            textures = (GLNVGtexture *)realloc(gl->textures, sizeof(GLNVGtexture) * ctextures);
+            textures = (GLNVGtexture *)gui_realloc(gl->textures, sizeof(GLNVGtexture) * ctextures);
             if (textures == NULL) { return NULL; }
             gl->textures = textures;
             gl->ctextures = ctextures;
@@ -1433,7 +1433,7 @@ static GLNVGcall *glnvg__allocCall(GLNVGcontext *gl)
     {
         GLNVGcall *calls;
         int ccalls = glnvg__maxi(gl->ncalls + 1, 128) + gl->ccalls / 2; // 1.5x Overallocate
-        calls = (GLNVGcall *)realloc(gl->calls, sizeof(GLNVGcall) * ccalls);
+        calls = (GLNVGcall *)gui_realloc(gl->calls, sizeof(GLNVGcall) * ccalls);
         if (calls == NULL) { return NULL; }
         gl->calls = calls;
         gl->ccalls = ccalls;
@@ -1450,7 +1450,7 @@ static int glnvg__allocPaths(GLNVGcontext *gl, int n)
     {
         GLNVGpath *paths;
         int cpaths = glnvg__maxi(gl->npaths + n, 128) + gl->cpaths / 2; // 1.5x Overallocate
-        paths = (GLNVGpath *)realloc(gl->paths, sizeof(GLNVGpath) * cpaths);
+        paths = (GLNVGpath *)gui_realloc(gl->paths, sizeof(GLNVGpath) * cpaths);
         if (paths == NULL) { return -1; }
         gl->paths = paths;
         gl->cpaths = cpaths;
@@ -1467,7 +1467,7 @@ static int glnvg__allocVerts(GLNVGcontext *gl, int n)
     {
         NVGvertex *verts;
         int cverts = glnvg__maxi(gl->nverts + n, 4096) + gl->cverts / 2; // 1.5x Overallocate
-        verts = (NVGvertex *)realloc(gl->verts, sizeof(NVGvertex) * cverts);
+        verts = (NVGvertex *)gui_realloc(gl->verts, sizeof(NVGvertex) * cverts);
         if (verts == NULL) { return -1; }
         gl->verts = verts;
         gl->cverts = cverts;
@@ -1484,7 +1484,7 @@ static int glnvg__allocFragUniforms(GLNVGcontext *gl, int n)
     {
         unsigned char *uniforms;
         int cuniforms = glnvg__maxi(gl->nuniforms + n, 128) + gl->cuniforms / 2; // 1.5x Overallocate
-        uniforms = (unsigned char *)realloc(gl->uniforms, structSize * cuniforms);
+        uniforms = (unsigned char *)gui_realloc(gl->uniforms, structSize * cuniforms);
         if (uniforms == NULL) { return -1; }
         gl->uniforms = uniforms;
         gl->cuniforms = cuniforms;
@@ -1731,14 +1731,14 @@ static void glnvg__renderDelete(void *uptr)
             glDeleteTextures(1, &gl->textures[i].tex);
         }
     }
-    free(gl->textures);
+    gui_free(gl->textures);
 
-    free(gl->paths);
-    free(gl->verts);
-    free(gl->uniforms);
-    free(gl->calls);
+    gui_free(gl->paths);
+    gui_free(gl->verts);
+    gui_free(gl->uniforms);
+    gui_free(gl->calls);
 
-    free(gl);
+    gui_free(gl);
 }
 
 
@@ -1754,7 +1754,7 @@ NVGcontext *nvgCreateGLES3(int flags)
 {
     NVGparams params;
     NVGcontext *ctx = NULL;
-    GLNVGcontext *gl = (GLNVGcontext *)malloc(sizeof(GLNVGcontext));
+    GLNVGcontext *gl = (GLNVGcontext *)gui_malloc(sizeof(GLNVGcontext));
     if (gl == NULL) { goto error; }
     memset(gl, 0, sizeof(GLNVGcontext));
 

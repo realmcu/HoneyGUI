@@ -11,7 +11,7 @@ extern "C" {
 #define RTK_GUI_IMAGE_MEM
 // #define RTK_GUI_FONT_FS
 #define RTK_GUI_FONT_MEM                3  //size of font_lib
-#define RTK_GUI_MEMHEAP_OS              0
+#define RTK_GUI_MEMHEAP_OS              1
 #define RTK_GUI_FONT_FREETYPE           0
 #define RTK_GUI_FONT_STB                1
 // #define RTK_GUI_TTF_SVG

@@ -39,7 +39,7 @@ extern "C" {
 //
 // The library suits well for anything from rendering scalable icons in your editor application to prototyping a game.
 //
-// NanoSVG supports a wide range of SVG features, but something may be missing, feel free to create a pull request!
+// NanoSVG supports a wide range of SVG features, but something may be missing, feel gui_free to create a pull request!
 //
 // The shapes in the SVG images are transformed by the viewBox and converted to specified units.
 // That is, you should get the same looking data as your designed in your favorite app.
@@ -702,8 +702,8 @@ static NSVGparser *nsvg__createParser(void)
 error:
     if (p)
     {
-        if (p->image) { free(p->image); }
-        free(p);
+        if (p->image) { gui_free(p->image); }
+        gui_free(p);
     }
     return NULL;
 }
@@ -715,9 +715,9 @@ static void nsvg__deletePaths(NSVGpath *path)
         NSVGpath *next = path->next;
         if (path->pts != NULL)
         {
-            free(path->pts);
+            gui_free(path->pts);
         }
-        free(path);
+        gui_free(path);
         path = next;
     }
 }
@@ -726,7 +726,7 @@ static void nsvg__deletePaint(NSVGpaint *paint)
 {
     if (paint->type == NSVG_PAINT_LINEAR_GRADIENT || paint->type == NSVG_PAINT_RADIAL_GRADIENT)
     {
-        free(paint->d.gradient);
+        gui_free(paint->d.gradient);
     }
 }
 
@@ -736,8 +736,8 @@ static void nsvg__deleteGradientData(NSVGgradientData *grad)
     while (grad != NULL)
     {
         next = grad->next;
-        free(grad->stops);
-        free(grad);
+        gui_free(grad->stops);
+        gui_free(grad);
         grad = next;
     }
 }
@@ -749,8 +749,8 @@ static void nsvg__deleteParser(NSVGparser *p)
         nsvg__deletePaths(p->plist);
         nsvg__deleteGradientData(p->gradients);
         nsvgDelete(p->image);
-        free(p->pts);
-        free(p);
+        gui_free(p->pts);
+        gui_free(p);
     }
 }
 
@@ -764,7 +764,7 @@ static void nsvg__addPoint(NSVGparser *p, float x, float y)
     if (p->npts + 1 > p->cpts)
     {
         p->cpts = p->cpts ? p->cpts * 2 : 8;
-        p->pts = (float *)realloc(p->pts, p->cpts * 2 * sizeof(float));
+        p->pts = (float *)gui_realloc(p->pts, p->cpts * 2 * sizeof(float));
         if (!p->pts) { return; }
     }
     p->pts[p->npts * 2 + 0] = x;
@@ -1135,7 +1135,7 @@ static void nsvg__addShape(NSVGparser *p)
     return;
 
 error:
-    if (shape) { free(shape); }
+    if (shape) { gui_free(shape); }
 }
 
 static void nsvg__addPath(NSVGparser *p, char closed)
@@ -1207,8 +1207,8 @@ static void nsvg__addPath(NSVGparser *p, char closed)
 error:
     if (path != NULL)
     {
-        if (path->pts != NULL) { free(path->pts); }
-        free(path);
+        if (path->pts != NULL) { gui_free(path->pts); }
+        gui_free(path);
     }
 }
 
@@ -3205,7 +3205,7 @@ static void nsvg__parseGradientStop(NSVGparser *p, const char **attr)
     if (grad == NULL) { return; }
 
     grad->nstops++;
-    grad->stops = (NSVGgradientStop *)realloc(grad->stops, sizeof(NSVGgradientStop) * grad->nstops);
+    grad->stops = (NSVGgradientStop *)gui_realloc(grad->stops, sizeof(NSVGgradientStop) * grad->nstops);
     if (grad->stops == NULL) { return; }
 
     // Insert
@@ -3598,13 +3598,13 @@ NSVGimage *nsvgParseFromFile(const char *filename, const char *units, float dpi)
     data[size] = '\0';  // Must be null terminated.
     fclose(fp);
     image = nsvgParse(data, units, dpi);
-    free(data);
+    gui_free(data);
 
     return image;
 
 error:
     if (fp) { fclose(fp); }
-    if (data) { free(data); }
+    if (data) { gui_free(data); }
     if (image) { nsvgDelete(image); }
     return NULL;
 }
@@ -3636,8 +3636,8 @@ NSVGpath *nsvgDuplicatePath(NSVGpath *p)
 error:
     if (res != NULL)
     {
-        free(res->pts);
-        free(res);
+        gui_free(res->pts);
+        gui_free(res);
     }
     return NULL;
 }
@@ -3653,10 +3653,10 @@ void nsvgDelete(NSVGimage *image)
         nsvg__deletePaths(shape->paths);
         nsvg__deletePaint(&shape->fill);
         nsvg__deletePaint(&shape->stroke);
-        free(shape);
+        gui_free(shape);
         shape = snext;
     }
-    free(image);
+    gui_free(image);
 }
 
 #endif // NANOSVG_IMPLEMENTATION

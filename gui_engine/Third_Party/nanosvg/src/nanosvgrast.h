@@ -181,16 +181,16 @@ void nsvgDeleteRasterizer(NSVGrasterizer *r)
     while (p != NULL)
     {
         NSVGmemPage *next = p->next;
-        free(p);
+        gui_free(p);
         p = next;
     }
 
-    if (r->edges) { free(r->edges); }
-    if (r->points) { free(r->points); }
-    if (r->points2) { free(r->points2); }
-    if (r->scanline) { free(r->scanline); }
+    if (r->edges) { gui_free(r->edges); }
+    if (r->points) { gui_free(r->points); }
+    if (r->points2) { gui_free(r->points2); }
+    if (r->scanline) { gui_free(r->scanline); }
 
-    free(r);
+    gui_free(r);
 }
 
 static NSVGmemPage *nsvg__nextPage(NSVGrasterizer *r, NSVGmemPage *cur)
@@ -269,7 +269,7 @@ static void nsvg__addPathPoint(NSVGrasterizer *r, float x, float y, int flags)
     if (r->npoints + 1 > r->cpoints)
     {
         r->cpoints = r->cpoints > 0 ? r->cpoints * 2 : 64;
-        r->points = (NSVGpoint *)realloc(r->points, sizeof(NSVGpoint) * r->cpoints);
+        r->points = (NSVGpoint *)gui_realloc(r->points, sizeof(NSVGpoint) * r->cpoints);
         if (r->points == NULL) { return; }
     }
 
@@ -285,7 +285,7 @@ static void nsvg__appendPathPoint(NSVGrasterizer *r, NSVGpoint pt)
     if (r->npoints + 1 > r->cpoints)
     {
         r->cpoints = r->cpoints > 0 ? r->cpoints * 2 : 64;
-        r->points = (NSVGpoint *)realloc(r->points, sizeof(NSVGpoint) * r->cpoints);
+        r->points = (NSVGpoint *)gui_realloc(r->points, sizeof(NSVGpoint) * r->cpoints);
         if (r->points == NULL) { return; }
     }
     r->points[r->npoints] = pt;
@@ -297,7 +297,7 @@ static void nsvg__duplicatePoints(NSVGrasterizer *r)
     if (r->npoints > r->cpoints2)
     {
         r->cpoints2 = r->npoints;
-        r->points2 = (NSVGpoint *)realloc(r->points2, sizeof(NSVGpoint) * r->cpoints2);
+        r->points2 = (NSVGpoint *)gui_realloc(r->points2, sizeof(NSVGpoint) * r->cpoints2);
         if (r->points2 == NULL) { return; }
     }
 
@@ -318,7 +318,7 @@ static void nsvg__addEdge(NSVGrasterizer *r, float x0, float y0, float x1, float
     if (r->nedges + 1 > r->cedges)
     {
         r->cedges = r->cedges > 0 ? r->cedges * 2 : 64;
-        r->edges = (NSVGedge *)realloc(r->edges, sizeof(NSVGedge) * r->cedges);
+        r->edges = (NSVGedge *)gui_realloc(r->edges, sizeof(NSVGedge) * r->cedges);
         if (r->edges == NULL) { return; }
     }
 
@@ -1596,7 +1596,7 @@ void nsvgRasterize(NSVGrasterizer *r,
     if (w > r->cscanline)
     {
         r->cscanline = w;
-        r->scanline = (unsigned char *)realloc(r->scanline, w);
+        r->scanline = (unsigned char *)gui_realloc(r->scanline, w);
         if (r->scanline == NULL) { return; }
     }
 

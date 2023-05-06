@@ -37,13 +37,13 @@
 
       MEMORY ALLOCATION
          The resize functions here perform a single memory allocation using
-         malloc. To control the memory allocation, before the #include that
+         gui_malloc. To control the memory allocation, before the #include that
          triggers the implementation, do:
 
             #define STBIR_MALLOC(size,context) ...
             #define STBIR_FREE(ptr,context)   ...
 
-         Each resize function makes exactly one call to malloc/free, so to use
+         Each resize function makes exactly one call to gui_malloc/free, so to use
          temp memory, store the temp memory in the context and return that.
 
       ASSERT
@@ -406,8 +406,8 @@ STBIRDEF int stbir_resize_region(const void *input_pixels, int input_w, int inpu
 #ifndef STBIR_MALLOC
 #include <stdlib.h>
 // use comma operator to evaluate c, to avoid "unused parameter" warnings
-#define STBIR_MALLOC(size,c) ((void)(c), malloc(size))
-#define STBIR_FREE(ptr,c)    ((void)(c), free(ptr))
+#define STBIR_MALLOC(size,c) ((void)(c), gui_malloc(size))
+#define STBIR_FREE(ptr,c)    ((void)(c), gui_free(ptr))
 #endif
 
 #ifndef _MSC_VER

@@ -45,7 +45,7 @@ struct AGGNVGcontext {
   }
 
   ~AGGNVGcontext() {
-    free(this->textures);
+    gui_free(this->textures);
     this->textures = NULL;
   }
 
@@ -92,7 +92,7 @@ static AGGNVGtexture* aggnvg__allocTexture(AGGNVGcontext* agg) {
       AGGNVGtexture* textures;
       int ctextures =
           aggnvg__maxi(agg->ntextures + 1, 4) + agg->ctextures / 2;  // 1.5x Overallocate
-      textures = (AGGNVGtexture*)realloc(agg->textures, sizeof(AGGNVGtexture) * ctextures);
+      textures = (AGGNVGtexture*)gui_realloc(agg->textures, sizeof(AGGNVGtexture) * ctextures);
       if (textures == NULL) return NULL;
       agg->textures = textures;
       agg->ctextures = ctextures;

@@ -14,7 +14,7 @@
 static void run_test(int32_t w, int32_t h, int32_t BPP, const char *filename)
 {
     int32_t size = w * h * BPP;
-    uint8_t *data = (uint8_t *)malloc(size);
+    uint8_t *data = (uint8_t *)gui_malloc(size);
     NVGcontext *vg = nvgCreateAGG(w, h, w * BPP, BPP == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_RGBA,
                                   data);
 
@@ -28,7 +28,7 @@ static void run_test(int32_t w, int32_t h, int32_t BPP, const char *filename)
         stbi_write_png(filename, w, h, BPP, data, 0);
     }
 
-    free(data);
+    gui_free(data);
 }
 
 int main()

@@ -646,9 +646,9 @@ typedef unsigned char validate_uint32[sizeof(stbi__uint32) == 4 ? 1 : -1];
 #endif
 
 #ifndef STBI_MALLOC
-#define STBI_MALLOC(sz)           malloc(sz)
-#define STBI_REALLOC(p,newsz)     realloc(p,newsz)
-#define STBI_FREE(p)              free(p)
+#define STBI_MALLOC(sz)           gui_malloc(sz)
+#define STBI_REALLOC(p,newsz)     gui_realloc(p,newsz)
+#define STBI_FREE(p)              gui_free(p)
 #endif
 
 #ifndef STBI_REALLOC_SIZED

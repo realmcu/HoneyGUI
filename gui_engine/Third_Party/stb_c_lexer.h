@@ -1053,19 +1053,19 @@ void dummy(void)
 int main(int argc, char **argv)
 {
     FILE *f = fopen("stb_c_lexer.h", "rb");
-    char *text = (char *) malloc(1 << 20);
+    char *text = (char *) gui_malloc(1 << 20);
     int len = f ? fread(text, 1, 1 << 20, f) : -1;
     stb_lexer lex;
     if (len < 0)
     {
         fprintf(stderr, "Error opening file\n");
-        free(text);
+        gui_free(text);
         fclose(f);
         return 1;
     }
     fclose(f);
 
-    stb_c_lexer_init(&lex, text, text + len, (char *) malloc(0x10000), 0x10000);
+    stb_c_lexer_init(&lex, text, text + len, (char *) gui_malloc(0x10000), 0x10000);
     while (stb_c_lexer_get_token(&lex))
     {
         if (lex.token == CLEX_parse_error)

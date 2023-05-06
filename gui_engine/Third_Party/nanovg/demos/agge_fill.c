@@ -152,7 +152,7 @@ static void do_fill(NVGcontext *vg, int32_t w, int32_t h)
 static void run_test(int32_t w, int32_t h, int32_t BPP, const char *filename)
 {
     int32_t size = w * h * BPP;
-    uint8_t *data = (uint8_t *)malloc(size);
+    uint8_t *data = (uint8_t *)gui_malloc(size);
     NVGcontext *vg = nvgCreateAGGE(w, h, w * BPP, BPP == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA,
                                    data);
     uint32_t *d1 = data;
@@ -211,7 +211,7 @@ static void run_test(int32_t w, int32_t h, int32_t BPP, const char *filename)
     }
 
 
-    free(data);
+    gui_free(data);
 }
 
 int main1()

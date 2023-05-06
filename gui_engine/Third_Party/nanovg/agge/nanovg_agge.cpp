@@ -19,7 +19,7 @@
 #include <agge/nanovg_image_blender.h>
 #include <agge/blender_linear_gradient.h>
 #include <agge/blender_radial_gradient.h>
-
+#include "gui_api.h"
 template <typename T>
 agge::rect<T> mkrect(T x1, T y1, T x2, T y2) {
   agge::rect<T> r = {x1, y1, x2, y2};
@@ -53,7 +53,7 @@ struct AGGENVGcontext {
   }
 
   ~AGGENVGcontext() {
-    free(this->textures);
+    gui_free(this->textures);
     this->textures = NULL;
   }
 
@@ -101,7 +101,7 @@ static AGGENVGtexture* aggenvg__allocTexture(AGGENVGcontext* agge) {
       AGGENVGtexture* textures;
       int ctextures =
           aggenvg__maxi(agge->ntextures + 1, 4) + agge->ctextures / 2;  // 1.5x Overallocate
-      textures = (AGGENVGtexture*)realloc(agge->textures, sizeof(AGGENVGtexture) * ctextures);
+      textures = (AGGENVGtexture*)gui_realloc(agge->textures, sizeof(AGGENVGtexture) * ctextures);
       if (textures == NULL) return NULL;
       agge->textures = textures;
       agge->ctextures = ctextures;
