@@ -395,8 +395,8 @@ void vg_lite_hal_free_contiguous(void *memory_handle)
                 pos->offset = node->offset;
             }
             /* Delete the current node from the list. */
-            delete_list(&node->list);
-            vg_lite_hal_free(node);
+            delete_list(&pos->list);
+            vg_lite_hal_free(pos);
         }
         break;
     }
