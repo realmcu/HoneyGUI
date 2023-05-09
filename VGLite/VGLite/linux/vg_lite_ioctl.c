@@ -52,25 +52,75 @@
 *
 *****************************************************************************/
 
-#ifndef _VG_LITE_PLATFORM_H
-#define _VG_LITE_PLATFORM_H
+#include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include "vg_lite_kernel.h"
+#include "vg_lite_ioctl.h"
 
-#include "stdint.h"
-#include "stdlib.h"
+static int device = 0;
+static uint32_t length = 0;
+static void *mapped = NULL;
 
-#define _BAREMETAL 0
+vg_lite_error_t vg_lite_kernel(vg_lite_kernel_command_t command, void *data)
+{
+    struct ioctl_data to_kernel;
+    static const uint32_t bytes[] =
+    {
+        sizeof(vg_lite_kernel_initialize_t),
+        sizeof(vg_lite_kernel_terminate_t),
+        sizeof(vg_lite_kernel_allocate_t),
+        sizeof(vg_lite_kernel_free_t),
+        sizeof(vg_lite_kernel_submit_t),
+        sizeof(vg_lite_kernel_wait_t),
+        sizeof(vg_lite_kernel_reset_t),
+        sizeof(vg_lite_kernel_debug_t),
+        sizeof(vg_lite_kernel_map_t),
+        sizeof(vg_lite_kernel_unmap_t),
+        sizeof(vg_lite_kernel_info_t),
+        sizeof(vg_lite_kernel_mem_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_flexa_info_t),
+        sizeof(vg_lite_kernel_map_memory_t),
+        sizeof(vg_lite_kernel_unmap_memory_t),
+        sizeof(vg_lite_kernel_close_t),
+        sizeof(vg_lite_kernel_cache_t),
+        sizeof(vg_lite_kernel_export_memory_t),
+    };
 
-/*!
-@brief Initialize the hardware mem setting.
-*/
-void vg_lite_init_mem(uint32_t register_mem_base,
-                      uint32_t gpu_mem_base,
-                      volatile void *contiguous_mem_base,
-                      uint32_t contiguous_mem_size);
+    if (device == 0)
+    {
+        device = open("/dev/vg_lite", O_RDWR);
+        if (device == -1)
+        {
+            return VG_LITE_GENERIC_IO;
+        }
 
-/*!
-@brief The hardware IRQ handler.
-*/
-void vg_lite_IRQHandler(void);
+        /* Default contiguous mapping size. */
+        length = MAX_CONTIGUOUS_SIZE;
 
-#endif
+        mapped = mmap(NULL, length, PROT_READ | PROT_WRITE, MAP_SHARED, device, 0);
+        if ((mapped == NULL) ||
+            (mapped == (char *) - 1))
+        {
+            close(device);
+            device = 0;
+            return VG_LITE_GENERIC_IO;
+        }
+    }
+
+    to_kernel.command = command;
+    to_kernel.buffer = data;
+    to_kernel.bytes = bytes[command];
+
+    if (ioctl(device, VG_LITE_IOCTL, &to_kernel) < 0)
+    {
+        return VG_LITE_GENERIC_IO;
+    }
+
+    return to_kernel.error;
+}

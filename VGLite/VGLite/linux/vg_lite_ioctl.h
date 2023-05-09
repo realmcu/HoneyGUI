@@ -52,25 +52,19 @@
 *
 *****************************************************************************/
 
-#ifndef _VG_LITE_PLATFORM_H
-#define _VG_LITE_PLATFORM_H
+#ifndef _vg_lite_ioctl_h_
+#define _vg_lite_ioctl_h_
 
-#include "stdint.h"
-#include "stdlib.h"
+#include "vg_lite_kernel.h"
 
-#define _BAREMETAL 0
+#define VG_LITE_IOCTL   30000
 
-/*!
-@brief Initialize the hardware mem setting.
-*/
-void vg_lite_init_mem(uint32_t register_mem_base,
-                      uint32_t gpu_mem_base,
-                      volatile void *contiguous_mem_base,
-                      uint32_t contiguous_mem_size);
+struct ioctl_data
+{
+    vg_lite_kernel_command_t command;
+    vg_lite_error_t error;
+    unsigned long bytes;
+    void *buffer;
+};
 
-/*!
-@brief The hardware IRQ handler.
-*/
-void vg_lite_IRQHandler(void);
-
-#endif
+#endif /* _vg_lite_ioctl_h_ */
