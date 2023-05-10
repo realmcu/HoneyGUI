@@ -693,12 +693,11 @@ vg_lite_error_t vg_lite_append_path(vg_lite_path_t *path,
                     if (cmd[i] <= VLC_OP_LINE_REL && cmd[i] >= VLC_OP_MOVE)
                     {
                         /* Update move to and line path bounds. */
-                        path->bounding_box[0] = CDMIN(path->bounding_box[0], cx);
-                        path->bounding_box[2] = CDMAX(path->bounding_box[2], cx);
-                        path->bounding_box[1] = CDMIN(path->bounding_box[1], cy);
-                        path->bounding_box[3] = CDMAX(path->bounding_box[3], cy);
                     }
-
+                    path->bounding_box[0] = CDMIN(path->bounding_box[0], cx);
+                    path->bounding_box[2] = CDMAX(path->bounding_box[2], cx);
+                    path->bounding_box[1] = CDMIN(path->bounding_box[1], cy);
+                    path->bounding_box[3] = CDMAX(path->bounding_box[3], cy);
                 }
             }
 #if gcFEATURE_VG_ARC_PATH

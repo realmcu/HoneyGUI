@@ -208,7 +208,7 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
 
 
         uint32_t data_size = vg_lite_path_calc_length(arc_cmd_bottom, sizeof(arc_cmd_bottom), VG_LITE_FP32);
-        vg_lite_init_path(&path1, VG_LITE_FP32, VG_LITE_HIGH, data_size, path_data1, 454, 454, -454, -454);
+        vg_lite_init_path(&path1, VG_LITE_FP32, VG_LITE_HIGH, data_size, path_data1, 0, 0, 0, 0);
         CHECK_ERROR(vg_lite_path_append(&path1, arc_cmd_bottom, arc_data, sizeof(arc_cmd_bottom)));
 
         vg_lite_init_path(&path2, VG_LITE_FP32, VG_LITE_HIGH, data_size, path_data2, 454, 454, -454, -454);
@@ -277,8 +277,8 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
         vg_lite_identity(matGrad1);
         vg_lite_translate(path1.bounding_box[0], path1.bounding_box[1], matGrad1);
         vg_lite_translate(cx, cy, matGrad1);
-        vg_lite_scale((path1.bounding_box[2] - path1.bounding_box[0]) / 256,
-                      (path1.bounding_box[3] - path1.bounding_box[1]) / 256, matGrad1);
+        vg_lite_scale(VLC_GRADIENT_BUFFER_WIDTH * 1.0f / (path1.bounding_box[2] - path1.bounding_box[0]),
+                      1, matGrad1);
         vg_lite_translate((path1.bounding_box[2] - path1.bounding_box[0]) / 2,
                           (path1.bounding_box[3] - path1.bounding_box[1]) / 2, matGrad1);
         vg_lite_rotate((180 - angle) * (180 - angle) / 15, matGrad1);
@@ -288,8 +288,8 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
         vg_lite_identity(matGrad2);
         vg_lite_translate(path2.bounding_box[0], path2.bounding_box[1], matGrad2);
         vg_lite_translate(cx, cy, matGrad3);
-        vg_lite_scale((path2.bounding_box[2] - path2.bounding_box[0]) / 256,
-                      (path2.bounding_box[3] - path2.bounding_box[1]) / 256, matGrad2);
+        vg_lite_scale(VLC_GRADIENT_BUFFER_WIDTH *  1.0f / (path2.bounding_box[2] - path2.bounding_box[0]),
+                      1, matGrad2);
         vg_lite_translate((path2.bounding_box[2] - path2.bounding_box[0]) / 2,
                           (path2.bounding_box[3] - path2.bounding_box[1]) / 2, matGrad2);
         vg_lite_rotate(angle, matGrad2);
@@ -299,8 +299,8 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
         vg_lite_identity(matGrad3);
         vg_lite_translate(path3.bounding_box[0], path3.bounding_box[1], matGrad3);
         vg_lite_translate(cx, cy, matGrad3);
-        vg_lite_scale((path3.bounding_box[2] - path3.bounding_box[0]) / 256,
-                      (path3.bounding_box[3] - path3.bounding_box[1]) / 256, matGrad3);
+        vg_lite_scale(VLC_GRADIENT_BUFFER_WIDTH * 1.0f / (path3.bounding_box[2] - path3.bounding_box[0]),
+                      1, matGrad3);
         vg_lite_translate((path3.bounding_box[2] - path3.bounding_box[0]) / 2,
                           (path3.bounding_box[3] - path3.bounding_box[1]) / 2, matGrad3);
         vg_lite_rotate(-angle, matGrad3);
