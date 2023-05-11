@@ -311,7 +311,7 @@ static void music_draw4(gui_canvas_t *c)
         gui_canvas_api.rectangle(c, &r);
     }
 }
-void music(gui_obj_t *screen)
+void music_play(gui_obj_t *screen)
 {
     gui_curtainview_t *cv = gui_curtainview_create(screen, "cvmusic", 0, 0, 0, 0);
     gui_curtain_t *c1 = gui_curtain_create(cv, "c1", 0, 0, 0, 0, CURTAIN_MIDDLE, 1);

@@ -17,12 +17,8 @@
 #include <gui_dynamic_img.h>
 #include "tp_algo.h"
 #include <math.h>
-#ifdef MODULE_VG_LITE
-#include "gui_vg_lite_clock.h"
-#include "gui_cube.h"
-#else
-#include "gui_cube.h"
-#endif
+
+
 static void sport_button_press_ani_cb(gui_button_t *button)
 {
     float per = (button->animate->progress_percent);
@@ -180,7 +176,9 @@ static void sport_button_release(gui_button_t *b)
 {
     gui_button_api.set_animate(b, 200, 0, sport_button_release_ani_cb, b);
 }
-void curtain2(void *curtian)
+
+
+void curtain_up(void *curtian)
 {
     gui_canvas_t *canvas1 = gui_canvas_create(curtian, "canvas2", 0, 0, 454, 454, 0);
     canvas1->draw = canvas2_draw;
@@ -188,15 +186,14 @@ void curtain2(void *curtian)
     gui_button_t *sport_button;
     gui_button_t *hr_button;
     gui_button_t *cube_button;
+
     sport_button = gui_button_create(curtian, 252, 57, 100, 100, ACTIVITY_SVG, NULL, NULL, 2,
                                      5134);
     hr_button = gui_button_create(curtian, 265, 205, 150, 150, SETTING_SVG, NULL, NULL, 2,
                                   2056);
     cube_button = gui_button_create(curtian, 5, 108, 250, 250, MESSAGE_SVG, NULL, NULL, 2,
                                     2666);
-    //gui_button_click(sport_button, (gui_event_cb_t)text_color_cb);
-    //gui_button_click(hr_button, (gui_event_cb_t)hr_button_cb);
-    //gui_button_click(cube_button, (gui_event_cb_t)cube_button_cb);
+
     gui_button_api.onPress(sport_button, sport_button_press, sport_button);
     gui_button_api.onRelease(sport_button, sport_button_release, sport_button);
     gui_button_api.onPress(cube_button, cube_button_press, sport_button);

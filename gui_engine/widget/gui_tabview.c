@@ -190,6 +190,12 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+void gui_tabview_set_style(gui_tabview_t *this, enum gui_tabview_style style)
+{
+    this->style = style;
+}
+
 #include "gui_tab.h"
 static void tab_update_att(gui_obj_t *obj)
 {
@@ -475,3 +481,5 @@ void gui_tab_jump(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
     parent_tabview->jump.jump_id.x = idx;
     parent_tabview->jump.jump_id.y = idy;
 }
+
+

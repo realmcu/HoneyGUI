@@ -59,7 +59,7 @@ static void read_page_draw(gui_canvas_t *c)
                                              color.a * 255.0f));
     gui_canvas_api.wave(c, &w);
 }
-void read_page(void *parent)
+void wave_page(void *parent)
 {
     //static char *t = "R";
     /*gui_text_t *text = gui_text_create(parent, "icon_text", 50, 272, RTK_GUI_DEFAULT_FONT_SIZE*4, RTK_GUI_DEFAULT_FONT_SIZE*4);

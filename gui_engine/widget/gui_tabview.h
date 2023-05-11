@@ -61,6 +61,7 @@ typedef struct gui_tabview
  */
 gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h);
+void gui_tabview_set_style(gui_tabview_t *this, enum gui_tabview_style style);
 void gui_tab_jump(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy);
 
 #include "gui_tab.h"

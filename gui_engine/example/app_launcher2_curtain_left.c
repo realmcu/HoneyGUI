@@ -35,7 +35,7 @@ static void canvas1_draw(gui_canvas_t *c)
     gui_canvas_api.rectangle(c, &r);
 
 }
-void curtain1(void *curtian)
+void curtain_left(void *curtian)
 {
     gui_canvas_t *canvas1 = gui_canvas_create(curtian, "canvas1", 0, 0, 454, 454, 0);
     canvas1->draw = canvas1_draw;

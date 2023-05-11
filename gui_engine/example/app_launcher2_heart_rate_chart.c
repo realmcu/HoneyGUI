@@ -23,7 +23,7 @@
 #else
 #include "gui_cube.h"
 #endif
-void heart_rate_chart(gui_obj_t *parent)
+void cube_page(gui_obj_t *parent)
 {
     void *array[] = {CRAB_LIME_BIN, CRAB_LIME_BIN, RTL_ORIGIN_BIN, RTL_ORIGIN_BIN, WATCH_RED_BIN, WATCH_RED_BIN};
     gui_cube_create(parent, "cube", array, 0, 0, 454, 454);
