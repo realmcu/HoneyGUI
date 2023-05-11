@@ -27,13 +27,28 @@ void page_update(gui_obj_t *obj)
                 if ((tp->type == TOUCH_HOLD_Y))
                 {
                     obj->y = tp->deltaY + ((gui_page_t *)obj)->yold;
+                    if (obj->y > ((gui_page_t *)obj)->start_y)
+                    {
+                        obj->y = ((gui_page_t *)obj)->start_y;
+
+                    }
+                    if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                        obj->y != 0)
+                    {
+                        obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
+                    }
                 }
                 else
                 {
                     if (obj->y > ((gui_page_t *)obj)->start_y)
                     {
                         obj->y = ((gui_page_t *)obj)->start_y;
-                        gui_app_exec(gui_current_app());
+                        // gui_app_exec(gui_current_app());
+                    }
+                    if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                        obj->y != 0)
+                    {
+                        obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
                     }
                     ((gui_page_t *)obj)->yold = obj->y;
                 }
