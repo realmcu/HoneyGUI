@@ -214,7 +214,7 @@ class CICheck(JenkinsCheckBase):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='HoneyComb CI build script')
     parser.add_argument('-m', '--mode', default='CICheck', choices=[JenkinsCheckBase.STATIC_CHECK_STRATEGY_BEFORE_BUILD, JenkinsCheckBase.STATIC_CHECK_STRATEGY_AFTER_BUILD], help='Select CI static check mode')
-    parser.add_argument('-c', '--chipType', choices=['guiEngine-dev'], help='Set the chip type')
+    parser.add_argument('-c', '--chipType', choices=['guiEngine-test-chip'], help='Set the chip type')
     parser.add_argument('-r', '--repoPath', help='Set the subgit repo path')
     parser.add_argument('-t', '--TestRequest', action = 'store_true', help='Set the test-request label')
 
