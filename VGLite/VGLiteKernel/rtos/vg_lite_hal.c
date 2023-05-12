@@ -2,7 +2,7 @@
 *
 *    The MIT License (MIT)
 *
-*    Copyright (c) 2014 - 2022 Vivante Corporation
+*    Copyright (c) 2014 - 2020 Vivante Corporation
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 *
 *    The GPL License (GPL)
 *
-*    Copyright (C) 2014 - 2022 Vivante Corporation
+*    Copyright (C) 2014 - 2020 Vivante Corporation
 *
 *    This program is free software; you can redistribute it and/or
 *    modify it under the terms of the GNU General Public License
@@ -181,7 +181,7 @@ struct mapped_memory
 struct vg_lite_device
 {
     /* void * gpu; */
-    uint32_t register_base;    /* Always use physical for register access in RTOS. */
+    uint32_t gpu;    /* Always use physical for register access in RTOS. */
     /* struct page * pages; */
     volatile void *contiguous;
     unsigned int order;
@@ -211,7 +211,16 @@ struct client_data
 
 static struct vg_lite_device Device, * device;
 
+void *vg_lite_hal_calloc(unsigned long n, unsigned long size)
+{
+    /* TODO: Allocate some memory. No more kernel mode in RTOS. */
+    return os_mem_zalloc(RAM_TYPE_EXT_DATA_SRAM, n * size);
+}
 
+void *vg_lite_hal_realloc(void *ptr, unsigned long size)
+{
+    while (1);
+}
 
 void *vg_lite_hal_alloc(unsigned long size)
 {
@@ -285,7 +294,7 @@ static int split_node(heap_node_t *node, unsigned long size)
     return 0;
 }
 
-vg_lite_error_t vg_lite_hal_allocate_contiguous(unsigned long size, void **logical, void **klogical,
+vg_lite_error_t vg_lite_hal_allocate_contiguous(unsigned long size, void **logical,
                                                 uint32_t *physical, void **node)
 {
     unsigned long aligned_size;
@@ -424,14 +433,14 @@ void vg_lite_hal_free_os_heap(void)
 uint32_t vg_lite_hal_peek(uint32_t address)
 {
     /* Read data from the GPU register. */
-    return (uint32_t)(*(volatile uint32_t *)(device->register_base + address));
+    return (uint32_t)(*(volatile uint32_t *)(device->gpu + address));
 }
 
 /* Portable: write register. */
 void vg_lite_hal_poke(uint32_t address, uint32_t data)
 {
     /* Write data to the GPU register. */
-    uint32_t *LocalAddr = (uint32_t *)(device->register_base + address);
+    uint32_t *LocalAddr = (uint32_t *)(device->gpu + address);
     *LocalAddr = data;
 }
 
@@ -508,20 +517,12 @@ int32_t vg_lite_hal_wait_interrupt(uint32_t timeout, uint32_t mask, uint32_t *va
     return 0;
 }
 
-vg_lite_error_t vg_lite_hal_memory_export(int32_t *fd)
+void *vg_lite_hal_map(unsigned long bytes, void *logical, uint32_t physical, uint32_t *gpu)
 {
-    return VG_LITE_SUCCESS;
-}
 
-
-void *vg_lite_hal_map(uint32_t flags, uint32_t bytes, void *logical, uint32_t physical,
-                      int32_t dma_buf_fd, uint32_t *gpu)
-{
-    (void) flags;
     (void) bytes;
     (void) logical;
     (void) physical;
-    (void) dma_buf_fd;
     (void) gpu;
     return (void *)0;
 }
@@ -532,13 +533,7 @@ void vg_lite_hal_unmap(void *handle)
     (void) handle;
 }
 
-vg_lite_error_t vg_lite_hal_operation_cache(void *handle, vg_lite_cache_op_t cache_op)
-{
-    (void) handle;
-    (void) cache_op;
 
-    return VG_LITE_SUCCESS;
-}
 
 static void vg_lite_exit(void)
 {
@@ -549,7 +544,7 @@ static void vg_lite_exit(void)
     if (device != NULL)
     {
         /* TODO: unmap register mem should be unnecessary. */
-        device->register_base = 0;
+        device->gpu = 0;
 
         /* Process each node. */
         for (pos = (heap_node_t *)device->heap.list.next, n = (heap_node_t *)pos->list.next;
@@ -580,7 +575,7 @@ static int vg_lite_init(void)
     _memset(device, 0, sizeof(struct vg_lite_device));
 
     /* Setup register memory. **********************************************/
-    device->register_base = registerMemBase;
+    device->gpu = registerMemBase;
 
     /* Initialize contiguous memory. ***************************************/
     /* Allocate the contiguous memory. */
