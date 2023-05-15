@@ -208,7 +208,7 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
 
 
         uint32_t data_size = vg_lite_path_calc_length(arc_cmd_bottom, sizeof(arc_cmd_bottom), VG_LITE_FP32);
-        vg_lite_init_path(&path1, VG_LITE_FP32, VG_LITE_HIGH, data_size, path_data1, 454, 454, -454, -454);
+        vg_lite_init_path(&path1, VG_LITE_FP32, VG_LITE_HIGH, data_size, path_data1, 0, 0, 0, 0);
         CHECK_ERROR(vg_lite_path_append(&path1, arc_cmd_bottom, arc_data, sizeof(arc_cmd_bottom)));
 
         vg_lite_init_path(&path2, VG_LITE_FP32, VG_LITE_HIGH, data_size, path_data2, 454, 454, -454, -454);
@@ -277,8 +277,8 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
         vg_lite_identity(matGrad1);
         vg_lite_translate(path1.bounding_box[0], path1.bounding_box[1], matGrad1);
         vg_lite_translate(cx, cy, matGrad1);
-        vg_lite_scale((path1.bounding_box[2] - path1.bounding_box[0]) / 256,
-                      (path1.bounding_box[3] - path1.bounding_box[1]) / 256, matGrad1);
+        vg_lite_scale(VLC_GRADIENT_BUFFER_WIDTH * 1.0f / (path1.bounding_box[2] - path1.bounding_box[0]),
+                      1, matGrad1);
         vg_lite_translate((path1.bounding_box[2] - path1.bounding_box[0]) / 2,
                           (path1.bounding_box[3] - path1.bounding_box[1]) / 2, matGrad1);
         vg_lite_rotate((180 - angle) * (180 - angle) / 15, matGrad1);
@@ -288,8 +288,8 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
         vg_lite_identity(matGrad2);
         vg_lite_translate(path2.bounding_box[0], path2.bounding_box[1], matGrad2);
         vg_lite_translate(cx, cy, matGrad3);
-        vg_lite_scale((path2.bounding_box[2] - path2.bounding_box[0]) / 256,
-                      (path2.bounding_box[3] - path2.bounding_box[1]) / 256, matGrad2);
+        vg_lite_scale(VLC_GRADIENT_BUFFER_WIDTH *  1.0f / (path2.bounding_box[2] - path2.bounding_box[0]),
+                      1, matGrad2);
         vg_lite_translate((path2.bounding_box[2] - path2.bounding_box[0]) / 2,
                           (path2.bounding_box[3] - path2.bounding_box[1]) / 2, matGrad2);
         vg_lite_rotate(angle, matGrad2);
@@ -299,8 +299,8 @@ static void vg_lite_clock_draw_cb(gui_obj_t *obj)
         vg_lite_identity(matGrad3);
         vg_lite_translate(path3.bounding_box[0], path3.bounding_box[1], matGrad3);
         vg_lite_translate(cx, cy, matGrad3);
-        vg_lite_scale((path3.bounding_box[2] - path3.bounding_box[0]) / 256,
-                      (path3.bounding_box[3] - path3.bounding_box[1]) / 256, matGrad3);
+        vg_lite_scale(VLC_GRADIENT_BUFFER_WIDTH * 1.0f / (path3.bounding_box[2] - path3.bounding_box[0]),
+                      1, matGrad3);
         vg_lite_translate((path3.bounding_box[2] - path3.bounding_box[0]) / 2,
                           (path3.bounding_box[3] - path3.bounding_box[1]) / 2, matGrad3);
         vg_lite_rotate(-angle, matGrad3);
@@ -583,7 +583,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_minute.path = path_minute_data;
     (vg_lite_path_append(&path_minute, line_cmd, minutes_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_minute, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 4, 24, dash, 0,
-                        0));
+                        0, 0xFFE0E0E0));
     (vg_lite_update_stroke(&path_minute));
     (vg_lite_set_draw_path_type(&path_minute, VG_LITE_DRAW_STROKE_PATH));
 
@@ -593,7 +593,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_sec.path = path_sec_data;
     (vg_lite_path_append(&path_sec, second_cmd, second_data, sizeof(second_cmd)));
     (vg_lite_set_stroke(&path_sec, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 1.5, 12, dash, 0,
-                        0));
+                        0, 0xFFE0E0E0));
     (vg_lite_update_stroke(&path_sec));
     (vg_lite_set_draw_path_type(&path_sec, VG_LITE_DRAW_STROKE_PATH));
 
@@ -604,7 +604,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_hour_1.path = path_hour_1_data;
     (vg_lite_path_append(&path_hour_1, line_cmd, hour_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_hour_1, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 9, 18, dash, 0,
-                        0));
+                        0, 0xFFE0E0E0));
     (vg_lite_update_stroke(&path_hour_1));
     (vg_lite_set_draw_path_type(&path_hour_1, VG_LITE_DRAW_STROKE_PATH));
 
@@ -615,7 +615,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_hour_2.path = path_hour_2_data;
     (vg_lite_path_append(&path_hour_2, line_cmd, hour_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_hour_2, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 6, 10, dash, 0,
-                        0));
+                        0, 0xFF999999));
     (vg_lite_update_stroke(&path_hour_2));
     (vg_lite_set_draw_path_type(&path_hour_2, VG_LITE_DRAW_STROKE_PATH));
 
@@ -625,7 +625,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     path_sunshine.path = path_sunshine_data;
     (vg_lite_path_append(&path_sunshine, line_cmd, sunshine_data, sizeof(line_cmd)));
     (vg_lite_set_stroke(&path_sunshine, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 2, 18, dash, 0,
-                        0));
+                        0, 0xFFE0E0E0));
     (vg_lite_update_stroke(&path_sunshine));
     (vg_lite_set_draw_path_type(&path_sunshine, VG_LITE_DRAW_STROKE_PATH));
 
@@ -648,7 +648,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
                       -50, 50, 50);
     (vg_lite_path_append(&path_c_letter, c_letter_cmd, c_letter_data, sizeof(c_letter_cmd)));
     (vg_lite_set_stroke(&path_c_letter, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 4, 18, dash, 0,
-                        0));
+                        0, 0xFFE0E0E0));
     (vg_lite_update_stroke(&path_c_letter));
     (vg_lite_set_draw_path_type(&path_c_letter, VG_LITE_DRAW_STROKE_PATH));
 
@@ -659,7 +659,7 @@ gui_vg_lite_clock_t *gui_vg_lite_clock_create(void *parent,  const char *name, v
     (vg_lite_path_append(&path_mark, out_circle_cmd, mark_data,
                          sizeof(out_circle_cmd)));
     (vg_lite_set_stroke(&path_mark, VG_LITE_CAP_BUTT, VG_LITE_JOIN_ROUND, 2, 18, dash, 0,
-                        0));
+                        0, 0xFFE0E0E0));
     (vg_lite_update_stroke(&path_mark));
     (vg_lite_set_draw_path_type(&path_mark, VG_LITE_DRAW_STROKE_PATH));
 
