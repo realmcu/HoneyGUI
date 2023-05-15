@@ -196,6 +196,13 @@ void gui_tabview_set_style(gui_tabview_t *this, enum gui_tabview_style style)
     this->style = style;
 }
 
+void gui_tab_jump(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
+{
+    parent_tabview->jump.jump_flag = true;
+    parent_tabview->jump.jump_id.x = idx;
+    parent_tabview->jump.jump_id.y = idy;
+}
+
 #include "gui_tab.h"
 static void tab_update_att(gui_obj_t *obj)
 {
@@ -205,6 +212,7 @@ static void tab_update_att(gui_obj_t *obj)
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     obj->x = (tab->id.x - parent->cur_id.x) * (int)gui_get_screen_width();
     obj->y = (tab->id.y - parent->cur_id.y) * (int)gui_get_screen_height();
+    // gui_log("tab_update_att x : %d , y : %d\n",obj->x,obj->y);
 }
 static float get_scale_offset_x(gui_obj_t *img, float scale_x)
 {
@@ -216,7 +224,7 @@ static float get_scale_offset_x(gui_obj_t *img, float scale_x)
 }
 static float get_scale_offset_y(gui_obj_t *img, float scale_y)
 {
-    return (1.0f - scale_y) * (((float)(gui_get_screen_width() / 2)) - (float)(img->y));
+    return (1.0f - scale_y) * (((float)(gui_get_screen_height() / 2)) - (float)(img->y));
 }
 #include "gui_canvas.h"
 #include "gui_curtain.h"
@@ -239,20 +247,35 @@ static void deal_img_in_root(gui_obj_t *object, float xx, float yy)
             case IMAGE_FROM_MEM:
                 {
                     gui_magic_img_t *img = (void *)obj;
-                    gui_img_scale(img, x, y);
-                    gui_img_translate(img, get_scale_offset_x((void *)img, x) / x, get_scale_offset_y((void *)img,
-                                      x) / y);
-                    img->base.draw_img.opacity_value = x * UINT8_MAX;
+                    if (((gui_tab_t *)object)->style == REDUCTION_FADE ||
+                        ((gui_tab_t *)object)->style == REDUCTION)
+                    {
+                        gui_img_scale_add(img, x, y);
+                        gui_img_translate(img, get_scale_offset_x((void *)img, x) / x, get_scale_offset_y((void *)img,
+                                          x) / y);
+                    }
+                    if (((gui_tab_t *)object)->style == REDUCTION_FADE ||
+                        ((gui_tab_t *)object)->style == FADE)
+                    {
+                        img->base.draw_img.opacity_value = x > 0.4f ? (x - 0.4f) / 0.6f * UINT8_MAX : 0;
+                    }
                 }
                 break;
             case CANVAS:
                 {
                     gui_canvas_t *img = (void *)obj;
-                    gui_canvas_api.scale(img, x, y);
-                    gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x),
-                                             get_scale_offset_y((void *)img,
-                                                                x));
-                    img->opacity_value = x * UINT8_MAX;
+                    if (((gui_tab_t *)object)->style == REDUCTION_FADE ||
+                        ((gui_tab_t *)object)->style == REDUCTION)
+                    {
+                        gui_canvas_api.scale(img, x, y);
+                        gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x),
+                                                 get_scale_offset_y((void *)img, x));
+                    }
+                    if (((gui_tab_t *)object)->style == REDUCTION_FADE ||
+                        ((gui_tab_t *)object)->style == FADE)
+                    {
+                        img->opacity_value = x > 0.4f ? (x - 0.4f) / 0.6f * UINT8_MAX : 0;
+                    }
                 }
                 break;
 #ifdef MODULE_VG_LITE
@@ -316,7 +339,7 @@ static void tab_prepare_scale_fade(gui_obj_t *obj)
                                        (float)obj->dx)) / ((float)gui_get_screen_width()),
                          ((float)(gui_get_screen_width() + ((float)(-to1(tp->deltaX))) * (float)obj->dx)) / ((
                                      float)gui_get_screen_width()));
-        //deal_img_in_root(obj, 0.5, 0.5);
+        // deal_img_in_root(obj, 0.5, 0.5);
     }
     else if ((tp->type == TOUCH_HOLD_X) && (tp->deltaX < 0) && (tab->id.x - parent->cur_id.x == 1) &&
              tab->id.y == 0)
@@ -328,10 +351,23 @@ static void tab_prepare_scale_fade(gui_obj_t *obj)
     else if ((tp->type == TOUCH_HOLD_X) && (tp->deltaX > 0) && (tab->id.x - parent->cur_id.x == -1) &&
              tab->id.y == 0)
     {
-        //gui_log("(float)obj->dx:%f\n",((float)obj->dx)/((float)gui_get_screen_width())+1.0f);
+        // gui_log("(float)obj->dx:%f\n",((float)obj->dx)/((float)gui_get_screen_width())+1.0f);
         deal_img_in_root(obj, ((float)obj->dx) / ((float)gui_get_screen_width()) + 1.0f,
                          ((float)obj->dx) / ((float)gui_get_screen_width()) + 1.0f);
     }
+}
+
+//static void tab_prepare_reduction(gui_obj_t *obj)
+//{
+
+//}
+//static void tab_prepare_fade(gui_obj_t *obj)
+//{
+
+//}
+static void tab_prepare_reduction_fade(gui_obj_t *obj)
+{
+    tab_prepare_scale_fade(obj);
 }
 static void tab_prepare(gui_obj_t *this)
 {
@@ -361,6 +397,22 @@ static void tab_prepare(gui_obj_t *this)
 
             tab_prepare_classic(this);
         }
+    }
+    switch (((gui_tab_t *)this)->style)
+    {
+    case CLASSIC:
+        break;
+    case REDUCTION:
+    // tab_prepare_reduction(this);
+    // break;
+    case FADE:
+    // tab_prepare_fade(this);
+    // break;
+    case REDUCTION_FADE:
+        tab_prepare_reduction_fade(this);
+        break;
+    default:
+        break;
     }
 }
 void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int16_t x, int16_t y,
@@ -432,7 +484,7 @@ static void tabview_theme1_update(gui_obj_t *obj)
         case 0:
             child_obj->x = tb->ccw - tb->ccw * cosf(rad) - 128 / 2;
             child_obj->y = 0;
-            gui_img_scale(img, sinf(rad) * 0.5f + 0.5f, sinf(rad) * 0.5f + 0.5f);
+            gui_img_scale_add(img, sinf(rad) * 0.5f + 0.5f, sinf(rad) * 0.5f + 0.5f);
             //img->set_alpha(img, (sinf(rad)*0.5f+0.5f)*0xff);
             child_obj->x -= (128 / 2) * (sinf(rad) * 0.5f + 0.5f - 1.0f);
             child_obj->y -= (128 / 2) * (sinf(rad) * 0.5f + 0.5f - 1.0f);
@@ -440,7 +492,8 @@ static void tabview_theme1_update(gui_obj_t *obj)
         case 2:
             child_obj->x = tb->ccw + tb->ccw * sinf(rad) - 128 / 2;
             child_obj->y = 0;
-            gui_img_scale(img, sinf(rad + M_PI / 2.0f) * 0.5f + 0.5f, sinf(rad + M_PI / 2.0f) * 0.5f + 0.5f);
+            gui_img_scale_add(img, sinf(rad + M_PI / 2.0f) * 0.5f + 0.5f,
+                              sinf(rad + M_PI / 2.0f) * 0.5f + 0.5f);
             //img->set_alpha(img, (sinf(rad+M_PI/2.0f)*0.5f+0.5f)*0xff);
             child_obj->x -= (128 / 2) * (sinf(rad + M_PI / 2.0f) * 0.5f + 0.5f - 1.0f);
             child_obj->y -= (128 / 2) * (sinf(rad + M_PI / 2.0f) * 0.5f + 0.5f - 1.0f);
@@ -448,7 +501,7 @@ static void tabview_theme1_update(gui_obj_t *obj)
         case 1:
             child_obj->x = tb->ccw + tb->ccw * cosf(rad) - 128 / 2;
             child_obj->y = 0;
-            gui_img_scale(img, sinf(rad + M_PI) * 0.5f + 0.5f, sinf(rad + M_PI) * 0.5f + 0.5f);
+            gui_img_scale_add(img, sinf(rad + M_PI) * 0.5f + 0.5f, sinf(rad + M_PI) * 0.5f + 0.5f);
             //img->set_alpha(img, (sinf(rad+M_PI)*0.5f+0.5f)*0xff);
             child_obj->x -= (128 / 2) * (sinf(rad + M_PI) * 0.5f + 0.5f - 1.0f);
             child_obj->y -= (128 / 2) * (sinf(rad + M_PI) * 0.5f + 0.5f - 1.0f);
@@ -474,12 +527,6 @@ gui_tabview_theme1_t *gui_tabview_theme1_create(void *parent, int16_t x, int16_t
 {
 #define _param_tabview_theme1_ctor this, parent, x,y,r
     GUI_NEW(gui_tabview_theme1_t, tabview_theme1_ctor, _param_tabview_theme1_ctor)
-}
-void gui_tab_jump(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
-{
-    parent_tabview->jump.jump_flag = true;
-    parent_tabview->jump.jump_id.x = idx;
-    parent_tabview->jump.jump_id.y = idy;
 }
 
 

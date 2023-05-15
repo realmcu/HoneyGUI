@@ -42,7 +42,7 @@ void gui_magic_img_from_mem_ctor(gui_magic_img_t *this, gui_obj_t *parent, const
                                  void *addr, int16_t x, int16_t y, int16_t w, int16_t h);
 
 void gui_img_rotation(gui_magic_img_t *img, float degrees, float c_x, float c_y);
-
+void gui_img_scale_add(gui_magic_img_t *img, float scale_x, float scale_y);
 void gui_img_scale(gui_magic_img_t *img, float scale_x, float scale_y);
 void gui_img_translate(gui_magic_img_t *img, float t_x, float t_y);
 void gui_img_set_opacity(gui_magic_img_t *this, unsigned char opacity_value);

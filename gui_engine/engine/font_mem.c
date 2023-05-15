@@ -163,6 +163,14 @@ void rtgui_font_mem_unload(gui_text_t *text)
 
 //    return color;
 //}
+gui_inline uint16_t rgba2565(uint32_t rgba)
+{
+    gui_color_t color_blend = {.rgba = rgba};
+    uint16_t red = color_blend.channel.red * 0x1f / 0xff << 11;
+    uint16_t green = color_blend.channel.green * 0x3f / 0xff << 5;
+    uint16_t blue = color_blend.channel.blue * 0x1f / 0xff;
+    return red + green + blue;
+}
 static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, struct rtgui_rect *rect)
 {
     uint8_t *dots = chr->dot_addr;
@@ -214,7 +222,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, struct rtg
             {
                 if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
                 {
-                    writebuf[write_off + j] = color;
+                    writebuf[write_off + j] = rgba2565(color);
                 }
             }
         }

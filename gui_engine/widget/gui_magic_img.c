@@ -25,7 +25,7 @@ void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *
     matrix_translate(this->c_x, this->c_y, draw_img->matrix);
     matrix_rotate(this->degrees, draw_img->matrix);
     matrix_translate(-this->c_x, -this->c_y, draw_img->matrix);
-    matrix_scale(this->scale_x, this->scale_y, draw_img->matrix);
+    matrix_scale(this->scale_x * this->p_x, this->scale_y * this ->p_y, draw_img->matrix);
     matrix_translate(this->t_x, this->t_y, draw_img->matrix);
     memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct rtgui_matrix));
     matrix_inverse(draw_img->inverse);
@@ -179,6 +179,12 @@ void gui_img_scale(gui_magic_img_t *img, float scale_x, float scale_y)
     img->scale_x = scale_x;
     img->scale_y = scale_y;
 }
+void gui_img_scale_add(gui_magic_img_t *img, float scale_x, float scale_y)
+{
+    GUI_ASSERT(img != NULL);
+    img->p_x = scale_x;
+    img->p_y = scale_y;
+}
 void gui_img_translate(gui_magic_img_t *img, float t_x, float t_y)
 {
     GUI_ASSERT(img != NULL);
@@ -265,6 +271,8 @@ void gui_magic_img_from_mem_ctor(gui_magic_img_t *this, gui_obj_t *parent, const
     //for self
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
+    this->p_x = 1.0f;
+    this->p_y = 1.0f;
     draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
     draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
     this->base.draw_img.opacity_value = UINT8_MAX;
