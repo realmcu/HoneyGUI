@@ -3847,7 +3847,8 @@ vg_lite_error_t vg_lite_set_stroke(
     vg_lite_float_t stroke_miter_limit,
     vg_lite_float_t *stroke_dash_pattern,
     uint32_t stroke_dash_pattern_count,
-    vg_lite_float_t stroke_dash_phase
+    vg_lite_float_t stroke_dash_phase,
+    vg_lite_color_t stroke_color
 )
 {
     if (!path || stroke_line_width <= 0)
