@@ -34,6 +34,16 @@
 #include "vg_lite.h"
 #include "vg_lite_kernel.h"
 
+static void *port_malloc(uint32_t n)
+{
+    extern struct rt_memheap ext_data_sram_heap;
+    return rt_memheap_alloc(&ext_data_sram_heap, n);
+}
+
+static void port_free(void *rmem)
+{
+    rt_memheap_free(rmem);
+}
 
 /* This is the function to call from the VGLite driver to interface with the GPU. */
 vg_lite_error_t vg_lite_kernel(vg_lite_kernel_command_t command, void *data);
@@ -1129,7 +1139,7 @@ static vg_lite_error_t _add_point_to_point_list_wdelta(
     }
 
     last_point = stroke_conversion->path_last_point;
-    point = (vg_lite_path_point_ptr)malloc(sizeof(*point));
+    point = (vg_lite_path_point_ptr)port_malloc(sizeof(*point));
     if (!point)
     {
         return VG_LITE_OUT_OF_RESOURCES;
@@ -1152,7 +1162,7 @@ static vg_lite_error_t _add_point_to_point_list_wdelta(
     return error;
 ErrorHandler:
 
-    free(point);
+    port_free(point);
     point = NULL;
     return error;
 }
@@ -1176,7 +1186,7 @@ static vg_lite_error_t _add_point_to_point_list(
     last_point = stroke_conversion->path_last_point;
     if (last_point == NULL)
     {
-        point = (vg_lite_path_point_ptr)malloc(sizeof(*point));
+        point = (vg_lite_path_point_ptr)port_malloc(sizeof(*point));
         if (!point)
         {
             return VG_LITE_OUT_OF_RESOURCES;
@@ -1886,7 +1896,7 @@ _add_point_to_right_stroke_point_list_tail(
         return VG_LITE_INVALID_ARGUMENT;
     }
 
-    point = (vg_lite_path_point_ptr)malloc(sizeof(*point));
+    point = (vg_lite_path_point_ptr)port_malloc(sizeof(*point));
     if (!point)
     {
         return VG_LITE_OUT_OF_RESOURCES;
@@ -1923,7 +1933,7 @@ _add_point_to_left_stroke_point_list_head(
         return VG_LITE_INVALID_ARGUMENT;
     }
 
-    point = (vg_lite_path_point_ptr)malloc(sizeof(*point));
+    point = (vg_lite_path_point_ptr)port_malloc(sizeof(*point));
     if (!point)
     {
         return VG_LITE_OUT_OF_RESOURCES;
@@ -1957,7 +1967,7 @@ static vg_lite_error_t _add_stroke_sub_path(
         return VG_LITE_INVALID_ARGUMENT;
     }
 
-    *sub_path = (vg_lite_sub_path_ptr)malloc(sizeof(**sub_path));
+    *sub_path = (vg_lite_sub_path_ptr)port_malloc(sizeof(**sub_path));
     if (!*sub_path)
     {
         return VG_LITE_OUT_OF_RESOURCES;
@@ -2021,7 +2031,7 @@ _add_zero_length_stroke_sub_path(
             dy = -Point->tangentX * half_width;
         }
 
-        new_point = (vg_lite_path_point_ptr)malloc(sizeof(*new_point));
+        new_point = (vg_lite_path_point_ptr)port_malloc(sizeof(*new_point));
         if (!new_point)
         {
             return VG_LITE_OUT_OF_RESOURCES;
@@ -2046,7 +2056,7 @@ _add_zero_length_stroke_sub_path(
     else
     {
         /* Draw a circle. */
-        new_point = (vg_lite_path_point_ptr)malloc(sizeof(*new_point));
+        new_point = (vg_lite_path_point_ptr)port_malloc(sizeof(*new_point));
         if (!new_point)
         {
             return VG_LITE_OUT_OF_RESOURCES;
@@ -2266,7 +2276,7 @@ _convert_circle_arc(
         }
 
         /* Add control point. */
-        point = (vg_lite_path_point_ptr)malloc(sizeof(*point));
+        point = (vg_lite_path_point_ptr)port_malloc(sizeof(*point));
         if (!point)
         {
             return VG_LITE_OUT_OF_RESOURCES;
@@ -2288,7 +2298,7 @@ _convert_circle_arc(
         }
 
         /* Add anchor point. */
-        point = (vg_lite_path_point_ptr)malloc(sizeof(*point));
+        point = (vg_lite_path_point_ptr)port_malloc(sizeof(*point));
         if (!point)
         {
             error = VG_LITE_OUT_OF_RESOURCES;
@@ -2312,7 +2322,7 @@ ErrorHandler:
     /* Return status. */
     if (start_point)
     {
-        free(start_point);
+        port_free(start_point);
         start_point = last_point = NULL;
     }
     return error;
@@ -2341,7 +2351,7 @@ _start_new_stroke_sub_path(
 
     VG_LITE_ERROR_HANDLER(_add_stroke_sub_path(stroke_conversion, &stroke_sub_path));
 
-    new_point = (vg_lite_path_point_ptr)malloc(sizeof(*new_point));
+    new_point = (vg_lite_path_point_ptr)port_malloc(sizeof(*new_point));
     if (!new_point)
     {
         return VG_LITE_OUT_OF_RESOURCES;
@@ -2356,7 +2366,7 @@ _start_new_stroke_sub_path(
 
     stroke_sub_path->point_list = stroke_conversion->last_right_stroke_point = new_point;
 
-    new_point = (vg_lite_path_point_ptr)malloc(sizeof(*new_point));
+    new_point = (vg_lite_path_point_ptr)port_malloc(sizeof(*new_point));
     if (!new_point)
     {
         return VG_LITE_OUT_OF_RESOURCES;
@@ -3480,7 +3490,7 @@ _create_stroke_path(
 
                 /* Add curve. */
                 /* Add extra point to the beginning with end point's coordinates. */
-                point = (vg_lite_path_point_ptr)malloc(sizeof(*point));
+                point = (vg_lite_path_point_ptr)port_malloc(sizeof(*point));
                 if (!point)
                 {
                     return VG_LITE_INVALID_ARGUMENT;
@@ -3561,7 +3571,7 @@ static vg_lite_error_t _copy_stroke_path(
         temp_stroke_path_size = path->stroke_path_size;
 
         path->stroke_path_size += totalsize;
-        path->stroke_path_data = (void *)malloc(path->stroke_path_size);
+        path->stroke_path_data = (void *)port_malloc(path->stroke_path_size);
         if (!path->stroke_path_data)
         {
             error = VG_LITE_INVALID_ARGUMENT;
@@ -3573,7 +3583,7 @@ static vg_lite_error_t _copy_stroke_path(
         if (temp_stroke_path_data)
         {
             memcpy(path->stroke_path_data, temp_stroke_path_data, temp_stroke_path_size);
-            free(temp_stroke_path_data);
+            port_free(temp_stroke_path_data);
             temp_stroke_path_data = NULL;
         }
 
@@ -3670,7 +3680,7 @@ static vg_lite_error_t _copy_stroke_path(
                     while (point_list)
                     {
                         temp_point = point_list->next;
-                        free(point_list);
+                        port_free(point_list);
                         point_list = temp_point;
                     }
                     temp_point = NULL;
@@ -3712,7 +3722,7 @@ ErrorHandler:
 
     if (temp_stroke_path_data)
     {
-        free(temp_stroke_path_data);
+        port_free(temp_stroke_path_data);
         temp_stroke_path_data = NULL;
     }
 
@@ -3746,7 +3756,7 @@ static vg_lite_error_t _initialize_stroke_dash_parameters(
     /* The last pattern is ignored if the number is odd. */
     if (count & 0x1) { count--; }
 
-    pattern = (vg_lite_float_t *)malloc(count * sizeof(vg_lite_float_t));
+    pattern = (vg_lite_float_t *)port_malloc(count * sizeof(vg_lite_float_t));
     if (!pattern)
     {
         return VG_LITE_OUT_OF_RESOURCES;
@@ -3772,7 +3782,7 @@ static vg_lite_error_t _initialize_stroke_dash_parameters(
     if (stroke_conversion->stroke_dash_pattern_length < FLOAT_EPSILON)
     {
         stroke_conversion->stroke_dash_pattern_count = 0;
-        free(temp_pattern);
+        port_free(temp_pattern);
         temp_pattern = NULL;
         return error;
     }
@@ -3798,7 +3808,7 @@ static vg_lite_error_t _initialize_stroke_dash_parameters(
     stroke_conversion->stroke_dash_initial_index = i;
     stroke_conversion->stroke_dash_initial_length = *pattern - length;
 
-    free(temp_pattern);
+    port_free(temp_pattern);
     temp_pattern = NULL;
 
     return error;
@@ -3821,7 +3831,7 @@ vg_lite_error_t vg_lite_update_stroke(
     /* Free the stroke. */
     if (path->stroke_path_data)
     {
-        free(path->stroke_path_data);
+        port_free(path->stroke_path_data);
         /* Reset the stroke. */
         path->stroke_path_data = NULL;
     }
@@ -4192,13 +4202,13 @@ vg_lite_error_t _convert_arc(
     /* Determine the size of the buffer required. */
     bufferSize = (1 + 2 * 2) * SIZEOF(vg_lite_float_t) * segs;
 
-    arcPath = (char *)malloc(*offset + bufferSize + last_size);
+    arcPath = (char *)port_malloc(*offset + bufferSize + last_size);
     if (arcPath == NULL)
     {
         return VG_LITE_OUT_OF_MEMORY;
     }
     memcpy(arcPath, (char *)*path_data, *offset);
-    free(*path_data);
+    port_free(*path_data);
 
     *path_data = arcPath;
 
@@ -7403,7 +7413,7 @@ vg_lite_error_t vg_lite_init(int32_t tessellation_width,
     vg_lite_kernel_initialize_t initialize;
     uint8_t i = 0;
 
-    s_context.rtbuffer = (vg_lite_buffer_t *)malloc(sizeof(vg_lite_buffer_t));
+    s_context.rtbuffer = (vg_lite_buffer_t *)port_malloc(sizeof(vg_lite_buffer_t));
     memset(s_context.rtbuffer, 0, sizeof(vg_lite_buffer_t));
 
     if (tessellation_width <= 0)
@@ -7720,7 +7730,7 @@ vg_lite_error_t vg_lite_close(void)
 
     if (s_context.rtbuffer)
     {
-        free(s_context.rtbuffer);
+        port_free(s_context.rtbuffer);
     }
 
     submit_flag = 0;
@@ -8219,7 +8229,7 @@ vg_lite_error_t vg_lite_init_arc_path(vg_lite_path_t *path,
 
     memset(path, 0, sizeof(*path));
     memset(&coords, 0, sizeof(vg_lite_control_coord_t));
-    pathdata = (char *)malloc(path_length);
+    pathdata = (char *)port_malloc(path_length);
     if (pathdata == NULL)
     {
         return VG_LITE_OUT_OF_MEMORY;
@@ -8556,7 +8566,7 @@ vg_lite_error_t vg_lite_init_arc_path(vg_lite_path_t *path,
     return VG_LITE_SUCCESS;
 
 ErrorHandler:
-    free(pathdata);
+    port_free(pathdata);
     pathdata = NULL;
     return error;
 }
@@ -8611,13 +8621,13 @@ vg_lite_error_t vg_lite_clear_path(vg_lite_path_t *path)
     path->uploaded.memory = NULL;
     if (path->pdata_internal == 1 && path->path != NULL)
     {
-        free(path->path);
+        port_free(path->path);
     }
     path->path = NULL;
 
     if (path->stroke_path_data)
     {
-        free(path->stroke_path_data);
+        port_free(path->stroke_path_data);
         path->stroke_path_data = NULL;
 
         if (path->stroke_conversion.path_point_list)
@@ -8626,7 +8636,7 @@ vg_lite_error_t vg_lite_clear_path(vg_lite_path_t *path)
             while (path->stroke_conversion.path_point_list)
             {
                 temp_point = path->stroke_conversion.path_point_list->next;
-                free(path->stroke_conversion.path_point_list);
+                port_free(path->stroke_conversion.path_point_list);
                 path->stroke_conversion.path_point_list = temp_point;
             }
             temp_point = NULL;
@@ -8644,12 +8654,12 @@ vg_lite_error_t vg_lite_clear_path(vg_lite_path_t *path)
                     while (path->stroke_conversion.stroke_sub_path_list->point_list)
                     {
                         temp_point = path->stroke_conversion.stroke_sub_path_list->point_list->next;
-                        free(path->stroke_conversion.stroke_sub_path_list->point_list);
+                        port_free(path->stroke_conversion.stroke_sub_path_list->point_list);
                         path->stroke_conversion.stroke_sub_path_list->point_list = temp_point;
                     }
                     temp_point = NULL;
                 }
-                free(path->stroke_conversion.stroke_sub_path_list);
+                port_free(path->stroke_conversion.stroke_sub_path_list);
                 path->stroke_conversion.stroke_sub_path_list = temp_sub_path;
             }
             temp_sub_path = NULL;

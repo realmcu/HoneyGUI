@@ -1152,6 +1152,7 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
 
 void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *dc)
 {
+    gui_log("____________%d\n", __LINE__);
     vg_lite_matrix_t matrix;
     vg_lite_buffer_t target;
 
@@ -1225,7 +1226,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
 
         uint32_t path_data_len = vg_lite_path_calc_length(arc_cmd, sizeof(arc_cmd), VG_LITE_FP32);
         vg_lite_init_path(&arc_path[i].path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
-                          -dc->fb_height, dc->fb_width, dc->fb_height);
+                          -dc->fb_height, dc->fb_width, dc->fb_height); gui_log("%d ", __LINE__);
         void *path_data = gui_malloc(path_data_len);
         arc_path[i].path.path = path_data;
         arc_path[i].path_data = path_data;
@@ -1237,9 +1238,9 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
         uint32_t stops[] = {0, 255};
         arc_path[i].p_grad = gui_malloc(sizeof(vg_lite_grad_ptr));
         memset(arc_path[i].p_grad, 0, sizeof(vg_lite_grad_ptr));
-        vg_lite_init_grad(&arc_path[i].p_grad->grad);
+        vg_lite_init_grad(&arc_path[i].p_grad->grad); gui_log("%d ", __LINE__);
         vg_lite_set_grad(&arc_path[i].p_grad->grad, sizeof(stops) / sizeof(uint32_t), colors, stops);
-        vg_lite_update_grad(&arc_path[i].p_grad->grad);
+        vg_lite_update_grad(&arc_path[i].p_grad->grad); gui_log("%d ", __LINE__);
         vg_lite_matrix_t *grad_matrix = vg_lite_get_grad_matrix(&arc_path[i].p_grad->grad);
         vg_lite_identity(grad_matrix);
         vg_lite_translate(cx + cosf(a0) * r0, cy + sinf(a0) * r0, grad_matrix);
@@ -1250,7 +1251,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
         vg_lite_draw_gradient(&target, &arc_path[i].path, VG_LITE_FILL_EVEN_ODD,
                               &matrix, &arc_path[i].p_grad->grad, VG_LITE_BLEND_SRC_OVER);
     }
-
+    gui_log("%d ", __LINE__);
     r = r0 - 6;
     ax = cosf(120.0f / 180.0f * PI) * r;
     ay = sinf(120.0f / 180.0f * PI) * r;
@@ -1276,11 +1277,11 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     uint32_t tri_stops[] = {0, 255};
 
     vg_lite_linear_gradient_t tri_white_grad, tri_black_grad;
-    memset(&tri_white_grad, 0, sizeof(vg_lite_linear_gradient_t));
+    memset(&tri_white_grad, 0, sizeof(vg_lite_linear_gradient_t)); gui_log("%d ", __LINE__);
     vg_lite_init_grad(&tri_white_grad);
     vg_lite_set_grad(&tri_white_grad, sizeof(tri_white_colors) / sizeof(uint32_t), tri_white_colors,
                      tri_stops);
-    vg_lite_update_grad(&tri_white_grad);
+    vg_lite_update_grad(&tri_white_grad); gui_log("%d ", __LINE__);
     vg_lite_matrix_t *tri_white_mat = vg_lite_get_grad_matrix(&tri_white_grad);
     vg_lite_identity(tri_white_mat);
     vg_lite_translate(cx + r * cosf(rotate_angle / 180.f * PI), cy + sinf(rotate_angle / 180.f * PI),
@@ -1448,7 +1449,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     vg_lite_set_stroke(&circle_display_path, VG_LITE_CAP_ROUND,
                        VG_LITE_JOIN_ROUND, 2.5f, 6,
                        NULL, 0, 0, disp_color);
-    vg_lite_update_stroke(&circle_display_path);
+    vg_lite_update_stroke(&circle_display_path); gui_log("%d ", __LINE__);
     vg_lite_set_draw_path_type(&circle_display_path, VG_LITE_DRAW_STROKE_PATH);
     vg_lite_identity(&matrix);
     vg_lite_translate(cx, cy, &matrix);
@@ -1473,17 +1474,17 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
             free(arc_path[i].path_data);
             arc_path[i].path_data = NULL;
         }
-    }
+    } gui_log("%d ", __LINE__);
     vg_lite_clear_path(&tri_path);
     gui_free(tri_path_data);
     vg_lite_clear_path(&rect_path);
-    gui_free(rect_path_data);
+    gui_free(rect_path_data); gui_log("%d ", __LINE__);
     vg_lite_clear_grad(&tri_white_grad);
     vg_lite_clear_grad(&tri_black_grad);
     gui_free(s_circle_path_data);
-    gui_free(b_circle_path_data);
+    gui_free(b_circle_path_data); gui_log("%d ", __LINE__);
     vg_lite_clear_path(&circle_big_path);
     vg_lite_clear_path(&circle_small_path);
     gui_free(disp_circle_path_data);
-    vg_lite_clear_path(&circle_display_path);
+    vg_lite_clear_path(&circle_display_path); gui_log("%d\n", __LINE__);
 }

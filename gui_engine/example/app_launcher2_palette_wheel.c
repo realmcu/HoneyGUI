@@ -88,6 +88,7 @@ static void palette_wheel_draw(gui_canvas_t *c)
     }
     else
     {
+        selector_radian += 0.3f;
         pw.selector_radian = selector_radian;
         selector_radian_old = selector_radian;
     }

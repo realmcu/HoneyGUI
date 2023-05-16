@@ -80,7 +80,7 @@ void wave_page(void *parent)
     text = gui_text_create(parent, "icon_text", 200, 200-50, RTK_GUI_DEFAULT_FONT_SIZE*6, RTK_GUI_DEFAULT_FONT_SIZE*6);
         gui_text_set(text, t, "rtk_font_stb", BUTTON_COLOR, strlen(t),
                      RTK_GUI_DEFAULT_FONT_SIZE*6);  */
-    gui_svg_create_from_mem(parent, HEARTRATE_SVG, 2890, 445, 445, 10, 10);
+    //gui_svg_create_from_mem(parent, HEARTRATE_SVG, 2890, 445, 445, 10, 10);
     //gui_svg_create_from_mem(parent, MUSIC_SVG, 2746, 450,450, 5, 5);
     gui_canvas_t *canvas = gui_canvas_create(parent, "c", 0, 0, 454, 454, 0);
     canvas->draw = read_page_draw;
