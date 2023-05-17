@@ -478,7 +478,32 @@ static void cube_destory(gui_obj_t *obj)
 
 }
 
-
+static void alien_cache(draw_img_t *img, void **image_addr)
+{
+    img->data = *image_addr;
+    rtgui_image_load_scale(img);
+    draw_img_t *image = img;
+    uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
+    gui_log("gpu_width:%d, image->img_w:%d\n", gpu_width, image->img_w);
+    uint8_t *source_buffer = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
+    uint8_t *tmp2 = 0;
+    uint32_t gpu_height = image->img_h;
+    tmp2 = gui_malloc(gpu_width * gpu_height * 2 + 63 + sizeof(struct gui_rgb_data_head));
+    uint8_t *tmp = tmp2 + sizeof(struct gui_rgb_data_head);
+    source_buffer = tmp + 64 - (int)tmp % 64;
+    memcpy(source_buffer - sizeof(struct gui_rgb_data_head), img->data,
+           sizeof(struct gui_rgb_data_head));
+    GUI_ASSERT(source_buffer != NULL);
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    char source_bytes_per_pixel = 2;
+    for (uint32_t i = 0; i < gpu_height; i++)
+    {
+        memcpy(source_buffer + i * gpu_width * source_bytes_per_pixel,
+               (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
+               image->img_w * source_bytes_per_pixel);
+    }
+    *image_addr = source_buffer - sizeof(struct gui_rgb_data_head);
+}
 
 
 void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
@@ -515,8 +540,8 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
     this->scale_y = 1.0f;
     extern void *vg_lite_hal_alloc(unsigned long size);
 
-#define CUBE_PICTURE_FILE_SIZE 120840
-#if 1
+#define CUBE_PICTURE_FILE_SIZE 131080
+#if 0
     {
         gui_log("VG_LITE_HAL_ALLOC\n");
         void *temp = gui_malloc(CUBE_PICTURE_FILE_SIZE);
@@ -531,6 +556,42 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
         memcpy(temp, array[4], CUBE_PICTURE_FILE_SIZE);
         array[4] = temp;
         array[5] = temp;
+    }
+#endif
+#if 1
+    {
+        gui_log("VG_LITE_HAL_ALLOC\n");
+        /*          this->draw_img_front.data = array[0];
+                    rtgui_image_load_scale(&(this->draw_img_front));
+                    draw_img_t *image = &(this->draw_img_front);
+                        uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
+                gui_log("gpu_width:%d, image->img_w:%d\n",gpu_width, image->img_w);
+                            bool image_alien = false;
+                            uint8_t *source_buffer = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+                    uint8_t *tmp2 = 0;
+                    uint32_t gpu_height = image->img_h;
+                    tmp2 = gui_malloc(gpu_width * gpu_height * 2 + 63+sizeof(struct gui_rgb_data_head));
+                    uint8_t *tmp = tmp2 + sizeof(struct gui_rgb_data_head);
+                    source_buffer = tmp + 64 - (int)tmp % 64;
+                    memcpy(source_buffer-sizeof(struct gui_rgb_data_head), this->draw_img_front.data , sizeof(struct gui_rgb_data_head));
+                    GUI_ASSERT(source_buffer != NULL);
+                    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+                    char source_bytes_per_pixel = 2;
+                        for (uint32_t i = 0; i < gpu_height; i++)
+                        {
+                                memcpy(source_buffer + i * gpu_width * source_bytes_per_pixel,
+                                             (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
+                                             image->img_w * source_bytes_per_pixel);
+                        }
+                array[0] = source_buffer-sizeof(struct gui_rgb_data_head);*/
+
+        alien_cache(&(this->draw_img_front), &(array[0]));
+        alien_cache(&(this->draw_img_back), &(array[1]));
+        alien_cache(&(this->draw_img_up), &(array[2]));
+        alien_cache(&(this->draw_img_down), &(array[3]));
+        alien_cache(&(this->draw_img_left), &(array[4]));
+        alien_cache(&(this->draw_img_right), &(array[5]));
+
     }
 #endif
     this->draw_img_front.data = array[0];

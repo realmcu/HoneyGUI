@@ -685,19 +685,42 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     default:
         break;
     }
+
     uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
+    gui_log("gpu_width:%d, image->img_w:%d\n", gpu_width, image->img_w);
+    bool image_alien = true;
+    gpu_width = ((image->img_w + 15) >> 4) << 4;
     uint32_t gpu_height = image->img_h;
     source.stride = gpu_width * source_bytes_per_pixel;
-    uint8_t *tmp = gui_malloc(gpu_width * gpu_height * source_bytes_per_pixel + 63);
-    uint8_t *source_buffer = tmp + 64 - (int)tmp % 64;
-    GUI_ASSERT(source_buffer != NULL);
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    for (uint32_t i = 0; i < gpu_height; i++)
+    uint8_t *source_buffer = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t *tmp = source_buffer;
+    //source_buffer = tmp + 64 - (int)tmp % 64;
+    //gui_log("tmp, (int)tmp % 64:%x, tmp:%x\n",tmp, (int)tmp % 64);
+    if (gpu_width != image->img_w || (int)tmp % 64 != 0)
     {
-        memcpy(source_buffer + i * gpu_width * source_bytes_per_pixel,
-               (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
-               image->img_w * source_bytes_per_pixel);
+        image_alien = false;
     }
+    if (!image_alien)
+    {
+        tmp = gui_malloc(gpu_width * gpu_height * source_bytes_per_pixel + 63);
+        source_buffer = tmp + 64 - (int)tmp % 64;
+
+
+        GUI_ASSERT(source_buffer != NULL);
+
+
+        uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+        for (uint32_t i = 0; i < gpu_height; i++)
+        {
+            memcpy(source_buffer + i * gpu_width * source_bytes_per_pixel,
+                   (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
+                   image->img_w * source_bytes_per_pixel);
+        }
+    }
+
+
+
+
 
     source.width = gpu_width;
     source.height = image->img_h;
@@ -737,7 +760,11 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 
     GUI_ASSERT(error_code == VG_LITE_SUCCESS);
     vg_lite_finish();
-    gui_free(tmp);
+    if (!image_alien)
+    {
+        gui_free(tmp);
+    }
+
 }
 
 #include "nanosvg.h"
