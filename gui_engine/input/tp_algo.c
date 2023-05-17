@@ -232,7 +232,7 @@ static bool tp_judge_slow_x_left_slide(struct gui_touch_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_X)
     {
-        if (abs(tp.deltaX) > HALF_SCREEN_SIZE)
+        if (abs(tp.deltaX) > gui_get_screen_width() / 2)
         {
             if (raw_data->x_coordinate < first_record.x_coordinate)
             {
@@ -248,7 +248,7 @@ static bool tp_judge_slow_x_right_slide(struct gui_touch_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_X)
     {
-        if (abs(tp.deltaX) > HALF_SCREEN_SIZE)
+        if (abs(tp.deltaX) > gui_get_screen_width() / 2)
         {
             if (raw_data->x_coordinate > first_record.x_coordinate)
             {
@@ -264,7 +264,7 @@ static bool tp_judge_slow_x_orign_slide(struct gui_touch_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_X)
     {
-        if (abs(tp.deltaX) <= HALF_SCREEN_SIZE)
+        if (abs(tp.deltaX) <= gui_get_screen_width() / 2)
         {
             tp.type = TOUCH_ORIGIN_FROM_X;
             TP_LOG("type = TOUCH_ORIGIN_FROM_X\n");
@@ -277,7 +277,7 @@ static bool tp_judge_slow_y_down_slide(struct gui_touch_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_Y)
     {
-        if (abs(tp.deltaY) > HALF_SCREEN_SIZE)
+        if (abs(tp.deltaY) > gui_get_screen_height() / 2)
         {
             if (raw_data->y_coordinate < first_record.y_coordinate)
             {
@@ -293,7 +293,7 @@ static bool tp_judge_slow_y_up_slide(struct gui_touch_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_Y)
     {
-        if (abs(tp.deltaY) > HALF_SCREEN_SIZE)
+        if (abs(tp.deltaY) > gui_get_screen_height() / 2)
         {
             if (raw_data->y_coordinate >= first_record.y_coordinate)
             {
@@ -309,7 +309,7 @@ static bool tp_judge_slow_y_orign_slide(struct gui_touch_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_Y)
     {
-        if (abs(tp.deltaY) <= HALF_SCREEN_SIZE)
+        if (abs(tp.deltaY) <= gui_get_screen_height() / 2)
         {
             tp.type = TOUCH_ORIGIN_FROM_Y;
             TP_LOG("type = TOUCH_ORIGIN_FROM_Y\n");
