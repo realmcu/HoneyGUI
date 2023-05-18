@@ -9,6 +9,7 @@
 #include <gui_server.h>
 #include "gui_obj.h"
 #include <tp_algo.h>
+#include <gui_magic_img.h>
 
 
 static void curtain_update_att(gui_obj_t *obj)
@@ -104,12 +105,49 @@ static void curtain_update_att(gui_obj_t *obj)
         }
     }
 }
+static void add_a_in_root(gui_obj_t *object)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == IMAGE_FROM_MEM)
+        {
+            gui_magic_img_t *img = (void *)obj;
+            int a = (object->dy + gui_get_screen_height()) * 255 + 1;
+            int b = ((gui_curtain_t *)object)->scope * gui_get_screen_height();
+            uint8_t op = a / b;
+            gui_img_set_opacity(img, op);
+        }
+        add_a_in_root(obj);
+    }
+}
+static void curtain_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    switch (((gui_curtain_t *)obj)->orientation)
+    {
+    case CURTAIN_UP:
+        add_a_in_root(obj);
+        break;
+    case CURTAIN_DOWN:
+        break;
+    case CURTAIN_LEFT:
+        break;
+    case CURTAIN_RIGHT:
+        break;
+    default:
+        break;
+    }
+}
 void gui_curtain_ctor(gui_curtain_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                       int16_t y,
                       int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     ((gui_obj_t *)this)->obj_update_att = curtain_update_att;
+    ((gui_obj_t *)this)->obj_prepare = curtain_prepare;
     ((gui_obj_t *)this)->type = CURTAIN;
     if (scope == 0)
     {

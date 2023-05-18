@@ -164,13 +164,17 @@ void tabview_prepare(gui_obj_t *obj)
     }
 }
 
+// void tabview_update(gui_obj_t *obj)
+// {
 
+// }
 void gui_tabview_ctor(gui_tabview_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                       int16_t y,
                       int16_t w, int16_t h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     ((gui_obj_t *)this)->obj_prepare = tabview_prepare;
+    // ((gui_obj_t *)this)->obj_update_att = tabview_update;
     GET_BASE(this)->type = TABVIEW;
 }
 
