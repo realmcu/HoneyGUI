@@ -36,13 +36,12 @@
 
 static void *port_malloc(uint32_t n)
 {
-    extern struct rt_memheap ext_data_sram_heap;
-    return rt_memheap_alloc(&ext_data_sram_heap, n);
+    return vg_lite_hal_alloc(n);;
 }
 
 static void port_free(void *rmem)
 {
-    rt_memheap_free(rmem);
+    vg_lite_hal_free(rmem);
 }
 
 /* This is the function to call from the VGLite driver to interface with the GPU. */
