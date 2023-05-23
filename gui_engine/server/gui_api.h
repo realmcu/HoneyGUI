@@ -77,8 +77,6 @@ gui_kb_port_data_t *kb_get_data(void);
 struct gui_indev *gui_get_indev(void);
 struct gui_dispdev *gui_get_dc(void);
 
-bool gui_need_adaption(void);
-
 float gui_get_scale_x(void);
 
 float gui_get_scale_y(void);

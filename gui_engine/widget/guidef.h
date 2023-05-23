@@ -222,7 +222,6 @@ typedef struct gui_dispdev
     uint8_t *frame_buf;
     uint8_t *disp_buf_1;
     uint8_t *disp_buf_2;
-    bool adaption;
     float scale_x;
     float scale_y;
     rtgui_rect_t section;

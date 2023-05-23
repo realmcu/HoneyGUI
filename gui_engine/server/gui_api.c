@@ -95,12 +95,6 @@ struct gui_dispdev *gui_get_dc(void)
     return dc;
 }
 
-
-bool gui_need_adaption(void)
-{
-    return dc->adaption;
-}
-
 float gui_get_scale_x(void)
 {
     return dc->scale_x;

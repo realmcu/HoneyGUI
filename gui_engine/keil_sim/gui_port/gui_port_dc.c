@@ -34,7 +34,6 @@ static struct gui_dispdev dc =
 
     .section = {0, 0, 0, 0},
     .section_count = 0,
-    .adaption = false,
     .scale_x = 1,
     .scale_y = 1,
     .disp_buf_1 = NULL,

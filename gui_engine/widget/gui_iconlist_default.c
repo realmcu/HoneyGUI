@@ -90,14 +90,7 @@ void gui_iconlist_default_ctor(gui_obj_t *parent, const char *filename, int16_t 
     this->base.ctor = gui_iconlist_ctor;
     this->base.ctor(parent, filename, x, y, w, h, &this->base);
     struct gui_dispdev *dc = gui_get_dc();
-    if (dc->adaption)
-    {
-        this->icon_gap = 100 * dc->scale_y;
-    }
-    else
-    {
-        this->icon_gap = 100;
-    }
+    this->icon_gap = 100;
     this->base.dy_static = SPRING_HEAD;
     this->base.set_background = set_background;
     ((gui_obj_t *)this)->obj_prepare = iconlist_prepare_default;
