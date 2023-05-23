@@ -58,7 +58,7 @@ void gui_acc_init(void)
     acc.draw_polyline = sw_draw_polyline;
     acc.draw_svg = sw_draw_svg;
 #else
-    acc.blit = sw_acc_blit;
+#ifdef  MODULE_GPU_NANOVG
     acc.draw_circle = nanovg_draw_circle;
     acc.draw_rectangle = nanovg_draw_rectangle;
     acc.draw_arc = nanovg_draw_arc;
@@ -68,6 +68,15 @@ void gui_acc_init(void)
     acc.draw_svg = sw_draw_svg;
     acc.draw_wave = nanovg_draw_wave;
     acc.draw_palette_wheel = nanovg_draw_palette_wheel;
+#else
+    acc.draw_circle = sw_draw_circle;
+    acc.draw_rectangle = sw_draw_rectangle;
+    acc.draw_arc = sw_draw_arc;
+    acc.draw_line = sw_draw_line;
+    acc.draw_path = sw_draw_path;
+    acc.draw_polyline = sw_draw_polyline;
+    acc.draw_svg = sw_draw_svg;
+#endif
 #endif
 }
 

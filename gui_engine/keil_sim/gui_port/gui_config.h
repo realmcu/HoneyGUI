@@ -14,6 +14,7 @@ extern "C" {
 #define RTK_GUI_MEMHEAP_OS              0
 #define RTK_GUI_FONT_FREETYPE           0
 #define RTK_GUI_FONT_STB                1
+//#define RTK_GUI_TTF_SVG
 #define RTK_GUI_DEFAULT_FONT_SIZE       24
 
 #define RTK_GUI_GPU_SW                  1
@@ -23,6 +24,7 @@ extern "C" {
 #define RTK_GUI_GPU_OPENGL              0
 #define RTK_GUI_GPU_OPENVG              0
 #define RTK_GUI_GPU_NANOVG              0
+#define MODULE_GPU_NANOVG
 
 
 #ifdef __cplusplus

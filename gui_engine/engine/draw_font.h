@@ -50,6 +50,13 @@ struct font_lib
     char *table_name;
     uint8_t font_size;
 };
+typedef struct font_stb_screen
+{
+    int width;
+    int height;
+    int offset;
+    uint8_t *buf;
+} FONT_STB_SCREEN;
 
 /* init rtgui text system */
 void rtgui_system_font_init(void);

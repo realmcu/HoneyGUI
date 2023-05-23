@@ -4,6 +4,7 @@
 #include "acc_engine.h"
 #include "gui_canvas.h"
 #include "nanovg_agge.h"
+#ifdef  MODULE_GPU_NANOVG
 void (nanovg_draw_circle)(canvas_circle_t *c, struct gui_dispdev *dc)
 {
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
@@ -328,6 +329,7 @@ void (nanovg_draw_line)(canvas_line_t *l, struct gui_dispdev *dc)
 
     nvgDeleteAGGE(vg);
 }
+#endif //MODULE_GPU_NANOVG
 static void normal_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                         struct rtgui_rect *rect)
 {
