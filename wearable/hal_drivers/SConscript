@@ -1,5 +1,5 @@
-Import('RTT_ROOT')
-Import('rtconfig')
+Import('TOOL_ROOT')
+#Import('rtconfig')
 from building import *
 
 cwd = GetCurrentDir()
@@ -14,7 +14,7 @@ src += ['drv_flash.c']
 if GetDepend(['RT_USING_SPI']):
     src += ['drv_spi.c']
 
-if GetDepend(['RT_USING_I2C']):
+if GetDepend(['BSP_USING_I2C']):
     if GetDepend('BSP_USING_I2C1') or GetDepend('BSP_USING_I2C2') or GetDepend('BSP_USING_I2C3') or GetDepend('BSP_USING_I2C4'):
         src += ['drv_i2c.c']
 

@@ -7,8 +7,8 @@
  *
  *
  */
-#include "wristband_sdk_config.h"
-#if (BSP_USING_RTC == 1)
+#include "menu_config.h"
+#if (BSP_USING_ONCHIP_RTC == 1)
 #include "rtl876x.h"
 #include "rtl_rtc.h"
 #include "rtl_nvic.h"
@@ -142,10 +142,10 @@ void drv_rtc_dlps_handler_cbacks_register(struct rtl_rtc_config *rtc_cfg)
 {
     if (rtc_cfg->rtc_dlps_register_flag == false)
     {
-        rtc_cfg->cbacks.enter_dlps_cb = rtc_enter_dlps;
-        rtc_cfg->cbacks.exit_dlps_cb = rtc_exit_dlps;
-        rtc_cfg->cbacks.allowed_dlps_check_cb = rtc_allowed_enter_dlps_check;
-        rtc_cfg->cbacks.system_wakeup_check_cb = rtc_system_wakeup_dlps_check;
+        //rtc_cfg->cbacks.enter_dlps_cb = rtc_enter_dlps;
+        //rtc_cfg->cbacks.exit_dlps_cb = rtc_exit_dlps;
+        //rtc_cfg->cbacks.allowed_dlps_check_cb = rtc_allowed_enter_dlps_check;
+        //rtc_cfg->cbacks.system_wakeup_check_cb = rtc_system_wakeup_dlps_check;
 
 #if BSP_USING_DLPS
         drv_dlps_handler_cbacks_register(&rtc_cfg->cbacks, rtc_cfg);

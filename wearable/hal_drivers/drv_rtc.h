@@ -23,7 +23,7 @@ extern "C" {
 #include "rtl_rtc.h"
 #include "rtl_nvic.h"
 #include "rtl_pinmux.h"
-#include "wristband_sdk_config.h"
+#include "menu_config.h"
 #include "drv_dlps.h"
 #include "time.h"
 
@@ -48,7 +48,7 @@ struct rtl_rtc_config
     bool rtc_enter_dlps_flag;
     bool rtc_dlps_register_flag;
     uint32_t rtc_wk;
-    T_DRV_DLPS_CBS cbacks;
+    //T_DRV_DLPS_CBS cbacks;
 };
 
 #define RTC_COMP0_CONFIG                                               \
