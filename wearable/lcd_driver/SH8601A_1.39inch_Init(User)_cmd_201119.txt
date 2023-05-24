@@ -1,0 +1,97 @@
+# 1. SET : Shinian Watch
+# 2. Panel : EDO 1.39" 454x454
+# 3. DDI : SH8601A
+# 4. Interface : MIPI Command
+
+func.key play
+#model.name SH8601A
+
+# 1. Power Off & A15 Initial
+user.init.power.config
+
+#=======================================================
+# 2. Power-On Sequence
+#=======================================================
+gpio.clear 1 #VCI_EN=LOW (assign GPIO_1=VCI_EN)
+delay 1
+
+power.on vbat #VBAT=3.7V ON
+delay 1
+
+power.on vio #VDDIO=1.8V ON
+gpio.enable
+delay 1
+
+power.on vdd #VCI=3.3V ON
+delay 1
+
+#GPIO MAP : GPIO_7 6 5 4 3 2 1 0
+gpio.set 1 #VCI_EN=HIGH (assign GPIO_1=VCI_EN)
+delay 12
+
+gpio.clear 0 #RESX=LOW (assign GPIO_0=RESX)
+delay 1
+gpio.set 0 #RESX=HIGH (assign GPIO_0=RESX)
+delay 10   #Timing: RESX-VCI_EN=14ms
+
+mipi.lane.enable # LP11
+delay 10
+
+# 3. DSC Config
+# 4. MIPI Config
+user.init.mipi.config
+
+#=======================================================
+# 5. Module Initialization
+#=======================================================
+
+
+####################
+#UCS
+####################
+mipi.write 0x05 0x11 # sleep out
+delay 5
+
+#=======================================================
+# 6. MIPI Tx Start & Display On
+#=======================================================
+#user.mipi.write.compression
+#user.mipi.write.pps
+
+image.gradation vv inc wrgb
+#image.display 19 #If DVI is on, the display is abnormal when using the image.display command.
+#dvi.video.enable  #It must be in front of mipi.video.enable
+mipi.video.enable
+
+#2Ah (CASET)
+#(190923)
+# - SC = 0, EC = 453
+mipi.write 0x39 0x2A 0x00 0x00 0x01 0xC5
+
+#2Bh (PASET)
+#(190923)
+# - SP = 0, EP = 453
+mipi.write 0x39 0x2B 0x00 0x00 0x01 0xC5
+
+#44h (TESCAN) : @Command Mode
+#(201119)
+# - N = 200
+# Shinian sets TE scan at 200
+mipi.write 0x39 0x44 0x00 0xC8
+
+#35h (TEON) : @Command Mode
+#(201119)
+# - Default
+# - M = 0
+mipi.write 0x39 0x35 0x00
+
+#53h (WRCTRLD)
+#(201119)
+# - SRE_MODE=0 : Off
+# - BCTRL=1 : Brightness Control on
+# - DISP_DIM=0 : Display Dimming off
+mipi.write 0x39 0x53 0x20
+
+delay 25
+mipi.write 0x05 0x29 # display on
+
