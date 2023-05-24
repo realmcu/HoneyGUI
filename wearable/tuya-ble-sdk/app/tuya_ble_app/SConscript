@@ -1,0 +1,16 @@
+# for module compiling
+import os
+from building import *
+
+cwd  = GetCurrentDir()
+group = []
+src   = Glob('*.c')
+CPPPATH = [cwd]
+
+SrcRemove(src,'tuya_ble_app_ota.c')
+
+
+group = DefineGroup('tuya_ble_sdk', src, depend = ['TUYA_BLE_SDK'], CPPPATH = CPPPATH)
+
+
+Return('group')

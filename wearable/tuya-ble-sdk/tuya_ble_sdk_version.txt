@@ -1,0 +1,273 @@
+
+[v2.1.3] - 2022-03-11:
+
+1、优化vos组件的内存处理。
+
+
+[v2.1.2] - 2022-01-11:
+
+1、新增支持V2模式下自定义广播内容长度最大14字符。
+2、优化LINK层配对机制下状态上报逻辑。
+
+[v2.1.1] - 2021-12-16:
+
+1、新增大数据请求读取接口。
+2、优化LINK层配对加密机制下的30秒定时结束逻辑。
+3、优化关闭VOS功能时编译不过的问题。
+
+
+[v2.1.0] - 2021-12-03:
+
+1、新增文件下发通道。
+    1）在custom tuya ble config.h文件中配置TUYA_BLE_FILE_ENABLE为1 。
+	2）文件下发处理函数调用示例（应用程序注册的回调处理函数内）：
+	
+	   case TUYA_BLE_CB_EVT_OTA_DATA:  //固件OTA
+        tuya_ota_proc(event->ota_data.type,event->ota_data.p_data,event->ota_data.data_len);
+        break;
+
+	   case TUYA_BLE_CB_EVT_FILE_DATA: //文件下发
+		tuya_file_proc(event->file_data.type,event->file_data.p_data,event->file_data.data_len); //处理函数原型示例
+		break;
+	3）下发流程和ota一致，具体参考示例demo和对应文档。
+
+2、新增附件OTA通道。
+    1）用于接收附件OTA文件数据的callback event：TUYA_BLE_CB_EVT_ATTACHMENT_OTA_DATA 
+	2）用于接收附件OTA文件数据的数据结构：
+	   typedef struct {
+			tuya_ble_ota_data_type_t type;
+			uint16_t data_len;
+			uint8_t *p_data;
+       } tuya_ble_attachment_ota_data_t;
+	3）重新定义的tuya_ble_ota_data_type_t数据结构：
+	   typedef enum
+       {
+			TUYA_BLE_OTA_REQ,
+			TUYA_BLE_OTA_FILE_INFO,
+			TUYA_BLE_OTA_FILE_OFFSET_REQ,
+			TUYA_BLE_OTA_DATA,
+			TUYA_BLE_OTA_END,
+			TUYA_BLE_OTA_UNKONWN,
+			TUYA_BLE_ATTACHMENT_OTA_REQ,
+			TUYA_BLE_ATTACHMENT_OTA_FILE_INFO,
+			TUYA_BLE_ATTACHMENT_OTA_FILE_OFFSET_REQ,
+			TUYA_BLE_ATTACHMENT_OTA_DATA,
+			TUYA_BLE_ATTACHMENT_OTA_END,
+			TUYA_BLE_ATTACHMENT_OTA_UNKONWN,
+		} tuya_ble_ota_data_type_t;
+	3）新增的api ：tuya_ble_status_t tuya_ble_attachment_ota_response(tuya_ble_attachment_ota_response_t *p_data) 
+	   用于应用程序发送ota响应数据，等同于固件ota的tuya_ble_ota_response() api。
+	   
+	4）TUYA_BLE_CB_EVT_ATTACHMENT_OTA_DATA event对应的数据格式参照 tuya_ble_sdk 说明文档中的固件ota部分，唯一区别是固件ota数据中的第一个字节默认为0，固件ota数据中的第一个字节是附件通道号，目前通道号有效范围是10 -19，也就是最大支持10个附件，附件ota文件在IOT开发者平台上传配置。
+	
+	5）附件OTA处理函数调用示例（应用程序注册的回调处理函数内）：
+	
+	   case TUYA_BLE_CB_EVT_OTA_DATA:  //固件OTA
+        tuya_ota_proc(event->ota_data.type,event->ota_data.p_data,event->ota_data.data_len);
+        break;
+
+	   case TUYA_BLE_CB_EVT_ATTACHMENT_OTA_DATA: //附件OTA
+		tuya_attachment_ota_proc(event->attachment_data.type,event->attachment_data.p_data,event->attachment_data.data_len);
+		break;
+		
+	6）tuya_attachment_ota_proc处理函数示例：
+	
+	   void tuya_attachment_ota_proc(uint16_t cmd,uint8_t*recv_data,uint32_t recv_len)
+       {
+			TUYA_APP_LOG_DEBUG("attachment ota cmd : 0x%04x , recv_len : %d",cmd,recv_len);
+			switch(cmd)
+			{
+			case TUYA_BLE_ATTACHMENT_OTA_REQ:
+				tuya_attachment_ota_start_req(recv_data,recv_len);
+				break;
+			case TUYA_BLE_ATTACHMENT_OTA_FILE_INFO:
+				tuya_attachment_ota_file_info_req(recv_data,recv_len);
+				break;
+			case TUYA_BLE_ATTACHMENT_OTA_FILE_OFFSET_REQ:
+				tuya_attachment_ota_offset_req(recv_data,recv_len);
+				break;
+			case TUYA_BLE_ATTACHMENT_OTA_DATA:
+				tuya_attachment_ota_data_req(recv_data,recv_len);
+				break;
+			case TUYA_BLE_ATTACHMENT_OTA_END:
+				tuya_attachment_ota_end_req(recv_data,recv_len);
+				break;
+			default:
+				break;
+			}
+
+        }
+	7）调用tuya_ble_sdk_init()初始化sdk时，应代上应用程序中定义的附件信息（附件个数、每个附件的通道号以及版本号），详见数据结构tuya_ble_attachment_version_data_t
+	   示例：
+	
+    #define TUYA_ATTACHMENT_CHANNEL_TEST   10   
+	#define TUYA_ATTACHMENT_FILE_VER_NUM       0x010000
+    #define TUYA_ATTACHMENT_FILE_VER_STR	   "1.0.0" 	
+	   
+    device_param.p_type = TUYA_BLE_PRODUCT_ID_TYPE_PID;
+    device_param.product_id_len = 8;
+    memcpy(device_param.product_id,APP_PRODUCT_ID,8);
+    device_param.firmware_version = TY_APP_VER_NUM;
+    device_param.hardware_version = TY_HARD_VER_NUM;
+    device_param.adv_local_name_len = strlen(device_local_name);
+    memcpy(device_param.adv_local_name,device_local_name,device_param.adv_local_name_len);
+	device_param.attacnment_version.channel_number = 1;   //示例总共一个附件
+	device_param.attacnment_version.channel_data[0].channel = TUYA_ATTACHMENT_CHANNEL_TEST;
+	device_param.attacnment_version.channel_data[0].version = TUYA_ATTACHMENT_FILE_VER_NUM;
+
+	
+    device_param.use_ext_license_key = 1; //If use the license stored by the SDK,initialized to 0, Otherwise 1.
+    device_param.device_id_len = 16;
+
+    if(device_param.use_ext_license_key==1)
+    {
+        memcpy(device_param.auth_key,(void *)auth_key_test,AUTH_KEY_LEN);
+        memcpy(device_param.device_id,(void *)device_id_test,DEVICE_ID_LEN);
+        memcpy(device_param.mac_addr_string,mac_test,12);
+        device_param.mac_addr.addr_type = TUYA_BLE_ADDRESS_TYPE_RANDOM;
+    }
+
+    tuya_ble_sdk_init(&device_param);	   
+	   	  		
+3、修复天气组件中极端场景下可能出现的内存问题。
+
+4、新增扫码配网配置项：TUYA_BLE_SECURE_CONNECTION_WITH_AUTH_KEY_FOR_QR_CODE 
+    在custom_tuya_ble_config.h配置文件中定义 #define  TUYA_BLE_SECURE_CONNECTION_TYPE  TUYA_BLE_SECURE_CONNECTION_WITH_AUTH_KEY_FOR_QR_CODE 即可。
+
+5、新增蓝牙链路层强制加密配置宏TUYA_BLE_LINK_LAYER_FORCED_ENCRYPTION及对应实现机制。
+   1) 适配层新增链路层加密请求接口函数tuya_ble_link_security_request() 。
+   2) 适配步骤：
+      - tuya Characteristic value Access open，不可加密。
+      - 在custom tuya ble config.h文件中配置TUYA_BLE_LINK_LAYER_FORCED_ENCRYPTION为1 。
+      - 在对应芯片平台的port.c文件中实现tuya_ble_link_security_request()函数。
+      - 在应用程序的链路层加密成功回调的地方调用tuya_ble_link_encrypted_handler() api，例如nordic平台下如下所示：
+ static void pm_evt_handler(pm_evt_t const * p_evt)
+{
+    pm_conn_sec_config_t conn_sec_config = {.allow_repairing = true};
+
+    pm_handler_on_pm_evt(p_evt);
+	pm_handler_disconnect_on_sec_failure(p_evt);
+    pm_handler_flash_clean(p_evt);
+
+    switch (p_evt->evt_id)
+    {
+
+    case PM_EVT_CONN_SEC_CONFIG_REQ:
+
+        // Reject pairing request from an already bonded peer.
+
+        pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+        break;
+
+    case PM_EVT_BONDED_PEER_CONNECTED:
+
+        TUYA_APP_LOG_DEBUG("Bonded peer CONNECTED!");
+        break;
+    case PM_EVT_CONN_SEC_SUCCEEDED:
+        tuya_ble_link_encrypted_handler();
+        TUYA_APP_LOG_DEBUG("The link has been encrypted!");
+        break;
+    case PM_EVT_PEERS_DELETE_SUCCEEDED:
+        TUYA_APP_LOG_DEBUG("Erase bonds SUCCEED!");
+        break;
+
+    default:
+        break;
+    }
+}
+ 
+6、内部协议升级为4.4，设备响应新增PacketMaxSize字段，用于通用分包 。
+
+7、新增avs组件,使用说明参阅sdk文档。
+
+8、新增IOT通道，当前支持场景数据的请求与控制。
+
+
+
+[v2.0.0] - 2021-04-24:
+1、新增支持串口测试接口指令。
+2、新增休眠是否允许查询接口。
+3、新增整机产测支持加密。
+4、新增OEM能力。
+5、新增设备请求手机本地实时时间接口。
+6、新增适配中断处理函数内发送dp数据（不建议中断处理函数内发送dp数据）。
+7、新增支持应用程序设置sdk广播名字。
+8、新增支持LINK层加密环境。
+9、新增支持大数据上传通道。
+10、新增支持天气服务。
+11、新增支持安全芯片加密机制。
+12、新增支持大于20字节的MTU用于适配运行BLE4.2及以上协议版本的应用程序。
+13、新增新的dp点数据收发函数，可收发超过255字节长度dp点数据，同时支持不带响应的发送模式。
+14、新增设备本地解绑函数，区别于本地重置功能，再次绑定后不会丢失云端历史数据。
+15、新增本地解绑、重置函数的异步响应。
+16、新增支持BEACON KEY。
+17、调整TUYA_BLE_GATT_SEND_DATA_QUEUE_SIZE为默认配置。
+18、优化临界区接口定义，支持嵌套临界区移植接口实现。
+19、优化非RTOS场景下的队列调度机制，防止SDK长时间占用CPU。
+
+
+[v1.2.4] - 2020-07-06:
+1、新增支持长度为0的字符型dp点数据。
+2、新增支持涂鸦v2版本协议。
+3、新增支持在蓝牙通道注册设备配置模式下使用由应用程序管理授权信息。
+4、优化单包数据指令不能解析的问题。
+5、优化在非蓝牙通道注册设备配置模式下编译不过的问题。
+6、优化某些事件处理函数中的动态内存释放逻辑，原有逻辑有可能引起在极端场景下导致动态内存可用空间变小。
+7、优化基于蓝牙dongle方式的涂鸦整机产测链路不通的问题。
+
+
+[v1.2.3] - 2020-05-19:
+1、新增支持共享类设备功能。
+2、新增带序列号和标志的dp点数据上报API。
+3、优化烧录授权信息时可以清除绑定信息。
+
+
+v1.2.2:
+1、按需连接之更新连接标志接口。
+2、新增无OS环境下获取调度队列size、space以及events接口。
+3、优化产测代码结构，取消引用应用层头文件获取应用程序版本号、指纹等信息方式。
+4、新增可配置是否使用tuya授权信息的mac地址。
+5、修改整机产测ble通道支持非加密传输。
+6、新增TUYA APP LOG接口。
+
+V1.2.1:
+1、产测接口新增通道参数。
+
+V1.2.0:
+1、新增外部内存管理配置接口。
+2、新增gatt发送队列管理。
+3、单个dp点数据最大限制由200改为255。
+4、ram占用优化。
+5、新增客户应用定制产测接口。
+6、分离uart通用对接至客户应用。
+
+V1.1.0:
+1、OS下新增不自建task配置功能。
+2、新增标准产测模块。
+3、升级信息存储数据结构。
+4、优化uart数据处理逻辑。
+5、优化bt addr数据结构。
+6、新增MAC地址设置接口。
+7、优化config配置文件结构。
+8、fix load flash settings时没有释放内存的bug。
+
+
+V1.0.0:
+1、设备信息响应指令中authkey改为register key。
+2、优化加密key计算方式。
+3、新增完善的LOG功能模块，支持log等级配置，各等级颜色提示，格式统一。
+4、核心部分打包成库文件。
+5、内存占用优化。
+
+v0.3.0:
+1、新增外部MCU升级接口。
+2、优化恢复出厂设置时删除login key和虚拟ID。
+3、新增整机产测异步发送接口api。
+4、获取设备信息指令协议升级为3.1。
+
+v0.2.0:
+1、优化异常解绑指令被过滤的问题。
+2、新增带ms级字符串时间戳dp点数据发送api。
+3、新增主动请求时间更新api。
+4、新增sdk不存储授权数据配置项。
+

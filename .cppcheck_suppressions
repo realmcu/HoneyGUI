@@ -15,6 +15,7 @@
 *:gui_engine\Third_Party\nanovg\demos\fill.inc
 *:gui_engine\Third_Party\nanovg\base\stb_image.h
 *:gui_engine\Third_Party\agge\agge\vector_rasterizer.cpp
+*:wearable\tuya-ble-sdk\*
 *:VGLite\*
 *:lvgl\*
 

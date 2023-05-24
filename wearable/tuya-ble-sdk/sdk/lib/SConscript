@@ -1,0 +1,17 @@
+# for module compiling
+import os
+from building import *
+
+cwd  = GetCurrentDir()
+group = []
+src = []
+CPPPATH = [cwd]
+libs = []
+libpath = [cwd]
+libs += Split('''
+tuya_ble_sdk_lib_arm_m4f_keil
+''')
+
+group = DefineGroup('tuya_ble_sdk', src, depend = ['TUYA_BLE_SDK'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
+
+Return('group')
