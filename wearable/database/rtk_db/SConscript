@@ -1,0 +1,17 @@
+
+from building import *
+
+
+cwd     = GetCurrentDir()
+src = Split("""""")
+CPPPATH = [cwd]
+
+
+src += ['rtk_kvdb.c']
+src += ['rtk_tsdb.c']
+
+
+group = DefineGroup('database', src, depend = [''], CPPPATH = CPPPATH)
+
+
+Return('group')

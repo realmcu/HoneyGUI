@@ -1,0 +1,28 @@
+
+from building import *
+
+
+cwd     = GetCurrentDir()
+src = Split("""""")
+CPPPATH = [cwd]
+list = os.listdir(cwd)
+
+if GetDepend(['RTK_BT_TASK']):
+    src += ['dp_rtk_db.c']
+    src += ['dp_app.c']
+    src += ['dp_ble_info.c']
+    src += ['dp_br_info.c']
+    src += ['dp_mcu_cfg_const.c']
+    src += ['dp_mcu_cfg_rw.c']    
+if GetDepend(['TUYA_BLE_SDK']):
+    src += ['dp_dataqueue.c']
+    src += ['dp_notification.c']
+    src += ['dp_wearable.c']
+    src += ['dp_sports_refs.c']
+    src += ['dp_tuya_cfg.c']
+    src += ['dp_tuya_panel_info.c']
+
+group = DefineGroup('database', src, depend = [''], CPPPATH = CPPPATH)
+
+
+Return('group')
