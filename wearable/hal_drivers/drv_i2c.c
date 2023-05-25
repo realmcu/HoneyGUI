@@ -16,13 +16,6 @@ struct realtek_i2c_bus i2c_bus[] =
 
 static void mcu_i2c_init(struct realtek_i2c_bus *i2c_cfg)
 {
-    Pad_Config(i2c_cfg->scl_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
-               PAD_OUT_LOW);
-    Pad_Config(i2c_cfg->sda_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
-               PAD_OUT_LOW);
-    Pinmux_Config(i2c_cfg->scl_pin, i2c_cfg->scl_pin_func);
-    Pinmux_Config(i2c_cfg->sda_pin, i2c_cfg->sda_pin_func);
-
     RCC_PeriphClockCmd(i2c_cfg->periph, i2c_cfg->periph_clock, ENABLE);
     I2C_InitTypeDef  I2C_InitStructure;
     I2C_InitStructure.I2C_Clock = 40000000;
@@ -34,6 +27,26 @@ static void mcu_i2c_init(struct realtek_i2c_bus *i2c_cfg)
     I2C_Cmd(i2c_cfg->Instance, ENABLE);
     i2c_cfg->actived = true;
 }
+
+void drv_i2c0_set_scl_sda(uint8_t scl_pin, uint8_t sda_pin)
+{
+    Pad_Config(scl_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
+               PAD_OUT_LOW);
+    Pad_Config(sda_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
+               PAD_OUT_LOW);
+    Pinmux_Config(scl_pin, I2C0_CLK);
+    Pinmux_Config(sda_pin, I2C0_DAT);
+}
+void drv_i2c1_set_scl_sda(uint8_t scl_pin, uint8_t sda_pin)
+{
+    Pad_Config(scl_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
+               PAD_OUT_LOW);
+    Pad_Config(sda_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
+               PAD_OUT_LOW);
+    Pinmux_Config(scl_pin, I2C1_CLK);
+    Pinmux_Config(sda_pin, I2C1_DAT);
+}
+
 
 uint32_t drv_i2c0_read(uint16_t slave_addr, uint8_t *buffer, uint32_t size)
 {

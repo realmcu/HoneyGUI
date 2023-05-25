@@ -14,8 +14,6 @@
 #include "trace.h"
 #include "string.h"
 
-#include "fal.h"
-
 
 /**
  * Read data from flash.
@@ -140,6 +138,7 @@ int realtek_flash_erase(uint32_t addr, size_t size)
 
 
 
+#if 0
 static int fal_flash_read(long offset, uint8_t *buf, size_t size);
 static int fal_flash_write(long offset, const uint8_t *buf, size_t size);
 static int fal_flash_erase(long offset, size_t size);
@@ -162,6 +161,7 @@ static int fal_flash_erase(long offset, size_t size)
 {
     return realtek_flash_erase(realtek_nor_flash.addr + offset, size);
 }
+#endif
 
 /************************** end of file ******************************/
 

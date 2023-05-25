@@ -28,7 +28,7 @@ static void ts_write_cmd(uint16_t cmd)
     iic_write_buf[0] = cmd & 0xff;
     iic_write_buf[1] = cmd >> 8;
 
-    i2c_config[TOUCH_I2C_INDEX].write(TOUCH_ZT2717_ADDR, iic_write_buf, 2);
+    drv_i2c0_write(TOUCH_ZT2717_ADDR, iic_write_buf, 2);
 }
 
 static void ts_write_reg(uint16_t reg, uint16_t data)
@@ -38,7 +38,7 @@ static void ts_write_reg(uint16_t reg, uint16_t data)
     iic_write_buf[1] = reg >> 8;
     iic_write_buf[2] = data & 0xff;
     iic_write_buf[3] = data >> 8;
-    i2c_config[TOUCH_I2C_INDEX].write(TOUCH_ZT2717_ADDR, iic_write_buf, 4);
+    drv_i2c0_write(TOUCH_ZT2717_ADDR, iic_write_buf, 4);
 }
 
 static void ts_read_data(uint16_t reg, uint8_t *buf, uint16_t len)
@@ -46,9 +46,9 @@ static void ts_read_data(uint16_t reg, uint8_t *buf, uint16_t len)
     uint8_t iic_write_buf[2];
     iic_write_buf[0] = reg & 0xff;
     iic_write_buf[1] = reg >> 8;
-    i2c_config[TOUCH_I2C_INDEX].write(TOUCH_ZT2717_ADDR, iic_write_buf, 2);
+    drv_i2c0_write(TOUCH_ZT2717_ADDR, iic_write_buf, 2);
     platform_delay_us(10);
-    i2c_config[TOUCH_I2C_INDEX].read(TOUCH_ZT2717_ADDR, buf, len);
+    drv_i2c0_read(TOUCH_ZT2717_ADDR, buf, len);
 }
 
 
@@ -84,19 +84,18 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
 
 
 
-void rtk_touch_hal_init(struct rtl_touch_config *touch_cfg)
+void rtk_touch_hal_init(void)
 {
-    gpio_config.pin_mode(TOUCH_ZT2717_RST, PIN_MODE_OUTPUT);
-    gpio_config.pin_write(TOUCH_ZT2717_RST, 1);
+    drv_i2c0_set_scl_sda(TOUCH_ZT2717_SCL, TOUCH_ZT2717_SDA);
+    drv_pin_mode(TOUCH_ZT2717_RST, PIN_MODE_OUTPUT);
+    drv_pin_write(TOUCH_ZT2717_RST, 1);
 
     platform_delay_ms(100);
-    gpio_config.pin_write(TOUCH_ZT2717_RST, 0);
+    drv_pin_write(TOUCH_ZT2717_RST, 0);
     platform_delay_ms(100);
-    gpio_config.pin_write(TOUCH_ZT2717_RST, 1);
+    drv_pin_write(TOUCH_ZT2717_RST, 1);
 
 
-
-    DBG_DIRECT("touch_zt2717_init line = %d GPIO_TOUCH_INT %d\n", __LINE__, touch_cfg->int_pin);
 
     uint16_t chip_code = 0;
     uint16_t firmware_version = 0;
