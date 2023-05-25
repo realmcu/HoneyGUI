@@ -110,6 +110,20 @@ void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16
     incna3311_enter_data_output_mode(len_byte);
 }
 
+uint32_t rtk_lcd_hal_get_width(void)
+{
+    return ICNA3311_LCD_WIDTH;
+}
+uint32_t rtk_lcd_hal_get_height(void)
+{
+    return ICNA3311_LCD_HIGHT;
+}
+
+uint32_t rtk_lcd_hal_get_pixel_bits(void)
+{
+    return ICNA3311_DRV_PIXEL_BITS;
+}
+
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
 {
 

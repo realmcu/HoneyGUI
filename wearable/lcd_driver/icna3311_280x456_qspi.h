@@ -37,6 +37,9 @@ void rtk_lcd_hal_init(void);
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len);
 void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h,
                            uint32_t color);
+uint32_t rtk_lcd_hal_get_width(void);
+uint32_t rtk_lcd_hal_get_height(void);
+uint32_t rtk_lcd_hal_get_pixel_bits(void);
 #ifdef __cplusplus
 }
 #endif
