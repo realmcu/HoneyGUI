@@ -1,0 +1,21 @@
+Import('TOOL_ROOT')
+#Import('rtconfig')
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+""")
+
+if GetDepend(['MODULE_LOCAL_PLAYBACK']):
+    src += ['app_playback.c']
+    src += ['mp3_player.c']
+    src += ['mp3_parser.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('musicplayer', src, depend = [''], CPPPATH = CPPPATH)
+
+
+Return('group')

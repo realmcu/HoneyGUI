@@ -1,0 +1,14 @@
+# for module compiling
+import os
+from building import *
+
+cwd  = GetCurrentDir()
+
+src = Split("""""")
+CPPPATH = [cwd]
+
+
+group = DefineGroup('structure', src, depend = [''], CPPPATH = CPPPATH)
+
+
+Return('group')

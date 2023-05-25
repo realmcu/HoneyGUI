@@ -1,0 +1,16 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+src = Glob('*.c')
+CPPPATH = [cwd]
+CPPDEFINES = ['LV_KCONFIG_IGNORE']
+CPPDEFINES += ['LV_LVGL_H_INCLUDE_SIMPLE']
+
+group = DefineGroup('port_lvgl', src, depend = ['MODULE_USING_PORT_FOR_LVGL'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+Return('group')

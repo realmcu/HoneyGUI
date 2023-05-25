@@ -1,0 +1,26 @@
+Import('TOOL_ROOT')
+#Import('rtconfig')
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+""")
+
+if GetDepend(['MODULE_OFFLINE_VOICE']):
+    src     = Glob('*.c')
+    
+
+CPPPATH = [cwd]
+libs = ['']
+libpath = [cwd]
+
+
+libs += Split('''
+libqvoice
+''')
+
+group = DefineGroup('offline_voice', src, depend = ['MODULE_OFFLINE_VOICE'], CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
+
+Return('group')

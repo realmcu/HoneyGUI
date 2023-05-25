@@ -1,0 +1,20 @@
+Import('TOOL_ROOT')
+
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+""")
+
+if GetDepend(['MODULE_USING_WATCH_CLOCK']):
+    src += ['watch_clock.c']
+
+
+CPPPATH = [cwd]
+
+group = DefineGroup('watch_clock', src, depend = [''], CPPPATH = CPPPATH)
+
+
+Return('group')
