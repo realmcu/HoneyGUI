@@ -9,8 +9,13 @@
  */
 
 #include "drv_dlps.h"
+#include "dlps.h"
 #include "trace.h"
 #include "app_section.h"
+#include "rtl_io_dlps.h"
+
+
+#define     DLPS_EN     1
 
 
 static dlps_slist_t drv_dlps_exit_slist =
@@ -37,7 +42,7 @@ static dlps_slist_t drv_dlps_wakeup_slist =
  * @return   void
  */
 RAM_FUNCTION
-void System_Handler(void)
+static void System_Handler(void)
 {
     //DBG_DIRECT("SYSTEM_HANDLER 0x%x", get_aon_wakeup_int());
 
@@ -62,15 +67,15 @@ void System_Handler(void)
  * @retval void
 */
 RAM_FUNCTION
-void app_enter_dlps_config(void)
+static void app_enter_dlps_config(void)
 {
     DBG_DIRECT("DLPS ENTER");
 
-    le_slist_t *node;
-    for (node = le_slist_first(&(drv_dlps_list.slist)); node; node = le_slist_next(node))
+    dlps_slist_t *node;
+    for (node = dlps_slist_first(&(drv_dlps_enter_slist)); node; node = dlps_slist_next(node))
     {
-        T_DRV_DLPS_CBACKS_ITEM *p_item = le_container_of(node, T_DRV_DLPS_CBACKS_ITEM, slist);
-        p_item->cbacks->enter_dlps_cb(p_item->drv_io);
+        drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
+        p_item->dlps_cb();
     }
 }
 
@@ -84,21 +89,15 @@ void app_enter_dlps_config(void)
  * @retval void
 */
 RAM_FUNCTION
-void app_exit_dlps_config(void)
+static void app_exit_dlps_config(void)
 {
     DBG_DIRECT("DLPS EXIT");
-    DBG_DIRECT("VENDOR 0X58 0x%x", HAL_READ32(SOC_VENDOR2_REG_BASE, 0x0058));
-
-    SystemClock_Config();
-
-    le_slist_t *node;
-    for (node = le_slist_first(&(drv_dlps_list.slist)); node; node = le_slist_next(node))
+    dlps_slist_t *node;
+    for (node = dlps_slist_first(&(drv_dlps_exit_slist)); node; node = dlps_slist_next(node))
     {
-        T_DRV_DLPS_CBACKS_ITEM *p_item = le_container_of(node, T_DRV_DLPS_CBACKS_ITEM, slist);
-        p_item->cbacks->exit_dlps_cb(p_item->drv_io);
+        drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
+        p_item->dlps_cb();
     }
-
-    dlps_enter_cnt++;
 }
 
 /**
@@ -108,26 +107,14 @@ void app_exit_dlps_config(void)
  * @retval void
 */
 RAM_FUNCTION
-PMCheckResult app_dlps_check_cb(void)
+static PMCheckResult app_dlps_check_cb(void)
 {
-    if (dlps_enter_cnt > 30)
-    {
-        return PM_CHECK_FAIL;
-    }
 
-    if (enter_dlps_check_flag == false)
+    dlps_slist_t *node;
+    for (node = dlps_slist_first(&(drv_dlps_exit_slist)); node; node = dlps_slist_next(node))
     {
-        return PM_CHECK_FAIL;
-    }
-
-    le_slist_t *node;
-    for (node = le_slist_first(&(drv_dlps_list.slist)); node; node = le_slist_next(node))
-    {
-        T_DRV_DLPS_CBACKS_ITEM *p_item = le_container_of(node, T_DRV_DLPS_CBACKS_ITEM, slist);
-        if (p_item->cbacks->allowed_dlps_check_cb(p_item->drv_io) == false)
-        {
-            return PM_CHECK_FAIL;
-        }
+        drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
+        return p_item->dlps_cb();
     }
 
     return PM_CHECK_PASS;
@@ -150,7 +137,12 @@ void pwr_mgr_init(void)
     DLPS_IORegUserDlpsEnterCb(app_enter_dlps_config);
     DLPS_IORegUserDlpsExitCb(app_exit_dlps_config);
     DLPS_IORegister();
+#ifdef RTL8762G
+    lps_mode_set(PLATFORM_DLPS_PFM);
+#endif
+#ifdef RTL8772F
     lps_mode_set(PLATFORM_DLPS);
+#endif
 #endif
 }
 

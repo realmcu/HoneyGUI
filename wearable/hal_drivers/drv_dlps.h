@@ -72,7 +72,7 @@ static __inline dlps_slist_t *dlps_slist_next(dlps_slist_t *n)
 typedef struct drv_dlps_cb_item
 {
     dlps_slist_t slist;
-    void (*dlps_cb)(void);
+    bool (*dlps_cb)(void);
 
 } drv_dlps_cb_item_t;
 
