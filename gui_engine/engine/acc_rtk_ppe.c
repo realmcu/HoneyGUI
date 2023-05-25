@@ -1,7 +1,7 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <gui_matrix.h>
-#include <rtl876x_ppe.h>
+#include <rtl_ppe.h>
 #include <drv_lcd.h>
 
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
