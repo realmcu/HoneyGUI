@@ -1,0 +1,22 @@
+Import('TOOL_ROOT')
+
+Import('SDK_ROOT')
+from building import *
+
+cwd = GetCurrentDir()
+list = os.listdir(cwd)
+
+# add the general drivers.
+src = Split("""
+""")
+
+
+src += ['app_cmd.c']
+src += ['app_report.c']
+
+
+CPPPATH = [cwd]
+
+group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH)
+
+Return('group')

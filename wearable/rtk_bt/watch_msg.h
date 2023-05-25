@@ -1,0 +1,51 @@
+/*
+ * Copyright(c) 2018, Realtek Semiconductor Corporation. All rights reserved.
+ */
+
+#ifndef _WATCH_MSG_H_
+#define _WATCH_MSG_H_
+
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
+
+typedef enum
+{
+    IO_MSG_PROTOCOL_SEND,
+    IO_MSG_ANCS_DISCOVERY,
+    IO_MSG_TYPE_AMS,
+    IO_MSG_UPDATE_CONPARA,
+    IO_MSG_SWITCH_IBEACON_ADV,
+    IO_MSG_SWITCH_NORMAL_ADV,
+    IO_MSG_TUYA_BLE_EVENT,
+    IO_MSG_AUDIO_TEST_LOAD_DSP,
+    IO_MSG_AUDIO_TEST_INIT,
+    IO_MSG_AUDIO_TEST_START,
+    IO_MSG_AUDIO_TEST_STOP,
+    IO_MSG_AUDIO_TEST_WRITE,
+    IO_MSG_AUDIO_TEST_RELEASE,
+    IO_MSG_TTS_TEST_START,
+    IO_MSG_TTS_TEST_STOP,
+    IO_MSG_VP_TEST_START,
+    IO_MSG_VP_TEST_STOP,
+    IO_MSG_RECORD_TEST_START,
+    IO_MSG_RECORD_TEST_STOP,
+    IO_MSG_MP3_TEST_START,
+    IO_MSG_MP3_TEST_STOP,
+    IO_MSG_SBC_FILE_TEST_START,
+    IO_MSG_SBC_FILE_TEST_STOP,
+    IO_MSG_SBC_FILE_TEST_WRITE,
+} T_IO_MSG_WATCH;
+
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _WATCH_MSG_H_ */

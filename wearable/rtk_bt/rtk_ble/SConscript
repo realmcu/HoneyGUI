@@ -1,0 +1,32 @@
+Import('TOOL_ROOT')
+
+from building import *
+
+cwd = GetCurrentDir()
+list = os.listdir(cwd)
+objs = []
+
+# add the general drivers.
+src = Split("""
+""")
+
+if GetDepend(['RTK_BT_TASK']):
+    src += ['ble_gap_msg.c']
+    src += ['ble_profile_init.c']
+    src += ['ble_gap_init.c']
+    src += ['ble_gap_cb.c']
+    src += ['app_ble_bas.c']
+    src += ['app_ble_hid.c']
+
+CPPPATH = [cwd]
+
+CPPDEFINES = ['DEFINE_RTK_BT_TODO']
+group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+objs = objs + group
+
+Return('objs')

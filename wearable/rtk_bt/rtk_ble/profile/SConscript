@@ -1,0 +1,27 @@
+Import('TOOL_ROOT')
+
+Import('SDK_ROOT')
+from building import *
+
+cwd = GetCurrentDir()
+list = os.listdir(cwd)
+
+# add the general drivers.
+src = Split("""
+""")
+
+src += [SDK_ROOT + '/src/ble/profile/server/bas.c']
+src += [SDK_ROOT + '/src/ble/profile/server/dis.c']
+src += [SDK_ROOT + '/src/ble/profile/server/hids_ms.c']
+src += [SDK_ROOT + '/src/ble/profile/server/transmit_service.c']
+if GetDepend(['RTK_BLE_WRISTBAND']):
+    src += ['wristband_private_service.c']
+if GetDepend(['RTK_BLE_THROUGHPUT']):
+    src += ['wristband_private_service.c']
+
+
+CPPPATH = [cwd]
+
+group = DefineGroup('realtek_ble', src, depend = [''], CPPPATH = CPPPATH)
+
+Return('group')
