@@ -1,5 +1,5 @@
 #include "icna3311_280x456_qspi.h"
-#include "rtl876x_dbic.h"
+#include "rtl_dbic.h"
 #include "utils.h"
 #include "rtl_pinmux.h"
 #include "rtl_gpio.h"
