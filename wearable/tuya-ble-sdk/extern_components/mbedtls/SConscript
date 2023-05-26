@@ -14,7 +14,10 @@ SrcRemove(src,'aes.c')
 SrcRemove(src,'md5.c')
 SrcRemove(src,'sha1.c')
 SrcRemove(src,'sha256.c')
-
+if GetDepend(['TUYA_MBEDTLS']):
+    src += ['md5.c']
+    src += ['sha1.c']
+    src += ['sha256.c']
 group = DefineGroup('tuya_ble_sdk', src, depend = ['TUYA_BLE_SDK'], CPPPATH = CPPPATH)
 
 if GetDepend('TUYA_BLE_SDK'):

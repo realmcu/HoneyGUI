@@ -24,6 +24,10 @@ if GetDepend(['ST7701S_360640_RGB']):
     src += ['st7701s_360640_rgb.c']
 if GetDepend(['ST7701S_480480_MIPI_VIDEO']):
     src += ['ST7701S_480480_mipi_video.c']
+if GetDepend(['INCA3311_280456_QSPI']):
+    src += ['icna3311_280x456_qspi.c']
+if GetDepend(['ST7796_320320_DBIB']):
+    src += ['st7796_320320_dbib.c']
 
 CPPPATH = [cwd]
 

@@ -28,9 +28,11 @@
 #include "ble_gap_init.h"
 #include "ble_profile_init.h"
 #include "bt_gap_init.h"
+#if (RTK_BT_TASK == 1)
 #include "btm.h"
 #include "sysm.h"
 #include "remote.h"
+#endif
 #include "rtl_pinmux.h"
 #include <watch_msg.h>
 #ifdef __RTTHREAD__
@@ -91,7 +93,7 @@ bool app_send_msg_to_bt_task(T_IO_MSG *p_msg)
     return true;
 }
 
-
+#if (RTK_BT_TASK == 1)
 /**
  * @brief    Contains the initialization of framework
  * @return   void
@@ -139,7 +141,7 @@ static void framework_init(void)
         APP_PRINT_ERROR0("Audio manager was failed to initialize!\n");
     }
 }
-
+#endif
 
 
 /**
@@ -155,7 +157,9 @@ void bt_task_entry(void *p_param)
     os_msg_queue_create(&io_queue_handle, "ioQ", MAX_NUMBER_OF_IO_MESSAGE, sizeof(T_IO_MSG));
     os_msg_queue_create(&evt_queue_handle, "evtQ", MAX_NUMBER_OF_EVENT_MESSAGE,
                         sizeof(uint8_t));
+#if (RTK_BT_TASK == 1)
     app_init_timer(evt_queue_handle, MAX_NUMBER_OF_APP_TIMER);
+#endif
     le_gap_init(1);
     gap_lib_init();
     app_le_gap_init();
@@ -163,10 +167,11 @@ void bt_task_entry(void *p_param)
 #if 0
     app_cfg_init();
 #endif
+#if (RTK_BT_TASK == 1)
     framework_init();
     watch_bt_gap_init();
     watch_app_gap_init();
-
+#endif
 #ifdef MODULE_LOCAL_PLAYBACK
     app_playback_init();
 #endif
@@ -247,10 +252,12 @@ void bt_task_entry(void *p_param)
             {
                 gap_handle_msg(event);
             }
+#if (RTK_BT_TASK == 1)
             else if (EVENT_GROUP(event) == EVENT_GROUP_FRAMEWORK)
             {
                 sys_mgr_event_handle(event);
             }
+#endif
         }
     }
 }
