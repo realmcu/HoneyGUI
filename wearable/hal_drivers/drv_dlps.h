@@ -73,12 +73,13 @@ typedef struct drv_dlps_cb_item
 {
     dlps_slist_t slist;
     bool (*dlps_cb)(void);
+    const char *name;
 
 } drv_dlps_cb_item_t;
 
 
-void drv_dlps_exit_cbacks_register(void *cbacks);
-void drv_dlps_enter_cbacks_register(void *cbacks);
+void drv_dlps_exit_cbacks_register(const char *name, void *cbacks);
+void drv_dlps_enter_cbacks_register(const char *name, void *cbacks);
 
 
 #endif  /* __DRV_DLPS_H__ */

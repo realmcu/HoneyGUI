@@ -101,7 +101,7 @@ void hw_lcd_init(void)
     rtk_lcd_hal_init();
     DBG_DIRECT("Drv lcd init");
 
-    drv_dlps_exit_cbacks_register(lcd_exit_dlps);
+    drv_dlps_exit_cbacks_register("lcd", lcd_exit_dlps);
     DBG_DIRECT("Drv lcd Register Exit DLPS CB");
 }
 
