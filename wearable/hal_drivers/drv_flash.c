@@ -9,12 +9,14 @@
  */
 
 #include "board.h"
+#include "menu_config.h"
 #include "drv_flash.h"
 #include "flash_nor_device.h"
 #include "trace.h"
 #include "string.h"
-
-
+#ifdef MODULE_USING_DATABASE
+#include "fal.h"
+#endif
 /**
  * Read data from flash.
  * @note This operation's units is word.
@@ -137,8 +139,7 @@ int realtek_flash_erase(uint32_t addr, size_t size)
 }
 
 
-
-#if 0
+#ifdef MODULE_USING_DATABASE
 static int fal_flash_read(long offset, uint8_t *buf, size_t size);
 static int fal_flash_write(long offset, const uint8_t *buf, size_t size);
 static int fal_flash_erase(long offset, size_t size);

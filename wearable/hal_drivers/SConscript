@@ -1,4 +1,4 @@
-Import('RTT_ROOT')
+Import('TOOL_ROOT')
 from building import *
 
 cwd = GetCurrentDir()

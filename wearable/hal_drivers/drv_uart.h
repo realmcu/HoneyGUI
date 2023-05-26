@@ -16,8 +16,7 @@
 #include "rtl_rcc.h"
 #include "rtl_nvic.h"
 #include "rtl_pinmux.h"
-#include "wsdef.h"
-#include "wristband_sdk_config.h"
+#include "menu_config.h"
 #include "drv_dlps.h"
 
 
@@ -58,6 +57,10 @@ struct rtl_uart_config
     uint32_t periph;
     uint32_t periph_clock;
     UART_BaudRate_Def baudrate_index;
+    uint32_t (*read)(void *buffer, uint32_t size);
+    uint32_t (*write)(const void *buffer, uint32_t size);
+    void (*control)(uint8_t cmd, void *args);
+    void (*uart_user_def)(uint8_t data);
 };
 
 typedef struct
@@ -142,7 +145,27 @@ typedef struct
                                                                                                    .baudrate_index = UART5_CONFIG_BAUDRATE,                             \
     }
 
-
+enum
+{
+#if (BSP_USING_UART0 == 1)
+    UART0_INDEX,
+#endif
+#if (BSP_USING_UART1 == 1)
+    UART1_INDEX,
+#endif
+#if (BSP_USING_UART2 == 1)
+    UART2_INDEX,
+#endif
+#if (BSP_USING_UART3 == 1)
+    UART3_INDEX,
+#endif
+#if (BSP_USING_UART4 == 1)
+    UART4_INDEX,
+#endif
+#if (BSP_USING_UART5 == 1)
+    UART5_INDEX,
+#endif
+};
 
 extern struct rtl_uart_config uart_config[];
 
