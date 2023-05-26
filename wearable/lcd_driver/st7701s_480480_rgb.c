@@ -1,5 +1,5 @@
 #include "st7701s_480480_rgb.h"
-#include "rtl876x_edpi.h"
+#include "rtl_edpi.h"
 #include "rtl_nvic.h"
 #include "rtl_spi.h"
 #include "rtl_pinmux.h"
