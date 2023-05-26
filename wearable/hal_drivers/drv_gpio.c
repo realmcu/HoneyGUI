@@ -12,7 +12,12 @@
 #include "drv_gpio.h"
 #include "utils.h"
 #include "trace.h"
+#ifdef RTL8762G
 #include "vector_table.h"
+#endif
+#ifdef RTL8772F
+#include "vector_table_ns.h"
+#endif
 #include "os_sched.h"
 
 
