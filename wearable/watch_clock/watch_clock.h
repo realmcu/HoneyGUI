@@ -55,7 +55,7 @@ void watch_clock_init(time_t timestamp);
 void watch_clock_start(void);
 void watch_clock_set(time_t timestamp);
 struct tm watch_clock_get(void);
-void watch_clock_update(void);
+void watch_clock_update(void *);
 
 #ifdef __cplusplus
 }

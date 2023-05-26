@@ -30,30 +30,24 @@ static uint32_t rtc_clock_src_freq;
 
 
 #if (MODULE_USING_WATCH_CLOCK == 1)
-extern struct rtl_rtc_config rtc_config[];
+
 
 static T_WATCH_CLOCK watch_clock;
 
 
-static void watch_rtc_handle(void)
-{
-    rtc_count = rtc_config[WATCH_CLOCK_RTC_COMP_INDEX].rtc_count;
-    rtc_set_comp = rtc_config[WATCH_CLOCK_RTC_COMP_INDEX].set_comp;
-    rtc_clock_src_freq = rtc_config[WATCH_CLOCK_RTC_COMP_INDEX].rtc_clock_src_freq;
-}
 #endif
 time_t get_unix_timestamp(void)
 {
-    uint32_t cur_rtc_tick_count = rtc_count();
+    uint32_t cur_rtc_tick_count = drv_rtc_count();
     uint32_t diff_second = 0;
     if (cur_rtc_tick_count > watch_clock.pre_rtc_tick_count)
     {
-        diff_second = (cur_rtc_tick_count - watch_clock.pre_rtc_tick_count) / rtc_clock_src_freq;
+        diff_second = (cur_rtc_tick_count - watch_clock.pre_rtc_tick_count) / drv_rtc_clock_src_freq();
     }
     else
     {
         diff_second = (cur_rtc_tick_count + 0xffffffff - watch_clock.pre_rtc_tick_count) /
-                      rtc_clock_src_freq;
+                      drv_rtc_clock_src_freq();
     }
     return (watch_clock.unix_timestamp + diff_second);
 }
@@ -91,7 +85,7 @@ void watch_clock_set(time_t time_stamp)
     watch_clock.local_time.seconds = tm_new.tm_sec;
 
     watch_clock.unix_timestamp = time_stamp;
-    watch_clock.pre_rtc_tick_count = rtc_count();
+    watch_clock.pre_rtc_tick_count = drv_rtc_count();
 }
 
 struct tm watch_clock_get(void)
@@ -99,12 +93,12 @@ struct tm watch_clock_get(void)
     return watch_clock.tm;
 }
 
-void watch_clock_update(void)
+void watch_clock_update(void *)
 {
     watch_clock.unix_timestamp = watch_clock.unix_timestamp + (60 - watch_clock.unix_timestamp % 60);
-    watch_clock.pre_rtc_tick_count = rtc_count();
+    watch_clock.pre_rtc_tick_count = drv_rtc_count();
 
-    rtc_set_comp(false, watch_clock.unix_timestamp);
+    mcu_rtc_set_comp(false, watch_clock.unix_timestamp);
 
     /* get UTCTime time */
     watch_clock_set(watch_clock.unix_timestamp);
@@ -123,7 +117,7 @@ void watch_clock_start(void)
     APP_PRINT_INFO1("watch clock_start second_diff_value: %d",
                     (60 - watch_clock.unix_timestamp % 60));
 
-    rtc_set_comp(true, watch_clock.unix_timestamp);
+    mcu_rtc_set_comp(true, watch_clock.unix_timestamp);
 }
 
 /**
@@ -133,7 +127,7 @@ void watch_clock_start(void)
   */
 void watch_clock_init(time_t time_stamp)
 {
-    watch_rtc_handle();
+    drv_rtc_minute_attach_irq(watch_clock_update, NULL);
 
     watch_clock.time_zone = 8;
 
