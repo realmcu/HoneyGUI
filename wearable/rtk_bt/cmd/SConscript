@@ -10,9 +10,9 @@ list = os.listdir(cwd)
 src = Split("""
 """)
 
-
-src += ['app_cmd.c']
-src += ['app_report.c']
+if GetDepend(['RTK_BT_TASK']):
+    src += ['app_cmd.c']
+    src += ['app_report.c']
 
 
 CPPPATH = [cwd]

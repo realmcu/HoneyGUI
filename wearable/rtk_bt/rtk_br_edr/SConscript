@@ -10,9 +10,9 @@ objs = []
 # add the general drivers.
 src = Split("""
 """)
-
-src += ['bt_gap_init.c']
-src += ['bt_gap_cb.c']
+if GetDepend(['RTK_BT_TASK']):
+    src += ['bt_gap_init.c']
+    src += ['bt_gap_cb.c']
 if GetDepend(['BT_PROFILE_SDP']):
     src += ['app_sdp.c']
 if GetDepend(['BT_PROFILE_SPP']):
