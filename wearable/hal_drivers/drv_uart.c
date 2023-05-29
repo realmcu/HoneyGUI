@@ -9,6 +9,12 @@
 #include "os_sync.h"
 #include "drv_dlps.h"
 
+void (*uart0_rx_indicate)(uint8_t ch) = NULL;
+void (*uart1_rx_indicate)(uint8_t ch) = NULL;
+void (*uart2_rx_indicate)(uint8_t ch) = NULL;
+void (*uart3_rx_indicate)(uint8_t ch) = NULL;
+void (*uart4_rx_indicate)(uint8_t ch) = NULL;
+void (*uart5_rx_indicate)(uint8_t ch) = NULL;
 
 static const UART_BaudRate_TypeDef BaudRate_Table[10] =
 {
@@ -24,71 +30,45 @@ static const UART_BaudRate_TypeDef BaudRate_Table[10] =
     {1,   1,  0x36D}, // BAUD_RATE_6000000
 };
 
-struct rtl_uart_config uart_config[] =
-{
-#if (BSP_USING_UART0 == 1)
-    UART0_CONFIG,
-#endif
-#if (BSP_USING_UART1 == 1)
-    UART1_CONFIG,
-#endif
-#if (BSP_USING_UART2 == 1)
-    UART2_CONFIG,
-#endif
-#if (BSP_USING_UART3 == 1)
-    UART3_CONFIG,
-#endif
-#if (BSP_USING_UART4 == 1)
-    UART4_CONFIG,
-#endif
-#if (BSP_USING_UART5 == 1)
-    UART5_CONFIG,
-#endif
-};
 
-#if (WS_USING_LETTER_SHELL == 1)
-void LETTER_SHELL_UART_HANDLE(void)
+static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
 {
+    uint8_t ch;
     /* Read interrupt type */
-    uint32_t int_status = UART_GetIID(uart_config[LETTER_SHELL_UART_INDEX].Instance);
+    uint32_t int_status = UART_GetIID(UARTx);
 
     /* Disable interrupt */
 
-    UART_INTConfig(uart_config[LETTER_SHELL_UART_INDEX].Instance,
-                   UART_INT_RD_AVA | UART_INT_RX_LINE_STS, DISABLE);
+    UART_INTConfig(UARTx, UART_INT_RD_AVA | UART_INT_RX_LINE_STS, DISABLE);
 
     /* Interrupt handle */
     switch (int_status & 0x0E)
     {
     case UART_INT_ID_RX_DATA_TIMEOUT:
         {
-            while (UART_GetFlagStatus(uart_config[LETTER_SHELL_UART_INDEX].Instance,
-                                      UART_FLAG_RX_DATA_AVA) == SET)
+            while (UART_GetFlagStatus(UARTx, UART_FLAG_RX_DATA_AVA) == SET)
             {
-                char data;
-                data = UART_ReceiveByte(uart_config[LETTER_SHELL_UART_INDEX].Instance);
-                uart_config[LETTER_SHELL_UART_INDEX].uart_user_def(data);
+                //HAVE RECIVE TIMEOUT THE LEFT
+                ch = UART_ReceiveByte(UARTx);
+                rx_ind(ch);
             }
             break;
         }
     case UART_INT_ID_LINE_STATUS:
         {
-            UART_GetFlagStatus(uart_config[LETTER_SHELL_UART_INDEX].Instance, UART_FLAG_RX_OVERRUN);
-            UART_ClearRxFIFO(uart_config[LETTER_SHELL_UART_INDEX].Instance);
-            UART_ClearTxFIFO(uart_config[LETTER_SHELL_UART_INDEX].Instance);
+            UART_GetFlagStatus(UARTx, UART_FLAG_RX_OVERRUN);
+            UART_ClearRxFIFO(UARTx);
+            UART_ClearTxFIFO(UARTx);
             /* Enable interrupt */
-            UART_INTConfig(uart_config[LETTER_SHELL_UART_INDEX].Instance,
-                           UART_INT_RD_AVA | UART_INT_RX_LINE_STS, ENABLE);
+            UART_INTConfig(UARTx, UART_INT_RD_AVA | UART_INT_RX_LINE_STS, ENABLE);
             return ;
         }
     case UART_INT_ID_RX_LEVEL_REACH:
         {
-            while (UART_GetFlagStatus(uart_config[LETTER_SHELL_UART_INDEX].Instance,
-                                      UART_FLAG_RX_DATA_AVA) == SET)
+            while (UART_GetFlagStatus(UARTx, UART_FLAG_RX_DATA_AVA) == SET)
             {
-                char data;
-                data = UART_ReceiveByte(uart_config[LETTER_SHELL_UART_INDEX].Instance);
-                uart_config[LETTER_SHELL_UART_INDEX].uart_user_def(data);
+                ch = UART_ReceiveByte(UARTx);
+                rx_ind(ch);
             }
             break;
         }
@@ -103,12 +83,27 @@ void LETTER_SHELL_UART_HANDLE(void)
     }
 
     /* Enable interrupt */
-    UART_INTConfig(uart_config[LETTER_SHELL_UART_INDEX].Instance,
-                   UART_INT_RD_AVA |  UART_INT_RX_LINE_STS, ENABLE);
+    UART_INTConfig(UARTx, UART_INT_RD_AVA |  UART_INT_RX_LINE_STS, ENABLE);
 }
-#endif
 
-static uint32_t mcu_uart_write(const void *buffer, uint32_t size)
+void UART2_Handler(void)
+{
+    uart_isr(uart2_rx_indicate, UART2);
+}
+void UART3_Handler(void)
+{
+    uart_isr(uart3_rx_indicate, UART3);
+}
+void UART4_Handler(void)
+{
+    uart_isr(uart4_rx_indicate, UART4);
+}
+void UART5_Handler(void)
+{
+    uart_isr(uart5_rx_indicate, UART5);
+}
+
+static uint32_t drv_uart_write(UART_TypeDef *UARTx, const void *buffer, uint32_t size)
 {
     if (size == 0)
     {
@@ -120,52 +115,132 @@ static uint32_t mcu_uart_write(const void *buffer, uint32_t size)
 
     for (i = 0; i < (size / UART_TX_FIFO_SIZE); i++)
     {
-        UART_SendData(uart_config[LETTER_SHELL_UART_INDEX].Instance, buf, UART_TX_FIFO_SIZE);
-        while (UART_GetFlagStatus(uart_config[LETTER_SHELL_UART_INDEX].Instance,
-                                  UART_FLAG_TX_EMPTY) != SET);
+        UART_SendData(UARTx, buf, UART_TX_FIFO_SIZE);
+        while (UART_GetFlagStatus(UARTx, UART_FLAG_TX_EMPTY) != SET);
         buf += UART_TX_FIFO_SIZE;
     }
 
-    UART_SendData(uart_config[LETTER_SHELL_UART_INDEX].Instance, buf,
-                  size % UART_TX_FIFO_SIZE);
-    while (UART_GetFlagStatus(uart_config[LETTER_SHELL_UART_INDEX].Instance,
-                              UART_FLAG_TX_EMPTY) != SET);
+    UART_SendData(UARTx, buf, size % UART_TX_FIFO_SIZE);
+    while (UART_GetFlagStatus(UARTx, UART_FLAG_TX_EMPTY) != SET);
 
     return size;
 }
 
-static void mcu_uart_init(struct rtl_uart_config *uart_cfg)
+uint32_t drv_uart2_write(const void *buffer, uint32_t size)
 {
-    Pinmux_Deinit(uart_cfg->tx_pin);
-    Pinmux_Deinit(uart_cfg->rx_pin);
-    Pad_Config(uart_cfg->tx_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE,
-               PAD_OUT_LOW);
-    Pad_Config(uart_cfg->rx_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
-               PAD_OUT_LOW);
-    Pinmux_Config(uart_cfg->tx_pin, uart_cfg->tx_pin_func);
-    Pinmux_Config(uart_cfg->rx_pin, uart_cfg->rx_pin_func);
+    return drv_uart_write(UART2, buffer, size);
+}
+uint32_t drv_uart3_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART3, buffer, size);
+}
+uint32_t drv_uart4_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART4, buffer, size);
+}
+uint32_t drv_uart5_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART5, buffer, size);
+}
 
-    RCC_PeriphClockCmd(uart_cfg->periph, uart_cfg->periph_clock, ENABLE);
+void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
+{
+    IRQn_Type irq_type = UART2_IRQn;
+    uint8_t tx_pin_func = UART2_TX;
+    uint8_t rx_pin_func = UART2_RX;
+    uint32_t periph = APBPeriph_UART2;
+    uint32_t periph_clock = APBPeriph_UART2_CLOCK;
+    if (UARTx == UART2)
+    {
+        irq_type = UART2_IRQn;
+        tx_pin_func = UART2_TX;
+        rx_pin_func = UART2_RX;
+        periph = APBPeriph_UART2;
+        periph_clock = APBPeriph_UART2_CLOCK;
+    }
+    else if (UARTx == UART3)
+    {
+        irq_type = UART3_IRQn;
+        tx_pin_func = UART3_TX;
+        rx_pin_func = UART3_RX;
+        periph = APBPeriph_UART3;
+        periph_clock = APBPeriph_UART3_CLOCK;
+    }
+    else if (UARTx == UART4)
+    {
+        irq_type = UART4_IRQn;
+        tx_pin_func = UART4_TX;
+        rx_pin_func = UART4_RX;
+        periph = APBPeriph_UART4;
+        periph_clock = APBPeriph_UART4_CLOCK;
+    }
+    else if (UARTx == UART5)
+    {
+        irq_type = UART5_IRQn;
+        tx_pin_func = UART5_TX;
+        rx_pin_func = UART5_RX;
+        periph = APBPeriph_UART5;
+        periph_clock = APBPeriph_UART5_CLOCK;
+    }
+    Pinmux_Deinit(tx_pin);
+    Pinmux_Deinit(rx_pin);
+    Pad_Config(tx_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE, PAD_OUT_LOW);
+    Pad_Config(rx_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
+    Pinmux_Config(tx_pin, tx_pin_func);
+    Pinmux_Config(rx_pin, rx_pin_func);
+
+    RCC_PeriphClockCmd(periph, periph_clock, ENABLE);
     UART_InitTypeDef UART_InitStruct;
     UART_StructInit(&UART_InitStruct);
 
-    UART_InitStruct.UART_Div            = BaudRate_Table[uart_cfg->baudrate_index].div;
-    UART_InitStruct.UART_Ovsr           = BaudRate_Table[uart_cfg->baudrate_index].ovsr;
-    UART_InitStruct.UART_OvsrAdj        = BaudRate_Table[uart_cfg->baudrate_index].ovsr_adj;
+    UART_InitStruct.UART_Div            = BaudRate_Table[BAUD_RATE_115200].div;
+    UART_InitStruct.UART_Ovsr           = BaudRate_Table[BAUD_RATE_115200].ovsr;
+    UART_InitStruct.UART_OvsrAdj        = BaudRate_Table[BAUD_RATE_115200].ovsr_adj;
 
-    UART_Init(uart_cfg->Instance, &UART_InitStruct);
-}
+    UART_Init(UARTx, &UART_InitStruct);
 
-static void mcu_uart_irq_init(struct rtl_uart_config *uart_cfg)
-{
-    UART_INTConfig(uart_cfg->Instance, UART_INT_RD_AVA | UART_INT_RX_LINE_STS, ENABLE);
+    UART_INTConfig(UARTx, UART_INT_RD_AVA | UART_INT_RX_LINE_STS, ENABLE);
     NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = uart_cfg->irq_type;
+    NVIC_InitStruct.NVIC_IRQChannel = irq_type;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStruct);
 }
 
+void drv_uart2_init(uint8_t tx_pin, uint8_t rx_pin)
+{
+    drv_uart_init(UART2, tx_pin, rx_pin);
+}
+void drv_uart3_init(uint8_t tx_pin, uint8_t rx_pin)
+{
+    drv_uart_init(UART3, tx_pin, rx_pin);
+}
+void drv_uart4_init(uint8_t tx_pin, uint8_t rx_pin)
+{
+    drv_uart_init(UART4, tx_pin, rx_pin);
+}
+void drv_uart5_init(uint8_t tx_pin, uint8_t rx_pin)
+{
+    drv_uart_init(UART5, tx_pin, rx_pin);
+}
+
+
+void drv_uart2_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+{
+    uart2_rx_indicate = rx_ind;
+}
+void drv_uart3_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+{
+    uart3_rx_indicate = rx_ind;
+}
+void drv_uart4_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+{
+    uart4_rx_indicate = rx_ind;
+}
+void drv_uart5_set_rx_indicate(void (*rx_ind)(uint8_t ch))
+{
+    uart5_rx_indicate = rx_ind;
+}
 
 
 

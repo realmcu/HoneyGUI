@@ -143,9 +143,27 @@ void *gui_thread_create(const char *name, void (*entry)(void *param), void *para
 }
 bool gui_thread_delete(void *handle)
 {
-    if (os_api->thread_create)
+    if (os_api->thread_delete)
     {
         return os_api->thread_delete(handle);
+    }
+    return false;
+}
+
+bool gui_thread_suspend(void *handle)
+{
+    if (os_api->thread_suspend)
+    {
+        return os_api->thread_suspend(handle);
+    }
+    return false;
+}
+
+bool gui_thread_resume(void *handle)
+{
+    if (os_api->thread_resume)
+    {
+        return os_api->thread_resume(handle);
     }
     return false;
 }

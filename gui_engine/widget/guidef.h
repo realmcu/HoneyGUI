@@ -290,6 +290,8 @@ struct gui_os_api
     void *(*thread_create)(const char *name, void (*entry)(void *param), void *param,
                            uint32_t stack_size, uint8_t priority);
     bool (*thread_delete)(void *handle);
+    bool (*thread_suspend)(void *handle);
+    bool (*thread_resume)(void *handle);
     bool (*thread_mdelay)(uint32_t ms);
 
 

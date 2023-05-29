@@ -9,7 +9,6 @@
  */
 
 #include "board.h"
-#include "menu_config.h"
 #include "drv_flash.h"
 #include "flash_nor_device.h"
 #include "trace.h"

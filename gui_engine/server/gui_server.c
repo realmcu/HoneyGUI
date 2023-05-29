@@ -14,6 +14,7 @@
 #include "acc_engine.h"
 
 static void (*gui_debug_hook)(void) = NULL;
+static void *gui_server_handle = NULL;
 
 void gui_debug_sethook(void (*hook)(void))
 {
@@ -41,9 +42,24 @@ static void rtgui_server_entry(void *parameter)
 
         gui_fb_disp(screen);
 
-        gui_thread_mdelay(10);
+        if (app->actived == false)
+        {
+            gui_log("!Suspend GUI Server and wait receive message! \n");
+            gui_thread_suspend(gui_server_handle);
+        }
 
     }
+}
+
+void gui_server_suspend(void)
+{
+    gui_log("!Suspend GUI Server and wait receive message! \n");
+    gui_thread_suspend(gui_server_handle);
+}
+
+void gui_server_resume(void)
+{
+    gui_thread_resume(gui_server_handle);
 }
 
 
@@ -73,10 +89,10 @@ int rtgui_server_init(void)
         while (1);
     }
 
-    void *gui_server_tid = gui_thread_create(GUI_SERVER_THREAD_NAME,
-                                             rtgui_server_entry, NULL,
-                                             1024 * 10,
-                                             15);
+    gui_server_handle = gui_thread_create(GUI_SERVER_THREAD_NAME,
+                                          rtgui_server_entry, NULL,
+                                          1024 * 10,
+                                          15);
     return 0;
 }
 
