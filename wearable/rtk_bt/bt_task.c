@@ -28,6 +28,11 @@
 #include "ble_gap_init.h"
 #include "ble_profile_init.h"
 #include "bt_gap_init.h"
+#ifdef __RTTHREAD__
+#include "rtthread.h"
+#else
+#include "menu_config.h"
+#endif
 #if (RTK_BT_TASK == 1)
 #include "btm.h"
 #include "sysm.h"
@@ -35,11 +40,6 @@
 #endif
 #include "rtl_pinmux.h"
 #include <watch_msg.h>
-#ifdef __RTTHREAD__
-#include "rtthread.h"
-#else
-#include "menu_config.h"
-#endif
 
 #define ADD_DSP_JTAG_PINMUX   0
 
