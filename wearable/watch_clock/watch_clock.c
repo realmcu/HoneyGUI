@@ -93,7 +93,7 @@ struct tm watch_clock_get(void)
     return watch_clock.tm;
 }
 
-void watch_clock_update(void *)
+void watch_clock_update(void *p_value)
 {
     watch_clock.unix_timestamp = watch_clock.unix_timestamp + (60 - watch_clock.unix_timestamp % 60);
     watch_clock.pre_rtc_tick_count = drv_rtc_count();
