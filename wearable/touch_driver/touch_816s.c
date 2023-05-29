@@ -51,21 +51,21 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
 
 void rtk_touch_hal_set_indicate(void *indicate)
 {
-    drv_pin_mode(TOUCH_INT, PIN_MODE_INPUT);
-    drv_pin_attach_irq(TOUCH_INT, PIN_IRQ_MODE_RISING_FALLING, indicate,
+    drv_pin_mode(TOUCH_816S_INT, PIN_MODE_INPUT);
+    drv_pin_attach_irq(TOUCH_816S_INT, PIN_IRQ_MODE_RISING_FALLING, indicate,
                        NULL);
-    drv_pin_irq_enable(TOUCH_INT, PIN_IRQ_DISABLE);
+    drv_pin_irq_enable(TOUCH_816S_INT, PIN_IRQ_DISABLE);
 }
 
 void rtk_touch_hal_int_config(bool enable)
 {
     if (enable == true)
     {
-        drv_pin_irq_enable(TOUCH_INT, PIN_IRQ_ENABLE);
+        drv_pin_irq_enable(TOUCH_816S_INT, PIN_IRQ_ENABLE);
     }
     else
     {
-        drv_pin_irq_enable(TOUCH_INT, PIN_IRQ_DISABLE);
+        drv_pin_irq_enable(TOUCH_816S_INT, PIN_IRQ_DISABLE);
     }
 }
 
@@ -74,10 +74,11 @@ void rtk_touch_hal_int_config(bool enable)
 
 void rtk_touch_hal_init(void)
 {
-    drv_pin_mode(TOUCH_RST, PIN_MODE_OUTPUT);
-    drv_pin_write(TOUCH_RST, 0);
+    drv_i2c0_set_scl_sda(TOUCH_816S_SCL, TOUCH_816S_SDA);
+    drv_pin_mode(TOUCH_816S_RST, PIN_MODE_OUTPUT);
+    drv_pin_write(TOUCH_816S_RST, 0);
     platform_delay_ms(10);
-    drv_pin_write(TOUCH_RST, 1);
+    drv_pin_write(TOUCH_816S_RST, 1);
     platform_delay_ms(100);
 
 
