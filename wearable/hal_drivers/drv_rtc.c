@@ -40,7 +40,15 @@ void drv_rtc_init(void)
     drv_rtc_started = true;
 }
 
+uint32_t drv_rtc_count(void)
+{
+    return RTC_GetCounter();
+}
 
+uint32_t drv_rtc_clock_src_freq()
+{
+    return RTC_SRC_FREQ;
+}
 
 void drv_rtc_second_attach_irq(void (*hdr)(void *args), void *args)
 {
@@ -70,6 +78,7 @@ void drv_rtc_minute_attach_irq(void (*hdr)(void *args), void *args)
     uint32_t CompareValue;
     CompareValue = RTC_GetCounter() + RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1) * 60; //todo
     RTC_SetCompValue(RTC_COMP1, CompareValue & 0xFFFFFFFF);
+    RTC_WKConfig(RTC_WK_COMP1, ENABLE);
     RTC_INTConfig(RTC_INT_COMP1, ENABLE);
 }
 
@@ -116,6 +125,7 @@ void RTC_Handler()
         RTC_ClearINTPendingBit(RTC_INT_COMP1);
         RTC_ClearCompINT(RTC_COMP1);
         RTC_ClearWakeupStatusBit(RTC_WK_COMP1);
+        comp0_irq.rtc_cb(comp0_irq.args);
     }
     if (RTC_GetINTStatus(RTC_INT_COMP2) == SET)
     {
