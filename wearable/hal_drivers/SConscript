@@ -9,6 +9,7 @@ src = Split("""
 
 src += ['drv_dlps.c']
 src += ['drv_flash.c']
+src += ['drv_rtc.c']
 
 if GetDepend(['BSP_USING_SPI']):
     src += ['drv_spi.c']
@@ -30,9 +31,6 @@ if GetDepend('BSP_USING_LCD'):
 
 if GetDepend('MODULE_VG_LITE'):
     src += ['drv_gpu.c']
-
-if GetDepend('BSP_USING_ONCHIP_RTC'):
-    src += ['drv_rtc.c']
 
 if GetDepend(['BSP_USING_SDIO']):
     src += ['drv_sdio.c']

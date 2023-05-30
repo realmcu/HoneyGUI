@@ -12,10 +12,11 @@
 #include "drv_gpio.h"
 #include "utils.h"
 #include "trace.h"
-#ifdef RTL8762G
+#include "patch_header_check.h"
+#if (IMG_IC_TYPE == 0xF)
 #include "vector_table.h"
 #endif
-#ifdef RTL8772F
+#if (IMG_IC_TYPE == 0xE)
 #include "vector_table_ns.h"
 #endif
 #include "os_sched.h"

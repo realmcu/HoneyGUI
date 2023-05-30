@@ -8,9 +8,6 @@
  * 2020-08-04     tyustli  first version
  */
 
-#include "wristband_sdk_config.h"
-
-#ifdef BSP_USING_TOUCH
 #include "rtl_gpio.h"
 #include "rtl_rcc.h"
 #include "drv_gpio.h"
@@ -139,4 +136,3 @@ void rtk_touch_hal_init(void)
 
 }
 
-#endif /* BSP_USING_TOUCH */
