@@ -3,6 +3,7 @@ ignore_file_encoding = [
     r"wearable/tuya-ble-sdk/",
     r"wearable/database/",
     r"wearable/vcxx/",
+    r"rt-thread/",
 ]
 ignore_file_check = [
     r"lvgl/",
@@ -10,4 +11,5 @@ ignore_file_check = [
     r"wearable/tuya-ble-sdk/",
     r"wearable/database/",
     r"wearable/vcxx/",
+    r"rt-thread/",
 ]

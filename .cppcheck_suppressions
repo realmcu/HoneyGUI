@@ -22,4 +22,5 @@
 *:wearable\music_player\mp3_parser.c
 *:VGLite\*
 *:lvgl\*
+*:rt-thread\*
 
