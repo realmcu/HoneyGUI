@@ -1,0 +1,18 @@
+#Import('rt_config')
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+""")
+
+src += ['shell.c']
+src += ['shell_cmd_list.c']
+src += ['shell_ext.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('letter_shell', src, depend = ['WS_USING_LETTER_SHELL'], CPPPATH = CPPPATH)
+
+Return('group')

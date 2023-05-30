@@ -1,0 +1,31 @@
+Import('TOOL_ROOT')
+#import wristband_sdk_config
+from building import *
+
+cwd = GetCurrentDir()
+list = os.listdir(cwd)
+objs = []
+
+# add the general drivers.
+src = Split("""
+""")
+
+if GetDepend(['WRISTBAND_PRIVATE_SERVICE']):
+    src += ['communicate_task.c']
+    src += ['communicate_protocol.c']
+    src += ['communicate_parse.c']
+    src += ['communicate_parse_bond.c']
+    src += ['communicate_parse_control.c']
+    src += ['communicate_parse_setting.c']
+    src += ['communicate_parse_health.c']
+    src += ['communicate_parse_notify.c']    
+
+CPPPATH = [cwd]
+
+group1 = DefineGroup('communication', src, depend = [''], CPPPATH = CPPPATH)
+
+group2 = DefineGroup('ble_profile', ['wristband_private_service.c'], depend = ['WRISTBAND_PRIVATE_SERVICE'], CPPPATH = CPPPATH)
+
+group = group1 + group2
+
+Return('group')
