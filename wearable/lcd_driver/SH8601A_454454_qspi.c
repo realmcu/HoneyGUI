@@ -4,6 +4,8 @@
 #include "utils.h"
 #include "trace.h"
 #include "os_sched.h"
+#include "rtl_pinmux.h"
+#include "drv_gpio.h"
 
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
@@ -421,9 +423,42 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
     LCDC_AXIMUXMode(LCDC_FW_MODE);
 }
 
+static void sh8601a_pad_config(void)
+{
+    Pad_Config(P16_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P16_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_3, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_4, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_5, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_6, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+
+    Pad_Dedicated_Config(P16_6, ENABLE);
+    Pad_Dedicated_Config(P16_7, ENABLE);
+    Pad_Dedicated_Config(P17_0, ENABLE);
+    Pad_Dedicated_Config(P17_1, ENABLE);
+    Pad_Dedicated_Config(P17_2, ENABLE);
+    Pad_Dedicated_Config(P17_3, ENABLE);
+    Pad_Dedicated_Config(P17_4, ENABLE);
+    Pad_Dedicated_Config(P17_5, ENABLE);
+    Pad_Dedicated_Config(P17_6, ENABLE);
+    Pad_Dedicated_Config(P17_7, ENABLE);
+
+    drv_pin_mode(P13_7, PIN_MODE_OUTPUT);
+    drv_pin_write(P13_7, 0); //im0
+    drv_pin_mode(P13_6, PIN_MODE_OUTPUT);
+    drv_pin_write(P13_6, 1); //im1
+
+}
 
 void rtk_lcd_hal_init(void)
 {
+    RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK_CLOCK, ENABLE);
+    RCC_PeriphClockCmd(APBPeriph_MIPI_HOST, APBPeriph_MIPI_HOST_CLOCK, ENABLE);
+    sh8601a_pad_config();
     LCDC_InitTypeDef lcdc_init = {0};
     lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
     lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_ARGB8888;
