@@ -22,17 +22,19 @@
 
 static void spic3_spi_write(uint8_t *buf, uint32_t len)
 {
+    DBIC->CTRLR0 |= BIT31;
     DBIC->CTRLR0 &= ~(BIT_CMD_CH(3) | BIT_ADDR_CH(3) | BIT_DATA_CH(3));//SET CHANNEL NUM
     DBIC->CTRLR0 &= ~(BIT_TMOD(3)); //tx mode
 
     DBIC_TX_NDF(len);
-    DBIC_Cmd(ENABLE);
     for (uint32_t i = 0; i < len; i++)
     {
         DBIC->DR[0].byte = buf[i];
     }
-    while (DBIC->SR & BIT0); // wait bus busy
-    DBIC_Cmd(DISABLE);//disable DBIC
+    DBIC_Cmd(ENABLE);
+    while (DBIC->SR & BIT0);// wait bus busy
+    //DBIC_Cmd(DISABLE);//disable DBIC
+    DBIC->CTRLR0 &= ~BIT31;
 }
 
 
