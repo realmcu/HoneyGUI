@@ -539,14 +539,14 @@ void log_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size)
 
     rt_kprintf("0x%x", buf[size - 1]);
 #else
-    WS_PRINTF("Hex: ");
+    DBG_DIRECT("Hex: ");
 
     for (uint32_t i = 0; i < (size - 1); i++)
     {
-        WS_PRINTF("0x%x-", buf[i]);
+        DBG_DIRECT("0x%x-", buf[i]);
     }
 
-    WS_PRINTF("0x%x", buf[size - 1]);
+    DBG_DIRECT("0x%x", buf[size - 1]);
 #endif
 #endif
 }

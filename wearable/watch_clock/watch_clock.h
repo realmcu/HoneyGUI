@@ -52,7 +52,6 @@ time_t convert_to_unix_timestamp(struct tm *time);
 time_t get_unix_timestamp(void);
 
 void watch_clock_init(time_t timestamp);
-void watch_clock_start(void);
 void watch_clock_set(time_t timestamp);
 struct tm watch_clock_get(void);
 void watch_clock_update(void *p_value);

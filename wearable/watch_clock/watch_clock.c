@@ -9,7 +9,7 @@
 * @version  v0.1
 *********************************************************************************************************
 */
-#if (MODULE_USING_WATCH_CLOCK == 1)
+
 #include "trace.h"
 #include "string.h"
 #include "watch_clock.h"
@@ -27,14 +27,8 @@ static uint32_t (*rtc_count)(void);
 static void (*rtc_set_comp)(bool start, time_t second);
 static uint32_t rtc_clock_src_freq;
 
-
-#if (MODULE_USING_WATCH_CLOCK == 1)
-
-
 static T_WATCH_CLOCK watch_clock;
 
-
-#endif
 time_t get_unix_timestamp(void)
 {
     uint32_t cur_rtc_tick_count = drv_rtc_count();
@@ -111,13 +105,6 @@ void watch_clock_update(void *p_value)
     APP_PRINT_INFO1("local time %s", TRACE_STRING(asctime(localtime(&watch_clock.unix_timestamp))));
 }
 
-void watch_clock_start(void)
-{
-    APP_PRINT_INFO1("watch clock_start second_diff_value: %d",
-                    (60 - watch_clock.unix_timestamp % 60));
-
-    mcu_rtc_set_comp(true, watch_clock.unix_timestamp);
-}
 
 /**
   * @brief   watch clock init
@@ -134,7 +121,9 @@ void watch_clock_init(time_t time_stamp)
 
     watch_clock_set(time_stamp);
 
-    watch_clock_start();
+    APP_PRINT_INFO1("watch clock_start second_diff_value: %d", (60 - watch_clock.unix_timestamp % 60));
+
+    mcu_rtc_set_comp(true, watch_clock.unix_timestamp);
 }
 
 #if (WS_USING_LETTER_SHELL == 1)
@@ -147,6 +136,4 @@ void watch_clock_test(time_t time_stamp)
 SHELL_EXPORT_CMD(
     SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC) | SHELL_CMD_DISABLE_RETURN,
     watch_clock_test, watch_clock_test, test);
-#endif
-
 #endif
