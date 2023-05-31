@@ -9,7 +9,9 @@ src     = Glob('*.c')
 CPPPATH = [cwd]
 list = os.listdir(cwd)
 
-group = DefineGroup('database', src, depend = ['MODULE_USING_DATABASE'], CPPPATH = CPPPATH)
+CPPDEFINES = ['MODULE_USING_DATABASE']
+
+group = DefineGroup('database', src, depend = ['MODULE_USING_DATABASE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 if GetDepend('MODULE_USING_DATABASE'):
     for d in list:

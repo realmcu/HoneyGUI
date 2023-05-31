@@ -21,9 +21,6 @@
  *============================================================================*/
 #include <stdlib.h>
 #include "dp_rtk_db.h"
-#ifndef __RTTHREAD__
-#include "menu_config.h"
-#endif
 
 
 void test_temp_code(void)

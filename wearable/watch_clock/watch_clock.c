@@ -9,7 +9,6 @@
 * @version  v0.1
 *********************************************************************************************************
 */
-#include "menu_config.h"
 #if (MODULE_USING_WATCH_CLOCK == 1)
 #include "trace.h"
 #include "string.h"

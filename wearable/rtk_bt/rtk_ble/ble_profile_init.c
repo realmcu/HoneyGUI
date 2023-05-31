@@ -7,11 +7,6 @@
 #include "trace.h"
 #include "profile_client.h"
 #include "app_ble_bas.h"
-#ifdef __RTTHREAD__
-#include "rtthread.h"
-#else
-#include "menu_config.h"
-#endif
 #ifdef TUYA_BLE_SDK
 #include "tuya_ble_app_demo.h"
 #endif
