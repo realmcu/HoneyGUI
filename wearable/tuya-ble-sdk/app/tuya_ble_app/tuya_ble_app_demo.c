@@ -41,7 +41,7 @@
 #endif
 #endif
 
-#ifdef RTK_USING_DATABASE
+#ifdef MODULE_USING_DATABASE
 #include "dp_wearable.h"
 #endif
 #include "watch_msg.h"

@@ -34,9 +34,7 @@
 #if TUYA_BLE_LOG_ENABLE
 
 #include "trace.h"
-#ifdef __RTTHREAD__
-#include "rtthread.h"
-#endif
+
 uint8_t get_args(const char *format);
 void log_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size);
 
@@ -47,7 +45,7 @@ void log_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size);
 //        }
 
 
-
+#if 0
 #ifdef __RTTHREAD__
 #define  TUYA_BLE_PRINTF(fmt,...) \
     { \
@@ -55,7 +53,6 @@ void log_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size);
         rt_kprintf("\n"); \
     }
 #else
-#include "menu_config.h"
 #if (WS_USING_LETTER_SHELL == 1)
 #include "shell.h"
 #include "shell_port.h"
@@ -69,6 +66,10 @@ void log_hexdump(const char *name, uint8_t width, uint8_t *buf, uint16_t size);
 #define  TUYA_BLE_PRINTF(fmt,...)  DBG_DIRECT(fmt, ##__VA_ARGS__)
 #endif
 #endif
+#endif
+
+#define  TUYA_BLE_PRINTF(fmt,...)  DBG_DIRECT(fmt, ##__VA_ARGS__)
+
 #define TUYA_BLE_HEXDUMP(...)    log_hexdump("", 8, __VA_ARGS__)
 
 #else
