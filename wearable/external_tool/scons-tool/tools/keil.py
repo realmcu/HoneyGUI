@@ -165,8 +165,8 @@ def MDK4AddGroup(ProjectFiles, parent, name, files, project_path):
         elif name.find('.S') != -1:
             obj_name = name.replace('.s', '.o')
         else:
-            obj_name = name		
-			
+            obj_name = name
+
         if ProjectFiles.count(obj_name):
             name = basename + '_' + name
         ProjectFiles.append(obj_name)
@@ -179,7 +179,7 @@ def MDK4AddGroup(ProjectFiles, parent, name, files, project_path):
 
     return group
 
-# The common part of making MDK4/5 project 
+# The common part of making MDK4/5 project
 def MDK45Project(tree, target, script):
     project_path = os.path.dirname(os.path.abspath(target))
 
@@ -292,7 +292,7 @@ def MDK4Project(target, script):
 
 def MDK5Project(target, script):
 
-    template_tree = etree.parse('template.uvprojx')
+    template_tree = etree.parse('mdk/template.uvprojx')
 
     MDK45Project(template_tree, target, script)
 
@@ -301,9 +301,9 @@ def MDK5Project(target, script):
     if os.path.isfile(project_uvopt):
         os.unlink(project_uvopt)
     # copy uvopt file
-    if os.path.exists('template.uvoptx'):
+    if os.path.exists('mdk/template.uvoptx'):
         import shutil
-        shutil.copy2('template.uvoptx', 'project.uvoptx')
+        shutil.copy2('mdk/template.uvoptx', 'mdk/project.uvoptx')
 
 def MDKProject(target, script):
     template = open('template.Uv2', "r")
@@ -423,7 +423,7 @@ def ARMCC_Version():
     stdout, stderr = child.communicate()
 
     '''
-    example stdout: 
+    example stdout:
     Product: MDK Plus 5.24
     Component: ARM Compiler 5.06 update 5 (build 528)
     Tool: armcc [4d3621]
