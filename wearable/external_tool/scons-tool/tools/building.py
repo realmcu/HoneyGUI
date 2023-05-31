@@ -384,7 +384,7 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
                 default = False,
                 help = 'Don`t show pyconfig window')
 
-    if GetOption('pyconfig_silent'):    
+    if GetOption('pyconfig_silent'):
         from menuconfig import guiconfig_silent
 
         guiconfig_silent(Tool_ROOT)
@@ -802,7 +802,7 @@ def GenTargetProject(program = None):
             else:
                 template = os.path.isfile('template.uvprojx')
                 if template:
-                    MDK5Project('project.uvprojx', Projects)
+                    MDK5Project('mdk/project.uvprojx', Projects)
                 else:
                     print ('No template project file found.')
 
@@ -812,7 +812,7 @@ def GenTargetProject(program = None):
 
     if GetOption('target') == 'mdk5':
         from keil import MDK5Project
-        MDK5Project('project.uvprojx', Projects)
+        MDK5Project('mdk/project.uvprojx', Projects)
 
     if GetOption('target') == 'iar':
         from iar import IARProject
