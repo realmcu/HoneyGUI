@@ -9,7 +9,6 @@ src = Split("""
 
 src += ['drv_dlps.c']
 src += ['drv_flash.c']
-src += ['drv_rtc.c']
 
 CPPDEFINES = ['BSP_HAL_DRIVER']
 
@@ -44,10 +43,15 @@ if GetDepend(['BSP_USING_USBD']):
 if GetDepend(['BSP_USING_USBH']):
     src += ['drv_usbh.c']
 	
-if GetDepend(['BSP_USING_TOUCH']):
-    src += ['drv_touch.c']
+if GetDepend(['BSP_USING_TOUCH']) or GetDepend(['BSP_USING_GPIO']):
     src += ['drv_gpio.c']
+    
+if GetDepend(['BSP_USING_TOUCH']):    
+    src += ['drv_touch.c']
     CPPDEFINES += ['BSP_USING_TOUCH']
+
+if GetDepend(['BSP_USING_RTC']):
+    src += ['drv_rtc.c'] 
 
 path =  [cwd]
 

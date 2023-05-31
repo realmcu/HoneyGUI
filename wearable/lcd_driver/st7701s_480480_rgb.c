@@ -227,6 +227,19 @@ static void st7701s_dma_init(void)
 
 void rtk_lcd_hal_init(void)
 {
+    RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK, ENABLE);
+
+    //from XTAL SOURCE = 40M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_ck_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_func_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_mux_clk_cg_en = 1;
+
+    //From PLL1, SOURCE = 125M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 0; //pll1_peri(0) or pll2(1, pll2 = 160M)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel1 = 1; //pll(1) or xtal(0)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_sel = 1; //div
+
     Pad_Config(LCDC_DATA0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
@@ -310,7 +323,7 @@ void rtk_lcd_hal_init(void)
                                           ST7701S_480480_LCD_WIDTH * ST7701S_DRV_PIXEL_BITS / 8);
     memset(internal_frame_buffer1, 0x88,
            ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_WIDTH * ST7701S_DRV_PIXEL_BITS / 8);
-    memset(internal_frame_buffer2, 0xFF,
+    memset(internal_frame_buffer2, 0x00,
            ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_WIDTH * ST7701S_DRV_PIXEL_BITS / 8);
 
 #if !DMA_MULTIBLOCK
@@ -435,6 +448,21 @@ void rtk_lcd_hal_transfer_done(void)
 void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h)
 {
     pfb_probe = yStart;
+}
+
+uint32_t rtk_lcd_hal_get_width(void)
+{
+    return ST7701S_480480_LCD_WIDTH;
+}
+
+uint32_t rtk_lcd_hal_get_height(void)
+{
+    return ST7701S_480480_LCD_HEIGHT;
+}
+
+uint32_t rtk_lcd_hal_get_pixel_bits(void)
+{
+    return ST7701S_DRV_PIXEL_BITS;
 }
 
 #if !DMA_MULTIBLOCK
