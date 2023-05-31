@@ -5,7 +5,12 @@ from building import *
 cwd  = GetCurrentDir()
 group = []
 list = os.listdir(cwd)
+src = Split("""""")
+CPPPATH = [cwd]
 
+CPPDEFINES = ['MODULE_USING_RTK_GUI']
+
+group = DefineGroup('bt_app', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 if GetDepend('MODULE_USING_RTK_GUI'):
     for d in list:
