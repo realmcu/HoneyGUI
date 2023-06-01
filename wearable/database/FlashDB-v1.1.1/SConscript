@@ -6,6 +6,6 @@ cwd     = GetCurrentDir()
 src     = Glob('src/*.c')
 path    = [cwd + '/inc']
 
-group = DefineGroup('FlashDB', src, depend = [''], CPPPATH = path)
+group = DefineGroup('database', src, depend = [''], CPPPATH = path)
 
 Return('group')

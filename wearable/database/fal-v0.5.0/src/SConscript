@@ -13,6 +13,6 @@ src += ['fal_partition.c']
 
 CPPPATH = ['../inc']
 
-group = DefineGroup('fal', src, depend = [''], CPPPATH = CPPPATH)
+group = DefineGroup('database', src, depend = [''], CPPPATH = CPPPATH)
 
 Return('group')
