@@ -249,11 +249,11 @@ void rtk_lcd_hal_init(void)
     LCDC_Init(&lcdc_init);
 
 
-    uint32_t HSA = 8, HFP = 10, HBP = 50, HACT = EK9716_800480_LCD_WIDTH;
-    uint32_t VSA = 8, VFP = 10, VBP = 20, VACT = EK9716_800480_LCD_HEIGHT;
+    uint32_t HSA = 48, HFP = 40, HBP = 40, HACT = EK9716_800480_LCD_WIDTH;
+    uint32_t VSA = 1, VFP = 13, VBP = 31, VACT = EK9716_800480_LCD_HEIGHT;
 
     LCDC_eDPICfgTypeDef eDPICfg;//480*640  ---->   500 * 660
-    eDPICfg.eDPI_ClockDiv = 0x3;
+    eDPICfg.eDPI_ClockDiv = 0x2;
 
     eDPICfg.eDPI_HoriSyncWidth = HSA;
     eDPICfg.eDPI_VeriSyncHeight = VSA;
@@ -289,6 +289,18 @@ void rtk_lcd_hal_init(void)
     st7701s_reset_high();
     platform_delay_ms(120);
     //*******************************/
+
+    uint8_t *pixel = (uint8_t *)SPIC1_ADDR;
+
+    for (uint32_t i = 0; i < EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_HEIGHT * 3; i = i + 3)
+    {
+        pixel[i] = 0xFF;
+        pixel[i + 1] = 0;
+        pixel[i + 2] = 0;
+    }
+
+    rtk_lcd_hal_update_framebuffer((uint8_t *)SPIC1_ADDR,
+                                   EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_HEIGHT);
 }
 
 

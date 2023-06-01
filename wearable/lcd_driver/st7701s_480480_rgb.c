@@ -345,6 +345,17 @@ void rtk_lcd_hal_init(void)
     platform_delay_ms(120);
     //*******************************/
 #include "st7701s_rgb.txt"
+    uint8_t *pixel = (uint8_t *)SPIC1_ADDR;
+
+    for (uint32_t i = 0; i < ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT * 3; i = i + 3)
+    {
+        pixel[i] = 0xFF;
+        pixel[i + 1] = 0;
+        pixel[i + 2] = 0;
+    }
+
+    rtk_lcd_hal_update_framebuffer((uint8_t *)SPIC1_ADDR,
+                                   ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT);
 
 }
 
