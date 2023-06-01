@@ -19,6 +19,7 @@
 #include "os_task.h"
 #include "os_sync.h"
 #include "trace.h"
+#include "menu_config.h"
 #include "shell_port.h"
 #include "drv_uart.h"
 
@@ -40,7 +41,7 @@ static short userShellWrite(char *data, unsigned short len)
     return drv_uart4_write(data, len);
 }
 
-static void user_func(uint8_t data)
+void shell_user_func(uint8_t data)
 {
     shellHandler(&shell_user, data);
 }
@@ -92,8 +93,6 @@ int userShellUnlock(Shell *shell)
 
 void userShellInit(void)
 {
-    //uart_config[LETTER_SHELL_UART_INDEX].uart_user_def = user_func;
-
     shell_user.write = userShellWrite;
     //shell_user.read = userShellRead;
     //shell.lock = userShellLock;
