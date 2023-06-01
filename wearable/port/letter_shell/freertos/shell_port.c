@@ -19,7 +19,6 @@
 #include "os_task.h"
 #include "os_sync.h"
 #include "trace.h"
-#include "menu_config.h"
 #include "shell_port.h"
 #include "drv_uart.h"
 
