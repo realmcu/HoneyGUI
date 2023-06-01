@@ -12,8 +12,6 @@ extern "C" {
 
 #define ST7701S_DRV_PIXEL_BITS                     24
 
-#define DMA_MULTIBLOCK                             1
-
 
 
 void st7701s_init(void);
