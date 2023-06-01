@@ -17,7 +17,7 @@
 #include "app_cfg.h"
 #include "dp_rtk_db.h"
 #ifndef __RTTHREAD__
-#include "wristband_sdk_config.h"
+#include "menu_config.h"
 #endif
 
 

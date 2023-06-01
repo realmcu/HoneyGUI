@@ -63,7 +63,7 @@ static void spp_demo_app_rx_data_test(uint8_t *bd_addr, uint8_t *buf, uint16_t l
 
     if (spp_demo_role_get())
     {
-#if F_BT_DLPS_EN
+#if (DLPS_EN == 1)
         bt_sniff_mode_enable(bd_addr, 500);
 #endif
     }

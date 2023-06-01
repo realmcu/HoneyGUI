@@ -8,6 +8,8 @@
 #include "trace.h"
 #include "os_sync.h"
 #include "drv_dlps.h"
+#include "os_timer.h"
+#include "board.h"
 
 void (*uart0_rx_indicate)(uint8_t ch) = NULL;
 void (*uart1_rx_indicate)(uint8_t ch) = NULL;
@@ -15,6 +17,9 @@ void (*uart2_rx_indicate)(uint8_t ch) = NULL;
 void (*uart3_rx_indicate)(uint8_t ch) = NULL;
 void (*uart4_rx_indicate)(uint8_t ch) = NULL;
 void (*uart5_rx_indicate)(uint8_t ch) = NULL;
+
+static bool uart4_enter_dlps_flag = false;
+static void *uart4_allow_enter_dlps_timer = NULL;
 
 static const UART_BaudRate_TypeDef BaudRate_Table[10] =
 {
@@ -29,7 +34,6 @@ static const UART_BaudRate_TypeDef BaudRate_Table[10] =
     {1,   5,  0},     // BAUD_RATE_4000000
     {1,   1,  0x36D}, // BAUD_RATE_6000000
 };
-
 
 static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
 {
@@ -193,9 +197,9 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
     UART_InitTypeDef UART_InitStruct;
     UART_StructInit(&UART_InitStruct);
 
-    UART_InitStruct.UART_Div            = BaudRate_Table[BAUD_RATE_115200].div;
-    UART_InitStruct.UART_Ovsr           = BaudRate_Table[BAUD_RATE_115200].ovsr;
-    UART_InitStruct.UART_OvsrAdj        = BaudRate_Table[BAUD_RATE_115200].ovsr_adj;
+    UART_InitStruct.UART_Div            = BaudRate_Table[BAUD_RATE_2000000].div;
+    UART_InitStruct.UART_Ovsr           = BaudRate_Table[BAUD_RATE_2000000].ovsr;
+    UART_InitStruct.UART_OvsrAdj        = BaudRate_Table[BAUD_RATE_2000000].ovsr_adj;
 
     UART_Init(UARTx, &UART_InitStruct);
 
@@ -204,6 +208,7 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
     NVIC_InitStruct.NVIC_IRQChannel = irq_type;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
     NVIC_Init(&NVIC_InitStruct);
 }
 
@@ -242,11 +247,77 @@ void drv_uart5_set_rx_indicate(void (*rx_ind)(uint8_t ch))
     uart5_rx_indicate = rx_ind;
 }
 
+void uart4_allow_enter_dlps_timer_cb()
+{
+    uart4_enter_dlps_flag = true;
+}
 
+void uart4_allow_enter_dlps_timer_init()
+{
+    os_timer_create(&uart4_allow_enter_dlps_timer, "uart4_allow_enter_dlps_timer", 0, 10000, false,
+                    uart4_allow_enter_dlps_timer_cb);
+}
+
+static bool uart4_enter_dlps(void *drv_io)
+{
+    Pad_Config(SHELL_UART_TX, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE, PAD_OUT_LOW);
+    Pad_Config(SHELL_UART_RX, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
+    System_WakeUpPinEnable(SHELL_UART_RX, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+    return true;
+}
+
+static bool uart4_exit_dlps(void *drv_io)
+{
+    Pad_Config(SHELL_UART_TX, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE,
+               PAD_OUT_LOW);
+    Pad_Config(SHELL_UART_RX, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
+//    Pinmux_Config(uart_cfg->tx_pin, uart_cfg->tx_pin_func);
+//    Pinmux_Config(uart_cfg->rx_pin, uart_cfg->rx_pin_func);
+    NVIC_InitTypeDef NVIC_InitStruct;
+    NVIC_InitStruct.NVIC_IRQChannel = UART4_IRQn;
+    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
+    NVIC_Init(&NVIC_InitStruct);
+    return true;
+}
+
+static bool uart4_allowed_enter_dlps_check(void *drv_io)
+{
+    return uart4_enter_dlps_flag;
+}
+
+static bool uart4_system_wakeup_dlps_check(void *drv_io)
+{
+    if (System_WakeUpInterruptValue(SHELL_UART_RX) == SET)
+    {
+        Pad_ClearWakeupINTPendingBit(SHELL_UART_RX);
+        System_WakeUpPinDisable(SHELL_UART_RX);
+        DBG_DIRECT("Uart4 Wake up");
+        uart4_enter_dlps_flag = false;
+        os_timer_start(&uart4_allow_enter_dlps_timer);
+        return true;
+    }
+    return false;
+}
+
+void drv_uart4_dlps_init(void)
+{
+    uart4_enter_dlps_flag = true;
+    System_WakeUpPinEnable(SHELL_UART_RX, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+    drv_dlps_exit_cbacks_register("uart4", uart4_exit_dlps);
+    drv_dlps_enter_cbacks_register("uart4", uart4_enter_dlps);
+    drv_dlps_wakeup_cbacks_register("uart4", uart4_system_wakeup_dlps_check);
+    drv_dlps_check_cbacks_register("uart4", uart4_allowed_enter_dlps_check);
+    uart4_allow_enter_dlps_timer_init();
+}
 
 void hw_uart_init(void)
 {
-
+    drv_uart4_init(SHELL_UART_TX, SHELL_UART_RX);
+    extern void shell_user_func(uint8_t data);
+    drv_uart4_set_rx_indicate(shell_user_func);
+    drv_uart4_dlps_init();
 }
 
 

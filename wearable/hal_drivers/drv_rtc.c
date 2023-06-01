@@ -24,6 +24,16 @@ static drv_rtc_irq comp0_irq;
 static drv_rtc_irq comp1_irq;
 static bool drv_rtc_started = false;
 
+static bool rtc_system_wakeup_dlps_check(void *drv_io)
+{
+    struct rtl_rtc_config *rtc_cfg = drv_io;
+    if (HAL_READ32(SOC_VENDOR2_REG_BASE, 0x0058) == 0x80)
+    {
+        DBG_DIRECT("RTC Wake up");
+        return true;
+    }
+    return false;
+}
 
 void drv_rtc_init(void)
 {
@@ -38,6 +48,10 @@ void drv_rtc_init(void)
     RTC_SetPrescaler(0);//no div
     RTC_SystemWakeupConfig(ENABLE);
     drv_rtc_started = true;
+
+    drv_rtc_second_attach_irq(NULL, NULL);
+
+    drv_dlps_wakeup_cbacks_register("rtc", NULL, rtc_system_wakeup_dlps_check);
 }
 
 uint32_t drv_rtc_count(void)
@@ -107,9 +121,11 @@ void mcu_rtc_set_comp(bool start, time_t time_stamp)
 void RTC_Handler()
 {
     uint32_t CompareValue = 0;
-    APP_PRINT_INFO5("RTC->CR0 = 0x%x, RTC->INT_CLR = 0x%x, RTC->INT_SR = 0x%x, RTC->CNT = 0x%x, RTC->COMP0 = 0x%x",
-                    RTC->RTC_CR0, RTC->RTC_INT_CLEAR, RTC->RTC_INT_SR, RTC->RTC_CNT0, RTC->RTC_COMP_0);
+    DBG_DIRECT("RTC->CR0 = 0x%x, RTC->INT_CLR = 0x%x, RTC->INT_SR = 0x%x, RTC->CNT = 0x%x, RTC->COMP0 = 0x%x",
+               RTC->RTC_CR0, RTC->RTC_INT_CLEAR, RTC->RTC_INT_SR, RTC->RTC_CNT0, RTC->RTC_COMP_0);
 
+    DBG_DIRECT("refuse_reason 0x%x error_code 0x%x", platform_pm_get_refuse_reason(),
+               platform_pm_get_error_code());
     if (RTC_GetINTStatus(RTC_INT_COMP0) == SET)
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP0);
@@ -118,14 +134,20 @@ void RTC_Handler()
         uint32_t CompareValue;
         CompareValue = RTC_GetCompValue(RTC_COMP0) + (RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1));
         RTC_SetCompValue(RTC_COMP0, CompareValue & 0xFFFFFFFF);
-        comp0_irq.rtc_cb(comp0_irq.args);
+        if (comp0_irq.rtc_cb != NULL)
+        {
+            comp0_irq.rtc_cb(comp0_irq.args);
+        }
     }
     if (RTC_GetINTStatus(RTC_INT_COMP1) == SET)
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP1);
         RTC_ClearCompINT(RTC_COMP1);
         RTC_ClearWakeupStatusBit(RTC_WK_COMP1);
-        comp0_irq.rtc_cb(comp0_irq.args);
+        if (comp1_irq.rtc_cb != NULL)
+        {
+            comp1_irq.rtc_cb(comp1_irq.args);
+        }
     }
     if (RTC_GetINTStatus(RTC_INT_COMP2) == SET)
     {

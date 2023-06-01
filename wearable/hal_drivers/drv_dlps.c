@@ -42,7 +42,7 @@ static dlps_slist_t drv_dlps_wakeup_slist =
  * @return   void
  */
 RAM_FUNCTION
-static void System_Handler(void)
+void System_Handler(void)
 {
 #ifdef RTL8772F
     DBG_DIRECT("SYSTEM_HANDLER 0x%x", get_aon_wakeup_int());
@@ -74,7 +74,8 @@ RAM_FUNCTION
 static void app_enter_dlps_config(void)
 {
     DBG_DIRECT("DLPS ENTER");
-
+    extern void Pad_ClearAllWakeupINT(void);
+    Pad_ClearAllWakeupINT();
     dlps_slist_t *node;
     for (node = dlps_slist_first(&(drv_dlps_enter_slist)); node; node = dlps_slist_next(node))
     {
@@ -117,8 +118,11 @@ static PMCheckResult app_dlps_check_cb(void)
     for (node = dlps_slist_first(&(drv_dlps_check_slist)); node; node = dlps_slist_next(node))
     {
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
-        DBG_DIRECT("%s check fail! Module[%s]", __func__, p_item->name);
-        return p_item->dlps_cb();
+        //DBG_DIRECT("%s check fail! Module[%s]", __func__, p_item->name);
+        if (p_item->dlps_cb() == false)
+        {
+            return PM_CHECK_FAIL;
+        }
     }
 
     return PM_CHECK_PASS;
