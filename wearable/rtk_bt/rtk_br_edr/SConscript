@@ -10,20 +10,20 @@ objs = []
 # add the general drivers.
 src = Split("""
 """)
-if GetDepend(['RTK_BT_TASK']):
-    src += ['bt_gap_init.c']
-    src += ['bt_gap_cb.c']
-if GetDepend(['BT_PROFILE_SDP']):
+if GetDepend(['RTK_BR_TASK']):
+    src += ['br_gap_init.c']
+    src += ['br_gap_cb.c']
+if GetDepend(['BR_PROFILE_SDP']):
     src += ['app_sdp.c']
-if GetDepend(['BT_PROFILE_SPP']):
+if GetDepend(['BR_PROFILE_SPP']):
     src += ['app_spp.c']
-if GetDepend(['BT_PROFILE_A2DP']):
+if GetDepend(['BR_PROFILE_A2DP']):
     src += ['app_a2dp.c']
-if GetDepend(['BT_PROFILE_AVRCP']):
+if GetDepend(['BR_PROFILE_AVRCP']):
     src += ['app_avrcp.c']
-if GetDepend(['BT_PROFILE_PBAP']):
+if GetDepend(['BR_PROFILE_PBAP']):
     src += ['app_pbap.c']
-if GetDepend(['BT_PROFILE_HFP']):
+if GetDepend(['BR_PROFILE_HFP']):
     src += ['app_hfp.c']
 
 

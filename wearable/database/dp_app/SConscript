@@ -7,13 +7,15 @@ src = Split("""""")
 CPPPATH = [cwd]
 list = os.listdir(cwd)
 
-if GetDepend(['RTK_BT_TASK']):
+if GetDepend(['RTK_BR_TASK']) or GetDepend(['RTK_BLE_TASK']):
     src += ['dp_rtk_db.c']
     src += ['dp_app.c']
+if GetDepend(['RTK_BLE_TASK']):
     src += ['dp_ble_info.c']
+if GetDepend(['RTK_BR_TASK']):  
     src += ['dp_br_info.c']
     src += ['dp_mcu_cfg_const.c']
-    src += ['dp_mcu_cfg_rw.c']    
+    src += ['dp_mcu_cfg_rw.c']  
 if GetDepend(['TUYA_BLE_SDK']):
     src += ['dp_dataqueue.c']
     src += ['dp_notification.c']

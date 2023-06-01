@@ -6,7 +6,7 @@
 #include "trace.h"
 #include "gap.h"
 #include "gap_br.h"
-#include "bt_gap_cb.h"
+#include "br_gap_cb.h"
 #include "remote.h"
 #include "btm.h"
 #include "app_linkback.h"

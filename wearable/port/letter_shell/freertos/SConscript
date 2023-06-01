@@ -11,6 +11,6 @@ src += ['shell_port.c']
 
 CPPPATH = [cwd]
 
-group = DefineGroup('letter_shell', src, depend = ['WS_USING_LETTER_SHELL'], CPPPATH = CPPPATH)
+group = DefineGroup('letter_shell', src, depend = ['USING_LETTER_SHELL'], CPPPATH = CPPPATH)
 
 Return('group')

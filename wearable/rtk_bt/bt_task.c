@@ -27,7 +27,7 @@
 #include "trace.h"
 #include "ble_gap_init.h"
 #include "ble_profile_init.h"
-#include "bt_gap_init.h"
+#include "br_gap_init.h"
 #if (RTK_BT_TASK == 1)
 #include "btm.h"
 #include "sysm.h"
