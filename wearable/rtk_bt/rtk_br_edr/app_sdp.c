@@ -14,7 +14,7 @@
 #ifdef __RTTHREAD__
 #include "rtthread.h"
 #else
-#include "wristband_sdk_config.h"
+#include "menu_config.h"
 #endif
 
 
