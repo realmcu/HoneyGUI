@@ -12,8 +12,6 @@ extern "C" {
 
 #define EK9716_DRV_PIXEL_BITS                     24
 
-#define DMA_MULTIBLOCK                             1
-
 
 
 void EK9716_init(void);

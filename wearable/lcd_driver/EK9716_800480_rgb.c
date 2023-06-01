@@ -1,7 +1,6 @@
 #include "EK9716_800480_rgb.h"
-#include "rtl_edpi.h"
+#include "rtl_lcdc_edpi.h"
 #include "rtl_nvic.h"
-#include "rtl_spi.h"
 #include "rtl_pinmux.h"
 #include "rtl_gpio.h"
 #include "rtl_rcc.h"
@@ -10,17 +9,7 @@
 #include "string.h"
 #include "rtl_gdma.h"
 
-/**************************************
-NOTE:VCI=3.3V,IOVCC=1.8V,
-Display resolution:480*640
-params->vertical_sync_active=2
-params->vertical_backporch=10
-params->vertical_frontporch=8
-params->horizontal_sync_active=2
-params->horizontal_backporch=10
-params->horizontal_frontporch=8
-params->RGB.PLL_CLOCK=(19.8)
-**************************************/
+
 
 #define LCDC_DATA23         P5_0
 #define LCDC_DATA22         P5_1
@@ -69,40 +58,19 @@ params->RGB.PLL_CLOCK=(19.8)
 #define TRANSFER_DMA_CHANNEL_NUM              0
 #define TRANSFER_DMA_CHANNEL_INDEX            GDMA_Channel0
 
-static void *internal_frame_buffer1, *internal_frame_buffer2;
-static bool using_frame_buffer1 = true;
-static uint32_t pfb_probe = 0;
 
-static void write_command(uint32_t cmd)
-{
-//    GPIO_WriteBit(GPIO_GetPort(SPI0_CS_PIN), GPIO_GetPin(SPI0_CS_PIN), (BitAction)(0));
-    platform_delay_us(200);
-    SPI_SendData(SPI0, cmd);
-//    platform_delay_us(2);
-//    GPIO_WriteBit(GPIO_GetPort(SPI0_CS_PIN), GPIO_GetPin(SPI0_CS_PIN), (BitAction)(1));
-}
-static void write_data(uint32_t data)
-{
-    uint32_t send = (data | 0x100);
-//    GPIO_WriteBit(GPIOB, GPIO_GetPin(SPI0_CS_PIN), (BitAction)(0));
-//    platform_delay_us(50);
-    SPI_SendData(SPI0, send);
-//    platform_delay_us(2);
-//    GPIO_WriteBit(GPIOB, GPIO_GetPin(SPI0_CS_PIN), (BitAction)(1));
-}
-
-static void EK9716_reset_high(void)
+static void st7701s_reset_high(void)
 {
     GPIO_WriteBit(GPIO_GetPort(LCDC_RESET), GPIO_GetPin(LCDC_RESET), 1);
 }
 
-static void EK9716_reset_low(void)
+static void st7701s_reset_low(void)
 {
     GPIO_WriteBit(GPIO_GetPort(LCDC_RESET), GPIO_GetPin(LCDC_RESET), 0);
 }
 
 //--------------------initial code-----------------------------------------//
-static void EK9716_gpio_init(void)
+static void st7701s_gpio_init(void)
 {
     Pad_Config(LCDC_RESET, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
 
@@ -118,42 +86,12 @@ static void EK9716_gpio_init(void)
     GPIO_InitStruct.GPIO_Mode   = GPIO_MODE_OUT;
     GPIO_InitStruct.GPIO_ITCmd  = DISABLE;
     GPIO_Init(GPIO_GetPort(LCDC_RESET), &GPIO_InitStruct);
-    EK9716_reset_high();
+    st7701s_reset_high();
 }
 
-static void EK9716_spi_init(void)
+
+static void st7701s_dma_init(uint8_t *init_buffer)
 {
-    Pad_Config(SPI0_MOSI_PIN, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
-    Pad_Config(SPI0_SCK_PIN, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
-    Pad_Config(SPI0_CS_PIN, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
-
-    Pinmux_Deinit(SPI0_MOSI_PIN);
-    Pinmux_Deinit(SPI0_SCK_PIN);
-    Pinmux_Deinit(SPI0_CS_PIN);
-
-    Pinmux_Config(SPI0_CS_PIN, SPI0_CSN_0_MASTER);
-    Pinmux_Config(SPI0_SCK_PIN, SPI0_CLK_MASTER);
-    Pinmux_Config(SPI0_MOSI_PIN, SPI0_MO_MASTER);
-
-    RCC_PeriphClockCmd(APBPeriph_SPI0, APBPeriph_SPI0_CLOCK, ENABLE);
-
-    SPI_InitTypeDef spi_init_struct;
-    SPI_StructInit(&spi_init_struct);
-    spi_init_struct.SPI_CPOL = SPI_CPOL_Low;
-    spi_init_struct.SPI_CPHA = SPI_CPHA_1Edge;
-    spi_init_struct.SPI_Direction = SPI_Direction_TxOnly;
-    spi_init_struct.SPI_DataSize = SPI_DataSize_9b;
-    spi_init_struct.SPI_BaudRatePrescaler = 64;
-    spi_init_struct.SPI_FrameFormat = SPI_Frame_Motorola;
-    SPI_Init(SPI0, &spi_init_struct);
-
-    SPI_Cmd(SPI0, ENABLE);
-
-}
-
-static void EK9716_dma_init(void)
-{
-#if DMA_MULTIBLOCK
     LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
     LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
     LCDC_DMA_InitStruct.LCDC_DMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
@@ -176,32 +114,19 @@ static void EK9716_dma_init(void)
     LCDC_SET_GROUP2_BLOCKSIZE(EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
 
     LCDC_DMALLI_InitTypeDef LCDC_DMA_LLI_Init = {0};
-    LCDC_DMA_LLI_Init.g1_source_addr = (uint32_t)internal_frame_buffer1;
-    LCDC_DMA_LLI_Init.g1_sar_offset = EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8 * 2;
 
-    LCDC_DMA_LLI_Init.g2_source_addr = (uint32_t)((uint32_t)internal_frame_buffer1 +
-                                                  EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
+    LCDC_DMA_LLI_Init.g1_source_addr = (uint32_t)init_buffer;
+    LCDC_DMA_LLI_Init.g2_source_addr = (uint32_t)((uint32_t)init_buffer + EK9716_800480_LCD_WIDTH *
+                                                  EK9716_DRV_PIXEL_BITS / 8);
+    LCDC_DMA_LLI_Init.g1_sar_offset = EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8 * 2;
     LCDC_DMA_LLI_Init.g2_sar_offset = EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8 * 2;
-    LCDC_DMA_Infinite_Buf_Update((uint8_t *)internal_frame_buffer1,
-                                 (uint8_t *)internal_frame_buffer1 + EK9716_800480_LCD_WIDTH *
+
+    LCDC_DMA_Infinite_Buf_Update((uint8_t *)init_buffer,
+                                 (uint8_t *)init_buffer + EK9716_800480_LCD_WIDTH *
                                  EK9716_DRV_PIXEL_BITS / 8);
     LCDC_DMA_LinkList_Init(&LCDC_DMA_LLI_Init,
                            &LCDC_DMA_InitStruct);//LLI_TRANSFER or LLI_WITH_CONTIGUOUS_SAR
-#else
-    LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
-    LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
-    LCDC_DMA_InitStruct.LCDC_DMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
-    LCDC_DMA_InitStruct.LCDC_DMA_DIR                 = DMA_DIR_PeripheralToMemory;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceInc           = DMA_SourceInc_Inc;
-    LCDC_DMA_InitStruct.LCDC_DMA_DestinationInc      = DMA_DestinationInc_Fix;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceDataSize      = DMA_DataSize_Word;
-    LCDC_DMA_InitStruct.LCDC_DMA_DestinationDataSize = DMA_DataSize_Word;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = DMA_Msize_8;
-    LCDC_DMA_InitStruct.LCDC_DMA_DestinationMsize    = DMA_Msize_8;
-    LCDC_DMA_InitStruct.LCDC_DMA_SourceAddr          = 0x00500000;
-    LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_En      = 0;
-    LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
-#endif
+
     LCDC_ClearDmaFifo();
     LCDC_ClearTxPixelCnt();
 
@@ -214,19 +139,32 @@ static void EK9716_dma_init(void)
     LCDC_Cmd(ENABLE);
 
 
-    LCDC_DMA_SetSourceAddress(LCDC_DMA_CHANNEL_INDEX, (uint32_t)internal_frame_buffer1);
+    LCDC_DMA_SetSourceAddress(LCDC_DMA_CHANNEL_INDEX, (uint32_t)init_buffer);
 
-#if DMA_MULTIBLOCK
     LCDC_DMA_MultiBlockCmd(ENABLE);
-#endif
+
     LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
 
     LCDC_DmaCmd(ENABLE);
     LCDC_AutoWriteCmd(ENABLE);
 }
 
-void rtk_lcd_hal_init(void)
+
+static void lcd_pad_and_clk_init(void)
 {
+    RCC_PeriphClockCmd(APBPeriph_DISP, APBPeriph_DISP_CLOCK, ENABLE);
+
+    //from XTAL SOURCE = 40M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_ck_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_func_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_mux_clk_cg_en = 1;
+
+    //From PLL1, SOURCE = 125M
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_en = 1;
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 0; //pll1_peri(0) or pll2(1, pll2 = 160M)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel1 = 1; //pll(1) or xtal(0)
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_sel = 1; //div
+
     Pad_Config(LCDC_DATA0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
@@ -289,9 +227,14 @@ void rtk_lcd_hal_init(void)
     Pad_Dedicated_Config(LCDC_VSYNC, ENABLE);
     Pad_Dedicated_Config(LCDC_CSN_DE, ENABLE);
 
-    EK9716_gpio_init();
+    st7701s_gpio_init();
     platform_delay_ms(1);
-    EK9716_spi_init();
+}
+
+void rtk_lcd_hal_init(void)
+{
+
+    lcd_pad_and_clk_init();
 
     LCDC_InitTypeDef lcdc_init = {0};
     lcdc_init.LCDC_Interface = LCDC_IF_DPI;
@@ -305,26 +248,6 @@ void rtk_lcd_hal_init(void)
     lcdc_init.LCDC_InfiniteModeEn = 1;
     LCDC_Init(&lcdc_init);
 
-    internal_frame_buffer1 = (uint32_t *)SPIC1_ADDR;
-    internal_frame_buffer2 = (uint32_t *)(SPIC1_ADDR + EK9716_800480_LCD_WIDTH *
-                                          EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
-    memset(internal_frame_buffer1, 0x88,
-           EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
-    memset(internal_frame_buffer2, 0xFF,
-           EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
-
-#if !DMA_MULTIBLOCK
-    LCDC_MaskINTConfig(LCDC_MASK_TX_AUTO_DONE_INT_MSK, DISABLE);
-    LCDC_ClearINTPendingBit(LCDC_CLR_TX_AUTO_DONE_INT_CLR_MSK);
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = Display_IRQn;
-    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStruct);
-#endif
-//    DBG_DIRECT("LCDC_HANDLER->DMA_FIFO_IMR = 0x%x\n", LCDC_HANDLER->DMA_FIFO_IMR);
-//    DBG_DIRECT("LCDC_HANDLER->DMA_FIFO_SR = 0x%x\n", LCDC_HANDLER->DMA_FIFO_SR);
-//    DBG_DIRECT("LCDC_HANDLER->DMA_FIFO_ICR = 0x%x\n", LCDC_HANDLER->DMA_FIFO_ICR);
 
     uint32_t HSA = 8, HFP = 10, HBP = 50, HACT = EK9716_800480_LCD_WIDTH;
     uint32_t VSA = 8, VFP = 10, VBP = 20, VACT = EK9716_800480_LCD_HEIGHT;
@@ -344,9 +267,6 @@ void rtk_lcd_hal_init(void)
     eDPICfg.eDPI_VeriSyncPolarity = 0;
     eDPICfg.eDPI_DataEnPolarity = 1;
     eDPICfg.eDPI_LineIntMask = 1;
-    //eDPICfg.eDPI_LineIntFlag = 0;
-    //eDPICfg.eDPI_LineIntClr = 0;
-    //eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB888;//for RGB888
     eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB565_2;//for RGB888
     eDPICfg.eDPI_OperateMode = 0;//video mode
     eDPICfg.eDPI_LcdArc = 0;
@@ -358,118 +278,66 @@ void rtk_lcd_hal_init(void)
     eDPICfg.eDPI_TearReq = 0;
     eDPICfg.eDPI_Halt = 0;
     eDPICfg.eDPI_CmdMaxLatency = 0;//todo
-    //eDPICfg.eDPI_LineBufferPixelNum = eDPICfg.eDPI_TotalWidth * 4;
     eDPICfg.eDPI_LineBufferPixelThreshold = eDPICfg.eDPI_TotalWidth / 2;
 
     EDPI_Init(&eDPICfg);
 
-    EK9716_reset_high();
+    st7701s_reset_high();
     platform_delay_ms(4);
-    EK9716_reset_low();
+    st7701s_reset_low();
     platform_delay_ms(30);
-    EK9716_reset_high();
+    st7701s_reset_high();
     platform_delay_ms(120);
-//*******************************/
-#include "EK9716_rgb.txt"
-
-    EK9716_dma_init();
+    //*******************************/
 }
+
+
+
+static bool flush_first = true;
 
 void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
-    if (using_frame_buffer1)
+    if (flush_first == true)
     {
-        using_frame_buffer1 = false;
-        LCDC_DMA_Infinite_Buf_Update(internal_frame_buffer2,
-                                     (uint32_t)internal_frame_buffer2 + EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
+        st7701s_dma_init(buf);
+        flush_first = false;
     }
     else
     {
-        using_frame_buffer1 = true;
-        LCDC_DMA_Infinite_Buf_Update(internal_frame_buffer1,
-                                     (uint32_t)internal_frame_buffer1 + EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
+        LCDC_DMA_Infinite_Buf_Update(buf,
+                                     (uint32_t)buf + EK9716_800480_LCD_WIDTH * EK9716_DRV_PIXEL_BITS / 8);
     }
-    pfb_probe = 0;
 }
 
 
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
 {
-    assert_param((uint32_t)buf % 4 == 0);
-    uint8_t *dst = NULL;
-    if (using_frame_buffer1)
-    {
-        dst = (uint8_t *)((uint32_t)internal_frame_buffer2 + pfb_probe * EK9716_800480_LCD_WIDTH *
-                          EK9716_DRV_PIXEL_BITS / 8);
-    }
-    else
-    {
-        dst = (uint8_t *)((uint32_t)internal_frame_buffer1 + pfb_probe * EK9716_800480_LCD_WIDTH *
-                          EK9716_DRV_PIXEL_BITS / 8);
-    }
-    RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
-    GDMA_InitTypeDef GDMA_InitStruct;
-    GDMA_StructInit(&GDMA_InitStruct);
-    GDMA_InitStruct.GDMA_ChannelNum = 0;
-    GDMA_InitStruct.GDMA_DIR = GDMA_DIR_MemoryToMemory;
-    GDMA_InitStruct.GDMA_BufferSize = len * EK9716_DRV_PIXEL_BITS / 8 / 4;
-    GDMA_InitStruct.GDMA_SourceInc = DMA_SourceInc_Inc;
-    GDMA_InitStruct.GDMA_DestinationInc = DMA_DestinationInc_Inc;
-    GDMA_InitStruct.GDMA_SourceDataSize = GDMA_DataSize_Word;
-    GDMA_InitStruct.GDMA_DestinationDataSize = GDMA_DataSize_Word;
-    GDMA_InitStruct.GDMA_SourceMsize = GDMA_Msize_16;
-    GDMA_InitStruct.GDMA_DestinationMsize = GDMA_Msize_16;
-    GDMA_InitStruct.GDMA_SourceAddr = (uint32_t)buf;
-    GDMA_InitStruct.GDMA_DestinationAddr = (uint32_t)dst;
-    GDMA_Init(TRANSFER_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
-    GDMA_INTConfig(TRANSFER_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
-    GDMA_Cmd(TRANSFER_DMA_CHANNEL_NUM, ENABLE);
+    return;//todo by howie
 }
 
 void rtk_lcd_hal_transfer_done(void)
 {
-    while (GDMA_GetTransferINTStatus(TRANSFER_DMA_CHANNEL_NUM) != SET);
-    GDMA_ClearINTPendingBit(TRANSFER_DMA_CHANNEL_NUM, GDMA_INT_Transfer);
+    return;//todo by howie
 }
 
 void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h)
 {
-    pfb_probe = yStart;
+    return;//todo by howie
 }
 
-#if !DMA_MULTIBLOCK
-void Display_Handler(void)
+uint32_t rtk_lcd_hal_get_width(void)
 {
-    if (LCDC_GetINTStatus(LCDC_INT_STATUS_TX_AUTO_DONE) == SET)
-    {
-        LCDC_ClearINTPendingBit(LCDC_CLR_TX_AUTO_DONE_INT_CLR_MSK);
-//        DBG_DIRECT("LCDC_IRQHandler line = %d\n",__LINE__);
-
-        LCDC_SwitchMode(LCDC_AUTO_MODE);
-        LCDC_SwitchDirect(LCDC_TX_MODE);
-        LCDC_DMA_SetSourceAddress(LCDC_DMA_CHANNEL_INDEX, (uint32_t)framebuffer);
-        LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
-        LCDC_DmaCmd(ENABLE);
-        LCDC_AutoWriteCmd(ENABLE);
-    }
-}
-#endif
-
-
-//*******************************************
-void EnterSleep(void)
-{
-    write_command(0x28);
-    platform_delay_ms(10);
-    write_command(0x10);
+    return EK9716_800480_LCD_WIDTH;
 }
 
-//*********************************************************
-void ExitSleep(void)
+uint32_t rtk_lcd_hal_get_height(void)
 {
-    write_command(0x11);
-    platform_delay_ms(120);
-    write_command(0x29);
+    return EK9716_800480_LCD_HEIGHT;
+}
+
+uint32_t rtk_lcd_hal_get_pixel_bits(void)
+{
+    return EK9716_DRV_PIXEL_BITS;
 }
 
 
