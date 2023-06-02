@@ -10,9 +10,9 @@ CPPPATH = [cwd]
 CPPDEFINES = ['DEFINE_RTK_BT_TODO']
 
 
-if GetDepend(['RTK_BR_TASK']) or GetDepend(['RTK_BLE_TASK']):
+if GetDepend(['USING_BR_TASK']) or GetDepend(['USING_BLE_TASK']):
     src += ['bt_task.c']
-if GetDepend(['RTK_BR_TASK']):
+if GetDepend(['USING_BR_TASK']):
     src += ['app_bond.c']
     src += ['app_cfg.c']
     src += ['mcu_cfg.c']
@@ -20,11 +20,13 @@ if GetDepend(['RTK_BR_TASK']):
     src += ['app_transfer.c']
     src += ['app_link_util.c']
     src += ['app_br_api.c']
-
-
+    CPPDEFINES += ['RTK_BR_TASK']
+if GetDepend(['USING_BLE_TASK']):
+    CPPDEFINES += ['RTK_BLE_TASK']
+    
 group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-if GetDepend(['RTK_BR_TASK']) or GetDepend(['RTK_BLE_TASK']):
+if GetDepend(['USING_BR_TASK']) or GetDepend(['USING_BLE_TASK']):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):

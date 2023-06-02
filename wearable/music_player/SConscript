@@ -7,15 +7,16 @@ cwd = GetCurrentDir()
 # add the general drivers.
 src = Split("""
 """)
-
+CPPDEFINES = []
 if GetDepend(['MODULE_LOCAL_PLAYBACK']):
     src += ['app_playback.c']
     src += ['mp3_player.c']
     src += ['mp3_parser.c']
+    CPPDEFINES += ['RTK_MODULE_LOCAL_PLAYBACK']
 
 CPPPATH = [cwd]
 
-group = DefineGroup('musicplayer', src, depend = [''], CPPPATH = CPPPATH)
+group = DefineGroup('musicplayer', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 
 Return('group')

@@ -9,7 +9,7 @@ src     = Glob('*.c')
 CPPPATH = [cwd]
 list = os.listdir(cwd)
 
-CPPDEFINES = ['MODULE_USING_DATABASE']
+CPPDEFINES = ['RTK_MODULE_USING_DATABASE']
 
 group = DefineGroup('database', src, depend = ['MODULE_USING_DATABASE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 

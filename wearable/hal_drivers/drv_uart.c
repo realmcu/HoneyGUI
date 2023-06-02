@@ -100,7 +100,11 @@ void UART3_Handler(void)
 }
 void UART4_Handler(void)
 {
+#ifdef RTK_RT_USING_CONSOLE
+    UART4_RT_Handler();
+#else
     uart_isr(uart4_rx_indicate, UART4);
+#endif
 }
 void UART5_Handler(void)
 {
@@ -314,10 +318,14 @@ void drv_uart4_dlps_init(void)
 
 void hw_uart_init(void)
 {
+#ifdef __RTTHREAD__
+
+#else
     drv_uart4_init(SHELL_UART_TX, SHELL_UART_RX);
     extern void shell_user_func(uint8_t data);
     drv_uart4_set_rx_indicate(shell_user_func);
     drv_uart4_dlps_init();
+#endif
 }
 
 
