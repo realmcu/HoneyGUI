@@ -46,11 +46,8 @@
 #define GPD2                P9_0
 #define GPD3                P2_6
 
-#define LCDC_RESET          GPD2
+#define LCDC_RESET          P2_2
 
-#define SPI0_SCK_PIN                               GPD0
-#define SPI0_MOSI_PIN                              P3_6
-#define SPI0_CS_PIN                                GPD3
 
 #define LCDC_DMA_CHANNEL_NUM              0
 #define LCDC_DMA_CHANNEL_INDEX            LCDC_DMA_Channel0
@@ -59,18 +56,18 @@
 #define TRANSFER_DMA_CHANNEL_INDEX            GDMA_Channel0
 
 
-static void st7701s_reset_high(void)
+static void ek9716_reset_high(void)
 {
     GPIO_WriteBit(GPIO_GetPort(LCDC_RESET), GPIO_GetPin(LCDC_RESET), 1);
 }
 
-static void st7701s_reset_low(void)
+static void ek9716_reset_low(void)
 {
     GPIO_WriteBit(GPIO_GetPort(LCDC_RESET), GPIO_GetPin(LCDC_RESET), 0);
 }
 
 //--------------------initial code-----------------------------------------//
-static void st7701s_gpio_init(void)
+static void ek9716_gpio_init(void)
 {
     Pad_Config(LCDC_RESET, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
 
@@ -86,11 +83,11 @@ static void st7701s_gpio_init(void)
     GPIO_InitStruct.GPIO_Mode   = GPIO_MODE_OUT;
     GPIO_InitStruct.GPIO_ITCmd  = DISABLE;
     GPIO_Init(GPIO_GetPort(LCDC_RESET), &GPIO_InitStruct);
-    st7701s_reset_high();
+    ek9716_reset_high();
 }
 
 
-static void st7701s_dma_init(uint8_t *init_buffer)
+static void ek9716_dma_init(uint8_t *init_buffer)
 {
     LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
     LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
@@ -134,7 +131,7 @@ static void st7701s_dma_init(uint8_t *init_buffer)
     LCDC_SwitchDirect(LCDC_TX_MODE);
 
 
-    LCDC_SetTxPixelLen(EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_WIDTH);
+    LCDC_SetTxPixelLen(EK9716_800480_LCD_WIDTH * EK9716_800480_LCD_HEIGHT);
 
     LCDC_Cmd(ENABLE);
 
@@ -159,11 +156,11 @@ static void lcd_pad_and_clk_init(void)
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.disp_func_en = 1;
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_mux_clk_cg_en = 1;
 
-    //From PLL1, SOURCE = 125M
+    //From PLL1, SOURCE = 100M
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_en = 1;
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel0 = 0; //pll1_peri(0) or pll2(1, pll2 = 160M)
     PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_clk_src_sel1 = 1; //pll(1) or xtal(0)
-    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_sel = 1; //div
+    PERIBLKCTRL_PERI_CLK->u_324.BITS_324.r_disp_div_sel = 0; //div
 
     Pad_Config(LCDC_DATA0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_DATA1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
@@ -196,6 +193,9 @@ static void lcd_pad_and_clk_init(void)
     Pad_Config(LCDC_VSYNC, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Config(LCDC_CSN_DE, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
 
+    //Pad_Config(P2_3, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);//HV
+    //Pad_Config(P2_3, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);//DE
+
     extern void Pad_Dedicated_Config(uint8_t Pin_Num, FunctionalState Status);
     Pad_Dedicated_Config(LCDC_DATA0, ENABLE);
     Pad_Dedicated_Config(LCDC_DATA1, ENABLE);
@@ -227,7 +227,7 @@ static void lcd_pad_and_clk_init(void)
     Pad_Dedicated_Config(LCDC_VSYNC, ENABLE);
     Pad_Dedicated_Config(LCDC_CSN_DE, ENABLE);
 
-    st7701s_gpio_init();
+    ek9716_gpio_init();
     platform_delay_ms(1);
 }
 
@@ -252,8 +252,9 @@ void rtk_lcd_hal_init(void)
     uint32_t HSA = 48, HFP = 40, HBP = 40, HACT = EK9716_800480_LCD_WIDTH;
     uint32_t VSA = 1, VFP = 13, VBP = 31, VACT = EK9716_800480_LCD_HEIGHT;
 
+
     LCDC_eDPICfgTypeDef eDPICfg;//480*640  ---->   500 * 660
-    eDPICfg.eDPI_ClockDiv = 0x2;
+    eDPICfg.eDPI_ClockDiv = 4;
 
     eDPICfg.eDPI_HoriSyncWidth = HSA;
     eDPICfg.eDPI_VeriSyncHeight = VSA;
@@ -267,7 +268,7 @@ void rtk_lcd_hal_init(void)
     eDPICfg.eDPI_VeriSyncPolarity = 0;
     eDPICfg.eDPI_DataEnPolarity = 1;
     eDPICfg.eDPI_LineIntMask = 1;
-    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB565_2;//for RGB888
+    eDPICfg.eDPI_ColorMap = EDPI_PIXELFORMAT_RGB888;//for RGB888
     eDPICfg.eDPI_OperateMode = 0;//video mode
     eDPICfg.eDPI_LcdArc = 0;
     eDPICfg.eDPI_ShutdnPolarity = 0;
@@ -282,12 +283,24 @@ void rtk_lcd_hal_init(void)
 
     EDPI_Init(&eDPICfg);
 
-    st7701s_reset_high();
-    platform_delay_ms(4);
-    st7701s_reset_low();
-    platform_delay_ms(30);
-    st7701s_reset_high();
-    platform_delay_ms(120);
+//    EDPI_RGB_COMPATIBLE_t edpi_reg_0x58 = {.d32 = EDPI->EDPI_RGB_COMPATIBLE};
+//    edpi_reg_0x58.b.hsync_constant = EDPI_HSYNC_CONSTANT_HIGH;
+//    edpi_reg_0x58.b.vsync_constant = EDPI_VSYNC_CONSTANT_HIGH;
+//    edpi_reg_0x58.b.de_constant = EDPI_DE_CONSTANT_NONE;
+//    EDPI->EDPI_RGB_COMPATIBLE = edpi_reg_0x58.d32;
+
+//    EDPI_RGB_COMPATIBLE_t edpi_reg_0x58 = {.d32 = EDPI->EDPI_RGB_COMPATIBLE};
+//    edpi_reg_0x58.b.hsync_constant = EDPI_HSYNC_CONSTANT_NONE;
+//    edpi_reg_0x58.b.vsync_constant = EDPI_VSYNC_CONSTANT_NONE;
+//    edpi_reg_0x58.b.de_constant = EDPI_DE_CONSTANT_LOW;
+//    EDPI->EDPI_RGB_COMPATIBLE = edpi_reg_0x58.d32;
+
+    ek9716_reset_high();
+    platform_delay_ms(200);
+    ek9716_reset_low();
+    platform_delay_ms(200);
+    ek9716_reset_high();
+    platform_delay_ms(200);
     //*******************************/
 
     uint8_t *pixel = (uint8_t *)SPIC1_ADDR;
@@ -311,7 +324,7 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len)
 {
     if (flush_first == true)
     {
-        st7701s_dma_init(buf);
+        ek9716_dma_init(buf);
         flush_first = false;
     }
     else

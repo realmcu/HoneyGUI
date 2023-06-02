@@ -188,7 +188,7 @@ static void st7701s_dma_init(uint8_t *init_buffer)
     LCDC_SwitchDirect(LCDC_TX_MODE);
 
 
-    LCDC_SetTxPixelLen(ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_WIDTH);
+    LCDC_SetTxPixelLen(ST7701S_480480_LCD_WIDTH * ST7701S_480480_LCD_HEIGHT);
 
     LCDC_Cmd(ENABLE);
 

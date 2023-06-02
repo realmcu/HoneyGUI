@@ -13,11 +13,6 @@ extern "C" {
 #define EK9716_DRV_PIXEL_BITS                     24
 
 
-
-void EK9716_init(void);
-void lcd_EK9716_init_framebuffer(uint8_t *buf, uint32_t len);
-void lcd_EK9716_update_framebuffer(uint8_t *buf, uint32_t len);
-
 void rtk_lcd_hal_init(void);
 void rtk_lcd_hal_update_framebuffer(uint8_t *p_buf, uint32_t size);
 void rtk_lcd_hal_set_window(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_t h);
