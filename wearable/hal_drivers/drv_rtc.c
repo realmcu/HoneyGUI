@@ -13,6 +13,7 @@
 #include "rtl_nvic.h"
 #include "trace.h"
 #include "drv_rtc.h"
+#include "patch_header_check.h"
 
 #define RTC_SRC_FREQ            32000
 #define RTC_PRESCALER_VAL       0
@@ -27,11 +28,16 @@ static bool drv_rtc_started = false;
 static bool rtc_system_wakeup_dlps_check(void *drv_io)
 {
     struct rtl_rtc_config *rtc_cfg = drv_io;
+#if (IMG_IC_TYPE == 0xF)
+#endif
+#if (IMG_IC_TYPE == 0xE)
     if (HAL_READ32(SOC_VENDOR2_REG_BASE, 0x0058) == 0x80)
     {
         DBG_DIRECT("RTC Wake up");
         return true;
     }
+#endif
+
     return false;
 }
 
