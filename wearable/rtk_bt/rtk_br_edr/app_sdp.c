@@ -1107,22 +1107,28 @@ void app_sdp_init(void)
         bt_sdp_record_add((void *)avp3_sdp_record);
     }
 
-
+#ifdef RTK_BR_PROFILE_A2DP
     bt_sdp_record_add((void *)a2dp_source_sdp_record);
-
+#endif
+#ifdef RTK_BR_PROFILE_AVRCP
     bt_sdp_record_add((void *)avrcp_ct_sdp_record);
     bt_sdp_record_add((void *)avrcp_tg_sdp_record);
-
+#endif
+#ifdef RTK_BR_PROFILE_HFP
     bt_sdp_record_add((void *)hfp_sdp_record);
-
+#endif
+#ifdef RTK_BR_PROFILE_HSP
     bt_sdp_record_add((void *)hsp_sdp_record);
-
+#endif
+#ifdef RTK_BR_PROFILE_SPP
     bt_sdp_record_add((void *)spp_sdp_record);
-
+#endif
+#ifdef RTK_BR_PROFILE_IAP
     bt_sdp_record_add((void *)iap_sdp_record);
-
+#endif
+#ifdef RTK_BR_PROFILE_PBAP
     bt_sdp_record_add((void *)pbap_pce_sdp_record);
-
+#endif
 
 }
 

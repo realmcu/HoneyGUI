@@ -10,25 +10,32 @@ objs = []
 # add the general drivers.
 src = Split("""
 """)
-if GetDepend(['RTK_BR_TASK']):
+CPPDEFINES = []
+if GetDepend(['USING_BR_TASK']):
     src += ['br_gap_init.c']
     src += ['br_gap_cb.c']
 if GetDepend(['BR_PROFILE_SDP']):
     src += ['app_sdp.c']
+    CPPDEFINES += ['RTK_BR_PROFILE_SDP']
 if GetDepend(['BR_PROFILE_SPP']):
     src += ['app_spp.c']
+    CPPDEFINES += ['RTK_BR_PROFILE_SPP']
 if GetDepend(['BR_PROFILE_A2DP']):
     src += ['app_a2dp.c']
+    CPPDEFINES += ['RTK_BR_PROFILE_A2DP']
 if GetDepend(['BR_PROFILE_AVRCP']):
     src += ['app_avrcp.c']
+    CPPDEFINES += ['RTK_BR_PROFILE_AVRCP']
 if GetDepend(['BR_PROFILE_PBAP']):
     src += ['app_pbap.c']
+    CPPDEFINES += ['RTK_BR_PROFILE_PBAP']
 if GetDepend(['BR_PROFILE_HFP']):
     src += ['app_hfp.c']
+    CPPDEFINES += ['RTK_BR_PROFILE_HFP']
 
 
 CPPPATH = [cwd]
-CPPDEFINES = ['DEFINE_RTK_BT_TODO']
+CPPDEFINES += ['DEFINE_RTK_BT_TODO']
 libs = ['']
 libpath = [SDK_ROOT + '/bin/mdk']
 libs += ['gap_utils']

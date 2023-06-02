@@ -13,7 +13,7 @@
 #include "flash_nor_device.h"
 #include "trace.h"
 #include "string.h"
-#ifdef MODULE_USING_DATABASE
+#ifdef RTK_MODULE_USING_DATABASE
 #include "fal.h"
 #endif
 /**
@@ -138,7 +138,7 @@ int realtek_flash_erase(uint32_t addr, size_t size)
 }
 
 
-#ifdef MODULE_USING_DATABASE
+#ifdef RTK_MODULE_USING_DATABASE
 static int fal_flash_read(long offset, uint8_t *buf, size_t size);
 static int fal_flash_write(long offset, const uint8_t *buf, size_t size);
 static int fal_flash_erase(long offset, size_t size);

@@ -10,7 +10,7 @@ src = Split("""
 src += ['drv_dlps.c']
 src += ['drv_flash.c']
 
-CPPDEFINES = ['BSP_HAL_DRIVER']
+CPPDEFINES = ['RTK_HAL_DRIVER']
 
 if GetDepend(['BSP_USING_SPI']):
     src += ['drv_spi.c']
@@ -29,7 +29,7 @@ if GetDepend(['RT_USING_DAC']):
 
 if GetDepend('BSP_USING_LCD'):
     src += ['drv_lcd.c']
-    CPPDEFINES += ['BSP_USING_LCD']
+    CPPDEFINES += ['RTK_USING_LCD']
 
 if GetDepend('MODULE_VG_LITE'):
     src += ['drv_gpu.c']
@@ -48,7 +48,7 @@ if GetDepend(['BSP_USING_TOUCH']) or GetDepend(['BSP_USING_GPIO']):
     
 if GetDepend(['BSP_USING_TOUCH']):    
     src += ['drv_touch.c']
-    CPPDEFINES += ['BSP_USING_TOUCH']
+    CPPDEFINES += ['RTK_USING_TOUCH']
 
 if GetDepend(['BSP_USING_ONCHIP_RTC']):
     src += ['drv_rtc.c'] 

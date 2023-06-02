@@ -10,7 +10,7 @@ objs = []
 src = Split("""
 """)
 
-if GetDepend(['RTK_BLE_TASK']):
+if GetDepend(['USING_BLE_TASK']):
     src += ['ble_gap_msg.c']
     src += ['ble_profile_init.c']
     src += ['ble_gap_init.c']
