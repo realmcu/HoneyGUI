@@ -3,7 +3,7 @@
 #include <gui_matrix.h>
 #include "acc_engine.h"
 
-#ifdef MODULE_VG_LITE
+#ifdef RTK_MODULE_VG_LITE
 #elif defined (MODULE_RTK_PPE)
 #include "rtl_rcc.h"
 #else
@@ -39,7 +39,7 @@ static struct acc_engine acc = {0};
 
 void gui_acc_init(void)
 {
-#ifdef MODULE_VG_LITE
+#ifdef RTK_MODULE_VG_LITE
     acc.blit = hw_acc_blit;
     acc.draw_circle = hw_draw_circle;
     acc.draw_rectangle = hw_draw_rectangle;

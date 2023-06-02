@@ -10,7 +10,7 @@
 #include <gui_obj.h>
 #include <gui_magic_img.h>
 #include <tp_algo.h>
-#ifdef MODULE_VG_LITE
+#ifdef RTK_MODULE_VG_LITE
 #include "gui_vg_lite_clock.h"
 #endif
 
@@ -282,7 +282,7 @@ static void deal_img_in_root(gui_obj_t *object, float xx, float yy)
                     }
                 }
                 break;
-#ifdef MODULE_VG_LITE
+#ifdef RTK_MODULE_VG_LITE
             case VG_LITE_CLOCK:
                 {
                     gui_vg_lite_clock_t *vg_lite_clock = (gui_vg_lite_clock_t *)obj;

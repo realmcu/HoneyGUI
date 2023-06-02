@@ -17,7 +17,7 @@
 #include <gui_dynamic_img.h>
 #include "tp_algo.h"
 #include <math.h>
-#ifdef MODULE_VG_LITE
+#ifdef RTK_MODULE_VG_LITE
 #include "gui_vg_lite_clock.h"
 #include "gui_cube.h"
 #else
