@@ -20,9 +20,9 @@
  *                        Header Files
  *============================================================================*/
 #include <stdlib.h>
-//#include "dp_ble_info.h"
+#include "dp_ble_info.h"
 
 
-//T_LE_DB le_db;
+T_LE_DB le_db;
 
 
