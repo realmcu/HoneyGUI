@@ -112,11 +112,11 @@ void mcu_rtc_set_comp(bool start, time_t time_stamp)
     }
     else
     {
-        CompareValue = RTC_GetCompValue(RTC_COMP0) + (RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1)) *
+        CompareValue = RTC_GetCompValue(RTC_COMP1) + (RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1)) *
                        (60 - time_stamp % 60);
     }
 
-    RTC_SetCompValue(RTC_COMP0, CompareValue & 0xFFFFFFFF);
+    RTC_SetCompValue(RTC_COMP1, CompareValue & 0xFFFFFFFF);
 }
 
 /**
