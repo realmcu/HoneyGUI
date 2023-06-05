@@ -14,45 +14,55 @@ CPPDEFINES = ['RTK_HAL_DRIVER']
 
 if GetDepend(['BSP_USING_SPI']):
     src += ['drv_spi.c']
-    CPPDEFINES += ['RTK_HAL_DRIVER']
+    CPPDEFINES += ['RTK_HAL_SPI']
+
 if GetDepend(['BSP_USING_UART']):
     src += ['drv_uart.c']
-    CPPDEFINES += ['RTK_USING_UART']
+    CPPDEFINES += ['RTK_HAL_UART']
+
 if GetDepend('BSP_USING_I2C'):
     src += ['drv_i2c.c']
-    CPPDEFINES += ['RTK_USING_I2C']
+    CPPDEFINES += ['RTK_HAL_I2C']
+
 if GetDepend(['RT_USING_ADC']):
     src += Glob('drv_adc.c')
+    CPPDEFINES += ['RTK_HAL_ADC']
 
 if GetDepend(['RT_USING_DAC']):
     src += Glob('drv_dac.c')
+    CPPDEFINES += ['RTK_HAL_DAC']
 
 if GetDepend('BSP_USING_LCD'):
     src += ['drv_lcd.c']
-    CPPDEFINES += ['RTK_USING_LCD']
+    CPPDEFINES += ['RTK_HAL_LCD']
 
 if GetDepend('MODULE_VG_LITE'):
     src += ['drv_gpu.c']
     CPPDEFINES += ['RTK_MODULE_VG_LITE']
+
 if GetDepend(['BSP_USING_SDIO']):
     src += ['drv_sdio.c']
+    CPPDEFINES += ['RTK_HAL_SDIO']
 
 if GetDepend(['BSP_USING_USBD']):
     src += ['drv_usbd.c']
+    CPPDEFINES += ['RTK_HAL_USBD']
 
 if GetDepend(['BSP_USING_USBH']):
     src += ['drv_usbh.c']
+    CPPDEFINES += ['RTK_HAL_USBH']
 	
 if GetDepend(['BSP_USING_TOUCH']) or GetDepend(['BSP_USING_GPIO']):
     src += ['drv_gpio.c']
-    CPPDEFINES += ['RTK_USING_GPIO']
+    CPPDEFINES += ['RTK_HAL_GPIO']
+
 if GetDepend(['BSP_USING_TOUCH']):    
     src += ['drv_touch.c']
-    CPPDEFINES += ['RTK_USING_TOUCH']
+    CPPDEFINES += ['RTK_HAL_TOUCH']
 
 if GetDepend(['BSP_USING_ONCHIP_RTC']):
     src += ['drv_rtc.c'] 
-    CPPDEFINES += ['RTK_USING_ONCHIP_RTC']
+    CPPDEFINES += ['RTK_HAL_RTC']
 path =  [cwd]
 
 
