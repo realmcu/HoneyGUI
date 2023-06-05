@@ -10,7 +10,7 @@ extern "C" {
 #define EK9716_800480_LCD_WIDTH                   800
 #define EK9716_800480_LCD_HEIGHT                  480
 
-#define EK9716_DRV_PIXEL_BITS                     24
+#define EK9716_DRV_PIXEL_BITS                     16
 
 
 void rtk_lcd_hal_init(void);
