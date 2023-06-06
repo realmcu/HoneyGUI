@@ -46,7 +46,4 @@ uint32_t get_profs_by_bond_flag(uint32_t bond_flag)
     return profs;
 }
 
-int32_t pm_cpu_freq_set(uint32_t required_mhz, uint32_t *actual_mhz)
-{
-    return 0;
-}
+
