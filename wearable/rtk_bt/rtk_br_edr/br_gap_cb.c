@@ -15,8 +15,8 @@
 #include "app_spp.h"
 #include "app_sdp.h"
 #include "app_bt_policy_int.h"
-#include "app_link_util.h"
 #include "dp_br_info.h"
+
 
 
 static bool linkback_need = false;

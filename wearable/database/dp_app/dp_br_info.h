@@ -27,8 +27,7 @@ extern "C"
 *============================================================================*/
 #include "stdbool.h"
 #include "stdint.h"
-
-#include "app_link_util.h"
+#include "app_br_link_util.h"
 
 
 typedef struct
@@ -42,9 +41,6 @@ typedef struct
     T_APP_BR_LINK               br_link[MAX_BR_LINK_NUM];
     T_HF_INFO                   hf_info;
 } T_BR_DB;
-
-
-extern T_BR_DB br_db;
 
 
 #ifdef __cplusplus

@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 #include "app_report.h"
-#include "app_link_util.h"
+#include "dp_br_info.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,7 +3,6 @@
  */
 
 #include <string.h>
-#include <app_le_link_util.h>
 #include "os_mem.h"
 #include "dp_ble_info.h"
 

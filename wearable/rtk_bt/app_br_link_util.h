@@ -2,8 +2,8 @@
  * Copyright (c) 2018, Realsil Semiconductor Corporation. All rights reserved.
  */
 
-#ifndef _APP_LINK_UTIL_H_
-#define _APP_LINK_UTIL_H_
+#ifndef _APP_BR_LINK_UTIL_H_
+#define _APP_BR_LINK_UTIL_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -25,9 +25,6 @@ extern "C" {
 
 /** max BR/EDR link num */
 #define MAX_BR_LINK_NUM                 2
-
-/** max BLE link num */
-#define MAX_BLE_LINK_NUM                2
 
 /** bitmask of profiles */
 #define A2DP_PROFILE_MASK               0x00000001    /**< A2DP profile bitmask */
@@ -188,85 +185,6 @@ typedef struct
     uint16_t            sniff_mode_disable_flag;
 } T_APP_BR_LINK;
 
-typedef void(*P_FUN_LE_LINK_DISC_CB)(uint8_t conn_id, uint8_t local_disc_cause,
-                                     uint16_t disc_cause);
-
-typedef struct t_le_disc_cb_entry
-{
-    struct t_le_disc_cb_entry  *p_next;
-    P_FUN_LE_LINK_DISC_CB disc_callback;
-} T_LE_DISC_CB_ENTRY;
-
-/**  @brief  App define le link connection database */
-typedef struct
-{
-    uint8_t             bd_addr[6];
-    bool                used;
-    uint8_t             id;
-    bool                cmd_set_enable;
-    uint8_t            *p_embedded_cmd;
-    void               *tts_handle;
-    uint8_t             tts_state;
-    uint8_t             tts_seq;
-    uint16_t            tts_data_offset;
-    uint8_t            *tts_frame_buf;
-    uint16_t            tts_frame_len;
-
-    uint8_t             eq_state;
-    uint8_t             eq_index;
-    uint8_t             eq_type;
-    uint8_t             eq_seq;
-    uint16_t            eq_data_offset;
-    uint8_t            *eq_data_buf;
-    uint16_t            eq_data_len;
-
-    uint16_t            embedded_cmd_len;
-    uint16_t            mtu_size;
-    uint8_t             state;
-    uint8_t             conn_id;
-    uint8_t             rx_cmd_seqn;
-    uint8_t             tx_event_seqn;
-    uint8_t             transmit_srv_tx_enable_fg;
-    uint8_t             local_disc_cause;
-    T_OS_QUEUE          disc_cb_list;
-} T_APP_LE_LINK;
-
-typedef struct
-{
-    T_APP_BR_LINK               br_link[MAX_BR_LINK_NUM];
-    T_APP_LE_LINK               le_link[MAX_BLE_LINK_NUM];
-    uint16_t                    external_mcu_mtu;
-    uint8_t                     local_batt_level;           /**< local battery level */
-    uint8_t                     remote_batt_level;          /**< remote battery level */
-    //T_BATTERY_INFO              batt;
-    uint8_t                     factory_addr[6];            /**< local factory address */
-    uint8_t                     avrcp_play_status;
-
-    uint8_t                     wait_resume_a2dp_idx;
-    uint8_t                     update_active_a2dp_idx;
-
-    //T_APP_DEVICE_STATE          device_state;
-
-    uint8_t                     first_hf_index;
-    uint8_t                     last_hf_index;
-
-    bool                        playback_muted;
-    bool                        voice_muted;
-
-    //T_APP_AUDIO_MODE            audio_play_mode;
-    T_BT_A2DP_ROLE              a2dp_cur_role;
-
-    //T_APP_TONE_VP_STARTED       tone_vp_status;
-    uint8_t                     a2dp_sink_addr[6];
-    //T_APP_A2DP_SRC_STATE        a2dp_src_state;
-    bool                        audio_pipe_create;
-    uint8_t                     sco_interrupt_a2dp;
-    uint8_t                     usb_status;
-    //T_APP_BOND_DEVICE           bond_device[MAX_BOND_INFO_NUM];
-    uint8_t                     acl_reconnect_addr[6];
-    uint8_t                     transfer_status;
-} T_APP_LINK_DB;
-
 uint32_t app_connected_profiles(void);
 
 /**
@@ -311,44 +229,6 @@ T_APP_BR_LINK *app_alloc_br_link(uint8_t *bd_addr);
     */
 bool app_free_br_link(T_APP_BR_LINK *p_link);
 
-/**
-    * @brief  find the BLE link by connected id
-    * @param  conn_id BLE link id(slot)
-    * @return the BLE link
-    */
-T_APP_LE_LINK *app_find_le_link_by_conn_id(uint8_t conn_id);
-
-/**
-    * @brief  find the BLE link by bluetooth address
-    * @param  bd_addr bluetooth address
-    * @return the BLE link
-    */
-T_APP_LE_LINK *app_find_le_link_by_addr(uint8_t *bd_addr);
-
-/**
-    * @brief  find the BLE link by tts handle
-    * @param  handle tts handle
-    * @return the BLE link
-    */
-T_APP_LE_LINK *app_find_le_link_by_tts_handle(T_TTS_HANDLE handle);
-
-/**
-    * @brief  alloc the BLE link by link id(slot)
-    * @param  conn_id BLE link id(slot)
-    * @return the BLE link
-    */
-T_APP_LE_LINK *app_alloc_le_link_by_conn_id(uint8_t conn_id);
-
-/**
-    * @brief  free the BLE link
-    * @param  p_link the BLE link
-    * @return true: success; false: fail
-    */
-bool app_free_le_link(T_APP_LE_LINK *p_link);
-
-bool app_reg_le_link_disc_cb(uint8_t conn_id, P_FUN_LE_LINK_DISC_CB p_fun_cb);
-
-uint8_t app_get_ble_link_num(void);
 
 /**
     * @brief  judge if the link is bud2bud link
@@ -386,4 +266,4 @@ uint8_t app_find_b2s_link_num(void);
 }
 #endif /* __cplusplus */
 
-#endif /* _APP_LINK_UTIL_H_ */
+#endif /* _APP_BR_LINK_UTIL_H_ */

@@ -77,6 +77,9 @@ static uint8_t uart_tx_wIndex;                 /**<uart transfer packet write in
 static uint8_t uart_resend_count;              /**<uart resend count*/
 
 
+extern T_LE_DB le_db;
+extern T_BR_DB br_db;
+
 void app_transfer_queue_recv_ack_check(uint16_t event_id, uint8_t cmd_path)
 {
     uint16_t    tx_queue_id = ((dt_queue[dt_queue_ctrl.dt_queue_r_idx].pkt_ptr[4]) |

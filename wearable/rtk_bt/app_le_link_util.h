@@ -2,13 +2,15 @@
  * Copyright (c) 2018, Realsil Semiconductor Corporation. All rights reserved.
  */
 
-#ifndef _APP_LINK_UTIL_H_
-#define _APP_LINK_UTIL_H_
+#ifndef _APP_LE_LINK_UTIL_H_
+#define _APP_LE_LINK_UTIL_H_
 
 #include <stdint.h>
 #include <stdbool.h>
 #include "os_queue.h"
-
+#ifdef RTL8772F
+#include "tts.h"
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -115,34 +117,7 @@ bool app_free_le_link(T_APP_LE_LINK *p_link);
 bool app_reg_le_link_disc_cb(uint8_t conn_id, P_FUN_LE_LINK_DISC_CB p_fun_cb);
 
 uint8_t app_get_ble_link_num(void);
-#ifdef RTL8772F
-/**
-    * @brief  judge if the link is bud2bud link
-    * @param  bd_addr bluetooth address
-    * @return true/false
-    */
-bool app_check_b2b_link(uint8_t *bd_addr);
 
-bool app_check_b2b_link_by_id(uint8_t id);
-
-/**
-    * @brief  judge if the link is bud2phone link
-    * @param  bd_addr bluetooth address
-    * @return true/false
-    */
-bool app_check_b2s_link(uint8_t *bd_addr);
-
-bool app_check_b2s_link_by_id(uint8_t id);
-
-T_APP_BR_LINK *app_find_b2s_link(uint8_t *bd_addr);
-
-/**
-    * @brief  get the bud2phone link num
-    * @param  void
-    * @return link num
-    */
-uint8_t app_find_b2s_link_num(void);
-#endif
 
 /** End of APP_LINK
 * @}
@@ -152,4 +127,4 @@ uint8_t app_find_b2s_link_num(void);
 }
 #endif /* __cplusplus */
 
-#endif /* _APP_LINK_UTIL_H_ */
+#endif /* _APP_LE_LINK_UTIL_H_ */
