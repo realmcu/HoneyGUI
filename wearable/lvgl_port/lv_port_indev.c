@@ -208,33 +208,13 @@ static void touchpad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
     data->point.x = last_x;
     data->point.y = last_y;
 }
-#include "rtthread.h"
 /*Return true is the touchpad is pressed*/
 static lv_coord_t touch_x;
 static lv_coord_t touch_y;
 static bool touchpad_is_pressed(void)
 {
     /*Your code comes here*/
-    rt_device_t dev = rt_device_find("touch");
-
-    rt_device_open(dev, RT_DEVICE_FLAG_RDONLY);
-    uint8_t buffer[24];
-    rt_device_read(dev, 0, buffer, 24);
-    uint32_t i = 0;
-
-    touch_x = 454 - (((buffer[3 + 6 * i + 0] & 0x0f) << 8) | buffer[3 + 6 *
-                                                                    i + 1]);
-    touch_y = 454 - (((buffer[3 + 6 * i + 2] & 0x0f) << 8) | buffer[3 + 6 * i +
-                                                                    3]);
-    rt_device_close(dev);
-    if ((buffer[3 + 6 * i] >> 6) == 2)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return false;
 
 }
 

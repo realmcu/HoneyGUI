@@ -12,7 +12,8 @@
 #include "lv_port_disp.h"
 #include <stdbool.h>
 #include "drv_lcd.h"
-#include "rtthread.h"
+#include "os_mem.h"
+#include "trace.h"
 
 /*********************
  *      DEFINES
@@ -45,7 +46,7 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
 /**********************
  *  STATIC VARIABLES
  **********************/
-
+static uint8_t *buffer0 = NULL;
 /**********************
  *      MACROS
  **********************/
@@ -89,13 +90,15 @@ void lv_port_disp_init(void)
     /* Example for 1) */
 
     static lv_disp_draw_buf_t draw_buf_dsc_1;
-    static struct rt_device_graphic_info info;
-    rt_device_t dev = rt_device_find("lcd");
-    rt_device_open(dev, RT_DEVICE_FLAG_RDWR);
-    rt_device_control(dev, RTGRAPHIC_CTRL_GET_INFO, &info);
-    rt_device_close(dev);
+    buffer0 = os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM,
+                           drv_lcd_get_fb_width() * drv_lcd_get_fb_height() * drv_lcd_get_pixel_bits() / 8 + 63);
+    if (buffer0 == NULL)
+    {
+        DBG_DIRECT("!!!LCD framebuffer alloc Fail\r\n");
+    }
+    buffer0 = buffer0 + 64 - (int)buffer0 % 64;
 
-    lv_disp_draw_buf_init(&draw_buf_dsc_1, (void *)info.framebuffer, NULL,
+    lv_disp_draw_buf_init(&draw_buf_dsc_1, (void *)buffer0, NULL,
                           MY_DISP_HOR_RES * MY_DISP_VER_RES);   /*Initialize the display buffer*/
 #endif
 
@@ -166,10 +169,7 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
     {
         //lcd_update_by_dma(area->x1, area->y1, area->x2, area->y2, (uint8_t *)color_p);
         //lcd_update_mass_by_dma(area->x1, area->y1, area->x2, area->y2, (uint8_t *)color_p);
-        rt_device_t dev = rt_device_find("lcd");
-        rt_device_open(dev, RT_DEVICE_FLAG_RDWR);
-        rt_device_control(dev, RTGRAPHIC_CTRL_RECT_UPDATE, NULL);
-        rt_device_close(dev);
+        drv_lcd_update(buffer0, 0, 0, drv_lcd_get_fb_width(), drv_lcd_get_fb_height());
     }
 
 
