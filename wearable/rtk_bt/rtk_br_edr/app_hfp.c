@@ -5,7 +5,7 @@
 #include <string.h>
 #include "trace.h"
 #include "btm.h"
-#include "app_link_util.h"
+#include "app_br_link_util.h"
 #include "bt_hfp.h"
 #include "app_sdp.h"
 #include "app_hfp.h"
@@ -16,12 +16,10 @@
 #include "dp_br_info.h"
 #include "app_cfg.h"
 #include "dp_rtk_db.h"
-#ifndef __RTTHREAD__
-#include "menu_config.h"
-#endif
 
 
 static uint8_t active_hf_index = 0;
+extern T_BR_DB br_db;
 
 void app_hfp_volume_up(void)
 {

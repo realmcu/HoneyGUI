@@ -11,11 +11,6 @@
 #include "gap_br.h"
 #include "app_sdp.h"
 #include "bt_sdp.h"
-#ifdef __RTTHREAD__
-#include "rtthread.h"
-#else
-#include "menu_config.h"
-#endif
 
 
 #ifdef __cplusplus

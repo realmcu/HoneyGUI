@@ -9,7 +9,7 @@
 #include "bt_spp.h"
 #include "app_sdp.h"
 #include "app_spp.h"
-#include "app_link_util.h"
+#include "app_br_link_util.h"
 #include "bt_spp.h"
 
 /** @brief  SPP UUID */

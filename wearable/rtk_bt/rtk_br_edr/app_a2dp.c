@@ -4,7 +4,7 @@
 #include <string.h>
 #include "trace.h"
 #include "btm.h"
-#include "app_link_util.h"
+#include "app_br_link_util.h"
 #include "bt_a2dp.h"
 #include "audio_track.h"
 
