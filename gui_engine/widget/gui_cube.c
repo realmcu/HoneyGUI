@@ -477,7 +477,7 @@ static void cube_destory(gui_obj_t *obj)
 {
 
 }
-
+/*
 static void alien_cache(draw_img_t *img, void **image_addr)
 {
     img->data = *image_addr;
@@ -504,7 +504,7 @@ static void alien_cache(draw_img_t *img, void **image_addr)
     }
     *image_addr = source_buffer - sizeof(struct gui_rgb_data_head);
 }
-
+*/
 
 void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
                    void *addr,
@@ -558,7 +558,7 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
         array[5] = temp;
     }
 #endif
-#if 1
+#if 0
     {
         gui_log("VG_LITE_HAL_ALLOC\n");
         /*          this->draw_img_front.data = array[0];
