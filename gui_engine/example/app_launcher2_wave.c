@@ -17,16 +17,16 @@
 #include <gui_dynamic_img.h>
 #include "tp_algo.h"
 #include <math.h>
-#ifdef RTK_MODULE_VG_LITE
+#ifdef MODULE_VG_LITE
 #include "gui_vg_lite_clock.h"
 #include "gui_cube.h"
 #else
 #include "gui_cube.h"
 #endif
 #include "nanovg_agge.h"
+float app_launcher2_wave_t = 0;
 static void read_page_draw(gui_canvas_t *c)
 {
-    static float t = 0;
 
     canvas_wave_t w = {0};
     w.h = 454;
@@ -37,13 +37,22 @@ static void read_page_draw(gui_canvas_t *c)
     static float sx[6];
     static float sy[6];
 
-    samples[0] = (1.0f + sinf(t * 1.2345f + cosf(t * 0.33457f) * 0.44f)) * 0.5f;
-    samples[1] = (1.0f + sinf(t * 0.68363f + cosf(t * 1.3f) * 1.55f)) * 0.5f;
-    samples[2] = (1.0f + sinf(t * 1.1642f + cosf(t * 0.33457f) * 1.24f)) * 0.5f;
-    samples[3] = (1.0f + sinf(t * 0.56345f + cosf(t * 1.63f) * 0.14f)) * 0.5f;
-    samples[4] = (1.0f + sinf(t * 1.6245f + cosf(t * 0.254f) * 0.3f)) * 0.5f;
-    samples[5] = (1.0f + sinf(t * 0.345f + cosf(t * 0.03f) * 0.6f)) * 0.5f;
-    t += 0.05f;
+    samples[0] = (1.0f + sinf(app_launcher2_wave_t * 1.2345f + cosf(app_launcher2_wave_t * 0.33457f) *
+                              0.44f)) * 0.5f;
+    samples[1] = (1.0f + sinf(app_launcher2_wave_t * 0.68363f + cosf(app_launcher2_wave_t * 1.3f) *
+                              1.55f)) * 0.5f;
+    samples[2] = (1.0f + sinf(app_launcher2_wave_t * 1.1642f + cosf(app_launcher2_wave_t * 0.33457f) *
+                              1.24f)) * 0.5f;
+    samples[3] = (1.0f + sinf(app_launcher2_wave_t * 0.56345f + cosf(app_launcher2_wave_t * 1.63f) *
+                              0.14f)) * 0.5f;
+    samples[4] = (1.0f + sinf(app_launcher2_wave_t * 1.6245f + cosf(app_launcher2_wave_t * 0.254f) *
+                              0.3f)) * 0.5f;
+    samples[5] = (1.0f + sinf(app_launcher2_wave_t * 0.345f + cosf(app_launcher2_wave_t * 0.03f) *
+                              0.6f)) * 0.5f;
+    //if(t_flag)
+    //app_launcher2_wave_t -= 0.05f;
+    //else
+    app_launcher2_wave_t += 0.05f;
     int i;
     for (i = 0; i < w.point_count; i++)
     {
@@ -53,11 +62,15 @@ static void read_page_draw(gui_canvas_t *c)
     w.point_x = sx;
     w.point_y = sy;
     extern NVGcolor nvgHSLA(float h, float s, float l, unsigned char a);
-    NVGcolor color = nvgHSLA(sinf(2.0F * M_PI / 12.0F * 0.12f * (t)), 1.0f, 0.55f, 255);
+    NVGcolor color = nvgHSLA(sinf(2.0F * M_PI / 12.0F * 0.12f * (app_launcher2_wave_t)), 1.0f, 0.55f,
+                             255);
     w.fill.color_data.rgba = (uint32_t)((uint32_t)(color.r * 255.0f) << 24) + (uint32_t)((uint32_t)(
                                  color.g * 255.0f) << 16) + (uint32_t)((uint32_t)(color.b * 255.0f) << 8) + (uint32_t)((uint32_t)(
                                              color.a * 255.0f));
     gui_canvas_api.wave(c, &w);
+    if (app_launcher2_wave_t > 4058.454476f) { app_launcher2_wave_t = 0; }
+    gui_log("%d ", (int)(app_launcher2_wave_t * 100));
+
 }
 void wave_page(void *parent)
 {
