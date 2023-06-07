@@ -293,6 +293,10 @@ struct gui_os_api
     bool (*thread_suspend)(void *handle);
     bool (*thread_resume)(void *handle);
     bool (*thread_mdelay)(uint32_t ms);
+    void *(*mq_create)(const char *name, uint32_t msg_size, uint32_t max_msgs);
+    bool (*mq_send)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
+    bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
+    bool (*mq_recv)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 
 
     void *(*f_malloc)(uint32_t);
@@ -477,55 +481,6 @@ typedef struct _gui_obj_t
 
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 
-#define GUI_SET_ANIMATE(widget_typedef) \
-    static void set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p)\
-    {\
-        gui_animate_t *animate = ((widget_typedef *)o)->animate;\
-        if (!(animate))\
-        {\
-            animate = gui_malloc(sizeof(gui_animate_t));\
-        }\
-        memset((animate), 0, sizeof(gui_animate_t));\
-        animate->animate = true;\
-        animate->dur = dur;\
-        animate->callback = (void (*)(void *))callback;\
-        animate->repeatCount = repeatCount;\
-        animate->p = p;\
-    }
-#define ANIMATE_UPDATE_ATT(widget_typedef) widget_typedef *obj = (void *)widget;\
-    if (obj->animate && obj->animate->animate)\
-    {\
-        size_t frame_count = obj->animate->dur * RTK_GUI_FPS / (1000);\
-        obj->animate->callback(obj->animate->p);\
-        obj->animate->current_frame++;\
-        \
-        if (obj->animate->current_frame > frame_count)\
-        {\
-            if (obj->animate->repeatCount == 0)\
-            {\
-                obj->animate->animate = false;\
-            }\
-            else if (obj->animate->repeatCount < 0)\
-            {\
-                obj->animate->current_frame = 0;\
-            }\
-            else if (obj->animate->repeatCount > 0)\
-            {\
-                obj->animate->current_repeat_count++;\
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)\
-                {\
-                    obj->animate->animate = false;\
-                }\
-                else\
-                {\
-                    obj->animate->current_frame = 0;\
-                }\
-            }\
-        }\
-        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(\
-                                                                                   frame_count));\
-        \
-    }
 #ifdef __cplusplus
 }
 #endif

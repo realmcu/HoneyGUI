@@ -15,18 +15,37 @@
 
 static void (*gui_debug_hook)(void) = NULL;
 static void *gui_server_handle = NULL;
+static void *gui_server_mq = NULL;
 
 void gui_debug_sethook(void (*hook)(void))
 {
     gui_debug_hook = hook;
 }
 
+bool send_msg_to_gui_server(rtgui_msg_t *msg)
+{
+    if (gui_server_mq != NULL)
+    {
+        if (msg == NULL)
+        {
+            gui_log("msg == NULL\n");
+        }
+
+        gui_mq_send(gui_server_mq, msg, sizeof(rtgui_msg_t), 0);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 /**
  * rtgui server thread's entry
  */
 
 static void rtgui_server_entry(void *parameter)
 {
+    gui_server_mq = gui_mq_create("gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {
         gui_app_t *app = gui_current_app();
@@ -42,11 +61,16 @@ static void rtgui_server_entry(void *parameter)
 
         gui_fb_disp(screen);
 
-        if (app->actived == false)
+        rtgui_msg_t msg;
+        if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0))
         {
-            gui_log("!Suspend GUI Server and wait receive message! \n");
-            gui_thread_suspend(gui_server_handle);
+            //rtgui_server_msg_handler(&msg);
         }
+        else
+        {
+
+        }
+
 
     }
 }

@@ -34,7 +34,7 @@ void gui_app_exec(gui_app_t *app)
 
 static void ctor(void *this)
 {
-    //gui_app_t *app = this;
+    GUI_ASSERT(this != NULL);
 }
 
 static void dtor(void *this)

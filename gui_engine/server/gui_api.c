@@ -177,6 +177,41 @@ bool gui_thread_mdelay(uint32_t ms)
     return false;
 }
 
+void *gui_mq_create(const char *name, uint32_t msg_size, uint32_t max_msgs)
+{
+    if (os_api->mq_create)
+    {
+        return os_api->mq_create(name, msg_size, max_msgs);
+    }
+    return NULL;
+}
+
+bool gui_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
+{
+    if (os_api->mq_send)
+    {
+        return os_api->mq_send(handle, buffer, size, timeout);
+    }
+    return false;
+}
+
+bool gui_mq_send_urgent(void *handle, void *buffer, uint32_t size, uint32_t timeout)
+{
+    if (os_api->mq_send_urgent)
+    {
+        return os_api->mq_send_urgent(handle, buffer, size, timeout);
+    }
+    return false;
+}
+
+bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
+{
+    if (os_api->mq_recv)
+    {
+        return os_api->mq_recv(handle, buffer, size, timeout);
+    }
+    return false;
+}
 
 
 void *gui_malloc(uint32_t n)

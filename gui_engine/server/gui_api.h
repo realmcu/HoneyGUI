@@ -97,6 +97,14 @@ bool gui_thread_suspend(void *handle);
 
 bool gui_thread_resume(void *handle);
 
+void *gui_mq_create(const char *name, uint32_t msg_size, uint32_t max_msgs);
+
+bool gui_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout);
+
+bool gui_mq_send_urgent(void *handle, void *buffer, uint32_t size, uint32_t timeout);
+
+bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout);
+
 void *gui_malloc(uint32_t n);
 void *gui_realloc(void *ptr_old, uint32_t n);
 
