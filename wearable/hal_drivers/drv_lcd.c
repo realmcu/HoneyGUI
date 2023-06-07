@@ -82,7 +82,8 @@ static void lcd_enter_dlps(void *drv_io)
 
 static void lcd_exit_dlps(void *drv_io)
 {
-
+    rtk_lcd_hal_init();
+    DBG_DIRECT("Drv lcd init");
 }
 
 static bool lcd_allowed_enter_dlps_check(void *drv_io)
