@@ -254,6 +254,10 @@ void bt_task_entry(void *p_param)
             {
                 sys_mgr_event_handle(event);
             }
+            else if (EVENT_GROUP(event) == EVENT_GROUP_APP)
+            {
+                app_timer_handle_msg(event);
+            }
 #endif
         }
     }
