@@ -25,9 +25,8 @@ static drv_rtc_irq comp0_irq;
 static drv_rtc_irq comp1_irq;
 static bool drv_rtc_started = false;
 
-static bool rtc_system_wakeup_dlps_check(void *drv_io)
+static bool rtc_system_wakeup_dlps_check(void)
 {
-    struct rtl_rtc_config *rtc_cfg = drv_io;
 #if (IMG_IC_TYPE == 0xF)
 #endif
 #if (IMG_IC_TYPE == 0xE)
@@ -41,6 +40,24 @@ static bool rtc_system_wakeup_dlps_check(void *drv_io)
     return false;
 }
 
+static bool rtc_exit_dlps(void)
+{
+    NVIC_InitTypeDef NVIC_InitStruct;
+    NVIC_InitStruct.NVIC_IRQChannel = RTC_IRQn;
+    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
+    NVIC_Init(&NVIC_InitStruct);
+    return true;
+}
+
+void drv_rtc_dlps_init(void)
+{
+    RTC_SystemWakeupConfig(ENABLE);
+    drv_dlps_exit_cbacks_register("rtc", rtc_exit_dlps);
+    drv_dlps_wakeup_cbacks_register("rtc", rtc_system_wakeup_dlps_check);
+}
+
 void drv_rtc_init(void)
 {
     RTC_NvCmd(ENABLE);
@@ -50,14 +67,15 @@ void drv_rtc_init(void)
     NVIC_InitStruct.NVIC_IRQChannel = RTC_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
     NVIC_Init(&NVIC_InitStruct);
     RTC_SetPrescaler(0);//no div
-    RTC_SystemWakeupConfig(ENABLE);
+
     drv_rtc_started = true;
 
     drv_rtc_second_attach_irq(NULL, NULL);
 
-    drv_dlps_wakeup_cbacks_register("rtc", NULL, rtc_system_wakeup_dlps_check);
+    drv_rtc_dlps_init();
 }
 
 uint32_t drv_rtc_count(void)

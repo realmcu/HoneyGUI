@@ -6,7 +6,7 @@ cwd = GetCurrentDir()
 # add the general drivers.
 src = Split("""
 """)
-
+CPPDEFINES = [HAL_LETTER_SHELL]
 src += ['shell.c']
 src += ['shell_cmd_list.c']
 src += ['shell_ext.c']

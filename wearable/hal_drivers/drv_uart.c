@@ -262,7 +262,7 @@ void uart4_allow_enter_dlps_timer_init()
                     uart4_allow_enter_dlps_timer_cb);
 }
 
-static bool uart4_enter_dlps(void *drv_io)
+static bool uart4_enter_dlps(void)
 {
     Pad_Config(SHELL_UART_TX, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE, PAD_OUT_LOW);
     Pad_Config(SHELL_UART_RX, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
@@ -270,7 +270,7 @@ static bool uart4_enter_dlps(void *drv_io)
     return true;
 }
 
-static bool uart4_exit_dlps(void *drv_io)
+static bool uart4_exit_dlps(void)
 {
     Pad_Config(SHELL_UART_TX, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE,
                PAD_OUT_LOW);
@@ -286,12 +286,12 @@ static bool uart4_exit_dlps(void *drv_io)
     return true;
 }
 
-static bool uart4_allowed_enter_dlps_check(void *drv_io)
+static bool uart4_allowed_enter_dlps_check(void)
 {
     return uart4_enter_dlps_flag;
 }
 
-static bool uart4_system_wakeup_dlps_check(void *drv_io)
+static bool uart4_system_wakeup_dlps_check(void)
 {
     if (System_WakeUpInterruptValue(SHELL_UART_RX) == SET)
     {
