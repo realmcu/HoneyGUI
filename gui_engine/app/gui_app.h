@@ -13,7 +13,7 @@ struct gui_app
 {
     gui_obj_t screen;
     const char *xml;
-    bool actived;
+    uint32_t active_ms;
     void *thread_id;
     void (* thread_entry)(void *this);
     void (* ctor)(void *this);
@@ -36,10 +36,6 @@ void gui_app_uninstall(gui_app_t *app);
 gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_entry);
 
 void gui_app_delete(gui_app_t *app);
-
-void gui_app_suspend(gui_app_t *app);
-
-void gui_app_resume(gui_app_t *app);
 
 void gui_switch_app(gui_app_t *from, gui_app_t *to);
 

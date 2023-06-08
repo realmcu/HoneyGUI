@@ -43,6 +43,10 @@ bool send_msg_to_gui_server(rtgui_msg_t *msg)
  * rtgui server thread's entry
  */
 
+//static int32_t daemon_left_ms = 5000;
+
+static uint32_t daemon_start_ms = 0;
+static uint32_t daemon_cnt = 0;
 static void rtgui_server_entry(void *parameter)
 {
     gui_server_mq = gui_mq_create("gui_svr_mq", sizeof(rtgui_msg_t), 16);
@@ -59,18 +63,37 @@ static void rtgui_server_entry(void *parameter)
         gui_obj_t *screen = &app->screen;
         GUI_ASSERT(screen != NULL);
 
-        gui_fb_disp(screen);
-
         rtgui_msg_t msg;
+#if 0
         if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0))
         {
-            //rtgui_server_msg_handler(&msg);
         }
         else
         {
+        }
+#endif
 
+
+        gui_fb_disp(screen);
+        daemon_cnt++;
+        if (daemon_cnt == 1)
+        {
+            daemon_start_ms = gui_ms_get();
         }
 
+        touch_info_t *tp = tp_get_info();
+        if (tp->pressed == true)
+        {
+            daemon_start_ms = gui_ms_get();
+        }
+
+        if ((gui_ms_get() - daemon_start_ms) > app->active_ms)
+        {
+            gui_log("daemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n", daemon_start_ms,
+                    gui_ms_get(), app->active_ms);
+            gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0x0FFFFFFF);
+            daemon_cnt = 0;
+        }
 
     }
 }

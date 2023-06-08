@@ -60,6 +60,10 @@ void gui_app_startup(gui_app_t *app)
     gui_list_init(&app->screen.brother_list);
 
     app->ui_design(app);
+    if (app->active_ms == 0)
+    {
+        app->active_ms = 10000;
+    }
     gui_app_exec(app);
     if (app->thread_entry != NULL)
     {
@@ -94,16 +98,6 @@ gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_e
 void gui_app_delete(gui_app_t *app)
 {
     gui_app_uninstall(app);
-}
-
-void gui_app_suspend(gui_app_t *app)
-{
-    app->actived = false;
-}
-
-void gui_app_resume(gui_app_t *app)
-{
-    app->actived = true;
 }
 
 void gui_switch_app(gui_app_t *from, gui_app_t *to)
