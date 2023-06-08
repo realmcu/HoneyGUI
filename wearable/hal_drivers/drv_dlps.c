@@ -15,7 +15,7 @@
 #include "rtl_io_dlps.h"
 
 
-#define     DLPS_EN     1
+#define     DLPS_EN     0
 
 
 static dlps_slist_t drv_dlps_exit_slist =
