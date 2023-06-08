@@ -40,6 +40,9 @@ if GetDepend('MODULE_VG_LITE'):
     src += ['drv_gpu.c']
     CPPDEFINES += ['RTK_MODULE_VG_LITE']
 
+if GetDepend('MODULE_RTK_PPE'):
+    CPPDEFINES += ['RTK_MODULE_RTK_PPE']
+
 if GetDepend(['BSP_USING_SDIO']):
     src += ['drv_sdio.c']
     CPPDEFINES += ['RTK_HAL_SDIO']
@@ -51,17 +54,17 @@ if GetDepend(['BSP_USING_USBD']):
 if GetDepend(['BSP_USING_USBH']):
     src += ['drv_usbh.c']
     CPPDEFINES += ['RTK_HAL_USBH']
-	
+
 if GetDepend(['BSP_USING_TOUCH']) or GetDepend(['BSP_USING_GPIO']):
     src += ['drv_gpio.c']
     CPPDEFINES += ['RTK_HAL_GPIO']
 
-if GetDepend(['BSP_USING_TOUCH']):    
+if GetDepend(['BSP_USING_TOUCH']):
     src += ['drv_touch.c']
     CPPDEFINES += ['RTK_HAL_TOUCH']
 
 if GetDepend(['BSP_USING_ONCHIP_RTC']):
-    src += ['drv_rtc.c'] 
+    src += ['drv_rtc.c']
     CPPDEFINES += ['RTK_HAL_RTC']
 path =  [cwd]
 

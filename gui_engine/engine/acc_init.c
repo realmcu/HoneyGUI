@@ -4,7 +4,7 @@
 #include "acc_engine.h"
 
 #ifdef RTK_MODULE_VG_LITE
-#elif defined (MODULE_RTK_PPE)
+#elif defined (RTK_MODULE_RTK_PPE)
 #include "rtl_rcc.h"
 #else
 #endif
@@ -51,7 +51,7 @@ void gui_acc_init(void)
     acc.draw_svg = hw_acc_draw_svg;
     acc.draw_wave = hw_acc_draw_wave;
     acc.draw_palette_wheel = hw_acc_draw_palette_wheel;
-#elif defined (MODULE_RTK_PPE)
+#elif defined (RTK_MODULE_RTK_PPE)
     RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
     acc.blit = hw_acc_blit;
     acc.draw_path = sw_draw_path;
