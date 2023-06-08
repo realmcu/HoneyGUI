@@ -38,12 +38,3 @@ void app_auto_power_off_disable(uint32_t flag)
 {
 
 }
-
-uint32_t get_profs_by_bond_flag(uint32_t bond_flag)
-{
-    uint32_t profs = 0;
-
-    return profs;
-}
-
-

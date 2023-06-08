@@ -33,6 +33,7 @@ typedef struct
 {
     uint8_t                     local_batt_level;           /**< local battery level */
     uint8_t                     remote_batt_level;          /**< remote battery level */
+    uint8_t                     factory_addr[6];            /**< local factory address */
 } T_APP_DB;
 
 

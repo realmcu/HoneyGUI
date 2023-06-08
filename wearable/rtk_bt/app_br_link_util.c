@@ -7,8 +7,10 @@
 #include "os_mem.h"
 #include "remote.h"
 #include "dp_br_info.h"
+#if (RTK_BR_TASK == 1)
+#include "app_cfg.h"
+#endif
 
-extern T_BR_DB br_db;
 /**  @brief  App define global app data structure */
 
 
@@ -144,7 +146,6 @@ bool app_free_br_link(T_APP_BR_LINK *p_link)
     return false;
 }
 
-#if 0
 bool app_check_b2b_link(uint8_t *bd_addr)
 {
     bool ret = false;
@@ -162,9 +163,9 @@ bool app_check_b2b_link_by_id(uint8_t id)
 {
     bool ret = false;
 
-    if (app_db.br_link[id].used)
+    if (br_db.br_link[id].used)
     {
-        ret = app_check_b2b_link(app_db.br_link[id].bd_addr);
+        ret = app_check_b2b_link(br_db.br_link[id].bd_addr);
     }
 
     return ret;
@@ -179,9 +180,9 @@ bool app_check_b2s_link_by_id(uint8_t id)
 {
     bool ret = false;
 
-    if (app_db.br_link[id].used)
+    if (br_db.br_link[id].used)
     {
-        ret = app_check_b2s_link(app_db.br_link[id].bd_addr);
+        ret = app_check_b2s_link(br_db.br_link[id].bd_addr);
     }
 
     return ret;
@@ -206,11 +207,10 @@ uint8_t app_find_b2s_link_num(void)
 
     for (i = 0; i < MAX_BR_LINK_NUM; i++)
     {
-        if (app_db.br_link[i].used)
+        if (br_db.br_link[i].used)
         {
             num++;
         }
     }
     return num;
 }
-#endif

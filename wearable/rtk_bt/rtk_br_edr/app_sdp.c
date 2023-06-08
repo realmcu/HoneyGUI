@@ -11,19 +11,20 @@
 #include "gap_br.h"
 #include "app_sdp.h"
 #include "bt_sdp.h"
+#include "app_cfg.h"
+#include "dp_br_info.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-
 #define RTK_COMPANY_ID 0x005D
 
 static const uint8_t did_sdp_record[] =
 {
     SDP_DATA_ELEM_SEQ_HDR,
-    0x4C,
+    0x4D,
     //attribute SDP_ATTR_SRV_CLASS_ID_LIST
     SDP_UNSIGNED_TWO_BYTE,
     (uint8_t)(SDP_ATTR_SRV_CLASS_ID_LIST >> 8),
@@ -31,27 +32,8 @@ static const uint8_t did_sdp_record[] =
     SDP_DATA_ELEM_SEQ_HDR,
     0x03,
     SDP_UUID16_HDR,
-    (uint8_t)(UUID_SERIAL_PORT >> 8),
-    (uint8_t)(UUID_SERIAL_PORT),
-
-    //attribute SDP_ATTR_PROTO_DESC_LIST
-    SDP_UNSIGNED_TWO_BYTE,
-    (uint8_t)(SDP_ATTR_PROTO_DESC_LIST >> 8),
-    (uint8_t)SDP_ATTR_PROTO_DESC_LIST,
-    SDP_DATA_ELEM_SEQ_HDR,
-    0x0c,
-    SDP_DATA_ELEM_SEQ_HDR,
-    03,
-    SDP_UUID16_HDR,
-    (uint8_t)(UUID_L2CAP >> 8),
-    (uint8_t)UUID_L2CAP,
-    SDP_DATA_ELEM_SEQ_HDR,
-    0x05,
-    SDP_UUID16_HDR,
-    (uint8_t)(UUID_RFCOMM >> 8),
-    (uint8_t)UUID_RFCOMM,
-    SDP_UNSIGNED_ONE_BYTE,
-    RFC_SPP_CHANN_NUM,
+    (uint8_t)(UUID_PNP_INFORMATION >> 8),
+    (uint8_t)(UUID_PNP_INFORMATION),
 
     //attribute SDP_ATTR_BROWSE_GROUP_LIST
     SDP_UNSIGNED_TWO_BYTE,
@@ -88,19 +70,60 @@ static const uint8_t did_sdp_record[] =
     SDP_DATA_ELEM_SEQ_HDR,
     0x06,
     SDP_UUID16_HDR,
-    (uint8_t)(UUID_SERIAL_PORT >> 8),
-    (uint8_t)UUID_SERIAL_PORT,
+    (uint8_t)(UUID_PNP_INFORMATION >> 8),
+    (uint8_t)UUID_PNP_INFORMATION,
     SDP_UNSIGNED_TWO_BYTE,
-    0x01,//version 1.2
-    0x02,
+    0x01,//version 1.3
+    0x03,
 
-    //attribute SDP_ATTR_SRV_NAME
+    //attribute SDP_ATTR_DIP_SPECIFICATION_ID
     SDP_UNSIGNED_TWO_BYTE,
-    (uint8_t)((SDP_ATTR_SRV_NAME + SDP_BASE_LANG_OFFSET) >> 8),
-    (uint8_t)(SDP_ATTR_SRV_NAME + SDP_BASE_LANG_OFFSET),
-    SDP_STRING_HDR,
-    0x0B,
-    0x73, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x20, 0x70, 0x6f, 0x72, 0x74 //"serial port"
+    (uint8_t)(SDP_ATTR_DIP_SPECIFICATION_ID >> 8),
+    (uint8_t)SDP_ATTR_DIP_SPECIFICATION_ID,
+    SDP_UNSIGNED_TWO_BYTE,
+    0x01,
+    0x03,
+
+    //attribute SDP_ATTR_DIP_VENDOR_ID
+    SDP_UNSIGNED_TWO_BYTE,
+    (uint8_t)(SDP_ATTR_DIP_VENDOR_ID >> 8),
+    (uint8_t)SDP_ATTR_DIP_VENDOR_ID,
+    SDP_UNSIGNED_TWO_BYTE,
+    //0x00,//0x005D : RealTek
+    //0x5D,
+    (uint8_t)(RTK_COMPANY_ID >> 8),
+    (uint8_t)RTK_COMPANY_ID,
+
+    //attribute SDP_ATTR_DIP_PRODUCT_ID
+    SDP_UNSIGNED_TWO_BYTE,
+    (uint8_t)(SDP_ATTR_DIP_PRODUCT_ID >> 8),
+    (uint8_t)SDP_ATTR_DIP_PRODUCT_ID,
+    SDP_UNSIGNED_TWO_BYTE,
+    0x22,//8763
+    0x3B,
+
+    //attribute SDP_ATTR_DIP_PRODUCT_VERSION
+    SDP_UNSIGNED_TWO_BYTE,
+    (uint8_t)(SDP_ATTR_DIP_PRODUCT_VERSION >> 8),
+    (uint8_t)SDP_ATTR_DIP_PRODUCT_VERSION,
+    SDP_UNSIGNED_TWO_BYTE,
+    0x01,// 1.0.0
+    0x00,
+
+    //attribute SDP_ATTR_DIP_PRIMARY_RECORD
+    SDP_UNSIGNED_TWO_BYTE,
+    (uint8_t)(SDP_ATTR_DIP_PRIMARY_RECORD >> 8),
+    (uint8_t)SDP_ATTR_DIP_PRIMARY_RECORD,
+    SDP_BOOL_ONE_BYTE,
+    true,
+
+    //attribute SDP_ATTR_DIP_VENDOR_ID_SOURCE
+    SDP_UNSIGNED_TWO_BYTE,
+    (uint8_t)(SDP_ATTR_DIP_VENDOR_ID_SOURCE >> 8),
+    (uint8_t)SDP_ATTR_DIP_VENDOR_ID_SOURCE,
+    SDP_UNSIGNED_TWO_BYTE,
+    0x00,//Bluetooth SIG
+    0x01
 };
 
 #if AVRCP_BROWSING_FEATURE_SUPPORT
@@ -1102,19 +1125,19 @@ void app_sdp_init(void)
         bt_sdp_record_add((void *)avp3_sdp_record);
     }
 
-#ifdef RTK_BR_PROFILE_A2DP
+//20230607    if (app_cfg_const.supported_profile_mask & A2DP_PROFILE_MASK)
     bt_sdp_record_add((void *)a2dp_source_sdp_record);
-#endif
-#ifdef RTK_BR_PROFILE_AVRCP
+
+//20230607    if (app_cfg_const.supported_profile_mask & AVRCP_PROFILE_MASK)
     bt_sdp_record_add((void *)avrcp_ct_sdp_record);
     bt_sdp_record_add((void *)avrcp_tg_sdp_record);
-#endif
-#ifdef RTK_BR_PROFILE_HFP
+
+//20230607    if (app_cfg_const.supported_profile_mask & HFP_PROFILE_MASK)
     bt_sdp_record_add((void *)hfp_sdp_record);
-#endif
-#ifdef RTK_BR_PROFILE_HSP
+
+//20230607    if (app_cfg_const.supported_profile_mask & HSP_PROFILE_MASK)
     bt_sdp_record_add((void *)hsp_sdp_record);
-#endif
+
 #ifdef RTK_BR_PROFILE_SPP
     bt_sdp_record_add((void *)spp_sdp_record);
 #endif

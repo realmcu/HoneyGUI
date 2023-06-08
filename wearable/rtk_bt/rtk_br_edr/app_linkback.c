@@ -16,9 +16,11 @@
 #include "engage.h"
 #include "app_cfg.h"
 #include "app_linkback.h"
-#include "app_link_util.h"
+#include "app_br_link_util.h"
 #include "app_bond.h"
 #include "app_bt_policy_int.h"
+#include "dp_br_info.h"
+
 
 const uint32_t prof_arr[] =
 {
@@ -73,7 +75,7 @@ bool linkback_profile_search_start(uint8_t *bd_addr, uint32_t prof, bool is_spec
 
     if (DID_PROFILE_MASK == prof)
     {
-        if (legacy_start_did_discov(bd_addr) != GAP_CAUSE_SUCCESS)
+        if (gap_br_start_did_discov(bd_addr) != GAP_CAUSE_SUCCESS)
         {
             ret = false;
         }
@@ -166,7 +168,7 @@ bool linkback_profile_search_start(uint8_t *bd_addr, uint32_t prof, bool is_spec
 
     if (ret)
     {
-        if (legacy_start_sdp_discov(bd_addr, uuid_type, uuid) != GAP_CAUSE_SUCCESS)
+        if (gap_br_start_sdp_discov(bd_addr, uuid_type, uuid) != GAP_CAUSE_SUCCESS)
         {
             ret = false;
         }
@@ -264,7 +266,7 @@ void linkback_profile_disconnect_start(uint8_t *bd_addr, uint32_t profs)
     }
     else
     {
-        legacy_send_acl_disconn_req(bd_addr);
+        gap_br_send_acl_disconn_req(bd_addr);
     }
 }
 
@@ -333,7 +335,14 @@ void linkback_todo_queue_insert_normal_node(uint8_t *bd_addr, uint32_t plan_prof
         p_item->linkback_node.is_force = false;
         p_item->linkback_node.is_special = true;
         p_item->linkback_node.retry_timeout = retry_timeout;
-        p_item->linkback_node.search_param.is_source = false;
+        if (br_db.a2dp_info.audio_play_mode == MODE_APP_A2DP_SNK)
+        {
+            p_item->linkback_node.search_param.is_source = true;
+        }
+        else
+        {
+            p_item->linkback_node.search_param.is_source = false;
+        }
 
         p_item->next = NULL;
         if (linkback_todo_queue.head == NULL)

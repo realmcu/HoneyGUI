@@ -24,15 +24,9 @@
 #include <watch_msg.h>
 #include "app_audio_fs_interface.h"
 #include "app_audio_if.h"
-
-
-typedef enum
-{
-    MODE_NONE                = 0x0,
-    MODE_APP_PLAYBACK        = 0x11,
-    MODE_APP_A2DP_SRC        = 0x22,
-    MODE_APP_A2DP_SNK        = 0x33,
-} T_APP_AUDIO_MODE;
+#if (RTK_BR_TASK == 1)
+#include "dp_br_info.h"
+#endif
 
 T_APP_AUDIO_ERROR app_audio_play_by_name(uint8_t *file_name, uint16_t length)
 {

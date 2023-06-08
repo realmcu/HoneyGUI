@@ -36,8 +36,7 @@ typedef struct
     T_APP_LE_LINK               le_link[MAX_BLE_LINK_NUM];
 } T_LE_DB;
 
-
-
+extern T_LE_DB le_db;
 
 #ifdef __cplusplus
 }

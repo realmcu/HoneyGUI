@@ -6,9 +6,7 @@
 #include "os_mem.h"
 #include "dp_ble_info.h"
 
-extern T_LE_DB le_db;
 /**  @brief  App define global app data structure */
-
 
 
 T_APP_LE_LINK *app_find_le_link_by_conn_id(uint8_t conn_id)

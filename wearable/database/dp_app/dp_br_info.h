@@ -31,6 +31,13 @@ extern "C"
 #include "app_a2dp.h"
 #include "app_bond.h"
 
+typedef enum
+{
+    MODE_NONE                = 0x0,
+    MODE_APP_PLAYBACK        = 0x11,
+    MODE_APP_A2DP_SRC        = 0x22,
+    MODE_APP_A2DP_SNK        = 0x33,
+} T_APP_AUDIO_MODE;
 
 typedef struct
 {
@@ -42,10 +49,10 @@ typedef struct
 {
     uint8_t                     wait_resume_a2dp_idx;
     uint8_t                     update_active_a2dp_idx;
+    T_APP_AUDIO_MODE            audio_play_mode;
     T_BT_A2DP_ROLE              a2dp_cur_role;
     uint8_t                     a2dp_sink_addr[6];
     T_APP_A2DP_SRC_STATE        a2dp_src_state;
-    uint8_t                     sco_interrupt_a2dp;
 } T_A2DP_INFO;
 
 typedef struct
@@ -72,10 +79,12 @@ typedef struct
     T_HF_INFO                   hf_info;
     T_A2DP_INFO                 a2dp_info;
     T_APP_BOND_DEVICE           bond_device[MAX_BOND_INFO_NUM];
+    T_AUDIO_INFO                audio_info;
     T_SCO_INFO                  sco_info;
     T_ACL_INFO                  acl_info;
 } T_BR_DB;
 
+extern T_BR_DB br_db;
 
 #ifdef __cplusplus
 }
