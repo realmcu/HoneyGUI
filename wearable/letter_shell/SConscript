@@ -6,13 +6,13 @@ cwd = GetCurrentDir()
 # add the general drivers.
 src = Split("""
 """)
-CPPDEFINES = [HAL_LETTER_SHELL]
+CPPDEFINES = ['RTK_LETTER_SHELL']
 src += ['shell.c']
 src += ['shell_cmd_list.c']
 src += ['shell_ext.c']
 
 CPPPATH = [cwd]
 
-group = DefineGroup('letter_shell', src, depend = ['USING_LETTER_SHELL'], CPPPATH = CPPPATH)
+group = DefineGroup('letter_shell', src, depend = ['USING_LETTER_SHELL'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

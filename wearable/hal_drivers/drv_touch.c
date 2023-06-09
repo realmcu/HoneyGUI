@@ -61,7 +61,6 @@ void drv_touch_dlps_init(void)
     drv_dlps_enter_cbacks_register("touch", touch_enter_dlps);
     drv_dlps_wakeup_cbacks_register("touch", touch_system_wakeup_dlps_check);
     drv_dlps_check_cbacks_register("touch", touch_allowed_enter_dlps_check);
-    uart4_allow_enter_dlps_timer_init();
 }
 
 void drv_touch_init(void)
