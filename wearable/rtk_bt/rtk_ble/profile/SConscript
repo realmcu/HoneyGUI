@@ -13,7 +13,8 @@ src = Split("""
 src += [SDK_ROOT + '/src/ble/profile/server/bas.c']
 src += [SDK_ROOT + '/src/ble/profile/server/dis.c']
 src += [SDK_ROOT + '/src/ble/profile/server/hids_ms.c']
-src += [SDK_ROOT + '/src/ble/profile/server/transmit_service.c']
+if GetDepend(['USING_8772F_DEVICE']):
+    src += [SDK_ROOT + '/src/ble/profile/server/transmit_service.c']
 if GetDepend(['RTK_BLE_WRISTBAND']):
     src += ['wristband_private_service.c']
 if GetDepend(['RTK_BLE_THROUGHPUT']):
