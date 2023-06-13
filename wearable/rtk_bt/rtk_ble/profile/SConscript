@@ -13,7 +13,8 @@ src = Split("""
 src += [SDK_ROOT + '/src/ble/profile/server/bas.c']
 src += [SDK_ROOT + '/src/ble/profile/server/dis.c']
 src += [SDK_ROOT + '/src/ble/profile/server/hids_ms.c']
-src += [SDK_ROOT + '/src/ble/profile/server/dfu_service.c']
+if GetDepend(['DFU_BLE_SERVICE']):
+    src += [SDK_ROOT + '/src/ble/profile/server/dfu_service.c']
 if GetDepend(['USING_BR_TASK']):
     src += [SDK_ROOT + '/src/ble/profile/server/transmit_service.c']
 if GetDepend(['RTK_BLE_WRISTBAND']):

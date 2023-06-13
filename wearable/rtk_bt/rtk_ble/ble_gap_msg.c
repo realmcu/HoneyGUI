@@ -31,19 +31,19 @@ void le_msg_handler_cback_register(P_LE_MSG_HANDLER_CBACK
 
     p_item->cback = cback;
 
-    slist_append(&(gap_msg_list.slist), &(p_item->slist));
+    ble_slist_append(&(gap_msg_list.slist), &(p_item->slist));
 
 }
 
 void le_msg_handler_cback_unregister(P_LE_MSG_HANDLER_CBACK cback)
 {
-    slist_t *node;
-    for (node = slist_first(&(gap_msg_list.slist)); node; node = slist_next(node))
+    ble_slist_t *node;
+    for (node = ble_slist_first(&(gap_msg_list.slist)); node; node = ble_slist_next(node))
     {
-        T_LE_MSG_CBACK_ITEM *p_item = container_of(node, T_LE_MSG_CBACK_ITEM, slist);
+        T_LE_MSG_CBACK_ITEM *p_item = ble_container_of(node, T_LE_MSG_CBACK_ITEM, slist);
         if (p_item->cback == cback)
         {
-            slist_remove(&(gap_msg_list.slist), &(p_item->slist));
+            ble_slist_remove(&(gap_msg_list.slist), &(p_item->slist));
             free(p_item);
         }
     }
@@ -60,19 +60,19 @@ void app_msg_handler_cback_register(P_LE_MSG_HANDLER_CBACK
 
     p_item->cback = cback;
 
-    slist_append(&(app_list.slist), &(p_item->slist));
+    ble_slist_append(&(app_list.slist), &(p_item->slist));
 
 }
 
 void app_msg_handler_cback_unregister(P_LE_MSG_HANDLER_CBACK cback)
 {
-    slist_t *node;
-    for (node = slist_first(&(app_list.slist)); node; node = slist_next(node))
+    ble_slist_t *node;
+    for (node = ble_slist_first(&(app_list.slist)); node; node = ble_slist_next(node))
     {
-        T_LE_MSG_CBACK_ITEM *p_item = container_of(node, T_LE_MSG_CBACK_ITEM, slist);
+        T_LE_MSG_CBACK_ITEM *p_item = ble_container_of(node, T_LE_MSG_CBACK_ITEM, slist);
         if (p_item->cback == cback)
         {
-            slist_remove(&(app_list.slist), &(p_item->slist));
+            ble_slist_remove(&(app_list.slist), &(p_item->slist));
             free(p_item);
         }
     }
@@ -381,20 +381,20 @@ void app_handle_io_msg(T_IO_MSG io_msg)
     case IO_MSG_TYPE_BT_STATUS:
         {
             app_handle_gap_msg(&io_msg);
-            slist_t *node;
-            for (node = slist_first(&(gap_msg_list.slist)); node; node = slist_next(node))
+            ble_slist_t *node;
+            for (node = ble_slist_first(&(gap_msg_list.slist)); node; node = ble_slist_next(node))
             {
-                T_LE_MSG_CBACK_ITEM *p_item = container_of(node, T_LE_MSG_CBACK_ITEM, slist);
+                T_LE_MSG_CBACK_ITEM *p_item = ble_container_of(node, T_LE_MSG_CBACK_ITEM, slist);
                 p_item->cback(&io_msg);
             }
         }
         break;
     case IO_MSG_TYPE_WRISTBNAD:
         {
-            slist_t *node;
-            for (node = slist_first(&(app_list.slist)); node; node = slist_next(node))
+            ble_slist_t *node;
+            for (node = ble_slist_first(&(app_list.slist)); node; node = ble_slist_next(node))
             {
-                T_LE_MSG_CBACK_ITEM *p_item = container_of(node, T_LE_MSG_CBACK_ITEM, slist);
+                T_LE_MSG_CBACK_ITEM *p_item = ble_container_of(node, T_LE_MSG_CBACK_ITEM, slist);
                 p_item->cback(&io_msg);
             }
         }

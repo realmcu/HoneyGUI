@@ -13,8 +13,8 @@
    **************************************************************************************
   */
 
-#ifndef _BLE_GAP_MSG_APP__
-#define _BLE_GAP_MSG_APP__
+#ifndef _STRUCTURE_LIST__
+#define _STRUCTURE_LIST__
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,20 +24,18 @@ extern "C" {
 #include "stdbool.h"
 #include "stddef.h"
 
-
-
 /**
- * Single List structure for ble
+ * Single List structure
  */
-struct ble_slist_node
+struct slist_node
 {
-    struct ble_slist_node *next;
+    struct slist_node *next;                         /**< point to next node. */
 };
-typedef struct ble_slist_node ble_slist_t;
+typedef struct slist_node slist_t;                /**< Type for single list. */
 
-static __inline void ble_slist_append(ble_slist_t *l, ble_slist_t *n)
+static __inline void slist_append(slist_t *l, slist_t *n)
 {
-    struct ble_slist_node *node;
+    struct slist_node *node;
 
     node = l;
     while (node->next) { node = node->next; }
@@ -46,50 +44,34 @@ static __inline void ble_slist_append(ble_slist_t *l, ble_slist_t *n)
     node->next = n;
     n->next = NULL;
 }
-static __inline ble_slist_t *ble_slist_remove(ble_slist_t *l, ble_slist_t *n)
+static __inline slist_t *slist_remove(slist_t *l, slist_t *n)
 {
     /* remove slist head */
-    struct ble_slist_node *node = l;
+    struct slist_node *node = l;
     while (node->next && node->next != n) { node = node->next; }
 
     /* remove node */
-    if (node->next != (ble_slist_t *)0) { node->next = node->next->next; }
+    if (node->next != (slist_t *)0) { node->next = node->next->next; }
 
     return l;
 }
-static __inline ble_slist_t *ble_slist_first(ble_slist_t *l)
+static __inline slist_t *slist_first(slist_t *l)
 {
     return l->next;
 }
-static __inline ble_slist_t *ble_slist_tail(ble_slist_t *l)
+static __inline slist_t *slist_tail(slist_t *l)
 {
     while (l->next) { l = l->next; }
 
     return l;
 }
-static __inline ble_slist_t *ble_slist_next(ble_slist_t *n)
+static __inline slist_t *slist_next(slist_t *n)
 {
     return n->next;
 }
 
-#define ble_container_of(ptr, type, member) \
+#define container_of(ptr, type, member) \
     ((type *)((char *)(ptr) - (unsigned long)(&((type *)0)->member)))
-
-
-typedef void (*P_LE_MSG_HANDLER_CBACK)(T_IO_MSG *p_gap_msg);
-
-typedef struct _T_LE_MSG_CBACK_ITEM
-{
-    ble_slist_t slist;
-    P_LE_MSG_HANDLER_CBACK              cback;
-} T_LE_MSG_CBACK_ITEM;
-
-void app_handle_io_msg(T_IO_MSG io_msg);
-
-void le_msg_handler_cback_register(P_LE_MSG_HANDLER_CBACK cback);
-void le_msg_handler_cback_unregister(P_LE_MSG_HANDLER_CBACK cback);
-void app_msg_handler_cback_register(P_LE_MSG_HANDLER_CBACK cback);
-void app_msg_handler_cback_unregister(P_LE_MSG_HANDLER_CBACK cback);
 
 
 #ifdef __cplusplus
@@ -97,4 +79,3 @@ void app_msg_handler_cback_unregister(P_LE_MSG_HANDLER_CBACK cback);
 #endif
 
 #endif
-
