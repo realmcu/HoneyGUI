@@ -13,6 +13,8 @@ if GetDepend(['BSP_TOUCH_816S']):
     src += ['touch_816s.c']
 if GetDepend(['BSP_TOUCH_ZT2717']):
     src += ['touch_zt2717.c']
+if GetDepend(['BSP_TOUCH_TOUCH_816S_8762D_320']):
+    src += ['touch_816s_8762d_320.c']
 
 CPPPATH = [cwd]
 

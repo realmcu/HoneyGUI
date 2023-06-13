@@ -109,6 +109,7 @@ static void drv_touch_dlps_init(void)
 
 void rtk_touch_hal_init(void)
 {
+    drv_touch_dlps_init();
     drv_i2c0_init(TOUCH_ZT2717_SCL, TOUCH_ZT2717_SDA);
     drv_pin_mode(TOUCH_ZT2717_RST, PIN_MODE_OUTPUT);
     drv_pin_write(TOUCH_ZT2717_RST, 1);

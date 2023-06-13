@@ -28,6 +28,8 @@ if GetDepend(['INCA3311_280456_QSPI']):
     src += ['icna3311_280x456_qspi.c']
 if GetDepend(['ST7796_320320_DBIB']):
     src += ['st7796_320320_dbib.c']
+if GetDepend(['ST7796_320320_8080']):
+    src += ['lcd_st7796_320.c']
 if GetDepend(['ST7701S_480480_RGB']):
     src += ['st7701s_480480_rgb.c']
 if GetDepend(['EK9716_800480_RGB']):

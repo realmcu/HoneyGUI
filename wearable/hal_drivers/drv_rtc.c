@@ -85,7 +85,7 @@ uint32_t drv_rtc_count(void)
     return RTC_GetCounter();
 }
 
-uint32_t drv_rtc_clock_src_freq()
+uint32_t drv_rtc_clock_src_freq(void)
 {
     return RTC_SRC_FREQ;
 }
@@ -126,7 +126,7 @@ void drv_rtc_minute_attach_irq(void (*hdr)(void *args), void *args)
     RTC_INTConfig(RTC_INT_COMP1, ENABLE);
 }
 
-void mcu_rtc_set_comp(bool start, time_t time_stamp)
+void drv_rtc_set_comp(bool start, time_t time_stamp)
 {
     uint32_t CompareValue;
 

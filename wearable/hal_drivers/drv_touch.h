@@ -21,6 +21,11 @@
 #include "touch_gt911.h"
 #endif
 
+
+void rtk_touch_hal_init(void);
+bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing);
+
+
 bool drv_touch_read(uint16_t *x, uint16_t *y, bool *pressing);
 void drv_touch_init(void);
 

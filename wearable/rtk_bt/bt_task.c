@@ -26,6 +26,7 @@
 #include "board.h"
 #include "trace.h"
 #include "ble_gap_init.h"
+#include "ble_gap_msg.h"
 #include "ble_profile_init.h"
 #include "br_gap_init.h"
 #if (RTK_BR_TASK == 1)
@@ -147,11 +148,18 @@ static void framework_init(void)
 void bt_task_entry(void *p_param)
 {
     uint8_t event;
+#if defined RTL8772F || defined RTL8762G
     os_alloc_secure_ctx(1024);
+#endif
 
+
+#if defined RTL8772F || defined RTL8762G
     os_msg_queue_create(&io_queue_handle, "ioQ", MAX_NUMBER_OF_IO_MESSAGE, sizeof(T_IO_MSG));
-    os_msg_queue_create(&evt_queue_handle, "evtQ", MAX_NUMBER_OF_EVENT_MESSAGE,
-                        sizeof(uint8_t));
+    os_msg_queue_create(&evt_queue_handle, "evtQ", MAX_NUMBER_OF_EVENT_MESSAGE, sizeof(uint8_t));
+#elif defined RTL8762D
+    os_msg_queue_create(&io_queue_handle, MAX_NUMBER_OF_IO_MESSAGE, sizeof(T_IO_MSG));
+    os_msg_queue_create(&evt_queue_handle, MAX_NUMBER_OF_EVENT_MESSAGE, sizeof(uint8_t));
+#endif
 #ifdef RTK_BR_TASK
     app_init_timer(evt_queue_handle, MAX_NUMBER_OF_APP_TIMER);
 #endif
@@ -195,45 +203,6 @@ void bt_task_entry(void *p_param)
 
     gap_start_bt_stack(evt_queue_handle, io_queue_handle, MAX_NUMBER_OF_GAP_MESSAGE);
 
-#if (ADD_DSP_JTAG_PINMUX == 1)
-    extern void dsp_load_test(void);
-    extern void start_vp(void);
-    extern void stop_vp(void);
-    extern void start_audio(void);
-    extern void start_tts(void);
-    // to do fix this
-    // set DSP JTAG pinmux
-    //set PMUX_PAD_P10_0 ~ 4 -> 140 ~ 144
-    //w4 0x400E2450 8f8e8d8c
-    //*(volatile uint32_t *)0x400E2450 = 0x8F8E8D8C;
-    ////w4 0x400E2454 90
-    //*(volatile uint32_t *)0x400E2454 = 0x90;
-    ////PAD vcore2 & pull up
-    ////w4 0x400019A0 30C130C1
-    //*(volatile uint32_t *)0x400019A0 = 0x30C130C1;
-    ////w4 0x400019A4 30C130C1
-    //*(volatile uint32_t *)0x400019A4 = 0x30C130C1;
-    ////w4 0x400019A8 308130C1
-    //*(volatile uint32_t *)0x400019A8 = 0x30C130C1;
-    Pinmux_Config(P10_0, DSP_JTCK);
-    Pinmux_Config(P10_1, DSP_JTDI);
-    Pinmux_Config(P10_2, DSP_JTDO);
-    Pinmux_Config(P10_3, DSP_JTMS);
-    Pinmux_Config(P10_4, DSP_JTRST);
-    //for vcore2 domain
-    Pad_Config(P10_0, PAD_V2_V4_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-    Pad_Config(P10_1, PAD_V2_V4_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-    Pad_Config(P10_2, PAD_V2_V4_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-    Pad_Config(P10_3, PAD_V2_V4_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-    Pad_Config(P10_4, PAD_V2_V4_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-    DBG_DIRECT("set dsp jtag 0x%X, 0x%X, 0x%X, 0x%X, 0x%X", *(volatile uint32_t *)0x400E2450,
-               *(volatile uint32_t *)0x400E2454, *(volatile uint32_t *)0x400019A0,
-               *(volatile uint32_t *)0x400019A4, *(volatile uint32_t *)0x400019A8);
-
-    //start_audio();
-    //start_tts();
-#endif
-
     while (true)
     {
         if (os_msg_recv(evt_queue_handle, &event, 0xFFFFFFFF) == true)
@@ -246,7 +215,11 @@ void bt_task_entry(void *p_param)
                     app_handle_io_msg(io_msg);
                 }
             }
+#if defined RTL8772F || defined RTL8762G
             else if (EVENT_GROUP(event) == EVENT_GROUP_STACK)
+#elif defined RTL8762D
+            else
+#endif
             {
                 gap_handle_msg(event);
             }

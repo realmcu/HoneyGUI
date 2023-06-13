@@ -21,7 +21,7 @@ if GetDepend(['USING_BR_TASK']):
     src += ['app_br_link_util.c']
     src += ['app_br_api.c']
     CPPDEFINES += ['RTK_BR_TASK']
-if GetDepend(['USING_BLE_TASK']):
+if GetDepend(['MODULE_USING_DATABASE']) and GetDepend(['USING_BLE_TASK']):
     src += ['app_le_link_util.c']
     CPPDEFINES += ['RTK_BLE_TASK']
     

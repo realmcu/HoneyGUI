@@ -104,6 +104,9 @@ void hw_lcd_init(void)
     DBG_DIRECT("Drv lcd init");
 
     drv_dlps_exit_cbacks_register("lcd", lcd_exit_dlps);
+    drv_dlps_enter_cbacks_register("lcd", lcd_enter_dlps);
+    drv_dlps_check_cbacks_register("lcd", lcd_allowed_enter_dlps_check);
+    drv_dlps_wakeup_cbacks_register("lcd", lcd_system_wakeup_dlps_check);
     DBG_DIRECT("Drv lcd Register Exit DLPS CB");
 }
 

@@ -23,9 +23,7 @@ uint32_t auto_test_count = 0;
 #endif
 
 
-static uint32_t (*rtc_count)(void);
-static void (*rtc_set_comp)(bool start, time_t second);
-static uint32_t rtc_clock_src_freq;
+
 
 static T_WATCH_CLOCK watch_clock;
 
@@ -91,7 +89,7 @@ void watch_clock_update(void *p_value)
     watch_clock.unix_timestamp = watch_clock.unix_timestamp + (60 - watch_clock.unix_timestamp % 60);
     watch_clock.pre_rtc_tick_count = drv_rtc_count();
 
-    mcu_rtc_set_comp(false, watch_clock.unix_timestamp);
+    drv_rtc_set_comp(false, watch_clock.unix_timestamp);
 
     /* get UTCTime time */
     watch_clock_set(watch_clock.unix_timestamp);
@@ -123,7 +121,7 @@ void watch_clock_init(time_t time_stamp)
 
     APP_PRINT_INFO1("watch clock_start second_diff_value: %d", (60 - watch_clock.unix_timestamp % 60));
 
-    mcu_rtc_set_comp(true, watch_clock.unix_timestamp);
+    drv_rtc_set_comp(true, watch_clock.unix_timestamp);
 }
 
 #if (WS_USING_LETTER_SHELL == 1)
