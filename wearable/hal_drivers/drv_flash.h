@@ -18,6 +18,7 @@ extern "C" {
 
 #include "stdint.h"
 #include "flash_map.h"
+#include "rtl_hal_peripheral.h"
 
 int rt_hw_flash_init(void);
 

@@ -11,10 +11,64 @@
 
 #include "patch_header_check.h"
 
+#if defined RTL8762D
+void drv_pin_clk_set(uint32_t pin)
+{
+    RCC_PeriphClockCmd(APBPeriph_GPIO, APBPeriph_GPIO_CLOCK, ENABLE);
+}
+
+const IRQn_Type table_irq[GPIO_NUM_MAX] =
+{
+
+};
+
+const IRQ_Fun table_func[GPIO_NUM_MAX] =
+{
+
+};
+
+const VECTORn_Type table_vector[GPIO_NUM_MAX] =
+{
+
+};
+
+void DRV_GPIO_A0_Handler(void)  {DRV_GPIO_HANDLER(P0_0);}
+void DRV_GPIO_A1_Handler(void)  {DRV_GPIO_HANDLER(P0_1);}
+void DRV_GPIO_A2_Handler(void)  {DRV_GPIO_HANDLER(P0_2);}
+void DRV_GPIO_A3_Handler(void)  {DRV_GPIO_HANDLER(P0_3);}
+void DRV_GPIO_A4_Handler(void)  {DRV_GPIO_HANDLER(P0_4);}
+void DRV_GPIO_A5_Handler(void)  {DRV_GPIO_HANDLER(P0_5);}
+void DRV_GPIO_A6_Handler(void)  {DRV_GPIO_HANDLER(P0_6);}
+void DRV_GPIO_A7_Handler(void)  {DRV_GPIO_HANDLER(P0_7);}
+void DRV_GPIO_A8_Handler(void)  {DRV_GPIO_HANDLER(P1_0);}
+void DRV_GPIO_A9_Handler(void)  {DRV_GPIO_HANDLER(P1_1);}
+void DRV_GPIO_A10_Handler(void) {DRV_GPIO_HANDLER(P1_2);}
+void DRV_GPIO_A11_Handler(void) {DRV_GPIO_HANDLER(P1_3);}
+void DRV_GPIO_A12_Handler(void) {DRV_GPIO_HANDLER(P1_4);}
+void DRV_GPIO_A13_Handler(void) {DRV_GPIO_HANDLER(P1_5);}
+void DRV_GPIO_A14_Handler(void) {DRV_GPIO_HANDLER(P1_6);}
+void DRV_GPIO_A15_Handler(void) {DRV_GPIO_HANDLER(P1_7);}
+void DRV_GPIO_A16_Handler(void) {DRV_GPIO_HANDLER(P2_0);}
+void DRV_GPIO_A17_Handler(void) {DRV_GPIO_HANDLER(P2_1);}
+void DRV_GPIO_A18_Handler(void) {DRV_GPIO_HANDLER(P2_2);}
+void DRV_GPIO_A19_Handler(void) {DRV_GPIO_HANDLER(P2_3);}
+void DRV_GPIO_A20_Handler(void) {DRV_GPIO_HANDLER(P2_4);}
+void DRV_GPIO_A21_Handler(void) {DRV_GPIO_HANDLER(P2_5);}
+void DRV_GPIO_A22_Handler(void) {DRV_GPIO_HANDLER(P2_6);}
+void DRV_GPIO_A23_Handler(void) {DRV_GPIO_HANDLER(P2_7);}
+void DRV_GPIO_A24_Handler(void) {DRV_GPIO_HANDLER(P3_0);}
+void DRV_GPIO_A25_Handler(void) {DRV_GPIO_HANDLER(P3_1);}
+void DRV_GPIO_A26_Handler(void) {DRV_GPIO_HANDLER(P3_2);}
+void DRV_GPIO_A27_Handler(void) {DRV_GPIO_HANDLER(P3_3);}
+void DRV_GPIO_A28_Handler(void) {DRV_GPIO_HANDLER(P2_4);}
+void DRV_GPIO_A29_Handler(void) {DRV_GPIO_HANDLER(P3_5);}
+void DRV_GPIO_A30_Handler(void) {DRV_GPIO_HANDLER(P3_6);}
+void DRV_GPIO_A31_Handler(void) {DRV_GPIO_HANDLER(P3_6);}
+
+#endif
 
 
-
-#if (IMG_IC_TYPE == 0xF)
+#if defined RTL8762G
 void drv_pin_clk_set(uint32_t pin)
 {
     if (GPIO_GetPort(pin) == GPIOA)
@@ -299,7 +353,7 @@ const VECTORn_Type table_vector[GPIO_NUM_MAX] =
     GPIOB31_VECTORn,
 };
 #endif
-#if (IMG_IC_TYPE == 0xE)
+#if defined RTL8772F
 void drv_pin_clk_set(uint32_t pin)
 {
     if (GPIO_GetPort(pin) == GPIOA)

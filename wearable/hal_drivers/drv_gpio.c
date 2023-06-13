@@ -10,13 +10,11 @@
 
 #include <board.h>
 #include "drv_gpio.h"
-#include "utils.h"
 #include "trace.h"
-#include "patch_header_check.h"
-#if (IMG_IC_TYPE == 0xF)
+#if defined RTL8762G
 #include "vector_table.h"
 #endif
-#if (IMG_IC_TYPE == 0xE)
+#if defined RTL8772F
 #include "vector_table_ns.h"
 #endif
 #include "os_sched.h"
@@ -37,10 +35,14 @@ typedef struct
 
 static drv_gpio_irq gpio_cb[GPIO_NUM_MAX] = {{NULL, NULL}};
 
-static void DRV_GPIO_HANDLER(uint32_t Pin_num)
+static void DRV_GPIO_HANDLER(uint32_t pin)
 {
-    uint8_t num = GPIO_GetNum(Pin_num);
-    GPIO_ClearINTPendingBit(GPIO_GetPort(Pin_num), GPIO_GetPin(Pin_num));
+    uint8_t num = GPIO_GetNum(pin);
+#if defined RTL8772F || defined RTL8762G
+    GPIO_ClearINTPendingBit(GPIO_GetPort(pin), GPIO_GetPin(pin));
+#elif defined RTL8762D
+    GPIO_ClearINTPendingBit(GPIO_GetPin(pin));
+#endif
 
     if (gpio_cb[num].gpio_cb != NULL)
     {
@@ -79,12 +81,21 @@ void drv_pin_mode(uint32_t pin, uint32_t mode)
         Pinmux_Config(pin, DWGPIO);
     }
     GPIO_InitStruct.GPIO_ITCmd  = DISABLE;
+
+#if defined RTL8772F || defined RTL8762G
     GPIO_Init(GPIO_GetPort(pin), &GPIO_InitStruct);
+#elif defined RTL8762D
+    GPIO_Init(&GPIO_InitStruct);
+#endif
 }
 
 void drv_pin_write(uint32_t pin, uint32_t value)
 {
+#if defined RTL8772F || defined RTL8762G
     GPIO_WriteBit(GPIO_GetPort(pin), GPIO_GetPin(pin), (BitAction)(value));
+#elif defined RTL8762D
+    GPIO_WriteBit(GPIO_GetPin(pin), (BitAction)(value));
+#endif
 }
 
 uint8_t drv_pin_read(uint32_t pin)
@@ -93,7 +104,11 @@ uint8_t drv_pin_read(uint32_t pin)
 
     value = PIN_LOW;
 
+#if defined RTL8772F || defined RTL8762G
     value = GPIO_ReadInputDataBit(GPIO_GetPort(pin), GPIO_GetPin(pin));
+#elif defined RTL8762D
+    value = GPIO_ReadInputDataBit(GPIO_GetPin(pin));
+#endif
 
     return value;
 }
@@ -139,11 +154,20 @@ uint8_t drv_pin_attach_irq(uint32_t pin, uint32_t mode, void (*hdr)(void *args),
         GPIO_InitStruct.GPIO_ITPolarity = GPIO_INT_POLARITY_ACTIVE_LOW;
     }
 
+#if defined RTL8772F || defined RTL8762G
     GPIO_Init(GPIO_GetPort(pin), &GPIO_InitStruct);
+#elif defined RTL8762D
+    GPIO_Init(&GPIO_InitStruct);
+#endif
 
     gpio_cb[GPIO_GetNum(pin)].gpio_cb = hdr;
     gpio_cb[GPIO_GetNum(pin)].args = args;
+#if defined RTL8772F || defined RTL8762G
     RamVectorTableUpdate_ns_ext(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
+#elif defined RTL8762D
+    extern bool RamVectorTableUpdate(VECTORn_Type v_num, IRQ_Fun isr_handler);
+    RamVectorTableUpdate(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
+#endif
 
     NVIC_InitTypeDef NVIC_InitStruct;
     NVIC_InitStruct.NVIC_IRQChannel = table_irq[GPIO_GetNum(pin)];
@@ -167,13 +191,14 @@ uint8_t drv_pin_dettach_irq(uint32_t pin)
 
 uint8_t drv_pin_irq_enable(uint32_t pin, uint32_t enabled)
 {
+
+#if defined RTL8772F || defined RTL8762G
     if (PIN_IRQ_ENABLE == enabled)
     {
         GPIO_MaskINTConfig(GPIO_GetPort(pin), GPIO_GetPin(pin), ENABLE);
         GPIO_INTConfig(GPIO_GetPort(pin), GPIO_GetPin(pin), ENABLE);
         GPIO_ClearINTPendingBit(GPIO_GetPort(pin), GPIO_GetPin(pin));
-        //platform_delay_us(10);
-        os_delay(2);
+        platform_delay_us(10);
         GPIO_MaskINTConfig(GPIO_GetPort(pin), GPIO_GetPin(pin), DISABLE);
     }
     else
@@ -182,6 +207,23 @@ uint8_t drv_pin_irq_enable(uint32_t pin, uint32_t enabled)
         GPIO_ClearINTPendingBit(GPIO_GetPort(pin), GPIO_GetPin(pin));
         GPIO_MaskINTConfig(GPIO_GetPort(pin), GPIO_GetPin(pin), DISABLE);
     }
+#elif defined RTL8762D
+    if (PIN_IRQ_ENABLE == enabled)
+    {
+        GPIO_MaskINTConfig(GPIO_GetPin(pin), ENABLE);
+        GPIO_INTConfig(GPIO_GetPin(pin), ENABLE);
+        GPIO_ClearINTPendingBit(GPIO_GetPin(pin));
+        platform_delay_us(100);
+        GPIO_MaskINTConfig(GPIO_GetPin(pin), DISABLE);
+    }
+    else
+    {
+        GPIO_INTConfig(GPIO_GetPin(pin), DISABLE);
+        GPIO_ClearINTPendingBit(GPIO_GetPin(pin));
+        GPIO_MaskINTConfig(GPIO_GetPin(pin), DISABLE);
+    }
+#endif
+
     return 0;
 }
 

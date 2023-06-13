@@ -9,10 +9,9 @@
  */
 
 #include "rtl876x.h"
-#include "rtl_rtc.h"
-#include "rtl_nvic.h"
-#include "trace.h"
+#include "rtl_hal_peripheral.h"
 #include "drv_rtc.h"
+#include "trace.h"
 #include "patch_header_check.h"
 
 #define RTC_SRC_FREQ            32000
@@ -27,9 +26,8 @@ static bool drv_rtc_started = false;
 
 static bool rtc_system_wakeup_dlps_check(void)
 {
-#if (IMG_IC_TYPE == 0xF)
-#endif
-#if (IMG_IC_TYPE == 0xE)
+
+#if defined RTL8772F
     if (HAL_READ32(SOC_VENDOR2_REG_BASE, 0x0058) == 0x80)
     {
         DBG_DIRECT("RTC Wake up");
@@ -46,7 +44,9 @@ static bool rtc_exit_dlps(void)
     NVIC_InitStruct.NVIC_IRQChannel = RTC_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+#if defined RTL8772F || defined RTL8762G
     NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
+#endif
     NVIC_Init(&NVIC_InitStruct);
     return true;
 }
@@ -67,7 +67,9 @@ void drv_rtc_init(void)
     NVIC_InitStruct.NVIC_IRQChannel = RTC_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+#if defined RTL8772F || defined RTL8762G
     NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
+#endif
     NVIC_Init(&NVIC_InitStruct);
     RTC_SetPrescaler(0);//no div
 
@@ -100,7 +102,9 @@ void drv_rtc_second_attach_irq(void (*hdr)(void *args), void *args)
     uint32_t CompareValue;
     CompareValue = RTC_GetCounter() + RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1);
     RTC_SetCompValue(RTC_COMP0, CompareValue & 0xFFFFFFFF);
+#if defined RTL8772F || defined RTL8762G
     RTC_WKConfig(RTC_WK_COMP0, ENABLE);
+#endif
     RTC_INTConfig(RTC_INT_COMP0, ENABLE);
 }
 
@@ -116,7 +120,9 @@ void drv_rtc_minute_attach_irq(void (*hdr)(void *args), void *args)
     uint32_t CompareValue;
     CompareValue = RTC_GetCounter() + RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1) * 60; //todo
     RTC_SetCompValue(RTC_COMP1, CompareValue & 0xFFFFFFFF);
+#if defined RTL8772F || defined RTL8762G
     RTC_WKConfig(RTC_WK_COMP1, ENABLE);
+#endif
     RTC_INTConfig(RTC_INT_COMP1, ENABLE);
 }
 
@@ -144,17 +150,21 @@ void mcu_rtc_set_comp(bool start, time_t time_stamp)
   */
 void RTC_Handler()
 {
-    uint32_t CompareValue = 0;
+    //uint32_t CompareValue = 0;
+#if defined RTL8772F || defined RTL8762G
     DBG_DIRECT("RTC->CR0 = 0x%x, RTC->INT_CLR = 0x%x, RTC->INT_SR = 0x%x, RTC->CNT = 0x%x, RTC->COMP0 = 0x%x",
                RTC->RTC_CR0, RTC->RTC_INT_CLEAR, RTC->RTC_INT_SR, RTC->RTC_CNT0, RTC->RTC_COMP_0);
-
     DBG_DIRECT("refuse_reason 0x%x error_code 0x%x", platform_pm_get_refuse_reason(),
                platform_pm_get_error_code());
+#endif
+
     if (RTC_GetINTStatus(RTC_INT_COMP0) == SET)
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP0);
         RTC_ClearCompINT(RTC_COMP0);
+#if defined RTL8772F || defined RTL8762G
         RTC_ClearWakeupStatusBit(RTC_WK_COMP0);
+#endif
         uint32_t CompareValue;
         CompareValue = RTC_GetCompValue(RTC_COMP0) + (RTC_SRC_FREQ / (RTC_PRESCALER_VAL + 1));
         RTC_SetCompValue(RTC_COMP0, CompareValue & 0xFFFFFFFF);
@@ -167,7 +177,9 @@ void RTC_Handler()
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP1);
         RTC_ClearCompINT(RTC_COMP1);
+#if defined RTL8772F || defined RTL8762G
         RTC_ClearWakeupStatusBit(RTC_WK_COMP1);
+#endif
         if (comp1_irq.rtc_cb != NULL)
         {
             comp1_irq.rtc_cb(comp1_irq.args);
@@ -177,13 +189,17 @@ void RTC_Handler()
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP2);
         RTC_ClearCompINT(RTC_COMP2);
+#if defined RTL8772F || defined RTL8762G
         RTC_ClearWakeupStatusBit(RTC_WK_COMP2);
+#endif
     }
     if (RTC_GetINTStatus(RTC_INT_COMP3) == SET)
     {
         RTC_ClearINTPendingBit(RTC_INT_COMP3);
         RTC_ClearCompINT(RTC_COMP3);
-        RTC_ClearWakeupStatusBit(RTC_WK_COMP3);
+#if defined RTL8772F || defined RTL8762G
+        RTC_ClearWakeupStatusBit(RTC_WK_COMP2);
+#endif
     }
 
     if (RTC_GetINTStatus(RTC_INT_TICK) == SET)

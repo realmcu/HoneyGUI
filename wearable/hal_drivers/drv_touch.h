@@ -11,11 +11,10 @@
 #ifndef __DRV_TOUCH_H__
 #define __DRV_TOUCH_H__
 
-#include "rtl_rcc.h"
-#include "rtl_nvic.h"
-#include "rtl_pinmux.h"
+#include "rtl_hal_peripheral.h"
 #include "drv_dlps.h"
 #include "drv_gpio.h"
+#include "drv_i2c.h"
 
 
 #ifdef TOUCH_GT911

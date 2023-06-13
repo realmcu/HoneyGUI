@@ -10,7 +10,6 @@
 #include "drv_lcd.h"
 #include "drv_dlps.h"
 #include "trace.h"
-#include "utils.h"
 #include "app_section.h"
 #include "os_mem.h"
 
@@ -75,23 +74,25 @@ void Display_Handler(void)
     DBG_DIRECT("Display_Handler1");
 }
 
-static void lcd_enter_dlps(void *drv_io)
+static bool lcd_enter_dlps(void)
 {
     drv_lcd_power_off();
+    return true;
 }
 
-static void lcd_exit_dlps(void *drv_io)
+static bool lcd_exit_dlps(void)
 {
     rtk_lcd_hal_init();
     DBG_DIRECT("Drv lcd init");
+    return true;
 }
 
-static bool lcd_allowed_enter_dlps_check(void *drv_io)
+static bool lcd_allowed_enter_dlps_check(void)
 {
     return false;
 }
 
-static bool lcd_system_wakeup_dlps_check(void *drv_io)
+static bool lcd_system_wakeup_dlps_check(void)
 {
     return false;
 }

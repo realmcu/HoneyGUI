@@ -13,10 +13,8 @@
 
 
 #include "string.h"
-#include "rtl_rcc.h"
-#include "rtl_nvic.h"
-#include "rtl_pinmux.h"
-#include "rtl_io_dlps.h"
+#include "rtl_hal_peripheral.h"
+
 
 /**
  * Single List structure for dlps
@@ -78,8 +76,10 @@ typedef struct drv_dlps_cb_item
 } drv_dlps_cb_item_t;
 
 
-void drv_dlps_exit_cbacks_register(const char *name, void *cbacks);
-void drv_dlps_enter_cbacks_register(const char *name, void *cbacks);
+void drv_dlps_exit_cbacks_register(const char *name, bool (*cbacks)(void));
+void drv_dlps_enter_cbacks_register(const char *name, bool (*cbacks)(void));
+void drv_dlps_check_cbacks_register(const char *name, bool (*cbacks)(void));
+void drv_dlps_wakeup_cbacks_register(const char *name, bool (*cbacks)(void));
 
 
 #endif  /* __DRV_DLPS_H__ */

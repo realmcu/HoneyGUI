@@ -11,9 +11,7 @@
 #ifndef __DRV_LCD_H__
 #define __DRV_LCD_H__
 
-#include "rtl_rcc.h"
-#include "rtl_nvic.h"
-#include "rtl_pinmux.h"
+#include "rtl_hal_peripheral.h"
 #include "drv_dlps.h"
 
 

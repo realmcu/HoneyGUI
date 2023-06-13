@@ -19,10 +19,7 @@ extern "C" {
 
 
 #include "stdbool.h"
-#include "rtl_rcc.h"
-#include "rtl_rtc.h"
-#include "rtl_nvic.h"
-#include "rtl_pinmux.h"
+#include "rtl_hal_peripheral.h"
 #include "drv_dlps.h"
 #include "time.h"
 

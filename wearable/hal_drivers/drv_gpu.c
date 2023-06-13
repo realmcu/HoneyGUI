@@ -19,24 +19,26 @@
 static uint8_t *contiguous_mem = NULL;
 
 
-static void gpu_enter_dlps(void *drv_io)
+static bool gpu_enter_dlps(void)
 {
     drv_gpu_deinit();
     DBG_DIRECT("gpu_enter_dlps");
+    return false;
 }
 
-static void gpu_exit_dlps(void *drv_io)
+static bool gpu_exit_dlps(void)
 {
     drv_gpu_init();
     DBG_DIRECT("gpu_exit_dlps");
+    return false;
 }
 
-static bool gpu_allowed_enter_dlps_check(void *drv_io)
+static bool gpu_allowed_enter_dlps_check(void)
 {
     return false;
 }
 
-static bool gpu_system_wakeup_dlps_check(void *drv_io)
+static bool gpu_system_wakeup_dlps_check(void)
 {
     return false;
 }

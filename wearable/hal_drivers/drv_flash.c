@@ -10,7 +10,6 @@
 
 #include "board.h"
 #include "drv_flash.h"
-#include "flash_nor_device.h"
 #include "trace.h"
 #include "string.h"
 #ifdef RTK_MODULE_USING_DATABASE
@@ -35,7 +34,11 @@ int realtek_flash_read(uint32_t addr, uint8_t *buf, uint32_t size)
         return -1;
     }
 
+#if defined RTL8772F || defined RTL8762G
     flash_nor_read_locked(addr, buf, size);
+#elif defined RTL8762D
+    flash_read_locked(addr, size, buf);
+#endif
     return size;
 }
 
@@ -53,7 +56,12 @@ int realtek_flash_read(uint32_t addr, uint8_t *buf, uint32_t size)
 
 int realtek_flash_write(uint32_t addr, const uint8_t *buf, uint32_t size)
 {
+
+#if defined RTL8772F || defined RTL8762G
     if (flash_nor_write_locked(addr, (uint8_t *)buf, size) == false)
+#elif defined RTL8762D
+    if (flash_write_locked(addr, size, (uint8_t *)buf) == false)
+#endif
     {
         DBG_DIRECT("realtek data write error!\r\n");
         return 0;
@@ -126,8 +134,15 @@ int realtek_flash_erase(uint32_t addr, size_t size)
 
     for (uint32_t i = 0; i < count_sector; i++)
     {
+
+#if defined RTL8772F || defined RTL8762G
         if (flash_nor_erase_locked(REALTK_FLASH_START_ADDRESS + start_sector * FLASH_SECTOR_SIZE +
                                    FLASH_SECTOR_SIZE * i, FLASH_NOR_ERASE_SECTOR) == false)
+#elif defined RTL8762D
+        if (flash_erase_locked(FLASH_ERASE_SECTOR,
+                               REALTK_FLASH_START_ADDRESS + start_sector * FLASH_SECTOR_SIZE +
+                               FLASH_SECTOR_SIZE * i) == false)
+#endif
         {
             DBG_DIRECT("fs data erase error!");
             return 0;

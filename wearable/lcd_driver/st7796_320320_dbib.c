@@ -1,7 +1,5 @@
-#include "rtl876x_lcdc.h"
-#include "rtl876x_dbib.h"
+#include "rtl_hal_peripheral.h"
 #include "st7796_320320_dbib.h"
-#include "utils.h"
 #include "drv_gpio.h"
 
 #define LCDC_DMA_CHANNEL_NUM              0

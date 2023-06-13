@@ -70,16 +70,18 @@ void rtk_touch_hal_int_config(bool enable)
 }
 
 
-static void touch_enter_dlps(void)
+static bool touch_enter_dlps(void)
 {
     Pad_Config(TOUCH_816S_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
     System_WakeUpPinEnable(TOUCH_816S_INT, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+    return false;
 }
 
-static void touch_exit_dlps(void)
+static bool touch_exit_dlps(void)
 {
     Pad_Config(TOUCH_816S_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_LOW);
+    return false;
 }
 
 static bool touch_allowed_enter_dlps_check(void)
@@ -112,7 +114,7 @@ void drv_touch_dlps_init(void)
 
 void rtk_touch_hal_init(void)
 {
-    drv_i2c0_set_scl_sda(TOUCH_816S_SCL, TOUCH_816S_SDA);
+    drv_i2c0_init(TOUCH_816S_SCL, TOUCH_816S_SDA);
     drv_pin_mode(TOUCH_816S_RST, PIN_MODE_OUTPUT);
     drv_pin_write(TOUCH_816S_RST, 0);
     platform_delay_ms(10);

@@ -34,7 +34,6 @@
 #include "sysm.h"
 #include "remote.h"
 #endif
-#include "rtl_pinmux.h"
 #include <watch_msg.h>
 
 #define ADD_DSP_JTAG_PINMUX   0

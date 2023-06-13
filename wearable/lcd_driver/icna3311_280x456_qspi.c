@@ -1,9 +1,7 @@
 #include "icna3311_280x456_qspi.h"
-#include "rtl_lcdc_dbic.h"
 #include "utils.h"
 #include "rtl_pinmux.h"
-#include "rtl_gpio.h"
-#include "rtl_rcc.h"
+#include "rtl_hal_peripheral.h"
 #include "trace.h"
 
 #define LCDC_DMA_CHANNEL_NUM              0

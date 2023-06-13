@@ -3,11 +3,6 @@
 #include <gui_matrix.h>
 #include "acc_engine.h"
 
-#ifdef RTK_MODULE_VG_LITE
-#elif defined (RTK_MODULE_RTK_PPE)
-#include "rtl_rcc.h"
-#else
-#endif
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
 extern void sw_draw_circle(canvas_circle_t *c, struct gui_dispdev *dc);
@@ -52,7 +47,6 @@ void gui_acc_init(void)
     acc.draw_wave = hw_acc_draw_wave;
     acc.draw_palette_wheel = hw_acc_draw_palette_wheel;
 #elif defined (RTK_MODULE_RTK_PPE)
-    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
     acc.blit = hw_acc_blit;
     acc.draw_path = sw_draw_path;
     acc.draw_polyline = sw_draw_polyline;

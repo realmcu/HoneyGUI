@@ -8,15 +8,11 @@
  * 2020-08-04     tyustli  first version
  */
 
-#include "rtl_gpio.h"
-#include "rtl_rcc.h"
-#include "drv_gpio.h"
-#include "drv_i2c.h"
+#include "rtl_hal_peripheral.h"
 #include "drv_touch.h"
 #include "touch_zt2717.h"
 #include "string.h"
 #include "trace.h"
-#include "utils.h"
 
 
 static void ts_write_cmd(uint16_t cmd)
@@ -79,15 +75,17 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     return true;
 }
 
-static void touch_enter_dlps(void)
+static bool touch_enter_dlps(void)
 {
     //Pad_Config(TOUCH_816S_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
     //System_WakeUpPinEnable(TOUCH_816S_INT, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+    return false;
 }
 
-static void touch_exit_dlps(void)
+static bool touch_exit_dlps(void)
 {
     //Pad_Config(TOUCH_816S_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,PAD_OUT_LOW);
+    return false;
 }
 
 static bool touch_allowed_enter_dlps_check(void)
@@ -111,8 +109,7 @@ static void drv_touch_dlps_init(void)
 
 void rtk_touch_hal_init(void)
 {
-    drv_touch_dlps_init();
-    drv_i2c0_set_scl_sda(TOUCH_ZT2717_SCL, TOUCH_ZT2717_SDA);
+    drv_i2c0_init(TOUCH_ZT2717_SCL, TOUCH_ZT2717_SDA);
     drv_pin_mode(TOUCH_ZT2717_RST, PIN_MODE_OUTPUT);
     drv_pin_write(TOUCH_ZT2717_RST, 1);
 

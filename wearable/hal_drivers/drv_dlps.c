@@ -9,10 +9,12 @@
  */
 
 #include "drv_dlps.h"
+#include "rtl_hal_peripheral.h"
 #include "dlps.h"
 #include "trace.h"
 #include "app_section.h"
-#include "rtl_io_dlps.h"
+#include "stdlib.h"
+
 
 
 #define     DLPS_EN     0
@@ -41,7 +43,7 @@ static dlps_slist_t drv_dlps_wakeup_slist =
  * @note     system handle to judge which pin is wake source
  * @return   void
  */
-RAM_FUNCTION
+RTL_HAL_RAM_CODE
 void System_Handler(void)
 {
 #ifdef RTL8772F
@@ -70,7 +72,7 @@ void System_Handler(void)
  * @return none
  * @retval void
 */
-RAM_FUNCTION
+RTL_HAL_RAM_CODE
 static void app_enter_dlps_config(void)
 {
     DBG_DIRECT("DLPS ENTER");
@@ -93,7 +95,7 @@ static void app_enter_dlps_config(void)
  * @return none
  * @retval void
 */
-RAM_FUNCTION
+RTL_HAL_RAM_CODE
 static void app_exit_dlps_config(void)
 {
     DBG_DIRECT("DLPS EXIT");
@@ -111,7 +113,7 @@ static void app_exit_dlps_config(void)
 * @return true : allow enter dlps
  * @retval void
 */
-RAM_FUNCTION
+RTL_HAL_RAM_CODE
 static PMCheckResult app_dlps_check_cb(void)
 {
     dlps_slist_t *node;
@@ -154,7 +156,7 @@ void pwr_mgr_init(void)
 #endif
 }
 
-void drv_dlps_exit_cbacks_register(const char *name, void *cbacks)
+void drv_dlps_exit_cbacks_register(const char *name, bool (*cbacks)(void))
 {
     drv_dlps_cb_item_t *p_item = malloc(sizeof(drv_dlps_cb_item_t));
     if (p_item == NULL)
@@ -168,7 +170,7 @@ void drv_dlps_exit_cbacks_register(const char *name, void *cbacks)
     dlps_slist_append(&drv_dlps_exit_slist, &(p_item->slist));
 }
 
-void drv_dlps_enter_cbacks_register(const char *name, void *cbacks)
+void drv_dlps_enter_cbacks_register(const char *name, bool (*cbacks)(void))
 {
     drv_dlps_cb_item_t *p_item = malloc(sizeof(drv_dlps_cb_item_t));
     if (p_item == NULL)
@@ -181,7 +183,7 @@ void drv_dlps_enter_cbacks_register(const char *name, void *cbacks)
     dlps_slist_append(&drv_dlps_enter_slist, &(p_item->slist));
 }
 
-void drv_dlps_check_cbacks_register(const char *name, void *cbacks)
+void drv_dlps_check_cbacks_register(const char *name, bool (*cbacks)(void))
 {
     drv_dlps_cb_item_t *p_item = malloc(sizeof(drv_dlps_cb_item_t));
     if (p_item == NULL)
@@ -194,7 +196,7 @@ void drv_dlps_check_cbacks_register(const char *name, void *cbacks)
     dlps_slist_append(&drv_dlps_check_slist, &(p_item->slist));
 }
 
-void drv_dlps_wakeup_cbacks_register(const char *name, void *cbacks)
+void drv_dlps_wakeup_cbacks_register(const char *name, bool (*cbacks)(void))
 {
     drv_dlps_cb_item_t *p_item = malloc(sizeof(drv_dlps_cb_item_t));
     if (p_item == NULL)

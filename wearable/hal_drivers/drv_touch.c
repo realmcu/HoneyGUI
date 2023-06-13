@@ -10,7 +10,7 @@
 
 
 #include "trace.h"
-#include "utils.h"
+#include "rtl_hal_peripheral.h"
 #include "app_section.h"
 #include "drv_i2c.h"
 #include "drv_gpio.h"
