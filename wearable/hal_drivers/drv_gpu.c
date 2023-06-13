@@ -19,26 +19,7 @@
 static uint8_t *contiguous_mem = NULL;
 
 
-static bool gpu_enter_dlps(void)
-{
-    drv_gpu_deinit();
-    DBG_DIRECT("gpu_enter_dlps");
-    return false;
-}
-
-static bool gpu_exit_dlps(void)
-{
-    drv_gpu_init();
-    DBG_DIRECT("gpu_exit_dlps");
-    return false;
-}
-
 static bool gpu_allowed_enter_dlps_check(void)
-{
-    return false;
-}
-
-static bool gpu_system_wakeup_dlps_check(void)
 {
     return false;
 }
@@ -74,9 +55,6 @@ void hw_gpu_init(void)
     vg_lite_get_register(0x30, &cid);
     DBG_DIRECT("chip id information, chid_id = 0x%x; chip_rev = 0x%x; cid = 0x%x\n", chip_id, chip_rev,
                cid);
-
-    drv_dlps_enter_cbacks_register("gpu", gpu_enter_dlps);
-    drv_dlps_exit_cbacks_register("gpu", gpu_exit_dlps);
 }
 
 
