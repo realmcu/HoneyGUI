@@ -18,6 +18,8 @@
 *:wearable\database\fal-v0.5.0\*
 *:wearable\database\FlashDB-v1.1.1\*
 *:wearable\tuya-ble-sdk\*
+*:wearable\aliIOT\*
+*:wearable\miwear-sdk_0.2.13\*
 *:wearable\music_player\app_playback.c
 *:wearable\music_player\mp3_parser.c
 *:VGLite\*

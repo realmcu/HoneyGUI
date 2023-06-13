@@ -1,0 +1,758 @@
+/*
+ * sm2_test.c
+ *
+ *  Created on: 2018-7-11
+ *      Author: Administrator
+ */
+
+#include "mbedtls/ecp.h"
+#include "mbedtls/bignum.h"
+#include "sm3.h"
+#include "alipay_vendor.h"
+//#include "co_log.h"
+
+#define ALIPAY_MBEDTLS_SYMBOL(func)     ALIPAY_##func
+#define LOG_ERROR(...)
+#define LOG_INFO(...)
+#define LOG_BUFFER(...)
+
+#define LOAD_GROUP_A( G )   ecp_group_load( grp,            \
+                            G ## _p,  sizeof( G ## _p  ),   \
+                            G ## _a,  sizeof( G ## _a  ),   \
+                            G ## _b,  sizeof( G ## _b  ),   \
+                            G ## _gx, sizeof( G ## _gx ),   \
+                            G ## _gy, sizeof( G ## _gy ),   \
+                            G ## _n,  sizeof( G ## _n  ) )
+
+#define BYTES_TO_T_UINT_8(a, b, c, d, e, f, g, h)   (d<<24)|(c<<16)|(b<<8)|(a<<0), (h<<24)|(g<<16)|(f<<8)|(e<<0)
+
+static const mbedtls_mpi_uint sm2256_p[] = {
+        BYTES_TO_T_UINT_8(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF),
+        BYTES_TO_T_UINT_8(0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF),
+        BYTES_TO_T_UINT_8(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF),
+        BYTES_TO_T_UINT_8(0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF),
+};
+static const mbedtls_mpi_uint sm2256_a[] = {
+        BYTES_TO_T_UINT_8(0xFC, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF),
+        BYTES_TO_T_UINT_8(0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF),
+        BYTES_TO_T_UINT_8(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF),
+        BYTES_TO_T_UINT_8(0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF),
+};
+static const mbedtls_mpi_uint sm2256_b[] = {
+        BYTES_TO_T_UINT_8(0x93, 0x0E, 0x94, 0x4D, 0x41, 0xBD, 0xBC, 0xDD),
+        BYTES_TO_T_UINT_8(0x92, 0x8F, 0xAB, 0x15, 0xF5, 0x89, 0x97, 0xF3),
+        BYTES_TO_T_UINT_8(0xA7, 0x09, 0x65, 0xCF, 0x4B, 0x9E, 0x5A, 0x4D),
+        BYTES_TO_T_UINT_8(0x34, 0x5E, 0x9F, 0x9D, 0x9E, 0xFA, 0xE9, 0x28),
+};
+static const mbedtls_mpi_uint sm2256_gx[] = {
+        BYTES_TO_T_UINT_8(0xC7, 0x74, 0x4C, 0x33, 0x89, 0x45, 0x5A, 0x71),
+        BYTES_TO_T_UINT_8(0xE1, 0x0B, 0x66, 0xF2, 0xBF, 0x0B, 0xE3, 0x8F),
+        BYTES_TO_T_UINT_8(0x94, 0xC9, 0x39, 0x6A, 0x46, 0x04, 0x99, 0x5F),
+        BYTES_TO_T_UINT_8(0x19, 0x81, 0x19, 0x1F, 0x2C, 0xAE, 0xC4, 0x32),
+};
+static const mbedtls_mpi_uint sm2256_gy[] = {
+        BYTES_TO_T_UINT_8(0xA0, 0xF0, 0x39, 0x21, 0xE5, 0x32, 0xDF, 0x02),
+        BYTES_TO_T_UINT_8(0x40, 0x47, 0x2A, 0xC6, 0x7C, 0x87, 0xA9, 0xD0),
+        BYTES_TO_T_UINT_8(0x53, 0x21, 0x69, 0x6B, 0xE3, 0xCE, 0xBD, 0x59),
+        BYTES_TO_T_UINT_8(0x9C, 0x77, 0xF6, 0xF4, 0xA2, 0x36, 0x37, 0xBC),
+};
+static const mbedtls_mpi_uint sm2256_n[] = {
+        BYTES_TO_T_UINT_8(0x23, 0x41, 0xD5, 0x39, 0x09, 0xF4, 0xBB, 0x53),
+        BYTES_TO_T_UINT_8(0x2B, 0x05, 0xC6, 0x21, 0x6B, 0xDF, 0x03, 0x72),
+        BYTES_TO_T_UINT_8(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF),
+        BYTES_TO_T_UINT_8(0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF),
+};
+
+#include "platform_utils.h"
+int alipay_f_rng(void *p_rng, unsigned char *output, uint32_t length)
+{
+    memcpy(output, (void *)0x00200000, length);
+    //*output = rand();
+    *output = platform_random(0xFFFFFFFF);
+    return 0;
+}
+
+static inline void ecp_mpi_load( mbedtls_mpi *X, const mbedtls_mpi_uint *p, uint32_t len )
+{
+    X->s = 1;
+    X->n = len / sizeof( mbedtls_mpi_uint );
+    X->p = (mbedtls_mpi_uint *) p;
+}
+static inline void ecp_mpi_set1( mbedtls_mpi *X )
+{
+    static mbedtls_mpi_uint one[] = { 1 };
+    X->s = 1;
+    X->n = 1;
+    X->p = one;
+}
+static int ecp_group_load( mbedtls_ecp_group *grp,
+                           const mbedtls_mpi_uint *p,  uint32_t plen,
+                           const mbedtls_mpi_uint *a,  uint32_t alen,
+                           const mbedtls_mpi_uint *b,  uint32_t blen,
+                           const mbedtls_mpi_uint *gx, uint32_t gxlen,
+                           const mbedtls_mpi_uint *gy, uint32_t gylen,
+                           const mbedtls_mpi_uint *n,  uint32_t nlen)
+{
+    ecp_mpi_load( &grp->P, p, plen );
+    if( a != NULL )
+        ecp_mpi_load( &grp->A, a, alen );
+    ecp_mpi_load( &grp->B, b, blen );
+    ecp_mpi_load( &grp->N, n, nlen );
+
+    ecp_mpi_load( &grp->G.X, gx, gxlen );
+    ecp_mpi_load( &grp->G.Y, gy, gylen );
+    ecp_mpi_set1( &grp->G.Z );
+
+    grp->pbits = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_bitlen)( &grp->P );
+    grp->nbits = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_bitlen)( &grp->N );
+
+    grp->h = 1;
+
+    return( 0 );
+}
+
+static int mbedtls_sm2_ecp_group_load( mbedtls_ecp_group *grp)
+{
+    return( LOAD_GROUP_A( sm2256 ) );
+}
+
+int lib_sm2_encrypt(const uint8_t pub[64],
+                               const uint8_t *plain_buf, uint32_t plain_buf_len,
+                               uint8_t *cipher_buf, uint32_t *cipher_buf_len)
+{
+
+    LOG_INFO("encrypt_test", "===================================sm2_encrypt=====================");
+    LOG_BUFFER("pubkey", pub, 64);
+    LOG_BUFFER("plain ", plain_buf, plain_buf_len);
+
+
+    int ret = 0;
+    uint8_t kp_buf[64] = {0};
+    // uint8_t t[1024] = {0};
+    uint8_t* t = ALIPAY_malloc(1024);
+    memset(t,0,sizeof(1024));
+
+
+    // if (sizeof(t) <= plain_buf_len)
+    // {
+    //     return -2;
+    // }
+
+    mbedtls_mpi k, h;
+    mbedtls_ecp_point C1, Pb, S, kP;
+    mbedtls_ecp_group sm2_ecp_grp;
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_init)(&k);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_init)(&h);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_init)(&C1);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_init)(&Pb);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_init)(&S);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_init)(&kP);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_group_init)(&sm2_ecp_grp);
+
+    mbedtls_sm2_ecp_group_load(&sm2_ecp_grp);
+    //mbedtls_mpi_read_binary(&public_key, pub, sizeof(pub));
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_read_binary)(&Pb.X, pub, 32));
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_read_binary)(&Pb.Y, pub + 32, 32));
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_lset)(&Pb.Z, 1));
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_lset)(&h, sm2_ecp_grp.h);
+
+    /*
+        * Generate a random value to blind inv_mod in next step,
+        * avoiding a potential timing leak.
+        */
+    int blind_tries = 0;
+    do
+    {
+        size_t n_size = (sm2_ecp_grp.nbits + 7) / 8;
+        MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_fill_random)(&k, n_size, alipay_f_rng, NULL));
+        MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_shift_r)(&k, 8 * n_size - sm2_ecp_grp.nbits));
+
+        if (++blind_tries > 30){
+            ret = MBEDTLS_ERR_ECP_RANDOM_FAILED;
+            goto cleanup;
+        }
+    } while (ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_cmp_int)(&k, 1) < 0 ||
+             ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_cmp_mpi)(&k, &sm2_ecp_grp.N) >= 0);
+
+    LOG_INFO("Random", "k", k.n, k.s);
+    LOG_BUFFER("Random", k.p, k.n * 4);
+
+    /* compute C1 = k*G */
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_mul)(&sm2_ecp_grp, &C1, &k, &sm2_ecp_grp.G, alipay_f_rng, NULL));
+
+    /* compute S = h*Pb */
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_mul)(&sm2_ecp_grp, &S, &h, &Pb, alipay_f_rng, NULL));
+
+    /* S=O ? */
+    if ( 1 == ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_is_zero)(&S))
+    {
+        ret = -1;
+        goto cleanup;
+    }
+
+    /* compute kP = k*Pb */
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_mul)(&sm2_ecp_grp, &kP, &k, &Pb, alipay_f_rng, NULL));
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&kP.X, kp_buf, 32);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&kP.Y, kp_buf+32, 32);
+
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&C1.X, t, 32);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&C1.Y, t+32, 32);
+
+//    /* t = kdf(kp.x || kp.y)*/
+    sm3_KDF(kp_buf, sizeof(kp_buf), plain_buf_len, t+64);
+    int i = 0;
+
+    for (uint8_t *pos = t + 64; i < plain_buf_len; i++)
+    {
+        if (0 != pos[i])
+        {
+            break;
+        }
+    }
+    if (i == plain_buf_len)
+    {
+        ret = -1;
+        goto cleanup;
+    }
+
+    i = 0;
+    for (uint8_t *pos = t + 64; i < plain_buf_len; i++)
+    {
+        pos[i] = pos[i] ^ plain_buf[i];
+    }
+
+    sm3_ctx_t md;
+    sm3_init(&md);
+    sm3_update(&md, kp_buf, 32);
+    sm3_update(&md, plain_buf, plain_buf_len);
+    sm3_update(&md, kp_buf+32, 32);
+    sm3_final(&md, t+64+plain_buf_len);
+    *cipher_buf_len = 1+32+32+plain_buf_len+32;
+
+    *cipher_buf = (uint8_t)0x04;
+    memcpy(cipher_buf+1, t, 64);
+    memcpy(cipher_buf+64+1, t+64+plain_buf_len, 32);
+    memcpy(cipher_buf+96+1, t+64, plain_buf_len);
+
+    //sm2_ciphper_to_asn1(C1.X, C1.Y, t+64, plain_buf_len, t+64+plain_buf_len, 32, cipher_buf, cipher_buf_len);
+
+
+cleanup:
+    if(t) ALIPAY_free(t);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_free)(&C1);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_free)(&Pb);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_free)(&S);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_free)(&kP);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_free)(&k);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_free)(&h);
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_group_free)(&sm2_ecp_grp);
+
+    LOG_INFO("chipher", "chipher length:%d", *cipher_buf_len);
+    LOG_BUFFER("chipher", cipher_buf, *cipher_buf_len);
+    return(ret);
+}
+
+int lib_in_init_keypair(void *context,
+                            const uint8_t *x, uint32_t x_size,
+                            const uint8_t *y, uint32_t y_size,
+                            const uint8_t *d, uint32_t d_size)
+{
+    mbedtls_ecp_keypair *ctx = NULL;
+    mbedtls_ecp_point *pt = NULL;
+    mbedtls_mpi *secret = NULL;
+    int ret = 0;
+
+    if (context == NULL) {
+        LOG_ERROR("invalid ctx");
+        // return HAL_CRYPT_INVALID_CONTEXT;
+        return -1;
+    }
+
+    ctx = (mbedtls_ecp_keypair *)context;
+    pt = &ctx->Q;
+    secret = &ctx->d;
+
+    // init ecp group
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_group_init)(&ctx->grp);
+    MBEDTLS_MPI_CHK(mbedtls_sm2_ecp_group_load(&ctx->grp));
+    // int public
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_init)( pt );
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_read_binary)(&pt->X, x, x_size));
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_read_binary)(&pt->Y, y, y_size));
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_lset)(&pt->Z, 1));
+    // int private
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_read_binary)(secret, d, d_size));
+
+cleanup:
+    if (ret) {
+        LOG_ERROR("failed(0x%08x)", ret);
+        // return HAL_CRYPT_ERROR;
+        return -1;
+    }
+    return ret;
+}
+
+#define IMPL_SM2_KEY_LEN        32
+
+static int lib_sm2_derive_p( mbedtls_ecp_keypair *context,
+                       unsigned char *dst, uint32_t *dst_size)
+{
+    int ret = 0;
+    mbedtls_ecp_point kp;
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_init)( &kp );
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_mul)( &context->grp,
+                               &kp, &context->d, &(context->grp.G), NULL, NULL ) );
+
+    /* dst = xp || yp */
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)( &(kp.X), dst, IMPL_SM2_KEY_LEN ));
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)( &(kp.Y), dst + IMPL_SM2_KEY_LEN, IMPL_SM2_KEY_LEN ));
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_free)( &kp );
+cleanup:
+    return ret;
+}
+
+int lib_sm2_msg_digest(void *context,
+                          const uint8_t *id, uint32_t id_size,
+                          const uint8_t *msg, uint32_t msg_size,
+                          uint8_t *dsg, uint32_t *dsg_size)
+{
+    int ret = 0;
+    mbedtls_ecp_keypair *ctx;
+    uint8_t entla[2] = { 0 };
+    // impl_sm3_context hash_ctx;
+    sm3_ctx_t hash_ctx;
+    // uint8_t *m = NULL; // m = zA || msg
+    uint8_t m[2048] = {0,};
+    uint32_t m_size;
+    uint8_t *e = NULL; // e = H256(m)
+    uint32_t hash_size;
+    // uint8_t *tmp = NULL; // conver mpi to byte for hash update
+    uint8_t tmp[IMPL_SM2_KEY_LEN * 2];
+    uint32_t tmp_size;
+
+    // hash_size = HAL_SM3_HASH_SIZE;
+    hash_size = SM3_DIGEST_LENGTH;
+    m_size = hash_size + msg_size;
+
+    if (*dsg_size < hash_size) {
+        *dsg_size = hash_size;
+        // return HAL_CRYPT_SHORT_BUFFER;
+        return -1;
+    }
+    *dsg_size = hash_size;
+
+    if (context == NULL) {
+        LOG_ERROR("invalid context");
+        // return HAL_CRYPT_INVALID_CONTEXT;
+        return -1;
+    }
+    ctx = (mbedtls_ecp_keypair *)context;
+
+    // update ENTLa
+    entla[0] = ((id_size << 3) & 0xFF00) >> 3;
+    entla[1] = (id_size << 3) & 0xFF;
+
+    // Za = ENTLa||IDa||a||b||xG||yG||xA||yA
+    // impl_sm3_init(&hash_ctx);
+    // impl_sm3_starts(&hash_ctx);
+    // ENTLa
+    // impl_sm3_update(&hash_ctx, entla, 2);
+    // IDa
+    // impl_sm3_update(&hash_ctx, id, id_size);
+    // a
+
+    sm3_init(&hash_ctx);
+    sm3_update(&hash_ctx, entla, 2);
+    sm3_update(&hash_ctx, id, id_size);
+
+    tmp_size = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)(&(ctx->grp.A));
+    if (tmp_size > IMPL_SM2_KEY_LEN) {
+        LOG_ERROR("invalid size(%ld)", tmp_size);
+        ret = -1;
+        goto cleanup;
+    }
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&(ctx->grp.A), tmp, tmp_size));
+    // impl_sm3_update(&hash_ctx, tmp, tmp_size);
+    sm3_update(&hash_ctx, tmp, tmp_size);
+    // b
+    tmp_size = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)(&(ctx->grp.B));
+    if (tmp_size > IMPL_SM2_KEY_LEN) {
+        LOG_ERROR("invalid size(%ld)", tmp_size);
+        ret = -1;
+        goto cleanup;
+    }
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&(ctx->grp.B), tmp, tmp_size));
+    // impl_sm3_update(&hash_ctx, tmp, tmp_size);
+    sm3_update(&hash_ctx, tmp, tmp_size);
+
+    // xG
+    tmp_size = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)(&(ctx->grp.G.X));
+    if (tmp_size > IMPL_SM2_KEY_LEN) {
+        LOG_ERROR("invalid size(%ld)", tmp_size);
+        ret = -1;
+        goto cleanup;
+    }
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&(ctx->grp.G.X), tmp, tmp_size));
+    // impl_sm3_update(&hash_ctx, tmp, tmp_size);
+    sm3_update(&hash_ctx, tmp, tmp_size);
+
+    // yG
+    tmp_size = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)(&(ctx->grp.G.Y));
+    if (tmp_size > IMPL_SM2_KEY_LEN) {
+        LOG_ERROR("invalid size(%ld)", tmp_size);
+        ret = -1;
+        goto cleanup;
+    }
+    MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&(ctx->grp.G.Y), tmp, tmp_size));
+    // impl_sm3_update(&hash_ctx, tmp, tmp_size);
+    sm3_update(&hash_ctx, tmp, tmp_size);
+
+    if (ctx->d.p) {
+        // ctx has priv key, use d to derive Q
+        tmp_size = IMPL_SM2_KEY_LEN * 2;
+        lib_sm2_derive_p(ctx, tmp, &tmp_size);
+        // impl_sm3_update(&hash_ctx, tmp, tmp_size);
+        sm3_update(&hash_ctx, tmp, tmp_size);
+    } else {
+        // ctx has only pubkey
+        // xA
+        tmp_size = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)(&(ctx->Q.X));
+        if (tmp_size > IMPL_SM2_KEY_LEN) {
+            LOG_ERROR("invalid size(%ld)", tmp_size);
+            ret = -1;
+            goto cleanup;
+        }
+        MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&(ctx->Q.X), tmp, tmp_size));
+        // impl_sm3_update(&hash_ctx, tmp, tmp_size);
+        sm3_update(&hash_ctx, tmp, tmp_size);
+
+        // yA
+        tmp_size = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)(&(ctx->Q.Y));
+        if (tmp_size > IMPL_SM2_KEY_LEN) {
+            LOG_ERROR("invalid size(%ld)", tmp_size);
+            ret = -1;
+            goto cleanup;
+        }
+        MBEDTLS_MPI_CHK(ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&(ctx->Q.Y), tmp, tmp_size));
+        // impl_sm3_update(&hash_ctx, tmp, tmp_size);
+        sm3_update(&hash_ctx, tmp, tmp_size);
+    }
+
+    // calc M
+    // impl_sm3_finish(&hash_ctx, m);
+    sm3_final(&hash_ctx, m);
+    // M' = Za || M
+    memcpy(m + hash_size, msg, msg_size);
+    // e = H256(M')
+    // impl_sm3_starts(&hash_ctx);
+    // impl_sm3_update(&hash_ctx, m, m_size);
+    // impl_sm3_finish(&hash_ctx, dsg);
+    sm3_init(&hash_ctx);
+    sm3_update(&hash_ctx, m, m_size);
+    sm3_final(&hash_ctx, dsg);
+
+cleanup:
+
+    return ret;
+}
+
+static int derive_mpi( const mbedtls_ecp_group *grp, mbedtls_mpi *x,
+                       const unsigned char *buf, uint32_t blen )
+{
+    int ret;
+    uint32_t n_size = ( grp->nbits + 7 ) / 8;
+    uint32_t use_size = blen > n_size ? n_size : blen;
+
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_read_binary)( x, buf, use_size ) );
+    if( use_size * 8 > grp->nbits )
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_shift_r)( x, use_size * 8 - grp->nbits ) );
+
+    /* While at it, reduce modulo N */
+    if( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_cmp_mpi)( x, &grp->N ) >= 0 )
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_sub_mpi)( x, x, &grp->N ) );
+
+    cleanup:
+    return( ret );
+}
+
+int lib_do_sm2_sign( mbedtls_ecp_keypair *context,
+                   const unsigned char *src, uint32_t src_size,
+                   uint8_t *sig, uint32_t *sig_size,
+                   int (*f_rng)(void *, unsigned char *, uint32_t), void *p_rng )
+{
+    int ret, key_tries, sign_tries;
+    mbedtls_ecp_point kg; // kG
+    mbedtls_mpi k, e, r, s;
+    mbedtls_ecp_group *grp;
+    mbedtls_mpi *d;
+    uint32_t rlen, slen;
+
+    grp = &context->grp;
+    d = &context->d;
+
+    if( grp->N.p == NULL )
+        return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_init)( &kg );
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_init)( &r );
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_init)( &s );
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_init)( &k );
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_init)( &e );
+
+    sign_tries = 0;
+    do {
+
+        /*
+         * Step A1(ignored): src is M' = Za || M
+         * Step A2: derive e from hashed message
+         */
+        MBEDTLS_MPI_CHK( derive_mpi( grp, &e, src, src_size ) );
+
+        key_tries = 0;
+        do {
+            /*
+             * Step A3: generate rand k
+             * Step A4: (x1, y1) = kG
+             */
+            MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_gen_keypair)( grp, &k, &kg, f_rng, p_rng ) );
+            /*
+             * Step A5: r = (e + x1) mod n
+             */
+            MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_add_mpi)( &r, &e, &(kg.X)) );
+            MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_mod_mpi)( &r, &r, &grp->N ) );
+
+            if( key_tries++ > 10 ) {
+                ret = -1;
+                // ret = IMPL_ERR_ECP_RANDOM_FAILED;
+                goto cleanup;
+            }
+
+            MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_add_mpi)( &e, &r, &k ) );
+        // r = 0 or r + k = n
+        } while( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_cmp_int)( &r, 0 ) == 0 || ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_cmp_mpi)( &e, &grp->N ) == 0 );
+
+        /*
+         * Step A6: compute s = (1 + d)^(-1) *(k - r * d)  mod n
+         */
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_mul_mpi)( &s, &r, d ) );
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_sub_mpi)( &s, &k, &s ) );
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_add_int)( &e, d, 1 ) );
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_inv_mod)( &e, &e, &grp->N ) );
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_mul_mpi)( &s, &s, &e ) );
+        MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_mod_mpi)( &s, &s, &grp->N ) );
+
+        if( sign_tries++ > 10 ) {
+            ret = -1;
+            // ret = IMPL_ERR_ECP_RANDOM_FAILED;
+            goto cleanup;
+        }
+    } while( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_cmp_int)( &s, 0 ) == 0 );
+
+
+    if( *sig_size < 2 * src_size ) {
+        ret = -1;
+        // ret = IMPL_ERR_ECP_BUFFER_TOO_SMALL;
+        *sig_size = 2 * src_size;
+        goto cleanup;
+    }
+    *sig_size = 2 * src_size;
+    memset(sig, 0, *sig_size);
+    rlen = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)( &r );
+    slen = ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_size)( &s );
+
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&r, sig + *sig_size/2 - rlen, rlen) );
+    MBEDTLS_MPI_CHK( ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_write_binary)(&s, sig + *sig_size - slen, slen) );
+
+cleanup:
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_free)( &r );
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_free)( &s );
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_free)( &e );
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_mpi_free)( &k );
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_point_free)( &kg );
+
+    return( ret );
+}
+
+int lib_sm2_sign(void *context,
+                    const uint8_t *src, uint32_t src_size,
+                    uint8_t *sig, uint32_t *sig_size)
+{
+    int ret = 0;
+    mbedtls_ecp_keypair *ctx;
+
+    if (context == NULL) {
+        LOG_ERROR("invalid context");
+        // return HAL_CRYPT_INVALID_CONTEXT;
+        return -1;
+    }
+
+    ctx = (mbedtls_ecp_keypair *)context;
+    ret = lib_do_sm2_sign(ctx,
+                        src, src_size,
+                        sig, sig_size,
+                        alipay_f_rng, NULL);
+    // if (ret == IMPL_ERR_ECP_BUFFER_TOO_SMALL) {
+    //     return HAL_CRYPT_SHORT_BUFFER;
+    // }
+
+    if (ret) {
+        LOG_ERROR("failed(%d)", ret);
+        goto cleanup;
+    }
+
+cleanup:
+    return ret;
+}
+
+static uint8_t X[] = {
+    0x00, 0x96, 0xff, 0xa4, 0x02, 0x4b, 0xa8, 0x3d,
+    0x39, 0xdc, 0x84, 0x6b, 0x9e, 0x11, 0x24, 0xbd,
+    0xa1, 0x0e, 0x33, 0xfd, 0x77, 0x36, 0x1c, 0x16,
+    0x03, 0xf7, 0x29, 0x13, 0x5b, 0xb8, 0xf6, 0x44, 0x8a
+};
+
+static uint8_t Y[] = {
+    0x00, 0xc6, 0x0c, 0x3c, 0x55, 0xf7, 0x37, 0xb5,
+    0x16, 0x3c, 0x23, 0x99, 0x24, 0xc3, 0x8f, 0x9b,
+    0x60, 0x92, 0x3f, 0xd1, 0x2c, 0xf8, 0xcf, 0x96,
+    0x15, 0x20, 0x83, 0x1b, 0x55, 0x01, 0x5b, 0xc7, 0x0a
+};
+int lib_sm2_private_sign(const uint8_t *d, uint32_t d_len,
+                     const uint8_t *id, uint32_t id_len,
+                     const uint8_t *msg, uint32_t msg_len,
+                     uint8_t *sig, uint32_t* sig_len)
+{
+    int ret;
+    // uint32_t size;
+    // void *ctx = NULL;
+    mbedtls_ecp_keypair ctx;
+    uint8_t hash[32];
+    uint32_t hash_len = 32;
+
+    if (d == NULL || d_len == 0 ||
+        id == NULL || id_len == 0 ||
+        msg == NULL || msg_len == 0 ||
+        sig == NULL || *sig_len == 0) {
+        LOG_ERROR("invalid input args");
+        return -1;
+    }
+
+    ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_keypair_init)(&ctx);
+#if 0
+    ret = lib_in_init_keypair(ctx, curve,
+                                  NULL, 0,
+                                  NULL, 0,
+                                  d, d_len);
+#else
+    ret = lib_in_init_keypair(&ctx,
+                     X, sizeof(X), Y, sizeof(X), d, d_len);
+#endif
+    if (ret < 0) {
+        LOG_ERROR("ecc init fail, 0x%x", ret);
+        goto _out;
+    }
+
+    ret = lib_sm2_msg_digest(&ctx,
+                                id, id_len,
+                                msg, msg_len,
+                                hash, &hash_len);
+    if (ret < 0) {
+        LOG_ERROR("hal sm2 msg digest fail, %d", ret);
+        goto _out;
+    }
+
+    ret = lib_sm2_sign(&ctx, (const uint8_t *)hash, hash_len, sig, sig_len);
+    if (ret < 0) {
+        LOG_ERROR("hal sm2 sign fail, %d", ret);
+        goto _out;
+    }
+
+    if (*sig_len != 64) {
+        LOG_ERROR("sm2 invalid sign length, %d", (int)(*sig_len));
+        ret = -1;
+        goto _out;
+    }
+
+_out:
+    if (&ctx != NULL) {
+        ALIPAY_MBEDTLS_SYMBOL(mbedtls_ecp_keypair_free)(&ctx);
+        // ls_hal_ecc_cleanup(ctx);
+        // ls_osa_free(ctx);
+    }
+
+    return ret;
+}
+
+//sm2_sign code
+int sm2_sign(const uint8_t *hex_data, const uint32_t data_len,
+               const uint8_t *private_key, const uint32_t key_len,
+               uint8_t *signature, uint32_t *sign_len)
+{
+    uint8_t *id = "1234567812345678";
+    uint32_t id_len = strlen(id);
+
+    LOG_INFO("SM SIGN", "begin++++++++++++++++++++=======================data_len:%d key_len:%d", data_len, key_len);
+    LOG_BUFFER("hex_data", hex_data, data_len);
+    LOG_BUFFER("private_key", private_key, key_len);
+
+    if (key_len != 32)
+    {
+        return -1;
+    }
+
+    if (*sign_len <= 64)
+    {
+        return -1;
+    }
+
+    if (0 != lib_sm2_private_sign(private_key, key_len, (const uint8_t*)id, id_len, hex_data, data_len, signature,sign_len))
+    {
+        return -1;
+    }
+
+    *sign_len = 64;
+    LOG_BUFFER("signature array", signature, 64);
+    return 0;
+}
+
+
+#include "rtthread.h"
+
+void sm2_sign_test(void)
+{
+    uint8_t * private_key = "\x2C\x3E\x16\xC7\x3C\x4E\xF8\x97\x1C\x6F\x50\x0D\x49\xE4\x7C\x6D\xC6\xE1\x6D\x10\xEF\x22\xA3\x88\xC0\x4A\x17\xDF\x59\xB0\x54\x71";
+    uint8_t * text_buffer = "\x54\x01\x65\x96\x86\x61\x21\x23\x0A\x84\xF8\xD4\x68\x80\x21\x23\x68\x43\x00\x80\x18\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x54\x01\x65\x96\x86\x61\x21\x23\x00\x00\x00\x00\x00\x00";
+
+    LOG_BUFFER("SIGN PrivateKey", private_key, 32);
+    LOG_BUFFER("SIGN PrivatText", text_buffer, 45);
+
+    uint8_t sign_buffer[256] = {0};
+    uint32_t sign_len = sizeof(sign_buffer);
+
+
+    int ret = sm2_sign(text_buffer, 45, private_key, 32, sign_buffer, &sign_len);
+    LOG_INFO("resoult", "ret:%d sign_len:%d", sign_len, ret);
+    LOG_BUFFER("SIGN BUFFER", sign_buffer, sign_len);
+    
+    rt_kprintf("result ret:%d sign_len:%d \n", ret, sign_len);
+
+    for(uint32_t i = 0; i < sign_len; i++)
+    {
+        rt_kprintf("0x%02x  ",sign_buffer[i]);
+    }
+    rt_kprintf("\n");
+}
+
+
+static void sm2_test(uint8_t argc, char **argv)
+{
+    sm2_sign_test();
+}
+MSH_CMD_EXPORT(sm2_test, lcd display test);
+
