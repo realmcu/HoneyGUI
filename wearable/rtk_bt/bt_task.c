@@ -162,38 +162,37 @@ void bt_task_entry(void *p_param)
     app_le_gap_init();
     app_le_profile_init();
 #endif
-//#if 0
-    app_cfg_init();
-//#endif
+
 #ifdef RTK_BR_TASK
+    app_cfg_init();
     framework_init();
     watch_bt_gap_init();
     watch_app_gap_init();
 #endif
-//#ifdef RTK_MODULE_LOCAL_PLAYBACK
+#ifdef RTK_MODULE_LOCAL_PLAYBACK
     app_playback_init();
-//#endif
-//#ifdef RTK_BR_PROFILE_HFP
+#endif
+#ifdef RTK_BR_PROFILE_HFP
     app_hfp_init();
-//#endif
-//#ifdef RTK_BR_PROFILE_AVRCP
+#endif
+#ifdef RTK_BR_PROFILE_AVRCP
     app_avrcp_init();
-//#endif
+#endif
 #ifdef RTK_BR_PROFILE_PBAP
     app_pbap_init();
 #endif
 #ifdef RTK_BR_PROFILE_SPP
     app_spp_init();
 #endif
-//#ifdef RTK_BR_PROFILE_SDP
+#ifdef RTK_BR_PROFILE_SDP
     app_sdp_init();
-//#endif
-//#ifdef RTK_BR_PROFILE_A2DP
+#endif
+#ifdef RTK_BR_PROFILE_A2DP
     app_a2dp_init();
     app_audio_init();
     /*20230607*/
     br_db.a2dp_info.audio_play_mode = MODE_APP_A2DP_SNK;
-//#endif
+#endif
 
     gap_start_bt_stack(evt_queue_handle, io_queue_handle, MAX_NUMBER_OF_GAP_MESSAGE);
 

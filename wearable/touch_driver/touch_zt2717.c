@@ -79,10 +79,39 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     return true;
 }
 
+static void touch_enter_dlps(void)
+{
+    //Pad_Config(TOUCH_816S_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
+    //System_WakeUpPinEnable(TOUCH_816S_INT, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+}
 
+static void touch_exit_dlps(void)
+{
+    //Pad_Config(TOUCH_816S_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,PAD_OUT_LOW);
+}
+
+static bool touch_allowed_enter_dlps_check(void)
+{
+    return true;
+}
+
+static bool touch_system_wakeup_dlps_check(void)
+{
+    return true;
+}
+
+static void drv_touch_dlps_init(void)
+{
+    //System_WakeUpPinEnable(TOUCH_816S_INT, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+    drv_dlps_exit_cbacks_register("touch", touch_exit_dlps);
+    drv_dlps_enter_cbacks_register("touch", touch_enter_dlps);
+    drv_dlps_wakeup_cbacks_register("touch", touch_system_wakeup_dlps_check);
+    drv_dlps_check_cbacks_register("touch", touch_allowed_enter_dlps_check);
+}
 
 void rtk_touch_hal_init(void)
 {
+    drv_touch_dlps_init();
     drv_i2c0_set_scl_sda(TOUCH_ZT2717_SCL, TOUCH_ZT2717_SDA);
     drv_pin_mode(TOUCH_ZT2717_RST, PIN_MODE_OUTPUT);
     drv_pin_write(TOUCH_ZT2717_RST, 1);
