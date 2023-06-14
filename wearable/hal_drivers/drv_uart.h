@@ -12,10 +12,7 @@
 #define __DRV_UART_H__
 
 #include "board.h"
-#include "rtl_uart.h"
-#include "rtl_rcc.h"
-#include "rtl_nvic.h"
-#include "rtl_pinmux.h"
+#include "rtl_hal_peripheral.h"
 #include "drv_dlps.h"
 
 

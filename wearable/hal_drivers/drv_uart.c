@@ -18,9 +18,6 @@ void (*uart3_rx_indicate)(uint8_t ch) = NULL;
 void (*uart4_rx_indicate)(uint8_t ch) = NULL;
 void (*uart5_rx_indicate)(uint8_t ch) = NULL;
 
-static bool uart4_enter_dlps_flag = false;
-static void *uart4_allow_enter_dlps_timer = NULL;
-
 static const UART_BaudRate_TypeDef BaudRate_Table[10] =
 {
     {271, 10, 0x24A}, // BAUD_RATE_9600
@@ -94,6 +91,7 @@ void UART2_Handler(void)
 {
     uart_isr(uart2_rx_indicate, UART2);
 }
+#if defined RTL8772F || defined RTL8762G
 void UART3_Handler(void)
 {
     uart_isr(uart3_rx_indicate, UART3);
@@ -110,6 +108,7 @@ void UART5_Handler(void)
 {
     uart_isr(uart5_rx_indicate, UART5);
 }
+#endif
 
 static uint32_t drv_uart_write(UART_TypeDef *UARTx, const void *buffer, uint32_t size)
 {
@@ -134,22 +133,7 @@ static uint32_t drv_uart_write(UART_TypeDef *UARTx, const void *buffer, uint32_t
     return size;
 }
 
-uint32_t drv_uart2_write(const void *buffer, uint32_t size)
-{
-    return drv_uart_write(UART2, buffer, size);
-}
-uint32_t drv_uart3_write(const void *buffer, uint32_t size)
-{
-    return drv_uart_write(UART3, buffer, size);
-}
-uint32_t drv_uart4_write(const void *buffer, uint32_t size)
-{
-    return drv_uart_write(UART4, buffer, size);
-}
-uint32_t drv_uart5_write(const void *buffer, uint32_t size)
-{
-    return drv_uart_write(UART5, buffer, size);
-}
+
 
 void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
 {
@@ -166,6 +150,7 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
         periph = APBPeriph_UART2;
         periph_clock = APBPeriph_UART2_CLOCK;
     }
+#if defined RTL8772F || defined RTL8762G
     else if (UARTx == UART3)
     {
         irq_type = UART3_IRQn;
@@ -190,6 +175,7 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
         periph = APBPeriph_UART5;
         periph_clock = APBPeriph_UART5_CLOCK;
     }
+#endif
     Pinmux_Deinit(tx_pin);
     Pinmux_Deinit(rx_pin);
     Pad_Config(tx_pin, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE, PAD_OUT_LOW);
@@ -212,7 +198,9 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
     NVIC_InitStruct.NVIC_IRQChannel = irq_type;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+#if defined RTL8772F || defined RTL8762G
     NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
+#endif
     NVIC_Init(&NVIC_InitStruct);
 }
 
@@ -220,6 +208,7 @@ void drv_uart2_init(uint8_t tx_pin, uint8_t rx_pin)
 {
     drv_uart_init(UART2, tx_pin, rx_pin);
 }
+#if defined RTL8772F || defined RTL8762G
 void drv_uart3_init(uint8_t tx_pin, uint8_t rx_pin)
 {
     drv_uart_init(UART3, tx_pin, rx_pin);
@@ -232,7 +221,26 @@ void drv_uart5_init(uint8_t tx_pin, uint8_t rx_pin)
 {
     drv_uart_init(UART5, tx_pin, rx_pin);
 }
+#endif
 
+uint32_t drv_uart2_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART2, buffer, size);
+}
+#if defined RTL8772F || defined RTL8762G
+uint32_t drv_uart3_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART3, buffer, size);
+}
+uint32_t drv_uart4_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART4, buffer, size);
+}
+uint32_t drv_uart5_write(const void *buffer, uint32_t size)
+{
+    return drv_uart_write(UART5, buffer, size);
+}
+#endif
 
 void drv_uart2_set_rx_indicate(void (*rx_ind)(uint8_t ch))
 {
@@ -251,81 +259,11 @@ void drv_uart5_set_rx_indicate(void (*rx_ind)(uint8_t ch))
     uart5_rx_indicate = rx_ind;
 }
 
-void uart4_allow_enter_dlps_timer_cb()
-{
-    uart4_enter_dlps_flag = true;
-}
 
-void uart4_allow_enter_dlps_timer_init()
-{
-    os_timer_create(&uart4_allow_enter_dlps_timer, "uart4_allow_enter_dlps_timer", 0, 10000, false,
-                    uart4_allow_enter_dlps_timer_cb);
-}
-
-static bool uart4_enter_dlps(void)
-{
-    Pad_Config(SHELL_UART_TX, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE, PAD_OUT_LOW);
-    Pad_Config(SHELL_UART_RX, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-    System_WakeUpPinEnable(SHELL_UART_RX, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
-    return true;
-}
-
-static bool uart4_exit_dlps(void)
-{
-    Pad_Config(SHELL_UART_TX, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE,
-               PAD_OUT_LOW);
-    Pad_Config(SHELL_UART_RX, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
-//    Pinmux_Config(uart_cfg->tx_pin, uart_cfg->tx_pin_func);
-//    Pinmux_Config(uart_cfg->rx_pin, uart_cfg->rx_pin_func);
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = UART4_IRQn;
-    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
-    NVIC_Init(&NVIC_InitStruct);
-    return true;
-}
-
-static bool uart4_allowed_enter_dlps_check(void)
-{
-    return uart4_enter_dlps_flag;
-}
-
-static bool uart4_system_wakeup_dlps_check(void)
-{
-    if (System_WakeUpInterruptValue(SHELL_UART_RX) == SET)
-    {
-        Pad_ClearWakeupINTPendingBit(SHELL_UART_RX);
-        System_WakeUpPinDisable(SHELL_UART_RX);
-        DBG_DIRECT("Uart4 Wake up");
-        uart4_enter_dlps_flag = false;
-        os_timer_start(&uart4_allow_enter_dlps_timer);
-        return true;
-    }
-    return false;
-}
-
-void drv_uart4_dlps_init(void)
-{
-    uart4_enter_dlps_flag = true;
-    System_WakeUpPinEnable(SHELL_UART_RX, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
-    drv_dlps_exit_cbacks_register("uart4", uart4_exit_dlps);
-    drv_dlps_enter_cbacks_register("uart4", uart4_enter_dlps);
-    drv_dlps_wakeup_cbacks_register("uart4", uart4_system_wakeup_dlps_check);
-    drv_dlps_check_cbacks_register("uart4", uart4_allowed_enter_dlps_check);
-    uart4_allow_enter_dlps_timer_init();
-}
 
 void hw_uart_init(void)
 {
-#ifdef __RTTHREAD__
-
-#else
-    drv_uart4_init(SHELL_UART_TX, SHELL_UART_RX);
-    extern void shell_user_func(uint8_t data);
-    drv_uart4_set_rx_indicate(shell_user_func);
-    drv_uart4_dlps_init();
-#endif
+    return;
 }
 
 
