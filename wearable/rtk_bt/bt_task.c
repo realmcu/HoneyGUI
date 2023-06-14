@@ -179,6 +179,7 @@ void bt_task_entry(void *p_param)
 #ifdef RTK_MODULE_LOCAL_PLAYBACK
     app_playback_init();
 #endif
+    app_bt_policy_init();
 #ifdef RTK_BR_PROFILE_HFP
     app_hfp_init();
 #endif
