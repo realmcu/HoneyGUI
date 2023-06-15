@@ -25,4 +25,19 @@
 *:VGLite\*
 *:lvgl\*
 *:rt-thread\*
+*:wearable\VCVC9202AtoPhilipsPSP\psp.c
+*:wearable\VCVC9202AtoPhilipsPSP\psp.h
+*:wearable\VCVC9202AtoPhilipsPSP\psp_map.h
+*:wearable\VCVC9202AtoPhilipsPSP\fx_datatypes.h
+*:wearable\VCVC9202AtoPhilipsPSP\algo.h
+*:wearable\VCVC9202AtoPhilipsPSP\biometrics_common.h
+*:wearable\VCVC9202AtoPhilipsPSP\spo2Algo.h
+*:wearable\VCVC9202AtoPhilipsPSP\vcHr02AHci.h
+*:wearable\VCVC9202AtoPhilipsPSP\vcHr02AHci.c
+*:wearable\VCVC9202AtoPhilipsPSP\vcSportMotionIntAlgo.h
+
+
+
+
+
 

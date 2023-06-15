@@ -1,0 +1,4 @@
+(c) Copyright 2023 Koninklijke Philips N.V. All rights reserved.
+This Software Library is provided to Realtek for use under and subject to the terms of the Evaluation License Agreement dated 26 April 2023.
+Philips Sensing Platform, Philips and its logo are trademarks of Koninklijke Philips N.V..
+All other names are the trademark or registered trademarks of their respective holders.
