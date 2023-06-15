@@ -21,6 +21,7 @@
 #include "trace.h"
 #include "shell_port.h"
 #include "drv_uart.h"
+#include "board.h"
 
 Shell shell_user;
 char shellBuffer[512];
@@ -36,7 +37,6 @@ void *shell_task_handle;
  */
 static short userShellWrite(char *data, unsigned short len)
 {
-    //return mcu_uart_write(data, len);
     return drv_uart4_write(data, len);
 }
 
@@ -92,6 +92,8 @@ int userShellUnlock(Shell *shell)
 
 void userShellInit(void)
 {
+    drv_uart4_init(SHELL_UART_TX, SHELL_UART_RX);
+    drv_uart4_set_rx_indicate(shell_user_func);
     shell_user.write = userShellWrite;
     //shell_user.read = userShellRead;
     //shell.lock = userShellLock;
