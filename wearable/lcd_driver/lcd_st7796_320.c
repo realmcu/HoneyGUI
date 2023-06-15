@@ -335,7 +335,28 @@ static void lcd_st7796_init(void)
 
     st7796_write_cmd(0x21);
 }
-
+#include "rtl876x_tim.h"
+void lcd_set_backlight(uint32_t percent)
+{
+    if (percent)
+    {
+        if (percent > 100)
+        {
+            percent = 100;
+        }
+        TIM_Cmd(BL_PWM_TIM, DISABLE);
+        TIM_PWMChangeFreqAndDuty(BL_PWM_TIM, percent * 10, (100 - percent) * 10);
+        TIM_Cmd(BL_PWM_TIM, ENABLE);
+        Pad_Config(LCD_8080_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_DISABLE,
+                   PAD_OUT_HIGH);
+    }
+    else
+    {
+        TIM_Cmd(BL_PWM_TIM, DISABLE);
+        Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    }
+    return;
+}
 
 void rtk_lcd_hal_init(void)
 {
@@ -345,6 +366,10 @@ void rtk_lcd_hal_init(void)
     lcd_set_reset(false);
     platform_delay_ms(50);
     lcd_st7796_init();
+
+    st7796_write_cmd(0x11);
+    st7796_write_cmd(0x29);
+    lcd_set_backlight(100);
 }
 
 
