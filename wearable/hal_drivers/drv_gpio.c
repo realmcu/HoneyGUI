@@ -49,7 +49,15 @@ static void DRV_GPIO_HANDLER(uint32_t pin)
         gpio_cb[num].gpio_cb(gpio_cb[num].args);
     }
 }
-#include "drv_gpio_ic.c"
+
+#if defined RTL8772F
+#include "drv_gpio_8772f.c"
+#elif defined RTL8762D
+#include "drv_gpio_8762d.c"
+#elif defined RTL8762G
+#include "drv_gpio_8762g.c"
+#endif
+
 void drv_pin_mode(uint32_t pin, uint32_t mode)
 {
 
@@ -165,12 +173,16 @@ uint8_t drv_pin_attach_irq(uint32_t pin, uint32_t mode, void (*hdr)(void *args),
 #if defined RTL8772F || defined RTL8762G
     RamVectorTableUpdate_ns_ext(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
 #elif defined RTL8762D
-    extern bool RamVectorTableUpdate(VECTORn_Type v_num, IRQ_Fun isr_handler);
-    RamVectorTableUpdate(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
+    //extern bool RamVectorTableUpdate(VECTORn_Type v_num, IRQ_Fun isr_handler);
+    //RamVectorTableUpdate(table_vector[GPIO_GetNum(pin)], table_func[GPIO_GetNum(pin)]);
 #endif
 
     NVIC_InitTypeDef NVIC_InitStruct;
+#if defined RTL8772F || defined RTL8762G
     NVIC_InitStruct.NVIC_IRQChannel = table_irq[GPIO_GetNum(pin)];
+#elif defined RTL8762D
+    NVIC_InitStruct.NVIC_IRQChannel = pin2irq(pin);
+#endif
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStruct);
@@ -182,7 +194,11 @@ uint8_t drv_pin_dettach_irq(uint32_t pin)
     gpio_cb[GPIO_GetNum(pin)].gpio_cb = NULL;
     gpio_cb[GPIO_GetNum(pin)].args = NULL;
     NVIC_InitTypeDef NVIC_InitStruct;
+#if defined RTL8772F || defined RTL8762G
     NVIC_InitStruct.NVIC_IRQChannel = table_irq[GPIO_GetNum(pin)];
+#elif defined RTL8762D
+    NVIC_InitStruct.NVIC_IRQChannel = pin2irq(pin);
+#endif
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = DISABLE;
     NVIC_Init(&NVIC_InitStruct);
