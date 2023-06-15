@@ -23,6 +23,7 @@ if GetDepend(['USING_BR_TASK']):
     CPPDEFINES += ['RTK_BR_TASK']
 if GetDepend(['MODULE_USING_DATABASE']) and GetDepend(['USING_BLE_TASK']):
     src += ['app_le_link_util.c']
+if GetDepend(['USING_BLE_TASK']):
     CPPDEFINES += ['RTK_BLE_TASK']
     
 group = DefineGroup('bt_app', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
