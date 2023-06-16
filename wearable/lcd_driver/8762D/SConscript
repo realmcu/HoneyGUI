@@ -1,0 +1,23 @@
+
+
+from building import *
+
+cwd = GetCurrentDir()
+
+# add the general drivers.
+src = Split("""
+""")
+
+
+if GetDepend(['ST7796_320320_8080']):
+    src += ['lcd_st7796_320.c']
+if GetDepend(['NV3041A_480272_QSPI']):
+    src += ['nv3041A_8762D_480_272_qspi.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('lcd_low_driver', src, depend = [''], CPPPATH = CPPPATH)
+# print(src)
+# print(group)
+
+Return('group')

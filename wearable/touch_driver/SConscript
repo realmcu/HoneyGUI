@@ -1,23 +1,14 @@
-Import('TOOL_ROOT')
-
+# for module compiling
+import os
 from building import *
 
-cwd = GetCurrentDir()
+cwd  = GetCurrentDir()
+objs = []
+list = os.listdir(cwd)
 
-src = Split("""
-""")
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
 
-if GetDepend(['BSP_TOUCH_GT911']):
-    src += ['touch_gt911.c']
-if GetDepend(['BSP_TOUCH_816S']):
-    src += ['touch_816s.c']
-if GetDepend(['BSP_TOUCH_ZT2717']):
-    src += ['touch_zt2717.c']
-if GetDepend(['BSP_TOUCH_816S_8762D_320']):
-    src += ['touch_816s_8762d_320.c']
-
-CPPPATH = [cwd]
-
-group = DefineGroup('touch_driver', src, depend = [''], CPPPATH = CPPPATH)
-
-Return('group')
+Return('objs')

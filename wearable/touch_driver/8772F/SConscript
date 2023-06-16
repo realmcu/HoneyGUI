@@ -1,0 +1,19 @@
+Import('TOOL_ROOT')
+
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Split("""
+""")
+
+if GetDepend(['BSP_TOUCH_GT911']):
+    src += ['touch_gt911.c']
+if GetDepend(['BSP_TOUCH_816S']):
+    src += ['touch_816s.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('touch_driver', src, depend = [''], CPPPATH = CPPPATH)
+
+Return('group')
