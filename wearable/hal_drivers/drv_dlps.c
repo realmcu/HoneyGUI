@@ -17,8 +17,6 @@
 
 
 
-#define     DLPS_EN     0
-
 
 static dlps_slist_t drv_dlps_exit_slist =
 {
@@ -62,7 +60,6 @@ void System_Handler(void)
 #endif
 }
 
-#if (DLPS_EN == 1)
 /**
  * @brief this function will be called before enter DLPS
  *
@@ -113,6 +110,7 @@ static void app_exit_dlps_config(void)
 * @return true : allow enter dlps
  * @retval void
 */
+#if defined RTL8772F || defined RTL8762G
 RTL_HAL_RAM_CODE
 static PMCheckResult app_dlps_check_cb(void)
 {
@@ -129,7 +127,25 @@ static PMCheckResult app_dlps_check_cb(void)
 
     return PM_CHECK_PASS;
 }
+#elif defined RTL8762D
+RTL_HAL_RAM_CODE
+static bool app_dlps_check_cb(void)
+{
+    dlps_slist_t *node;
+    for (node = dlps_slist_first(&(drv_dlps_check_slist)); node; node = dlps_slist_next(node))
+    {
+        drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
+        //DBG_DIRECT("%s check fail! Module[%s]", __func__, p_item->name);
+        if (p_item->dlps_cb() == false)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
 #endif
+
 
 /******************************************************************
  * @brief  pwr_mgr_init() contains the setting about power mode.
@@ -139,7 +155,6 @@ static PMCheckResult app_dlps_check_cb(void)
  */
 void pwr_mgr_init(void)
 {
-#if (DLPS_EN == 1)
     if (false == dlps_check_cb_reg(app_dlps_check_cb))
     {
         APP_PRINT_ERROR0("Error: dlps_check_cb_reg(app_dlps_check_cb) failed!");
@@ -152,7 +167,6 @@ void pwr_mgr_init(void)
 #endif
 #ifdef RTL8772F
     lps_mode_set(PLATFORM_DLPS);
-#endif
 #endif
 }
 
