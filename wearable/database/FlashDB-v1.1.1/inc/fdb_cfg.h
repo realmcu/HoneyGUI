@@ -40,7 +40,7 @@
 
 /* MCU Endian Configuration, default is Little Endian Order. */
 /* #define FDB_BIG_ENDIAN */
-#ifdef __RTTHREAD__
+#ifdef OS_RTTHREAD
 #include <rtconfig.h>
 extern void rt_kprintf(const char *fmt, ...);
 /* log print macro. default EF_PRINT macro is printf() */

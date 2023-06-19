@@ -109,7 +109,7 @@ void app_handle_dev_state_evt(T_GAP_DEV_STATE new_state, uint16_t cause)
         else if (new_state.gap_adv_state == GAP_ADV_STATE_ADVERTISING)
         {
             APP_PRINT_INFO0("GAP adv start");
-#ifdef  __RTTHREAD__
+#ifdef  OS_RTTHREAD
             rt_kprintf("GAP adv start");
 #endif
         }

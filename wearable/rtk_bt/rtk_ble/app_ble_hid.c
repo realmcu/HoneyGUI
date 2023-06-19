@@ -3,7 +3,7 @@
 #include "hids_ms.h"
 #include "trace.h"
 #include "ble_gap_msg.h"
-#ifdef __RTTHREAD__
+#ifdef OS_RTTHREAD
 #include "rtthread.h"
 #endif
 
@@ -33,7 +33,7 @@ void app_ble_hid_init(void)
     le_msg_handler_cback_register(app_hid_msg);
 }
 
-#ifdef __RTTHREAD__
+#ifdef OS_RTTHREAD
 static void hids_send(uint8_t argc, char **argv)
 {
     uint8_t len = argc - 1;
