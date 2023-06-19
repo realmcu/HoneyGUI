@@ -6,8 +6,8 @@ extern "C" {
 #endif
 #include "stdint.h"
 
-#define NV3041A_LCD_WIDTH                  320
-#define NV3041A_LCD_HIGHT                  320
+#define NV3041A_LCD_WIDTH                  480
+#define NV3041A_LCD_HIGHT                  272
 #define NV3041A_DRV_PIXEL_BITS             16
 
 #define INPUT_PIXEL_BYTES                 2
