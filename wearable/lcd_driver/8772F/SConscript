@@ -13,7 +13,7 @@ if GetDepend(['NT35510_480800_DBIB']):
 if GetDepend(['SH8601A_454454_QSPI']):
     src += ['sh8601a_454454_qspi.c']
 if GetDepend(['SH8601A_454454_MIPI_CMD']):
-    src += ['sh8601a_454454_mipi_cmd.c']
+    src += ['SH8601A_454454_mipi_cmd.c']
 if GetDepend(['SH8601A_454454_MIPI_VIDEO']):
     src += ['sh8601a_454454_mipi_video.c']
 if GetDepend(['OTM8009A_480800_MIPI_CMD']):

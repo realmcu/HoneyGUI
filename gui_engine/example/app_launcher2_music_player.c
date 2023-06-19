@@ -76,22 +76,7 @@ static void music_button_release(gui_button_t *b)
 #include "nanosvg.h"
 //start_mp3(),stop_mp3()
 static bool music_button_click_pause = true;
-static void start_mp3(void)
-{
-    gui_log("static void start_mp3(void)\n");
-    extern void audio_test_start_mp3(void);
-#if defined (GUI_RTL8772F)
-    audio_test_start_mp3();
-#endif
-}
-static void stop_mp3(void)
-{
-    gui_log("static void stop_mp3(void)\n");
-    extern void audio_test_stop_mp3(void);
-#if defined (GUI_RTL8772F)
-    audio_test_stop_mp3();
-#endif
-}
+
 static void music_button_click(gui_button_t *b)
 {
     gui_log("music_button_click\n");
@@ -102,12 +87,18 @@ static void music_button_click(gui_button_t *b)
     if (!music_button_click_pause)
     {
         b->img = (void *)gui_svg_create_from_mem(b, PALY2_SVG, 610, 0, 0, 100, 100);
-        stop_mp3();
+        gui_log("static void stop_mp3(void)\n");
+#if defined (GUI_RTL8772F)
+        gui_evnet_stop_mp3();
+#endif
     }
     else
     {
         b->img = (void *)gui_svg_create_from_mem(b, PAUSE2_SVG, 946, 0, 0, 100, 100);
-        start_mp3();
+        gui_log("static void start_mp3(void)\n");
+#if defined (GUI_RTL8772F)
+        gui_evnet_start_mp3();
+#endif
     }
 
 

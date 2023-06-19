@@ -8,8 +8,8 @@
  * 2020-08-04     howie  first version
  */
 
-#ifndef __TOUCH_816S_H
-#define __TOUCH_816S_H
+#ifndef __TOUCH_816S_8772F_454_H
+#define __TOUCH_816S_8772F_454_H
 
 
 #include "board.h"
@@ -37,4 +37,4 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing);
 }
 #endif
 
-#endif /* __TOUCH_816S_H */
+#endif /* __TOUCH_816S_8772F_454_H */

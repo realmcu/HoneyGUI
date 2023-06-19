@@ -14,7 +14,7 @@
 #include "drv_gpio.h"
 #include "drv_i2c.h"
 #include "drv_touch.h"
-#include "touch_816s.h"
+#include "touch_816s_8772f_454.h"
 #include "string.h"
 #include "trace.h"
 #include "utils.h"
