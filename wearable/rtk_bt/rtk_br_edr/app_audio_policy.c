@@ -824,7 +824,7 @@ void app_audio_init(void)
     bt_mgr_cback_register(app_audio_bt_cback);
     app_timer_reg_cb(app_audio_policy_timeout_cb, &audio_policy_timer_id);
 
-//20230607  app_audio_route_gain_init();
+    app_audio_route_gain_init();
 //20230607  app_eq_init();
 
     voice_prompt_language_set((T_VOICE_PROMPT_LANGUAGE_ID)app_cfg_nv.voice_prompt_language);

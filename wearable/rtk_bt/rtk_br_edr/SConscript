@@ -25,6 +25,7 @@ if GetDepend(['BR_PROFILE_SPP']):
     CPPDEFINES += ['RTK_BR_PROFILE_SPP']
 if GetDepend(['BR_PROFILE_A2DP']):
     src += ['app_audio_policy.c']
+    src += ['app_audio_route.c']
     src += ['app_a2dp.c']
     CPPDEFINES += ['RTK_BR_PROFILE_A2DP']
 if GetDepend(['BR_PROFILE_AVRCP']):

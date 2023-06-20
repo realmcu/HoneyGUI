@@ -13,7 +13,7 @@
 #include "bt_spp.h"
 
 /** @brief  SPP UUID */
-static const uint8_t spp_demo_service_class_uuid128[16] =
+static const uint8_t spp_service_class_uuid128[16] =
 {
     0x00, 0x00, 0x11, 0x01, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
 };
@@ -27,7 +27,7 @@ static bool is_spp_server = true;//APP SPP role flag; false: client, true: serve
  * @param[in] Remote BT address..
  * @return    void
  */
-static void spp_demo_app_tx_data_test(uint8_t *bd_addr)
+static void spp_app_tx_data_test(uint8_t *bd_addr)
 {
     T_APP_BR_LINK *p_link;
     uint8_t spp_tx_data_test[15] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08, 0x09, 0x0a};
@@ -35,7 +35,7 @@ static void spp_demo_app_tx_data_test(uint8_t *bd_addr)
     p_link = app_find_br_link(bd_addr);
     if (p_link != NULL)
     {
-        APP_PRINT_TRACE1("spp_demo_app_tx_data_test: p_link->rfc_spp_credit %d",
+        APP_PRINT_TRACE1("spp_app_tx_data_test: p_link->rfc_spp_credit %d",
                          p_link->rfc_spp_credit);
         if (p_link->rfc_spp_credit)
         {
@@ -53,12 +53,12 @@ static void spp_demo_app_tx_data_test(uint8_t *bd_addr)
  * @param[in] SPP Rx buffer length.
  * @return    void
  */
-static void spp_demo_app_rx_data_test(uint8_t *bd_addr, uint8_t *buf, uint16_t len)
+static void spp_app_rx_data_test(uint8_t *bd_addr, uint8_t *buf, uint16_t len)
 {
-    APP_PRINT_TRACE2("spp_demo_app_rx_data_test: bd_addr %s len %d", TRACE_BDADDR(bd_addr), len);
+    APP_PRINT_TRACE2("spp_app_rx_data_test: bd_addr %s len %d", TRACE_BDADDR(bd_addr), len);
     for (uint16_t i = 0; i < len; i++)
     {
-        APP_PRINT_TRACE2("spp_demo_app_rx_data_test: buf[i:%d] 0x%x", i, buf[i]);
+        APP_PRINT_TRACE2("spp_app_rx_data_test: buf[i:%d] 0x%x", i, buf[i]);
     }
 
     if (spp_demo_role_get())
@@ -69,7 +69,7 @@ static void spp_demo_app_rx_data_test(uint8_t *bd_addr, uint8_t *buf, uint16_t l
     }
     else
     {
-        spp_demo_app_tx_data_test(bd_addr);
+        spp_app_tx_data_test(bd_addr);
     }
 }
 
@@ -83,7 +83,7 @@ static void spp_demo_app_rx_data_test(uint8_t *bd_addr, uint8_t *buf, uint16_t l
  * @param[in] buf_len    BT manager event buffer length.
  * @return   void
  */
-static void spp_demo_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16_t buf_len)
+static void spp_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16_t buf_len)
 {
     T_BT_EVENT_PARAM *param = event_buf;
     T_APP_BR_LINK *p_link;
@@ -112,7 +112,7 @@ static void spp_demo_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16
                     //spp send first data
                     if (spp_demo_role_get())
                     {
-                        spp_demo_app_tx_data_test(param->spp_conn_cmpl.bd_addr);
+                        spp_app_tx_data_test(param->spp_conn_cmpl.bd_addr);
                     }
                 }
             }
@@ -129,7 +129,7 @@ static void spp_demo_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16
             p_link = app_find_br_link(param->spp_credit_rcvd.bd_addr);
             if (p_link == NULL)
             {
-                APP_PRINT_ERROR0("spp_demo_app_bt_cback: no acl link found");
+                APP_PRINT_ERROR0("spp_app_bt_cback: no acl link found");
                 return;
             }
 
@@ -138,7 +138,7 @@ static void spp_demo_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16
                 //send data when spp tx credit is no more 0 or send first data.
                 if (spp_demo_role_get())
                 {
-                    spp_demo_app_tx_data_test(param->spp_conn_cmpl.bd_addr);
+                    spp_app_tx_data_test(param->spp_conn_cmpl.bd_addr);
                 }
             }
             p_link->rfc_spp_credit = param->spp_credit_rcvd.link_credit;
@@ -155,12 +155,12 @@ static void spp_demo_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16
             p_link = app_find_br_link(param->spp_data_ind.bd_addr);
             if (p_link == NULL)
             {
-                APP_PRINT_ERROR0("spp_demo_app_bt_cback: no acl link found");
+                APP_PRINT_ERROR0("spp_app_bt_cback: no acl link found");
                 return;
             }
             //spp data recieved.
-            spp_demo_app_rx_data_test(param->spp_data_ind.bd_addr, param->spp_data_ind.data,
-                                      param->spp_data_ind.len);
+            spp_app_rx_data_test(param->spp_data_ind.bd_addr, param->spp_data_ind.data,
+                                 param->spp_data_ind.len);
             bt_spp_credits_give(param->spp_data_ind.bd_addr, param->spp_data_ind.local_server_chann,
                                 1);
         }
@@ -176,7 +176,7 @@ static void spp_demo_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16
             p_link = app_find_br_link(param->spp_conn_ind.bd_addr);
             if (p_link == NULL)
             {
-                APP_PRINT_ERROR0("spp_demo_app_bt_cback: no acl link found");
+                APP_PRINT_ERROR0("spp_app_bt_cback: no acl link found");
                 return;
             }
 
@@ -208,7 +208,7 @@ static void spp_demo_app_bt_cback(T_BT_EVENT event_type, void *event_buf, uint16
 
     if (handle == true)
     {
-        APP_PRINT_INFO1("spp_demo_app_bt_cback: event_type 0x%04x", event_type);
+        APP_PRINT_INFO1("spp_app_bt_cback: event_type 0x%04x", event_type);
     }
 }
 
@@ -224,8 +224,8 @@ void app_spp_init(void)
 
     //register spp uuid together with local server channel.
     //register spp service with uuid.
-    bt_spp_service_register((uint8_t *)spp_demo_service_class_uuid128, RFC_SPP_CHANN_NUM);
-    bt_mgr_cback_register(spp_demo_app_bt_cback);
+    bt_spp_service_register((uint8_t *)spp_service_class_uuid128, RFC_SPP_CHANN_NUM);
+    bt_mgr_cback_register(spp_app_bt_cback);
 
 
     //enable or disable ERTM mode
