@@ -14,5 +14,6 @@ src += [cwd + '/nanovg/demos/agge_fill.c', cwd + '/nanovg/base/nanovg.c', cwd + 
 CPPPATH = [cwd,cwd + '/nanosvg/src', cwd + '/nanosvg/example', cwd + '/agge/agge', cwd + '/nanovg/base', cwd + '/nanovg/agge', cwd + '/agge', cwd + '/nanovg']
 
 group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
-
+group = group + SConscript(os.path.join('jerryscript-latest', 'SConscript'))
+group = group + SConscript(os.path.join('ezXML', 'SConscript'))
 Return('group')

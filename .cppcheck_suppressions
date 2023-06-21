@@ -35,8 +35,8 @@
 *:wearable\VCVC9202AtoPhilipsPSP\vcHr02AHci.h
 *:wearable\VCVC9202AtoPhilipsPSP\vcHr02AHci.c
 *:wearable\VCVC9202AtoPhilipsPSP\vcSportMotionIntAlgo.h
-
-
+*:gui_engine\Third_Party\jerryscript-latest\*
+*:gui_engine\Third_Party\ezXML\*
 
 
 

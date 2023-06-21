@@ -1,0 +1,24 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+#src = Glob('*.c')
+src += ['ezxml.c']
+
+#SrcRemove(src,'font_genitop.c')
+#SrcRemove(src,'image_bmp.c')
+#SrcRemove(src,'image_evo.c')
+#SrcRemove(src,'image_path.c')
+#SrcRemove(src,'image_png.c')
+#SrcRemove(src,'image_svg.c')
+
+
+CPPPATH = [cwd]
+
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+
+Return('group')
