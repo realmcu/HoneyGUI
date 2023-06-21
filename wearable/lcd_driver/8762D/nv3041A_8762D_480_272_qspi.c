@@ -245,7 +245,7 @@ void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len)
     GDMA_Init(LCD_DMA_CHANNEL_INDEX, &GDMA_InitStruct);
     GDMA_INTConfig(LCD_DMA_CHANNEL_NUM, GDMA_INT_Transfer, ENABLE);
 
-    GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len >> 2);
+    GDMA_SetBufferSize(LCD_DMA_CHANNEL_INDEX, len >> 1);
 
     GDMA_SetDestinationAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)(&(SPIC2->dr[0].word)));
     GDMA_SetSourceAddress(LCD_DMA_CHANNEL_INDEX, (uint32_t)buf);
