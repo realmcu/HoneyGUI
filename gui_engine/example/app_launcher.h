@@ -34,7 +34,10 @@ extern "C" {
 #include <gui_app.h>
 #include <stdlib.h>
 #include "acc_engine.h"
-
+#include "gui_grid.h"
+#include "gui_scroll_text.h"
+#include "gui_radio.h"
+#include "gui_switch.h"
 typedef struct app_launcher app_launcher_t;
 
 

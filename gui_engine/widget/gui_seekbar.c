@@ -9,143 +9,296 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-
-static void seekbar_update_att(gui_obj_t *obj)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
-    if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
-        (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
-    {
-        if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y)
-        {
-            gui_obj_t *circle_bitmap = &(((gui_seekbar_t *)obj)->slider.slider_circle->base.base.base);
-            if (!(((gui_seekbar_t *)obj)->hit_slider))
-            {
-                if ((tp->x >= (circle_bitmap->x + obj->x + obj->parent->dx) &&
-                     tp->x <= (circle_bitmap->x + obj->x + obj->parent->dx + circle_bitmap->w)) \
-                    && (tp->y >= (circle_bitmap->y + obj->y + obj->parent->dy) &&
-                        tp->y <= (circle_bitmap->y + obj->y + obj->parent->dy + circle_bitmap->h)))
-                {
-                    (((gui_seekbar_t *)obj)->hit_slider) = true;
-                    if (((gui_seekbar_t *)obj)->hit_cb)
-                    {
-                        rtgui_msg_t msg;
-                        msg.type = GUI_SRV_CB;
-                        msg.cb = ((gui_seekbar_t *)obj)->hit_cb;
-                        GUI_ASSERT(NULL != NULL);
-                        GUI_UNUSED(msg);
-                    }
-                }
-            }
-
-        }
-        else
-        {
-            (((gui_seekbar_t *)obj)->hit_slider) = false;
-        }
-
-    }
-    obj->cover = ((gui_seekbar_t *)obj)->hit_slider;
-}
 static void seekbar_preapre(gui_obj_t *obj)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
-    //gui_seekbar_t *circle = (gui_seekbar_t *)obj;
+    GUI_RENDER_DATA
+    gui_seekbar_t *circle = (gui_seekbar_t *)obj;
+    //gui_seekbar_t *b =  circle;
     //circle->slider.slider_circle->set((gui_circle_t *)circle, circle->base.get_progress(&(circle->base))+obj->x, (int16_t)(circle->slider.slider_circle->circle.center.y));
     if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
         (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
     {
 
-        if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y)
+        if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
         {
-            gui_obj_t *circle_bitmap = &(((gui_seekbar_t *)obj)->slider.slider_circle->base.base.base);
-
-            if (!(((gui_seekbar_t *)obj)->hit_slider))
+            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) && (tp->y >= obj->dy &&
+                                                                      tp->y <= (obj->dy + obj->h)))
             {
-                if ((tp->x >= (circle_bitmap->x + obj->dx) &&
-                     tp->x <= (circle_bitmap->x + obj->dx + circle_bitmap->w)) \
-                    && (tp->y >= (circle_bitmap->y + obj->dy) &&
-                        tp->y <= (circle_bitmap->y + obj->dy + circle_bitmap->h)))
-                {
-                    (((gui_seekbar_t *)obj)->hit_slider) = true;
-                }
+                int pro = tp->y + tp->deltaY - obj->dy;
+                if (pro <= 0) { pro = 1; }
+                if (pro >= obj->h) { pro = obj->h; }
+                gui_progressbar_api.set_progress((void *)circle, obj->h - pro);
             }
-            else
+        }
+
+
+    }
+    if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
+        (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
+    {
+        if (tp->type != 271)
+        {
+            ////gui_log("type2:%d,%d\n", tp->type, tp->released);
+        }
+        gui_seekbar_t *b = (void *)obj;
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
             {
-                gui_circle_t *circle = ((gui_seekbar_t *)obj)->slider.slider_circle;
-                int progress = circle->circle.center.x + tp->deltaX - ((gui_seekbar_t *)obj)->deltaX_old;
-                if (progress >= 0 &&
-                    progress <= ((gui_seekbar_t *)obj)->base.get_max(&(((gui_seekbar_t *)obj)->base)))
+                //////gui_log("%s\n", "TOUCH_SHORT");
+                //
+                bool callback = false;
+                if (callback) { callback = false; }
+                for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                 {
-                    if (((gui_seekbar_t *)obj)->slider_cb)
+                    gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+                    if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
                     {
-                        rtgui_msg_t msg;
-                        msg.type = GUI_SRV_CB;
-                        msg.cb = ((gui_seekbar_t *)obj)->slider_cb;
-                        GUI_ASSERT(NULL != NULL);
-                        GUI_UNUSED(msg);
+                        callback = true;
                     }
-                    circle->set(circle, (float)progress, (float)(circle->circle.center.y), circle->circle.radius,
-                                circle->base.color);
-                    ((gui_seekbar_t *)obj)->base.set_progress((gui_progressbar_t *)obj, progress);
+                } ////gui_log("%d\n", __LINE__);
+                //if (callback)
+                {
+                    ////gui_log("%d\n", __LINE__);
+                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                    {
+                        ////gui_log("%d\n", __LINE__);
+                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    }
                 }
-                ((gui_seekbar_t *)obj)->deltaX_old = tp->deltaX;
             }
-        }
-        else
-        {
-            (((gui_seekbar_t *)obj)->hit_slider) = false;
-            ((gui_seekbar_t *)obj)->deltaX_old = 0;
+            break;
+        case TOUCH_LONG:
+            {
+
+            }
+            break;
+
+        default:
+            break;
         }
 
+
+        {
+            if (tp->pressed)
+            {
+
+
+                if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                    (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                {
+                    b->press_flag = true;
+                    //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+
+                    ////gui_log("%d\n", __LINE__);
+                    gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+
+                }
+            }
+
+            if (tp->released)
+            {
+
+                {
+
+
+                    {
+                        b->press_flag = false;
+                        gui_obj_event_set(obj, GUI_EVENT_2);
+                    }  ////gui_log("%d\n", __LINE__);
+
+                }
+            }
+            if (b->press_flag)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_3);
+            }
+
+
+        }
     }
     obj->cover = ((gui_seekbar_t *)obj)->hit_slider;
 
 }
+
+static void seekbar_h_preapre(gui_obj_t *obj)
+{
+    GUI_RENDER_DATA
+    gui_seekbar_t *circle = (gui_seekbar_t *)obj;
+    //gui_seekbar_t *b =  circle;
+    //circle->slider.slider_circle->set((gui_circle_t *)circle, circle->base.get_progress(&(circle->base))+obj->x, (int16_t)(circle->slider.slider_circle->circle.center.y));
+    if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
+        (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
+    {
+
+        if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
+        {
+            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) && (tp->y >= obj->dy &&
+                                                                      tp->y <= (obj->dy + obj->h)))
+            {
+                int pro = tp->x + tp->deltaX - obj->dx;
+                if (pro <= 0) { pro = 1; }
+                if (pro >= obj->w) { pro = obj->w; }
+                gui_progressbar_api.set_progress((void *)circle, pro);
+            }
+        }
+    }
+    if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
+        (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
+    {
+        if (tp->type != 271)
+        {
+            ////gui_log("type2:%d,%d\n", tp->type, tp->released);
+        }
+        gui_seekbar_t *b = (void *)obj;
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
+            {
+                //////gui_log("%s\n", "TOUCH_SHORT");
+                //
+                bool callback = false;
+                if (callback) { callback = false; }
+                for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
+                {
+                    gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+                    if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                    {
+                        callback = true;
+                    }
+                } ////gui_log("%d\n", __LINE__);
+                //if (callback)
+                {
+                    ////gui_log("%d\n", __LINE__);
+                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                    {
+                        ////gui_log("%d\n", __LINE__);
+                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    }
+                }
+            }
+            break;
+        case TOUCH_LONG:
+            {
+
+            }
+            break;
+
+        default:
+            break;
+        }
+
+
+        {
+            if (tp->pressed)
+            {
+
+
+                if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                    (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                {
+                    b->press_flag = true;
+                    //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+
+                    ////gui_log("%d\n", __LINE__);
+                    gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+
+                }
+            }
+
+            if (tp->released)
+            {
+
+                {
+
+
+                    {
+                        b->press_flag = false;
+                        gui_obj_event_set(obj, GUI_EVENT_2);
+                    }  ////gui_log("%d\n", __LINE__);
+
+                }
+            }
+            if (b->press_flag)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_3);
+            }
+
+
+        }
+    }
+
+    obj->cover = ((gui_seekbar_t *)obj)->hit_slider;
+
+}
+static void (onPress)(gui_seekbar_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+}
+static void (onRelease)(gui_seekbar_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+}
+static void (onPressing)(gui_seekbar_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
+}
 void gui_seekbar_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                       int16_t y, int16_t w, int16_t h)
+{
+    this->base.ctor = gui_progressbar_v_ctor;
+    this->base.ctor(&(this->base), parent, filename, x, y, w, h);
+    //this->slider.slider_circle = gui_circle_create(this, "slider", this->base.get_progress(&(this->base)),
+    //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
+    this->base.base.type = SEEKBAR;
+    GET_BASE(this)->obj_prepare = seekbar_preapre;
+    //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
+}
+void gui_seekbar_h_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
+                        int16_t y, int16_t w, int16_t h)
 {
     this->base.ctor = gui_progressbar_ctor;
     this->base.ctor(&(this->base), parent, filename, x, y, w, h);
     //this->slider.slider_circle = gui_circle_create(this, "slider", this->base.get_progress(&(this->base)),
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
-
-    this->base.base.obj_prepare = seekbar_preapre;
-    this->base.base.obj_update_att = seekbar_update_att;
     this->base.base.type = SEEKBAR;
+    GET_BASE(this)->obj_prepare = seekbar_h_preapre;
+    //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
 }
-static void set_progress(gui_progressbar_t *this, size_t progress)
+gui_api_seekbar_t gui_seekbar_api =
 {
-    this->progress_rectangle->set(this->progress_rectangle, ((gui_obj_t *)this->progress_rectangle)->x,
-                                  ((gui_obj_t *)this->progress_rectangle)->y, progress, ((gui_obj_t *)this->progress_rectangle)->h,
-                                  this->progress_rectangle->base.color);
-}
-static size_t get_progress(gui_progressbar_t *this)
-{
-    return this->progress_rectangle->base.base.base.w;
-}
+    .onPress = onPress,
+    .onRelease = onRelease,
+    .onPressing = onPressing,
+};
 gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h)
 {
+//#define _param_gui_seekbar_t this, parent, filename, x,y,w,h
+//GUI_NEW(gui_seekbar_t, gui_seekbar_ctor, _param_gui_seekbar_t)
+
     gui_seekbar_t *this = gui_malloc(sizeof(gui_seekbar_t));
     memset(this, 0, sizeof(gui_seekbar_t));
-    this->ctor = gui_seekbar_ctor;
-    this->ctor(this, parent, filename, x, y, w, h);
-    gui_list_init(&(GET_BASE(this)->child_list));
-    if ((GET_BASE(this)->parent) != NULL)
-    {
-        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));
-    }
-    ((gui_progressbar_t *)this)->max_rectangle = gui_rectangle_create(this, "max_r", 0, 0, w, h,
-                                                                      0xf0f0);
-    ((gui_progressbar_t *)this)->progress_rectangle = gui_rectangle_create(this, "progress_r", 0, 0,
-                                                                           (int16_t)(w * 0.6f), h, 0x0f0f);
-    ((gui_progressbar_t *)this)->get_progress = get_progress;
-    ((gui_progressbar_t *)this)->set_progress = set_progress;
-    this->slider.slider_circle = gui_circle_create(this, "v", this->base.get_progress(&(this->base)),
-                                                   h / 2, h, 0x8080);
-    GET_BASE(this)->create_done = true;
+    gui_seekbar_ctor(this, parent, filename, x, y, w, h);
+//gui_list_init(&(((gui_obj_t *)this)->child_list));
+//if ((((gui_obj_t *)this)->parent) != ((void *)0))
+//{ gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
+    ((gui_obj_t *)this)->create_done = 1;
+    return this;
+}
+gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t x, int16_t y,
+                                    int16_t w, int16_t h)
+{
+///#define _param_gui_seekbar_t this, parent, filename, x,y,w,h
+//GUI_NEW(gui_seekbar_t, gui_seekbar_h_ctor, _param_gui_seekbar_t)
+    gui_seekbar_t *this = gui_malloc(sizeof(gui_seekbar_t));
+    memset(this, 0, sizeof(gui_seekbar_t));
+    gui_seekbar_h_ctor(this, parent, filename, x, y, w, h);
+//gui_list_init(&(((gui_obj_t *)this)->child_list));
+//if ((((gui_obj_t *)this)->parent) != ((void *)0))
+//{ gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
+    ((gui_obj_t *)this)->create_done = 1;
     return this;
 }

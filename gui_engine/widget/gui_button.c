@@ -59,30 +59,33 @@ static void button_prepare(gui_obj_t *obj)
     if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
         (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
     {
-
+        if (tp->type != 271)
+        {
+            ////gui_log("type2:%d,%d\n", tp->type, tp->released);
+        }
         gui_button_t *b = (void *)obj;
         switch (tp->type)
         {
         case TOUCH_SHORT:
             {
-                //gui_log("%s\n", "TOUCH_SHORT");
+                //////gui_log("%s\n", "TOUCH_SHORT");
                 //
-                bool callback = false;
+//                bool callback = false;
                 for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                 {
                     gui_event_dsc_t *event_dsc = obj->event_dsc + i;
                     if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
                     {
-                        callback = true;
+                        //callback = true;
                     }
-                } gui_log("%d\n", __LINE__);
-                if (callback)
+                } ////gui_log("%d\n", __LINE__);
+                //if (callback)
                 {
-                    gui_log("%d\n", __LINE__);
+                    ////gui_log("%d\n", __LINE__);
                     if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
                         (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
                     {
-                        gui_log("%d\n", __LINE__);
+                        ////gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                     }
                 }
@@ -111,10 +114,7 @@ static void button_prepare(gui_obj_t *obj)
             break;
         }
 
-        if (tp->type != 271)
-        {
-            gui_log("type2:%d,%d\n", tp->type, tp->released);
-        }
+
         {
             if (tp->pressed)
             {
@@ -124,42 +124,48 @@ static void button_prepare(gui_obj_t *obj)
                 {
 
                     //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-                    if (b->on_pic_addr)
+                    if (b->on_pic_addr && b->style == 0)
                     {
                         //gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
                     }
-                    gui_log("%d\n", __LINE__);
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  gui_log("%d\n", __LINE__);
+                    ////gui_log("%d\n", __LINE__);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
                     b->long_flag = false;
                     b->press_flag = true;
                 }
             }
-            if (tp->released && b->press_flag)
+
+            if (b->release_flag)
             {
 
                 {
                     b->press_flag = false;
+                    b->release_flag = false;
                     //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-                    gui_log("%d\n", __LINE__);
-                    if (b->off_pic_addr)
+                    ////gui_log("%d\n", __LINE__);
+                    if (b->off_pic_addr && b->style == 0)
                     {
                         //gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
                     }
-                    bool callback = false;
+                    // bool callback = false;
                     for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                     {
                         gui_event_dsc_t *event_dsc = obj->event_dsc + i;
                         if (event_dsc->filter == GUI_EVENT_TOUCH_RELEASED)
                         {
-                            callback = true;
+                            // callback = true;
                         }
                     }
-                    if (callback)
+                    //if (callback)
                     {
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-                    }  gui_log("%d\n", __LINE__);
+                    }  ////gui_log("%d\n", __LINE__);
                     b->long_flag = false;
                 }
+            }
+            if (tp->released && b->press_flag)
+            {
+                b->release_flag = true;
             }
         }
 

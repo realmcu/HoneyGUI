@@ -365,6 +365,18 @@ int gui_fs_lseek(int fd, int offset, int whence)
 
     return 0;
 }
+int gui_fs_ioctl(int fd, int cmd)
+{
+    if (fs)
+    {
+        if (fs->ioctl)
+        {
+            return fs->ioctl(fd, cmd);
+        }
+    }
+
+    return 0;
+}
 int gui_fs_closedir(gui_fs_DIR *d)
 {
     if (fs)

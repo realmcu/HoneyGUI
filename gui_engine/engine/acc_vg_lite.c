@@ -687,7 +687,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     }
 
     uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
-    gui_log("gpu_width:%d, image->img_w:%d\n", gpu_width, image->img_w);
+    //gui_log("gpu_width:%d, image->img_w:%d\n", gpu_width, image->img_w);
     bool image_alien = true;
     gpu_width = ((image->img_w + 15) >> 4) << 4;
     uint32_t gpu_height = image->img_h;

@@ -48,6 +48,7 @@ typedef struct gui_curtainview
 {
     gui_obj_t base;
     uint16_t curtain_cnt;
+    uint16_t style;
     gui_curtain_enum_t cur_curtain;
     gui_curtain_float_t scopes;
     gui_curtain_bool_t orientations;

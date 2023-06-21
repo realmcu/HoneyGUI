@@ -22,19 +22,28 @@ typedef struct gui_page
     int start_x;
     int start_y;
     gui_img_t *scroll_bar;
+    int get_yend;
     void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
 } gui_page_t;
+typedef struct _gui_api_page
+{
+    void (*gui_page_add_scroll_bar)(gui_page_t *this, void *bar_pic);
+    void (*set_offset)(gui_page_t *this, int offset);
+    int (*get_offset)(gui_page_t *this);
+} _gui_api_page_t;
+
 void page_update(gui_obj_t *obj);
 void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                    int16_t y, int16_t w, int16_t h);
 //gui_grid
 /**
  * @brief create a page widget.
- * @param parent the father widget the pagedow nested in.
- * @param filename the pagedow widget name.
+ *
+ * @param parent the father widget the page nested in.
+ * @param filename the page widget name.
  * @param x the X-axis coordinate.
- * @param y the Y-axis coordinate.
+ * @param x the Y-axis coordinate.
  * @param w the width.
  * @param h the hight.
  * @return return the widget object pointer
@@ -42,34 +51,8 @@ void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, in
  */
 gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16_t y,
                             int16_t w, int16_t h);
-typedef gui_curtain_enum_t BAR_LAYOUT_T;
-typedef struct gui_pagebar
-{
-    gui_obj_t base;
-    BAR_LAYOUT_T bar_layout;
-    uint32_t page_count;
-    uint32_t current_page;
-    gui_iconlist_t *ic;
-    uint32_t icon_w;
-    uint32_t icon_h;
-    int page_x;
-    int page_y;
-    uint32_t page_w;
-    uint32_t page_h;
-    void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
-                 int16_t y, int16_t w, int16_t h);
-} gui_pagebar_t;
 
-gui_pagebar_t *gui_pagebar_create(void *parent, const char *filename, int16_t x, int16_t y,
-                                  int16_t w, int16_t h, BAR_LAYOUT_T bar_layout);
-
-/**
- * @brief add scroll bar in page
- *
- * @param this the page widget object pointer
- * @param bar_pic the bar picture address
- */
-void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic);
+extern _gui_api_page_t gui_page_api;
 
 #ifdef __cplusplus
 }

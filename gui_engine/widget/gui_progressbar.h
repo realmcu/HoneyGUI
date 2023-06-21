@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 #include "gui_graphic.h"
-#include "gui_rectangle.h"
+#include "gui_canvas.h"
 /**********************
  *      TYPEDEFS
  **********************/
@@ -19,25 +19,41 @@ typedef struct gui_progressbar gui_progressbar_t;
 struct gui_progressbar
 {
     gui_obj_t base;
-    gui_rectangle_t *max_rectangle;
-    gui_rectangle_t *progress_rectangle;
-    void (*set_progress)(gui_progressbar_t *this, size_t progress);
-    size_t (*get_progress)(gui_progressbar_t *this);
-    size_t (*get_max)(gui_progressbar_t *this);
+    gui_canvas_t *c;
+    uint32_t color;
+    uint32_t color_hl;
+    size_t max;
+    float per;
     void (*ctor)(gui_progressbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y,
                  int16_t w, int16_t h);
-} ;
 
+} ;
+typedef struct _gui_api_progressbar
+{
+    void (*set_progress)(gui_progressbar_t *this, size_t progress);
+    size_t (*get_progress)(gui_progressbar_t *this);
+    size_t (*get_max)(gui_progressbar_t *this);
+    void (*set_percentage)(gui_progressbar_t *this, float percentage);
+    float (*get_percentage)(gui_progressbar_t *this);
+} _gui_api_progressbar_t;
+extern _gui_api_progressbar_t gui_progressbar_api;
 void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
                           int16_t x,
                           int16_t y, int16_t w, int16_t h);
+void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
+                            int16_t x,
+                            int16_t y, int16_t w, int16_t h);
+void gui_progressbar_h_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
+                            int16_t x,
+                            int16_t y, int16_t w, int16_t h);
 /**
- * @brief create a progressbar widget,which can nest tabs.
+ * @brief create a progressbar widget.
+ *
  * @param parent the father widget it nested in.
  * @param filename this progressbar widget's name.
  * @param x the X-axis coordinate of the widget.
- * @param x the Y-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
  * @param h the hight of the widget.
  * @return return the widget object pointer.
@@ -45,8 +61,11 @@ void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char
  */
 gui_progressbar_t *gui_progressbar_create(void *parent, const char *filename, int16_t x, int16_t y,
                                           int16_t w, int16_t h);
-
-
+gui_progressbar_t *gui_progressbar_v_create(void *parent, const char *filename, int16_t x,
+                                            int16_t y,
+                                            int16_t w, int16_t h);
+gui_progressbar_t *gui_progressbar_picture_create(void *parent, int16_t x, int16_t y,
+                                                  int16_t w, int16_t h, void *picture_addr);
 #ifdef __cplusplus
 }
 #endif

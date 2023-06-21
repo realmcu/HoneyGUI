@@ -121,7 +121,6 @@ typedef union gui_color_msb
 
 
 
-
 /***touch device***/
 
 
@@ -262,6 +261,7 @@ struct gui_fs
     gui_fs_DIR *(*opendir)(const char *name);
     struct gui_fs_dirent *(*readdir)(gui_fs_DIR *d);
     int (*closedir)(gui_fs_DIR *d);
+    int (*ioctl)(int fildes, int cmd, ...);
 };
 
 struct gui_indev
@@ -370,6 +370,11 @@ typedef enum obj_type
     CANVAS,
     VG_LITE_CLOCK,
     VG_LITE_CUBE,
+    GRID,
+    RADIO,
+    RADIOSWITCH,
+    ARC,
+    JAVASCRIPT,
 } obj_type_t;
 typedef struct rtgui_msg
 {
@@ -463,9 +468,14 @@ typedef struct _gui_obj_t
     gui_event_dsc_t *event_dsc;
 } gui_obj_t;
 
-
-
-
+#define GUI_RENDER_DATA     gui_dispdev_t *dc = gui_get_dc();\
+    touch_info_t *tp = tp_get_info();
+#define GUI_TYPE(type, obj) ((type *)obj)
+#if defined __WIN32
+#define GUI_ROOT_FOLDER "example/root_image/root_image_sim_vscode/root/"
+#else
+#define GUI_ROOT_FOLDER "/"
+#endif
 #define GUI_NEW(type, constructor_cb, param) type *this = gui_malloc(sizeof(type));\
     memset(this, 0, sizeof(type));\
     constructor_cb(param);\

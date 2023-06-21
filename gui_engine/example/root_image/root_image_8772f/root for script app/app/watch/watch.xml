@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<app iconPicture="app/watch/resource/icMenuAlarm.bin">watch
+	<script src="app/album/album.js"></script>
+	<screen>app_album
+		<tabview>tv1
+			<tab >t1
+				<curtainview>curtainview0
+					<curtain scope="1" orientation="up">curtain1
+						<img file="app/album/resource/charge6.bin" y = "300">img3</img>
+					</curtain>
+					<curtain scope="1" orientation="left">curtain1
+						<img file="app/album/resource/charge4.bin" x = "300">img2</img>
+					</curtain>
+				</curtainview>
+				<win x="100" y="100">
+					<img file="app/album/resource/charge2.bin" scaleX="2" scaleY="0.5" rotationAngle="60" mode="blendSrcBlack">img1</img>
+					<textbox w="400" h="40" x="100"y="100" text="123456" color="#ffff00ff" fontSize="16">t1</textbox>
+				</win>
+				
+			</tab>
+			<tab idx="1">t2
+				<img file="app/album/resource/charge2.bin">img1</img>
+			</tab>
+		</tabview>
+		<icon x="200" y="200" w="200" h="200" picture="app/album/resource/charge2.bin" highlightPicture="app/album/resource/charge6.bin" text="battery" textX="10" textX="10" textY="20" pictureX="50" pictureY="10">i</icon>
+		
+	</screen>
+</app>

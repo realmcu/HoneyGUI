@@ -11,12 +11,33 @@
 #include "gui_obj.h"
 #include <gui_iconlist.h>
 #include <tp_algo.h>
-
-
+static void deal_img_in_root(gui_obj_t *object, int dyend, int *out)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        obj->dx = obj->x + obj->parent->dx;
+        obj->dy = obj->y + obj->parent->dy;
+        if (dyend < obj->dy + obj->h) { dyend = obj->dy + obj->h; }
+        *out = dyend;
+        deal_img_in_root(obj, dyend, out);
+    }
+}
 void page_update(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    if (((gui_page_t *)obj)->get_yend < 2)
+    {
+        int dy = 0;
+        deal_img_in_root(obj, obj->y + obj->h, &dy);
+        obj->h = dy - obj->y;
+        obj->w = 320;
+        //gui_log("deal_img_in_root %d",obj->h);
+        ((gui_page_t *)obj)->get_yend++;
+    }
+
     if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
         (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
     {
@@ -26,15 +47,17 @@ void page_update(gui_obj_t *obj)
             {
                 if ((tp->type == TOUCH_HOLD_Y))
                 {
+                    ////gui_log("obj->y:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-gui_get_screen_height()));
                     obj->y = tp->deltaY + ((gui_page_t *)obj)->yold;
                     if (obj->y > ((gui_page_t *)obj)->start_y)
                     {
                         obj->y = ((gui_page_t *)obj)->start_y;
 
                     }
-                    if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-                        obj->y != 0)
+                    else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                             obj->y != 0)
                     {
+                        ////gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                         obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
                     }
                 }
@@ -43,89 +66,73 @@ void page_update(gui_obj_t *obj)
                     if (obj->y > ((gui_page_t *)obj)->start_y)
                     {
                         obj->y = ((gui_page_t *)obj)->start_y;
-                        // gui_app_exec(gui_current_app());
+
                     }
-                    if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-                        obj->y != 0)
+                    else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                             obj->y != 0)
                     {
+                        ////gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                         obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
                     }
+
                     ((gui_page_t *)obj)->yold = obj->y;
                 }
             }
         }
+
+
         if (((gui_page_t *)obj)->scroll_bar)
         {
             ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
                                                        gui_get_screen_height() / obj->h);
         }
+
+
     }
 }
-struct page_icon_cb_p
-{
-    gui_pagebar_t *bar;
-    uint32_t current_page;
-};
 
-void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
+static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
 {
     this->scroll_bar = gui_img_create_from_mem(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
-    rtgui_image_load_scale(&this->scroll_bar->draw_img);
+    gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
-
-//static void page_icon_cb(struct page_icon_cb_p *p)
-//{
-//    gui_pagebar_t *bar = p->bar;
-//    bar->current_page = p->current_page;
-//    //gui_free(p);
-//    gui_app_exec(gui_current_app());
-//}
-void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *name, int16_t x,
+static void set_offset(gui_page_t *this, int offset)
+{
+    this->yold = offset;
+    this->base.y = offset;
+}
+static int get_offset(gui_page_t *this)
+{
+    return this->base.y;
+}
+_gui_api_page_t gui_page_api =
+{
+    .set_offset = set_offset,
+    .get_offset = get_offset,
+    .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
+};
+void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                    int16_t y, int16_t w, int16_t h)
 {
-    //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
-
-    gui_obj_t *root = (gui_obj_t *)this;
-    root->type = PAGE;
-    root->obj_update_att = page_update;
-
-    // if (parent->type == PAGEBAR)
-    // {
-    //     gui_pagebar_t *bar = (gui_pagebar_t *)parent;
-    //     struct page_icon_cb_p *p = gui_malloc(sizeof(struct page_icon_cb_p));
-    //     p->bar = (void *)parent;
-    //     p->current_page = bar->page_count;
-    //     /// gui_icon_t *ic = gui_icon_create_theme4(bar->ic, "_page_ic", 0,0,65,65, bar->page_count++, "app/system/resource/switchOn.bin");
-    //     // GUI_ASSERT(NULL != NULL);(ic, page_icon_cb, SHORT_TOUCH_CB, p);
-    //     this->base.x = bar->page_x;
-    //     this->base.y = bar->page_y;
-    //     this->start_x = bar->page_x;
-    //     this->start_y = bar->page_y;
-    // }
+    gui_obj_ctor(&this->base, parent, filename, x, y, w, h
+                );
+    GET_BASE(this)->type = PAGE;
+    GET_BASE(this)->obj_update_att = page_update;
+    this->base.type = PAGE;
+    this->start_x = x;
+    this->start_y = y;
 }
-
-gui_page_t *gui_page_create(void *parent, const char *name, int16_t x, int16_t y,
+gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16_t y,
                             int16_t w, int16_t h)
 {
-    GUI_ASSERT(parent != NULL);
-    if (name == NULL)
-    {
-        name = "DEFAULT_PAGE";
-    }
-    gui_page_t *this = gui_malloc(sizeof(gui_page_t));
-    GUI_ASSERT(this != NULL);
-    memset(this, 0, sizeof(gui_page_t));
-
-    gui_page_ctor(this, parent, name, x, y, w, h);
-    gui_list_init(&(((gui_obj_t *)this)->child_list));
-    if ((((gui_obj_t *)this)->parent) != ((void *)0))
-    {
-        gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
-                               &(GET_BASE(this)->brother_list));
-    }
-    GET_BASE(this)->create_done = 1;
-    return this;
+#define _GUI_NEW_gui_page_create_param this, parent, filename, x, y, w, h
+    GUI_NEW(gui_page_t, gui_page_ctor, _GUI_NEW_gui_page_create_param)
 }
+
+
+
+
+
+
+

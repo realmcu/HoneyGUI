@@ -44,7 +44,14 @@ typedef enum
     GUI_EVENT_KB_DOWN_RELEASED,
     /** Special events*/
     /** Other events*/
-
+    GUI_EVENT_1,
+    GUI_EVENT_2,
+    GUI_EVENT_3,
+    GUI_EVENT_4,
+    GUI_EVENT_5,
+    GUI_EVENT_6,
+    GUI_EVENT_7,
+    GUI_EVENT_8,
 } gui_event_t;
 
 

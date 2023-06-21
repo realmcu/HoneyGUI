@@ -129,7 +129,7 @@ static void curtain_prepare(gui_obj_t *obj)
     switch (((gui_curtain_t *)obj)->orientation)
     {
     case CURTAIN_UP:
-        add_a_in_root(obj);
+        //add_a_in_root(obj);
         break;
     case CURTAIN_DOWN:
         break;

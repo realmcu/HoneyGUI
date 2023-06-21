@@ -21,8 +21,11 @@ struct gui_button
     gui_text_t *text;
     bool press_flag;
     bool long_flag;
+    bool release_flag;
     void *on_pic_addr;
     void *off_pic_addr;
+    void *data;
+    char style;
     gui_animate_t *animate;
     void (*ctor)(
         gui_button_t *this,

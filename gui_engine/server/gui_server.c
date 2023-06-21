@@ -63,7 +63,7 @@ static void rtgui_server_entry(void *parameter)
         gui_obj_t *screen = &app->screen;
         GUI_ASSERT(screen != NULL);
 
-        rtgui_msg_t msg;
+        // rtgui_msg_t msg;
 #if 0
         if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0))
         {
@@ -91,7 +91,7 @@ static void rtgui_server_entry(void *parameter)
         {
             gui_log("daemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n", daemon_start_ms,
                     gui_ms_get(), app->active_ms);
-            gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0x0FFFFFFF);
+            //gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0x0FFFFFFF);
             daemon_cnt = 0;
         }
 
@@ -135,7 +135,10 @@ int rtgui_server_init(void)
         gui_log("GUI Debug Mode!!");
         while (1);
     }
-
+#if defined RTK_GUI_SCRIPT_APP
+    extern void js_init(void);
+    js_init();
+#endif
     gui_server_handle = gui_thread_create(GUI_SERVER_THREAD_NAME,
                                           rtgui_server_entry, NULL,
                                           1024 * 10,

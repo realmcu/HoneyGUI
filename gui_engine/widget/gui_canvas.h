@@ -43,7 +43,7 @@ struct gui_canvas
     float sx;
     float sy;
     float tx;
-    float ty;
+    float ty; float cx, cy, sw, r, sd, ed, sc; uint32_t s;
     uint8_t opacity_value;
 
 };

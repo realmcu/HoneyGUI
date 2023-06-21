@@ -17,7 +17,7 @@ void rtgui_system_image_init(void)
     //rtgui_image_bmp_init();
     //rtgui_image_png_init();
 #ifdef RTK_GUI_IMAGE_FS
-    rtgui_image_rgb_init();
+    //rtgui_image_rgb_init();
 #endif
 #ifdef RTK_GUI_IMAGE_MEM
     rtgui_image_bitmap_init();

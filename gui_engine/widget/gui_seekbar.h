@@ -11,7 +11,6 @@
 extern "C" {
 #endif
 #include "gui_progressbar.h"
-#include "gui_circle.h"
 /**********************
  *      TYPEDEFS
  **********************/
@@ -22,25 +21,33 @@ struct gui_seekbar
     union
     {
         gui_img_t *slider_img;
-        gui_circle_t *slider_circle;
     } slider;
     bool hit_slider;
+    bool press_flag;
+    void *press_cb;
+    void *release_cb;
+    void *release_cb_p;
+    void *press_cb_p;
     int deltaX_old;
-    void (*hit_cb)(void *obj, gui_event_t e);
-    void (*free_cb)(void *obj, gui_event_t e);
-    void (*slider_cb)(void *obj, gui_event_t e);
     void (*ctor)(gui_seekbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y,
                  int16_t w, int16_t h);
 } ;
 
-
+typedef struct gui_api_seekbar
+{
+    void (*onPress)(gui_seekbar_t *this, void *cb, void *p);
+    void (*onRelease)(gui_seekbar_t *this, void *cb, void *p);
+    void (*onPressing)(gui_seekbar_t *this, void *cb, void *p);
+} gui_api_seekbar_t;
+extern gui_api_seekbar_t gui_seekbar_api;
 /**
- * @brief create a seekbar widget,which can nest tabs.
+ * @brief create a seekbar widget.
+ *
  * @param parent the father widget it nested in.
  * @param filename this seekbar widget's name.
  * @param x the X-axis coordinate of the widget.
- * @param x the Y-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
  * @param h the hight of the widget.
  * @return return the widget object pointer.
@@ -49,7 +56,8 @@ struct gui_seekbar
 gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h);
 
-
+gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t x, int16_t y,
+                                    int16_t w, int16_t h);
 #ifdef __cplusplus
 }
 #endif

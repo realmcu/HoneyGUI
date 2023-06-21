@@ -404,4 +404,36 @@ gui_magic_img_t *gui_svg_create_from_mem(void *parent, void *data, uint32_t data
     GUI_NEW(gui_magic_img_t, svg_ctor, _param_ctor_gui_svg_create_from_mem_)
 }
 #endif
+void *gui_get_file_address(const char *file)
+{
+#if defined(_WIN32)
+    {
+        char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
+        int fd = gui_fs_open(path,  0);
+        gui_free(path);
+        int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+        void *imgbuf = gui_malloc(size);
+        memset(imgbuf, 0, size);
+        gui_fs_read(fd, imgbuf, size);
+        return imgbuf;
+    }
+#else
+    {
+        char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
+        int fd = gui_fs_open(path,  0);
+        gui_free(path);
+        void *rst;
+        rst = (void *)gui_fs_ioctl(fd, 0);
+        gui_fs_close(fd);
+        gui_log("rst:%p\n", rst);
+        return rst;
 
+    }
+#endif
+}
+gui_magic_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)
+{
+    return gui_magic_img_create_from_mem(parent, "image", gui_get_file_address(file), x, y, 0, 0);
+}

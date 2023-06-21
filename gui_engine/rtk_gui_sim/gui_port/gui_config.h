@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-//#define RTK_GUI_IMAGE_FS
+#define RTK_GUI_IMAGE_FS
 #define RTK_GUI_IMAGE_MEM
 // #define RTK_GUI_FONT_FS
 #define RTK_GUI_FONT_MEM                3  //size of font_lib
@@ -25,7 +25,7 @@ extern "C" {
 #define RTK_GUI_GPU_OPENVG              0
 #define RTK_GUI_GPU_NANOVG              0
 #define MODULE_GPU_NANOVG
-
+//#define RTK_GUI_SCRIPT_APP
 #ifdef __cplusplus
 }
 #endif

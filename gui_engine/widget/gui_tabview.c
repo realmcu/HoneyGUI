@@ -299,6 +299,105 @@ static void deal_img_in_root(gui_obj_t *object, float xx, float yy)
         deal_img_in_root(obj, x, y);
     }
 }
+static void deal_img_in_root_scale(gui_obj_t *object, float xx, float yy)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    float x = xx * 0.6f + 0.4f;
+    float y = yy * 0.6f + 0.4f;
+    gui_list_for_each_safe(node, tmp, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if ((!(obj->parent->type == CURTAIN &&
+               ((gui_curtain_t *)obj->parent)->orientation != CURTAIN_MIDDLE)) &&
+            (!(obj->parent->parent->type == CURTAIN &&
+               ((gui_curtain_t *)obj->parent->parent)->orientation != CURTAIN_MIDDLE)))
+        {
+            switch (obj->type)
+            {
+            case IMAGE_FROM_MEM:
+                {
+                    gui_magic_img_t *img = (void *)obj;
+                    gui_img_scale(img, x, y);
+                    gui_img_translate(img, get_scale_offset_x((void *)img, x) / x, get_scale_offset_y((void *)img,
+                                      x) / y);
+                    //img->base.draw_img.opacity_value = x * UINT8_MAX;
+                }
+                break;
+            case CANVAS:
+                {
+                    gui_canvas_t *img = (void *)obj;
+                    gui_canvas_api.scale(img, x, y);
+                    gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x),
+                                             get_scale_offset_y((void *)img,
+                                                                x));
+                    //img->opacity_value = x * UINT8_MAX;
+                }
+                break;
+#ifdef MODULE_VG_LITE
+            case VG_LITE_CLOCK:
+                {
+                    gui_vg_lite_clock_t *vg_lite_clock = (gui_vg_lite_clock_t *)obj;
+                    gui_vg_lite_scale(vg_lite_clock, x, y);
+                    //gui_vg_lite_translate(vg_lite_clock, get_scale_offset_x((void *)vg_lite_clock, x) / x, get_scale_offset_y((void *)vg_lite_clock, x) / y);
+                }
+                break;
+#endif
+
+            default:
+                break;
+            }
+        }
+        deal_img_in_root(obj, x, y);
+    }
+}
+static void deal_img_in_root_fade(gui_obj_t *object, float xx, float yy)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    float x = xx * 0.6f + 0.4f;
+    float y = yy * 0.6f + 0.4f;
+    gui_list_for_each_safe(node, tmp, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if ((!(obj->parent->type == CURTAIN &&
+               ((gui_curtain_t *)obj->parent)->orientation != CURTAIN_MIDDLE)) &&
+            (!(obj->parent->parent->type == CURTAIN &&
+               ((gui_curtain_t *)obj->parent->parent)->orientation != CURTAIN_MIDDLE)))
+        {
+            switch (obj->type)
+            {
+            case IMAGE_FROM_MEM:
+                {
+                    gui_magic_img_t *img = (void *)obj;
+
+                    img->base.draw_img.opacity_value = x * UINT8_MAX;
+                }
+                break;
+            case CANVAS:
+                {
+                    gui_canvas_t *img = (void *)obj;
+
+                    img->opacity_value = x * UINT8_MAX;
+                }
+                break;
+#ifdef MODULE_VG_LITE
+            case VG_LITE_CLOCK:
+                {
+                    gui_vg_lite_clock_t *vg_lite_clock = (gui_vg_lite_clock_t *)obj;
+                    //gui_vg_lite_scale(vg_lite_clock, x, y);
+                    //gui_vg_lite_translate(vg_lite_clock, get_scale_offset_x((void *)vg_lite_clock, x) / x, get_scale_offset_y((void *)vg_lite_clock, x) / y);
+                }
+                break;
+#endif
+
+            default:
+                break;
+            }
+        }
+        deal_img_in_root(obj, x, y);
+    }
+}
 static int to1(int input)
 {
     if (input < 0)
@@ -373,33 +472,109 @@ static void tab_prepare_reduction_fade(gui_obj_t *obj)
 {
     tab_prepare_scale_fade(obj);
 }
+static void tab_prepare_scale(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_tab_t *tab = (gui_tab_t *)obj;
+    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+    /**
+     * @note tp->deltaX >0 means slide right, the left tab shows
+     *       tp->deltaX <0 means slide left, the right tab shows
+     *       the left tab's dx -320~0
+     *       the right tab's dx 320~0
+     */
+    if (((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_LEFT_SLIDE) ||
+         (tp->type == TOUCH_RIGHT_SLIDE) || (tp->type == TOUCH_INVALIDE))  &&
+        (tab->id.x - parent->cur_id.x == 0) && tab->id.y == 0)
+    {
+        ////gui_log("tp->type:%d,%f,%d\n",tp->type,((float)(gui_get_screen_width()+(float)obj->dx))/((float)gui_get_screen_width()),tab->id.x - parent->cur_id.x);
+
+        ////gui_log("%f,%f\n",((float)(gui_get_screen_width()+tp->deltaX))/((float)gui_get_screen_width()), (gui_get_screen_width()+tp->deltaX)/gui_get_screen_width());
+
+        deal_img_in_root_scale(obj, ((float)(gui_get_screen_width() + ((float)(-to1(tp->deltaX))) *
+                                             (float)obj->dx)) / ((float)gui_get_screen_width()),
+                               ((float)(gui_get_screen_width() + ((float)(-to1(tp->deltaX))) * (float)obj->dx)) / ((
+                                           float)gui_get_screen_width()));
+        //deal_img_in_root(obj, 0.5, 0.5);
+    }
+    else if ((tp->type == TOUCH_HOLD_X) && (tp->deltaX < 0) && (tab->id.x - parent->cur_id.x == 1) &&
+             tab->id.y == 0)
+    {
+        deal_img_in_root_scale(obj, ((float)(gui_get_screen_width() - (float)obj->dx)) / ((
+                                   float)gui_get_screen_width()),
+                               ((float)(gui_get_screen_width() - (float)obj->dx)) / ((float)gui_get_screen_width()));
+    }
+    else if ((tp->type == TOUCH_HOLD_X) && (tp->deltaX > 0) && (tab->id.x - parent->cur_id.x == -1) &&
+             tab->id.y == 0)
+    {
+        ////gui_log("(float)obj->dx:%f\n",((float)obj->dx)/((float)gui_get_screen_width())+1.0f);
+        deal_img_in_root_scale(obj, ((float)obj->dx) / ((float)gui_get_screen_width()) + 1.0f,
+                               ((float)obj->dx) / ((float)gui_get_screen_width()) + 1.0f);
+    }
+}
+static void tab_prepare_fade(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_tab_t *tab = (gui_tab_t *)obj;
+    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+    /**
+     * @note tp->deltaX >0 means slide right, the left tab shows
+     *       tp->deltaX <0 means slide left, the right tab shows
+     *       the left tab's dx -320~0
+     *       the right tab's dx 320~0
+     */
+    if (((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_LEFT_SLIDE) ||
+         (tp->type == TOUCH_RIGHT_SLIDE) || (tp->type == TOUCH_INVALIDE))  &&
+        (tab->id.x - parent->cur_id.x == 0) && tab->id.y == 0)
+    {
+        ////gui_log("tp->type:%d,%f,%d\n",tp->type,((float)(gui_get_screen_width()+(float)obj->dx))/((float)gui_get_screen_width()),tab->id.x - parent->cur_id.x);
+
+        ////gui_log("%f,%f\n",((float)(gui_get_screen_width()+tp->deltaX))/((float)gui_get_screen_width()), (gui_get_screen_width()+tp->deltaX)/gui_get_screen_width());
+
+        deal_img_in_root_fade(obj, ((float)(gui_get_screen_width() + ((float)(-to1(tp->deltaX))) *
+                                            (float)obj->dx)) / ((float)gui_get_screen_width()),
+                              ((float)(gui_get_screen_width() + ((float)(-to1(tp->deltaX))) * (float)obj->dx)) / ((
+                                          float)gui_get_screen_width()));
+        //deal_img_in_root(obj, 0.5, 0.5);
+    }
+    else if ((tp->type == TOUCH_HOLD_X) && (tp->deltaX < 0) && (tab->id.x - parent->cur_id.x == 1) &&
+             tab->id.y == 0)
+    {
+        deal_img_in_root_fade(obj, ((float)(gui_get_screen_width() - (float)obj->dx)) / ((
+                                  float)gui_get_screen_width()),
+                              ((float)(gui_get_screen_width() - (float)obj->dx)) / ((float)gui_get_screen_width()));
+    }
+    else if ((tp->type == TOUCH_HOLD_X) && (tp->deltaX > 0) && (tab->id.x - parent->cur_id.x == -1) &&
+             tab->id.y == 0)
+    {
+        ////gui_log("(float)obj->dx:%f\n",((float)obj->dx)/((float)gui_get_screen_width())+1.0f);
+        deal_img_in_root_fade(obj, ((float)obj->dx) / ((float)gui_get_screen_width()) + 1.0f,
+                              ((float)obj->dx) / ((float)gui_get_screen_width()) + 1.0f);
+    }
+}
 static void tab_prepare(gui_obj_t *this)
 {
-    if (this->parent->type == TABVIEW)
+    if (this->parent->type == TABVIEW && ((gui_tab_t *)this)->id.x != 4)
     {
-        if (((gui_tab_t *)this)->id.x != 4 && ((gui_tab_t *)this)->id.x != 2 &&
-            ((gui_tab_t *)this)->id.x != 6)
-        {
-            switch (((gui_tabview_t *)(this->parent))->style)
-            {
-            case SLIDE_CLASSIC:
-            case SLIDE_FADE:
-            case SLIDE_WHEEL:
-            case SLIDE_SCALE:
-                tab_prepare_classic(this);
-                break;
-            case SLIDE_SCALE_FADE:
-                tab_prepare_scale_fade(this);;
-                break;
-            default:
-                tab_prepare_classic(this);
-                break;
-            }
-        }
-        else
+        switch (((gui_tabview_t *)(this->parent))->style)
         {
 
+        case SLIDE_FADE:
+            tab_prepare_fade(this);;
+            break;
+        case SLIDE_SCALE:
+            tab_prepare_scale(this);
+            break;
+        case SLIDE_SCALE_FADE:
+            tab_prepare_scale_fade(this);;
+            break;
+        case SLIDE_WHEEL:
+        case SLIDE_CLASSIC:
+        default:
             tab_prepare_classic(this);
+            break;
         }
     }
     switch (((gui_tab_t *)this)->style)
@@ -407,11 +582,13 @@ static void tab_prepare(gui_obj_t *this)
     case CLASSIC:
         break;
     case REDUCTION:
-    // tab_prepare_reduction(this);
-    // break;
+        // tab_prepare_reduction(this);
+        tab_prepare_scale(this);
+        break;
     case FADE:
-    // tab_prepare_fade(this);
-    // break;
+        // tab_prepare_fade(this);
+        tab_prepare_fade(this);;
+        break;
     case REDUCTION_FADE:
         tab_prepare_reduction_fade(this);
         break;
@@ -447,6 +624,23 @@ void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int1
         else if (idy < 0)
         {
             parent_ext->tab_cnt_up--;
+        }
+        switch (parent_ext->style)
+        {
+
+        case SLIDE_FADE:
+            this->style = FADE;
+            break;
+        case SLIDE_SCALE:
+            this->style = REDUCTION;
+            break;
+        case SLIDE_SCALE_FADE:
+            this->style = REDUCTION_FADE;
+            break;
+        case SLIDE_WHEEL:
+        case SLIDE_CLASSIC:
+        default:
+            break;
         }
 
     }

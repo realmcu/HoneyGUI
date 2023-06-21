@@ -50,7 +50,8 @@ void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *
 gui_magic_img_t *gui_svg_create_from_mem(void *parent, void *data, uint32_t data_size,
                                          int16_t x, int16_t y, int16_t w, int16_t h);
 void gui_magicimage_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p);
-
+gui_magic_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
+void *gui_get_file_address(const char *file);
 #ifdef __cplusplus
 }
 #endif

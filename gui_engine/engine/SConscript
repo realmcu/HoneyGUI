@@ -15,7 +15,9 @@ src += ['image_bitmap.c']
 src += ['font_stb.c']
 src += ['acc_sw.c']
 #src += ['acc_arm_2d.c']
-
+src += ['ezhtml.c']
+src += ['ezjs.c']
+src += ['frontend_launcher.c']
 src += ['acc_init.c']
 #SrcRemove(src,'font_genitop.c')
 #SrcRemove(src,'image_bmp.c')

@@ -17,10 +17,26 @@ typedef struct gui_win
     void (*ctor)(struct gui_win *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
     gui_animate_t *animate;
+    bool press_flag;
+    bool long_flag;
+    bool release_flag;
     void (* set_animate)(struct gui_win *win, uint32_t dur, int repeatCount, void *callback, void *p);
 
 } gui_win_t;
+typedef struct gui_api_win
+{
+    void (*set_animate)(gui_win_t *b, uint32_t dur, int repeatCount, void *callback, void *p);
+    void (*onPress)(gui_win_t *b, void *callback, void *parameter);
+    void (*onRelease)(gui_win_t *b, void *callback, void *parameter);
+    void (*onLong)(gui_win_t *b, void *callback, void *parameter);
+    void (*onClick)(gui_win_t *b, void *callback, void *parameter);
+    void (*onLeft)(gui_win_t *b, void *callback, void *parameter);
+    void (*onRight)(gui_win_t *b, void *callback, void *parameter);
+    void (*onUp)(gui_win_t *b, void *callback, void *parameter);
+    void (*onDown)(gui_win_t *b, void *callback, void *parameter);
+} gui_api_win_t;
 
+extern gui_api_win_t gui_win_api;
 /**
  * @brief create a window widget.
  * @param parent the father widget the window nested in.

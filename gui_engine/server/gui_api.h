@@ -119,6 +119,7 @@ int gui_fs_read(int fd, void *buf, size_t len);
 int gui_fs_write(int fd, const void *buf, size_t len);
 int gui_fs_lseek(int fd, int offset, int whence);
 int gui_fs_closedir(gui_fs_DIR *d);
+int gui_fs_ioctl(int fd, int cmd);
 gui_fs_DIR *gui_fs_opendir(const char *name);
 struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d);
 
