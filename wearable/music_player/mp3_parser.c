@@ -34,8 +34,12 @@
 #include "mp3_parser.h"
 
 #include <string.h>
+#ifdef OS_RTTHREAD
 #include "dfs_posix.h"
-
+#endif
+#ifdef OS_FREERTOS
+#include "romfs.h"
+#endif
 #define ID3V1_BYTES         128
 #define ID3V2_HEADER_SIZE   10
 
@@ -99,39 +103,39 @@ static bool SeekRead(int fp, long int ofs, void *read, size_t btr, size_t *br);
 Mp3Hdl_t Mp3_CreateHandle(const char *pxFileName, EMp3Res *peRes)
 {
     *peRes = MP3RES_OK;
-    rt_kprintf("Mp3_CreateHandle %d\n", __LINE__);
+    DBG_DIRECT("Mp3_CreateHandle %d\n", __LINE__);
     Mp3Hdl_t hMp3 = MPS_PARSER_ALLOC(sizeof(*hMp3));
     if (hMp3 == NULL)
     {
         *peRes = MP3RES_MALLOC_FAILED;
         goto Err1;
     }
-    rt_kprintf("Mp3_CreateHandle %d\n", __LINE__);
+    DBG_DIRECT("Mp3_CreateHandle %d\n", __LINE__);
     hMp3->xFil = open(pxFileName, O_RDONLY | O_BINARY, 0);
     if (hMp3->xFil == NULL)
     {
         *peRes = MP3RES_FOPEN_ERROR;
         goto Err2;
     }
-    rt_kprintf("Mp3_CreateHandle %d\n", __LINE__);
+    DBG_DIRECT("Mp3_CreateHandle %d\n", __LINE__);
     *peRes = InitId3v1Info(hMp3);
     if (*peRes != MP3RES_OK)
     {
         goto Err3;
     }
-    rt_kprintf("Mp3_CreateHandle %d\n", __LINE__);
+    DBG_DIRECT("Mp3_CreateHandle %d\n", __LINE__);
     *peRes = InitId3v2Info(hMp3);
     if (*peRes != MP3RES_OK)
     {
         goto Err3;
     }
-    rt_kprintf("Mp3_CreateHandle %d\n", __LINE__);
+    DBG_DIRECT("Mp3_CreateHandle %d\n", __LINE__);
     *peRes = InitAudioFrameInfo(hMp3);
     if (*peRes != MP3RES_OK)
     {
         goto Err3;
     }
-    rt_kprintf("Mp3_CreateHandle %d\n", __LINE__);
+    DBG_DIRECT("Mp3_CreateHandle %d\n", __LINE__);
     return hMp3;
 
 Err3:
@@ -774,7 +778,7 @@ static inline bool IsCbr(Mp3Hdl_t hMp3)
 }
 
 
-#if 1
+#ifdef OS_RTTHREAD
 
 char *audio_name = "/music/f04short_raw.mp3";//please use ANSI encode
 
@@ -889,3 +893,120 @@ void Mp3_Test(const char *pxFileName)
 MSH_CMD_EXPORT(Mp3_Test, mcu config test);
 #endif
 
+#ifdef OS_FREERTOS
+
+#include "shell_port.h"
+
+char *audio_name = "/music/f04short_raw.mp3";//please use ANSI encode
+
+void Mp3_Test(const char *pxFileName)
+{
+    EMp3Res eRes;
+
+    pxFileName = (const char *)audio_name;
+
+    DBG_DIRECT("!!!!!! void Mp3_Test(const char *pxFileName) !!!!!! \n");
+
+
+    Mp3Hdl_t hMp3 = Mp3_CreateHandle(pxFileName, &eRes);
+    DBG_DIRECT("Mp3Hdl_t hMp3 = Mp3_CreateHandle(pxFileName, &eRes);""%d \n", eRes);
+    DBG_DIRECT("%d, %d, %d, %d \n", eRes, MP3_BUF_BYTES, hMp3->bIsId3v1Exist, hMp3->uId3v2Count);
+    DBG_DIRECT("0x%08x \n", *(uint32_t *)&hMp3->z1stAuFrmHdr);
+    DBG_DIRECT("%d, %d \n", hMp3->uSamplingFreq_Hz, hMp3->uBitRate_kbps);
+    DBG_DIRECT("%f, %f, %u, %f \n", hMp3->fBytesPerFrm, hMp3->fTimePerFrm_ms, hMp3->uTotalFrmNum,
+               hMp3->fTotalPlayTime_ms);
+    DBG_DIRECT("%d, 0x%x, %d \n", hMp3->uMaxPossibleFrmBytes, hMp3->u1stAuFrmOfs, hMp3->e1stFrmType);
+    DBG_DIRECT("0x%x, %d \n", hMp3->uReadOfs, hMp3->uReadSqnNum);
+    DBG_DIRECT("0x%x, 0x%x \n", hMp3->uFlag, hMp3->uFileLen);
+
+
+    uint8_t *puBuf;
+    uint32_t uLen;
+    float fCurrPlayTime_ms;
+    eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &fCurrPlayTime_ms);
+    DBG_DIRECT("eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &uCurrPlayTime_ms);""%d \n", eRes);
+    DBG_DIRECT("%d, %d, %f \n", eRes, uLen, fCurrPlayTime_ms);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+    eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &fCurrPlayTime_ms);
+    DBG_DIRECT("eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &uCurrPlayTime_ms);""%d \n", eRes);
+    DBG_DIRECT("%d, %d, %f \n", eRes, uLen, fCurrPlayTime_ms);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+
+    eRes = Mp3_SetPlayPos(hMp3, hMp3->fTotalPlayTime_ms / 2.0f);
+    DBG_DIRECT("eRes = Mp3_SetPlayPos(hMp3, hMp3->fTotalPlayTime_ms / 2.0f);""%d \n", eRes);
+    eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &fCurrPlayTime_ms);
+    DBG_DIRECT("eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &uCurrPlayTime_ms);""%d \n", eRes);
+    DBG_DIRECT("%d, %d, %f \n", eRes, uLen, fCurrPlayTime_ms);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+
+    eRes = Mp3_SetPlayPos(hMp3, hMp3->fTotalPlayTime_ms);
+    DBG_DIRECT("eRes = Mp3_SetPlayPos(hMp3, hMp3->fTotalPlayTime_ms);""%d \n", eRes);
+    eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &fCurrPlayTime_ms);
+    DBG_DIRECT("eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &uCurrPlayTime_ms);""%d \n", eRes);
+    DBG_DIRECT("%d, %d, %f \n", eRes, uLen, fCurrPlayTime_ms);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+    for (uint32_t i = 0; i < 25; ++i)
+    {
+        eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &fCurrPlayTime_ms);
+        DBG_DIRECT("eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &uCurrPlayTime_ms);""%d \n", eRes);
+        DBG_DIRECT("%d, %d, %f \n", eRes, uLen, fCurrPlayTime_ms);
+        DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+                   puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+    }
+
+    eRes = Mp3_SetPlayPos(hMp3, 20 * 1000);
+    DBG_DIRECT("eRes = Mp3_SetPlayPos(hMp3, 20 * 1000);""%d \n", eRes);
+    eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &fCurrPlayTime_ms);
+    DBG_DIRECT("eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &uCurrPlayTime_ms);""%d \n", eRes);
+    DBG_DIRECT("%d, %d, %f \n", eRes, uLen, fCurrPlayTime_ms);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+    eRes = Mp3_SetPlayPos(hMp3, 0);
+    DBG_DIRECT("eRes = Mp3_SetPlayPos(hMp3, 0);""%d \n", eRes);
+    eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &fCurrPlayTime_ms);
+    DBG_DIRECT("eRes = Mp3_ReadNextFrame(hMp3, &puBuf, &uLen, &uCurrPlayTime_ms);""%d \n", eRes);
+    DBG_DIRECT("%d, %d, %f \n", eRes, uLen, fCurrPlayTime_ms);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+
+    eRes = Mp3_ReadId3v1(hMp3, &puBuf, &uLen);
+    DBG_DIRECT("eRes = Mp3_ReadId3v1(hMp3, &puBuf, &uLen);""%d \n", eRes);
+    DBG_DIRECT("%d, %d \n", eRes, uLen);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+
+    eRes = Mp3_RetrieveId3v2Frame(hMp3, "TIT2", &puBuf, &uLen);
+    DBG_DIRECT("eRes = Mp3_RetrieveId3v2Frame(hMp3, \"TIT2\", &puBuf, &uLen);""%d \n", eRes);
+    DBG_DIRECT("%d, %d \n", eRes, uLen);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+    eRes = Mp3_RetrieveId3v2Frame(hMp3, "TPE1", &puBuf, &uLen);
+    DBG_DIRECT("eRes = Mp3_RetrieveId3v2Frame(hMp3, \"TPE1\", &puBuf, &uLen);""%d \n", eRes);
+    DBG_DIRECT("%d, %d \n", eRes, uLen);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+    eRes = Mp3_RetrieveId3v2Frame(hMp3, "TSSE", &puBuf, &uLen);
+    DBG_DIRECT("eRes = Mp3_RetrieveId3v2Frame(hMp3, \"TSSE\", &puBuf, &uLen);""%d\n", eRes);
+    DBG_DIRECT("%d, %d \n", eRes, uLen);
+    DBG_DIRECT("0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x \n",
+               puBuf[0], puBuf[1], puBuf[2], puBuf[uLen - 4], puBuf[uLen - 3], puBuf[uLen - 2], puBuf[uLen - 1]);
+
+    Mp3_FreeHandle(hMp3);
+}
+SHELL_EXPORT_CMD(
+    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC) | SHELL_CMD_DISABLE_RETURN,
+    mp3_test, Mp3_Test, mp3 test);
+#endif

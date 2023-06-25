@@ -8,11 +8,7 @@
  * 2022-09-06     howie  first version
  */
 
-#include <rtthread.h>
-#include <rtdevice.h>
 #include "board.h"
-#include "rtconfig.h"
-#include "rthw.h"
 #include "stdlib.h"
 #include "string.h"
 #include "os_sched.h"
