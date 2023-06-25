@@ -23,6 +23,7 @@
 #include "board.h"
 #include "trace.h"
 #include <watch_msg.h>
+#include "os_ext_api.h"
 
 
 
@@ -68,23 +69,33 @@ static void sensor_mode_task_entry(void *p_param)
     }
 }
 
-#include "rtthread.h"
+
 #include "platform_scenario_draft.h"
 
-void scheduler_hook(struct rt_thread *from, struct rt_thread *to)
+void scheduler_hook(void *from, void *to)
 {
     //rt_kprintf("from task [%s] to task [%s] \n", from->name, to->name);
 
     //OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
     //rt_kprintf("PLATFORM_SCENARIO_OPERATION_MODE = %d \n", mode);
+    char **from_task_name;
+    char **to_task_name;
+    os_task_name_get(from, from_task_name);
+    os_task_name_get(from, to_task_name);
 
-    if ((strcmp(from->name, "sensor_mode") == 0) && (strcmp(to->name, "idle") != 0))
+    if (
+        (strcmp(*from_task_name, "sensor_mode") == 0) && \
+        ((strcmp(*to_task_name, "idle") != 0) || (strcmp(*to_task_name, "IDLE") != 0)) \
+    )
     {
         //need set to HP mode
         //need set clock to 200M
     }
 
-    if ((strcmp(to->name, "sensor_mode") == 0) && (strcmp(from->name, "idle") == 0))
+    if (
+        (strcmp(*to_task_name, "sensor_mode") == 0) && \
+        ((strcmp(*from_task_name, "idle") == 0) || (strcmp(*from_task_name, "IDLE") == 0))
+    )
     {
         //need set to sensor mode
         //need set clock to 40M
@@ -95,7 +106,7 @@ void sensor_mode_task_init(void)
 {
     void *app_task_handle;   //!< APP Task handle
     os_task_create(&app_task_handle, "sensor_mode", sensor_mode_task_entry, NULL, 1024, 2);
-    rt_scheduler_sethook(scheduler_hook);
+    os_sched_set_hook(scheduler_hook);
 }
 
 /** @} */ /* End of group PERIPH_APP_TASK */
