@@ -10,11 +10,12 @@
 #include "gui_obj.h"
 #include "gui_app.h"
 #include "gui_magic_img.h"
+#include "tp_algo.h"
 static void screen_backfunc()
 {
-    gui_app_t *app = gui_current_app();
-    extern void *get_app_launcher_frontend(void);
-    gui_switch_app(app, get_app_launcher_frontend());
+//    gui_app_t *app = gui_current_app();
+//    extern void *get_app_launcher_frontend(void);
+//    gui_switch_app(app, get_app_launcher_frontend());
 }
 void return_update_att(gui_obj_t *obj)
 {

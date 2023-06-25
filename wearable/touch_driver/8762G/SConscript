@@ -12,6 +12,6 @@ if GetDepend(['BSP_TOUCH_ZT2717']):
 
 CPPPATH = [cwd]
 
-group = DefineGroup('touch_driver', src, depend = [''], CPPPATH = CPPPATH)
+group = DefineGroup('touch_driver', src, depend = ['BSP_USING_TOUCH'], CPPPATH = CPPPATH)
 
 Return('group')

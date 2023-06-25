@@ -10,6 +10,7 @@
 #include <gui_obj.h>
 #include <gui_win.h>
 #include "gui_text.h"
+#include "tp_algo.h"
 
 static uint32_t (get_checked)(gui_radio_t *this)
 {

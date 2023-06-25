@@ -9,6 +9,7 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <gui_win.h>
+#include "tp_algo.h"
 void gui_switch_change_switch(gui_switch_t *sw)
 {
 
