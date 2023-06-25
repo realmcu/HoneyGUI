@@ -5,18 +5,18 @@ from building import *
 cwd = GetCurrentDir()
 src = Split("""
 """)
-
-src += ['app_launcher2.c']
-src += ['app_launcher_curtain_up.c']
-src += ['app_launcher2_create_selector.c']
-src += ['app_launcher2_curtain_left.c']
-src += ['app_launcher2_grid_icon.c']
-src += ['app_launcher2_heart_rate_chart.c']
-src += ['app_launcher2_music_player.c']
-src += ['app_launcher2_sport_chart.c']
-src += ['app_launcher2_watchface1.c']
-src += ['app_launcher2_wave.c']
-src += ['app_launcher2_palette_wheel.c']
+if not GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
+    src += ['app_launcher2.c']
+    src += ['app_launcher_curtain_up.c']
+    src += ['app_launcher2_create_selector.c']
+    src += ['app_launcher2_curtain_left.c']
+    src += ['app_launcher2_grid_icon.c']
+    src += ['app_launcher2_heart_rate_chart.c']
+    src += ['app_launcher2_music_player.c']
+    src += ['app_launcher2_sport_chart.c']
+    src += ['app_launcher2_watchface1.c']
+    src += ['app_launcher2_wave.c']
+    src += ['app_launcher2_palette_wheel.c']
 if GetDepend(['MODULE_VG_LITE']):
     src += ['vg_lite_demo.c']
 CPPPATH = [cwd,cwd + '/root_image']

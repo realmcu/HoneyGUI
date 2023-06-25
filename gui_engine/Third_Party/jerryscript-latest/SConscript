@@ -31,7 +31,7 @@ jerry_ext += Glob(jerry_ext_dir + '/handler/*.c')
 jerry_ext += Glob(jerry_ext_dir + '/include/*.c')
 jerry_ext += Glob(jerry_ext_dir + '/module/*.c')
 
-#src = jerry_core + jerry_ext
+src = jerry_core + jerry_ext
 
 CPPPATH = [cwd]
 
@@ -80,7 +80,7 @@ CPPDEFINES += ['JERRY_ENABLE_LOGGING']
 LIBPATH = [cwd]
 LIBS = ['JerryScript_gcc']
 group = DefineGroup('JerryScript', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH, 
-    CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS, LIBS = LIBS, LIBPATH=LIBPATH)
+    CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
 
 group = group + SConscript(os.path.join('rtthread-port', 'SConscript'))
 
