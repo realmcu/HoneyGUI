@@ -34,7 +34,10 @@ int dfs_romfs_unmount(struct dfs_filesystem *fs)
     return RT_EOK;
 }
 
-
+int dfs_romfs_ioctl(struct dfs_fd *file, int cmd, void *args)
+{
+    return -EIO;
+}
 
 rt_inline int check_dirent(struct romfs_dirent *dirent)
 {
@@ -45,30 +48,7 @@ rt_inline int check_dirent(struct romfs_dirent *dirent)
     }
     return 0;
 }
-int dfs_romfs_ioctl(struct dfs_fd *file, int cmd, void *args)
-{
-    switch (cmd)
-    {
-    case 0:
-        {
-            rt_size_t length;
-            struct romfs_dirent *dirent;
 
-            dirent = (struct romfs_dirent *)file->data;
-            RT_ASSERT(dirent != NULL);
-
-            if (check_dirent(dirent) != 0)
-            {
-                return -EIO;
-            }
-
-            return &(dirent->data[file->pos]);
-
-        }
-        break;
-    }
-    return -EIO;
-}
 struct romfs_dirent *dfs_romfs_lookup(struct romfs_dirent *root_dirent, const char *path,
                                       rt_size_t *size)
 {

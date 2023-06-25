@@ -37,7 +37,7 @@
 *:wearable\VCVC9202AtoPhilipsPSP\vcSportMotionIntAlgo.h
 *:gui_engine\Third_Party\jerryscript-latest\*
 *:gui_engine\Third_Party\ezXML\*
-
+*:rt-thread\components\dfs\filesystems\romfs\dfs_romfs.c
 
 
 
