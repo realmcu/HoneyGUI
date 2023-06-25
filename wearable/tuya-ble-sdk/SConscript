@@ -10,6 +10,7 @@ libs = []
 libpath = []
 list = os.listdir(cwd)
 CPPDEFINES = ['CUSTOMIZED_TUYA_BLE_CONFIG_FILE=<custom_tuya_ble_config.h>']
+CPPDEFINES += ['TUYA_BLE_SDK']
 
 group = DefineGroup('tuya_ble_sdk', src, depend = ['TUYA_BLE_SDK'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES, LIBS = libs, LIBPATH = libpath)
 
