@@ -13,9 +13,11 @@
 #include "tp_algo.h"
 static void screen_backfunc()
 {
-//    gui_app_t *app = gui_current_app();
-//    extern void *get_app_launcher_frontend(void);
-//    gui_switch_app(app, get_app_launcher_frontend());
+#ifdef RTK_GUI_SCRIPT_AS_A_APP
+    gui_app_t *app = gui_current_app();
+    extern void *get_app_launcher_frontend(void);
+    gui_switch_app(app, get_app_launcher_frontend());
+#endif
 }
 void return_update_att(gui_obj_t *obj)
 {

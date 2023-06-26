@@ -341,7 +341,7 @@
 // <c> RTK GUI Demo
 #define MODULE_USING_RTK_GUI_DEMO
 // </c>
-#define MODULE_USING_SCRIPT_AS_A_APP
+//#define MODULE_USING_SCRIPT_AS_A_APP
 // <c> RTK GUI frame buffer type
 #define RTK_GUI_FB_RAM_SINGLE
 // </c>

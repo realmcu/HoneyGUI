@@ -58,7 +58,7 @@ void ezjsinit()
 }
 void js_close_on_server(void);
 static void js_cb(jerry_value_t func);
-static void js_cb_with_args(cb_arg_t *args);
+static void js_cb_with_args(gui_obj_t *obj);
 #include "gui_magic_img.h"
 DECLARE_HANDLER(rotation)
 {
@@ -715,9 +715,31 @@ static void js_cb(jerry_value_t func)
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
 }
 
-static void js_cb_with_args(cb_arg_t *args)
+static void js_cb_with_args(gui_obj_t *obj)
 {
-    //gui_log("case js_cb_with_args:%x\n", args);
+    cb_arg_t *args = NULL;
+    gui_event_dsc_t *event = obj->event_dsc;
+    int event_code = 0;
+    for (size_t i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        if (event[i].event_code)
+        {
+            event_code = event[i].event_code;
+            break;
+        }
+
+    }
+    for (size_t i = 0; i < obj->event_dsc_cnt; i++)
+    {
+        if (event[i].filter == event_code)
+        {
+            args = event[i].user_data;
+        }
+    }
+    if (args == NULL)
+    {
+        return;
+    }
     jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
                                             args->args_count);
     jerry_release_value(res);

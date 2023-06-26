@@ -126,7 +126,9 @@ static void button_prepare(gui_obj_t *obj)
                     //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
                     if (b->on_pic_addr && b->style == 0)
                     {
-                        //gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
+#ifdef RTK_GUI_SCRIPT_AS_A_APP
+                        gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
+#endif
                     }
                     ////gui_log("%d\n", __LINE__);
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
@@ -145,7 +147,9 @@ static void button_prepare(gui_obj_t *obj)
                     ////gui_log("%d\n", __LINE__);
                     if (b->off_pic_addr && b->style == 0)
                     {
-                        //gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
+#ifdef RTK_GUI_SCRIPT_AS_A_APP
+                        gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
+#endif
                     }
                     // bool callback = false;
                     for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)

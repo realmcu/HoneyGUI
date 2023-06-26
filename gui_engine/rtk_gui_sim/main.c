@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     rtgui_server_init();
 //#ifdef MODULE_USING_RTK_GUI_DEMO
 #if 1
-#ifndef RTK_GUI_SCRIPT_APP
+#ifndef RTK_GUI_SCRIPT_AS_A_APP
     extern gui_app_t *get_app_launcher2(void);
     gui_app_startup(get_app_launcher2());
 #endif
