@@ -306,11 +306,19 @@ static void lcd_seq_init(void)
 
     rtl_lcd_qspi_cmd_param(0x36, 0xc0);
 
+#if 1
+    rtl_lcd_qspi_cmd_param(0x38, 0xff);//idle off
+#else
+    rtl_lcd_qspi_cmd_param(0x39, 0xff);//idle on
+#endif
+
     rtl_lcd_qspi_cmd_param(0x3A, 0x01);//01---565/00---666
 
     rtl_lcd_qspi_cmd_param(0x40, 0x01);//01:IPS/00:TN
 
-    rtl_lcd_qspi_cmd_param(0x41, 0x01);//01--8bit//03--16bit
+    rtl_lcd_qspi_cmd_param(0x41, 0x03);//01--8bit//03--16bit
+
+    rtl_lcd_qspi_cmd_param(0x43, 0x01);// 00 msb/01 lsb
 
     rtl_lcd_qspi_cmd_param(0x44, 0x15);//VBP
 
