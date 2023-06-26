@@ -36,7 +36,8 @@
 
 static void *port_malloc(uint32_t n)
 {
-    return vg_lite_hal_alloc(n);;
+    extern void *vg_lite_hal_alloc(unsigned long size);
+    return vg_lite_hal_alloc(n);
 }
 
 static void port_free(void *rmem)
