@@ -221,7 +221,7 @@ static void music_draw2(gui_canvas_t *c)
     {
         angle = 0;
     }
-    a.stroke.stroke_linecap = ROUND;
+    a.stroke.stroke_linecap = STROKE_CAP_ROUND;
     gui_canvas_api.arc(c, &a);
 
 

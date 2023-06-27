@@ -143,15 +143,15 @@ static void transfrom_blit(float w, float h, Vertex_t *v0, Vertex_t *v1, Vertex_
     matrix->m[2][2] = 1.0;
 }
 
-static void print_matrix(struct rtgui_matrix *matrix)
-{
-#if 0
-    gui_log("Blit Matrix:\n");
-    gui_log("    %f    %f    %f \n", matrix->m[0][0], matrix->m[0][1], matrix->m[0][2]);
-    gui_log("    %f    %f    %f \n", matrix->m[1][0], matrix->m[1][1], matrix->m[1][2]);
-    gui_log("    %f    %f    %f \n", matrix->m[2][0], matrix->m[2][1], matrix->m[2][2]);
-#endif
-}
+// static void print_matrix(struct rtgui_matrix *matrix)
+// {
+// #if 0
+//     gui_log("Blit Matrix:\n");
+//     gui_log("    %f    %f    %f \n", matrix->m[0][0], matrix->m[0][1], matrix->m[0][2]);
+//     gui_log("    %f    %f    %f \n", matrix->m[1][0], matrix->m[1][1], matrix->m[1][2]);
+//     gui_log("    %f    %f    %f \n", matrix->m[2][0], matrix->m[2][1], matrix->m[2][2]);
+// #endif
+// }
 
 //static void cleanup(void)
 //{
@@ -264,11 +264,11 @@ static bool full_rank(struct rtgui_matrix *m)
 {
     for (int i = 0; i < 3; i++)
     {
-        gui_log("%f, %f, %f, ", m->m[0][i], m->m[1][i], m->m[2][i]);
+        //gui_log("%f, %f, %f, ", m->m[0][i], m->m[1][i], m->m[2][i]);
         //gui_log("%f,%f,%f,", m->m[i][0], m->m[i][1], m->m[i][2]);
         if (m->m[i][0] == 0 && m->m[i][1] == 0 && m->m[i][2] == 0)
         {
-            gui_log("\n");
+            //gui_log("\n");
             return false;
         }
         //
@@ -276,10 +276,10 @@ static bool full_rank(struct rtgui_matrix *m)
             (m->m[1][i] * 10000.0f < 1000.0f && m->m[1][i] * 10000.0f > -1000.0f) &&
             (m->m[2][i] * 10000.0f < 1000.0f && m->m[2][i] * 10000.0f > -1000.0f))
         {
-            gui_log("\n");
+            //gui_log("\n");
             return false;
         }
-    } gui_log("\n");
+    } //gui_log("\n");
     return true;
 }
 #define CUBE_JUDEG_FULL_RANK(m) if(full_rank(m->matrix))
@@ -413,7 +413,7 @@ static void cube_prepare(gui_obj_t *obj)
     if (nz0321 > 0.0f)
     {
         transfrom_blit(front->img_w, front->img_h, &rv0, &rv3, &rv2, &rv1, &matrix);
-        print_matrix(&matrix);
+//        print_matrix(&matrix);
         memcpy(front->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(front->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(front->inverse);
@@ -423,7 +423,7 @@ static void cube_prepare(gui_obj_t *obj)
     if (nz4567 > 0.0f)
     {
         transfrom_blit(back->img_w, back->img_h, &rv4, &rv5, &rv6, &rv7, &matrix);
-        print_matrix(&matrix);
+//        print_matrix(&matrix);
         memcpy(back->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(back->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(back->inverse);

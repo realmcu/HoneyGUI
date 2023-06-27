@@ -51,7 +51,7 @@ void static sport_chart_draw(gui_canvas_t *c)
                 end_angle2 = (1 - pro) * (330 - 30) * 0.75f + 30;
                 end_angle3 = (1 - pro) * (330 - 30) + 30;
             }
-            gui_log("end_angle1:%f,%d,%f\n", end_angle1, end_flag, pro);
+//            gui_log("end_angle1:%f,%d,%f\n", end_angle1, end_flag, pro);
         }
         pro += 0.03f;
     }
@@ -66,7 +66,7 @@ void static sport_chart_draw(gui_canvas_t *c)
     arc1.r = w / 2 - gap - stroke_width;
     arc1.stroke.fill.color_data.rgba = 0xffff0099;
     arc1.stroke.stroke_width = stroke_width;
-    arc1.stroke.stroke_linecap = ROUND;
+    arc1.stroke.stroke_linecap = STROKE_CAP_ROUND;
     arc1.start_angle = 30;
     arc1.end_angle = 330;
     gui_canvas_api.arc(c, &arc1);

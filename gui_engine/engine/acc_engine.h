@@ -48,16 +48,16 @@ typedef struct canvas_radial_gradient
 
 typedef enum CAP
 {
-    BUTT,
-    ROUND,
-    SQUARE,
+    STROKE_CAP_BUTT,
+    STROKE_CAP_ROUND,
+    STROKE_CAP_SQUARE,
 } STROKE_LINECAP;
 
 typedef enum JOIN
 {
-    MITER,
-    ROUNDER,
-    BEVEL,
+    STROKE_JOIN_MITER,
+    STROKE_JOIN_ROUND,
+    STROKE_JOIN_BEVEL,
 } STROKE_LINEJOIN;
 
 typedef enum FILL_COLOR

@@ -182,8 +182,6 @@ void hw_draw_arc(canvas_arc_t *a, struct gui_dispdev *dc)
     uint32_t data_size = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
     vg_lite_init_path(&arc_path, VG_LITE_FP32, VG_LITE_HIGH, data_size, NULL, -target.width,
                       -target.width, target.width, target.width);
-    void *path_data = gui_malloc(data_size);
-    arc_path.path = path_data;
     vg_lite_path_append(&arc_path, circle_cmd, l_circle_data, sizeof(circle_cmd));
     if ((a->stroke.stroke_width == 0) || (a->stroke.fill.color_data.rgba == 0))
     {
@@ -196,7 +194,33 @@ void hw_draw_arc(canvas_arc_t *a, struct gui_dispdev *dc)
     }
     else
     {
-        vg_lite_set_stroke(&arc_path, (vg_lite_cap_style_t)a->stroke.stroke_linecap, VG_LITE_JOIN_MITER, \
+        vg_lite_cap_style_t cap;
+        switch (a->stroke.stroke_linecap)
+        {
+        case STROKE_CAP_SQUARE:
+            cap = VG_LITE_CAP_SQUARE;
+            break;
+        case STROKE_CAP_ROUND:
+            cap = VG_LITE_CAP_ROUND;
+            break;
+        default:
+            cap = VG_LITE_CAP_BUTT;
+            break;
+        }
+        vg_lite_join_style_t join;
+        switch (a->stroke.stroke_linejoin)
+        {
+        case STROKE_JOIN_ROUND:
+            join = VG_LITE_JOIN_ROUND;
+            break;
+        case STROKE_JOIN_BEVEL:
+            join = VG_LITE_JOIN_BEVEL;
+            break;
+        default:
+            join = VG_LITE_JOIN_MITER;
+            break;
+        }
+        vg_lite_set_stroke(&arc_path, cap, join, \
                            stroke_width, 0, dash, 0, 0, out_color.d32);
         vg_lite_update_stroke(&arc_path);
         vg_lite_set_draw_path_type(&arc_path, VG_LITE_DRAW_STROKE_PATH);
@@ -205,7 +229,6 @@ void hw_draw_arc(canvas_arc_t *a, struct gui_dispdev *dc)
     }
     vg_lite_finish();
     vg_lite_clear_path(&arc_path);
-    gui_free(path_data);
     if (a->counterclockwise)
     {
 
@@ -282,8 +305,6 @@ void hw_draw_circle(canvas_circle_t *circle, struct gui_dispdev *dc)
     uint32_t data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
     vg_lite_init_path(&circle_path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *path_data = gui_malloc(data_len);
-    circle_path.path = path_data;
     vg_lite_path_append(&circle_path, circle_cmd, circle_data, sizeof(circle_cmd));
     if (((circle->stroke.stroke_width == 0) || (circle->stroke.fill.color_data.rgba == 0)) &&
         (circle->fill.color_data.rgba != 0))
@@ -293,8 +314,34 @@ void hw_draw_circle(canvas_circle_t *circle, struct gui_dispdev *dc)
     }
     else if ((circle->stroke.stroke_width != 0) && (circle->stroke.fill.color_data.rgba != 0))
     {
-        vg_lite_set_stroke(&circle_path, (vg_lite_cap_style_t)circle->stroke.stroke_linecap,
-                           (vg_lite_join_style_t)circle->stroke.stroke_linejoin, stroke_width,
+        vg_lite_cap_style_t cap;
+        switch (circle->stroke.stroke_linecap)
+        {
+        case STROKE_CAP_SQUARE:
+            cap = VG_LITE_CAP_SQUARE;
+            break;
+        case STROKE_CAP_ROUND:
+            cap = VG_LITE_CAP_ROUND;
+            break;
+        default:
+            cap = VG_LITE_CAP_BUTT;
+            break;
+        }
+        vg_lite_join_style_t join;
+        switch (circle->stroke.stroke_linejoin)
+        {
+        case STROKE_JOIN_ROUND:
+            join = VG_LITE_JOIN_ROUND;
+            break;
+        case STROKE_JOIN_BEVEL:
+            join = VG_LITE_JOIN_BEVEL;
+            break;
+        default:
+            join = VG_LITE_JOIN_MITER;
+            break;
+        }
+        vg_lite_set_stroke(&circle_path, cap,
+                           join, stroke_width,
                            circle->stroke.miter_limit, circle->stroke.dash, circle->stroke.dash_count,
                            circle->stroke.dash_phase, stroke_color.d32);
         vg_lite_update_stroke(&circle_path);
@@ -310,7 +357,6 @@ void hw_draw_circle(canvas_circle_t *circle, struct gui_dispdev *dc)
     }
     vg_lite_finish();
     vg_lite_clear_path(&circle_path);
-    free(path_data);
 }
 
 void hw_draw_line(canvas_line_t *l, struct gui_dispdev *dc)
@@ -370,8 +416,6 @@ void hw_draw_line(canvas_line_t *l, struct gui_dispdev *dc)
     uint32_t data_len = vg_lite_path_calc_length(line_cmd, sizeof(line_cmd), VG_LITE_FP32);
     vg_lite_init_path(&line_path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *path_data = gui_malloc(data_len);
-    line_path.path = path_data;
     vg_lite_path_append(&line_path, line_cmd, line_data, sizeof(line_cmd));
     if ((l->stroke.stroke_width == 0) || (l->stroke.fill.color_data.rgba == 0))
     {
@@ -384,8 +428,34 @@ void hw_draw_line(canvas_line_t *l, struct gui_dispdev *dc)
     }
     else
     {
-        vg_lite_set_stroke(&line_path, (vg_lite_cap_style_t)l->stroke.stroke_linecap,
-                           (vg_lite_join_style_t)l->stroke.stroke_linejoin, stroke_width,
+        vg_lite_cap_style_t cap;
+        switch (l->stroke.stroke_linecap)
+        {
+        case STROKE_CAP_SQUARE:
+            cap = VG_LITE_CAP_SQUARE;
+            break;
+        case STROKE_CAP_ROUND:
+            cap = VG_LITE_CAP_ROUND;
+            break;
+        default:
+            cap = VG_LITE_CAP_BUTT;
+            break;
+        }
+        vg_lite_join_style_t join;
+        switch (l->stroke.stroke_linejoin)
+        {
+        case STROKE_JOIN_ROUND:
+            join = VG_LITE_JOIN_ROUND;
+            break;
+        case STROKE_JOIN_BEVEL:
+            join = VG_LITE_JOIN_BEVEL;
+            break;
+        default:
+            join = VG_LITE_JOIN_MITER;
+            break;
+        }
+        vg_lite_set_stroke(&line_path, cap,
+                           join, stroke_width,
                            stroke_width, l->stroke.dash, l->stroke.dash_count, l->stroke.dash_phase, stroke_color.d32);
         vg_lite_update_stroke(&line_path);
         vg_lite_set_draw_path_type(&line_path, VG_LITE_DRAW_STROKE_PATH);
@@ -394,7 +464,6 @@ void hw_draw_line(canvas_line_t *l, struct gui_dispdev *dc)
     }
     vg_lite_finish();
     vg_lite_clear_path(&line_path);
-    gui_free(path_data);
 }
 
 void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
@@ -563,8 +632,6 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
     uint32_t data_len = vg_lite_path_calc_length(rect_cmd, cmd_size, VG_LITE_FP32);
     vg_lite_init_path(&rect_path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *path_data = gui_malloc(data_len);
-    rect_path.path = path_data;
     vg_lite_path_append(&rect_path, rect_cmd, rect_data, cmd_size);
     float dash[] = {0, 0};
     if (r->fill.color_data.linear_gradient.stops_number > 0)
@@ -616,8 +683,34 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
 
     if ((r->stroke.stroke_width != 0) && (r->stroke.fill.color_data.rgba != 0))
     {
-        vg_lite_set_stroke(&rect_path, (vg_lite_cap_style_t)r->stroke.stroke_linecap,
-                           (vg_lite_join_style_t)r->stroke.stroke_linejoin, stroke_width,
+        vg_lite_cap_style_t cap;
+        switch (r->stroke.stroke_linecap)
+        {
+        case STROKE_CAP_SQUARE:
+            cap = VG_LITE_CAP_SQUARE;
+            break;
+        case STROKE_CAP_ROUND:
+            cap = VG_LITE_CAP_ROUND;
+            break;
+        default:
+            cap = VG_LITE_CAP_BUTT;
+            break;
+        }
+        vg_lite_join_style_t join;
+        switch (r->stroke.stroke_linejoin)
+        {
+        case STROKE_JOIN_ROUND:
+            join = VG_LITE_JOIN_ROUND;
+            break;
+        case STROKE_JOIN_BEVEL:
+            join = VG_LITE_JOIN_BEVEL;
+            break;
+        default:
+            join = VG_LITE_JOIN_MITER;
+            break;
+        }
+        vg_lite_set_stroke(&rect_path, cap,
+                           join, stroke_width,
                            r->stroke.miter_limit, r->stroke.dash, r->stroke.dash_count, r->stroke.dash_phase,
                            stroke_color.d32);
         vg_lite_update_stroke(&rect_path);
@@ -632,7 +725,6 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
     {
         vg_lite_clear_grad(&rect_grad);
     }
-    gui_free(path_data);
     gui_free(rect_cmd);
     gui_free(rect_data);
 }
@@ -687,7 +779,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     }
 
     uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
-    //gui_log("gpu_width:%d, image->img_w:%d\n", gpu_width, image->img_w);
     bool image_alien = true;
     gpu_width = ((image->img_w + 15) >> 4) << 4;
     uint32_t gpu_height = image->img_h;
@@ -851,9 +942,6 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
             uint32_t data_len = vg_lite_path_calc_length(cmd_list, cmd_size, VG_LITE_FP32);
             vg_lite_init_path(&temp_path_record->path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, dc->fb_width,
                               dc->fb_height, -dc->fb_width, -dc->fb_height);
-            void *path_data = gui_malloc(data_len);
-            temp_path_record->path.path = path_data;
-            temp_path_record->path_data = path_data;
             vg_lite_path_append(&temp_path_record->path, cmd_list, data_list, cmd_size);
 
             ARGB_struct in_color = {.d32 = shape_list->fill.d.color};
@@ -919,8 +1007,34 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
             if ((shape_list->strokeWidth > 0) && (shape_list->stroke.type == 1) &&
                 (shape_list->stroke.d.color != 0))
             {
-                vg_lite_set_stroke(&temp_path_record->path, (vg_lite_cap_style_t)shape_list->strokeLineCap,
-                                   (vg_lite_join_style_t)shape_list->strokeLineJoin, shape_list->strokeWidth, shape_list->miterLimit,
+                vg_lite_cap_style_t cap;
+                switch (shape_list->strokeLineCap)
+                {
+                case NSVG_CAP_SQUARE:
+                    cap = VG_LITE_CAP_SQUARE;
+                    break;
+                case NSVG_CAP_ROUND:
+                    cap = VG_LITE_CAP_ROUND;
+                    break;
+                default:
+                    cap = VG_LITE_CAP_BUTT;
+                    break;
+                }
+                vg_lite_join_style_t join;
+                switch (shape_list->strokeLineJoin)
+                {
+                case NSVG_JOIN_ROUND:
+                    join = VG_LITE_JOIN_ROUND;
+                    break;
+                case NSVG_JOIN_BEVEL:
+                    join = VG_LITE_JOIN_BEVEL;
+                    break;
+                default:
+                    join = VG_LITE_JOIN_MITER;
+                    break;
+                }
+                vg_lite_set_stroke(&temp_path_record->path, cap,
+                                   join, shape_list->strokeWidth, shape_list->miterLimit,
                                    shape_list->strokeDashArray, shape_list->strokeDashCount, shape_list->strokeDashOffset,
                                    stroke_color.d32);
                 vg_lite_update_stroke(&temp_path_record->path);
@@ -1070,8 +1184,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
     uint32_t path_data_len = vg_lite_path_calc_length(cmd, cmd_len, VG_LITE_FP32);
     vg_lite_init_path(&wave_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *path_data = gui_malloc(path_data_len);
-    wave_path.path = path_data;
     vg_lite_path_append(&wave_path, cmd, data, cmd_len);
     vg_lite_draw_gradient(&target, &wave_path, VG_LITE_FILL_NON_ZERO,
                           &matrix, &wave_grad, VG_LITE_BLEND_SRC_OVER);
@@ -1112,9 +1224,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
         uint32_t data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
         vg_lite_init_path(&probe->path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, dc->fb_width,
                           dc->fb_height, -dc->fb_width, -dc->fb_height);
-        void *path_data = gui_malloc(data_len);
-        probe->path.path = path_data;
-        probe->path_data = path_data;
         vg_lite_path_append(&probe->path, circle_cmd, circle_data, sizeof(circle_cmd));
         vg_lite_draw(&target, &probe->path, VG_LITE_FILL_NON_ZERO, &matrix,
                      VG_LITE_BLEND_SRC_OVER, 0xFFc0a000);
@@ -1144,7 +1253,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
     }
 
     vg_lite_finish();
-    gui_free(path_data);
     gui_free(data);
     gui_free(cmd);
     gui_free(stroke_data);
@@ -1179,7 +1287,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
 
 void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *dc)
 {
-    gui_log("____________%d\n", __LINE__);
     vg_lite_matrix_t matrix;
     vg_lite_buffer_t target;
 
@@ -1253,10 +1360,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
 
         uint32_t path_data_len = vg_lite_path_calc_length(arc_cmd, sizeof(arc_cmd), VG_LITE_FP32);
         vg_lite_init_path(&arc_path[i].path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
-                          -dc->fb_height, dc->fb_width, dc->fb_height); gui_log("%d ", __LINE__);
-        void *path_data = gui_malloc(path_data_len);
-        arc_path[i].path.path = path_data;
-        arc_path[i].path_data = path_data;
+                          -dc->fb_height, dc->fb_width, dc->fb_height);
         vg_lite_path_append(&arc_path[i].path, arc_cmd, arc_data, sizeof(arc_cmd));
 
         BGRA_struct from_color = HSLA(a0 / (PI * 2.0f), 1.0f, 0.55f, 255);
@@ -1265,9 +1369,9 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
         uint32_t stops[] = {0, 255};
         arc_path[i].p_grad = gui_malloc(sizeof(vg_lite_grad_ptr));
         memset(arc_path[i].p_grad, 0, sizeof(vg_lite_grad_ptr));
-        vg_lite_init_grad(&arc_path[i].p_grad->grad); gui_log("%d ", __LINE__);
+        vg_lite_init_grad(&arc_path[i].p_grad->grad);
         vg_lite_set_grad(&arc_path[i].p_grad->grad, sizeof(stops) / sizeof(uint32_t), colors, stops);
-        vg_lite_update_grad(&arc_path[i].p_grad->grad); gui_log("%d ", __LINE__);
+        vg_lite_update_grad(&arc_path[i].p_grad->grad);
         vg_lite_matrix_t *grad_matrix = vg_lite_get_grad_matrix(&arc_path[i].p_grad->grad);
         vg_lite_identity(grad_matrix);
         vg_lite_translate(cx + cosf(a0) * r0, cy + sinf(a0) * r0, grad_matrix);
@@ -1278,7 +1382,6 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
         vg_lite_draw_gradient(&target, &arc_path[i].path, VG_LITE_FILL_EVEN_ODD,
                               &matrix, &arc_path[i].p_grad->grad, VG_LITE_BLEND_SRC_OVER);
     }
-    gui_log("%d ", __LINE__);
     r = r0 - 6;
     ax = cosf(120.0f / 180.0f * PI) * r;
     ay = sinf(120.0f / 180.0f * PI) * r;
@@ -1304,11 +1407,11 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     uint32_t tri_stops[] = {0, 255};
 
     vg_lite_linear_gradient_t tri_white_grad, tri_black_grad;
-    memset(&tri_white_grad, 0, sizeof(vg_lite_linear_gradient_t)); gui_log("%d ", __LINE__);
+    memset(&tri_white_grad, 0, sizeof(vg_lite_linear_gradient_t));
     vg_lite_init_grad(&tri_white_grad);
     vg_lite_set_grad(&tri_white_grad, sizeof(tri_white_colors) / sizeof(uint32_t), tri_white_colors,
                      tri_stops);
-    vg_lite_update_grad(&tri_white_grad); gui_log("%d ", __LINE__);
+    vg_lite_update_grad(&tri_white_grad);
     vg_lite_matrix_t *tri_white_mat = vg_lite_get_grad_matrix(&tri_white_grad);
     vg_lite_identity(tri_white_mat);
     vg_lite_translate(cx + r * cosf(rotate_angle / 180.f * PI), cy + sinf(rotate_angle / 180.f * PI),
@@ -1334,8 +1437,6 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     uint32_t path_data_len = vg_lite_path_calc_length(tri_cmd, sizeof(tri_cmd), VG_LITE_FP32);
     vg_lite_init_path(&tri_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *tri_path_data = gui_malloc(path_data_len);
-    tri_path.path = tri_path_data;
     vg_lite_path_append(&tri_path, tri_cmd, tri_data, sizeof(tri_cmd));
     vg_lite_identity(&matrix);
     vg_lite_translate(cx, cy, &matrix);
@@ -1372,8 +1473,6 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     path_data_len = vg_lite_path_calc_length(rect_cmd, sizeof(rect_cmd), VG_LITE_FP32);
     vg_lite_init_path(&rect_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *rect_path_data = gui_malloc(path_data_len);
-    rect_path.path = rect_path_data;
     vg_lite_path_append(&rect_path, rect_cmd, rect_data, sizeof(rect_cmd));
     vg_lite_set_stroke(&rect_path, VG_LITE_CAP_ROUND,
                        VG_LITE_JOIN_ROUND, 3.0f, 6,
@@ -1414,14 +1513,13 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     vg_lite_path_t circle_small_path, circle_big_path, circle_display_path;
     memset(&circle_small_path, 0, sizeof(vg_lite_path_t));
     memset(&circle_big_path, 0, sizeof(vg_lite_path_t));
+    memset(&circle_display_path, 0, sizeof(vg_lite_path_t));
     vg_lite_identity(&matrix);
 
     path_data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
     vg_lite_init_path(&circle_small_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL,
                       -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *s_circle_path_data = gui_malloc(path_data_len);
-    circle_small_path.path = s_circle_path_data;
     vg_lite_path_append(&circle_small_path, circle_cmd, small_circle_data, sizeof(circle_cmd));
     vg_lite_set_stroke(&circle_small_path, VG_LITE_CAP_ROUND,
                        VG_LITE_JOIN_ROUND, 2.0f, 6,
@@ -1434,8 +1532,6 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
 
     vg_lite_init_path(&circle_big_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *b_circle_path_data = gui_malloc(path_data_len);
-    circle_big_path.path = b_circle_path_data;
     vg_lite_path_append(&circle_big_path, circle_cmd, big_circle_data, sizeof(circle_cmd));
     vg_lite_set_stroke(&circle_big_path, VG_LITE_CAP_ROUND,
                        VG_LITE_JOIN_ROUND, 2.0f, 6,
@@ -1467,16 +1563,14 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
         color.channel.B = temp;
         disp_color = color.d32;
     }
+    path_data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
     vg_lite_init_path(&circle_display_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL,
                       -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *disp_circle_path_data = gui_malloc(path_data_len);
-    circle_display_path.path = disp_circle_path_data;
     vg_lite_path_append(&circle_display_path, circle_cmd, display_circle_data, sizeof(circle_cmd));
-    vg_lite_set_stroke(&circle_display_path, VG_LITE_CAP_ROUND,
-                       VG_LITE_JOIN_ROUND, 2.5f, 6,
-                       NULL, 0, 0, disp_color);
-    vg_lite_update_stroke(&circle_display_path); gui_log("%d ", __LINE__);
+    vg_lite_set_stroke(&circle_display_path, VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, 2.5, 6, NULL, 0, 0,
+                       disp_color);
+    vg_lite_update_stroke(&circle_display_path);
     vg_lite_set_draw_path_type(&circle_display_path, VG_LITE_DRAW_STROKE_PATH);
     vg_lite_identity(&matrix);
     vg_lite_translate(cx, cy, &matrix);
@@ -1501,17 +1595,12 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
             free(arc_path[i].path_data);
             arc_path[i].path_data = NULL;
         }
-    } gui_log("%d ", __LINE__);
+    }
     vg_lite_clear_path(&tri_path);
-    gui_free(tri_path_data);
     vg_lite_clear_path(&rect_path);
-    gui_free(rect_path_data); gui_log("%d ", __LINE__);
     vg_lite_clear_grad(&tri_white_grad);
-    vg_lite_clear_grad(&tri_black_grad);
-    gui_free(s_circle_path_data);
-    gui_free(b_circle_path_data); gui_log("%d ", __LINE__);
+    vg_lite_clear_grad(&tri_black_grad);;
     vg_lite_clear_path(&circle_big_path);
     vg_lite_clear_path(&circle_small_path);
-    gui_free(disp_circle_path_data);
-    vg_lite_clear_path(&circle_display_path); gui_log("%d\n", __LINE__);
+    vg_lite_clear_path(&circle_display_path);
 }

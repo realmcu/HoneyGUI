@@ -1316,7 +1316,7 @@ void (sw_draw_arc)(canvas_arc_t *c, struct gui_dispdev *dc)
                     }
                 }
             }
-            if (c->stroke.stroke_linecap == ROUND)
+            if (c->stroke.stroke_linecap == STROKE_CAP_ROUND)
             {
                 gui_point_t cstart; bool start_left = true;
                 gui_point_t cend; bool end_left = true;
