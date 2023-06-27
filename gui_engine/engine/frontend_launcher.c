@@ -10,7 +10,6 @@
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
-#include "rtk_gui_resource.h"
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "gui_grid.h"
@@ -139,7 +138,8 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
 static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_frontend_ui_design\n");
-    gui_font_stb_init(TANGYUANTI_TTF);
+    gui_font_stb_init(gui_get_file_address("app/system/resource/font/tangyuanti.ttf"));
+
 
     g = gui_grid_create(&app->screen, 100, 100, 4, 2, 100, 100);
     char *apppath = "app";
@@ -150,7 +150,8 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
 }
 static void app_xml_ui_design(gui_app_t *app)
 {
-    gui_font_stb_init(TANGYUANTI_TTF);
+    gui_font_stb_init(gui_get_file_address("app/system/resource/font/tangyuanti.ttf"));
+
     extern void create_tree(gui_app_t *app);
     create_tree(app);
     gui_return_create(&app->screen);

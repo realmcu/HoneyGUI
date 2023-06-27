@@ -1,5 +1,32 @@
 #include "ezxml.h"
-#include "app_launcher.h"
+#include <gui_tabview.h>
+#include <gui_img.h>
+#include <gui_win.h>
+#include <gui_text.h>
+#include <gui_obj.h>
+#include <gui_curtain.h>
+#include <gui_iconlist.h>
+
+#include <gui_seekbar.h>
+
+#include <gui_alert.h>
+#include <gui_page.h>
+
+#include <gui_d_island.h>
+#include <string.h>
+#include <time.h>
+#include <stdio.h>
+#include "gui_server.h"
+#include "app_dialing.h"
+#include "gui_img_with_animate.h"
+#include <gui_magic_img.h>
+#include <gui_app.h>
+#include <stdlib.h>
+#include "acc_engine.h"
+#include "gui_grid.h"
+#include "gui_scroll_text.h"
+#include "gui_radio.h"
+#include "gui_switch.h"
 #include "string.h"
 #include "stdio.h"
 #include <stdlib.h>
