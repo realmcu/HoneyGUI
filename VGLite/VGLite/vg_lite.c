@@ -246,10 +246,10 @@ static int32_t has_valid_command_buffer(vg_lite_context_t *context)
     {
         return 0;
     }
-    if (context->command_buffer == NULL)
-    {
-        return 0;
-    }
+//    if (context->command_buffer == NULL)
+//    {
+//        return 0;
+//    }
     if (context->command_buffer[context->command_buffer_current] == NULL)
     {
         return 0;
