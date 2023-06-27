@@ -1290,6 +1290,8 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     vg_lite_matrix_t matrix;
     vg_lite_buffer_t target;
 
+    float scale = pw->scale;
+
     memset(&target, 0x00, sizeof(vg_lite_buffer_t));
 
     vg_lite_blend_t blend_mode = VG_LITE_BLEND_NONE;
@@ -1314,12 +1316,14 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     float hue = sinf(pw->selector_radian * 0.12f);
     float rotate_angle = hue * 360.0f;
 
-    cx = pw->x + pw->w * 0.5f;
-    cy = pw->y + pw->h * 0.5f;
-    r1 = (pw->w < pw->h ? pw->w : pw->h) * 0.5f - 15.0f;
-    r0 = r1 - 20.0f;
-    r2 = r1 + 9.0f;
-    aeps = 0.3f / r1;   // half a pixel arc length in radians (2pi cancels out).
+    float w = pw->w * scale;
+    float h = pw->h * scale;
+    cx = pw->x + w * 0.5f;
+    cy = pw->y + h * 0.5f;
+    r1 = (w < h ? w : h) * 0.5f - 15.0f * scale;
+    r0 = r1 - 20.0f * scale;
+    r2 = r1 + 9.0f * scale;
+    aeps = 0.3f * scale / r1;   // half a pixel arc length in radians (2pi cancels out).
 
     float a0 = aeps;
     float a1 = 1.0f * PI / 3.0f - aeps;
@@ -1382,7 +1386,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
         vg_lite_draw_gradient(&target, &arc_path[i].path, VG_LITE_FILL_EVEN_ODD,
                               &matrix, &arc_path[i].p_grad->grad, VG_LITE_BLEND_SRC_OVER);
     }
-    r = r0 - 6;
+    r = r0 - 6 * scale;
     ax = cosf(120.0f / 180.0f * PI) * r;
     ay = sinf(120.0f / 180.0f * PI) * r;
     bx = cosf(-120.0f / 180.0f * PI) * r;
@@ -1457,10 +1461,10 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
 
     float rect_data[] =
     {
-        r0 - 1, -3,
-        (r1 - r0 + 2), 0,
-        0, 6,
-        -(r1 - r0 + 2), 0,
+        r0 - 1 * scale, -3 * scale,
+        (r1 - r0 + 2 * scale), 0,
+        0, 6 * scale,
+        -(r1 - r0 + 2 * scale), 0,
     };
 
     BGRA_struct rect_color = {.d32 = 0};
@@ -1475,7 +1479,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
                       -dc->fb_height, dc->fb_width, dc->fb_height);
     vg_lite_path_append(&rect_path, rect_cmd, rect_data, sizeof(rect_cmd));
     vg_lite_set_stroke(&rect_path, VG_LITE_CAP_ROUND,
-                       VG_LITE_JOIN_ROUND, 3.0f, 6,
+                       VG_LITE_JOIN_ROUND, 3.0f * scale, 6 * scale,
                        NULL, 0, 0, rect_color.d32);
     vg_lite_update_stroke(&rect_path);
     vg_lite_set_draw_path_type(&rect_path, VG_LITE_DRAW_STROKE_PATH);
@@ -1487,27 +1491,30 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     uint8_t circle_cmd[] = {    VLC_OP_MOVE,
                                 VLC_OP_LCWARC,
                                 VLC_OP_LCWARC,
-                                VLC_OP_END,
+//                                VLC_OP_END,
                            };
 
-    float cpx = cx + (r0 - 6) / 4, cpy = cy + (r0 - 6) / 3;
+    float cpx = cx + (r0 - 6 * scale) / 4, cpy = cy + (r0 - 6 * scale) / 3;
     if (((cpx - cx) * (cpx - cx) + (cpy - cy) * (cpy - cy) - (r0 - 6) * (r0 - 6)) >= 0)
     {
         cpx = cx;
         cpy = cy;
     }
+
+    float small_circle_radius = 5 * scale;
+    float big_circle_radius = 7 * scale;
     float small_circle_data[] =
     {
-        cpx, cpy - 5,
-        5, 5, 0, 0 + cpx, 5 + cpy,
-        5, 5, 0, 0 + cpx, -5 + cpy,
+        cpx, cpy - small_circle_radius,
+        small_circle_radius, small_circle_radius, 0, cpx, small_circle_radius + cpy,
+        small_circle_radius, small_circle_radius, 0, cpx, -small_circle_radius + cpy,
     };
 
     float big_circle_data[] =
     {
-        cpx, cpy - 7,
-        7, 7, 0, 0 + cpx, 7 + cpy,
-        7, 7, 0, 0 + cpx, -7 + cpy,
+        cpx, cpy - big_circle_radius,
+        big_circle_radius, big_circle_radius, 0, cpx, big_circle_radius + cpy,
+        big_circle_radius, big_circle_radius, 0, cpx, -big_circle_radius + cpy,
     };
 
     vg_lite_path_t circle_small_path, circle_big_path, circle_display_path;
@@ -1522,7 +1529,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
                       -dc->fb_height, dc->fb_width, dc->fb_height);
     vg_lite_path_append(&circle_small_path, circle_cmd, small_circle_data, sizeof(circle_cmd));
     vg_lite_set_stroke(&circle_small_path, VG_LITE_CAP_ROUND,
-                       VG_LITE_JOIN_ROUND, 2.0f, 6,
+                       VG_LITE_JOIN_ROUND, 2.0f * scale, 6 * scale,
                        NULL, 0, 0, 0xC0C0C0C0);
     vg_lite_update_stroke(&circle_small_path);
     vg_lite_set_draw_path_type(&circle_small_path, VG_LITE_DRAW_STROKE_PATH);
@@ -1534,7 +1541,7 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
                       -dc->fb_height, dc->fb_width, dc->fb_height);
     vg_lite_path_append(&circle_big_path, circle_cmd, big_circle_data, sizeof(circle_cmd));
     vg_lite_set_stroke(&circle_big_path, VG_LITE_CAP_ROUND,
-                       VG_LITE_JOIN_ROUND, 2.0f, 6,
+                       VG_LITE_JOIN_ROUND, 2.0f * scale, 6 * scale,
                        NULL, 0, 0, 0x40000000);
     vg_lite_update_stroke(&circle_big_path);
     vg_lite_set_draw_path_type(&circle_big_path, VG_LITE_DRAW_STROKE_PATH);
@@ -1543,43 +1550,48 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
                  0x40000000);
 
     vg_lite_finish();
-    float display_circle_data[] =
+    if ((pw->x == 0) && (pw->y == 0))
     {
-        cx, cy - r2 / 3,
-        r2 / 3, r2 / 3, 0, 0 + cx, r2 / 3 + cy,
-        r2 / 3, r2 / 3, 0, 0 + cx, -r2 / 3 + cy,
-    };
-    uint32_t gpu_width = ((dc->fb_width + 15) >> 4) << 4;
-    uint32_t disp_color = 0;
-    if (dc->bit_depth == 16)
-    {
-        uint16_t color = *(uint16_t *)((uint8_t *)dc->frame_buf + ((int)cpx + (int)cpy * gpu_width) * 2);
+        float display_circle_data[] =
+        {
+            cx, cy - r2 / 3,
+            r2 / 3, r2 / 3, 0, 0 + cx, r2 / 3 + cy,
+            r2 / 3, r2 / 3, 0, 0 + cx, -r2 / 3 + cy,
+        };
+        uint32_t gpu_width = ((dc->fb_width + 15) >> 4) << 4;
+        uint32_t disp_color = 0;
+        if (dc->bit_depth == 16)
+        {
+            uint16_t color = *(uint16_t *)((uint8_t *)dc->frame_buf + ((int)cpx + (int)cpy * gpu_width) * 2);
+        }
+        else
+        {
+            BGRA_struct color = {.d32 = *(uint32_t *)((uint8_t *)dc->frame_buf + ((int)cpx + (int)cpy * gpu_width) * 4)};
+            uint8_t temp = color.channel.R;
+            color.channel.R = color.channel.B;
+            color.channel.B = temp;
+            disp_color = color.d32;
+        }
+        path_data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
+        vg_lite_init_path(&circle_display_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL,
+                          -dc->fb_width,
+                          -dc->fb_height, dc->fb_width, dc->fb_height);
+        vg_lite_path_append(&circle_display_path, circle_cmd, display_circle_data, sizeof(circle_cmd));
+        vg_lite_set_stroke(&circle_display_path, VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, 2.5 * scale,
+                           6 * scale, NULL, 0, 0,
+                           disp_color);
+        vg_lite_update_stroke(&circle_display_path);
+        vg_lite_set_draw_path_type(&circle_display_path, VG_LITE_DRAW_STROKE_PATH);
+        vg_lite_identity(&matrix);
+        vg_lite_translate(cx, cy, &matrix);
+        vg_lite_scale(3, 3, &matrix);
+        vg_lite_translate(-cx, -cy, &matrix);
+        vg_lite_draw(&target, &circle_display_path, VG_LITE_FILL_NON_ZERO, &matrix,
+                     VG_LITE_BLEND_SRC_OVER,
+                     disp_color);
+        vg_lite_finish();
+        vg_lite_clear_path(&circle_display_path);
     }
-    else
-    {
-        BGRA_struct color = {.d32 = *(uint32_t *)((uint8_t *)dc->frame_buf + ((int)cpx + (int)cpy * gpu_width) * 4)};
-        uint8_t temp = color.channel.R;
-        color.channel.R = color.channel.B;
-        color.channel.B = temp;
-        disp_color = color.d32;
-    }
-    path_data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
-    vg_lite_init_path(&circle_display_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL,
-                      -dc->fb_width,
-                      -dc->fb_height, dc->fb_width, dc->fb_height);
-    vg_lite_path_append(&circle_display_path, circle_cmd, display_circle_data, sizeof(circle_cmd));
-    vg_lite_set_stroke(&circle_display_path, VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, 2.5, 6, NULL, 0, 0,
-                       disp_color);
-    vg_lite_update_stroke(&circle_display_path);
-    vg_lite_set_draw_path_type(&circle_display_path, VG_LITE_DRAW_STROKE_PATH);
-    vg_lite_identity(&matrix);
-    vg_lite_translate(cx, cy, &matrix);
-    vg_lite_scale(3, 3, &matrix);
-    vg_lite_translate(-cx, -cy, &matrix);
-    vg_lite_draw(&target, &circle_display_path, VG_LITE_FILL_NON_ZERO, &matrix,
-                 VG_LITE_BLEND_SRC_OVER,
-                 disp_color);
-    vg_lite_finish();
 
     for (i = 0; i < 6; i++)
     {
@@ -1602,5 +1614,4 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     vg_lite_clear_grad(&tri_black_grad);;
     vg_lite_clear_path(&circle_big_path);
     vg_lite_clear_path(&circle_small_path);
-    vg_lite_clear_path(&circle_display_path);
 }

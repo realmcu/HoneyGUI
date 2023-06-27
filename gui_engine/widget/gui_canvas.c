@@ -547,8 +547,9 @@ static void (palette_wheel)(gui_canvas_t *this, canvas_palette_wheel_t *pw)
 {
     pw->x += GET_BASE(this)->dx + this->tx;
     pw->y += GET_BASE(this)->dy + this->ty;
-    pw->w = pw->w * this->sx;
-    pw->h = pw->h * this->sx;
+    pw->w = pw->w;
+    pw->h = pw->h;
+    pw->scale = this->sx;
     gui_get_acc()->draw_palette_wheel(pw, gui_get_dc());
 }
 static float get_scale_offset_x(float x, float scale_x)
