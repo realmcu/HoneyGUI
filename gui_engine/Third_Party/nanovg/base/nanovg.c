@@ -31,7 +31,16 @@
 #include <string.h>
 #define printf(...)
 #endif/*WITH_NANOVG_GPU*/
+#ifdef RTK_MODULE_USING_RTK_GUI
 #include "gui_api.h"
+#define NANOVG_MALLOC gui_malloc
+#define NANOVG_REALLOC gui_realloc
+#define NANOVG_FREE gui_free
+#else
+#define NANOVG_MALLOC malloc
+#define NANOVG_REALLOC realloc
+#define NANOVG_FREE free
+#endif
 #ifdef _MSC_VER
 #pragma warning(disable: 4100)  // unreferenced formal parameter
 #pragma warning(disable: 4127)  // conditional expression is constant
@@ -175,29 +184,29 @@ static float nvg__normalize(float *x, float *y)
 static void nvg__deletePathCache(NVGpathCache *c)
 {
     if (c == NULL) { return; }
-    if (c->points != NULL) { gui_free(c->points); }
-    if (c->paths != NULL) { gui_free(c->paths); }
-    if (c->verts != NULL) { gui_free(c->verts); }
-    gui_free(c);
+    if (c->points != NULL) { NANOVG_FREE(c->points); }
+    if (c->paths != NULL) { NANOVG_FREE(c->paths); }
+    if (c->verts != NULL) { NANOVG_FREE(c->verts); }
+    NANOVG_FREE(c);
 }
 
 static NVGpathCache *nvg__allocPathCache(void)
 {
-    NVGpathCache *c = (NVGpathCache *)gui_malloc(sizeof(NVGpathCache));
+    NVGpathCache *c = (NVGpathCache *)NANOVG_MALLOC(sizeof(NVGpathCache));
     if (c == NULL) { goto error; }
     memset(c, 0, sizeof(NVGpathCache));
 
-    c->points = (NVGpoint *)gui_malloc(sizeof(NVGpoint) * NVG_INIT_POINTS_SIZE);
+    c->points = (NVGpoint *)NANOVG_MALLOC(sizeof(NVGpoint) * NVG_INIT_POINTS_SIZE);
     if (!c->points) { goto error; }
     c->npoints = 0;
     c->cpoints = NVG_INIT_POINTS_SIZE;
 
-    c->paths = (NVGpath *)gui_malloc(sizeof(NVGpath) * NVG_INIT_PATHS_SIZE);
+    c->paths = (NVGpath *)NANOVG_MALLOC(sizeof(NVGpath) * NVG_INIT_PATHS_SIZE);
     if (!c->paths) { goto error; }
     c->npaths = 0;
     c->cpaths = NVG_INIT_PATHS_SIZE;
 
-    c->verts = (NVGvertex *)gui_malloc(sizeof(NVGvertex) * NVG_INIT_VERTS_SIZE);
+    c->verts = (NVGvertex *)NANOVG_MALLOC(sizeof(NVGvertex) * NVG_INIT_VERTS_SIZE);
     if (!c->verts) { goto error; }
     c->nverts = 0;
     c->cverts = NVG_INIT_VERTS_SIZE;
@@ -299,7 +308,7 @@ NVGcontext *nvgCreateInternal(NVGparams *params)
 #ifdef WITH_NANOVG_GPU
     FONSparams fontParams;
 #endif/*WITH_NANOVG_GPU*/
-    NVGcontext *ctx = (NVGcontext *)gui_malloc(sizeof(NVGcontext));
+    NVGcontext *ctx = (NVGcontext *)NANOVG_MALLOC(sizeof(NVGcontext));
     int i;
     if (ctx == NULL) { goto error; }
     memset(ctx, 0, sizeof(NVGcontext));
@@ -310,7 +319,7 @@ NVGcontext *nvgCreateInternal(NVGparams *params)
         ctx->fontImages[i] = 0;
     }
 
-    ctx->commands = (float *)gui_malloc(sizeof(float) * NVG_INIT_COMMANDS_SIZE);
+    ctx->commands = (float *)NANOVG_MALLOC(sizeof(float) * NVG_INIT_COMMANDS_SIZE);
     if (!ctx->commands) { goto error; }
     ctx->ncommands = 0;
     ctx->ccommands = NVG_INIT_COMMANDS_SIZE;
@@ -362,7 +371,7 @@ void nvgDeleteInternal(NVGcontext *ctx)
 {
     int i;
     if (ctx == NULL) { return; }
-    if (ctx->commands != NULL) { gui_free(ctx->commands); }
+    if (ctx->commands != NULL) { NANOVG_FREE(ctx->commands); }
     if (ctx->cache != NULL) { nvg__deletePathCache(ctx->cache); }
 
 #ifdef WITH_NANOVG_GPU
@@ -388,7 +397,7 @@ void nvgDeleteInternal(NVGcontext *ctx)
         ctx->params.renderDelete(ctx->params.userPtr);
     }
 
-    gui_free(ctx);
+    NANOVG_FREE(ctx);
 }
 
 void nvgBeginFrame(NVGcontext *ctx, float windowWidth, float windowHeight, float devicePixelRatio)
@@ -1150,7 +1159,7 @@ static void nvg__appendCommands(NVGcontext *ctx, float *vals, int nvals)
     {
         float *commands;
         int ccommands = ctx->ncommands + nvals + ctx->ccommands / 2;
-        commands = (float *)gui_realloc(ctx->commands, sizeof(float) * ccommands);
+        commands = (float *)NANOVG_REALLOC(ctx->commands, sizeof(float) * ccommands);
         if (commands == NULL) { return; }
         ctx->commands = commands;
         ctx->ccommands = ccommands;
@@ -1222,7 +1231,7 @@ static void nvg__addPath(NVGcontext *ctx)
     {
         NVGpath *paths;
         int cpaths = ctx->cache->npaths + 1 + ctx->cache->cpaths / 2;
-        paths = (NVGpath *)gui_realloc(ctx->cache->paths, sizeof(NVGpath) * cpaths);
+        paths = (NVGpath *)NANOVG_REALLOC(ctx->cache->paths, sizeof(NVGpath) * cpaths);
         if (paths == NULL) { return; }
         ctx->cache->paths = paths;
         ctx->cache->cpaths = cpaths;
@@ -1264,7 +1273,7 @@ static void nvg__addPoint(NVGcontext *ctx, float x, float y, int flags)
     {
         NVGpoint *points;
         int cpoints = ctx->cache->npoints + 1 + ctx->cache->cpoints / 2;
-        points = (NVGpoint *)gui_realloc(ctx->cache->points, sizeof(NVGpoint) * cpoints);
+        points = (NVGpoint *)NANOVG_REALLOC(ctx->cache->points, sizeof(NVGpoint) * cpoints);
         if (points == NULL) { return; }
         ctx->cache->points = points;
         ctx->cache->cpoints = cpoints;
@@ -1308,7 +1317,7 @@ static NVGvertex *nvg__allocTempVerts(NVGcontext *ctx, int nverts)
         NVGvertex *verts;
         int cverts = (nverts + 0xff) &
                      ~0xff; // Round up to prevent allocations when things change just slightly.
-        verts = (NVGvertex *)gui_realloc(ctx->cache->verts, sizeof(NVGvertex) * cverts);
+        verts = (NVGvertex *)NANOVG_REALLOC(ctx->cache->verts, sizeof(NVGvertex) * cverts);
         if (verts == NULL) { return NULL; }
         ctx->cache->verts = verts;
         ctx->cache->cverts = cverts;

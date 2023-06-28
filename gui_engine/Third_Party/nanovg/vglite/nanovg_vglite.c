@@ -4,57 +4,60 @@
 #include <stdint.h>
 #include <assert.h>
 #include <nanovg.h>
+#include <trace.h>
 
 
 static int vglite_nvg_renderCreate(void *uptr)
 {
-    printf(" %s %d\n", __func__, __LINE__);
-    return 0;
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
+    NVG_NOTUSED(uptr);
+    return 1;
 }
 static int vglite_nvg_renderCreateTexture(void *uptr, int type, int w, int h, int imageFlags,
                                           const unsigned char *data)
 {
-    printf(" %s %d\n", __func__, __LINE__);
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
+    DBG_DIRECT(" uptr = 0x%x, type = %d, w = %d, h = %d, imageFlags = %d, data = 0x%x\n", uptr, type, w,
+               h, imageFlags, data);
     return 0;
 }
 static int vglite_nvg_renderDeleteTexture(void *uptr, int image)
 {
-    printf(" %s %d\n", __func__, __LINE__);
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
+    DBG_DIRECT(" uptr = 0x%x, image = %d\n", uptr, image);
     return 0;
 }
 static int vglite_nvg_renderUpdateTexture(void *uptr, int image, int x, int y, int w, int h,
                                           const unsigned char *data)
 {
-    printf(" %s %d\n", __func__, __LINE__);
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
+    DBG_DIRECT(" uptr = 0x%x, image = %d, x = %d, y = %d, w = %d, h = %d, data = 0x%x\n", uptr, image,
+               x, y, w, h, data);
     return 0;
 }
 static void vglite_nvg_renderViewport(void *uptr, float width, float height, float devicePixelRatio)
 {
-    printf(" %s %d\n", __func__, __LINE__);
-    return 0;
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
 }
 static int vglite_nvg_renderGetTextureSize(void *uptr, int image, int *w, int *h)
 {
-    printf(" %s %d\n", __func__, __LINE__);
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
     return 0;
 }
 static void vglite_nvg_renderCancel(void *uptr)
 {
     NVG_NOTUSED(uptr);
-    printf(" %s %d\n", __func__, __LINE__);
-    return 0;
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
 }
 
 static void vglite_nvg_renderFlush(void *uptr)
 {
     NVG_NOTUSED(uptr);
-    printf(" %s %d\n", __func__, __LINE__);
-    return 0;
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
 }
 static void vglite_nvg_renderDelete(void *uptr)
 {
-    printf(" %s %d\n", __func__, __LINE__);
-    return 0;
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
 }
 
 void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
@@ -62,16 +65,14 @@ void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
                              NVGscissor *scissor, float fringe, float strokeWidth, const NVGpath *paths,
                              int npaths)
 {
-    printf(" %s %d\n", __func__, __LINE__);
-    return 0;
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
 }
 void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
                            NVGcompositeOperationState compositeOperation,
                            NVGscissor *scissor, float fringe, const float *bounds, const NVGpath *paths,
                            int npaths)
 {
-    printf(" %s %d\n", __func__, __LINE__);
-    return 0;
+    DBG_DIRECT(" %s %d\n", __func__, __LINE__);
 }
 
 

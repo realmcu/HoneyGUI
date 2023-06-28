@@ -19,7 +19,16 @@
 #include <agge/nanovg_image_blender.h>
 #include <agge/blender_linear_gradient.h>
 #include <agge/blender_radial_gradient.h>
+#ifdef RTK_MODULE_USING_RTK_GUI
 #include "gui_api.h"
+#define NANOVG_MALLOC gui_malloc
+#define NANOVG_REALLOC gui_realloc
+#define NANOVG_FREE gui_free
+#else
+#define NANOVG_MALLOC malloc
+#define NANOVG_REALLOC realloc
+#define NANOVG_FREE free
+#endif
 template <typename T>
 agge::rect<T> mkrect(T x1, T y1, T x2, T y2) {
   agge::rect<T> r = {x1, y1, x2, y2};
@@ -53,7 +62,7 @@ struct AGGENVGcontext {
   }
 
   ~AGGENVGcontext() {
-    gui_free(this->textures);
+    NANOVG_FREE(this->textures);
     this->textures = NULL;
   }
 
@@ -101,7 +110,7 @@ static AGGENVGtexture* aggenvg__allocTexture(AGGENVGcontext* agge) {
       AGGENVGtexture* textures;
       int ctextures =
           aggenvg__maxi(agge->ntextures + 1, 4) + agge->ctextures / 2;  // 1.5x Overallocate
-      textures = (AGGENVGtexture*)gui_realloc(agge->textures, sizeof(AGGENVGtexture) * ctextures);
+      textures = (AGGENVGtexture*)NANOVG_REALLOC(agge->textures, sizeof(AGGENVGtexture) * ctextures);
       if (textures == NULL) return NULL;
       agge->textures = textures;
       agge->ctextures = ctextures;
