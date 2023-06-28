@@ -11,14 +11,14 @@ if GetDepend(['USING_BR_TASK']) or GetDepend(['USING_BLE_TASK']):
     src += ['dp_app.c']
 if GetDepend(['USING_BLE_TASK']):
     src += ['dp_ble_info.c']
+    src += ['dp_dataqueue.c']
+    src += ['dp_notification.c']
 if GetDepend(['USING_BR_TASK']):  
     src += ['dp_br_info.c']
     src += ['dp_rtk_db.c']
     src += ['dp_mcu_cfg_const.c']
     src += ['dp_mcu_cfg_rw.c']  
 if GetDepend(['TUYA_BLE_SDK']):
-    src += ['dp_dataqueue.c']
-    src += ['dp_notification.c']
     src += ['dp_wearable.c']
     src += ['dp_sports_refs.c']
     src += ['dp_tuya_cfg.c']

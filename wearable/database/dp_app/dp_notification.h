@@ -30,8 +30,6 @@ extern "C"
 #include "dp_wearable.h"
 
 
-
-
 typedef enum
 {
     NOTIFICATION,
@@ -42,7 +40,7 @@ typedef enum
 } T_NC_TYPE;
 
 void set_notification(uint8_t len, void *p_value);
-void get_notification(uint8_t len, void *p_value);
+void get_notification(uint8_t len, void *p_value, uint8_t msg_num);
 uint8_t notification_current_num_get(void);
 void notification_data_manage_init(void);
 

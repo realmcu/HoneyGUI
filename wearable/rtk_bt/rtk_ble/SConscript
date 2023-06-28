@@ -17,6 +17,8 @@ if GetDepend(['USING_BLE_TASK']):
     src += ['ble_gap_cb.c']
     src += ['app_ble_bas.c']
     src += ['app_ble_hid.c']
+    src += ['app_gatts_client.c']
+    src += ['ancs.c']
 
 CPPPATH = [cwd]
 

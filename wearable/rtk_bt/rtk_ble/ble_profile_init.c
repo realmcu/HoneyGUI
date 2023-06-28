@@ -51,6 +51,7 @@ T_APP_RESULT app_profile_callback(T_SERVER_ID service_id, void *p_data)
 }
 
 
+
 void app_le_profile_init(void)
 {
     server_init(2);
@@ -68,9 +69,10 @@ void app_le_profile_init(void)
     server_register_app_cb(app_profile_callback);
 
 
-
+    client_init(2);
+    ancs_init(1);
+    app_gatts_client_init();
 #if 0
-    client_init(1);
     gcs_client_id = gcs_add_client(gcs_client_callback, APP_MAX_LINKS, 256);
     client_register_general_client_cb(gcs_client_callback);
 #endif

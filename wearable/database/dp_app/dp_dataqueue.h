@@ -30,12 +30,8 @@ extern "C"
 #include "dp_wearable.h"
 
 
-#define NC_DATA_NODE_BUF_NUM_MAX 3
-#define NC_DATA_NODE_BUF_LEN_MAX 100
-
 typedef struct
 {
-    uint8_t type;
     uint16_t len;
     uint8_t *buf;
 } T_DATAQUEUE_DATA;
