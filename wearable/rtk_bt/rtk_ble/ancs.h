@@ -32,6 +32,8 @@ extern "C" {
 /** @defgroup PERIPH_ANCS_Exported_Macros ANCS Exported Macros
    * @{
    */
+#define ANCS_MAX_APP_IDENTIFIER_LEN 64 //!< Max ancs attribute title length
+#define ANCS_MAX_SUB_TITLE_LEN 64 //!< Max ancs attribute sub title length
 #define ANCS_MAX_ATTR_LEN 256 //!< Max ancs attribute length
 
 /** @brief  Config ANCS Client: 0-Not built in, 1-Open ANCS client function */

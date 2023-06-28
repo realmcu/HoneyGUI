@@ -23,10 +23,7 @@
 #include <os_mem.h>
 #include <ancs.h>
 #include <ancs_client.h>
-#include <ams_client.h>
-#include "hub_interaction.h"
-#include "communicate_protocol.h"
-#include "wristband_global_data.h"
+//#include <ams_client.h>
 /** @defgroup  PERIPH_ANCS Peripheral ANCS
     * @brief Apple ANCS service modulization
     * @{
@@ -50,7 +47,7 @@ typedef struct
 typedef struct
 {
     uint16_t   total_len;
-    uint8_t    total_data[ANCS_MAX_ATTR_LEN];
+    uint8_t    total_data[ANCS_MAX_APP_IDENTIFIER_LEN + ANCS_MAX_SUB_TITLE_LEN + ANCS_MAX_ATTR_LEN];
 } T_DS_NOTIFICATION_ATTR_TOTAL;
 
 /*============================================================================*
@@ -115,76 +112,88 @@ void app_handle_notification_attribute_data(T_APP_ANCS_LINK *p_ancs_link)
             if (0 == memcmp(p_value, "com.tencent.xin", 16))
             {
                 p_ancs_link->app_type = 1;
+                ds_notification_attr_total.total_data[0] = 'w'; //sync tuya
+                ds_notification_attr_total.total_len = 1;
             }
             else if (0 == memcmp(p_value, "com.apple.MobileSMS", 20))
             {
                 p_ancs_link->app_type = 2;
+                ds_notification_attr_total.total_data[0] = 's'; //sync tuya
+                ds_notification_attr_total.total_len = 1;
             }
             else if (0 == memcmp(p_value, "com.apple.mobilephone", 22))
             {
                 p_ancs_link->app_type = 3;
+                ds_notification_attr_total.total_data[0] = 'p'; //sync tuya
+                ds_notification_attr_total.total_len = 1;
             }
             else if (0 == memcmp(p_value, "com.tencent.mqq", 16))
             {
                 p_ancs_link->app_type = 4;
+                ds_notification_attr_total.total_data[0] = 'q'; //sync tuya
+                ds_notification_attr_total.total_len = 1;
             }
             else if (0 == memcmp(p_value, "com.tencent.qq", 15))
             {
                 p_ancs_link->app_type = 4;
+                ds_notification_attr_total.total_data[0] = 'q'; //sync tuya
+                ds_notification_attr_total.total_len = 1;
             }
         }
         if (p_ancs_link->notification_attr.attribute_id == DS_NOTIFICATION_ATTR_ID_TITLE)
         {
-            if ((p_ancs_link->app_type == 1) && (RtkWristbandSys.msg_switch.bit.switch_wechat_msg))
+            if ((p_ancs_link->app_type == 1))
             {
                 APP_PRINT_INFO1("Wechat: message %s", TRACE_STRING(p_value));
-                ds_notification_attr_total.total_len = p_ancs_link->current_len;
-                memcpy(ds_notification_attr_total.total_data, p_value, p_ancs_link->current_len);
-                ds_notification_attr_total.total_data[p_ancs_link->current_len] = ':';
+                memcpy(ds_notification_attr_total.total_data + ds_notification_attr_total.total_len, p_value,
+                       p_ancs_link->current_len);
+                ds_notification_attr_total.total_len += p_ancs_link->current_len;
+                ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = ':';
                 ds_notification_attr_total.total_len += 1;
             }
-            else if ((p_ancs_link->app_type == 2) &&
-                     (RtkWristbandSys.msg_switch.bit.switch_shortmessage_msg))
+            else if ((p_ancs_link->app_type == 2))
             {
                 APP_PRINT_INFO1("MobileSMS: message %s", TRACE_STRING(p_value));
-                ds_notification_attr_total.total_len = p_ancs_link->current_len;
-                memcpy(ds_notification_attr_total.total_data, p_value, p_ancs_link->current_len);
-                ds_notification_attr_total.total_data[p_ancs_link->current_len] = ':';
+                memcpy(ds_notification_attr_total.total_data + ds_notification_attr_total.total_len, p_value,
+                       p_ancs_link->current_len);
+                ds_notification_attr_total.total_len += p_ancs_link->current_len;
+                ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = ':';
                 ds_notification_attr_total.total_len += 1;
             }
-            else if ((p_ancs_link->app_type == 3) && (RtkWristbandSys.msg_switch.bit.switch_call_msg))
+            else if ((p_ancs_link->app_type == 3))
             {
                 APP_PRINT_INFO1("MobileCall: Name or Phone number %s", TRACE_STRING(p_value));
-                ds_notification_attr_total.total_len = p_ancs_link->current_len;
-                memcpy(ds_notification_attr_total.total_data, p_value, p_ancs_link->current_len);
-                ds_notification_attr_total.total_data[p_ancs_link->current_len] = ':';
+                memcpy(ds_notification_attr_total.total_data + ds_notification_attr_total.total_len, p_value,
+                       p_ancs_link->current_len);
+                ds_notification_attr_total.total_len += p_ancs_link->current_len;
+                ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = ':';
                 ds_notification_attr_total.total_len += 1;
             }
-            else if ((p_ancs_link->app_type == 4) && (RtkWristbandSys.msg_switch.bit.switch_qq_msg))
+            else if ((p_ancs_link->app_type == 4))
             {
                 APP_PRINT_INFO1("QQ: message %s", TRACE_STRING(p_value));
             }
         }
         if (p_ancs_link->notification_attr.attribute_id == DS_NOTIFICATION_ATTR_ID_SUB_TITLE)
         {
-            if ((p_ancs_link->app_type == 1) && (RtkWristbandSys.msg_switch.bit.switch_wechat_msg))
+            if ((p_ancs_link->app_type == 1))
             {
                 APP_PRINT_INFO1("Wechat: message %s", TRACE_STRING(p_value));
             }
-            else if ((p_ancs_link->app_type == 2) &&
-                     (RtkWristbandSys.msg_switch.bit.switch_shortmessage_msg))
+            else if ((p_ancs_link->app_type == 2))
             {
                 APP_PRINT_INFO1("MobileSMS: message %s", TRACE_STRING(p_value));
             }
-            else if ((p_ancs_link->app_type == 3) && (RtkWristbandSys.msg_switch.bit.switch_call_msg))
+            else if ((p_ancs_link->app_type == 3))
             {
                 APP_PRINT_INFO1("MobileCall: Name or Phone number %s", TRACE_STRING(p_value));
             }
-            else if ((p_ancs_link->app_type == 4) && (RtkWristbandSys.msg_switch.bit.switch_call_msg))
+            else if ((p_ancs_link->app_type == 4))
             {
                 APP_PRINT_INFO1("QQ: message %s", TRACE_STRING(p_value));
-                ds_notification_attr_total.total_len = p_ancs_link->current_len;
-                memcpy(ds_notification_attr_total.total_data, p_value, p_ancs_link->current_len);
+                memcpy(ds_notification_attr_total.total_data + ds_notification_attr_total.total_len, p_value,
+                       p_ancs_link->current_len);
+                ds_notification_attr_total.total_len += p_ancs_link->current_len;
             }
         }
         if (p_ancs_link->notification_attr.attribute_id == DS_NOTIFICATION_ATTR_ID_MESSAGE)
@@ -193,29 +202,11 @@ void app_handle_notification_attribute_data(T_APP_ANCS_LINK *p_ancs_link)
                    p_ancs_link->current_len);
             ds_notification_attr_total.total_len += p_ancs_link->current_len;
             ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = '\0';
-            if ((p_ancs_link->app_type == 1) && (RtkWristbandSys.msg_switch.bit.switch_wechat_msg))
-            {
-                APP_PRINT_INFO1("Wechat: message %s", TRACE_STRING(p_value));
-                wristband_system_interact(INTERACT_WECHAT, 0, ds_notification_attr_total.total_data);
-            }
-            else if ((p_ancs_link->app_type == 2) &&
-                     (RtkWristbandSys.msg_switch.bit.switch_shortmessage_msg))
-            {
-                APP_PRINT_INFO1("MobileSMS: message %s", TRACE_STRING(p_value));
-                wristband_system_interact(INTERACT_PHONEMESSAGE, 0, ds_notification_attr_total.total_data);
-            }
-            else if ((p_ancs_link->app_type == 3) && (RtkWristbandSys.msg_switch.bit.switch_call_msg))
-            {
-                APP_PRINT_INFO1("MobileCall: Name or Phone number %s", TRACE_STRING(p_value));
-                wristband_system_interact(INTERACT_CALLING, 0, ds_notification_attr_total.total_data);
-            }
-            else if ((p_ancs_link->app_type == 4) && (RtkWristbandSys.msg_switch.bit.switch_qq_msg))
-            {
-                APP_PRINT_INFO1("QQ: message %s", TRACE_STRING(p_value));
-                wristband_system_interact(INTERACT_QQ, 0, ds_notification_attr_total.total_data);
-            }
-            ds_notification_attr_total.total_len = 0;
+            set_notification(ds_notification_attr_total.total_len, ds_notification_attr_total.total_data);
+            APP_PRINT_INFO1("%s", TRACE_STRING(ds_notification_attr_total.total_data));
+
             ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = '\0';
+            ds_notification_attr_total.total_len = 0;
         }
         if (p_ancs_link->notification_attr.attribute_id == DS_NOTIFICATION_ATTR_ID_DATE)
         {
@@ -501,7 +492,7 @@ void app_parse_notification_source_data(uint8_t conn_id, uint8_t *p_data, uint8_
                 //refuse or accept incomming call
                 if (ns_data.event_id == NS_EVENT_ID_NOTIFICATION_REMOVED)
                 {
-                    wristband_system_interact(INTERACT_CALLING_REFUSE, 0, NULL);//accept or refuse same action
+                    //wristband_system_interact(INTERACT_CALLING_REFUSE, 0, NULL);//accept or refuse same action
                 }
             }
             if (ns_data.event_id != NS_EVENT_ID_NOTIFICATION_REMOVED)
@@ -513,12 +504,12 @@ void app_parse_notification_source_data(uint8_t conn_id, uint8_t *p_data, uint8_
 
                 attr_id_list[cur_index++] = DS_NOTIFICATION_ATTR_ID_APP_IDENTIFIER;
                 attr_id_list[cur_index++] = DS_NOTIFICATION_ATTR_ID_TITLE;
-                attr_id_list[cur_index++] = LO_WORD(ANCS_MAX_ATTR_LEN);
-                attr_id_list[cur_index++] = HI_WORD(ANCS_MAX_ATTR_LEN);
+                attr_id_list[cur_index++] = LO_WORD(ANCS_MAX_APP_IDENTIFIER_LEN);
+                attr_id_list[cur_index++] = HI_WORD(ANCS_MAX_APP_IDENTIFIER_LEN);
 
                 attr_id_list[cur_index++] = DS_NOTIFICATION_ATTR_ID_SUB_TITLE;
-                attr_id_list[cur_index++] = LO_WORD(ANCS_MAX_ATTR_LEN);
-                attr_id_list[cur_index++] = HI_WORD(ANCS_MAX_ATTR_LEN);
+                attr_id_list[cur_index++] = LO_WORD(ANCS_MAX_SUB_TITLE_LEN);
+                attr_id_list[cur_index++] = HI_WORD(ANCS_MAX_SUB_TITLE_LEN);
 
                 attr_id_list[cur_index++] = DS_NOTIFICATION_ATTR_ID_MESSAGE;
                 attr_id_list[cur_index++] = LO_WORD(ANCS_MAX_ATTR_LEN);
@@ -619,7 +610,7 @@ T_APP_RESULT ancs_client_cb(T_CLIENT_ID client_id, uint8_t conn_id, void *p_data
             {
             case ANCS_WRITE_NOTIFICATION_SOURCE_NOTIFY_ENABLE:
                 APP_PRINT_INFO0("ANCS_WRITE_NOTIFICATION_SOURCE_NOTIFY_ENABLE");
-                ams_start_discovery(conn_id);
+                //ams_start_discovery(conn_id);
                 break;
 
             case ANCS_WRITE_NOTIFICATION_SOURCE_NOTIFY_DISABLE:
@@ -754,7 +745,7 @@ void ancs_init(uint8_t link_num)
     }
     for (i = 0; i < ancs_link_number; i++)
     {
-        if (os_msg_queue_create(&(ancs_link_table[i].ancs_queue_handle), ANCS_MSG_QUEUE_NUM,
+        if (os_msg_queue_create(&(ancs_link_table[i].ancs_queue_handle), "ancsQ", ANCS_MSG_QUEUE_NUM,
                                 sizeof(T_ANCS_MSG)) == false)
         {
             APP_PRINT_ERROR2("ancs_init: link_num %d, i 0x%x create queue failed", link_num, i);

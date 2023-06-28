@@ -194,9 +194,8 @@ void app_handle_authen_state_evt(uint8_t conn_id, uint8_t new_state, uint16_t ca
         {
             if (cause == GAP_SUCCESS)
             {
-#if F_BT_ANCS_CLIENT_SUPPORT
-                ancs_start_discovery(conn_id);
-#endif
+                gatts_start_discovery(conn_id);
+
                 APP_PRINT_INFO0("app_handle_authen_state_evt: GAP_AUTHEN_STATE_COMPLETE pair success");
 
             }
