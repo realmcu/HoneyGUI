@@ -27,14 +27,13 @@
 
 #include "os_mem.h"
 #include "trace.h"
-void *vg_lite_os_malloc_intern(uint32_t size, const char *p_func, uint32_t line)
+void *vg_lite_os_malloc(uint32_t size)
 {
     if (size == 0)
     {
         return NULL;
     }
     void *ram_data = os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
-//    DBG_DIRECT("malloc %d bytes at 0x%08x %s<%d> ", size, ram_data, p_func, line);
     return ram_data;
 }
 

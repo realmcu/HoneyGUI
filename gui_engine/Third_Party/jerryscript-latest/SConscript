@@ -71,17 +71,14 @@ CPPDEFINES += ['JERRY_ENABLE_ERROR_MESSAGES']
 #if GetDepend('PKG_JERRY_ENABLE_LOGGING'):
 CPPDEFINES += ['JERRY_ENABLE_LOGGING']
 #    
-#if GetDepend('PKG_JMEM_STATS'):
-#CPPDEFINES += ['JMEM_STATS']
-#
-#if GetDepend('PKG_CONFIG_DISABLE_ES2015'):
-#CPPDEFINES += ['CONFIG_DISABLE_ES2015']
 
-LIBPATH = [cwd]
-LIBS = ['JerryScript_gcc']
-group = DefineGroup('JerryScript', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH, 
+
+
+
+group = DefineGroup('JerryScript', src, depend = ['MODULE_USING_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH, 
     CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
 
-group = group + SConscript(os.path.join('rtthread-port', 'SConscript'))
+if GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
+    group = group + SConscript(os.path.join('rtthread-port', 'SConscript'))
 
 Return('group')

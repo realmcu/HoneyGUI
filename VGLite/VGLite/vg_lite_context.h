@@ -230,9 +230,8 @@ extern vg_lite_error_t push_clut(vg_lite_context_t *context, uint32_t address, u
                                  uint32_t *data);
 extern vg_lite_error_t push_stall(vg_lite_context_t *context, uint32_t module);
 
-#define vg_lite_os_malloc(size)     \
-    vg_lite_os_malloc_intern(size, __func__, __LINE__)
-//extern void* vg_lite_os_malloc(size_t size);
+
+extern void *vg_lite_os_malloc(uint32_t size);
 extern void  vg_lite_os_free(void *memory);
 
 

@@ -186,7 +186,6 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
-            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -340,7 +339,7 @@
               <MiscControls>--diag_suppress=1</MiscControls>
               <Define>GUI_KEIL_SIM</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;..\example\root_image;gui_port;..\app;..\dc;..\engine;..\input;..\misc;..\misc\tlsf;..\server;..\Third_Party;..\Third_Party\nanosvg\src;..\Third_Party\nanosvg\example;..\Third_Party\agge\agge;..\Third_Party\nanovg\base;..\Third_Party\nanovg\agge;..\Third_Party\agge;..\Third_Party\nanovg;..\widget;..\example;..\example\root_image</IncludePath>
+              <IncludePath>.;.;..\example\root_image;gui_port;..\app;..\dc;..\engine;..\input;..\misc;..\misc\tlsf;..\server;..\Third_Party;..\Third_Party\nanosvg\src;..\Third_Party\nanosvg\example;..\Third_Party\agge\agge;..\Third_Party\nanovg\base;..\Third_Party\nanovg\agge;..\Third_Party\agge;..\Third_Party\nanovg;..\widget;..\example;..\example\root_image;..\Third_Party\stb</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -488,26 +487,6 @@
               <FileName>gui_server.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\server\gui_server.c</FilePath>
-            </File>
-            <File>
-              <FileName>math.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\agge\agge\math.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\agge\agge\stroke.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke_features.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\agge\agge\stroke_features.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>vector_rasterizer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\agge\agge\vector_rasterizer.cpp</FilePath>
             </File>
             <File>
               <FileName>agge_fill.c</FileName>
@@ -718,6 +697,26 @@
               <FileName>gui_window_border.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_window_border.c</FilePath>
+            </File>
+            <File>
+              <FileName>math.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\math.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\stroke.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke_features.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\stroke_features.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>vector_rasterizer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\vector_rasterizer.cpp</FilePath>
             </File>
           </Files>
         </Group>

@@ -6,19 +6,10 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-#src = Glob('*.c')
 src += ['ezxml.c']
-
-#SrcRemove(src,'font_genitop.c')
-#SrcRemove(src,'image_bmp.c')
-#SrcRemove(src,'image_evo.c')
-#SrcRemove(src,'image_path.c')
-#SrcRemove(src,'image_png.c')
-#SrcRemove(src,'image_svg.c')
-
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH)
 
 Return('group')

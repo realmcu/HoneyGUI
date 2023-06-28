@@ -15,6 +15,7 @@
 *:gui_engine\Third_Party\nanovg\demos\fill.inc
 *:gui_engine\Third_Party\nanovg\base\stb_image.h
 *:gui_engine\Third_Party\agge\agge\vector_rasterizer.cpp
+*:gui_engine\Third_Party\*
 *:wearable\database\fal-v0.5.0\*
 *:wearable\database\FlashDB-v1.1.1\*
 *:wearable\tuya-ble-sdk\*
