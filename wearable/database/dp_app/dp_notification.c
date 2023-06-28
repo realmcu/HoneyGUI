@@ -124,14 +124,10 @@ uint8_t notification_current_num_get(void)
     return data_queue_depth_get(nc_valid_queue_hdr);
 }
 
-uint16_t data_node_buf_len(void)
-{
-    return NC_DATA_NODE_BUF_LEN_MAX;
-}
-
 void notification_data_manage_init(void)
 {
-    empty_queue_init(nc_empty_queue_hdr, nc_data_node_array, nc_node_buf, NC_DATA_NODE_BUF_NUM_MAX);
+    empty_queue_init(nc_empty_queue_hdr, nc_data_node_array, *nc_node_buf, NC_DATA_NODE_BUF_NUM_MAX,
+                     NC_DATA_NODE_BUF_LEN_MAX);
     valid_queue_init(nc_valid_queue_hdr, NC_DATA_NODE_BUF_NUM_MAX, NC_DATA_NODE_BUF_LEN_MAX);
 }
 

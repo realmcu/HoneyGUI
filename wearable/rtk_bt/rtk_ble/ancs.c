@@ -206,6 +206,15 @@ void app_handle_notification_attribute_data(T_APP_ANCS_LINK *p_ancs_link)
             APP_PRINT_INFO1("%s", TRACE_STRING(ds_notification_attr_total.total_data));
 
             ds_notification_attr_total.total_data[ds_notification_attr_total.total_len] = '\0';
+#if 1// test code
+            uint8_t msg_num = notification_current_num_get();
+
+            for (uint8_t i = msg_num; i > 0; i--)
+            {
+                get_notification(ds_notification_attr_total.total_len, ds_notification_attr_total.total_data, i);
+                APP_PRINT_INFO2("msg_num %d %s", i, TRACE_STRING(ds_notification_attr_total.total_data));
+            }
+#endif
             ds_notification_attr_total.total_len = 0;
         }
         if (p_ancs_link->notification_attr.attribute_id == DS_NOTIFICATION_ATTR_ID_DATE)

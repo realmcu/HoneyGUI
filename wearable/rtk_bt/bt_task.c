@@ -168,6 +168,7 @@ void bt_task_entry(void *p_param)
     gap_lib_init();
     app_le_gap_init();
     app_le_profile_init();
+    notification_data_manage_init();
 #endif
 
 #ifdef RTK_BR_TASK

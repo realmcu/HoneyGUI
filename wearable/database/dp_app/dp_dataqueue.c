@@ -58,7 +58,7 @@ T_DATAQUEUE_NODE *get_empty_node(T_DATAQUEUE_NODE *empty_queue_hdr)
 }
 
 void empty_queue_init(T_DATAQUEUE_NODE *empty_queue_hdr, T_DATAQUEUE_NODE *data_node_array,
-                      uint8_t data_node_buf[][data_node_buf_len()], uint8_t buf_num_max)
+                      uint8_t *data_node_buf, uint8_t buf_num_max, uint16_t buf_len_max)
 {
     T_DATAQUEUE_NODE *tmp_node;
 
@@ -70,7 +70,7 @@ void empty_queue_init(T_DATAQUEUE_NODE *empty_queue_hdr, T_DATAQUEUE_NODE *data_
     {
         tmp_node->next = &data_node_array[i];
         tmp_node = tmp_node->next;
-        tmp_node->data.buf = data_node_buf[i];
+        tmp_node->data.buf = data_node_buf + i * buf_len_max;
     }
 
     tmp_node->next = NULL;
