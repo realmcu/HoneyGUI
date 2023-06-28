@@ -6,14 +6,30 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-#src = Glob('*.c')
-# src += ['draw_img.c']
-src += [cwd + '/agge/agge/math.cpp', cwd + '/agge/agge/stroke.cpp', cwd + '/agge/agge/stroke_features.cpp', cwd + '/agge/agge/vector_rasterizer.cpp']
-src += [cwd + '/nanovg/demos/agge_fill.c', cwd + '/nanovg/base/nanovg.c', cwd + '/nanovg/agge/nanovg_agge.cpp', cwd + '/nanovg/agge/nanovg_vertex.cpp']
 
-CPPPATH = [cwd,cwd + '/nanosvg/src', cwd + '/nanosvg/example', cwd + '/agge/agge', cwd + '/nanovg/base', cwd + '/nanovg/agge', cwd + '/agge', cwd + '/nanovg']
+src += [cwd + '/nanovg/base/nanovg.c']
+#src += [cwd + '/nanovg/vglite/nanovg_vglite.c']
 
-group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+src += [cwd + '/agge/agge/math.cpp']
+src += [cwd + '/agge/agge/stroke.cpp']
+src += [cwd + '/agge/agge/stroke_features.cpp']
+src += [cwd + '/agge/agge/vector_rasterizer.cpp']
+src += [cwd + '/nanovg/agge/nanovg_agge.cpp']
+src += [cwd + '/nanovg/agge/nanovg_vertex.cpp']
+
+
+path = [cwd,
+        cwd + '/nanosvg/src', 
+        cwd + '/nanosvg/example', 
+        cwd + '/agge/agge', 
+        cwd + '/nanovg/base', 
+        cwd + '/nanovg/agge', 
+        cwd + '/nanovg/vglite', 
+        cwd + '/agge', 
+        cwd + '/nanovg']
+
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = path)
+
 if GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
     group = group + SConscript(os.path.join('jerryscript-latest', 'SConscript'))
     group = group + SConscript(os.path.join('ezXML', 'SConscript'))
