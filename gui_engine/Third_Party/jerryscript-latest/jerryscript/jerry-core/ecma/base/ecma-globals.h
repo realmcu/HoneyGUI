@@ -16,7 +16,7 @@
 #ifndef ECMA_GLOBALS_H
 #define ECMA_GLOBALS_H
 
-#include "jerryscript-latest/rtthread-port/config.h"
+#include "rtthread-port/config.h"
 #include "jrt.h"
 #include "lit-magic-strings.h"
 #include "jmem.h"
