@@ -245,7 +245,7 @@ static void sw_turn_on(gui_radio_switch_t *this)
         msg.type = GUI_SRV_CB;
         msg.cb = gui_radio_switch_change_radio_switch;
         msg.u.payload = this;
-        gui_radio_switch_t *sw = (gui_radio_switch_t *)this;
+//        gui_radio_switch_t *sw = (gui_radio_switch_t *)this;
         /*  send_msg_to_gui_server(&msg);
           if (sw->cb_on.link_cb && sw->ifon)
           {
@@ -271,7 +271,7 @@ static void sw_turn_off(gui_radio_switch_t *this)
 {
     this->ifon = false;
     {
-        gui_radio_switch_t *sw = (gui_radio_switch_t *)this;
+//        gui_radio_switch_t *sw = (gui_radio_switch_t *)this;
         gui_radio_switch_change_radio_switch(this);
         /*if (sw->cb_on.link_cb && sw->ifon)
         {
