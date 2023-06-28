@@ -731,6 +731,11 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
 {
+    if (image->opacity_value == 0)
+    {
+        return;
+    }
+
     vg_lite_matrix_t matrix;
     memcpy(&matrix, image->matrix, sizeof(vg_lite_matrix_t));
 
@@ -754,7 +759,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     target.address = (uint32_t)dc->frame_buf;
     target.tiled = VG_LITE_LINEAR;
 
-
+    vg_lite_clear(&target, NULL, 0xFF0000FF);
     vg_lite_buffer_t source;
     memset(&source, 0x00, sizeof(vg_lite_buffer_t));
 
@@ -809,34 +814,39 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         }
     }
 
-
-
-
-
     source.width = gpu_width;
     source.height = image->img_h;
     source.memory = (void *)source_buffer;
     source.address = (uint32_t)source_buffer;
     source.tiled = VG_LITE_LINEAR;
 
-    source.tiled = VG_LITE_LINEAR;
+    uint32_t opa_input = image->opacity_value;
+    uint32_t opa = 0;
+    if (opa_input < 255)
+    {
+        source.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        opa = (opa_input << 24) | (opa_input << 16) | (opa_input << 8) | opa_input;
+    }
     switch (image->blend_mode)
     {
     case IMG_BYPASS_MODE:
+        blend_mode = VG_LITE_BLEND_NONE;
         break;
     case IMG_FILTER_BLACK:
         {
-            vg_lite_color_key4_t color_key;
-            color_key[0].alpha = 0x00;
-            color_key[0].enable = 1;
-            color_key[0].hign_r = 0x00;
-            color_key[0].low_r = 0x00;
-            color_key[0].hign_b = 0x00;
-            color_key[0].low_b = 0x00;
-            color_key[0].hign_g = 0x00;
-            color_key[0].low_g = 0x00;
-            vg_lite_set_color_key(color_key);
-            source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+//            vg_lite_color_key4_t color_key;
+//            color_key[0].alpha = 0x00;
+//            color_key[0].enable = 1;
+//            color_key[0].hign_r = 0x00;
+//            color_key[0].low_r = 0x00;
+//            color_key[0].hign_b = 0x00;
+//            color_key[0].low_b = 0x00;
+//            color_key[0].hign_g = 0x00;
+//            color_key[0].low_g = 0x00;
+//            vg_lite_set_color_key(color_key);
+//            source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+            blend_mode = VG_LITE_BLEND_SRC_OVER;
+
         }
         break;
     case IMG_TRANSPARENT_MODE:
@@ -844,18 +854,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     default:
         break;
     }
-
     vg_lite_rectangle_t imgae_rect = {.x = 0, .y = 0, .width = image->img_w, .height = image->img_h};
     vg_lite_error_t error_code = vg_lite_blit_rect(&target, &source, &imgae_rect, &matrix,
-                                                   VG_LITE_BLEND_NONE, 0, VG_LITE_FILTER_POINT);
-
+                                                   blend_mode, opa, VG_LITE_FILTER_POINT);
     GUI_ASSERT(error_code == VG_LITE_SUCCESS);
     vg_lite_finish();
     if (!image_alien)
     {
         gui_free(tmp);
     }
-
 }
 
 #include "nanosvg.h"
