@@ -69,7 +69,11 @@ static fdb_time_t get_time(void)
      * Please change this function to return RTC time.
      */
     struct tm tm_time = { .tm_year = 2022 - 1900, .tm_mon = 4, .tm_mday = 5, .tm_hour = 0, .tm_min = 0, .tm_sec = 0 };
+#if 0
     struct tm sport_data_time = watch_clock_get();
+#else
+    struct tm sport_data_time = {0};
+#endif
     sport_data_time.tm_sec = 0;
     FDB_INFO("mean : query from %d %d %d %d %d\n", sport_data_time.tm_year,
              sport_data_time.tm_mon,
