@@ -53,17 +53,6 @@
 #include "tuya_ble_log.h"
 
 
-void gui_port_get_local_time(time_t *now)
-{
-#ifdef __RTTHREAD__
-    rt_device_t device;
-    device = rt_device_find("rtc");
-    rt_device_control(device, RT_DEVICE_CTRL_RTC_GET_TIME, now);
-#else
-    *now = get_unix_timestamp();
-#endif
-}
-
 void dp_database_init(void)
 {
     dp_tuya_cfg_flashDB_init();

@@ -7,7 +7,7 @@
 #include "trace.h"
 #include "profile_client.h"
 #include "app_ble_bas.h"
-#ifdef TUYA_BLE_SDK
+#ifdef RTK_TUYA_BLE_SDK
 #include "tuya_ble_app_demo.h"
 #endif
 
@@ -58,7 +58,7 @@ void app_le_profile_init(void)
 
     //app_ble_bas_init();
     //app_ble_hid_init();
-#ifdef TUYA_BLE_SDK
+#ifdef RTK_TUYA_BLE_SDK
     app_ble_tuya_init();
 #endif
 #ifdef RTK_MI_WEAR
