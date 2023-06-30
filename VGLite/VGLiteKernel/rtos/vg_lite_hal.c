@@ -58,7 +58,7 @@
 #include "vg_lite_hal.h"
 #include "vg_lite_hw.h"
 #include "rtl_nvic.h"
-
+#include "rtl_rcc.h"
 
 #include "trace.h"
 #include "os_queue.h"
@@ -90,7 +90,7 @@ static    uint32_t    registerMemBase    = 0x40240000;
 
 volatile void *contiguousMem = NULL;
 uint32_t gpuMemBase = 0;
-
+static bool gpu_allowed_enter_dlps_flag = true;
 /* Default heap size is 16MB. */
 static int heap_size = MAX_CONTIGUOUS_SIZE;
 
@@ -238,10 +238,16 @@ void vg_lite_hal_barrier(void)
 #endif
 }
 
+static bool gpu_allowed_enter_dlps_check(void)
+{
+    return gpu_allowed_enter_dlps_flag;
+}
+
 static int vg_lite_init(void);
 void vg_lite_hal_initialize(void)
 {
-    *(uint32_t *)0x400e2150 |= BIT17 + BIT16;
+    RCC_PeriphClockCmd(APBPeriph_GPU, APBPeriph_GPU_CLOCK_CLOCK, DISABLE);
+    RCC_PeriphClockCmd(APBPeriph_GPU, APBPeriph_GPU_CLOCK_CLOCK, ENABLE);
     /* TODO: Turn on the power. */
     vg_lite_init();
     /* TODO: Turn on the clock. */
@@ -250,7 +256,10 @@ void vg_lite_hal_initialize(void)
     NVIC_InitStruct.NVIC_IRQChannel = GPU_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
     NVIC_Init(&NVIC_InitStruct);
+
+    drv_dlps_check_cbacks_register("gpu", gpu_allowed_enter_dlps_check);
 }
 
 void vg_lite_hal_deinitialize(void)
@@ -489,8 +498,10 @@ int32_t vg_lite_hal_wait_interrupt(uint32_t timeout, uint32_t mask, uint32_t *va
 {
     if (device->gpu_sem_handle)
     {
+        gpu_allowed_enter_dlps_flag = false;
         if (os_sem_take(device->gpu_sem_handle, timeout) == true)
         {
+            gpu_allowed_enter_dlps_flag = true;
             if (value != NULL)
             {
                 *value = device->int_flags & mask;

@@ -439,24 +439,28 @@ void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size)
     gui_log("0x%x\n", buf[size - 1]);
 }
 
-static uint32_t gui_tick = 0;
-
-void gui_tick_increase(void)
+void gui_display_on(void)
 {
-    gui_tick++;
+    if (dc->lcd_power_on)
+    {
+        dc->lcd_power_on();
+    }
 }
 
-uint32_t gui_tick_get(void)
+void gui_display_off(void)
 {
-    return gui_tick;
+    if (dc->lcd_power_off)
+    {
+        dc->lcd_power_off();
+    }
 }
 
 uint32_t gui_ms_get(void)
 {
-    return 10 * gui_tick;
-}
+    if (os_api->thread_ms_get == NULL)
+    {
+        return 0;
+    }
 
-void gui_tick_clear(void)
-{
-    gui_tick = 0;
+    return os_api->thread_ms_get();
 }

@@ -15,7 +15,6 @@ void gui_port_dc_init(void);
 void gui_port_indev_init(void);
 void gui_port_os_init(void);
 void gui_port_fs_init(void);
-
 #ifdef __cplusplus
 }
 #endif

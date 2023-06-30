@@ -47,8 +47,12 @@ bool send_msg_to_gui_server(rtgui_msg_t *msg)
 
 static uint32_t daemon_start_ms = 0;
 static uint32_t daemon_cnt = 0;
+
 static void rtgui_server_entry(void *parameter)
 {
+#ifdef RTL8772F
+    rtk_os_alloc_secure_ctx(); //template code; when nvic restore ready, remove it
+#endif
     gui_server_mq = gui_mq_create("gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {
@@ -91,8 +95,11 @@ static void rtgui_server_entry(void *parameter)
         {
             gui_log("daemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n", daemon_start_ms,
                     gui_ms_get(), app->active_ms);
+            gui_display_off();
             gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0x0FFFFFFF);
+            gui_display_on();
             daemon_cnt = 0;
+            daemon_start_ms = 0;
         }
 
     }

@@ -126,9 +126,8 @@ struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d);
 char *gui_strdup(const char *s);
 void gui_log(const char *format, ...);
 void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size);
-
-void gui_tick_increase(void);
-uint32_t gui_tick_get(void);
+void gui_display_on(void);
+void gui_display_off(void);
 uint32_t gui_ms_get(void);
 #ifdef __cplusplus
 }

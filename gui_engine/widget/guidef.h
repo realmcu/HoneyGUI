@@ -171,6 +171,7 @@ typedef enum
     GUI_SRV_RUN_JS,
     GUI_SRV_CB_CHILDTREEFREE,
     GUI_SRV_EXT_BUTTON,
+    GUI_SRV_WAKEUP,
 } GUI_SRV_TYPE;
 
 
@@ -293,6 +294,7 @@ struct gui_os_api
     bool (*thread_suspend)(void *handle);
     bool (*thread_resume)(void *handle);
     bool (*thread_mdelay)(uint32_t ms);
+    uint32_t (*thread_ms_get)(void);
     void *(*mq_create)(const char *name, uint32_t msg_size, uint32_t max_msgs);
     bool (*mq_send)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
     bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);

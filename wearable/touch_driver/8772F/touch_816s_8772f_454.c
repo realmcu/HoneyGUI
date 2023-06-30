@@ -21,6 +21,8 @@
 #include "board.h"
 
 
+void (*touch_wakeup_indicate)(void) = NULL;
+
 
 bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
 {
@@ -100,6 +102,10 @@ static bool touch_system_wakeup_dlps_check(void)
         Pad_ClearWakeupINTPendingBit(TOUCH_816S_INT);
         System_WakeUpPinDisable(TOUCH_816S_INT);
         DBG_DIRECT("Touch Wake up");
+        if (touch_wakeup_indicate != NULL)
+        {
+            touch_wakeup_indicate();
+        }
         return true;
     }
     return false;
@@ -114,7 +120,10 @@ void drv_touch_dlps_init(void)
     drv_dlps_check_cbacks_register("touch", touch_allowed_enter_dlps_check);
 }
 
-
+void drv_touch_set_wakeup_indicate(void (*wakeup_ind))
+{
+    touch_wakeup_indicate = wakeup_ind;
+}
 
 void rtk_touch_hal_init(void)
 {

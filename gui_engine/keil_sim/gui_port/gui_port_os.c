@@ -22,7 +22,10 @@ bool port_thread_mdelay(uint32_t ms)
     return true;
 }
 
-
+uint32_t port_thread_ms_get(void)
+{
+    return 0;
+}
 
 void *port_malloc(uint32_t n)
 {
@@ -48,7 +51,7 @@ static struct gui_os_api os_api =
     .thread_create = port_thread_create,
     .thread_delete = port_thread_delete,
     .thread_mdelay = port_thread_mdelay,
-
+    .thread_ms_get = port_thread_ms_get,
     .f_malloc = port_malloc,
     .f_realloc = port_realloc,
     .f_free = port_free,
@@ -56,8 +59,6 @@ static struct gui_os_api os_api =
     .mem_size = PORT_MEMHEAP_SIZE,
     .log = (log_func_t)printf,
 };
-
-
 void gui_port_os_init(void)
 {
 

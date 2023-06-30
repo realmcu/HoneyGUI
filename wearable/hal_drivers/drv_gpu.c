@@ -19,15 +19,9 @@
 static uint8_t *contiguous_mem = NULL;
 
 
-static bool gpu_allowed_enter_dlps_check(void)
-{
-    return false;
-}
 
 void drv_gpu_init(void)
 {
-    RCC_PeriphClockCmd(APBPeriph_GPU, APBPeriph_GPU_CLOCK_CLOCK, DISABLE);
-    RCC_PeriphClockCmd(APBPeriph_GPU, APBPeriph_GPU_CLOCK_CLOCK, ENABLE);
     vg_lite_init_mem(0x40140000, 0x0, contiguous_mem, 0x50000);
     DBG_DIRECT("contiguous_mem addr = 0x%x\r\n", contiguous_mem);
 
