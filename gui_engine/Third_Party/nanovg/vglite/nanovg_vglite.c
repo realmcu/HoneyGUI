@@ -89,6 +89,13 @@ void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
                              int npaths)
 {
     NANOVG_LOG(" %s %d\n", __func__, __LINE__);
+    for (int i = 0; i < npaths; i++)
+    {
+        const NVGpath *p = paths + i;
+        //agge::nanovg_vertex::iterator iter(p->stroke, p->nstroke);
+        //agge::path_generator_adapter<agge::nanovg_vertex::iterator, agge::stroke> path_gen(iter, line_style);
+        //add_path(ras, path_gen);
+    }
 }
 void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
                            NVGcompositeOperationState compositeOperation,
@@ -107,6 +114,14 @@ void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
                paint->xform[1], paint->xform[2], paint->xform[3], paint->xform[4], paint->xform[5]);
     NANOVG_LOG("[%s] paint->extent = [%f][%f]\n", __func__, paint->extent[0], paint->extent[1]);
 
+    //uint8_t *path_cmd = NULL;
+    //vg_lite_float_t *path_data;
+#define PATH_CMD_LEN 512
+    static uint8_t path_cmd[PATH_CMD_LEN];
+    static vg_lite_float_t path_data[PATH_CMD_LEN];
+    uint32_t cmd_cnt = 0;
+    uint32_t data_cnt = 0;
+
     for (int i = 0; i < npaths; i++)
     {
         const NVGpath *p = paths + i;
@@ -117,15 +132,33 @@ void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
             {
                 //ras.move_to(v->x, v->y);
                 NANOVG_LOG("[J = 0]v->x[%f], v->y[%f]\n", v->x, v->y);
+                path_cmd[cmd_cnt++] = VLC_OP_MOVE;
+                path_data[data_cnt++] = v->x;
+                path_data[data_cnt++] = v->y;
             }
             else
             {
                 //ras.line_to(v->x, v->y);
                 NANOVG_LOG("[J = 1]v->x[%f], v->y[%f]\n", v->x, v->y);
+                path_cmd[cmd_cnt++] = VLC_OP_LINE;
+                path_data[data_cnt++] = v->x;
+                path_data[data_cnt++] = v->y;
             }
         }
         NANOVG_LOG("[CLOSE]\n");
+        path_cmd[cmd_cnt++] = VLC_OP_END;
     }
+
+    vg_lite_path_t path;
+    memset(&path, 0, sizeof(vg_lite_path_t));
+    uint32_t path_data_len = vg_lite_path_calc_length(path_cmd, sizeof(path_cmd), VG_LITE_FP32);
+    vg_lite_init_path(&path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, 0, 0, 0, 0);
+    vg_lite_path_append(&path, path_cmd, path_data, cmd_cnt);
+    vg_lite_matrix_t matrix;
+    vg_lite_identity(&matrix);
+    vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, 0xFF00FF00);
+    vg_lite_finish();
+    vg_lite_clear_path(&path);
 }
 
 
