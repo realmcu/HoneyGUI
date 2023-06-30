@@ -130,9 +130,7 @@ void rtk_lcd_hal_init(void)
     RCC_PeriphClockCmd(APBPeriph_MIPI_HOST, APBPeriph_MIPI_HOST_CLOCK, ENABLE);
 
     Pad_Config(P17_2, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
     Pad_Dedicated_Config(P17_2, ENABLE);
-    Pad_Dedicated_Config(P17_7, ENABLE);
     drv_pin_mode(P13_7, PIN_MODE_OUTPUT);
     drv_pin_write(P13_7, 0); //im0
     drv_pin_mode(P13_6, PIN_MODE_OUTPUT);
@@ -185,14 +183,6 @@ void rtk_lcd_hal_init(void)
 
 
     EDPI_Init(&eDPICfg);
-
-
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(50);
-    LCDC_LCD_SET_RST(true);
-    platform_delay_ms(200);
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(50);//todo
 
 
 #if 0
@@ -594,6 +584,37 @@ void rtk_lcd_hal_init(void)
     DPHY->CLOCK_GEN |= REG_LANE0_EN_MSK;
 #endif
 
+    DSI->CMD_MODE_CFG           = (
+                                      TRANS_HS << DSI_MAX_RD_PKT_SIZE_POS
+                                      | TRANS_HS << DSI_DCS_LW_TX_POS
+                                      | TRANS_HS << DSI_DCS_SR_0P_TX_POS
+                                      | TRANS_HS << DSI_DCS_SW_1P_TX_POS
+                                      | TRANS_HS << DSI_DCS_SW_0P_TX_POS
+                                      | TRANS_HS << DSI_GEN_LW_TX_POS
+                                      | TRANS_HS << DSI_GEN_SR_2P_TX_POS
+                                      | TRANS_HS << DSI_GEN_SR_1P_TX_POS
+                                      | TRANS_HS << DSI_GEN_SR_0P_TX_POS
+                                      | TRANS_HS << DSI_GEN_SW_2P_TX_POS
+                                      | TRANS_HS << DSI_GEN_SW_1P_TX_POS
+                                      | TRANS_HS << DSI_GEN_SW_0P_TX_POS
+                                      | 0 << DSI_ACK_RQST_EN_POS
+                                      | 0 << DSI_TEAR_FX_EN_POS
+                                  );
+}
+
+void rtk_lcd_init(void)
+{
+    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Dedicated_Config(P17_7, ENABLE);
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(50);
+    LCDC_LCD_SET_RST(true);
+    platform_delay_ms(200);
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(50);//todo
+    Pad_Config(P17_7, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Dedicated_Config(P17_7, DISABLE);
+
     uint8_t pass_word_0[] = {0x5a, 0x5a, 0xC0};
     DSI_IO_WriteCmd(2, (uint8_t *)pass_word_0);
     uint8_t pass_word_1[] = {0x5a, 0x5a, 0xC1};
@@ -631,38 +652,32 @@ void rtk_lcd_hal_init(void)
     DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData41);
 
 
-
     platform_delay_ms(60);
     uint8_t ShortRegData44[] = {0x29, 0x00};
     DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData44);
 
+}
 
-
-    //for bist mode
-//    uint8_t bist[] = {0xBA, 0X81};
-//    DSI_IO_WriteCmd(0, (uint8_t *)bist);
-
-    platform_delay_ms(10);
-
-    DSI->CMD_MODE_CFG           = (
-                                      TRANS_HS << DSI_MAX_RD_PKT_SIZE_POS
-                                      | TRANS_HS << DSI_DCS_LW_TX_POS
-                                      | TRANS_HS << DSI_DCS_SR_0P_TX_POS
-                                      | TRANS_HS << DSI_DCS_SW_1P_TX_POS
-                                      | TRANS_HS << DSI_DCS_SW_0P_TX_POS
-                                      | TRANS_HS << DSI_GEN_LW_TX_POS
-                                      | TRANS_HS << DSI_GEN_SR_2P_TX_POS
-                                      | TRANS_HS << DSI_GEN_SR_1P_TX_POS
-                                      | TRANS_HS << DSI_GEN_SR_0P_TX_POS
-                                      | TRANS_HS << DSI_GEN_SW_2P_TX_POS
-                                      | TRANS_HS << DSI_GEN_SW_1P_TX_POS
-                                      | TRANS_HS << DSI_GEN_SW_0P_TX_POS
-                                      | 0 << DSI_ACK_RQST_EN_POS
-                                      | 0 << DSI_TEAR_FX_EN_POS
-                                  );
-
+void rtk_lcd_clear(void)
+{
     rtk_lcd_hal_set_window(0, 0, 454, 454);
     rtk_lcd_hal_rect_fill(0, 0, 454, 454, 0x00ff0000);
+}
+
+void rtl_lcd_hal_power_on(void)
+{
+    uint8_t ShortRegData44[] = {0x29, 0x00};
+    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData44);
+    uint8_t ShortRegData36[] = {0x11, 0x00};
+    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData36);
+}
+
+void rtl_lcd_hal_power_off(void)
+{
+    uint8_t ShortRegData35[] = {0x10, 0x00};
+    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData35);
+    uint8_t ShortRegData43[] = {0x28, 0x00};
+    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData43);
 }
 
 

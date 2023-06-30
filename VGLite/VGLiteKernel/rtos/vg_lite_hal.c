@@ -71,7 +71,7 @@
 #if !_BAREMETAL
 static void sleep(uint32_t msec)
 {
-    os_delay(msec);
+    platform_delay_ms(msec);
 }
 
 #endif

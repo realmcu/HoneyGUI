@@ -81,6 +81,10 @@ static bool touch_exit_dlps(void)
 {
     Pad_Config(TOUCH_816S_INT, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
                PAD_OUT_LOW);
+    Pad_Config(TOUCH_816S_SCL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
+               PAD_OUT_LOW);
+    Pad_Config(TOUCH_816S_SDA, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE,
+               PAD_OUT_LOW);
     return false;
 }
 
@@ -133,7 +137,7 @@ void rtk_touch_hal_init(void)
 
     DBG_DIRECT("CTP ID:0x%x\r\n", iic_read_buf[0]);
 
-
+    drv_touch_dlps_init();
 
 }
 

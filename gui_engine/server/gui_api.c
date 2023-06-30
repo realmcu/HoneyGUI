@@ -456,3 +456,7 @@ uint32_t gui_ms_get(void)
     return 10 * gui_tick;
 }
 
+void gui_tick_clear(void)
+{
+    gui_tick = 0;
+}
