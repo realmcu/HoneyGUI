@@ -12,6 +12,16 @@
 #include "gui_win.h"
 #include "gui_iconlist.h"
 #if 1
+#ifdef OS_FREERTOS
+#include "os_mem.h"
+#include "trace.h"
+#include "string.h"
+#endif
+
+
+
+
+
 struct ezjs
 {
     int a;
@@ -1367,7 +1377,11 @@ void gui_js_init()
 }
 static void *context_alloc(size_t size, void *cb_data_p)
 {
+#ifdef OS_FREERTOS
+    return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
+#else
     return malloc(size);
+#endif
 }
 #include <jerryscript.h>
 #include <jerry_util.h>

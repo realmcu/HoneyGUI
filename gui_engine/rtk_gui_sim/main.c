@@ -36,6 +36,7 @@ int main(int argc, char **argv)
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
+        read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
     {
@@ -43,7 +44,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    read(fd, resource_root, 1024 * 1024 * 20);
+
 
 
     rtgui_server_init();

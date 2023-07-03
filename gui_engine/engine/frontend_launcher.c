@@ -56,10 +56,12 @@ void *get_app_xml(void)
     return &app_xml;
 }
 
-
-
+#ifdef OS_FREERTOS
+#include "romfs.h"
+#else
 #include <sys/stat.h>
 #include <fcntl.h>
+#endif
 #if defined __WIN32
 #include <dirent.h>
 #endif

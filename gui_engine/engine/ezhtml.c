@@ -34,8 +34,12 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
+#ifdef OS_FREERTOS
+#include "romfs.h"
+#else
 #include <sys/stat.h>
 #include <fcntl.h>
+#endif
 struct widget_create
 {
     char *name;

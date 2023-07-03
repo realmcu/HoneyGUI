@@ -244,8 +244,12 @@ void js_value_dump(jerry_value_t value)
     _js_value_dump(value);
     printf("\n");
 }
+#ifdef OS_FREERTOS
+#include "romfs.h"
+#else
 #include <sys/stat.h>
 #include <fcntl.h>
+#endif
 int js_read_file(const char *filename, char **script)
 {
 #ifdef __WIN32
