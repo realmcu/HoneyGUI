@@ -36,7 +36,7 @@ void nt35510_write_data16(uint16_t data)
     DBIB_SendData(data_buf, 2);
 }
 
-void lcd_nt35510_power_on(void)
+void rtl_lcd_hal_power_on(void)
 {
 //    nt35510_write_cmd(0x1100);
 ////    rt_thread_mdelay(160);
@@ -44,7 +44,7 @@ void lcd_nt35510_power_on(void)
     //lcd_set_backlight(100);
 }
 
-void lcd_nt35510_power_off(void)
+void rtl_lcd_hal_power_off(void)
 {
     nt35510_write_cmd(0x2800);
     nt35510_write_cmd(0x1000);
@@ -290,6 +290,10 @@ void rtk_lcd_hal_init(void)
     DBIB_Init(&dbib_init);
 
     //lcdc_dbib_init_lcd();
+}
+
+void rtk_lcd_init(void)
+{
     LCDC_SwitchMode(LCDC_MANUAL_MODE);
     LCDC_SwitchDirect(LCDC_TX_MODE);
     LCDC_Cmd(ENABLE);
@@ -302,7 +306,50 @@ void rtk_lcd_hal_init(void)
     platform_delay_ms(50);
 
     nt35510_seq_init();
+}
 
+void rtk_lcd_clear(void)
+{
+    rtk_lcd_hal_set_window(0, 0, NT35510_LCD_WIDTH, NT35510_LCD_HIGHT);
+
+    uint32_t buf[128];
+    for (int i = 0; i < 64; i++)
+    {
+        buf[i] = 0;
+    }
+    LCDC_DMA_InitTypeDef LCDC_DMA_InitStruct = {0};
+    LCDC_DMA_StructInit(&LCDC_DMA_InitStruct);
+    LCDC_DMA_InitStruct.LCDC_DMA_ChannelNum          = LCDC_DMA_CHANNEL_NUM;
+    LCDC_DMA_InitStruct.LCDC_DMA_DIR                 = DMA_DIR_PeripheralToMemory;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceInc           = DMA_SourceInc_Fix;
+    LCDC_DMA_InitStruct.LCDC_DMA_DestinationInc      = DMA_DestinationInc_Fix;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceDataSize      = DMA_DataSize_Word;
+    LCDC_DMA_InitStruct.LCDC_DMA_DestinationDataSize = DMA_DataSize_Word;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceMsize         = DMA_Msize_8;
+    LCDC_DMA_InitStruct.LCDC_DMA_DestinationMsize    = DMA_Msize_8;
+    LCDC_DMA_InitStruct.LCDC_DMA_SourceAddr          = 0x00500000;
+    LCDC_DMA_InitStruct.LCDC_DMA_Multi_Block_En      = 0;
+    LCDC_DMA_Init(LCDC_DMA_CHANNEL_INDEX, &LCDC_DMA_InitStruct);
+
+    LCDC_ClearDmaFifo();
+    LCDC_ClearTxPixelCnt();
+
+    LCDC_SwitchMode(LCDC_AUTO_MODE);
+    LCDC_SwitchDirect(LCDC_TX_MODE);
+    DBIB_BypassCmdByteCmd(DISABLE);
+
+    uint8_t cmd[2] = {0x2C, 0x00};
+    LCDC_DBIB_SetCmdSequence(cmd, 2);
+
+    LCDC_SetTxPixelLen(NT35510_LCD_WIDTH * NT35510_LCD_HIGHT);
+
+    LCDC_Cmd(ENABLE);
+
+
+    LCDC_DMA_SetSourceAddress(LCDC_DMA_CHANNEL_INDEX, (uint32_t)buf);
+    LCDC_DMAChannelCmd(LCDC_DMA_CHANNEL_NUM, ENABLE);
+    LCDC_DmaCmd(ENABLE);
+    LCDC_AutoWriteCmd(ENABLE);
 }
 
 uint32_t rtk_lcd_hal_get_width(void)
