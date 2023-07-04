@@ -391,7 +391,19 @@ static void incna3311_chip_reset(void)
     //no need HW do it
 }
 
+uint32_t rtk_lcd_hal_power_off(void)
+{
+    return 0;
+}
+uint32_t rtk_lcd_hal_power_on(void)
+{
+    return 0;
+}
 
+uint32_t rtk_lcd_hal_dlps_restore(void)
+{
+    return 0;
+}
 
 void rtk_lcd_hal_init(void)
 {

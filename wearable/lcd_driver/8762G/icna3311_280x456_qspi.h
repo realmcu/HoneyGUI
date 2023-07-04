@@ -40,6 +40,9 @@ void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_
 uint32_t rtk_lcd_hal_get_width(void);
 uint32_t rtk_lcd_hal_get_height(void);
 uint32_t rtk_lcd_hal_get_pixel_bits(void);
+uint32_t rtk_lcd_hal_power_off(void);
+uint32_t rtk_lcd_hal_power_on(void);
+uint32_t rtk_lcd_hal_dlps_restore(void);
 #ifdef __cplusplus
 }
 #endif

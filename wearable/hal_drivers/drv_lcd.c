@@ -17,12 +17,12 @@
 
 void drv_lcd_power_on(void)
 {
-    rtl_lcd_hal_power_on();
+    rtk_lcd_hal_power_on();
 }
 
 void drv_lcd_power_off(void)
 {
-    rtl_lcd_hal_power_off();
+    rtk_lcd_hal_power_off();
 }
 
 void drv_lcd_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, uint16_t w,
@@ -76,8 +76,7 @@ void Display_Handler(void)
 void hw_lcd_init(void)
 {
     rtk_lcd_hal_init();
-    rtk_lcd_init();
-    rtk_lcd_clear();
+
     DBG_DIRECT("Drv lcd init");
 }
 
