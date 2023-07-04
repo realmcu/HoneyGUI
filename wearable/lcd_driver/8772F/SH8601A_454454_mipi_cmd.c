@@ -123,6 +123,62 @@ void rtk_lcd_hal_rect_fill(uint16_t xStart, uint16_t yStart, uint16_t w, uint16_
 
 }
 
+static void driver_ic_init(void)
+{
+    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Dedicated_Config(P17_7, ENABLE);
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(50);
+    LCDC_LCD_SET_RST(true);
+    platform_delay_ms(200);
+    LCDC_LCD_SET_RST(false);
+    platform_delay_ms(50);//todo
+    Pad_Config(P17_7, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
+    Pad_Dedicated_Config(P17_7, DISABLE);
+
+    uint8_t pass_word_0[] = {0x5a, 0x5a, 0xC0};
+    DSI_IO_WriteCmd(2, (uint8_t *)pass_word_0);
+    uint8_t pass_word_1[] = {0x5a, 0x5a, 0xC1};
+    DSI_IO_WriteCmd(2, (uint8_t *)pass_word_1);
+    platform_delay_ms(5);
+    uint8_t ShortRegData36[] = {0x11, 0x00};
+    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData36);
+    platform_delay_ms(5);
+
+    /*set tear*/
+    uint8_t lcdRegData_tear_on[] = {0x35, 0x00};
+    DSI_IO_WriteCmd(0, (uint8_t *)lcdRegData_tear_on);
+    platform_delay_ms(5);
+    uint8_t lcdRegData_tear_scan_line[] = {0x00, 0x00, 0x44};
+    DSI_IO_WriteCmd(2, (uint8_t *)lcdRegData_tear_scan_line);
+    platform_delay_ms(5);
+
+    // frame rate switch://
+    uint8_t paramter_select[] = {0xB0, 0x16}; // Parameter selection, 22th parameter
+    DSI_IO_WriteCmd(1, (uint8_t *)paramter_select);
+    platform_delay_ms(5);
+    uint8_t frame_rate[] = {0xB1, 0x00}; //0x01=45Hz, 0x00=60Hz
+    DSI_IO_WriteCmd(1, (uint8_t *)frame_rate);
+    platform_delay_ms(5);
+
+    uint8_t lcdRegData27[] = {0, 0, 0x01, 0xC5, 0x2A};
+    DSI_IO_WriteCmd(4, (uint8_t *)lcdRegData27);
+    platform_delay_ms(5);
+
+    uint8_t lcdRegData28[] = {0, 0, 0x01, 0xC5, 0x2B};
+    DSI_IO_WriteCmd(4, (uint8_t *)lcdRegData28);
+    platform_delay_ms(5);
+
+    uint8_t ShortRegData41[] = {0x53, 0x20};//Write CTRL Display
+    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData41);
+
+
+    platform_delay_ms(60);
+    uint8_t ShortRegData44[] = {0x29, 0x00};
+    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData44);
+
+}
+
 void rtk_lcd_hal_init(void)
 {
 
@@ -600,84 +656,34 @@ void rtk_lcd_hal_init(void)
                                       | 0 << DSI_ACK_RQST_EN_POS
                                       | 0 << DSI_TEAR_FX_EN_POS
                                   );
+    driver_ic_init();
 }
 
-void rtk_lcd_init(void)
-{
-    Pad_Config(P17_7, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Dedicated_Config(P17_7, ENABLE);
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(50);
-    LCDC_LCD_SET_RST(true);
-    platform_delay_ms(200);
-    LCDC_LCD_SET_RST(false);
-    platform_delay_ms(50);//todo
-    Pad_Config(P17_7, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_HIGH);
-    Pad_Dedicated_Config(P17_7, DISABLE);
-
-    uint8_t pass_word_0[] = {0x5a, 0x5a, 0xC0};
-    DSI_IO_WriteCmd(2, (uint8_t *)pass_word_0);
-    uint8_t pass_word_1[] = {0x5a, 0x5a, 0xC1};
-    DSI_IO_WriteCmd(2, (uint8_t *)pass_word_1);
-    platform_delay_ms(5);
-    uint8_t ShortRegData36[] = {0x11, 0x00};
-    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData36);
-    platform_delay_ms(5);
-
-    /*set tear*/
-    uint8_t lcdRegData_tear_on[] = {0x35, 0x00};
-    DSI_IO_WriteCmd(0, (uint8_t *)lcdRegData_tear_on);
-    platform_delay_ms(5);
-    uint8_t lcdRegData_tear_scan_line[] = {0x00, 0x00, 0x44};
-    DSI_IO_WriteCmd(2, (uint8_t *)lcdRegData_tear_scan_line);
-    platform_delay_ms(5);
-
-    // frame rate switch://
-    uint8_t paramter_select[] = {0xB0, 0x16}; // Parameter selection, 22th parameter
-    DSI_IO_WriteCmd(1, (uint8_t *)paramter_select);
-    platform_delay_ms(5);
-    uint8_t frame_rate[] = {0xB1, 0x00}; //0x01=45Hz, 0x00=60Hz
-    DSI_IO_WriteCmd(1, (uint8_t *)frame_rate);
-    platform_delay_ms(5);
-
-    uint8_t lcdRegData27[] = {0, 0, 0x01, 0xC5, 0x2A};
-    DSI_IO_WriteCmd(4, (uint8_t *)lcdRegData27);
-    platform_delay_ms(5);
-
-    uint8_t lcdRegData28[] = {0, 0, 0x01, 0xC5, 0x2B};
-    DSI_IO_WriteCmd(4, (uint8_t *)lcdRegData28);
-    platform_delay_ms(5);
-
-    uint8_t ShortRegData41[] = {0x53, 0x20};//Write CTRL Display
-    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData41);
 
 
-    platform_delay_ms(60);
-    uint8_t ShortRegData44[] = {0x29, 0x00};
-    DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData44);
 
-}
 
-void rtk_lcd_clear(void)
-{
-    rtk_lcd_hal_set_window(0, 0, 454, 454);
-    rtk_lcd_hal_rect_fill(0, 0, 454, 454, 0x00ff0000);
-}
-
-void rtl_lcd_hal_power_on(void)
+uint32_t rtk_lcd_hal_power_on(void)
 {
     uint8_t ShortRegData44[] = {0x29, 0x00};
     DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData44);
     uint8_t ShortRegData36[] = {0x11, 0x00};
     DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData36);
+    return 0;
 }
 
-void rtl_lcd_hal_power_off(void)
+uint32_t rtk_lcd_hal_power_off(void)
 {
     uint8_t ShortRegData35[] = {0x10, 0x00};
     DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData35);
     uint8_t ShortRegData43[] = {0x28, 0x00};
     DSI_IO_WriteCmd(0, (uint8_t *)ShortRegData43);
+    return 0;
+}
+
+uint32_t rtk_lcd_hal_dlps_restore(void)
+{
+    return 0;
 }
 
 

@@ -64,6 +64,9 @@ void rtk_lcd_hal_update_framebuffer(uint8_t *buf, uint32_t len);
 uint32_t rtk_lcd_hal_get_width(void);
 uint32_t rtk_lcd_hal_get_height(void);
 uint32_t rtk_lcd_hal_get_pixel_bits(void);
+uint32_t rtk_lcd_hal_power_on(void);
+uint32_t rtk_lcd_hal_power_off(void);
+uint32_t rtk_lcd_hal_dlps_restore(void);
 
 //for ramless
 void rtk_lcd_hal_start_transfer(uint8_t *buf, uint32_t len);
