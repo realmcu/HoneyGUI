@@ -9,24 +9,23 @@
 #include "os_sync.h"
 
 
-void (*tim4_indicate)(void) = NULL;
+void (*tim5_indicate)(void) = NULL;
 
 
-void drv_tim4_start(void)
+void drv_tim5_start(void)
 {
-    TIM_Cmd(TIM4, ENABLE);
+    TIM_Cmd(TIM5, ENABLE);
 }
 
-void drv_tim4_stop(void)
+void drv_tim5_stop(void)
 {
-    TIM_Cmd(TIM4, DISABLE);
+    TIM_Cmd(TIM5, DISABLE);
 }
 
-void drv_tim4_init(void)
+void drv_tim5_init(void)
 {
     /* Enable TIMER peripheral clock */
 #ifdef RTL8772F
-    RCC_PeriphClockCmd(APBPeriph_TIMERB, APBPeriph_TIMERB_CLOCK, DISABLE);
     RCC_PeriphClockCmd(APBPeriph_TIMERB, APBPeriph_TIMERB_CLOCK, ENABLE);
 #endif
     /* Configure TIMER init parameters */
@@ -35,18 +34,18 @@ void drv_tim4_init(void)
     TIM_InitStruct.TIM_PWM_En = DISABLE;
     TIM_InitStruct.TIM_Period = 40 * 10000 - 1;
     TIM_InitStruct.TIM_Mode = TIM_Mode_UserDefine;
-    TIM_TimeBaseInit(TIM4, &TIM_InitStruct);
+    TIM_TimeBaseInit(TIM5, &TIM_InitStruct);
 
     /* Enable NVIC */
     NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = Timer_B1_IRQn;
+    NVIC_InitStruct.NVIC_IRQChannel = Timer_B2_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
     NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
     NVIC_Init(&NVIC_InitStruct);
 
-    TIM_ClearINT(TIM4);
-    TIM_INTConfig(TIM4, ENABLE);
+    TIM_ClearINT(TIM5);
+    TIM_INTConfig(TIM5, ENABLE);
 }
 
 static void tim_isr(void (*tim_ind)(void), TIM_TypeDef *TIMx)
@@ -58,34 +57,34 @@ static void tim_isr(void (*tim_ind)(void), TIM_TypeDef *TIMx)
     TIM_Cmd(TIMx, ENABLE);
 }
 
-void Timer_B1_Handler(void)
+void Timer_B2_Handler(void)
 {
-    tim_isr(tim4_indicate, TIM4);
+    tim_isr(tim5_indicate, TIM5);
 }
 
-void drv_tim4_set_indicate(void (*tim_ind)(void))
+void drv_tim5_set_indicate(void (*tim_ind)(void))
 {
-    tim4_indicate = tim_ind;
+    tim5_indicate = tim_ind;
 }
 
-bool drv_tim4_exit_dlps(void)
+bool drv_tim5_exit_dlps(void)
 {
     /* Enable NVIC */
 //    NVIC_InitTypeDef NVIC_InitStruct;
-//    NVIC_InitStruct.NVIC_IRQChannel = Timer_B1_IRQn;
+//    NVIC_InitStruct.NVIC_IRQChannel = Timer_B2_IRQn;
 //    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
 //    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
 //    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
 //    NVIC_Init(&NVIC_InitStruct);
-    drv_tim4_init();
-    DBG_DIRECT("drv_tim4_exit_dlps");
+    drv_tim5_init();
+    DBG_DIRECT("drv_tim5_exit_dlps");
     return true;
 }
 
 void hw_tim_init(void)
 {
     DBG_DIRECT("hw_tim_init");
-    drv_dlps_exit_cbacks_register("tim4", drv_tim4_exit_dlps);
+    drv_dlps_exit_cbacks_register("tim5", drv_tim5_exit_dlps);
 }
 
 /************** end of file ********************/
