@@ -1,9 +1,9 @@
 /**
 *****************************************************************************************
-*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*     Copyright(c) 2023, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-   * @file      app_task.c
-   * @brief     Routines to create App task and handle events & messages
+   * @file      sensor_task.c
+   * @brief     Routines to create sensor task and handle events & messages
    * @author    howie_wang
    * @date      2023-06-07
    * @version   v1.0
@@ -30,15 +30,15 @@
 /*============================================================================*
  *                              Variables
  *============================================================================*/
+static void *sensor_task_handle;    //!< Sensor Task handle
+static void *sensor_queue_handle;   //!< Sensor queue handle
 
-static void *sensor_mode_queue_handle;   //!< IO queue handle
 
-
-bool app_send_msg_to_sensor_mode_task(T_IO_MSG *p_msg)
+bool app_send_msg_to_sensor_task(T_IO_MSG *p_msg)
 {
-    if (os_msg_send(sensor_mode_queue_handle, p_msg, 0) == false)
+    if (os_msg_send(sensor_queue_handle, p_msg, 0) == false)
     {
-        APP_PRINT_ERROR0("send_io_msg_to_app fail io queue");
+        APP_PRINT_ERROR0("send_io_msg_to_app fail sensor queue");
         return false;
     }
     return true;
@@ -47,23 +47,22 @@ bool app_send_msg_to_sensor_mode_task(T_IO_MSG *p_msg)
 
 
 /**
- * @brief        App task to handle events & messages
+ * @brief        Sensor task to handle events & messages
  * @param[in]    p_param    Parameters sending to the task
  * @return       void
  */
-static void sensor_mode_task_entry(void *p_param)
+static void sensor_task_entry(void *p_param)
 {
-    T_IO_MSG io_msg;
     os_alloc_secure_ctx(1024);
 
-    os_msg_queue_create(&sensor_mode_queue_handle, "sensor mode", 20, sizeof(T_IO_MSG));
-
+    os_msg_queue_create(&sensor_queue_handle, "sensorQ", 20, sizeof(T_IO_MSG));
 
     while (true)
     {
-        if (os_msg_recv(sensor_mode_queue_handle, &io_msg, 0xFFFFFFFF) == true)
+        T_IO_MSG io_msg;
+        if (os_msg_recv(sensor_queue_handle, &io_msg, 0xFFFFFFFF) == true)
         {
-
+            DBG_DIRECT("=====%s %d", __FUNCTION__, __LINE__);
 
         }
     }
@@ -78,34 +77,34 @@ void scheduler_hook(void *from, void *to)
 
     //OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
     //rt_kprintf("PLATFORM_SCENARIO_OPERATION_MODE = %d \n", mode);
-    char **from_task_name;
-    char **to_task_name;
-    os_task_name_get(from, from_task_name);
-    os_task_name_get(from, to_task_name);
+    char *from_task_name;
+    char *to_task_name;
+    os_task_name_get(from, &from_task_name);
+    os_task_name_get(to, &to_task_name);
 
-    if (
-        (strcmp(*from_task_name, "sensor_mode") == 0) && \
-        ((strcmp(*to_task_name, "idle") != 0) || (strcmp(*to_task_name, "IDLE") != 0)) \
-    )
+    if ((strcmp(from_task_name, "sensor") == 0) && (strcmp(to_task_name, "IDLE") != 0))
     {
         //need set to HP mode
         //need set clock to 200M
+        uint32_t ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE, OPERATION_HP_MODE);
+        DBG_DIRECT("from sensor to IDLE ret %d", ret);
     }
 
-    if (
-        (strcmp(*to_task_name, "sensor_mode") == 0) && \
-        ((strcmp(*from_task_name, "idle") == 0) || (strcmp(*from_task_name, "IDLE") == 0))
-    )
+    if ((strcmp(to_task_name, "sensor") == 0) && (strcmp(from_task_name, "IDLE") == 0))
     {
         //need set to sensor mode
         //need set clock to 40M
+        //uint32_t ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE, OPERATION_SENSOR_MODE);
+        DBG_DIRECT("from IDLE to sensor ret %d");
     }
+    OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
+    DBG_DIRECT("PLATFORM_SCENARIO_OPERATION_MODE = %d \n", mode);
 }
 
-void sensor_mode_task_init(void)
+void sensor_task_init(void)
 {
-    void *app_task_handle;   //!< APP Task handle
-    os_task_create(&app_task_handle, "sensor_mode", sensor_mode_task_entry, NULL, 1024, 2);
+    os_task_create(&sensor_task_handle, "sensor", sensor_task_entry, NULL, 1024, 1);
+    os_ext_func_init();
     os_sched_set_hook(scheduler_hook);
 }
 
