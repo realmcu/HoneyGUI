@@ -298,7 +298,7 @@ typedef enum vg_lite_buffer_format
 
     /* Original VGLite API image format enums */
 
-    VG_LITE_RGBA8888                        =  0 | (1 << 10),
+    VG_LITE_RGBA8888                        =  0 | (1 << 10), //by howie A(24~31),R(16~23),G(8~15),B(0~7)
     VG_LITE_BGRA8888                        =  1 | (1 << 10),
     VG_LITE_RGBX8888                        =  2 | (1 << 10),
     VG_LITE_BGRX8888                        =  3 | (1 << 10),

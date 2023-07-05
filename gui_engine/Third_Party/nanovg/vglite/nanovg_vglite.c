@@ -18,6 +18,32 @@
 
 #endif
 
+#define PATH_CMD_LEN 512
+static uint8_t path_cmd[PATH_CMD_LEN];
+static vg_lite_float_t path_data[PATH_CMD_LEN];
+
+static void multiply(vg_lite_matrix_t *matrix, vg_lite_matrix_t *mult)
+{
+    vg_lite_matrix_t temp;
+    int row, column;
+
+    /* Process all rows. */
+    for (row = 0; row < 3; row++)
+    {
+        /* Process all columns. */
+        for (column = 0; column < 3; column++)
+        {
+            /* Compute matrix entry. */
+            temp.m[row][column] = (matrix->m[row][0] * mult->m[0][column])
+                                  + (matrix->m[row][1] * mult->m[1][column])
+                                  + (matrix->m[row][2] * mult->m[2][column]);
+        }
+    }
+
+    /* Copy temporary matrix into result. */
+    memcpy(matrix, &temp, sizeof(temp));
+}
+
 static int vglite_nvg_renderCreate(void *uptr)
 {
     NANOVG_LOG(" %s %d\n", __func__, __LINE__);
@@ -91,9 +117,6 @@ void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
     NANOVG_LOG(" %s %d\n", __func__, __LINE__);
     vg_lite_buffer_t *target = (vg_lite_buffer_t *)uptr;
 
-#define PATH_CMD_LEN 512
-    static uint8_t path_cmd[PATH_CMD_LEN];
-    static vg_lite_float_t path_data[PATH_CMD_LEN];
     uint32_t cmd_cnt = 0;
     uint32_t data_cnt = 0;
 
@@ -128,17 +151,24 @@ void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
+    uint8_t r = paint->innerColor.r * 0xff;
+    uint8_t g = paint->innerColor.g * 0xff;
+    uint8_t b = paint->innerColor.b * 0xff;
+    uint8_t a = paint->innerColor.a * 0xff;
+
+    vg_lite_color_t color = (a << 24) | (b << 16) | (g << 8) | r;
     vg_lite_set_stroke(&path, VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, strokeWidth, 60, NULL, 0, 0,
-                       0xFF00FF00);
+                       color);
     vg_lite_update_stroke(&path);
     vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH);
-    vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, 0xFF00FF00);
+    vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, color);
     vg_lite_finish();
     vg_lite_clear_path(&path);
 
-
-
 }
+
+
+
 void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
                            NVGcompositeOperationState compositeOperation,
                            NVGscissor *scissor, float fringe, const float *bounds, const NVGpath *paths,
@@ -146,10 +176,6 @@ void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
 {
     vg_lite_buffer_t *target = (vg_lite_buffer_t *)uptr;
 
-
-#define PATH_CMD_LEN 512
-    static uint8_t path_cmd[PATH_CMD_LEN];
-    static vg_lite_float_t path_data[PATH_CMD_LEN];
     uint32_t cmd_cnt = 0;
     uint32_t data_cnt = 0;
 
@@ -171,6 +197,7 @@ void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
                 path_data[data_cnt++] = v->x;
                 path_data[data_cnt++] = v->y;
             }
+            NANOVG_LOG(" %s j = %d\n", __func__, j);
         }
         path_cmd[cmd_cnt++] = VLC_OP_END;
     }
@@ -183,7 +210,68 @@ void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, 0xFF00FF00);
+
+    uint8_t inner_r = paint->innerColor.r * 0xff;
+    uint8_t inner_g = paint->innerColor.g * 0xff;
+    uint8_t inner_b = paint->innerColor.b * 0xff;
+    uint8_t inner_a = paint->innerColor.a * 0xff;
+    uint8_t outer_r = paint->outerColor.r * 0xff;
+    uint8_t outer_g = paint->outerColor.g * 0xff;
+    uint8_t outer_b = paint->outerColor.b * 0xff;
+    uint8_t outer_a = paint->outerColor.a * 0xff;
+
+    uint32_t inner_color = (inner_a << 24) | (inner_b << 0) | (inner_g << 8) | (inner_r << 16);
+    uint32_t outer_color = (outer_a << 24) | (outer_b << 0) | (outer_g << 8) | (outer_r << 16);
+
+    if (memcmp(&(paint->innerColor), &(paint->outerColor), sizeof(paint->outerColor)) == 0)
+    {
+        vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, inner_color);
+    }
+    else if (paint->radius == 0)
+    {
+        NANOVG_LOG(" %s %d\n", __func__, __LINE__);
+        const float large = 1e5;
+        float dx = paint->xform[2];
+        float dy = paint->xform[3];
+        float d = (paint->extent[1] - large) * 2;
+        float sx = paint->xform[4] + dx * large;
+        float sy = paint->xform[5] + dy * large;
+        float ex = sx + d * dx;
+        float ey = sy + d * dy;
+
+        vg_lite_linear_gradient_t grad;
+        memset(&grad, 0, sizeof(vg_lite_linear_gradient_t));
+        vg_lite_init_grad(&grad);
+
+
+        uint32_t colors[] = {inner_color, outer_color};
+        uint32_t stops[] = {0, VLC_GRADIENT_BUFFER_WIDTH - 1};
+        vg_lite_set_grad(&grad, 2, colors, stops);
+        vg_lite_update_grad(&grad);
+        vg_lite_matrix_t *gradMatrix = vg_lite_get_grad_matrix(&grad);
+        vg_lite_identity(gradMatrix);
+
+        vg_lite_float_t cos_angle = dy;
+        vg_lite_float_t sin_angle = dx;
+        /* Set rotation matrix. */
+        vg_lite_matrix_t r = { { {cos_angle, -sin_angle, 0.0f},
+                {sin_angle, cos_angle, 0.0f},
+                {0.0f, 0.0f, 1.0f}
+            }
+        };
+        multiply(gradMatrix, &r);
+
+        vg_lite_scale(d / VLC_GRADIENT_BUFFER_WIDTH, 1, gradMatrix);
+        vg_lite_draw_gradient(target, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &grad, VG_LITE_BLEND_NONE);
+    }
+    else
+    {
+        float cx = paint->xform[4];
+        float cy = paint->xform[5];
+        float inr = paint->radius - paint->feather / 2;
+        float outr = paint->radius + paint->feather / 2;
+    }
+
     vg_lite_finish();
     vg_lite_clear_path(&path);
 }
@@ -194,7 +282,6 @@ NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtextu
 {
     NVGparams params;
     NVGcontext *ctx = NULL;
-    //AGGENVGcontext* agge = new AGGENVGcontext();
     static vg_lite_buffer_t target;
     memset(&target, 0x00, sizeof(vg_lite_buffer_t));
     target.width  = w;
@@ -204,7 +291,6 @@ NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtextu
     target.address = (uint32_t)data;
     target.stride = target.width * 4;
 
-    //if (agge == NULL) goto error;
 
     memset(&params, 0, sizeof(params));
     params.renderCreate = vglite_nvg_renderCreate;
@@ -222,11 +308,6 @@ NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtextu
     params.userPtr = (void *)&target;
     params.edgeAntiAlias = 1;
 
-    //nvgInitAGGE(agge, &params, w, h, stride, format, data);
-
-
-    //vg_lite_clear(&target, NULL, 0xFFFFAAAA);
-    //vg_lite_finish();
 
     ctx = nvgCreateInternal(&params);
     if (ctx == NULL) { goto error; }
