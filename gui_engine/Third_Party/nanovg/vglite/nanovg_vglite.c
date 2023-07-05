@@ -20,7 +20,7 @@
 
 #define PATH_CMD_LEN 512
 static uint8_t path_cmd[PATH_CMD_LEN];
-static vg_lite_float_t path_data[PATH_CMD_LEN];
+static vg_lite_float_t path_data[PATH_CMD_LEN * 2];
 
 static void multiply(vg_lite_matrix_t *matrix, vg_lite_matrix_t *mult)
 {
@@ -141,6 +141,12 @@ void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
         }
         path_cmd[cmd_cnt++] = VLC_OP_END;
     }
+    if (cmd_cnt >= PATH_CMD_LEN)
+    {
+        NANOVG_LOG(" ERROR !%s %d, cmd_cnt >= PATH_CMD_LEN\n", __func__, __LINE__);
+        *(uint32_t *)0xFFFFFFFF = 0;
+        while (1);
+    }
 
 
     vg_lite_path_t path;
@@ -200,6 +206,12 @@ void vglite_nvg_renderFill(void *uptr, NVGpaint *paint,
             NANOVG_LOG(" %s j = %d\n", __func__, j);
         }
         path_cmd[cmd_cnt++] = VLC_OP_END;
+    }
+    if (cmd_cnt >= PATH_CMD_LEN)
+    {
+        NANOVG_LOG(" ERROR !%s %d, cmd_cnt >= PATH_CMD_LEN\n", __func__, __LINE__);
+        *(uint32_t *)0xFFFFFFFF = 0;
+        while (1);
     }
 
     vg_lite_path_t path;
