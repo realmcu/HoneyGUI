@@ -100,8 +100,11 @@
 			</tab>
 			<tab idx="8">t2
 				<switch x="100" y="100" w="100" h="100" 
-					picture="app/system/resource/switchOff.bin" 
-					highlightPicture="app/system/resource/switchOn.bin" >tab8Switch
+					picture="app/test/resource/rgba/light_off.bin" 
+					clickedPicture = "app/test/resource/rgba/light_off_click.bin" 
+					highlightPicture="app/test/resource/rgba/light_on.bin"
+					clickedHighlightPicture="app/test/resource/rgba/light_off_on.bin"
+					 >tab8Switch
 				</switch>
 				<textbox text="switch开关控件" ></textbox>
 			</tab>
