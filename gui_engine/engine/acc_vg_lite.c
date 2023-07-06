@@ -759,7 +759,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     target.address = (uint32_t)dc->frame_buf;
     target.tiled = VG_LITE_LINEAR;
 
-    vg_lite_clear(&target, NULL, 0xFF0000FF);
     vg_lite_buffer_t source;
     memset(&source, 0x00, sizeof(vg_lite_buffer_t));
 

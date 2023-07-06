@@ -17,8 +17,6 @@ if not GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
     src += ['app_launcher2_watchface1.c']
     src += ['app_launcher2_wave.c']
     src += ['app_launcher2_palette_wheel.c']
-if GetDepend(['MODULE_VG_LITE']):
-    src += ['vg_lite_demo.c']
 CPPPATH = [cwd,cwd + '/root_image']
 if GetDepend(['MODULE_RTK_GUI_WRISTBAND_DEMO']):
     src = []
