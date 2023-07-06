@@ -23,7 +23,7 @@ extern "C" {
 
 #define TOUCH_816S_RST                                     P5_0
 #define TOUCH_816S_INT                                     P5_1
-#define TOUCH_816S_SCL                                     P5_2
+#define TOUCH_816S_SCL                                     P5_5
 #define TOUCH_816S_SDA                                     P5_3
 
 #define TOUCH_816S_ADDR                                      0x15
