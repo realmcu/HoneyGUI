@@ -27,6 +27,23 @@ void gui_switch_change_switch(gui_switch_t *sw)
 
 
 }
+static void gui_switch_hl(gui_switch_t *sw)
+{
+
+    //sw->off->base.not_show = (sw->ifon);
+    //sw->on->base.not_show = !(sw->ifon);
+    if (sw->ifon)
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->on_hl_pic_addr, 0, 0);
+    }
+    else
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->off_hl_pic_addr, 0, 0);
+    }
+    //gui_app_exec(gui_current_app());
+
+
+}
 static void switch_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -36,7 +53,7 @@ static void switch_prepare(gui_obj_t *obj)
         (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
     {
 
-        if (((tp->type == TOUCH_SHORT) &&
+        /*if (((tp->type == TOUCH_SHORT) &&
              ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) && (tp->y >= obj->dy &&
                                                                     tp->y <= (obj->dy + obj->h)))))
         {
@@ -53,6 +70,130 @@ static void switch_prepare(gui_obj_t *obj)
             {
                 //gui_log("switch_prepare5\n");
                 gui_obj_event_set(obj, GUI_EVENT_2);
+            }
+
+        }*/
+        if (
+            ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) && (tp->y >= obj->dy &&
+                                                                   tp->y <= (obj->dy + obj->h))))
+        {
+            gui_switch_t *b = (void *)obj;
+            switch (tp->type)
+            {
+            case TOUCH_SHORT:
+                {
+
+
+                }
+                break;
+            case TOUCH_UP_SLIDE:
+                {
+
+                }
+                break;
+            case TOUCH_DOWN_SLIDE:
+                {
+
+                }
+                break;
+            case TOUCH_LEFT_SLIDE:
+                {
+
+                }
+                break;
+            case TOUCH_RIGHT_SLIDE:
+                {
+
+                }
+                break;
+            case TOUCH_LONG:
+                {
+                    if (b->long_flag == false)
+                    {
+
+                        //if (b->long_click_cb)
+                        {
+                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                            {
+                                b->long_flag = true;
+                                //gui_send_callback_p_to_server(b->long_click_cb, b->long_click_cb_p);
+                                // gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                            }
+                        }
+                    }
+                }
+                break;
+
+            default:
+                break;
+            }
+
+
+            {
+                if (tp->pressed)
+                {
+
+                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                    {
+
+                        //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+
+                        //gui_log("%d\n", __LINE__);
+                        //gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  //gui_log("%d\n", __LINE__);
+                        b->long_flag = false;
+                        b->press_flag = true;
+                        gui_switch_hl(b);
+                    }
+                }
+
+                if (b->release_flag)
+                {
+
+                    {
+                        b->press_flag = false;
+                        b->release_flag = false;
+                        //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+                        //gui_log("%d\n", __LINE__);
+
+                        //if (callback)
+                        {
+                            //gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+                        }  //gui_log("%d\n", __LINE__);
+
+                        b->long_flag = false;
+////gui_log("%s\n", "TOUCH_SHORT");
+                        //
+
+                        //if (callback)
+                        {
+                            //gui_log("%d\n", __LINE__);
+                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                            {
+                                //gui_log("%d\n", __LINE__);
+                                gui_switch_t *sw = (gui_switch_t *)obj;
+                                sw->ifon = !(sw->ifon);
+                                gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
+                                if (sw->ifon)
+                                {
+                                    //gui_log("switch_prepare4\n");
+                                    gui_obj_event_set(obj, GUI_EVENT_1);
+                                }
+                                else if (!sw->ifon)
+                                {
+                                    //gui_log("switch_prepare5\n");
+                                    gui_obj_event_set(obj, GUI_EVENT_2);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (tp->released && b->press_flag)
+                {
+                    b->release_flag = true;
+                }
             }
 
         }
@@ -190,6 +331,8 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->onOff = onOff;
     this->off_pic_addr = off_pic;
     this->on_pic_addr = on_pic;
+    this->off_hl_pic_addr = this->off_pic_addr;
+    this->on_hl_pic_addr = this->on_pic_addr;
 }
 #include "gui_magic_img.h"
 gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,

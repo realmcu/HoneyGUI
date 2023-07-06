@@ -22,7 +22,12 @@ struct gui_switch
     gui_img_t *switch_picture;
     void *on_pic_addr;
     void *off_pic_addr;
+    void *on_hl_pic_addr;
+    void *off_hl_pic_addr;
     bool ifon;
+    bool press_flag;
+    bool long_flag;
+    bool release_flag;
     void (*turn_off)(gui_switch_t *sw);
     void (*turn_on)(gui_switch_t *sw);
     void (*onOn)(gui_switch_t *this, void *cb, void *p);

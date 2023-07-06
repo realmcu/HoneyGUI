@@ -114,8 +114,8 @@ unsigned short string_rgb888_to_rgb565(const char *color)
         gui_log("color format wrong");
         return 0;
     }
-    uint32_t c = strtol(color + 1, NULL, 16);
-    gui_log("color%s:%x,%x\n", color + 1, c, RGB888ToRGB565(c));
+    uint32_t c = strtoul(color + 1, NULL, 16);
+    gui_log("color%s:%x,%x\n", color, c, RGB888ToRGB565(c));
     return RGB888ToRGB565(c);
 }
 uint32_t string_rgb888(const char *color)
@@ -1414,7 +1414,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         else if (!strcmp(p->attr[i], "fontColor"))
                         {
-                            font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            //font_color = string_rgb888_to_rgb565(p->attr[++i]);
+                            font_color = string_rgb888(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "fontSize"))
                         {
@@ -1478,6 +1479,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
                     gui_button_text_move((void *)parent, text_x, text_y);
+                    GUI_TYPE(gui_button_t, parent)->text->color = font_color;
                     gui_button_api.onPress((void *)parent, sport_button_press, parent);
                     gui_button_api.onRelease((void *)parent, sport_button_release, parent);
 
@@ -1560,6 +1562,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t h = 0;
                     char *picture = NULL;
                     char *hl_picture = NULL;
+                    char *pictureHl = NULL;
+                    char *hl_pictureHl = NULL;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1591,6 +1595,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             hl_picture = gui_strdup(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "clickedPicture"))
+                        {
+                            pictureHl = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "clickedHighlightPicture"))
+                        {
+                            hl_pictureHl = gui_strdup(p->attr[++i]);
+                        }
 
                         i++;
                     }
@@ -1604,6 +1616,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     parent = (void *)gui_switch_create(parent, x, y, w, h, img1, img2);
                     parent->name = get_space_string_head(p->txt);
+                    GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = gui_get_file_address(hl_pictureHl);
+                    GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
 
                 }
                 break;
