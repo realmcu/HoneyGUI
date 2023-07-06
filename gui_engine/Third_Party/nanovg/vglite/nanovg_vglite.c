@@ -139,7 +139,7 @@ void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
                 path_data[data_cnt++] = v->y;
             }
         }
-        path_cmd[cmd_cnt++] = VLC_OP_END;
+        //path_cmd[cmd_cnt++] = VLC_OP_END;
     }
     if (cmd_cnt >= PATH_CMD_LEN)
     {
@@ -157,17 +157,20 @@ void vglite_nvg_renderStroke(void *uptr, NVGpaint *paint,
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    uint8_t r = paint->innerColor.r * 0xff;
-    uint8_t g = paint->innerColor.g * 0xff;
-    uint8_t b = paint->innerColor.b * 0xff;
+
     uint8_t a = paint->innerColor.a * 0xff;
+    uint8_t r = paint->innerColor.r * 0xff * paint->innerColor.a;
+    uint8_t g = paint->innerColor.g * 0xff * paint->innerColor.a;
+    uint8_t b = paint->innerColor.b * 0xff * paint->innerColor.a;
+
 
     vg_lite_color_t color = (a << 24) | (b << 16) | (g << 8) | r;
+
     vg_lite_set_stroke(&path, VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, strokeWidth, 60, NULL, 0, 0,
                        color);
     vg_lite_update_stroke(&path);
     vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH);
-    vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, color);
+    vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, color);
     vg_lite_finish();
     vg_lite_clear_path(&path);
 
