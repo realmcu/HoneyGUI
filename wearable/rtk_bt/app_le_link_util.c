@@ -136,6 +136,7 @@ bool app_reg_le_link_disc_cb(uint8_t conn_id, P_FUN_LE_LINK_DISC_CB p_fun_cb)
     if (p_link != NULL)
     {
         T_LE_DISC_CB_ENTRY *p_entry;
+#if defined RTL8772F || defined RTL8762G
         for (uint8_t i = 0; i < p_link->disc_cb_list.count; i++)
         {
             p_entry = os_queue_peek(&p_link->disc_cb_list, i);
@@ -144,6 +145,24 @@ bool app_reg_le_link_disc_cb(uint8_t conn_id, P_FUN_LE_LINK_DISC_CB p_fun_cb)
                 return true;
             }
         }
+#elif defined RTL8762D
+        T_OS_QUEUE_ELEM *p_curr_elem;
+        for (uint8_t i = 0; i < p_link->disc_cb_list.count; i++)
+        {
+            p_curr_elem = (void *)&p_link->disc_cb_list.p_first;
+            uint8_t index = i;
+            while (index > 0 && p_curr_elem != NULL)
+            {
+                p_curr_elem = p_curr_elem->p_next;
+                index--;
+            }
+            p_entry = (void *)p_curr_elem;
+            if (p_entry != NULL && p_entry->disc_callback == p_fun_cb)
+            {
+                return true;
+            }
+        }
+#endif
         p_entry = os_mem_zalloc(RAM_TYPE_DATA_ON, sizeof(T_LE_DISC_CB_ENTRY));
         if (p_entry != NULL)
         {

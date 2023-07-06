@@ -53,7 +53,8 @@ void add_valid_node(T_DATAQUEUE_NODE *valid_queue_hdr, T_DATAQUEUE_NODE *node);
 void delete_valid_node(T_DATAQUEUE_NODE *empty_queue_hdr, T_DATAQUEUE_NODE *valid_queue_hdr);
 T_DATAQUEUE_NODE *get_valid_node(T_DATAQUEUE_NODE *valid_queue_hdr, uint8_t node_num);
 uint8_t data_queue_depth_get(T_DATAQUEUE_NODE *valid_queue_hdr);
-
+void empty_queue_init(T_DATAQUEUE_NODE *empty_queue_hdr, T_DATAQUEUE_NODE *data_node_array,
+                      uint8_t *data_node_buf, uint8_t buf_num_max, uint16_t buf_len_max);
 
 #ifdef __cplusplus
 }

@@ -29,6 +29,11 @@
 #include "ble_gap_msg.h"
 #include "ble_profile_init.h"
 #include "br_gap_init.h"
+
+#ifdef RTK_MODULE_USING_DATABASE
+#include <dp_notification.h>
+#endif // RTK_MODULE_USING_DATABASE
+
 #if (RTK_BR_TASK == 1)
 #include "dp_br_info.h"
 #include "btm.h"
@@ -168,7 +173,9 @@ void bt_task_entry(void *p_param)
     gap_lib_init();
     app_le_gap_init();
     app_le_profile_init();
+#ifdef RTK_MODULE_USING_DATABASE
     notification_data_manage_init();
+#endif // RTK_MODULE_USING_DATABASE
 #endif
 
 #ifdef RTK_BR_TASK

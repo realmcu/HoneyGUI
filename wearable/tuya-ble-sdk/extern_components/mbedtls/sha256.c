@@ -28,12 +28,12 @@
 
 #if defined(MBEDTLS_SHA256_C)
 
-#include "sha256.h"
+#include "mbedtls_sha256.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define mbedtls_printf //printf
+#include "trace.h"
+#define mbedtls_printf  DBG_DIRECT
 
 /* Internal macros meant to be called only from within the library. */
 #define MBEDTLS_INTERNAL_VALIDATE_RET( cond, ret )  do { } while( 0 )

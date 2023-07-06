@@ -3,7 +3,7 @@
 #include "trace.h"
 #include "app_gatts_client.h"
 #include "ble_gap_msg.h"
-
+#include <ancs_client.h>
 
 
 static T_CLIENT_ID gatts_client_id;

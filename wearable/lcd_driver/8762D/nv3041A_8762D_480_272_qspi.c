@@ -529,9 +529,17 @@ void rtk_lcd_hal_init(void)
 
     rtk_lcd_hal_rect_fill(0, 0, 480, 272, 0xF0F0F0F0);
 
-
 }
 
+uint32_t rtk_lcd_hal_power_on(void)
+{
+    return 0;
+}
+
+uint32_t rtk_lcd_hal_power_off(void)
+{
+    return 0;
+}
 
 
 

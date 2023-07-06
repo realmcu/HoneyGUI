@@ -13,6 +13,7 @@
 #include "bt_task.h"
 #include "ble_gap_init.h"
 #include "ble_gap_msg.h"
+#include <gatts_client.h>
 
 static T_GAP_DEV_STATE gap_dev_state = {0, 0, 0, 0};                 /**< GAP device state */
 static T_GAP_CONN_STATE gap_conn_state = GAP_CONN_STATE_DISCONNECTED; /**< GAP connection state */

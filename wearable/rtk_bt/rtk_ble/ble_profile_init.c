@@ -6,6 +6,8 @@
 #include "board.h"
 #include "trace.h"
 #include "profile_client.h"
+#include "ancs.h"
+#include "app_gatts_client.h"
 #include "app_ble_bas.h"
 #ifdef RTK_TUYA_BLE_SDK
 #include "tuya_ble_app_demo.h"

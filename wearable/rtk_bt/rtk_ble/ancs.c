@@ -23,6 +23,10 @@
 #include <os_mem.h>
 #include <ancs.h>
 #include <ancs_client.h>
+#ifdef RTK_MODULE_USING_DATABASE
+#include "dp_notification.h"
+#endif // RTK_MODULE_USING_DATABASE
+
 //#include <ams_client.h>
 /** @defgroup  PERIPH_ANCS Peripheral ANCS
     * @brief Apple ANCS service modulization
@@ -754,11 +758,19 @@ void ancs_init(uint8_t link_num)
     }
     for (i = 0; i < ancs_link_number; i++)
     {
+#if defined RTL8772F || defined RTL8762G
         if (os_msg_queue_create(&(ancs_link_table[i].ancs_queue_handle), "ancsQ", ANCS_MSG_QUEUE_NUM,
                                 sizeof(T_ANCS_MSG)) == false)
         {
             APP_PRINT_ERROR2("ancs_init: link_num %d, i 0x%x create queue failed", link_num, i);
         }
+#elif defined RTL8762D
+        if (os_msg_queue_create(&(ancs_link_table[i].ancs_queue_handle), ANCS_MSG_QUEUE_NUM,
+                                sizeof(T_ANCS_MSG)) == false)
+        {
+            APP_PRINT_ERROR2("ancs_init: link_num %d, i 0x%x create queue failed", link_num, i);
+        }
+#endif
     }
     ancs_client = ancs_add_client(ancs_client_cb, link_num);
 }

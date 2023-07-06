@@ -81,12 +81,12 @@ static void lcd_pad_init(void)
     Pinmux_Config(LCD_8080_WR, IDLE_MODE);
 
     /*BL AND RESET ARE NOT FIX*/
-    Pad_Config(LCD_8080_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(LCD_8080_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
 
-    Pinmux_Config(LCD_8080_BL, timer_pwm4);
+    // Pinmux_Config(LCD_8080_BL, timer_pwm4);
 
 }
-void lcd_enter_dlps(void)
+uint32_t rtk_lcd_hal_power_off(void)
 {
     Pad_Config(LCD_8080_D0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
     Pad_Config(LCD_8080_D1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
@@ -107,8 +107,9 @@ void lcd_enter_dlps(void)
     Pad_Config(LCD_8080_WR, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
 
     Pad_Config(LCD_8080_BL, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    return 0;
 }
-void lcd_exit_dlps(void)
+uint32_t rtk_lcd_hal_power_on(void)
 {
     Pad_Config(LCD_8080_D0, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
     Pad_Config(LCD_8080_D1, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
@@ -129,6 +130,7 @@ void lcd_exit_dlps(void)
     Pad_Config(LCD_8080_WR, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE, PAD_OUT_LOW);
 
     Pad_Config(LCD_8080_BL, PAD_PINMUX_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    return 0;
 }
 
 
@@ -369,7 +371,7 @@ void rtk_lcd_hal_init(void)
 
     st7796_write_cmd(0x11);
     st7796_write_cmd(0x29);
-    lcd_set_backlight(100);
+    // lcd_set_backlight(100);
 }
 
 
