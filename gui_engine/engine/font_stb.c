@@ -9,7 +9,7 @@ static stbtt_fontinfo font;
 
 static void rtgui_font_stb_load(gui_text_t *text)
 {
-    //gui_font_stb_init(text->path);
+    gui_font_stb_init(text->path);
     uint16_t *p_buf = gui_malloc(text->len * sizeof(uint16_t));
     if (p_buf == NULL)
     {

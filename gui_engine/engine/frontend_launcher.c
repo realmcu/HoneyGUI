@@ -126,6 +126,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_button_api.onRelease(button, button_release_cb, button);
                     button->data = gui_strdup(path);
                     gui_button_text_move(button, 0, 70);
+                    button->text->path = gui_get_file_address("app/system/resource/font/malgunbd.ttf");
                 }
 
             }
@@ -140,7 +141,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
 static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_frontend_ui_design\n");
-    gui_font_stb_init(gui_get_file_address("app/system/resource/font/malgunbd.ttf"));
+    //gui_font_stb_init(gui_get_file_address("app/system/resource/font/malgunbd.ttf"));
 
 
     g = gui_grid_create(&app->screen, 100, 100, 4, 2, 100, 100);
@@ -159,7 +160,7 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
 }
 static void app_xml_ui_design(gui_app_t *app)
 {
-    gui_font_stb_init(gui_get_file_address("app/system/resource/font/malgunbd.ttf"));
+
 
     extern void create_tree(gui_app_t *app);
     create_tree(app);

@@ -226,7 +226,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t w = gui_get_screen_width();
                     int16_t h = 50;
                     const char *text = "text";
-                    const char *font = "rtk_font_stb";
+                    char *font = "app/system/resource/font/malgunbd.ttf";
                     size_t color = 0xffffffff;
                     int fontSize = 30;
                     int style = 0;
@@ -307,6 +307,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             t = gui_text_create(parent, ptxt, x, y, gui_get_screen_width(), h);
                             gui_text_set(t, gui_strdup(text), "rtk_font_stb", color, strlen(text), fontSize);
+                            t->path = gui_get_file_address(font);
                         }
                         else
                         {
@@ -1365,7 +1366,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0;
                     int16_t h = 0;
-                    char *font_type = "rtk_font_fs32";
+                    char *font_type = "app/system/resource/font/malgunbd.ttf";
                     char *text = NULL;
                     int text_x = 0;
                     int text_y = 0;
@@ -1482,7 +1483,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_button_t, parent)->text->color = font_color;
                     gui_button_api.onPress((void *)parent, sport_button_press, parent);
                     gui_button_api.onRelease((void *)parent, sport_button_release, parent);
-
+                    GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
 
 
 
