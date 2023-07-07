@@ -49,7 +49,7 @@ typedef struct gui_text
     gui_animate_t *animate;
     // uint8_t font_width;
 
-    // void *path;// address or path
+    void *path;// address or path
     // int fd_table;
     // int fd_dot;
 } gui_text_t;

@@ -69,7 +69,7 @@ void *rtk_gui_timer(void *arg)
     while (true)
     {
         usleep(10 * 1000); //10ms
-        gui_tick_increase();
+        // gui_tick_increase();
     }
 }
 void gui_port_os_init(void)

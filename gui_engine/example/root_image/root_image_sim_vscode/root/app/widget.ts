@@ -25,6 +25,10 @@ var icon = {
     onPress : function (callback_func) {},
     onRelease : function (click_callback_func) {},
     onHold : function (callback_func) {},
+    getAttribute : function(attributeName : string) {},
+    setAttribute :function(attributeName : string, value : any) {},
+    getChildElementByTag : function (tag:string) {},
+    write : function (txt_string) {},
 }
 var textbox = {
     getElementById : function (win_name : string) {},

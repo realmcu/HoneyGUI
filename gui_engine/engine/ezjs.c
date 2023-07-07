@@ -569,6 +569,80 @@ DECLARE_HANDLER(getElementById)
     jerry_release_value(app_property);
     return jerry_create_undefined();
 }
+#include "ezxml.h"
+DECLARE_HANDLER(getAttribute)
+{
+    if (args_cnt != 1 || !jerry_value_is_string(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    ezxml_t title;
+    jerry_get_object_native_pointer(this_value, (void *)&title, NULL);
+    printf("ezxmltitle:%x", title);
+    char *widget_type = ezxml_attr(title, js_value_to_string(args[0]));
+    return jerry_create_string(widget_type);
+}
+
+extern const char *get_tag_by_widget_type(int type);
+extern const char *get_child_ele_attr(char *xml, char *ele, char *txt, char *chile_ele, char *attr);
+extern ezxml_t get_child_ele(char *xml, char *ele, char *txt, char *chile_ele);
+DECLARE_HANDLER(getChildElementByTag)
+{
+    if (args_cnt != 1 || !jerry_value_is_string(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_obj_t *widget = NULL;
+    jerry_get_object_native_pointer(this_value, &widget, NULL);
+    char *name = widget->name;
+    int type = widget->type;
+    jerry_value_t global_obj = jerry_get_global_object();
+    jerry_value_t app_property = js_get_property(global_obj, "app");
+    gui_app_t *app = NULL;
+    jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
+    printf("app:%s,%s\n", app->xml, name);
+    char *widget_type = get_tag_by_widget_type(type);
+    ezxml_t c = get_child_ele(app->xml, widget_type, name, js_value_to_string(args[0]));
+    printf("ezxmlc:%x", c);
+    jerry_value_t v = jerry_create_object();
+    jerry_set_object_native_pointer(v, c, NULL);
+    REGISTER_METHOD(v, getAttribute);
+    return v;
+}
+DECLARE_HANDLER(icon_write)
+{
+    if (args_cnt != 1 || !jerry_value_is_string(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_button_t *txtbox = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
+    //gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
+    if (txtbox)
+    {
+        /*jerry_value_t s = jerry_value_to_string(args[0]);//gui_log("jerryenter1\n");
+        jerry_length_t length = jerry_get_utf8_string_length(s); //gui_log("jerryenter2\n");
+        jerry_char_t *strbuf1 = gui_malloc(length + 1); //gui_log("jerryenter3\n");
+        //gui_log("strbuf1=%p\n",strbuf1);//gui_log("txtbox->text_type:%s,\n",txtbox->text_type);
+        jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); //gui_log("jerryenter4\n");
+        strbuf1[length] = '\0';
+        //gui_log("txtbox->text_type:%s,\n",txtbox->text_type);
+        txtbox->text->utf_8 = strbuf1;*/
+        char *strbuf1 = js_value_to_string(args[0]);
+        printf("iconwrite:%s\n", strbuf1);
+        gui_text_set(txtbox->text, strbuf1, "rtk_font_stb", txtbox->text->color, strlen(strbuf1),
+                     txtbox->text->font_height);
+        //jerry_release_value(s);
+        jerry_value_t global_obj = jerry_get_global_object();
+        jerry_value_t app_property = js_get_property(global_obj, "app");
+        gui_app_t *app = NULL;
+        jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
+        jerry_release_value(global_obj);
+        jerry_release_value(app_property);
+        //gui_exec(app->screen);
+    }
+    return jerry_create_undefined();
+}
 #if 0
 void js_timeout(void *p)
 {
@@ -1261,6 +1335,7 @@ DECLARE_HANDLER(sw_open)
     return jerry_create_undefined();
 }
 
+
 jerry_value_t fs_init()
 {
     jerry_value_t fs = jerry_create_object();
@@ -1291,6 +1366,7 @@ void gui_js_init()
 //    REGISTER_METHOD(global_obj, alert);
     //REGISTER_METHOD(global_obj, confirm);
     //
+    REGISTER_METHOD(global_obj, getAttribute);
     jerry_value_t img = jerry_create_object();
     js_set_property(global_obj, "img", img);
     REGISTER_METHOD(img, getElementById);
@@ -1310,7 +1386,8 @@ void gui_js_init()
     REGISTER_METHOD(icon, onPress);
     REGISTER_METHOD(icon, onRelease);
     REGISTER_METHOD(icon, onHold);
-
+    REGISTER_METHOD(icon, getChildElementByTag);
+    REGISTER_METHOD_NAME(icon, "write", icon_write);
     jerry_value_t progress = jerry_create_object();
     js_set_property(global_obj, "progressbar", progress);
     REGISTER_METHOD(progress, progress);

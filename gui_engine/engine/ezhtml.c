@@ -1686,6 +1686,22 @@ void foreach_scan(ezxml_t p, const char *element, ezxml_t *target)
         foreach_scan(i->child, element, target);
     }
 }
+void foreach_scan_with_content(ezxml_t p, const char *element, ezxml_t *target, const char *content)
+{
+    ezxml_t i;
+    for (i = p; i != NULL; i = i->ordered)
+    {
+        printf("name:%s,txt:%s\n", i->name, i->txt);
+        if (strncmp(i->name, element, strlen(element)) == 0 &&
+            strncmp(i->txt, content, strlen(content)) == 0)
+        {
+
+            *target = i;
+            return;
+        }
+        foreach_scan_with_content(i->child, element, target, content);
+    }
+}
 void level_scan(ezxml_t p, char **pic, char **text)
 {
     ezxml_t i;
@@ -1760,9 +1776,38 @@ void create_tree(gui_app_t *app)
         js_run_file(path, app);
         gui_free(path);
     }
+}
+const char *get_child_ele_attr(char *xml, char *ele, char *txt, char *chile_ele, char *attr)
+{
+    ezxml_t f1 = ezxml_parse_file(xml);
+    ezxml_t t;
+    foreach_scan_with_content(f1, ele, &t, txt);
+    ezxml_t title = ezxml_get(t, chile_ele, -1);
+    return ezxml_attr(title, attr);
+}
+ezxml_t get_child_ele(char *xml, char *ele, char *txt, char *chile_ele)
+{
+    ezxml_t f1 = ezxml_parse_file(xml);
+    ezxml_t t;
+    foreach_scan_with_content(f1, ele, &t, txt);
+    ezxml_t title = ezxml_get(t, chile_ele, -1);
+    return title;
+}
+const char *get_tag_by_widget_type(int type)
+{
+    if (type == BUTTON)
+    {
+        type = ICON;
+    }
 
+    for (size_t i = 0; i < sizeof(widget) / sizeof(struct widget_create); i++)
+    {
+        if (widget[i].type == type)
+        {
+            return widget[i].name;
+        }
+    }
 
-    ezxml_free(f1);
 }
 void get_app(gui_app_t *app, char *pic, char *text)
 {
