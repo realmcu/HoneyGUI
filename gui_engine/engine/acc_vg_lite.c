@@ -926,25 +926,48 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
     while (shape_list)
     {
         NSVGpath *path_list = shape_list->paths;
+        uint32_t cmd_size = 0, cmd_offset = 0, data_offset = 0, data_size = 0;
+        uint8_t *cmd_list = NULL;
+        float *data_list = NULL;
         while (path_list)
         {
-            uint32_t cmd_size = 2, cmd_offset = 1;
+            cmd_size += 1;
             cmd_size += (path_list->npts - 1) / 3;
-            uint8_t *cmd_list = gui_malloc(cmd_size);
-            float *data_list = gui_malloc(sizeof(float) * (2 + 6 * ((path_list->npts - 1) / 3)));
-            cmd_list[0] = VLC_OP_MOVE;
-            memcpy(data_list, path_list->pts, 2 * sizeof(float));
+            cmd_list = gui_realloc(cmd_list, cmd_size);
+            data_size += 2;
+            data_size += 6 * ((path_list->npts - 1) / 3);
+            data_list = gui_realloc(data_list, sizeof(float) * data_size);
+            cmd_list[cmd_offset++] = VLC_OP_MOVE;
+            memcpy(data_list + data_offset, path_list->pts, 2 * sizeof(float));
+            uint32_t *pt = (uint32_t *)path_list->pts;
+            data_offset += 2;
             for (int i = 0; i < path_list->npts - 1; i += 3)
             {
                 cmd_list[cmd_offset++] = VLC_OP_CUBIC;
                 float *p = &path_list->pts[i * 2];
-                memcpy(data_list + i * 2 + 2, p + 2, 6 * sizeof(float));
+                memcpy(data_list + data_offset, p + 2, 6 * sizeof(float));
+                data_offset += 6;
+            }
+            if (path_list->closed)
+            {
+                cmd_size += 1;
+                cmd_list = gui_realloc(cmd_list, cmd_size);
+                cmd_list[cmd_offset++] = VLC_OP_CLOSE;
+                if (path_list->next)
+                {
+                    path_list = path_list->next;
+                    goto continue_font;
+                }
             }
             if ((shape_list->stroke.type == 1) && (path_list->closed == 0))
             {
-                cmd_size -= 1;
             }
-            cmd_list[cmd_offset++] = VLC_OP_END;
+            else
+            {
+                cmd_size += 1;
+                cmd_list = gui_realloc(cmd_list, cmd_size);
+                cmd_list[cmd_offset++] = VLC_OP_END;
+            }
             uint32_t data_len = vg_lite_path_calc_length(cmd_list, cmd_size, VG_LITE_FP32);
             vg_lite_init_path(&temp_path_record->path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, dc->fb_width,
                               dc->fb_height, -dc->fb_width, -dc->fb_height);
@@ -1058,6 +1081,12 @@ void hw_acc_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, in
             cmd_list = NULL;
             free(data_list);
             data_list = NULL;
+            cmd_size = 0;
+            cmd_offset = 0;
+            data_offset = 0;
+            data_size = 0;
+continue_font:
+            ;
         }
         shape_list = shape_list->next;
     }

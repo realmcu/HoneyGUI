@@ -209,6 +209,7 @@ static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_cou
     path->npts = (line_count) * 3 + 1;
 
     path->pts = (float *)gui_malloc(path->npts * 2 * sizeof(float));
+    memset(path->pts, 0, path->npts * 2 * sizeof(float));
     if (path->pts == NULL)
     {
         GUI_ASSERT(NULL != NULL);
