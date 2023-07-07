@@ -25,6 +25,22 @@ bool port_thread_mdelay(uint32_t ms)
     return true;
 }
 
+static uint32_t gui_tick = 0;
+
+void gui_tick_increase(void)
+{
+    gui_tick++;
+}
+
+uint32_t gui_tick_get(void)
+{
+    return gui_tick;
+}
+
+uint32_t port_thread_ms_get(void)
+{
+    return 10 * gui_tick;
+}
 
 
 void *port_malloc(uint32_t n)
@@ -53,6 +69,7 @@ static struct gui_os_api os_api =
     .thread_create = port_thread_create,
     .thread_delete = port_thread_delete,
     .thread_mdelay = port_thread_mdelay,
+    .thread_ms_get = port_thread_ms_get,
     .f_malloc = port_malloc,
     .f_realloc = port_realloc,
     .f_free = port_free,
@@ -69,7 +86,7 @@ void *rtk_gui_timer(void *arg)
     while (true)
     {
         usleep(10 * 1000); //10ms
-        // gui_tick_increase();
+        gui_tick_increase();
     }
 }
 void gui_port_os_init(void)
