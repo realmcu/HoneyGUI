@@ -4,7 +4,7 @@
  */
 
 #include <string.h>
-#include "sensor_mode_i2c.h"
+#include "sensor_i2c.h"
 #include "trace.h"
 
 
