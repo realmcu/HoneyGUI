@@ -70,7 +70,28 @@ static void sensor_task_entry(void *p_param)
 
 
 #include "platform_scenario_draft.h"
+typedef enum
+{
+    DVFS_NORMAL_VDD                 = 0,
+} DVFSVDDType;
 
+typedef enum
+{
+    DVFS_VDD_0V9                    = 0,
+    DVFS_VDD_0V8                    = 1,
+} DVFSVDDMode;
+
+typedef enum
+{
+    DVFS_SUCCESS                    = 0x0,
+    DVFS_BUSY                       = 0x1,
+    DVFS_VOLTAGE_FAIL               = 0x2,
+    DVFS_CONDITION_FAIL             = 0x4,
+    DVFS_SRAM_FAIL                  = 0x8,
+    DVFS_NOT_SUPPORT                = 0x10,
+} DVFSErrorCode;
+
+extern DVFSErrorCode(*dvfs_set_mode)(DVFSVDDType, DVFSVDDMode);
 void scheduler_hook(void *from, void *to)
 {
     //rt_kprintf("from task [%s] to task [%s] \n", from->name, to->name);
@@ -93,9 +114,12 @@ void scheduler_hook(void *from, void *to)
     if ((strcmp(to_task_name, "sensor") == 0) && (strcmp(from_task_name, "IDLE") == 0))
     {
         //need set to sensor mode
-        //need set clock to 40M
-        //uint32_t ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE, OPERATION_SENSOR_MODE);
-        DBG_DIRECT("from IDLE to sensor ret %d");
+        //need set clock to 40
+
+        DVFSErrorCode dvfs_ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V8);
+        uint32_t scenario_ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE,
+                                                           OPERATION_SENSOR_MODE);
+        DBG_DIRECT("from IDLE to sensor dvfs_ret %d scenario_ret %d", dvfs_ret, scenario_ret);
     }
     OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
     DBG_DIRECT("PLATFORM_SCENARIO_OPERATION_MODE = %d \n", mode);
