@@ -69,8 +69,6 @@ static void read_page_draw(gui_canvas_t *c)
                                              color.a * 255.0f));
     gui_canvas_api.wave(c, &w);
     if (app_launcher2_wave_t > 4058.454476f) { app_launcher2_wave_t = 0; }
-    gui_log("%d ", (int)(app_launcher2_wave_t * 100));
-
 }
 void wave_page(void *parent)
 {

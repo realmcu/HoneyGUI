@@ -1226,8 +1226,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
     path_data_len = vg_lite_path_calc_length(cmd, cmd_len - 4, VG_LITE_FP32);
     vg_lite_init_path(&stroke_path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, -dc->fb_width,
                       -dc->fb_height, dc->fb_width, dc->fb_height);
-    void *stroke_data = gui_malloc(path_data_len);
-    stroke_path.path = stroke_data;
     vg_lite_path_append(&stroke_path, cmd, data, cmd_len - 4);
     vg_lite_set_stroke(&stroke_path, VG_LITE_CAP_ROUND,
                        VG_LITE_JOIN_ROUND, 2.8, 6,
@@ -1276,9 +1274,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
         data_len = vg_lite_path_calc_length(circle_cmd, sizeof(circle_cmd), VG_LITE_FP32);
         vg_lite_init_path(&probe->path, VG_LITE_FP32, VG_LITE_HIGH, data_len, NULL, dc->fb_width,
                           dc->fb_height, -dc->fb_width, -dc->fb_height);
-        void *top_path_data = gui_malloc(data_len);
-        probe->path.path = top_path_data;
-        probe->path_data = top_path_data;
         vg_lite_path_append(&probe->path, circle_cmd, top_circle_data, sizeof(circle_cmd));
         vg_lite_draw(&target, &probe->path, VG_LITE_FILL_NON_ZERO, &matrix,
                      VG_LITE_BLEND_SRC_OVER, 0xFFDCDCDC);
@@ -1290,7 +1285,6 @@ void (hw_acc_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
     vg_lite_finish();
     gui_free(data);
     gui_free(cmd);
-    gui_free(stroke_data);
     vg_lite_clear_path(&stroke_path);
     vg_lite_clear_path(&wave_path);
     vg_lite_clear_grad(&wave_grad);
