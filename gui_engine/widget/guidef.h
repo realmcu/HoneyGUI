@@ -377,6 +377,7 @@ typedef enum obj_type
     RADIOSWITCH,
     ARC,
     JAVASCRIPT,
+    MOVIE,
 } obj_type_t;
 typedef struct rtgui_msg
 {
