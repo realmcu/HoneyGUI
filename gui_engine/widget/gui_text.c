@@ -129,7 +129,10 @@ void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
     this->font_height = height;
 }
 
-
+void gui_text_type_set(gui_text_t *this, void *type)
+{
+    this->path = type;
+}
 void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
                    int16_t y, int16_t w, int16_t h)
 {

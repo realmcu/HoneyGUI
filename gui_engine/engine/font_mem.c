@@ -19,17 +19,32 @@ typedef struct
     char *font_lib_tab_name;
 } fontlib_name_t;
 static fontlib_name_t fontlib_name;
-static fontlib_name_t *get_fontlib_name(uint8_t font_size)
+static fontlib_name_t *get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
 {
     fontlib_name_t *font_name = &fontlib_name;
     uint8_t tab_size = sizeof(font_lib_tab) / sizeof(struct font_lib);
-    for (size_t i = 0; i < tab_size; i++)
+    if (dot_addr)
     {
-        if (font_lib_tab[i].font_size == font_size)
+        for (size_t i = 0; i < tab_size; i++)
         {
-            font_name->font_lib_name = font_lib_tab[i].dot_name;
-            font_name->font_lib_tab_name = font_lib_tab[i].table_name;
-            return font_name;
+            if (font_lib_tab[i].dot_name == (char *)dot_addr)
+            {
+                font_name->font_lib_name = font_lib_tab[i].dot_name;
+                font_name->font_lib_tab_name = font_lib_tab[i].table_name;
+                return font_name;
+            }
+        }
+    }
+    else if (font_size)
+    {
+        for (size_t i = 0; i < tab_size; i++)
+        {
+            if (font_lib_tab[i].font_size == font_size)
+            {
+                font_name->font_lib_name = font_lib_tab[i].dot_name;
+                font_name->font_lib_tab_name = font_lib_tab[i].table_name;
+                return font_name;
+            }
         }
     }
     return NULL;
@@ -38,7 +53,7 @@ static fontlib_name_t *get_fontlib_name(uint8_t font_size)
 void rtgui_font_mem_load(gui_text_t *text)
 {
     fontlib_name_t *font_name;
-    font_name = get_fontlib_name(text->font_height);
+    font_name = get_fontlib_name(text->path, text->font_height);
 
     uint32_t dot_offset;
     uint32_t table_offset;
@@ -404,12 +419,12 @@ void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
     size_t i = 0;
     for (; i < sizeof(font_lib_tab) / sizeof(struct font_lib); i++)
     {
-        if (font_lib_tab[i].font_size == font_size)
+        if (font_lib_tab[i].dot_name == 0 && font_lib_tab[i].font_size == 0 &&
+            font_lib_tab[i].table_name == 0)
         {
             break;
         }
-        if (font_lib_tab[i].dot_name == 0 && font_lib_tab[i].font_size == 0 &&
-            font_lib_tab[i].table_name == 0)
+        if (font_lib_tab[i].dot_name == font_bitmap_addr)
         {
             break;
         }

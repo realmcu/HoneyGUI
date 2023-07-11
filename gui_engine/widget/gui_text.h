@@ -80,11 +80,19 @@ void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode);
 /**
  * @brief set font size or width and height
  * @note if use freetype, width and height is effective, else height will be applied as font size
- * @param this the text box widget pointer.
+ * @param this the text widget pointer.
  * @param height font height or font size.
  * @param width font width(only be effective when freetype was used).
  */
 void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width);
+
+/**
+ * @brief set font type
+ *
+ * @param this the text widget pointer
+ * @param type the addr of .ttf or .bin
+ */
+void gui_text_type_set(gui_text_t *this, void *type);
 
 /**
  * @brief create a text box widget.
