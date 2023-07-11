@@ -406,6 +406,10 @@ gui_magic_img_t *gui_svg_create_from_mem(void *parent, void *data, uint32_t data
 #endif
 void *gui_get_file_address(const char *file)
 {
+    if (file == NULL)
+    {
+        return NULL;
+    }
 #if defined(_WIN32)
     {
         char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
