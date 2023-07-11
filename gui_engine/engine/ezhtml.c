@@ -34,18 +34,28 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
+#include "gui_dynamic_img.h"
 #ifdef OS_FREERTOS
 #include "romfs.h"
 #else
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif
+#ifdef OS_FREERTOS
+#include "romfs.h"
+#else
+#include <sys/stat.h>
+#include <fcntl.h>
+#endif
+#if defined __WIN32
+#include <dirent.h>
+#endif
 struct widget_create
 {
     char *name;
     obj_type_t type;
 };
-#define WIDGETS_NUM 18
+#define WIDGETS_NUM 19
 struct widget_create widget[] =
 {
     { "win", WINDOW }, //
@@ -68,6 +78,7 @@ struct widget_create widget[] =
     {"radio", RADIO},
     {"appendTexts", RADIOSWITCH},
     {"arc", ARC},
+    {"movie", MOVIE}
 };
 char *get_space_string_head(const char *string)
 {
@@ -1615,10 +1626,151 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         img2 = gui_get_file_address(hl_picture);
                     }
+                    if (!img1)
+                    {
+                        img1 = img2;
+                    }
+                    if (!img2)
+                    {
+                        img2 = img1;
+                    }
+                    if (!img2 && !img1)
+                    {
+                        img1 = gui_get_file_address("app/system/resource/switchOff.bin");
+                        img2 = gui_get_file_address("app/system/resource/switchOn.bin");
+                    }
+
+
                     parent = (void *)gui_switch_create(parent, x, y, w, h, img1, img2);
                     parent->name = get_space_string_head(p->txt);
                     GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = gui_get_file_address(hl_pictureHl);
                     GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
+
+                }
+                break;
+            case MOVIE:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    char *folder = NULL;
+                    uint32_t dur = 1000;
+                    bool reverse = false;
+                    int repeat = -1;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "folder"))
+                        {
+                            folder = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "dur"))
+                        {
+                            char *d = p->attr[++i];
+                            dur = atoi(d);
+                            if (strstr(d, "ms") != NULL)
+                            {
+                                (void)(dur);
+                            }
+                            else if (strstr(d, "h") != NULL)
+                            {
+                                dur = dur * 60 * 60 * 1000;
+                            }
+                            else if (strstr(d, "s") != NULL)
+                            {
+                                dur = dur * 1000;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "repeatCount"))
+                        {
+
+                            char *r = p->attr[++i];
+                            if (strstr(r, "indefinite") != NULL)
+                            {
+                                repeat = -1;
+                            }
+                            else
+                            {
+                                repeat = atoi(r);
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "reverse"))
+                        {
+                            char *r = p->attr[++i];
+                            if (strstr(r, "false") != NULL)
+                            {
+                                reverse = false;
+                            }
+                            else if (strstr(r, "true") != NULL)
+                            {
+                                reverse = true;
+                            }
+                        }
+
+                        i++;
+                    }
+                    int file_count = 0;
+                    {
+                        DIR *dir = 0;
+                        struct dirent *entry;
+                        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                        if ((dir = opendir(path)) == NULL)
+                        {
+                            gui_free(path);
+                            //perror("opendir() failed"); return;
+                        }
+                        gui_free(path);
+                        while ((entry = readdir(dir)) != NULL)
+                        {
+                            file_count++;
+                        }
+                        closedir(dir);
+                    }
+                    void **image_array = gui_malloc(file_count * sizeof(void *));
+                    {
+                        DIR *dir = 0;
+                        struct dirent *entry;
+                        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                        if ((dir = opendir(path)) == NULL)
+                        {
+                            gui_free(path);
+                            //perror("opendir() failed"); return;
+                        }
+                        gui_free(path);
+                        int count = 0;
+                        while ((entry = readdir(dir)) != NULL)
+                        {
+                            image_array[count++] = gui_get_file_address(entry->d_name);
+                        }
+                        closedir(dir);
+                    }
+                    uint32_t duration_time_ms = 0;
+                    if (repeat == -1)
+                    {
+                        duration_time_ms = UINT32_MAX;
+                    }
+                    else
+                    {
+                        duration_time_ms = repeat * dur;
+                    }
+
+
+                    parent = (void *)gui_dynamic_create_from_mem(parent, "dm", image_array, x, y, file_count - 1, 100,
+                                                                 10000000);
 
                 }
                 break;
