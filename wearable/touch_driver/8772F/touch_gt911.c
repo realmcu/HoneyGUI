@@ -8,9 +8,9 @@
  * 2020-08-04     tyustli  first version
  */
 
-#include "wristband_sdk_config.h"
+//#include "wristband_sdk_config.h"
 
-#ifdef BSP_USING_TOUCH
+#if 1
 #include "rtl_gpio.h"
 #include "rtl_rcc.h"
 #include "drv_gpio.h"
@@ -59,20 +59,20 @@ uint8_t GT911_WR_Reg(uint16_t reg, uint8_t *buf, uint8_t len)
 
     memcpy(send + 2, buf, len);
 
-    i2c_config[TOUCH_I2C_INDEX].write(TOUCH_GT911_ADDR, send, 2 + len);
+    drv_i2c0_write(TOUCH_GT911_ADDR, send, 2 + len);
 
     return 0;
 }
 
-void GT911_RD_Reg(uint16_t reg, uint8_t *buf, uint8_t len)
+uint32_t GT911_RD_Reg(uint16_t reg, uint8_t *buf, uint8_t len)
 {
     uint8_t iic_write_buf[2] = {0};
     iic_write_buf[0] = reg >> 8;
     iic_write_buf[1] = reg & 0xff;
 
-    i2c_config[TOUCH_I2C_INDEX].write(TOUCH_GT911_ADDR, iic_write_buf, 2);
+    drv_i2c0_write(TOUCH_GT911_ADDR, iic_write_buf, 2);
 
-    i2c_config[TOUCH_I2C_INDEX].read(TOUCH_GT911_ADDR, buf, len);
+    return drv_i2c0_read(TOUCH_GT911_ADDR, buf, len);
 }
 
 uint8_t GT911_Send_Cfg(uint8_t mode)
@@ -100,6 +100,7 @@ uint32_t GT911_read(uint8_t *buf, uint32_t len)
     uint8_t point_num = 0;
     uint8_t reset = 0;
     GT911_RD_Reg(GT_GSTID_REG, &mode, 1);
+    //DBG_DIRECT("mode:%d",mode);
     read[0] = mode;
     if (mode & 0x80)
     {
@@ -107,18 +108,20 @@ uint32_t GT911_read(uint8_t *buf, uint32_t len)
     }
     else
     {
+        //DBG_DIRECT("GT911_read");
         return 0;
     }
     point_num = mode & 0x0F;
     if (point_num == 0)
     {
+        //DBG_DIRECT("GT911_read point_num");
         return 0;
     }
 
-    GT911_RD_Reg(0x814F, read + 1, 7);
+    len = GT911_RD_Reg(0x814F, read + 1, 7);
 
     GT911_WR_Reg(GT_GSTID_REG, &reset, 1);
-
+//DBG_DIRECT("len:%d",len);
     return len;
 }
 
@@ -137,27 +140,27 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     return true;
 }
 
-void rtk_touch_hal_init(struct rtl_touch_config *touch_cfg)
+void rtk_touch_hal_init(void)
 {
-    DBG_DIRECT("touch_gt911_init line = %d GPIO_TOUCH_INT %d\n", __LINE__, touch_cfg->int_pin);
-
-    gpio_config.pin_mode(touch_cfg->int_pin, PIN_MODE_OUTPUT);
-    gpio_config.pin_write(touch_cfg->int_pin, 0);
-    gpio_config.pin_mode(touch_cfg->rst_pin, PIN_MODE_OUTPUT);
-    gpio_config.pin_write(touch_cfg->rst_pin, 0);
+    DBG_DIRECT("touch_gt911_init line = %d\n", __LINE__);
+    drv_i2c0_init(TOUCH_GT911_SCL, TOUCH_GT911_SDA);
+    drv_pin_mode(TOUCH_GT911_INT, PIN_MODE_OUTPUT);
+    drv_pin_write(TOUCH_GT911_INT, 0);
+    drv_pin_mode(TOUCH_GT911_RST, PIN_MODE_OUTPUT);
+    drv_pin_write(TOUCH_GT911_RST, 0);
     platform_delay_ms(10);
-    gpio_config.pin_write(touch_cfg->int_pin, 1);
+    drv_pin_write(TOUCH_GT911_INT, 1);
     platform_delay_ms(10);
-    gpio_config.pin_write(touch_cfg->rst_pin, 1);
+    drv_pin_write(TOUCH_GT911_RST, 1);
     platform_delay_ms(30);
-    gpio_config.pin_mode(touch_cfg->int_pin, PIN_MODE_INPUT);
+    drv_pin_mode(TOUCH_GT911_INT, PIN_MODE_INPUT);
 
     uint8_t iic_write_buf[2] = {0x81, 0x40};
     uint8_t iic_read_buf[5] = {0};
 
-    i2c_config[TOUCH_I2C_INDEX].write(TOUCH_GT911_ADDR, iic_write_buf, 2);
+    drv_i2c0_write(TOUCH_GT911_ADDR, iic_write_buf, 2);
 
-    i2c_config[TOUCH_I2C_INDEX].read(TOUCH_GT911_ADDR, iic_read_buf, 4);
+    drv_i2c0_read(TOUCH_GT911_ADDR, iic_read_buf, 4);
 
     DBG_DIRECT("CTP ID:%s\r\n", iic_read_buf);
 

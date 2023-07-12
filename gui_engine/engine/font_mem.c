@@ -244,7 +244,22 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, struct rtg
     }
     else if (dc_bytes_per_pixel == 3)
     {
+        uint8_t *writebuf = (uint8_t *)dc->frame_buf;
+        uint8_t *pixel = (uint8_t *)&color;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
 
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                {
+                    writebuf[write_off * 3 + j * 3] = pixel[2];
+                    writebuf[write_off * 3 + j * 3 + 1] = pixel[1];
+                    writebuf[write_off * 3 + j * 3 + 2] = pixel[0];
+                }
+            }
+        }
     }
     else if (dc_bytes_per_pixel == 4)
     {

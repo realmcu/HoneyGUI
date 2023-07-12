@@ -6,7 +6,7 @@
 #include "acc_engine.h"
 
 static stbtt_fontinfo font;
-
+void gui_font_stb_init(void *font_ttf_addr);
 static void rtgui_font_stb_load(gui_text_t *text)
 {
     if (text->path)

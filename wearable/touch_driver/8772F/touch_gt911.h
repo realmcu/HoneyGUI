@@ -34,7 +34,10 @@ extern "C" {
 #define GT_TP3_REG      0X8160
 #define GT_TP4_REG      0X8168
 #define GT_TP5_REG      0X8170
-
+#define TOUCH_GT911_RST                                          P1_6
+#define TOUCH_GT911_INT                                          P2_2
+#define TOUCH_GT911_SCL                                          P2_3
+#define TOUCH_GT911_SDA                                          P2_4
 bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing);
 #ifdef __cplusplus
 }
