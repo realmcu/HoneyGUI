@@ -36,12 +36,12 @@ void curtainvie_update_att(gui_obj_t *obj)
             {
                 obj->y = 0;
             }
-            if (obj->y < -(int)gui_get_screen_height() * ext->scopedown * 0.6f)
+            if (obj->y < -(int)gui_get_screen_height() * ext->scopedown * 0.5f)
             {
                 ext->cur_curtain = CURTAIN_DOWN;
                 obj->y = 0;
             }
-            else if (obj->y > (int)gui_get_screen_height() * ext->scopeup * 0.6f)
+            else if (obj->y > (int)gui_get_screen_height() * ext->scopeup * 0.5f)
             {
                 ext->cur_curtain = CURTAIN_UP;
                 obj->y = 0;
@@ -82,6 +82,11 @@ void curtainvie_update_att(gui_obj_t *obj)
             if (tp->deltaY < 0)
             {
                 obj->y = tp->deltaY;
+            }
+            if (obj->y < -(int)gui_get_screen_height() * ext->scopeup * 0.5f)
+            {
+                ext->cur_curtain = CURTAIN_MIDDLE;
+                obj->y = 0;
             }
         }
         else if (tp->type == TOUCH_DOWN_SLIDE)

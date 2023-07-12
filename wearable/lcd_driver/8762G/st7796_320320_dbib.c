@@ -428,16 +428,16 @@ static void st7796_pad_config(void)
 static void st7796_chip_reset(void)
 {
     //no need HW do it
-    gpio_config.pin_mode(LCD_8080_RST, PIN_MODE_OUTPUT);
-    gpio_config.pin_write(LCD_8080_RST, 1);
+    drv_pin_mode(LCD_8080_RST, PIN_MODE_OUTPUT);
+    drv_pin_write(LCD_8080_RST, 1);
     platform_delay_ms(100);
-    gpio_config.pin_write(LCD_8080_RST, 0);
+    drv_pin_write(LCD_8080_RST, 0);
     platform_delay_ms(50);
-    gpio_config.pin_write(LCD_8080_RST, 1);
+    drv_pin_write(LCD_8080_RST, 1);
     platform_delay_ms(50);
 
-    gpio_config.pin_mode(LCD_8080_BL, PIN_MODE_OUTPUT);
-    gpio_config.pin_write(LCD_8080_BL, 1);
+    drv_pin_mode(LCD_8080_BL, PIN_MODE_OUTPUT);
+    drv_pin_write(LCD_8080_BL, 1);
 }
 
 
