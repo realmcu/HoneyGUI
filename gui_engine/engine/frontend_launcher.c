@@ -126,7 +126,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_button_api.onRelease(button, button_release_cb, button);
                     button->data = gui_strdup(path);
                     gui_button_text_move(button, 0, 70);
-                    button->text->path = gui_get_file_address("app/system/resource/font/malgunbd.ttf");
+//                    button->text->path = gui_get_file_address("app/system/resource/font/malgunbd.ttf");
                 }
 
             }
@@ -142,20 +142,16 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_frontend_ui_design\n");
     //gui_font_stb_init(gui_get_file_address("app/system/resource/font/malgunbd.ttf"));
-
+    gui_set_font_mem_resourse(32, gui_get_file_address("app/system/resource/font/gbk_32_32_dot.bin"),
+                              gui_get_file_address("app/system/resource/font/gbk_unicode_table.bin"));
 
     g = gui_grid_create(&app->screen, 100, 100, 4, 2, 100, 100);
     char *apppath = "app";
     char *path = gui_malloc(strlen(apppath) + strlen(GUI_ROOT_FOLDER) + 1);
     sprintf(path, "%s%s", GUI_ROOT_FOLDER, apppath);
     searchXmlFiles(path, app);
-    /*gui_text_t *text3 = gui_text_create(&(app->screen),  "text3",  100, 0, 120, 64);
-    gui_text_set(text3, "ABC", "rtk_font_stb", 0xFF0000FF, 3, 50);
-    text3->path = gui_get_file_address("app/system/resource/font/malgunbd.ttf");
 
-    gui_text_t *text4 = gui_text_create(&(app->screen),  "text4",  190, 0, 120, 64);
-    gui_text_set(text4, "123", "rtk_font_stb", 0xffffffff, 3, 40);
-    text4->path = gui_get_file_address("app/system/resource/font/unifont.ttf");*/
+    //text4->path = gui_get_file_address("app/system/resource/font/unifont.ttf");
     //gui_return_create(&app->screen);
 }
 static void app_xml_ui_design(gui_app_t *app)

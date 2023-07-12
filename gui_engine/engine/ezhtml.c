@@ -252,7 +252,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     const char *text = "text";
                     char *font = "app/system/resource/font/malgunbd.ttf";
                     size_t color = 0xffffffff;
-                    int fontSize = 30;
+                    int fontSize = 32;
                     int style = 0;
                     while (true)
                     {
@@ -331,7 +331,34 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             t = gui_text_create(parent, ptxt, x, y, gui_get_screen_width(), h);
                             gui_text_set(t, gui_strdup(text), "rtk_font_stb", color, strlen(text), fontSize);
-                            t->path = gui_get_file_address(font);
+
+
+
+                            {
+                                char *font_type2 = NULL;
+                                char *font_type = font;
+                                if (strstr(font_type, ".bin") != NULL)
+                                {
+                                    font_type2 = "rtk_font_mem";
+                                    char b[100] = {0};
+                                    strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                                    void *addr1 = gui_get_file_address(b);
+                                    memset(b, 0, sizeof(b));
+                                    char *a = font_type;
+                                    strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                                         ".bin;") - a + strlen(".bin;")));
+                                    void *addr2 = gui_get_file_address(b);
+                                    gui_set_font_mem_resourse(fontSize, addr1,  addr2);
+                                    t->path = 0;
+                                }
+                                else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
+                                {
+                                    font_type2 = "rtk_font_stb";
+                                    t->path = gui_get_file_address(font);
+                                }
+                                GUI_TYPE(gui_text_t, t)->text_type = font_type2;
+
+                            }
                         }
                         else
                         {
@@ -1395,7 +1422,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int text_x = 0;
                     int text_y = 0;
                     uint32_t font_color = 0Xf0f0;
-                    uint32_t font_size = 40;
+                    uint32_t font_size = 32;
                     int picture_x = 0;
                     int picture_y = 0;
                     int transition = 0;
@@ -1507,7 +1534,36 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_button_t, parent)->text->color = font_color;
                     gui_button_api.onPress((void *)parent, sport_button_press, parent);
                     gui_button_api.onRelease((void *)parent, sport_button_release, parent);
-                    GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
+                    {
+                        char *font_type2 = NULL;
+                        if (strstr(font_type, ".bin") != NULL)
+                        {
+                            font_type2 = "rtk_font_mem";
+                            char b[100] = {0};
+                            strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                            void *addr1 = gui_get_file_address(b);
+                            memset(b, 0, sizeof(b));
+                            char *a = font_type;
+                            strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                                 ".bin;") - a + strlen(".bin;")));
+                            void *addr2 = gui_get_file_address(b);
+                            gui_set_font_mem_resourse(32, addr1,  addr2);
+                            GUI_TYPE(gui_button_t, parent)->text->path = 0;
+                        }
+                        else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
+                        {
+                            font_type2 = "rtk_font_stb";
+                            GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
+                        }
+                        GUI_TYPE(gui_button_t, parent)->text->text_type = font_type2;
+
+                    }
+
+
+
+
+
+
 
 
 

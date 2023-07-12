@@ -4,7 +4,7 @@
 	<screen>app_test
 		<tabview >tv1
 			<tab >t1
-				<textbox text="图片img， 缩放和旋转" ></textbox>
+				<textbox text="picture" font="app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin"></textbox>
 				<img file="app/test/resource/icMenuNotification.bin" x="100" y="100">img1 </img>
 				<img file="app/test/resource/icMenuNotification.bin" x="100" y="200" rotationAngle="60">img1 </img>
 				<img file="app/test/resource/icMenuNotification.bin" x="200" y="200" scaleX="2" scaleY="0.5">img1</img>
@@ -61,7 +61,9 @@
 				<icon x="100" y="10" w="100" h="100" 
 					picture="app/test/resource/icMenuAlbum.bin" 
 					highlightPicture="app/test/resource/icMenuNotification.bin" 
-					mode="normal" text="normal" textX="0" textY="70">iconNormal
+					mode="normal" text="normal" textX="0" textY="70"
+					font="app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin"
+					>iconNormal
 				</icon>
 				<icon x="100" y="120" w="100" h="100" 
 					picture="app/test/resource/icMenuAlbum.bin" 

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     printf("defaultPath path: %s\n", defaultPath);
     //extern int nanosv_main(void);
     //nanosv_main();
-
+#ifndef RTK_GUI_SCRIPT_AS_A_APP
     int fd;
     fd = open("./example/root_image/root_image_sim_vscode/root(0x4400000).bin", 0);
     if (fd > 0)
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-
+#endif
 
 
     rtgui_server_init();
