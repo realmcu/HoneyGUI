@@ -416,6 +416,11 @@ void *gui_get_file_address(const char *file)
         sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
         int fd = gui_fs_open(path,  0);
         gui_free(path);
+        if (fd == -1)
+        {
+            return NULL;
+        }
+
         int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
         void *imgbuf = gui_malloc(size);
         memset(imgbuf, 0, size);
@@ -428,6 +433,10 @@ void *gui_get_file_address(const char *file)
         sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
         int fd = gui_fs_open(path,  0);
         gui_free(path);
+        if (fd == -1)
+        {
+            return NULL;
+        }
         void *rst;
         rst = (void *)gui_fs_ioctl(fd, 0);
         gui_fs_close(fd);

@@ -124,6 +124,9 @@
 				<arc cx="300" cy="300" stroke-width="5" r="30" stroke="#00ffffff" startDegree="0" endDegree="300"></arc>
 				<textbox text="arc" ></textbox>
 			</tab>
+			<tab idx="12">t2
+				<movie folder="app/test/resource/curtain" dur="2000ms" repeatCount="1" reverse="false"></movie>
+			</tab>
 		</tabview>		
 	</screen>
 </app>

@@ -80,6 +80,19 @@ struct widget_create widget[] =
     {"arc", ARC},
     {"movie", MOVIE}
 };
+gui_magic_img_t *xml_gui_magic_img_create_from_mem(void *parent,  const char *name, void *addr,
+                                                   int16_t x,
+                                                   int16_t y)
+{
+    if (addr == NULL)
+    {
+        addr = gui_get_file_address("app/system/resource/icMenuBird.bin");
+    }
+
+    return gui_magic_img_create_from_mem(parent, name, addr,
+                                         x,
+                                         y, 0, 0);
+}
 char *get_space_string_head(const char *string)
 {
     char *s = gui_strdup(string);
@@ -417,7 +430,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
 
                         void *imgbuf = gui_get_file_address(file);
-                        parent = (void *)gui_magic_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y, w, h);
+                        parent = (void *)xml_gui_magic_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);
@@ -1750,12 +1763,19 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_free(path);
                             //perror("opendir() failed"); return;
                         }
-                        gui_free(path);
+
                         int count = 0;
                         while ((entry = readdir(dir)) != NULL)
                         {
-                            image_array[count++] = gui_get_file_address(entry->d_name);
+                            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                            {
+                                char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 1);
+                                sprintf(path2, "%s/%s", folder, entry->d_name);
+                                image_array[count++] = gui_get_file_address(path2);
+                            }
+
                         }
+                        gui_free(path);
                         closedir(dir);
                     }
                     uint32_t duration_time_ms = 0;
@@ -1769,9 +1789,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
 
 
-                    parent = (void *)gui_dynamic_create_from_mem(parent, "dm", image_array, x, y, file_count - 1, 100,
-                                                                 10000000);
-
+                    parent = (void *)gui_dynamic_create_from_mem(parent, "dm", image_array, x, y, file_count - 2,
+                                                                 dur / (file_count - 5),
+                                                                 INT32_MAX);
                 }
                 break;
             case RADIOSWITCH:
