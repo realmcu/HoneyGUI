@@ -25,9 +25,18 @@
 
 uint8_t resource_root[1024 * 1024 * 20];
 
-
+char *defaultPath = GUI_ROOT_FOLDER;
 int main(int argc, char **argv)
 {
+    for (int count = 1; count < argc; count++)
+    {
+        if (!strcmp(argv[count], "-p") && count + 1 < argc)
+        {
+            defaultPath = argv[count + 1];
+        }
+    }
+
+    printf("defaultPath path: %s\n", defaultPath);
     //extern int nanosv_main(void);
     //nanosv_main();
 

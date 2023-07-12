@@ -1944,8 +1944,9 @@ void create_tree(gui_app_t *app)
     extern void js_run_file(const char *file, gui_app_t  *app);
     if (js)
     {
-        char *path = gui_malloc(strlen(js) + strlen(GUI_ROOT_FOLDER) + 1);
-        sprintf(path, "%s%s", GUI_ROOT_FOLDER, js);
+        extern char *defaultPath;
+        char *path = gui_malloc(strlen(js) + strlen(defaultPath) + 1);
+        sprintf(path, "%s%s", defaultPath, js);
         js_run_file(path, app);
         gui_free(path);
     }
@@ -1992,8 +1993,13 @@ void get_app(gui_app_t *app, char *pic, char *text)
 }
 void get_system_screen(int *w, int *h)
 {
+    extern char *defaultPath;
+    char *ezxmlpath = "app/system/launcher.xml";
+    char *path = gui_malloc(strlen(ezxmlpath) + strlen(defaultPath) + 1);
+    sprintf(path, "%s%s", defaultPath, ezxmlpath);
     ezxml_t f1 =
-        ezxml_parse_file("example/root_image/root_image_sim_vscode/root/app/system/launcher.xml");
+        ezxml_parse_file(path);
+    gui_free(path);
     ezxml_t t;
     foreach_scan(f1, "screen", &t);
     size_t i = 0;
