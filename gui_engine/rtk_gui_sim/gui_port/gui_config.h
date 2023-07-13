@@ -25,7 +25,7 @@ extern "C" {
 #define RTK_GUI_GPU_OPENVG              0
 #define RTK_GUI_GPU_NANOVG              0
 #define MODULE_GPU_NANOVG
-#define RTK_GUI_SCRIPT_AS_A_APP
+//#define RTK_GUI_SCRIPT_AS_A_APP
 #ifdef __cplusplus
 }
 #endif
