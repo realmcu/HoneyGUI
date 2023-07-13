@@ -3,7 +3,7 @@
 #include <tp_algo.h>
 #include "gui_magic_img.h"
 #include "gui_dynamic_img.h"
-
+#include "draw_font.h"
 void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y)
 {
     this->text->base.x = text_x;

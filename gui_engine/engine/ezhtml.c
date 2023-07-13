@@ -250,7 +250,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t w = gui_get_screen_width();
                     int16_t h = 50;
                     const char *text = "text";
-                    char *font = "app/system/resource/font/malgunbd.ttf";
+                    char *font = "app/system/resource/font/tangyuanti.ttf";
                     size_t color = 0xffffffff;
                     int fontSize = 32;
                     int style = 0;
@@ -575,19 +575,19 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "transition"))
                         {
                             char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "Normal"))
+                            if (!strcmp(p->attr[i], "normal"))
                             {
                                 style = SLIDE_CLASSIC;
                             }
-                            else if (!strcmp(p->attr[i], "Fade"))
+                            else if (!strcmp(p->attr[i], "fade"))
                             {
                                 style = SLIDE_FADE;
                             }
-                            else if (!strcmp(p->attr[i], "Scale"))
+                            else if (!strcmp(p->attr[i], "scale"))
                             {
                                 style = SLIDE_SCALE;
                             }
-                            else if (!strcmp(p->attr[i], "Fade&Scale"))
+                            else if (!strcmp(p->attr[i], "fadeScale"))
                             {
                                 style = SLIDE_SCALE_FADE;
                             }
@@ -731,7 +731,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             highlightColor = string_rgb888(p->attr[++i]);
                             gui_log("color %s,%x\n", p->attr[i], highlightColor);
                         }
-                        else if (!strcmp(p->attr[i], "VH"))
+                        else if (!strcmp(p->attr[i], "orientation"))
                         {
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "vertical"))
@@ -813,7 +813,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             highlightColor = string_rgb888(p->attr[++i]);
                             gui_log("color %s,%x\n", p->attr[i], highlightColor);
                         }
-                        else if (!strcmp(p->attr[i], "VH"))
+                        else if (!strcmp(p->attr[i], "orientation"))
                         {
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "vertical"))
@@ -1017,7 +1017,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 style = SLIDE_SCALE;
                             }
-                            else if (!strcmp(p->attr[i], "fade&scale"))
+                            else if (!strcmp(p->attr[i], "fadeScale"))
                             {
                                 style = SLIDE_SCALE_FADE;
                             }
@@ -1276,7 +1276,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 style = SLIDE_SCALE;
                             }
-                            else if (!strcmp(p->attr[i], "fade&scale"))
+                            else if (!strcmp(p->attr[i], "fadeScale"))
                             {
                                 style = SLIDE_SCALE_FADE;
                             }
@@ -1417,7 +1417,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0;
                     int16_t h = 0;
-                    char *font_type = "app/system/resource/font/malgunbd.ttf";
+                    char *font_type = "app/system/resource/font/tangyuanti.ttf";
                     char *text = NULL;
                     int text_x = 0;
                     int text_y = 0;
@@ -1508,7 +1508,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 style = SLIDE_SCALE;
                             }
-                            else if (!strcmp(p->attr[i], "fade&scale"))
+                            else if (!strcmp(p->attr[i], "fadeScale"))
                             {
                                 style = SLIDE_SCALE_FADE;
                             }
