@@ -115,8 +115,11 @@ void scheduler_hook(void *from, void *to)
     {
         //need set to sensor mode
         //need set clock to 40
-
+        uint32_t actual_mhz = 0;
+        int32_t ret = pm_cpu_freq_set(40, &actual_mhz);
+        DBG_DIRECT("pm_cpu_freq_set ret %d actual_mhz %d", ret, actual_mhz);
         DVFSErrorCode dvfs_ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V8);
+        DBG_DIRECT("dvfs_ret ret %d", dvfs_ret);
         uint32_t scenario_ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE,
                                                            OPERATION_SENSOR_MODE);
         DBG_DIRECT("from IDLE to sensor dvfs_ret %d scenario_ret %d", dvfs_ret, scenario_ret);

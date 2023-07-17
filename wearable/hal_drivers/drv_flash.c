@@ -58,15 +58,20 @@ int realtek_flash_write(uint32_t addr, const uint8_t *buf, uint32_t size)
 {
 
 #if defined RTL8772F || defined RTL8762G
-    if (flash_nor_write_locked(addr, (uint8_t *)buf, size) == false)
-#elif defined RTL8762D
-    if (flash_write_locked(addr, size, (uint8_t *)buf) == false)
-#endif
+    FLASH_NOR_RET_TYPE ret = flash_nor_write_locked(addr, (uint8_t *)buf, size);
+    if (ret != FLASH_NOR_RET_SUCCESS)
     {
-        DBG_DIRECT("realtek data write error!\r\n");
+        DBG_DIRECT("realtek data write error %d", ret);
         return 0;
     }
+#elif defined RTL8762D
+    if (flash_write_locked(addr, size, (uint8_t *)buf) == false)
 
+    {
+        DBG_DIRECT("realtek data write error");
+        return 0;
+    }
+#endif
     return size;
 }
 
@@ -136,17 +141,24 @@ int realtek_flash_erase(uint32_t addr, size_t size)
     {
 
 #if defined RTL8772F || defined RTL8762G
-        if (flash_nor_erase_locked(REALTK_FLASH_START_ADDRESS + start_sector * FLASH_SECTOR_SIZE +
-                                   FLASH_SECTOR_SIZE * i, FLASH_NOR_ERASE_SECTOR) == false)
-#elif defined RTL8762D
-        if (flash_erase_locked(FLASH_ERASE_SECTOR,
-                               REALTK_FLASH_START_ADDRESS + start_sector * FLASH_SECTOR_SIZE +
-                               FLASH_SECTOR_SIZE * i) == false)
-#endif
+        FLASH_NOR_RET_TYPE ret = flash_nor_erase_locked(REALTK_FLASH_START_ADDRESS + start_sector *
+                                                        FLASH_SECTOR_SIZE +
+                                                        FLASH_SECTOR_SIZE * i, FLASH_NOR_ERASE_SECTOR);
+        if (ret != FLASH_NOR_RET_SUCCESS)
         {
             DBG_DIRECT("fs data erase error!");
             return 0;
         }
+#elif defined RTL8762D
+        if (flash_erase_locked(FLASH_ERASE_SECTOR,
+                               REALTK_FLASH_START_ADDRESS + start_sector * FLASH_SECTOR_SIZE +
+                               FLASH_SECTOR_SIZE * i) == false)
+
+        {
+            DBG_DIRECT("fs data erase error!");
+            return 0;
+        }
+#endif
     }
 
     return size;
