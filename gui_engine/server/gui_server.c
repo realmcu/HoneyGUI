@@ -68,6 +68,7 @@ static void rtgui_server_entry(void *parameter)
         GUI_ASSERT(screen != NULL);
 
         rtgui_msg_t msg;
+        (void)msg;
 #if 0
         if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0))
         {

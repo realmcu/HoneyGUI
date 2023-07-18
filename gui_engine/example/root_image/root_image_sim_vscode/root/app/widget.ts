@@ -73,3 +73,13 @@ var seekbar = {
     onPressing : function (callback_func) {},
     onRelease : function (click_callback_func) {},
 }
+/**
+ * @link https://www.npmjs.com/package/onoff#gpiogpio-direction--edge--options
+ * @param gpio 
+ * @param direction 
+ */
+function Gpio(gpio, direction) {
+    this.gpio = gpio;
+    this.direction = direction;
+    this.writeSync;
+  }

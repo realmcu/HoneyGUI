@@ -147,7 +147,7 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
     gui_set_font_mem_resourse(32, gui_get_file_address("app/system/resource/font/gbk_32_32_dot.bin"),
                               gui_get_file_address("app/system/resource/font/gbk_unicode_table.bin"));
 
-    g = gui_grid_create(&app->screen, 100, 100, 4, 2, 100, 100);
+    g = gui_grid_create(&app->screen, 100, 100, 4, 3, 100, 100);
     char *apppath = "app";
     char *path = gui_malloc(strlen(apppath) + strlen(GUI_ROOT_FOLDER) + 1);
     sprintf(path, "%s%s", GUI_ROOT_FOLDER, apppath);

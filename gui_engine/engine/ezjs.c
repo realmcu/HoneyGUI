@@ -1327,6 +1327,7 @@ DECLARE_HANDLER(sw_close)
     sw->turn_off(sw);
     return jerry_create_undefined();
 }
+
 DECLARE_HANDLER(sw_open)
 {
     gui_switch_t *sw = NULL;
@@ -1334,7 +1335,105 @@ DECLARE_HANDLER(sw_open)
     sw->turn_on(sw);
     return jerry_create_undefined();
 }
+#ifdef RTL8762G
+#include "rtl_gpio.h"
+#include "rtl_rcc.h"
+#include "drv_gpio.h"
+#include "drv_i2c.h"
+#include "drv_touch.h"
+#include "drv_lcd.h"
+#include "touch_gt911.h"
+#include "string.h"
+#include "trace.h"
+#include "utils.h"
+#endif
+DECLARE_HANDLER(writeSync)
+{
+    if (args_cnt >= 1 && jerry_value_is_number(args[0]))
+    {
 
+        int write_value = jerry_get_number_value(args[0]);
+        int gpio = -1;
+        gpio = jerry_get_number_value(js_get_property(this_value, "gpio"));
+        char *direction = js_value_to_string(js_get_property(this_value, "direction"));
+        int mode = 0;
+#ifdef RTL8762G
+
+        if (!strcmp(direction, "out"))
+        {
+            mode = PIN_MODE_OUTPUT;
+        }
+        else if (!strcmp(direction, "in"))
+        {
+            mode = PIN_MODE_INPUT;
+        }
+        if (gpio >= 0)
+        {
+            gui_log("gpio%d, %d, %d", gpio, mode, write_value);
+            drv_pin_mode(gpio, mode);
+            drv_pin_write(gpio, write_value);
+        }
+
+
+#endif
+    }
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(Gpio)
+{
+    REGISTER_METHOD(this_value, writeSync);
+    char *mode_string = "in";
+    int pin = -1;
+    if (args_cnt >= 1)
+    {
+        if (jerry_value_is_number(args[0]))
+        {
+            pin = jerry_get_number_value(args[0]);
+
+        }
+        if (args_cnt >= 2)
+        {
+            if (jerry_value_is_string(args[1]))
+            {
+                mode_string = js_value_to_string(args[1]);
+            }
+        }
+    }
+    jerry_value_t pin_js = jerry_create_number(pin);
+    js_set_property(this_value, "gpio", pin_js);
+    js_set_string_property(this_value, "direction", mode_string);
+    /*{
+    #ifdef RTL8762G
+    #include "drv_gpio.h"
+        if (mode ==1)
+        {
+            mode = PIN_MODE_OUTPUT;
+        }
+        else
+        {
+            mode = PIN_MODE_INPUT;
+        }
+        if (pin>=0)
+        {
+            drv_pin_mode(pin, mode);
+        }
+    #endif
+    }*/
+
+
+    return jerry_create_undefined();
+}
+void gpio_init()
+{
+    /*var LED1 = new Gpio('P1_0', 'out');
+    var LED2 = new Gpio('P1_1', 'out');
+    var LED3 = new Gpio('P2_5', 'out');
+    LED1.writeSync(1)
+    LED2.writeSync(1)
+    LED3.writeSync(1)*/
+    jerry_value_t global_obj = jerry_get_global_object();
+    REGISTER_METHOD(global_obj, Gpio);
+}
 
 jerry_value_t fs_init()
 {
@@ -1487,6 +1586,7 @@ void js_init(void)
                                    jerryx_handler_print);
     js_console_init();
     gui_js_init();
+    gpio_init();
     //fs_init();
     extern gui_app_t *get_app_launcher_frontend(void);
     gui_app_startup(get_app_launcher_frontend());
