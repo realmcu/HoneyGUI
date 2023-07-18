@@ -17,14 +17,19 @@
 
 #include "app_msg.h"
 #include "stdbool.h"
-
-#define ASSERT(x) if(!(x)) { DBG_DIRECT("Assert(%s) fail in %s,%d\n", #x,__FILE__, __LINE__, 3); while(1) {;}}
+#include <communicate_protocol.h>
+#include "board.h"
+typedef void (* pfunc)(void);
 /**
  * @brief  Initialize App task
  * @return void
  */
-void communicate_task_init(void);
+
+
+int communicate_task_init(void);
 bool send_msg_to_communicatetask(T_IO_MSG *p_msg);
-
+bool cb_send_to_queue(pfunc func);
+#if USE_HRS_MASTER
+bool cb_l1receive_to_queue(void *buf);
 #endif
-
+#endif

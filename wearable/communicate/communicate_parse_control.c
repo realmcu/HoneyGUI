@@ -39,9 +39,3 @@ void resolve_Control_command(uint8_t key, const uint8_t *pValue, uint16_t length
         break;
     }
 }
-
-
-
-
-
-

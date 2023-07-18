@@ -143,72 +143,27 @@ typedef union
 } time_union_t;
 /* time bit field */
 
-
-typedef enum
+struct protocol_pack
 {
-    L1SEND_SPORT_AND_SLEEP_DATA                = 1,
-    L1SEND_BOND_FAIL_EVENT                     = 2,
-    L1SEND_BOND_SUCCESS_EVENT                  = 3,
-    L1SEND_LOGIN_FAIL_EVENT                    = 4,
-    L1SEND_LOGIN_SUCCESS_EVENT                 = 5,
-    L1SEND_RETURN_ALARM_EVENT                  = 6,
-    L1SEND_RETURN_PHONE_CONTROL_CMD_EVENT      = 7,
-    L1SEND_RETURN_LIFT_SWITCH_EVENT            = 8,
-    L1SEND_RETURN_INCOMMING_MESSAGE_SETTINGS   = 9,
-    L1SEND_SIT_SETTING_RETURN                  = 10,
-    L1SEND_HISTORY_DATA_SYNC_START             = 11,
-    L1SEND_HISTORY_DATA_SYNC_END               = 12,
-    L1SEND_SPORT_DATA                          = 13,
-    L1SEND_SLEEP_DATA                          = 14,
-    L1SEND_HEART_DATA                          = 15,
-    L1SEND_BLOODPRESSURE_DATA                  = 16,
-    L1SEND_EXERCISE_DATA                       = 17,
-    L1SEND_RETURN_CANCEL_HEART_SAMPLE          = 18,
-    L1SEND_RETURN_HEART_SETTING                = 19,
-    L1SEND_RETURN_CALL_REJECT_COMMAND          = 20,
-    L1SEND_RETURN_FIND_MOBILE_COMMAND          = 21,
-    L1SEND_RETURN_FUNCTIONS_EVENT              = 22,
-    L1SEND_RETURN_CANCEL_BP_SAMPLE             = 23,
-    L1SEND_RETURN_HOUR_FORMAT_SETTING          = 24,
-    L1SEND_RETURN_DISTANCE_UNIT_SETTING        = 25,
-    L1SEND_RETURN_DNDM_SETTING                 = 26,
-    L1SEND_RETURN_OLED_DISPLAY_TIME            = 27,
-    L1SEND_RETURN_LANGUAGE                     = 28,
-    L1SEND_RETURN_TWIST_SWITCH_EVENT           = 29,
-    L1SEND_RETURN_SPORT_OFFSETDATA             = 30,
-    L1SEND_RETURN_CHARGE_STATUS                = 31,
-    L1SEND_RETURN_WEATHER_DATA_GET             = 32,
-    L1SEND_RETURN_BBPRO_MAC_ADDR               = 33,
-    L1SEND_RETURN_DEVICE_INFO                  = 34,
-    L1SEND_RETURN_DAIL_CHANGE                  = 35,
-    L1SEND_RETURN_BBPRO_STATE                  = 36,
-    L1SEND_RETURN_EXERCISEMODE_EVENT           = 37,
-    L1SEND_RETURN_ANCS_INCOMMING_CALL          = 38,
-    L1SEND_RETURN_HR_SAMPLE_EVENT              = 39,
-    L1SEND_RETURN_BACKLIGHT_EVENT              = 40,
-    L1SEND_RETURN_CHARGE_EVENT                 = 41,
-    L1SEND_RETURN_PATCH_EVENT                  = 42,
-    L1SEND_RETURN_GSENSOR_ID_EVENT             = 43,
-    L1SEND_RETURN_HR_ID_EVENT                  = 44,
-    L1SEND_RETURN_HALL_EVENT                   = 45,
-    L1SEND_RETURN_LOCK                         = 46,
-    L1SEND_RETURN_FACTORY_END_EVENT            = 47,
-    L1SEND_RETURN_COUNTER_EVENT                = 48,
-    L1SEND_RETURN_HIDDEN_FUNC                  = 49,
-    L1SEND_RETURN_BBPRO_CONNECTED_STATE        = 50,
-    L1SEND_RETURN_BBPRO_CONN_INFO              = 51,
-    L1SEND_RETURN_REALTIME_HEART_DATA          = 52,
-    L1SEND_RETURN_USER_ID_EVENT                = 53,
-    L1SEND_RETURN_DAILY_DATA_CALIBRATION       = 54,
-    L1SEND_AUTO_TEST,
-    L1SEND_INVALID,
-} L1SEND_TYPE_WRISTBAND;
+    uint8_t l1_magic;
+    uint8_t l1_version;
+    uint16_t l1_length;
+    uint16_t l1_crc;
+    uint16_t l1_seq_id;
+    uint8_t l2_cmd_id;
+    uint8_t l2_version;
+    uint8_t l2_key;
+    uint16_t l2_lenght;
+    uint8_t l2_payload[32];
+};
+
 
 /******************* Function definition **********************************/
+void package_prepare_send(struct protocol_pack *package);
 void communicate_protocol_init(void);
 bool L1_send(uint8_t *buf, uint16_t length);
-void L1_receive_data(uint8_t *data, uint16_t length);
-void L1_send_event(L1SEND_TYPE_WRISTBAND event, void *res);
+void resolve_remote_data(uint8_t *data, uint16_t length);
+
 
 #ifdef __cplusplus
 }

@@ -50,4 +50,4 @@ void resolve_private_bond_command(uint8_t key, const uint8_t *pValue, uint16_t l
 }
 #endif
 
-#endif //__COMMUNICATE_PARSE_BOND_H__
+#endif //__COMMUNICATE_PARSE_BOND_H_

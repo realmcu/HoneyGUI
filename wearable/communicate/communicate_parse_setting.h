@@ -23,6 +23,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include "stdint.h"
+#include "rtk_gsa.h"
 
 #define MAX_ALARM_NUM       (3)  //support 3 alarm now
 
@@ -63,6 +64,19 @@ typedef union
     uint64_t data __attribute__((packed));
     long_time_sit_alert_field_type_t sit_alert __attribute__((packed));
 } T_SIT_ALERT;
+
+
+typedef union
+{
+    uint32_t data;
+    usr_prof_t bit_field;
+} userprofile_union_t;
+
+typedef struct
+{
+    uint8_t user_id[32];
+    userprofile_union_t user_profile;
+} T_USER_DATA;
 
 typedef union
 {

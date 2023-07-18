@@ -10,7 +10,7 @@ objs = []
 src = Split("""
 """)
 
-if GetDepend(['WRISTBAND_PRIVATE_SERVICE']):
+if GetDepend(['PRIVATE_SERVICE']):
     src += ['communicate_task.c']
     src += ['communicate_protocol.c']
     src += ['communicate_parse.c']
@@ -18,14 +18,12 @@ if GetDepend(['WRISTBAND_PRIVATE_SERVICE']):
     src += ['communicate_parse_control.c']
     src += ['communicate_parse_setting.c']
     src += ['communicate_parse_health.c']
-    src += ['communicate_parse_notify.c']    
+    src += ['communicate_parse_notify.c']
+    src += ['communicate_parse_navigation.c']
 
-CPPPATH = [cwd]
+CPPPATH = [cwd, cwd + './../Sensor_Algorithm_3.8.14']
+CPPDEFINES = ['RTK_PRIVATE_SERVICE']
 
-group1 = DefineGroup('communication', src, depend = [''], CPPPATH = CPPPATH)
-
-group2 = DefineGroup('ble_profile', ['wristband_private_service.c'], depend = ['WRISTBAND_PRIVATE_SERVICE'], CPPPATH = CPPPATH)
-
-group = group1 + group2
+group = DefineGroup('communication', src, depend = ['PRIVATE_SERVICE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')
