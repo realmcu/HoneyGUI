@@ -50,3 +50,27 @@ typedef bool (*OperationModeSystemCheckFunc)(OperationModeType);
 typedef void (*OperationModeSystemEnterFunc)(OperationModeType);
 
 void operation_mode_register_callback_func(OperationModeStage stage, void *cb_func);
+
+
+typedef enum
+{
+    DVFS_NORMAL_VDD                 = 0,
+} DVFSVDDType;
+
+typedef enum
+{
+    DVFS_VDD_0V9                    = 0,
+    DVFS_VDD_0V8                    = 1,
+} DVFSVDDMode;
+
+typedef enum
+{
+    DVFS_SUCCESS                    = 0x0,
+    DVFS_BUSY                       = 0x1,
+    DVFS_VOLTAGE_FAIL               = 0x2,
+    DVFS_CONDITION_FAIL             = 0x4,
+    DVFS_SRAM_FAIL                  = 0x8,
+    DVFS_NOT_SUPPORT                = 0x10,
+} DVFSErrorCode;
+extern DVFSErrorCode(*dvfs_set_mode)(DVFSVDDType, DVFSVDDMode);
+

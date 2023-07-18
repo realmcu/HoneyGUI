@@ -22,10 +22,11 @@
 #include <string.h>
 #include "board.h"
 #include "trace.h"
-#include <watch_msg.h>
+#include "sensor_msg.h"
+#ifdef RTL8772F
 #include "os_ext_api.h"
-
-
+#include "platform_scenario_draft.h"
+#endif
 
 /*============================================================================*
  *                              Variables
@@ -57,47 +58,37 @@ static void sensor_task_entry(void *p_param)
 
     os_msg_queue_create(&sensor_queue_handle, "sensorQ", 20, sizeof(T_IO_MSG));
 
+#if 0    //for sensor mode test
+    sensor_mode_touch_int_init();
+#endif
     while (true)
     {
         T_IO_MSG io_msg;
         if (os_msg_recv(sensor_queue_handle, &io_msg, 0xFFFFFFFF) == true)
         {
-            DBG_DIRECT("=====%s %d", __FUNCTION__, __LINE__);
+            switch (io_msg.subtype)
+            {
+            case IO_MSG_SENSOR_TOUCH_TEST:
+                {
+#if 0    //for sensor mode test
+                    sensor_mode_i2c_read();
+#endif
+                }
+                break;
 
+            default:
+                break;
+            }
+            DBG_DIRECT("sensor_queue_handle end");
         }
     }
 }
 
-
-#include "platform_scenario_draft.h"
-typedef enum
-{
-    DVFS_NORMAL_VDD                 = 0,
-} DVFSVDDType;
-
-typedef enum
-{
-    DVFS_VDD_0V9                    = 0,
-    DVFS_VDD_0V8                    = 1,
-} DVFSVDDMode;
-
-typedef enum
-{
-    DVFS_SUCCESS                    = 0x0,
-    DVFS_BUSY                       = 0x1,
-    DVFS_VOLTAGE_FAIL               = 0x2,
-    DVFS_CONDITION_FAIL             = 0x4,
-    DVFS_SRAM_FAIL                  = 0x8,
-    DVFS_NOT_SUPPORT                = 0x10,
-} DVFSErrorCode;
-
-extern DVFSErrorCode(*dvfs_set_mode)(DVFSVDDType, DVFSVDDMode);
+#ifdef RTL8772F
 void scheduler_hook(void *from, void *to)
 {
-    //rt_kprintf("from task [%s] to task [%s] \n", from->name, to->name);
-
-    //OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
-    //rt_kprintf("PLATFORM_SCENARIO_OPERATION_MODE = %d \n", mode);
+    OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
+    DBG_DIRECT("PLATFORM_SCENARIO_OPERATION_MODE = %d line %d", mode, __LINE__);
     char *from_task_name;
     char *to_task_name;
     os_task_name_get(from, &from_task_name);
@@ -122,17 +113,20 @@ void scheduler_hook(void *from, void *to)
         DBG_DIRECT("dvfs_ret ret %d", dvfs_ret);
         uint32_t scenario_ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE,
                                                            OPERATION_SENSOR_MODE);
-        DBG_DIRECT("from IDLE to sensor dvfs_ret %d scenario_ret %d", dvfs_ret, scenario_ret);
+        DBG_DIRECT("from IDLE to sensor scenario_ret %d", scenario_ret);
     }
-    OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
-    DBG_DIRECT("PLATFORM_SCENARIO_OPERATION_MODE = %d \n", mode);
+    mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
+    DBG_DIRECT("PLATFORM_SCENARIO_OPERATION_MODE = %d line %d\n", mode, __LINE__);
 }
+#endif
 
 void sensor_task_init(void)
 {
     os_task_create(&sensor_task_handle, "sensor", sensor_task_entry, NULL, 1024, 1);
+#ifdef RTL8772F
     os_ext_func_init();
     os_sched_set_hook(scheduler_hook);
+#endif
 }
 
 /** @} */ /* End of group PERIPH_APP_TASK */
