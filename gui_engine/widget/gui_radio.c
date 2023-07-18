@@ -101,6 +101,7 @@ static void on(gui_radio_switch_t *this)
 
 
 }
+#include "gui_magic_img.h"
 static void (append)(gui_radio_t *this, char *text)
 {
     gui_radio_switch_t *sw = gui_radio_switch_create(this, this->gap * this->length, 0,
@@ -109,7 +110,17 @@ static void (append)(gui_radio_t *this, char *text)
     sw->onOn(sw, on, sw);
     gui_text_t *t = gui_text_create(sw, "radio_text", this->text_x, this->text_y,
                                     gui_get_screen_width(), gui_get_screen_height());
+#ifdef __WIN32
     gui_text_set(t, text, "rtk_font_stb", this->text_color, strlen(text), 30);
+#elif defined RTL8772F
+    gui_text_set(t, text, "rtk_font_stb", this->text_color, strlen(text), 30);
+#else
+    gui_set_font_mem_resourse(RTK_GUI_DEFAULT_FONT_SIZE,
+                              gui_get_file_address("app/system/resource/font/gbk_32_32_dot.bin"),
+                              gui_get_file_address("app/system/resource/font/gbk_unicode_table.bin"));
+
+    gui_text_set(t, text, "rtk_font_mem", this->text_color, strlen(text), 32);
+#endif
     this->length++;
 }
 static void (append_vertical)(gui_radio_t *this, char *text)

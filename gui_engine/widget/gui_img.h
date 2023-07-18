@@ -21,6 +21,14 @@ typedef struct gui_img
     draw_img_t draw_img;
 } gui_img_t;
 
+typedef struct gui_img_scope
+{
+    gui_img_t base;
+    uint16_t scope_x1;
+    uint16_t scope_x2;
+    uint16_t scope_y1;
+    uint16_t scope_y2;
+} gui_img_scope_t;
 
 
 
@@ -77,6 +85,17 @@ void gui_img_set_location(gui_img_t *img, uint16_t x, uint16_t y);
  *
  */
 void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode);
+
+/**
+ * @brief create a picture with scope
+ *
+ * @param parent parent widget
+ * @param addr picture address
+ * @param x the x coordinate
+ * @param y the y coordinate
+ * @return gui_img_scope_t*
+ */
+gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16_t y);
 #ifdef __cplusplus
 }
 #endif

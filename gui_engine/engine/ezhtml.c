@@ -17,7 +17,7 @@
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
-#include "app_dialing.h"
+
 #include "gui_img_with_animate.h"
 #include <gui_magic_img.h>
 #include <gui_app.h>
@@ -49,6 +49,8 @@
 #endif
 #if defined __WIN32
 #include <dirent.h>
+#else
+char *defaultPath = GUI_ROOT_FOLDER;
 #endif
 struct widget_create
 {
@@ -80,6 +82,7 @@ struct widget_create widget[] =
     {"arc", ARC},
     {"movie", MOVIE}
 };
+extern char *defaultPath;
 gui_magic_img_t *xml_gui_magic_img_create_from_mem(void *parent,  const char *name, void *addr,
                                                    int16_t x,
                                                    int16_t y)
@@ -250,7 +253,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t w = gui_get_screen_width();
                     int16_t h = 50;
                     const char *text = "text";
+#ifdef __WIN32
                     char *font = "app/system/resource/font/tangyuanti.ttf";
+#elif defined RTL8772F
+                    char *font = "app/system/resource/font/tangyuanti.ttf";
+#else
+                    char *font =
+                        "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
+#endif
                     size_t color = 0xffffffff;
                     int fontSize = 32;
                     int style = 0;
@@ -324,6 +334,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     //gui_log("x:%d,y:%d,w:%dh:%d,font:%s,text:%s,color:%x\n", x, y, w, h, font, text, color);
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("p->txt2 = %s,\n", ptxt);
+                    fontSize = 32;
                     if (text && font)
                     {
                         gui_text_t *t = 0;
@@ -353,8 +364,29 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
                                 else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
                                 {
+#ifdef __WIN32
                                     font_type2 = "rtk_font_stb";
                                     t->path = gui_get_file_address(font);
+#elif defined RTL8772F
+                                    font_type2 = "rtk_font_stb";
+                                    t->path = gui_get_file_address(font);
+#else
+                                    font_type =
+                                        "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
+                                    {
+                                        font_type2 = "rtk_font_mem";
+                                        char b[100] = {0};
+                                        strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                                        void *addr1 = gui_get_file_address(b);
+                                        memset(b, 0, sizeof(b));
+                                        char *a = font_type;
+                                        strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                                             ".bin;") - a + strlen(".bin;")));
+                                        void *addr2 = gui_get_file_address(b);
+                                        gui_set_font_mem_resourse(fontSize, addr1,  addr2);
+                                        t->path = 0;
+                                    }
+#endif
                                 }
                                 GUI_TYPE(gui_text_t, t)->text_type = font_type2;
 
@@ -698,6 +730,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     uint32_t color = 0xffffffaa;
                     uint32_t highlightColor = 0xffffffff;
                     bool vh = false;
+                    bool canvas = false;
+                    char *picture = "app/system/resource/Progress bar_full.bin";
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -720,6 +754,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "h"))
                         {
                             h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "canvasOrPicture"))
+                        {
+                            if (!strcmp(p->attr[++i], "canvas"))
+                            {
+                                canvas = true;
+                            }
+                            else
+                            {
+                                canvas = false;
+                            }
+
+                        }
+                        else if (!strcmp(p->attr[i], "picture"))
+                        {
+                            picture = gui_strdup(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "color"))
                         {
@@ -755,19 +805,36 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
-                    if (vh)
+                    if (canvas == true)
                     {
-                        parent = (void *)gui_progressbar_v_create(parent, ptxt, x, y, w, h);
+                        if (vh)
+                        {
+                            parent = (void *)gui_progressbar_v_create(parent, ptxt, x, y, w, h);
+                        }
+                        else
+                        {
+                            parent = (void *)gui_progressbar_create(parent, ptxt, x, y, w, h);
+                        }
+
+                        GUI_TYPE(gui_progressbar_t, parent)->color = color;
+                        GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
                     }
                     else
                     {
-                        parent = (void *)gui_progressbar_create(parent, ptxt, x, y, w, h);
+                        if (vh)
+                        {
+                            parent = (void *)gui_progressbar_img_v_create(parent, gui_get_file_address(picture), x, y);
+                        }
+                        else
+                        {
+                            parent = (void *)gui_progressbar_img_h_create(parent, gui_get_file_address(picture), x, y);
+                        }
                     }
 
 
 
-                    GUI_TYPE(gui_progressbar_t, parent)->color = color;
-                    GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
+
+
                 }
                 break;
             case SEEKBAR:
@@ -779,7 +846,16 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t h = 0;
                     uint32_t color = 0xffffffaa;
                     uint32_t highlightColor = 0xffffffff;
+                    bool canvas = false;
+                    bool arc = false;
+                    char *picture = "app/system/resource/Progress bar_full.bin";
+                    char *folder = NULL;
                     bool vh = false;
+                    int16_t cx = 0;
+                    int16_t cy = 0;
+
+                    float sd = 0;
+                    float ed = 0;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -802,6 +878,26 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "h"))
                         {
                             h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "canvasOrPicture"))
+                        {
+                            if (!strcmp(p->attr[++i], "canvas"))
+                            {
+                                canvas = true;
+                            }
+                            else
+                            {
+                                canvas = false;
+                            }
+
+                        }
+                        else if (!strcmp(p->attr[i], "folder"))
+                        {
+                            folder = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "picture"))
+                        {
+                            picture = gui_strdup(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "color"))
                         {
@@ -832,24 +928,131 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 vh = false;
                             }
+                            else if (!strcmp(p->attr[i], "arc"))
+                            {
+                                arc = true;
+                            }
 
+                        }
+                        else if (!strcmp(p->attr[i], "cx") || !strcmp(p->attr[i], "centralX"))
+                        {
+                            cx = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "cy") || !strcmp(p->attr[i], "centralY"))
+                        {
+                            cy = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "startDegree"))
+                        {
+                            sd = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "endDegree"))
+                        {
+                            ed = atof(p->attr[++i]);
                         }
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
-                    if (vh)
+                    if (canvas)
                     {
-                        parent = (void *)gui_seekbar_create(parent, ptxt, x, y, w, h);
+                        /* code */
+
+
+                        if (vh)
+                        {
+                            parent = (void *)gui_seekbar_create(parent, ptxt, x, y, w, h);
+                        }
+                        else
+                        {
+                            parent = (void *)gui_seekbar_h_create(parent, ptxt, x, y, w, h);
+                        }
+
+                        GUI_TYPE(gui_progressbar_t, parent)->color = color;
+                        GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
                     }
-                    else
+                    else if (!folder)
                     {
-                        parent = (void *)gui_seekbar_h_create(parent, ptxt, x, y, w, h);
+
+                        if (vh)
+                        {
+                            parent = (void *)gui_seekbar_create_img_v(parent, gui_get_file_address(picture), x, y);
+                        }
+                        else
+                        {
+                            parent = (void *)gui_seekbar_create_img_h(parent, gui_get_file_address(picture), x, y);
+                        }
+                    }
+                    else if (folder)
+                    {
+                        int file_count = 0;
+
+                        {
+                            DIR *dir = 0;
+                            struct dirent *entry;
+                            char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
+                            sprintf(path, "%s%s", defaultPath, folder);
+                            if ((dir = opendir(path)) == NULL)
+                            {
+                                gui_free(path);
+                                //perror("opendir() failed"); return;
+                            }
+                            gui_free(path);
+                            while ((entry = readdir(dir)) != NULL)
+                            {
+                                file_count++;
+                            }
+                            closedir(dir);
+                        }
+                        void **image_array = gui_malloc(file_count * sizeof(void *));
+                        {
+                            DIR *dir = 0;
+                            struct dirent *entry;
+                            char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
+                            sprintf(path, "%s%s", defaultPath, folder);
+                            if ((dir = opendir(path)) == NULL)
+                            {
+                                gui_free(path);
+                                //perror("opendir() failed"); return;
+                            }
+
+                            int count = 0;
+                            while ((entry = readdir(dir)) != NULL)
+                            {
+                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                {
+                                    char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 1);
+                                    sprintf(path2, "%s/%s", folder, entry->d_name);
+                                    image_array[count++] = gui_get_file_address(path2);
+                                }
+
+                            }
+                            gui_free(path);
+                            closedir(dir);
+                        }
+                        if (arc)
+                        {
+                            parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
+                                                                          cx, cy, 100, 100, sd, ed);
+                        }
+                        else
+                        {
+                            if (vh)
+                            {
+                                parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
+                            }
+                            else
+                            {
+                                parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
+                            }
+                        }
+
+
                     }
 
 
 
-                    GUI_TYPE(gui_progressbar_t, parent)->color = color;
-                    GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
+
+
                 }
                 break;
             /*case PROGRESSBAR:
@@ -1525,7 +1728,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         img2 = gui_get_file_address(hl_picture);;
                     }
                     char *ptxt = get_space_string_head(p->txt);
-
+                    font_size = 32;
                     parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, 0, 0);
                     GUI_TYPE(gui_button_t, parent)->style = style;
                     parent->name = ptxt;
@@ -1552,8 +1755,29 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
                         {
+#ifdef __WIN32
                             font_type2 = "rtk_font_stb";
                             GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
+#elif defined RTL8772F
+                            font_type2 = "rtk_font_stb";
+                            GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
+#else
+                            font_type =
+                                "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
+                            {
+                                font_type2 = "rtk_font_mem";
+                                char b[100] = {0};
+                                strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                                void *addr1 = gui_get_file_address(b);
+                                memset(b, 0, sizeof(b));
+                                char *a = font_type;
+                                strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                                     ".bin;") - a + strlen(".bin;")));
+                                void *addr2 = gui_get_file_address(b);
+                                gui_set_font_mem_resourse(32, addr1,  addr2);
+                                GUI_TYPE(gui_button_t, parent)->text->path = 0;
+                            }
+#endif
                         }
                         GUI_TYPE(gui_button_t, parent)->text->text_type = font_type2;
 
@@ -1794,8 +2018,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         DIR *dir = 0;
                         struct dirent *entry;
-                        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                        char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
+                        sprintf(path, "%s%s", defaultPath, folder);
                         if ((dir = opendir(path)) == NULL)
                         {
                             gui_free(path);
@@ -1812,8 +2036,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         DIR *dir = 0;
                         struct dirent *entry;
-                        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
-                        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                        char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
+                        sprintf(path, "%s%s", defaultPath, folder);
                         if ((dir = opendir(path)) == NULL)
                         {
                             gui_free(path);
@@ -2002,8 +2226,10 @@ void create_tree(gui_app_t *app)
     {
         extern char *defaultPath;
         char *path = gui_malloc(strlen(js) + strlen(defaultPath) + 1);
-        sprintf(path, "%s%s", defaultPath, js);
+
+        sprintf(path, "%s%s", defaultPath, js); gui_log("js_path:%s", path);
         js_run_file(path, app);
+
         gui_free(path);
     }
 }
@@ -2037,7 +2263,7 @@ const char *get_tag_by_widget_type(int type)
             return widget[i].name;
         }
     }
-
+    return NULL;
 }
 void get_app(gui_app_t *app, char *pic, char *text)
 {

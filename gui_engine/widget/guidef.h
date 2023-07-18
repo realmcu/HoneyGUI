@@ -378,6 +378,7 @@ typedef enum obj_type
     ARC,
     JAVASCRIPT,
     MOVIE,
+    IMAGE_SCOPE,
 } obj_type_t;
 typedef struct rtgui_msg
 {

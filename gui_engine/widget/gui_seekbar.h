@@ -29,6 +29,12 @@ struct gui_seekbar
     void *release_cb_p;
     void *press_cb_p;
     int deltaX_old;
+    uint16_t arcx;
+    uint16_t arcy;
+    uint16_t arc_r;
+    uint16_t arc_w;
+    float arc_start;
+    float arc_end;
     void (*ctor)(gui_seekbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y,
                  int16_t w, int16_t h);
@@ -58,6 +64,17 @@ gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x,
 
 gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t x, int16_t y,
                                     int16_t w, int16_t h);
+gui_seekbar_t *gui_seekbar_create_img_v(void *parent, const char *filename, int16_t x, int16_t y
+                                       );
+gui_seekbar_t *gui_seekbar_create_img_h(void *parent, const char *filename, int16_t x, int16_t y
+                                       );
+gui_seekbar_t *gui_seekbar_create_movie_h(void *parent, void  **picture_array,
+                                          uint16_t array_length, int16_t x, int16_t y);
+gui_seekbar_t *gui_seekbar_create_movie_v(void *parent, void  **picture_array,
+                                          uint16_t array_length, int16_t x, int16_t y);
+gui_seekbar_t *gui_seekbar_create_movie_arc(void *parent, void  **picture_array,
+                                            uint16_t array_length, int16_t x, int16_t y, uint16_t arc_x, uint16_t arc_y, uint16_t arc_r,
+                                            uint16_t arc_w, float arc_start, float arc_end);
 #ifdef __cplusplus
 }
 #endif

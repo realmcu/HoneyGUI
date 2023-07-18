@@ -26,7 +26,7 @@
 const uint8_t GT911_CFG_TBL[] =
 {
     0X60, 0XE0, 0X01, 0XE0, 0X01, 0X05, 0X35, 0X00, 0X02, 0X08,
-    0X1E, 0X08, 0X50, 0X3C, 0X0F, 0X05, 0X00, 0X00, 0XFF, 0X67,
+    0X1E, 0X08, 0X05, 0X3C, 0X0F, 0X05, 0X00, 0X00, 0XFF, 0X67,
     0X50, 0X00, 0X00, 0X18, 0X1A, 0X1E, 0X14, 0X89, 0X28, 0X0A,
     0X30, 0X2E, 0XBB, 0X0A, 0X03, 0X00, 0X00, 0X02, 0X33, 0X1D,
     0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X32, 0X00, 0X00,
@@ -100,7 +100,7 @@ uint32_t GT911_read(uint8_t *buf, uint32_t len)
     uint8_t point_num = 0;
     uint8_t reset = 0;
     GT911_RD_Reg(GT_GSTID_REG, &mode, 1);
-    //DBG_DIRECT("mode:%d",mode);
+    //DBG_DIRECT("mode:%x",mode);
     read[0] = mode;
     if (mode & 0x80)
     {
@@ -131,13 +131,25 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     uint8_t buf[10] = {0};
     *x = 480;
     *y = 480;
+    static uint16_t x_old = 0;
+    static uint16_t y_old = 0;
     if (GT911_read(buf, 0))
     {
         *pressing = true;
         *x = (buf[2] | (buf[3] << 8));
         *y = (buf[4] | (buf[5] << 8));
+        x_old = *x;
+        y_old = *y;
+        return true;
     }
-    return true;
+    else
+    {
+        *x = x_old;
+        *y = y_old;
+        return true;
+    }
+
+
 }
 
 void rtk_touch_hal_init(void)

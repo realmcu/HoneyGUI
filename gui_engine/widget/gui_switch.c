@@ -82,7 +82,24 @@ static void switch_prepare(gui_obj_t *obj)
             {
             case TOUCH_SHORT:
                 {
-
+                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                    {
+                        //gui_log("%d\n", __LINE__);
+                        gui_switch_t *sw = (gui_switch_t *)obj;
+                        sw->ifon = !(sw->ifon);
+                        gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
+                        if (sw->ifon)
+                        {
+                            //gui_log("switch_prepare4\n");
+                            gui_obj_event_set(obj, GUI_EVENT_1);
+                        }
+                        else if (!sw->ifon)
+                        {
+                            //gui_log("switch_prepare5\n");
+                            gui_obj_event_set(obj, GUI_EVENT_2);
+                        }
+                    }
 
                 }
                 break;
@@ -120,6 +137,7 @@ static void switch_prepare(gui_obj_t *obj)
                                 //gui_send_callback_p_to_server(b->long_click_cb, b->long_click_cb_p);
                                 // gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
                             }
+
                         }
                     }
                 }
@@ -169,24 +187,7 @@ static void switch_prepare(gui_obj_t *obj)
                         //if (callback)
                         {
                             //gui_log("%d\n", __LINE__);
-                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                            {
-                                //gui_log("%d\n", __LINE__);
-                                gui_switch_t *sw = (gui_switch_t *)obj;
-                                sw->ifon = !(sw->ifon);
-                                gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
-                                if (sw->ifon)
-                                {
-                                    //gui_log("switch_prepare4\n");
-                                    gui_obj_event_set(obj, GUI_EVENT_1);
-                                }
-                                else if (!sw->ifon)
-                                {
-                                    //gui_log("switch_prepare5\n");
-                                    gui_obj_event_set(obj, GUI_EVENT_2);
-                                }
-                            }
+
                         }
                     }
                 }

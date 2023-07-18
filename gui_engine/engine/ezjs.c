@@ -1455,10 +1455,16 @@ void gui_js_init()
 static void *context_alloc(size_t size, void *cb_data_p)
 {
 #ifdef OS_FREERTOS
-    return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
+#ifdef RTL8762G
+#include "mem_config.h"
+    return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);//return (void *)(SPIC1_ADDR + 0x200000);
+#else
+
+#endif
 #else
     return malloc(size);
 #endif
+    return malloc(size);
 }
 #include <jerryscript.h>
 #include <jerry_util.h>
@@ -1493,13 +1499,14 @@ void js_run_file(const char *file, gui_app_t  *app)
     jerry_release_value(global_obj);
     jerry_release_value(app_property);
     jerry_char_t *script;
-
+    gui_log("js_run_file1");
     size_t length = js_read_file(file, (void *)(&script));
     if (length > 0)
     {
+        gui_log("js_run_file2:%s", script);
         /* Setup Global scope code */
         parsed_code = jerry_parse(NULL, 0, script, length, JERRY_PARSE_NO_OPTS);
-
+        gui_log("js_run_file3");
         if (!jerry_value_is_error(parsed_code))
         {
             /* Execute the parsed source code in the Global scope */

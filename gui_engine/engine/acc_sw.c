@@ -468,9 +468,8 @@ static void normal_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev 
         }
     }
 }
-
-static void normal_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect)
+static void normal_blit_rgb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                           struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -481,6 +480,80 @@ static void normal_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev 
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint8_t source_bytes_per_pixel = 4;
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+
+    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
+
+    for (uint32_t i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+                       source_bytes_per_pixel * x_start;
+
+        uint8_t *writebuf = dc->frame_buf;
+        uint8_t *pixel;
+
+        for (uint32_t j = x_start; j < x_end; j++)
+        {
+            pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+
+            // uint8_t opacity_value = pixel[3];
+            canvas_color_t color = {.color.channel.alpha = pixel[3],
+                                    .color.channel.blue = pixel[0],
+                                    .color.channel.green = pixel[1],
+                                    .color.channel.red = pixel[2],
+                                   };
+            switch (image->opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    blend_rgba_to_rgb_screen(writebuf + (write_off + j) * dc_bytes_per_pixel, color.color.rgba);
+                }
+                break;
+            default:
+                {
+                    color.color.channel.alpha = color.color.channel.alpha * image->opacity_value / UINT8_MAX;
+                    blend_rgba_to_rgb_screen(writebuf + (write_off + j) * dc_bytes_per_pixel, color.color.rgba);
+                }
+                break;
+            }
+        }
+    }
+}
+static void normal_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                          struct rtgui_rect *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
+
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -937,6 +1010,10 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         else if ((img_type == RGBA8888) && (dc_bytes_per_pixel == 2))
         {
             normal_blit_rgba8888_2_rgb565(image, dc, rect);
+        }
+        else if ((img_type == RGBA8888) && (dc_bytes_per_pixel == 4))
+        {
+            normal_blit_rgb8888_2_argb8888(image, dc, rect);
         }
     }
     else if (image->blend_mode == IMG_MAGIC_MATRIX)

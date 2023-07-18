@@ -26,14 +26,14 @@ void return_update_att(gui_obj_t *obj)
     gui_return_t *this = (gui_return_t *)obj;
     if (tp->type == TOUCH_HOLD_X)
     {
-        if (tp->x > 0 && tp->x < 65 && tp->deltaX < 100 && tp->y > (gui_get_screen_height() - 200))
+        if (tp->x > 0 && tp->x < 20 && tp->deltaX < 100 && tp->y > (gui_get_screen_height() - 100))
         {
             gui_img_set_attribute(this->return_img_left, NULL, NULL, tp->deltaX - 100,
                                   this->return_img_left->base.y);
             this->hit = true;
         }
-        else if (tp->x > (gui_get_screen_width() - 100) && tp->x < gui_get_screen_width() &&
-                 tp->deltaX > -100 && tp->y > (gui_get_screen_height() - 200))
+        else if (tp->x > (gui_get_screen_width() - 20) && tp->x < gui_get_screen_width() &&
+                 tp->deltaX > -100 && tp->y > (gui_get_screen_height() - 100))
         {
             gui_img_set_attribute(this->return_img_right, NULL, NULL, tp->deltaX + gui_get_screen_width(),
                                   this->return_img_right->base.y);

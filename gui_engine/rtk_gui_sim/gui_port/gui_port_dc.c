@@ -225,7 +225,7 @@ static struct gui_indev indev =
     .tp_witdh = 0,
     .touch_timeout_ms = 110,
     .long_button_time_ms = 800,
-    .short_button_time_ms = 300,
+    .short_button_time_ms = 800,
     .quick_slide_time_ms = 50,
 };
 

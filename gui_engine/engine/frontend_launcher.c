@@ -14,6 +14,8 @@
 #include "gui_tab.h"
 #include "gui_grid.h"
 #include <gui_dynamic_img.h>
+#include "gui_progressbar.h"
+#include "gui_seekbar.h"
 #include "tp_algo.h"
 #include "gui_return.h"
 #include <math.h>
@@ -151,8 +153,6 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
     sprintf(path, "%s%s", GUI_ROOT_FOLDER, apppath);
     searchXmlFiles(path, app);
 
-    //text4->path = gui_get_file_address("app/system/resource/font/unifont.ttf");
-    //gui_return_create(&app->screen);
 }
 static void app_xml_ui_design(gui_app_t *app)
 {
