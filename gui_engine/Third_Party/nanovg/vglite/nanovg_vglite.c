@@ -323,6 +323,14 @@ NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtextu
     params.userPtr = (void *)&target;
     params.edgeAntiAlias = 1;
 
+    extern void patch_nvgStroke(NVGcontext * ctx);
+    extern void (*patch_nvg_stroke)(NVGcontext * ctx);
+    extern void patch_nvgFill(NVGcontext * ctx);
+    extern void (*patch_nvg_fill)(NVGcontext * ctx);
+
+    patch_nvg_stroke = patch_nvgStroke;
+    patch_nvg_fill = patch_nvgFill;
+
 
     ctx = nvgCreateInternal(&params);
     if (ctx == NULL) { goto error; }

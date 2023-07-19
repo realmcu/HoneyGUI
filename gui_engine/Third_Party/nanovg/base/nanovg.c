@@ -2687,8 +2687,15 @@ void nvgDebugDumpPathCache(NVGcontext *ctx)
 }
 #endif/*WITH_NANOVG_GPU*/
 
+void (*patch_nvg_fill)(NVGcontext *ctx) = NULL;
+
 void nvgFill(NVGcontext *ctx)
 {
+    if (patch_nvg_fill != NULL)
+    {
+        patch_nvg_fill(ctx);
+        return;
+    }
     NVGstate *state = nvg__getState(ctx);
     const NVGpath *path;
     NVGpaint fillPaint = state->fill;
@@ -2722,8 +2729,17 @@ void nvgFill(NVGcontext *ctx)
     }
 }
 
+
+void (*patch_nvg_stroke)(NVGcontext *ctx) = NULL;
+
 void nvgStroke(NVGcontext *ctx)
 {
+    if (patch_nvg_stroke != NULL)
+    {
+        patch_nvg_stroke(ctx);
+        return;
+    }
+
     NVGstate *state = nvg__getState(ctx);
     float scale = nvg__getAverageScale(state->xform);
     float strokeWidth = nvg__clampf(state->strokeWidth * scale, 0.0f, 200.0f);
@@ -3556,4 +3572,327 @@ int nvgCreateImageRaw(NVGcontext *ctx, int w, int h, int format, int imageFlags,
     return ctx->params.renderCreateTexture(ctx->params.userPtr, format, w, h, imageFlags, data);
 }
 
+#ifdef RTK_MODULE_VG_LITE
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <math.h>
+#include "nanovg.h"
+#include "vg_lite.h"
+
+#define PATH_CMD_LEN 256
+uint8_t path_cmd[PATH_CMD_LEN] = {0};
+vg_lite_float_t path_data[PATH_CMD_LEN * 2] = {0};
+
+
+static void multiply(vg_lite_matrix_t *matrix, vg_lite_matrix_t *mult)
+{
+    vg_lite_matrix_t temp;
+    int row, column;
+
+    /* Process all rows. */
+    for (row = 0; row < 3; row++)
+    {
+        /* Process all columns. */
+        for (column = 0; column < 3; column++)
+        {
+            /* Compute matrix entry. */
+            temp.m[row][column] = (matrix->m[row][0] * mult->m[0][column])
+                                  + (matrix->m[row][1] * mult->m[1][column])
+                                  + (matrix->m[row][2] * mult->m[2][column]);
+        }
+    }
+
+    /* Copy temporary matrix into result. */
+    memcpy(matrix, &temp, sizeof(temp));
+}
+
+void patch_nvgFill(NVGcontext *ctx)
+{
+    NVGstate *state = nvg__getState(ctx);
+    NVGpaint fillPaint = state->fill;
+
+
+    nvg__flattenPaths(ctx);
+    if (ctx->params.edgeAntiAlias && state->shapeAntiAlias)
+    {
+        nvg__expandFill(ctx, ctx->fringeWidth, NVG_MITER, 2.4f);
+    }
+    else
+    {
+        nvg__expandFill(ctx, 0.0f, NVG_MITER, 2.4f);
+    }
+
+    // Apply global alpha
+    fillPaint.innerColor.a *= state->alpha;
+    fillPaint.outerColor.a *= state->alpha;
+
+    uint32_t total_cnt = 0;
+    uint32_t cmd_cnt = 0;
+    uint32_t data_cnt = 0;
+    vg_lite_matrix_t matrix;
+    vg_lite_identity(&matrix);
+
+    while (total_cnt < ctx->ncommands)
+    {
+        float *cp1;
+        float *cp2;
+        float *p;
+        int cmd = (int)ctx->commands[total_cnt];
+        switch (cmd)
+        {
+        case NVG_MOVETO:
+            p = &ctx->commands[total_cnt + 1];
+            path_cmd[cmd_cnt++] = VLC_OP_MOVE;
+            path_data[data_cnt++] = p[0];
+            path_data[data_cnt++] = p[1];
+            total_cnt += 3;
+            break;
+        case NVG_LINETO:
+            p = &ctx->commands[total_cnt + 1];
+            path_cmd[cmd_cnt++] = VLC_OP_LINE;
+            path_data[data_cnt++] = p[0];
+            path_data[data_cnt++] = p[1];
+            total_cnt += 3;
+            break;
+        case NVG_BEZIERTO:
+            p = &ctx->commands[total_cnt + 1];
+            path_cmd[cmd_cnt++] = VLC_OP_CUBIC;
+            path_data[data_cnt++] = p[0];
+            path_data[data_cnt++] = p[1];
+            path_data[data_cnt++] = p[2];
+            path_data[data_cnt++] = p[3];
+            path_data[data_cnt++] = p[4];
+            path_data[data_cnt++] = p[5];
+            total_cnt += 7;
+            break;
+        case NVG_CLOSE:
+            path_cmd[cmd_cnt++] = VLC_OP_END;
+            total_cnt++;
+            break;
+        case NVG_WINDING:
+            total_cnt += 2;
+            break;
+        default:
+            total_cnt++;
+        }
+        if (total_cnt >= PATH_CMD_LEN)
+        {
+            DBG_DIRECT(" ERROR !%s %d, cmd_cnt >= PATH_CMD_LEN\n", __func__, __LINE__);
+            *(uint32_t *)0xFFFFFFFF = 0;
+            while (1);
+        }
+    }
+    vg_lite_path_t path;
+    memset(&path, 0, sizeof(vg_lite_path_t));
+    uint32_t path_data_len = vg_lite_path_calc_length(path_cmd, sizeof(path_cmd), VG_LITE_FP32);
+    vg_lite_init_path(&path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, 0, 0, 0, 0);
+    vg_lite_path_append(&path, path_cmd, path_data, cmd_cnt);
+
+    vg_lite_buffer_t *target = (vg_lite_buffer_t *)ctx->params.userPtr;
+
+    NVGpaint *paint = &fillPaint;
+
+    uint8_t inner_r = paint->innerColor.r * 0xff;
+    uint8_t inner_g = paint->innerColor.g * 0xff;
+    uint8_t inner_b = paint->innerColor.b * 0xff;
+    uint8_t inner_a = paint->innerColor.a * 0xff;
+    uint8_t outer_r = paint->outerColor.r * 0xff;
+    uint8_t outer_g = paint->outerColor.g * 0xff;
+    uint8_t outer_b = paint->outerColor.b * 0xff;
+    uint8_t outer_a = paint->outerColor.a * 0xff;
+    uint32_t inner_color = (inner_a << 24) | (inner_b << 0) | (inner_g << 8) | (inner_r << 16);
+    uint32_t outer_color = (outer_a << 24) | (outer_b << 0) | (outer_g << 8) | (outer_r << 16);
+
+
+    if (memcmp(&(paint->innerColor), &(paint->outerColor), sizeof(paint->outerColor)) == 0)
+    {
+        vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, inner_color);
+    }
+    else if (paint->radius == 0)
+    {
+        const float large = 1e5;
+        float dx = paint->xform[2];
+        float dy = paint->xform[3];
+        float d = (paint->extent[1] - large) * 2;
+        float sx = paint->xform[4] + dx * large;
+        float sy = paint->xform[5] + dy * large;
+        float ex = sx + d * dx;
+        float ey = sy + d * dy;
+
+        vg_lite_linear_gradient_t grad;
+        memset(&grad, 0, sizeof(vg_lite_linear_gradient_t));
+        vg_lite_init_grad(&grad);
+
+
+        uint32_t colors[] = {inner_color, outer_color};
+        uint32_t stops[] = {0, VLC_GRADIENT_BUFFER_WIDTH - 1};
+        vg_lite_set_grad(&grad, 2, colors, stops);
+        vg_lite_update_grad(&grad);
+        vg_lite_matrix_t *gradMatrix = vg_lite_get_grad_matrix(&grad);
+        vg_lite_identity(gradMatrix);
+
+        vg_lite_float_t cos_angle = dy;
+        vg_lite_float_t sin_angle = dx;
+        /* Set rotation matrix. */
+        vg_lite_matrix_t r = { { {cos_angle, -sin_angle, 0.0f},
+                {sin_angle, cos_angle, 0.0f},
+                {0.0f, 0.0f, 1.0f}
+            }
+        };
+        multiply(gradMatrix, &r);
+
+        vg_lite_scale(d / VLC_GRADIENT_BUFFER_WIDTH, 1, gradMatrix);
+        vg_lite_draw_gradient(target, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &grad, VG_LITE_BLEND_NONE);
+    }
+    else
+    {
+        float cx = paint->xform[4];
+        float cy = paint->xform[5];
+        float inr = paint->radius - paint->feather / 2;
+        float outr = paint->radius + paint->feather / 2;
+    }
+
+    vg_lite_finish();
+    vg_lite_clear_path(&path);
+
+    // Count triangles
+    for (uint32_t i = 0; i < ctx->cache->npaths; i++)
+    {
+        const NVGpath *path;
+        path = &ctx->cache->paths[i];
+        ctx->fillTriCount += path->nfill - 2;
+        ctx->fillTriCount += path->nstroke - 2;
+        ctx->drawCallCount += 2;
+    }
+
+}
+
+void patch_nvgStroke(NVGcontext *ctx)
+{
+
+    NVGstate *state = nvg__getState(ctx);
+    float scale = nvg__getAverageScale(state->xform);
+    float strokeWidth = nvg__clampf(state->strokeWidth * scale, 0.0f, 200.0f);
+    NVGpaint strokePaint = state->stroke;
+
+    if (strokeWidth < ctx->fringeWidth)
+    {
+        // If the stroke width is less than pixel size, use alpha to emulate coverage.
+        // Since coverage is area, scale by alpha*alpha.
+        float alpha = nvg__clampf(strokeWidth / ctx->fringeWidth, 0.0f, 1.0f);
+        strokePaint.innerColor.a *= alpha * alpha;
+        strokePaint.outerColor.a *= alpha * alpha;
+        strokeWidth = ctx->fringeWidth;
+    }
+
+    // Apply global alpha
+    strokePaint.innerColor.a *= state->alpha;
+    strokePaint.outerColor.a *= state->alpha;
+
+    if (ctx->params.edgeAntiAlias && state->shapeAntiAlias)
+    {
+        nvg__expandStroke(ctx, strokeWidth * 0.5f, ctx->fringeWidth, state->lineCap, state->lineJoin,
+                          state->miterLimit);
+    }
+    else
+    {
+        nvg__expandStroke(ctx, strokeWidth * 0.5f, 0.0f, state->lineCap, state->lineJoin,
+                          state->miterLimit);
+    }
+
+
+    vg_lite_buffer_t *target = (vg_lite_buffer_t *)ctx->params.userPtr;
+
+    uint32_t total_cnt = 0;
+    uint32_t cmd_cnt = 0;
+    uint32_t data_cnt = 0;
+
+    while (total_cnt < ctx->ncommands)
+    {
+        float *cp1;
+        float *cp2;
+        float *p;
+        int cmd = (int)ctx->commands[total_cnt];
+        switch (cmd)
+        {
+        case NVG_MOVETO:
+            p = &ctx->commands[total_cnt + 1];
+            path_cmd[cmd_cnt++] = VLC_OP_MOVE;
+            path_data[data_cnt++] = p[0];
+            path_data[data_cnt++] = p[1];
+            total_cnt += 3;
+            break;
+        case NVG_LINETO:
+            p = &ctx->commands[total_cnt + 1];
+            path_cmd[cmd_cnt++] = VLC_OP_LINE;
+            path_data[data_cnt++] = p[0];
+            path_data[data_cnt++] = p[1];
+            total_cnt += 3;
+            break;
+        case NVG_BEZIERTO:
+            p = &ctx->commands[total_cnt + 1];
+            path_cmd[cmd_cnt++] = VLC_OP_CUBIC;
+            path_data[data_cnt++] = p[0];
+            path_data[data_cnt++] = p[1];
+            path_data[data_cnt++] = p[2];
+            path_data[data_cnt++] = p[3];
+            path_data[data_cnt++] = p[4];
+            path_data[data_cnt++] = p[5];
+            total_cnt += 7;
+            break;
+        case NVG_CLOSE:
+            path_cmd[cmd_cnt++] = VLC_OP_END;
+            total_cnt++;
+            break;
+        case NVG_WINDING:
+            total_cnt += 2;
+            break;
+        default:
+            total_cnt++;
+        }
+        if (total_cnt >= PATH_CMD_LEN)
+        {
+            DBG_DIRECT(" ERROR !%s %d, cmd_cnt >= PATH_CMD_LEN\n", __func__, __LINE__);
+            *(uint32_t *)0xFFFFFFFF = 0;
+            while (1);
+        }
+    }
+
+    vg_lite_path_t path;
+    memset(&path, 0, sizeof(vg_lite_path_t));
+    uint32_t path_data_len = vg_lite_path_calc_length(path_cmd, sizeof(path_cmd), VG_LITE_FP32);
+    vg_lite_init_path(&path, VG_LITE_FP32, VG_LITE_HIGH, path_data_len, NULL, 0, 0, 0, 0);
+    vg_lite_path_append(&path, path_cmd, path_data, cmd_cnt);
+    vg_lite_matrix_t matrix;
+    vg_lite_identity(&matrix);
+
+    NVGpaint *paint = &strokePaint;
+    uint8_t a = paint->innerColor.a * 0xff;
+    uint8_t r = paint->innerColor.r * 0xff * paint->innerColor.a;
+    uint8_t g = paint->innerColor.g * 0xff * paint->innerColor.a;
+    uint8_t b = paint->innerColor.b * 0xff * paint->innerColor.a;
+
+
+    vg_lite_color_t color = (a << 24) | (b << 16) | (g << 8) | r;
+
+    vg_lite_set_stroke(&path, VG_LITE_CAP_ROUND, VG_LITE_JOIN_ROUND, strokeWidth, 60, NULL, 0, 0,
+                       color);
+    vg_lite_update_stroke(&path);
+    vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH);
+    vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, color);
+    vg_lite_finish();
+    vg_lite_clear_path(&path);
+
+    // Count triangles
+    for (uint32_t i = 0; i < ctx->cache->npaths; i++)
+    {
+        const NVGpath *path;
+        path = &ctx->cache->paths[i];
+        ctx->strokeTriCount += path->nstroke - 2;
+        ctx->drawCallCount++;
+    }
+}
+
+#endif
 // vim: ft=c nu noet ts=4
