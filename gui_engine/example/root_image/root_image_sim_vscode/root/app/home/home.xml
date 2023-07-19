@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<app iconPicture="app/home/resource/home.bin">HOME
+<script
+    file="app/home/home.js"></script>
+<screen
+    w="480"
+    h="480"
+    x="0"
+    y="0">screen0
+    <tabview transition="fade">tv1
+        <tab >main
+            <img file="app/home/resource/8866bbooxx/back/background.bin">img1 </img>
+            <textbox text="09:30" x="46" y="108"></textbox>
+            <textbox text="Friday, March 25th" x="46" y="223" color="#E5DCFF"></textbox>
+            <textbox text="24℃" x="73" y="339"></textbox>
+            <textbox text="50%" x="184" y="338"></textbox>
+            <textbox text="32" x="291" y="337"></textbox>
+
+        </tab>
+        <tab idx="1">lamp
+            <img file="app/home/resource/8866bbooxx/back/lampbackground.bin" >img1</img>
+            <switch x="410" y="30" w="30" h="410" 
+					picture="app/home/resource/8866bbooxx/lamp/switch_off.bin" 
+					highlightPicture="app/home/resource/8866bbooxx/lamp/switch_on.bin">tab8Switch
+			</switch>
+            <grid rowNumber="3" colNumber="2" rowGap="118" colGap="210" x="42" y="83">
+                <switch w="186" h="97" 
+                        picture="app/home/resource/8866bbooxx/lamp/lamp_off_1.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/lamp/lamp_on_1.bin">tab8Switch
+                </switch>
+                <switch w="186" h="97" 
+                        picture="app/home/resource/8866bbooxx/lamp/lamp_off_2.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/lamp/lamp_on_2.bin">tab8Switch
+                </switch>
+                <switch w="186" h="97" 
+                        picture="app/home/resource/8866bbooxx/lamp/lamp_off_3.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/lamp/lamp_on_3.bin">tab8Switch
+                </switch>
+                <switch w="186" h="97" 
+                        picture="app/home/resource/8866bbooxx/lamp/lamp_off_4.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/lamp/lamp_on_4.bin">tab8Switch
+                </switch>
+                <switch w="186" h="97" 
+                        picture="app/home/resource/8866bbooxx/lamp/lamp_off_5.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/lamp/lamp_on_5.bin">tab8Switch
+                </switch>
+                <switch w="186" h="97" 
+                        picture="app/home/resource/8866bbooxx/lamp/lamp_off_6.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/lamp/lamp_on_6.bin">tab8Switch
+                </switch>
+            </grid>
+        </tab>
+        <tab idx="2">ac
+            <img file="app/home/resource/8866bbooxx/back/cooling_background.bin" >img1</img>
+            <grid rowNumber="1" colNumber="3" rowGap="118" colGap="92" x="136" y="369">
+                <switch w="28" h="33" 
+                        picture="app/home/resource/8866bbooxx/ac/cooling_off.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/ac/cooling_on.bin">tab8Switch
+                </switch>
+                 <switch w="28" h="33" 
+                        picture="app/home/resource/8866bbooxx/ac/switch_off.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/ac/switch_on.bin">tab8Switch
+                </switch>
+                 <switch w="28" h="33" 
+                        picture="app/home/resource/8866bbooxx/ac/heating_off.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/ac/heating_on.bin">tab8Switch
+                </switch>
+            </grid>
+            <textbox text="28" x="184" y="165"></textbox>
+            <textbox text="℃" x="281" y="212"></textbox>
+            <seekbar x="85" y="61" w="250" h="136" 
+            folder="app/home/resource/8866bbooxx/cool arc"
+            centralX="156" centralY="164" startDegree="270" endDegree="90" orientation="arc" >
+            coolArc
+            </seekbar>
+
+        </tab>
+        <tab idx="3">ct
+            <img file="app/home/resource/8866bbooxx/back/curtainback.bin" >img1</img>
+            <seekbar x="84" y="78"  orientation="V" folder="app/home/resource/8866bbooxx/curtain seek" >curtain</seekbar>
+            <grid rowNumber="1" colNumber="3" rowGap="118" colGap="92" x="136" y="353">
+                <switch w="28" h="33" 
+                        picture="app/home/resource/8866bbooxx/ct/off.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/ct/on.bin">tab8Switch
+                </switch>
+                 <switch w="28" h="33" 
+                        picture="app/home/resource/8866bbooxx/ct/switch_off.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/ct/switch_on.bin">tab8Switch
+                </switch>
+                 <switch w="28" h="33" 
+                        picture="app/home/resource/8866bbooxx/ct/off.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/ct/on.bin">tab8Switch
+                </switch>
+            </grid>
+        </tab>
+    </tabview>		
+
+</screen></app>
