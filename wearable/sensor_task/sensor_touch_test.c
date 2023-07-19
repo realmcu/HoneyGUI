@@ -33,7 +33,7 @@ uint32_t sensor_mode_i2c_write(uint16_t slave_addr, uint8_t *buffer, uint32_t si
 void sensor_touch_int(void)
 {
     T_IO_MSG msg;
-    msg.subtype = IO_MSG_SENSOR_TOUCH_TEST;
+    msg.subtype = SENSOR_MSG_TOUCH_TEST;
     app_send_msg_to_sensor_task(&msg);
 }
 

@@ -16,7 +16,8 @@ extern "C" {
 
 typedef enum
 {
-    IO_MSG_SENSOR_TOUCH_TEST,
+    SENSOR_MSG_TOUCH_TEST,
+    SENSOR_MSG_UART_TEST,
 } T_SENSOR_MSG;
 
 
