@@ -271,7 +271,7 @@ class HoneyGUIRelease(WindowsToolRelease):
         #  v1.0.x.0
         #  GUI simulator-vx.zip
         tag_item = self.get_tag_item()
-        pack_name = f'GUI_simulator-v{tag_item[3]}'
+        pack_name = f'GUI_simulator-{self.tag_name}'
         return pack_name, pack_name + '.zip'
 
     def jenkins_archive_tool(self):
