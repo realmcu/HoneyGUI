@@ -10,7 +10,7 @@ src = Glob('*.c')
 CPPPATH = [cwd]
 
 
-group = DefineGroup('vg_lite', src, depend = ['MODULE_VG_LITE'], CPPPATH = CPPPATH)
+group = DefineGroup('vg_lite', src, depend = [''], CPPPATH = CPPPATH)
 
 
 Return('group')

@@ -9,7 +9,7 @@ src = Split("""
 src = Glob('*.c')
 SrcRemove(src,'gui_vg_lite_clock.c')
 
-if GetDepend(['MODULE_VG_LITE']):
+if GetDepend(['BUILD_USING_VG_LITE']):
     src += ['gui_vg_lite_clock.c']
 
 

@@ -36,7 +36,7 @@ if GetDepend('BSP_USING_LCD'):
     src += ['drv_lcd.c']
     CPPDEFINES += ['RTK_HAL_LCD']
 
-if GetDepend('MODULE_VG_LITE'):
+if GetDepend('BUILD_USING_VG_LITE'):
     src += ['drv_gpu.c']
     CPPDEFINES += ['RTK_MODULE_VG_LITE']
 

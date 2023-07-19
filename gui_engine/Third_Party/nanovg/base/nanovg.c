@@ -3579,6 +3579,7 @@ int nvgCreateImageRaw(NVGcontext *ctx, int w, int h, int format, int imageFlags,
 #include <math.h>
 #include "nanovg.h"
 #include "vg_lite.h"
+#include "trace.h"
 
 #define PATH_CMD_LEN 256
 uint8_t path_cmd[PATH_CMD_LEN] = {0};

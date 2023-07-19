@@ -12,10 +12,7 @@ CPPPATH = [cwd, cwd + '/rtos']
 src += Glob('rtos/*.c')
 
 
-# CPPDEFINES = ['TEST_DEFINE']
-# group = DefineGroup('vg_lite', src, depend = ['MODULE_VG_LITE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
-
-group = DefineGroup('vg_lite', src, depend = ['MODULE_VG_LITE'], CPPPATH = CPPPATH)
+group = DefineGroup('vg_lite', src, depend = [''], CPPPATH = CPPPATH)
 
 
 Return('group')

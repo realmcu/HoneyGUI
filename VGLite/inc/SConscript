@@ -11,6 +11,6 @@ src = Split("""
 path = [cwd]
 		
 
-group = DefineGroup('MODULE_VG_LITE', src, depend = [''], CPPPATH = path)
+group = DefineGroup('', src, depend = [''], CPPPATH = path)
 
 Return('group')

@@ -38,7 +38,6 @@ void gui_acc_init(void)
     acc.blit = hw_acc_blit;
     acc.draw_circle = hw_draw_circle;
     acc.draw_rectangle = hw_draw_rectangle;
-    //acc.draw_arc = sw_draw_arc;
     acc.draw_arc = hw_draw_arc;
     acc.draw_line = hw_draw_line;
     acc.draw_path = sw_draw_path;

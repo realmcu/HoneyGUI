@@ -27,9 +27,9 @@ src += ['acc_init.c']
 #SrcRemove(src,'image_png.c')
 #SrcRemove(src,'image_svg.c')
 
-if GetDepend(['MODULE_VG_LITE']):
+if GetDepend(['BUILD_USING_VG_LITE']):
     src += ['acc_vg_lite.c']
-if GetDepend(['MODULE_RTK_PPE']):
+if GetDepend(['BUILD_USING_RTK_PPE']):
     src += ['acc_rtk_ppe.c']
 
 CPPPATH = [cwd]
