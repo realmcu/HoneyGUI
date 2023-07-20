@@ -1,6 +1,8 @@
 console.log('enter box3')
 
-
+/**
+ * lamp
+ */
 
 var P1_1 = 9
 var P1_0 = 8
@@ -92,4 +94,187 @@ sw.onOff(led3OffFunc)
 sw.getElementById('lampSwitch')
 sw.onOn(lampSwitchOnFunc)
 sw.onOff(lampSwitchOffFunc)
+
+/**
+ * ac
+ */
+var acStatus = 1
+var acOnOffStatus = 0;
+function coolingFunc(params) {
+    console.log('coolingFunc')
+    win.getElementById('coolAC')
+    hid = win.getAttribute("hidden")
+    if (hid) {
+        console.log("true")
+    }
+    if (!hid) {
+        console.log("false")
+    }
+    if (hid) {
+        win.removeAttribute("hidden");
+    }
+    win.getElementById('heatAC')
+    hid = win.getAttribute("hidden")
+    console.log(hid)
+    if (hid) {
+        console.log("true")
+    }
+    if (!hid) {
+        console.log("false")
+    }
+    if (!hid) {
+        win.setAttribute("hidden", "hidden");
+    }
+    sw.getElementById('heatingSwitch')
+    sw.turnOff()
+    acStatus = 1
+    acOnOffStatus = 1
+    sw.getElementById('acSwitch')
+    sw.turnOn()
+}
+function heatingFunc(params) {
+    console.log('heatingFunc')
+    win.getElementById('heatAC')
+    hid = win.getAttribute("hidden")
+    if (hid) {
+        console.log("true")
+    }
+    if (!hid) {
+        console.log("false")
+    }
+    if (hid) {
+        win.removeAttribute("hidden");
+    }
+    win.getElementById('coolAC')
+    hid = win.getAttribute("hidden")
+    console.log(hid)
+    if (hid) {
+        console.log("true")
+    }
+    if (!hid) {
+        console.log("false")
+    }
+    if (!hid) {
+        win.setAttribute("hidden", "hidden");
+    }
+    sw.getElementById('coolingSwitch')
+    sw.turnOff()
+    acStatus = 2
+    acOnOffStatus = 1
+    sw.getElementById('acSwitch')
+    sw.turnOn()
+}
+function acOffFunc(params) {
+    console.log('heatingFunc')
+    win.getElementById('coolAC')
+    hid = win.getAttribute("hidden")
+    console.log(hid)
+    if (hid) {
+        console.log("true")
+    }
+    if (!hid) {
+        console.log("false")
+    }
+    if (!hid) {
+        win.setAttribute("hidden", "hidden");
+    }
+    win.getElementById('heatAC')
+    hid = win.getAttribute("hidden")
+    console.log(hid)
+    if (hid) {
+        console.log("true")
+    }
+    if (!hid) {
+        console.log("false")
+    }
+    if (!hid) {
+        win.setAttribute("hidden", "hidden");
+    }
+    sw.getElementById('coolingSwitch')
+    sw.turnOff()
+    sw.getElementById('heatingSwitch')
+    sw.turnOff()
+    acOnOffStatus = 0;
+}
+function acOnFunc(params) {
+    console.log('heatingFunc')
+    if (!acOnOffStatus) {
+        
+    
+    if (acStatus == 1) {
+        sw.getElementById('coolingSwitch')
+        sw.turnOn()
+    } else if (acStatus == 2) {
+        sw.getElementById('heatingSwitch')
+        sw.turnOn()
+    }
+    }
+
+}
+function acOffFunc1(params) {
+    console.log('heatingFunc')
+
+}
+sw.getElementById('coolingSwitch')
+sw.onOn(coolingFunc)
+sw.onOff(acOffFunc1)
+
+
+sw.getElementById('heatingSwitch')
+sw.onOn(heatingFunc)
+sw.onOff(acOffFunc1)
+
+sw.getElementById('acSwitch')
+sw.onOn(acOnFunc)
+sw.onOff(acOffFunc)
+sw.turnOn()
+
+/**
+ * curtain
+ */
+var curtainAnimateTiming = {
+    duration: 2000,
+    iterations:1,
+    from: 1,
+    to: 0
+}
+var curtain_open = 0;
+function curtainFrame(params) {
+
+    console.log('curtainFrame')
+    seekbar.getElementById('curtain')
+    var animate = seekbar.getAttribute("animate")
+    console.log(animate.progress)
+    if (curtain_open==1) {
+        seekbar.setAttribute("progress", 1.0-animate.progress)
+    } else {
+        seekbar.setAttribute("progress", animate.progress)
+    }
+    
+}
+function swCurtain(params) {
+    console.log('swCurtain')
+    seekbar.getElementById('curtain')
+    seekbar.palyAnimate()
+    if (curtain_open==1) {
+        curtain_open = 0;
+    } else {
+        curtain_open = 1;
+    }
+}
+
+seekbar.getElementById('curtain')
+seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
+sw.getElementById('curtainSwitch1')
+sw.onOn(swCurtain)
+sw.onOff(swCurtain)
+sw.getElementById('curtainSwitch2')
+sw.onOn(swCurtain)
+sw.onOff(swCurtain)
+sw.getElementById('curtainSwitch3')
+sw.onOn(swCurtain)
+sw.onOff(swCurtain)
+
+
+
 

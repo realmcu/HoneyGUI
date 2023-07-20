@@ -68,7 +68,7 @@ var progressbar = {
 }
 var seekbar = {
     getElementById : function (win_name : string) {},
-    progress : function (progressToSet : number):number ,
+    progress : function (progressToSet : number):{},
     onPress : function (callback_func) {},
     onPressing : function (callback_func) {},
     onRelease : function (click_callback_func) {},

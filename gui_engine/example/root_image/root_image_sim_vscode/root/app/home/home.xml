@@ -51,28 +51,38 @@
             </grid>
         </tab>
         <tab idx="2">ac
-            <img file="app/home/resource/8866bbooxx/back/cooling_background.bin" >img1</img>
+            <win hidden="hidden">heatAC
+                <img file="app/home/resource/8866bbooxx/back/heating_background.bin" >img1</img>
+                <seekbar x="85" y="61" w="250" h="136" 
+                folder="app/home/resource/8866bbooxx/heat arc"
+                centralX="156" centralY="164" startDegree="270" endDegree="90" orientation="arc" >
+                heatArc
+                </seekbar>
+            </win>
+            <win >coolAC
+                <img file="app/home/resource/8866bbooxx/back/cooling_background.bin" >img1</img>
+                <seekbar x="85" y="61" w="250" h="136" 
+                folder="app/home/resource/8866bbooxx/cool arc"
+                centralX="156" centralY="164" startDegree="270" endDegree="90" orientation="arc" >
+                coolArc
+                </seekbar>
+            </win>
             <grid rowNumber="1" colNumber="3" rowGap="118" colGap="92" x="136" y="369">
                 <switch w="28" h="33" 
-                        picture="app/home/resource/8866bbooxx/ac/cooling_off.bin" 
-                        highlightPicture="app/home/resource/8866bbooxx/ac/cooling_on.bin">tab8Switch
+                        picture="app/home/resource/8866bbooxx/ac/cooling_on.bin" 
+                        highlightPicture="app/home/resource/8866bbooxx/ac/cooling_off.bin">coolingSwitch
                 </switch>
-                 <switch w="28" h="33" 
+                <switch w="28" h="33" 
                         picture="app/home/resource/8866bbooxx/ac/switch_off.bin" 
-                        highlightPicture="app/home/resource/8866bbooxx/ac/switch_on.bin">tab8Switch
+                        highlightPicture="app/home/resource/8866bbooxx/ac/switch_on.bin">acSwitch
                 </switch>
-                 <switch w="28" h="33" 
+                <switch w="28" h="33" 
                         picture="app/home/resource/8866bbooxx/ac/heating_off.bin" 
-                        highlightPicture="app/home/resource/8866bbooxx/ac/heating_on.bin">tab8Switch
+                        highlightPicture="app/home/resource/8866bbooxx/ac/heating_on.bin">heatingSwitch
                 </switch>
-            </grid>
-            <textbox text="28" x="184" y="165"></textbox>
-            <textbox text="℃" x="281" y="212"></textbox>
-            <seekbar x="85" y="61" w="250" h="136" 
-            folder="app/home/resource/8866bbooxx/cool arc"
-            centralX="156" centralY="164" startDegree="270" endDegree="90" orientation="arc" >
-            coolArc
-            </seekbar>
+             </grid>
+             <textbox text="28" x="184" y="165"></textbox>
+             <textbox text="℃" x="281" y="212"></textbox>
 
         </tab>
         <tab idx="3">ct
@@ -81,15 +91,15 @@
             <grid rowNumber="1" colNumber="3" rowGap="118" colGap="92" x="136" y="353">
                 <switch w="28" h="33" 
                         picture="app/home/resource/8866bbooxx/ct/off.bin" 
-                        highlightPicture="app/home/resource/8866bbooxx/ct/on.bin">tab8Switch
+                        highlightPicture="app/home/resource/8866bbooxx/ct/on.bin">curtainSwitch1
                 </switch>
                  <switch w="28" h="33" 
                         picture="app/home/resource/8866bbooxx/ct/switch_off.bin" 
-                        highlightPicture="app/home/resource/8866bbooxx/ct/switch_on.bin">tab8Switch
+                        highlightPicture="app/home/resource/8866bbooxx/ct/switch_on.bin">curtainSwitch2
                 </switch>
                  <switch w="28" h="33" 
                         picture="app/home/resource/8866bbooxx/ct/off.bin" 
-                        highlightPicture="app/home/resource/8866bbooxx/ct/on.bin">tab8Switch
+                        highlightPicture="app/home/resource/8866bbooxx/ct/on.bin">curtainSwitch3
                 </switch>
             </grid>
         </tab>

@@ -835,7 +835,22 @@ static void js_cb_with_args(gui_obj_t *obj)
     jerry_release_value(app_property);
 }
 
-
+static void js_cb_with_args_animate(cb_arg_t *args)
+{
+    if (args == NULL)
+    {
+        return;
+    }
+    jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
+                                            args->args_count);
+    jerry_release_value(res);
+    jerry_value_t global_obj = jerry_get_global_object();
+    jerry_value_t app_property = js_get_property(global_obj, "app");
+    gui_app_t *app = NULL;
+    jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
+    jerry_release_value(global_obj);
+    jerry_release_value(app_property);
+}
 
 static void js_cb_with_arg(cb_arg_t *arg)
 {
@@ -1303,6 +1318,153 @@ DECLARE_HANDLER(onrelease_seekbar)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(play_animate_seekbar)
+{
+    gui_log("enter setAnimate_seekbar\n");
+
+    {
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = true;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->current_frame = 0;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent = 0;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->current_repeat_count = 0;
+    }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(setAnimate_seekbar)
+{
+    gui_log("enter setAnimate_seekbar\n");
+    if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_object(args[1]))
+    {
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        //gui_log("cb_arg:%x\n", cb_arg);
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+        }
+        cb_arg->func = args[0];
+
+        float from = jerry_get_number_value(js_get_property(args[1], "from"));
+        float to = jerry_get_number_value(js_get_property(args[1], "to"));
+        int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
+        int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
+        gui_seekbar_api.set_animate(obj, duration, repeat, js_cb_with_args_animate, (void *)(cb_arg));
+        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
+    }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(win_getAttribute)
+{
+    //gui_log("enter onPress\n");
+    if (args_cnt >= 1 && jerry_value_is_string(args[0]))
+    {
+        char *a = js_value_to_string(args[0]);
+        if (strcmp(a, "hidden") == 0)
+        {
+            gui_obj_t *obj = NULL;
+            jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+            if (obj->not_show)
+            {
+                return js_string_to_value("hidden");
+            }
+            else
+            {
+                return jerry_create_undefined();
+            }
+
+
+        }
+    }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(seekbar_getAttribute)
+{
+    //gui_log("enter onPress\n");
+    if (args_cnt >= 1 && jerry_value_is_string(args[0]))
+    {
+        char *a = js_value_to_string(args[0]);
+        if (strcmp(a, "animate") == 0)
+        {
+            gui_obj_t *obj = NULL;
+            jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+            jerry_value_t v = jerry_create_object();
+            js_set_property(v, "progress", jerry_create_number(GUI_TYPE(gui_seekbar_t,
+                                                                        obj)->animate->progress_percent));
+            return v;
+
+        }
+    }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(seekbar_setAttribute)
+{
+    //gui_log("enter onPress\n");
+    if (args_cnt >= 2 && jerry_value_is_string(args[0]) && jerry_value_is_number(args[1]))
+    {
+        char *a = js_value_to_string(args[0]);
+        if (strcmp(a, "progress") == 0)
+        {
+            gui_obj_t *obj = NULL;
+            jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+            gui_log("seekbar_setAttribute:%f\n", jerry_get_number_value(args[1]));
+            gui_progressbar_api.set_percentage((void *)obj, jerry_get_number_value(args[1]));
+
+        }
+    }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(win_setAttribute)
+{
+    //gui_log("enter onPress\n");
+    if (args_cnt >= 1 && jerry_value_is_string(args[0]))
+    {
+        char *a = js_value_to_string(args[0]);
+        if (strcmp(a, "hidden") == 0)
+        {
+            gui_obj_t *obj = NULL;
+            jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+            (obj->not_show) = true;
+
+
+
+        }
+    }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(win_removeAttribute)
+{
+    //gui_log("enter onPress\n");
+    if (args_cnt >= 1 && jerry_value_is_string(args[0]))
+    {
+        char *a = js_value_to_string(args[0]);
+        if (strcmp(a, "hidden") == 0)
+        {
+            gui_obj_t *obj = NULL;
+            jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+            obj->not_show = false;
+
+        }
+    }
+
+    return jerry_create_undefined();
+}
 #include "gui_progressbar.h"
 DECLARE_HANDLER(progress)
 {
@@ -1499,6 +1661,10 @@ void gui_js_init()
     REGISTER_METHOD_NAME(seekbar, "onRelease", onrelease_seekbar);
     REGISTER_METHOD_NAME(seekbar, "onPress", onpress_seekbar);
     REGISTER_METHOD_NAME(seekbar, "onPressing", onpressing_seekbar);
+    REGISTER_METHOD_NAME(seekbar, "setAnimate", setAnimate_seekbar);
+    REGISTER_METHOD_NAME(seekbar, "setAttribute", seekbar_setAttribute);
+    REGISTER_METHOD_NAME(seekbar, "getAttribute", seekbar_getAttribute);
+    REGISTER_METHOD_NAME(seekbar, "palyAnimate", play_animate_seekbar);
 //    REGISTER_METHOD_NAME(icon, "write", ic_write);
 //    REGISTER_METHOD(icon, show);
 //    REGISTER_METHOD(icon, notShow);
@@ -1532,7 +1698,9 @@ void gui_js_init()
     REGISTER_METHOD_NAME(win, "onRight", onRight_win);
     REGISTER_METHOD_NAME(win, "onDown", onUp_win);
     REGISTER_METHOD_NAME(win, "onUp", onDown_win);
-
+    REGISTER_METHOD_NAME(win, "getAttribute", win_getAttribute);
+    REGISTER_METHOD_NAME(win, "removeAttribute", win_removeAttribute);
+    REGISTER_METHOD_NAME(win, "setAttribute", win_setAttribute);
     jerry_value_t sw = jerry_create_object();
     js_set_property(global_obj, "sw", sw);
     REGISTER_METHOD(sw, getElementById);

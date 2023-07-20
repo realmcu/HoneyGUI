@@ -512,6 +512,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0;
                     int16_t h = 0;
+                    bool hide = false;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -535,12 +536,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             h = atoi(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "hidden"))
+                        {
+                            hide = true;
+                        }
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
                     {
                         parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
+                        if (hide)
+                        {
+                            parent->not_show = 1;
+                        }
+
+
                     }
                 }
                 break;
@@ -1049,7 +1060,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     }
 
-
+                    parent->name = get_space_string_head(p->txt);
 
 
 

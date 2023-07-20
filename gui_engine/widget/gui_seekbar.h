@@ -35,6 +35,7 @@ struct gui_seekbar
     uint16_t arc_w;
     float arc_start;
     float arc_end;
+    gui_animate_t *animate;
     void (*ctor)(gui_seekbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y,
                  int16_t w, int16_t h);
@@ -45,6 +46,7 @@ typedef struct gui_api_seekbar
     void (*onPress)(gui_seekbar_t *this, void *cb, void *p);
     void (*onRelease)(gui_seekbar_t *this, void *cb, void *p);
     void (*onPressing)(gui_seekbar_t *this, void *cb, void *p);
+    void (*set_animate)(gui_seekbar_t *this, uint32_t dur, int repeatCount, void *callback, void *p);
 } gui_api_seekbar_t;
 extern gui_api_seekbar_t gui_seekbar_api;
 /**
