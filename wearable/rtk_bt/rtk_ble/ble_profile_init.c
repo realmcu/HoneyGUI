@@ -68,6 +68,7 @@ void app_le_profile_init(void)
     app_miwear_init();
 #endif
 #ifdef RTK_PRIVATE_SERVICE
+    extern void app_ble_bwps_init(void);
     app_ble_bwps_init();
 #endif
 
