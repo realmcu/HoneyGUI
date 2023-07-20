@@ -42,6 +42,8 @@ typedef enum
     CONTROL_COMMAND_ID          = 0X07,
     WEATHER_INFORMATION_ID      = 0X0b,
     BLUETOOTH_LOG_COMMAND_ID    = 0x0a,
+    NAVIGATION_INFORMATION_ID   = 0x0c,
+    SEND_HRS_RAW_DATA           = 0x11,
     GET_STACK_DUMP              = 0x10,
     TEST_FLASH_READ_WRITE       = 0xFE,
     TEST_COMMAND_ID             = 0xFF,

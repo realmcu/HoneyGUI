@@ -58,8 +58,8 @@ void app_le_profile_init(void)
 {
     server_init(2);
 
-    //app_ble_bas_init();
-    //app_ble_hid_init();
+    app_ble_bas_init();
+    // app_ble_hid_init();
 #ifdef RTK_TUYA_BLE_SDK
     app_ble_tuya_init();
 #endif
@@ -67,13 +67,18 @@ void app_le_profile_init(void)
     extern void app_miwear_init(void);
     app_miwear_init();
 #endif
+#ifdef RTK_PRIVATE_SERVICE
+    app_ble_bwps_init();
+#endif
 
     server_register_app_cb(app_profile_callback);
 
-
+#ifdef RTL8762G
+#else
     client_init(2);
     ancs_init(1);
     app_gatts_client_init();
+#endif
 #if 0
     gcs_client_id = gcs_add_client(gcs_client_callback, APP_MAX_LINKS, 256);
     client_register_general_client_cb(gcs_client_callback);

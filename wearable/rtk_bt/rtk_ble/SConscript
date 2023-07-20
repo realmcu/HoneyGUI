@@ -19,7 +19,8 @@ if GetDepend(['USING_BLE_TASK']):
     src += ['app_ble_hid.c']
     src += ['app_gatts_client.c']
     src += ['ancs.c']
-
+if GetDepend(['PRIVATE_SERVICE']):
+    src += ['app_ble_bwps.c']
 CPPPATH = [cwd]
 
 CPPDEFINES = ['DEFINE_RTK_BT_TODO']

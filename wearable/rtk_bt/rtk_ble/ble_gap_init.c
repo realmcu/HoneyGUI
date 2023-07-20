@@ -23,7 +23,10 @@
 #include <app_msg.h>
 #include <ble_gap_cb.h>
 #include "trace.h"
-
+#ifdef RTL8762G_DASHBOARD
+#include "gatt.h"
+#include <simple_ble_service.h>
+#endif
 
 
 
@@ -36,6 +39,33 @@
 #define GATT_UUID128_BWPS_ADV   0x12, 0xA2, 0x4D, 0x2E, 0xFE, 0x14, 0x48, 0x8e, 0x93, 0xD2, 0x17, 0x3C, 0xFF, 0x01, 0x00, 0x00
 #define GATT_UUID128_BEACON_SERVICE_ADV           0x12, 0xA2, 0x4D, 0x2E, 0xFE, 0x14, 0x48, 0x8e, 0x93, 0xD2, 0x17, 0x3C, 0xFF, 0x02, 0x00, 0x00
 
+#ifdef RTL8762G_DASHBOARD
+static const uint8_t scan_rsp_data[] =
+{
+    0x03,                             /* length */
+    GAP_ADTYPE_APPEARANCE,            /* type="Appearance" */
+    LO_WORD(GAP_GATT_APPEARANCE_UNKNOWN),
+    HI_WORD(GAP_GATT_APPEARANCE_UNKNOWN),
+};
+
+/** @brief  GAP - Advertisement data (max size = 31 bytes, best kept short to conserve power) */
+uint8_t adv_data[] =
+{
+    /* Flags */
+    0x02,             /* length */
+    GAP_ADTYPE_FLAGS, /* type="Flags" */
+    GAP_ADTYPE_FLAGS_LIMITED | GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED,
+    /* Service */
+    0x03,             /* length */
+    GAP_ADTYPE_16BIT_COMPLETE,
+    LO_WORD(GATT_UUID_SIMPLE_PROFILE),
+    HI_WORD(GATT_UUID_SIMPLE_PROFILE),
+    /* Local name */
+    0x0F,             /* length */
+    GAP_ADTYPE_LOCAL_NAME_COMPLETE,
+    'B', 'L', 'E', '_', 'P', 'E', 'R', 'I', 'P', 'H', 'E', 'R', 'A', 'L',
+};
+#else
 // GAP - SCAN RSP data (max size = 31 bytes)
 static uint8_t scan_rsp_data[] =
 {
@@ -78,6 +108,7 @@ uint8_t adv_data[] =
     0xC5, 0xFE,     /* company id */
     0x20, 0x15, 0x09, 0x14, 0x14, 0x21, /* mac address*/
 };
+#endif
 
 
 
@@ -91,9 +122,15 @@ uint8_t adv_data[] =
 void app_le_gap_init(void)
 {
     /* Device name and device appearance */
+#ifdef RTL8762G_DASHBOARD
+    uint8_t  device_name[GAP_DEVICE_NAME_LEN] = "BLE_PERIPHERAL";
+    uint16_t appearance = GAP_GATT_APPEARANCE_UNKNOWN;
+    uint8_t  slave_init_mtu_req = true;
+#else
     uint8_t  device_name[GAP_DEVICE_NAME_LEN] = "B3PWatch";
     uint16_t appearance = GAP_GATT_APPEARANCE_WRIST_WORN;
     uint8_t  slave_init_mtu_req = true;
+#endif
 
 
     /* Advertising parameters */

@@ -365,6 +365,14 @@ uint32_t rtk_lcd_hal_get_pixel_bits(void)
     return EK9716_DRV_PIXEL_BITS;
 }
 
+uint32_t rtk_lcd_hal_power_off(void)
+{
+    return 0;
+}
+uint32_t rtk_lcd_hal_power_on(void)
+{
+    return 0;
+}
 
 
 

@@ -7,98 +7,126 @@
    * @author    howie
    * @date      2019-12-26
    * @version   v1.0
-   **************************************************************************************
-   * @attention
-   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
-   **************************************************************************************
+*****************************************************************************************
   */
+#include <os_msg.h>
+#include <os_task.h>
+#include <communicate_task.h>
+#include <communicate_protocol.h>
+#include <communicate_parse.h>
+#include <app_msg.h>
+#include <os_task.h>
+#include "trace.h"
+#include "version.h"
+#include <stdlib.h>
+#include "string.h"
 
-/*============================================================================*
- *                              Header Files
- *============================================================================*/
 #include <os_msg.h>
 #include <os_task.h>
 #include <gap.h>
 #include <gap_le.h>
-#include <gap_msg.h>
-#include <communicate_task.h>
 #include <app_msg.h>
-#include <ble_task.h>
 #include "trace.h"
-#include "ble_cb.h"
-#include "communicate_protocol.h"
-#include "communicate_parse.h"
-#include "version.h"
-/** @addtogroup  PERIPH_DEMO
-    * @{
-    */
 
-/** @defgroup  PERIPH_APP_TASK Peripheral App Task
-    * @brief This file handles the implementation of application task related functions.
-    *
-    * Create App task and handle events & messages
-    * @{
-    */
-/*============================================================================*
- *                              Macros
- *============================================================================*/
+void *l1send_task_handle;
+void *l1reveive_task_handle;
 
-#define L1SEND_TASK_PRIORITY          1        //!< Task priorities
-#define L1SEND_TASK_STACK_SIZE        256 * 4  //!<  Task stack size
+void *l1send_queue_handle;
+void *l1recv_queue_handle;
+void *raw_data_receive_queue_handle;
 
-
-/*============================================================================*
- *                              Variables
- *============================================================================*/
-
-void *l1send_task_handle;   //!< APP Task handle
-void *l1send_queue_handle;  //!< Event queue handle
-void *l1recv_queue_handle;  //!< Event queue handle
-
-/*============================================================================*
- *                              Functions
- *============================================================================*/
 void l1send_task(void *p_param);
+void l1receive_task(void *p_param);
 
-/**
- * @brief  Initialize App task
- * @return void
- */
-void communicate_task_init()
+int communicate_task_init(void)
 {
-    os_task_create(&l1send_task_handle, "l1send", l1send_task, 0, L1SEND_TASK_STACK_SIZE,
-                   L1SEND_TASK_PRIORITY);
+    os_task_create(&l1send_task_handle, "l1send", l1send_task, 0, 256 * 4, 1);
+    os_task_create(&l1reveive_task_handle, "l1receive", l1receive_task, 0, 256 * 4, 1);
+    return 0;
 }
 
-void L1_send_event(L1SEND_TYPE_WRISTBAND event, void *res)
+bool cb_send_to_queue(pfunc func)
 {
-
+    if (os_msg_send(l1send_queue_handle, &func, 0) == false)
+    {
+        return false;
+    }
+    return true;
 }
 
-/**
- * @brief        L1send task
- * @param[in]    p_params    Parameters sending to the task
- * @return       void
- */
 
 void l1send_task(void *pvParameters)
 {
-    uint8_t event;
-    uint8_t psendbuf[30];
-
-    os_msg_queue_create(&l1send_queue_handle, "l1send queue", 0x10, sizeof(uint8_t));
-    os_msg_queue_create(&l1recv_queue_handle, "l1recv queue", 0x10, sizeof(uint8_t));
+    os_alloc_secure_ctx(1024);
+    pfunc p_func = NULL;
+    os_msg_queue_create(&l1send_queue_handle, "l1send", 0x10, sizeof(void *));
+    os_msg_queue_create(&l1recv_queue_handle, "l1recv", 0x10, sizeof(uint8_t));
 
     while (true)
     {
-        if (os_msg_recv(l1send_queue_handle, &event, 0xFFFFFFFF) == true)
+        if (os_msg_recv(l1send_queue_handle, &p_func, 0xFFFFFFFF) == true)
         {
-            APP_PRINT_INFO1("Send Event = %d", event);
-
+            if (p_func != NULL)
+            {
+                p_func();
+            }
         }
     }
 }
+#if USE_HRS_MASTER
+bool cb_l1receive_to_queue(void *buf)
+{
+    if (os_msg_send(raw_data_receive_queue_handle, &buf, 0) == false)
+    {
+        return false;
+    }
+    return true;
+}
+#include "gcs_client.h"
+void l1receive_task(void *pvParameters)
+{
+    uint8_t buf[256] = {0};
+    memset(buf, 0x0, 256);
+    os_msg_queue_create(&raw_data_receive_queue_handle, 0x10, sizeof(void *));
+    while (true)
+    {
+        if (os_msg_recv(raw_data_receive_queue_handle, &buf, 0xFFFFFFFF) == true)
+        {
+            APP_PRINT_INFO0("os_msg_recv raw_data_receive_queue_handle");
+            uint16 length = buf[5] * 128 + buf[4];
+            APP_PRINT_INFO1("length is %d", length);
 
-/** @} */ /* End of group PERIPH_APP_TASK */
-/** @} */ /* End of group PERIPH_DEMO */
+            resolve_remote_data(((T_GCS_NOTIF_IND *)buf)->p_value, length);
+//            free(buf);
+        }
+    }
+}
+#else
+bool cb_l1receive_to_queue(pfunc func)
+{
+    if (os_msg_send(raw_data_receive_queue_handle, &func, 0) == false)
+    {
+        return false;
+    }
+    return true;
+}
 
+void l1receive_task(void *pvParameters)
+{
+    uint8_t *buf = NULL;
+    os_alloc_secure_ctx(1024);
+    os_msg_queue_create(&raw_data_receive_queue_handle, "rec_raw_data", 0x10, sizeof(void *));
+
+    while (true)
+    {
+        if (os_msg_recv(raw_data_receive_queue_handle, &buf, 0xFFFFFFFF) == true)
+        {
+            //rt_kprintf("buf2 = 0x%x \n", buf);
+            resolve_remote_data(buf + 1, buf[0]);
+            free(buf);
+        }
+    }
+}
+#endif
+//#include "rtthread.h"
+//INIT_APP_EXPORT(communicate_task_init);

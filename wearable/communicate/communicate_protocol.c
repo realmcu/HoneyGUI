@@ -13,18 +13,18 @@
 #include "board.h"
 #include "string.h"
 #include "trace.h"
-#include "ble_cb.h"
 #include "crc16btx.h"
-#include "gap_conn_le.h"
 #include "os_msg.h"
 #include "os_timer.h"
-#include "ftl.h"
-#include "ancs_client.h"
-#include "ancs.h"
-#include "wristband_private_service.h"
 #include "communicate_protocol.h"
 #include "communicate_parse.h"
-
+//#include "ble_task.h"
+#include "stdlib.h"
+#include "app_msg.h"
+#include "watch_msg.h"
+#if USE_HRS_MASTER
+#include "gcs_client.h"
+#endif
 /******************* Private variables **********************************/
 
 #define MAX_RESEND_COUNT        3
@@ -37,8 +37,6 @@ static uint32_t     package_offset = 0;
 /* L1 layer message parameter */
 static uint8_t      received_buffer[GLOBAL_RECEIVE_BUFFER_SIZE];
 static uint16_t     L1_sequence_id = 0;
-static uint8_t      wristband_credits = 10;
-
 
 
 extern void *l1send_task_handle;
@@ -52,7 +50,7 @@ extern void *l1send_task_handle;
 * @param   length:  data length
 * @retval  error code
 */
-static bool L1_crc_check(uint16_t crc_value, uint8_t *pData, uint16_t length)
+static bool l1_crc_check(uint16_t crc_value, uint8_t *pData, uint16_t length)
 {
     uint16_t crc = btxfcs(0x0000, pData, length);
     if (crc == crc_value)
@@ -63,21 +61,41 @@ static bool L1_crc_check(uint16_t crc_value, uint8_t *pData, uint16_t length)
 
 }
 
-
-
-
-bool L1_send(uint8_t *buf, uint16_t length)
+static bool communicate_send_internal(uint8_t *p_data, uint16_t data_len)
 {
-    uint16_t record_len = length;
+    //todo check link status
+
+    T_IO_MSG msg;
+    uint8_t *buf = NULL;
+    buf = malloc((data_len + 1) * sizeof(uint8_t));
+    if (buf == NULL)
+    {
+        return false;
+    }
+
+    msg.type = IO_MSG_TYPE_WRISTBNAD;
+    msg.subtype = IO_MSG_PROTOCOL_SEND;
+    msg.u.buf = buf;
+    buf[0] = data_len;
+    memcpy(buf + 1, p_data, data_len);
+
+    if (app_send_msg_to_bt_task(&msg) == false)
+    {
+        free(buf);
+        return false;
+    }
+    return true;
+}
+
+void package_prepare_send(struct protocol_pack *package)
+{
+    uint8_t buf[32];
     /*fill header*/
+    package->l1_length = package->l2_lenght + 4;
     buf[L1_HEADER_MAGIC_POS]                = L1_HEADER_MAGIC;                               /* Magic */
     buf[L1_HEADER_PROTOCOL_VERSION_POS]     = L1_HEADER_VERSION;                  /* protocol version */
-    buf[L1_PAYLOAD_LENGTH_HIGH_BYTE_POS]    = (length - L1_HEADER_SIZE) >> 8;    /* length high byte */
-    buf[L1_PAYLOAD_LENGTH_LOW_BYTE_POS]     = length - L1_HEADER_SIZE;            /* length low byte */
-    /*cal crc*/
-    uint16_t crc16_ret = btxfcs(0, buf + L1_HEADER_SIZE, length - L1_HEADER_SIZE);
-    buf[L1_HEADER_CRC16_HIGH_BYTE_POS]      = crc16_ret >> 8;
-    buf[L1_HEADER_CRC16_LOW_BYTE_POS]       = crc16_ret;
+    buf[L1_PAYLOAD_LENGTH_HIGH_BYTE_POS]    = (package->l1_length) >> 8;    /* length high byte */
+    buf[L1_PAYLOAD_LENGTH_LOW_BYTE_POS]     = package->l1_length;            /* length low byte */
 
     L1_sequence_id ++;
 
@@ -87,30 +105,30 @@ bool L1_send(uint8_t *buf, uint16_t length)
 
     APP_PRINT_INFO1("sequence id:%d", L1_sequence_id);
 
-    uint8_t conn_id = 0;
-    uint8_t mtu_size = 0;
-    le_get_gap_param(GAP_PARAM_LE_REMAIN_CREDITS, &wristband_credits);
-    le_get_conn_param(GAP_PARAM_CONN_MTU_SIZE, &mtu_size, conn_id);
-    uint8_t send_offset = 0;
-    while (wristband_credits && length)
+    /* next prepare L2 payload */
+    buf[8] = package->l2_cmd_id;
+    buf[9] = L2_HEADER_VERSION;
+    buf[10] = package->l2_key;
+    buf[11] = 0;
+#if USE_HRS_MASTER
+    buf[12] = package->l2_lenght;
+#else
+    buf[12] = 0;
+#endif
+    if (package->l2_lenght != 0)
     {
-        if (length >= mtu_size - 3)
-        {
-            server_send_data(conn_id, wristband_ser_id, GATT_SRV_BWPS_RX_INDEX,
-                             buf + send_offset, mtu_size - 3, GATT_PDU_TYPE_NOTIFICATION);
-            send_offset += mtu_size - 3;
-            length = length - (mtu_size - 3);
-        }
-        else
-        {
-            server_send_data(conn_id, wristband_ser_id, GATT_SRV_BWPS_RX_INDEX,
-                             buf + send_offset, length, GATT_PDU_TYPE_NOTIFICATION);
-            length = 0;
-            send_offset = 0;
-        }
-
+        memcpy(buf + 13, package->l2_payload, package->l2_lenght);
     }
 
+    /*cal crc*/
+    uint16_t crc16_ret = btxfcs(0, buf + L1_HEADER_SIZE, package->l1_length);
+    buf[L1_HEADER_CRC16_HIGH_BYTE_POS]      = crc16_ret >> 8;
+    buf[L1_HEADER_CRC16_LOW_BYTE_POS]       = crc16_ret;
+
+    if (communicate_send_internal(buf, package->l1_length + L1_HEADER_SIZE) == false)
+    {
+        return;
+    }
 
     uint8_t event;
     static uint32_t retry_count = 0;
@@ -118,7 +136,7 @@ bool L1_send(uint8_t *buf, uint16_t length)
     {
         APP_PRINT_INFO0("receive L1 send ACK success!");
         retry_count = 0;
-        return true;
+        return;
     }
     else
     {
@@ -126,14 +144,14 @@ bool L1_send(uint8_t *buf, uint16_t length)
         APP_PRINT_INFO1("receive L1 send ACK time out! do retry count = %d", retry_count);
         if (retry_count < MAX_RESEND_COUNT)
         {
-            L1_send(buf, record_len);
+            package_prepare_send(package);
         }
         else
         {
             APP_PRINT_ERROR1("retry fail!!! retry count= %d", retry_count);
             retry_count = 0;
         }
-        return false;
+        return;
     }
 }
 
@@ -169,7 +187,7 @@ static void ack_package_handle(uint16_t sequence_id, bool err_flag)
 * @param   check_success: crc check result
 * @retval  error code
 */
-void L1_send_ack(uint16_t sequence_id, bool check_success)
+void l1_send_ack(uint16_t sequence_id, bool check_success)
 {
     uint8_t ack_package_buffer[8] = {0};
     L1_version_value_t version_ack;
@@ -187,10 +205,14 @@ void L1_send_ack(uint16_t sequence_id, bool check_success)
     ack_package_buffer[5] = 0;//crc16
     ack_package_buffer[6] = (sequence_id >> 8) & 0xFF;
     ack_package_buffer[7] = sequence_id & 0xFF;
-
-    uint8_t conn_id = 0;
-    server_send_data(conn_id, wristband_ser_id, GATT_SRV_BWPS_RX_INDEX,
-                     ack_package_buffer, L1_HEADER_SIZE, GATT_PDU_TYPE_NOTIFICATION);
+#if USE_HRS_MASTER
+//    communicate_send_internal(ack_package_buffer, L1_HEADER_SIZE);
+    //gcs_attr_write(0, GATT_WRITE_TYPE_REQ,19, 8,(uint8_t *)ack_package_buffer);
+    gcs_attr_write(0, GATT_WRITE_TYPE_REQ, 16, 8, (uint8_t *)ack_package_buffer);
+    //gcs_attr_write(0, GATT_WRITE_TYPE_REQ,21, 8,(uint8_t *)ack_package_buffer);
+#else
+    communicate_send_internal(ack_package_buffer, L1_HEADER_SIZE);
+#endif
 }
 
 
@@ -201,7 +223,7 @@ void L1_send_ack(uint16_t sequence_id, bool check_success)
 * @param   length:  data length
 * @retval  void
 */
-void L1_receive_data(uint8_t *data, uint16_t length)
+void resolve_remote_data(uint8_t *data, uint16_t length)
 {
     static bool receiving = false;
     L1_version_value_t inner_version;
@@ -259,18 +281,18 @@ void L1_receive_data(uint8_t *data, uint16_t length)
             return;
         }
 
-        if (L1_crc_check(crc16_value, received_buffer + L1_HEADER_SIZE, L2_frame_length) == true)
+        if (l1_crc_check(crc16_value, received_buffer + L1_HEADER_SIZE, L2_frame_length) == true)
         {
             APP_PRINT_INFO0("receive data package & send response");
             /* send response */
-            L1_send_ack(seq_id, true);
+            l1_send_ack(seq_id, true);
             /*throw data to upper layer*/
             L2_frame_resolve(received_buffer + L1_HEADER_SIZE, L2_frame_length);
         }
         else
         {
             //send response
-            L1_send_ack(seq_id, false);
+            l1_send_ack(seq_id, false);
             //schedule error handler
             APP_PRINT_INFO0("received data crc check error");
         }
@@ -288,6 +310,3 @@ void L1_receive_data(uint8_t *data, uint16_t length)
     }
 
 }
-
-
-

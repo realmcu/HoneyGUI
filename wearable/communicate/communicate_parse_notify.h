@@ -40,9 +40,14 @@ typedef enum
     KEY_BBPRO_CONN_INFO_RETURN       = 0X13,
 } NOTIFY_KEY;
 
-void resolve_Notify_command(uint8_t key, uint8_t *pValue, uint16_t length);
+typedef void(*P_FUNC_MES_CB)(uint32_t len, void *value);
+typedef void(*P_FUNC_NOTIFY_CB)(uint8_t key, uint8_t *pValue, uint8_t length);
 
+void resolve_Notify_command(uint8_t key, uint8_t *pValue, uint16_t length, uint8_t messaye_type);
+void send_call_handle(uint8_t handle_type);
 
+void Notify_register_call_cb(P_FUNC_NOTIFY_CB cb);
+void Notify_register_message_cb(P_FUNC_MES_CB cb);
 
 #ifdef __cplusplus
 }

@@ -19,6 +19,8 @@ enum { __FILE_NUM__ = 0 };
 #include <stdlib.h>
 #include <trace.h>
 #include <gap.h>
+#include "ftl.h"
+#include "gap_adv.h"
 #include "gap_conn_le.h"
 #include "os_msg.h"
 
@@ -159,6 +161,7 @@ T_APP_RESULT   bwps_service_attr_read_cb(uint8_t conn_id, T_SERVER_ID service_id
                                          uint16_t attrib_index, uint16_t offset, uint16_t *p_length, uint8_t **pp_value)
 {
     T_APP_RESULT  wCause  = APP_RESULT_SUCCESS;
+    APP_PRINT_INFO1("bwps_service_attr_read_cb: attrib_index = %d", attrib_index);
 
     switch (attrib_index)
     {
@@ -193,6 +196,8 @@ T_APP_RESULT bwps_service_attr_write_cb(uint8_t conn_id, T_SERVER_ID service_id,
 {
     T_APP_RESULT  wCause  = APP_RESULT_SUCCESS;
     uint8_t *buf = NULL;
+    APP_PRINT_INFO2("bwps_service_attr_write_cb: attrib_index = %d, data %b", attrib_index,
+                    TRACE_BINARY(length, p_value));
 
     if (p_value == NULL)
     {
@@ -211,9 +216,8 @@ T_APP_RESULT bwps_service_attr_write_cb(uint8_t conn_id, T_SERVER_ID service_id,
         break;
     case GATT_SRV_BWPS_TX_INDEX:
         APP_PRINT_INFO0("bwps_service_attr_write_cb, GATT_SRV_BWPS_TX_INDEX");
-
         /* copy gatt write value in tx_buffer, the first byte is value length*/
-        buf = malloc(length * sizeof(uint8_t));
+        buf = malloc((length + 1) * sizeof(uint8_t));
         buf[0] = length;
         memcpy(buf + 1, p_value, length);
         extern void *raw_data_receive_queue_handle;
@@ -315,7 +319,7 @@ void wristband_send(uint8_t conn_id, uint16_t length, uint8_t *value)
     uint8_t mtu_size = 0;
     le_get_gap_param(GAP_PARAM_LE_REMAIN_CREDITS, &wristband_credits);
     le_get_conn_param(GAP_PARAM_CONN_MTU_SIZE, &mtu_size, conn_id);
-    while (wristband_credits && length)
+    while (length)
     {
         if (length >= mtu_size - 3)
         {
@@ -334,5 +338,3 @@ void wristband_send(uint8_t conn_id, uint16_t length, uint8_t *value)
 
     }
 }
-
-
