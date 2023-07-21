@@ -3,7 +3,7 @@
 #include "gui_win.h"
 #include "gui_img.h"
 #include "gui_tabview.h"
-#include "gui_iconlist.h"
+#include "gui_curtain.h"
 #include "gui_curtain.h"
 #include "gui_seekbar.h"
 #include "gui_text.h"

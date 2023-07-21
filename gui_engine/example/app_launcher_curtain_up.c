@@ -4,7 +4,7 @@
 #include <gui_text.h>
 #include <gui_obj.h>
 #include <gui_curtain.h>
-#include <gui_iconlist.h>
+#include <gui_curtain.h>
 #include "gui_canvas.h"
 #include <string.h>
 #include <time.h>
@@ -17,7 +17,7 @@
 #include <gui_dynamic_img.h>
 #include "tp_algo.h"
 #include <math.h>
-
+#include "gui_button.h"
 
 static void sport_button_press_ani_cb(gui_button_t *button)
 {

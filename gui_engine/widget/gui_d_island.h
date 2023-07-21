@@ -11,8 +11,7 @@ extern "C" {
 #include <guidef.h>
 #include <gui_fb.h>
 #include <gui_graphic.h>
-#include "gui_round_rect.h"
-#include "gui_round_corner_rect.h"
+#include "gui_canvas.h"
 typedef struct gui_d_island gui_d_island_t;
 struct gui_d_island
 {

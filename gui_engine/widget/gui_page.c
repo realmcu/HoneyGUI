@@ -9,7 +9,7 @@
 #include <gui_server.h>
 #include <gui_img.h>
 #include "gui_obj.h"
-#include <gui_iconlist.h>
+#include <gui_curtain.h>
 #include <tp_algo.h>
 static void deal_img_in_root(gui_obj_t *object, int dyend, int *out)
 {

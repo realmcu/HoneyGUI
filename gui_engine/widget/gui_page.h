@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 #include <gui_curtain.h>
-#include <gui_iconlist.h>
+#include <gui_img.h>
 typedef struct gui_page
 {
     gui_obj_t base;

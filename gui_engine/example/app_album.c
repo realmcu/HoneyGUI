@@ -4,7 +4,7 @@
 #include <gui_text.h>
 #include <gui_obj.h>
 #include <gui_curtain.h>
-#include <gui_iconlist.h>
+#include <gui_curtain.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>

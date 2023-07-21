@@ -11,7 +11,7 @@
 #include <gui_win.h>
 #include "gui_text.h"
 #include "tp_algo.h"
-
+#include "draw_font.h"
 static uint32_t (get_checked)(gui_radio_t *this)
 {
     if (this)
@@ -253,6 +253,7 @@ static void sw_turn_on(gui_radio_switch_t *this)
     this->ifon = true;
     {
         rtgui_msg_t msg;
+        (void)msg;
         msg.type = GUI_SRV_CB;
         msg.cb = gui_radio_switch_change_radio_switch;
         msg.u.payload = this;

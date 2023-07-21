@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -337,9 +338,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>GUI_KEIL_SIM</Define>
+              <Define>RTK_MODULE_USING_RTK_GUI, GUI_KEIL_SIM</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;..\example\root_image;gui_port;..\app;..\dc;..\engine;..\input;..\misc;..\misc\tlsf;..\server;..\Third_Party;..\Third_Party\nanosvg\src;..\Third_Party\nanosvg\example;..\Third_Party\agge\agge;..\Third_Party\nanovg\base;..\Third_Party\nanovg\agge;..\Third_Party\agge;..\Third_Party\nanovg;..\widget;..\example;..\example\root_image;..\Third_Party\stb</IncludePath>
+              <IncludePath>.;.;..\example\root_image;gui_port;..\app;..\dc;..\engine;..\input;..\misc;..\misc\tlsf;..\server;..\Third_Party\nanosvg\src;..\Third_Party\nanovg;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\base;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\vglite;..\Third_Party\stb;..\widget;..;..\example;..\example\root_image</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -489,14 +490,29 @@
               <FilePath>..\server\gui_server.c</FilePath>
             </File>
             <File>
-              <FileName>agge_fill.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Third_Party\nanovg\demos\agge_fill.c</FilePath>
-            </File>
-            <File>
               <FileName>nanovg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Third_Party\nanovg\base\nanovg.c</FilePath>
+            </File>
+            <File>
+              <FileName>math.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\math.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\stroke.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke_features.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\stroke_features.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>vector_rasterizer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Third_Party\nanovg\agge\vector_rasterizer.cpp</FilePath>
             </File>
             <File>
               <FileName>nanovg_agge.cpp</FileName>
@@ -514,16 +530,6 @@
               <FilePath>..\widget\gui_alert.c</FilePath>
             </File>
             <File>
-              <FileName>gui_arc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_arc.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_arc_hl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_arc_hl.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_bitmap.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_bitmap.c</FilePath>
@@ -537,16 +543,6 @@
               <FileName>gui_canvas.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_canvas.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_chart_bars.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_chart_bars.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_circle.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_circle.c</FilePath>
             </File>
             <File>
               <FileName>gui_cube.c</FileName>
@@ -584,26 +580,6 @@
               <FilePath>..\widget\gui_grid.c</FilePath>
             </File>
             <File>
-              <FileName>gui_icon.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_icon.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_icon_default.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_icon_default.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_iconlist.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_iconlist.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_iconlist_default.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_iconlist_default.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_img.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_img.c</FilePath>
@@ -629,34 +605,19 @@
               <FilePath>..\widget\gui_page.c</FilePath>
             </File>
             <File>
-              <FileName>gui_path.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_path.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_progressbar.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_progressbar.c</FilePath>
             </File>
             <File>
-              <FileName>gui_rectangle.c</FileName>
+              <FileName>gui_radio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\widget\gui_rectangle.c</FilePath>
+              <FilePath>..\widget\gui_radio.c</FilePath>
             </File>
             <File>
-              <FileName>gui_ring.c</FileName>
+              <FileName>gui_return.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\widget\gui_ring.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_round_corner_rect.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_round_corner_rect.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_round_rect.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_round_rect.c</FilePath>
+              <FilePath>..\widget\gui_return.c</FilePath>
             </File>
             <File>
               <FileName>gui_scroll_text.c</FileName>
@@ -679,6 +640,11 @@
               <FilePath>..\widget\gui_stb_img.c</FilePath>
             </File>
             <File>
+              <FileName>gui_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\widget\gui_switch.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_tabview.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_tabview.c</FilePath>
@@ -692,31 +658,6 @@
               <FileName>gui_win.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_win.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_window_border.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_window_border.c</FilePath>
-            </File>
-            <File>
-              <FileName>math.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\nanovg\agge\math.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\nanovg\agge\stroke.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke_features.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\nanovg\agge\stroke_features.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>vector_rasterizer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\Third_Party\nanovg\agge\vector_rasterizer.cpp</FilePath>
             </File>
           </Files>
         </Group>
