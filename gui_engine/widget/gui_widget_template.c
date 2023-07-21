@@ -71,24 +71,24 @@ gui_widget_template_t *gui_widget_template_create(void *parent,  const char *nam
     {
         name = "WIDGET_TEMPLATE";
     }
-    gui_widget_template_t *widget = gui_malloc(sizeof(gui_widget_template_t));
-    GUI_ASSERT(widget != NULL);
-    memset(widget, 0x00, sizeof(gui_widget_template_t));
+    gui_widget_template_t *this = gui_malloc(sizeof(gui_widget_template_t));
+    GUI_ASSERT(this != NULL);
+    memset(this, 0x00, sizeof(gui_widget_template_t));
 
-    widget_template_ctor(widget, (gui_obj_t *)parent, name, data, x, y, w, h);
+    widget_template_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
 
-    gui_list_init(&(GET_BASE(widget)->child_list));
-    if ((GET_BASE(widget)->parent) != NULL)
+    gui_list_init(&(GET_BASE(this)->child_list));
+    if ((GET_BASE(this)->parent) != NULL)
     {
-        gui_list_insert_before(&((GET_BASE(widget)->parent)->child_list),
-                               &(GET_BASE(widget)->brother_list));
+        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list),
+                               &(GET_BASE(this)->brother_list));
     }
 
 
 
 
-    GET_BASE(widget)->create_done = true;
-    return widget;
+    GET_BASE(this)->create_done = true;
+    return this;
 }
 
 
