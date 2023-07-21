@@ -22,6 +22,7 @@ static gui_app_t app_launcher2 =
     },
     .ui_design = app_launcher2_ui_design,
     .thread_entry = NULL,
+    .active_ms = 1000000,
 };
 
 void *get_app_launcher2(void)

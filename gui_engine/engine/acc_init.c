@@ -45,6 +45,16 @@ void gui_acc_init(void)
     acc.draw_svg = hw_acc_draw_svg;
     acc.draw_wave = hw_acc_draw_wave;
     acc.draw_palette_wheel = hw_acc_draw_palette_wheel;
+
+//    acc.draw_circle = nanovg_draw_circle;
+//    acc.draw_rectangle = nanovg_draw_rectangle;
+//    acc.draw_arc = nanovg_draw_arc;
+//    acc.draw_line = nanovg_draw_line;
+//    acc.draw_path = sw_draw_path;
+//    acc.draw_polyline = sw_draw_polyline;
+//    acc.draw_svg = hw_acc_draw_svg;
+//    acc.draw_wave = nanovg_draw_wave;
+//    acc.draw_palette_wheel = nanovg_draw_palette_wheel;
 #elif defined (RTK_MODULE_RTK_PPE)
     acc.blit = hw_acc_blit;
     acc.draw_path = sw_draw_path;
