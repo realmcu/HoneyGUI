@@ -57,6 +57,7 @@ static void sensor_task_entry(void *p_param)
     os_msg_queue_create(&sensor_queue_handle, "sensorQ", 20, sizeof(T_IO_MSG));
 
     sensor_mode_uart_init();
+    sensor_mode_hw_tim_init();
 
     while (true)
     {
@@ -67,7 +68,10 @@ static void sensor_task_entry(void *p_param)
             {
             case SENSOR_MSG_UART_TEST:
                 {
+                    uint32_t start_time = sensor_mode_hw_tim_read();
                     sensor_mode_uart_write();
+                    uint32_t stop_time = sensor_mode_hw_tim_read();
+                    DBG_DIRECT("SENSOR_MSG_UART_TEST time %d us", stop_time - start_time);
                 }
                 break;
 
@@ -105,6 +109,8 @@ void scheduler_hook(void *from, void *to)
             DBG_DIRECT("dvfs_ret %d line %d", ret, __LINE__);
             ret = pm_cpu_freq_set(200, &actual_mhz);
             DBG_DIRECT("pm_cpu_freq_set ret %d actual_mhz %d line %d", ret, actual_mhz, __LINE__);
+            ret = pm_dsp1_freq_set(320, &actual_mhz);
+            DBG_DIRECT("dsp: ret %d, actual_mhz %d", ret, actual_mhz);
         }
     }
 
@@ -122,11 +128,13 @@ void scheduler_hook(void *from, void *to)
         {
             ret = pm_cpu_freq_set(40, &actual_mhz);
             DBG_DIRECT("pm_cpu_freq_set ret %d actual_mhz %d", ret, actual_mhz);
+            ret = pm_dsp1_freq_set(160, &actual_mhz);
+            DBG_DIRECT("dsp: ret %d, actual_mhz %d", ret, actual_mhz);
             ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V8);
-            DBG_DIRECT("dvfs_ret %d time %d", ret);
+            DBG_DIRECT("dvfs_ret %d", ret);
             uint32_t scenario_ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE,
                                                                OPERATION_SENSOR_MODE);
-            DBG_DIRECT("from IDLE to sensor scenario_ret %d time %d", ret);
+            DBG_DIRECT("from IDLE to sensor scenario_ret %d", ret);
         }
     }
     mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
