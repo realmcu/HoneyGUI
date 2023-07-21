@@ -9,7 +9,6 @@
  */
 
 #include "drv_dlps.h"
-#include "rtl_hal_peripheral.h"
 #include "dlps.h"
 #include "trace.h"
 #include "app_section.h"

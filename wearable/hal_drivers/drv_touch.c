@@ -24,8 +24,15 @@ bool drv_touch_read(uint16_t *x, uint16_t *y, bool *pressing)
     return rtk_touch_hal_read_all(x, y, pressing);
 }
 
+void drv_touch_set_indicate(void (*indicate)(void *))
+{
+    rtk_touch_hal_set_indicate(indicate);
+}
 
-
+void drv_touch_int_config(bool enable)
+{
+    rtk_touch_hal_int_config(enable);
+}
 
 void drv_touch_init(void)
 {

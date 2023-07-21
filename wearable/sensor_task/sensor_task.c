@@ -45,8 +45,6 @@ bool app_send_msg_to_sensor_task(T_IO_MSG *p_msg)
     return true;
 }
 
-
-
 /**
  * @brief        Sensor task to handle events & messages
  * @param[in]    p_param    Parameters sending to the task
@@ -58,10 +56,8 @@ static void sensor_task_entry(void *p_param)
 
     os_msg_queue_create(&sensor_queue_handle, "sensorQ", 20, sizeof(T_IO_MSG));
 
-#if 1    //for sensor mode test
-    sensor_mode_touch_int_init();
-    sensor_mode_uart_rtc_int_init();
-#endif
+    sensor_mode_uart_init();
+
     while (true)
     {
         T_IO_MSG io_msg;
@@ -69,26 +65,15 @@ static void sensor_task_entry(void *p_param)
         {
             switch (io_msg.subtype)
             {
-            case SENSOR_MSG_TOUCH_TEST:
-                {
-#if 1    //for sensor mode test
-                    sensor_mode_i2c_read();
-#endif
-                }
-                break;
-
             case SENSOR_MSG_UART_TEST:
                 {
-#if 1    //for sensor mode test
                     sensor_mode_uart_write();
-#endif
                 }
                 break;
 
             default:
                 break;
             }
-            DBG_DIRECT("sensor_queue_handle end");
         }
     }
 }
@@ -102,18 +87,24 @@ void scheduler_hook(void *from, void *to)
     char *to_task_name;
     os_task_name_get(from, &from_task_name);
     os_task_name_get(to, &to_task_name);
+    uint32_t actual_mhz = 0;
+    int32_t ret = 0;
 
     DBG_DIRECT("scheduler_hook from_task_name %s to_task_name %s", from_task_name, to_task_name);
 
-    if ((strcmp(from_task_name, "sensor") == 0) && (strcmp(to_task_name, "IDLE") != 0))
+    if (strcmp(to_task_name, "sensor") != 0 && strcmp(to_task_name, "IDLE") != 0)
     {
         //need set to HP mode
         //need set clock to 200M
         mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
         if (mode != OPERATION_HP_MODE)
         {
-            uint32_t ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE, OPERATION_HP_MODE);
-            DBG_DIRECT("from sensor to not IDLE ret %d", ret);
+            ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE, OPERATION_HP_MODE);
+            DBG_DIRECT("from xxx to not sensor neither IDLE scenario_ret %d", ret);
+            ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V9);
+            DBG_DIRECT("dvfs_ret %d line %d", ret, __LINE__);
+            ret = pm_cpu_freq_set(200, &actual_mhz);
+            DBG_DIRECT("pm_cpu_freq_set ret %d actual_mhz %d line %d", ret, actual_mhz, __LINE__);
         }
     }
 
@@ -129,16 +120,13 @@ void scheduler_hook(void *from, void *to)
         mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
         if (mode != OPERATION_SENSOR_MODE)
         {
-            uint32_t actual_mhz = 0;
-            int32_t ret = pm_cpu_freq_set(40, &actual_mhz);
+            ret = pm_cpu_freq_set(40, &actual_mhz);
             DBG_DIRECT("pm_cpu_freq_set ret %d actual_mhz %d", ret, actual_mhz);
-            //ret = pm_dsp1_freq_set(160, &actual_mhz);
-            //DBG_DIRECT("dsp: ret %d, actual_mhz %d", ret, actual_mhz);
-            DVFSErrorCode dvfs_ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V8);
-            DBG_DIRECT("dvfs_ret ret %d", dvfs_ret);
+            ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V8);
+            DBG_DIRECT("dvfs_ret %d time %d", ret);
             uint32_t scenario_ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE,
                                                                OPERATION_SENSOR_MODE);
-            DBG_DIRECT("from IDLE to sensor scenario_ret %d", scenario_ret);
+            DBG_DIRECT("from IDLE to sensor scenario_ret %d time %d", ret);
         }
     }
     mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
@@ -148,11 +136,11 @@ void scheduler_hook(void *from, void *to)
 
 void sensor_task_init(void)
 {
-    os_task_create(&sensor_task_handle, "sensor", sensor_task_entry, NULL, 1024, 1);
 #ifdef RTL8772F
     os_ext_func_init();
     os_sched_set_hook(scheduler_hook);
 #endif
+    os_task_create(&sensor_task_handle, "sensor", sensor_task_entry, NULL, 1024, 1);
 }
 
 /** @} */ /* End of group PERIPH_APP_TASK */
