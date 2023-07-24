@@ -48,9 +48,49 @@ static T_APP_RESULT app_bwps_callback(T_SERVER_ID service_id, void *p_data)
     return app_result;
 }
 
+static void gap_bwps_msg(T_IO_MSG *p_gap_msg)
+{
+    APP_PRINT_INFO1("line = %d \n", __LINE__);
+    APP_PRINT_TRACE2("gap_bwps_msg: subtype %d,%d", p_gap_msg->type, p_gap_msg->subtype);
+    T_LE_GAP_MSG gap_msg;
+    memcpy(&gap_msg, &p_gap_msg->u.param, sizeof(p_gap_msg->u.param));
+    switch (p_gap_msg->type)
+    {
+    case IO_MSG_TYPE_BT_STATUS:
+        switch (p_gap_msg->subtype)
+        {
+        case GAP_MSG_LE_CONN_STATE_CHANGE:
+            switch ((T_GAP_CONN_STATE)gap_msg.msg_data.gap_conn_state_change.new_state)
+            {
+            case GAP_CONN_STATE_DISCONNECTED:
+                app_cluster_data_set_bluetooth_status(T_BLUETOOTH_INFO_OFF);
+                app_cluster_data_set_show_main_display(0xff, BP_LE_DISC_EVENT);
+                break;
+
+            case GAP_CONN_STATE_CONNECTED:
+                app_cluster_data_set_bluetooth_status(T_BLUETOOTH_INFO_ON);
+                app_cluster_data_set_show_main_display(0xff, BP_LE_CONN_EVENT);
+                break;
+
+            default:
+                break;
+            }
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void app_bwps_msg(T_IO_MSG *p_gap_msg)
 {
-    T_LE_GAP_MSG gap_msg;
+    APP_PRINT_INFO1("line = %d \n", __LINE__);
+    APP_PRINT_TRACE2("app_bwps_msg: subtype %d,%d", p_gap_msg->type, p_gap_msg->subtype);
     switch (p_gap_msg->type)
     {
     case IO_MSG_TYPE_WRISTBNAD:
@@ -86,40 +126,20 @@ static void app_bwps_msg(T_IO_MSG *p_gap_msg)
                 //update_normal_adv_data();
             }
             break;
+
         default:
             break;
         }
         break;
-    case IO_MSG_TYPE_BT_STATUS:
-        switch (p_gap_msg->subtype)
-        {
-        case GAP_MSG_LE_CONN_STATE_CHANGE:
-            switch ((T_GAP_CONN_STATE)gap_msg.msg_data.gap_conn_state_change.new_state)
-            {
-            case GAP_CONN_STATE_DISCONNECTED:
-                app_cluster_data_set_bluetooth_status(T_BLUETOOTH_INFO_OFF);
-                app_cluster_data_set_show_main_display(0xff, BP_LE_DISC_EVENT);
-                break;
 
-            case GAP_CONN_STATE_CONNECTED:
-                app_cluster_data_set_bluetooth_status(T_BLUETOOTH_INFO_ON);
-                app_cluster_data_set_show_main_display(0xff, BP_LE_CONN_EVENT);
-                break;
-
-            default:
-                break;
-            }
-            break;
-
-        default:
-            break;
-        }
     default:
         break;
     }
 }
 void app_ble_bwps_init(void)
 {
+    APP_PRINT_TRACE0("app_ble_bwps_init");
     bwps_srv_id  = bwps_service_add_service(app_bwps_callback);
-    le_msg_handler_cback_register(app_bwps_msg);
+    le_msg_handler_cback_register(gap_bwps_msg);
+    app_msg_handler_cback_register(app_bwps_msg);
 }

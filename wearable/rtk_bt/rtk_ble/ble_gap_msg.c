@@ -276,7 +276,6 @@ void app_handle_gap_msg(T_IO_MSG *p_gap_msg)
     T_LE_GAP_MSG gap_msg;
     uint8_t conn_id;
     memcpy(&gap_msg, &p_gap_msg->u.param, sizeof(p_gap_msg->u.param));
-
     APP_PRINT_TRACE1("app_handle_gap_msg: subtype %d", p_gap_msg->subtype);
     switch (p_gap_msg->subtype)
     {
@@ -375,7 +374,7 @@ void app_handle_gap_msg(T_IO_MSG *p_gap_msg)
 void app_handle_io_msg(T_IO_MSG io_msg)
 {
     uint16_t msg_type = io_msg.type;
-
+    APP_PRINT_TRACE1("app_handle_io_msg %d", msg_type);
     switch (msg_type)
     {
     case IO_MSG_TYPE_BT_STATUS:
