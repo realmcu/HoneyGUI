@@ -105,9 +105,9 @@ void draw_bar_v(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int16_t h)
     recth = h - w / 2 * 2 + 1;
     rect_x = x;
     recty = c1_y;
-    this->draw_rectangle(this, rect_x, recty, rectw, recth);
-    this->draw_circle(this, c1_x, c1_y, cr);
-    this->draw_circle(this, c2_x, c2_y, cr);
+    draw_rectangle(this, rect_x, recty, rectw, recth);
+    draw_circle(this, c1_x, c1_y, cr);
+    draw_circle(this, c2_x, c2_y, cr);
 }
 void (draw_round_rect)(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int16_t h)
 {
@@ -149,9 +149,9 @@ void (draw_round_rect)(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int1
         rect_x = 0;
         recty = c1_y;
     }
-    this->draw_rectangle(this, rect_x, recty, rectw, recth);
-    this->draw_circle(this, c1_x, c1_y, cr);
-    this->draw_circle(this, c2_x, c2_y, cr);
+    draw_rectangle(this, rect_x, recty, rectw, recth);
+    draw_circle(this, c1_x, c1_y, cr);
+    draw_circle(this, c2_x, c2_y, cr);
 }
 void erase(gui_canvas_t *this)
 {
@@ -164,8 +164,8 @@ void erase(gui_canvas_t *this)
 void draw_ring(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t radius,
                uint16_t width)
 {
-    this->draw_circle(this, center_x, center_y, radius + width);
-    this->erase_circle(this, center_x, center_y, radius);
+    draw_circle(this, center_x, center_y, radius + width);
+    erase_circle(this, center_x, center_y, radius);
 }
 void draw_round_corner_rect(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int16_t h,
                             int16_t corner_radius)
@@ -193,13 +193,13 @@ void draw_round_corner_rect(gui_canvas_t *this, int16_t x, int16_t y, int16_t w,
     rect3_y = corner3_y;
     rect3_w = rect1_w;
     rect3_h = corner_radius;
-    this->draw_circle(this, corner1_x, corner1_y, corner_radius + 1);
-    this->draw_circle(this, corner2_x, corner2_y, corner_radius + 1);
-    this->draw_circle(this, corner3_x, corner3_y - 1, corner_radius + 1);
-    this->draw_circle(this, corner4_x, corner4_y - 1, corner_radius + 1);
-    this->draw_rectangle(this, rect1_x, rect1_y, rect1_w, rect1_h);
-    this->draw_rectangle(this, rect2_x, rect2_y, rect2_w, rect2_h);
-    this->draw_rectangle(this, rect3_x, rect3_y, rect3_w, rect3_h);
+    draw_circle(this, corner1_x, corner1_y, corner_radius + 1);
+    draw_circle(this, corner2_x, corner2_y, corner_radius + 1);
+    draw_circle(this, corner3_x, corner3_y - 1, corner_radius + 1);
+    draw_circle(this, corner4_x, corner4_y - 1, corner_radius + 1);
+    draw_rectangle(this, rect1_x, rect1_y, rect1_w, rect1_h);
+    draw_rectangle(this, rect2_x, rect2_y, rect2_w, rect2_h);
+    draw_rectangle(this, rect3_x, rect3_y, rect3_w, rect3_h);
 }
 
 void get_line_from_point_and_degree(gui_point_t *point1, float degree, gui_line_t *line)
@@ -276,7 +276,7 @@ void (draw_arc)(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t 
     {
 
 
-        this->draw_ring(this, center_x, center_y, radius, width);
+        draw_ring(this, center_x, center_y, radius, width);
         gui_point_t center = {.x = center_x, .y = center_y};
         gui_line_t cut_line, cut_line2;
 
@@ -401,8 +401,8 @@ void (draw_arc)(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t 
             }
             get_piont_line_cross_circle(center_x, center_y, radius + width / 2, &cut_line, &cstart, start_left);
             get_piont_line_cross_circle(center_x, center_y, radius + width / 2, &cut_line2, &cend, end_left);
-            this->draw_circle(this, (int)(cstart.x), (int)(cstart.y), width / 2);
-            this->draw_circle(this, (int)(cend.x), (int)(cend.y), width / 2);
+            draw_circle(this, (int)(cstart.x), (int)(cstart.y), width / 2);
+            draw_circle(this, (int)(cend.x), (int)(cend.y), width / 2);
 
         }
 
@@ -489,6 +489,24 @@ static void (arc)(gui_canvas_t *this, const canvas_arc_t *data)
     rect_data->stroke.fill.color_data.rgba = rgba_mask_alpha(rect_data->stroke.fill.color_data.rgba,
                                                              this->opacity_value);
     gui_get_acc()->draw_arc(rect_data, gui_get_dc());
+}
+static void (bezier_curve)(gui_canvas_t *this, const canvas_bezier_curve_t *data)
+{
+    canvas_bezier_curve_t rect;
+    canvas_bezier_curve_t *rect_data = &rect;
+    memcpy(rect_data, data, sizeof(canvas_bezier_curve_t));
+    /*rect_data->end_x += (GET_BASE(this)->dx);
+    rect_data->control_x_1 += (GET_BASE(this)->dx);
+    rect_data->start_x += (GET_BASE(this)->dx);
+    rect_data->control_x_2 += (GET_BASE(this)->dx);
+    rect_data->end_y += (GET_BASE(this)->dy);
+    rect_data->control_y_1 += (GET_BASE(this)->dy);
+    rect_data->start_y += (GET_BASE(this)->dy);
+    rect_data->control_y_2 += (GET_BASE(this)->dy);    */
+    rect_data->stroke.stroke_width = rect_data->stroke.stroke_width * (this->sx);
+    rect_data->stroke.fill.color_data.rgba = rgba_mask_alpha(rect_data->stroke.fill.color_data.rgba,
+                                                             this->opacity_value);
+    gui_get_acc()->draw_bezier_curve(rect_data, gui_get_dc());
 }
 static void (line)(gui_canvas_t *this, canvas_line_t *line_data)
 {
@@ -584,5 +602,6 @@ gui_api_canvas_t gui_canvas_api =
     .svg = svg,
     .set_animate = set_animate,
     .wave = wave,
-    .palette_wheel = palette_wheel
+    .palette_wheel = palette_wheel,
+    .bezier_curve = bezier_curve
 };

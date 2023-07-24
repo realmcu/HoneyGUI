@@ -13,7 +13,7 @@ extern void sw_draw_polyline(canvas_polyline_t *p, struct gui_dispdev *dc);
 extern void sw_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
                         float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);
 extern void sw_draw_path(draw_path_t *path, struct gui_dispdev *dc);
-
+extern void sw_draw_bezier_curve(canvas_bezier_curve_t *curve, struct gui_dispdev *dc);
 extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
 extern void hw_draw_arc(canvas_arc_t *a, struct gui_dispdev *dc);
 extern void hw_draw_line(canvas_line_t *l, struct gui_dispdev *dc);
@@ -62,6 +62,7 @@ void gui_acc_init(void)
     acc.draw_svg = sw_draw_svg;
     acc.draw_wave = nanovg_draw_wave;
     acc.draw_palette_wheel = nanovg_draw_palette_wheel;
+    acc.draw_bezier_curve = sw_draw_bezier_curve;
 #else
     acc.blit = sw_acc_blit;
     acc.draw_circle = sw_draw_circle;

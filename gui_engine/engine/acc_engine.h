@@ -158,7 +158,12 @@ typedef struct canvas_polyline
     canvas_fill_t fill;
     canvas_stroke_t stroke;
 } canvas_polyline_t;
-
+typedef struct canvas_bezier_curve
+{
+    float start_x, start_y, control_x_1, control_y_1, control_x_2, control_y_2, end_x, end_y;
+    canvas_fill_t fill;
+    canvas_stroke_t stroke;
+} canvas_bezier_curve_t;
 
 typedef struct canvas_path
 {
@@ -204,6 +209,7 @@ typedef struct acc_engine
     void (*draw_path)(draw_path_t *path, struct gui_dispdev *dc);
     void (*draw_wave)(canvas_wave_t *w, struct gui_dispdev *dc);
     void (*draw_palette_wheel)(canvas_palette_wheel_t *pw, struct gui_dispdev *dc);
+    void (*draw_bezier_curve)(canvas_bezier_curve_t *c, struct gui_dispdev *dc);
     //todo
     void (*draw_svg)(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
                      float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);

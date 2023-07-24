@@ -280,6 +280,31 @@ void (nanovg_draw_wave)(canvas_wave_t *wave, struct gui_dispdev *dc)
 
     nvgDeleteAGGE(vg);
 }
+void sw_draw_bezier_curve(canvas_bezier_curve_t *curve, struct gui_dispdev *dc)
+{
+    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+    nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+    nvgSave(vg);
+    nvgBeginPath(vg);
+    //nvgCircle(vg, center_x,center_y, radius);
+    //nvgRect(vg, 20,20,w-40,h-40);
+    //nvgRoundedRect(vg, 20,20,100,50, 25);
+    nvgLineCap(vg, NVG_ROUND);
+    nvgMoveTo(vg, curve->start_x, curve->start_y);
+    nvgBezierTo(vg, curve->control_x_1, curve->control_y_1, curve->control_x_2, curve->control_y_2,
+                curve->end_x, curve->end_y);
+    canvas_color_t c = {0};
+    c.color.rgba = curve->stroke.fill.color_data.rgba;
+    nvgStrokeColor(vg, nvgRGBA(c.color.channel.red, c.color.channel.green, c.color.channel.blue,
+                               c.color.channel.alpha));
+    nvgStrokeWidth(vg, curve->stroke.stroke_width);
+    nvgStroke(vg);
+    nvgRestore(vg);
+    nvgEndFrame(vg);
+
+    nvgDeleteAGGE(vg);
+}
 void (nanovg_draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc)
 {
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),

@@ -18,27 +18,11 @@ typedef struct gui_canvas gui_canvas_t;
 struct gui_canvas
 {
     gui_bitmap_t base;
-    void (* draw_circle)(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t radius);
     void (* set_color)(void *this, uint32_t color);
     uint32_t (* get_color)(gui_canvas_t *this);
-    void (* erase_circle)(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t radius);
-    void (* draw_rectangle)(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int16_t h);
-    void (* draw_round_rect)(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int16_t h);
-    void (* draw_round_corner_rect)(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int16_t h,
-                                    int16_t radius);
-    void (* draw_path)(gui_canvas_t *this, int16_t x, int16_t y, void *path);
-    void (* draw_ring)(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t radius,
-                       uint16_t width);
-    void (* draw_arc)(gui_canvas_t *this, int16_t center_x, int16_t center_y, int16_t radius,
-                      uint16_t width, int16_t start_degreee, int16_t end_degreee, bool round);
-    void (* draw_bar_v)(gui_canvas_t *this, int16_t x, int16_t y, int16_t w, int16_t h);
-    void (* erase)(gui_canvas_t *this);
     void (*ctor)(gui_canvas_t *this, gui_obj_t *parent, const char *name, int16_t x, int16_t y,
                  int16_t w, int16_t h, uint32_t color);
     gui_animate_t *animate;
-
-
-    void (*circle)(gui_canvas_t *this, canvas_circle_t *circle_data);
     void (*draw)(gui_canvas_t *this);
     float sx;
     float sy;
@@ -59,6 +43,7 @@ typedef struct gui_api_canvas
     void (*set_animate)(gui_canvas_t *canvas, uint32_t dur, int repeatCount, void *callback, void *p);
     void (*wave)(gui_canvas_t *this, canvas_wave_t *wave);
     void (*palette_wheel)(gui_canvas_t *this, canvas_palette_wheel_t *pw);
+    void (*bezier_curve)(gui_canvas_t *this, const canvas_bezier_curve_t *pw);
 } gui_api_canvas_t;
 
 void (gui_canvas_ctor)(gui_canvas_t *this, gui_obj_t *parent, const char *name, int16_t x,
