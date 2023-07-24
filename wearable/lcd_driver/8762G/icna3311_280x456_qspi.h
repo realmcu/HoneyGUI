@@ -15,7 +15,20 @@ extern "C" {
 #define OUTPUT_PIXEL_BYTES                  2
 #define ICNA3311_DRV_PIXEL_BITS             16
 
+#if 1 //1 QFN68 -  0 QFN88
+#define LCD_QSPI_RST                     P3_6
+// #define LCD_QSPI_BL                      P1_4
+#define LCD_QSPI_D0                      P4_2
+#define LCD_QSPI_D1                      P4_1
+#define LCD_QSPI_D2                      P3_2
+#define LCD_QSPI_D3                      P3_3
+#define LCD_QSPI_CS                      P4_3
+#define LCD_QSPI_CLK                     P4_0
+#define LCD_QSPI_TE                      P0_5
 
+//#define LCD_QSPI_IM0                      P0_1
+//#define LCD_QSPI_IM1                      P0_1
+#else
 #define LCD_QSPI_RST                     P3_6
 //#define LCD_QSPI_BL                      P1_2
 #define LCD_QSPI_D0                      P4_2
@@ -28,6 +41,7 @@ extern "C" {
 //#define LCD_QSPI_IM0                      P0_1
 //#define LCD_QSPI_IM1                      P0_1
 
+#endif
 
 
 

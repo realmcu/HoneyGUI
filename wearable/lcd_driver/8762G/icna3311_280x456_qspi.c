@@ -425,7 +425,7 @@ void rtk_lcd_hal_init(void)
     incna3311_chip_reset();
     LCDC_InitTypeDef lcdc_init = {0};
     lcdc_init.LCDC_Interface = LCDC_IF_DBIC;
-    lcdc_init.LCDC_GroupSel = 2;
+    lcdc_init.LCDC_GroupSel = 1; //QFN88 2 - QFN68 1
     lcdc_init.LCDC_PixelInputFarmat = LCDC_INPUT_RGB565;
     lcdc_init.LCDC_PixelOutpuFarmat = LCDC_OUTPUT_RGB565;
     lcdc_init.LCDC_PixelBitSwap = LCDC_SWAP_BYPASS; //lcdc_handler_cfg->LCDC_TeEn = LCDC_TE_DISABLE;
