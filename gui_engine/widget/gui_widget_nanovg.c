@@ -30,12 +30,12 @@ void gui_widget_nanovg_set_canvas_cb(gui_widget_nanovg_t *this,
 {
     this->nanovg_canvas_cb = cb;
 }
-
 static void widget_nanovg_draw_cb(gui_obj_t *obj)
 {
     gui_widget_nanovg_t *this = (gui_widget_nanovg_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
-
+    extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
+                                     uint8_t *data);
     if (this->nanovg_canvas_cb != NULL)
     {
         NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),

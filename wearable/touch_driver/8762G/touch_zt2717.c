@@ -75,6 +75,26 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     return true;
 }
 
+void rtk_touch_hal_set_indicate(void *indicate)
+{
+    drv_pin_mode(TOUCH_ZT2717_INT, PIN_MODE_INPUT);
+    drv_pin_attach_irq(TOUCH_ZT2717_INT, PIN_IRQ_MODE_RISING_FALLING, indicate,
+                       NULL);
+    drv_pin_irq_enable(TOUCH_ZT2717_INT, PIN_IRQ_DISABLE);
+}
+
+void rtk_touch_hal_int_config(bool enable)
+{
+    if (enable == true)
+    {
+        drv_pin_irq_enable(TOUCH_ZT2717_INT, PIN_IRQ_ENABLE);
+    }
+    else
+    {
+        drv_pin_irq_enable(TOUCH_ZT2717_INT, PIN_IRQ_DISABLE);
+    }
+}
+
 static bool touch_enter_dlps(void)
 {
     //Pad_Config(TOUCH_816S_INT, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_DISABLE, PAD_OUT_LOW);
