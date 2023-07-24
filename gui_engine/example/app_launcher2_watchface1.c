@@ -29,7 +29,7 @@
 void static sport_chart_draw(gui_canvas_t *c)
 {
 
-    {
+    /*{
         GUI_RENDER_DATA
         NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
                                        (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
@@ -50,7 +50,7 @@ void static sport_chart_draw(gui_canvas_t *c)
         nvgEndFrame(vg);
 
         nvgDeleteAGGE(vg);
-    }
+    }*/
     canvas_bezier_curve_t bc = {0};
     bc.start_x = 20;
     bc.end_x = 400;

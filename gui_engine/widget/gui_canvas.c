@@ -495,14 +495,14 @@ static void (bezier_curve)(gui_canvas_t *this, const canvas_bezier_curve_t *data
     canvas_bezier_curve_t rect;
     canvas_bezier_curve_t *rect_data = &rect;
     memcpy(rect_data, data, sizeof(canvas_bezier_curve_t));
-    /*rect_data->end_x += (GET_BASE(this)->dx);
+    rect_data->end_x += (GET_BASE(this)->dx);
     rect_data->control_x_1 += (GET_BASE(this)->dx);
     rect_data->start_x += (GET_BASE(this)->dx);
     rect_data->control_x_2 += (GET_BASE(this)->dx);
     rect_data->end_y += (GET_BASE(this)->dy);
     rect_data->control_y_1 += (GET_BASE(this)->dy);
     rect_data->start_y += (GET_BASE(this)->dy);
-    rect_data->control_y_2 += (GET_BASE(this)->dy);    */
+    rect_data->control_y_2 += (GET_BASE(this)->dy);
     rect_data->stroke.stroke_width = rect_data->stroke.stroke_width * (this->sx);
     rect_data->stroke.fill.color_data.rgba = rgba_mask_alpha(rect_data->stroke.fill.color_data.rgba,
                                                              this->opacity_value);
