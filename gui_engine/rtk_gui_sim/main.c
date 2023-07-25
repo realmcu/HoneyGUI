@@ -25,7 +25,7 @@
 
 uint8_t resource_root[1024 * 1024 * 20];
 
-char *defaultPath = GUI_ROOT_FOLDER;
+char *defaultPath = "example/root_image/root_image_sim_vscode/root/";
 int main(int argc, char **argv)
 {
     for (int count = 1; count < argc; count++)
