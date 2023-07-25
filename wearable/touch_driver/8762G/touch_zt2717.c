@@ -75,7 +75,7 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
     return true;
 }
 
-void rtk_touch_hal_set_indicate(void *indicate)
+void rtk_touch_hal_set_indicate(void (*indicate)(void *))
 {
     drv_pin_mode(TOUCH_ZT2717_INT, PIN_MODE_INPUT);
     drv_pin_attach_irq(TOUCH_ZT2717_INT, PIN_IRQ_MODE_RISING_FALLING, indicate,
