@@ -476,7 +476,10 @@ typedef struct _gui_obj_t
     touch_info_t *tp = tp_get_info();
 #define GUI_TYPE(type, obj) ((type *)obj)
 #if defined __WIN32
-#define GUI_ROOT_FOLDER "example/root_image/root_image_sim_vscode/root/"
+
+extern char *defaultPath;
+#define GUI_ROOT_FOLDER defaultPath
+//#define GUI_ROOT_FOLDER "example/root_image/root_image_sim_vscode/root/"
 #else
 #define GUI_ROOT_FOLDER "/"
 #endif
