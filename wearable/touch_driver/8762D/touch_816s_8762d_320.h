@@ -32,6 +32,8 @@ extern "C" {
 
 void rtk_touch_hal_init(void);
 bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing);
+void rtk_touch_hal_int_config(bool enable);
+void rtk_touch_hal_set_indicate(void (*indicate)(void *));
 
 #ifdef __cplusplus
 }

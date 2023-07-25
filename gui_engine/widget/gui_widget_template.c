@@ -15,15 +15,15 @@ static void widget_template_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
     gui_dispdev_t *dc = gui_get_dc();
-    gui_obj_t *root = (gui_obj_t *)obj;
+//    gui_obj_t *root = (gui_obj_t *)obj;
 
-    uint32_t cx = dc->fb_width / 2;
-    uint32_t cy = dc->fb_height / 2;
+//    uint32_t cx = dc->fb_width / 2;
+//    uint32_t cy = dc->fb_height / 2;
 }
 
 static void widget_template_draw_cb(gui_obj_t *obj)
 {
-    gui_widget_template_t *this = (gui_widget_template_t *)obj;
+//    gui_widget_template_t *this = (gui_widget_template_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
 

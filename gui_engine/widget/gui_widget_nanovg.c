@@ -16,10 +16,10 @@ static void widget_nanovg_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
     gui_dispdev_t *dc = gui_get_dc();
-    gui_obj_t *root = (gui_obj_t *)obj;
+//    gui_obj_t *root = (gui_obj_t *)obj;
 
-    uint32_t cx = dc->fb_width / 2;
-    uint32_t cy = dc->fb_height / 2;
+//    uint32_t cx = dc->fb_width / 2;
+//    uint32_t cy = dc->fb_height / 2;
 
 
 }
@@ -46,14 +46,14 @@ static void widget_nanovg_draw_cb(gui_obj_t *obj)
         this->vg = vg;
         this->nanovg_canvas_cb(this);
         nvgEndFrame(this->vg);
-
+        extern void nvgDeleteAGGE(NVGcontext * ctx);
         nvgDeleteAGGE(this->vg);
     }
 
 }
 static void widget_nanovg_end(gui_obj_t *obj)
 {
-    gui_widget_nanovg_t *this = (gui_widget_nanovg_t *)obj;
+//    gui_widget_nanovg_t *this = (gui_widget_nanovg_t *)obj;
 
 }
 static void widget_nanovg_destory(gui_obj_t *obj)
