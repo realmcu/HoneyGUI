@@ -578,9 +578,9 @@ DECLARE_HANDLER(getAttribute)
     }
     ezxml_t title;
     jerry_get_object_native_pointer(this_value, (void *)&title, NULL);
-    printf("ezxmltitle:%x", title);
-    char *widget_type = ezxml_attr(title, js_value_to_string(args[0]));
-    return jerry_create_string(widget_type);
+    //printf("ezxmltitle:%x", title);
+    const char *widget_type = ezxml_attr(title, js_value_to_string(args[0]));
+    return jerry_create_string((void *)widget_type);
 }
 
 extern const char *get_tag_by_widget_type(int type);
@@ -593,17 +593,17 @@ DECLARE_HANDLER(getChildElementByTag)
         return jerry_create_undefined();
     }
     gui_obj_t *widget = NULL;
-    jerry_get_object_native_pointer(this_value, &widget, NULL);
-    char *name = widget->name;
+    jerry_get_object_native_pointer(this_value, (void *)&widget, NULL);
+    char *name = (void *)widget->name;
     int type = widget->type;
     jerry_value_t global_obj = jerry_get_global_object();
     jerry_value_t app_property = js_get_property(global_obj, "app");
     gui_app_t *app = NULL;
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
-    printf("app:%s,%s\n", app->xml, name);
-    char *widget_type = get_tag_by_widget_type(type);
-    ezxml_t c = get_child_ele(app->xml, widget_type, name, js_value_to_string(args[0]));
-    printf("ezxmlc:%x", c);
+    //printf("app:%s,%s\n", app->xml, name);
+    char *widget_type = (void *)get_tag_by_widget_type(type);
+    ezxml_t c = get_child_ele((void *)app->xml, widget_type, name, js_value_to_string(args[0]));
+    //printf("ezxmlc:%x", c);
     jerry_value_t v = jerry_create_object();
     jerry_set_object_native_pointer(v, c, NULL);
     REGISTER_METHOD(v, getAttribute);
@@ -753,7 +753,7 @@ DECLARE_HANDLER(open)
 
         char *new_xml = js_value_to_string(args[0]);
         //open_xml_app(new_xml);
-        gui_app_t *app2 = get_app_xml();
+        gui_app_t *app2 = (void *)get_app_xml();
         app2->xml = new_xml;
         gui_switch_app(app, app2);
     }
@@ -1360,7 +1360,8 @@ DECLARE_HANDLER(setAnimate_seekbar)
         float to = jerry_get_number_value(js_get_property(args[1], "to"));
         int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
         int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
-        gui_seekbar_api.set_animate(obj, duration, repeat, js_cb_with_args_animate, (void *)(cb_arg));
+        gui_seekbar_api.set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
+                                    (void *)(cb_arg));
         GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
     }
 

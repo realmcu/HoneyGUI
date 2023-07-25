@@ -99,6 +99,7 @@ void rtgui_font_mem_load(gui_text_t *text)
         if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D || offset == 0xFFFF)
         {
             offset = *(uint16_t *)(0x20 * 2 + table_offset);
+            if (offset == 0xFFFF) { continue; }
             chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
             chr[i].char_w = text->font_height / 2;
         }
@@ -106,12 +107,14 @@ void rtgui_font_mem_load(gui_text_t *text)
         {
             line_flag ++;
             offset = *(uint16_t *)(0x20 * 2 + table_offset);
+            if (offset == 0xFFFF) { continue; }
             chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
             chr[i].char_w = 0;
         }
         else
         {
             offset = *(uint16_t *)(chr[i].unicode * 2 + table_offset);
+            if (offset == 0xFFFF) { continue; }
             chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
             chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
         }

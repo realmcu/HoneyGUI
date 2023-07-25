@@ -151,7 +151,16 @@ bool rtk_touch_hal_read_all(uint16_t *x, uint16_t *y, bool *pressing)
 
 
 }
-
+void rtk_touch_hal_set_indicate(void (*indicate)(void *))
+{
+    (void)indicate;
+    return;
+}
+void rtk_touch_hal_int_config(bool enable)
+{
+    (void)enable;
+    return;
+}
 void rtk_touch_hal_init(void)
 {
     DBG_DIRECT("touch_gt911_init line = %d\n", __LINE__);
