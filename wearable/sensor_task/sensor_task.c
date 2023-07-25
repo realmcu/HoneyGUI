@@ -114,11 +114,6 @@ void scheduler_hook(void *from, void *to)
         }
     }
 
-    if ((strcmp(from_task_name, "sensor") == 0) && (strcmp(to_task_name, "IDLE") == 0))
-    {
-        DBG_DIRECT("from sensor to IDLE");
-    }
-
     if ((strcmp(to_task_name, "sensor") == 0) && (strcmp(from_task_name, "IDLE") == 0))
     {
         //need set to sensor mode

@@ -33,6 +33,8 @@ void drv_tim5_init(void)
     TIM_TimeBaseInitTypeDef TIM_InitStruct;
     TIM_StructInit(&TIM_InitStruct);
     TIM_InitStruct.TIM_PWM_En = DISABLE;
+    TIM_InitStruct.TIM_ClockSrc = CK_40M_VCORE4;
+    //TIM_InitStruct.TIM_ClockSrc = CK_32K_TIMER;
     TIM_InitStruct.TIM_Period = 40 * 10000 - 1;
     TIM_InitStruct.TIM_Mode = TIM_Mode_UserDefine;
     TIM_TimeBaseInit(TIM5, &TIM_InitStruct);
@@ -75,6 +77,8 @@ void drv_tim6_init(void)
     TIM_TimeBaseInitTypeDef TIM_InitStruct;
     TIM_StructInit(&TIM_InitStruct);
     TIM_InitStruct.TIM_PWM_En = DISABLE;
+    TIM_InitStruct.TIM_ClockSrc = CK_40M_VCORE4;
+    //TIM_InitStruct.TIM_ClockSrc = CK_32K_TIMER;
     TIM_InitStruct.TIM_ClockSrcDiv_En = ENABLE;
     TIM_InitStruct.TIM_ClockSrcDiv = TIM_CLOCK_DIVIDER_40;
     TIM_InitStruct.TIM_Mode = TIM_Mode_FreeRun;

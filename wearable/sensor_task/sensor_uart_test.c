@@ -40,11 +40,6 @@ void sensor_rtc_int(void *p_value)
     count++;
 }
 
-void sensor_mode_uart_rtc_int_init(void)
-{
-    drv_rtc_second_attach_irq(sensor_rtc_int, NULL);
-}
-
 void sensor_mode_uart_init(void)
 {
     drv_uart5_init(SENSOR_UART_TX, SENSOR_UART_RX);
