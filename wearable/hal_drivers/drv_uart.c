@@ -51,7 +51,10 @@ static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
             {
                 //HAVE RECIVE TIMEOUT THE LEFT
                 ch = UART_ReceiveByte(UARTx);
-                rx_ind(ch);
+                if (rx_ind != NULL)
+                {
+                    rx_ind(ch);
+                }
             }
             break;
         }
@@ -69,7 +72,10 @@ static void uart_isr(void (*rx_ind)(uint8_t ch), UART_TypeDef *UARTx)
             while (UART_GetFlagStatus(UARTx, UART_FLAG_RX_DATA_AVA) == SET)
             {
                 ch = UART_ReceiveByte(UARTx);
-                rx_ind(ch);
+                if (rx_ind != NULL)
+                {
+                    rx_ind(ch);
+                }
             }
             break;
         }

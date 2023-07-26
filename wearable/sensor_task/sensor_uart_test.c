@@ -40,9 +40,28 @@ void sensor_rtc_int(void *p_value)
     count++;
 }
 
+static bool uart_system_wakeup_dlps_check(void)
+{
+    if (System_WakeUpInterruptValue(SENSOR_UART_RX) == SET)
+    {
+        Pad_ClearWakeupINTPendingBit(SENSOR_UART_RX);
+        System_WakeUpPinDisable(SENSOR_UART_RX);
+        DBG_DIRECT("Uart5 Wake up");
+        return true;
+    }
+    return false;
+}
+
+void drv_uart5_dlps_init(void)
+{
+    System_WakeUpPinEnable(SENSOR_UART_RX, PAD_WAKEUP_POL_LOW, PAD_WAKEUP_DEB_DISABLE);
+    drv_dlps_wakeup_cbacks_register("uart5", uart_system_wakeup_dlps_check);
+}
+
 void sensor_mode_uart_init(void)
 {
     drv_uart5_init(SENSOR_UART_TX, SENSOR_UART_RX);
+    drv_uart5_dlps_init();
 
     drv_rtc_second_attach_irq(sensor_rtc_int, NULL);
 }

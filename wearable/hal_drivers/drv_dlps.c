@@ -17,6 +17,8 @@
 
 
 
+bool dlps_flag = false;
+
 static dlps_slist_t drv_dlps_exit_slist =
 {
     .next = NULL,
@@ -80,6 +82,8 @@ static void app_enter_dlps_config(void)
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
         p_item->dlps_cb();
     }
+
+    dlps_flag = true;
 }
 
 /**
@@ -101,6 +105,9 @@ static void app_exit_dlps_config(void)
         drv_dlps_cb_item_t *p_item = dlps_container_of(node, drv_dlps_cb_item_t, slist);
         p_item->dlps_cb();
     }
+
+    dlps_flag = false;
+    DBG_DIRECT("DLPS EXIT END");
 }
 
 /**

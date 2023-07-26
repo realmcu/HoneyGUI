@@ -96,6 +96,12 @@ void scheduler_hook(void *from, void *to)
 
     DBG_DIRECT("scheduler_hook from_task_name %s to_task_name %s", from_task_name, to_task_name);
 
+    extern bool dlps_flag;
+    if (dlps_flag)
+    {
+        return;
+    }
+
     if (strcmp(to_task_name, "sensor") != 0 && strcmp(to_task_name, "IDLE") != 0)
     {
         //need set to HP mode
@@ -105,6 +111,7 @@ void scheduler_hook(void *from, void *to)
         {
             ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE, OPERATION_HP_MODE);
             DBG_DIRECT("from xxx to not sensor neither IDLE scenario_ret %d", ret);
+            //disable_xip_access(false);
             ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V9);
             DBG_DIRECT("dvfs_ret %d line %d", ret, __LINE__);
             ret = pm_cpu_freq_set(200, &actual_mhz);
@@ -114,7 +121,8 @@ void scheduler_hook(void *from, void *to)
         }
     }
 
-    if ((strcmp(to_task_name, "sensor") == 0) && (strcmp(from_task_name, "IDLE") == 0))
+    if ((strcmp(to_task_name, "sensor") == 0) && ((strcmp(from_task_name, "IDLE") == 0) ||
+                                                  (strcmp(from_task_name, "Tmr Svc") == 0)))
     {
         //need set to sensor mode
         //need set clock to 40
@@ -129,6 +137,7 @@ void scheduler_hook(void *from, void *to)
             DBG_DIRECT("dvfs_ret %d", ret);
             uint32_t scenario_ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE,
                                                                OPERATION_SENSOR_MODE);
+            //disable_xip_access(true);
             DBG_DIRECT("from IDLE to sensor scenario_ret %d", ret);
         }
     }
