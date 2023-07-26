@@ -3581,7 +3581,7 @@ int nvgCreateImageRaw(NVGcontext *ctx, int w, int h, int format, int imageFlags,
 #include "vg_lite.h"
 #include "trace.h"
 
-#define PATH_CMD_LEN 256
+#define PATH_CMD_LEN 512
 uint8_t path_cmd[PATH_CMD_LEN] = {0};
 vg_lite_float_t path_data[PATH_CMD_LEN * 2] = {0};
 
@@ -3715,7 +3715,7 @@ void patch_nvgFill(NVGcontext *ctx)
     {
         uint32_t inner_color = (inner_a << 24) | (inner_b << 0) | (inner_g << 8) | (inner_r << 16);
         uint32_t outer_color = (outer_a << 24) | (outer_b << 0) | (outer_g << 8) | (outer_r << 16);
-        vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_NONE, inner_color);
+        vg_lite_draw(target, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, inner_color);
     }
     else if (paint->radius == 0)
     {
@@ -3727,9 +3727,9 @@ void patch_nvgFill(NVGcontext *ctx)
         float sy = paint->xform[5] + dy * large;
         float ex = sx + d * dx;
         float ey = sy + d * dy;
-        uint32_t inner_color = (inner_a << 24) | (inner_b << 16) | (inner_g << 8) | (inner_r << 0);
-        uint32_t outer_color = (outer_a << 24) | (outer_b << 16) | (outer_g << 8) |
-                               (outer_r << 0);//VG_LITE_RGBA8888
+        uint32_t inner_color = (inner_a << 24) | (inner_b << 0) | (inner_g << 8) | (inner_r << 16);
+        uint32_t outer_color = (outer_a << 24) | (outer_b << 0) | (outer_g << 8) |
+                               (outer_r << 16);//VG_LITE_RGBA8888
 
         uint32_t colors[] = {inner_color, outer_color};
         uint32_t stops[] = {0, VLC_GRADIENT_BUFFER_WIDTH - 1};
@@ -3752,7 +3752,7 @@ void patch_nvgFill(NVGcontext *ctx)
 
         vg_lite_scale(d / VLC_GRADIENT_BUFFER_WIDTH, 1, gradMatrix);
 
-        vg_lite_draw_gradient(target, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &grad, VG_LITE_BLEND_NONE);
+        vg_lite_draw_gradient(target, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &grad, VG_LITE_BLEND_SRC_OVER);
     }
     else
     {
@@ -3833,11 +3833,11 @@ void patch_nvgStroke(NVGcontext *ctx)
     uint8_t r = paint->innerColor.r * 0xff * paint->innerColor.a;
     uint8_t g = paint->innerColor.g * 0xff * paint->innerColor.a;
     uint8_t b = paint->innerColor.b * 0xff * paint->innerColor.a;
-    vg_lite_color_t color = (a << 24) | (b << 16) | (g << 8) | r;
+    vg_lite_color_t color = (a << 24) | (r << 16) | (g << 8) | b;
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    vg_lite_path_t *path_stroke = vg_lite_os_malloc(sizeof(vg_lite_path_t) * npaths);
+    vg_lite_path_t *path_stroke = (vg_lite_path_t *)vg_lite_os_malloc(sizeof(vg_lite_path_t) * npaths);
 
     for (int i = 0; i < npaths; i++)
     {

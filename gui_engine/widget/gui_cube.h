@@ -41,10 +41,11 @@ typedef struct gui_cube
     draw_img_t draw_img_right;
     float c_x;
     float c_y;
-    float scale_x;
-    float scale_y;
-    float t_x;
-    float t_y;
+    float cbsize;
+    //float scale_x;
+    //float scale_y;
+    //float t_x;
+    //float t_y;
 } gui_cube_t;
 
 #define RAD(d)        (d*3.1415926f/180.0f)
@@ -53,11 +54,8 @@ typedef struct gui_cube
 gui_cube_t *gui_cube_create(void *parent,  const char *name, void *addr,
                             int16_t x, int16_t y, int16_t w, int16_t h);
 
-void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
-                   void *addr,
-                   int16_t x,
-                   int16_t y, int16_t w, int16_t h);
-
+void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
+void gui_cube_set_size(gui_cube_t *this, float size);
 
 #ifdef __cplusplus
 }

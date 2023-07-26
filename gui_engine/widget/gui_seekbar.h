@@ -11,6 +11,7 @@
 extern "C" {
 #endif
 #include "gui_progressbar.h"
+#include "gui_img.h"
 /**********************
  *      TYPEDEFS
  **********************/
@@ -18,10 +19,8 @@ typedef struct gui_seekbar gui_seekbar_t;
 struct gui_seekbar
 {
     gui_progressbar_t base;
-    union
-    {
-        gui_img_t *slider_img;
-    } slider;
+
+    gui_img_t *slider_img;
     bool hit_slider;
     bool press_flag;
     void *press_cb;
@@ -41,14 +40,6 @@ struct gui_seekbar
                  int16_t w, int16_t h);
 } ;
 
-typedef struct gui_api_seekbar
-{
-    void (*onPress)(gui_seekbar_t *this, void *cb, void *p);
-    void (*onRelease)(gui_seekbar_t *this, void *cb, void *p);
-    void (*onPressing)(gui_seekbar_t *this, void *cb, void *p);
-    void (*set_animate)(gui_seekbar_t *this, uint32_t dur, int repeatCount, void *callback, void *p);
-} gui_api_seekbar_t;
-extern gui_api_seekbar_t gui_seekbar_api;
 /**
  * @brief create a seekbar widget.
  *

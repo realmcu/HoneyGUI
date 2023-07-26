@@ -32,7 +32,7 @@ static void seekbar_preapre(gui_obj_t *obj)
                     pro = pro * (circle->base.max - 2) / obj->h; //gui_log("pro:%d\n",pro);
                 }
                 //gui_log("pro:%d,type:%d\n",pro, GET_BASE(circle->base.c)->type);
-                gui_progressbar_api.set_progress((void *)circle, (circle->base.max - 2) - pro);
+                //gui_progressbar_api.set_progress((void *)circle, (circle->base.max - 2) - pro);
             }
         }
 
@@ -126,16 +126,12 @@ static void seekbar_preapre(gui_obj_t *obj)
     obj->cover = ((gui_seekbar_t *)obj)->hit_slider;
 
 }
-#include "gui_graphic.h"
+
 
 static bool judge_point_in_ring(uint16_t cx, uint16_t cy, uint16_t r_in, uint16_t r_out,
                                 uint16_t point_x, uint16_t point_y)
 {
-    gui_circleshape_t c1 = {.center.x = cx, .center.y = cy, .radius = r_in};
-    gui_circleshape_t c2 = {.center.x = cx, .center.y = cy, .radius = r_out};
-    gui_point_t p = {.x = point_x, .y = point_y};
     return true;
-    //return (!judge_point_in_circle(&c1, &p) && judge_point_in_circle(&c2, &p));
 }
 #include "math.h"
 static float get_gegree_to_center(uint16_t cx, uint16_t cy, uint16_t point_x, uint16_t point_y)
@@ -189,6 +185,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
                     float pro = get_gegree_to_center(circle->arcx + obj->dx, circle->arcy + obj->dy, tp->x + tp->deltaX,
                                                      tp->y + tp->deltaY);
                     float progress = 0;
+                    GUI_UNUSED(progress);
                     // gui_log("degree:%f\n",pro*180.0f/M_PI);
                     float start = circle->arc_start * M_PI / 180.f;
                     float end = circle->arc_end * M_PI / 180.f;
@@ -221,7 +218,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
                         }
                     }
                     //gui_log("start:%f, end:%f, pro:%f, progress:%f\n", start, end, pro, progress);
-                    gui_progressbar_api.set_percentage((void *)circle, progress);
+                    //gui_progressbar_api.set_percentage((void *)circle, progress);
                 }
             }
         }
@@ -339,7 +336,7 @@ static void seekbar_h_preapre(gui_obj_t *obj)
                     pro = pro * (circle->base.max - 2) / obj->w;
                     gui_log("pro:%d\n", pro);
                 }
-                gui_progressbar_api.set_progress((void *)circle, pro);
+                //gui_progressbar_api.set_progress((void *)circle, pro);
             }
         }
     }
@@ -470,18 +467,8 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
     }
 }
-static void (onPress)(gui_seekbar_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
-}
-static void (onRelease)(gui_seekbar_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
-}
-static void (onPressing)(gui_seekbar_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
-}
+
+
 void gui_seekbar_ctor_img_v(gui_seekbar_t *this, gui_obj_t *parent, void *picture, int16_t x,
                             int16_t y)
 {
@@ -604,28 +591,8 @@ void gui_seekbar_h_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *file
     GET_BASE(this)->obj_update_att = obj_update_att;
     //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
 }
-static void set_animate(gui_seekbar_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
-{
-    gui_animate_t *animate = ((gui_seekbar_t *)o)->animate;
-    if (!(animate))
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-    }
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
-    animate->p = p;
-    ((gui_seekbar_t *)o)->animate = animate;
-}
-gui_api_seekbar_t gui_seekbar_api =
-{
-    .onPress = onPress,
-    .onRelease = onRelease,
-    .onPressing = onPressing,
-    .set_animate = set_animate,
-};
+
+
 
 gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h)

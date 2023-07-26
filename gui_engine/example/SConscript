@@ -1,25 +1,16 @@
-# RT-Thread building script for GuiEngine demo
-
 from building import *
 
 cwd = GetCurrentDir()
 src = Split("""
 """)
 if not GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
-    src += ['app_launcher2.c']
-    src += ['app_launcher_curtain_up.c']
-    src += ['app_launcher2_create_selector.c']
-    src += ['app_launcher2_curtain_left.c']
-    src += ['app_launcher2_grid_icon.c']
-    src += ['app_launcher2_heart_rate_chart.c']
-    src += ['app_launcher2_music_player.c']
-    src += ['app_launcher2_sport_chart.c']
-    src += ['app_launcher2_watchface1.c']
-    src += ['app_launcher2_wave.c']
-    src += ['app_launcher2_palette_wheel.c']
+    src += ['app_launcher.c']
+    src += ['app_launcher_tb_watch.c']
+    src += ['app_launcher_tb_sport.c']
+    src += ['app_launcher_tb_colorwheel.c']
+    src += ['app_launcher_tb_cube.c']
 CPPPATH = [cwd,cwd + '/root_image']
-if GetDepend(['MODULE_RTK_GUI_WRISTBAND_DEMO']):
-    src = []
+
 group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI_DEMO'], CPPPATH = CPPPATH)
 
 Return('group')

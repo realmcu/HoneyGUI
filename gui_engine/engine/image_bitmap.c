@@ -1,7 +1,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <gui_matrix.h>
-#include <gui_graphic.h>
 #include "gui_bitmap.h"
 static bool rtgui_image_bitmap_check(draw_img_t *image);
 static bool rtgui_image_bitmap_load(draw_img_t *image,

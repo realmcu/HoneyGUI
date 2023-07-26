@@ -108,7 +108,7 @@ NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtextu
     memset(&target, 0x00, sizeof(vg_lite_buffer_t));
     target.width  = w;
     target.height = h;
-    target.format = VG_LITE_RGBA8888;
+    target.format = VG_LITE_BGRA8888;
     target.memory = (void *)data;
     target.address = (uint32_t)data;
     target.stride = target.width * 4;

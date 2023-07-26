@@ -186,7 +186,6 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
-            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -338,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>RTK_MODULE_USING_RTK_GUI, GUI_KEIL_SIM</Define>
+              <Define>GUI_KEIL_SIM, RTK_MODULE_USING_RTK_GUI</Define>
               <Undefine></Undefine>
               <IncludePath>.;.;..\example\root_image;gui_port;..\app;..\dc;..\engine;..\input;..\misc;..\misc\tlsf;..\server;..\Third_Party\nanosvg\src;..\Third_Party\nanovg;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\base;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\vglite;..\Third_Party\stb;..\widget;..;..\example;..\example\root_image</IncludePath>
             </VariousControls>
@@ -530,6 +529,11 @@
               <FilePath>..\widget\gui_alert.c</FilePath>
             </File>
             <File>
+              <FileName>gui_arc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\widget\gui_arc.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_bitmap.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_bitmap.c</FilePath>
@@ -543,6 +547,11 @@
               <FileName>gui_canvas.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_canvas.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_colorwheel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\widget\gui_colorwheel.c</FilePath>
             </File>
             <File>
               <FileName>gui_cube.c</FileName>
@@ -560,19 +569,9 @@
               <FilePath>..\widget\gui_curtainview.c</FilePath>
             </File>
             <File>
-              <FileName>gui_d_island.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_d_island.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_dynamic_img.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_dynamic_img.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_graphic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_graphic.c</FilePath>
             </File>
             <File>
               <FileName>gui_grid.c</FileName>
@@ -655,6 +654,16 @@
               <FilePath>..\widget\gui_text.c</FilePath>
             </File>
             <File>
+              <FileName>gui_watch_gradient_spot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\widget\gui_watch_gradient_spot.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_widget_template.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\widget\gui_widget_template.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_win.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_win.c</FilePath>
@@ -665,59 +674,29 @@
           <GroupName>gui_demo</GroupName>
           <Files>
             <File>
-              <FileName>app_launcher2.c</FileName>
+              <FileName>app_launcher.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2.c</FilePath>
+              <FilePath>..\example\app_launcher.c</FilePath>
             </File>
             <File>
-              <FileName>app_launcher_curtain_up.c</FileName>
+              <FileName>app_launcher_tb_watch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_curtain_up.c</FilePath>
+              <FilePath>..\example\app_launcher_tb_watch.c</FilePath>
             </File>
             <File>
-              <FileName>app_launcher2_create_selector.c</FileName>
+              <FileName>app_launcher_tb_sport.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_create_selector.c</FilePath>
+              <FilePath>..\example\app_launcher_tb_sport.c</FilePath>
             </File>
             <File>
-              <FileName>app_launcher2_curtain_left.c</FileName>
+              <FileName>app_launcher_tb_colorwheel.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_curtain_left.c</FilePath>
+              <FilePath>..\example\app_launcher_tb_colorwheel.c</FilePath>
             </File>
             <File>
-              <FileName>app_launcher2_grid_icon.c</FileName>
+              <FileName>app_launcher_tb_cube.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_grid_icon.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher2_heart_rate_chart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_heart_rate_chart.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher2_music_player.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_music_player.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher2_sport_chart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_sport_chart.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher2_watchface1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_watchface1.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher2_wave.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_wave.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher2_palette_wheel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher2_palette_wheel.c</FilePath>
+              <FilePath>..\example\app_launcher_tb_cube.c</FilePath>
             </File>
           </Files>
         </Group>

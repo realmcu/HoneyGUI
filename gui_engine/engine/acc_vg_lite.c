@@ -787,7 +787,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     gpu_width = ((image->img_w + 15) >> 4) << 4;
     uint32_t gpu_height = image->img_h;
     source.stride = gpu_width * source_bytes_per_pixel;
-    uint8_t *source_buffer = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t *source_buffer = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
     uint8_t *tmp = source_buffer;
     //source_buffer = tmp + 64 - (int)tmp % 64;
     //gui_log("tmp, (int)tmp % 64:%x, tmp:%x\n",tmp, (int)tmp % 64);

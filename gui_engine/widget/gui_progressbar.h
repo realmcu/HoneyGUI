@@ -10,7 +10,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "gui_graphic.h"
 #include "gui_canvas.h"
 /**********************
  *      TYPEDEFS
@@ -29,15 +28,9 @@ struct gui_progressbar
                  int16_t w, int16_t h);
 
 } ;
-typedef struct _gui_api_progressbar
-{
-    void (*set_progress)(gui_progressbar_t *this, size_t progress);
-    size_t (*get_progress)(gui_progressbar_t *this);
-    size_t (*get_max)(gui_progressbar_t *this);
-    void (*set_percentage)(gui_progressbar_t *this, float percentage);
-    float (*get_percentage)(gui_progressbar_t *this);
-} _gui_api_progressbar_t;
-extern _gui_api_progressbar_t gui_progressbar_api;
+
+
+
 void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
                           int16_t x,
                           int16_t y, int16_t w, int16_t h);

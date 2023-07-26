@@ -10,9 +10,6 @@
 #include <gui_obj.h>
 #include <gui_magic_img.h>
 #include <tp_algo.h>
-#ifdef RTK_MODULE_VG_LITE
-#include "gui_vg_lite_clock.h"
-#endif
 
 void tabview_prepare(gui_obj_t *obj)
 {
@@ -216,7 +213,7 @@ static void tab_update_att(gui_obj_t *obj)
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     obj->x = (tab->id.x - parent->cur_id.x) * (int)gui_get_screen_width();
     obj->y = (tab->id.y - parent->cur_id.y) * (int)gui_get_screen_height();
-    // gui_log("tab_update_att x : %d , y : %d\n",obj->x,obj->y);
+    //gui_log("tab_update_att x : %d , y : %d\n",obj->x,obj->y);gui_log("tab_update_att x : %d , y : %d\n",obj->x,obj->y);
 }
 static float get_scale_offset_x(gui_obj_t *img, float scale_x)
 {
@@ -267,30 +264,9 @@ static void deal_img_in_root(gui_obj_t *object, float xx, float yy)
                 break;
             case CANVAS:
                 {
-                    gui_canvas_t *img = (void *)obj;
-                    if (((gui_tab_t *)object)->style == REDUCTION_FADE ||
-                        ((gui_tab_t *)object)->style == REDUCTION)
-                    {
-                        gui_canvas_api.scale(img, x, y);
-                        gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x),
-                                                 get_scale_offset_y((void *)img, x));
-                    }
-                    if (((gui_tab_t *)object)->style == REDUCTION_FADE ||
-                        ((gui_tab_t *)object)->style == FADE)
-                    {
-                        img->opacity_value = x > 0.4f ? (x - 0.4f) / 0.6f * UINT8_MAX : 0;
-                    }
+
                 }
                 break;
-#ifdef RTK_MODULE_VG_LITE
-            case VG_LITE_CLOCK:
-                {
-                    gui_vg_lite_clock_t *vg_lite_clock = (gui_vg_lite_clock_t *)obj;
-                    gui_vg_lite_scale(vg_lite_clock, x, y);
-                    //gui_vg_lite_translate(vg_lite_clock, get_scale_offset_x((void *)vg_lite_clock, x) / x, get_scale_offset_y((void *)vg_lite_clock, x) / y);
-                }
-                break;
-#endif
 
             default:
                 break;
@@ -326,23 +302,9 @@ static void deal_img_in_root_scale(gui_obj_t *object, float xx, float yy)
                 break;
             case CANVAS:
                 {
-                    gui_canvas_t *img = (void *)obj;
-                    gui_canvas_api.scale(img, x, y);
-                    gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x),
-                                             get_scale_offset_y((void *)img,
-                                                                x));
-                    //img->opacity_value = x * UINT8_MAX;
+
                 }
                 break;
-#ifdef RTK_MODULE_VG_LITE
-            case VG_LITE_CLOCK:
-                {
-                    gui_vg_lite_clock_t *vg_lite_clock = (gui_vg_lite_clock_t *)obj;
-                    gui_vg_lite_scale(vg_lite_clock, x, y);
-                    //gui_vg_lite_translate(vg_lite_clock, get_scale_offset_x((void *)vg_lite_clock, x) / x, get_scale_offset_y((void *)vg_lite_clock, x) / y);
-                }
-                break;
-#endif
 
             default:
                 break;
@@ -376,20 +338,9 @@ static void deal_img_in_root_fade(gui_obj_t *object, float xx, float yy)
                 break;
             case CANVAS:
                 {
-                    gui_canvas_t *img = (void *)obj;
 
-                    img->opacity_value = x * UINT8_MAX;
                 }
                 break;
-#ifdef RTK_MODULE_VG_LITE
-            case VG_LITE_CLOCK:
-                {
-                    gui_vg_lite_clock_t *vg_lite_clock = (gui_vg_lite_clock_t *)obj;
-                    //gui_vg_lite_scale(vg_lite_clock, x, y);
-                    //gui_vg_lite_translate(vg_lite_clock, get_scale_offset_x((void *)vg_lite_clock, x) / x, get_scale_offset_y((void *)vg_lite_clock, x) / y);
-                }
-                break;
-#endif
 
             default:
                 break;

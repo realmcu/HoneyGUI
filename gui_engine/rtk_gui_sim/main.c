@@ -60,8 +60,8 @@ int main(int argc, char **argv)
 //#ifdef MODULE_USING_RTK_GUI_DEMO
 #if 1
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
-    extern gui_app_t *get_app_launcher2(void);
-    gui_app_startup(get_app_launcher2());
+    extern gui_app_t *get_app_launcher(void);
+    gui_app_startup(get_app_launcher());
 #endif
 #else
     extern gui_app_t *get_rtk_gui_demo(void);

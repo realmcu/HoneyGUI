@@ -10,7 +10,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "gui_graphic.h"
 #include "gui_img.h"
 /**********************
  *      TYPEDEFS

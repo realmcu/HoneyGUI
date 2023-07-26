@@ -22,12 +22,10 @@ extern "C" {
 #include <gui_alert.h>
 #include <gui_page.h>
 
-#include <gui_d_island.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
-#include "app_dialing.h"
 #include "rtk_gui_resource.h"
 #include "gui_img_with_animate.h"
 #include <gui_magic_img.h>

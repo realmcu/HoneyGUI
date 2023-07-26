@@ -8,9 +8,10 @@
 #include <string.h>
 #include <gui_server.h>
 #include <gui_obj.h>
+#include <gui_img.h>
 
 
-static void set_progress(gui_progressbar_t *this, size_t progress)
+void set_progress(gui_progressbar_t *this, size_t progress)
 {
     this->per = ((float)progress) / ((float)this->max);
     if (GET_BASE(this->c)->type == IMAGE_SCOPE)
@@ -37,11 +38,11 @@ static void set_progress(gui_progressbar_t *this, size_t progress)
 
 
 }
-static size_t get_progress(gui_progressbar_t *this)
+size_t get_progress(gui_progressbar_t *this)
 {
     return (size_t)(this->per  * ((float)this->max));
 }
-static void set_percentage(gui_progressbar_t *this, float percentage)
+void set_percentage(gui_progressbar_t *this, float percentage)
 {
     this->per = percentage;
     if (GET_BASE(this->c)->type == IMAGE_SCOPE)
@@ -66,64 +67,25 @@ static void set_percentage(gui_progressbar_t *this, float percentage)
         GUI_TYPE(gui_img_t, this->c)->draw_img.data = ((void **)(this->color_hl))[p];
     }
 }
-static float get_percentage(gui_progressbar_t *this)
+float get_percentage(gui_progressbar_t *this)
 {
     return this->per;
 }
-static size_t get_max(gui_progressbar_t *this)
+size_t get_max(gui_progressbar_t *this)
 {
     return this->max;
 }
-_gui_api_progressbar_t gui_progressbar_api =
-{
-    .get_max = get_max,
-    .get_percentage = get_percentage,
-    .get_progress = get_progress,
-    .set_percentage = set_percentage,
-    .set_progress = set_progress,
-};
-#include "acc_engine.h"
-static void draw_h(gui_canvas_t *c)
-{
-    gui_progressbar_t *p = (void *)(GET_BASE(c)->parent);
-    {
-        canvas_rectangle_t r = {0};
-        r.width = GET_BASE(p)->w;
-        r.height = GET_BASE(p)->h;
-        r.rx = r.height / 2;
-        r.fill.color_data.rgba = p->color;
-        gui_canvas_api.rectangle(p->c, &r);
-    }
-    {
-        canvas_rectangle_t r2 = {0};
-        r2.width = GET_BASE(p)->w * p->per;
-        r2.height = GET_BASE(p)->h;
-        r2.rx = r2.height / 2;
-        r2.fill.color_data.rgba = p->color_hl;
-        gui_canvas_api.rectangle(p->c, &r2);
-    }
-}
-static void draw_v(gui_canvas_t *c)
-{
-    gui_progressbar_t *p = (void *)(GET_BASE(c)->parent);
-    {
-        canvas_rectangle_t r = {0};
-        r.width = GET_BASE(p)->w;
-        r.height = GET_BASE(p)->h;
-        r.rx = r.width / 2;
-        r.fill.color_data.rgba = p->color;
-        gui_canvas_api.rectangle(p->c, &r);
-    }
-    {
-        canvas_rectangle_t r2 = {0};
-        r2.width = GET_BASE(p)->w;
-        r2.height = GET_BASE(p)->h * p->per;
-        r2.y = GET_BASE(p)->h - r2.height;
-        r2.rx = r2.width / 2;
-        r2.fill.color_data.rgba = p->color_hl;
-        gui_canvas_api.rectangle(p->c, &r2);
-    }
-}
+
+
+//void draw_h(gui_canvas_t *c)
+//{
+
+//}
+//void draw_v(gui_canvas_t *c)
+//{
+
+//}
+
 void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
                           int16_t x,
                           int16_t y, int16_t w, int16_t h)
@@ -140,8 +102,8 @@ void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
-    this->c = gui_canvas_create(this, "pro", 0, 0, w, h, 0xffffffff);
-    this->c->draw = draw_h;
+    //this->c = gui_canvas_create(this, "pro", 0, 0, w, h, 0xffffffff);
+    //this->c->draw = draw_h;
 }
 void gui_progressbar_h_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void *picture,
                                 int16_t x,
@@ -248,8 +210,8 @@ void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const ch
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
-    this->c = gui_canvas_create(this, "pro", 0, 0, w, h, 0xffffffff);
-    this->c->draw = draw_v;
+    //this->c = gui_canvas_create(this, "pro", 0, 0, w, h, 0xffffffff);
+    //this->c->draw = draw_v;
 }
 void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent, void  **picture_array,
                                 uint16_t array_number,

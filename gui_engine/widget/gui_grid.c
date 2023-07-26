@@ -17,18 +17,20 @@ static void (obj_update_att)(struct _gui_obj_t *obj)
         member_count++;
     }
 }
-static float get_scale_offset_x(gui_obj_t *img, float scale_x)
-{
-    /**
-     * @note (1-scale)(center-x)
-     *
-     */
-    return (1.0f - scale_x) * (((float)(gui_get_screen_width() / 2)) - (float)(img->x));
-}
-static float get_scale_offset_y(gui_obj_t *img, float scale_y)
-{
-    return (1.0f - scale_y) * (((float)(gui_get_screen_width() / 2)) - (float)(img->y));
-}
+//static float get_scale_offset_x(gui_obj_t *img, float scale_x)
+//{
+//    /**
+//     * @note (1-scale)(center-x)
+//     *
+//     */
+//    return (1.0f - scale_x) * (((float)(gui_get_screen_width() / 2)) - (float)(img->x));
+//}
+
+//static float get_scale_offset_y(gui_obj_t *img, float scale_y)
+//{
+//    return (1.0f - scale_y) * (((float)(gui_get_screen_width() / 2)) - (float)(img->y));
+//}
+
 #include "gui_canvas.h"
 #include "gui_magic_img.h"
 static void deal_img_in_root(gui_obj_t *object, float x, float y)
@@ -51,11 +53,7 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
         case CANVAS:
             {
                 gui_canvas_t *img = (void *)obj;
-                gui_canvas_api.scale(img, x, y);
-                gui_canvas_api.translate(img, get_scale_offset_x((void *)img, x) / x,
-                                         get_scale_offset_y((void *)img,
-                                                            x) / y);
-                //img->opacity_value = x * UINT8_MAX;
+                GUI_UNUSED(img);
             }
             break;
         default:
