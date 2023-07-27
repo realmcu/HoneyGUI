@@ -93,7 +93,7 @@ static inline uint32_t FileLenOfs(const SMp3FrmHdr *pzFrmHdr);
 static inline uint32_t TocOfs(const SMp3FrmHdr *pzFrmHdr);
 static inline bool IsCbr(Mp3Hdl_t hMp3);
 static inline uint32_t GetBigEndianUint32From(const void *pvAddr);
-static EMp3Res SearchFrameFrom(FILE *pxFil, uint8_t *puBuf, uint32_t uBufLen, uint32_t uStartOfs,
+static EMp3Res SearchFrameFrom(int pxFil, uint8_t *puBuf, uint32_t uBufLen, uint32_t uStartOfs,
                                const SMp3FrmHdr *pz1stAuFrmHdr, uint32_t *puFoundOfs, uint32_t *puFrmBytes);
 //static bool SeekRead(FILE *fp, long int ofs, void *read, size_t btr, size_t *br);
 static bool SeekRead(int fp, long int ofs, void *read, size_t btr, size_t *br);
@@ -699,7 +699,7 @@ static inline uint32_t GetBigEndianUint32From(const void *pvAddr)
 
 // If search success, frame data will be in puBuf,
 // frame offset will be in *puFoundOfs, and length of frame data will be in *puFrmBytes.
-static EMp3Res SearchFrameFrom(FILE *pxFil, uint8_t *puBuf, uint32_t uBufLen, uint32_t uStartOfs,
+static EMp3Res SearchFrameFrom(int pxFil, uint8_t *puBuf, uint32_t uBufLen, uint32_t uStartOfs,
                                const SMp3FrmHdr *pz1stAuFrmHdr, uint32_t *puFoundOfs, uint32_t *puFrmBytes)
 {
     size_t uBr;
