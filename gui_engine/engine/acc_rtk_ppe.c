@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <gui_matrix.h>
 #include <rtl_ppe.h>
+#include <rtl_rtzip.h>
 #include <drv_lcd.h>
 
+#include "trace.h"
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
 
@@ -11,6 +13,11 @@ extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
 {
+    if ((rect->x1 >= dc->screen_width - 1) || (rect->y1 >= dc->screen_height - 1) ||
+        (rect->x1 + image->img_w <= 0) || (rect->y1 + image->img_h <= 0))
+    {
+        return;
+    }
     ppe_buffer_t source, target;
     memset(&source, 0, sizeof(ppe_buffer_t));
     memset(&target, 0, sizeof(ppe_buffer_t));
@@ -44,8 +51,30 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     case RGBA8888:
         source.format = PPE_ABGR8888;
         break;
+    case RTZIP_COMPRESS:
+        {
+            const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
+                                                                        struct gui_rgb_data_head));
+            if (header->algorithm_type.pixel_bytes == 0)
+            {
+                source.format = PPE_BGR565;
+            }
+            else if (header->algorithm_type.pixel_bytes == 2)
+            {
+                source.format = PPE_ABGR8888;
+            }
+            else if (header->algorithm_type.pixel_bytes == 1)
+            {
+                source.format = PPE_BGR888;
+            }
+            else
+            {
+                return;
+            }
+            break;
+        }
     default:
-        break;
+        return;
     }
     source.width = image->img_w;
     source.height = image->img_h;
@@ -64,6 +93,62 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     (image->img_h == (int)(image->img_h * scale_y)))
                 {
                     PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+                    if (head->type == RTZIP_COMPRESS)
+                    {
+                        RCC_PeriphClockCmd(APBPeriph_RTZIP, APBPeriph_RTZIP_CLOCK, ENABLE);
+                        uint32_t start_line = 0, end_line = 0;
+                        if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
+                        {
+                            start_line = 0;
+                            if ((rect->y1 + image->img_h) <= dc->section.y2)
+                            {
+                                end_line = image->img_h - 1;
+                            }
+                            else
+                            {
+                                end_line = dc->section.y2 - rect->y1 - 1;
+                            }
+                        }
+                        else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
+                        {
+                            trans.y = 0;
+                            start_line = dc->section.y1 - rect->y1;
+                            end_line = dc->section.y2 - rect->y1 - 1;
+                        }
+                        else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
+                                 && (dc->section.y1 < (rect->y1 + image->img_h)))
+                        {
+                            trans.y = 0;
+                            start_line = dc->section.y1 - rect->y1;
+                            end_line = image->img_h - 1;
+                        }
+                        source.height = end_line - start_line + 1;
+                        const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
+                                                                                    struct gui_rgb_data_head));
+                        RTZIP_decode_range range;
+                        range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
+                        range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                                           - range.start_column : header->raw_pic_width - 1;
+                        range.start_line = start_line;
+                        range.end_line = end_line;
+                        RTZIP_DMA_config dma_cfg;
+                        source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
+                                                   * (header->algorithm_type.pixel_bytes + 2));
+                        source.address = (uint32_t)source.memory;
+                        source.width = range.end_column - range.start_column + 1;
+                        dma_cfg.output_buf = (uint32_t *)source.memory;
+                        dma_cfg.RX_DMA_channel_num = 2;
+                        dma_cfg.TX_DMA_channel_num = 1;
+                        dma_cfg.RX_DMA_channel = GDMA_Channel2;
+                        dma_cfg.TX_DMA_channel = GDMA_Channel1;
+                        trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
+                        RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+                        if (err)
+                        {
+                            gui_free(source.memory);
+                            return;
+                        }
+                    }
                     PPE_blend(&source, &target, &trans);
                     return;
                 }
@@ -77,9 +162,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                                     (dc->section.y2 - dc->section.y1) : image->img_h * scale_y;
                 scaled_img.height += ceil(scale_y);
                 uint32_t modified_height = image->img_h * scale_y;
-                switch (head->type)
+                switch (source.format)
                 {
-                case RGB565:
+                case PPE_BGR565:
                     scaled_img.format = PPE_BGR565;
                     if (dc->type == DC_SINGLE)
                     {
@@ -91,7 +176,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                                                                                scale_y) * 2 + 1) * 2);
                     }
                     break;
-                case RGB888:
+                case PPE_BGR888:
                     scaled_img.format = PPE_BGR888;
                     if (dc->type == DC_SINGLE)
                     {
@@ -103,7 +188,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                                                                                scale_y) + 1) * 3);
                     }
                     break;
-                case RGBA8888:
+                case PPE_BGRA8888:
                     scaled_img.format = PPE_BGRA8888;
                     if (dc->type == DC_SINGLE)
                     {
@@ -140,11 +225,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     trans.y = (int)image->matrix->m[1][2] - dc->section.y1;
                     scale_rect.left = 0;
                     scale_rect.right = source.width - 1;
-                    PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
-                    if (err == PPE_SUCCESS)
-                    {
-                        PPE_blend(&scaled_img, &target, &trans);
-                    }
                 }
                 else if ((dc->section.y2 < (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1))
                 {
@@ -152,11 +232,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_y;
                     scale_rect.left = 0;
                     scale_rect.right = source.width - 1;
-                    PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
-                    if (err == PPE_SUCCESS)
-                    {
-                        PPE_blend(&scaled_img, &target, &trans);
-                    }
                 }
                 else if ((dc->section.y2 >= (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1)
                          && (dc->section.y1 < (rect->y1 + modified_height)))
@@ -166,11 +241,50 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scaled_img.height = rect->y1 + modified_height - dc->section.y1;
                     scale_rect.left = 0;
                     scale_rect.right = source.width - 1;
-                    PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
-                    if (err == PPE_SUCCESS)
+                }
+                else
+                {
+                    if (scaled_img.memory != NULL)
                     {
-                        PPE_blend(&scaled_img, &target, &trans);
+                        gui_free(scaled_img.memory);
                     }
+                    return;
+                }
+                if (head->type == RTZIP_COMPRESS)
+                {
+                    source.height = scale_rect.bottom - scale_rect.top + 1;
+                    const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
+                                                                                struct gui_rgb_data_head));
+                    RTZIP_decode_range range;
+                    range.start_column = scale_rect.left;
+                    range.end_column = scale_rect.right;
+                    range.start_line = scale_rect.top;
+                    range.end_line = scale_rect.bottom;
+                    scale_rect.left = 0;
+                    scale_rect.right = range.end_column - range.start_column;
+                    scale_rect.top = 0;
+                    scale_rect.bottom = range.end_line - range.start_line;
+                    RTZIP_DMA_config dma_cfg;
+                    source.memory = gui_malloc(source.height * header->raw_pic_width *
+                                               (header->algorithm_type.pixel_bytes + 2));
+                    source.address = (uint32_t)source.memory;
+                    dma_cfg.output_buf = (uint32_t *)source.memory;
+                    dma_cfg.RX_DMA_channel_num = 2;
+                    dma_cfg.TX_DMA_channel_num = 1;
+                    dma_cfg.RX_DMA_channel = GDMA_Channel2;
+                    dma_cfg.TX_DMA_channel = GDMA_Channel1;
+                    RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+//                    DBG_DIRECT("RTZIP res %d, line %d to %d", err, range.start_line, range.end_line);
+                    if (err)
+                    {
+                        gui_free(source.memory);
+                        return;
+                    }
+                }
+                PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
+                if (err == PPE_SUCCESS)
+                {
+                    PPE_blend(&scaled_img, &target, &trans);
                 }
                 if (dc->type == DC_SINGLE)
                 {
@@ -178,15 +292,78 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 }
                 else if (dc->type == DC_RAMLESS)
                 {
+                    if (head->type == RTZIP_COMPRESS)
+                    {
+                        gui_free(source.memory);
+                    }
                     gui_free(scaled_img.memory);
                 }
             }
             else
             {
-                source.width = image->img_w;
-                source.height = image->img_h;
                 PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+                if (head->type == RTZIP_COMPRESS)
+                {
+                    RCC_PeriphClockCmd(APBPeriph_RTZIP, APBPeriph_RTZIP_CLOCK, ENABLE);
+                    uint32_t start_line = 0, end_line = 0;
+                    if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
+                    {
+                        start_line = 0;
+                        if ((rect->y1 + image->img_h) <= dc->section.y2)
+                        {
+                            end_line = image->img_h - 1;
+                        }
+                        else
+                        {
+                            end_line = dc->section.y2 - rect->y1 - 1;
+                        }
+                    }
+                    else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
+                    {
+                        trans.y = 0;
+                        start_line = dc->section.y1 - rect->y1;
+                        end_line = dc->section.y2 - rect->y1 - 1;
+                    }
+                    else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
+                             && (dc->section.y1 < (rect->y1 + image->img_h)))
+                    {
+                        trans.y = 0;
+                        start_line = dc->section.y1 - rect->y1;
+                        end_line = image->img_h - 1;
+                    }
+                    source.height = end_line - start_line + 1;
+                    const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
+                                                                                struct gui_rgb_data_head));
+                    RTZIP_decode_range range;
+                    range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
+                    range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                                       - range.start_column : header->raw_pic_width - 1;
+                    range.start_line = start_line;
+                    range.end_line = end_line;
+                    RTZIP_DMA_config dma_cfg;
+                    source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
+                                               * (header->algorithm_type.pixel_bytes + 2));
+                    source.address = (uint32_t)source.memory;
+                    source.width = range.end_column - range.start_column + 1;
+                    dma_cfg.output_buf = (uint32_t *)source.memory;
+                    dma_cfg.RX_DMA_channel_num = 2;
+                    dma_cfg.TX_DMA_channel_num = 1;
+                    dma_cfg.RX_DMA_channel = GDMA_Channel2;
+                    dma_cfg.TX_DMA_channel = GDMA_Channel1;
+                    trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
+                    RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+
+                    if (err)
+                    {
+                        gui_free(source.memory);
+                        return;
+                    }
+                }
                 PPE_blend(&source, &target, &trans);
+                if (head->type == RTZIP_COMPRESS)
+                {
+                    gui_free(source.memory);
+                }
             }
         }
         else
@@ -203,6 +380,66 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         }
 
         PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+        if (head->type == RTZIP_COMPRESS)
+        {
+            RCC_PeriphClockCmd(APBPeriph_RTZIP, APBPeriph_RTZIP_CLOCK, ENABLE);
+            uint32_t start_line = 0, end_line = 0;
+            if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
+            {
+                start_line = 0;
+                if ((rect->y1 + image->img_h) <= dc->section.y2)
+                {
+                    end_line = image->img_h - 1;
+                }
+                else
+                {
+                    end_line = dc->section.y2 - rect->y1 - 1;
+                }
+            }
+            else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
+            {
+                trans.y = 0;
+                start_line = dc->section.y1 - rect->y1;
+                end_line = dc->section.y2 - rect->y1 - 1;
+            }
+            else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
+                     && (dc->section.y1 < (rect->y1 + image->img_h)))
+            {
+                trans.y = 0;
+                start_line = dc->section.y1 - rect->y1;
+                end_line = image->img_h - 1;
+            }
+            source.height = end_line - start_line + 1;
+            const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
+                                                                        struct gui_rgb_data_head));
+            RTZIP_decode_range range;
+            range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
+            range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                               - range.start_column : header->raw_pic_width - 1;
+            range.start_line = start_line;
+            range.end_line = end_line;
+            RTZIP_DMA_config dma_cfg;
+            source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
+                                       * (header->algorithm_type.pixel_bytes + 2));
+            source.address = (uint32_t)source.memory;
+            source.width = range.end_column - range.start_column + 1;
+            dma_cfg.output_buf = (uint32_t *)source.memory;
+            dma_cfg.RX_DMA_channel_num = 2;
+            dma_cfg.TX_DMA_channel_num = 1;
+            dma_cfg.RX_DMA_channel = GDMA_Channel2;
+            dma_cfg.TX_DMA_channel = GDMA_Channel1;
+            trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
+            RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+            if (err)
+            {
+                gui_free(source.memory);
+                return;
+            }
+        }
         PPE_blend(&source, &target, &trans);
+        if (head->type == RTZIP_COMPRESS)
+        {
+            gui_free(source.memory);
+        }
     }
 }
