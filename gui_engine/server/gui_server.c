@@ -50,9 +50,6 @@ static uint32_t daemon_cnt = 0;
 
 static void rtgui_server_entry(void *parameter)
 {
-#ifdef RTL8772F
-    rtk_os_alloc_secure_ctx(); //template code; when nvic restore ready, remove it
-#endif
     gui_server_mq = gui_mq_create("gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {

@@ -256,9 +256,6 @@ void vg_lite_hal_initialize(void)
     NVIC_InitStruct.NVIC_IRQChannel = GPU_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-#ifdef OS_FREERTOS
-    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel); //when nvic restore ready,remove it
-#endif
     NVIC_Init(&NVIC_InitStruct);
 
     drv_dlps_check_cbacks_register("gpu", gpu_allowed_enter_dlps_check);

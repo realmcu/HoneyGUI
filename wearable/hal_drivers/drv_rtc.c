@@ -38,23 +38,9 @@ static bool rtc_system_wakeup_dlps_check(void)
     return false;
 }
 
-static bool rtc_exit_dlps(void)
-{
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = RTC_IRQn;
-    NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-#if defined RTL8772F || defined RTL8762G
-    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
-#endif
-    NVIC_Init(&NVIC_InitStruct);
-    return true;
-}
-
 void drv_rtc_dlps_init(void)
 {
     RTC_SystemWakeupConfig(ENABLE);
-    drv_dlps_exit_cbacks_register("rtc", rtc_exit_dlps);
     drv_dlps_wakeup_cbacks_register("rtc", rtc_system_wakeup_dlps_check);
 }
 
@@ -67,9 +53,6 @@ void drv_rtc_init(void)
     NVIC_InitStruct.NVIC_IRQChannel = RTC_IRQn;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-#if defined RTL8772F || defined RTL8762G
-    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
-#endif
     NVIC_Init(&NVIC_InitStruct);
     RTC_SetPrescaler(0);//no div
 

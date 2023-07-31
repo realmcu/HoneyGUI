@@ -204,9 +204,6 @@ void drv_uart_init(UART_TypeDef *UARTx, uint8_t tx_pin, uint8_t rx_pin)
     NVIC_InitStruct.NVIC_IRQChannel = irq_type;
     NVIC_InitStruct.NVIC_IRQChannelPriority = 3;
     NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-#if defined RTL8772F || defined RTL8762G
-    NVIC_SetIRQNonSecure(NVIC_InitStruct.NVIC_IRQChannel);
-#endif
     NVIC_Init(&NVIC_InitStruct);
 }
 
