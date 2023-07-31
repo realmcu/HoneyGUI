@@ -13,8 +13,9 @@
 #include "trace.h"
 #include "app_section.h"
 #include "stdlib.h"
-
-
+#ifdef SENSOR_MODE
+#include "pm.h"
+#endif
 
 
 bool dlps_flag = false;
@@ -108,6 +109,14 @@ static void app_exit_dlps_config(void)
 
     dlps_flag = false;
     DBG_DIRECT("DLPS EXIT END");
+#ifdef SENSOR_MODE
+    POWERScenarioMode mode = power_scenario_mode_get(POWER_SCENARIO_OPERATION_MODE);
+    if (mode == SCENARIO_OPERATION_SENSOR_MODE)
+    {
+        disable_xip_access(true);
+        DBG_DIRECT("disable_xip_access");
+    }
+#endif
 }
 
 /**

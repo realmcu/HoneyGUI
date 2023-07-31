@@ -24,7 +24,7 @@ void sensor_mode_uart_write(void)
 void sensor_rtc_int(void *p_value)
 {
     DBG_DIRECT("sensor_rtc_int");
-    if (count % 2 == 0)
+    if (count % 3 == 0 || count % 3 == 1)
     {
         T_IO_MSG msg;
         msg.subtype = SENSOR_MSG_UART_TEST;

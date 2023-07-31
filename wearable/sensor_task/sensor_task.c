@@ -23,9 +23,9 @@
 #include "board.h"
 #include "trace.h"
 #include "sensor_msg.h"
-#ifdef RTL8772F
+#ifdef SENSOR_MODE
 #include "os_ext_api.h"
-#include "platform_scenario_draft.h"
+#include "pm.h"
 #endif
 
 /*============================================================================*
@@ -82,10 +82,10 @@ static void sensor_task_entry(void *p_param)
     }
 }
 
-#ifdef RTL8772F
+#ifdef SENSOR_MODE
 void scheduler_hook(void *from, void *to)
 {
-    OperationModeType mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
+    POWERScenarioMode mode = power_scenario_mode_get(POWER_SCENARIO_OPERATION_MODE);
     DBG_DIRECT("scheduler_hook mode = %d line %d", mode, __LINE__);
     char *from_task_name;
     char *to_task_name;
@@ -106,14 +106,12 @@ void scheduler_hook(void *from, void *to)
     {
         //need set to HP mode
         //need set clock to 200M
-        mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
-        if (mode != OPERATION_HP_MODE)
+        mode = power_scenario_mode_get(POWER_SCENARIO_OPERATION_MODE);
+        if (mode != SCENARIO_OPERATION_HP_MODE)
         {
-            ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE, OPERATION_HP_MODE);
+            ret = power_scenario_mode_set(POWER_SCENARIO_OPERATION_MODE, SCENARIO_OPERATION_HP_MODE);
             DBG_DIRECT("from xxx to not sensor neither IDLE scenario_ret %d", ret);
-            //disable_xip_access(false);
-            ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V9);
-            DBG_DIRECT("dvfs_ret %d line %d", ret, __LINE__);
+            disable_xip_access(false);
             ret = pm_cpu_freq_set(200, &actual_mhz);
             DBG_DIRECT("pm_cpu_freq_set ret %d actual_mhz %d line %d", ret, actual_mhz, __LINE__);
             ret = pm_dsp1_freq_set(320, &actual_mhz);
@@ -126,29 +124,27 @@ void scheduler_hook(void *from, void *to)
     {
         //need set to sensor mode
         //need set clock to 40
-        mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
-        if (mode != OPERATION_SENSOR_MODE)
+        mode = power_scenario_mode_get(POWER_SCENARIO_OPERATION_MODE);
+        if (mode != SCENARIO_OPERATION_SENSOR_MODE)
         {
             ret = pm_cpu_freq_set(40, &actual_mhz);
             DBG_DIRECT("pm_cpu_freq_set ret %d actual_mhz %d", ret, actual_mhz);
             ret = pm_dsp1_freq_set(160, &actual_mhz);
             DBG_DIRECT("dsp: ret %d, actual_mhz %d", ret, actual_mhz);
-            ret = dvfs_set_mode(DVFS_NORMAL_VDD, DVFS_VDD_0V8);
-            DBG_DIRECT("dvfs_ret %d", ret);
-            uint32_t scenario_ret = platform_scenario_set_mode(PLATFORM_SCENARIO_OPERATION_MODE,
-                                                               OPERATION_SENSOR_MODE);
-            //disable_xip_access(true);
+            uint32_t scenario_ret = power_scenario_mode_set(POWER_SCENARIO_OPERATION_MODE,
+                                                            SCENARIO_OPERATION_SENSOR_MODE);
+            disable_xip_access(true);
             DBG_DIRECT("from IDLE to sensor scenario_ret %d", ret);
         }
     }
-    mode = platform_scenario_get_mode(PLATFORM_SCENARIO_OPERATION_MODE);
+    mode = power_scenario_mode_get(POWER_SCENARIO_OPERATION_MODE);
     DBG_DIRECT("scheduler_hook mode = %d line %d\n", mode, __LINE__);
 }
 #endif
 
 void sensor_task_init(void)
 {
-#ifdef RTL8772F
+#ifdef SENSOR_MODE
     os_ext_func_init();
     os_sched_set_hook(scheduler_hook);
 #endif

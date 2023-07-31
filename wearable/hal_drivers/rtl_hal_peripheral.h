@@ -36,7 +36,7 @@
 
 
 
-#define RTL_HAL_RAM_CODE    RAM_FUNCTION
+#define RTL_HAL_RAM_CODE    RAM_TEXT_SECTION
 
 
 
