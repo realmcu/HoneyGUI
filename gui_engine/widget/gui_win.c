@@ -1,5 +1,5 @@
 /*
- * File      : gui_img.c
+ * File      : gui_win.c
  * This file is part of GUI Engine
  */
 
@@ -261,12 +261,11 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
     }
 }
-void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                  int16_t y, int16_t w, int16_t h)
+static void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
+                         int16_t y, int16_t w, int16_t h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
-    ((gui_obj_t *)this)->obj_prepare = win_prepare;
-    this->set_animate = set_animate;
+    GET_BASE(this)->obj_prepare = win_prepare;
     GET_BASE(this)->obj_update_att = obj_update_att;
 }
 gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t y,

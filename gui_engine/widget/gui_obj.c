@@ -53,6 +53,7 @@ void gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter
 
 }
 
+//this API only for Widget, not for Application
 void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code)
 {
     for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)

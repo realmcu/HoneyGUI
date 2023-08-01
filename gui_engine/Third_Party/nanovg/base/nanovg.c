@@ -3833,7 +3833,9 @@ void patch_nvgStroke(NVGcontext *ctx)
     uint8_t r = paint->innerColor.r * 0xff * paint->innerColor.a;
     uint8_t g = paint->innerColor.g * 0xff * paint->innerColor.a;
     uint8_t b = paint->innerColor.b * 0xff * paint->innerColor.a;
-    vg_lite_color_t color = (a << 24) | (r << 16) | (g << 8) | b;
+    vg_lite_color_t color = (a << 24) | (r << 0) | (g << 8) | (b << 16);
+
+
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 

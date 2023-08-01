@@ -53,19 +53,21 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_tab_t *tb_sport = gui_tab_create(tv, "tb_sport",             0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_colorwheel = gui_tab_create(tv, "tb_colorwheel",   0, 0, 0, 0, 2, 0);
     gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",               0, 0, 0, 0, 3, 0);
-    gui_tab_t *tb_40 = gui_tab_create(tv, "tb_",             0, 0, 0, 0, 4, 0);
-    gui_tab_t *tb_50 = gui_tab_create(tv, "tb_",             0, 0, 0, 0, 5, 0);
-    gui_tab_t *tb_60 = gui_tab_create(tv, "tb_",             0, 0, 0, 0, 6, 0);
-    gui_tab_t *tb_70 = gui_tab_create(tv, "tb_",             0, 0, 0, 0, 7, 0);
+    gui_tab_t *tb_svg = gui_tab_create(tv, "tb_svg",                 0, 0, 0, 0, 4, 0);
+    gui_tab_t *tb_50 = gui_tab_create(tv, "tb_",                     0, 0, 0, 0, 5, 0);
+    gui_tab_t *tb_60 = gui_tab_create(tv, "tb_",                     0, 0, 0, 0, 6, 0);
+    gui_tab_t *tb_70 = gui_tab_create(tv, "tb_",                     0, 0, 0, 0, 7, 0);
 
     extern void page_tb_watch(void *parent);
     extern void page_tb_sport(void *parent);
     extern void page_tb_colorwheel(void *parent);
     extern void page_tb_cube(void *parent);
+    extern void page_tb_svg(void *parent);
     page_tb_watch(tb_watch);
     page_tb_sport(tb_sport);
     page_tb_cube(tb_cube);
     page_tb_colorwheel(tb_colorwheel);
+    page_tb_svg(tb_svg);
 
 }
 

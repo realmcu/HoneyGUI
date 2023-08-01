@@ -743,14 +743,5 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 #include <string.h>
 #include <float.h>
 
-//#define NANOSVG_IMPLEMENTATION
-#include "nanosvg.h"
-#define NANOSVGRAST_IMPLEMENTATION
-#include "nanosvgrast.h"
-void sw_draw_svg(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
-                 float scale, float rotate_degree, float rotate_center_x, float rotate_center_y)
-{
-    return;
-}
 
 

@@ -302,8 +302,7 @@ gui_button_t *gui_button_create(
                                                               30, INT32_MAX - 1);
             break;
         case 2:
-            button->img = (void *)gui_svg_create_from_mem((void *)button, background_pic, count, 0, 0,
-                                                          w, h);
+            //button->img = (void *)gui_svg_create_from_mem((void *)button, background_pic, count, 0, 0, w, h);
             break;
         default:
             break;

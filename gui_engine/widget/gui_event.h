@@ -56,7 +56,7 @@ typedef enum
 
 
 
-typedef void (*gui_event_cb_t)(void *parameter, gui_event_t e);
+typedef void (*gui_event_cb_t)(void *obj, gui_event_t e);
 
 typedef struct _gui_event_dsc_t
 {

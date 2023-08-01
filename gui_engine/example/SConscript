@@ -9,6 +9,7 @@ if not GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
     src += ['app_launcher_tb_sport.c']
     src += ['app_launcher_tb_colorwheel.c']
     src += ['app_launcher_tb_cube.c']
+    src += ['app_launcher_tb_svg.c']
 CPPPATH = [cwd,cwd + '/root_image']
 
 group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI_DEMO'], CPPPATH = CPPPATH)

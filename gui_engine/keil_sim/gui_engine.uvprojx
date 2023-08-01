@@ -668,6 +668,11 @@
               <FileType>1</FileType>
               <FilePath>..\widget\gui_win.c</FilePath>
             </File>
+            <File>
+              <FileName>gui_svg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\widget\gui_svg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -697,6 +702,11 @@
               <FileName>app_launcher_tb_cube.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\example\app_launcher_tb_cube.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_launcher_tb_svg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\example\app_launcher_tb_svg.c</FilePath>
             </File>
           </Files>
         </Group>
