@@ -399,6 +399,11 @@
           <GroupName>rtk_gui</GroupName>
           <Files>
             <File>
+              <FileName>gui_wave.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\widget\gui_wave.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_port_dc.c</FileName>
               <FileType>1</FileType>
               <FilePath>gui_port\gui_port_dc.c</FilePath>
@@ -707,6 +712,11 @@
               <FileName>app_launcher_tb_svg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\example\app_launcher_tb_svg.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_launcher_tb_wave.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\example\app_launcher_tb_wave.c</FilePath>
             </File>
           </Files>
         </Group>

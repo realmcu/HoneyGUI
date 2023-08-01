@@ -54,8 +54,8 @@ static void widget_nanovg_draw_cb(gui_obj_t *obj)
 
         this->nanovg_canvas_cb(this);
 
-        nvgEndFrame(this->vg);
-        nvgDeleteAGGE(this->vg);
+        nvgEndFrame(vg);
+        nvgDeleteAGGE(vg);
     }
 
 }

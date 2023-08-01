@@ -179,9 +179,6 @@ static void svg_draw_cb(gui_obj_t *obj)
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
     nvgResetTransform(vg);
-
-
-
     nvgTranslate(vg, (float)obj->dx, (float)obj->dy);
     nvgTranslate(vg, this->t_x, this->t_y);
     nvgTranslate(vg, (float)this->c_x, (float)this->c_y);
