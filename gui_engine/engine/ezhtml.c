@@ -12,7 +12,6 @@
 #include <gui_alert.h>
 #include <gui_page.h>
 
-#include <gui_d_island.h>
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
@@ -186,17 +185,20 @@ static void sport_button_press_ani_cb(gui_button_t *button)
 
     //gui_log("o:%f\n", 25.0f * (from - scale));
 }
+
 static void draw_arc(gui_canvas_t *c)
 {
-    canvas_arc_t a = {0};
-    a.cx = c->cx;
-    a.cy = c->cy;
-    a.r = c->r;
-    a.stroke.fill.color_data.rgba = c->s;
-    a.stroke.stroke_width = c->sw;
-    a.start_angle = c->sd;
-    a.end_angle = c->ed;
-    gui_canvas_api.arc(c, &a);
+
+    nvgBeginPath(c->vg);
+    nvgLineCap(c->vg, NVG_ROUND);
+    /*can't get arc data*/
+    //nvgArc(c->vg, this->cx, this->cy, this->r, this->a0, this->a1, NVG_CW);
+    //nvgStrokeColor(c->vg, this->color);
+    //nvgStrokeWidth(c->vg, this->width);
+    nvgArc(c->vg, 100, 100, 20, 1, 2, NVG_CW);
+    nvgStrokeColor(c->vg, nvgRGBA(255, 255, 255, 255));
+    nvgStrokeWidth(c->vg, 3);
+    nvgStroke(c->vg);
 
 }
 static void sport_button_release_ani_cb(gui_button_t *button)
@@ -723,14 +725,15 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     parent = (void *)gui_canvas_create(parent, ptxt, 0, 0, 454, 454, 0xffffffff);
-                    GUI_TYPE(gui_canvas_t, parent)->draw = draw_arc;
+                    gui_canvas_set_canvas_cb(parent, draw_arc);
+                    /*GUI_TYPE(gui_canvas_t, parent)->draw = draw_arc;
                     GUI_TYPE(gui_canvas_t, parent)->cx = cx;
                     GUI_TYPE(gui_canvas_t, parent)->cy = cy;
                     GUI_TYPE(gui_canvas_t, parent)->r = r;
                     GUI_TYPE(gui_canvas_t, parent)->sw = stroke_width;
                     GUI_TYPE(gui_canvas_t, parent)->s = stroke;
                     GUI_TYPE(gui_canvas_t, parent)->ed = ed;
-                    GUI_TYPE(gui_canvas_t, parent)->sd = sd;
+                    GUI_TYPE(gui_canvas_t, parent)->sd = sd;*/
 
 
                 }

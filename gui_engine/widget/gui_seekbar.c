@@ -32,7 +32,7 @@ static void seekbar_preapre(gui_obj_t *obj)
                     pro = pro * (circle->base.max - 2) / obj->h; //gui_log("pro:%d\n",pro);
                 }
                 //gui_log("pro:%d,type:%d\n",pro, GET_BASE(circle->base.c)->type);
-                //gui_progressbar_api.set_progress((void *)circle, (circle->base.max - 2) - pro);
+                gui_progressbar_set_progress((void *)circle, (circle->base.max - 2) - pro);
             }
         }
 
@@ -218,7 +218,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
                         }
                     }
                     //gui_log("start:%f, end:%f, pro:%f, progress:%f\n", start, end, pro, progress);
-                    //gui_progressbar_api.set_percentage((void *)circle, progress);
+                    gui_progressbar_set_percentage((void *)circle, progress);
                 }
             }
         }

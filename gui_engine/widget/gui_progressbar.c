@@ -11,7 +11,7 @@
 #include <gui_img.h>
 
 
-void set_progress(gui_progressbar_t *this, size_t progress)
+static void set_progress(gui_progressbar_t *this, size_t progress)
 {
     this->per = ((float)progress) / ((float)this->max);
     if (GET_BASE(this->c)->type == IMAGE_SCOPE)
@@ -38,11 +38,11 @@ void set_progress(gui_progressbar_t *this, size_t progress)
 
 
 }
-size_t get_progress(gui_progressbar_t *this)
+static size_t get_progress(gui_progressbar_t *this)
 {
     return (size_t)(this->per  * ((float)this->max));
 }
-void set_percentage(gui_progressbar_t *this, float percentage)
+static void set_percentage(gui_progressbar_t *this, float percentage)
 {
     this->per = percentage;
     if (GET_BASE(this->c)->type == IMAGE_SCOPE)
@@ -67,16 +67,35 @@ void set_percentage(gui_progressbar_t *this, float percentage)
         GUI_TYPE(gui_img_t, this->c)->draw_img.data = ((void **)(this->color_hl))[p];
     }
 }
-float get_percentage(gui_progressbar_t *this)
+static float get_percentage(gui_progressbar_t *this)
 {
     return this->per;
 }
-size_t get_max(gui_progressbar_t *this)
+static size_t get_max(gui_progressbar_t *this)
 {
     return this->max;
 }
 
-
+void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
+{
+    set_progress(this, progress);
+}
+size_t gui_progressbar_get_progress(gui_progressbar_t *this)
+{
+    return get_progress(this);
+}
+void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
+{
+    set_percentage(this, percentage);
+}
+float gui_progressbar_get_percentage(gui_progressbar_t *this)
+{
+    return get_percentage(this);
+}
+size_t gui_progressbar_get_max(gui_progressbar_t *this)
+{
+    return get_max(this);
+}
 //void draw_h(gui_canvas_t *c)
 //{
 

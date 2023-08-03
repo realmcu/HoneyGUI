@@ -1257,7 +1257,7 @@ DECLARE_HANDLER(onpress_seekbar)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_seekbar_api.onPress((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_obj_add_event_cb(obj, (gui_event_cb_t)js_cb_with_args, GUI_EVENT_1, cb_arg);
     }
 
     return jerry_create_undefined();
@@ -1285,7 +1285,7 @@ DECLARE_HANDLER(onpressing_seekbar)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_seekbar_api.onPressing((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_obj_add_event_cb(obj, (gui_event_cb_t)js_cb_with_args, GUI_EVENT_3, cb_arg);
     }
 
     return jerry_create_undefined();
@@ -1313,7 +1313,7 @@ DECLARE_HANDLER(onrelease_seekbar)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_seekbar_api.onRelease((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_obj_add_event_cb(obj, (gui_event_cb_t)js_cb_with_args, GUI_EVENT_2, cb_arg);
     }
 
     return jerry_create_undefined();
@@ -1333,6 +1333,22 @@ DECLARE_HANDLER(play_animate_seekbar)
     }
 
     return jerry_create_undefined();
+}
+static void gui_seekbar_set_animate(gui_seekbar_t *o, uint32_t dur, int repeatCount, void *callback,
+                                    void *p)
+{
+    gui_animate_t *animate = ((gui_seekbar_t *)o)->animate;
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *))callback;
+    animate->repeatCount = repeatCount;
+    animate->p = p;
+    ((gui_seekbar_t *)o)->animate = animate;
 }
 DECLARE_HANDLER(setAnimate_seekbar)
 {
@@ -1360,8 +1376,8 @@ DECLARE_HANDLER(setAnimate_seekbar)
         float to = jerry_get_number_value(js_get_property(args[1], "to"));
         int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
         int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
-        gui_seekbar_api.set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
-                                    (void *)(cb_arg));
+        gui_seekbar_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
+                                (void *)(cb_arg));
         GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
     }
 
@@ -1423,7 +1439,7 @@ DECLARE_HANDLER(seekbar_setAttribute)
             gui_obj_t *obj = NULL;
             jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
             gui_log("seekbar_setAttribute:%f\n", jerry_get_number_value(args[1]));
-            gui_progressbar_api.set_percentage((void *)obj, jerry_get_number_value(args[1]));
+            gui_progressbar_set_percentage((void *)obj, jerry_get_number_value(args[1]));
 
         }
     }
@@ -1477,9 +1493,9 @@ DECLARE_HANDLER(progress)
         //js_add_event_listener(this_value, "onclick", args[0]);
 
         ////gui_log("enter onclick %s\n",obj->name);
-        gui_progressbar_api.set_percentage((void *)obj, jerry_get_number_value(args[0]));
+        gui_progressbar_set_percentage((void *)obj, jerry_get_number_value(args[0]));
     }
-    float per = gui_progressbar_api.get_percentage((void *)obj);
+    float per = gui_progressbar_get_percentage((void *)obj);
     return jerry_create_number(per);
     //return jerry_create_undefined();
 }

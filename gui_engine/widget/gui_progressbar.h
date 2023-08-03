@@ -93,6 +93,42 @@ gui_progressbar_t *gui_progressbar_img_v_create(void *parent, void *picture, int
  */
 gui_progressbar_t *gui_progressbar_movie_create(void *parent, void  **picture_array,
                                                 uint16_t array_length, int16_t x, int16_t y);
+/**
+ * @brief set progress
+ *
+ * @param this
+ * @param progress
+ */
+void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress);
+/**
+ * @brief get_progress
+ *
+ * @param this
+ * @return size_t
+ */
+size_t gui_progressbar_get_progress(gui_progressbar_t *this);
+/**
+ * @brief set_percentage
+ *
+ * @param this
+ * @param percentage
+ */
+void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage);
+/**
+ * @brief get_percentage
+ *
+ * @param this
+ * @return float
+ */
+float gui_progressbar_get_percentage(gui_progressbar_t *this);
+/**
+ * @brief get_max
+ *
+ * @param this
+ * @return size_t
+ */
+size_t gui_progressbar_get_max(gui_progressbar_t *this);
+
 #ifdef __cplusplus
 }
 #endif
