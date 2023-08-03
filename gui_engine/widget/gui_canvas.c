@@ -53,6 +53,8 @@ static void widget_nanovg_draw_cb(gui_obj_t *obj)
 
         //nvgTranslate(vg, (float)0.0, -(float)(dc->section_count * dc->fb_height));// no need do this , because restruct nanovg  help do this
 
+        //nvgTranslate(vg, (float)0.0, -(float)(dc->section_count * dc->fb_height));// no need do this , because restruct nanovg  help do this
+
         this->nanovg_canvas_cb(this);
 
         nvgEndFrame(vg);

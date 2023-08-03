@@ -3910,7 +3910,10 @@ static void draw_line(float sx, float sy, float ex, float ey, float width, uint8
                       uint8_t g, uint8_t b)
 {
     float dx, dy, d;
-    uint16_t color565 = a << 11 | g << 6 | b;
+    r = r >> 3;
+    b = b >> 3;
+    g = g >> g;
+    uint16_t color565 = r << 11 | g << 5 | b;
     dx = ex - sx;
     dy = ey - sy;
     d = sqrtf(dx * dx + dy * dy);
