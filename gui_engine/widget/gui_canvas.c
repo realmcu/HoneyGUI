@@ -47,17 +47,17 @@ static void widget_nanovg_draw_cb(gui_obj_t *obj)
                                        (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
         nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
-        gui_canvas_t *this = (gui_canvas_t *)obj;
         this->vg = vg;
         nvgResetTransform(vg);
         nvgTranslate(vg, (float)obj->dx, (float)obj->dy);
+
+        //nvgTranslate(vg, (float)0.0, -(float)(dc->section_count * dc->fb_height));// no need do this , because restruct nanovg  help do this
 
         this->nanovg_canvas_cb(this);
 
         nvgEndFrame(vg);
         nvgDeleteAGGE(vg);
     }
-
 }
 static void widget_nanovg_end(gui_obj_t *obj)
 {

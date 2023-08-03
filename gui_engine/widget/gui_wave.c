@@ -116,6 +116,11 @@ static void wave_draw_cb(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     GUI_UNUSED(this);
     GUI_UNUSED(dc);
+    float x = this->x;
+    float y = this->y;
+    float w = this->w;
+    float h = this->h;
+    float t = this->t;
     extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
                                      uint8_t *data);
     extern void nvgDeleteAGGE(NVGcontext * ctx);
@@ -126,7 +131,7 @@ static void wave_draw_cb(gui_obj_t *obj)
     nvgResetTransform(vg);
     nvgTranslate(vg, (float)obj->dx, (float)obj->dy);
 
-    drawGraph(vg, 0, 0, 454, 454, 0);
+    drawGraph(vg, x, y, w, h, t);
 
     nvgEndFrame(vg);
     nvgDeleteAGGE(vg);
@@ -164,7 +169,14 @@ static void wave_ctor(gui_wave_t *this, gui_obj_t *parent, const char *name,
 
 }
 
-
+void gui_wave_set(gui_wave_t *this, float x, float y, float w, float h, float t)
+{
+    this->x = x;
+    this->y = y;
+    this->h = h;
+    this->w = w;
+    this->t = t;
+}
 
 gui_wave_t *gui_wave_create(void *parent,  const char *name,
                             int16_t x,
@@ -188,7 +200,11 @@ gui_wave_t *gui_wave_create(void *parent,  const char *name,
                                &(GET_BASE(this)->brother_list));
     }
 
-
+    this->x = x;
+    this->y = y;
+    this->h = h;
+    this->w = w;
+    this->t = 0;
 
 
     GET_BASE(this)->create_done = true;

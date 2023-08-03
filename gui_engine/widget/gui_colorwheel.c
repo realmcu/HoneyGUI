@@ -224,7 +224,11 @@ gui_colorwheel_t *gui_colorwheel_create(void *parent,  const char *name, void *d
                                &(GET_BASE(this)->brother_list));
     }
 
-
+    this->x = x;
+    this->y = y;
+    this->h = h;
+    this->w = w;
+    this->t = 0;
 
 
     GET_BASE(this)->create_done = true;
