@@ -49,6 +49,7 @@ struct font_lib
     char *dot_name;
     char *table_name;
     uint8_t font_size;
+    uint8_t rendor_mode;
 };
 typedef struct font_stb_screen
 {
@@ -72,6 +73,8 @@ uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
                          uint16_t unicode_buf_len);
 void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
                                void *font_table_addr);
+void gui_font_mem_init(uint8_t font_size, void *font_bitmap_addr,
+                       void *font_table_addr, uint8_t rendor_mode);
 #if RTK_GUI_FONT_STB
 void gui_font_stb_init(void *font_ttf_addr);
 #endif

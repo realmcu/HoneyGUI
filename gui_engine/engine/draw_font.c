@@ -132,7 +132,7 @@ static struct rtgui_font_engine *rtgui_font_get_engine_by_type(char *string)
     gui_list_for_each(node, &_rtgui_system_font_list)
     {
         engine = gui_list_entry(node, struct rtgui_font_engine, list);
-        if (strncasecmp(engine->name, string, strlen(engine->name)) == 0)
+        if (strncmp(engine->name, string, strlen(engine->name)) == 0)
         {
 //            gui_log("engine addr = 0x%x \n", engine);
 //            gui_log("font string = %s \n", string);
