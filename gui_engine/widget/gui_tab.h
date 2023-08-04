@@ -30,8 +30,6 @@ typedef struct gui_tab
     gui_obj_t base;
     gui_tab_ext_id_t id;
     SLIDE_STYLE style;
-    void (*ctor)(struct gui_tab *this, gui_obj_t *parent, const char *filename, int16_t x, int16_t y,
-                 int16_t w, int16_t h, int16_t idx, int16_t idy);
 } gui_tab_t;
 
 /**
