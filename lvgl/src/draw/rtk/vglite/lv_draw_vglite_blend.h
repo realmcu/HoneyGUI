@@ -110,6 +110,7 @@ lv_res_t lv_gpu_vglite_index(const lv_img_dsc_t *img, lv_area_t *dest_area,
                              const lv_draw_img_dsc_t *dsc);
 lv_res_t lv_gpu_vglite_alpha_only(const lv_img_dsc_t *img, lv_area_t *dest_area,
                                   const lv_draw_img_dsc_t *dsc);
+lv_res_t lv_gpu_vglite_mask(const lv_draw_sw_blend_dsc_t *dsc);
 /**********************
  *      MACROS
  **********************/

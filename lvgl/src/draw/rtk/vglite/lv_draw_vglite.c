@@ -28,7 +28,7 @@
 
 /* Minimum area (in pixels) for VG-Lite blit/fill processing. */
 #ifndef LV_GPU_VG_LITE_SIZE_LIMIT
-#define LV_GPU_VG_LITE_SIZE_LIMIT 20
+#define LV_GPU_VG_LITE_SIZE_LIMIT 1
 #endif
 
 /**********************
@@ -175,6 +175,8 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend
             done = (lv_gpu_vglite_fill(&blend_area, dsc->color, dsc->opa) == LV_RES_OK);
             if (!done)
             {
+                DBG_DIRECT("fill fail range %d->%d, %d->%d", blend_area.x1, blend_area.x2, blend_area.y1,
+                           blend_area.y2);
                 VG_LITE_LOG_TRACE("VG-Lite fill failed. Fallback.");
             }
         }
@@ -200,6 +202,11 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend
         }
         done = true;
     }
+    //TODO: should be added in MP version
+//    else if(dsc->mask_buf != NULL)
+//    {
+//        done = (lv_gpu_vglite_mask(dsc) == LV_RES_OK);
+//    }
 
     if (!done)
     {
@@ -260,7 +267,7 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_im
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
-    if (!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
+    if (!_lv_area_intersect(&blend_area, coords, draw_ctx->buf_area))
     {
         return;    /*Fully clipped, nothing to do*/
     }
@@ -280,29 +287,29 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_im
        )
     {
         lv_color_t *dest_buf = draw_ctx->buf;
-        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
-        //TODO: handle chroma key in if condition: !lv_img_cf_is_chroma_keyed(cf)
-        lv_area_t src_area;
-        src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
-        src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
-        src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
-        src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
-        lv_coord_t src_stride = lv_area_get_width(coords);
-
-        done = (lv_gpu_vglite_blit_transform(dest_buf, &blend_area, dest_stride,
-                                             src_buf, &src_area, src_stride, dsc) == LV_RES_OK);
-
-        if (!done)
-        {
-            DBG_DIRECT("VG-Lite blit transform failed. Fallback.");
-        }
     }
+    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
+    //TODO: handle chroma key in if condition: !lv_img_cf_is_chroma_keyed(cf)
+    lv_area_t src_area;
+    src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
+    src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
+    src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
+    src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
+    lv_coord_t src_stride = lv_area_get_width(coords);
+    done = (lv_gpu_vglite_blit_transform(dest_buf, &blend_area, dest_stride,
+                                         src_buf, &src_area, src_stride, dsc) == LV_RES_OK);
 
     if (!done)
     {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+        DBG_DIRECT("VG-Lite blit transform failed. Fallback.");
     }
+}
+
+if (!done)
+{
+    lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+}
 }
 
 static void lv_draw_vglite_line(lv_draw_ctx_t *draw_ctx, const lv_draw_line_dsc_t *dsc,
@@ -336,6 +343,7 @@ static void lv_draw_vglite_line(lv_draw_ctx_t *draw_ctx, const lv_draw_line_dsc_
 
     bool is_common;
     is_common = _lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_ctx->clip_area);
+
     if (!is_common)
     {
         return;
@@ -352,6 +360,7 @@ static void lv_draw_vglite_line(lv_draw_ctx_t *draw_ctx, const lv_draw_line_dsc_
 
     if (!mask_any)
     {
+        done = (lv_gpu_vglite_draw_line(&rel_point1, &rel_point2, &rel_clip_area, dsc) == LV_RES_OK);
         if (!done)
         {
             VG_LITE_LOG_TRACE("VG-Lite draw line failed. Fallback.");
@@ -388,7 +397,6 @@ static void lv_draw_vglite_rect(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_
     {
         if (dsc->bg_opa > LV_OPA_MIN)
         {
-            DBG_DIRECT("bg fail %d");
             lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
         }
     }
@@ -412,7 +420,6 @@ static void lv_draw_vglite_rect(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_
     vglite_dsc.border_opa = dsc->border_opa;
     if (lv_draw_vglite_border(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
     {
-        DBG_DIRECT("border fail %d");
         lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
     }
     vglite_dsc.border_opa = 0;
@@ -421,7 +428,6 @@ static void lv_draw_vglite_rect(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_
     vglite_dsc.outline_opa = dsc->outline_opa;
     if (lv_draw_vglite_outline(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
     {
-        DBG_DIRECT("outline fail %d");
         lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
     }
 }
@@ -431,7 +437,6 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_ds
 {
     if (dsc->bg_opa <= (lv_opa_t)LV_OPA_MIN)
     {
-//        DBG_DIRECT("bg return %d ", __LINE__);
         return LV_RES_OK;
     }
 
@@ -599,9 +604,12 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t *draw_ctx, const lv_draw_arc_dsc_t 
     lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
+
+    done = (lv_vglite_draw_arc(&rel_center, radius, start_angle, end_angle, &rel_clip_area,
+                               dsc) == LV_RES_OK);
     if (!done)
     {
-        VG_LITE_LOG_TRACE("VG-Lite draw arc failed. Fallback.");
+        DBG_DIRECT("VG-Lite draw arc failed. Fallback.");
     }
 #endif/*LV_DRAW_COMPLEX*/
 
