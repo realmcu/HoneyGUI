@@ -139,7 +139,7 @@ The key highlights of this release include:
     def get_tool_release_summary(self, platform=""):
         if platform:
             return self.tool_name + f" {platform} Release Task"
-        return self.tool_name + "Release Task"
+        return self.tool_name + " Release Task"
 
     def get_jira_ins(self):
         user, password = os.environ.get("JIRA_USR_NAME"), os.environ.get("JIRA_PWD")
@@ -271,7 +271,7 @@ class HoneyGUIRelease(WindowsToolRelease):
         #  v1.0.x.0
         #  GUI simulator-vx.zip
         tag_item = self.get_tag_item()
-        pack_name = f'GUI_simulator-{self.tag_name}'
+        pack_name = f'{self.tool_name}-{self.tag_name}'
         return pack_name, pack_name + '.zip'
 
     def jenkins_archive_tool(self):
@@ -286,7 +286,6 @@ class HoneyGUIRelease(WindowsToolRelease):
         self.do_copy(src_list, self.distribution_directory)
         pack_name , _ = self.get_pack_name() 
         shutil.make_archive(base_name=pack_name, format='zip', root_dir=self.distribution_directory)
-
 
     def jenkins_push_tool(self):
         jira, subtask, t_platform = self.get_tool_release_task_jira()
