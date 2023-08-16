@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../lvgl"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"stdlib.h": "c",
+			"corecrt.h": "c",
+			"lv_port_disp.h": "c"
+		}
+	}
+}

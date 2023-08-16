@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_draw_vglite_blend.h"
-#include "trace.h"
+//#include "trace.h"
 #if LV_USE_GPU_VG_LITE
 #include "lv_vglite_buf.h"
 
@@ -467,13 +467,13 @@ lv_res_t lv_gpu_vglite_mask(const lv_draw_sw_blend_dsc_t *dsc)
     err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, &rect, &vgmatrix, blend, color, VG_LITE_FILTER_POINT);
     if (err != VG_LITE_SUCCESS)
     {
-        DBG_DIRECT("Blit rectangle failed . %d", err);
+        //DBG_DIRECT("Blit rectangle failed . %d", err);
         VG_LITE_RETURN_INV("Blit rectangle failed.");
     }
 
     if (lv_vglite_run() != LV_RES_OK)
     {
-        DBG_DIRECT("Run failed.");
+        //DBG_DIRECT("Run failed.");
         VG_LITE_RETURN_INV("Run failed.");
     }
 
