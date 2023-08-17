@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -722,6 +723,11 @@
               <FileName>app_launcher_tb_wave.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\example\app_launcher_tb_wave.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_launcher_tb_grid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\example\app_launcher_tb_grid.c</FilePath>
             </File>
           </Files>
         </Group>

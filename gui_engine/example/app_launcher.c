@@ -62,12 +62,14 @@ static void app_launcher_ui_design(gui_app_t *app)
     extern void page_tb_cube(void *parent);
     extern void page_tb_svg(void *parent);
     extern void page_tb_wave(void *parent);
+    extern void page_tb_grid(void *parent);
     page_tb_watch(tb_watch);
     page_tb_sport(tb_sport);
     page_tb_cube(tb_cube);
     page_tb_colorwheel(tb_colorwheel);
     page_tb_svg(tb_svg);
     page_tb_wave(tb_wave);
+    page_tb_grid(tb_60);
 
 }
 

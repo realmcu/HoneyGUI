@@ -176,8 +176,11 @@ void gui_img_rotation(gui_magic_img_t *img, float degrees, float c_x, float c_y)
 void gui_img_scale(gui_magic_img_t *img, float scale_x, float scale_y)
 {
     GUI_ASSERT(img != NULL);
-    img->scale_x = scale_x;
-    img->scale_y = scale_y;
+    if (scale_x > 0 && scale_y > 0)
+    {
+        img->scale_x = scale_x;
+        img->scale_y = scale_y;
+    }
 }
 void gui_img_scale_add(gui_magic_img_t *img, float scale_x, float scale_y)
 {
