@@ -6,6 +6,127 @@
 #include "gui_canvas.h"
 #include "nanovg_agge.h"
 
+#if defined ( __CC_ARM )
+#define __FPU_PRESENT                  1            /* FPU present                                                             */
+#include "arm_math.h"
+#endif
+
+
+
+static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len)
+{
+#if defined ( __CC_ARM )
+    arm_fill_q15(pixel, (int16_t *)addr, len);
+#endif
+#if defined(_MSC_VER) || (defined(__GNUC__))
+    for (uint32_t i = 0; i < len; i++)
+    {
+        addr[i] = pixel;
+    }
+#endif
+}
+
+typedef struct rtzip_file_header
+{
+    struct
+    {
+        uint8_t algorithm: 2;
+        uint8_t feature_1: 2;
+        uint8_t feature_2: 2;
+        uint8_t pixel_bytes: 2;
+    } algorithm_type;
+    uint8_t reserved[3];
+    uint32_t raw_pic_width;
+    uint32_t raw_pic_height;
+} rtzip_file_header_t;
+
+typedef struct rtzip_file
+{
+    rtzip_file_header_t header;
+    uint32_t compressed_addr[1024];
+
+} rtzip_file_t;
+
+#pragma pack(1)
+typedef struct rtzip_node
+{
+    uint8_t len;
+    uint16_t pixel16;
+} rtzip_node_t;
+#pragma pack()
+
+
+static void uncompressed_rle(rtzip_file_t *file, uint32_t line,  uint8_t *buf)
+{
+    //rtzip_file_header_t *header = (rtzip_file_header_t *)file;
+    uint32_t start = (uint32_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint16_t *linebuf = (uint16_t *)buf;
+
+    for (uint32_t addr = start; addr < end;)
+    {
+        rtzip_node_t *node = (rtzip_node_t *)addr;
+        gui_memset16(linebuf, node->pixel16, node->len);
+
+        addr = addr + sizeof(rtzip_node_t);
+        linebuf = linebuf + node->len;
+    }
+}
+
+static void rle_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                struct rtgui_rect *rect)
+{
+    gui_log("todo for this line = %d \n", __LINE__);
+    return;
+}
+static void rle_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                              struct rtgui_rect *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint8_t source_bytes_per_pixel = 2;
+    uint8_t line_buf[source_bytes_per_pixel * image_w];
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+
+    rtzip_file_t *file = (rtzip_file_t *)image_off;
+
+    for (uint32_t i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+        int line = i - image_y;
+
+        uncompressed_rle(file, line, line_buf);
+
+        int read_off = (int)line_buf - source_bytes_per_pixel * x_start;
+
+        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+        for (uint32_t j = x_start; j < x_end; j++)
+        {
+            if (*((uint16_t *)read_off + j) != 0)
+            {
+                writebuf[write_off + j] = (*((uint16_t *)read_off + j));
+            }
+        }
+    }
+}
+
+
 static void normal_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                         struct rtgui_rect *rect)
 {
@@ -711,6 +832,14 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         else if ((img_type == RGBA8888) && (dc_bytes_per_pixel == 4))
         {
             normal_blit_rgba8888_2_argb8888(image, dc, rect);
+        }
+        else if ((img_type == RTZIP_COMPRESS) && (dc_bytes_per_pixel == 2))
+        {
+            rle_blit_2_rgb565(image, dc, rect);
+        }
+        else if ((img_type == RTZIP_COMPRESS) && (dc_bytes_per_pixel == 4))
+        {
+            rle_blit_2_argb8888(image, dc, rect);
         }
     }
     else if (image->blend_mode == IMG_MAGIC_MATRIX)

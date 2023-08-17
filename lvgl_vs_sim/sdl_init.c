@@ -157,5 +157,10 @@ void sdl_dc_init(void)
     pthread_cond_destroy(&sdl_ok_event);
 }
 
+void *sdl_getframebuffer(void)
+{
+    return surface->pixels;
+}
+
 
 
