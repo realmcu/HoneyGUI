@@ -336,7 +336,7 @@ static void seekbar_h_preapre(gui_obj_t *obj)
                     pro = pro * (circle->base.max - 2) / obj->w;
                     gui_log("pro:%d\n", pro);
                 }
-                //gui_progressbar_api.set_progress((void *)circle, pro);
+                gui_progressbar_set_progress((void *)circle, pro);
             }
         }
     }

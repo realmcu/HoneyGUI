@@ -729,6 +729,11 @@
               <FileType>1</FileType>
               <FilePath>..\example\app_launcher_tb_grid.c</FilePath>
             </File>
+            <File>
+              <FileName>app_launcher_tb_carousel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\example\app_launcher_tb_carousel.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
