@@ -53,3 +53,12 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+*.pyc
+.gitignore
+lvgl_vs_sim/cconfig.h
+lvgl_vs_sim/gui.bin
+gui_engine/rtk_gui_sim/cconfig.h
+*.dblite
+
+gui_engine/rtk_gui_sim/gui.bin
+gui_engine/rtk_gui_sim/.sconsign.dblite

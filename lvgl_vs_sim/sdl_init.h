@@ -12,6 +12,7 @@ extern "C" {
 
 void sdl_dc_update(void);
 void sdl_dc_init(void);
+void *sdl_getframebuffer(void);
 
 #ifdef __cplusplus
 }
