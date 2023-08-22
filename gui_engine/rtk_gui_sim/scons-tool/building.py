@@ -118,13 +118,13 @@ class Win32Spawn:
 
 # generate cconfig.h file
 def GenCconfigFile(env, BuildOptions):
-    import rtk_gui_config
+    import menu_config
 
-    if rtk_gui_config.PLATFORM == 'gcc':
+    if menu_config.PLATFORM == 'gcc':
         contents = ''
         if not os.path.isfile('cconfig.h'):
             import gcc
-            gcc.GenerateGCCConfig(rtk_gui_config)
+            gcc.GenerateGCCConfig(menu_config)
 
         # try again
         if os.path.isfile('cconfig.h'):
@@ -143,7 +143,7 @@ def GenCconfigFile(env, BuildOptions):
                 env.AppendUnique(CPPDEFINES = ['HAVE_CCONFIG_H'])
 
 def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = []):
-    import rtk_gui_config
+    import menu_config
 
     global BuildOptions
     global Projects
@@ -262,29 +262,29 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
 
         SetOption('no_exec', 1)
         try:
-            rtk_gui_config.CROSS_TOOL, rtk_gui_config.PLATFORM = tgt_dict[tgt_name]
+            menu_config.CROSS_TOOL, menu_config.PLATFORM = tgt_dict[tgt_name]
             # replace the 'RTT_CC' to 'CROSS_TOOL'
-            os.environ['RTT_CC'] = rtk_gui_config.CROSS_TOOL
-            utils.ReloadModule(rtk_gui_config)
+            os.environ['RTT_CC'] = menu_config.CROSS_TOOL
+            utils.ReloadModule(menu_config)
         except KeyError:
             print ('Unknow target: '+ tgt_name+'. Avaible targets: ' +', '.join(tgt_dict.keys()))
             sys.exit(1)
     elif (GetDepend('RT_USING_NEWLIB') == False and GetDepend('RT_USING_NOLIBC') == False) \
-        and rtk_gui_config.PLATFORM == 'gcc':
+        and menu_config.PLATFORM == 'gcc':
         AddDepend('RT_USING_MINILIBC')
 
-    # auto change the 'RTT_EXEC_PATH' when 'rtk_gui_config.EXEC_PATH' get failed
-    if not os.path.exists(rtk_gui_config.EXEC_PATH):
+    # auto change the 'RTT_EXEC_PATH' when 'menu_config.EXEC_PATH' get failed
+    if not os.path.exists(menu_config.EXEC_PATH):
         if 'RTT_EXEC_PATH' in os.environ:
-            # del the 'RTT_EXEC_PATH' and using the 'EXEC_PATH' setting on rtk_gui_config.py
+            # del the 'RTT_EXEC_PATH' and using the 'EXEC_PATH' setting on menu_config.py
             del os.environ['RTT_EXEC_PATH']
-            utils.ReloadModule(rtk_gui_config)
+            utils.ReloadModule(menu_config)
 
     # add compability with Keil MDK 4.6 which changes the directory of armcc.exe
-    if rtk_gui_config.PLATFORM == 'armcc' or rtk_gui_config.PLATFORM == 'armclang':
-        if rtk_gui_config.PLATFORM == 'armcc' and not os.path.isfile(os.path.join(rtk_gui_config.EXEC_PATH, 'armcc.exe')):
-            if rtk_gui_config.EXEC_PATH.find('bin40') > 0:
-                rtk_gui_config.EXEC_PATH = rtk_gui_config.EXEC_PATH.replace('bin40', 'armcc/bin')
+    if menu_config.PLATFORM == 'armcc' or menu_config.PLATFORM == 'armclang':
+        if menu_config.PLATFORM == 'armcc' and not os.path.isfile(os.path.join(menu_config.EXEC_PATH, 'armcc.exe')):
+            if menu_config.EXEC_PATH.find('bin40') > 0:
+                menu_config.EXEC_PATH = menu_config.EXEC_PATH.replace('bin40', 'armcc/bin')
                 Env['LINKFLAGS'] = Env['LINKFLAGS'].replace('RV31', 'armcc')
 
         # reset AR command flags
@@ -295,7 +295,7 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
         env['LIBLINKSUFFIX'] = '.lib'
         env['LIBDIRPREFIX'] = '--userlibpath '
 
-    elif rtk_gui_config.PLATFORM == 'iar':
+    elif menu_config.PLATFORM == 'iar':
         env['LIBPREFIX'] = ''
         env['LIBSUFFIX'] = '.a'
         env['LIBLINKPREFIX'] = ''
@@ -309,13 +309,13 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
         env['SPAWN'] = win32_spawn.spawn
 
     if env['PLATFORM'] == 'win32':
-        os.environ['PATH'] = rtk_gui_config.EXEC_PATH + ";" + os.environ['PATH']
+        os.environ['PATH'] = menu_config.EXEC_PATH + ";" + os.environ['PATH']
     else:
-        os.environ['PATH'] = rtk_gui_config.EXEC_PATH + ":" + os.environ['PATH']
+        os.environ['PATH'] = menu_config.EXEC_PATH + ":" + os.environ['PATH']
 
     # add program path
     env.PrependENVPath('PATH', os.environ['PATH'])
-    # add rtk_gui_config.h/BSP path into Kernel group
+    # add menu_config.h/BSP path into Kernel group
     DefineGroup("Kernel", [], [], CPPPATH=[str(Dir('#').abspath)])
 
     # add library build action
@@ -323,9 +323,9 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
     bld = Builder(action = act)
     Env.Append(BUILDERS = {'BuildLib': bld})
 
-    # parse rtk_gui_config.h to get used component
+    # parse menu_config.h to get used component
     PreProcessor = PatchedPreProcessor()
-    f = open('rtk_gui_config.h', 'r', encoding='utf-8')
+    f = open('menu_config.h', 'r', encoding='utf-8')
     contents = f.read()
     f.close()
     PreProcessor.process_contents(contents)
@@ -348,13 +348,13 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
         env.Append(CXXFLAGS=['-fsyntax-only', '-Wall', '-Wno-invalid-source-encoding'])
         # remove the POST_ACTION as it will cause meaningless errors(file not
         # found or something like that).
-        rtk_gui_config.POST_ACTION = ''
+        menu_config.POST_ACTION = ''
 
     # generate cconfig.h file
     GenCconfigFile(env, BuildOptions)
 
     # auto append '_REENT_SMALL' when using newlib 'nano.specs' option
-    if rtk_gui_config.PLATFORM == 'gcc' and str(env['LINKFLAGS']).find('nano.specs') != -1:
+    if menu_config.PLATFORM == 'gcc' and str(env['LINKFLAGS']).find('nano.specs') != -1:
         env.AppendUnique(CPPDEFINES = ['_REENT_SMALL'])
 
     if GetOption('genconfig'):
@@ -397,8 +397,8 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
 
     configfn = GetOption('useconfig')
     if configfn:
-        from menuconfig import mk_rtk_gui_config
-        mk_rtk_gui_config(configfn)
+        from menuconfig import mk_menu_config
+        mk_menu_config(configfn)
         exit(0)
 
 
@@ -441,7 +441,7 @@ def PrepareBuilding(env, root_directory, has_libcpu=False, remove_components = [
     return objs
 
 def PrepareModuleBuilding(env, root_directory, bsp_directory):
-    import rtk_gui_config
+    import menu_config
 
     global BuildOptions
     global Env
@@ -456,9 +456,9 @@ def PrepareModuleBuilding(env, root_directory, bsp_directory):
     Env = env
     Tool_ROOT = root_directory
 
-    # parse bsp rtk_gui_config.h to get used component
+    # parse bsp menu_config.h to get used component
     PreProcessor = PatchedPreProcessor()
-    f = open(bsp_directory + '/rtk_gui_config.h', 'r')
+    f = open(bsp_directory + '/menu_config.h', 'r')
     contents = f.read()
     f.close()
     PreProcessor.process_contents(contents)
@@ -476,7 +476,7 @@ def PrepareModuleBuilding(env, root_directory, bsp_directory):
               help='clean up the library by --buildlib')
 
     # add program path
-    env.PrependENVPath('PATH', rtk_gui_config.EXEC_PATH)
+    env.PrependENVPath('PATH', menu_config.EXEC_PATH)
 
 def GetConfigValue(name):
     assert type(name) == str, 'GetConfigValue: only string parameter is valid'
@@ -641,8 +641,8 @@ def DefineGroup(name, src, depend, **parameters):
             paths.append(os.path.abspath(item))
         group['LOCAL_CPPPATH'] = paths
 
-    import rtk_gui_config
-    if rtk_gui_config.PLATFORM == 'gcc':
+    import menu_config
+    if menu_config.PLATFORM == 'gcc':
         if 'CCFLAGS' in group:
             group['CCFLAGS'] = utils.GCCC99Patch(group['CCFLAGS'])
         if 'LOCAL_CCFLAGS' in group:
@@ -699,10 +699,10 @@ def PreBuilding():
         a()
 
 def GroupLibName(name, env):
-    import rtk_gui_config
-    if rtk_gui_config.PLATFORM == 'armcc':
+    import menu_config
+    if menu_config.PLATFORM == 'armcc':
         return name + '_rvds'
-    elif rtk_gui_config.PLATFORM == 'gcc':
+    elif menu_config.PLATFORM == 'gcc':
         return name + '_gcc'
 
     return name
@@ -856,20 +856,20 @@ def GenTargetProject(program = None):
 
 
 def EndBuilding(target, program = None):
-    import rtk_gui_config
+    import menu_config
 
     need_exit = False
 
     Env['target']  = program
     Env['project'] = Projects
 
-    if hasattr(rtk_gui_config, 'BSP_LIBRARY_TYPE'):
-        Env['bsp_lib_type'] = rtk_gui_config.BSP_LIBRARY_TYPE
+    if hasattr(menu_config, 'BSP_LIBRARY_TYPE'):
+        Env['bsp_lib_type'] = menu_config.BSP_LIBRARY_TYPE
 
-    if hasattr(rtk_gui_config, 'dist_handle'):
-        Env['dist_handle'] = rtk_gui_config.dist_handle
+    if hasattr(menu_config, 'dist_handle'):
+        Env['dist_handle'] = menu_config.dist_handle
 
-    Env.AddPostAction(target, rtk_gui_config.POST_ACTION)
+    Env.AddPostAction(target, menu_config.POST_ACTION)
     # Add addition clean files
     Clean(target, 'cconfig.h')
     Clean(target, 'rtua.py')
@@ -909,8 +909,8 @@ def EndBuilding(target, program = None):
         CscopeDatabase(Projects)
 
     if not GetOption('help') and not GetOption('target'):
-        if not os.path.exists(rtk_gui_config.EXEC_PATH):
-            print ("Error: the toolchain path (" + rtk_gui_config.EXEC_PATH + ") is not exist, please check 'EXEC_PATH' in path or rtk_gui_config.py.")
+        if not os.path.exists(menu_config.EXEC_PATH):
+            print ("Error: the toolchain path (" + menu_config.EXEC_PATH + ") is not exist, please check 'EXEC_PATH' in path or menu_config.py.")
             need_exit = True
 
     if need_exit:

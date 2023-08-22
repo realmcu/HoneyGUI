@@ -25,9 +25,9 @@ import os
 import re
 import platform
 
-def GetGCCRoot(rtconfig):
-    exec_path = rtconfig.EXEC_PATH
-    prefix = rtconfig.PREFIX
+def GetGCCRoot(menu_config):
+    exec_path = menu_config.EXEC_PATH
+    prefix = menu_config.PREFIX
 
     if prefix.endswith('-'):
         prefix = prefix[:-1]
@@ -39,8 +39,8 @@ def GetGCCRoot(rtconfig):
 
     return root_path
 
-def CheckHeader(rtconfig, filename):
-    root = GetGCCRoot(rtconfig)
+def CheckHeader(menu_config, filename):
+    root = GetGCCRoot(menu_config)
 
     fn = os.path.join(root, 'include', filename)
     if os.path.isfile(fn):
@@ -56,7 +56,7 @@ def CheckHeader(rtconfig, filename):
     #    include
     #    lib
     #    share
-    prefix = rtconfig.PREFIX
+    prefix = menu_config.PREFIX
     if prefix.endswith('-'):
         prefix = prefix[:-1]
 
@@ -66,18 +66,18 @@ def CheckHeader(rtconfig, filename):
 
     return False
 
-def GetNewLibVersion(rtconfig):
+def GetNewLibVersion(menu_config):
     version = 'unknown'
-    root = GetGCCRoot(rtconfig)
+    root = GetGCCRoot(menu_config)
 
-    if CheckHeader(rtconfig, '_newlib_version.h'): # get version from _newlib_version.h file
+    if CheckHeader(menu_config, '_newlib_version.h'): # get version from _newlib_version.h file
         f = open(os.path.join(root, 'include', '_newlib_version.h'), 'r')
         if f:
             for line in f:
                 if line.find('_NEWLIB_VERSION') != -1 and line.find('"') != -1:
                     version = re.search(r'\"([^"]+)\"', line).groups()[0]
             f.close()
-    elif CheckHeader(rtconfig, 'newlib.h'): # get version from newlib.h
+    elif CheckHeader(menu_config, 'newlib.h'): # get version from newlib.h
         f = open(os.path.join(root, 'include', 'newlib.h'), 'r')
         if f:
             for line in f:
@@ -86,7 +86,7 @@ def GetNewLibVersion(rtconfig):
             f.close()
     return version
 
-def GCCResult(rtconfig, str):
+def GCCResult(menu_config, str):
     import subprocess
 
     result = ''
@@ -96,7 +96,7 @@ def GCCResult(rtconfig, str):
             return re.search(pattern, string).group(0)
         return None
 
-    gcc_cmd = os.path.join(rtconfig.EXEC_PATH, rtconfig.CC)
+    gcc_cmd = os.path.join(menu_config.EXEC_PATH, menu_config.CC)
 
     # use temp file to get more information
     f = open('__tmp.c', 'w')
@@ -172,7 +172,7 @@ def GCCResult(rtconfig, str):
         os.remove('__tmp.c')
     return result
 
-def GenerateGCCConfig(rtconfig):
+def GenerateGCCConfig(menu_config):
     str = ''
     cc_header = ''
     cc_header += '#ifndef CCONFIG_H__\n'
@@ -180,22 +180,22 @@ def GenerateGCCConfig(rtconfig):
     cc_header += '/* Automatically generated file; DO NOT EDIT. */\n'
     cc_header += '/* compiler configure file for RT-Thread in GCC*/\n\n'
 
-    if CheckHeader(rtconfig, 'newlib.h'):
+    if CheckHeader(menu_config, 'newlib.h'):
         str += '#include <newlib.h>\n'
         cc_header += '#define HAVE_NEWLIB_H 1\n'
-        cc_header += '#define LIBC_VERSION "newlib %s"\n\n' % GetNewLibVersion(rtconfig)
+        cc_header += '#define LIBC_VERSION "newlib %s"\n\n' % GetNewLibVersion(menu_config)
 
-    if CheckHeader(rtconfig, 'sys/signal.h'):
+    if CheckHeader(menu_config, 'sys/signal.h'):
         str += '#include <sys/signal.h>\n'
         cc_header += '#define HAVE_SYS_SIGNAL_H 1\n'
-    if CheckHeader(rtconfig, 'sys/select.h'):
+    if CheckHeader(menu_config, 'sys/select.h'):
         str += '#include <sys/select.h>\n'
         cc_header += '#define HAVE_SYS_SELECT_H 1\n'
-    if CheckHeader(rtconfig, 'pthread.h'):
+    if CheckHeader(menu_config, 'pthread.h'):
         str += "#include <pthread.h>\n"
         cc_header += '#define HAVE_PTHREAD_H 1\n'
 
-    # if CheckHeader(rtconfig, 'sys/dirent.h'):
+    # if CheckHeader(menu_config, 'sys/dirent.h'):
     #    str += '#include <sys/dirent.h>\n'
 
     # add some common features
@@ -206,7 +206,7 @@ def GenerateGCCConfig(rtconfig):
     str += '#endif\n'
 
     cc_header += '\n'
-    cc_header += GCCResult(rtconfig, str)
+    cc_header += GCCResult(menu_config, str)
     cc_header += '\n#endif\n'
 
     cc_file = open('cconfig.h', 'w')
