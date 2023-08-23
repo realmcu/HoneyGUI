@@ -4,12 +4,25 @@
 #include <rtl_ppe.h>
 #include <rtl_rtzip.h>
 #include <drv_lcd.h>
-
+#include "math.h"
 #include "trace.h"
+
+
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+
+
+
+static double acc_ppe_ceil(double _x)
+{
+#if defined (__GNUC__)
+    return (_x + 1.0); //todo, only fix gcc compile issue
+#endif
+    return ceil(_x);
+}
+
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
 {
@@ -160,7 +173,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 scaled_img.width = image->img_w * scale_x;
                 scaled_img.height = image->img_h * scale_y > (dc->section.y2 - dc->section.y1) ?
                                     (dc->section.y2 - dc->section.y1) : image->img_h * scale_y;
-                scaled_img.height += ceil(scale_y);
+                scaled_img.height += acc_ppe_ceil(scale_y);
                 uint32_t modified_height = image->img_h * scale_y;
                 switch (source.format)
                 {
@@ -168,11 +181,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scaled_img.format = PPE_BGR565;
                     if (dc->type == DC_SINGLE)
                     {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(scale_y)) * 2);
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 2);
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
+                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 +
+                                                                           (int)acc_ppe_ceil(
                                                                                scale_y) * 2 + 1) * 2);
                     }
                     break;
@@ -180,11 +194,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scaled_img.format = PPE_BGR888;
                     if (dc->type == DC_SINGLE)
                     {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(scale_y)) * 3);
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 3);
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
+                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 +
+                                                                           (int)acc_ppe_ceil(
                                                                                scale_y) + 1) * 3);
                     }
                     break;
@@ -192,11 +207,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scaled_img.format = PPE_BGRA8888;
                     if (dc->type == DC_SINGLE)
                     {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(scale_y)) * 4);
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 4);
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)ceil(
+                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 +
+                                                                           (int)acc_ppe_ceil(
                                                                                scale_y) + 1) * 4);
                     }
                     break;
