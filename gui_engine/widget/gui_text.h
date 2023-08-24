@@ -100,7 +100,7 @@ void gui_text_type_set(gui_text_t *this, void *type);
  * @param parent the father widget which the text nested in.
  * @param filename the widget's name.
  * @param x the X-axis coordinate of the text box.
- * @param x the Y-axis coordinate of the text box.
+ * @param y the Y-axis coordinate of the text box.
  * @param w the width of the text box.
  * @param h the hight of the text box.
  * @return return the widget object pointer

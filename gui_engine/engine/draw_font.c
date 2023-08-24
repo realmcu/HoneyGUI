@@ -45,9 +45,8 @@ uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
             }
         case 2:
             {
-
-                //unicodeArray[k] = utf8[i]>>8;
-                unicode_array[k] = utf8[i + 1];
+                unicode_array[k] = (uint16_t)(((utf8[i] & 0x03) << 6 | utf8[i + 1] & 0x3F) | ((
+                        utf8[i] & 0x38) >> 2 << 8));
                 k++;
                 i = i + 1;
                 break;
