@@ -194,6 +194,19 @@ void gui_img_translate(gui_magic_img_t *img, float t_x, float t_y)
     img->t_x = t_x;
     img->t_y = t_y;
 }
+
+// Skews the current coordinate system along X axis. Angle is specified in radians.
+void gui_img_skew_x(gui_magic_img_t *img, float degrees)
+{
+
+}
+
+// Skews the current coordinate system along Y axis. Angle is specified in radians.
+void gui_img_skew_y(gui_magic_img_t *img, float degrees)
+{
+
+}
+
 static void magic_img_update(gui_obj_t *o)
 {
     gui_magic_img_t *obj = (void *)o;

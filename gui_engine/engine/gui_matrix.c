@@ -55,6 +55,9 @@ void pox_mul(struct rtgui_matrix *matrix, struct rtgui_pox *pox)
                       + (matrix->m[row][1] * pox->p[1])
                       + (matrix->m[row][2] * pox->p[2]);
     }
+    temp.p[0] = temp.p[0] / temp.p[2];
+    temp.p[1] = temp.p[1] / temp.p[2];
+    temp.p[2] = 1;
 
     memcpy(pox, &temp, sizeof(temp));
 }
