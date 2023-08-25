@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include "gui_server.h"
 #include "unistd.h"
-#include "rtk_gui_config.h"
+#include "menu_config.h"
 #include "signal.h"
 #include "nanovg.h"
 

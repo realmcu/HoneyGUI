@@ -1,6 +1,6 @@
 import os
 import sys
-import rtk_gui_config
+import menu_config
 from SCons.Script import *
 
 TOOL_ROOT="./scons-tool"
@@ -15,17 +15,17 @@ except:
 TARGET = 'gui.' + 'exe'
 
 #env = Environment(tools = ['mingw'],
-#    AS = rtk_gui_config.AS, ASFLAGS = rtk_gui_config.AFLAGS,
-#    CC = rtk_gui_config.CC, CCFLAGS = rtk_gui_config.CFLAGS,
-#    AR = rtk_gui_config.AR, ARFLAGS = '-rc',
-#    CXX = rtk_gui_config.CXX, CXXFLAGS = rtk_gui_config.CXXFLAGS,
-#    LINK = rtk_gui_config.LINK, LINKFLAGS = rtk_gui_config.LFLAGS)
+#    AS = menu_config.AS, ASFLAGS = menu_config.AFLAGS,
+#    CC = menu_config.CC, CCFLAGS = menu_config.CFLAGS,
+#    AR = menu_config.AR, ARFLAGS = '-rc',
+#    CXX = menu_config.CXX, CXXFLAGS = menu_config.CXXFLAGS,
+#    LINK = menu_config.LINK, LINKFLAGS = menu_config.LFLAGS)
 
 env = Environment(tools = ['mingw'],
-                  CC=rtk_gui_config.CC, CCFLAGS = rtk_gui_config.CFLAGS,
-                  LINKFLAGS = rtk_gui_config.LFLAGS)
+                  CC=menu_config.CC, CCFLAGS = menu_config.CFLAGS,
+                  LINKFLAGS = menu_config.LFLAGS)
 
-#env.PrependENVPath('PATH', rtk_gui_config.EXEC_PATH)
+#env.PrependENVPath('PATH', menu_config.EXEC_PATH)
 env.Append(LIBS = ['mingw32'])
 
 
