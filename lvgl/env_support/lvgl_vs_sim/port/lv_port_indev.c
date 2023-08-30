@@ -1,16 +1,17 @@
 /**
- * @file lv_port_indev_templ.c
+ * @file lv_port_indev.c
  *
  */
 
 /*Copy this file as "lv_port_indev.c" and set this value to "1" to enable content*/
-#if 0
+#if 1
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_port_indev_template.h"
+#include "lv_port_indev.h"
 #include "../../lvgl.h"
+#include "sdl_init.h"
 
 /*********************
  *      DEFINES
@@ -95,6 +96,8 @@ void lv_port_indev_init(void)
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = touchpad_read;
     indev_touchpad = lv_indev_drv_register(&indev_drv);
+
+    return;
 
     /*------------------
      * Mouse
@@ -213,7 +216,7 @@ static bool touchpad_is_pressed(void)
 {
     /*Your code comes here*/
 
-    return false;
+    return sdl_get_touch_status();
 }
 
 /*Get the x and y coordinates if the touchpad is pressed*/
@@ -221,8 +224,8 @@ static void touchpad_get_xy(lv_coord_t *x, lv_coord_t *y)
 {
     /*Your code comes here*/
 
-    (*x) = 0;
-    (*y) = 0;
+    (*x) = sdl_get_x();
+    (*y) = sdl_get_y();
 }
 
 /*------------------

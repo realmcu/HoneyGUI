@@ -32,6 +32,24 @@ static pthread_mutex_t sdl_ok_mutex;
 static pthread_cond_t sdl_ok_event;
 
 
+static bool touch_pressed = false;
+static uint32_t touch_x = 0;
+static uint32_t touch_y = 0;
+
+bool sdl_get_touch_status(void)
+{
+    return touch_pressed;
+}
+
+uint32_t sdl_get_x(void)
+{
+    return touch_x;
+}
+
+uint32_t sdl_get_y(void)
+{
+    return touch_y;
+}
 
 
 static void *loop_sdl(void *arg)
@@ -81,7 +99,9 @@ static void *loop_sdl(void *arg)
             {
                 /* save to (x,y) in the motion */
                 //gui_log("line = %d \n",__LINE__);
-                //gui_log("mouse motion:(%d,%d)\n",event.button.x,event.button.y);
+                //printf("mouse motion:(%d,%d)\n",event.button.x,event.button.y);
+                touch_x = event.button.x;
+                touch_y = event.button.y;
             }
             break;
 
@@ -89,7 +109,8 @@ static void *loop_sdl(void *arg)
             {
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
-                //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
+                touch_pressed = true;
+                //printf("mouse down:(%d,%d)\n", event.button.x, event.button.y);
             }
             break;
 
@@ -97,7 +118,8 @@ static void *loop_sdl(void *arg)
             {
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
-                //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
+                touch_pressed = false;
+                //printf("mouse up:(%d,%d)\n", event.button.x, event.button.y);
             }
             break;
         case SDL_MOUSEWHEEL:
@@ -160,7 +182,7 @@ void sdl_dc_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, uint1
         {
             for (uint32_t j = xStart; j <= xEnd; j++)
             {
-                *(write + i * w + j) = *pixel;
+                *(write + i * DRV_LCD_WIDTH + j) = *pixel;
                 pixel++;
             }
         }
@@ -173,7 +195,7 @@ void sdl_dc_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, uint1
         {
             for (uint32_t j = xStart; j <= xEnd; j++)
             {
-                *(write + i * w + j) = *pixel;
+                *(write + i * DRV_LCD_WIDTH + j) = *pixel;
                 pixel++;
             }
         }
