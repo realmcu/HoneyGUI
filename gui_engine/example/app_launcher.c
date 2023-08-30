@@ -58,7 +58,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_tab_t *tb_svg = gui_tab_create(tv, "tb_svg",                 0, 0, 0, 0, 4, 0);
     gui_tab_t *tb_wave = gui_tab_create(tv, "tb_wave",               0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_60 = gui_tab_create(tv, "tb_",                     0, 0, 0, 0, 6, 0);
-    gui_tab_t *tb_70 = gui_tab_create(tv, "tb_",                     0, 0, 0, 0, 7, 0);
+    //gui_tab_t *tb_70 = gui_tab_create(tv, "tb_",                     0, 0, 0, 0, 7, 0);
 
     extern void page_tb_watch(void *parent);
     extern void page_tb_sport(void *parent);
@@ -75,6 +75,6 @@ static void app_launcher_ui_design(gui_app_t *app)
     page_tb_svg(tb_svg);
     page_tb_wave(tb_wave);
     page_tb_grid(tb_60);
-    page_tb_carousel(tb_70);
+    //page_tb_carousel(tb_70);
 }
 
