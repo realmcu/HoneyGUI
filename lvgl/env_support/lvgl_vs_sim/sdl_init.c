@@ -13,10 +13,11 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "lvgl.h"
 
-#define DRV_LCD_WIDTH   454
-#define DRV_LCD_HIGHT   454
-#define DRV_PIXEL_BITS  32
+#define DRV_LCD_WIDTH   MY_DISP_HOR_RES
+#define DRV_LCD_HIGHT   MY_DISP_VER_RES
+#define DRV_PIXEL_BITS  LV_COLOR_DEPTH
 
 
 
@@ -127,17 +128,6 @@ static void *loop_sdl(void *arg)
     }
 }
 
-void sdl_dc_update(void)
-{
-    SDL_Texture *texture;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
-    SDL_RenderCopy(renderer, texture, NULL, &_rect);
-    SDL_RenderPresent(renderer);
-    SDL_DestroyTexture(texture);
-
-    return;
-}
 
 void sdl_dc_init(void)
 {
@@ -157,10 +147,46 @@ void sdl_dc_init(void)
     pthread_cond_destroy(&sdl_ok_event);
 }
 
-void *sdl_getframebuffer(void)
+void sdl_dc_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, uint16_t w,
+                   uint16_t h)
 {
-    return surface->pixels;
+    uint16_t xEnd = xStart + w - 1;
+    uint16_t yEnd = yStart + h - 1;
+    if (DRV_PIXEL_BITS == 16)
+    {
+        uint16_t *pixel = (uint16_t *)framebuffer;
+        uint16_t *write = surface->pixels;
+        for (uint32_t i = yStart; i <= yEnd; i++)
+        {
+            for (uint32_t j = xStart; j <= xEnd; j++)
+            {
+                *(write + i * w + j) = *pixel;
+                pixel++;
+            }
+        }
+    }
+    else if (DRV_PIXEL_BITS == 32)
+    {
+        uint32_t *pixel = (uint32_t *)framebuffer;
+        uint32_t *write = surface->pixels;
+        for (uint32_t i = yStart; i <= yEnd; i++)
+        {
+            for (uint32_t j = xStart; j <= xEnd; j++)
+            {
+                *(write + i * w + j) = *pixel;
+                pixel++;
+            }
+        }
+    }
+    SDL_Texture *texture;
+
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+    SDL_RenderCopy(renderer, texture, NULL, &_rect);
+    SDL_RenderPresent(renderer);
+    SDL_DestroyTexture(texture);
 }
+
 
 
 

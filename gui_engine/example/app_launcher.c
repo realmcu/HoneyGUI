@@ -45,6 +45,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     // gui_img_translate(img, 200, 200);
     // gui_img_rotation(img, 45, 128 + (454 - 256) / 2, 128 + (454 - 256) / 2);
     // gui_perspective_t *img_test = gui_perspective_create(win, "test", C1_BIN, 0, 0, 454, 454);
+    // return;
 
 
     tv = gui_tabview_create(win, "tabview", 0, 0, 0, 0);

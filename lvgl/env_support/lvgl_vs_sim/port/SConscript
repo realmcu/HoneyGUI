@@ -9,6 +9,6 @@ src = Split("""
 src = Glob('*.c')
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_PORT_FOR_LVGL'], CPPPATH = CPPPATH)
 
 Return('group')
