@@ -10,6 +10,7 @@
 /* Automatically generated file; DO NOT EDIT. */
 
 #define MODULE_USING_PORT_FOR_LVGL
+#define PKG_LVGL_USING_EXAMPLES
 
 
 
