@@ -21,25 +21,12 @@
 #include "time.h"
 #include "sdl_init.h"
 #include "lvgl.h"
+#include "lv_example_widgets.h"
 #include <pthread.h>
 
 
 
-static void lv_example_arc_1(void)
-{
-    lv_obj_t *label = lv_label_create(lv_scr_act());
-    /*Create an Arc*/
-    lv_obj_t *arc = lv_arc_create(lv_scr_act());
-    LV_LOG("Running LVGL Benchmark...arc = 0x%x \n", arc);
-    lv_obj_set_size(arc, 150, 150);
-    lv_arc_set_rotation(arc, 135);
-    lv_arc_set_bg_angles(arc, 0, 270);
-    lv_arc_set_value(arc, 20);
-    lv_obj_center(arc);
-    //lv_obj_add_event_cb(arc, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, label);
-    /*Manually update the label for the first time*/
-    lv_event_send(arc, LV_EVENT_VALUE_CHANGED, NULL);
-}
+
 static void *lv_tick_task(void *arg)
 {
     while (1)
@@ -77,14 +64,15 @@ int main(int argc, char **argv)
     // lv_demo_benchmark();
 #endif
 #if LV_USE_DEMO_WIDGETS
-    lv_demo_widgets();
+    // lv_demo_widgets();
 #endif
     //lv_example_arc_1();
     //lv_example_btn_1();
+    lv_example_btn_1();
 
     while (1)
     {
-        lv_timer_handler();                 //! run lv task at the max speed
+        lv_task_handler();                 //! run lv task at the max speed
     }
 
     return 0;
