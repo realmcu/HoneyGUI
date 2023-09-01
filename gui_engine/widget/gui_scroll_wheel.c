@@ -112,7 +112,7 @@ void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this, gui_obj_t *parent, int
 
     //for self
     this->child_gap = 200 / 3;
-    this->highlight_start = (w - this->child_gap) / 2;
+    // this->highlight_start = (w - this->child_gap) / 2;
     this->highlight_start = (w + this->child_gap) / 2;
     this->get_index = get_index;
 }

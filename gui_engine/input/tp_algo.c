@@ -2,7 +2,7 @@
 /*
  * File      : tp_algo.c
  */
-#include <string.h>
+//#include <string.h>
 #include <gui_server.h>
 #include <guidef.h>
 #include <gui_api.h>

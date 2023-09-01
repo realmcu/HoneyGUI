@@ -5,7 +5,7 @@
 
 #include <guidef.h>
 #include <gui_alert.h>
-#include <string.h>
+//#include <string.h>
 #include <gui_server.h>
 #include "gui_curtain.h"
 #include "gui_obj.h"

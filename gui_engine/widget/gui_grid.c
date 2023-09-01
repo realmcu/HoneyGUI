@@ -344,7 +344,7 @@ static void deal_img_in_root_3d(gui_obj_t *obj, float x, float y)
 //     }
 //     return 0;
 // }
-#include "gui_tabview.h"
+//#include "gui_tabview.h"
 static void tab_prepare_scale(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
