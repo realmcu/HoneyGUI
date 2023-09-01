@@ -5,7 +5,7 @@
 #include <guidef.h>
 #include <gui_app.h>
 #include <string.h>
-#include "gui_server.h"
+//#include "gui_server.h"
 //#include "gui_img.h"
 #include <string.h>
 #include <stdio.h>

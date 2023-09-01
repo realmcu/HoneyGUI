@@ -1,7 +1,7 @@
 
-#include <math.h>
+//#include <math.h>
 #include <string.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <guidef.h>
 #include <gui_fb.h>
 #include <gui_obj.h>

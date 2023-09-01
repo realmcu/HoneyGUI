@@ -221,7 +221,7 @@ void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const ch
     gui_obj_ctor(&(this->base), parent, filename, x, y, w, h);
 
 
-    this->color = 0xffffffaa;
+    //this->color = 0xffffffaa;
     this->color = 0xffffffff;
     this->per = 0.3f;
     this->base.type = PROGRESSBAR;

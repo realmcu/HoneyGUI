@@ -7,7 +7,7 @@
 #include <gui_scroll_text.h>
 #include <string.h>
 #include <draw_font.h>
-#include "gui_obj.h"
+//#include "gui_obj.h"
 static uint32_t cur_time_ms;
 
 static void scrolltext_prepare(gui_obj_t *obj)

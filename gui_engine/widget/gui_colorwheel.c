@@ -4,9 +4,9 @@
  */
 #include <guidef.h>
 #include <string.h>
-#include <gui_matrix.h>
+//#include <gui_matrix.h>
 #include <gui_obj.h>
-#include <tp_algo.h>
+//#include <tp_algo.h>
 #include <gui_kb.h>
 #include "gui_colorwheel.h"
 #include <math.h>

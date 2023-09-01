@@ -3,10 +3,10 @@
  * File      : gui_kb.c
  */
 #include <string.h>
-#include <gui_server.h>
+//#include <gui_server.h>
 #include <guidef.h>
 #include <gui_api.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <gui_kb.h>
 
 

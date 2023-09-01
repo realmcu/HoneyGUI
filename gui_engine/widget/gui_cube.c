@@ -5,8 +5,8 @@
 #include <guidef.h>
 #include <string.h>
 #include <gui_obj.h>
-#include <tp_algo.h>
-#include <gui_kb.h>
+//#include <tp_algo.h>
+//#include <gui_kb.h>
 #include <draw_img.h>
 #include <gui_matrix.h>
 #include "gui_cube.h"

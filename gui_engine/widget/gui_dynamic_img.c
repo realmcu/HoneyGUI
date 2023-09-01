@@ -5,7 +5,7 @@
 #include <guidef.h>
 #include <gui_dynamic_img.h>
 #include <string.h>
-#include <gui_matrix.h>
+//#include <gui_matrix.h>
 #include <gui_obj.h>
 #include <draw_img.h>
 #include <tp_algo.h>
