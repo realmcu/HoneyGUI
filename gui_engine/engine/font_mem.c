@@ -489,8 +489,8 @@ void rtgui_font_mem_draw(gui_text_t *text, struct rtgui_rect *rect)
     case MUTI_LEFT:
     case MUTI_CENTER:
     case MUTI_RIGHT:
-        line_buf = gui_malloc(text->text_offset * sizeof(gui_text_line_t));
-        memset(line_buf, 0, text->text_offset * sizeof(gui_text_line_t));
+        line_buf = gui_malloc((text->text_offset + 1) * sizeof(gui_text_line_t));
+        memset(line_buf, 0, (text->text_offset + 1) * sizeof(gui_text_line_t));
         for (uint16_t i = 0; i < text->font_len; i++)
         {
             // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
