@@ -2,8 +2,8 @@
 
 * [Introduction](Introduction/README.md)
     * [Feature](Introduction/Home.md)
-    * [License](Introduction/Home.md)
-    * [FAQ](Introduction/Home.md)
+    * [License]
+    * [FAQ]
 * [Examples](Examples/README.md)
     * [SmartWatch](Examples/Demo.md)
     * [Dashboard](Examples/Demo.md)

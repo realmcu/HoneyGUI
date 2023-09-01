@@ -1,9 +1,10 @@
 {
     "plugins": [
-
+      "chapter-fold",
+      "expandable-chapters"
     ],
     "title": "书本的标题",
-    "author": "韩振亚",
+    "author": "王浩",
     "description": "本书的简单描述",
     "language" : "zh-hans",
     "links" : {
