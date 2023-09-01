@@ -14,8 +14,22 @@
 * [Layouts](Layouts/README.md)
     * [Screen]
     * [Window]
+    * [tabview]
+    * [tab]
     * [Curtain]
+    * [Page]
 * [Widgets](Widgets/README.md)
+    * [Button]
+    * [image]
+    * [dynamic imgage]
+    * [dynamic imgage]
+    * [magic image]
+    * [canvas]
+    * [Text]
+    * [Cube]
+    * [Svg]
+    * [Wave]
+    * [Colorwheel]
 * [Porting](Porting/README.md)
 * [CHANGELOG](CHANGELOG.md)
 

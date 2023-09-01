@@ -3,13 +3,13 @@
       "chapter-fold",
       "expandable-chapters"
     ],
-    "title": "书本的标题",
-    "author": "王浩",
-    "description": "本书的简单描述",
+    "title": "RTL8762x Realtek GUI Engine Programming Guide",
+    "author": "BT2SW3",
+    "description": "RTL8762x Realtek GUI Engine Programming Guide",
     "language" : "zh-hans",
     "links" : {
       "sidebar" : {
-          "Home" : "https://www.baidu.com"
+          "Home" : "https://www.realmcu.com/"
       }
     },
     "pluginsConfig": {
