@@ -235,7 +235,7 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
     // baseline = 900 * scale;
     gui_dispdev_t *dc = gui_get_dc();
     uint16_t *p_buf = gui_malloc(text->len * sizeof(uint16_t));
-    if (!p_buf)
+    if (p_buf == NULL)
     {
         GUI_ASSERT(NULL != NULL);
     }
