@@ -1,0 +1,17 @@
+{
+    "plugins": [
+
+    ],
+    "title": "书本的标题",
+    "author": "韩振亚",
+    "description": "本书的简单描述",
+    "language" : "zh-hans",
+    "links" : {
+      "sidebar" : {
+          "Home" : "https://www.baidu.com"
+      }
+    },
+    "pluginsConfig": {
+
+    }
+  }
