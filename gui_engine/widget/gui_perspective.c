@@ -13,15 +13,8 @@
 #include "acc_engine.h"
 #include <math.h>
 
-static struct rtgui_matrix matrix, rotate_3D;
-static Vertex_t rv0, rv1, rv2, rv3, rv4, rv5, rv6, rv7;
-static float nz0321, nz4567, nz5126, nz0473, nz7623, nz0154;
-
-// Set the intial cube rotation degree and step.
-static float xrot = 0.0;
-static float yrot = 0.0;
-static float zrot = 0.0;
-static float rotstep = 0.5;
+static struct rtgui_matrix rotate_3D;
+static Vertex_t rv0, rv1, rv2, rv3;
 
 
 
@@ -193,13 +186,6 @@ static void transfrom_rotate(struct rtgui_matrix *rotate, Vertex_t *vertex, Vert
     rc->z += tz;
 }
 
-static void transfrom_normalZ(struct rtgui_matrix *rotate, Normal_t *nVec, float *nZ)
-{
-    // Compute the new normal Z coordinate transformed by the rotation matrix.
-    //
-    *nZ = rotate->m[2][0] * nVec->x + rotate->m[2][1] * nVec->y + rotate->m[2][2] * nVec->z;
-}
-
 
 // w means image width
 // h means image height, use w and h can get four point in XY plane
@@ -321,6 +307,7 @@ static void get_new_area(draw_img_t *draw_img)
 }
 
 
+#if 0
 static bool full_rank(struct rtgui_matrix *m)
 {
     for (int i = 0; i < 3; i++)
@@ -340,8 +327,7 @@ static bool full_rank(struct rtgui_matrix *m)
     }
     return true;
 }
-#define CUBE_JUDEG_FULL_RANK(m) if(full_rank(m->matrix))
-
+#endif
 
 
 static void prepare(gui_obj_t *obj)
@@ -370,6 +356,11 @@ static void draw_cb(gui_obj_t *obj)
     Vertex_t v1 = {w / 2, -h / 2, d};
     Vertex_t v2 = {w / 2, h / 2, d};
     Vertex_t v3 = {-w / 2, h / 2, d};
+
+    scale_3d(&v0, 1.0f);
+    scale_3d(&v1, 1.0f);
+    scale_3d(&v2, 1.0f);
+    scale_3d(&v3, 1.0f);
 
     int ry[6] = {0, 60, 120, 180, 240, 300};
 
