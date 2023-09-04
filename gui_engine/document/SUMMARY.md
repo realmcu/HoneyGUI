@@ -19,17 +19,18 @@
     * [Curtain]
     * [Page]
 * [Widgets](Widgets/README.md)
-    * [Button]
-    * [image]
+    * [Button](Widgets/gui_button.md)
+    * [image](Widgets/gui_image.md)
     * [dynamic imgage]
     * [dynamic imgage]
     * [magic image]
-    * [canvas]
+    * [canvas](Widgets/gui_canvas.md)
     * [Text]
-    * [Cube]
+    * [Cube](Widgets/gui_cube.md)
     * [Svg]
     * [Wave]
     * [Colorwheel]
+    * [Template](Widgets/gui_template.md)
 * [Porting](Porting/README.md)
 * [CHANGELOG](CHANGELOG.md)
 
