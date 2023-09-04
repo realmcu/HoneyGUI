@@ -6,14 +6,14 @@
 #include "gui_canvas.h"
 #include "nanovg_agge.h"
 
-#if defined ( __CC_ARM )
+#if defined ( __CC_ARM ) && !defined(RTL8763EP)
 #define __FPU_PRESENT                  1            /* FPU present                                                             */
 #include "arm_math.h"
 #endif
 
 static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 {
-#if defined ( __CC_ARM )
+#if defined ( __CC_ARM ) && !defined(RTL8763EP)
     arm_fill_q15(pixel, (int16_t *)addr, len);
 #endif
 #if defined(_MSC_VER) || (defined(__GNUC__))
@@ -25,7 +25,7 @@ static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 }
 static void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
 {
-#if defined ( __CC_ARM )
+#if defined ( __CC_ARM ) && !defined(RTL8763EP)
     arm_fill_q31(pixel, (int32_t *)addr, len);
 #endif
 #if defined(_MSC_VER) || (defined(__GNUC__))
