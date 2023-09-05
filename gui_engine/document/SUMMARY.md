@@ -31,6 +31,7 @@
     * [Wave]
     * [Colorwheel]
     * [Template](Widgets/gui_template.md)
+    * [grid](Widgets/gui_grid.md)
 * [Porting](Porting/README.md)
 * [CHANGELOG](CHANGELOG.md)
 
