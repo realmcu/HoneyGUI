@@ -547,6 +547,11 @@ gui_grid_t *gui_grid_create(void *parent,
 void gui_grid_style(gui_grid_t *grid, enum gui_grid_style style)
 {
     grid->style = style;
+    if (style == GRID_3D)
+    {
+        grid->col += 2;
+    }
+
 }
 
 

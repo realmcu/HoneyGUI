@@ -42,7 +42,7 @@ typedef struct gui_grid
  * @brief create a grid widget.
  * @param parent the father widget the grid nested in.
  * @param x the X-axis coordinate.
- * @param x the Y-axis coordinate.
+ * @param y the Y-axis coordinate.
  * @param row Rows number.
  * @param col Columns number.
  * @param gap_col gap between two Columns.
