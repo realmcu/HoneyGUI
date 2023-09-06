@@ -46,10 +46,23 @@ struct rtgui_font_engine
 
 struct font_lib
 {
-    char *dot_name;
-    char *table_name;
+    uint8_t *font_file;
+    uint8_t *dot_name;
+    uint8_t *table_name;
     uint8_t font_size;
-    uint8_t rendor_mode;
+    uint8_t rendor_mode;  // support 1 4 8
+    union
+    {
+        uint8_t value;
+        struct
+        {
+            uint8_t bold : 1;
+            uint8_t italic : 1;
+            uint8_t scanMode : 1;
+            uint8_t index_method : 1;   // 0 offset ; 1 address
+            uint8_t reserve : 4;
+        } detail;
+    } font_mode_detail;
 };
 typedef struct font_stb_screen
 {
@@ -71,11 +84,30 @@ void rtgui_font_draw(gui_text_t *text, struct rtgui_rect *rect);
 
 uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
                          uint16_t unicode_buf_len);
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list
+ *
+ * @param font_size the size of this font file
+ * @param font_bitmap_addr the bitmap file address of this font type
+ * @param font_table_addr the table file address of this font type
+ */
 void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
                                void *font_table_addr);
-void gui_font_mem_init(uint8_t font_size, void *font_bitmap_addr,
-                       void *font_table_addr, uint8_t rendor_mode);
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list
+ *
+ * @param font_bin_addr the binary file address of this font type
+ */
+void gui_font_mem_init(uint8_t *font_bin_addr);
 #if RTK_GUI_FONT_STB
+/**
+ * @brief Initialize a standard ttf file and send the font and
+ * corresponding information to the parser
+ *
+ * @param font_ttf_addr the address of ttf file
+ */
 void gui_font_stb_init(void *font_ttf_addr);
 #endif
 #ifdef __cplusplus

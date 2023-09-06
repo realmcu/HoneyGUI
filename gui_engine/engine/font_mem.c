@@ -15,9 +15,10 @@ typedef struct
 
 typedef struct
 {
-    char *font_lib_name;
-    char *font_lib_tab_name;
-    uint8_t rendor_mode;
+    uint8_t *font_lib_name;
+    uint8_t *font_lib_tab_name;
+    uint8_t rendor_mode : 4;
+    uint8_t index_method : 1;
 } fontlib_name_t;
 static fontlib_name_t fontlib_name;
 static fontlib_name_t *get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
@@ -28,11 +29,12 @@ static fontlib_name_t *get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
     {
         for (size_t i = 0; i < tab_size; i++)
         {
-            if (font_lib_tab[i].dot_name == (char *)dot_addr)
+            if (font_lib_tab[i].dot_name == dot_addr || font_lib_tab[i].font_file == dot_addr)
             {
                 font_name->font_lib_name = font_lib_tab[i].dot_name;
                 font_name->font_lib_tab_name = font_lib_tab[i].table_name;
                 font_name->rendor_mode = font_lib_tab[i].rendor_mode;
+                font_name->index_method = font_lib_tab[i].font_mode_detail.detail.index_method;
                 return font_name;
             }
         }
@@ -46,6 +48,7 @@ static fontlib_name_t *get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
                 font_name->font_lib_name = font_lib_tab[i].dot_name;
                 font_name->font_lib_tab_name = font_lib_tab[i].table_name;
                 font_name->rendor_mode = font_lib_tab[i].rendor_mode;
+                font_name->index_method = font_lib_tab[i].font_mode_detail.detail.index_method;
                 return font_name;
             }
         }
@@ -76,6 +79,7 @@ void rtgui_font_mem_load(gui_text_t *text)
     {
         GUI_ASSERT(NULL != NULL);
     }
+    memset(chr, 0, sizeof(mem_char_t) * text->len);
     text->data = chr;
     uint8_t aliened_font_size;
     aliened_font_size = text->font_height;
@@ -95,35 +99,74 @@ void rtgui_font_mem_load(gui_text_t *text)
     uint16_t unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
     uint32_t all_char_w = 0;
     uint32_t line_flag = 0;
-    for (uint32_t i = 0; i < unicode_len; i++)
+    switch (font_name->index_method)
     {
-        chr[i].unicode = p_buf[i];
-        chr[i].w = aliened_font_size;
-        chr[i].h = text->font_height;
-        uint16_t offset = 0;
-        if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D || offset == 0xFFFF)
+    case 0: //address
+        for (uint32_t i = 0; i < unicode_len; i++)
         {
-            offset = *(uint16_t *)(0x20 * 2 + table_offset);
-            if (offset == 0xFFFF) { continue; }
-            chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
-            chr[i].char_w = text->font_height / 2;
+            chr[i].unicode = p_buf[i];
+            chr[i].w = aliened_font_size;
+            chr[i].h = text->font_height;
+            uint16_t offset = 0;
+            if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D || offset == 0xFFFF)
+            {
+                offset = *(uint16_t *)(0x20 * 2 + table_offset);
+                if (offset == 0xFFFF) { continue; }
+                chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                chr[i].char_w = text->font_height / 2;
+            }
+            else if (chr[i].unicode == 0x0A)
+            {
+                line_flag ++;
+                offset = *(uint16_t *)(0x20 * 2 + table_offset);
+                if (offset == 0xFFFF) { continue; }
+                chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                chr[i].char_w = 0;
+            }
+            else
+            {
+                offset = *(uint16_t *)(chr[i].unicode * 2 + table_offset);
+                if (offset == 0xFFFF) { continue; }
+                chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+            }
+            all_char_w += chr[i].char_w;
         }
-        else if (chr[i].unicode == 0x0A)
+        break;
+    case 1: //offset
         {
-            line_flag ++;
-            offset = *(uint16_t *)(0x20 * 2 + table_offset);
-            if (offset == 0xFFFF) { continue; }
-            chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
-            chr[i].char_w = 0;
+            void *index_area_size_addr = ((uint8_t *)text->path + 9);
+            uint32_t index_area_size = *(uint32_t *)index_area_size_addr;
+            for (uint32_t i = 0; i < unicode_len; i++)
+            {
+                chr[i].unicode = p_buf[i];
+                chr[i].w = aliened_font_size;
+                chr[i].h = text->font_height;
+                chr[i].char_w = text->font_height / 2;
+                uint32_t index = 0;
+                if (chr[i].unicode == 0x0A)
+                {
+                    line_flag ++;
+                    chr[i].char_w = 0;
+                }
+                else
+                {
+                    for (; index < index_area_size / 2; index ++)
+                    {
+                        if (chr[i].unicode == *(uint16_t *)(table_offset + index * 2))
+                        {
+                            chr[i].dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
+                            chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+                            break;
+                        }
+                    }
+                }
+                all_char_w += chr[i].char_w;
+            }
         }
-        else
-        {
-            offset = *(uint16_t *)(chr[i].unicode * 2 + table_offset);
-            if (offset == 0xFFFF) { continue; }
-            chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
-            chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
-        }
-        all_char_w += chr[i].char_w;
+        break;
+    default:
+        break;
     }
     if (text->text_offset == 0)
     {
@@ -220,6 +263,10 @@ gui_inline uint32_t rgb5652rgba(uint16_t rgb565)
 static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t rendor_mode,
                              struct rtgui_rect *rect)
 {
+    if (chr->dot_addr == NULL)
+    {
+        return;
+    }
     uint8_t *dots = chr->dot_addr;
     gui_dispdev_t *dc = gui_get_dc();
     int font_x = chr->x + dx;
@@ -619,30 +666,44 @@ void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
             break;
         }
     }
+    font_lib_tab[i].font_file = font_bitmap_addr;
     font_lib_tab[i].dot_name = font_bitmap_addr;
     font_lib_tab[i].font_size = font_size;
     font_lib_tab[i].table_name = font_table_addr;
     font_lib_tab[i].rendor_mode = 1;
+    font_lib_tab[i].font_mode_detail.value = 0;
 }
 
-void gui_font_mem_init(uint8_t font_size, void *font_bitmap_addr,
-                       void *font_table_addr, uint8_t rendor_mode)
+void gui_font_mem_init(uint8_t *font_bin_addr)
 {
     size_t i = 0;
+    if (!font_bin_addr)
+    {
+        return;
+    }
+    uint8_t font_file_flag = * (uint8_t *)(font_bin_addr + 1);
+    if (font_file_flag == 0)
+    {
+        return;
+    }
     for (; i < sizeof(font_lib_tab) / sizeof(struct font_lib); i++)
     {
-        if (font_lib_tab[i].dot_name == 0 && font_lib_tab[i].font_size == 0 &&
-            font_lib_tab[i].table_name == 0)
+        if (font_lib_tab[i].dot_name == 0)
         {
             break;
         }
-        if (font_lib_tab[i].dot_name == font_bitmap_addr)
+        if (font_lib_tab[i].font_file == font_bin_addr)
         {
             break;
         }
     }
-    font_lib_tab[i].dot_name = font_bitmap_addr;
-    font_lib_tab[i].font_size = font_size;
-    font_lib_tab[i].table_name = font_table_addr;
-    font_lib_tab[i].rendor_mode = rendor_mode;
+    font_lib_tab[i].font_file = font_bin_addr;
+    font_lib_tab[i].font_size = * (uint8_t *)(font_bin_addr + 6);
+    font_lib_tab[i].rendor_mode = * (uint8_t *)(font_bin_addr + 7);
+    uint8_t head_length = * (uint8_t *)(font_bin_addr);
+    font_lib_tab[i].table_name = (uint8_t *)(font_bin_addr + head_length);
+    void *index_area_size_addr = (uint8_t *)(font_bin_addr + 9);
+    uint32_t index_area_size = *(uint32_t *)index_area_size_addr;
+    font_lib_tab[i].dot_name = (uint8_t *)(font_bin_addr + index_area_size + head_length);
+    font_lib_tab[i].font_mode_detail.value =  * (uint8_t *)(font_bin_addr + 8);
 }

@@ -69,6 +69,13 @@ void gui_text_set(gui_text_t *this, const char *text, char *text_type, uint32_t 
                   uint16_t length, uint8_t font_size);
 void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x, int16_t y,
                    int16_t w, int16_t h);
+/**
+ * @brief move the text widget
+ *
+ * @param this the text box widget pointer.
+ * @param x the X-axis coordinate of the text box.
+ * @param y the Y-axis coordinate of the text box.
+ */
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y);
 /**
  * @brief set text mode of this text widget
