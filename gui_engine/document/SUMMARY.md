@@ -32,6 +32,7 @@
     * [Colorwheel]
     * [Template](Widgets/gui_template.md)
     * [grid](Widgets/gui_grid.md)
+    * [window](Widgets/gui_window.md)
 * [Porting](Porting/README.md)
 * [CHANGELOG](CHANGELOG.md)
 
