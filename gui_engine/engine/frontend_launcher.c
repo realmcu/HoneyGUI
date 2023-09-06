@@ -123,6 +123,10 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     {
                         img1 = gui_get_file_address(pic);
                     }
+                    if (strcmp(text, "launcher") == 0)
+                    {
+                        continue;
+                    }
                     gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, 0, 0);
                     gui_button_api.onPress(button, button_cb, button);
                     gui_button_api.onRelease(button, button_release_cb, button);

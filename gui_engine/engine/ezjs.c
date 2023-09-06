@@ -514,6 +514,22 @@ DECLARE_HANDLER(write)
     }
     return jerry_create_undefined();
 }
+#include "gui_tabview.h"
+DECLARE_HANDLER(jump)
+{
+    if (args_cnt != 1 || !jerry_value_is_number(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_obj_t *txtbox = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
+    //gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
+    if (txtbox)
+    {
+        //gui_tab_jump(txtbox, jerry_get_number_value(args[0]), 0);
+    }
+    return jerry_create_undefined();
+}
 /*DECLARE_HANDLER(getElementById)
 {
 
@@ -553,6 +569,7 @@ void gui_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **o
 }
 DECLARE_HANDLER(getElementById)
 {
+    gui_log("enter getElementById\n");
     if (args_cnt != 1 || !jerry_value_is_string(args[0]))
     {
         return jerry_create_undefined();
@@ -562,7 +579,9 @@ DECLARE_HANDLER(getElementById)
     gui_app_t *app = NULL;
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
     gui_obj_t *widget = NULL;
-    gui_tree_get_widget_by_name(&app->screen, js_value_to_string(args[0]), &widget);
+    char *a = js_value_to_string(args[0]);
+    gui_tree_get_widget_by_name(&app->screen, a, &widget);
+    gui_free(a);
     //gui_log("getElementById:%x\n",widget);
     jerry_set_object_native_pointer(this_value, widget, NULL);
     jerry_release_value(global_obj);
@@ -579,7 +598,9 @@ DECLARE_HANDLER(getAttribute)
     ezxml_t title;
     jerry_get_object_native_pointer(this_value, (void *)&title, NULL);
     //printf("ezxmltitle:%x", title);
-    const char *widget_type = ezxml_attr(title, js_value_to_string(args[0]));
+    char *a = js_value_to_string(args[0]);
+    const char *widget_type = ezxml_attr(title, a);
+    gui_free(a);
     return jerry_create_string((void *)widget_type);
 }
 
@@ -629,7 +650,7 @@ DECLARE_HANDLER(icon_write)
         //gui_log("txtbox->text_type:%s,\n",txtbox->text_type);
         txtbox->text->utf_8 = strbuf1;*/
         char *strbuf1 = js_value_to_string(args[0]);
-        printf("iconwrite:%s\n", strbuf1);
+        //printf("iconwrite:%s\n", strbuf1);
         gui_text_set(txtbox->text, strbuf1, "rtk_font_stb", txtbox->text->color, strlen(strbuf1),
                      txtbox->text->font_height);
         //jerry_release_value(s);
@@ -801,6 +822,7 @@ static void js_cb(jerry_value_t func)
 
 static void js_cb_with_args(gui_obj_t *obj)
 {
+    gui_log("enter js_cb_with_args\n");
     cb_arg_t *args = NULL;
     gui_event_dsc_t *event = obj->event_dsc;
     int event_code = 0;
@@ -827,16 +849,11 @@ static void js_cb_with_args(gui_obj_t *obj)
     jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
                                             args->args_count);
     jerry_release_value(res);
-    jerry_value_t global_obj = jerry_get_global_object();
-    jerry_value_t app_property = js_get_property(global_obj, "app");
-    gui_app_t *app = NULL;
-    jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
-    jerry_release_value(global_obj);
-    jerry_release_value(app_property);
 }
 
 static void js_cb_with_args_animate(cb_arg_t *args)
 {
+    gui_log("enter js_cb_with_args_animate\n");
     if (args == NULL)
     {
         return;
@@ -844,12 +861,7 @@ static void js_cb_with_args_animate(cb_arg_t *args)
     jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
                                             args->args_count);
     jerry_release_value(res);
-    jerry_value_t global_obj = jerry_get_global_object();
-    jerry_value_t app_property = js_get_property(global_obj, "app");
-    gui_app_t *app = NULL;
-    jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
-    jerry_release_value(global_obj);
-    jerry_release_value(app_property);
+
 }
 
 static void js_cb_with_arg(cb_arg_t *arg)
@@ -1320,7 +1332,7 @@ DECLARE_HANDLER(onrelease_seekbar)
 }
 DECLARE_HANDLER(play_animate_seekbar)
 {
-    gui_log("enter setAnimate_seekbar\n");
+    gui_log("enter play_animate_seekbar\n");
 
     {
         gui_obj_t *obj = NULL;
@@ -1333,22 +1345,6 @@ DECLARE_HANDLER(play_animate_seekbar)
     }
 
     return jerry_create_undefined();
-}
-static void gui_seekbar_set_animate(gui_seekbar_t *o, uint32_t dur, int repeatCount, void *callback,
-                                    void *p)
-{
-    gui_animate_t *animate = ((gui_seekbar_t *)o)->animate;
-    if (!(animate))
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-    }
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
-    animate->p = p;
-    ((gui_seekbar_t *)o)->animate = animate;
 }
 DECLARE_HANDLER(setAnimate_seekbar)
 {
@@ -1376,8 +1372,8 @@ DECLARE_HANDLER(setAnimate_seekbar)
         float to = jerry_get_number_value(js_get_property(args[1], "to"));
         int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
         int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
-        gui_seekbar_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
-                                (void *)(cb_arg));
+//        gui_seekbar_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
+//                                (void *)(cb_arg));
         GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
     }
 
@@ -1404,6 +1400,7 @@ DECLARE_HANDLER(win_getAttribute)
 
 
         }
+        gui_free(a);
     }
 
     return jerry_create_undefined();
@@ -1421,9 +1418,11 @@ DECLARE_HANDLER(seekbar_getAttribute)
             jerry_value_t v = jerry_create_object();
             js_set_property(v, "progress", jerry_create_number(GUI_TYPE(gui_seekbar_t,
                                                                         obj)->animate->progress_percent));
+            gui_free(a);
             return v;
 
         }
+        gui_free(a);
     }
 
     return jerry_create_undefined();
@@ -1442,6 +1441,7 @@ DECLARE_HANDLER(seekbar_setAttribute)
             gui_progressbar_set_percentage((void *)obj, jerry_get_number_value(args[1]));
 
         }
+        gui_free(a);
     }
 
     return jerry_create_undefined();
@@ -1461,6 +1461,7 @@ DECLARE_HANDLER(win_setAttribute)
 
 
         }
+        gui_free(a);
     }
 
     return jerry_create_undefined();
@@ -1478,6 +1479,7 @@ DECLARE_HANDLER(win_removeAttribute)
             obj->not_show = false;
 
         }
+        gui_free(a);
     }
 
     return jerry_create_undefined();
@@ -1501,6 +1503,7 @@ DECLARE_HANDLER(progress)
 }
 DECLARE_HANDLER(sw_close)
 {
+    gui_log("enter sw_close\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
     sw->turn_off(sw);
@@ -1509,6 +1512,7 @@ DECLARE_HANDLER(sw_close)
 
 DECLARE_HANDLER(sw_open)
 {
+    gui_log("enter sw_open\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
     sw->turn_on(sw);
@@ -1526,15 +1530,27 @@ DECLARE_HANDLER(sw_open)
 #include "trace.h"
 #include "utils.h"
 #endif
+#ifdef RTL8762G
+#include "app_msg.h"
+T_IO_MSG led_msg = {.type = IO_MSG_TYPE_LED_ON};
+T_IO_MSG led_off_msg = {.type = IO_MSG_TYPE_LED_OFF};
+#endif
 DECLARE_HANDLER(writeSync)
 {
+    gui_log("enter writeSync:%d\n", args[0]);
     if (args_cnt >= 1 && jerry_value_is_number(args[0]))
     {
 
         int write_value = jerry_get_number_value(args[0]);
         int gpio = -1;
-        gpio = jerry_get_number_value(js_get_property(this_value, "gpio"));
-        char *direction = js_value_to_string(js_get_property(this_value, "direction"));
+        jerry_value_t v1;
+        jerry_value_t v2;
+        v1 = js_get_property(this_value, "gpio");
+        v2 = js_get_property(this_value, "direction");
+        gpio = jerry_get_number_value(v1);
+        jerry_release_value(v1);
+        char *direction = js_value_to_string(v2);
+        jerry_release_value(v2);
         int mode = 0;
 #ifdef RTL8762G
 
@@ -1549,8 +1565,53 @@ DECLARE_HANDLER(writeSync)
         if (gpio >= 0)
         {
             gui_log("gpio%d, %d, %d", gpio, mode, write_value);
-            drv_pin_mode(gpio, mode);
-            drv_pin_write(gpio, write_value);
+            //drv_pin_mode(gpio, mode);
+            //drv_pin_write(gpio, write_value);
+//extern bool app_send_msg_to_apptask(T_IO_MSG *p_msg);
+//                  if(write_value == 0){
+//                  led_msg.u.param = 0x64+gpio;
+//                  app_send_msg_to_apptask(&led_msg);}
+//                  else
+//                  {
+//                                      led_off_msg.u.param = 0x64+gpio;
+//                  app_send_msg_to_apptask(&led_off_msg);
+//                  }
+        }
+
+
+#endif
+        gui_free(direction);
+    }
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(gpioWrite)
+{
+    if (args_cnt >= 1 && jerry_value_is_number(args[0]))
+    {
+
+        int write_value = jerry_get_number_value(args[0]);
+        int gpio = -1;
+        gpio = jerry_get_number_value(args[1]);
+        int mode = 0;
+#ifdef RTL8762G
+
+
+        if (gpio >= 0)
+        {
+            gui_log("gpio%d, %d, %d", gpio, mode, write_value);
+            //drv_pin_mode(gpio, mode);
+            //drv_pin_write(gpio, write_value);
+            extern bool app_send_msg_to_apptask(T_IO_MSG * p_msg);
+            if (write_value == 0)
+            {
+                led_msg.u.param = 0x64 + gpio;
+                app_send_msg_to_apptask(&led_msg);
+            }
+            else
+            {
+                led_off_msg.u.param = 0x64 + gpio;
+                app_send_msg_to_apptask(&led_off_msg);
+            }
         }
 
 
@@ -1560,7 +1621,9 @@ DECLARE_HANDLER(writeSync)
 }
 DECLARE_HANDLER(Gpio)
 {
+    gui_log("enter GPIO\n");
     REGISTER_METHOD(this_value, writeSync);
+    //REGISTER_METHOD(this_value, gpioWrite);
     char *mode_string = "in";
     int pin = -1;
     if (args_cnt >= 1)
@@ -1652,6 +1715,14 @@ void gui_js_init()
     REGISTER_METHOD(img, scale);
     REGISTER_METHOD(img, setMode);
     REGISTER_METHOD(img, setAttribute);
+
+    jerry_value_t tab = jerry_create_object();
+    js_set_property(global_obj, "tab", tab);
+    REGISTER_METHOD(tab, getElementById);
+    REGISTER_METHOD(tab, jump);
+
+
+
 //    REGISTER_METHOD(img, setGpu);
 //    REGISTER_METHOD(img, setNogpu);
 //    REGISTER_METHOD(img, show);
@@ -1741,7 +1812,8 @@ static void *context_alloc(size_t size, void *cb_data_p)
 #ifdef OS_FREERTOS
 #ifdef RTL8762G
 #include "mem_config.h"
-    return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);//return (void *)(SPIC1_ADDR + 0x200000);
+    //return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
+    return (void *)(SPIC1_ADDR + 0x200000);
 #else
 
 #endif

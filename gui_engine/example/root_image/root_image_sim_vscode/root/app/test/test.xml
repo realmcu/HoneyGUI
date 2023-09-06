@@ -27,6 +27,10 @@
 			</tab>
 			<tab idx="2">t2
 				<textbox text="文本" ></textbox>
+<textbox text="24℃" x="73" y="339"
+            font="app/system/resource/font/gilroy_bold_20_basic_latin_fl.bin;app/system/resource/font/gilroy_bold_20_basic_latin_out.bin" fontSize="20"></textbox>
+<textbox text="87" x="300" y="339"
+            font="app/system/resource/font/simkai_size24_bits4_font.bin" fontSize="24"></textbox>
 
 			</tab>
 			<tab idx="3">t2
