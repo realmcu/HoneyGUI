@@ -33,6 +33,8 @@
     * [Template](Widgets/gui_template.md)
     * [grid](Widgets/gui_grid.md)
     * [window](Widgets/gui_window.md)
+    * [dynamic](Widgets/gui_dynamic.md)
+    * [progressbar](Widgets/gui_progressbar.md)
 * [Porting](Porting/README.md)
 * [CHANGELOG](CHANGELOG.md)
 
