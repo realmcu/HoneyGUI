@@ -217,6 +217,7 @@ gui_inline uint32_t rgb5652rgba(uint16_t rgb565)
 
     return color_blend.rgba;
 }
+
 static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t rendor_mode,
                              struct rtgui_rect *rect)
 {
@@ -433,6 +434,12 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
         else if (dc_bytes_per_pixel == 4)
         {
             uint32_t *writebuf = (uint32_t *)dc->frame_buf;
+
+#if defined(_WIN32)
+            uint32_t alpha = color & 0xff;
+            color = (color >> 8) + (alpha << 24);
+#endif
+
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -451,6 +458,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
         break;
     }
 }
+
 
 void rtgui_font_mem_draw(gui_text_t *text, struct rtgui_rect *rect)
 {
