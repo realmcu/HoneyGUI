@@ -6,7 +6,7 @@
 
 #include <guidef.h>
 #include <gui_fb.h>
-
+#include "gui_img_scope.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

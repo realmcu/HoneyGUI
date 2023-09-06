@@ -183,7 +183,7 @@ static bool tp_judge_quick_x_right_slide(struct gui_touch_data *raw_data)
         {
             if (raw_data->x_coordinate > first_record.x_coordinate)
             {
-                tp.type = TOUCH_LEFT_SLIDE;
+                tp.type = TOUCH_RIGHT_SLIDE;
                 TP_LOG("type = TOUCH_LEFT_SLIDE, %d \n", __LINE__);
                 return true;
             }
