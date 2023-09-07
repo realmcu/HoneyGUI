@@ -405,9 +405,9 @@ static void draw_cb(gui_obj_t *obj)
 
         compute_rotate(0, rryy[i], 0, &rotate_3D);
 
-        float xoff = 454 / 2;
-        float yoff = 454 / 2;
-        float zoff = -454 / 2;
+        float xoff = dc->screen_width / 2;
+        float yoff = dc->screen_height / 2;
+        float zoff = -2 * d;
 
 
         transfrom_rotate(&rotate_3D, &v0, &rv0, xoff, yoff, zoff);
@@ -415,7 +415,7 @@ static void draw_cb(gui_obj_t *obj)
         transfrom_rotate(&rotate_3D, &v2, &rv2, xoff, yoff, zoff);
         transfrom_rotate(&rotate_3D, &v3, &rv3, xoff, yoff, zoff);
 
-        Vertex_t p = {454 / 2, 0, 500};
+        Vertex_t p = {dc->screen_width / 2, 0, 2 * d};
         transfrom_blit(256, 256, &p, &rv0, &rv1, &rv2, &rv3, this->img.matrix);
 
         memcpy(this->img.inverse, this->img.matrix, sizeof(struct rtgui_matrix));
