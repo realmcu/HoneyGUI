@@ -580,7 +580,7 @@ DECLARE_HANDLER(getElementById)
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
     gui_obj_t *widget = NULL;
     char *a = js_value_to_string(args[0]);
-    gui_tree_get_widget_by_name(&app->screen, a, &widget);
+    gui_tree_get_widget_by_name(&app->screen, a, &widget); gui_log("name:%s,widget:%p\n", a, widget);
     gui_free(a);
     //gui_log("getElementById:%x\n",widget);
     jerry_set_object_native_pointer(this_value, widget, NULL);

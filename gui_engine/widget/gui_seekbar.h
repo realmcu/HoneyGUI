@@ -39,7 +39,7 @@ struct gui_seekbar
                  int16_t y,
                  int16_t w, int16_t h);
 } ;
-
+#if 0
 /**
  * @brief create a seekbar widget.
  *
@@ -57,6 +57,7 @@ gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x,
 
 gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t x, int16_t y,
                                     int16_t w, int16_t h);
+#endif
 gui_seekbar_t *gui_seekbar_create_img_v(void *parent, const char *filename, int16_t x, int16_t y
                                        );
 gui_seekbar_t *gui_seekbar_create_img_h(void *parent, const char *filename, int16_t x, int16_t y

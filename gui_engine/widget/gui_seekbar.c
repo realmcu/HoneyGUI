@@ -593,7 +593,7 @@ void gui_seekbar_h_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *file
 }
 
 
-
+#if 0
 gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h)
 {
@@ -609,6 +609,7 @@ gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x,
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
+#endif
 gui_seekbar_t *gui_seekbar_create_img_v(void *parent, const char *filename, int16_t x, int16_t y
                                        )
 {
@@ -686,6 +687,7 @@ gui_seekbar_t *gui_seekbar_create_movie_arc(void *parent, void  **picture_array,
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
+#if 0
 gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t x, int16_t y,
                                     int16_t w, int16_t h)
 {
@@ -700,3 +702,4 @@ gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t 
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
+#endif

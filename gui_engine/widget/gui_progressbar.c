@@ -169,6 +169,7 @@ void gui_progressbar_v_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void
 
 
 }
+#if 0
 /*
    gui_img_scope_t *s = gui_img_scope_create(&app->screen, gui_get_file_address("app/system/resource/back_left.bin"), 100,100);
 s->scope_x1=10;
@@ -189,6 +190,7 @@ gui_progressbar_t *gui_progressbar_create(void *parent, const char *filename, in
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
+#endif
 gui_progressbar_t *gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)
 {
 
@@ -261,6 +263,7 @@ gui_progressbar_t *gui_progressbar_movie_create(void *parent, void  **picture_ar
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
+#if 0
 gui_progressbar_t *gui_progressbar_v_create(void *parent, const char *filename, int16_t x,
                                             int16_t y,
                                             int16_t w, int16_t h)
@@ -275,7 +278,7 @@ gui_progressbar_t *gui_progressbar_v_create(void *parent, const char *filename, 
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
-
+#endif
 /*
 void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
                           int16_t x,

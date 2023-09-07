@@ -845,17 +845,19 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *ptxt = get_space_string_head(p->txt);
                     if (canvas == true)
                     {
+#if 0
                         if (vh)
                         {
-                            parent = (void *)gui_progressbar_v_create(parent, ptxt, x, y, w, h);
+                            //parent = (void *)gui_progressbar_v_create(parent, ptxt, x, y, w, h);
                         }
                         else
                         {
-                            parent = (void *)gui_progressbar_create(parent, ptxt, x, y, w, h);
+                            //parent = (void *)gui_progressbar_create(parent, ptxt, x, y, w, h);
                         }
 
                         GUI_TYPE(gui_progressbar_t, parent)->color = color;
                         GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
+#endif
                     }
                     else
                     {
@@ -868,7 +870,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             parent = (void *)gui_progressbar_img_h_create(parent, gui_get_file_address(picture), x, y);
                         }
                     }
-
+                    parent->name = ptxt;
 
 
 
@@ -993,20 +995,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *ptxt = get_space_string_head(p->txt);
                     if (canvas)
                     {
+#if 0
                         /* code */
 
 
                         if (vh)
                         {
-                            parent = (void *)gui_seekbar_create(parent, ptxt, x, y, w, h);
+                            //parent = (void *)gui_seekbar_create(parent, ptxt, x, y, w, h);
                         }
                         else
                         {
-                            parent = (void *)gui_seekbar_h_create(parent, ptxt, x, y, w, h);
+                            //parent = (void *)gui_seekbar_h_create(parent, ptxt, x, y, w, h);
                         }
 
                         GUI_TYPE(gui_progressbar_t, parent)->color = color;
                         GUI_TYPE(gui_progressbar_t, parent)->color_hl = highlightColor;
+#endif
                     }
                     else if (!folder)
                     {
@@ -1087,7 +1091,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     }
 
-                    parent->name = get_space_string_head(p->txt);
+                    parent->name = ptxt;
 
 
 

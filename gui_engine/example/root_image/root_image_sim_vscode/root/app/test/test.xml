@@ -115,13 +115,13 @@
 				<textbox text="switch开关控件" ></textbox>
 			</tab>
 			<tab idx="9">t2
-				<progressbar x="20" y="100" w="30" h="300" orientation="V" canvasOrPicture="canvas">tab9Pro1</progressbar>
-				<progressbar x="70" y="100" w="250" h="50" orientation="H" canvasOrPicture="canvas">tab9Pro2</progressbar>
+				<progressbar x="20" y="100" w="30" h="300" orientation="V" canvasOrPicture="picture" picture="app/system/resource/Progress bar_full.bin">tab9Pro1</progressbar>
+				<progressbar x="200" y="100" w="250" h="50" orientation="H" canvasOrPicture="picture" picture="app/system/resource/Progress bar_full.bin">tab9Pro2</progressbar>
 				<textbox text="progressbar进度条" ></textbox>
 			</tab>
 			<tab idx="10">t2
-				<seekbar x="20" y="100" w="30" h="300" orientation="V" canvasOrPicture="canvas">tab10Seek1</seekbar>
-				<seekbar x="70" y="100" w="250" h="50" orientation="H" canvasOrPicture="canvas">tab10Seek2</seekbar>
+				<seekbar x="20" y="100" w="30" h="300" orientation="V" canvasOrPicture="picture" picture="app/system/resource/Progress bar_full.bin" >tab10Seek1</seekbar>
+				<seekbar x="200" y="100" w="250" h="50" orientation="H" canvasOrPicture="picture" picture="app/system/resource/Progress bar_full.bin">tab10Seek2</seekbar>
 				<textbox text="tab10Seek1:30%" x="100" y="300">tab10text1</textbox>
 				<textbox text="seekbar拖动条" ></textbox>
 			</tab>
