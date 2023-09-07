@@ -280,11 +280,12 @@ static void cube_prepare(gui_obj_t *obj)
 
     gui_cube_t *this = (gui_cube_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
+    gui_obj_t *root = (gui_obj_t *)obj;
     // Scale the cube to proper size
-    float cbsize = this->cbsize;
+    float cbsize = this->cbsize * root->sx;
     // Translate the cube to the center of framebuffer.
-    float xoff = this->c_x;
-    float yoff = this->c_y;
+    float xoff = (this->c_x - dc->screen_width / 2) * root->sx + dc->screen_width / 2;
+    float yoff = (this->c_y - dc->screen_height / 2) * root->sy + dc->screen_height / 2;
 
     xoff = xoff + obj->dx;
     yoff = yoff + obj->dy;

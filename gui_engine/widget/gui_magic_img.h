@@ -19,16 +19,12 @@ typedef struct gui_magic_img
     gui_img_t base;
 
     float degrees;
-    int16_t w;
-    int16_t h;
-    float c_x;
-    float c_y;
+    float c_x;//center of image x
+    float c_y;//center of image y
     float scale_x;
     float scale_y;
-    float t_x;
-    float t_y;
-    float p_x;
-    float p_y;
+    float t_x;//center of screen x
+    float t_y;//center of screen y
     gui_animate_t *animate;
 } gui_magic_img_t;
 

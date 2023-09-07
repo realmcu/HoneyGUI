@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "gui_config.h"
 #include "gui_list.h"
 #include "gui_event.h"
@@ -462,7 +463,7 @@ typedef struct _gui_obj_t
 
     //void (* obj_cb)(struct _gui_obj_t *obj); todo
     //run time
-    obj_type_t type;
+    obj_type_t type; //no need this , only use name
     uint16_t active         : 1;    // this flag means obj location in screen
     uint16_t not_show       : 1;
     uint16_t cover          : 1;
@@ -470,6 +471,9 @@ typedef struct _gui_obj_t
     uint16_t has_animate    : 1;
     uint16_t event_dsc_cnt  : 5;
     gui_event_dsc_t *event_dsc;
+    float sx;
+    float sy;
+    unsigned char opacity_value;
 } gui_obj_t;
 
 #define GUI_RENDER_DATA     gui_dispdev_t *dc = gui_get_dc();\

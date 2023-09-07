@@ -43,10 +43,12 @@ static void obj_draw_prepare(gui_obj_t *object)
         }
         if (obj->obj_update_att != NULL)
         {
-            obj->obj_update_att(obj);
+            obj->obj_update_att(obj);//update change x, not change dx
         }
         obj->dx = obj->x + obj->parent->dx;
         obj->dy = obj->y + obj->parent->dy;
+        obj->sx = obj->parent->sx;
+        obj->sy = obj->parent->sy;
         if (obj->obj_prepare != NULL)
         {
             obj->obj_prepare(obj);
@@ -117,6 +119,8 @@ static void obj_draw_end(gui_obj_t *obj)
         }
         obj->dx = 0;
         obj->dy = 0;
+        obj->sx = 1.0f;
+        obj->sy = 1.0f;
         obj->active = false;
         obj_draw_end(obj);
     }

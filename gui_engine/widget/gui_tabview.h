@@ -22,16 +22,6 @@ typedef struct
 } gui_tab_ext_id_t;
 
 
-enum gui_tabview_style
-{
-    SLIDE_CLASSIC,
-    SLIDE_FADE,
-    SLIDE_WHEEL,
-    SLIDE_SCALE,
-    SLIDE_SCALE_FADE,
-};
-
-
 typedef struct gui_tabview
 {
     gui_obj_t base;
@@ -42,7 +32,6 @@ typedef struct gui_tabview
     int8_t tab_cnt_down;
     gui_tab_ext_id_t cur_id;
     gui_jump_t jump;
-    enum gui_tabview_style style;
 
 } gui_tabview_t;
 
@@ -59,7 +48,7 @@ typedef struct gui_tabview
  */
 gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h);
-void gui_tabview_set_style(gui_tabview_t *this, enum gui_tabview_style style);
+
 void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy);
 
 #include "gui_tab.h"

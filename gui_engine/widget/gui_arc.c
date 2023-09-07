@@ -46,9 +46,15 @@ void gui_arc_set_stroke(gui_arc_t *this, gui_color_t color, float w)
 
 static void draw_arc(gui_arc_t *this, NVGcontext *vg)
 {
+    gui_dispdev_t *dc = gui_get_dc();
     nvgBeginPath(vg);
     nvgResetTransform(vg);
     nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+
+    nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+    nvgScale(vg, this->base.sx, this->base.sy);
+    nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
+
     nvgLineCap(vg, NVG_ROUND);
     nvgArc(vg, this->cx, this->cy, this->r, this->a0, this->a1, NVG_CW);
 

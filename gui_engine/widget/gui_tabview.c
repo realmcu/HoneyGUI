@@ -11,7 +11,6 @@
 #include <tp_algo.h>
 #include <gui_tabview.h>
 #include <gui_magic_img.h>
-#include "gui_tab.h"
 #include "gui_canvas.h"
 #include "gui_curtain.h"
 #include "gui_img.h"
@@ -191,10 +190,6 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
     return this;
 }
 
-void gui_tabview_set_style(gui_tabview_t *this, enum gui_tabview_style style)
-{
-    this->style = style;
-}
 
 void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
 {

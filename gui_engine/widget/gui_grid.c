@@ -3,7 +3,10 @@
 #include "gui_list.h"
 #include "tp_algo.h"
 #include "gui_img.h"
-static void (obj_update_att)(struct _gui_obj_t *obj)
+#include "gui_canvas.h"
+#include "gui_magic_img.h"
+#include "math.h"
+static void obj_update_att(struct _gui_obj_t *obj)
 {
     GUI_RENDER_DATA
     uint32_t member_count = 0;
@@ -141,22 +144,9 @@ static void (obj_update_att)(struct _gui_obj_t *obj)
 
     }
 }
-//static float get_scale_offset_x(gui_obj_t *img, float scale_x)
-//{
-//    /**
-//     * @note (1-scale)(center-x)
-//     *
-//     */
-//    return (1.0f - scale_x) * (((float)(gui_get_screen_width() / 2)) - (float)(img->x));
-//}
 
-//static float get_scale_offset_y(gui_obj_t *img, float scale_y)
-//{
-//    return (1.0f - scale_y) * (((float)(gui_get_screen_width() / 2)) - (float)(img->y));
-//}
 
-#include "gui_canvas.h"
-#include "gui_magic_img.h"
+
 static void deal_img_in_root(gui_obj_t *object, float x, float y)
 {
     gui_list_t *node = NULL;
@@ -188,7 +178,7 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
 
 
 }
-#include "math.h"
+
 static void deal_img_in_root_3d(gui_obj_t *obj, float x, float y)
 {
     struct gui_grid *this = (void *)obj;
@@ -259,7 +249,7 @@ static void deal_img_in_root_3d(gui_obj_t *obj, float x, float y)
     {
         press_flag = true;
     }
-    gui_log("touch_y:%d\n", this->col_count);
+    //gui_log("touch_y:%d\n", this->col_count);
 
     //gui_log("touch_y:%d\n", touch_y);
     if (touch_y < -this->change_threshold && press_flag && id2 < this->col_count - 1)
@@ -295,7 +285,7 @@ static void deal_img_in_root_3d(gui_obj_t *obj, float x, float y)
         return;
     }
 
-    gui_log("idid:%f,%f\n", id, id2);
+    //gui_log("idid:%f,%f\n", id, id2);
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);

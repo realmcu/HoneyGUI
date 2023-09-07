@@ -152,7 +152,11 @@ static void colorwheel_draw_cb(gui_obj_t *obj)
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
     nvgResetTransform(vg);
-    nvgTranslate(vg, (float)obj->dx, (float)obj->dy);
+
+    nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+    nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+    nvgScale(vg, this->base.sx, this->base.sy);
+    nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
 
     drawColorwheel(vg, x, y, w, h, t);
 
