@@ -34,7 +34,7 @@ static void dynamic_prepare(gui_obj_t *obj)
 
     uint32_t cur_time_ms = gui_ms_get();
     uint8_t index = (cur_time_ms - this->init_time_ms) / this->interval_time_ms;
-    if (cur_time_ms < (this->init_time_ms + this->duration_time_ms))
+    if ((cur_time_ms < (this->init_time_ms + this->duration_time_ms)) && this->status)
     {
         void **addr = this->addr_entry;
         draw_img->data = addr[index % this->total_cnt];
@@ -98,6 +98,7 @@ void gui_dynamic_from_mem_ctor(gui_dynamic_img_t *this, gui_obj_t *parent, const
     this->interval_time_ms = interval_time_ms;
     this->duration_time_ms = duration_time_ms;
     this->init_time_ms = gui_ms_get();
+    this->status = true;
     gui_log("gui tick get = %d \n", this->init_time_ms);
 
 
@@ -115,7 +116,6 @@ gui_dynamic_img_t *gui_dynamic_create_from_mem(gui_obj_t *parent, const char *na
     gui_dynamic_img_t *dynamic = gui_malloc(sizeof(gui_dynamic_img_t));
     GUI_ASSERT(dynamic != NULL);
     memset(dynamic, 0x00, sizeof(gui_dynamic_img_t));
-
     gui_dynamic_from_mem_ctor(dynamic, (gui_obj_t *)parent, name, addr_entry, x, y, total_cnt,
                               interval_time_ms,
                               duration_time_ms);
@@ -127,4 +127,12 @@ gui_dynamic_img_t *gui_dynamic_create_from_mem(gui_obj_t *parent, const char *na
     }
     GET_BASE(dynamic)->create_done = true;
     return dynamic;
+}
+void gui_dynamic_img_stop(gui_dynamic_img_t *this)
+{
+    this->status = false;
+}
+void gui_dynamic_img_start(gui_dynamic_img_t *this)
+{
+    this->status = true;
 }

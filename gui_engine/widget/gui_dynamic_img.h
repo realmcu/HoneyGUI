@@ -21,14 +21,15 @@ typedef struct gui_dynamic_img
     uint32_t init_time_ms;
     uint32_t interval_time_ms;
     uint32_t duration_time_ms;
+    bool status;
 } gui_dynamic_img_t;
 
 gui_dynamic_img_t *gui_dynamic_create_from_mem(gui_obj_t *parent, const char *name,
                                                void *addr_entry, int16_t x, int16_t y,  uint8_t total_cnt, uint32_t interval_time_ms,
                                                uint32_t duration_time_ms);
 
-void gui_dynamic_img_stop(void);
-void gui_dynamic_img_start(void);
+void gui_dynamic_img_stop(gui_dynamic_img_t *this);
+void gui_dynamic_img_start(gui_dynamic_img_t *this);
 void gui_dynamic_img_restart(gui_dynamic_img_t *this);
 
 #ifdef __cplusplus
