@@ -170,12 +170,12 @@ static void sport_button_press_ani_cb(gui_button_t *button)
     float scale = (-0.5f * from) * per + from;
     //circle_color_tab[1] = change_opacity_of_rgba(circle_color_tab[1],
     //                                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
-    if (button->style == SLIDE_FADE || button->style == SLIDE_SCALE_FADE)
+    if (button->style == WIDGET_FADE || button->style == WIDGET_SCALE_FADE)
     {
         gui_img_set_opacity((void *)button->img,
                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
     }
-    if (button->style == SLIDE_SCALE || button->style == SLIDE_SCALE_FADE)
+    if (button->style == WIDGET_SCALE || button->style == WIDGET_SCALE_FADE)
     {
         gui_img_scale((void *)button->img, scale,  scale);
         //gui_img_translate((void *)button->img, 25.0f * (from - scale),  25.0f * (from - scale));
@@ -219,12 +219,12 @@ static void sport_button_release_ani_cb(gui_button_t *button)
 
 
     //gui_img_translate((void *)button->img, 25.0f * (1.0f - scale),  25.0f * (1.0f - scale));
-    if (button->style == SLIDE_FADE || button->style == SLIDE_SCALE_FADE)
+    if (button->style == WIDGET_FADE || button->style == WIDGET_SCALE_FADE)
     {
         gui_img_set_opacity((void *)button->img,
                             (uint8_t)(int)((alpha_to - alpha_from) * per + alpha_from));
     }
-    if (button->style == SLIDE_SCALE || button->style == SLIDE_SCALE_FADE)
+    if (button->style == WIDGET_SCALE || button->style == WIDGET_SCALE_FADE)
     {
         gui_img_scale((void *)button->img, scale,  scale);
     }
@@ -641,7 +641,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             h = atoi(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "transition"))
+                        /*else if (!strcmp(p->attr[i], "transition"))
                         {
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "normal"))
@@ -661,13 +661,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 style = SLIDE_SCALE_FADE;
                             }
 
-                        }
+                        }*/
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
-                    GUI_TYPE(gui_tabview_t, parent)->style = style;
-                    ((gui_tabview_t *)parent)->style = style;
                 }
                 break;
             case ARC:
@@ -1252,19 +1250,19 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "normal"))
                             {
-                                style = SLIDE_CLASSIC;
+                                style = WIDGET_CLASSIC;
                             }
                             else if (!strcmp(p->attr[i], "fade"))
                             {
-                                style = SLIDE_FADE;
+                                style = WIDGET_FADE;
                             }
                             else if (!strcmp(p->attr[i], "scale"))
                             {
-                                style = SLIDE_SCALE;
+                                style = WIDGET_SCALE;
                             }
                             else if (!strcmp(p->attr[i], "fadeScale"))
                             {
-                                style = SLIDE_SCALE_FADE;
+                                style = WIDGET_SCALE_FADE;
                             }
 
                         }
@@ -1511,19 +1509,19 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "normal"))
                             {
-                                style = SLIDE_CLASSIC;
+                                style = WIDGET_CLASSIC;
                             }
                             else if (!strcmp(p->attr[i], "fade"))
                             {
-                                style = SLIDE_FADE;
+                                style = WIDGET_FADE;
                             }
                             else if (!strcmp(p->attr[i], "scale"))
                             {
-                                style = SLIDE_SCALE;
+                                style = WIDGET_SCALE;
                             }
                             else if (!strcmp(p->attr[i], "fadeScale"))
                             {
-                                style = SLIDE_SCALE_FADE;
+                                style = WIDGET_SCALE_FADE;
                             }
 
                         }
@@ -1743,19 +1741,19 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "normal"))
                             {
-                                style = SLIDE_CLASSIC;
+                                style = WIDGET_CLASSIC;
                             }
                             else if (!strcmp(p->attr[i], "fade"))
                             {
-                                style = SLIDE_FADE;
+                                style = WIDGET_FADE;
                             }
                             else if (!strcmp(p->attr[i], "scale"))
                             {
-                                style = SLIDE_SCALE;
+                                style = WIDGET_SCALE;
                             }
                             else if (!strcmp(p->attr[i], "fadeScale"))
                             {
-                                style = SLIDE_SCALE_FADE;
+                                style = WIDGET_SCALE_FADE;
                             }
 
                         }

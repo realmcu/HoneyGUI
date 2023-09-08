@@ -13,6 +13,13 @@ extern "C" {
 #include "gui_win.h"
 #define BUTTON_COLOR 0xffffffff
 #define BUTTON_HLCOLOR 0x0bffff
+typedef enum gui_button_style
+{
+    WIDGET_CLASSIC,
+    WIDGET_FADE,
+    WIDGET_SCALE_FADE,
+    WIDGET_SCALE,
+} gui_button_style_t;
 typedef struct gui_button gui_button_t;
 struct gui_button
 {
