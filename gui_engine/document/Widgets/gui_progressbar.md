@@ -71,7 +71,7 @@ The code is to create a progressbaras follows.
 +  vertical style
 
 ```
-gui_progressbar_t *IMG=gui_progressbar_img_h_create(&(app->screen), picture, 0, 0);
+gui_progressbar_t *IMG=gui_progressbar_img_v_create(&(app->screen), picture, 0, 0);
 ```
 ![vertical](https://foruda.gitee.com/images/1694154259257637618/08ffb2a3_13406851.png "create_v.png")
 + horizontal style
