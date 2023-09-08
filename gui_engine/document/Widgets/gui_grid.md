@@ -1,37 +1,69 @@
+---
+description: The Grid Widget allows you to display widget set in a grid view.
+---
+
 # Grid
 
-## Overview
+### Overview <a href="#overview" id="overview"></a>
+
 The Grid Widget allows you to display widget set in a grid view.
 
+### API <a href="#api" id="api"></a>
+
+{% swagger method="get" path="" baseUrl="" summary="gui_grid_create()" %}
+{% swagger-description %}
+create a grid widget
+{% endswagger-description %}
+
+{% swagger-parameter name="parent" type="void *" in="body" required="true" %}
+the father widget the grid nested in
+{% endswagger-parameter %}
+
+{% swagger-parameter in="body" name="x" type="int" required="true" %}
+ the X-axis coordinate
+{% endswagger-parameter %}
+
+{% swagger-parameter in="body" name="y" type="int" required="true" %}
+ the Y-axis coordinate
+{% endswagger-parameter %}
+
+{% swagger-parameter in="body" name="row" type="int" required="true" %}
+Rows number
+{% endswagger-parameter %}
+
+{% swagger-parameter in="body" name="col" type="int" required="true" %}
+ Columns number
+{% endswagger-parameter %}
+
+{% swagger-parameter in="body" name="gap_col" type="int" required="true" %}
+ gap between two Columns
+{% endswagger-parameter %}
+
+{% swagger-parameter in="body" name="gap_row" type="int" required="true" %}
+gap between two Rows
+{% endswagger-parameter %}
+
+{% swagger-parameter in="body" name="return" type="gui_grid_t *" required="true" %}
+ the widget object pointer
+{% endswagger-parameter %}
+{% endswagger %}
 
 
 
+{% swagger method="get" path="" baseUrl="" summary="gui_grid_style()" %}
+{% swagger-description %}
+config grid style
+{% endswagger-description %}
 
-## API 
+{% swagger-parameter in="body" name="grid" type="gui_grid_t *" required="true" %}
+grid widget pointer
+{% endswagger-parameter %}
 
--  `gui_grid_create()` 
-        
-        create a grid widget
+{% swagger-parameter in="body" name="style" type="enum gui_grid_style" required="true" %}
+3 styles: GRID_CLASSIC/ GRID_SCALE/ GRID_3D
+{% endswagger-parameter %}
+{% endswagger %}
 
-|param  | description  |type|
-|--|--|--|
-|`parent`|the father widget the grid nested in|`void *`|
-|`x`|the X-axis coordinate|`int`|
-|`y`|the Y-axis coordinate|`int`|
-|`row`|Rows number|`int`|
-|`col`|Columns number|`int`|
-|`gap_col`|gap between two Columns|`int`|
-|`gap_row`|gap between two Rows|`int`|
-|`return`|the widget object pointer|`gui_grid_t`|
-
--  `gui_grid_style()` 
-        
-        config grid style
-
-|param  | description  |type|
-|--|--|--|
-|`grid`|grid widget pointer|`gui_grid_t *`|
-|`style`|3 styles: GRID_CLASSIC/ GRID_SCALE/ GRID_3D |`enum gui_grid_style`|
 ```c
 enum gui_grid_style
 {
@@ -43,11 +75,13 @@ enum gui_grid_style
 
 
 
-## Example
-- classic style
-  
+### Example <a href="#example" id="example"></a>
 
-![classic style](https://foruda.gitee.com/images/1693896763454036220/6c0a498b_10088396.png "grid calssic.PNG")
+
+
+* classic style
+
+<figure><img src="https://foruda.gitee.com/images/1693896763454036220/6c0a498b_10088396.png" alt=""><figcaption></figcaption></figure>
 
 ```cpp
 void page_tb_grid(void *parent)
@@ -62,10 +96,9 @@ void page_tb_grid(void *parent)
 }
 ```
 
-- scale style
-  
+* scale style
 
-[scale style video](https://drive.google.com/file/d/1JuL5OWKgfBuEiSbvaiRGtf1P5muiYE6P/view?usp=sharing)
+{% embed url="https://drive.google.com/file/d/1JuL5OWKgfBuEiSbvaiRGtf1P5muiYE6P/view?usp=sharing" %}
 
 ```cpp
 void page_tb_grid(void *parent)
@@ -80,10 +113,9 @@ void page_tb_grid(void *parent)
 }
 ```
 
-- 3D style
-  
+* 3D style
 
-[3D style video](https://drive.google.com/file/d/1bZWN2LKSXdb-HsNS3gSeXscYDeRV26B_/view?usp=sharing)
+{% embed url="https://drive.google.com/file/d/1bZWN2LKSXdb-HsNS3gSeXscYDeRV26B_/view?usp=sharing" %}
 
 ```cpp
 void page_tb_grid(void *parent)
