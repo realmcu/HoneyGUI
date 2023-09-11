@@ -80,7 +80,13 @@ gui_progressbar_t *IMG=gui_progressbar_img_v_create(&(app->screen), picture, 0, 
 gui_progressbar_t *IMG=gui_progressbar_img_h_create(&(app->screen), picture, 0, 0);
 ```
 ![horizontal](https://foruda.gitee.com/images/1694154279857524204/57d3e021_13406851.png "create_h.png")
++ movice style
 
+```
+    gui_progressbar_t *demo = gui_progressbar_movie_create(&(app->screen), frame_list,
+                                                0, 10, 10);
+```
+![frame = 1](https://foruda.gitee.com/images/1694424698504008860/40b6b21e_13406851.png "create_movice.png")
 + set percentage
 
 ```
@@ -90,7 +96,7 @@ gui_progressbar_set_percentage(IMG, 0.5);
 + get percentage
 
 ```
-int pro = gui_progressbar_get_percentage(IMG);
+float pro = gui_progressbar_get_percentage(IMG);
 ```
 + get_max progressbar
 

@@ -13,13 +13,18 @@ make dynamic frame
 |`addr_entry`|get the first address of the image storage address information|`void  *`|
 |`x`|the X-axis coordinate|`int`|
 |`y`|the Y-axis coordinate|`int`|
-|`total_cnt`|Rows number|`uint8_t `|
+|`total_cnt`|total count frame|`uint8_t `|
 |`interval_time_ms`|interval time|`uint32_t `|
 |`duration_time_ms`|duration time|`uint32_t `|
 
 ## Example
 + classic style
-[classic style video](https://drive.google.com/file/d/1SwJ_j7mVQ0GoZEVxde2xhdVdUwBDqiu3/view?usp=sharing)
+
+```
+gui_dynamic_img_t *dym = gui_dynamic_create_from_mem(&(app->screen), "demo", frame_list, 100, 100, 6, 50, 50*10000);
+```
+
+[classic style video](https://drive.google.com/file/d/1tq2wCY16waEF7jcq0R3DhCDXSg5pRSvH/view?usp=sharing)
 
 
 
