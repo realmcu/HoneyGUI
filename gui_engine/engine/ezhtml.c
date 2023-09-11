@@ -641,27 +641,27 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             h = atoi(p->attr[++i]);
                         }
-                        /*else if (!strcmp(p->attr[i], "transition"))
+                        else if (!strcmp(p->attr[i], "transition"))
                         {
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "normal"))
                             {
-                                style = SLIDE_CLASSIC;
+                                style = CLASSIC;
                             }
                             else if (!strcmp(p->attr[i], "fade"))
                             {
-                                style = SLIDE_FADE;
+                                style = FADE;
                             }
                             else if (!strcmp(p->attr[i], "scale"))
                             {
-                                style = SLIDE_SCALE;
+                                style = REDUCTION;
                             }
                             else if (!strcmp(p->attr[i], "fadeScale"))
                             {
-                                style = SLIDE_SCALE_FADE;
+                                style = REDUCTION_FADE;
                             }
 
-                        }*/
+                        }
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);

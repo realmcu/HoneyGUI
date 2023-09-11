@@ -1330,6 +1330,22 @@ DECLARE_HANDLER(onrelease_seekbar)
 
     return jerry_create_undefined();
 }
+static void gui_seekbar_set_animate(gui_seekbar_t *o, uint32_t dur, int repeatCount, void *callback,
+                                    void *p)
+{
+    gui_animate_t *animate = ((gui_seekbar_t *)o)->animate;
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *))callback;
+    animate->repeatCount = repeatCount;
+    animate->p = p;
+    ((gui_seekbar_t *)o)->animate = animate;
+}
 DECLARE_HANDLER(play_animate_seekbar)
 {
     gui_log("enter play_animate_seekbar\n");
@@ -1338,10 +1354,10 @@ DECLARE_HANDLER(play_animate_seekbar)
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
         //js_add_event_listener(this_value, "onclick", args[0]);
-        //GUI_TYPE(gui_seekbar_t, obj)->animate->animate = true;
-        //GUI_TYPE(gui_seekbar_t, obj)->animate->current_frame = 0;
-        //GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent = 0;
-        //GUI_TYPE(gui_seekbar_t, obj)->animate->current_repeat_count = 0;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = true;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->current_frame = 0;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent = 0;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->current_repeat_count = 0;
     }
 
     return jerry_create_undefined();
@@ -1372,9 +1388,9 @@ DECLARE_HANDLER(setAnimate_seekbar)
         float to = jerry_get_number_value(js_get_property(args[1], "to"));
         int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
         int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
-//        gui_seekbar_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
-//                                (void *)(cb_arg));
-//        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
+        gui_seekbar_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
+                                (void *)(cb_arg));
+        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
     }
 
     return jerry_create_undefined();
