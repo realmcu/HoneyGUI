@@ -1338,10 +1338,10 @@ DECLARE_HANDLER(play_animate_seekbar)
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
         //js_add_event_listener(this_value, "onclick", args[0]);
-        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = true;
-        GUI_TYPE(gui_seekbar_t, obj)->animate->current_frame = 0;
-        GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent = 0;
-        GUI_TYPE(gui_seekbar_t, obj)->animate->current_repeat_count = 0;
+        //GUI_TYPE(gui_seekbar_t, obj)->animate->animate = true;
+        //GUI_TYPE(gui_seekbar_t, obj)->animate->current_frame = 0;
+        //GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent = 0;
+        //GUI_TYPE(gui_seekbar_t, obj)->animate->current_repeat_count = 0;
     }
 
     return jerry_create_undefined();
@@ -1374,7 +1374,7 @@ DECLARE_HANDLER(setAnimate_seekbar)
         int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
 //        gui_seekbar_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
 //                                (void *)(cb_arg));
-        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
+//        GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
     }
 
     return jerry_create_undefined();
@@ -1519,21 +1519,21 @@ DECLARE_HANDLER(sw_open)
     return jerry_create_undefined();
 }
 #ifdef RTL8762G
-#include "rtl_gpio.h"
-#include "rtl_rcc.h"
-#include "drv_gpio.h"
-#include "drv_i2c.h"
-#include "drv_touch.h"
-#include "drv_lcd.h"
-#include "touch_gt911.h"
-#include "string.h"
-#include "trace.h"
-#include "utils.h"
-#endif
-#ifdef RTL8762G
-#include "app_msg.h"
-T_IO_MSG led_msg = {.type = IO_MSG_TYPE_LED_ON};
-T_IO_MSG led_off_msg = {.type = IO_MSG_TYPE_LED_OFF};
+//#include "rtl_gpio.h"
+//#include "rtl_rcc.h"
+//#include "drv_gpio.h"
+//#include "drv_i2c.h"
+//#include "drv_touch.h"
+//#include "drv_lcd.h"
+//#include "touch_gt911.h"
+//#include "string.h"
+//#include "trace.h"
+//#include "utils.h"
+//#endif
+//#ifdef RTL8762G
+//#include "app_msg.h"
+//T_IO_MSG led_msg = {.type = IO_MSG_TYPE_LED_ON};
+//T_IO_MSG led_off_msg = {.type = IO_MSG_TYPE_LED_OFF};
 #endif
 DECLARE_HANDLER(writeSync)
 {
@@ -1554,14 +1554,14 @@ DECLARE_HANDLER(writeSync)
         int mode = 0;
 #ifdef RTL8762G
 
-        if (!strcmp(direction, "out"))
-        {
-            mode = PIN_MODE_OUTPUT;
-        }
-        else if (!strcmp(direction, "in"))
-        {
-            mode = PIN_MODE_INPUT;
-        }
+        //if (!strcmp(direction, "out"))
+        //{
+        //    mode = PIN_MODE_OUTPUT;
+        //}
+        //else if (!strcmp(direction, "in"))
+        //{
+        //    mode = PIN_MODE_INPUT;
+        //}
         if (gpio >= 0)
         {
             gui_log("gpio%d, %d, %d", gpio, mode, write_value);
@@ -1584,41 +1584,7 @@ DECLARE_HANDLER(writeSync)
     }
     return jerry_create_undefined();
 }
-DECLARE_HANDLER(gpioWrite)
-{
-    if (args_cnt >= 1 && jerry_value_is_number(args[0]))
-    {
 
-        int write_value = jerry_get_number_value(args[0]);
-        int gpio = -1;
-        gpio = jerry_get_number_value(args[1]);
-        int mode = 0;
-#ifdef RTL8762G
-
-
-        if (gpio >= 0)
-        {
-            gui_log("gpio%d, %d, %d", gpio, mode, write_value);
-            //drv_pin_mode(gpio, mode);
-            //drv_pin_write(gpio, write_value);
-            extern bool app_send_msg_to_apptask(T_IO_MSG * p_msg);
-            if (write_value == 0)
-            {
-                led_msg.u.param = 0x64 + gpio;
-                app_send_msg_to_apptask(&led_msg);
-            }
-            else
-            {
-                led_off_msg.u.param = 0x64 + gpio;
-                app_send_msg_to_apptask(&led_off_msg);
-            }
-        }
-
-
-#endif
-    }
-    return jerry_create_undefined();
-}
 DECLARE_HANDLER(Gpio)
 {
     gui_log("enter GPIO\n");
@@ -1812,8 +1778,8 @@ static void *context_alloc(size_t size, void *cb_data_p)
 #ifdef OS_FREERTOS
 #ifdef RTL8762G
 #include "mem_config.h"
-    //return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
     return (void *)(SPIC1_ADDR + 0x200000);
+    //return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);//
 #else
 
 #endif

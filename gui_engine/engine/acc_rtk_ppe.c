@@ -150,9 +150,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                         source.address = (uint32_t)source.memory;
                         source.width = range.end_column - range.start_column + 1;
                         dma_cfg.output_buf = (uint32_t *)source.memory;
-                        dma_cfg.RX_DMA_channel_num = 2;
+                        dma_cfg.RX_DMA_channel_num = 3;
                         dma_cfg.TX_DMA_channel_num = 1;
-                        dma_cfg.RX_DMA_channel = GDMA_Channel2;
+                        dma_cfg.RX_DMA_channel = GDMA_Channel3;
                         dma_cfg.TX_DMA_channel = GDMA_Channel1;
                         trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
                         RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
@@ -285,9 +285,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                                                (header->algorithm_type.pixel_bytes + 2));
                     source.address = (uint32_t)source.memory;
                     dma_cfg.output_buf = (uint32_t *)source.memory;
-                    dma_cfg.RX_DMA_channel_num = 2;
+                    dma_cfg.RX_DMA_channel_num = 3;
                     dma_cfg.TX_DMA_channel_num = 1;
-                    dma_cfg.RX_DMA_channel = GDMA_Channel2;
+                    dma_cfg.RX_DMA_channel = GDMA_Channel3;
                     dma_cfg.TX_DMA_channel = GDMA_Channel1;
                     RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
 //                    DBG_DIRECT("RTZIP res %d, line %d to %d", err, range.start_line, range.end_line);
@@ -362,9 +362,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     source.address = (uint32_t)source.memory;
                     source.width = range.end_column - range.start_column + 1;
                     dma_cfg.output_buf = (uint32_t *)source.memory;
-                    dma_cfg.RX_DMA_channel_num = 2;
+                    dma_cfg.RX_DMA_channel_num = 3;
                     dma_cfg.TX_DMA_channel_num = 1;
-                    dma_cfg.RX_DMA_channel = GDMA_Channel2;
+                    dma_cfg.RX_DMA_channel = GDMA_Channel3;
                     dma_cfg.TX_DMA_channel = GDMA_Channel1;
                     trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
                     RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
@@ -440,9 +440,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             source.address = (uint32_t)source.memory;
             source.width = range.end_column - range.start_column + 1;
             dma_cfg.output_buf = (uint32_t *)source.memory;
-            dma_cfg.RX_DMA_channel_num = 2;
+            dma_cfg.RX_DMA_channel_num = 3;
             dma_cfg.TX_DMA_channel_num = 1;
-            dma_cfg.RX_DMA_channel = GDMA_Channel2;
+            dma_cfg.RX_DMA_channel = GDMA_Channel3;
             dma_cfg.TX_DMA_channel = GDMA_Channel1;
             trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
             RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
