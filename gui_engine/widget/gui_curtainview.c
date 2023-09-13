@@ -21,6 +21,22 @@ void curtainvie_update_att(gui_obj_t *obj)
         obj->cover = false;
         return;
     }
+    gui_curtain_t *c_middle = NULL;
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == CURTAIN)
+        {
+            gui_curtain_t *c = (void *)obj;
+            if (c->orientation == CURTAIN_MIDDLE)
+            {
+                c_middle = c;
+                break;
+            }
+        }
+    }
     switch (ext->cur_curtain)
     {
     case CURTAIN_MIDDLE:
@@ -40,11 +56,13 @@ void curtainvie_update_att(gui_obj_t *obj)
             {
                 ext->cur_curtain = CURTAIN_DOWN;
                 obj->y = 0;
+                ext->down_flag = true;
             }
             else if (obj->y > (int)gui_get_screen_height() * ext->scopeup * 0.5f)
             {
                 ext->cur_curtain = CURTAIN_UP;
                 obj->y = 0;
+                ext->down_flag = true;
             }
         }
         else if ((tp->type == TOUCH_HOLD_X))
@@ -77,17 +95,46 @@ void curtainvie_update_att(gui_obj_t *obj)
         break;
     case CURTAIN_UP:
         obj->cover = true;
+        if (ext->down_flag)
+        {
+            GET_BASE(c_middle)->not_show = true;
+            if (obj->y > 100)
+            {
+                ext->spring_flag = true;
+            }
+            if (ext->spring_flag)
+            {
+                ext->spring_value--;
+                obj->y += ext->spring_value;
+                if (obj->y < 0)
+                {
+                    ext->down_flag = false;
+                    ext->spring_flag = false;
+                    ext->spring_value = 0;
+                    GET_BASE(c_middle)->not_show = false;
+                }
+
+            }
+            else
+            {
+                ext->spring_value++;
+                obj->y += ext->spring_value;
+            }
+
+
+            break;
+        }
         if ((tp->type == TOUCH_HOLD_Y))
         {
             if (tp->deltaY < 0)
             {
                 obj->y = tp->deltaY;
             }
-            if (obj->y < -(int)gui_get_screen_height() * ext->scopeup * 0.5f)
-            {
-                ext->cur_curtain = CURTAIN_MIDDLE;
-                obj->y = 0;
-            }
+            //if (obj->y < -(int)gui_get_screen_height() * ext->scopeup * 0.5f)
+            //{
+            //    ext->cur_curtain = CURTAIN_MIDDLE;gui_log("CURTAIN_MIDDLE:%d\n",obj->y );
+            //    obj->y = 0;
+            //}
         }
         else if (tp->type == TOUCH_DOWN_SLIDE)
         {
@@ -102,6 +149,37 @@ void curtainvie_update_att(gui_obj_t *obj)
         break;
     case CURTAIN_DOWN:
         obj->cover = true;
+
+        if (ext->down_flag)
+        {
+            GET_BASE(c_middle)->not_show = true;
+            if (obj->y < -100)
+            {
+                ext->spring_flag = true;
+            }
+            if (ext->spring_flag)
+            {
+                ext->spring_value++;
+                obj->y += ext->spring_value;
+                if (obj->y > 0)
+                {
+                    ext->down_flag = false;
+                    ext->spring_flag = false;
+                    ext->spring_value = 0;
+                    GET_BASE(c_middle)->not_show = false;
+                }
+
+            }
+            else
+            {
+                ext->spring_value--;
+                obj->y += ext->spring_value;
+            }
+
+
+            break;
+        }
+
         if ((tp->type == TOUCH_HOLD_Y))
         {
             if (tp->deltaY > 0)
