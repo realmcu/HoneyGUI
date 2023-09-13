@@ -39,7 +39,7 @@ typedef struct gui_perspective
     draw_img_t draw_img_down;
     draw_img_t draw_img_left;
     draw_img_t draw_img_right;
-    draw_img_t img;
+    draw_img_t img[6];
     float c_x;
     float c_y;
     float cbsize;
