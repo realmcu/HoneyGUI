@@ -91,6 +91,8 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgResetTransform(vg);
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+        nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+        nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
         nvgScale(vg, this->base.sx, this->base.sy);
 
@@ -153,6 +155,8 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         float y = 260;
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+        nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+        nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
 
         nvgRotate(vg, M_PI * (d / 60.0f));
@@ -177,6 +181,8 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         float y = 210;
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+        nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+        nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
         nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
         nvgScale(vg, this->base.sx, this->base.sy);
@@ -200,6 +206,8 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         float y = 180;
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+        nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+        nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
 
         nvgRotate(vg, M_PI * (d));
@@ -216,6 +224,8 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         //for center point
         nvgResetTransform(vg);
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+        nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+        nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
         nvgBeginPath(vg);
         nvgCircle(vg, 0, 0, 10);

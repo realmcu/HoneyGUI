@@ -40,6 +40,11 @@ gui_svg_t *gui_svg_create_from_file(void *parent,  const char *name, const char 
 gui_svg_t *gui_svg_create_from_mem(void *parent,  const char *name, uint8_t *addr, uint32_t size,
                                    int16_t x, int16_t y, int16_t w, int16_t h);
 
+void gui_svg_rotation(gui_svg_t *svg, float degrees, float c_x, float c_y);
+void gui_svg_scale(gui_svg_t *svg, float scale_x, float scale_y);
+void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y);
+void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value);
+
 #ifdef __cplusplus
 }
 #endif

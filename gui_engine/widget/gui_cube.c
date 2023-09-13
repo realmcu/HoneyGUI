@@ -287,8 +287,8 @@ static void cube_prepare(gui_obj_t *obj)
     float xoff = (this->c_x - dc->screen_width / 2) * root->sx + dc->screen_width / 2;
     float yoff = (this->c_y - dc->screen_height / 2) * root->sy + dc->screen_height / 2;
 
-    xoff = xoff + obj->dx;
-    yoff = yoff + obj->dy;
+    xoff = xoff + obj->dx + obj->ax + obj->tx;
+    yoff = yoff + obj->dy + obj->ay + obj->ty;
 
 
 

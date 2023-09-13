@@ -11,5 +11,6 @@ void page_tb_svg(void *parent)
     // "./example/root_image/root_image_sim_vscode/root/svg/activity.svg", 200, 200, 454, 454);
 
     gui_svg_t *svg_mem = gui_svg_create_from_mem(parent, "test_svg_widget", (uint8_t *)_acactivity,
-                                                 sizeof(_acactivity), 200, 200, 454, 454);
+                                                 sizeof(_acactivity), 0, 0, 454, 454);
+    gui_svg_scale(svg_mem, 5.0f, 5.0f);
 }

@@ -14,12 +14,23 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef enum gui_tab_style
+{
+    CLASSIC,
+    REDUCTION,
+    FADE,
+    REDUCTION_FADE,
+    STACKING,
+} SLIDE_STYLE;
+
 /*Data of tab*/
 typedef struct
 {
     int32_t x;
     int32_t y;
-} gui_tab_ext_id_t;
+    int32_t z;
+} gui_tabview_tab_id_t;
 
 
 typedef struct gui_tabview
@@ -30,8 +41,9 @@ typedef struct gui_tabview
     int8_t tab_cnt_right;
     int8_t tab_cnt_up;
     int8_t tab_cnt_down;
-    gui_tab_ext_id_t cur_id;
+    gui_tabview_tab_id_t cur_id;
     gui_jump_t jump;
+    SLIDE_STYLE style;
 
 } gui_tabview_t;
 
@@ -50,6 +62,8 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
                                   int16_t w, int16_t h);
 
 void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy);
+
+void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style);
 
 #include "gui_tab.h"
 

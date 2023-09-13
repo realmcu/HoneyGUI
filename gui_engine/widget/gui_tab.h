@@ -11,24 +11,24 @@ extern "C" {
 #endif
 #include <guidef.h>
 #include <gui_fb.h>
-/**********************
- *      TYPEDEFS
- **********************/
-/*Data of tab*/
 #include "gui_tabview.h"
 
-typedef enum gui_tab_style
+
+
+typedef struct _gui_tab_stacking_t
 {
-    CLASSIC,
-    REDUCTION,
-    FADE,
-    REDUCTION_FADE,
-} SLIDE_STYLE;
+    float scale;
+    float location;
+    uint8_t opacity;
+} gui_tab_stacking_t;
+
+
+
 
 typedef struct gui_tab
 {
     gui_obj_t base;
-    gui_tab_ext_id_t id;
+    gui_tabview_tab_id_t id;
     SLIDE_STYLE style;
 } gui_tab_t;
 
@@ -50,6 +50,9 @@ gui_tab_t *gui_tab_create(void *parent, const char *filename, int16_t x, int16_t
 
 void gui_tab_set_style(gui_tab_t *this, SLIDE_STYLE style);
 
+
+static void gui_tab_get_stacking_location(gui_tab_stacking_t *result, gui_tab_stacking_t *start,
+                                          gui_tab_stacking_t *end, float step);
 
 #ifdef __cplusplus
 }

@@ -380,6 +380,7 @@ typedef enum obj_type
     JAVASCRIPT,
     MOVIE,
     IMAGE_SCOPE,
+    INTELLIGENT_STACKING,
 } obj_type_t;
 typedef struct rtgui_msg
 {
@@ -445,8 +446,7 @@ typedef struct _gui_obj_t
 {
     const char *name;
     struct _gui_obj_t *parent;//point to father obj
-    int16_t dx;
-    int16_t dy;
+
     int16_t x;
     int16_t y;
     int16_t w;
@@ -471,8 +471,15 @@ typedef struct _gui_obj_t
     uint16_t has_animate    : 1;
     uint16_t event_dsc_cnt  : 5;
     gui_event_dsc_t *event_dsc;
+    int16_t dx;//for touch
+    int16_t dy;//for touch
+    int16_t ax;//absolute value
+    int16_t ay;//absolute value
     float sx;
     float sy;
+    int16_t tx;
+    int16_t ty;
+
     unsigned char opacity_value;
 } gui_obj_t;
 

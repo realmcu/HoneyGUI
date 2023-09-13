@@ -17,12 +17,25 @@
 #include "gui_matrix.h"
 
 
+static void gui_tab_get_stacking_location(gui_tab_stacking_t *result, gui_tab_stacking_t *start,
+                                          gui_tab_stacking_t *end, float percent)
+{
+    result->scale = start->scale + (end->scale - start->scale) * percent;
+    result->location = start->location + (end->location - start->location) * percent;
+    result->opacity = start->opacity + (end->opacity - start->opacity) * percent;
+}
+
 
 static void tab_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     if (this->style == CLASSIC)
     {
+        obj->tx = (this->id.x - parent->cur_id.x) * (int)gui_get_screen_width();
+        obj->ty = (this->id.y - parent->cur_id.y) * (int)gui_get_screen_height();
         return;
     }
     else if (this->style == FADE)
@@ -55,43 +68,66 @@ static void tab_prepare(gui_obj_t *obj)
     }
     else if (this->style == REDUCTION)
     {
-        float x = 1.0f - (float)abs(obj->dx) / gui_get_screen_width();
-        if (x < 0.2f)
+        float s;
+        obj->tx = (this->id.x - parent->cur_id.x) * (int)gui_get_screen_width();
+        obj->ty = (this->id.y - parent->cur_id.y) * (int)gui_get_screen_height();
+        int sx = abs(obj->dx + obj->ax + obj->tx);
+        sx = sx % gui_get_screen_width();
+        s = 1.0f - (float)sx / gui_get_screen_width();
+
+        if (s < 0.2f)
         {
-            x = 0.2f;
+            s = 0.2f;
         }
-        if (x >= 1.0f)
+        if (s >= 1.0f)
         {
-            x = 1.0f;
+            s = 1.0f;
         }
-        obj->sx = x;
-        obj->sy = x;
+        obj->sx = s;
+        obj->sy = s;
+
     }
+    else if (this->style == STACKING)
+    {
+        // scale 0.5f ~ 0.5f, 10 ~ 10, opa, 0~255
+        // scale 0.5f ~ 0.8f, 10 ~ 1/4h, opa, 255
+        // scale 0.8f ~ 0.9f, 1/4h ~ 3/4h, opa, 255
+        // scale 0.9f ~ 0.9f, 3/4h ~ h, opa, 255
+
+        float h = gui_get_screen_height();
+
+        float scale[5] = {0.5f, 0.5f, 0.8f, 0.9f, 0.9f};
+        uint8_t opacity[5] = {0, 255, 255, 255, 255};
+        float location[5] = {5, 5, h / 4, h * 3 / 4, h};
+
+        float percent = 0.5f;
+        if (tp->type == TOUCH_HOLD_Y)
+        {
+            percent += (float)tp->deltaY / gui_get_screen_width();
+        }
 
 
+        int32_t i = this->id.z - parent->cur_id.y + 1; //parent->cur_id.y
+        if ((i >= 0) && (i < 3))
+        {
+            gui_tab_stacking_t result;
+            gui_tab_stacking_t start = {.location = location[i],          .scale = scale[i],      .opacity = opacity[i]};
+            gui_tab_stacking_t end =   {.location = location[i + 1],      .scale = scale[i + 1],  .opacity = opacity[i + 1]};
+            gui_tab_get_stacking_location(&result, &start, &end, percent);
+            obj->tx = 0;
+            obj->ty = (int16_t)(h * (result.scale - 1.0f) / 2 + result.location);
+            obj->sx = result.scale;
+            obj->sy = result.scale;
+            obj->dy = obj->dy - parent->base.dy;
+        }
+        else
+        {
+            obj->tx = 100 * gui_get_screen_width(); //for out of range
+        }
+    }
 }
 
-static void tab_update_att(gui_obj_t *obj)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
-    gui_tab_t *this = (gui_tab_t *)obj;
-    if (obj->parent->type == TABVIEW)
-    {
-        gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
-        obj->x = (this->id.x - parent->cur_id.x) * (int)gui_get_screen_width();
-        obj->y = (this->id.y - parent->cur_id.y) * (int)gui_get_screen_height();
-    }
-    else if (obj->parent->type == CURTAINVIEW)
-    {
 
-    }
-    else
-    {
-
-    }
-
-}
 
 void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int16_t x, int16_t y,
                   int16_t w, int16_t h, int16_t idx, int16_t idy)
@@ -99,32 +135,31 @@ void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int1
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_update_att = tab_update_att;
+    GET_BASE(this)->obj_update_att = NULL;
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->type = TAB;
-    this->style = REDUCTION;
-    if (parent != NULL)
+
+    gui_tabview_t *parent_ext = (gui_tabview_t *)parent;
+    this->style = parent_ext->style;
+    this->id.x = idx;
+    this->id.y = idy;
+    this->id.z = idy;
+    parent_ext->tab_cnt++;
+    if (idx > 0)
     {
-        gui_tabview_t *parent_ext = (gui_tabview_t *)parent;
-        this->id.x = idx;
-        this->id.y = idy;
-        parent_ext->tab_cnt++;
-        if (idx > 0)
-        {
-            parent_ext->tab_cnt_right++;
-        }
-        else if (idx < 0)
-        {
-            parent_ext->tab_cnt_left--;
-        }
-        if (idy > 0)
-        {
-            parent_ext->tab_cnt_down++;
-        }
-        else if (idy < 0)
-        {
-            parent_ext->tab_cnt_up--;
-        }
+        parent_ext->tab_cnt_right++;
+    }
+    else if (idx < 0)
+    {
+        parent_ext->tab_cnt_left--;
+    }
+    if (idy > 0)
+    {
+        parent_ext->tab_cnt_down++;
+    }
+    else if (idy < 0)
+    {
+        parent_ext->tab_cnt_up--;
     }
 
 }

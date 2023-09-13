@@ -39,12 +39,16 @@ void tabview_prepare(gui_obj_t *obj)
     cover = cover1 || cover2;
     gui_tree_get_cover(obj, SEEKBAR, &cover1);
     cover = cover1 || cover;
-    //gui_log("cover = %d\n", cover);
-    //gui_log("outer cover=%d,cur_id.x=%d,cur_id.y=%d\n", cover, ext->cur_id.x, ext->cur_id.y);
+
     if (cover && tabview->cur_id.x == 0)
     {
         return;
     }
+    if (cover && tabview->cur_id.y == 0)
+    {
+        return;
+    }
+
     if (tabview->cur_id.x != 0)
     {
         if (tp->type == TOUCH_HOLD_Y || tp->type == TOUCH_DOWN_SLIDE || tp->type == TOUCH_UP_SLIDE)
@@ -59,7 +63,7 @@ void tabview_prepare(gui_obj_t *obj)
             return;
         }
     }
-    //gui_log("tp->type = %d\n", tp->type);
+
     switch (tp->type)
     {
     case TOUCH_HOLD_X:
@@ -165,22 +169,20 @@ void tabview_prepare(gui_obj_t *obj)
     }
 }
 
-
-void gui_tabview_ctor(gui_tabview_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                      int16_t y,
-                      int16_t w, int16_t h)
+void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
 {
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
-    GET_BASE(this)->obj_prepare = tabview_prepare;
-    GET_BASE(this)->type = TABVIEW;
+    this->style = style;
 }
+
 
 gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h)
 {
     gui_tabview_t *this = gui_malloc(sizeof(gui_tabview_t));
     memset(this, 0, sizeof(gui_tabview_t));
-    gui_tabview_ctor(this, parent, filename, x, y, w, h);
+    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+    GET_BASE(this)->obj_prepare = tabview_prepare;
+    GET_BASE(this)->type = TABVIEW;
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
     {

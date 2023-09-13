@@ -179,13 +179,23 @@ static void svg_draw_cb(gui_obj_t *obj)
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
     nvgResetTransform(vg);
-    nvgTranslate(vg, (float)obj->dx, (float)obj->dy);
+    nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+    nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+    nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
+
+    nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+    nvgScale(vg, this->base.sx, this->base.sy);
+    nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
+
+    nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+    nvgScale(vg, this->base.sx, this->base.sy);
+    nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
+
     nvgTranslate(vg, this->t_x, this->t_y);
-    nvgTranslate(vg, (float)this->c_x, (float)this->c_y);
     nvgRotate(vg, nvgDegToRad(this->degrees));
+    nvgScale(vg, this->scale_x, this->scale_y);
     nvgTranslate(vg, -(float)this->c_x, -(float)this->c_y);
 
-    nvgScale(vg, this->scale_x, this->scale_y);
 
 
 
@@ -227,6 +237,27 @@ static void svg_destory(gui_obj_t *obj)
 
 }
 
+void gui_svg_rotation(gui_svg_t *svg, float degrees, float c_x, float c_y)
+{
+    svg->degrees = degrees;
+    svg->c_x = c_x;
+    svg->c_y = c_y;
+}
+
+void gui_svg_scale(gui_svg_t *svg, float scale_x, float scale_y)
+{
+    svg->scale_x = scale_x;
+    svg->scale_y = scale_y;
+}
+void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y)
+{
+    svg->t_x = t_x;
+    svg->t_y = t_y;
+}
+void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value)
+{
+
+}
 
 gui_svg_t *gui_svg_create_from_mem(void *parent,  const char *name, uint8_t *addr, uint32_t size,
                                    int16_t x, int16_t y, int16_t w, int16_t h)

@@ -13,13 +13,17 @@
 
 static void obj_is_active(gui_obj_t *obj)
 {
-    if ((obj->dx < (int)gui_get_screen_width()) && (((obj->dx + obj->w) > 0) || obj->dx == 0) && \
-        (obj->dy < (int)gui_get_screen_height()) && (((obj->dy + obj->h) > 0) || obj->dy == 0))
+
+    int sx = obj->dx + obj->ax + obj->tx;
+    int sy = obj->dy + obj->ay + obj->ty;
+    int ex = sx + obj->w;
+    int ey = sy + obj->h;
+
+
+    if ((sx < (int)gui_get_screen_width()) && ((ex > 0) || sx == 0) && \
+        (sy < (int)gui_get_screen_height()) && ((ey > 0) || sy == 0))
     {
-        //if (obj->obj_draw != NULL)
-        {
-            obj->active = true;
-        }
+        obj->active = true;
     }
 }
 
@@ -45,13 +49,21 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             obj->obj_update_att(obj);//update change x, not change dx
         }
-        obj->dx = obj->x + obj->parent->dx;
-        obj->dy = obj->y + obj->parent->dy;
-        obj->sx = obj->parent->sx;
-        obj->sy = obj->parent->sy;
+        obj->dx += obj->parent->dx;
+        obj->dy += obj->parent->dy;
+        obj->ax = obj->x + obj->parent->ax;
+        obj->ay = obj->y + obj->parent->ay;
+        obj->sx *= obj->parent->sx;
+        obj->sy *= obj->parent->sy;
+        obj->tx += obj->parent->tx;
+        obj->ty += obj->parent->ty;
         if (obj->obj_prepare != NULL)
         {
             obj->obj_prepare(obj);
+        }
+        if (obj->not_show)
+        {
+            continue;
         }
         obj_is_active(obj);
         obj_draw_prepare(obj);
@@ -69,11 +81,6 @@ static void obj_draw_scan(gui_obj_t *obj)
         {
             dc->section.y1 = dc->section_count * dc->fb_height;
             dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height, dc->screen_height);
-            // rtgui_rect_t draw_rect = {0};
-            // draw_rect.x1 = obj->dx;
-            // draw_rect.y1 = obj->dy;
-            // draw_rect.x2 = draw_rect.x1 + obj->w;
-            // draw_rect.y2 = draw_rect.y1 + obj->h;
             if (obj->obj_draw != NULL)
             {
                 obj->obj_draw(obj);
@@ -119,6 +126,10 @@ static void obj_draw_end(gui_obj_t *obj)
         }
         obj->dx = 0;
         obj->dy = 0;
+        obj->ax = 0;
+        obj->ay = 0;
+        obj->tx = 0;
+        obj->ty = 0;
         obj->sx = 1.0f;
         obj->sy = 1.0f;
         obj->active = false;
