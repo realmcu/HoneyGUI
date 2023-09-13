@@ -120,6 +120,8 @@ void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *
 
     obj->dx = (int16_t)x_min;
     obj->dy = (int16_t)y_min;
+    draw_img->img_x = (int16_t)x_min;
+    draw_img->img_y = (int16_t)y_min;
     obj->w = (int16_t)x_max - (int16_t)x_min;
     obj->h = (int16_t)y_max - (int16_t)y_min;
     draw_img->target_w = obj->w;

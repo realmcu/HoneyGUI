@@ -16,9 +16,53 @@
 static struct rtgui_matrix rotate_3D;
 static Vertex_t rv0, rv1, rv2, rv3;
 
+#define USE_FIX_SIN 1
+#if USE_FIX_SIN
+static const int16_t sin_table[] =
+{
+    0,     572,   1144,  1715,  2286,  2856,  3425,  3993,  4560,  5126,  5690,  6252,  6813,  7371,  7927,  8481,
+    9032,  9580,  10126, 10668, 11207, 11743, 12275, 12803, 13328, 13848, 14364, 14876, 15383, 15886, 16383, 16876,
+    17364, 17846, 18323, 18794, 19260, 19720, 20173, 20621, 21062, 21497, 21925, 22347, 22762, 23170, 23571, 23964,
+    24351, 24730, 25101, 25465, 25821, 26169, 26509, 26841, 27165, 27481, 27788, 28087, 28377, 28659, 28932, 29196,
+    29451, 29697, 29934, 30162, 30381, 30591, 30791, 30982, 31163, 31335, 31498, 31650, 31794, 31927, 32051, 32165,
+    32269, 32364, 32448, 32523, 32587, 32642, 32687, 32722, 32747, 32762, 32767
+};
 
+static float fix_sin(int angle)
+{
+    int16_t ret = 0;
+    angle       = angle % 360;
 
+    if (angle < 0) { angle = 360 + angle; }
 
+    if (angle < 90)
+    {
+        ret = sin_table[angle];
+    }
+    else if (angle >= 90 && angle < 180)
+    {
+        angle = 180 - angle;
+        ret   = sin_table[angle];
+    }
+    else if (angle >= 180 && angle < 270)
+    {
+        angle = angle - 180;
+        ret   = -sin_table[angle];
+    }
+    else     /*angle >=270*/
+    {
+        angle = 360 - angle;
+        ret   = -sin_table[angle];
+    }
+
+    return ret / 32767.0f;
+}
+
+static inline float fix_cos(int angle)
+{
+    return fix_sin(angle + 90);
+}
+#endif
 
 /* Calculates coefficients of perspective transformation
 * which maps (xi,yi) to (ui,vi), (i=1,2,3,4):
@@ -159,6 +203,22 @@ static void compute_rotate(float rx, float ry, float rz, struct rtgui_matrix *ro
     // Rotation angles rx, ry, rz (degree) for axis X, Y, Z
     // Compute 3D rotation matrix base on rotation angle rx, ry, rz about axis X, Y, Z.
     //
+#if USE_FIX_SIN
+    int frz = round(rz), frx = round(rx), fry = round(ry);
+    rotate->m[0][0] = fix_cos((int)(frz)) * fix_cos((int)(fry));
+    rotate->m[0][1] = fix_cos((int)(frz)) * fix_sin((int)(fry)) * fix_sin((int)(frx)) - fix_sin((int)(
+                          frz)) * fix_cos((int)(frx));
+    rotate->m[0][2] = fix_cos((int)(frz)) * fix_sin((int)(fry)) * fix_cos((int)(frx)) + fix_sin((int)(
+                          frz)) * fix_sin((int)(frx));
+    rotate->m[1][0] = fix_sin((int)(frz)) * fix_cos((int)(fry));
+    rotate->m[1][1] = fix_sin((int)(frz)) * fix_sin((int)(fry)) * fix_sin((int)(frx)) + fix_cos((int)(
+                          frz)) * fix_cos((int)(frx));
+    rotate->m[1][2] = fix_sin((int)(frz)) * fix_sin((int)(fry)) * fix_cos((int)(frx)) - fix_cos((int)(
+                          frz)) * fix_sin((int)(frx));
+    rotate->m[2][0] = -fix_sin((int)(fry));
+    rotate->m[2][1] = fix_cos((int)(fry)) * fix_sin((int)(frx));
+    rotate->m[2][2] = fix_cos((int)(fry)) * fix_cos((int)(frx));
+#else
     rotate->m[0][0] = cos(RAD(rz)) * cos(RAD(ry));
     rotate->m[0][1] = cos(RAD(rz)) * sin(RAD(ry)) * sin(RAD(rx)) - sin(RAD(rz)) * cos(RAD(rx));
     rotate->m[0][2] = cos(RAD(rz)) * sin(RAD(ry)) * cos(RAD(rx)) + sin(RAD(rz)) * sin(RAD(rx));
@@ -168,6 +228,7 @@ static void compute_rotate(float rx, float ry, float rz, struct rtgui_matrix *ro
     rotate->m[2][0] = -sin(RAD(ry));
     rotate->m[2][1] = cos(RAD(ry)) * sin(RAD(rx));
     rotate->m[2][2] = cos(RAD(ry)) * cos(RAD(rx));
+#endif
 }
 
 static void transfrom_rotate(struct rtgui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
@@ -329,29 +390,27 @@ static bool full_rank(struct rtgui_matrix *m)
 }
 #endif
 
-
 static void prepare(gui_obj_t *obj)
-{
-    return;
-}
-
-static void draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     //tp->deltaX
     //gui_log("%d,tp->deltaX = %d\n", __LINE__, tp->deltaX);
 
-
-
     gui_perspective_t *this = (gui_perspective_t *)obj;
-    rtgui_image_load_scale(&this->img);
-    matrix_identity(this->img.matrix);
+    for (int i = 0; i < 6; i++)
+    {
+        rtgui_image_load_scale(&this->img[i]);
+        matrix_identity(this->img[i].matrix);
+    }
 
     float w = 200;
     float h = 300;
+#if USE_FIX_SIN
+    float d = w * fix_sin(60);
+#else
     float d = w * sin(RAD(60));
-
+#endif
     Vertex_t v0 = {-w / 2, -h / 2, d};
     Vertex_t v1 = {w / 2, -h / 2, d};
     Vertex_t v2 = {w / 2, h / 2, d};
@@ -399,7 +458,6 @@ static void draw_cb(gui_obj_t *obj)
         }
     }
 
-
     for (uint32_t i = 0; i < 6; i++)
     {
 
@@ -416,13 +474,26 @@ static void draw_cb(gui_obj_t *obj)
         transfrom_rotate(&rotate_3D, &v3, &rv3, xoff, yoff, zoff);
 
         Vertex_t p = {dc->screen_width / 2, 0, 2 * d};
-        transfrom_blit(256, 256, &p, &rv0, &rv1, &rv2, &rv3, this->img.matrix);
+        transfrom_blit(this->img[i].img_w, this->img[i].img_h, &p, &rv0, &rv1, &rv2, &rv3,
+                       this->img[i].matrix);
 
-        memcpy(this->img.inverse, this->img.matrix, sizeof(struct rtgui_matrix));
-        matrix_inverse(this->img.inverse);
-        get_new_area(&this->img);
+        memcpy(this->img[i].inverse, this->img[i].matrix, sizeof(struct rtgui_matrix));
+        matrix_inverse(this->img[i].inverse);
+        get_new_area(&this->img[i]);
+    }
+    return;
+}
 
-        draw_img_t *draw_img = &this->img;
+static void draw_cb(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    //tp->deltaX
+    //gui_log("%d,tp->deltaX = %d\n", __LINE__, tp->deltaX);
+
+    gui_perspective_t *this = (gui_perspective_t *)obj;
+    for (uint32_t i = 0; i < 6; i++)
+    {
+        draw_img_t *draw_img = &this->img[i];
         draw_img->opacity_value = UINT8_MAX;
 
         rtgui_rect_t rect = {0};
@@ -430,11 +501,8 @@ static void draw_cb(gui_obj_t *obj)
         rect.y1 = obj->dy + draw_img->img_y;
         rect.x2 = rect.x1 + obj->w;
         rect.y2 = rect.y1 + obj->h;
-
         gui_get_acc()->blit(draw_img, dc, &rect);
     }
-
-
     return;
 
 }
@@ -467,51 +535,50 @@ void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, const char
     root->obj_end = end;
     root->obj_destory = destory;
     //for self
-    void **array = (void **)addr;
+//    void **array = (void **)addr;
+//    this->draw_img_front.opacity_value = UINT8_MAX;
+//    this->draw_img_back.opacity_value = UINT8_MAX;
+//    this->draw_img_up.opacity_value = UINT8_MAX;
+//    this->draw_img_down.opacity_value = UINT8_MAX;
+//    this->draw_img_left.opacity_value = UINT8_MAX;
+//    this->draw_img_right.opacity_value = UINT8_MAX;
 
 
+//    this->draw_img_front.data = array[0];
+//    this->draw_img_back.data = array[1];
+//    this->draw_img_up.data = array[2];
+//    this->draw_img_down.data = array[3];
+//    this->draw_img_left.data = array[4];
+//    this->draw_img_right.data = array[5];
 
+//    this->draw_img_front.blend_mode = IMG_MAGIC_MATRIX;
+//    this->draw_img_back.blend_mode = IMG_MAGIC_MATRIX;
+//    this->draw_img_up.blend_mode = IMG_MAGIC_MATRIX;
+//    this->draw_img_down.blend_mode = IMG_MAGIC_MATRIX;
+//    this->draw_img_left.blend_mode = IMG_MAGIC_MATRIX;
+//    this->draw_img_right.blend_mode = IMG_MAGIC_MATRIX;
 
-    this->draw_img_front.opacity_value = UINT8_MAX;
-    this->draw_img_back.opacity_value = UINT8_MAX;
-    this->draw_img_up.opacity_value = UINT8_MAX;
-    this->draw_img_down.opacity_value = UINT8_MAX;
-    this->draw_img_left.opacity_value = UINT8_MAX;
-    this->draw_img_right.opacity_value = UINT8_MAX;
+//    this->draw_img_front.matrix = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_back.matrix = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_up.matrix = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_down.matrix = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_left.matrix = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_right.matrix = gui_malloc(sizeof(struct rtgui_matrix));
 
+//    this->draw_img_front.inverse = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_back.inverse = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_up.inverse = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_down.inverse = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_left.inverse = gui_malloc(sizeof(struct rtgui_matrix));
+//    this->draw_img_right.inverse = gui_malloc(sizeof(struct rtgui_matrix));
 
-    this->draw_img_front.data = array[0];
-    this->draw_img_back.data = array[1];
-    this->draw_img_up.data = array[2];
-    this->draw_img_down.data = array[3];
-    this->draw_img_left.data = array[4];
-    this->draw_img_right.data = array[5];
-
-    this->draw_img_front.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_back.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_up.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_down.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_left.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_right.blend_mode = IMG_MAGIC_MATRIX;
-
-    this->draw_img_front.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_back.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_up.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_down.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_left.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_right.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-
-    this->draw_img_front.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_back.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_up.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_down.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_left.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_right.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-
-    this->img.data = addr;
-    this->img.blend_mode = IMG_MAGIC_MATRIX;
-    this->img.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->img.inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    for (int i = 0; i < 6; i++)
+    {
+        this->img[i].data = addr;
+        this->img[i].blend_mode = IMG_MAGIC_MATRIX;
+        this->img[i].matrix = gui_malloc(sizeof(struct rtgui_matrix));
+        this->img[i].inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    }
 
     gui_dispdev_t *dc = gui_get_dc();
     this->cbsize = dc->fb_height / 8.0;
@@ -519,7 +586,6 @@ void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, const char
     this->c_y = (dc->fb_width - this->cbsize) / 2.0f;
 
 }
-
 
 
 gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void *data,
@@ -545,6 +611,4 @@ gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void 
     GET_BASE(this)->create_done = true;
     return this;
 }
-
-
 
