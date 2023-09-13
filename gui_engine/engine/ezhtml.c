@@ -742,8 +742,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
-                    parent = (void *)gui_canvas_create(parent, ptxt, 0, 0, 454, 454, 0xffffffff);
-                    gui_canvas_set_canvas_cb(parent, draw_arc);
+                    parent = (void *)gui_canvas_create(parent, ptxt, 0, 0, 454, 454, 0);
+                    gui_canvas_set_canvas_cb((void *)parent, draw_arc);
                     /*GUI_TYPE(gui_canvas_t, parent)->draw = draw_arc;
                     GUI_TYPE(gui_canvas_t, parent)->cx = cx;
                     GUI_TYPE(gui_canvas_t, parent)->cy = cy;
