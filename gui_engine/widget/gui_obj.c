@@ -129,25 +129,21 @@ void gui_tree_free(void *obj)
 }
 
 
-void gui_tree_not_show(gui_obj_t *obj)
+static void gui_tree_child_show(gui_obj_t *obj, bool enable)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        obj->not_show = true;
-        gui_tree_print(obj);
+        obj->not_show = !enable;
+        gui_tree_child_show(obj, enable);
     }
 }
-void gui_tree_show(gui_obj_t *obj)
+
+void gui_tree_show(gui_obj_t *obj, bool enable)
 {
-    gui_list_t *node = NULL;
-    gui_list_for_each(node, &obj->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        obj->not_show = false;
-        gui_tree_show(obj);
-    }
+    gui_tree_child_show(obj, enable);
+    GET_BASE(obj)->not_show = !enable;
 }
 
 
