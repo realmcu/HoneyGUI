@@ -27,7 +27,7 @@ void gui_tree_print(gui_obj_t *obj);
 
 void gui_tree_not_show(gui_obj_t *obj);
 
-void gui_tree_show(gui_obj_t *obj);
+void gui_tree_show(gui_obj_t *obj, bool enable);
 
 gui_obj_t *gui_tree_get_root(gui_obj_t *obj);
 

@@ -105,6 +105,14 @@ static void tab_prepare(gui_obj_t *obj)
         {
             percent += (float)tp->deltaY / gui_get_screen_width();
         }
+        if (percent > 1.0f)
+        {
+            percent = 1.0f;
+        }
+        if (percent < 0.0f)
+        {
+            percent = 0.0f;
+        }
 
 
         int32_t i = this->id.z - parent->cur_id.y + 1; //parent->cur_id.y
