@@ -40,7 +40,6 @@ static void dynamic_prepare(gui_obj_t *obj)
         draw_img->data = addr[index % this->total_cnt];
     }
 
-
     if (tp->type == TOUCH_SHORT)
     {
         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
@@ -134,5 +133,10 @@ void gui_dynamic_img_stop(gui_dynamic_img_t *this)
 }
 void gui_dynamic_img_start(gui_dynamic_img_t *this)
 {
+    this->status = true;
+}
+void gui_dynamic_img_restart(gui_dynamic_img_t *this)
+{
+    this->init_time_ms = gui_ms_get();
     this->status = true;
 }
