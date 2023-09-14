@@ -33,40 +33,22 @@
 #include "trace.h"
 
 #endif
-
+extern void *gui_malloc(size_t n);
+extern void *gui_realloc(void *ptr_old, size_t n);
+extern void gui_free(void *rmem);
 static void *xml_malloc(unsigned int size)
 {
-#ifdef OS_FREERTOS
-    return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
-#else
-    return malloc(size);
-#endif
+    return gui_malloc(size);
 }
 
 static void *xml_realloc(void *ptr, size_t size)
 {
-#ifdef OS_FREERTOS
-    void *p = os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);
-    if (ptr)
-    {
-        memcpy(p, ptr, size);
-        os_mem_free(ptr);
-    }
-    return p;
-#else
-    return realloc(ptr, size);
-#endif
-
+    return gui_realloc(ptr, size);
 }
 
 static void xml_free(void *ptr)
 {
-#ifdef OS_FREERTOS
-    os_mem_free(ptr);
-#else
-    free(ptr);
-#endif
-
+    gui_free(ptr);
 }
 
 
