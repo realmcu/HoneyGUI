@@ -20,6 +20,7 @@ void tabview_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_tabview_t *tabview = (gui_tabview_t *)obj;
+    gui_tabview_t *this = (gui_tabview_t *)obj;
 
     if (tabview->jump.jump_flag)
     {
@@ -63,7 +64,6 @@ void tabview_prepare(gui_obj_t *obj)
             return;
         }
     }
-
     switch (tp->type)
     {
     case TOUCH_HOLD_X:
@@ -71,7 +71,8 @@ void tabview_prepare(gui_obj_t *obj)
         {
             break;
         }
-        obj->dx += tp->deltaX;
+        obj->dx = tp->deltaX;
+        this->release_x = obj->dx;
         if (tabview->cur_id.x == 0 && tabview->tab_cnt_right == 0)
         {
             if (obj->dx < 0)
@@ -94,7 +95,8 @@ void tabview_prepare(gui_obj_t *obj)
         {
             break;
         }
-        obj->dy += tp->deltaY;
+        obj->dy = tp->deltaY;
+        this->release_y = obj->dy;
         if (tabview->cur_id.y == 0 && tabview->tab_cnt_down == 0)
         {
             if (obj->dy < 0)
@@ -113,7 +115,7 @@ void tabview_prepare(gui_obj_t *obj)
         }
         break;
     case TOUCH_LEFT_SLIDE:
-        gui_log("TOUCH_LEFT_SLIDE\n");
+        gui_log("TOUCH_LEFT_SLIDE, obj->dx = %d\n", obj->dx);
         if (tabview->tab_cnt_right == 0 && tabview->cur_id.x == 0)
         {
             break;
@@ -124,6 +126,7 @@ void tabview_prepare(gui_obj_t *obj)
             return;
         }
         tabview->cur_id.x = tabview->cur_id.x + 1;
+        this->release_x = this->release_x  + dc->screen_width;
         break;
     case TOUCH_RIGHT_SLIDE:
         gui_log("TOUCH_RIGHT_SLIDE0\n");
@@ -137,6 +140,7 @@ void tabview_prepare(gui_obj_t *obj)
             return;
         }
         tabview->cur_id.x = tabview->cur_id.x - 1;
+        this->release_x = this->release_x  - dc->screen_width;
         break;
     case TOUCH_DOWN_SLIDE:
         gui_log("TOUCH_DOWN_SLIDE\n");
@@ -164,9 +168,22 @@ void tabview_prepare(gui_obj_t *obj)
         }
         tabview->cur_id.y = tabview->cur_id.y - 1;
         break;
+    case TOUCH_ORIGIN_FROM_X:
+    case TOUCH_ORIGIN_FROM_Y:
+        break;
     default:
         break;
     }
+
+    if (this->release_x > 0)
+    {
+        this->release_x--;
+    }
+    if (this->release_x < 0)
+    {
+        this->release_x++;
+    }
+    obj->dx = this->release_x;
 }
 
 void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)

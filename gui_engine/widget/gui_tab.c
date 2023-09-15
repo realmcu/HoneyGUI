@@ -17,15 +17,6 @@
 #include "gui_matrix.h"
 
 
-static void gui_tab_get_stacking_location(gui_tab_stacking_t *result, gui_tab_stacking_t *start,
-                                          gui_tab_stacking_t *end, float percent)
-{
-    result->scale = start->scale + (end->scale - start->scale) * percent;
-    result->location = start->location + (end->location - start->location) * percent;
-    result->opacity = start->opacity + (end->opacity - start->opacity) * percent;
-}
-
-
 static void tab_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
@@ -86,52 +77,6 @@ static void tab_prepare(gui_obj_t *obj)
         obj->sx = s;
         obj->sy = s;
 
-    }
-    else if (this->style == STACKING)
-    {
-        // scale 0.5f ~ 0.5f, 10 ~ 10, opa, 0~255
-        // scale 0.5f ~ 0.8f, 10 ~ 1/4h, opa, 255
-        // scale 0.8f ~ 0.9f, 1/4h ~ 3/4h, opa, 255
-        // scale 0.9f ~ 0.9f, 3/4h ~ h, opa, 255
-
-        float h = gui_get_screen_height();
-
-        float scale[5] = {0.5f, 0.5f, 0.8f, 0.9f, 0.9f};
-        uint8_t opacity[5] = {0, 255, 255, 255, 255};
-        float location[5] = {5, 5, h / 4, h * 3 / 4, h};
-
-        float percent = 0.5f;
-        if (tp->type == TOUCH_HOLD_Y)
-        {
-            percent += (float)tp->deltaY / gui_get_screen_width();
-        }
-        if (percent > 1.0f)
-        {
-            percent = 1.0f;
-        }
-        if (percent < 0.0f)
-        {
-            percent = 0.0f;
-        }
-
-
-        int32_t i = this->id.z - parent->cur_id.y + 1; //parent->cur_id.y
-        if ((i >= 0) && (i < 3))
-        {
-            gui_tab_stacking_t result;
-            gui_tab_stacking_t start = {.location = location[i],          .scale = scale[i],      .opacity = opacity[i]};
-            gui_tab_stacking_t end =   {.location = location[i + 1],      .scale = scale[i + 1],  .opacity = opacity[i + 1]};
-            gui_tab_get_stacking_location(&result, &start, &end, percent);
-            obj->tx = 0;
-            obj->ty = (int16_t)(h * (result.scale - 1.0f) / 2 + result.location);
-            obj->sx = result.scale;
-            obj->sy = result.scale;
-            obj->dy = obj->dy - parent->base.dy;
-        }
-        else
-        {
-            obj->tx = 100 * gui_get_screen_width(); //for out of range
-        }
     }
 }
 

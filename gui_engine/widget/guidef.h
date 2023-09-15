@@ -344,6 +344,15 @@ typedef enum
     KB_KEYUP,
 } GUI_InputType;
 
+typedef enum gui_tab_style
+{
+    CLASSIC,
+    REDUCTION,
+    FADE,
+    REDUCTION_FADE,
+    STACKING,
+} SLIDE_STYLE;
+
 
 
 typedef enum obj_type
@@ -380,7 +389,8 @@ typedef enum obj_type
     JAVASCRIPT,
     MOVIE,
     IMAGE_SCOPE,
-    INTELLIGENT_STACKING,
+    CARDVIEW,
+    CARD,
 } obj_type_t;
 typedef struct rtgui_msg
 {

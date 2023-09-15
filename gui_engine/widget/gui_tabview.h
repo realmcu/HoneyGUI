@@ -15,15 +15,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum gui_tab_style
-{
-    CLASSIC,
-    REDUCTION,
-    FADE,
-    REDUCTION_FADE,
-    STACKING,
-} SLIDE_STYLE;
-
 /*Data of tab*/
 typedef struct
 {
@@ -44,7 +35,8 @@ typedef struct gui_tabview
     gui_tabview_tab_id_t cur_id;
     gui_jump_t jump;
     SLIDE_STYLE style;
-
+    int16_t release_x;
+    int16_t release_y;
 } gui_tabview_t;
 
 /**
