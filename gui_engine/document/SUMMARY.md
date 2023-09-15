@@ -21,11 +21,10 @@
 * [Widgets](Widgets/README.md)
     * [Button](Widgets/gui_button.md)
     * [image](Widgets/gui_image.md)
-    * [dynamic imgage]
-    * [dynamic imgage]
+    * [dynamic image]
     * [magic image]
     * [canvas](Widgets/gui_canvas.md)
-    * [Text]
+    * [Text](Widgets/gui_text.md)
     * [Cube](Widgets/gui_cube.md)
     * [Svg]
     * [Wave]

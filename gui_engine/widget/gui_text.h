@@ -56,7 +56,7 @@ typedef struct gui_text
 
 /**
 * @brief set the string in a text box widget.
-* @note the area of the text box should be larger than that of the string to be shown.
+* @note The font size must match the font file!
 * @param this the text box widget pointer.
 * @param text the text string.
 * @param font_type the font's name.
@@ -95,7 +95,7 @@ void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width);
 
 /**
  * @brief set font type
- *
+ * @note The type must match the font size!
  * @param this the text widget pointer
  * @param type the addr of .ttf or .bin
  */
@@ -103,7 +103,7 @@ void gui_text_type_set(gui_text_t *this, void *type);
 
 /**
  * @brief create a text box widget.
- * @note the area of the text box should be larger than that of the string to be shown.
+ * @note The area of the text box should be larger than that of the string to be shown, otherwise, part of the text will be hidden.
  * @param parent the father widget which the text nested in.
  * @param filename the widget's name.
  * @param x the X-axis coordinate of the text box.
