@@ -1004,7 +1004,7 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 
 #include <stdio.h>
 #include <string.h>
-#include <float.h>
+//#include <float.h>
 
 
 

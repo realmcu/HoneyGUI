@@ -6,7 +6,7 @@
 #include <guidef.h>
 #include <gui_win.h>
 #include <string.h>
-#include <gui_server.h>
+//#include <gui_server.h>
 #include <tp_algo.h>
 #include "gui_obj.h"
 static void (onLeft)(gui_win_t *b, void *callback, void *parameter)
