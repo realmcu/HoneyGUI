@@ -2,8 +2,8 @@
 /*
  * File      : gui_kb.c
  */
-#include <string.h>
-//#include <gui_server.h>
+//#include <string.h>
+#include <gui_server.h>
 #include <guidef.h>
 #include <gui_api.h>
 //#include <stdlib.h>

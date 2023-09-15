@@ -8,7 +8,7 @@
 #include <string.h>
 #include <gui_return.h>
 #include "gui_obj.h"
-#include "gui_app.h"
+//#include "gui_app.h"
 #include "gui_magic_img.h"
 #include "tp_algo.h"
 static void screen_backfunc()

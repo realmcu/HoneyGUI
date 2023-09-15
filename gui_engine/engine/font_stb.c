@@ -196,7 +196,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
 }
 #endif // !RTK_GUI_TTF_SVG
 #include "nanosvg.h"
-#include "nanosvgrast.h"
+//#include "nanosvgrast.h"
 #ifdef RTK_GUI_TTF_SVG
 static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_count)
 {
