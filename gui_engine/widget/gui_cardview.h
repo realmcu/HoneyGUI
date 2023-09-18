@@ -32,6 +32,7 @@ typedef struct gui_cardview
     int8_t tab_cnt_down;
     gui_card_id_t cur_id;
     SLIDE_STYLE style;
+    int16_t release_y;
 } gui_cardview_t;
 
 

@@ -28,6 +28,7 @@ static void cardview_prepare(gui_obj_t *obj)
     {
     case TOUCH_HOLD_Y:
         obj->dy += tp->deltaY;
+        this->release_y = obj->dy;
         break;
     case TOUCH_DOWN_SLIDE:
         gui_log("TOUCH_DOWN_SLIDE\n");
@@ -41,6 +42,7 @@ static void cardview_prepare(gui_obj_t *obj)
             return;
         }
         this->cur_id.y = this->cur_id.y + 1;
+        this->release_y = this->release_y  + dc->screen_width;
         break;
     case TOUCH_UP_SLIDE:
         gui_log("TOUCH_UP_SLIDE\n");
@@ -54,10 +56,21 @@ static void cardview_prepare(gui_obj_t *obj)
             return;
         }
         this->cur_id.y = this->cur_id.y - 1;
+        this->release_y = this->release_y  - dc->screen_width;
         break;
     default:
         break;
     }
+
+    if (this->release_y > 0)
+    {
+        this->release_y--;
+    }
+    if (this->release_y < 0)
+    {
+        this->release_y++;
+    }
+    obj->dy = this->release_y;
 
 }
 

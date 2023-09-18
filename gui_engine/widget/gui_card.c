@@ -46,10 +46,9 @@ static void tab_prepare(gui_obj_t *obj)
         float location[5] = {5, 5, h / 4, h * 3 / 4, h};
 
         float percent = 0.5f;
-        if (tp->type == TOUCH_HOLD_Y)
-        {
-            percent += (float)tp->deltaY / gui_get_screen_width();
-        }
+
+        percent += (float)obj->dy / gui_get_screen_width();
+
         if (percent > 1.0f)
         {
             percent = 1.0f;
