@@ -27,7 +27,7 @@
 
 uint8_t resource_root[1024 * 1024 * 20];
 
-char *defaultPath = "example/root_image/root_image_sim_vscode/root/";
+char *defaultPath = "example/screen_454_454/root_image/root/";
 int main(int argc, char **argv)
 {
 
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     //nanosv_main();
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
     int fd;
-    fd = open("./example/root_image/root_image_sim_vscode/root(0x4400000).bin", 0);
+    fd = open("./example/screen_454_454/root_image/root(0x4400000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");

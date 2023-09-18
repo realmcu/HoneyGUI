@@ -701,56 +701,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>gui_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>app_launcher.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_watch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_watch.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_sport.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_sport.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_colorwheel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_colorwheel.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_cube.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_cube.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_svg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_svg.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_wave.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_wave.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_grid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_grid.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_launcher_tb_carousel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\example\app_launcher_tb_carousel.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>::Board Support</GroupName>
         </Group>
         <Group>

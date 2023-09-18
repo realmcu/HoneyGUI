@@ -8,7 +8,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <gui_app.h>
-#include "rtk_gui_resource.h"
+#include "root_image/resource_8772f.h"
 #include "gui_text.h"
 #include "gui_scroll_text.h"
 #include "gui_stb_img.h"

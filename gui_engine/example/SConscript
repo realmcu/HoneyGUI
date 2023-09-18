@@ -1,21 +1,14 @@
+# for module compiling
+import os
 from building import *
 
-cwd = GetCurrentDir()
-src = Split("""
-""")
-if not GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
-    src += ['app_launcher.c']
-    src += ['app_launcher_tb_watch.c']
-    src += ['app_launcher_tb_sport.c']
-    src += ['app_launcher_tb_colorwheel.c']
-    src += ['app_launcher_tb_cube.c']
-    src += ['app_launcher_tb_svg.c']
-    src += ['app_launcher_tb_wave.c']
-    src += ['app_launcher_tb_grid.c']
-    src += ['app_launcher_tb_carousel.c']
-    src += ['app_launcher_tb_3d.c']
-CPPPATH = [cwd,cwd + '/root_image']
+cwd  = GetCurrentDir()
+objs = []
+list = os.listdir(cwd)
 
-group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI_DEMO'], CPPPATH = CPPPATH)
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
 
-Return('group')
+Return('objs')

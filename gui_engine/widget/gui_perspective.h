@@ -33,16 +33,10 @@ typedef struct NormalRec
 typedef struct gui_perspective
 {
     gui_obj_t base;
-    draw_img_t draw_img_front;
-    draw_img_t draw_img_back;
-    draw_img_t draw_img_up;
-    draw_img_t draw_img_down;
-    draw_img_t draw_img_left;
-    draw_img_t draw_img_right;
     draw_img_t img[6];
-    float c_x;
-    float c_y;
-    float cbsize;
+    // float c_x;
+    // float c_y;
+    // float cbsize;
 } gui_perspective_t;
 
 #define RAD(d)        (d*3.1415926f/180.0f)
@@ -50,9 +44,6 @@ typedef struct gui_perspective
 
 gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void *addr,
                                           int16_t x, int16_t y, int16_t w, int16_t h);
-
-//void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
-//void gui_cube_set_size(gui_cube_t *this, float size);
 
 #ifdef __cplusplus
 }
