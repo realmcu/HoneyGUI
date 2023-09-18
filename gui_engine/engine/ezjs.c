@@ -1799,6 +1799,8 @@ static void *context_alloc(size_t size, void *cb_data_p)
 #else
 
 #endif
+#elif defined RTL8763EP
+    return (void *)(0x4000000 + 0x200000);
 #else
     return malloc(size);
 #endif
