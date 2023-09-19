@@ -42,7 +42,7 @@ void gui_img_scale_add(gui_magic_img_t *img, float scale_x, float scale_y);
 void gui_img_scale(gui_magic_img_t *img, float scale_x, float scale_y);
 void gui_img_translate(gui_magic_img_t *img, float t_x, float t_y);
 void gui_img_set_opacity(gui_magic_img_t *this, unsigned char opacity_value);
-void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *dc);
+void magic_img_get_new_area(gui_obj_t *obj, struct gui_dispdev *dc);
 
 void gui_magicimage_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p);
 gui_magic_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
