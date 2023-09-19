@@ -8,7 +8,10 @@
 #include <string.h>
 #include <gui_return.h>
 #include "gui_obj.h"
-//#include "gui_app.h"
+#ifdef RTK_GUI_SCRIPT_AS_A_APP
+#include "gui_app.h"
+#endif
+
 #include "gui_magic_img.h"
 #include "tp_algo.h"
 static void screen_backfunc()
