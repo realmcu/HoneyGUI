@@ -1,13 +1,15 @@
-#define   ACTIVITY_BIN                            (void *)0x044000f4
-#define   BLOODOXYGEN_BIN                         (void *)0x044a110c
-#define   CLOCKN_BIN                              (void *)0x04542120
-#define   CONTROLMENU_0_BIN                       (void *)0x045e313c
-#define   CONTROLMENU_1_BIN                       (void *)0x04684158
-#define   HEARTRATE_BIN                           (void *)0x04725170
-#define   MESSAGE_BIN                             (void *)0x047c6184
-#define   MUSIC_BIN                               (void *)0x04867198
-#define   QUICKCARD_BIN                           (void *)0x049081b0
-#define   SLEEPN_BIN                              (void *)0x049a91c4
-#define   STRESS_BIN                              (void *)0x04a4a1d8
-#define   UTE_BIN                                 (void *)0x04aeb1e8
-#define   WEATHER_BIN                             (void *)0x04b8c1fc
+extern unsigned char resource_root[1024 * 1024 * 20];
+
+#define   ACTIVITY_BIN                            (void *)(resource_root + 0x044000f4 - 0x4400000)
+#define   BLOODOXYGEN_BIN                         (void *)(resource_root + 0x044a110c - 0x4400000)
+#define   CLOCKN_BIN                              (void *)(resource_root + 0x04542120 - 0x4400000)
+#define   CONTROLMENU_0_BIN                       (void *)(resource_root + 0x045e313c - 0x4400000)
+#define   CONTROLMENU_1_BIN                       (void *)(resource_root + 0x04684158 - 0x4400000)
+#define   HEARTRATE_BIN                           (void *)(resource_root + 0x04725170 - 0x4400000)
+#define   MESSAGE_BIN                             (void *)(resource_root + 0x047c6184 - 0x4400000)
+#define   MUSIC_BIN                               (void *)(resource_root + 0x04867198 - 0x4400000)
+#define   QUICKCARD_BIN                           (void *)(resource_root + 0x049081b0 - 0x4400000)
+#define   SLEEPN_BIN                              (void *)(resource_root + 0x049a91c4 - 0x4400000)
+#define   STRESS_BIN                              (void *)(resource_root + 0x04a4a1d8 - 0x4400000)
+#define   UTE_BIN                                 (void *)(resource_root + 0x04aeb1e8 - 0x4400000)
+#define   WEATHER_BIN                             (void *)(resource_root + 0x04b8c1fc - 0x4400000)
