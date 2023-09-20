@@ -41,6 +41,17 @@ if GetDepend('PKG_LVGL_USING_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
+if GetDepend('PKG_LVGL_USING_EXAMPLES'):
+    lvgl_src_cwd = lvgl_cwd + 'rlottie/'
+    inc = inc + [lvgl_src_cwd]
+    for root, dirs, files in os.walk(lvgl_src_cwd):
+        for dir in dirs:
+            current_path = os.path.join(root, dir)
+            src = src + Glob(os.path.join(current_path,'*.c'))
+            src = src + Glob(os.path.join(current_path,'*.cpp'))
+            if check_h_hpp_exsit(current_path):
+                inc = inc + [current_path]
+
 if GetDepend('MODULE_USING_PORT_FOR_LVGL'):
     lvgl_src_cwd = lvgl_cwd + 'demos/'
     inc = inc + [lvgl_src_cwd]
