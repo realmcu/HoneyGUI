@@ -25,7 +25,7 @@ static void dynamic_prepare(gui_obj_t *obj)
     draw_img->img_h = head.h;
     obj->w = draw_img->img_w;
     obj->h = draw_img->img_h;
-    magic_img_get_new_area(obj, img, dc);
+    magic_img_get_new_area(obj, dc);
 
     gui_dynamic_img_t *this = (gui_dynamic_img_t *)obj;
     gui_img_t *root = (gui_img_t *)obj;

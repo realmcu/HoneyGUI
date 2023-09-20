@@ -11,13 +11,13 @@
 #include <tp_algo.h>
 #include "acc_engine.h"
 
-void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *dc)
+void magic_img_get_new_area(gui_obj_t *obj, struct gui_dispdev *dc)
 {
     gui_img_t *base = (gui_img_t *)obj;
     GUI_UNUSED(base);
     gui_obj_t *root = (gui_obj_t *)obj;
     gui_magic_img_t *this = (gui_magic_img_t *)obj;
-    draw_img_t *draw_img = &img->draw_img;
+    draw_img_t *draw_img = &base->draw_img;
 
     matrix_identity(draw_img->matrix);
     matrix_translate(root->dx, root->dy, draw_img->matrix);
@@ -56,7 +56,7 @@ void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *
     y_max = pox.p[1];
 
 
-    pox.p[0] = (float)root->w;
+    pox.p[0] = (float)draw_img->img_w;
     pox.p[1] = 0.0f;
     pox.p[2] = 1.0f;
     pox_mul(draw_img->matrix, &pox);
@@ -79,7 +79,7 @@ void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *
 
 
     pox.p[0] = 0.0f;
-    pox.p[1] = (float)obj->h;
+    pox.p[1] = (float)draw_img->img_h;
     pox.p[2] = 1.0f;
     pox_mul(draw_img->matrix, &pox);
     if (x_min > pox.p[0])
@@ -99,8 +99,8 @@ void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *
         y_max = pox.p[1];
     }
 
-    pox.p[0] = (float)obj->w;
-    pox.p[1] = (float)obj->h;
+    pox.p[0] = (float)draw_img->img_w;
+    pox.p[1] = (float)draw_img->img_h;
     pox.p[2] = 1.0f;
     pox_mul(draw_img->matrix, &pox);
     if (x_min > pox.p[0])
@@ -120,14 +120,11 @@ void magic_img_get_new_area(gui_obj_t *obj, gui_img_t *img, struct gui_dispdev *
         y_max = pox.p[1];
     }
 
-    obj->dx = (int16_t)x_min;
-    obj->dy = (int16_t)y_min;
     draw_img->img_x = (int16_t)x_min;
     draw_img->img_y = (int16_t)y_min;
-    obj->w = (int16_t)x_max - (int16_t)x_min;
-    obj->h = (int16_t)y_max - (int16_t)y_min;
-    draw_img->target_w = obj->w;
-    draw_img->target_h = obj->h;
+    draw_img->target_w = (int16_t)x_max - (int16_t)x_min;
+    draw_img->target_h = (int16_t)y_max - (int16_t)y_min;
+
 }
 
 static void img_prepare(gui_obj_t *obj)
@@ -139,9 +136,7 @@ static void img_prepare(gui_obj_t *obj)
     draw_img_t *draw_img = &img->draw_img;
 
     rtgui_image_load_scale(draw_img);
-    obj->w = draw_img->img_w;
-    obj->h = draw_img->img_h;
-    magic_img_get_new_area(obj, img, dc);
+    magic_img_get_new_area(obj, dc);
 
     if (tp->type == TOUCH_SHORT)
     {
@@ -156,10 +151,10 @@ static void img_draw_cb(gui_obj_t *obj)
     draw_img_t *draw_img = &img->draw_img;
 
     rtgui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->dx;
-    draw_rect.y1 = obj->dy;
-    draw_rect.x2 = draw_rect.x1 + obj->w;
-    draw_rect.y2 = draw_rect.y1 + obj->h;
+    draw_rect.x1 = draw_img->img_x;
+    draw_rect.y1 = draw_img->img_y;
+    draw_rect.x2 = draw_rect.x1 + draw_img->target_w;
+    draw_rect.y2 = draw_rect.y1 + draw_img->target_h;
     if (gui_get_acc() != NULL)
     {
         gui_get_acc()->blit(draw_img, dc, &draw_rect);
@@ -287,10 +282,23 @@ void gui_magic_img_from_mem_ctor(gui_magic_img_t *this, gui_obj_t *parent, const
 
     draw_img->data = addr;
     draw_img->blend_mode = IMG_MAGIC_MATRIX;
+    gui_dispdev_t *dc = gui_get_dc();
 
     //for root class
     gui_obj_t *obj = (gui_obj_t *)this;
     obj->type = IMAGE_FROM_MEM;
+    if ((w == 0) || (h == 0))
+    {
+        obj->w = dc->screen_width;
+        obj->h = dc->screen_height;
+    }
+    else
+    {
+        obj->w = w;
+        obj->h = h;
+    }
+
+
     obj->obj_prepare = img_prepare;
     obj->obj_draw = img_draw_cb;
     obj->obj_end = img_end;
@@ -299,6 +307,7 @@ void gui_magic_img_from_mem_ctor(gui_magic_img_t *this, gui_obj_t *parent, const
     //for self
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
+
     draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
     draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
     this->base.draw_img.opacity_value = UINT8_MAX;

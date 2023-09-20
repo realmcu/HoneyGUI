@@ -44,7 +44,8 @@ int main(int argc, char **argv)
     //nanosv_main();
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
     int fd;
-    fd = open("./example/screen_454_454/root_image/root(0x4400000).bin", 0);
+    // fd = open("./example/screen_454_454/root_image/root(0x4400000).bin", 0);
+    fd = open("./example/screen_448_368/root_image_ute/root(0x4400000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
@@ -63,8 +64,11 @@ int main(int argc, char **argv)
 //#ifdef MODULE_USING_RTK_GUI_DEMO
 #if 1
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
-    extern gui_app_t *get_app_launcher(void);
-    gui_app_startup(get_app_launcher());
+    // extern gui_app_t *get_app_launcher(void);
+    // gui_app_startup(get_app_launcher());
+    extern void *get_app_ute(void);
+    gui_app_startup(get_app_ute());
+
 #endif
 #else
     extern gui_app_t *get_rtk_gui_demo(void);
