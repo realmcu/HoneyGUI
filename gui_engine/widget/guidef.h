@@ -98,10 +98,10 @@ typedef union gui_color
     unsigned long rgba;
     struct
     {
-        unsigned char alpha;
-        unsigned char blue;
-        unsigned char green;
-        unsigned char red;
+        unsigned char blue; //0x00
+        unsigned char green;   //0x01
+        unsigned char red; //0x02
+        unsigned char alpha;  //0x03
     } channel;
 } gui_color_t;
 typedef union gui_color_msb
