@@ -74,7 +74,10 @@ static void text_draw(gui_obj_t *obj)
         rtgui_text_create(text);
     }
     rtgui_font_draw(text, &draw_rect);
-    if (dc->section_count == dc->screen_height / dc->fb_height - 1)
+    uint32_t total_section_count = dc->screen_height / dc->fb_height - ((dc->screen_height %
+                                                                         dc->fb_height) ?
+                                                                        0 : 1);
+    if (dc->section_count == total_section_count)
     {
         rtgui_text_destroy(text);
     }
