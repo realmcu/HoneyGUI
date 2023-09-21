@@ -16,6 +16,6 @@ if not GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
     src += ['app_launcher_tb_3d.c']
 CPPPATH = [cwd,cwd + '/root_image']
 
-group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI_DEMO'], CPPPATH = CPPPATH)
+group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI_454_454_DEMO'], CPPPATH = CPPPATH)
 
 Return('group')
