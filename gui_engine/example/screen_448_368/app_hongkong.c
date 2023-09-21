@@ -5,7 +5,7 @@
 #include <gui_win.h>
 #include <gui_text.h>
 #include <gui_curtain.h>
-#include "root_image_hongkong/hongkong.h"
+#include "root_image_hongkong/ui_resource.h"
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "gui_perspective.h"

@@ -16,8 +16,14 @@ parser.add_argument('--dump', action='store_true', help='dump the fs hierarchy')
 parser.add_argument('--binary', action='store_true', help='output binary file')
 parser.add_argument('--addr', default='0', help='set the base address of the binary file, default to 0.')
 
-global FILE_ADDR
-FILE_ADDR = ''
+global BASE_ADDR
+BASE_ADDR = 0
+global H_FILE
+global H_FILE_IF
+global H_FILE_ELSE
+H_FILE = ''
+H_FILE_IF = ''
+H_FILE_ELSE = ''
 
 
 class File(object):
@@ -169,7 +175,9 @@ class Folder(object):
         #  const rt_uint8_t *data;
 	    #  rt_size_t size;
         #}
-        global FILE_ADDR
+        global H_FILE
+        global H_FILE_IF
+        global H_FILE_ELSE
         d_li = []
         # payload base
         pad_len = 64
@@ -200,8 +208,14 @@ class Folder(object):
                 if (data_addr + 8) % pad_len != 0:
                     add_data = b'\0' * (pad_len - (data_addr + 8) % pad_len)
                 data_addr = data_addr + len(add_data)
-                FILE_ADDR = (FILE_ADDR + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) +
-                             '0x%08x' % data_addr + '\n')
+                # H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
+                #                '(void *)(resource_root + ' + '0x%08x' % data_addr + ' - ' + '0x%08x' % BASE_ADDR + ')' + '\n')
+                
+                H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
+                               '(void *)(resource_root + ' + '0x%08x' % (data_addr - BASE_ADDR) + ')' + '\n')
+
+                H_FILE_ELSE = (H_FILE_ELSE + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
+                               '(void *)(' + '0x%08x' % data_addr + ')' + '\n')
             # pad the data to 4 bytes boundary
 
             data = add_data + data
@@ -216,7 +230,14 @@ class Folder(object):
         # if len(d_li)*self.bin_fmt.size % pad_len != 0:
         #     d_li.append(b'\0' * (pad_len - (len(d_li)*self.bin_fmt.size) % pad_len))
 
-        return (bytes().join(d_li) + bytes().join(p_li)), FILE_ADDR
+        H_FILE += '#if defined _WIN32\n'
+        H_FILE += 'extern unsigned char resource_root[1024 * 1024 * 20];\n\n'
+        H_FILE += H_FILE_IF
+        H_FILE += '\n#else\n'
+        H_FILE += H_FILE_ELSE
+        H_FILE += '\n#endif\n'
+
+        return (bytes().join(d_li) + bytes().join(p_li)), H_FILE
 
 def get_c_data(tree):
     # Handle the root dirent specially.
@@ -267,9 +288,10 @@ if __name__ == '__main__':
     if args.dump:
         tree.dump()
 
+    BASE_ADDR = int(args.addr, 16)
     file_addr = ''
     if args.binary:
-        data, file_addr = get_bin_data(tree, int(args.addr, 16))
+        data, file_addr = get_bin_data(tree, BASE_ADDR)
     else:
         data = get_c_data(tree)
 
@@ -278,5 +300,5 @@ if __name__ == '__main__':
         output = sys.stdout
 
     output.write(data)
-    with open(os.path.join(os.path.dirname(os.getcwd()), 'addr.h'), 'w') as f:
+    with open(os.path.join(os.path.dirname(os.getcwd()), 'ui_resource.h'), 'w') as f:
         f.write(file_addr)

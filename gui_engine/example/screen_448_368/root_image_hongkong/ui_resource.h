@@ -1,0 +1,43 @@
+#if defined _WIN32
+extern unsigned char resource_root[1024 * 1024 * 20];
+
+#define   ACTIVITY_BIN                            (void *)(resource_root + 0x00000178)
+#define   BLOODOXYGEN_BIN                         (void *)(resource_root + 0x000a11b8)
+#define   CLOCKN_BIN                              (void *)(resource_root + 0x001421f8)
+#define   CONTROLMENU_0_BIN                       (void *)(resource_root + 0x001e3238)
+#define   CONTROLMENU_1_BIN                       (void *)(resource_root + 0x00284278)
+#define   HEARTRATE_BIN                           (void *)(resource_root + 0x003252b8)
+#define   MESSAGE_BIN                             (void *)(resource_root + 0x003c62f8)
+#define   MUSIC_BIN                               (void *)(resource_root + 0x00467338)
+#define   QUICKCARD_BIN                           (void *)(resource_root + 0x00508378)
+#define   SLEEPN_BIN                              (void *)(resource_root + 0x005a93b8)
+#define   STRESS_BIN                              (void *)(resource_root + 0x0064a3f8)
+#define   WEATHER_BIN                             (void *)(resource_root + 0x006eb438)
+#define   C1_BIN                                  (void *)(resource_root + 0x0078c478)
+#define   C2_BIN                                  (void *)(resource_root + 0x007ac4b8)
+#define   C3_BIN                                  (void *)(resource_root + 0x007cc4f8)
+#define   C4_BIN                                  (void *)(resource_root + 0x007ec538)
+#define   C5_BIN                                  (void *)(resource_root + 0x0080c578)
+#define   C6_BIN                                  (void *)(resource_root + 0x0082c5b8)
+
+#else
+#define   ACTIVITY_BIN                            (void *)(0x04400178)
+#define   BLOODOXYGEN_BIN                         (void *)(0x044a11b8)
+#define   CLOCKN_BIN                              (void *)(0x045421f8)
+#define   CONTROLMENU_0_BIN                       (void *)(0x045e3238)
+#define   CONTROLMENU_1_BIN                       (void *)(0x04684278)
+#define   HEARTRATE_BIN                           (void *)(0x047252b8)
+#define   MESSAGE_BIN                             (void *)(0x047c62f8)
+#define   MUSIC_BIN                               (void *)(0x04867338)
+#define   QUICKCARD_BIN                           (void *)(0x04908378)
+#define   SLEEPN_BIN                              (void *)(0x049a93b8)
+#define   STRESS_BIN                              (void *)(0x04a4a3f8)
+#define   WEATHER_BIN                             (void *)(0x04aeb438)
+#define   C1_BIN                                  (void *)(0x04b8c478)
+#define   C2_BIN                                  (void *)(0x04bac4b8)
+#define   C3_BIN                                  (void *)(0x04bcc4f8)
+#define   C4_BIN                                  (void *)(0x04bec538)
+#define   C5_BIN                                  (void *)(0x04c0c578)
+#define   C6_BIN                                  (void *)(0x04c2c5b8)
+
+#endif

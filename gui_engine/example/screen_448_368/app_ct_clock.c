@@ -1,4 +1,4 @@
-#include "root_image_hongkong/hongkong.h"
+#include "root_image_hongkong/ui_resource.h"
 #include <gui_magic_img.h>
 
 void page_ct_clock(void *parent)

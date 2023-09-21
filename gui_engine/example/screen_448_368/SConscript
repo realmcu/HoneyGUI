@@ -10,6 +10,6 @@ src = Glob('*.c')
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_ute']
 print(CPPPATH)
-group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
 
 Return('group')
