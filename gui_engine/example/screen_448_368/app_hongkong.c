@@ -18,8 +18,17 @@ static void app_hongkong_ui_design(gui_app_t *app);
 static gui_tabview_t *tv;
 static gui_tabview_t *tv_up;
 static gui_win_t *win;
+gui_cardview_t *cv;
+extern void page_tb_clock(void *parent);
+extern void page_tb_activity(void *parent);
+extern void page_tb_heart(void *parent);
+extern void page_tb_blood(void *parent);
+extern void page_tb_stress(void *parent);
+extern void page_tb_sleep(void *parent);
+extern void page_tb_weather(void *parent);
+extern void page_tb_music(void *parent);
 
-
+static void callback_tab();
 static gui_app_t app_hongkong =
 {
     .screen =
@@ -43,14 +52,24 @@ void canvas_cb(gui_canvas_t *canvas)
     nvgFillColor(canvas->vg, nvgRGBA(255, 255, 255, 30));
     nvgFill(canvas->vg);
 }
+void canvas_cb_balck(gui_canvas_t *canvas)
+{
+    nvgRect(canvas->vg, 0, 0, 368, 448);
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
+    nvgFill(canvas->vg);
+}
 static void callback(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
 
-    gui_tree_free(tv);
+    gui_tree_free(win);
+    win = gui_win_create(get_app_hongkong(), "win", 0, 0, 320, 320);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)callback_tab, GUI_EVENT_TOUCH_CLICKED, NULL);
+
     gui_canvas_t *canvas = gui_canvas_create(win, "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb);
-    gui_cardview_t *tv = gui_cardview_create(win, "cardview", 0, 0, 0, 0);
+    cv = gui_cardview_create(win, "cardview", 0, 0, 0, 0);
+    gui_cardview_t *tv = cv;
     gui_cardview_set_style(tv, STACKING);
     gui_card_t *tb_clock = gui_card_create(tv, "tb_clock",         0, 0, 0, 0, 0, 0);
     gui_card_t *tb_activity = gui_card_create(tv, "tb_activity",   0, 0, 0, 0, 0, 1);
@@ -94,14 +113,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 6, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 7, 0);
 
-    extern void page_tb_clock(void *parent);
-    extern void page_tb_activity(void *parent);
-    extern void page_tb_heart(void *parent);
-    extern void page_tb_blood(void *parent);
-    extern void page_tb_stress(void *parent);
-    extern void page_tb_sleep(void *parent);
-    extern void page_tb_weather(void *parent);
-    extern void page_tb_music(void *parent);
+
     // page_tb_clock(tb_clock);
     page_tb_activity(tb_activity);
     page_tb_heart(tb_heart);
@@ -121,7 +133,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
     extern void page_ct_message(void *parent);
     page_ct_clock(ct_clock);
     page_ct_message(ct_message);
-
+    gui_canvas_t *canvas = gui_canvas_create(ct_control0, "canvas", 0, 0, 0, 368, 448);
+    gui_canvas_set_canvas_cb(canvas, canvas_cb_balck);
     tv_up = gui_tabview_create(ct_control0, "tabview_up", 0, 0, 0, 0);
     gui_tabview_set_style(tv_up, CLASSIC);
     gui_tab_t *tb_control0 = gui_tab_create(tv_up, "tb_control0",    0, 0, 0, 0, 0, 0);
@@ -131,4 +144,12 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_control0(tb_control0);
     page_tb_control1(tb_control1);
 }
+static void callback_tab()
+{
+    int idx = cv->cur_id.y;
+    gui_tree_free(win);
+    app_hongkong_ui_design(get_app_hongkong());
 
+    gui_tabview_jump_tab(tv, idx, 0);
+
+}

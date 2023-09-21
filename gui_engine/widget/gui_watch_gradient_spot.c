@@ -105,7 +105,7 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
                       arc_data1[2 + i * 4 + 3]);
         }
         NVGpaint bg = nvgLinearGradient(vg, -100, -100, 200, 200, nvgRGBA(0x4b, 0x5d, 0x3d, 230),
-                                        nvgRGBA(0x4b, 0x5d, 0x3d, 0));
+                                        nvgRGBA(0x4b, 0, 0x3d, 0));
         nvgFillPaint(vg, bg);
         nvgFill(vg);
     }
@@ -119,8 +119,8 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
             nvgQuadTo(vg, arc_data2[2 + i * 4], arc_data2[2 + i * 4 + 1], arc_data2[2 + i * 4 + 2],
                       arc_data2[2 + i * 4 + 3]);
         }
-        NVGpaint bg = nvgLinearGradient(vg, -100, -100, 200, 200, nvgRGBA(0x41, 0x5d, 0x1E, 200), nvgRGBA(0,
-                                        255, 66, 0));
+        NVGpaint bg = nvgLinearGradient(vg, -100, -100, 200, 200, nvgRGBA(0x41, 0x4d, 0x1E, 200), nvgRGBA(0,
+                                        0x9d, 66, 0));
         nvgFillPaint(vg, bg);
         nvgFill(vg);
     }
@@ -135,7 +135,7 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         }
 
         NVGpaint bg = nvgLinearGradient(vg, -100, -100, 200, 200, nvgRGBA(0x41, 0x4f, 0x1E, 100),
-                                        nvgRGBA(0x41, 0x4f, 0x1E, 0));
+                                        nvgRGBA(0x41, 0, 0x1E, 0));
         nvgFillPaint(vg, bg);
         nvgFill(vg);
     }
