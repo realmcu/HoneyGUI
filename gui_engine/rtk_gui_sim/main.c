@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
     int fd;
     // fd = open("./example/screen_454_454/root_image/root(0x4400000).bin", 0);
-    fd = open("./example/screen_448_368/root_image_ute/root(0x4400000).bin", 0);
+    fd = open("./example/screen_448_368/root_image_hongkong/root(0x4400000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
@@ -66,8 +66,8 @@ int main(int argc, char **argv)
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
     // extern gui_app_t *get_app_launcher(void);
     // gui_app_startup(get_app_launcher());
-    extern void *get_app_ute(void);
-    gui_app_startup(get_app_ute());
+    extern void *get_app_hongkong(void);
+    gui_app_startup(get_app_hongkong());
 
 #endif
 #else

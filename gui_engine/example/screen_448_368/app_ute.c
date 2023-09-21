@@ -8,6 +8,7 @@
 #include "ute.h"
 #include <gui_app.h>
 #include "gui_tab.h"
+#include "gui_canvas.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
 #include <gui_magic_img.h>
@@ -37,13 +38,28 @@ void *get_app_ute(void)
     return &app_ute;
 }
 
+static void canvas_cb(gui_canvas_t *this)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    NVGcontext *vg = this->vg;
+    nvgBeginPath(vg);
+    nvgRect(vg, 0, 0,  368, 448);
+    nvgFillColor(vg, nvgRGBA(0XFF, 0XFF, 0XFF, 30));
+    nvgFill(vg);
+}
+
+
 static void callback(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
 
     gui_tree_free(tv);
 
+    gui_canvas_t *canvas = gui_canvas_create(win, "canvas", NULL, 0, 0, 368, 448);
+    gui_canvas_set_canvas_cb(canvas, canvas_cb);
+
     gui_cardview_t *tv = gui_cardview_create(win, "cardview", 0, 0, 0, 0);
+
     gui_cardview_set_style(tv, STACKING);
     gui_card_t *tb_watch = gui_card_create(tv, "tb_watch",             0, 0, 0, 0, 0, 0);
     gui_card_t *tb_sport = gui_card_create(tv, "tb_sport",             0, 0, 0, 0, 0, 1);
@@ -88,6 +104,8 @@ static void app_ute_ui_design(gui_app_t *app)
 
     // gui_magic_img_create_from_mem(tb_watch, "page0", CLOCKN_BIN, 0, 0, 0, 0);
     gui_magic_img_create_from_mem(tb_sport, "page1", ACTIVITY_BIN, 0, 0, 0, 0);       //ACTIVITY_BIN
+
+
     gui_magic_img_create_from_mem(tb_colorwheel, "page2", HEARTRATE_BIN, 0, 0, 0, 0); //HEARTRATE_BIN
     gui_magic_img_create_from_mem(tb_cube, "page3", BLOODOXYGEN_BIN, 0, 0, 0, 0);     //BLOODOXYGEN_BIN
     gui_magic_img_create_from_mem(tb_svg, "page4", STRESS_BIN, 0, 0, 0, 0);           //STRESS_BIN
