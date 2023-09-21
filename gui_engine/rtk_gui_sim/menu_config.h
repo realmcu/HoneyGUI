@@ -339,7 +339,7 @@
 // </c>
 
 // <c> RTK GUI Demo
-#define MODULE_USING_RTK_GUI_DEMO
+#define MODULE_USING_RTK_GUI_448_368_DEMO
 // </c>
 //#define MODULE_USING_SCRIPT_AS_A_APP
 // <c> RTK GUI frame buffer type
