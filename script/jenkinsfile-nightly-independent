@@ -1,0 +1,240 @@
+import groovy.json.JsonSlurper
+import org.apache.tools.ant.types.resources.selectors.None
+
+
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '60', artifactNumToKeepStr: '', daysToKeepStr: '60', numToKeepStr: '')),
+           [$class: 'ScannerJobProperty', doNotScan: false], disableResume(), pipelineTriggers([cron("""H 21 * * 1-5
+
+""")])])
+
+// Skip test for bypassed or deprecated branches
+// Each item contains Branch name, Status and Reason
+
+def emptyFolder(folderName){
+    if (fileExists("${folderName}")){
+        dir("${folderName}"){
+            echo "clean dir ${folderName}"
+            deleteDir()
+        }
+    }
+}
+
+BRANCH_NAME = "gui-engine-test-chip"
+def COV_VIEW_MAP = [
+    "gui-engine-test-chip":[
+        "project":"HoneyGui",
+        "stream":"gui-engine-test-chip",
+        "view_id":"-1"
+    ]
+]
+
+SRC_HOME = "SRC"
+HoneyRepo_Home = "${SRC_HOME}\\HoneyRepo"
+Manifest_Home = "${SRC_HOME}\\HoneyRepo\\.repo\\manifest"
+
+
+def do_code_checkout(relative_dir, url, project, branch_name, ref_spec, revision)
+{
+    echo "do_code_checkout: ${relative_dir} ${url} ${project} ${branch_name} ${ref_spec} ${revision}"
+    if (fileExists("${relative_dir}/.git/index.lock")){
+        bat "del ${WORKSPACE}\\${relative_dir}\\.git\\index.lock /f /q"
+    }
+     def is_commit_id = false
+     def p2 = ~/[0-9a-zA-Z]{12}/
+     def matcher = (revision =~ p2)
+     if(matcher.getCount() > 0){
+        echo "${revision}'s version is commitID"
+        is_commit_id = true
+    }else{
+        is_commit_id = false
+    }
+
+    if(ref_spec.size() > 0)
+    {
+        timestamps{
+            try_time = 0
+            retry(3) {
+                try_time += 1
+                if(try_time > 1){
+                    sleep time: 2, unit: 'MINUTES'
+                }
+                echo "checkout ${project} ${branch_name} ${ref_spec}"
+                honeyComb_src_check_res = checkout([$class: 'GitSCM', 
+                                            branches: [[name: "${branch_name}"]], 
+                                            doGenerateSubmoduleConfigurations: false, 
+                                            extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${relative_dir}"], [$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: true, reference: '', shallow: false, timeout: 50], [$class: 'BuildChooserSetting', buildChooser: [$class: 'GerritTriggerBuildChooser']]],
+                                            submoduleCfg: [],
+                                            userRemoteConfigs: [[credentialsId: 'a47475ae-3cc6-4172-9baf-8b472d834b9f', refspec: "${ref_spec}", url: "${url}/${project}"]]])
+            }
+        }
+    }else if(is_commit_id == true)
+    {
+        timestamps {
+            try_time = 0
+            retry(3) {
+                try_time += 1
+                if (try_time > 1) {
+                    sleep time: 2, unit: 'MINUTES'
+                }
+                echo "checkout ${project} ${branch_name}  by commitID ${revision}"
+                checkout_res = checkout([$class: 'GitSCM',
+                                         branches: [[name: "${revision}"]],
+                                         doGenerateSubmoduleConfigurations: false,
+                                         extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${relative_dir}"], [$class: 'CloneOption', noTags: true, reference: '', shallow: false, timeout: 50], [$class: 'CleanBeforeCheckout']],
+                                         submoduleCfg: [],
+                                         userRemoteConfigs: [[credentialsId: 'a47475ae-3cc6-4172-9baf-8b472d834b9f', name: 'origin', refspec: "+refs/heads/${branch_name}:refs/remotes/origin/${branch_name}", url: "${url}/${project}"]]])
+            }
+        }
+    }else{
+        timestamps{
+            try_time = 0
+            retry(3) {
+                try_time += 1
+                if(try_time > 1){
+                    sleep time: 2, unit: 'MINUTES'
+                }
+                echo "checkout ${project} ${branch_name} ${revision} by branch name"
+                checkout_res = checkout([$class: 'GitSCM',
+                                        branches: [[name: "refs/heads/${revision}"]],
+                                        doGenerateSubmoduleConfigurations: false,
+                                        extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: "${relative_dir}"],[$class: 'CloneOption', noTags: true, reference: '', shallow: false, timeout: 50], [$class: 'CleanBeforeCheckout']],
+                                        submoduleCfg: [],
+                                        userRemoteConfigs: [[credentialsId: 'a47475ae-3cc6-4172-9baf-8b472d834b9f', name: 'origin', refspec: "+refs/heads/${revision}:refs/remotes/origin/${revision}", url: "${url}/${project}"]]])
+            }
+        }
+    }
+    dir("${relative_dir}"){
+        bat(label: '', returnStdout: true, script: """
+git fetch""")
+        
+        git_log = bat(label: '', returnStdout: true, script: """@echo off
+
+
+git log -1 HEAD --pretty=oneline""")
+        echo "${project}-${branch_name}: ${git_log}"
+    }
+}
+
+
+def get_project_info_from_manifest(manifest_path)
+{
+    def input = readFile(manifest_path)
+    def all_projects = []
+    def current_project = ""
+    def all_remotes =  [:]
+    def manifest = new XmlSlurper().parseText(input)
+
+    def remote_size = manifest.remote.size()
+
+    for(i = 0; i <  remote_size; i++)
+    {
+        def r = manifest.remote[i]
+        def r_name = "${r['@name']}"
+        def r_url = "${r['@fetch']}"
+        all_remotes[r_name] = ["url": r_url]
+    }
+
+    def default_remote_name = "${manifest.default['@remote']}"
+    def project_size = manifest.project.size()
+    for(i = 0; i <  project_size; i++){
+        def p = manifest.project[i]
+        def p_name = "${p['@name']}"
+        def p_path = "${p['@path']}"
+        def p_revision = "${p["@revision"]}"
+        def p_branch = "${p["@dest-branch"]}"
+        def p_groups = "${p["@groups"]}".split()
+
+        def p_remote = "${p['@remote']}"
+        if(p_remote.size() > 0){
+            p_remote = all_remotes[p_remote]["url"]
+        }else{
+            p_remote = all_remotes[default_remote_name]["url"]
+        }
+        def t_project = [
+                "name": p_name,
+                "path": p_path,
+                "revision": p_revision,
+                "branch": p_branch,
+                "url": p_remote,
+                "groups": p_groups,
+                "ref_spec": ""]
+        if((p_name == params["GERRIT_PROJECT"]) && (p_branch == params["GERRIT_BRANCH"])){
+            t_project["ref_spec"] = params["GERRIT_REFSPEC"]
+        }
+        all_projects = all_projects + [t_project]
+    }
+    return all_projects
+}
+
+
+def check_out_project(all_projects){
+    for(p in all_projects){
+        if(p["name"].indexOf("protected/") == 0){
+            echo "${p['name']} can not check on OA"
+            continue 
+        }
+        do_code_checkout("${HoneyRepo_Home}\\${p['path']}",
+            "${p['url']}",
+            "${p['name']}",
+            "${p['branch']}",
+            "${p['ref_spec']}",
+            "${p['revision']}")
+    }
+}
+
+
+def get_single_project_info_from_all_project_list(all_projects, single_project_group_name){
+    for(p in all_projects){
+        echo "${p['groups'][0]}  ${single_project_group_name}"
+        if(p["groups"][0] == single_project_group_name){
+            return p
+        }
+    }
+}
+
+
+def copy_depend_script(rom_path, rom_branch){
+    echo "${rom_path}"
+    echo "${rom_branch}"
+    bat "copy \"D:\\local_depend_script\\${rom_branch}\\nightly-build.py\" ${rom_path}\\script"
+}
+
+
+timestamps{
+    catchError{
+        def iDir = 'cov-idir';
+        throttle(['KeilBuild']){
+            node('keilBuildServer'){
+            //node('windows-build-server8'){
+                stage("NightlyBuild"){
+                    timeout(180){
+                        do_code_checkout("${Manifest_Home}", env['GIT_URL'], "HoneyRepo/manifest", "master", "","master")
+
+                        // to do, nightly need to update manifest according RD's requirement
+                        all_projects_in_manifest = get_project_info_from_manifest("${Manifest_Home}\\guiEngine\\test-chip.xml")
+                        check_out_project(all_projects_in_manifest)
+                        emptyFolder(iDir)
+                        dir("${HoneyRepo_Home}\\${BRANCH_NAME}"){
+                            if(COV_VIEW_MAP.containsKey(BRANCH_NAME) == false){
+                                error 'Please configure Coverity first.'
+                            }
+                            env['COVERITY_UNSUPPORTED']=1
+                            env['HoneyRepo'] = "${WORKSPACE}\\${HoneyRepo_Home}"
+                            env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\test-chip.xml"
+                            withCoverityEnv(coverityToolName: 'default', connectInstance: 'BT-Coverity'){
+                                // run cov-build capture command
+                                bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-test-chip"
+
+                                // run cov-analyze command
+                                bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true"
+
+                                // run cov-commit-defects command
+                                bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --host ${COVERITY_HOST} --dataport ${COVERITY_PORT} --stream ${COV_VIEW_MAP[BRANCH_NAME]['stream']}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
