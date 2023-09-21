@@ -23,7 +23,7 @@ static void rtgui_font_stb_load(gui_text_t *text)
     float all_char_w = 0;
     float scale = 0;
     int ch = 0, advance = 0, lsb = 0;
-    int line_flag;
+    int line_flag = 0;
     scale = stbtt_ScaleForPixelHeight(&font, text->font_height);
     while (ch < unicode_len)
     {
@@ -155,7 +155,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     if (dc_bytes_per_pixel == 4)
     {
         uint32_t *writebuf = (uint32_t *)dc->frame_buf + (rect->y1) * dc->fb_width + rect->x1 + offset;
-        uint32_t color_back;
+        uint32_t color_back = 0;
         for (int32_t i  = _UI_MAX(text->base.dy - rect->y1, 0); i < stb_screen->height &&
              (i + rect->y1 <= text->base.dy + text->base.h); i++)
         {
@@ -175,7 +175,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     else if (dc_bytes_per_pixel == 2)
     {
         uint16_t *writebuf = (uint16_t *)dc->frame_buf + (rect->y1) * dc->fb_width + rect->x1 + offset;
-        uint16_t color_back;
+        uint16_t color_back = 0;
         for (int32_t i  = _UI_MAX(text->base.dy - rect->y1, 0); i < stb_screen->height &&
              (i + rect->y1 <= text->base.dy + text->base.h); i++)
         {

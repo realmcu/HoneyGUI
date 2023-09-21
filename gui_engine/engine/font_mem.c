@@ -661,7 +661,7 @@ void rtgui_font_mem_init(void)
 void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
                                void *font_table_addr)
 {
-    size_t i = 0;
+    int i = 0;
     for (; i < sizeof(font_lib_tab) / sizeof(struct font_lib); i++)
     {
         if (font_lib_tab[i].dot_name == 0 && font_lib_tab[i].font_size == 0 &&
@@ -674,6 +674,10 @@ void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
             break;
         }
     }
+    if (i >= sizeof(font_lib_tab) / sizeof(struct font_lib))
+    {
+        return;
+    }
     font_lib_tab[i].font_file = font_bitmap_addr;
     font_lib_tab[i].dot_name = font_bitmap_addr;
     font_lib_tab[i].font_size = font_size;
@@ -684,7 +688,7 @@ void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
 
 void gui_font_mem_init(uint8_t *font_bin_addr)
 {
-    size_t i = 0;
+    int i = 0;
     if (!font_bin_addr)
     {
         return;
@@ -704,6 +708,10 @@ void gui_font_mem_init(uint8_t *font_bin_addr)
         {
             break;
         }
+    }
+    if (i >= sizeof(font_lib_tab) / sizeof(struct font_lib))
+    {
+        return;
     }
     font_lib_tab[i].font_file = font_bin_addr;
     font_lib_tab[i].font_size = * (uint8_t *)(font_bin_addr + 6);
