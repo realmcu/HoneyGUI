@@ -10,7 +10,7 @@
 //#define NANOVG_VGLITE_DEBUG
 #ifdef NANOVG_VGLITE_DEBUG
 
-#define NANOVG_LOG(format, ...) DBG_DIRECT(format, ##__VA_ARGS__)
+#define NANOVG_LOG(format, ...) gui_log(format, ##__VA_ARGS__)
 
 #else
 

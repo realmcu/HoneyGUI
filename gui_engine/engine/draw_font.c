@@ -81,7 +81,7 @@ uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
                 break;
             }
         default:
-            //DBG_DIRECT("the len is more than 6\n");
+            //gui_log("the len is more than 6\n");
             break;
         }
     }

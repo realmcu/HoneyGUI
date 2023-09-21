@@ -95,14 +95,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             ppe_matrix_inverse(&temp);
             memcpy(&source.inv_matrix, &temp, sizeof(float) * 9);
         }
-//        DBG_DIRECT("%f | %f | %f", image->inverse->m[0][0], image->inverse->m[0][1], image->inverse->m[0][2]);
-//        DBG_DIRECT("%f | %f | %f", image->inverse->m[1][0], image->inverse->m[1][1], image->inverse->m[1][2]);
-//        DBG_DIRECT("%f | %f | %f", image->inverse->m[2][0], image->inverse->m[2][1], image->inverse->m[2][2]);
-//        DBG_DIRECT("==============================");
-//        DBG_DIRECT("%f | %f | %f", source.inv_matrix.m[0][0], source.inv_matrix.m[0][1], source.inv_matrix.m[0][2]);
-//        DBG_DIRECT("%f | %f | %f", source.inv_matrix.m[1][0], source.inv_matrix.m[1][1], source.inv_matrix.m[1][2]);
-//        DBG_DIRECT("%f | %f | %f", source.inv_matrix.m[2][0], source.inv_matrix.m[2][1], source.inv_matrix.m[2][2]);
-//        DBG_DIRECT("==============================");
+
         PPEV2_err err = PPEV2_Blend(&target, &source);
         if (err != PPEV2_SUCCESS)
         {
@@ -127,7 +120,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                                                   * (header->algorithm_type.pixel_bytes + 2));
             if (source.address == NULL)
             {
-                DBG_DIRECT("no mem remain");
+                gui_log("no mem remain");
                 return;
             }
             source.width = range.end_column - range.start_column + 1;
@@ -135,12 +128,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             uint8_t rtzip_tx_dma_num = 0xa5, rtzip_rx_dma_num = 0xa5;
             if (!GDMA_channel_request(&rtzip_tx_dma_num, NULL, true))
             {
-                DBG_DIRECT("no dma for tx");
+                gui_log("no dma for tx");
                 return;
             }
             if (!GDMA_channel_request(&rtzip_rx_dma_num, NULL, true))
             {
-                DBG_DIRECT("no dma for rx");
+                gui_log("no dma for rx");
                 return;
             }
             dma_cfg.output_buf = (uint32_t *)source.address;

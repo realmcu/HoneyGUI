@@ -49,11 +49,15 @@ static void widget_nanovg_draw_cb(gui_obj_t *obj)
 
         this->vg = vg;
         nvgResetTransform(vg);
-        nvgTranslate(vg, (float)obj->dx, (float)obj->dy);
 
-        //nvgTranslate(vg, (float)0.0, -(float)(dc->section_count * dc->fb_height));// no need do this , because restruct nanovg  help do this
+        nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+        nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+        nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
 
-        //nvgTranslate(vg, (float)0.0, -(float)(dc->section_count * dc->fb_height));// no need do this , because restruct nanovg  help do this
+        nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+        nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
+
 
         this->nanovg_canvas_cb(this);
 

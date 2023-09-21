@@ -290,7 +290,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     dma_cfg.RX_DMA_channel = GDMA_Channel3;
                     dma_cfg.TX_DMA_channel = GDMA_Channel1;
                     RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
-//                    DBG_DIRECT("RTZIP res %d, line %d to %d", err, range.start_line, range.end_line);
                     if (err)
                     {
                         gui_free(source.memory);

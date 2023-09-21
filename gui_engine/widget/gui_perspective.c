@@ -421,15 +421,12 @@ static void prepare(gui_obj_t *obj)
 
     int ry[6] = {0, 60, 120, 180, 240, 300};
 
-
     switch (tp->type)
     {
     case TOUCH_HOLD_X:
         for (uint32_t i = 0; i < 6; i++)
         {
             ry[i] += tp->deltaX;
-            ry[i] += 720;
-            ry[i] = ry[i] % 360;
         }
         break;
     default:
@@ -437,34 +434,13 @@ static void prepare(gui_obj_t *obj)
     }
 
 
-    float rryy[6];
-    int k = 0;
-    for (uint32_t i = 0; i < 6; i++)
-    {
-        if ((ry[i] > 90) && (ry[i] < 270))
-        {
-            rryy[k] = ry[i];
-            k++;
-        }
-    }
-    for (uint32_t i = 0; i < 6; i++)
-    {
-        if ((ry[i] <= 90) || (ry[i] >= 270))
-        {
-            rryy[k] = ry[i];
-            k++;
-        }
-    }
-
     for (uint32_t i = 0; i < 6; i++)
     {
 
-        compute_rotate(0, rryy[i], 0, &rotate_3D);
-
+        compute_rotate(0, ry[i], 0, &rotate_3D);
         float xoff = dc->screen_width / 2;
         float yoff = dc->screen_height / 2 + 100;
         float zoff = -2 * d;
-
 
         transfrom_rotate(&rotate_3D, &v0, &rv0, xoff, yoff, zoff);
         transfrom_rotate(&rotate_3D, &v1, &rv1, xoff, yoff, zoff);
@@ -485,10 +461,43 @@ static void prepare(gui_obj_t *obj)
 static void draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
-
+    touch_info_t *tp = tp_get_info();
     gui_perspective_t *this = (gui_perspective_t *)obj;
+
+    int ry[6] = {0, 60, 120, 180, 240, 300};
+    switch (tp->type)
+    {
+    case TOUCH_HOLD_X:
+        for (uint32_t i = 0; i < 6; i++)
+        {
+            ry[i] += tp->deltaX;
+        }
+        break;
+    default:
+        break;
+    }
+
     for (uint32_t i = 0; i < 6; i++)
     {
+        if (fix_cos(ry[i]) >= 0.0f)
+        {
+            continue;
+        }
+        draw_img_t *draw_img = &this->img[i];
+
+        rtgui_rect_t rect = {0};
+        rect.x1 = obj->dx + draw_img->img_x;
+        rect.y1 = obj->dy + draw_img->img_y;
+        rect.x2 = rect.x1 + obj->w;
+        rect.y2 = rect.y1 + obj->h;
+        gui_get_acc()->blit(draw_img, dc, &rect);
+    }
+    for (uint32_t i = 0; i < 6; i++)
+    {
+        if (fix_cos(ry[i]) < 0.0f)
+        {
+            continue;
+        }
         draw_img_t *draw_img = &this->img[i];
 
         rtgui_rect_t rect = {0};
