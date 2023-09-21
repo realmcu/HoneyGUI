@@ -15,6 +15,7 @@
 
 static struct rtgui_matrix rotate_3D;
 static Vertex_t rv0, rv1, rv2, rv3;
+static Vertex_t tv0, tv1, tv2, tv3;
 
 #define USE_FIX_SIN 1
 #if USE_FIX_SIN
@@ -438,14 +439,22 @@ static void prepare(gui_obj_t *obj)
     {
 
         compute_rotate(0, ry[i], 0, &rotate_3D);
+
+        transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
+        transfrom_rotate(&rotate_3D, &v1, &tv1, 0, 0, 0);
+        transfrom_rotate(&rotate_3D, &v2, &tv2, 0, 0, 0);
+        transfrom_rotate(&rotate_3D, &v3, &tv3, 0, 0, 0);
+
+        compute_rotate(0, 0, 0, &rotate_3D);//set here for x-axis
+
         float xoff = dc->screen_width / 2;
         float yoff = dc->screen_height / 2 + 100;
         float zoff = -2 * d;
 
-        transfrom_rotate(&rotate_3D, &v0, &rv0, xoff, yoff, zoff);
-        transfrom_rotate(&rotate_3D, &v1, &rv1, xoff, yoff, zoff);
-        transfrom_rotate(&rotate_3D, &v2, &rv2, xoff, yoff, zoff);
-        transfrom_rotate(&rotate_3D, &v3, &rv3, xoff, yoff, zoff);
+        transfrom_rotate(&rotate_3D, &tv0, &rv0, xoff, yoff, zoff);
+        transfrom_rotate(&rotate_3D, &tv1, &rv1, xoff, yoff, zoff);
+        transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
+        transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
 
         Vertex_t p = {dc->screen_width / 2, 0, 2 * d};
         transfrom_blit(this->img[i].img_w, this->img[i].img_h, &p, &rv0, &rv1, &rv2, &rv3,

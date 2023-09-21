@@ -102,6 +102,10 @@ static void app_hongkong_ui_design(gui_app_t *app)
     // page_array_flash(win);
     // return;
 
+    uint8_t *array_flash[] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, CLOCKN_BIN, STRESS_BIN, MUSIC_BIN, QUICKCARD_BIN};
+    gui_perspective_t *img_test = gui_perspective_create(win, "test", array_flash, 0, 0, 454, 454);
+    return;
+
     tv = gui_tabview_create(win, "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
