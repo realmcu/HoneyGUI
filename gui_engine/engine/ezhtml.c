@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include "gui_server.h"
 
-#include "gui_img_with_animate.h"
+//#include "gui_img_with_animate.h"
 #include <gui_magic_img.h>
 #include <gui_app.h>
 #include <stdlib.h>
@@ -2234,7 +2234,7 @@ void foreach_count(ezxml_t p, size_t *widget_count)
         foreach_count(i->child, widget_count);
     }
 }
-#include "gui_server.h"
+//#include "gui_server.h"
 /*void app_init(void *p)
 {
     gui_app_t *app = p;

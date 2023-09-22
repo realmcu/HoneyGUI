@@ -1,10 +1,10 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <gui_matrix.h>
+//#include <gui_matrix.h>
 #include "acc_engine.h"
-#include "gui_canvas.h"
-#include "nanovg_agge.h"
+//#include "gui_canvas.h"
+//#include "nanovg_agge.h"
 
 #if defined ( __CC_ARM ) && !defined(RTL8763EP)
 #define __FPU_PRESENT                  1            /* FPU present                                                             */

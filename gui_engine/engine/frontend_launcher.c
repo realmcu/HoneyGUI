@@ -14,16 +14,16 @@
 #include "gui_tab.h"
 #include "gui_grid.h"
 #include <gui_dynamic_img.h>
-#include "gui_progressbar.h"
-#include "gui_seekbar.h"
-#include "tp_algo.h"
+//#include "gui_progressbar.h"
+//#include "gui_seekbar.h"
+//#include "tp_algo.h"
 #include "gui_return.h"
-#include <math.h>
+//#include <math.h>
 #ifdef MODULE_VG_LITE
 #include "gui_vg_lite_clock.h"
 #include "gui_cube.h"
 #else
-#include "gui_cube.h"
+//#include "gui_cube.h"
 #endif
 static void app_launcher_frontend_ui_design(gui_app_t *app);
 static gui_app_t app_launcher_frontend =
