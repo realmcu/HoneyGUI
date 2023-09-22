@@ -391,6 +391,8 @@ static bool full_rank(struct rtgui_matrix *m)
 }
 #endif
 
+static int ry[6] = {0, 60, 120, 180, 240, 300};
+static int temp[6] = {0, 60, 120, 180, 240, 300};
 static void prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -420,20 +422,48 @@ static void prepare(gui_obj_t *obj)
     scale_3d(&v2, 1.0f);
     scale_3d(&v3, 1.0f);
 
-    int ry[6] = {0, 60, 120, 180, 240, 300};
 
+
+    for (uint32_t i = 0; i < 6; i++)
+    {
+        ry[i] = i * 60;
+    }
     switch (tp->type)
     {
     case TOUCH_HOLD_X:
-        for (uint32_t i = 0; i < 6; i++)
-        {
-            ry[i] += tp->deltaX;
-        }
+        this->release_x = tp->deltaX;
         break;
     default:
         break;
     }
+    if (this->release_x > 0)
+    {
+        this->release_x--;
+    }
+    if (this->release_x < 0)
+    {
+        this->release_x++;
+    }
 
+
+    for (uint32_t i = 0; i < 6; i++)
+    {
+        ry[i] += this->release_x;
+        temp[i] = ry[i];
+    }
+
+    for (uint32_t i = 0; i < 6 - 1; i++)
+    {
+        for (uint32_t j = 0; j < 6 - i - 1; j++)
+        {
+            if (fix_cos(temp[j]) > fix_cos(temp[j + 1]))
+            {
+                float t = temp[j];
+                temp[j] = temp[j + 1];
+                temp[j + 1] = t;
+            }
+        }
+    }
 
     for (uint32_t i = 0; i < 6; i++)
     {
@@ -473,49 +503,26 @@ static void draw_cb(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_perspective_t *this = (gui_perspective_t *)obj;
 
-    int ry[6] = {0, 60, 120, 180, 240, 300};
-    switch (tp->type)
+
+
+    for (uint32_t j = 0; j < 6; j++)
     {
-    case TOUCH_HOLD_X:
         for (uint32_t i = 0; i < 6; i++)
         {
-            ry[i] += tp->deltaX;
+            if (temp[j] == ry[i])
+            {
+                draw_img_t *draw_img = &this->img[i];
+
+                rtgui_rect_t rect = {0};
+                rect.x1 = obj->dx + draw_img->img_x;
+                rect.y1 = obj->dy + draw_img->img_y;
+                rect.x2 = rect.x1 + obj->w;
+                rect.y2 = rect.y1 + obj->h;
+                gui_get_acc()->blit(draw_img, dc, &rect);
+            }
         }
-        break;
-    default:
-        break;
     }
 
-    for (uint32_t i = 0; i < 6; i++)
-    {
-        if (fix_cos(ry[i]) >= 0.0f)
-        {
-            continue;
-        }
-        draw_img_t *draw_img = &this->img[i];
-
-        rtgui_rect_t rect = {0};
-        rect.x1 = obj->dx + draw_img->img_x;
-        rect.y1 = obj->dy + draw_img->img_y;
-        rect.x2 = rect.x1 + obj->w;
-        rect.y2 = rect.y1 + obj->h;
-        gui_get_acc()->blit(draw_img, dc, &rect);
-    }
-    for (uint32_t i = 0; i < 6; i++)
-    {
-        if (fix_cos(ry[i]) < 0.0f)
-        {
-            continue;
-        }
-        draw_img_t *draw_img = &this->img[i];
-
-        rtgui_rect_t rect = {0};
-        rect.x1 = obj->dx + draw_img->img_x;
-        rect.y1 = obj->dy + draw_img->img_y;
-        rect.x2 = rect.x1 + obj->w;
-        rect.y2 = rect.y1 + obj->h;
-        gui_get_acc()->blit(draw_img, dc, &rect);
-    }
 }
 
 

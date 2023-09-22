@@ -34,9 +34,7 @@ typedef struct gui_perspective
 {
     gui_obj_t base;
     draw_img_t img[6];
-    // float c_x;
-    // float c_y;
-    // float cbsize;
+    int16_t release_x;
 } gui_perspective_t;
 
 #define RAD(d)        (d*3.1415926f/180.0f)
