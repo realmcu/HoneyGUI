@@ -7,7 +7,7 @@
 #include <gui_alert.h>
 //#include <string.h>
 #include <gui_server.h>
-#include "gui_curtain.h"
+//#include "gui_curtain.h"
 #include "gui_obj.h"
 
 void gui_alert_ctor(struct gui_alert *this, gui_obj_t *parent, const char *widgetname, int16_t x,

@@ -53,7 +53,7 @@ static void seekbar_preapre(gui_obj_t *obj)
                 //////gui_log("%s\n", "TOUCH_SHORT");
                 //
                 bool callback = false;
-                if (callback) { callback = false; }
+                if (!callback) { callback = false; }
                 for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                 {
                     gui_event_dsc_t *event_dsc = obj->event_dsc + i;
@@ -355,7 +355,7 @@ static void seekbar_h_preapre(gui_obj_t *obj)
                 //////gui_log("%s\n", "TOUCH_SHORT");
                 //
                 bool callback = false;
-                if (callback) { callback = false; }
+                if (!callback) { callback = false; }
                 for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                 {
                     gui_event_dsc_t *event_dsc = obj->event_dsc + i;

@@ -5,14 +5,15 @@
 
 #include <guidef.h>
 #include <string.h>
-#include <math.h>
+//#include <math.h>
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include <gui_tabview.h>
 #include <gui_magic_img.h>
-#include "gui_canvas.h"
-#include "gui_curtain.h"
+#include "gui_tab.h"
+//#include "gui_canvas.h"
+//#include "gui_curtain.h"
 #include "gui_img.h"
 
 void tabview_prepare(gui_obj_t *obj)
