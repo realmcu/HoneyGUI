@@ -851,6 +851,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     case IMG_TRANSPARENT_MODE:
     case IMG_MAGIC_MATRIX:
         blend_mode = VG_LITE_BLEND_SRC_OVER;
+        source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     default:
         break;
     }
