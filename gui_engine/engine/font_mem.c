@@ -95,8 +95,12 @@ void rtgui_font_mem_load(gui_text_t *text)
     {
         GUI_ASSERT(NULL != NULL);
     }
+    uint16_t unicode_len = 0;
+    if (p_buf)
+    {
+        unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    }
 
-    uint16_t unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
     uint32_t all_char_w = 0;
     uint32_t line_flag = 0;
     switch (font_name->index_method)
