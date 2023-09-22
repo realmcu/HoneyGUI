@@ -178,11 +178,11 @@ void tabview_prepare(gui_obj_t *obj)
 
     if (this->release_x > 0)
     {
-        this->release_x--;
+        this->release_x -= GUI_FRAME_STEP;
     }
     if (this->release_x < 0)
     {
-        this->release_x++;
+        this->release_x += GUI_FRAME_STEP;
     }
     obj->dx = this->release_x;
 }

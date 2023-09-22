@@ -102,9 +102,6 @@ static void app_hongkong_ui_design(gui_app_t *app)
     // page_array_flash(win);
     // return;
 
-    uint8_t *array_flash[] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, CLOCKN_BIN, STRESS_BIN, MUSIC_BIN, QUICKCARD_BIN};
-    gui_perspective_t *img_test = gui_perspective_create(win, "test", array_flash, 0, 0, 454, 454);
-    return;
 
     tv = gui_tabview_create(win, "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);
@@ -116,8 +113,9 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_sleep = gui_tab_create(tv, "tb_sleep",           0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 6, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 7, 0);
-
-
+    gui_tab_t *tb_3d = gui_tab_create(tv, "tb_3d",              0, 0, 0, 0, -2, 0);
+    uint8_t *array_flash[] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, CLOCKN_BIN, STRESS_BIN, MUSIC_BIN, QUICKCARD_BIN};
+    gui_perspective_t *img_test = gui_perspective_create(tb_3d, "test", array_flash, 0, 0, 454, 454);
     // page_tb_clock(tb_clock);
     page_tb_activity(tb_activity);
     page_tb_heart(tb_heart);

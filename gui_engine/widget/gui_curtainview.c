@@ -15,6 +15,12 @@ void curtainvie_update_att(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_curtainview_t *ext = (gui_curtainview_t *)obj;
+    int frame_step = GUI_FRAME_STEP;
+    if (frame_step / 10 >= 1)
+    {
+        frame_step = frame_step / 10;
+    }
+
     if (!((obj->parent->dx == 0) && (obj->parent->dy == 0)))
     {
         ext->cur_curtain = CURTAIN_MIDDLE;
@@ -104,7 +110,7 @@ void curtainvie_update_att(gui_obj_t *obj)
             }
             if (ext->spring_flag)
             {
-                ext->spring_value--;
+                ext->spring_value -= GUI_FRAME_STEP;
                 obj->y += ext->spring_value;
                 if (obj->y < 0)
                 {
@@ -117,7 +123,7 @@ void curtainvie_update_att(gui_obj_t *obj)
             }
             else
             {
-                ext->spring_value++;
+                ext->spring_value += GUI_FRAME_STEP;
                 obj->y += ext->spring_value;
             }
 
@@ -159,7 +165,7 @@ void curtainvie_update_att(gui_obj_t *obj)
             }
             if (ext->spring_flag)
             {
-                ext->spring_value++;
+                ext->spring_value += GUI_FRAME_STEP;
                 obj->y += ext->spring_value;
                 if (obj->y > 0)
                 {
@@ -172,7 +178,7 @@ void curtainvie_update_att(gui_obj_t *obj)
             }
             else
             {
-                ext->spring_value--;
+                ext->spring_value -= GUI_FRAME_STEP;
                 obj->y += ext->spring_value;
             }
 
