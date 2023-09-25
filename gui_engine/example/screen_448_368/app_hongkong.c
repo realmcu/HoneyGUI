@@ -46,13 +46,13 @@ void *get_app_hongkong(void)
 {
     return &app_hongkong;
 }
-void canvas_cb(gui_canvas_t *canvas)
+static void canvas_cb(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
     nvgFillColor(canvas->vg, nvgRGBA(255, 255, 255, 30));
     nvgFill(canvas->vg);
 }
-void canvas_cb_balck(gui_canvas_t *canvas)
+static void canvas_cb_balck(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
     nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
@@ -113,9 +113,9 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_sleep = gui_tab_create(tv, "tb_sleep",           0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 6, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 7, 0);
-    gui_tab_t *tb_3d = gui_tab_create(tv, "tb_3d",              0, 0, 0, 0, -2, 0);
-    uint8_t *array_flash[] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, CLOCKN_BIN, STRESS_BIN, MUSIC_BIN, QUICKCARD_BIN};
-    gui_perspective_t *img_test = gui_perspective_create(tb_3d, "test", array_flash, 0, 0, 454, 454);
+    // gui_tab_t *tb_3d = gui_tab_create(tv, "tb_3d",              0, 0, 0, 0, -2, 0);
+    // uint8_t *array_flash[] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, CLOCKN_BIN, STRESS_BIN, MUSIC_BIN, QUICKCARD_BIN};
+    // gui_perspective_t *img_test = gui_perspective_create(tb_3d, "test", array_flash, 0, 0, 454, 454);
     // page_tb_clock(tb_clock);
     page_tb_activity(tb_activity);
     page_tb_heart(tb_heart);
@@ -128,13 +128,17 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, NULL);
 
     gui_curtainview_t *ct = gui_curtainview_create(tb_clock, "ct", 0, 0, 368, 448);
+    GET_BASE(ct)->cover = true;
     gui_curtain_t *ct_clock = gui_curtain_create(ct, "1", 0, 0, 368, 448, CURTAIN_MIDDLE, 1);
     gui_curtain_t *ct_control0 = gui_curtain_create(ct, "2", 0, 0, 368, 448, CURTAIN_UP, 1);
     gui_curtain_t *ct_message = gui_curtain_create(ct, "3", 0, 0, 368, 448, CURTAIN_DOWN, 1);
+    gui_curtain_t *ct_left = gui_curtain_create(ct, "3", 0, 0, 368, 448, CURTAIN_LEFT, 0.6f);
     extern void page_ct_clock(void *parent);
     extern void page_ct_message(void *parent);
+    extern void page_ct_sidebar(void *parent);
     page_ct_clock(ct_clock);
     page_ct_message(ct_message);
+    page_ct_sidebar(ct_left);
     gui_canvas_t *canvas = gui_canvas_create(ct_control0, "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_balck);
     tv_up = gui_tabview_create(ct_control0, "tabview_up", 0, 0, 0, 0);

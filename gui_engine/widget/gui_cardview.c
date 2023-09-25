@@ -64,11 +64,11 @@ static void cardview_prepare(gui_obj_t *obj)
 
     if (this->release_y > 0)
     {
-        this->release_y--;
+        this->release_y -= GUI_FRAME_STEP;
     }
     if (this->release_y < 0)
     {
-        this->release_y++;
+        this->release_y += GUI_FRAME_STEP;
     }
     obj->dy = this->release_y;
 

@@ -87,6 +87,7 @@ void tabview_prepare(gui_obj_t *obj)
             if (obj->dx > 0)
             {
                 obj->dx = 0;
+                this->release_x = 0;
                 break;
             }
         }
