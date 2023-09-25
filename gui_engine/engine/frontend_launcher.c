@@ -99,7 +99,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
             strcmp(entry->d_name, "widget.ts") != 0)
         {
-            char path2[1024];
+            char path2[512];
             sprintf(path2, "%s/%s", dirPath, entry->d_name);
             DIR *dirr = 0;
             if ((dirr = opendir(path2)) == NULL)
@@ -112,7 +112,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                 //printf("ddname:%s\n",entryy->d_name);
                 if (strstr(entryy->d_name, ".xml") != NULL)
                 {
-                    char path[1024];
+                    char path[512];
                     sprintf(path, "%s/%s", path2, entryy->d_name);
                     extern void get_app(gui_app_t *app, char **pic, char **text);
                     char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";

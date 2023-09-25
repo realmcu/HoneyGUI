@@ -16,10 +16,16 @@
 static void (*gui_debug_hook)(void) = NULL;
 static void *gui_server_handle = NULL;
 static void *gui_server_mq = NULL;
+static void (*gui_task_ext_execution_hook)(void) = NULL;
 
 void gui_debug_sethook(void (*hook)(void))
 {
     gui_debug_hook = hook;
+}
+
+void gui_task_ext_execution_sethook(void (*hook)(void))
+{
+    gui_task_ext_execution_hook = hook;
 }
 
 bool send_msg_to_gui_server(rtgui_msg_t *msg)
@@ -63,6 +69,12 @@ static void rtgui_server_entry(void *parameter)
 
         gui_obj_t *screen = &app->screen;
         GUI_ASSERT(screen != NULL);
+
+        /*exe some app action, like kick watchdog*/
+        if (gui_task_ext_execution_hook != NULL)
+        {
+            gui_task_ext_execution_hook();
+        }
 
         rtgui_msg_t msg;
         (void)msg;
