@@ -338,9 +338,21 @@
 #define MODULE_USING_RTK_GUI
 // </c>
 
-// <c> RTK GUI Demo
+// <o> UI_DEMO
+// <0=> MODULE_USING_RTK_GUI_454_454_DEMO
+// <1=> MODULE_USING_RTK_GUI_448_368_DEMO
+// <2=> MODULE_USING_RTK_GUI_320_384_DEMO
+
+#define UI_DEMO_TYPE 1
+#if UI_DEMO_TYPE == 0
+#define MODULE_USING_RTK_GUI_454_454_DEMO
+#endif // 0
+#if UI_DEMO_TYPE == 1
 #define MODULE_USING_RTK_GUI_448_368_DEMO
-// </c>
+#endif // 1
+#if UI_DEMO_TYPE == 2
+#define MODULE_USING_RTK_GUI_320_384_DEMO
+#endif // 2
 //#define MODULE_USING_SCRIPT_AS_A_APP
 // <c> RTK GUI frame buffer type
 #define RTK_GUI_FB_RAM_SINGLE

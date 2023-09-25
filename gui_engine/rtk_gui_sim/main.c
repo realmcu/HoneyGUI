@@ -21,7 +21,19 @@
 #include "time.h"
 
 
+#define BEE3_PRO       0
+#define BEE3_PRO_HK    1
+#define BEE4_HK        2
 
+#ifdef MODULE_USING_RTK_GUI_454_454_DEMO
+#define UI_DEMO        BEE3_PRO
+#endif
+#ifdef MODULE_USING_RTK_GUI_448_368_DEMO
+#define UI_DEMO        BEE3_PRO_HK
+#endif
+#ifdef MODULE_USING_RTK_GUI_320_384_DEMO
+#define UI_DEMO        BEE4_HK
+#endif
 
 
 
@@ -44,8 +56,15 @@ int main(int argc, char **argv)
     //nanosv_main();
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
     int fd;
-    // fd = open("./example/screen_454_454/root_image/root(0x4400000).bin", 0);
+#if UI_DEMO == BEE3_PRO
+    fd = open("./example/screen_454_454/root_image/root(0x4400000).bin", 0);
+#endif
+#if UI_DEMO == BEE3_PRO_HK
     fd = open("./example/screen_448_368/root_image_hongkong/root(0x4400000).bin", 0);
+#endif
+#if UI_DEMO == BEE4_HK
+    fd = open("./example/screen_320_384/root_image_hongkong_bee4/root(0x4400000).bin", 0);
+#endif
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
@@ -64,11 +83,18 @@ int main(int argc, char **argv)
 //#ifdef MODULE_USING_RTK_GUI_DEMO
 #if 1
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
-    // extern gui_app_t *get_app_launcher(void);
-    // gui_app_startup(get_app_launcher());
+#if UI_DEMO == BEE3_PRO
+    extern gui_app_t *get_app_launcher(void);
+    gui_app_startup(get_app_launcher());
+#endif
+#if UI_DEMO == BEE3_PRO_HK
     extern void *get_app_hongkong(void);
     gui_app_startup(get_app_hongkong());
-
+#endif
+#if UI_DEMO == BEE4_HK
+    extern void *get_app_bee4_hk(void);
+    gui_app_startup(get_app_bee4_hk());
+#endif
 #endif
 #else
     extern gui_app_t *get_rtk_gui_demo(void);
