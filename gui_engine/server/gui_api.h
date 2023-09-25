@@ -129,6 +129,7 @@ void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size);
 void gui_display_on(void);
 void gui_display_off(void);
 uint32_t gui_ms_get(void);
+void gui_task_ext_execution_sethook(void (*hook)(void));
 #ifdef __cplusplus
 }
 #endif
