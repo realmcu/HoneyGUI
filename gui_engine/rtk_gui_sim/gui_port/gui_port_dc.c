@@ -8,8 +8,14 @@
 #include "time.h"
 #include "tp_algo.h"
 
+
+#if 0
+#define DRV_LCD_WIDTH   320
+#define DRV_LCD_HIGHT   384
+#else
 #define DRV_LCD_WIDTH   368
 #define DRV_LCD_HIGHT   448
+#endif // 0
 #define DRV_PIXEL_BITS  32
 #define LCD_SECTION_HEIGHT 10
 //#define USE_DC_PFB
