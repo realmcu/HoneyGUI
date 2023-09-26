@@ -1,6 +1,7 @@
 #include "gui_img_with_animate.h"
-static void set_animate(gui_img_with_animate_t *o, uint32_t dur, int repeatCount, void *callback,
-                        void *p)
+void gui_img_with_animate_set_animate(gui_img_with_animate_t *o, uint32_t dur, int repeatCount,
+                                      void *callback,
+                                      void *p)
 {
     gui_img_with_animate_t *a = (o);
     GUI_UNUSED(a);
@@ -61,8 +62,8 @@ static void img_with_animate_ctor(gui_img_with_animate_t *this, void *parent,
 {
     gui_img_from_mem_ctor((void *)this, parent, "_default_img_with_animate", resourse_address, x, y,
                           0, 0);
-    this->set_animate = set_animate;
     GET_BASE(this)->obj_update_att = obj_update_att;
+    this->base.draw_img.blend_mode = IMG_BYPASS_MODE;
 }
 gui_img_with_animate_t *gui_img_with_animate_create(void *parent, void *resourse_address, int16_t x,
                                                     int16_t y)

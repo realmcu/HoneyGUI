@@ -13,12 +13,13 @@
 #include <gui_magic_img.h>
 #include "gui_switch.h"
 #include "gui_canvas.h"
-
+#include "gui_img_with_animate.h"
 static void app_hongkong_ui_design(gui_app_t *app);
 static gui_tabview_t *tv;
 static gui_tabview_t *tv_up;
 static gui_win_t *win;
 gui_cardview_t *cv;
+gui_curtain_t *ct_control0;
 extern void page_tb_clock(void *parent);
 extern void page_tb_activity(void *parent);
 extern void page_tb_heart(void *parent);
@@ -54,8 +55,8 @@ static void canvas_cb(gui_canvas_t *canvas)
 }
 static void canvas_cb_balck(gui_canvas_t *canvas)
 {
-    nvgRect(canvas->vg, 0, 0, 368, 448);
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
+    nvgRect(canvas->vg, 0, -448, 368, 448 * 2);
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 150));
     nvgFill(canvas->vg);
 }
 static void callback(void *obj, gui_event_t e)
@@ -134,7 +135,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_curtainview_t *ct = gui_curtainview_create(tb_clock, "ct", 0, 0, 368, 448);
     GET_BASE(ct)->cover = true;
     gui_curtain_t *ct_clock = gui_curtain_create(ct, "1", 0, 0, 368, 448, CURTAIN_MIDDLE, 1);
-    gui_curtain_t *ct_control0 = gui_curtain_create(ct, "2", 0, 0, 368, 448, CURTAIN_UP, 1);
+    ct_control0 = gui_curtain_create(ct, "2", 0, 0, 368, 448, CURTAIN_UP, 1);
     gui_curtain_t *ct_message = gui_curtain_create(ct, "3", 0, 0, 368, 448, CURTAIN_DOWN, 1);
     gui_curtain_t *ct_left = gui_curtain_create(ct, "3", 0, 0, 368, 448, CURTAIN_LEFT, 0.6f);
     extern void page_ct_clock(void *parent);
@@ -154,30 +155,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_control0(tb_control0);
     page_tb_control1(tb_control1);
 
-    gui_switch_t *sw_no_disturb  = gui_switch_create(tb_control0, 10, 108, 169, 98, NO_DISTURB_OFF_BIN,
-                                                     NO_DISTURB_ON_BIN);
-    gui_switch_t *sw_notice      = gui_switch_create(tb_control0, 190, 108, 169, 98, NOTICE_OFF_BIN,
-                                                     NOTICE_ON_BIN);
-    gui_switch_t *sw_call        = gui_switch_create(tb_control0, 10, 220, 169, 98, CALL_OFF_BIN,
-                                                     CALL_ON_BIN);
-    gui_switch_t *sw_bright      = gui_switch_create(tb_control0, 190, 220, 169, 98, BRIGHT_OFF_BIN,
-                                                     BRIGHT_ON_BIN);
-    gui_switch_t *sw_watch       = gui_switch_create(tb_control0, 10, 332, 169, 98, WATCH_OFF_BIN,
-                                                     WATCH_ON_BIN);
-    gui_switch_t *sw_set         = gui_switch_create(tb_control0, 190, 332, 169, 98, SET_OFF_BIN,
-                                                     SET_ON_BIN);
-    gui_switch_t *sw_vibrate     = gui_switch_create(tb_control1, 10, 108, 169, 98, VIBRATE_OFF_BIN,
-                                                     VIBRATE_ON_BIN);
-    gui_switch_t *sw_ring        = gui_switch_create(tb_control1, 190, 108, 169, 98, RING_OFF_BIN,
-                                                     RING_ON_BIN);
-    gui_switch_t *sw_emotion     = gui_switch_create(tb_control1, 10, 220, 169, 98, EMOTION_OFF_BIN,
-                                                     EMOTION_ON_BIN);
-    gui_switch_t *sw_flashlight  = gui_switch_create(tb_control1, 190, 220, 169, 98, FLASHLIGHT_OFF_BIN,
-                                                     FLASHLIGHT_ON_BIN);
-    gui_switch_t *sw_signal      = gui_switch_create(tb_control1, 10, 332, 169, 98, SIGNAL_OFF_BIN,
-                                                     SIGNAL_ON_BIN);
-    gui_switch_t *sw_alarm_clock = gui_switch_create(tb_control1, 190, 332, 169, 98,
-                                                     ALARM_CLOCK_OFF_BIN, ALARM_CLOCK_ON_BIN);
+
 
 }
 static void callback_tab()

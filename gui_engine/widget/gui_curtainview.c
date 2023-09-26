@@ -43,6 +43,7 @@ void curtainvie_update_att(gui_obj_t *obj)
             }
         }
     }
+    GUI_UNUSED(c_middle);
     switch (ext->cur_curtain)
     {
     case CURTAIN_MIDDLE:
@@ -103,10 +104,10 @@ void curtainvie_update_att(gui_obj_t *obj)
         obj->cover = true;
         if (ext->down_flag)
         {
-            if (c_middle)
-            {
-                GET_BASE(c_middle)->not_show = true;
-            }
+            //if (c_middle)
+            //{
+            //    GET_BASE(c_middle)->not_show = true;
+            //}
 
             if (obj->y > 100)
             {
@@ -121,10 +122,10 @@ void curtainvie_update_att(gui_obj_t *obj)
                     ext->down_flag = false;
                     ext->spring_flag = false;
                     ext->spring_value = 0;
-                    if (c_middle)
-                    {
-                        GET_BASE(c_middle)->not_show = false;
-                    }
+                    //if (c_middle)
+                    //{
+                    //    GET_BASE(c_middle)->not_show = false;
+                    //}
 
                 }
 
@@ -166,11 +167,11 @@ void curtainvie_update_att(gui_obj_t *obj)
 
         if (ext->down_flag)
         {
-            if (c_middle)
-            {
-                GET_BASE(c_middle)->not_show = true;
-            }
-
+            //if (c_middle)
+            //{
+            //    GET_BASE(c_middle)->not_show = true;
+            //}
+//
             if (obj->y < -100)
             {
                 ext->spring_flag = true;
@@ -184,11 +185,11 @@ void curtainvie_update_att(gui_obj_t *obj)
                     ext->down_flag = false;
                     ext->spring_flag = false;
                     ext->spring_value = 0;
-                    if (c_middle)
-                    {
-                        GET_BASE(c_middle)->not_show = false;
-                    }
-
+                    //if (c_middle)
+                    //{
+                    //    GET_BASE(c_middle)->not_show = false;
+                    //}
+//
                 }
 
             }

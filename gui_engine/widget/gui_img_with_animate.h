@@ -19,11 +19,12 @@ struct gui_img_with_animate
     gui_img_t base;
     gui_animate_t *animate;
     void (*ctor)(gui_img_with_animate_t *image, gui_obj_t *parent, void *addr, int16_t x, int16_t y);
-    void (* set_animate)(gui_img_with_animate_t *image, uint32_t dur, int repeatCount, void *callback,
-                         void *p);
 } ;
 gui_img_with_animate_t *gui_img_with_animate_create(void *parent, void *resourse_address, int16_t x,
                                                     int16_t y);
+void gui_img_with_animate_set_animate(gui_img_with_animate_t *o, uint32_t dur, int repeatCount,
+                                      void *callback,
+                                      void *p);
 
 #ifdef __cplusplus
 }

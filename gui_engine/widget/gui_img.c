@@ -46,8 +46,8 @@ static void img_draw_cb(gui_obj_t *obj)
     draw_img_t *draw_img = &img->draw_img;
 
     rtgui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->dx;
-    draw_rect.y1 = obj->dy;
+    draw_rect.x1 = obj->ax;
+    draw_rect.y1 = obj->ay;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
     if (gui_get_acc() != NULL)
