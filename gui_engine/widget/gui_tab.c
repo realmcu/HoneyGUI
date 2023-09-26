@@ -25,13 +25,13 @@ static void tab_prepare(gui_obj_t *obj)
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     if (this->style == CLASSIC)
     {
-        obj->tx = (this->id.x - parent->cur_id.x) * (int)gui_get_screen_width();
-        obj->ty = (this->id.y - parent->cur_id.y) * (int)gui_get_screen_height();
+        obj->tx = (this->id.x - parent->cur_id.x) * (int)this->base.w;
+        obj->ty = (this->id.y - parent->cur_id.y) * (int)this->base.h;
         return;
     }
     else if (this->style == FADE)
     {
-        float x = 1.0f - (float)abs(obj->dx) / gui_get_screen_width();
+        float x = 1.0f - (float)abs(obj->dx) / this->base.w;
         if (x < 0.2f)
         {
             x = 0.2f;
@@ -45,7 +45,7 @@ static void tab_prepare(gui_obj_t *obj)
     }
     else if (this->style == REDUCTION_FADE)
     {
-        float x = 1.0f - (float)abs(obj->dx) / gui_get_screen_width();
+        float x = 1.0f - (float)abs(obj->dx) / this->base.w;
         if (x < 0.2f)
         {
             x = 0.2f;
@@ -60,11 +60,11 @@ static void tab_prepare(gui_obj_t *obj)
     else if (this->style == REDUCTION)
     {
         float s;
-        obj->tx = (this->id.x - parent->cur_id.x) * (int)gui_get_screen_width();
-        obj->ty = (this->id.y - parent->cur_id.y) * (int)gui_get_screen_height();
+        obj->tx = (this->id.x - parent->cur_id.x) * (int)this->base.w;
+        obj->ty = (this->id.y - parent->cur_id.y) * (int)this->base.h;
         int sx = abs(obj->dx + obj->ax + obj->tx);
-        sx = sx % gui_get_screen_width();
-        s = 1.0f - (float)sx / gui_get_screen_width();
+        sx = sx % this->base.w;
+        s = 1.0f - (float)sx / this->base.w;
 
         if (s < 0.2f)
         {

@@ -128,7 +128,7 @@ void tabview_prepare(gui_obj_t *obj)
             return;
         }
         tabview->cur_id.x = tabview->cur_id.x + 1;
-        this->release_x = this->release_x  + dc->screen_width;
+        this->release_x = this->release_x + tabview->base.w;
         break;
     case TOUCH_RIGHT_SLIDE:
         gui_log("TOUCH_RIGHT_SLIDE0\n");
@@ -142,7 +142,7 @@ void tabview_prepare(gui_obj_t *obj)
             return;
         }
         tabview->cur_id.x = tabview->cur_id.x - 1;
-        this->release_x = this->release_x  - dc->screen_width;
+        this->release_x = this->release_x - tabview->base.w;
         break;
     case TOUCH_DOWN_SLIDE:
         gui_log("TOUCH_DOWN_SLIDE\n");
@@ -199,6 +199,14 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
 {
     gui_tabview_t *this = gui_malloc(sizeof(gui_tabview_t));
     memset(this, 0, sizeof(gui_tabview_t));
+    if (w == 0)
+    {
+        w = (int)gui_get_screen_width();
+    }
+    if (h == 0)
+    {
+        h = (int)gui_get_screen_height();
+    }
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     GET_BASE(this)->obj_prepare = tabview_prepare;
     GET_BASE(this)->type = TABVIEW;
