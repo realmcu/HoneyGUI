@@ -187,10 +187,6 @@ static void svg_draw_cb(gui_obj_t *obj)
     nvgScale(vg, this->base.sx, this->base.sy);
     nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
 
-    nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
-    nvgScale(vg, this->base.sx, this->base.sy);
-    nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
-
     nvgTranslate(vg, this->t_x, this->t_y);
     nvgRotate(vg, nvgDegToRad(this->degrees));
     nvgScale(vg, this->scale_x, this->scale_y);

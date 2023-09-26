@@ -21,13 +21,13 @@ void magic_img_get_new_area(gui_obj_t *obj, struct gui_dispdev *dc)
 
     matrix_identity(draw_img->matrix);
     matrix_translate(root->dx, root->dy, draw_img->matrix);
-    matrix_translate(root->ax, root->ay, draw_img->matrix);
     matrix_translate(root->tx, root->ty, draw_img->matrix);
 
 
     matrix_translate(dc->screen_width / 2, dc->screen_height / 2, draw_img->matrix);
     matrix_scale(root->sx, root->sy, draw_img->matrix);
     matrix_translate(-dc->screen_width / 2, -dc->screen_height / 2, draw_img->matrix);
+    matrix_translate(root->ax, root->ay, draw_img->matrix);
 
     matrix_translate(this->t_x, this->t_y, draw_img->matrix);
     matrix_rotate(this->degrees, draw_img->matrix);
