@@ -90,6 +90,15 @@ static void callback(void *obj, gui_event_t e)
     page_tb_sleep(tb_sleep);
     page_tb_weather(tb_weather);
     page_tb_music(tb_music);
+
+    // gui_magic_img_create_from_mem(tb_clock, "page0", CLOCKN_GLOW_BIN, 0, 0, 0, 0);
+    // gui_magic_img_create_from_mem(tb_activity, "page1", ACTIVITY_GLOW_BIN, 0, 0, 0, 0);
+    // gui_magic_img_create_from_mem(tb_heart, "page2", HEARTRATE_GLOW_BIN, 0, 0, 0, 0);
+    // gui_magic_img_create_from_mem(tb_blood, "page3", BLOODOXYGEN_GLOW_BIN, 0, 0, 0, 0);
+    // gui_magic_img_create_from_mem(tb_stress, "page4", STRESS_GLOW_BIN, 0, 0, 0, 0);
+    // gui_magic_img_create_from_mem(tb_sleep, "page5", SLEEP_GLOW_BIN, 0, 0, 0, 0);
+    // gui_magic_img_create_from_mem(tb_weather, "page6", WEATHER_GLOW_BIN, 0, 0, 0, 0);
+    // gui_magic_img_create_from_mem(tb_music, "page7", MUSIC_GLOW_BIN, 0, 0, 0, 0);
 }
 
 static void app_hongkong_ui_design(gui_app_t *app)
@@ -97,11 +106,6 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_log("app_hongkong_ui_design\n");
 
     win = gui_win_create(&(app->screen), "win", 0, 0, 320, 320);
-
-    // extern void page_array_flash(void *parent);
-    // page_array_flash(win);
-    // return;
-
 
     tv = gui_tabview_create(win, "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);
@@ -116,7 +120,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     // gui_tab_t *tb_3d = gui_tab_create(tv, "tb_3d",              0, 0, 0, 0, -2, 0);
     // uint8_t *array_flash[] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, CLOCKN_BIN, STRESS_BIN, MUSIC_BIN, QUICKCARD_BIN};
     // gui_perspective_t *img_test = gui_perspective_create(tb_3d, "test", array_flash, 0, 0, 454, 454);
-    // page_tb_clock(tb_clock);
+
     page_tb_activity(tb_activity);
     page_tb_heart(tb_heart);
     page_tb_blood(tb_blood);
@@ -149,6 +153,32 @@ static void app_hongkong_ui_design(gui_app_t *app)
     extern void page_tb_control1(void *parent);
     page_tb_control0(tb_control0);
     page_tb_control1(tb_control1);
+
+    gui_switch_t *sw_no_disturb  = gui_switch_create(tb_control0, 10, 108, 169, 98, NO_DISTURB_OFF_BIN,
+                                                     NO_DISTURB_ON_BIN);
+    gui_switch_t *sw_notice      = gui_switch_create(tb_control0, 190, 108, 169, 98, NOTICE_OFF_BIN,
+                                                     NOTICE_ON_BIN);
+    gui_switch_t *sw_call        = gui_switch_create(tb_control0, 10, 220, 169, 98, CALL_OFF_BIN,
+                                                     CALL_ON_BIN);
+    gui_switch_t *sw_bright      = gui_switch_create(tb_control0, 190, 220, 169, 98, BRIGHT_OFF_BIN,
+                                                     BRIGHT_ON_BIN);
+    gui_switch_t *sw_watch       = gui_switch_create(tb_control0, 10, 332, 169, 98, WATCH_OFF_BIN,
+                                                     WATCH_ON_BIN);
+    gui_switch_t *sw_set         = gui_switch_create(tb_control0, 190, 332, 169, 98, SET_OFF_BIN,
+                                                     SET_ON_BIN);
+    gui_switch_t *sw_vibrate     = gui_switch_create(tb_control1, 10, 108, 169, 98, VIBRATE_OFF_BIN,
+                                                     VIBRATE_ON_BIN);
+    gui_switch_t *sw_ring        = gui_switch_create(tb_control1, 190, 108, 169, 98, RING_OFF_BIN,
+                                                     RING_ON_BIN);
+    gui_switch_t *sw_emotion     = gui_switch_create(tb_control1, 10, 220, 169, 98, EMOTION_OFF_BIN,
+                                                     EMOTION_ON_BIN);
+    gui_switch_t *sw_flashlight  = gui_switch_create(tb_control1, 190, 220, 169, 98, FLASHLIGHT_OFF_BIN,
+                                                     FLASHLIGHT_ON_BIN);
+    gui_switch_t *sw_signal      = gui_switch_create(tb_control1, 10, 332, 169, 98, SIGNAL_OFF_BIN,
+                                                     SIGNAL_ON_BIN);
+    gui_switch_t *sw_alarm_clock = gui_switch_create(tb_control1, 190, 332, 169, 98,
+                                                     ALARM_CLOCK_OFF_BIN, ALARM_CLOCK_ON_BIN);
+
 }
 static void callback_tab()
 {
