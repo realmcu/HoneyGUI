@@ -29,7 +29,7 @@ extern void design_tab_breath(void *parent);
 extern void design_tab_sleep(void *parent);
 
 extern void  page_left_figure(void *parent);
-
+extern void page_down_message(void *parent);
 static gui_app_t app_home =
 {
     .screen =
@@ -68,6 +68,7 @@ static void app_home_ui_design(gui_app_t *app)
     GET_BASE(ct)->cover = true;
     gui_curtain_t *ct_mid = gui_curtain_create(ct, "ct_mid", 0, 0, 320, 384, CURTAIN_MIDDLE, 1);
     gui_curtain_t *ct_left = gui_curtain_create(ct, "ct_left", 0, 0, 320, 384, CURTAIN_LEFT, 0.775f);
+    gui_curtain_t *ct_down = gui_curtain_create(ct, "4", 0, 0, 320, 384, CURTAIN_DOWN, 1);
 
     design_tab_sport(tab_sport);
     design_tab_heart(tab_heart);
@@ -81,4 +82,5 @@ static void app_home_ui_design(gui_app_t *app)
 
     design_tab_home(ct_mid);
     page_left_figure(ct_left);
+    page_down_message(ct_down);
 }
