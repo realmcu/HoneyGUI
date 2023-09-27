@@ -37,7 +37,7 @@
 
 
 
-uint8_t resource_root[1024 * 1024 * 20];
+uint8_t resource_root[1024 * 1024 * 200];
 
 char *defaultPath = "example/screen_454_454/root_image/root/";
 int main(int argc, char **argv)
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
-        read(fd, resource_root, 1024 * 1024 * 20);
+        read(fd, resource_root, 1024 * 1024 * 200);
     }
     else
     {

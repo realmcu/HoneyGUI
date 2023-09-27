@@ -19,7 +19,7 @@ static void seekbar_preapre(gui_obj_t *obj)
         (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
     {
 
-        if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
+        if (tp->type == TOUCH_HOLD_Y)
         {
             if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) && (tp->y >= obj->dy &&
                                                                       tp->y <= (obj->dy + obj->h)))

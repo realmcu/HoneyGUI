@@ -57,7 +57,7 @@ typedef struct gui_curtainview
     float scopeleft;
     float scoperight;
     bool down_flag;
-    bool spring_flag;
+    bool left_flag;
     int spring_value;
     void (*ctor)(struct gui_curtainview *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
