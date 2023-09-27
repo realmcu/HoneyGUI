@@ -17,6 +17,7 @@
 static void app_hongkong_ui_design(gui_app_t *app);
 static gui_tabview_t *tv;
 
+
 extern void design_tab_home(void *parent);
 extern void design_tab_sport(void *parent);
 extern void design_tab_heart(void *parent);
@@ -46,7 +47,7 @@ void *get_app_bee4_hk(void)
 {
     return &app_hongkong;
 }
-
+extern void  page_left_figure(void *parent);
 static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hk_bee4_ui_design\n");
@@ -64,10 +65,13 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tab_note = gui_tab_create(tv, "tb_note",             0, 0, 0, 0, 7, 0);
     gui_tab_t *tab_breath = gui_tab_create(tv, "tb_breath",         0, 0, 0, 0, 8, 0);
     gui_tab_t *tab_sleep = gui_tab_create(tv, "tb_note",            0, 0, 0, 0, 9, 0);
-
+    gui_curtainview_t *ct = gui_curtainview_create(tv, "ct", 0, 0, 368, 448);
+    GET_BASE(ct)->cover = true;
+    gui_curtain_t *ct_left = gui_curtain_create(ct, "4", 0, 0, 368, 448, CURTAIN_LEFT, 0.775f);
 
     design_tab_home(tab_home);
     design_tab_sport(tab_sport);
+
     design_tab_heart(tab_heart);
     design_tab_blood(tab_blood);
     design_tab_call(tab_call);
@@ -76,4 +80,5 @@ static void app_hongkong_ui_design(gui_app_t *app)
     design_tab_note(tab_note);
     design_tab_breath(tab_breath);
     design_tab_sleep(tab_sleep);
+    page_left_figure(ct_left);
 }
