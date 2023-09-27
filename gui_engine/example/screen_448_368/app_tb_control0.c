@@ -3,7 +3,7 @@
 #include "gui_switch.h"
 #include "gui_curtain.h"
 #include "gui_img_with_animate.h"
-gui_img_with_animate_t *img;
+static gui_img_with_animate_t *img;
 static void img_animate(gui_img_with_animate_t *img)
 {
     gui_log("%f\n", img->animate->progress_percent);
@@ -43,30 +43,61 @@ static void callback_disturb_off()
 static void callback_mute_on()
 {
     reset_animate();
-    img->base.draw_img.data = JINGYINGKAI_BIN;
+    img->base.draw_img.data = JINGYINKAI_BIN;
 }
 static void callback_mute_off()
 {
     reset_animate();
     img->base.draw_img.data = JINGYINGUAN_BIN;
 }
-static void callback_on()
+static void callback_call_on()
 {
     reset_animate();
-    img->base.draw_img.data = KAI_BIN;
+    img->base.draw_img.data = DIANHUAKAI_BIN;
 }
-static void callback_off()
+static void callback_call_off()
 {
     reset_animate();
-    img->base.draw_img.data = GUAN_BIN;
+    img->base.draw_img.data = DIANHUAGUAN_BIN;
+}
+
+static void callback_bright_on()
+{
+    reset_animate();
+    img->base.draw_img.data = LIANGDUKAI_BIN;
+}
+static void callback_bright_off()
+{
+    reset_animate();
+    img->base.draw_img.data = LIANGDUGUAN_BIN;
+}
+static void callback_watch_on()
+{
+    reset_animate();
+    img->base.draw_img.data = SHIZHONGKAI_BIN;
+}
+static void callback_watch_off()
+{
+    reset_animate();
+    img->base.draw_img.data = SHIZHONGGUAN_BIN;
+}
+static void callback_set_on()
+{
+    reset_animate();
+    img->base.draw_img.data = SHEZHIKAI_BIN;
+}
+static void callback_set_off()
+{
+    reset_animate();
+    img->base.draw_img.data = SHEZHIGUAN_BIN;
 }
 void page_tb_control0(void *parent)
 {
     // gui_magic_img_create_from_mem(parent, "parent", CONTROLMENU_0_BIN, 0, 0, 0, 0);
     gui_switch_t *sw_no_disturb  = gui_switch_create(parent, 10, 108, 169, 98, NO_DISTURB_OFF_BIN,
                                                      NO_DISTURB_ON_BIN);
-    gui_switch_t *sw_notice      = gui_switch_create(parent, 190, 108, 169, 98, NOTICE_OFF_BIN,
-                                                     NOTICE_ON_BIN);
+    gui_switch_t *sw_mute        = gui_switch_create(parent, 190, 108, 169, 98, MUTE_OFF_BIN,
+                                                     MUTE_ON_BIN);
     gui_switch_t *sw_call        = gui_switch_create(parent, 10, 220, 169, 98, CALL_OFF_BIN,
                                                      CALL_ON_BIN);
     gui_switch_t *sw_bright      = gui_switch_create(parent, 190, 220, 169, 98, BRIGHT_OFF_BIN,
@@ -82,14 +113,14 @@ void page_tb_control0(void *parent)
     img->base.base.not_show = true;
     gui_obj_add_event_cb(sw_no_disturb, (gui_event_cb_t)callback_disturb_on, GUI_EVENT_1, NULL);
     gui_obj_add_event_cb(sw_no_disturb, (gui_event_cb_t)callback_disturb_off, GUI_EVENT_2, NULL);
-    gui_obj_add_event_cb(sw_notice, (gui_event_cb_t)callback_mute_on, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(sw_notice, (gui_event_cb_t)callback_mute_off, GUI_EVENT_2, NULL);
-    gui_obj_add_event_cb(sw_call, (gui_event_cb_t)callback_on, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(sw_call, (gui_event_cb_t)callback_off, GUI_EVENT_2, NULL);
-    gui_obj_add_event_cb(sw_bright, (gui_event_cb_t)callback_on, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(sw_bright, (gui_event_cb_t)callback_off, GUI_EVENT_2, NULL);
-    gui_obj_add_event_cb(sw_watch, (gui_event_cb_t)callback_on, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(sw_watch, (gui_event_cb_t)callback_off, GUI_EVENT_2, NULL);
-    gui_obj_add_event_cb(sw_set, (gui_event_cb_t)callback_on, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(sw_set, (gui_event_cb_t)callback_off, GUI_EVENT_2, NULL);
+    gui_obj_add_event_cb(sw_mute, (gui_event_cb_t)callback_mute_on, GUI_EVENT_1, NULL);
+    gui_obj_add_event_cb(sw_mute, (gui_event_cb_t)callback_mute_off, GUI_EVENT_2, NULL);
+    gui_obj_add_event_cb(sw_call, (gui_event_cb_t)callback_call_on, GUI_EVENT_1, NULL);
+    gui_obj_add_event_cb(sw_call, (gui_event_cb_t)callback_call_off, GUI_EVENT_2, NULL);
+    gui_obj_add_event_cb(sw_bright, (gui_event_cb_t)callback_bright_on, GUI_EVENT_1, NULL);
+    gui_obj_add_event_cb(sw_bright, (gui_event_cb_t)callback_bright_off, GUI_EVENT_2, NULL);
+    gui_obj_add_event_cb(sw_watch, (gui_event_cb_t)callback_watch_on, GUI_EVENT_1, NULL);
+    gui_obj_add_event_cb(sw_watch, (gui_event_cb_t)callback_watch_off, GUI_EVENT_2, NULL);
+    gui_obj_add_event_cb(sw_set, (gui_event_cb_t)callback_set_on, GUI_EVENT_1, NULL);
+    gui_obj_add_event_cb(sw_set, (gui_event_cb_t)callback_set_off, GUI_EVENT_2, NULL);
 }
