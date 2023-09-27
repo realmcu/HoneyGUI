@@ -60,165 +60,66 @@ void win_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
-        (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
+    if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
+        (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
     {
+        if (((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
+             (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h))))
         {
-            if (
-                ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) && (tp->y >= obj->dy &&
-                                                                       tp->y <= (obj->dy + obj->h))))
+            gui_win_t *b = (void *)obj;
+            switch (tp->type)
             {
-                gui_win_t *b = (void *)obj;
-                switch (tp->type)
+            case TOUCH_SHORT:
                 {
-                case TOUCH_SHORT:
-                    {
-                        ////gui_log("%s\n", "TOUCH_SHORT");
-                        //
-
-                        //if (callback)
-                        {
-                            //gui_log("%d\n", __LINE__);
-                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                            {
-                                //gui_log("%d\n", __LINE__);
-                                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
-                            }
-                        }
-                    }
-                    break;
-                case TOUCH_UP_SLIDE:
-                    {
-                        ////gui_log("%s\n", "TOUCH_SHORT");
-                        //
-
-                        //if (callback)
-                        {
-                            //gui_log("%d\n", __LINE__);
-                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                            {
-                                //gui_log("%d\n", __LINE__);
-                                gui_obj_event_set(obj, GUI_EVENT_3);
-                            }
-                        }
-                    }
-                    break;
-                case TOUCH_DOWN_SLIDE:
-                    {
-                        ////gui_log("%s\n", "TOUCH_SHORT");
-                        //
-
-                        //if (callback)
-                        {
-                            //gui_log("%d\n", __LINE__);
-                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                            {
-                                //gui_log("%d\n", __LINE__);
-                                gui_obj_event_set(obj, GUI_EVENT_4);
-                            }
-                        }
-                    }
-                    break;
-                case TOUCH_LEFT_SLIDE:
-                    {
-                        ////gui_log("%s\n", "TOUCH_SHORT");
-                        //
-
-                        //if (callback)
-                        {
-                            //gui_log("%d\n", __LINE__);
-                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                            {
-                                //gui_log("%d\n", __LINE__);
-                                gui_obj_event_set(obj, GUI_EVENT_1);
-                            }
-                        }
-                    }
-                    break;
-                case TOUCH_RIGHT_SLIDE:
-                    {
-                        ////gui_log("%s\n", "TOUCH_SHORT");
-                        //
-
-                        //if (callback)
-                        {
-                            //gui_log("%d\n", __LINE__);
-                            if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                                (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                            {
-                                //gui_log("%d\n", __LINE__);
-                                gui_obj_event_set(obj, GUI_EVENT_2);
-                            }
-                        }
-                    }
-                    break;
-                case TOUCH_LONG:
-                    {
-                        if (b->long_flag == false)
-                        {
-
-                            //if (b->long_click_cb)
-                            {
-                                if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                                    (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                                {
-                                    b->long_flag = true;
-                                    //gui_send_callback_p_to_server(b->long_click_cb, b->long_click_cb_p);
-                                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
-                                }
-                            }
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
-
-
+                break;
+            case TOUCH_UP_SLIDE:
                 {
-                    if (tp->pressed)
-                    {
-
-                        if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                            (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                        {
-
-                            //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-
-                            //gui_log("%d\n", __LINE__);
-                            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  //gui_log("%d\n", __LINE__);
-                            b->long_flag = false;
-                            b->press_flag = true;
-                        }
-                    }
-
-                    if (b->release_flag)
-                    {
-
-                        {
-                            b->press_flag = false;
-                            b->release_flag = false;
-                            //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-                            //gui_log("%d\n", __LINE__);
-
-                            //if (callback)
-                            {
-                                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-                            }  //gui_log("%d\n", __LINE__);
-                            b->long_flag = false;
-                        }
-                    }
-                    if (tp->released && b->press_flag)
-                    {
-                        b->release_flag = true;
-                    }
+                    gui_obj_event_set(obj, GUI_EVENT_3);
                 }
+                break;
+            case TOUCH_DOWN_SLIDE:
+                {
+                    gui_obj_event_set(obj, GUI_EVENT_4);
+                }
+                break;
+            case TOUCH_LEFT_SLIDE:
+                {
+                    gui_obj_event_set(obj, GUI_EVENT_1);
+                }
+                break;
+            case TOUCH_RIGHT_SLIDE:
+                {
+                    gui_obj_event_set(obj, GUI_EVENT_2);
+                }
+                break;
+            case TOUCH_LONG:
+                {
+                    b->long_flag = true;
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                }
+                break;
 
+            default:
+                break;
+            }
+            if (tp->pressed)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                b->long_flag = false;
+                b->press_flag = true;
+            }
+            if (b->release_flag)
+            {
+                b->press_flag = false;
+                b->release_flag = false;
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+                b->long_flag = false;
+            }
+            if (tp->released && b->press_flag)
+            {
+                b->release_flag = true;
             }
         }
     }

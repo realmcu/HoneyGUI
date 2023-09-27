@@ -29,6 +29,8 @@ void gui_tree_not_show(gui_obj_t *obj);
 
 void gui_tree_show(gui_obj_t *obj, bool enable);
 
+void gui_obj_show(void *obj, bool show_info);
+
 gui_obj_t *gui_tree_get_root(gui_obj_t *obj);
 
 gui_obj_t *gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type);
