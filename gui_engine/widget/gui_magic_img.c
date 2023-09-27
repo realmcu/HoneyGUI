@@ -56,7 +56,7 @@ void magic_img_get_new_area(gui_obj_t *obj, struct gui_dispdev *dc)
     y_max = pox.p[1];
 
 
-    pox.p[0] = (float)draw_img->img_w;
+    pox.p[0] = (float)draw_img->img_w - 1;
     pox.p[1] = 0.0f;
     pox.p[2] = 1.0f;
     pox_mul(draw_img->matrix, &pox);
@@ -79,7 +79,7 @@ void magic_img_get_new_area(gui_obj_t *obj, struct gui_dispdev *dc)
 
 
     pox.p[0] = 0.0f;
-    pox.p[1] = (float)draw_img->img_h;
+    pox.p[1] = (float)draw_img->img_h - 1;
     pox.p[2] = 1.0f;
     pox_mul(draw_img->matrix, &pox);
     if (x_min > pox.p[0])
@@ -99,8 +99,8 @@ void magic_img_get_new_area(gui_obj_t *obj, struct gui_dispdev *dc)
         y_max = pox.p[1];
     }
 
-    pox.p[0] = (float)draw_img->img_w;
-    pox.p[1] = (float)draw_img->img_h;
+    pox.p[0] = (float)draw_img->img_w - 1;
+    pox.p[1] = (float)draw_img->img_h - 1;
     pox.p[2] = 1.0f;
     pox_mul(draw_img->matrix, &pox);
     if (x_min > pox.p[0])

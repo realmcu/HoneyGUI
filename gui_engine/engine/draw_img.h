@@ -45,8 +45,8 @@ typedef enum
 
 typedef struct draw_img
 {
-    uint16_t img_x;
-    uint16_t img_y;
+    int16_t img_x;
+    int16_t img_y;
     uint16_t img_w;
     uint16_t img_h;
     uint16_t target_w;
