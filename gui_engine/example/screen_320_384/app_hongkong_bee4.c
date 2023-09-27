@@ -14,9 +14,8 @@
 #include "gui_switch.h"
 #include "gui_canvas.h"
 
-static void app_hongkong_ui_design(gui_app_t *app);
-static gui_tabview_t *tv;
-
+static void app_home_ui_design(gui_app_t *app);
+gui_tabview_t *home_tab;
 
 extern void design_tab_home(void *parent);
 extern void design_tab_sport(void *parent);
@@ -29,8 +28,9 @@ extern void design_tab_weather(void *parent);
 extern void design_tab_breath(void *parent);
 extern void design_tab_sleep(void *parent);
 
-static void callback_tab();
-static gui_app_t app_hongkong =
+extern void  page_left_figure(void *parent);
+
+static gui_app_t app_home =
 {
     .screen =
     {
@@ -38,40 +38,38 @@ static gui_app_t app_hongkong =
         .x    = 0,
         .y    = 0,
     },
-    .ui_design = app_hongkong_ui_design,
+    .ui_design = app_home_ui_design,
     .thread_entry = NULL,
     .active_ms = 1000000,
 };
 
-void *get_app_bee4_hk(void)
+void *get_app_home(void)
 {
-    return &app_hongkong;
+    return &app_home;
 }
-extern void  page_left_figure(void *parent);
-static void app_hongkong_ui_design(gui_app_t *app)
+static void app_home_ui_design(gui_app_t *app)
 {
     gui_log("app_hk_bee4_ui_design\n");
 
+    home_tab = gui_tabview_create(&(app->screen), "tabview", 0, 0, 320, 384);
+    gui_tabview_set_style(home_tab, REDUCTION);
+    gui_tab_t *tab_home = gui_tab_create(home_tab, "tab_home",            0, 0, 0, 0, 0, 0);
+    gui_tab_t *tab_sport = gui_tab_create(home_tab, "tab_sport",          0, 0, 0, 0, 1, 0);
+    gui_tab_t *tab_heart = gui_tab_create(home_tab, "tb_heart",           0, 0, 0, 0, 2, 0);
+    gui_tab_t *tab_blood = gui_tab_create(home_tab, "tb_blood",           0, 0, 0, 0, 3, 0);
+    gui_tab_t *tab_call = gui_tab_create(home_tab, "tb_call",             0, 0, 0, 0, 4, 0);
+    gui_tab_t *tab_music = gui_tab_create(home_tab, "tb_music",           0, 0, 0, 0, 5, 0);
+    gui_tab_t *tab_weather = gui_tab_create(home_tab, "tb_weather",       0, 0, 0, 0, 6, 0);
+    gui_tab_t *tab_note = gui_tab_create(home_tab, "tb_note",             0, 0, 0, 0, 7, 0);
+    gui_tab_t *tab_breath = gui_tab_create(home_tab, "tb_breath",         0, 0, 0, 0, 8, 0);
+    gui_tab_t *tab_sleep = gui_tab_create(home_tab, "tb_note",            0, 0, 0, 0, 9, 0);
 
-    tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, REDUCTION);
-    gui_tab_t *tab_home = gui_tab_create(tv, "tab_home",            0, 0, 0, 0, 0, 0);
-    gui_tab_t *tab_sport = gui_tab_create(tv, "tab_sport",          0, 0, 0, 0, 1, 0);
-    gui_tab_t *tab_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    gui_tab_t *tab_blood = gui_tab_create(tv, "tb_blood",           0, 0, 0, 0, 3, 0);
-    gui_tab_t *tab_call = gui_tab_create(tv, "tb_call",             0, 0, 0, 0, 4, 0);
-    gui_tab_t *tab_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 5, 0);
-    gui_tab_t *tab_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 6, 0);
-    gui_tab_t *tab_note = gui_tab_create(tv, "tb_note",             0, 0, 0, 0, 7, 0);
-    gui_tab_t *tab_breath = gui_tab_create(tv, "tb_breath",         0, 0, 0, 0, 8, 0);
-    gui_tab_t *tab_sleep = gui_tab_create(tv, "tb_note",            0, 0, 0, 0, 9, 0);
-    gui_curtainview_t *ct = gui_curtainview_create(tv, "ct", 0, 0, 368, 448);
+    gui_curtainview_t *ct = gui_curtainview_create(tab_home, "ct", 0, 0, 320, 384);
     GET_BASE(ct)->cover = true;
-    gui_curtain_t *ct_left = gui_curtain_create(ct, "4", 0, 0, 368, 448, CURTAIN_LEFT, 0.775f);
+    gui_curtain_t *ct_mid = gui_curtain_create(ct, "ct_mid", 0, 0, 320, 384, CURTAIN_MIDDLE, 1);
+    gui_curtain_t *ct_left = gui_curtain_create(ct, "ct_left", 0, 0, 320, 384, CURTAIN_LEFT, 0.775f);
 
-    design_tab_home(tab_home);
     design_tab_sport(tab_sport);
-
     design_tab_heart(tab_heart);
     design_tab_blood(tab_blood);
     design_tab_call(tab_call);
@@ -80,5 +78,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     design_tab_note(tab_note);
     design_tab_breath(tab_breath);
     design_tab_sleep(tab_sleep);
+
+    design_tab_home(ct_mid);
     page_left_figure(ct_left);
 }

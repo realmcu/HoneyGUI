@@ -7,11 +7,18 @@
 #include "gui_tab.h"
 #include "draw_font.h"
 #include <gui_magic_img.h>
+#include <gui_win.h>
+
+extern void enter_tablist(void *obj, gui_event_t e);
+uint8_t APP_AMOUNT = 9;
 
 void design_tab_sport(void *parent)
 {
     gui_magic_img_t *home_bg = gui_magic_img_create_from_mem(parent, "home_bg", APP_SPORT_BIN, 0, 0, 0,
                                                              0);
+    gui_win_t *win = gui_win_create(parent, "win", 0, 0, ((gui_tab_t *)parent)->base.w * APP_AMOUNT,
+                                    384);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)enter_tablist, GUI_EVENT_TOUCH_LONG, NULL);
 }
 void design_tab_heart(void *parent)
 {

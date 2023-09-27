@@ -92,8 +92,8 @@ int main(int argc, char **argv)
     gui_app_startup(get_app_hongkong());
 #endif
 #if UI_DEMO == BEE4_HK
-    extern void *get_app_bee4_hk(void);
-    gui_app_startup(get_app_bee4_hk());
+    extern void gui_load_bee4_hk(void);
+    gui_load_bee4_hk();
 #endif
 #endif
 #else
