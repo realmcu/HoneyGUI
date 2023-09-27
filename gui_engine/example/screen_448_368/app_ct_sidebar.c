@@ -114,8 +114,8 @@ void page_ct_sidebar(void *parent)
     gui_grid_t *grid = gui_grid_create(page, 180, 0, 1, 20, 100, 150);
     gui_switch_t *sw_no_disturb  = gui_switch_create(grid, 10, 108, 169, 98, NO_DISTURB_OFF_BIN,
                                                      NO_DISTURB_ON_BIN);
-    gui_switch_t *sw_notice      = gui_switch_create(grid, 190, 108, 169, 98, NOTICE_OFF_BIN,
-                                                     NOTICE_ON_BIN);
+    gui_switch_t *sw_mute      = gui_switch_create(grid, 190, 108, 169, 98, MUTE_OFF_BIN,
+                                                   MUTE_ON_BIN);
     gui_switch_t *sw_call        = gui_switch_create(grid, 10, 220, 169, 98, CALL_OFF_BIN,
                                                      CALL_ON_BIN);
     gui_switch_t *sw_bright      = gui_switch_create(grid, 190, 220, 169, 98, BRIGHT_OFF_BIN,
@@ -126,8 +126,8 @@ void page_ct_sidebar(void *parent)
                                                      SET_ON_BIN);
     gui_switch_t *sw_vibrate     = gui_switch_create(grid, 10, 108, 169, 98, VIBRATE_OFF_BIN,
                                                      VIBRATE_ON_BIN);
-    gui_switch_t *sw_emotion     = gui_switch_create(grid, 10, 220, 169, 98, EMOTION_OFF_BIN,
-                                                     EMOTION_ON_BIN);
+    gui_switch_t *sw_theatre     = gui_switch_create(grid, 10, 220, 169, 98, THEATRE_OFF_BIN,
+                                                     THEATRE_ON_BIN);
     gui_switch_t *sw_flashlight  = gui_switch_create(grid, 190, 220, 169, 98, FLASHLIGHT_OFF_BIN,
                                                      FLASHLIGHT_ON_BIN);
     gui_switch_t *sw_signal      = gui_switch_create(grid, 10, 332, 169, 98, SIGNAL_OFF_BIN,

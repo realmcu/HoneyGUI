@@ -20,6 +20,7 @@ static gui_tabview_t *tv_up;
 static gui_win_t *win;
 gui_cardview_t *cv;
 gui_curtain_t *ct_control0;
+gui_tab_t *tb_control1;
 extern void page_tb_clock(void *parent);
 extern void page_tb_activity(void *parent);
 extern void page_tb_heart(void *parent);
@@ -53,7 +54,7 @@ static void canvas_cb(gui_canvas_t *canvas)
     nvgFillColor(canvas->vg, nvgRGBA(255, 255, 255, 30));
     nvgFill(canvas->vg);
 }
-static void canvas_cb_balck(gui_canvas_t *canvas)
+static void canvas_cb_black(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, -448, 368, 448 * 2);
     nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 150));
@@ -145,11 +146,11 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_ct_message(ct_message);
     page_ct_sidebar(ct_left);
     gui_canvas_t *canvas = gui_canvas_create(ct_control0, "canvas", 0, 0, 0, 368, 448);
-    gui_canvas_set_canvas_cb(canvas, canvas_cb_balck);
+    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
     tv_up = gui_tabview_create(ct_control0, "tabview_up", 0, 0, 0, 0);
     gui_tabview_set_style(tv_up, CLASSIC);
     gui_tab_t *tb_control0 = gui_tab_create(tv_up, "tb_control0",    0, 0, 0, 0, 0, 0);
-    gui_tab_t *tb_control1 = gui_tab_create(tv_up, "tb_control1",    0, 0, 0, 0, 1, 0);
+    tb_control1 = gui_tab_create(tv_up, "tb_control1",    0, 0, 0, 0, 1, 0);
     extern void page_tb_control0(void *parent);
     extern void page_tb_control1(void *parent);
     page_tb_control0(tb_control0);
