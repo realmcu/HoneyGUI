@@ -56,36 +56,22 @@ static void button_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
 
-    if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
-        (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
+    if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
+        (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
     {
         if (tp->type != 271)
         {
-            ////gui_log("type2:%d,%d\n", tp->type, tp->released);
+            //gui_log("type2:%d,%d\n", tp->type, tp->released);
         }
         gui_button_t *b = (void *)obj;
         switch (tp->type)
         {
         case TOUCH_SHORT:
             {
-                //////gui_log("%s\n", "TOUCH_SHORT");
-                //
-//                bool callback = false;
-                for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                 {
-                    gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-                    if (event_dsc->filter == GUI_EVENT_TOUCH_CLICKED)
+                    if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
+                        (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
                     {
-                        //callback = true;
-                    }
-                } ////gui_log("%d\n", __LINE__);
-                //if (callback)
-                {
-                    ////gui_log("%d\n", __LINE__);
-                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
-                    {
-                        ////gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                     }
                 }
@@ -95,14 +81,11 @@ static void button_prepare(gui_obj_t *obj)
             {
                 if (b->long_flag == false)
                 {
-
-                    //if (b->long_click_cb)
                     {
-                        if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                            (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                        if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
+                            (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
                         {
                             b->long_flag = true;
-                            //gui_send_callback_p_to_server(b->long_click_cb, b->long_click_cb_p);
                             gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
                         }
                     }
@@ -119,19 +102,17 @@ static void button_prepare(gui_obj_t *obj)
             if (tp->pressed)
             {
 
-                if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                    (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
+                    (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
                 {
 
-                    //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
                     if (b->on_pic_addr && b->style == 0)
                     {
-#ifdef RTK_GUI_SCRIPT_AS_A_APP
+
                         gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
-#endif
+
                     }
-                    ////gui_log("%d\n", __LINE__);
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
                     b->long_flag = false;
                     b->press_flag = true;
                 }
@@ -143,27 +124,13 @@ static void button_prepare(gui_obj_t *obj)
                 {
                     b->press_flag = false;
                     b->release_flag = false;
-                    //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-                    ////gui_log("%d\n", __LINE__);
                     if (b->off_pic_addr && b->style == 0)
                     {
-#ifdef RTK_GUI_SCRIPT_AS_A_APP
                         gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
-#endif
                     }
-                    // bool callback = false;
-                    for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
-                    {
-                        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-                        if (event_dsc->filter == GUI_EVENT_TOUCH_RELEASED)
-                        {
-                            // callback = true;
-                        }
-                    }
-                    //if (callback)
                     {
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-                    }  ////gui_log("%d\n", __LINE__);
+                    }
                     b->long_flag = false;
                 }
             }
