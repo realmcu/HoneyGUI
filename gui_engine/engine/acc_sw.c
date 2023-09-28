@@ -827,10 +827,24 @@ static void cpu_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_disp
                     }
                     break;
                 default:
-                    // {
-                    //     blend_565withalpha_to_rgb_screen(writebuf + (write_off + j) * dc_bytes_per_pixel, pixel,
-                    //                                      image->opacity_value);
-                    // }
+                    {
+                        if (image->opacity_value < 255)
+                        {
+                            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) *
+                                                                                  (256 - image->opacity_value)
+                                                                                  + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * image->opacity_value)) / 256 ;
+                            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) *
+                                                                                  (256 - image->opacity_value)
+                                                                                  + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * image->opacity_value)) / 256 ;
+                            writebuf[(write_off + j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) *
+                                                                              (256 - image->opacity_value)
+                                                                              + writebuf[(write_off + j) * dc_bytes_per_pixel] * image->opacity_value) / 256 ;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                     break;
                 }
 
@@ -840,6 +854,7 @@ static void cpu_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_disp
 
     }
 }
+
 
 static void cpu_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                             struct rtgui_rect *rect)

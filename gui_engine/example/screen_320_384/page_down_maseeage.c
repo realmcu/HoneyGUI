@@ -13,7 +13,7 @@ void  page_down_message(void *parent)
 #if 1
     gui_magic_img_t *figure_bk0 =  gui_magic_img_create_from_mem(parent, "figure_bk0", RECT_300_127_BIN,
                                                                  10, 76, 0, 0);
-    gui_img_set_opacity(figure_bk0, 128);
+    gui_img_set_opacity(figure_bk0, 200);
     gui_img_t *text_0 =  gui_img_create_from_mem(parent, "text_0", TEXT_0_BIN, 33, 119, 0, 0);
     gui_img_t *text_1 =  gui_img_create_from_mem(parent, "text_1", TEXT_1_BIN, 33, 157, 0, 0);
     gui_img_t *time_0 =  gui_img_create_from_mem(parent, "time_0", TEXT_2_BIN, 237, 84, 0, 0);
@@ -34,7 +34,7 @@ void  page_down_message(void *parent)
 
     gui_magic_img_t *figure_bk1 =  gui_magic_img_create_from_mem(parent, "figure_bk1", RECT_300_127_BIN,
                                                                  10, 240, 0, 0);
-    gui_img_set_opacity(figure_bk1, 128);
+    gui_img_set_opacity(figure_bk1, 200);
     gui_img_t *text_2 =  gui_img_create_from_mem(parent, "text_2", TEXT_0_BIN, 33, 283, 0, 0);
     gui_img_t *text_3 =  gui_img_create_from_mem(parent, "text_3", TEXT_1_BIN, 33, 321, 0, 0);
     gui_img_t *time_1 =  gui_img_create_from_mem(parent, "time_1", TEXT_2_BIN, 237, 248, 0, 0);
