@@ -128,10 +128,16 @@ static bool tp_judge_same_point(void)
         ((y_max_record.y_coordinate - y_min_record.y_coordinate) >= SAME_POINT_THR)
     )
     {
+        TP_LOG("tp_judge_same_point delta_x: %d , delta_y: %d , return FALSE!!",
+               x_max_record.x_coordinate - x_min_record.x_coordinate,
+               y_max_record.y_coordinate - y_min_record.y_coordinate);
         return false;
     }
     else
     {
+        TP_LOG("tp_judge_same_point delta_x: %d , delta_y: %d , return TRUE!!",
+               x_max_record.x_coordinate - x_min_record.x_coordinate,
+               y_max_record.y_coordinate - y_min_record.y_coordinate);
         return true;
     }
 }
