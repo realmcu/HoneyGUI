@@ -26,6 +26,14 @@ void gui_obj_ctor(gui_obj_t *this, gui_obj_t *parent, const char *name, int16_t 
 
     this->x = x;
     this->y = y;
+    if (w == 0)
+    {
+        w = (int)gui_get_screen_width();
+    }
+    if (h == 0)
+    {
+        h = (int)gui_get_screen_height();
+    }
     this->w = w;
     this->h = h;
 
