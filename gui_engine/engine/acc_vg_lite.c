@@ -737,7 +737,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     }
 
     vg_lite_matrix_t matrix;
-    memcpy(&matrix, image->matrix, sizeof(vg_lite_matrix_t));
 
     vg_lite_buffer_t target;
     memset(&target, 0x00, sizeof(vg_lite_buffer_t));
@@ -830,9 +829,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     {
     case IMG_BYPASS_MODE:
         blend_mode = VG_LITE_BLEND_NONE;
+        vg_lite_identity(&matrix);
+        vg_lite_translate(rect->x1 * 1.0f, rect->y1 * 1.0f, &matrix);
         break;
     case IMG_FILTER_BLACK:
         {
+//TODO: add this part in MP version
 //            vg_lite_color_key4_t color_key;
 //            color_key[0].alpha = 0x00;
 //            color_key[0].enable = 1;
@@ -845,13 +847,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 //            vg_lite_set_color_key(color_key);
 //            source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
             blend_mode = VG_LITE_BLEND_SRC_OVER;
-
+            vg_lite_identity(&matrix);
+            vg_lite_translate(rect->x1 * 1.0f, rect->y1 * 1.0f, &matrix);
         }
         break;
     case IMG_TRANSPARENT_MODE:
     case IMG_MAGIC_MATRIX:
         blend_mode = VG_LITE_BLEND_SRC_OVER;
         source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+        memcpy(&matrix, image->matrix, sizeof(vg_lite_matrix_t));
     default:
         break;
     }
