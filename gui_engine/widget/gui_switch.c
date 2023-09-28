@@ -64,8 +64,9 @@ static void switch_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     // gui_log("switch_prepare\n");
-    if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
-        (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
+    if (((obj->ax + obj->tx) < (int)gui_get_screen_width()) && (((obj->ax + obj->tx) + obj->w) >= 0) &&
+        \
+        ((obj->ay + obj->ty) < (int)gui_get_screen_height()) && (((obj->ay + obj->ty) + obj->h) >= 0))
     {
 
         /*if (((tp->type == TOUCH_SHORT) &&
@@ -89,19 +90,20 @@ static void switch_prepare(gui_obj_t *obj)
 
         }*/
         if (
-            ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) && (tp->y >= obj->ay &&
-                                                                   tp->y <= (obj->ay + obj->h))))
+            ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+             (tp->y >= (obj->ay + obj->ty) &&
+              tp->y <= ((obj->ay + obj->ty) + obj->h))))
         {
             gui_switch_t *b = (void *)obj;
             switch (tp->type)
             {
             case TOUCH_SHORT:
                 {
-                    gui_log("Touch_short\n");
-                    if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                        (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                    gui_log("Touch_short,%d,%d,%d,%d,%d\n", tp->x, (obj->ax + obj->tx), obj->dx, obj->sx, obj->tx);
+                    if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+                        (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                     {
-                        //gui_log("%d\n", __LINE__);
+                        gui_log("%d\n", __LINE__);
                         gui_switch_t *sw = (gui_switch_t *)obj;
                         sw->ifon = !(sw->ifon);
                         gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
@@ -147,8 +149,8 @@ static void switch_prepare(gui_obj_t *obj)
 
                         //if (b->long_click_cb)
                         {
-                            if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                                (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                            if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+                                (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                             {
                                 b->long_flag = true;
                                 //gui_send_callback_p_to_server(b->long_click_cb, b->long_click_cb_p);
@@ -169,8 +171,8 @@ static void switch_prepare(gui_obj_t *obj)
                 if (tp->pressed)
                 {
 
-                    if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                        (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                    if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+                        (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                     {
 
                         //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
