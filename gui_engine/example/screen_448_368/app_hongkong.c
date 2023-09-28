@@ -102,9 +102,19 @@ static void callback(void *obj, gui_event_t e)
     // gui_magic_img_create_from_mem(tb_weather, "page6", WEATHER_GLOW_BIN, 0, 0, 0, 0);
     // gui_magic_img_create_from_mem(tb_music, "page7", MUSIC_GLOW_BIN, 0, 0, 0, 0);
 }
-
+#ifndef  _WIN32
+#include "mem_config.h"
+#endif
 static void app_hongkong_ui_design(gui_app_t *app)
 {
+    static bool flag;
+#ifndef _WIN32
+    if (!flag)
+    {
+        memcpy((void *)SPIC2_ADDR, (void *)0x4400000, 0xb92a80);
+        flag = true;
+    }
+#endif
     gui_log("app_hongkong_ui_design\n");
 
     win = gui_win_create(&(app->screen), "win", 0, 0, 320, 320);
