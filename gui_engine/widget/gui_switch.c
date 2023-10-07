@@ -99,7 +99,7 @@ static void switch_prepare(gui_obj_t *obj)
             {
             case TOUCH_SHORT:
                 {
-                    gui_log("Touch_short,%d,%d,%d,%d,%d\n", tp->x, (obj->ax + obj->tx), obj->dx, obj->sx, obj->tx);
+                    gui_log("Touch_short,%d,%d,%d,%f,%d\n", tp->x, (obj->ax + obj->tx), obj->dx, obj->sx, obj->tx);
                     if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
                         (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                     {

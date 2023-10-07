@@ -18,7 +18,11 @@ static void rtgui_font_stb_load(gui_text_t *text)
     {
         GUI_ASSERT(NULL != NULL);
     }
-    uint16_t unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    uint16_t unicode_len = 0;
+    if (p_buf)
+    {
+        unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    }
     text->font_len = unicode_len;
     float all_char_w = 0;
     float scale = 0;
@@ -239,7 +243,11 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
     {
         GUI_ASSERT(NULL != NULL);
     }
-    uint16_t unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    uint16_t unicode_len = 0;
+    if (p_buf)
+    {
+        unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    }
 
 #ifdef RTK_GUI_TTF_SVG
     while (ch < unicode_len)

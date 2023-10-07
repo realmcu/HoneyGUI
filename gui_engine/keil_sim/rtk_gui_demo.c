@@ -1,7 +1,7 @@
 #include "guidef.h"
 #include "gui_img.h"
 #include "gui_magic_img.h"
-#include "gui_dynamic_img.h"
+//#include "gui_dynamic_img.h"
 #include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"

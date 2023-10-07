@@ -223,7 +223,7 @@ static void radio_switch_prepare(gui_obj_t *obj)
               ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) && (tp->y >= obj->dy &&
                                                                      tp->y <= (obj->dy + obj->h))))))
         {
-            gui_log("tp->type:%d,%d,%d\n", tp->type, obj->dx, obj->w, obj->h);
+            //gui_log("tp->type:%d,%d,%d\n", tp->type, obj->dx, obj->w, obj->h);
             gui_radio_switch_t *sw = (gui_radio_switch_t *)obj;
             sw->ifon = !(sw->ifon);
             //send_msg_to_gui_server(&msg);

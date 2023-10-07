@@ -5,16 +5,16 @@
 
 #include <guidef.h>
 #include <string.h>
-#include <math.h>
+//#include <math.h>
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include <gui_magic_img.h>
 #include "gui_card.h"
 #include "gui_canvas.h"
-#include "gui_curtain.h"
+//#include "gui_curtain.h"
 #include "gui_img.h"
-#include "gui_matrix.h"
+//#include "gui_matrix.h"
 
 
 static void gui_card_get_stacking_location(gui_card_stacking_t *result, gui_card_stacking_t *start,

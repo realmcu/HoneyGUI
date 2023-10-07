@@ -198,7 +198,10 @@ void gui_fb_disp(gui_obj_t *root)
             {
                 dc->frame_buf = dc->disp_buf_2;
             }
-            memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
+            if (dc->frame_buf)
+            {
+                memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
+            }
             dc->section_count = i;
 
             obj_draw_scan(root);

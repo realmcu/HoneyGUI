@@ -79,7 +79,10 @@ void rtgui_font_mem_load(gui_text_t *text)
     {
         GUI_ASSERT(NULL != NULL);
     }
-    memset(chr, 0, sizeof(mem_char_t) * text->len);
+    if (chr)
+    {
+        memset(chr, 0, sizeof(mem_char_t) * text->len);
+    }
     text->data = chr;
     uint8_t aliened_font_size;
     aliened_font_size = text->font_height;
