@@ -28,8 +28,8 @@ extern void design_tab_weather(void *parent);
 extern void design_tab_breath(void *parent);
 extern void design_tab_sleep(void *parent);
 
-extern void  page_left_figure(void *parent);
-extern void page_down_message(void *parent);
+extern void page_left_figure(void *parent);
+extern void page_down_message_design(void *parent);
 static gui_app_t app_home =
 {
     .screen =
@@ -82,5 +82,6 @@ static void app_home_ui_design(gui_app_t *app)
 
     design_tab_home(ct_mid);
     page_left_figure(ct_left);
-    page_down_message(ct_down);
+    page_down_message_design(ct_down);
 }
+

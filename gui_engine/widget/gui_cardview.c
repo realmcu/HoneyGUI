@@ -7,7 +7,7 @@
 #include <gui_matrix.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-#include <gui_kb.h>
+//#include <gui_kb.h>
 #include "gui_cardview.h"
 
 
