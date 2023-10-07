@@ -51,7 +51,7 @@ void *get_app_hongkong(void)
 static void canvas_cb(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
-    nvgFillColor(canvas->vg, nvgRGBA(255, 255, 255, 30));
+    nvgFillColor(canvas->vg, nvgRGBA(30, 30, 30, 255));
     nvgFill(canvas->vg);
 }
 static void canvas_cb_black(gui_canvas_t *canvas)
