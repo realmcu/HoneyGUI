@@ -11,7 +11,9 @@
 			"draw_img.h": "c",
 			"gui_kb.h": "c",
 			"gui_matrix.h": "c",
-			"gui_perspective.h": "c"
+			"gui_perspective.h": "c",
+			"gui_watchface_gradient.h": "c",
+			"gui_magic_img.h": "c"
 		},
 		"search.exclude": {
 			"**/keil_sim": true

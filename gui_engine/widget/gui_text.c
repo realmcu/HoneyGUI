@@ -65,8 +65,8 @@ static void text_draw(gui_obj_t *obj)
     }
     struct gui_dispdev *dc = gui_get_dc();
     rtgui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->ax;
-    draw_rect.y1 = obj->ay;
+    draw_rect.x1 = obj->ax + obj->dx + obj->tx;
+    draw_rect.y1 = obj->ay + obj->dy + obj->ty;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
     if (dc->section_count == 0)
@@ -122,6 +122,14 @@ void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 {
     this->mode = mode;
 }
+// void gui_text_scale(gui_text_t *this, float scale_x, float scale_y)
+// {
+//     if (scale_x > 0 && scale_y > 0)
+//     {
+//         img->scale_x = scale_x;
+//         img->scale_y = scale_y;
+//     }
+// }
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
 {
     this->base.x = x ;
