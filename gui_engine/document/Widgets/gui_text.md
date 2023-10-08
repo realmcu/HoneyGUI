@@ -145,6 +145,7 @@ static void app_launcher_ui_design(gui_app_t *app)
 ```
 
 </details>
+
 ### Multiple text widget
 
 ![text widget example2](https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "text_widget_example2.png")

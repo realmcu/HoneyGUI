@@ -4,6 +4,7 @@
 
 extern void *get_app_home(void);
 extern void *get_app_tablist(void);
+extern void *get_app_applist(void);
 
 uint8_t LAST_TABLIST_X = 0;
 uint8_t LAST_TABHOME_X = 0;
