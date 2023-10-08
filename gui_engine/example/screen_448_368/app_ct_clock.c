@@ -35,8 +35,6 @@ static void callback_watchface()
         clock = 1;
     }
 
-
-
 }
 
 static void text_cb()
@@ -46,10 +44,12 @@ static void text_cb()
     sprintf(str, "%03d", p);
     gui_text_set(rate, str, "rtk_font_mem", 0xffcfcfcf, 3, 32);
 }
+extern void callback_interface(void *obj, gui_event_t e);
 void page_ct_clock(void *parent)
 {
     win_watch = gui_win_create(parent, "win", 0, 0, 368, 448);
     gui_obj_add_event_cb(win_watch, (gui_event_cb_t)callback_watchface, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_obj_add_event_cb(win_watch, (gui_event_cb_t)callback_interface, GUI_EVENT_TOUCH_LONG, NULL);
     // img = gui_magic_img_create_from_mem(parent, "page0", CLOCKN_BIN, 0, 0, 0, 0);
     img = gui_magic_img_create_from_mem(parent, "page0", BACKGROUND_BIN, 0, 0, 0, 0);
     watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
@@ -69,3 +69,4 @@ void page_ct_clock(void *parent)
     gui_text_type_set(rate, DINCOND_MEDIUM_SIZE32_BITS8_FONT_BIN);
     gui_text_mode_set(rate, LEFT);
 }
+
