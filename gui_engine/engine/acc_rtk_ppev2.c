@@ -167,13 +167,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     {
         return;
     }
-    if ((image->target_w + image->img_x < dc->section.x1) ||
-        (image->target_h + image->img_y < dc->section.y1)
-        || (image->img_x >= dc->section.x1 + dc->fb_width) ||
-        (image->img_y >= dc->section.y1 + dc->fb_height))
-    {
-        return;
-    }
+
     ppe_buffer_t target, source;
     memset(&target, 0, sizeof(ppe_buffer_t));
     memset(&source, 0, sizeof(ppe_buffer_t));
@@ -219,13 +213,20 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         }
         if (image->blend_mode == IMG_MAGIC_MATRIX)
         {
+            if ((image->target_w + image->img_x < dc->section.x1) ||
+                (image->target_h + image->img_y < dc->section.y1)
+                || (image->img_x >= dc->section.x1 + dc->fb_width) ||
+                (image->img_y >= dc->section.y1 + dc->fb_height))
+            {
+                return;
+            }
 #if PPE_ACC_CACHE_SOURCE
             uint32_t image_size = image->img_w * image->img_h * PPEV2_Get_Pixel_Size(source.format);
             if (image_size <= PPEV2_CACHE_BUF_SIZE)
             {
 #endif
                 ppe_rect_t ppe_rect = {.x = 0, .y = 0, .w = dc->fb_width, .h = dc->fb_height};
-                if (image->img_x - dc->section.x1 < 0)
+                if (rect->x1 - dc->section.x1 < 0)
                 {
                     ppe_rect.x = 0;
                 }
@@ -288,7 +289,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 memcpy(&source.matrix, &pre_trans, sizeof(float) * 9);
                 ppe_matrix_inverse(&pre_trans);
                 memcpy(&source.inv_matrix, &pre_trans, sizeof(float) * 9);
-                GPIOx_SetBits(GPIOB, GPIO_GetPin(P8_1));
                 PPEV2_err err = PPEV2_Blend(&target, &source, &ppe_rect);
                 if (err != PPEV2_SUCCESS)
                 {
@@ -416,6 +416,77 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 }
             }
 #endif
+        }
+        else
+        {
+            if ((rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1)
+                || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
+            {
+                return;
+            }
+            float x_ref = 0, y_ref = 0;
+            ppe_rect_t ppe_rect = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
+            if (ppe_rect.x < 0)
+            {
+                x_ref = ppe_rect.x;
+                ppe_rect.x = 0;
+            }
+            if (ppe_rect.y < 0)
+            {
+                y_ref = ppe_rect.y;
+                ppe_rect.y = 0;
+            }
+            if (rect->x2 >= dc->fb_width)
+            {
+                ppe_rect.w = dc->fb_width - ppe_rect.x;
+            }
+            else
+            {
+                ppe_rect.w = rect->x2 - ppe_rect.x;
+            }
+            if (rect->y2 >= dc->fb_height)
+            {
+                ppe_rect.h = dc->fb_height - ppe_rect.y;
+            }
+            else
+            {
+                ppe_rect.h = rect->y2 - ppe_rect.y;
+            }
+            source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
+#if PPE_ACC_CACHE_SOURCE
+            memcpy_by_dma(ppe_cache_buf, (void *)source.address, image_size);
+            source.address = (uint32_t)ppe_cache_buf;
+#endif
+            source.opacity = image->opacity_value;
+            source.width = image->img_w;
+            source.height = image->img_h;
+            if (image->blend_mode == IMG_FILTER_BLACK)
+            {
+                source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
+                source.color_key_min = 0;
+                source.color_key_max = 0x010101;
+            }
+            else
+            {
+                source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+            }
+            source.win_x_min = 0;
+            source.win_x_max = target.width;
+            source.win_y_min = 0;
+            source.win_y_max = target.height;
+
+            ppe_matrix_t pre_trans;
+            ppe_get_identity(&pre_trans);
+            if ((x_ref < 0) || (y_ref < 0))
+            {
+                ppe_translate(x_ref * (-1.0f), y_ref * (-1.0f), &pre_trans);
+            }
+            memcpy(&source.inv_matrix, &pre_trans, sizeof(float) * 9);
+            PPEV2_err err = PPEV2_Blend(&target, &source, &ppe_rect);
+            if (err != PPEV2_SUCCESS)
+            {
+                sw_acc_blit(image, dc, rect);
+            }
         }
     }
     else
