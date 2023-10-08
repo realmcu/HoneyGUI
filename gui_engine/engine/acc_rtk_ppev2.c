@@ -226,7 +226,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             {
 #endif
                 ppe_rect_t ppe_rect = {.x = 0, .y = 0, .w = dc->fb_width, .h = dc->fb_height};
-                if (rect->x1 - dc->section.x1 < 0)
+                if (image->img_x - dc->section.x1 < 0)
                 {
                     ppe_rect.x = 0;
                 }
