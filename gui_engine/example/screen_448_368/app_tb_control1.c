@@ -107,8 +107,7 @@ void page_tb_control1(void *parent)
     gui_switch_t *sw_alarm_clock = gui_switch_create(parent, 190, 332, 169, 98,
                                                      ALARM_CLOCK_OFF_BIN, ALARM_CLOCK_ON_BIN);
 
-    extern gui_tab_t *tb_control1;
-    img =  gui_img_with_animate_create(tb_control1, ZHENDONGKAI_BIN, 0, 0);
+    img =  gui_img_with_animate_create(parent, ZHENDONGKAI_BIN, 0, 0);
     gui_img_with_animate_set_animate(img, 1000, 1, img_animate, img);
     img->animate->animate = false;
     img->base.base.not_show = true;

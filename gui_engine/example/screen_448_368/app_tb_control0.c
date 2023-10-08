@@ -106,8 +106,7 @@ void page_tb_control0(void *parent)
                                                      WATCH_ON_BIN);
     gui_switch_t *sw_set         = gui_switch_create(parent, 190, 332, 169, 98, SET_OFF_BIN,
                                                      SET_ON_BIN);
-    extern gui_curtain_t *ct_control0;
-    img =  gui_img_with_animate_create(ct_control0, WURAOKAI_BIN, 0, 0);
+    img =  gui_img_with_animate_create(GET_BASE(parent)->parent, WURAOKAI_BIN, 0, 0);
     gui_img_with_animate_set_animate(img, 1000, 1, img_animate, img);
     img->animate->animate = false;
     img->base.base.not_show = true;
