@@ -44,7 +44,7 @@ static void gui_switch_hl(gui_switch_t *sw)
 
 
 }
-static void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
+void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &obj->child_list)

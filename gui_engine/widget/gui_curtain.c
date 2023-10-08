@@ -104,6 +104,12 @@ static void curtain_prepare(gui_obj_t *obj)
                      (1 - ext->scope);
         }
     }
+    if (parent_ext->cur_curtain != CURTAIN_MIDDLE)
+    {
+        extern void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type);
+        gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
+    }
+
 }
 
 
