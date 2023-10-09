@@ -5,23 +5,19 @@
 #include "gui_page.h"
 #include "gui_grid.h"
 #include "gui_switch.h"
+#include "gui_win.h"
 static void canvas_cb(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 200));
     nvgFill(canvas->vg);
 }
 
-void  page_left_figure(void *parent)
+void  page_left_figure(void *parent_widget)
 {
 
-    gui_magic_img_t *background =  gui_magic_img_create_from_mem(parent, "background",
-                                                                 CURTAIN_RECT_248_385_BIN,
-                                                                 72, 0, 0, 0);
-    background->base.draw_img.blend_mode = IMG_BYPASS_MODE;
-    gui_img_set_opacity(background, 128);
-
-    gui_img_t *time =  gui_img_create_from_mem(parent, "time", TIME_BIN, 161, 20, 0, 0);
+    gui_win_t *parent = gui_win_create(parent_widget, NULL, 50, 30, 0, 0);
+    gui_img_t *time =  gui_img_create_from_mem(parent, "time", TIME_BIN, 142, 20, 0, 0);
     gui_img_t *data =  gui_img_create_from_mem(parent, "data", DATA_BIN, 132, 64, 0, 0);
     gui_img_t *week =  gui_img_create_from_mem(parent, "week", SUN_BIN, 213, 64, 0, 0);
 
