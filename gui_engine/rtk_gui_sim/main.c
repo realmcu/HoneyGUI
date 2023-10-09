@@ -47,7 +47,9 @@ int main(int argc, char **argv)
     {
         if (!strcmp(argv[count], "-p") && count + 1 < argc)
         {
-            defaultPath = argv[count + 1];
+            char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
+            sprintf(path, "%s%s", argv[count + 1], "\\");
+            defaultPath = path;
         }
     }
 
