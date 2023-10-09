@@ -149,8 +149,9 @@ typedef struct touch_info
 
 typedef struct gui_kb_port_data
 {
-    bool          flag;
+    uint8_t       event;
     uint8_t       name[10];
+    uint32_t      timestamp_ms;             /* The timestamp when the data was received */
 } gui_kb_port_data_t;
 
 typedef struct kb_info
@@ -273,6 +274,8 @@ struct gui_indev
     uint32_t touch_timeout_ms;
     uint16_t long_button_time_ms;
     uint16_t short_button_time_ms;
+    uint16_t kb_long_button_time_ms;
+    uint16_t kb_short_button_time_ms;
     uint16_t quick_slide_time_ms;
 
     struct gui_touch_data *(*tp_get_data)(void);
@@ -340,8 +343,9 @@ typedef enum
     TOUCH_INVALIDE,
 
     KB_INIT      = 0x200,
-    KB_KEYDOWN,
-    KB_KEYUP,
+    KB_SHORT,
+    KB_LONG,
+    KB_INVALIDE,
 } GUI_InputType;
 
 typedef enum gui_tab_style
