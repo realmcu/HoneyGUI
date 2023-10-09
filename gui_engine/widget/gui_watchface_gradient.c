@@ -329,8 +329,8 @@ static void watchface_gradient_ctor(gui_watchface_gradient_t *this, gui_obj_t *p
                                    void *data,
                                    int16_t x,
                                    int16_t y, int16_t w, int16_t h);
-    widget_nanovg_ctor(this, parent, name, NULL, x, y, w, h);
-    gui_canvas_set_canvas_cb(this, canvas_design);
+    widget_nanovg_ctor((gui_canvas_t *)this, parent, name, NULL, x, y, w, h);
+    gui_canvas_set_canvas_cb((gui_canvas_t *)this, canvas_design);
 }
 
 
