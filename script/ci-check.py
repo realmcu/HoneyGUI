@@ -144,7 +144,6 @@ class CICheck(JenkinsCheckBase):
 
             print_message = print_message.lstrip().lstrip('\n')
             return False, print_message
-        return True,''
 
     def check_commit_message(self, repo, module_table):
         # Commit string is capsulated in '', strip it
