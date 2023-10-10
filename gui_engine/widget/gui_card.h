@@ -25,8 +25,7 @@ typedef struct _gui_card_stacking_t
 typedef struct gui_card
 {
     gui_obj_t base;
-    gui_card_id_t id;
-    SLIDE_STYLE style;
+    int32_t id;
 } gui_card_t;
 
 /**

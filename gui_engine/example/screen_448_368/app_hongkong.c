@@ -41,6 +41,10 @@ static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
 
+    // extern void test_cv(void *p);
+    // test_cv(&(app->screen));
+    // return;
+
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);
 

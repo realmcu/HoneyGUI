@@ -33,6 +33,9 @@ typedef struct gui_cardview
     gui_card_id_t cur_id;
     SLIDE_STYLE style;
     int16_t release_y;
+    int16_t remain_y;
+    bool mute;
+    void (*status_cb)(struct gui_cardview *this);
 } gui_cardview_t;
 
 
@@ -41,11 +44,12 @@ typedef struct gui_cardview
 gui_cardview_t *gui_cardview_create(void *parent,  const char *name,
                                     int16_t x, int16_t y, int16_t w, int16_t h);
 
-void gui_cardview_add_tab(void *addr);
 
 void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style);
 
-void gui_cardview_default(void);
+void gui_cardview_mute(gui_cardview_t *this);
+
+void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this));
 
 
 #ifdef __cplusplus

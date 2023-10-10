@@ -11,6 +11,10 @@
 #include "gui_cardview.h"
 
 
+void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this))
+{
+    this->status_cb = cb;
+}
 static void cardview_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
@@ -24,53 +28,50 @@ static void cardview_prepare(gui_obj_t *obj)
     GUI_UNUSED(root);
     GUI_UNUSED(cx);
     GUI_UNUSED(cy);
+    if (this->mute == true)
+    {
+        return;
+    }
+
+
     switch (tp->type)
     {
     case TOUCH_HOLD_Y:
-        obj->dy += tp->deltaY;
-        this->release_y = obj->dy;
+        this->release_y = tp->deltaY + this->remain_y;
+        if (this->release_y > 0)
+        {
+            this->release_y = 0;
+        }
         break;
     case TOUCH_DOWN_SLIDE:
-        gui_log("TOUCH_DOWN_SLIDE\n");
-        if (this->tab_cnt_down == 0 && this->cur_id.y == 0)
-        {
-            break;
-        }
-
-        if (this->cur_id.y == this->tab_cnt_down)
-        {
-            return;
-        }
-        this->cur_id.y = this->cur_id.y + 1;
-        this->release_y = this->release_y  + dc->screen_width;
+        this->remain_y = this->release_y;
         break;
     case TOUCH_UP_SLIDE:
-        gui_log("TOUCH_UP_SLIDE\n");
-        if (this->tab_cnt_up == 0 && this->cur_id.y == 0)
-        {
-            break;
-        }
-
-        if (this->cur_id.y == this->tab_cnt_up)
-        {
-            return;
-        }
-        this->cur_id.y = this->cur_id.y - 1;
-        this->release_y = this->release_y  - dc->screen_width;
+        this->remain_y = this->release_y;
         break;
     default:
+        this->remain_y = this->release_y;
         break;
     }
 
-    if (this->release_y > 0)
+    if (this->release_y % (this->base.h) != 0)
     {
-        this->release_y -= GUI_FRAME_STEP;
+        if (this->release_y > 0)
+        {
+            this->release_y--;
+        }
+        if (this->release_y < 0)
+        {
+            this->release_y++;
+        }
     }
-    if (this->release_y < 0)
+    if (this->status_cb != NULL)
     {
-        this->release_y += GUI_FRAME_STEP;
+        this->status_cb(this);
     }
-    obj->dy = this->release_y;
+
+
+
 
 }
 
@@ -92,6 +93,10 @@ static void cardview_destory(gui_obj_t *obj)
 
 }
 
+void gui_cardview_mute(gui_cardview_t *this)
+{
+
+}
 
 void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style)
 {
@@ -134,6 +139,7 @@ gui_cardview_t *gui_cardview_create(void *parent,  const char *name,
     }
 
     gui_list_init(&this->tab_list);
+    this->mute = true;
 
 
 

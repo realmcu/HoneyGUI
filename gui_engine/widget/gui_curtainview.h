@@ -61,8 +61,11 @@ typedef struct gui_curtainview
     bool init_flag;
     bool release_flag;
     int spring_value;
+    void (*done_cb)(struct gui_curtainview *this);
     void (*ctor)(struct gui_curtainview *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
+    bool mute;
+    int16_t release_y;
 } gui_curtainview_t;
 
 
@@ -83,7 +86,7 @@ gui_curtainview_t *gui_curtainview_create(void *parent, const char *filename, in
                                           int16_t y,
                                           int16_t w, int16_t h);
 
-
+void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this));
 
 #ifdef __cplusplus
 }

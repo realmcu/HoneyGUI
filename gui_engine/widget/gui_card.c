@@ -17,13 +17,13 @@
 //#include "gui_matrix.h"
 
 
-static void gui_card_get_stacking_location(gui_card_stacking_t *result, gui_card_stacking_t *start,
-                                           gui_card_stacking_t *end, float percent)
-{
-    result->scale = start->scale + (end->scale - start->scale) * percent;
-    result->location = start->location + (end->location - start->location) * percent;
-    result->opacity = start->opacity + (end->opacity - start->opacity) * percent;
-}
+// static void gui_card_get_stacking_location(gui_card_stacking_t *result, gui_card_stacking_t *start,
+//                                            gui_card_stacking_t *end, float percent)
+// {
+//     result->scale = start->scale + (end->scale - start->scale) * percent;
+//     result->location = start->location + (end->location - start->location) * percent;
+//     result->opacity = start->opacity + (end->opacity - start->opacity) * percent;
+// }
 
 
 static void tab_prepare(gui_obj_t *obj)
@@ -32,51 +32,70 @@ static void tab_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
-    if (this->style == STACKING)
+
+
+    float h = gui_get_screen_height();//int32_t i = this->id.z - parent->cur_id.y + 1; //parent->cur_id.y
+
+
+    //gui_cardview_t *cv = this->base.parent;
+
+
+    int32_t card_dy = parent->release_y;
+
+    if (parent->mute == true)
     {
-        // scale 0.5f ~ 0.5f, 10 ~ 10, opa, 0~255
-        // scale 0.5f ~ 0.8f, 10 ~ 1/4h, opa, 255
-        // scale 0.8f ~ 0.9f, 1/4h ~ 3/4h, opa, 255
-        // scale 0.9f ~ 0.9f, 3/4h ~ h, opa, 255
-
-        float h = gui_get_screen_height();
-
-        float scale[5] = {0.5f, 0.5f, 0.8f, 0.9f, 0.9f};
-        uint8_t opacity[5] = {0, 255, 255, 255, 255};
-        float location[5] = {5, 5, h / 4, h * 3 / 4, h};
-
-        float percent = 0.5f;
-
-        percent += (float)obj->dy / gui_get_screen_width();
-
-        if (percent > 1.0f)
-        {
-            percent = 1.0f;
-        }
-        if (percent < 0.0f)
-        {
-            percent = 0.0f;
-        }
-
-
-        int32_t i = this->id.z - parent->cur_id.y + 1; //parent->cur_id.y
-        if ((i >= 0) && (i < 3))
-        {
-            gui_card_stacking_t result;
-            gui_card_stacking_t start = {.location = location[i],          .scale = scale[i],      .opacity = opacity[i]};
-            gui_card_stacking_t end =   {.location = location[i + 1],      .scale = scale[i + 1],  .opacity = opacity[i + 1]};
-            gui_card_get_stacking_location(&result, &start, &end, percent);
-            obj->tx = 0;
-            obj->ty = (int16_t)(h * (result.scale - 1.0f) / 2 + result.location);
-            obj->sx = result.scale;
-            obj->sy = result.scale;
-            obj->dy = obj->dy - parent->base.dy;
-        }
-        else
-        {
-            obj->tx = 100 * gui_get_screen_width(); //for out of range
-        }
+        card_dy = 0;
     }
+
+
+
+    int32_t location = this->base.h * this->id + card_dy;
+
+    int32_t location_0 = h / 2;
+    int32_t location_1 = h / 2 + 20;
+    int32_t location_2 = h / 2 + 40;
+
+    float scale_0 = 1.0f;
+    float scale_1 = 0.9f;
+    //float scale_2 = 0.82f;
+
+    if (location < location_0)
+    {
+        obj->tx = 0;
+        obj->ty = this->base.h * this->id + card_dy;
+        obj->sx = scale_0;
+        obj->sy = scale_0;
+        obj->dx = 0;
+        obj->dy = 0;
+    }
+    else if (location < location_1)
+    {
+        float scale = (scale_0 - scale_1) * (location - location_0) / (location_1 - location_0);
+        obj->tx = 0;
+        obj->ty = location;
+        obj->sx = 1.0f - scale;
+        obj->sy = 1.0f - scale;
+        obj->dx = 0;
+        obj->dy = 0;
+    }
+    else
+    {
+        obj->tx = 0;
+        obj->ty = location_1;
+        obj->sx = scale_1;
+        obj->sy = scale_1;
+        obj->dx = 0;
+        obj->dy = 0;
+    }
+
+
+    // if(location >= h)
+    // {
+    //     obj->not_show = true;
+    // }
+
+
+
 }
 
 
@@ -91,28 +110,10 @@ void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filename, in
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->type = CARD;
 
-    gui_cardview_t *parent_ext = (gui_cardview_t *)parent;
-    this->style = parent_ext->style;
-    this->id.x = idx;
-    this->id.y = idy;
-    this->id.z = idy;
-    parent_ext->tab_cnt++;
-    if (idx > 0)
-    {
-        parent_ext->tab_cnt_right++;
-    }
-    else if (idx < 0)
-    {
-        parent_ext->tab_cnt_left--;
-    }
-    if (idy > 0)
-    {
-        parent_ext->tab_cnt_down++;
-    }
-    else if (idy < 0)
-    {
-        parent_ext->tab_cnt_up--;
-    }
+    //gui_cardview_t *parent_ext = (gui_cardview_t *)parent;
+
+    this->id = idy;
+
 
 }
 
@@ -144,10 +145,6 @@ gui_card_t *gui_card_create(void *parent, const char *name, int16_t x, int16_t y
     return this;
 }
 
-void gui_card_set_style(gui_card_t *this, SLIDE_STYLE style)
-{
-    this->style = style;
-}
 
 
 

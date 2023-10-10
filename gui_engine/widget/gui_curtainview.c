@@ -10,8 +10,14 @@
 #include "gui_obj.h"
 #include <tp_algo.h>
 
+void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this))
+{
+    this->done_cb = cb;
+}
+
 void curtainview_prepare(gui_obj_t *obj)
 {
+    gui_curtainview_t *this = (gui_curtainview_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_curtainview_t *ext = (gui_curtainview_t *)obj;
@@ -27,6 +33,12 @@ void curtainview_prepare(gui_obj_t *obj)
         obj->cover = false;
         return;
     }
+
+    if (this->mute == true)
+    {
+        return;
+    }
+
     gui_list_t *node = NULL;
     gui_list_t *tmp = NULL;
     gui_curtain_t *c_middle = NULL;
@@ -150,6 +162,10 @@ void curtainview_prepare(gui_obj_t *obj)
                     {
                         ext->down_flag = false;
                         ext->cur_curtain = CURTAIN_DOWN;
+                        if (this->done_cb != NULL)
+                        {
+                            this->done_cb(this);
+                        }
                         obj->y = 0;
                         ext->spring_value = 0;
                         ext->release_flag = false;
@@ -288,6 +304,10 @@ void curtainview_prepare(gui_obj_t *obj)
             else if (tp->type == TOUCH_UP_SLIDE)
             {
                 ext->cur_curtain = CURTAIN_MIDDLE;
+                if (this->done_cb != NULL)
+                {
+                    this->done_cb(this);
+                }
                 obj->y = 0;
             }
             else
@@ -371,6 +391,7 @@ void gui_curtainview_ctor(gui_curtainview_t *this, gui_obj_t *parent, const char
     ((gui_obj_t *)this)->obj_prepare = curtainview_prepare;
     ((gui_obj_t *)this)->type = CURTAINVIEW;
     this->cur_curtain = CURTAIN_MIDDLE;
+    this->mute = false;
 }
 gui_curtainview_t *gui_curtainview_create(void *parent, const char *filename, int16_t x,
                                           int16_t y,
