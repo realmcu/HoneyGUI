@@ -150,16 +150,16 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgBeginPath(vg);
 
         float width = 4;
-        float height = 300;
+        float height = 240;
         float x = width / 2;
-        float y = 260;
+        float y = 210;
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
 
-        nvgRotate(vg, M_PI * (d / 60.0f));
+        nvgRotate(vg, M_PI * (d));
         nvgScale(vg, this->base.sx, this->base.sy);
 
         nvgTranslate(vg, -x, -y);
@@ -176,15 +176,15 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgBeginPath(vg);
 
         float width = 8;
-        float height = 250;
+        float height = 200;
         float x = width / 2;
-        float y = 210;
+        float y = 170;
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
-        nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
+        nvgRotate(vg, M_PI * (d / 60.0f));
         nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -x, -y);
 
@@ -201,16 +201,16 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgBeginPath(vg);
 
         float width = 16;
-        float height = 200;
+        float height = 150;
         float x = width / 2;
-        float y = 180;
+        float y = 130;
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
 
-        nvgRotate(vg, M_PI * (d));
+        nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
         nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -x, -y);
 

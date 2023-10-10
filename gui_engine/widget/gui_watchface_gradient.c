@@ -78,7 +78,7 @@ static void canvas_design(gui_canvas_t *canvas)
         r1 = WATCHFACE_GRADIENT_RING2 * WATCHFACE_GRADIENT_SCLAE  / 2.0F;
         r0 = WATCHFACE_GRADIENT_RING3 * WATCHFACE_GRADIENT_SCLAE  / 2.0F;
         a0 = hour_degree * 2.0f - NVG_PI / 2.0f;
-        a1 = a0 + NVG_PI / 1.7f;
+        a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
@@ -89,8 +89,8 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
                      -(dc->screen_height / 2 - GET_BASE(this)->y));
-        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r1, a0, a1, NVG_CW);
-        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r0, a1, a0, NVG_CCW);
+        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r1, a1, a0, NVG_CW);
+        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r0, a0, a1, NVG_CCW);
         nvgClosePath(vg);
         ax = cx + cosf(a0) * (r0 + r1) * 0.5f;
         ay = cy + sinf(a0) * (r0 + r1) * 0.5f;
@@ -185,7 +185,7 @@ static void canvas_design(gui_canvas_t *canvas)
         r1 = WATCHFACE_GRADIENT_RING1 * WATCHFACE_GRADIENT_SCLAE  / 2;
         r0 = WATCHFACE_GRADIENT_RING2 * WATCHFACE_GRADIENT_SCLAE  / 2.0F;
         a0 = hour_degree * 10.0F - NVG_PI / 2.0f;
-        a1 = a0 + NVG_PI / 1.7f;
+        a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
@@ -196,8 +196,8 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
                      -(dc->screen_height / 2 - GET_BASE(this)->y));
-        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r1, a0, a1, NVG_CW);
-        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r0, a1, a0, NVG_CCW);
+        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r1, a1, a0, NVG_CW);
+        nvgArc(vg, GET_BASE(canvas)->w / 2, GET_BASE(canvas)->h / 2, r0, a0, a1, NVG_CCW);
         nvgClosePath(vg);
         ax = cx + cosf(a0) * (r0 + r1) * 0.5f;
         ay = cy + sinf(a0) * (r0 + r1) * 0.5f;
@@ -265,7 +265,7 @@ static void canvas_design(gui_canvas_t *canvas)
         r1 = GET_BASE(canvas)->h / 2;
         r0 = 2 / 2.0F;
         a0 = hour_degree * 60.0f - NVG_PI / 2.0f;
-        a1 = a0 + NVG_PI / 1.7f;
+        a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
