@@ -35,6 +35,16 @@ void curtainview_prepare(gui_obj_t *obj)
     gui_curtain_t *c_down = NULL;
     gui_curtain_t *c_left = NULL;
     gui_curtain_t *c_right = NULL;
+    if (tp->released)
+    {
+        ext->release_flag = true;
+    }
+    if (tp->pressed)
+    {
+        ext->release_flag = false;
+    }
+
+
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -91,7 +101,8 @@ void curtainview_prepare(gui_obj_t *obj)
 
 
             obj->cover = false;
-            if ((tp->type == TOUCH_HOLD_Y) || ext->down_flag)
+            if ((tp->type == TOUCH_HOLD_Y) || (tp->type == TOUCH_ORIGIN_FROM_Y) ||
+                (tp->type == TOUCH_DOWN_SLIDE) || (tp->type == TOUCH_UP_SLIDE) || ext->down_flag)
             {
                 if (!ext->down_flag)
                 {
@@ -129,32 +140,34 @@ void curtainview_prepare(gui_obj_t *obj)
                         GET_BASE(c_down)->not_show = true;
                     }
                 }
-                if (obj->y < -(int)gui_get_screen_height() * ext->scopedown * 0.5f)
+                //gui_log("obj->y :%d  ext->release_flag:%d\n",obj->y ,ext->release_flag);
+                if (obj->y < 0 && ext->release_flag)
                 {
                     ext->down_flag = true;
                     ext->spring_value -= GUI_FRAME_STEP;
                     obj->y += ext->spring_value;
-                    if (obj->y <= -(int)gui_get_screen_height() * ext->scopeup)
+                    if (obj->y <= -(int)gui_get_screen_height())
                     {
                         ext->down_flag = false;
                         ext->cur_curtain = CURTAIN_DOWN;
                         obj->y = 0;
                         ext->spring_value = 0;
-
+                        ext->release_flag = false;
                     }
 
                 }
-                else if (obj->y > (int)gui_get_screen_height() * ext->scopeup * 0.5f)
+                else if (obj->y > 0 && ext->release_flag)
                 {
                     ext->down_flag = true;
                     ext->spring_value += GUI_FRAME_STEP;
                     obj->y += ext->spring_value;
-                    if (obj->y >= (int)gui_get_screen_height() * ext->scopeup)
+                    if (obj->y >= (int)gui_get_screen_height())
                     {
                         ext->down_flag = false;
                         ext->cur_curtain = CURTAIN_UP;
                         obj->y = 0;
                         ext->spring_value = 0;
+                        ext->release_flag = false;
                     }
                 }
             }
