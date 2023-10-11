@@ -60,13 +60,21 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
+
         nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
                      dc->screen_height / 2 - GET_BASE(this)->y);
-        nvgRotate(vg, hour_degree * 2.0f);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, hour_degree * 2.0f);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, 0);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, 0);
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 1 * 255));
         nvgFill(vg);
     }
@@ -118,11 +126,19 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
                      dc->screen_height / 2 - GET_BASE(this)->y);
-        nvgRotate(vg, hour_degree * 2.0f);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, hour_degree * 2.0f);
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, width / 2.0f);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, width / 2);
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
         nvgFill(vg);
     }
@@ -142,11 +158,19 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
                      dc->screen_height / 2 - GET_BASE(this)->y);
-        nvgRotate(vg, hour_degree * 2.0f);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, hour_degree * 2.0f);
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, width / 2.0f);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, width / 2);
         nvgFillColor(vg, nvgRGBA(255, 153, 102, 1 * 255));
         nvgFill(vg);
     }
@@ -169,11 +193,19 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
                      dc->screen_height / 2 - GET_BASE(this)->y);
-        nvgRotate(vg, hour_degree * 10.0F);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, hour_degree * 10.0f);
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, 0);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, width / 2);
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 1 * 255));
         nvgFill(vg);
     }
@@ -224,11 +256,19 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
                      dc->screen_height / 2 - GET_BASE(this)->y);
-        nvgRotate(vg, hour_degree * 10.0F);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, hour_degree * 10.0f);
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, width / 2.0f);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, width / 2);
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
         nvgFill(vg);
     }
@@ -248,11 +288,19 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
                      dc->screen_height / 2 - GET_BASE(this)->y);
-        nvgRotate(vg, hour_degree * 10.0F);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, hour_degree * 10.0f);
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, width / 2.0f);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, width / 2);
         nvgFillColor(vg, nvgRGBA(94, 92, 230, 1 * 255));
         nvgFill(vg);
     }
@@ -273,14 +321,21 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
                      dc->screen_height / 2 - GET_BASE(this)->y);
-        nvgRotate(vg, hour_degree * 60.0F);
         nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
                      -(dc->screen_height / 2 - GET_BASE(this)->y));
-        nvgRect(vg, cx, cy, cx * 2, cy * 1.3f);
+
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, hour_degree * 60.0f);
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
+        nvgRect(vg, GET_BASE(this)->x + cx, GET_BASE(this)->y + cy, cx * 2, cy * 1.3f);
 
         nvgClosePath(vg);
-        NVGpaint paint = nvgLinearGradient(vg, cx * 2.0f, cy * 2.5f, cx * 2.0f, cy, nvgRGBA(255, 51, 119,
+        NVGpaint paint = nvgLinearGradient(vg, cx * 2.0f, cy * 3.0f, cx * 2.0f, cy, nvgRGBA(255, 51, 119,
                                            1 * 255), nvgRGBA(255, 51, 119, 0));
         nvgFillPaint(vg, paint);
 
@@ -318,7 +373,34 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFillColor(vg, nvgRGBA(0, 0, 0, 1 * 255));
         nvgFill(vg);
     }
+    nvgResetTransform(vg);
 
+    nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+    nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+    nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
+    nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
+                 dc->screen_height / 2 - GET_BASE(this)->y);
+    nvgScale(vg, this->base.sx, this->base.sy);
+    nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                 -(dc->screen_height / 2 - GET_BASE(this)->y));
+
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, -dc->screen_width, - GET_BASE(this)->y, dc->screen_width, dc->screen_height, 0);
+    nvgFillColor(vg, nvgRGBA(0, 0, 0, 1 * 255));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, GET_BASE(this)->w, - GET_BASE(this)->y, dc->screen_width, dc->screen_height, 0);
+    nvgFillColor(vg, nvgRGBA(0, 0, 0, 1 * 255));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, - GET_BASE(this)->x, - dc->screen_height, dc->screen_width * 2,
+                   dc->screen_height, 0);
+    nvgFillColor(vg, nvgRGBA(0, 0, 0, 1 * 255));
+    nvgFill(vg);
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, 0, GET_BASE(this)->h, dc->screen_width * 2, dc->screen_height, 0);
+    nvgFillColor(vg, nvgRGBA(0, 0, 0, 1 * 255));
+    nvgFill(vg);
 }
 static void watchface_gradient_ctor(gui_watchface_gradient_t *this, gui_obj_t *parent,
                                     const char *name,

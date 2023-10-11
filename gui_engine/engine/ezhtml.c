@@ -90,10 +90,15 @@ gui_magic_img_t *xml_gui_magic_img_create_from_mem(void *parent,  const char *na
     {
         addr = gui_get_file_address("app/system/resource/icMenuBird.bin");
     }
-
+#ifdef RTL8763EP
+    return gui_img_create_from_mem(parent, name, addr,
+                                   x,
+                                   y, 0, 0);
+#else
     return gui_magic_img_create_from_mem(parent, name, addr,
                                          x,
                                          y, 0, 0);
+#endif
 }
 char *get_space_string_head(const char *string)
 {
