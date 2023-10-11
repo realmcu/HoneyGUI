@@ -17,7 +17,7 @@
 static void app_home_ui_design(gui_app_t *app);
 gui_tabview_t *home_tab;
 
-extern void design_tab_home(void *parent);
+extern void design_tv_home(void *parent);
 extern void design_tab_sport(void *parent);
 extern void design_tab_heart(void *parent);
 extern void design_tab_blood(void *parent);
@@ -28,8 +28,6 @@ extern void design_tab_weather(void *parent);
 extern void design_tab_breath(void *parent);
 extern void design_tab_sleep(void *parent);
 
-extern void page_left_figure(void *parent);
-extern void page_down_message_design(void *parent);
 static gui_app_t app_home =
 {
     .screen =
@@ -64,12 +62,7 @@ static void app_home_ui_design(gui_app_t *app)
     gui_tab_t *tab_breath = gui_tab_create(home_tab, "tb_breath",         0, 0, 0, 0, 8, 0);
     gui_tab_t *tab_sleep = gui_tab_create(home_tab, "tb_note",            0, 0, 0, 0, 9, 0);
 
-    gui_curtainview_t *ct = gui_curtainview_create(tab_home, "ct", 0, 0, 320, 384);
-    GET_BASE(ct)->cover = true;
-    gui_curtain_t *ct_mid = gui_curtain_create(ct, "ct_mid", 0, 0, 320, 384, CURTAIN_MIDDLE, 1);
-    gui_curtain_t *ct_left = gui_curtain_create(ct, "ct_left", 0, 0, 320, 384, CURTAIN_LEFT, 0.775f);
-    gui_curtain_t *ct_down = gui_curtain_create(ct, "4", 0, 0, 320, 384, CURTAIN_DOWN, 1);
-
+    design_tv_home(tab_home);
     design_tab_sport(tab_sport);
     design_tab_heart(tab_heart);
     design_tab_blood(tab_blood);
@@ -80,8 +73,6 @@ static void app_home_ui_design(gui_app_t *app)
     design_tab_breath(tab_breath);
     design_tab_sleep(tab_sleep);
 
-    design_tab_home(ct_mid);
-    page_left_figure(ct_left);
-    page_down_message_design(ct_down);
+
 }
 

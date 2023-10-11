@@ -13,54 +13,58 @@ static void canvas_cb(gui_canvas_t *canvas)
     nvgFillColor(canvas->vg, nvgRGBA(30, 30, 30, 255));
     nvgFill(canvas->vg);
 }
-void page_down_message_app1(void *parent)
+void page_down_message_health(void *parent)
 {
-    gui_magic_img_t *app1_message =  gui_magic_img_create_from_mem(parent, "app1_message",
-                                                                   RECT_300_127_BIN,
-                                                                   0, 0, 0, 0);
-    gui_img_set_opacity(app1_message, 128);
-    gui_magic_img_t *text_0 =  gui_magic_img_create_from_mem(parent, "text_0", TEXT_0_BIN, 22, 43, 0,
-                                                             0);
-    gui_magic_img_t *text_1 =  gui_magic_img_create_from_mem(parent, "text_1", TEXT_1_BIN, 22, 81, 0,
-                                                             0);
-    gui_magic_img_t *time_0 =  gui_magic_img_create_from_mem(parent, "time_0", TEXT_2_BIN, 226, 8, 0,
-                                                             0);
-    gui_magic_img_t *pic_app =  gui_magic_img_create_from_mem(parent, "pic_app", INSTAGRAM_BIN, 22, -21,
-                                                              0, 0);
+
+    gui_magic_img_t *health_message =  gui_magic_img_create_from_mem(parent, "health_message",
+                                                                     CARD_HEALTH_BIN,
+                                                                     10, 0, 0, 0);
+    gui_magic_img_t *health_watch =  gui_magic_img_create_from_mem(parent, "card_time",
+                                                                   CARD_TIME_BIN,
+                                                                   170, -138, 0, 0);
+    gui_img_set_opacity(health_watch, 50);
+    gui_magic_img_t *week =  gui_magic_img_create_from_mem(parent, "time", SUN_BIN, 25, -90, 0, 0);
+    gui_magic_img_t *data =  gui_magic_img_create_from_mem(parent, "data", DATA_BIN, 25, -37, 0, 0);
 }
 void page_down_message_music(void *parent)
 {
-    gui_magic_img_t *muisc =  gui_magic_img_create_from_mem(parent, "muisc_message", MESSAGE_MUS_BIN,
-                                                            0, 0, 0, 0);
+    gui_magic_img_t *muisc_message =  gui_magic_img_create_from_mem(parent, "muisc_message",
+                                                                    CARD_MUSIC1_BIN,
+                                                                    10, 0, 0, 0);
 
 }
-void page_down_message_app2(void *parent)
+void page_down_message_weather1(void *parent)
 {
-    gui_magic_img_t *app2_message =  gui_magic_img_create_from_mem(parent, "app2_message",
-                                                                   MESSAGE_3_BIN,
-                                                                   0, 0, 0, 0);
+    gui_magic_img_t *weather_message =  gui_magic_img_create_from_mem(parent, "weather_message1",
+                                                                      CARD_WEATHER1_BIN,
+                                                                      10, 0, 0, 0);
 }
-void page_down_message_weixin(void *parent)
+void page_down_message_weather2(void *parent)
 {
-    gui_magic_img_t *weixin_message =  gui_magic_img_create_from_mem(parent, "weixin_message",
-                                                                     RECT_300_127_BIN,
-                                                                     0, 0, 0, 0);
-    gui_img_set_opacity(weixin_message, 128);
-    gui_magic_img_t *text_2 =  gui_magic_img_create_from_mem(parent, "text_2", TEXT_0_BIN, 22, 43, 0,
-                                                             0);
-    gui_magic_img_t *text_3 =  gui_magic_img_create_from_mem(parent, "text_3", TEXT_1_BIN, 22, 81, 0,
-                                                             0);
-    gui_magic_img_t *time_1 =  gui_magic_img_create_from_mem(parent, "time_1", TEXT_2_BIN, 226, 8, 0,
-                                                             0);
-    gui_magic_img_t *pic_weixin =  gui_magic_img_create_from_mem(parent, "pic_weixin", WEIXIN_BIN, 22,
-                                                                 -21, 0, 0);
+    gui_magic_img_t *weather_message =  gui_magic_img_create_from_mem(parent, "weather_message2",
+                                                                      CARD_WEATHER1_BIN,
+                                                                      10, 0, 0, 0);
 }
-void page_down_message_close(void *parent)
+void page_down_message_mult(void *parent)
 {
-    gui_magic_img_t *close =  gui_magic_img_create_from_mem(parent, "close", CLOSE_BIN,
-                                                            35, 330, 0, 0);
-    //gui_img_set_opacity(close, 50);
+    gui_magic_img_t *muit_message =  gui_magic_img_create_from_mem(parent, "muit_message",
+                                                                   CARD_MORE_BIN,
+                                                                   10, 0, 0, 0);
+    gui_magic_img_t *all_app =  gui_magic_img_create_from_mem(parent, "close",
+                                                              DYNAMIC_ISLAND_260_66_BIN,
+                                                              30, 156, 0, 0);
+    gui_magic_img_t *menu = gui_magic_img_create_from_mem(parent, "menu", CARD_LIST_BIN, 140, 170, 0,
+                                                          0);
 }
+//void page_down_all(void *parent)
+//{
+//    gui_magic_img_t *all_app =  gui_magic_img_create_from_mem(parent, "close",
+//                                                              DYNAMIC_ISLAND_260_66_BIN,
+//                                                              30, 306, 0, 0);
+//    gui_magic_img_t *menu = gui_magic_img_create_from_mem(parent, "menu", CARD_LIST_BIN, 140, 320, 0,
+//                                                          0);
+//    //gui_img_set_opacity(close, 50);
+//}
 void  page_down_message_design(void *parent)
 {
     gui_canvas_t *canvas = gui_canvas_create(parent, "canvas", 0, 0, 0, 320, 384);
@@ -68,17 +72,18 @@ void  page_down_message_design(void *parent)
     gui_cardview_t *cd =  gui_cardview_create(parent, "cardview",    0, 0, 0, 0);
     gui_cardview_set_style(cd, STACKING);
 
-    gui_card_t *tb_music = gui_card_create(cd, "app1",     0, 0, 0, 0, 0, 0);
-    gui_card_t *tb_weixin = gui_card_create(cd, "tb_weixin",   0, 0, 0, 0, 0, 1);
-    gui_card_t *tb_weixin1 = gui_card_create(cd, "music",  0, 0, 0, 0, 0, 2);
-    gui_card_t *tb_weixin2 = gui_card_create(cd, "app2",  0, 0, 0, 0, 0, 3);
-    // gui_cardview_set_style(cd, STACKING);
+    gui_card_t *tb_health   =    gui_card_create(cd, "tb_health",  0, 0, 0, 0, 0, 0);
+    gui_card_t *tb_weather1 = gui_card_create(cd, "tb_weather1",   0, 0, 0, 0, 0, 1);
+    gui_card_t *tb_music    =  gui_card_create(cd, "tb_music",     0, 0, 0, 0, 0, 2);
+    gui_card_t *tb_weather2 =  gui_card_create(cd, "tb_weather2",  0, 0, 0, 0, 0, 3);
+    gui_card_t *tb_more     =      gui_card_create(cd, "tb_more",  0, 0, 0, 0, 0, 4);
+    gui_card_t *tb_non      =       gui_card_create(cd, "tb_non",  0, 0, 0, 0, 0, 5);
+    //gui_cardview_set_style(cd, STACKING);
 
-    page_down_message_app1(tb_music);
-    page_down_message_weixin(tb_weixin);
-    page_down_message_music(tb_weixin1);
-    page_down_message_app2(tb_weixin2);
-    gui_magic_img_t *close =  gui_magic_img_create_from_mem(parent, "close",
-                                                            CLOSE_BIN,
-                                                            35, 300, 0, 0);
+    page_down_message_health(tb_health);
+    page_down_message_weather1(tb_weather1);
+    page_down_message_music(tb_music);
+    page_down_message_weather2(tb_weather2);
+    page_down_message_mult(tb_more);
+
 }
