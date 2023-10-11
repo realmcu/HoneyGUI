@@ -6,12 +6,15 @@
 #include "gui_watchface_gradient.h"
 #include "gui_cardview.h"
 #include "gui_card.h"
+#include "gui_tab.h"
+#include "gui_app.h"
 
 gui_win_t *win_watch;
 gui_magic_img_t *img;
 gui_watch_gradient_spot_t *watch;
 gui_text_t *rate;
 static gui_watchface_gradient_t *canvas;
+gui_tabview_t *tablist_tab;
 
 // static void canvas_cb(gui_canvas_t *canvas)
 // {
@@ -20,44 +23,57 @@ static gui_watchface_gradient_t *canvas;
 //     nvgFill(canvas->vg);
 // }
 
-// static void callback_tab()
-// {
-//     int idx = cv->cur_id.y;
-//     gui_tree_free(win);
-//     app_hongkong_ui_design(get_app_hongkong());
+static void callback_time()
+{
+    int idx = tablist_tab->cur_id.x;
+    gui_log("idx:%d\n", idx);
+    gui_app_t *app = get_app_hongkong();
+    gui_obj_t *screen = &(app->screen);
 
-//     gui_tabview_jump_tab(tv, idx, 0);
+    gui_tree_free(screen);
+    // app_hongkong_ui_design(get_app_hongkong());
+    gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
+    gui_tabview_set_style(tv, REDUCTION);
+    gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
+    gui_tab_t *tb_watch = gui_tab_create(tv, "tb_watch",           0, 0, 0, 0, -1, 0);
+    gui_tab_t *tb_watchface = gui_tab_create(tv, "tb_watchface",   0, 0, 0, 0, -2, 0);
+    gui_tab_t *tb_blood = gui_tab_create(tv, "tb_blood",           0, 0, 0, 0, -3, 0);
 
-// }
+    gui_magic_img_t *tablist_clock = gui_magic_img_create_from_mem(tb_clock, "page0", CLOCKN_BIN, 0, 0,
+                                                                   0, 0);
+    gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_create(tb_watch, "watchface", 0, 0, 0,
+                                                                      0);
+    gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
+    gui_watchface_gradient_t *canvas = gui_watchface_gradient_create(tb_watchface, "watchface_gradient",
+                                                                     0,
+                                                                     0, 368, 448);
+    gui_magic_img_t *tablist_blood = gui_magic_img_create_from_mem(tb_blood, "page3", BLOODOXYGEN_BIN,
+                                                                   0, 0, 0, 0);
+
+    gui_tabview_jump_tab(tablist_tab, -idx, 0);
+}
 
 static void callback_touch_long(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
+    gui_app_t *app = get_app_hongkong();
+    gui_obj_t *screen = &(app->screen);
 
-    // gui_tree_free(win);
-    // win = gui_win_create(get_app_hongkong(), "win", 0, 0, 320, 320);
-    // gui_obj_add_event_cb(win, (gui_event_cb_t)callback_tab, GUI_EVENT_TOUCH_CLICKED, NULL);
+    gui_tree_free(screen);
+    gui_win_t *win = gui_win_create(screen, "win", 0, 0, 320, 320);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)callback_time, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    // gui_canvas_t *canvas = gui_canvas_create(win, "canvas", 0, 0, 0, 368, 448);
-    // gui_canvas_set_canvas_cb(canvas, canvas_cb);
-    // cv = gui_cardview_create(win, "cardview", 0, 0, 0, 0);
-    // gui_cardview_t *tv = cv;
-    // gui_cardview_set_style(tv, STACKING);
-    // gui_card_t *tb_clock = gui_card_create(tv, "tb_clock",         0, 0, 0, 0, 0, 0);
-    // gui_card_t *tb_activity = gui_card_create(tv, "tb_activity",   0, 0, 0, 0, 0, 1);
-    // gui_card_t *tb_heart = gui_card_create(tv, "tb_heart",         0, 0, 0, 0, 0, 2);
-    // gui_card_t *tb_blood = gui_card_create(tv, "tb_tb_bloodcube",  0, 0, 0, 0, 0, 3);
-    // gui_card_t *tb_weather = gui_card_create(tv, "tb_weather",     0, 0, 0, 0, 0, 4);
-    // gui_card_t *tb_music = gui_card_create(tv, "tb_music",         0, 0, 0, 0, 0, 5);
+    tablist_tab = gui_tabview_create(win, "tabview", 59, 84, 250, 300);
+    gui_tabview_set_style(tablist_tab, CLASSIC);
+    gui_tab_t *tb_clock = gui_tab_create(tablist_tab, "tb_clock",           0, 0, 250, 0, 0, 0);
+    gui_tab_t *tb_watch = gui_tab_create(tablist_tab, "tb_watch",           0, 0, 250, 0, 1, 0);
+    gui_tab_t *tb_watchface = gui_tab_create(tablist_tab, "tb_watchface",   0, 0, 250, 0, 2, 0);
+    gui_tab_t *tb_blood = gui_tab_create(tablist_tab, "tb_blood",           0, 0, 250, 0, 3, 0);
 
-    // gui_cardview_set_style(tv, STACKING);
-
-    // tablist_clock(tb_clock);
-    // tablist_activity(tb_activity);
-    // tablist_heart(tb_heart);
-    // tablist_blood(tb_blood);
-    // tablist_weather(tb_weather);
-    // tablist_music(tb_music);
+    tablist_clock(tb_clock);
+    tablist_watch(tb_watch);
+    tablist_watchface(tb_watchface);
+    tablist_blood(tb_blood);
 
 }
 
@@ -97,13 +113,13 @@ void page_ct_clock(void *parent)
 
     gui_obj_add_event_cb(win_watch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);
 
-    img = gui_magic_img_create_from_mem(parent, "page0", BACKGROUND_BIN, 0, 0, 0, 0);
-    watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
-    gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
-    canvas = gui_watchface_gradient_create(parent, "watchface_gradient", (368 - 368) / 2,
-                                           (448 - 448) / 2, 368, 448);
-    GET_BASE(watch)->not_show = true;
-    GET_BASE(canvas)->not_show = true;
+    img = gui_magic_img_create_from_mem(parent, "page0", CLOCKN_BIN, 0, 0, 0, 0);
+    // watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
+    // gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
+    // canvas = gui_watchface_gradient_create(parent, "watchface_gradient", (368 - 368) / 2,
+    //                                        (448 - 448) / 2, 368, 448);
+    // GET_BASE(watch)->not_show = true;
+    // GET_BASE(canvas)->not_show = true;
 
 }
 

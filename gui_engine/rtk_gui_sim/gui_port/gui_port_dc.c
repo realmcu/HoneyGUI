@@ -224,7 +224,7 @@ void *rtk_gui_sdl(void *arg)
         case SDL_KEYDOWN:
             {
                 gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
-                kb_port_data.flag = true;
+                // kb_port_data.flag = true;
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
                        strlen(SDL_GetKeyName(event.key.keysym.sym)));
@@ -233,7 +233,7 @@ void *rtk_gui_sdl(void *arg)
         case SDL_KEYUP:
             {
                 gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
-                kb_port_data.flag = false;
+                // kb_port_data.flag = false;
                 memset(kb_port_data.name, 0x00, 10);
             }
             break;
