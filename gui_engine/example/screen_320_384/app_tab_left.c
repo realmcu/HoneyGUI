@@ -7,11 +7,10 @@
 void  page_left_figure(void *parent)
 {
 
-    gui_magic_img_t *background =  gui_magic_img_create_from_mem(parent, "background",
-                                                                 CURTAIN_RECT_248_385_BIN,
+    gui_magic_img_t *background =  gui_magic_img_create_from_mem(parent, "background_left",
+                                                                 RECT_248_384_BIN,
                                                                  72, 0, 0, 0);
-    background->base.draw_img.blend_mode = IMG_BYPASS_MODE;
-    gui_img_set_opacity(background, 128);
+    gui_img_set_opacity(background, 50);
 
     gui_img_t *time =  gui_img_create_from_mem(parent, "time", TIME_BIN, 161, 20, 0, 0);
     gui_img_t *data =  gui_img_create_from_mem(parent, "data", DATA_BIN, 132, 64, 0, 0);
