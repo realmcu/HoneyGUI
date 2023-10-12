@@ -26,29 +26,6 @@ void curtainview_prepare(gui_obj_t *obj)
     {
         frame_step = frame_step / 10;
     }
-
-    if (!((obj->parent->dx == 0) && (obj->parent->dy == 0)))
-    {
-        ext->cur_curtain = CURTAIN_MIDDLE;
-        obj->cover = false;
-        return;
-    }
-    if (obj->parent->parent->type == TABVIEW)
-    {
-        if (!(((gui_tabview_t *)(obj->parent->parent))->cur_id.x == 0 &&
-              ((gui_tabview_t *)(obj->parent->parent))->cur_id.y == 0))
-        {
-            ext->cur_curtain = CURTAIN_MIDDLE;
-            obj->cover = false;
-            return;
-        }
-
-    }
-    if (this->mute == true)
-    {
-        return;
-    }
-
     gui_list_t *node = NULL;
     gui_list_t *tmp = NULL;
     gui_curtain_t *c_middle = NULL;
@@ -95,33 +72,56 @@ void curtainview_prepare(gui_obj_t *obj)
             }
         }
     }
+    if (ext->cur_curtain == CURTAIN_MIDDLE)
+    {
+        if (ext->init_flag)
+        {
+            if (c_up)
+            {
+                GET_BASE(c_up)->not_show = true;
+            }
+            if (c_down)
+            {
+                GET_BASE(c_down)->not_show = true;
+            }
+            if (c_left)
+            {
+                GET_BASE(c_left)->not_show = true;
+            }
+            if (c_right)
+            {
+                GET_BASE(c_right)->not_show = true;
+            }
+        }
+        ext->init_flag = true;
+    }
+    if (!((obj->parent->dx == 0) && (obj->parent->dy == 0)))
+    {
+        ext->cur_curtain = CURTAIN_MIDDLE;
+        obj->cover = false;
+        return;
+    }
+    if (obj->parent->parent->type == TABVIEW)
+    {
+        if (!(((gui_tabview_t *)(obj->parent->parent))->cur_id.x == 0 &&
+              ((gui_tabview_t *)(obj->parent->parent))->cur_id.y == 0))
+        {
+            ext->cur_curtain = CURTAIN_MIDDLE;
+            obj->cover = false;
+            return;
+        }
+
+    }
+    if (this->mute == true)
+    {
+        return;
+    }
+
+
     switch (ext->cur_curtain)
     {
     case CURTAIN_MIDDLE:
         {
-            if (ext->init_flag)
-            {
-                if (c_up)
-                {
-                    GET_BASE(c_up)->not_show = true;
-                }
-                if (c_down)
-                {
-                    GET_BASE(c_down)->not_show = true;
-                }
-                if (c_left)
-                {
-                    GET_BASE(c_left)->not_show = true;
-                }
-                if (c_right)
-                {
-                    GET_BASE(c_right)->not_show = true;
-                }
-
-            }
-            ext->init_flag = true;
-
-
             obj->cover = false;
             if ((tp->type == TOUCH_HOLD_Y) || (tp->type == TOUCH_ORIGIN_FROM_Y) ||
                 (tp->type == TOUCH_DOWN_SLIDE) || (tp->type == TOUCH_UP_SLIDE) || ext->down_flag)
