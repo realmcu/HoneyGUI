@@ -20,8 +20,8 @@ void tablist_watch(void *parent)
 void tablist_watchface(void *parent)
 {
     gui_watchface_gradient_t *canvas = gui_watchface_gradient_create(parent, "watchface_gradient",
-                                                                     (368 - 221) / 2,
-                                                                     (448 - 269) / 2, 221, 269);
+                                                                     (368 - 368) / 2,
+                                                                     (448 - 448) / 2, 221, 269);
     gui_magic_img_t *rect = gui_magic_img_create_from_mem(parent, "rect", RECT_221_269_BIN, 0, 0, 0, 0);
 }
 void tablist_blood(void *parent)

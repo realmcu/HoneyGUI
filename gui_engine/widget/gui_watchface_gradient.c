@@ -42,10 +42,8 @@ static void canvas_design(gui_canvas_t *canvas)
               WATCHFACE_GRADIENT_RING3 * WATCHFACE_GRADIENT_SCLAE / 2);
     nvgFillColor(canvas->vg, nvgRGBA(94, 92, 230, 0.5 * 0xff));
     nvgFill(canvas->vg);
-    static float second;
-    second++;
-    float hour_degree = (second / 3600.0f) / 12.0f * 2 * NVG_PI;
-
+    static float d = 0;
+    d += 0.005f;
     {
         //for hour point
         nvgResetTransform(vg);
@@ -69,7 +67,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, hour_degree * 2.0f);
+        nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
@@ -85,7 +83,7 @@ static void canvas_design(gui_canvas_t *canvas)
         cy = GET_BASE(canvas)->h / 2;
         r1 = WATCHFACE_GRADIENT_RING2 * WATCHFACE_GRADIENT_SCLAE  / 2.0F;
         r0 = WATCHFACE_GRADIENT_RING3 * WATCHFACE_GRADIENT_SCLAE  / 2.0F;
-        a0 = hour_degree * 2.0f - NVG_PI / 2.0f;
+        a0 = M_PI * (d / 60.0f / 60.0f) * 2.0f - NVG_PI / 2.0f;
         a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
@@ -132,7 +130,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, hour_degree * 2.0f);
+        nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -164,7 +162,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, hour_degree * 2.0f);
+        nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -199,7 +197,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, hour_degree * 10.0f);
+        nvgRotate(vg, M_PI * (d / 60.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -216,7 +214,7 @@ static void canvas_design(gui_canvas_t *canvas)
         cy = GET_BASE(canvas)->h / 2;
         r1 = WATCHFACE_GRADIENT_RING1 * WATCHFACE_GRADIENT_SCLAE  / 2;
         r0 = WATCHFACE_GRADIENT_RING2 * WATCHFACE_GRADIENT_SCLAE  / 2.0F;
-        a0 = hour_degree * 10.0F - NVG_PI / 2.0f;
+        a0 = M_PI * (d / 60.0f) - NVG_PI / 2.0f;
         a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
@@ -262,7 +260,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, hour_degree * 10.0f);
+        nvgRotate(vg, M_PI * (d / 60.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -294,7 +292,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, hour_degree * 10.0f);
+        nvgRotate(vg, M_PI * (d / 60.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -312,7 +310,7 @@ static void canvas_design(gui_canvas_t *canvas)
         cy = GET_BASE(canvas)->h / 2;
         r1 = GET_BASE(canvas)->h / 2;
         r0 = 2 / 2.0F;
-        a0 = hour_degree * 60.0f - NVG_PI / 2.0f;
+        a0 = M_PI * (d / 1.0f) - NVG_PI / 2.0f;
         a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
@@ -328,7 +326,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, hour_degree * 60.0f);
+        nvgRotate(vg, M_PI * (d / 1.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -385,7 +383,8 @@ static void canvas_design(gui_canvas_t *canvas)
                  -(dc->screen_height / 2 - GET_BASE(this)->y));
 
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, -dc->screen_width, - GET_BASE(this)->y, dc->screen_width, dc->screen_height, 0);
+    nvgRoundedRect(vg, -dc->screen_width, -dc->screen_height - GET_BASE(this)->y, dc->screen_width,
+                   dc->screen_height * 2, 0);
     nvgFillColor(vg, nvgRGBA(0, 0, 0, 1 * 255));
     nvgFill(vg);
     nvgBeginPath(vg);

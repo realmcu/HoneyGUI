@@ -29,28 +29,35 @@ static void callback_time()
     gui_log("idx:%d\n", idx);
     gui_app_t *app = get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
-
     gui_tree_free(screen);
-    // app_hongkong_ui_design(get_app_hongkong());
-    gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, REDUCTION);
-    gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
-    gui_tab_t *tb_watch = gui_tab_create(tv, "tb_watch",           0, 0, 0, 0, -1, 0);
-    gui_tab_t *tb_watchface = gui_tab_create(tv, "tb_watchface",   0, 0, 0, 0, -2, 0);
-    gui_tab_t *tb_blood = gui_tab_create(tv, "tb_blood",           0, 0, 0, 0, -3, 0);
+    app->ui_design(app);
+    switch (idx)
+    {
+    case 0:
+        {
+            GET_BASE(img)->not_show = false;
+            GET_BASE(watch)->not_show = true;
+            GET_BASE(canvas)->not_show = true;
+        }
+        break;
+    case 1:
+        {
+            GET_BASE(img)->not_show = true;
+            GET_BASE(watch)->not_show = false;
+            GET_BASE(canvas)->not_show = true;
+        }
+        break;
+    case 2:
+        {
+            GET_BASE(img)->not_show = true;
+            GET_BASE(watch)->not_show = true;
+            GET_BASE(canvas)->not_show = false;
+        }
+        break;
+    default:
+        break;
+    }
 
-    gui_magic_img_t *tablist_clock = gui_magic_img_create_from_mem(tb_clock, "page0", CLOCKN_BIN, 0, 0,
-                                                                   0, 0);
-    gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_create(tb_watch, "watchface", 0, 0, 0,
-                                                                      0);
-    gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
-    gui_watchface_gradient_t *canvas = gui_watchface_gradient_create(tb_watchface, "watchface_gradient",
-                                                                     0,
-                                                                     0, 368, 448);
-    gui_magic_img_t *tablist_blood = gui_magic_img_create_from_mem(tb_blood, "page3", BLOODOXYGEN_BIN,
-                                                                   0, 0, 0, 0);
-
-    gui_tabview_jump_tab(tablist_tab, -idx, 0);
 }
 
 static void callback_touch_long(void *obj, gui_event_t e)
@@ -58,6 +65,19 @@ static void callback_touch_long(void *obj, gui_event_t e)
     gui_log("win widget long touch enter cb\n");
     gui_app_t *app = get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
+    int idx = 0;
+    if (!GET_BASE(img)->not_show)
+    {
+        idx = 0;
+    }
+    if (!GET_BASE(watch)->not_show)
+    {
+        idx = 1;
+    }
+    if (!GET_BASE(canvas)->not_show)
+    {
+        idx = 2;
+    }
 
     gui_tree_free(screen);
     gui_win_t *win = gui_win_create(screen, "win", 0, 0, 320, 320);
@@ -65,45 +85,45 @@ static void callback_touch_long(void *obj, gui_event_t e)
 
     tablist_tab = gui_tabview_create(win, "tabview", 59, 84, 250, 300);
     gui_tabview_set_style(tablist_tab, CLASSIC);
-    gui_tab_t *tb_clock = gui_tab_create(tablist_tab, "tb_clock",           0, 0, 250, 0, 0, 0);
-    gui_tab_t *tb_watch = gui_tab_create(tablist_tab, "tb_watch",           0, 0, 250, 0, 1, 0);
     gui_tab_t *tb_watchface = gui_tab_create(tablist_tab, "tb_watchface",   0, 0, 250, 0, 2, 0);
-    gui_tab_t *tb_blood = gui_tab_create(tablist_tab, "tb_blood",           0, 0, 250, 0, 3, 0);
+    gui_tab_t *tb_watch = gui_tab_create(tablist_tab, "tb_watch",           0, 0, 250, 0, 1, 0);
 
+    gui_tab_t *tb_clock = gui_tab_create(tablist_tab, "tb_clock",           0, 0, 250, 0, 0, 0);
+    gui_tabview_jump_tab(tablist_tab, idx, 0);
+    extern void tablist_clock(void *parent);
     tablist_clock(tb_clock);
+    extern void tablist_watch(void *parent);
     tablist_watch(tb_watch);
+    extern void tablist_watchface(void *parent);
     tablist_watchface(tb_watchface);
-    tablist_blood(tb_blood);
 
 }
 
-// static void callback_watchface()
-// {
-//     static char clock;
-//     if (clock == 1)
-//     {
-
-//         GET_BASE(img)->not_show = false;
-//         GET_BASE(watch)->not_show = true;
-//         GET_BASE(canvas)->not_show = true;
-//         clock = 2;
-//     }
-//     else if (clock == 2)
-//     {
-//         GET_BASE(img)->not_show = true;
-//         GET_BASE(watch)->not_show = false;
-//         GET_BASE(canvas)->not_show = true;
-//         clock = 0;
-//     }
-//     else if (clock == 0)
-//     {
-//         GET_BASE(img)->not_show = true;
-//         GET_BASE(watch)->not_show = true;
-//         GET_BASE(canvas)->not_show = false;
-//         clock = 1;
-//     }
-
-// }
+static void callback_watchface()
+{
+    static char clock;
+    if (clock == 1)
+    {
+        GET_BASE(img)->not_show = false;
+        GET_BASE(watch)->not_show = true;
+        GET_BASE(canvas)->not_show = true;
+        clock = 2;
+    }
+    else if (clock == 2)
+    {
+        GET_BASE(img)->not_show = true;
+        GET_BASE(watch)->not_show = false;
+        GET_BASE(canvas)->not_show = true;
+        clock = 0;
+    }
+    else if (clock == 0)
+    {
+        GET_BASE(img)->not_show = true;
+        GET_BASE(watch)->not_show = true;
+        GET_BASE(canvas)->not_show = false;
+        clock = 1;
+    }
+}
 
 
 
@@ -114,12 +134,12 @@ void page_ct_clock(void *parent)
     gui_obj_add_event_cb(win_watch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);
 
     img = gui_magic_img_create_from_mem(parent, "page0", CLOCKN_BIN, 0, 0, 0, 0);
-    // watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
-    // gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
-    // canvas = gui_watchface_gradient_create(parent, "watchface_gradient", (368 - 368) / 2,
-    //                                        (448 - 448) / 2, 368, 448);
-    // GET_BASE(watch)->not_show = true;
-    // GET_BASE(canvas)->not_show = true;
+    watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
+    gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
+    canvas = gui_watchface_gradient_create(parent, "watchface_gradient", (368 - 368) / 2,
+                                           (448 - 448) / 2, 368, 448);
+    GET_BASE(watch)->not_show = true;
+    GET_BASE(canvas)->not_show = true;
 
 }
 

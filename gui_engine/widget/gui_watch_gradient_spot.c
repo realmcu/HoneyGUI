@@ -10,8 +10,8 @@
 //#include <gui_kb.h>
 #include "gui_watch_gradient_spot.h"
 #include <math.h>
-
-
+#define WATCH_GRADIENT_SPOT_BASE 454.0f
+#define WATCH_GRADIENT_SPOT_SCLAE     ((float)(GET_BASE(this)->w)/WATCH_GRADIENT_SPOT_BASE)
 static void watch_gradient_spot_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
@@ -94,9 +94,11 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
         nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+        //
         nvgScale(vg, this->base.sx, this->base.sy);
-
-
+        nvgScale(vg, (float)(GET_BASE(this)->w) / 454.0f, (float)(GET_BASE(this)->w) / 454.0f);
+        nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
+        nvgTranslate(vg, (float)(GET_BASE(this)->w) / 2, (float)(GET_BASE(this)->h) / 2);
         nvgLineCap(vg, NVG_ROUND);
         nvgMoveTo(vg, arc_data1[0], arc_data1[1]);
         for (size_t i = 0; i < 5; i++)
@@ -141,7 +143,7 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
     }
 
     static float d = 0;
-    d += 0.0005f;
+    d += 0.005f;
 
     {
         //for second point
@@ -149,23 +151,31 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
 
         nvgBeginPath(vg);
 
-        float width = 4;
-        float height = 240;
+        float width = 4 * WATCH_GRADIENT_SPOT_SCLAE;
+        float height = 240 * WATCH_GRADIENT_SPOT_SCLAE;
         float x = width / 2;
-        float y = 210;
+        float y = height - 40 * WATCH_GRADIENT_SPOT_SCLAE;
+
 
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
-        nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
-
-        nvgRotate(vg, M_PI * (d));
+        nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
+                     dc->screen_height / 2 - GET_BASE(this)->y);
         nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, M_PI * (d / 1.0f));
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgTranslate(vg, -x, -y);
-
-        nvgRoundedRect(vg, 0, 0, width, height, 2);
-        nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, 2);
+        nvgFillColor(vg, nvgRGBA(255, 255, 255, 1 * 255));
         nvgFill(vg);
     }
 
@@ -175,20 +185,28 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
 
         nvgBeginPath(vg);
 
-        float width = 8;
-        float height = 200;
+        float width = 8 * WATCH_GRADIENT_SPOT_SCLAE;
+        float height = 200 * WATCH_GRADIENT_SPOT_SCLAE;
         float x = width / 2;
-        float y = 170;
-
+        float y = height;
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
-        nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
-        nvgRotate(vg, M_PI * (d / 60.0f));
+        nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
+                     dc->screen_height / 2 - GET_BASE(this)->y);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, M_PI * (d / 60.0f));
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, 2);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, 2);
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
         nvgFill(vg);
     }
@@ -200,21 +218,28 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
 
         nvgBeginPath(vg);
 
-        float width = 16;
-        float height = 150;
+        float width = 16 * WATCH_GRADIENT_SPOT_SCLAE;
+        float height = 150 * WATCH_GRADIENT_SPOT_SCLAE;
         float x = width / 2;
-        float y = 130;
-
+        float y = height;
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
-        nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
-
-        nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
+        nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
+                     dc->screen_height / 2 - GET_BASE(this)->y);
         nvgScale(vg, this->base.sx, this->base.sy);
-        nvgTranslate(vg, -x, -y);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
+        nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
+        nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
+                     GET_BASE(this)->y + GET_BASE(this)->h / 2);
+        nvgRotate(vg, M_PI * (d / 60.0f / 60.0f));
+        //nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
+                     -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
 
-        nvgRoundedRect(vg, 0, 0, width, height, 2);
+        nvgRoundedRect(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2 - x,
+                       GET_BASE(this)->y + GET_BASE(this)->h / 2 - y, width, height, 2);
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
         nvgFill(vg);
     }
@@ -226,9 +251,13 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
         nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
         nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
-        nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+        nvgTranslate(vg, dc->screen_width / 2 - GET_BASE(this)->x,
+                     dc->screen_height / 2 - GET_BASE(this)->y);
+        nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
+                     -(dc->screen_height / 2 - GET_BASE(this)->y));
         nvgBeginPath(vg);
-        nvgCircle(vg, 0, 0, 10);
+        nvgCircle(vg, GET_BASE(this)->w / 2, GET_BASE(this)->h / 2, 10);
         nvgFillColor(vg, nvgRGBA(0x41, 0x5d, 0x1E, 255));
         nvgFill(vg);
     }
