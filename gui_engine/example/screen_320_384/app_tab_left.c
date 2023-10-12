@@ -10,7 +10,7 @@ void  page_left_figure(void *parent)
     gui_magic_img_t *background =  gui_magic_img_create_from_mem(parent, "background_left",
                                                                  RECT_248_384_BIN,
                                                                  72, 0, 0, 0);
-    gui_img_set_opacity(background, 50);
+    gui_img_set_opacity(background, 128);
 
     gui_img_t *time =  gui_img_create_from_mem(parent, "time", TIME_BIN, 161, 20, 0, 0);
     gui_img_t *data =  gui_img_create_from_mem(parent, "data", DATA_BIN, 132, 64, 0, 0);
@@ -36,11 +36,13 @@ void  page_left_figure(void *parent)
                                                      98, 225, 0, 0);
     gui_img_t *sound =  gui_img_create_from_mem(parent, "sound", SOUND_RECORDING_BIN, 150,
                                                 225, 0, 0);
+    gui_img_t *sound_left =  gui_img_create_from_mem(parent, "sound", SOUND_LEFT_BIN, 93,
+                                                     317, 0, 0);
+    gui_img_t *sound_right =  gui_img_create_from_mem(parent, "sound", SOUND_RIGHT_BIN, 206,
+                                                      317, 0, 0);
     gui_img_t *sport =  gui_img_create_from_mem(parent, "sport", SPORT_BIN, 202, 225, 0, 0);
     gui_img_t *ring =  gui_img_create_from_mem(parent, "ring", RING_BIN, 254, 225, 0, 0);
 
-    gui_magic_img_t *figure_bk2 =  gui_magic_img_create_from_mem(parent, "figure_bk2", SOUND_BIN, 72,
-                                                                 319, 0, 0);
     gui_img_t *siri =  gui_img_create_from_mem(parent, "siri", SIRI_BIN, 161, 297, 0, 0);
 
 }

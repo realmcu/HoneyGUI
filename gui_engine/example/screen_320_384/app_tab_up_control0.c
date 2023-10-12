@@ -98,7 +98,7 @@ static void callback_bright_off()
 void page_tb_up_control0(void *parent)
 {
 
-    gui_magic_img_create_from_mem(parent, "decoration0", APP_LOGO_BIN, 128, 24, 0, 0);
+    gui_img_t *logo = gui_img_create_from_mem(parent, "decoration0", APP_LOGO_BIN, 128, 24, 0, 0);
     gui_switch_t *sw_BT  = gui_switch_create(parent, 16, 90, 169, 98, APP_BT_BIN,
                                              APP_BT_BIN);
     gui_switch_t *sw_charge        = gui_switch_create(parent, 164, 90, 169, 98, APP_CHARGE_BIN,
@@ -113,7 +113,7 @@ void page_tb_up_control0(void *parent)
                                                         APP_BRIGHT_SCREEN_BIN,
                                                         APP_BRIGHT_SCREEN0_BIN);
     img =  gui_img_with_animate_create(GET_BASE(parent)->parent, TEXT_DISTURB_ON_BIN, 0, 0);
-    gui_img_with_animate_set_animate(img, 1000 * 10, 1, img_animate, img);
+    gui_img_with_animate_set_animate(img, 1000, 1, img_animate, img);
     img->animate->animate = false;
     img->base.base.not_show = true;
     //gui_obj_add_event_cb(sw_BT, (gui_event_cb_t)callback_BT_on, GUI_EVENT_1, NULL);

@@ -97,7 +97,7 @@ static void callback_find_on()
 #endif
 void page_tb_up_control1(void *parent)
 {
-    gui_magic_img_create_from_mem(parent, "decoration1", APP_LOGO_BIN, 128, 24, 0, 0);
+    gui_img_t *logo = gui_img_create_from_mem(parent, "decoration0", APP_LOGO_BIN, 128, 24, 0, 0);
     gui_switch_t *sw_brightness     = gui_switch_create(parent, 16, 90, 169, 98, APP_BRIGHT_BIN,
                                                         APP_BRIGHT_ALL_BIN);
     gui_switch_t *sw_sound        = gui_switch_create(parent, 164, 90, 169, 98, APP_SOUND_BIN,
@@ -112,7 +112,7 @@ void page_tb_up_control1(void *parent)
                                               APP_FIND_BIN, APP_FIND_BIN);
 
     img =  gui_img_with_animate_create(parent, TEXT_BRIGHT_ADJUST_BIN, 0, 0);
-    gui_img_with_animate_set_animate(img, 1000 * 10, 1, img_animate, img);
+    gui_img_with_animate_set_animate(img, 1000, 1, img_animate, img);
     img->animate->animate = false;
     img->base.base.not_show = true;
     gui_obj_add_event_cb(sw_brightness, (gui_event_cb_t)callback_brightness_on, GUI_EVENT_1, NULL);

@@ -19,7 +19,6 @@ float degree = 0;
 uint32_t time_count = 0;
 uint8_t dynamic_island_count = 0;
 void switch_dynamic_island(void *obj, gui_event_t e);
-extern void reset_card(void *obj, gui_event_t e);
 void turn(void)
 {
     degree += 0.01;

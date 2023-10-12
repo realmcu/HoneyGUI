@@ -56,13 +56,17 @@ static void cardview_prepare(gui_obj_t *obj)
 
     if (this->release_y % (this->base.h) != 0)
     {
-        if (this->release_y > 0)
+        if (this->release_y > 10)
         {
-            this->release_y--;
+            this->release_y -= 10;
         }
-        if (this->release_y < 0)
+        else if (this->release_y < -10)
         {
-            this->release_y++;
+            this->release_y += 10;
+        }
+        else
+        {
+            this->release_y = 0;
         }
     }
     if (this->status_cb != NULL)
