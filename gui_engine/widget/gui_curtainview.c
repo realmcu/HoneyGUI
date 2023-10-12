@@ -9,7 +9,7 @@
 #include <gui_server.h>
 #include "gui_obj.h"
 #include <tp_algo.h>
-
+#include "gui_tabview.h"
 void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this))
 {
     this->done_cb = cb;
@@ -33,7 +33,17 @@ void curtainview_prepare(gui_obj_t *obj)
         obj->cover = false;
         return;
     }
+    if (obj->parent->parent->type == TABVIEW)
+    {
+        if (!(((gui_tabview_t *)(obj->parent->parent))->cur_id.x == 0 &&
+              ((gui_tabview_t *)(obj->parent->parent))->cur_id.y == 0))
+        {
+            ext->cur_curtain = CURTAIN_MIDDLE;
+            obj->cover = false;
+            return;
+        }
 
+    }
     if (this->mute == true)
     {
         return;
@@ -152,7 +162,6 @@ void curtainview_prepare(gui_obj_t *obj)
                         GET_BASE(c_down)->not_show = true;
                     }
                 }
-                //gui_log("obj->y :%d  ext->release_flag:%d\n",obj->y ,ext->release_flag);
                 if (obj->y < 0 && ext->release_flag)
                 {
                     ext->down_flag = true;
