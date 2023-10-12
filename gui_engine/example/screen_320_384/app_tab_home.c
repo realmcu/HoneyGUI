@@ -16,13 +16,22 @@ gui_magic_img_t *home_bg;
 gui_magic_img_t *dynamic_island_rect;
 gui_win_t *dynamic_island;
 float degree = 0;
+uint32_t time_count = 0;
 uint8_t dynamic_island_count = 0;
+void switch_dynamic_island(void *obj, gui_event_t e);
+extern void reset_card(void *obj, gui_event_t e);
 void turn(void)
 {
     degree += 0.01;
     gui_img_rotation(hour, degree, 8, 90);
     gui_img_rotation(minute, degree * 5, 8, 140);
     gui_img_rotation(second, degree * 5 * 5, 7, 143);
+    if (++time_count == 100)
+    {
+        time_count = 0;
+        switch_dynamic_island(NULL, 0);
+    }
+
 }
 void show_clock(void *obj, gui_event_t e)
 {

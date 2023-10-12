@@ -367,8 +367,8 @@ gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
-    this->switch_picture = (void *)gui_magic_img_create_from_mem(this, "switch_picture", off_pic, 0, 0,
-                                                                 0, 0);
+    this->switch_picture = (void *)gui_img_create_from_mem(this, "switch_picture", off_pic, 0, 0,
+                                                           0, 0);
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
