@@ -423,7 +423,7 @@ static void prepare(gui_obj_t *obj)
     scale_3d(&v3, 1.0f);
 
 
-
+    static float angle;
     for (uint32_t i = 0; i < 6; i++)
     {
         ry[i] = i * 60;
@@ -432,17 +432,21 @@ static void prepare(gui_obj_t *obj)
     {
     case TOUCH_HOLD_X:
         this->release_x = tp->deltaX;
+
         break;
     default:
+        angle += 0.1f;
+
+        this->release_x = ((int)((float)(10 * this->release_x) + 30.0f * fix_sin(angle))) / 10;
         break;
     }
     if (this->release_x > 0)
     {
-        this->release_x--;
+        //this->release_x--;
     }
     if (this->release_x < 0)
     {
-        this->release_x++;
+        //this->release_x++;
     }
 
 
