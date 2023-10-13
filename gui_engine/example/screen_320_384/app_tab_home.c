@@ -15,10 +15,12 @@ gui_magic_img_t *second;
 gui_magic_img_t *home_bg;
 gui_magic_img_t *dynamic_island_rect;
 gui_win_t *dynamic_island;
+gui_win_t *dynamic_set_start;
 float degree = 0;
 uint32_t time_count = 0;
 uint8_t dynamic_island_count = 0;
-void switch_dynamic_island(void *obj, gui_event_t e);
+extern void enter_app_set_start(void *obj, gui_event_t e);
+
 void turn(void)
 {
     degree += 0.01;
@@ -55,13 +57,13 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     if (dynamic_island_count == 1)
     {
         dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
-                                                            DYNAMIC_ISLAND_POINT_BIN, 147, 35, 0, 0);
+                                                            DYNAMIC_ISLAND_POINT_BIN, 107, 35, 0, 0);
     }
     else if (dynamic_island_count == 2)
     {
         gui_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
-                                                            DYNAMIC_ISLAND_PIC1_BIN, 30, 25, 0, 0);
+                                                            DYNAMIC_ISLAND_PIC1_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
         //                                                     DYNAMIC_ISLAND_260_66_BIN, 30, 25, 0, 0);
         // gui_magic_img_t *dynamic_islcand_pic1 = gui_magic_img_create_from_mem(dynamic_island_rect, "dynamic_islcand_pic1",
@@ -73,7 +75,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     {
         gui_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
-                                                            DYNAMIC_ISLAND_PIC2_BIN, 30, 25, 0, 0);
+                                                            DYNAMIC_ISLAND_PIC2_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
         //                                                     DYNAMIC_ISLAND_260_66_BIN, 30, 25, 0, 0);
         // gui_magic_img_t *dynamic_islcand_pic1 = gui_magic_img_create_from_mem(dynamic_island_rect, "dynamic_islcand_pic1",
@@ -85,7 +87,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     {
         gui_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
-                                                            DYNAMIC_ISLAND_PIC3_BIN, 30, 25, 0, 0);
+                                                            DYNAMIC_ISLAND_PIC3_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
         //                                                     DYNAMIC_ISLAND_260_66_BIN, 30, 25, 0, 0);
         gui_magic_img_t *dynamic_islcand_pic1 = gui_magic_img_create_from_mem(dynamic_island_rect,
@@ -96,7 +98,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     {
         gui_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
-                                                            DYNAMIC_ISLAND_PIC4_BIN, 30, 25, 0, 0);
+                                                            DYNAMIC_ISLAND_PIC4_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
         //                                                     DYNAMIC_ISLAND_260_66_BIN, 30, 25, 0, 0);
         // gui_magic_img_t *dynamic_islcand_pic1 = gui_magic_img_create_from_mem(dynamic_island_rect, "dynamic_islcand_pic1",
@@ -106,7 +108,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     {
         gui_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_magic_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
-                                                            DYNAMIC_ISLAND_260_66_BIN, 30, 25, 0, 0);
+                                                            DYNAMIC_ISLAND_260_66_BIN, -10, 25, 0, 0);
         gui_magic_img_t *dynamic_islcand_pic1 = gui_magic_img_create_from_mem(dynamic_island_rect,
                                                                               "dynamic_islcand_pic1",
                                                                               DYNAMIC_ISLAND_SPORT_BIN, 10, 10, 0, 0);
@@ -135,6 +137,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
         dynamic_island_count = 0;
     }
 }
+
 void design_tab_home(void *parent)
 {
     home_bg = gui_magic_img_create_from_mem(parent, "home_bg", HOME_BACKGROUND_BIN, 0,
@@ -146,8 +149,12 @@ void design_tab_home(void *parent)
     gui_win_t *clock = gui_win_create(parent, "clock", 0, 84, 320, 300);
     gui_obj_add_event_cb(clock, (gui_event_cb_t)show_clock, GUI_EVENT_TOUCH_CLICKED, NULL);
 
-    dynamic_island = gui_win_create(parent, "dynamic_island", 0, 0, 320, 84);
+    dynamic_island = gui_win_create(parent, "dynamic_island", 40, 0, 280, 84);
     gui_obj_add_event_cb(dynamic_island, (gui_event_cb_t)switch_dynamic_island, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
+    dynamic_set_start = gui_win_create(parent, "dynamic_island", 0, 0, 40, 40);
+    gui_obj_add_event_cb(dynamic_island, (gui_event_cb_t)enter_app_set_start, GUI_EVENT_TOUCH_CLICKED,
+                         NULL);
     gui_magicimage_set_animate(hour, 100000, 0xffffffff, turn, NULL);
+
 }
