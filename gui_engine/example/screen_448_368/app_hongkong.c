@@ -14,10 +14,12 @@
 #include "gui_canvas.h"
 #include "gui_img_with_animate.h"
 #include "app_hongkong.h"
+#include "gui_perspective.h"
 static void app_hongkong_ui_design(gui_app_t *app);
 
 
 gui_tabview_t *tv;
+
 static gui_app_t app_hongkong =
 {
     .screen =
@@ -61,6 +63,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_blood(tb_blood);
     page_tb_weather(tb_weather);
     page_tb_music(tb_music);
+    extern void always_on_ui_design(gui_obj_t *parent);
+    always_on_ui_design(&(app->screen));
 }
-
 

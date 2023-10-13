@@ -48,7 +48,7 @@ extern gui_api_win_t gui_win_api;
  */
 gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t y,
                           int16_t w, int16_t h);
-
+void gui_win_set_animate(gui_win_t *o, uint32_t dur, int repeatCount, void *callback, void *p);
 
 #ifdef __cplusplus
 }
