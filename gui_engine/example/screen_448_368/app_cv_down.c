@@ -63,7 +63,7 @@ static void cv_status_cb(gui_cardview_t *this)
 {
     //gui_log("cv release value = %d \n", this->release_y);
 
-    gui_curtainview_t *curtainview = this->base.parent->parent;
+    gui_curtainview_t *curtainview = (gui_curtainview_t *)this->base.parent->parent;
 
     if (this->release_y != 0)
     {

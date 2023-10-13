@@ -27,7 +27,7 @@ static void callback_time()
 {
     int idx = tablist_tab->cur_id.x;
     gui_log("idx:%d\n", idx);
-    gui_app_t *app = get_app_hongkong();
+    gui_app_t *app = (gui_app_t *)get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
     gui_tree_free(screen);
     app->ui_design(app);
@@ -63,7 +63,7 @@ static void callback_time()
 static void callback_touch_long(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
-    gui_app_t *app = get_app_hongkong();
+    gui_app_t *app = (gui_app_t *)get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
     int idx = 0;
     if (!GET_BASE(img)->not_show)
