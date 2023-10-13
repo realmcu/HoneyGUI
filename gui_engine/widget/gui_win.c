@@ -41,7 +41,7 @@ static void (onClick)(gui_win_t *b, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
-static void set_animate(gui_win_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
+void gui_win_set_animate(gui_win_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
 {
     gui_animate_t *animate = ((gui_win_t *)o)->animate;
     if (!(animate))
@@ -186,7 +186,7 @@ gui_api_win_t gui_win_api =
     .onRight = onRight,
     .onUp = onUp,
     .onDown = onDown,
-    .set_animate = set_animate,
+    .set_animate = gui_win_set_animate,
 };
 
 
