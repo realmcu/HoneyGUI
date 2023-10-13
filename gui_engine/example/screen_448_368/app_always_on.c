@@ -23,7 +23,7 @@ static void always_on_animate_cb(gui_win_t *win_always_on)
 }
 static void callback_always_on()
 {
-    gui_app_t *app = get_app_hongkong();
+    gui_app_t *app = (gui_app_t *)get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
     if (always_on_flag)
     {
@@ -41,7 +41,7 @@ static void callback_always_on()
 }
 static void callback_always_on_release()
 {
-    gui_app_t *app = get_app_hongkong();
+    gui_app_t *app = (gui_app_t *)get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
     if (!always_on_flag)
     {
