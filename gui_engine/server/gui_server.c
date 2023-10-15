@@ -89,6 +89,9 @@ static void rtgui_server_entry(void *parameter)
 
 
         gui_fb_disp(screen);
+#ifdef _WIN32
+        gui_thread_mdelay(17);
+#endif
         daemon_cnt++;
         if (daemon_cnt == 1)
         {
