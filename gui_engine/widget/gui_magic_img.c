@@ -170,6 +170,12 @@ static void img_end(gui_obj_t *obj)
 
 }
 
+static void magic_img_destory(gui_obj_t *obj)
+{
+    gui_free(((gui_magic_img_t *)obj)->base.draw_img.inverse);
+    gui_free(((gui_magic_img_t *)obj)->base.draw_img.matrix);
+}
+
 
 void gui_img_rotation(gui_magic_img_t *img, float degrees, float c_x, float c_y)
 {
@@ -303,6 +309,7 @@ void gui_magic_img_from_mem_ctor(gui_magic_img_t *this, gui_obj_t *parent, const
     obj->obj_draw = img_draw_cb;
     obj->obj_end = img_end;
     obj->obj_update_att = magic_img_update;
+    obj->obj_destory = magic_img_destory;
 
     //for self
     this->scale_x = 1.0f;

@@ -8,8 +8,14 @@
 
 void tabview_up_design(void *parent_widget)
 {
+#ifdef RTL8762G
+    gui_magic_img_t *bg = gui_magic_img_create_from_mem(parent_widget, "bg_up", ZIP_RECT_320_384_BIN, 0,
+                                                        0,
+                                                        0, 0);
+#else
     gui_magic_img_t *bg = gui_magic_img_create_from_mem(parent_widget, "bg_up", RECT_320_384_BIN, 0, 0,
                                                         0, 0);
+#endif // RTL8762G
     gui_img_set_opacity(bg, 128);
     gui_tabview_t *tv_up = gui_tabview_create(parent_widget, "tabview_up", 0, 0, 0, 0);
     gui_tabview_set_style(tv_up, CLASSIC);

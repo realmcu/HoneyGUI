@@ -34,7 +34,7 @@ static gui_app_t app_tablist =
 {
     .screen =
     {
-        .name = "app_hongkong",
+        .name = "app_tablist",
         .x    = 0,
         .y    = 0,
     },

@@ -25,7 +25,7 @@ static gui_app_t app_set_start =
 {
     .screen =
     {
-        .name = "app_hongkong",
+        .name = "app_set_start",
         .x    = 0,
         .y    = 0,
     },
@@ -38,7 +38,6 @@ void *get_app_set_start(void)
 {
     return &app_set_start;
 }
-gui_win_t *dynamic_set_start;
 int idx = 0;
 extern void exit_app_set_start(void *obj, gui_event_t e);
 extern void enter_app_set_start(void *obj, gui_event_t e);
@@ -90,17 +89,17 @@ static void app_set_start_ui_design(gui_app_t *app)
     // gui_tabview_jump_tab(tab_all, idx, 0);
     gui_win_t *win_start = gui_win_create(tab_all, "win_start", 0, 173, 320, 70);
     gui_obj_add_event_cb(win_start, (gui_event_cb_t)tab_go_to1, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_win_t *win_start_back = gui_win_create(tab_all, "win_start_back", 24, 24, 56, 56);
+    gui_win_t *win_start_back = gui_win_create(tab_all, "win_start_back", 0, 0, 100, 100);
     gui_obj_add_event_cb(win_start_back, (gui_event_cb_t)exit_app_set_start, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
 
     gui_win_t *win_call = gui_win_create(tab_call, "win_call_sos", 0, 291, 320, 70);
     gui_obj_add_event_cb(win_call, (gui_event_cb_t)tab_go_to2, GUI_EVENT_TOUCH_CLICKED, NULL);
-    gui_win_t *win_call_back = gui_win_create(tab_call, "wiwin_call_sos", 24, 24, 56, 56);
+    gui_win_t *win_call_back = gui_win_create(tab_call, "wiwin_call_sos", 0, 0, 100, 100);
     gui_obj_add_event_cb(win_call_back, (gui_event_cb_t)tab_callback_to0, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
 
-    gui_win_t *win_digital_back = gui_win_create(tab_digital, "win_digital_back", 24, 24, 56, 56);
+    gui_win_t *win_digital_back = gui_win_create(tab_digital, "win_digital_back", 0, 0, 100, 100);
     gui_obj_add_event_cb(win_digital_back, (gui_event_cb_t)tab_callback_to1, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
 
