@@ -228,7 +228,7 @@ static float nz0321, nz4567, nz5126, nz0473, nz7623, nz0154;
 static float xrot = 20.0;
 static float yrot = 0.0;
 static float zrot = 20.0;
-static float rotstep = 0.5;
+static float rotstep = 5.5;
 
 
 

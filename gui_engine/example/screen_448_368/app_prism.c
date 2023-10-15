@@ -50,7 +50,7 @@ void callback_prism(void *obj, gui_event_t e)
     gui_win_t *win = gui_win_create(screen, "win", 0, 0, 368, 448);
     gui_canvas_t *canvas = gui_canvas_create(win, "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
-    uint8_t *array_flash[] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
+    uint8_t *array_flash[] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
     img_test = gui_perspective_create(canvas, "test", array_flash, 0, 0, 0, 0);
 
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,

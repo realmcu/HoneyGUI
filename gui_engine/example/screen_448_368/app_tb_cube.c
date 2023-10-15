@@ -7,7 +7,7 @@
 
 void page_tb_cube(void *parent)
 {
-    uint8_t *array[6] = {ACTIVITY_BIN, BLOODOXYGEN_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
+    uint8_t *array[6] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
 
 
     gui_cube_t *cube4 = gui_cube_create(parent, "cube", array, 0, 0, 454, 454);

@@ -437,7 +437,7 @@ static void prepare(gui_obj_t *obj)
     default:
         angle += 0.1f;
 
-        this->release_x = ((int)((float)(10 * this->release_x) + 30.0f * fix_sin(angle))) / 10;
+        this->release_x += 5 ;
         break;
     }
     if (this->release_x > 0)

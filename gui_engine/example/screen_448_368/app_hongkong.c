@@ -15,6 +15,8 @@
 #include "gui_img_with_animate.h"
 #include "app_hongkong.h"
 #include "gui_perspective.h"
+#include "gui_cube.h"
+#include "gui_seekbar.h"
 static void app_hongkong_ui_design(gui_app_t *app);
 
 
@@ -43,7 +45,13 @@ static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
 
-
+    // extern void test_cv(void *p);
+    // test_cv(&(app->screen));
+    // return;
+#ifndef _WIN32
+#include "mem_config.h"
+    memcpy((void *)SPIC2_ADDR, (void *)0x0426F000, 0xD822c0);
+#endif
     tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);
 
@@ -51,15 +59,76 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
     gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",           0, 0, 0, 0, 3, 0);
-    gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 4, 0);
-    gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 5, 0);
-
+    gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
+    gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
+    gui_card_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
     page_tb_clock(tb_clock);
     page_tb_activity(tb_activity);
     page_tb_heart(tb_heart);
     page_tb_cube(tb_cube);
     page_tb_weather(tb_weather);
     page_tb_music(tb_music);
+    static void *array[] =
+    {
+        DOG20_BIN,
+        DOG40_BIN,
+        DOG60_BIN,
+        DOG80_BIN,
+        DOG100_BIN,
+        DOG120_BIN,
+        DOG140_BIN,
+        DOG160_BIN,
+        DOG180_BIN,
+        DOG200_BIN,
+        DOG220_BIN,
+        DOG240_BIN,
+        DOG260_BIN,
+        DOG280_BIN,
+        DOG300_BIN,
+        DOG320_BIN,
+        DOG340_BIN,
+        DOG360_BIN,
+        DOG20_BIN,
+        DOG40_BIN,
+        DOG60_BIN,
+        DOG80_BIN,
+        DOG100_BIN,
+        DOG120_BIN,
+        DOG140_BIN,
+        DOG160_BIN,
+        DOG180_BIN,
+        DOG200_BIN,
+        DOG220_BIN,
+        DOG240_BIN,
+        DOG260_BIN,
+        DOG280_BIN,
+        DOG300_BIN,
+        DOG320_BIN,
+        DOG340_BIN,
+        DOG360_BIN,
+        DOG20_BIN,
+        DOG40_BIN,
+        DOG60_BIN,
+        DOG80_BIN,
+        DOG100_BIN,
+        DOG120_BIN,
+        DOG140_BIN,
+        DOG160_BIN,
+        DOG180_BIN,
+        DOG200_BIN,
+        DOG220_BIN,
+        DOG240_BIN,
+        DOG260_BIN,
+        DOG280_BIN,
+        DOG300_BIN,
+        DOG320_BIN,
+        DOG340_BIN,
+        DOG360_BIN,
+    };
+
+
+    static void *array2[] = {C1_BIN, C2_BIN, C3_BIN, C4_BIN, C5_BIN, C6_BIN};
+    gui_seekbar_create_movie_v(tb_ani, array, 18 * 2, (368 - 232) / 2, (448 - 193) / 2);
     extern void always_on_ui_design(gui_obj_t *parent);
     always_on_ui_design(&(app->screen));
 }

@@ -26,7 +26,7 @@ void tablist_watchface(void *parent)
 }
 void tablist_blood(void *parent)
 {
-    gui_magic_img_t *tablist_img = gui_magic_img_create_from_mem(parent, "page3", BLOODOXYGEN_BIN, 0, 0,
+    gui_magic_img_t *tablist_img = gui_magic_img_create_from_mem(parent, "page3", WEATHER_BIN, 0, 0,
                                                                  0, 0);
     gui_img_scale(tablist_img, 0.6, 0.6);
     gui_magic_img_t *rect = gui_magic_img_create_from_mem(parent, "rect", RECT_221_269_BIN, 0, 0, 0, 0);

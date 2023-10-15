@@ -136,18 +136,22 @@ void gui_curtain_ctor(gui_curtain_t *this, gui_obj_t *parent, const char *filena
         case CURTAIN_UP:
             parent_ext->orientations.up = true;
             parent_ext->scopeup = this->scope;
+            GET_BASE(this)->y = -(int)gui_get_screen_height();
             break;
         case CURTAIN_DOWN:
             parent_ext->orientations.down = true;
             parent_ext->scopedown = this->scope;
+            GET_BASE(this)->y = (int)gui_get_screen_height();
             break;
         case CURTAIN_LEFT:
             parent_ext->orientations.left = true;
             parent_ext->scopeleft = this->scope;
+            GET_BASE(this)->x = -(int)gui_get_screen_width();
             break;
         case CURTAIN_RIGHT:
             parent_ext->orientations.right = true;
             parent_ext->scoperight = this->scope;
+            GET_BASE(this)->x = (int)gui_get_screen_width();
             break;
         default:
             break;

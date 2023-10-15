@@ -13,21 +13,7 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 #include "gui_magic_img.h"
-
-
-typedef struct VertexRec
-{
-    float x;
-    float y;
-    float z;
-} Vertex_t;
-
-typedef struct NormalRec
-{
-    float x;
-    float y;
-    float z;
-} Normal_t;
+#include "gui_perspective.h"
 
 
 typedef struct gui_cube
