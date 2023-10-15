@@ -37,7 +37,7 @@ static void cardlist_music(void *parent)
 static void canvas_cb_black(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 150));
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 128));
     nvgFill(canvas->vg);
 }
 

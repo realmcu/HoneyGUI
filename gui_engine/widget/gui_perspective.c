@@ -423,7 +423,6 @@ static void prepare(gui_obj_t *obj)
     scale_3d(&v3, 1.0f);
 
 
-    static float angle;
     for (uint32_t i = 0; i < 6; i++)
     {
         ry[i] = i * 60;
@@ -435,8 +434,6 @@ static void prepare(gui_obj_t *obj)
 
         break;
     default:
-        angle += 0.1f;
-
         this->release_x += 5 ;
         break;
     }
