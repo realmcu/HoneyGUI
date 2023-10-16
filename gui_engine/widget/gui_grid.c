@@ -8,7 +8,8 @@
 #include "math.h"
 static void obj_update_att(struct _gui_obj_t *obj)
 {
-    GUI_RENDER_DATA
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
     uint32_t member_count = 0;
     struct gui_grid *this = (void *)obj;
 
@@ -182,7 +183,8 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
 static void deal_img_in_root_3d(gui_obj_t *obj, float x, float y)
 {
     struct gui_grid *this = (void *)obj;
-    GUI_RENDER_DATA
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
     static int touch_y  = 0;
     {
 

@@ -209,35 +209,7 @@ void rtgui_font_mem_unload(gui_text_t *text)
     gui_free(text->data);
     return;
 }
-//gui_inline rtgui_color_t rtgui_color_from_565(uint16_t pixel)
-//{
-//    int16_t r, g, b;
-//    rtgui_color_t color;
-//#ifdef RTGUI_rgb_CHANGE_ENDIAN
-//    pixel = (((pixel & 0x00ff) << 8) + ((pixel & 0xff00) >> 8));
-//#endif
-//    r = (pixel >> 11) & 0x1f;
-//    g = (pixel >> 5)  & 0x3f;
-//    b = pixel & 0x1f;
 
-//    color = b * 255 / 31 + ((g * 255 / 63) << 8) + ((r * 255 / 31) << 16);
-
-//    return color;
-//}
-
-//gui_inline rtgui_color_t rtgui_color_from_565p(uint16_t pixel)
-//{
-//    uint8_t r, g, b;
-//    rtgui_color_t color;
-
-//    r = pixel & 0x1f;
-//    g = (pixel >> 5) & 0x3f;
-//    b = (pixel >> 11) & 0x1f;
-
-//    color = b * 255 / 31 + ((g * 255 / 63) << 8) + ((r * 255 / 31) << 16);
-
-//    return color;
-//}
 #define _b_and_f(color_b,color_f,c) (color_b.channel.c * color_b.channel.alpha + color_f.channel.c * color_f.channel.alpha) / 0xff;
 gui_inline uint32_t blend_b_and_f_with_a(uint32_t b, uint32_t f, uint8_t a)
 {

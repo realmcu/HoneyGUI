@@ -23,11 +23,6 @@ extern "C" {
 #include <stdarg.h>
 #define gui_inline                   static inline
 #elif defined (__GNUC__)                /* GNU GCC Compiler */
-#ifdef RT_USING_NEWLIB
-#include <stdarg.h>
-#else
-/* the version of GNU GCC must be greater than 4.x */
-#endif
 #define gui_inline                   static __inline
 #elif defined _WIN32
 #define gui_inline                   __inline
@@ -35,7 +30,6 @@ extern "C" {
 #error not supported tool chain
 #endif
 
-typedef unsigned long rtgui_color_t;
 /*
  * The color used in the GUI:
  *
@@ -50,11 +44,7 @@ typedef unsigned long rtgui_color_t;
  * The rtgui_color is defined as ARGB888.
  *        bit31 A,R,G,B bit0
  */
-#define RTGUI_ARGB(a, r, g, b)  \
-    ((rtgui_color_t)(((uint8_t)(b)|\
-                      (((unsigned long)(uint8_t)(g))<<8))|\
-                     (((unsigned long)(uint8_t)(r))<<16)|\
-                     (((unsigned long)(uint8_t)(a))<<24)))
+
 
 #define RTGUI_RGB_B(c)  ((c) & 0xff)
 #define RTGUI_RGB_G(c)  (((c) >> 8)  & 0xff)
@@ -62,16 +52,6 @@ typedef unsigned long rtgui_color_t;
 #define RTGUI_RGB_A(c)  (((c) >> 24) & 0xff)
 
 
-/* it's better use these color definitions */
-#define GUI_RED                RTGUI_ARGB(0xff, 0xff, 0x00, 0x00)
-#define GUI_GREEN              RTGUI_ARGB(0xff, 0x00, 0xff, 0x00)
-#define GUI_BLUE               RTGUI_ARGB(0xff, 0x00, 0x00, 0xff)
-#define GUI_BLACK              RTGUI_ARGB(0xff, 0x00, 0x00, 0x00)
-#define GUI_WHITE              RTGUI_ARGB(0xff, 0xff, 0xff, 0xff)
-#define GUI_HIGH_LIGHT         RTGUI_ARGB(0xff, 0xfc, 0xfc, 0xfc)
-#define GUI_DARK_GREY          RTGUI_ARGB(0xff, 0x7f, 0x7f, 0x7f)
-#define GUI_LIGHT_GREY         RTGUI_ARGB(0xff, 0xc0, 0xc0, 0xc0)
-#define TRANSPARENT            RTGUI_ARGB(0, 0, 0, 0)
 #define GUI_SWAP16(x)          ((uint16_t)(                         \
                                                                     (((uint16_t)(x) & (uint16_t)0x00ff) <<  8) |            \
                                                                     (((uint16_t)(x) & (uint16_t)0xff00) >>  8)))
@@ -493,12 +473,12 @@ typedef struct _gui_obj_t
     float sy;
     int16_t tx;
     int16_t ty;
-
     unsigned char opacity_value;
+
 } gui_obj_t;
 
-#define GUI_RENDER_DATA     gui_dispdev_t *dc = gui_get_dc();\
-    touch_info_t *tp = tp_get_info();
+
+
 #define GUI_TYPE(type, obj) ((type *)obj)
 #if defined __WIN32
 

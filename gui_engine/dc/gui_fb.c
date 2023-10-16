@@ -1,7 +1,14 @@
-
-//#include <math.h>
+/**
+ * @file gui_fb.c
+ * @author howie_wang (howie_wang@realtek.com.cn)
+ * @brief
+ * @version 0.1
+ * @date 2023-10-16
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include <string.h>
-//#include <stdlib.h>
 #include <guidef.h>
 #include <gui_fb.h>
 #include <gui_obj.h>

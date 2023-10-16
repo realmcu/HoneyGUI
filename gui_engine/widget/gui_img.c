@@ -5,21 +5,22 @@
 #include <guidef.h>
 #include <gui_img.h>
 #include <string.h>
-//#include <gui_matrix.h>
 #include <gui_obj.h>
 #include <draw_img.h>
 #include <tp_algo.h>
 #include <gui_kb.h>
 #include "acc_engine.h"
 
-static void img_prepare(gui_obj_t *obj)
+
+
+
+static void prepare(gui_img_t *this)
 {
-    GUI_ASSERT(obj != NULL);
-    gui_img_t *img = (gui_img_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
-    draw_img_t *draw_img = &img->draw_img;
+    draw_img_t *draw_img = &this->draw_img;
+    gui_obj_t *root = (gui_obj_t *)this;
 
     struct gui_rgb_data_head head;
     memcpy(&head, draw_img->data, sizeof(head));
@@ -27,14 +28,14 @@ static void img_prepare(gui_obj_t *obj)
     /* set image information */
     draw_img->img_w = head.w;
     draw_img->img_h = head.h;
-    obj->w = draw_img->img_w;
-    obj->h = draw_img->img_h;
+    root->w = draw_img->img_w;
+    root->h = draw_img->img_h;
 
     if (tp->type == TOUCH_SHORT)
     {
-        if (tp->x > obj->x && tp->x < obj->x + obj->w && tp->y > obj->y && tp->y < obj->y + obj->h)
+        if (tp->x > root->x && tp->x < root->x + root->w && tp->y > root->y && tp->y < root->y + root->h)
         {
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+            gui_obj_event_set(root, GUI_EVENT_TOUCH_CLICKED);
         }
     }
 }
@@ -128,7 +129,7 @@ void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = IMAGE_FROM_MEM;
-    root->obj_prepare = img_prepare;
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
     root->obj_draw = img_draw_cb;
     root->obj_end = img_end;
     root->obj_destory = img_destory;

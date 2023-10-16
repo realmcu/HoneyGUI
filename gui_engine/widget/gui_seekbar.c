@@ -11,7 +11,8 @@
 #include <tp_algo.h>
 static void seekbar_preapre(gui_obj_t *obj)
 {
-    GUI_RENDER_DATA
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = (gui_seekbar_t *)obj;//gui_log("obj:%s,%p\n",obj->name, circle->animate);
     //gui_seekbar_t *b =  circle;
     //circle->slider.slider_circle->set((gui_circle_t *)circle, circle->base.get_progress(&(circle->base))+obj->x, (int16_t)(circle->slider.slider_circle->circle.center.y));
@@ -165,7 +166,8 @@ static float get_gegree_to_center(uint16_t cx, uint16_t cy, uint16_t point_x, ui
 }
 static void seekbar_preapre_arc(gui_obj_t *obj)
 {
-    GUI_RENDER_DATA
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = (gui_seekbar_t *)obj;
     //gui_seekbar_t *b =  circle;
     //circle->slider.slider_circle->set((gui_circle_t *)circle, circle->base.get_progress(&(circle->base))+obj->x, (int16_t)(circle->slider.slider_circle->circle.center.y));
@@ -315,7 +317,8 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
 }
 static void seekbar_h_preapre(gui_obj_t *obj)
 {
-    GUI_RENDER_DATA
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = (gui_seekbar_t *)obj;
     //gui_seekbar_t *b =  circle;
     //circle->slider.slider_circle->set((gui_circle_t *)circle, circle->base.get_progress(&(circle->base))+obj->x, (int16_t)(circle->slider.slider_circle->circle.center.y));

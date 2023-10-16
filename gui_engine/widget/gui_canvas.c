@@ -1,22 +1,26 @@
-/*
- * File      : gui_canvas.c
- * This file is part of GUI Engine
+/**
+ * @file gui_canvas.c
+ * @author howie_wang (howie_wang@realtek.com.cn)
+ * @brief
+ * @version 0.1
+ * @date 2023-10-16
+ *
+ * @copyright Copyright (c) 2023
+ *
  */
 #include <guidef.h>
 #include <string.h>
 #include <gui_matrix.h>
 #include <gui_obj.h>
-//#include <tp_algo.h>
-//#include <gui_kb.h>
 #include <nanovg.h>
 #include "gui_canvas.h"
 
 
-static void widget_nanovg_prepare(gui_obj_t *obj)
+static void prepare(gui_canvas_t *this)
 {
-    GUI_UNUSED(obj);
+    GUI_UNUSED(this);
     gui_dispdev_t *dc = gui_get_dc();
-    gui_obj_t *root = (gui_obj_t *)obj;
+    gui_obj_t *root = (gui_obj_t *)this;
 
     uint32_t cx = dc->fb_width / 2;
     uint32_t cy = dc->fb_height / 2;
@@ -90,7 +94,7 @@ void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = widget_nanovg_prepare;
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
     root->obj_draw = widget_nanovg_draw_cb;
     root->obj_end = widget_nanovg_end;
     root->obj_destory = widget_nanovg_destory;
@@ -99,7 +103,18 @@ void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
 
 }
 
-
+/**
+ * @brief
+ *
+ * @param parent
+ * @param name
+ * @param data
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return gui_canvas_t*
+ */
 
 gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
                                 int16_t x,
@@ -122,9 +137,6 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
         gui_list_insert_before(&((GET_BASE(this)->parent)->child_list),
                                &(GET_BASE(this)->brother_list));
     }
-
-
-
 
     GET_BASE(this)->create_done = true;
     return this;

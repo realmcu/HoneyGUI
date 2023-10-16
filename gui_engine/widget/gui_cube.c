@@ -1,18 +1,22 @@
-/*
- * File      : gui_cube.c
- * This file is part of GUI Engine
+/**
+ * @file gui_cube.c
+ * @author your name (you@domain.com)
+ * @brief
+ * @version 0.1
+ * @date 2023-10-16
+ *
+ * @copyright Copyright (c) 2023
+ *
  */
+
 #include <guidef.h>
 #include <string.h>
 #include <gui_obj.h>
-//#include <tp_algo.h>
-//#include <gui_kb.h>
 #include <draw_img.h>
 #include <gui_matrix.h>
 #include "gui_cube.h"
 
 #include <math.h>
-
 
 
 static void scale_cube(Vertex_t *vertex, float scale)
@@ -561,6 +565,18 @@ void gui_cube_set_size(gui_cube_t *this, float size)
     this->cbsize = size;
 }
 
+/**
+ * @brief
+ *
+ * @param parent
+ * @param name
+ * @param data
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return gui_cube_t*
+ */
 gui_cube_t *gui_cube_create(void *parent,  const char *name, void *data,
                             int16_t x,
                             int16_t y, int16_t w, int16_t h)

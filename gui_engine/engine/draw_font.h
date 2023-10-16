@@ -38,7 +38,6 @@ struct rtgui_font_engine
 {
     const char *name;
     gui_list_t list;
-    //void (*font_init)(struct rtgui_font *font);
     void (*font_load)(gui_text_t *text);
     void (*font_unload)(gui_text_t *text);
     void (*font_draw)(gui_text_t *text, struct rtgui_rect *rect);
