@@ -6,6 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import os
+
 project = 'HoneyGUI'
 copyright = '2023, miaomiao_wu'
 author = 'miaomiao_wu'
@@ -38,7 +40,7 @@ source_encoding = "utf-8"
 
 master_doc = "index"
 
-breathe_projects = {"HoneyGUI": r"D:\code\Doc\HoneyGUI\doc\doxyxml\xml"}
+breathe_projects = {"HoneyGUI": os.path.join(os.path.dirname(__file__), r"..\doxyxml\xml")}
 breathe_default_project = "HoneyGUI"
 breathe_domain_by_extension = {"h" : "c"}
 breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
