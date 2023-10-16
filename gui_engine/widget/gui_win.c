@@ -124,7 +124,7 @@ void win_prepare(gui_obj_t *obj)
         }
     }
 }
-#include "gui_server.h"
+//#include "gui_server.h"
 static void (obj_update_att)(struct _gui_obj_t *o)
 {
     gui_win_t *obj = (void *)o;

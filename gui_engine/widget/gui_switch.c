@@ -354,7 +354,7 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->off_hl_pic_addr = this->off_pic_addr;
     this->on_hl_pic_addr = this->on_pic_addr;
 }
-#include "gui_magic_img.h"
+//#include "gui_magic_img.h"
 gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
                                 int16_t w, int16_t h, void *off_pic, void *on_pic)
 {

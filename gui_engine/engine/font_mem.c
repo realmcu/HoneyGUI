@@ -78,6 +78,7 @@ void rtgui_font_mem_load(gui_text_t *text)
     if (chr == NULL)
     {
         GUI_ASSERT(NULL != NULL);
+        return;
     }
     if (chr)
     {
@@ -97,6 +98,7 @@ void rtgui_font_mem_load(gui_text_t *text)
     if (p_buf == NULL)
     {
         GUI_ASSERT(NULL != NULL);
+        return;
     }
     uint16_t unicode_len = 0;
     if (p_buf)
