@@ -35,5 +35,7 @@
     * [dynamic](Widgets/gui_dynamic.md)
     * [progressbar](Widgets/gui_progressbar.md)
 * [Porting](Porting/README.md)
+* [developer](developer/README.md)
+    * [widget](developer/widget.md)
 * [CHANGELOG](CHANGELOG.md)
 
