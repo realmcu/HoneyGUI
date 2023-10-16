@@ -3730,9 +3730,9 @@ void patch_nvgFill(NVGcontext *ctx)
         float sy = paint->xform[5] + dy * large;
         float ex = sx + d * dx;
         float ey = sy + d * dy;
-        uint32_t inner_color = (inner_a << 24) | (inner_r << 0) | (inner_g << 8) | (inner_b << 16);
-        uint32_t outer_color = (outer_a << 24) | (outer_r << 0) | (outer_g << 8) |
-                               (outer_b << 16);//VG_LITE_RGBA8888
+        uint32_t inner_color = (inner_a << 24) | (inner_b << 0) | (inner_g << 8) | (inner_r << 16);
+        uint32_t outer_color = (outer_a << 24) | (outer_b << 0) | (outer_g << 8) |
+                               (outer_r << 16);//VG_LITE_RGBA8888
 
         uint32_t colors[] = {inner_color, outer_color};
         uint32_t stops[] = {0, VLC_GRADIENT_BUFFER_WIDTH - 1};

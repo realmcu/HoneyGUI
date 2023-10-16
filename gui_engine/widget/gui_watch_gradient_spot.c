@@ -200,7 +200,7 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, M_PI * (d / 60.0f));
+        nvgRotate(vg, M_PI * (d / 5.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));

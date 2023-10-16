@@ -24,7 +24,7 @@ static void canvas_design(gui_canvas_t *canvas)
     nvgTranslate(vg, -(dc->screen_width / 2 - GET_BASE(this)->x),
                  -(dc->screen_height / 2 - GET_BASE(this)->y));
     nvgBeginPath(canvas->vg);
-    nvgRect(canvas->vg, 0, 0, GET_BASE(canvas)->w, GET_BASE(canvas)->h);
+    nvgRoundedRect(canvas->vg, 0, 0, GET_BASE(canvas)->w, GET_BASE(canvas)->h, 37);
     nvgFillColor(canvas->vg, nvgRGB(0x7C, 0x7A, 0xEB));
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
@@ -197,7 +197,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, M_PI * (d / 60.0f));
+        nvgRotate(vg, M_PI * (d / 5.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -214,7 +214,7 @@ static void canvas_design(gui_canvas_t *canvas)
         cy = GET_BASE(canvas)->h / 2;
         r1 = WATCHFACE_GRADIENT_RING1 * WATCHFACE_GRADIENT_SCLAE  / 2;
         r0 = WATCHFACE_GRADIENT_RING2 * WATCHFACE_GRADIENT_SCLAE  / 2.0F;
-        a0 = M_PI * (d / 60.0f) - NVG_PI / 2.0f;
+        a0 = M_PI * (d / 5.0f) - NVG_PI / 2.0f;
         a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
@@ -233,8 +233,15 @@ static void canvas_design(gui_canvas_t *canvas)
         ay = cy + sinf(a0) * (r0 + r1) * 0.5f;
         bx = cx + cosf(a1) * (r0 + r1) * 0.5f;
         by = cy + sinf(a1) * (r0 + r1) * 0.5f;
+#ifdef _WIN32
         NVGpaint paint = nvgLinearGradient(vg, ax, ay, bx, by, nvgRGBA(168, 167, 241, 1 * 255), nvgRGBA(94,
                                            92, 230, 0));
+#else
+        NVGpaint paint = nvgLinearGradient(vg, ax, ay, bx, by, nvgRGBA(94,
+                                                                       92, 230, 1 * 255), nvgRGBA(94,
+                                                                               92, 230, 0));
+#endif
+
         nvgFillPaint(vg, paint);
         nvgFill(vg);
     }
@@ -260,7 +267,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, M_PI * (d / 60.0f));
+        nvgRotate(vg, M_PI * (d / 5.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -292,7 +299,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgTranslate(vg, -GET_BASE(this)->x, -GET_BASE(this)->y);
         nvgTranslate(vg, GET_BASE(this)->x + GET_BASE(this)->w / 2,
                      GET_BASE(this)->y + GET_BASE(this)->h / 2);
-        nvgRotate(vg, M_PI * (d / 60.0f));
+        nvgRotate(vg, M_PI * (d / 5.0f));
         //nvgScale(vg, this->base.sx, this->base.sy);
         nvgTranslate(vg, -(GET_BASE(this)->x + GET_BASE(this)->w / 2),
                      -(GET_BASE(this)->y + GET_BASE(this)->h / 2));
@@ -333,8 +340,14 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgRect(vg, GET_BASE(this)->x + cx, GET_BASE(this)->y + cy, cx * 2, cy * 1.3f);
 
         nvgClosePath(vg);
+#ifdef _WIN32
         NVGpaint paint = nvgLinearGradient(vg, cx * 2.0f, cy * 3.0f, cx * 2.0f, cy, nvgRGBA(255, 51, 119,
                                            1 * 255), nvgRGBA(255, 51, 119, 0));
+#else
+        NVGpaint paint = nvgLinearGradient(vg, cx * 1.5f, cy * 2.0f, cx * 1.5f, cy * 1.0f, nvgRGBA(255, 51,
+                                           119,
+                                           1 * 255), nvgRGBA(255, 51, 119, 0));
+#endif
         nvgFillPaint(vg, paint);
 
         nvgFill(vg);
