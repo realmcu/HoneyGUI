@@ -56,6 +56,10 @@ static uint32_t daemon_cnt = 0;
 
 static void rtgui_server_entry(void *parameter)
 {
+#if defined RTK_GUI_SCRIPT_AS_A_APP
+    extern void js_init(void);
+    js_init();
+#endif
     gui_server_mq = gui_mq_create("gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {
@@ -155,10 +159,7 @@ int rtgui_server_init(void)
         gui_log("GUI Debug Mode!!");
         while (1);
     }
-#if defined RTK_GUI_SCRIPT_AS_A_APP
-    extern void js_init(void);
-    js_init();
-#endif
+
     gui_server_handle = gui_thread_create(GUI_SERVER_THREAD_NAME,
                                           rtgui_server_entry, NULL,
                                           1024 * 10,
