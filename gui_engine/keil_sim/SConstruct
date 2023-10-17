@@ -1,6 +1,6 @@
 import os
 import sys
-import rtk_gui_config
+import menu_config
 from SCons.Script import *
 
 TOOL_ROOT="../rtk_gui_sim/scons-tool"
@@ -13,12 +13,12 @@ except:
     exit(-1)
 
 
-TARGET = 'gui.' + rtk_gui_config.TARGET_EXT
+TARGET = 'gui.' + menu_config.TARGET_EXT
 
 
 env = Environment(tools = ['mingw'],
-                  CC=rtk_gui_config.CC, CCFLAGS = rtk_gui_config.CFLAGS,
-                  LINKFLAGS = rtk_gui_config.LFLAGS)
+                  CC=menu_config.CC, CCFLAGS = menu_config.CFLAGS,
+                  LINKFLAGS = menu_config.LFLAGS)
 
 
 

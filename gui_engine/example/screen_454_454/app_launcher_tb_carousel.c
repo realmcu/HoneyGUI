@@ -1,6 +1,6 @@
 
 #include "gui_seekbar.h"
-#include "root_image/resource_8772f.h"
+#include "root_image/ui_resource.h"
 
 void page_tb_carousel(void *parent)
 {

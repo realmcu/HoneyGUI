@@ -1,2 +1,0 @@
-# HoneyGUI Engine Programming Guide
-

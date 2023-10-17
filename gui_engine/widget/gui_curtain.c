@@ -9,7 +9,7 @@
 #include <gui_server.h>
 #include "gui_obj.h"
 #include <tp_algo.h>
-#include <gui_magic_img.h>
+#include <gui_img.h>
 
 
 static void curtain_prepare(gui_obj_t *obj)
@@ -106,8 +106,8 @@ static void curtain_prepare(gui_obj_t *obj)
     }
     if (parent_ext->cur_curtain != CURTAIN_MIDDLE)
     {
-        extern void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type);
-        gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
+        // extern void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type);
+        // gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
     }
 
 }

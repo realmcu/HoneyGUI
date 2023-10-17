@@ -13,12 +13,22 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 #include <draw_img.h>
+#include <gui_matrix.h>
 
 
 typedef struct gui_img
 {
     gui_obj_t base;
     draw_img_t draw_img;
+
+    float degrees;
+    float c_x;//center of image x
+    float c_y;//center of image y
+    float scale_x;
+    float scale_y;
+    float t_x;//center of screen x
+    float t_y;//center of screen y
+    gui_animate_t *animate;
 } gui_img_t;
 
 
@@ -28,9 +38,6 @@ typedef struct gui_img
 gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                    int16_t x, int16_t y, int16_t w, int16_t h);
 
-void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, void *addr,
-                           int16_t x,
-                           int16_t y, int16_t w, int16_t h);
 
 /**
  * @brief set x,y and file path
@@ -78,6 +85,12 @@ void gui_img_set_location(gui_img_t *img, uint16_t x, uint16_t y);
  *
  */
 void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode);
+
+void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y);
+void gui_img_scale_add(gui_img_t *img, float scale_x, float scale_y);
+void gui_img_scale(gui_img_t *img, float scale_x, float scale_y);
+void gui_img_translate(gui_img_t *img, float t_x, float t_y);
+void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
 
 
 #ifdef __cplusplus

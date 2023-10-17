@@ -101,7 +101,7 @@ static void on(gui_radio_switch_t *this)
 
 
 }
-#include "gui_magic_img.h"
+#include "gui_img.h"
 static void (append)(gui_radio_t *this, char *text)
 {
     gui_radio_switch_t *sw = gui_radio_switch_create(this, this->gap * this->length, 0,
@@ -115,9 +115,6 @@ static void (append)(gui_radio_t *this, char *text)
 #elif defined RTL8772F
     gui_text_set(t, text, "rtk_font_stb", this->text_color, strlen(text), 30);
 #else
-    gui_set_font_mem_resourse(RTK_GUI_DEFAULT_FONT_SIZE,
-                              gui_get_file_address("app/system/resource/font/gbk_32_32_dot.bin"),
-                              gui_get_file_address("app/system/resource/font/gbk_unicode_table.bin"));
 
     gui_text_set(t, text, "rtk_font_mem", this->text_color, strlen(text), 32);
 #endif
@@ -330,7 +327,7 @@ void gui_radio_switch_ctor(gui_radio_switch_t *this, gui_obj_t *parent,
     this->off_pic_addr = off_pic;
     this->on_pic_addr = on_pic;
 }
-#include "gui_magic_img.h"
+#include "gui_img.h"
 gui_radio_switch_t *gui_radio_switch_create(void *parent, int16_t x, int16_t y,
                                             int16_t w, int16_t h, void *off_pic, void *on_pic)
 {
@@ -340,8 +337,8 @@ gui_radio_switch_t *gui_radio_switch_create(void *parent, int16_t x, int16_t y,
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
-    this->radio_switch_picture = (void *)gui_magic_img_create_from_mem(this, "radio_switch_picture",
-                                                                       off_pic, 0, 0, 0, 0);;
+    this->radio_switch_picture = (void *)gui_img_create_from_mem(this, "radio_switch_picture",
+                                                                 off_pic, 0, 0, 0, 0);;
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }

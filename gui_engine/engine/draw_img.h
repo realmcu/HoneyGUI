@@ -6,6 +6,7 @@
 
 #include <guidef.h>
 #include <gui_api.h>
+#include <gui_matrix.h>
 
 
 #ifdef __cplusplus
@@ -81,6 +82,7 @@ typedef struct rtgui_image_engine
 /* init rtgui image system */
 void rtgui_system_image_init(void);
 void rtgui_image_load_scale(draw_img_t *img);
+bool rtgui_image_new_area(draw_img_t *img);
 bool rtgui_image_create(draw_img_t *img, bool load);
 void rtgui_image_destroy(draw_img_t *image);
 void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);

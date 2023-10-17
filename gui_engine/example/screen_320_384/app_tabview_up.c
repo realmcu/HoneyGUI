@@ -1,5 +1,5 @@
 #include "root_image_hongkong_bee4/ui_resource.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include "gui_curtainview.h"
 #include "gui_curtain.h"
 #include "gui_tabview.h"
@@ -9,12 +9,12 @@
 void tabview_up_design(void *parent_widget)
 {
 #ifdef RTL8762G
-    gui_magic_img_t *bg = gui_magic_img_create_from_mem(parent_widget, "bg_up", ZIP_RECT_320_384_BIN, 0,
-                                                        0,
-                                                        0, 0);
+    gui_img_t *bg = gui_img_create_from_mem(parent_widget, "bg_up", ZIP_RECT_320_384_BIN, 0,
+                                            0,
+                                            0, 0);
 #else
-    gui_magic_img_t *bg = gui_magic_img_create_from_mem(parent_widget, "bg_up", RECT_320_384_BIN, 0, 0,
-                                                        0, 0);
+    gui_img_t *bg = gui_img_create_from_mem(parent_widget, "bg_up", RECT_320_384_BIN, 0, 0,
+                                            0, 0);
 #endif // RTL8762G
     gui_img_set_opacity(bg, 128);
     gui_tabview_t *tv_up = gui_tabview_create(parent_widget, "tabview_up", 0, 0, 0, 0);

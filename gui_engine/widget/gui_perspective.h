@@ -12,7 +12,7 @@ extern "C" {
 
 #include <guidef.h>
 #include <gui_api.h>
-#include "gui_magic_img.h"
+#include "gui_img.h"
 
 
 typedef struct VertexRec

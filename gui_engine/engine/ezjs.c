@@ -69,7 +69,7 @@ void ezjsinit()
 void js_close_on_server(void);
 static void js_cb(jerry_value_t func);
 static void js_cb_with_args(gui_obj_t *obj);
-#include "gui_magic_img.h"
+#include "gui_img.h"
 DECLARE_HANDLER(rotation)
 {
     if (args_cnt != 3 || !jerry_value_is_number(args[0]) || !jerry_value_is_number(args[1]) ||

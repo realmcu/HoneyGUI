@@ -4,13 +4,13 @@
 #include <gui_win.h>
 #include <gui_text.h>
 #include <gui_curtain.h>
-#include "root_image/resource_8772f.h"
+#include "root_image/ui_resource.h"
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "gui_card.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 
 
 static void app_launcher_ui_design(gui_app_t *app);
@@ -75,7 +75,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     win_main = gui_win_create(&(app->screen), "win", 0, 0, 320, 320);
     gui_obj_add_event_cb(win_main, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, NULL);
 
-    // gui_magic_img_t *img = gui_magic_img_create_from_mem(win, "test", C1_BIN, 0, 0, 454, 454);
+    // gui_magic_img_t *img = gui_img_create_from_mem(win, "test", C1_BIN, 0, 0, 454, 454);
     //  gui_img_scale(img, 0.2f, 0.2f);
     //  gui_img_translate(img, 200, 200);
     //  gui_img_rotation(img, 45, 128 + (454 - 256) / 2, 128 + (454 - 256) / 2);

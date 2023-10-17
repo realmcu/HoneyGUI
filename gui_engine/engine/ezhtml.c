@@ -18,7 +18,7 @@
 #include "gui_server.h"
 
 //#include "gui_img_with_animate.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include <gui_app.h>
 #include <stdlib.h>
 #include "acc_engine.h"
@@ -82,9 +82,9 @@ struct widget_create widget[] =
     {"movie", MOVIE}
 };
 extern char *defaultPath;
-gui_magic_img_t *xml_gui_magic_img_create_from_mem(void *parent,  const char *name, void *addr,
-                                                   int16_t x,
-                                                   int16_t y)
+gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *addr,
+                                       int16_t x,
+                                       int16_t y)
 {
     if (addr == NULL)
     {
@@ -95,9 +95,9 @@ gui_magic_img_t *xml_gui_magic_img_create_from_mem(void *parent,  const char *na
                                    x,
                                    y, 0, 0);
 #else
-    return gui_magic_img_create_from_mem(parent, name, addr,
-                                         x,
-                                         y, 0, 0);
+    return gui_img_create_from_mem(parent, name, addr,
+                                   x,
+                                   y, 0, 0);
 #endif
 }
 char *get_space_string_head(const char *string)
@@ -168,7 +168,7 @@ static void sport_button_press_ani_cb(gui_button_t *button)
     static float from = 0;
     if (per == 0.0f)
     {
-        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        from = ((gui_img_t *)(button->img))->scale_x;
         alpha_from = button->img->draw_img.opacity_value;
     }
     from = 1.0f;
@@ -214,7 +214,7 @@ static void sport_button_release_ani_cb(gui_button_t *button)
     static float from = 0;
     if (per == 0.0f)
     {
-        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        from = ((gui_img_t *)(button->img))->scale_x;
         alpha_from = button->img->draw_img.opacity_value;
     }
     //from = 1.25f;
@@ -520,7 +520,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
 
                         void *imgbuf = gui_get_file_address(file);
-                        parent = (void *)xml_gui_magic_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
+                        parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);

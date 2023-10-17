@@ -6,7 +6,7 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include <gui_win.h>
 
 #define APP_OFFSET_X 9

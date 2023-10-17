@@ -1,5 +1,12 @@
-/*
- * File      : gui_widget_template.h
+/**
+ * @file gui_widget_template.h
+ * @author howie_wang (howie_wang@realtek.com.cn)
+ * @brief
+ * @version 0.1
+ * @date 2023-10-17
+ *
+ * @copyright Copyright (c) 2023
+ *
  */
 #ifndef __GUI_WIDGET_TEMPLATE_H__
 #define __GUI_WIDGET_TEMPLATE_H__

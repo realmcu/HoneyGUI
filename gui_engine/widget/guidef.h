@@ -474,6 +474,7 @@ typedef struct _gui_obj_t
     int16_t tx;
     int16_t ty;
     unsigned char opacity_value;
+    rtgui_matrix_t *matrix;
 
 } gui_obj_t;
 

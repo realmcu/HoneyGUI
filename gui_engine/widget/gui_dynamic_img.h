@@ -11,11 +11,11 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 #include <gui_img.h>
-#include <gui_magic_img.h>
+#include <gui_img.h>
 
 typedef struct gui_dynamic_img
 {
-    gui_magic_img_t base;
+    gui_img_t base;
     void *addr_entry;
     uint8_t total_cnt;
     uint32_t init_time_ms;

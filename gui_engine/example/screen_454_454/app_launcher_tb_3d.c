@@ -2,7 +2,7 @@
 #include <gui_obj.h>
 #include <gui_watch_gradient_spot.h>
 #include <gui_magic_img.h>
-#include "root_image/resource_8772f.h"
+#include "root_image/ui_resource.h"
 #include "gui_perspective.h"
 
 

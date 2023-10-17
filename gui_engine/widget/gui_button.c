@@ -1,7 +1,7 @@
 #include "gui_button.h"
 #include "gui_obj.h"
 #include <tp_algo.h>
-#include "gui_magic_img.h"
+#include "gui_img.h"
 #include "gui_dynamic_img.h"
 #include "draw_font.h"
 void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y)
@@ -262,7 +262,7 @@ gui_button_t *gui_button_create(
         switch (image_type)
         {
         case 0:
-            button->img = (void *)gui_magic_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
+            button->img = (void *)gui_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
             break;
         case 1:
             button->img = (void *)gui_dynamic_create_from_mem((void *)button, "g", background_pic, count, 0, 0,

@@ -3,11 +3,12 @@
  * This file is part of GUI Engine
  */
 #include "gui_watchface_gradient.h"
+#include "math.h"
 
-#define WATCHFACE_GRADIENT_RING1 296.52
-#define WATCHFACE_GRADIENT_RING2 192.17
-#define WATCHFACE_GRADIENT_RING3 87.83
-#define WATCHFACE_GRADIENT_BASE 368.0F
+#define WATCHFACE_GRADIENT_RING1 296.52f
+#define WATCHFACE_GRADIENT_RING2 192.17f
+#define WATCHFACE_GRADIENT_RING3 87.83f
+#define WATCHFACE_GRADIENT_BASE 368.0f
 #define WATCHFACE_GRADIENT_SCLAE     (GET_BASE(canvas)->w/WATCHFACE_GRADIENT_BASE)
 static void canvas_design(gui_canvas_t *canvas)
 {
@@ -77,7 +78,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFill(vg);
     }
     {
-        float r0, r1, ax, ay, bx, by, cx, cy, aeps, r;
+        float r0, r1, ax, ay, bx, by, cx, cy;
         float a0, a1;
         cx = GET_BASE(canvas)->w / 2;
         cy = GET_BASE(canvas)->h / 2;
@@ -208,7 +209,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFill(vg);
     }
     {
-        float r0, r1, ax, ay, bx, by, cx, cy, aeps, r;
+        float r0, r1, ax, ay, bx, by, cx, cy;
         float a0, a1;
         cx = GET_BASE(canvas)->w / 2;
         cy = GET_BASE(canvas)->h / 2;
@@ -311,14 +312,9 @@ static void canvas_design(gui_canvas_t *canvas)
     }
     {
         //for sceond point
-        float r0, r1, ax, ay, bx, by, cx, cy, aeps, r;
-        float a0, a1;
+        float cx, cy;
         cx = GET_BASE(canvas)->w / 2;
         cy = GET_BASE(canvas)->h / 2;
-        r1 = GET_BASE(canvas)->h / 2;
-        r0 = 2 / 2.0F;
-        a0 = M_PI * (d / 1.0f) - NVG_PI / 2.0f;
-        a1 = a0 - NVG_PI / 1.7f;
         nvgResetTransform(vg);
         nvgBeginPath(vg);
         nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);

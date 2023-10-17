@@ -1,11 +1,16 @@
-/*
- * File      : gui_dynamic.c
- * This file is part of GUI Widget
+/**
+ * @file gui_dynamic_img.c
+ * @author howie_wang (howie_wang@realtek.com.cn)
+ * @brief
+ * @version 0.1
+ * @date 2023-10-17
+ *
+ * @copyright Copyright (c) 2023
+ *
  */
 #include <guidef.h>
 #include <gui_dynamic_img.h>
 #include <string.h>
-//#include <gui_matrix.h>
 #include <gui_obj.h>
 #include <draw_img.h>
 #include <tp_algo.h>
@@ -15,6 +20,8 @@ static void dynamic_prepare(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
     gui_img_t *img = (gui_img_t *)obj;
+    gui_dynamic_img_t *this = (gui_dynamic_img_t *)obj;
+    gui_obj_t *root = (gui_obj_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     draw_img_t *draw_img = &img->draw_img;
@@ -25,12 +32,26 @@ static void dynamic_prepare(gui_obj_t *obj)
     draw_img->img_h = head.h;
     obj->w = draw_img->img_w;
     obj->h = draw_img->img_h;
-    magic_img_get_new_area(obj, dc);
 
-    gui_dynamic_img_t *this = (gui_dynamic_img_t *)obj;
-    gui_img_t *root = (gui_img_t *)obj;
+    matrix_identity(draw_img->matrix);
+    matrix_translate(root->dx, root->dy, draw_img->matrix);
+    matrix_translate(root->tx, root->ty, draw_img->matrix);
 
-    GUI_UNUSED(root);
+
+    matrix_translate(dc->screen_width / 2, dc->screen_height / 2, draw_img->matrix);
+    matrix_scale(root->sx, root->sy, draw_img->matrix);
+    matrix_translate(-dc->screen_width / 2, -dc->screen_height / 2, draw_img->matrix);
+    matrix_translate(root->ax, root->ay, draw_img->matrix);
+
+    matrix_translate(img->t_x, img->t_y, draw_img->matrix);
+    matrix_rotate(img->degrees, draw_img->matrix);
+    matrix_scale(img->scale_x, img->scale_y, draw_img->matrix);
+    matrix_translate(-img->c_x, -img->c_y, draw_img->matrix);
+
+    memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct rtgui_matrix));
+    matrix_inverse(draw_img->inverse);
+    rtgui_image_new_area(draw_img);
+
 
     uint32_t cur_time_ms = gui_ms_get();
     uint8_t index = (cur_time_ms - this->init_time_ms) / this->interval_time_ms;
@@ -73,6 +94,36 @@ static void dynamic_end(gui_obj_t *obj)
     GUI_ASSERT(obj != NULL);
 }
 
+static void gui_dynamic_img_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
+                                     void *addr,
+                                     int16_t x,
+                                     int16_t y, int16_t w, int16_t h)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_obj_t *root = (gui_obj_t *)this;
+    draw_img_t *draw_img = &this->draw_img;
+
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
+    root->obj_prepare = dynamic_prepare;
+    root->obj_draw = dynamic_draw_cb;
+    root->obj_end = dynamic_end;
+    root->obj_destory = NULL;
+    root->type = IMAGE_FROM_MEM;
+
+    draw_img->blend_mode = IMG_FILTER_BLACK;
+    draw_img->data = addr;
+    draw_img->opacity_value = 255;
+    draw_img->blend_mode = IMG_MAGIC_MATRIX;
+    draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->opacity_value = UINT8_MAX;
+
+    this->scale_x = 1.0f;
+    this->scale_y = 1.0f;
+
+}
+
 void gui_dynamic_from_mem_ctor(gui_dynamic_img_t *this, gui_obj_t *parent, const char *name,
                                void *addr_entry,
                                int16_t x, int16_t y, uint8_t total_cnt,
@@ -81,8 +132,8 @@ void gui_dynamic_from_mem_ctor(gui_dynamic_img_t *this, gui_obj_t *parent, const
 
     void **addr = addr_entry;
     //for base class
-    gui_magic_img_t *base = (gui_magic_img_t *)this;
-    gui_magic_img_from_mem_ctor(base, (gui_obj_t *)parent, name, addr[0], x, y, 0, 0);
+    gui_img_t *base = (gui_img_t *)this;
+    gui_dynamic_img_mem_ctor(base, (gui_obj_t *)parent, name, addr[0], x, y, 0, 0);
 
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;

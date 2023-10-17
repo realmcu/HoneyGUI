@@ -1,5 +1,5 @@
 #include "root_image_hongkong_bee4/ui_resource.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include "gui_curtainview.h"
 #include "gui_curtain.h"
 #include "gui_canvas.h"

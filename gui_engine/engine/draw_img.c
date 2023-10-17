@@ -14,16 +14,6 @@ static gui_list_t _rtgui_system_image_list = {NULL};
 void rtgui_system_image_init(void)
 {
     gui_list_init(&_rtgui_system_image_list);
-    //rtgui_image_bmp_init();
-    //rtgui_image_png_init();
-#ifdef RTK_GUI_IMAGE_FS
-    //rtgui_image_rgb_init();
-#endif
-#ifdef RTK_GUI_IMAGE_MEM
-    rtgui_image_bitmap_init();
-    //rtgui_image_compress_mem_init();
-#endif
-
 }
 
 static struct rtgui_image_engine *rtgui_image_get_engine_from_mem(draw_img_t *img)
@@ -147,6 +137,99 @@ bool rtgui_image_create(draw_img_t *img, bool load)
     img->engine = engine;
 
 
+    return true;
+}
+
+bool rtgui_image_new_area(draw_img_t *img)
+{
+
+    memcpy(img->inverse, img->matrix, sizeof(struct rtgui_matrix));
+    matrix_inverse(img->inverse);
+
+    struct rtgui_pox pox = {0.0f};
+    float x_min = 0.0f;
+    float x_max = 0.0f;
+    float y_min = 0.0f;
+    float y_max = 0.0f;
+
+    pox.p[0] = 0.0f;
+    pox.p[1] = 0.0f;
+    pox.p[2] = 1.0f;
+    pox_mul(img->matrix, &pox);
+    x_min = pox.p[0];
+    x_max = pox.p[0];
+    y_min = pox.p[1];
+    y_max = pox.p[1];
+
+
+    pox.p[0] = (float)img->img_w - 1;
+    pox.p[1] = 0.0f;
+    pox.p[2] = 1.0f;
+    pox_mul(img->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+
+    pox.p[0] = 0.0f;
+    pox.p[1] = (float)img->img_h - 1;
+    pox.p[2] = 1.0f;
+    pox_mul(img->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = (float)img->img_w - 1;
+    pox.p[1] = (float)img->img_h - 1;
+    pox.p[2] = 1.0f;
+    pox_mul(img->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    img->img_x = (int16_t)x_min;
+    img->img_y = (int16_t)y_min;
+    img->target_w = (int16_t)x_max - (int16_t)x_min;
+    img->target_h = (int16_t)y_max - (int16_t)y_min;
     return true;
 }
 

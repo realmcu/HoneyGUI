@@ -4,7 +4,7 @@
 #include "tp_algo.h"
 #include "gui_img.h"
 #include "gui_canvas.h"
-#include "gui_magic_img.h"
+#include "gui_img.h"
 #include "math.h"
 static void obj_update_att(struct _gui_obj_t *obj)
 {
@@ -160,7 +160,7 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
         case IMAGE_FROM_MEM:
             {
                 //gui_log("scale:%f\n", x);
-                gui_magic_img_t *img = (void *)obj;
+                gui_img_t *img = (void *)obj;
                 gui_img_scale(img, x, y);
 
             }
@@ -297,7 +297,7 @@ static void deal_img_in_root_3d(gui_obj_t *obj, float x, float y)
             {
 
 
-                gui_magic_img_t *img = (void *)obj;
+                gui_img_t *img = (void *)obj;
                 float scale = sinf(id * M_PI / 10.0f - (float)touch_y /
                                    100.0f); //gui_log("scale:%f \n", id*M_PI/10.0f-touch_y/100);
                 gui_img_scale(img, scale, scale);

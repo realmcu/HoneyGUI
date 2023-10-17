@@ -13,7 +13,10 @@
 			"gui_matrix.h": "c",
 			"gui_perspective.h": "c",
 			"gui_watchface_gradient.h": "c",
-			"gui_magic_img.h": "c"
+			"gui_img.h": "c",
+			"guidef.h": "c",
+			"gui_widget_template.h": "c",
+			"gui_dynamic_img.h": "c"
 		},
 		"search.exclude": {
 			"**/keil_sim": true

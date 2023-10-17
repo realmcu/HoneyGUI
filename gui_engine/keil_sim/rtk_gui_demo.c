@@ -1,7 +1,6 @@
 #include "guidef.h"
 #include "gui_img.h"
-#include "gui_magic_img.h"
-//#include "gui_dynamic_img.h"
+#include "gui_img.h"
 #include "gui_obj.h"
 #include "string.h"
 #include "stdio.h"
@@ -15,11 +14,7 @@ gui_app_t *get_rtk_gui_demo(void);
 
 static void app_dialing_ui_design(gui_app_t *app)
 {
-
-    //gui_img_t *img = gui_img_create_from_mem(&app->screen,  "center", (void *)_actiger, 0, 0, 0, 0);
-    gui_magic_img_t *img = gui_magic_img_create_from_mem(&app->screen,  "center", (void *)_actiger, 0,
-                                                         0, 0, 0);
-
+    gui_img_t *img = gui_img_create_from_mem(&app->screen,  "center", (void *)_actiger, 0, 0, 0, 0);
 }
 
 

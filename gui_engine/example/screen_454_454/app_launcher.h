@@ -26,7 +26,7 @@ extern "C" {
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
-#include "root_image/resource_8772f.h"
+#include "root_image/ui_resource.h"
 #include "gui_img_with_animate.h"
 #include <gui_magic_img.h>
 #include <gui_app.h>

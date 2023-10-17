@@ -13,30 +13,41 @@
 
 
 
-
-static void prepare(gui_img_t *this)
+static void img_prepare(gui_obj_t *obj)
 {
+    GUI_ASSERT(obj != NULL);
+    gui_img_t *this = (gui_img_t *)obj;
+    gui_obj_t *root = (gui_obj_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
     draw_img_t *draw_img = &this->draw_img;
-    gui_obj_t *root = (gui_obj_t *)this;
 
-    struct gui_rgb_data_head head;
-    memcpy(&head, draw_img->data, sizeof(head));
+    rtgui_image_load_scale(draw_img);
 
-    /* set image information */
-    draw_img->img_w = head.w;
-    draw_img->img_h = head.h;
-    root->w = draw_img->img_w;
-    root->h = draw_img->img_h;
+    matrix_identity(draw_img->matrix);
+    matrix_identity(draw_img->matrix);
+    matrix_translate(root->dx, root->dy, draw_img->matrix);
+    matrix_translate(root->tx, root->ty, draw_img->matrix);
+
+
+    matrix_translate(dc->screen_width / 2, dc->screen_height / 2, draw_img->matrix);
+    matrix_scale(root->sx, root->sy, draw_img->matrix);
+    matrix_translate(-dc->screen_width / 2, -dc->screen_height / 2, draw_img->matrix);
+    matrix_translate(root->ax, root->ay, draw_img->matrix);
+
+    matrix_translate(this->t_x, this->t_y, draw_img->matrix);
+    matrix_rotate(this->degrees, draw_img->matrix);
+    matrix_scale(this->scale_x, this->scale_y, draw_img->matrix);
+
+    matrix_translate(-this->c_x, -this->c_y, draw_img->matrix);
+
+    memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct rtgui_matrix));
+    matrix_inverse(draw_img->inverse);
+    rtgui_image_new_area(draw_img);
 
     if (tp->type == TOUCH_SHORT)
     {
-        if (tp->x > root->x && tp->x < root->x + root->w && tp->y > root->y && tp->y < root->y + root->h)
-        {
-            gui_obj_event_set(root, GUI_EVENT_TOUCH_CLICKED);
-        }
+        gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
     }
 }
 static void img_draw_cb(gui_obj_t *obj)
@@ -47,10 +58,10 @@ static void img_draw_cb(gui_obj_t *obj)
     draw_img_t *draw_img = &img->draw_img;
 
     rtgui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->ax + obj->tx + obj->dx;
-    draw_rect.y1 = obj->ay + obj->ty + obj->dy;
-    draw_rect.x2 = draw_rect.x1 + obj->w;
-    draw_rect.y2 = draw_rect.y1 + obj->h;
+    draw_rect.x1 = draw_img->img_x;
+    draw_rect.y1 = draw_img->img_y;
+    draw_rect.x2 = draw_rect.x1 + draw_img->target_w;
+    draw_rect.y2 = draw_rect.y1 + draw_img->target_h;
     if (gui_get_acc() != NULL)
     {
         gui_get_acc()->blit(draw_img, dc, &draw_rect);
@@ -60,38 +71,16 @@ static void img_draw_cb(gui_obj_t *obj)
         GUI_ASSERT(NULL != NULL);
     }
 }
-
 static void img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-}
-static void img_destory(gui_obj_t *obj)
-{
-    GUI_ASSERT(obj != NULL);
-    gui_log("do obj %s free\n", obj->name);
-    //gui_free(obj);
+
 }
 
-
-void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode)
+static void magic_img_destory(gui_obj_t *obj)
 {
-    GUI_ASSERT(img != NULL);
-    struct gui_dispdev *dc = gui_get_dc();
-    draw_img_t *draw_img = &img->draw_img;
-    draw_img->blend_mode = mode;
-}
-
-void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int16_t x,
-                           int16_t y)
-{
-    GUI_ASSERT(img != NULL);
-    img->base.x = x;
-    img->base.y = y;
-    if (addr != NULL)
-    {
-        draw_img_t *draw_img = &img->draw_img;
-        draw_img->data = addr;
-    }
+    gui_free(((gui_img_t *)obj)->draw_img.inverse);
+    gui_free(((gui_img_t *)obj)->draw_img.matrix);
 }
 
 uint16_t gui_img_get_width(gui_img_t *img)
@@ -117,27 +106,103 @@ void gui_img_set_location(gui_img_t *img, uint16_t x, uint16_t y)
     root->y = y;
 }
 
-void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, void *addr,
-                           int16_t x,
-                           int16_t y, int16_t w, int16_t h)
+void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode)
 {
-    draw_img_t *draw_img = &this->draw_img;
-    //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
+    GUI_ASSERT(img != NULL);
+    struct gui_dispdev *dc = gui_get_dc();
+    draw_img_t *draw_img = &img->draw_img;
+    draw_img->blend_mode = mode;
+}
 
-    //for root class
+void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int16_t x,
+                           int16_t y)
+{
+    GUI_ASSERT(img != NULL);
+    img->base.x = x;
+    img->base.y = y;
+    if (addr != NULL)
+    {
+        draw_img_t *draw_img = &img->draw_img;
+        draw_img->data = addr;
+    }
+}
+
+
+
+
+
+void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)
+{
+    GUI_ASSERT(img != NULL);
+
+    img->degrees = degrees;
+    img->c_x = c_x;
+    img->c_y = c_y;
+}
+
+void gui_img_scale(gui_img_t *img, float scale_x, float scale_y)
+{
+    GUI_ASSERT(img != NULL);
+    if (scale_x > 0 && scale_y > 0)
+    {
+        img->scale_x = scale_x;
+        img->scale_y = scale_y;
+    }
+}
+
+void gui_img_translate(gui_img_t *img, float t_x, float t_y)
+{
+    GUI_ASSERT(img != NULL);
+    img->t_x = t_x;
+    img->t_y = t_y;
+}
+
+// Skews the current coordinate system along X axis. Angle is specified in radians.
+void gui_img_skew_x(gui_img_t *img, float degrees)
+{
+
+}
+
+// Skews the current coordinate system along Y axis. Angle is specified in radians.
+void gui_img_skew_y(gui_img_t *img, float degrees)
+{
+
+}
+
+void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
+{
+    this->draw_img.opacity_value = opacity_value;
+}
+
+
+
+static void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
+                                  void *addr,
+                                  int16_t x,
+                                  int16_t y, int16_t w, int16_t h)
+{
+    gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *root = (gui_obj_t *)this;
-    root->type = IMAGE_FROM_MEM;
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
+    draw_img_t *draw_img = &this->draw_img;
+
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
+    root->obj_prepare = img_prepare;
     root->obj_draw = img_draw_cb;
     root->obj_end = img_end;
-    root->obj_destory = img_destory;
-    draw_img->blend_mode = IMG_FILTER_BLACK;
-    //for self
+    root->obj_destory = magic_img_destory;
+    root->type = IMAGE_FROM_MEM;
 
+    draw_img->blend_mode = IMG_FILTER_BLACK;
     draw_img->data = addr;
     draw_img->opacity_value = 255;
+    draw_img->blend_mode = IMG_MAGIC_MATRIX;
+    draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->opacity_value = UINT8_MAX;
+
+    this->scale_x = 1.0f;
+    this->scale_y = 1.0f;
 
 }
 
@@ -148,7 +213,7 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
     {
-        name = "DEFAULT_IMG";
+        name = "MAGIC_IMG";
     }
     gui_img_t *img = gui_malloc(sizeof(gui_img_t));
     GUI_ASSERT(img != NULL);
@@ -163,5 +228,13 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
     GET_BASE(img)->create_done = true;
     return img;
 }
+
+
+
+
+
+
+
+
 
 

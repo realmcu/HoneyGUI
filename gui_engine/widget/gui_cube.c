@@ -130,95 +130,7 @@ static void transfrom_blit(float w, float h, Vertex_t *v0, Vertex_t *v1, Vertex_
 //}
 
 
-static void get_new_area(draw_img_t *draw_img)
-{
 
-    struct rtgui_pox pox = {0.0f};
-    float x_min = 0.0f;
-    float x_max = 0.0f;
-    float y_min = 0.0f;
-    float y_max = 0.0f;
-
-    pox.p[0] = 0.0f;
-    pox.p[1] = 0.0f;
-    pox.p[2] = 1.0f;
-    pox_mul(draw_img->matrix, &pox);
-    x_min = pox.p[0];
-    x_max = pox.p[0];
-    y_min = pox.p[1];
-    y_max = pox.p[1];
-
-
-    pox.p[0] = (float)draw_img->img_w;
-    pox.p[1] = 0.0f;
-    pox.p[2] = 1.0f;
-    pox_mul(draw_img->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-
-    pox.p[0] = 0.0f;
-    pox.p[1] = (float)draw_img->img_h;
-    pox.p[2] = 1.0f;
-    pox_mul(draw_img->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    pox.p[0] = (float)draw_img->img_w;
-    pox.p[1] = (float)draw_img->img_h;
-    pox.p[2] = 1.0f;
-    pox_mul(draw_img->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    draw_img->img_x = (int16_t)x_min;
-    draw_img->img_y = (int16_t)y_min;
-
-    draw_img->target_w = (int16_t)x_max - (int16_t)x_min;
-    draw_img->target_h = (int16_t)y_max - (int16_t)y_min;
-}
 
 
 
@@ -355,7 +267,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(front->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(front->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(front->inverse);
-        get_new_area(front);
+        rtgui_image_new_area(front);
     }
 
     if (nz4567 > 0.0f)
@@ -364,7 +276,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(back->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(back->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(back->inverse);
-        get_new_area(back);
+        rtgui_image_new_area(back);
     }
 
     if (nz5126 > 0.0f)
@@ -373,7 +285,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(up->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(up->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(up->inverse);
-        get_new_area(up);
+        rtgui_image_new_area(up);
     }
 
     if (nz0473 > 0.0f)
@@ -382,7 +294,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(down->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(down->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(down->inverse);
-        get_new_area(down);
+        rtgui_image_new_area(down);
     }
 
     if (nz7623 > 0.0f)
@@ -391,7 +303,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(left->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(left->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(left->inverse);
-        get_new_area(left);
+        rtgui_image_new_area(left);
     }
 
     if (nz0154 > 0.0f)
@@ -400,7 +312,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(right->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(right->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(right->inverse);
-        get_new_area(right);
+        rtgui_image_new_area(right);
     }
 }
 
