@@ -2230,6 +2230,40 @@ void level_scan(ezxml_t p, char **pic, char **text)
         }
     }
 }
+void level_scan_width_and_hight(ezxml_t p, int *width, int *hight)
+{
+    ezxml_t i;
+    for (i = p; i != NULL; i = i->ordered)
+    {
+        //gui_log("%s\n",i->child->next->name);
+        if (strcmp(i->name, "app") == 0)
+        {
+            ezxml_t title = ezxml_get(i, "screen", -1);
+//gui_log("%s,%s,%s,%s\n",title->name, title->attr[0], title->attr[1],title->attr[2]);
+
+            size_t j = 0;
+            while (true)
+            {
+                if (!(title->attr[j]))
+                {
+                    break;
+                }
+                //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                if (!strcmp(title->attr[j], "w"))
+                {
+                    *width = atoi(title->attr[++j]); gui_log("widgt:%d\n", *width);
+                }
+                else if (!strcmp(title->attr[j], "h"))
+                {
+                    *hight = atoi(title->attr[++j]); gui_log("hight:%d\n", *hight);
+                }
+
+                j++;
+            }
+            break;
+        }
+    }
+}
 void foreach_count(ezxml_t p, size_t *widget_count)
 {
     ezxml_t i;
@@ -2316,6 +2350,22 @@ void get_app(gui_app_t *app, char *pic, char *text)
 
 
     level_scan(f1, (void *)pic, (void *)text);
+    ezxml_free(f1);
+}
+void get_app_by_file(char *xml, char *pic, char *text)
+{
+    ezxml_t f1 = ezxml_parse_file(xml);
+
+
+    level_scan(f1, (void *)pic, (void *)text);
+    ezxml_free(f1);
+}
+void get_screen_size(char *xml, int *widgt, int *hight)
+{
+    ezxml_t f1 = ezxml_parse_file(xml);
+
+
+    level_scan_width_and_hight(f1, widgt, hight);
     ezxml_free(f1);
 }
 void get_system_screen(int *w, int *h)
