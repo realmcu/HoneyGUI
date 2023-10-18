@@ -1,28 +1,90 @@
-/*
- * File      : guidef.h
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_api.h
+  * @brief Application Programming Interface for UI
+  * @details file system; operation system; hardware;
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/17
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __GUI_API_H__
 #define __GUI_API_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 #include <guidef.h>
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+/** @defgroup SERVER SERVER
+  * @brief
+  * @{
+  */
+
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+/** @defgroup SERVER_Exported_Types SERVER Exported Types
+  * @brief
+  * @{
+  */
+
+/** @brief  ... */
+
+
+
+/** End of SERVER_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+/** @defgroup SERVER_Exported_Constants SERVER Exported Constants
+  * @brief
+  * @{
+  */
+
+
+/** End of SERVER_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+/** @defgroup SERVER_Exported_Macros SERVER Exported Macros
+  * @brief
+  * @{
+  */
+
+
 #define GUI_ASSERT(EX)                                                         \
     if (!(EX))                                                                    \
     {                                                                             \
         gui_assert_handler(#EX, __FUNCTION__, __LINE__);                           \
-    }
-
+    } //!< assert here
 #define GUI_LINE(EX)                                                         \
     if ((EX))                                                                    \
     {                                                                             \
         gui_log("[GUI] debug at function:%s, line number:%d \n", __FUNCTION__, __LINE__); \
-    }
-
+    } //!< print line number
 #define __param_name(line) param_##line
 #define _param_name(line) __param_name(line)
 #define param_name() _param_name(__LINE__)
@@ -49,14 +111,27 @@ extern "C" {
     gui_log("%f    ",matrix->m[2][0]); \
     gui_log("%f    ",matrix->m[2][1]); \
     gui_log("%f  \n",matrix->m[2][2]); \
-    gui_log("-----------------------------------------------\n");
+    gui_log("-----------------------------------------------\n");  //!< print matrix(3*3)
 
 #define PRINT_POX(pox)       gui_log("-----------------POX---------------------------\n"); \
     gui_log("%f  \n",(pox)->p[0]); \
     gui_log("%f  \n",(pox)->p[1]); \
     gui_log("%f  \n",(pox)->p[2]); \
-    gui_log("-----------------------------------------------\n");
+    gui_log("-----------------------------------------------\n"); //!< print position
 
+/** End of SERVER_Exported_Macros
+  * @}
+  */
+
+
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
+/** @defgroup SERVER_Exported_Functions SERVER Exported Functions
+  * @brief
+  * @{
+  */
 
 extern float gui_get_scale_x(void);
 extern float gui_get_scale_y(void);
@@ -130,9 +205,15 @@ void gui_display_on(void);
 void gui_display_off(void);
 uint32_t gui_ms_get(void);
 void gui_task_ext_execution_sethook(void (*hook)(void));
+
+/** End of SERVER_Exported_Functions
+  * @}
+  */
+
+/** End of SERVER
+  * @}
+  */
 #ifdef __cplusplus
 }
 #endif
-
 #endif
-

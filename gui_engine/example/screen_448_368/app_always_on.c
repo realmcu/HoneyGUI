@@ -1,3 +1,22 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file app_always_on.c
+  * @brief always on effect in app
+  * @details will dispaly without any operation for a while
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/10/18
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <gui_tabview.h>
 #include <gui_obj.h>
 #include <gui_win.h>
@@ -6,12 +25,71 @@
 #include "gui_perspective.h"
 #include "gui_perspective.h"
 
+
+/** @defgroup EXAMPLE EXAMPLE
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Types EXAMPLE Exported Types
+  * @{
+  */
+
+
+/** End of EXAMPLE_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Constants EXAMPLE Exported Constants
+  * @{
+  */
+
+
+/** End of EXAMPLE_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Macros EXAMPLE Exported Macros
+  * @{
+  */
+
+
+/** End of EXAMPLE_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Variables EXAMPLE Exported Variables
+  * @{
+  */
 gui_win_t *win_always_on;
 gui_perspective_t *per;
 extern gui_tabview_t *tv;
-
-
 static bool always_on_flag;
+
+/** End of EXAMPLE_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup EXAMPLE_Exported_Functions EXAMPLE Exported Functions
+  * @{
+  */
+
+/**
+ * @brief Animation callback. If animation ends, always-on shows.
+ * @param win_always_on the window widget which has the animation effect
+ */
 static void always_on_animate_cb(gui_win_t *win_always_on)
 {
     if (win_always_on->animate->progress_percent == 1)
@@ -21,6 +99,10 @@ static void always_on_animate_cb(gui_win_t *win_always_on)
         always_on_flag = true;
     }
 }
+/**
+ * @brief window press genture callback. IF pressed, set the animate invalid. The always-on will not show until released.
+ *
+ */
 static void callback_always_on()
 {
     gui_app_t *app = (gui_app_t *)get_app_hongkong();
@@ -39,6 +121,10 @@ static void callback_always_on()
     }
 
 }
+/**
+ * @brief window release genture callback. IF released, set the animate starting. It is a timer.
+ *
+ */
 static void callback_always_on_release()
 {
     gui_app_t *app = (gui_app_t *)get_app_hongkong();
@@ -50,6 +136,28 @@ static void callback_always_on_release()
     }
 
 }
+
+
+/** End of EXAMPLE_Exported_Functions
+  * @}
+  */
+
+/** End of EXAMPLE
+  * @}
+  */
+
+
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+/**
+ * @brief create the always-on effect nested in a parent widget
+ *
+ * @param parent parent widget
+ */
 void always_on_ui_design(gui_obj_t *parent)
 {
     win_always_on = gui_win_create(parent, "always_on", 0, 0, 368, 448);
@@ -64,5 +172,3 @@ void always_on_ui_design(gui_obj_t *parent)
     gui_win_set_animate(win_always_on, 8000, 0, always_on_animate_cb, win_always_on);
 
 }
-
-
