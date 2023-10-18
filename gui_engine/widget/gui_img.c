@@ -39,18 +39,17 @@ static void prepare(gui_img_t *this)
         }
     }
 }
-static void img_draw_cb(gui_obj_t *obj)
+static void draw(gui_img_t *this)
 {
-    GUI_ASSERT(obj != NULL);
-    gui_img_t *img = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
-    draw_img_t *draw_img = &img->draw_img;
+    draw_img_t *draw_img = &this->draw_img;
+    gui_obj_t *root = GET_BASE(this);
 
     rtgui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->ax + obj->tx + obj->dx;
-    draw_rect.y1 = obj->ay + obj->ty + obj->dy;
-    draw_rect.x2 = draw_rect.x1 + obj->w;
-    draw_rect.y2 = draw_rect.y1 + obj->h;
+    draw_rect.x1 = root->ax + root->tx + root->dx;
+    draw_rect.y1 = root->ay + root->ty + root->dy;
+    draw_rect.x2 = draw_rect.x1 + root->w;
+    draw_rect.y2 = draw_rect.y1 + root->h;
     if (gui_get_acc() != NULL)
     {
         gui_get_acc()->blit(draw_img, dc, &draw_rect);
@@ -60,18 +59,16 @@ static void img_draw_cb(gui_obj_t *obj)
         GUI_ASSERT(NULL != NULL);
     }
 }
-
-static void img_end(gui_obj_t *obj)
+static void end(gui_img_t *this)
 {
-    GUI_ASSERT(obj != NULL);
+    GUI_ASSERT(this != NULL);
 }
-static void img_destory(gui_obj_t *obj)
+static void destory(gui_img_t *this)
 {
-    GUI_ASSERT(obj != NULL);
-    gui_log("do obj %s free\n", obj->name);
-    //gui_free(obj);
+    GUI_ASSERT(this != NULL);
+    gui_obj_t *root = GET_BASE(this);
+    gui_log("do obj %s free\n", root->name);
 }
-
 
 void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode)
 {
@@ -130,9 +127,9 @@ void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = IMAGE_FROM_MEM;
     root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
-    root->obj_draw = img_draw_cb;
-    root->obj_end = img_end;
-    root->obj_destory = img_destory;
+    root->obj_draw = (void (*)(struct _gui_obj_t *))draw;
+    root->obj_end = (void (*)(struct _gui_obj_t *))end;
+    root->obj_destory = (void (*)(struct _gui_obj_t *))destory;
     draw_img->blend_mode = IMG_FILTER_BLACK;
     //for self
 
