@@ -1797,7 +1797,8 @@ static void *context_alloc(size_t size, void *cb_data_p)
     return (void *)(SPIC1_ADDR + 0x200000);
     //return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);//
 #elif defined RTL8763EP
-    return (void *)(0x4000000 + 0x200000);
+    //return (void *)(0x4000000 + 0x200000);
+    return malloc(size);
 #else
     return malloc(size);
 #endif
