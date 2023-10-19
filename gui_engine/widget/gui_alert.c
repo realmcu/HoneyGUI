@@ -95,11 +95,23 @@
   * @return void
   * @retval void
   */
-void gui_alert_ctor(struct gui_alert *this, gui_obj_t *parent, const char *widgetname, int16_t x,
-                    int16_t y, int16_t w, int16_t h, uint32_t timeout)
+static void gui_alert_ctor(struct gui_alert *this, gui_obj_t *parent, const char *widgetname,
+                           int16_t x,
+                           int16_t y, int16_t w, int16_t h, uint32_t timeout)
 {
     gui_obj_ctor(&this->base, parent, widgetname, x, y, w, h);
     uint32_t *p = gui_malloc(sizeof(int) * 2);
+}
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+
+gui_alert_t *gui_alert_create(gui_obj_t *screen, const char *widget_name, int16_t x, int16_t y,
+                              int16_t w, int16_t h, uint32_t timeout)
+{
+#define _gui_alert_param this, screen,widget_name, x, y, w, h, timeout
+    GUI_NEW(gui_alert_t, gui_alert_ctor, _gui_alert_param)
 }
 
 /** End of WIDGET_Exported_Functions
@@ -113,33 +125,6 @@ void gui_alert_ctor(struct gui_alert *this, gui_obj_t *parent, const char *widge
 
 
 
-/*============================================================================*
- *                           Public Functions
- *============================================================================*/
-
-/**
-  * @brief  ...
-  * @note   ...
-  * @param screen parent widget
-  * @param widget_name name
-  * @param x left
-  * @param y top
-  * @param w width
-  * @param h hight
-  * @param timeout pop timeout
-  * @return void
-  * @retval void
-  * <b>Example usage</b>
-  * \code{.c}
-  * gui_alert_create(parent, "alert", 0,0,0,0,1000);
-  * \endcode
-  */
-gui_alert_t *gui_alert_create(gui_obj_t *screen, const char *widget_name, int16_t x, int16_t y,
-                              int16_t w, int16_t h, uint32_t timeout)
-{
-#define _gui_alert_param this, screen,widget_name, x, y, w, h, timeout
-    GUI_NEW(gui_alert_t, gui_alert_ctor, _gui_alert_param)
-}
 
 
 

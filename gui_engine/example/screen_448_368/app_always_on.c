@@ -137,18 +137,6 @@ static void callback_always_on_release()
 
 }
 
-
-/** End of EXAMPLE_Exported_Functions
-  * @}
-  */
-
-/** End of EXAMPLE
-  * @}
-  */
-
-
-
-
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -172,3 +160,15 @@ void always_on_ui_design(gui_obj_t *parent)
     gui_win_set_animate(win_always_on, 8000, 0, always_on_animate_cb, win_always_on);
 
 }
+
+/** End of EXAMPLE_Exported_Functions
+  * @}
+  */
+
+/** End of EXAMPLE
+  * @}
+  */
+
+
+
+
