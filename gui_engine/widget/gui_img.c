@@ -1,7 +1,22 @@
-/*
- * File      : gui_img.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file
+  * @brief
+  * @details
+  * @author
+  * @date
+  * @version
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_img.h>
 #include <string.h>
@@ -11,6 +26,64 @@
 #include <gui_kb.h>
 #include "acc_engine.h"
 
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 
 
 static void img_prepare(gui_obj_t *obj)
@@ -82,6 +155,39 @@ static void magic_img_destory(gui_obj_t *obj)
     gui_free(((gui_img_t *)obj)->draw_img.inverse);
     gui_free(((gui_img_t *)obj)->draw_img.matrix);
 }
+
+static void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
+                                  void *addr,
+                                  int16_t x,
+                                  int16_t y, int16_t w, int16_t h)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_obj_t *root = (gui_obj_t *)this;
+    draw_img_t *draw_img = &this->draw_img;
+
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
+    root->obj_prepare = img_prepare;
+    root->obj_draw = img_draw_cb;
+    root->obj_end = img_end;
+    root->obj_destory = magic_img_destory;
+    root->type = IMAGE_FROM_MEM;
+
+    draw_img->blend_mode = IMG_FILTER_BLACK;
+    draw_img->data = addr;
+    draw_img->opacity_value = 255;
+    draw_img->blend_mode = IMG_MAGIC_MATRIX;
+    draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->opacity_value = UINT8_MAX;
+
+    this->scale_x = 1.0f;
+    this->scale_y = 1.0f;
+
+}
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 uint16_t gui_img_get_width(gui_img_t *img)
 {
@@ -157,13 +263,13 @@ void gui_img_translate(gui_img_t *img, float t_x, float t_y)
     img->t_y = t_y;
 }
 
-// Skews the current coordinate system along X axis. Angle is specified in radians.
+
 void gui_img_skew_x(gui_img_t *img, float degrees)
 {
 
 }
 
-// Skews the current coordinate system along Y axis. Angle is specified in radians.
+
 void gui_img_skew_y(gui_img_t *img, float degrees)
 {
 
@@ -176,35 +282,7 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 
 
 
-static void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
-                                  void *addr,
-                                  int16_t x,
-                                  int16_t y, int16_t w, int16_t h)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_obj_t *root = (gui_obj_t *)this;
-    draw_img_t *draw_img = &this->draw_img;
 
-    gui_obj_ctor(root, parent, name, x, y, w, h);
-
-    root->obj_prepare = img_prepare;
-    root->obj_draw = img_draw_cb;
-    root->obj_end = img_end;
-    root->obj_destory = magic_img_destory;
-    root->type = IMAGE_FROM_MEM;
-
-    draw_img->blend_mode = IMG_FILTER_BLACK;
-    draw_img->data = addr;
-    draw_img->opacity_value = 255;
-    draw_img->blend_mode = IMG_MAGIC_MATRIX;
-    draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    draw_img->opacity_value = UINT8_MAX;
-
-    this->scale_x = 1.0f;
-    this->scale_y = 1.0f;
-
-}
 
 gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                    int16_t x,
@@ -229,9 +307,13 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
     return img;
 }
 
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
 
-
-
+/** End of WIDGET
+  * @}
+  */
 
 
 

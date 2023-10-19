@@ -1,18 +1,87 @@
 /**
- * @file gui_widget_template.c
- * @author howie_wang (howie_wang@realtek.com.cn)
- * @brief
- * @version 0.1
- * @date 2023-10-17
- *
- * @copyright Copyright (c) 2023
- *
- */
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file
+  * @brief
+  * @details
+  * @author
+  * @date
+  * @version
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <gui_obj.h>
 #include "gui_widget_template.h"
 #include <tp_algo.h>
+
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 
 
 static void prepare(gui_widget_template_t *this)
@@ -81,6 +150,9 @@ static void widget_template_ctor(gui_widget_template_t *this, gui_obj_t *parent,
 
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 /**
  * @brief
@@ -120,6 +192,18 @@ gui_widget_template_t *gui_widget_template_create(void *parent,  const char *nam
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
 
 
 
