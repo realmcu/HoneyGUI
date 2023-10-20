@@ -1,14 +1,22 @@
 /**
- * @file gui_cube.c
- * @author your name (you@domain.com)
- * @brief
- * @version 0.1
- * @date 2023-10-16
- *
- * @copyright Copyright (c) 2023
- *
- */
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_cube.c
+  * @brief cube widget
+  * @details cube widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/19
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <gui_obj.h>
@@ -17,8 +25,72 @@
 #include "gui_cube.h"
 
 #include <math.h>
+#include "acc_engine.h"
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
 
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+#define CUBE_JUDEG_FULL_RANK(m) if(full_rank(m->matrix))  //!< JUDGE IF THIS IS FULL RANK
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+static struct rtgui_matrix matrix, rotate_3D;
+static Vertex_t rv0, rv1, rv2, rv3, rv4, rv5, rv6, rv7;
+static float nz0321, nz4567, nz5126, nz0473, nz7623, nz0154;
+
+// Set the intial cube rotation degree and step.
+static float xrot = 20.0;
+static float yrot = 0.0;
+static float zrot = 20.0;
+static float rotstep = 5.5;
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 static void scale_cube(Vertex_t *vertex, float scale)
 {
     // Scale cube vertex coordinates to proper size.
@@ -130,27 +202,95 @@ static void transfrom_blit(float w, float h, Vertex_t *v0, Vertex_t *v1, Vertex_
 //}
 
 
+static void get_new_area(draw_img_t *draw_img)
+{
+
+    struct rtgui_pox pox = {0.0f};
+    float x_min = 0.0f;
+    float x_max = 0.0f;
+    float y_min = 0.0f;
+    float y_max = 0.0f;
+
+    pox.p[0] = 0.0f;
+    pox.p[1] = 0.0f;
+    pox.p[2] = 1.0f;
+    pox_mul(draw_img->matrix, &pox);
+    x_min = pox.p[0];
+    x_max = pox.p[0];
+    y_min = pox.p[1];
+    y_max = pox.p[1];
 
 
+    pox.p[0] = (float)draw_img->img_w;
+    pox.p[1] = 0.0f;
+    pox.p[2] = 1.0f;
+    pox_mul(draw_img->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
 
 
+    pox.p[0] = 0.0f;
+    pox.p[1] = (float)draw_img->img_h;
+    pox.p[2] = 1.0f;
+    pox_mul(draw_img->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
 
+    pox.p[0] = (float)draw_img->img_w;
+    pox.p[1] = (float)draw_img->img_h;
+    pox.p[2] = 1.0f;
+    pox_mul(draw_img->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
 
-static struct rtgui_matrix matrix, rotate_3D;
-static Vertex_t rv0, rv1, rv2, rv3, rv4, rv5, rv6, rv7;
-static float nz0321, nz4567, nz5126, nz0473, nz7623, nz0154;
+    draw_img->img_x = (int16_t)x_min;
+    draw_img->img_y = (int16_t)y_min;
 
-// Set the intial cube rotation degree and step.
-static float xrot = 20.0;
-static float yrot = 0.0;
-static float zrot = 20.0;
-static float rotstep = 5.5;
-
-
-
-
-
-#include "acc_engine.h"
+    draw_img->target_w = (int16_t)x_max - (int16_t)x_min;
+    draw_img->target_h = (int16_t)y_max - (int16_t)y_min;
+}
 static bool full_rank(struct rtgui_matrix *m)
 {
     for (int i = 0; i < 3; i++)
@@ -173,10 +313,6 @@ static bool full_rank(struct rtgui_matrix *m)
     } //gui_log("\n");
     return true;
 }
-#define CUBE_JUDEG_FULL_RANK(m) if(full_rank(m->matrix))
-
-
-
 static void cube_prepare(gui_obj_t *obj)
 {
     Vertex_t cube_v0 = {-1.0, -1.0, -1.0};
@@ -267,7 +403,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(front->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(front->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(front->inverse);
-        rtgui_image_new_area(front);
+        get_new_area(front);
     }
 
     if (nz4567 > 0.0f)
@@ -276,7 +412,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(back->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(back->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(back->inverse);
-        rtgui_image_new_area(back);
+        get_new_area(back);
     }
 
     if (nz5126 > 0.0f)
@@ -285,7 +421,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(up->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(up->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(up->inverse);
-        rtgui_image_new_area(up);
+        get_new_area(up);
     }
 
     if (nz0473 > 0.0f)
@@ -294,7 +430,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(down->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(down->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(down->inverse);
-        rtgui_image_new_area(down);
+        get_new_area(down);
     }
 
     if (nz7623 > 0.0f)
@@ -303,7 +439,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(left->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(left->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(left->inverse);
-        rtgui_image_new_area(left);
+        get_new_area(left);
     }
 
     if (nz0154 > 0.0f)
@@ -312,7 +448,7 @@ static void cube_prepare(gui_obj_t *obj)
         memcpy(right->matrix, &matrix, sizeof(struct rtgui_matrix));
         memcpy(right->inverse, &matrix, sizeof(struct rtgui_matrix));
         matrix_inverse(right->inverse);
-        rtgui_image_new_area(right);
+        get_new_area(right);
     }
 }
 
@@ -401,10 +537,10 @@ static void cube_destory(gui_obj_t *obj)
 
 }
 
-void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
-                   void *addr,
-                   int16_t x,
-                   int16_t y, int16_t w, int16_t h)
+static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
+                          void *addr,
+                          int16_t x,
+                          int16_t y, int16_t w, int16_t h)
 {
 
     //for base class
@@ -466,7 +602,9 @@ void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
     this->c_y = (dc->fb_width - this->cbsize) / 2.0f;
 
 }
-
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y)
 {
     this->c_x = c_x;
@@ -477,18 +615,7 @@ void gui_cube_set_size(gui_cube_t *this, float size)
     this->cbsize = size;
 }
 
-/**
- * @brief
- *
- * @param parent
- * @param name
- * @param data
- * @param x
- * @param y
- * @param w
- * @param h
- * @return gui_cube_t*
- */
+
 gui_cube_t *gui_cube_create(void *parent,  const char *name, void *data,
                             int16_t x,
                             int16_t y, int16_t w, int16_t h)
@@ -512,6 +639,17 @@ gui_cube_t *gui_cube_create(void *parent,  const char *name, void *data,
     GET_BASE(cube)->create_done = true;
     return cube;
 }
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
 
 
 

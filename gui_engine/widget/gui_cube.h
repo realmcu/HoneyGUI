@@ -1,24 +1,53 @@
-/*
- * File      : gui_vg_lite_clock.h
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_cube.h
+  * @brief cube widget
+  * @details cube widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/19
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __GUI_CUBE_H__
 #define __GUI_CUBE_H__
-
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_api.h>
 #include "gui_img.h"
 #include "gui_perspective.h"
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
+
+/** @brief  CUBE widget structure */
 typedef struct gui_cube
 {
-    gui_obj_t base;
+    gui_obj_t base;                 //!< base structure
     draw_img_t draw_img_front;
     draw_img_t draw_img_back;
     draw_img_t draw_img_up;
@@ -34,14 +63,108 @@ typedef struct gui_cube
     //float t_y;
 } gui_cube_t;
 
-#define RAD(d)        (d*3.1415926f/180.0f)
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
 
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
+
+#define RAD(d)        (d*3.1415926f/180.0f) //!< angle to rad
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
+
+
+/**
+ * @brief cube create
+ *
+ * @param parent parent widget
+ * @param name  widget name
+ * @param addr
+ * @param x  left
+ * @param y top
+ * @param w  width
+ * @param h hight
+ * @return gui_cube_t* widget pointer
+ * <b>Example usage</b>
+ * \code{.c}
+ *{
+ *    uint8_t *array[6] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
+ *
+ *
+ *    gui_cube_t *cube4 = gui_cube_create(parent, "cube", array, 0, 0, 454, 454);
+ *    gui_cube_set_size(cube4, 100);
+ *    gui_cube_set_center(cube4, 200, 200);
+ *}
+ * \endcode
+ */
 gui_cube_t *gui_cube_create(void *parent,  const char *name, void *addr,
                             int16_t x, int16_t y, int16_t w, int16_t h);
-
+/**
+ * @brief set center
+ *
+ * @param this widget pointer
+ * @param c_x center x
+ * @param c_y center y
+ */
 void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
+/**
+ * @brief set size
+ *
+ * @param this widget pointer
+ * @param size scale size
+ */
 void gui_cube_set_size(gui_cube_t *this, float size);
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
 
 #ifdef __cplusplus
 }

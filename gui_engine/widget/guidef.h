@@ -1,9 +1,31 @@
-/*
- * File      : guidef.h
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file guidef.h
+  * @brief base define for bee gui
+  * @details base define for bee gui
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/19
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __GUIDEF_H__
 #define __GUIDEF_H__
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -11,11 +33,7 @@
 #include "gui_config.h"
 #include "gui_list.h"
 #include "gui_event.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-/*****Compiler Related*****/
 #if defined(__CC_ARM) || defined(__CLANG_ARM)           /* ARM Compiler */
 #include <stdarg.h>
 #define gui_inline                   static __inline
@@ -30,49 +48,20 @@ extern "C" {
 #error not supported tool chain
 #endif
 
-/*
- * The color used in the GUI:
- *
- *         bit        bit
- * RGB565  15 R,G,B   0
- * BGR565  15 B,G,R   0
- * RGB888  23 R,G,B   0
- * ARGB888 31 A,R,G,B 0
- * RGBA888 31 R,G,B,A 0
- * ABGR888 31 A,B,G,R 0
- *
- * The rtgui_color is defined as ARGB888.
- *        bit31 A,R,G,B bit0
- */
+/** @defgroup SUBMOUDLE SUBMOUDLE
+  * @brief
+  * @{
+  */
 
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Types SUBMOUDLE Exported Types
+  * @brief
+  * @{
+  */
 
-#define RTGUI_RGB_B(c)  ((c) & 0xff)
-#define RTGUI_RGB_G(c)  (((c) >> 8)  & 0xff)
-#define RTGUI_RGB_R(c)  (((c) >> 16) & 0xff)
-#define RTGUI_RGB_A(c)  (((c) >> 24) & 0xff)
-
-
-#define GUI_SWAP16(x)          ((uint16_t)(                         \
-                                                                    (((uint16_t)(x) & (uint16_t)0x00ff) <<  8) |            \
-                                                                    (((uint16_t)(x) & (uint16_t)0xff00) >>  8)))
-
-#define GUI_SWAP32(x)          ((uint32_t)(                         \
-                                                                    (((uint32_t)(x) & (uint32_t)0x000000ff) << 24) |            \
-                                                                    (((uint32_t)(x) & (uint32_t)0x0000ff00) <<  8) |            \
-                                                                    (((uint32_t)(x) & (uint32_t)0x00ff0000) >>  8) |            \
-                                                                    (((uint32_t)(x) & (uint32_t)0xff000000) >> 24)))
-
-#ifndef M_PI
-#define M_PI    ((float)3.14159265358979323846)
-#endif
-
-#define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
-#define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
-#define _UI_BITBYTES(bits)      ((bits + 7)/8)
-#define _UI_ABS(x)              ((x)>=0? (x):-(x))
-
-#define GUI_UNUSED(x) (void)(x)             /* macro to get rid of 'unused parameter' warning */
-
+/** @brief  ... */
 typedef union gui_color
 {
     unsigned long rgba;
@@ -95,15 +84,6 @@ typedef union gui_color_msb
         unsigned char alpha;
     } channel;
 } gui_color_msb_t;
-
-
-
-
-
-
-
-/***touch device***/
-
 
 typedef struct gui_touch_data
 {
@@ -177,16 +157,6 @@ typedef enum dc_type
     DC_DOUBLE,
 } dc_type_t;
 
-enum
-{
-    GPU_SW,
-    GPU_ARM2D,
-    GPU_DMA2D,
-    GPU_VGLITE,
-    GPU_OPENVG,
-    GPU_OPENGL,
-    GPU_NANOVG,
-};
 typedef struct gui_dispdev
 {
     /* width and height */
@@ -265,7 +235,6 @@ struct gui_indev
     //next for kb keyboard or hw button
     gui_kb_port_data_t *(*kb_get_port_data)(void);
 };
-
 
 typedef void (* log_func_t)(const char *fmt, ...);
 
@@ -479,8 +448,72 @@ typedef struct _gui_obj_t
 } gui_obj_t;
 
 
+/** End of SUBMOUDLE_Exported_Types
+  * @}
+  */
 
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Constants SUBMOUDLE Exported Constants
+  * @brief
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
+  * @brief
+  * @{
+  * The color used in the GUI:
+  *
+  *         bit        bit
+  * RGB565  15 R,G,B   0
+  * BGR565  15 B,G,R   0
+  * RGB888  23 R,G,B   0
+  * ARGB888 31 A,R,G,B 0
+  * RGBA888 31 R,G,B,A 0
+  * ABGR888 31 A,B,G,R 0
+  *
+  * The rtgui_color is defined as ARGB888.
+  *        bit31 A,R,G,B bit0
+  */
+
+
+#define RTGUI_RGB_B(c)  ((c) & 0xff)
+#define RTGUI_RGB_G(c)  (((c) >> 8)  & 0xff)
+#define RTGUI_RGB_R(c)  (((c) >> 16) & 0xff)
+#define RTGUI_RGB_A(c)  (((c) >> 24) & 0xff)
+
+
+#define GUI_SWAP16(x)          ((uint16_t)(                         \
+                                                                    (((uint16_t)(x) & (uint16_t)0x00ff) <<  8) |            \
+                                                                    (((uint16_t)(x) & (uint16_t)0xff00) >>  8)))
+
+#define GUI_SWAP32(x)          ((uint32_t)(                         \
+                                                                    (((uint32_t)(x) & (uint32_t)0x000000ff) << 24) |            \
+                                                                    (((uint32_t)(x) & (uint32_t)0x0000ff00) <<  8) |            \
+                                                                    (((uint32_t)(x) & (uint32_t)0x00ff0000) >>  8) |            \
+                                                                    (((uint32_t)(x) & (uint32_t)0xff000000) >> 24)))
+
+#ifndef M_PI
+#define M_PI    ((float)3.14159265358979323846)
+#endif
+
+#define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
+#define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
+#define _UI_BITBYTES(bits)      ((bits + 7)/8)
+#define _UI_ABS(x)              ((x)>=0? (x):-(x))
+
+#define GUI_UNUSED(x) (void)(x)             /* macro to get rid of 'unused parameter' warning */
 #define GUI_TYPE(type, obj) ((type *)obj)
+
 #if defined __WIN32
 
 extern char *defaultPath;
@@ -508,6 +541,57 @@ extern char *defaultPath;
 #else
 #define GUI_FRAME_STEP 50
 #endif
+
+
+/** End of SUBMOUDLE_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
+  * @brief
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Functions SUBMOUDLE Exported Functions
+  * @brief
+  * @{
+  */
+
+
+/**
+ * @brief
+ *
+ * @param parent
+ * @param name
+ * @param addr
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return gui_widget_template_t*
+ */
+
+
+/** End of SUBMOUDLE_Exported_Functions
+  * @}
+  */
+
+/** End of SUBMOUDLE
+  * @}
+  */
+
+
 #ifdef __cplusplus
 }
 #endif
