@@ -24,8 +24,10 @@ Realtek solution, user guide, study guide and other documents listed on this tut
    :hidden:
 
    Get Started <get-started/index>
+   GUI APP <GUI-APP/index>
    API Reference <api-reference/index>
    Layouts <layouts/index>
+   Porting <Porting/index>
    
 * :ref:`genindex`
 
