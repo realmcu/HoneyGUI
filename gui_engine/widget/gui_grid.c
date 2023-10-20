@@ -23,7 +23,6 @@
 #include "gui_img.h"
 #include "gui_canvas.h"
 #include "gui_magic_img.h"
-#include "math.h"
 
 
 /** @defgroup WIDGET WIDGET
