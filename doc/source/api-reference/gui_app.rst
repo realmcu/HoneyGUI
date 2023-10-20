@@ -9,5 +9,5 @@ GUI APP reference APIs.
 API Reference
 -------------
 
-.. doxygengroup:: GUI_APP
+.. doxygengroup:: APP
    :outline:

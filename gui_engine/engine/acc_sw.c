@@ -1,40 +1,40 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file acc_sw.c
+  * @brief Picture software decoding library
+  * @details input:rgba/rgb/rgb565;output:rgba/rgb565
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/19
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-//#include <gui_matrix.h>
 #include "acc_engine.h"
-//#include "gui_canvas.h"
-//#include "nanovg_agge.h"
-
 #if defined ( __CC_ARM ) && !defined(RTL8763EP)
 #define __FPU_PRESENT                  1            /* FPU present                                                             */
 #include "arm_math.h"
 #endif
 
-static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
-{
-#if defined ( __CC_ARM ) && !defined(RTL8763EP)
-    arm_fill_q15(pixel, (int16_t *)addr, len);
-#endif
-#if defined(_MSC_VER) || (defined(__GNUC__))
-    for (uint32_t i = 0; i < len; i++)
-    {
-        addr[i] = pixel;
-    }
-#endif
-}
-static void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
-{
-#if defined ( __CC_ARM ) && !defined(RTL8763EP)
-    arm_fill_q31(pixel, (int32_t *)addr, len);
-#endif
-#if defined(_MSC_VER) || (defined(__GNUC__))
-    for (uint32_t i = 0; i < len; i++)
-    {
-        addr[i] = pixel;
-    }
-#endif
-}
+/** @defgroup ENGINE ENGINE
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup ENGINE_Exported_Types ENGINE Exported Types
+  * @{
+  */
 typedef struct rtzip_file_header
 {
     struct
@@ -69,6 +69,76 @@ typedef struct rtzip_argb8888_node
 } rtzip_argb8888_node_t;
 #pragma pack()
 
+/** End of ENGINE_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup ENGINE_Exported_Constants ENGINE Exported Constants
+  * @{
+  */
+
+
+/** End of ENGINE_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup ENGINE_Exported_Macros ENGINE Exported Macros
+  * @{
+  */
+
+
+/** End of ENGINE_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup ENGINE_Exported_Variables ENGINE Exported Variables
+  * @{
+  */
+
+
+/** End of ENGINE_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup ENGINE_Exported_Functions ENGINE Exported Functions
+  * @{
+  */
+
+static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
+{
+#if defined ( __CC_ARM ) && !defined(RTL8763EP)
+    arm_fill_q15(pixel, (int16_t *)addr, len);
+#endif
+#if defined(_MSC_VER) || (defined(__GNUC__))
+    for (uint32_t i = 0; i < len; i++)
+    {
+        addr[i] = pixel;
+    }
+#endif
+}
+static void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
+{
+#if defined ( __CC_ARM ) && !defined(RTL8763EP)
+    arm_fill_q31(pixel, (int32_t *)addr, len);
+#endif
+#if defined(_MSC_VER) || (defined(__GNUC__))
+    for (uint32_t i = 0; i < len; i++)
+    {
+        addr[i] = pixel;
+    }
+#endif
+}
 static void uncompressed_rle_rgb565(rtzip_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //rtzip_file_header_t *header = (rtzip_file_header_t *)file;
@@ -952,6 +1022,22 @@ static void normal_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev 
     }
 
 }
+
+
+
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+/**
+ * @brief show image to display
+ *
+ * @param image image
+ * @param dc dispaly
+ * @param rect scope
+ */
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
@@ -1027,4 +1113,10 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     }
 
 }
+/** End of ENGINE_Exported_Functions
+  * @}
+  */
 
+/** End of ENGINE
+  * @}
+  */
