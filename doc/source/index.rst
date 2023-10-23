@@ -21,14 +21,13 @@ Realtek solution, user guide, study guide and other documents listed on this tut
 
 
 .. toctree::
-   :hidden:
 
    Get Started <get-started/index>
    GUI APP <GUI-APP/index>
    API Reference <api-reference/index>
    Layouts <layouts/index>
    Porting <Porting/index>
-   
+   widgets <widgets/index>
 * :ref:`genindex`
 
 
