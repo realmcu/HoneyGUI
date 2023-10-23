@@ -10,6 +10,7 @@ myst-parser = "*"
 sphinx-notfound-page = "*"
 sphinx-rtd-theme = "*"
 sphinx-press-theme = "*"
+recommonmark = "*"
 
 [dev-packages]
 
