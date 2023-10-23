@@ -37,7 +37,6 @@ enum gui_grid_style
 {
     GRID_CLASSIC,
     GRID_SCALE,
-    GRID_3D
 };
 ```
 
@@ -80,20 +79,4 @@ void page_tb_grid(void *parent)
 }
 ```
 
-- 3D style
-  
 
-[3D style video](https://drive.google.com/file/d/1bZWN2LKSXdb-HsNS3gSeXscYDeRV26B_/view?usp=sharing)
-
-```cpp
-void page_tb_grid(void *parent)
-{
-    void *array[] = {CLOCK_BIN, EMAIL_BIN, SPORT_BIN, SLEEP_BIN, MAP_BIN};
-    gui_grid_t *grid = gui_grid_create(parent, 100, 200, 1, 5, 30, 30);
-    gui_grid_style(grid, GRID_3D);
-    for (size_t i = 0; i < 5; i++)
-    {
-        gui_magic_img_create_from_mem(grid, "1", array[i], 0, 0, 0, 0);
-    }
-}
-```

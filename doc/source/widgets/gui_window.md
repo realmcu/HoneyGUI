@@ -124,12 +124,13 @@ gui_obj_add_event_cb(win, (gui_event_cb_t)callback8, GUI_EVENT_TOUCH_CLICKED, 0)
 
 ### gesture test video
 
-[![Watch the video](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png)](https://drive.google.com/file/d/11g0-r2ntHIZG5vmdE5hANysPnQtJoUAD/view?usp=drive_link)
-
 
 ```eval_rst
 
  
+.. raw:: html
+
+    <iframe src="https://drive.google.com/file/d/11g0-r2ntHIZG5vmdE5hANysPnQtJoUAD/preview" width="640" height="480" allow="autoplay"></iframe>
 
 .. doxygengroup:: WIDGET
 .. doxygenfile:: gui_win.h

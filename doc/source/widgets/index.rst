@@ -29,7 +29,4 @@ Widgets             brief
     grid <gui_grid>
 
 
-.. raw:: html
-
-    <iframe src="https://drive.google.com/file/d/11g0-r2ntHIZG5vmdE5hANysPnQtJoUAD/preview" width="640" height="480" allow="autoplay"></iframe>
 

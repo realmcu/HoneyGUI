@@ -24,8 +24,20 @@ make dynamic frame
 gui_dynamic_img_t *dym = gui_dynamic_create_from_mem(&(app->screen), "demo", frame_list, 100, 100, 6, 50, 50*10000);
 ```
 
-[classic style video](https://drive.google.com/file/d/1tq2wCY16waEF7jcq0R3DhCDXSg5pRSvH/view?usp=sharing)
++ classic style video
 
 
+```eval_rst
+
+ 
+.. raw:: html
+
+    <iframe src="https://drive.google.com/file/d/1tq2wCY16waEF7jcq0R3DhCDXSg5pRSvH/preview" width="640" height="480" allow="autoplay"></iframe>
+
+
+
+ 
+
+```
 
 
