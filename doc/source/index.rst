@@ -1,4 +1,4 @@
-HoneyGUI Engine Programming Guide
+BeeGUI Engine Programming Guide
 =================================
 
 Realtek solution, user guide, study guide and other documents listed on this tutorial(collectively, "Documents") are provided "as is" and with all faults. Customers agree to use any Documents solely for agreed purpose and subject to the terms of this Disclaimer.

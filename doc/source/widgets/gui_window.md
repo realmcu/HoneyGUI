@@ -127,3 +127,13 @@ gui_obj_add_event_cb(win, (gui_event_cb_t)callback8, GUI_EVENT_TOUCH_CLICKED, 0)
 [![Watch the video](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png)](https://drive.google.com/file/d/11g0-r2ntHIZG5vmdE5hANysPnQtJoUAD/view?usp=drive_link)
 
 
+```eval_rst
+
+ 
+
+.. doxygengroup:: WIDGET
+.. doxygenfile:: gui_win.h
+
+ 
+
+```

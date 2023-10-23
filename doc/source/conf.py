@@ -10,7 +10,7 @@ import os
 import recommonmark
 from recommonmark.transform import AutoStructify
 
-project = 'HoneyGUI'
+project = 'BeeGUI'
 copyright = '2023, miaomiao_wu'
 author = 'miaomiao_wu'
 release = 'v0.0.0.1'
