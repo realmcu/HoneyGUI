@@ -106,7 +106,6 @@ void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filename, in
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_update_att = NULL;
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->type = CARD;
 

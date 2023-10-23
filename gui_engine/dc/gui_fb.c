@@ -52,10 +52,6 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
-        if (obj->obj_update_att != NULL)
-        {
-            obj->obj_update_att(obj);//update change x, not change dx
-        }
         obj->dx += obj->parent->dx;
         obj->dy += obj->parent->dy;
         obj->ax = obj->x + obj->parent->ax;

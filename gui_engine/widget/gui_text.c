@@ -10,16 +10,8 @@
 #include <draw_font.h>
 
 
-static void text_prepare(gui_obj_t *obj)
-{
-    // gui_text_t *text = (gui_text_t *)obj;
-    // if (text->len == 0)
-    // {
-    //     return;
-    // }
-    // rtgui_text_create(text);
-}
-static void text_update(gui_obj_t *o)
+
+static void text_prepare(gui_obj_t *o)
 {
     gui_text_t *obj = (void *)o;
     if (obj->animate && obj->animate->animate)
@@ -157,7 +149,6 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
     root->obj_prepare = text_prepare;
     root->obj_draw = text_draw;
     root->obj_end = text_end;
-    root->obj_update_att = text_update;
 
     //for self
     this->mode = LEFT;

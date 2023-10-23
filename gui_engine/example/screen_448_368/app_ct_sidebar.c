@@ -1,7 +1,6 @@
 #include "root_image_hongkong/ui_resource.h"
 #include <gui_img.h>
 #include "gui_canvas.h"
-#include "gui_grid.h"
 #include "gui_win.h"
 static void canvas_cb(gui_canvas_t *canvas)
 {

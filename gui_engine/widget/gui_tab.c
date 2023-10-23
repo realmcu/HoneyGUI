@@ -88,7 +88,6 @@ void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int1
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_update_att = NULL;
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->type = TAB;
 

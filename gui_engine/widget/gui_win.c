@@ -124,50 +124,12 @@ void win_prepare(gui_obj_t *obj)
         }
     }
 }
-//#include "gui_server.h"
-static void (obj_update_att)(struct _gui_obj_t *o)
-{
-    gui_win_t *obj = (void *)o;
-    if (obj->animate && obj->animate->animate)
-    {
-        size_t frame_count = obj->animate->dur * (1000 / 15) / (1000);
-        obj->animate->callback(obj->animate->p);
-        obj->animate->current_frame++;
 
-        if (obj->animate->current_frame > frame_count)
-        {
-            if (obj->animate->repeatCount == 0)
-            {
-                obj->animate->animate = false;
-            }
-            else if (obj->animate->repeatCount < 0)
-            {
-                obj->animate->current_frame = 0;
-            }
-            else if (obj->animate->repeatCount > 0)
-            {
-                obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
-                {
-                    obj->animate->animate = false;
-                }
-                else
-                {
-                    obj->animate->current_frame = 0;
-                }
-            }
-        }
-        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
-                                                                                       frame_count));
-
-    }
-}
 static void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                          int16_t y, int16_t w, int16_t h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     GET_BASE(this)->obj_prepare = win_prepare;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     GET_BASE(this)->type = WINDOW;
 }
 gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t y,

@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>RTK_MODULE_USING_RTK_GUI, GUI_KEIL_SIM</Define>
+              <Define>GUI_KEIL_SIM, RTK_MODULE_USING_RTK_GUI</Define>
               <Undefine></Undefine>
               <IncludePath>.;.;..\example\root_image;gui_port;..\app;..\dc;..\engine;..\input;..\misc;..\misc\tlsf;..\server;..\Third_Party\nanosvg\src;..\Third_Party\nanovg;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\base;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\vglite;..\Third_Party\stb;..\widget;..</IncludePath>
             </VariousControls>
@@ -519,21 +519,6 @@
               <FilePath>..\Third_Party\nanovg\agge\nanovg_vertex.cpp</FilePath>
             </File>
             <File>
-              <FileName>gui_alert.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_alert.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_arc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_arc.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_button.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_button.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_canvas.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_canvas.c</FilePath>
@@ -547,11 +532,6 @@
               <FileName>gui_cardview.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_cardview.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_colorwheel.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_colorwheel.c</FilePath>
             </File>
             <File>
               <FileName>gui_cube.c</FileName>
@@ -569,29 +549,9 @@
               <FilePath>..\widget\gui_curtainview.c</FilePath>
             </File>
             <File>
-              <FileName>gui_dynamic_img.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_dynamic_img.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_eq.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_eq.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_grid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_grid.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_img.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_img.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_img_scope.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_img_scope.c</FilePath>
             </File>
             <File>
               <FileName>gui_obj.c</FileName>
@@ -602,16 +562,6 @@
               <FileName>gui_perspective.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_perspective.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_radio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_radio.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_scroll_text.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_scroll_text.c</FilePath>
             </File>
             <File>
               <FileName>gui_stb_img.c</FileName>
@@ -647,11 +597,6 @@
               <FileName>gui_watchface_gradient.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\widget\gui_watchface_gradient.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_wave.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\widget\gui_wave.c</FilePath>
             </File>
             <File>
               <FileName>gui_widget_template.c</FileName>
