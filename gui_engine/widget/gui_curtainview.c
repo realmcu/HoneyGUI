@@ -1,8 +1,22 @@
-/*
- * File      : gui_tabview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_curtainview.c
+  * @brief curtain effect container widget, which can nest curtains.
+  * @details Slide to extend and retract curtains
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/10/24
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_curtain.h>
 #include <string.h>
@@ -10,12 +24,68 @@
 #include "gui_obj.h"
 #include <tp_algo.h>
 #include "gui_tabview.h"
-void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this))
-{
-    this->done_cb = cb;
-}
 
-void curtainview_prepare(gui_obj_t *obj)
+/** @defgroup SUBMOUDLE SUBMOUDLE
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Types SUBMOUDLE Exported Types
+  * @{
+  */
+
+
+
+/** End of SUBMOUDLE_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Constants SUBMOUDLE Exported Constants
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
+  * @{
+  */
+
+
+
+/** End of SUBMOUDLE_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Functions SUBMOUDLE Exported Functions
+  * @{
+  */
+
+
+static void curtainview_prepare(gui_obj_t *obj)
 {
     gui_curtainview_t *this = (gui_curtainview_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
@@ -392,15 +462,24 @@ void curtainview_prepare(gui_obj_t *obj)
 
 
 }
-void gui_curtainview_ctor(gui_curtainview_t *this, gui_obj_t *parent, const char *filename,
-                          int16_t x,
-                          int16_t y, int16_t w, int16_t h)
+static void gui_curtainview_ctor(gui_curtainview_t *this, gui_obj_t *parent, const char *filename,
+                                 int16_t x,
+                                 int16_t y, int16_t w, int16_t h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     ((gui_obj_t *)this)->obj_prepare = curtainview_prepare;
     ((gui_obj_t *)this)->type = CURTAINVIEW;
     this->cur_curtain = CURTAIN_MIDDLE;
     this->mute = false;
+}
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this))
+{
+    this->done_cb = cb;
 }
 gui_curtainview_t *gui_curtainview_create(void *parent, const char *filename, int16_t x,
                                           int16_t y,
@@ -409,3 +488,19 @@ gui_curtainview_t *gui_curtainview_create(void *parent, const char *filename, in
 #define _paramgui_curtainview_create_ this, parent, filename, x, y, w, h
     GUI_NEW(gui_curtainview_t, gui_curtainview_ctor, _paramgui_curtainview_create_)
 }
+
+/** End of SUBMOUDLE_Exported_Functions
+  * @}
+  */
+
+/** End of SUBMOUDLE
+  * @}
+  */
+
+
+
+
+
+
+
+

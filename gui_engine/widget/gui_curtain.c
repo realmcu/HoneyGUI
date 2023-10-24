@@ -1,8 +1,22 @@
-/*
- * File      : gui_tabview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_curtain.c
+  * @brief create a curtain effect widget,which should be nested in a curtainview.
+  * @details Slide to extend and retract curtains
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/10/24
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_curtain.h>
 #include <string.h>
@@ -10,6 +24,67 @@
 #include "gui_obj.h"
 #include <tp_algo.h>
 #include <gui_img.h>
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
 
 
 static void curtain_prepare(gui_obj_t *obj)
@@ -159,10 +234,26 @@ void gui_curtain_ctor(gui_curtain_t *this, gui_obj_t *parent, const char *filena
 
     }
 }
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
 gui_curtain_t *gui_curtain_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope)
 {
 #define _paramgui_curtain_create_ this, parent, filename, x, y, w, h, orientation, scope
     GUI_NEW(gui_curtain_t, gui_curtain_ctor, _paramgui_curtain_create_)
 }
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
 

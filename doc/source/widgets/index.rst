@@ -12,6 +12,9 @@ Widgets             brief
 `grid`_             Display widgets set in a grid view(Evenly layout vertically and horizontally)
 `cube`_             Display a cube 
 `card`_             Display a 3d card set 
+`curtain`_          Slide to extend and retract curtains
+`curtainview`_      Slide to extend and retract curtains
+`perspective`_      Slide to extend and retract curtains
 ==================  ==================  
 
 .. _screen: gui_screen.html
@@ -22,6 +25,9 @@ Widgets             brief
 .. _grid: gui_grid.html
 .. _cube: gui_cube.html
 .. _card: gui_card.html
+.. _curtain: gui_curtain.html
+.. _curtainview: gui_curtainview.html
+.. _perspective: gui_perspective.html
 .. toctree::
     :maxdepth: 2
 
@@ -33,5 +39,6 @@ Widgets             brief
     grid <gui_grid>
     cube <gui_cube>
     card <gui_card> 
-
-
+    curtain <gui_curtain> 
+    curtainview <gui_curtainview> 
+    perspective <gui_perspective> 
