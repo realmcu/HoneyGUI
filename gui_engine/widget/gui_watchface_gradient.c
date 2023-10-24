@@ -2,6 +2,7 @@
  * File      : gui_watchface_gradient.c
  * This file is part of GUI Engine
  */
+#include <gui_obj.h>
 #include "gui_watchface_gradient.h"
 #include "math.h"
 
@@ -410,15 +411,89 @@ static void canvas_design(gui_canvas_t *canvas)
     nvgFillColor(vg, nvgRGBA(0, 0, 0, 1 * 255));
     nvgFill(vg);
 }
+
+static void prepare(gui_canvas_t *this)
+{
+    GUI_UNUSED(this);
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_obj_t *root = (gui_obj_t *)this;
+
+    uint32_t cx = dc->fb_width / 2;
+    uint32_t cy = dc->fb_height / 2;
+
+    GUI_UNUSED(root);
+    GUI_UNUSED(cx);
+    GUI_UNUSED(cy);
+}
+
+static void widget_nanovg_draw_cb(gui_obj_t *obj)
+{
+    gui_canvas_t *this = (gui_canvas_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    if (this->nanovg_canvas_cb != NULL)
+    {
+        extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
+                                         uint8_t *data);
+        extern void nvgDeleteAGGE(NVGcontext * ctx);
+        NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                                       (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+        nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
+
+        this->vg = vg;
+        nvgResetTransform(vg);
+
+        nvgTranslate(vg, GET_BASE(this)->dx, GET_BASE(this)->dy);
+        nvgTranslate(vg, GET_BASE(this)->tx, GET_BASE(this)->ty);
+        nvgTranslate(vg, GET_BASE(this)->ax, GET_BASE(this)->ay);
+
+        nvgTranslate(vg, dc->screen_width / 2, dc->screen_height / 2);
+        nvgScale(vg, this->base.sx, this->base.sy);
+        nvgTranslate(vg, -dc->screen_width / 2, -dc->screen_height / 2);
+
+
+        this->nanovg_canvas_cb(this);
+
+        nvgEndFrame(vg);
+        nvgDeleteAGGE(vg);
+    }
+}
+static void widget_nanovg_end(gui_obj_t *obj)
+{
+    gui_canvas_t *this = (gui_canvas_t *)obj;
+    GUI_UNUSED(this);
+
+}
+static void widget_nanovg_destory(gui_obj_t *obj)
+{
+
+}
+static void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
+                               void *data,
+                               int16_t x,
+                               int16_t y, int16_t w, int16_t h)
+{
+    //for base class
+    gui_obj_t *base = (gui_obj_t *)this;
+    gui_obj_ctor(base, parent, name, x, y, w, h);
+
+    //for root class
+    gui_obj_t *root = (gui_obj_t *)this;
+    root->type = VG_LITE_CLOCK;
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
+    root->obj_draw = widget_nanovg_draw_cb;
+    root->obj_end = widget_nanovg_end;
+    root->obj_destory = widget_nanovg_destory;
+
+    //for self
+
+}
+
 static void watchface_gradient_ctor(gui_watchface_gradient_t *this, gui_obj_t *parent,
                                     const char *name,
                                     int16_t x,
                                     int16_t y, int16_t w, int16_t h)
 {
-    extern void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
-                                   void *data,
-                                   int16_t x,
-                                   int16_t y, int16_t w, int16_t h);
     widget_nanovg_ctor((gui_canvas_t *)this, parent, name, NULL, x, y, w, h);
     gui_canvas_set_canvas_cb((gui_canvas_t *)this, canvas_design);
 }

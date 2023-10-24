@@ -31,21 +31,25 @@ env.Append(LIBS = ['mingw32'])
 
 
 
-WEARABLE_ROOT = os.path.abspath('./../')
+GUI_ENGINE = os.path.abspath('./../')
+LVGL_ROOT = os.path.abspath('../../lvgl/')
 
 Export('TOOL_ROOT')
-Export('WEARABLE_ROOT')
+Export('GUI_ENGINE')
+Export('LVGL_ROOT')
 
 
 print('TOOL ROOT = ' + TOOL_ROOT)
-print('RTK WEARABLE ROOT = ' + WEARABLE_ROOT)
+print('RTK GUI ENGINE ROOT = ' + GUI_ENGINE)
+print('LVGL ROOT = ' + LVGL_ROOT)
 
 # prepare building environment
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
 
 
 # include app
-objs.extend(SConscript(os.path.join(WEARABLE_ROOT, 'SConscript')))
+objs.extend(SConscript(os.path.join(GUI_ENGINE, 'SConscript')))
+objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
 
 # bsp_vdir = 'build'
 

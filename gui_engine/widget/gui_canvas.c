@@ -1,19 +1,88 @@
 /**
- * @file gui_canvas.c
- * @author howie_wang (howie_wang@realtek.com.cn)
- * @brief
- * @version 0.1
- * @date 2023-10-16
- *
- * @copyright Copyright (c) 2023
- *
- */
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file
+  * @brief
+  * @details
+  * @author
+  * @date
+  * @version
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <gui_matrix.h>
 #include <gui_obj.h>
 #include <nanovg.h>
 #include "gui_canvas.h"
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup CANVAS_Exported_Types CANVAS Exported Types
+  * @{
+  */
+
+
+
+/** End of CANVAS_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup CANVAS_Exported_Constants CANVAS Exported Constants
+  * @{
+  */
+
+
+/** End of CANVAS_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup CANVAS_Exported_Macros CANVAS Exported Macros
+  * @{
+  */
+
+
+
+/** End of CANVAS_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup CANVAS_Exported_Variables CANVAS Exported Variables
+  * @{
+  */
+
+
+/** End of CANVAS_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup CANVAS_Exported_Functions CANVAS Exported Functions
+  * @{
+  */
 
 
 static void prepare(gui_canvas_t *this)
@@ -28,13 +97,6 @@ static void prepare(gui_canvas_t *this)
     GUI_UNUSED(root);
     GUI_UNUSED(cx);
     GUI_UNUSED(cy);
-}
-
-
-void gui_canvas_set_canvas_cb(gui_canvas_t *this,
-                              void (*cb)(gui_canvas_t *this))
-{
-    this->nanovg_canvas_cb = cb;
 }
 
 static void widget_nanovg_draw_cb(gui_obj_t *obj)
@@ -80,12 +142,10 @@ static void widget_nanovg_destory(gui_obj_t *obj)
 
 }
 
-
-
-void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
-                        void *data,
-                        int16_t x,
-                        int16_t y, int16_t w, int16_t h)
+static void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
+                               void *data,
+                               int16_t x,
+                               int16_t y, int16_t w, int16_t h)
 {
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
@@ -103,18 +163,17 @@ void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
 
 }
 
-/**
- * @brief
- *
- * @param parent
- * @param name
- * @param data
- * @param x
- * @param y
- * @param w
- * @param h
- * @return gui_canvas_t*
- */
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+void gui_canvas_set_canvas_cb(gui_canvas_t *this,
+                              void (*cb)(gui_canvas_t *this))
+{
+    this->nanovg_canvas_cb = cb;
+}
+
 
 gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
                                 int16_t x,
@@ -141,6 +200,18 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+
+/** End of CANVAS_Exported_Functions
+  * @}
+  */
+
+/** End of CANVAS
+  * @}
+  */
+
+
+
 
 
 

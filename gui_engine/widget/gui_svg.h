@@ -1,20 +1,48 @@
-/*
- * File      : gui_svg.h
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file
+  * @brief
+  * @details
+  * @author
+  * @date
+  * @version
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __GUI_SVG_H__
 #define __GUI_SVG_H__
-
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_api.h>
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+/** @defgroup SVG_Exported_Types SVG Exported Types
+  * @brief
+  * @{
+  */
 
+/** @brief  ... */
 typedef struct gui_svg
 {
     gui_obj_t base;
@@ -32,18 +60,132 @@ typedef struct gui_svg
 } gui_svg_t;
 
 
+/** End of SVG_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+/** @defgroup SVG_Exported_Constants SVG Exported Constants
+  * @brief
+  * @{
+  */
 
 
+/** End of SVG_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+/** @defgroup SVG_Exported_Macros SVG Exported Macros
+  * @brief
+  * @{
+  */
+
+
+
+
+/** End of SVG_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+/** @defgroup SVG_Exported_Variables SVG Exported Variables
+  * @brief
+  * @{
+  */
+
+
+/** End of SVG_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
+/** @defgroup SVG_Exported_Functions SVG Exported Functions
+  * @brief
+  * @{
+  */
+
+
+/**
+ * @brief
+ *
+ * @param parent
+ * @param name
+ * @param filename
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return gui_svg_t*
+ */
 gui_svg_t *gui_svg_create_from_file(void *parent,  const char *name, const char *filename,
                                     int16_t x, int16_t y, int16_t w, int16_t h);
 
+/**
+ * @brief
+ *
+ * @param parent
+ * @param name
+ * @param addr
+ * @param size
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return gui_svg_t*
+ */
 gui_svg_t *gui_svg_create_from_mem(void *parent,  const char *name, uint8_t *addr, uint32_t size,
                                    int16_t x, int16_t y, int16_t w, int16_t h);
-
+/**
+ * @brief
+ *
+ * @param svg
+ * @param degrees
+ * @param c_x
+ * @param c_y
+ */
 void gui_svg_rotation(gui_svg_t *svg, float degrees, float c_x, float c_y);
+/**
+ * @brief
+ *
+ * @param svg
+ * @param scale_x
+ * @param scale_y
+ */
 void gui_svg_scale(gui_svg_t *svg, float scale_x, float scale_y);
+/**
+ * @brief
+ *
+ * @param svg
+ * @param t_x
+ * @param t_y
+ */
 void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y);
+/**
+ * @brief
+ *
+ * @param svg
+ * @param opacity_value
+ */
 void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value);
+
+
+/** End of SVG_Exported_Functions
+  * @}
+  */
+
+/** End of SVG
+  * @}
+  */
+
 
 #ifdef __cplusplus
 }

@@ -1,13 +1,13 @@
 # for module compiling
 import os
 Import('TOOL_ROOT')
-Import('WEARABLE_ROOT')
+Import('GUI_ENGINE')
 
 from building import *
 
 cwd = GetCurrentDir()
 CPPPATH = [cwd, 
-           WEARABLE_ROOT + '/example/root_image/']
+           GUI_ENGINE + '/example/root_image/']
 
 
 
@@ -16,7 +16,12 @@ src = ['main.c']
 src += ['rtk_gui_demo.c']
 src += ['nanovg_test.c']
 
-objs = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = CPPPATH)
+CPPDEFINES = ['LV_KCONFIG_IGNORE']
+CPPDEFINES += ['LV_LVGL_H_INCLUDE_SIMPLE']
+CPPDEFINES += ['LV_USE_DEMO_BENCHMARK']
+CPPDEFINES += ['LV_USE_DEMO_WIDGETS']
+
+objs = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_PORT_FOR_LVGL'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 
 list = os.listdir(cwd)

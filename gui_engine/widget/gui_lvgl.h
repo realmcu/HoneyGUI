@@ -17,8 +17,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_CANVAS_H__
-#define __GUI_CANVAS_H__
+#ifndef __GUI_LVGL_H__
+#define __GUI_LVGL_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,9 +28,8 @@ extern "C" {
  *============================================================================*/
 #include <guidef.h>
 #include <gui_api.h>
-#include <nanovg.h>
 
-/** @defgroup WIDGET WIDGET
+/** @defgroup LVGL LVGL
   * @brief
   * @{
   */
@@ -38,41 +37,40 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Types CANVAS Exported Types
+/** @defgroup LVGL_Exported_Types LVGL Exported Types
   * @brief
   * @{
   */
 
 /** @brief  ... */
-typedef struct _gui_canvas
+typedef struct gui_lvgl_template
 {
     gui_obj_t base;
-    NVGcontext *vg;
-    void (*nanovg_canvas_cb)(struct _gui_canvas *this);
-} gui_canvas_t;
+    void *user_data;
+} gui_lvgl_t;
 
 
-/** End of CANVAS_Exported_Types
+/** End of LVGL_Exported_Types
   * @}
   */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Constants CANVAS Exported Constants
+/** @defgroup LVGL_Exported_Constants LVGL Exported Constants
   * @brief
   * @{
   */
 
 
-/** End of CANVAS_Exported_Constants
+/** End of LVGL_Exported_Constants
   * @}
   */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Macros CANVAS Exported Macros
+/** @defgroup LVGL_Exported_Macros LVGL Exported Macros
   * @brief
   * @{
   */
@@ -81,30 +79,31 @@ typedef struct _gui_canvas
 
 
 
-/** End of CANVAS_Exported_Macros
+/** End of LVGL_Exported_Macros
   * @}
   */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Variables CANVAS Exported Variables
+/** @defgroup LVGL_Exported_Variables LVGL Exported Variables
   * @brief
   * @{
   */
 
 
-/** End of CANVAS_Exported_Variables
+/** End of LVGL_Exported_Variables
   * @}
   */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Functions CANVAS Exported Functions
+/** @defgroup LVGL_Exported_Functions LVGL Exported Functions
   * @brief
   * @{
   */
+
 
 /**
  * @brief
@@ -116,26 +115,17 @@ typedef struct _gui_canvas
  * @param y
  * @param w
  * @param h
- * @return gui_canvas_t*
+ * @return gui_lvgl_t*
  */
-gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *addr,
-                                int16_t x, int16_t y, int16_t w, int16_t h);
-
-/**
- * @brief
- *
- * @param this
- * @param cb
- */
-void gui_canvas_set_canvas_cb(gui_canvas_t *this,
-                              void (*cb)(gui_canvas_t *this));
+gui_lvgl_t *gui_lvgl_create(void *parent,  const char *name, void *addr,
+                            int16_t x, int16_t y, int16_t w, int16_t h);
 
 
-/** End of CANVAS_Exported_Functions
+/** End of LVGL_Exported_Functions
   * @}
   */
 
-/** End of CANVAS
+/** End of LVGL
   * @}
   */
 
