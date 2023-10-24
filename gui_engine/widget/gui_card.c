@@ -1,29 +1,97 @@
-/*
- * File      : gui_tabview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_card.c
+  * @brief 3d card container
+  * @details slide to switch card
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/24
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
-//#include <math.h>
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include <gui_img.h>
 #include "gui_card.h"
 #include "gui_canvas.h"
-//#include "gui_curtain.h"
 #include "gui_img.h"
-//#include "gui_matrix.h"
 
 
-// static void gui_card_get_stacking_location(gui_card_stacking_t *result, gui_card_stacking_t *start,
-//                                            gui_card_stacking_t *end, float percent)
-// {
-//     result->scale = start->scale + (end->scale - start->scale) * percent;
-//     result->location = start->location + (end->location - start->location) * percent;
-//     result->opacity = start->opacity + (end->opacity - start->opacity) * percent;
-// }
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+/** @brief  ... */
+typedef enum
+{
+    EXAMPLE_SUCCESS,                //!< ...
+    EXAMPLE_INVALID_STATE,          //!< ...
+} T_EXAMPLE;
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
 
 
 static void tab_prepare(gui_obj_t *obj)
@@ -100,8 +168,9 @@ static void tab_prepare(gui_obj_t *obj)
 
 
 
-void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filename, int16_t x, int16_t y,
-                   int16_t w, int16_t h, int16_t idx, int16_t idy)
+static void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filename, int16_t x,
+                          int16_t y,
+                          int16_t w, int16_t h, int16_t idx, int16_t idy)
 {
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
@@ -115,6 +184,10 @@ void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filename, in
 
 
 }
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 gui_card_t *gui_card_create(void *parent, const char *name, int16_t x, int16_t y,
                             int16_t w, int16_t h, int16_t idx, int16_t idy)
@@ -143,6 +216,18 @@ gui_card_t *gui_card_create(void *parent, const char *name, int16_t x, int16_t y
     GET_BASE(this)->create_done = true;
     return this;
 }
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
+
+
 
 
 

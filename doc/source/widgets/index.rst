@@ -10,6 +10,8 @@ Widgets             brief
 `dynamic`_          Play multiple picture frames in a loop 
 `text`_             To display text, which can be used to output text in different fonts, different colors, and different sizes
 `grid`_             Display widgets set in a grid view(Evenly layout vertically and horizontally)
+`cube`_             Display a cube 
+`card`_             Display a 3d card set 
 ==================  ==================  
 
 .. _screen: gui_screen.html
@@ -18,6 +20,8 @@ Widgets             brief
 .. _dynamic: gui_dynamic.html
 .. _text: gui_text.html
 .. _grid: gui_grid.html
+.. _cube: gui_cube.html
+.. _card: gui_card.html
 .. toctree::
     :maxdepth: 2
 
@@ -27,6 +31,7 @@ Widgets             brief
     dynamic <gui_dynamic>
     text <gui_text>
     grid <gui_grid>
-
+    cube <gui_cube>
+    card <gui_card> 
 
 
