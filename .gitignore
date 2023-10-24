@@ -49,6 +49,8 @@
 *.mod*
 *.cmd
 .tmp_versions/
+doc/doxyxml/
+doc/build/
 modules.order
 Module.symvers
 Mkfile.old
