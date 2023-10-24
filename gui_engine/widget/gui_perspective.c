@@ -1,24 +1,108 @@
-/*
- * File      : gui_cube.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_perspective.c
+  * @brief perspective widget
+  * @details create 3D widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/20
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-//#include <gui_kb.h>
 #include <draw_img.h>
 #include <gui_matrix.h>
 #include "gui_perspective.h"
 #include "acc_engine.h"
 #include <math.h>
 
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+typedef struct Point2f
+{
+    float x;
+    float y;
+} Point2f_t;
+/** @brief  ... */
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+#define USE_FIX_SIN 1
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
 static struct rtgui_matrix rotate_3D;
 static Vertex_t rv0, rv1, rv2, rv3;
 static Vertex_t tv0, tv1, tv2, tv3;
 
-#define USE_FIX_SIN 1
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
+
+/**
+  * @brief  ...
+  * @note   ...
+  * @param[IN]  param1 ...
+  * @param[IN]  param2 ...
+  * @return ...
+  * @retval ...
+  */
 #if USE_FIX_SIN
+// Set the intial cube rotation degree and step.
 static const int16_t sin_table[] =
 {
     0,     572,   1144,  1715,  2286,  2856,  3425,  3993,  4560,  5126,  5690,  6252,  6813,  7371,  7927,  8481,
@@ -64,7 +148,6 @@ static inline float fix_cos(int angle)
     return fix_sin(angle + 90);
 }
 #endif
-
 /* Calculates coefficients of perspective transformation
 * which maps (xi,yi) to (ui,vi), (i=1,2,3,4):
 *
@@ -89,20 +172,12 @@ static inline float fix_cos(int angle)
 * where:
 *   cij - matrix coefficients, c22 = 1
 */
-
-typedef struct Point2f
-{
-    float x;
-    float y;
-} Point2f_t;
-
 static void swap(float *a, float *b)
 {
     float c = *a;
     *a = *b;
     *b = c;
 }
-
 static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row  var:A's col-1
 {
     int row, col;
@@ -159,8 +234,6 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
     return true;
 }
 
-
-
 static bool getPerspectiveTransform(Point2f_t *src, Point2f_t *dst, float *ret)
 {
     float x0 = src[0].x, x1 = src[1].x, x2 = src[3].x, x3 = src[2].x;
@@ -186,9 +259,6 @@ static bool getPerspectiveTransform(Point2f_t *src, Point2f_t *dst, float *ret)
     return false;
 
 }
-
-
-
 
 static void scale_3d(Vertex_t *vertex, float scale)
 {
@@ -248,7 +318,6 @@ static void transfrom_rotate(struct rtgui_matrix *rotate, Vertex_t *vertex, Vert
     rc->z += tz;
 }
 
-
 // w means image width
 // h means image height, use w and h can get four point in XY plane
 
@@ -275,11 +344,6 @@ static void transfrom_blit(float w, float h, Vertex_t *p, Vertex_t *v0, Vertex_t
     float *answer = (float *)matrix->m;
     getPerspectiveTransform(src, dst, answer);
 }
-
-
-
-
-
 
 #if 0
 static bool full_rank(struct rtgui_matrix *m)
@@ -334,7 +398,6 @@ static void prepare(gui_obj_t *obj)
     scale_3d(&v2, 1.0f);
     scale_3d(&v3, 1.0f);
 
-
     for (uint32_t i = 0; i < 6; i++)
     {
         ry[i] = i * 60;
@@ -357,7 +420,6 @@ static void prepare(gui_obj_t *obj)
     {
         //this->release_x++;
     }
-
 
     for (uint32_t i = 0; i < 6; i++)
     {
@@ -438,7 +500,6 @@ static void draw_cb(gui_obj_t *obj)
 
 }
 
-
 static void end(gui_obj_t *obj)
 {
 
@@ -447,11 +508,10 @@ static void destory(gui_obj_t *obj)
 {
 
 }
-
-void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, const char *name,
-                          void *addr,
-                          int16_t x,
-                          int16_t y, int16_t w, int16_t h)
+static void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, const char *name,
+                                 void *addr,
+                                 int16_t x,
+                                 int16_t y, int16_t w, int16_t h)
 {
 
     //for base class
@@ -478,8 +538,9 @@ void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, const char
     }
 
 }
-
-
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void *data,
                                           int16_t x,
                                           int16_t y, int16_t w, int16_t h)
@@ -503,4 +564,17 @@ gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void 
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
+
+
 
