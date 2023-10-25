@@ -2,12 +2,12 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file
-  * @brief
-  * @details
-  * @author
-  * @date
-  * @version
+  * @file gui_img.c
+  * @brief image widget
+  * @details image widget is used to show image on the screen
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/25
+  * @version 1.0
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
@@ -85,7 +85,6 @@
   * @{
   */
 
-
 static void img_prepare(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -123,6 +122,7 @@ static void img_prepare(gui_obj_t *obj)
         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
     }
 }
+
 static void img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -144,6 +144,7 @@ static void img_draw_cb(gui_obj_t *obj)
         GUI_ASSERT(NULL != NULL);
     }
 }
+
 static void img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -183,7 +184,6 @@ static void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char
 
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
-
 }
 /*============================================================================*
  *                           Public Functions
@@ -233,10 +233,6 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
     }
 }
 
-
-
-
-
 void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)
 {
     GUI_ASSERT(img != NULL);
@@ -263,12 +259,10 @@ void gui_img_translate(gui_img_t *img, float t_x, float t_y)
     img->t_y = t_y;
 }
 
-
 void gui_img_skew_x(gui_img_t *img, float degrees)
 {
 
 }
-
 
 void gui_img_skew_y(gui_img_t *img, float degrees)
 {
@@ -279,10 +273,6 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 {
     this->draw_img.opacity_value = opacity_value;
 }
-
-
-
-
 
 gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                    int16_t x,
@@ -314,9 +304,3 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-

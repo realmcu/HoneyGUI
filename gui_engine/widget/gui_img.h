@@ -2,12 +2,12 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file
-  * @brief
-  * @details
-  * @author
-  * @date
-  * @version
+  * @file gui_img.h
+  * @brief image widget header file
+  * @details image widget is used to show image on the screen
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/25
+  * @version 1.0
   ***************************************************************************************
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
@@ -44,8 +44,7 @@ extern "C" {
   * @{
   */
 
-/** @brief  ... */
-
+/** @brief  image widget structure */
 typedef struct gui_img
 {
     gui_obj_t base;
@@ -115,30 +114,6 @@ typedef struct gui_img
   */
 
 /**
-  * @brief  ...
-  * @note
-  * @param[in]  param1 ...
-  * @param[in]  param2 ...
-  * @return ...
-  * @retval ...
-  */
-gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
-                                   int16_t x, int16_t y, int16_t w, int16_t h);
-
-
-/**
- * @brief set x,y and file path
- *
- * @param img image widget
- * @param filename change filename if using filesystem picture
- * @param addr change picture address
- * @param x X-axis coordinate
- * @param y Y-axis coordinate
- */
-void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int16_t x,
-                           int16_t y);
-
-/**
  * @brief load the image to read it's width
  *
  * @param img the image widget pointer.
@@ -164,59 +139,92 @@ uint16_t gui_img_get_height(gui_img_t *img);
 void gui_img_set_location(gui_img_t *img, uint16_t x, uint16_t y);
 
 /**
- * @brief set the image's mode.
+ * @brief set the image's blend mode.
  *
  * @param img the image widget pointer.
- * @param mode the enumeration value of the mode is IMAGE_MODE.
- * @return void
+ * @param mode the enumeration value of the mode is BLEND_MODE_TYPE.
  *
  */
 void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode);
 
 /**
- * @brief
+ * @brief set x,y and file path
  *
- * @param img
- * @param degrees
- * @param c_x
- * @param c_y
+ * @param img image widget
+ * @param filename change filename if using filesystem picture
+ * @param addr change picture address
+ * @param x X-axis coordinate
+ * @param y Y-axis coordinate
+ */
+void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int16_t x,
+                           int16_t y);
+
+/**
+ * @brief Rotate the iamge around the center of the circle
+ *
+ * @param img the image widget pointer.
+ * @param degrees rotation angle
+ * @param c_x The X-axis coordinates of the center of the circle
+ * @param c_y The Y-axis coordinates of the center of the circle
  */
 void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y);
 
 /**
- * @brief
+ * @brief Change the size of the image
  *
- * @param img
- * @param scale_x
- * @param scale_y
- */
-void gui_img_scale_add(gui_img_t *img, float scale_x, float scale_y);
-
-/**
- * @brief
- *
- * @param img
- * @param scale_x
- * @param scale_y
+ * @param img the image widget pointer.
+ * @param scale_x Scale in the x direction
+ * @param scale_y Scale in the y direction
  */
 void gui_img_scale(gui_img_t *img, float scale_x, float scale_y);
 
 /**
- * @brief
+ * @brief move image
  *
- * @param img
- * @param t_x
- * @param t_y
+ * @param img the image widget pointer.
+ * @param t_x New X-axis coordinate
+ * @param t_y New Y-axis coordinate
  */
 void gui_img_translate(gui_img_t *img, float t_x, float t_y);
 
 /**
- * @brief
+ * @brief skew inage on X-axis
  *
- * @param this
- * @param opacity_value
+ * @param img the image widget pointer.
+ * @param degrees skew angle
+ */
+void gui_img_skew_x(gui_img_t *img, float degrees);
+
+/**
+ * @brief skew inage on Y-axis
+ *
+ * @param img the image widget pointer.
+ * @param degrees skew angle
+ */
+void gui_img_skew_x(gui_img_t *img, float degrees);
+
+/**
+ * @brief Add opacity value to the image
+ *
+ * @param this the image widget pointer.
+ * @param opacity_value The opacity value ranges from 0 to 255.
  */
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
+
+/**
+ * @brief creat an image widget
+ * @note creat an image widget and set attribute
+ * @param parent the father widget it nested in.
+ * @param name widget name
+ * @param addr bin file address
+ * @param x the X-axis coordinate of the widget.
+ * @param x the Y-axis coordinate of the widget.
+ * @param w the width of the widget.
+ * @param h the hight of the widget.
+ * @return return the widget object pointer.
+ */
+gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
+                                   int16_t x, int16_t y, int16_t w, int16_t h);
 
 
 /** End of WIDGET_Exported_Functions
