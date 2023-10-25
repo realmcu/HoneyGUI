@@ -61,17 +61,31 @@ static void button_prepare(gui_obj_t *obj)
     {
         if (tp->type != 271)
         {
-            //gui_log("type2:%d,%d\n", tp->type, tp->released);
+            gui_log("type2:%d,%d\n", tp->type, tp->released);
         }
         gui_button_t *b = (void *)obj;
         switch (tp->type)
         {
         case TOUCH_SHORT:
             {
+                gui_log("%s\n", "TOUCH_SHORT");
+                //
+//                bool callback = false;
+                for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                 {
                     if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
                         (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
                     {
+                        //callback = true;
+                    }
+                } ////gui_log("%d\n", __LINE__);
+                //if (callback)
+                {
+                    gui_log("%d\n", __LINE__);
+                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
+                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                    {
+                        gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                     }
                 }
@@ -112,7 +126,8 @@ static void button_prepare(gui_obj_t *obj)
                         gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
 
                     }
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                    gui_log("%d\n", __LINE__);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
                     b->long_flag = false;
                     b->press_flag = true;
                 }
@@ -126,7 +141,9 @@ static void button_prepare(gui_obj_t *obj)
                     b->release_flag = false;
                     if (b->off_pic_addr && b->style == 0)
                     {
+
                         gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
+
                     }
                     {
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
@@ -283,10 +300,10 @@ gui_button_t *gui_button_create(
                                   gui_get_file_address("app/system/resource/font/gbk_32_32_dot.bin"),
                                   gui_get_file_address("app/system/resource/font/gbk_unicode_table.bin"));
 #endif
-        button->text = gui_text_create(button, "icon_text", 0, button->img->draw_img.img_h + 40, w + 10, h);
-        gui_text_set(button->text, text, "rtk_font_mem", BUTTON_COLOR, strlen(text),
-                     RTK_GUI_DEFAULT_FONT_SIZE);
-        gui_text_mode_set(button->text, LEFT);
+//        button->text = gui_text_create(button, "icon_text", 0, button->img->draw_img.img_h + 40, w + 10, h);
+//        gui_text_set(button->text, text, "rtk_font_mem", BUTTON_COLOR, strlen(text),
+//                     RTK_GUI_DEFAULT_FONT_SIZE);
+//        gui_text_mode_set(button->text, LEFT);
     }
 
     GET_BASE(button)->create_done = true;
