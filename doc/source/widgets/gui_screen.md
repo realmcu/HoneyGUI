@@ -63,3 +63,9 @@ typedef struct _gui_obj_t
 } gui_obj_t;
 ```
 
+```eval_rst
+
+
+.. doxygenfile:: gui_obj.h
+
+```

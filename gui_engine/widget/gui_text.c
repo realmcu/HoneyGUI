@@ -23,60 +23,60 @@
 #include "gui_obj.h"
 #include <draw_font.h>
 
-/** @defgroup SUBMOUDLE SUBMOUDLE
+/** @defgroup WIDGET WIDGET
   * @{
   */
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Types SUBMOUDLE Exported Types
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @{
   */
 
 
-/** End of SUBMOUDLE_Exported_Types
+/** End of WIDGET_Exported_Types
   * @}
   */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Constants SUBMOUDLE Exported Constants
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
   * @{
   */
 
 
-/** End of SUBMOUDLE_Exported_Constants
+/** End of WIDGET_Exported_Constants
   * @}
   */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @{
   */
 
 
-/** End of SUBMOUDLE_Exported_Macros
+/** End of WIDGET_Exported_Macros
   * @}
   */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
 
 
-/** End of SUBMOUDLE_Exported_Variables
+/** End of WIDGET_Exported_Variables
   * @}
   */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Functions SUBMOUDLE Exported Functions
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
 
@@ -249,10 +249,10 @@ gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y
     return text;
 }
 
-/** End of SUBMOUDLE_Exported_Functions
+/** End of WIDGET_Exported_Functions
   * @}
   */
 
-/** End of SUBMOUDLE
+/** End of WIDGET
   * @}
   */

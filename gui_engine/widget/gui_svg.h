@@ -17,8 +17,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_SVG_H__
-#define __GUI_SVG_H__
+#ifndef __GUI_WIDGET_H__
+#define __GUI_WIDGET_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,7 +37,7 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup SVG_Exported_Types SVG Exported Types
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @brief
   * @{
   */
@@ -60,27 +60,27 @@ typedef struct gui_svg
 } gui_svg_t;
 
 
-/** End of SVG_Exported_Types
+/** End of WIDGET_Exported_Types
   * @}
   */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup SVG_Exported_Constants SVG Exported Constants
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
   * @brief
   * @{
   */
 
 
-/** End of SVG_Exported_Constants
+/** End of WIDGET_Exported_Constants
   * @}
   */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup SVG_Exported_Macros SVG Exported Macros
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @brief
   * @{
   */
@@ -88,27 +88,27 @@ typedef struct gui_svg
 
 
 
-/** End of SVG_Exported_Macros
+/** End of WIDGET_Exported_Macros
   * @}
   */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup SVG_Exported_Variables SVG Exported Variables
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @brief
   * @{
   */
 
 
-/** End of SVG_Exported_Variables
+/** End of WIDGET_Exported_Variables
   * @}
   */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup SVG_Exported_Functions SVG Exported Functions
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -178,11 +178,11 @@ void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y);
 void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value);
 
 
-/** End of SVG_Exported_Functions
+/** End of WIDGET_Exported_Functions
   * @}
   */
 
-/** End of SVG
+/** End of WIDGET
   * @}
   */
 

@@ -31,56 +31,56 @@
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup SVG_Exported_Types SVG Exported Types
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @{
   */
 
 
 
-/** End of SVG_Exported_Types
+/** End of WIDGET_Exported_Types
   * @}
   */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup SVG_Exported_Constants SVG Exported Constants
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
   * @{
   */
 
 
-/** End of SVG_Exported_Constants
+/** End of WIDGET_Exported_Constants
   * @}
   */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup SVG_Exported_Macros SVG Exported Macros
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @{
   */
 
 
 
-/** End of SVG_Exported_Macros
+/** End of WIDGET_Exported_Macros
   * @}
   */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup SVG_Exported_Variables SVG Exported Variables
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
 
 
-/** End of SVG_Exported_Variables
+/** End of WIDGET_Exported_Variables
   * @}
   */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup SVG_Exported_Functions SVG Exported Functions
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
 
@@ -420,11 +420,11 @@ gui_svg_t *gui_svg_create_from_file(void *parent,  const char *name, const char 
     return this;
 }
 
-/** End of SVG_Exported_Functions
+/** End of WIDGET_Exported_Functions
   * @}
   */
 
-/** End of SVG
+/** End of WIDGET
   * @}
   */
 

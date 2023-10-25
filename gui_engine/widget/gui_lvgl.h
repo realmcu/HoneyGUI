@@ -29,7 +29,7 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 
-/** @defgroup LVGL LVGL
+/** @defgroup WIDGET WIDGET
   * @brief
   * @{
   */
@@ -37,7 +37,7 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup LVGL_Exported_Types LVGL Exported Types
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @brief
   * @{
   */
@@ -50,27 +50,27 @@ typedef struct gui_lvgl_template
 } gui_lvgl_t;
 
 
-/** End of LVGL_Exported_Types
+/** End of WIDGET_Exported_Types
   * @}
   */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup LVGL_Exported_Constants LVGL Exported Constants
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
   * @brief
   * @{
   */
 
 
-/** End of LVGL_Exported_Constants
+/** End of WIDGET_Exported_Constants
   * @}
   */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup LVGL_Exported_Macros LVGL Exported Macros
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @brief
   * @{
   */
@@ -79,27 +79,27 @@ typedef struct gui_lvgl_template
 
 
 
-/** End of LVGL_Exported_Macros
+/** End of WIDGET_Exported_Macros
   * @}
   */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup LVGL_Exported_Variables LVGL Exported Variables
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @brief
   * @{
   */
 
 
-/** End of LVGL_Exported_Variables
+/** End of WIDGET_Exported_Variables
   * @}
   */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup LVGL_Exported_Functions LVGL Exported Functions
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -121,11 +121,11 @@ gui_lvgl_t *gui_lvgl_create(void *parent,  const char *name, void *addr,
                             int16_t x, int16_t y, int16_t w, int16_t h);
 
 
-/** End of LVGL_Exported_Functions
+/** End of WIDGET_Exported_Functions
   * @}
   */
 
-/** End of LVGL
+/** End of WIDGET
   * @}
   */
 

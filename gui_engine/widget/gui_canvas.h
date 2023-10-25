@@ -38,7 +38,7 @@ extern "C" {
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Types CANVAS Exported Types
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @brief
   * @{
   */
@@ -52,27 +52,27 @@ typedef struct _gui_canvas
 } gui_canvas_t;
 
 
-/** End of CANVAS_Exported_Types
+/** End of WIDGET_Exported_Types
   * @}
   */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Constants CANVAS Exported Constants
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
   * @brief
   * @{
   */
 
 
-/** End of CANVAS_Exported_Constants
+/** End of WIDGET_Exported_Constants
   * @}
   */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Macros CANVAS Exported Macros
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @brief
   * @{
   */
@@ -81,27 +81,27 @@ typedef struct _gui_canvas
 
 
 
-/** End of CANVAS_Exported_Macros
+/** End of WIDGET_Exported_Macros
   * @}
   */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Variables CANVAS Exported Variables
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @brief
   * @{
   */
 
 
-/** End of CANVAS_Exported_Variables
+/** End of WIDGET_Exported_Variables
   * @}
   */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Functions CANVAS Exported Functions
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -131,11 +131,11 @@ void gui_canvas_set_canvas_cb(gui_canvas_t *this,
                               void (*cb)(gui_canvas_t *this));
 
 
-/** End of CANVAS_Exported_Functions
+/** End of WIDGET_Exported_Functions
   * @}
   */
 
-/** End of CANVAS
+/** End of WIDGET
   * @}
   */
 

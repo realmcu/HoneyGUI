@@ -43,12 +43,6 @@ extern "C" {
   * @{
   */
 
-/** @brief  ... */
-typedef enum
-{
-    EXAMPLE_SUCCESS,                //!< ...
-    EXAMPLE_INVALID_STATE,          //!< ...
-} T_EXAMPLE;
 
 
 /** End of WIDGET_Exported_Types

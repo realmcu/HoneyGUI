@@ -31,56 +31,56 @@
 /*============================================================================*
  *                           Types
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Types CANVAS Exported Types
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @{
   */
 
 
 
-/** End of CANVAS_Exported_Types
+/** End of WIDGET_Exported_Types
   * @}
   */
 
 /*============================================================================*
  *                           Constants
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Constants CANVAS Exported Constants
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
   * @{
   */
 
 
-/** End of CANVAS_Exported_Constants
+/** End of WIDGET_Exported_Constants
   * @}
   */
 
 /*============================================================================*
  *                            Macros
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Macros CANVAS Exported Macros
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @{
   */
 
 
 
-/** End of CANVAS_Exported_Macros
+/** End of WIDGET_Exported_Macros
   * @}
   */
 /*============================================================================*
  *                            Variables
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Variables CANVAS Exported Variables
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
 
 
-/** End of CANVAS_Exported_Variables
+/** End of WIDGET_Exported_Variables
   * @}
   */
 
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-/** @defgroup CANVAS_Exported_Functions CANVAS Exported Functions
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
 
@@ -202,11 +202,11 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
 }
 
 
-/** End of CANVAS_Exported_Functions
+/** End of WIDGET_Exported_Functions
   * @}
   */
 
-/** End of CANVAS
+/** End of WIDGET
   * @}
   */
 

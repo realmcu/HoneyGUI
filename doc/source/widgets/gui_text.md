@@ -350,3 +350,9 @@ void gui_text_type_set(gui_text_t *this, void *type);
  */
 void gui_text_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p);
 ```
+```eval_rst
+
+
+.. doxygenfile:: gui_text.h
+
+```

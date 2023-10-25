@@ -151,9 +151,14 @@ static void gui_tree_child_show(gui_obj_t *obj, bool enable)
 }
 
 /*============================================================================*
- *                           Public Functions
+ *                           Private Functions
  *============================================================================*/
-
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+/*============================================================================*
+*                           Public Functions
+*============================================================================*/
 void gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter,
                           void *user_data)
 {

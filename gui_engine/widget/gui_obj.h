@@ -124,10 +124,7 @@ extern "C" {
 void gui_obj_ctor(struct _gui_obj_t *this, struct _gui_obj_t *parent, const char *filename,
                   int16_t x, int16_t y, int16_t w, int16_t h);
 
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
+
 /**
   * @param  this
   * @return void
