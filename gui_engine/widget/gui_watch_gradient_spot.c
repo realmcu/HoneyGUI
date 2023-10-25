@@ -1,17 +1,90 @@
-/*
- * File      : gui_watch_gradient_spot.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_watch_gradient_spot.c
+  * @brief  This file is part of GUI Engine
+  * @details create watch gradient spot
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/25
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <gui_matrix.h>
 #include <gui_obj.h>
-//#include <tp_algo.h>
-//#include <gui_kb.h>
 #include "gui_watch_gradient_spot.h"
 #include <math.h>
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+/** @brief  ... */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
 #define WATCH_GRADIENT_SPOT_BASE 454.0f
 #define WATCH_GRADIENT_SPOT_SCLAE     ((float)(GET_BASE(this)->w)/WATCH_GRADIENT_SPOT_BASE)
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
 static void watch_gradient_spot_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
@@ -314,13 +387,16 @@ static void watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this, gui_obj_t 
 
 }
 
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
 void gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c_x, float c_y)
 {
     this->c_x = c_x;
     this->c_y = c_y;
 }
-
-
 
 gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const char *name,
                                                           int16_t x, int16_t y, int16_t w, int16_t h)
@@ -346,6 +422,17 @@ gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const c
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
 
 
 

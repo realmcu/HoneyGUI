@@ -1,16 +1,91 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_watchface_gradient.c
+  * @brief  This file is part of GUI Engine
+  * @details create watchface gradien widget
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/10/24
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 /*nt
  * File      : gui_watchface_gradient.c
- * This file is part of GUI Engine
+ *
  */
 #include <gui_obj.h>
 #include "gui_watchface_gradient.h"
 #include "math.h"
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+/** @brief  ... */
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
 
 #define WATCHFACE_GRADIENT_RING1 296.52f
 #define WATCHFACE_GRADIENT_RING2 192.17f
 #define WATCHFACE_GRADIENT_RING3 87.83f
 #define WATCHFACE_GRADIENT_BASE 368.0f
 #define WATCHFACE_GRADIENT_SCLAE     (GET_BASE(canvas)->w/WATCHFACE_GRADIENT_BASE)
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
 static void canvas_design(gui_canvas_t *canvas)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -498,6 +573,9 @@ static void watchface_gradient_ctor(gui_watchface_gradient_t *this, gui_obj_t *p
     gui_canvas_set_canvas_cb((gui_canvas_t *)this, canvas_design);
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 
 gui_watchface_gradient_t *gui_watchface_gradient_create(void *parent,  const char *name,
@@ -525,5 +603,10 @@ gui_watchface_gradient_t *gui_watchface_gradient_create(void *parent,  const cha
     return this;
 }
 
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
 
-
+/** End of WIDGET
+  * @}
+  */
