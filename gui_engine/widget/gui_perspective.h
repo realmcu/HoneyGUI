@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_perspective.c
+  * @file gui_perspective.h
   * @brief perspective widget
   * @details create 3D widget
   * @author howie_wang@realsil.com.cn
@@ -121,14 +121,15 @@ typedef struct gui_perspective
   */
 
 /**
-  * @param parent parent widget
-  * @param name  widget name
-  * @param addr the pictures frame
-  * @param x  left
-  * @param y top
-  * @param w  width
-  * @param h hight
-  * @return gui_cube_t* widget pointer
+  * @brief  create 3D perspective
+  * @param  parent parent widget
+  * @param  name  widget name
+  * @param  addr the pictures frame
+  * @param  x  left
+  * @param  y top
+  * @param  w  width
+  * @param  h hight
+  * @return gui_perspective_t* widget pointer
   *
   *
   *
