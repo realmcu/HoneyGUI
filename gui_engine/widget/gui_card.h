@@ -110,6 +110,15 @@ typedef struct gui_card
   */
 
 /**
+ * @brief set card style
+ *
+ * @param this the widget object pointer.
+ * @param style
+ */
+void gui_card_set_style(gui_card_t *this, SLIDE_STYLE style);
+
+
+/**
  * @brief create a card widget
  * @param parent the father widget it nested in.
  * @param filename this tab widget's name.
@@ -124,13 +133,9 @@ typedef struct gui_card
  */
 gui_card_t *gui_card_create(void *parent, const char *filename, int16_t x, int16_t y,
                             int16_t w, int16_t h, int16_t idx, int16_t idy);
-/**
- * @brief set card style
- *
- * @param this the widget object pointer.
- * @param style
- */
-void gui_card_set_style(gui_card_t *this, SLIDE_STYLE style);
+
+
+
 
 
 

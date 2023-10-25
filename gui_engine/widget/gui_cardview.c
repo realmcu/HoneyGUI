@@ -1,20 +1,90 @@
-/*
- * File      : gui_cardview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_cardview.c
+  * @brief 3d container
+  * @details slide to swap
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/25
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <gui_matrix.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-//#include <gui_kb.h>
 #include "gui_cardview.h"
 
 
-void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this))
-{
-    this->status_cb = cb;
-}
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
+
 static void cardview_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
@@ -97,6 +167,17 @@ static void cardview_destory(gui_obj_t *obj)
 
 }
 
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+
+void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this))
+{
+    this->status_cb = cb;
+}
+
 void gui_cardview_mute(gui_cardview_t *this)
 {
 
@@ -150,6 +231,15 @@ gui_cardview_t *gui_cardview_create(void *parent,  const char *name,
     GET_BASE(this)->create_done = true;
     return this;
 }
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
 
 
 
