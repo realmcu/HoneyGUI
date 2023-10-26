@@ -9,7 +9,7 @@
 // <<< Use Configuration Wizard in Context Menu >>>\n
 /* Automatically generated file; DO NOT EDIT. */
 
-#define MODULE_USING_PORT_FOR_LVGL
+#define MODULE_USING_LVGL_GUI
 #define PKG_LVGL_USING_EXAMPLES
 
 

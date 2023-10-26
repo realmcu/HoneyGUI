@@ -46,6 +46,7 @@ extern "C" {
 typedef struct gui_lvgl_template
 {
     gui_obj_t base;
+    void (*lvgl_cb)(struct _gui_lvgl *this);
     void *user_data;
 } gui_lvgl_t;
 
@@ -110,16 +111,16 @@ typedef struct gui_lvgl_template
  *
  * @param parent
  * @param name
- * @param addr
+ * @param design
  * @param x
  * @param y
  * @param w
  * @param h
  * @return gui_lvgl_t*
  */
-gui_lvgl_t *gui_lvgl_create(void *parent,  const char *name, void *addr,
-                            int16_t x, int16_t y, int16_t w, int16_t h);
-
+gui_lvgl_t *gui_lvgl_create(void *parent,  const char *name, void (*design)(gui_lvgl_t *this),
+                            int16_t x,
+                            int16_t y, int16_t w, int16_t h);
 
 /** End of WIDGET_Exported_Functions
   * @}

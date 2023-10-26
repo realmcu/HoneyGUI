@@ -22,6 +22,8 @@
 #include <gui_obj.h>
 #include "gui_lvgl.h"
 #include <tp_algo.h>
+#include "lvgl.h"
+#include "lv_port_disp.h"
 
 
 
@@ -106,6 +108,7 @@ static void draw(gui_lvgl_t *this)
     GUI_UNUSED(root);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
+    lv_task_handler();                 //! run lv task at the max speed
 }
 static void end(gui_lvgl_t *this)
 {
@@ -132,19 +135,13 @@ static void destory(gui_lvgl_t *this)
 
 
 
-static void LVGL_ctor(gui_lvgl_t *this, gui_obj_t *parent, const char *name,
+static void lvgl_ctor(gui_lvgl_t *this, gui_obj_t *parent, const char *name,
                       void *data,
                       int16_t x,
                       int16_t y, int16_t w, int16_t h)
 {
     //for root class
-    gui_obj_t *root = (gui_obj_t *)this;
-    gui_obj_ctor(root, parent, name, x, y, w, h);
 
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
-    root->obj_draw = (void (*)(struct _gui_obj_t *))draw;
-    root->obj_end = (void (*)(struct _gui_obj_t *))end;
-    root->obj_destory = (void (*)(struct _gui_obj_t *))destory;
 
     //for self
 
@@ -166,7 +163,7 @@ static void LVGL_ctor(gui_lvgl_t *this, gui_obj_t *parent, const char *name,
  * @param h
  * @return gui_lvgl_t*
  */
-gui_lvgl_t *gui_lvgl_create(void *parent,  const char *name, void *data,
+gui_lvgl_t *gui_lvgl_create(void *parent,  const char *name, void (*design)(gui_lvgl_t *this),
                             int16_t x,
                             int16_t y, int16_t w, int16_t h)
 {
@@ -177,9 +174,22 @@ gui_lvgl_t *gui_lvgl_create(void *parent,  const char *name, void *data,
     }
     gui_lvgl_t *this = gui_malloc(sizeof(gui_lvgl_t));
     GUI_ASSERT(this != NULL);
+    lv_init();
+    lv_port_disp_init();
+    //lv_port_indev_init();
     memset(this, 0x00, sizeof(gui_lvgl_t));
 
-    LVGL_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
+    gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
+    root->obj_draw = (void (*)(struct _gui_obj_t *))draw;
+    root->obj_end = (void (*)(struct _gui_obj_t *))end;
+    root->obj_destory = (void (*)(struct _gui_obj_t *))destory;
+
+    this->lvgl_cb = design;
+
+    this->lvgl_cb(this);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)

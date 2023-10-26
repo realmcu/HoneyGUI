@@ -17,7 +17,7 @@ Software architecture description
 3.  Add a environment variable:/mingw64/bin
 ### Install scons
 1.  ```pip install scons==4.4.0```
-## Install VSCODE
+### Install VSCODE
 1.  [```Install VSCODE```](https://code.visualstudio.com/)
 2.  [```Install C/C++```](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 ### Open project

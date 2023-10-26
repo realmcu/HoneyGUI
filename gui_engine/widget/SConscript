@@ -8,9 +8,18 @@ src = Split("""
 
 src = Glob('*.c')
 
+if not GetDepend(['MODULE_USING_LVGL_GUI']):
+    SrcRemove(src,'gui_lvgl.c')
+
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+objs = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
 
-Return('group')
+list = os.listdir(cwd)
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+Return('objs')
