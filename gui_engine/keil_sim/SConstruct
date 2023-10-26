@@ -3,7 +3,7 @@ import sys
 import menu_config
 from SCons.Script import *
 
-TOOL_ROOT="../rtk_gui_sim/scons-tool"
+TOOL_ROOT="../../simulator/scons-tool"
 
 sys.path = sys.path + [os.path.join(TOOL_ROOT, '')]
 try:

@@ -65,6 +65,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_data *raw_data)
         {
             long_button_flag = false;
             tp.pressed = true;
+            tp.pressing = true;
             TP_LOG("=====START DOWN====== tick = %d\n", raw_data->timestamp_ms);
         }
     }
@@ -80,6 +81,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_data *raw_data)
             tp_local_event = GUI_TOUCH_EVENT_UP;
             down_cnt = 0;
             tp.released = true;
+            tp.pressing = false;
             TP_LOG("=====END UP====== tick = %d\n", raw_data->timestamp_ms);
         }
     }

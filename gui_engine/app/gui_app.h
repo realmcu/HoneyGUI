@@ -55,6 +55,7 @@ struct gui_app
     void (* ctor)(void *this);      //!< constructor
     void (* dtor)(void *this);      //!< destructor
     void (* ui_design)(gui_app_t *); //!< ui create entry
+    bool lvgl;
 
 };
 /** End of APP_Exported_Types

@@ -9,6 +9,7 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
+#include <gui_kb.h>
 #include <string.h>
 #include <gui_app.h>
 #include "acc_engine.h"
@@ -78,15 +79,18 @@ static void rtgui_server_entry(void *parameter)
 
         rtgui_msg_t msg;
         (void)msg;
-#if 0
-        if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0))
-        {
-        }
-        else
-        {
-        }
-#endif
 
+
+        struct gui_touch_data *raw = touchpad_get_data();
+        tp_algo_process(raw);
+
+        gui_kb_port_data_t *kb_raw = kb_get_data();
+        kb_algo_process(kb_raw);
+
+        if (app->lvgl == true)
+        {
+            continue;
+        }
 
         gui_fb_disp(screen);
 #ifdef _WIN32

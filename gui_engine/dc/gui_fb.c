@@ -159,12 +159,6 @@ void gui_fb_disp(gui_obj_t *root)
         return;
     }
 
-    struct gui_touch_data *raw = touchpad_get_data();
-    tp_algo_process(raw);
-
-    gui_kb_port_data_t *kb_raw = kb_get_data();
-    kb_algo_process(kb_raw);
-
     obj_draw_prepare(root);
     uint32_t active_line = dc->driver_ic_active_width;
     uint32_t hfp_line = dc->driver_ic_hfp;

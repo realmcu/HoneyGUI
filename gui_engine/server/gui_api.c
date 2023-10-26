@@ -176,6 +176,10 @@ bool gui_thread_mdelay(uint32_t ms)
     }
     return false;
 }
+void gui_set_tick_hook(void (*hook)(void))
+{
+    os_api->gui_tick_hook = hook;
+}
 
 void *gui_mq_create(const char *name, uint32_t msg_size, uint32_t max_msgs)
 {

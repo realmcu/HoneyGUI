@@ -105,6 +105,7 @@ typedef struct touch_info
     uint32_t type;
     uint8_t pressed : 1;
     uint8_t released : 1;
+    uint8_t pressing : 1;
 } touch_info_t;
 
 typedef struct gui_kb_port_data
@@ -260,6 +261,7 @@ struct gui_os_api
     void *mem_addr;
     uint32_t mem_size;
     log_func_t log;
+    void (*gui_tick_hook)(void);
 };
 
 typedef struct rtgui_matrix
