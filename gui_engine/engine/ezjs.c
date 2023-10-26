@@ -1534,7 +1534,7 @@ DECLARE_HANDLER(sw_open)
     sw->turn_on(sw);
     return jerry_create_undefined();
 }
-#ifdef RTL8762G
+#ifdef RTL87x2G
 //#include "rtl_gpio.h"
 //#include "rtl_rcc.h"
 //#include "drv_gpio.h"
@@ -1546,7 +1546,7 @@ DECLARE_HANDLER(sw_open)
 //#include "trace.h"
 //#include "utils.h"
 //#endif
-//#ifdef RTL8762G
+//#ifdef RTL87x2G
 //#include "app_msg.h"
 //T_IO_MSG led_msg = {.type = IO_MSG_TYPE_LED_ON};
 //T_IO_MSG led_off_msg = {.type = IO_MSG_TYPE_LED_OFF};
@@ -1568,7 +1568,7 @@ DECLARE_HANDLER(writeSync)
         char *direction = js_value_to_string(v2);
         jerry_release_value(v2);
         int mode = 0;
-#ifdef RTL8762G
+#ifdef RTL87x2G
 
         //if (!strcmp(direction, "out"))
         //{
@@ -1627,7 +1627,7 @@ DECLARE_HANDLER(Gpio)
     js_set_property(this_value, "gpio", pin_js);
     js_set_string_property(this_value, "direction", mode_string);
     /*{
-    #ifdef RTL8762G
+    #ifdef RTL87x2G
     #include "drv_gpio.h"
         if (mode ==1)
         {
@@ -1792,7 +1792,7 @@ void gui_js_init()
 static void *context_alloc(size_t size, void *cb_data_p)
 {
 #ifdef OS_FREERTOS
-#ifdef RTL8762G
+#ifdef RTL87x2G
 #include "mem_config.h"
     return (void *)(SPIC1_ADDR + 0x200000);
     //return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);//

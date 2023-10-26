@@ -23,7 +23,7 @@ extern void enter_app_set_start(void *obj, gui_event_t e);
 extern void enter_homelist(void *obj, gui_event_t e);
 
 void switch_dynamic_island(void *obj, gui_event_t e);
-#ifdef RTL8762G
+#ifdef RTL87x2G
 void *home[2] =
 {
     ZIP_HOME_BACKGROUND_BIN,
@@ -35,7 +35,7 @@ void *home[2] =
     HOME_BACKGROUND_BIN,
     HOME_WATCH1_BIN,
 };
-#endif // RTL8762G
+#endif // RTL87x2G
 
 void turn(void)
 {

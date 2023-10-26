@@ -13,7 +13,7 @@ extern void enter_tablist(void *obj, gui_event_t e);
 uint8_t APP_AMOUNT = 9;
 
 
-#ifdef RTL8762G
+#ifdef RTL87x2G
 void *app_image_list[9] =
 {
     ZIP_APP_SPORT_BIN,
@@ -39,7 +39,7 @@ void *app_image_list[9] =
     APP_BREATH_BIN,
     APP_SLEEP_BIN,
 };
-#endif // RTL8762G
+#endif // RTL87x2G
 void design_tab_sport(void *parent)
 {
     gui_magic_img_t *home_bg = gui_magic_img_create_from_mem(parent, "design_tab_sport",

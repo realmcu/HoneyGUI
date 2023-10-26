@@ -7,7 +7,7 @@
 #include "gui_tab.h"
 #include "gui_canvas.h"
 
-#ifdef RTL8762G
+#ifdef RTL87x2G
 void *card[7] =
 {
     ZIP_CARD_TIME_BIN,
@@ -110,7 +110,7 @@ static void cv_status_cb(gui_cardview_t *this)
 }
 void  page_down_message_design(void *parent)
 {
-#ifdef RTL8762G
+#ifdef RTL87x2G
     gui_magic_img_t *bg = gui_magic_img_create_from_mem(parent, "bg_up", ZIP_BLACK_BACKGROUND_BIN, 0, 0,
                                                         0, 0);
 #else

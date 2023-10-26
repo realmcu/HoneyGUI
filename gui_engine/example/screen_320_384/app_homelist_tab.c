@@ -18,10 +18,10 @@ uint8_t HOME_ACOUNT = 8;
 bool move_flag = true;
 void move_homelist(void)
 {
-#ifndef RTL8762G
+#ifndef RTL87x2G
     gui_thread_mdelay(1);
     gui_log("homelist_tab->base.x is %d \n", homelist_tab->base.x);
-#endif // !RTL8762G
+#endif // !RTL87x2G
     if (move_flag)
     {
         homelist_tab->base.x --;
