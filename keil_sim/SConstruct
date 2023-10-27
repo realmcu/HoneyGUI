@@ -3,7 +3,7 @@ import sys
 import menu_config
 from SCons.Script import *
 
-TOOL_ROOT="../../simulator/scons-tool"
+TOOL_ROOT="../tool/scons-tool"
 
 sys.path = sys.path + [os.path.join(TOOL_ROOT, '')]
 try:
@@ -24,21 +24,23 @@ env = Environment(tools = ['mingw'],
 
 
 
-WEARABLE_ROOT = os.path.abspath('./../')
+RTK_GUI_ENGINE = os.path.abspath('./../gui_engine/')
+LVGL_ROOT = os.path.abspath('./../lvgl/')
 
 Export('TOOL_ROOT')
-Export('WEARABLE_ROOT')
+Export('RTK_GUI_ENGINE')
 
 
 print('TOOL ROOT = ' + TOOL_ROOT)
-print('RTK WEARABLE ROOT = ' + WEARABLE_ROOT)
+print('RTK WEARABLE ROOT = ' + RTK_GUI_ENGINE)
 
 # prepare building environment
 objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
 
 
 # include app
-objs.extend(SConscript(os.path.join(WEARABLE_ROOT, 'SConscript')))
+objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
+objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
 
 # bsp_vdir = 'build'
 

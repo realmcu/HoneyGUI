@@ -1,4 +1,6 @@
 #include <gui_app.h>
+#include "lv_port_disp.h"
+#include "lv_port_indev.h"
 #include "lvgl.h"
 
 static void app_lvgl_ui_design(gui_app_t *app);
@@ -53,7 +55,7 @@ static void app_lvgl_ui_design(gui_app_t *app)
     // lv_demo_benchmark();
 #endif
 #if LV_USE_DEMO_WIDGETS
-    lv_demo_widgets();
+    // lv_demo_widgets();
 #endif
     //lv_example_arc_1();
     //lv_example_btn_1();
