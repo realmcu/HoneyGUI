@@ -5,7 +5,7 @@
             "name": "g++.exe build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\simulator\\gui.exe",
+            "program": "${workspaceFolder}\\win32_sim\\gui.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

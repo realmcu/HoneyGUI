@@ -2,7 +2,7 @@
     "guiEngine-ramless": {
         "mandatory": [],
         "temporary": [
-            ["gui_engine/keil_sim/gui_engine.uvprojx", "", "sdk"]
+            ["keil_sim/gui_engine.uvprojx", "", "sdk"]
         ]
     }
 }
