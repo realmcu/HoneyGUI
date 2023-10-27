@@ -1,6 +1,8 @@
 SaaA
 *************
 
+Script as a APP
+
 .. toctree::
     :maxdepth: 2
 

@@ -1,5 +1,5 @@
 # Porting
-    The porting files are in the gui_port folder. 
+The porting files are in the gui_port folder. 
     There are four files that need to be modified, corresponding to the input device, display device, OS, and file system. 
     At present, it has been transplanted in FreeRtos, rt-thread, and Windows, you can refer to it.
 ## the input device
