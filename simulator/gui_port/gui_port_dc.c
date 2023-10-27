@@ -154,7 +154,7 @@ void *rtk_gui_sdl(void *arg)
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s\n", SDL_GetError());
         return NULL;
     }
-    window = SDL_CreateWindow("Bee GUI Simulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    window = SDL_CreateWindow("RTKIOT GUI Simulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               DRV_LCD_WIDTH,
                               DRV_LCD_HIGHT, 0);
     renderer = SDL_CreateRenderer(window, -1, 0);

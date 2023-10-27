@@ -3,9 +3,8 @@
 
 
 ```eval_rst
-
-
-.. doxygenfile:: gui_card.h
+.. doxygenfunction:: gui_card_create
+.. doxygenfunction:: gui_card_set_style
 
 ```
 

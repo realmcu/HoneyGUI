@@ -1,13 +1,13 @@
-# **Welcome to the GUI wiki!!** 
+# **Welcome to the RTKIOT GUI wiki!!** 
 ## Description
 
-- There are two ways to develop an application, using script(Front-end app) and using C api(GUI-APP).
-- The front-end app is developed with JavaScript and XML. Meanwhile you can use PC designer to do low-code development.
+- There are two ways to develop an application, SaaA(Script as a APP) or GUI-APP(Native C api).
+- SaaA(Script as a APP) consists of JavaScript and XML. Recommended ```RVisualDesigner``` as a  PC designer to do low-code development.
 - GUI-APP development using C/C++ language, directly call the API of GUI engine.
-- The GUI has good portability, which can run on a variety of chips and OS. The GUI simulator on Windows is provided.
+- The GUI has good portability, which can run on a variety of chips and OS.  PC Windows version is provided.
 ## Software Architecture
-Software architecture description
-![png](https://foruda.gitee.com/images/1669961585859428914/84bdc0a9_10088396.png "111111.PNG")
+
+![sa](https://foruda.gitee.com/images/1698215110757026070/a3648515_10088396.png "sa")
 
 ## Installation
 
@@ -17,13 +17,24 @@ Software architecture description
 3.  Add a environment variable:/mingw64/bin
 ### Install scons
 1.  ```pip install scons==4.4.0```
-### Install VSCODE
+
+### Startup by CMD 
+```shell
+> cd gui_engine\rtk_gui_sim
+> scons
+> cd ..
+> .\rtk_gui_sim\gui.exe
+```
+
+### Startup by GUI
+
+
+#### Install VSCODE
 1.  [```Install VSCODE```](https://code.visualstudio.com/)
 2.  [```Install C/C++```](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
-### Open project
-1.  Click ```gui_engine.code-workspace``` 
-### Run project
+#### Open project
+1.  Click ```gui_engine.code-workspace``` file
+#### Run project
    ![Image description](https://foruda.gitee.com/images/1673343789273016802/9126e625_10088396.png "png")
-### Will see the watchface
-  ![Image description](https://foruda.gitee.com/images/1673343970935395629/3c017ee5_10088396.png "watchface.PNG")
-
+#### Display the watchface. You can swipe and long press to interact
+![Image description](https://foruda.gitee.com/images/1698286583110259632/b48ad0af_10088396.png "watchface.PNG")
