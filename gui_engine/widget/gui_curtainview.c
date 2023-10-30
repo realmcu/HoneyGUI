@@ -103,8 +103,8 @@ void curtainview_prepare(gui_obj_t *obj)
     }
     if (obj->parent->parent->type == TABVIEW)
     {
-        if (!(((gui_tabview_t *)(obj->parent->parent))->cur_id.x == 0 &&
-              ((gui_tabview_t *)(obj->parent->parent))->cur_id.y == 0))
+        if (!(((gui_tabview_t *)(obj->parent->parent))->cur_id.x == ((gui_tab_t *)(obj->parent))->id.x &&
+              ((gui_tabview_t *)(obj->parent->parent))->cur_id.y == ((gui_tab_t *)(obj->parent))->id.y))
         {
             ext->cur_curtain = CURTAIN_MIDDLE;
             obj->cover = false;
