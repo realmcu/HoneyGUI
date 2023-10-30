@@ -41,7 +41,7 @@ if GetDepend('PKG_LVGL_USING_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-if GetDepend('PKG_LVGL_USING_EXAMPLES'):
+if GetDepend('PKG_LVGL_USING_RLOTTIE'):
     lvgl_src_cwd = lvgl_cwd + 'rlottie/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):
