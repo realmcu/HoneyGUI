@@ -1,5 +1,6 @@
 from building import *
 import os
+import menu_config
 
 src = []
 inc = []
@@ -9,7 +10,7 @@ cwd = GetCurrentDir() # get current dir path
 
 port_src = Glob('*.c')
 port_inc = [cwd]
-group = group + DefineGroup('LVGL-port', port_src, depend = ['MODULE_USING_LVGL_GUI'], CPPPATH = port_inc)
+group = group + DefineGroup('LVGL-port', port_src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = port_inc)
 
 # check if .h or .hpp files exsit
 def check_h_hpp_exsit(path):
@@ -62,15 +63,18 @@ if GetDepend('PKG_LVGL_USING_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-flags = '--diag_suppress=188 '
-flags += '--diag_suppress=546 '
-flags += '--diag_suppress=550 '
-flags += '--diag_suppress=111 '
-flags += '--diag_suppress=68 '
-flags += '--diag_suppress=870 '
-LOCAL_CPPDEFINES = ['PRIX32=\\"x\\"']
 
-group = group + DefineGroup('LVGL', src, depend = ['MODULE_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = flags, LOCAL_CPPDEFINES = LOCAL_CPPDEFINES)
+
+LOCAL_CFLAGS = ''
+if menu_config.PLATFORM == 'gcc' or menu_config.PLATFORM == 'armclang': # GCC or Keil AC6
+    LOCAL_CFLAGS += ' -std=c99'
+    group = group + DefineGroup('LVGL', src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS)
+elif menu_config.PLATFORM == 'armcc': # Keil AC5
+    LOCAL_CPPDEFINES = ['PRIX32=\\"x\\"']
+    LOCAL_CFLAGS += ' --c99 --gnu --diag_suppress=188 --diag_suppress=546 --diag_suppress=550 --diag_suppress=111 --diag_suppress=68 --diag_suppress=870'
+    group = group + DefineGroup('LVGL', src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS, LOCAL_CPPDEFINES = LOCAL_CPPDEFINES)
+
+
 
 list = os.listdir(cwd)
 for d in list:
