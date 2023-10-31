@@ -61,7 +61,7 @@ typedef struct
     float left;
     float right;
 } gui_curtain_float_t;
-typedef enum
+typedef enum CURTAIN_ORIENTATION
 {
     CURTAIN_UNDEFINED,
     CURTAIN_UP,

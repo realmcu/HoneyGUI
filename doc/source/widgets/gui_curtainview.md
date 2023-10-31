@@ -1,12 +1,23 @@
 # curtainview
-
-
-
+## Demo
+Please refer to the page below:
 ```eval_rst
+`curtain`_    
 
-.. doxygengroup:: WIDGET
-.. doxygenfile:: gui_curtainview.h
+.. _curtain: gui_curtain.html
 
 ```
+## API
+```eval_rst
+
+.. doxygenfunction:: gui_curtainview_create
+
+.. doxygenfunction:: gui_curtainview_set_done_cb
+```
+
+
+
+
+
 
 
