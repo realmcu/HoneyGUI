@@ -17,11 +17,11 @@
 
 
 // <c> HoneyGUI Enable RTK Real GUI
-#define MODULE_USING_RTK_GUI
+#define BUILD_USING_RTK_GUI
 // </c>
 
 // <c> RTK GUI Demo
-#define MODULE_USING_RTK_GUI_DEMO
+#define BUILD_USING_RTK_GUI_DEMO
 // </c>
 
 // <c> RTK GUI frame buffer type
@@ -30,7 +30,7 @@
 
 
 // <c> HoneyGUI Enable LVGL
-#define MODULE_USING_LVGL_GUI
+#define BUILD_USING_LVGL_GUI
 // </c>
 
 // <c> HoneyGUI Enable LVGL EXAMPLES

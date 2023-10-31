@@ -31,7 +31,7 @@
 #include <string.h>
 #define printf(...)
 #endif/*WITH_NANOVG_GPU*/
-#ifdef RTK_MODULE_USING_RTK_GUI
+#ifdef RTK_BUILD_USING_RTK_GUI
 #include "gui_api.h"
 #define NANOVG_MALLOC gui_malloc
 #define NANOVG_REALLOC gui_realloc

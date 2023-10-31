@@ -9,6 +9,6 @@ src = Split("""
 src = Glob('*.c')
 CPPPATH = [cwd]
 print(CPPPATH)
-group = DefineGroup('gui_demo', src, depend = ['MODULE_USING_RTK_GUI_320_384_DEMO'], CPPPATH = CPPPATH)
+group = DefineGroup('gui_demo', src, depend = ['BUILD_USING_RTK_GUI_320_384_DEMO'], CPPPATH = CPPPATH)
 
 Return('group')

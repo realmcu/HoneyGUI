@@ -19,7 +19,7 @@
 #include <agge/nanovg_image_blender.h>
 #include <agge/blender_linear_gradient.h>
 #include <agge/blender_radial_gradient.h>
-#ifdef RTK_MODULE_USING_RTK_GUI
+#ifdef RTK_BUILD_USING_RTK_GUI
 #include "gui_api.h"
 #define NANOVG_MALLOC gui_malloc
 #define NANOVG_REALLOC gui_realloc

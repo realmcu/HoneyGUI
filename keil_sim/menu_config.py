@@ -4,8 +4,8 @@ import sys
 # toolchains options
 #ARCH='arm'
 #CPU='cortex-m4'
-CROSS_TOOL='gcc'
-PLATFORM    = 'gcc'
+CROSS_TOOL='armcc'
+PLATFORM    = 'armcc'
 EXEC_PATH   = r'C:/mingw64/bin'
 BSP_LIBRARY_TYPE = None
 
@@ -14,15 +14,12 @@ BUILD = 'debug'
 
 # toolchains
 PREFIX = ''
-CC = PREFIX + 'gcc'
-AS = PREFIX + 'gcc'
-AR = PREFIX + 'ar'
-CXX = PREFIX + 'g++'
-LINK = PREFIX + 'gcc'
-TARGET_EXT = 'elf'
-SIZE = PREFIX + 'size'
-OBJDUMP = PREFIX + 'objdump'
-OBJCPY = PREFIX + 'objcopy'
+CC = PREFIX + 'armcc'
+AS = PREFIX + 'armasm'
+AR = PREFIX + 'armar'
+CXX = PREFIX + 'armcc'
+LINK = PREFIX + 'armlink'
+TARGET_EXT = 'axf'
 
 CPATH = ''
 LPATH = ''
@@ -33,6 +30,6 @@ else:
     CFLAGS = ' '
     LFLAGS = ' '
 CXXFLAGS = CFLAGS
-POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n' + SIZE + ' $TARGET \n'
+POST_ACTION = 'fromelf --bin $TARGET --output gui.bin \nfromelf -z $TARGET'
 
 
