@@ -62,10 +62,15 @@ if GetDepend('PKG_LVGL_USING_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-LOCAL_CFLAGS = ''
+flags = '--diag_suppress=188 '
+flags += '--diag_suppress=546 '
+flags += '--diag_suppress=550 '
+flags += '--diag_suppress=111 '
+flags += '--diag_suppress=68 '
+flags += '--diag_suppress=870 '
+LOCAL_CPPDEFINES = ['PRIX32=\\"x\\"']
 
-
-group = group + DefineGroup('LVGL', src, depend = ['MODULE_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CFLAGS = LOCAL_CFLAGS)
+group = group + DefineGroup('LVGL', src, depend = ['MODULE_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = flags, LOCAL_CPPDEFINES = LOCAL_CPPDEFINES)
 
 list = os.listdir(cwd)
 for d in list:

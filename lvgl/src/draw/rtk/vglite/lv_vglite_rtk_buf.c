@@ -7,9 +7,8 @@
  *      INCLUDES
  *********************/
 
-#include "lv_vglite_buf.h"
-
-#if LV_USE_GPU_VG_LITE
+#if LV_USE_GPU_RTK_VG_LITE
+#include "lv_vglite_rtk_buf.h"
 
 /*********************
  *      DEFINES
@@ -120,4 +119,4 @@ static inline void lv_vglite_set_buf(vg_lite_buffer_t *vgbuf, const lv_color_t *
     vgbuf->handle = NULL;
 }
 
-#endif /*LV_USE_GPU_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_VG_LITE*/

@@ -212,7 +212,7 @@ def MDK45Project(tree, target, script):
                 MiscControls.text = ' '
             Define          = SubElement(VariousControls, 'Define')
             if 'LOCAL_CPPDEFINES' in group:
-                Define.text     = ', '.join(set(group['LOCAL_CPPDEFINES']))
+                Define.text     = ' '.join(set(group['LOCAL_CPPDEFINES']))
             else:
                 Define.text     = ' '
             Undefine        = SubElement(VariousControls, 'Undefine')
@@ -264,7 +264,7 @@ def MDK45Project(tree, target, script):
     IncludePath.text = ';'.join([_make_path_relative(project_path, os.path.normpath(i)) for i in CPPPATH])
 
     Define = tree.find('Targets/Target/TargetOption/TargetArmAds/Cads/VariousControls/Define')
-    Define.text = ', '.join(set(CPPDEFINES))
+    Define.text = ' '.join(set(CPPDEFINES))
 
     Misc = tree.find('Targets/Target/TargetOption/TargetArmAds/LDads/Misc')
     Misc.text = LINKFLAGS

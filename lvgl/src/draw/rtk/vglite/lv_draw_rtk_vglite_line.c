@@ -31,10 +31,10 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vglite_line.h"
 
-#if LV_USE_GPU_VG_LITE
-#include "lv_vglite_buf.h"
+#if LV_USE_GPU_RTK_VG_LITE
+#include "lv_draw_rtk_vglite_line.h"
+#include "lv_vglite_rtk_buf.h"
 #include <math.h>
 
 /*********************

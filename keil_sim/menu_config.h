@@ -30,7 +30,7 @@
 
 
 // <c> HoneyGUI Enable LVGL
-//#define MODULE_USING_LVGL_GUI
+#define MODULE_USING_LVGL_GUI
 // </c>
 
 // <c> HoneyGUI Enable LVGL EXAMPLES

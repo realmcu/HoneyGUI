@@ -31,9 +31,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vglite_arc.h"
 
-#if LV_USE_GPU_VG_LITE
+#if LV_USE_GPU_RTK_VG_LITE
+#include "lv_draw_rtk_vglite_arc.h"
 #include "lv_vglite_buf.h"
 #include <math.h>
 #include "trace.h"
