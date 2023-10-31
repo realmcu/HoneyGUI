@@ -9,7 +9,7 @@ cwd = GetCurrentDir() # get current dir path
 
 port_src = Glob('*.c')
 port_inc = [cwd]
-group = group + DefineGroup('LVGL-port', port_src, depend = ['MODULE_USING_PORT_FOR_LVGL'], CPPPATH = port_inc)
+group = group + DefineGroup('LVGL-port', port_src, depend = ['MODULE_USING_LVGL_GUI'], CPPPATH = port_inc)
 
 # check if .h or .hpp files exsit
 def check_h_hpp_exsit(path):
@@ -41,7 +41,7 @@ if GetDepend('PKG_LVGL_USING_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-if GetDepend('PKG_LVGL_USING_EXAMPLES'):
+if GetDepend('PKG_LVGL_USING_RLOTTIE'):
     lvgl_src_cwd = lvgl_cwd + 'rlottie/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):
@@ -52,7 +52,7 @@ if GetDepend('PKG_LVGL_USING_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-if GetDepend('MODULE_USING_PORT_FOR_LVGL'):
+if GetDepend('MODULE_USING_LVGL_GUI'):
     lvgl_src_cwd = lvgl_cwd + 'demos/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):
@@ -65,7 +65,7 @@ if GetDepend('MODULE_USING_PORT_FOR_LVGL'):
 LOCAL_CFLAGS = ''
 
 
-group = group + DefineGroup('LVGL', src, depend = ['MODULE_USING_PORT_FOR_LVGL'], CPPPATH = inc, LOCAL_CFLAGS = LOCAL_CFLAGS)
+group = group + DefineGroup('LVGL', src, depend = ['MODULE_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CFLAGS = LOCAL_CFLAGS)
 
 list = os.listdir(cwd)
 for d in list:

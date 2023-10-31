@@ -46,7 +46,7 @@ void app_main(void *argument)
     GLCD_SetForegroundColor(GLCD_COLOR_GREEN);
 
     rtgui_server_init();
-#ifdef MODULE_USING_RTK_GUI_DEMO
+#ifdef BUILD_USING_RTK_GUI_DEMO
     extern gui_app_t *get_launcher_app(void);
     gui_app_startup(get_launcher_app());
 #else

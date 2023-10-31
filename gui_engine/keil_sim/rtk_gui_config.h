@@ -335,11 +335,11 @@
 // </e>
 
 // <c> RTK GUI Config
-#define MODULE_USING_RTK_GUI
+#define BUILD_USING_RTK_GUI
 // </c>
 
 // <c> RTK GUI Demo
-#define MODULE_USING_RTK_GUI_DEMO
+#define BUILD_USING_RTK_GUI_DEMO
 // </c>
 
 // <c> RTK GUI frame buffer type

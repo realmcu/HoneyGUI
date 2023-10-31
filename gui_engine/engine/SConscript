@@ -34,6 +34,6 @@ if GetDepend(['BUILD_USING_RTK_PPE']):
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
 
 Return('group')

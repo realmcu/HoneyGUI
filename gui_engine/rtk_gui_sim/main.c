@@ -25,13 +25,13 @@
 #define BEE3_PRO_HK    1
 #define BEE4_HK        2
 
-#ifdef MODULE_USING_RTK_GUI_454_454_DEMO
+#ifdef BUILD_USING_RTK_GUI_454_454_DEMO
 #define UI_DEMO        BEE3_PRO
 #endif
-#ifdef MODULE_USING_RTK_GUI_448_368_DEMO
+#ifdef BUILD_USING_RTK_GUI_448_368_DEMO
 #define UI_DEMO        BEE3_PRO_HK
 #endif
-#ifdef MODULE_USING_RTK_GUI_320_384_DEMO
+#ifdef BUILD_USING_RTK_GUI_320_384_DEMO
 #define UI_DEMO        BEE4_HK
 #endif
 
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
 
     rtgui_server_init();
-//#ifdef MODULE_USING_RTK_GUI_DEMO
+//#ifdef BUILD_USING_RTK_GUI_DEMO
 #if 1
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
 #if UI_DEMO == BEE3_PRO

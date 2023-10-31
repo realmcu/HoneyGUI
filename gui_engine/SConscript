@@ -8,11 +8,11 @@ list = os.listdir(cwd)
 src = Split("""""")
 CPPPATH = [cwd]
 
-CPPDEFINES = ['RTK_MODULE_USING_RTK_GUI']
+CPPDEFINES = ['ENABLE_RTK_GUI']
 
-group = DefineGroup('bt_app', src, depend = ['MODULE_USING_RTK_GUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+group = DefineGroup('bt_app', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-if GetDepend('MODULE_USING_RTK_GUI'):
+if GetDepend('BUILD_USING_RTK_GUI'):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):

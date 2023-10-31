@@ -7,15 +7,15 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vglite.h"
 
-#if LV_USE_GPU_VG_LITE
+#if LV_USE_GPU_RTK_VG_LITE
 #include <math.h>
-#include "lv_draw_vglite_blend.h"
-#include "lv_draw_vglite_line.h"
-#include "lv_draw_vglite_rect.h"
-#include "lv_draw_vglite_arc.h"
-#include "lv_vglite_buf.h"
+#include "lv_draw_rtk_vglite.h"
+#include "lv_draw_rtk_vglite_blend.h"
+#include "lv_draw_rtk_vglite_line.h"
+#include "lv_draw_rtk_vglite_rect.h"
+#include "lv_draw_rtk_vglite_arc.h"
+#include "lv_vglite_rtk_buf.h"
 #include "trace.h"
 
 #if LV_COLOR_DEPTH != 32
@@ -619,4 +619,4 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t *draw_ctx, const lv_draw_arc_dsc_t 
     }
 }
 
-#endif /*LV_USE_GPU_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_VG_LITE*/

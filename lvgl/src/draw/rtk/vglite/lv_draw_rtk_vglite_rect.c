@@ -8,10 +8,10 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vglite_rect.h"
 
-#if LV_USE_GPU_VG_LITE
-#include "lv_vglite_buf.h"
+#if LV_USE_GPU_RTK_VG_LITE
+#include "lv_draw_rtk_vglite_rect.h"
+#include "lv_vglite_rtk_buf.h"
 #include <math.h>
 
 /*********************
@@ -1215,4 +1215,4 @@ static void lv_vglite_create_rect_path_data(float *path_data, uint32_t *path_dat
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_VG_LITE*/

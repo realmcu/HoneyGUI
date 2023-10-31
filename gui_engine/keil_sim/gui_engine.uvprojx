@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>GUI_KEIL_SIM, RTK_MODULE_USING_RTK_GUI</Define>
+              <Define>GUI_KEIL_SIM, ENABLE_RTK_GUI</Define>
               <Undefine></Undefine>
               <IncludePath>.;.;..\example\root_image;gui_port;..\app;..\dc;..\engine;..\input;..\misc;..\misc\tlsf;..\server;..\Third_Party\nanosvg\src;..\Third_Party\nanovg;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\base;..\Third_Party\nanovg\agge;..\Third_Party\nanovg\vglite;..\Third_Party\stb;..\widget;..;..\example;..\example\root_image</IncludePath>
             </VariousControls>

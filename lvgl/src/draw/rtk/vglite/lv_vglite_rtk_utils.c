@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_vglite_utils.h"
 
-#if LV_USE_GPU_VG_LITE
+#if LV_USE_GPU_RTK_VG_LITE
+#include "lv_vglite_rtk_utils.h"
 #include "../../../core/lv_refr.h"
 
 /*********************
@@ -126,4 +126,4 @@ static inline void invalidate_cache(void)
     }
 }
 
-#endif /*LV_USE_GPU_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_VG_LITE*/

@@ -18,7 +18,7 @@ CPPDEFINES += ['LV_USE_DEMO_WIDGETS']
 src = ['main.c']
 src += ['sdl_init.c']
 
-objs = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_PORT_FOR_LVGL'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+objs = DefineGroup('rtk_gui', src, depend = ['MODULE_USING_LVGL_GUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 
 list = os.listdir(cwd)

@@ -7,10 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vglite_blend.h"
-//#include "trace.h"
-#if LV_USE_GPU_VG_LITE
-#include "lv_vglite_buf.h"
+
+#if LV_USE_GPU_RTK_VG_LITE
+#include "lv_draw_rtk_vglite_blend.h"
+#include "lv_vglite_rtk_buf.h"
 
 /*********************
  *      DEFINES
@@ -19,27 +19,11 @@
 /** Stride in px required by VG-Lite HW*/
 #define LV_GPU_VG_LITE_STRIDE_ALIGN_PX 16U
 
-/**
- * Enable BLIT quality degradation workaround for RT595,
- * recommended for screen's dimension > 352 pixels.
- */
-#define RT595_BLIT_WRKRND_ENABLED 1
-
 /* Internal compound symbol */
-#if (defined(CPU_MIMXRT595SFFOB) || defined(CPU_MIMXRT595SFFOB_cm33) || \
-    defined(CPU_MIMXRT595SFFOC) || defined(CPU_MIMXRT595SFFOC_cm33)) && \
-    RT595_BLIT_WRKRND_ENABLED
+#if 0
 #define VG_LITE_BLIT_SPLIT_ENABLED 1
 #else
 #define VG_LITE_BLIT_SPLIT_ENABLED 0
-#endif
-
-#if VG_LITE_BLIT_SPLIT_ENABLED
-/**
-* BLIT split threshold - BLITs with width or height higher than this value will be done
-* in multiple steps. Value must be 16-aligned. Don't change.
-*/
-#define LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR 352
 #endif
 
 /**********************
@@ -622,4 +606,4 @@ static inline void lv_vglite_set_transformation_matrix(const lv_area_t *dest_are
     }
 }
 
-#endif /*LV_USE_GPU_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_VG_LITE*/
