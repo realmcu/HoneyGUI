@@ -1,48 +1,6 @@
 # Grid
-
-## Overview
 The Grid Widget allows you to display widget set in a grid view.
-
-
-
-
-
-## API 
-
--  `gui_grid_create()` 
-        
-        create a grid widget
-
-|param  | description  |type|
-|--|--|--|
-|`parent`|the father widget the grid nested in|`void *`|
-|`x`|the X-axis coordinate|`int`|
-|`y`|the Y-axis coordinate|`int`|
-|`row`|Rows number|`int`|
-|`col`|Columns number|`int`|
-|`gap_col`|gap between two Columns|`int`|
-|`gap_row`|gap between two Rows|`int`|
-|`return`|the widget object pointer|`gui_grid_t`|
-
--  `gui_grid_style()` 
-        
-        config grid style
-
-|param  | description  |type|
-|--|--|--|
-|`grid`|grid widget pointer|`gui_grid_t *`|
-|`style`|3 styles: GRID_CLASSIC/ GRID_SCALE/ GRID_3D |`enum gui_grid_style`|
-```c
-enum gui_grid_style
-{
-    GRID_CLASSIC,
-    GRID_SCALE,
-};
-```
-
-
-
-## Example
+## Demo
 - classic style
   
 
@@ -77,6 +35,53 @@ void page_tb_grid(void *parent)
         gui_magic_img_create_from_mem(grid, "1", array[i], 0, 0, 0, 0);
     }
 }
+```
+
+
+
+
+
+## API 
+
+
+```eval_rst
+
+.. doxygenfunction:: gui_grid_create
+
+.. doxygenfunction:: gui_grid_style
+.. doxygenenum:: gui_grid_style
+```
+
+
+-  `gui_grid_create()` 
+        
+        create a grid widget
+
+|param  | description  |type|
+|--|--|--|
+|`parent`|the father widget the grid nested in|`void *`|
+|`x`|the X-axis coordinate|`int`|
+|`y`|the Y-axis coordinate|`int`|
+|`row`|Rows number|`int`|
+|`col`|Columns number|`int`|
+|`gap_col`|gap between two Columns|`int`|
+|`gap_row`|gap between two Rows|`int`|
+|`return`|the widget object pointer|`gui_grid_t`|
+
+-  `gui_grid_style()` 
+        
+        config grid style
+
+|param  | description  |type|
+|--|--|--|
+|`grid`|grid widget pointer|`gui_grid_t *`|
+|`style`|3 styles: GRID_CLASSIC/ GRID_SCALE/ GRID_3D |`enum gui_grid_style`|
+```c
+enum gui_grid_style
+{
+    GRID_CLASSIC,
+    GRID_SCALE,
+};
 ```
 
 

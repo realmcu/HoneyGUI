@@ -1,21 +1,52 @@
 # Progressbar
+create a progressbar
+## Demo
+The code is to create a progressbaras follows.
++  vertical style
 
-## Overview
 
-|function  | description  |
-|--|--|
-|`gui_progressbar_img_v_create()`|create a vertical based on picture progressbar|
-|`gui_progressbar_img_h_create()`|Create a horizontal based on picture progressbar|
-|`gui_progressbar_movie_create()`|create a  based on pictures frame progressbar|
-|`gui_progressbar_set_progress()`|set progress|
-|`gui_progressbar_get_progress()`|get progress|
-|`gui_progressbar_set_percentage()`|set_percentage|
-|`gui_progressbar_get_percentage()`|get_percentage|
-|`gui_progressbar_get_max()`|get_max|
-|......  |......  |
-|--|--|
+![vertical](https://foruda.gitee.com/images/1694154259257637618/08ffb2a3_13406851.png "create_v.png")
+```
+gui_progressbar_t *IMG=gui_progressbar_img_v_create(&(app->screen), picture, 0, 0);
+```
++ horizontal style
+
+
+![horizontal](https://foruda.gitee.com/images/1694154279857524204/57d3e021_13406851.png "create_h.png")
+```
+gui_progressbar_t *IMG=gui_progressbar_img_h_create(&(app->screen), picture, 0, 0);
+```
++ movice style
+
+
+![frame = 1](https://foruda.gitee.com/images/1694424698504008860/40b6b21e_13406851.png "create_movice.png")
+```
+    gui_progressbar_t *demo = gui_progressbar_movie_create(&(app->screen), frame_list,
+                                                0, 10, 10);
+```
++ set percentage
+
+
+![percentage = 50%](https://foruda.gitee.com/images/1694154303391505761/f3d00de0_13406851.png "set_progressbar_percentage.png")
+```
+gui_progressbar_set_percentage(IMG, 0.5);
+```
++ get percentage
+
+```
+float pro = gui_progressbar_get_percentage(IMG);
+```
++ get_max progressbar
+
+```
+int pro = gui_progressbar_get_max(IMG);
+```
+
+
+
 
 ## API
+
 
 -  `gui_progressbar_img_v_create()` 
     create a vertical based on picture progressbar
@@ -66,43 +97,16 @@
 |`this`|this|`gui_progressbar_t *`|
 |`return`|the widget object pointer|`size_t`|
 
-## Example
-The code is to create a progressbaras follows.
-+  vertical style
+```eval_rst
+.. doxygenfunction:: gui_progressbar_img_v_create
+.. doxygenfunction:: gui_progressbar_img_h_create
+.. doxygenfunction:: gui_progressbar_movie_create
+.. doxygenfunction:: gui_progressbar_set_progress
+.. doxygenfunction:: gui_progressbar_get_progress
+.. doxygenfunction:: gui_progressbar_set_percentage
+.. doxygenfunction:: gui_progressbar_get_percentage
+.. doxygenfunction:: gui_progressbar_get_max
 
 ```
-gui_progressbar_t *IMG=gui_progressbar_img_v_create(&(app->screen), picture, 0, 0);
-```
-![vertical](https://foruda.gitee.com/images/1694154259257637618/08ffb2a3_13406851.png "create_v.png")
-+ horizontal style
-
-```
-gui_progressbar_t *IMG=gui_progressbar_img_h_create(&(app->screen), picture, 0, 0);
-```
-![horizontal](https://foruda.gitee.com/images/1694154279857524204/57d3e021_13406851.png "create_h.png")
-+ movice style
-
-```
-    gui_progressbar_t *demo = gui_progressbar_movie_create(&(app->screen), frame_list,
-                                                0, 10, 10);
-```
-![frame = 1](https://foruda.gitee.com/images/1694424698504008860/40b6b21e_13406851.png "create_movice.png")
-+ set percentage
-
-```
-gui_progressbar_set_percentage(IMG, 0.5);
-```
-![percentage = 50%](https://foruda.gitee.com/images/1694154303391505761/f3d00de0_13406851.png "set_progressbar_percentage.png")
-+ get percentage
-
-```
-float pro = gui_progressbar_get_percentage(IMG);
-```
-+ get_max progressbar
-
-```
-int pro = gui_progressbar_get_max(IMG);
-```
-
 
 

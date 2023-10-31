@@ -1,39 +1,13 @@
 # Window
 
-## Overview
 The Window Widget is a rectangular container widget.
 
-## API 
-
--  `gui_win_create()` 
-        
-        create a window widget
-
-|param  | description  |type|
-|--|--|--|
-|`parent`|the father widget the window nested in|`void *`|  
-|`filename`|the window widget name|`const char *`|
-|`x`|the X-axis coordinate|`int`|
-|`y`|the Y-axis coordinate|`int`|
-|`w`|the width|`int`|
-|`h`|the height|`int`|
-|`return`|the widget object pointer|`gui_win_t`|  
 
 
--  `gui_obj_add_event_cb()` 
-        
-        monitor gestures only within the window size range 
-
-|param  | description  |type|
-|--|--|--|
-|`obj`|the window object|`gui_win_t *`|  
-|`event_cb`|callback function for the event|`gui_event_cb_t`|
-|`filter`|respond to this type of event|`gui_event_t`|
-|`user_data`|user data that needs to be transmitted|`void *`|
-
-
-## Example 
-### The following code is used to create a window and add an image to it.
+## Demo
+### Create a wimdow
+![win](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png "win.PNG") 
+The following code is used to create a window and add an image to it.
 ```cpp
 static void app_launcher_ui_design(gui_app_t *app)
 {
@@ -43,11 +17,23 @@ static void app_launcher_ui_design(gui_app_t *app)
     page_tb_watch(tb_watch);
 }
 ```
-![win](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png "win.PNG") 
+
 
 
 
 ### 8 types of gestures  
+```eval_rst
+
+ 
+.. raw:: html
+
+    <iframe src="https://drive.google.com/file/d/11g0-r2ntHIZG5vmdE5hANysPnQtJoUAD/preview" width="640" height="480" allow="autoplay"></iframe>
+
+
+
+ 
+
+```
 - left slide and its callback function
 ```cpp
 static void callback1(){
@@ -122,19 +108,12 @@ static void callback8(){
 gui_obj_add_event_cb(win, (gui_event_cb_t)callback8, GUI_EVENT_TOUCH_CLICKED, 0);
 ```
 
-### gesture test video
-
+## API 
 
 ```eval_rst
 
- 
-.. raw:: html
-
-    <iframe src="https://drive.google.com/file/d/11g0-r2ntHIZG5vmdE5hANysPnQtJoUAD/preview" width="640" height="480" allow="autoplay"></iframe>
-
-.. doxygengroup:: WIDGET
-.. doxygenfile:: gui_win.h
-
- 
+.. doxygenfunction:: gui_win_create
 
 ```
+
+
