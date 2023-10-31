@@ -350,6 +350,26 @@ static void do_blending_argb8888_2_argb8888(gui_color_t *d, gui_color_t *s)
     d->channel.green = ((255 - Sa) * Dg + Sa * Sg) / 255;
     d->channel.blue = ((255 - Sa) * Db + Sa * Sb) / 255;
 }
+static void do_blending_argb8888_2_argb8888_with_opacity(gui_color_t *d, gui_color_t *s,
+                                                         int opacity)
+{
+    //gui_log("[GUI] TODO line = %d", __LINE__);
+
+    uint8_t Sa = s->channel.alpha * opacity / 255;
+    uint8_t Sr = s->channel.red;
+    uint8_t Sg = s->channel.green;
+    uint8_t Sb = s->channel.blue;
+
+    uint8_t Da = d->channel.alpha;
+    uint8_t Dr = d->channel.red;
+    uint8_t Dg = d->channel.green;
+    uint8_t Db = d->channel.blue;
+
+    d->channel.alpha = ((255 - Sa) * Da + Sa * Sa) / 255;
+    d->channel.red = ((255 - Sa) * Dr + Sa * Sr) / 255;
+    d->channel.green = ((255 - Sa) * Dg + Sa * Sg) / 255;
+    d->channel.blue = ((255 - Sa) * Db + Sa * Sb) / 255;
+}
 static void do_blending_argb8888_2_rgb565(uint8_t *target, gui_color_t color)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
@@ -771,7 +791,7 @@ static void cpu_matrix_blit_rgb8888_2_argb8888(draw_img_t *image, struct gui_dis
             default:
                 {
                     gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_argb8888_2_argb8888(d, &color);
+                    do_blending_argb8888_2_argb8888_with_opacity(d, &color, image->opacity_value);
                 }
                 break;
             }
@@ -831,6 +851,43 @@ static void cpu_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_disp
                 writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
                 writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
                 writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+            }
+            if (pixel  != 0)
+            {
+                switch (image->opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                    }
+                    break;
+                default:
+                    {
+                        if (image->opacity_value < 255)
+                        {
+                            writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0] *
+                                                                             (256 - image->opacity_value)
+                                                                             + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * image->opacity_value) / 256 ;
+                            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = (pixel[0] *
+                                                                                  (256 - image->opacity_value)
+                                                                                  + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * image->opacity_value) / 256);
+                            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[1] *
+                                                                                  (256 - image->opacity_value)
+                                                                                  + writebuf[(write_off + j) * dc_bytes_per_pixel] * image->opacity_value) / 256 ;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
+
             }
         }
     }
