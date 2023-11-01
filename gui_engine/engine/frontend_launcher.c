@@ -143,64 +143,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
     }
     closedir(dir);
 }
-void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
-{
-    DIR *dir = 0;
-    struct dirent *entry;
-    if ((dir = opendir(dirPath)) == NULL)
-    {
-        perror("opendir() failed"); return;
-    }
-    while ((entry = readdir(dir)) != NULL)
-    {
-        //printf("dname:%s\n",entry->d_name);
-        if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
-            strcmp(entry->d_name, "widget.ts") != 0)
-        {
-            char path2[512];
-            sprintf(path2, "%s/%s", dirPath, entry->d_name);
-            DIR *dirr = 0;
-            if ((dirr = opendir(path2)) == NULL)
-            {
-                perror("opendir() failed"); return;
-            }
-            struct dirent *entryy;
-            while ((entryy = readdir(dirr)) != NULL)
-            {
-                //printf("ddname:%s\n",entryy->d_name);
-                if (strstr(entryy->d_name, ".xml") != NULL)
-                {
-                    char path[512];
-                    sprintf(path, "%s/%s", path2, entryy->d_name);
-                    extern void get_app(gui_app_t *app, char **pic, char **text);
-                    extern void get_app_by_file(char *xml, char *pic, char *text);
-                    char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";
 
-
-                    get_app_by_file(path, &pic, &text); gui_log("get:%s,%s\n", pic, text);
-                    void *img1;
-                    {
-                        img1 = gui_get_file_address(pic);
-                    }
-                    if (strcmp(text, "launcher") == 0)
-                    {
-                        extern void get_screen_size(char *xml, int *widgt, int *hight);
-                        get_screen_size(path, width, hight);
-
-                        return;
-                    }
-
-//                    button->text->path = gui_get_file_address("app/system/resource/font/malgunbd.ttf");
-                }
-
-            }
-            closedir(dirr);
-        }
-
-
-    }
-    closedir(dir);
-}
 static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_frontend_ui_design\n");

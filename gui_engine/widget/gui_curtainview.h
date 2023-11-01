@@ -1,20 +1,47 @@
-/*
- * File      : gui_curtainview.h
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_curtainview.h
+  * @brief curtain effect container widget, which can nest curtains.
+  * @details Slide to extend and retract curtains
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/10/24
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __GUI_CURTAINVIEW_H__
 #define __GUI_CURTAINVIEW_H__
-
-#include <guidef.h>
-#include <gui_fb.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**********************
- *      TYPEDEFS
- **********************/
-/*Data of tab*/
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <guidef.h>
+#include <gui_fb.h>
+
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
+
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
+
 typedef struct
 {
     int32_t x;
@@ -34,7 +61,7 @@ typedef struct
     float left;
     float right;
 } gui_curtain_float_t;
-typedef enum
+typedef enum CURTAIN_ORIENTATION
 {
     CURTAIN_UNDEFINED,
     CURTAIN_UP,
@@ -43,7 +70,7 @@ typedef enum
     CURTAIN_RIGHT,
     CURTAIN_MIDDLE,
 } gui_curtain_enum_t;
-
+/** @brief  curtainview structure */
 typedef struct gui_curtainview
 {
     gui_obj_t base;
@@ -67,17 +94,65 @@ typedef struct gui_curtainview
     bool mute;
     int16_t release_y;
 } gui_curtainview_t;
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
 
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
 /**
  * @brief create a curtainview widget,which can nest curtains.
  * @param parent the father widget it nested in.
  * @param filename this curtainview widget's name.
- * @param x the X-axis coordinate of the widget.
- * @param x the Y-axis coordinate of the widget.
- * @param w the width of the widget.
- * @param h the hight of the widget.
+ * @param x the X-axis coordinate relative to parent widget
+ * @param y the Y-axis coordinate relative to parent widget
+ * @param w width
+ * @param h height
  * @param scope the scope of every curtain.
  * @return return the widget object pointer.
  *
@@ -85,8 +160,24 @@ typedef struct gui_curtainview
 gui_curtainview_t *gui_curtainview_create(void *parent, const char *filename, int16_t x,
                                           int16_t y,
                                           int16_t w, int16_t h);
-
+/**
+ * @brief Curtain expanding completed event
+ *
+ * @param this widget pointer
+ * @param cb event callback
+ */
 void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this));
+
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
 
 #ifdef __cplusplus
 }

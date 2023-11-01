@@ -1,5 +1,5 @@
 #include "root_image_hongkong/ui_resource.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include "gui_curtainview.h"
 #include "gui_curtain.h"
 #include "gui_tabview.h"
@@ -10,27 +10,27 @@
 
 static void cardlist_clock(void *parent)
 {
-    gui_magic_img_create_from_mem(parent, "page0", CARD_HEALTH_BIN, 14, 0, 0, 0);
+    gui_img_create_from_mem(parent, "page0", CARD_HEALTH_BIN, 14, 0, 0, 0);
 }
 static void cardlist_activity(void *parent)
 {
-    gui_magic_img_create_from_mem(parent, "page1", CARD_MORE_BIN, 14, 0, 0, 0);
+    gui_img_create_from_mem(parent, "page1", CARD_MORE_BIN, 14, 0, 0, 0);
 }
 static void cardlist_heart(void *parent)
 {
-    gui_magic_img_create_from_mem(parent, "page2", CARD_MUSIC_BIN, 14, 0, 0, 0);
+    gui_img_create_from_mem(parent, "page2", CARD_MUSIC_BIN, 14, 0, 0, 0);
 }
 static void cardlist_blood(void *parent)
 {
-    gui_magic_img_create_from_mem(parent, "page3", CARD_MUSIC1_BIN, 14, 0, 0, 0);
+    gui_img_create_from_mem(parent, "page3", CARD_MUSIC1_BIN, 14, 0, 0, 0);
 }
 static void cardlist_weather(void *parent)
 {
-    gui_magic_img_create_from_mem(parent, "page4", CARD_WEATHER1_BIN, 14, 0, 0, 0);
+    gui_img_create_from_mem(parent, "page4", CARD_WEATHER1_BIN, 14, 0, 0, 0);
 }
 static void cardlist_music(void *parent)
 {
-    gui_magic_img_create_from_mem(parent, "page5", CARD_MORE_BIN, 14, 0, 0, 0);
+    gui_img_create_from_mem(parent, "page5", CARD_MORE_BIN, 14, 0, 0, 0);
 }
 
 

@@ -1,45 +1,133 @@
-/*
- * File      : gui_widget_template.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file
+  * @brief
+  * @details
+  * @author
+  * @date
+  * @version
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
-//#include <gui_matrix.h>
 #include <gui_obj.h>
-//#include <tp_algo.h>
-//#include <gui_kb.h>
 #include "gui_widget_template.h"
+#include <tp_algo.h>
 
 
-static void widget_template_prepare(gui_obj_t *obj)
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
+
+static void prepare(gui_widget_template_t *this)
 {
-    GUI_UNUSED(obj);
+    touch_info_t *tp = tp_get_info();
+    gui_obj_t *root = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
-    gui_obj_t *root = (gui_obj_t *)obj;
 
-    uint32_t cx = dc->fb_width / 2;
-    uint32_t cy = dc->fb_height / 2;
-    GUI_UNUSED(root);
-    GUI_UNUSED(cx);
-    GUI_UNUSED(cy);
-}
-
-static void widget_template_draw_cb(gui_obj_t *obj)
-{
-    gui_widget_template_t *this = (gui_widget_template_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
     GUI_UNUSED(this);
+    GUI_UNUSED(root);
+    GUI_UNUSED(tp);
     GUI_UNUSED(dc);
-
-
 }
-static void widget_template_end(gui_obj_t *obj)
-{
 
+static void draw(gui_widget_template_t *this)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_obj_t *root = (gui_obj_t *)this;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    GUI_UNUSED(this);
+    GUI_UNUSED(root);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(dc);
 }
-static void widget_template_destory(gui_obj_t *obj)
+static void end(gui_widget_template_t *this)
 {
+    touch_info_t *tp = tp_get_info();
+    gui_obj_t *root = (gui_obj_t *)this;
+    gui_dispdev_t *dc = gui_get_dc();
 
+    GUI_UNUSED(this);
+    GUI_UNUSED(root);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(dc);
+}
+static void destory(gui_widget_template_t *this)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_obj_t *root = (gui_obj_t *)this;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    GUI_UNUSED(this);
+    GUI_UNUSED(root);
+    GUI_UNUSED(tp);
+    GUI_UNUSED(dc);
 }
 
 
@@ -49,24 +137,35 @@ static void widget_template_ctor(gui_widget_template_t *this, gui_obj_t *parent,
                                  int16_t x,
                                  int16_t y, int16_t w, int16_t h)
 {
-    //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
-
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
-    root->type = VG_LITE_CLOCK;
-    root->obj_prepare = widget_template_prepare;
-    root->obj_draw = widget_template_draw_cb;
-    root->obj_end = widget_template_end;
-    root->obj_destory = widget_template_destory;
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
+    root->obj_draw = (void (*)(struct _gui_obj_t *))draw;
+    root->obj_end = (void (*)(struct _gui_obj_t *))end;
+    root->obj_destory = (void (*)(struct _gui_obj_t *))destory;
 
     //for self
 
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
-
+/**
+ * @brief
+ *
+ * @param parent
+ * @param name
+ * @param data
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return gui_widget_template_t*
+ */
 gui_widget_template_t *gui_widget_template_create(void *parent,  const char *name, void *data,
                                                   int16_t x,
                                                   int16_t y, int16_t w, int16_t h)
@@ -90,11 +189,21 @@ gui_widget_template_t *gui_widget_template_create(void *parent,  const char *nam
     }
 
 
-
-
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
 
 
 

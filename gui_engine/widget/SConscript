@@ -7,10 +7,28 @@ src = Split("""
 """)
 
 src = Glob('*.c')
+SrcRemove(src,'gui_button.c')
+SrcRemove(src,'gui_grid.c')
+SrcRemove(src,'gui_page.c')
+SrcRemove(src,'gui_return.c')
+SrcRemove(src,'gui_scroll_wheel.c')
+SrcRemove(src,'gui_seekbar.c')
+SrcRemove(src,'gui_bitmap.c')
+SrcRemove(src,'gui_stb_img.c')
+SrcRemove(src,'gui_scroll_text.c')
+
+if not GetDepend(['BUILD_USING_LVGL_GUI']):
+    SrcRemove(src,'gui_lvgl.c')
 
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
+objs = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
 
-Return('group')
+list = os.listdir(cwd)
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+Return('objs')

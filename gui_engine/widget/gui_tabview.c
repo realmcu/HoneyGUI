@@ -1,22 +1,94 @@
-/*
- * File      : gui_tabview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_tabview.c
+  * @brief Extended in the cross direction
+  * @details switch the currently displayed screen by sliding
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/24
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
-//#include <math.h>
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include <gui_tabview.h>
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include "gui_tab.h"
-//#include "gui_canvas.h"
-//#include "gui_curtain.h"
 #include "gui_img.h"
 
-void tabview_prepare(gui_obj_t *obj)
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
+
+
+static void tabview_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
@@ -192,6 +264,9 @@ void tabview_prepare(gui_obj_t *obj)
     obj->dx = this->release_x;
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
 {
     this->style = style;
@@ -230,6 +305,16 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
     parent_tabview->jump.jump_id.x = idx;
     parent_tabview->jump.jump_id.y = idy;
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
 
 
 

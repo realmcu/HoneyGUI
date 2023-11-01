@@ -18,7 +18,7 @@
 #include "gui_server.h"
 
 //#include "gui_img_with_animate.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include <gui_app.h>
 #include <stdlib.h>
 #include "acc_engine.h"
@@ -82,9 +82,9 @@ struct widget_create widget[] =
     {"movie", MOVIE}
 };
 extern char *defaultPath;
-gui_magic_img_t *xml_gui_magic_img_create_from_mem(void *parent,  const char *name, void *addr,
-                                                   int16_t x,
-                                                   int16_t y)
+gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *addr,
+                                       int16_t x,
+                                       int16_t y)
 {
     if (addr == NULL)
     {
@@ -95,9 +95,9 @@ gui_magic_img_t *xml_gui_magic_img_create_from_mem(void *parent,  const char *na
                                    x,
                                    y, 0, 0);
 #else
-    return gui_magic_img_create_from_mem(parent, name, addr,
-                                         x,
-                                         y, 0, 0);
+    return gui_img_create_from_mem(parent, name, addr,
+                                   x,
+                                   y, 0, 0);
 #endif
 }
 char *get_space_string_head(const char *string)
@@ -168,7 +168,7 @@ static void sport_button_press_ani_cb(gui_button_t *button)
     static float from = 0;
     if (per == 0.0f)
     {
-        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        from = ((gui_img_t *)(button->img))->scale_x;
         alpha_from = button->img->draw_img.opacity_value;
     }
     from = 1.0f;
@@ -214,7 +214,7 @@ static void sport_button_release_ani_cb(gui_button_t *button)
     static float from = 0;
     if (per == 0.0f)
     {
-        from = ((gui_magic_img_t *)(button->img))->scale_x;
+        from = ((gui_img_t *)(button->img))->scale_x;
         alpha_from = button->img->draw_img.opacity_value;
     }
     //from = 1.25f;
@@ -520,7 +520,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
 
                         void *imgbuf = gui_get_file_address(file);
-                        parent = (void *)xml_gui_magic_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
+                        parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);
@@ -1786,38 +1786,17 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         char *font_type2 = NULL;
                         if (strstr(font_type, ".bin") != NULL)
                         {
-
-                            if (strstr(font_type, ".bin;") != NULL)
-                            {
-                                font_type2 = "rtk_font_mem";
-                                char b[100] = {0};
-                                strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
-                                void *addr1 = gui_get_file_address(b);
-                                memset(b, 0, sizeof(b));
-                                char *a = font_type;
-                                strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
-                                                                                                     ".bin;") - a + strlen(".bin;")));
-                                void *addr2 = gui_get_file_address(b);
-                                gui_set_font_mem_resourse(font_size, addr1,  addr2);
-                                GUI_TYPE(gui_button_t, parent)->text->font_height = font_size ;
-                                GUI_TYPE(gui_button_t, parent)->text->path = 0;
-                            }
-                            else
-                            {
-                                font_type2 = "rtk_font_mem";
-                                void *addr1 = gui_get_file_address(font_type);
-                                gui_font_mem_init(addr1);
-                                GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
-                                GUI_TYPE(gui_button_t, parent)->text->path = 0;
-                                gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1);
-                                gui_text_mode_set(GUI_TYPE(gui_button_t, parent)->text, LEFT);
-                                // t->font_height = fontSize;
-                                //t->path = 0;
-                            }
-
-
-
-
+                            font_type2 = "rtk_font_mem";
+                            char b[100] = {0};
+                            strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                            void *addr1 = gui_get_file_address(b);
+                            memset(b, 0, sizeof(b));
+                            char *a = font_type;
+                            strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                                 ".bin;") - a + strlen(".bin;")));
+                            void *addr2 = gui_get_file_address(b);
+                            gui_set_font_mem_resourse(32, addr1,  addr2);
+                            GUI_TYPE(gui_button_t, parent)->text->path = 0;
                         }
                         else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
                         {
@@ -2251,40 +2230,6 @@ void level_scan(ezxml_t p, char **pic, char **text)
         }
     }
 }
-void level_scan_width_and_hight(ezxml_t p, int *width, int *hight)
-{
-    ezxml_t i;
-    for (i = p; i != NULL; i = i->ordered)
-    {
-        //gui_log("%s\n",i->child->next->name);
-        if (strcmp(i->name, "app") == 0)
-        {
-            ezxml_t title = ezxml_get(i, "screen", -1);
-//gui_log("%s,%s,%s,%s\n",title->name, title->attr[0], title->attr[1],title->attr[2]);
-
-            size_t j = 0;
-            while (true)
-            {
-                if (!(title->attr[j]))
-                {
-                    break;
-                }
-                //gui_log("p->attr[i]:%s\n", p->attr[i]);
-                if (!strcmp(title->attr[j], "w"))
-                {
-                    *width = atoi(title->attr[++j]); gui_log("widgt:%d\n", *width);
-                }
-                else if (!strcmp(title->attr[j], "h"))
-                {
-                    *hight = atoi(title->attr[++j]); gui_log("hight:%d\n", *hight);
-                }
-
-                j++;
-            }
-            break;
-        }
-    }
-}
 void foreach_count(ezxml_t p, size_t *widget_count)
 {
     ezxml_t i;
@@ -2371,22 +2316,6 @@ void get_app(gui_app_t *app, char *pic, char *text)
 
 
     level_scan(f1, (void *)pic, (void *)text);
-    ezxml_free(f1);
-}
-void get_app_by_file(char *xml, char *pic, char *text)
-{
-    ezxml_t f1 = ezxml_parse_file(xml);
-
-
-    level_scan(f1, (void *)pic, (void *)text);
-    ezxml_free(f1);
-}
-void get_screen_size(char *xml, int *widgt, int *hight)
-{
-    ezxml_t f1 = ezxml_parse_file(xml);
-
-
-    level_scan_width_and_hight(f1, widgt, hight);
     ezxml_free(f1);
 }
 void get_system_screen(int *w, int *h)

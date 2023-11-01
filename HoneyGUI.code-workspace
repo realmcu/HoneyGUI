@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"lvgl.h": "c",
+			"lv_port_disp.h": "c",
+			"lv_conf.h": "c"
+		}
+	}
+}

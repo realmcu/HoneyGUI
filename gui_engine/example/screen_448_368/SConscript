@@ -7,6 +7,8 @@ src = Split("""
 """)
 
 src = Glob('*.c')
+if not GetDepend('BUILD_USING_LVGL_GUI'):
+    SrcRemove(src,'app_lvgl.c')
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_hongkong']
 print(CPPPATH)

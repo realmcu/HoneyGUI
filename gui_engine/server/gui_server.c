@@ -9,6 +9,7 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
+#include <gui_kb.h>
 #include <string.h>
 #include <gui_app.h>
 #include "acc_engine.h"
@@ -56,10 +57,6 @@ static uint32_t daemon_cnt = 0;
 
 static void rtgui_server_entry(void *parameter)
 {
-#if defined RTK_GUI_SCRIPT_AS_A_APP
-    extern void js_init(void);
-    js_init();
-#endif
     gui_server_mq = gui_mq_create("gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {
@@ -82,15 +79,18 @@ static void rtgui_server_entry(void *parameter)
 
         rtgui_msg_t msg;
         (void)msg;
-#if 0
-        if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0))
-        {
-        }
-        else
-        {
-        }
-#endif
 
+
+        struct gui_touch_data *raw = touchpad_get_data();
+        tp_algo_process(raw);
+
+        gui_kb_port_data_t *kb_raw = kb_get_data();
+        kb_algo_process(kb_raw);
+
+        if (app->lvgl == true)
+        {
+            continue;
+        }
 
         gui_fb_disp(screen);
 #ifdef _WIN32
@@ -159,7 +159,10 @@ int rtgui_server_init(void)
         gui_log("GUI Debug Mode!!");
         while (1);
     }
-
+#if defined RTK_GUI_SCRIPT_AS_A_APP
+    extern void js_init(void);
+    js_init();
+#endif
     gui_server_handle = gui_thread_create(GUI_SERVER_THREAD_NAME,
                                           rtgui_server_entry, NULL,
                                           1024 * 10,

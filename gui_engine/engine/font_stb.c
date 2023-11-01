@@ -129,7 +129,6 @@ static bool creat_stb_screen(gui_text_t *text, struct rtgui_rect *rect, FONT_STB
     if (buffer == NULL)
     {
         GUI_ASSERT(NULL != NULL);
-        return false;
     }
     memset(buffer, 0, (screen->width) * (screen->height)*sizeof(uint8_t));
     screen->buf = buffer;

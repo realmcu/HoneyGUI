@@ -168,6 +168,8 @@ bool gui_thread_delete(void *handle);
 
 bool gui_thread_mdelay(uint32_t ms);
 
+void gui_set_tick_hook(void (*hook)(void));
+
 bool gui_thread_suspend(void *handle);
 
 bool gui_thread_resume(void *handle);

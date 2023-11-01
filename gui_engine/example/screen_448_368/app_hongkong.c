@@ -9,14 +9,11 @@
 #include "gui_tab.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
-#include "gui_switch.h"
+#include <gui_img.h>
 #include "gui_canvas.h"
-#include "gui_img_with_animate.h"
 #include "app_hongkong.h"
 #include "gui_perspective.h"
 #include "gui_cube.h"
-#include "gui_seekbar.h"
 static void app_hongkong_ui_design(gui_app_t *app);
 
 
@@ -45,9 +42,6 @@ static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
 
-    // extern void test_cv(void *p);
-    // test_cv(&(app->screen));
-    // return;
 #ifndef _WIN32
 #include "mem_config.h"
     memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
@@ -68,67 +62,5 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_cube(tb_cube);
     page_tb_weather(tb_weather);
     page_tb_music(tb_music);
-    static void *array[] =
-    {
-        DOG20_BIN,
-        DOG40_BIN,
-        DOG60_BIN,
-        DOG80_BIN,
-        DOG100_BIN,
-        DOG120_BIN,
-        DOG140_BIN,
-        DOG160_BIN,
-        DOG180_BIN,
-        DOG200_BIN,
-        DOG220_BIN,
-        DOG240_BIN,
-        DOG260_BIN,
-        DOG280_BIN,
-        DOG300_BIN,
-        DOG320_BIN,
-        DOG340_BIN,
-        DOG360_BIN,
-        DOG20_BIN,
-        DOG40_BIN,
-        DOG60_BIN,
-        DOG80_BIN,
-        DOG100_BIN,
-        DOG120_BIN,
-        DOG140_BIN,
-        DOG160_BIN,
-        DOG180_BIN,
-        DOG200_BIN,
-        DOG220_BIN,
-        DOG240_BIN,
-        DOG260_BIN,
-        DOG280_BIN,
-        DOG300_BIN,
-        DOG320_BIN,
-        DOG340_BIN,
-        DOG360_BIN,
-        DOG20_BIN,
-        DOG40_BIN,
-        DOG60_BIN,
-        DOG80_BIN,
-        DOG100_BIN,
-        DOG120_BIN,
-        DOG140_BIN,
-        DOG160_BIN,
-        DOG180_BIN,
-        DOG200_BIN,
-        DOG220_BIN,
-        DOG240_BIN,
-        DOG260_BIN,
-        DOG280_BIN,
-        DOG300_BIN,
-        DOG320_BIN,
-        DOG340_BIN,
-        DOG360_BIN,
-    };
-
-
-    gui_seekbar_create_movie_v(tb_ani, array, 18 * 2, (368 - 232) / 2, (448 - 193) / 2);
-    extern void always_on_ui_design(gui_obj_t *parent);
-    always_on_ui_design(&(app->screen));
 }
 

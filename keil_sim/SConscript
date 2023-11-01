@@ -1,0 +1,45 @@
+# for module compiling
+import os
+Import('TOOL_ROOT')
+Import('RTK_GUI_ENGINE')
+
+from building import *
+
+cwd = GetCurrentDir()
+
+
+src = Split("""
+""")
+
+
+CPPDEFINES = ['LV_KCONFIG_IGNORE']
+CPPDEFINES += ['LV_LVGL_H_INCLUDE_SIMPLE']
+CPPDEFINES += ['LV_CONF_INCLUDE_SIMPLE']
+CPPDEFINES += ['LV_USE_DEMO_BENCHMARK']
+CPPDEFINES += ['LV_USE_DEMO_WIDGETS']
+CPPDEFINES += ['GUI_KEIL_SIM']
+
+path = [cwd]
+
+config = ['./menu_config.h']
+
+DefineGroup('menuconfig', config, depend = [''], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+src = ['main.c']
+src += ['rtk_gui_demo.c']
+
+if GetDepend('BUILD_USING_LVGL_GUI'):
+    src += ['app_lvgl.c']
+
+CPPPATH = [cwd, 
+           RTK_GUI_ENGINE + '/example/root_image/']
+objs = DefineGroup('application', src, depend = [''], CPPPATH = CPPPATH)
+
+
+list = os.listdir(cwd)
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+Return('objs')

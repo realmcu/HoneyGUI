@@ -1,10 +1,6 @@
 #include "root_image_hongkong/ui_resource.h"
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include "gui_canvas.h"
-#include "gui_seekbar.h"
-#include "gui_page.h"
-#include "gui_grid.h"
-#include "gui_switch.h"
 #include "gui_win.h"
 static void canvas_cb(gui_canvas_t *canvas)
 {
@@ -21,8 +17,8 @@ void  page_left_figure(void *parent_widget)
     gui_img_t *data =  gui_img_create_from_mem(parent, "data", DATA_BIN, 132, 64, 0, 0);
     gui_img_t *week =  gui_img_create_from_mem(parent, "week", SUN_BIN, 213, 64, 0, 0);
 
-    gui_magic_img_t *figure_bk0 =  gui_magic_img_create_from_mem(parent, "figure_bk0", RECT_110_108_BIN,
-                                                                 82, 98, 0, 0);
+    gui_img_t *figure_bk0 =  gui_img_create_from_mem(parent, "figure_bk0", RECT_110_108_BIN,
+                                                     82, 98, 0, 0);
     gui_img_set_opacity(figure_bk0, 200);
     gui_img_t *sky =  gui_img_create_from_mem(parent, "sky", SKY1_BIN, 123, 112, 0, 0);
     gui_img_t *centigrade0 =  gui_img_create_from_mem(parent, "centigrade", ASSEMBLY_BIN,
@@ -34,8 +30,8 @@ void  page_left_figure(void *parent_widget)
 
     gui_img_t *map =  gui_img_create_from_mem(parent, "siri", MAP_BIN, 202, 98, 0, 0);
 
-    gui_magic_img_t *figure_bk1 =  gui_magic_img_create_from_mem(parent, "figure_bk1", RECT_228_64_BIN,
-                                                                 82, 214, 0, 0);
+    gui_img_t *figure_bk1 =  gui_img_create_from_mem(parent, "figure_bk1", RECT_228_64_BIN,
+                                                     82, 214, 0, 0);
     gui_img_set_opacity(figure_bk1, 200);
     gui_img_t *heart_rate =  gui_img_create_from_mem(parent, "heart_rate", HEART_RATE_BIN,
                                                      98, 225, 0, 0);
@@ -44,8 +40,8 @@ void  page_left_figure(void *parent_widget)
     gui_img_t *sport =  gui_img_create_from_mem(parent, "sport", SPORT_BIN, 202, 225, 0, 0);
     gui_img_t *ring =  gui_img_create_from_mem(parent, "ring", RING_BIN, 254, 225, 0, 0);
 
-    gui_magic_img_t *figure_bk2 =  gui_magic_img_create_from_mem(parent, "figure_bk2", SOUND_BIN, 72,
-                                                                 319, 0, 0);
+    gui_img_t *figure_bk2 =  gui_img_create_from_mem(parent, "figure_bk2", SOUND_BIN, 72,
+                                                     319, 0, 0);
     gui_img_t *siri =  gui_img_create_from_mem(parent, "siri", SIRI_BIN, 161, 297, 0, 0);
 
 }

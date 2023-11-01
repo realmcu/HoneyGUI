@@ -52,10 +52,6 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
-        if (obj->obj_update_att != NULL)
-        {
-            obj->obj_update_att(obj);//update change x, not change dx
-        }
         obj->dx += obj->parent->dx;
         obj->dy += obj->parent->dy;
         obj->ax = obj->x + obj->parent->ax;
@@ -162,12 +158,6 @@ void gui_fb_disp(gui_obj_t *root)
         GUI_ASSERT(NULL != NULL);
         return;
     }
-
-    struct gui_touch_data *raw = touchpad_get_data();
-    tp_algo_process(raw);
-
-    gui_kb_port_data_t *kb_raw = kb_get_data();
-    kb_algo_process(kb_raw);
 
     obj_draw_prepare(root);
     uint32_t active_line = dc->driver_ic_active_width;

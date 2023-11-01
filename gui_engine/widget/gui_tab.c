@@ -1,21 +1,88 @@
-/*
- * File      : gui_tabview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_tab.c
+  * @brief tab widget
+  * @details tab widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/10/25
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
-//#include <math.h>
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-#include <gui_magic_img.h>
+#include <gui_img.h>
 #include "gui_tab.h"
 #include "gui_canvas.h"
-//#include "gui_curtain.h"
 #include "gui_img.h"
-//#include "gui_matrix.h"
 
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 
 static void tab_prepare(gui_obj_t *obj)
 {
@@ -80,15 +147,13 @@ static void tab_prepare(gui_obj_t *obj)
     }
 }
 
-
-
-void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int16_t x, int16_t y,
-                  int16_t w, int16_t h, int16_t idx, int16_t idy)
+static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int16_t x,
+                         int16_t y,
+                         int16_t w, int16_t h, int16_t idx, int16_t idy)
 {
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_update_att = NULL;
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->type = TAB;
 
@@ -116,6 +181,10 @@ void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int1
     }
 
 }
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 gui_tab_t *gui_tab_create(void *parent, const char *name, int16_t x, int16_t y,
                           int16_t w, int16_t h, int16_t idx, int16_t idy)
@@ -150,5 +219,10 @@ void gui_tab_set_style(gui_tab_t *this, SLIDE_STYLE style)
     this->style = style;
 }
 
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
 
-
+/** End of WIDGET
+  * @}
+  */
