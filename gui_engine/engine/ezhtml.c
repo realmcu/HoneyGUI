@@ -1065,7 +1065,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                                 {
-                                    char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 1);
+                                    char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
                                     sprintf(path2, "%s/%s", folder, entry->d_name);
                                     image_array[count++] = gui_get_file_address(path2);
                                 }
@@ -2115,7 +2115,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                             {
-                                char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 1);
+                                char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
                                 sprintf(path2, "%s/%s", folder, entry->d_name);
                                 image_array[count++] = gui_get_file_address(path2);
                             }
