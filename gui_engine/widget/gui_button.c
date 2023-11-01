@@ -82,8 +82,8 @@ static void button_prepare(gui_obj_t *obj)
                 //if (callback)
                 {
                     gui_log("%d\n", __LINE__);
-                    if ((tp->x >= obj->dx && tp->x <= (obj->dx + obj->w)) &&
-                        (tp->y >= obj->dy && tp->y <= (obj->dy + obj->h)))
+                    if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
+                        (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
                     {
                         gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
@@ -223,7 +223,7 @@ static void gui_button_ctor(
     this->on_pic_addr = highlight_pic;
 }
 
-static void set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
+void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
 {
     gui_animate_t *animate = ((gui_button_t *)o)->animate;
     if (!(animate))
@@ -243,8 +243,7 @@ gui_api_button_t gui_button_api =
     .onClick = onClick,
     .onLong = onLong,
     .onPress = onPress,
-    .onRelease = onRelease,
-    .set_animate = set_animate,
+    .onRelease = onRelease
 };
 gui_button_t *gui_button_create(
     void *parent,

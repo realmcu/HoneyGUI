@@ -224,6 +224,17 @@ void gui_button_img_move(gui_button_t *this, int16_t img_x, int16_t img_y);
  * @param text_y The y relative coordinates value of text(up).
  */
 void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y);
+/**
+ * @brief
+ *
+ * @param o
+ * @param dur
+ * @param reapteCount
+ * @param callback
+ * @param p
+ */
+void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback,
+                            void *p);
 
 /** End of WIDGET_Exported_Functions
   * @}
