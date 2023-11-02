@@ -83,7 +83,21 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static gui_curtain_t *get_child(gui_obj_t *object, gui_curtain_enum_t orientation)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == CURTAIN && GUI_TYPE(gui_curtain_t, obj)->orientation == orientation)
+        {
+            return (void *)obj;
+        }
 
+    }
+    return NULL;
+}
 
 static void curtainview_prepare(gui_obj_t *obj)
 {
@@ -171,7 +185,7 @@ static void curtainview_prepare(gui_obj_t *obj)
         obj->cover = false;
         return;
     }
-    if (obj->parent->parent->type == TABVIEW)
+    if (obj->parent->parent && obj->parent->parent->type == TABVIEW)
     {
         if (!(((gui_tabview_t *)(obj->parent->parent))->cur_id.x == 0 &&
               ((gui_tabview_t *)(obj->parent->parent))->cur_id.y == 0))
@@ -237,7 +251,14 @@ static void curtainview_prepare(gui_obj_t *obj)
                     ext->down_flag = true;
                     ext->spring_value -= GUI_FRAME_STEP;
                     obj->y += ext->spring_value;
-                    if (obj->y <= -(int)gui_get_screen_height())
+                    gui_curtain_t *child =  get_child(obj, CURTAIN_DOWN);
+                    float scope = 1;
+                    if (child)
+                    {
+                        scope = child->scope;
+                    }
+
+                    if (obj->y <= -(int)gui_get_screen_height()*scope)
                     {
                         ext->down_flag = false;
                         ext->cur_curtain = CURTAIN_DOWN;
@@ -256,7 +277,13 @@ static void curtainview_prepare(gui_obj_t *obj)
                     ext->down_flag = true;
                     ext->spring_value += GUI_FRAME_STEP;
                     obj->y += ext->spring_value;
-                    if (obj->y >= (int)gui_get_screen_height())
+                    gui_curtain_t *child =  get_child(obj, CURTAIN_UP);
+                    float scope = 1;
+                    if (child)
+                    {
+                        scope = child->scope;
+                    }
+                    if (obj->y >= (int)gui_get_screen_height()*scope)
                     {
                         ext->down_flag = false;
                         ext->cur_curtain = CURTAIN_UP;
