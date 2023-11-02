@@ -141,6 +141,7 @@ typedef struct gui_perspective
   * {
   *     gui_perspective_t *img_test = gui_perspective_create(parent, "test", pic, 0, 0, 454, 454);
   * }
+  * \endcode
   */
 gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void *addr,
                                           int16_t x, int16_t y, int16_t w, int16_t h);
