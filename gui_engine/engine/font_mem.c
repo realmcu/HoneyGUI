@@ -300,7 +300,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
 
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    uint8_t alpha = dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >> (7 - (j - font_x) % 2);
+                    uint8_t alpha = dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >> (4 - (j - font_x) % 2 * 4);
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x0f;
