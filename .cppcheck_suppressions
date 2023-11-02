@@ -1,44 +1,7 @@
 
-*:gui_engine\Third_Party\agge\agge\math.cpp
-*:gui_engine\Third_Party\agge\agge\stroke.cpp
-*:gui_engine\Third_Party\agge\agge\stroke_features.cpp
-*:gui_engine\Third_Party\nanovg\agg\nanovg_agg.cpp
-*:gui_engine\Third_Party\nanovg\agge\nanovg_agge.cpp
-*:gui_engine\Third_Party\nanovg\agge\nanovg_vertex.cpp
-*:gui_engine\Third_Party\nanovg\base\nanovg.c
-*:gui_engine\Third_Party\nanovg\base\fontstash.h
-*:gui_engine\Third_Party\nanovg\base\stb_image.h
-*:gui_engine\Third_Party\nanovg\base\stb_truetype.h
-*:gui_engine\Third_Party\nanovg\bgfx\nanovg_bgfx.cpp
-*:gui_engine\Third_Party\nanovg\demos\agg_draw_image.c
-*:gui_engine\Third_Party\nanovg\demos\agg_fill.c
-*:gui_engine\Third_Party\nanovg\demos\fill.inc
-*:gui_engine\Third_Party\nanovg\base\stb_image.h
-*:gui_engine\Third_Party\agge\agge\vector_rasterizer.cpp
-*:gui_engine\Third_Party\*
-*:wearable\database\fal-v0.5.0\*
-*:wearable\database\FlashDB-v1.1.1\*
-*:wearable\tuya-ble-sdk\*
-*:wearable\aliIOT\*
-*:wearable\miwear-sdk_0.2.13\*
-*:wearable\music_player\app_playback.c
-*:wearable\music_player\mp3_parser.c
-*:VGLite\*
+
+*:gui_engine\3rd\*
 *:lvgl\*
-*:rt-thread\*
-*:wearable\VCVC9202AtoPhilipsPSP\psp.c
-*:wearable\VCVC9202AtoPhilipsPSP\psp.h
-*:wearable\VCVC9202AtoPhilipsPSP\psp_map.h
-*:wearable\VCVC9202AtoPhilipsPSP\fx_datatypes.h
-*:wearable\VCVC9202AtoPhilipsPSP\algo.h
-*:wearable\VCVC9202AtoPhilipsPSP\biometrics_common.h
-*:wearable\VCVC9202AtoPhilipsPSP\spo2Algo.h
-*:wearable\VCVC9202AtoPhilipsPSP\vcHr02AHci.h
-*:wearable\VCVC9202AtoPhilipsPSP\vcHr02AHci.c
-*:wearable\VCVC9202AtoPhilipsPSP\vcSportMotionIntAlgo.h
-*:gui_engine\Third_Party\jerryscript-latest\*
-*:gui_engine\Third_Party\ezXML\*
-*:rt-thread\components\dfs\filesystems\romfs\dfs_romfs.c
 
 
 

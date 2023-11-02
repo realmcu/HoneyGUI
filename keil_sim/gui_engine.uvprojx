@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>RTK_BUILD_USING_RTK_GUI LV_KCONFIG_IGNORE LV_USE_DEMO_BENCHMARK LV_CONF_INCLUDE_SIMPLE LV_LVGL_H_INCLUDE_SIMPLE GUI_KEIL_SIM LV_USE_DEMO_WIDGETS</Define>
+              <Define>LV_USE_DEMO_WIDGETS LV_LVGL_H_INCLUDE_SIMPLE ENABLE_RTK_GUI LV_USE_DEMO_BENCHMARK LV_KCONFIG_IGNORE GUI_KEIL_SIM LV_CONF_INCLUDE_SIMPLE</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;lvgl_port;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\server;..\gui_engine\Third_Party\nanosvg\src;..\gui_engine\Third_Party\nanovg;..\gui_engine\Third_Party\nanovg\agge;..\gui_engine\Third_Party\nanovg\base;..\gui_engine\Third_Party\nanovg\agge;..\gui_engine\Third_Party\nanovg\vglite;..\gui_engine\Third_Party\stb;..\gui_engine\widget;..\gui_engine;..\lvgl;..\lvgl\src;..\lvgl\src\core;..\lvgl\src\draw;..\lvgl\src\extra;..\lvgl\src\font;..\lvgl\src\hal;..\lvgl\src\misc;..\lvgl\src\widgets;..\lvgl\src\draw\arm2d;..\lvgl\src\draw\sdl;..\lvgl\src\draw\stm32_dma2d;..\lvgl\src\draw\sw;..\lvgl\src\draw\swm341_dma2d;..\lvgl\src\draw\nxp\pxp;..\lvgl\src\draw\nxp\vglite;..\lvgl\src\draw\rtk\vglite;..\lvgl\src\extra\layouts;..\lvgl\src\extra\libs;..\lvgl\src\extra\others;..\lvgl\src\extra\themes;..\lvgl\src\extra\widgets;..\lvgl\src\extra\layouts\flex;..\lvgl\src\extra\layouts\grid;..\lvgl\src\extra\libs\bmp;..\lvgl\src\extra\libs\ffmpeg;..\lvgl\src\extra\libs\freetype;..\lvgl\src\extra\libs\fsdrv;..\lvgl\src\extra\libs\gif;..\lvgl\src\extra\libs\png;..\lvgl\src\extra\libs\qrcode;..\lvgl\src\extra\libs\rlottie;..\lvgl\src\extra\libs\sjpg;..\lvgl\src\extra\others\fragment;..\lvgl\src\extra\others\gridnav;..\lvgl\src\extra\others\ime;..\lvgl\src\extra\others\imgfont;..\lvgl\src\extra\others\monkey;..\lvgl\src\extra\others\msg;..\lvgl\src\extra\others\snapshot;..\lvgl\src\extra\themes\basic;..\lvgl\src\extra\themes\default;..\lvgl\src\extra\themes\mono;..\lvgl\src\extra\widgets\animimg;..\lvgl\src\extra\widgets\calendar;..\lvgl\src\extra\widgets\chart;..\lvgl\src\extra\widgets\colorwheel;..\lvgl\src\extra\widgets\imgbtn;..\lvgl\src\extra\widgets\keyboard;..\lvgl\src\extra\widgets\led;..\lvgl\src\extra\widgets\list;..\lvgl\src\extra\widgets\menu;..\lvgl\src\extra\widgets\meter;..\lvgl\src\extra\widgets\msgbox;..\lvgl\src\extra\widgets\span;..\lvgl\src\extra\widgets\spinbox;..\lvgl\src\extra\widgets\spinner;..\lvgl\src\extra\widgets\tabview;..\lvgl\src\extra\widgets\tileview;..\lvgl\src\extra\widgets\win</IncludePath>
+              <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;lvgl_port;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\server;..\gui_engine\widget;..\gui_engine;..\lvgl;..\lvgl\src;..\lvgl\src\core;..\lvgl\src\draw;..\lvgl\src\extra;..\lvgl\src\font;..\lvgl\src\hal;..\lvgl\src\misc;..\lvgl\src\widgets;..\lvgl\src\draw\arm2d;..\lvgl\src\draw\sdl;..\lvgl\src\draw\stm32_dma2d;..\lvgl\src\draw\sw;..\lvgl\src\draw\swm341_dma2d;..\lvgl\src\draw\nxp\pxp;..\lvgl\src\draw\nxp\vglite;..\lvgl\src\draw\rtk\vglite;..\lvgl\src\extra\layouts;..\lvgl\src\extra\libs;..\lvgl\src\extra\others;..\lvgl\src\extra\themes;..\lvgl\src\extra\widgets;..\lvgl\src\extra\layouts\flex;..\lvgl\src\extra\layouts\grid;..\lvgl\src\extra\libs\bmp;..\lvgl\src\extra\libs\ffmpeg;..\lvgl\src\extra\libs\freetype;..\lvgl\src\extra\libs\fsdrv;..\lvgl\src\extra\libs\gif;..\lvgl\src\extra\libs\png;..\lvgl\src\extra\libs\qrcode;..\lvgl\src\extra\libs\rlottie;..\lvgl\src\extra\libs\sjpg;..\lvgl\src\extra\others\fragment;..\lvgl\src\extra\others\gridnav;..\lvgl\src\extra\others\ime;..\lvgl\src\extra\others\imgfont;..\lvgl\src\extra\others\monkey;..\lvgl\src\extra\others\msg;..\lvgl\src\extra\others\snapshot;..\lvgl\src\extra\themes\basic;..\lvgl\src\extra\themes\default;..\lvgl\src\extra\themes\mono;..\lvgl\src\extra\widgets\animimg;..\lvgl\src\extra\widgets\calendar;..\lvgl\src\extra\widgets\chart;..\lvgl\src\extra\widgets\colorwheel;..\lvgl\src\extra\widgets\imgbtn;..\lvgl\src\extra\widgets\keyboard;..\lvgl\src\extra\widgets\led;..\lvgl\src\extra\widgets\list;..\lvgl\src\extra\widgets\menu;..\lvgl\src\extra\widgets\meter;..\lvgl\src\extra\widgets\msgbox;..\lvgl\src\extra\widgets\span;..\lvgl\src\extra\widgets\spinbox;..\lvgl\src\extra\widgets\spinner;..\lvgl\src\extra\widgets\tabview;..\lvgl\src\extra\widgets\tileview;..\lvgl\src\extra\widgets\win</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -444,6 +444,41 @@
               <FilePath>lvgl_port\lv_port_indev.c</FilePath>
             </File>
             <File>
+              <FileName>nanovg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\3rd\nanovg\base\nanovg.c</FilePath>
+            </File>
+            <File>
+              <FileName>math.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\gui_engine\3rd\nanovg\agge\math.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\gui_engine\3rd\nanovg\agge\stroke.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>stroke_features.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\gui_engine\3rd\nanovg\agge\stroke_features.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>vector_rasterizer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\gui_engine\3rd\nanovg\agge\vector_rasterizer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>nanovg_agge.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\gui_engine\3rd\nanovg\agge\nanovg_agge.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>nanovg_vertex.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\gui_engine\3rd\nanovg\agge\nanovg_vertex.cpp</FilePath>
+            </File>
+            <File>
               <FileName>gui_app.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\app\gui_app.c</FilePath>
@@ -514,39 +549,14 @@
               <FilePath>..\gui_engine\server\gui_server.c</FilePath>
             </File>
             <File>
-              <FileName>nanovg.c</FileName>
+              <FileName>gui_alert.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\gui_engine\Third_Party\nanovg\base\nanovg.c</FilePath>
+              <FilePath>..\gui_engine\widget\gui_alert.c</FilePath>
             </File>
             <File>
-              <FileName>math.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\gui_engine\Third_Party\nanovg\agge\math.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\gui_engine\Third_Party\nanovg\agge\stroke.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>stroke_features.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\gui_engine\Third_Party\nanovg\agge\stroke_features.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>vector_rasterizer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\gui_engine\Third_Party\nanovg\agge\vector_rasterizer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>nanovg_agge.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\gui_engine\Third_Party\nanovg\agge\nanovg_agge.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>nanovg_vertex.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\gui_engine\Third_Party\nanovg\agge\nanovg_vertex.cpp</FilePath>
+              <FileName>gui_arc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_arc.c</FilePath>
             </File>
             <File>
               <FileName>gui_canvas.c</FileName>
@@ -564,6 +574,11 @@
               <FilePath>..\gui_engine\widget\gui_cardview.c</FilePath>
             </File>
             <File>
+              <FileName>gui_colorwheel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_colorwheel.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_cube.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_cube.c</FilePath>
@@ -579,9 +594,19 @@
               <FilePath>..\gui_engine\widget\gui_curtainview.c</FilePath>
             </File>
             <File>
+              <FileName>gui_eq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_eq.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_img.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_img.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_img_scope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_img_scope.c</FilePath>
             </File>
             <File>
               <FileName>gui_obj.c</FileName>
@@ -594,9 +619,19 @@
               <FilePath>..\gui_engine\widget\gui_perspective.c</FilePath>
             </File>
             <File>
+              <FileName>gui_progressbar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_progressbar.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_svg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_svg.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_switch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_switch.c</FilePath>
             </File>
             <File>
               <FileName>gui_tab.c</FileName>
@@ -622,6 +657,11 @@
               <FileName>gui_watchface_gradient.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_watchface_gradient.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_wave.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_wave.c</FilePath>
             </File>
             <File>
               <FileName>gui_widget_template.c</FileName>
@@ -683,7 +723,7 @@
                   <MiscControls> --c99 --gnu --diag_suppress=188 --diag_suppress=546 --diag_suppress=550 --diag_suppress=111 --diag_suppress=68 --diag_suppress=870</MiscControls>
                   <Define>PRIX32=\"x\"</Define>
                   <Undefine> </Undefine>
-                  <IncludePath></IncludePath>
+                  <IncludePath> </IncludePath>
                 </VariousControls>
               </Cads>
               <Aads>

@@ -1806,7 +1806,7 @@ static void *context_alloc(size_t size, void *cb_data_p)
 }
 #include <jerryscript.h>
 #include <jerry_util.h>
-#include "..\Third_Party\jerryscript-latest\rtthread-port\config.h"
+#include "..\3rd\js\js-port\config.h"
 extern int js_console_init(void);
 extern void jerry_port_set_default_context(jerry_context_t *context);
 jerry_value_t parsed_code;
