@@ -1,8 +1,6 @@
 #include "gui_button.h"
 #include "gui_obj.h"
 #include <tp_algo.h>
-#include "gui_magic_img.h"
-#include "gui_dynamic_img.h"
 #include "draw_font.h"
 void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y)
 {
@@ -51,8 +49,10 @@ static void (onClick)(gui_button_t *b, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
+static void (obj_update_att)(struct _gui_obj_t *o);
 static void button_prepare(gui_obj_t *obj)
 {
+    obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
 
@@ -216,7 +216,6 @@ static void gui_button_ctor(
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = BUTTON;
     root->obj_prepare = button_prepare;
-    root->obj_update_att = obj_update_att;
 
     // for self
     this->off_pic_addr = background_pic;
@@ -278,11 +277,12 @@ gui_button_t *gui_button_create(
         switch (image_type)
         {
         case 0:
-            button->img = (void *)gui_magic_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
+            button->img = (void *)gui_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
             break;
         case 1:
-            button->img = (void *)gui_dynamic_create_from_mem((void *)button, "g", background_pic, count, 0, 0,
-                                                              30, INT32_MAX - 1);
+            button->img = (void *)gui_img_create_from_mem((void *)button, "g", ((void **)background_pic)[0], 0,
+                                                          0,
+                                                          0, 0);
             break;
         case 2:
             //button->img = (void *)gui_svg_create_from_mem((void *)button, background_pic, count, 0, 0, w, h);

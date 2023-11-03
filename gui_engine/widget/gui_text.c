@@ -148,8 +148,8 @@ static void text_end(gui_obj_t *obj)
 
 }
 
-static void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
-                          int16_t y, int16_t w, int16_t h)
+void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
+                   int16_t y, int16_t w, int16_t h)
 {
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;

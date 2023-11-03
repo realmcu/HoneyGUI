@@ -12,7 +12,7 @@
 #include "gui_app.h"
 #endif
 
-#include "gui_magic_img.h"
+#include "gui_img.h"
 #include "tp_algo.h"
 static void screen_backfunc()
 {
@@ -72,7 +72,7 @@ void gui_return_ctor(gui_return_t *this, gui_obj_t *parent, const char *widgetam
 {
     gui_obj_ctor(&this->base, parent, widgetame, 0, 0, 0, 0);
     ((gui_obj_t *)this)->type = RETURNWIDGET;
-    this->base.obj_update_att = return_update_att;
+    this->base.obj_prepare = return_update_att;
 }
 gui_return_t *gui_return_create(void *parent)
 {

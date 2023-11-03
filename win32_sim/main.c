@@ -39,7 +39,7 @@
 
 uint8_t resource_root[1024 * 1024 * 200];
 
-char *defaultPath = "example/screen_454_454/root_image/root/";
+char *defaultPath = "./gui_engine/example/screen_454_454/root_image/root/";
 int main(int argc, char **argv)
 {
 

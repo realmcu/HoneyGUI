@@ -7,13 +7,9 @@ src = Split("""
 """)
 
 src = Glob('*.c')
-SrcRemove(src,'gui_button.c')
-SrcRemove(src,'gui_return.c')
 SrcRemove(src,'gui_scroll_wheel.c')
-SrcRemove(src,'gui_seekbar.c')
 SrcRemove(src,'gui_bitmap.c')
 SrcRemove(src,'gui_stb_img.c')
-SrcRemove(src,'gui_scroll_text.c')
 
 if not GetDepend(['BUILD_USING_LVGL_GUI']):
     SrcRemove(src,'gui_lvgl.c')

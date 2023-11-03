@@ -1896,8 +1896,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         img2 = gui_get_file_address(hl_picture);;
                     }
-                    parent = (void *)gui_radio_create(parent, x, y, w, h, img1, img2);
-                    parent->name = get_space_string_head(p->txt);
+                    //parent = (void *)gui_radio_create(parent, x, y, w, h, img1, img2);
+                    //parent->name = get_space_string_head(p->txt);
                     //parent = gui_win_create(parent, "1", 0,0,0,0);
                 }
                 break;

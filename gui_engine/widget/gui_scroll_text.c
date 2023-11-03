@@ -109,6 +109,8 @@ void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char 
                          int16_t y, int16_t w, int16_t h)
 {
     gui_text_t *base = (gui_text_t *)this;
+    extern void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
+                              int16_t y, int16_t w, int16_t h);
     gui_text_ctor(base, parent, name, x, y, w, h);
     base->mode = SCROLL_X;
 

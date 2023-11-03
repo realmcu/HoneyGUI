@@ -9,8 +9,10 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
+static void (obj_update_att)(struct _gui_obj_t *o);
 static void seekbar_preapre(gui_obj_t *obj)
 {
+    obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = (gui_seekbar_t *)obj;//gui_log("obj:%s,%p\n",obj->name, circle->animate);
@@ -166,6 +168,7 @@ static float get_gegree_to_center(uint16_t cx, uint16_t cy, uint16_t point_x, ui
 }
 static void seekbar_preapre_arc(gui_obj_t *obj)
 {
+    obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = (gui_seekbar_t *)obj;
@@ -317,6 +320,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
 }
 static void seekbar_h_preapre(gui_obj_t *obj)
 {
+    obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = (gui_seekbar_t *)obj;
@@ -483,7 +487,6 @@ void gui_seekbar_ctor_img_v(gui_seekbar_t *this, gui_obj_t *parent, void *pictur
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_prepare = seekbar_preapre;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
 }
 void gui_seekbar_ctor_img_h(gui_seekbar_t *this, gui_obj_t *parent, void *picture, int16_t x,
@@ -497,7 +500,6 @@ void gui_seekbar_ctor_img_h(gui_seekbar_t *this, gui_obj_t *parent, void *pictur
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_prepare = seekbar_h_preapre;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
 }
 void gui_seekbar_ctor_movie_h(gui_seekbar_t *this, gui_obj_t *parent, void  **picture_array,
@@ -513,7 +515,6 @@ void gui_seekbar_ctor_movie_h(gui_seekbar_t *this, gui_obj_t *parent, void  **pi
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_prepare = seekbar_h_preapre;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     uint16_t w = gui_img_get_width((void *)this->base.c);
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
@@ -534,7 +535,6 @@ void gui_seekbar_ctor_movie_v(gui_seekbar_t *this, gui_obj_t *parent, void  **pi
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_prepare = seekbar_preapre;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     uint16_t w = gui_img_get_width((void *)this->base.c);
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
@@ -562,7 +562,6 @@ void gui_seekbar_ctor_movie_arc(gui_seekbar_t *this, gui_obj_t *parent, void  **
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_prepare = seekbar_preapre_arc;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     uint16_t w = gui_img_get_width((void *)this->base.c);
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
@@ -579,7 +578,6 @@ void gui_seekbar_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *filena
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_prepare = seekbar_preapre;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
 }
 void gui_seekbar_h_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
@@ -591,7 +589,6 @@ void gui_seekbar_h_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *file
     //this->base.base.y+this->base.max_rectangle->base.base.base.h/2, this->base.max_rectangle->base.base.base.h/2, 0x0f0f);
     this->base.base.type = SEEKBAR;
     GET_BASE(this)->obj_prepare = seekbar_h_preapre;
-    GET_BASE(this)->obj_update_att = obj_update_att;
     //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
 }
 

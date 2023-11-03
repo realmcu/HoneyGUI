@@ -225,8 +225,16 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
  */
 gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                    int16_t x, int16_t y, int16_t w, int16_t h);
-
-
+/**
+ * @brief creat an image widget using file path
+ *
+ * @param parent the father widget it nested in.
+ * @param file image file path
+ * @param x the X-axis coordinate of the widget.
+ * @param x the Y-axis coordinate of the widget.
+ * @return gui_magic_img_t*
+ */
+gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
 /** End of WIDGET_Exported_Functions
   * @}
   */

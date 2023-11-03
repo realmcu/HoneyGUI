@@ -296,7 +296,10 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
     GET_BASE(img)->create_done = true;
     return img;
 }
-
+gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)
+{
+    return gui_img_create_from_mem(parent, "image", gui_get_file_address(file), x, y, 0, 0);
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */
