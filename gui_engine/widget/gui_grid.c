@@ -22,7 +22,7 @@
 #include "tp_algo.h"
 #include "gui_img.h"
 #include "gui_canvas.h"
-#include "gui_magic_img.h"
+
 
 
 /** @defgroup WIDGET WIDGET
@@ -123,9 +123,7 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
         {
         case IMAGE_FROM_MEM:
             {
-                //gui_log("scale:%f\n", x);
-                gui_magic_img_t *img = (void *)obj;
-                gui_img_scale(img, x, y);
+
 
             }
             break;
@@ -146,6 +144,7 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
 
 static void tab_prepare_scale(gui_obj_t *obj)
 {
+    obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = (touch_info_t *)tp_get_info();
     struct gui_grid *this = (void *)obj;
@@ -153,45 +152,7 @@ static void tab_prepare_scale(gui_obj_t *obj)
     {
     case GRID_CLASSIC:
         break;
-    case GRID_SCALE:
-        {
-            /**
-                 * @note tp->deltaX >0 means slide right, the left tab shows
-                 *       tp->deltaX <0 means slide left, the right tab shows
-                 *       the left tab's dx -320~0
-                 *       the right tab's dx 320~0
-                 */
 
-
-            {
-//gui_log("%d\n", tp->type);
-                switch (tp->type)
-                {
-                case TOUCH_ORIGIN_FROM_Y:
-                case TOUCH_ORIGIN_FROM_X:
-                case TOUCH_LEFT_SLIDE:
-                case TOUCH_RIGHT_SLIDE:
-                    break;
-                case TOUCH_HOLD_X:
-                case TOUCH_HOLD_Y:
-                    {
-                        if (obj->dx == 0 && obj->dy == 0)
-                        {
-                            float scale = ((float)(gui_get_screen_width() + ((float)((tp->deltaX)))
-                                                  )) / ((float)gui_get_screen_width());
-                            if (scale < 0.3f) { scale = 0.3f; }
-                            if (scale > 3.0f) { scale = 3.0f; }
-                            deal_img_in_root(obj, scale, scale);
-                            struct gui_grid *this = (void *)obj;
-                            this->gap_col_scale = scale * this->gap_col;
-                            this->gap_row_scale = scale * this->gap_row;
-                        }
-                    }
-                default:
-                    break;
-                }
-            }
-        }
         break;
     default:
         break;
@@ -208,7 +169,7 @@ static void gui_grid_ctor(struct gui_grid *this,
                           uint16_t gap_row)
 {
     gui_obj_ctor(&this->base, parent, "grid", x, y, gap_col * col, 700);
-    GET_BASE(this)->obj_update_att = obj_update_att;
+    //GET_BASE(this)->obj_update_att = obj_update_att;
     GET_BASE(this)->obj_prepare = tab_prepare_scale;
     this->row = row;
     this->col = col;

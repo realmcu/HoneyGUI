@@ -17,8 +17,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_CURTAIN_H__
-#define __GUI_CURTAIN_H__
+#ifndef __GUI_WIN_H__
+#define __GUI_WIN_H__
 #ifdef __cplusplus
 extern "C" {
 #endif

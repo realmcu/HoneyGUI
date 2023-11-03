@@ -8,8 +8,6 @@ src = Split("""
 
 src = Glob('*.c')
 SrcRemove(src,'gui_button.c')
-SrcRemove(src,'gui_grid.c')
-SrcRemove(src,'gui_page.c')
 SrcRemove(src,'gui_return.c')
 SrcRemove(src,'gui_scroll_wheel.c')
 SrcRemove(src,'gui_seekbar.c')

@@ -13,7 +13,7 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "gui_grid.h"
-#include <gui_dynamic_img.h>
+//#include <gui_dynamic_img.h>
 //#include "gui_progressbar.h"
 //#include "gui_seekbar.h"
 //#include "tp_algo.h"

@@ -11,17 +11,17 @@
 #include "gui_obj.h"
 #include <gui_curtain.h>
 #include <tp_algo.h>
-static void deal_img_in_root(gui_obj_t *object, int dyend, int *out)
+static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        obj->dx = obj->x + obj->parent->dx;
-        obj->dy = obj->y + obj->parent->dy;
-        if (dyend < obj->dy + obj->h) { dyend = obj->dy + obj->h; }
-        *out = dyend;
-        deal_img_in_root(obj, dyend, out);
+        obj->ax = obj->x + obj->parent->ax;
+        obj->ay = obj->y + obj->parent->ay;
+        if (ayend < obj->ay + obj->h) { ayend = obj->ay + obj->h; }
+        *out = ayend;
+        deal_img_in_root(obj, ayend, out);
     }
 }
 void page_update(gui_obj_t *obj)
@@ -30,16 +30,20 @@ void page_update(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     if (((gui_page_t *)obj)->get_yend < 2)
     {
-        int dy = 0;
-        deal_img_in_root(obj, obj->y + obj->h, &dy);
-        obj->h = dy - obj->y;
+        int ay = 0;
+        deal_img_in_root(obj, obj->y + obj->h, &ay);
+        obj->h = ay - obj->y;
         obj->w = 320;
         //gui_log("deal_img_in_root %d",obj->h);
         ((gui_page_t *)obj)->get_yend++;
     }
+    if (obj->parent->ay != 0)
+    {
+        return;
+    }
 
-    if ((obj->dx < (int)gui_get_screen_width()) && ((obj->dx + obj->w) >= 0) && \
-        (obj->dy < (int)gui_get_screen_height()) && ((obj->dy + obj->h) >= 0))
+    if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
+        (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
     {
         if ((tp->x > ((gui_page_t *)obj)->start_x) && (tp->x < ((gui_page_t *)obj)->start_x + obj->w))
         {
@@ -86,9 +90,19 @@ void page_update(gui_obj_t *obj)
             ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
                                                        gui_get_screen_height() / obj->h);
         }
-
-
+        gui_log("obj->y:%d,%d, %d\n", obj->y, obj->ay, obj->parent->ay);
+        if (obj->y == ((gui_page_t *)obj)->start_y)
+        {
+            obj->cover = false;
+        }
+        else
+        {
+            obj->cover = true;
+        }
     }
+
+
+
 }
 
 static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
@@ -118,7 +132,7 @@ void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, in
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h
                 );
     GET_BASE(this)->type = PAGE;
-    GET_BASE(this)->obj_update_att = page_update;
+    GET_BASE(this)->obj_prepare = page_update;
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;

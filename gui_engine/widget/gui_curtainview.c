@@ -200,6 +200,12 @@ static void curtainview_prepare(gui_obj_t *obj)
     {
         return;
     }
+    bool cover1 = false;
+    gui_tree_get_cover(obj, PAGE, &cover1);
+    if (cover1)
+    {
+        return;
+    }
 
 
     switch (ext->cur_curtain)

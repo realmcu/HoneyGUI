@@ -24,7 +24,7 @@
 #include "acc_engine.h"
 #include "gui_grid.h"
 #include "gui_scroll_text.h"
-#include "gui_radio.h"
+//#include "gui_radio.h"
 #include "gui_switch.h"
 #include "string.h"
 #include "stdio.h"
@@ -33,7 +33,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
-#include "gui_dynamic_img.h"
+//#include "gui_dynamic_img.h"
 #ifdef OS_FREERTOS
 #include "romfs.h"
 #else
@@ -1837,72 +1837,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                 }
-            case RADIO:
-                {
-                    size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    char *font_type = "rtk_font_fs32";
-                    char *text = NULL;
-                    int text_x = 0;
-                    int text_y = 0;
-                    uint32_t font_color = 0Xf0f0;
-                    uint32_t font_size = 40;
-                    int picture_x = 0;
-                    int picture_y = 0;
-                    int transition = 0;
-                    char *picture = NULL;
-                    char *hl_picture = NULL;
-                    int style = 0;
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "x"))
-                        {
-                            x = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "y"))
-                        {
-                            y = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "w"))
-                        {
-                            w = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "h"))
-                        {
-                            h = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "picture"))
-                        {
-                            picture = gui_strdup(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "highlightPicture"))
-                        {
-                            hl_picture = gui_strdup(p->attr[++i]);
-                        }
 
-                        i++;
-                    }
-                    void *img1;
-                    void *img2;
-                    {
-                        img1 = gui_get_file_address(picture);
-                    }
-                    {
-                        img2 = gui_get_file_address(hl_picture);;
-                    }
-                    parent = (void *)gui_radio_create(parent, x, y, w, h, img1, img2);
-                    parent->name = get_space_string_head(p->txt);
-                    //parent = gui_win_create(parent, "1", 0,0,0,0);
-                }
-                break;
             case CLICKSWITCH:
                 {
                     size_t i = 0;
@@ -2119,32 +2054,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                                  INT32_MAX);
                 }
                 break;
-            case RADIOSWITCH:
-                {
-                    size_t i = 0;
-                    char *text = "radio";
-                    while (true)
-                    {
-                        if (!(p->attr[i]))
-                        {
-                            break;
-                        }
-                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
-                        if (!strcmp(p->attr[i], "text"))
-                        {
-                            text = gui_strdup(p->attr[++i]);
-                        }
 
-                        i++;
-                    }
-                    if (parent->type == RADIO)
-                    {
-                        gui_radio_api.append((void *)parent, text);
-
-                    }
-                    //parent = gui_win_create(parent, "1", 0,0,0,0);
-                }
-                break;
             case JAVASCRIPT:
                 {
                     if (!strcmp(p->attr[0], "file"))
