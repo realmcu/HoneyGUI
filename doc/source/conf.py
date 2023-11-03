@@ -11,8 +11,7 @@ import recommonmark
 from recommonmark.transform import AutoStructify
 
 project = 'RTKIOT GUI'
-copyright = '2023, miaomiao_wu'
-author = 'miaomiao_wu'
+author = 'RTKIOT GUI'
 release = 'v0.0.0.1'
 
 # -- General configuration ---------------------------------------------------
@@ -31,6 +30,16 @@ exclude_patterns = []
 
 highlight_language = 'c'
 
+# The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
+#
+source_suffix = ['.rst', '.md']
+
+source_encoding = "utf-8"
+
+# The master toctree document.
+master_doc = "index"
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
@@ -46,20 +55,80 @@ html_favicon = "./_static/image/favicon.ico"
 
 html_show_sourcelink = False
 
-# The default language to highlight source code in. The default is 'python'.
-# The value should be a valid Pygments lexer name, see Showing code examples for more details.
+html_theme_options = {
+    'collapse_navigation' : False,
+    'logo_only': True,
+}
+
+html_js_files = [
+    'js/custom.js'
+]
+
+# -- Options for LaTeX output ---------------------------------------------
+
+latex_engine = 'xelatex'
+latex_use_xindy = False
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    # 'papersize': 'letterpaper',
+
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    # 'pointsize': '10pt',
+
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
+
+    # Latex figure (float) alignment
+    #
+    # 'figure_align': 'htbp',
+
+    'inputenc': '',
+    'utf8extra': '',
+    'classoptions': ',openany,oneside',
+    'babel': '\\usepackage{babel}',
+    'passoptionstopackages': r'''
+\PassOptionsToPackage{bookmarksdepth=5}{hyperref}% depth of pdf bookmarks
+''',
+    'preamble': r'''
+\usepackage{fontspec}
+\setmonofont{DejaVu Sans Mono}
+\usepackage{silence}
+\WarningsOff*
+''',
+}
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title,
+#  author, documentclass [howto, manual, or own class]).
+latex_documents = [
+    (master_doc, 'BeeGUI.tex', 'BeeGUI Documentation',
+     'BeeGUI community', 'manual'),
+]
 
 
-highlight_language = 'c'
+# -- Options for manual page output ---------------------------------------
 
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-source_suffix = ['.rst', '.md']
+# One entry per manual page. List of tuples
+# (source start file, name, description, authors, manual section).
+man_pages = [
+    (master_doc, 'BeeGUI', 'BeeGUI Documentation',
+     [author], 1)
+]
 
-source_encoding = "utf-8"
 
-master_doc = "index"
+# -- Options for Texinfo output -------------------------------------------
+
+# Grouping the document tree into Texinfo files. List of tuples
+# (source start file, target name, title, author,
+#  dir menu entry, description, category)
+texinfo_documents = [
+    (master_doc, 'BeeGUI', 'BeeGUI Documentation',
+     author, 'Contributors of BeeGUI', 'One line description of project.',
+     'Miscellaneous'),
+]
 
 # -- Options for Breathe ----------------------------------------------------
 
@@ -77,3 +146,5 @@ def setup(app):
             'enable_auto_toc_tree': 'True',
             }, True)
     app.add_transform(AutoStructify)
+    app.add_css_file('css/custom.css')
+    app.add_css_file('css/fontawesome.min.css')
