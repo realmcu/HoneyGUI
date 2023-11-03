@@ -256,7 +256,7 @@ class HoneyGUIRelease(WindowsToolRelease):
         self.uncomment_code_line(line_content=r'#define RTK_GUI_SCRIPT_AS_A_APP',
                                  file_path=os.path.join(os.getcwd(), r"gui_engine/rtk_gui_sim/gui_port/gui_config.h"))
 
-        self.uncomment_code_line(line_content=r'#define MODULE_USING_SCRIPT_AS_A_APP',
+        self.uncomment_code_line(line_content=r'#define BUILD_USING_SCRIPT_AS_A_APP',
                                  file_path=os.path.join(os.getcwd(), r"gui_engine/rtk_gui_sim/menu_config.h"))
         self.print_git_diff()
 

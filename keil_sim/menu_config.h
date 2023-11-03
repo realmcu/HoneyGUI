@@ -34,7 +34,13 @@
 // </c>
 
 // <c> HoneyGUI Enable LVGL EXAMPLES
-//#define PKG_LVGL_USING_EXAMPLES
+//#define BUILD_USING_LVGL_EXAMPLES
+// </c>
+
+
+
+// <c> HoneyGUI Enable SasA
+#define BUILD_USING_SCRIPT_AS_A_APP
 // </c>
 
 // </h>

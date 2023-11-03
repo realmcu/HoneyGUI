@@ -75,10 +75,10 @@ CPPDEFINES += ['JERRY_ENABLE_LOGGING']
 
 
 
-group = DefineGroup('JerryScript', src, depend = ['MODULE_USING_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH, 
+group = DefineGroup('JerryScript', src, depend = ['BUILD_USING_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH, 
     CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
 
-if GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
+if GetDepend(['BUILD_USING_SCRIPT_AS_A_APP']):
     group = group + SConscript(os.path.join('js-port', 'SConscript'))
 
 Return('group')

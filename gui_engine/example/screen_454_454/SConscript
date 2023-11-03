@@ -3,7 +3,7 @@ from building import *
 cwd = GetCurrentDir()
 src = Split("""
 """)
-if not GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
+if not GetDepend(['BUILD_USING_SCRIPT_AS_A_APP']):
     src += ['app_launcher.c']
     src += ['app_launcher_tb_watch.c']
     src += ['app_launcher_tb_sport.c']
