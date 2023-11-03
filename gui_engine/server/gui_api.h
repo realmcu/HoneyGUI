@@ -199,6 +199,7 @@ int gui_fs_closedir(gui_fs_DIR *d);
 int gui_fs_ioctl(int fd, int cmd);
 gui_fs_DIR *gui_fs_opendir(const char *name);
 struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d);
+void *gui_get_file_address(const char *file);
 
 char *gui_strdup(const char *s);
 void gui_log(const char *format, ...);

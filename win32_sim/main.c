@@ -92,8 +92,8 @@ int main(int argc, char **argv)
 #if UI_DEMO == BEE3_PRO_HK
     extern void *get_app_hongkong(void);
     extern void *get_app_lvgl(void);
-    //gui_app_startup(get_app_hongkong());
-    gui_app_startup(get_app_lvgl());
+    gui_app_startup(get_app_hongkong());
+    //gui_app_startup(get_app_lvgl());
 #endif
 #if UI_DEMO == BEE4_HK
     extern void gui_load_bee4_hk(void);

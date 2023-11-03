@@ -14,7 +14,7 @@ src += ['font_mem.c']
 src += ['font_stb.c']
 src += ['acc_sw.c']
 #src += ['acc_arm_2d.c']
-if GetDepend(['MODULE_USING_SCRIPT_AS_A_APP']):
+if GetDepend(['BUILD_USING_SCRIPT_AS_A_APP']):
     src += ['ezhtml.c']
     src += ['ezjs.c']
     src += ['frontend_launcher.c']
