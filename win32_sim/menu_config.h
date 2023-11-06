@@ -16,13 +16,19 @@
 // <h> HoneyGUI Config
 
 
-// <c> HoneyGUI Enable RTK Real GUI
-#define BUILD_USING_RTK_GUI
+
+// <e> HoneyGUI Enable RTK Real GUI
+#define BUILD_USING_RTK_GUI 1
+#if (BUILD_USING_RTK_GUI == 1)
+
+// <c> RTK GUI 448*368 Demo
+#define BUILD_USING_RTK_GUI_448_368_DEMO
 // </c>
 
-// <c> RTK GUI Demo
-#define BUILD_USING_RTK_GUI_DEMO
-// </c>
+#endif
+// </e>
+
+
 
 // <c> RTK GUI frame buffer type
 #define RTK_GUI_FB_RAM_SINGLE

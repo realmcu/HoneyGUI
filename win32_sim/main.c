@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
 
     rtgui_server_init();
-//#ifdef BUILD_USING_RTK_GUI_DEMO
+
 #if 1
 #ifndef RTK_GUI_SCRIPT_AS_A_APP
 #if UI_DEMO == BEE3_PRO
