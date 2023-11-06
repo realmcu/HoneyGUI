@@ -36,14 +36,13 @@ RTKIOT GUI
 
 
 .. toctree::
-  :hidden:
 
   Get Started <get-started/index>
+  integration/index
   GUI APP <GUI-APP/index>
   widgets <widgets/index>
   Porting <Porting/index>
   FAQ <FAQ/index>
-* :ref:`genindex`
 
 
 
