@@ -62,3 +62,7 @@ gui_engine/rtk_gui_sim/cconfig.h
 
 gui_engine/rtk_gui_sim/gui.bin
 gui_engine/rtk_gui_sim/.sconsign.dblite
+
+doc/doxyxml/html
+doc/doxyxml/xml
+doc/output

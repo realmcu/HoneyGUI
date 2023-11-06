@@ -40,6 +40,7 @@ class CICheck(JenkinsCheckBase):
 
         self.module_table = (
                  [ 'GUI',        '',            kwargs["sdk_handler"] ],
+                 [ 'DOC',        '',            kwargs["sdk_handler"] ],
 
                  [ 'Script',       'CI',        kwargs["sdk_handler"] ],
                  [ 'Script',       'Other',     kwargs["sdk_handler"] ],

@@ -11,6 +11,7 @@ sphinx-notfound-page = "*"
 sphinx-rtd-theme = "*"
 sphinx-press-theme = "*"
 recommonmark = "*"
+sphinx-multiversion = "*"
 
 [dev-packages]
 

@@ -46,6 +46,18 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     return True
 
 
+def DOC_handler(module, submodule, manifest_path, repo_home, chip_type):
+    print("build sphinx document\n")
+    try:
+        cmd = ["python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "../doc/source/build.py"), "skip_latex"]
+        print(" ".join(cmd), flush=True)
+        subprocess.check_call(cmd, universal_newlines=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        print("Generate sphinx document exception: {}".format(e))
+        return False
+    return True
+
+
 def App_handler(module, submodule, manifest_path, repo_home, chip_type):
     print("app handler")
     global Keil_path
@@ -80,6 +92,7 @@ def Keyword_handler(module, submodule, manifest_path, repo_home, chip_type):
 # module tuple table: module, submodule, handler
 module_table =  (
                     ['sdk', 'GUI',          '',         SDK_handler ],
+                    ['sdk', 'Doc',          '',         DOC_handler ],
 
                     ['sdk', 'Script',       'CI',            SDK_handler ],
                     ['sdk', 'Script',       'Other',         SDK_handler ],

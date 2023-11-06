@@ -20,7 +20,6 @@ release = 'v0.0.0.1'
 extensions = ["breathe", 
               "myst_parser", 
               "sphinx_rtd_theme",
-              # 多版本文档支持
               "sphinx_multiversion"]
 
 templates_path = ['_templates']
@@ -99,6 +98,7 @@ latex_elements = {
 \setmonofont{DejaVu Sans Mono}
 \usepackage{silence}
 \WarningsOff*
+\usepackage[pipeTables=true]{markdown}
 ''',
 }
 
@@ -106,8 +106,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'BeeGUI.tex', 'BeeGUI Documentation',
-     'BeeGUI community', 'manual'),
+    (master_doc, 'RTKIOT GUI.tex', 'RTKIOT GUI Documentation',
+     'RTKIOT GUI community', 'manual'),
 ]
 
 
@@ -116,7 +116,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'BeeGUI', 'BeeGUI Documentation',
+    (master_doc, 'RTKIOT GUI', 'RTKIOT GUI Documentation',
      [author], 1)
 ]
 
@@ -127,22 +127,21 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'BeeGUI', 'BeeGUI Documentation',
-     author, 'Contributors of BeeGUI', 'One line description of project.',
+    (master_doc, 'RTKIOT GUI', 'RTKIOT GUI Documentation',
+     author, 'Contributors of RTKIOT GUI', 'One line description of project.',
      'Miscellaneous'),
 ]
 
 # -- Options for Breathe ----------------------------------------------------
 
-# breathe_projects = {"HoneyGUI": os.path.join(os.path.dirname(__file__), r"..\doxyxml\xml")}
-# breathe_default_project = "HoneyGUI"
-# breathe_domain_by_extension = {"h" : "c"}
-# breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
+breathe_projects = {"HoneyGUI": os.path.join(os.path.dirname(__file__), r"../doxyxml/xml")}
+breathe_default_project = "HoneyGUI"
+breathe_domain_by_extension = {"h" : "c"}
+breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
 
 
 # -- Options for sphinx-multiversion ----------------------------------------------------
 
-# 指定哪个分支为 lastest 版本
 smv_latest_version = 'ramless'
 
 
