@@ -10,6 +10,12 @@ RTKIOT GUI
 `Get Started`_      `GUI-APP`_          `Widgets`_
 ==================  ==================  ==================
 
+==================  ==================  ==================
+|Porting|_          |FAQ|_              |Other|_
+------------------  ------------------  ------------------
+`Porting`_          `FAQ`_              `Other`_
+==================  ==================  ==================
+
 .. |Get Started| image:: ./_static/image/get-started.png
 .. _Get Started: get-started/index.html
 
@@ -19,14 +25,24 @@ RTKIOT GUI
 .. |Widgets| image:: ./_static/image/api-reference.png
 .. _Widgets: widgets/index.html
 
+.. |Porting| image:: ./_static/image/get-started.png
+.. _Porting: get-started/index.html
+
+.. |FAQ| image:: ./_static/image/layouts.png
+.. _FAQ: GUI-APP/index.html
+
+.. |Other| image:: ./_static/image/api-reference.png
+.. _Other: widgets/index.html
+
 
 .. toctree::
+  :hidden:
 
-   Get Started <get-started/index>
-   GUI APP <GUI-APP/index>
-   widgets <widgets/index>
-   Porting <Porting/index>
-   FAQ <FAQ/index>
+  Get Started <get-started/index>
+  GUI APP <GUI-APP/index>
+  widgets <widgets/index>
+  Porting <Porting/index>
+  FAQ <FAQ/index>
 * :ref:`genindex`
 
 
