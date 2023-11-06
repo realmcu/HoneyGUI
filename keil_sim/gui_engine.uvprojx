@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -554,11 +555,6 @@
               <FilePath>..\gui_engine\widget\gui_alert.c</FilePath>
             </File>
             <File>
-              <FileName>gui_arc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\widget\gui_arc.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_canvas.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_canvas.c</FilePath>
@@ -723,7 +719,7 @@
                   <MiscControls> --c99 --gnu --diag_suppress=188 --diag_suppress=546 --diag_suppress=550 --diag_suppress=111 --diag_suppress=68 --diag_suppress=870</MiscControls>
                   <Define>PRIX32=\"x\"</Define>
                   <Undefine> </Undefine>
-                  <IncludePath> </IncludePath>
+                  <IncludePath></IncludePath>
                 </VariousControls>
               </Cads>
               <Aads>
@@ -1834,8 +1830,8 @@
       </file>
       <file attr="config" category="header" name="Config\EventRecorderConf.h" version="1.1.0">
         <instance index="0">RTE\Compiler\EventRecorderConf.h</instance>
-        <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="Event Recorder" Cvariant="DAP" Cvendor="Keil" Cversion="1.4.0" condition="Cortex-M Device"/>
-        <package name="ARM_Compiler" schemaVersion="1.6.3" url="http://www.keil.com/pack/" vendor="Keil" version="1.6.3"/>
+        <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="Event Recorder" Cvariant="DAP" Cvendor="Keil" Cversion="1.5.1" condition="Cortex-M Device"/>
+        <package name="ARM_Compiler" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="Keil" version="1.7.2"/>
         <targetInfos>
           <targetInfo name="gui_sim"/>
         </targetInfos>
