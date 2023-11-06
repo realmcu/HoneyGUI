@@ -550,11 +550,6 @@
               <FilePath>..\gui_engine\server\gui_server.c</FilePath>
             </File>
             <File>
-              <FileName>gui_alert.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\widget\gui_alert.c</FilePath>
-            </File>
-            <File>
               <FileName>gui_canvas.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_canvas.c</FilePath>

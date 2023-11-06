@@ -18,18 +18,18 @@
 
 | 5bit red | 6bit green | 5bit blue |
 |----------|------------|-----------|
-
+|  |  |  |
 
 - RGB : True color. 3 bytes per pixel.
 
 | 8bit red | 8bit green | 8bit blue |
 |----------|------------|-----------|
-
+|  |  |  |
 - RGBA : True color with opacity. Enhance the display quality with transparency effects. 4 bytes per pixel.
 
 | 8bit red | 8bit green | 8bit blue | 8bit opacity |
 |----------|------------|-----------|--------------|
-
+|  |  |  | |
 - BINARY : Use one bit for a pixel.
 
 
