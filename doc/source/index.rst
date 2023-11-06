@@ -24,7 +24,6 @@ RTKIOT GUI
 
    Get Started <get-started/index>
    GUI APP <GUI-APP/index>
-   SaaA <SaaA/index>
    widgets <widgets/index>
    Porting <Porting/index>
    FAQ <FAQ/index>

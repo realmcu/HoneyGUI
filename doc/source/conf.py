@@ -132,10 +132,10 @@ texinfo_documents = [
 
 # -- Options for Breathe ----------------------------------------------------
 
-breathe_projects = {"HoneyGUI": os.path.join(os.path.dirname(__file__), r"..\doxyxml\xml")}
-breathe_default_project = "HoneyGUI"
-breathe_domain_by_extension = {"h" : "c"}
-breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
+# breathe_projects = {"HoneyGUI": os.path.join(os.path.dirname(__file__), r"..\doxyxml\xml")}
+# breathe_default_project = "HoneyGUI"
+# breathe_domain_by_extension = {"h" : "c"}
+# breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
