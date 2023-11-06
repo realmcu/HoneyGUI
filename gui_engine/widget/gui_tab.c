@@ -22,10 +22,9 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-#include <gui_img.h>
 #include "gui_tab.h"
 #include "gui_canvas.h"
-#include "gui_img.h"
+
 
 /** @defgroup WIDGET WIDGET
   * @{

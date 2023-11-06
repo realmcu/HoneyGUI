@@ -23,9 +23,7 @@
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include <gui_tabview.h>
-#include <gui_img.h>
-#include "gui_tab.h"
-#include "gui_img.h"
+
 
 /** @defgroup WIDGET WIDGET
   * @{

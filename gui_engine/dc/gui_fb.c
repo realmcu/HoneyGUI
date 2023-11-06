@@ -13,8 +13,7 @@
 #include <gui_fb.h>
 #include <gui_obj.h>
 #include "gui_server.h"
-#include "tp_algo.h"
-#include "gui_kb.h"
+
 
 
 

@@ -452,8 +452,8 @@ static void prepare(gui_obj_t *obj)
 
         compute_rotate(0, 0, 0, &rotate_3D);//set here for x-axis
 
-        float xoff = dc->screen_width / 2;
-        float yoff = dc->screen_height / 2 + 100;
+        float xoff = (float)dc->screen_width / 2;
+        float yoff = (float)dc->screen_height / 2 + 100;
         float zoff = -2 * d;
 
         transfrom_rotate(&rotate_3D, &tv0, &rv0, xoff, yoff, zoff);

@@ -129,6 +129,7 @@ static bool creat_stb_screen(gui_text_t *text, struct rtgui_rect *rect, FONT_STB
     if (buffer == NULL)
     {
         GUI_ASSERT(NULL != NULL);
+        return false;
     }
     memset(buffer, 0, (screen->width) * (screen->height)*sizeof(uint8_t));
     screen->buf = buffer;
@@ -139,7 +140,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
 {
     gui_dispdev_t *dc = gui_get_dc();
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    int offset;
+    int offset = 0;
     switch (text->mode)
     {
     case LEFT:
