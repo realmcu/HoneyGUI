@@ -19,7 +19,9 @@ release = 'v0.0.0.1'
 
 extensions = ["breathe", 
               "myst_parser", 
-              "sphinx_rtd_theme"]
+              "sphinx_rtd_theme",
+              # 多版本文档支持
+              "sphinx_multiversion"]
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -136,6 +138,12 @@ texinfo_documents = [
 # breathe_default_project = "HoneyGUI"
 # breathe_domain_by_extension = {"h" : "c"}
 # breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
+
+
+# -- Options for sphinx-multiversion ----------------------------------------------------
+
+# 指定哪个分支为 lastest 版本
+smv_latest_version = 'ramless'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
