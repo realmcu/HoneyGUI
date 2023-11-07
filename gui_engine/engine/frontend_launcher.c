@@ -57,7 +57,7 @@ void *get_app_xml(void)
     return &app_xml;
 }
 
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #include "romfs.h"
 #else
 #include <sys/stat.h>

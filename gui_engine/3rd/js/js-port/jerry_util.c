@@ -244,7 +244,7 @@ void js_value_dump(jerry_value_t value)
     _js_value_dump(value);
     printf("\n");
 }
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #include "romfs.h"
 #else
 #include <sys/stat.h>

@@ -32,13 +32,13 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #include "romfs.h"
 #else
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #include "romfs.h"
 #else
 #include <sys/stat.h>

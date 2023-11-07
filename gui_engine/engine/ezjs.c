@@ -1786,7 +1786,7 @@ void gui_js_init()
 }
 static void *context_alloc(size_t size, void *cb_data_p)
 {
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #ifdef RTL8762G
 #include "mem_config.h"
     return (void *)(SPIC1_ADDR + 0x200000);

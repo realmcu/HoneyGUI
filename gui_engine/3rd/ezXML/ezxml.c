@@ -28,7 +28,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #include "os_mem.h"
 #include "trace.h"
 
@@ -56,7 +56,7 @@ static void xml_free(void *ptr)
 
 //#include <unistd.h>
 //#include <sys/types.h>
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #include "romfs.h"
 #elif defined OS_RTTHREAD
 
@@ -733,7 +733,7 @@ ezxml_t ezxml_parse_fp(FILE *fp)
 // A wrapper for ezxml_parse_str() that accepts a file descriptor. First
 // attempts to mem map the file. Failing that, reads the file into memory.
 // Returns NULL on failure.
-#ifdef OS_FREERTOS
+#ifdef FS_NOT_UNIX
 #include <romfs.h>
 #else
 #include <sys/stat.h>
