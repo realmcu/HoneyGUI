@@ -3,8 +3,8 @@
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_wave.h
-  * @brief page wave
-  * @details page wave
+  * @brief wave widget
+  * @details wave widget
   * @author howie_wang@realsil.com.cn
   * @date 2023/11/07
   * @version 1.0

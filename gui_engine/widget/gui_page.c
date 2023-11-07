@@ -72,13 +72,6 @@
   * @{
   */
 
-_gui_api_page_t gui_page_api =
-{
-    .set_offset = set_offset,
-    .get_offset = get_offset,
-    .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
-};
-
 
 /** End of SUBMOUDLE_Exported_Variables
   * @}
@@ -122,6 +115,12 @@ static int get_offset(gui_page_t *this)
     return this->base.y;
 }
 
+_gui_api_page_t gui_page_api =
+{
+    .set_offset = set_offset,
+    .get_offset = get_offset,
+    .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
+};
 
 /*============================================================================*
  *                           Public Functions
