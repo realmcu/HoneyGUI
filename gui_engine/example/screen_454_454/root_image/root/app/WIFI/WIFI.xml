@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<app>WIFI
+<script
+    file="app/WIFI/WIFI.js"></script><screen
+    w="480"
+    h="480"
+    x="0"
+    y="0">screen0
+<page
+      x="0"
+      y="0"
+      w="480"
+      h="589">page0
+<icon
+        picture="app/WIFI/resource/new_folder/wifi.bin"
+        highlightPicture="app/WIFI/resource/new_folder/wifihl.bin"
+        pictureX="0"
+        pictureY="0"
+        rotationAngle="0"
+        text="WiFi1"
+        fontSize="40"
+        font="app/WIFI/resource/font/times_size40_bits8_font.bin"
+        textX="70"
+        textY="0"
+        fontColor="#ffffff"
+        mode="normal"
+        w="480"
+        h="50"
+        x="0"
+        y="50">button0
+</icon><switch
+        x="0"
+        y="0"
+        picture="app/WIFI/resource/new_folder/wifisw.bin"
+        highlightPicture="app/WIFI/resource/new_folder/wifiswhl.bin"
+        w="120"
+        h="50">switch1
+</switch></page></screen></app>

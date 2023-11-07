@@ -1771,30 +1771,51 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         img2 = gui_get_file_address(hl_picture);;
                     }
                     char *ptxt = get_space_string_head(p->txt);
-                    font_size = 32;
+                    //font_size = 32;
                     parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, 0, 0);
                     GUI_TYPE(gui_button_t, parent)->style = style;
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
                     gui_button_text_move((void *)parent, text_x, text_y);
                     GUI_TYPE(gui_button_t, parent)->text->color = font_color;
-                    gui_button_api.onPress((void *)parent, sport_button_press, parent);
-                    gui_button_api.onRelease((void *)parent, sport_button_release, parent);
+                    if (style)
+                    {
+                        gui_button_api.onPress((void *)parent, sport_button_press, parent);
+                        gui_button_api.onRelease((void *)parent, sport_button_release, parent);
+                    }
+
                     {
                         char *font_type2 = NULL;
                         if (strstr(font_type, ".bin") != NULL)
                         {
-                            font_type2 = "rtk_font_mem";
-                            char b[100] = {0};
-                            strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
-                            void *addr1 = gui_get_file_address(b);
-                            memset(b, 0, sizeof(b));
-                            char *a = font_type;
-                            strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
-                                                                                                 ".bin;") - a + strlen(".bin;")));
-                            void *addr2 = gui_get_file_address(b);
-                            gui_set_font_mem_resourse(32, addr1,  addr2);
-                            GUI_TYPE(gui_button_t, parent)->text->path = 0;
+
+                            if (strstr(font_type, ".bin;") != NULL)
+                            {
+                                font_type2 = "rtk_font_mem";
+                                char b[100] = {0};
+                                strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
+                                void *addr1 = gui_get_file_address(b);
+                                memset(b, 0, sizeof(b));
+                                char *a = font_type;
+                                strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
+                                                                                                     ".bin;") - a + strlen(".bin;")));
+                                void *addr2 = gui_get_file_address(b);
+                                gui_set_font_mem_resourse(font_size, addr1,  addr2);
+                                GUI_TYPE(gui_button_t, parent)->text->font_height = font_size ;
+                                GUI_TYPE(gui_button_t, parent)->text->path = 0;
+                            }
+                            else
+                            {
+                                font_type2 = "rtk_font_mem";
+                                void *addr1 = gui_get_file_address(font_type);
+                                gui_font_mem_init(addr1);
+                                GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
+                                GUI_TYPE(gui_button_t, parent)->text->path = 0;
+                                gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1);
+                                gui_text_mode_set(GUI_TYPE(gui_button_t, parent)->text, LEFT);
+                                // t->font_height = fontSize;
+                                //t->path = 0;
+                            }
                         }
                         else if ((strstr(font_type, ".ttf") != NULL) || (strstr(font_type, ".TTF") != NULL))
                         {
