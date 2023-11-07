@@ -8,10 +8,8 @@ list = os.listdir(cwd)
 src = Split("""""")
 CPPPATH = [cwd]
 
-CPPDEFINES = ['']
+CPPDEFINES = ['ENABLE_RTK_GUI']
 
-if GetDepend('BUILD_USING_RTK_GUI'):
-    CPPDEFINES += ['ENABLE_RTK_GUI']
 if GetDepend('BUILD_USING_RTK_GUI_DEMO'):
     CPPDEFINES += ['ENABLE_RTK_GUI_DEMO']
 if GetDepend('BUILD_USING_RTK_GUI_OS_HEAP'):
