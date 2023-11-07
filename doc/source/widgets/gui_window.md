@@ -1,123 +1,47 @@
 # Window
+<br>
 
-The Window Widget is a rectangular container widget.
+## Overview
 
+The widget provides a virtual area for the developer to place application-required widgets. The developer can depend on the requirement to create the space relative to the screen.
+For example, figure-1 creates an area the same as the screen dimension, and the developer can create a space with different sizes, as in figure-2.
 
+<center><img src="https://foruda.gitee.com/images/1701081169144847122/2f0a8469_13671147.png" /></center>
+<center>figure-1</center>
+<br>
 
-## Demo
-### Create a window
+<center><img src="https://foruda.gitee.com/images/1701081183476854396/dec93062_13671147.png" /></center>
+<center>figure-2</center>
+<br>
 
+And the following widgets will take the Window's widget left-top corner as the initial coordinates in figure-3.
+<br>
 
-![win](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png  "win.PNG") 
+<center><img src="https://foruda.gitee.com/images/1701081206134160709/80ae8874_13671147.png" /></center>
+<center>figure-3</center>
+<br>
 
+## Usage
 
-The following code is used to create a window and add an image to it.
-```cpp
-static void app_launcher_ui_design(gui_app_t *app)
-{
-    gui_win_t *win = gui_win_create(&(app->screen), "win", 0, 0, 320, 320);
-    gui_tab_t *tb_watch = gui_tab_create(win, "tb_watch", 0, 0, 0, 0, 0, 0);
-    extern void page_tb_watch(void *parent);
-    page_tb_watch(tb_watch);
-}
-```
+### Create widget
 
+You can create a win widget by this api [`gui_win_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w, int16_t h)`](#api).
+This `w/h` are the width and height of the win widget.
 
+### Add event
 
+To add an event of widget by this api [gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter, void *user_data)](#api).
+`obj` is the selected widget, `event_cb` is the switching events, `filter` is the way how to trigger event, and `user_data` is the data to transmit.
+<br>
 
-### 8 types of gestures  
-```eval_rst
+<span id="api">
 
- 
-.. raw:: html
+## API
 
-    <iframe src="https://drive.google.com/file/d/11g0-r2ntHIZG5vmdE5hANysPnQtJoUAD/preview" width="640" height="480" allow="autoplay"></iframe>
-
-
-
- 
-
-```
-- left slide and its callback function
-```cpp
-static void callback1(){
-     gui_log("enter on left\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback1, GUI_EVENT_1, 0);
-```
-
-- right slide
-```cpp
-static void callback2(){
-     gui_log("enter on right\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback2, GUI_EVENT_2, 0);
-```
-- slide up
-```cpp
-static void callback3(){
-     gui_log("enter on up\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback3, GUI_EVENT_3, 0);
-```
-- slide down
-```cpp
-static void callback4(){
-     gui_log("enter on down\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback4, GUI_EVENT_4, 0);
-```
-- press
-```cpp
-static void callback5(){
-     gui_log("enter on press\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback5, GUI_EVENT_TOUCH_PRESSED, 0);
-```
-- release
-```cpp
-static void callback6(){
-     gui_log("enter on release\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback6, GUI_EVENT_TOUCH_RELEASED, 0);
-```
-- long touch
-```cpp
-static void callback7(){
-     gui_log("enter on long touch\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback7, GUI_EVENT_TOUCH_LONG, 0);
-```
-- click
-```cpp
-static void callback8(){
-     gui_log("enter on click\n");
-}
-```
-```cpp
-gui_obj_add_event_cb(win, (gui_event_cb_t)callback8, GUI_EVENT_TOUCH_CLICKED, 0);
-```
-
-## API 
+</span>
 
 ```eval_rst
 
 .. doxygenfile:: gui_win.h
 
 ```
-
-
