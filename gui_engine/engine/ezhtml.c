@@ -9,7 +9,7 @@
 #include "gui_button.h"
 #include <gui_seekbar.h>
 
-#include <gui_alert.h>
+
 #include <gui_page.h>
 
 #include <string.h>
