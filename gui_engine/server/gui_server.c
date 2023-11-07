@@ -143,9 +143,9 @@ int rtgui_server_init(void)
     gui_port_os_init();
     gui_port_indev_init();
     gui_port_dc_init();
-#ifdef RTK_GUI_IMAGE_FS
+
     gui_port_fs_init();
-#endif
+
 
     gui_acc_init();
 

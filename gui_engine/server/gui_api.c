@@ -506,7 +506,7 @@ void *gui_get_file_address(const char *file)
         void *rst;
         rst = (void *)gui_fs_ioctl(fd, 0);
         gui_fs_close(fd);
-        gui_log("rst:%p\n", rst);
+        gui_log("filename = %s, rst:%p\n", file, rst);
         return rst;
 
     }
