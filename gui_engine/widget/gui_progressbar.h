@@ -1,10 +1,11 @@
 /**
+\internal
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
   * @file gui_progressbar.h
   * @brief progressbar widget header file
- * @details progressbar widget
+  * @details progressbar widget
   * @author luke_sun@realsil.com.cn
   * @date 2023/11/07
   * @version 1.0
@@ -12,6 +13,7 @@
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
+\endinternal
   */
 
 /*============================================================================*
@@ -165,7 +167,7 @@ gui_progressbar_t *gui_progressbar_v_create(void *parent, const char *filename, 
 gui_progressbar_t *gui_progressbar_picture_create(void *parent, int16_t x, int16_t y,
                                                   int16_t w, int16_t h, void *picture_addr);
 /**
- * @brief create a horizontal based on picture progressbar
+ * @brief create a horizontal progressbar based on picture
  *
  * @param parent parent widget
  * @param picture the picture background
@@ -176,7 +178,7 @@ gui_progressbar_t *gui_progressbar_picture_create(void *parent, int16_t x, int16
 gui_progressbar_t *gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y);
 
 /**
- * @brief create a vertical based on picture progressbar
+ * @brief create a vertical progressbar based on picture
  *
  * @param parent parent widget
  * @param picture the picture background
@@ -186,7 +188,7 @@ gui_progressbar_t *gui_progressbar_img_h_create(void *parent, void *picture, int
  */
 gui_progressbar_t *gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y);
 /**
- * @brief create a  based on pictures frame progressbar
+ * @brief create a frame progressbar based on pictures
  *
  * @param parent parent widget
  * @param picture_array the pictures frame
