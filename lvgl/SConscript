@@ -10,7 +10,8 @@ cwd = GetCurrentDir() # get current dir path
 
 port_src = Glob('*.c')
 port_inc = [cwd]
-group = group + DefineGroup('LVGL-port', port_src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = port_inc)
+CPPDEFINE = ['ENABLE_LVGL_GUI']
+group = group + DefineGroup('LVGL-port', port_src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = port_inc, CPPDEFINES = CPPDEFINE)
 
 # check if .h or .hpp files exsit
 def check_h_hpp_exsit(path):
