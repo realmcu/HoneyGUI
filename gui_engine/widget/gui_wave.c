@@ -1,7 +1,22 @@
-/*
- * File      : gui_wave.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_wave.c
+  * @brief page wave
+  * @details page wave
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/11/07
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <math.h>
@@ -13,6 +28,63 @@
 #include "gui_wave.h"
 
 
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float t)
 {
     NVGpaint bg;
@@ -175,6 +247,11 @@ static void wave_ctor(gui_wave_t *this, gui_obj_t *parent, const char *name,
 
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+
 void gui_wave_set(gui_wave_t *this, float x, float y, float w, float h, float t)
 {
     this->x = x;
@@ -217,5 +294,12 @@ gui_wave_t *gui_wave_create(void *parent,  const char *name,
     return this;
 }
 
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 
 

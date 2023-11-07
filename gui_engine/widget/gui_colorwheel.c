@@ -1,7 +1,22 @@
-/*
- * File      : gui_colorwheel.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_colorwheel.c
+  * @brief colorwheel widget
+  * @details colorwheel widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/11/07
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 //#include <gui_matrix.h>
@@ -11,6 +26,63 @@
 #include "gui_colorwheel.h"
 #include <math.h>
 
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 
 static void colorwheel_prepare(gui_obj_t *obj)
 {
@@ -197,6 +269,12 @@ static void colorwheel_ctor(gui_colorwheel_t *this, gui_obj_t *parent, const cha
 
 }
 
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
 void gui_colorwheel_set(gui_colorwheel_t *this, float x, float y, float w, float h, float t)
 {
     this->x = x;
@@ -240,6 +318,14 @@ gui_colorwheel_t *gui_colorwheel_create(void *parent,  const char *name, void *d
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 
 
 

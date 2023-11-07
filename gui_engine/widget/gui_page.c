@@ -1,8 +1,22 @@
-/*
- * File      : gui_page.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_page.c
+  * @brief page widget
+  * @details page widget
+  * @author howie_wang@realsil.com.cn
+  * @date 2023/11/07
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_page.h>
 #include <string.h>
@@ -11,6 +25,71 @@
 #include "gui_obj.h"
 #include <gui_curtain.h>
 #include <tp_algo.h>
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Macros SUBMOUDLE Exported Macros
+  * @{
+  */
+
+
+/** End of SUBMOUDLE_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
+  * @{
+  */
+
+_gui_api_page_t gui_page_api =
+{
+    .set_offset = set_offset,
+    .get_offset = get_offset,
+    .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
+};
+
+
+/** End of SUBMOUDLE_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
 {
     gui_list_t *node = NULL;
@@ -24,6 +103,30 @@ static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
         deal_img_in_root(obj, ayend, out);
     }
 }
+
+static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
+{
+    this->scroll_bar = gui_img_create_from_mem(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
+    gui_img_get_height(this->scroll_bar);
+    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
+}
+
+static void set_offset(gui_page_t *this, int offset)
+{
+    this->yold = offset;
+    this->base.y = offset;
+}
+
+static int get_offset(gui_page_t *this)
+{
+    return this->base.y;
+}
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
 void page_update(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -105,27 +208,7 @@ void page_update(gui_obj_t *obj)
 
 }
 
-static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
-{
-    this->scroll_bar = gui_img_create_from_mem(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
-    gui_img_get_height(this->scroll_bar);
-    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
-}
-static void set_offset(gui_page_t *this, int offset)
-{
-    this->yold = offset;
-    this->base.y = offset;
-}
-static int get_offset(gui_page_t *this)
-{
-    return this->base.y;
-}
-_gui_api_page_t gui_page_api =
-{
-    .set_offset = set_offset,
-    .get_offset = get_offset,
-    .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
-};
+
 void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                    int16_t y, int16_t w, int16_t h)
 {
@@ -137,6 +220,7 @@ void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, in
     this->start_x = x;
     this->start_y = y;
 }
+
 gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16_t y,
                             int16_t w, int16_t h)
 {
@@ -145,8 +229,10 @@ gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16
 }
 
 
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
 
-
-
-
-
+/** End of WIDGET
+  * @}
+  */
