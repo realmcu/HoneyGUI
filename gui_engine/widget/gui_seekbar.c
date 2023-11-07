@@ -1,14 +1,84 @@
-/*
- * File      : gui_tabview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_seekbar.c
+  * @brief seekbar widget
+  * @details seekbar widget
+  * @author luke_sun@realsil.com.cn
+  * @date 2023/11/06
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_seekbar.h>
 #include <string.h>
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+/** @brief  ... */
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+
 static void (obj_update_att)(struct _gui_obj_t *o);
 static void seekbar_preapre(gui_obj_t *obj)
 {
@@ -592,6 +662,10 @@ void gui_seekbar_h_ctor(gui_seekbar_t *this, gui_obj_t *parent, const char *file
     //gui_get_render_api_table()[GET_BASE(this)->type].obj_update_att = seekbar_update_att;
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
 
 #if 0
 gui_seekbar_t *gui_seekbar_create(void *parent, const char *filename, int16_t x, int16_t y,
@@ -703,3 +777,10 @@ gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t 
     return this;
 }
 #endif
+
+
+
+
+
+
+
