@@ -20,7 +20,5 @@ extern void gui_fs_info_register(struct gui_fs *info);
 void gui_port_fs_init(void)
 {
     GUI_UNUSED(fs_api);
-#ifdef RTK_GUI_IMAGE_FS
     gui_fs_info_register(&fs_api);
-#endif
 }

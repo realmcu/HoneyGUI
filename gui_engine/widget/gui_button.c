@@ -294,15 +294,11 @@ gui_button_t *gui_button_create(
     if (text)
     {
         gui_img_get_height(button->img);
-#ifdef RTK_GUI_SCRIPT_AS_A_APP
-        gui_set_font_mem_resourse(RTK_GUI_DEFAULT_FONT_SIZE,
-                                  gui_get_file_address("app/system/resource/font/gbk_32_32_dot.bin"),
-                                  gui_get_file_address("app/system/resource/font/gbk_unicode_table.bin"));
-#endif
+
         button->text = gui_text_create(button, "icon_text", 0, button->img->draw_img.img_h + 40,
                                        gui_get_screen_width(), h);
         gui_text_set(button->text, text, "rtk_font_mem", BUTTON_COLOR, strlen(text),
-                     RTK_GUI_DEFAULT_FONT_SIZE);
+                     32);
         gui_text_mode_set(button->text, LEFT);
     }
 

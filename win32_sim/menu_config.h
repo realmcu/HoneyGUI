@@ -13,41 +13,73 @@
 
 
 
-// <h> HoneyGUI Config
-
+// <h> HoneyGUI Framework Config
 
 
 // <e> HoneyGUI Enable RTK Real GUI
-#define BUILD_USING_RTK_GUI 1
+#define BUILD_USING_RTK_GUI     1
+
 #if (BUILD_USING_RTK_GUI == 1)
 
-// <c> RTK GUI 448*368 Demo
-#define BUILD_USING_RTK_GUI_448_368_DEMO
+// <c> RTK GUI Demo
+#define BUILD_USING_RTK_GUI_DEMO
 // </c>
+
+// <c> RTK GUI Use OS Heap
+#define BUILD_USING_RTK_GUI_OS_HEAP
+// </c>
+
+// <c> RTK GUI Font Enable STB
+#define BUILD_USING_RTK_GUI_FONT_STB
+// </c>
+
+// <c> RTK GUI Font Enable FREETYPE
+//#define BUILD_USING_RTK_GUI_FONT_FREETYPE
+// </c>
+
+// <c> RTK GUI Font Enable RTK MEM
+#define BUILD_USING_RTK_GUI_FONT_RTK_MEM
+// </c>
+
+// <c> RTK GUI Font Enable TTF SVG
+//#define BUILD_USING_RTK_GUI_FONT_TTF_SVG
+// </c>
+
+// <c> RTK GUI Enable VGLITE GPU
+//#define BUILD_USING_VG_LITE
+// </c>
+
+// <c> RTK GUI Enable PPE1.0
+//#define BUILD_USING_RTK_PPE
+// </c>
+
+
+// <c> RTK GUI Enable SasA
+#define BUILD_USING_SCRIPT_AS_A_APP
+// </c>
+
 
 #endif
+
 // </e>
 
+// <e> HoneyGUI Enable LVGL
+#define BUILD_USING_LVGL_GUI     1
 
-
-// <c> RTK GUI frame buffer type
-#define RTK_GUI_FB_RAM_SINGLE
-// </c>
-
-
-// <c> HoneyGUI Enable LVGL
-#define BUILD_USING_LVGL_GUI
-// </c>
+#if (BUILD_USING_LVGL_GUI == 1)
 
 // <c> HoneyGUI Enable LVGL EXAMPLES
 #define BUILD_USING_LVGL_EXAMPLES
 // </c>
 
-
-
-// <c> HoneyGUI Enable SasA
-#define BUILD_USING_SCRIPT_AS_A_APP
+// <c> HoneyGUI Enable LVGL RLOTTIE
+//#define BUILD_USING_LVGL_RLOTTIE
 // </c>
+
+#endif
+
+// </e>
+
 
 // </h>
 

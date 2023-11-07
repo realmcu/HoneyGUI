@@ -2,7 +2,6 @@
 #include <guidef.h>
 #include <draw_font.h>
 #include <string.h>
-#include "gui_config.h"
 
 static int get_utf8_byte_num(uint8_t firstCh)
 {
@@ -106,14 +105,14 @@ void rtgui_system_font_init(void)
     extern void rtgui_font_rtk_init(void);
     rtgui_font_rtk_init();
 #endif
-#ifdef RTK_GUI_FONT_MEM
+#ifdef ENABLE_RTK_GUI_FONT_RTK_MEM
     extern void rtgui_font_mem_init(void);
     rtgui_font_mem_init();
-#if RTK_GUI_FONT_FREETYPE
+#if ENABLE_RTK_GUI_FONT_FREETYPE
     extern void rtgui_freetype_init(void);
     rtgui_freetype_init();
 #endif
-#if RTK_GUI_FONT_STB
+#if ENABLE_RTK_GUI_FONT_STB
     extern void rtgui_font_stb_init(void);
     rtgui_font_stb_init();
 #endif

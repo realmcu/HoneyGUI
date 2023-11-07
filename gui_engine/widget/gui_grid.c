@@ -152,8 +152,6 @@ static void tab_prepare_scale(gui_obj_t *obj)
     {
     case GRID_CLASSIC:
         break;
-
-        break;
     default:
         break;
     }

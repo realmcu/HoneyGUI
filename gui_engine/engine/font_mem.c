@@ -1,7 +1,7 @@
 
 #include <string.h>
 #include <draw_font.h>
-static struct font_lib font_lib_tab[RTK_GUI_FONT_MEM];
+static struct font_lib font_lib_tab[10];
 typedef struct
 {
     uint16_t unicode;
@@ -66,7 +66,7 @@ void rtgui_font_mem_load(gui_text_t *text)
     uint8_t rendor_mode;
     if (text->font_height == 0)
     {
-        text->font_height = RTK_GUI_DEFAULT_FONT_SIZE;
+        text->font_height = 32;
     }
 
     dot_offset = (uint32_t)font_name->font_lib_name;

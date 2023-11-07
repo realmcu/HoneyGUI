@@ -30,7 +30,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "gui_config.h"
 #include "gui_list.h"
 #include "gui_event.h"
 

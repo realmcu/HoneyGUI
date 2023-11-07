@@ -35,7 +35,5 @@ static struct gui_fs fs_api =
 extern void gui_fs_info_register(struct gui_fs *info);
 void gui_port_fs_init(void)
 {
-#ifdef RTK_GUI_IMAGE_FS
     gui_fs_info_register(&fs_api);
-#endif
 }

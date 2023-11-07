@@ -8,7 +8,7 @@
 #include <string.h>
 #include <gui_return.h>
 #include "gui_obj.h"
-#ifdef RTK_GUI_SCRIPT_AS_A_APP
+#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "gui_app.h"
 #endif
 
@@ -16,7 +16,7 @@
 #include "tp_algo.h"
 static void screen_backfunc()
 {
-#ifdef RTK_GUI_SCRIPT_AS_A_APP
+#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     gui_app_t *app = gui_current_app();
     extern void *get_app_launcher_frontend(void);
     gui_switch_app(app, get_app_launcher_frontend());

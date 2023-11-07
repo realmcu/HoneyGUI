@@ -54,9 +54,8 @@ int main(int argc, char **argv)
     }
 
     printf("defaultPath path: %s\n", defaultPath);
-    //extern int nanosv_main(void);
-    //nanosv_main();
-#ifndef RTK_GUI_SCRIPT_AS_A_APP
+
+#ifndef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     int fd;
 #if UI_DEMO == BEE3_PRO
     fd = open("./example/screen_454_454/root_image/root(0x4400000).bin", 0);
@@ -84,7 +83,7 @@ int main(int argc, char **argv)
     rtgui_server_init();
 
 #if 1
-#ifndef RTK_GUI_SCRIPT_AS_A_APP
+#ifndef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #if UI_DEMO == BEE3_PRO
     extern gui_app_t *get_app_launcher(void);
     gui_app_startup(get_app_launcher());

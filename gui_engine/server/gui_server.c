@@ -159,7 +159,7 @@ int rtgui_server_init(void)
         gui_log("GUI Debug Mode!!");
         while (1);
     }
-#if defined RTK_GUI_SCRIPT_AS_A_APP
+#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_init(void);
     js_init();
 #endif

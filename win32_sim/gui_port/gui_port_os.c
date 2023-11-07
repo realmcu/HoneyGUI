@@ -49,7 +49,7 @@ static void port_free(void *rmem)
     free(rmem);
 }
 
-#if RTK_GUI_MEMHEAP_OS == 0
+#if ENABLE_RTK_GUI_OS_HEAP == 0
 #define PORT_GUI_MEMHEAP_SIZE 1024*1204*10
 static uint8_t gui_memheap[PORT_GUI_MEMHEAP_SIZE] = {0};
 #endif
@@ -64,7 +64,7 @@ static struct gui_os_api os_api =
     .f_malloc = port_malloc,
     .f_realloc = port_realloc,
     .f_free = port_free,
-#if RTK_GUI_MEMHEAP_OS == 0
+#if ENABLE_RTK_GUI_OS_HEAP == 0
     .mem_size = PORT_GUI_MEMHEAP_SIZE,
     .mem_addr = gui_memheap,
 #endif

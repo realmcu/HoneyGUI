@@ -1,4 +1,3 @@
-#include "gui_config.h"
 #include <draw_font.h>
 #define STB_TRUETYPE_IMPLEMENTATION
 // #define ALLOW_UNALIGNED_TRUETYPE
@@ -65,7 +64,7 @@ static void rtgui_font_stb_unload(gui_text_t *text)
 {
 
 }
-#ifndef RTK_GUI_TTF_SVG
+#ifndef RTK_GUI_FONT_ENABLE_TTF_SVG
 #define _b_and_f(color_b,color_f,c) (color_b.channel.c * color_b.channel.alpha + color_f.channel.c * color_f.channel.alpha) / 0xff;
 gui_inline uint32_t blend_b_and_f_with_a(uint32_t b, uint32_t f, uint8_t a)
 {
@@ -202,10 +201,10 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
         }
     }
 }
-#endif // !RTK_GUI_TTF_SVG
+#endif // !RTK_GUI_FONT_ENABLE_TTF_SVG
 #include "nanosvg.h"
 //#include "nanosvgrast.h"
-#ifdef RTK_GUI_TTF_SVG
+#ifdef RTK_GUI_FONT_ENABLE_TTF_SVG
 static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_count)
 {
     NSVGpath *path = NULL;
@@ -254,7 +253,7 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
     }
 
-#ifdef RTK_GUI_TTF_SVG
+#ifdef RTK_GUI_FONT_ENABLE_TTF_SVG
     while (ch < unicode_len)
     {
         int glyph_index = stbtt_FindGlyphIndex(&font, p_buf[ch]);
