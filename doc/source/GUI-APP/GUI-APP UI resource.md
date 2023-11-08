@@ -1,7 +1,7 @@
 # GUI-APP: UI resource 
 ## 2.1 Image format conversion
     Convert pictures in various formats into RGB raw pictures
-* Open the converter. ```ImageConvert\ImageConverter.exe``` 
+* Open the converter. Please download from [```ImageConvert\ImageConverter.exe```](https://wiki.realtek.com/display/BTMKT/BLE+Soc+Image+Convert+Tool) 
 * The operation steps and detailed instructions are as follows: 
 ![Image description](https://foruda.gitee.com/images/1686896876324689552/b3be8646_10088396.png "converter.png")
 
