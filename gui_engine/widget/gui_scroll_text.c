@@ -1,14 +1,84 @@
-/*
- * File      : gui_scroll_text.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_scroll_text.c
+  * @brief scroll text widget
+  * @details scroll text widget
+  * @author luke_sun@realsil.com.cn
+  * @date 2023/11/08
+  * @version v1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_scroll_text.h>
 #include <string.h>
 #include <draw_font.h>
-//#include "gui_obj.h"
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
 static uint32_t cur_time_ms;
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
@@ -19,6 +89,7 @@ static void scrolltext_prepare(gui_obj_t *obj)
     // }
     // rtgui_text_create(&text->base);
 }
+
 static void scrolltext_draw(gui_obj_t *obj)
 {
     gui_scroll_text_t *text = (gui_scroll_text_t *)obj;
@@ -74,6 +145,7 @@ static void scrolltext_draw(gui_obj_t *obj)
         rtgui_text_destroy(&text->base);
     }
 }
+
 static void scrolltext_end(gui_obj_t *obj)
 {
     // gui_text_t *text = (gui_text_t *)obj;
@@ -84,29 +156,8 @@ static void scrolltext_end(gui_obj_t *obj)
     // rtgui_text_destroy(text);
 }
 
-void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
-                             uint32_t color, uint16_t length, uint8_t font_size)
-{
-    this->base.text_type = text_type;
-    this->base.utf_8 = (uint8_t *)text;
-    this->base.color = color;
-    this->base.len = length;
-    this->base.font_height = font_size;
-    this->base.text_offset = 0;
-}
-void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t start_value,
-                               uint8_t end_value,
-                               uint32_t interval_time_ms, uint32_t duration_time_ms)
-{
-    this->base.mode = mode;
-    this->start_value = start_value;
-    this->end_value = end_value;
-    this->interval_time_ms = interval_time_ms;
-    this->duration_time_ms = duration_time_ms;
-}
-void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char *name,
-                         int16_t x,
-                         int16_t y, int16_t w, int16_t h)
+static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char *name,
+                                int16_t x, int16_t y, int16_t w, int16_t h)
 {
     gui_text_t *base = (gui_text_t *)this;
     extern void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
@@ -123,9 +174,34 @@ void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char 
     this->init_time_ms = gui_ms_get();
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
+                             uint32_t color, uint16_t length, uint8_t font_size)
+{
+    this->base.text_type = text_type;
+    this->base.utf_8 = (uint8_t *)text;
+    this->base.color = color;
+    this->base.len = length;
+    this->base.font_height = font_size;
+    this->base.text_offset = 0;
+}
+
+void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t start_value,
+                               uint8_t end_value,
+                               uint32_t interval_time_ms, uint32_t duration_time_ms)
+{
+    this->base.mode = mode;
+    this->start_value = start_value;
+    this->end_value = end_value;
+    this->interval_time_ms = interval_time_ms;
+    this->duration_time_ms = duration_time_ms;
+}
+
 gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t x, int16_t y,
-                                         int16_t w,
-                                         int16_t h)
+                                         int16_t w, int16_t h)
 {
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
@@ -146,3 +222,11 @@ gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t
     GET_BASE(scrolltext)->create_done = true;
     return scrolltext;
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */

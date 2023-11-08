@@ -1,24 +1,49 @@
-/*
- * File      : gui_scroll_text.h
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_scroll_text.c
+  * @brief scroll text widget
+  * @details scroll text widget
+  * @author luke_sun@realsil.com.cn
+  * @date 2023/11/08
+  * @version v1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *               Define to prevent recursive inclusion
+ *============================================================================*/
 #ifndef __GUI_SCROLL_TEXT_H__
 #define __GUI_SCROLL_TEXT_H__
-
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <draw_font.h>
 #include <gui_text.h>
 
-/**********************
- *      TYPEDEFS
- **********************/
-/*Data of textbox*/
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
+/*============================================================================*
+ *                         Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
+
+/** @brief  card structure */
 typedef struct gui_scroll_text
 {
     gui_text_t base;
@@ -29,6 +54,59 @@ typedef struct gui_scroll_text
     uint32_t duration_time_ms;
     uint32_t interval_time_ms;
 } gui_scroll_text_t;
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                         Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                         Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+
+/*============================================================================*
+ *                         Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                         Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
+
 /**
  * @brief Creat a scroll text widget.
  * @note Scroll text widget can show horizontal and vertical scroll text.
@@ -41,9 +119,11 @@ typedef struct gui_scroll_text
  * @param w The width of the text box.
  * @param h The hight of the text box.
  * @return Return the widget object pointer: gui_scroll_text_t*
+ *
  */
 gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t x,
                                          int16_t y, int16_t w, int16_t h);
+
 /**
  * @brief Set the text scroll property of the scroll text box.
  *
@@ -53,10 +133,13 @@ gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t
  * @param end_value the number of pixels to the right of the text at the last frame.
  * @param interval_time_ms the time for one loop.
  * @param duration_time_ms the total time that text scrolling lasts.
+ * @return void
+ *
  */
 void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t start_value,
                                uint8_t end_value,
                                uint32_t interval_time_ms, uint32_t duration_time_ms);
+
 /**
 * @brief set the string in a scroll text box widget.
 * @note
@@ -67,14 +150,23 @@ void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t 
 * @param length the text string's length.
 * @param font_size the text string's font size.
 * @return void
+*
 */
 void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
                              uint32_t color,
                              uint16_t length, uint8_t font_size);
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
