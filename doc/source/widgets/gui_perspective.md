@@ -1,13 +1,38 @@
-# perspective
+# Perspective
+<br>
+
+## Overview
+
 The perspective is a hexagonal prism-like widget that uses 6 tabs as column faces. The prism will automatically rotate to show all tabs. A single click allows the user to quick jump to the current tab.
 
+## Features
 
-## demo
-```eval_rst
-.. raw:: html
+Perspective widget can support the following features.
 
-    <iframe src="https://drive.google.com/file/d/1eKNfZbz84aMV3w30YqhFmz-5G646j1n_/preview" width="640" height="480" allow="autoplay"></iframe>
+- Perspective that can rotate
+
+## Usage
+
+### Input array
+
+  Select different tabs to form an array
+
+```c
+uint8_t *array_flash[] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
 ```
+
+### Create perspective widget
+
+  Use [gui_perspective_create](#gui_perspective_create) to create perspecivet widget
+
+```c
+
+img_test = gui_perspective_create(canvas, "test", array_flash, 0, 0, 0, 0);
+```
+
+## Example
+
+<details><summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -64,14 +89,23 @@ void callback_prism(void *obj, gui_event_t e)
     uint8_t *array_flash[] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
     img_test = gui_perspective_create(canvas, "test", array_flash, 0, 0, 0, 0);
 
-    gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,
-                         NULL);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,NULL);
 }
 ```
 
+</details>
+<br><br>
+
+<div align=center><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png"></div>
+
+<span id = "gui_perspective_create">
+
 ## API
+
+</span>
+
 ```eval_rst
+
+.. doxygenfile:: gui_perspective.h
 .. doxygenfunction:: gui_perspective_create
-
 ```
-

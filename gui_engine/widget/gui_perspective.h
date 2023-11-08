@@ -1,4 +1,5 @@
 /**
+\internal
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
@@ -12,7 +13,9 @@
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
+\endinternal
   */
+
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
@@ -161,4 +164,3 @@ gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void 
 #endif
 
 #endif
-
