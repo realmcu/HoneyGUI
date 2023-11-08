@@ -45,7 +45,7 @@ extern "C" {
   * @{
   */
 
-/** @brief  ... */
+/** @brief  canvas structure */
 typedef struct _gui_canvas
 {
     gui_obj_t base;
@@ -109,25 +109,25 @@ typedef struct _gui_canvas
   */
 
 /**
- * @brief
+ * @brief create a canvas widget used to drawing graphics in nanovg.
  *
- * @param parent
- * @param name
+ * @param parent the father widget nested in.
+ * @param name this canvas widget's name.
  * @param addr
- * @param x
- * @param y
- * @param w
- * @param h
+ * @param x the X-axis coordinate relative to parent widget
+ * @param y the Y-axis coordinate relative to parent widget
+ * @param w width
+ * @param h height
  * @return gui_canvas_t*
  */
 gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *addr,
                                 int16_t x, int16_t y, int16_t w, int16_t h);
 
 /**
- * @brief
+ * @brief set the callback function for drawing specific shapes.
  *
- * @param this
- * @param cb
+ * @param this this widget pointer
+ * @param cb the callback function for drawing specific shapes
  */
 void gui_canvas_set_canvas_cb(gui_canvas_t *this,
                               void (*cb)(gui_canvas_t *this));

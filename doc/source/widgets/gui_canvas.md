@@ -1,16 +1,27 @@
 # canvas
-## Demo
+<br/>
+
+## Overview
+The canvas widget is the basic widget used to drawing graphics in nanovg.
+
+## Usage
+### Creat a cube
+[gui_canvas_create(parent, name, addr, x, y, w, h)](#api) creates a canvas. This `addr` can be a null pointer.
+
+### Add callback function
+[gui_canvas_set_canvas_cb(canvas, cb)](#api) sets the callback function for drawing specific shapes.
+
+## Example
 ### Rounded Rectangle
+
+A simple example of drawing three rounded rectangles of different colors.
 - three color refer to [Colors' RGB Data](https://www.rapidtables.com/web/color/RGB_Color.html)
 - ```firebrick```
 - ```olive drab```
 - ```dodger blue``` with 100 value opacity
-  
-
-![rounedrect](https://foruda.gitee.com/images/1698649650262539854/8b1a974f_10088396.png "rounedrect")
-
 
 ```c
+#include "gui_canvas.h"
 static void canvas_cb(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 10, 10, 348, 200, 30);
@@ -25,24 +36,23 @@ static void canvas_cb(gui_canvas_t *canvas)
     nvgFillColor(canvas->vg, nvgRGBA(30,144,255, 100));
     nvgFill(canvas->vg);
 }
-static void app__ui_design(gui_app_t *app)
+static void app_ui_design(gui_app_t *app)
 {
-
     gui_canvas_t *canvas = gui_canvas_create(&(app->screen), "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb);
 }
 ```
+<br/>
+<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1698649650262539854/8b1a974f_10088396.png "></div>
+<br/>
 
 ### Arc animation
-```arc_cb``` will be triggered every frame.
 
-```eval_rst
-.. raw:: html
-  
-    <iframe src="https://drive.google.com/file/d/1Do82j-juwLKqVJWnS5tb-ouzTx9mEXrk/preview" width="640" height="480" allow="autoplay"></iframe>
-```
+An example of drawing an arc animation. ```arc_cb``` will be triggered every frame.
+
 ```c
 #include "math.h"
+#include "gui_canvas.h"
 static void arc_cb(gui_canvas_t *canvas)
 {
     static float  progress;
@@ -52,22 +62,26 @@ static void arc_cb(gui_canvas_t *canvas)
     nvgStrokeColor(canvas->vg, nvgRGB(178,34,34));
     nvgStroke(canvas->vg);
 }
-static void ui_design(gui_app_t *app)
+static void app_ui_design(gui_app_t *app)
 {
-
     gui_canvas_t *canvas = gui_canvas_create(&(app->screen), "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, arc_cb);
 }
 ```
+<br/>
+<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1700192672716244989/94347ec7_13671125.gif "></div>
+<br/>
+
 ## API
 ### Vector graphics api
-Please refer to 
+Please refer to
 - [nanovg-introduction](https://openplanet.dev/docs/tutorials/nanovg-introduction) 
-- [nanovg github](https://github.com/memononen/nanovg) 
+- [nanovg github](https://github.com/memononen/nanovg)
+
 ### GUI widget api
+
 ```eval_rst
+.. doxygenfile:: gui_canvas.h
 .. doxygenfunction:: gui_canvas_create
 .. doxygenfunction:: gui_canvas_set_canvas_cb
 ```
-
-
