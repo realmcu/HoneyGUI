@@ -18,7 +18,6 @@ Widgets                              brief
 `cardview`_                          Display a 3d card set 
 `tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
 `canvas`_                            using nanovg lib to draw 2d graphics
-`lvgl`_                              using lvgl lib to show lvgl
 `img`_                               display image on the screen
 `tab`_                               The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
 ==================                   ==================  
@@ -37,7 +36,6 @@ Widgets                              brief
 .. _cardview: gui_cardview.html
 .. _tabview: gui_tabview.html
 .. _canvas: gui_canvas.html
-.. _lvgl: gui_lvgl.html
 .. _svg: gui_svg.html
 .. _img: gui_img.html
 .. _tab: gui_tab.html
@@ -60,7 +58,6 @@ Widgets                              brief
     cardview <gui_cardview> 
     tabview <gui_tabview> 
     canvas <gui_canvas> 
-    lvgl <gui_lvgl> 
     svg <gui_svg> 
     img <gui_img> 
     tab <gui_tab> 

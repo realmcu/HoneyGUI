@@ -1,18 +1,89 @@
-/*
- * File      : gui_eq.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file
+  * @brief
+  * @details
+  * @author
+  * @date
+  * @version
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <string.h>
 #include <math.h>
 #include <gui_matrix.h>
 #include <gui_obj.h>
-//#include <tp_algo.h>
-//#include <gui_kb.h>
 #include <nanovg.h>
 #include "gui_eq.h"
 
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
 static float time = 0;
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
 
 static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float t)
 {
@@ -97,8 +168,6 @@ static void eq_destory(gui_obj_t *obj)
 
 }
 
-
-
 static void eq_ctor(gui_eq_t *this, gui_obj_t *parent, const char *name,
                     int16_t x,
                     int16_t y, int16_t w, int16_t h)
@@ -118,6 +187,11 @@ static void eq_ctor(gui_eq_t *this, gui_obj_t *parent, const char *name,
     //for self
 
 }
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 void gui_eq_set(gui_eq_t *this, float x, float y, float w, float h, float t)
 {
@@ -160,6 +234,17 @@ gui_eq_t *gui_eq_create(void *parent,  const char *name,
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
 
 
 
