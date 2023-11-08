@@ -40,5 +40,8 @@ if __name__ == '__main__':
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
     keil_builder = SDKBuild(os.environ.get("manifest"), os.environ.get("HoneyRepo"), chip_type)
     print("call build {}".format(chip_type))
+    os.chdir('./keil_sim')
+    subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+    os.chdir('./..')
     if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path")):
         sys.exit("build {} fail".format(chip_type))
