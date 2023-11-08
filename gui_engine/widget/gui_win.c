@@ -34,12 +34,7 @@
   * @{
   */
 
-/** @brief  ... */
-typedef enum
-{
-    EXAMPLE_SUCCESS,                //!< ...
-    EXAMPLE_INVALID_STATE,          //!< ...
-} T_EXAMPLE;
+
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -64,8 +59,7 @@ typedef enum
   * @{
   */
 
-#define EXAMPLE_A              a     //!< ...
-#define EXAMPLE_B              b     //!< ...
+
 
 
 /** End of WIDGET_Exported_Macros
@@ -81,6 +75,13 @@ typedef enum
 
 /** End of WIDGET_Exported_Variables
   * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
   */
 static void (onLeft)(gui_win_t *b, void *callback, void *parameter)
 {
@@ -194,13 +195,6 @@ gui_api_win_t gui_win_api =
     .onDown = onDown,
     .set_animate = gui_win_set_animate,
 };
-/*============================================================================*
- *                           Private Functions
- *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @{
-  */
-
 
 static void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                          int16_t y, int16_t w, int16_t h)

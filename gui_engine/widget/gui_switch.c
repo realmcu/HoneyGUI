@@ -1,8 +1,22 @@
-/*
- * File      : gui_tabview.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_switch.c
+  * @brief on or off status. Click to change.
+  * @details listen to on and off gesture
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/11/8
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_switch.h>
 #include <string.h>
@@ -10,6 +24,67 @@
 #include <gui_obj.h>
 #include <gui_win.h>
 #include "tp_algo.h"
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 void gui_switch_change_switch(gui_switch_t *sw)
 {
 
@@ -27,6 +102,85 @@ void gui_switch_change_switch(gui_switch_t *sw)
 
 
 }
+static void sw_turn_on(gui_switch_t *this)
+{
+    this->ifon = true;
+    {
+
+        gui_switch_change_switch(this);
+
+        if (this->ifon)
+        {
+            gui_obj_event_set((void *)this, GUI_EVENT_1);
+        }
+        else if (!this->ifon)
+        {
+            gui_obj_event_set((void *)this, GUI_EVENT_2);
+        }
+
+    }
+}
+static void sw_turn_off(gui_switch_t *this)
+{
+    this->ifon = false;
+    {
+
+        gui_switch_change_switch(this);
+
+        if (this->ifon)
+        {
+            gui_obj_event_set((void *)this, GUI_EVENT_1);
+        }
+        else if (!this->ifon)
+        {
+            gui_obj_event_set((void *)this, GUI_EVENT_2);
+        }
+
+    }
+}
+/*static void sw_turn_off2(gui_switch_t *this)
+{
+    this->ifon = false;
+    {
+        gui_switch_t *sw = (gui_switch_t *)this;
+        gui_switch_change_switch(this);
+        if (sw->cb_on.link_cb && sw->ifon)
+        {
+            rtgui_msg_t msg;
+            msg.type = GUI_SRV_CB;
+            msg.cb = sw->cb_on.link_cb;
+            msg.u.payload = sw->cb_on.param;
+            send_msg_to_gui_server(&msg);
+        }
+        else if(sw->cb_off.link_cb && !sw->ifon)
+        {
+            rtgui_msg_t msg;
+            msg.type = GUI_SRV_CB;
+            msg.cb = sw->cb_off.link_cb;
+            msg.u.payload = sw->cb_off.param;
+            send_msg_to_gui_server(&msg);
+        }
+
+    }
+}*/
+
+static void (onOn)(gui_switch_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+}
+static void (onOff)(gui_switch_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+}
+
+
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+
 static void gui_switch_hl(gui_switch_t *sw)
 {
 
@@ -219,123 +373,6 @@ static void switch_prepare(gui_obj_t *obj)
         }
     }
 }
-/*static void switch_prepare2(gui_obj_t *obj, struct gui_dispdev *dc, struct rtgui_rect *rect,
-                           touch_info_t *tp)
-{   if (!(((gui_switch_t *)obj)->ifon))
-    if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
-        (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
-    {gui_log("1");
-        if (obj->callback.link_cb != NULL)
-        {
-            if (((tp->type == TOUCH_SHORT && obj->callback.cb_type == SHORT_TOUCH_CB) &&
-                 ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) && (tp->y >= obj->ay &&
-                                                                        tp->y <= (obj->ay + obj->h)))))
-            {
-                rtgui_msg_t msg;
-                msg.type = GUI_SRV_CB;
-                msg.cb = obj->callback.link_cb;
-                msg.u.payload = obj->callback.param;
-                send_msg_to_gui_server(&msg);
-            }
-        }gui_log("2");
-        if (((tp->type == TOUCH_SHORT && obj->callback.cb_type == SHORT_TOUCH_CB) &&
-             ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) && (tp->y >= obj->ay &&
-                                                                    tp->y <= (obj->ay + obj->h)))))
-        {
-            gui_switch_t *sw = (gui_switch_t *)obj;
-            sw->ifon = !(sw->ifon);
-            //send_msg_to_gui_server(&msg);
-            gui_switch_change_switch(sw);gui_log("3");
-            if (sw->cb_on.link_cb && sw->ifon)
-            {
-                rtgui_msg_t msg;
-                msg.type = GUI_SRV_CB;
-                msg.cb = sw->cb_on.link_cb;
-                msg.u.payload = sw->cb_on.param;gui_log("4");
-                send_msg_to_gui_server(&msg);gui_log("5");
-            }
-            else if(sw->cb_off.link_cb && !sw->ifon)
-            {
-                rtgui_msg_t msg;
-                msg.type = GUI_SRV_CB;
-                msg.cb = sw->cb_off.link_cb;
-                msg.u.payload = sw->cb_off.param;gui_log("6");
-                send_msg_to_gui_server(&msg);gui_log("7");
-            }
-
-        }
-    }
-}*/
-static void sw_turn_on(gui_switch_t *this)
-{
-    this->ifon = true;
-    {
-
-        gui_switch_change_switch(this);
-
-        if (this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_1);
-        }
-        else if (!this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_2);
-        }
-
-    }
-}
-static void sw_turn_off(gui_switch_t *this)
-{
-    this->ifon = false;
-    {
-
-        gui_switch_change_switch(this);
-
-        if (this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_1);
-        }
-        else if (!this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_2);
-        }
-
-    }
-}
-/*static void sw_turn_off2(gui_switch_t *this)
-{
-    this->ifon = false;
-    {
-        gui_switch_t *sw = (gui_switch_t *)this;
-        gui_switch_change_switch(this);
-        if (sw->cb_on.link_cb && sw->ifon)
-        {
-            rtgui_msg_t msg;
-            msg.type = GUI_SRV_CB;
-            msg.cb = sw->cb_on.link_cb;
-            msg.u.payload = sw->cb_on.param;
-            send_msg_to_gui_server(&msg);
-        }
-        else if(sw->cb_off.link_cb && !sw->ifon)
-        {
-            rtgui_msg_t msg;
-            msg.type = GUI_SRV_CB;
-            msg.cb = sw->cb_off.link_cb;
-            msg.u.payload = sw->cb_off.param;
-            send_msg_to_gui_server(&msg);
-        }
-
-    }
-}*/
-
-static void (onOn)(gui_switch_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
-}
-static void (onOff)(gui_switch_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
-}
 void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
                      int16_t x,
                      int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)
@@ -354,7 +391,6 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->off_hl_pic_addr = this->off_pic_addr;
     this->on_hl_pic_addr = this->on_pic_addr;
 }
-//#include "gui_magic_img.h"
 gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
                                 int16_t w, int16_t h, void *off_pic, void *on_pic)
 {
@@ -372,4 +408,16 @@ gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
+
 

@@ -78,7 +78,9 @@
 /*============================================================================*
  *                           Private Functions
  *============================================================================*/
-
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 static void (obj_update_att)(struct _gui_obj_t *o);
 static void seekbar_preapre(gui_obj_t *obj)
 {
@@ -777,6 +779,15 @@ gui_seekbar_t *gui_seekbar_h_create(void *parent, const char *filename, int16_t 
     return this;
 }
 #endif
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
 
 
 

@@ -1,8 +1,22 @@
-/*
- * File      : gui_return.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_return.c
+  * @brief slide to return to home
+  * @details return to launcher
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/11/8
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_return.h>
 #include <string.h>
@@ -11,9 +25,69 @@
 #ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "gui_app.h"
 #endif
-
 #include "gui_img.h"
 #include "tp_algo.h"
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
 static void screen_backfunc()
 {
 #ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
@@ -74,6 +148,10 @@ void gui_return_ctor(gui_return_t *this, gui_obj_t *parent, const char *widgetam
     ((gui_obj_t *)this)->type = RETURNWIDGET;
     this->base.obj_prepare = return_update_att;
 }
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 gui_return_t *gui_return_create(void *parent)
 {
 
@@ -97,5 +175,18 @@ gui_return_t *gui_return_create(void *parent)
     return this;
 
 }
+
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
 
 

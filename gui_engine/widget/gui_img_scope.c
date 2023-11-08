@@ -1,16 +1,92 @@
-/*
- * File      : gui_img_scope.c
- * This file is part of GUI Engine
- */
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_img_scope.c
+  * @brief  create a picture with scope
+  * @details only display pixels in scope
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/11/8
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <guidef.h>
 #include <gui_img_scope.h>
 #include <string.h>
-//#include <gui_matrix.h>
 #include <gui_obj.h>
 #include <draw_img.h>
 #include <tp_algo.h>
 #include <gui_kb.h>
 #include "acc_engine.h"
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
+
 
 static void img_prepare(gui_obj_t *obj)
 {
@@ -75,7 +151,6 @@ static void img_destory(gui_obj_t *obj)
     //gui_free(obj);
 }
 
-
 void gui_img_scope_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, void *addr,
                         int16_t x,
                         int16_t y, int16_t w, int16_t h)
@@ -99,6 +174,9 @@ void gui_img_scope_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, vo
     draw_img->opacity_value = 255;
 
 }
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16_t y)
 {
@@ -118,4 +196,20 @@ gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16
     GET_BASE(img)->create_done = true;
     return img;
 }
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
+
+
+
+
 

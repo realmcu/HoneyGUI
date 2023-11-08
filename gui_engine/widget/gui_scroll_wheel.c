@@ -1,6 +1,89 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_scroll_wheel.c
+  * @brief scroll wheel effect
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/11/8
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+
 #include <guidef.h>
 #include <gui_scroll_wheel.h>
 #include <tp_algo.h>
+
+
+
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+
+
 
 void scroll_wheel_update_att(gui_obj_t *obj)
 {
@@ -107,7 +190,7 @@ void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this, gui_obj_t *parent, int
 
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
-    root->obj_update_att = scroll_wheel_update_att;
+    root->obj_prepare = scroll_wheel_update_att;
     root->type = SCROLL_WHEEL;
 
     //for self
@@ -116,6 +199,11 @@ void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this, gui_obj_t *parent, int
     this->highlight_start = (w + this->child_gap) / 2;
     this->get_index = get_index;
 }
+
+
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
 
 gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent, void *addr, int16_t x, int16_t y,
                                             int16_t w,
@@ -135,3 +223,16 @@ gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent, void *addr, int16_t x,
     GET_BASE(this)->create_done = true;
     return this;
 }
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
+
