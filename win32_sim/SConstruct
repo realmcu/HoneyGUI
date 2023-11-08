@@ -36,7 +36,9 @@ env.Append(LIBS = ['mingw32'])
 
 RTK_GUI_ENGINE = os.path.abspath('./../gui_engine/')
 LVGL_ROOT = os.path.abspath('./../lvgl/')
+PLATFORM = menu_config.PLATFORM
 
+Export('PLATFORM')
 Export('TOOL_ROOT')
 Export('RTK_GUI_ENGINE')
 Export('LVGL_ROOT')
