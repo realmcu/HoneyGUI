@@ -878,7 +878,11 @@ EXCLUDE                = ../../gui_engine/.vscode \
                          ../../gui_engine/keil_sim \
                          ../../gui_engine/misc \
                          ../../gui_engine/rtk_gui_sim \
-                         ../../gui_engine/Third_Party
+                         ../../gui_engine/Third_Party \
+                         ../../gui_engine/3rd \
+                         ../../gui_engine/3rd \
+                         ../../gui_engine/misc \
+                         ../../gui_engine/misc
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
