@@ -49,13 +49,23 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
 def DOC_handler(module, submodule, manifest_path, repo_home, chip_type):
     print("build sphinx document\n")
     try:
-        cmd = ["python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "../doc/source/build.py"), "skip_latex"]
+        cmd = ["python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "../doc/source/build.py")]
         print(" ".join(cmd), flush=True)
         subprocess.check_call(cmd, universal_newlines=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         print("Generate sphinx document exception: {}".format(e))
         return False
     return True
+
+
+def GUI_handler(module, submodule, manifest_path, repo_home, chip_type):
+    ret1 = SDK_handler(module, submodule, manifest_path, repo_home, chip_type)
+    ret2 = DOC_handler(module, submodule, manifest_path, repo_home, chip_type)
+    if ret1 and ret2:
+        return True
+    else:
+        return False
+
 
 
 def App_handler(module, submodule, manifest_path, repo_home, chip_type):
@@ -91,7 +101,7 @@ def Keyword_handler(module, submodule, manifest_path, repo_home, chip_type):
 
 # module tuple table: module, submodule, handler
 module_table =  (
-                    ['sdk', 'GUI',          '',         SDK_handler ],
+                    ['sdk', 'GUI',          '',         GUI_handler ],
                     ['sdk', 'Doc',          '',         DOC_handler ],
 
                     ['sdk', 'Script',       'CI',            SDK_handler ],
