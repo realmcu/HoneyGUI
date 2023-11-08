@@ -1,4 +1,5 @@
 /**
+\internal
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
@@ -12,6 +13,7 @@
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
+\endinternal
   */
 
 /*============================================================================*
@@ -146,13 +148,13 @@ typedef struct gui_curtainview
   */
 
 /**
- * @brief create a curtainview widget,which can nest curtains.
+ * @brief Create a curtainview widget, which can nest curtains.
  * @param parent the father widget it nested in.
  * @param filename this curtainview widget's name.
- * @param x the X-axis coordinate relative to parent widget
- * @param y the Y-axis coordinate relative to parent widget
- * @param w width
- * @param h height
+ * @param x the X-axis coordinate relative to parent widget.
+ * @param y the Y-axis coordinate relative to parent widget.
+ * @param w width.
+ * @param h height.
  * @param scope the scope of every curtain.
  * @return return the widget object pointer.
  *
