@@ -1,13 +1,21 @@
-# watch_gradient_spot
+# Watch_gradient_spot
+<br>
+
+## Overview
+
 The watch_gradient_spot widget allows you to create a pointer watchface with dynamic water drops in the center.
 
+## Usage
 
-## demo
-```eval_rst
-.. raw:: html
+### Create watch_gradient_spot widget
 
-    <iframe src="https://drive.google.com/file/d/16JoM6xig2XUZZfV4K_v3EEnfvB2H7yNm/preview" width="640" height="480" allow="autoplay"></iframe>
-```
+You can create a watch gradient spot widget by calling the [gui_watch_gradient_spot_create(parent, name, x, y, w, h)](#gui_watch_gradient_spot_create)
+
+### Set center
+
+If you wish to modify the central position of this widget, you can utilize [gui_watch_gradient_spot_set_center(this, c_x, c_y)](#gui_watch_gradient_spot_create) to make the adjustment. The coordinate points for the central position are c_x and c_y.
+
+## Example
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -21,7 +29,7 @@ The watch_gradient_spot widget allows you to create a pointer watchface with dyn
 #include "gui_tab.h"
 #include "gui_app.h"
 
-gui_win_t *win_watch;
+gui_win_t *win_watch; 
 gui_img_t *img;
 gui_watch_gradient_spot_t *watch;
 gui_text_t *rate;
@@ -44,10 +52,20 @@ void page_ct_clock(void *parent)
 }
 ```
 
+<br>
+
+<div align=center><img src="https://foruda.gitee.com/images/1699931734086261442/f0690691_10641540.png"></div>
+<br>
+
+<span id = "gui_watch_gradient_spot_create">
+
 ## API
+
+</span>
+
 ```eval_rst
+
+.. doxygenfile:: gui_watch_gradient_spot.h
 .. doxygenfunction:: gui_watch_gradient_spot_create
 .. doxygenfunction:: gui_watch_gradient_spot_set_center
-
 ```
-
