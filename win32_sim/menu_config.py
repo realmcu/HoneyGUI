@@ -28,11 +28,12 @@ CPATH = ''
 LPATH = ''
 if BUILD == 'debug':
     CFLAGS = ' -O0 -g -gdwarf-2 -static-libgcc'
-    LFLAGS = ' -pthread'
+    LFLAGS = ' -T default.ld -pthread'
 else:
     CFLAGS = ' '
     LFLAGS = ' '
 CXXFLAGS = CFLAGS
-POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n' + SIZE + ' $TARGET \n'
+POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n'
+POST_ACTION += SIZE + ' $TARGET \n'
 
 

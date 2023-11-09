@@ -22,7 +22,11 @@
 #if (BUILD_USING_RTK_GUI == 1)
 
 // <c> RTK GUI Demo
-#define BUILD_USING_RTK_GUI_DEMO
+//#define BUILD_USING_RTK_GUI_DEMO
+// </c>
+
+// <c> RTK GUI Demo 368 448
+#define BUILD_USING_RTK_GUI_448_368_DEMO
 // </c>
 
 // <c> RTK GUI Use OS Heap
@@ -55,7 +59,7 @@
 
 
 // <c> RTK GUI Enable SasA
-#define BUILD_USING_SCRIPT_AS_A_APP
+//#define BUILD_USING_SCRIPT_AS_A_APP
 // </c>
 
 
@@ -64,7 +68,7 @@
 // </e>
 
 // <e> HoneyGUI Enable LVGL
-#define BUILD_USING_LVGL_GUI     1
+#define BUILD_USING_LVGL_GUI     0
 
 #if (BUILD_USING_LVGL_GUI == 1)
 

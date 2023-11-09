@@ -477,9 +477,8 @@ void *gui_get_file_address(const char *file)
     }
 #if defined(_WIN32)
     {
-        extern char *defaultPath;
-        char *path = gui_malloc(strlen(file) + strlen(defaultPath) + 1);
-        sprintf(path, "%s%s", defaultPath, file);
+        char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
         int fd = gui_fs_open(path,  0);
         gui_free(path);
         if (fd == -1)

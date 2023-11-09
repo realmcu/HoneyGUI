@@ -232,7 +232,7 @@ class Folder(object):
         #     d_li.append(b'\0' * (pad_len - (len(d_li)*self.bin_fmt.size) % pad_len))
 
         # H_FILE += '#if defined _WIN32\n'
-        # H_FILE += 'extern unsigned char resource_root[1024 * 1024 * 20];\n\n'
+        # H_FILE += 'extern unsigned char resource_root[];\n\n'
         # H_FILE += H_FILE_IF
         # H_FILE += '\n#else\n'
         # H_FILE += H_FILE_ELSE
@@ -278,7 +278,7 @@ def get_bin_data(tree, base_addr):
     tree_data, file_addr1, file_addr2 = tree.bin_data(v_len)
 	
     H_FILE += '#if defined _WIN32\n'
-    H_FILE += 'extern unsigned char resource_root[1024 * 1024 * 20];\n\n'
+    H_FILE += 'extern unsigned char resource_root[];\n\n'
     H_FILE += file_addr1
     H_FILE += '\n#else\n'
     H_FILE += file_addr2

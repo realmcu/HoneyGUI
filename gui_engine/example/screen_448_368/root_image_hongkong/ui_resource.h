@@ -1,5 +1,5 @@
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ACTIVITY_BIN                            (void *)(resource_root + 0x000003f8)
 #define   APP_LIST3_BIN                           (void *)(resource_root + 0x000a1938)

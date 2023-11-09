@@ -1,5 +1,5 @@
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   CAROUSEL_0_BIN                          (void *)(resource_root + 0x04400640 - 0x4400000)
 #define   CAROUSEL_1_BIN                          (void *)(resource_root + 0x0440ce58 - 0x4400000)

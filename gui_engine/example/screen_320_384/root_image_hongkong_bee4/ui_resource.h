@@ -1,5 +1,5 @@
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -48,7 +48,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -169,7 +169,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -334,7 +334,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -569,7 +569,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -996,7 +996,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -1487,7 +1487,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -2052,7 +2052,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -2633,7 +2633,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)
@@ -3240,7 +3240,7 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 
 #endif
 #if defined _WIN32
-extern unsigned char resource_root[1024 * 1024 * 20];
+extern unsigned char resource_root[];
 
 #define   ZIP_APP_BLOOD_OXYGEN_BIN                (void *)(resource_root + 0x00000238)
 #define   ZIP_APP_BREATH_BIN                      (void *)(resource_root + 0x00006778)

@@ -516,9 +516,9 @@ typedef struct _gui_obj_t
 
 #if defined __WIN32
 
-extern char *defaultPath;
-#define GUI_ROOT_FOLDER defaultPath
-//#define GUI_ROOT_FOLDER "example/root_image/root_image_sim_vscode/root/"
+
+#define GUI_ROOT_FOLDER "example/root_image/root_image_sim_vscode/root/"
+
 #else
 #define GUI_ROOT_FOLDER "/"
 #endif
