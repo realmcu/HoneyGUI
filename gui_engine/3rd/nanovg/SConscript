@@ -14,7 +14,7 @@ src += [cwd + '/agge/vector_rasterizer.cpp']
 src += [cwd + '/agge/nanovg_agge.cpp']
 src += [cwd + '/agge/nanovg_vertex.cpp']
 
-if GetDepend(['MODULE_USING_NANOVG_VGLITE']):
+if GetDepend(['USING_NANOVG_HW_VGLITE']):
     src += [cwd + '/vglite/nanovg_vglite.c']
     SrcRemove(src,cwd + '/agge/math.cpp')
     SrcRemove(src,cwd + '/agge/stroke.cpp')

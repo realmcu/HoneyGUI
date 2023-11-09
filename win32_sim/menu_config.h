@@ -57,6 +57,9 @@
 //#define BUILD_USING_RTK_PPE
 // </c>
 
+// <c> MODULE NANOVG VGLITE
+//#define USING_NANOVG_HW_VGLITE
+// </c>
 
 // <c> RTK GUI Enable SasA
 //#define BUILD_USING_SCRIPT_AS_A_APP

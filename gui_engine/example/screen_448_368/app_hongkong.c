@@ -17,7 +17,6 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include <stdio.h>
-#include <unistd.h>
 
 static void app_hongkong_ui_design(gui_app_t *app);
 
@@ -73,6 +72,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 uint8_t resource_root[1024 * 1024 * 20];
 static int app_init(void)
 {
+#if defined _WIN32
     int fd;
     fd = open("./gui_engine/example/screen_448_368/root_image_hongkong/root(0x4400000).bin", 0);
     if (fd > 0)
@@ -87,6 +87,7 @@ static int app_init(void)
         printf("open root(0x4400000).bin Fail!\n");
         return 0;
     }
+#endif
     rtgui_server_init();
     gui_app_startup(get_app_hongkong());
     return 0;
