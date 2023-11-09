@@ -162,7 +162,7 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
                            int16_t y);
 
 /**
- * @brief Rotate the iamge around the center of the circle
+ * @brief Rotate the image around the center of the circle
  *
  * @param img the image widget pointer.
  * @param degrees rotation angle
@@ -190,7 +190,7 @@ void gui_img_scale(gui_img_t *img, float scale_x, float scale_y);
 void gui_img_translate(gui_img_t *img, float t_x, float t_y);
 
 /**
- * @brief skew inage on X-axis
+ * @brief skew image on X-axis
  *
  * @param img the image widget pointer.
  * @param degrees skew angle
@@ -198,7 +198,7 @@ void gui_img_translate(gui_img_t *img, float t_x, float t_y);
 void gui_img_skew_x(gui_img_t *img, float degrees);
 
 /**
- * @brief skew inage on Y-axis
+ * @brief skew image on Y-axis
  *
  * @param img the image widget pointer.
  * @param degrees skew angle
