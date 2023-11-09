@@ -71,7 +71,7 @@
 // </e>
 
 // <e> HoneyGUI Enable LVGL
-#define BUILD_USING_LVGL_GUI     0
+#define BUILD_USING_LVGL_GUI     1
 
 #if (BUILD_USING_LVGL_GUI == 1)
 

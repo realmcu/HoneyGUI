@@ -2,11 +2,21 @@
 #include <gui_img.h>
 #include "gui_canvas.h"
 #include "gui_win.h"
+#include "gui_obj.h"
+#include "gui_app.h"
+
 static void canvas_cb(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
     nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 200));
     nvgFill(canvas->vg);
+}
+
+static void touch_long_cb(void *obj, gui_event_t e)
+{
+    gui_log("line = %d \n", __LINE__);
+
+    gui_switch_app(gui_current_app(), get_app_lvgl());
 }
 
 void  page_left_figure(void *parent_widget)
@@ -43,6 +53,8 @@ void  page_left_figure(void *parent_widget)
     gui_img_t *figure_bk2 =  gui_img_create_from_mem(parent, "figure_bk2", SOUND_BIN, 72,
                                                      319, 0, 0);
     gui_img_t *siri =  gui_img_create_from_mem(parent, "siri", SIRI_BIN, 161, 297, 0, 0);
+
+    gui_obj_add_event_cb(siri, (gui_event_cb_t)touch_long_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
 
 }
 void page_ct_sidebar(void *parent)

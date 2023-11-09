@@ -1,5 +1,6 @@
 #include <gui_app.h>
 #include "lvgl.h"
+#include "gui_components_init.h"
 
 static void app_lvgl_ui_design(gui_app_t *app);
 
@@ -37,6 +38,11 @@ static void lv_tick(void)
     lv_tick_inc(10);
 }
 
+static void on_benchmark_finished(void)
+{
+    disp_enable_update();
+}
+
 static void app_lvgl_ui_design(gui_app_t *app)
 {
     gui_set_tick_hook(lv_tick);
@@ -44,19 +50,29 @@ static void app_lvgl_ui_design(gui_app_t *app)
     lv_port_disp_init();
     lv_port_indev_init();
 #if LV_USE_DEMO_BENCHMARK
-    // LV_LOG("Running LVGL Benchmark... \n");
-    // LV_LOG("Please stand by... \n");
-    // LV_LOG("NOTE: You will NOT see anything until the end. \n");
+    LV_LOG("Running LVGL Benchmark... \n");
+    LV_LOG("Please stand by... \n");
+    LV_LOG("NOTE: You will NOT see anything until the end. \n");
 
-    // lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
-    // lv_demo_benchmark_set_max_speed(true);
-    // lv_demo_benchmark();
+    lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
+    lv_demo_benchmark_set_max_speed(true);
+    lv_demo_benchmark();
 #endif
 #if LV_USE_DEMO_WIDGETS
-    lv_demo_widgets();
+    //lv_demo_widgets();
 #endif
     //lv_example_arc_1();
     //lv_example_btn_1();
     //lv_example_btn_1();
 }
 
+#if 0
+static int app_init(void)
+{
+    rtgui_server_init();
+    gui_app_startup(get_app_lvgl());
+    return 0;
+}
+
+GUI_INIT_APP_EXPORT(app_init);
+#endif

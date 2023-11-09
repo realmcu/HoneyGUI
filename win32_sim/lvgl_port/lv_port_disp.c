@@ -155,7 +155,7 @@ static void dc_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, ui
                       uint16_t h)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    printf("xStart = %d, yStart = %d, w = %d, h = %d \n", xStart, yStart, w, h);
+    //printf("xStart = %d, yStart = %d, w = %d, h = %d \n", xStart, yStart, w, h);
     uint16_t xEnd = xStart + w - 1;
     uint16_t yEnd = yStart + h - 1;
     if (dc->bit_depth == 16)

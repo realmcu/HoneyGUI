@@ -403,11 +403,6 @@
               <FileType>1</FileType>
               <FilePath>.\rtk_gui_demo.c</FilePath>
             </File>
-            <File>
-              <FileName>app_lvgl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\app_lvgl.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>

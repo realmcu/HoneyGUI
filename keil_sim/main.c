@@ -45,15 +45,6 @@ void app_main(void *argument)
     //GLCD_SetBackgroundColor(GLCD_COLOR_BLUE);
     GLCD_SetForegroundColor(GLCD_COLOR_GREEN);
 
-    rtgui_server_init();
-#ifdef BUILD_USING_RTK_GUI_DEMO
-    extern gui_app_t *get_launcher_app(void);
-    gui_app_startup(get_launcher_app());
-#else
-    extern gui_app_t *get_rtk_gui_demo(void);
-    gui_app_install(get_rtk_gui_demo(), get_rtk_gui_demo()->ui_design, NULL);
-    gui_app_startup(get_rtk_gui_demo());
-#endif
 
     while (1)
     {
