@@ -74,7 +74,7 @@ typedef int (*gui_init_fn_t)(void);
 
 
 #define GUI_APP_INIT_EXPORT(fn, level)                                                       \
-    GUI_APP_USED const gui_init_fn_t __rt_init_##fn GUI_APP_SECTION(".rti_fn." level) = fn
+    GUI_APP_USED const gui_init_fn_t __ui_init_##fn GUI_APP_SECTION(".uii_fn." level) = fn
 
 /* board init routines will be called in board_init() function */
 #define GUI_INIT_BOARD_EXPORT(fn)           GUI_APP_INIT_EXPORT(fn, "1")

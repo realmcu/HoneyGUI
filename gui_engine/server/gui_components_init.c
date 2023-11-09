@@ -43,7 +43,7 @@ void gui_components_init(void)
     volatile const gui_init_fn_t *fn_ptr;
 
     // cppcheck-suppress comparePointers
-    for (fn_ptr = &__rt_init_rti_board_end; fn_ptr < &__rt_init_rti_end; fn_ptr ++)
+    for (fn_ptr = &__ui_init_rti_board_end; fn_ptr < &__ui_init_rti_end; fn_ptr ++)
     {
         (*fn_ptr)();
     }

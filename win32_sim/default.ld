@@ -57,7 +57,7 @@ SECTIONS
      KEEP (*(.gcc_except_table))
     /* section information for initial. */
     __rt_init_start = .;
-    KEEP(*(SORT(.rti_fn*)))
+    KEEP(*(SORT(.uii_fn*)))
     __rt_init_end = .;
   }
   /* The Cygwin32 library uses a section to avoid copying certain data
