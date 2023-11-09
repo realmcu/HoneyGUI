@@ -1,12 +1,20 @@
-# card
-3d card container
-## demo 
+# Card
+<br>
 
-```eval_rst
-.. raw:: html
+## Overview
+Users can create various controls on the card. Before creating the card widget, you must select create cardview widget.
 
-    <iframe src="https://drive.google.com/file/d/1zGdYdRZiLHFYS-fU7Yq-KmcvK4V_b6zC/preview" width="640" height="480" allow="autoplay"></iframe>
-```
+## Usage
+
+### Create card widget
+Using [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#api) to create card widget
+
+## Example
+
+There are  six cards created
+
+<details> <summary>Example code</summary>
+
 ```c
 #include "root_image_hongkong/ui_resource.h"
 #include <gui_magic_img.h>
@@ -103,16 +111,19 @@ void curtain_down_design(void *parent_widget)
 }
 
 ```
+</details>
+
+<br>
+
+<center><img width="300" src= "https://foruda.gitee.com/images/1699872126165535256/1a26f029_13674272.gif "/></center>
+
+<br>
+
 ## API
 
 ```eval_rst
+
+.. doxygenfile:: gui_card.h
 .. doxygenfunction:: gui_card_create
 
 ```
-
-```eval_rst
-.. doxygenfunction:: gui_card_set_style
-.. doxygentypedef:: SLIDE_STYLE
-.. doxygenenum:: gui_tab_style
-```
-
