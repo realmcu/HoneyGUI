@@ -23,7 +23,6 @@
 #include <gui_obj.h>
 #include <draw_img.h>
 #include <tp_algo.h>
-#include <gui_kb.h>
 #include "acc_engine.h"
 
 

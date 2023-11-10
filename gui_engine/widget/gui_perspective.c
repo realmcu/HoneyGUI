@@ -461,7 +461,7 @@ static void prepare(gui_obj_t *obj)
         transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
         transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
 
-        Vertex_t p = {dc->screen_width / 2, 0, 2 * d};
+        Vertex_t p = {(float)(dc->screen_width) / 2, 0, 2 * d};
         transfrom_blit(this->img[i].img_w, this->img[i].img_h, &p, &rv0, &rv1, &rv2, &rv3,
                        this->img[i].matrix);
 
