@@ -215,21 +215,24 @@ timestamps{
                         check_out_project(all_projects_in_manifest)
                         emptyFolder(iDir)
                         dir("${HoneyRepo_Home}\\${BRANCH_NAME}"){
-                            if(COV_VIEW_MAP.containsKey(BRANCH_NAME) == false){
-                                error 'Please configure Coverity first.'
-                            }
-                            env['COVERITY_UNSUPPORTED']=1
-                            env['HoneyRepo'] = "${WORKSPACE}\\${HoneyRepo_Home}"
-                            env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\test-chip.xml"
-                            withCoverityEnv(coverityToolName: 'default', connectInstance: 'BT-Coverity'){
-                                // run cov-build capture command
-                                bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-test-chip"
+                            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'JIRA_ACCOUNT', usernameVariable: 'JIRA_USER', passwordVariable: 'JIRA_PWD'],
+                                            [$class: 'UsernamePasswordMultiBinding', credentialsId: 'f6ab79fa-8117-4176-8adf-733f31644972', usernameVariable: 'BLACKDUCK_USER', passwordVariable: 'BLACKDUCK_PWD']]){
+                                if(COV_VIEW_MAP.containsKey(BRANCH_NAME) == false){
+                                    error 'Please configure Coverity first.'
+                                }
+                                env['COVERITY_UNSUPPORTED']=1
+                                env['HoneyRepo'] = "${WORKSPACE}\\${HoneyRepo_Home}"
+                                env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\test-chip.xml"
+                                withCoverityEnv(coverityToolName: 'default', connectInstance: 'BT-Coverity'){
+                                    // run cov-build capture command
+                                    bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-test-chip"
 
-                                // run cov-analyze command
-                                bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true"
+                                    // run cov-analyze command
+                                    bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true"
 
-                                // run cov-commit-defects command
-                                bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --host ${COVERITY_HOST} --dataport ${COVERITY_PORT} --stream ${COV_VIEW_MAP[BRANCH_NAME]['stream']}"
+                                    // run cov-commit-defects command
+                                    bat "cov-commit-defects --dir ${WORKSPACE}\\${iDir} --host ${COVERITY_HOST} --dataport ${COVERITY_PORT} --stream ${COV_VIEW_MAP[BRANCH_NAME]['stream']}"
+                                }
                             }
                         }
                     }

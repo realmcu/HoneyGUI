@@ -9,6 +9,7 @@ import time
 import argparse
 import shutil
 import importlib
+from project_update import *
 from build.sdk_build import *
 
 honeyRepo_env = "HoneyRepo"
@@ -158,5 +159,10 @@ if __name__ == '__main__':
             manifest_path=os.environ.get(manifest_path_env),
             repo_home=os.environ.get(honeyRepo_env),
             chip_type = arg_dict.chipType)
+    #repo = git.Repo(search_parent_directories=True)
+    #change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
+    #os.chdir('./keil_sim')
+    #subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+    #os.chdir('./..')
     if not ci_build.build_handler():
         sys.exit(1)

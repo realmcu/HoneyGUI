@@ -9,6 +9,7 @@ import time
 import argparse
 import shutil
 import importlib
+from project_update import *
 from build.sdk_build import *
 
 honeyRepo_env = "HoneyRepo"
@@ -29,38 +30,43 @@ from jenkins_base import JenkinsCheckBase
 from keil_build import *
 
 
-def change_or_revert_macros(repo, app_flag_path, update_type, macro_list, insert=False):
-    if update_type == "change" and not macro_list:
-        print("There is no macro to change, skip")
-        return
+def gcc_build():
+    try:
+        os.chdir('./win32_sim')
+        subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT)
+        os.chdir('./..')
+        subprocess.check_call([".\\win32_sim\\gui.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
+    except Exception as e:
+        print("gcc build error: {}".format(e))
 
-    if update_type == 'change':
-        with open(app_flag_path, mode='r', newline='', errors='surrogateescape') as fd:
-            lines = fd.readlines()
- 
-        with open(app_flag_path, mode='w+', newline='', errors='surrogateescape') as fd:
-            for macro, value, check_pattern in macro_list:
-                start_replace = False if check_pattern else True
-                pattern = r'^(\s*#define\s+{}\s+)(\d+)'.format(macro)
-                for i, line in enumerate(lines):
-                    if check_pattern and re.search(check_pattern, line):
-                        print("Find target definition, start change macro {}".format(macro))
-                        start_replace = True
-                    if start_replace:
-                        if insert:
-                            lines[i] = line + "#undef {}\n#define {}\t{}\n".format(macro, macro, value)
-                            start_replace = False
-                        else:
-                            if re.search(pattern, line):
-                                lines[i] = re.sub(pattern, lambda objs:objs.group(1)+value, line, count=1, flags=re.M)
-                                start_replace = False
-            fd.writelines(lines)
-        
-        print('Configure {} diff ->\n{}'.format(os.path.basename(app_flag_path), repo.git.diff(app_flag_path)), flush=True)
-        
-    elif update_type == 'revert':
-        repo.git.checkout('--', app_flag_path)
-        print('after revert {} diff ->\n{}'.format(os.path.basename(app_flag_path), repo.git.diff(app_flag_path)), flush=True)
+
+def keil_scons(repo):
+    change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
+    os.chdir('./keil_sim')
+    subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+    os.chdir('./..')
+
+
+def send_mail(err_msg = None, attachment_file = None):
+    sys.path.append(r'D:\admin\DependTools\Python Lib\MailSending')
+    from mail import MailSending
+    send_mail = MailSending()
+    send_mail.empty_sending_mail_info()
+    send_mail.set_mail_from('bluetooth_jenkins <bluetooth_jenkins@realsil.com.cn>')
+    send_mail.add_mail_cc(['howie_wang@realsil.com.cn, wenjing_jiang@realsil.com.cn, tracy_yan@realsil.com.cn'])
+    if err_msg or attachment_file:
+        send_mail.set_mail_subject('HoneyGUI gui-engine-test-chip nightly build all project fail')
+        mail_content = "JenkinsLink: {}<br>".format(os.getenv("BUILD_URL"))
+        send_mail.set_mail_hightlight(True)
+        if err_msg:
+            mail_content += "{}<br>".format(err_msg)
+        if attachment_file:
+            send_mail.add_mail_attachment(attachment_file)
+        send_mail.set_mail_content(mail_content, True)
+    else:
+        send_mail.set_mail_subject('HoneyGUI gui-engine-test-chip nightly build all project pass')
+    send_mail.send_mail()
+    send_mail.quit()
 
 
 if __name__ == '__main__':
@@ -74,9 +80,17 @@ if __name__ == '__main__':
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
     keil_builder = SDKBuild(os.environ.get("manifest"), os.environ.get("HoneyRepo"), chip_type)
     print("call build {}".format(chip_type))
+    #gcc_build()
+    #keil_scons(repo)
     change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
-    subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+    try:
+        subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+    except Exception as e:
+        send_mail("keil_sim: 'scons --target=mdk5' after enable BUILD_USING_SCRIPT_AS_A_APP fail.", None)
+        sys.exit("keil_sim: 'scons --target=mdk5' after enable BUILD_USING_SCRIPT_AS_A_APP fail, {}".format(e))
     os.chdir('./..')
-    if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path")):
+    if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path"), error_record_path=os.path.join(os.getcwd(), "error_record_{}".format(chip_type))):
+        send_mail("keil_sim: keil build fail", os.path.join(os.getcwd(), "error_record_{}".format(chip_type)))
         sys.exit("build {} fail".format(chip_type))
+    send_mail()
