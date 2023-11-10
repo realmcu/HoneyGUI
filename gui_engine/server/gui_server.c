@@ -113,7 +113,7 @@ static void rtgui_server_entry(void *parameter)
             gui_log("daemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n", daemon_start_ms,
                     gui_ms_get(), app->active_ms);
             gui_display_off();
-            gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0x0FFFFFFF);
+            gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0xFFFFFFFF);
             gui_display_on();
             daemon_cnt = 0;
             daemon_start_ms = 0;
