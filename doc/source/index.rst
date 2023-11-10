@@ -1,3 +1,5 @@
+PDF version: :download:`RTKIOT GUI.pdf <RTKIOT GUI.pdf>`
+
 RTKIOT GUI
 ==========================================
 .. hint::
