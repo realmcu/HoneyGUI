@@ -48,7 +48,13 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 #ifndef _WIN32
 #include "mem_config.h"
-    memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
+    static bool flag;
+    if (!flag)
+    {
+        memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
+        flag = !flag;
+    }
+
 #endif
     tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);

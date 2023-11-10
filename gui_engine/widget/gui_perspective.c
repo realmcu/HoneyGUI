@@ -409,7 +409,7 @@ static void prepare(gui_obj_t *obj)
 
         break;
     default:
-        this->release_x += 5 ;
+        this->release_x += 1 ;
         break;
     }
     if (this->release_x > 0)

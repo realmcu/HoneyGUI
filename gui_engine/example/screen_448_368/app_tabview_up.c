@@ -10,6 +10,10 @@ static void canvas_cb_black(gui_canvas_t *canvas)
     nvgRect(canvas->vg, 0, -448, 368, 448 * 2);
     nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 150));
     nvgFill(canvas->vg);
+    nvgBeginPath(canvas->vg);
+    nvgRoundedRect(canvas->vg, 50, 440, (368 - 50 * 2), 5, 2);
+    nvgFillColor(canvas->vg, nvgRGBA(255, 255, 255, 150));
+    nvgFill(canvas->vg);
 }
 void tabview_up_design(void *parent_widget)
 {

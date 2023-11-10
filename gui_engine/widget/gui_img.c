@@ -84,10 +84,66 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+void gui_img_set_animate(gui_img_t *o, uint32_t dur, int repeatCount, void *callback,
+                         void *p)
+{
+    gui_img_t *a = (o);
+    GUI_UNUSED(a);
 
+    gui_animate_t *animate = ((gui_img_t *)o)->animate;
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *))callback;
+    animate->repeatCount = repeatCount;
+    animate->p = p;
+    ((gui_img_t *)o)->animate = animate;
+}
+static void (obj_update_att)(struct _gui_obj_t *o)
+{
+    gui_img_t *obj = (void *)o;
+    if (obj->animate && obj->animate->animate)
+    {
+        size_t frame_count = obj->animate->dur * 30 / (1000);
+        obj->animate->callback(obj->animate->p);
+        obj->animate->current_frame++;
+
+        if (obj->animate->current_frame > frame_count)
+        {
+            if (obj->animate->repeatCount == 0)
+            {
+                obj->animate->animate = false;
+            }
+            else if (obj->animate->repeatCount < 0)
+            {
+                obj->animate->current_frame = 0;
+            }
+            else if (obj->animate->repeatCount > 0)
+            {
+                obj->animate->current_repeat_count++;
+                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                {
+                    obj->animate->animate = false;
+                }
+                else
+                {
+                    obj->animate->current_frame = 0;
+                }
+            }
+        }
+        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
+                                                                                       frame_count));
+
+    }
+}
 static void img_prepare(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
+    obj_update_att(obj);
     gui_img_t *this = (gui_img_t *)obj;
     gui_obj_t *root = (gui_obj_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
