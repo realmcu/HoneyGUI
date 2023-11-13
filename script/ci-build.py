@@ -43,6 +43,18 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=Keil_path):
         print("build {} fail".format(chip_type))
         return False
+    #check scons step
+    repo = git.Repo(search_parent_directories=True)
+    repo.git.checkout('--', '.')
+    repo.git.clean('-dfx')
+    change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
+    os.chdir('./keil_sim')
+    try:
+        subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+    except Exception as e:
+        os.chdir('./..')
+        sys.exit("scons fail after enable BUILD_USING_SCRIPT_AS_A_APP: {}".format(e))
+    os.chdir('./..')
 
     return True
 
@@ -159,10 +171,5 @@ if __name__ == '__main__':
             manifest_path=os.environ.get(manifest_path_env),
             repo_home=os.environ.get(honeyRepo_env),
             chip_type = arg_dict.chipType)
-    #repo = git.Repo(search_parent_directories=True)
-    #change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
-    #os.chdir('./keil_sim')
-    #subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
-    #os.chdir('./..')
     if not ci_build.build_handler():
         sys.exit(1)
