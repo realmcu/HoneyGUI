@@ -89,6 +89,12 @@ void page_tb_clock(void *parent)
 
 ## API
 
+```eval_rst
+
+.. doxygenfile:: gui_curtain.h
+
+```
+
 - ### Struct
 
 ```c
