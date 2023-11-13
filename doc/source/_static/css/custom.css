@@ -1,3 +1,12 @@
+/*Let `code` wrap*/
+.rst-content code, .rst-content tt, code {
+    white-space: normal;
+}
+
+.highlight {
+    background:#eeffcc;
+}
+
 dl.cpp.unexpanded dd {
     display: none;
 }
