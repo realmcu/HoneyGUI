@@ -28,8 +28,6 @@ DefineGroup('menuconfig', config, depend = [''], CPPPATH = path, CPPDEFINES = CP
 src = ['main.c']
 src += ['rtk_gui_demo.c']
 
-if GetDepend('BUILD_USING_LVGL_GUI'):
-    src += ['app_lvgl.c']
 
 CPPPATH = [cwd, 
            RTK_GUI_ENGINE + '/example/root_image/']

@@ -60,8 +60,11 @@ CPPPATH += [jerry_ext_dir + '/include']
 CPPPATH += [jerry_ext_dir + '/module']
 
 LOCAL_CCFLAGS = ''
-#import rtconfig
-LOCAL_CCFLAGS += ' -std=c11'
+
+
+Import('PLATFORM')
+if PLATFORM == 'gcc' or PLATFORM == 'armclang': # GCC or Keil AC6
+    LOCAL_CCFLAGS += ' -std=c11'
 
 CPPDEFINES = ['JERRY_JS_PARSER', 'JERRY_ENABLE_EXTERNAL_CONTEXT']
 

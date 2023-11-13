@@ -28,11 +28,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
-#ifdef FS_NOT_UNIX
-#include "os_mem.h"
-#include "trace.h"
 
-#endif
 extern void *gui_malloc(size_t n);
 extern void *gui_realloc(void *ptr_old, size_t n);
 extern void gui_free(void *rmem);
