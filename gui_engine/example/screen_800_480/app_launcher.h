@@ -22,8 +22,6 @@ extern "C" {
 #include <gui_app.h>
 #include <stdlib.h>
 #include "draw_font.h"
-#include "gui_dynamic_img.h"
-#include "gui_magic_img.h"
 #include <gui_app.h>
 
 gui_app_t *get_app_dashboard(void);

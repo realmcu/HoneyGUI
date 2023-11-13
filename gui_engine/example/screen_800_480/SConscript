@@ -8,6 +8,8 @@ src = Split("""
 
 src = Glob('*.c')
 
+SrcRemove(src,'app_dashboard_480_272.c')
+SrcRemove(src,'app_dashboard_800_400.c')
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_800_400']
 print(CPPPATH)

@@ -6,8 +6,6 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "draw_font.h"
-#include "gui_img_with_animate.h"
-#include "gui_magic_img.h"
 #include "acc_engine.h"
 #include "nanosvg.h"
 #include "gui_img.h"
@@ -242,6 +240,7 @@ void app_cluster_update_connected_display_battery_info(uint8_t battery_level)
 
 void app_cluster_update_connected_display_speed_info(uint8_t current_speed)
 {
+    DBG_DIRECT("app_cluster_update_connected_display_speed_info:%d", __LINE__);
     app_update_gui_widget(speed_high_c_digital,
                           current_speed / 10,
                           connected_display_speed_resource_def,

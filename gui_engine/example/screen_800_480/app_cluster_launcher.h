@@ -15,20 +15,14 @@ extern "C" {
 #include <gui_text.h>
 #include <gui_obj.h>
 #include <gui_curtain.h>
-
 #include <gui_seekbar.h>
-
-#include <gui_alert.h>
 #include <gui_page.h>
-
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
 //#include "app_dialing.h"
 #include "resource_8762g.h"
-#include "gui_img_with_animate.h"
-#include <gui_magic_img.h>
 #include <gui_app.h>
 #include <stdlib.h>
 #include "acc_engine.h"

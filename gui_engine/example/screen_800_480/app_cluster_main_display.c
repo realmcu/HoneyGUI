@@ -6,8 +6,6 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "draw_font.h"
-#include "gui_img_with_animate.h"
-#include "gui_magic_img.h"
 #include "acc_engine.h"
 #include "nanosvg.h"
 #include "gui_img.h"
@@ -28,47 +26,68 @@ void app_cluster_create_main_display(gui_win_t *target_main_display)
     /* set Image data */
     cluster_background = gui_img_create_from_mem(target_main_display, "cluster_background",
                                                  BACKGROUND_BIN, 0, 0, 800, 480);
+    cluster_background->draw_img.blend_mode = IMG_FILTER_BLACK;
     speed_high_digital = gui_img_create_from_mem(target_main_display, "speed_high_digital", SPED0_BIN,
                                                  360, 202, 40, 60);
+    speed_high_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     speed_low_digital = gui_img_create_from_mem(target_main_display, "speed_low_digital", SPED0_BIN,
                                                 406, 202, 40, 60);
+    speed_low_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     bluetooth_status = gui_img_create_from_mem(target_main_display, "bluetooth_status", BTOF_BIN, 48,
                                                10, 23, 30);
+    bluetooth_status->draw_img.blend_mode = IMG_FILTER_BLACK;
     left_turn_light_status = gui_img_create_from_mem(target_main_display, "left_turn_light_status",
                                                      TL_OF_BIN, 48, 208, 42, 40);
+    left_turn_light_status->draw_img.blend_mode = IMG_FILTER_BLACK;
     right_turn_light_status = gui_img_create_from_mem(target_main_display, "right_turn_light_status",
                                                       TR_OF_BIN, 710, 208, 42, 40);
+    right_turn_light_status->draw_img.blend_mode = IMG_FILTER_BLACK;
     hour_high_digital = gui_img_create_from_mem(target_main_display, "hour_high_digital", TIMER0_BIN,
                                                 355, 12, 9, 16);
+    hour_high_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     hour_low_digital = gui_img_create_from_mem(target_main_display, "hour_low_digital", TIMER0_BIN, 366,
                                                12, 9, 16);
+    hour_low_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     min_high_digital = gui_img_create_from_mem(target_main_display, "min_high_digital", TIMER0_BIN, 387,
                                                12, 9, 18);
+    min_high_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     min_low_digital = gui_img_create_from_mem(target_main_display, "min_low_digital", TIMER0_BIN, 399,
                                               12, 9, 18);
+    min_low_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     tense_high_digital = gui_img_create_from_mem(target_main_display, "tense_high_digital", APM_A_BIN,
                                                  417,
                                                  12, 9, 18);
+    tense_high_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     tense_low_digital = gui_img_create_from_mem(target_main_display, "tense_low_digital", APM_M_BIN,
                                                 432,
                                                 12, 9, 18);
+    tense_low_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     bat_high_digital = gui_img_create_from_mem(target_main_display, "bat_high_digital", TIMER0_BIN, 394,
                                                360, 9, 18);
+    bat_high_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     bat_low_digital = gui_img_create_from_mem(target_main_display, "bat_low_digital", TIMER0_BIN, 406,
                                               360, 9, 18);
+    bat_low_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     tel_box = gui_img_create_from_mem(target_main_display, "tel_box", TELBOX_BIN, 253, 410, 295, 49);
+    tel_box->draw_img.blend_mode = IMG_FILTER_BLACK;
     refuse_button = gui_img_create_from_mem(target_main_display, "refuse_button", REFUS_BIN, 263, 416,
                                             36, 36);
+    refuse_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     ans_button = gui_img_create_from_mem(target_main_display, "ans_button", ANS_BIN, 500, 416, 36, 36);
+    ans_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     tel_box_left_button = gui_img_create_from_mem(target_main_display, "tel_box_left_button", SYMB1_BIN,
                                                   315, 416, 36, 36);
+    tel_box_left_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     tel_box_right_button = gui_img_create_from_mem(target_main_display, "tel_box_right_button",
                                                    SYMB2_BIN, 479, 416, 36, 36);
+    tel_box_right_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     dashboard_pointer = gui_img_create_from_mem(target_main_display, "dashboard_Cpointer",
                                                 DASHBOARD_2_BIN, 243, 84,
                                                 9, 18);
+    dashboard_pointer->draw_img.blend_mode = IMG_FILTER_BLACK;
     short_message = gui_img_create_from_mem(target_main_display, "short_message", MESSAGE_BIN, 221,
                                             0, 359, 80);
+    short_message->draw_img.blend_mode = IMG_FILTER_BLACK;
 
     /* set font data */
     app_phone_data current_phone_status;
