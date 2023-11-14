@@ -1,29 +1,30 @@
-# **Curtain**
+# Curtain
+<br>
 
-## Overview
+## 1 Overview
 
 The curtain widget allows you to create a curtain sliding effect in five directions.
-Before creating a curtain widget, you must select Create Curtainview widget.
+Before creating a curtain widget, you must select create curtainview widget.
 
-## Features
+## 2 Features
 
 Curtain widget can support the following features.
 
 - Five selectable directions
 
-## Usage
+## 3 Usage
 
-- ### Create curtain widget
+### 3.1 Create curtain widget
 
-Use this functions to create curtain widget
+Use [gui_curtain_create](#gui_curtain_create) to create curtain widget
 
 ```c
-    gui_curtainview_t *ct = gui_curtainview_create(parent, "ct", 0, 0, 368, 448);
-    gui_curtain_t *ct_clock = gui_curtain_create(ct, "1", 0, 0, 368, 448, CURTAIN_MIDDLE, 1);
-    gui_curtain_t *ct_control0 = gui_curtain_create(ct, "2", 0, 0, 368, 448, CURTAIN_UP, 1);
+gui_curtainview_t *ct = gui_curtainview_create(parent, "ct", 0, 0, 368, 448);
+ui_curtain_t *ct_clock = gui_curtain_create(ct, "1", 0, 0, 368, 448, CURTAIN_MIDDLE, 1);
+gui_curtain_t *ct_control0 = gui_curtain_create(ct, "2", 0, 0, 368, 448, CURTAIN_UP, 1);
 ```
 
-- ### Select curtain orientation
+### 3.2 Select curtain orientation
 
 There are five directions in curtain widget.
 
@@ -71,60 +72,18 @@ void page_tb_clock(void *parent)
 
 </details>
 
-## Example display
+## 4 Example display
 
-### Curtain middle
+<div align=center><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png"></div>
 
-<div align=center><img src="https://foruda.gitee.com/images/1699598241164687669/dfa390fd_10641540.png"></div>
+<span id="gui_curtain_create">
 
-### Curtain left
+## 5 API
 
-<div align=center><img src="https://foruda.gitee.com/images/1699598101922668537/42e53db8_10641540.png"></div>
-
-### Curtain down
-
-<div align=center><img src="https://foruda.gitee.com/images/1699598123896262065/f1ca11fb_10641540.png"></div>
-
-<iframe src="https://drive.google.com/file/d/1ldpbh_wWDRebAIMNhPelFBF98Der49An/preview" width="640" height="480" allow="autoplay"></iframe>
-
-## API
+</span>
 
 ```eval_rst
 
 .. doxygenfile:: gui_curtain.h
-
+.. doxygenfunction:: gui_curtain_create
 ```
-
-- ### Struct
-
-```c
-typedef struct gui_curtain
-{
-    gui_obj_t base; 
-    gui_curtain_enum_t orientation;
-    float scope;
-    void (*ctor)(struct gui_curtain *this, gui_obj_t *parent, const char *filename, int16_t x,
-                 int16_t y,
-                 int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope); 
-} gui_curtain_t;
-```
-
-- ### Function
-
-    gui_curtain_create()
-
-```c
-gui_curtain_create(void *parent, const char *filename, int16_t x, int16_t y,int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope)
-```
-
-|params  | description  |
-|--|--|
-|`parent`|the father widget the grid nested in|
-|`filename`|the widget name|
-|`x`|the X-axis coordinate|
-|`y`|the Y-axis coordinate|
-|`w`|the widget width|
-|`h`|the widget height|
-|`orientation`|the curtain orientation|
-|`scope`|the curtain scope||
-|`return`|the widget object pointer|
