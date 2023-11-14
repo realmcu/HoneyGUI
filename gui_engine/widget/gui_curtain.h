@@ -138,11 +138,3 @@ gui_curtain_t *gui_curtain_create(void *parent, const char *filename, int16_t x,
 #endif
 
 #endif
-
-
-
-
-
-
-
-
