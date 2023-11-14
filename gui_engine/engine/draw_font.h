@@ -100,15 +100,19 @@ void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
  * @param font_bin_addr the binary file address of this font type
  */
 void gui_font_mem_init(uint8_t *font_bin_addr);
+
 #if ENABLE_RTK_GUI_FONT_STB
 /**
+ *
  * @brief Initialize a standard ttf file and send the font and
  * corresponding information to the parser
  *
  * @param font_ttf_addr the address of ttf file
+ *
  */
 void gui_font_stb_init(void *font_ttf_addr);
 #endif
+
 #ifdef __cplusplus
 }
 #endif

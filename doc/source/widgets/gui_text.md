@@ -1,12 +1,9 @@
-# text widget
+# Text widget
+<br>
 
 ## Overview
 
-The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen.
-
-In order to draw text, .
-
-The font file can be standard .ttf file or customized .bin file.
+The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen. In order to draw text, the font file can be standard .ttf file or customized .bin file.
 
 ## Features
 
@@ -28,62 +25,50 @@ Text widgets can support the following features.
 
 ## Usage
 
+Using functions to load font files and display text
+
 ### Initialize the font file
 
 In order to draw text, font files containing glyph information need to be loaded into the system.
 
 The font file can be standard .ttf file or customized .bin file. It must to be initialized before use the text widget.
 
-+ To initialize the old version customized bin font file, you need to use  `gui_set_font_mem_resourse(24, DOT_BIN, TABLE_BIN);`. The font size and two files must be matched.
++ To initialize the old version customized bin font file, you need to use [gui_set_font_mem_resourse(font_size, font_bitmap_addr, font_table_addr)](#api) . The font size and two files must be matched.
 
-+ To initialize the new version customized bin font file, you need to use `gui_font_mem_init(FONT_BIN);`.
++ To initialize the new version customized bin font file, you need to use [gui_font_mem_init(font_bin_addr)](#api) .
 
-+ To initialize the standrad TTF file to draw text, you need to use `gui_font_stb_init(FONT_TTF)`.
++ To initialize the standrad TTF file to draw text, you need to use [gui_font_stb_init(font_ttf_addr)](#api) .
 
 All customized bin font files are available from RTK technicians.
 
 `DOT_BIN`,`TABLE_BIN`,`FONT_BIN`,`FONT_TTF` are all address of the files stored in flash.
+
 If you want to know more about file storage, please read userdata.md.
 
-### Creat text widget
+### Create text widget
 
-To creat a text widget, you can use
+To create a text widget, you can use [gui_text_create(parent, filename, x, y, w, h)](#api)
 
-``` C
-gui_text_t *time = gui_text_create(curtain_center,  "time",  0, 0, 100, 30);
-```
-
-The coordinates on the screen and text box size have been identified after creat.
+The coordinates on the screen and text box size have been identified after create.
 
 These attributes also can be modified whenever you want.
 
-Note that, text box size should be larger than the string to be shown, out-of-range text will be hidden.
+Note that text box size should be larger than the string to be shown, out-of-range text will be hidden.
 
 ### Set text attributes
 
 #### Set text
 
-To add some texts or characters to a text widget and set text attributes with:
+To add some texts or characters to a text widget and set text attributes with: [gui_text_set(this, text, text_type, color, length, font_size)](#api)
 
-``` C
-gui_text_set(time, "8:30 PM", "rtk_font_mem", 0xffffffff, 7, 24);
-```
+Note that text length must be the same as the set character length, text frontsize should must be the same as the type size
 
 #### Font type
-
-``` C
-gui_text_type_set(time, DOT_BIN);
-gui_text_type_set(time, FONT_BIN);
-gui_text_type_set(time, FONT_TTF);
-```
+Text widget support the type setting. You can use this function to set type 
+[gui_text_type_set(this, type)](#api).
 
 #### Text mode
-
-Text widget support seven typesetting modes, to set text typesetting mode with:
-
-``` C
-gui_text_mode_set(time, CENTER);
-```
+Text widget support seven typesetting modes, to set text typesetting mode with: [gui_text_mode_set(this, mode)](#api).
 
 All nine typesetting modes are as follows.
 
@@ -112,47 +97,19 @@ typedef enum
 } TEXT_MODE;
 ```
 
+### Text move
+You can use this function [gui_text_move(this, x, y)](#api) to move text to a specified location, but x and y cannot be larger than w and h of the text
+
+### Set animate
+Using this function [gui_text_set_animate(o, dur, repeatCount, callback, p)](#api) to set the animation and implement the animation effect in the corresponding callback function
+
 To use scroll text, you can read scrolltext.md.
 
 ## Example
 
-### Simple text widget
+### Example Multiple text widget
 
-An example image of the text widget is shown below.
-
-
-![text widget example1](https://foruda.gitee.com/images/1694429674838659868/2912dcda_9325830.png "text_widget_example1.png")
-
-
-<details> <summary>Example code</summary>
-
-```C
-#include "string.h"
-#include "gui_obj.h"
-#include "guidef.h"
-#include "gui_text.h"
-#include "draw_font.h"
-#include "gui_app.h"
-#include "rtk_gui_resource.h"
-
-static void app_launcher_ui_design(gui_app_t *app)
-{
-    gui_font_mem_init(HARMONYOS_SIZE24_BITS1_FONT_BIN);
-
-    gui_text_t *time = gui_text_create(&app->screen,  "time", 20, 20, 100, 30);
-    gui_text_set(time, "15:30", "rtk_font_mem", 0xff0000ff, 5, 24);
-    gui_text_type_set(time, HARMONYOS_SIZE24_BITS1_FONT_BIN);
-    gui_text_mode_set(time, LEFT);
-}
-```
-
-</details>
-
-### Multiple text widget
-
-
-![text widget example2](https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "text_widget_example2.png")
-
+An example of the multiple text widget is shown below.
 
 <details> <summary>Example code</summary>
 
@@ -204,159 +161,79 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 ```
 
-</details>
+</details></br>
 
-## Struct
+<center><img  width="300" src= "https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "/></center></br>
 
-text widget struct
+### Example Animate text widget
+
+An example of the animate text widget is shown below.
+
+<details> <summary>Example code</summary>
 
 ```C
-typedef struct gui_text
+#include "root_image_hongkong/ui_resource.h"
+#include "string.h"
+#include "gui_obj.h"
+#include "guidef.h"
+#include "gui_text.h"
+#include "draw_font.h"
+
+void change_text_cb(gui_text_t *obj)
 {
-    gui_obj_t base;
-    const struct rtgui_font_engine *engine;
-    uint32_t color;
-    TEXT_MODE mode;
-    uint16_t len;
-    uint16_t font_len;
-    uint16_t text_offset;
-    uint8_t font_height;
-    uint8_t *utf_8;
-    void *data;
-    char *text_type;
-    gui_animate_t *animate;
-    void *path;
-} gui_text_t;
+    if (obj->animate->current_frame > 0 && obj->animate->current_frame < 50)
+    {
+        gui_text_move(obj, 50, 150);
+        obj->utf_8 = "123456789";
+    }
+    else if (obj->animate->current_frame > 50 && obj->animate->current_frame < 100)
+    {
+        gui_text_move(obj, 200, 150);
+        obj->utf_8 = "987654321";
+        
+    }
+    else
+    {
+        gui_text_move(obj, 125, 50);
+        obj->utf_8 = "abcdefghi";
+    }
+}
+
+void page_tb_activity(void *parent)
+{
+    gui_font_mem_init(SIMKAI_SIZE24_BITS4_FONT_BIN);
+
+    gui_text_t *text = gui_text_create(parent,  "text",  0, 0, 100, 200);
+    gui_text_set(text, "ABCDEFGHI", "rtk_font_mem", 0xffff0000, 9, 24);
+    gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN);
+    gui_text_mode_set(text, MUTI_CENTER);
+    gui_text_set_animate(text, 5000, 15, change_text_cb, text);
+}
+
 ```
 
-## APIs
+</details></br>
 
-|Parameter|Description|Type|
-|--|--|--|
-|`font_size`|the font size of this font file|`unsigned char`|
-|`font_bitmap_addr`|the bitmap file address of this font type|`void *`|
-|`font_table_addr`|the table file address of this font type|`void *`|
+<center><img width="300" src= "https://foruda.gitee.com/images/1701077306172011299/b0206172_13674272.gif "/></center>
 
-```C
-/**
- * @brief Initialize the character binary file and store the font and corresponding information in the font list
- * @note This API works with older font files
- * @param font_size the font size of this font file
- * @param font_bitmap_addr the bitmap file address of this font type
- * @param font_table_addr the table file address of this font type
- */
-void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
-                               void *font_table_addr);
-```
+<br>
 
-```C
-/**
- * @brief Initialize the character binary file and store the font and corresponding information in the font list
- * @note The area of the text box should be larger than that of the string to be shown, otherwise, part of
- * @param font_bin_addr the binary file address of this font type
- */
-void gui_font_mem_init(uint8_t *font_bin_addr);
-```
+## API
 
-```C
-/**
- * @brief Initialize a standard ttf file and send the font and corresponding information to the parser
- *
- * @param font_ttf_addr the address of ttf file
- */
-void gui_font_stb_init(void *font_ttf_addr);
-```
-
-### Create and modify text widgets
-
-```C
-/**
- * @brief create a text box widget.
- * @note The area of the text box should be larger than that of the string to be shown, otherwise, part of the text will be hidden.
- * @param parent the father widget which the text nested in.
- * @param filename the widget's name.
- * @param x the X-axis coordinate of the text box.
- * @param y the Y-axis coordinate of the text box.
- * @param w the width of the text box.
- * @param h the hight of the text box.
- * @return return the widget object pointer
- *
- */
-gui_text_t *gui_text_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w, int16_t h);
-```
-
-```C
-/**
-* @brief set the string in a text box widget.
-* @note The font size must match the font file!
-* @param this the text box widget pointer.
-* @param text the text string.
-* @param text_type font file type, "rtk_font_mem" match FONT_BIN or "rtk_font_stb" match FONT_TTF.
-* @param color the text's color.
-* @param length the text string's length.
-* @param font_size the text string's font size.
-* @return void
-*/
-void gui_text_set(gui_text_t *this, const char *text, char *text_type, uint32_t color, uint16_t length, uint8_t font_size);
-```
-
-```C
-/**
- * @brief move the text widget
- *
- * @param this the text box widget pointer.
- * @param x the X-axis coordinate of the text box.
- * @param y the Y-axis coordinate of the text box.
- */
-void gui_text_move(gui_text_t *this, int16_t x, int16_t y);
-```
-
-```C
-/**
- * @brief set text mode of this text widget
- * @note if text line count was more than one, it will display on the left even if it was set lft or right
- * @param this the text widget pointer.
- * @param mode there was three mode: LEFT, CENTER and RIGHT.
- */
-void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode);
-```
-
-```C
-/**
- * @brief set font size or width and height
- * @note if use freetype, width and height is effective, else height will be applied as font size
- * @param this the text widget pointer.
- * @param height font height or font size.
- * @param width font width(only be effective when freetype was used).
- */
-void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width);
-```
-
-```C
-/**
- * @brief set font type
- * @note The type must match the font size!
- * @param this the text widget pointer
- * @param type the addr of .ttf or .bin
- */
-void gui_text_type_set(gui_text_t *this, void *type);
-```
-
-```C
-/**
- * @brief set animate
- *
- * @param o text widget
- * @param dur durtion. time length of the animate
- * @param repeatCount  0:one shoot -1:endless
- * @param callback happens at every frame
- * @param p callback's parameter
- */
-void gui_text_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p);
-```
 ```eval_rst
 
+.. doxygenfunction:: gui_set_font_mem_resourse
+.. doxygenfunction:: gui_font_mem_init
+.. doxygenfunction:: gui_font_stb_init
 
 .. doxygenfile:: gui_text.h
+.. doxygenfunction:: gui_text_create
+.. doxygenstruct:: gui_text
+.. doxygenfunction:: gui_text_set
+.. doxygenfunction:: gui_text_type_set
+.. doxygenfunction:: gui_text_size_set
+.. doxygenfunction:: gui_text_move
+.. doxygenfunction:: gui_text_mode_set
+.. doxygenfunction:: gui_text_set_animate
 
 ```
