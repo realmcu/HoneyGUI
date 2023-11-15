@@ -37,6 +37,7 @@ Keil_path = os.environ.get("Keil_Path")
 
 def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     global Keil_path
+    repo = git.Repo(search_parent_directories=True)
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
     keil_builder = SDKBuild(manifest_path, repo_home, chip_type)
     print("call build {}".format(chip_type))
@@ -44,7 +45,6 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
         print("build {} fail".format(chip_type))
         return False
     #check scons step
-    repo = git.Repo(search_parent_directories=True)
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
     change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
@@ -53,7 +53,8 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
         subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
         os.chdir('./..')
-        sys.exit("scons fail after enable BUILD_USING_SCRIPT_AS_A_APP: {}".format(e))
+        print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: {}".format(e))
+        return False
     os.chdir('./..')
 
     return True
