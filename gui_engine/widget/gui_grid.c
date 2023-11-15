@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_grid.h
+  * @file gui_grid.c
   * @brief  grid design
   * @details Evenly layout vertically and horizontally
   * @author triton_yu@realsil.com.cn
