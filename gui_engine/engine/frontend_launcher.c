@@ -24,6 +24,7 @@
 #else
 //#include "gui_cube.h"
 #endif
+#include "gui_components_init.h"
 static void app_launcher_frontend_ui_design(gui_app_t *app);
 static gui_app_t app_launcher_frontend =
 {
@@ -94,7 +95,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
     }
     while ((entry = readdir(dir)) != NULL)
     {
-        //printf("dname:%s\n",entry->d_name);
+        printf("dname:%s\n", entry->d_name);
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
             strcmp(entry->d_name, "widget.ts") != 0)
         {
@@ -166,4 +167,4 @@ static void app_xml_ui_design(gui_app_t *app)
     gui_return_create(&app->screen);
 
 }
-
+GUI_INIT_APP_EXPORT(rtgui_server_init);

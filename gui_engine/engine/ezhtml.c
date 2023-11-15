@@ -47,8 +47,9 @@
 #if defined __WIN32
 #include <dirent.h>
 #else
-char *defaultPath = GUI_ROOT_FOLDER;
+
 #endif
+char *defaultPath = GUI_ROOT_FOLDER;
 struct widget_create
 {
     char *name;
