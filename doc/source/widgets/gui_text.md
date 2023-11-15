@@ -120,7 +120,9 @@ To use scroll text, you can read scrolltext.md.
 
 An example image of the text widget is shown below.
 
+
 ![text widget example1](https://foruda.gitee.com/images/1694429674838659868/2912dcda_9325830.png "text_widget_example1.png")
+
 
 <details> <summary>Example code</summary>
 
@@ -148,7 +150,9 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 ### Multiple text widget
 
+
 ![text widget example2](https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "text_widget_example2.png")
+
 
 <details> <summary>Example code</summary>
 

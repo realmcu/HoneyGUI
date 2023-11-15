@@ -6,6 +6,8 @@ The code is to create a progressbaras follows.
 
 
 ![vertical](https://foruda.gitee.com/images/1694154259257637618/08ffb2a3_13406851.png "create_v.png")
+
+
 ```
 gui_progressbar_t *IMG=gui_progressbar_img_v_create(&(app->screen), picture, 0, 0);
 ```
@@ -13,6 +15,8 @@ gui_progressbar_t *IMG=gui_progressbar_img_v_create(&(app->screen), picture, 0, 
 
 
 ![horizontal](https://foruda.gitee.com/images/1694154279857524204/57d3e021_13406851.png "create_h.png")
+
+
 ```
 gui_progressbar_t *IMG=gui_progressbar_img_h_create(&(app->screen), picture, 0, 0);
 ```
@@ -20,6 +24,8 @@ gui_progressbar_t *IMG=gui_progressbar_img_h_create(&(app->screen), picture, 0, 
 
 
 ![frame = 1](https://foruda.gitee.com/images/1694424698504008860/40b6b21e_13406851.png "create_movice.png")
+
+
 ```
     gui_progressbar_t *demo = gui_progressbar_movie_create(&(app->screen), frame_list,
                                                 0, 10, 10);
@@ -28,6 +34,8 @@ gui_progressbar_t *IMG=gui_progressbar_img_h_create(&(app->screen), picture, 0, 
 
 
 ![percentage = 50%](https://foruda.gitee.com/images/1694154303391505761/f3d00de0_13406851.png "set_progressbar_percentage.png")
+
+
 ```
 gui_progressbar_set_percentage(IMG, 0.5);
 ```

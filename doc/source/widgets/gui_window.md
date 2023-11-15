@@ -6,7 +6,11 @@ The Window Widget is a rectangular container widget.
 
 ## Demo
 ### Create a wimdow
+
+
 ![win](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png "win.PNG") 
+
+
 The following code is used to create a window and add an image to it.
 ```cpp
 static void app_launcher_ui_design(gui_app_t *app)

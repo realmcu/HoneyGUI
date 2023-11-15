@@ -74,7 +74,9 @@ void page_tb_clock(void *parent)
 
 ## 4 Example display
 
+
 <div align=center><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png"></div>
+
 
 <span id="gui_curtain_create">
 
