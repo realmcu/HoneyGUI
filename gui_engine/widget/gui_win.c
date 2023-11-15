@@ -115,6 +115,7 @@ static void (onClick)(gui_win_t *b, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
+
 void win_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -181,6 +182,39 @@ void win_prepare(gui_obj_t *obj)
                 b->release_flag = true;
             }
         }
+    }
+    gui_win_t *ob = (void *)obj;
+    if (ob->animate && ob->animate->animate)
+    {
+        size_t frame_count = ob->animate->dur * (1000 / 15) / (1000);
+        ob->animate->callback(ob->animate->p);
+        ob->animate->current_frame++;
+
+        if (ob->animate->current_frame > frame_count)
+        {
+            if (ob->animate->repeatCount == 0)
+            {
+                ob->animate->animate = false;
+            }
+            else if (ob->animate->repeatCount < 0)
+            {
+                ob->animate->current_frame = 0;
+            }
+            else if (ob->animate->repeatCount > 0)
+            {
+                ob->animate->current_repeat_count++;
+                if (ob->animate->current_repeat_count >= ob->animate->repeatCount)
+                {
+                    ob->animate->animate = false;
+                }
+                else
+                {
+                    ob->animate->current_frame = 0;
+                }
+            }
+        }
+        ob->animate->progress_percent = ((float)(ob->animate->current_frame)) / ((float)(
+                                                                                     frame_count));
     }
 }
 gui_api_win_t gui_win_api =
