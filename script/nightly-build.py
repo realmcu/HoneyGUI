@@ -54,7 +54,7 @@ def send_mail(err_msg = None, attachment_file = None):
     send_mail = MailSending()
     send_mail.empty_sending_mail_info()
     send_mail.set_mail_from('bluetooth_jenkins <bluetooth_jenkins@realsil.com.cn>')
-    send_mail.add_mail_cc(['howie_wang@realsil.com.cn, wenjing_jiang@realsil.com.cn, tracy_yan@realsil.com.cn'])
+    send_mail.add_mail_cc(['howie_wang@realsil.com.cn', 'wenjing_jiang@realsil.com.cn', 'tracy_yan@realsil.com.cn'])
     if err_msg or attachment_file:
         send_mail.set_mail_subject('HoneyGUI gui-engine-test-chip nightly build all project fail')
         mail_content = "JenkinsLink: {}<br>".format(os.getenv("BUILD_URL"))
