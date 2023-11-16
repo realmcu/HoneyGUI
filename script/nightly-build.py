@@ -81,18 +81,33 @@ if __name__ == '__main__':
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
     keil_builder = SDKBuild(os.environ.get("manifest"), os.environ.get("HoneyRepo"), chip_type)
     print("call build {}".format(chip_type))
-    #gcc_build()
-    #keil_scons(repo)
+    #scons
+    os.chdir('./win32_sim')
+    try:
+        subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT)
+    except Exception as e:
+        os.chdir('./..')
+        send_mail("win32_sim: 'scons' fail.", None)
+        sys.exit("win32_sim: 'scons' fail, {}".format(e))
+    os.chdir('./..')
+    #reset
+    repo.git.checkout('--', '.')
+    repo.git.clean('-dfx')
+    #scons --target=mdk5
     change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
     try:
         subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
+        os.chdir('./..')
         send_mail("keil_sim: 'scons --target=mdk5' after enable BUILD_USING_SCRIPT_AS_A_APP fail.", None)
         sys.exit("keil_sim: 'scons --target=mdk5' after enable BUILD_USING_SCRIPT_AS_A_APP fail, {}".format(e))
     os.chdir('./..')
+    #reset
+    repo.git.checkout('--', '.')
+    repo.git.clean('-dfx')
+    #keil
     if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=os.environ.get("Keil_Path"), error_record_path=os.path.join(os.getcwd(), "error_record_{}".format(chip_type))):
         log_file = sorted(glob.glob(os.path.join(os.path.join(os.getcwd(), "error_record_{}".format(chip_type)), '*.txt')), reverse=True)[0]
         send_mail("keil_sim: keil build fail", log_file)
         sys.exit("build {} fail".format(chip_type))
-    send_mail()
