@@ -108,7 +108,7 @@ typedef struct gui_curtain
   */
 
 /**
- * @brief create a curtain effect widget,which should be nested in a curtainview.
+ * @brief Create a curtain effect widget, which should be nested in a curtainview.
  *
  * @param parent the father widget nested in(hould be a curtainview.)
  * @param filename this curtain widget's name.
