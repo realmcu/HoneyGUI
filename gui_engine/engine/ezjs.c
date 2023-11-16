@@ -1357,6 +1357,22 @@ DECLARE_HANDLER(play_animate_seekbar)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(play_animate_text)
+{
+    gui_log("enter play_animate_text\n");
+
+    {
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        GUI_TYPE(gui_text_t, obj)->animate->animate = true;
+        GUI_TYPE(gui_text_t, obj)->animate->current_frame = 0;
+        GUI_TYPE(gui_text_t, obj)->animate->progress_percent = 0;
+        GUI_TYPE(gui_text_t, obj)->animate->current_repeat_count = 0;
+    }
+
+    return jerry_create_undefined();
+}
 DECLARE_HANDLER(setAnimate_seekbar)
 {
     gui_log("enter setAnimate_seekbar\n");
@@ -1387,6 +1403,49 @@ DECLARE_HANDLER(setAnimate_seekbar)
                                 (void *)(cb_arg));
         GUI_TYPE(gui_seekbar_t, obj)->animate->animate = false;
     }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(setAnimate_text)
+{
+    gui_log("enter setAnimate_text\n");
+    if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_object(args[1]))
+    {
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        //gui_log("cb_arg:%x\n", cb_arg);
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+        }
+        cb_arg->func = args[0];
+
+        float from = jerry_get_number_value(js_get_property(args[1], "from"));
+        float to = jerry_get_number_value(js_get_property(args[1], "to"));
+        int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
+        int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
+        gui_text_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
+                             (void *)(cb_arg));
+        GUI_TYPE(gui_text_t, obj)->animate->animate = false;
+    }
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(pause_animate_text)
+{
+    gui_log("enter pause_animate_text\n");
+
+    gui_obj_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    GUI_TYPE(gui_text_t, obj)->animate->animate = false;
 
     return jerry_create_undefined();
 }
@@ -1738,6 +1797,10 @@ void gui_js_init()
     js_set_property(global_obj, "textbox", document);
     REGISTER_METHOD(document, write);
     REGISTER_METHOD(document, getElementById);
+    REGISTER_METHOD_NAME(document, "palyAnimate", play_animate_text);
+    REGISTER_METHOD_NAME(document, "setAnimate", setAnimate_text);
+
+    REGISTER_METHOD_NAME(document, "pauseAnimate", pause_animate_text);
 //    REGISTER_METHOD(document, show);
 //    REGISTER_METHOD(document, notShow);
     //

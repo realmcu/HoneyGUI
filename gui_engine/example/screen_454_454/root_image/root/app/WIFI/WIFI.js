@@ -1,19 +1,25 @@
-sw.getElementById('switch1')
-sw1Flag = false;
-function swOnFunc(params) {
-    if (sw1Flag) {
-        console.log('swFunc Off')
-        sw1Flag = false
-    } else {
-        console.log('swFunc On')
-        sw1Flag = true
+textbox.getElementById('text1')
+textbox.write('Click')
+var textAnimateConfig = {
+    duration: 2000,
+    iterations:-1,
+    from: 1,
+    to: 0
+}
+var speed = 888;
+function textAnimateCallback(params) {
+    speed=speed+1
+    textbox.write(speed+'bit/s')
+}
+
+function startSpeed(params) {
+textbox.setAnimate(textAnimateCallback, textAnimateConfig)
+textbox.palyAnimate()
+}
+function pauseSpeed(params) {
+    textbox.setAnimate(textAnimateCallback, textAnimateConfig)
+    textbox.pauseAnimate()
     }
-    
-}
-sw.onOn(swOnFunc)
-sw.onOff(swOnFunc)
-icon.getElementById('button0')
-function iconNromalOnPressFunc(params) {
-    console.log('iconNromalOnPressFunc')
-}
-icon.onClick(iconNromalOnPressFunc)
+sw.getElementById('switch2')
+sw.onOn(startSpeed)
+sw.onOff(pauseSpeed)

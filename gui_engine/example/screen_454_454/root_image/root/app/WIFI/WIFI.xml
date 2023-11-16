@@ -7,11 +7,11 @@
     x="0"
     y="0">screen0
 <win
-      x="0"
-      y="0"
+      hidden="hidden"
       w="480"
       h="480"
-      >win0
+      x="0"
+      y="0">win0
 <page
         w="480"
         h="589"
@@ -45,8 +45,7 @@
       x="0"
       y="0"
       w="480"
-      h="480"
-      hidden="hidden">win1
+      h="480">win1
 <switch
         x="0"
         y="120"

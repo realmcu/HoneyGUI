@@ -33,6 +33,9 @@ var icon = {
 var textbox = {
     getElementById : function (win_name : string) {},
     write : function (txt_string) {},
+    setAnimate :function (animate_frame_callback: Function, animate_config: Object) {},
+    palyAnimate: function(){},
+    pauseAnimate: function(){},
 }
 var img = {
     getElementById : function (win_name : string) {},
@@ -68,10 +71,12 @@ var progressbar = {
 }
 var seekbar = {
     getElementById : function (win_name : string) {},
-    progress : function (progressToSet : number):{},
+    progress : function (progressToSet : number){},
     onPress : function (callback_func) {},
     onPressing : function (callback_func) {},
     onRelease : function (click_callback_func) {},
+    setAnimate :function (animate_frame_callback: Function, animate_config: Object) {},
+    palyAnimate: function(){},
 }
 /**
  * @link https://www.npmjs.com/package/onoff#gpiogpio-direction--edge--options
