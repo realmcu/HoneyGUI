@@ -84,7 +84,7 @@ if __name__ == '__main__':
     #scons
     os.chdir('./win32_sim')
     try:
-        subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT)
+        subprocess.check_call(["scons.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
         os.chdir('./..')
         send_mail("win32_sim: 'scons' fail.", None)
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
     try:
-        subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+        subprocess.check_call(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
         os.chdir('./..')
         send_mail("keil_sim: 'scons --target=mdk5' after enable BUILD_USING_SCRIPT_AS_A_APP fail.", None)
