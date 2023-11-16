@@ -239,6 +239,9 @@ void app_cluster_data_set_current_timer(void);
 uint32_t app_cluster_data_get_current_timer(void);
 void app_cluster_data_set_tense_timer_info(T_TENSE_APM_INFO current_tense_apm_info);
 T_TENSE_APM_INFO app_cluster_data_get_tense_timer_info(void);
+
+void app_cluster_data_set_reject_end_call(void);
+void app_cluster_data_set_accept_call(void);
 #ifdef __cplusplus
 }
 #endif

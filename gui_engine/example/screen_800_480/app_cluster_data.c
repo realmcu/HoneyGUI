@@ -6,6 +6,8 @@
 #include "app_cluster_main_display.h"
 #include "app_cluster_connected_display.h"
 #include "os_sync.h"
+#include "communicate_protocol.h"
+#include "communicate_parse.h"
 
 uint32_t current_counter = 0x0;
 bool is_blink_the_right_light = false;
@@ -335,6 +337,39 @@ void app_cluster_data_get_message_data_update(app_message_data *rtn_phone_status
     memcpy(rtn_phone_status,
            &app_current_cluster_data.current_message_status,
            sizeof(app_message_data));
+}
+
+void app_cluster_data_set_reject_end_call(void)
+{
+    app_phone_data current_phone_status;
+    app_cluster_data_get_phone_status(&current_phone_status);
+
+    if ((current_phone_status.phone_status == T_PHONE_STATUS_ACCEPT) ||
+        (current_phone_status.phone_status == T_PHONE_STATUS_ONGOING))
+    {
+        struct protocol_pack p = {0};
+        p.l2_cmd_id = NOTIFY_COMMAND_ID;
+        p.l2_key = NOTIFY_CALL_EVENT_REJECT_END;
+        p.l2_lenght = 1;
+        p.l2_payload[0] = 0;
+        package_prepare_send(&p);
+    }
+}
+
+void app_cluster_data_set_accept_call(void)
+{
+    app_phone_data current_phone_status;
+    app_cluster_data_get_phone_status(&current_phone_status);
+
+    if (current_phone_status.phone_status == T_PHONE_STATUS_ONGOING)
+    {
+        struct protocol_pack p = {0};
+        p.l2_cmd_id = NOTIFY_COMMAND_ID;
+        p.l2_key = NOTIFY_CALL_EVENT_ACCEPT;
+        p.l2_lenght = 1;
+        p.l2_payload[0] = 0;
+        package_prepare_send(&p);
+    }
 }
 
 void app_cluster_data_update_phone_status(uint8_t key, const uint8_t *pValue, uint16_t length)
