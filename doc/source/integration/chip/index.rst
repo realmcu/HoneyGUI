@@ -2,7 +2,7 @@ SOC Chips
 *************
 
 ==================                   ====================================  
-Widgets                              brief    
+SOC                                  brief    
 ------------------                   ------------------------------------  
 `RTL8762C`_                          support Bluetooth 5.0
 `RTL8762D`_                          support Bluetooth 5.1

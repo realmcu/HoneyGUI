@@ -14,6 +14,7 @@
 #include "app_hongkong.h"
 #include "gui_perspective.h"
 #include "gui_cube.h"
+#include "gui_win.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include <stdio.h>
@@ -42,6 +43,13 @@ void *get_app_hongkong(void)
     return &app_hongkong;
 }
 
+static void kb_button_cb(void *obj, gui_event_t e)
+{
+    gui_log("line = %d \n", __LINE__);
+
+    //gui_switch_app(gui_current_app(), get_app_lvgl());
+}
+
 static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
@@ -57,6 +65,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 #endif
     tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
+    gui_win_t *win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
     gui_tabview_set_style(tv, REDUCTION);
 
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);

@@ -133,7 +133,7 @@ struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
         }
         else
         {
-            KB_LOG("not cache kb down \n");
+            // KB_LOG("not cache kb down \n");
         }
     }
     else if (flag == GUI_KB_EVENT_UP)
@@ -144,7 +144,7 @@ struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
         }
         else
         {
-            KB_LOG("not cache kb up \n");
+            // KB_LOG("not cache kb up \n");
         }
         kb_do_reset();
     }

@@ -7,6 +7,7 @@
 #include "unistd.h"
 #include "time.h"
 #include "tp_algo.h"
+#include "gui_kb.h"
 
 
 #if 0
@@ -223,8 +224,8 @@ void *rtk_gui_sdl(void *arg)
             break;
         case SDL_KEYDOWN:
             {
-                gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
-                // kb_port_data.flag = true;
+                //gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
+                kb_port_data.event = GUI_KB_EVENT_DOWN;
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
                        strlen(SDL_GetKeyName(event.key.keysym.sym)));
@@ -232,8 +233,8 @@ void *rtk_gui_sdl(void *arg)
             break;
         case SDL_KEYUP:
             {
-                gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
-                // kb_port_data.flag = false;
+                //gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
+                kb_port_data.event = GUI_KB_EVENT_UP;
                 memset(kb_port_data.name, 0x00, 10);
             }
             break;
@@ -301,6 +302,9 @@ static struct gui_indev indev =
     .long_button_time_ms = 800,
     .short_button_time_ms = 800,
     .quick_slide_time_ms = 50,
+
+    .kb_short_button_time_ms = 300,
+    .kb_long_button_time_ms = 800,
 };
 
 

@@ -22,6 +22,7 @@
 #include <string.h>
 #include <tp_algo.h>
 #include "gui_obj.h"
+#include <gui_kb.h>
 
 
 /** @defgroup WIDGET WIDGET
@@ -120,6 +121,11 @@ void win_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
+    if (kb->pressed == true)
+    {
+        gui_obj_event_set(obj, GUI_EVENT_KB_UP_PRESSED);
+    }
     if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
         (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
     {
