@@ -30,45 +30,65 @@ void app_cluster_create_connected_display(gui_win_t *target_connected_display)
     /* set Image data */
     cluster_c_background = gui_img_create_from_mem(target_connected_display, "cluster_c_background",
                                                    BACKGROUND_C_BIN, 0, 0, 800, 480);
+    cluster_c_background->draw_img.blend_mode = IMG_FILTER_BLACK;
     speed_high_c_digital = gui_img_create_from_mem(target_connected_display, "speed_high_c_digital",
                                                    SPED_C0_BIN, 214, 232, 27, 40);
+    speed_high_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     speed_low_c_digital = gui_img_create_from_mem(target_connected_display, "speed_low_c_digital",
                                                   SPED_C0_BIN, 251, 232, 27, 40);
+    speed_low_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     hour_high_c_digital = gui_img_create_from_mem(target_connected_display, "hour_high_digital",
                                                   TIMER0_BIN, 355, 12, 9, 16);
+    hour_high_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     hour_low_c_digital = gui_img_create_from_mem(target_connected_display, "hour_low_digital",
                                                  TIMER0_BIN, 366, 12, 9, 16);
+    hour_low_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     min_high_c_digital = gui_img_create_from_mem(target_connected_display, "min_high_digital",
                                                  TIMER0_BIN, 387, 12, 9, 18);
+    min_high_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     min_low_c_digital = gui_img_create_from_mem(target_connected_display, "min_low_digital", TIMER0_BIN,
                                                 399, 12, 9, 18);
+    min_low_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     tense_high_c_digital = gui_img_create_from_mem(target_connected_display, "tense_high_c_digital",
                                                    APM_CA_BIN, 417, 12, 9, 18);
+    tense_high_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     tense_low_c_digital = gui_img_create_from_mem(target_connected_display, "tense_low_c_digital",
                                                   APM_CM_BIN,
                                                   432, 12, 9, 18);
+    tense_low_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     bat_high_c_digital = gui_img_create_from_mem(target_connected_display, "bat_high_c_digital",
                                                  TIMER0_BIN, 238, 371, 9, 18);
+    bat_high_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     bat_low_c_digital = gui_img_create_from_mem(target_connected_display, "bat_low_c_digital",
                                                 TIMER0_BIN, 250, 371, 9, 18);
+    bat_low_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     left_turn_light_c_status = gui_img_create_from_mem(target_connected_display,
                                                        "left_turn_light_c_status", TL_OF_C_BIN, 110, 10, 42, 40);
+    left_turn_light_c_status->draw_img.blend_mode = IMG_FILTER_BLACK;
     right_turn_light_c_status = gui_img_create_from_mem(target_connected_display,
                                                         "right_turn_light_c_status", TR_OF_C_BIN, 665, 10, 42, 40);
+    right_turn_light_c_status->draw_img.blend_mode = IMG_FILTER_BLACK;
     navi_c_status = gui_img_create_from_mem(target_connected_display, "navi_c_status", NAVI_C1_BIN, 505,
                                             170, 268, 218);
+    navi_c_status->draw_img.blend_mode = IMG_FILTER_BLACK;
     refuse_c_button = gui_img_create_from_mem(target_connected_display, "refuse_c_button", REFUS_BIN,
                                               502, 410, 36, 36);
+    refuse_c_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     ans_c_button = gui_img_create_from_mem(target_connected_display, "ans_c_button", ANS_BIN, 740, 410,
                                            36, 36);
+    ans_c_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     tel_box_left_c_button = gui_img_create_from_mem(target_connected_display, "tel_box_left_c_button",
                                                     SYMB1_BIN, 554, 414, 36, 36);
+    tel_box_left_c_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     tel_box_right_c_button = gui_img_create_from_mem(target_connected_display, "tel_box_right_c_button",
                                                      SYMB2_BIN, 718, 414, 36, 36);
+    tel_box_right_c_button->draw_img.blend_mode = IMG_FILTER_BLACK;
     dashboard_Cpointer = gui_img_create_from_mem(target_connected_display, "dashboard_Cpointer",
                                                  DASHBOARD_C2_BIN, 110, 133, 9, 18);
+    dashboard_Cpointer->draw_img.blend_mode = IMG_FILTER_BLACK;
     short_c_message = gui_img_create_from_mem(target_connected_display, "short_c_message",
                                               MESSAGE_BIN, 221, 0, 359, 80);
+    short_c_message->draw_img.blend_mode = IMG_FILTER_BLACK;
 
     /* set font data */
     app_navi_data current_navi_data;

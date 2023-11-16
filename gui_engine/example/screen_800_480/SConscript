@@ -11,7 +11,7 @@ src = Glob('*.c')
 SrcRemove(src,'app_dashboard_480_272.c')
 SrcRemove(src,'app_dashboard_800_400.c')
 CPPPATH = [cwd]
-CPPPATH += [cwd + '\\root_image_800_400']
+CPPPATH += [cwd + '\\root_image_800_480']
 print(CPPPATH)
 group = DefineGroup('gui_demo', src, depend = ['BUILD_USING_RTK_GUI_800_480_DEMO'], CPPPATH = CPPPATH)
 
