@@ -34,7 +34,7 @@ CPU frequence should set to a higher value based on chip capabilities.
 |  Linear gradient | N  | Y   |  N |  Y  |N |
 |  Radial gradient | N  | N   |  N |  Y  |N |
 
-### Memory usage
+### 2. Memory usage
 #### 8772F demo
 
 ```eval_rst
@@ -49,3 +49,18 @@ The memory consumption statistics of this demo are as follows
 | Framebuffer  |  screenWidth*pixelBytes*Lines |
 | Thread stack  |  10KB |
 
+#### Widget memory usage
+| Widget | Memory(byte)  |
+|---|---|
+| RGB565  |  Y | 
+|win	|104|
+|img	|248|
+|switch	|384|
+|text	|128|
+|page 	|128|
+|tabview	|120|
+|tab	|104|
+|curtainview	|152|
+|curtain	|104|
+|button	|408|
+|seekbar	|416|
