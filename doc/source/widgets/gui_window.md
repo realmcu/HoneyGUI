@@ -116,7 +116,7 @@ gui_obj_add_event_cb(win, (gui_event_cb_t)callback8, GUI_EVENT_TOUCH_CLICKED, 0)
 
 ```eval_rst
 
-.. doxygenfunction:: gui_win_create
+.. doxygenfile:: gui_win.h
 
 ```
 
