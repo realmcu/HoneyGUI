@@ -252,6 +252,7 @@ if __name__ == '__main__':
         else:
             ci_check.gerrit_comment_wrap(label_map, label_name="License-Scan", result=False, write_flag=True, message=do_license_msg + '\n' + ci_check.BUILD_LOG_INFO)
     elif arg_dict.mode == JenkinsCheckBase.STATIC_CHECK_STRATEGY_AFTER_BUILD:
+        add_reviewers_by_stat(reviewers = {"CC": ["ranhui_xia"]})
         check_file_permission, check_file_permission_msg = ci_check.check_file_permission()
         if not check_file_permission:
             # check_file_permission false
