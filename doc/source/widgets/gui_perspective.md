@@ -3,36 +3,15 @@
 
 ## Overview
 
-The perspective is a hexagonal prism-like widget that uses 6 tabs as column faces. The prism will automatically rotate to show all tabs. A single click allows the user to quick jump to the current tab.
-
-## Features
-
-Perspective widget can support the following features.
-
-- Perspective that can rotate
+The perspective is a hexagonal prism-like widget that uses six tabs as column faces. The prism will automatically rotate to show all tabs. A single click allows the user to quick jump to the current tab.
 
 ## Usage
 
-### Input array
-
-  Select different tabs to form an array
-
-```c
-uint8_t *array_flash[] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
-```
-
 ### Create perspective widget
 
-  Use [gui_perspective_create](#gui_perspective_create) to create perspecivet widget
-
-```c
-
-img_test = gui_perspective_create(canvas, "test", array_flash, 0, 0, 0, 0);
-```
+[gui_perspective_create(parent, name, addr, x, y, w, h)](#gui_perspective_create) is used to create a perspective widget, where the `addr` field is an array containing different tabs.
 
 ## Example
-
-<details><summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -93,10 +72,10 @@ void callback_prism(void *obj, gui_event_t e)
 }
 ```
 
-</details>
-<br><br>
+<br>
 
 <div align=center><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png"></div>
+<br>
 
 <span id = "gui_perspective_create">
 
