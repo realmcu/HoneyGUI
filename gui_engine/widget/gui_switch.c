@@ -198,6 +198,59 @@ static void gui_switch_hl(gui_switch_t *sw)
 
 
 }
+
+static void gui_switch_hl_back(gui_switch_t *sw)
+{
+
+    //sw->off->base.not_show = (sw->ifon);
+    //sw->on->base.not_show = !(sw->ifon);
+    if (sw->ifon)
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->on_pic_addr, 0, 0);
+    }
+    else
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->off_pic_addr, 0, 0);
+    }
+    //gui_app_exec(gui_current_app());
+}
+
+static void gui_switch_long_touch(gui_switch_t *sw)
+{
+    if (sw->ifon)
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_pic_addr, 0, 0);
+    }
+    else
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_pic_addr, 0, 0);
+    }
+}
+
+static void gui_switch_long_touch_back(gui_switch_t *sw)
+{
+    if (sw->ifon)
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->on_pic_addr, 0, 0);
+    }
+    else
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->off_pic_addr, 0, 0);
+    }
+}
+
+static void gui_switch_hl_long_touch(gui_switch_t *sw)
+{
+    if (sw->ifon)
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_hl_pic_addr, 0, 0);
+    }
+    else
+    {
+        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_hl_pic_addr, 0, 0);
+    }
+}
+
 void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
 {
     gui_list_t *node = NULL;
@@ -243,36 +296,34 @@ static void switch_prepare(gui_obj_t *obj)
             }
 
         }*/
-        if (
-            ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
-             (tp->y >= (obj->ay + obj->ty) &&
-              tp->y <= ((obj->ay + obj->ty) + obj->h))))
+        if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+            (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
         {
             gui_switch_t *b = (void *)obj;
             switch (tp->type)
             {
             case TOUCH_SHORT:
                 {
-                    gui_log("Touch_short,%d,%d,%d,%f,%d\n", tp->x, (obj->ax + obj->tx), obj->dx, obj->sx, obj->tx);
-                    if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
-                        (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
-                    {
-                        gui_log("%d\n", __LINE__);
-                        gui_switch_t *sw = (gui_switch_t *)obj;
-                        sw->ifon = !(sw->ifon);
-                        gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
-                        if (sw->ifon)
-                        {
-                            //gui_log("switch_prepare4\n");
-                            gui_obj_event_set(obj, GUI_EVENT_1);
-                        }
-                        else if (!sw->ifon)
-                        {
-                            //gui_log("switch_prepare5\n");
-                            gui_obj_event_set(obj, GUI_EVENT_2);
-                        }
-                        gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
-                    }
+                    // gui_log("Touch_short,%d,%d,%d,%f,%d\n", tp->x, (obj->ax + obj->tx), obj->dx, obj->sx, obj->tx);
+                    // // if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+                    // //     (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
+                    // {
+                    //     gui_log("%d\n", __LINE__);
+                    //     gui_switch_t *sw = (gui_switch_t *)obj;
+                    //     sw->ifon = !(sw->ifon);
+                    //     gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
+                    //     if (sw->ifon)
+                    //     {
+                    //         //gui_log("switch_prepare4\n");
+                    //         gui_obj_event_set(obj, GUI_EVENT_1);
+                    //     }
+                    //     else if (!sw->ifon)
+                    //     {
+                    //         //gui_log("switch_prepare5\n");
+                    //         gui_obj_event_set(obj, GUI_EVENT_2);
+                    //     }
+                    //     gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
+                    // }
 
                 }
                 break;
@@ -307,8 +358,23 @@ static void switch_prepare(gui_obj_t *obj)
                                 (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                             {
                                 b->long_flag = true;
+                                if (b->long_touch_enable)
+                                {
+                                    gui_log("TOUCH_LONG b->long_touch_state = %d\n", b->long_touch_state);
+                                    b->long_touch_state = !b->long_touch_state;
+                                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                                    gui_switch_hl_back(b);
+                                    if (b->long_touch_state)
+                                    {
+                                        gui_switch_long_touch(b);
+                                    }
+                                    else
+                                    {
+                                        gui_switch_long_touch_back(b);
+                                    }
+
+                                }
                                 //gui_send_callback_p_to_server(b->long_click_cb, b->long_click_cb_p);
-                                // gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
                             }
 
                         }
@@ -322,6 +388,7 @@ static void switch_prepare(gui_obj_t *obj)
 
 
             {
+                //gui_log("switch_prepare: tp->type = %d\n", tp->type);
                 if (tp->pressed)
                 {
 
@@ -333,36 +400,88 @@ static void switch_prepare(gui_obj_t *obj)
 
                         //gui_log("%d\n", __LINE__);
                         //gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  //gui_log("%d\n", __LINE__);
+
+                        gui_log("pressed\n");
+
                         b->long_flag = false;
                         b->press_flag = true;
-                        gui_switch_hl(b);
+                        if (!b->long_touch_state)
+                        {
+                            gui_switch_hl(b);
+                        }
+                        else
+                        {
+                            gui_switch_hl_long_touch(b);
+                        }
+
+
                     }
                 }
-
-                if (b->release_flag)
+                // for case: grid->switch. avoid pic switch stuck
+                gui_obj_t *parent = b->base.parent;
+                if (!strcmp(parent->name, "grid"))
                 {
-
+                    if (b->press_flag == true && (tp->type == TOUCH_HOLD_Y || tp->type == TOUCH_ORIGIN_FROM_Y))
                     {
-                        b->press_flag = false;
-                        b->release_flag = false;
-                        //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
-                        //gui_log("%d\n", __LINE__);
-
-                        //if (callback)
+                        gui_log("pressed TOUCH_HOLD_Y\n");
+                        if (!b->long_touch_state)
                         {
-                            //gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-                        }  //gui_log("%d\n", __LINE__);
-
-                        b->long_flag = false;
-////gui_log("%s\n", "TOUCH_SHORT");
-                        //
-
-                        //if (callback)
+                            gui_switch_hl(b);
+                        }
+                        else
                         {
-                            //gui_log("%d\n", __LINE__);
-
+                            gui_switch_hl_long_touch(b);
                         }
                     }
+                }
+                if (b->release_flag)
+                {
+                    if (tp->type != TOUCH_HOLD_Y && tp->type != TOUCH_ORIGIN_FROM_Y)
+                    {
+                        if (b->long_touch_state)
+                        {
+                            gui_switch_long_touch(b);
+                        }
+                        else if (!b->long_touch_state && !b->long_flag)
+                        {
+                            {
+                                gui_switch_t *sw = (gui_switch_t *)obj;
+                                sw->ifon = !(sw->ifon);
+                                gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
+                                if (sw->ifon)
+                                {
+                                    //gui_log("switch_prepare4\n");
+                                    gui_obj_event_set(obj, GUI_EVENT_1);
+                                }
+                                else if (!sw->ifon)
+                                {
+                                    //gui_log("switch_prepare5\n");
+                                    gui_obj_event_set(obj, GUI_EVENT_2);
+                                }
+                                gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
+                            }
+                            //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
+                            //gui_log("%d\n", __LINE__);
+
+                            //if (callback)
+                            //{
+                            //gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+                            //}  //gui_log("%d\n", __LINE__);
+
+                            //b->long_flag = false;
+                            ////gui_log("%s\n", "TOUCH_SHORT");
+                            //
+
+                            //if (callback)
+                            //{
+                            //gui_log("%d\n", __LINE__);
+
+                            //}
+                        }
+                    }
+                    b->press_flag = false;
+                    b->release_flag = false;
+                    b->long_flag = false;
                 }
                 if (tp->released && b->press_flag)
                 {
@@ -390,6 +509,8 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->on_pic_addr = on_pic;
     this->off_hl_pic_addr = this->off_pic_addr;
     this->on_hl_pic_addr = this->on_pic_addr;
+    this->long_touch_state_pic_addr = this->off_pic_addr;
+    this->long_touch_state_hl_pic_addr = this->off_pic_addr;
 }
 gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
                                 int16_t w, int16_t h, void *off_pic, void *on_pic)

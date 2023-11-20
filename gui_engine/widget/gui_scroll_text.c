@@ -110,9 +110,12 @@ static void scrolltext_draw(gui_obj_t *obj)
     rtgui_rect_t draw_rect = {0};
     if (text->base.mode == SCROLL_X && offset > obj->w)
     {
-        draw_rect.x1 = obj->dx - text->cnt_value + text->start_value;
+
+        //draw_rect.x1 = obj->dx - text->cnt_value + text->start_value;
+        draw_rect.x1 = obj->ax + obj->dx + obj->tx - text->cnt_value + text->start_value;
         draw_rect.x2 = draw_rect.x1 + text->base.text_offset;
-        draw_rect.y1 = obj->dy;
+        //draw_rect.y1 = obj->dy;
+        draw_rect.y1 = obj->ay + obj->dy + obj->ty;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
     else if (text->base.mode == SCROLL_Y && (offset > obj->h || offset == 0))
@@ -129,13 +132,25 @@ static void scrolltext_draw(gui_obj_t *obj)
         draw_rect.y1 = obj->dy;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
-    draw_rect.xboundleft = obj->dx;
-    draw_rect.xboundright = obj->dx + obj->w;
-    draw_rect.yboundtop = obj->dy;
-    draw_rect.yboundbottom = obj->dy + obj->h;
-    if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
+    //draw_rect.xboundleft = obj->dx;
+    // draw_rect.xboundright = obj->dx + obj->w;
+    // draw_rect.yboundtop = obj->dy;
+    // draw_rect.yboundbottom = obj->dy + obj->h;
+
+    draw_rect.xboundleft = obj->ax + obj->dx + obj->tx;
+    draw_rect.xboundright = obj->ax + obj->dx + obj->tx + obj->w;
+    draw_rect.yboundtop = obj->ay + obj->dy + obj->ty;
+    draw_rect.yboundbottom = obj->ay + obj->dy + obj->ty + obj->h;
+    if (text->duration_time_ms == 0)
     {
         rtgui_font_draw(&text->base, &draw_rect);
+    }
+    else
+    {
+        if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
+        {
+            rtgui_font_draw(&text->base, &draw_rect);
+        }
     }
     uint32_t total_section_count = dc->screen_height / dc->fb_height - ((dc->screen_height %
                                                                          dc->fb_height) ?

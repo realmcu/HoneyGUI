@@ -94,8 +94,8 @@ static void obj_update_att(struct _gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        obj->x = member_count / this->col * this->gap_col_scale;
-        obj->y = member_count % this->col * this->gap_row_scale;
+        obj->x = (member_count / this->row) / this->col * this->gap_col_scale;
+        obj->y = member_count % this->row * this->gap_row_scale;
         member_count++;
     }
     if (!this->row_count_flag)
@@ -109,8 +109,6 @@ static void obj_update_att(struct _gui_obj_t *obj)
         this->col_count_flag = true;
     }
 }
-
-
 
 static void deal_img_in_root(gui_obj_t *object, float x, float y)
 {
@@ -161,12 +159,14 @@ static void tab_prepare_scale(gui_obj_t *obj)
 static void gui_grid_ctor(struct gui_grid *this,
                           gui_obj_t *parent, int16_t x,
                           int16_t y,
-                          int16_t row,
                           int16_t col,
+                          int16_t row,
                           uint16_t gap_col,
                           uint16_t gap_row)
 {
-    gui_obj_ctor(&this->base, parent, "grid", x, y, gap_col * col, 700);
+    gui_log("x = %d, y = %d, col = %d, row = %d, gap_col = %d, gap_row = %d", x, y, col, row, gap_col,
+            gap_row);
+    gui_obj_ctor(&this->base, parent, "grid", x, y, gap_col * col, gap_row * row);//700
     //GET_BASE(this)->obj_update_att = obj_update_att;
     GET_BASE(this)->obj_prepare = tab_prepare_scale;
     this->row = row;
@@ -187,8 +187,8 @@ static void gui_grid_ctor(struct gui_grid *this,
 gui_grid_t *gui_grid_create(void *parent,
                             int16_t x,
                             int16_t y,
-                            int16_t row,
                             int16_t col,
+                            int16_t row,
                             uint16_t gap_col,
                             uint16_t gap_row)
 {

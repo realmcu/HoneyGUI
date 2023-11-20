@@ -53,7 +53,11 @@ struct gui_switch
     void *off_pic_addr;
     void *on_hl_pic_addr;
     void *off_hl_pic_addr;
+    void *long_touch_state_pic_addr;
+    void *long_touch_state_hl_pic_addr;
     bool ifon;
+    bool long_touch_state;
+    bool long_touch_enable;
     bool press_flag;
     bool long_flag;
     bool release_flag;
