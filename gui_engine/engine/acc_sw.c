@@ -1110,6 +1110,14 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         {
             cpu_matrix_blit_rgb8888_2_argb8888(image, dc, rect);
         }
+        else if ((img_type == RTZIP_COMPRESS) && (dc_bytes_per_pixel == 2))
+        {
+            rle_blit_2_rgb565(image, dc, rect);
+        }
+        else if ((img_type == RTZIP_COMPRESS) && (dc_bytes_per_pixel == 4))
+        {
+            rle_blit_2_argb8888(image, dc, rect);
+        }
     }
 
 }
