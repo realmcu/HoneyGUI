@@ -174,7 +174,7 @@ bool gui_thread_suspend(void *handle);
 
 bool gui_thread_resume(void *handle);
 
-void *gui_mq_create(const char *name, uint32_t msg_size, uint32_t max_msgs);
+bool gui_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs);
 
 bool gui_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 

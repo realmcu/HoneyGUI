@@ -181,11 +181,11 @@ void gui_set_tick_hook(void (*hook)(void))
     os_api->gui_tick_hook = hook;
 }
 
-void *gui_mq_create(const char *name, uint32_t msg_size, uint32_t max_msgs)
+bool gui_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs)
 {
     if (os_api->mq_create)
     {
-        return os_api->mq_create(name, msg_size, max_msgs);
+        return os_api->mq_create(handle, name, msg_size, max_msgs);
     }
     return NULL;
 }
@@ -445,6 +445,7 @@ void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size)
 
 void gui_display_on(void)
 {
+    gui_log("gui_display_on \n");
     if (dc->lcd_power_on)
     {
         dc->lcd_power_on();
@@ -453,6 +454,7 @@ void gui_display_on(void)
 
 void gui_display_off(void)
 {
+    gui_log("gui_display_off \n");
     if (dc->lcd_power_off)
     {
         dc->lcd_power_off();

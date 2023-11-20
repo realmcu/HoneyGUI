@@ -57,7 +57,7 @@ static uint32_t daemon_cnt = 0;
 
 static void rtgui_server_entry(void *parameter)
 {
-    gui_server_mq = gui_mq_create("gui_svr_mq", sizeof(rtgui_msg_t), 16);
+    gui_mq_create(&gui_server_mq, "gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {
         gui_app_t *app = gui_current_app();
@@ -118,7 +118,6 @@ static void rtgui_server_entry(void *parameter)
             daemon_cnt = 0;
             daemon_start_ms = 0;
         }
-
     }
 }
 
@@ -145,7 +144,6 @@ int rtgui_server_init(void)
     gui_port_dc_init();
 
     gui_port_fs_init();
-
 
     gui_acc_init();
 

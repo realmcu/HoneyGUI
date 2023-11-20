@@ -136,7 +136,7 @@ void page_update(gui_obj_t *obj)
         deal_img_in_root(obj, obj->y + obj->h, &ay);
         obj->h = ay - obj->y;
         obj->w = 320;
-        //gui_log("deal_img_in_root %d",obj->h);
+        // gui_log("deal_img_in_root %d",obj->h);
         ((gui_page_t *)obj)->get_yend++;
     }
     if (obj->parent->ay != 0)
@@ -153,7 +153,7 @@ void page_update(gui_obj_t *obj)
             {
                 if ((tp->type == TOUCH_HOLD_Y))
                 {
-                    ////gui_log("obj->y:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-gui_get_screen_height()));
+                    // gui_log("obj->y:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-gui_get_screen_height()));
                     obj->y = tp->deltaY + ((gui_page_t *)obj)->yold;
                     if (obj->y > ((gui_page_t *)obj)->start_y)
                     {
@@ -163,7 +163,7 @@ void page_update(gui_obj_t *obj)
                     else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
                              obj->y != 0)
                     {
-                        ////gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
+                        // gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                         obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
                     }
                 }
@@ -177,7 +177,7 @@ void page_update(gui_obj_t *obj)
                     else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
                              obj->y != 0)
                     {
-                        ////gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
+                        // gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                         obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
                     }
 
@@ -192,7 +192,7 @@ void page_update(gui_obj_t *obj)
             ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
                                                        gui_get_screen_height() / obj->h);
         }
-        gui_log("obj->y:%d,%d, %d\n", obj->y, obj->ay, obj->parent->ay);
+        // gui_log("obj->y:%d,%d, %d\n", obj->y, obj->ay, obj->parent->ay);
         if (obj->y == ((gui_page_t *)obj)->start_y)
         {
             obj->cover = false;
