@@ -31,23 +31,6 @@ from jenkins_base import JenkinsCheckBase
 from keil_build import *
 
 
-def gcc_build():
-    try:
-        os.chdir('./win32_sim')
-        subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT)
-        os.chdir('./..')
-        subprocess.check_call([".\\win32_sim\\gui.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
-    except Exception as e:
-        print("gcc build error: {}".format(e))
-
-
-def keil_scons(repo):
-    change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
-    os.chdir('./keil_sim')
-    subprocess.check_call(["scons", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
-    os.chdir('./..')
-
-
 def send_mail(err_msg = None, attachment_file = None):
     sys.path.append(r'D:\admin\DependTools\Python Lib\MailSending')
     from mail import MailSending
@@ -81,7 +64,7 @@ if __name__ == '__main__':
     print("\n================ build {} ====================\n".format(chip_type), flush=True)
     keil_builder = SDKBuild(os.environ.get("manifest"), os.environ.get("HoneyRepo"), chip_type)
     print("call build {}".format(chip_type))
-    #scons
+    #win32_sim scons
     os.chdir('./win32_sim')
     try:
         subprocess.check_call(["scons.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
@@ -93,7 +76,7 @@ if __name__ == '__main__':
     #reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
-    #scons --target=mdk5
+    #keil_sim scons --target=mdk5
     change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
     try:
