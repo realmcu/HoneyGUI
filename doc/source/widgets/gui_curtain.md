@@ -66,8 +66,7 @@ void page_tb_clock(void *parent)
 ```
 
 <br>
-
-<div align=center><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png"></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png" width = "300" /></div>
 <br>
 
 <span id="gui_curtain_create">
@@ -79,4 +78,5 @@ void page_tb_clock(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_curtain.h
+.. doxygenfunction:: gui_curtain_create
 ```
