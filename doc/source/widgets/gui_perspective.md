@@ -73,8 +73,7 @@ void callback_prism(void *obj, gui_event_t e)
 ```
 
 <br>
-
-<div align=center><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png"></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png" width = "300" /></div>
 <br>
 
 <span id = "gui_perspective_create">
