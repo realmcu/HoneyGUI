@@ -1041,11 +1041,11 @@ ezxml_t ezxml_insert(ezxml_t xml, ezxml_t dest, size_t off)
 // of the parent tag's character content. Returns the child tag.
 ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off)
 {
-    ezxml_t child;
+    ezxml_t child = NULL;
 
     if (! xml) { return NULL; }
-    child = (ezxml_t)memset(xml_malloc(sizeof(struct ezxml)), '\0',
-                            sizeof(struct ezxml));
+    child = xml_malloc(sizeof(struct ezxml));
+    memset(child, '\0', sizeof(struct ezxml));
     child->name = (char *)name;
     child->attr = EZXML_NIL;
     child->txt = "";
