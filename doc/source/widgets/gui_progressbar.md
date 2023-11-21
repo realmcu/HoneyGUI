@@ -109,7 +109,7 @@ void page_tb_three(void *parent)
 
 <br>
 
-<div align=center><img src="https://foruda.gitee.com/images/1700102166174264891/96e1cada_13671147.gif"></div>
+<center><img width= "300" src="https://foruda.gitee.com/images/1700102166174264891/96e1cada_13671147.gif" /></center>
 
 <span id="api">
 
