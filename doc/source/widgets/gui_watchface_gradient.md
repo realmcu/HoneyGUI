@@ -5,23 +5,13 @@
 
 The watchface_gradient widget allows you to create a pointer watchface with a scanning effect for each pointer.
 
-## Features
-
-- Drawing using the NanoVG library
-
 ## Usage
 
 ### Create watchface_gradient widget
 
-use [gui_watchface_gradient_create](#gui_watchface_gradient_create) to create widget
-
-```c
-canvas = gui_watchface_gradient_create(parent, "watchface_gradient", (368 - 368) / 2,(448 - 448) / 2, 368, 448);
-```
+If you want to create a new watchface_gradient widget, please call the function [gui_watchface_gradient_create(parent, name, x, y, w, h)](#gui_watchface_gradient_create) to achieve it.
 
 ## Example
-
-<details> <summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -55,10 +45,9 @@ void page_ct_clock(void *parent)
 }
 ```
 
-</details>
-<br><br>
-
-<div align=center><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png"></div>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width = "300" /></div>
+<br>
 
 <span id = "gui_watchface_gradient_create">
 
