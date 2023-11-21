@@ -13,9 +13,9 @@ RTKIOT GUI
 ==================  ==================  ==================
 
 ==================  ==================  ==================
-|Porting|_          |FAQ|_              |Other|_
+|Porting|_          |Integration|_              |FAQ|_
 ------------------  ------------------  ------------------
-`Porting`_          `FAQ`_              `Other`_
+`Porting`_          `Integration`_              `FAQ`_
 ==================  ==================  ==================
 
 .. |Get Started| image:: ./_static/image/get-started.png
@@ -30,20 +30,21 @@ RTKIOT GUI
 .. |Porting| image:: ./_static/image/get-started.png
 .. _Porting: get-started/index.html
 
-.. |FAQ| image:: ./_static/image/layouts.png
-.. _FAQ: GUI-APP/index.html
+.. |Integration| image:: ./_static/image/api-reference.png
+.. _Integration: integration/index.html
 
-.. |Other| image:: ./_static/image/api-reference.png
-.. _Other: widgets/index.html
+.. |FAQ| image:: ./_static/image/layouts.png
+.. _FAQ: FAQ/index.html
+
 
 
 .. toctree::
 
   Get Started <get-started/index>
-  integration/index
-  GUI APP <GUI-APP/index>
+  Application <GUI-APP/index>
   widgets <widgets/index>
   Porting <Porting/index>
+  Integration and Drivers <integration/index>
   FAQ <FAQ/index>
 
 
