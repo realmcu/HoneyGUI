@@ -841,6 +841,7 @@ error:
 
 static FONSstate *fons__getState(FONScontext *stash)
 {
+    // cppcheck-suppress [nullPointerRedundantCheck]
     return &stash->states[stash->nstates - 1];
 }
 

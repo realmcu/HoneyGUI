@@ -2218,7 +2218,8 @@ static int nvg__expandStroke(NVGcontext *ctx, float w, float fringe, int lineCap
         NVGpoint *p0;
         NVGpoint *p1;
         int s, e, loop;
-        float dx, dy;
+        float dx = 0.0f;
+        float dy = 0.0f;
         dx = dy;
         dy = dx;
         path->fill = 0;
@@ -2309,8 +2310,8 @@ static int nvg__expandFill(NVGcontext *ctx, float w, int lineJoin, float miterLi
     {
         NVGpath *path = &cache->paths[i];
         NVGpoint *pts = &cache->points[path->first];
-        NVGpoint *p0;
-        NVGpoint *p1;
+        NVGpoint *p0 = NULL;
+        NVGpoint *p1 = NULL;
         p0 = p1;
         p1 = p0;
         float rw, lw, woff;
@@ -2460,7 +2461,6 @@ void nvgArcTo(NVGcontext *ctx, float x1, float y1, float x2, float y2, float rad
     a = nvg__acosf(dx0 * dx1 + dy0 * dy1);
     d = radius / nvg__tanf(a / 2.0f);
 
-//  printf("a=%f° d=%f\n", a/NVG_PI*180.0f, d);
 
     if (d > 10000.0f)
     {
@@ -2475,7 +2475,6 @@ void nvgArcTo(NVGcontext *ctx, float x1, float y1, float x2, float y2, float rad
         a0 = nvg__atan2f(dx0, -dy0);
         a1 = nvg__atan2f(-dx1, dy1);
         dir = NVG_CW;
-//      printf("CW c=(%f, %f) a0=%f° a1=%f°\n", cx, cy, a0/NVG_PI*180.0f, a1/NVG_PI*180.0f);
     }
     else
     {
@@ -2484,7 +2483,6 @@ void nvgArcTo(NVGcontext *ctx, float x1, float y1, float x2, float y2, float rad
         a0 = nvg__atan2f(-dx0, dy0);
         a1 = nvg__atan2f(dx1, -dy1);
         dir = NVG_CCW;
-//      printf("CCW c=(%f, %f) a0=%f° a1=%f°\n", cx, cy, a0/NVG_PI*180.0f, a1/NVG_PI*180.0f);
     }
 
     nvgArc(ctx, cx, cy, radius, a0, a1, dir);
@@ -2656,36 +2654,7 @@ void nvgCircle(NVGcontext *ctx, float cx, float cy, float r)
     nvgEllipse(ctx, cx, cy, r, r);
 }
 
-#ifdef WITH_NANOVG_GPU
-void nvgDebugDumpPathCache(NVGcontext *ctx)
-{
-    const NVGpath *path;
-    int i, j;
 
-    printf("Dumping %d cached paths\n", ctx->cache->npaths);
-    for (i = 0; i < ctx->cache->npaths; i++)
-    {
-        path = &ctx->cache->paths[i];
-        printf(" - Path %d\n", i);
-        if (path->nfill)
-        {
-            printf("   - fill: %d\n", path->nfill);
-            for (j = 0; j < path->nfill; j++)
-            {
-                printf("%f\t%f\n", path->fill[j].x, path->fill[j].y);
-            }
-        }
-        if (path->nstroke)
-        {
-            printf("   - stroke: %d\n", path->nstroke);
-            for (j = 0; j < path->nstroke; j++)
-            {
-                printf("%f\t%f\n", path->stroke[j].x, path->stroke[j].y);
-            }
-        }
-    }
-}
-#endif/*WITH_NANOVG_GPU*/
 
 void (*patch_nvg_fill)(NVGcontext *ctx) = NULL;
 void (*patch_nvg_stroke)(NVGcontext *ctx) = NULL;

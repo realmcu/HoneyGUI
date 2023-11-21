@@ -95,7 +95,6 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
     }
     while ((entry = readdir(dir)) != NULL)
     {
-        printf("dname:%s\n", entry->d_name);
         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0 &&
             strcmp(entry->d_name, "widget.ts") != 0)
         {
@@ -109,7 +108,6 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
             struct dirent *entryy;
             while ((entryy = readdir(dirr)) != NULL)
             {
-                //printf("ddname:%s\n",entryy->d_name);
                 if (strstr(entryy->d_name, ".xml") != NULL)
                 {
                     char path[512];

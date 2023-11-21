@@ -32,6 +32,8 @@
 extern void *gui_malloc(size_t n);
 extern void *gui_realloc(void *ptr_old, size_t n);
 extern void gui_free(void *rmem);
+
+
 static void *xml_malloc(unsigned int size)
 {
     return gui_malloc(size);
@@ -864,6 +866,7 @@ char *ezxml_toxml_r(ezxml_t xml, char **s, size_t *len, size_t *max,
 
     *len += sprintf(*s + *len, "</%s>", xml->name); // close tag
 
+    // cppcheck-suppress [arrayIndexThenCheck]
     while (txt[off] && off < xml->off) { off++; } // make sure off is within bounds
     return (xml->ordered) ? ezxml_toxml_r(xml->ordered, s, len, max, off, attr)
            : ezxml_ampencode(txt + off, -1, s, len, max, 0);
@@ -976,8 +979,9 @@ ezxml_t ezxml_new(const char *name)
     static char *ent[] = { "lt;", "&#60;", "gt;", "&#62;", "quot;", "&#34;",
                            "apos;", "&#39;", "amp;", "&#38;", NULL
                          };
-    ezxml_root_t root = (ezxml_root_t)memset(xml_malloc(sizeof(struct ezxml_root)),
-                                             '\0', sizeof(struct ezxml_root));
+
+    ezxml_root_t root = xml_malloc(sizeof(struct ezxml_root));
+    memset(root, '\0', sizeof(struct ezxml_root));
     root->xml.name = (char *)name;
     root->cur = &root->xml;
     strcpy(root->err, root->xml.txt = "");

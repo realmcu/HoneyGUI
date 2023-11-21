@@ -592,7 +592,6 @@ DECLARE_HANDLER(getAttribute)
     }
     ezxml_t title;
     jerry_get_object_native_pointer(this_value, (void *)&title, NULL);
-    //printf("ezxmltitle:%x", title);
     char *a = js_value_to_string(args[0]);
     const char *widget_type = ezxml_attr(title, a);
     gui_free(a);
@@ -616,10 +615,8 @@ DECLARE_HANDLER(getChildElementByTag)
     jerry_value_t app_property = js_get_property(global_obj, "app");
     gui_app_t *app = NULL;
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
-    //printf("app:%s,%s\n", app->xml, name);
     char *widget_type = (void *)get_tag_by_widget_type(type);
     ezxml_t c = get_child_ele((void *)app->xml, widget_type, name, js_value_to_string(args[0]));
-    //printf("ezxmlc:%x", c);
     jerry_value_t v = jerry_create_object();
     jerry_set_object_native_pointer(v, c, NULL);
     REGISTER_METHOD(v, getAttribute);
@@ -645,7 +642,6 @@ DECLARE_HANDLER(icon_write)
         //gui_log("txtbox->text_type:%s,\n",txtbox->text_type);
         txtbox->text->utf_8 = strbuf1;*/
         char *strbuf1 = js_value_to_string(args[0]);
-        //printf("iconwrite:%s\n", strbuf1);
         gui_text_set(txtbox->text, strbuf1, "rtk_font_stb", txtbox->text->color, strlen(strbuf1),
                      txtbox->text->font_height);
         //jerry_release_value(s);

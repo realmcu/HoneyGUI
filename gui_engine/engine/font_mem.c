@@ -255,7 +255,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
     int font_y = chr->y;
     int font_w = chr->w;
     int font_h = chr->h;
-    // rt_kprintf("chr->x %d, chr->y %d, chr->w %d, chr->h %d\n",chr->x,chr->y,chr->w,chr->h);
     int x_start = _UI_MAX(_UI_MAX(font_x, rect->xboundleft), 0);
     int x_end;
 
@@ -269,7 +268,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
     }
     int y_start = _UI_MAX(dc->section.y1, _UI_MAX(font_y, rect->yboundtop));
     int y_end;
-    // gui_log("chr->h_bound is %d\n");
     if (rect->yboundbottom != 0)
     {
         y_end = _UI_MIN(_UI_MIN(dc->section.y2, font_y + font_h), rect->yboundbottom);
@@ -278,13 +276,10 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
     {
         y_end = _UI_MIN(dc->section.y2, font_y + font_h);
     }
-    // rt_kprintf("x_start is  %d, x_end is %d\n", x_start, x_end);
-    // rt_kprintf("y_start is  %d, y_end is %d\n", y_start, y_end);
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
-    // rt_kprintf("dc->section.y1 %d, font_y %d, chr->y_bound %d, chr->h_bound %d\n",dc->section.y1,font_y,chr->y_bound,chr->h_bound);
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;//
 
     switch (rendor_mode)

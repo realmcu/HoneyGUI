@@ -2183,7 +2183,6 @@ void foreach_scan_with_content(ezxml_t p, const char *element, ezxml_t *target, 
     ezxml_t i;
     for (i = p; i != NULL; i = i->ordered)
     {
-        printf("name:%s,txt:%s\n", i->name, i->txt);
         if (strncmp(i->name, element, strlen(element)) == 0 &&
             strncmp(i->txt, content, strlen(content)) == 0)
         {
