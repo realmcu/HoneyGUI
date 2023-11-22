@@ -325,9 +325,9 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
                         color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
-                        writebuf[write_off * 3 + j * 3 + 0] = (pixel[2] * alpha + color_back[2] * (0xff - alpha) / 0xff);
-                        writebuf[write_off * 3 + j * 3 + 1] = (pixel[1] * alpha + color_back[1] * (0xff - alpha) / 0xff);
-                        writebuf[write_off * 3 + j * 3 + 2] = (pixel[0] * alpha + color_back[0] * (0xff - alpha) / 0xff);
+                        writebuf[write_off * 3 + j * 3 + 0] = (pixel[2] * alpha + color_back[2] * (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 1] = (pixel[1] * alpha + color_back[1] * (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 2] = (pixel[0] * alpha + color_back[0] * (0xff - alpha)) / 0xff;
                     }
                 }
             }
@@ -391,9 +391,9 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
                         color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
-                        writebuf[write_off * 3 + j * 3 + 0] = (pixel[2] * alpha + color_back[2] * (0xff - alpha) / 0xff);
-                        writebuf[write_off * 3 + j * 3 + 1] = (pixel[1] * alpha + color_back[1] * (0xff - alpha) / 0xff);
-                        writebuf[write_off * 3 + j * 3 + 2] = (pixel[0] * alpha + color_back[0] * (0xff - alpha) / 0xff);
+                        writebuf[write_off * 3 + j * 3 + 0] = (pixel[2] * alpha + color_back[2] * (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 1] = (pixel[1] * alpha + color_back[1] * (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 2] = (pixel[0] * alpha + color_back[0] * (0xff - alpha)) / 0xff;
                     }
                 }
             }

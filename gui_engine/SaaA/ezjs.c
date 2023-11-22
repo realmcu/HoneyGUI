@@ -496,16 +496,10 @@ DECLARE_HANDLER(write)
         jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); //gui_log("jerryenter4\n");
         strbuf1[length] = '\0';
         //gui_log("txtbox->text_type:%s,\n",txtbox->text_type);
+        gui_free(txtbox->utf_8);
         gui_text_set(txtbox, (void *)strbuf1, txtbox->text_type, txtbox->color, length,
                      txtbox->font_height);
         jerry_release_value(s);
-        jerry_value_t global_obj = jerry_get_global_object();
-        jerry_value_t app_property = js_get_property(global_obj, "app");
-        gui_app_t *app = NULL;
-        jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
-        jerry_release_value(global_obj);
-        jerry_release_value(app_property);
-        //gui_exec(app->screen);
     }
     return jerry_create_undefined();
 }
@@ -1584,7 +1578,23 @@ DECLARE_HANDLER(sw_open)
     sw->turn_on(sw);
     return jerry_create_undefined();
 }
-
+#ifdef RTL87x2G
+//#include "rtl_gpio.h"
+//#include "rtl_rcc.h"
+//#include "drv_gpio.h"
+//#include "drv_i2c.h"
+//#include "drv_touch.h"
+//#include "drv_lcd.h"
+//#include "touch_gt911.h"
+//#include "string.h"
+//#include "trace.h"
+//#include "utils.h"
+//#endif
+//#ifdef RTL8762G
+//#include "app_msg.h"
+//T_IO_MSG led_msg = {.type = IO_MSG_TYPE_LED_ON};
+//T_IO_MSG led_off_msg = {.type = IO_MSG_TYPE_LED_OFF};
+#endif
 DECLARE_HANDLER(writeSync)
 {
     gui_log("enter writeSync:%d\n", args[0]);
@@ -1602,7 +1612,34 @@ DECLARE_HANDLER(writeSync)
         char *direction = js_value_to_string(v2);
         jerry_release_value(v2);
         int mode = 0;
+#ifdef RTL87x2G
 
+        //if (!strcmp(direction, "out"))
+        //{
+        //    mode = PIN_MODE_OUTPUT;
+        //}
+        //else if (!strcmp(direction, "in"))
+        //{
+        //    mode = PIN_MODE_INPUT;
+        //}
+        if (gpio >= 0)
+        {
+            gui_log("gpio%d, %d, %d", gpio, mode, write_value);
+            //drv_pin_mode(gpio, mode);
+            //drv_pin_write(gpio, write_value);
+            //extern bool app_send_msg_to_apptask(T_IO_MSG *p_msg);
+            //if(write_value == 0){
+            //led_msg.u.param = 0x64+gpio;
+            //app_send_msg_to_apptask(&led_msg);}
+            //else
+            //{
+            //    led_off_msg.u.param = 0x64+gpio;
+            //    app_send_msg_to_apptask(&led_off_msg);
+            // }
+        }
+
+
+#endif
         gui_free(direction);
     }
     return jerry_create_undefined();
@@ -1647,7 +1684,39 @@ void gpio_init()
     jerry_value_t global_obj = jerry_get_global_object();
     REGISTER_METHOD(global_obj, Gpio);
 }
+DECLARE_HANDLER(startSpeed)
+{
+    gui_log("enter startSpeed\n");
+    extern void iperf_start(char *ip, char *port);
+    //iperf_start(NULL, NULL);
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(stopSpeed)
+{
+    gui_log("enter stopSpeed\n");
+    extern void iperf_stop(void);
+    //iperf_stop();
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(readSpeed)
+{
+    gui_log("enter readSpeed\n");
+    extern uint32_t iperf_get_current_speed(void);
+    uint32_t speed = 1000;
+    //speed = iperf_get_current_speed();
+    return jerry_create_number((double)speed);
+}
+void wifi_init()
+{
 
+    jerry_value_t global_obj = jerry_get_global_object();
+    jerry_value_t wifi = jerry_create_object();
+    js_set_property(global_obj, "wifi", wifi);
+    REGISTER_METHOD(wifi, startSpeed);
+    REGISTER_METHOD(wifi, stopSpeed);
+    REGISTER_METHOD(wifi, readSpeed);
+    jerry_release_value(global_obj);
+}
 jerry_value_t fs_init()
 {
     jerry_value_t fs = jerry_create_object();
@@ -1784,8 +1853,16 @@ void gui_js_init()
 }
 static void *context_alloc(size_t size, void *cb_data_p)
 {
-#ifdef RTL8763EP
+#ifdef FS_NOT_UNIX
+#ifdef RTL87x2G
+#include "mem_config.h"
+    return (void *)(SPIC1_ADDR + 0x200000);
+    //return os_mem_alloc(RAM_TYPE_EXT_DATA_SRAM, size);//
+#elif defined RTL8763EP
     return (void *)(0x4000000 + 0x200000);
+#else
+    return malloc(size);
+#endif
 #endif
     return malloc(size);
 }
@@ -1812,6 +1889,7 @@ void js_init(void)
     gui_js_init();
     gpio_init();
     //fs_init();
+    wifi_init();
     extern gui_app_t *get_app_launcher_frontend(void);
     gui_app_startup(get_app_launcher_frontend());
 }
