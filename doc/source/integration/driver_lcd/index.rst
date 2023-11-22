@@ -1,6 +1,7 @@
 LCD Chips
 *************
 
+The following table lists the LCD-related interfaces, buses, drivers and other capabilities supported by all chips. If you want to know more information, please click on the specific chip name.
 ===============  =======  ========  =======  =======  =======  ==========   ========  ========  ====================================
 SOC              I8080    QSPI      RGB      MIPI     SPI      nt35510      ST7701S   ST77903S  sh8601z
 ---------------  -------  --------  -------  -------  -------  ----------   --------  --------  ------------------------------------
