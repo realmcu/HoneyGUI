@@ -66,3 +66,8 @@ gui_engine/rtk_gui_sim/.sconsign.dblite
 doc/doxyxml/html
 doc/doxyxml/xml
 doc/output
+doc/build
+doc/_build
+
+# editor config
+.vscode/

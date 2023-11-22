@@ -1,3 +1,8 @@
+/* div[role="search"] style */
+.wy-side-nav-search > div[role="search"] {
+    text-align: center;
+}
+
 /*Let `code` wrap*/
 .rst-content code, .rst-content tt, code {
     white-space: normal;

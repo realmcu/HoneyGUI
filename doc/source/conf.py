@@ -62,7 +62,8 @@ html_theme_options = {
 }
 
 html_js_files = [
-    'js/custom.js'
+    'js/custom.js',
+    'js/versions.js'
 ]
 
 # -- Options for LaTeX output ---------------------------------------------
