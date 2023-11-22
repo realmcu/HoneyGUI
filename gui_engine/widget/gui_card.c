@@ -23,7 +23,7 @@
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include "gui_card.h"
-#include "gui_canvas.h"
+
 
 
 

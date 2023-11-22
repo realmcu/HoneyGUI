@@ -5,7 +5,6 @@
 #include "gui_tabview.h"
 #include "gui_cardview.h"
 #include "gui_card.h"
-#include "gui_tab.h"
 #include "gui_canvas.h"
 
 static void cardlist_clock(void *parent)

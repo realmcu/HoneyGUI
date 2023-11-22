@@ -27,7 +27,6 @@
 #include "root_image_hongkong/ui_resource.h"
 
 #include <math.h>
-#include "acc_engine.h"
 #include <gui_app.h>
 
 /** @defgroup WIDGET WIDGET

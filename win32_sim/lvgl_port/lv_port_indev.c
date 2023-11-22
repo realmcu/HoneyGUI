@@ -96,7 +96,7 @@ void lv_port_indev_init(void)
     indev_drv.read_cb = touchpad_read;
     indev_touchpad = lv_indev_drv_register(&indev_drv);
 
-    return;
+    //return;
 
     /*------------------
      * Mouse

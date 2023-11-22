@@ -16,8 +16,6 @@
 #include <unistd.h>
 #include "gui_server.h"
 #include "unistd.h"
-#include "menu_config.h"
-#include "signal.h"
 #include "time.h"
 #include "gui_components_init.h"
 

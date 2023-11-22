@@ -1,6 +1,5 @@
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_switch.h"
-#include "gui_tab.h"
 #include "gui_img.h"
 static gui_img_t *img;
 static void img_animate(gui_img_t *img)

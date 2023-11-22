@@ -2,7 +2,6 @@
 #include <gui_img.h>
 #include "gui_curtainview.h"
 #include "gui_curtain.h"
-#include "gui_canvas.h"
 
 void page_tb_clock(void *parent)
 {

@@ -7,13 +7,7 @@
 #include "root_image_hongkong/ui_resource.h"
 #include <gui_app.h>
 #include "gui_tab.h"
-#include "gui_perspective.h"
-#include "draw_font.h"
-#include <gui_img.h>
-#include "gui_canvas.h"
 #include "app_hongkong.h"
-#include "gui_perspective.h"
-#include "gui_cube.h"
 #include "gui_win.h"
 #include "gui_server.h"
 #include "gui_components_init.h"

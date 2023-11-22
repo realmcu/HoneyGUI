@@ -19,8 +19,6 @@
  *============================================================================*/
 #include <guidef.h>
 #include <gui_return.h>
-#include <string.h>
-#include <gui_return.h>
 #include "gui_obj.h"
 #ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "gui_app.h"
