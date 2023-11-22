@@ -9,7 +9,7 @@ The watch_gradient_spot widget allows you to create a pointer watchface with dyn
 
 ### Create watch_gradient_spot widget
 
-You can create a watch gradient spot widget by calling the [gui_watch_gradient_spot_create(parent, name, x, y, w, h)](#gui_watch_gradient_spot_create)
+You can create a watch gradient spot widget by calling the [gui_watch_gradient_spot_create(parent, name, x, y, w, h)](#gui_watch_gradient_spot_create).
 
 ### Set center
 
@@ -53,8 +53,7 @@ void page_ct_clock(void *parent)
 ```
 
 <br>
-
-<div align=center><img src="https://foruda.gitee.com/images/1699931734086261442/f0690691_10641540.png"></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931734086261442/f0690691_10641540.png" width = "300" /></div>
 <br>
 
 <span id = "gui_watch_gradient_spot_create">
