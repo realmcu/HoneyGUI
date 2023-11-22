@@ -1,0 +1,19 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+
+if GetDepend(['BUILD_USING_SCRIPT_AS_A_APP']):
+    src += ['ezhtml.c']
+    src += ['ezjs.c']
+    src += ['frontend_launcher.c']
+
+CPPPATH = [cwd]
+
+group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
+
+Return('group')

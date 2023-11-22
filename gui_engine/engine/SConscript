@@ -14,10 +14,6 @@ src += ['font_mem.c']
 src += ['font_stb.c']
 src += ['acc_sw.c']
 src += ['acc_init.c']
-if GetDepend(['BUILD_USING_SCRIPT_AS_A_APP']):
-    src += ['ezhtml.c']
-    src += ['ezjs.c']
-    src += ['frontend_launcher.c']
 
 if GetDepend(['BUILD_USING_VG_LITE']):
     src += ['acc_vg_lite.c']
