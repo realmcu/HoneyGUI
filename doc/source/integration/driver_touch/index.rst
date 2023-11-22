@@ -2,6 +2,7 @@ Touch Chips
 *************
 
 The following table lists the Touch-related interfaces, buses, drivers and other capabilities supported by all chips. If you want to know more information, please click on the specific chip name.
+
 ==================                   ====================================                ====================================
 SOC                                  cts816t                                             gt9147
 ------------------                   ------------------------------------                ------------------------------------
