@@ -5,19 +5,13 @@
 #include <gui_text.h>
 #include <gui_obj.h>
 #include <gui_curtain.h>
-//#include <gui_iconlist.h>
 #include "gui_button.h"
 #include <gui_seekbar.h>
-
-
 #include <gui_page.h>
-
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
-
-//#include "gui_img_with_animate.h"
 #include <gui_img.h>
 #include <gui_app.h>
 #include <stdlib.h>
@@ -89,15 +83,10 @@ gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *ad
     {
         addr = gui_get_file_address("app/system/resource/icMenuBird.bin");
     }
-#ifdef RTL8763EP
+
     return gui_img_create_from_mem(parent, name, addr,
                                    x,
                                    y, 0, 0);
-#else
-    return gui_img_create_from_mem(parent, name, addr,
-                                   x,
-                                   y, 0, 0);
-#endif
 }
 char *get_space_string_head(const char *string)
 {
