@@ -164,7 +164,7 @@ class CIBuild(JenkinsCheckBase):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='HoneyPatch CI build script')
-    parser.add_argument('-c', '--chipType', choices=['guiEngine-test-chip'], help='Set the chip type')
+    parser.add_argument('-c', '--chipType', help='Set the chip type')
     arg_dict = parser.parse_args()
 
     ci_build = CIBuild(subgit_repo_path=os.environ.get(sub_git_path_env), 

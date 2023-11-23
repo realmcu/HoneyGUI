@@ -1,5 +1,5 @@
 {
-    "guiEngine-test-chip": {
+    "guiEngine-master": {
         "mandatory": [],
         "temporary": [
             ["keil_sim/gui_engine.uvprojx", "", "sdk"]
