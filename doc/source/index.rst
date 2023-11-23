@@ -18,22 +18,22 @@ RTKIOT GUI
 `Porting`_          `Integration`_              `FAQ`_
 ==================  ==================  ==================
 
-.. |Get Started| image:: ./_static/image/get-started.png
+.. |Get Started| image:: ./_static/image/get_started.png
 .. _Get Started: get-started/index.html
 
-.. |GUI-APP| image:: ./_static/image/layouts.png
+.. |GUI-APP| image:: ./_static/image/app.png
 .. _GUI-APP: GUI-APP/index.html
 
-.. |Widgets| image:: ./_static/image/api-reference.png
+.. |Widgets| image:: ./_static/image/widgets.png
 .. _Widgets: widgets/index.html
 
-.. |Porting| image:: ./_static/image/get-started.png
+.. |Porting| image:: ./_static/image/porting.png
 .. _Porting: get-started/index.html
 
-.. |Integration| image:: ./_static/image/api-reference.png
+.. |Integration| image:: ./_static/image/integration.png
 .. _Integration: integration/index.html
 
-.. |FAQ| image:: ./_static/image/layouts.png
+.. |FAQ| image:: ./_static/image/FAQ.png
 .. _FAQ: FAQ/index.html
 
 
