@@ -87,6 +87,11 @@ DECLARE_HANDLER(jump)
     }
     gui_obj_t *txtbox = NULL;
     jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
+    //gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
+    if (txtbox)
+    {
+        gui_tabview_jump_tab(txtbox, jerry_get_number_value(args[0]), 0);
+    }
     return jerry_create_undefined();
 }
 

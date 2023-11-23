@@ -39,6 +39,27 @@ DECLARE_HANDLER(writeSync)
             //    led_off_msg.u.param = 0x64+gpio;
             //    app_send_msg_to_apptask(&led_off_msg);
             // }
+#ifdef ENABLE_MATTER_SWITCH
+            if (gpio >= 0)
+            {
+                extern bool matter_send_msg_to_app(uint16_t sub_type, uint32_t param);
+
+                uint32_t param = gpio << 8 | mode;
+                if (gpio != 49052)
+                {
+                    //single
+                    matter_send_msg_to_app(0, param);
+                }
+                else
+                {
+                    //group
+                    matter_send_msg_to_app(1, param);
+                }
+
+                gui_log("gpio%d, %d, %d param %d", gpio, mode, write_value, param);
+            }
+#endif
+
         }
 
 
@@ -51,7 +72,7 @@ DECLARE_HANDLER(writeSync)
 DECLARE_HANDLER(Gpio)
 {
     gui_log("enter GPIO\n");
-
+    REGISTER_METHOD(this_value, writeSync);
     char *mode_string = "in";
     int pin = -1;
     if (args_cnt >= 1)
@@ -80,5 +101,5 @@ void js_gpio_init()
 {
     jerry_value_t global_obj = jerry_get_global_object();
     REGISTER_METHOD(global_obj, Gpio);
-    REGISTER_METHOD(global_obj, writeSync);
+
 }
