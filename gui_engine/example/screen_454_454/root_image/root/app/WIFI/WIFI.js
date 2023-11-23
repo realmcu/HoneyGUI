@@ -9,17 +9,19 @@ var textAnimateConfig = {
 var speed = 888;
 function textAnimateCallback(params) {
     speed=speed+1
-    textbox.write(speed+'bit/s')
+    textbox.write(wifi.readSpeed()+'bit/s')
 }
 
 function startSpeed(params) {
 textbox.setAnimate(textAnimateCallback, textAnimateConfig)
 textbox.palyAnimate()
+wifi.startSpeed()
 }
-function pauseSpeed(params) {
+function stopSpeed(params) {
     textbox.setAnimate(textAnimateCallback, textAnimateConfig)
     textbox.pauseAnimate()
+	wifi.stopSpeed()
     }
 sw.getElementById('switch2')
 sw.onOn(startSpeed)
-sw.onOff(pauseSpeed)
+sw.onOff(stopSpeed)

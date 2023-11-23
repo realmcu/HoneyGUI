@@ -9,6 +9,9 @@ static void *context_alloc(size_t size, void *cb_data_p)
 {
 #ifdef RTL8763EP
     return (void *)(0x4000000 + 0x200000);
+#elif defined RTL87x2G
+#include "mem_config.h"
+    return (void *)(SPIC1_ADDR + 0x200000);
 #endif
     return malloc(size);
 }
@@ -55,6 +58,7 @@ void js_init(void)
     js_gui_init();
     js_gpio_init();
     //js_fs_init();
+    wifi_init();
     extern gui_app_t *get_app_launcher_frontend(void);
     gui_app_startup(get_app_launcher_frontend());
 }

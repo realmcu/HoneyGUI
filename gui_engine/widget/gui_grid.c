@@ -94,8 +94,9 @@ static void obj_update_att(struct _gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        obj->x = (member_count / this->row) / this->col * this->gap_col_scale;
-        obj->y = member_count % this->row * this->gap_row_scale;
+        obj->x = member_count / this->col * this->gap_col_scale;
+        obj->y = member_count % this->col * this->gap_row_scale;
+
         member_count++;
     }
     if (!this->row_count_flag)

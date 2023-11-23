@@ -46,8 +46,8 @@ typedef struct cb_arg
     jerry_value_t *args_p;
     jerry_size_t args_count;
 } cb_arg_t;
-
-
+void js_gpio_init();
+void wifi_init();
 #ifdef __cplusplus
 }
 #endif
