@@ -70,6 +70,11 @@ void app_cluster_create_main_display(gui_win_t *target_main_display)
     bat_low_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
     tel_box = gui_img_create_from_mem(target_main_display, "tel_box", TELBOX_BIN, 253, 410, 295, 49);
     tel_box->draw_img.blend_mode = IMG_FILTER_BLACK;
+    tel_accept = gui_img_create_from_mem(target_main_display, "tel_box", TELBOX_BIN, 253, 410, 295, 49);
+    tel_accept->draw_img.blend_mode = IMG_FILTER_BLACK;
+    tel_reject_end = gui_img_create_from_mem(target_main_display, "tel_box", TELBOX_BIN, 253, 410, 295,
+                                             49);
+    tel_reject_end->draw_img.blend_mode = IMG_FILTER_BLACK;
     refuse_button = gui_img_create_from_mem(target_main_display, "refuse_button", REFUS_BIN, 263, 416,
                                             36, 36);
     refuse_button->draw_img.blend_mode = IMG_FILTER_BLACK;
@@ -98,6 +103,8 @@ void app_cluster_create_main_display(gui_win_t *target_main_display)
     gui_text_set(short_tel_number, (char *)show_tel_number, "rtk_font_mem", 0xffffff,
                  current_phone_status.current_phone_number_len, 28);
     gui_text_mode_set(short_tel_number, CENTER);
+    short_tel_accept = gui_text_create(target_main_display, "short_tel_accept", 360, 415, 800, 30);
+    gui_text_set(short_tel_accept, "calling", "rtk_font_mem", 0xffffffff, 7, 32);
 
     app_message_data current_message_status;
     app_cluster_data_get_message_data_update(&current_message_status);
@@ -334,11 +341,14 @@ void app_cluster_update_main_display_message_infor(app_message_data *app_message
 void app_cluster_update_main_display_phone_infor(app_phone_data *app_call_information)
 {
     tel_box->base.not_show = true;
+    tel_accept->base.not_show = true;
+    tel_reject_end->base.not_show = true;
     refuse_button->base.not_show = true;
     ans_button->base.not_show = true;
     tel_box_left_button->base.not_show = true;
     tel_box_right_button->base.not_show = true;
     short_tel_number->base.not_show = true;
+    short_tel_accept->base.not_show = true;
 
     if (app_call_information->phone_status == T_PHONE_STATUS_ONGOING)
     {
@@ -349,9 +359,22 @@ void app_cluster_update_main_display_phone_infor(app_phone_data *app_call_inform
         tel_box_right_button->base.not_show = false;
         short_tel_number->base.not_show = false;
     }
+//    if ((app_call_information->phone_status == T_PHONE_STATUS_ACCEPT) ||
+//        (app_call_information->phone_status == T_PHONE_STATUS_ONGOING))
+//    {
+//            tel_reject_end->base.not_show = false;
+//        gui_log("tel reject or end");
+//    }
+    if (app_call_information->phone_status == T_PHONE_STATUS_ACCEPT)
+    {
+        tel_accept->base.not_show = false;
+        short_tel_accept->base.not_show = false;
+        gui_log("tel accept");
+    }
 
     memcpy(&show_tel_number[0], &app_call_information->current_phone_number[0],
            app_call_information->current_phone_number_len);
     gui_text_set(short_tel_number, (char *)show_tel_number, "rtk_font_mem", 0xffffff,
                  app_call_information->current_phone_number_len, 28);
+
 }

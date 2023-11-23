@@ -68,7 +68,7 @@ void gui_app_startup(gui_app_t *app)
     {
         app->thread_id = gui_thread_create(app->screen.name,
                                            app->thread_entry, app,
-                                           1024, 25);
+                                           1024 * 3, 25);
     }
     current_app = app;
 }

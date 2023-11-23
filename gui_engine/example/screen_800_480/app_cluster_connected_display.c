@@ -130,7 +130,9 @@ void app_cluster_create_connected_display(gui_win_t *target_connected_display)
     gui_text_set(short_c_tel_number, (char *)show_c_tel_number, "rtk_font_mem", 0xffffff,
                  current_phone_status.current_phone_number_len, 28);
     gui_text_mode_set(short_c_tel_number, CENTER);
-
+    short_c_tel_accept = gui_text_create(target_connected_display,  "short_c_tel_accept",  600, 410,
+                                         800, 30);
+    gui_text_set(short_c_tel_accept, "calling", "rtk_font_mem", 0xffffff, 7, 28);
     app_message_data current_message_status;
     app_cluster_data_get_message_data_update(&current_message_status);
     memcpy(&show_c_message_data[0], &current_message_status.wechat_msg[0],
@@ -339,6 +341,7 @@ void app_cluster_update_connected_display_phone_infor(app_phone_data *app_call_i
     tel_box_left_c_button->base.not_show = true;
     tel_box_right_c_button->base.not_show = true;
     short_c_tel_number->base.not_show = true;
+    short_c_tel_accept->base.not_show = true;
 
     if (app_call_information->phone_status == T_PHONE_STATUS_ONGOING)
     {
@@ -347,6 +350,10 @@ void app_cluster_update_connected_display_phone_infor(app_phone_data *app_call_i
         tel_box_left_c_button->base.not_show = false;
         tel_box_right_c_button->base.not_show = false;
         short_c_tel_number->base.not_show = false;
+    }
+    if (app_call_information->phone_status == T_PHONE_STATUS_ACCEPT)
+    {
+        short_c_tel_accept->base.not_show = false;
     }
 
     memcpy(&show_c_tel_number[0], &app_call_information->current_phone_number[0],

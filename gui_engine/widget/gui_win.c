@@ -124,7 +124,7 @@ void win_prepare(gui_obj_t *obj)
     kb_info_t *kb = kb_get_info();
     if (kb->pressed == true)
     {
-        gui_obj_event_set(obj, GUI_EVENT_KB_UP_PRESSED);
+        gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);
     }
     if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
         (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))

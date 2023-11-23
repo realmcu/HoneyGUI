@@ -44,6 +44,8 @@ static gui_img_t *bat_high_digital = NULL;
 static gui_img_t *bat_low_digital = NULL;
 static gui_img_t *speed_meter = NULL;
 static gui_img_t *tel_box = NULL;
+static gui_img_t *tel_accept = NULL;//
+static gui_img_t *tel_reject_end = NULL;//
 static gui_img_t *ans_button = NULL;
 static gui_img_t *refuse_button = NULL;
 static gui_img_t *tel_box_left_button = NULL;
@@ -52,6 +54,7 @@ static gui_img_t *short_message = NULL;
 static gui_img_t *dashboard_pointer = NULL;
 
 static gui_text_t *short_tel_number = NULL;
+static gui_text_t *short_tel_accept = NULL;
 static gui_text_t *short_message_data = NULL;
 
 static void *dashboard_pointer_num[25] =

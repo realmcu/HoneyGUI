@@ -55,6 +55,7 @@ static gui_text_t *short_c_navi_message_2 = NULL;
 static gui_text_t *short_c_navi_message_3 = NULL;
 static gui_text_t *short_c_tel_number = NULL;
 static gui_text_t *short_c_message_data = NULL;
+static gui_text_t *short_c_tel_accept = NULL;
 
 static void *dashboard_Cpointer_num[25] =
 {
