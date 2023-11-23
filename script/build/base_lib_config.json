@@ -1,5 +1,5 @@
 {
-    "guiEngine-test-chip": {
+    "guiEngine-bb2-cs-release-v1": {
         "mandatory": [],
         "temporary": [
             ["keil_sim/gui_engine.uvprojx", "", "sdk"]
