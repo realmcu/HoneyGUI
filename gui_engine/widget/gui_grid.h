@@ -1,5 +1,4 @@
 /**
- \internal
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
@@ -13,7 +12,6 @@
     * @attention
   * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
   ***************************************************************************************
- \endinternal
   */
 
 /*============================================================================*
@@ -161,8 +159,8 @@ typedef struct gui_grid
 gui_grid_t *gui_grid_create(void *parent,
                             int16_t x,
                             int16_t y,
-                            int16_t col,
                             int16_t row,
+                            int16_t col,
                             uint16_t gap_col,
                             uint16_t gap_row);
 /**
