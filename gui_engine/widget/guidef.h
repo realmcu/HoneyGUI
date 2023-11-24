@@ -517,7 +517,7 @@ typedef struct _gui_obj_t
 #if defined __WIN32
 
 
-#define GUI_ROOT_FOLDER "gui_engine\\example\\screen_454_454\\root_image\\root\\"
+#define GUI_ROOT_FOLDER "gui_engine\\example\\screen_480_480\\root\\"
 
 #else
 #define GUI_ROOT_FOLDER "/"

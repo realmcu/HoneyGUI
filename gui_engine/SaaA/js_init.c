@@ -10,8 +10,9 @@ static void *context_alloc(size_t size, void *cb_data_p)
 #ifdef RTL8763EP
     return (void *)(0x4000000 + 0x200000);
 #elif defined RTL87x2G
-#include "mem_config.h"
-    return (void *)(SPIC1_ADDR + 0x200000);
+#include "app_section.h"
+    APP_PSRAM_SECTION static uint8_t js_buffer[PKG_JMEM_HEAP_SIZE * 1024] = {0};
+    return (void *)js_buffer;
 #endif
     return malloc(size);
 }
