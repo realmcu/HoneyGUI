@@ -502,6 +502,7 @@ void *gui_get_file_address(const char *file)
         gui_free(path);
         if (fd == -1)
         {
+            gui_log("!!!filename = %s, open fail!\n", path);
             return NULL;
         }
         void *rst;

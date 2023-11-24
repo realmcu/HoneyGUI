@@ -16,14 +16,8 @@ parser.add_argument('--dump', action='store_true', help='dump the fs hierarchy')
 parser.add_argument('--binary', action='store_true', help='output binary file')
 parser.add_argument('--addr', default='0', help='set the base address of the binary file, default to 0.')
 
-global BASE_ADDR
-BASE_ADDR = 0
-global H_FILE
-global H_FILE_IF
-global H_FILE_ELSE
-H_FILE = ''
-H_FILE_IF = ''
-H_FILE_ELSE = ''
+global FILE_ADDR
+FILE_ADDR = ''
 
 
 class File(object):
@@ -42,10 +36,8 @@ class File(object):
     @property
     def bin_name(self):
         # Pad to 4 bytes boundary with \0
-        bn = self._name
         pad_len = 4
-        if len(self._name) % pad_len != 0:
-            bn = self._name + '\0' * (pad_len - len(self._name) % pad_len)
+        bn = self._name + '\0' * (pad_len - len(self._name) % pad_len)
         return bn
 
     def c_data(self, prefix=''):
@@ -60,9 +52,8 @@ class File(object):
         return len(self._data)
 
     def bin_data(self, base_addr=0x0):
-        file_addr1 = ''
-        file_addr2 = ''
-        return bytes(self._data), file_addr1, file_addr2
+        file_addr = ''
+        return bytes(self._data), file_addr
 
     def dump(self, indent=0):
         print ('%s%s' % (' ' * indent, self._name))
@@ -87,10 +78,8 @@ class Folder(object):
     @property
     def bin_name(self):
         # Pad to 4 bytes boundary with \0
-        bn = self._name
         pad_len = 4
-        if len(self._name) % pad_len != 0:
-            bn = self._name + '\0' * (pad_len - len(self._name) % pad_len)
+        bn = self._name + '\0' * (pad_len - len(self._name) % pad_len)
         return bn
 
     def walk(self):
@@ -176,12 +165,8 @@ class Folder(object):
         #  const rt_uint8_t *data;
 	    #  rt_size_t size;
         #}
-        global H_FILE
-        global H_FILE_IF
-        global H_FILE_ELSE
         d_li = []
         # payload base
-        pad_len = 64
         p_base = base_addr + self.bin_fmt.size * self.entry_size
         # the length to record how many data is in
         v_len = p_base
@@ -201,44 +186,27 @@ class Folder(object):
             name_addr = v_len
             v_len += len(name)
 
-            data, file_addr1, file_addr2 = c.bin_data(base_addr=v_len)
+            data,  file_addr1 = c.bin_data(base_addr=v_len)
             data_addr = v_len
-
-            add_data = b''
             if isinstance(c, File):
-                if (data_addr + 8) % pad_len != 0:
-                    add_data = b'\0' * (pad_len - (data_addr + 8) % pad_len)
-                data_addr = data_addr + len(add_data)
-                # H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
-                #                '(void *)(resource_root + ' + '0x%08x' % data_addr + ' - ' + '0x%08x' % BASE_ADDR + ')' + '\n')
-                
-                H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
-                               '(void *)(resource_root + ' + '0x%08x' % (data_addr - BASE_ADDR) + ')' + '\n')
-
-                H_FILE_ELSE = (H_FILE_ELSE + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
-                               '(void *)(' + '0x%08x' % data_addr + ')' + '\n')
+                global FILE_ADDR
+                FILE_ADDR = (FILE_ADDR + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) +
+                             '(void *)0x%08x' % data_addr + '\n')
             # pad the data to 4 bytes boundary
-
-            data = add_data + data
+            pad_len = 4
+            if len(data) % pad_len != 0:
+                data += b'\0' * (pad_len - len(data) % pad_len)
             v_len += len(data)
 
-            d_li.append(self.bin_fmt.pack(*self.bin_item(type=tp,
-                                                         name=name_addr,
-                                                         data=data_addr,
-                                                         size=c.entry_size)))
+            d_li.append(self.bin_fmt.pack(*self.bin_item(
+                                               type=tp,
+                                               name=name_addr,
+                                               data=data_addr,
+                                               size=c.entry_size)))
+
             p_li.extend((name, data))
 
-        # if len(d_li)*self.bin_fmt.size % pad_len != 0:
-        #     d_li.append(b'\0' * (pad_len - (len(d_li)*self.bin_fmt.size) % pad_len))
-
-        # H_FILE += '#if defined _WIN32\n'
-        # H_FILE += 'extern unsigned char resource_root[];\n\n'
-        # H_FILE += H_FILE_IF
-        # H_FILE += '\n#else\n'
-        # H_FILE += H_FILE_ELSE
-        # H_FILE += '\n#endif\n'
-
-        return (bytes().join(d_li) + bytes().join(p_li)), H_FILE_IF, H_FILE_ELSE
+        return (bytes().join(d_li) + bytes().join(p_li)), FILE_ADDR
 
 def get_c_data(tree):
     # Handle the root dirent specially.
@@ -258,7 +226,6 @@ const struct romfs_dirent {name} = {{
                                   data=tree.c_data())
 
 def get_bin_data(tree, base_addr):
-    global H_FILE
     v_len = base_addr + Folder.bin_fmt.size
     name = bytes('/\0\0\0', 'utf8')
     name_addr = v_len
@@ -269,22 +236,8 @@ def get_bin_data(tree, base_addr):
                                                 name=name_addr,
                                                 data=data_addr,
                                                 size=tree.entry_size))
-    data = data + name
-    # pad_len = 56
-    # if len(data) % pad_len != 0:
-    #     v_len += len(b'\0' * (pad_len - len(data) % pad_len))
-    #     data += b'\0' * (pad_len - len(data) % pad_len)
-
-    tree_data, file_addr1, file_addr2 = tree.bin_data(v_len)
-	
-    H_FILE += '#if defined _WIN32\n'
-    H_FILE += 'extern unsigned char resource_root[];\n\n'
-    H_FILE += file_addr1
-    H_FILE += '\n#else\n'
-    H_FILE += file_addr2
-    H_FILE += '\n#endif\n'
-	
-    return (data + tree_data), H_FILE
+    tree_data, file_addr = tree.bin_data(v_len)
+    return (data + name + tree_data), file_addr
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -298,10 +251,9 @@ if __name__ == '__main__':
     if args.dump:
         tree.dump()
 
-    BASE_ADDR = int(args.addr, 16)
     file_addr = ''
     if args.binary:
-        data, file_addr = get_bin_data(tree, BASE_ADDR)
+        data, file_addr = get_bin_data(tree, int(args.addr, 16))
     else:
         data = get_c_data(tree)
 
@@ -310,5 +262,5 @@ if __name__ == '__main__':
         output = sys.stdout
 
     output.write(data)
-    with open(os.path.join(os.path.dirname(os.getcwd()), 'ui_resource.h'), 'w') as f:
+    with open(os.path.join(os.path.dirname(os.getcwd()), 'resource_8762g.h'), 'w') as f:
         f.write(file_addr)
