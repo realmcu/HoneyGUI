@@ -16,7 +16,9 @@ gui_win_t *win_song_lists_back = NULL;
 gui_switch_t *switch_song_files[3] = {NULL};
 gui_switch_t *switch_song_delete = NULL;
 gui_img_t *img_song_list_back = NULL;
+extern gui_win_t *win_confirm;
 
+char *txet_delete_songs = "确认删除歌曲？";
 char *song_files_name[3] = {"song name 1", "song name 2", "song name 3"};
 
 //if current view has a "delete icon", need to set delete info before create a win_delete
@@ -28,6 +30,10 @@ static void switch_song_delete_yes_action(void *obj)
 static void switch_song_delete_no_action(void *obj)
 {
     gui_log("switch_song_delete_no_action, obj = 0x%x\n", obj);
+    win_song_lists->base.not_show = false;
+
+    gui_tree_free(win_confirm);
+    win_confirm = NULL;
     //do nothing
 }
 static void switch_song_delete_text(void *obj)
@@ -42,7 +48,7 @@ static void switch_song_back_cb(void *obj, gui_event_t event)
     switch (event)
     {
     case GUI_EVENT_TOUCH_RELEASED:
-        if (win_song_lists != NULL)
+        //if (win_song_lists != NULL)
         {
             gui_tree_free(win_song_lists);
             win_song_lists = NULL;
@@ -110,17 +116,17 @@ static void switch_song_delete_cb(void *obj, gui_event_t event)
                 win_confirm = NULL;
                 set_confirm_yes(NULL, NULL);
                 set_confirm_no(NULL, NULL);
-                set_confirm_text(NULL, NULL);
+                set_confirm_text(NULL, 0, 0, 0);
             }
             win_confirm = gui_win_create(&(app->screen), "win_confirm", 0, 0, LCD_W, LCD_H);
+
+            set_confirm_yes(switch_song_delete_yes_action, NULL);
+            set_confirm_no(switch_song_delete_no_action, NULL);
+            set_confirm_text(txet_delete_songs, 123, 131, 7);
+
             void design_win_confirm(void *parent);
             design_win_confirm(win_confirm);
             gui_obj_show(win_confirm, true);
-            //win_confirm->base.not_show = true;
-            set_confirm_yes(switch_song_delete_yes_action, NULL);
-            set_confirm_no(switch_song_delete_no_action, NULL);
-            set_confirm_text(switch_song_delete_text, NULL);
-            //gui_obj_set_update_att(text_confirm, 0xffffffff, true, NULL);
         }
         push_current_widget(win_song_lists);
         win_song_lists->base.not_show = true;

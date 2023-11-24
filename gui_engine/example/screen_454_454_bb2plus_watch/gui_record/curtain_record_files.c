@@ -33,6 +33,7 @@ char *record_files_name[MAX_FILES_NUM] = {"录音文件2023/11/16", "录音文�
                                          };
 
 static uint8_t record_file_num = 0;
+char *txet_record_delete_file = "确认删除录音？";
 
 //if current view has a "delete icon", need to set delete info before create a win_delete
 static void switch_record_file_delete_yes_action(void *obj)
@@ -116,17 +117,15 @@ static void switch_record_files_touch_cb(void *obj, gui_event_t event)
                 win_confirm = NULL;
                 set_confirm_yes(NULL, NULL);
                 set_confirm_no(NULL, NULL);
-                set_confirm_text(NULL, NULL);
             }
             win_confirm = gui_win_create(&(app->screen), "win_confirm", 0, 0, LCD_W, LCD_H);
+            set_confirm_yes(switch_record_file_delete_yes_action, this);
+            set_confirm_no(switch_record_file_delete_no_action, this);
+            set_confirm_text(txet_record_delete_file, 123, 131, 7);
+
             void design_win_confirm(void *parent);
             design_win_confirm(win_confirm);
             gui_obj_show(win_confirm, false);
-            //win_confirm->base.not_show = true;
-            set_confirm_yes(switch_record_file_delete_yes_action, this);
-            set_confirm_no(switch_record_file_delete_no_action, this);
-            set_confirm_text(switch_record_file_delete_text, this);
-            //gui_obj_set_update_att(text_confirm, 0xffffffff, true, NULL);
         }
 
         break;

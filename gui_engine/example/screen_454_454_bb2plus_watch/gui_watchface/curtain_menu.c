@@ -25,8 +25,6 @@ gui_win_t *win_menu_buds  = NULL;
 gui_win_t *win_menu_phone = NULL;
 gui_win_t *win_menu_setting = NULL;
 
-
-
 static void curtain_down_menu_update_cb(void *obj)
 {
     gui_log("curtain_down_menu_update_cb\n");
@@ -49,8 +47,6 @@ static void curtain_down_menu_update_cb(void *obj)
 static void switch_menu_bluetooth_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_bluetooth_released_cb\n");
-    // cfg_mode = !cfg_mode;
-    // gui_obj_set_update_att(curtain_down_menu, 0xFFFFFFFF, true, NULL);
     if (switch_menu_bluetooth->ifon)
     {
         switch_menu_buds->base.not_show = false;
@@ -70,31 +66,45 @@ static void switch_menu_buds_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_buds_released_cb\n");
     tabview_main->base.not_show = true;
-    extern gui_win_t *win_menu_buds;
-    win_menu_buds->base.not_show = false;
-
-
+    if (win_menu_buds == NULL)
+    {
+        gui_app_t *app = get_app_watch_ui();
+        win_menu_buds = gui_win_create(&(app->screen), "win_menu_buds", 0, 0, 454, 454);
+        extern void design_win_menu_buds(void *parent);
+        design_win_menu_buds(win_menu_buds);
+    }
 }
 
 static void switch_menu_phone_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_phone_released_cb\n");
-
+    tabview_main->base.not_show = true;
+    if (win_menu_phone == NULL)
+    {
+        gui_app_t *app = get_app_watch_ui();
+        win_menu_phone = gui_win_create(&(app->screen), "win_menu_phone", 0, 0, 454, 454);
+        extern void design_win_menu_phone(void *parent);
+        design_win_menu_phone(win_menu_phone);
+    }
 }
 
 static void switch_menu_setting_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_setting_released_cb\n");
-
+    tabview_main->base.not_show = true;
+    if (win_menu_setting == NULL)
+    {
+        gui_app_t *app = get_app_watch_ui();
+        win_menu_setting = gui_win_create(&(app->screen), "win_menu_setting", 0, 0, 454, 454);
+        extern void design_win_menu_setting(void *parent);
+        design_win_menu_setting(win_menu_setting);
+    }
 }
 
 void design_curtain_menu(void *parent)
 {
     gui_curtainview_t *ct = (gui_curtainview_t *)parent;
     curtain_down_menu = gui_curtain_create(ct, "curtain_down_menu", 0, 0, 454, 454, CURTAIN_DOWN, 1.0f);
-    //gui_obj_add_update_cb(curtain_down_menu, (gui_update_cb_t)curtain_down_menu_update_cb, 0xFFFFFFFF,
-    //                      true, NULL);
-
     img_base_menu = gui_img_create_from_mem(curtain_down_menu, "", WATCH_BASE_GREY_70_ALPHA_BIN, 0, 0,
                                             454, 454);
     img_base_menu->draw_img.blend_mode = IMG_BYPASS_MODE;
@@ -110,7 +120,7 @@ void design_curtain_menu(void *parent)
                          GUI_EVENT_2, NULL);
 
     switch_menu_buds = gui_switch_create(img_base_menu, 300, 177, 100, 100, ICON_BUDS_OFF_BIN,
-                                         ICON_BUDS_ON_BIN);
+                                         ICON_BUDS_OFF_BIN);//on_bin by BT event ICON_BUDS_ON_BIN
     switch_menu_buds->off_hl_pic_addr = ICON_BUDS_TOUCH_BIN;
     switch_menu_buds->on_hl_pic_addr = ICON_BUDS_TOUCH_BIN;
     gui_obj_add_event_cb(switch_menu_buds, (gui_event_cb_t)switch_menu_buds_released_cb, GUI_EVENT_1,
@@ -119,7 +129,7 @@ void design_curtain_menu(void *parent)
                          NULL);
 
     switch_menu_phone = gui_switch_create(img_base_menu, 51, 177, 100, 100, ICON_PHONE_OFF_BIN,
-                                          ICON_PHONE_ON_BIN);
+                                          ICON_PHONE_OFF_BIN);
     switch_menu_phone->off_hl_pic_addr = ICON_PHONE_TOUCH_BIN;
     switch_menu_phone->on_hl_pic_addr = ICON_PHONE_TOUCH_BIN;
     gui_obj_add_event_cb(switch_menu_phone, (gui_event_cb_t)switch_menu_phone_released_cb, GUI_EVENT_1,
@@ -128,7 +138,7 @@ void design_curtain_menu(void *parent)
                          NULL);
 
     switch_menu_setting = gui_switch_create(img_base_menu, 177, 327, 100, 100, ICON_MORE_OFF_BIN,
-                                            ICON_MORE_ON_BIN);
+                                            ICON_MORE_OFF_BIN);
     switch_menu_setting->off_hl_pic_addr = ICON_MORE_TOUCH_BIN;
     switch_menu_setting->on_hl_pic_addr = ICON_MORE_TOUCH_BIN;
     gui_obj_add_event_cb(switch_menu_setting, (gui_event_cb_t)switch_menu_setting_released_cb,
@@ -136,16 +146,7 @@ void design_curtain_menu(void *parent)
     gui_obj_add_event_cb(switch_menu_setting, (gui_event_cb_t)switch_menu_setting_released_cb,
                          GUI_EVENT_2, NULL);
 
-    gui_app_t *app = get_app_watch_ui();
-    win_menu_buds = gui_win_create(&(app->screen), "win_menu_buds", 0, 0, 454, 454);
-    win_menu_phone = gui_win_create(&(app->screen), "win_menu_phone", 0, 0, 454, 454);
-    win_menu_setting = gui_win_create(&(app->screen), "win_menu_setting", 0, 0, 454, 454);
-    win_menu_buds->base.not_show = true;
-    win_menu_phone->base.not_show = true;
-    win_menu_setting->base.not_show = true;
-
-    design_win_menu_buds(win_menu_buds);
-    //design_win_menu_phone(win_menu_phone);
-    //design_win_menu_setting(win_menu_setting);
-
+    switch_menu_buds->base.not_show = true;
+    switch_menu_phone->base.not_show = true;
+    switch_menu_setting->base.not_show = true;
 }

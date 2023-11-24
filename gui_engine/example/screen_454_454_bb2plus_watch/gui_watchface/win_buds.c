@@ -8,6 +8,7 @@
 #include "app_gui_main.h"
 #include "gui_tabview.h"
 #include "gui_obj.h"
+#include "gui_common.h"
 
 gui_switch_t *switch_back_menu_buds = NULL;
 gui_switch_t *switch_text_base_buds_device = NULL;
@@ -20,26 +21,30 @@ gui_text_t *text_disconnect = NULL;
 gui_win_t *win_buds_device = NULL;
 gui_win_t *win_search_buds = NULL;
 
+extern gui_tabview_t *tabview_main;
+extern gui_win_t *win_menu_buds;
+extern gui_win_t *win_confirm;
+
+char *txet_disconnect = "确认断开连接？";
+
 static void switch_back_menu_buds_touch_cb(void *obj, gui_event_cb_t event)
 {
     gui_log("switch_back_menu_buds_touch_cb, event = %d\n", event);
-
-    extern gui_win_t *win_menu_buds;
     win_menu_buds->base.not_show = true;
-    extern gui_tabview_t *tabview_main;
     tabview_main->base.not_show = false;
+
+    gui_tree_free(win_menu_buds);
+    win_menu_buds = NULL;
 }
 
 static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t event)
 {
     gui_log("switch_text_base_buds_device_touch_cb, event = %d\n", event);
-
-    extern gui_win_t *win_menu_buds;
-    win_menu_buds->base.not_show = true;
+    push_current_widget(win_menu_buds);
+    gui_obj_show(win_menu_buds, false);
 
     gui_app_t *app = get_app_watch_ui();
-    gui_log("win_buds_device = 0x%x\n", win_buds_device);
-    if (win_buds_device == NULL)
+    //if (win_buds_device == NULL)
     {
         gui_log("win_buds_device create\n");
         win_buds_device = gui_win_create(&(app->screen), "win_buds_device", 0, 0, 454, 454);
@@ -47,25 +52,57 @@ static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t even
         extern void design_win_buds_device(void *parent);
         design_win_buds_device(win_buds_device);
     }
-    if (win_search_buds == NULL)
-    {
-        win_search_buds = gui_win_create(&(app->screen), "win_search_buds", 0, 0, 454, 454);
-        win_search_buds->base.not_show = true;
-        //design_win_search_buds(win_search_buds);
-    }
 
 }
 
 static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t event)
 {
     gui_log("switch_text_base_search_buds_touch_cb, event = %d\n", event);
+    extern gui_win_t *win_menu_buds;
+    push_current_widget(win_menu_buds);
+    gui_obj_show(win_menu_buds, false);
+    gui_app_t *app = get_app_watch_ui();
+    //if (win_search_buds == NULL)//when to free ?
+    {
+        gui_log("win_buds_searching create\n");
+        win_search_buds = gui_win_create(&(app->screen), "win_search_buds", 0, 0, 454, 454);
+        win_search_buds->base.not_show = false;
+        extern void design_win_buds_searching(void *parent);
+        design_win_buds_searching(win_search_buds);
+    }
+}
+
+static void switch_disconnect_yes_action(void *obj)
+{
+    gui_log("switch_disconnect_yes_action, obj = 0x%x\n", obj);
+}
+
+static void switch_disconnect_no_action(void *obj)
+{
+    gui_log("switch_disconnect_no_action, obj = 0x%x\n", obj);
+    win_menu_buds->base.not_show = false;
+
+    gui_tree_free(win_confirm);
+    win_confirm = NULL;
 }
 
 static void switch_disconnect_touch_cb(void *obj, gui_event_cb_t event)
 {
     gui_log("switch_disconnect_touch_cb, event = %d\n", event);
-}
+    push_current_widget(win_menu_buds);
+    gui_obj_show(win_menu_buds, false);
 
+    gui_app_t *app = get_app_watch_ui();
+    win_confirm = gui_win_create(&(app->screen), "win_confirm", 0, 0, 454, 454);
+    win_confirm->base.not_show = false;
+
+    set_confirm_yes(switch_disconnect_yes_action, obj);
+    set_confirm_no(switch_disconnect_no_action, obj);
+    set_confirm_text(txet_disconnect, 123, 131, 7);
+
+    extern void design_win_confirm(void *parent);
+    design_win_confirm(win_confirm);
+}
 
 void design_win_menu_buds(void *parent)
 {
@@ -122,21 +159,5 @@ void design_win_menu_buds(void *parent)
     text_disconnect = gui_text_create(parent, "text_disconnect", 163, 392, 128, font_size);
     gui_text_set(text_disconnect, "断开连接", "rtk_font_mem", 0xffffffff, 12, font_size);
     gui_text_type_set(text_disconnect, SIMKAI_SIZE32_BITS1_FONT_BIN);
-
-    // gui_app_t *app = get_app_watch_ui();
-    // win_buds_device = gui_win_create(&(app->screen), "win_buds_device", 0, 0, 454, 454);
-    // win_search_buds = gui_win_create(&(app->screen), "win_search_buds", 0, 0, 454, 454);
-    // win_buds_device->base.not_show = true;
-    // win_search_buds->base.not_show = true;
-
-    // extern void design_win_buds_device(void *parent);
-    // design_win_buds_device(win_buds_device);
-    // //design_win_search_buds(win_search_buds);
-}
-
-
-
-void design_win_search_buds(void *parent)
-{
 
 }
