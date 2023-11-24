@@ -88,6 +88,40 @@ static void scrolltext_prepare(gui_obj_t *obj)
     //     return;
     // }
     // rtgui_text_create(&text->base);
+    gui_scroll_text_t *object = (gui_scroll_text_t *)obj;
+
+    if (object->base.animate && object->base.animate->animate)
+    {
+        size_t frame_count = object->base.animate->dur * 30 / (1000);
+        object->base.animate->callback(object->base.animate->p);
+        object->base.animate->current_frame++;
+
+        if (object->base.animate->current_frame > frame_count)
+        {
+            if (object->base.animate->repeatCount == 0)
+            {
+                object->base.animate->animate = false;
+            }
+            else if (object->base.animate->repeatCount < 0)
+            {
+                object->base.animate->current_frame = 0;
+            }
+            else if (object->base.animate->repeatCount > 0)
+            {
+                object->base.animate->current_repeat_count++;
+                if (object->base.animate->current_repeat_count >= object->base.animate->repeatCount)
+                {
+                    object->base.animate->animate = false;
+                }
+                else
+                {
+                    object->base.animate->current_frame = 0;
+                }
+            }
+        }
+        object->base.animate->progress_percent = ((float)(object->base.animate->current_frame)) /
+                                                 ((float)(frame_count));
+    }
 }
 
 static void scrolltext_draw(gui_obj_t *obj)

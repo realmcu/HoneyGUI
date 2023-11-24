@@ -427,11 +427,7 @@ static void switch_prepare(gui_obj_t *obj)
                         gui_log("pressed TOUCH_HOLD_Y\n");
                         if (!b->long_touch_state)
                         {
-                            gui_switch_hl(b);
-                        }
-                        else
-                        {
-                            gui_switch_hl_long_touch(b);
+                            gui_switch_hl_back(b);
                         }
                     }
                 }
@@ -443,7 +439,8 @@ static void switch_prepare(gui_obj_t *obj)
                         {
                             gui_switch_long_touch(b);
                         }
-                        else if (!b->long_touch_state && !b->long_flag)
+                        else if (!b->long_touch_state && !b->long_flag
+                                 || !b->long_touch_enable)
                         {
                             {
                                 gui_switch_t *sw = (gui_switch_t *)obj;
