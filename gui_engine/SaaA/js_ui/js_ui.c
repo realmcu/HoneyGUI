@@ -90,7 +90,7 @@ DECLARE_HANDLER(jump)
     //gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
     if (txtbox)
     {
-        gui_tabview_jump_tab(txtbox, jerry_get_number_value(args[0]), 0);
+        gui_tabview_jump_tab((void *)txtbox, jerry_get_number_value(args[0]), 0);
     }
     return jerry_create_undefined();
 }

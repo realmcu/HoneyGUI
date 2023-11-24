@@ -162,7 +162,8 @@ static void app_xml_ui_design(gui_app_t *app)
 
     extern void create_tree(gui_app_t *app);
     create_tree(app);
+#if defined(_WIN32)
     gui_return_create(&app->screen);
-
+#endif
 }
 GUI_INIT_APP_EXPORT(rtgui_server_init);
