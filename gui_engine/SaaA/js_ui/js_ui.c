@@ -484,6 +484,36 @@ DECLARE_HANDLER(onPress_win)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(onPress_switch)
+{
+    //gui_log("enter onPress\n");
+    if (args_cnt >= 1 && jerry_value_is_function(args[0]))
+    {
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        ////gui_log("enter onclick %s\n",obj->name);
+
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        //gui_log("cb_arg:%x\n", cb_arg);
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+        }
+        cb_arg->func = args[0];
+        gui_obj_add_event_cb((void *)obj, (gui_event_cb_t)js_cb_with_args, GUI_EVENT_TOUCH_PRESSED,
+                             (void *)(cb_arg));
+
+    }
+
+    return jerry_create_undefined();
+}
 DECLARE_HANDLER(onHold_win)
 {
     //gui_log("enter onPress\n");
@@ -1141,6 +1171,8 @@ void js_gui_init()
     REGISTER_METHOD(sw, onOff);
     REGISTER_METHOD_NAME(sw, "turnOn", sw_open);
     REGISTER_METHOD_NAME(sw, "turnOff", sw_close);
+    REGISTER_METHOD_NAME(sw, "onPress", onPress_switch);
+
     jerry_release_value(global_obj);
 }
 

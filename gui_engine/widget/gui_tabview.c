@@ -199,6 +199,15 @@ static void tabview_prepare(gui_obj_t *obj)
         //when current tab is the end,come back to current tab if sliding.
         if (tabview->cur_id.x == tabview->tab_cnt_right)
         {
+            gui_tabview_jump_tab(tabview, 0, 0);
+            if (tabview->jump.jump_flag)
+            {
+                tabview->cur_id.y = tabview->jump.jump_id.y;
+                tabview->cur_id.x = tabview->jump.jump_id.x;
+                tabview->jump.jump_flag = false;
+                this->release_x = 0;
+                return;
+            }
             return;
         }
         tabview->cur_id.x = tabview->cur_id.x + 1;
@@ -206,14 +215,24 @@ static void tabview_prepare(gui_obj_t *obj)
         break;
     case TOUCH_RIGHT_SLIDE:
         gui_log("TOUCH_RIGHT_SLIDE0\n");
-        if (tabview->tab_cnt_left == 0 && tabview->cur_id.x == 0)
-        {
-            break;
-        }
+
         //when current tab is the end,come back to current tab if sliding.
         if (tabview->cur_id.x == tabview->tab_cnt_left)
         {
+            gui_tabview_jump_tab(tabview, tabview->tab_cnt_right, 0);
+            if (tabview->jump.jump_flag)
+            {
+                tabview->cur_id.y = tabview->jump.jump_id.y;
+                tabview->cur_id.x = tabview->jump.jump_id.x;
+                tabview->jump.jump_flag = false;
+                this->release_x = 0;
+                return;
+            }
             return;
+        }
+        if (tabview->tab_cnt_left == 0 && tabview->cur_id.x == 0)
+        {
+            break;
         }
         tabview->cur_id.x = tabview->cur_id.x - 1;
         this->release_x = this->release_x - tabview->base.w;

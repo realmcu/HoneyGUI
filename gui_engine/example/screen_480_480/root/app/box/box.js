@@ -17,7 +17,7 @@ var lamp6 = P2_5
 var LED1 = new Gpio(0, 'out');
 var LED2 = new Gpio(1, 'out');
 var LED3 = new Gpio(2, 'out');
-var LED4 = new Gpio(8, 'out');
+var LED4 = new Gpio(3, 'out');
 var LED5 = new Gpio(4, 'out');
 var LED6 = new Gpio(5, 'out');
 var LED7 = new Gpio(6, 'out');
@@ -26,72 +26,127 @@ var LED9 = new Gpio(49052, 'out');
 
 //console.log(LED1.gpio+';'+LED1.direction)
 
-
+var sleep_flag = true;
+function sleepflagTrue(params) {
+    
+    sleep_flag = true;
+    //console.log('sleep_flag;'+sleep_flag)
+}
 function led1OnFunc(params) {
     //console.log('led1OnFunc')
-    LED1.writeSync(0)
+    //console.log('sleep_flag;'+sleep_flag)
+    if (sleep_flag) {
+        LED1.writeSync(0)
+    }
+    
 }
 function led1OffFunc(params) {
     //console.log('led1OffFunc')
-    LED1.writeSync(1)
+    
+    if (sleep_flag) {
+        LED1.writeSync(1)
+    }
 }
 function led2OnFunc(params) {
     //console.log('led2OnFunc')
-    LED2.writeSync(0)
+    
+    if (sleep_flag) {
+        LED2.writeSync(0)
+    }
 }
 function led2OffFunc(params) {
     //console.log('led2OffFunc')
-    LED2.writeSync(1)
+    
+    if (sleep_flag) {
+        LED2.writeSync(1)
+    }    
 }
 function led3OnFunc(params) {
     //console.log('led3OnFunc')
-    LED3.writeSync(0)
+    
+    if (sleep_flag) {
+        LED3.writeSync(0)
+    }
 }
 function led3OffFunc(params) {
     //console.log('led3OffFunc')
-    LED3.writeSync(1)
+    
+    if (sleep_flag) {
+        LED3.writeSync(1)
+    }
 }
 function led4OnFunc(params) {
     //console.log('led1OnFunc')
-    LED4.writeSync(0)
+    
+    if (sleep_flag) {
+        LED4.writeSync(0)
+    }
 }
 function led4OffFunc(params) {
     //console.log('led1OffFunc')
-    LED4.writeSync(1)
+    
+    if (sleep_flag) {
+        LED4.writeSync(1)
+    }
 }
 function led5OnFunc(params) {
     //console.log('led2OnFunc')
-    LED5.writeSync(0)
+    
+    if (sleep_flag) {
+        LED5.writeSync(0)
+    }
 }
 function led5OffFunc(params) {
     //console.log('led2OffFunc')
-    LED5.writeSync(1)
+    
+    if (sleep_flag) {
+        LED5.writeSync(1)
+    }
 }
 function led6OnFunc(params) {
     //console.log('led3OnFunc')
-    LED6.writeSync(0)
+    
+    if (sleep_flag) {
+        LED6.writeSync(0)
+    }
 }
 function led6OffFunc(params) {
     //console.log('led3OffFunc')
-    LED6.writeSync(1)
+    
+    if (sleep_flag) {
+        LED6.writeSync(1)
+    }
 }
 function led7OnFunc(params) {
     //console.log('led2OnFunc')
-    LED7.writeSync(0)
+    
+    if (sleep_flag) {
+        LED7.writeSync(0)
+    }
 }
 function led7OffFunc(params) {
     //console.log('led2OffFunc')
-    LED7.writeSync(1)
+    
+    if (sleep_flag) {
+        LED7.writeSync(1)
+    }
 }
 function led8OnFunc(params) {
     //console.log('led3OnFunc')
-    LED8.writeSync(0)
+    
+    if (sleep_flag) {
+        LED8.writeSync(0)
+    }
 }
 function led8OffFunc(params) {
     //console.log('led3OffFunc')
-    LED8.writeSync(1)
+    
+    if (sleep_flag) {
+        LED8.writeSync(1)
+    }
 }
 function lampSwitchOnFunc(params) {
+    sleep_flag = false;
     //console.log('lampSwitchOnFunc')
     sw.getElementById('living_switch')
     sw.turnOn()
@@ -113,6 +168,7 @@ function lampSwitchOnFunc(params) {
 
 }
 function lampSwitchOffFunc(params) {
+    sleep_flag = false;
     //console.log('lampSwitchOffFunc')
     sw.getElementById('living_switch')
     sw.turnOff()
@@ -136,27 +192,35 @@ function lampSwitchOffFunc(params) {
 sw.getElementById('living_switch')
 sw.onOn(led1OnFunc)
 sw.onOff(led1OffFunc)
+sw.onPress(sleepflagTrue)
 sw.getElementById('dining_switch')
 sw.onOn(led2OnFunc)
 sw.onOff(led2OffFunc)
+sw.onPress(sleepflagTrue)
 sw.getElementById('study_switch')
 sw.onOn(led3OnFunc)
 sw.onOff(led3OffFunc)
+sw.onPress(sleepflagTrue)
 sw.getElementById('wash_switch')
 sw.onOn(led4OnFunc)
 sw.onOff(led4OffFunc)
+sw.onPress(sleepflagTrue)
 sw.getElementById('kitchen_switch')
 sw.onOn(led5OnFunc)
 sw.onOff(led5OffFunc)
+sw.onPress(sleepflagTrue)
 sw.getElementById('bathroom_switch')
 sw.onOn(led6OnFunc)
 sw.onOff(led6OffFunc)
+sw.onPress(sleepflagTrue)
 sw.getElementById('bedroom_switch')
 sw.onOn(led7OnFunc)
 sw.onOff(led7OffFunc)
+sw.onPress(sleepflagTrue)
 sw.getElementById('children_switch')
 sw.onOn(led8OnFunc)
 sw.onOff(led8OffFunc)
+sw.onPress(sleepflagTrue)
 icon.getElementById('allTurnOn_button')
 icon.onClick(lampSwitchOnFunc)
 icon.getElementById('sleep_button')

@@ -402,6 +402,7 @@ static void switch_prepare(gui_obj_t *obj)
                         //gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  //gui_log("%d\n", __LINE__);
 
                         gui_log("pressed\n");
+                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
 
                         b->long_flag = false;
                         b->press_flag = true;
