@@ -1,8 +1,8 @@
 # Porting
 The porting files are in the gui_port folder. 
     There are four files that need to be modified, corresponding to the input device, display device, OS, and file system. 
-    At present, it has been transplanted in FreeRtos, rt-thread, and Windows, you can refer to it.
-## the input device
+    At present, it has been transplanted in FreeRTOS, RT-Thread, and Windows, you can refer to it.
+## Input device
 - ``sdk\src\app\wristband\gui_port\gui_port_indev.c``
 - The input information is abstracted as touch screen contacts, and the input information structure is as follows
 ```
@@ -17,7 +17,7 @@ typedef struct gui_touch_data
     void            *data;
 } gui_touch_data_t;
 ```
-## the display device
+## Display device
 - ``sdk\src\app\wristband\gui_port\gui_port_dc.c``
 - It is necessary to define the screen width and height, frame buffer address and mode, whether the resolution is scaled, and realize the refresh function. The structure is as follows.
 - The framebuffer's size is ```fb_width*fb_height*bit_depth/8```.
@@ -47,7 +47,7 @@ static struct gui_dispdev dc =
     .gpu_type = GPU_SW,
 };
 ```
-## the file system
+## File system
 - ``sdk\src\app\wristband\gui_port\gui_port_filesystem.c``
 - Need to define several posix-style interface operation files and folders, as follows.
 ```
@@ -64,7 +64,7 @@ struct gui_fs
     int (*closedir)(gui_fs_DIR *d);
 };
 ```
-## the os
+## OS
 - ``sdk\src\app\wristband\gui_port\gui_port_os.c``
 - Need to define interfaces for threads, timers, message queues, and memory management, as follows
 ```

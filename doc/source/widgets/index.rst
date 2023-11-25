@@ -2,7 +2,7 @@ widgets
 *************
 
 ==================                   ==================  
-Widgets                              brief    
+Widgets                              Brief    
 ------------------                   ------------------  
 `screen`_                            The root widget of the widget tree   
 `window`_                            A rectangular container widget 
@@ -16,8 +16,8 @@ Widgets                              brief
 `perspective`_                       Slide to extend and retract curtains
 `cardview`_                          Display a 3d card set 
 `tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
-`canvas`_                            using nanovg lib to draw 2d graphics
-`img`_                               display image on the screen
+`canvas`_                            Use nanovg lib to draw 2d graphics
+`img`_                               Display image on the screen
 `tab`_                               The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
 ==================                   ==================  
 

@@ -15,9 +15,9 @@
 .. toctree::
     :hidden:
 
-    Use C/C++ Design An Application <GUI-APP Demo>
-    Use LVGL Design An Application <fwk_app_lvgl>
-    Use Script Design An Application <SaaA/index>
-    How to prepare UI resource <GUI-APP UI resource>
-    Demo An Application <GUI-APP Demo>
+    Use C/C++ Design an Application <GUI-APP Demo>
+    Use LVGL Design an Application <fwk_app_lvgl>
+    Use Script Design an Application <SaaA/index>
+    How to Prepare UI Resource <GUI-APP UI resource>
+    Demo an Application <GUI-APP Demo>
 ```

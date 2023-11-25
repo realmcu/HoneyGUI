@@ -5,10 +5,10 @@ The Window Widget is a rectangular container widget.
 
 
 ## Demo
-### Create a wimdow
+### Create a window
 
 
-![win](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png "win.PNG") 
+![win](https://foruda.gitee.com/images/1694169886660683122/5a0b4b9e_13408154.png  "win.PNG") 
 
 
 The following code is used to create a window and add an image to it.
