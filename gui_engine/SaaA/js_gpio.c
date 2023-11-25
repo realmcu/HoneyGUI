@@ -44,7 +44,7 @@ DECLARE_HANDLER(writeSync)
             {
                 extern bool matter_send_msg_to_app(uint16_t sub_type, uint32_t param);
 
-                uint32_t param = gpio << 8 | mode;
+                uint32_t param = gpio << 8 | write_value;
                 if (gpio != 49052)
                 {
                     //single
