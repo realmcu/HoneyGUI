@@ -57,7 +57,7 @@ static uint32_t daemon_cnt = 0;
 
 static void rtgui_server_entry(void *parameter)
 {
-    gui_thread_mdelay(10000);
+    gui_thread_mdelay(1000);
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_init(void);
     js_init();
