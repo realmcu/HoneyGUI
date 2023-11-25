@@ -39,3 +39,4 @@ sphinxcontrib-serializinghtml==1.1.5
 typing_extensions==4.1.1
 urllib3==1.26.18
 zipp==3.6.0
+sphinx_copybutton
