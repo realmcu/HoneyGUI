@@ -173,7 +173,7 @@ static void seekbar_preapre(gui_obj_t *obj)
 
                     ////gui_log("%d\n", __LINE__);
                     gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
-
+                    obj->cover = true;
                 }
             }
 
@@ -186,6 +186,7 @@ static void seekbar_preapre(gui_obj_t *obj)
                     {
                         b->press_flag = false;
                         gui_obj_event_set(obj, GUI_EVENT_2);
+                        obj->cover = false;
                     }  ////gui_log("%d\n", __LINE__);
 
                 }
@@ -198,7 +199,7 @@ static void seekbar_preapre(gui_obj_t *obj)
 
         }
     }
-    obj->cover = ((gui_seekbar_t *)obj)->hit_slider;
+
 
 }
 
@@ -362,7 +363,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
 
                     ////gui_log("%d\n", __LINE__);
                     gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
-
+                    obj->cover = true;
                 }
             }
 
@@ -375,6 +376,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
                     {
                         b->press_flag = false;
                         gui_obj_event_set(obj, GUI_EVENT_2);
+                        obj->cover = false;
                     }  ////gui_log("%d\n", __LINE__);
 
                 }
@@ -479,7 +481,7 @@ static void seekbar_h_preapre(gui_obj_t *obj)
 
                     ////gui_log("%d\n", __LINE__);
                     gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
-
+                    obj->cover = true;
                 }
             }
 
@@ -492,6 +494,7 @@ static void seekbar_h_preapre(gui_obj_t *obj)
                     {
                         b->press_flag = false;
                         gui_obj_event_set(obj, GUI_EVENT_2);
+                        obj->cover = false;
                     }  ////gui_log("%d\n", __LINE__);
 
                 }

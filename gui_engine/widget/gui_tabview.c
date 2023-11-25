@@ -109,8 +109,9 @@ static void tabview_prepare(gui_obj_t *obj)
     gui_tree_get_cover(obj, ICONLIST, &cover2);
 
     cover = cover1 || cover2;
-    gui_tree_get_cover(obj, SEEKBAR, &cover1);
-    cover = cover1 || cover;
+    bool cover3 = false;
+    gui_tree_get_cover(obj, SEEKBAR, &cover3);
+    cover = cover3 || cover;
 
     if (cover && tabview->cur_id.x == 0)
     {
@@ -120,7 +121,10 @@ static void tabview_prepare(gui_obj_t *obj)
     {
         return;
     }
-
+    if (cover)
+    {
+        return;
+    }
     if (tabview->cur_id.x != 0)
     {
         if (tp->type == TOUCH_HOLD_Y || tp->type == TOUCH_DOWN_SLIDE || tp->type == TOUCH_UP_SLIDE)
