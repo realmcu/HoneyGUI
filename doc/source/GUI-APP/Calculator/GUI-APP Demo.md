@@ -10,7 +10,7 @@ The "Calculator" works just like a traditional calculator, using button widget f
 ```
 
 ### Source File
-To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\wearable\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
+To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
 
 
 ### Two Steps 

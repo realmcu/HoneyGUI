@@ -17,7 +17,7 @@
 #include <jerry_util.h>
 #include <jerryscript.h>
 #include <jerry_util.h>
-#include "..\3rd\js\js-port\config.h"
+#include "../3rd/js/js-port/config.h"
 #include <gui_app.h>
 #include <gui_obj.h>
 #include <gui_text.h>

@@ -1,6 +1,6 @@
 ##  Demo: Develop a "86Box APP"
 ### Introduction
-This example demostrates how to develop a SmartUI 86BOX APP, from which you can learn and understand the basic methods and processes of developing a ui application.
+This example demostrates how to develop a SmartUI 86box APP, from which you can learn and understand the basic methods and processes of developing a ui application.
 
 
 ```eval_rst
@@ -10,7 +10,7 @@ This example demostrates how to develop a SmartUI 86BOX APP, from which you can 
 ```
 
 ### Source File
-To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\wearable\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
+To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
 
 
 ### Two Steps 
