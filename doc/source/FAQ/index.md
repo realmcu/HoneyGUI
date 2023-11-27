@@ -20,15 +20,17 @@ GUI need this function, but it would bring hardfault if using C library api. APP
 Flash speed mode should set to 4 bit mode; flash clock should set to a higher value based on chip capabilities.
 ###  CPU frequence
 CPU frequence should set to a higher value based on chip capabilities.
+###  SCONS Version
+Specific scons version is required, please use the `pip install scons==4.4.0` command to download.
 ## Specification FAQ
 ###  Graphics 
 | Platform  | 8762D  |8772F   |87X2D |PC   |8763E|
 |---|---|---|---|---|---|
 | RGB565  |  Y | Y  | Y  | Y  | Y  |
-|  RGB888 | N  | Y  |  Y |  Y | N  | 
-|  RGBA8888 |  N | Y  |  Y | Y  | N  | 
-|  SVG | N  | Y   |  N |  Y  | N  | 
-| TTF | N  | Y   |  N |  Y  | N  | 
+|  RGB888 | N  | Y  |  Y |  Y | N  |
+|  RGBA8888 |  N | Y  |  Y | Y  | N  |
+|  SVG | N  | Y   |  N |  Y  | N  |
+| TTF | N  | Y   |  N |  Y  | N  |
 | DOT font  |  Y | Y  | Y  | Y  |Y  |
 |  Vector Graphics | N  | Y   |  N |  Y  |N |
 |  Linear gradient | N  | Y   |  N |  Y  |N |
@@ -52,7 +54,7 @@ The memory consumption statistics of this demo are as follows
 #### Widget memory usage
 | Widget | Memory(Byte)  |
 |---|---|
-| RGB565  |  Y | 
+| RGB565  |  Y |
 |win	|104|
 |img	|248|
 |switch	|384|
