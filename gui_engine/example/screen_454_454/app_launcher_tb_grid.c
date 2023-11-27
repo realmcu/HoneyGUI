@@ -12,6 +12,6 @@ void page_tb_grid(void *parent)
     gui_grid_style(grid, GRID_3D);
     for (size_t i = 0; i < 6; i++)
     {
-        gui_magic_img_create_from_mem(grid, "1", array[i], 0, 0, 0, 0);
+        gui_img_creat_from_mem(grid, "1", array[i], 0, 0, 0, 0);
     }
 }

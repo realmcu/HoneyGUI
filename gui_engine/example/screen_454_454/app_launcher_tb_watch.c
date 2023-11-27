@@ -9,7 +9,7 @@
 void page_tb_watch(void *parent)
 {
 
-    gui_magic_img_t *img = gui_magic_img_create_from_mem(parent, "test", C1_BIN, 0, 0, 454, 454);
+    gui_magic_img_t *img = gui_img_creat_from_mem(parent, "test", C1_BIN, 0, 0, 454, 454);
     //gui_img_scale(img, 0.2f, 0.2f);
     gui_img_translate(img, (454) / 2, (454) / 2);
     gui_img_rotation(img, 45, 256 / 2, 256 / 2);

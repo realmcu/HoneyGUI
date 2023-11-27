@@ -91,7 +91,7 @@ static void callback_set_off()
 }
 void page_tb_control0(void *parent)
 {
-    // gui_magic_img_create_from_mem(parent, "parent", CONTROLMENU_0_BIN, 0, 0, 0, 0);
+    // gui_img_creat_from_mem(parent, "parent", CONTROLMENU_0_BIN, 0, 0, 0, 0);
     gui_switch_t *sw_no_disturb  = gui_switch_create(parent, 10, 108, 169, 98, NO_DISTURB_OFF_BIN,
                                                      NO_DISTURB_ON_BIN);
     gui_switch_t *sw_mute        = gui_switch_create(parent, 190, 108, 169, 98, MUTE_OFF_BIN,

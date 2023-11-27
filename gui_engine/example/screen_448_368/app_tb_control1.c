@@ -91,7 +91,7 @@ static void callback_alarm_off()
 }
 void page_tb_control1(void *parent)
 {
-    //gui_magic_img_create_from_mem(parent, "parent", CONTROLMENU_1_BIN, 0, 0, 0, 0);
+    //gui_img_creat_from_mem(parent, "parent", CONTROLMENU_1_BIN, 0, 0, 0, 0);
     gui_switch_t *sw_vibrate     = gui_switch_create(parent, 10, 108, 169, 98, VIBRATE_OFF_BIN,
                                                      VIBRATE_ON_BIN);
     gui_switch_t *sw_ring        = gui_switch_create(parent, 190, 108, 169, 98, RING_OFF_BIN,

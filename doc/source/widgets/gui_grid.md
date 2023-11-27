@@ -15,7 +15,7 @@ void page_tb_grid(void *parent)
     gui_grid_style(grid, GRID_CLASSIC);
     for (size_t i = 0; i < 5; i++)
     {
-        gui_magic_img_create_from_mem(grid, "1", array[i], 0, 0, 0, 0);
+        gui_img_creat_from_mem(grid, "1", array[i], 0, 0, 0, 0);
     }
 }
 ```
@@ -33,7 +33,7 @@ void page_tb_grid(void *parent)
     gui_grid_style(grid, GRID_SCALE);
     for (size_t i = 0; i < 5; i++)
     {
-        gui_magic_img_create_from_mem(grid, "1", array[i], 0, 0, 0, 0);
+        gui_img_creat_from_mem(grid, "1", array[i], 0, 0, 0, 0);
     }
 }
 ```

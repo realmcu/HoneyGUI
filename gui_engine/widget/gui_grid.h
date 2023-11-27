@@ -154,7 +154,7 @@ typedef struct gui_grid
  *                                      , 2, 30, 30);
  *   for (size_t i = 0; i < 6; i++)
  *   {
- *       gui_magic_img_create_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
+ *       gui_img_creat_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
  *   }}
  * \endcode
  */
@@ -190,7 +190,7 @@ gui_grid_t *gui_grid_create(void *parent,
  *   gui_grid_style(grid, GRID_SCALE);
  *   for (size_t i = 0; i < 6; i++)
  *   {
- *       gui_magic_img_create_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
+ *       gui_img_creat_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
  *   }}
  * \endcode
  */
