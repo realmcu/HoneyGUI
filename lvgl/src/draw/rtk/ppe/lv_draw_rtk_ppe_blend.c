@@ -70,7 +70,7 @@ lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
         target.global_alpha = dsc->opa;
     }
     PPE_rect_t rect = {.left = dest_area->x1, .right = dest_area->x2, .top = dest_area->y1, .bottom = dest_area->y2};
-    PPE_ERR err = PPE_Clear_Rect(&target, &rect, bg_color.full);
+    PPE_ERR err = PPE_Clear_Rect_lvgl(&target, &rect, bg_color.full);
     if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
@@ -100,7 +100,7 @@ lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
     source.format = PPE_A8;
 
     PPE_translate_t trans = {.x = coords->x1, .y = coords->y1};
-    PPE_ERR err = PPE_blend(&source, &target, &trans);
+    PPE_ERR err = PPE_blend_lvgl(&source, &target, &trans);
     if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
@@ -193,14 +193,14 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         if (dsc->opa != 0xFF)
         {
             zoom.global_alpha_en = ENABLE;
-            zoom.global_alpha = (dsc->opa << 24);
+            zoom.global_alpha = dsc->opa;
         }
         if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
         {
             zoom.color_key_en = ENABLE;
             zoom.color_key_value = LV_COLOR_CHROMA_KEY.full;
         }
-        err = PPE_blend(&zoom, &target, &trans);
+        err = PPE_blend_lvgl(&zoom, &target, &trans);
         os_mem_free(zoom.memory);
         if (err == PPE_SUCCESS)
         {
@@ -216,9 +216,9 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         if (dsc->opa != 0xFF)
         {
             source.global_alpha_en = ENABLE;
-            source.global_alpha = (dsc->opa << 24);
+            source.global_alpha = dsc->opa;
         }
-        PPE_ERR err = PPE_blend(&source, &target, &trans);
+        PPE_ERR err = PPE_blend_lvgl(&source, &target, &trans);
         if (err == PPE_SUCCESS)
         {
             return LV_RES_OK;
@@ -259,7 +259,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
         }
     }
     source.global_alpha_en = ENABLE;
-    source.global_alpha = ((0xFF - dsc->recolor_opa) << 24);
+    source.global_alpha = 0xFF - dsc->recolor_opa;
 
     ppe_buffer_t recolor;
     memset(&recolor, 0, sizeof(ppe_buffer_t));
@@ -275,7 +275,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     recolor.height = source.height;
     lv_color32_t recolor_value = lv_ppe_toABGR8888(dsc->recolor);
     recolor_value.ch.alpha = dsc->recolor_opa;
-    PPE_ERR err = PPE_recolor(&source, &recolor, recolor_value.full);
+    PPE_ERR err = PPE_recolor_lvgl(&source, &recolor, recolor_value.full);
     if (err != PPE_SUCCESS)
     {
         os_mem_free(recolor.memory);
@@ -283,8 +283,8 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     }
     PPE_translate_t trans = {.x = coords->x1, .y = coords->y1};
     recolor.global_alpha_en = ENABLE;
-    recolor.global_alpha = (dsc->opa << 24);
-    err = PPE_blend(&recolor, &target, &trans);
+    recolor.global_alpha = dsc->opa;
+    err = PPE_blend_lvgl(&recolor, &target, &trans);
     os_mem_free(recolor.memory);
     if (err == PPE_SUCCESS)
     {
@@ -317,7 +317,7 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
     source.format = PPE_A8;
 
     PPE_translate_t trans = {.x = dsc->mask_area->x1, .y = dsc->mask_area->y1};
-    PPE_ERR err = PPE_blend(&source, &target, &trans);
+    PPE_ERR err = PPE_blend_lvgl(&source, &target, &trans);
     if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
