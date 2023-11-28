@@ -36,6 +36,11 @@ Convert pictures in various formats into RGB raw pictures
 - BINARY : Use one bit for a pixel.
 
 
+## Font bin generate
+
+### Configuration
+
+### Configuration
 
 ##  Packing a filesystem image
 * Copy all the generated bin files to the folder ```\src\app\dashboard\application\root_image\root```.
