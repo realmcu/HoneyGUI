@@ -52,7 +52,7 @@ function led1OnFunc(params) {
 ```eval_rst
 .. raw:: html
 
-    <iframe src="https://rtk168-my.sharepoint.com/personal/triton_yu_rtk168_com/_layouts/15/embed.aspx?UniqueId=8ef63f88-8aac-41f2-b57d-172e3a68558c&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="tab jumping.webm"></iframe>
+  <iframe src="https://drive.google.com/file/d/15Y4EEu80GzwjadqK78vbQ3xBi2vgxf-k/preview" width="640" height="480" allow="autoplay"></iframe>
 ```
 
 - On line 425 ~ 431 of the file ```gui_engine\example\screen_480_480\root\app\box\box.js```, it registers a function that will be triggered by the press gesture of a button widget called ```icon123```.
