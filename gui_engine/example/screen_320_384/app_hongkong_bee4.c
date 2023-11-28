@@ -73,6 +73,31 @@ static void app_home_ui_design(gui_app_t *app)
     design_tab_breath(tab_breath);
     design_tab_sleep(tab_sleep);
 
-
 }
+
+uint8_t resource_root[1024 * 1024 * 20];
+static int app_init(void)
+{
+#if defined _WIN32
+    int fd;
+    fd = open("./gui_engine/example/screen_320_384/root_image_hongkong_bee4/root(0x4400000).bin", 0);
+    if (fd > 0)
+    {
+        printf("open root(0x4400000).bin Successful!\n");
+        read(fd, resource_root, 1024 * 1024 * 20);
+    }
+    else
+    {
+        printf("open root(0x4400000).bin Fail!\n");
+        printf("open root(0x4400000).bin Fail!\n");
+        printf("open root(0x4400000).bin Fail!\n");
+        return 0;
+    }
+#endif
+    rtgui_server_init();
+    gui_app_startup(get_app_hongkong());
+    return 0;
+}
+
+GUI_INIT_APP_EXPORT(app_init);
 
