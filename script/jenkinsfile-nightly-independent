@@ -19,9 +19,9 @@ def emptyFolder(folderName){
     }
 }
 
-BRANCH_NAME = "gui-engine-master"
+BRANCH_NAME = "guiEngine-master"
 def COV_VIEW_MAP = [
-    "gui-engine-master":[
+    "guiEngine-master":[
         "project":"HoneyGui",
         "stream":"gui-master",
         "view_id":"-1"
@@ -225,7 +225,7 @@ timestamps{
                                 env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\master.xml"
                                 withCoverityEnv(coverityToolName: 'default', connectInstance: 'BT-Coverity'){
                                     // run cov-build capture command
-                                    bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType gui-engine-master"
+                                    bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-master"
 
                                     // run cov-analyze command
                                     bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true"
