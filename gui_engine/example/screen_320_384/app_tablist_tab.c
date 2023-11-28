@@ -6,9 +6,9 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
+#include "gui_img.h"
 #include <gui_win.h>
-
+#include "gui_obj.h"
 #define APP_OFFSET_X 9
 #define APP_OFFSET_Y 4
 #define RECT_OFFSET_X 5

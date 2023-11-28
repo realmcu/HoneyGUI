@@ -10,10 +10,9 @@
 #include "gui_tab.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
 #include "gui_switch.h"
 #include "gui_canvas.h"
-
+#include "gui_components_init.h"
 static void app_home_ui_design(gui_app_t *app);
 gui_tabview_t *home_tab;
 
@@ -73,8 +72,8 @@ static void app_home_ui_design(gui_app_t *app)
     design_tab_breath(tab_breath);
     design_tab_sleep(tab_sleep);
 
-}
 
+}
 uint8_t resource_root[1024 * 1024 * 20];
 static int app_init(void)
 {
@@ -95,7 +94,7 @@ static int app_init(void)
     }
 #endif
     rtgui_server_init();
-    gui_app_startup(get_app_hongkong());
+    gui_app_startup(get_app_home());
     return 0;
 }
 

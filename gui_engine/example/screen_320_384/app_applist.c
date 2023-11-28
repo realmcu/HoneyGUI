@@ -10,7 +10,6 @@
 #include "gui_tab.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
 #include "gui_switch.h"
 #include "gui_canvas.h"
 #include "gui_img.h"
@@ -43,21 +42,21 @@ static void app_applist_ui_design(gui_app_t *app)
 {
     gui_log("app_applist_ui_design\n");
 
-    gui_magic_img_t *applist0 = gui_img_creat_from_mem(&(app->screen), "applist",
-                                                       APPLIST_ADDRESS_BOOK_BIN, 160 - 36, 192 - 36, 0, 0);
+    gui_img_t *applist0 = gui_img_create_from_mem(&(app->screen), "applist",
+                                                  APPLIST_ADDRESS_BOOK_BIN, 160 - 36, 192 - 36, 0, 0);
 
-    gui_magic_img_t *applist1 = gui_img_creat_from_mem(applist0, "applist", APPLIST_BPM_BIN, r,
-                                                       0, 0, 0);
-    gui_magic_img_t *applist2 = gui_img_creat_from_mem(applist0, "applist",
-                                                       APPLIST_AIR_PRESSURE_BIN, round(r * cos60), round(r * sin60), 0, 0);
-    gui_magic_img_t *applist3 = gui_img_creat_from_mem(applist0, "applist",
-                                                       APPLIST_ALARM_CLOCK_BIN, -round(r * cos60), round(r * sin60), 0, 0);
-    gui_magic_img_t *applist4 = gui_img_creat_from_mem(applist0, "applist",
-                                                       APPLIST_CALCULATOR_BIN, -r, 0, 0, 0);
-    gui_magic_img_t *applist5 = gui_img_creat_from_mem(applist0, "applist", APPLIST_DANCE_BIN,
-                                                       -round(r * cos60), -round(r * sin60), 0, 0);
-    gui_magic_img_t *applist6 = gui_img_creat_from_mem(applist0, "applist", APPLIST_GPS_BIN,
-                                                       round(r * cos60), -round(r * sin60), 0, 0);
+    gui_img_t *applist1 = gui_img_create_from_mem(applist0, "applist", APPLIST_BPM_BIN, r,
+                                                  0, 0, 0);
+    gui_img_t *applist2 = gui_img_create_from_mem(applist0, "applist",
+                                                  APPLIST_AIR_PRESSURE_BIN, round(r * cos60), round(r * sin60), 0, 0);
+    gui_img_t *applist3 = gui_img_create_from_mem(applist0, "applist",
+                                                  APPLIST_ALARM_CLOCK_BIN, -round(r * cos60), round(r * sin60), 0, 0);
+    gui_img_t *applist4 = gui_img_create_from_mem(applist0, "applist",
+                                                  APPLIST_CALCULATOR_BIN, -r, 0, 0, 0);
+    gui_img_t *applist5 = gui_img_create_from_mem(applist0, "applist", APPLIST_DANCE_BIN,
+                                                  -round(r * cos60), -round(r * sin60), 0, 0);
+    gui_img_t *applist6 = gui_img_create_from_mem(applist0, "applist", APPLIST_GPS_BIN,
+                                                  round(r * cos60), -round(r * sin60), 0, 0);
 
     // gui_img_t *home_bg = gui_img_create_from_mem(&(app->screen), "home_bg", APP_HEART_RATE_BIN, 0,
     //                                                          0, 0, 0);

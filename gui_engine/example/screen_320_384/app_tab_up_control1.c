@@ -1,10 +1,11 @@
 #include "root_image_hongkong_bee4/ui_resource.h"
-#include <gui_magic_img.h>
+#include "gui_img.h"
 #include "gui_switch.h"
 #include "gui_tab.h"
-#include "gui_img_with_animate.h"
-static gui_img_with_animate_t *img;
-static void img_animate(gui_img_with_animate_t *img)
+#include "gui_img.h"
+#include "gui_obj.h"
+static gui_img_t *img;
+static void img_animate(gui_img_t *img)
 {
     gui_log("%f\n", img->animate->progress_percent);
     if (img->animate->progress_percent < 0.5f)
@@ -18,14 +19,14 @@ static void img_animate(gui_img_with_animate_t *img)
     if (img->animate->progress_percent == 1.0f)
     {
         img->animate->current_repeat_count = 0;
-        img->base.base.not_show = true;
+        img->base.not_show = true;
     }
 
 }
 static void reset_animate()
 {
     img->animate->animate = true;
-    img->base.base.not_show = false;
+    img->base.not_show = false;
     img->animate->current_frame = 0;
     img->animate->current_repeat_count = 0;
     img->animate->progress_percent = 0;
@@ -34,65 +35,65 @@ static void reset_animate()
 static void callback_brightness_on()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_BRIGHT_ADJUST_BIN;
+    img->draw_img.data = TEXT_BRIGHT_ADJUST_BIN;
 }
 static void callback_brightness_off()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_BRIGHT_ADJUST_BIN;
+    img->draw_img.data = TEXT_BRIGHT_ADJUST_BIN;
 }
 static void callback_alarm_on()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_ALARM_ON_BIN;
+    img->draw_img.data = TEXT_ALARM_ON_BIN;
 }
 static void callback_alarm_off()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_ALARM_OFF_BIN;
+    img->draw_img.data = TEXT_ALARM_OFF_BIN;
 }
 
 #else
 static void callback_sound_on()
 {
     reset_animate();
-    img->base.draw_img.data = LINGSHENGKAI_BIN;
+    img->draw_img.data = LINGSHENGKAI_BIN;
 }
 static void callback_sound_off()
 {
     reset_animate();
-    img->base.draw_img.data = LINGSHENGGUAN_BIN;
+    img->draw_img.data = LINGSHENGGUAN_BIN;
 }
 static void callback_set_on()
 {
     reset_animate();
-    img->base.draw_img.data = JUYUANMOSHIKAI_BIN;
+    img->draw_img.data = JUYUANMOSHIKAI_BIN;
 }
 static void callback_set_off()
 {
     reset_animate();
-    img->base.draw_img.data = JUYUANMOSHIGUAN_BIN;
+    img->draw_img.data = JUYUANMOSHIGUAN_BIN;
 }
 
 static void callback_lock_on()
 {
     reset_animate();
-    img->base.draw_img.data = SHOUDIANTONGKAI_BIN;
+    img->draw_img.data = SHOUDIANTONGKAI_BIN;
 }
 static void callback_lock_off()
 {
     reset_animate();
-    img->base.draw_img.data = SHOUDIANTONGGUAN_BIN;
+    img->draw_img.data = SHOUDIANTONGGUAN_BIN;
 }
 static void callback_find_off()
 {
     reset_animate();
-    img->base.draw_img.data = NAOZHONGGUAN_BIN;
+    img->draw_img.data = NAOZHONGGUAN_BIN;
 }
 static void callback_find_on()
 {
     reset_animate();
-    img->base.draw_img.data = NAOZHONGKAI_BIN;
+    img->draw_img.data = NAOZHONGKAI_BIN;
 }
 #endif
 void page_tb_up_control1(void *parent)
@@ -111,10 +112,10 @@ void page_tb_up_control1(void *parent)
     gui_switch_t *sw_find = gui_switch_create(parent, 164, 280, 169, 98,
                                               APP_FIND_BIN, APP_FIND_BIN);
 
-    img =  gui_img_with_animate_create(parent, TEXT_BRIGHT_ADJUST_BIN, 0, 0);
-    gui_img_with_animate_set_animate(img, 1000, 1, img_animate, img);
+    img =  gui_img_create_from_mem(parent, 0, TEXT_BRIGHT_ADJUST_BIN, 0, 0, 0, 0);
+    gui_img_set_animate(img, 1000, 1, img_animate, img);
     img->animate->animate = false;
-    img->base.base.not_show = true;
+    img->base.not_show = true;
     gui_obj_add_event_cb(sw_brightness, (gui_event_cb_t)callback_brightness_on, GUI_EVENT_1, NULL);
     gui_obj_add_event_cb(sw_brightness, (gui_event_cb_t)callback_brightness_off, GUI_EVENT_2, NULL);
     //gui_obj_add_event_cb(sw_sound, (gui_event_cb_t)callback_sound_on, GUI_EVENT_1, NULL);

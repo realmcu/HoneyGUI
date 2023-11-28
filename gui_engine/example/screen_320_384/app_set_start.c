@@ -10,11 +10,10 @@
 #include "gui_tab.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
 #include "gui_switch.h"
 #include "gui_canvas.h"
 #include "gui_img.h"
-
+#include "gui_obj.h"
 static void app_set_start_ui_design(gui_app_t *app);
 gui_tabview_t *tablist_tab_v;
 gui_img_t *tablist_set_start;

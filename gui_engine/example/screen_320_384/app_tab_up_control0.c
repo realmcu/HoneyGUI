@@ -1,10 +1,10 @@
 #include "root_image_hongkong_bee4/ui_resource.h"
-#include <gui_magic_img.h>
 #include "gui_switch.h"
 #include "gui_curtain.h"
-#include "gui_img_with_animate.h"
-static gui_img_with_animate_t *img;
-static void img_animate(gui_img_with_animate_t *img)
+#include "gui_img.h"
+#include "gui_obj.h"
+static gui_img_t *img;
+static void img_animate(gui_img_t *img)
 {
     gui_log("%f\n", img->animate->progress_percent);
     if (img->animate->progress_percent < 0.5f)
@@ -18,14 +18,14 @@ static void img_animate(gui_img_with_animate_t *img)
     if (img->animate->progress_percent == 1.0f)
     {
         img->animate->current_repeat_count = 0;
-        img->base.base.not_show = true;
+        img->base.not_show = true;
     }
 
 }
 static void reset_animate()
 {
     img->animate->animate = true;
-    img->base.base.not_show = false;
+    img->base.not_show = false;
     img->animate->current_frame = 0;
     img->animate->current_repeat_count = 0;
     img->animate->progress_percent = 0;
@@ -34,65 +34,65 @@ static void reset_animate()
 static void callback_BT_on()
 {
     reset_animate();
-    img->base.draw_img.data = WURAOKAI_BIN;
+    img->draw_img.data = WURAOKAI_BIN;
 }
 static void callback_BT_off()
 {
     reset_animate();
-    img->base.draw_img.data = WURAOGUAN_BIN;
+    img->draw_img.data = WURAOGUAN_BIN;
 }
 static void callback_charge_on()
 {
     reset_animate();
-    img->base.draw_img.data = JINGYINKAI_BIN;
+    img->draw_img.data = JINGYINKAI_BIN;
 }
 static void callback_charge_off()
 {
     reset_animate();
-    img->base.draw_img.data = JINGYINGUAN_BIN;
+    img->draw_img.data = JINGYINGUAN_BIN;
 }
 
 static void callback_QR_on()
 {
     reset_animate();
-    img->base.draw_img.data = SHIZHONGKAI_BIN;
+    img->draw_img.data = SHIZHONGKAI_BIN;
 }
 static void callback_QR_off()
 {
     reset_animate();
-    img->base.draw_img.data = SHIZHONGGUAN_BIN;
+    img->draw_img.data = SHIZHONGGUAN_BIN;
 }
 
 #else
 static void callback_headset_on()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_HEADSET_CONNECT_BIN;
+    img->draw_img.data = TEXT_HEADSET_CONNECT_BIN;
 }
 static void callback_headset_off()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_HEADSET_DISCONNECT_BIN;
+    img->draw_img.data = TEXT_HEADSET_DISCONNECT_BIN;
 }
 static void callback_disturb_on()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_DISTURB_ON_BIN;
+    img->draw_img.data = TEXT_DISTURB_ON_BIN;
 }
 static void callback_disturb_off()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_DISTURB_OFF_BIN;
+    img->draw_img.data = TEXT_DISTURB_OFF_BIN;
 }
 static void callback_bright_on()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_BRIGHT_SCREEN_ON_BIN;
+    img->draw_img.data = TEXT_BRIGHT_SCREEN_ON_BIN;
 }
 static void callback_bright_off()
 {
     reset_animate();
-    img->base.draw_img.data = TEXT_BRIGHT_SCREEN_OFF_BIN;
+    img->draw_img.data = TEXT_BRIGHT_SCREEN_OFF_BIN;
 }
 #endif
 void page_tb_up_control0(void *parent)
@@ -112,10 +112,10 @@ void page_tb_up_control0(void *parent)
     gui_switch_t *sw_bright         = gui_switch_create(parent, 164, 280, 169, 98,
                                                         APP_BRIGHT_SCREEN_BIN,
                                                         APP_BRIGHT_SCREEN0_BIN);
-    img =  gui_img_with_animate_create(GET_BASE(parent)->parent, TEXT_DISTURB_ON_BIN, 0, 0);
-    gui_img_with_animate_set_animate(img, 1000, 1, img_animate, img);
+    img =  gui_img_create_from_mem(GET_BASE(parent)->parent, 0, TEXT_DISTURB_ON_BIN, 0, 0, 0, 0);
+    gui_img_set_animate(img, 1000, 1, img_animate, img);
     img->animate->animate = false;
-    img->base.base.not_show = true;
+    img->base.not_show = true;
     //gui_obj_add_event_cb(sw_BT, (gui_event_cb_t)callback_BT_on, GUI_EVENT_1, NULL);
     //gui_obj_add_event_cb(sw_BT, (gui_event_cb_t)callback_BT_off, GUI_EVENT_2, NULL);
     //gui_obj_add_event_cb(sw_charge, (gui_event_cb_t)callback_charge_on, GUI_EVENT_1, NULL);

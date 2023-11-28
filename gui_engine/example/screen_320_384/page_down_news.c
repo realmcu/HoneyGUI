@@ -1,6 +1,6 @@
 
 #include "root_image_hongkong_bee4/ui_resource.h"
-#include <gui_magic_img.h>
+#include "gui_img.h"
 #include <gui_curtain.h>
 #include "gui_cardview.h"
 #include "gui_card.h"
@@ -32,49 +32,49 @@ void *card[7] =
 #endif
 void page_down_message_time(void *parent)
 {
-    gui_magic_img_t *health_watch =  gui_img_creat_from_mem(parent, "card_time",
-                                                            card[0],
-                                                            170, 0, 0, 0);
+    gui_img_t *health_watch =  gui_img_create_from_mem(parent, "card_time",
+                                                       card[0],
+                                                       170, 0, 0, 0);
     gui_img_set_opacity(health_watch, 128);
-    gui_magic_img_t *data =  gui_img_creat_from_mem(parent, "data", CARD_DATE_BIN, 25, 14, 0, 0);
+    gui_img_t *data =  gui_img_create_from_mem(parent, "data", CARD_DATE_BIN, 25, 14, 0, 0);
 }
 void page_down_message_health(void *parent)
 {
-    gui_magic_img_t *health_message =  gui_img_creat_from_mem(parent, "health_message",
-                                                              card[1],
-                                                              10, 0, 0, 0);
+    gui_img_t *health_message =  gui_img_create_from_mem(parent, "health_message",
+                                                         card[1],
+                                                         10, 0, 0, 0);
 }
 void page_down_message_weather1(void *parent)
 {
-    gui_magic_img_t *weather_message =  gui_img_creat_from_mem(parent, "weather_message1",
-                                                               card[2],
-                                                               10, 0, 0, 0);
+    gui_img_t *weather_message =  gui_img_create_from_mem(parent, "weather_message1",
+                                                          card[2],
+                                                          10, 0, 0, 0);
 }
 void page_down_message_music(void *parent)
 {
-    gui_magic_img_t *muisc_message =  gui_img_creat_from_mem(parent, "muisc_message",
-                                                             card[3],
-                                                             10, 0, 0, 0);
+    gui_img_t *muisc_message =  gui_img_create_from_mem(parent, "muisc_message",
+                                                        card[3],
+                                                        10, 0, 0, 0);
 }
 void page_down_message_weather2(void *parent)
 {
-    gui_magic_img_t *weather_message =  gui_img_creat_from_mem(parent, "weather_message2",
-                                                               card[4],
-                                                               10, 0, 0, 0);
+    gui_img_t *weather_message =  gui_img_create_from_mem(parent, "weather_message2",
+                                                          card[4],
+                                                          10, 0, 0, 0);
 }
 void page_down_message_mult(void *parent)
 {
-    gui_magic_img_t *muit_message =  gui_img_creat_from_mem(parent, "muit_message",
-                                                            card[5],
-                                                            10, 0, 0, 0);
+    gui_img_t *muit_message =  gui_img_create_from_mem(parent, "muit_message",
+                                                       card[5],
+                                                       10, 0, 0, 0);
 }
 void page_down_message_all(void *parent)
 {
-    gui_magic_img_t *all_app =  gui_img_creat_from_mem(parent, "close",
-                                                       card[6],
-                                                       30, 30, 0, 0);
-    gui_magic_img_t *menu = gui_img_creat_from_mem(parent, "menu", CARD_LIST_BIN, 140, 44, 0,
-                                                   0);
+    gui_img_t *all_app =  gui_img_create_from_mem(parent, "close",
+                                                  card[6],
+                                                  30, 30, 0, 0);
+    gui_img_t *menu = gui_img_create_from_mem(parent, "menu", CARD_LIST_BIN, 140, 44, 0,
+                                              0);
 }
 static gui_cardview_t *cv;
 static void done_cb(gui_curtainview_t *this)
@@ -111,11 +111,11 @@ static void cv_status_cb(gui_cardview_t *this)
 void  page_down_message_design(void *parent)
 {
 #ifdef RTL87x2G
-    gui_magic_img_t *bg = gui_img_creat_from_mem(parent, "bg_up", ZIP_BLACK_BACKGROUND_BIN, 0, 0,
-                                                 0, 0);
+    gui_img_t *bg = gui_img_create_from_mem(parent, "bg_up", ZIP_BLACK_BACKGROUND_BIN, 0, 0,
+                                            0, 0);
 #else
-    gui_magic_img_t *bg = gui_img_creat_from_mem(parent, "bg_up", BLACK_BACKGROUND_BIN, 0, 0, 0,
-                                                 0);
+    gui_img_t *bg = gui_img_create_from_mem(parent, "bg_up", BLACK_BACKGROUND_BIN, 0, 0, 0,
+                                            0);
 #endif
     gui_img_set_opacity(bg, 128);
 

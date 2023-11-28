@@ -10,7 +10,7 @@
 #include "gui_tab.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
+#include "gui_img.h"
 #include "gui_switch.h"
 #include "gui_canvas.h"
 #include "gui_img.h"
