@@ -165,8 +165,8 @@ static void button_prepare(gui_obj_t *obj)
             if (tp->pressed)
             {
 
-                if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                    (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx  + obj->w)) &&
+                    (tp->y >= obj->ay + obj->ty && tp->y <= (obj->ay + obj->ty + obj->h)))
                 {
 
                     if (b->on_pic_addr && b->style == 0)
