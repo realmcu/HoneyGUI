@@ -21,7 +21,7 @@ uint8_t show_tel_number[11];
 void app_cluster_create_main_display(gui_win_t *target_main_display)
 {
     /* set update callback */
-    gui_win_api.set_animate(target_main_display, 1000, -1, paint_main_display_cb, target_main_display);
+    gui_win_set_animate(target_main_display, 1000, -1, paint_main_display_cb, target_main_display);
 
     /* set Image data */
     cluster_background = gui_img_create_from_mem(target_main_display, "cluster_background",

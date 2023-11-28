@@ -24,8 +24,8 @@ uint8_t show_c_tel_number[11];
 void app_cluster_create_connected_display(gui_win_t *target_connected_display)
 {
     /* set update callback */
-    gui_win_api.set_animate(target_connected_display, 1000, -1, paint_connected_display_cb,
-                            target_connected_display);
+    gui_win_set_animate(target_connected_display, 1000, -1, paint_connected_display_cb,
+                        target_connected_display);
 
     /* set Image data */
     cluster_c_background = gui_img_create_from_mem(target_connected_display, "cluster_c_background",

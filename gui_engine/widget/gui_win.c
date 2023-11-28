@@ -84,40 +84,9 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void (onLeft)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
-}
-static void (onRight)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
-}
-static void (onUp)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
-}
-static void (onDown)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
-}
-static void (onPress)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED, parameter);
-}
-static void (onRelease)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_RELEASED, parameter);
-}
-static void (onLong)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, parameter);
-}
-static void (onClick)(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
-}
 
-void win_prepare(gui_obj_t *obj)
+
+static void win_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
@@ -223,18 +192,7 @@ void win_prepare(gui_obj_t *obj)
                                                                                      frame_count));
     }
 }
-gui_api_win_t gui_win_api =
-{
-    .onClick = onClick,
-    .onLong = onLong,
-    .onPress = onPress,
-    .onRelease = onRelease,
-    .onLeft = onLeft,
-    .onRight = onRight,
-    .onUp = onUp,
-    .onDown = onDown,
-    .set_animate = gui_win_set_animate,
-};
+
 
 static void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                          int16_t y, int16_t w, int16_t h)
@@ -262,6 +220,39 @@ void gui_win_set_animate(gui_win_t *o, uint32_t dur, int repeatCount, void *call
     animate->repeatCount = repeatCount;
     animate->p = p;
     ((gui_win_t *)o)->animate = animate;
+}
+
+void gui_win_onLeft(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+}
+void gui_win_onRight(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+}
+void gui_win_onUp(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
+}
+void gui_win_onDown(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
+}
+void gui_win_onPress(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED, parameter);
+}
+void gui_win_onRelease(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_RELEASED, parameter);
+}
+void gui_win_onLong(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, parameter);
+}
+void gui_win_onClick(gui_win_t *b, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
 
 gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t y,

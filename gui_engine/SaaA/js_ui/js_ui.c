@@ -423,7 +423,7 @@ DECLARE_HANDLER(onRelease_win)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_win_api.onRelease((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onRelease((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -451,7 +451,7 @@ DECLARE_HANDLER(onClick_win)
         }
 
         cb_arg->func = args[0];
-        gui_win_api.onClick((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onClick((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -479,7 +479,7 @@ DECLARE_HANDLER(onPress_win)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_win_api.onPress((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onPress((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -537,7 +537,7 @@ DECLARE_HANDLER(onHold_win)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_win_api.onLong((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onLong((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -568,7 +568,7 @@ DECLARE_HANDLER(onLeft_win)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_win_api.onLeft((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onLeft((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -596,7 +596,7 @@ DECLARE_HANDLER(onRight_win)
         }
 
         cb_arg->func = args[0];
-        gui_win_api.onRight((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onRight((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -624,7 +624,7 @@ DECLARE_HANDLER(onUp_win)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_win_api.onUp((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onUp((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -652,7 +652,7 @@ DECLARE_HANDLER(onDown_win)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_win_api.onDown((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_onDown((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
