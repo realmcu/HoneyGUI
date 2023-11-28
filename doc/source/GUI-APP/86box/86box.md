@@ -1,55 +1,72 @@
-##  Demo: Develop a "86Box APP"
-### Introduction
-This example demostrates how to develop a SmartUI 86box APP, from which you can learn and understand the basic methods and processes of developing a ui application.
+#  Demo: Develop a "86Box APP"
+## Introduction
+This example demostrates how to develop a SmartUI 86BOX APP, from which you can learn and understand the basic methods and processes of developing a ui application.
 
 
 ```eval_rst
 .. raw:: html
 
-    <iframe src="https://drive.google.com/file/d/1bYeDFMwqZZv-E_dL26H8uvvoNiRp4x6A/preview" width="640" height="480" allow="autoplay"></iframe>
+    <iframe src="https://drive.google.com/file/d/1W79eozpryLyD1ffKUxHUPL2ZUGMDcSe4/preview" width="640" height="480" allow="autoplay"></iframe>
 ```
 
-### Source File
-To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
+## Source File
+- APP package ```gui_engine\example\screen_480_480\root\app\box```
+- Design project ```RVisualDesigner-v1.0.5.0\Demo\480x480\box\box480x480.rtkprj```
 
+## UI design
+### RVisualDesigner
+- Use RVisualDesigner to design the UI display, you can get detailed usage instructions from ```RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf```
+- Open an already completed project
+  ![Image description](https://foruda.gitee.com/images/1701067827418608218/7c54ffbf_10088396.png "ss")
+- Click Export and Simulate to use this UI.
+  ![Image description](https://foruda.gitee.com/images/1701068361132692754/85acb896_10088396.png "ss")
+  ![Image description](https://foruda.gitee.com/images/1701068989928620648/71684794_10088396.png "ss")
+- What you see is what you get
+  ![Image description](https://foruda.gitee.com/images/1701069129985417739/5558648f_10088396.png "ss")
+- This tool requires adding pictures in advance, and then dragging the widgets in the ```ToolBox``` to the middle screen to lay out the same UI as the current ```Widget tree```.
+## Javascript
+- Non-default control effects in the current version require JavaScript coding to implement, please look forward to subsequent updates.
+- Please refer to the page ```JavaScript syntax``` for specific syntax.
 
-### Two Steps 
-__Step 1:  Declare the app structure__
-
-The app structure saves all the information of ui. Developers should initialize the app structure with the app name and ui design function.
-
-```c
-#include <gui_app.h>
-static void app_calculator_ui_design(gui_app_t *app);
-
-static gui_app_t calculator =
-{
-    .screen =
-    {
-        .name = "calculator",
-    },
-    .ui_design = app_calculator_ui_design,
-};
-
-/*
- * Public API to get app structure
- */
-gui_app_t *get_app_calculator(void)
-{
-    return &calculator;
+### Gestures
+#### Light control switch
+![Image description](https://foruda.gitee.com/images/1701075114325492203/ca9769d1_10088396.png "ss")
+- On line 192 ~ 194 of the file ```gui_engine\example\screen_480_480\root\app\box\box.js```, it registers functions that will be triggered by the turning on and turning off gestures of a switch widget called ```living_switch```.
+```javascript
+sw.getElementById('living_switch')
+sw.onOn(led1OnFunc)
+sw.onOff(led1OffFunc)
+```
+- The function triggered by turning on gesture is ```led1OnFunc```. 
+- Define an instance of GPIO with an index value of 0 and a direction of output. 
+- Use this GPIO to write a 0 value in the function to turn off the light.
+```javascript
+var LED1 = new Gpio(0, 'out');
+function led1OnFunc(params) {
+    if (sleep_flag) {
+        LED1.writeSync(0)
+    }   
 }
 ```
-__Step 2:  Declare the app ui design function__
+#### Tab jumping switch
+```eval_rst
+.. raw:: html
 
-The app ui design function adds all the widgets required to form a complex ui. In this example, we add a window widgets and draw the calculator ui. 
-
-```c
-static void app_calculator_ui_design(gui_app_t *app)
-{
-    gui_win_t *win = gui_win_create(&app->screen, "back_win", 0, 0, gui_get_screen_width(),
-                                    gui_get_screen_height());
-
-    gui_calculator_create(&app->screen, "calculator", 0, 0, 454, 454);
-}
+    <iframe src="https://rtk168-my.sharepoint.com/personal/triton_yu_rtk168_com/_layouts/15/embed.aspx?UniqueId=8ef63f88-8aac-41f2-b57d-172e3a68558c&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create" width="640" height="360" frameborder="0" scrolling="no" allowfullscreen title="tab jumping.webm"></iframe>
 ```
+
+- On line 425 ~ 431 of the file ```gui_engine\example\screen_480_480\root\app\box\box.js```, it registers a function that will be triggered by the press gesture of a button widget called ```icon123```.
+- In the function ```icon123OnPressFunc```, tab jumps to index 0.
+```javascript
+tab.getElementById('tabview0')
+icon.getElementById('icon123')
+function icon123OnPressFunc(params) {
+  //  console.log('iconNromalOnPressFunc')
+    tab.jump(0);
+}
+icon.onPress(icon123OnPressFunc)
+```
+
+
+
 
