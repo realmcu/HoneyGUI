@@ -19,11 +19,11 @@ def emptyFolder(folderName){
     }
 }
 
-BRANCH_NAME = "gui-engine-test-chip"
+BRANCH_NAME = "gui-engine-master"
 def COV_VIEW_MAP = [
-    "gui-engine-test-chip":[
+    "gui-engine-master":[
         "project":"HoneyGui",
-        "stream":"gui-engine-test-chip",
+        "stream":"gui-master",
         "view_id":"-1"
     ]
 ]
@@ -211,7 +211,7 @@ timestamps{
                         do_code_checkout("${Manifest_Home}", env['GIT_URL'], "HoneyRepo/manifest", "master", "","master")
 
                         // to do, nightly need to update manifest according RD's requirement
-                        all_projects_in_manifest = get_project_info_from_manifest("${Manifest_Home}\\guiEngine\\test-chip.xml")
+                        all_projects_in_manifest = get_project_info_from_manifest("${Manifest_Home}\\guiEngine\\master.xml")
                         check_out_project(all_projects_in_manifest)
                         emptyFolder(iDir)
                         dir("${HoneyRepo_Home}\\${BRANCH_NAME}"){
@@ -222,10 +222,10 @@ timestamps{
                                 }
                                 env['COVERITY_UNSUPPORTED']=1
                                 env['HoneyRepo'] = "${WORKSPACE}\\${HoneyRepo_Home}"
-                                env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\test-chip.xml"
+                                env['manifest'] = "${WORKSPACE}\\${Manifest_Home}\\guiEngine\\master.xml"
                                 withCoverityEnv(coverityToolName: 'default', connectInstance: 'BT-Coverity'){
                                     // run cov-build capture command
-                                    bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType guiEngine-test-chip"
+                                    bat "cov-build --dir ${WORKSPACE}\\${iDir} --fs-capture-search ${WORKSPACE}\\${HoneyRepo_Home}\\${BRANCH_NAME} python script/nightly-build.py --chipType gui-engine-master"
 
                                     // run cov-analyze command
                                     bat "cov-analyze --dir ${WORKSPACE}\\${iDir} --security --hfa --enable INTEGER_OVERFLOW --strip-path ${WORKSPACE}\\${HoneyRepo_Home} -co OVERRUN:check_nonsymbolic_dynamic:true"
