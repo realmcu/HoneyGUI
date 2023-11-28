@@ -51,19 +51,6 @@ static void switch_record_file_delete_text(void *obj)
     // set delete text
 }
 
-static void page_record_files_update_cb(void *obj)
-{
-    gui_log("page_record_files_update_cb\n");
-    page_record_files->get_yend = 0;
-}
-
-static void grid_record_files_update_cb(void *obj)
-{
-    gui_log("grid_record_files_update_cb\n");
-    grid_record_files->row = record_file_num + 1;
-    grid_record_files->base.h = grid_record_files->row * grid_record_files->gap_row_scale;
-}
-
 static void switch_record_files_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_record_files_touch_cb, obj = 0x%x\n", obj);
@@ -205,10 +192,11 @@ static void win_add_record_files_touch_cb(void *obj, gui_event_t event)
         gui_log("win_add_record_files_touch_cb scroll_text_record_files = 0x%x, num = %d\n",
                 scroll_text_record_files[record_file_num], record_file_num);
 
-        //page_record_files update
-        //gui_obj_set_update_att(page_record_files, 0xffffffff, true, NULL);
-        //gui_obj_set_update_att(grid_record_files, 0xffffffff, true, NULL);
         record_file_num++;
+
+        //update page and grid attribute
+        page_record_files->get_yend = 0;
+        grid_record_files->row = record_file_num + 1;
     }
 
 }
@@ -255,11 +243,6 @@ void design_curtain_record_files(void *parent)
                  strlen(string_title_record_files), FONT_H_32);
 
     grid_record_files = gui_grid_create(page_record_files, 83, 111, 1, 1, 50, 64 + 18);
-    //gui_obj_add_update_cb(page_record_files, (gui_update_cb_t)page_record_files_update_cb, 0xFFFFFFFF,
-    //                      false, NULL);
-    //gui_obj_add_update_cb(grid_record_files, (gui_update_cb_t)grid_record_files_update_cb, 0xFFFFFFFF,
-    //                      false, NULL);
-
     //touch "录音文件" to add a record file
     example_add_record_files();
 

@@ -49,12 +49,11 @@ static void switch_record_play_pause_touch_cb(void *obj, gui_event_t event)
 
 }
 
-static void scroll_text_record_play_title_update_cb(void *obj)
+static void scroll_text_record_play_title_animate_cb(void *obj)
 {
-    gui_log("scroll_text_record_play_title_update_cb\n");
+    gui_log("scroll_text_record_play_title_animate_cb\n");
 
-    gui_scroll_text_t *this = (gui_scroll_text_t *)obj;
-    gui_switch_t *file = this->base.base.update->user_data;
+    gui_switch_t *file = (gui_switch_t *)obj;
     gui_scroll_text_t *file_name = NULL;
 
     gui_list_t *node = NULL;
@@ -68,17 +67,18 @@ static void scroll_text_record_play_title_update_cb(void *obj)
         }
     }
 
-    gui_log("text_record_play_time_update_cb obj = 0x%x\n", obj);
-    gui_log("text_record_play_time_update_cb title = 0x%x\n", file_name);
+    gui_log("scroll_text_record_play_title_animate_cb obj = 0x%x\n", obj);
+    gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", file_name);
 
     char *string_title = file_name->base.utf_8;
-    gui_scrolltext_text_set(this, string_title, "rtk_font_mem", 0xffffffff, strlen(string_title),
+    gui_scrolltext_text_set(scroll_text_record_play_title, string_title, "rtk_font_mem", 0xffffffff,
+                            strlen(string_title),
                             FONT_H_32);
 }
 
-static void text_record_play_time_update_cb(void *obj)
+static void text_record_play_time_animate_cb(void *obj)
 {
-    gui_log("text_record_play_time_update_cb\n");
+    gui_log("text_record_play_time_animate_cb\n");
 }
 
 void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_file)
@@ -107,13 +107,15 @@ void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_fil
     gui_scrolltext_scroll_set(scroll_text_record_play_title, SCROLL_X, 0, 0, 5000, 0);
     gui_scrolltext_text_set(scroll_text_record_play_title, "录音文件123456", "rtk_font_mem",
                             0xffffffff, strlen("录音文件123456"), FONT_H_32);
-    //gui_obj_add_update_cb(scroll_text_record_play_title, scroll_text_record_play_title_update_cb,
-    //                      0xffffffff, true, selected_record_file);
+    gui_text_set_animate(scroll_text_record_play_title, 1000, 2,
+                         scroll_text_record_play_title_animate_cb, selected_record_file);
 
     char *string_record_play_time = "00:00:00/00:00:00";
     text_record_play_time = gui_text_create(parent, "text_record_play_time", 108, 281, 248, FONT_H_32);
     gui_text_set(text_record_play_time, string_record_play_time, "rtk_font_mem", 0xffffffff,
                  strlen(string_record_play_time), FONT_H_32);
-    //gui_obj_add_update_cb(text_record_play_time, text_record_play_time_update_cb, 0xffffffff, false,
-    //                      NULL);
+    gui_text_set_animate(text_record_play_time, 1000, 0, text_record_play_time_animate_cb,
+                         text_record_play_time);
 }
+
+

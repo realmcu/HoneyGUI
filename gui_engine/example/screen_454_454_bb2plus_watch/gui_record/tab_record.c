@@ -63,6 +63,23 @@ void reset_record_time(void)
     record_time_display[10] = '\0';
 }
 
+static void text_record_tips_animate_cb(void *obj)
+{
+    gui_text_t *this = (gui_text_t *)obj;
+    gui_log("text_record_tips_animate_cb\n");
+    gui_log("text_record_tips_animate_cb, os_time_ms = %d\n", gui_ms_get());
+    gui_log("text_record_tips_animate_cb, current_frame = %d, repeate_count = %d, progress_percent = %f\n",
+            this->animate->current_frame, this->animate->current_repeat_count, this->animate->progress_percent);
+
+    //update every 7 frame(about 210 ms)
+    if (this->animate->current_frame % 7 == 0)
+    {
+        gui_log("text_record_tips_animate_cb update record time\n");
+        string_record_time = update_record_time();
+        //todo: update record time
+    }
+}
+
 static void switch_record_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_record_touch_cb\n");
@@ -83,7 +100,8 @@ static void switch_record_touch_cb(void *obj, gui_event_t event)
         gui_text_move(text_record_tips, 163, 314);
         gui_text_set(text_record_tips, string_record_tips, "rtk_font_mem", 0xffffffff,
                      strlen(string_record_tips), FONT_H_32);
-        //gui_obj_set_update_att(text_record_tips, 250, false, NULL);
+        //shut down animate
+        text_record_tips->animate->animate = false;
         reset_record_time();
 
         //todo: add record stop action
@@ -106,7 +124,7 @@ static void switch_record_touch_cb(void *obj, gui_event_t event)
         gui_text_set(text_record_tips, string_record_time, "rtk_font_mem", 0xffffffff,
                      strlen(string_record_time), FONT_H_32);
         //gui_obj_set_update_att(text_record_tips, 250, true, NULL);
-
+        gui_text_set_animate(text_record_tips, 1000, -1, text_record_tips_animate_cb, text_record_tips);
 
         //todo: add record start action
         break;
@@ -133,15 +151,6 @@ static void curtainview_set_done_cb_record(gui_curtainview_t *this)
         //switch_record->base.not_show = false;
     }
 }
-
-static void text_record_tips_update_cb(void *obj)
-{
-    gui_log("text_record_tips_update_cb\n");
-    //todo: update record time
-    string_record_time = update_record_time();
-
-}
-
 void design_tab_record(void *parent)
 {
     switch_record = gui_switch_create(parent, 131, 78, 192, 192, ICON_RECORD_START_BIN,
@@ -163,9 +172,9 @@ void design_tab_record(void *parent)
                                        strlen(string_record_tips) / FONT_CHINESE_BYTE * FONT_CHINESE_W, FONT_H_32);
     gui_text_set(text_record_tips, string_record_tips, "rtk_font_mem", 0xffffffff,
                  strlen(string_record_tips), FONT_H_32);
-    //add update callback, interval 0 for continous update, 0xffffffff for one-time update.
-    //gui_obj_add_update_cb(text_record_tips, (gui_update_cb_t)text_record_tips_update_cb, 0xFFFFFFFF,
-    //                      false, NULL);
+    //set animate for updating display string of text_record_tips
+    gui_text_set_animate(text_record_tips, 1000, -1, text_record_tips_animate_cb, text_record_tips);
+    text_record_tips->animate->animate = false;
 
     img_slide_record = gui_img_create_from_mem(parent, "img_slide_record", ICON_UP_SLIDE_BIN, 88, 373,
                                                277, 81);

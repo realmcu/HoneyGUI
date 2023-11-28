@@ -16,6 +16,7 @@ extern "C" {
 #define FONT_NUM_ALPHA_W        16
 #define FONT_H_32               32
 #define FONT_BIN                SIMKAI_SIZE32_BITS1_FONT_BIN
+#define GUI_FRAME               30
 
 
 void *get_app_watch_ui(void);

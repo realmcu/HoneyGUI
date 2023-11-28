@@ -10,9 +10,6 @@
 #include "gui_tabview.h"
 #include "gui_obj.h"
 
-gui_obj_t *obj_stack[GUI_OBJ_STACK_SIZE_MAX] = {NULL};
-int8_t obj_stack_index = 0;
-
 gui_win_t *win_confirm = NULL;
 gui_text_t *text_confirm = NULL;
 gui_switch_t *switch_confirm_yes = NULL;
@@ -50,36 +47,6 @@ void set_confirm_text(void *text_display, void *obj)
 {
     win_confirm_action.confirm_text_display = text_display;
     win_confirm_action.text_display_obj = obj;
-}
-
-void push_current_widget(void *obj)
-{
-    if (obj_stack_index < GUI_OBJ_STACK_SIZE_MAX)
-    {
-        obj_stack[obj_stack_index] = (gui_obj_t *)obj;
-    }
-    else
-    {
-        GUI_ASSERT(obj_stack_index >= GUI_OBJ_STACK_SIZE_MAX);
-    }
-    obj_stack_index++;
-    gui_log("push_current_widget: obj_stack = 0x%x obj_stack_index = %d\n",
-            obj_stack[obj_stack_index - 1], obj_stack_index);
-}
-
-gui_obj_t *pop_current_widget(void)
-{
-    obj_stack_index--;
-    if (obj_stack_index < GUI_OBJ_STACK_SIZE_MAX && obj_stack_index >= 0)
-    {
-        gui_log("pop_current_widget obj_stack = %x, obj_stack_index = %d\n", obj_stack[obj_stack_index],
-                obj_stack_index);
-        return obj_stack[obj_stack_index];
-    }
-    else
-    {
-        GUI_ASSERT(obj_stack_index < 0);
-    }
 }
 
 static void switch_confirm_yes_touch_cb(void *obj, gui_event_cb_t event)
