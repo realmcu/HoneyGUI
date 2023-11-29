@@ -1,60 +1,55 @@
-# tabview
+# Tabview
+
+## Overview
+The gui_tabview widget is the container to store and depends on user selection to change the tab for different functions. As in Figure-1, the "Green Area" represents the actual display region, and there're five rectangles with the red dashed line as the whole gui_tabview area. And each rectangle is the gui_tab widget. The "idx" stands for the index on the X-axis, and the "idy" stands for the index on Y-axis.
+
+<br>
+<center><img src="https://foruda.gitee.com/images/1700117108278339023/652a6a38_10641540.png" /></center>
+<center>Figure-1</center>
+<br>
+
+## Usage
+
+### Create tabview widget
+If developers need to construct a container to house tabs, they may utilize the [gui_tabview_create(parent, filename, x, y, w, h)](#gui_tabview_create) function to establish a tabview.
+
+### Switch the gui_tab
+
+[gui_tabview_jump_tab(parent_tabview, idx, idy)](#gui_tabview_create ) is used to set up a jump to a specified tab, and through this function, users can quickly locate the desired tab.
+
+### Set tabview style
+Developers can use [gui_tabview_set_style(this, style)](#gui_tabview_create) to set the desired style of tabview. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
+
+```c
+typedef enum gui_tab_style
+{
+    CLASSIC,
+    REDUCTION,
+    FADE,
+    REDUCTION_FADE,
+    STACKING,
+} SLIDE_STYLE;
+```
+
+## Example
 
 Please refer to the page below:
 
-
-
 ```eval_rst
-`tab`_    
+`tab`_
 
 .. _tab: gui_tab.html
-```
 
 ```
-#include <gui_tabview.h>
-#include <gui_obj.h>
-#include <gui_win.h>
-#include "root_image_hongkong/ui_resource.h"
-#include <gui_app.h>
-#include "gui_tab.h"
-#include <gui_magic_img.h>
-#include "app_hongkong.h"
 
-
-gui_tabview_t *tv;
-
-static void tab_ui_design(gui_app_t *app)
-{
-    gui_log("tab_ui_design\n");
-
-    tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-
-    gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
-    gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
-    gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 4, 0);
-    gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 3, 0);
-    page_tb_clock(tb_clock);
-    gui_tab_set_style(tb_clock,REDUCTION);
-    page_tb_activity(tb_activity);
-    gui_tab_set_style(tb_activity,REDUCTION);
-    page_tb_heart(tb_heart);
-    gui_tab_set_style(tb_heart,REDUCTION);
-    page_tb_weather(tb_weather);
-    page_tb_music(tb_music);
-}
-
-
-
-```
+<span id="gui_tabview_create">
 
 ## API
+
+</span>
 
 ```eval_rst
 
 .. doxygenfile:: gui_tabview.h
 
 ```
-
-
-

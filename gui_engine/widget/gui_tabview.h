@@ -79,7 +79,7 @@ typedef struct gui_tabview
  *============================================================================*/
 
 /**
- * @brief create a tabview widget,which can nest tabs.
+ * @brief create a tabview widget, which can nest tabs.
  * @param parent the father widget it nested in.
  * @param filename this tabview widget's name.
  * @param x the X-axis coordinate relative to parent widget
