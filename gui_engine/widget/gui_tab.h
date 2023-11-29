@@ -81,7 +81,7 @@ typedef struct _gui_tab_stacking_t
  *============================================================================*/
 
 /**
- * @brief create a tab widget,which should be nested in a tabview.
+ * @brief create a tab widget, which should be nested in a tabview.
  * @param parent the father widget it nested in.
  * @param filename this tab widget's name.
  * @param x the X-axis coordinate of the widget.
