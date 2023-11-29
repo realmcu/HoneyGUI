@@ -343,14 +343,9 @@ function testFrame(params) {
 	}
      
  }
-function swTest(params) {
-    // console.log('swCurtain')
-     seekbar.getElementById('cool_bar')
-     seekbar.palyAnimate()
- }
+ 
 function acOnFunc(params) {
    // console.log('heatingFunc')
-   //swTest()
     if (!acOnOffStatus) {
         
     
@@ -398,23 +393,22 @@ var testAnimateTiming = {
     to: 0
 }
 var curtain_open = 0;
+seekbar.getElementById('curtain_bar')
 function curtainFrame(params) {
 
    // console.log('curtainFrame')
-    seekbar.getElementById('curtain_bar')
-    var animate = seekbar.getAttribute("animate")
-   // console.log(animate.progress)
+    
+     animate= seekbar.animateProgress()
     if (curtain_open==1) {
-        seekbar.setAttribute("progress", 1.0-animate.progress)
+        seekbar.setAttribute("progress", 1.0-animate)
     } else {
-        seekbar.setAttribute("progress", animate.progress)
+        seekbar.setAttribute("progress", animate)
     }
     
 }
 
 function swCurtain(params) {
    // console.log('swCurtain')
-    seekbar.getElementById('curtain_bar')
     seekbar.palyAnimate()
     if (curtain_open==1) {
         curtain_open = 0;
@@ -456,21 +450,15 @@ function icon1234OnPressFunc(params) {
     tab.jump(4);
 }
 icon.onPress(icon1234OnPressFunc)
-seekbar.getElementById('curtain_bar')
 seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
 
-seekbar.getElementById('cool_bar')
-seekbar.setAnimate(testFrame, testAnimateTiming)
-//sw.getElementById('open_switch')
-//sw.onOn(swCurtain)
-//sw.onOff(swCurtain)
-//sw.getElementById('curtain_on_off_switch')
-//sw.onOn(swCurtain)
-//sw.onOff(swCurtain)
-//sw.getElementById('close_switch')
-//sw.onOn(swCurtain)
-//sw.onOff(swCurtain)
-
-
-
+sw.getElementById('open_switch')
+sw.onOn(swCurtain)
+sw.onOff(swCurtain)
+sw.getElementById('curtain_on_off_switch')
+sw.onOn(swCurtain)
+sw.onOff(swCurtain)
+sw.getElementById('close_switch')
+sw.onOn(swCurtain)
+sw.onOff(swCurtain)
 

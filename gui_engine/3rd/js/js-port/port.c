@@ -36,7 +36,7 @@ extern void jmem_heap_stats_print(void);
  */
 void jerry_port_fatal(jerry_fatal_code_t code)
 {
-    gui_log("jerry_port_fatal");
+    gui_log("jerry fatal error code:%d", code);
     while (1);
 }
 

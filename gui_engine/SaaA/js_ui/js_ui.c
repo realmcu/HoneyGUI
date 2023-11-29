@@ -4,7 +4,7 @@
 
 static void js_cb_with_args(gui_obj_t *obj)
 {
-    gui_log("enter js_cb_with_args\n");
+    //gui_log("enter js_cb_with_args\n");
     cb_arg_t *args = NULL;
     gui_event_dsc_t *event = obj->event_dsc;
     int event_code = 0;
@@ -35,7 +35,7 @@ static void js_cb_with_args(gui_obj_t *obj)
 
 static void js_cb_with_args_animate(cb_arg_t *args)
 {
-    gui_log("enter js_cb_with_args_animate\n");
+    //gui_log("enter js_cb_with_args_animate\n");
     if (args == NULL)
     {
         return;
@@ -66,10 +66,10 @@ DECLARE_HANDLER(write)
     jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
     if (txtbox)
     {
-        jerry_value_t s = jerry_value_to_string(args[0]);//gui_log("jerryenter1\n");
-        jerry_length_t length = jerry_get_utf8_string_length(s); //gui_log("jerryenter2\n");
-        jerry_char_t *strbuf1 = gui_malloc(length + 1); //gui_log("jerryenter3\n");
-        jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); //gui_log("jerryenter4\n");
+        jerry_value_t s = jerry_value_to_string(args[0]);////gui_log("jerryenter1\n");
+        jerry_length_t length = jerry_get_utf8_string_length(s); ////gui_log("jerryenter2\n");
+        jerry_char_t *strbuf1 = gui_malloc(length + 1); ////gui_log("jerryenter3\n");
+        jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); ////gui_log("jerryenter4\n");
         strbuf1[length] = '\0';
         gui_free(txtbox->utf_8);
         gui_text_set(txtbox, (void *)strbuf1, txtbox->text_type, txtbox->color, length,
@@ -87,7 +87,7 @@ DECLARE_HANDLER(jump)
     }
     gui_obj_t *txtbox = NULL;
     jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
-    //gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
+    ////gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
     if (txtbox)
     {
         gui_tabview_jump_tab((void *)txtbox, jerry_get_number_value(args[0]), 0);
@@ -111,7 +111,7 @@ void gui_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **o
 }
 DECLARE_HANDLER(getElementById)
 {
-    gui_log("enter getElementById\n");
+    //gui_log("enter getElementById\n");
     if (args_cnt != 1 || !jerry_value_is_string(args[0]))
     {
         return jerry_create_undefined();
@@ -122,9 +122,9 @@ DECLARE_HANDLER(getElementById)
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
     gui_obj_t *widget = NULL;
     char *a = js_value_to_string(args[0]);
-    gui_tree_get_widget_by_name(&app->screen, a, &widget); gui_log("name:%s,widget:%p\n", a, widget);
+    gui_tree_get_widget_by_name(&app->screen, a, &widget); //gui_log("name:%s,widget:%p\n", a, widget);
     gui_free(a);
-    //gui_log("getElementById:%x\n",widget);
+    ////gui_log("getElementById:%x\n",widget);
     jerry_set_object_native_pointer(this_value, widget, NULL);
     jerry_release_value(global_obj);
     jerry_release_value(app_property);
@@ -297,16 +297,16 @@ DECLARE_HANDLER(setAttribute)
     }
     gui_img_t *img = NULL;
     jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
-    //gui_log("jerry_get_object_native_pointer = %s",img->base.name);
+    ////gui_log("jerry_get_object_native_pointer = %s",img->base.name);
     if (img)
     {
-        jerry_value_t s = jerry_value_to_string(args[0]);//gui_log("jerryenter1\n");
-        jerry_length_t length = jerry_get_utf8_string_length(s); //gui_log("jerryenter2\n");
-        jerry_char_t *strbuf1 = gui_malloc(length + 1); //gui_log("jerryenter3\n");
-        jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); //gui_log("jerryenter4\n");
+        jerry_value_t s = jerry_value_to_string(args[0]);////gui_log("jerryenter1\n");
+        jerry_length_t length = jerry_get_utf8_string_length(s); ////gui_log("jerryenter2\n");
+        jerry_char_t *strbuf1 = gui_malloc(length + 1); ////gui_log("jerryenter3\n");
+        jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); ////gui_log("jerryenter4\n");
         strbuf1[length] = '\0';
         gui_img_set_attribute(img, (void *)strbuf1, NULL, jerry_get_number_value(args[1]),
-                              jerry_get_number_value(args[2]));//gui_log("jerryenter5\n");
+                              jerry_get_number_value(args[2]));////gui_log("jerryenter5\n");
         jerry_release_value(s);
     }
     return jerry_create_undefined();
@@ -315,13 +315,13 @@ DECLARE_HANDLER(setAttribute)
 
 DECLARE_HANDLER(onClick)
 {
-    ////gui_log("enter onclick\n");
+    //////gui_log("enter onclick\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
         memset(cb_arg, 0, sizeof(cb_arg_t));
@@ -343,16 +343,16 @@ DECLARE_HANDLER(onClick)
 }
 DECLARE_HANDLER(onPress)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -371,16 +371,16 @@ DECLARE_HANDLER(onPress)
 }
 DECLARE_HANDLER(onHold)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -402,16 +402,16 @@ DECLARE_HANDLER(onHold)
 
 DECLARE_HANDLER(onRelease_win)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -430,13 +430,13 @@ DECLARE_HANDLER(onRelease_win)
 }
 DECLARE_HANDLER(onClick_win)
 {
-    ////gui_log("enter onclick\n");
+    //////gui_log("enter onclick\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
         memset(cb_arg, 0, sizeof(cb_arg_t));
@@ -458,16 +458,16 @@ DECLARE_HANDLER(onClick_win)
 }
 DECLARE_HANDLER(onPress_win)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -486,16 +486,16 @@ DECLARE_HANDLER(onPress_win)
 }
 DECLARE_HANDLER(onPress_switch)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -516,16 +516,16 @@ DECLARE_HANDLER(onPress_switch)
 }
 DECLARE_HANDLER(onHold_win)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -547,16 +547,16 @@ DECLARE_HANDLER(onHold_win)
 
 DECLARE_HANDLER(onLeft_win)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -575,13 +575,13 @@ DECLARE_HANDLER(onLeft_win)
 }
 DECLARE_HANDLER(onRight_win)
 {
-    ////gui_log("enter onclick\n");
+    //////gui_log("enter onclick\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
         memset(cb_arg, 0, sizeof(cb_arg_t));
@@ -603,16 +603,16 @@ DECLARE_HANDLER(onRight_win)
 }
 DECLARE_HANDLER(onUp_win)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *) &obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -631,16 +631,16 @@ DECLARE_HANDLER(onUp_win)
 }
 DECLARE_HANDLER(onDown_win)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -660,16 +660,16 @@ DECLARE_HANDLER(onDown_win)
 
 DECLARE_HANDLER(onRelease)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -689,16 +689,16 @@ DECLARE_HANDLER(onRelease)
 
 DECLARE_HANDLER(onOn)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -717,16 +717,16 @@ DECLARE_HANDLER(onOn)
 }
 DECLARE_HANDLER(onOff)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -746,16 +746,16 @@ DECLARE_HANDLER(onOff)
 #include "gui_seekbar.h"
 DECLARE_HANDLER(onpress_seekbar)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -774,16 +774,16 @@ DECLARE_HANDLER(onpress_seekbar)
 }
 DECLARE_HANDLER(onpressing_seekbar)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -802,16 +802,16 @@ DECLARE_HANDLER(onpressing_seekbar)
 }
 DECLARE_HANDLER(onrelease_seekbar)
 {
-    //gui_log("enter onPress\n");
+    ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
     {
         //js_add_event_listener(this_value, "onclick", args[0]);
         gui_obj_t *obj = NULL;
         jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-        ////gui_log("enter onclick %s\n",obj->name);
+        //////gui_log("enter onclick %s\n",obj->name);
 
         cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
-        //gui_log("cb_arg:%x\n", cb_arg);
+        ////gui_log("cb_arg:%x\n", cb_arg);
         memset(cb_arg, 0, sizeof(cb_arg_t));
         cb_arg->args_count = args_cnt - 1;
         if (cb_arg->args_count)
@@ -846,7 +846,7 @@ static void gui_seekbar_set_animate(gui_seekbar_t *o, uint32_t dur, int repeatCo
 }
 DECLARE_HANDLER(play_animate_seekbar)
 {
-    gui_log("enter play_animate_seekbar\n");
+    //gui_log("enter play_animate_seekbar\n");
 
     {
         gui_obj_t *obj = NULL;
@@ -862,7 +862,7 @@ DECLARE_HANDLER(play_animate_seekbar)
 }
 DECLARE_HANDLER(play_animate_text)
 {
-    gui_log("enter play_animate_text\n");
+    //gui_log("enter play_animate_text\n");
 
     {
         gui_obj_t *obj = NULL;
@@ -878,7 +878,7 @@ DECLARE_HANDLER(play_animate_text)
 }
 DECLARE_HANDLER(setAnimate_seekbar)
 {
-    gui_log("enter setAnimate_seekbar\n");
+    //gui_log("enter setAnimate_seekbar\n");
     if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_object(args[1]))
     {
         gui_obj_t *obj = NULL;
@@ -911,7 +911,7 @@ DECLARE_HANDLER(setAnimate_seekbar)
 }
 DECLARE_HANDLER(setAnimate_text)
 {
-    gui_log("enter setAnimate_text\n");
+    //gui_log("enter setAnimate_text\n");
     if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_object(args[1]))
     {
         gui_obj_t *obj = NULL;
@@ -944,7 +944,7 @@ DECLARE_HANDLER(setAnimate_text)
 }
 DECLARE_HANDLER(pause_animate_text)
 {
-    gui_log("enter pause_animate_text\n");
+    //gui_log("enter pause_animate_text\n");
 
     gui_obj_t *obj = NULL;
     jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
@@ -980,7 +980,7 @@ DECLARE_HANDLER(win_getAttribute)
 }
 DECLARE_HANDLER(seekbar_getAttribute)
 {
-    //gui_log("enter onPress\n");
+    //gui_log("enter seekbar_getAttribute1\n");
     if (args_cnt >= 1 && jerry_value_is_string(args[0]))
     {
         char *a = js_value_to_string(args[0]);
@@ -1000,9 +1000,26 @@ DECLARE_HANDLER(seekbar_getAttribute)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(seekbar_getAnimateProgress)
+{
+    //gui_log("enter seekbar_getAttribute1\n");
+    {
+        {
+            gui_obj_t *obj = NULL;
+            jerry_get_object_native_pointer(this_value, (void *)&obj,
+                                            NULL);//gui_log("enter seekbar_getAttribute4\n");
+
+            return jerry_create_number(GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent);
+
+        }
+        ;//gui_log("enter seekbar_getAttribute7\n");
+    }
+
+
+}
 DECLARE_HANDLER(seekbar_setAttribute)
 {
-    //gui_log("enter onPress\n");
+    //gui_log("enter seekbar_setAttribute\n");
     if (args_cnt >= 2 && jerry_value_is_string(args[0]) && jerry_value_is_number(args[1]))
     {
         char *a = js_value_to_string(args[0]);
@@ -1010,7 +1027,7 @@ DECLARE_HANDLER(seekbar_setAttribute)
         {
             gui_obj_t *obj = NULL;
             jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-            gui_log("seekbar_setAttribute:%f\n", jerry_get_number_value(args[1]));
+            //gui_log("seekbar_setAttribute:%f\n", jerry_get_number_value(args[1]));
             gui_progressbar_set_percentage((void *)obj, jerry_get_number_value(args[1]));
 
         }
@@ -1076,7 +1093,7 @@ DECLARE_HANDLER(progress)
 }
 DECLARE_HANDLER(sw_close)
 {
-    gui_log("enter sw_close\n");
+    //gui_log("enter sw_close\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
     sw->turn_off(sw);
@@ -1085,7 +1102,7 @@ DECLARE_HANDLER(sw_close)
 
 DECLARE_HANDLER(sw_open)
 {
-    gui_log("enter sw_open\n");
+    //gui_log("enter sw_open\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
     sw->turn_on(sw);
@@ -1134,7 +1151,7 @@ void js_gui_init()
     REGISTER_METHOD_NAME(seekbar, "setAttribute", seekbar_setAttribute);
     REGISTER_METHOD_NAME(seekbar, "getAttribute", seekbar_getAttribute);
     REGISTER_METHOD_NAME(seekbar, "palyAnimate", play_animate_seekbar);
-
+    REGISTER_METHOD_NAME(seekbar, "animateProgress", seekbar_getAnimateProgress);
     jerry_value_t document = jerry_create_object();
     js_set_property(global_obj, "textbox", document);
     REGISTER_METHOD(document, write);
