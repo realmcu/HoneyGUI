@@ -94,7 +94,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
     source.memory = (void *)source.address;
     source.global_alpha_en = true;
-    source.global_alpha = image->opacity_value << 24;
+    source.global_alpha = image->opacity_value;
     if (image->blend_mode == IMG_MAGIC_MATRIX)
     {
         if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
