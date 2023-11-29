@@ -33,18 +33,12 @@ extern "C" {
 #include <draw_img.h>
 #include <gui_matrix.h>
 
-/** @defgroup WIDGET WIDGET
-  * @brief
-  * @{
-  */
+
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
-  * @brief
-  * @{
-  */
+
 
 /** @brief  image widget structure */
 typedef struct gui_img
@@ -63,57 +57,25 @@ typedef struct gui_img
 } gui_img_t;
 
 
-/** End of WIDGET_Exported_Types
-  * @}
-  */
+
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
-  * @brief
-  * @{
-  */
-
-
-
-/** End of WIDGET_Exported_Macros
-  * @}
-  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of WIDGET_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
-  * @brief
-  * @{
-  */
 
 /**
  * @brief load the image to read it's width
@@ -240,13 +202,7 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
 
 void gui_img_set_animate(gui_img_t *o, uint32_t dur, int repeatCount, void *callback,
                          void *p);
-/** End of WIDGET_Exported_Functions
-  * @}
-  */
 
-/** End of WIDGET
-  * @}
-  */
 
 
 #ifdef __cplusplus

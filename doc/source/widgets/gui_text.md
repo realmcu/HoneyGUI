@@ -222,18 +222,7 @@ void page_tb_activity(void *parent)
 
 ```eval_rst
 
-.. doxygenfunction:: gui_set_font_mem_resourse
-.. doxygenfunction:: gui_font_mem_init
-.. doxygenfunction:: gui_font_stb_init
-
 .. doxygenfile:: gui_text.h
-.. doxygenfunction:: gui_text_create
-.. doxygenstruct:: gui_text
-.. doxygenfunction:: gui_text_set
-.. doxygenfunction:: gui_text_type_set
-.. doxygenfunction:: gui_text_size_set
-.. doxygenfunction:: gui_text_move
-.. doxygenfunction:: gui_text_mode_set
-.. doxygenfunction:: gui_text_set_animate
+
 
 ```

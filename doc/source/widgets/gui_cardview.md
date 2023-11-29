@@ -44,12 +44,5 @@ Please refer to the page below:
 ```eval_rst
 
 .. doxygenfile:: gui_cardview.h
-.. doxygenfunction:: gui_cardview_create
-.. doxygenstruct:: gui_cardview
-
-.. doxygenfunction:: gui_cardview_mute
-.. doxygenfunction:: gui_cardview_status_cb
-.. doxygenfunction:: gui_cardview_set_style
-.. doxygenenum:: gui_tab_style
 
 ```

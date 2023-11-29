@@ -153,14 +153,7 @@ void page_tb6(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_img.h
-.. doxygenfunction:: gui_img_create_from_mem
-.. doxygenfunction:: gui_img_set_location
-.. doxygenfunction:: gui_img_set_attribute
-.. doxygenfunction:: gui_img_get_height
-.. doxygenfunction:: gui_img_get_width
-.. doxygenfunction:: gui_img_translate
-.. doxygenfunction:: gui_img_rotation
-.. doxygenfunction:: gui_img_scale
+
 
 ```
 
