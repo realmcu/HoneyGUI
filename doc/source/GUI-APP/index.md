@@ -18,7 +18,4 @@
     Use C/C++ Design An Application <Native/Native>
     Use LVGL Design An Application <LVGL/fwk_app_lvgl>
     Use Script Design An Application <SaaA/index>
-    How to prepare resource <Resource/prepare_resource>
-    Demo An Calculator Application <Calculator/GUI-APP Demo>
-    Demo An 86box Application <86box/86box>
 ```
