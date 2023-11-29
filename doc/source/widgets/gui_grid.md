@@ -53,8 +53,5 @@ void page_tb_grid(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_grid.h
-.. doxygenfunction:: gui_grid_create
-.. doxygenfunction:: gui_grid_style
-.. doxygenenum:: gui_grid_style
 
 ```

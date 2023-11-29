@@ -81,7 +81,7 @@ Please refer to
 ### GUI widget api
 
 ```eval_rst
+
 .. doxygenfile:: gui_canvas.h
-.. doxygenfunction:: gui_canvas_create
-.. doxygenfunction:: gui_canvas_set_canvas_cb
+
 ```

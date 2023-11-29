@@ -65,6 +65,5 @@ void page_ct_clock(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_watch_gradient_spot.h
-.. doxygenfunction:: gui_watch_gradient_spot_create
-.. doxygenfunction:: gui_watch_gradient_spot_set_center
+
 ```

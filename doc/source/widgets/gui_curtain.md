@@ -78,5 +78,5 @@ void page_tb_clock(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_curtain.h
-.. doxygenfunction:: gui_curtain_create
+
 ```

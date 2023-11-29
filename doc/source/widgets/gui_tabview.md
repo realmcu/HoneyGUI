@@ -51,9 +51,8 @@ static void tab_ui_design(gui_app_t *app)
 ## API
 
 ```eval_rst
-.. doxygenfunction:: gui_tabview_create
-.. doxygenfunction:: gui_tabview_jump_tab
-.. doxygenfunction:: gui_tabview_set_style
+
+.. doxygenfile:: gui_tabview.h
 
 ```
 

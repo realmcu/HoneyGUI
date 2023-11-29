@@ -87,11 +87,7 @@ void page_tb_svg(void *parent)
 ## API
 
 ```eval_rst
+
 .. doxygenfile:: gui_svg.h
-.. doxygenfunction:: gui_svg_create_from_file
-.. doxygenfunction:: gui_svg_create_from_mem
-.. doxygenfunction:: gui_svg_rotation
-.. doxygenfunction:: gui_svg_scale
-.. doxygenfunction:: gui_svg_translate
-.. doxygenfunction:: gui_svg_set_opacity
+
 ```

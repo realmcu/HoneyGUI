@@ -37,8 +37,7 @@ void page_tb_cube(void *parent)
 ## API
 
 ```eval_rst
+
 .. doxygenfile:: gui_cube.h
-.. doxygenfunction:: gui_cube_create
-.. doxygenfunction:: gui_cube_set_center
-.. doxygenfunction:: gui_cube_set_size
+
 ```

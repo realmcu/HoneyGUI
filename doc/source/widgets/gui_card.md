@@ -124,6 +124,5 @@ void curtain_down_design(void *parent_widget)
 ```eval_rst
 
 .. doxygenfile:: gui_card.h
-.. doxygenfunction:: gui_card_create
 
 ```

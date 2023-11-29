@@ -153,7 +153,10 @@ void page_tb6(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_img.h
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 ```
 

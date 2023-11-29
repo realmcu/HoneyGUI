@@ -47,18 +47,10 @@ extern "C" {
 #error not supported tool chain
 #endif
 
-/** @defgroup SUBMOUDLE SUBMOUDLE
-  * @brief
-  * @{
-  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Types SUBMOUDLE Exported Types
-  * @brief
-  * @{
-  */
 
 /** @brief  ... */
 typedef union gui_color
@@ -448,22 +440,10 @@ typedef struct _gui_obj_t
 } gui_obj_t;
 
 
-/** End of SUBMOUDLE_Exported_Types
-  * @}
-  */
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Constants SUBMOUDLE Exported Constants
-  * @brief
-  * @{
-  */
 
-
-/** End of SUBMOUDLE_Exported_Constants
-  * @}
-  */
 
 /*============================================================================*
  *                         Macros
@@ -550,23 +530,11 @@ typedef struct _gui_obj_t
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Variables SUBMOUDLE Exported Variables
-  * @brief
-  * @{
-  */
 
-
-/** End of SUBMOUDLE_Exported_Variables
-  * @}
-  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup SUBMOUDLE_Exported_Functions SUBMOUDLE Exported Functions
-  * @brief
-  * @{
-  */
 
 
 /**
@@ -583,13 +551,6 @@ typedef struct _gui_obj_t
  */
 
 
-/** End of SUBMOUDLE_Exported_Functions
-  * @}
-  */
-
-/** End of SUBMOUDLE
-  * @}
-  */
 
 
 #ifdef __cplusplus

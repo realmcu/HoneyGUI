@@ -223,6 +223,9 @@ void page_tb_activity(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_text.h
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 ```

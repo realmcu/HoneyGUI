@@ -50,12 +50,8 @@ static void tab_ui_design(gui_app_t *app)
 ```
 ## API
 ```eval_rst
-.. doxygenfunction:: gui_tab_create
-```
 
-```eval_rst
-.. doxygenfunction:: gui_tab_set_style
-.. doxygentypedef:: SLIDE_STYLE
-.. doxygenfunction:: gui_tab_get_stacking_location
+.. doxygenfile:: gui_tab.h
+
 ```
 

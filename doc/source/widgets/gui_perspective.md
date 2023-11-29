@@ -85,5 +85,5 @@ void callback_prism(void *obj, gui_event_t e)
 ```eval_rst
 
 .. doxygenfile:: gui_perspective.h
-.. doxygenfunction:: gui_perspective_create
+
 ```

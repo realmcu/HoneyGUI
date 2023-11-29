@@ -58,5 +58,5 @@ void page_ct_clock(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_watchface_gradient.h
-.. doxygenfunction:: gui_watchface_gradient_create
+
 ```

@@ -39,6 +39,5 @@ Please refer to the page below:
 ```eval_rst
 
 .. doxygenfile:: gui_curtainview.h
-.. doxygenfunction:: gui_curtainview_create
-.. doxygenfunction:: gui_curtainview_set_done_cb
+
 ```

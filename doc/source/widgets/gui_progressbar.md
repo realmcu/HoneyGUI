@@ -120,14 +120,6 @@ void page_tb_three(void *parent)
 ```eval_rst
 
 .. doxygenfile:: gui_progressbar.h
-.. doxygenfunction:: gui_progressbar_img_v_create
-.. doxygenfunction:: gui_progressbar_img_h_create
-.. doxygenfunction:: gui_progressbar_movie_create
-.. doxygenfunction:: gui_progressbar_set_progress
-.. doxygenfunction:: gui_progressbar_get_progress
-.. doxygenfunction:: gui_progressbar_set_percentage
-.. doxygenfunction:: gui_progressbar_get_percentage
-.. doxygenfunction:: gui_progressbar_get_max
 
 ```
 
