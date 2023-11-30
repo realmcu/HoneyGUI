@@ -110,7 +110,7 @@ static void button_prepare(gui_obj_t *obj)
     {
         if (tp->type != 271)
         {
-            gui_log("type2:%d,%d\n", tp->type, tp->released);
+            //gui_log("type2:%d,%d\n", tp->type, tp->released);
         }
         gui_button_t *b = (void *)obj;
         switch (tp->type)

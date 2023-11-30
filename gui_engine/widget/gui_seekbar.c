@@ -165,8 +165,8 @@ static void seekbar_preapre(gui_obj_t *obj)
             {
 
 
-                if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                    (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx + obj->w)) &&
+                    (tp->y >= obj->ay + obj->ty && tp->y <= (obj->ay + obj->ty + obj->h)))
                 {
                     b->press_flag = true;
                     //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
@@ -177,7 +177,7 @@ static void seekbar_preapre(gui_obj_t *obj)
                 }
             }
 
-            if (tp->released)
+            if (tp->released && b->press_flag)
             {
 
                 {
@@ -253,8 +253,9 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
 
         if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
         {
-            if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) && (tp->y >= obj->ay &&
-                                                                      tp->y <= (obj->ay + obj->h)))
+            if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx + obj->w)) &&
+                (tp->y >= obj->ay + obj->ty &&
+                 tp->y <= (obj->ay + obj->ty + obj->h)))
             {
                 if (judge_point_in_ring(circle->arcx + obj->ax, circle->arcy + obj->ay, circle->arc_r,
                                         circle->arc_w + circle->arc_r, tp->x + tp->deltaX, tp->y + tp->deltaY))
@@ -355,8 +356,8 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
             {
 
 
-                if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                    (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx + obj->w)) &&
+                    (tp->y >= obj->ay + obj->ty && tp->y <= (obj->ay + obj->ty + obj->h)))
                 {
                     b->press_flag = true;
                     //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
@@ -367,7 +368,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
                 }
             }
 
-            if (tp->released)
+            if (tp->released && b->press_flag)
             {
 
                 {
@@ -389,7 +390,7 @@ static void seekbar_preapre_arc(gui_obj_t *obj)
 
         }
     }
-    obj->cover = ((gui_seekbar_t *)obj)->hit_slider;
+
 
 }
 static void seekbar_h_preapre(gui_obj_t *obj)
@@ -473,8 +474,8 @@ static void seekbar_h_preapre(gui_obj_t *obj)
             {
 
 
-                if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                    (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx + obj->w)) &&
+                    (tp->y >= obj->ay + obj->ty && tp->y <= (obj->ay + obj->ty + obj->h)))
                 {
                     b->press_flag = true;
                     //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
@@ -485,7 +486,7 @@ static void seekbar_h_preapre(gui_obj_t *obj)
                 }
             }
 
-            if (tp->released)
+            if (tp->released && b->press_flag)
             {
 
                 {
@@ -508,7 +509,7 @@ static void seekbar_h_preapre(gui_obj_t *obj)
         }
     }
 
-    obj->cover = ((gui_seekbar_t *)obj)->hit_slider;
+
 
 }
 static void (obj_update_att)(struct _gui_obj_t *o)
