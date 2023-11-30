@@ -65,7 +65,7 @@ static void rtgui_server_entry(void *parameter)
     gui_mq_create(&gui_server_mq, "gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {
-        gui_thread_mdelay(10);
+        // gui_thread_mdelay(10);
         gui_app_t *app = gui_current_app();
         while (app == NULL)
         {
