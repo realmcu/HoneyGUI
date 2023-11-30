@@ -6,4 +6,4 @@ RTKIOT Visual Designer is a tool to make graphical interface design for Realtek 
 - Export the user designed GUI project to .bin, and the .bin can be programmed into the IC to display graphical interface.
 - Simulate the GUI project on PC.
 
-Get RVisualDesigner tool from SDK.
+Get RVisualDesigner tool from SDK. Or download from [here](https://wiki.realtek.com/pages/viewpage.action?spaceKey=BTMKT&title=RVisualDesigner+Release)
