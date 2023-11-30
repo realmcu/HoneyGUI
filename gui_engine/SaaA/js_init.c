@@ -8,7 +8,7 @@ jerry_value_t ret_value;
 static void *context_alloc(size_t size, void *cb_data_p)
 {
 #ifdef RTL8763EP
-    return (void *)(0x4000000 + 0x200000);
+    return malloc(size);
 #endif
     return malloc(size);
 }
