@@ -130,7 +130,13 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_button_api.onRelease(button, button_release_cb, button);
                     button->data = gui_strdup(path);
                     gui_button_text_move(button, 0, 70);
-//                    button->text->path = gui_get_file_address("app/system/resource/font/malgunbd.ttf");
+                    {
+                        int font_size = 16;
+                        gui_text_set(button->text, text, "rtk_font_mem", 0xffffffff, strlen(text), font_size);
+                        void *addr1 = gui_get_file_address("app/system/resource/font/arialbd_size16_bits4_font.bin");
+                        gui_font_mem_init(addr1);
+                        gui_text_type_set(button->text, addr1);
+                    }
                 }
 
             }
@@ -146,8 +152,7 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_frontend_ui_design\n");
     //gui_font_stb_init(gui_get_file_address("app/system/resource/font/malgunbd.ttf"));
-    gui_set_font_mem_resourse(32, gui_get_file_address("app/system/resource/font/gbk_32_32_dot.bin"),
-                              gui_get_file_address("app/system/resource/font/gbk_unicode_table.bin"));
+
 
     g = gui_grid_create(&app->screen, 100, 100, 3, 4, 100, 100);
     char *apppath = "app";
