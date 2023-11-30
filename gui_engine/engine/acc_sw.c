@@ -190,9 +190,7 @@ static void rle_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         return;
     }
 
-    //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    //uint8_t *head = (uint8_t *)((uint8_t *)(image->data) + sizeof(struct gui_rgb_data_head));
     uint8_t img_type = *((uint8_t *)image_off);
     rtzip_file_t *file = (rtzip_file_t *)image_off;
 
@@ -248,6 +246,7 @@ static void rle_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         }
     }
 }
+
 static void rle_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                 struct rtgui_rect *rect)
 {
@@ -319,6 +318,219 @@ static void rle_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             for (uint32_t j = x_start; j < x_end; j++)
             {
                 uint16_t pixel = *((uint16_t *)(read_off + j * source_bytes_per_pixel));
+                if (pixel != 0)
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                }
+            }
+        }
+
+    }
+    return;
+}
+static void rle_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                     struct rtgui_rect *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
+    int source_w = image->img_w;
+    int source_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    struct rtgui_matrix *inverse = image->inverse;
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t img_type = *((uint8_t *)image_off);
+    rtzip_file_t *file = (rtzip_file_t *)image_off;
+
+    if (img_type == 4)//matrix_rgb565_2_rgb565
+    {
+        uint8_t source_bytes_per_pixel = 2;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+            int line = i - image_y;
+
+            uncompressed_rle_rgb565(file, line, line_buf);
+
+            int read_off = (int)line_buf;
+
+            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+                float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+                float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+                int x = X / Z;
+                int y = Y / Z;
+
+                if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+                {
+                    continue;
+                }
+                uint16_t pixel = *((uint16_t *)read_off + x);
+
+                if (pixel  != 0)
+                {
+                    writebuf[write_off + j] = pixel;
+                }
+
+            }
+        }
+    }
+    else if (img_type == 132) //matrix_argb8888_2_rgb565
+    {
+        uint8_t source_bytes_per_pixel = 4;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+            int line = i - image_y;
+            uncompressed_rle_argb8888(file, line, line_buf);
+            int read_off = (int)line_buf;
+
+            uint16_t *writebuf = (uint16_t *) dc->frame_buf;
+
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+                float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+                float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+                int x = X / Z;
+                int y = Y / Z;
+
+                if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+                {
+                    continue;
+                }
+                uint8_t *pixel = (uint8_t *)(read_off + x);
+                if (pixel != 0)
+                {
+                    writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                              + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+                }
+            }
+        }
+    }
+    return;
+}
+
+static void rle_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                       struct rtgui_rect *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
+    int source_w = image->img_w;
+    int source_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    struct rtgui_matrix *inverse = image->inverse;
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t img_type = *((uint8_t *)image_off);
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+
+    if (img_type == 132)//matric_rgb8888_2_argb8888
+    {
+        uint8_t source_bytes_per_pixel = 4;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int line = i - image_y;
+            uncompressed_rle_argb8888(file, line, line_buf);
+            int read_off = (int)line_buf;
+            uint8_t *writebuf = dc->frame_buf;
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+                float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+                float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+                int x = X / Z;
+                int y = Y / Z;
+
+                if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+                {
+                    continue;
+                }
+                uint8_t *pixel = (uint8_t *)(read_off + x * source_bytes_per_pixel);
+
+                switch (image->opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+    else if (img_type == 4) //matric_rgb565_2_argb8888
+    {
+        uint8_t source_bytes_per_pixel = 2;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int line = i - image_y;
+            uncompressed_rle_rgb565(file, line, line_buf);
+            int read_off = (int)line_buf ;
+            uint8_t *writebuf = dc->frame_buf;
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+                float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+                float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+                int x = X / Z;
+                int y = Y / Z;
+
+                if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+                {
+                    continue;
+                }
+                uint16_t pixel = *((uint16_t *)(read_off  + x * source_bytes_per_pixel));
+
                 if (pixel != 0)
                 {
                     writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
@@ -1048,6 +1260,7 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 
     if (image->blend_mode == IMG_BYPASS_MODE)
     {
+        //gui_log("test IMG_BYPASS_MODE\n");
         if ((img_type == RGB888) && (dc_bytes_per_pixel == 4))
         {
             normal_blit_rgb888_2_argb8888(image, dc, rect);
@@ -1112,11 +1325,11 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         }
         else if ((img_type == RTZIP_COMPRESS) && (dc_bytes_per_pixel == 2))
         {
-            rle_blit_2_rgb565(image, dc, rect);
+            rle_matrix_blit_2_rgb565(image, dc, rect);
         }
         else if ((img_type == RTZIP_COMPRESS) && (dc_bytes_per_pixel == 4))
         {
-            rle_blit_2_argb8888(image, dc, rect);
+            rle_matrix_blit_2_argb8888(image, dc, rect);
         }
     }
 
