@@ -23,7 +23,10 @@ void gui_debug_sethook(void (*hook)(void))
 {
     gui_debug_hook = hook;
 }
+static void rtgui_server_msg_handler(rtgui_msg_t *msg)
+{
 
+}
 void gui_task_ext_execution_sethook(void (*hook)(void))
 {
     gui_task_ext_execution_hook = hook;
@@ -57,7 +60,6 @@ static uint32_t daemon_cnt = 0;
 
 static void rtgui_server_entry(void *parameter)
 {
-    // gui_thread_mdelay(1000);
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_init(void);
     js_init();
@@ -116,11 +118,12 @@ static void rtgui_server_entry(void *parameter)
 
         if ((gui_ms_get() - daemon_start_ms) > app->active_ms)
         {
-            gui_log("daemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n", daemon_start_ms,
-                    gui_ms_get(), app->active_ms);
-            gui_display_off();
-            gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0xFFFFFFFF);
-            gui_display_on();
+            gui_log("line %d, aemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n",
+                    __LINE__, daemon_start_ms, gui_ms_get(), app->active_ms);
+            if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0xFFFFFFFF))
+            {
+                rtgui_server_msg_handler(&msg);
+            }
             daemon_cnt = 0;
             daemon_start_ms = 0;
         }
@@ -131,6 +134,14 @@ void gui_server_suspend(void)
 {
     gui_log("!Suspend GUI Server and wait receive message! \n");
     gui_thread_suspend(gui_server_handle);
+}
+
+bool gui_server_exit_dlps(void)
+{
+    rtgui_msg_t msg;
+    msg.type = 1;
+    send_msg_to_gui_server(&msg);
+    return true;
 }
 
 void gui_server_resume(void)
