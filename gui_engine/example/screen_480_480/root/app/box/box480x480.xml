@@ -1,0 +1,326 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<app>box480x480
+<script
+    file="app/box/box480x480.js"></script><screen
+    w="480"
+    h="480"
+    x="0"
+    y="0">screen0
+<tabview
+      w="480"
+      h="480"
+      transition="normal"
+      x="0"
+      y="0">tabview0
+<tab
+        idx="0"
+        idy="0"
+        x="0"
+        y="0">home_tab
+<img
+          x="0"
+          y="0"
+          w="480"
+          h="480"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">home_bg img
+</img><img
+          x="0"
+          y="0"
+          w="480"
+          h="480"
+          file="app/box/resource/home/home_1.bin"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">image0
+</img></tab><tab
+        idx="1"
+        idy="0"
+        x="0"
+        y="0">lamp_tab
+<switch
+          x="42"
+          y="48"
+          picture="app/box/resource/lamp/Living_off.bin"
+          highlightPicture="app/box/resource/lamp/Living_on.bin"
+          w="184"
+          h="97">kitchen_switch
+</switch><switch
+          x="254"
+          y="48"
+          picture="app/box/resource/lamp/Dining_off.bin"
+          highlightPicture="app/box/resource/lamp/Dining_on.bin"
+          w="184"
+          h="97">parlor_switch
+</switch><switch
+          x="43"
+          y="175"
+          picture="app/box/resource/lamp/Study_off.bin"
+          highlightPicture="app/box/resource/lamp/Study_on.bin"
+          w="184"
+          h="97">bedroom_switch
+</switch><switch
+          x="254"
+          y="175"
+          picture="app/box/resource/lamp/Wash_off.bin"
+          highlightPicture="app/box/resource/lamp/Wash_on.bin"
+          w="184"
+          h="97">bedroom_switch1
+</switch><switch
+          x="42"
+          y="302"
+          picture="app/box/resource/lamp/Kitchen_off.bin"
+          highlightPicture="app/box/resource/lamp/Kitchen_on.bin"
+          w="184"
+          h="97">bedroom_switch2
+</switch><switch
+          x="254"
+          y="302"
+          picture="app/box/resource/lamp/Bathroom_off.bin"
+          highlightPicture="app/box/resource/lamp/Bathroom_on.bin"
+          w="184"
+          h="97">porch_switch
+</switch><img
+          x="110"
+          y="432"
+          w="260"
+          h="12"
+          file="app/box/resource/lamp/lamp_bg.bin"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">diot
+</img></tab><tab
+        idx="2"
+        idy="0"
+        x="0"
+        y="0">lamp_tab2
+<switch
+          x="42"
+          y="48"
+          picture="app/box/resource/lamp2/Bedroom_off.bin"
+          highlightPicture="app/box/resource/lamp2/Bedroom_on.bin"
+          w="184"
+          h="97">bedroom_off
+</switch><switch
+          x="254"
+          y="48"
+          picture="app/box/resource/lamp2/Children_off.bin"
+          highlightPicture="app/box/resource/lamp2/Children_on.bin"
+          w="184"
+          h="97">children
+</switch><icon
+          picture="app/box/resource/lamp2/AllTurnon_off.bin"
+          highlightPicture="app/box/resource/lamp2/AllTurnon_on.bin"
+          pictureX="0"
+          pictureY="0"
+          rotationAngle="0"
+          text=""
+          textX="0"
+          textY="0"
+          fontColor="#ffffff"
+          mode="normal"
+          w="184"
+          h="97"
+          x="42"
+          y="175">allturnon
+</icon><icon
+          picture="app/box/resource/lamp2/sleep_off-1.bin"
+          highlightPicture="app/box/resource/lamp2/sleep_on.bin"
+          pictureX="0"
+          pictureY="0"
+          rotationAngle="0"
+          text=""
+          textX="0"
+          textY="0"
+          fontColor="#ffffff"
+          mode="normal"
+          w="184"
+          h="97"
+          x="254"
+          y="175">sleep
+</icon><img
+          x="110"
+          y="432"
+          w="260"
+          h="12"
+          file="app/box/resource/lamp2/lamp_bg2.bin"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">image1
+</img><switch
+          x="42"
+          y="302"
+          picture="app/box/resource/lamp2/socket1_off.bin"
+          highlightPicture="app/box/resource/lamp2/socket1_on.bin"
+          w="124"
+          h="97">socket1
+</switch><switch
+          x="313"
+          y="302"
+          picture="app/box/resource/lamp2/socket3_off.bin"
+          highlightPicture="app/box/resource/lamp2/socket3_on.bin"
+          w="124"
+          h="97">socket3
+</switch><switch
+          x="178"
+          y="302"
+          picture="app/box/resource/lamp2/socket2_off.bin"
+          highlightPicture="app/box/resource/lamp2/socket2_on.bin"
+          w="124"
+          h="97">switch0
+</switch></tab><tab
+        idx="3"
+        idy="0"
+        x="0"
+        y="0">ac_tab
+<win
+          w="480"
+          h="480"
+          x="0"
+          y="0">cool_win
+<img
+            x="2"
+            y="0"
+            w="480"
+            h="480"
+            file="app/box/resource/air_condition/air_cold_bg.bin"
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1">cool_bg_img
+</img><seekbar
+            orientation="arc"
+            centralX="156"
+            centralY="164"
+            folder="app/box/resource/cooling"
+            startDegree="270"
+            endDegree="90"
+            w="312"
+            h="164"
+            x="83"
+            y="30">cool_bar
+</seekbar></win><win
+          hidden="hidden"
+          w="480"
+          h="480"
+          x="0"
+          y="0">heat_win
+<img
+            x="0"
+            y="0"
+            w="480"
+            h="480"
+            file="app/box/resource/air_condition/air_heat_bg.bin"
+            rotationAngle="0"
+            scaleX="1"
+            scaleY="1">heat_bg_img
+</img><seekbar
+            orientation="arc"
+            centralX="156"
+            centralY="164"
+            folder="app/box/resource/heating"
+            startDegree="270"
+            endDegree="90"
+            w="312"
+            h="164"
+            x="83"
+            y="30">heat_bar
+</seekbar></win><switch
+          x="118"
+          y="341"
+          picture="app/box/resource/air_condition/cooling_on.bin"
+          highlightPicture="app/box/resource/air_condition/cooling_off.bin"
+          w="30"
+          h="34">cool_switch
+</switch><switch
+          x="324"
+          y="341"
+          picture="app/box/resource/air_condition/heating_off.bin"
+          highlightPicture="app/box/resource/air_condition/heating_on.bin"
+          w="33"
+          h="34">heat_switch
+</switch><switch
+          x="224"
+          y="341"
+          picture="app/box/resource/air_condition/switch_off.bin"
+          highlightPicture="app/box/resource/air_condition/switch_on.bin"
+          w="30"
+          h="34">ac_on_off_switch
+</switch></tab><tab
+        idx="4"
+        idy="0"
+        x="0"
+        y="0">curain_tab
+<seekbar
+          orientation="vertical"
+          centralX="0"
+          centralY="0"
+          folder="app/box/resource/curtain_list"
+          startDegree="0"
+          endDegree="0"
+          w="314"
+          h="229"
+          x="85"
+          y="74">curtain_bar
+</seekbar><switch
+          x="117"
+          y="354"
+          picture="app/box/resource/cutain/open.bin"
+          highlightPicture="app/box/resource/cutain/close.bin"
+          w="27"
+          h="25">open_switch
+</switch><switch
+          x="335"
+          y="354"
+          picture="app/box/resource/cutain/close.bin"
+          highlightPicture="app/box/resource/cutain/open.bin"
+          w="27"
+          h="25">close_switch
+</switch><switch
+          x="224"
+          y="351"
+          picture="app/box/resource/cutain/switch_off.bin"
+          highlightPicture="app/box/resource/cutain/switch_on.bin"
+          w="30"
+          h="32">curtain_on_off_switch
+</switch><img
+          x="110"
+          y="432"
+          w="260"
+          h="12"
+          file="app/box/resource/cutain/cuirtain_bg.bin"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">diot2
+</img></tab></tabview>
+        <icon x="79" y="432" w="61" h="60" 
+                picture="app/box/resource/cutain/switch_off.bin" 
+                highlightPicture="app/box/resource/cutain/switch_off.bin"  
+                pictureY="1000" text=" " textX="0" textY="1000">icon123
+        </icon>
+
+        <icon x="141" y="432" w="61" h="60" 
+                picture="app/box/resource/cutain/switch_off.bin" 
+                highlightPicture="app/box/resource/cutain/switch_off.bin"  
+                pictureY="1000" text=" " textX="0" textY="1000">icon1231
+        </icon>
+
+        <icon x="203" y="432" w="61" h="60" 
+                picture="app/box/resource/cutain/switch_off.bin" 
+                highlightPicture="app/box/resource/cutain/switch_off.bin"  
+                pictureY="1000" text=" " textX="0" textY="1000">icon1232
+        </icon>
+
+        <icon x="265" y="432" w="61" h="60" 
+                picture="app/box/resource/cutain/switch_off.bin" 
+                highlightPicture="app/box/resource/cutain/switch_off.bin"  
+                pictureY="1000" text=" " textX="0" textY="1000">icon1233
+        </icon>
+
+
+        <icon x="327" y="432" w="61" h="60" 
+                picture="app/box/resource/cutain/switch_off.bin" 
+                highlightPicture="app/box/resource/cutain/switch_off.bin"  
+                pictureY="1000" text=" " textX="0" textY="1000">icon1234
+        </icon>
+</screen></app>
