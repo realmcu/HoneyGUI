@@ -1,0 +1,484 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ui version="1.0">
+  <widget class="Screen" name="screen0" layer="0" isLocked="False">
+    <property name="geometry">
+      <width>480</width>
+      <height>480</height>
+      <x>0</x>
+      <y>0</y>
+    </property>
+    <widget class="TabView" name="tabview0" layer="0" isLocked="False">
+      <property name="geometry">
+        <width>480</width>
+        <height>480</height>
+        <x>0</x>
+        <y>0</y>
+      </property>
+      <widget class="Tab" name="home_tab" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>0</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="home_bg img" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>480</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <image />
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Image" name="image0" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>480</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <image>Resources/image/home/home_1.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="lamp_tab" layer="1" isLocked="False">
+        <property name="tabData">
+          <idX>1</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Switch" name="kitchen_switch" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>42</x>
+            <y>48</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp/Living_off.png</picture>
+            <highlightPicture>Resources/image/lamp/Living_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="parlor_switch" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>254</x>
+            <y>48</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp/Dining_off.png</picture>
+            <highlightPicture>Resources/image/lamp/Dining_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="bedroom_switch" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>43</x>
+            <y>175</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp/Study_off.png</picture>
+            <highlightPicture>Resources/image/lamp/Study_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="bedroom_switch1" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>254</x>
+            <y>175</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp/Wash_off.png</picture>
+            <highlightPicture>Resources/image/lamp/Wash_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="bedroom_switch2" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>42</x>
+            <y>302</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp/Kitchen_off.png</picture>
+            <highlightPicture>Resources/image/lamp/Kitchen_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="porch_switch" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>254</x>
+            <y>302</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp/Bathroom_off.png</picture>
+            <highlightPicture>Resources/image/lamp/Bathroom_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Image" name="diot" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>260</width>
+            <height>12</height>
+            <x>110</x>
+            <y>432</y>
+          </property>
+          <property name="imageData">
+            <image>Resources/image/lamp/2bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="lamp_tab2" layer="2" isLocked="False">
+        <property name="tabData">
+          <idX>2</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Switch" name="bedroom_off" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>42</x>
+            <y>48</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp2/Bedroom_off.png</picture>
+            <highlightPicture>Resources/image/lamp2/Bedroom_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="children" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>254</x>
+            <y>48</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp2/Children_off.png</picture>
+            <highlightPicture>Resources/image/lamp2/Children_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Button" name="allturnon" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>42</x>
+            <y>175</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <picture>Resources/image/lamp2/AllTurnon_off.png</picture>
+            <highlightPicture>Resources/image/lamp2/AllTurnon_on.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="sleep" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>184</width>
+            <height>97</height>
+            <x>254</x>
+            <y>175</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <picture>Resources/image/lamp2/sleep_off-1.png</picture>
+            <highlightPicture>Resources/image/lamp2/sleep_on.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Image" name="image1" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>260</width>
+            <height>12</height>
+            <x>110</x>
+            <y>432</y>
+          </property>
+          <property name="imageData">
+            <image>Resources/image/lamp/3bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="socket1" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>124</width>
+            <height>97</height>
+            <x>42</x>
+            <y>302</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp2/socket1_off.png</picture>
+            <highlightPicture>Resources/image/lamp2/socket1_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="socket3" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>124</width>
+            <height>97</height>
+            <x>313</x>
+            <y>302</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp2/socket3_off.png</picture>
+            <highlightPicture>Resources/image/lamp2/socket3_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="switch0" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>124</width>
+            <height>97</height>
+            <x>178</x>
+            <y>302</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/lamp2/socket2_off.png</picture>
+            <highlightPicture>Resources/image/lamp2/socket2_on.png</highlightPicture>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="ac_tab" layer="3" isLocked="False">
+        <property name="tabData">
+          <idX>3</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Win" name="cool_win" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>480</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="winData">
+            <hidden>False</hidden>
+          </property>
+          <widget class="Image" name="cool_bg_img" layer="3" isLocked="False">
+            <property name="geometry">
+              <width>480</width>
+              <height>480</height>
+              <x>0</x>
+              <y>0</y>
+            </property>
+            <property name="imageData">
+              <image>Resources/image/air_condition/air_cold_bg.png</image>
+              <rotationAngle>0</rotationAngle>
+              <scaleX>1</scaleX>
+              <scaleY>1</scaleY>
+            </property>
+          </widget>
+          <widget class="ImageSeekBar" name="cool_bar" layer="4" isLocked="False">
+            <property name="geometry">
+              <width>312</width>
+              <height>164</height>
+              <x>83</x>
+              <y>30</y>
+            </property>
+            <property name="imageSeekBarData">
+              <isArc>arc</isArc>
+              <centralX>156</centralX>
+              <centralY>164</centralY>
+              <startDegree>270</startDegree>
+              <endDegree>90</endDegree>
+              <folder>cooling</folder>
+            </property>
+          </widget>
+        </widget>
+        <widget class="Win" name="heat_win" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>480</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="winData">
+            <hidden>True</hidden>
+          </property>
+          <widget class="Image" name="heat_bg_img" layer="4" isLocked="False">
+            <property name="geometry">
+              <width>480</width>
+              <height>480</height>
+              <x>0</x>
+              <y>0</y>
+            </property>
+            <property name="imageData">
+              <image>Resources/image/air_condition/air_heat_bg.png</image>
+              <rotationAngle>0</rotationAngle>
+              <scaleX>1</scaleX>
+              <scaleY>1</scaleY>
+            </property>
+          </widget>
+          <widget class="ImageSeekBar" name="heat_bar" layer="4" isLocked="False">
+            <property name="geometry">
+              <width>312</width>
+              <height>164</height>
+              <x>83</x>
+              <y>30</y>
+            </property>
+            <property name="imageSeekBarData">
+              <isArc>arc</isArc>
+              <centralX>156</centralX>
+              <centralY>164</centralY>
+              <startDegree>270</startDegree>
+              <endDegree>90</endDegree>
+              <folder>heating</folder>
+            </property>
+          </widget>
+        </widget>
+        <widget class="Switch" name="cool_switch" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>34</height>
+            <x>118</x>
+            <y>341</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/air_condition/cooling_on.jpg</picture>
+            <highlightPicture>Resources/image/air_condition/cooling_off.jpg</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="heat_switch" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>33</width>
+            <height>34</height>
+            <x>324</x>
+            <y>341</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/air_condition/heating_off.jpg</picture>
+            <highlightPicture>Resources/image/air_condition/heating_on.jpg</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="ac_on_off_switch" layer="7" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>34</height>
+            <x>224</x>
+            <y>341</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/air_condition/switch_off.jpg</picture>
+            <highlightPicture>Resources/image/air_condition/switch_on.jpg</highlightPicture>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="curain_tab" layer="4" isLocked="False">
+        <property name="tabData">
+          <idX>4</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="ImageSeekBar" name="curtain_bar" layer="-2" isLocked="False">
+          <property name="geometry">
+            <width>314</width>
+            <height>229</height>
+            <x>85</x>
+            <y>74</y>
+          </property>
+          <property name="imageSeekBarData">
+            <isArc>vertical</isArc>
+            <centralX>0</centralX>
+            <centralY>0</centralY>
+            <startDegree>0</startDegree>
+            <endDegree>0</endDegree>
+            <folder>curtain_list</folder>
+          </property>
+        </widget>
+        <widget class="Switch" name="open_switch" layer="-2" isLocked="False">
+          <property name="geometry">
+            <width>27</width>
+            <height>25</height>
+            <x>117</x>
+            <y>354</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/cutain/open.jpg</picture>
+            <highlightPicture>Resources/image/cutain/close.jpg</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="close_switch" layer="-2" isLocked="False">
+          <property name="geometry">
+            <width>27</width>
+            <height>25</height>
+            <x>335</x>
+            <y>354</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/cutain/close.jpg</picture>
+            <highlightPicture>Resources/image/cutain/open.jpg</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="curtain_on_off_switch" layer="-2" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>32</height>
+            <x>224</x>
+            <y>351</y>
+          </property>
+          <property name="switchData">
+            <picture>Resources/image/cutain/switch_off.jpg</picture>
+            <highlightPicture>Resources/image/cutain/switch_on.jpg</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Image" name="diot2" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>260</width>
+            <height>12</height>
+            <x>110</x>
+            <y>432</y>
+          </property>
+          <property name="imageData">
+            <image>Resources/image/lamp/5bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Button" name="resetBtn" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>35</width>
+            <height>30</height>
+            <x>21</x>
+            <y>20</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <picture>Resources/image/other/default.png</picture>
+            <highlightPicture>Resources/image/other/high.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+    </widget>
+  </widget>
+</ui>

@@ -486,6 +486,19 @@ function swCurtain(params) {
         curtain_open = 1;
     }
 }
+
+
+icon.getElementById('resetBtn')
+function resetPressFunc(params) {
+    //console.log('resetPressFunc')
+
+    matter.dataRst();
+}
+icon.onPress(resetPressFunc)
+
+
+
+
 tab.getElementById('tabview0')
 icon.getElementById('icon123')
 function icon123OnPressFunc(params) {

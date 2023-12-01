@@ -262,5 +262,5 @@ if __name__ == '__main__':
         output = sys.stdout
 
     output.write(data)
-    with open(os.path.join(os.path.dirname(os.getcwd()), 'resource_8762g.h'), 'w') as f:
-        f.write(file_addr)
+    # with open(os.path.join(os.path.dirname(os.getcwd()), 'resource_8762g.h'), 'w') as f:
+    #     f.write(file_addr)
