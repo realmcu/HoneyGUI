@@ -556,7 +556,25 @@ static void rle_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     }
     return;
 }
+static void do_blending_argb8888_2_argb8888(gui_color_t *d, gui_color_t *s)
+{
+    //gui_log("[GUI] TODO line = %d", __LINE__);
 
+    uint8_t Sa = s->channel.alpha;
+    uint8_t Sr = s->channel.red;
+    uint8_t Sg = s->channel.green;
+    uint8_t Sb = s->channel.blue;
+
+    uint8_t Da = d->channel.alpha;
+    uint8_t Dr = d->channel.red;
+    uint8_t Dg = d->channel.green;
+    uint8_t Db = d->channel.blue;
+
+    d->channel.alpha = ((255 - Sa) * Da + Sa * Sa) / 255;
+    d->channel.red = ((255 - Sa) * Dr + Sa * Sr) / 255;
+    d->channel.green = ((255 - Sa) * Dg + Sa * Sg) / 255;
+    d->channel.blue = ((255 - Sa) * Db + Sa * Sb) / 255;
+}
 static void rle_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                        struct rtgui_rect *rect)
 {
@@ -616,12 +634,18 @@ static void rle_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                     break;
                 case 255:
                     {
+
+                        gui_color_t color = {.channel.blue = pixel[0],
+                                             .channel.green = pixel[1],
+                                             .channel.red = pixel[2],
+                                             .channel.alpha = pixel[3],
+                                            };
                         if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
                         {
-                            writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
-                            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
-                            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
-                            writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
+
+                            gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                            do_blending_argb8888_2_argb8888(d, &color);
+
                         }
 
                     }
@@ -710,25 +734,7 @@ static void rle_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
     }
     return;
 }
-static void do_blending_argb8888_2_argb8888(gui_color_t *d, gui_color_t *s)
-{
-    //gui_log("[GUI] TODO line = %d", __LINE__);
 
-    uint8_t Sa = s->channel.alpha;
-    uint8_t Sr = s->channel.red;
-    uint8_t Sg = s->channel.green;
-    uint8_t Sb = s->channel.blue;
-
-    uint8_t Da = d->channel.alpha;
-    uint8_t Dr = d->channel.red;
-    uint8_t Dg = d->channel.green;
-    uint8_t Db = d->channel.blue;
-
-    d->channel.alpha = ((255 - Sa) * Da + Sa * Sa) / 255;
-    d->channel.red = ((255 - Sa) * Dr + Sa * Sr) / 255;
-    d->channel.green = ((255 - Sa) * Dg + Sa * Sg) / 255;
-    d->channel.blue = ((255 - Sa) * Db + Sa * Sb) / 255;
-}
 static void do_blending_argb8888_2_rgb565(uint8_t *target, gui_color_t color)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
