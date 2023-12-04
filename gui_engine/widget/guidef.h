@@ -109,8 +109,10 @@ typedef struct gui_kb_port_data
 typedef struct kb_info
 {
     uint32_t type;
+    char *string[20];
     uint8_t pressed : 1;
     uint8_t released : 1;
+    uint8_t pressing : 1;
 } kb_info_t;
 
 typedef enum

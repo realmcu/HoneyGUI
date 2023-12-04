@@ -40,8 +40,6 @@ void *get_app_hongkong(void)
 static void kb_button_cb(void *obj, gui_event_t e)
 {
     gui_log("line = %d \n", __LINE__);
-
-    //gui_switch_app(gui_current_app(), get_app_lvgl());
 }
 
 static void app_hongkong_ui_design(gui_app_t *app)

@@ -16,7 +16,11 @@ void *port_thread_create(const char *name, void (*entry)(void *param), void *par
 bool port_thread_delete(void *handle)
 {
     pthread_t *thread = handle;
-    pthread_detach(*thread);
+    void *ret = NULL;
+    //pthread_detach(*thread);
+    //pthread_kill(*thread, 3);
+    pthread_cancel(*thread);
+    pthread_join(*thread, &ret);
     return true;
 }
 bool port_thread_mdelay(uint32_t ms)

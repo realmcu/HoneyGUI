@@ -135,6 +135,7 @@ struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
         {
             // KB_LOG("not cache kb down \n");
         }
+        kb.pressing = true;
     }
     else if (flag == GUI_KB_EVENT_UP)
     {
@@ -147,12 +148,15 @@ struct kb_info *kb_algo_process(gui_kb_port_data_t *kb_raw)
             // KB_LOG("not cache kb up \n");
         }
         kb_do_reset();
+        kb.pressing = false;
     }
     else
     {
         //KB_LOG("not cache kb down and up, do keep \n");
     }
     //KB_LOG("kb.type:%d\n", kb.type);
+    memset(kb.string, 0x00, sizeof(kb.string));
+    memcpy(kb.string, kb_raw->name, sizeof(kb_raw->name));
     return &kb;
 }
 

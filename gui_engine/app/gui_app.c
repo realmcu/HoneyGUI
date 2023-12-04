@@ -75,6 +75,10 @@ void gui_app_startup(gui_app_t *app)
 
 void gui_app_shutdown(gui_app_t *app)
 {
+    if (app->thread_entry != NULL)
+    {
+        gui_thread_delete(app->thread_id);
+    }
     gui_tree_free(&app->screen);
 }
 

@@ -95,6 +95,10 @@ struct gui_os_api
 };
 ```
 
+## Sleep management
+
+todo
+
 
 
 

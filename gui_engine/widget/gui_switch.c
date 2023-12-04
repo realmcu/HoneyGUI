@@ -495,7 +495,6 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
                      int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)
 {
     gui_obj_ctor(&(this->base), parent, "switch", x, y, w, h);
-    //this->on = gui_img_create_from_fs(this, "_on", "app/system/resource/switchOn.bin", 0,0,0,0);
 
     this->base.type = CLICKSWITCH;
     GET_BASE(this)->obj_prepare = switch_prepare;
@@ -513,9 +512,7 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
 gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
                                 int16_t w, int16_t h, void *off_pic, void *on_pic)
 {
-    //#define sw_p this, parent, x, y, w, h, off_pic, on_pic
-    //GUI_NEW(gui_switch_t, gui_switch_ctor, sw_p)
-    gui_log("gui_switch_create:%p,%d,%d,%d,%d,%p,%p\n", parent, x, y, w, h, off_pic, on_pic);
+    //gui_log("gui_switch_create:%p,%d,%d,%d,%d,%p,%p\n", parent, x, y, w, h, off_pic, on_pic);
     gui_switch_t *this = gui_malloc(sizeof(gui_switch_t));
     memset(this, 0, sizeof(gui_switch_t));
     gui_switch_ctor(this, parent, x, y, w, h, off_pic, on_pic);
