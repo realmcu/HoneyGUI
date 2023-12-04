@@ -180,14 +180,14 @@
           w="480"
           h="480">cool_win
 <img
-            x="0"
-            y="0"
-            w="480"
-            h="480"
-            file="app/box/resource/air_condition/air_cold_bg.bin"
+            x="78"
+            y="68"
+            w="355"
+            h="297"
+            file="app/box/resource/new_folder/aa3.bin"
             rotationAngle="0"
             scaleX="1"
-            scaleY="1">cool_bg_img
+            scaleY="1">image2
 </img><seekbar
             x="83"
             y="30"
@@ -206,14 +206,14 @@
           h="480"
           hidden="hidden">heat_win
 <img
-            x="0"
-            y="0"
-            w="480"
-            h="480"
-            file="app/box/resource/air_condition/air_heat_bg.bin"
+            x="82"
+            y="70"
+            w="303"
+            h="239"
+            file="app/box/resource/new_folder/aa1.bin"
             rotationAngle="0"
             scaleX="1"
-            scaleY="1">heat_bg_img
+            scaleY="1">image3
 </img><seekbar
             x="83"
             y="30"
@@ -246,7 +246,16 @@
           highlightPicture="app/box/resource/air_condition/switch_on.bin"
           w="30"
           h="34">ac_on_off_switch
-</switch></tab><tab
+</switch><img
+          x="106"
+          y="426"
+          w="350"
+          h="100"
+          file="app/box/resource/new_folder/aa1.bin"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">image4
+</img></tab><tab
         idx="4"
         idy="0"
         x="0"

@@ -277,15 +277,15 @@
           <property name="winData">
             <hidden>False</hidden>
           </property>
-          <widget class="Image" name="cool_bg_img" layer="3" isLocked="False">
+          <widget class="Image" name="image2" layer="3" isLocked="False">
             <property name="geometry">
-              <width>480</width>
-              <height>480</height>
-              <x>0</x>
-              <y>0</y>
+              <width>355</width>
+              <height>297</height>
+              <x>78</x>
+              <y>68</y>
             </property>
             <property name="imageData">
-              <image>Resources/image/air_condition/air_cold_bg.png</image>
+              <image>Resources/image/new_folder/aa3.png</image>
               <rotationAngle>0</rotationAngle>
               <scaleX>1</scaleX>
               <scaleY>1</scaleY>
@@ -318,21 +318,21 @@
           <property name="winData">
             <hidden>True</hidden>
           </property>
-          <widget class="Image" name="heat_bg_img" layer="4" isLocked="False">
+          <widget class="Image" name="image3" layer="4" isLocked="False">
             <property name="geometry">
-              <width>480</width>
-              <height>480</height>
-              <x>0</x>
-              <y>0</y>
+              <width>303</width>
+              <height>239</height>
+              <x>82</x>
+              <y>70</y>
             </property>
             <property name="imageData">
-              <image>Resources/image/air_condition/air_heat_bg.png</image>
+              <image>Resources/image/new_folder/aa1.png</image>
               <rotationAngle>0</rotationAngle>
               <scaleX>1</scaleX>
               <scaleY>1</scaleY>
             </property>
           </widget>
-          <widget class="ImageSeekBar" name="heat_bar" layer="4" isLocked="False">
+          <widget class="ImageSeekBar" name="heat_bar" layer="5" isLocked="False">
             <property name="geometry">
               <width>312</width>
               <height>164</height>
@@ -383,6 +383,20 @@
           <property name="switchData">
             <picture>Resources/image/air_condition/switch_off.jpg</picture>
             <highlightPicture>Resources/image/air_condition/switch_on.jpg</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Image" name="image4" layer="7" isLocked="False">
+          <property name="geometry">
+            <width>350</width>
+            <height>100</height>
+            <x>106</x>
+            <y>426</y>
+          </property>
+          <property name="imageData">
+            <image>Resources/image/new_folder/aa1.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
           </property>
         </widget>
       </widget>
