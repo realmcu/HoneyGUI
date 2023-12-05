@@ -45,7 +45,7 @@ static void switch_contacts_details_call_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_contacts_details_call_touch_cb, obj = 0x%x\n", obj);
 
-    gui_switch_t *this = (gui_switch_t *)obj;
+    //gui_switch_t *this = (gui_switch_t *)obj;
     gui_app_t *app = get_app_watch_ui();
     extern gui_win_t *win_calling;
 
@@ -57,7 +57,7 @@ static void switch_contacts_details_call_touch_cb(void *obj, gui_event_t event)
         // jump to win_calling
         gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", obj);
         extern gui_win_t *win_calling;
-        gui_app_t *app = get_app_watch_ui();
+        //gui_app_t *app = get_app_watch_ui();
 
         win_calling = gui_win_create(&(app->screen), "win_calling", 0, 0, LCD_H, LCD_W);
         extern void design_win_calling(void *parent, char *dial_num);
@@ -94,10 +94,10 @@ static void text_contacts_details_name_animate_cb(void *obj)
 
     if (file_name == NULL)
     {
-        return 0;
+        return;
     }
 
-    char *string_title = file_name->utf_8;
+    char *string_title = (char *)file_name->utf_8;
     gui_text_set(text_contacts_details_name, string_title, "rtk_font_mem", 0xffffffff,
                  strlen(string_title),
                  FONT_H_32);

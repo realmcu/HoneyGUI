@@ -33,7 +33,7 @@ static void switch_contacts_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_contacts_touch_cb, obj = 0x%x\n", obj);
 
-    gui_switch_t *this = (gui_switch_t *)obj;
+    //gui_switch_t *this = (gui_switch_t *)obj;
     //for contracts list window creation
     gui_app_t *app = get_app_watch_ui();
     extern gui_win_t *win_contacts_list;

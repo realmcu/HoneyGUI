@@ -36,11 +36,11 @@ static void switch_song_delete_no_action(void *obj)
     win_confirm = NULL;
     //do nothing
 }
-static void switch_song_delete_text(void *obj)
-{
-    gui_log("switch_song_delete_text, obj = 0x%x\n", obj);
-    // set delete text
-}
+//static void switch_song_delete_text(void *obj)
+//{
+//    gui_log("switch_song_delete_text, obj = 0x%x\n", obj);
+//    // set delete text
+//}
 
 static void switch_song_back_cb(void *obj, gui_event_t event)
 {
@@ -64,9 +64,10 @@ static void switch_song_back_cb(void *obj, gui_event_t event)
 static void switch_song_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_song_1_cb event = %d\n", event);
-    gui_switch_t *this = (gui_switch_t *)obj;
+    //gui_switch_t *this = (gui_switch_t *)obj;
     gui_app_t *app = get_app_watch_ui();
     extern gui_win_t *win_confirm;
+    gui_obj_t *object_return = NULL;
 
     switch (event)
     {
@@ -75,7 +76,7 @@ static void switch_song_cb(void *obj, gui_event_t event)
         gui_tree_free(win_song_lists);
         win_song_lists = NULL;
 
-        gui_obj_t *object_return = pop_current_widget();
+        object_return = pop_current_widget();
         gui_obj_show(object_return, true);
         break;
     case GUI_EVENT_TOUCH_LONG:
@@ -141,9 +142,9 @@ static void switch_song_delete_cb(void *obj, gui_event_t event)
 void design_win_song_lists(gui_win_t *parent)
 {
     char *string_song_list_title = "播放列表";
-    char *string_song_1 = "Feels";
-    char *string_song_2 = "Atentions";
-    char *string_song_3 = "Hello";
+    //char *string_song_1 = "Feels";
+    //char *string_song_2 = "Atentions";
+    //char *string_song_3 = "Hello";
     int font_size = 32;
 
 

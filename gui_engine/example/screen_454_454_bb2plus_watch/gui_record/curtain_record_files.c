@@ -46,11 +46,11 @@ static void switch_record_file_delete_no_action(void *obj)
     gui_log("switch_record_file_delete_no_action, obj = 0x%x\n", obj);
     //do nothing
 }
-static void switch_record_file_delete_text(void *obj)
-{
-    gui_log("switch_record_file_delete_text, obj = 0x%x\n", obj);
-    // set delete text
-}
+//static void switch_record_file_delete_text(void *obj)
+//{
+//    gui_log("switch_record_file_delete_text, obj = 0x%x\n", obj);
+//    // set delete text
+//}
 
 static void switch_record_files_touch_cb(void *obj, gui_event_t event)
 {
@@ -210,7 +210,7 @@ static void example_add_record_files(void)
 
 void design_curtain_record_files(void *parent)
 {
-    gui_curtainview_t *curtainview_record = (gui_curtainview_t *)parent;
+    //gui_curtainview_t *curtainview_record = (gui_curtainview_t *)parent;
     curtain_down_record = gui_curtain_create(parent, "curtain_down_record", 0, 0, LCD_W, LCD_H,
                                              CURTAIN_DOWN, 1.0f);
     img_base_record_files = gui_img_create_from_mem(curtain_down_record, "img_base_record_files",

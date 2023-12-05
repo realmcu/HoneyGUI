@@ -70,7 +70,7 @@ static void scroll_text_record_play_title_animate_cb(void *obj)
     gui_log("scroll_text_record_play_title_animate_cb obj = 0x%x\n", obj);
     gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", file_name);
 
-    char *string_title = file_name->base.utf_8;
+    char *string_title = (char *)file_name->base.utf_8;
     gui_scrolltext_text_set(scroll_text_record_play_title, string_title, "rtk_font_mem", 0xffffffff,
                             strlen(string_title),
                             FONT_H_32);

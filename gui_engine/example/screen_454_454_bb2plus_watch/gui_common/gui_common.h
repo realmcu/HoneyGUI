@@ -11,8 +11,8 @@ extern "C" {
 
 #define GUI_OBJ_STACK_SIZE_MAX          10
 
-void set_confirm_yes(void *yes_action, void *obj);
-void set_confirm_no(void *no_action, void *obj);
+void set_confirm_yes(void yes_action(void *), void *obj);
+void set_confirm_no(void no_action(void *), void *obj);
 void set_confirm_text(char *confirm_text_display, int16_t x, int16_t y, uint16_t length);
 void push_current_widget(void *obj);
 gui_obj_t *pop_current_widget(void);

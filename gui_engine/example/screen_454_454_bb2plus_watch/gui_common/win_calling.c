@@ -37,6 +37,7 @@ float volume_percentage = 0.1f;
 uint32_t volume_show_state = false;
 
 
+void design_win_calling_volume(void *parent);
 
 static void reset_talk_time(void)
 {
@@ -151,7 +152,7 @@ static void switch_calling_mute_touch_cb(void *obj, gui_event_t event)
 void design_win_calling(void *parent, char *dial_num)
 {
     char *string_dial_num = dial_num;
-    char *string_dial_name = "";
+    //char *string_dial_name = "";
     gui_log("string_dial_num = %s\n", string_dial_num);
     //todo: displaying name or num depends on pbap
     text_calling_num = gui_text_create(parent, "text_calling_num", 0, 59,

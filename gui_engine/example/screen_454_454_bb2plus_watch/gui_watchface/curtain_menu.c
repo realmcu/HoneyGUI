@@ -25,24 +25,24 @@ gui_win_t *win_menu_buds  = NULL;
 gui_win_t *win_menu_phone = NULL;
 gui_win_t *win_menu_setting = NULL;
 
-static void curtain_down_menu_update_cb(void *obj)
-{
-    gui_log("curtain_down_menu_update_cb\n");
-    if (cfg_mode == MODE_SOURCE)
-    {
-        switch_menu_buds->base.not_show = false;
+//static void curtain_down_menu_update_cb(void *obj)
+//{
+//    gui_log("curtain_down_menu_update_cb\n");
+//    if (cfg_mode == MODE_SOURCE)
+//    {
+//        switch_menu_buds->base.not_show = false;
 
-        switch_menu_phone->base.x = 51;
-        switch_menu_phone->base.y = 177;
-    }
-    else
-    {
-        switch_menu_buds->base.not_show = true;
+//        switch_menu_phone->base.x = 51;
+//        switch_menu_phone->base.y = 177;
+//    }
+//    else
+//    {
+//        switch_menu_buds->base.not_show = true;
 
-        switch_menu_phone->base.x = 177;
-        switch_menu_phone->base.y = 177;
-    }
-}
+//        switch_menu_phone->base.x = 177;
+//        switch_menu_phone->base.y = 177;
+//    }
+//}
 
 static void switch_menu_bluetooth_released_cb(void *obj, gui_event_t event)
 {

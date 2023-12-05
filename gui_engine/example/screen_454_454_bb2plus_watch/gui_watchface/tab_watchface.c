@@ -57,14 +57,14 @@ void design_tab_watchface(void *parent)
     void design_curtain_menu(void *parent);
     design_curtain_menu(curtainview_menu);
 //Get the current real-time time and print it
-    struct tm *ptr;
-    time_t lt;
-    lt = time(NULL);
-    ptr = localtime(&lt);
-    printf(asctime(ptr));
+//    struct tm *ptr;
+//    time_t lt;
+//    lt = time(NULL);
+//    ptr = localtime(&lt);
+//    printf(asctime(ptr));
 
-    int tm_sec = ptr->tm_sec;
-    int tm_min = ptr->tm_min;
-    int tm_hour = ptr->tm_hour;
-    printf("time: %d:%d:%d \n", tm_hour, tm_min, tm_sec);
+//    int tm_sec = ptr->tm_sec;
+//    int tm_min = ptr->tm_min;
+//    int tm_hour = ptr->tm_hour;
+//    printf("time: %d:%d:%d \n", tm_hour, tm_min, tm_sec);
 }

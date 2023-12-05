@@ -52,4 +52,5 @@ gui_obj_t *pop_current_widget(void)
     {
         GUI_ASSERT(obj_stack_index < 0);
     }
+    return NULL;
 }

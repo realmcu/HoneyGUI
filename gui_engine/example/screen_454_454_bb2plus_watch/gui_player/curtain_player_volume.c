@@ -16,7 +16,7 @@ static void switch_player_vol_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_play_pause_touch_cb\n");
 
-    char *string_record_title;
+    //char *string_record_title;
     switch (event)
     {
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
@@ -36,7 +36,7 @@ static void switch_player_vol_touch_cb(void *obj, gui_event_t event)
 
 void design_curtain_player_vol(void *parent)
 {
-    gui_curtainview_t *curtainview_player_vol = (gui_curtainview_t *)parent;
+    //gui_curtainview_t *curtainview_player_vol = (gui_curtainview_t *)parent;
     curtain_down_player_vol = gui_curtain_create(parent, "curtain_down_record", 0, 0, LCD_W, LCD_H,
                                                  CURTAIN_DOWN, 0.5f);
     img_base_player_vol = gui_img_create_from_mem(curtain_down_player_vol, "img_base_record_files",

@@ -3,6 +3,8 @@
 #include "gui_switch.h"
 #include "gui_curtainview.h"
 #include "gui_win.h"
+#include "gui_obj.h"
+#include "gui_common.h"
 
 gui_text_t *text_player_title = NULL;
 gui_text_t *text_song_name = NULL;

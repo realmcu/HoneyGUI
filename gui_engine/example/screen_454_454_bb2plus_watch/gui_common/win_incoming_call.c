@@ -51,7 +51,7 @@ void design_win_incoming_call(void *parent, char *dial_num)
                  strlen(string_incoming_call_title), FONT_H_32);
     //incoming call number
     char *string_dial_num = dial_num;
-    char *string_dial_name = "";
+    //char *string_dial_name = "";
     gui_log("string_dial_num = %s\n", string_dial_num);
     //todo: displaying name or num depends on pbap
     text_incoming_call_num = gui_text_create(parent, "text_incoming_call_num", 0, 59,

@@ -46,13 +46,13 @@ typedef struct _win_confirm_action_t
 
 win_confirm_action_t win_confirm_action;
 
-void set_confirm_yes(void *yes_action, void *obj)
+void set_confirm_yes(void yes_action(void *), void *obj)
 {
     win_confirm_action.confirm_yes_action = yes_action;
     win_confirm_action.yes_action_obj = obj;
 }
 
-void set_confirm_no(void *no_action, void *obj)
+void set_confirm_no(void no_action(void *), void *obj)
 {
     win_confirm_action.confirm_no_action = no_action;
     win_confirm_action.no_action_obj = obj;
@@ -143,11 +143,11 @@ static void switch_confirm_no_touch_cb(void *obj, gui_event_cb_t event)
     set_confirm_text(NULL, 0, 0, 0);
 }
 
-static void text_confirm_update_cb(void *obj)
-{
-    gui_log("text_confirm_update_cb\n");
-    win_confirm_action.confirm_text_display(win_confirm_action.text_display_obj);
-}
+//static void text_confirm_update_cb(void *obj)
+//{
+//    gui_log("text_confirm_update_cb\n");
+//    win_confirm_action.confirm_text_display(win_confirm_action.text_display_obj);
+//}
 
 
 void design_win_confirm(void *parent)

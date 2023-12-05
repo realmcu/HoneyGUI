@@ -56,7 +56,7 @@ static void switch_dial_num_touch_cb(void *obj, gui_event_t event)
 
     gui_switch_t *this = (gui_switch_t *)obj;
     char touch_dial_num = 0;
-    uint32_t offset_num = 0;
+    //uint32_t offset_num = 0;
     switch (event)
     {
     case GUI_EVENT_1:
