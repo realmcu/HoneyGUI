@@ -207,7 +207,7 @@ static void rle_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
             uncompressed_rle_rgb565(file, line, line_buf);
 
-            int read_off = (int)line_buf - source_bytes_per_pixel * x_start;
+            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
 
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
