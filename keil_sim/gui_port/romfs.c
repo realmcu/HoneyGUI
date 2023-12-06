@@ -3,7 +3,7 @@
 #include "stdarg.h"
 
 // default romfs address
-static void *romfs_addr = 0x04400000;
+static void *romfs_addr = (void *)0x04400000;
 
 void romfs_mount(void *addr)
 {
@@ -201,7 +201,7 @@ int romfs_open(struct romfs_fd *file)
 
         if (file->flags & (O_CREAT | O_WRONLY | O_APPEND | O_TRUNC | O_RDWR))
         {
-            return -EINVAL;
+            return -FS_EINVAL;
         }
 
         dirent = romfs_lookup(root_dirent, file->path, &size);
