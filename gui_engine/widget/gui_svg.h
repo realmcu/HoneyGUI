@@ -110,7 +110,7 @@ typedef struct gui_svg
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -180,7 +180,7 @@ void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y);
 void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value);
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

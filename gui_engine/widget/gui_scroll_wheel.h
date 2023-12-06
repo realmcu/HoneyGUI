@@ -114,7 +114,7 @@ typedef struct gui_scroll_wheel
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -141,7 +141,7 @@ gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent,  void *addr, int16_t x
 void gui_scrollwheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

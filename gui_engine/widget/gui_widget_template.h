@@ -101,7 +101,7 @@ typedef struct gui_widget_template
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -123,7 +123,7 @@ gui_widget_template_t *gui_widget_template_create(void *parent,  const char *nam
                                                   int16_t x, int16_t y, int16_t w, int16_t h);
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

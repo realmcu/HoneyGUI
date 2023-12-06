@@ -104,7 +104,7 @@ typedef struct gui_watchface_gradient
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -135,7 +135,7 @@ gui_watchface_gradient_t *gui_watchface_gradient_create(void *parent,  const cha
 
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

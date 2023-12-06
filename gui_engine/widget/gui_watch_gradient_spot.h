@@ -103,7 +103,7 @@ typedef struct gui_watch_gradient_spot
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -152,7 +152,7 @@ void gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c
 
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

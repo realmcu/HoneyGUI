@@ -103,7 +103,7 @@ typedef struct _gui_canvas
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -133,7 +133,7 @@ void gui_canvas_set_canvas_cb(gui_canvas_t *this,
                               void (*cb)(gui_canvas_t *this));
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

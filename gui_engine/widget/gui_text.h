@@ -128,7 +128,7 @@ typedef struct gui_text_line
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -208,7 +208,7 @@ gui_text_t *gui_text_create(void *parent, const char *filename, int16_t x, int16
                             int16_t w, int16_t h);
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

@@ -109,7 +109,7 @@ typedef struct gui_img_scope
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -128,7 +128,7 @@ gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16
 
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

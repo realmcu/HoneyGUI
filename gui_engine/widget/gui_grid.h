@@ -120,7 +120,7 @@ typedef struct gui_grid
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -197,7 +197,7 @@ gui_grid_t *gui_grid_create(void *parent,
 void gui_grid_style(gui_grid_t *grid, enum gui_grid_style style);
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

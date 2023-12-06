@@ -102,7 +102,7 @@ typedef struct gui_curtain
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -124,7 +124,7 @@ gui_curtain_t *gui_curtain_create(void *parent, const char *filename, int16_t x,
                                   int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope);
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

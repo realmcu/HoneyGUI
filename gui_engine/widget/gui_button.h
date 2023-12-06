@@ -137,7 +137,7 @@ extern gui_api_button_t gui_button_api;
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -238,7 +238,7 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y);
 void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback,
                             void *p);
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

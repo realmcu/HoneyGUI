@@ -104,7 +104,7 @@ typedef struct gui_scroll_text
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -158,7 +158,7 @@ void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *te
                              uint32_t color,
                              uint16_t length, uint8_t font_size);
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

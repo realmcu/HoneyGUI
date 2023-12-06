@@ -142,7 +142,7 @@ typedef struct gui_curtainview
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -172,7 +172,7 @@ void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtain
 
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

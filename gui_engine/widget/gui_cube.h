@@ -112,7 +112,7 @@ typedef struct gui_cube
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -159,7 +159,7 @@ void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
  */
 void gui_cube_set_size(gui_cube_t *this, float size);
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

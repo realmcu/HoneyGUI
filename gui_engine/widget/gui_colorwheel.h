@@ -107,7 +107,7 @@ typedef struct gui_colorwheel
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -149,7 +149,7 @@ gui_colorwheel_t *gui_colorwheel_create(void *parent,  const char *name, void *a
 void gui_colorwheel_set(gui_colorwheel_t *this, float x, float y, float w, float h, float t);
 
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 

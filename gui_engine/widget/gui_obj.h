@@ -99,7 +99,7 @@ extern "C" {
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
   * @brief
   * @{
   */
@@ -257,7 +257,7 @@ gui_obj_t *gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type);
   */
 void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst);
 
-/** End of WIDGET_Exported_TEST_Functions
+/** End of WIDGET_Exported_GUI_Functions
   * @}
   */
 
