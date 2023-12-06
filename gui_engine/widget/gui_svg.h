@@ -31,10 +31,18 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 /** @brief  svg structure */
 typedef struct gui_svg
@@ -54,25 +62,59 @@ typedef struct gui_svg
 } gui_svg_t;
 
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
+
 
 /**
  * @brief create a svg widget from file,which should be display an SVG image.
@@ -137,6 +179,14 @@ void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y);
  */
 void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value);
 
+
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 
 
 #ifdef __cplusplus

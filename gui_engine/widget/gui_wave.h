@@ -33,9 +33,18 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 /** @brief  WAVE widget structure */
 typedef struct gui_wave
@@ -49,24 +58,56 @@ typedef struct gui_wave
 } gui_wave_t;
 
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
 /**
  * @brief create a wave widget.
@@ -102,6 +143,13 @@ gui_wave_t *gui_wave_create(void *parent,  const char *name, int16_t x, int16_t 
 void gui_wave_set(gui_wave_t *this, float x, float y, float w, float h, float t);
 
 
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 #ifdef __cplusplus
 }
 #endif

@@ -37,9 +37,18 @@ extern "C" {
 #include "gui_colorwheel.h"
 
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 /** @brief  COLORWHEEL widget structure */
 typedef struct gui_colorwheel
@@ -52,25 +61,56 @@ typedef struct gui_colorwheel
     float t;
 } gui_colorwheel_t;
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
 /**
  * @brief colorwheel create
@@ -109,6 +149,13 @@ gui_colorwheel_t *gui_colorwheel_create(void *parent,  const char *name, void *a
 void gui_colorwheel_set(gui_colorwheel_t *this, float x, float y, float w, float h, float t);
 
 
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 #ifdef __cplusplus
 }
 #endif

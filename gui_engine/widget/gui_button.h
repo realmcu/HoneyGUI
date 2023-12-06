@@ -33,10 +33,18 @@ extern "C" {
 #include "gui_img.h"
 #include "gui_win.h"
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 /** @brief  press effect style */
 typedef enum gui_button_style
@@ -82,29 +90,58 @@ typedef struct gui_api_button
     void (*onClick)(gui_button_t *b, void *callback, void *parameter);
 } gui_api_button_t;
 extern gui_api_button_t gui_button_api;
-
+/** End of WIDGET_Exported_Types
+  * @}
+  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
-
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 #define BUTTON_COLOR 0xffffffff //!< default color
 #define BUTTON_HLCOLOR 0x0bffff //!< default highlight color
 
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
+
 
 /**
  * @brief Creat a button widget.
@@ -200,6 +237,15 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y);
  */
 void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback,
                             void *p);
+
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
 
 
 

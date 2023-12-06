@@ -31,11 +31,18 @@ extern "C" {
 #include <guidef.h>
 #include <gui_fb.h>
 #include "gui_cardview.h"
-
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 typedef struct _gui_card_stacking_t
 {
@@ -50,25 +57,59 @@ typedef struct gui_card
     int32_t id;
 } gui_card_t;
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 
+
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
 /**
  * @brief set card style
@@ -94,6 +135,19 @@ void gui_card_set_style(gui_card_t *this, SLIDE_STYLE style);
  */
 gui_card_t *gui_card_create(void *parent, const char *filename, int16_t x, int16_t y,
                             int16_t w, int16_t h, int16_t idx, int16_t idy);
+
+
+
+
+
+
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 
 
 #ifdef __cplusplus

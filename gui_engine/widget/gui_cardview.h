@@ -32,10 +32,19 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
+
 
 typedef struct
 {
@@ -63,24 +72,57 @@ typedef struct gui_cardview
 } gui_cardview_t;
 
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
 /**
  * @brief cardview create
@@ -119,6 +161,15 @@ void gui_cardview_mute(gui_cardview_t *this);
  */
 void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this));
 
+
+
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 
 
 #ifdef __cplusplus

@@ -31,10 +31,18 @@ extern "C" {
 #include <guidef.h>
 #include <gui_api.h>
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 /** @brief  ... */
 typedef struct gui_eq
@@ -48,24 +56,60 @@ typedef struct gui_eq
 } gui_eq_t;
 
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 
+
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
+
 
 /**
  * @brief
@@ -92,6 +136,14 @@ gui_eq_t *gui_eq_create(void *parent,  const char *name, int16_t x, int16_t y, i
  */
 void gui_eq_set(gui_eq_t *this, float x, float y, float w, float h, float t);
 
+
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 
 
 #ifdef __cplusplus

@@ -32,9 +32,18 @@ extern "C" {
 #include <gui_api.h>
 #include <nanovg.h>
 
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
+
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 /** @brief  canvas structure */
 typedef struct _gui_canvas
@@ -45,24 +54,59 @@ typedef struct _gui_canvas
 } gui_canvas_t;
 
 
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
 
+
+
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_TEST_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
 /**
  * @brief create a canvas widget used to drawing graphics in nanovg.
@@ -87,6 +131,15 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *addr,
  */
 void gui_canvas_set_canvas_cb(gui_canvas_t *this,
                               void (*cb)(gui_canvas_t *this));
+
+
+/** End of WIDGET_Exported_TEST_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
 
 
 #ifdef __cplusplus
