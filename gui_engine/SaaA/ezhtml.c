@@ -26,18 +26,13 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
-#ifdef FS_NOT_UNIX
+#ifdef __arm__
 #include "romfs.h"
 #else
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif
-#ifdef FS_NOT_UNIX
-#include "romfs.h"
-#else
-#include <sys/stat.h>
-#include <fcntl.h>
-#endif
+
 #if defined __WIN32
 #include <dirent.h>
 #else

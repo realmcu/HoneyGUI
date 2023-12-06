@@ -54,10 +54,10 @@ static void xml_free(void *ptr)
 
 //#include <unistd.h>
 //#include <sys/types.h>
-#ifdef FS_NOT_UNIX
+
+#ifdef __arm__
 #include "romfs.h"
 #elif defined OS_RTTHREAD
-
 #include "rtthread.h"
 #endif
 #ifndef EZXML_NOMMAP
@@ -731,7 +731,7 @@ ezxml_t ezxml_parse_fp(FILE *fp)
 // A wrapper for ezxml_parse_str() that accepts a file descriptor. First
 // attempts to mem map the file. Failing that, reads the file into memory.
 // Returns NULL on failure.
-#ifdef FS_NOT_UNIX
+#ifdef __arm__
 #include <romfs.h>
 #else
 #include <sys/stat.h>

@@ -58,12 +58,13 @@ void *get_app_xml(void)
     return &app_xml;
 }
 
-#ifdef FS_NOT_UNIX
+#ifdef __arm__
 #include "romfs.h"
 #else
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif
+
 #if defined __WIN32
 #include <dirent.h>
 #endif
@@ -114,7 +115,12 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     sprintf(path, "%s/%s", path2, entryy->d_name);
                     extern void get_app(gui_app_t *app, char **pic, char **text);
                     char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";
-                    app->xml = path;
+                    // app->xml = path;
+                    //  redundant transforming only for code check
+                    //  error: Address of local auto-variable assigned to a function parameter.
+                    uint32_t temp = (uint32_t)path;
+                    app->xml = (char *)temp;
+
 
                     get_app(app, &pic, &text); gui_log("get:%s,%s\n", pic, text);
                     void *img1;
