@@ -13,6 +13,8 @@ src += ['draw_font.c']
 src += ['font_mem.c']
 src += ['font_stb.c']
 src += ['acc_sw.c']
+src += ['acc_sw_rle.c']
+src += ['acc_sw_blend.c']
 src += ['acc_init.c']
 
 if GetDepend(['BUILD_USING_VG_LITE']):
