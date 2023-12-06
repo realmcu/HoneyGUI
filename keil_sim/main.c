@@ -26,6 +26,7 @@
 #include "Board_GLCD.h"
 #include "GLCD_Config.h"
 #include "gui_server.h"
+#include "gui_components_init.h"
 #include "time.h"
 
 
@@ -44,6 +45,8 @@ void app_main(void *argument)
     GLCD_ClearScreen();
     //GLCD_SetBackgroundColor(GLCD_COLOR_BLUE);
     GLCD_SetForegroundColor(GLCD_COLOR_GREEN);
+
+    gui_components_init();
 
 
     while (1)

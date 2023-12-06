@@ -2,19 +2,27 @@
 #include "gui_img.h"
 #include "gui_img.h"
 #include "gui_obj.h"
+#include "gui_canvas.h"
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include <gui_app.h>
 #include "tiger.txt"
+#include "gui_server.h"
+#include "gui_components_init.h"
 
-
-gui_app_t *get_rtk_gui_demo(void);
-
+//static void canvas_cb_black(gui_canvas_t *canvas)
+//{
+//    nvgRect(canvas->vg, 0, 0, 368, 448);
+//    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 128));
+//    nvgFill(canvas->vg);
+//}
 
 static void app_dialing_ui_design(gui_app_t *app)
 {
     gui_img_t *img = gui_img_create_from_mem(&app->screen,  "center", (void *)_actiger, 0, 0, 0, 0);
+//    gui_canvas_t *canvas = gui_canvas_create(&app->screen, "canvas", 0, 0, 0, 368, 448);
+//    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
 }
 
 
@@ -29,10 +37,15 @@ static gui_app_t rtk_gui_demo =
     .ui_design = app_dialing_ui_design,
 };
 
-gui_app_t *get_rtk_gui_demo(void)
+
+static int app_init(void)
 {
-    return &rtk_gui_demo;
+    rtgui_server_init();
+    gui_app_startup(&rtk_gui_demo);
+    return 0;
 }
+
+GUI_INIT_APP_EXPORT(app_init);
 
 
 

@@ -1425,6 +1425,11 @@ static void normal_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev 
  */
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
 {
+    // uint8_t checksum = rtgui_image_checksum(image);
+    // if(checksum == image->checksum)
+    // {
+    //     return;
+    // }
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 
     struct gui_rgb_data_head *head = image->data;
@@ -1506,6 +1511,7 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         }
     }
 
+    // image->checksum = checksum;
 }
 /** End of ENGINE_Exported_Functions
   * @}
