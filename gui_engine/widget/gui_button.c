@@ -105,8 +105,10 @@ static void button_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
 
-    if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
-        (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
+    if (((obj->ax + obj->tx) < (int)gui_get_screen_width()) && (((obj->ax + obj->tx) + obj->w) >= 0) &&
+        \
+        ((obj->ay + obj->ty) < (int)gui_get_screen_height()) && (((obj->ay + obj->ty) + obj->h) >= 0))
+
     {
         if (tp->type != 271)
         {
@@ -122,8 +124,8 @@ static void button_prepare(gui_obj_t *obj)
 //                bool callback = false;
                 for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
                 {
-                    if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                        (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                    if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+                        (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                     {
                         //callback = true;
                     }
@@ -131,8 +133,8 @@ static void button_prepare(gui_obj_t *obj)
                 //if (callback)
                 {
                     gui_log("%d\n", __LINE__);
-                    if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                        (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                    if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+                        (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                     {
                         gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
@@ -145,8 +147,8 @@ static void button_prepare(gui_obj_t *obj)
                 if (b->long_flag == false)
                 {
                     {
-                        if ((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-                            (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h)))
+                        if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
+                            (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                         {
                             b->long_flag = true;
                             gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
