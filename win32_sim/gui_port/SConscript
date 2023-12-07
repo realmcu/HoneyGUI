@@ -7,9 +7,6 @@ src = Split("""
 """)
 
 src = Glob('*.c')
-SrcRemove(src,'fsal_posix.c')
-SrcRemove(src,'gui_fsal.c')
-SrcRemove(src,'gui_mem_fs.c')
 CPPPATH = [cwd]
 
 group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)

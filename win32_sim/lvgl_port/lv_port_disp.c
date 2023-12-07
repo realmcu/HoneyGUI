@@ -151,7 +151,8 @@ void disp_disable_update(void)
  *You can use DMA or any hardware acceleration to do this operation in the background but
  *'lv_disp_flush_ready()' has to be called when finished.*/
 #include "gui_api.h"
-static void dc_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, uint16_t w,
+static void dc_update(lv_disp_drv_t *disp_drv, uint8_t *framebuffer, uint16_t xStart,
+                      uint16_t yStart, uint16_t w,
                       uint16_t h)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -184,7 +185,11 @@ static void dc_update(uint8_t *framebuffer, uint16_t xStart, uint16_t yStart, ui
             }
         }
     }
-    dc->lcd_update(dc);
+    if (lv_disp_flush_is_last(disp_drv) == true)
+    {
+        dc->lcd_update(dc);
+    }
+
 }
 static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
 {
@@ -192,7 +197,8 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
     if (disp_flush_enabled)
     {
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
-        dc_update((uint8_t *)color_p, area->x1, area->y1, area->x2 - area->x1 + 1, area->y2 - area->y1 + 1);
+        dc_update(disp_drv, (uint8_t *)color_p, area->x1, area->y1, area->x2 - area->x1 + 1,
+                  area->y2 - area->y1 + 1);
     }
 
     /*IMPORTANT!!!

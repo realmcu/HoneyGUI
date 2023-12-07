@@ -758,6 +758,7 @@ void *gui_calculator_create(void *parent,  const char *name,
 {
     GUI_ASSERT(parent != NULL);
     calculator_draw_button(parent);
+    return NULL;
 }
 
 gui_app_t *get_app_calculator(void)
