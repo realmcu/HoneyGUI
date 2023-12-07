@@ -158,6 +158,10 @@ void rtgui_font_mem_load(gui_text_t *text)
                     line_flag ++;
                     chr[i].char_w = 0;
                 }
+                else if (chr[i].unicode == 0x20)
+                {
+                    chr[i].char_w = text->font_height / 2;
+                }
                 else
                 {
                     for (; index < index_area_size / 2; index ++)
