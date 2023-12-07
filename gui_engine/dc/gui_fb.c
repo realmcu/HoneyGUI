@@ -59,6 +59,7 @@ static void obj_draw_prepare(gui_obj_t *object)
         obj->sy *= obj->parent->sy;
         obj->tx += obj->parent->tx;
         obj->ty += obj->parent->ty;
+        obj->opacity_value = obj->parent->opacity_value;
         if (obj->obj_prepare != NULL)
         {
             obj->obj_prepare(obj);

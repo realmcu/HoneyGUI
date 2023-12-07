@@ -477,7 +477,25 @@ static void no_blending_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dis
     }
 
 }
+static void do_blending_argb8888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity)
+{
+    //gui_log("[GUI] TODO line = %d", __LINE__);
 
+    uint8_t Sa = s->channel.alpha * opacity / 255;
+    uint8_t Sr = s->channel.red;
+    uint8_t Sg = s->channel.green;
+    uint8_t Sb = s->channel.blue;
+
+    uint8_t Da = d->channel.alpha;
+    uint8_t Dr = d->channel.red;
+    uint8_t Dg = d->channel.green;
+    uint8_t Db = d->channel.blue;
+
+    d->channel.alpha = ((255 - Sa) * Da + Sa * Sa) / 255;
+    d->channel.red = ((255 - Sa) * Dr + Sa * Sr) / 255;
+    d->channel.green = ((255 - Sa) * Dg + Sa * Sg) / 255;
+    d->channel.blue = ((255 - Sa) * Db + Sa * Sb) / 255;
+}
 static void cpu_matrix_blit_rgb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                                struct rtgui_rect *rect)
 {
@@ -546,7 +564,7 @@ static void cpu_matrix_blit_rgb8888_2_argb8888(draw_img_t *image, struct gui_dis
             default:
                 {
                     gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_argb8888_2_argb8888(d, &color);
+                    do_blending_argb8888_2_argb8888_opacity(d, &color, image->opacity_value);
                 }
                 break;
             }

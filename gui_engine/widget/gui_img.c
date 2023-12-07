@@ -171,11 +171,11 @@ static void img_prepare(gui_obj_t *obj)
     memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct rtgui_matrix));
     matrix_inverse(draw_img->inverse);
     rtgui_image_new_area(draw_img);
-
     if (tp->type == TOUCH_SHORT)
     {
         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
     }
+    gui_img_set_opacity((void *)obj, obj->opacity_value);
 }
 
 static void img_draw_cb(gui_obj_t *obj)

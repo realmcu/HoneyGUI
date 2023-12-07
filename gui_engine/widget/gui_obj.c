@@ -110,6 +110,7 @@ void gui_obj_ctor(gui_obj_t *this, gui_obj_t *parent, const char *name, int16_t 
 
     this->sx = 1.0f;
     this->sy = 1.0f;
+    this->opacity_value = UINT8_MAX;
 
 }
 void gui_obj_dtor(gui_obj_t *this)
