@@ -8,6 +8,7 @@ import subprocess
 import os
 import shutil
 from jira import JIRA
+import importlib
 
 class WindowsToolRelease():
     def __init__(self):
@@ -312,11 +313,107 @@ class HoneyGUIRelease(WindowsToolRelease):
         comment = comment + self.release_notes
         jira.add_comment(subtask, comment)
 
+def update_version(ftp_helper, win_sftp, sdk_path, zip_file, version, update_latest_version):
+    print("Update {} to ali cloud server".format(version))
+    #upoad html output to root folder
+    win_sftp.upload(os.path.join(sdk_path, zip_file), "")
+    if win_sftp.isdir(version):
+        win_sftp.rm(version)
+    #unzip to version folder
+    win_sftp.unzip(zip_file, version)
+    #update latest version
+    if update_latest_version:
+        print("Update latest version")
+        latest_version = "latest"
+        if win_sftp.isdir(latest_version):
+            win_sftp.rm(latest_version)
+        win_sftp.unzip(zip_file, latest_version)
+    win_sftp.disconnect()
+    #remove html output zip
+    win_sftp.connect()
+    win_sftp.sftp.remove(zip_file)
+    #update version list
+    #download version list first
+    version_list = "versionlist.txt"
+    win_sftp.download(version_list, os.getcwd())
+    with open(version_list, mode='r', newline='', errors='surrogateescape') as fd:
+        stream = fd.read()
+    if re.search(version + "\n", stream):
+        print("Already record {} in version list, skip".format(version))
+    else:
+        print("update {} into {}".format(version, version_list))
+        with open(version_list, mode='w+', newline='', errors='surrogateescape') as fd:
+            fd.write(stream + version + "\n")
+        #upload version list to alicloud server
+        win_sftp.upload(version_list, "")
+    win_sftp.disconnect()
+
+def backup_old_version(ftp_helper, win_sftp, version, update_latest_version):
+    backup_path = os.path.join(os.getcwd(), "backup")
+    if os.path.exists(backup_path):
+        shutil.rmtree(backup_path)
+    os.makedirs(backup_path)
+    if win_sftp.isdir(version):
+        print("backup {} first".format(version))
+        zip_name = version + ".tar.gz"
+        win_sftp.zip(version, version)
+        win_sftp.download(zip_name, backup_path)
+        win_sftp.sftp.remove(zip_name)
+    latest_version = "latest"
+    if update_latest_version and win_sftp.isdir(latest_version):
+        print("backup latest version")
+        zip_name = latest_version + ".tar.gz"
+        win_sftp.zip(latest_version, latest_version)
+        win_sftp.download(zip_name, backup_path)
+        win_sftp.sftp.remove(zip_name)
+    current_node = os.environ["node_name"]
+    os.environ["node_name"] = ""
+    hsot, port, key = ftp_helper.rs_ftp_host()
+    sftp = ftp_helper.SFTP(hsot, port, key)
+    sftp.connect()
+    for f in os.listdir(backup_path):
+        sftp.upload(os.path.join(backup_path, f), ftp_helper.rs_ftp_server())
+    sftp.disconnect()
+    os.environ["node_name"] = current_node
+
+def push_ali_cloud_server_version():
+    version = os.getenv("Release_Version")
+    update_latest_version = False
+    version_rule = r'(v\d+\.\d+\.\d+\.\d+)(\.\w+)*'
+    if not re.search(version_rule, version):
+        sys.exit("Please check release version")
+    if os.getenv("Update_Latest_Verion") == "true":
+        update_latest_version = True
+    sdk_path = os.path.join(os.getenv("WORKSPACE"), os.getenv("SDK_PATH"))
+    html_output_path = os.path.join(sdk_path, r"doc\output\html_out")
+    if not os.path.exists(html_output_path):
+        sys.exit("{} doesn't exist".format(html_output_path))
+
+    #connect ali cloud server
+    sys.path.append(os.path.join(os.getenv("WORKSPACE"), os.getenv("BUILD_SCRIPT_PATH")))
+    ftp_helper = importlib.import_module("release.helper.ftp_helper")
+    host, port, key = ftp_helper.ali_cloud_ftp_host()
+    win_sftp = ftp_helper.SFTP(host, port, key)
+    win_sftp.connect()
+
+    #backup old version
+    backup_old_version(ftp_helper, win_sftp, version, update_latest_version)
+    #zip html output
+    zip_name = version + ".tar.gz"
+    shutil.make_archive(base_name=os.path.splitext(os.path.splitext(zip_name)[0])[0], format='gztar', root_dir=html_output_path)
+    #update doc version
+    update_version(ftp_helper, win_sftp, sdk_path, zip_name, version, update_latest_version)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GUI Design Tool release build script')
-    parser.add_argument('-s', '--step', default='build', choices=['build', 'test', 'archive', 'push'], help='Select release build step')
+    parser.add_argument('-s', '--step', default='build', choices=['build', 'test', 'archive', 'push', 'pushALiCloud'], help='Select release build step')
     step = parser.parse_args().step
+
+    if step == "pushALiCloud":
+        push_ali_cloud_server_version()
+        sys.exit(0)
+
 
     honey_gui_release = HoneyGUIRelease()
     honey_gui_release.jenkins_check_env()
