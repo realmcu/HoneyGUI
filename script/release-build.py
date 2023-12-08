@@ -104,6 +104,22 @@ The key highlights of this release include:
             fd.writelines(all_lines)
 
 
+    def add_comment_code_line(self, line_content, file_path):
+        '''
+        add //
+        '''
+        with open(file_path, encoding='utf-8',newline='', errors='surrogateescape', mode='r') as fd:
+            all_lines = fd.readlines()
+            for i in range(len(all_lines)):
+                if line_content in all_lines[i]:
+                    print(f"find          -> {all_lines[i]}")
+                    all_lines[i] = r"//" + all_lines[i]
+                    print(f"after replace -> {all_lines[i]}")
+
+        with open(file_path, encoding='utf-8',newline='', errors='surrogateescape', mode='w') as fd:
+            fd.writelines(all_lines)
+
+
     def do_copy(self, src_list, dest_dir):
         """
         copy all file/dir in src_list inside the dest_dir
@@ -246,7 +262,7 @@ class HoneyGUIRelease(WindowsToolRelease):
         WindowsToolRelease.__init__(self)
         self.owner = "mengfei_gao"
         self.platform_separate = False
-        self.bin_dir = os.path.join(self.cwd, r'gui_engine\rtk_gui_sim')
+        self.bin_dir = os.path.join(self.cwd, r'win32_sim')
         self.mingw64_path = os.environ.get("MINGW64")
         if not self.mingw64_path:
             sys.exit(f"Can not find env MINGW64")
@@ -254,12 +270,16 @@ class HoneyGUIRelease(WindowsToolRelease):
 
     def before_build(self):
 
+        self.uncomment_code_line(line_content=r'#define BUILD_USING_SCRIPT_AS_A_APP',
+                                 file_path=os.path.join(os.getcwd(), r"win32_sim/menu_config.h"))
+        self.add_comment_code_line(line_content=r'#define BUILD_USING_RTK_GUI_448_368_DEMO',
+                                 file_path=os.path.join(os.getcwd(), r"win32_sim/menu_config.h"))
         self.print_git_diff()
 
     def jenkins_build_tool(self):
         self.before_build()
         try:
-            subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT, cwd=os.path.join(self.cwd, r'gui_engine\rtk_gui_sim'))
+            subprocess.check_call(["scons"], universal_newlines=True, stderr=subprocess.STDOUT, cwd=os.path.join(self.cwd, r'win32_sim'))
         except subprocess.CalledProcessError as e:
             sys.exit('scons: compiling error code ->\n{}'.format(e.returncode))
 
@@ -284,6 +304,7 @@ class HoneyGUIRelease(WindowsToolRelease):
         shutil.make_archive(base_name=pack_name, format='zip', root_dir=self.distribution_directory)
 
     def jenkins_push_tool(self):
+        return
         jira, subtask, t_platform = self.get_tool_release_task_jira()
         _ , pack_name = self.get_pack_name() 
         attachment = jira.add_attachment(issue=subtask, attachment=os.path.join(self.cwd, pack_name))
