@@ -442,8 +442,8 @@ typedef struct _gui_obj_t
     int16_t ay;//absolute value
     float sx;
     float sy;
-    int16_t tx;
-    int16_t ty;
+    int16_t tx;//for tab, diffent view use this value
+    int16_t ty;//for tab, diffent view use this value
     unsigned char opacity_value;
     //rtgui_matrix_t *matrix;
 

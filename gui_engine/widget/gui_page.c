@@ -136,7 +136,6 @@ void page_update(gui_obj_t *obj)
         deal_img_in_root(obj, obj->y + obj->h, &ay);
         obj->h = ay - obj->y;
         obj->w = 320;
-        // gui_log("deal_img_in_root %d",obj->h);
         ((gui_page_t *)obj)->get_yend++;
     }
     if (obj->parent->ay != 0)

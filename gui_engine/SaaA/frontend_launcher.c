@@ -115,9 +115,6 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     sprintf(path, "%s/%s", path2, entryy->d_name);
                     extern void get_app(gui_app_t *app, char **pic, char **text);
                     char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";
-                    // app->xml = path;
-                    //  redundant transforming only for code check
-                    //  error: Address of local auto-variable assigned to a function parameter.
                     uint32_t temp = (uint32_t)path;
                     app->xml = (char *)temp;
 
