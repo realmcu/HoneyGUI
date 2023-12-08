@@ -519,8 +519,9 @@ typedef struct _gui_obj_t
 #if defined __WIN32
 
 
-#define GUI_ROOT_FOLDER "gui_engine\\example\\screen_480_480\\root\\"
-
+//#define GUI_ROOT_FOLDER "gui_engine\\example\\screen_480_480\\root\\"
+extern char *defaultPath;
+#define GUI_ROOT_FOLDER defaultPath
 #else
 #define GUI_ROOT_FOLDER "/"
 #endif

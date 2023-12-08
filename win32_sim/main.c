@@ -21,9 +21,19 @@
 
 
 
-
+char *defaultPath = "gui_engine\\example\\screen_480_480\\root\\";
 int main(int argc, char **argv)
 {
+    for (int count = 1; count < argc; count++)
+    {
+        if (!strcmp(argv[count], "-p") && count + 1 < argc)
+        {
+            char *path = malloc(strlen(argv[count + 1]) + strlen("\\") + 1);
+            sprintf(path, "%s%s", argv[count + 1], "\\");
+            defaultPath = path;
+        }
+    }
+    printf("defaultPath path: %s\n", defaultPath);
     gui_components_init();
     while (1)
     {

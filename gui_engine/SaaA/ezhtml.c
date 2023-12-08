@@ -38,7 +38,7 @@
 #else
 
 #endif
-char *defaultPath = GUI_ROOT_FOLDER;
+//char *defaultPath = GUI_ROOT_FOLDER;
 struct widget_create
 {
     char *name;
