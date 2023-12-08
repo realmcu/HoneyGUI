@@ -304,7 +304,6 @@ class HoneyGUIRelease(WindowsToolRelease):
         shutil.make_archive(base_name=pack_name, format='zip', root_dir=self.distribution_directory)
 
     def jenkins_push_tool(self):
-        return
         jira, subtask, t_platform = self.get_tool_release_task_jira()
         _ , pack_name = self.get_pack_name() 
         attachment = jira.add_attachment(issue=subtask, attachment=os.path.join(self.cwd, pack_name))
