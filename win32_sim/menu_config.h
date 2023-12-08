@@ -34,6 +34,10 @@
 // #define BUILD_USING_RTK_GUI_320_384_DEMO
 // </c>
 
+// <c> RTK GUI Demo 320 385
+// #define BUILD_USING_RTK_GUI_320_385_DEMO
+// </c>
+
 // <c> RTK GUI Use OS Heap
 #define BUILD_USING_RTK_GUI_OS_HEAP
 // </c>
