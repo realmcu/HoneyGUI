@@ -38,7 +38,7 @@
 #else
 
 #endif
-//char *defaultPath = GUI_ROOT_FOLDER;
+//char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
 struct widget_create
 {
     char *name;
@@ -69,7 +69,7 @@ struct widget_create widget[] =
     {"arc", ARC},
     {"movie", MOVIE}
 };
-extern char *defaultPath;
+
 gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                        int16_t x,
                                        int16_t y)
@@ -1017,8 +1017,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             DIR *dir = 0;
                             struct dirent *entry;
-                            char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
-                            sprintf(path, "%s%s", defaultPath, folder);
+                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
@@ -1035,8 +1035,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             DIR *dir = 0;
                             struct dirent *entry;
-                            char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
-                            sprintf(path, "%s%s", defaultPath, folder);
+                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
@@ -2067,8 +2067,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             //         {
             //             DIR *dir = 0;
             //             struct dirent *entry;
-            //             char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
-            //             sprintf(path, "%s%s", defaultPath, folder);
+            //             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+            //             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
             //             if ((dir = opendir(path)) == NULL)
             //             {
             //                 gui_free(path);
@@ -2085,8 +2085,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             //         {
             //             DIR *dir = 0;
             //             struct dirent *entry;
-            //             char *path = gui_malloc(strlen(folder) + strlen(defaultPath) + 1);
-            //             sprintf(path, "%s%s", defaultPath, folder);
+            //             char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+            //             sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
             //             if ((dir = opendir(path)) == NULL)
             //             {
             //                 gui_free(path);
@@ -2246,10 +2246,9 @@ void create_tree(gui_app_t *app)
     extern void js_run_file(const char *file, gui_app_t  *app);
     if (js)
     {
-        extern char *defaultPath;
-        char *path = gui_malloc(strlen(js) + strlen(defaultPath) + 1);
+        char *path = gui_malloc(strlen(js) + strlen(GUI_ROOT_FOLDER) + 1);
 
-        sprintf(path, "%s%s", defaultPath, js); gui_log("js_path:%s", path);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, js); gui_log("js_path:%s", path);
         js_run_file(path, app);
 
         gui_free(path);
@@ -2297,10 +2296,9 @@ void get_app(gui_app_t *app, char *pic, char *text)
 }
 void get_system_screen(int *w, int *h)
 {
-    extern char *defaultPath;
     char *ezxmlpath = "app/system/launcher.xml";
-    char *path = gui_malloc(strlen(ezxmlpath) + strlen(defaultPath) + 1);
-    sprintf(path, "%s%s", defaultPath, ezxmlpath);
+    char *path = gui_malloc(strlen(ezxmlpath) + strlen(GUI_ROOT_FOLDER) + 1);
+    sprintf(path, "%s%s", GUI_ROOT_FOLDER, ezxmlpath);
     ezxml_t f1 =
         ezxml_parse_file(path);
     gui_free(path);
