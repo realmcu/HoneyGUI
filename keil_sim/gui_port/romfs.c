@@ -241,7 +241,7 @@ int open(const char *file, int flags, ...)
     struct romfs_fd *fd;
 
     /* allocate a fd */
-    fd = malloc(sizeof(struct romfs_fd));
+    fd = (struct romfs_fd *)malloc(sizeof(struct romfs_fd));
     if (fd)
     {
         fd->flags = flags;
