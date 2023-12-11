@@ -450,6 +450,18 @@ typedef struct _gui_obj_t
 
 } gui_obj_t;
 
+struct _gui_color
+{
+    union
+    {
+        unsigned char array[4];
+        struct
+        {
+            unsigned char r, g, b, a;
+        } rgba;
+    } color;
+};
+typedef struct _gui_color app_color;
 
 /** End of SUBMOUDLE_Exported_Types
   * @}

@@ -282,6 +282,28 @@ void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst)
     }
 }
 
+app_color gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
+                   unsigned char opacity)
+{
+    app_color color;
+    // Use longer initialization to suppress warning.
+    color.color.rgba.r = red;
+    color.color.rgba.g = green;
+    color.color.rgba.b = blue ;
+    color.color.rgba.a = opacity ;
+    return color;
+}
+
+app_color gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
+{
+    app_color color;
+    // Use longer initialization to suppress warning.
+    color.color.rgba.r = red;
+    color.color.rgba.g = green;
+    color.color.rgba.b = blue ;
+    color.color.rgba.a = UINT8_MAX ;
+    return color;
+}
 
 /** End of WIDGET_Exported_Functions
   * @}

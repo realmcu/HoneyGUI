@@ -256,7 +256,26 @@ gui_obj_t *gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type);
   * @return gui_obj_t*
   */
 void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst);
-
+/**
+ * @brief Get a color value from red, green, blue and opacity values.
+ *
+ * @param red  Range of unsigned char
+ * @param green Range of unsigned char
+ * @param blue Range of unsigned char
+ * @param opacity Range of unsigned char
+ * @return app_color
+ */
+app_color gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
+                   unsigned char opacity);
+/**
+ * @brief Get a color value from red, green, blue and opacity values.
+ *
+ * @param red  Range of unsigned char
+ * @param green Range of unsigned char
+ * @param blue Range of unsigned char
+ * @return app_color
+ */
+app_color gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
