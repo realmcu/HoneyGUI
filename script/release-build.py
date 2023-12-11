@@ -380,7 +380,7 @@ def push_ali_cloud_server_version():
     version = os.getenv("Release_Version")
     update_latest_version = False
     version_rule = r'(v\d+\.\d+\.\d+\.\d+)(\.\w+)*'
-    if not re.search(version_rule, version):
+    if not re.search(version_rule, version) and version not in ["master", "latest"]:
         sys.exit("Please check release version")
     if os.getenv("Update_Latest_Verion") == "true":
         update_latest_version = True
