@@ -40,7 +40,16 @@ static pthread_cond_t sdl_ok_event;
 static struct gui_touch_data raw_data = {0};
 
 static gui_kb_port_data_t kb_port_data = {0};
-
+int sim_screen_width = DRV_LCD_WIDTH;
+int sim_screen_hight = DRV_LCD_HIGHT;
+int32_t sim_get_width()
+{
+    return sim_screen_width;
+}
+int32_t sim_get_hight()
+{
+    return sim_screen_hight;
+}
 
 
 
@@ -80,7 +89,7 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
 #else
     SDL_Texture *texture;
 
-    memcpy(surface->pixels, dc->frame_buf, DRV_LCD_WIDTH * DRV_LCD_HIGHT * DRV_PIXEL_BITS / 8);
+    memcpy(surface->pixels, dc->frame_buf, sim_get_width() * sim_get_hight() * DRV_PIXEL_BITS / 8);
 
     texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
@@ -92,7 +101,7 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
     return;
 }
 
-static uint8_t sim_framebuffer[DRV_LCD_WIDTH * DRV_LCD_HIGHT * DRV_PIXEL_BITS / 8] = {0};
+static uint8_t sim_framebuffer[1080 * 1080 * DRV_PIXEL_BITS / 8] = {0};
 static uint8_t __attribute__((aligned(4))) disp_write_buff1_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
                                                                                * DRV_PIXEL_BITS / 8];
 static uint8_t __attribute__((aligned(4))) disp_write_buff2_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
@@ -156,8 +165,8 @@ void *rtk_gui_sdl(void *arg)
         return NULL;
     }
     window = SDL_CreateWindow("RTKIOT GUI Simulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              DRV_LCD_WIDTH,
-                              DRV_LCD_HIGHT, 0);
+                              sim_get_width(),
+                              sim_get_hight(), 0);
     renderer = SDL_CreateRenderer(window, -1, 0);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -174,7 +183,8 @@ void *rtk_gui_sdl(void *arg)
         SDL_PixelFormatEnumToMasks(SDL_PIXELFORMAT_ARGB8888, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
     }
 
-    surface = SDL_CreateRGBSurface(0, DRV_LCD_WIDTH, DRV_LCD_HIGHT, bpp, Rmask, Gmask, Bmask, Amask);
+    surface = SDL_CreateRGBSurface(0, sim_get_width(), sim_get_hight(), bpp, Rmask, Gmask, Bmask,
+                                   Amask);
     SDL_RenderPresent(renderer);
 
     pthread_cond_signal(&sdl_ok_event);
@@ -253,6 +263,18 @@ void *rtk_gui_sdl(void *arg)
 
 void gui_port_dc_init(void)
 {
+#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+    char *apppath = "app";
+    char *path = gui_malloc(strlen(apppath) + strlen(GUI_ROOT_FOLDER) + 1);
+    sprintf(path, "%s%s", GUI_ROOT_FOLDER, apppath);
+
+    extern void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight);
+    extern int sim_screen_width;
+    extern int sim_screen_hight;
+    xml_get_screen(path, 0, &sim_screen_width, &sim_screen_hight);
+    _rect.w = sim_screen_width;
+    _rect.h = sim_screen_hight;
+#endif
     pthread_mutex_init(&sdl_ok_mutex, NULL);
     pthread_cond_init(&sdl_ok_event, NULL);
 
@@ -268,6 +290,14 @@ void gui_port_dc_init(void)
     pthread_cond_destroy(&sdl_ok_event);
 
     gui_dc_info_register(&dc);
+#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+    struct gui_dispdev *dc =  gui_get_dc();
+    dc->fb_height = sim_screen_hight;
+    dc->fb_width = sim_screen_width;
+    dc->screen_width = sim_screen_width;
+    dc->screen_height = sim_screen_hight;
+    dc->driver_ic_active_width = sim_screen_width;
+#endif
 }
 
 
