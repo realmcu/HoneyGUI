@@ -200,14 +200,17 @@ static void tabview_prepare(gui_obj_t *obj)
         //when current tab is the end,come back to current tab if sliding.
         if (tabview->cur_id.x == tabview->tab_cnt_right)
         {
-            gui_tabview_jump_tab(tabview, 0, 0);
-            if (tabview->jump.jump_flag)
+            if (tabview->loop)
             {
-                tabview->cur_id.y = tabview->jump.jump_id.y;
-                tabview->cur_id.x = tabview->jump.jump_id.x;
-                tabview->jump.jump_flag = false;
-                this->release_x = 0;
-                return;
+                gui_tabview_jump_tab(tabview, 0, 0);
+                if (tabview->jump.jump_flag)
+                {
+                    tabview->cur_id.y = tabview->jump.jump_id.y;
+                    tabview->cur_id.x = tabview->jump.jump_id.x;
+                    tabview->jump.jump_flag = false;
+                    this->release_x = 0;
+                    return;
+                }
             }
             return;
         }
@@ -220,14 +223,17 @@ static void tabview_prepare(gui_obj_t *obj)
         //when current tab is the end,come back to current tab if sliding.
         if (tabview->cur_id.x == tabview->tab_cnt_left)
         {
-            gui_tabview_jump_tab(tabview, tabview->tab_cnt_right, 0);
-            if (tabview->jump.jump_flag)
+            if (tabview->loop)
             {
-                tabview->cur_id.y = tabview->jump.jump_id.y;
-                tabview->cur_id.x = tabview->jump.jump_id.x;
-                tabview->jump.jump_flag = false;
-                this->release_x = 0;
-                return;
+                gui_tabview_jump_tab(tabview, tabview->tab_cnt_right, 0);
+                if (tabview->jump.jump_flag)
+                {
+                    tabview->cur_id.y = tabview->jump.jump_id.y;
+                    tabview->cur_id.x = tabview->jump.jump_id.x;
+                    tabview->jump.jump_flag = false;
+                    this->release_x = 0;
+                    return;
+                }
             }
             return;
         }
@@ -343,7 +349,10 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
     parent_tabview->jump.jump_id.x = idx;
     parent_tabview->jump.jump_id.y = idy;
 }
-
+void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not)
+{
+    tabview->loop = loop_or_not;
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

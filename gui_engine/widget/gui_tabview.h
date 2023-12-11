@@ -64,6 +64,7 @@ typedef struct gui_tabview
     gui_tabview_tab_id_t cur_id;
     gui_jump_t jump;
     SLIDE_STYLE style;
+    bool loop;
     int16_t release_x;
     int16_t release_y;
 } gui_tabview_t;
@@ -151,7 +152,13 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
  */
 void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style);
 
-
+/**
+ * @brief Config tabview loop sliding feature. The default setting is no looping.
+ *
+ * @param tabview tabview pointer.
+ * @param loop_or_not Loops when set to true, does not loop when set to false.
+ */
+void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
