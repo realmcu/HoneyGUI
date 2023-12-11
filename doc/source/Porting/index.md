@@ -1,11 +1,14 @@
 # Porting
-The porting files are in the gui_port folder. 
-    There are four files that need to be modified, corresponding to the input device, display device, OS, and file system. 
+
+The porting files are in the gui_port folder.
+    There are four files that need to be modified, corresponding to the input device, display device, OS, and file system.
     At present, it has been transplanted in FreeRTOS, RT-Thread, and Windows, you can refer to it.
 ## Input device
+
 - ``sdk\src\app\wristband\gui_port\gui_port_indev.c``
 - The input information is abstracted as touch screen contacts, and the input information structure is as follows
-```
+
+```C
 typedef struct gui_touch_data
 {
     uint8_t          event;                 /* The touch event of the data */
@@ -17,12 +20,15 @@ typedef struct gui_touch_data
     void            *data;
 } gui_touch_data_t;
 ```
+
 ## Display device
+
 - ``sdk\src\app\wristband\gui_port\gui_port_dc.c``
 - It is necessary to define the screen width and height, frame buffer address and mode, whether the resolution is scaled, and realize the refresh function. The structure is as follows.
 - The framebuffer's size is ```fb_width*fb_height*bit_depth/8```.
-- In ```DC_RAMLESS``` mode, two framebuffers are used, and the fb_height is section height. 
-```
+- In ```DC_RAMLESS``` mode, two framebuffers are used, and the fb_height is section height.
+
+```C
 static struct gui_dispdev dc =
 {
     .bit_depth = DRV_PIXEL_BITS,
@@ -47,10 +53,13 @@ static struct gui_dispdev dc =
     .gpu_type = GPU_SW,
 };
 ```
+
 ## File system
+
 - ``sdk\src\app\wristband\gui_port\gui_port_filesystem.c``
 - Need to define several posix-style interface operation files and folders, as follows.
-```
+
+```C
 struct gui_fs
 {
     int (*open)(const char *file, int flags, ...);
@@ -64,10 +73,13 @@ struct gui_fs
     int (*closedir)(gui_fs_DIR *d);
 };
 ```
+
 ## OS
+
 - ``sdk\src\app\wristband\gui_port\gui_port_os.c``
 - Need to define interfaces for threads, timers, message queues, and memory management, as follows
-```
+
+```C
 struct gui_os_api
 {
     char *name;
@@ -97,26 +109,27 @@ struct gui_os_api
 
 ## Sleep management
 
-todo
+In order to reduce power consumption and increase device usage time, the sleep(low-power) mode is supported.
 
+- ``sdk\src\app\wristband\gui_port\gui_port_os.c``
 
+```C
+typedef struct gui_app gui_app_t;
+struct gui_app
+{
+    gui_obj_t screen;               //!< widget tree root
+    const char *xml;                //!< widget tree design file
+    uint32_t active_ms;             //!< screen shut dowm delay
+    void *thread_id;                //!< thread handle(optional)
+    void (* thread_entry)(void *this); //!< thread entry
+    void (* ctor)(void *this);      //!< constructor
+    void (* dtor)(void *this);      //!< destructor
+    void (* ui_design)(gui_app_t *); //!< ui create entry
+    bool lvgl;
+};
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+``active_ms`` is the standby time of the gui app, which can be defined as different values in different apps.
+Same as other types of electronic devices, when the screen continues to display an interface for longer than the standby time, it will enter sleep mode.
+During sleep, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
+In chip manual, this low-power state where peripherals can be turned off is called deep low power state(DLPS). More information about DLPS can be found in the relevant guidance documentation in the SDK.
