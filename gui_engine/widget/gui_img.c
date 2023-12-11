@@ -150,7 +150,8 @@ static void img_prepare(gui_obj_t *obj)
     draw_img_t *draw_img = &this->draw_img;
 
     rtgui_image_load_scale(draw_img);
-
+    root->w = draw_img->img_w;
+    root->h = draw_img->img_h;
     matrix_identity(draw_img->matrix);
     matrix_identity(draw_img->matrix);
     matrix_translate(root->dx, root->dy, draw_img->matrix);
