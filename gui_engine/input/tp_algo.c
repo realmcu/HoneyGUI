@@ -84,6 +84,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_data *raw_data)
             tp.pressing = false;
             TP_LOG("=====END UP====== tick = %d\n", raw_data->timestamp_ms);
         }
+        return tp_local_event;
     }
 
     if (down_cnt == 1)
@@ -103,7 +104,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_data *raw_data)
         {
             x_min_record = *raw_data;
         }
-        if (raw_data->y_coordinate < x_min_record.y_coordinate)
+        if (raw_data->y_coordinate < y_min_record.y_coordinate)
         {
             y_min_record = *raw_data;
         }
@@ -111,7 +112,7 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_data *raw_data)
         {
             x_max_record = *raw_data;
         }
-        if (raw_data->y_coordinate > x_max_record.y_coordinate)
+        if (raw_data->y_coordinate > y_max_record.y_coordinate)
         {
             y_max_record = *raw_data;
         }
@@ -171,7 +172,7 @@ static bool tp_judge_quick_x_left_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaX) >= abs(tp.deltaY))
         {
-            if (raw_data->x_coordinate < first_record.x_coordinate)
+            if (tp.deltaX < 0)
             {
                 tp.type = TOUCH_LEFT_SLIDE;
                 TP_LOG("type = TOUCH_LEFT_SLIDE, %d \n", __LINE__);
@@ -189,10 +190,10 @@ static bool tp_judge_quick_x_right_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaX) >= abs(tp.deltaY))
         {
-            if (raw_data->x_coordinate > first_record.x_coordinate)
+            if (tp.deltaX > 0)
             {
                 tp.type = TOUCH_RIGHT_SLIDE;
-                TP_LOG("type = TOUCH_LEFT_SLIDE, %d \n", __LINE__);
+                TP_LOG("type = TOUCH_RIGHT_SLIDE, %d \n", __LINE__);
                 return true;
             }
         }
@@ -207,7 +208,7 @@ static bool tp_judge_quick_y_down_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaX) < abs(tp.deltaY))
         {
-            if (raw_data->y_coordinate < first_record.y_coordinate)
+            if (tp.deltaY > 0)
             {
                 tp.type = TOUCH_DOWN_SLIDE;
                 TP_LOG("type = TOUCH_DOWN_SLIDE\n");
@@ -225,7 +226,7 @@ static bool tp_judge_quick_y_up_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaX) < abs(tp.deltaY))
         {
-            if (raw_data->y_coordinate > first_record.y_coordinate)
+            if (tp.deltaY < 0)
             {
                 tp.type = TOUCH_UP_SLIDE;
                 TP_LOG("type = TOUCH_UP_SLIDE\n");
@@ -242,7 +243,7 @@ static bool tp_judge_slow_x_left_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaX) > gui_get_screen_width() / 2)
         {
-            if (raw_data->x_coordinate < first_record.x_coordinate)
+            if (tp.deltaX < 0)
             {
                 tp.type = TOUCH_LEFT_SLIDE;
                 TP_LOG("type = TOUCH_LEFT_SLIDE, %d \n", __LINE__);
@@ -258,7 +259,7 @@ static bool tp_judge_slow_x_right_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaX) > gui_get_screen_width() / 2)
         {
-            if (raw_data->x_coordinate > first_record.x_coordinate)
+            if (tp.deltaX > 0)
             {
                 tp.type = TOUCH_RIGHT_SLIDE;
                 TP_LOG("type = TOUCH_RIGHT_SLIDE, %d \n", __LINE__);
@@ -287,7 +288,7 @@ static bool tp_judge_slow_y_down_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaY) > gui_get_screen_height() / 2)
         {
-            if (raw_data->y_coordinate < first_record.y_coordinate)
+            if (tp.deltaY > 0)
             {
                 tp.type = TOUCH_DOWN_SLIDE;
                 TP_LOG("type = TOUCH_DOWN_SLIDE\n");
@@ -303,7 +304,7 @@ static bool tp_judge_slow_y_up_slide(struct gui_touch_data *raw_data)
     {
         if (abs(tp.deltaY) > gui_get_screen_height() / 2)
         {
-            if (raw_data->y_coordinate >= first_record.y_coordinate)
+            if (tp.deltaY < 0)
             {
                 tp.type = TOUCH_UP_SLIDE;
                 TP_LOG("type = TOUCH_UP_SLIDE\n");
