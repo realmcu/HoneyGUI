@@ -5,7 +5,7 @@ The porting files are in the gui_port folder.
     At present, it has been transplanted in FreeRTOS, RT-Thread, and Windows, you can refer to it.
 ## Input device
 
-- ``sdk\src\app\wristband\gui_port\gui_port_indev.c``
+- ``guidef.h and gui_port_indev.c``
 - The input information is abstracted as touch screen contacts, and the input information structure is as follows
 
 ```C
