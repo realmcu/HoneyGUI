@@ -948,7 +948,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 }
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
-                int8_t opacity_value = image->opacity_value;
+                uint8_t opacity_value = image->opacity_value;
                 gui_color_t color = {.channel.blue = pixel[0],
                                      .channel.green = pixel[1],
                                      .channel.red = pixel[2],
@@ -1014,7 +1014,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
                 //gui_log("piexl_%d %d %d\n",pixel[0],pixel[1],pixel[2]);
-                int8_t opacity_value = image->opacity_value;
+                uint8_t opacity_value = image->opacity_value;
                 gui_color_t color = {.channel.blue = pixel[0],
                                      .channel.green = pixel[1],
                                      .channel.red = pixel[2],
@@ -1080,7 +1080,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 uint16_t pixel = *(uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                                source_bytes_per_pixel);
 
-                int8_t opacity_value = image->opacity_value;
+                uint8_t opacity_value = image->opacity_value;
                 gui_color_t color = {.channel.blue = (pixel & 0x001f) << 3,
                                      .channel.green = ((pixel & 0x07e0) >> 5) << 2,
                                      .channel.red = (pixel >> 11) << 3,
