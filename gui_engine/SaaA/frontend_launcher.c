@@ -184,7 +184,7 @@ void xml_get_screen(char *dirPath, char *xml_file, int *width, int *hight)
                     char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";
 
 
-                    get_app_by_file(path, &pic, &text); gui_log("get:%s,%s\n", pic, text);
+                    get_app_by_file(path, (char *)&pic, (char *)&text); gui_log("get:%s,%s\n", pic, text);
                     void *img1;
                     {
                         img1 = gui_get_file_address(pic);

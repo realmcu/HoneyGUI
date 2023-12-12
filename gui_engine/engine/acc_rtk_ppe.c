@@ -1,4 +1,3 @@
-#include <draw_img.h>
 #include <stdio.h>
 #include <gui_matrix.h>
 #include <rtl_ppe.h>
@@ -6,7 +5,7 @@
 #include <drv_lcd.h>
 #include "math.h"
 #include "trace.h"
-
+#include "draw_img.h"
 
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
@@ -95,7 +94,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     source.memory = (void *)source.address;
     source.global_alpha_en = true;
     source.global_alpha = image->opacity_value;
-    if (image->blend_mode == IMG_MAGIC_MATRIX)
+    if (image->blend_mode == IMG_FILTER_MATRIX)
     {
         if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
         {
