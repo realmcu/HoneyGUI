@@ -575,12 +575,12 @@ static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
     this->draw_img_left.data = array[4];
     this->draw_img_right.data = array[5];
 
-    this->draw_img_front.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_back.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_up.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_down.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_left.blend_mode = IMG_MAGIC_MATRIX;
-    this->draw_img_right.blend_mode = IMG_MAGIC_MATRIX;
+    this->draw_img_front.blend_mode = IMG_FILTER_MATRIX;
+    this->draw_img_back.blend_mode = IMG_FILTER_MATRIX;
+    this->draw_img_up.blend_mode = IMG_FILTER_MATRIX;
+    this->draw_img_down.blend_mode = IMG_FILTER_MATRIX;
+    this->draw_img_left.blend_mode = IMG_FILTER_MATRIX;
+    this->draw_img_right.blend_mode = IMG_FILTER_MATRIX;
 
     this->draw_img_front.matrix = gui_malloc(sizeof(struct rtgui_matrix));
     this->draw_img_back.matrix = gui_malloc(sizeof(struct rtgui_matrix));

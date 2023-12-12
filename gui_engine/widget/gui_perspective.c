@@ -532,7 +532,7 @@ static void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, con
     {
         this->img[i].data = array[i];
         this->img[i].opacity_value = UINT8_MAX;
-        this->img[i].blend_mode = IMG_MAGIC_MATRIX;
+        this->img[i].blend_mode = IMG_FILTER_MATRIX;
         this->img[i].matrix = gui_malloc(sizeof(struct rtgui_matrix));
         this->img[i].inverse = gui_malloc(sizeof(struct rtgui_matrix));
     }

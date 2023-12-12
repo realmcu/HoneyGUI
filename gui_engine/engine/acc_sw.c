@@ -296,29 +296,25 @@ void normal_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-
-            gui_color_t color = {.channel.blue = pixel[0],
-                                 .channel.green = pixel[1],
-                                 .channel.red = pixel[2],
-                                 .channel.alpha = pixel[3],
-                                };
             switch (image->opacity_value)
             {
             case 0:
                 break;
             case 255:
                 {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_argb8888_2_argb8888(d, &color);
+                    if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
+                    }
                 }
                 break;
             default:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_argb8888_2_argb8888(d, &color);
-                }
                 break;
             }
+
         }
     }
 }
@@ -357,12 +353,11 @@ void normal_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             uint8_t *pixel = (uint8_t *)read_off;
-            gui_color_t color = {.channel.alpha = pixel[3],
-                                 .channel.blue = pixel[0],
-                                 .channel.green = pixel[1],
-                                 .channel.red = pixel[2],
-                                };
-            do_blending_argb8888_2_rgb565((uint8_t *)(writebuf + write_off + j), color);
+            if (pixel != 0)
+            {
+                writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                          + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+            }
         }
     }
 
@@ -640,31 +635,34 @@ void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_di
             }
 
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
-
             gui_color_t color = {.channel.blue = pixel[0],
                                  .channel.green = pixel[1],
                                  .channel.red = pixel[2],
                                  .channel.alpha = pixel[3],
                                 };
             uint8_t opacity_value = (uint8_t)image->opacity_value;
-            switch (opacity_value)
+            if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-            case 0:
-                break;
-            case 255:
+                //uint8_t opacity_value = image->opacity_value;
+                switch (opacity_value)
                 {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_argb8888_2_argb8888(d, &color);
+                case 0:
+                    break;
+                case 255:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_argb8888_2_argb8888(d, &color);
+                    }
+                    break;
+                default:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_argb8888_2_argb8888_opacity(d, &color, opacity_value);
+                    }
+                    break;
                 }
-                break;
-            default:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_argb8888_2_argb8888_opacity(d, &color, opacity_value);
-                }
-                break;
-            }
 
+            }
         }
     }
 }
@@ -714,12 +712,33 @@ void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_disp
             }
 
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
-
+            gui_color_t color = {.channel.blue = pixel[0],
+                                 .channel.green = pixel[1],
+                                 .channel.red = pixel[2],
+                                 .channel.alpha = pixel[3],
+                                };
+            uint8_t opacity_value = (uint8_t)image->opacity_value;
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-                writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                //uint8_t opacity_value = image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_rgb888_2_argb8888(d, &color);
+                    }
+                    break;
+                default:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_rgb888_2_argb8888_opacity(d, &color, opacity_value);
+                    }
+                    break;
+                }
+
             }
         }
     }
@@ -970,7 +989,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if (image->blend_mode == IMG_MAGIC_MATRIX)
+    if (image->blend_mode == IMG_FILTER_MATRIX)
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1018,6 +1037,103 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
+    if (image->blend_mode == IMG_ALPHA_MATRIX)
+    {
+        if (dc_bytes_per_pixel == 2)
+        {
+            if (img_type == RGB565)
+            {
+                //alpha_matrix_blit_rgb565_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                // alpha_matrix_blit_rgb888_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                // alpha_matrix_blit_argb8888_2_rgb565(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+            if (img_type == RGB565)
+            {
+                // alpha_matrix_blit_rgb565_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                // alpha_matrix_blit_rgb888_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                // alpha_matrix_blit_argb8888_2_rgb888(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 4)
+        {
+            if (img_type == RGB565)
+            {
+                // alpha_matrix_blit_rgb565_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                // alpha_matrix_blit_rgb888_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                // alpha_matrix_blit_argb8888_2_argb8888(image, dc, rect);
+            }
+        }
+    }
+    if (image->blend_mode == IMG_ALPHA_BLEND)
+    {
+        // if (dc_bytes_per_pixel == 2)
+        // {
+        //     if (img_type == RGB565)
+        //     {
+        //         //alpha_blend_blit_rgb565_2_rgb565(image, dc, rect);
+        //     }
+        //     else if (img_type == RGB888)
+        //     {
+        //         // alpha_blend_blit_rgb888_2_rgb565(image, dc, rect);
+        //     }
+        //     else if (img_type == RGBA8888)
+        //     {
+        alpha_blend_blit_argb8888_2_rgb565(image, dc, rect);
+        //     }
+        // }
+        // else if (dc_bytes_per_pixel == 3)
+        // {
+        //     if (img_type == RGB565)
+        //     {
+        //         // alpha_blend_blit_rgb565_2_rgb888(image, dc, rect);
+        //     }
+        //     else if (img_type == RGB888)
+        //     {
+        //         // alpha_blend_blit_rgb888_2_rgb888(image, dc, rect);
+        //     }
+        //     else if (img_type == RGBA8888)
+        //     {
+        //         // alpha_blend_blit_argb8888_2_rgb888(image, dc, rect);
+        //     }
+        // }
+        if (dc_bytes_per_pixel == 4)
+        {
+            if (img_type == RGB565)
+            {
+                alpha_blend_blit_rgb565_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                alpha_blend_blit_rgb888_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                alpha_blend_blit_argb8888_2_argb8888(image, dc, rect);
+            }
+        }
+    }
+
 }
 
 

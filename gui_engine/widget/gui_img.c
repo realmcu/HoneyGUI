@@ -233,7 +233,7 @@ static void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char
     //draw_img->blend_mode = IMG_FILTER_BLACK;
     draw_img->data = addr;
     draw_img->opacity_value = 255;
-    draw_img->blend_mode = IMG_MAGIC_MATRIX;
+    draw_img->blend_mode = IMG_FILTER_MATRIX;
     draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
     draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
     draw_img->opacity_value = UINT8_MAX;
