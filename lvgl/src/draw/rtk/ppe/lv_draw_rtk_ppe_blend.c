@@ -10,7 +10,9 @@
 
 #if LV_USE_GPU_RTK_PPE
 #include "lv_draw_rtk_ppe_blend.h"
+#include "lv_draw_rtk_ppe_buffer.h"
 #include "rtl_ppe.h"
+#include "rtl_gdma.h"
 /*********************
  *      DEFINES
  *********************/
@@ -111,7 +113,6 @@ lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
     }
 }
 
-#include "trace.h"
 #include "os_mem.h"
 lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
                                const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf)
@@ -161,7 +162,6 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     }
     else
     {
-        //DBG_DIRECT("format return %d", cf);
         return LV_RES_INV;
     }
     PPE_translate_t trans = {.x = coords->x1, .y = coords->y1};
@@ -218,17 +218,58 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             source.global_alpha_en = ENABLE;
             source.global_alpha = dsc->opa;
         }
-        PPE_ERR err = PPE_blend(&source, &target, &trans);
-        if (err == PPE_SUCCESS)
+
+#if PPE_CACHE_BG
+        uint32_t ppe_buffer_size;
+        uint8_t *m_buf = lv_draw_rtk_ppe_get_buffer(&ppe_buffer_size);
+        uint32_t block_size = source.width * source.height * LV_COLOR_DEPTH / 8;
+        uint32_t block_num = block_size / ppe_buffer_size;
+
+        if (block_size % ppe_buffer_size)
         {
-            return LV_RES_OK;
+            block_num ++;
+        }
+        lv_area_t block_area;
+        if (block_num == 0)
+        {
+            //NOTE: for potential solution, will never be accessed
+            lv_area_t blend_area;
+            /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
+            if (!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
+            {
+                return LV_RES_INV;    /*Fully clipped, nothing to do*/
+            }
+            ppe_buffer_t bg;
+            memset(&bg, 0, sizeof(ppe_buffer_t));
+            bg.memory = (uint32_t *)m_buf;
+            bg.address = (uint32_t)bg.memory;
+            bg.width = blend_area.x2 - blend_area.x1;
+            bg.height = blend_area.y2 - blend_area.y1;
+            bg.format = target.format;
+            lv_draw_rtk_ppe_read_buffer(draw_ctx, &blend_area, (uint8_t *)target.memory);
+            PPE_translate_t block_trans = {.x = coords->x1, .y = coords->y1};
+            PPE_translate_t blend_trans = {.x = blend_area.x1, .y = blend_area.y1};
+            PPE_ERR err = PPE_blend_multi(&source, &bg, &target, &block_trans, &blend_trans);
+            if (err != PPE_SUCCESS)
+            {
+                return LV_RES_INV;
+            }
         }
         else
+#endif
         {
-            return LV_RES_INV;
+            PPE_ERR err = PPE_blend(&source, &target, &trans);
+            if (err == PPE_SUCCESS)
+            {
+                return LV_RES_OK;
+            }
+            else
+            {
+                return LV_RES_INV;
+            }
         }
     }
-//    DBG_DIRECT("src w %d, h %d, x1 %d, y1 %d", source.width, source.height, trans.x, trans.y);
+    return LV_RES_INV;
 }
 
 lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,

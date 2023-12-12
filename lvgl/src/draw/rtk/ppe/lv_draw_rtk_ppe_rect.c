@@ -42,8 +42,8 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
                         const lv_area_t *clip_area,
                         const lv_draw_rect_dsc_t *dsc)
 {
-//    DBG_DIRECT("coord: %d->%d,  %d->%d", coords->x1, coords->x2, coords->y1, coords->y2);
-//    DBG_DIRECT("clips: %d->%d,  %d->%d", clip_area->x1, clip_area->x2, clip_area->y1, clip_area->y2);
+
+
     if (dsc->radius > 0)
     {
         return LV_RES_INV;
