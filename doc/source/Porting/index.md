@@ -111,7 +111,7 @@ struct gui_os_api
 
 In order to reduce power consumption and increase device usage time, the sleep(low-power) mode is supported.
 
-- ``sdk\src\app\wristband\gui_port\gui_port_os.c``
+- ``gui_engine\app\gui_app.h``
 
 ```C
 typedef struct gui_app gui_app_t;
