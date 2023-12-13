@@ -1,7 +1,13 @@
-/*
- * File      : gui_server.c
+/**
+ * @file gui_server.c
+ * @author howie_wang (howie_wang@realtek.com.cn)
+ * @brief
+ * @version 0.1
+ * @date 2023-12-12
+ *
+ * @copyright Copyright (c) 2023
+ *
  */
-
 #include <guidef.h>
 #include <draw_img.h>
 #include <draw_font.h>
@@ -14,15 +20,10 @@
 #include <gui_app.h>
 #include "acc_engine.h"
 
-static void (*gui_debug_hook)(void) = NULL;
-static void *gui_server_handle = NULL;
 static void *gui_server_mq = NULL;
 static void (*gui_task_ext_execution_hook)(void) = NULL;
 
-void gui_debug_sethook(void (*hook)(void))
-{
-    gui_debug_hook = hook;
-}
+
 static void rtgui_server_msg_handler(rtgui_msg_t *msg)
 {
 
@@ -49,15 +50,15 @@ bool send_msg_to_gui_server(rtgui_msg_t *msg)
         return false;
     }
 }
-/**
- * rtgui server thread's entry
- */
-
-//static int32_t daemon_left_ms = 5000;
 
 static uint32_t daemon_start_ms = 0;
 static uint32_t daemon_cnt = 0;
 
+/**
+ * @brief
+ *
+ * @param parameter
+ */
 static void rtgui_server_entry(void *parameter)
 {
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
@@ -67,7 +68,6 @@ static void rtgui_server_entry(void *parameter)
     gui_mq_create(&gui_server_mq, "gui_svr_mq", sizeof(rtgui_msg_t), 16);
     while (1)
     {
-        // gui_thread_mdelay(10);
         gui_app_t *app = gui_current_app();
         while (app == NULL)
         {
@@ -85,15 +85,9 @@ static void rtgui_server_entry(void *parameter)
             gui_task_ext_execution_hook();
         }
 
-        rtgui_msg_t msg;
-        (void)msg;
+        tp_algo_process(touchpad_get_data());
 
-
-        struct gui_touch_data *raw = touchpad_get_data();
-        tp_algo_process(raw);
-
-        gui_kb_port_data_t *kb_raw = kb_get_data();
-        kb_algo_process(kb_raw);
+        kb_algo_process(kb_get_data());
 
         if (app->lvgl == true)
         {
@@ -111,6 +105,7 @@ static void rtgui_server_entry(void *parameter)
         }
 
         touch_info_t *tp = tp_get_info();
+
         if (tp->pressed == true)
         {
             daemon_start_ms = gui_ms_get();
@@ -120,6 +115,7 @@ static void rtgui_server_entry(void *parameter)
         {
             gui_log("line %d, aemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n",
                     __LINE__, daemon_start_ms, gui_ms_get(), app->active_ms);
+            rtgui_msg_t msg;
             if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0xFFFFFFFF))
             {
                 rtgui_server_msg_handler(&msg);
@@ -130,26 +126,12 @@ static void rtgui_server_entry(void *parameter)
     }
 }
 
-void gui_server_suspend(void)
-{
-    gui_log("!Suspend GUI Server and wait receive message! \n");
-    gui_thread_suspend(gui_server_handle);
-}
 
-bool gui_server_exit_dlps(void)
-{
-    rtgui_msg_t msg;
-    msg.type = 1;
-    send_msg_to_gui_server(&msg);
-    return true;
-}
-
-void gui_server_resume(void)
-{
-    gui_thread_resume(gui_server_handle);
-}
-
-
+/**
+ * @brief
+ *
+ * @return int
+ */
 int rtgui_server_init(void)
 {
     extern void gui_port_dc_init(void);
@@ -159,26 +141,17 @@ int rtgui_server_init(void)
     gui_port_os_init();
     gui_port_indev_init();
     gui_port_dc_init();
-
     gui_port_fs_init();
 
     gui_acc_init();
 
     rtgui_system_image_init();
     rtgui_system_font_init();
-    struct gui_indev *indev = gui_get_indev();
 
-    if (gui_debug_hook != 0)
-    {
-        gui_debug_hook();
-        gui_log("GUI Debug Mode!!");
-        while (1);
-    }
-
-    gui_server_handle = gui_thread_create(GUI_SERVER_THREAD_NAME,
-                                          rtgui_server_entry, NULL,
-                                          1024 * 10,
-                                          15);
+    gui_thread_create(GUI_SERVER_THREAD_NAME,
+                      rtgui_server_entry, NULL,
+                      1024 * 10,
+                      15);
     return 0;
 }
 

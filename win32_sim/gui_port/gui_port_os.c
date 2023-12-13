@@ -4,16 +4,20 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <pthread.h>
+#include "gui_queue.h"
 
-void *port_thread_create(const char *name, void (*entry)(void *param), void *param,
-                         uint32_t stack_size, uint8_t priority)
+static uint32_t gui_tick = 0;
+
+static void *port_thread_create(const char *name, void (*entry)(void *param), void *param,
+                                uint32_t stack_size, uint8_t priority)
 {
     pthread_t *thread = malloc(sizeof(pthread_t));
     pthread_create(thread, NULL, entry, param);
     pthread_setname_np(*thread, name);
     return thread;
 }
-bool port_thread_delete(void *handle)
+
+static bool port_thread_delete(void *handle)
 {
     pthread_t *thread = handle;
     void *ret = NULL;
@@ -23,13 +27,50 @@ bool port_thread_delete(void *handle)
     pthread_join(*thread, &ret);
     return true;
 }
-bool port_thread_mdelay(uint32_t ms)
+static bool port_thread_mdelay(uint32_t ms)
 {
     usleep(ms * 1000);
     return true;
 }
 
-static uint32_t gui_tick = 0;
+static pthread_mutex_t port_mutex;
+static pthread_mutex_t queue_mutex;
+static pthread_cond_t port_cond;
+static Queue q;
+
+
+static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs)
+{
+    pthread_mutex_init(&port_mutex, NULL);
+    pthread_cond_init(&port_cond, NULL);
+
+    pthread_mutex_init(&queue_mutex, NULL);
+    QueueInit(&q);
+}
+static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
+{
+    pthread_mutex_lock(&queue_mutex);
+    QueuePush(&q, 1);
+    pthread_mutex_unlock(&queue_mutex);
+
+    pthread_mutex_lock(&port_mutex);
+    pthread_cond_signal(&port_cond);
+    pthread_mutex_unlock(&port_mutex);
+
+}
+
+static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
+{
+    if (QueueEmpty(&q) == true)
+    {
+        pthread_mutex_lock(&port_mutex);
+        pthread_cond_timedwait(&port_cond, &port_mutex, &timeout);
+        pthread_mutex_unlock(&port_mutex);
+    }
+    pthread_mutex_lock(&queue_mutex);
+    QueuePop(&q);
+    pthread_mutex_unlock(&queue_mutex);
+}
 
 
 static uint32_t port_thread_ms_get(void)
@@ -65,6 +106,9 @@ static struct gui_os_api os_api =
     .thread_delete = port_thread_delete,
     .thread_mdelay = port_thread_mdelay,
     .thread_ms_get = port_thread_ms_get,
+    .mq_create = port_mq_create,
+    .mq_send = port_mq_send,
+    .mq_recv = port_mq_recv,
     .f_malloc = port_malloc,
     .f_realloc = port_realloc,
     .f_free = port_free,

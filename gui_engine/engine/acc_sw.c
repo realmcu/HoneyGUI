@@ -1254,7 +1254,11 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
 
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
 {
-
+    // uint8_t checksum = rtgui_image_checksum(image);
+    // if(checksum == image->checksum)
+    // {
+    //     return;
+    // }
     struct gui_rgb_data_head *head = image->data;
 
     char img_type = head->type;

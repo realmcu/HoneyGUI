@@ -22,7 +22,7 @@
 #if (BUILD_USING_RTK_GUI == 1)
 
 // <c> RTK GUI Demo
-//#define BUILD_USING_RTK_GUI_DEMO
+// #define BUILD_USING_RTK_GUI_DEMO
 // </c>
 
 // <c> RTK GUI Demo 368 448

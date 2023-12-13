@@ -13,8 +13,8 @@ CPPPATH = [cwd,
 
 #src = Glob('*.c')
 src = ['main.c']
-src += ['rtk_gui_demo.c']
-src += ['nanovg_test.c']
+if GetDepend('BUILD_USING_RTK_GUI_DEMO'):
+    src += ['rtk_gui_demo.c']
 
 CPPDEFINES = ['LV_KCONFIG_IGNORE']
 CPPDEFINES += ['LV_LVGL_H_INCLUDE_SIMPLE']
