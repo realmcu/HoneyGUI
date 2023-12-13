@@ -86,7 +86,7 @@
 
 
 
-void normal_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
@@ -129,7 +129,7 @@ void normal_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     }
 }
 #if 0
-static void normal_blit_rgb565_2_rgb565_with_alpha(draw_img_t *image, struct gui_dispdev *dc,
+static void filter_blit_rgb565_2_rgb565_with_alpha(draw_img_t *image, struct gui_dispdev *dc,
                                                    struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
@@ -177,38 +177,31 @@ static void normal_blit_rgb565_2_rgb565_with_alpha(draw_img_t *image, struct gui
 }
 #endif
 
-void normal_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void normal_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void normal_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void normal_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void normal_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect)
-{
-    gui_log("[GUI] TODO line = %d", __LINE__);
-    while (1);
-}
-
-void normal_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
@@ -258,7 +251,7 @@ void normal_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
 
 
-void normal_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                      struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
@@ -319,7 +312,7 @@ void normal_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     }
 }
 
-void normal_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
@@ -363,7 +356,7 @@ void normal_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
 }
 
-void normal_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
@@ -426,58 +419,164 @@ void normal_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
 
 
-void no_blending_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    //gui_log("x_start%d,x_end%d, y_start%d, y_end%d\n", x_start,x_end, y_start, y_end);
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+
+    int read_x_off = -_UI_MIN(image_x, 0) * 4  + image_off;
+
+    for (uint32_t i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+        int read_off = ((i - image_y) * image_w) * 4 + read_x_off -
+                       4 * x_start;
+
+        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+        for (uint32_t j = x_start; j < x_end; j++)
+        {
+            uint8_t *pixel = (uint8_t *)read_off;
+
+            writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                      + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+        }
+    }
+}
+
+void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void no_blending_blit_argb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                       struct rtgui_rect *rect)
+void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void no_blending_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void no_blending_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect)
 {
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
-void no_blending_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+void bypass_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                     struct rtgui_rect *rect)
 {
-    gui_log("[GUI] TODO line = %d", __LINE__);
-    while (1);
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint8_t source_bytes_per_pixel = 4;
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+
+    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
+
+    for (uint32_t i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+                       source_bytes_per_pixel * x_start;
+
+        uint8_t *writebuf = dc->frame_buf;
+        uint8_t *pixel;
+
+        for (uint32_t j = x_start; j < x_end; j++)
+        {
+            pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+
+            writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
+            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
+            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
+            writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
+
+        }
+    }
 }
-void no_blending_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+
+void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect)
 {
-    gui_log("[GUI] TODO line = %d", __LINE__);
-    while (1);
-}
-void no_blending_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect)
-{
-    gui_log("[GUI] TODO line = %d", __LINE__);
-    while (1);
-}
-void no_blending_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
-{
-    gui_log("[GUI] TODO line = %d", __LINE__);
-    while (1);
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    //gui_log("x_start%d,x_end%d, y_start%d, y_end%d\n", x_start,x_end, y_start, y_end);
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+
+    int read_x_off = -_UI_MIN(image_x, 0) * 4  + image_off;
+
+    for (uint32_t i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+        int read_off = ((i - image_y) * image_w) * 4 + read_x_off -
+                       4 * x_start;
+
+        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+        for (uint32_t j = x_start; j < x_end; j++)
+        {
+            uint8_t *pixel = (uint8_t *)read_off;
+
+            writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                      + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+        }
+    }
+
 }
 
 
-void no_blending_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -509,8 +608,8 @@ void no_blending_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     }
 }
 
-void no_blending_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -899,45 +998,46 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                no_blending_blit_rgb565_2_rgb565(image, dc, rect);
+                bypass_blit_rgb565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                no_blending_blit_rgb888_2_rgb565(image, dc, rect);
+                bypass_blit_rgb888_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
-                no_blending_blit_argb888_2_rgb565(image, dc, rect);
+                bypass_blit_argb8888_2_rgb565(image, dc, rect);
             }
         }
         else if (dc_bytes_per_pixel == 3)
         {
             if (img_type == RGB565)
             {
-                no_blending_blit_rgb565_2_rgb888(image, dc, rect);
+                bypass_blit_rgb565_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                no_blending_blit_rgb888_2_rgb888(image, dc, rect);
+                bypass_blit_rgb888_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
-                no_blending_blit_argb8888_2_rgb888(image, dc, rect);
+
+                bypass_blit_argb8888_2_rgb888(image, dc, rect);
             }
         }
         else if (dc_bytes_per_pixel == 4)
         {
             if (img_type == RGB565)
             {
-                no_blending_blit_rgb565_2_argb8888(image, dc, rect);
+                bypass_blit_rgb565_2_argb8888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                no_blending_blit_rgb888_2_argb8888(image, dc, rect);
+                bypass_blit_rgb888_2_argb8888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
-                no_blending_blit_argb8888_2_argb8888(image, dc, rect);
+                bypass_blit_argb8888_2_argb8888(image, dc, rect);
             }
         }
     }
@@ -947,45 +1047,45 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                normal_blit_rgb565_2_rgb565(image, dc, rect);
+                filter_blit_rgb565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                normal_blit_rgb888_2_rgb565(image, dc, rect);
+                filter_blit_rgb888_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
-                normal_blit_rgba8888_2_rgb565(image, dc, rect);
+                filter_blit_rgba8888_2_rgb565(image, dc, rect);
             }
         }
         else if (dc_bytes_per_pixel == 3)
         {
             if (img_type == RGB565)
             {
-                normal_blit_rgb565_2_rgb888(image, dc, rect);
+                filter_blit_rgb565_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                normal_blit_rgb888_2_rgb888(image, dc, rect);
+                filter_blit_rgb888_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
-                normal_blit_argb8888_2_rgb888(image, dc, rect);
+                filter_blit_argb8888_2_rgb888(image, dc, rect);
             }
         }
         else if (dc_bytes_per_pixel == 4)
         {
             if (img_type == RGB565)
             {
-                normal_blit_rgb565_2_argb8888(image, dc, rect);
+                filter_blit_rgb565_2_argb8888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                normal_blit_rgb888_2_argb8888(image, dc, rect);
+                filter_blit_rgb888_2_argb8888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
-                normal_blit_argb8888_2_argb8888(image, dc, rect);
+                filter_blit_rgba8888_2_argb8888(image, dc, rect);
             }
         }
     }

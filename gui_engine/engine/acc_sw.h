@@ -22,45 +22,43 @@
 extern "C" {
 #endif
 
-void normal_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect);
-void normal_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect);
-void normal_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect);
-void normal_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect);
-void normal_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect);
-void normal_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect);
 
-void normal_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect);
-void normal_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                      struct rtgui_rect *rect);
-void normal_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect);
-void normal_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+void filter_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect);
-void no_blending_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect);
-void no_blending_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect);
-void no_blending_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect);
-void no_blending_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect);
-void no_blending_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect);
-void no_blending_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect);
-void no_blending_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect);
-void no_blending_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect);
-void no_blending_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect);
+void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect);
+void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect);
+void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect);
+void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect);
+void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect);
+void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect);
+void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                   struct rtgui_rect *rect);
+void bypass_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                     struct rtgui_rect *rect);
+void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                 struct rtgui_rect *rect);
 void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                                 struct rtgui_rect *rect);
 void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
