@@ -67,6 +67,7 @@
 // </c>
 
 // <c> MODULE NANOVG VGLITE
+//#define BUILD_USING_SCRIPT_AS_A_APP
 //#define USING_NANOVG_HW_VGLITE
 // </c>
 
