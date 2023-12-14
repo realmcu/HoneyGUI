@@ -381,7 +381,7 @@ static void curtainview_prepare(gui_obj_t *obj)
                     obj->y = tp->deltaY;
                 }
             }
-            else if (tp->type == TOUCH_DOWN_SLIDE)
+            else if (tp->type == TOUCH_UP_SLIDE)
             {
                 this->cur_curtain = CURTAIN_MIDDLE;
                 obj->y = 0;
@@ -407,7 +407,7 @@ static void curtainview_prepare(gui_obj_t *obj)
                     obj->y = tp->deltaY;
                 }
             }
-            else if (tp->type == TOUCH_UP_SLIDE)
+            else if (tp->type == TOUCH_DOWN_SLIDE)
             {
                 this->cur_curtain = CURTAIN_MIDDLE;
                 if (this->done_cb != NULL)
