@@ -3,15 +3,15 @@ Touch Chips
 
 The following table lists the Touch-related IC supported by all chips. If you want to know more information, please click on the specific chip name.
 
-==================                   =========  ==========  ========  =======  ========  =========  =========                  
-SOC                                  CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147                 
-------------------                   ---------  ----------  --------  -------  --------  ---------  ---------         
-`RTL8762D`_                          Y          NA          NA        NA       NA        NA         NA
-`RTL8763E`_                          NA         NA          NA        NA       NA        Y          Y
-`RTL8772G`_                          NA         NA          NA        Y        Y         NA         NA
-`RTL8773E`_                          Y          NA          NA        Y        NA        NA         NA
-`RTL8772F`_                          Y          Y           Y         Y        NA        NA         NA 
-==================                   =========  ==========  ========  =======  ========  ========  =========
+==================  =========  ==========  ========  =======  ========  ========  =========                  
+SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147                 
+------------------  ---------  ----------  --------  -------  --------  --------  ---------         
+`RTL8762D`_         Y          NA          NA        NA       NA        NA         NA
+`RTL8763E`_         NA         NA          NA        NA       NA        Y          Y
+`RTL8772G`_         NA         NA          NA        Y        Y         NA         NA
+`RTL8773E`_         Y          NA          NA        Y        NA        NA         NA
+`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA 
+==================  =========  ==========  ========  =======  ========  ========  =========
 
 'Y' means the driver already included in the library.
 'NA' means the driver not yet included in the library.              
