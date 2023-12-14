@@ -72,7 +72,7 @@ void design_tab_contacts(void *parent)
     int font_size = 32;
     text_contacts_title = gui_text_create(parent, "text_contacts_title", 179, 24,
                                           strlen(string_contacts_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
-    gui_text_set(text_contacts_title, string_contacts_title, "rtk_font_mem", 0xffffffff,
+    gui_text_set(text_contacts_title, string_contacts_title, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(string_contacts_title), font_size);
 
     switch_touch_contacts = gui_switch_create(parent, 129, 129, 196, 196,

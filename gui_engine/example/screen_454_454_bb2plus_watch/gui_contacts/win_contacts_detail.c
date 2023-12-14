@@ -98,7 +98,7 @@ static void text_contacts_details_name_animate_cb(void *obj)
     }
 
     char *string_title = (char *)file_name->utf_8;
-    gui_text_set(text_contacts_details_name, string_title, "rtk_font_mem", 0xffffffff,
+    gui_text_set(text_contacts_details_name, string_title, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(string_title),
                  FONT_H_32);
 }
@@ -120,7 +120,8 @@ void design_win_contracts_details(gui_win_t *parent, gui_switch_t *selected_cont
     int font_size = 32;
     text_contacts_details_title = gui_text_create(parent, "text_contacts_details_title", 179, 24,
                                                   strlen(string_contacts_details_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
-    gui_text_set(text_contacts_details_title, string_contacts_details_title, "rtk_font_mem", 0xffffffff,
+    gui_text_set(text_contacts_details_title, string_contacts_details_title, "rtk_font_mem",
+                 APP_COLOR_WHITE,
                  strlen(string_contacts_details_title), font_size);
 
     //name/phone
@@ -128,15 +129,15 @@ void design_win_contracts_details(gui_win_t *parent, gui_switch_t *selected_cont
     text_contacts_details_name_title = gui_text_create(parent, "text_contacts_details_name", 83, 94,
                                                        strlen(string_contacts_details_name_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
     gui_text_set(text_contacts_details_name_title, string_contacts_details_name_title, "rtk_font_mem",
-                 0xffffffff,
-                 strlen(string_contacts_details_name_title), font_size);
+                 APP_COLOR_WHITE, strlen(string_contacts_details_name_title), font_size);
     img_contacts_details_name = gui_img_create_from_mem(parent, "img_contacts_details_name",
                                                         ICON_TEXT_BASE_DARK_BIN, 83, 137,
                                                         288, 64);
     char *string_contacts_details_name = "联系人0";
     text_contacts_details_name = gui_text_create(parent, "text_contacts_details_name", 154, 148, 160,
                                                  font_size);
-    gui_text_set(text_contacts_details_name, string_contacts_details_name, "rtk_font_mem", 0xffffffff,
+    gui_text_set(text_contacts_details_name, string_contacts_details_name, "rtk_font_mem",
+                 APP_COLOR_WHITE,
                  strlen(string_contacts_details_name), font_size);
     gui_text_set_animate(text_contacts_details_name, 1000, 2, text_contacts_details_name_animate_cb,
                          selected_contacts_list);
@@ -146,15 +147,15 @@ void design_win_contracts_details(gui_win_t *parent, gui_switch_t *selected_cont
                                                         201,
                                                         strlen(string_contacts_details_phone_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
     gui_text_set(text_contacts_details_phone_title, string_contacts_details_phone_title, "rtk_font_mem",
-                 0xffffffff,
-                 strlen(string_contacts_details_phone_title), font_size);
+                 APP_COLOR_WHITE, strlen(string_contacts_details_phone_title), font_size);
     img_contacts_details_phone = gui_img_create_from_mem(parent, "img_contacts_details_phone",
                                                          ICON_TEXT_BASE_DARK_BIN, 83, 244,
                                                          288, 64);
     char *string_contacts_details_phone = "12345678910";
     text_contacts_details_phone = gui_text_create(parent, "text_contacts_details_phone", 154, 255, 200,
                                                   font_size);
-    gui_text_set(text_contacts_details_phone, string_contacts_details_phone, "rtk_font_mem", 0xffffffff,
+    gui_text_set(text_contacts_details_phone, string_contacts_details_phone, "rtk_font_mem",
+                 APP_COLOR_WHITE,
                  strlen(string_contacts_details_phone), font_size);
 
     //call phone

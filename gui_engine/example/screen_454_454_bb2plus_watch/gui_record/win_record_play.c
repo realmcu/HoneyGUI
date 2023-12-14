@@ -71,9 +71,8 @@ static void scroll_text_record_play_title_animate_cb(void *obj)
     gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", file_name);
 
     char *string_title = (char *)file_name->base.utf_8;
-    gui_scrolltext_text_set(scroll_text_record_play_title, string_title, "rtk_font_mem", 0xffffffff,
-                            strlen(string_title),
-                            FONT_H_32);
+    gui_scrolltext_text_set(scroll_text_record_play_title, string_title, "rtk_font_mem",
+                            gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_title), FONT_H_32);
 }
 
 static void text_record_play_time_animate_cb(void *obj)
@@ -106,13 +105,13 @@ void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_fil
                                                           24, 128, FONT_H_32);
     gui_scrolltext_scroll_set(scroll_text_record_play_title, SCROLL_X, 0, 0, 5000, 0);
     gui_scrolltext_text_set(scroll_text_record_play_title, "录音文件123456", "rtk_font_mem",
-                            0xffffffff, strlen("录音文件123456"), FONT_H_32);
+                            gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen("录音文件123456"), FONT_H_32);
     gui_text_set_animate(scroll_text_record_play_title, 1000, 2,
                          scroll_text_record_play_title_animate_cb, selected_record_file);
 
     char *string_record_play_time = "00:00:00/00:00:00";
     text_record_play_time = gui_text_create(parent, "text_record_play_time", 108, 281, 248, FONT_H_32);
-    gui_text_set(text_record_play_time, string_record_play_time, "rtk_font_mem", 0xffffffff,
+    gui_text_set(text_record_play_time, string_record_play_time, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(string_record_play_time), FONT_H_32);
     gui_text_set_animate(text_record_play_time, 1000, 0, text_record_play_time_animate_cb,
                          text_record_play_time);

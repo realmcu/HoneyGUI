@@ -155,7 +155,7 @@ void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t 
 *
 */
 void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
-                             uint32_t color,
+                             app_color color,
                              uint16_t length, uint8_t font_size);
 
 /** End of WIDGET_Exported_GUI_Functions

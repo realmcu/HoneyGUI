@@ -29,7 +29,7 @@ void app_dashboard_ui_design(gui_app_t *app)
 
     gui_img_t *bg = gui_img_create_from_mem(&app->screen, "bg", BG_BIN, 0, 0, 0, 0);
 //    gui_text_t *text1 = gui_text_create(&app->screen,  "text1",  0, 0, 800, 100);
-//    gui_text_set(text1, "/////////////////", "rtk_font_mem", 0xff0000ff, 15, 96);
+//    gui_text_set(text1, "/////////////////", "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), 15, 96);
 //    gui_text_mode_set(text1, LEFT);
 }
 void gui_dashboard_init()

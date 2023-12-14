@@ -12,7 +12,6 @@ typedef struct
     int16_t char_w;
     uint8_t *dot_addr;
 } mem_char_t;
-
 typedef struct
 {
     uint8_t *font_lib_name;
@@ -55,12 +54,10 @@ static fontlib_name_t *get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
     }
     return NULL;
 }
-
 void rtgui_font_mem_load(gui_text_t *text)
 {
     fontlib_name_t *font_name;
     font_name = get_fontlib_name(text->path, text->font_height);
-
     uint32_t dot_offset;
     uint32_t table_offset;
     uint8_t rendor_mode;
@@ -68,12 +65,10 @@ void rtgui_font_mem_load(gui_text_t *text)
     {
         text->font_height = 32;
     }
-
     dot_offset = (uint32_t)font_name->font_lib_name;
     table_offset = (uint32_t)font_name->font_lib_tab_name;
     rendor_mode = font_name->rendor_mode;
     // gui_log("dot_offset is  %p , table_offset is %p \n", dot_offset, table_offset);
-
     mem_char_t *chr = gui_malloc(sizeof(mem_char_t) * text->len);
     if (chr == NULL)
     {
@@ -91,9 +86,7 @@ void rtgui_font_mem_load(gui_text_t *text)
     {
         aliened_font_size = 8 - text->font_height % 8 + text->font_height;
     }
-
     uint32_t font_area = aliened_font_size * text->font_height / 8 * rendor_mode + 4;
-
     uint16_t *p_buf = gui_malloc(text->len * sizeof(uint16_t));
     if (p_buf == NULL)
     {
@@ -105,7 +98,6 @@ void rtgui_font_mem_load(gui_text_t *text)
     {
         unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
     }
-
     uint32_t all_char_w = 0;
     uint32_t line_flag = 0;
     switch (font_name->index_method)
@@ -207,46 +199,61 @@ void rtgui_font_mem_load(gui_text_t *text)
     text->font_len = unicode_len;
     gui_free(p_buf);
 }
-
 void rtgui_font_mem_unload(gui_text_t *text)
 {
     gui_free(text->data);
     return;
 }
-
-#define _b_and_f(color_b,color_f,c) (color_b.channel.c * color_b.channel.alpha + color_f.channel.c * color_f.channel.alpha) / 0xff;
-gui_inline uint32_t blend_b_and_f_with_a(uint32_t b, uint32_t f, uint8_t a)
+// Fast RGB565 pixel blending
+// Found in a pull request for the Adafruit framebuffer library. Clever!
+// https://github.com/tricorderproject/arducordermini/pull/1/files#diff-d22a481ade4dbb4e41acc4d7c77f683d
+gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
 {
-    gui_color_t color_b = {.rgba = b};
-    gui_color_t color_f = {.rgba = f};
-    color_f.channel.alpha = a;
-    gui_color_msb_t color_r;
-    color_b.channel.alpha = 0xff - color_f.channel.alpha;
-    color_r.channel.blue = _b_and_f(color_b, color_f, blue)
-                           color_r.channel.green = _b_and_f(color_b, color_f, green)
-                                                   color_r.channel.red = _b_and_f(color_b, color_f, red)
-                                                                         return color_r.rgba;
+    // Alpha converted from [0..255] to [0..31]
+    alpha = (alpha + 4) >> 3;
+    // Converts  0000000000000000rrrrrggggggbbbbb
+    //     into  00000gggggg00000rrrrr000000bbbbb
+    // with mask 00000111111000001111100000011111
+    // This is useful because it makes space for a parallel fixed-point multiply
+    // bg = (bg | (bg << 16)) & 0b00000111111000001111100000011111;
+    // fg = (fg | (fg << 16)) & 0b00000111111000001111100000011111;
+    bg = (bg | (bg << 16)) & 0x7e0f81f;
+    fg = (fg | (fg << 16)) & 0x7e0f81f;
+    // This implements the linear interpolation formula: result = bg * (1.0 - alpha) + fg * alpha
+    // This can be factorized into: result = bg + (fg - bg) * alpha
+    // alpha is in Q1.5 format, so 0.0 is represented by 0, and 1.0 is represented by 32
+    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
+    result >>= 5;
+    result += bg;
+    // result &= 0b00000111111000001111100000011111; // mask out fractional parts
+    result &= 0x7e0f81f;
+    return (uint16_t)((result >> 16) | result); // contract result
 }
-gui_inline uint16_t rgba2565(uint32_t rgba)
+gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
 {
-    gui_color_t color_blend = {.rgba = rgba};
-    uint16_t red = color_blend.channel.red * 0x1f / 0xff << 11;
-    uint16_t green = color_blend.channel.green * 0x3f / 0xff << 5;
-    uint16_t blue = color_blend.channel.blue * 0x1f / 0xff;
-    return red + green + blue;
+    uint32_t mix;
+    uint8_t back_a = 0xff - alpha;
+#if defined(_WIN32)
+    mix = 0xff000000;
+    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
+    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
+    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
+#else
+    mix = 0x000000ff;
+    mix += ((bg >> 24 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 24;
+    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff << 16;
+    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  8;
+#endif
+    return mix;
 }
-gui_inline uint32_t rgb5652rgba(uint16_t rgb565)
+gui_inline uint16_t rgba2565(app_color rgba)
 {
-    gui_color_t color_blend ;
-    color_blend.channel.red = (int)((rgb565 & 0xf800) >> 11) * 0xff / 0x1f;
-    color_blend.channel.green = (int)((rgb565 & 0x07e0) >> 5) * 0xff / 0x3f;
-    color_blend.channel.blue = (int)(rgb565 & 0x001F) * 0xff / 0x1f;
-    color_blend.channel.alpha = 0xff;
-
-    return color_blend.rgba;
+    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
+    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
+    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
+    return red + gre + blu;
 }
-
-static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t rendor_mode,
+static void rtk_draw_unicode(int dx, mem_char_t *chr, app_color color, uint8_t rendor_mode,
                              struct rtgui_rect *rect)
 {
     if (chr->dot_addr == NULL)
@@ -261,7 +268,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
     int font_h = chr->h;
     int x_start = _UI_MAX(_UI_MAX(font_x, rect->xboundleft), 0);
     int x_end;
-
     if (rect->xboundright != 0)
     {
         x_end = _UI_MIN(_UI_MIN(font_x + chr->char_w, dc->fb_width), rect->xboundright);
@@ -285,7 +291,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
         return;
     }
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;//
-
     switch (rendor_mode)
     {
     case 4:
@@ -296,7 +301,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >> (4 - (j - font_x) % 2 * 4);
@@ -305,7 +309,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
                         alpha = alpha & 0x0f;
                         alpha *= 16;
                         color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = rgba2565(blend_b_and_f_with_a(rgb5652rgba(color_back), color, alpha));
+                        writebuf[write_off + j] = alphaBlendRGB565(rgba2565(color), color_back, alpha);
                     }
                 }
             }
@@ -314,7 +318,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
         {
             uint8_t *writebuf = (uint8_t *)dc->frame_buf;
             uint8_t color_back[3];
-            uint8_t *pixel = (uint8_t *)&color;
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -329,9 +332,12 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
                         color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
-                        writebuf[write_off * 3 + j * 3 + 0] = (pixel[2] * alpha + color_back[2] * (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 1] = (pixel[1] * alpha + color_back[1] * (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 2] = (pixel[0] * alpha + color_back[0] * (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 0] = (color.color.rgba.b * alpha + color_back[2] *
+                                                               (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 1] = (color.color.rgba.g * alpha + color_back[1] *
+                                                               (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 2] = (color.color.rgba.r * alpha + color_back[0] *
+                                                               (0xff - alpha)) / 0xff;
                     }
                 }
             }
@@ -343,17 +349,16 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    uint8_t alpha = (dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >> (4 -
-                                                                                              (j - font_x) % 2 * 4));
+                    uint8_t alpha = (dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >>
+                                     (4 - (j - font_x) % 2 * 4));
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x0f;
                         alpha *= 16;
                         color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = blend_b_and_f_with_a(color_back, color, alpha);
+                        writebuf[write_off + j] = alphaBlendRGBA(color, color_back, alpha);
                     }
                 }
             }
@@ -367,14 +372,13 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                     if (alpha != 0)
                     {
                         color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = rgba2565(blend_b_and_f_with_a(rgb5652rgba(color_back), color, alpha));
+                        writebuf[write_off + j] = alphaBlendRGB565(rgba2565(color), color_back, alpha);
                     }
                 }
             }
@@ -383,7 +387,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
         {
             uint8_t *writebuf = (uint8_t *)dc->frame_buf;
             uint8_t color_back[3];
-            uint8_t *pixel = (uint8_t *)&color;
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -395,9 +398,12 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
                         color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
-                        writebuf[write_off * 3 + j * 3 + 0] = (pixel[2] * alpha + color_back[2] * (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 1] = (pixel[1] * alpha + color_back[1] * (0xff - alpha)) / 0xff;
-                        writebuf[write_off * 3 + j * 3 + 2] = (pixel[0] * alpha + color_back[0] * (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 0] = (color.color.rgba.b * alpha + color_back[2] *
+                                                               (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 1] = (color.color.rgba.g * alpha + color_back[1] *
+                                                               (0xff - alpha)) / 0xff;
+                        writebuf[write_off * 3 + j * 3 + 2] = (color.color.rgba.r * alpha + color_back[0] *
+                                                               (0xff - alpha)) / 0xff;
                     }
                 }
             }
@@ -409,14 +415,13 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                     if (alpha != 0)
                     {
                         color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = blend_b_and_f_with_a(color_back, color, alpha);
+                        writebuf[write_off + j] = alphaBlendRGBA(color, color_back, alpha);
                     }
                 }
             }
@@ -429,7 +434,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
@@ -442,40 +446,41 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
         else if (dc_bytes_per_pixel == 3)
         {
             uint8_t *writebuf = (uint8_t *)dc->frame_buf;
-            uint8_t *pixel = (uint8_t *)&color;
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
                     {
-                        writebuf[write_off * 3 + j * 3] = pixel[2];
-                        writebuf[write_off * 3 + j * 3 + 1] = pixel[1];
-                        writebuf[write_off * 3 + j * 3 + 2] = pixel[0];
+                        writebuf[write_off * 3 + j * 3 + 0] = color.color.rgba.b;
+                        writebuf[write_off * 3 + j * 3 + 1] = color.color.rgba.g;
+                        writebuf[write_off * 3 + j * 3 + 2] = color.color.rgba.r;
                     }
                 }
             }
         }
         else if (dc_bytes_per_pixel == 4)
         {
-            uint32_t *writebuf = (uint32_t *)dc->frame_buf;
-
-#if defined(_WIN32)
-            uint32_t alpha = color & 0xff;
-            color = (color >> 8) + (alpha << 24);
-#endif
-
+            uint8_t *writebuf = (uint8_t *)dc->frame_buf;
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
                     {
-                        writebuf[write_off + j] = color;
+#if defined(_WIN32)
+                        writebuf[write_off * 4 + j * 4 + 0] = color.color.rgba.b;
+                        writebuf[write_off * 4 + j * 4 + 1] = color.color.rgba.g;
+                        writebuf[write_off * 4 + j * 4 + 2] = color.color.rgba.r;
+                        writebuf[write_off * 4 + j * 4 + 3] = color.color.rgba.a;
+#else
+                        writebuf[write_off * 4 + j * 4 + 0] = color.color.rgba.a;
+                        writebuf[write_off * 4 + j * 4 + 1] = color.color.rgba.b;
+                        writebuf[write_off * 4 + j * 4 + 2] = color.color.rgba.g;
+                        writebuf[write_off * 4 + j * 4 + 3] = color.color.rgba.r;
+#endif
                     }
                 }
             }
@@ -485,8 +490,6 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, uint32_t color, uint8_t re
         break;
     }
 }
-
-
 void rtgui_font_mem_draw(gui_text_t *text, struct rtgui_rect *rect)
 {
     mem_char_t *chr = text->data;
@@ -622,8 +625,6 @@ void rtgui_font_mem_draw(gui_text_t *text, struct rtgui_rect *rect)
         break;
     }
 }
-
-
 struct rtgui_font_engine rtgui_font_mem_engine =
 {
     "rtk_font_mem",
@@ -632,12 +633,10 @@ struct rtgui_font_engine rtgui_font_mem_engine =
     rtgui_font_mem_unload,
     rtgui_font_mem_draw,
 };
-
 void rtgui_font_mem_init(void)
 {
     rtgui_font_register_engine(&rtgui_font_mem_engine);
 }
-
 void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
                                void *font_table_addr)
 {
@@ -665,7 +664,6 @@ void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
     font_lib_tab[i].rendor_mode = 1;
     font_lib_tab[i].font_mode_detail.value = 0;
 }
-
 void gui_font_mem_init(uint8_t *font_bin_addr)
 {
     int i = 0;

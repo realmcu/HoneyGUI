@@ -289,7 +289,7 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y)
     this->text->base.x = text_x;
     this->text->base.y = text_y;
 }
-void gui_button_text_color(gui_button_t *this, uint32_t color)
+void gui_button_text_color(gui_button_t *this, app_color color)
 {
     this->text->color = color;
 }
@@ -391,8 +391,8 @@ gui_button_t *gui_button_create(
 
         button->text = gui_text_create(button, "icon_text", 0, button->img->draw_img.img_h + 40,
                                        gui_get_screen_width(), h);
-        gui_text_set(button->text, text, "rtk_font_mem", BUTTON_COLOR, strlen(text),
-                     32);
+        gui_text_set(button->text, text, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                     strlen(text), 32);
         gui_text_mode_set(button->text, LEFT);
     }
 

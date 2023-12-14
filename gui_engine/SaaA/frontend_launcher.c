@@ -135,7 +135,8 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     gui_button_text_move(button, 0, 70);
                     {
                         int font_size = 16;
-                        gui_text_set(button->text, text, "rtk_font_mem", 0xffffffff, strlen(text), font_size);
+                        gui_text_set(button->text, text, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                                     strlen(text), font_size);
                         void *addr1 = gui_get_file_address("app/system/resource/font/arialbd_size16_bits4_font.bin");
                         gui_font_mem_init(addr1);
                         gui_text_type_set(button->text, addr1);

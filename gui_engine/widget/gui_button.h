@@ -209,7 +209,7 @@ void gui_button_release(gui_button_t *this, gui_event_cb_t event_cb, void *param
  * @param this The pointer of this button widget.
  * @param color The color of text.
  */
-void gui_button_text_color(gui_button_t *this, uint32_t color);
+void gui_button_text_color(gui_button_t *this, app_color color);
 /**
  * @brief Move the img of this button.
  *

@@ -331,7 +331,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         if (style == 0)
                         {
                             t = gui_text_create(parent, ptxt, x, y, gui_get_screen_width(), h);
-                            gui_text_set(t, gui_strdup(text), "rtk_font_stb", color, strlen(text), 32);
+                            app_color color_temporary;
+                            color_temporary.color.rgba_full = color;
+                            gui_text_set(t, gui_strdup(text), "rtk_font_stb", color_temporary, strlen(text), 32);
 
 
 
@@ -411,7 +413,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_scroll_text_t *scroll_text = gui_scrolltext_create(parent,  ptxt, x, y,
                                                                                    strlen(text) * (fontSize / 4), h);
                             gui_scrolltext_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
-                            gui_scrolltext_text_set(scroll_text, gui_strdup(text), "rtk_font_stb", color, strlen(text),
+                            app_color color_temporary;
+                            color_temporary.color.rgba_full = color;
+                            gui_scrolltext_text_set(scroll_text, gui_strdup(text), "rtk_font_stb", color_temporary,
+                                                    strlen(text),
                                                     fontSize);
                             t = (void *)scroll_text;
                         }
@@ -1763,7 +1768,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
                     gui_button_text_move((void *)parent, text_x, text_y);
-                    GUI_TYPE(gui_button_t, parent)->text->color = font_color;
+                    app_color color_temporary;
+                    color_temporary.color.rgba_full = font_color;
+                    GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
                         gui_button_api.onPress((void *)parent, sport_button_press, parent);

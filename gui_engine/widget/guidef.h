@@ -458,6 +458,7 @@ struct _gui_color
         {
             unsigned char r, g, b, a;
         } rgba;
+        uint32_t rgba_full;
     } color;
 };
 typedef struct _gui_color app_color;

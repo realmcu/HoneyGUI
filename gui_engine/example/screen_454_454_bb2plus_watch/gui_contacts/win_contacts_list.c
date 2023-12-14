@@ -165,7 +165,7 @@ void design_win_contracts_list(gui_win_t *parent)
     int font_size = 32;
     text_contacts_list_title = gui_text_create(parent, "text_contacts_list_title", 179, 19,
                                                strlen(string_contacts_list_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
-    gui_text_set(text_contacts_list_title, string_contacts_list_title, "rtk_font_mem", 0xffffffff,
+    gui_text_set(text_contacts_list_title, string_contacts_list_title, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(string_contacts_list_title), font_size);
 
     //contacts switch and text
@@ -193,7 +193,7 @@ void design_win_contracts_list(gui_win_t *parent)
         text_designated_contact[i] = gui_text_create(switch_designated_contact[i],
                                                      "text_designated_contact", 71, 11,
                                                      strlen(contacts_list_name[i]) * FONT_NUM_ALPHA_W, font_size);
-        gui_text_set(text_designated_contact[i], contacts_list_name[i], "rtk_font_mem", 0xffffffff,
+        gui_text_set(text_designated_contact[i], contacts_list_name[i], "rtk_font_mem", APP_COLOR_WHITE,
                      strlen(contacts_list_name[i]), font_size);
     }
 

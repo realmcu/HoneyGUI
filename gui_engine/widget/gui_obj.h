@@ -74,8 +74,8 @@ extern "C" {
   * @brief
   * @{
   */
-
-
+/** @brief white color in app_color structure */
+#define APP_COLOR_WHITE gui_rgba(UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX)
 
 
 

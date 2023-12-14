@@ -65,37 +65,57 @@ static void rtgui_font_stb_unload(gui_text_t *text)
 
 }
 #ifndef RTK_GUI_FONT_ENABLE_TTF_SVG
-#define _b_and_f(color_b,color_f,c) (color_b.channel.c * color_b.channel.alpha + color_f.channel.c * color_f.channel.alpha) / 0xff;
-gui_inline uint32_t blend_b_and_f_with_a(uint32_t b, uint32_t f, uint8_t a)
+gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
 {
-    gui_color_t color_b = {.rgba = b};
-    gui_color_t color_f = {.rgba = f};
-    color_f.channel.alpha = a;
-    gui_color_msb_t color_r;
-    color_b.channel.alpha = 0xff - color_f.channel.alpha;
-    color_r.channel.blue = _b_and_f(color_b, color_f, blue)
-                           color_r.channel.green = _b_and_f(color_b, color_f, green)
-                                                   color_r.channel.red = _b_and_f(color_b, color_f, red)
-                                                                         return color_r.rgba;
+    uint32_t mix;
+    uint8_t back_a = 0xff - alpha;
+#if defined(_WIN32)
+    mix = 0xff000000;
+    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
+    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
+    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
+#else
+    mix = 0x000000ff;
+    mix += ((bg >> 24 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 24;
+    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff << 16;
+    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  8;
+#endif
+    return mix;
 }
-gui_inline uint16_t rgba2565(uint32_t rgba)
-{
-    gui_color_t color_blend = {.rgba = rgba};
-    uint16_t red = color_blend.channel.red * 0x1f / 0xff << 11;
-    uint16_t green = color_blend.channel.green * 0x3f / 0xff << 5;
-    uint16_t blue = color_blend.channel.blue * 0x1f / 0xff;
-    return red + green + blue;
-}
-gui_inline uint32_t rgb5652rgba(uint16_t rgb565)
-{
-    gui_color_t color_blend ;
-    color_blend.channel.red = (int)((rgb565 & 0xf800) >> 11) * 0xff / 0x1f;
-    color_blend.channel.green = (int)((rgb565 & 0x07e0) >> 5) * 0xff / 0x3f;
-    color_blend.channel.blue = (int)(rgb565 & 0x001F) * 0xff / 0x1f;
-    color_blend.channel.alpha = 0xff;
 
-    return color_blend.rgba;
+gui_inline uint16_t rgba2565(app_color rgba)
+{
+    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
+    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
+    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
+    return red + gre + blu;
 }
+
+gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
+{
+    // Alpha converted from [0..255] to [0..31]
+    alpha = (alpha + 4) >> 3;
+
+    // Converts  0000000000000000rrrrrggggggbbbbb
+    //     into  00000gggggg00000rrrrr000000bbbbb
+    // with mask 00000111111000001111100000011111
+    // This is useful because it makes space for a parallel fixed-point multiply
+    // bg = (bg | (bg << 16)) & 0b00000111111000001111100000011111;
+    // fg = (fg | (fg << 16)) & 0b00000111111000001111100000011111;
+    bg = (bg | (bg << 16)) & 0x7e0f81f;
+    fg = (fg | (fg << 16)) & 0x7e0f81f;
+
+    // This implements the linear interpolation formula: result = bg * (1.0 - alpha) + fg * alpha
+    // This can be factorized into: result = bg + (fg - bg) * alpha
+    // alpha is in Q1.5 format, so 0.0 is represented by 0, and 1.0 is represented by 32
+    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
+    result >>= 5;
+    result += bg;
+    // result &= 0b00000111111000001111100000011111; // mask out fractional parts
+    result &= 0x7e0f81f;
+    return (uint16_t)((result >> 16) | result); // contract result
+}
+
 static bool creat_stb_screen(gui_text_t *text, struct rtgui_rect *rect, FONT_STB_SCREEN *screen)
 {
     if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
@@ -172,8 +192,36 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 if (stb_screen->buf[i * stb_screen->width + j] != 0)
                 {
                     color_back = writebuf[write_off + j];
-                    writebuf[write_off + j] = blend_b_and_f_with_a(color_back, text->color,
-                                                                   stb_screen->buf[i * stb_screen->width + j]);
+                    writebuf[write_off + j] = alphaBlendRGBA(text->color, color_back,
+                                                             stb_screen->buf[i * stb_screen->width + j]);
+                }
+            }
+        }
+    }
+    else if (dc_bytes_per_pixel == 3)
+    {
+        uint8_t *writebuf = NULL;
+        writebuf = (uint8_t *)dc->frame_buf + ((rect->y1) * dc->fb_width + rect->x1 + offset) * 3;
+        uint8_t color_back[3];
+        for (int32_t i  = _UI_MAX(text->base.dy - rect->y1, 0); i < stb_screen->height &&
+             (i + rect->y1 <= text->base.dy + text->base.h); i++)
+        {
+            int write_off = (i + dc->section.y1) * dc->fb_width;
+            for (int32_t j = _UI_MAX(text->base.dx - rect->x1, 0); j < stb_screen->width &&
+                 (j + rect->x1 <= text->base.dx + text->base.w); j++)
+            {
+                uint8_t alpha = stb_screen->buf[i * stb_screen->width + j];
+                if (alpha != 0)
+                {
+                    color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
+                    color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
+                    color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
+                    writebuf[write_off * 3 + j * 3 + 0] = (text->color.color.rgba.r * alpha + color_back[2] *
+                                                           (0xff - alpha)) / 0xff;
+                    writebuf[write_off * 3 + j * 3 + 1] = (text->color.color.rgba.g * alpha + color_back[1] *
+                                                           (0xff - alpha)) / 0xff;
+                    writebuf[write_off * 3 + j * 3 + 2] = (text->color.color.rgba.r * alpha + color_back[0] *
+                                                           (0xff - alpha)) / 0xff;
                 }
             }
         }
@@ -193,9 +241,8 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 if (stb_screen->buf[i * stb_screen->width + j] != 0)
                 {
                     color_back = writebuf[write_off + j];
-                    // writebuf[write_off + j] = rgba2565(blend_b_and_f(rgb5652rgba(color_back_565), rgb5652rgba(text->color),screen[i][j]));
-                    writebuf[write_off + j] = rgba2565(blend_b_and_f_with_a(rgb5652rgba(color_back), text->color,
-                                                                            stb_screen->buf[i * stb_screen->width + j]));
+                    writebuf[write_off + j] = alphaBlendRGB565(rgba2565(text->color), color_back,
+                                                               stb_screen->buf[i * stb_screen->width + j]);
                 }
             }
         }

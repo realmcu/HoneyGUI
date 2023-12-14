@@ -61,7 +61,7 @@ typedef struct gui_text
 {
     gui_obj_t base;
     const struct rtgui_font_engine *engine;
-    uint32_t color;
+    app_color color;
     TEXT_MODE mode;
     uint16_t len;
     uint16_t font_len;
@@ -144,7 +144,7 @@ typedef struct gui_text_line
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t *this, const char *text, char *text_type, uint32_t color,
+void gui_text_set(gui_text_t *this, const char *text, char *text_type, app_color color,
                   uint16_t length, uint8_t font_size);
 
 /**

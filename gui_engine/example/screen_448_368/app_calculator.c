@@ -77,10 +77,10 @@ typedef enum
 /** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @{
   */
-#define CAL_BUFF_INPUT_MAXLEN 128  //!< 
-#define CAL_BUFF_OP_MAXLEN 64  //!< 
-#define CAL_BUFF_NUM_MAXLEN 64  //!< 
-#define CAL_BUFF_DISPLAY_MAXLEN 128 //!< 
+#define CAL_BUFF_INPUT_MAXLEN 128  //!<
+#define CAL_BUFF_OP_MAXLEN 64  //!<
+#define CAL_BUFF_NUM_MAXLEN 64  //!<
+#define CAL_BUFF_DISPLAY_MAXLEN 128 //!<
 
 
 /** End of WIDGET_Exported_Macros
@@ -288,15 +288,19 @@ static void cal_display_update(void)
     if (len <= line_len)
     {
         // single line
-        gui_text_set(text_display_up, NULL, "rtk_font_mem", 0xffffffff, 0, CAL_TEXT_FONT_SIZE_DISPLAY);
-        gui_text_set(text_display_dn, pstr, "rtk_font_mem", 0xffffffff, len, CAL_TEXT_FONT_SIZE_DISPLAY);
+        gui_text_set(text_display_up, NULL, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), 0,
+                     CAL_TEXT_FONT_SIZE_DISPLAY);
+        gui_text_set(text_display_dn, pstr, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), len,
+                     CAL_TEXT_FONT_SIZE_DISPLAY);
     }
     else
     {
         // double line
-        gui_text_set(text_display_up, pstr, "rtk_font_mem", 0xffffffff, line_len,
+        gui_text_set(text_display_up, pstr, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                     line_len,
                      CAL_TEXT_FONT_SIZE_DISPLAY);
-        gui_text_set(text_display_dn, pstr + line_len, "rtk_font_mem", 0xffffffff, len - line_len,
+        gui_text_set(text_display_dn, pstr + line_len, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX,
+                                                                               UINT8_MAX), len - line_len,
                      CAL_TEXT_FONT_SIZE_DISPLAY);
     }
 }
@@ -721,7 +725,8 @@ static void calculator_draw_button(void *parent)
                                       font_size);
     text_display_dn = gui_text_create(parent, "txt", 0, offset_y / 2 - 9, offset_x + del_x * 3 + 20,
                                       font_size);
-    gui_text_set(text_display_dn, text, "rtk_font_mem", 0xffffffff, strlen(text), font_size);
+    gui_text_set(text_display_dn, text, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                 strlen(text), font_size);
     gui_text_type_set(text_display_up, addr_font);
     gui_text_mode_set(text_display_up, RIGHT);
     gui_text_type_set(text_display_dn, addr_font);

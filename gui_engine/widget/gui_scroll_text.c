@@ -228,7 +228,7 @@ static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, cons
  *============================================================================*/
 
 void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
-                             uint32_t color, uint16_t length, uint8_t font_size)
+                             app_color color, uint16_t length, uint8_t font_size)
 {
     this->base.text_type = text_type;
     this->base.utf_8 = (uint8_t *)text;

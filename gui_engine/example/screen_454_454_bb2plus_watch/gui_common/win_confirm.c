@@ -121,8 +121,8 @@ static void switch_confirm_yes_touch_cb(void *obj, gui_event_cb_t event)
     img_confirm_no->draw_img.opacity_value = 128;
     text_confirm = gui_text_create(win_confirm, "text_confirm", text_display.x, text_display.y,
                                    text_display.length * 32, FONT_H_32);
-    gui_text_set(text_confirm, text_display.text, "rtk_font_mem", 0xffffffff, (text_display.length * 3),
-                 FONT_H_32);
+    gui_text_set(text_confirm, text_display.text, "rtk_font_mem", APP_COLOR_WHITE,
+                 (text_display.length * 3), FONT_H_32);
     win_confirm_action.confirm_yes_action(win_confirm_action.yes_action_obj);
 
     gui_obj_show(switch_confirm_yes, false);
@@ -154,8 +154,8 @@ void design_win_confirm(void *parent)
 {
     text_confirm = gui_text_create(parent, "text_confirm", text_display.x, text_display.y,
                                    text_display.length * 32, FONT_H_32);
-    gui_text_set(text_confirm, text_display.text, "rtk_font_mem", 0xffffffff, (text_display.length * 3),
-                 FONT_H_32);
+    gui_text_set(text_confirm, text_display.text, "rtk_font_mem", APP_COLOR_WHITE,
+                 (text_display.length * 3), FONT_H_32);
 
     switch_confirm_yes = gui_switch_create(parent, 75, 249, 96, 96, ICON_CONFIRM_BIN, ICON_CONFIRM_BIN);
     switch_confirm_yes->off_hl_pic_addr = ICON_CONFIRM_TOUCH_BIN;
