@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <gui_matrix.h>
 #include <rtl_ppe.h>
-#include <rtl_rtzip.h>
+#include <rtl_imdc.h>
 #include <drv_lcd.h>
 #include "math.h"
 #include "trace.h"
@@ -63,10 +63,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     case RGBA8888:
         source.format = PPE_ABGR8888;
         break;
-    case RTZIP_COMPRESS:
+    case IMDC_COMPRESS:
         {
-            const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
-                                                                        struct gui_rgb_data_head));
+            const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
+                                                                      struct gui_rgb_data_head));
             if (header->algorithm_type.pixel_bytes == 0)
             {
                 source.format = PPE_BGR565;
@@ -94,8 +94,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     source.memory = (void *)source.address;
     source.global_alpha_en = true;
     source.global_alpha = image->opacity_value;
-    if (image->blend_mode == IMG_FILTER_MATRIX)
+    if (image->blend_mode == IMG_FILTER_MATRIX || image->blend_mode == IMG_ALPHA_MATRIX)
     {
+        if (image->blend_mode == IMG_FILTER_MATRIX)
+        {
+            source.color_key_en = true;
+            source.color_key_value = 0x00000000;
+        }
         if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
         {
             if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1) && 1)
@@ -105,9 +110,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     (image->img_h == (int)(image->img_h * scale_y)))
                 {
                     PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
-                    if (head->type == RTZIP_COMPRESS)
+                    if (head->type == IMDC_COMPRESS)
                     {
-                        RCC_PeriphClockCmd(APBPeriph_RTZIP, APBPeriph_RTZIP_CLOCK, ENABLE);
+                        RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
                         uint32_t start_line = 0, end_line = 0;
                         if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
                         {
@@ -135,15 +140,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                             end_line = image->img_h - 1;
                         }
                         source.height = end_line - start_line + 1;
-                        const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
-                                                                                    struct gui_rgb_data_head));
-                        RTZIP_decode_range range;
+                        const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
+                                                                                  struct gui_rgb_data_head));
+                        IMDC_decode_range range;
                         range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
                         range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
                                            - range.start_column : header->raw_pic_width - 1;
                         range.start_line = start_line;
                         range.end_line = end_line;
-                        RTZIP_DMA_config dma_cfg;
+                        IMDC_DMA_config dma_cfg;
                         source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
                                                    * (header->algorithm_type.pixel_bytes + 2));
                         source.address = (uint32_t)source.memory;
@@ -154,7 +159,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                         dma_cfg.RX_DMA_channel = GDMA_Channel3;
                         dma_cfg.TX_DMA_channel = GDMA_Channel1;
                         trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
-                        RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+                        IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
                         if (err)
                         {
                             gui_free(source.memory);
@@ -265,12 +270,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     }
                     return;
                 }
-                if (head->type == RTZIP_COMPRESS)
+                if (head->type == IMDC_COMPRESS)
                 {
                     source.height = scale_rect.bottom - scale_rect.top + 1;
-                    const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
-                                                                                struct gui_rgb_data_head));
-                    RTZIP_decode_range range;
+                    const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
+                                                                              struct gui_rgb_data_head));
+                    IMDC_decode_range range;
                     range.start_column = scale_rect.left;
                     range.end_column = scale_rect.right;
                     range.start_line = scale_rect.top;
@@ -279,7 +284,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     scale_rect.right = range.end_column - range.start_column;
                     scale_rect.top = 0;
                     scale_rect.bottom = range.end_line - range.start_line;
-                    RTZIP_DMA_config dma_cfg;
+                    IMDC_DMA_config dma_cfg;
                     source.memory = gui_malloc(source.height * header->raw_pic_width *
                                                (header->algorithm_type.pixel_bytes + 2));
                     source.address = (uint32_t)source.memory;
@@ -288,7 +293,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     dma_cfg.TX_DMA_channel_num = 1;
                     dma_cfg.RX_DMA_channel = GDMA_Channel3;
                     dma_cfg.TX_DMA_channel = GDMA_Channel1;
-                    RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+                    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
                     if (err)
                     {
                         gui_free(source.memory);
@@ -306,7 +311,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 }
                 else if (dc->type == DC_RAMLESS)
                 {
-                    if (head->type == RTZIP_COMPRESS)
+                    if (head->type == IMDC_COMPRESS)
                     {
                         gui_free(source.memory);
                     }
@@ -316,9 +321,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             else
             {
                 PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
-                if (head->type == RTZIP_COMPRESS)
+                if (head->type == IMDC_COMPRESS)
                 {
-                    RCC_PeriphClockCmd(APBPeriph_RTZIP, APBPeriph_RTZIP_CLOCK, ENABLE);
+                    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
                     uint32_t start_line = 0, end_line = 0;
                     if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
                     {
@@ -346,15 +351,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                         end_line = image->img_h - 1;
                     }
                     source.height = end_line - start_line + 1;
-                    const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
-                                                                                struct gui_rgb_data_head));
-                    RTZIP_decode_range range;
+                    const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
+                                                                              struct gui_rgb_data_head));
+                    IMDC_decode_range range;
                     range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
                     range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
                                        - range.start_column : header->raw_pic_width - 1;
                     range.start_line = start_line;
                     range.end_line = end_line;
-                    RTZIP_DMA_config dma_cfg;
+                    IMDC_DMA_config dma_cfg;
                     source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
                                                * (header->algorithm_type.pixel_bytes + 2));
                     source.address = (uint32_t)source.memory;
@@ -365,7 +370,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     dma_cfg.RX_DMA_channel = GDMA_Channel3;
                     dma_cfg.TX_DMA_channel = GDMA_Channel1;
                     trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
-                    RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+                    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
 
                     if (err)
                     {
@@ -374,7 +379,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     }
                 }
                 PPE_blend(&source, &target, &trans);
-                if (head->type == RTZIP_COMPRESS)
+                if (head->type == IMDC_COMPRESS)
                 {
                     gui_free(source.memory);
                 }
@@ -394,9 +399,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         }
 
         PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
-        if (head->type == RTZIP_COMPRESS)
+        if (head->type == IMDC_COMPRESS)
         {
-            RCC_PeriphClockCmd(APBPeriph_RTZIP, APBPeriph_RTZIP_CLOCK, ENABLE);
+            RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
             uint32_t start_line = 0, end_line = 0;
             if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
             {
@@ -424,15 +429,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 end_line = image->img_h - 1;
             }
             source.height = end_line - start_line + 1;
-            const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
-                                                                        struct gui_rgb_data_head));
-            RTZIP_decode_range range;
+            const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
+                                                                      struct gui_rgb_data_head));
+            IMDC_decode_range range;
             range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
             range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
                                - range.start_column : header->raw_pic_width - 1;
             range.start_line = start_line;
             range.end_line = end_line;
-            RTZIP_DMA_config dma_cfg;
+            IMDC_DMA_config dma_cfg;
             source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
                                        * (header->algorithm_type.pixel_bytes + 2));
             source.address = (uint32_t)source.memory;
@@ -443,7 +448,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             dma_cfg.RX_DMA_channel = GDMA_Channel3;
             dma_cfg.TX_DMA_channel = GDMA_Channel1;
             trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
-            RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+            IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
             if (err)
             {
                 gui_free(source.memory);
@@ -451,7 +456,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             }
         }
         PPE_blend(&source, &target, &trans);
-        if (head->type == RTZIP_COMPRESS)
+        if (head->type == IMDC_COMPRESS)
         {
             gui_free(source.memory);
         }

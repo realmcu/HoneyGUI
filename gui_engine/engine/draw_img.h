@@ -32,7 +32,7 @@ typedef enum
     RGBA8888 = 4,
     BINARY = 5,
     ALPHAMASK = 9,
-    RTZIP_COMPRESS = 10,
+    IMDC_COMPRESS = 10,
 } GUI_FormatType;
 
 

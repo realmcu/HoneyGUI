@@ -1263,11 +1263,11 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 
     char img_type = head->type;
 
-    if (img_type == RTZIP_COMPRESS)
+    if (img_type == IMDC_COMPRESS)
     {
         rle(image, dc, rect);
     }
-    else if (img_type != RTZIP_COMPRESS)
+    else if (img_type != IMDC_COMPRESS)
     {
         no_rle(image, dc, rect);
     }
