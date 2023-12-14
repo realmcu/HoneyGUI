@@ -1919,6 +1919,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *hl_picture = NULL;
                     char *pictureHl = NULL;
                     char *hl_pictureHl = NULL;
+                    int picture_x = 0;
+                    int picture_y = 0;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1958,7 +1960,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             hl_pictureHl = gui_strdup(p->attr[++i]);
                         }
-
+                        else if (!strcmp(p->attr[i], "pictureX"))
+                        {
+                            picture_x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "pictureY"))
+                        {
+                            picture_y = atoi(p->attr[++i]);
+                        }
                         i++;
                     }
                     void *img1;
@@ -1988,7 +1997,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent->name = get_space_string_head(p->txt);
                     GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = gui_get_file_address(hl_pictureHl);
                     GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
-
+                    GUI_TYPE(gui_switch_t, parent)->switch_picture->base.x = picture_x;
+                    GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
                 }
                 break;
             // case MOVIE:
