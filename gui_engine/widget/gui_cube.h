@@ -63,6 +63,8 @@ typedef struct gui_cube
     //float scale_y;
     //float t_x;
     //float t_y;
+    int16_t release_x;
+    int16_t release_y;
 } gui_cube_t;
 
 /** End of WIDGET_Exported_Types

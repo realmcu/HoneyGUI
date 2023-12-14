@@ -23,6 +23,7 @@
 #include <draw_img.h>
 #include <gui_matrix.h>
 #include "gui_cube.h"
+#include "tp_algo.h"
 
 #include <math.h>
 #include "acc_engine.h"
@@ -313,6 +314,7 @@ static bool full_rank(struct rtgui_matrix *m)
     } //gui_log("\n");
     return true;
 }
+
 static void cube_prepare(gui_obj_t *obj)
 {
     Vertex_t cube_v0 = {-1.0, -1.0, -1.0};
@@ -332,6 +334,7 @@ static void cube_prepare(gui_obj_t *obj)
 
     gui_cube_t *this = (gui_cube_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = (touch_info_t *)tp_get_info();
     gui_obj_t *root = (gui_obj_t *)obj;
     // Scale the cube to proper size
     float cbsize = this->cbsize * root->sx;
@@ -341,8 +344,6 @@ static void cube_prepare(gui_obj_t *obj)
 
     xoff = xoff + obj->dx + obj->ax + obj->tx;
     yoff = yoff + obj->dy + obj->ay + obj->ty;
-
-
 
     scale_cube(&cube_v0, cbsize);
     scale_cube(&cube_v1, cbsize);
@@ -354,14 +355,25 @@ static void cube_prepare(gui_obj_t *obj)
     scale_cube(&cube_v7, cbsize);
 
 
-
-
-
     // Rotation angles (degree) for axis X, Y, Z
     compute_rotate(xrot, yrot, zrot, &rotate_3D);
-    //xrot += rotstep;
+    // xrot += rotstep;
     yrot += rotstep;
     //zrot += rotstep;
+
+    switch (tp->type)
+    {
+    case TOUCH_HOLD_X:
+        this->release_x = tp->deltaX;
+        yrot += this->release_x;
+        break;
+    case TOUCH_HOLD_Y:
+        this->release_y = tp->deltaY;
+        xrot += this->release_y;
+        break;
+    default:
+        break;
+    }
 
     // Compute the new cube vertex coordinates transformed by the rotation matrix.
     transfrom_rotate(&rotate_3D, &cube_v0, &rv0, xoff, yoff);

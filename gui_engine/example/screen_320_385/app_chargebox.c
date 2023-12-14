@@ -32,7 +32,7 @@ static gui_app_t app_chargebox =
     .active_ms = 1000000,
 };
 
-void *get_app_hongkong(void)
+void *get_app_chargebox(void)
 {
     return &app_chargebox;
 }
@@ -91,7 +91,7 @@ static int app_init(void)
     }
 #endif
     rtgui_server_init();
-    gui_app_startup(get_app_hongkong());
+    gui_app_startup(get_app_chargebox());
     return 0;
 }
 
