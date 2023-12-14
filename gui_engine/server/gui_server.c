@@ -110,6 +110,9 @@ static void rtgui_server_entry(void *parameter)
         {
             daemon_start_ms = gui_ms_get();
         }
+#if defined __WIN32
+        continue;
+#endif
 
         if ((gui_ms_get() - daemon_start_ms) > app->active_ms)
         {
@@ -147,6 +150,7 @@ int rtgui_server_init(void)
 
     rtgui_system_image_init();
     rtgui_system_font_init();
+    gui_fb_change();
 
     gui_thread_create(GUI_SERVER_THREAD_NAME,
                       rtgui_server_entry, NULL,

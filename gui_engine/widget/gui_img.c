@@ -177,6 +177,15 @@ static void img_prepare(gui_obj_t *obj)
         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
     }
     gui_img_set_opacity((void *)obj, obj->opacity_value);
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+
+    if (last != this->checksum)
+    {
+        gui_fb_change();
+    }
 }
 
 static void img_draw_cb(gui_obj_t *obj)

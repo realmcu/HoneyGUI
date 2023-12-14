@@ -433,8 +433,7 @@ typedef struct _gui_obj_t
     uint16_t not_show       : 1;
     uint16_t cover          : 1;
     uint16_t create_done    : 1;
-    uint16_t has_animate    : 1;
-    uint16_t need_update    : 1;
+
     uint16_t event_dsc_cnt  : 5;
     gui_event_dsc_t *event_dsc;
     int16_t dx;//for touch

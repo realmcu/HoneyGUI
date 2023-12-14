@@ -67,6 +67,7 @@ typedef struct gui_tabview
     bool loop;
     int16_t release_x;
     int16_t release_y;
+    uint8_t checksum;
 } gui_tabview_t;
 
 

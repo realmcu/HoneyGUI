@@ -108,6 +108,14 @@ extern "C" {
 void gui_fb_disp(struct _gui_obj_t *parent);
 
 
+/**
+ * @brief this means framebuffer have change, need update framebuffer
+ *
+ */
+void gui_fb_change(void);
+
+
+
 /** End of DC_Exported_Functions
   * @}
   */

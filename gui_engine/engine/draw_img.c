@@ -233,28 +233,7 @@ bool rtgui_image_new_area(draw_img_t *img)
     return true;
 }
 
-static uint8_t CheckSum(uint8_t seed, uint8_t *data, uint8_t len)
-{
-    uint8_t crc = seed;
-    for (uint32_t i = 0; i < len; i++)
-    {
-        crc += *(data++);
-    }
-    return crc;
-}
 
-uint16_t rtgui_image_checksum(draw_img_t *image)
-{
-    uint8_t tmp = image->checksum;
-    image->checksum = 0;
-    uint8_t ret = 0;
-    ret = CheckSum(0, (uint8_t *)image, sizeof(image));
-    ret = CheckSum(ret, (uint8_t *)image, sizeof(image->matrix));
-    ret = CheckSum(ret, (uint8_t *)image, sizeof(image->inverse));
-    image->checksum = tmp;
-    return ret;
-
-}
 
 void rtgui_image_destroy(draw_img_t *image)
 {

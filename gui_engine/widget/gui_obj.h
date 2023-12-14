@@ -276,6 +276,16 @@ app_color gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
  * @return app_color
  */
 app_color gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
+
+/**
+ * @brief
+ *
+ * @param seed
+ * @param data
+ * @param len
+ * @return uint8_t
+ */
+uint8_t gui_checksum(uint8_t seed, uint8_t *data, uint8_t len);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

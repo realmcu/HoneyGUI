@@ -110,7 +110,6 @@ void gui_obj_ctor(gui_obj_t *this, gui_obj_t *parent, const char *name, int16_t 
 
     this->sx = 1.0f;
     this->sy = 1.0f;
-    this->need_update = true;
     this->opacity_value = UINT8_MAX;
 
 }
@@ -120,6 +119,17 @@ void gui_obj_dtor(gui_obj_t *this)
     a = this->x;
     return;
 }
+
+uint8_t gui_checksum(uint8_t seed, uint8_t *data, uint8_t len)
+{
+    uint8_t crc = seed;
+    for (uint32_t i = 0; i < len; i++)
+    {
+        crc += *(data++);
+    }
+    return crc;
+}
+
 static void gui_obj_destory_cb(gui_obj_t *obj)
 {
     gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
@@ -127,9 +137,8 @@ static void gui_obj_destory_cb(gui_obj_t *obj)
     {
         obj->obj_destory(obj);
     }
-
-
 }
+
 static void gui_tree_child_free(gui_obj_t *object)
 {
     gui_list_t *node = NULL;

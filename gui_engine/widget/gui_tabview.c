@@ -306,6 +306,15 @@ static void tabview_prepare(gui_obj_t *obj)
         this->release_y = 0;
     }
     obj->dy = this->release_y;
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
+
+    if (last != this->checksum)
+    {
+        gui_fb_change();
+    }
 }
 
 /*============================================================================*

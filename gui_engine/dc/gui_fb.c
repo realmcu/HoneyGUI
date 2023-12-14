@@ -140,26 +140,9 @@ static void obj_draw_end(gui_obj_t *obj)
     }
 }
 
-
-
-
-
-void gui_fb_disp(gui_obj_t *root)
+static void gui_fb_draw(gui_obj_t *root)
 {
-    if (root == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-        return;
-    }
-
     gui_dispdev_t *dc = gui_get_dc();
-    if ((dc->frame_buf == NULL) && (dc->disp_buf_1 == NULL) && (dc->disp_buf_2 == NULL))
-    {
-        GUI_ASSERT(NULL != NULL);
-        return;
-    }
-
-    obj_draw_prepare(root);
     uint32_t active_line = dc->driver_ic_active_width;
     uint32_t hfp_line = dc->driver_ic_hfp;
     uint32_t hbp_line = dc->driver_ic_hbp;
@@ -236,6 +219,43 @@ void gui_fb_disp(gui_obj_t *root)
         dc->lcd_update(dc);
 #endif
     }
+}
+
+static bool fb_change = false;
+void gui_fb_change(void)
+{
+    fb_change = true;
+}
+
+void gui_fb_disp(gui_obj_t *root)
+{
+    if (root == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+        return;
+    }
+
+    gui_dispdev_t *dc = gui_get_dc();
+    if ((dc->frame_buf == NULL) && (dc->disp_buf_1 == NULL) && (dc->disp_buf_2 == NULL))
+    {
+        GUI_ASSERT(NULL != NULL);
+        return;
+    }
+
+    obj_draw_prepare(root);
+
+
+    if (fb_change == true)
+    {
+        gui_fb_draw(root);
+        fb_change = false;
+    }
+    else
+    {
+        gui_thread_mdelay(17);
+    }
+
+
     obj_draw_end(root);
     for (uint8_t i = 0; i < event_cnt; i++)
     {

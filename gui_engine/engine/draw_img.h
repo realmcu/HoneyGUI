@@ -89,7 +89,6 @@ bool rtgui_image_new_area(draw_img_t *img);
 bool rtgui_image_create(draw_img_t *img, bool load);
 void rtgui_image_destroy(draw_img_t *image);
 void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
-uint16_t rtgui_image_checksum(draw_img_t *image);
 
 /* register an image engine */
 void rtgui_image_register_engine(struct rtgui_image_engine *engine);
