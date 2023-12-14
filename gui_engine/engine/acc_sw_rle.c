@@ -1298,7 +1298,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
         }
 
     }
-    else if (image->blend_mode == IMG_FILTER_BLACK)
+    else if (image->blend_mode == IMG_FILTER_BLACK)//no matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1313,7 +1313,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
             rle_filter_blit_2_argb8888(image, dc, rect);
         }
     }
-    else if (image->blend_mode == IMG_FILTER_MATRIX)
+    else if (image->blend_mode == IMG_FILTER_BLACK)//matrix
     {
         // gui_log("test\n");
         if (dc_bytes_per_pixel == 2)
@@ -1329,11 +1329,11 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
             rle_filter_matrix_blit_2_argb8888(image, dc, rect);
         }
     }
-    else if (image->blend_mode == IMG_ALPHA_MATRIX)
+    else if (image->blend_mode == IMG_SRC_OVER_MODE)//matrix
     {
 
     }
-    else if (image->blend_mode == IMG_ALPHA_BLEND)
+    else if (image->blend_mode == IMG_SRC_OVER_MODE)//no matrix
     {
 
     }

@@ -94,9 +94,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     source.memory = (void *)source.address;
     source.global_alpha_en = true;
     source.global_alpha = image->opacity_value;
-    if (image->blend_mode == IMG_FILTER_MATRIX || image->blend_mode == IMG_ALPHA_MATRIX)
+    if ((image->blend_mode == IMG_FILTER_BLACK) || (image->blend_mode == IMG_SRC_OVER_MODE))
     {
-        if (image->blend_mode == IMG_FILTER_MATRIX)
+        if (image->blend_mode == IMG_FILTER_BLACK)
         {
             source.color_key_en = true;
             source.color_key_value = 0x00000000;

@@ -40,10 +40,7 @@ typedef enum
 {
     IMG_BYPASS_MODE = 0,
     IMG_FILTER_BLACK,
-    IMG_ALPHA_BLEND,
-    IMG_ALPHA_MATRIX,
-    IMG_FILTER_MATRIX,
-    IMG_TRANSPARENT_MODE,
+    IMG_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
 } BLEND_MODE_TYPE;
 
 typedef struct draw_img

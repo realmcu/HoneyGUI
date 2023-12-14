@@ -991,8 +991,28 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct gui_rgb_data_head *head = image->data;
     char img_type = head->type;
+    rtgui_matrix_t *matrix = image->matrix;
+    bool identity = true;
+    if (
+        (matrix->m[0][0] == 1) && \
+        (matrix->m[1][1] == 1) && \
+        (matrix->m[2][2] == 1) && \
+        (matrix->m[0][1] == 1) && \
+        (matrix->m[1][0] == 1) && \
+        (matrix->m[0][2] == 1) && \
+        (matrix->m[2][0] == 1) && \
+        (matrix->m[1][2] == 1) && \
+        (matrix->m[2][1] == 1)
+    )
+    {
+        identity = true;
+    }
+    else
+    {
+        identity = false;
+    }
 
-    if (image->blend_mode == IMG_BYPASS_MODE)
+    if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == true))
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1041,7 +1061,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if (image->blend_mode == IMG_FILTER_BLACK)
+    if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1089,7 +1109,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if (image->blend_mode == IMG_FILTER_MATRIX)
+    if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == false))//matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1137,7 +1157,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if (image->blend_mode == IMG_ALPHA_MATRIX)
+    if ((image->blend_mode == IMG_SRC_OVER_MODE) && (identity == false))//matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1185,7 +1205,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if (image->blend_mode == IMG_ALPHA_BLEND)
+    if ((image->blend_mode == IMG_SRC_OVER_MODE) && (identity == true))//no matrix
     {
         // if (dc_bytes_per_pixel == 2)
         // {

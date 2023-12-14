@@ -248,7 +248,7 @@ void gui_fb_disp(gui_obj_t *root)
     if (fb_change == true)
     {
         gui_fb_draw(root);
-        fb_change = false;
+        fb_change = true;
     }
     else
     {

@@ -239,10 +239,9 @@ static void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char
     root->obj_destory = magic_img_destory;
     root->type = IMAGE_FROM_MEM;
 
-    //draw_img->blend_mode = IMG_FILTER_BLACK;
     draw_img->data = addr;
     draw_img->opacity_value = 255;
-    draw_img->blend_mode = IMG_BYPASS_MODE;
+    draw_img->blend_mode = IMG_FILTER_BLACK;
     draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
     draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
     draw_img->opacity_value = UINT8_MAX;
@@ -294,7 +293,6 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
     if (addr != NULL)
     {
         draw_img_t *draw_img = &img->draw_img;
-        draw_img->blend_mode = IMG_FILTER_MATRIX;
         draw_img->data = addr;
     }
 }
@@ -302,8 +300,6 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
 void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)
 {
     GUI_ASSERT(img != NULL);
-    draw_img_t *draw_img = &img->draw_img;
-    draw_img->blend_mode = IMG_FILTER_MATRIX;
     img->degrees = degrees;
     img->c_x = c_x;
     img->c_y = c_y;
@@ -312,8 +308,6 @@ void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)
 void gui_img_scale(gui_img_t *img, float scale_x, float scale_y)
 {
     GUI_ASSERT(img != NULL);
-    draw_img_t *draw_img = &img->draw_img;
-    draw_img->blend_mode = IMG_FILTER_MATRIX;
     if (scale_x > 0 && scale_y > 0)
     {
         img->scale_x = scale_x;
@@ -324,8 +318,6 @@ void gui_img_scale(gui_img_t *img, float scale_x, float scale_y)
 void gui_img_translate(gui_img_t *img, float t_x, float t_y)
 {
     GUI_ASSERT(img != NULL);
-    draw_img_t *draw_img = &img->draw_img;
-    draw_img->blend_mode = IMG_FILTER_MATRIX;
     img->t_x = t_x;
     img->t_y = t_y;
 }
