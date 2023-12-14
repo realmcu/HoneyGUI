@@ -5,7 +5,7 @@ The porting files are in the gui_port folder.
     At present, it has been transplanted in FreeRTOS, RT-Thread, and Windows, you can refer to it.
 ## Input device
 
-- ``guidef.h and gui_port_indev.c``
+- Refer to ``guidef.h`` and ``gui_port_indev.c``
 - The input information is abstracted as touch screen contacts, and the input information structure is as follows
 
 ```C
@@ -23,7 +23,7 @@ typedef struct gui_touch_data
 
 ## Display device
 
-- ``sdk\src\app\wristband\gui_port\gui_port_dc.c``
+- Refer to ``guidef.h`` and ``gui_port_dc.c``
 - It is necessary to define the screen width and height, frame buffer address and mode, whether the resolution is scaled, and realize the refresh function. The structure is as follows.
 - The framebuffer's size is ```fb_width*fb_height*bit_depth/8```.
 - In ```DC_RAMLESS``` mode, two framebuffers are used, and the fb_height is section height.
@@ -56,7 +56,7 @@ static struct gui_dispdev dc =
 
 ## File system
 
-- ``sdk\src\app\wristband\gui_port\gui_port_filesystem.c``
+- Refer to ``guidef.h`` and ``gui_port_filesystem.c``
 - Need to define several posix-style interface operation files and folders, as follows.
 
 ```C
@@ -76,7 +76,7 @@ struct gui_fs
 
 ## OS
 
-- ``sdk\src\app\wristband\gui_port\gui_port_os.c``
+- Refer to ``guidef.h`` and ``gui_port_os.c``
 - Need to define interfaces for threads, timers, message queues, and memory management, as follows
 
 ```C
@@ -111,7 +111,7 @@ struct gui_os_api
 
 In order to reduce power consumption and increase device usage time, the sleep(low-power) mode is supported.
 
-- ``gui_engine\app\gui_app.h``
+- Refer to ``gui_app.h``
 
 ```C
 typedef struct gui_app gui_app_t;

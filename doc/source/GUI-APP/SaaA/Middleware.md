@@ -24,7 +24,7 @@ This page shows how the  UI switch corresponds to the peripheral switch.
 - Use ```matter_send_msg_to_app()``` to operate lights;
 
 
-This is the ```writeSync``` 's control light implementation for RTL87X2G. First get gpio value and direction value, then use specify driver api to operate light.
+The following code example is the ```writeSync``` 's control light implementation for RTL87X2G. First get gpio value and direction value, then use specify driver api to operate light.
 ```c
 #ifdef RTL87x2G
 #define ENABLE_MATTER_SWITCH
