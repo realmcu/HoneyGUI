@@ -1,13 +1,16 @@
 #include "js_user.h"
+#ifdef RTL87x2G
 #include "wdg.h"
 #include "rtl_wdg.h"
-
+#endif
 DECLARE_HANDLER(dataRst)
 {
     // TODO: Reset matter
 
     gui_log("reset from ui\n");
+#ifdef RTL87x2G
     WDG_SystemReset(RESET_ALL, RESET_REASON_FACTORY_RESET);
+#endif
     return jerry_create_undefined();
 }
 
