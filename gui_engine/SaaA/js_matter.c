@@ -1,10 +1,13 @@
 #include "js_user.h"
+#include "wdg.h"
+#include "rtl_wdg.h"
 
 DECLARE_HANDLER(dataRst)
 {
     // TODO: Reset matter
 
-
+    gui_log("reset from ui\n");
+    WDG_SystemReset(RESET_ALL, RESET_REASON_FACTORY_RESET);
     return jerry_create_undefined();
 }
 
