@@ -347,6 +347,8 @@ typedef enum obj_type
     IMAGE_SCOPE,
     CARDVIEW,
     CARD,
+    PAGELIST,
+    PAGELISTVIEW,
 } obj_type_t;
 typedef struct rtgui_msg
 {

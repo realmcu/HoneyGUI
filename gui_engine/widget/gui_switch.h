@@ -61,6 +61,7 @@ struct gui_switch
     bool press_flag;
     bool long_flag;
     bool release_flag;
+    bool touch_disable;
     void (*turn_off)(gui_switch_t *sw);
     void (*turn_on)(gui_switch_t *sw);
     void (*onOn)(gui_switch_t *this, void *cb, void *p);
