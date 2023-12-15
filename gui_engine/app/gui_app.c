@@ -10,15 +10,18 @@
 #include "gui_obj.h"
 
 
-static gui_app_t *current_app;
-
+gui_app_t *current_app;
+gui_app_t *next_app;
 
 
 gui_app_t *gui_current_app(void)
 {
     return current_app;
 }
-
+gui_app_t *gui_next_app(void)
+{
+    return next_app;
+}
 void gui_app_exec(gui_app_t *app)
 {
     rtgui_msg_t msg;
@@ -70,7 +73,17 @@ void gui_app_startup(gui_app_t *app)
                                            app->thread_entry, app,
                                            1024 * 3, 25);
     }
-    current_app = app;
+    if (current_app && !current_app->close_sync)
+    {
+        next_app = app;
+        current_app->next = true;
+    }
+    else
+    {
+        current_app = app;
+    }
+
+
 }
 
 void gui_app_shutdown(gui_app_t *app)
@@ -79,7 +92,16 @@ void gui_app_shutdown(gui_app_t *app)
     {
         gui_thread_delete(app->thread_id);
     }
-    gui_tree_free(&app->screen);
+
+    if (app->next)
+    {
+        app->close = true;
+    }
+    else
+    {
+        gui_tree_free(&app->screen);
+        app->close_sync = true;
+    }
 }
 
 void gui_app_uninstall(gui_app_t *app)

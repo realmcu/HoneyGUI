@@ -56,6 +56,9 @@ struct gui_app
     void (* dtor)(void *this);      //!< destructor
     void (* ui_design)(gui_app_t *); //!< ui create entry
     bool lvgl;
+    bool close;
+    bool next;
+    bool close_sync;
 
 };
 /** End of APP_Exported_Types
@@ -110,7 +113,7 @@ struct gui_app
   * @{
   */
 gui_app_t *gui_current_app(void);
-
+gui_app_t *gui_next_app(void);
 void gui_app_exec(gui_app_t *app);
 
 void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry);

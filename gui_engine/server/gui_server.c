@@ -69,6 +69,7 @@ static void rtgui_server_entry(void *parameter)
     while (1)
     {
         gui_app_t *app = gui_current_app();
+        gui_app_t *app_next = gui_next_app();
         while (app == NULL)
         {
             gui_thread_mdelay(1000);
@@ -93,8 +94,30 @@ static void rtgui_server_entry(void *parameter)
         {
             continue;
         }
-
+        if (app_next && (&(app_next->screen)))
+        {
+            if (app->close)
+            {
+                extern gui_app_t *next_app;
+                extern gui_app_t *current_app;
+                current_app->close = false;
+                gui_list_remove(&(app->screen.brother_list));
+                current_app = next_app;
+                next_app = 0;
+            }
+            else
+            {
+                gui_list_insert_before(&((screen)->child_list), &(app_next->screen.brother_list));
+                app_next->screen.parent = screen;
+            }
+        }
+        screen = &app->screen;
         gui_fb_disp(screen);
+        app_next = gui_next_app();
+        if (app_next && (&(app_next->screen)))
+        {
+            gui_list_remove(&(app_next->screen.brother_list));
+        }
 #ifdef _WIN32
         gui_thread_mdelay(17);
 #endif
