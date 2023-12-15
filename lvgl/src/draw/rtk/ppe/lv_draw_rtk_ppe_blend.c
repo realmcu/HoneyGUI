@@ -129,21 +129,27 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
 
     source.address = (uint32_t)map_p;
     source.memory = (uint32_t *)source.address;
-    source.width = coords->x2 - coords->x1 + 1;
-    source.height = coords->y2 - coords->y1 + 1;
+    uint32_t source_width = coords->x2 - coords->x1 + 1;
+    uint32_t source_height = coords->y2 - coords->y1 + 1;
+    source.width = source_width;
+    source.height = source_height;
+    uint8_t pixel_byte = 2;
     if (LV_COLOR_DEPTH == 16)
     {
         if (cf == LV_IMG_CF_TRUE_COLOR)
         {
-            source.format = PPE_BGR565;
+            source.format = PPE_RGB565;
+            pixel_byte = 2;
         }
         else if (cf == LV_IMG_CF_TRUE_COLOR_ALPHA)
         {
-            source.format = PPE_ABGR8565;
+            source.format = PPE_ARGB8565;
+            pixel_byte = 3;
         }
         else if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
         {
-            source.format = PPE_BGR565;
+            source.format = PPE_RGB565;
+            pixel_byte = 2;
             source.color_key_en = ENABLE;
             source.color_key_value = LV_COLOR_CHROMA_KEY.full;
         }
@@ -154,11 +160,11 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     }
     else if (LV_COLOR_DEPTH == 32)
     {
-        source.format = PPE_ABGR8888;
+        source.format = PPE_ARGB8888;
     }
     else if (cf == LV_IMG_CF_RGB888)
     {
-        source.format = PPE_BGR888;
+        source.format = PPE_RGB888;
     }
     else
     {
@@ -169,27 +175,6 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     if (dsc->zoom != LV_IMG_ZOOM_NONE)
     {
         memset(&zoom, 0, sizeof(ppe_buffer_t));
-        float zoom_ratio = dsc->zoom * 1.0f / LV_IMG_ZOOM_NONE;
-        uint32_t new_width = (uint32_t)((coords->x2 - coords->x1 + 1) * zoom_ratio);
-        uint32_t new_height = (uint32_t)((coords->y2 - coords->y1 + 1) * zoom_ratio);
-        if (source.format == PPE_BGR565)
-        {
-            zoom.memory = (uint32_t *)os_mem_alloc(RAM_TYPE_DATA_ON, new_width * new_height * 2);
-        }
-        else if (source.format == PPE_ABGR8565)
-        {
-            zoom.memory = (uint32_t *)os_mem_alloc(RAM_TYPE_DATA_ON, new_width * new_height * 3);
-        }
-        zoom.address = (uint32_t)zoom.memory;
-        zoom.color_key_en = DISABLE;
-        zoom.color_key_value = 0;
-        zoom.format = source.format;
-        PPE_ERR err = PPE_Scale(&source, &zoom, zoom_ratio, zoom_ratio);
-        if (err != PPE_SUCCESS)
-        {
-            os_mem_free(zoom.memory);
-            return LV_RES_INV;
-        }
         if (dsc->opa != 0xFF)
         {
             zoom.global_alpha_en = ENABLE;
@@ -200,15 +185,66 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             zoom.color_key_en = ENABLE;
             zoom.color_key_value = LV_COLOR_CHROMA_KEY.full;
         }
-        err = PPE_blend(&zoom, &target, &trans);
-        os_mem_free(zoom.memory);
-        if (err == PPE_SUCCESS)
+        float zoom_ratio = dsc->zoom * 1.0f / LV_IMG_ZOOM_NONE;
+        uint32_t new_width = (uint32_t)(source_width * zoom_ratio);
+        uint32_t new_height = (uint32_t)(source_height * zoom_ratio);
+        uint32_t buffer_size = 0;
+        uint8_t *internal_buf = lv_draw_rtk_ppe_get_buffer(&buffer_size);
+        zoom.memory = (uint32_t *)internal_buf;
+        uint32_t new_size = new_width * new_height * pixel_byte;
+
+        zoom.address = (uint32_t)zoom.memory;
+        zoom.color_key_en = DISABLE;
+        zoom.color_key_value = 0;
+        zoom.format = source.format;
+        if (new_size <= buffer_size)
         {
-            return LV_RES_OK;
+            PPE_ERR err = PPE_Scale(&source, &zoom, zoom_ratio, zoom_ratio);
+            if (err != PPE_SUCCESS)
+            {
+                return LV_RES_INV;
+            }
+
+            err = PPE_blend(&zoom, &target, &trans);
+            if (err == PPE_SUCCESS)
+            {
+                return LV_RES_OK;
+            }
+            else
+            {
+                return LV_RES_INV;
+            }
         }
         else
         {
-            return LV_RES_INV;
+            uint32_t extra_line = ceil(zoom_ratio);
+            uint32_t zoom_line_num = buffer_size / (new_width * pixel_byte);
+            for (int y = 0; y < new_height; y += (zoom_line_num - extra_line))
+            {
+                uint32_t start_line = y / zoom_ratio;
+                uint32_t end_line = (y + zoom_line_num - extra_line) / zoom_ratio;
+                if (end_line >= source_height)
+                {
+                    end_line = source_height - 1;
+                }
+                PPE_rect_t scale_rect = {.left = 0, .top = start_line, .bottom = end_line, .right = source.width - 1};
+                PPE_ERR err = PPE_Scale_Rect(&source, &zoom, zoom_ratio, zoom_ratio, &scale_rect);
+                if (err != PPE_SUCCESS)
+                {
+                    return LV_RES_INV;
+                }
+                trans.y = coords->y1 + y;
+                err = PPE_blend(&zoom, &target, &trans);
+                if (err != PPE_SUCCESS)
+                {
+                    return LV_RES_INV;
+                }
+                if ((trans.y + zoom_line_num - extra_line) > draw_ctx->buf_area->y2)
+                {
+                    break;
+                }
+            }
+            return LV_RES_OK;
         }
     }
     else
