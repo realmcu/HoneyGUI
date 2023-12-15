@@ -36,6 +36,10 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
 void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                        struct rtgui_rect *rect);
+void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                     struct rtgui_rect *rect);
+void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                      struct rtgui_rect *rect);
 void rle(draw_img_t *image, struct gui_dispdev *dc,
          struct rtgui_rect *rect);
 

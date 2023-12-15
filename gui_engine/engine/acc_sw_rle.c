@@ -1058,7 +1058,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
-//            int line = y_i - image_y;
+
             for (int k = start_line; k <= end_line; k++)
             {
                 uncompressed_rle_rgb565(file, k, line_buf + (k - start_line) * source_w * source_bytes_per_pixel);
@@ -1072,7 +1072,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
                 int x_matric = round(X / Z);
                 int y_matric = round(Y / Z);
-// gui_log("matric_rgb565_2_argb8888:z\n");
+
                 if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
                 {
                     continue;
@@ -1111,18 +1111,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                     }
                     break;
                 }
-                // if (pixel != 0)
-                // {
-                // gui_color_t *d = (gui_color_t *)(writebuf + (write_off + x_j) * dc_bytes_per_pixel);
-                // do_blending_rgb565_2_argb8888_opacity(d, &color,opacity_value);
 
-                //     if (pixel != 0)
-                // {
-                //     writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
-                //     writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
-                //     writebuf[(write_off + x_j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
-                // }
-                // }
             }
         }
 
@@ -1156,7 +1145,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     uint8_t img_type = *((uint8_t *)image_off);
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 
-    if (img_type == 132)//matric_rgb8888_2_argb8888
+    if (img_type == 132)//alpha_matric_rgb8888_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 4;
         int32_t  y1, y2, z1, z2;
@@ -1204,17 +1193,16 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             end_line = y2 + 4;
         }
         //TODO: y2 + ceil(1 / scale_y_ratio)
-        // gui_log("matric_rgb565_2_argb8888\n");
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
         rtzip_file_t *file = (rtzip_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
-//            int line = y_i - image_y;
+
             for (int k = start_line; k <= end_line; k++)
             {
-                uncompressed_rle_rgb565(file, k, line_buf + (k - start_line) * source_w * source_bytes_per_pixel);
+                uncompressed_rle_argb8888(file, k, line_buf + (k - start_line) * source_w * source_bytes_per_pixel);
             }
             uint32_t read_off = (uint32_t)line_buf ;
             uint8_t *writebuf = dc->frame_buf;
@@ -1225,7 +1213,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
                 int x_matric = round(X / Z);
                 int y_matric = round(Y / Z);
-// gui_log("matric_rgb565_2_argb8888:z%d\n",x);
+
                 if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
                 {
                     continue;
@@ -1278,11 +1266,296 @@ void rle_filter_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     gui_log("[GUI] TODO line = %d", __LINE__);
     while (1);
 }
+void rle_alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                              struct rtgui_rect *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t img_type = *((uint8_t *)image_off);
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+
+    if (img_type == 132)
+    {
+        uint8_t source_bytes_per_pixel = 4;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int line = i - image_y;
+            uncompressed_rle_argb8888(file, line, line_buf);
+            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
+            uint8_t *writebuf = dc->frame_buf;
+            uint8_t *pixel;
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+                gui_color_t color = {.channel.blue = pixel[0],
+                                     .channel.green = pixel[1],
+                                     .channel.red = pixel[2],
+                                     .channel.alpha = pixel[3],
+                                    };
+                uint8_t opacity_value = (uint8_t)image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_argb8888_2_argb8888(d, &color);
+                    }
+                    break;
+                default:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_argb8888_2_argb8888_opacity(d, &color, opacity_value);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    else if (img_type == 68) //rle_rgb888_2_argb8888
+    {
+        uint8_t source_bytes_per_pixel = 3;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        memset(line_buf, 0, source_bytes_per_pixel * image_w);
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+            int line = i - image_y;
+            uncompressed_rle_rgb888(file, line, line_buf);
+            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
+            uint8_t *writebuf = dc->frame_buf;
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+                gui_color_t color = {.channel.blue = pixel[0],
+                                     .channel.green = pixel[1],
+                                     .channel.red = pixel[2],
+                                     .channel.alpha = 255,
+                                    };
+                uint8_t opacity_value = (uint8_t)image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_rgb888_2_argb8888(d, &color);
+                    }
+                    break;
+                default:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_rgb888_2_argb8888_opacity(d, &color, opacity_value);
+                    }
+                    break;
+                }
+            }
+
+        }
+    }
+    else if (img_type == 4) //rgb565_2_argb8888
+    {
+        uint8_t source_bytes_per_pixel = 2;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int line = i - image_y;
+            uncompressed_rle_rgb565(file, line, line_buf);
+            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
+            uint8_t *writebuf = dc->frame_buf;
+
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                uint16_t pixel = *((uint16_t *)(read_off + j * source_bytes_per_pixel));
+                gui_color_t color = {.channel.blue = (pixel & 0x001f) << 3,
+                                     .channel.green = ((pixel & 0x07e0) >> 5) << 2,
+                                     .channel.red = (pixel >> 11) << 3,
+                                     .channel.alpha = 255,
+                                    };
+                uint8_t opacity_value = (uint8_t)image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_rgb565_2_argb8888(d, &color);
+                    }
+                    break;
+                default:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_rgb565_2_argb8888_opacity(d, &color, opacity_value);
+                    }
+                    break;
+                }
+            }
+        }
+
+    }
+    return;
+}
+void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                     struct rtgui_rect *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t img_type = *((uint8_t *)image_off);
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+
+    if (img_type == 132)
+    {
+        uint8_t source_bytes_per_pixel = 4;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int line = i - image_y;
+            uncompressed_rle_argb8888(file, line, line_buf);
+            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
+            uint8_t *writebuf = dc->frame_buf;
+            uint8_t *pixel;
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+                gui_color_t color = {.channel.blue = pixel[0],
+                                     .channel.green = pixel[1],
+                                     .channel.red = pixel[2],
+                                     .channel.alpha = pixel[3],
+                                    };
+                uint8_t opacity_value = (uint8_t)image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_argb8888_2_argb8888(d, &color);
+                    }
+                    break;
+                default:
+                    {
+                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                        do_blending_argb8888_2_argb8888_opacity(d, &color, opacity_value);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    else if (img_type == 68) //rle_rgb888_2_argb8888
+    {
+        uint8_t source_bytes_per_pixel = 3;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        memset(line_buf, 0, source_bytes_per_pixel * image_w);
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+            int line = i - image_y;
+            uncompressed_rle_rgb888(file, line, line_buf);
+            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
+            uint8_t *writebuf = dc->frame_buf;
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+                //gui_log("piexl_%d %d %d\n",pixel[0],pixel[1],pixel[2]);
+                writebuf[(write_off + j) * dc_bytes_per_pixel]     = pixel[0]; //B
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
+            }
+
+        }
+    }
+    else if (img_type == 4) //rgb565_2_argb8888
+    {
+        uint8_t source_bytes_per_pixel = 2;
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
+        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        for (uint32_t i = y_start; i < y_end; i++)
+        {
+            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int line = i - image_y;
+            uncompressed_rle_rgb565(file, line, line_buf);
+            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
+            uint8_t *writebuf = dc->frame_buf;
+
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                uint16_t pixel = *((uint16_t *)(read_off + j * source_bytes_per_pixel));
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+            }
+        }
+
+    }
+    return;
+}
 void rle(draw_img_t *image, struct gui_dispdev *dc,
          struct rtgui_rect *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    if (image->blend_mode == IMG_BYPASS_MODE)
+    rtgui_matrix_t *matrix = image->matrix;
+    bool identity = true;
+    if (
+        (matrix->m[0][0] == 1) && \
+        (matrix->m[1][1] == 1) && \
+        (matrix->m[2][2] == 1) && \
+        (matrix->m[0][1] == 1) && \
+        (matrix->m[1][0] == 1) && \
+        (matrix->m[0][2] == 1) && \
+        (matrix->m[2][0] == 1) && \
+        (matrix->m[1][2] == 1) && \
+        (matrix->m[2][1] == 1)
+    )
+    {
+        identity = true;
+    }
+    else
+    {
+        identity = false;
+    }
+    if (image->blend_mode == IMG_BYPASS_MODE && (identity == true))
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1298,7 +1571,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
         }
 
     }
-    else if (image->blend_mode == IMG_FILTER_BLACK)//no matrix
+    else if (image->blend_mode == IMG_FILTER_BLACK && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -1313,7 +1586,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
             rle_filter_blit_2_argb8888(image, dc, rect);
         }
     }
-    else if (image->blend_mode == IMG_FILTER_BLACK)//matrix
+    else if (image->blend_mode == IMG_FILTER_BLACK && (identity == false))//matrix
     {
         // gui_log("test\n");
         if (dc_bytes_per_pixel == 2)
@@ -1329,12 +1602,36 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
             rle_filter_matrix_blit_2_argb8888(image, dc, rect);
         }
     }
-    else if (image->blend_mode == IMG_SRC_OVER_MODE)//matrix
+    else if (image->blend_mode == IMG_SRC_OVER_MODE && (identity == false))//matrix
     {
+        if (dc_bytes_per_pixel == 2)
+        {
+            //rle_alpha_matrix_blit_2_rgb565(image, dc, rect);
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+            //rle_alpha_matrix_blit_2_rgb888(image, dc, rect);
+        }
+        else if (dc_bytes_per_pixel == 4)
+        {
+            rle_alpha_matrix_blit_2_argb8888(image, dc, rect);
+        }
 
     }
-    else if (image->blend_mode == IMG_SRC_OVER_MODE)//no matrix
+    else if (image->blend_mode == IMG_SRC_OVER_MODE && (identity == true))//no matrix
     {
+        if (dc_bytes_per_pixel == 2)
+        {
+            //rle_alpha_blend_blit_2_rgb565(image, dc, rect);
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+            // rle_alpha_blend_blit_2_rgb888(image, dc, rect);
+        }
+        else if (dc_bytes_per_pixel == 4)
+        {
+            rle_alpha_blend_blit_2_argb8888(image, dc, rect);
+        }
 
     }
 
