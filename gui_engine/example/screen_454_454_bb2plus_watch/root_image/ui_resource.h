@@ -1,275 +1,287 @@
 #if defined _WIN32
 extern unsigned char resource_root[1024 * 1024 * 20];
 
-#define   OVAL_BIN                                (void *)(resource_root + 0x00000878)
-#define   CLOCK_BIN                               (void *)(resource_root + 0x000010b8)
-#define   ICON_ANSWER_BIN                         (void *)(resource_root + 0x00065b38)
-#define   ICON_ANSWER_TOUCH_BIN                   (void *)(resource_root + 0x00068d78)
-#define   ICON_BACK_BIN                           (void *)(resource_root + 0x0006bfb8)
-#define   ICON_BACKSPACE_BIN                      (void *)(resource_root + 0x0006d1f8)
-#define   ICON_BLUETOOTH_OFF_BIN                  (void *)(resource_root + 0x0006f238)
-#define   ICON_BLUETOOTH_ON_BIN                   (void *)(resource_root + 0x00074078)
-#define   ICON_BLUETOOTH_TOUCH_BIN                (void *)(resource_root + 0x00078eb8)
-#define   ICON_BUDS_OFF_BIN                       (void *)(resource_root + 0x0007dcf8)
-#define   ICON_BUDS_ON_BIN                        (void *)(resource_root + 0x00082b38)
-#define   ICON_BUDS_TOUCH_BIN                     (void *)(resource_root + 0x00087978)
-#define   ICON_BUTTON_OFF_BIN                     (void *)(resource_root + 0x0008c7b8)
-#define   ICON_BUTTON_ON_BIN                      (void *)(resource_root + 0x0008e7f8)
-#define   ICON_CALL_BIN                           (void *)(resource_root + 0x00090838)
-#define   ICON_CALL_CONTACTS_BIN                  (void *)(resource_root + 0x000a3478)
-#define   ICON_CALL_CONTACTS_TOUCH_BIN            (void *)(resource_root + 0x000ae4b8)
-#define   ICON_CALL_HISTORY_BIN                   (void *)(resource_root + 0x000b94f8)
-#define   ICON_CALL_HISTORY_TOUCH_BIN             (void *)(resource_root + 0x000c4538)
-#define   ICON_CALL_TOUCH_BIN                     (void *)(resource_root + 0x000cf578)
-#define   ICON_CALL_VOLUME_BAR_BIN                (void *)(resource_root + 0x000e21b8)
-#define   ICON_CALL_VOLUME_BAR_1_BIN              (void *)(resource_root + 0x000e30f8)
-#define   ICON_CALL_VOLUME_BAR_2_BIN              (void *)(resource_root + 0x000e32b8)
-#define   ICON_CALLER_BIN                         (void *)(resource_root + 0x000e41f8)
-#define   ICON_CALLER_LARGE_BIN                   (void *)(resource_root + 0x000ebc38)
-#define   ICON_CANCEL_BIN                         (void *)(resource_root + 0x000febb8)
-#define   ICON_CANCEL_TOUCH_BIN                   (void *)(resource_root + 0x001033f8)
-#define   ICON_CONFIRM_BIN                        (void *)(resource_root + 0x00107c38)
-#define   ICON_CONFIRM_TOUCH_BIN                  (void *)(resource_root + 0x0010c478)
-#define   ICON_CONTACTCS_BIN                      (void *)(resource_root + 0x00110cb8)
-#define   ICON_CONTACTCS_TOUCH_BIN                (void *)(resource_root + 0x001238f8)
-#define   ICON_DIAL_0_BIN                         (void *)(resource_root + 0x00136538)
-#define   ICON_DIAL_1_BIN                         (void *)(resource_root + 0x0013af38)
-#define   ICON_DIAL_2_BIN                         (void *)(resource_root + 0x0013f938)
-#define   ICON_DIAL_3_BIN                         (void *)(resource_root + 0x00144338)
-#define   ICON_DIAL_4_BIN                         (void *)(resource_root + 0x00148d38)
-#define   ICON_DIAL_5_BIN                         (void *)(resource_root + 0x0014d738)
-#define   ICON_DIAL_6_BIN                         (void *)(resource_root + 0x00152138)
-#define   ICON_DIAL_7_BIN                         (void *)(resource_root + 0x00156b38)
-#define   ICON_DIAL_8_BIN                         (void *)(resource_root + 0x0015aef8)
-#define   ICON_DIAL_9_BIN                         (void *)(resource_root + 0x0015f8f8)
-#define   ICON_DIAL_TOUCH_0_BIN                   (void *)(resource_root + 0x001642f8)
-#define   ICON_DIAL_TOUCH_1_BIN                   (void *)(resource_root + 0x00168cf8)
-#define   ICON_DIAL_TOUCH_2_BIN                   (void *)(resource_root + 0x0016d6f8)
-#define   ICON_DIAL_TOUCH_3_BIN                   (void *)(resource_root + 0x001720f8)
-#define   ICON_DIAL_TOUCH_4_BIN                   (void *)(resource_root + 0x00176af8)
-#define   ICON_DIAL_TOUCH_5_BIN                   (void *)(resource_root + 0x0017b4f8)
-#define   ICON_DIAL_TOUCH_6_BIN                   (void *)(resource_root + 0x0017fef8)
-#define   ICON_DIAL_TOUCH_7_BIN                   (void *)(resource_root + 0x001848f8)
-#define   ICON_DIAL_TOUCH_8_BIN                   (void *)(resource_root + 0x00189538)
-#define   ICON_DIAL_TOUCH_9_BIN                   (void *)(resource_root + 0x0018df38)
-#define   ICON_DISCONNECT_BIN                     (void *)(resource_root + 0x00192938)
-#define   ICON_DISCONNECT_TOUCH_BIN               (void *)(resource_root + 0x0019d978)
-#define   ICON_FAIL_BIN                           (void *)(resource_root + 0x001a89b8)
-#define   ICON_FILES_BASE_BLUE_BIN                (void *)(resource_root + 0x001b09f8)
-#define   ICON_FILES_BASE_DARK_BIN                (void *)(resource_root + 0x001b9a38)
-#define   ICON_FILES_BASE_RED_BIN                 (void *)(resource_root + 0x001c2a78)
-#define   ICON_FOLDER_BIN                         (void *)(resource_root + 0x001cbab8)
-#define   ICON_HANGUP_BIN                         (void *)(resource_root + 0x001cbf78)
-#define   ICON_HANGUP_TOUCH_BIN                   (void *)(resource_root + 0x001cf1b8)
-#define   ICON_LOADING_BIN                        (void *)(resource_root + 0x001d23f8)
-#define   ICON_MIC_MUTE_OFF_BIN                   (void *)(resource_root + 0x001d6db8)
-#define   ICON_MIC_MUTE_OFF_TOUCH_BIN             (void *)(resource_root + 0x001d9ff8)
-#define   ICON_MIC_MUTE_ON_BIN                    (void *)(resource_root + 0x001dd238)
-#define   ICON_MIC_MUTE_ON_TOUCH_BIN              (void *)(resource_root + 0x001e0478)
-#define   ICON_MORE_OFF_BIN                       (void *)(resource_root + 0x001e36b8)
-#define   ICON_MORE_ON_BIN                        (void *)(resource_root + 0x001e84f8)
-#define   ICON_MORE_TOUCH_BIN                     (void *)(resource_root + 0x001ed338)
-#define   ICON_PHONE_OFF_BIN                      (void *)(resource_root + 0x001f2178)
-#define   ICON_PHONE_ON_BIN                       (void *)(resource_root + 0x001f6fb8)
-#define   ICON_PHONE_TOUCH_BIN                    (void *)(resource_root + 0x001fbdf8)
-#define   ICON_PROCESS_BAR_BIN                    (void *)(resource_root + 0x00200c38)
-#define   ICON_PROCESS_BAR_1_BIN                  (void *)(resource_root + 0x00201e78)
-#define   ICON_PROCESS_NODE_BIN                   (void *)(resource_root + 0x00201f78)
-#define   ICON_PROCESS_NODE_TOUCH_BIN             (void *)(resource_root + 0x002027b8)
-#define   ICON_RECORD_DELETE_BIN                  (void *)(resource_root + 0x00202ff8)
-#define   ICON_RECORD_DELETE_TOUCH_BIN            (void *)(resource_root + 0x0020df78)
-#define   ICON_RECORD_PAUSE_BIN                   (void *)(resource_root + 0x00218ef8)
-#define   ICON_RECORD_PAUSE_TOUCH_BIN             (void *)(resource_root + 0x0022af38)
-#define   ICON_RECORD_PLAY_BIN                    (void *)(resource_root + 0x0023cf78)
-#define   ICON_RECORD_PLAY_BAR_BIN                (void *)(resource_root + 0x0024efb8)
-#define   ICON_RECORD_PLAY_TOUCH_BIN              (void *)(resource_root + 0x00250df8)
-#define   ICON_RECORD_START_BIN                   (void *)(resource_root + 0x00262e38)
-#define   ICON_RECORD_STOP_BIN                    (void *)(resource_root + 0x00274e78)
-#define   ICON_SEEKBAR_BIN                        (void *)(resource_root + 0x00286eb8)
-#define   ICON_SEEKBAR1_BIN                       (void *)(resource_root + 0x00288778)
-#define   ICON_SEEKBAR2_BIN                       (void *)(resource_root + 0x00288ab8)
-#define   ICON_SONG_BUDS_BIN                      (void *)(resource_root + 0x0028a378)
-#define   ICON_SONG_LOCAL_BIN                     (void *)(resource_root + 0x0028abb8)
-#define   ICON_SONG_NEXT_BIN                      (void *)(resource_root + 0x0028b3f8)
-#define   ICON_SONG_NEXT_TOUCH_BIN                (void *)(resource_root + 0x0028cdb8)
-#define   ICON_SONG_PAUSE_BIN                     (void *)(resource_root + 0x0028e738)
-#define   ICON_SONG_PAUSE_TOUCH_BIN               (void *)(resource_root + 0x00290778)
-#define   ICON_SONG_PHONE_BIN                     (void *)(resource_root + 0x002927b8)
-#define   ICON_SONG_PLAY_BIN                      (void *)(resource_root + 0x00292ff8)
-#define   ICON_SONG_PLAY_TOUCH_BIN                (void *)(resource_root + 0x00295038)
-#define   ICON_SONG_PREV_BIN                      (void *)(resource_root + 0x00297078)
-#define   ICON_SONG_PREV_TOUCH_BIN                (void *)(resource_root + 0x002989b8)
-#define   ICON_SONG_SPK_BIN                       (void *)(resource_root + 0x0029a2f8)
-#define   ICON_SUCCESS_BIN                        (void *)(resource_root + 0x0029ab38)
-#define   ICON_SWITCH_OFF_BIN                     (void *)(resource_root + 0x002a2b78)
-#define   ICON_SWITCH_ON_BIN                      (void *)(resource_root + 0x002a5a78)
-#define   ICON_TEXT_BASE_BLUE_BIN                 (void *)(resource_root + 0x002a8978)
-#define   ICON_TEXT_BASE_DARK_BIN                 (void *)(resource_root + 0x002b19b8)
-#define   ICON_TEXT_BASE_RED_BIN                  (void *)(resource_root + 0x002ba9f8)
-#define   ICON_TEXT_BASE_SHORT_BIN                (void *)(resource_root + 0x002c3a38)
-#define   ICON_TOUCH_BACKSPACE_BIN                (void *)(resource_root + 0x002c8278)
-#define   ICON_TRASH_BIN                          (void *)(resource_root + 0x002ca2b8)
-#define   ICON_TRASH_TOUCH_BIN                    (void *)(resource_root + 0x002cc2f8)
-#define   ICON_UP_SLIDE_BIN                       (void *)(resource_root + 0x002ce338)
-#define   ICON_VOLUME_BIN                         (void *)(resource_root + 0x002d9378)
-#define   ICON_VOLUME_BAR_BIN                     (void *)(resource_root + 0x002d9bb8)
-#define   ICON_VOLUME_BAR_1_BIN                   (void *)(resource_root + 0x002daaf8)
-#define   ICON_VOLUME_BAR_2_BIN                   (void *)(resource_root + 0x002dacb8)
-#define   ICON_VOLUME_CALL_BIN                    (void *)(resource_root + 0x002dbbf8)
-#define   ICON_VOLUME_CALL_TOUCH_BIN              (void *)(resource_root + 0x002dee38)
-#define   ICON_VOLUME_DOWN_BIN                    (void *)(resource_root + 0x002e2078)
-#define   ICON_VOLUME_DOWN_TOUCH_BIN              (void *)(resource_root + 0x002e32b8)
-#define   ICON_VOLUME_TOUCH_BIN                   (void *)(resource_root + 0x002e44f8)
-#define   ICON_VOLUME_UP_BIN                      (void *)(resource_root + 0x002e5738)
-#define   ICON_VOLUME_UP_TOUCH_BIN                (void *)(resource_root + 0x002e6978)
-#define   RECORD_FILES_ICON_FOLDER_BIN            (void *)(resource_root + 0x002e7bb8)
-#define   RECORD_PLAY_BAR1_BIN                    (void *)(resource_root + 0x002e8078)
-#define   RECORD_PLAY_BAR2_BIN                    (void *)(resource_root + 0x002e8178)
-#define   RECORD_PLAY_BAR_DOT_BIN                 (void *)(resource_root + 0x002e90b8)
-#define   WATCH_BASE_BLACK_BIN                    (void *)(resource_root + 0x002e92f8)
-#define   WATCH_BASE_BLACK_LIGHT_BIN              (void *)(resource_root + 0x0034dd78)
-#define   WATCH_BASE_GREY_BIN                     (void *)(resource_root + 0x003b27f8)
-#define   WATCH_BASE_GREY_70_ALPHA_BIN            (void *)(resource_root + 0x00417278)
-#define   WATCH_BASE_GREY_90ALPHA_HALF_BIN        (void *)(resource_root + 0x0047bcf8)
-#define   WATCH_BASE_MASK_BLACK_BIN               (void *)(resource_root + 0x004ae278)
-#define   SIMKAI_SIZE24_BITS4_FONT_BIN            (void *)(resource_root + 0x004c45b8)
-#define   SIMKAI_SIZE32_BITS1_FONT_BIN            (void *)(resource_root + 0x004dd938)
-#define   SIMKAI_SIZE32_BITS4_FONT_BIN            (void *)(resource_root + 0x009d95f8)
+#define   OVAL_BIN                                (void *)(resource_root + 0x000008f8)
+#define   CLOCK_BIN                               (void *)(resource_root + 0x00001138)
+#define   CLOCK_BASE_BIN                          (void *)(resource_root + 0x00065bb8)
+#define   ICON_ANSWER_BIN                         (void *)(resource_root + 0x000ca638)
+#define   ICON_ANSWER_TOUCH_BIN                   (void *)(resource_root + 0x000cd878)
+#define   ICON_BACK_BIN                           (void *)(resource_root + 0x000d0ab8)
+#define   ICON_BACKSPACE_BIN                      (void *)(resource_root + 0x000d1cf8)
+#define   ICON_BLUETOOTH_OFF_BIN                  (void *)(resource_root + 0x000d3d38)
+#define   ICON_BLUETOOTH_ON_BIN                   (void *)(resource_root + 0x000d8b78)
+#define   ICON_BLUETOOTH_TOUCH_BIN                (void *)(resource_root + 0x000dd9b8)
+#define   ICON_BUDS_OFF_BIN                       (void *)(resource_root + 0x000e27f8)
+#define   ICON_BUDS_ON_BIN                        (void *)(resource_root + 0x000e7638)
+#define   ICON_BUDS_TOUCH_BIN                     (void *)(resource_root + 0x000ec478)
+#define   ICON_BUTTON_OFF_BIN                     (void *)(resource_root + 0x000f12b8)
+#define   ICON_BUTTON_ON_BIN                      (void *)(resource_root + 0x000f32f8)
+#define   ICON_CALL_BIN                           (void *)(resource_root + 0x000f5338)
+#define   ICON_CALL_CONTACTS_BIN                  (void *)(resource_root + 0x00107f78)
+#define   ICON_CALL_CONTACTS_TOUCH_BIN            (void *)(resource_root + 0x00112fb8)
+#define   ICON_CALL_HISTORY_BIN                   (void *)(resource_root + 0x0011dff8)
+#define   ICON_CALL_HISTORY_TOUCH_BIN             (void *)(resource_root + 0x00129038)
+#define   ICON_CALL_TOUCH_BIN                     (void *)(resource_root + 0x00134078)
+#define   ICON_CALL_VOLUME_BAR_BIN                (void *)(resource_root + 0x00146cb8)
+#define   ICON_CALL_VOLUME_BAR_1_BIN              (void *)(resource_root + 0x00147bf8)
+#define   ICON_CALL_VOLUME_BAR_2_BIN              (void *)(resource_root + 0x00147db8)
+#define   ICON_CALLER_BIN                         (void *)(resource_root + 0x00148cf8)
+#define   ICON_CALLER_LARGE_BIN                   (void *)(resource_root + 0x00150738)
+#define   ICON_CANCEL_BIN                         (void *)(resource_root + 0x001636b8)
+#define   ICON_CANCEL_TOUCH_BIN                   (void *)(resource_root + 0x00167ef8)
+#define   ICON_CLOCK_HAND_DOT_BIN                 (void *)(resource_root + 0x0016c738)
+#define   ICON_CLOCK_HOUR_HAND_BIN                (void *)(resource_root + 0x0016c978)
+#define   ICON_CLOCK_MINUTE_HAND_BIN              (void *)(resource_root + 0x0016cfb8)
+#define   ICON_CLOCK_SECOND_HAND_BIN              (void *)(resource_root + 0x0016d8f8)
+#define   ICON_CONFIRM_BIN                        (void *)(resource_root + 0x0016ddb8)
+#define   ICON_CONFIRM_TOUCH_BIN                  (void *)(resource_root + 0x001725f8)
+#define   ICON_CONTACTCS_BIN                      (void *)(resource_root + 0x00176e38)
+#define   ICON_CONTACTCS_TOUCH_BIN                (void *)(resource_root + 0x00189a78)
+#define   ICON_DIAL_0_BIN                         (void *)(resource_root + 0x0019c6b8)
+#define   ICON_DIAL_1_BIN                         (void *)(resource_root + 0x001a10b8)
+#define   ICON_DIAL_2_BIN                         (void *)(resource_root + 0x001a5ab8)
+#define   ICON_DIAL_3_BIN                         (void *)(resource_root + 0x001aa4b8)
+#define   ICON_DIAL_4_BIN                         (void *)(resource_root + 0x001aeeb8)
+#define   ICON_DIAL_5_BIN                         (void *)(resource_root + 0x001b38b8)
+#define   ICON_DIAL_6_BIN                         (void *)(resource_root + 0x001b82b8)
+#define   ICON_DIAL_7_BIN                         (void *)(resource_root + 0x001bccb8)
+#define   ICON_DIAL_8_BIN                         (void *)(resource_root + 0x001c1078)
+#define   ICON_DIAL_9_BIN                         (void *)(resource_root + 0x001c5a78)
+#define   ICON_DIAL_TOUCH_0_BIN                   (void *)(resource_root + 0x001ca478)
+#define   ICON_DIAL_TOUCH_1_BIN                   (void *)(resource_root + 0x001cee78)
+#define   ICON_DIAL_TOUCH_2_BIN                   (void *)(resource_root + 0x001d3878)
+#define   ICON_DIAL_TOUCH_3_BIN                   (void *)(resource_root + 0x001d8278)
+#define   ICON_DIAL_TOUCH_4_BIN                   (void *)(resource_root + 0x001dcc78)
+#define   ICON_DIAL_TOUCH_5_BIN                   (void *)(resource_root + 0x001e1678)
+#define   ICON_DIAL_TOUCH_6_BIN                   (void *)(resource_root + 0x001e6078)
+#define   ICON_DIAL_TOUCH_7_BIN                   (void *)(resource_root + 0x001eaa78)
+#define   ICON_DIAL_TOUCH_8_BIN                   (void *)(resource_root + 0x001ef6b8)
+#define   ICON_DIAL_TOUCH_9_BIN                   (void *)(resource_root + 0x001f40b8)
+#define   ICON_DISCONNECT_BIN                     (void *)(resource_root + 0x001f8ab8)
+#define   ICON_DISCONNECT_TOUCH_BIN               (void *)(resource_root + 0x00203af8)
+#define   ICON_FAIL_BIN                           (void *)(resource_root + 0x0020eb38)
+#define   ICON_FILES_BASE_BLUE_BIN                (void *)(resource_root + 0x00216b78)
+#define   ICON_FILES_BASE_DARK_BIN                (void *)(resource_root + 0x0021fbb8)
+#define   ICON_FILES_BASE_RED_BIN                 (void *)(resource_root + 0x00228bf8)
+#define   ICON_FOLDER_BIN                         (void *)(resource_root + 0x00231c38)
+#define   ICON_HANGUP_BIN                         (void *)(resource_root + 0x002320f8)
+#define   ICON_HANGUP_TOUCH_BIN                   (void *)(resource_root + 0x00235338)
+#define   ICON_LOADING_BIN                        (void *)(resource_root + 0x00238578)
+#define   ICON_MIC_MUTE_OFF_BIN                   (void *)(resource_root + 0x0023cf38)
+#define   ICON_MIC_MUTE_OFF_TOUCH_BIN             (void *)(resource_root + 0x00240178)
+#define   ICON_MIC_MUTE_ON_BIN                    (void *)(resource_root + 0x002433b8)
+#define   ICON_MIC_MUTE_ON_TOUCH_BIN              (void *)(resource_root + 0x002465f8)
+#define   ICON_MORE_OFF_BIN                       (void *)(resource_root + 0x00249838)
+#define   ICON_MORE_ON_BIN                        (void *)(resource_root + 0x0024e678)
+#define   ICON_MORE_TOUCH_BIN                     (void *)(resource_root + 0x002534b8)
+#define   ICON_PHONE_OFF_BIN                      (void *)(resource_root + 0x002582f8)
+#define   ICON_PHONE_ON_BIN                       (void *)(resource_root + 0x0025d138)
+#define   ICON_PHONE_TOUCH_BIN                    (void *)(resource_root + 0x00261f78)
+#define   ICON_PROCESS_BAR_BIN                    (void *)(resource_root + 0x00266db8)
+#define   ICON_PROCESS_BAR_1_BIN                  (void *)(resource_root + 0x00267ff8)
+#define   ICON_PROCESS_NODE_BIN                   (void *)(resource_root + 0x002680f8)
+#define   ICON_PROCESS_NODE_TOUCH_BIN             (void *)(resource_root + 0x00268938)
+#define   ICON_RECORD_DELETE_BIN                  (void *)(resource_root + 0x00269178)
+#define   ICON_RECORD_DELETE_TOUCH_BIN            (void *)(resource_root + 0x002740f8)
+#define   ICON_RECORD_PAUSE_BIN                   (void *)(resource_root + 0x0027f078)
+#define   ICON_RECORD_PAUSE_TOUCH_BIN             (void *)(resource_root + 0x002910b8)
+#define   ICON_RECORD_PLAY_BIN                    (void *)(resource_root + 0x002a30f8)
+#define   ICON_RECORD_PLAY_BAR_BIN                (void *)(resource_root + 0x002b5138)
+#define   ICON_RECORD_PLAY_TOUCH_BIN              (void *)(resource_root + 0x002b6f78)
+#define   ICON_RECORD_START_BIN                   (void *)(resource_root + 0x002c8fb8)
+#define   ICON_RECORD_STOP_BIN                    (void *)(resource_root + 0x002daff8)
+#define   ICON_SEEKBAR_BIN                        (void *)(resource_root + 0x002ed038)
+#define   ICON_SEEKBAR1_BIN                       (void *)(resource_root + 0x002ee8f8)
+#define   ICON_SEEKBAR2_BIN                       (void *)(resource_root + 0x002eec38)
+#define   ICON_SONG_BUDS_BIN                      (void *)(resource_root + 0x002f04f8)
+#define   ICON_SONG_LOCAL_BIN                     (void *)(resource_root + 0x002f0d38)
+#define   ICON_SONG_NEXT_BIN                      (void *)(resource_root + 0x002f1578)
+#define   ICON_SONG_NEXT_TOUCH_BIN                (void *)(resource_root + 0x002f2f38)
+#define   ICON_SONG_PAUSE_BIN                     (void *)(resource_root + 0x002f48b8)
+#define   ICON_SONG_PAUSE_TOUCH_BIN               (void *)(resource_root + 0x002f68f8)
+#define   ICON_SONG_PHONE_BIN                     (void *)(resource_root + 0x002f8938)
+#define   ICON_SONG_PLAY_BIN                      (void *)(resource_root + 0x002f9178)
+#define   ICON_SONG_PLAY_TOUCH_BIN                (void *)(resource_root + 0x002fb1b8)
+#define   ICON_SONG_PREV_BIN                      (void *)(resource_root + 0x002fd1f8)
+#define   ICON_SONG_PREV_TOUCH_BIN                (void *)(resource_root + 0x002feb38)
+#define   ICON_SONG_SPK_BIN                       (void *)(resource_root + 0x00300478)
+#define   ICON_SUCCESS_BIN                        (void *)(resource_root + 0x00300cb8)
+#define   ICON_SWITCH_OFF_BIN                     (void *)(resource_root + 0x00308cf8)
+#define   ICON_SWITCH_ON_BIN                      (void *)(resource_root + 0x0030bbf8)
+#define   ICON_TEXT_BASE_BLUE_BIN                 (void *)(resource_root + 0x0030eaf8)
+#define   ICON_TEXT_BASE_DARK_BIN                 (void *)(resource_root + 0x00317b38)
+#define   ICON_TEXT_BASE_RED_BIN                  (void *)(resource_root + 0x00320b78)
+#define   ICON_TEXT_BASE_SHORT_BIN                (void *)(resource_root + 0x00329bb8)
+#define   ICON_TOUCH_BACKSPACE_BIN                (void *)(resource_root + 0x0032e3f8)
+#define   ICON_TRASH_BIN                          (void *)(resource_root + 0x00330438)
+#define   ICON_TRASH_TOUCH_BIN                    (void *)(resource_root + 0x00332478)
+#define   ICON_UP_SLIDE_BIN                       (void *)(resource_root + 0x003344b8)
+#define   ICON_VOLUME_BIN                         (void *)(resource_root + 0x0033f4f8)
+#define   ICON_VOLUME_BAR_BIN                     (void *)(resource_root + 0x0033fd38)
+#define   ICON_VOLUME_BAR_1_BIN                   (void *)(resource_root + 0x00340c78)
+#define   ICON_VOLUME_BAR_2_BIN                   (void *)(resource_root + 0x00340e38)
+#define   ICON_VOLUME_CALL_BIN                    (void *)(resource_root + 0x00341d78)
+#define   ICON_VOLUME_CALL_TOUCH_BIN              (void *)(resource_root + 0x00344fb8)
+#define   ICON_VOLUME_DOWN_BIN                    (void *)(resource_root + 0x003481f8)
+#define   ICON_VOLUME_DOWN_TOUCH_BIN              (void *)(resource_root + 0x00349438)
+#define   ICON_VOLUME_TOUCH_BIN                   (void *)(resource_root + 0x0034a678)
+#define   ICON_VOLUME_UP_BIN                      (void *)(resource_root + 0x0034b8b8)
+#define   ICON_VOLUME_UP_TOUCH_BIN                (void *)(resource_root + 0x0034caf8)
+#define   RECORD_FILES_ICON_FOLDER_BIN            (void *)(resource_root + 0x0034dd38)
+#define   RECORD_PLAY_BAR1_BIN                    (void *)(resource_root + 0x0034e1f8)
+#define   RECORD_PLAY_BAR2_BIN                    (void *)(resource_root + 0x0034e2f8)
+#define   RECORD_PLAY_BAR_DOT_BIN                 (void *)(resource_root + 0x0034f238)
+#define   WATCH_BASE_BLACK_BIN                    (void *)(resource_root + 0x0034f478)
+#define   WATCH_BASE_BLACK_LIGHT_BIN              (void *)(resource_root + 0x003b3ef8)
+#define   WATCH_BASE_GREY_BIN                     (void *)(resource_root + 0x00418978)
+#define   WATCH_BASE_GREY_70_ALPHA_BIN            (void *)(resource_root + 0x0047d3f8)
+#define   WATCH_BASE_GREY_90ALPHA_HALF_BIN        (void *)(resource_root + 0x004e1e78)
+#define   WATCH_BASE_MASK_BLACK_BIN               (void *)(resource_root + 0x005143f8)
+#define   WATCH_BASE_MASK_GREY_BIN                (void *)(resource_root + 0x0052a6f8)
+#define   SIMKAI_SIZE24_BITS4_FONT_BIN            (void *)(resource_root + 0x00540a38)
+#define   SIMKAI_SIZE32_BITS1_FONT_BIN            (void *)(resource_root + 0x00559db8)
+#define   SIMKAI_SIZE32_BITS4_FONT_BIN            (void *)(resource_root + 0x00a55a78)
 
 #else
-#define   OVAL_BIN                                (void *)(0x0c000878)
-#define   CLOCK_BIN                               (void *)(0x0c0010b8)
-#define   ICON_ANSWER_BIN                         (void *)(0x0c065b38)
-#define   ICON_ANSWER_TOUCH_BIN                   (void *)(0x0c068d78)
-#define   ICON_BACK_BIN                           (void *)(0x0c06bfb8)
-#define   ICON_BACKSPACE_BIN                      (void *)(0x0c06d1f8)
-#define   ICON_BLUETOOTH_OFF_BIN                  (void *)(0x0c06f238)
-#define   ICON_BLUETOOTH_ON_BIN                   (void *)(0x0c074078)
-#define   ICON_BLUETOOTH_TOUCH_BIN                (void *)(0x0c078eb8)
-#define   ICON_BUDS_OFF_BIN                       (void *)(0x0c07dcf8)
-#define   ICON_BUDS_ON_BIN                        (void *)(0x0c082b38)
-#define   ICON_BUDS_TOUCH_BIN                     (void *)(0x0c087978)
-#define   ICON_BUTTON_OFF_BIN                     (void *)(0x0c08c7b8)
-#define   ICON_BUTTON_ON_BIN                      (void *)(0x0c08e7f8)
-#define   ICON_CALL_BIN                           (void *)(0x0c090838)
-#define   ICON_CALL_CONTACTS_BIN                  (void *)(0x0c0a3478)
-#define   ICON_CALL_CONTACTS_TOUCH_BIN            (void *)(0x0c0ae4b8)
-#define   ICON_CALL_HISTORY_BIN                   (void *)(0x0c0b94f8)
-#define   ICON_CALL_HISTORY_TOUCH_BIN             (void *)(0x0c0c4538)
-#define   ICON_CALL_TOUCH_BIN                     (void *)(0x0c0cf578)
-#define   ICON_CALL_VOLUME_BAR_BIN                (void *)(0x0c0e21b8)
-#define   ICON_CALL_VOLUME_BAR_1_BIN              (void *)(0x0c0e30f8)
-#define   ICON_CALL_VOLUME_BAR_2_BIN              (void *)(0x0c0e32b8)
-#define   ICON_CALLER_BIN                         (void *)(0x0c0e41f8)
-#define   ICON_CALLER_LARGE_BIN                   (void *)(0x0c0ebc38)
-#define   ICON_CANCEL_BIN                         (void *)(0x0c0febb8)
-#define   ICON_CANCEL_TOUCH_BIN                   (void *)(0x0c1033f8)
-#define   ICON_CONFIRM_BIN                        (void *)(0x0c107c38)
-#define   ICON_CONFIRM_TOUCH_BIN                  (void *)(0x0c10c478)
-#define   ICON_CONTACTCS_BIN                      (void *)(0x0c110cb8)
-#define   ICON_CONTACTCS_TOUCH_BIN                (void *)(0x0c1238f8)
-#define   ICON_DIAL_0_BIN                         (void *)(0x0c136538)
-#define   ICON_DIAL_1_BIN                         (void *)(0x0c13af38)
-#define   ICON_DIAL_2_BIN                         (void *)(0x0c13f938)
-#define   ICON_DIAL_3_BIN                         (void *)(0x0c144338)
-#define   ICON_DIAL_4_BIN                         (void *)(0x0c148d38)
-#define   ICON_DIAL_5_BIN                         (void *)(0x0c14d738)
-#define   ICON_DIAL_6_BIN                         (void *)(0x0c152138)
-#define   ICON_DIAL_7_BIN                         (void *)(0x0c156b38)
-#define   ICON_DIAL_8_BIN                         (void *)(0x0c15aef8)
-#define   ICON_DIAL_9_BIN                         (void *)(0x0c15f8f8)
-#define   ICON_DIAL_TOUCH_0_BIN                   (void *)(0x0c1642f8)
-#define   ICON_DIAL_TOUCH_1_BIN                   (void *)(0x0c168cf8)
-#define   ICON_DIAL_TOUCH_2_BIN                   (void *)(0x0c16d6f8)
-#define   ICON_DIAL_TOUCH_3_BIN                   (void *)(0x0c1720f8)
-#define   ICON_DIAL_TOUCH_4_BIN                   (void *)(0x0c176af8)
-#define   ICON_DIAL_TOUCH_5_BIN                   (void *)(0x0c17b4f8)
-#define   ICON_DIAL_TOUCH_6_BIN                   (void *)(0x0c17fef8)
-#define   ICON_DIAL_TOUCH_7_BIN                   (void *)(0x0c1848f8)
-#define   ICON_DIAL_TOUCH_8_BIN                   (void *)(0x0c189538)
-#define   ICON_DIAL_TOUCH_9_BIN                   (void *)(0x0c18df38)
-#define   ICON_DISCONNECT_BIN                     (void *)(0x0c192938)
-#define   ICON_DISCONNECT_TOUCH_BIN               (void *)(0x0c19d978)
-#define   ICON_FAIL_BIN                           (void *)(0x0c1a89b8)
-#define   ICON_FILES_BASE_BLUE_BIN                (void *)(0x0c1b09f8)
-#define   ICON_FILES_BASE_DARK_BIN                (void *)(0x0c1b9a38)
-#define   ICON_FILES_BASE_RED_BIN                 (void *)(0x0c1c2a78)
-#define   ICON_FOLDER_BIN                         (void *)(0x0c1cbab8)
-#define   ICON_HANGUP_BIN                         (void *)(0x0c1cbf78)
-#define   ICON_HANGUP_TOUCH_BIN                   (void *)(0x0c1cf1b8)
-#define   ICON_LOADING_BIN                        (void *)(0x0c1d23f8)
-#define   ICON_MIC_MUTE_OFF_BIN                   (void *)(0x0c1d6db8)
-#define   ICON_MIC_MUTE_OFF_TOUCH_BIN             (void *)(0x0c1d9ff8)
-#define   ICON_MIC_MUTE_ON_BIN                    (void *)(0x0c1dd238)
-#define   ICON_MIC_MUTE_ON_TOUCH_BIN              (void *)(0x0c1e0478)
-#define   ICON_MORE_OFF_BIN                       (void *)(0x0c1e36b8)
-#define   ICON_MORE_ON_BIN                        (void *)(0x0c1e84f8)
-#define   ICON_MORE_TOUCH_BIN                     (void *)(0x0c1ed338)
-#define   ICON_PHONE_OFF_BIN                      (void *)(0x0c1f2178)
-#define   ICON_PHONE_ON_BIN                       (void *)(0x0c1f6fb8)
-#define   ICON_PHONE_TOUCH_BIN                    (void *)(0x0c1fbdf8)
-#define   ICON_PROCESS_BAR_BIN                    (void *)(0x0c200c38)
-#define   ICON_PROCESS_BAR_1_BIN                  (void *)(0x0c201e78)
-#define   ICON_PROCESS_NODE_BIN                   (void *)(0x0c201f78)
-#define   ICON_PROCESS_NODE_TOUCH_BIN             (void *)(0x0c2027b8)
-#define   ICON_RECORD_DELETE_BIN                  (void *)(0x0c202ff8)
-#define   ICON_RECORD_DELETE_TOUCH_BIN            (void *)(0x0c20df78)
-#define   ICON_RECORD_PAUSE_BIN                   (void *)(0x0c218ef8)
-#define   ICON_RECORD_PAUSE_TOUCH_BIN             (void *)(0x0c22af38)
-#define   ICON_RECORD_PLAY_BIN                    (void *)(0x0c23cf78)
-#define   ICON_RECORD_PLAY_BAR_BIN                (void *)(0x0c24efb8)
-#define   ICON_RECORD_PLAY_TOUCH_BIN              (void *)(0x0c250df8)
-#define   ICON_RECORD_START_BIN                   (void *)(0x0c262e38)
-#define   ICON_RECORD_STOP_BIN                    (void *)(0x0c274e78)
-#define   ICON_SEEKBAR_BIN                        (void *)(0x0c286eb8)
-#define   ICON_SEEKBAR1_BIN                       (void *)(0x0c288778)
-#define   ICON_SEEKBAR2_BIN                       (void *)(0x0c288ab8)
-#define   ICON_SONG_BUDS_BIN                      (void *)(0x0c28a378)
-#define   ICON_SONG_LOCAL_BIN                     (void *)(0x0c28abb8)
-#define   ICON_SONG_NEXT_BIN                      (void *)(0x0c28b3f8)
-#define   ICON_SONG_NEXT_TOUCH_BIN                (void *)(0x0c28cdb8)
-#define   ICON_SONG_PAUSE_BIN                     (void *)(0x0c28e738)
-#define   ICON_SONG_PAUSE_TOUCH_BIN               (void *)(0x0c290778)
-#define   ICON_SONG_PHONE_BIN                     (void *)(0x0c2927b8)
-#define   ICON_SONG_PLAY_BIN                      (void *)(0x0c292ff8)
-#define   ICON_SONG_PLAY_TOUCH_BIN                (void *)(0x0c295038)
-#define   ICON_SONG_PREV_BIN                      (void *)(0x0c297078)
-#define   ICON_SONG_PREV_TOUCH_BIN                (void *)(0x0c2989b8)
-#define   ICON_SONG_SPK_BIN                       (void *)(0x0c29a2f8)
-#define   ICON_SUCCESS_BIN                        (void *)(0x0c29ab38)
-#define   ICON_SWITCH_OFF_BIN                     (void *)(0x0c2a2b78)
-#define   ICON_SWITCH_ON_BIN                      (void *)(0x0c2a5a78)
-#define   ICON_TEXT_BASE_BLUE_BIN                 (void *)(0x0c2a8978)
-#define   ICON_TEXT_BASE_DARK_BIN                 (void *)(0x0c2b19b8)
-#define   ICON_TEXT_BASE_RED_BIN                  (void *)(0x0c2ba9f8)
-#define   ICON_TEXT_BASE_SHORT_BIN                (void *)(0x0c2c3a38)
-#define   ICON_TOUCH_BACKSPACE_BIN                (void *)(0x0c2c8278)
-#define   ICON_TRASH_BIN                          (void *)(0x0c2ca2b8)
-#define   ICON_TRASH_TOUCH_BIN                    (void *)(0x0c2cc2f8)
-#define   ICON_UP_SLIDE_BIN                       (void *)(0x0c2ce338)
-#define   ICON_VOLUME_BIN                         (void *)(0x0c2d9378)
-#define   ICON_VOLUME_BAR_BIN                     (void *)(0x0c2d9bb8)
-#define   ICON_VOLUME_BAR_1_BIN                   (void *)(0x0c2daaf8)
-#define   ICON_VOLUME_BAR_2_BIN                   (void *)(0x0c2dacb8)
-#define   ICON_VOLUME_CALL_BIN                    (void *)(0x0c2dbbf8)
-#define   ICON_VOLUME_CALL_TOUCH_BIN              (void *)(0x0c2dee38)
-#define   ICON_VOLUME_DOWN_BIN                    (void *)(0x0c2e2078)
-#define   ICON_VOLUME_DOWN_TOUCH_BIN              (void *)(0x0c2e32b8)
-#define   ICON_VOLUME_TOUCH_BIN                   (void *)(0x0c2e44f8)
-#define   ICON_VOLUME_UP_BIN                      (void *)(0x0c2e5738)
-#define   ICON_VOLUME_UP_TOUCH_BIN                (void *)(0x0c2e6978)
-#define   RECORD_FILES_ICON_FOLDER_BIN            (void *)(0x0c2e7bb8)
-#define   RECORD_PLAY_BAR1_BIN                    (void *)(0x0c2e8078)
-#define   RECORD_PLAY_BAR2_BIN                    (void *)(0x0c2e8178)
-#define   RECORD_PLAY_BAR_DOT_BIN                 (void *)(0x0c2e90b8)
-#define   WATCH_BASE_BLACK_BIN                    (void *)(0x0c2e92f8)
-#define   WATCH_BASE_BLACK_LIGHT_BIN              (void *)(0x0c34dd78)
-#define   WATCH_BASE_GREY_BIN                     (void *)(0x0c3b27f8)
-#define   WATCH_BASE_GREY_70_ALPHA_BIN            (void *)(0x0c417278)
-#define   WATCH_BASE_GREY_90ALPHA_HALF_BIN        (void *)(0x0c47bcf8)
-#define   WATCH_BASE_MASK_BLACK_BIN               (void *)(0x0c4ae278)
-#define   SIMKAI_SIZE24_BITS4_FONT_BIN            (void *)(0x0c4c45b8)
-#define   SIMKAI_SIZE32_BITS1_FONT_BIN            (void *)(0x0c4dd938)
-#define   SIMKAI_SIZE32_BITS4_FONT_BIN            (void *)(0x0c9d95f8)
+#include "flash_map.h"
+#define   SIMKAI_SIZE32_BITS1_FONT_BIN            (uint8_t *)(USER_DATA1_ADDR)
+#define   SIMKAI_SIZE32_BITS1_FONT_BIN_SIZE             0x4FBCA1
+#define   USER_DATA_RES_BASE_ADDR                                       SIMKAI_SIZE32_BITS1_FONT_BIN + SIMKAI_SIZE32_BITS1_FONT_BIN_SIZE
+#define   CLOCK_BIN                           (uint32_t *)(USER_DATA_RES_BASE_ADDR+0) //454x454
+#define   CLOCK_BASE_BIN                      (uint32_t *)(USER_DATA_RES_BASE_ADDR+412288) //454x454
+#define   ICON_ANSWER_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+824576) //80x80
+#define   ICON_ANSWER_TOUCH_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+837440) //80x80
+#define   ICON_BACK_BIN                       (uint32_t *)(USER_DATA_RES_BASE_ADDR+850304) //48x48
+#define   ICON_BACKSPACE_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+854976) //64x64
+#define   ICON_BLUETOOTH_OFF_BIN              (uint32_t *)(USER_DATA_RES_BASE_ADDR+863232) //100x100
+#define   ICON_BLUETOOTH_ON_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+883264) //100x100
+#define   ICON_BLUETOOTH_TOUCH_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+903296) //100x100
+#define   ICON_BUDS_OFF_BIN                   (uint32_t *)(USER_DATA_RES_BASE_ADDR+923328) //100x100
+#define   ICON_BUDS_ON_BIN                    (uint32_t *)(USER_DATA_RES_BASE_ADDR+943360) //100x100
+#define   ICON_BUDS_TOUCH_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+963392) //100x100
+#define   ICON_BUTTON_OFF_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+983424) //64x64
+#define   ICON_BUTTON_ON_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+991680) //64x64
+#define   ICON_CALL_BIN                       (uint32_t *)(USER_DATA_RES_BASE_ADDR+999936) //196x196
+#define   ICON_CALLER_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1076800) //125x125
+#define   ICON_CALLER_LARGE_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1108096) //197x197
+#define   ICON_CALL_CONTACTS_BIN              (uint32_t *)(USER_DATA_RES_BASE_ADDR+1185728) //278x81
+#define   ICON_CALL_CONTACTS_TOUCH_BIN        (uint32_t *)(USER_DATA_RES_BASE_ADDR+1230784) //278x81
+#define   ICON_CALL_HISTORY_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1275840) //278x81
+#define   ICON_CALL_HISTORY_TOUCH_BIN         (uint32_t *)(USER_DATA_RES_BASE_ADDR+1320896) //278x81
+#define   ICON_CALL_TOUCH_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+1365952) //196x196
+#define   ICON_CALL_VOLUME_BAR_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+1442816) //240x8
+#define   ICON_CALL_VOLUME_BAR_1_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+1446720) //24x8
+#define   ICON_CALL_VOLUME_BAR_2_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+1447168) //240x8
+#define   ICON_CANCEL_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1451072) //96x96
+#define   ICON_CANCEL_TOUCH_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1469568) //96x96
+#define   ICON_CLOCK_HAND_DOT_BIN             (uint32_t *)(USER_DATA_RES_BASE_ADDR+1488064) //16x16
+#define   ICON_CLOCK_HOUR_HAND_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+1488640) //96x8
+#define   ICON_CLOCK_MINUTE_HAND_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+1490240) //9x128
+#define   ICON_CLOCK_SECOND_HAND_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+1492608) //144x4
+#define   ICON_CONFIRM_BIN                    (uint32_t *)(USER_DATA_RES_BASE_ADDR+1493824) //96x96
+#define   ICON_CONFIRM_TOUCH_BIN              (uint32_t *)(USER_DATA_RES_BASE_ADDR+1512320) //96x96
+#define   ICON_CONTACTCS_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+1530816) //196x196
+#define   ICON_CONTACTCS_TOUCH_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+1607680) //196x196
+#define   ICON_DIAL_0_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1684544) //118x80
+#define   ICON_DIAL_1_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1703488) //118x80
+#define   ICON_DIAL_2_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1722432) //118x80
+#define   ICON_DIAL_3_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1741376) //118x80
+#define   ICON_DIAL_4_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1760320) //118x80
+#define   ICON_DIAL_5_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1779264) //118x80
+#define   ICON_DIAL_6_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1798208) //118x80
+#define   ICON_DIAL_7_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1817152) //108x80
+#define   ICON_DIAL_8_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1834496) //118x80
+#define   ICON_DIAL_9_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+1853440) //118x80
+#define   ICON_DIAL_TOUCH_0_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1872384) //118x80
+#define   ICON_DIAL_TOUCH_1_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1891328) //118x80
+#define   ICON_DIAL_TOUCH_2_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1910272) //118x80
+#define   ICON_DIAL_TOUCH_3_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1929216) //118x80
+#define   ICON_DIAL_TOUCH_4_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1948160) //118x80
+#define   ICON_DIAL_TOUCH_5_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1967104) //118x80
+#define   ICON_DIAL_TOUCH_6_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+1986048) //118x80
+#define   ICON_DIAL_TOUCH_7_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2004992) //108x90
+#define   ICON_DIAL_TOUCH_8_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2024448) //118x80
+#define   ICON_DIAL_TOUCH_9_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2043392) //118x80
+#define   ICON_DISCONNECT_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+2062336) //278x81
+#define   ICON_DISCONNECT_TOUCH_BIN           (uint32_t *)(USER_DATA_RES_BASE_ADDR+2107392) //278x81
+#define   ICON_FAIL_BIN                       (uint32_t *)(USER_DATA_RES_BASE_ADDR+2152448) //128x128
+#define   ICON_FILES_BASE_BLUE_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+2185280) //288x64
+#define   ICON_FILES_BASE_DARK_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+2222208) //288x64
+#define   ICON_FILES_BASE_RED_BIN             (uint32_t *)(USER_DATA_RES_BASE_ADDR+2259136) //288x64
+#define   ICON_FOLDER_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+2296064) //24x24
+#define   ICON_HANGUP_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+2297280) //80x80
+#define   ICON_HANGUP_TOUCH_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2310144) //80x80
+#define   ICON_LOADING_BIN                    (uint32_t *)(USER_DATA_RES_BASE_ADDR+2323008) //96x98
+#define   ICON_MIC_MUTE_OFF_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2341888) //80x80
+#define   ICON_MIC_MUTE_OFF_TOUCH_BIN         (uint32_t *)(USER_DATA_RES_BASE_ADDR+2354752) //80x80
+#define   ICON_MIC_MUTE_ON_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+2367616) //80x80
+#define   ICON_MIC_MUTE_ON_TOUCH_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+2380480) //80x80
+#define   ICON_MORE_OFF_BIN                   (uint32_t *)(USER_DATA_RES_BASE_ADDR+2393344) //100x100
+#define   ICON_MORE_ON_BIN                    (uint32_t *)(USER_DATA_RES_BASE_ADDR+2413376) //100x100
+#define   ICON_MORE_TOUCH_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+2433408) //100x100
+#define   ICON_PHONE_OFF_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+2453440) //100x100
+#define   ICON_PHONE_ON_BIN                   (uint32_t *)(USER_DATA_RES_BASE_ADDR+2473472) //100x100
+#define   ICON_PHONE_TOUCH_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+2493504) //100x100
+#define   ICON_PROCESS_BAR_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+2513536) //288x8
+#define   ICON_PROCESS_BAR_1_BIN              (uint32_t *)(USER_DATA_RES_BASE_ADDR+2518208) //14x8
+#define   ICON_PROCESS_NODE_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2518464) //32x32
+#define   ICON_PROCESS_NODE_TOUCH_BIN         (uint32_t *)(USER_DATA_RES_BASE_ADDR+2520576) //32x32
+#define   ICON_RECORD_DELETE_BIN              (uint32_t *)(USER_DATA_RES_BASE_ADDR+2522688) //277x81
+#define   ICON_RECORD_DELETE_TOUCH_BIN        (uint32_t *)(USER_DATA_RES_BASE_ADDR+2567616) //277x81
+#define   ICON_RECORD_PAUSE_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2612544) //192x192
+#define   ICON_RECORD_PAUSE_TOUCH_BIN         (uint32_t *)(USER_DATA_RES_BASE_ADDR+2686336) //192x192
+#define   ICON_RECORD_PLAY_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+2760128) //192x192
+#define   ICON_RECORD_PLAY_BAR_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+2833920) //240x16
+#define   ICON_RECORD_PLAY_TOUCH_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+2841664) //192x192
+#define   ICON_RECORD_START_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+2915456) //192x192
+#define   ICON_RECORD_STOP_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+2989248) //192x192
+#define   ICON_SEEKBAR_BIN                    (uint32_t *)(USER_DATA_RES_BASE_ADDR+3063040) //16x196
+#define   ICON_SEEKBAR1_BIN                   (uint32_t *)(USER_DATA_RES_BASE_ADDR+3069376) //16x24
+#define   ICON_SEEKBAR2_BIN                   (uint32_t *)(USER_DATA_RES_BASE_ADDR+3070208) //16x196
+#define   ICON_SONG_BUDS_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+3076544) //32x32
+#define   ICON_SONG_LOCAL_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+3078656) //32x32
+#define   ICON_SONG_NEXT_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+3080768) //57x57
+#define   ICON_SONG_NEXT_TOUCH_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+3087296) //57x57
+#define   ICON_SONG_PAUSE_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+3093824) //64x64
+#define   ICON_SONG_PAUSE_TOUCH_BIN           (uint32_t *)(USER_DATA_RES_BASE_ADDR+3102080) //64x64
+#define   ICON_SONG_PHONE_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+3110336) //32x32
+#define   ICON_SONG_PLAY_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+3112448) //64x64
+#define   ICON_SONG_PLAY_TOUCH_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+3120704) //64x64
+#define   ICON_SONG_PREV_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+3128960) //57x56
+#define   ICON_SONG_PREV_TOUCH_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+3135360) //57x56
+#define   ICON_SONG_SPK_BIN                   (uint32_t *)(USER_DATA_RES_BASE_ADDR+3141760) //32x32
+#define   ICON_SUCCESS_BIN                    (uint32_t *)(USER_DATA_RES_BASE_ADDR+3143872) //128x128
+#define   ICON_SWITCH_OFF_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+3176704) //100x60
+#define   ICON_SWITCH_ON_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+3188736) //100x60
+#define   ICON_TEXT_BASE_BLUE_BIN             (uint32_t *)(USER_DATA_RES_BASE_ADDR+3200768) //288x64
+#define   ICON_TEXT_BASE_DARK_BIN             (uint32_t *)(USER_DATA_RES_BASE_ADDR+3237696) //288x64
+#define   ICON_TEXT_BASE_RED_BIN              (uint32_t *)(USER_DATA_RES_BASE_ADDR+3274624) //288x64
+#define   ICON_TEXT_BASE_SHORT_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+3311552) //144x64
+#define   ICON_TOUCH_BACKSPACE_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+3330048) //64x64
+#define   ICON_TRASH_BIN                      (uint32_t *)(USER_DATA_RES_BASE_ADDR+3338304) //64x64
+#define   ICON_TRASH_TOUCH_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+3346560) //64x64
+#define   ICON_UP_SLIDE_BIN                   (uint32_t *)(USER_DATA_RES_BASE_ADDR+3354816) //278x81
+#define   ICON_VOLUME_BIN                     (uint32_t *)(USER_DATA_RES_BASE_ADDR+3399872) //32x32
+#define   ICON_VOLUME_BAR_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+3401984) //240x8
+#define   ICON_VOLUME_BAR_1_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+3405888) //24x8
+#define   ICON_VOLUME_BAR_2_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+3406336) //240x8
+#define   ICON_VOLUME_CALL_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+3410240) //80x80
+#define   ICON_VOLUME_CALL_TOUCH_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+3423104) //80x80
+#define   ICON_VOLUME_DOWN_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+3435968) //48x48
+#define   ICON_VOLUME_DOWN_TOUCH_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+3440640) //48x48
+#define   ICON_VOLUME_TOUCH_BIN               (uint32_t *)(USER_DATA_RES_BASE_ADDR+3445312) //48x48
+#define   ICON_VOLUME_UP_BIN                  (uint32_t *)(USER_DATA_RES_BASE_ADDR+3449984) //48x48
+#define   ICON_VOLUME_UP_TOUCH_BIN            (uint32_t *)(USER_DATA_RES_BASE_ADDR+3454656) //48x48
+#define   OVAL_BIN                            (uint32_t *)(USER_DATA_RES_BASE_ADDR+3459328) //32x32
+#define   RECORD_FILES_ICON_FOLDER_BIN        (uint32_t *)(USER_DATA_RES_BASE_ADDR+3461440) //24x24
+#define   RECORD_PLAY_BAR1_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+3462656) //12x8
+#define   RECORD_PLAY_BAR2_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+3462912) //240x8
+#define   RECORD_PLAY_BAR_DOT_BIN             (uint32_t *)(USER_DATA_RES_BASE_ADDR+3466816) //16x16
+#define   WATCH_BASE_BLACK_BIN                (uint32_t *)(USER_DATA_RES_BASE_ADDR+3467392) //454x454
+#define   WATCH_BASE_BLACK_LIGHT_BIN          (uint32_t *)(USER_DATA_RES_BASE_ADDR+3879680) //454x454
+#define   WATCH_BASE_GREY_BIN                 (uint32_t *)(USER_DATA_RES_BASE_ADDR+4291968) //454x454
+#define   WATCH_BASE_GREY_70_ALPHA_BIN        (uint32_t *)(USER_DATA_RES_BASE_ADDR+4704256) //454x454
+#define   WATCH_BASE_GREY_90ALPHA_HALF_BIN    (uint32_t *)(USER_DATA_RES_BASE_ADDR+5116544) //454x227
+#define   WATCH_BASE_MASK_BLACK_BIN           (uint32_t *)(USER_DATA_RES_BASE_ADDR+5322688) //454x100
 
 #endif
