@@ -41,6 +41,24 @@ void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *d
                                         struct rtgui_rect *rect);
 void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                         struct rtgui_rect *rect);
+void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                           struct rtgui_rect *rect);
+void alpha_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                         struct rtgui_rect *rect);
+void alpha_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                                         struct rtgui_rect *rect);
+void alpha_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                       struct rtgui_rect *rect);
+void alpha_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                       struct rtgui_rect *rect);
+void alpha_matrix_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                         struct rtgui_rect *rect);
+void alpha_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                       struct rtgui_rect *rect);
+void alpha_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                       struct rtgui_rect *rect);
+void alpha_matrix_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
+                                         struct rtgui_rect *rect);
 #ifdef __cplusplus
 }
 #endif
