@@ -21,6 +21,7 @@ extensions = ["breathe",
               "myst_parser", 
               "sphinx_rtd_theme",
               "sphinx_multiversion",
+              "sphinxcontrib.mermaid",
               "sphinx_copybutton"]
 
 templates_path = ['_templates']
