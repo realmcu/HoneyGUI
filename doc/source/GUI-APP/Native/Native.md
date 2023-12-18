@@ -1,4 +1,4 @@
-##  Demo: Develop a APP use native C/C++
+##  Develop a APP use native C/C++
 ### Introduction
 
 
