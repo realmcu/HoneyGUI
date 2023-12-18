@@ -12,7 +12,7 @@
 #include "lv_draw_rtk_ppe_buffer.h"
 #include "rtl_gdma.h"
 
-#define LV_PPE_INTERNAL_BUFFER_SIZE     (20 * 1024)
+#define LV_PPE_INTERNAL_BUFFER_SIZE     (10 * 1024)
 
 static uint8_t __attribute__((aligned(4))) ppe_buf[LV_PPE_INTERNAL_BUFFER_SIZE];
 

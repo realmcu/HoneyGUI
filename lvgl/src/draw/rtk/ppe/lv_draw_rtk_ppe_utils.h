@@ -18,6 +18,8 @@ extern "C" {
 #if LV_USE_GPU_RTK_PPE
 #include "../../sw/lv_draw_sw.h"
 #include "../../../misc/lv_log.h"
+#include "rtl_ppe.h"
+#include "rtl_rcc.h"
 
 /*********************
  *      DEFINES
@@ -51,6 +53,7 @@ extern "C" {
  **********************/
 lv_color32_t lv_ppe_toABGR8888(lv_color_t color);
 
+PPE_ERR lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, PPE_rect_t *rect, uint32_t color);
 /**********************
  *      MACROS
  **********************/
