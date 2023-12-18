@@ -171,6 +171,7 @@ static void tabview_prepare(gui_obj_t *obj)
         {
             break;
         }
+        gui_obj_event_set(obj, GUI_EVENT_8);
         obj->dy = tp->deltaY;
         this->release_y = obj->dy;
         if (tabview->cur_id.y == 0 && tabview->tab_cnt_down == 0)
