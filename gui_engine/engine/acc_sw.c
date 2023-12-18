@@ -1115,10 +1115,33 @@ void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispde
                 continue;
             }
             uint16_t pixel = *((uint16_t *)image_off + y * source_w + x);
-
-            if (pixel  != 0)
+            uint8_t opacity_value = image->opacity_value;
+            if (pixel != 0)
             {
-                writebuf[write_off + j] = (pixel);
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[write_off + j] = pixel;
+                    }
+                    break;
+                default:
+                    {
+                        if (opacity_value < 255)
+                        {
+                            // writebuf[write_off + j] = (((pixel >> 11) << 3) * (256 - opacity_value) +  ((writebuf[write_off + j] >> 11) << 3) * opacity_value) / 256 +
+                            //                             (((((pixel & 0x07e0) >> 5) << 2) *(256 - opacity_value)) + (((writebuf[write_off + j] & 0x07e0) >> 5) << 2) * opacity_value) / 256 +
+                            //                             (((pixel  & 0x001f) << 3) * (256 - opacity_value) + ((writebuf[write_off + j]  & 0x001f) << 3) * opacity_value) / 256;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
             }
         }
     }
@@ -1145,8 +1168,13 @@ void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispde
     }
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t *writebuf = dc->frame_buf;
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+
+    uint8_t source_bytes_per_pixel = 3;
+    //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct rtgui_matrix *inverse = image->inverse;
+    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
 
     for (uint32_t i = y_start; i < y_end; i++)
     {
@@ -1164,15 +1192,44 @@ void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispde
             {
                 continue;
             }
-            uint8_t *pixel = ((uint8_t *)image_off + y * source_w + x);
+            int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+                           source_bytes_per_pixel * x_start;
+            uint8_t *pixel = (uint8_t *)(read_off + x * source_bytes_per_pixel);
 
+            uint8_t opacity_value = image->opacity_value;
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-                writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
-                                          + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                                  + (uint16_t)(((pixel[0]) >> 3)); //RGB  565  565
+                    }
+                    break;
+                default:
+                    {
+                        if (opacity_value < 255)
+                        {
+                            writebuf[write_off + j] = (((pixel [0]) * (256 - opacity_value)) + ((writebuf[write_off + j]  &
+                                                                                                 0x001f) << 3) * opacity_value) / 256 +
+                                                      ((pixel[1] * (256 - opacity_value)) + (((writebuf[write_off + j] & 0x07e0) >> 5) << 2) *
+                                                       opacity_value) / 256 +
+                                                      ((pixel[2] * (256 - opacity_value)) + ((writebuf[write_off + j] >> 11) << 3) * opacity_value) / 256;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
             }
         }
     }
+    return;
 }
 void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                               struct rtgui_rect *rect)
@@ -1196,12 +1253,13 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
     }
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t *writebuf = dc->frame_buf;
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
 
-//    uint8_t source_bytes_per_pixel = 4;
-//    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+    uint8_t source_bytes_per_pixel = 4;
+    //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct rtgui_matrix *inverse = image->inverse;
+    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
 
     for (uint32_t i = y_start; i < y_end; i++)
     {
@@ -1219,16 +1277,48 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
             {
                 continue;
             }
-            uint8_t *pixel = ((uint8_t *)image_off + y * source_w + x);
+            int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+                           source_bytes_per_pixel * x_start;
+            uint8_t *pixel = (uint8_t *)(read_off + x * source_bytes_per_pixel);
 
+            uint8_t opacity_value = image->opacity_value;
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-                writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
-                                          + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                                  + (uint16_t)(((pixel[0]) >> 3)); //RGB  565  565
+                    }
+                    break;
+                default:
+                    {
+                        if (opacity_value < 255)
+                        {
+                            writebuf[write_off + j] = (((uint16_t)(pixel [0]) * (256 - opacity_value)) + ((
+                                    writebuf[write_off + j]  & 0x001f) << 3) * opacity_value) / 256 +
+                                                      (((uint16_t)pixel[1] * (256 - opacity_value)) + (((writebuf[write_off + j] & 0x07e0) >> 5) << 2) *
+                                                       opacity_value) / 256 +
+                                                      (((uint16_t)pixel[2] * (256 - opacity_value)) + ((writebuf[write_off + j] >> 11) << 3) *
+                                                       opacity_value) / 256;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
             }
         }
     }
+    return;
 }
+
+
 void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                             struct rtgui_rect *rect)
 {
@@ -1446,8 +1536,8 @@ void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_di
     int image_x = rect->x1;
     int image_y = rect->y1;
 
-    int image_w = image->target_w + 1;//for more data,20220104,howie
-    int image_h = image->target_h + 1;//for more data,20220104,howie
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
     int source_w = image->img_w;
     int source_h = image->img_h;
 
@@ -1809,7 +1899,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
             else if (img_type == RGB888)
             {
-                // alpha_matrix_blit_rgb888_2_rgba8888(image, dc, rect);
+                alpha_matrix_blit_rgb888_2_argb8888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
