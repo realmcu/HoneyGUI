@@ -30,6 +30,12 @@
 #include "gui_server.h"
 #include "gui_switch.h"
 #include "gui_img.h"
+#include "menu_config.h"
+
+#ifdef RTL87x2G
+#include "wdg.h"
+#include "rtl_wdg.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

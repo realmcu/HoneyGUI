@@ -1,8 +1,5 @@
 #include "js_user.h"
-#ifdef RTL87x2G
-#include "wdg.h"
-#include "rtl_wdg.h"
-#endif
+
 DECLARE_HANDLER(dataRst)
 {
 #ifdef RTL87x2G
