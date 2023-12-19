@@ -286,6 +286,15 @@ void gui_free(void *rmem)
 #endif
 }
 
+void gui_mem_debug(void)
+{
+#if ENABLE_RTK_GUI_OS_HEAP == 1
+    gui_log("can't use thie func");
+#else
+    tlsf_walk_pool(tlsf_get_pool(tlsf), NULL, NULL);
+#endif
+}
+
 void gui_log(const char *format, ...)
 {
     if (os_api->log == NULL)
