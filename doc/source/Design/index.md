@@ -1,8 +1,10 @@
+# Design Spec
 
 ## Design details
 
-# sw acc
-```mermaid
+## sw acc
+
+```{mermaid}
 graph TD
 A[mode A] -->|A1| B(model B)
 B --> C{Judgment conditions C}
@@ -11,7 +13,7 @@ C -->|conditionC2| E[module E]
 C -->|conditionC3| F[module F]
 ```
 
-# image type
+## image type
 
 |  |  |  |  |
 | --- | --- | --- | --- |
@@ -24,7 +26,7 @@ C -->|conditionC3| F[module F]
 |  |  |  |  |
 
 
-# todo
+## todo
 ```chart
 ,Budget,Income,Expenses,Debt
 June,5000,8000,4000,6000
