@@ -290,7 +290,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, app_color color, uint8_t r
     {
         return;
     }
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;//
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     switch (rendor_mode)
     {
     case 4:
@@ -323,8 +323,8 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, app_color color, uint8_t r
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    uint8_t alpha = (dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >> (4 -
-                                                                                              (j - font_x) % 2 * 4));
+                    uint8_t alpha = (dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >>
+                                     (4 - (j - font_x) % 2 * 4));
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x0f;
