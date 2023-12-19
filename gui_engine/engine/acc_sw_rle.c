@@ -191,7 +191,7 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    else if (img_type == 68) //rle_rgb888_2_rgb565
+    else if (img_type == 68) //rle_bypass_rgb888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
@@ -204,17 +204,47 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
             int line = i - image_y;
             uncompressed_rle_rgb888(file, line, line_buf);
             int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
-            uint8_t *writebuf = dc->frame_buf;
-            for (uint32_t j = x_start; j < x_end; j++)
+            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+            for (uint32_t x_j = x_start; x_j < x_end; x_j++)
             {
-                uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-                writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
-                                          + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+                uint8_t *pixel = (uint8_t *)(read_off + x_j * source_bytes_per_pixel);
+
+                uint8_t opacity_value = image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[write_off + x_j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                                    + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+                    }
+                    break;
+                default:
+                    {
+                        if (opacity_value < 255)
+                        {
+                            writebuf[write_off + x_j] = (((pixel [0]) * (256 - opacity_value)) + ((
+                                                                                                      writebuf[write_off + x_j]  & 0x001f) << 3) * opacity_value) / 256 +
+                                                        ((pixel[1] * (256 - opacity_value)) + (((writebuf[write_off + x_j] & 0x07e0) >> 5) << 2) *
+                                                         opacity_value) / 256 +
+                                                        ((pixel[2] * (256 - opacity_value)) + ((writebuf[write_off + x_j] >> 11) << 3) * opacity_value) /
+                                                        256;
+
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
+
             }
 
         }
     }
-    else if (img_type == 132) //argb8888_2_rgb565
+    else if (img_type == 132) //rle_bypass_argb8888_2_rgb565
     {
         // gui_log("rle 8888_2_565\n");
         uint8_t source_bytes_per_pixel = 4;
@@ -273,28 +303,39 @@ void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
             uint8_t *writebuf = dc->frame_buf;
             uint8_t *pixel;
-            for (uint32_t j = x_start; j < x_end; j++)
+            for (uint32_t x_j = x_start; x_j < x_end; x_j++)
             {
-                pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-                switch (image->opacity_value)
+                pixel = (uint8_t *)(read_off + x_j * source_bytes_per_pixel);
+                uint8_t opacity_value = image->opacity_value;
+                switch (opacity_value)
                 {
                 case 0:
                     break;
                 case 255:
                     {
-                        writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
-                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
-                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
-                        writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel] = pixel[0];//b
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = pixel[3]; //r
                     }
                     break;
                 default:
+                    {
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 3] = (pixel[3] * (256 - opacity_value)
+                                                                                + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 3] * opacity_value)) / 256 ;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                                + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                                + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                            + writebuf[(write_off + x_j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    }
                     break;
                 }
             }
         }
     }
-    else if (img_type == 68) //rle_rgb888_2_argb8888
+    else if (img_type == 68) //rle_bypass_rgb888_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
@@ -308,18 +349,37 @@ void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             uncompressed_rle_rgb888(file, line, line_buf);
             int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
             uint8_t *writebuf = dc->frame_buf;
-            for (uint32_t j = x_start; j < x_end; j++)
+            for (uint32_t x_j = x_start; x_j < x_end; x_j++)
             {
-                uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-                //gui_log("piexl_%d %d %d\n",pixel[0],pixel[1],pixel[2]);
-                writebuf[(write_off + j) * dc_bytes_per_pixel]     = pixel[0]; //B
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
+                uint8_t *pixel = (uint8_t *)(read_off + x_j * source_bytes_per_pixel);
+                uint8_t opacity_value = image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel] = pixel[0];//b
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
+                    }
+                    break;
+                default:
+                    {
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                                + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                                + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                            + writebuf[(write_off + x_j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    }
+                    break;
+                }
             }
 
         }
     }
-    else if (img_type == 4) //rgb565_2_argb8888
+    else if (img_type == 4) //rle_bypass_rgb565_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
@@ -332,12 +392,34 @@ void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
             uint8_t *writebuf = dc->frame_buf;
 
-            for (uint32_t j = x_start; j < x_end; j++)
+            for (uint32_t x_j = x_start; x_j < x_end; x_j++)
             {
-                uint16_t pixel = *((uint16_t *)(read_off + j * source_bytes_per_pixel));
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
-                writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                uint16_t pixel = *((uint16_t *)(read_off + x_j * source_bytes_per_pixel));
+                uint8_t opacity_value = image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                    }
+                    break;
+                default:
+                    {
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) * (256 - opacity_value)
+                                                                                + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) *
+                                                                                (256 - opacity_value)
+                                                                                + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) * (256 - opacity_value)
+                                                                            + writebuf[(write_off + x_j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    }
+                    break;
+                }
+
             }
         }
 
@@ -578,7 +660,7 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
     struct rtgui_matrix *inverse = image->inverse;
-
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
@@ -586,69 +668,66 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
+    //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 //    rtzip_file_t *file = (rtzip_file_t *)image_off;
-
-    if (img_type == 4)//matrix_rgb565_2_rgb565
-    {
-        int32_t y1, y2, z1, z2;
+    int32_t y1, y2, z1, z2;
 //        x1 = round(inverse->m[0][0] * dc->section.x1 + inverse->m[0][1] * dc->section.y1 +
 //                   inverse->m[0][2]);
-        y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
-                   inverse->m[1][2]);
-        z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
-                   inverse->m[2][2]);
+    y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
+               inverse->m[1][2]);
+    z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
+               inverse->m[2][2]);
 
 //        x2 = round(inverse->m[0][0] * dc->section.x2 + inverse->m[0][1] * (dc->section.y2 - 1) +
 //                   inverse->m[0][2]);
-        y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
-                   inverse->m[1][2]);
-        z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
-                   inverse->m[2][2]);
+    y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
+               inverse->m[1][2]);
+    z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
+               inverse->m[2][2]);
 
-        y1 = y1 / z1;
-        y2 = y2 / z2;
+    y1 = y1 / z1;
+    y2 = y2 / z2;
 
-        uint32_t start_line = 0, end_line = image->img_h - 1;
-        if (y1 < 0)
-        {
-            start_line = 0;
-        }
-        else if (y1 >= image->img_h)
-        {
-            return;
-        }
-        else
-        {
-            start_line = y1;
-        }
+    uint32_t start_line = 0, end_line = image->img_h - 1;
+    if (y1 < 0)
+    {
+        start_line = 0;
+    }
+    else if (y1 >= image->img_h)
+    {
+        return;
+    }
+    else
+    {
+        start_line = y1;
+    }
 
-        if (y2 < 0)
-        {
-            return;
-        }
-        else if (y2 + 4 >= image->img_h)
-        {
-            end_line = image->img_h - 1;
-        }
-        else
-        {
-            end_line = y2 + 4;
-        }
-        //TODO: y2 + ceil(1 / scale_y_ratio)
-        // gui_log("matric_rgb565_2_argb8888\n");
+    if (y2 < 0)
+    {
+        return;
+    }
+    else if (y2 + 4 >= image->img_h)
+    {
+        end_line = image->img_h - 1;
+    }
+    else
+    {
+        end_line = y2 + 4;
+    }
+    //TODO: y2 + ceil(1 / scale_y_ratio)
+    if (img_type == 4)//rle_filter_matrix_rgb565_2_rgb565
+    {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         rtzip_file_t *file = (rtzip_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
-//            int line = y_i - image_y;
             for (int k = start_line; k <= end_line; k++)
             {
                 uncompressed_rle_rgb565(file, k, line_buf + (k - start_line) * source_w * source_bytes_per_pixel);
             }
             uint32_t read_off = (uint32_t)line_buf ;
-            uint8_t *writebuf = dc->frame_buf;
             for (uint32_t x_j = x_start; x_j < x_end; x_j++)
             {
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
@@ -656,71 +735,52 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
                 int x_matric = round(X / Z);
                 int y_matric = round(Y / Z);
-// gui_log("matric_rgb565_2_argb8888:z%d\n",x);
+
                 if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
                 {
                     continue;
                 }
                 uint16_t pixel = *((uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                                 source_bytes_per_pixel));
-
-                if (pixel  != 0)
+                uint8_t opacity_value = image->opacity_value;
+                if (pixel != 0)
                 {
-                    writebuf[write_off + x_j] = pixel;
+                    switch (opacity_value)
+                    {
+                    case 0:
+                        break;
+                    case 255:
+                        {
+                            writebuf[write_off + x_j] = pixel;
+                        }
+                        break;
+                    default:
+                        {
+                            if (opacity_value < 255)
+                            {
+                                writebuf[write_off + x_j] = (((pixel >> 11) << 3) * (256 - opacity_value) + ((
+                                        writebuf[write_off + x_j] >> 11) << 3) * opacity_value) / 256 +
+                                                            (((((pixel & 0x07e0) >> 5) << 2) * (256 - opacity_value)) + (((writebuf[write_off + x_j] & 0x07e0)
+                                                                    >> 5) << 2) * opacity_value) / 256 +
+                                                            (((pixel  & 0x001f) << 3) * (256 - opacity_value) + ((writebuf[write_off + x_j]  & 0x001f) << 3) *
+                                                             opacity_value) / 256;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    }
                 }
 
             }
         }
     }
-    else if (img_type == 68) //matrix_rgb888_2_rgb565
+    else if (img_type == 68) //rle_filter_matrix_rgb888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 3;
-        int32_t  y1, y2, z1, z2;
-//        x1 = round(inverse->m[0][0] * dc->section.x1 + inverse->m[0][1] * dc->section.y1 +
-//                   inverse->m[0][2]);
-        y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
-                   inverse->m[1][2]);
-        z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
-                   inverse->m[2][2]);
 
-//        x2 = round(inverse->m[0][0] * dc->section.x2 + inverse->m[0][1] * (dc->section.y2 - 1) +
-//                   inverse->m[0][2]);
-        y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
-                   inverse->m[1][2]);
-        z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
-                   inverse->m[2][2]);
-
-        y1 = y1 / z1;
-        y2 = y2 / z2;
-
-        uint32_t start_line = 0, end_line = image->img_h - 1;
-        if (y1 < 0)
-        {
-            start_line = 0;
-        }
-        else if (y1 >= image->img_h)
-        {
-            return;
-        }
-        else
-        {
-            start_line = y1;
-        }
-
-        if (y2 < 0)
-        {
-            return;
-        }
-        else if (y2 + 4 >= image->img_h)
-        {
-            end_line = image->img_h - 1;
-        }
-        else
-        {
-            end_line = y2 + 4;
-        }
-        //TODO: y2 + ceil(1 / scale_y_ratio)
-        // gui_log("matric_rgb565_2_argb8888\n");
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
         rtzip_file_t *file = (rtzip_file_t *)image_off;
@@ -733,7 +793,6 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 uncompressed_rle_rgb888(file, k, line_buf + (k - start_line) * source_w * source_bytes_per_pixel);
             }
             uint32_t read_off = (uint32_t)line_buf ;
-            uint8_t *writebuf = dc->frame_buf;
             for (uint32_t x_j = x_start; x_j < x_end; x_j++)
             {
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
@@ -741,72 +800,57 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
                 int x_matric = round(X / Z);
                 int y_matric = round(Y / Z);
-// gui_log("matric_rgb565_2_argb8888:z%d\n",x);
+
                 if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
                 {
                     continue;
                 }
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
-                //gui_log("piexl_%d %d %d\n",pixel[0],pixel[1],pixel[2]);
-                if (pixel != 0)
+                uint8_t opacity_value = image->opacity_value;
+                if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
                 {
-                    writebuf[write_off + x_j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
-                                                + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+                    switch (opacity_value)
+                    {
+                    case 0:
+                        break;
+                    case 255:
+                        {
+
+                            writebuf[write_off + x_j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                                        + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+
+                        }
+                        break;
+                    default:
+                        {
+                            if (opacity_value < 255)
+                            {
+                                writebuf[write_off + x_j] = (((pixel [0]) * (256 - opacity_value)) + ((
+                                                                                                          writebuf[write_off + x_j]  & 0x001f) << 3) * opacity_value) / 256 +
+                                                            ((pixel[1] * (256 - opacity_value)) + (((writebuf[write_off + x_j] & 0x07e0) >> 5) << 2) *
+                                                             opacity_value) / 256 +
+                                                            ((pixel[2] * (256 - opacity_value)) + ((writebuf[write_off + x_j] >> 11) << 3) * opacity_value) /
+                                                            256;
+
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    }
                 }
+
             }
 
         }
     }
-    else if (img_type == 132) //matrix_argb8888_2_rgb565
+    else if (img_type == 132) //rle_filter_matrix_argb8888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 4;
-        int32_t  y1, y2, z1, z2;
-//        x1 = round(inverse->m[0][0] * dc->section.x1 + inverse->m[0][1] * dc->section.y1 +
-//                   inverse->m[0][2]);
-        y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
-                   inverse->m[1][2]);
-        z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
-                   inverse->m[2][2]);
 
-//        x2 = round(inverse->m[0][0] * dc->section.x2 + inverse->m[0][1] * (dc->section.y2 - 1) +
-//                   inverse->m[0][2]);
-        y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
-                   inverse->m[1][2]);
-        z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
-                   inverse->m[2][2]);
-
-        y1 = y1 / z1;
-        y2 = y2 / z2;
-
-        uint32_t start_line = 0, end_line = image->img_h - 1;
-        if (y1 < 0)
-        {
-            start_line = 0;
-        }
-        else if (y1 >= image->img_h)
-        {
-            return;
-        }
-        else
-        {
-            start_line = y1;
-        }
-
-        if (y2 < 0)
-        {
-            return;
-        }
-        else if (y2 + 4 >= image->img_h)
-        {
-            end_line = image->img_h - 1;
-        }
-        else
-        {
-            end_line = y2 + 4;
-        }
-        //TODO: y2 + ceil(1 / scale_y_ratio)
-        // gui_log("matric_rgb565_2_argb8888\n");
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
         rtzip_file_t *file = (rtzip_file_t *)image_off;
@@ -819,7 +863,6 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 uncompressed_rle_argb8888(file, k, line_buf + (k - start_line) * source_w * source_bytes_per_pixel);
             }
             uint32_t read_off = (uint32_t)line_buf ;
-            uint8_t *writebuf = dc->frame_buf;
             for (uint32_t x_j = x_start; x_j < x_end; x_j++)
             {
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
@@ -827,18 +870,49 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
                 int x_matric = round(X / Z);
                 int y_matric = round(Y / Z);
-// gui_log("matric_rgb565_2_argb8888:z%d\n",x);
+
                 if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
                 {
                     continue;
                 }
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
-                if (pixel != 0)
+                uint8_t opacity_value = image->opacity_value;
+                if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
                 {
-                    writebuf[write_off + x_j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
-                                                + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+                    switch (opacity_value)
+                    {
+                    case 0:
+                        break;
+                    case 255:
+                        {
+
+                            writebuf[write_off + x_j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
+                                                        + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
+
+                        }
+                        break;
+                    default:
+                        {
+                            if (opacity_value < 255)
+                            {
+                                writebuf[write_off + x_j] = (((pixel [0]) * (256 - opacity_value)) + ((
+                                                                                                          writebuf[write_off + x_j]  & 0x001f) << 3) * opacity_value) / 256 +
+                                                            ((pixel[1] * (256 - opacity_value)) + (((writebuf[write_off + x_j] & 0x07e0) >> 5) << 2) *
+                                                             opacity_value) / 256 +
+                                                            ((pixel[2] * (256 - opacity_value)) + ((writebuf[write_off + x_j] >> 11) << 3) * opacity_value) /
+                                                            256;
+
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        break;
+                    }
                 }
+
             }
         }
     }
@@ -949,35 +1023,33 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
                 uint8_t opacity_value = image->opacity_value;
-                gui_color_t color = {.channel.blue = pixel[0],
-                                     .channel.green = pixel[1],
-                                     .channel.red = pixel[2],
-                                     .channel.alpha = pixel[3],
-                                    };
-                switch (opacity_value)
+                if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
                 {
-                case 0:
-                    break;
-                case 255:
+                    switch (opacity_value)
                     {
-
-
-                        if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
+                    case 0:
+                        break;
+                    case 255:
                         {
-
-                            gui_color_t *d = (gui_color_t *)(writebuf + (write_off + x_j) * dc_bytes_per_pixel);
-                            do_blending_argb8888_2_argb8888(d, &color);
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel] = pixel[0];//b
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 3] = pixel[3]; //a
                         }
-
+                        break;
+                    default:
+                        {
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 3] = (pixel[3] * (256 - opacity_value)
+                                                                                    + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                                    + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                                    + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                                + writebuf[(write_off + x_j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                        }
+                        break;
                     }
-                    break;
-                default:
-                    if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
-                    {
-                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + x_j) * dc_bytes_per_pixel);
-                        do_blending_argb8888_2_argb8888_opacity(d, &color, opacity_value);
-                    }
-                    break;
                 }
             }
         }
@@ -1013,37 +1085,32 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 }
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
-                //gui_log("piexl_%d %d %d\n",pixel[0],pixel[1],pixel[2]);
+
                 uint8_t opacity_value = image->opacity_value;
-                gui_color_t color = {.channel.blue = pixel[0],
-                                     .channel.green = pixel[1],
-                                     .channel.red = pixel[2],
-                                     .channel.alpha = 255,
-                                    };
-                switch (opacity_value)
+                if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
                 {
-                case 0:
-                    break;
-                case 255:
+                    switch (opacity_value)
                     {
-
-
-                        if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
+                    case 0:
+                        break;
+                    case 255:
                         {
-
-                            gui_color_t *d = (gui_color_t *)(writebuf + (write_off + x_j) * dc_bytes_per_pixel);
-                            do_blending_rgb888_2_argb8888(d, &color);
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel] = pixel[0];//b
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
                         }
-
+                        break;
+                    default:
+                        {
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                                    + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                                    + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                                + writebuf[(write_off + x_j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                        }
+                        break;
                     }
-                    break;
-                default:
-                    if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
-                    {
-                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + x_j) * dc_bytes_per_pixel);
-                        do_blending_rgb888_2_argb8888_opacity(d, &color, opacity_value);
-                    }
-                    break;
                 }
             }
         }
@@ -1081,37 +1148,35 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                                                source_bytes_per_pixel);
 
                 uint8_t opacity_value = image->opacity_value;
-                gui_color_t color = {.channel.blue = (pixel & 0x001f) << 3,
-                                     .channel.green = ((pixel & 0x07e0) >> 5) << 2,
-                                     .channel.red = (pixel >> 11) << 3,
-                                     .channel.alpha = 255,
-                                    };
-                switch (opacity_value)
+                if (pixel != 0)
                 {
-                case 0:
-                    break;
-                case 255:
+                    switch (opacity_value)
                     {
-
-
-                        if (pixel != 0)
+                    case 0:
+                        break;
+                    case 255:
                         {
-
-                            gui_color_t *d = (gui_color_t *)(writebuf + (write_off + x_j) * dc_bytes_per_pixel);
-                            do_blending_rgb565_2_argb8888(d, &color);
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
                         }
+                        break;
+                    default:
+                        {
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) *
+                                                                                    (256 - opacity_value)
+                                                                                    + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) *
+                                                                                    (256 - opacity_value)
+                                                                                    + (writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                            writebuf[(write_off + x_j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) *
+                                                                                (256 - opacity_value)
+                                                                                + writebuf[(write_off + x_j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                        }
+                        break;
+                    }
 
-                    }
-                    break;
-                default:
-                    if (pixel != 0)
-                    {
-                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + x_j) * dc_bytes_per_pixel);
-                        do_blending_rgb565_2_argb8888_opacity(d, &color, opacity_value);
-                    }
-                    break;
                 }
-
             }
         }
 
@@ -1555,7 +1620,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
     {
         identity = false;
     }
-    if (image->blend_mode == IMG_BYPASS_MODE && (identity == true))
+    if (image->blend_mode == IMG_BYPASS_MODE)
     {
         if (dc_bytes_per_pixel == 2)
         {
