@@ -204,18 +204,23 @@ void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
+
+    struct rtgui_matrix *inverse = image->inverse;
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t *writebuf = dc->frame_buf;
     uint8_t source_bytes_per_pixel = 4;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    struct rtgui_matrix *inverse = image->inverse;
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
 
     for (uint32_t i = y_start; i < y_end; i++)
     {
 
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-
-        uint8_t *writebuf = dc->frame_buf;
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
@@ -227,12 +232,14 @@ void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev
                 continue;
             }
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
+            uint8_t opacity_value = image->opacity_value;
+
             gui_color_t color = {.channel.blue = pixel[0],
                                  .channel.green = pixel[1],
                                  .channel.red = pixel[2],
                                  .channel.alpha = pixel[3],
                                 };
-            uint8_t opacity_value = image->opacity_value;
+
             switch (opacity_value)
             {
             case 0:

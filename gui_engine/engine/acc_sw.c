@@ -1554,8 +1554,6 @@ void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_di
     }
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t *writebuf = dc->frame_buf;
-
-
     uint8_t source_bytes_per_pixel = 4;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 
@@ -1575,8 +1573,8 @@ void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_di
             }
 
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
-
             uint8_t opacity_value = (uint8_t)image->opacity_value;
+
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
                 switch (opacity_value)

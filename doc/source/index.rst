@@ -47,6 +47,7 @@ RTKIOT GUI
   Integration and Drivers <integration/index>
   Example <example/index>
   Tool <tool/index>
+  Design Spec<Design/index>
   FAQ <FAQ/index>
 
 
