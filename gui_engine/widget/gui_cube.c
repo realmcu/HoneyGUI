@@ -546,6 +546,20 @@ static void cube_end(gui_obj_t *obj)
 }
 static void cube_destory(gui_obj_t *obj)
 {
+    gui_cube_t *this = (gui_cube_t *)obj;
+    gui_free(this->draw_img_front.matrix);
+    gui_free(this->draw_img_back.matrix);
+    gui_free(this->draw_img_up.matrix);
+    gui_free(this->draw_img_down.matrix);
+    gui_free(this->draw_img_left.matrix);
+    gui_free(this->draw_img_right.matrix);
+
+    gui_free(this->draw_img_front.inverse);
+    gui_free(this->draw_img_back.inverse);
+    gui_free(this->draw_img_up.inverse);
+    gui_free(this->draw_img_down.inverse);
+    gui_free(this->draw_img_left.inverse);
+    gui_free(this->draw_img_right.inverse);
 
 }
 

@@ -242,6 +242,10 @@ void *gui_malloc(uint32_t n)
     {
         GUI_ASSERT(NULL != NULL);
     }
+    // if (ptr == (void *)0x00000000009196C8)
+    // {
+    //     GUI_ASSERT(NULL != NULL);
+    // }
     return ptr;
 #endif
 }
@@ -270,6 +274,10 @@ void *gui_realloc(void *ptr_old, uint32_t n)
     {
         GUI_ASSERT(NULL != NULL);
     }
+    // if (ptr == (void *)0x00000000009196C8)
+    // {
+    //     GUI_ASSERT(NULL != NULL);
+    // }
     return ptr;
 #endif
 }

@@ -148,6 +148,10 @@ static void gui_tree_child_free(gui_obj_t *object)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         gui_tree_child_free(obj);
         gui_obj_destory_cb(obj);
+        if (obj->event_dsc != NULL)
+        {
+            gui_free(obj->event_dsc);
+        }
         gui_free(obj);
     }
 }
@@ -214,7 +218,10 @@ void gui_tree_free(void *obj)
     {
         gui_list_remove(&object->brother_list);
         gui_obj_destory_cb(obj);
-        gui_free(object->event_dsc);
+        if (object->event_dsc != NULL)
+        {
+            gui_free(object->event_dsc);
+        }
         gui_free(obj);
     }
     else
