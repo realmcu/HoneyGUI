@@ -176,7 +176,7 @@ static void img_prepare(gui_obj_t *obj)
     {
         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
     }
-    gui_img_set_opacity((void *)obj, obj->opacity_value);
+    // gui_img_set_opacity((void *)obj, obj->opacity_value);
 
     uint8_t last = this->checksum;
     this->checksum = 0;

@@ -39,7 +39,7 @@
 // </c>
 
 // <c> RTK GUI Use OS Heap
-#define BUILD_USING_RTK_GUI_OS_HEAP
+// #define BUILD_USING_RTK_GUI_OS_HEAP
 // </c>
 
 // <c> RTK GUI Font Enable STB
@@ -81,7 +81,7 @@
 // </e>
 
 // <e> HoneyGUI Enable LVGL
-#define BUILD_USING_LVGL_GUI     1
+#define BUILD_USING_LVGL_GUI     0
 
 #if (BUILD_USING_LVGL_GUI == 1)
 

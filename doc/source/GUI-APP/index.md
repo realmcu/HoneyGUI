@@ -18,4 +18,5 @@
     Use C/C++ Design An Application <Native/Native>
     Use LVGL Design An Application <LVGL/fwk_app_lvgl>
     Use Script Design An Application <SaaA/index>
+    Switch Application <Switch_APP/index>
 ```

@@ -71,7 +71,7 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
         target.global_alpha = dsc->bg_opa;
     }
     PPE_rect_t rect = {.left = coords->x1, .right = coords->x2, .top = coords->y1, .bottom = coords->y2};
-    PPE_ERR err = PPE_Clear_Rect_lvgl(&target, &rect, bg_color.full);
+    PPE_ERR err = PPE_Clear_Rect(&target, &rect, bg_color.full);
     if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;

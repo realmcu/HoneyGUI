@@ -102,6 +102,8 @@ static void rtgui_server_entry(void *parameter)
                 extern gui_app_t *current_app;
                 current_app->close = false;
                 gui_list_remove(&(app->screen.brother_list));
+                app->screen.parent = 0;
+                gui_tree_free(&((gui_app_t *)app)->screen);
                 current_app = next_app;
                 next_app = 0;
             }

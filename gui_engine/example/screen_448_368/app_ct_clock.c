@@ -134,6 +134,7 @@ void page_ct_clock(void *parent)
     gui_obj_add_event_cb(win_watch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);
 
     img = gui_img_create_from_mem(parent, "page0", CLOCKN_BIN, 0, 0, 0, 0);
+    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
     gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
     canvas = gui_watchface_gradient_create(parent, "watchface_gradient", (368 - 368) / 2,

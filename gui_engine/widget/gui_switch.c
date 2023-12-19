@@ -270,6 +270,10 @@ static void switch_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    // if(obj->parent->type == PAGELIST)
+    // {
+    //     gui_log("obj->y = %d, obj->ay = %d\n", obj->y, obj->ay);
+    // }
     // gui_log("switch_prepare\n");
     if (((obj->ax + obj->tx) < (int)gui_get_screen_width()) && (((obj->ax + obj->tx) + obj->w) >= 0) &&
         \
@@ -489,6 +493,10 @@ static void switch_prepare(gui_obj_t *obj)
                 if (tp->released && b->press_flag)
                 {
                     b->release_flag = true;
+                }
+                if (b->touch_disable)
+                {
+                    gui_obj_event_set(obj, (gui_event_t)0);
                 }
             }
 

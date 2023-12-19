@@ -1,5 +1,5 @@
 {
-    "guiEngine-master": {
+    "guiEngine-release_v1.0": {
         "mandatory": [],
         "temporary": [
             ["keil_sim/gui_engine.uvprojx", "", "sdk"]

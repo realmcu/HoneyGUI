@@ -13,6 +13,8 @@ sphinx-press-theme = "*"
 recommonmark = "*"
 sphinx-multiversion = "*"
 sphinx-copybutton = "*"
+sphinx-mermaid = "*"
+sphinxcontrib-mermaid = "*"
 
 [dev-packages]
 

@@ -95,7 +95,7 @@ static void port_free(void *rmem)
 }
 
 #if ENABLE_RTK_GUI_OS_HEAP == 0
-#define PORT_GUI_MEMHEAP_SIZE 1024*1204*10
+#define PORT_GUI_MEMHEAP_SIZE 1024*1024*10
 static uint8_t gui_memheap[PORT_GUI_MEMHEAP_SIZE] = {0};
 #endif
 

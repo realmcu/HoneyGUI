@@ -137,9 +137,10 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 #define   WATCH_BASE_GREY_70_ALPHA_BIN            (void *)(resource_root + 0x0047d3f8)
 #define   WATCH_BASE_GREY_90ALPHA_HALF_BIN        (void *)(resource_root + 0x004e1e78)
 #define   WATCH_BASE_MASK_BLACK_BIN               (void *)(resource_root + 0x005143f8)
-#define   SIMKAI_SIZE24_BITS4_FONT_BIN            (void *)(resource_root + 0x0052a738)
-#define   SIMKAI_SIZE32_BITS1_FONT_BIN            (void *)(resource_root + 0x00543ab8)
-#define   SIMKAI_SIZE32_BITS4_FONT_BIN            (void *)(resource_root + 0x00a3f778)
+#define   WATCH_BASE_MASK_GREY_BIN                (void *)(resource_root + 0x0052a6f8)
+#define   SIMKAI_SIZE24_BITS4_FONT_BIN            (void *)(resource_root + 0x00540a38)
+#define   SIMKAI_SIZE32_BITS1_FONT_BIN            (void *)(resource_root + 0x00559db8)
+#define   SIMKAI_SIZE32_BITS4_FONT_BIN            (void *)(resource_root + 0x00a55a78)
 
 #else
 #include "flash_map.h"
