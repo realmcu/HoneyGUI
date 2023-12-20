@@ -14,6 +14,9 @@ static void canvas_cb(gui_canvas_t *canvas)
 
 static void touch_long_cb(void *obj, gui_event_t e)
 {
+    gui_app_shutdown(gui_current_app());
+    gui_log("line = %d \n", __LINE__);
+    gui_mem_debug();
     gui_log("line = %d \n", __LINE__);
 
 #ifdef ENABLE_LVGL_GUI

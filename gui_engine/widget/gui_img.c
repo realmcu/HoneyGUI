@@ -83,13 +83,11 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-void gui_img_set_animate(gui_img_t *o, uint32_t dur, int repeatCount, void *callback,
+void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *callback,
                          void *p)
 {
-    gui_img_t *a = (o);
-    GUI_UNUSED(a);
 
-    gui_animate_t *animate = ((gui_img_t *)o)->animate;
+    gui_animate_t *animate = this->animate;
     if (!(animate))
     {
         animate = gui_malloc(sizeof(gui_animate_t));
@@ -100,7 +98,7 @@ void gui_img_set_animate(gui_img_t *o, uint32_t dur, int repeatCount, void *call
     animate->callback = (void (*)(void *))callback;
     animate->repeatCount = repeatCount;
     animate->p = p;
-    ((gui_img_t *)o)->animate = animate;
+    this->animate = animate;
 }
 static void (obj_update_att)(struct _gui_obj_t *o)
 {
@@ -218,8 +216,10 @@ static void img_end(gui_obj_t *obj)
 
 static void magic_img_destory(gui_obj_t *obj)
 {
-    gui_free(((gui_img_t *)obj)->draw_img.inverse);
-    gui_free(((gui_img_t *)obj)->draw_img.matrix);
+    gui_img_t *this = (gui_img_t *)obj;
+    gui_free(this->draw_img.inverse);
+    gui_free(this->draw_img.matrix);
+    gui_free(this->animate);
 }
 
 static void gui_img_from_mem_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,

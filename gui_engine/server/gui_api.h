@@ -184,6 +184,7 @@ bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 
 void *gui_malloc(uint32_t n);
 void *gui_realloc(void *ptr_old, uint32_t n);
+void gui_mem_debug(void);
 
 
 void gui_free(void *rmem);

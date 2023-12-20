@@ -3198,7 +3198,15 @@ static void *stbtt__hheap_alloc(stbtt__hheap *hh, size_t size, void *userdata)
     {
         if (hh->num_remaining_in_head_chunk == 0)
         {
+
+#ifdef STB_REDUCE_MEMORY
+            //To save memory, reduce the count by half.By luke.
+            //modified, sim 32 * 400 + 8 = 12808B, soc 28 * 1000 + 4 = 28004B
+            int count = (size < 32 ? 1000 : size < 128 ? 400 : 100);
+#else
+            //original, sim 32 * 800 + 8 = 25608B, soc 28 * 2000 + 4 = 56004B
             int count = (size < 32 ? 2000 : size < 128 ? 800 : 100);
+#endif // STB_REDUCE_MEMORY
             stbtt__hheap_chunk *c = (stbtt__hheap_chunk *) STBTT_malloc(sizeof(stbtt__hheap_chunk) + size *
                                                                         count, userdata);
             if (c == NULL)
