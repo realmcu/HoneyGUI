@@ -7,6 +7,7 @@ src = Split("""
 """)
 
 src = Glob('*.c')
+SrcRemove(src,'app_calculator.c')
 if not GetDepend('BUILD_USING_LVGL_GUI'):
     SrcRemove(src,'app_lvgl.c')
 CPPPATH = [cwd]

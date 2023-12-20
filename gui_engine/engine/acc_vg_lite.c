@@ -851,8 +851,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             vg_lite_translate(rect->x1 * 1.0f, rect->y1 * 1.0f, &matrix);
         }
         break;
-    case IMG_TRANSPARENT_MODE:
-    case IMG_MAGIC_MATRIX:
+    case IMG_SRC_OVER_MODE:
         blend_mode = VG_LITE_BLEND_SRC_OVER;
         source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
         memcpy(&matrix, image->matrix, sizeof(vg_lite_matrix_t));
