@@ -4,289 +4,317 @@
 
 ## sw acc
 
+
+### Overall flow chart
 ```{mermaid}
 graph TD
-A[mode A] -->|A1| B(model B)
-B --> C{Judgment conditions C}
-C -->|conditionC1| D[module D]
-C -->|conditionC2| E[module E]
-C -->|conditionC3| F[module F]
+source[source] -->C{judge compress}
+C -->|N| no_rle[no rle]
+C -->|Y| rle[rle]
+no_rle --> img_type{image type}
+img_type -->bypass
+img_type -->filter
+img_type -->source_over
+rle --> rle_img_type{image type}
+rle_img_type --> rle_bypass
+rle_img_type --> rle_filter
+rle_img_type --> rle_source_over
+
 ```
 ### no_rle_bypass mode
 ```{mermaid}
 graph TD
-NO_RLE --> | | NO_BYPASS(bypassD)
-NO_BYPASS --> b{output}
-b --> |Identity matrix judgment| J(RGB565)
-J --> e{input}
-e --> | |ea(RGB565)
-ea --> no_bypass_opacity_case565{opacity}
+bypass --> b{output}
+b --> |Identity matrix judgment| byapss_rgb565
+b --> |Identity matrix judgment| bypass_rgb888
+b --> |Identity matrix judgment| bypass_rgba8888
+```
+```{mermaid}
+graph TD
+bypass_rgb565 --> bypass_565{input}
+bypass_565 --> | |bypass_565_565
+bypass_565_565 --> no_bypass_opacity_case565{opacity}
 no_bypass_opacity_case565 --> |opacity|no_bypass_opacity_value0_255(0-255)
 no_bypass_opacity_case565 --> |no opacity|no_bypass_opacity_value255(255)
 no_bypass_opacity_case565 --> |break|no_bypass_opacity_value0(0)
-
-e --> | |eb(RGB888)
-eb --> no_bypass_opacity_case888{opacity}
+bypass_565 --> | |bypass_565_888
+bypass_565_888--> no_bypass_opacity_case888{opacity}
 no_bypass_opacity_case888 --> |opacity|no_bypass_opacity_value888_0_255(0-255)
 no_bypass_opacity_case888 --> |no opacity|no_bypass_opacity_value888_255(255)
 no_bypass_opacity_case888 --> |break|no_bypass_opacity_value888_0(0)
-e --> | |ec(RGBA8888)
-ec --> no_bypass_opacity_case8888{opacity}
+bypass_565 --> | |bypass_565_8888
+bypass_565_8888 --> no_bypass_opacity_case8888{opacity}
 no_bypass_opacity_case8888 --> |opacity|no_bypass_opacity_value8888_0_255(0-255)
 no_bypass_opacity_case8888 --> |no opacity|no_bypass_opacity_value8888_255(255)
 no_bypass_opacity_case8888 --> |break|no_bypass_opacity_value8888_0(0)
-
-b --> |Identity matrix judgment| K(RGB888)
-K --> f{input format}
-f --> fa(RGB565)
-fa--> no_bypass_opacity_case888_565{opacity}
-no_bypass_opacity_case888_565 --> |opacity|no_bypass_opacity_value888_565_a0_255(0-255)
-no_bypass_opacity_case888_565 --> |no opacity|no_bypass_opacity_value888_888_a255(255)
-no_bypass_opacity_case888_565 --> |break|no_bypass_opacity_value888_8888_a0(0)
-
-f --> fb(RGB888)
-fb--> no_bypass_opacity_case888_888{opacity}
-no_bypass_opacity_case888_888 --> |opacity|no_bypass_opacity_value888_888_b0_255(0-255)
-no_bypass_opacity_case888_888 --> |no opacity|no_bypass_opacity_value888_888_b255(255)
-no_bypass_opacity_case888_888 --> |break|no_bypass_opacity_value888_8888_b0(0)
-
-f --> fc(RGBA8888)
-fc--> no_bypass_opacity_case888_8888{opacity}
-no_bypass_opacity_case888_8888 --> |opacity|no_bypass_opacity_value888_8888_c0_255(0-255)
-no_bypass_opacity_case888_8888 --> |no opacity|no_bypass_opacity_value888_8888_c255(255)
-no_bypass_opacity_case888_8888 --> |break|no_bypass_opacity_value888_8888_c0(0)
-
-b --> |Identity matrix judgment| L(RGBA8888)
-L --> g{input format}
-g --> ga(RGB565)
-ga --> no_bypass_opacity_case8888_565{opacity}
-no_bypass_opacity_case8888_565 --> |opacity|no_bypass_opacity_value8888_8888_a0_255(0-255)
-no_bypass_opacity_case8888_565 --> |no opacity|no_bypass_opacity_value8888_8888_a255(255)
-no_bypass_opacity_case8888_565 --> |break|no_bypass_opacity_value8888_8888_a0(0)
-
-g --> gb(RGB888)
-gb --> no_bypass_opacity_case8888_888{opacity}
-no_bypass_opacity_case8888_888 --> |opacity|no_bypass_opacity_value8888_8888_b0_255(0-255)
-no_bypass_opacity_case8888_888--> |no opacity|no_bypass_opacity_value8888_8888_b255(255)
-no_bypass_opacity_case8888_888 --> |break|no_bypass_opacity_value8888_8888_b0(0)
-
-g --> gc(RGBA8888)
-gc --> no_bypass_opacity_case8888_8888{opacity}
-no_bypass_opacity_case8888_8888 --> |opacity|no_bypass_opacity_value8888_8888_c0_255(0-255)
-no_bypass_opacity_case8888_8888--> |no opacity|no_bypass_opacity_value8888_8888_c255(255)
-no_bypass_opacity_case8888_8888 --> |break|no_bypass_opacity_value8888_8888_c0(0)
 ```
-
-### no_rle_filter
+Notice: In non-compressed bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
+### overview filter
 ```{mermaid}
 graph TD
-NO_RLE --> | | no_filter(filter)
-no_filter --> c{output format}
-c --> |matix| filter_matrix_ture(ture)
-filter_matrix_ture --> | |filter_matrix_ture565(rgb565)
-filter_matrix_ture565 --> filter_matrix_judge{input format}
-filter_matrix_judge --> filter_matrix_565_565(rgb565)
-filter_matrix_565_565 --> filter_matrix_565_565_opacity{opacity}
-filter_matrix_565_565_opacity --> |opacity |filter_matrix_565_565_a0_255(0-255)
-filter_matrix_565_565_opacity --> |no opacity |filter_matrix_565_565_a255(255)
-filter_matrix_565_565_opacity --> |break |filter_matrix_565_565_a0(0)
-
-filter_matrix_judge --> filter_matrix_565_888(rgb888)
-filter_matrix_565_888 --> filter_matrix_565_888_opacity{opacity}
-filter_matrix_565_888_opacity --> |opacity |filter_matrix_565_888_a0_255(0-255)
-filter_matrix_565_888_opacity --> |no opacity |filter_matrix_565_888_a255(255)
-filter_matrix_565_888_opacity --> |break |filter_matrix_565_888_a0(0)
-
-filter_matrix_judge --> filter_matrix_565_8888(rgba8888)
-filter_matrix_565_8888 --> filter_matrix_565_8888_opacity{opacity}
-filter_matrix_565_8888_opacity --> |opacity |filter_matrix_565_8888_a0_255(0-255)
-filter_matrix_565_8888_opacity --> |no opacity |filter_matrix_565_8888_a255(255)
-filter_matrix_565_8888_opacity --> |break |filter_matrix_565_8888_a0(0)
-
-filter_matrix_ture --> | |filter_matrix_ture888(rgb888)
-filter_matrix_ture888 --> filter_matrix_judge_888{input format}
-filter_matrix_judge_888 -->filter_matrix_888_565
-filter_matrix_888_565 -->filter_matrix_888_565_opacity{opacity}
-filter_matrix_888_565_opacity --> |opacity|filter_matrix_888_565_0_255(0-255)
-filter_matrix_888_565_opacity --> |no opacity|filter_matrix_888_565_255(255)
-filter_matrix_888_565_opacity --> |break|filter_matrix_888_565_0(0)
-
-filter_matrix_judge_888 -->filter_matrix_888_888
-filter_matrix_888_888 --> filter_matrix_888_888_opacity{opacity}
-filter_matrix_888_888_opacity --> |opacity|filter_matrix_888_888_0_255(0-255)
-filter_matrix_888_888_opacity --> |no opacity|filter_matrix_888_888_255(255)
-filter_matrix_888_888_opacity --> |break|filter_matrix_888_888_0(0)
-
-filter_matrix_judge_888 -->filter_matrix_888_8888
-filter_matrix_888_8888 --> filter_matrix_888_8888_opacity{opacity}
-filter_matrix_888_8888_opacity --> |opacity|filter_matrix_888_8888_0_255(0-255)
-filter_matrix_888_8888_opacity --> |no opacity|filter_matrix_888_8888_255(255)
-filter_matrix_888_8888_opacity --> |break|filter_matrix_888_8888_0(0)
-
-filter_matrix_ture --> | |filter_matrix_ture8888(rgba8888)
-filter_matrix_ture8888 -->filter_matrix_judge_8888{input format}
-filter_matrix_judge_8888 --> filter_matrix_8888_565
-filter_matrix_8888_565 --> filter_matrix_8888_565_opacity{opacity}
-filter_matrix_8888_565_opacity --> |opacity|filter_matrix_8888_565_0_255(0-255)
-filter_matrix_8888_565_opacity --> |no opacity|filter_matrix_8888_565_255(255)
-filter_matrix_8888_565_opacity --> |break|filter_matrix_8888_565_0(0)
-
-filter_matrix_judge_8888 --> filter_matrix_8888_888
-filter_matrix_8888_888 --> filter_matrix_8888_888_opacity{opacity}
-filter_matrix_8888_888_opacity --> |opacity|filter_matrix_8888_888_0_255(0-255)
-filter_matrix_8888_888_opacity --> |no opacity|filter_matrix_8888_888_255(255)
-filter_matrix_8888_888_opacity --> |break|filter_matrix_8888_888_0(0)
-
-filter_matrix_judge_8888 --> filter_matrix_8888_8888
-filter_matrix_8888_8888 --> filter_matrix_8888_8888_opacity{opacity}
-filter_matrix_8888_8888_opacity --> |opacity|filter_matrix_8888_8888_0_255(0-255)
-filter_matrix_8888_8888_opacity --> |no opacity|filter_matrix_8888_8888_255(255)
-filter_matrix_8888_8888_opacity --> |break|filter_matrix_8888_8888_0(0)
-
-c --> | no_matrix| filter_matrix_F_1(false)
+filter --> b{Identity matrix judgment}
+b --> |N|filter__no_matrix
+filter__no_matrix -->fiter_no_matrix_output{output}
+fiter_no_matrix_output -->filter_rgb565
+fiter_no_matrix_output -->filter_rgb888
+fiter_no_matrix_output -->filter_rgba8888
+b --> |Y|filter_matrix
+filter_matrix --> fiter_matrix_output{output}
+fiter_matrix_output -->filter_matrix_rgb565
+fiter_matrix_output -->filter_matirx_rgb888
+fiter_matrix_output -->filter_matrix_rgba8888
 ```
+### no_rle_filter
 
+```{mermaid}
+graph TD
+filter_rgb565 --> filter_565{input}
+filter_565 --> | |filter_565_565
+filter_565_565 --> filter_opacity_case565{opacity}
+filter_opacity_case565 --> |opacity| filter_opacity_value0_255(0-255)
+filter_opacity_case565 --> |no opacity|filter_opacity_value255(255)
+filter_opacity_case565 --> |break|filter_opacity_value0(0)
+filter_565 --> | |filter_565_888
+filter_565_888--> filter_opacity_case888{opacity}
+filter_opacity_case888 --> |opacity|filter_opacity_value888_0_255(0-255)
+filter_opacity_case888 --> |no opacity|filter_opacity_value888_255(255)
+filter_opacity_case888 --> |break|filter_opacity_value888_0(0)
+filter_565 --> | |filter_565_8888
+filter_565_8888 --> filter_opacity_case8888{opacity}
+filter_opacity_case8888 --> |opacity|filter_opacity_value8888_0_255(0-255)
+filter_opacity_case8888 --> |no opacity|filter_opacity_value8888_255(255)
+filter_opacity_case8888 --> |break|filter_opacity_value8888_0(0)
+```
+Notice: In non-compressed filter mode output rgb888 and rgba8888 equivalent to output as rgb565.
 ### no rle filter_matrix
 ```{mermaid}
 graph TD
-
-filter_matrix_F[flase] --> | |filter_matrix_F565(rgb565)
-filter_matrix_F565 --> filter_judge_565{input format}
-filter_judge_565 --> filter_565_565
-filter_565_565 --> filter_565_565_opacity{opacity}
-filter_565_565_opacity -->|opacity|filter_565_565_0_255(0-255)
-filter_565_565_opacity -->|no opacity|filter_565_565_255(255)
-filter_565_565_opacity -->|break|filter_565_565_0(0)
-
-filter_judge_565 --> filter_565_888
-filter_565_888 --> filter_565_888_opacity{opacity}
-filter_565_888_opacity -->|opacity|filter_565_888_0_255(0-255)
-filter_565_888_opacity -->|no opacity|filter_565_888_255(255)
-filter_565_888_opacity -->|break|filter_565_888_0(0)
-
-filter_judge_565 --> filter_565_8888
-filter_565_8888 --> filter_565_8888_opacity{opacity}
-filter_565_8888_opacity -->|opacity|filter_565_8888_0_255(0-255)
-filter_565_8888_opacity -->|no opacity|filter_565_8888_255(255)
-filter_565_8888_opacity -->|break|filter_565_8888_0(0)
-
-filter_matrix_F(flase) --> | |filter_matrix_F888(rgb888)
-filter_matrix_F888 --> filter_judge_888{input format}
-filter_judge_888 --> filter_888_565
-filter_888_565 --> filter_888_565_opacity{opacity}
-filter_888_565_opacity -->|opacity|filter_888_565_0_255(0-255)
-filter_888_565_opacity -->|no opacity|filter_888_565_255(255)
-filter_888_565_opacity -->|break|filter_888_565_0(0)
-
-filter_judge_888 --> filter_888_888
-filter_888_888 --> filter_888_888_opacity{opacity}
-filter_888_888_opacity -->|opacity|filter_888_888_0_255(0-255)
-filter_888_888_opacity -->|no opacity|filter_888_888_255(255)
-filter_888_888_opacity -->|break|filter_888_888_0(0)
-
-filter_judge_888 --> filter_888_8888
-filter_888_8888 --> filter_888_8888_opacity{opacity}
-filter_888_8888_opacity -->|opacity|filter_888_8888_0_255(0-255)
-filter_888_8888_opacity -->|no opacity|filter_888_8888_255(255)
-filter_888_8888_opacity -->|break|filter_888_8888_0(0)
-
-filter_matrix_F(false) --> | |filter_matrix_F8888(rgba8888)
-filter_matrix_F8888 --> filter_judge_8888{input format}
-filter_judge_8888 --> filter_8888_565
-filter_8888_565 --> filter_8888_565_opacity{opacity}
-filter_8888_565_opacity --> |opacity|filter_8888_565_0_255(0-255)
-filter_8888_565_opacity --> |no opacity|filter_8888_565_255(255)
-filter_8888_565_opacity --> |break|filter_8888_565_0(0)
-
-filter_judge_8888 --> filter_8888_888
-filter_8888_888 --> filter_8888_888_opacity{opacity}
-filter_8888_888_opacity --> |opacity|filter_8888_888_0_255(0-255)
-filter_8888_888_opacity --> |no opacity|filter_8888_888_255(255)
-filter_8888_888_opacity --> |break|filter_8888_888_0(0)
-
-filter_judge_8888 --> filter_8888_8888
-filter_8888_8888 --> filter_8888_8888_opacity{opacity}
-filter_8888_8888_opacity --> |opacity|filter_8888_8888_0_255(0-255)
-filter_8888_8888_opacity --> |no opacity|filter_8888_8888_255(255)
-filter_8888_8888_opacity --> |break|filter_8888_8888_0(0)
+filter_matrix_rgb565 --> filter_matrix_565{input}
+filter_matrix_565 --> | |filter_matrix_565_565
+filter_matrix_565_565 --> filter_matrix_opacity_case565{opacity}
+filter_matrix_opacity_case565 --> |opacity| filter_matrix_opacity_value0_255(0-255)
+filter_matrix_opacity_case565 --> |no opacity|filter_matrix_opacity_value255(255)
+filter_matrix_opacity_case565 --> |break|filter_matrix_opacity_value0(0)
+filter_matrix_565 --> | |filter_matrix_565_888
+filter_matrix_565_888--> filter_matrix_opacity_case888{opacity}
+filter_matrix_opacity_case888 --> |opacity|filter_matrix_opacity_value888_0_255(0-255)
+filter_matrix_opacity_case888 --> |no opacity|filter_matrix_opacity_value888_255(255)
+filter_matrix_opacity_case888 --> |break|filter_matrix_opacity_value888_0(0)
+filter_matrix_565 --> | |filter_matrix_565_8888
+filter_matrix_565_8888 --> filter_matrix_opacity_case8888{opacity}
+filter_matrix_opacity_case8888 --> |opacity|filter_matrix_opacity_value8888_0_255(0-255)
+filter_matrix_opacity_case8888 --> |no opacity|filter_matrix_opacity_value8888_255(255)
+filter_matrix_opacity_case8888 --> |break|filter_matrix_opacity_value8888_0(0)
 ```
+Notice: In non-compressed filter_matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
 
+### overview source_over
 
-### no_rle_source_over_matrix
 ```{mermaid}
 graph TD
-source_over --> c{output format}
-c --> |matix| alpha_matrix_ture(ture)
-c --> |matix| alpha_matrix_false(false)
-
-alpha_matrix_ture --> | |alpha_matrix_ture565(rgb565)
-alpha_matrix_ture565 --> alpha_matrix_judge{input format}
-alpha_matrix_judge --> alpha_matrix_565_565(rgb565)
-alpha_matrix_565_565 --> alpha_matrix_565_565_opacity{opacity}
-alpha_matrix_565_565_opacity --> |opacity+alpha|alpha_matrix_565_565_a0_255(0-255)
-alpha_matrix_565_565_opacity --> |alpha|alpha_matrix_565_565_a255(255)
-alpha_matrix_565_565_opacity --> |break|alpha_matrix_565_565_a0(0)
-
-alpha_matrix_judge --> alpha_matrix_565_888(rgb888)
-alpha_matrix_565_888 --> alpha_matrix_565_888_opacity{opacity}
-alpha_matrix_565_888_opacity --> |opacity+alpha|alpha_matrix_565_888_a0_255(0-255)
-alpha_matrix_565_888_opacity --> |alpha blending|alpha_matrix_565_888_a255(255)
-alpha_matrix_565_888_opacity --> |break|alpha_matrix_565_888_a0(0)
-
-alpha_matrix_judge --> alpha_matrix_565_8888(rgba8888)
-alpha_matrix_565_8888 --> alpha_matrix_565_8888_opacity{opacity}
-alpha_matrix_565_8888_opacity --> |opacity+alpha|alpha_matrix_565_8888_a0_255(0-255)
-alpha_matrix_565_8888_opacity --> |alpha blending|alpha_matrix_565_8888_a255(255)
-alpha_matrix_565_8888_opacity --> |no opacity|alpha_matrix_565_8888_a0(0)
-
-alpha_matrix_ture --> | |alpha_matrix_ture888(rgb888)
-alpha_matrix_ture888 --> alpha_matrix_judge_888{input format}
-alpha_matrix_judge_888 -->alpha_matrix_888_565
-alpha_matrix_888_565 -->alpha_matrix_888_565_opacity{opacity}
-alpha_matrix_888_565_opacity --> |opacity+alpha| alpha_matrix_888_565_0_255(0-255)
-alpha_matrix_888_565_opacity --> |alpha blending|alpha_matrix_888_565_255(255)
-alpha_matrix_888_565_opacity --> |break|alpha_matrix_888_565_0(0)
-
-alpha_matrix_judge_888 -->alpha_matrix_888_888
-alpha_matrix_888_888 --> alpha_matrix_888_888_opacity{opacity}
-alpha_matrix_888_888_opacity --> |opacity+alpha| alpha_matrix_888_888_0_255(0-255)
-alpha_matrix_888_888_opacity --> |alpha blending| alpha_matrix_888_888_255(255)
-alpha_matrix_888_888_opacity --> |break| alpha_matrix_888_888_0(0)
-
-alpha_matrix_judge_888 -->alpha_matrix_888_8888
-alpha_matrix_888_8888 --> alpha_matrix_888_8888_opacity{opacity}
-alpha_matrix_888_8888_opacity --> |opacity+alpha|alpha_matrix_888_8888_0_255(0-255)
-alpha_matrix_888_8888_opacity --> |alpha blending|alpha_matrix_888_8888_255(255)
-alpha_matrix_888_8888_opacity --> |break|alpha_matrix_888_8888_0(0)
-
-alpha_matrix_ture --> | |alpha_matrix_ture8888(rgba8888)
-alpha_matrix_ture8888 --> alpha_matrix_judge_8888{input format}
-alpha_matrix_judge_8888 --> alpha_matrix_8888_565
-alpha_matrix_8888_565 --> alpha_matrix_8888_565_opacity{opacity}
-alpha_matrix_8888_565_opacity --> |opacity+alpha| alpha_matrix_8888_565_0_255(0-255)
-alpha_matrix_8888_565_opacity --> |alpha blending| alpha_matrix_8888_565_255(255)
-alpha_matrix_8888_565_opacity --> |break| alpha_matrix_8888_565_0(0)
-
-alpha_matrix_judge_8888 --> alpha_matrix_8888_888
-alpha_matrix_8888_888 --> alpha_matrix_8888_888_opacity{opacity}
-alpha_matrix_8888_888_opacity --> |opacity+alpha| alpha_matrix_8888_888_0_255(0-255)
-alpha_matrix_8888_888_opacity --> |alpha| alpha_matrix_8888_888_255(255)
-alpha_matrix_8888_888_opacity --> |break|alpha_matrix_8888_888_0(0)
-
-alpha_matrix_judge_8888 --> alpha_matrix_8888_8888
-alpha_matrix_8888_8888 --> alpha_matrix_8888_8888_opacity{opacity}
-alpha_matrix_8888_8888_opacity --> |opacity+alpha| alpha_matrix_8888_8888_0_255(0-255)
-alpha_matrix_8888_8888_opacity --> |alpha| alpha_matrix_8888_8888_255(255)
-alpha_matrix_8888_8888_opacity --> |break| alpha_matrix_8888_8888_0(0)
+alpha --> b{Identity matrix judgment}
+b --> |N|alpha__no_matrix
+alpha__no_matrix -->fiter_no_matrix_output{output}
+fiter_no_matrix_output -->alpha_rgb565
+fiter_no_matrix_output -->alpha_rgb888
+fiter_no_matrix_output -->alpha_rgba8888
+b --> |Y|alpha_matrix
+alpha_matrix --> fiter_matrix_output{output}
+fiter_matrix_output -->alpha_matrix_rgb565
+fiter_matrix_output -->alpha_matirx_rgb888
+fiter_matrix_output -->alpha_matrix_rgba8888
 ```
-
-### rle
+### no_rle_alpha no matrix
 ```{mermaid}
 graph TD
-RLE --> | | RLE_BYPASS(bypassG)
-RLE --> | | RLE_FILTER(filterH)
-RLE --> | | RLE_SOURCE_OVER(source_overI)
+alpha_rgb565 --> alpha_565{input}
+alpha_565 --> | |alpha_565_565
+alpha_565_565 --> alpha_opacity_case565{opacity}
+alpha_opacity_case565 --> |opacity + alpha| alpha_opacity_value0_255(0-255)
+alpha_opacity_case565 --> |alpha|alpha_opacity_value255(255)
+alpha_opacity_case565 --> |break|alpha_opacity_value0(0)
+alpha_565 --> | |alpha_565_888
+alpha_565_888--> alpha_opacity_case888{opacity}
+alpha_opacity_case888 --> |opacity + alpha|alpha_opacity_value888_0_255(0-255)
+alpha_opacity_case888 --> |alpha|alpha_opacity_value888_255(255)
+alpha_opacity_case888 --> |break|alpha_opacity_value888_0(0)
+alpha_565 --> | |alpha_565_8888
+alpha_565_8888 --> alpha_opacity_case8888{opacity}
+alpha_opacity_case8888 --> |opacity + alpha|alpha_opacity_value8888_0_255(0-255)
+alpha_opacity_case8888 --> |alpha|alpha_opacity_value8888_255(255)
+alpha_opacity_case8888 --> |break|alpha_opacity_value8888_0(0)
 ```
+Notice: In non-compressed source_over mode output rgb888 and rgba8888 equivalent to output as rgb565.
+
+### no_rle_alpha matrix
+
+```{mermaid}
+graph TD
+alpha_matrix_rgb565 --> alpha_matrix_565{input}
+alpha_matrix_565 --> | |alpha_matrix_565_565
+alpha_matrix_565_565 --> alpha_matrix_opacity_case565{opacity}
+alpha_matrix_opacity_case565 --> |opacity + alpha| alpha_matrix_opacity_value0_255(0-255)
+alpha_matrix_opacity_case565 --> |alpha|alpha_matrix_opacity_value255(255)
+alpha_matrix_opacity_case565 --> |break|alpha_matrix_opacity_value0(0)
+alpha_matrix_565 --> | |alpha_matrix_565_888
+alpha_matrix_565_888--> alpha_matrix_opacity_case888{opacity}
+alpha_matrix_opacity_case888 --> |opacity + alpha|alpha_matrix_opacity_value888_0_255(0-255)
+alpha_matrix_opacity_case888 --> |alpha|alpha_matrix_opacity_value888_255(255)
+alpha_matrix_opacity_case888 --> |break|alpha_matrix_opacity_value888_0(0)
+alpha_matrix_565 --> | |alpha_matrix_565_8888
+alpha_matrix_565_8888 --> alpha_matrix_opacity_case8888{opacity}
+alpha_matrix_opacity_case8888 --> |opacity + alpha|alpha_matrix_opacity_value8888_0_255(0-255)
+alpha_matrix_opacity_case8888 --> |alpha|alpha_matrix_opacity_value8888_255(255)
+alpha_matrix_opacity_case8888 --> |break|alpha_matrix_opacity_value8888_0(0)
+```
+Notice: In non-compressed source_over matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+
+### rle bypass
+
+```{mermaid}
+graph TD
+rle_bypass --> b{output}
+b --> |Identity matrix judgment| rle_rgb565
+b --> |Identity matrix judgment| rle_rgb888
+b --> |Identity matrix judgment| rle_rgba8888
+```
+```{mermaid}
+graph TD
+rle_rgb565 --> rle_bypass_565{input}
+rle_bypass_565 --> | |rle_bypass_565_565
+rle_bypass_565_565 --> rle_bypass_opacity_case565{opacity}
+rle_bypass_opacity_case565 --> |opacity|rle_bypass_opacity_value0_255(0-255)
+rle_bypass_opacity_case565 --> |no opacity|rle_bypass_opacity_value255(255)
+rle_bypass_opacity_case565 --> |break|rle_bypass_opacity_value0(0)
+rle_bypass_565 --> | |rle_bypass_565_888
+rle_bypass_565_888--> rle_bypass_opacity_case888{opacity}
+rle_bypass_opacity_case888 --> |opacity|rle_bypass_opacity_value888_0_255(0-255)
+rle_bypass_opacity_case888 --> |no opacity|rle_bypass_opacity_value888_255(255)
+rle_bypass_opacity_case888 --> |break|rle_bypass_opacity_value888_0(0)
+rle_bypass_565 --> | |rle_bypass_565_8888
+rle_bypass_565_8888 --> rle_bypass_opacity_case8888{opacity}
+rle_bypass_opacity_case8888 --> |opacity|rle_bypass_opacity_value8888_0_255(0-255)
+rle_bypass_opacity_case8888 --> |no opacity|rle_bypass_opacity_value8888_255(255)
+rle_bypass_opacity_case8888 --> |break|rle_bypass_opacity_value8888_0(0)
+```
+Notice: In compressed bypass mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+### overview rle filter
+```{mermaid}
+graph TD
+rle_filter --> b{Identity matrix judgment}
+b --> |N| rle_filter_no_matrix
+rle_filter_no_matrix --> rle_fiter_no_matrix_output{output}
+rle_fiter_no_matrix_output -->rle_filter_rgb565
+rle_fiter_no_matrix_output -->rle_filter_rgb888
+rle_fiter_no_matrix_output -->rle_filter_rgba8888
+b --> |Y| rle_filter_matrix
+rle_filter_matrix --> rle_fiter_matrix_output{output}
+rle_fiter_matrix_output -->rle_filter_matrix_rgb565
+rle_fiter_matrix_output -->rle_filter_matirx_rgb888
+rle_fiter_matrix_output -->rle_filter_matrix_rgba8888
+```
+
+### rle_filter
+```{mermaid}
+graph TD
+rle_filter_rgb565 --> rle_filter_565{input}
+rle_filter_565 --> | |rle_filter_565_565
+rle_filter_565_565 --> rle_filter_opacity_case565{opacity}
+rle_filter_opacity_case565 --> |opacity| rle_filter_opacity_value0_255(0-255)
+rle_filter_opacity_case565 --> |no opacity|rle_filter_opacity_value255(255)
+rle_filter_opacity_case565 --> |break|rle_filter_opacity_value0(0)
+rle_filter_565 --> | |rle_filter_565_888
+rle_filter_565_888--> rle_filter_opacity_case888{opacity}
+rle_filter_opacity_case888 --> |opacity|rle_filter_opacity_value888_0_255(0-255)
+rle_filter_opacity_case888 --> |no opacity|rle_filter_opacity_value888_255(255)
+rle_filter_opacity_case888 --> |break|rle_filter_opacity_value888_0(0)
+rle_filter_565 --> | |rle_filter_565_8888
+rle_filter_565_8888 --> rle_filter_opacity_case8888{opacity}
+rle_filter_opacity_case8888 --> |opacity|rle_filter_opacity_value8888_0_255(0-255)
+rle_filter_opacity_case8888 --> |no opacity|rle_filter_opacity_value8888_255(255)
+rle_filter_opacity_case8888 --> |break|rle_filter_opacity_value8888_0(0)
+```
+Notice: In compressed filter mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+### rle_filter_matrix
+```{mermaid}
+graph TD
+rle_filter_matrix_rgb565 --> rle_filter_matrix_565{input}
+rle_filter_matrix_565 --> | |rle_filter_matrix_565_565
+rle_filter_matrix_565_565 --> rle_filter_matrix_opacity_case565{opacity}
+rle_filter_matrix_opacity_case565 --> |opacity| rle_filter_matrix_opacity_value0_255(0-255)
+rle_filter_matrix_opacity_case565 --> |no opacity|rle_filter_matrix_opacity_value255(255)
+rle_filter_matrix_opacity_case565 --> |break|rle_filter_matrix_opacity_value0(0)
+rle_filter_matrix_565 --> | |rle_filter_matrix_565_888
+rle_filter_matrix_565_888--> rle_filter_matrix_opacity_case888{opacity}
+rle_filter_matrix_opacity_case888 --> |opacity|rle_filter_matrix_opacity_value888_0_255(0-255)
+rle_filter_matrix_opacity_case888 --> |no opacity|rle_filter_matrix_opacity_value888_255(255)
+rle_filter_matrix_opacity_case888 --> |break|rle_filter_matrix_opacity_value888_0(0)
+rle_filter_matrix_565 --> | |rle_filter_matrix_565_8888
+rle_filter_matrix_565_8888 --> rle_filter_matrix_opacity_case8888{opacity}
+rle_filter_matrix_opacity_case8888 --> |opacity|rle_filter_matrix_opacity_value8888_0_255(0-255)
+rle_filter_matrix_opacity_case8888 --> |no opacity|rle_filter_matrix_opacity_value8888_255(255)
+rle_filter_matrix_opacity_case8888 --> |break|rle_filter_matrix_opacity_value8888_0(0)
+```
+Notice: In compressed filter matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+### overview rle source_over
+```{mermaid}
+graph TD
+rle_alpha --> b{Identity matrix judgment}
+b --> |N|rle_alpha__no_matrix
+rle_alpha__no_matrix -->fiter_no_matrix_output{output}
+fiter_no_matrix_output -->rle_alpha_rgb565
+fiter_no_matrix_output -->rle_alpha_rgb888
+fiter_no_matrix_output -->rle_alpha_rgba8888
+b --> |Y|rle_alpha_matrix
+rle_alpha_matrix --> fiter_matrix_output{output}
+fiter_matrix_output -->rle_alpha_matrix_rgb565
+fiter_matrix_output -->rle_alpha_matirx_rgb888
+fiter_matrix_output -->rle_alpha_matrix_rgba8888
+```
+### rle alpha no matrix
+```{mermaid}
+graph TD
+rle_alpha_rgb565 --> rle_alpha_565{input}
+rle_alpha_565 --> | |rle_alpha_565_565
+rle_alpha_565_565 --> rle_alpha_opacity_case565{opacity}
+rle_alpha_opacity_case565 --> |opacity + alpha| rle_alpha_opacity_value0_255(0-255)
+rle_alpha_opacity_case565 --> |alpha|rle_alpha_opacity_value255(255)
+rle_alpha_opacity_case565 --> |break|rle_alpha_opacity_value0(0)
+rle_alpha_565 --> | |rle_alpha_565_888
+rle_alpha_565_888--> rle_alpha_opacity_case888{opacity}
+rle_alpha_opacity_case888 --> |opacity + alpha|rle_alpha_opacity_value888_0_255(0-255)
+rle_alpha_opacity_case888 --> |alpha|rle_alpha_opacity_value888_255(255)
+rle_alpha_opacity_case888 --> |break|rle_alpha_opacity_value888_0(0)
+rle_alpha_565 --> | |rle_alpha_565_8888
+rle_alpha_565_8888 --> rle_alpha_opacity_case8888{opacity}
+rle_alpha_opacity_case8888 --> |opacity + alpha|rle_alpha_opacity_value8888_0_255(0-255)
+rle_alpha_opacity_case8888 --> |alpha|rle_alpha_opacity_value8888_255(255)
+rle_alpha_opacity_case8888 --> |break|rle_alpha_opacity_value8888_0(0)
+```
+Notice: In compressed source_over mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+### rle_alpha matrix
+```{mermaid}
+graph TD
+rle_alpha_matrix_rgb565 --> rle_alpha_matrix_565{input}
+rle_alpha_matrix_565 --> | |rle_alpha_matrix_565_565
+rle_alpha_matrix_565_565 --> rle_alpha_matrix_opacity_case565{opacity}
+rle_alpha_matrix_opacity_case565 --> |opacity + alpha| rle_alpha_matrix_opacity_value0_255(0-255)
+rle_alpha_matrix_opacity_case565 --> |alpha|rle_alpha_matrix_opacity_value255(255)
+rle_alpha_matrix_opacity_case565 --> |break|rle_alpha_matrix_opacity_value0(0)
+rle_alpha_matrix_565 --> | |rle_alpha_matrix_565_888
+rle_alpha_matrix_565_888--> rle_alpha_matrix_opacity_case888{opacity}
+rle_alpha_matrix_opacity_case888 --> |opacity + alpha|rle_alpha_matrix_opacity_value888_0_255(0-255)
+rle_alpha_matrix_opacity_case888 --> |alpha|rle_alpha_matrix_opacity_value888_255(255)
+rle_alpha_matrix_opacity_case888 --> |break|rle_alpha_matrix_opacity_value888_0(0)
+rle_alpha_matrix_565 --> | |rle_alpha_matrix_565_8888
+rle_alpha_matrix_565_8888 --> rle_alpha_matrix_opacity_case8888{opacity}
+rle_alpha_matrix_opacity_case8888 --> |opacity + alpha|rle_alpha_matrix_opacity_value8888_0_255(0-255)
+rle_alpha_matrix_opacity_case8888 --> |alpha|rle_alpha_matrix_opacity_value8888_255(255)
+rle_alpha_matrix_opacity_case8888 --> |break|rle_alpha_matrix_opacity_value8888_0(0)
+```
+Notice: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
 
 ## image type
 
