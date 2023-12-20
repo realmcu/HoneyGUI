@@ -1,4 +1,27 @@
 #include "js_user.h"
+#if defined ENABLE_GPIO_SWITCH
+#ifdef RTL87x2G
+#include "rtl_gpio.h"
+#include "rtl_rcc.h"
+#include "drv_gpio.h"
+#include "drv_i2c.h"
+#include "drv_touch.h"
+#include "drv_lcd.h"
+#include "touch_gt911.h"
+#include "string.h"
+#include "trace.h"
+#include "utils.h"
+#endif
+#endif
+
+#if defined ENABLE_MESH_SWITCH
+#include "app_msg.h"
+T_IO_MSG led_msg = {.type = IO_MSG_TYPE_LED_ON};
+T_IO_MSG led_off_msg = {.type = IO_MSG_TYPE_LED_OFF};
+#endif
+
+#if defined ENABLE_MATTER_SWITCH
+#endif
 
 DECLARE_HANDLER(writeSync)
 {
@@ -15,31 +38,51 @@ DECLARE_HANDLER(writeSync)
         char *direction = js_value_to_string(v2);
         jerry_release_value(v2);
         int mode = 0;
-#ifdef RTL87x2G
 
-        //if (!strcmp(direction, "out"))
-        //{
-        //    mode = PIN_MODE_OUTPUT;
-        //}
-        //else if (!strcmp(direction, "in"))
-        //{
-        //    mode = PIN_MODE_INPUT;
-        //}
+
         if (gpio >= 0)
         {
             gui_log("gpio%d, %d, %d", gpio, mode, write_value);
-            //drv_pin_mode(gpio, mode);
-            //drv_pin_write(gpio, write_value);
-            //extern bool app_send_msg_to_apptask(T_IO_MSG *p_msg);
-            //if(write_value == 0){
-            //led_msg.u.param = 0x64+gpio;
-            //app_send_msg_to_apptask(&led_msg);}
-            //else
-            //{
-            //    led_off_msg.u.param = 0x64+gpio;
-            //    app_send_msg_to_apptask(&led_off_msg);
-            // }
+            /**
+             * GPIO
+            */
+#ifdef ENABLE_GPIO_SWITCH
+#ifdef RTL87x2G
+            if (!strcmp(direction, "out"))
+            {
+                mode = PIN_MODE_OUTPUT;
+            }
+            else if (!strcmp(direction, "in"))
+            {
+                mode = PIN_MODE_INPUT;
+            }
+            drv_pin_mode(gpio, mode);
+            drv_pin_write(gpio, write_value);
+#endif
+#endif
+            /**
+             * MESH
+            */
+#ifdef ENABLE_MESH_SWITCH
+#ifdef RTL87x2G
+            extern bool app_send_msg_to_apptask(T_IO_MSG * p_msg);
+            if (write_value == 0)
+            {
+                led_msg.u.param = 0x64 + gpio;
+                app_send_msg_to_apptask(&led_msg);
+            }
+            else
+            {
+                led_off_msg.u.param = 0x64 + gpio;
+                app_send_msg_to_apptask(&led_off_msg);
+            }
+#endif
+#endif
+            /**
+             * MATTER
+            */
 #ifdef ENABLE_MATTER_SWITCH
+#ifdef RTL87x2G
             if (gpio >= 0)
             {
                 extern bool matter_send_msg_to_app(uint16_t sub_type, uint32_t param);
@@ -59,11 +102,9 @@ DECLARE_HANDLER(writeSync)
                 gui_log("gpio%d, %d, %d param %d", gpio, mode, write_value, param);
             }
 #endif
-
+#endif
         }
 
-
-#endif
         gui_free(direction);
     }
     return jerry_create_undefined();

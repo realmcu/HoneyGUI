@@ -3,7 +3,7 @@
   +  The GUI framework diagram is shown in the figure below:
   
   
-![APP](https://foruda.gitee.com/images/1669962011556176197/5cf9c62c_10088396.png "app.png")
+![Image description](https://foruda.gitee.com/images/1703071724612530370/974a550f_10088396.png "app fw.png")
 
 
   +  Each APP consists of a thread, a control tree, and event trigger callbacks (optional).

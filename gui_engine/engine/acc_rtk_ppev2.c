@@ -195,7 +195,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     target.win_y_min = 0;
     target.win_y_max = target.height;
     struct gui_rgb_data_head *head = image->data;
-    if (head->type != RTZIP_COMPRESS)
+    if (head->type != IMDC_COMPRESS)
     {
         switch (head->type)
         {
@@ -211,7 +211,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
         default:
             return;
         }
-        if (image->blend_mode == IMG_MAGIC_MATRIX)
+        if (image->blend_mode == IMG_SRC_OVER_MODE)
         {
             if ((image->target_w + image->img_x < dc->section.x1) ||
                 (image->target_h + image->img_y < dc->section.y1)
