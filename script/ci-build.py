@@ -74,6 +74,9 @@ def DOC_handler(module, submodule, manifest_path, repo_home, chip_type):
 
 def GUI_handler(module, submodule, manifest_path, repo_home, chip_type):
     ret1 = SDK_handler(module, submodule, manifest_path, repo_home, chip_type)
+    if not ret1:
+        print("SDK build fail!")
+        return False
     ret2 = DOC_handler(module, submodule, manifest_path, repo_home, chip_type)
     if ret1 and ret2:
         return True
