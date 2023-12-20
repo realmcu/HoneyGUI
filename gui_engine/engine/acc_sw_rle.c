@@ -26,6 +26,8 @@
 #if defined ( __CC_ARM ) && !defined(RTL8763EP)
 #define __FPU_PRESENT                  1            /* FPU present                                                             */
 #include "arm_math.h"
+#else
+#include "math.h"
 #endif
 
 typedef struct rtzip_file_header
