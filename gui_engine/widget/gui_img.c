@@ -170,11 +170,21 @@ static void img_prepare(gui_obj_t *obj)
     memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct rtgui_matrix));
     matrix_inverse(draw_img->inverse);
     rtgui_image_new_area(draw_img);
-    if (tp->type == TOUCH_SHORT)
+
+    int sx = obj->dx + obj->ax + obj->tx;
+    int sy = obj->dy + obj->ay + obj->ty;
+    int ex = sx + obj->w;
+    int ey = sy + obj->h;
+
+    if ((tp->x >= sx && tp->x <= ex) && (tp->y >= sy && tp->y <= ey))
     {
-        gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+        {
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+        }
+
     }
-    // gui_img_set_opacity((void *)obj, obj->opacity_value);
+
 
     uint8_t last = this->checksum;
     this->checksum = 0;
