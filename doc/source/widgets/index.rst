@@ -2,30 +2,32 @@ widgets
 *************
 
 ==================                   ==================
-Widgets                              Brief    
+Widgets                              Brief
 ------------------                   ------------------
-`screen`_                            The root widget of the widget tree   
-`window`_                            A rectangular container widget 
+`screen`_                            The root widget of the widget tree
+`window`_                            A rectangular container widget
 `img`_                               display image on the screen
+`stbimage`_                         use stb lib to decode standard image format files and display
 `text`_                              To display text, which can be used to output text in different fonts, different colors, and different sizes
 `tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
 `tab`_                               The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
 `curtainview`_                       Slide to extend and retract curtains
 `curtain`_                           Slide to extend and retract curtains
-`cardview`_                          Display a 3d card set 
-`card`_                              Display a 3d card set 
+`cardview`_                          Display a 3d card set
+`card`_                              Display a 3d card set
 `page`                               Swipe up and down to display the creation of controls in different vertical directions
 `switch`_                            Listen to on and off gesture
 `grid`_                              Display widgets set in a grid view(Evenly layout vertically and horizontally)
 `progressbar`_                       Show progress by showing part of picture, or one frame of pictures, or drawing bar of specified length
 `canvas`_                            using nanovg lib to draw 2d graphics
-`cube`_                              Display a cube 
+`cube`_                              Display a cube
 `perspective`_                       Slide to extend and retract curtains
 ==================                   ==================
 
 .. _screen: gui_screen.html
 .. _window: gui_window.html
 .. _img: gui_img.html
+.. _stbimg: gui_img_stb.html
 .. _text: gui_text.html
 .. _tabview: gui_tabview.html
 .. _tab: gui_tab.html
@@ -49,6 +51,7 @@ Widgets                              Brief
     screen <gui_screen>
     window <gui_window>
     img <gui_img>
+    stbimg <gui_img_stb>
     text <gui_text>
     tabview <gui_tabview>
     tab <gui_tab>
