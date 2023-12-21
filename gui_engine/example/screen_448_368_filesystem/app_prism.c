@@ -72,6 +72,26 @@ void callback_prism(void *obj, gui_event_t e)
     //     .data_addr[4] = HEARTRATE_BIN,
     //     .data_addr[5] = ACTIVITY_BIN
     // };
+    // gui_perspective_imgfile_t imgfile_re =
+    // {
+    //     .flg_fs = false,
+    //     .data_addr[0] = CLOCKN_BIN,
+    //     .data_addr[1] = WEATHER_BIN,
+    //     .data_addr[2] = MUSIC_BIN,
+    //     .data_addr[3] = MUSIC_BIN,
+    //     .data_addr[4] = MUSIC_BIN,
+    //     .data_addr[5] = MUSIC_BIN
+    // };
+    // gui_perspective_imgfile_t imgfile_re =
+    // {
+    //     .flg_fs = true,
+    //     .img_path[0] = "Weather.bin",
+    //     .img_path[1] = "Weather.bin",
+    //     .img_path[2] = "Music.bin",
+    //     .img_path[3] = "Weather.bin",
+    //     .img_path[4] = "Weather.bin",
+    //     .img_path[5] = "Activity.bin"
+    // };
 #else
     gui_perspective_imgfile_t imgfile =
     {
@@ -85,6 +105,7 @@ void callback_prism(void *obj, gui_event_t e)
     };
 #endif
     img_test = gui_perspective_create(canvas, "test", &imgfile, 0, 0);
+    // gui_perspective_set_img(img_test, &imgfile_re);
 
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,
                          NULL);

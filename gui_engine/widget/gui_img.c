@@ -407,30 +407,45 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
                            int16_t y)
 {
     GUI_ASSERT(img != NULL);
-    img->base.x = x;
-    img->base.y = y;
+    gui_img_t *this = img;
+    draw_img_t *draw_img = &img->draw_img;
+
+    this->base.x = x;
+    this->base.y = y;
+
+    // reset file data
+    if (this->flg_fs)
+    {
+        if (draw_img->data)
+        {
+            gui_free(draw_img->data);
+            draw_img->data = NULL;
+        }
+
+#ifdef _WIN32
+        gui_free(this->img_path);
+#endif
+        this->img_path = NULL;
+    }
+    else
+    {
+        this->draw_img.data = NULL;
+    }
+
     if (addr != NULL)
     {
-        draw_img_t *draw_img = &img->draw_img;
-        img->flg_fs = false;
+        this->flg_fs = false;
         draw_img->data = addr;
     }
     else if (filename)
     {
-        if (img->flg_fs && img->draw_img.data)
-        {
-            gui_free(img->draw_img.data);
-            img->draw_img.data = NULL;
-        }
+        this->flg_fs = true;
 
         void *path = (void *)filename;
-        img->flg_fs = true;
 #ifdef _WIN32
-        gui_free(img->img_path);
         path = gui_img_filepath_transforming(path);
 #endif
-        img->img_path = path;
-        img->draw_img.data = NULL;
+        this->img_path = path;
     }
 }
 

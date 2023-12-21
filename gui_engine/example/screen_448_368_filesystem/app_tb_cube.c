@@ -30,6 +30,26 @@ void page_tb_cube(void *parent)
     //     .data_addr.data_addr_left = MUSIC_BIN,
     //     .data_addr.data_addr_right = QUICKCARD_BIN
     // };
+    // gui_cube_imgfile_t imgfile_re =
+    // {
+    //     .flg_fs = true,
+    //     .img_path.img_path_front = "Activity.bin",
+    //     .img_path.img_path_back = "Activity.bin",
+    //     .img_path.img_path_up = "Activity.bin",
+    //     .img_path.img_path_down = "Clockn.bin",
+    //     .img_path.img_path_left = "Activity.bin",
+    //     .img_path.img_path_right = "QuickCard.bin"
+    // };
+    gui_cube_imgfile_t imgfile_re =
+    {
+        .flg_fs = false,
+        .data_addr.data_addr_front = WEATHER_BIN,
+        .data_addr.data_addr_back = WEATHER_BIN,
+        .data_addr.data_addr_up =  WEATHER_BIN,
+        .data_addr.data_addr_down = CLOCKN_BIN,
+        .data_addr.data_addr_left = WEATHER_BIN,
+        .data_addr.data_addr_right = QUICKCARD_BIN
+    };
 #else
     gui_cube_imgfile_t imgfile =
     {
@@ -45,6 +65,8 @@ void page_tb_cube(void *parent)
     gui_cube_t *cube4 = gui_cube_create(parent, "cube", &imgfile, 0, 0);
     // "Clockn.bin"
     gui_cube_set_mode(cube4, CUBE_SIDE_DOWN, IMG_SRC_OVER_MODE);
+    gui_cube_set_img(cube4, &imgfile_re);
+
     gui_cube_set_size(cube4, 100);
     gui_cube_set_center(cube4, 200, 200);
     gui_win_t *win_function = gui_win_create(parent, "win_function", 0, 0, 368, 448);

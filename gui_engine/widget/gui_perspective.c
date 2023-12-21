@@ -594,31 +594,46 @@ void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_img
     gui_perspective_t *this = perspective;
 
     GUI_ASSERT(this != NULL);
-    this->flg_fs = img_file->flg_fs;
-
-    void **array = (void **)img_file->img_path;
+    // reset file data
     for (int i = 0; i < 6; i++)
     {
-        if (img_file->flg_fs)
+        if (this->flg_fs)
         {
             if (this->img[i].data)
             {
                 gui_free(this->img[i].data);
+                this->img[i].data = NULL;
             }
-            char *path = array[i];
 #ifdef _WIN32
             gui_free(this->img_path[i]);
-            path = gui_img_filepath_transforming(array[i]);
 #endif
-            this->img_path[i] = path;
-            this->img[i].data = NULL;
+            this->img_path[i] = NULL;
         }
         else
         {
-            this->img[i].data = array[i];
+            this->img[i].data = NULL;
+        }
+    }
+
+    // set new images
+    this->flg_fs = img_file->flg_fs;
+    for (int i = 0; i < 6; i++)
+    {
+        if (this->flg_fs)
+        {
+            void *path = (void *)img_file->img_path[i];
+#ifdef _WIN32
+            path = gui_img_filepath_transforming(path);
+#endif
+            this->img_path[i] = path;
+        }
+        else
+        {
+            this->img[i].data = img_file->data_addr[i];
         }
     }
 }
+
 gui_perspective_t *gui_perspective_create(void *parent,  const char *name,
                                           gui_perspective_imgfile_t *img_file,
                                           int16_t x,

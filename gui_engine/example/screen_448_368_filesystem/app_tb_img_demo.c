@@ -76,7 +76,8 @@ void callback_img_demo(void *obj, gui_event_t e)
     case 9:
         {
             gui_log("filepath\n");
-            gui_img_set_attribute(img_demo, "Activity.bin", NULL, 0, 0);
+            // gui_img_set_attribute(img_demo, "Activity.bin", NULL, 0, 0);
+            gui_img_set_attribute(img_demo, NULL, ACTIVITY_BIN, 0, 0);
             break;
         }
     case 10:

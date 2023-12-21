@@ -8,10 +8,10 @@ The perspective is a hexagonal prism-like widget that uses six tabs as column fa
 ## Usage
 
 ### Create perspective widget
-[gui_perspective_t *gui_perspective_create(void *parent,  const char *name, gui_perspective_imgfile_t *img_file, int16_t x, int16_t y);](#gui_perspective_create) is used to create a perspective widget. The `img_file` is an struct including image sources for the six pages. Both memory address and file path are supported, `uint8_t flg_fs` should be set `true` when using filesystem.
+[gui_perspective_t *gui_perspective_create(void *parent,  const char *name, gui_perspective_imgfile_t *img_file, int16_t x, int16_t y)](#gui_perspective_create) is used to create a perspective widget. The `img_file` is an struct including image sources for the six pages. Both memory address and file path are supported, `uint8_t flg_fs` should be set `true` when using filesystem.
 
 ### Set image mode
-By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, You can change the blend mode of image by calling [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#api).
+By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, you can change the blend mode of image by calling [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#api).
 
 ### Set cube image
 The images of cube can be configured by calling [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#api).

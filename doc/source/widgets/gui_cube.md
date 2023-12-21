@@ -6,7 +6,7 @@ The cube is a 3D display widget that show a rotating cube with six faces, each c
 
 ## Usage
 ### Create a cube
-[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y);](#api) creates a cube widget. The `img_file` is an struct including image sources for the six faces of a cube. Both memory address and file path are supported, `uint8_t flg_fs` should be set `true` when using filesystem.
+[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y)](#api) creates a cube widget. The `img_file` is an struct including image sources for the six faces of a cube. Both memory address and file path are supported, `uint8_t flg_fs` should be set `true` when using filesystem.
 
 ### Set size
 By default, the cube's size is `dc->fb_height / 8.0`. If you want to change the size set [void gui_cube_set_size(cube, size)](#api). Note this `size` is the 1/2 length of cube edge.
@@ -15,7 +15,7 @@ By default, the cube's size is `dc->fb_height / 8.0`. If you want to change the 
 By default, the center is `((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`. You can use [void gui_cube_set_center(cube, c_x, c_y)](#api) to set the center coordinates of the cube.
 
 ### Set image mode
-By default, the cube's image blend mode is `IMG_FILTER_BLACK`, You can change the blend mode of image by calling [void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api).
+By default, the cube's image blend mode is `IMG_FILTER_BLACK`, you can change the blend mode of image by calling [void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api).
 
 ### Set cube image
 The images of cube can be configured by calling [void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#api).

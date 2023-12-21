@@ -709,7 +709,6 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
     gui_cube_t *this = cube;
 
     GUI_ASSERT(this != NULL);
-    this->flg_fs = img_file->flg_fs;
 
     draw_img_t *cube_img[6];
     cube_img[0] = &this->draw_img_front;
@@ -719,23 +718,40 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
     cube_img[4] = &this->draw_img_left;
     cube_img[5] = &this->draw_img_right;
 
-    if (img_file->flg_fs)
+    char *img_path[6];
+    img_path[0] = this->img_path.img_path_front;
+    img_path[1] = this->img_path.img_path_back;
+    img_path[2] = this->img_path.img_path_up;
+    img_path[3] = this->img_path.img_path_down;
+    img_path[4] = this->img_path.img_path_left;
+    img_path[5] = this->img_path.img_path_right;
+
+    // reset file data
+    for (int i = 0; i < 6; i++)
     {
-        for (uint8_t i = 0; i < 6; i++)
+        if (this->flg_fs)
         {
             if (cube_img[i]->data)
             {
                 gui_free(cube_img[i]->data);
                 cube_img[i]->data = NULL;
             }
-        }
 #ifdef _WIN32
-        gui_free(this->img_path.img_path_front);
-        gui_free(this->img_path.img_path_back);
-        gui_free(this->img_path.img_path_up);
-        gui_free(this->img_path.img_path_down);
-        gui_free(this->img_path.img_path_left);
-        gui_free(this->img_path.img_path_right);
+            gui_free(img_path[i]);
+#endif
+            *(img_path[i]) = NULL;
+        }
+        else
+        {
+            cube_img[i]->data = NULL;
+        }
+    }
+
+    // set new images
+    this->flg_fs = img_file->flg_fs;
+    if (img_file->flg_fs)
+    {
+#ifdef _WIN32
         img_file->img_path.img_path_front = gui_img_filepath_transforming(
                                                 img_file->img_path.img_path_front);
         img_file->img_path.img_path_back = gui_img_filepath_transforming(img_file->img_path.img_path_back);
