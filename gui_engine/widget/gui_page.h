@@ -54,12 +54,17 @@ typedef struct gui_page
     uint32_t widget_count;
     uint32_t width;
     int yold;
+    int y_last;
+    int count;
+    int speed;
+
     int start_x;
     int start_y;
     gui_img_t *scroll_bar;
     int get_yend;
     void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
+    bool release;
 } gui_page_t;
 
 /** @brief  PAGE widget api structure */
