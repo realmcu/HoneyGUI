@@ -127,6 +127,7 @@ void filter_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
+    return;
 }
 #if 0
 static void filter_blit_rgb565_2_rgb565_with_alpha(draw_img_t *image, struct gui_dispdev *dc,
@@ -221,6 +222,7 @@ void filter_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
         }
     }
+    return;
 }
 void filter_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
@@ -260,14 +262,35 @@ void filter_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+            uint8_t opacity_value = image->opacity_value;
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-                writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//b
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
+                    }
+                    break;
+                default:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                          + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    }
+                    break;
+                }
             }
         }
     }
+    return;
 }
 void filter_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
@@ -307,14 +330,35 @@ void filter_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+            uint8_t opacity_value = image->opacity_value;
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-                writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//b
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
+                    }
+                    break;
+                default:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                          + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    }
+                    break;
+                }
             }
         }
     }
+    return;
 }
 void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
@@ -328,6 +372,7 @@ void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    uint8_t opacity_value = image->opacity_value;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -355,12 +400,33 @@ void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
             pixel = *((uint16_t *)read_off + j);
             if (pixel != 0)
             {
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
-                writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                    }
+                    break;
+                default:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) * (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) *
+                                                                              (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value)) / 256 ;
+                    }
+                    break;
+                }
             }
         }
     }
+    return;
 }
 void filter_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
@@ -402,15 +468,34 @@ void filter_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-                writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                uint8_t opacity_value = image->opacity_value;
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                    }
+                    break;
+                default:
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                      + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                    break;
+                }
+
             }
         }
     }
+    return;
 }
-
-
 
 void filter_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                      struct rtgui_rect *rect)
@@ -450,27 +535,38 @@ void filter_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            switch (image->opacity_value)
+            int8_t opacity_value = image->opacity_value;
+            if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-            case 0:
-                break;
-            case 255:
+                switch (opacity_value)
                 {
-                    if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
+                case 0:
+                    break;
+                case 255:
                     {
+
                         writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
                         writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
                         writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
                         writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
                     }
+                    break;
+                default:
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                      + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = (pixel[3] * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 3] * opacity_value)) / 256 ;
+                    break;
                 }
-                break;
-            default:
-                break;
             }
 
         }
     }
+    return;
 }
 
 void filter_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
@@ -516,7 +612,7 @@ void filter_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
         }
     }
-
+    return;
 }
 
 void filter_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
@@ -569,14 +665,42 @@ void filter_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = *((uint16_t *)read_off + j);
-            if (pixel  != 0)
+            uint8_t opacity_value = image->opacity_value;
+            switch (opacity_value)
             {
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
-                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
-                writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+            case 0:
+                break;
+            case 255:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                }
+                break;
+            default:
+                {
+                    if (opacity_value < 255)
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) *
+                                                                              (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) *
+                                                                              (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) *
+                                                                          (256 - opacity_value)
+                                                                          + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                break;
             }
         }
     }
+    return;
 }
 
 void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
@@ -619,7 +743,7 @@ void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
         }
     }
-
+    return;
 }
 
 void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
@@ -646,7 +770,7 @@ void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
 
     int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
+    uint8_t opacity_value = image->opacity_value;
     for (uint32_t i = y_start; i < y_end; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -659,11 +783,32 @@ void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = *((uint16_t *)read_off + j);
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
-            writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                }
+                break;
+            default:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) *
+                                                                          (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) * (256 - opacity_value)
+                                                                      + (writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value)) / 256 ;
+                }
+                break;
+            }
         }
     }
+    return;
 }
 void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
@@ -689,7 +834,7 @@ void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
 
     int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
+    uint8_t opacity_value = image->opacity_value;
     for (uint32_t i = y_start; i < y_end; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -703,13 +848,32 @@ void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-
-            writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//b
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
+                }
+                break;
+            default:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                      + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                }
+                break;
+            }
 
         }
     }
+    return;
 }
 void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
@@ -735,7 +899,7 @@ void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
 
     int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
+    uint8_t opacity_value = image->opacity_value;
     for (uint32_t i = y_start; i < y_end; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -749,13 +913,32 @@ void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-
-            writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//b
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//g
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
+                }
+                break;
+            default:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                          + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                      + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                }
+                break;
+            }
 
         }
     }
+    return;
 }
 void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    struct rtgui_rect *rect)
@@ -796,9 +979,28 @@ void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
 
-            writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+            uint8_t opacity_value = image->opacity_value;
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = pixel[0];//R
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1];//G
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                }
+                break;
+            default:
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                      + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                      + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                  + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //B
+                break;
+            }
         }
     }
 }
@@ -840,14 +1042,35 @@ void bypass_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
+            uint8_t opacity_value = image->opacity_value;
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
 
-            writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
+                    writebuf[(write_off + j) * dc_bytes_per_pixel    ] = pixel[0]; //B
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = pixel[1]; //G
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = pixel[2]; //R
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = pixel[3]; //A
+                }
+                break;
+            default:
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel[2] * (256 - opacity_value)
+                                                                      + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel[1]) * (256 - opacity_value)
+                                                                      + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                writebuf[(write_off + j) * dc_bytes_per_pixel] = ((pixel[0]) * (256 - opacity_value)
+                                                                  + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = (pixel[3] * (256 - opacity_value)
+                                                                      + (writebuf[(write_off + j) * dc_bytes_per_pixel + 3] * opacity_value)) / 256 ;
+                break;
 
+            }
         }
     }
+    return;
 }
 
 void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
@@ -892,7 +1115,6 @@ void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     }
 
 }
-
 
 void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
@@ -972,10 +1194,40 @@ void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = *((uint16_t *)read_off + j);
+            uint8_t opacity_value = image->opacity_value;
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                    writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
+                }
+                break;
+            default:
+                {
+                    if (opacity_value < 255)
+                    {
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) *
+                                                                              (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) *
+                                                                              (256 - opacity_value)
+                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * opacity_value)) / 256 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) *
+                                                                          (256 - opacity_value)
+                                                                          + writebuf[(write_off + j) * dc_bytes_per_pixel] * opacity_value) / 256 ;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                break;
+            }
 
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
-            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
-            writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
         }
     }
 
@@ -1318,7 +1570,6 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
     return;
 }
 
-
 void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                             struct rtgui_rect *rect)
 {
@@ -1656,7 +1907,6 @@ void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_disp
             uint8_t opacity_value = (uint8_t)image->opacity_value;
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
-                //uint8_t opacity_value = image->opacity_value;
                 switch (opacity_value)
                 {
                 case 0:
