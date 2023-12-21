@@ -106,6 +106,7 @@ static void rtgui_server_entry(void *parameter)
                 gui_tree_free(&((gui_app_t *)app)->screen);
                 current_app = next_app;
                 next_app = 0;
+                app = current_app;
             }
             else
             {
