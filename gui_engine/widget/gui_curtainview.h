@@ -155,7 +155,6 @@ typedef struct gui_curtainview
  * @param y the Y-axis coordinate relative to parent widget.
  * @param w width.
  * @param h height.
- * @param scope the scope of every curtain.
  * @return return the widget object pointer.
  *
  */

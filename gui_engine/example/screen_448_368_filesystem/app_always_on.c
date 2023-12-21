@@ -152,15 +152,14 @@ void always_on_ui_design(gui_obj_t *parent)
     gui_perspective_imgfile_t imgfile =
     {
         .flg_fs = false,
-        .data_addr[0] = ACTIVITY_BIN,
+        .data_addr[0] = CLOCKN_BIN,
         .data_addr[1] = WEATHER_BIN,
-        .data_addr[2] = HEARTRATE_BIN,
-        .data_addr[3] = CLOCKN_BIN,
-        .data_addr[4] = MUSIC_BIN,
-        .data_addr[5] = QUICKCARD_BIN
+        .data_addr[2] = MUSIC_BIN,
+        .data_addr[3] = QUICKCARD_BIN,
+        .data_addr[4] = HEARTRATE_BIN,
+        .data_addr[5] = ACTIVITY_BIN
     };
     per = gui_perspective_create(win_always_on, "test", &imgfile, 0, 0);
-
     GET_BASE(per)->not_show = true;
     gui_obj_add_event_cb(win_always_on, (gui_event_cb_t)callback_always_on, GUI_EVENT_TOUCH_PRESSED,
                          NULL);

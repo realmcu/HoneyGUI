@@ -44,6 +44,7 @@ extern "C" {
 typedef struct gui_img
 {
     gui_obj_t base;
+    char *img_path;
     draw_img_t draw_img;
 
     float degrees;
@@ -55,6 +56,7 @@ typedef struct gui_img
     float t_y;//!< center of screen y
     gui_animate_t *animate;
     uint8_t checksum;
+    uint8_t flg_fs;
 } gui_img_t;
 
 
@@ -128,14 +130,14 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
  * @brief Rotate the image around the center of the circle
  *
  * @param img the image widget pointer.
- * @param degrees rotation angle
+ * @param degrees clockwise rotation absolute angle
  * @param c_x The X-axis coordinates of the center of the circle
  * @param c_y The Y-axis coordinates of the center of the circle
  */
 void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y);
 
 /**
- * @brief Change the size of the image
+ * @brief Change the size of the image, take (0, 0) as the zoom center
  *
  * @param img the image widget pointer.
  * @param scale_x Scale in the x direction
@@ -166,13 +168,13 @@ void gui_img_skew_x(gui_img_t *img, float degrees);
  * @param img the image widget pointer.
  * @param degrees skew angle
  */
-void gui_img_skew_x(gui_img_t *img, float degrees);
+void gui_img_skew_y(gui_img_t *img, float degrees);
 
 /**
  * @brief Add opacity value to the image
  *
  * @param this the image widget pointer.
- * @param opacity_value The opacity value ranges from 0 to 255.
+ * @param opacity_value The opacity value ranges from 0 to 255, default 255.
  */
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
 
@@ -183,7 +185,7 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
  * @param name widget name
  * @param addr bin file address
  * @param x the X-axis coordinate of the widget.
- * @param x the Y-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
  * @param h the hight of the widget.
  * @return return the widget object pointer.
@@ -196,7 +198,7 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
  * @param parent the father widget it nested in.
  * @param file image file path
  * @param x the X-axis coordinate of the widget.
- * @param x the Y-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
  * @return gui_magic_img_t*
  */
 gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);

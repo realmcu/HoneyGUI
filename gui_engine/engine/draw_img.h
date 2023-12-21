@@ -58,7 +58,6 @@ typedef struct draw_img
     unsigned char opacity_value;
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
-
 } draw_img_t;
 
 typedef struct rtgui_image_engine

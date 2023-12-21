@@ -144,7 +144,7 @@ extern gui_api_button_t gui_button_api;
 
 
 /**
- * @brief Creat a button widget.
+ * @brief Creat a button widget from memory, images are loaded from memory address.
  *
  * @param parent The father widget which the button nested in.
  * @param x The X-axis relative coordinate of the button(left).
@@ -176,6 +176,37 @@ gui_button_t *gui_button_create(
 );
 
 /**
+ * @brief Creat a button widget from fs, images are loaded from filesystem.
+ *
+ * @param parent The father widget which the button nested in.
+ * @param x The X-axis relative coordinate of the button(left).
+ * @param y The Y-axis v coordinate of the button(up).
+ * @param w The width of the button(response area).
+ * @param h The hight of the button(response area).
+ * @param background_pic The image shown when button was not pressed.
+ * @param highlight_pic The image shown when button was pressed.
+ * @param text The text of the button which always shown.
+ * @param image_type shoule be 0.
+ * @param count shoule be 0.
+ * @return Return the widget object pointer
+ * <b>Example usage</b>
+ * \code{.c}
+ * gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img2, text, 0, 0);
+ * \endcode
+ */
+gui_button_t *gui_button_create_from_fs(
+    void *parent,
+    int16_t x,
+    int16_t y,
+    int16_t w,
+    int16_t h,
+    void *background_pic,
+    void *highlight_pic,
+    char *text,
+    char image_type,
+    int count
+);
+/**
  * @brief please use gui_obj_add_event_cb to set gesture trigger.
  *
  * @param this
@@ -187,6 +218,7 @@ void gui_button_click(gui_button_t *this, gui_event_cb_t event_cb);
  *
  * @param this
  * @param event_cb
+ * @param parameter
  */
 void gui_button_press(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
 /**
@@ -194,6 +226,7 @@ void gui_button_press(gui_button_t *this, gui_event_cb_t event_cb, void *paramet
  *
  * @param this
  * @param event_cb
+ * @param parameter
  */
 void gui_button_long(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
 /**
@@ -201,6 +234,7 @@ void gui_button_long(gui_button_t *this, gui_event_cb_t event_cb, void *paramete
  *
  * @param this
  * @param event_cb
+ * @param parameter
  */
 void gui_button_release(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
 /**
@@ -231,7 +265,7 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y);
  *
  * @param o
  * @param dur
- * @param reapteCount
+ * @param repeatCount
  * @param callback
  * @param p
  */

@@ -107,13 +107,12 @@ static void obj_draw_end(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->obj_end != NULL)
+        {
+            obj->obj_end(obj);
+        }
         if (obj->active)
         {
-            if (obj->obj_end != NULL)
-            {
-                obj->obj_end(obj);
-            }
-
             for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
             {
                 gui_event_dsc_t *event_dsc = obj->event_dsc + i;

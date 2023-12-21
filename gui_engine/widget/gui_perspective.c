@@ -369,14 +369,22 @@ static bool full_rank(struct rtgui_matrix *m)
 
 static int ry[6] = {0, 60, 120, 180, 240, 300};
 static int temp[6] = {0, 60, 120, 180, 240, 300};
+
+extern void gui_load_imgfile_from_fs(const char *file_path, draw_img_t *draw_img);
 static void prepare(gui_obj_t *obj)
 {
+    // gui_log("perspective %s \n", __FUNCTION__);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
 
     gui_perspective_t *this = (gui_perspective_t *)obj;
     for (int i = 0; i < 6; i++)
     {
+        if (this->flg_fs)
+        {
+            gui_load_imgfile_from_fs(this->img_path[i], &this->img[i]);
+        }
+
         rtgui_image_load_scale(&this->img[i]);
         matrix_identity(this->img[i].matrix);
     }
@@ -502,18 +510,38 @@ static void draw_cb(gui_obj_t *obj)
 
 static void end(gui_obj_t *obj)
 {
-
+    // gui_log("perspective %s \n", __FUNCTION__);
+    for (int i = 0; i < 6; i++)
+    {
+        if (((gui_perspective_t *)obj)->flg_fs)
+        {
+            gui_free(((gui_perspective_t *)obj)->img[i].data);
+            ((gui_perspective_t *)obj)->img[i].data = NULL;
+        }
+    }
 }
 static void destory(gui_obj_t *obj)
 {
-
+    gui_log("perspective %s \n", __FUNCTION__);
+    for (int i = 0; i < 6; i++)
+    {
+        gui_free(((gui_perspective_t *)obj)->img[i].inverse);
+        gui_free(((gui_perspective_t *)obj)->img[i].matrix);
+        if (((gui_perspective_t *)obj)->flg_fs)
+        {
+#ifdef _WIN32
+            // free path transforming memory on win
+            gui_free(((gui_perspective_t *)obj)->img_path[i]);
+#endif
+        }
+    }
 }
+extern char *gui_img_filepath_transforming(void *addr);
 static void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, const char *name,
-                                 void *addr,
+                                 gui_perspective_imgfile_t *img_file,
                                  int16_t x,
                                  int16_t y, int16_t w, int16_t h)
 {
-
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
     gui_obj_ctor(base, parent, name, x, y, w, h);
@@ -527,23 +555,74 @@ static void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, con
     root->obj_destory = destory;
 
     //for self
-    void **array = (void **)addr;
+    this->flg_fs = img_file->flg_fs;
+    void **array = (void **)img_file->img_path;
     for (int i = 0; i < 6; i++)
     {
-        this->img[i].data = array[i];
+        if (img_file->flg_fs)
+        {
+            char *path = array[i];
+#ifdef _WIN32
+            path = gui_img_filepath_transforming(array[i]);
+#endif
+            this->img_path[i] = path;
+        }
+        else
+        {
+            this->img[i].data = array[i];
+        }
+
         this->img[i].opacity_value = UINT8_MAX;
         this->img[i].blend_mode = IMG_SRC_OVER_MODE;
         this->img[i].matrix = gui_malloc(sizeof(struct rtgui_matrix));
         this->img[i].inverse = gui_malloc(sizeof(struct rtgui_matrix));
     }
-
 }
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void *data,
+void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index,
+                              BLEND_MODE_TYPE mode)
+{
+    GUI_ASSERT(perspective != NULL);
+    draw_img_t *draw_img = &perspective->img[img_index];
+    draw_img->blend_mode = mode;
+}
+
+void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)
+{
+    gui_perspective_t *this = perspective;
+
+    GUI_ASSERT(this != NULL);
+    this->flg_fs = img_file->flg_fs;
+
+    void **array = (void **)img_file->img_path;
+    for (int i = 0; i < 6; i++)
+    {
+        if (img_file->flg_fs)
+        {
+            if (this->img[i].data)
+            {
+                gui_free(this->img[i].data);
+            }
+            char *path = array[i];
+#ifdef _WIN32
+            gui_free(this->img_path[i]);
+            path = gui_img_filepath_transforming(array[i]);
+#endif
+            this->img_path[i] = path;
+            this->img[i].data = NULL;
+        }
+        else
+        {
+            this->img[i].data = array[i];
+        }
+    }
+}
+gui_perspective_t *gui_perspective_create(void *parent,  const char *name,
+                                          gui_perspective_imgfile_t *img_file,
                                           int16_t x,
-                                          int16_t y, int16_t w, int16_t h)
+                                          int16_t y)
 {
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
@@ -554,7 +633,8 @@ gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void 
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_perspective_t));
 
-    gui_perspective_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
+    gui_perspective_ctor(this, (gui_obj_t *)parent, name, img_file, x, y, 0, 0);
+
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
     {
@@ -564,7 +644,6 @@ gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void 
     GET_BASE(this)->create_done = true;
     return this;
 }
-
 /** End of WIDGET_Exported_Functions
   * @}
   */

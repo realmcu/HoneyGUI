@@ -9,7 +9,14 @@
 			"lvgl.h": "c",
 			"lv_port_disp.h": "c",
 			"lv_conf.h": "c",
-			"gui_cube.h": "c"
+			"gui_cube.h": "c",
+			"romfs.h": "c",
+			"array": "c",
+			"string": "c",
+			"string_view": "c",
+			"*.tcc": "c",
+			"cstdlib": "c",
+			"memory": "c"
 		}
 	}
 }

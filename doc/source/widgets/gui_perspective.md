@@ -8,8 +8,13 @@ The perspective is a hexagonal prism-like widget that uses six tabs as column fa
 ## Usage
 
 ### Create perspective widget
+[gui_perspective_t *gui_perspective_create(void *parent,  const char *name, gui_perspective_imgfile_t *img_file, int16_t x, int16_t y);](#gui_perspective_create) is used to create a perspective widget. The `img_file` is an struct including image sources for the six pages. Both memory address and file path are supported, `uint8_t flg_fs` should be set `true` when using filesystem.
 
-[gui_perspective_create(parent, name, addr, x, y, w, h)](#gui_perspective_create) is used to create a perspective widget, where the `addr` field is an array containing different tabs.
+### Set image mode
+By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, You can change the blend mode of image by calling [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#api).
+
+### Set cube image
+The images of cube can be configured by calling [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#api).
 
 ## Example
 
@@ -65,8 +70,28 @@ void callback_prism(void *obj, gui_event_t e)
     gui_win_t *win = gui_win_create(screen, "win", 0, 0, 368, 448);
     gui_canvas_t *canvas = gui_canvas_create(win, "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
-    uint8_t *array_flash[] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
-    img_test = gui_perspective_create(canvas, "test", array_flash, 0, 0, 0, 0);
+    gui_perspective_imgfile_t imgfile =
+    {
+        .flg_fs = true,
+        .img_path[0] = "Clockn.bin",
+        .img_path[1] = "Weather.bin",
+        .img_path[2] = "Music.bin",
+        .img_path[3] = "QuickCard.bin",
+        .img_path[4] = "HeartRate.bin",
+        .img_path[5] = "Activity.bin"
+    };
+    //// using memory address
+    // gui_perspective_imgfile_t imgfile =
+    // {
+    //     .flg_fs = false,
+    //     .data_addr[0] = CLOCKN_BIN,
+    //     .data_addr[1] = WEATHER_BIN,
+    //     .data_addr[2] = MUSIC_BIN,
+    //     .data_addr[3] = QUICKCARD_BIN,
+    //     .data_addr[4] = HEARTRATE_BIN,
+    //     .data_addr[5] = ACTIVITY_BIN
+    // };
+    img_test = gui_perspective_create(canvas, "test", &imgfile, 0, 0);
 
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,NULL);
 }

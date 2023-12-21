@@ -71,3 +71,4 @@ doc/_build
 
 # editor config
 .vscode/
+win32_sim/gui.bin

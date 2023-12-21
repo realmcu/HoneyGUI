@@ -315,8 +315,10 @@ static bool full_rank(struct rtgui_matrix *m)
     return true;
 }
 
+extern void gui_load_imgfile_from_fs(const char *file_path, draw_img_t *draw_img);
 static void cube_prepare(gui_obj_t *obj)
 {
+    // gui_log("%s \n", __FUNCTION__);
     Vertex_t cube_v0 = {-1.0, -1.0, -1.0};
     Vertex_t cube_v1 = {1.0, -1.0, -1.0};
     Vertex_t cube_v2 = {1.0, 1.0, -1.0};
@@ -400,6 +402,16 @@ static void cube_prepare(gui_obj_t *obj)
     draw_img_t *left = &this->draw_img_left;
     draw_img_t *right = &this->draw_img_right;
 
+    // malloc for images
+    if (this->flg_fs)
+    {
+        gui_load_imgfile_from_fs(this->img_path.img_path_front, front);
+        gui_load_imgfile_from_fs(this->img_path.img_path_back, back);
+        gui_load_imgfile_from_fs(this->img_path.img_path_up, up);
+        gui_load_imgfile_from_fs(this->img_path.img_path_down, down);
+        gui_load_imgfile_from_fs(this->img_path.img_path_left, left);
+        gui_load_imgfile_from_fs(this->img_path.img_path_right, right);
+    }
 
     rtgui_image_load_scale(front);
     rtgui_image_load_scale(back);
@@ -542,29 +554,66 @@ static void cube_draw_cb(gui_obj_t *obj)
 
 static void cube_end(gui_obj_t *obj)
 {
+    // gui_log("%s \n", __FUNCTION__);
+    gui_cube_t *this = (gui_cube_t *)obj;
+    draw_img_t *cube_img[6];
 
+    cube_img[0] = &this->draw_img_front;
+    cube_img[1] = &this->draw_img_back;
+    cube_img[2] = &this->draw_img_up;
+    cube_img[3] = &this->draw_img_down;
+    cube_img[4] = &this->draw_img_left;
+    cube_img[5] = &this->draw_img_right;
+
+    for (int i = 0; i < 6; i++)
+    {
+        if (this->flg_fs)
+        {
+            gui_free(cube_img[i]->data);
+            cube_img[i]->data = NULL;
+        }
+    }
 }
 static void cube_destory(gui_obj_t *obj)
 {
+    // gui_log("%s \n", __FUNCTION__);
     gui_cube_t *this = (gui_cube_t *)obj;
-    gui_free(this->draw_img_front.matrix);
-    gui_free(this->draw_img_back.matrix);
-    gui_free(this->draw_img_up.matrix);
-    gui_free(this->draw_img_down.matrix);
-    gui_free(this->draw_img_left.matrix);
-    gui_free(this->draw_img_right.matrix);
+    draw_img_t *cube_img[6];
 
-    gui_free(this->draw_img_front.inverse);
-    gui_free(this->draw_img_back.inverse);
-    gui_free(this->draw_img_up.inverse);
-    gui_free(this->draw_img_down.inverse);
-    gui_free(this->draw_img_left.inverse);
-    gui_free(this->draw_img_right.inverse);
+    cube_img[0] = &this->draw_img_front;
+    cube_img[1] = &this->draw_img_back;
+    cube_img[2] = &this->draw_img_up;
+    cube_img[3] = &this->draw_img_down;
+    cube_img[4] = &this->draw_img_left;
+    cube_img[5] = &this->draw_img_right;
 
+#ifdef _WIN32
+    char *img_path[6];
+    img_path[0] = this->img_path.img_path_front;
+    img_path[1] = this->img_path.img_path_back;
+    img_path[2] = this->img_path.img_path_up;
+    img_path[3] = this->img_path.img_path_down;
+    img_path[4] = this->img_path.img_path_left;
+    img_path[5] = this->img_path.img_path_right;
+#endif
+
+    for (int i = 0; i < 6; i++)
+    {
+        gui_free(cube_img[i]->inverse);
+        gui_free(cube_img[i]->matrix);
+        if (this->flg_fs)
+        {
+#ifdef _WIN32
+            // free path transforming memory on win
+            gui_free(img_path[i]);
+#endif
+        }
+    }
 }
 
+extern char *gui_img_filepath_transforming(void *addr);
 static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
-                          void *addr,
+                          gui_cube_imgfile_t *img_file,
                           int16_t x,
                           int16_t y, int16_t w, int16_t h)
 {
@@ -581,46 +630,46 @@ static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
     root->obj_end = cube_end;
     root->obj_destory = cube_destory;
     //for self
-    void **array = (void **)addr;
+    draw_img_t *cube_img[6];
+    cube_img[0] = &this->draw_img_front;
+    cube_img[1] = &this->draw_img_back;
+    cube_img[2] = &this->draw_img_up;
+    cube_img[3] = &this->draw_img_down;
+    cube_img[4] = &this->draw_img_left;
+    cube_img[5] = &this->draw_img_right;
 
+    if (img_file->flg_fs)
+    {
+#ifdef _WIN32
+        img_file->img_path.img_path_front = gui_img_filepath_transforming(
+                                                img_file->img_path.img_path_front);
+        img_file->img_path.img_path_back = gui_img_filepath_transforming(img_file->img_path.img_path_back);
+        img_file->img_path.img_path_up = gui_img_filepath_transforming(img_file->img_path.img_path_up);
+        img_file->img_path.img_path_down = gui_img_filepath_transforming(img_file->img_path.img_path_down);
+        img_file->img_path.img_path_left = gui_img_filepath_transforming(img_file->img_path.img_path_left);
+        img_file->img_path.img_path_right = gui_img_filepath_transforming(
+                                                img_file->img_path.img_path_right);
+#endif
+        this->img_path = img_file->img_path;
+    }
+    else
+    {
+        cube_img[0]->data = img_file->data_addr.data_addr_front;
+        cube_img[1]->data = img_file->data_addr.data_addr_back;
+        cube_img[2]->data = img_file->data_addr.data_addr_up;
+        cube_img[3]->data = img_file->data_addr.data_addr_down;
+        cube_img[4]->data = img_file->data_addr.data_addr_left;
+        cube_img[5]->data = img_file->data_addr.data_addr_right;
+    }
 
-
-
-    this->draw_img_front.opacity_value = UINT8_MAX;
-    this->draw_img_back.opacity_value = UINT8_MAX;
-    this->draw_img_up.opacity_value = UINT8_MAX;
-    this->draw_img_down.opacity_value = UINT8_MAX;
-    this->draw_img_left.opacity_value = UINT8_MAX;
-    this->draw_img_right.opacity_value = UINT8_MAX;
-
-
-    this->draw_img_front.data = array[0];
-    this->draw_img_back.data = array[1];
-    this->draw_img_up.data = array[2];
-    this->draw_img_down.data = array[3];
-    this->draw_img_left.data = array[4];
-    this->draw_img_right.data = array[5];
-
-    this->draw_img_front.blend_mode = IMG_SRC_OVER_MODE;
-    this->draw_img_back.blend_mode = IMG_SRC_OVER_MODE;
-    this->draw_img_up.blend_mode = IMG_SRC_OVER_MODE;
-    this->draw_img_down.blend_mode = IMG_SRC_OVER_MODE;
-    this->draw_img_left.blend_mode = IMG_SRC_OVER_MODE;
-    this->draw_img_right.blend_mode = IMG_SRC_OVER_MODE;
-
-    this->draw_img_front.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_back.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_up.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_down.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_left.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_right.matrix = gui_malloc(sizeof(struct rtgui_matrix));
-
-    this->draw_img_front.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_back.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_up.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_down.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_left.inverse = gui_malloc(sizeof(struct rtgui_matrix));
-    this->draw_img_right.inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    this->flg_fs = img_file->flg_fs;
+    for (int i = 0; i < 6; i++)
+    {
+        cube_img[i]->opacity_value = UINT8_MAX;
+        cube_img[i]->blend_mode = IMG_FILTER_BLACK;
+        cube_img[i]->matrix = gui_malloc(sizeof(struct rtgui_matrix));
+        cube_img[i]->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    }
 
     gui_dispdev_t *dc = gui_get_dc();
     this->cbsize = dc->fb_height / 8.0;
@@ -641,10 +690,77 @@ void gui_cube_set_size(gui_cube_t *this, float size)
     this->cbsize = size;
 }
 
+void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)
+{
+    GUI_ASSERT(cube != NULL);
+    draw_img_t *cube_img[6];
+    cube_img[0] = &cube->draw_img_front;
+    cube_img[1] = &cube->draw_img_back;
+    cube_img[2] = &cube->draw_img_up;
+    cube_img[3] = &cube->draw_img_down;
+    cube_img[4] = &cube->draw_img_left;
+    cube_img[5] = &cube->draw_img_right;
 
-gui_cube_t *gui_cube_create(void *parent,  const char *name, void *data,
+    cube_img[cube_side]->blend_mode = mode;
+}
+
+void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
+{
+    gui_cube_t *this = cube;
+
+    GUI_ASSERT(this != NULL);
+    this->flg_fs = img_file->flg_fs;
+
+    draw_img_t *cube_img[6];
+    cube_img[0] = &this->draw_img_front;
+    cube_img[1] = &this->draw_img_back;
+    cube_img[2] = &this->draw_img_up;
+    cube_img[3] = &this->draw_img_down;
+    cube_img[4] = &this->draw_img_left;
+    cube_img[5] = &this->draw_img_right;
+
+    if (img_file->flg_fs)
+    {
+        for (uint8_t i = 0; i < 6; i++)
+        {
+            if (cube_img[i]->data)
+            {
+                gui_free(cube_img[i]->data);
+                cube_img[i]->data = NULL;
+            }
+        }
+#ifdef _WIN32
+        gui_free(this->img_path.img_path_front);
+        gui_free(this->img_path.img_path_back);
+        gui_free(this->img_path.img_path_up);
+        gui_free(this->img_path.img_path_down);
+        gui_free(this->img_path.img_path_left);
+        gui_free(this->img_path.img_path_right);
+        img_file->img_path.img_path_front = gui_img_filepath_transforming(
+                                                img_file->img_path.img_path_front);
+        img_file->img_path.img_path_back = gui_img_filepath_transforming(img_file->img_path.img_path_back);
+        img_file->img_path.img_path_up = gui_img_filepath_transforming(img_file->img_path.img_path_up);
+        img_file->img_path.img_path_down = gui_img_filepath_transforming(img_file->img_path.img_path_down);
+        img_file->img_path.img_path_left = gui_img_filepath_transforming(img_file->img_path.img_path_left);
+        img_file->img_path.img_path_right = gui_img_filepath_transforming(
+                                                img_file->img_path.img_path_right);
+#endif
+        this->img_path = img_file->img_path;
+    }
+    else
+    {
+        cube_img[0]->data = img_file->data_addr.data_addr_front;
+        cube_img[1]->data = img_file->data_addr.data_addr_back;
+        cube_img[2]->data = img_file->data_addr.data_addr_up;
+        cube_img[3]->data = img_file->data_addr.data_addr_down;
+        cube_img[4]->data = img_file->data_addr.data_addr_left;
+        cube_img[5]->data = img_file->data_addr.data_addr_right;
+    }
+}
+
+gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file,
                             int16_t x,
-                            int16_t y, int16_t w, int16_t h)
+                            int16_t y)
 {
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
@@ -655,7 +771,7 @@ gui_cube_t *gui_cube_create(void *parent,  const char *name, void *data,
     GUI_ASSERT(cube != NULL);
     memset(cube, 0x00, sizeof(gui_cube_t));
 
-    gui_cube_ctor(cube, (gui_obj_t *)parent, name, data, x, y, w, h);
+    gui_cube_ctor(cube, (gui_obj_t *)parent, name, img_file, x, y, 0, 0);
     gui_list_init(&(GET_BASE(cube)->child_list));
     if ((GET_BASE(cube)->parent) != NULL)
     {
@@ -665,8 +781,6 @@ gui_cube_t *gui_cube_create(void *parent,  const char *name, void *data,
     GET_BASE(cube)->create_done = true;
     return cube;
 }
-
-
 /** End of WIDGET_Exported_Functions
   * @}
   */
