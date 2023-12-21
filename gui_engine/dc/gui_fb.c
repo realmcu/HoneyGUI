@@ -33,7 +33,7 @@ static void obj_is_active(gui_obj_t *obj)
     }
 }
 
-
+#include "gui_img.h"
 static void obj_draw_prepare(gui_obj_t *object)
 {
     GUI_ASSERT(object->name != NULL);
@@ -60,6 +60,11 @@ static void obj_draw_prepare(gui_obj_t *object)
         obj->tx += obj->parent->tx;
         obj->ty += obj->parent->ty;
         obj->opacity_value = obj->parent->opacity_value;
+        if (obj->type == IMAGE_FROM_MEM)
+        {
+            gui_img_set_opacity((void *)obj, obj->parent->opacity_value);
+        }
+
         if (obj->obj_prepare != NULL)
         {
             obj->obj_prepare(obj);
