@@ -268,9 +268,8 @@ Single frame draw mode can be used when the available RAM can accommodate a full
 
 After configuring display controller, it will transfer the frame buffer data to the screen, at this time, the screen will display the UI interface.
 
-## Design details
 
-## sw acc
+## Software Accelerate
 
 
 ### Overall flow chart
@@ -584,7 +583,7 @@ rle_alpha_matrix_opacity_case8888 --> |break|rle_alpha_matrix_opacity_value8888_
 ```
 Notice: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
 
-## image type
+## Support Input type and Output type
 
 |  |  |  |  |
 | --- | --- | --- | --- |
@@ -598,7 +597,7 @@ Notice: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888
 
 
 ## todo
-```chart
+```{chart}
 ,Budget,Income,Expenses,Debt
 June,5000,8000,4000,6000
 July,3000,1000,4000,3000
