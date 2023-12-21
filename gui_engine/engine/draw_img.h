@@ -33,6 +33,10 @@ typedef enum
     BINARY = 5,
     ALPHAMASK = 9,
     IMDC_COMPRESS = 10,
+    BMP = 11,
+    JPEG = 12,
+    PNG = 13,
+    GIF = 14,
 } GUI_FormatType;
 
 
