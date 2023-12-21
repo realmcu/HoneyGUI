@@ -105,11 +105,11 @@ static void pagelist_prepare(gui_pagelist_t *this)
     {
         return;
     }
-    int16_t list_h = 0;
-    if (this->list_last != NULL)
-    {
-        list_h = this->list_last->base.h;
-    }
+    // int16_t list_h = 0;
+    // if (this->list_last != NULL)
+    // {
+    //     list_h = this->list_last->base.h;
+    // }
     //gui_log("root ax = %d, root ay = %d\n", root->ax, root->ay);
     if ((root->ax < (int)gui_get_screen_width()) && ((root->ax + root->w) >= 0) && \
         (root->ay < (int)gui_get_screen_height()) && ((root->ay + root->h) >= 0))
