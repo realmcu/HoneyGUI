@@ -7,3 +7,4 @@ Integration and Drivers
 
     driver_lcd/index
     driver_touch/index
+    project/index

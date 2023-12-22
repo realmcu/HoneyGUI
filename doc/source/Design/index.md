@@ -315,7 +315,12 @@ no_bypass_opacity_case8888 --> |opacity|no_bypass_opacity_value8888_0_255(0-255)
 no_bypass_opacity_case8888 --> |no opacity|no_bypass_opacity_value8888_255(255)
 no_bypass_opacity_case8888 --> |break|no_bypass_opacity_value8888_0(0)
 ```
-Notice: In non-compressed bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
+
+```{eval-rst}
+.. note::
+   In non-compressed bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
+```
+
 ### overview filter
 ```{mermaid}
 graph TD
@@ -352,7 +357,12 @@ filter_opacity_case8888 --> |opacity|filter_opacity_value8888_0_255(0-255)
 filter_opacity_case8888 --> |no opacity|filter_opacity_value8888_255(255)
 filter_opacity_case8888 --> |break|filter_opacity_value8888_0(0)
 ```
-Notice: In non-compressed filter mode output rgb888 and rgba8888 equivalent to output as rgb565.
+
+```{eval-rst}
+.. note::
+   In non-compressed filter mode output rgb888 and rgba8888 equivalent to output as rgb565.
+```
+
 ### no rle filter_matrix
 ```{mermaid}
 graph TD
@@ -373,7 +383,11 @@ filter_matrix_opacity_case8888 --> |opacity|filter_matrix_opacity_value8888_0_25
 filter_matrix_opacity_case8888 --> |no opacity|filter_matrix_opacity_value8888_255(255)
 filter_matrix_opacity_case8888 --> |break|filter_matrix_opacity_value8888_0(0)
 ```
-Notice: In non-compressed filter_matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+
+```{eval-rst}
+.. note::
+   In non-compressed filter_matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+```
 
 ### overview source_over
 
@@ -411,7 +425,11 @@ alpha_opacity_case8888 --> |opacity + alpha|alpha_opacity_value8888_0_255(0-255)
 alpha_opacity_case8888 --> |alpha|alpha_opacity_value8888_255(255)
 alpha_opacity_case8888 --> |break|alpha_opacity_value8888_0(0)
 ```
-Notice: In non-compressed source_over mode output rgb888 and rgba8888 equivalent to output as rgb565.
+
+```{eval-rst}
+.. note::
+   In non-compressed source_over mode output rgb888 and rgba8888 equivalent to output as rgb565.
+```
 
 ### no_rle_alpha matrix
 
@@ -434,7 +452,12 @@ alpha_matrix_opacity_case8888 --> |opacity + alpha|alpha_matrix_opacity_value888
 alpha_matrix_opacity_case8888 --> |alpha|alpha_matrix_opacity_value8888_255(255)
 alpha_matrix_opacity_case8888 --> |break|alpha_matrix_opacity_value8888_0(0)
 ```
-Notice: In non-compressed source_over matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+
+
+```{eval-rst}
+.. note::
+   In non-compressed source_over matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+```
 
 ### rle bypass
 
@@ -464,7 +487,11 @@ rle_bypass_opacity_case8888 --> |opacity|rle_bypass_opacity_value8888_0_255(0-25
 rle_bypass_opacity_case8888 --> |no opacity|rle_bypass_opacity_value8888_255(255)
 rle_bypass_opacity_case8888 --> |break|rle_bypass_opacity_value8888_0(0)
 ```
-Notice: In compressed bypass mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+```{eval-rst}
+.. note::
+   In compressed bypass mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+```
 
 ### overview rle filter
 ```{mermaid}
@@ -502,7 +529,12 @@ rle_filter_opacity_case8888 --> |opacity|rle_filter_opacity_value8888_0_255(0-25
 rle_filter_opacity_case8888 --> |no opacity|rle_filter_opacity_value8888_255(255)
 rle_filter_opacity_case8888 --> |break|rle_filter_opacity_value8888_0(0)
 ```
-Notice: In compressed filter mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+
+```{eval-rst}
+.. note::
+   In compressed filter mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+```
 
 ### rle_filter_matrix
 ```{mermaid}
@@ -524,7 +556,12 @@ rle_filter_matrix_opacity_case8888 --> |opacity|rle_filter_matrix_opacity_value8
 rle_filter_matrix_opacity_case8888 --> |no opacity|rle_filter_matrix_opacity_value8888_255(255)
 rle_filter_matrix_opacity_case8888 --> |break|rle_filter_matrix_opacity_value8888_0(0)
 ```
-Notice: In compressed filter matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+```{eval-rst}
+.. note::
+   In compressed filter matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+```
+
 ### overview rle source_over
 ```{mermaid}
 graph TD
@@ -560,7 +597,12 @@ rle_alpha_opacity_case8888 --> |opacity + alpha|rle_alpha_opacity_value8888_0_25
 rle_alpha_opacity_case8888 --> |alpha|rle_alpha_opacity_value8888_255(255)
 rle_alpha_opacity_case8888 --> |break|rle_alpha_opacity_value8888_0(0)
 ```
-Notice: In compressed source_over mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+```{eval-rst}
+.. note::
+   In compressed source_over mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+```
+
 ### rle_alpha matrix
 ```{mermaid}
 graph TD
@@ -581,7 +623,12 @@ rle_alpha_matrix_opacity_case8888 --> |opacity + alpha|rle_alpha_matrix_opacity_
 rle_alpha_matrix_opacity_case8888 --> |alpha|rle_alpha_matrix_opacity_value8888_255(255)
 rle_alpha_matrix_opacity_case8888 --> |break|rle_alpha_matrix_opacity_value8888_0(0)
 ```
-Notice: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+
+
+```{eval-rst}
+.. note::
+   In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+```
 
 ## Support Input type and Output type
 
@@ -595,23 +642,6 @@ Notice: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888
 |  |  |  |  |
 |  |  |  |  |
 
-
-## todo
-```{chart}
-,Budget,Income,Expenses,Debt
-June,5000,8000,4000,6000
-July,3000,1000,4000,3000
-Aug,5000,7000,6000,3000
-Sep,7000,2000,3000,1000
-Oct,6000,5000,4000,2000
-Nov,4000,3000,5000,
-
-type: pie
-title: Monthly Revenue
-x.title: Amount
-y.title: Month
-y.suffix: $
-```
 
 
 

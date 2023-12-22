@@ -7,7 +7,7 @@ Widgets                              Brief
 `screen`_                            The root widget of the widget tree
 `window`_                            A rectangular container widget
 `img`_                               display image on the screen
-`stbimage`_                         use stb lib to decode standard image format files and display
+`stbimage`_                          use stb lib to decode standard image format files and display
 `text`_                              To display text, which can be used to output text in different fonts, different colors, and different sizes
 `tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
 `tab`_                               The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
@@ -43,6 +43,7 @@ Widgets                              Brief
 .. _cube: gui_cube.html
 .. _perspective: gui_perspective.html
 .. _svg: gui_svg.html
+.. _stbimage: gui_img_stb.html
 .. _watch gradient spot: gui_watch_gradient_spot.html
 .. _watchface gradient: gui_watchface_gradient.html
 .. toctree::
