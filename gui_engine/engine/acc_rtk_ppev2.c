@@ -4,7 +4,7 @@
 #include <gui_matrix.h>
 #include "acc_engine.h"
 #include <rtl_PPEV2.h>
-#include <rtl_rtzip.h>
+#include <rtl_imdc.h>
 #include <rtl876x_rcc.h>
 #include <rtl876x_gdma.h>
 #include <dma_channel.h>
@@ -195,7 +195,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     target.win_y_min = 0;
     target.win_y_max = target.height;
     struct gui_rgb_data_head *head = image->data;
-    if (head->type != IMDC_COMPRESS)
+    if (head->type != IMDC_COMPRESS)    //Not compressed
     {
         switch (head->type)
         {
@@ -493,52 +493,67 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     {
         if (dc->type == DC_SINGLE)  //may need PSRAM
         {
-            RCC_PeriphClockCmd(APBPeriph_RTZIP, APBPeriph_RTZIP_CLOCK, ENABLE);
-            const RTZIP_file_header *header = (RTZIP_file_header *)((uint32_t)image->data + sizeof(
-                                                                        struct gui_rgb_data_head));
-            RTZIP_decode_range range;
-            range.start_column = 0;
-            range.end_column = header->raw_pic_width - 1;
-            range.start_line = 0;
-            range.end_line = header->raw_pic_height - 1;
-            RTZIP_DMA_config dma_cfg;
-            source.address = (uint32_t)gui_malloc((range.end_line - range.start_line + 1) *
-                                                  (range.end_column - range.start_column + 1)
-                                                  * (header->algorithm_type.pixel_bytes + 2));
-            if (source.address == NULL)
+            if (image->matrix->m[0][0] != 1 || image->matrix->m[1][1] != 1 || \
+                image->matrix->m[2][2] != 1 || image->matrix->m[0][1] != 0 || \
+                image->matrix->m[1][0] != 0 || image->matrix->m[2][0] != 0 || \
+                image->matrix->m[2][1] != 0)
             {
-                DBG_DIRECT("no mem remain");
+                GUI_ASSERT(0);
                 return;
             }
+            if ((rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1)
+                || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
+            {
+                return;
+            }
+            uint32_t start_line = 0, end_line = 0;
+            uint32_t start_column = 0, end_column = 0;
+            ppe_rect_t ppe_rect = {.x = rect->x1, .y = rect->y1, .w = image->img_w, .h = image->img_h};
+            if (rect->x1 < dc->section.x1)
+            {
+                ppe_rect.x = 0;
+                start_column = dc->section.x1 - rect->x1;
+            }
+            if (rect->y1 < dc->section.y1)
+            {
+                ppe_rect.y = 0;
+                start_line = dc->section.y1 - rect->y1;
+            }
+            if (rect->y1 + image->img_h > dc->section.y1 + dc->fb_height)
+            {
+                end_line = dc->section.y2 - rect->y1 - 1;
+            }
+            if (rect->x1 + image->img_w > dc->section.x1 + dc->fb_width)
+            {
+                end_column = dc->section.x2 - rect->x1 - 1;
+            }
+            ppe_rect.h = end_line - start_line + 1;
+            ppe_rect.w = end_column - start_column + 1;
+            RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
+            const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
+                                                                      struct gui_rgb_data_head));
+            IMDC_decode_range range;
+            range.start_column = start_column;
+            range.end_column = end_column;
+            range.start_line = start_line;
+            range.end_line = end_line;
+            IMDC_DMA_config dma_cfg;
             source.width = range.end_column - range.start_column + 1;
             source.height = range.end_line - range.start_line + 1;
-            uint8_t rtzip_tx_dma_num = 0xa5, rtzip_rx_dma_num = 0xa5;
-            if (!GDMA_channel_request(&rtzip_tx_dma_num, NULL, true))
-            {
-                DBG_DIRECT("no dma for tx");
-                return;
-            }
-            if (!GDMA_channel_request(&rtzip_rx_dma_num, NULL, true))
+            uint8_t imdc_rx_dma_num = 0xa5;
+            if (!GDMA_channel_request(&imdc_rx_dma_num, NULL, true))
             {
                 DBG_DIRECT("no dma for rx");
                 return;
             }
-            dma_cfg.output_buf = (uint32_t *)source.address;
-            dma_cfg.RX_DMA_channel_num = rtzip_rx_dma_num;
-            dma_cfg.TX_DMA_channel_num = rtzip_tx_dma_num;
-            dma_cfg.RX_DMA_channel = DMA_CH_BASE(rtzip_rx_dma_num);
-            dma_cfg.TX_DMA_channel = DMA_CH_BASE(rtzip_tx_dma_num);
-            RTZIP_ERROR err = RTZIP_Decode((uint8_t *)header, &range, &dma_cfg);
+            dma_cfg.RX_DMA_channel_num = imdc_rx_dma_num;
+            dma_cfg.RX_DMA_channel = DMA_CH_BASE(imdc_rx_dma_num);
+            IMDC_ERROR err = IMDC_Decode_Direct((uint8_t *)header, &range, &dma_cfg);
             if (err)
             {
-                gui_free((void *)source.address);
-                if (rtzip_tx_dma_num != 0xa5)
+                if (imdc_rx_dma_num != 0xa5)
                 {
-                    GDMA_channel_release(rtzip_tx_dma_num);
-                }
-                if (rtzip_rx_dma_num != 0xa5)
-                {
-                    GDMA_channel_release(rtzip_rx_dma_num);
+                    GDMA_channel_release(imdc_rx_dma_num);
                 }
                 return;
             }
@@ -557,23 +572,17 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             source.win_x_max = target.width;
             source.win_y_min = 0;
             source.win_y_max = target.height;
-            memcpy(&source.matrix, image->matrix, sizeof(float) * 9);
-            memcpy(&source.inv_matrix, image->inverse, sizeof(float) * 9);
-            ppe_rect_t rect;
-            PPEV2_Blend(&target, &source, &rect);
-            gui_free((void *)source.address);
-            if (rtzip_tx_dma_num != 0xa5)
+            ppe_get_identity(&source.matrix);
+            ppe_get_identity(&source.inv_matrix);
+            PPEV2_Blend_Handshake(&target, &source, &ppe_rect);
+            if (imdc_rx_dma_num != 0xa5)
             {
-                GDMA_channel_release(rtzip_tx_dma_num);
-            }
-            if (rtzip_rx_dma_num != 0xa5)
-            {
-                GDMA_channel_release(rtzip_rx_dma_num);
+                GDMA_channel_release(imdc_rx_dma_num);
             }
         }
         else
         {
-            //TODO: split RTZIP(may be difficult), suppose to have PSRAM
+            //TODO: suppose to be overed by DC_SINGLE branch, will verify later
             return;
         }
     }

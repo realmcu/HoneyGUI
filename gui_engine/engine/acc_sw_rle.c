@@ -23,14 +23,14 @@
 #include "acc_sw_blend.h"
 #include "acc_sw.h"
 #include "acc_sw_rle.h"
-#if defined ( __CC_ARM ) && !defined(RTL8763EP)
+#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E)
 #define __FPU_PRESENT                  1            /* FPU present                                                             */
 #include "arm_math.h"
 #else
 #include "math.h"
 #endif
 
-typedef struct rtzip_file_header
+typedef struct imdc_file_header
 {
     struct
     {
@@ -42,38 +42,38 @@ typedef struct rtzip_file_header
     uint8_t reserved[3];
     uint32_t raw_pic_width;
     uint32_t raw_pic_height;
-} rtzip_file_header_t;
+} imdc_file_header_t;
 
-typedef struct rtzip_file
+typedef struct imdc_file
 {
-    rtzip_file_header_t header;
+    imdc_file_header_t header;
     uint32_t compressed_addr[1024];
 
-} rtzip_file_t;
+} imdc_file_t;
 #pragma pack(1)
 
-typedef struct rtzip_rgb565_node
+typedef struct imdc_rgb565_node
 {
     uint8_t len;
     uint16_t pixel16;  //rgb565
-} rtzip_rgb565_node_t;
-typedef struct rtzip_rgb888_node
+} imdc_rgb565_node_t;
+typedef struct imdc_rgb888_node
 {
     uint8_t len;
     uint8_t pixel_b;  //rgb888
     uint8_t pixel_g;
     uint8_t pixel_r;
-} rtzip_rgb888_node_t;
-typedef struct rtzip_argb8888_node
+} imdc_rgb888_node_t;
+typedef struct imdc_argb8888_node
 {
     uint8_t len;
     uint32_t pixel32;    //argb8888
-} rtzip_argb8888_node_t;
+} imdc_argb8888_node_t;
 #pragma pack()
 
 static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 {
-#if defined ( __CC_ARM ) && !defined(RTL8763EP)
+#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E)
     arm_fill_q15(pixel, (int16_t *)addr, len);
 #endif
 #if defined(_MSC_VER) || (defined(__GNUC__))
@@ -85,7 +85,7 @@ static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 }
 static void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
 {
-#if defined ( __CC_ARM ) && !defined(RTL8763EP)
+#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E)
     arm_fill_q31(pixel, (int32_t *)addr, len);
 #endif
 #if defined(_MSC_VER) || (defined(__GNUC__))
@@ -95,55 +95,55 @@ static void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb88
     }
 #endif
 }
-static void uncompressed_rle_rgb565(rtzip_file_t *file, uint32_t line,  uint8_t *buf)
+static void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
-    //rtzip_file_header_t *header = (rtzip_file_header_t *)file;
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
     uint32_t start = (uint32_t)file + file->compressed_addr[line];
     uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
     uint16_t *linebuf = (uint16_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        rtzip_rgb565_node_t *node = (rtzip_rgb565_node_t *)addr;
+        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)addr;
         gui_memset16(linebuf, node->pixel16, node->len);
 
-        addr = addr + sizeof(rtzip_rgb565_node_t);
+        addr = addr + sizeof(imdc_rgb565_node_t);
         linebuf = linebuf + node->len;
     }
 }
-void uncompressed_rle_rgb888(rtzip_file_t *file, uint32_t line,  uint8_t *buf)
+void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
-    //rtzip_file_header_t *header = (rtzip_file_header_t *)file;
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
     uint32_t start = (uint32_t)file + file->compressed_addr[line];
     uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
     uint8_t *linebuf = (uint8_t *)buf;
     //gui_log("linebuf %o\n",linebuf);
     for (uint32_t addr = start; addr < end;)
     {
-        rtzip_rgb888_node_t *node = (rtzip_rgb888_node_t *)addr;
+        imdc_rgb888_node_t *node = (imdc_rgb888_node_t *)addr;
         for (uint32_t i = 0; i < node->len; i++)
         {
             linebuf[i * 3]     = node->pixel_b;
             linebuf[i * 3 + 1] = node->pixel_g;
             linebuf[i * 3 + 2] = node->pixel_r;
         }
-        addr = addr + sizeof(rtzip_rgb888_node_t);
+        addr = addr + sizeof(imdc_rgb888_node_t);
         linebuf = linebuf + node->len * 3;
     }
 }
-void uncompressed_rle_argb8888(rtzip_file_t *file, uint32_t line,  uint8_t *buf)
+void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
-    //rtzip_file_header_t *header = (rtzip_file_header_t *)file;
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
     uint32_t start = (uint32_t)file + file->compressed_addr[line];
     uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
     uint32_t *linebuf = (uint32_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        rtzip_argb8888_node_t *node = (rtzip_argb8888_node_t *)addr;
+        imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)addr;
         gui_memset32(linebuf, node->pixel32, node->len);
 
-        addr = addr + sizeof(rtzip_argb8888_node_t);
+        addr = addr + sizeof(imdc_argb8888_node_t);
         linebuf = linebuf + node->len;
     }
 }
@@ -167,7 +167,7 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
-    rtzip_file_t *file = (rtzip_file_t *)image_off;
+    imdc_file_t *file = (imdc_file_t *)image_off;
 
     if (img_type == 4)
     {
@@ -198,7 +198,7 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -296,7 +296,7 @@ void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -342,7 +342,7 @@ void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -385,7 +385,7 @@ void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -448,7 +448,7 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
-    rtzip_file_t *file = (rtzip_file_t *)image_off;
+    imdc_file_t *file = (imdc_file_t *)image_off;
 
     if (img_type == 4)
     {
@@ -482,7 +482,7 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -556,7 +556,7 @@ void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -594,7 +594,7 @@ void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -621,7 +621,7 @@ void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -671,7 +671,7 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
     //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-//    rtzip_file_t *file = (rtzip_file_t *)image_off;
+//    imdc_file_t *file = (imdc_file_t *)image_off;
     int32_t y1, y2, z1, z2;
 //        x1 = round(inverse->m[0][0] * dc->section.x1 + inverse->m[0][1] * dc->section.y1 +
 //                   inverse->m[0][2]);
@@ -721,7 +721,7 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
@@ -785,7 +785,7 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
@@ -855,7 +855,7 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
@@ -999,7 +999,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
 
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
@@ -1062,7 +1062,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
@@ -1123,7 +1123,7 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
@@ -1262,7 +1262,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         //TODO: y2 + ceil(1 / scale_y_ratio)
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
             int write_off = (y_i - dc->section.y1) * dc->fb_width ;
@@ -1358,7 +1358,7 @@ void rle_alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_disp
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -1401,7 +1401,7 @@ void rle_alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_disp
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -1444,7 +1444,7 @@ void rle_alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_disp
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -1510,7 +1510,7 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -1553,7 +1553,7 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
         memset(line_buf, 0, source_bytes_per_pixel * image_w);
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -1577,7 +1577,7 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * image_w];
-        rtzip_file_t *file = (rtzip_file_t *)image_off;
+        imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
