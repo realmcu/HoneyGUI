@@ -487,6 +487,7 @@ void gui_img_skew_y(gui_img_t *img, float degrees)
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 {
     this->draw_img.opacity_value = opacity_value;
+    GET_BASE(this)->opacity_value = opacity_value;
 }
 
 gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
