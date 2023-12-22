@@ -62,7 +62,9 @@ typedef struct NormalRec
     float z;                    //!< z axis
 } Normal_t;
 
+#ifdef  __CC_ARM
 #pragma anon_unions
+#endif
 typedef struct
 {
     uint8_t flg_fs;                    //!< flag: using filesystem

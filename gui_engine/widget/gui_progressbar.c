@@ -315,7 +315,7 @@ void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const ch
 void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent, void  **picture_array,
                                 uint16_t array_number,
                                 int16_t x,
-                                int16_t y)
+                                int16_t y, uint8_t flg_fs)
 {
 
     gui_obj_ctor(&(this->base), parent, "progressbar_movie", x, y, 0, 0);
@@ -325,7 +325,15 @@ void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent, void
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
-    this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
+
+    if (flg_fs)
+    {
+        this->c = (void *)gui_img_create_from_fs(this, picture_array[0], 0, 0);
+    }
+    else
+    {
+        this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
+    }
     this->color_hl = (uint32_t)picture_array;
 }
 gui_progressbar_t *gui_progressbar_movie_create(void *parent, void  **picture_array,
@@ -336,11 +344,24 @@ gui_progressbar_t *gui_progressbar_movie_create(void *parent, void  **picture_ar
 //      GUI_NEW(gui_progressbar_t, gui_progressbar_ctor, _progressbar_create_parameter_)
     gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
     memset(this, 0, sizeof(gui_progressbar_t));
-    gui_progressbar_movie_ctor(this, parent, picture_array, array_length, x, y);
+    gui_progressbar_movie_ctor(this, parent, picture_array, array_length, x, y, false);
 
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }
+
+gui_progressbar_t *gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array,
+                                                        uint16_t array_length, int16_t x, int16_t y)
+{
+//#define _progressbar_create_parameter_ this, parent, filename, x, y, w, h
+//      GUI_NEW(gui_progressbar_t, gui_progressbar_ctor, _progressbar_create_parameter_)
+    gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
+    memset(this, 0, sizeof(gui_progressbar_t));
+    gui_progressbar_movie_ctor(this, parent, picture_array, array_length, x, y, true);
+    ((gui_obj_t *)this)->create_done = 1;
+    return this;
+}
+
 #if 0
 gui_progressbar_t *gui_progressbar_v_create(void *parent, const char *filename, int16_t x,
                                             int16_t y,

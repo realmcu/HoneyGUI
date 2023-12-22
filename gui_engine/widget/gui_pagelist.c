@@ -306,6 +306,12 @@ void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic)
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
+void gui_pagelist_add_scroll_bar_from_fs(gui_pagelist_t *this, void *bar_pic)
+{
+    this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
+    gui_img_get_height(this->scroll_bar);
+    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
+}
 
 void gui_pagelist_increase_real_list_max(gui_pagelist_t *this, int16_t real_list_max)
 {

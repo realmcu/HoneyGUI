@@ -61,6 +61,16 @@ void page_tb_cube(void *parent)
         .data_addr.data_addr_left = MUSIC_BIN,
         .data_addr.data_addr_right = QUICKCARD_BIN
     };
+    gui_cube_imgfile_t imgfile_re =
+    {
+        .flg_fs = false,
+        .data_addr.data_addr_front = WEATHER_BIN,
+        .data_addr.data_addr_back = WEATHER_BIN,
+        .data_addr.data_addr_up =  WEATHER_BIN,
+        .data_addr.data_addr_down = CLOCKN_BIN,
+        .data_addr.data_addr_left = WEATHER_BIN,
+        .data_addr.data_addr_right = QUICKCARD_BIN
+    };
 #endif
     gui_cube_t *cube4 = gui_cube_create(parent, "cube", &imgfile, 0, 0);
     // "Clockn.bin"

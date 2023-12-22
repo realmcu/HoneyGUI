@@ -103,6 +103,12 @@ static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
+static void gui_page_add_scroll_bar_from_fs(gui_page_t *this, void *bar_pic)
+{
+    this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
+    gui_img_get_height(this->scroll_bar);
+    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
+}
 
 static void set_offset(gui_page_t *this, int offset)
 {
@@ -120,6 +126,7 @@ _gui_api_page_t gui_page_api =
     .set_offset = set_offset,
     .get_offset = get_offset,
     .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
+    .gui_page_add_scroll_bar_from_fs = gui_page_add_scroll_bar_from_fs,
 };
 
 /*============================================================================*

@@ -170,7 +170,7 @@ void gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_c
 void gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max,
                           int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last);
 /**
- * @brief add a scroll bar picture for a pagelist widget
+ * @brief add a scroll bar picture for a pagelist widget, file source is memory address
  *
  * @param this pagelist widget
  * @param bar_pic bar picture
@@ -178,6 +178,17 @@ void gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t s
  */
 
 void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic);
+
+/**
+ * @brief add a scroll bar picture for a pagelist widget, file source is filesystem
+ *
+ * @param this pagelist widget
+ * @param bar_pic bar picture filepath
+ * @return
+ */
+
+void gui_pagelist_add_scroll_bar_from_fs(gui_pagelist_t *this, void *bar_pic);
+
 /**
  * @brief create a pagelist widget
  *

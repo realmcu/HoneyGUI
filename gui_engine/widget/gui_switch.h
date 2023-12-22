@@ -130,20 +130,34 @@ struct gui_switch
 
 
 /**
- * @brief create a switch widget.
+ * @brief create a switch widget, file source is memory address.
  * @param parent the father widget it nested in.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
  * @param h the hight of the widget.
- * @param off_pic off status image.
- * @param on_pic on status image.
+ * @param off_pic off status image memory address.
+ * @param on_pic on status image memory address.
  * @return return the widget object pointer.
  *
  */
 gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
                                 int16_t w, int16_t h, void *off_pic, void *on_pic);
 
+/**
+ * @brief create a switch widget, file source is filesystem.
+ * @param parent the father widget it nested in.
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @param w the width of the widget.
+ * @param h the hight of the widget.
+ * @param off_pic off status image filepath.
+ * @param on_pic on status image filepath.
+ * @return return the widget object pointer.
+ *
+ */
+gui_switch_t *gui_switch_create_from_fs(void *parent, int16_t x, int16_t y,
+                                        int16_t w, int16_t h, void *off_pic, void *on_pic);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

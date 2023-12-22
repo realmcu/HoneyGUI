@@ -71,6 +71,7 @@ typedef struct gui_page
 typedef struct _gui_api_page
 {
     void (*gui_page_add_scroll_bar)(gui_page_t *this, void *bar_pic);
+    void (*gui_page_add_scroll_bar_from_fs)(gui_page_t *this, void *bar_pic);
     void (*set_offset)(gui_page_t *this, int offset);
     int (*get_offset)(gui_page_t *this);
 } _gui_api_page_t;

@@ -7,7 +7,7 @@ Switch is a custom switch button control, often used to enable or disable certai
 ## Usage
 
 ### Create switch widget
-Using [gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#api) to create switch widget
+Using [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#api) to create switch widget from memory address, and [gui_switch_t * gui_switch_create_frome_fs(parent, x, y, w, h, off_pic, on_pic)](#api) to create from filesystem.
 
 ## Example
 

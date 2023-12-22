@@ -76,6 +76,7 @@ typedef struct gui_scroll_wheel
     struct scroll_wheel_picture picture[SCROLL_WHEEL_ROW];
     bool press_flag;
     char row_count;
+    uint8_t flg_fs;
 } gui_scroll_wheel_t;
 
 
@@ -132,14 +133,22 @@ typedef struct gui_scroll_wheel
 gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent,  void *addr, int16_t x, int16_t y,
                                             int16_t w, int16_t h);
 /**
- * @brief Append a picture in the wheel.
+ * @brief Append a picture in the wheel, images are loaded from memory address.
  *
  * @param this  The pointer of scroll_wheel widget.
- * @param num_pic The picture array address.
- * @param num_pic_hl The picture(highlight) array address.
+ * @param num_pic The picture array memory address.
+ * @param num_pic_hl The picture(highlight) array memory address.
  */
 void gui_scrollwheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
 
+/**
+ * @brief Append a picture in the wheel, images are loaded from filesystem.
+ *
+ * @param this  The pointer of scroll_wheel widget.
+ * @param num_pic The picture filepath.
+ * @param num_pic_hl The picture(highlight) filepath.
+ */
+void gui_scrollwheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

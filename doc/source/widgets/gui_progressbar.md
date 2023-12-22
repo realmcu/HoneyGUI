@@ -19,7 +19,7 @@ Similar to `Create vertical widget` above, you can use [gui_progressbar_img_h_cr
 ### Create movie widget
 
 Unlike the above two normal single picture progressbar, a movie style progressbar consists of a series of pictures.
-You can create a movie style progressbar by using [gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api). `picture_array` is the array used to store the pictures and `array_length` is the number of pictures.
+You can create a movie style progressbar from memory address by using [gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api), and [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api) from filesystem. `picture_array` is the array used to store the pictures and `array_length` is the number of pictures.
 The first picture is shown at 0% progress and the last picture is shown at 100% progress.
 
 ### Percentage

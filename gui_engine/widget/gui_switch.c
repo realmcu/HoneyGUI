@@ -522,8 +522,8 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->long_touch_state_pic_addr = this->off_pic_addr;
     this->long_touch_state_hl_pic_addr = this->off_pic_addr;
 }
-gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
-                                int16_t w, int16_t h, void *off_pic, void *on_pic)
+static gui_switch_t *gui_switch_create_core(void *parent, int16_t x, int16_t y,
+                                            int16_t w, int16_t h, void *off_pic, void *on_pic, uint8_t flg_fs)
 {
     //gui_log("gui_switch_create:%p,%d,%d,%d,%d,%p,%p\n", parent, x, y, w, h, off_pic, on_pic);
     gui_switch_t *this = gui_malloc(sizeof(gui_switch_t));
@@ -532,10 +532,29 @@ gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
-    this->switch_picture = (void *)gui_img_create_from_mem(this, "switch_picture", off_pic, 0, 0,
-                                                           0, 0);
+
+    if (flg_fs)
+    {
+        this->switch_picture = (void *)gui_img_create_from_fs(this, off_pic, 0, 0);
+    }
+    else
+    {
+        this->switch_picture = (void *)gui_img_create_from_mem(this, "switch_picture", off_pic, 0, 0, 0, 0);
+    }
     ((gui_obj_t *)this)->create_done = 1;
     return this;
+}
+
+gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
+                                int16_t w, int16_t h, void *off_pic, void *on_pic)
+{
+    return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, false);
+}
+
+gui_switch_t *gui_switch_create_from_fs(void *parent, int16_t x, int16_t y,
+                                        int16_t w, int16_t h, void *off_pic, void *on_pic)
+{
+    return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, true);
 }
 
 /** End of WIDGET_Exported_Functions
