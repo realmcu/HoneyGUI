@@ -217,14 +217,7 @@ static void gui_switch_hl_back(gui_switch_t *sw)
 
 static void gui_switch_long_touch(gui_switch_t *sw)
 {
-    if (sw->ifon)
-    {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_pic_addr, 0, 0);
-    }
-    else
-    {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_pic_addr, 0, 0);
-    }
+    gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_pic_addr, 0, 0);
 }
 
 static void gui_switch_long_touch_back(gui_switch_t *sw)
@@ -241,14 +234,7 @@ static void gui_switch_long_touch_back(gui_switch_t *sw)
 
 static void gui_switch_hl_long_touch(gui_switch_t *sw)
 {
-    if (sw->ifon)
-    {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_hl_pic_addr, 0, 0);
-    }
-    else
-    {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_hl_pic_addr, 0, 0);
-    }
+    gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_hl_pic_addr, 0, 0);
 }
 
 void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
