@@ -68,10 +68,6 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             obj->opacity_value = obj->parent->opacity_value;
         }
-        if (obj->type == IMAGE_FROM_MEM)
-        {
-            gui_img_set_opacity((void *)obj, obj->parent->opacity_value);
-        }
 
         if (obj->obj_prepare != NULL)
         {
