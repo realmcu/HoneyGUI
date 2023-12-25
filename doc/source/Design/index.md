@@ -272,7 +272,8 @@ After configuring display controller, it will transfer the frame buffer data to 
 ## Software Accelerate
 
 
-### Overall flow chart
+
+### Overall Flow Chart
 ```{mermaid}
 graph TD
 source[source] -->C{judge compress}
@@ -286,42 +287,66 @@ rle --> rle_img_type{image type}
 rle_img_type --> rle_bypass
 rle_img_type --> rle_filter
 rle_img_type --> rle_source_over
-
 ```
-### no_rle_bypass mode
+### Overview No RLE Bypass Mode
 ```{mermaid}
 graph TD
-bypass --> b{output}
-b --> |Identity matrix judgment| byapss_rgb565
-b --> |Identity matrix judgment| bypass_rgb888
-b --> |Identity matrix judgment| bypass_rgba8888
+bypass --> b{Identity matrix judgment}
+b --> |N|bypass__no_matrix
+bypass__no_matrix -->bypass_no_matrix_output{output}
+bypass_no_matrix_output -->bypass_rgb565
+bypass_no_matrix_output -->bypass_rgb888
+bypass_no_matrix_output -->bypass_rgba8888
+b --> |Y|bypass_matrix
+bypass_matrix --> bypass_matrix_output{output}
+bypass_matrix_output -->bypass_matrix_rgb565
+bypass_matrix_output -->bypass_matirx_rgb888
+bypass_matrix_output -->bypass_matrix_rgba8888
 ```
+#### No RLE Bypass Mode
 ```{mermaid}
 graph TD
 bypass_rgb565 --> bypass_565{input}
 bypass_565 --> | |bypass_565_565
-bypass_565_565 --> no_bypass_opacity_case565{opacity}
-no_bypass_opacity_case565 --> |opacity|no_bypass_opacity_value0_255(0-255)
-no_bypass_opacity_case565 --> |no opacity|no_bypass_opacity_value255(255)
-no_bypass_opacity_case565 --> |break|no_bypass_opacity_value0(0)
+bypass_565_565 --> bypass_opacity_case565{opacity}
+bypass_opacity_case565 --> |opacity| bypass_opacity_value0_255(0-255)
+bypass_opacity_case565 --> |no opacity|bypass_opacity_value255(255)
+bypass_opacity_case565 --> |break|bypass_opacity_value0(0)
 bypass_565 --> | |bypass_565_888
-bypass_565_888--> no_bypass_opacity_case888{opacity}
-no_bypass_opacity_case888 --> |opacity|no_bypass_opacity_value888_0_255(0-255)
-no_bypass_opacity_case888 --> |no opacity|no_bypass_opacity_value888_255(255)
-no_bypass_opacity_case888 --> |break|no_bypass_opacity_value888_0(0)
+bypass_565_888--> bypass_opacity_case888{opacity}
+bypass_opacity_case888 --> |opacity|bypass_opacity_value888_0_255(0-255)
+bypass_opacity_case888 --> |no opacity|bypass_opacity_value888_255(255)
+bypass_opacity_case888 --> |break|bypass_opacity_value888_0(0)
 bypass_565 --> | |bypass_565_8888
-bypass_565_8888 --> no_bypass_opacity_case8888{opacity}
-no_bypass_opacity_case8888 --> |opacity|no_bypass_opacity_value8888_0_255(0-255)
-no_bypass_opacity_case8888 --> |no opacity|no_bypass_opacity_value8888_255(255)
-no_bypass_opacity_case8888 --> |break|no_bypass_opacity_value8888_0(0)
+bypass_565_8888 --> bypass_opacity_case8888{opacity}
+bypass_opacity_case8888 --> |opacity|bypass_opacity_value8888_0_255(0-255)
+bypass_opacity_case8888 --> |no opacity|bypass_opacity_value8888_255(255)
+bypass_opacity_case8888 --> |break|bypass_opacity_value8888_0(0)
 ```
-
-```{eval-rst}
-.. note::
-   In non-compressed bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
+* Additional information: In non-compressed bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
+#### No RLE Bypass Matrix
+```{mermaid}
+graph TD
+bypass_matrix_rgb565 --> bypass_matrix_565{input}
+bypass_matrix_565 --> | |bypass_matrix_565_565
+bypass_matrix_565_565 --> bypass_matrix_opacity_case565{opacity}
+bypass_matrix_opacity_case565 --> |opacity| bypass_matrix_opacity_value0_255(0-255)
+bypass_matrix_opacity_case565 --> |no opacity|bypass_matrix_opacity_value255(255)
+bypass_matrix_opacity_case565 --> |break|bypass_matrix_opacity_value0(0)
+bypass_matrix_565 --> | |bypass_matrix_565_888
+bypass_matrix_565_888--> bypass_matrix_opacity_case888{opacity}
+bypass_matrix_opacity_case888 --> |opacity|bypass_matrix_opacity_value888_0_255(0-255)
+bypass_matrix_opacity_case888 --> |no opacity|bypass_matrix_opacity_value888_255(255)
+bypass_matrix_opacity_case888 --> |break|bypass_matrix_opacity_value888_0(0)
+bypass_matrix_565 --> | |bypass_matrix_565_8888
+bypass_matrix_565_8888 --> bypass_matrix_opacity_case8888{opacity}
+bypass_matrix_opacity_case8888 --> |opacity|bypass_matrix_opacity_value8888_0_255(0-255)
+bypass_matrix_opacity_case8888 --> |no opacity|bypass_matrix_opacity_value8888_255(255)
+bypass_matrix_opacity_case8888 --> |break|bypass_matrix_opacity_value8888_0(0)
 ```
+* Additional information: In non-compressed bypass matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
 
-### overview filter
+### Overview No RLE Filter
 ```{mermaid}
 graph TD
 filter --> b{Identity matrix judgment}
@@ -336,8 +361,7 @@ fiter_matrix_output -->filter_matrix_rgb565
 fiter_matrix_output -->filter_matirx_rgb888
 fiter_matrix_output -->filter_matrix_rgba8888
 ```
-### no_rle_filter
-
+#### No RLE Filter
 ```{mermaid}
 graph TD
 filter_rgb565 --> filter_565{input}
@@ -357,13 +381,8 @@ filter_opacity_case8888 --> |opacity|filter_opacity_value8888_0_255(0-255)
 filter_opacity_case8888 --> |no opacity|filter_opacity_value8888_255(255)
 filter_opacity_case8888 --> |break|filter_opacity_value8888_0(0)
 ```
-
-```{eval-rst}
-.. note::
-   In non-compressed filter mode output rgb888 and rgba8888 equivalent to output as rgb565.
-```
-
-### no rle filter_matrix
+* Additional information: In non-compressed filter mode output rgb888 and rgba8888 equivalent to output as rgb565.
+#### No RLE Filter Matrix
 ```{mermaid}
 graph TD
 filter_matrix_rgb565 --> filter_matrix_565{input}
@@ -383,14 +402,8 @@ filter_matrix_opacity_case8888 --> |opacity|filter_matrix_opacity_value8888_0_25
 filter_matrix_opacity_case8888 --> |no opacity|filter_matrix_opacity_value8888_255(255)
 filter_matrix_opacity_case8888 --> |break|filter_matrix_opacity_value8888_0(0)
 ```
-
-```{eval-rst}
-.. note::
-   In non-compressed filter_matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
-```
-
-### overview source_over
-
+* Additional information: In non-compressed filter matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+### Overview Source_over
 ```{mermaid}
 graph TD
 alpha --> b{Identity matrix judgment}
@@ -405,7 +418,7 @@ fiter_matrix_output -->alpha_matrix_rgb565
 fiter_matrix_output -->alpha_matirx_rgb888
 fiter_matrix_output -->alpha_matrix_rgba8888
 ```
-### no_rle_alpha no matrix
+#### No RLE Alpha No Matrix
 ```{mermaid}
 graph TD
 alpha_rgb565 --> alpha_565{input}
@@ -425,14 +438,8 @@ alpha_opacity_case8888 --> |opacity + alpha|alpha_opacity_value8888_0_255(0-255)
 alpha_opacity_case8888 --> |alpha|alpha_opacity_value8888_255(255)
 alpha_opacity_case8888 --> |break|alpha_opacity_value8888_0(0)
 ```
-
-```{eval-rst}
-.. note::
-   In non-compressed source_over mode output rgb888 and rgba8888 equivalent to output as rgb565.
-```
-
-### no_rle_alpha matrix
-
+* Additional information: In non-compressed source_over mode output rgb888 and rgba8888 equivalent to output as rgb565.
+#### No RLE Alpha Matrix
 ```{mermaid}
 graph TD
 alpha_matrix_rgb565 --> alpha_matrix_565{input}
@@ -452,28 +459,29 @@ alpha_matrix_opacity_case8888 --> |opacity + alpha|alpha_matrix_opacity_value888
 alpha_matrix_opacity_case8888 --> |alpha|alpha_matrix_opacity_value8888_255(255)
 alpha_matrix_opacity_case8888 --> |break|alpha_matrix_opacity_value8888_0(0)
 ```
-
-
-```{eval-rst}
-.. note::
-   In non-compressed source_over matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
-```
-
-### rle bypass
-
+* Additional information: In non-compressed source_over matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+### Overview RLE Bypass Mode
 ```{mermaid}
 graph TD
-rle_bypass --> b{output}
-b --> |Identity matrix judgment| rle_rgb565
-b --> |Identity matrix judgment| rle_rgb888
-b --> |Identity matrix judgment| rle_rgba8888
+rle_bypass --> b{Identity matrix judgment}
+b --> |N|rle_bypass__no_matrix
+rle_bypass__no_matrix -->rle_bypass_no_matrix_output{output}
+rle_bypass_no_matrix_output -->rle_bypass_rgb565
+rle_bypass_no_matrix_output -->rle_bypass_rgb888
+rle_bypass_no_matrix_output -->rle_bypass_rgba8888
+b --> |Y|rle_bypass_matrix
+rle_bypass_matrix --> rle_bypass_matrix_output{output}
+rle_bypass_matrix_output -->rle_bypass_matrix_rgb565
+rle_bypass_matrix_output -->rle_bypass_matirx_rgb888
+rle_bypass_matrix_output -->rle_bypass_matrix_rgba8888
 ```
+#### RLE Bypass Matrix
 ```{mermaid}
 graph TD
-rle_rgb565 --> rle_bypass_565{input}
+rle_bypass_rgb565 --> rle_bypass_565{input}
 rle_bypass_565 --> | |rle_bypass_565_565
 rle_bypass_565_565 --> rle_bypass_opacity_case565{opacity}
-rle_bypass_opacity_case565 --> |opacity|rle_bypass_opacity_value0_255(0-255)
+rle_bypass_opacity_case565 --> |opacity| rle_bypass_opacity_value0_255(0-255)
 rle_bypass_opacity_case565 --> |no opacity|rle_bypass_opacity_value255(255)
 rle_bypass_opacity_case565 --> |break|rle_bypass_opacity_value0(0)
 rle_bypass_565 --> | |rle_bypass_565_888
@@ -487,13 +495,29 @@ rle_bypass_opacity_case8888 --> |opacity|rle_bypass_opacity_value8888_0_255(0-25
 rle_bypass_opacity_case8888 --> |no opacity|rle_bypass_opacity_value8888_255(255)
 rle_bypass_opacity_case8888 --> |break|rle_bypass_opacity_value8888_0(0)
 ```
-
-```{eval-rst}
-.. note::
-   In compressed bypass mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
+* Additional information: In compressed rle bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
+#### RLE Bypass Matrix
+```{mermaid}
+graph TD
+rle_bypass_matrix_rgb565 --> rle_bypass_matrix_565{input}
+rle_bypass_matrix_565 --> | |rle_bypass_matrix_565_565
+rle_bypass_matrix_565_565 --> rle_bypass_matrix_opacity_case565{opacity}
+rle_bypass_matrix_opacity_case565 --> |opacity| rle_bypass_matrix_opacity_value0_255(0-255)
+rle_bypass_matrix_opacity_case565 --> |no opacity|rle_bypass_matrix_opacity_value255(255)
+rle_bypass_matrix_opacity_case565 --> |break|rle_bypass_matrix_opacity_value0(0)
+rle_bypass_matrix_565 --> | |rle_bypass_matrix_565_888
+rle_bypass_matrix_565_888--> rle_bypass_matrix_opacity_case888{opacity}
+rle_bypass_matrix_opacity_case888 --> |opacity|rle_bypass_matrix_opacity_value888_0_255(0-255)
+rle_bypass_matrix_opacity_case888 --> |no opacity|rle_bypass_matrix_opacity_value888_255(255)
+rle_bypass_matrix_opacity_case888 --> |break|rle_bypass_matrix_opacity_value888_0(0)
+rle_bypass_matrix_565 --> | |rle_bypass_matrix_565_8888
+rle_bypass_matrix_565_8888 --> rle_bypass_matrix_opacity_case8888{opacity}
+rle_bypass_matrix_opacity_case8888 --> |opacity|rle_bypass_matrix_opacity_value8888_0_255(0-255)
+rle_bypass_matrix_opacity_case8888 --> |no opacity|rle_bypass_matrix_opacity_value8888_255(255)
+rle_bypass_matrix_opacity_case8888 --> |break|rle_bypass_matrix_opacity_value8888_0(0)
 ```
-
-### overview rle filter
+* Additional information: In compressed bypass mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
+### Overview RLE Filter
 ```{mermaid}
 graph TD
 rle_filter --> b{Identity matrix judgment}
@@ -508,8 +532,7 @@ rle_fiter_matrix_output -->rle_filter_matrix_rgb565
 rle_fiter_matrix_output -->rle_filter_matirx_rgb888
 rle_fiter_matrix_output -->rle_filter_matrix_rgba8888
 ```
-
-### rle_filter
+#### RLE Filter
 ```{mermaid}
 graph TD
 rle_filter_rgb565 --> rle_filter_565{input}
@@ -529,14 +552,8 @@ rle_filter_opacity_case8888 --> |opacity|rle_filter_opacity_value8888_0_255(0-25
 rle_filter_opacity_case8888 --> |no opacity|rle_filter_opacity_value8888_255(255)
 rle_filter_opacity_case8888 --> |break|rle_filter_opacity_value8888_0(0)
 ```
-
-
-```{eval-rst}
-.. note::
-   In compressed filter mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
-```
-
-### rle_filter_matrix
+* Additional information: In compressed filter mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
+#### RLE Filter Matrix
 ```{mermaid}
 graph TD
 rle_filter_matrix_rgb565 --> rle_filter_matrix_565{input}
@@ -556,13 +573,8 @@ rle_filter_matrix_opacity_case8888 --> |opacity|rle_filter_matrix_opacity_value8
 rle_filter_matrix_opacity_case8888 --> |no opacity|rle_filter_matrix_opacity_value8888_255(255)
 rle_filter_matrix_opacity_case8888 --> |break|rle_filter_matrix_opacity_value8888_0(0)
 ```
-
-```{eval-rst}
-.. note::
-   In compressed filter matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
-```
-
-### overview rle source_over
+* Additional information: In compressed filter matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
+### Overview RLE Source_over
 ```{mermaid}
 graph TD
 rle_alpha --> b{Identity matrix judgment}
@@ -577,7 +589,7 @@ fiter_matrix_output -->rle_alpha_matrix_rgb565
 fiter_matrix_output -->rle_alpha_matirx_rgb888
 fiter_matrix_output -->rle_alpha_matrix_rgba8888
 ```
-### rle alpha no matrix
+#### RLE Source_over No Matrix
 ```{mermaid}
 graph TD
 rle_alpha_rgb565 --> rle_alpha_565{input}
@@ -597,13 +609,8 @@ rle_alpha_opacity_case8888 --> |opacity + alpha|rle_alpha_opacity_value8888_0_25
 rle_alpha_opacity_case8888 --> |alpha|rle_alpha_opacity_value8888_255(255)
 rle_alpha_opacity_case8888 --> |break|rle_alpha_opacity_value8888_0(0)
 ```
-
-```{eval-rst}
-.. note::
-   In compressed source_over mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle_rgb565.
-```
-
-### rle_alpha matrix
+* Additional information: In compressed source_over mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
+#### RLE Source_over Matrix
 ```{mermaid}
 graph TD
 rle_alpha_matrix_rgb565 --> rle_alpha_matrix_565{input}
@@ -623,6 +630,10 @@ rle_alpha_matrix_opacity_case8888 --> |opacity + alpha|rle_alpha_matrix_opacity_
 rle_alpha_matrix_opacity_case8888 --> |alpha|rle_alpha_matrix_opacity_value8888_255(255)
 rle_alpha_matrix_opacity_case8888 --> |break|rle_alpha_matrix_opacity_value8888_0(0)
 ```
+
+* Additional information: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
+
+
 
 
 ```{eval-rst}
