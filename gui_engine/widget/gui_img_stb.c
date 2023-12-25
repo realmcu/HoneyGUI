@@ -90,7 +90,7 @@ static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
                                  struct rtgui_rect *rect)
 {
     gui_stb_img_t *buf_image = (gui_stb_img_t *)((gui_obj_t *)image - 1);
-    int num_components;
+    int num_components = 0;
     uint8_t *stb_data = NULL;
     int stb_length = 0;
     stb_data = (uint8_t *)(image->data) + sizeof(struct gui_rgb_data_head);
@@ -101,7 +101,7 @@ static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
     case JPEG:
     case PNG:
         {
-            if (dc->section.y1 == 0)
+            if (dc->section_count == 0)
             {
                 if (buf_image->src_changed)
                 {
@@ -110,8 +110,12 @@ static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
                         gui_free(buf_image->buffer);
                         buf_image->buffer = NULL;
                     }
-                    buf_image->buffer = stbi_load_from_memory(stb_data, stb_length, (int *) & (image->img_w),
-                                                              (int *) & (image->img_h), &num_components, 0);
+                    int source_w = 0;
+                    int source_h = 0;
+                    buf_image->buffer = stbi_load_from_memory(stb_data, stb_length, &source_w, &source_h,
+                                                              &num_components, 0);
+                    image->img_w = source_w;
+                    image->img_h = source_h;
                 }
             }
             int image_x = rect->x1;
@@ -183,7 +187,7 @@ static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
         break;
     case GIF:
         {
-            if (dc->section.y1 == 0)
+            if (dc->section_count == 0)
             {
                 if (buf_image->src_changed)
                 {
@@ -194,9 +198,14 @@ static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
                     }
                     int *delays = NULL;
                     delays = (int *)malloc(sizeof(int) * buf_image->gif_info->total_frame);
-                    buf_image->buffer = stbi_load_gif_from_memory(stb_data, stb_length, &delays,
-                                                                  (int *) & (image->img_w),
-                                                                  (int *) & (image->img_h), (int *) & (buf_image->gif_info->total_frame), &num_components, 3);
+                    int source_w = 0;
+                    int source_h = 0;
+                    int frame = 0;
+                    buf_image->buffer = stbi_load_gif_from_memory(stb_data, stb_length, &delays, &source_w, &source_h,
+                                                                  &frame, &num_components, 3);
+                    image->img_w = source_w;
+                    image->img_h = source_h;
+                    buf_image->gif_info->total_frame = frame;
                     buf_image->gif_info->delay_ms = (uint32_t *)delays;
                     for (int i = 0; i < buf_image->gif_info->total_frame; i++)
                     {

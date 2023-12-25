@@ -44,9 +44,9 @@ typedef struct gui_gif_info
     uint32_t init_time_ms;
     uint32_t *delay_ms;
     uint32_t cycle_index;
-    uint16_t delay_ms_sum;
-    uint8_t total_frame;
-    uint8_t current_frame;
+    uint32_t delay_ms_sum;
+    uint32_t total_frame;
+    uint32_t current_frame;
 } gui_gif_info_t;
 
 /** @brief  stb img widget information structure */
