@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>LV_KCONFIG_IGNORE ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI_OS_HEAP ENABLE_RTK_GUI LV_CONF_INCLUDE_SIMPLE ENABLE_RTK_GUI_DEMO ENABLE_LVGL_GUI LV_USE_DEMO_WIDGETS LV_LVGL_H_INCLUDE_SIMPLE LV_USE_DEMO_BENCHMARK ENABLE_RTK_GUI_FONT_RTK_MEM GUI_KEIL_SIM</Define>
+              <Define>ENABLE_RTK_GUI_OS_HEAP ENABLE_RTK_GUI_DEMO LV_USE_DEMO_WIDGETS LV_CONF_INCLUDE_SIMPLE LV_USE_DEMO_BENCHMARK GUI_KEIL_SIM LV_LVGL_H_INCLUDE_SIMPLE ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI_FONT_RTK_MEM ENABLE_RTK_GUI LV_KCONFIG_IGNORE ENABLE_LVGL_GUI</Define>
               <Undefine></Undefine>
               <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;lvgl_port;..\gui_engine;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget;..\lvgl;..\lvgl\src;..\lvgl\src\core;..\lvgl\src\draw;..\lvgl\src\extra;..\lvgl\src\font;..\lvgl\src\hal;..\lvgl\src\misc;..\lvgl\src\widgets;..\lvgl\src\draw\arm2d;..\lvgl\src\draw\sdl;..\lvgl\src\draw\stm32_dma2d;..\lvgl\src\draw\sw;..\lvgl\src\draw\swm341_dma2d;..\lvgl\src\draw\nxp\pxp;..\lvgl\src\draw\nxp\vglite;..\lvgl\src\draw\rtk\ppe;..\lvgl\src\draw\rtk\vglite;..\lvgl\src\extra\layouts;..\lvgl\src\extra\libs;..\lvgl\src\extra\others;..\lvgl\src\extra\themes;..\lvgl\src\extra\widgets;..\lvgl\src\extra\layouts\flex;..\lvgl\src\extra\layouts\grid;..\lvgl\src\extra\libs\bmp;..\lvgl\src\extra\libs\ffmpeg;..\lvgl\src\extra\libs\freetype;..\lvgl\src\extra\libs\fsdrv;..\lvgl\src\extra\libs\gif;..\lvgl\src\extra\libs\png;..\lvgl\src\extra\libs\qrcode;..\lvgl\src\extra\libs\rlottie;..\lvgl\src\extra\libs\sjpg;..\lvgl\src\extra\others\fragment;..\lvgl\src\extra\others\gridnav;..\lvgl\src\extra\others\ime;..\lvgl\src\extra\others\imgfont;..\lvgl\src\extra\others\monkey;..\lvgl\src\extra\others\msg;..\lvgl\src\extra\others\snapshot;..\lvgl\src\extra\themes\basic;..\lvgl\src\extra\themes\default;..\lvgl\src\extra\themes\mono;..\lvgl\src\extra\widgets\animimg;..\lvgl\src\extra\widgets\calendar;..\lvgl\src\extra\widgets\chart;..\lvgl\src\extra\widgets\colorwheel;..\lvgl\src\extra\widgets\imgbtn;..\lvgl\src\extra\widgets\keyboard;..\lvgl\src\extra\widgets\led;..\lvgl\src\extra\widgets\list;..\lvgl\src\extra\widgets\menu;..\lvgl\src\extra\widgets\meter;..\lvgl\src\extra\widgets\msgbox;..\lvgl\src\extra\widgets\span;..\lvgl\src\extra\widgets\spinbox;..\lvgl\src\extra\widgets\spinner;..\lvgl\src\extra\widgets\tabview;..\lvgl\src\extra\widgets\tileview;..\lvgl\src\extra\widgets\win</IncludePath>
             </VariousControls>
@@ -557,6 +557,16 @@
               <FileName>acc_sw_filter_matrix.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\acc_sw_filter_matrix.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_source_over.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\acc_sw_source_over.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_source_over_matrix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\acc_sw_source_over_matrix.c</FilePath>
             </File>
             <File>
               <FileName>gui_kb.c</FileName>
@@ -798,7 +808,7 @@
                   <MiscControls> --c99 --gnu --diag_suppress=188 --diag_suppress=546 --diag_suppress=550 --diag_suppress=111 --diag_suppress=68 --diag_suppress=870</MiscControls>
                   <Define>PRIX32=\"x\"</Define>
                   <Undefine> </Undefine>
-                  <IncludePath> </IncludePath>
+                  <IncludePath></IncludePath>
                 </VariousControls>
               </Cads>
               <Aads>

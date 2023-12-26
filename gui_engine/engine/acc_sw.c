@@ -27,6 +27,8 @@
 #include "acc_sw_bypass_matrix.h"
 #include "acc_sw_filter.h"
 #include "acc_sw_filter_matrix.h"
+#include "acc_sw_source_over.h"
+#include "acc_sw_source_over_matrix.h"
 #include "acc_sw.h"
 
 /** @defgroup ENGINE ENGINE
@@ -289,14 +291,14 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
             else if (img_type == RGBA8888)
             {
-                // alpha_matrix_blit_rgba8888_2_rgb888(image, dc, rect);
+                alpha_matrix_blit_rgba8888_2_rgb888(image, dc, rect);
             }
         }
         else if (dc_bytes_per_pixel == 4)
         {
             if (img_type == RGB565)
             {
-                // alpha_matrix_blit_rgb565_2_argb8888(image, dc, rect);
+                alpha_matrix_blit_rgb565_2_argb8888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
@@ -314,11 +316,11 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                //alpha_blend_blit_rgb565_2_rgb565(image, dc, rect);
+                alpha_blend_blit_rgb565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                // alpha_blend_blit_rgb888_2_rgb565(image, dc, rect);
+                alpha_blend_blit_rgb888_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
@@ -329,15 +331,15 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                // alpha_blend_blit_rgb565_2_rgb888(image, dc, rect);
+                alpha_blend_blit_rgb565_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                // alpha_blend_blit_rgb888_2_rgb888(image, dc, rect);
+                alpha_blend_blit_rgb888_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
-                // alpha_blend_blit_argb8888_2_rgb888(image, dc, rect);
+                alpha_blend_blit_rgba8888_2_rgb888(image, dc, rect);
             }
         }
         if (dc_bytes_per_pixel == 4)

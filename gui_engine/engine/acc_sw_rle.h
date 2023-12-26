@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-typedef struct rtzip_file_header
+typedef struct imdc_file_header
 {
     struct
     {
@@ -33,33 +33,33 @@ typedef struct rtzip_file_header
     uint8_t reserved[3];
     uint32_t raw_pic_width;
     uint32_t raw_pic_height;
-} rtzip_file_header_t;
+} imdc_file_header_t;
 
-typedef struct rtzip_file
+typedef struct imdc_file
 {
-    rtzip_file_header_t header;
+    imdc_file_header_t header;
     uint32_t compressed_addr[1024];
 
-} rtzip_file_t;
+} imdc_file_t;
 #pragma pack(1)
 
-typedef struct rtzip_rgb565_node
+typedef struct imdc_rgb565_node
 {
     uint8_t len;
     uint16_t pixel16;  //rgb565
-} rtzip_rgb565_node_t;
-typedef struct rtzip_rgb888_node
+} imdc_rgb565_node_t;
+typedef struct imdc_rgb888_node
 {
     uint8_t len;
     uint8_t pixel_b;  //rgb888
     uint8_t pixel_g;
     uint8_t pixel_r;
-} rtzip_rgb888_node_t;
-typedef struct rtzip_argb8888_node
+} imdc_rgb888_node_t;
+typedef struct imdc_argb8888_node
 {
     uint8_t len;
     uint32_t pixel32;    //argb8888
-} rtzip_argb8888_node_t;
+} imdc_argb8888_node_t;
 #pragma pack()
 
 void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
@@ -96,9 +96,9 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
 
 static void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len);
 static void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len);
-static void uncompressed_rle_rgb565(rtzip_file_t *file, uint32_t line,  uint8_t *buf);
-void uncompressed_rle_rgb888(rtzip_file_t *file, uint32_t line,  uint8_t *buf);
-void uncompressed_rle_argb8888(rtzip_file_t *file, uint32_t line,  uint8_t *buf);
+static void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf);
+void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
+void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 
 
 #ifdef __cplusplus
