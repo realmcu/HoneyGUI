@@ -173,8 +173,8 @@ static void button_prepare(gui_obj_t *obj)
 
                     if (b->on_pic_addr && b->style == 0)
                     {
-
-                        gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
+                        gui_img_set_attribute(b->img, b->flg_fs ? b->on_pic_addr : NULL, b->flg_fs ? NULL : b->on_pic_addr,
+                                              b->img->base.x, b->img->base.y);
 
                     }
                     gui_log("%d\n", __LINE__);
@@ -192,9 +192,8 @@ static void button_prepare(gui_obj_t *obj)
                     b->release_flag = false;
                     if (b->off_pic_addr && b->style == 0)
                     {
-
-                        gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
-
+                        gui_img_set_attribute(b->img, b->flg_fs ? b->off_pic_addr : NULL,
+                                              b->flg_fs ? NULL : b->off_pic_addr, b->img->base.x, b->img->base.y);
                     }
                     {
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
@@ -357,6 +356,7 @@ static gui_button_t *gui_button_create_core(
     GUI_ASSERT(button != NULL);
     memset(button, 0, sizeof(gui_button_t));
 
+    button->flg_fs = is_fs;
     gui_button_ctor(button, parent, x, y, w, h, background_pic, highlight_pic, text);
     gui_list_init(&(GET_BASE(button)->child_list));
     if ((GET_BASE(button)->parent) != NULL)

@@ -80,6 +80,7 @@ struct gui_button
         void *highlight_pic,
         char *text
     );
+    bool flg_fs;
 };
 typedef struct gui_api_button
 {

@@ -67,7 +67,7 @@ typedef struct NormalRec
 #endif
 typedef struct
 {
-    uint8_t flg_fs;                    //!< flag: using filesystem
+    bool flg_fs;                    //!< flag: using filesystem
     union
     {
         char *img_path[6];               //!< images file path
@@ -81,7 +81,7 @@ typedef struct gui_perspective
     char *img_path[6];
     draw_img_t img[6];
     int16_t release_x;
-    uint8_t flg_fs;
+    bool flg_fs;
 } gui_perspective_t;
 
 /** End of WIDGET_Exported_Types

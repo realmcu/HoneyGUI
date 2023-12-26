@@ -92,11 +92,13 @@ void gui_switch_change_switch(gui_switch_t *sw)
     //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->on_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->on_pic_addr, 0, 0);
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->off_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->off_pic_addr, 0, 0);
     }
     //gui_app_exec(gui_current_app());
 
@@ -188,11 +190,13 @@ static void gui_switch_hl(gui_switch_t *sw)
     //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->on_hl_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_hl_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->on_hl_pic_addr, 0, 0);
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->off_hl_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_hl_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->off_hl_pic_addr, 0, 0);
     }
     //gui_app_exec(gui_current_app());
 
@@ -206,35 +210,41 @@ static void gui_switch_hl_back(gui_switch_t *sw)
     //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->on_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->on_pic_addr, 0, 0);
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->off_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->off_pic_addr, 0, 0);
     }
     //gui_app_exec(gui_current_app());
 }
 
 static void gui_switch_long_touch(gui_switch_t *sw)
 {
-    gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_pic_addr, 0, 0);
+    gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->long_touch_state_pic_addr : NULL, \
+                          sw->flg_fs ? NULL : sw->long_touch_state_pic_addr, 0, 0);
 }
 
 static void gui_switch_long_touch_back(gui_switch_t *sw)
 {
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->on_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->on_pic_addr, 0, 0);
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, 0, sw->off_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_pic_addr : NULL, \
+                              sw->flg_fs ? NULL : sw->off_pic_addr, 0, 0);
     }
 }
 
 static void gui_switch_hl_long_touch(gui_switch_t *sw)
 {
-    gui_img_set_attribute(sw->switch_picture, 0, sw->long_touch_state_hl_pic_addr, 0, 0);
+    gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->long_touch_state_hl_pic_addr : NULL, \
+                          sw->flg_fs ? NULL : sw->long_touch_state_hl_pic_addr, 0, 0);
 }
 
 void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
@@ -509,11 +519,12 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->long_touch_state_hl_pic_addr = this->off_pic_addr;
 }
 static gui_switch_t *gui_switch_create_core(void *parent, int16_t x, int16_t y,
-                                            int16_t w, int16_t h, void *off_pic, void *on_pic, uint8_t flg_fs)
+                                            int16_t w, int16_t h, void *off_pic, void *on_pic, bool flg_fs)
 {
     //gui_log("gui_switch_create:%p,%d,%d,%d,%d,%p,%p\n", parent, x, y, w, h, off_pic, on_pic);
     gui_switch_t *this = gui_malloc(sizeof(gui_switch_t));
     memset(this, 0, sizeof(gui_switch_t));
+    this->flg_fs = flg_fs;
     gui_switch_ctor(this, parent, x, y, w, h, off_pic, on_pic);
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))

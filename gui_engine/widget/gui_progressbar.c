@@ -150,7 +150,32 @@ static size_t get_max(gui_progressbar_t *this)
     return this->max;
 }
 
+static void gui_progressbar_movie_ctor_core(gui_progressbar_t *this, gui_obj_t *parent,
+                                            void  **picture_array,
+                                            uint16_t array_number,
+                                            int16_t x,
+                                            int16_t y, bool flg_fs)
+{
+    gui_obj_ctor(&(this->base), parent, "progressbar_movie", x, y, 0, 0);
+    this->per = 0.3f;
+    this->base.type = PROGRESSBAR;
+    this->max = array_number - 1;
+    gui_list_init(&(((gui_obj_t *)this)->child_list));
+    if ((((gui_obj_t *)this)->parent) != ((void *)0))
+    { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
 
+    gui_log("here %d %d %s\n", __LINE__, flg_fs, picture_array[0]);
+    this->flg_fs = flg_fs;
+    if (flg_fs == true)
+    {
+        this->c = (void *)gui_img_create_from_fs(this, picture_array[0], 0, 0);
+    }
+    else
+    {
+        this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
+    }
+    this->color_hl = (uint32_t)picture_array;
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -315,26 +340,17 @@ void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const ch
 void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent, void  **picture_array,
                                 uint16_t array_number,
                                 int16_t x,
-                                int16_t y, uint8_t flg_fs)
+                                int16_t y)
 {
-
-    gui_obj_ctor(&(this->base), parent, "progressbar_movie", x, y, 0, 0);
-    this->per = 0.3f;
-    this->base.type = PROGRESSBAR;
-    this->max = array_number - 1;
-    gui_list_init(&(((gui_obj_t *)this)->child_list));
-    if ((((gui_obj_t *)this)->parent) != ((void *)0))
-    { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
-
-    if (flg_fs)
-    {
-        this->c = (void *)gui_img_create_from_fs(this, picture_array[0], 0, 0);
-    }
-    else
-    {
-        this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
-    }
-    this->color_hl = (uint32_t)picture_array;
+    gui_progressbar_movie_ctor_core(this, parent, picture_array, array_number, x, y, false);
+}
+void gui_progressbar_movie_ctor_fs(gui_progressbar_t *this, gui_obj_t *parent,
+                                   void  **picture_array,
+                                   uint16_t array_number,
+                                   int16_t x,
+                                   int16_t y)
+{
+    gui_progressbar_movie_ctor_core(this, parent, picture_array, array_number, x, y, true);
 }
 gui_progressbar_t *gui_progressbar_movie_create(void *parent, void  **picture_array,
                                                 uint16_t array_length, int16_t x, int16_t y)
@@ -344,7 +360,7 @@ gui_progressbar_t *gui_progressbar_movie_create(void *parent, void  **picture_ar
 //      GUI_NEW(gui_progressbar_t, gui_progressbar_ctor, _progressbar_create_parameter_)
     gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
     memset(this, 0, sizeof(gui_progressbar_t));
-    gui_progressbar_movie_ctor(this, parent, picture_array, array_length, x, y, false);
+    gui_progressbar_movie_ctor_core(this, parent, picture_array, array_length, x, y, false);
 
     ((gui_obj_t *)this)->create_done = 1;
     return this;
@@ -357,7 +373,7 @@ gui_progressbar_t *gui_progressbar_movie_create_from_fs(void *parent, void  **pi
 //      GUI_NEW(gui_progressbar_t, gui_progressbar_ctor, _progressbar_create_parameter_)
     gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
     memset(this, 0, sizeof(gui_progressbar_t));
-    gui_progressbar_movie_ctor(this, parent, picture_array, array_length, x, y, true);
+    gui_progressbar_movie_ctor_core(this, parent, picture_array, array_length, x, y, true);
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }

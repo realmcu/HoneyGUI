@@ -56,7 +56,7 @@ typedef struct gui_img
     float t_y;//!< center of screen y
     gui_animate_t *animate;
     uint8_t checksum;
-    uint8_t flg_fs;
+    bool flg_fs;
 } gui_img_t;
 
 

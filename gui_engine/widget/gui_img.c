@@ -143,21 +143,19 @@ void gui_load_imgfile_from_fs(const char *file_path, draw_img_t *draw_img)
     // gui_log("%s \n", file_path);
     // copy image from fs
     int fd = gui_fs_open(file_path,  0);
-    if (fd == -1)
+    if (fd <= 0)
     {
         gui_log("open file fail !\n");
         return;
     }
 
     int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+    // gui_log("img size: %d \n", size);
     draw_img->data = gui_malloc(size);
     GUI_ASSERT(draw_img->data != NULL);
     memset(draw_img->data, 0, size);
     gui_fs_read(fd, draw_img->data, size);
-    if (fd > 0)
-    {
-        gui_fs_close(fd);
-    }
+    gui_fs_close(fd);
 }
 
 
@@ -346,15 +344,12 @@ uint16_t gui_img_get_width(gui_img_t *img)
     if (img->flg_fs)
     {
         int fd = gui_fs_open(img->img_path,  0);
-        if (fd == -1)
+        if (fd <= 0)
         {
             gui_log("open file fail !\n");
         }
         gui_fs_read(fd, &head, sizeof(head));
-        if (fd > 0)
-        {
-            gui_fs_close(fd);
-        }
+        gui_fs_close(fd);
     }
     else
     {
@@ -371,15 +366,12 @@ uint16_t gui_img_get_height(gui_img_t *img)
     if (img->flg_fs)
     {
         int fd = gui_fs_open(img->img_path,  0);
-        if (fd == -1)
+        if (fd <= 0)
         {
             gui_log("open file fail !\n");
         }
         gui_fs_read(fd, &head, sizeof(head));
-        if (fd > 0)
-        {
-            gui_fs_close(fd);
-        }
+        gui_fs_close(fd);
     }
     else
     {
@@ -410,6 +402,10 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
     gui_img_t *this = img;
     draw_img_t *draw_img = &img->draw_img;
 
+    if (!filename && !addr)
+    {
+        return;
+    }
     this->base.x = x;
     this->base.y = y;
 

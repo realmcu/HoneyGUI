@@ -77,7 +77,7 @@ typedef struct
 
 typedef struct
 {
-    uint8_t flg_fs;                    //!< flag: using filesystem
+    bool flg_fs;                    //!< flag: using filesystem
     union
     {
         cube_img_path_t img_path;
@@ -105,7 +105,7 @@ typedef struct gui_cube
     //float t_y;
     int16_t release_x;
     int16_t release_y;
-    uint8_t flg_fs;
+    bool flg_fs;
 } gui_cube_t;
 
 /** End of WIDGET_Exported_Types

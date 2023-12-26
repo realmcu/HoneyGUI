@@ -168,7 +168,7 @@ void scroll_wheel_update_att(gui_obj_t *obj)
 
 extern void gui_load_imgfile_from_fs(const char *file_path, draw_img_t *draw_img);
 void gui_scrollwheel_append_core(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl,
-                                 uint8_t flg_fs)
+                                 bool flg_fs)
 {
     gui_img_t **img = &this->picture[this->row_count].pic;
     if (flg_fs)

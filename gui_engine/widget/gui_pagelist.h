@@ -70,6 +70,7 @@ typedef struct gui_pagelist
     gui_pagelist_update_cb_t update_list_first_cb;
     gui_pagelist_update_cb_t update_list_last_cb;
     int16_t list_count;
+    bool flg_fs;   // scroll_bar
 
 } gui_pagelist_t;
 
