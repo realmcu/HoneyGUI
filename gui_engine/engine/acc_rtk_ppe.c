@@ -94,7 +94,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     source.memory = (void *)source.address;
     source.global_alpha_en = true;
     source.global_alpha = image->opacity_value;
-    if ((image->blend_mode == IMG_FILTER_BLACK) || (image->blend_mode == IMG_SRC_OVER_MODE))
+    if (image->blend_mode == IMG_SRC_OVER_MODE || image->blend_mode == IMG_FILTER_BLACK)
     {
         if (image->blend_mode == IMG_FILTER_BLACK)
         {
@@ -179,50 +179,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                                     (dc->section.y2 - dc->section.y1) : image->img_h * scale_y;
                 scaled_img.height += acc_ppe_ceil(scale_y);
                 uint32_t modified_height = image->img_h * scale_y;
-                switch (source.format)
-                {
-                case PPE_BGR565:
-                    scaled_img.format = PPE_BGR565;
-                    if (dc->type == DC_SINGLE)
-                    {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 2);
-                    }
-                    else if (dc->type == DC_RAMLESS)
-                    {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 +
-                                                                           (int)acc_ppe_ceil(
-                                                                               scale_y) * 2 + 1) * 2);
-                    }
-                    break;
-                case PPE_BGR888:
-                    scaled_img.format = PPE_BGR888;
-                    if (dc->type == DC_SINGLE)
-                    {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 3);
-                    }
-                    else if (dc->type == DC_RAMLESS)
-                    {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 +
-                                                                           (int)acc_ppe_ceil(
-                                                                               scale_y) + 1) * 3);
-                    }
-                    break;
-                case PPE_BGRA8888:
-                    scaled_img.format = PPE_BGRA8888;
-                    if (dc->type == DC_SINGLE)
-                    {
-                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 4);
-                    }
-                    else if (dc->type == DC_RAMLESS)
-                    {
-                        scaled_img.memory = gui_malloc(scaled_img.width * (dc->section.y2 - dc->section.y1 +
-                                                                           (int)acc_ppe_ceil(
-                                                                               scale_y) + 1) * 4);
-                    }
-                    break;
-                default:
-                    return;
-                }
+
                 trans.x = (int)image->matrix->m[0][2];
                 trans.y = 0;
                 range.left = 0;
@@ -230,7 +187,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 range.top = 0;
                 range.bottom = scaled_img.height - 1;
                 scaled_img.global_alpha_en = true;
-                scaled_img.global_alpha = image->opacity_value << 24;
+                scaled_img.global_alpha = image->opacity_value;
                 if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
                 {
                     scale_rect.top = 0;
@@ -264,10 +221,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 }
                 else
                 {
-                    if (scaled_img.memory != NULL)
-                    {
-                        gui_free(scaled_img.memory);
-                    }
                     return;
                 }
                 if (head->type == IMDC_COMPRESS)
@@ -299,6 +252,46 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                         gui_free(source.memory);
                         return;
                     }
+                }
+                uint32_t scaled_width = (uint32_t)source.width * scale_x;
+                uint32_t scaled_height  = (uint32_t)source.height * scale_y;
+                switch (source.format)
+                {
+                case PPE_BGR565:
+                    scaled_img.format = PPE_BGR565;
+                    if (dc->type == DC_SINGLE)
+                    {
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 2);
+                    }
+                    else if (dc->type == DC_RAMLESS)
+                    {
+                        scaled_img.memory = gui_malloc(scaled_width * scaled_height * 2);
+                    }
+                    break;
+                case PPE_BGR888:
+                    scaled_img.format = PPE_BGR888;
+                    if (dc->type == DC_SINGLE)
+                    {
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 3);
+                    }
+                    else if (dc->type == DC_RAMLESS)
+                    {
+                        scaled_img.memory = gui_malloc(scaled_width * scaled_height * 3);
+                    }
+                    break;
+                case PPE_BGRA8888:
+                    scaled_img.format = PPE_BGRA8888;
+                    if (dc->type == DC_SINGLE)
+                    {
+                        //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 4);
+                    }
+                    else if (dc->type == DC_RAMLESS)
+                    {
+                        scaled_img.memory = gui_malloc(scaled_width * scaled_height * 4);
+                    }
+                    break;
+                default:
+                    return;
                 }
                 PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
                 if (err == PPE_SUCCESS)
@@ -371,7 +364,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                     dma_cfg.TX_DMA_channel = GDMA_Channel1;
                     trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
                     IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
-
                     if (err)
                     {
                         gui_free(source.memory);
