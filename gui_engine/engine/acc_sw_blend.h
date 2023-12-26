@@ -23,12 +23,12 @@ extern "C" {
 
 void do_blending_argb8888_2_argb8888(gui_color_t *d, gui_color_t *s);
 
-void do_blending_argb8888_2_rgb565(gui_color_t *target, gui_color_t *color);
+void do_blending_argb8888_2_rgb565(uint16_t *d, gui_color_t *s);
 void do_blending_rgb888_2_argb8888(gui_color_t *d, gui_color_t *s);
 void do_blending_rgb565_2_argb8888(gui_color_t *d, gui_color_t *s);
 void do_blending_argb8888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
 void do_blending_argb8888_2_rgb888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_argb8888_2_rgb565_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
+void do_blending_argb8888_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t opacity);
 void do_blending_rgb888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
 void do_blending_rgb565_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
 
