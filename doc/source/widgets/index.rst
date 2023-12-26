@@ -4,7 +4,7 @@ widgets
 ==================                   ==================
 Widgets                              Brief
 ------------------                   ------------------
-`screen`_                            The root widget of the widget tree
+`obj`_                               The root widget of the widget tree
 `window`_                            A rectangular container widget
 `img`_                               display image on the screen
 `stbimage`_                          use stb lib to decode standard image format files and display
@@ -24,7 +24,7 @@ Widgets                              Brief
 `perspective`_                       Slide to extend and retract curtains
 ==================                   ==================
 
-.. _screen: gui_screen.html
+.. _obj: gui_obj.html
 .. _window: gui_window.html
 .. _img: gui_img.html
 .. _stbimg: gui_img_stb.html
@@ -49,7 +49,7 @@ Widgets                              Brief
 .. toctree::
     :maxdepth: 2
 
-    screen <gui_screen>
+    obj <gui_obj>
     window <gui_window>
     img <gui_img>
     stbimg <gui_img_stb>

@@ -485,7 +485,14 @@ static void curtainview_prepare(gui_obj_t *obj)
     {
         obj->cover = true;
     }
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_curtainview_t));
 
+    if (last != this->checksum)
+    {
+        gui_fb_change();
+    }
 
 }
 static void gui_curtainview_ctor(gui_curtainview_t *this, gui_obj_t *parent, const char *filename,

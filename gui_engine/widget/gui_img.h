@@ -203,7 +203,16 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
  */
 gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
 
-void gui_img_set_animate(gui_img_t *o, uint32_t dur, int repeatCount, void *callback,
+/**
+ * @brief
+ *
+ * @param this
+ * @param dur
+ * @param repeatCount
+ * @param callback
+ * @param p
+ */
+void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *callback,
                          void *p);
 
 

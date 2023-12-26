@@ -95,6 +95,7 @@ typedef struct gui_curtainview
                  int16_t y, int16_t w, int16_t h);
     bool mute;
     int16_t release_y;
+    uint8_t checksum;
 } gui_curtainview_t;
 /** End of WIDGET_Exported_Types
   * @}
