@@ -399,16 +399,7 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         memset(font_shape, 0, sizeof(NSVGshape));
         font_shape->opacity = 1;
         font_shape->fill.type = 1;
-        //font_shape->fill.d.color = text->color;
-        gui_color_t color_r = {0};
-        color_r.rgba = text->color;
-        gui_color_msb_t color_f = {0};
-        color_f.channel.alpha = color_r.channel.alpha;
-        color_f.channel.red = color_r.channel.blue;
-        color_f.channel.blue = color_r.channel.red;
-        color_f.channel.green = color_r.channel.green;
-
-        font_shape->fill.d.color = color_f.rgba;
+        font_shape->fill.d.color = text->color.color.rgba_full;
         font_shape->flags = 1;
         // font_shape->bounds[0] = 0;
         // font_shape->bounds[1] = 0;
