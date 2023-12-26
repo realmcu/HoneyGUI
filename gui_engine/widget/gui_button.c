@@ -119,7 +119,7 @@ static void button_prepare(gui_obj_t *obj)
         {
         case TOUCH_SHORT:
             {
-                gui_log("%s\n", "TOUCH_SHORT");
+                //gui_log("%s\n", "TOUCH_SHORT");
                 //
 //                bool callback = false;
                 for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
@@ -132,11 +132,11 @@ static void button_prepare(gui_obj_t *obj)
                 } ////gui_log("%d\n", __LINE__);
                 //if (callback)
                 {
-                    gui_log("%d\n", __LINE__);
+                    //gui_log("%d\n", __LINE__);
                     if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
                         (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                     {
-                        gui_log("%d\n", __LINE__);
+                        //gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                     }
                 }
@@ -177,7 +177,7 @@ static void button_prepare(gui_obj_t *obj)
                                               b->img->base.x, b->img->base.y);
 
                     }
-                    gui_log("%d\n", __LINE__);
+                    //gui_log("%d\n", __LINE__);
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
                     b->long_flag = false;
                     b->press_flag = true;

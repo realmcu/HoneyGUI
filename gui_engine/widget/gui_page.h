@@ -62,6 +62,7 @@ typedef struct gui_page
     int start_y;
     gui_img_t *scroll_bar;
     int get_yend;
+    gui_animate_t *animate;
     void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
     bool release;
@@ -175,7 +176,7 @@ gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16
                             int16_t w, int16_t h);
 
 extern _gui_api_page_t gui_page_api;
-
+void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeatCount, void *callback, void *p);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
