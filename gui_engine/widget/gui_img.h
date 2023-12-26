@@ -57,6 +57,7 @@ typedef struct gui_img
     gui_animate_t *animate;
     uint8_t checksum;
     bool flg_fs;
+    uint8_t opacity;
 } gui_img_t;
 
 

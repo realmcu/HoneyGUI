@@ -59,15 +59,7 @@ static void obj_draw_prepare(gui_obj_t *object)
         obj->sy *= obj->parent->sy;
         obj->tx += obj->parent->tx;
         obj->ty += obj->parent->ty;
-        if (obj->type == IMAGE_FROM_MEM)
-        {
-            GUI_TYPE(gui_img_t, obj)->draw_img.opacity_value = obj->parent->opacity_value * obj->opacity_value /
-                                                               UINT8_MAX;
-        }
-        else
-        {
-            obj->opacity_value = obj->parent->opacity_value;
-        }
+        obj->opacity_value = obj->parent->opacity_value;
 
         if (obj->obj_prepare != NULL)
         {

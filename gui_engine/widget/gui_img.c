@@ -163,6 +163,9 @@ static void img_prepare(gui_obj_t *obj)
 {
 
     GUI_ASSERT(obj != NULL);
+    GUI_TYPE(gui_img_t, obj)->draw_img.opacity_value = obj->parent->opacity_value * GUI_TYPE(gui_img_t,
+                                                       obj)->opacity / UINT8_MAX;
+
     obj_update_att(obj);
     gui_img_t *this = (gui_img_t *)obj;
     gui_obj_t *root = (gui_obj_t *)obj;
@@ -331,6 +334,7 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
 
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
+    this->opacity = draw_img->opacity_value;
 }
 /*============================================================================*
  *                           Public Functions
@@ -483,7 +487,7 @@ void gui_img_skew_y(gui_img_t *img, float degrees)
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 {
     this->draw_img.opacity_value = opacity_value;
-    GET_BASE(this)->opacity_value = opacity_value;
+    this->opacity = opacity_value;
 }
 
 gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
