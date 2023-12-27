@@ -6,7 +6,8 @@ void page_ct_message(void *parent)
     //gui_img_create_from_mem(parent, "page_down", MESSAGE_BIN, 0, 0, 0, 0);
     gui_perspective_imgfile_t imgfile =
     {
-        .flg_fs = false,
+        .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
+        .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
         .data_addr[0] = CLOCKN_BIN,
         .data_addr[1] = WEATHER_BIN,
         .data_addr[2] = MUSIC_BIN,

@@ -138,30 +138,8 @@ static void (obj_update_att)(struct _gui_obj_t *o)
     }
 }
 
-void gui_load_imgfile_from_fs(const char *file_path, draw_img_t *draw_img)
-{
-    // gui_log("%s \n", file_path);
-    // copy image from fs
-    int fd = gui_fs_open(file_path,  0);
-    if (fd <= 0)
-    {
-        gui_log("open file fail !\n");
-        return;
-    }
-
-    int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
-    // gui_log("img size: %d \n", size);
-    draw_img->data = gui_malloc(size);
-    GUI_ASSERT(draw_img->data != NULL);
-    memset(draw_img->data, 0, size);
-    gui_fs_read(fd, draw_img->data, size);
-    gui_fs_close(fd);
-}
-
-
 static void img_prepare(gui_obj_t *obj)
 {
-
     GUI_ASSERT(obj != NULL);
     GUI_TYPE(gui_img_t, obj)->draw_img.opacity_value = obj->parent->opacity_value * GUI_TYPE(gui_img_t,
                                                        obj)->opacity / UINT8_MAX;
@@ -173,10 +151,6 @@ static void img_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     draw_img_t *draw_img = &this->draw_img;
 
-    if (this->flg_fs)
-    {
-        gui_load_imgfile_from_fs(this->img_path, draw_img);
-    }
     rtgui_image_load_scale(draw_img);
     root->w = draw_img->img_w;
     root->h = draw_img->img_h;
@@ -226,6 +200,7 @@ static void img_prepare(gui_obj_t *obj)
     }
 }
 
+extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
 static void img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -240,7 +215,7 @@ static void img_draw_cb(gui_obj_t *obj)
     draw_rect.y2 = draw_rect.y1 + draw_img->target_h;
     if (gui_get_acc() != NULL)
     {
-        gui_get_acc()->blit(draw_img, dc, &draw_rect);
+        gui_acc_blit(draw_img, dc, &draw_rect);
     }
     else
     {
@@ -251,12 +226,6 @@ static void img_draw_cb(gui_obj_t *obj)
 static void img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-    if (((gui_img_t *)obj)->flg_fs)
-    {
-        // gui_log("%s \n", __FUNCTION__);
-        gui_free(((gui_img_t *)obj)->draw_img.data);
-        ((gui_img_t *)obj)->draw_img.data = NULL;
-    }
 }
 
 static void magic_img_destory(gui_obj_t *obj)
@@ -266,11 +235,11 @@ static void magic_img_destory(gui_obj_t *obj)
     gui_free(this->draw_img.inverse);
     gui_free(this->draw_img.matrix);
     gui_free(this->animate);
-    if (this->flg_fs)
+    if (this->draw_img.src_mode == IMG_SRC_FILESYS)
     {
 #ifdef _WIN32
         // free path transforming memory on win
-        gui_free(this->img_path);
+        gui_free(this->draw_img.data);
 #endif
     }
 }
@@ -295,17 +264,14 @@ char *gui_img_filepath_transforming(void *addr)
     return path;
 }
 
-static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
-                         void *addr,
-                         int16_t x,
-                         int16_t y, int16_t w, int16_t h, bool is_fs)
+static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *config)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *root = (gui_obj_t *)this;
     draw_img_t *draw_img = &this->draw_img;
-    this->flg_fs = is_fs;
+    draw_img->src_mode = config->src_mode;
 
-    gui_obj_ctor(root, parent, name, x, y, w, h);
+    gui_obj_ctor(root, parent, config->name, config->x, config->y, config->w, config->h);
 
     root->obj_prepare = img_prepare;
     root->obj_draw = img_draw_cb;
@@ -313,17 +279,17 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
     root->obj_destory = magic_img_destory;
     root->type = IMAGE_FROM_MEM;
 
-    if (is_fs)
+    if (config->src_mode == IMG_SRC_FILESYS)
     {
-        char *path = addr;
+        const char *path = config->file;
 #ifdef _WIN32
-        path = gui_img_filepath_transforming(addr);
+        path = gui_img_filepath_transforming(config->file);
 #endif
-        this->img_path = path;
+        draw_img->data = (void *)path;
     }
-    else
+    else if (config->src_mode == IMG_SRC_MEMADDR)
     {
-        draw_img->data = addr;
+        draw_img->data = (void *)config->addr;
     }
 
     draw_img->opacity_value = 255;
@@ -336,6 +302,29 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, const char *name,
     this->scale_y = 1.0f;
     this->opacity = draw_img->opacity_value;
 }
+
+static gui_img_t *gui_img_create_core(void *parent, gui_imgconfig_t *config)
+{
+    GUI_ASSERT(parent != NULL);
+    GUI_ASSERT(config->addr != NULL);
+    if (config->name == NULL)
+    {
+        config->name = "MAGIC_IMG";
+    }
+    gui_img_t *img = gui_malloc(sizeof(gui_img_t));
+    GUI_ASSERT(img != NULL);
+    memset(img, 0x00, sizeof(gui_img_t));
+
+    gui_img_ctor(img, (gui_obj_t *)parent, config);
+    gui_list_init(&(GET_BASE(img)->child_list));
+    if ((GET_BASE(img)->parent) != NULL)
+    {
+        gui_list_insert_before(&((GET_BASE(img)->parent)->child_list), &(GET_BASE(img)->brother_list));
+    }
+    GET_BASE(img)->create_done = true;
+    return img;
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -345,17 +334,17 @@ uint16_t gui_img_get_width(gui_img_t *img)
     draw_img_t *draw_img = &img->draw_img;
     struct gui_rgb_data_head head;
 
-    if (img->flg_fs)
+    if (draw_img->src_mode == IMG_SRC_FILESYS)
     {
-        int fd = gui_fs_open(img->img_path,  0);
+        int fd = gui_fs_open(draw_img->data,  0);
         if (fd <= 0)
         {
-            gui_log("open file fail !\n");
+            gui_log("open file fail:%s !\n", draw_img->data);
         }
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
     }
-    else
+    else if (draw_img->src_mode == IMG_SRC_MEMADDR)
     {
         memcpy(&head, draw_img->data, sizeof(head));
     }
@@ -367,17 +356,17 @@ uint16_t gui_img_get_height(gui_img_t *img)
     draw_img_t *draw_img = &img->draw_img;
     struct gui_rgb_data_head head;
 
-    if (img->flg_fs)
+    if (draw_img->src_mode == IMG_SRC_FILESYS)
     {
-        int fd = gui_fs_open(img->img_path,  0);
+        int fd = gui_fs_open(draw_img->data,  0);
         if (fd <= 0)
         {
-            gui_log("open file fail !\n");
+            gui_log("open file fail:%s !\n", draw_img->data);
         }
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
     }
-    else
+    else if (draw_img->src_mode == IMG_SRC_MEMADDR)
     {
         memcpy(&head, draw_img->data, sizeof(head));
     }
@@ -413,39 +402,28 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
     this->base.x = x;
     this->base.y = y;
 
-    // reset file data
-    if (this->flg_fs)
+    // free filepath on win
+    if (draw_img->src_mode == IMG_SRC_FILESYS)
     {
-        if (draw_img->data)
-        {
-            gui_free(draw_img->data);
-            draw_img->data = NULL;
-        }
-
 #ifdef _WIN32
-        gui_free(this->img_path);
+        gui_free(draw_img->data);
 #endif
-        this->img_path = NULL;
-    }
-    else
-    {
-        this->draw_img.data = NULL;
     }
 
     if (addr != NULL)
     {
-        this->flg_fs = false;
+        draw_img->src_mode = IMG_SRC_MEMADDR;
         draw_img->data = addr;
     }
     else if (filename)
     {
-        this->flg_fs = true;
+        draw_img->src_mode = IMG_SRC_FILESYS;
 
         void *path = (void *)filename;
 #ifdef _WIN32
         path = gui_img_filepath_transforming(path);
 #endif
-        this->img_path = path;
+        draw_img->data = path;
     }
 }
 
@@ -494,43 +472,30 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                    int16_t x,
                                    int16_t y, int16_t w, int16_t h)
 {
-    GUI_ASSERT(parent != NULL);
-    if (name == NULL)
-    {
-        name = "MAGIC_IMG";
-    }
-    gui_img_t *img = gui_malloc(sizeof(gui_img_t));
-    GUI_ASSERT(img != NULL);
-    memset(img, 0x00, sizeof(gui_img_t));
-
-    gui_img_ctor(img, (gui_obj_t *)parent, name, addr, x, y, w, h, false);
-    gui_list_init(&(GET_BASE(img)->child_list));
-    if ((GET_BASE(img)->parent) != NULL)
-    {
-        gui_list_insert_before(&((GET_BASE(img)->parent)->child_list), &(GET_BASE(img)->brother_list));
-    }
-    GET_BASE(img)->create_done = true;
-    return img;
+    gui_imgconfig_t config = {   .name = name,
+                                 .addr = addr,
+                                 .src_mode = IMG_SRC_MEMADDR,
+                                 .x    = x,
+                                 .y    = y,
+                                 .w    = w,
+                                 .h    = h,
+                             };
+    return gui_img_create_core(parent, &config);
 }
 
 gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)
 {
-    GUI_ASSERT(parent != NULL);
-    GUI_ASSERT(file != NULL);
-
-    gui_img_t *img = gui_malloc(sizeof(gui_img_t));
-    GUI_ASSERT(img != NULL);
-    memset(img, 0x00, sizeof(gui_img_t));
-
-    gui_img_ctor(img, (gui_obj_t *)parent, "image", (void *)file, x, y, 0, 0, true);
-    gui_list_init(&(GET_BASE(img)->child_list));
-    if ((GET_BASE(img)->parent) != NULL)
-    {
-        gui_list_insert_before(&((GET_BASE(img)->parent)->child_list), &(GET_BASE(img)->brother_list));
-    }
-    GET_BASE(img)->create_done = true;
-    return img;
+    gui_imgconfig_t config = {   .name = "image",
+                                 .file = file,
+                                 .src_mode = IMG_SRC_FILESYS,
+                                 .x    = x,
+                                 .y    = y,
+                                 .w    = 0,
+                                 .h    = 0,
+                             };
+    return gui_img_create_core(parent, &config);
 }
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

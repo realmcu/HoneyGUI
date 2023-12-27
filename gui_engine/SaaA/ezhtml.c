@@ -84,7 +84,7 @@ gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *ad
                                    y, 0, 0);
 }
 
-gui_img_t *xml_gui_img_create(parent, file, x, y)
+gui_img_t *xml_gui_img_create(void *parent, const char *file, int16_t x, int16_t y)
 {
     if (file == NULL)
     {
@@ -109,6 +109,9 @@ gui_img_t *xml_gui_img_create(parent, file, x, y)
 
     if (size < 100000)
     {
+#ifdef __WIN32
+        path = file;
+#endif
         return parent = (void *)gui_img_create_from_fs(parent, path, x, y);
     }
     else
@@ -543,7 +546,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         void *imgbuf = gui_get_file_address(file);
                         parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
-
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);

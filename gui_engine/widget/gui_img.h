@@ -41,10 +41,27 @@ extern "C" {
 
 
 /** @brief  image widget structure */
+#ifdef  __CC_ARM
+#pragma anon_unions
+#endif
+typedef struct
+{
+    const char *name;
+    IMG_SOURCE_MODE_TYPE src_mode;
+    union
+    {
+        const char *file;
+        const void *addr;
+    };
+    int16_t x;
+    int16_t y;
+    int16_t w;
+    int16_t h;
+} gui_imgconfig_t;
+
 typedef struct gui_img
 {
     gui_obj_t base;
-    char *img_path;
     draw_img_t draw_img;
 
     float degrees;
@@ -56,7 +73,6 @@ typedef struct gui_img
     float t_y;//!< center of screen y
     gui_animate_t *animate;
     uint8_t checksum;
-    bool flg_fs;
     uint8_t opacity;
 } gui_img_t;
 

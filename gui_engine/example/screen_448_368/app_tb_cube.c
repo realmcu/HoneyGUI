@@ -11,7 +11,8 @@ void page_tb_cube(void *parent)
 {
     gui_cube_imgfile_t imgfile =
     {
-        .flg_fs = false,
+        .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
+        .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
         .data_addr.data_addr_front = ACTIVITY_BIN,
         .data_addr.data_addr_back = WEATHER_BIN,
         .data_addr.data_addr_up =  HEARTRATE_BIN,

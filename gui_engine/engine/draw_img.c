@@ -122,8 +122,23 @@ static struct rtgui_image_engine *rtgui_image_get_engine_by_filename(const char 
 
 void rtgui_image_load_scale(draw_img_t *img)
 {
-    struct gui_rgb_data_head head;
-    memcpy(&head, img->data, sizeof(head));
+    struct gui_rgb_data_head head = {0};
+
+    if (img->src_mode == IMG_SRC_FILESYS)
+    {
+        int fd = gui_fs_open(img->data,  0);
+        if (fd <= 0)
+        {
+            gui_log("open file fail:%s !\n", img->data);
+        }
+        gui_fs_read(fd, &head, sizeof(head));
+        gui_fs_close(fd);
+    }
+    else if (img->src_mode == IMG_SRC_MEMADDR)
+    {
+        memcpy(&head, img->data, sizeof(head));
+    }
+
     img->img_w = head.w;
     img->img_h = head.h;
 }

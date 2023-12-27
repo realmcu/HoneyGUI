@@ -67,7 +67,7 @@ typedef struct NormalRec
 #endif
 typedef struct
 {
-    bool flg_fs;                    //!< flag: using filesystem
+    IMG_SOURCE_MODE_TYPE src_mode[6];                    //!< flag: indicate file src
     union
     {
         char *img_path[6];               //!< images file path
@@ -78,12 +78,10 @@ typedef struct
 typedef struct gui_perspective
 {
     gui_obj_t base;             //!< base structure
-    char *img_path[6];
     draw_img_t img[6];
     int ry[6];
     int temp[6];
     int16_t release_x;
-    bool flg_fs;
     uint8_t checksum;
 } gui_perspective_t;
 

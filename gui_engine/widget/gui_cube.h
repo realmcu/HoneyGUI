@@ -77,7 +77,7 @@ typedef struct
 
 typedef struct
 {
-    bool flg_fs;                    //!< flag: using filesystem
+    IMG_SOURCE_MODE_TYPE src_mode[6];                    //!< flag: indicate file source
     union
     {
         cube_img_path_t img_path;
@@ -89,7 +89,6 @@ typedef struct
 typedef struct gui_cube
 {
     gui_obj_t base;                 //!< base structure
-    cube_img_path_t img_path;
     draw_img_t draw_img_front;
     draw_img_t draw_img_back;
     draw_img_t draw_img_up;
@@ -111,7 +110,6 @@ typedef struct gui_cube
     //float t_y;
     int16_t release_x;
     int16_t release_y;
-    bool flg_fs;
     bool auto_flag;
     uint32_t interval_ms_y;
     float    step_degree_y;
