@@ -541,7 +541,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     //gui_log("x:%d,y:%d,w:%dh:%d,file:%s\n", x, y, w, h, file);
                     if (file)
                     {
-                        xml_gui_img_create(parent, file, x, y);
+                        void *imgbuf = gui_get_file_address(file);
+                        parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
+
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);
