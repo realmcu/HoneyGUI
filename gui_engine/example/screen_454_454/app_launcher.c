@@ -75,14 +75,6 @@ static void app_launcher_ui_design(gui_app_t *app)
     win_main = gui_win_create(&(app->screen), "win", 0, 0, 320, 320);
     gui_obj_add_event_cb(win_main, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, NULL);
 
-    // gui_magic_img_t *img = gui_img_creat_from_mem(win, "test", C1_BIN, 0, 0, 454, 454);
-    //  gui_img_scale(img, 0.2f, 0.2f);
-    //  gui_img_translate(img, 200, 200);
-    //  gui_img_rotation(img, 45, 128 + (454 - 256) / 2, 128 + (454 - 256) / 2);
-    // uint8_t *array_flash[] = {C1_BIN, C2_BIN, C3_BIN, C4_BIN, C5_BIN, C6_BIN};
-    // gui_perspective_t *img_test = gui_perspective_create(win_main, "test", array_flash, 0, 0, 454, 454);
-    // return;
-
 
     tv_main = gui_tabview_create(win_main, "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv_main, REDUCTION);

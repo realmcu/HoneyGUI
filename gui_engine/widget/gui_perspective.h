@@ -80,8 +80,11 @@ typedef struct gui_perspective
     gui_obj_t base;             //!< base structure
     char *img_path[6];
     draw_img_t img[6];
+    int ry[6];
+    int temp[6];
     int16_t release_x;
     bool flg_fs;
+    uint8_t checksum;
 } gui_perspective_t;
 
 /** End of WIDGET_Exported_Types

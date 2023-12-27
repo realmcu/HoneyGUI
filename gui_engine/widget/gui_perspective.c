@@ -77,9 +77,7 @@ typedef struct Point2f
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-static struct rtgui_matrix rotate_3D;
-static Vertex_t rv0, rv1, rv2, rv3;
-static Vertex_t tv0, tv1, tv2, tv3;
+
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -367,13 +365,14 @@ static bool full_rank(struct rtgui_matrix *m)
 }
 #endif
 
-static int ry[6] = {0, 60, 120, 180, 240, 300};
-static int temp[6] = {0, 60, 120, 180, 240, 300};
+
 
 extern void gui_load_imgfile_from_fs(const char *file_path, draw_img_t *draw_img);
 static void prepare(gui_obj_t *obj)
 {
-    // gui_log("perspective %s \n", __FUNCTION__);
+    struct rtgui_matrix rotate_3D;
+    Vertex_t rv0, rv1, rv2, rv3;
+    Vertex_t tv0, tv1, tv2, tv3;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
 
@@ -408,7 +407,7 @@ static void prepare(gui_obj_t *obj)
 
     for (uint32_t i = 0; i < 6; i++)
     {
-        ry[i] = i * 60;
+        this->ry[i] = i * 60;
     }
     switch (tp->type)
     {
@@ -417,33 +416,24 @@ static void prepare(gui_obj_t *obj)
 
         break;
     default:
-        this->release_x += 1 ;
         break;
-    }
-    if (this->release_x > 0)
-    {
-        //this->release_x--;
-    }
-    if (this->release_x < 0)
-    {
-        //this->release_x++;
     }
 
     for (uint32_t i = 0; i < 6; i++)
     {
-        ry[i] += this->release_x;
-        temp[i] = ry[i];
+        this->ry[i] += this->release_x;
+        this->temp[i] = this->ry[i];
     }
 
     for (uint32_t i = 0; i < 6 - 1; i++)
     {
         for (uint32_t j = 0; j < 6 - i - 1; j++)
         {
-            if (fix_cos(temp[j]) > fix_cos(temp[j + 1]))
+            if (fix_cos(this->temp[j]) > fix_cos(this->temp[j + 1]))
             {
-                float t = temp[j];
-                temp[j] = temp[j + 1];
-                temp[j + 1] = t;
+                float t = this->temp[j];
+                this->temp[j] = this->temp[j + 1];
+                this->temp[j + 1] = t;
             }
         }
     }
@@ -451,7 +441,7 @@ static void prepare(gui_obj_t *obj)
     for (uint32_t i = 0; i < 6; i++)
     {
 
-        compute_rotate(0, ry[i], 0, &rotate_3D);
+        compute_rotate(0, this->ry[i], 0, &rotate_3D);
 
         transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
         transfrom_rotate(&rotate_3D, &v1, &tv1, 0, 0, 0);
@@ -477,7 +467,16 @@ static void prepare(gui_obj_t *obj)
         matrix_inverse(this->img[i].inverse);
         rtgui_image_new_area(&this->img[i]);
     }
-    return;
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = this->release_x;
+
+    if ((last != this->checksum) || (this->release_x == 0))
+    {
+        gui_fb_change();
+    }
+
 }
 
 static void draw_cb(gui_obj_t *obj)
@@ -492,7 +491,7 @@ static void draw_cb(gui_obj_t *obj)
     {
         for (uint32_t i = 0; i < 6; i++)
         {
-            if (temp[j] == ry[i])
+            if (this->temp[j] == this->ry[i])
             {
                 draw_img_t *draw_img = &this->img[i];
 
@@ -576,6 +575,8 @@ static void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, con
         this->img[i].blend_mode = IMG_SRC_OVER_MODE;
         this->img[i].matrix = gui_malloc(sizeof(struct rtgui_matrix));
         this->img[i].inverse = gui_malloc(sizeof(struct rtgui_matrix));
+        this->temp[i] = i * 30;
+        this->ry[i] = i * 30;
     }
 }
 /*============================================================================*

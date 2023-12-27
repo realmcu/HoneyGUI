@@ -99,6 +99,12 @@ typedef struct gui_cube
     float c_x;
     float c_y;
     float cbsize;
+    float nz0321;
+    float nz4567;
+    float nz5126;
+    float nz0473;
+    float nz7623;
+    float nz0154;
     //float scale_x;
     //float scale_y;
     //float t_x;
@@ -106,6 +112,13 @@ typedef struct gui_cube
     int16_t release_x;
     int16_t release_y;
     bool flg_fs;
+    bool auto_flag;
+    uint32_t interval_ms_y;
+    float    step_degree_y;
+
+    float xrot;
+    float yrot;
+    float zrot;
 } gui_cube_t;
 
 /** End of WIDGET_Exported_Types
@@ -226,6 +239,30 @@ void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
  * @param size scale size
  */
 void gui_cube_set_size(gui_cube_t *this, float size);
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param interval
+ */
+void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree);
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param interval
+ */
+void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree);
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param interval
+ */
+void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

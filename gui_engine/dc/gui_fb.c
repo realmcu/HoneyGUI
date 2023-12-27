@@ -33,7 +33,7 @@ static void obj_is_active(gui_obj_t *obj)
     }
 }
 
-#include "gui_img.h"
+
 static void obj_draw_prepare(gui_obj_t *object)
 {
     GUI_ASSERT(object->name != NULL);
@@ -248,7 +248,7 @@ void gui_fb_disp(gui_obj_t *root)
     if (fb_change == true)
     {
         gui_fb_draw(root);
-        fb_change = true;
+        fb_change = false;
     }
     else
     {

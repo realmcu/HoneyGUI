@@ -20,6 +20,7 @@ void page_tb_cube(void *parent)
         .data_addr.data_addr_right = QUICKCARD_BIN
     };
     gui_cube_t *cube4 = gui_cube_create(parent, "cube", &imgfile, 0, 0);
+    gui_cube_auto_rotation_by_y(cube4, 100, 5.5f);
     // "Clockn.bin"
     gui_cube_set_mode(cube4, CUBE_SIDE_DOWN, IMG_SRC_OVER_MODE);
     gui_cube_set_size(cube4, 100);
