@@ -1102,6 +1102,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_log("here %d\n", __LINE__);
                             parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
                                                                           cx, cy, 100, 100, sd, ed);
+                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), IMG_SRC_OVER_MODE);
+
                         }
                         else
                         {
