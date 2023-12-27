@@ -298,10 +298,10 @@ void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst)
     }
 }
 
-app_color gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
-                   unsigned char opacity)
+gui_color_t gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
+                     unsigned char opacity)
 {
-    app_color color;
+    gui_color_t color;
     // Use longer initialization to suppress warning.
     color.color.rgba.r = red;
     color.color.rgba.g = green;
@@ -310,9 +310,9 @@ app_color gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
     return color;
 }
 
-app_color gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
+gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
 {
-    app_color color;
+    gui_color_t color;
     // Use longer initialization to suppress warning.
     color.color.rgba.r = red;
     color.color.rgba.g = green;

@@ -288,7 +288,7 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y)
     this->text->base.x = text_x;
     this->text->base.y = text_y;
 }
-void gui_button_text_color(gui_button_t *this, app_color color)
+void gui_button_text_color(gui_button_t *this, gui_color_t color)
 {
     this->text->color = color;
 }

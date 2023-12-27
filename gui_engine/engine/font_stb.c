@@ -67,7 +67,7 @@ static void rtgui_font_stb_unload(gui_text_t *text)
     gui_free((FONT_STB_SCREEN *)text->data);
 }
 #ifndef RTK_GUI_FONT_ENABLE_TTF_SVG
-gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
+gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
 {
     uint32_t mix;
     uint8_t back_a = 0xff - alpha;
@@ -85,7 +85,7 @@ gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
     return mix;
 }
 
-gui_inline uint16_t rgba2565(app_color rgba)
+gui_inline uint16_t rgba2565(gui_color_t rgba)
 {
     uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
     uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;

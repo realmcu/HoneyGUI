@@ -2728,10 +2728,10 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             for (uint32_t j = x_start; j < x_end; j++)
             {
                 pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-                gui_color_t color = {.channel.blue = pixel[0],
-                                     .channel.green = pixel[1],
-                                     .channel.red = pixel[2],
-                                     .channel.alpha = pixel[3],
+                gui_color_t color = {.color.rgba.r = pixel[0],
+                                     .color.rgba.g = pixel[1],
+                                     .color.rgba.b = pixel[2],
+                                     .color.rgba.a = pixel[3],
                                     };
                 uint8_t opacity_value = (uint8_t)image->opacity_value;
                 switch (opacity_value)
@@ -2771,10 +2771,10 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             for (uint32_t j = x_start; j < x_end; j++)
             {
                 uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-                gui_color_t color = {.channel.blue = pixel[0],
-                                     .channel.green = pixel[1],
-                                     .channel.red = pixel[2],
-                                     .channel.alpha = 255,
+                gui_color_t color = {.color.rgba.r = pixel[0],
+                                     .color.rgba.g = pixel[1],
+                                     .color.rgba.b = pixel[2],
+                                     .color.rgba.a = 255,
                                     };
                 uint8_t opacity_value = (uint8_t)image->opacity_value;
                 switch (opacity_value)
@@ -2814,10 +2814,10 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             for (uint32_t j = x_start; j < x_end; j++)
             {
                 uint16_t pixel = *((uint16_t *)(read_off + j * source_bytes_per_pixel));
-                gui_color_t color = {.channel.blue = (pixel & 0x001f) << 3,
-                                     .channel.green = ((pixel & 0x07e0) >> 5) << 2,
-                                     .channel.red = (pixel >> 11) << 3,
-                                     .channel.alpha = 255,
+                gui_color_t color = {.color.rgba.b = (pixel & 0x001f) << 3,
+                                     .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
+                                     .color.rgba.r = (pixel >> 11) << 3,
+                                     .color.rgba.a = 255,
                                     };
                 uint8_t opacity_value = (uint8_t)image->opacity_value;
                 switch (opacity_value)
@@ -2946,10 +2946,10 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
 
-                gui_color_t color = {.channel.blue = pixel[0],
-                                     .channel.green = pixel[1],
-                                     .channel.red = pixel[2],
-                                     .channel.alpha = pixel[3],
+                gui_color_t color = {.color.rgba.r = pixel[0],
+                                     .color.rgba.g = pixel[1],
+                                     .color.rgba.b = pixel[2],
+                                     .color.rgba.a = pixel[3],
                                     };
                 uint8_t opacity_value = (uint8_t)image->opacity_value;
                 switch (opacity_value)
@@ -3004,10 +3004,10 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 }
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
-                gui_color_t color = {.channel.blue = pixel[0],
-                                     .channel.green = pixel[1],
-                                     .channel.red = pixel[2],
-                                     .channel.alpha = 0xff,
+                gui_color_t color = {.color.rgba.r = pixel[0],
+                                     .color.rgba.g = pixel[1],
+                                     .color.rgba.b = pixel[2],
+                                     .color.rgba.a = 255,
                                     };
                 switch (opacity_value)
                 {
@@ -3060,10 +3060,10 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 }
                 uint16_t pixel = *(uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                                source_bytes_per_pixel);
-                gui_color_t color = {.channel.blue = (pixel & 0x001f) << 3,
-                                     .channel.green = ((pixel & 0x07e0) >> 5) << 2,
-                                     .channel.red = (pixel >> 11) << 3,
-                                     .channel.alpha = 0xFF,
+                gui_color_t color = {.color.rgba.b = (pixel & 0x001f) << 3,
+                                     .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
+                                     .color.rgba.r = (pixel >> 11) << 3,
+                                     .color.rgba.a = 0xFF,
                                     };
                 switch (opacity_value)
                 {
