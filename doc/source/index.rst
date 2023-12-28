@@ -45,7 +45,6 @@ RTKIOT GUI
   widgets <widgets/index>
   Porting <Porting/index>
   Integration and Drivers <integration/index>
-  Overview <overview/index>
   Example <example/index>
   Tool <tool/index>
   Design Spec<Design/index>

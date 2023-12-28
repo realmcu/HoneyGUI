@@ -54,18 +54,26 @@ typedef struct gui_page
     uint32_t widget_count;
     uint32_t width;
     int yold;
+    int y_last;
+    int count;
+    int speed;
+
     int start_x;
     int start_y;
     gui_img_t *scroll_bar;
     int get_yend;
+    gui_animate_t *animate;
     void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
+    bool release;
+    bool flg_fs;  // scroll_bar
 } gui_page_t;
 
 /** @brief  PAGE widget api structure */
 typedef struct _gui_api_page
 {
     void (*gui_page_add_scroll_bar)(gui_page_t *this, void *bar_pic);
+    void (*gui_page_add_scroll_bar_from_fs)(gui_page_t *this, void *bar_pic);
     void (*set_offset)(gui_page_t *this, int offset);
     int (*get_offset)(gui_page_t *this);
 } _gui_api_page_t;
@@ -168,7 +176,7 @@ gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16
                             int16_t w, int16_t h);
 
 extern _gui_api_page_t gui_page_api;
-
+void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeatCount, void *callback, void *p);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

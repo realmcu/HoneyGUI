@@ -105,11 +105,11 @@ static void pagelist_prepare(gui_pagelist_t *this)
     {
         return;
     }
-    int16_t list_h = 0;
-    if (this->list_last != NULL)
-    {
-        list_h = this->list_last->base.h;
-    }
+    // int16_t list_h = 0;
+    // if (this->list_last != NULL)
+    // {
+    //     list_h = this->list_last->base.h;
+    // }
     //gui_log("root ax = %d, root ay = %d\n", root->ax, root->ay);
     if ((root->ax < (int)gui_get_screen_width()) && ((root->ax + root->w) >= 0) && \
         (root->ay < (int)gui_get_screen_height()) && ((root->ay + root->h) >= 0))
@@ -302,7 +302,15 @@ static void pagelist_ctor(gui_pagelist_t *this, gui_obj_t *parent, const char *n
  *============================================================================*/
 void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic)
 {
+    this->flg_fs = false;
     this->scroll_bar = gui_img_create_from_mem(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
+    gui_img_get_height(this->scroll_bar);
+    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
+}
+void gui_pagelist_add_scroll_bar_from_fs(gui_pagelist_t *this, void *bar_pic)
+{
+    this->flg_fs = true;
+    this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }

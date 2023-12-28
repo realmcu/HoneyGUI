@@ -33,6 +33,10 @@ typedef enum
     BINARY = 5,
     ALPHAMASK = 9,
     IMDC_COMPRESS = 10,
+    BMP = 11,
+    JPEG = 12,
+    PNG = 13,
+    GIF = 14,
 } GUI_FormatType;
 
 
@@ -42,6 +46,13 @@ typedef enum
     IMG_FILTER_BLACK,
     IMG_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
 } BLEND_MODE_TYPE;
+
+typedef enum
+{
+    IMG_SRC_MEMADDR = 0,
+    IMG_SRC_FILESYS,
+    IMG_SRC_RLE,
+} IMG_SOURCE_MODE_TYPE;
 
 typedef struct draw_img
 {
@@ -58,7 +69,7 @@ typedef struct draw_img
     unsigned char opacity_value;
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
-
+    uint32_t src_mode : 3;
 } draw_img_t;
 
 typedef struct rtgui_image_engine

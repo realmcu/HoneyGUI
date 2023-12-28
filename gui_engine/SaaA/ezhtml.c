@@ -83,6 +83,44 @@ gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *ad
                                    x,
                                    y, 0, 0);
 }
+
+gui_img_t *xml_gui_img_create(void *parent, const char *file, int16_t x, int16_t y)
+{
+    if (file == NULL)
+    {
+        file = gui_get_file_address("app/system/resource/icMenuBird.bin");
+    }
+
+    // check image size
+    char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
+    sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
+    gui_log("xml imgfile>%s \n", path);
+
+    int fd = gui_fs_open(path,  0);
+    if (fd == -1)
+    {
+        gui_log("open file fail !\n");
+        return NULL;
+    }
+    int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+    gui_log("img size: %d \n", size);
+    gui_fs_close(fd);
+    // gui_free(path);
+
+    if (size < 100000)
+    {
+#ifdef __WIN32
+        path = file;
+#endif
+        return parent = (void *)gui_img_create_from_fs(parent, path, x, y);
+    }
+    else
+    {
+        void *imgbuf = gui_get_file_address(file);
+        return parent = (void *)gui_img_create_from_mem(parent, "image", imgbuf, x, y, 0, 0);
+    }
+}
+
 char *get_space_string_head(const char *string)
 {
     char *s = gui_strdup(string);
@@ -331,7 +369,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         if (style == 0)
                         {
                             t = gui_text_create(parent, ptxt, x, y, gui_get_screen_width(), h);
-                            app_color color_temporary;
+                            gui_color_t color_temporary;
                             color_temporary.color.rgba_full = color;
                             gui_text_set(t, gui_strdup(text), "rtk_font_stb", color_temporary, strlen(text), 32);
 
@@ -413,7 +451,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_scroll_text_t *scroll_text = gui_scrolltext_create(parent,  ptxt, x, y,
                                                                                    strlen(text) * (fontSize / 4), h);
                             gui_scrolltext_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
-                            app_color color_temporary;
+                            gui_color_t color_temporary;
                             color_temporary.color.rgba_full = color;
                             gui_scrolltext_text_set(scroll_text, gui_strdup(text), "rtk_font_stb", color_temporary,
                                                     strlen(text),
@@ -506,7 +544,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     //gui_log("x:%d,y:%d,w:%dh:%d,file:%s\n", x, y, w, h, file);
                     if (file)
                     {
-
                         void *imgbuf = gui_get_file_address(file);
                         parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
                         if (scalex != 1 || scaley != 1)
@@ -518,9 +555,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_img_get_height((void *)parent);
                             gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
                         }
-
-
-
                     }
                 }
                 break;
@@ -1065,17 +1099,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         if (arc)
                         {
+                            gui_log("here %d\n", __LINE__);
                             parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
                                                                           cx, cy, 100, 100, sd, ed);
+                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), IMG_SRC_OVER_MODE);
+
                         }
                         else
                         {
                             if (vh)
                             {
+                                gui_log("here %d\n", __LINE__);
                                 parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
                             }
                             else
                             {
+                                gui_log("here %d\n", __LINE__);
                                 parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
                             }
                         }
@@ -1768,7 +1807,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
                     gui_button_text_move((void *)parent, text_x, text_y);
-                    app_color color_temporary;
+                    gui_color_t color_temporary;
                     color_temporary.color.rgba_full = font_color;
                     GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)

@@ -60,6 +60,7 @@ static void obj_draw_prepare(gui_obj_t *object)
         obj->tx += obj->parent->tx;
         obj->ty += obj->parent->ty;
         obj->opacity_value = obj->parent->opacity_value;
+
         if (obj->obj_prepare != NULL)
         {
             obj->obj_prepare(obj);
@@ -107,13 +108,12 @@ static void obj_draw_end(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->obj_end != NULL)
+        {
+            obj->obj_end(obj);
+        }
         if (obj->active)
         {
-            if (obj->obj_end != NULL)
-            {
-                obj->obj_end(obj);
-            }
-
             for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
             {
                 gui_event_dsc_t *event_dsc = obj->event_dsc + i;
@@ -248,7 +248,7 @@ void gui_fb_disp(gui_obj_t *root)
     if (fb_change == true)
     {
         gui_fb_draw(root);
-        fb_change = true;
+        fb_change = false;
     }
     else
     {

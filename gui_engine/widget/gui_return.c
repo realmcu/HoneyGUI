@@ -164,10 +164,12 @@ gui_return_t *gui_return_create(void *parent)
 
     }
     gui_obj_add_event_cb(this, (gui_event_cb_t)screen_backfunc, GUI_EVENT_TOUCH_CLICKED, NULL);
-    this->return_img_left = (void *)gui_img_create_from_fs(this, "app/system/resource/back_left.bin",
-                                                           -100, gui_get_screen_height() - 200);
-    this->return_img_right = (void *)gui_img_create_from_fs(this, "app/system/resource/back_right.bin",
-                                                            gui_get_screen_width(), gui_get_screen_height() - 200);
+    this->return_img_left = (void *)gui_img_create_from_mem(this, "image",
+                                                            gui_get_file_address("app/system/resource/back_left.bin"),
+                                                            -100, gui_get_screen_height() - 200, 0, 0);
+    this->return_img_right = (void *)gui_img_create_from_mem(this, "image",
+                                                             gui_get_file_address("app/system/resource/back_right.bin"),
+                                                             gui_get_screen_width(), gui_get_screen_height() - 200, 0, 0);
 
     ((gui_obj_t *)this)->create_done = 1;
     return this;

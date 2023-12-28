@@ -44,9 +44,19 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     if not keil_builder.build_all_keil_projects(all=True, fail_fast=True, keil_path=Keil_path):
         print("build {} fail".format(chip_type))
         return False
-    #check scons step
+    #win32_sim scons
+    os.chdir('./win32_sim')
+    try:
+        subprocess.check_call(["scons.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
+    except Exception as e:
+        os.chdir('./..')
+        print("win32_sim: 'scons' fail: {}".format(e))
+        return False
+    os.chdir('./..')
+    #reset
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
+    #keil_sim scons --target=mdk5
     change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
     try:
@@ -74,6 +84,9 @@ def DOC_handler(module, submodule, manifest_path, repo_home, chip_type):
 
 def GUI_handler(module, submodule, manifest_path, repo_home, chip_type):
     ret1 = SDK_handler(module, submodule, manifest_path, repo_home, chip_type)
+    if not ret1:
+        print("SDK build fail!")
+        return False
     ret2 = DOC_handler(module, submodule, manifest_path, repo_home, chip_type)
     if ret1 and ret2:
         return True

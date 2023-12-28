@@ -29,6 +29,9 @@
 #define BUILD_USING_RTK_GUI_448_368_DEMO
 // </c>
 
+// <c> RTK GUI Demo 368 448 FileSystem
+// #define BUILD_USING_RTK_GUI_448_368_FILESYSTEM_DEMO
+// </c>
 
 // <c> RTK GUI Demo 320 384
 // #define BUILD_USING_RTK_GUI_320_384_DEMO
@@ -64,6 +67,7 @@
 
 // <c> RTK GUI Enable PPE1.0
 //#define BUILD_USING_RTK_PPE
+//#define BUILD_USING_SCRIPT_AS_A_APP
 // </c>
 
 // <c> MODULE NANOVG VGLITE
@@ -96,7 +100,9 @@
 #endif
 
 // </e>
-
+// <c> RTK GUI Enable DEMO PAGE
+//#define BUILD_USING_RTK_GUI_448_368_DEMO_PAGE
+// </c>
 
 // </h>
 

@@ -119,7 +119,7 @@ static void button_prepare(gui_obj_t *obj)
         {
         case TOUCH_SHORT:
             {
-                gui_log("%s\n", "TOUCH_SHORT");
+                //gui_log("%s\n", "TOUCH_SHORT");
                 //
 //                bool callback = false;
                 for (uint32_t i = 0; i < obj->event_dsc_cnt; i++)
@@ -132,11 +132,11 @@ static void button_prepare(gui_obj_t *obj)
                 } ////gui_log("%d\n", __LINE__);
                 //if (callback)
                 {
-                    gui_log("%d\n", __LINE__);
+                    //gui_log("%d\n", __LINE__);
                     if ((tp->x >= (obj->ax + obj->tx) && tp->x <= ((obj->ax + obj->tx) + obj->w)) &&
                         (tp->y >= (obj->ay + obj->ty) && tp->y <= ((obj->ay + obj->ty) + obj->h)))
                     {
-                        gui_log("%d\n", __LINE__);
+                        //gui_log("%d\n", __LINE__);
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                     }
                 }
@@ -173,11 +173,11 @@ static void button_prepare(gui_obj_t *obj)
 
                     if (b->on_pic_addr && b->style == 0)
                     {
-
-                        gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
+                        gui_img_set_attribute(b->img, b->flg_fs ? b->on_pic_addr : NULL, b->flg_fs ? NULL : b->on_pic_addr,
+                                              b->img->base.x, b->img->base.y);
 
                     }
-                    gui_log("%d\n", __LINE__);
+                    //gui_log("%d\n", __LINE__);
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
                     b->long_flag = false;
                     b->press_flag = true;
@@ -192,9 +192,8 @@ static void button_prepare(gui_obj_t *obj)
                     b->release_flag = false;
                     if (b->off_pic_addr && b->style == 0)
                     {
-
-                        gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
-
+                        gui_img_set_attribute(b->img, b->flg_fs ? b->off_pic_addr : NULL,
+                                              b->flg_fs ? NULL : b->off_pic_addr, b->img->base.x, b->img->base.y);
                     }
                     {
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
@@ -289,7 +288,7 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y)
     this->text->base.x = text_x;
     this->text->base.y = text_y;
 }
-void gui_button_text_color(gui_button_t *this, app_color color)
+void gui_button_text_color(gui_button_t *this, gui_color_t color)
 {
     this->text->color = color;
 }
@@ -338,7 +337,7 @@ gui_api_button_t gui_button_api =
     .onPress = onPress,
     .onRelease = onRelease
 };
-gui_button_t *gui_button_create(
+static gui_button_t *gui_button_create_core(
     void *parent,
     int16_t x,
     int16_t y,
@@ -348,7 +347,8 @@ gui_button_t *gui_button_create(
     void *highlight_pic,
     char *text,
     char image_type,
-    int count
+    int count,
+    bool is_fs
 )
 {
     GUI_ASSERT(parent != NULL);
@@ -356,6 +356,7 @@ gui_button_t *gui_button_create(
     GUI_ASSERT(button != NULL);
     memset(button, 0, sizeof(gui_button_t));
 
+    button->flg_fs = is_fs;
     gui_button_ctor(button, parent, x, y, w, h, background_pic, highlight_pic, text);
     gui_list_init(&(GET_BASE(button)->child_list));
     if ((GET_BASE(button)->parent) != NULL)
@@ -371,12 +372,26 @@ gui_button_t *gui_button_create(
         switch (image_type)
         {
         case 0:
-            button->img = (void *)gui_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
+            if (is_fs)
+            {
+                button->img = (void *)gui_img_create_from_fs(button, background_pic, 0, 0);
+            }
+            else
+            {
+                button->img = (void *)gui_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
+            }
             break;
         case 1:
-            button->img = (void *)gui_img_create_from_mem((void *)button, "g", ((void **)background_pic)[0], 0,
-                                                          0,
-                                                          0, 0);
+            if (is_fs)
+            {
+                button->img = (void *)gui_img_create_from_fs((void *)button, ((void **)background_pic)[0], 0, 0);
+            }
+            else
+            {
+                button->img = (void *)gui_img_create_from_mem((void *)button, "g", ((void **)background_pic)[0], 0,
+                                                              0,
+                                                              0, 0);
+            }
             break;
         case 2:
             //button->img = (void *)gui_svg_create_from_mem((void *)button, background_pic, count, 0, 0, w, h);
@@ -400,6 +415,42 @@ gui_button_t *gui_button_create(
     return button;
 }
 
+
+gui_button_t *gui_button_create(
+    void *parent,
+    int16_t x,
+    int16_t y,
+    int16_t w,
+    int16_t h,
+    void *background_pic,
+    void *highlight_pic,
+    char *text,
+    char image_type,
+    int count
+)
+{
+    return gui_button_create_core(parent, x, y, w, h, background_pic, highlight_pic, text, image_type,
+                                  count,
+                                  false);
+}
+
+gui_button_t *gui_button_create_from_fs(
+    void *parent,
+    int16_t x,
+    int16_t y,
+    int16_t w,
+    int16_t h,
+    void *background_pic,
+    void *highlight_pic,
+    char *text,
+    char image_type,
+    int count
+)
+{
+    return gui_button_create_core(parent, x, y, w, h, background_pic, highlight_pic, text, image_type,
+                                  count,
+                                  true);
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

@@ -11,7 +11,9 @@ extern int js_console_init(void);
 extern int js_module_init(void);
 extern int js_buffer_init(void);
 extern int js_buffer_cleanup(void);
-
+extern void *gui_malloc(uint32_t n);
+extern void *gui_realloc(void *ptr_old, uint32_t n);
+extern void gui_free(void *rmem);
 static void _js_value_dump(jerry_value_t value);
 
 static js_util_user _user_init = NULL, _user_cleanup = NULL;
@@ -82,7 +84,7 @@ jerry_value_t js_string_to_value(const char *value)
         jerry_str2utf8((char *)value, strlen(value), &utf8);
         str = jerry_create_string((const jerry_char_t *)utf8);
 
-        free(utf8);
+        gui_free(utf8);
     }
 
     return str;
@@ -95,7 +97,7 @@ char *js_value_to_string(const jerry_value_t value)
 
     len = jerry_get_utf8_string_size(value);
 
-    str = (char *)malloc(len + 1);
+    str = (char *)gui_malloc(len + 1);
     if (str)
     {
         jerry_string_to_char_buffer(value, (jerry_char_t *)str, len);
@@ -156,13 +158,13 @@ bool object_dump_foreach(const jerry_value_t property_name,
     if (jerry_value_is_string(property_name))
     {
         str_size = jerry_get_string_size(property_name);
-        str = (char *) malloc(str_size + 1);
+        str = (char *) gui_malloc(str_size + 1);
         //RT_ASSERT(str != NULL);
 
         jerry_string_to_char_buffer(property_name, (jerry_char_t *)str, str_size);
         str[str_size] = '\0';
         printf("%s : ", str);
-        free(str);
+        gui_free(str);
     }
     _js_value_dump(property_value);
 
@@ -193,13 +195,13 @@ static void _js_value_dump(jerry_value_t value)
         int str_size;
 
         str_size = jerry_get_string_size(value);
-        str = (char *) malloc(str_size + 1);
+        str = (char *) gui_malloc(str_size + 1);
         //RT_ASSERT(str != NULL);
 
         jerry_string_to_char_buffer(value, (jerry_char_t *)str, str_size);
         str[str_size] = '\0';
         printf("\"%s\"", str);
-        free(str);
+        gui_free(str);
     }
     else if (jerry_value_is_promise(value))
     {
@@ -264,14 +266,14 @@ int js_read_file(const char *filename, char **script)
 
     if (!length) { return 0; }
 
-    *script = (char *)malloc(length + 1);
+    *script = (char *)gui_malloc(length + 1);
     if (!(*script)) { return 0; }
     (*script)[length] = '\0';
 
     fp = fopen(filename, "rb");
     if (!fp)
     {
-        free(*script);
+        gui_free(*script);
         *script = NULL;
         printf("open %s failed!\n", filename);
         return 0;
@@ -280,7 +282,7 @@ int js_read_file(const char *filename, char **script)
     if (fread(*script, length, 1, fp) != 1)
     {
         length = 0;
-        free(*script);
+        gui_free(*script);
         *script = NULL;
         printf("read %s failed!\n", filename);
     }
@@ -301,7 +303,7 @@ int js_read_file(const char *filename, char **script)
     int fd = 0;
     fd = open(filename, 0);
     length = gui_fs_lseek(fd, 0, SEEK_END) - lseek(fd, 0, SEEK_SET);
-    *script = (char *)malloc(length + 1);
+    *script = (char *)gui_malloc(length + 1);
     if (!(*script)) { return 0; }
     (*script)[length] = '\0';
 
@@ -310,7 +312,7 @@ int js_read_file(const char *filename, char **script)
     //rt_kprintf("length:%d",length);
     if (fd == 0)
     {
-        free(*script);
+        gui_free(*script);
         *script = NULL;
         printf("open %s failed!\n", filename);
         return 0;

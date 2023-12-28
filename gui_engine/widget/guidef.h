@@ -60,29 +60,7 @@ extern "C" {
   * @{
   */
 
-/** @brief  ... */
-typedef union gui_color
-{
-    unsigned long rgba;
-    struct
-    {
-        unsigned char blue; //0x00
-        unsigned char green;   //0x01
-        unsigned char red; //0x02
-        unsigned char alpha;  //0x03
-    } channel;
-} gui_color_t;
-typedef union gui_color_msb
-{
-    unsigned long rgba;
-    struct
-    {
-        unsigned char blue;
-        unsigned char green;
-        unsigned char red;
-        unsigned char alpha;
-    } channel;
-} gui_color_msb_t;
+
 
 typedef struct gui_touch_data
 {
@@ -463,7 +441,7 @@ struct _gui_color
         uint32_t rgba_full;
     } color;
 };
-typedef struct _gui_color app_color;
+typedef struct _gui_color gui_color_t;
 
 /** End of SUBMOUDLE_Exported_Types
   * @}

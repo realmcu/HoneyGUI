@@ -47,6 +47,7 @@ typedef struct gui_win
     bool press_flag;
     bool long_flag;
     bool release_flag;
+    bool enter_auto_scale;
 } gui_win_t;
 
 typedef struct gui_api_win

@@ -74,7 +74,7 @@ extern "C" {
   * @brief
   * @{
   */
-/** @brief white color in app_color structure */
+/** @brief white color in gui_color_t structure */
 #define APP_COLOR_WHITE gui_rgba(UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX)
 
 
@@ -263,19 +263,19 @@ void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst);
  * @param green Range of unsigned char
  * @param blue Range of unsigned char
  * @param opacity Range of unsigned char
- * @return app_color
+ * @return gui_color_t
  */
-app_color gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
-                   unsigned char opacity);
+gui_color_t gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
+                     unsigned char opacity);
 /**
  * @brief Get a color value from red, green, blue and opacity values.
  *
  * @param red  Range of unsigned char
  * @param green Range of unsigned char
  * @param blue Range of unsigned char
- * @return app_color
+ * @return gui_color_t
  */
-app_color gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
+gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
 
 /**
  * @brief

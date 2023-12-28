@@ -89,6 +89,7 @@ void scroll_wheel_update_att(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    gui_scroll_wheel_t *this = (gui_scroll_wheel_t *)obj;
 
     int child_count = 0;
     int child_gap = ((gui_scroll_wheel_t *)obj)->child_gap;
@@ -135,45 +136,70 @@ void scroll_wheel_update_att(gui_obj_t *obj)
     }
     if ((current_row + 1 >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic))
     {
-        gui_img_set_attribute(((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic->base.name,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic_hl_addr,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic->base.x,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic->base.y);
+        struct scroll_wheel_picture *picture = &this->picture[current_row + 1];
+        gui_img_set_attribute(picture->pic,
+                              this->flg_fs ? picture->pic_hl_addr : NULL,
+                              this->flg_fs ? NULL : picture->pic_hl_addr,
+                              picture->pic->base.x,
+                              picture->pic->base.y);
     }
     if ((current_row >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row].pic))
     {
-        gui_img_set_attribute(((gui_scroll_wheel_t *)obj)->picture[current_row].pic,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row].pic->base.name,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row].pic_addr,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row].pic->base.x,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row].pic->base.y);
+        struct scroll_wheel_picture *picture = &this->picture[current_row];
+        gui_img_set_attribute(picture->pic,
+                              this->flg_fs ? picture->pic_addr : NULL,
+                              this->flg_fs ? NULL : picture->pic_addr,
+                              picture->pic->base.x,
+                              picture->pic->base.y);
     }
     if ((current_row + 2 >= 0) && (current_row + 2 < ((gui_scroll_wheel_t *)obj)->row_count) &&
         (((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic))
     {
-        gui_img_set_attribute(((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic->base.name,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic_addr,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic->base.x,
-                              ((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic->base.y);
+        struct scroll_wheel_picture *picture = &this->picture[current_row + 2];
+        gui_img_set_attribute(picture->pic,
+                              this->flg_fs ? picture->pic_addr : NULL,
+                              this->flg_fs ? NULL : picture->pic_addr,
+                              picture->pic->base.x,
+                              picture->pic->base.y);
     }
     // gui_log("current_row:%d\n",current_row);
     ((gui_scroll_wheel_t *)obj)->index = current_row + 1;
 }
 
-void gui_scrollwheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl)
+extern void gui_load_imgfile_from_fs(const char *file_path, draw_img_t *draw_img);
+void gui_scrollwheel_append_core(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl,
+                                 bool flg_fs)
 {
-    this->picture[this->row_count].pic = gui_img_create_from_mem(this, "num_pic", num_pic, 0, 0, 0, 0);
+    gui_img_t **img = &this->picture[this->row_count].pic;
+    if (flg_fs)
+    {
+        this->flg_fs = true;
+        *img = gui_img_create_from_fs(this, num_pic, 0, 0);
+        gui_load_imgfile_from_fs((*img)->img_path, &(*img)->draw_img);
+    }
+    else
+    {
+        this->flg_fs = false;
+        this->picture[this->row_count].pic = gui_img_create_from_mem(this, "num_pic", num_pic, 0, 0, 0, 0);
+    }
     rtgui_image_load_scale(&this->picture[this->row_count].pic->draw_img);
-    gui_img_set_attribute(this->picture[this->row_count].pic,
-                          this->picture[this->row_count].pic->base.name, this->picture[this->row_count].pic->draw_img.data,
-                          (this->base.base.w - this->picture[this->row_count].pic->draw_img.img_h) / 2,
-                          this->picture[this->row_count].pic->base.y);
+
+    this->picture[this->row_count].pic->base.x = (this->base.base.w -
+                                                  this->picture[this->row_count].pic->draw_img.img_h) / 2;
     this->picture[this->row_count].pic_addr = num_pic;
     this->picture[this->row_count].pic_hl_addr = num_pic_hl;
     //gui_log("num:%d\n", (this->base.base.w - this->picture[this->row_count].pic->w) / 2);
     this->row_count++;
+}
+
+void gui_scrollwheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl)
+{
+    gui_scrollwheel_append_core(this, num_pic, num_pic_hl, false);
+}
+
+void gui_scrollwheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl)
+{
+    gui_scrollwheel_append_core(this, num_pic, num_pic_hl, true);
 }
 
 static uint32_t (get_index)(struct gui_scroll_wheel *this)

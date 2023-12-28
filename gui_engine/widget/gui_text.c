@@ -170,7 +170,7 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
  *                           Public Functions
  *============================================================================*/
 
-void gui_text_set(gui_text_t *this, const char *text, char *text_type, app_color color,
+void gui_text_set(gui_text_t *this, const char *text, char *text_type, gui_color_t color,
                   uint16_t length, uint8_t font_size)
 {
     this->text_type = text_type;

@@ -2,6 +2,9 @@
 #include "js_user.h"
 extern int js_console_init(void);
 extern void jerry_port_set_default_context(jerry_context_t *context);
+extern void *gui_malloc(uint32_t n);
+extern void *gui_realloc(void *ptr_old, uint32_t n);
+extern void gui_free(void *rmem);
 jerry_value_t parsed_code;
 jerry_value_t ret_value;
 
@@ -39,7 +42,7 @@ void js_run_file(const char *file, gui_app_t  *app)
         }
         /* Parsed source code must be freed */
         jerry_release_value(parsed_code);
-        free(script);
+        gui_free(script);
     }
 }
 

@@ -67,7 +67,7 @@ static void rtgui_font_stb_unload(gui_text_t *text)
     gui_free((FONT_STB_SCREEN *)text->data);
 }
 #ifndef RTK_GUI_FONT_ENABLE_TTF_SVG
-gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
+gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
 {
     uint32_t mix;
     uint8_t back_a = 0xff - alpha;
@@ -85,7 +85,7 @@ gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
     return mix;
 }
 
-gui_inline uint16_t rgba2565(app_color rgba)
+gui_inline uint16_t rgba2565(gui_color_t rgba)
 {
     uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
     uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
@@ -399,16 +399,7 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
         memset(font_shape, 0, sizeof(NSVGshape));
         font_shape->opacity = 1;
         font_shape->fill.type = 1;
-        //font_shape->fill.d.color = text->color;
-        gui_color_t color_r = {0};
-        color_r.rgba = text->color;
-        gui_color_msb_t color_f = {0};
-        color_f.channel.alpha = color_r.channel.alpha;
-        color_f.channel.red = color_r.channel.blue;
-        color_f.channel.blue = color_r.channel.red;
-        color_f.channel.green = color_r.channel.green;
-
-        font_shape->fill.d.color = color_f.rgba;
+        font_shape->fill.d.color = text->color.color.rgba_full;
         font_shape->flags = 1;
         // font_shape->bounds[0] = 0;
         // font_shape->bounds[1] = 0;

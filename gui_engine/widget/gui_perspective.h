@@ -62,11 +62,27 @@ typedef struct NormalRec
     float z;                    //!< z axis
 } Normal_t;
 
+#ifdef  __CC_ARM
+#pragma anon_unions
+#endif
+typedef struct
+{
+    IMG_SOURCE_MODE_TYPE src_mode[6];                    //!< flag: indicate file src
+    union
+    {
+        char *img_path[6];               //!< images file path
+        void *data_addr[6];              //!< images memory address
+    };
+} gui_perspective_imgfile_t;
+
 typedef struct gui_perspective
 {
     gui_obj_t base;             //!< base structure
     draw_img_t img[6];
+    int ry[6];
+    int temp[6];
     int16_t release_x;
+    uint8_t checksum;
 } gui_perspective_t;
 
 /** End of WIDGET_Exported_Types
@@ -123,15 +139,33 @@ typedef struct gui_perspective
   * @{
   */
 
+
 /**
-  * @brief  create 3D perspective
+ * @brief set the perspective image's blend mode
+ *
+ * @param perspective the perspective widget pointer
+ * @param img_index the perspective image's index
+ * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
+ *
+ */
+void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index,
+                              BLEND_MODE_TYPE mode);
+
+/**
+ * @brief set perspective image
+ *
+ * @param perspective the perspective widget pointer
+ * @param img_file the image file data, set flg_fs true when using filesystem
+ */
+void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file);
+
+/**
+  * @brief  create 3D perspective, images can be loaded from filesystem or memory address
   * @param  parent parent widget
   * @param  name  widget name
-  * @param  addr the pictures frame
+  * @param  img_file the image file data, set flg_fs true when using filesystem
   * @param  x  left
   * @param  y top
-  * @param  w  width
-  * @param  h hight
   * @return gui_perspective_t* widget pointer
   *
   *
@@ -142,14 +176,24 @@ typedef struct gui_perspective
   * \code{.c}
   * void perspctive_example(void *parent)
   * {
-  *     gui_perspective_t *img_test = gui_perspective_create(parent, "test", pic, 0, 0, 454, 454);
+  *     gui_perspective_imgfile_t imgfile =
+  *     {
+  *         .flg_fs = true,
+  *         .img_path[0] = "Clockn.bin",
+  *         .img_path[1] = "Weather.bin",
+  *         .img_path[2] = "Music.bin",
+  *         .img_path[3] = "QuickCard.bin",
+  *         .img_path[4] = "HeartRate.bin",
+  *         .img_path[5] = "Activity.bin"
+  *     };
+  *     img_test = gui_perspective_create(canvas, "test", &imgfile, 0, 0);
   * }
   * \endcode
   */
-gui_perspective_t *gui_perspective_create(void *parent,  const char *name, void *addr,
-                                          int16_t x, int16_t y, int16_t w, int16_t h);
-
-
+gui_perspective_t *gui_perspective_create(void *parent,  const char *name,
+                                          gui_perspective_imgfile_t *img_file,
+                                          int16_t x,
+                                          int16_t y);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

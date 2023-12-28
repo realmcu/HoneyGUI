@@ -50,8 +50,19 @@ void callback_prism(void *obj, gui_event_t e)
     gui_win_t *win = gui_win_create(screen, "win", 0, 0, 368, 448);
     gui_canvas_t *canvas = gui_canvas_create(win, "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
-    uint8_t *array_flash[] = {CLOCKN_BIN, WEATHER_BIN, MUSIC_BIN,  QUICKCARD_BIN,  HEARTRATE_BIN, ACTIVITY_BIN,};
-    img_test = gui_perspective_create(canvas, "test", array_flash, 0, 0, 0, 0);
+
+    gui_perspective_imgfile_t imgfile =
+    {
+        .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
+        .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
+        .data_addr[0] = CLOCKN_BIN,
+        .data_addr[1] = WEATHER_BIN,
+        .data_addr[2] = MUSIC_BIN,
+        .data_addr[3] = QUICKCARD_BIN,
+        .data_addr[4] = HEARTRATE_BIN,
+        .data_addr[5] = ACTIVITY_BIN
+    };
+    img_test = gui_perspective_create(canvas, "test", &imgfile, 0, 0);
 
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,
                          NULL);

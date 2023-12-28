@@ -229,7 +229,7 @@ gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
     result &= 0x7e0f81f;
     return (uint16_t)((result >> 16) | result); // contract result
 }
-gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
+gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
 {
     uint32_t mix;
     uint8_t back_a = 0xff - alpha;
@@ -246,14 +246,14 @@ gui_inline uint32_t alphaBlendRGBA(app_color fg, uint32_t bg, uint8_t alpha)
 #endif
     return mix;
 }
-gui_inline uint16_t rgba2565(app_color rgba)
+gui_inline uint16_t rgba2565(gui_color_t rgba)
 {
     uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
     uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
     uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
     return red + gre + blu;
 }
-static void rtk_draw_unicode(int dx, mem_char_t *chr, app_color color, uint8_t rendor_mode,
+static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
                              struct rtgui_rect *rect)
 {
     if (chr->dot_addr == NULL)

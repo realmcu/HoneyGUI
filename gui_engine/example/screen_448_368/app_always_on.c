@@ -149,8 +149,17 @@ static void callback_always_on_release()
 void always_on_ui_design(gui_obj_t *parent)
 {
     win_always_on = gui_win_create(parent, "always_on", 0, 0, 368, 448);
-    uint8_t *array_flash[] = {ACTIVITY_BIN, WEATHER_BIN, HEARTRATE_BIN, CLOCKN_BIN, MUSIC_BIN, QUICKCARD_BIN};
-    per = gui_perspective_create(win_always_on, "test", array_flash, 0, 0, 0, 0);
+    gui_perspective_imgfile_t imgfile =
+    {
+        .data_addr[0] = ACTIVITY_BIN,
+        .data_addr[1] = WEATHER_BIN,
+        .data_addr[2] = HEARTRATE_BIN,
+        .data_addr[3] = CLOCKN_BIN,
+        .data_addr[4] = MUSIC_BIN,
+        .data_addr[5] = QUICKCARD_BIN
+    };
+    per = gui_perspective_create(win_always_on, "test", &imgfile, 0, 0);
+
     GET_BASE(per)->not_show = true;
     gui_obj_add_event_cb(win_always_on, (gui_event_cb_t)callback_always_on, GUI_EVENT_TOUCH_PRESSED,
                          NULL);
