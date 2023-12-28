@@ -15,7 +15,7 @@ Widgets                              Brief
 `curtain`_                           Slide to extend and retract curtains
 `cardview`_                          Display a 3d card set
 `card`_                              Display a 3d card set
-`page`                               Swipe up and down to display the creation of controls in different vertical directions
+`page`_                               Swipe up and down to display the creation of controls in different vertical directions
 `switch`_                            Listen to on and off gesture
 `grid`_                              Display widgets set in a grid view(Evenly layout vertically and horizontally)
 `progressbar`_                       Show progress by showing part of picture, or one frame of pictures, or drawing bar of specified length
