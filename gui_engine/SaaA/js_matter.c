@@ -10,7 +10,7 @@ DECLARE_HANDLER(dataRst)
     otPlatFlashErase(NULL, 0);
 #endif
     gui_log("Reset from ui\n");
-    WDG_SystemReset(RESET_ALL, RESET_REASON_FACTORY_RESET);
+    //WDG_SystemReset(RESET_ALL, RESET_REASON_FACTORY_RESET);
 #endif
     return jerry_create_undefined();
 }
