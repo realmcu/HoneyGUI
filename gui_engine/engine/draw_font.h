@@ -21,8 +21,8 @@
  * Date           Author       Notes
  * 2009-10-16     Bernard      first version
  */
-#ifndef __FONT_H__
-#define __FONT_H__
+#ifndef __DRAW_FONT_H__
+#define __DRAW_FONT_H__
 
 #include <guidef.h>
 #include <gui_api.h>
@@ -32,16 +32,16 @@
 extern "C" {
 #endif
 
-typedef struct rtgui_font_engine rtgui_font_engine_t;
 
-struct rtgui_font_engine
+
+typedef struct rtgui_font_engine
 {
     const char *name;
     gui_list_t list;
     void (*font_load)(gui_text_t *text);
     void (*font_unload)(gui_text_t *text);
     void (*font_draw)(gui_text_t *text, rtgui_rect_t *rect);
-};
+} rtgui_font_engine_t;
 
 struct font_lib
 {

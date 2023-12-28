@@ -106,15 +106,15 @@ void rtgui_system_font_init(void)
     rtgui_font_rtk_init();
 #endif
 #ifdef ENABLE_RTK_GUI_FONT_RTK_MEM
-    extern void rtgui_font_mem_init(void);
-    rtgui_font_mem_init();
+    extern rtgui_font_engine_t rtgui_font_mem_engine;
+    rtgui_font_register_engine(&rtgui_font_mem_engine);
 #if ENABLE_RTK_GUI_FONT_FREETYPE
     extern void rtgui_freetype_init(void);
     rtgui_freetype_init();
 #endif
 #if ENABLE_RTK_GUI_FONT_STB
-    extern void rtgui_font_stb_init(void);
-    rtgui_font_stb_init();
+    extern rtgui_font_engine_t rtgui_font_stb_engine;
+    rtgui_font_register_engine(&rtgui_font_stb_engine);
 #endif
 #endif
 }
@@ -132,8 +132,6 @@ static struct rtgui_font_engine *rtgui_font_get_engine_by_type(char *string)
         engine = gui_list_entry(node, struct rtgui_font_engine, list);
         if (strncmp(engine->name, string, strlen(engine->name)) == 0)
         {
-//            gui_log("engine addr = 0x%x \n", engine);
-//            gui_log("font string = %s \n", string);
             return engine;
         }
     }

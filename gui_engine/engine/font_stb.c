@@ -587,11 +587,6 @@ struct rtgui_font_engine rtgui_font_stb_engine =
     rtgui_font_stb_draw,
 };
 
-void rtgui_font_stb_init(void)
-{
-    rtgui_font_register_engine(&rtgui_font_stb_engine);
-}
-
 void gui_font_stb_init(void *font_ttf_addr)
 {
     stbtt_InitFont(&font, font_ttf_addr, 0);

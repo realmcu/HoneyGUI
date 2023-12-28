@@ -633,10 +633,7 @@ struct rtgui_font_engine rtgui_font_mem_engine =
     rtgui_font_mem_unload,
     rtgui_font_mem_draw,
 };
-void rtgui_font_mem_init(void)
-{
-    rtgui_font_register_engine(&rtgui_font_mem_engine);
-}
+
 void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
                                void *font_table_addr)
 {

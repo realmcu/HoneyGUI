@@ -82,12 +82,6 @@ static uint32_t cur_time_ms;
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
-    // gui_scroll_text_t *text = (gui_scroll_text_t *)obj;
-    // if (text->base.len == 0)
-    // {
-    //     return;
-    // }
-    // rtgui_text_create(&text->base);
     gui_scroll_text_t *object = (gui_scroll_text_t *)obj;
 
     if (object->base.animate && object->base.animate->animate)
