@@ -268,11 +268,11 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                //alpha_matrix_blit_rgb565_2_rgb565(image, dc, rect);
+                alpha_matrix_blit_rgb565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                // alpha_matrix_blit_rgb888_2_rgb565(image, dc, rect);
+                alpha_matrix_blit_rgb888_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
@@ -283,11 +283,11 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                // alpha_matrix_blit_rgb565_2_rgb888(image, dc, rect);
+                alpha_matrix_blit_rgb565_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                // alpha_matrix_blit_rgb888_2_rgb888(image, dc, rect);
+                alpha_matrix_blit_rgb888_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
