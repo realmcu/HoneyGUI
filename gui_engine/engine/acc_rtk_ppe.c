@@ -6,6 +6,7 @@
 #include "math.h"
 #include "trace.h"
 #include "draw_img.h"
+#include "guidef.h"
 
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
@@ -452,5 +453,61 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
         {
             gui_free(source.memory);
         }
+    }
+}
+
+bool hw_acc_imdc_decode(draw_img_t *image, rtgui_rect_t *rect, uint8_t *output)
+{
+    if (image == NULL || rect == NULL || output == NULL)
+    {
+        GUI_ASSERT(image != NULL && rect != NULL && output != NULL);
+        return false;
+    }
+    struct gui_rgb_data_head output_header;
+    struct gui_rgb_data_head *head = image->data;
+    memset(&output_header, 0, sizeof(struct gui_rgb_data_head));
+    const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
+                                                              struct gui_rgb_data_head));
+    if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_16BIT)
+    {
+        output_header.type = RGB565;
+    }
+    else if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_32BIT)
+    {
+        output_header.type = RGBA8888;
+    }
+    else if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_24BIT)
+    {
+        output_header.type = RGB888;
+    }
+    else
+    {
+        return false;
+    }
+
+    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
+    IMDC_decode_range range;
+    range.start_column = rect->x1;
+    range.end_column = rect->x2;
+    range.start_line = rect->y1;
+    range.end_line = rect->y2;
+    output_header.w = range.end_column - range.start_column + 1;
+    output_header.h = range.end_line - range.start_line + 1;
+    IMDC_DMA_config dma_cfg;
+    dma_cfg.output_buf = (uint32_t *)(output + 8);
+    dma_cfg.RX_DMA_channel_num = 3;
+    dma_cfg.TX_DMA_channel_num = 1;
+    dma_cfg.RX_DMA_channel = GDMA_Channel3;
+    dma_cfg.TX_DMA_channel = GDMA_Channel1;
+    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
+
+    if (err == IMDC_SUCCESS)
+    {
+        memcpy(output, &output_header, sizeof(gui_img_file_head_t));
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
