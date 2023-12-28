@@ -87,7 +87,7 @@
   * @{
   */
 static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 rtgui_rect_t *rect)
 {
     gui_stb_img_t *buf_image = (gui_stb_img_t *)((gui_obj_t *)image - 1);
     int num_components = 0;

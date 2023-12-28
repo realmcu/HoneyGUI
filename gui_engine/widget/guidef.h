@@ -135,7 +135,7 @@ typedef enum dc_type
     DC_RAMLESS,
     DC_SINGLE,
     DC_DOUBLE,
-} dc_type_t;
+} gui_dc_type_t;
 
 typedef struct gui_dispdev
 {
@@ -148,7 +148,7 @@ typedef struct gui_dispdev
     uint16_t driver_ic_hfp;
     uint16_t driver_ic_hbp;
     uint16_t driver_ic_active_width;
-    enum dc_type type;
+    gui_dc_type_t type;
     char gpu_type;
     /* pixel data */
     uint8_t *frame_buf;
@@ -479,12 +479,6 @@ typedef struct _gui_color gui_color_t;
   * The rtgui_color is defined as ARGB888.
   *        bit31 A,R,G,B bit0
   */
-
-
-#define RTGUI_RGB_B(c)  ((c) & 0xff)
-#define RTGUI_RGB_G(c)  (((c) >> 8)  & 0xff)
-#define RTGUI_RGB_R(c)  (((c) >> 16) & 0xff)
-#define RTGUI_RGB_A(c)  (((c) >> 24) & 0xff)
 
 
 #define GUI_SWAP16(x)          ((uint16_t)(                         \

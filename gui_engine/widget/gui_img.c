@@ -200,7 +200,7 @@ static void img_prepare(gui_obj_t *obj)
     }
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
 static void img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);

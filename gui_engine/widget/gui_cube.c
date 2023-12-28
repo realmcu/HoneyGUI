@@ -336,7 +336,7 @@ static void cube_prepare(gui_obj_t *obj)
     }
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
 static void cube_draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();

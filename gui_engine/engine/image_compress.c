@@ -28,7 +28,7 @@ static bool rtgui_image_compress_mem_load(gui_img_t *image,
                                           bool load);
 static void rtgui_image_compress_mem_unload(gui_img_t *image);
 static void rtgui_image_compress_mem_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect);
+                                          rtgui_rect_t *rect);
 
 
 struct gui_rgb_data_head
@@ -87,7 +87,7 @@ static void rtgui_image_compress_mem_unload(gui_img_t *image)
 
 
 static void normal_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct gui_dispdev *dc,
-                                                 struct rtgui_rect *rect)
+                                                 rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -307,7 +307,7 @@ static void normal_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct gui_di
 
 }
 static void no_blending_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct gui_dispdev *dc,
-                                                      struct rtgui_rect *rect)
+                                                      rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -496,7 +496,7 @@ static void no_blending_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct g
 }
 
 static void rtgui_image_compress_mem_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect)
+                                          rtgui_rect_t *rect)
 {
     uint8_t source_bytes_per_pixel;
     switch (image->color_format)

@@ -40,7 +40,7 @@ struct rtgui_font_engine
     gui_list_t list;
     void (*font_load)(gui_text_t *text);
     void (*font_unload)(gui_text_t *text);
-    void (*font_draw)(gui_text_t *text, struct rtgui_rect *rect);
+    void (*font_draw)(gui_text_t *text, rtgui_rect_t *rect);
 };
 
 struct font_lib
@@ -79,7 +79,7 @@ static struct rtgui_font_engine *rtgui_font_get_engine_by_type(char *string);
 void rtgui_text_create(gui_text_t *text);
 void rtgui_text_destroy(gui_text_t *text);
 /* draw a text */
-void rtgui_font_draw(gui_text_t *text, struct rtgui_rect *rect);
+void rtgui_font_draw(gui_text_t *text, rtgui_rect_t *rect);
 
 uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
                          uint16_t unicode_buf_len);

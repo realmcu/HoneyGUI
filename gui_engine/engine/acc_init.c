@@ -4,9 +4,9 @@
 #include "acc_engine.h"
 
 
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
 
-extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
 extern void hw_acc_init(void);
 
 static struct acc_engine acc = {0};
@@ -71,7 +71,7 @@ static void gui_release_imgfile_acc(draw_img_t *draw_img, const char *path)
 }
 
 
-void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
+void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
 {
     const char *path = NULL;
     if (image->src_mode == IMG_SRC_FILESYS)

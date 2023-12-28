@@ -11,7 +11,7 @@
 #include "trace.h"
 #include "rtl876x_gpio.h"
 
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
 
 #define PPE_ACC_CACHE_SOURCE        0
 
@@ -161,7 +161,7 @@ static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
 #endif
 
 
-void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
+void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
 {
     if (image->opacity_value <= PPEV2_ACC_MIN_OPA)
     {

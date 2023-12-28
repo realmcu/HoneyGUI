@@ -26,7 +26,7 @@
 // #include "acc_sw_rle.h"
 
 void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -103,7 +103,7 @@ void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispde
     }
 }
 void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -188,7 +188,7 @@ void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispde
     return;
 }
 void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -275,7 +275,7 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
 }
 
 void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -350,7 +350,7 @@ void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispde
     }
 }
 void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -428,7 +428,7 @@ void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispde
     }
 }
 void cpu_filter_matrix_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -503,7 +503,7 @@ void cpu_filter_matrix_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_disp
     }
 }
 void cpu_filter_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -591,7 +591,7 @@ void cpu_filter_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_disp
     }
 }
 void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -669,7 +669,7 @@ void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_disp
     }
 }
 void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                                struct rtgui_rect *rect)
+                                                rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;

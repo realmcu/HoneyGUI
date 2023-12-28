@@ -266,7 +266,7 @@ void rtgui_image_register_engine(struct rtgui_image_engine *engine)
     gui_list_append(&_rtgui_system_image_list, &(engine->list));
 }
 
-void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
+void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
 {
     if (image != NULL && image->engine != NULL)
     {

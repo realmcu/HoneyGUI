@@ -26,7 +26,7 @@
 
 
 void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                           struct rtgui_rect *rect)
+                                           rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -102,7 +102,7 @@ void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev
     return;
 }
 void alpha_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                         struct rtgui_rect *rect)
+                                         rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -171,7 +171,7 @@ void alpha_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *
     return;
 }
 void alpha_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                         struct rtgui_rect *rect)
+                                         rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -246,7 +246,7 @@ void alpha_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *
     return;
 }
 void alpha_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                       struct rtgui_rect *rect)
+                                       rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -323,7 +323,7 @@ void alpha_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc
     return;
 }
 void alpha_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                       struct rtgui_rect *rect)
+                                       rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -406,7 +406,7 @@ void alpha_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc
     return;
 }
 void alpha_matrix_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                         struct rtgui_rect *rect)
+                                         rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -489,7 +489,7 @@ void alpha_matrix_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *
     return;
 }
 void alpha_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                       struct rtgui_rect *rect)
+                                       rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -562,7 +562,7 @@ void alpha_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc
     return;
 }
 void alpha_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                       struct rtgui_rect *rect)
+                                       rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -634,7 +634,7 @@ void alpha_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc
     return;
 }
 void alpha_matrix_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                         struct rtgui_rect *rect)
+                                         rtgui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;

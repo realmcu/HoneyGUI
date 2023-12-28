@@ -10,7 +10,7 @@ static bool rtgui_image_rgb_mem_load(draw_img_t *image, bool load);
 static void rtgui_image_rgb_mem_unload(draw_img_t *image);
 
 static void rtgui_image_rgb_mem_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect);
+                                     rtgui_rect_t *rect);
 
 
 struct rtgui_image_engine rtgui_image_rgb_mem_engine =
@@ -53,7 +53,7 @@ static void rtgui_image_rgb_mem_unload(draw_img_t *image)
 #include "acc_engine.h"
 
 static void rtgui_image_rgb_mem_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect)
+                                     rtgui_rect_t *rect)
 {
     if (gui_get_acc() != NULL)
     {

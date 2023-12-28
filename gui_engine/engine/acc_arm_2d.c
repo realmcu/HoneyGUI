@@ -5,26 +5,26 @@
 
 
 static void arm_2d_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+                                        rtgui_rect_t *rect)
 {
 
 }
 
 
 static void arm_2d_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect)
+                                          rtgui_rect_t *rect)
 {
 
 }
 
 static void arm_2d_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect)
+                                          rtgui_rect_t *rect)
 {
 
 }
 
 
-void arm_2d_sw_bilt(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
+void arm_2d_sw_bilt(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 

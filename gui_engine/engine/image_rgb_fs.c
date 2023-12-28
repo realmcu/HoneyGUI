@@ -6,7 +6,7 @@ static bool rtgui_image_rgb_load(gui_img_t *image,
                                  bool load);
 static void rtgui_image_rgb_unload(gui_img_t *image);
 static void rtgui_image_rgb_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect);
+                                 rtgui_rect_t *rect);
 //static int fd;
 
 struct gui_rgb_data_head
@@ -151,7 +151,7 @@ static void pixel_convert_rgb888_2_argb8888(int fd, int x_start, int x_end, stru
 }
 
 static void rtgui_image_rgb_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 rtgui_rect_t *rect)
 {
 
     int image_x = rect->x1;

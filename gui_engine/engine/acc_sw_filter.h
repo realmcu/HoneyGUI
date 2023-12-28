@@ -23,24 +23,24 @@ extern "C" {
 #endif
 
 void filter_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect);
+                                 rtgui_rect_t *rect);
 void filter_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect);
+                                 rtgui_rect_t *rect);
 void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect);
+                                 rtgui_rect_t *rect);
 void filter_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect);
+                                 rtgui_rect_t *rect);
 void filter_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect);
+                                   rtgui_rect_t *rect);
 
 void filter_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect);
+                                   rtgui_rect_t *rect);
 void filter_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect);
+                                     rtgui_rect_t *rect);
 void filter_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect);
+                                   rtgui_rect_t *rect);
 void filter_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect);
+                                   rtgui_rect_t *rect);
 
 
 #ifdef __cplusplus

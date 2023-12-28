@@ -118,7 +118,7 @@ gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
     return (uint16_t)((result >> 16) | result); // contract result
 }
 
-static bool creat_stb_screen(gui_text_t *text, struct rtgui_rect *rect, FONT_STB_SCREEN *screen)
+static bool creat_stb_screen(gui_text_t *text, rtgui_rect_t *rect, FONT_STB_SCREEN *screen)
 {
     if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
     {
@@ -158,7 +158,7 @@ static bool creat_stb_screen(gui_text_t *text, struct rtgui_rect *rect, FONT_STB
     return true;
 }
 static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
-                                 struct rtgui_rect *rect)
+                                 rtgui_rect_t *rect)
 {
     gui_dispdev_t *dc = gui_get_dc();
     uint8_t *dots = stb_screen->buf;
@@ -304,7 +304,7 @@ static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_cou
     shape->paths = path;
 }
 #endif
-static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
+static void rtgui_font_stb_draw(gui_text_t *text, rtgui_rect_t *rect)
 {
     int ascent = 0, descent = 0, lineGap = 0, ch = 0, line_num = 0;
     float scale = 0, xpos = 0, ypos = 0, baseline = 0;

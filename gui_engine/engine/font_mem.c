@@ -254,7 +254,7 @@ gui_inline uint16_t rgba2565(gui_color_t rgba)
     return red + gre + blu;
 }
 static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
-                             struct rtgui_rect *rect)
+                             rtgui_rect_t *rect)
 {
     if (chr->dot_addr == NULL)
     {
@@ -490,7 +490,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         break;
     }
 }
-void rtgui_font_mem_draw(gui_text_t *text, struct rtgui_rect *rect)
+void rtgui_font_mem_draw(gui_text_t *text, rtgui_rect_t *rect)
 {
     mem_char_t *chr = text->data;
     gui_dispdev_t *dc = gui_get_dc();

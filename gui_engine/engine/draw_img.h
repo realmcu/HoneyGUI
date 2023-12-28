@@ -83,7 +83,7 @@ typedef struct rtgui_image_engine
     bool (*image_load)(draw_img_t *image, bool load);
     void (*image_unload)(draw_img_t *image);
 
-    void (*image_blit)(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+    void (*image_blit)(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
 
 
 } rtgui_image_engine_t;
@@ -96,7 +96,7 @@ void rtgui_image_load_scale(draw_img_t *img);
 bool rtgui_image_new_area(draw_img_t *img);
 bool rtgui_image_create(draw_img_t *img, bool load);
 void rtgui_image_destroy(draw_img_t *image);
-void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
 
 /* register an image engine */
 void rtgui_image_register_engine(struct rtgui_image_engine *engine);

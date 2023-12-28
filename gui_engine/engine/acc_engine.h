@@ -195,7 +195,7 @@ typedef struct canvas_palette_wave
 
 typedef struct acc_engine
 {
-    void (*blit)(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+    void (*blit)(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
     void (*draw_circle)(canvas_circle_t *circle, struct gui_dispdev *dc);
     void (*draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
     void (*draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);

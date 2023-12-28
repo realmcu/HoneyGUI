@@ -156,7 +156,7 @@ void rtgui_text_destroy(gui_text_t *text)
 }
 
 /* draw a text */
-void rtgui_font_draw(gui_text_t *text, struct rtgui_rect *rect)
+void rtgui_font_draw(gui_text_t *text, rtgui_rect_t *rect)
 {
     GUI_ASSERT(text != NULL);
 

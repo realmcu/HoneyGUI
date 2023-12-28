@@ -17,8 +17,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __RTGUI_FB_H__
-#define __RTGUI_FB_H__
+#ifndef __GUI_FB_H__
+#define __GUI_FB_H__
 
 #ifdef __cplusplus
 extern "C" {

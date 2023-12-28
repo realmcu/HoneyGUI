@@ -93,7 +93,7 @@
 
 
 void no_rle(draw_img_t *image, struct gui_dispdev *dc,
-            struct rtgui_rect *rect)
+            rtgui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct gui_rgb_data_head *head = image->data;
@@ -377,7 +377,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
 
 
 
-void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
+void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
 {
     struct gui_rgb_data_head *head = image->data;
 
