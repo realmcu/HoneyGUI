@@ -228,4 +228,4 @@ static void app_xml_ui_design(gui_app_t *app)
     gui_return_create(&app->screen);
 #endif
 }
-GUI_INIT_APP_EXPORT(rtgui_server_init);
+GUI_INIT_APP_EXPORT(gui_server_init);

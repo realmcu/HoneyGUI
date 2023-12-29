@@ -1,12 +1,12 @@
 #include <draw_img.h>
 #include <stdio.h>
 
-static bool rtgui_image_rgb_check(gui_img_t *image);
-static bool rtgui_image_rgb_load(gui_img_t *image,
-                                 bool load);
-static void rtgui_image_rgb_unload(gui_img_t *image);
-static void rtgui_image_rgb_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                 rtgui_rect_t *rect);
+static bool gui_image_rgb_check(gui_img_t *image);
+static bool gui_image_rgb_load(gui_img_t *image,
+                               bool load);
+static void gui_image_rgb_unload(gui_img_t *image);
+static void gui_image_rgb_blit(gui_img_t *image, struct gui_dispdev *dc,
+                               gui_rect_t *rect);
 //static int fd;
 
 struct gui_rgb_data_head
@@ -24,23 +24,23 @@ struct gui_rgb_data_head
 };
 
 
-struct rtgui_image_engine rtgui_image_rgb_engine =
+struct gui_image_engine gui_image_rgb_engine =
 {
     "bin",
     { NULL },
-    rtgui_image_rgb_check,
-    rtgui_image_rgb_load,
-    rtgui_image_rgb_unload,
-    rtgui_image_rgb_blit,
+    gui_image_rgb_check,
+    gui_image_rgb_load,
+    gui_image_rgb_unload,
+    gui_image_rgb_blit,
 };
 
-static bool rtgui_image_rgb_check(gui_img_t *image)
+static bool gui_image_rgb_check(gui_img_t *image)
 {
     return true;
 }
 
-static bool rtgui_image_rgb_load(gui_img_t *image,
-                                 bool load)
+static bool gui_image_rgb_load(gui_img_t *image,
+                               bool load)
 {
     struct gui_rgb_data_head head;
 
@@ -75,7 +75,7 @@ static bool rtgui_image_rgb_load(gui_img_t *image,
 
     GET_BASE(image)->w = head.w;
     GET_BASE(image)->h = head.h;
-    image->engine = &rtgui_image_rgb_engine;
+    image->engine = &gui_image_rgb_engine;
     image->fd = fd;
     image->color_format = (gui_color_format)(head.type);
 
@@ -86,7 +86,7 @@ static bool rtgui_image_rgb_load(gui_img_t *image,
 
 
 
-static void rtgui_image_rgb_unload(gui_img_t *image)
+static void gui_image_rgb_unload(gui_img_t *image)
 {
     if (image != NULL)
     {
@@ -150,8 +150,8 @@ static void pixel_convert_rgb888_2_argb8888(int fd, int x_start, int x_end, stru
     }
 }
 
-static void rtgui_image_rgb_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                 rtgui_rect_t *rect)
+static void gui_image_rgb_blit(gui_img_t *image, struct gui_dispdev *dc,
+                               gui_rect_t *rect)
 {
 
     int image_x = rect->x1;
@@ -219,9 +219,9 @@ static void rtgui_image_rgb_blit(gui_img_t *image, struct gui_dispdev *dc,
 
 
 
-void rtgui_image_rgb_init(void)
+void gui_image_rgb_init(void)
 {
     /* register rgb565 on image system */
-    rtgui_image_register_engine(&rtgui_image_rgb_engine);
+    gui_image_register_engine(&gui_image_rgb_engine);
 }
 

@@ -227,7 +227,7 @@ typedef struct draw_path
 {
     void *path;
     path_fill_t fill_rule;
-    struct rtgui_matrix *matrix;
+    struct gui_matrix *matrix;
     path_blend_t blend;
     uint32_t color;
     path_linear_gradient_t *grad;

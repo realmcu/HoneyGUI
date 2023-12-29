@@ -94,7 +94,7 @@ static int wath_app_init(void)
         return 0;
     }
 #endif
-    rtgui_server_init();
+    gui_server_init();
     gui_app_startup(get_app_watch_ui());
     return 0;
 }

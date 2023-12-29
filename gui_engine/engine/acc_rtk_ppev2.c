@@ -11,7 +11,7 @@
 #include "trace.h"
 #include "rtl876x_gpio.h"
 
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
+extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
 #define PPE_ACC_CACHE_SOURCE        0
 
@@ -59,7 +59,7 @@ static void wait_memcpy_dma(void)
 
 static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
 {
-    struct rtgui_pox pox = {0.0f};
+    struct gui_pox pox = {0.0f};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;
@@ -68,7 +68,7 @@ static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
     pox.p[0] = 0.0f;
     pox.p[1] = 0.0f;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
     x_min = pox.p[0];
     x_max = pox.p[0];
     y_min = pox.p[1];
@@ -78,7 +78,7 @@ static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
     pox.p[0] = image->width - 1;
     pox.p[1] = 0.0f;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -100,7 +100,7 @@ static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
     pox.p[0] = 0.0f;
     pox.p[1] = image->height - 1;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -121,7 +121,7 @@ static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
     pox.p[0] = image->width - 1;
     pox.p[1] = image->height - 1;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -161,7 +161,7 @@ static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
 #endif
 
 
-void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
+void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     if (image->opacity_value <= PPEV2_ACC_MIN_OPA)
     {

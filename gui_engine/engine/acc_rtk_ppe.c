@@ -11,7 +11,7 @@
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
 
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
+extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
 
 
@@ -24,7 +24,7 @@ static double acc_ppe_ceil(double _x)
 }
 
 
-void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
+void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     if ((rect->x1 >= dc->screen_width - 1) || (rect->y1 >= dc->screen_height - 1) ||
         (rect->x1 + image->img_w <= 0) || (rect->y1 + image->img_h <= 0))
@@ -456,7 +456,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
     }
 }
 
-bool hw_acc_imdc_decode(draw_img_t *image, rtgui_rect_t *rect, uint8_t *output)
+bool hw_acc_imdc_decode(draw_img_t *image, gui_rect_t *rect, uint8_t *output)
 {
     if (image == NULL || rect == NULL || output == NULL)
     {

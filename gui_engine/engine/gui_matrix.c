@@ -8,7 +8,7 @@
 #include <gui_matrix.h>
 #include <math.h>
 
-void matrix_identity(struct rtgui_matrix *matrix)
+void matrix_identity(struct gui_matrix *matrix)
 {
     /* Set identify matrix. */
     matrix->m[0][0] = 1.0f;
@@ -21,9 +21,9 @@ void matrix_identity(struct rtgui_matrix *matrix)
     matrix->m[2][1] = 0.0f;
     matrix->m[2][2] = 1.0f;
 }
-void multiply(struct rtgui_matrix *matrix, struct rtgui_matrix *mult)
+void multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
 {
-    struct rtgui_matrix temp;
+    struct gui_matrix temp;
     int row, column;
 
     /* Process all rows. */
@@ -43,9 +43,9 @@ void multiply(struct rtgui_matrix *matrix, struct rtgui_matrix *mult)
     memcpy(matrix, &temp, sizeof(temp));
 }
 
-void pox_mul(struct rtgui_matrix *matrix, struct rtgui_pox *pox)
+void pox_mul(struct gui_matrix *matrix, struct gui_pox *pox)
 {
-    struct rtgui_pox temp;
+    struct gui_pox temp;
     int row;
 
     /* Process all rows. */
@@ -62,10 +62,10 @@ void pox_mul(struct rtgui_matrix *matrix, struct rtgui_pox *pox)
     memcpy(pox, &temp, sizeof(temp));
 }
 
-void matrix_translate(float x, float y, struct rtgui_matrix *matrix)
+void matrix_translate(float x, float y, struct gui_matrix *matrix)
 {
     /* Set translation matrix. */
-    struct rtgui_matrix t = { { {1.0f, 0.0f, x},
+    struct gui_matrix t = { { {1.0f, 0.0f, x},
             {0.0f, 1.0f, y},
             {0.0f, 0.0f, 1.0f}
         }
@@ -75,7 +75,7 @@ void matrix_translate(float x, float y, struct rtgui_matrix *matrix)
     multiply(matrix, &t);
 }
 
-void matrix_rotate(float degrees, struct rtgui_matrix *matrix)
+void matrix_rotate(float degrees, struct gui_matrix *matrix)
 {
     /* Convert degrees into radians. */
     float angle = degrees / 180.0f * 3.1415926f;
@@ -85,7 +85,7 @@ void matrix_rotate(float degrees, struct rtgui_matrix *matrix)
     float sin_angle = sinf(angle);
 
     /* Set rotation matrix. */
-    struct rtgui_matrix r = { { {cos_angle, -sin_angle, 0.0f},
+    struct gui_matrix r = { { {cos_angle, -sin_angle, 0.0f},
             {sin_angle, cos_angle, 0.0f},
             {0.0f, 0.0f, 1.0f}
         }
@@ -95,9 +95,9 @@ void matrix_rotate(float degrees, struct rtgui_matrix *matrix)
     multiply(matrix, &r);
 }
 
-void matrix_inverse(struct rtgui_matrix *matrix)
+void matrix_inverse(struct gui_matrix *matrix)
 {
-    struct rtgui_matrix temp;
+    struct gui_matrix temp;
 
     float detal = matrix->m[0][0] * matrix->m[1][1] * matrix->m[2][2] + \
                   matrix->m[0][1] * matrix->m[1][2] * matrix->m[2][0] + \
@@ -123,10 +123,10 @@ void matrix_inverse(struct rtgui_matrix *matrix)
     memcpy(matrix, &temp, sizeof(temp));
 }
 
-void matrix_scale(float scale_x, float scale_y, struct rtgui_matrix *matrix)
+void matrix_scale(float scale_x, float scale_y, struct gui_matrix *matrix)
 {
     /* Set scale matrix. */
-    struct rtgui_matrix s = { { {scale_x, 0.0f, 0.0f},
+    struct gui_matrix s = { { {scale_x, 0.0f, 0.0f},
             {0.0f, scale_y, 0.0f},
             {0.0f, 0.0f, 1.0f}
         }
@@ -136,10 +136,10 @@ void matrix_scale(float scale_x, float scale_y, struct rtgui_matrix *matrix)
     multiply(matrix, &s);
 }
 
-void matrix_perspective(float px, float py, struct rtgui_matrix *matrix)
+void matrix_perspective(float px, float py, struct gui_matrix *matrix)
 {
     /* set prespective matrix */
-    struct rtgui_matrix p = { { {1.0f, 0.0f, 0.0f},
+    struct gui_matrix p = { { {1.0f, 0.0f, 0.0f},
             {0.0f, 1.0f, 0.0f},
             {px, py, 1.0f}
         }

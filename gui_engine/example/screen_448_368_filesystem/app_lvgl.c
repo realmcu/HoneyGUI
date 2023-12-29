@@ -98,7 +98,7 @@ static void app_lvgl_ui_design(gui_app_t *app)
 #if 0
 static int app_init(void)
 {
-    rtgui_server_init();
+    gui_server_init();
     gui_app_startup(get_app_lvgl());
     return 0;
 }

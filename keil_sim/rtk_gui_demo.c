@@ -47,7 +47,7 @@ static gui_app_t rtk_gui_demo =
 
 static int app_init(void)
 {
-    rtgui_server_init();
+    gui_server_init();
     gui_app_startup(&rtk_gui_demo);
     return 0;
 }

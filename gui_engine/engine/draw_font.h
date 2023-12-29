@@ -34,14 +34,14 @@ extern "C" {
 
 
 
-typedef struct rtgui_font_engine
+typedef struct gui_font_engine
 {
     const char *name;
     gui_list_t list;
     void (*font_load)(gui_text_t *text);
     void (*font_unload)(gui_text_t *text);
-    void (*font_draw)(gui_text_t *text, rtgui_rect_t *rect);
-} rtgui_font_engine_t;
+    void (*font_draw)(gui_text_t *text, gui_rect_t *rect);
+} gui_font_engine_t;
 
 struct font_lib
 {
@@ -72,14 +72,14 @@ typedef struct font_stb_screen
 } FONT_STB_SCREEN;
 
 /* init rtgui text system */
-void rtgui_system_font_init(void);
-void rtgui_font_register_engine(struct rtgui_font_engine *engine);
-static struct rtgui_font_engine *rtgui_font_get_engine_by_type(char *string);
+void gui_system_font_init(void);
+void gui_font_register_engine(struct gui_font_engine *engine);
+static struct gui_font_engine *gui_font_get_engine_by_type(char *string);
 
-void rtgui_text_create(gui_text_t *text);
-void rtgui_text_destroy(gui_text_t *text);
+void font_text_create(gui_text_t *text);
+void font_text_destroy(gui_text_t *text);
 /* draw a text */
-void rtgui_font_draw(gui_text_t *text, rtgui_rect_t *rect);
+void font_text_draw(gui_text_t *text, gui_rect_t *rect);
 
 uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
                          uint16_t unicode_buf_len);

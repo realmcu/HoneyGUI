@@ -7,40 +7,40 @@
 #include <gui_stb_img.h>
 #include "stb_image.h"
 
-static bool rtgui_image_stb_check(draw_img_t *image);
+static bool gui_image_stb_check(draw_img_t *image);
 
-static bool rtgui_image_stb_load(draw_img_t *image, bool load);
+static bool gui_image_stb_load(draw_img_t *image, bool load);
 
-static void rtgui_image_stb_unload(draw_img_t *image);
+static void gui_image_stb_unload(draw_img_t *image);
 
-static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                 rtgui_rect_t *rect);
+static void gui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
+                               gui_rect_t *rect);
 
 
 /* Private variables ---------------------------------------------------------*/
-struct rtgui_image_engine rtgui_image_stb_engine =
+struct gui_image_engine gui_image_stb_engine =
 {
     "stb",
     {NULL},
-    rtgui_image_stb_check,
-    rtgui_image_stb_load,
-    rtgui_image_stb_unload,
-    rtgui_image_stb_blit
+    gui_image_stb_check,
+    gui_image_stb_load,
+    gui_image_stb_unload,
+    gui_image_stb_blit
 };
-static bool rtgui_image_stb_check(draw_img_t *image)
+static bool gui_image_stb_check(draw_img_t *image)
 {
     return true;
 }
-static bool rtgui_image_stb_load(draw_img_t *image, bool load)
+static bool gui_image_stb_load(draw_img_t *image, bool load)
 {
     return true;
 }
-static void rtgui_image_stb_unload(draw_img_t *image)
+static void gui_image_stb_unload(draw_img_t *image)
 {
     return;
 }
-static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                 rtgui_rect_t *rect)
+static void gui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
+                               gui_rect_t *rect)
 {
     gui_stb_img_t *buf_image = (gui_stb_img_t *)((gui_obj_t *)image - 1);
     int num_components;
@@ -246,10 +246,10 @@ static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
         break;
     }
 }
-void rtgui_image_stb_init(void)
+void gui_image_stb_init(void)
 {
     /* register rgb565 on image system */
-    rtgui_image_register_engine(&rtgui_image_stb_engine);
+    gui_image_register_engine(&gui_image_stb_engine);
 }
 
 

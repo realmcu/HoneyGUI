@@ -116,10 +116,10 @@ void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 }
 
 void rle(draw_img_t *image, struct gui_dispdev *dc,
-         rtgui_rect_t *rect)
+         gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    rtgui_matrix_t *matrix = image->matrix;
+    gui_matrix_t *matrix = image->matrix;
     bool identity = true;
     if (
         (matrix->m[0][0] == 1) && \

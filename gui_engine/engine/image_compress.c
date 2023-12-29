@@ -23,12 +23,12 @@ static void gui_memset16(uint16_t pixel, int16_t *addr, uint32_t len)
 }
 
 
-static bool rtgui_image_compress_mem_check(gui_img_t *image);
-static bool rtgui_image_compress_mem_load(gui_img_t *image,
-                                          bool load);
-static void rtgui_image_compress_mem_unload(gui_img_t *image);
-static void rtgui_image_compress_mem_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                          rtgui_rect_t *rect);
+static bool gui_image_compress_mem_check(gui_img_t *image);
+static bool gui_image_compress_mem_load(gui_img_t *image,
+                                        bool load);
+static void gui_image_compress_mem_unload(gui_img_t *image);
+static void gui_image_compress_mem_blit(gui_img_t *image, struct gui_dispdev *dc,
+                                        gui_rect_t *rect);
 
 
 struct gui_rgb_data_head
@@ -44,23 +44,23 @@ struct gui_rgb_data_head
 };
 
 
-struct rtgui_image_engine rtgui_image_compress_mem_engine =
+struct gui_image_engine gui_image_compress_mem_engine =
 {
     "compress_mem",
     { NULL },
-    rtgui_image_compress_mem_check,
-    rtgui_image_compress_mem_load,
-    rtgui_image_compress_mem_unload,
-    rtgui_image_compress_mem_blit,
+    gui_image_compress_mem_check,
+    gui_image_compress_mem_load,
+    gui_image_compress_mem_unload,
+    gui_image_compress_mem_blit,
 };
 
-static bool rtgui_image_compress_mem_check(gui_img_t *image)
+static bool gui_image_compress_mem_check(gui_img_t *image)
 {
     return true;
 }
 
-static bool rtgui_image_compress_mem_load(gui_img_t *image,
-                                          bool load)
+static bool gui_image_compress_mem_load(gui_img_t *image,
+                                        bool load)
 {
     struct gui_rgb_data_head head;
     memcpy(&head, image->data, sizeof(head));
@@ -69,7 +69,7 @@ static bool rtgui_image_compress_mem_load(gui_img_t *image,
     image->w = head.w;
     image->h = head.h;
     image->color_format = (gui_color_format)(head.type);
-    image->engine = &rtgui_image_compress_mem_engine;
+    image->engine = &gui_image_compress_mem_engine;
     if (!head.compress)
     {
         return false;
@@ -79,7 +79,7 @@ static bool rtgui_image_compress_mem_load(gui_img_t *image,
     return true;
 }
 
-static void rtgui_image_compress_mem_unload(gui_img_t *image)
+static void gui_image_compress_mem_unload(gui_img_t *image)
 {
 
 }
@@ -87,7 +87,7 @@ static void rtgui_image_compress_mem_unload(gui_img_t *image)
 
 
 static void normal_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct gui_dispdev *dc,
-                                                 rtgui_rect_t *rect)
+                                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -307,7 +307,7 @@ static void normal_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct gui_di
 
 }
 static void no_blending_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct gui_dispdev *dc,
-                                                      rtgui_rect_t *rect)
+                                                      gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -495,8 +495,8 @@ static void no_blending_blit_compress_rgb565_2_rgb565(gui_img_t *image, struct g
     }
 }
 
-static void rtgui_image_compress_mem_blit(gui_img_t *image, struct gui_dispdev *dc,
-                                          rtgui_rect_t *rect)
+static void gui_image_compress_mem_blit(gui_img_t *image, struct gui_dispdev *dc,
+                                        gui_rect_t *rect)
 {
     uint8_t source_bytes_per_pixel;
     switch (image->color_format)
@@ -534,9 +534,9 @@ static void rtgui_image_compress_mem_blit(gui_img_t *image, struct gui_dispdev *
 }
 
 
-void rtgui_image_compress_mem_init(void)
+void gui_image_compress_mem_init(void)
 {
     /* register rgb565 on image system */
-    rtgui_image_register_engine(&rtgui_image_compress_mem_engine);
+    gui_image_register_engine(&gui_image_compress_mem_engine);
 }
 

@@ -1,22 +1,22 @@
 #include <draw_img.h>
 #include <string.h>
 
-extern void rtgui_image_bmp_init(void);
-extern void rtgui_image_rgb_init(void);
-extern void rtgui_image_rgb_compress_init(void);
-extern void rtgui_image_compress_mem_init(void);
-extern void rtgui_image_evo_init(void);
-extern void rtgui_image_path_init(void);
-extern void rtgui_image_bitmap_init(void);
-static gui_list_t _rtgui_system_image_list = {NULL};
+extern void gui_image_bmp_init(void);
+extern void gui_image_rgb_init(void);
+extern void gui_image_rgb_compress_init(void);
+extern void gui_image_compress_mem_init(void);
+extern void gui_image_evo_init(void);
+extern void gui_image_path_init(void);
+extern void gui_image_bitmap_init(void);
+static gui_list_t _gui_system_image_list = {NULL};
 
 /* initialize rtgui image system */
-void rtgui_system_image_init(void)
+void gui_system_image_init(void)
 {
-    gui_list_init(&_rtgui_system_image_list);
+    gui_list_init(&_gui_system_image_list);
 }
 
-static struct rtgui_image_engine *rtgui_image_get_engine_from_mem(draw_img_t *img)
+static struct gui_image_engine *gui_image_get_engine_from_mem(draw_img_t *img)
 {
     gui_img_file_head_t head;
     memcpy(&head, img->data, sizeof(head));
@@ -57,11 +57,11 @@ static struct rtgui_image_engine *rtgui_image_get_engine_from_mem(draw_img_t *im
         break;
     }
     gui_list_t *node = NULL;
-    struct rtgui_image_engine *engine;
-    gui_list_for_each(node, &_rtgui_system_image_list)
+    struct gui_image_engine *engine;
+    gui_list_for_each(node, &_gui_system_image_list)
     {
         GUI_ASSERT(node != NULL);
-        engine = gui_list_entry(node, struct rtgui_image_engine, list);
+        engine = gui_list_entry(node, struct gui_image_engine, list);
 
         if (strlen(engine->name) == strlen(string))
         {
@@ -78,10 +78,10 @@ static struct rtgui_image_engine *rtgui_image_get_engine_from_mem(draw_img_t *im
 }
 
 #if 0
-static struct rtgui_image_engine *rtgui_image_get_engine_by_filename(const char *fn)
+static struct gui_image_engine *gui_image_get_engine_by_filename(const char *fn)
 {
     gui_list_t *node = NULL;
-    struct rtgui_image_engine *engine;
+    struct gui_image_engine *engine;
     const char *ext;
 
     ext = fn + strlen(fn);
@@ -106,9 +106,9 @@ static struct rtgui_image_engine *rtgui_image_get_engine_by_filename(const char 
     {
         ext = "jpeg";
     }
-    gui_list_for_each(node, &_rtgui_system_image_list)
+    gui_list_for_each(node, &_gui_system_image_list)
     {
-        engine = gui_list_entry(node, struct rtgui_image_engine, list);
+        engine = gui_list_entry(node, struct gui_image_engine, list);
         if (strncasecmp(engine->name, ext, strlen(engine->name)) == 0)
         {
             return engine;
@@ -120,7 +120,7 @@ static struct rtgui_image_engine *rtgui_image_get_engine_by_filename(const char 
 #endif
 
 
-void rtgui_image_load_scale(draw_img_t *img)
+void gui_image_load_scale(draw_img_t *img)
 {
     struct gui_rgb_data_head head = {0};
 
@@ -143,11 +143,11 @@ void rtgui_image_load_scale(draw_img_t *img)
     img->img_h = head.h;
 }
 
-bool rtgui_image_create(draw_img_t *img, bool load)
+bool gui_image_create(draw_img_t *img, bool load)
 {
-    struct rtgui_image_engine *engine;
+    struct gui_image_engine *engine;
 
-    engine = rtgui_image_get_engine_from_mem(img);
+    engine = gui_image_get_engine_from_mem(img);
     engine->image_load(img, load);
     img->engine = engine;
 
@@ -155,13 +155,13 @@ bool rtgui_image_create(draw_img_t *img, bool load)
     return true;
 }
 
-bool rtgui_image_new_area(draw_img_t *img)
+bool gui_image_new_area(draw_img_t *img)
 {
 
-    memcpy(img->inverse, img->matrix, sizeof(struct rtgui_matrix));
+    memcpy(img->inverse, img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(img->inverse);
 
-    struct rtgui_pox pox = {0.0f};
+    struct gui_pox pox = {0.0f};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;
@@ -250,7 +250,7 @@ bool rtgui_image_new_area(draw_img_t *img)
 
 
 
-void rtgui_image_destroy(draw_img_t *image)
+void gui_image_destroy(draw_img_t *image)
 {
     GUI_ASSERT(image != NULL);
 
@@ -259,14 +259,14 @@ void rtgui_image_destroy(draw_img_t *image)
 }
 
 /* register an image engine */
-void rtgui_image_register_engine(struct rtgui_image_engine *engine)
+void gui_image_register_engine(struct gui_image_engine *engine)
 {
     GUI_ASSERT(engine != NULL);
 
-    gui_list_append(&_rtgui_system_image_list, &(engine->list));
+    gui_list_append(&_gui_system_image_list, &(engine->list));
 }
 
-void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
+void gui_image_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     if (image != NULL && image->engine != NULL)
     {

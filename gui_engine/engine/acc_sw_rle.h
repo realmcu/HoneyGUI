@@ -63,11 +63,11 @@ typedef struct imdc_argb8888_node
 #pragma pack()
 
 void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                     rtgui_rect_t *rect);
+                                     gui_rect_t *rect);
 void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                      rtgui_rect_t *rect);
+                                      gui_rect_t *rect);
 void rle(draw_img_t *image, struct gui_dispdev *dc,
-         rtgui_rect_t *rect);
+         gui_rect_t *rect);
 
 void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len);
 void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len);

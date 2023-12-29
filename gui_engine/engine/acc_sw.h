@@ -20,7 +20,7 @@ extern "C" {
 #endif
 
 void no_rle(draw_img_t *image, struct gui_dispdev *dc,
-            rtgui_rect_t *rect);
+            gui_rect_t *rect);
 
 #ifdef __cplusplus
 }

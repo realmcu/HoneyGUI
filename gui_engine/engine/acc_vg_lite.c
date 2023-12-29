@@ -729,7 +729,7 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
     gui_free(rect_data);
 }
 
-void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect)
+void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     if (image->opacity_value == 0)
     {

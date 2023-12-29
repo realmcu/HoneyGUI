@@ -60,7 +60,7 @@ typedef enum
 typedef struct gui_text
 {
     gui_obj_t base;
-    const struct rtgui_font_engine *engine;
+    const struct gui_font_engine *engine;
     gui_color_t color;
     TEXT_MODE mode;
     uint16_t len;

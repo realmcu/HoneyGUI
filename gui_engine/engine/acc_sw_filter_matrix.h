@@ -23,24 +23,24 @@ extern "C" {
 #endif
 
 void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            rtgui_rect_t *rect);
+                                            gui_rect_t *rect);
 void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            rtgui_rect_t *rect);
+                                            gui_rect_t *rect);
 void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                            rtgui_rect_t *rect);
+                                            gui_rect_t *rect);
 void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                            rtgui_rect_t *rect);
+                                            gui_rect_t *rect);
 void cpu_filter_matrix_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                              rtgui_rect_t *rect);
+                                              gui_rect_t *rect);
 
 void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                              rtgui_rect_t *rect);
+                                              gui_rect_t *rect);
 void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                                rtgui_rect_t *rect);
+                                                gui_rect_t *rect);
 void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                              rtgui_rect_t *rect);
+                                              gui_rect_t *rect);
 void cpu_filter_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                              rtgui_rect_t *rect);
+                                              gui_rect_t *rect);
 
 
 #ifdef __cplusplus

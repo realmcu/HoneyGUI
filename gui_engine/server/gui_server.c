@@ -24,7 +24,7 @@ static void *gui_server_mq = NULL;
 static void (*gui_task_ext_execution_hook)(void) = NULL;
 
 
-static void rtgui_server_msg_handler(rtgui_msg_t *msg)
+static void gui_server_msg_handler(gui_msg_t *msg)
 {
 
 }
@@ -33,7 +33,7 @@ void gui_task_ext_execution_sethook(void (*hook)(void))
     gui_task_ext_execution_hook = hook;
 }
 
-bool send_msg_to_gui_server(rtgui_msg_t *msg)
+bool send_msg_to_gui_server(gui_msg_t *msg)
 {
     if (gui_server_mq != NULL)
     {
@@ -42,7 +42,7 @@ bool send_msg_to_gui_server(rtgui_msg_t *msg)
             gui_log("msg == NULL\n");
         }
 
-        gui_mq_send(gui_server_mq, msg, sizeof(rtgui_msg_t), 0);
+        gui_mq_send(gui_server_mq, msg, sizeof(gui_msg_t), 0);
         return true;
     }
     else
@@ -59,13 +59,13 @@ static uint32_t daemon_cnt = 0;
  *
  * @param parameter
  */
-static void rtgui_server_entry(void *parameter)
+static void gui_server_entry(void *parameter)
 {
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_init(void);
     js_init();
 #endif
-    gui_mq_create(&gui_server_mq, "gui_svr_mq", sizeof(rtgui_msg_t), 16);
+    gui_mq_create(&gui_server_mq, "gui_svr_mq", sizeof(gui_msg_t), 16);
     while (1)
     {
         gui_app_t *app = gui_current_app();
@@ -144,10 +144,10 @@ static void rtgui_server_entry(void *parameter)
         {
             gui_log("line %d, aemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n",
                     __LINE__, daemon_start_ms, gui_ms_get(), app->active_ms);
-            rtgui_msg_t msg;
-            if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(rtgui_msg_t), 0xFFFFFFFF))
+            gui_msg_t msg;
+            if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0xFFFFFFFF))
             {
-                rtgui_server_msg_handler(&msg);
+                gui_server_msg_handler(&msg);
             }
             daemon_cnt = 0;
             daemon_start_ms = 0;
@@ -161,7 +161,7 @@ static void rtgui_server_entry(void *parameter)
  *
  * @return int
  */
-int rtgui_server_init(void)
+int gui_server_init(void)
 {
     extern void gui_port_dc_init(void);
     extern void gui_port_indev_init(void);
@@ -174,12 +174,12 @@ int rtgui_server_init(void)
 
     gui_acc_init();
 
-    rtgui_system_image_init();
-    rtgui_system_font_init();
+    gui_system_image_init();
+    gui_system_font_init();
     gui_fb_change();
 
     gui_thread_create(GUI_SERVER_THREAD_NAME,
-                      rtgui_server_entry, NULL,
+                      gui_server_entry, NULL,
                       1024 * 10,
                       15);
     return 0;

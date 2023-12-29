@@ -63,16 +63,16 @@ typedef struct draw_img
     uint16_t target_w;
     uint16_t target_h;
     void *data;
-    struct rtgui_matrix *matrix;
-    struct rtgui_matrix *inverse;
-    struct rtgui_image_engine *engine;
+    struct gui_matrix *matrix;
+    struct gui_matrix *inverse;
+    struct gui_image_engine *engine;
     unsigned char opacity_value;
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
     uint32_t src_mode : 3;
 } draw_img_t;
 
-typedef struct rtgui_image_engine
+typedef struct gui_image_engine
 {
     const char *name;
     gui_list_t list;
@@ -83,23 +83,23 @@ typedef struct rtgui_image_engine
     bool (*image_load)(draw_img_t *image, bool load);
     void (*image_unload)(draw_img_t *image);
 
-    void (*image_blit)(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
+    void (*image_blit)(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
 
-} rtgui_image_engine_t;
+} gui_image_engine_t;
 
 
 
 /* init rtgui image system */
-void rtgui_system_image_init(void);
-void rtgui_image_load_scale(draw_img_t *img);
-bool rtgui_image_new_area(draw_img_t *img);
-bool rtgui_image_create(draw_img_t *img, bool load);
-void rtgui_image_destroy(draw_img_t *image);
-void rtgui_image_blit(draw_img_t *image, struct gui_dispdev *dc, rtgui_rect_t *rect);
+void gui_system_image_init(void);
+void gui_image_load_scale(draw_img_t *img);
+bool gui_image_new_area(draw_img_t *img);
+bool gui_image_create(draw_img_t *img, bool load);
+void gui_image_destroy(draw_img_t *image);
+void gui_image_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
 /* register an image engine */
-void rtgui_image_register_engine(struct rtgui_image_engine *engine);
+void gui_image_register_engine(struct gui_image_engine *engine);
 
 
 

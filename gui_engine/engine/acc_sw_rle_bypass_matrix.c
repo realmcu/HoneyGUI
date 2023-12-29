@@ -24,7 +24,7 @@
 #include "math.h"
 
 void rle_bypass_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect)
+                                     struct gui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -39,7 +39,7 @@ void rle_bypass_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -280,7 +280,7 @@ void rle_bypass_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect)
+                                     struct gui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -295,7 +295,7 @@ void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -524,7 +524,7 @@ void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void rle_bypass_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                       struct rtgui_rect *rect)
+                                       struct gui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -539,7 +539,7 @@ void rle_bypass_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {

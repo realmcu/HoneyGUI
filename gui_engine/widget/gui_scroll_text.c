@@ -129,13 +129,13 @@ static void scrolltext_draw(gui_obj_t *obj)
     if (dc->section_count == 0)
     {
         cur_time_ms = gui_ms_get();
-        rtgui_text_create(&text->base);
+        font_text_create(&text->base);
     }
     uint32_t offset = text->base.text_offset;
     uint32_t index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
     text->cnt_value = (text->end_value + text->start_value + offset) * index
                       / text->interval_time_ms;
-    rtgui_rect_t draw_rect = {0};
+    gui_rect_t draw_rect = {0};
     if (text->base.mode == SCROLL_X && offset > obj->w)
     {
 
@@ -171,13 +171,13 @@ static void scrolltext_draw(gui_obj_t *obj)
     draw_rect.yboundbottom = obj->ay + obj->dy + obj->ty + obj->h;
     if (text->duration_time_ms == 0)
     {
-        rtgui_font_draw(&text->base, &draw_rect);
+        font_text_draw(&text->base, &draw_rect);
     }
     else
     {
         if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
         {
-            rtgui_font_draw(&text->base, &draw_rect);
+            font_text_draw(&text->base, &draw_rect);
         }
     }
     uint32_t total_section_count = dc->screen_height / dc->fb_height - ((dc->screen_height %
@@ -185,7 +185,7 @@ static void scrolltext_draw(gui_obj_t *obj)
                                                                         0 : 1);
     if (dc->section_count == total_section_count)
     {
-        rtgui_text_destroy(&text->base);
+        font_text_destroy(&text->base);
     }
 }
 
@@ -196,7 +196,7 @@ static void scrolltext_end(gui_obj_t *obj)
     // {
     //     return;
     // }
-    // rtgui_text_destroy(text);
+    // font_text_destroy(text);
 }
 
 static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char *name,

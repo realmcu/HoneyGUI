@@ -86,8 +86,8 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void rtgui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                 rtgui_rect_t *rect)
+static void gui_image_stb_blit(draw_img_t *image, struct gui_dispdev *dc,
+                               gui_rect_t *rect)
 {
     gui_stb_img_t *buf_image = (gui_stb_img_t *)((gui_obj_t *)image - 1);
     int num_components = 0;
@@ -298,7 +298,7 @@ static void stb_image_draw_cb(gui_obj_t *obj)
     struct gui_dispdev *dc = gui_get_dc();
     draw_img_t *draw_img = &img->base.draw_img;
 
-    rtgui_rect_t draw_rect = {0};
+    gui_rect_t draw_rect = {0};
     draw_rect.x1 = obj->ax + obj->dx + obj->tx;
     draw_rect.y1 = obj->ay + obj->dy + obj->ty;
     draw_rect.x2 = draw_rect.x1 + obj->w;
@@ -322,7 +322,7 @@ static void stb_image_draw_cb(gui_obj_t *obj)
             img->gif_info->current_frame = --i;
         }
     }
-    rtgui_image_stb_blit(draw_img, dc, &draw_rect);
+    gui_image_stb_blit(draw_img, dc, &draw_rect);
 }
 static void stb_image_end(gui_obj_t *obj)
 {
@@ -337,8 +337,8 @@ static void gui_stbimg_from_mem_ctor(gui_stb_img_t *this, gui_obj_t *parent, con
     draw_img->data = addr;
     draw_img->opacity_value = 255;
     draw_img->blend_mode = IMG_FILTER_BLACK;
-    draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->matrix = gui_malloc(sizeof(struct gui_matrix));
+    draw_img->inverse = gui_malloc(sizeof(struct gui_matrix));
     draw_img->opacity_value = UINT8_MAX;
 
     //for root class

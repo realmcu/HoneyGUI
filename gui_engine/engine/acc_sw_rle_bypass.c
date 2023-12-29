@@ -23,7 +23,7 @@
 #include "acc_sw_rle.h"
 
 void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                              struct rtgui_rect *rect)
+                              struct gui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -200,7 +200,7 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void rle_bypass_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                              struct rtgui_rect *rect)
+                              struct gui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -354,7 +354,7 @@ void rle_bypass_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                struct rtgui_rect *rect)
+                                struct gui_rect *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
