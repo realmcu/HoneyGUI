@@ -386,8 +386,11 @@ void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispde
         for (uint32_t j = x_start; j < x_end; j++)
         {
 
-            int x = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            int y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+            int x = X / Z;
+            int y = Y / Z;
 
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
             {
@@ -627,8 +630,11 @@ void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_disp
         for (uint32_t j = x_start; j < x_end; j++)
         {
 
-            int x = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            int y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+            int x = X / Z;
+            int y = Y / Z;
 
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
             {
@@ -703,8 +709,11 @@ void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_di
         for (uint32_t j = x_start; j < x_end; j++)
         {
 
-            int x = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            int y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+            int x = X / Z;
+            int y = Y / Z;
 
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
             {
