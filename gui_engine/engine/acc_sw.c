@@ -166,6 +166,55 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
+    if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == false))
+    {
+        if (dc_bytes_per_pixel == 2)
+        {
+            if (img_type == RGB565)
+            {
+                bypass_matrix_blit_rgb565_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                bypass_matrix_blit_rgb888_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                bypass_matrix_blit_argb8888_2_rgb565(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+            if (img_type == RGB565)
+            {
+                bypass_matrix_blit_rgb565_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                bypass_matrix_blit_rgb888_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+
+                bypass_matrix_blit_argb8888_2_rgb888(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 4)
+        {
+            if (img_type == RGB565)
+            {
+                bypass_matrix_blit_rgb565_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                bypass_matrix_blit_rgb888_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                bypass_matrix_blit_argb8888_2_argb8888(image, dc, rect);
+            }
+        }
+    }
     if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)

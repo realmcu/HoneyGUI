@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2023
  *
  */
-#ifndef __ACC_SW_BYPASS_H__
-#define __ACC_SW_BYPASS_H__
+#ifndef __ACC_SW_BYPASS_MATRIX_H__
+#define __ACC_SW_BYPASS_MATRIX_H__
 
 #include <draw_img.h>
 #include <stdio.h>
