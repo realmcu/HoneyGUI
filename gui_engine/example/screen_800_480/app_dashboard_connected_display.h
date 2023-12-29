@@ -1,8 +1,8 @@
 /*
- * File      : app_cluster_connected_display.h
+ * File      : app_dashboard_connected_display.h
  */
-#ifndef __APP_CLUSTER_CONNECTED_DISPLAY_H__
-#define __APP_CLUSTER_CONNECTED_DISPLAY_H__
+#ifndef __APP_DASHBOARD_CONNECTED_DISPLAY_H__
+#define __APP_DASHBOARD_CONNECTED_DISPLAY_H__
 
 
 
@@ -26,9 +26,9 @@ extern "C" {
 #include <gui_app.h>
 #include <stdlib.h>
 #include "acc_engine.h"
-#include "app_cluster_data.h"
+#include "app_dashboard_data.h"
 
-static gui_img_t *cluster_c_background = NULL;
+static gui_img_t *dashboard_c_background = NULL;
 static gui_img_t *speed_high_c_digital = NULL;
 static gui_img_t *speed_low_c_digital = NULL;
 static gui_img_t *left_turn_light_c_status = NULL;
@@ -117,34 +117,35 @@ static void *connected_display_navi_resource_def[] =
 };
 
 /* Create function */
-void app_cluster_create_connected_display(gui_win_t *target_main_display);
+void app_dashboard_create_connected_display(gui_win_t *target_main_display);
 
 /* Update timer information */
-void app_cluster_update_connected_display_time_info(void);
-void app_cluster_update_connected_display_tense_apm_info(T_TENSE_APM_INFO
-                                                         current_tens_apm_info);
-void app_cluster_refresh_connected_display_tense_apm_info(gui_img_t *tense_high_image_obj,
-                                                          gui_img_t *tense_low_image_obj,
-                                                          T_TENSE_APM_INFO current_tens_apm_info);
+void app_dashboard_update_connected_display_time_info(void);
+void app_dashboard_update_connected_display_tense_apm_info(T_TENSE_APM_INFO
+                                                           current_tens_apm_info);
+void app_dashboard_refresh_connected_display_tense_apm_info(gui_img_t *tense_high_image_obj,
+                                                            gui_img_t *tense_low_image_obj,
+                                                            T_TENSE_APM_INFO current_tens_apm_info);
 
 /* Update battery information */
-void app_cluster_update_connected_display_battery_info(uint8_t battery_level);
+void app_dashboard_update_connected_display_battery_info(uint8_t battery_level);
 
 /* Update speed information */
-void app_cluster_update_connected_display_speed_info(uint8_t current_speed);
+void app_dashboard_update_connected_display_speed_info(uint8_t current_speed);
 
 /* Update turn information */
-void app_cluster_update_connected_display_turn_info(T_TURN_INFO current_turn_information);
-void app_cluster_refresh_connected_display_turn_info(gui_img_t *left_turn_image_obj,
-                                                     gui_img_t *right_turn_image_obj,
-                                                     T_TURN_INFO current_turn_information);
+void app_dashboard_update_connected_display_turn_info(T_TURN_INFO current_turn_information);
+void app_dashboard_refresh_connected_display_turn_info(gui_img_t *left_turn_image_obj,
+                                                       gui_img_t *right_turn_image_obj,
+                                                       T_TURN_INFO current_turn_information);
 
 /* Update phone information */
-void app_cluster_update_connected_display_phone_infor(app_phone_data *app_call_information);
+void app_dashboard_update_connected_display_phone_infor(app_phone_data *app_call_information);
 
 /* Update Navi information */
-void app_cluster_update_connected_display_navi_infor(T_NAVI_INFO navi_information);
-void app_cluster_update_connected_display_message_infor(app_message_data *app_message_information);
+void app_dashboard_update_connected_display_navi_infor(T_NAVI_INFO navi_information);
+void app_dashboard_update_connected_display_message_infor(app_message_data
+                                                          *app_message_information);
 
 /* Update connected_display every frame */
 void paint_connected_display_cb(gui_win_t *win);

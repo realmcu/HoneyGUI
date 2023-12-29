@@ -1,8 +1,8 @@
 /*
  * File      : app_launcher.h
  */
-#ifndef __APP_CLUSTER_MAIN_DISPLAY_H__
-#define __APP_CLUSTER_MAIN_DISPLAY_H__
+#ifndef __APP_DASHBOARD_MAIN_DISPLAY_H__
+#define __APP_DASHBOARD_MAIN_DISPLAY_H__
 
 
 
@@ -26,9 +26,9 @@ extern "C" {
 #include <gui_app.h>
 #include <stdlib.h>
 #include "acc_engine.h"
-#include "app_cluster_data.h"
+#include "app_dashboard_data.h"
 
-static gui_img_t *cluster_background = NULL;
+static gui_img_t *dashboard_background = NULL;
 static gui_img_t *speed_high_digital = NULL;
 static gui_img_t *speed_low_digital = NULL;
 static gui_img_t *bluetooth_status = NULL;
@@ -109,35 +109,35 @@ static void *main_display_speed_resource_def[] =
 };
 
 /* Create function */
-void app_cluster_create_main_display(gui_win_t *target_main_display);
+void app_dashboard_create_main_display(gui_win_t *target_main_display);
 
 /* Update timer information */
-void app_cluster_update_main_display_time_info(void);
-void app_cluster_update_main_display_tense_apm_info(T_TENSE_APM_INFO current_tens_apm_info);
-void app_cluster_refresh_main_display_tense_apm_info(gui_img_t *tense_high_image_obj,
-                                                     gui_img_t *tense_low_image_obj,
-                                                     T_TENSE_APM_INFO current_tens_apm_info);
+void app_dashboard_update_main_display_time_info(void);
+void app_dashboard_update_main_display_tense_apm_info(T_TENSE_APM_INFO current_tens_apm_info);
+void app_dashboard_refresh_main_display_tense_apm_info(gui_img_t *tense_high_image_obj,
+                                                       gui_img_t *tense_low_image_obj,
+                                                       T_TENSE_APM_INFO current_tens_apm_info);
 
 /* Update battery information */
-void app_cluster_update_main_display_battery_info(uint8_t battery_level);
+void app_dashboard_update_main_display_battery_info(uint8_t battery_level);
 
 /* Update speed information */
-void app_cluster_update_main_display_speed_info(uint8_t current_speed);
+void app_dashboard_update_main_display_speed_info(uint8_t current_speed);
 
 /* Update turn information */
-void app_cluster_update_main_display_turn_info(T_TURN_INFO current_turn_information);
-void app_cluster_refresh_main_display_turn_info(gui_img_t *left_turn_image_obj,
-                                                gui_img_t *right_turn_image_obj,
-                                                T_TURN_INFO current_turn_information);
+void app_dashboard_update_main_display_turn_info(T_TURN_INFO current_turn_information);
+void app_dashboard_refresh_main_display_turn_info(gui_img_t *left_turn_image_obj,
+                                                  gui_img_t *right_turn_image_obj,
+                                                  T_TURN_INFO current_turn_information);
 
 /* Update Bluetooth status */
-void app_cluster_update_main_display_bluetooth_info(T_BLUETOOTH_INFO current_bluetooth_info);
-void app_cluster_refresh_main_display_bluetooth_info(gui_img_t *target_image_obj,
-                                                     T_BLUETOOTH_INFO current_bluetooth_info);
+void app_dashboard_update_main_display_bluetooth_info(T_BLUETOOTH_INFO current_bluetooth_info);
+void app_dashboard_refresh_main_display_bluetooth_info(gui_img_t *target_image_obj,
+                                                       T_BLUETOOTH_INFO current_bluetooth_info);
 
 /* Update phone information */
-void app_cluster_update_main_display_phone_infor(app_phone_data *app_call_information);
-void app_cluster_update_main_display_message_infor(app_message_data *app_message_information);
+void app_dashboard_update_main_display_phone_infor(app_phone_data *app_call_information);
+void app_dashboard_update_main_display_message_infor(app_message_data *app_message_information);
 
 /* Update main_display every frame */
 void paint_main_display_cb(gui_win_t *win);

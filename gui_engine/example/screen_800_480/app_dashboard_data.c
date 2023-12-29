@@ -1,10 +1,10 @@
-#include "app_cluster_data.h"
+#include "app_dashboard_data.h"
 #include "trace.h"
 #include "communicate_parse_navigation.h"
 #include "communicate_parse_notify.h"
 #include "os_timer.h"
-#include "app_cluster_main_display.h"
-#include "app_cluster_connected_display.h"
+#include "app_dashboard_main_display.h"
+#include "app_dashboard_connected_display.h"
 #include "os_sync.h"
 #include "communicate_protocol.h"
 #include "communicate_parse.h"
@@ -19,7 +19,7 @@ char str_def2[] = {0xe8, 0xbf, 0x9b, 0xe5, 0x85, 0xa5, '\0'};
 char str_def3[] = {0xe7, 0xb1, 0xb3, '\0'};
 char str_def4[] = {0x20, 0xe8, 0xbf, 0x9b, 0xe5, 0x85, 0xa5, '\0'};
 
-void app_cluster_auto_refresh_data_demo(void)
+void app_dashboard_auto_refresh_data_demo(void)
 {
     uint8_t current_battery_level_temp = 0x0;
     uint8_t current_speed_temp = 0x0;
@@ -34,8 +34,8 @@ void app_cluster_auto_refresh_data_demo(void)
     }
     current_counter++;
 
-    current_battery_level_temp = app_cluster_data_get_battery_level();
-    current_speed_temp = app_cluster_data_get_car_speed();
+    current_battery_level_temp = app_dashboard_data_get_battery_level();
+    current_speed_temp = app_dashboard_data_get_car_speed();
 
     current_battery_level_temp++;
     current_speed_temp++;
@@ -74,120 +74,120 @@ void app_cluster_auto_refresh_data_demo(void)
         }
     }
 
-    app_cluster_data_set_battery_level(current_battery_level_temp);
-    app_cluster_data_set_car_speed(current_speed_temp);
-    app_cluster_data_set_car_turn_info(current_turn_info_temp);
+    app_dashboard_data_set_battery_level(current_battery_level_temp);
+    app_dashboard_data_set_car_speed(current_speed_temp);
+    app_dashboard_data_set_car_turn_info(current_turn_info_temp);
 }
 
 void *refresh_count_timer;
 static void refresh_count_timer_cb(void *p_handle)
 {
-    app_cluster_data_set_current_timer();
+    app_dashboard_data_set_current_timer();
     os_timer_start(&p_handle);
 }
 
-void app_cluster_initialize_data(void)
+void app_dashboard_initialize_data(void)
 {
-    app_current_cluster_data.current_bluetooth_status = T_BLUETOOTH_INFO_OFF;
-    app_current_cluster_data.show_main_display = true;
-    app_current_cluster_data.refresh_timer_value = 36900;
-    app_current_cluster_data.tense_apm_display = T_TENSE_AM_DISPLAY;
+    app_current_dashboard_data.current_bluetooth_status = T_BLUETOOTH_INFO_OFF;
+    app_current_dashboard_data.show_main_display = true;
+    app_current_dashboard_data.refresh_timer_value = 36900;
+    app_current_dashboard_data.tense_apm_display = T_TENSE_AM_DISPLAY;
 
     os_timer_create(&refresh_count_timer, "gui-tick", 0, 1000, true, refresh_count_timer_cb);
     os_timer_start(&refresh_count_timer);
 }
 
-void app_cluster_data_set_current_timer(void)
+void app_dashboard_data_set_current_timer(void)
 {
-    app_current_cluster_data.refresh_timer_value++;
-    if (app_current_cluster_data.refresh_timer_value == 43200)
+    app_current_dashboard_data.refresh_timer_value++;
+    if (app_current_dashboard_data.refresh_timer_value == 43200)
     {
-        app_current_cluster_data.refresh_timer_value = 0;
-        app_cluster_data_set_tense_timer_info(!app_cluster_data_get_tense_timer_info());
+        app_current_dashboard_data.refresh_timer_value = 0;
+        app_dashboard_data_set_tense_timer_info(!app_dashboard_data_get_tense_timer_info());
     }
 }
 
-void app_cluster_data_set_tense_timer_info(T_TENSE_APM_INFO current_tense_apm_info)
+void app_dashboard_data_set_tense_timer_info(T_TENSE_APM_INFO current_tense_apm_info)
 {
-    app_current_cluster_data.tense_apm_display = current_tense_apm_info;
+    app_current_dashboard_data.tense_apm_display = current_tense_apm_info;
 }
 
-T_TENSE_APM_INFO app_cluster_data_get_tense_timer_info(void)
+T_TENSE_APM_INFO app_dashboard_data_get_tense_timer_info(void)
 {
-    return app_current_cluster_data.tense_apm_display;
+    return app_current_dashboard_data.tense_apm_display;
 }
 
-uint32_t app_cluster_data_get_current_timer(void)
+uint32_t app_dashboard_data_get_current_timer(void)
 {
-    return app_current_cluster_data.refresh_timer_value;
+    return app_current_dashboard_data.refresh_timer_value;
 }
 
-app_cluster_data *app_cluster_get_data(void)
+app_dashboard_data *app_dashboard_get_data(void)
 {
-    return &app_current_cluster_data;
+    return &app_current_dashboard_data;
 }
 
-void app_cluster_data_set_battery_level(uint8_t battery_level)
+void app_dashboard_data_set_battery_level(uint8_t battery_level)
 {
-    app_current_cluster_data.battery_level = battery_level;
+    app_current_dashboard_data.battery_level = battery_level;
 }
 
-uint8_t app_cluster_data_get_battery_level(void)
+uint8_t app_dashboard_data_get_battery_level(void)
 {
-    return app_current_cluster_data.battery_level;
+    return app_current_dashboard_data.battery_level;
 }
 
-void app_cluster_data_set_car_speed(uint8_t current_car_speed)
+void app_dashboard_data_set_car_speed(uint8_t current_car_speed)
 {
-    app_current_cluster_data.current_speed = current_car_speed;
+    app_current_dashboard_data.current_speed = current_car_speed;
 }
 
-uint8_t app_cluster_data_get_car_speed(void)
+uint8_t app_dashboard_data_get_car_speed(void)
 {
-    return app_current_cluster_data.current_speed;
+    return app_current_dashboard_data.current_speed;
 }
 
-void app_cluster_data_set_car_turn_info(T_TURN_INFO current_car_turn_info)
+void app_dashboard_data_set_car_turn_info(T_TURN_INFO current_car_turn_info)
 {
-    app_current_cluster_data.current_turn_information = current_car_turn_info;
+    app_current_dashboard_data.current_turn_information = current_car_turn_info;
 }
 
-T_TURN_INFO app_cluster_data_get_car_turn_info(void)
+T_TURN_INFO app_dashboard_data_get_car_turn_info(void)
 {
-    return app_current_cluster_data.current_turn_information;
+    return app_current_dashboard_data.current_turn_information;
 }
 
-void app_cluster_data_set_bluetooth_status(T_BLUETOOTH_INFO current_bluetooth_status)
+void app_dashboard_data_set_bluetooth_status(T_BLUETOOTH_INFO current_bluetooth_status)
 {
-    app_current_cluster_data.current_bluetooth_status = current_bluetooth_status;
+    app_current_dashboard_data.current_bluetooth_status = current_bluetooth_status;
 }
 
-T_BLUETOOTH_INFO app_cluster_data_get_bluetooth_status(void)
+T_BLUETOOTH_INFO app_dashboard_data_get_bluetooth_status(void)
 {
-    return app_current_cluster_data.current_bluetooth_status;
+    return app_current_dashboard_data.current_bluetooth_status;
 }
 
-void app_cluster_data_set_navi_status(T_NAVI_INFO current_navi_status)
+void app_dashboard_data_set_navi_status(T_NAVI_INFO current_navi_status)
 {
-    app_current_cluster_data.current_navi_info = current_navi_status;
+    app_current_dashboard_data.current_navi_info = current_navi_status;
 }
 
-T_NAVI_INFO app_cluster_data_get_navi_status(void)
+T_NAVI_INFO app_dashboard_data_get_navi_status(void)
 {
-    return app_current_cluster_data.current_navi_info;
+    return app_current_dashboard_data.current_navi_info;
 }
 
-void app_cluster_data_set_phone_status(app_phone_data current_phone_status)
+void app_dashboard_data_set_phone_status(app_phone_data current_phone_status)
 {
-    memcpy(&app_current_cluster_data.current_phone_status,
+    memcpy(&app_current_dashboard_data.current_phone_status,
            &current_phone_status,
            sizeof(app_phone_data));
 }
 
-void app_cluster_data_get_phone_status(app_phone_data *rtn_phone_status)
+void app_dashboard_data_get_phone_status(app_phone_data *rtn_phone_status)
 {
     memcpy(rtn_phone_status,
-           &app_current_cluster_data.current_phone_status,
+           &app_current_dashboard_data.current_phone_status,
            sizeof(app_phone_data));
 }
 
@@ -213,55 +213,55 @@ void app_update_gui_widget(gui_img_t *target_image_obj,
     }
 }
 
-void app_cluster_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
+void app_dashboard_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
 {
     if (event == BP_UPDATE_VALUE_EVENT)
     {
         if (Value == NAVI_START)
         {
-            app_current_cluster_data.show_main_display = false;
+            app_current_dashboard_data.show_main_display = false;
         }
         else if (Value == NAVI_IDLE)
         {
-            app_current_cluster_data.show_main_display = true;
+            app_current_dashboard_data.show_main_display = true;
         }
     }
     else if (event == BP_LE_DISC_EVENT)
     {
-        app_current_cluster_data.show_main_display = true;
+        app_current_dashboard_data.show_main_display = true;
         //message off
         app_message_data current_message_status;
-        app_cluster_data_get_message_data_update(&current_message_status);
+        app_dashboard_data_get_message_data_update(&current_message_status);
         current_message_status.wechat_notify_message = false;
-        app_cluster_data_set_message_data_update(current_message_status);
+        app_dashboard_data_set_message_data_update(current_message_status);
         //phone nume off
         app_phone_data current_phone_status;
-        app_cluster_data_get_phone_status(&current_phone_status);
+        app_dashboard_data_get_phone_status(&current_phone_status);
         current_phone_status.phone_status = T_PHONE_STATUS_NONE;
-        app_cluster_data_set_phone_status(current_phone_status);
+        app_dashboard_data_set_phone_status(current_phone_status);
     }
 }
 
-uint8_t app_cluster_data_get_show_main_display(void)
+uint8_t app_dashboard_data_get_show_main_display(void)
 {
-    return app_current_cluster_data.show_main_display;
+    return app_current_dashboard_data.show_main_display;
 }
 
-void app_cluster_data_set_navi_data_update(app_navi_data current_navi_data)
+void app_dashboard_data_set_navi_data_update(app_navi_data current_navi_data)
 {
-    memcpy(&app_current_cluster_data.current_navi_data,
+    memcpy(&app_current_dashboard_data.current_navi_data,
            &current_navi_data,
            sizeof(app_navi_data));
 }
 
-void app_cluster_data_get_navi_data_update(app_navi_data *rtn_phone_status)
+void app_dashboard_data_get_navi_data_update(app_navi_data *rtn_phone_status)
 {
     memcpy(rtn_phone_status,
-           &app_current_cluster_data.current_navi_data,
+           &app_current_dashboard_data.current_navi_data,
            sizeof(app_navi_data));
 }
 
-void app_cluster_data_update_navi_status(const uint8_t *pValue, uint16_t length)
+void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t length)
 {
     int32_t distance = 0;
     uint8_t navi_type = 0;
@@ -271,20 +271,20 @@ void app_cluster_data_update_navi_status(const uint8_t *pValue, uint16_t length)
         || navi_type == LEFT_TURN_AROUND)
     {
         //turn_left();
-        app_current_cluster_data.current_navi_info = T_NAVI_INFO_2;
+        app_current_dashboard_data.current_navi_info = T_NAVI_INFO_2;
     }
     else if (navi_type == TURN_RIGHT || navi_type == RIGHT_FRONT || navi_type == RIGHT_BACK)
     {
         //turn_right();
-        app_current_cluster_data.current_navi_info = T_NAVI_INFO_3;
+        app_current_dashboard_data.current_navi_info = T_NAVI_INFO_3;
     }
     else
     {
         //stright_ahead();
-        app_current_cluster_data.current_navi_info = T_NAVI_INFO_1;
+        app_current_dashboard_data.current_navi_info = T_NAVI_INFO_1;
     }
     app_navi_data current_navi_data;
-    app_cluster_data_get_navi_data_update(&current_navi_data);
+    app_dashboard_data_get_navi_data_update(&current_navi_data);
 
     memset(current_navi_data.navigation_msg, 0x0, sizeof(current_navi_data.navigation_msg));
     memset(current_navi_data.road_names, 0x0, sizeof(current_navi_data.road_names));
@@ -322,27 +322,27 @@ void app_cluster_data_update_navi_status(const uint8_t *pValue, uint16_t length)
         current_navi_data.road_num_len = length - 3 + strlen(str_def4);
     }
 
-    app_cluster_data_set_navi_data_update(current_navi_data);
+    app_dashboard_data_set_navi_data_update(current_navi_data);
 }
 
-void app_cluster_data_set_message_data_update(app_message_data current_message_status)
+void app_dashboard_data_set_message_data_update(app_message_data current_message_status)
 {
-    memcpy(&app_current_cluster_data.current_message_status,
+    memcpy(&app_current_dashboard_data.current_message_status,
            &current_message_status,
            sizeof(app_message_data));
 }
 
-void app_cluster_data_get_message_data_update(app_message_data *rtn_phone_status)
+void app_dashboard_data_get_message_data_update(app_message_data *rtn_phone_status)
 {
     memcpy(rtn_phone_status,
-           &app_current_cluster_data.current_message_status,
+           &app_current_dashboard_data.current_message_status,
            sizeof(app_message_data));
 }
 
-void app_cluster_data_set_reject_end_call(void)
+void app_dashboard_data_set_reject_end_call(void)
 {
     app_phone_data current_phone_status;
-    app_cluster_data_get_phone_status(&current_phone_status);
+    app_dashboard_data_get_phone_status(&current_phone_status);
 
     if ((current_phone_status.phone_status == T_PHONE_STATUS_ACCEPT) ||
         (current_phone_status.phone_status == T_PHONE_STATUS_ONGOING))
@@ -356,10 +356,10 @@ void app_cluster_data_set_reject_end_call(void)
     }
 }
 
-void app_cluster_data_set_accept_call(void)
+void app_dashboard_data_set_accept_call(void)
 {
     app_phone_data current_phone_status;
-    app_cluster_data_get_phone_status(&current_phone_status);
+    app_dashboard_data_get_phone_status(&current_phone_status);
 
     if (current_phone_status.phone_status == T_PHONE_STATUS_ONGOING)
     {
@@ -372,12 +372,12 @@ void app_cluster_data_set_accept_call(void)
     }
 }
 
-void app_cluster_data_update_phone_status(uint8_t key, const uint8_t *pValue, uint16_t length)
+void app_dashboard_data_update_phone_status(uint8_t key, const uint8_t *pValue, uint16_t length)
 {
     if (length <= 11)
     {
         app_phone_data current_phone_status;
-        app_cluster_data_get_phone_status(&current_phone_status);
+        app_dashboard_data_get_phone_status(&current_phone_status);
 
         memset(current_phone_status.current_phone_number, 0x0,
                sizeof(current_phone_status.current_phone_number));
@@ -398,11 +398,11 @@ void app_cluster_data_update_phone_status(uint8_t key, const uint8_t *pValue, ui
         memcpy(current_phone_status.current_phone_number,
                pValue,
                length);
-        app_cluster_data_set_phone_status(current_phone_status);
+        app_dashboard_data_set_phone_status(current_phone_status);
     }
     else
     {
-        APP_PRINT_INFO0("app_cluster_data_update_phone_status over size");
+        APP_PRINT_INFO0("app_dashboard_data_update_phone_status over size");
     }
 }
 
@@ -411,36 +411,36 @@ static void dashboard_message_timer_cb(void *p_handle)
 {
     APP_PRINT_INFO0("dashboard_message_timer_cb");
     app_message_data current_message_status;
-    app_cluster_data_get_message_data_update(&current_message_status);
+    app_dashboard_data_get_message_data_update(&current_message_status);
     memset(current_message_status.wechat_msg, 0x0, sizeof(current_message_status.wechat_msg));
     current_message_status.wechat_notify_message = false;
-    app_cluster_data_set_message_data_update(current_message_status);
+    app_dashboard_data_set_message_data_update(current_message_status);
 
     os_timer_stop(&p_handle);
 }
 
-void app_cluster_data_update_message_status(const uint8_t *pValue, uint16_t length,
-                                            uint8_t messaye_type)
+void app_dashboard_data_update_message_status(const uint8_t *pValue, uint16_t length,
+                                              uint8_t messaye_type)
 {
     if ((messaye_type == MESSGAE_INFO_QQ) ||
         (messaye_type == MESSGAE_INFO_WECHAT) ||
         (messaye_type == MESSGAE_INFO_MESSAGE))
     {
         app_message_data current_message_status;
-        app_cluster_data_get_message_data_update(&current_message_status);
+        app_dashboard_data_get_message_data_update(&current_message_status);
 
         memset(current_message_status.wechat_msg, 0x0, sizeof(current_message_status.wechat_msg));
 
         current_message_status.wechat_msg_len = length;
         memcpy(&current_message_status.wechat_msg[0], &pValue[0], length);
         current_message_status.wechat_notify_message = true;
-        app_cluster_data_set_message_data_update(current_message_status);
+        app_dashboard_data_set_message_data_update(current_message_status);
 
         os_timer_create(&dashboard_message_timer, "gui-tick", 0, 3000, true, dashboard_message_timer_cb);
         os_timer_start(&dashboard_message_timer);
     }
     else
     {
-        APP_PRINT_INFO0("app_cluster_data_update_message_status message type ni support");
+        APP_PRINT_INFO0("app_dashboard_data_update_message_status message type ni support");
     }
 }

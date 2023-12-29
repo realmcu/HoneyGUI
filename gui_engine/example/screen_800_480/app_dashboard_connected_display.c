@@ -11,8 +11,8 @@
 #include "gui_img.h"
 #include "time.h"
 #include "gui_button.h"
-#include "app_cluster_connected_display.h"
-#include "app_cluster_data.h"
+#include "app_dashboard_connected_display.h"
+#include "app_dashboard_data.h"
 #include "trace.h"
 
 uint8_t show_c_navigation_msg[40];
@@ -21,16 +21,16 @@ uint8_t show_c_road_names[40];
 uint8_t show_c_message_data[40];
 uint8_t show_c_tel_number[11];
 
-void app_cluster_create_connected_display(gui_win_t *target_connected_display)
+void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
 {
     /* set update callback */
     gui_win_set_animate(target_connected_display, 1000, -1, paint_connected_display_cb,
                         target_connected_display);
 
     /* set Image data */
-    cluster_c_background = gui_img_create_from_mem(target_connected_display, "cluster_c_background",
-                                                   BACKGROUND_C_BIN, 0, 0, 800, 480);
-    cluster_c_background->draw_img.blend_mode = IMG_FILTER_BLACK;
+    dashboard_c_background = gui_img_create_from_mem(target_connected_display, "dashboard_c_background",
+                                                     BACKGROUND_C_BIN, 0, 0, 800, 480);
+    dashboard_c_background->draw_img.blend_mode = IMG_FILTER_BLACK;
     speed_high_c_digital = gui_img_create_from_mem(target_connected_display, "speed_high_c_digital",
                                                    SPED_C0_BIN, 214, 232, 27, 40);
     speed_high_c_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
@@ -92,7 +92,7 @@ void app_cluster_create_connected_display(gui_win_t *target_connected_display)
 
     /* set font data */
     app_navi_data current_navi_data;
-    app_cluster_data_get_navi_data_update(&current_navi_data);
+    app_dashboard_data_get_navi_data_update(&current_navi_data);
 
     memcpy(&show_c_navigation_msg[0], &current_navi_data.navigation_msg[0],
            current_navi_data.navigation_num_len);
@@ -122,7 +122,7 @@ void app_cluster_create_connected_display(gui_win_t *target_connected_display)
     gui_text_mode_set(short_c_navi_message_2, CENTER);
 
     app_phone_data current_phone_status;
-    app_cluster_data_get_phone_status(&current_phone_status);
+    app_dashboard_data_get_phone_status(&current_phone_status);
     short_c_tel_number = gui_text_create(target_connected_display,  "short_c_tel_number",  560, 410,
                                          158, 30);
     memcpy(&show_c_tel_number[0], &current_phone_status.current_phone_number[0],
@@ -135,7 +135,7 @@ void app_cluster_create_connected_display(gui_win_t *target_connected_display)
     gui_text_set(short_c_tel_accept, "calling", "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX,
                                                                         UINT8_MAX), 7, 28);
     app_message_data current_message_status;
-    app_cluster_data_get_message_data_update(&current_message_status);
+    app_dashboard_data_get_message_data_update(&current_message_status);
     memcpy(&show_c_message_data[0], &current_message_status.wechat_msg[0],
            current_message_status.wechat_msg_len);
     short_c_message_data = gui_text_create(target_connected_display,  "short_c_message_data",  300, 10,
@@ -145,21 +145,21 @@ void app_cluster_create_connected_display(gui_win_t *target_connected_display)
     gui_text_mode_set(short_c_message_data, MUTI_LEFT);
 
     /* Prepare the intial data */
-    app_cluster_update_connected_display_time_info();
-    app_cluster_update_connected_display_tense_apm_info(app_cluster_data_get_tense_timer_info());
-    app_cluster_update_connected_display_battery_info(app_cluster_data_get_battery_level());
-    app_cluster_update_connected_display_speed_info(app_cluster_data_get_car_speed());
-    app_cluster_update_connected_display_turn_info(app_cluster_data_get_car_turn_info());
-    app_cluster_update_connected_display_phone_infor(&current_phone_status);
-    app_cluster_update_connected_display_message_infor(&current_message_status);
+    app_dashboard_update_connected_display_time_info();
+    app_dashboard_update_connected_display_tense_apm_info(app_dashboard_data_get_tense_timer_info());
+    app_dashboard_update_connected_display_battery_info(app_dashboard_data_get_battery_level());
+    app_dashboard_update_connected_display_speed_info(app_dashboard_data_get_car_speed());
+    app_dashboard_update_connected_display_turn_info(app_dashboard_data_get_car_turn_info());
+    app_dashboard_update_connected_display_phone_infor(&current_phone_status);
+    app_dashboard_update_connected_display_message_infor(&current_message_status);
 }
 
 extern gui_win_t *win_main_display;
 void paint_connected_display_cb(gui_win_t *win)
 {
-    if (app_cluster_data_get_show_main_display() == true)
+    if (app_dashboard_data_get_show_main_display() == true)
     {
-        win->base.not_show = app_cluster_data_get_show_main_display();
+        win->base.not_show = app_dashboard_data_get_show_main_display();
         if (win_main_display->base.not_show)
         {
             win_main_display->base.not_show = false;
@@ -168,23 +168,23 @@ void paint_connected_display_cb(gui_win_t *win)
     }
 
     app_phone_data current_phone_status;
-    app_cluster_data_get_phone_status(&current_phone_status);
-    app_cluster_update_connected_display_time_info();
-    app_cluster_update_connected_display_tense_apm_info(app_cluster_data_get_tense_timer_info());
-    app_cluster_update_connected_display_battery_info(app_cluster_data_get_battery_level());
-    app_cluster_update_connected_display_speed_info(app_cluster_data_get_car_speed());
-    app_cluster_update_connected_display_turn_info(app_cluster_data_get_car_turn_info());
-    app_cluster_update_connected_display_phone_infor(&current_phone_status);
-    app_cluster_update_connected_display_navi_infor(app_cluster_data_get_navi_status());
+    app_dashboard_data_get_phone_status(&current_phone_status);
+    app_dashboard_update_connected_display_time_info();
+    app_dashboard_update_connected_display_tense_apm_info(app_dashboard_data_get_tense_timer_info());
+    app_dashboard_update_connected_display_battery_info(app_dashboard_data_get_battery_level());
+    app_dashboard_update_connected_display_speed_info(app_dashboard_data_get_car_speed());
+    app_dashboard_update_connected_display_turn_info(app_dashboard_data_get_car_turn_info());
+    app_dashboard_update_connected_display_phone_infor(&current_phone_status);
+    app_dashboard_update_connected_display_navi_infor(app_dashboard_data_get_navi_status());
     app_message_data current_message_status;
-    app_cluster_data_get_message_data_update(&current_message_status);
-    app_cluster_update_connected_display_message_infor(&current_message_status);
+    app_dashboard_data_get_message_data_update(&current_message_status);
+    app_dashboard_update_connected_display_message_infor(&current_message_status);
 }
 
-void app_cluster_update_connected_display_time_info(void)
+void app_dashboard_update_connected_display_time_info(void)
 {
-    uint32_t connected_display_hour = app_cluster_data_get_current_timer() / 3600;
-    uint32_t connected_display_min = (app_cluster_data_get_current_timer() -
+    uint32_t connected_display_hour = app_dashboard_data_get_current_timer() / 3600;
+    uint32_t connected_display_min = (app_dashboard_data_get_current_timer() -
                                       (connected_display_hour * 3600)) / 60;
 
     app_update_gui_widget(hour_high_c_digital,
@@ -205,16 +205,16 @@ void app_cluster_update_connected_display_time_info(void)
                           sizeof(connected_display_time_resource_def));
 }
 
-void app_cluster_update_connected_display_tense_apm_info(T_TENSE_APM_INFO
-                                                         current_tense_apm_info)
+void app_dashboard_update_connected_display_tense_apm_info(T_TENSE_APM_INFO
+                                                           current_tense_apm_info)
 {
-    app_cluster_refresh_connected_display_tense_apm_info(tense_high_c_digital, tense_low_c_digital,
-                                                         current_tense_apm_info);
+    app_dashboard_refresh_connected_display_tense_apm_info(tense_high_c_digital, tense_low_c_digital,
+                                                           current_tense_apm_info);
 }
 
-void app_cluster_refresh_connected_display_tense_apm_info(gui_img_t *tense_high_image_obj,
-                                                          gui_img_t *tense_low_image_obj,
-                                                          T_TENSE_APM_INFO current_tense_apm_info)
+void app_dashboard_refresh_connected_display_tense_apm_info(gui_img_t *tense_high_image_obj,
+                                                            gui_img_t *tense_low_image_obj,
+                                                            T_TENSE_APM_INFO current_tense_apm_info)
 {
     void *tense_high_digital_info = APM_CA_BIN;
     void *tense_low_digital_info = APM_CM_BIN;
@@ -249,7 +249,7 @@ void app_cluster_refresh_connected_display_tense_apm_info(gui_img_t *tense_high_
     }
 }
 
-void app_cluster_update_connected_display_battery_info(uint8_t battery_level)
+void app_dashboard_update_connected_display_battery_info(uint8_t battery_level)
 {
     app_update_gui_widget(bat_high_c_digital,
                           battery_level / 10,
@@ -261,9 +261,9 @@ void app_cluster_update_connected_display_battery_info(uint8_t battery_level)
                           sizeof(connected_display_battery_resource_def));
 }
 
-void app_cluster_update_connected_display_speed_info(uint8_t current_speed)
+void app_dashboard_update_connected_display_speed_info(uint8_t current_speed)
 {
-    DBG_DIRECT("app_cluster_update_connected_display_speed_info:%d", __LINE__);
+    DBG_DIRECT("app_dashboard_update_connected_display_speed_info:%d", __LINE__);
     app_update_gui_widget(speed_high_c_digital,
                           current_speed / 10,
                           connected_display_speed_resource_def,
@@ -278,15 +278,16 @@ void app_cluster_update_connected_display_speed_info(uint8_t current_speed)
                           sizeof(dashboard_Cpointer_num));
 }
 
-void app_cluster_update_connected_display_turn_info(T_TURN_INFO current_turn_information)
+void app_dashboard_update_connected_display_turn_info(T_TURN_INFO current_turn_information)
 {
-    app_cluster_refresh_connected_display_turn_info(left_turn_light_c_status, right_turn_light_c_status,
-                                                    current_turn_information);
+    app_dashboard_refresh_connected_display_turn_info(left_turn_light_c_status,
+                                                      right_turn_light_c_status,
+                                                      current_turn_information);
 }
 
-void app_cluster_refresh_connected_display_turn_info(gui_img_t *left_turn_image_obj,
-                                                     gui_img_t *right_turn_image_obj,
-                                                     T_TURN_INFO current_turn_information)
+void app_dashboard_refresh_connected_display_turn_info(gui_img_t *left_turn_image_obj,
+                                                       gui_img_t *right_turn_image_obj,
+                                                       T_TURN_INFO current_turn_information)
 {
     void *left_turn_resource_info = TL_OF_BIN;
     void *right_turn_resource_info = TR_OF_BIN;
@@ -320,7 +321,7 @@ void app_cluster_refresh_connected_display_turn_info(gui_img_t *left_turn_image_
     }
 }
 
-void app_cluster_update_connected_display_message_infor(app_message_data *app_message_information)
+void app_dashboard_update_connected_display_message_infor(app_message_data *app_message_information)
 {
     short_c_message->base.not_show = true;
     short_c_message_data->base.not_show = true;
@@ -335,7 +336,7 @@ void app_cluster_update_connected_display_message_infor(app_message_data *app_me
                  UINT8_MAX, UINT8_MAX), (app_message_information->wechat_msg_len - 1), 32);
 }
 
-void app_cluster_update_connected_display_phone_infor(app_phone_data *app_call_information)
+void app_dashboard_update_connected_display_phone_infor(app_phone_data *app_call_information)
 {
     refuse_c_button->base.not_show = true;
     ans_c_button->base.not_show = true;
@@ -364,7 +365,7 @@ void app_cluster_update_connected_display_phone_infor(app_phone_data *app_call_i
 
 }
 
-void app_cluster_update_connected_display_navi_infor(T_NAVI_INFO navi_information)
+void app_dashboard_update_connected_display_navi_infor(T_NAVI_INFO navi_information)
 {
     navi_c_status->base.not_show = true;
 
@@ -378,7 +379,7 @@ void app_cluster_update_connected_display_navi_infor(T_NAVI_INFO navi_informatio
                           connected_display_navi_resource_def,
                           sizeof(connected_display_navi_resource_def));
     app_navi_data current_navi_data;
-    app_cluster_data_get_navi_data_update(&current_navi_data);
+    app_dashboard_data_get_navi_data_update(&current_navi_data);
     memcpy(&show_c_navigation_msg[0], &current_navi_data.navigation_msg[0],
            current_navi_data.navigation_num_len);
     gui_text_set(short_c_navi_message_1, (char *)show_c_navigation_msg, "rtk_font_mem",

@@ -11,22 +11,22 @@
 #include "gui_img.h"
 #include "time.h"
 #include "gui_button.h"
-#include "app_cluster_main_display.h"
-#include "app_cluster_data.h"
+#include "app_dashboard_main_display.h"
+#include "app_dashboard_data.h"
 #include "trace.h"
 
 uint8_t show_message_data[40];
 uint8_t show_tel_number[11];
 
-void app_cluster_create_main_display(gui_win_t *target_main_display)
+void app_dashboard_create_main_display(gui_win_t *target_main_display)
 {
     /* set update callback */
     gui_win_set_animate(target_main_display, 1000, -1, paint_main_display_cb, target_main_display);
 
     /* set Image data */
-    cluster_background = gui_img_create_from_mem(target_main_display, "cluster_background",
-                                                 BACKGROUND_BIN, 0, 0, 800, 480);
-    cluster_background->draw_img.blend_mode = IMG_FILTER_BLACK;
+    dashboard_background = gui_img_create_from_mem(target_main_display, "dashboard_background",
+                                                   BACKGROUND_BIN, 0, 0, 800, 480);
+    dashboard_background->draw_img.blend_mode = IMG_FILTER_BLACK;
     speed_high_digital = gui_img_create_from_mem(target_main_display, "speed_high_digital", SPED0_BIN,
                                                  360, 202, 40, 60);
     speed_high_digital->draw_img.blend_mode = IMG_FILTER_BLACK;
@@ -96,7 +96,7 @@ void app_cluster_create_main_display(gui_win_t *target_main_display)
 
     /* set font data */
     app_phone_data current_phone_status;
-    app_cluster_data_get_phone_status(&current_phone_status);
+    app_dashboard_data_get_phone_status(&current_phone_status);
     short_tel_number = gui_text_create(target_main_display,  "short_tel_number",  322, 415, 158, 30);
     memcpy(&show_tel_number[0], &current_phone_status.current_phone_number[0],
            current_phone_status.current_phone_number_len);
@@ -108,7 +108,7 @@ void app_cluster_create_main_display(gui_win_t *target_main_display)
                  7, 32);
 
     app_message_data current_message_status;
-    app_cluster_data_get_message_data_update(&current_message_status);
+    app_dashboard_data_get_message_data_update(&current_message_status);
     memcpy(&show_message_data[0], &current_message_status.wechat_msg[0],
            current_message_status.wechat_msg_len);
     short_message_data = gui_text_create(target_main_display,  "short_message_data",  300, 10, 240, 50);
@@ -117,22 +117,22 @@ void app_cluster_create_main_display(gui_win_t *target_main_display)
     gui_text_mode_set(short_message_data, MUTI_LEFT);
 
     /* Prepare the intial data */
-    app_cluster_update_main_display_time_info();
-    app_cluster_update_main_display_tense_apm_info(app_cluster_data_get_tense_timer_info());
-    app_cluster_update_main_display_battery_info(app_cluster_data_get_battery_level());
-    app_cluster_update_main_display_speed_info(app_cluster_data_get_car_speed());
-    app_cluster_update_main_display_turn_info(app_cluster_data_get_car_turn_info());
-    app_cluster_update_main_display_bluetooth_info(app_cluster_data_get_bluetooth_status());
-    app_cluster_update_main_display_phone_infor(&current_phone_status);
-    app_cluster_update_main_display_message_infor(&current_message_status);
+    app_dashboard_update_main_display_time_info();
+    app_dashboard_update_main_display_tense_apm_info(app_dashboard_data_get_tense_timer_info());
+    app_dashboard_update_main_display_battery_info(app_dashboard_data_get_battery_level());
+    app_dashboard_update_main_display_speed_info(app_dashboard_data_get_car_speed());
+    app_dashboard_update_main_display_turn_info(app_dashboard_data_get_car_turn_info());
+    app_dashboard_update_main_display_bluetooth_info(app_dashboard_data_get_bluetooth_status());
+    app_dashboard_update_main_display_phone_infor(&current_phone_status);
+    app_dashboard_update_main_display_message_infor(&current_message_status);
 }
 
 extern gui_win_t *win_connected_display;
 void paint_main_display_cb(gui_win_t *win)
 {
-    if (app_cluster_data_get_show_main_display() == false)
+    if (app_dashboard_data_get_show_main_display() == false)
     {
-        win->base.not_show = !app_cluster_data_get_show_main_display();
+        win->base.not_show = !app_dashboard_data_get_show_main_display();
         if (win_connected_display->base.not_show)
         {
             win_connected_display->base.not_show = false;
@@ -141,23 +141,23 @@ void paint_main_display_cb(gui_win_t *win)
     }
 
     app_phone_data current_phone_status;
-    app_cluster_data_get_phone_status(&current_phone_status);
-    app_cluster_update_main_display_time_info();
-    app_cluster_update_main_display_tense_apm_info(app_cluster_data_get_tense_timer_info());
-    app_cluster_update_main_display_battery_info(app_cluster_data_get_battery_level());
-    app_cluster_update_main_display_speed_info(app_cluster_data_get_car_speed());
-    app_cluster_update_main_display_turn_info(app_cluster_data_get_car_turn_info());
-    app_cluster_update_main_display_bluetooth_info(app_cluster_data_get_bluetooth_status());
-    app_cluster_update_main_display_phone_infor(&current_phone_status);
+    app_dashboard_data_get_phone_status(&current_phone_status);
+    app_dashboard_update_main_display_time_info();
+    app_dashboard_update_main_display_tense_apm_info(app_dashboard_data_get_tense_timer_info());
+    app_dashboard_update_main_display_battery_info(app_dashboard_data_get_battery_level());
+    app_dashboard_update_main_display_speed_info(app_dashboard_data_get_car_speed());
+    app_dashboard_update_main_display_turn_info(app_dashboard_data_get_car_turn_info());
+    app_dashboard_update_main_display_bluetooth_info(app_dashboard_data_get_bluetooth_status());
+    app_dashboard_update_main_display_phone_infor(&current_phone_status);
     app_message_data current_message_status;
-    app_cluster_data_get_message_data_update(&current_message_status);
-    app_cluster_update_main_display_message_infor(&current_message_status);
+    app_dashboard_data_get_message_data_update(&current_message_status);
+    app_dashboard_update_main_display_message_infor(&current_message_status);
 }
 
-void app_cluster_update_main_display_time_info(void)
+void app_dashboard_update_main_display_time_info(void)
 {
-    uint32_t main_display_hour = app_cluster_data_get_current_timer() / 3600;
-    uint32_t main_display_min = (app_cluster_data_get_current_timer() - (main_display_hour * 3600)) /
+    uint32_t main_display_hour = app_dashboard_data_get_current_timer() / 3600;
+    uint32_t main_display_min = (app_dashboard_data_get_current_timer() - (main_display_hour * 3600)) /
                                 60;
 
     app_update_gui_widget(hour_high_digital,
@@ -178,15 +178,15 @@ void app_cluster_update_main_display_time_info(void)
                           sizeof(main_display_time_resource_def));
 }
 
-void app_cluster_update_main_display_tense_apm_info(T_TENSE_APM_INFO current_tense_apm_info)
+void app_dashboard_update_main_display_tense_apm_info(T_TENSE_APM_INFO current_tense_apm_info)
 {
-    app_cluster_refresh_main_display_tense_apm_info(tense_high_digital, tense_low_digital,
-                                                    current_tense_apm_info);
+    app_dashboard_refresh_main_display_tense_apm_info(tense_high_digital, tense_low_digital,
+                                                      current_tense_apm_info);
 }
 
-void app_cluster_refresh_main_display_tense_apm_info(gui_img_t *tense_high_image_obj,
-                                                     gui_img_t *tense_low_image_obj,
-                                                     T_TENSE_APM_INFO current_tense_apm_info)
+void app_dashboard_refresh_main_display_tense_apm_info(gui_img_t *tense_high_image_obj,
+                                                       gui_img_t *tense_low_image_obj,
+                                                       T_TENSE_APM_INFO current_tense_apm_info)
 {
     void *tense_high_digital_info = APM_A_BIN;
     void *tense_low_digital_info = APM_M_BIN;
@@ -221,7 +221,7 @@ void app_cluster_refresh_main_display_tense_apm_info(gui_img_t *tense_high_image
     }
 }
 
-void app_cluster_update_main_display_battery_info(uint8_t battery_level)
+void app_dashboard_update_main_display_battery_info(uint8_t battery_level)
 {
     app_update_gui_widget(bat_high_digital,
                           battery_level / 10,
@@ -234,7 +234,7 @@ void app_cluster_update_main_display_battery_info(uint8_t battery_level)
                           sizeof(main_display_battery_resource_def));
 }
 
-void app_cluster_update_main_display_speed_info(uint8_t current_speed)
+void app_dashboard_update_main_display_speed_info(uint8_t current_speed)
 {
     app_update_gui_widget(speed_high_digital,
                           current_speed / 10,
@@ -252,15 +252,15 @@ void app_cluster_update_main_display_speed_info(uint8_t current_speed)
                           sizeof(dashboard_pointer_num));
 }
 
-void app_cluster_update_main_display_turn_info(T_TURN_INFO current_turn_information)
+void app_dashboard_update_main_display_turn_info(T_TURN_INFO current_turn_information)
 {
-    app_cluster_refresh_main_display_turn_info(left_turn_light_status, right_turn_light_status,
-                                               current_turn_information);
+    app_dashboard_refresh_main_display_turn_info(left_turn_light_status, right_turn_light_status,
+                                                 current_turn_information);
 }
 
-void app_cluster_refresh_main_display_turn_info(gui_img_t *left_turn_image_obj,
-                                                gui_img_t *right_turn_image_obj,
-                                                T_TURN_INFO current_turn_information)
+void app_dashboard_refresh_main_display_turn_info(gui_img_t *left_turn_image_obj,
+                                                  gui_img_t *right_turn_image_obj,
+                                                  T_TURN_INFO current_turn_information)
 {
     void *left_turn_resource_info = TL_OF_BIN;
     void *right_turn_resource_info = TR_OF_BIN;
@@ -294,13 +294,13 @@ void app_cluster_refresh_main_display_turn_info(gui_img_t *left_turn_image_obj,
     }
 }
 
-void app_cluster_update_main_display_bluetooth_info(T_BLUETOOTH_INFO current_bluetooth_info)
+void app_dashboard_update_main_display_bluetooth_info(T_BLUETOOTH_INFO current_bluetooth_info)
 {
-    app_cluster_refresh_main_display_bluetooth_info(bluetooth_status, current_bluetooth_info);
+    app_dashboard_refresh_main_display_bluetooth_info(bluetooth_status, current_bluetooth_info);
 }
 
-void app_cluster_refresh_main_display_bluetooth_info(gui_img_t *target_image_obj,
-                                                     T_BLUETOOTH_INFO current_bluetooth_info)
+void app_dashboard_refresh_main_display_bluetooth_info(gui_img_t *target_image_obj,
+                                                       T_BLUETOOTH_INFO current_bluetooth_info)
 {
     void *target_digital_resource_loc = 0x0;
 
@@ -323,7 +323,7 @@ void app_cluster_refresh_main_display_bluetooth_info(gui_img_t *target_image_obj
     }
 }
 
-void app_cluster_update_main_display_message_infor(app_message_data *app_message_information)
+void app_dashboard_update_main_display_message_infor(app_message_data *app_message_information)
 {
     short_message->base.not_show = true;
     short_message_data->base.not_show = true;
@@ -339,7 +339,7 @@ void app_cluster_update_main_display_message_infor(app_message_data *app_message
                  UINT8_MAX, UINT8_MAX), (app_message_information->wechat_msg_len - 1), 32);
 }
 
-void app_cluster_update_main_display_phone_infor(app_phone_data *app_call_information)
+void app_dashboard_update_main_display_phone_infor(app_phone_data *app_call_information)
 {
     tel_box->base.not_show = true;
     tel_accept->base.not_show = true;

@@ -1,8 +1,8 @@
 /*
  * File      : app_launcher.h
  */
-#ifndef __APP_CLUSTER_LAUNCHER_H__
-#define __APP_CLUSTER_LAUNCHER_H__
+#ifndef __APP_DASHBOARD_LAUNCHER_H__
+#define __APP_DASHBOARD_LAUNCHER_H__
 
 
 
@@ -27,9 +27,9 @@ extern "C" {
 #include <stdlib.h>
 #include "acc_engine.h"
 
-gui_app_t *get_app_cluster_launcher(void);
-void app_cluster_launcher_ui_design(gui_app_t *app);
-void app_cluster_launcher_update_thread(void *this);
+gui_app_t *get_app_dashboard_launcher(void);
+void app_dashboard_launcher_ui_design(gui_app_t *app);
+void app_dashboard_launcher_update_thread(void *this);
 gui_win_t *win_main_display = NULL;
 gui_win_t *win_connected_display = NULL;
 
