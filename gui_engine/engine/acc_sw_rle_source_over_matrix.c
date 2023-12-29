@@ -123,9 +123,9 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                                 source_bytes_per_pixel));
                 uint8_t opacity_value = image->opacity_value;
                 gui_color_t color = {.color.rgba.a = 255,
-                                     .color.rgba.r = (pixel & 0x001f) << 3,
+                                     .color.rgba.b = (pixel & 0x001f) << 3,
                                      .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
-                                     .color.rgba.b = (pixel >> 11) << 3,
+                                     .color.rgba.r = (pixel >> 11) << 3,
                                     };
                 switch (opacity_value)
                 {
@@ -184,9 +184,9 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
                 uint8_t opacity_value = image->opacity_value;
-                gui_color_t color = {.color.rgba.r = pixel[0],
+                gui_color_t color = {.color.rgba.r = pixel[2],
                                      .color.rgba.g = pixel[1],
-                                     .color.rgba.b = pixel[2],
+                                     .color.rgba.b = pixel[0],
                                      .color.rgba.a = 255,
                                     };
                 switch (opacity_value)
@@ -247,9 +247,9 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
                                              source_bytes_per_pixel);
                 uint8_t opacity_value = image->opacity_value;
-                gui_color_t color = {.color.rgba.r = pixel[0],
+                gui_color_t color = {.color.rgba.r = pixel[2],
                                      .color.rgba.g = pixel[1],
-                                     .color.rgba.b = pixel[2],
+                                     .color.rgba.b = pixel[0],
                                      .color.rgba.a = pixel[3],
                                     };
                 switch (opacity_value)
