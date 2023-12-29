@@ -122,7 +122,7 @@ static void img_scope_draw_cb(gui_obj_t *obj)
     struct gui_dispdev *dc = gui_get_dc();
     draw_img_t *draw_img = &img->draw_img;
 
-    rtgui_rect_t draw_rect = {0};
+    gui_rect_t draw_rect = {0};
     draw_rect.x1 = obj->ax;
     draw_rect.y1 = obj->ay;
     draw_rect.x2 = draw_rect.x1 + obj->w;

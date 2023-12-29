@@ -26,7 +26,7 @@
 // #include "acc_sw_rle.h"
 
 void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -43,7 +43,7 @@ void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispde
 
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -103,7 +103,7 @@ void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispde
     }
 }
 void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -129,7 +129,7 @@ void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispde
 
     uint8_t source_bytes_per_pixel = 3;
     //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
     int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
     uint8_t opacity_value = image->opacity_value;
 
@@ -188,7 +188,7 @@ void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispde
     return;
 }
 void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -214,7 +214,7 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
 
     uint8_t source_bytes_per_pixel = 4;
     //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
     int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
     uint8_t opacity_value = image->opacity_value;
 
@@ -275,7 +275,7 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
 }
 
 void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -301,7 +301,7 @@ void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispde
 
     uint8_t source_bytes_per_pixel = 2;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
     uint8_t opacity_value = image->opacity_value;
     for (uint32_t i = y_start; i < y_end; i++)
     {
@@ -350,7 +350,7 @@ void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispde
     }
 }
 void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                            struct rtgui_rect *rect)
+                                            gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -365,7 +365,7 @@ void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispde
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -428,7 +428,7 @@ void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispde
     }
 }
 void cpu_filter_matrix_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -443,7 +443,7 @@ void cpu_filter_matrix_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_disp
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -503,7 +503,7 @@ void cpu_filter_matrix_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_disp
     }
 }
 void cpu_filter_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -520,7 +520,7 @@ void cpu_filter_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_disp
 
     uint8_t *writebuf = dc->frame_buf;
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -591,7 +591,7 @@ void cpu_filter_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_disp
     }
 }
 void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                              struct rtgui_rect *rect)
+                                              gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -606,7 +606,7 @@ void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_disp
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -669,7 +669,7 @@ void cpu_filter_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_disp
     }
 }
 void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                                struct rtgui_rect *rect)
+                                                gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -684,7 +684,7 @@ void cpu_filter_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_di
     int y_start = _UI_MAX(dc->section.y1, image_y);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
 
-    struct rtgui_matrix *inverse = image->inverse;
+    struct gui_matrix *inverse = image->inverse;
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {

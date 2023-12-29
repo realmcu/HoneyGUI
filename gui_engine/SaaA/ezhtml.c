@@ -2475,14 +2475,14 @@ static void set_sreeen_back_function(gui_app_t *app, void *backfunc)
     app->screen->h = gui_get_screen_height();
     gui_cb_set_with_param(app->screen, backfunc, RIGHT_SLIDE_CB, app);
 }
-static void screen_prepare(gui_obj_t *obj, struct gui_dispdev *dc, struct rtgui_rect *rect,
+static void screen_prepare(gui_obj_t *obj, struct gui_dispdev *dc, gui_rect_t *rect,
                              touch_info_t *tp)
 {
     if (obj->callback.link_cb)
     {
         if ((tp->type == TOUCH_RIGHT_SLIDE && (tp->x>0&&tp->x<20))|| (tp->type == TOUCH_LEFT_SLIDE&& (tp->x>(gui_get_screen_width()-20)&&tp->x<gui_get_screen_width())))
         {
-                rtgui_msg_t msg;
+                gui_msg_t msg;
                 msg.type = GUI_SRV_CB;
                 msg.cb = obj->callback.link_cb;
                 msg.u.payload = obj->callback.param;

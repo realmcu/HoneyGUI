@@ -314,22 +314,6 @@ void do_blending_argb8888_2_argb8888(gui_color_t *d, gui_color_t *s)
     d->color.rgba.g = ((255 - Sa) * Dg + Sa * Sg) / 255;
     d->color.rgba.b = ((255 - Sa) * Db + Sa * Sb) / 255;
 }
-void do_blending_argb8888_2_argb8888_new(gui_color_t *d, gui_color_t *s)
-{
-    uint8_t Sa = s->color.rgba.a;
-    uint8_t Sr = s->color.rgba.r;
-    uint8_t Sg = s->color.rgba.g;
-    uint8_t Sb = s->color.rgba.b;
-
-    uint8_t Da = d->color.rgba.a;
-    uint8_t Dr = d->color.rgba.r;
-    uint8_t Dg = d->color.rgba.g;
-    uint8_t Db = d->color.rgba.b;
-    d->color.rgba.a = ((255 - Sa) * Da + Sa * Sa) / 255;
-    d->color.rgba.r = ((255 - Sa) * Dr + Sa * Sr) / 255;
-    d->color.rgba.g = ((255 - Sa) * Dg + Sa * Sg) / 255;
-    d->color.rgba.b = ((255 - Sa) * Db + Sa * Sb) / 255;
-}
 void do_blending_argb8888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity)
 {
     uint8_t Sa = s->color.rgba.a * opacity / 255;
@@ -347,22 +331,7 @@ void do_blending_argb8888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uin
     d->color.rgba.g = ((255 - Sa) * Dg + Sa * Sg) / 255;
     d->color.rgba.b = ((255 - Sa) * Db + Sa * Sb) / 255;
 }
-void do_blending_argb8888_2_argb8888_opacity_new(gui_color_t *d, gui_color_t *s, uint8_t opacity)
-{
-    uint8_t Sa = s->color.rgba.a * opacity / 255;
-    uint8_t Sr = s->color.rgba.r;
-    uint8_t Sg = s->color.rgba.g;
-    uint8_t Sb = s->color.rgba.b;
 
-    uint8_t Da = d->color.rgba.a;
-    uint8_t Dr = d->color.rgba.r;
-    uint8_t Dg = d->color.rgba.g;
-    uint8_t Db = d->color.rgba.b;
-    d->color.rgba.a = ((255 - Sa) * Da + Sa * Sa) / 255;
-    d->color.rgba.r = ((255 - Sa) * Dr + Sa * Sr) / 255;
-    d->color.rgba.g = ((255 - Sa) * Dg + Sa * Sg) / 255;
-    d->color.rgba.b = ((255 - Sa) * Db + Sa * Sb) / 255;
-}
 
 
 

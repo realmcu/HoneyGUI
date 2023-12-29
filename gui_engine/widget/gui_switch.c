@@ -148,7 +148,7 @@ static void sw_turn_off(gui_switch_t *this)
         gui_switch_change_switch(this);
         if (sw->cb_on.link_cb && sw->ifon)
         {
-            rtgui_msg_t msg;
+            gui_msg_t msg;
             msg.type = GUI_SRV_CB;
             msg.cb = sw->cb_on.link_cb;
             msg.u.payload = sw->cb_on.param;
@@ -156,7 +156,7 @@ static void sw_turn_off(gui_switch_t *this)
         }
         else if(sw->cb_off.link_cb && !sw->ifon)
         {
-            rtgui_msg_t msg;
+            gui_msg_t msg;
             msg.type = GUI_SRV_CB;
             msg.cb = sw->cb_off.link_cb;
             msg.u.payload = sw->cb_off.param;

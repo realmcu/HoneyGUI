@@ -96,7 +96,7 @@ static int app_init(void)
         return 0;
     }
 #endif
-    rtgui_server_init();
+    gui_server_init();
     gui_app_startup(get_app_hongkong());
     return 0;
 }

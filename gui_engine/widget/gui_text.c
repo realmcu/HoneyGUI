@@ -125,21 +125,21 @@ static void text_draw(gui_obj_t *obj)
         return;
     }
     struct gui_dispdev *dc = gui_get_dc();
-    rtgui_rect_t draw_rect = {0};
+    gui_rect_t draw_rect = {0};
     draw_rect.x1 = obj->ax + obj->dx + obj->tx;
     draw_rect.y1 = obj->ay + obj->dy + obj->ty;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
     if (dc->section_count == 0)
     {
-        rtgui_text_create(text);
+        font_text_create(text);
     }
-    rtgui_font_draw(text, &draw_rect);
+    font_text_draw(text, &draw_rect);
     uint32_t total_section_count = dc->screen_height / dc->fb_height -
                                    ((dc->screen_height % dc->fb_height) ? 0 : 1);
     if (dc->section_count == total_section_count)
     {
-        rtgui_text_destroy(text);
+        font_text_destroy(text);
     }
 }
 

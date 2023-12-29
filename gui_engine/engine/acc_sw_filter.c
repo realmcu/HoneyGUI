@@ -26,7 +26,7 @@
 // #include "acc_sw_rle.h"
 
 void filter_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -98,7 +98,7 @@ void filter_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
 #if 0
 static void filter_blit_rgb565_2_rgb565_with_alpha(draw_img_t *image, struct gui_dispdev *dc,
-                                                   struct rtgui_rect *rect)
+                                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -147,7 +147,7 @@ static void filter_blit_rgb565_2_rgb565_with_alpha(draw_img_t *image, struct gui
 #endif
 
 void filter_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -219,7 +219,7 @@ void filter_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void filter_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -288,7 +288,7 @@ void filter_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void filter_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -355,7 +355,7 @@ void filter_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -422,7 +422,7 @@ void filter_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void filter_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -492,7 +492,7 @@ void filter_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 }
 
 void filter_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect)
+                                     gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -562,7 +562,7 @@ void filter_blit_rgba8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 }
 
 void filter_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -636,7 +636,7 @@ void filter_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 }
 
 void filter_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;

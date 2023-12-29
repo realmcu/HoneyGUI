@@ -54,7 +54,7 @@ static fontlib_name_t *get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
     }
     return NULL;
 }
-void rtgui_font_mem_load(gui_text_t *text)
+void gui_font_mem_load(gui_text_t *text)
 {
     fontlib_name_t *font_name;
     font_name = get_fontlib_name(text->path, text->font_height);
@@ -199,7 +199,7 @@ void rtgui_font_mem_load(gui_text_t *text)
     text->font_len = unicode_len;
     gui_free(p_buf);
 }
-void rtgui_font_mem_unload(gui_text_t *text)
+void gui_font_mem_unload(gui_text_t *text)
 {
     gui_free(text->data);
     return;
@@ -254,7 +254,7 @@ gui_inline uint16_t rgba2565(gui_color_t rgba)
     return red + gre + blu;
 }
 static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
-                             struct rtgui_rect *rect)
+                             gui_rect_t *rect)
 {
     if (chr->dot_addr == NULL)
     {
@@ -490,7 +490,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         break;
     }
 }
-void rtgui_font_mem_draw(gui_text_t *text, struct rtgui_rect *rect)
+void gui_font_mem_draw(gui_text_t *text, gui_rect_t *rect)
 {
     mem_char_t *chr = text->data;
     gui_dispdev_t *dc = gui_get_dc();
@@ -625,18 +625,15 @@ void rtgui_font_mem_draw(gui_text_t *text, struct rtgui_rect *rect)
         break;
     }
 }
-struct rtgui_font_engine rtgui_font_mem_engine =
+struct gui_font_engine gui_font_mem_engine =
 {
     "rtk_font_mem",
     { NULL },
-    rtgui_font_mem_load,
-    rtgui_font_mem_unload,
-    rtgui_font_mem_draw,
+    gui_font_mem_load,
+    gui_font_mem_unload,
+    gui_font_mem_draw,
 };
-void rtgui_font_mem_init(void)
-{
-    rtgui_font_register_engine(&rtgui_font_mem_engine);
-}
+
 void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
                                void *font_table_addr)
 {

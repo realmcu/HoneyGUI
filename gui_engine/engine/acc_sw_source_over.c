@@ -26,7 +26,7 @@
 
 
 void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+                                      gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -94,7 +94,7 @@ void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+                                      gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -127,9 +127,9 @@ void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
+            gui_color_t color = {.color.rgba.r = pixel[2],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
+                                 .color.rgba.b = pixel[0],
                                  .color.rgba.a = 255,
                                 };
             switch (opacity_value)
@@ -161,7 +161,7 @@ void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+                                        gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -195,9 +195,9 @@ void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *d
         for (uint32_t j = x_start; j < x_end; j++)
         {
             uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
+            gui_color_t color = {.color.rgba.r = pixel[2],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
+                                 .color.rgba.b = pixel[0],
                                  .color.rgba.a = pixel[3],
                                 };
             switch (opacity_value)
@@ -230,7 +230,7 @@ void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *d
 }
 
 void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+                                      gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -294,7 +294,7 @@ void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      struct rtgui_rect *rect)
+                                      gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -331,9 +331,9 @@ void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
+            gui_color_t color = {.color.rgba.r = pixel[2],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
+                                 .color.rgba.b = pixel[0],
                                  .color.rgba.a = 255,
                                 };
             switch (opacity_value)
@@ -358,7 +358,7 @@ void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+                                        gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -395,9 +395,9 @@ void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
+            gui_color_t color = {.color.rgba.r = pixel[2],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
+                                 .color.rgba.b = pixel[0],
                                  .color.rgba.a = pixel[3],
                                 };
             switch (opacity_value)
@@ -422,7 +422,7 @@ void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
     return;
 }
 void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+                                        gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -495,7 +495,7 @@ void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *d
 }
 
 void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        struct rtgui_rect *rect)
+                                        gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -532,9 +532,9 @@ void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *d
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
+            gui_color_t color = {.color.rgba.r = pixel[2],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
+                                 .color.rgba.b = pixel[0],
                                  .color.rgba.a = 255,
                                 };
             uint8_t opacity_value = image->opacity_value;
@@ -560,7 +560,7 @@ void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *d
     return;
 }
 void alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          struct rtgui_rect *rect)
+                                          gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;

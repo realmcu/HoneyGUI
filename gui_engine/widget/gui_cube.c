@@ -93,7 +93,7 @@ static void scale_cube(Vertex_t *vertex, float scale)
     vertex->z *= scale;
 }
 
-static void compute_rotate(float rx, float ry, float rz, struct rtgui_matrix *rotate)
+static void compute_rotate(float rx, float ry, float rz, struct gui_matrix *rotate)
 {
     // Rotation angles rx, ry, rz (degree) for axis X, Y, Z
     // Compute 3D rotation matrix base on rotation angle rx, ry, rz about axis X, Y, Z.
@@ -109,7 +109,7 @@ static void compute_rotate(float rx, float ry, float rz, struct rtgui_matrix *ro
     rotate->m[2][2] = cos(RAD(ry)) * cos(RAD(rx));
 }
 
-static void transfrom_rotate(struct rtgui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
+static void transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
                              float ty)
 {
     // Compute the new cube vertex coordinates transformed by the rotation matrix.
@@ -124,7 +124,7 @@ static void transfrom_rotate(struct rtgui_matrix *rotate, Vertex_t *vertex, Vert
     rc->y += ty;
 }
 
-static void transfrom_normalZ(struct rtgui_matrix *rotate, Normal_t *nVec, float *nZ)
+static void transfrom_normalZ(struct gui_matrix *rotate, Normal_t *nVec, float *nZ)
 {
     // Compute the new normal Z coordinate transformed by the rotation matrix.
     //
@@ -146,7 +146,7 @@ static void transfrom_normalZ(struct rtgui_matrix *rotate, Normal_t *nVec, float
 // So the homogeneous matrix sx, sy, shx, shy, tx, ty can be easily solved from above equations.
 //
 static void transfrom_blit(float w, float h, Vertex_t *v0, Vertex_t *v1, Vertex_t *v2, Vertex_t *v3,
-                           struct rtgui_matrix *matrix)
+                           struct gui_matrix *matrix)
 {
     float sx, sy, shx, shy, tx, ty;
 
@@ -173,7 +173,7 @@ static void transfrom_blit(float w, float h, Vertex_t *v0, Vertex_t *v1, Vertex_
 }
 
 
-static bool full_rank(struct rtgui_matrix *m)
+static bool full_rank(struct gui_matrix *m)
 {
     for (int i = 0; i < 3; i++)
     {
@@ -198,8 +198,8 @@ static bool full_rank(struct rtgui_matrix *m)
 
 static void cube_prepare(gui_obj_t *obj)
 {
-    struct rtgui_matrix rotate_3D;
-    struct rtgui_matrix matrix;
+    struct gui_matrix rotate_3D;
+    struct gui_matrix matrix;
     Vertex_t rv0, rv1, rv2, rv3, rv4, rv5, rv6, rv7;
     Vertex_t cube_v0 = {-1.0, -1.0, -1.0};
     Vertex_t cube_v1 = {1.0, -1.0, -1.0};
@@ -273,70 +273,70 @@ static void cube_prepare(gui_obj_t *obj)
     draw_img_t *left = &this->draw_img_left;
     draw_img_t *right = &this->draw_img_right;
 
-    rtgui_image_load_scale(front);
-    rtgui_image_load_scale(back);
-    rtgui_image_load_scale(up);
-    rtgui_image_load_scale(down);
-    rtgui_image_load_scale(left);
-    rtgui_image_load_scale(right);
+    gui_image_load_scale(front);
+    gui_image_load_scale(back);
+    gui_image_load_scale(up);
+    gui_image_load_scale(down);
+    gui_image_load_scale(left);
+    gui_image_load_scale(right);
 
 
     if (this->nz0321 > 0.0f)
     {
         transfrom_blit(front->img_w, front->img_h, &rv0, &rv3, &rv2, &rv1, &matrix);
-        memcpy(front->matrix, &matrix, sizeof(struct rtgui_matrix));
-        memcpy(front->inverse, &matrix, sizeof(struct rtgui_matrix));
+        memcpy(front->matrix, &matrix, sizeof(struct gui_matrix));
+        memcpy(front->inverse, &matrix, sizeof(struct gui_matrix));
         matrix_inverse(front->inverse);
-        rtgui_image_new_area(front);
+        gui_image_new_area(front);
     }
 
     if (this->nz4567 > 0.0f)
     {
         transfrom_blit(back->img_w, back->img_h, &rv4, &rv5, &rv6, &rv7, &matrix);
-        memcpy(back->matrix, &matrix, sizeof(struct rtgui_matrix));
-        memcpy(back->inverse, &matrix, sizeof(struct rtgui_matrix));
+        memcpy(back->matrix, &matrix, sizeof(struct gui_matrix));
+        memcpy(back->inverse, &matrix, sizeof(struct gui_matrix));
         matrix_inverse(back->inverse);
-        rtgui_image_new_area(back);
+        gui_image_new_area(back);
     }
 
     if (this->nz5126 > 0.0f)
     {
         transfrom_blit(up->img_w, up->img_h, &rv5, &rv1, &rv2, &rv6, &matrix);
-        memcpy(up->matrix, &matrix, sizeof(struct rtgui_matrix));
-        memcpy(up->inverse, &matrix, sizeof(struct rtgui_matrix));
+        memcpy(up->matrix, &matrix, sizeof(struct gui_matrix));
+        memcpy(up->inverse, &matrix, sizeof(struct gui_matrix));
         matrix_inverse(up->inverse);
-        rtgui_image_new_area(up);
+        gui_image_new_area(up);
     }
 
     if (this->nz0473 > 0.0f)
     {
         transfrom_blit(down->img_w, down->img_h, &rv0, &rv4, &rv7, &rv3, &matrix);
-        memcpy(down->matrix, &matrix, sizeof(struct rtgui_matrix));
-        memcpy(down->inverse, &matrix, sizeof(struct rtgui_matrix));
+        memcpy(down->matrix, &matrix, sizeof(struct gui_matrix));
+        memcpy(down->inverse, &matrix, sizeof(struct gui_matrix));
         matrix_inverse(down->inverse);
-        rtgui_image_new_area(down);
+        gui_image_new_area(down);
     }
 
     if (this->nz7623 > 0.0f)
     {
         transfrom_blit(left->img_w, left->img_h, &rv7, &rv6, &rv2, &rv3, &matrix);
-        memcpy(left->matrix, &matrix, sizeof(struct rtgui_matrix));
-        memcpy(left->inverse, &matrix, sizeof(struct rtgui_matrix));
+        memcpy(left->matrix, &matrix, sizeof(struct gui_matrix));
+        memcpy(left->inverse, &matrix, sizeof(struct gui_matrix));
         matrix_inverse(left->inverse);
-        rtgui_image_new_area(left);
+        gui_image_new_area(left);
     }
 
     if (this->nz0154 > 0.0f)
     {
         transfrom_blit(right->img_w, right->img_h, &rv0, &rv1, &rv5, &rv4, &matrix);
-        memcpy(right->matrix, &matrix, sizeof(struct rtgui_matrix));
-        memcpy(right->inverse, &matrix, sizeof(struct rtgui_matrix));
+        memcpy(right->matrix, &matrix, sizeof(struct gui_matrix));
+        memcpy(right->inverse, &matrix, sizeof(struct gui_matrix));
         matrix_inverse(right->inverse);
-        rtgui_image_new_area(right);
+        gui_image_new_area(right);
     }
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 static void cube_draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -349,7 +349,7 @@ static void cube_draw_cb(gui_obj_t *obj)
     draw_img_t *left = &this->draw_img_left;
     draw_img_t *right = &this->draw_img_right;
 
-    rtgui_rect_t draw_rect = {0};
+    gui_rect_t draw_rect = {0};
 
     if (this->nz0321 > 0.0f)
     {
@@ -498,8 +498,8 @@ static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
         cube_img[i]->src_mode = img_file->src_mode[i];
         cube_img[i]->opacity_value = UINT8_MAX;
         cube_img[i]->blend_mode = IMG_FILTER_BLACK;
-        cube_img[i]->matrix = gui_malloc(sizeof(struct rtgui_matrix));
-        cube_img[i]->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+        cube_img[i]->matrix = gui_malloc(sizeof(struct gui_matrix));
+        cube_img[i]->inverse = gui_malloc(sizeof(struct gui_matrix));
     }
 
     gui_dispdev_t *dc = gui_get_dc();

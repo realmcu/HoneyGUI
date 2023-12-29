@@ -3,33 +3,33 @@
 #include <gui_matrix.h>
 
 
-static bool rtgui_image_rgb_mem_check(draw_img_t *image);
+static bool gui_image_rgb_mem_check(draw_img_t *image);
 
-static bool rtgui_image_rgb_mem_load(draw_img_t *image, bool load);
+static bool gui_image_rgb_mem_load(draw_img_t *image, bool load);
 
-static void rtgui_image_rgb_mem_unload(draw_img_t *image);
+static void gui_image_rgb_mem_unload(draw_img_t *image);
 
-static void rtgui_image_rgb_mem_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect);
+static void gui_image_rgb_mem_blit(draw_img_t *image, struct gui_dispdev *dc,
+                                   gui_rect_t *rect);
 
 
-struct rtgui_image_engine rtgui_image_rgb_mem_engine =
+struct gui_image_engine gui_image_rgb_mem_engine =
 {
     "rgb_mem",
     { NULL },
-    rtgui_image_rgb_mem_check,
-    rtgui_image_rgb_mem_load,
-    rtgui_image_rgb_mem_unload,
-    rtgui_image_rgb_mem_blit,
+    gui_image_rgb_mem_check,
+    gui_image_rgb_mem_load,
+    gui_image_rgb_mem_unload,
+    gui_image_rgb_mem_blit,
 };
 
-static bool rtgui_image_rgb_mem_check(draw_img_t *image)
+static bool gui_image_rgb_mem_check(draw_img_t *image)
 {
     return true;
 }
 
-static bool rtgui_image_rgb_mem_load(draw_img_t *image,
-                                     bool load)
+static bool gui_image_rgb_mem_load(draw_img_t *image,
+                                   bool load)
 {
     struct gui_rgb_data_head head;
     memcpy(&head, image->data, sizeof(head));
@@ -37,14 +37,14 @@ static bool rtgui_image_rgb_mem_load(draw_img_t *image,
     /* set image information */
     image->img_w = head.w;
     image->img_h = head.h;
-    image->engine = &rtgui_image_rgb_mem_engine;
+    image->engine = &gui_image_rgb_mem_engine;
 
     //rt_kprintf("w = %d, h = %d, bit_depth =%d\n", image->img_w, image->img_h, image->bit_depth);
 
     return true;
 }
 
-static void rtgui_image_rgb_mem_unload(draw_img_t *image)
+static void gui_image_rgb_mem_unload(draw_img_t *image)
 {
 
 }
@@ -52,8 +52,8 @@ static void rtgui_image_rgb_mem_unload(draw_img_t *image)
 
 #include "acc_engine.h"
 
-static void rtgui_image_rgb_mem_blit(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect)
+static void gui_image_rgb_mem_blit(draw_img_t *image, struct gui_dispdev *dc,
+                                   gui_rect_t *rect)
 {
     if (gui_get_acc() != NULL)
     {
@@ -66,9 +66,9 @@ static void rtgui_image_rgb_mem_blit(draw_img_t *image, struct gui_dispdev *dc,
 }
 
 
-void rtgui_image_rgb_mem_init(void)
+void gui_image_rgb_mem_init(void)
 {
     /* register rgb565 on image system */
-    rtgui_image_register_engine(&rtgui_image_rgb_mem_engine);
+    gui_image_register_engine(&gui_image_rgb_mem_engine);
 }
 

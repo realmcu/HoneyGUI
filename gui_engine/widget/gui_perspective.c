@@ -267,7 +267,7 @@ static void scale_3d(Vertex_t *vertex, float scale)
     vertex->z *= scale;
 }
 
-static void compute_rotate(float rx, float ry, float rz, struct rtgui_matrix *rotate)
+static void compute_rotate(float rx, float ry, float rz, struct gui_matrix *rotate)
 {
     // Rotation angles rx, ry, rz (degree) for axis X, Y, Z
     // Compute 3D rotation matrix base on rotation angle rx, ry, rz about axis X, Y, Z.
@@ -300,7 +300,7 @@ static void compute_rotate(float rx, float ry, float rz, struct rtgui_matrix *ro
 #endif
 }
 
-static void transfrom_rotate(struct rtgui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
+static void transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
                              float ty, float tz)
 {
     // Compute the new cube vertex coordinates transformed by the rotation matrix.
@@ -322,7 +322,7 @@ static void transfrom_rotate(struct rtgui_matrix *rotate, Vertex_t *vertex, Vert
 // p means the perspective point,  use this parameter can get four point in XY plane
 static void transfrom_blit(float w, float h, Vertex_t *p, Vertex_t *v0, Vertex_t *v1, Vertex_t *v2,
                            Vertex_t *v3,
-                           struct rtgui_matrix *matrix)
+                           struct gui_matrix *matrix)
 {
     // Compute 3x3 image transform matrix to map a rectangle image (w,h) to
     // a parallelogram (x0,y0), (x1,y1), (x2,y2), (x3,y3) counterclock wise.
@@ -344,7 +344,7 @@ static void transfrom_blit(float w, float h, Vertex_t *p, Vertex_t *v0, Vertex_t
 }
 
 #if 0
-static bool full_rank(struct rtgui_matrix *m)
+static bool full_rank(struct gui_matrix *m)
 {
     for (int i = 0; i < 3; i++)
     {
@@ -369,7 +369,7 @@ static bool full_rank(struct rtgui_matrix *m)
 
 static void prepare(gui_obj_t *obj)
 {
-    struct rtgui_matrix rotate_3D;
+    struct gui_matrix rotate_3D;
     Vertex_t rv0, rv1, rv2, rv3;
     Vertex_t tv0, tv1, tv2, tv3;
     gui_dispdev_t *dc = gui_get_dc();
@@ -378,7 +378,7 @@ static void prepare(gui_obj_t *obj)
     gui_perspective_t *this = (gui_perspective_t *)obj;
     for (int i = 0; i < 6; i++)
     {
-        rtgui_image_load_scale(&this->img[i]);
+        gui_image_load_scale(&this->img[i]);
         matrix_identity(this->img[i].matrix);
     }
 
@@ -457,9 +457,9 @@ static void prepare(gui_obj_t *obj)
         transfrom_blit(this->img[i].img_w, this->img[i].img_h, &p, &rv0, &rv1, &rv2, &rv3,
                        this->img[i].matrix);
 
-        memcpy(this->img[i].inverse, this->img[i].matrix, sizeof(struct rtgui_matrix));
+        memcpy(this->img[i].inverse, this->img[i].matrix, sizeof(struct gui_matrix));
         matrix_inverse(this->img[i].inverse);
-        rtgui_image_new_area(&this->img[i]);
+        gui_image_new_area(&this->img[i]);
     }
 
     uint8_t last = this->checksum;
@@ -473,7 +473,7 @@ static void prepare(gui_obj_t *obj)
 
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 static void draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -490,7 +490,7 @@ static void draw_cb(gui_obj_t *obj)
             {
                 draw_img_t *draw_img = &this->img[i];
 
-                rtgui_rect_t rect = {0};
+                gui_rect_t rect = {0};
                 rect.x1 = obj->dx + draw_img->img_x;
                 rect.y1 = obj->dy + draw_img->img_y;
                 rect.x2 = rect.x1 + obj->w;
@@ -562,8 +562,8 @@ static void gui_perspective_ctor(gui_perspective_t *this, gui_obj_t *parent, con
         }
         draw_img->opacity_value = UINT8_MAX;
         draw_img->blend_mode = IMG_SRC_OVER_MODE;
-        draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
-        draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+        draw_img->matrix = gui_malloc(sizeof(struct gui_matrix));
+        draw_img->inverse = gui_malloc(sizeof(struct gui_matrix));
         this->temp[i] = i * 30;
         this->ry[i] = i * 30;
     }

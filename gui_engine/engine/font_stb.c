@@ -7,7 +7,7 @@
 
 static stbtt_fontinfo font;
 void gui_font_stb_init(void *font_ttf_addr);
-static void rtgui_font_stb_load(gui_text_t *text)
+static void gui_font_stb_load(gui_text_t *text)
 {
     if (text->path)
     {
@@ -61,7 +61,7 @@ static void rtgui_font_stb_load(gui_text_t *text)
     gui_free(p_buf);
 }
 
-static void rtgui_font_stb_unload(gui_text_t *text)
+static void gui_font_stb_unload(gui_text_t *text)
 {
     gui_free(((FONT_STB_SCREEN *)text->data)->buf);
     gui_free((FONT_STB_SCREEN *)text->data);
@@ -118,7 +118,7 @@ gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
     return (uint16_t)((result >> 16) | result); // contract result
 }
 
-static bool creat_stb_screen(gui_text_t *text, struct rtgui_rect *rect, FONT_STB_SCREEN *screen)
+static bool creat_stb_screen(gui_text_t *text, gui_rect_t *rect, FONT_STB_SCREEN *screen)
 {
     if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
     {
@@ -158,7 +158,7 @@ static bool creat_stb_screen(gui_text_t *text, struct rtgui_rect *rect, FONT_STB
     return true;
 }
 static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     gui_dispdev_t *dc = gui_get_dc();
     uint8_t *dots = stb_screen->buf;
@@ -304,7 +304,7 @@ static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_cou
     shape->paths = path;
 }
 #endif
-static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
+static void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
 {
     int ascent = 0, descent = 0, lineGap = 0, ch = 0, line_num = 0;
     float scale = 0, xpos = 0, ypos = 0, baseline = 0;
@@ -578,19 +578,14 @@ static void rtgui_font_stb_draw(gui_text_t *text, struct rtgui_rect *rect)
     gui_free(p_buf);
 }
 
-struct rtgui_font_engine rtgui_font_stb_engine =
+struct gui_font_engine gui_font_stb_engine =
 {
     "rtk_font_stb",
     { NULL },
-    rtgui_font_stb_load,
-    rtgui_font_stb_unload,
-    rtgui_font_stb_draw,
+    gui_font_stb_load,
+    gui_font_stb_unload,
+    gui_font_stb_draw,
 };
-
-void rtgui_font_stb_init(void)
-{
-    rtgui_font_register_engine(&rtgui_font_stb_engine);
-}
 
 void gui_font_stb_init(void *font_ttf_addr)
 {

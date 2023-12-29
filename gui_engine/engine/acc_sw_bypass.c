@@ -25,7 +25,7 @@
 // #include "acc_sw.h"
 // #include "acc_sw_rle.h"
 void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -92,7 +92,7 @@ void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     }
 }
 void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -160,7 +160,7 @@ void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -229,7 +229,7 @@ void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
 }
 void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -292,7 +292,7 @@ void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                 struct rtgui_rect *rect)
+                                 gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -357,7 +357,7 @@ void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -422,7 +422,7 @@ void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -496,7 +496,7 @@ void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
 }
 void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                   struct rtgui_rect *rect)
+                                   gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
@@ -560,7 +560,7 @@ void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     }
 }
 void bypass_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                     struct rtgui_rect *rect)
+                                     gui_rect_t *rect)
 {
     int image_x = rect->x1;
     int image_y = rect->y1;

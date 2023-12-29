@@ -93,12 +93,12 @@
 
 
 void no_rle(draw_img_t *image, struct gui_dispdev *dc,
-            struct rtgui_rect *rect)
+            gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct gui_rgb_data_head *head = image->data;
     char img_type = head->type;
-    rtgui_matrix_t *matrix = image->matrix;
+    gui_matrix_t *matrix = image->matrix;
     bool identity = true;
     if (
         (matrix->m[0][0] == 1) && \
@@ -268,11 +268,11 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                //alpha_matrix_blit_rgb565_2_rgb565(image, dc, rect);
+                alpha_matrix_blit_rgb565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                // alpha_matrix_blit_rgb888_2_rgb565(image, dc, rect);
+                alpha_matrix_blit_rgb888_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
@@ -283,11 +283,11 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
         {
             if (img_type == RGB565)
             {
-                // alpha_matrix_blit_rgb565_2_rgb888(image, dc, rect);
+                alpha_matrix_blit_rgb565_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
-                // alpha_matrix_blit_rgb888_2_rgb888(image, dc, rect);
+                alpha_matrix_blit_rgb888_2_rgb888(image, dc, rect);
             }
             else if (img_type == RGBA8888)
             {
@@ -377,7 +377,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
 
 
 
-void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
+void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     struct gui_rgb_data_head *head = image->data;
 

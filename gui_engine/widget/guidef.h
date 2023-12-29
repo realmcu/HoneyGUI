@@ -118,7 +118,7 @@ typedef enum
 
 
 
-typedef struct rtgui_rect
+typedef struct gui_rect
 {
     int16_t x1;
     int16_t y1;
@@ -128,14 +128,14 @@ typedef struct rtgui_rect
     int16_t xboundright;
     int16_t yboundtop;
     int16_t yboundbottom;
-} rtgui_rect_t;
+} gui_rect_t;
 
 typedef enum dc_type
 {
     DC_RAMLESS,
     DC_SINGLE,
     DC_DOUBLE,
-} dc_type_t;
+} gui_dc_type_t;
 
 typedef struct gui_dispdev
 {
@@ -148,7 +148,7 @@ typedef struct gui_dispdev
     uint16_t driver_ic_hfp;
     uint16_t driver_ic_hbp;
     uint16_t driver_ic_active_width;
-    enum dc_type type;
+    gui_dc_type_t type;
     char gpu_type;
     /* pixel data */
     uint8_t *frame_buf;
@@ -156,7 +156,7 @@ typedef struct gui_dispdev
     uint8_t *disp_buf_2;
     float scale_x;
     float scale_y;
-    rtgui_rect_t section;
+    gui_rect_t section;
     //uint16_t section_height;
     uint32_t section_count;
     uint8_t bit_depth;
@@ -243,12 +243,12 @@ struct gui_os_api
     void (*gui_tick_hook)(void);
 };
 
-typedef struct rtgui_matrix
+typedef struct gui_matrix
 {
     float m[3][3];
-} rtgui_matrix_t;
+} gui_matrix_t;
 
-struct rtgui_pox
+struct gui_pox
 {
     float p[3];
 };
@@ -328,7 +328,7 @@ typedef enum obj_type
     PAGELIST,
     PAGELISTVIEW,
 } obj_type_t;
-typedef struct rtgui_msg
+typedef struct gui_msg
 {
     /* the event type */
     uint8_t type;
@@ -341,7 +341,7 @@ typedef struct rtgui_msg
     void *app;
     void *cb;
 
-} rtgui_msg_t;
+} gui_msg_t;
 
 typedef struct gui_index
 {
@@ -425,7 +425,7 @@ typedef struct _gui_obj_t
     int16_t tx;//for tab, diffent view use this value
     int16_t ty;//for tab, diffent view use this value
     unsigned char opacity_value;
-    //rtgui_matrix_t *matrix;
+    //gui_matrix_t *matrix;
 
 } gui_obj_t;
 
@@ -476,15 +476,9 @@ typedef struct _gui_color gui_color_t;
   * RGBA888 31 R,G,B,A 0
   * ABGR888 31 A,B,G,R 0
   *
-  * The rtgui_color is defined as ARGB888.
+  * The gui_color is defined as ARGB888.
   *        bit31 A,R,G,B bit0
   */
-
-
-#define RTGUI_RGB_B(c)  ((c) & 0xff)
-#define RTGUI_RGB_G(c)  (((c) >> 8)  & 0xff)
-#define RTGUI_RGB_R(c)  (((c) >> 16) & 0xff)
-#define RTGUI_RGB_A(c)  (((c) >> 24) & 0xff)
 
 
 #define GUI_SWAP16(x)          ((uint16_t)(                         \

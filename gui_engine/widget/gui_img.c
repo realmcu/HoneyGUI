@@ -151,7 +151,7 @@ static void img_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     draw_img_t *draw_img = &this->draw_img;
 
-    rtgui_image_load_scale(draw_img);
+    gui_image_load_scale(draw_img);
     root->w = draw_img->img_w;
     root->h = draw_img->img_h;
     matrix_identity(draw_img->matrix);
@@ -171,9 +171,9 @@ static void img_prepare(gui_obj_t *obj)
 
     matrix_translate(-this->c_x, -this->c_y, draw_img->matrix);
 
-    memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct rtgui_matrix));
+    memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(draw_img->inverse);
-    rtgui_image_new_area(draw_img);
+    gui_image_new_area(draw_img);
 
     int sx = obj->dx + obj->ax + obj->tx;
     int sy = obj->dy + obj->ay + obj->ty;
@@ -200,7 +200,7 @@ static void img_prepare(gui_obj_t *obj)
     }
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
+extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 static void img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -208,7 +208,7 @@ static void img_draw_cb(gui_obj_t *obj)
     struct gui_dispdev *dc = gui_get_dc();
     draw_img_t *draw_img = &img->draw_img;
 
-    rtgui_rect_t draw_rect = {0};
+    gui_rect_t draw_rect = {0};
     draw_rect.x1 = draw_img->img_x;
     draw_rect.y1 = draw_img->img_y;
     draw_rect.x2 = draw_rect.x1 + draw_img->target_w;
@@ -294,8 +294,8 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
 
     draw_img->opacity_value = 255;
     draw_img->blend_mode = IMG_FILTER_BLACK;
-    draw_img->matrix = gui_malloc(sizeof(struct rtgui_matrix));
-    draw_img->inverse = gui_malloc(sizeof(struct rtgui_matrix));
+    draw_img->matrix = gui_malloc(sizeof(struct gui_matrix));
+    draw_img->inverse = gui_malloc(sizeof(struct gui_matrix));
     draw_img->opacity_value = UINT8_MAX;
 
     this->scale_x = 1.0f;
