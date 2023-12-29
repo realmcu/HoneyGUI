@@ -91,7 +91,7 @@ static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         obj->ax = obj->x + obj->parent->ax;
         obj->ay = obj->y + obj->parent->ay;
-        if (ayend < obj->ay + obj->h) { ayend = obj->ay + obj->h; }
+        ayend = obj->ay + obj->h;
         *out = ayend;
         deal_img_in_root(obj, ayend, out);
     }
