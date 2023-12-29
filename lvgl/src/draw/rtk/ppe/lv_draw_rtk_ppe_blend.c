@@ -72,7 +72,7 @@ lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
         target.global_alpha_en = ENABLE;
         target.global_alpha = dsc->opa;
     }
-    PPE_rect_t rect = {.left = dest_area->x1, .right = dest_area->x2, .top = dest_area->y1, .bottom = dest_area->y2};
+    ppe_rect_t rect = {.left = dest_area->x1, .right = dest_area->x2, .top = dest_area->y1, .bottom = dest_area->y2};
     PPE_ERR err = PPE_Clear_Rect(&target, &rect, bg_color.full);
     if (err == PPE_SUCCESS)
     {
@@ -102,7 +102,7 @@ lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
     source.height = coords->y2 - coords->y1 + 1;
     source.format = PPE_A8;
 
-    PPE_translate_t trans = {.x = coords->x1, .y = coords->y1};
+    ppe_translate_t trans = {.x = coords->x1, .y = coords->y1};
     PPE_ERR err = PPE_blend(&source, &target, &trans);
     if (err == PPE_SUCCESS)
     {
@@ -172,7 +172,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     {
         return LV_RES_INV;
     }
-    PPE_translate_t trans = {.x = coords->x1, .y = coords->y1};
+    ppe_translate_t trans = {.x = coords->x1, .y = coords->y1};
 
     if (dsc->zoom != LV_IMG_ZOOM_NONE)
     {
@@ -229,7 +229,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 {
                     end_line = source_height - 1;
                 }
-                PPE_rect_t scale_rect = {.left = 0, .top = start_line, .bottom = end_line, .right = source.width - 1};
+                ppe_rect_t scale_rect = {.left = 0, .top = start_line, .bottom = end_line, .right = source.width - 1};
                 PPE_ERR err = PPE_Scale_Rect(&source, &zoom, zoom_ratio, zoom_ratio, &scale_rect);
                 if (err != PPE_SUCCESS)
                 {
@@ -285,8 +285,8 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             bg.height = blend_area.y2 - blend_area.y1;
             bg.format = target.format;
             lv_draw_rtk_ppe_read_buffer(draw_ctx, &blend_area, (uint8_t *)target.memory);
-            PPE_translate_t block_trans = {.x = coords->x1, .y = coords->y1};
-            PPE_translate_t blend_trans = {.x = blend_area.x1, .y = blend_area.y1};
+            ppe_translate_t block_trans = {.x = coords->x1, .y = coords->y1};
+            ppe_translate_t blend_trans = {.x = blend_area.x1, .y = blend_area.y1};
             PPE_ERR err = PPE_blend_multi(&source, &bg, &target, &block_trans, &blend_trans);
             if (err != PPE_SUCCESS)
             {
@@ -355,11 +355,11 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
     lv_color32_t recolor_value = lv_ppe_toABGR8888(dsc->recolor);
     recolor_value.ch.alpha = dsc->recolor_opa;
 
-    PPE_translate_t trans = {.x = coords->x1, .y = coords->y1};
+    ppe_translate_t trans = {.x = coords->x1, .y = coords->y1};
     uint32_t image_size = source.width * source.height * LV_COLOR_DEPTH / 8;
     if (image_size <= buffer_size)
     {
-        PPE_rect_t rect = {.left = 0, .right = source.width - 1, .top = 0, .bottom = source.height - 1};
+        ppe_rect_t rect = {.left = 0, .right = source.width - 1, .top = 0, .bottom = source.height - 1};
         PPE_ERR err = lv_ppe_recolor(&source, &recolor, &rect, recolor_value.full);
         if (err != PPE_SUCCESS)
         {
@@ -382,7 +382,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
         uint32_t recolor_line_num = buffer_size / (source.width * LV_COLOR_DEPTH / 8);
         for (uint16_t y = 0; y < source.height; y += recolor_line_num)
         {
-            PPE_rect_t rect = {.left = 0, .right = source.width - 1, .top = y, .bottom = y + recolor_line_num};
+            ppe_rect_t rect = {.left = 0, .right = source.width - 1, .top = y, .bottom = y + recolor_line_num};
             if (y + recolor_line_num >= source.height)
             {
                 rect.bottom = source.height - 1;
@@ -425,7 +425,7 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
     source.height = dsc->mask_area->y2 - dsc->mask_area->y1 + 1;
     source.format = PPE_A8;
 
-    PPE_translate_t trans = {.x = dsc->mask_area->x1, .y = dsc->mask_area->y1};
+    ppe_translate_t trans = {.x = dsc->mask_area->x1, .y = dsc->mask_area->y1};
     PPE_ERR err = PPE_blend(&source, &target, &trans);
     if (err == PPE_SUCCESS)
     {

@@ -110,7 +110,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 if ((image->img_w == (int)(image->img_w * scale_x)) &&
                     (image->img_h == (int)(image->img_h * scale_y)))
                 {
-                    PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+                    ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
                     if (head->type == IMDC_COMPRESS)
                     {
                         RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
@@ -171,9 +171,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     return;
                 }
                 ppe_buffer_t scaled_img;
-                PPE_translate_t trans;
-                PPE_rect_t range;
-                PPE_rect_t scale_rect;
+                ppe_translate_t trans;
+                ppe_rect_t range;
+                ppe_rect_t scale_rect;
                 memset(&scaled_img, 0, sizeof(ppe_buffer_t));
                 scaled_img.width = image->img_w * scale_x;
                 scaled_img.height = image->img_h * scale_y > (dc->section.y2 - dc->section.y1) ?
@@ -314,7 +314,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             }
             else
             {
-                PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+                ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
                 if (head->type == IMDC_COMPRESS)
                 {
                     RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
@@ -391,7 +391,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             source.color_key_value = 0x00000000;
         }
 
-        PPE_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+        ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
         if (head->type == IMDC_COMPRESS)
         {
             RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);

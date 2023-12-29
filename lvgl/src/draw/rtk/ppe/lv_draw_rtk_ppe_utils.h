@@ -53,7 +53,7 @@ extern "C" {
  **********************/
 lv_color32_t lv_ppe_toABGR8888(lv_color_t color);
 
-PPE_ERR lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, PPE_rect_t *rect, uint32_t color);
+PPE_ERR lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, ppe_rect_t *rect, uint32_t color);
 /**********************
  *      MACROS
  **********************/
