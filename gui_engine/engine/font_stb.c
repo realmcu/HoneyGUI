@@ -245,6 +245,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 if (alpha != 0)
                 {
                     color_back = writebuf[write_off + j];
+                    alpha = text->color.color.rgba.a * alpha / 0xff;
                     writebuf[write_off + j] = alphaBlendRGBA(text->color, color_back, alpha);
                 }
             }
@@ -262,6 +263,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                 if (alpha != 0)
                 {
+                    alpha = text->color.color.rgba.a * alpha / 0xff;
                     color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                     color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
                     color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
@@ -287,6 +289,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                 if (alpha != 0)
                 {
+                    alpha = text->color.color.rgba.a * alpha / 0xff;
                     color_back = writebuf[write_off + j];
                     writebuf[write_off + j] = alphaBlendRGB565(rgba2565(text->color), color_back, alpha);
                 }
