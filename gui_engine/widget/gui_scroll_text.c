@@ -225,7 +225,7 @@ void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *te
                              gui_color_t color, uint16_t length, uint8_t font_size)
 {
     this->base.text_type = text_type;
-    this->base.utf_8 = (uint8_t *)text;
+    this->base.content = (uint8_t *)text;
     this->base.color = color;
     this->base.len = length;
     this->base.font_height = font_size;

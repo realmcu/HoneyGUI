@@ -1,6 +1,7 @@
 
 #include <string.h>
 #include <draw_font.h>
+
 static struct font_lib font_lib_tab[10];
 typedef struct
 {
@@ -87,16 +88,28 @@ void gui_font_mem_load(gui_text_t *text)
         aliened_font_size = 8 - text->font_height % 8 + text->font_height;
     }
     uint32_t font_area = aliened_font_size * text->font_height / 8 * rendor_mode + 4;
-    uint16_t *p_buf = gui_malloc(text->len * sizeof(uint16_t));
-    if (p_buf == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-        return;
-    }
+    uint16_t *p_buf = NULL;
     uint16_t unicode_len = 0;
-    if (p_buf)
+    switch (text->charset)
     {
-        unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    case UTF_8_CHARSET:
+        p_buf = gui_malloc(text->len * sizeof(uint16_t));
+        if (p_buf == NULL)
+        {
+            GUI_ASSERT(NULL != NULL);
+            return;
+        }
+        else
+        {
+            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
+        }
+        break;
+    case UTF_16_CHARSET:
+        unicode_len = text->len;
+        p_buf = (uint16_t *)text->content;
+        break;
+    default:
+        break;
     }
     uint32_t all_char_w = 0;
     uint32_t line_flag = 0;
@@ -197,7 +210,16 @@ void gui_font_mem_load(gui_text_t *text)
         }
     }
     text->font_len = unicode_len;
-    gui_free(p_buf);
+    switch (text->charset)
+    {
+    case UTF_8_CHARSET:
+        gui_free(p_buf);
+        break;
+    case UTF_16_CHARSET:
+        break;
+    default:
+        break;
+    }
 }
 void gui_font_mem_unload(gui_text_t *text)
 {

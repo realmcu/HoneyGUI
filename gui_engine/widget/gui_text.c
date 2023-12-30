@@ -170,11 +170,11 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
  *                           Public Functions
  *============================================================================*/
 
-void gui_text_set(gui_text_t *this, const char *text, char *text_type, gui_color_t color,
+void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t color,
                   uint16_t length, uint8_t font_size)
 {
     this->text_type = text_type;
-    this->utf_8 = (uint8_t *)text;
+    this->content = (uint8_t *)text;
     this->color = color;
     this->len = length;
     this->font_height = font_size;
@@ -222,9 +222,14 @@ void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
     this->font_height = height;
 }
 
-void gui_text_type_set(gui_text_t *this, void *type)
+void gui_text_type_set(gui_text_t *this, void *font_source)
 {
-    this->path = type;
+    this->path = font_source;
+}
+
+void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
+{
+    this->charset = charset;
 }
 
 gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
