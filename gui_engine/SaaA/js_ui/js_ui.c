@@ -71,7 +71,7 @@ DECLARE_HANDLER(write)
         jerry_char_t *strbuf1 = gui_malloc(length + 1); ////gui_log("jerryenter3\n");
         jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); ////gui_log("jerryenter4\n");
         strbuf1[length] = '\0';
-        gui_free(txtbox->utf_8);
+        gui_free(txtbox->content);
         gui_text_set(txtbox, (void *)strbuf1, txtbox->text_type, txtbox->color, length,
                      txtbox->font_height);
         jerry_release_value(s);
