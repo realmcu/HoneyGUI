@@ -74,6 +74,8 @@ typedef struct gui_img
     gui_animate_t *animate;
     uint8_t checksum;
     uint8_t opacity;
+    bool press_flag;                    //!< press to change picture to the highlighted
+    bool release_flag;
 } gui_img_t;
 
 

@@ -145,6 +145,39 @@ static void img_prepare(gui_obj_t *obj)
                                                        obj)->opacity / UINT8_MAX;
 
     obj_update_att(obj);
+    {
+        gui_dispdev_t *dc = gui_get_dc();
+        touch_info_t *tp = tp_get_info();
+
+        if (((obj->ax + obj->tx) < (int)gui_get_screen_width()) && (((obj->ax + obj->tx) + obj->w) >= 0) &&
+            \
+            ((obj->ay + obj->ty) < (int)gui_get_screen_height()) && (((obj->ay + obj->ty) + obj->h) >= 0))
+
+        {
+            gui_img_t *b = (void *)obj;
+            if (tp->pressed)
+            {
+
+                if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx  + obj->w)) &&
+                    (tp->y >= obj->ay + obj->ty && tp->y <= (obj->ay + obj->ty + obj->h)))
+                {
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                    b->press_flag = true;
+                }
+            }
+
+            if (b->release_flag)
+            {
+                b->press_flag = false;
+                b->release_flag = false;
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+            }
+            if (tp->released && b->press_flag)
+            {
+                b->release_flag = true;
+            }
+        }
+    }
     gui_img_t *this = (gui_img_t *)obj;
     gui_obj_t *root = (gui_obj_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
