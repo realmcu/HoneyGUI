@@ -92,7 +92,10 @@ static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
         obj->ax = obj->x + obj->parent->ax;
         obj->ay = obj->y + obj->parent->ay;
         ayend = obj->ay + obj->h;
-        *out = ayend;
+        if (*out < ayend)
+        {
+            *out = ayend;
+        }
         deal_img_in_root(obj, ayend, out);
     }
 }
@@ -191,14 +194,11 @@ void page_update(gui_obj_t *obj)
     obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    if (((gui_page_t *)obj)->get_yend < 2)
-    {
-        int ay = 0;
-        deal_img_in_root(obj, obj->y + obj->h, &ay);
-        obj->h = ay - obj->y;
-        obj->w = 320;
-        ((gui_page_t *)obj)->get_yend++;
-    }
+    int ay = 0;
+    deal_img_in_root(obj, obj->y + obj->h, &ay);
+    obj->h = ay - obj->y;
+    obj->w = 320;
+    ((gui_page_t *)obj)->get_yend++;
     if (obj->parent->ay != 0)
     {
         return;
