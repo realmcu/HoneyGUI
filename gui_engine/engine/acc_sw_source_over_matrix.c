@@ -289,31 +289,16 @@ void alpha_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc
                 continue;
             }
             uint16_t pixel = *((uint16_t *)image_off + y * source_w + x);
-            gui_color_t color = {.color.rgba.a = 255,
-                                 .color.rgba.b = (pixel & 0x001f) << 3,
-                                 .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
-                                 .color.rgba.r = (pixel >> 11) << 3,
-                                };
             switch (opacity_value)
             {
             case 0:
                 break;
-            case 255:
-                {
-                    uint16_t *d = writebuf + (write_off + j);
-                    do_blending_rgb565_2_rgb565(d, &color);
-                }
-                break;
             default:
                 {
-                    if (opacity_value < 255)
+                    if (opacity_value <= 255)
                     {
                         uint16_t *d = writebuf + (write_off + j);
-                        do_blending_rgb565_2_rgb565_opacity(d, &color, opacity_value);
-                    }
-                    else
-                    {
-                        break;
+                        *d = alphaBlendRGB565((uint32_t)pixel, (uint32_t) * d, opacity_value);
                     }
                 }
                 break;
