@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include "acc_engine.h"
 #include "acc_sw_rle.h"
-#include "acc_sw_blend.h"
 #include "acc_sw_bypass.h"
 #include "acc_sw_bypass_matrix.h"
 #include "acc_sw_filter.h"

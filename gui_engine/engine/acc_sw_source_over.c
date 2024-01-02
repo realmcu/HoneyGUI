@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "acc_engine.h"
 #include "acc_sw_blend.h"
-#include "acc_sw.h"
+
 
 
 void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,

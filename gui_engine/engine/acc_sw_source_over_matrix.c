@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include "acc_engine.h"
 #include "acc_sw_blend.h"
-#include "acc_sw.h"
+
 
 
 void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,

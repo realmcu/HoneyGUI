@@ -160,7 +160,6 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t source_bytes_per_pixel = 3;
 
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -227,7 +226,6 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t source_bytes_per_pixel = 4;
 
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -368,7 +366,6 @@ void rle_filter_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -429,7 +426,6 @@ void rle_filter_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -488,7 +484,6 @@ void rle_filter_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -625,7 +620,6 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -688,7 +682,6 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
 
         uint8_t source_bytes_per_pixel = 3;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -750,7 +743,6 @@ void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
-        memset(line_buf, 0, source_bytes_per_pixel * image_w);
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
