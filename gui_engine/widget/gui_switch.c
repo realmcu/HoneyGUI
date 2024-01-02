@@ -420,7 +420,7 @@ static void switch_prepare(gui_obj_t *obj)
                 }
                 // for case: grid->switch. avoid pic switch stuck
                 gui_obj_t *parent = b->base.parent;
-                if (!strcmp(parent->name, "grid"))
+                if (!strcmp(parent->name, "grid") || parent->type == PAGELIST)
                 {
                     if (b->press_flag == true && (tp->type == TOUCH_HOLD_Y || tp->type == TOUCH_ORIGIN_FROM_Y))
                     {
