@@ -167,12 +167,17 @@ void gui_img_scope_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, vo
     root->obj_draw = img_scope_draw_cb;
     root->obj_end = img_end;
     root->obj_destory = img_destory;
-    draw_img->blend_mode = IMG_FILTER_BLACK;
     //for self
 
     draw_img->data = addr;
-    draw_img->opacity_value = 255;
+    draw_img->blend_mode = IMG_FILTER_BLACK;
+    draw_img->matrix = gui_malloc(sizeof(struct gui_matrix));
+    draw_img->inverse = gui_malloc(sizeof(struct gui_matrix));
+    draw_img->opacity_value = UINT8_MAX;
 
+    this->scale_x = 1.0f;
+    this->scale_y = 1.0f;
+    this->opacity = draw_img->opacity_value;
 }
 /*============================================================================*
  *                           Public Functions
