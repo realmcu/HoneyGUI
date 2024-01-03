@@ -68,20 +68,20 @@ if PLATFORM == 'gcc' or PLATFORM == 'armclang': # GCC or Keil AC6
 
 CPPDEFINES = ['JERRY_JS_PARSER', 'JERRY_ENABLE_EXTERNAL_CONTEXT']
 
-#if GetDepend('PKG_JERRY_ENABLE_ERROR_MESSAGES'):
+#if GetDepend('CONFIG_REALTEK_PKG_JERRY_ENABLE_ERROR_MESSAGES'):
 CPPDEFINES += ['JERRY_ENABLE_ERROR_MESSAGES']
 #
-#if GetDepend('PKG_JERRY_ENABLE_LOGGING'):
+#if GetDepend('CONFIG_REALTEK_PKG_JERRY_ENABLE_LOGGING'):
 CPPDEFINES += ['JERRY_ENABLE_LOGGING']
 #    
 
 
 
 
-group = DefineGroup('JerryScript', src, depend = ['BUILD_USING_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH, 
+group = DefineGroup('JerryScript', src, depend = ['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH, 
     CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CCFLAGS)
 
-if GetDepend(['BUILD_USING_SCRIPT_AS_A_APP']):
+if GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
     group = group + SConscript(os.path.join('js-port', 'SConscript'))
 
 Return('group')

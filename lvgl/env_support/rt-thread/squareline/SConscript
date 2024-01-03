@@ -5,6 +5,6 @@ src = ['lv_ui_entry.c']
 
 src += Glob(cwd + '/ui/*.c')
 
-group = DefineGroup('LVGL-SquareLine', src, depend = ['PKG_USING_LVGL_SQUARELINE'])
+group = DefineGroup('LVGL-SquareLine', src, depend = ['CONFIG_REALTEK_PKG_USING_LVGL_SQUARELINE'])
 
 Return('group')

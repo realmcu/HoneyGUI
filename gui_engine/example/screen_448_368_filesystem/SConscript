@@ -7,11 +7,11 @@ src = Split("""
 """)
 
 src = Glob('*.c')
-if not GetDepend('BUILD_USING_LVGL_GUI'):
+if not GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
     SrcRemove(src,'app_lvgl.c')
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_hongkong']
 print(CPPPATH)
-group = DefineGroup('gui_demo', src, depend = ['BUILD_USING_RTK_GUI_448_368_FILESYSTEM_DEMO'], CPPPATH = CPPPATH)
+group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_448_368_FILESYSTEM_DEMO'], CPPPATH = CPPPATH)
 
 Return('group')

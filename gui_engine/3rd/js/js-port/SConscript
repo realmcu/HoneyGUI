@@ -9,6 +9,6 @@ src += [cwd + '/jerry_console.c']
 src += [cwd + '/jerry_utf8.c']
 CPPPATH = [cwd]
 
-group = DefineGroup('JerryScriptPort', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('JerryScriptPort', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
 
 Return('group')
