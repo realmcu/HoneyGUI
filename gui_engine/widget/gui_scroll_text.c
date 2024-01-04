@@ -68,7 +68,12 @@
   */
 
 static uint32_t cur_time_ms;
-
+/**
+ * @brief The number of frames that need to be skipped.
+ * If the value is 2, then scrolling text will skip two frames and scroll one frame.
+ */
+static uint8_t skip_frame = 1;
+static uint8_t skip_frame_count;
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -82,7 +87,15 @@ static uint32_t cur_time_ms;
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
-    gui_fb_change();
+    if (skip_frame_count < skip_frame)
+    {
+        skip_frame_count++;
+    }
+    else
+    {
+        skip_frame_count = 0;
+        gui_fb_change();
+    }
     gui_scroll_text_t *object = (gui_scroll_text_t *)obj;
 
     if (object->base.animate && object->base.animate->animate)
