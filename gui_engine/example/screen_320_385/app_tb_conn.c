@@ -24,7 +24,7 @@ void page_tb_conn(void *parent)
     gui_text_type_set(GUI_TYPE(gui_button_t, button1)->text, addr1);
     gui_text_mode_set(GUI_TYPE(gui_button_t, button1)->text, LEFT);
     gui_text_move(GUI_TYPE(gui_button_t, button1)->text, 20, 2);
-    GUI_TYPE(gui_button_t, button1)->text->utf_8 = (void *)text1;
+    GUI_TYPE(gui_button_t, button1)->text->content = (void *)text1;
     GUI_TYPE(gui_button_t, button1)->text->len = strlen(text1);
 
 
@@ -36,7 +36,7 @@ void page_tb_conn(void *parent)
     gui_text_type_set(GUI_TYPE(gui_button_t, button2)->text, addr1);
     gui_text_mode_set(GUI_TYPE(gui_button_t, button2)->text, LEFT);
     gui_text_move(GUI_TYPE(gui_button_t, button2)->text, 20, 2);
-    GUI_TYPE(gui_button_t, button2)->text->utf_8 = (void *)text2;
+    GUI_TYPE(gui_button_t, button2)->text->content = (void *)text2;
     GUI_TYPE(gui_button_t, button2)->text->len = strlen(text2);
 
     gui_button_t *button3 = gui_button_create(pg, 10, 120, 367, 38, BUTTON_BIN, BUTTON_ON_BIN, "",
@@ -47,7 +47,7 @@ void page_tb_conn(void *parent)
     gui_text_type_set(GUI_TYPE(gui_button_t, button3)->text, addr1);
     gui_text_mode_set(GUI_TYPE(gui_button_t, button3)->text, LEFT);
     gui_text_move(GUI_TYPE(gui_button_t, button3)->text, 20, 2);
-    GUI_TYPE(gui_button_t, button3)->text->utf_8 = (void *)text3;
+    GUI_TYPE(gui_button_t, button3)->text->content = (void *)text3;
     GUI_TYPE(gui_button_t, button3)->text->len = strlen(text3);
 
     gui_button_t *button4 = gui_button_create(pg, 10, 160, 367, 38, BUTTON_BIN, BUTTON_ON_BIN, "",
@@ -58,7 +58,7 @@ void page_tb_conn(void *parent)
     gui_text_type_set(GUI_TYPE(gui_button_t, button4)->text, addr1);
     gui_text_mode_set(GUI_TYPE(gui_button_t, button4)->text, LEFT);
     gui_text_move(GUI_TYPE(gui_button_t, button4)->text, 20, 2);
-    GUI_TYPE(gui_button_t, button4)->text->utf_8 = (void *)text4;
+    GUI_TYPE(gui_button_t, button4)->text->content = (void *)text4;
     GUI_TYPE(gui_button_t, button4)->text->len = strlen(text4);
 
     gui_button_t *button5 = gui_button_create(pg, 10, 200, 367, 38, BUTTON_BIN, BUTTON_ON_BIN, "",
@@ -69,7 +69,7 @@ void page_tb_conn(void *parent)
     gui_text_type_set(GUI_TYPE(gui_button_t, button5)->text, addr1);
     gui_text_mode_set(GUI_TYPE(gui_button_t, button5)->text, LEFT);
     gui_text_move(GUI_TYPE(gui_button_t, button5)->text, 20, 2);
-    GUI_TYPE(gui_button_t, button5)->text->utf_8 = (void *)text5;
+    GUI_TYPE(gui_button_t, button5)->text->content = (void *)text5;
     GUI_TYPE(gui_button_t, button5)->text->len = strlen(text5);
 
     gui_button_t *button6 = gui_button_create(pg, 10, 240, 367, 38, BUTTON_BIN, BUTTON_ON_BIN, "",
@@ -80,7 +80,7 @@ void page_tb_conn(void *parent)
     gui_text_type_set(GUI_TYPE(gui_button_t, button6)->text, addr1);
     gui_text_mode_set(GUI_TYPE(gui_button_t, button6)->text, LEFT);
     gui_text_move(GUI_TYPE(gui_button_t, button6)->text, 20, 2);
-    GUI_TYPE(gui_button_t, button6)->text->utf_8 = (void *)text6;
+    GUI_TYPE(gui_button_t, button6)->text->content = (void *)text6;
     GUI_TYPE(gui_button_t, button6)->text->len = strlen(text6);
 
 
