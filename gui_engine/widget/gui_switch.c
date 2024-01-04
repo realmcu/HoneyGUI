@@ -148,6 +148,16 @@ void gui_switch_turn_off(gui_switch_t *this)
 {
     sw_turn_off(this);
 }
+void gui_switch_is_on(gui_switch_t *this)
+{
+    this->ifon = true;
+    gui_switch_change_switch(this);
+}
+void gui_switch_is_off(gui_switch_t *this)
+{
+    this->ifon = false;
+    gui_switch_change_switch(this);
+}
 /*static void sw_turn_off2(gui_switch_t *this)
 {
     this->ifon = false;

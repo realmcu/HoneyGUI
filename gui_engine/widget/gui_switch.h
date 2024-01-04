@@ -171,6 +171,21 @@ void gui_switch_turn_on(gui_switch_t *this);
  * @param this
  */
 void gui_switch_turn_off(gui_switch_t *this);
+/**
+ * @brief If the switch has been turned on somehow, it can upadte the status to on status.
+ *
+ * @param this
+ */
+void gui_switch_is_on(gui_switch_t *this);
+
+/**
+ * @brief If the switch has been turned off somehow, it can upadte the status to off status.
+ *
+ * @param this
+ */
+void gui_switch_is_off(gui_switch_t *this);
+
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
