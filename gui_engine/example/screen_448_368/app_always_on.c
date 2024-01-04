@@ -151,6 +151,8 @@ void always_on_ui_design(gui_obj_t *parent)
     win_always_on = gui_win_create(parent, "always_on", 0, 0, 368, 448);
     gui_perspective_imgfile_t imgfile =
     {
+        .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
+        .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
         .data_addr[0] = ACTIVITY_BIN,
         .data_addr[1] = WEATHER_BIN,
         .data_addr[2] = HEARTRATE_BIN,

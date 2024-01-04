@@ -82,6 +82,7 @@ void page_tb_cube(void *parent)
     // "Clockn.bin"
     gui_cube_set_mode(cube4, CUBE_SIDE_DOWN, IMG_SRC_OVER_MODE);
     // gui_cube_set_img(cube4, &imgfile_re);
+    gui_cube_auto_rotation_by_y(cube4, 100, 5.5f);
 
     gui_cube_set_size(cube4, 100);
     gui_cube_set_center(cube4, 200, 200);

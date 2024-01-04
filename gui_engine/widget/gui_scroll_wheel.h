@@ -76,7 +76,7 @@ typedef struct gui_scroll_wheel
     struct scroll_wheel_picture picture[SCROLL_WHEEL_ROW];
     bool press_flag;
     char row_count;
-    bool flg_fs;
+    IMG_SOURCE_MODE_TYPE src_mode;
 } gui_scroll_wheel_t;
 
 
