@@ -164,6 +164,7 @@ static void app_page_ui_design(gui_app_t *app)
     gui_log("app_page_ui_design\n");
     gui_img_create_from_mem(&(app->screen), 0, BACK_BIN, 0, 0, 0, 0);
     gui_page_t *page = gui_page_create(&(app->screen), 0, 4, 0, 0, 0);
+    gui_page_rebound(page, true);
     int array_size = sizeof(array) / sizeof(array[0]);
     gui_grid_t *grid = gui_grid_create(page, 0, 0, array_size, 1, 0, 104);
     for (size_t i = 0; i < array_size; i++)
