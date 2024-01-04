@@ -750,5 +750,4 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
     }
     return;
-
 }

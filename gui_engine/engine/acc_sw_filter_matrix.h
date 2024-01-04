@@ -48,4 +48,3 @@ void cpu_filter_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_disp
 #endif
 
 #endif
-

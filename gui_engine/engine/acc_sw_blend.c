@@ -309,7 +309,3 @@ void do_blending_argb8888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uin
     d->color.rgba.g = ((255 - Sa) * Dg + Sa * Sg) / 255;
     d->color.rgba.b = ((255 - Sa) * Db + Sa * Sb) / 255;
 }
-
-
-
-

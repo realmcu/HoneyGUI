@@ -44,4 +44,3 @@ void do_blending_argb8888_2_rgb888_opacity(gui_color_t *d, gui_color_t *s, uint8
 #endif
 
 #endif
-

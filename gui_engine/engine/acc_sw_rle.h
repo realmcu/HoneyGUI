@@ -81,4 +81,3 @@ void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 #endif
 
 #endif
-

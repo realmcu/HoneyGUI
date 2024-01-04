@@ -47,4 +47,3 @@ void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 #endif
 
 #endif
-

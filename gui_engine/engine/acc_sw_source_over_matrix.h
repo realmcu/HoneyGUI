@@ -45,4 +45,3 @@ void alpha_matrix_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *
 #endif
 
 #endif
-

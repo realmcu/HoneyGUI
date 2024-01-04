@@ -232,4 +232,3 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
     return;
 
 }
-
