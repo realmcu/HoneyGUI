@@ -255,7 +255,7 @@ void page_update(gui_obj_t *obj)
                         }
                         //GUI_TYPE(gui_page_t, obj)->y_last = 0;
                     }
-
+                    gui_obj_event_set(obj, GUI_EVENT_8);
 
                 }
                 else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed != 0)
@@ -291,7 +291,7 @@ void page_update(gui_obj_t *obj)
                             obj->y += GUI_TYPE(gui_page_t, obj)->speed;
                             GUI_TYPE(gui_page_t, obj)->speed += 1;
                         }
-
+                        gui_obj_event_set(obj, GUI_EVENT_8);
 
 
                     }
