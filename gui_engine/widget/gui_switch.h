@@ -159,7 +159,18 @@ gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
  */
 gui_switch_t *gui_switch_create_from_fs(void *parent, int16_t x, int16_t y,
                                         int16_t w, int16_t h, void *off_pic, void *on_pic);
-
+/**
+ * @brief Turn on the switch
+ *
+ * @param this
+ */
+void gui_switch_turn_on(gui_switch_t *this);
+/**
+ * @brief Turn off the switch
+ *
+ * @param this
+ */
+void gui_switch_turn_off(gui_switch_t *this);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
