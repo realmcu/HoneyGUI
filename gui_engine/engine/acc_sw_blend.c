@@ -23,7 +23,7 @@
 #include "acc_engine.h"
 #include "acc_sw_blend.h"
 
-uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
+uint16_t do_blending_rgb565_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8_t alpha)
 {
     // Alpha converted from [0..255] to [0..31]
     // Converts  0000000000000000rrrrrggggggbbbbb
@@ -36,6 +36,24 @@ uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
     uint32_t result = (((((fg - bg) * alpha) >> 5) + bg) & 0x07C5F81F);
     return (uint16_t)((result >> 16) | result);
 }
+void  do_blending_argb8565_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t alpha)
+{
+    uint8_t Sa = alpha;
+    uint16_t Sr = (uint16_t)s->color.rgba.r;
+    uint16_t Sg = (uint16_t)s->color.rgba.g;
+    uint16_t Sb = (uint16_t)s->color.rgba.b;
+
+    uint16_t Dr = ((*d >> 11) << 3);
+    uint16_t Dg = (((*d & 0x07e0) >> 5) << 2);
+    uint16_t Db = ((*d & 0x001f) << 3);
+
+    uint16_t red = (((((255 - Sa) * Dr + Sa * Sr) / 255) >> 3) << 11);
+    uint16_t green = (((((255 - Sa) * Dg + Sa * Sg) / 255) >> 2) << 5);
+    uint16_t blue = ((((255 - Sa) * Db + Sa * Sb) / 255) >> 3);
+
+    *d = red + green + blue ;
+}
+
 void do_blending_rgb888_2_rgb565(uint16_t *d, gui_color_t *s)
 {
     uint8_t Sa = 255;

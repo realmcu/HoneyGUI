@@ -28,6 +28,7 @@ struct gui_rgb_data_head
 typedef enum
 {
     RGB565 = 0,
+    ARGB8565 = 1,
     RGB888 = 3,
     RGBA8888 = 4,
     BINARY = 5,
