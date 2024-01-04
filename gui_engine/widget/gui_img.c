@@ -421,6 +421,14 @@ void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode)
     draw_img->blend_mode = mode;
 }
 
+void gui_img_set_quality(gui_img_t *img, bool high_quality)
+{
+    GUI_ASSERT(img != NULL);
+    struct gui_dispdev *dc = gui_get_dc();
+    draw_img_t *draw_img = &img->draw_img;
+    draw_img->high_quality = high_quality;
+}
+
 void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int16_t x,
                            int16_t y)
 {

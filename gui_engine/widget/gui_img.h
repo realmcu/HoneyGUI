@@ -234,7 +234,14 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
 void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *callback,
                          void *p);
 
-
+/**
+ * @brief set the image's quality.
+ *
+ * @param img the image widget pointer.
+ * @param high_quality image drawn in high quality or not.
+ *
+ */
+void gui_img_set_quality(gui_img_t *img, bool high_quality);
 
 #ifdef __cplusplus
 }
