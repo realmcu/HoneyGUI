@@ -115,6 +115,14 @@ static void text_prepare(gui_obj_t *o)
         obj->animate->progress_percent = ((float)(obj->animate->current_frame)) /
                                          ((float)(frame_count));
     }
+    uint8_t last = obj->checksum;
+    obj->checksum = 0;
+    obj->checksum = gui_checksum(0, (uint8_t *)obj, sizeof(gui_text_t));
+
+    if (last != obj->checksum)
+    {
+        gui_fb_change();
+    }
 }
 
 static void text_draw(gui_obj_t *obj)

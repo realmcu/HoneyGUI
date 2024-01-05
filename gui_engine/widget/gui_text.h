@@ -76,6 +76,7 @@ typedef struct gui_text
     uint16_t text_offset;
     TEXT_CHARSET charset;
     uint8_t font_height;
+    uint8_t checksum;
     //uint8_t font_width;
     void *content;
     void *data;
