@@ -15,8 +15,8 @@
 #include "math.h"
 #include "fmc_api_ext.h"
 
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect);
-static void prepare_data(uint8_t *data, ppe_rect_t *p_rect, ppe_buffer_t *source);
+extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
+//static void prepare_data(uint8_t *data, ppe_rect_t *p_rect, ppe_buffer_t *source);
 #define PPE_ACC_CACHE_SOURCE        0
 
 #define PPEV2_ACC_MIN_OPA       3
@@ -28,6 +28,108 @@ static uint8_t temp_buf[TEMP_BUF_SIZE];
 #define PPEV2_PFB_SIZE             (PPEV2_CACHE_BUF_SIZE/2)
 static uint8_t ppe_cache_buf[PPEV2_CACHE_BUF_SIZE];
 static uint8_t *ppe_fb_port1, *ppe_fb_port2, *pfb_buffer;
+
+static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
+{
+    struct gui_pox pox = {0.0f};
+    float x_min = 0.0f;
+    float x_max = 0.0f;
+    float y_min = 0.0f;
+    float y_max = 0.0f;
+
+    pox.p[0] = 0.0f;
+    pox.p[1] = 0.0f;
+    pox.p[2] = 1.0f;
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
+    x_min = pox.p[0];
+    x_max = pox.p[0];
+    y_min = pox.p[1];
+    y_max = pox.p[1];
+
+
+    pox.p[0] = image->width - 1;
+    pox.p[1] = 0.0f;
+    pox.p[2] = 1.0f;
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+
+    pox.p[0] = 0.0f;
+    pox.p[1] = image->height - 1;
+    pox.p[2] = 1.0f;
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    pox.p[0] = image->width - 1;
+    pox.p[1] = image->height - 1;
+    pox.p[2] = 1.0f;
+    pox_mul((gui_matrix_t *)&image->matrix, &pox);
+    if (x_min > pox.p[0])
+    {
+        x_min = pox.p[0];
+    }
+    if (x_max < pox.p[0])
+    {
+        x_max = pox.p[0];
+    }
+    if (y_min > pox.p[1])
+    {
+        y_min = pox.p[1];
+    }
+    if (y_max < pox.p[1])
+    {
+        y_max = pox.p[1];
+    }
+
+    if (x_min < 0)
+    {
+        rect->x = 0;
+    }
+    else
+    {
+        rect->x = (int16_t)x_min;
+    }
+    if (y_min < 0)
+    {
+        rect->y = 0;
+    }
+    else
+    {
+        rect->y = (int16_t)y_min;
+    }
+    rect->w = (int16_t)x_max - rect->x + 1;
+    rect->h = (int16_t)y_max - rect->y + 1;
+}
 #endif
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
@@ -36,8 +138,10 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
     {
         return false;
     }
-    bool use_LLI = true, use_support = false, support_LLI = false;
-    uint32_t dma_height = p_rect->h, support_height = 0;
+    bool use_LLI = true;
+//    bool use_support = false, support_LLI = false;
+    uint32_t dma_height = p_rect->h;
+//  uint32_t support_height = 0;
 //    if(p_rect->h > 1 && support_dma_num != 0xa5)
 //    {
 //        use_support = true;
@@ -49,21 +153,22 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
     if (p_rect->w == source->width || dma_height == 1)
     {
         use_LLI = false;
-        support_LLI = false;
+//        support_LLI = false;
     }
-    GDMA_LLIDef *GDMA_LLIStruct, *SP_LLIStruct;
+    GDMA_LLIDef *GDMA_LLIStruct;
+//    GDMA_LLIDef *SP_LLIStruct;
     if (use_LLI)
     {
         GDMA_LLIStruct = os_mem_alloc(RAM_TYPE_DATA_ON, p_rect->h * sizeof(GDMA_LLIDef));
         memset(GDMA_LLIStruct, 0, p_rect->h * sizeof(GDMA_LLIDef));
-        SP_LLIStruct = &GDMA_LLIStruct[dma_height];
+//        SP_LLIStruct = &GDMA_LLIStruct[dma_height];
     }
     uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->width) * 2;
     //fmc_flash_set_seq_trans(FMC_FLASH_NOR_IDX0, true);
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_ChannelTypeDef *dma_channel = DMA_CH_BASE(memcpy_dma_num);
-    GDMA_ChannelTypeDef *support_channel = DMA_CH_BASE(support_dma_num);
-    GDMA_InitTypeDef SP_GDMA_InitStruct;
+//    GDMA_ChannelTypeDef *support_channel = DMA_CH_BASE(support_dma_num);
+//    GDMA_InitTypeDef SP_GDMA_InitStruct;
     GDMA_InitTypeDef RX_GDMA_InitStruct;
     /*--------------GDMA init-----------------------------*/
     GDMA_StructInit(&RX_GDMA_InitStruct);
@@ -236,117 +341,11 @@ static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
     }
 }
 
-static void wait_memcpy_dma(void)
-{
 
-}
-
-
-static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
-{
-    struct rtgui_pox pox = {0.0f};
-    float x_min = 0.0f;
-    float x_max = 0.0f;
-    float y_min = 0.0f;
-    float y_max = 0.0f;
-
-    pox.p[0] = 0.0f;
-    pox.p[1] = 0.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
-    x_min = pox.p[0];
-    x_max = pox.p[0];
-    y_min = pox.p[1];
-    y_max = pox.p[1];
-
-
-    pox.p[0] = image->width - 1;
-    pox.p[1] = 0.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-
-    pox.p[0] = 0.0f;
-    pox.p[1] = image->height - 1;
-    pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    pox.p[0] = image->width - 1;
-    pox.p[1] = image->height - 1;
-    pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    if (x_min < 0)
-    {
-        rect->x = 0;
-    }
-    else
-    {
-        rect->x = (int16_t)x_min;
-    }
-    if (y_min < 0)
-    {
-        rect->y = 0;
-    }
-    else
-    {
-        rect->y = (int16_t)y_min;
-    }
-    rect->w = (int16_t)x_max - rect->x + 1;
-    rect->h = (int16_t)y_max - rect->y + 1;
-}
 
 static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buffer_t *image)
 {
-    struct rtgui_pox pox = {0.0f};
+    struct gui_pox pox = {0.0f};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;
@@ -355,7 +354,7 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     pox.p[0] = source_rect->x;
     pox.p[1] = source_rect->y;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->inv_matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
     x_min = pox.p[0];
     x_max = pox.p[0];
     y_min = pox.p[1];
@@ -365,7 +364,7 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     pox.p[0] = source_rect->x + source_rect->w - 1;
     pox.p[1] = source_rect->y;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->inv_matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -387,7 +386,7 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     pox.p[0] = source_rect->x;
     pox.p[1] = source_rect->y + source_rect->h - 1;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->inv_matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -408,7 +407,7 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     pox.p[0] = source_rect->x + source_rect->w - 1;
     pox.p[1] = source_rect->y + source_rect->h - 1;
     pox.p[2] = 1.0f;
-    pox_mul((rtgui_matrix_t *)&image->inv_matrix, &pox);
+    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -475,12 +474,12 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     {
         rect->h = image->height - rect->y;
     }
-    DBG_DIRECT("x min %f max %f, %d - %d = %d", x_min, x_max, (int16_t)x_max, rect->x, rect->w);
-    DBG_DIRECT("y min %f max %f, %d - %d = %d", y_min, y_max, (int16_t)y_max, rect->y, rect->h);
+//    DBG_DIRECT("x min %f max %f, %d - %d = %d", x_min, x_max, (int16_t)x_max, rect->x, rect->w);
+//    DBG_DIRECT("y min %f max %f, %d - %d = %d", y_min, y_max, (int16_t)y_max, rect->y, rect->h);
     return true;
 }
 
-void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *rect)
+void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect)
 {
     if (image->opacity_value <= PPEV2_ACC_MIN_OPA)
     {
@@ -513,6 +512,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
     target.win_x_max = target.width;
     target.win_y_min = 0;
     target.win_y_max = target.height;
+    target.use_bg = true;
     struct gui_rgb_data_head *head = image->data;
     if (1)    //Not compressed
     {
@@ -767,7 +767,17 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             {
                 return;
             }
+            source.win_x_min = 0;
+            source.win_x_max = target.width;
+            source.win_y_min = 0;
+            source.win_y_max = target.height;
             float x_ref = 0, y_ref = 0;
+            uint32_t blend_area = 0;
+            int x1 = rect->x1 < 0 ? 0 : rect->x1;
+            int y1 = rect->y1 < 0 ? 0 : rect->y1;
+            int x2 = rect->x2 > dc->screen_width ? dc->screen_width : rect->x2;
+            int y2 = rect->x2 > dc->screen_height ? dc->screen_height : rect->x2;
+            blend_area = (y2 - y1) * (x2 - x1);
             ppe_rect_t ppe_rect = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
             if (ppe_rect.x < 0)
             {
@@ -793,10 +803,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             {
                 ppe_rect.h = rect->y2 - dc->section.y1 - ppe_rect.y;
             }
-            DBG_DIRECT("****section %d->%d", dc->section.y1, dc->section.y2);
-            DBG_DIRECT("rect x %d -> %d | y %d -> %d", rect->x1, rect->x2, rect->y1, rect->y2);
-            DBG_DIRECT("image x %d y %d, w %d h %d", image->img_x, image->img_y, image->target_w,
-                       image->target_h);
+//            DBG_DIRECT("****section %d->%d",dc->section.y1, dc->section.y2);
+//            DBG_DIRECT("rect x %d -> %d | y %d -> %d", rect->x1, rect->x2, rect->y1, rect->y2);
+//            DBG_DIRECT("image x %d y %d, w %d h %d", image->img_x, image->img_y, image->target_w, image->target_h);
             source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
 #if PPE_ACC_CACHE_SOURCE
             memcpy_by_dma(ppe_cache_buf, (void *)source.address, image_size);
@@ -811,14 +820,18 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
                 source.color_key_min = 0;
                 source.color_key_max = 0x010101;
             }
+            else if (image->blend_mode == IMG_BYPASS_MODE)
+            {
+                source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+//                source.color_key_min = 0;
+//                source.color_key_max = 0x010101;
+                target.use_bg = false;
+            }
             else
             {
                 source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+                target.use_bg = true;
             }
-            source.win_x_min = 0;
-            source.win_x_max = target.width;
-            source.win_y_min = 0;
-            source.win_y_max = target.height;
 
             memcpy(&source.matrix, image->matrix, sizeof(float) * 9);
             memcpy(&source.inv_matrix, image->inverse, sizeof(float) * 9);
@@ -828,7 +841,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             ppe_rect.y += dc->section.y1;
             ppe_rect_t old_rect;
             bool ret = ppe_get_old_area(&old_rect, &ppe_rect, &source);
-            DBG_DIRECT("before rect x %d | y %d | w %d | h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
+//            DBG_DIRECT("before rect x %d | y %d | w %d | h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
             if (!ret)
             {
                 return;
@@ -839,8 +852,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 //            }
             ppe_rect.x -= dc->section.x1;
             ppe_rect.y -= dc->section.y1;
-            DBG_DIRECT("ppe rect x %d | y %d | w %d | h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
-            DBG_DIRECT("old rect x %d | y %d | w %d | h %d", old_rect.x, old_rect.y, old_rect.w, old_rect.h);
+//            DBG_DIRECT("ppe rect x %d | y %d | w %d | h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
+//            DBG_DIRECT("old rect x %d | y %d | w %d | h %d", old_rect.x, old_rect.y, old_rect.w, old_rect.h);
 
 
 //            if (dc->type == DC_RAMLESS)
@@ -891,13 +904,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             }
             Pad_Config(P1_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE,
                        PAD_OUT_LOW);
-            DBG_DIRECT("x_ref %f, y_ref %f", x_ref, y_ref);
-            DBG_DIRECT("x_t %f, y_t %f", source.inv_matrix.m[0][2], source.inv_matrix.m[1][2]);
+//            DBG_DIRECT("x_ref %f, y_ref %f", x_ref, y_ref);
+//            DBG_DIRECT("x_t %f, y_t %f", source.inv_matrix.m[0][2], source.inv_matrix.m[1][2]);
             source.high_quality = image->high_quality;
-            if (image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
-                image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
-                image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
-                image->matrix->m[2][1] == 0)
+            if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
+                 image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
+                 image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
+                 image->matrix->m[2][1] == 0) || (blend_area > 250 * 250))
             {
                 source.high_quality = false;
             }
@@ -906,8 +919,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
 
             if (err != PPEV2_SUCCESS)
             {
-                DBG_DIRECT("PPE err %d, err");
-                sw_acc_blit(image, dc, rect);
+//                DBG_DIRECT("PPE err %d", err);
+//                sw_acc_blit(image, dc, rect);
             }
         }
     }
@@ -1007,15 +1020,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct rtgui_rect *r
             //TODO: suppose to be overed by DC_SINGLE branch, will verify later
             return;
         }
-    }
-}
-
-static void prepare_data(uint8_t *data, ppe_rect_t *p_rect, ppe_buffer_t *source)
-{
-    uint8_t *data_start = data + (p_rect->x + p_rect->y * source->width) * 2;
-    for (int i = 0; i < p_rect->h; i++)
-    {
-        memcpy(temp_buf + i * p_rect->w * 2, data_start + i * source->width * 2, p_rect->w * 2);
     }
 }
 
