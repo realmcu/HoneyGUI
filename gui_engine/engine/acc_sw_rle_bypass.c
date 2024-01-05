@@ -400,7 +400,7 @@ void rle_bypass_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                         writebuf[(write_off + x_j) * dc_bytes_per_pixel] = pixel[0];//b
                         writebuf[(write_off + x_j) * dc_bytes_per_pixel + 1] = pixel[1];//g
                         writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = pixel[2]; //r
-                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 2] = pixel[3]; //r
+                        writebuf[(write_off + x_j) * dc_bytes_per_pixel + 3] = pixel[3]; //a
                     }
                     break;
                 default:

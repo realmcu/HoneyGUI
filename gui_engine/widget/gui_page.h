@@ -67,6 +67,7 @@ typedef struct gui_page
                  int16_t y, int16_t w, int16_t h);
     bool release;
     bool flg_fs;  // scroll_bar
+    uint8_t status;
 } gui_page_t;
 
 /** @brief  PAGE widget api structure */
@@ -177,7 +178,13 @@ gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16
 
 extern _gui_api_page_t gui_page_api;
 void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeatCount, void *callback, void *p);
-
+/**
+ * @brief config rebound
+ *
+ * @param this widget object pointer
+ * @param rebound true: config rebound; false: not rebound;
+ */
+void gui_page_rebound(gui_page_t *this, bool rebound);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

@@ -8,8 +8,8 @@
  * @copyright Copyright (c) 2023
  *
  */
-#ifndef __ACC_SW_BYPASS_H__
-#define __ACC_SW_BYPASS_H__
+#ifndef __ACC_SW_BYPASS_MATRIX_H__
+#define __ACC_SW_BYPASS_MATRIX_H__
 
 #include <draw_img.h>
 #include <stdio.h>
@@ -47,4 +47,3 @@ void bypass_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
 #endif
 
 #endif
-

@@ -20,7 +20,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
 // #include "acc_sw_blend.h"
 // #include "acc_sw.h"
 // #include "acc_sw_rle.h"
@@ -685,37 +684,40 @@ void filter_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         for (uint32_t j = x_start; j < x_end; j++)
         {
             pixel = *((uint16_t *)read_off + j);
-            switch (opacity_value)
+            if (pixel != 0)
             {
-            case 0:
-                break;
-            case 255:
+                switch (opacity_value)
                 {
-                    writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = 0xff;
-                    writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
-                    writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
-                    writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
+                case 0:
+                    break;
+                case 255:
                     {
-                        writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = (0xFF * opacity_value
-                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 3] * (255 - opacity_value))) / 255 ;
-                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) * opacity_value
-                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * (255 - opacity_value))) / 255 ;
-                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) * opacity_value
-                                                                              + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * (255 - opacity_value))) / 255 ;
-                        writebuf[(write_off + j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) * opacity_value
-                                                                          + writebuf[(write_off + j) * dc_bytes_per_pixel] * (255 - opacity_value)) / 255 ;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = 0xff;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (pixel >> 11) << 3;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((pixel & 0x07e0) >> 5) << 2;
+                        writebuf[(write_off + j) * dc_bytes_per_pixel] = (pixel & 0x001f) << 3;
                     }
-                    else
+                    break;
+                default:
                     {
-                        break;
+                        if (opacity_value < 255)
+                        {
+                            writebuf[(write_off + j) * dc_bytes_per_pixel + 3] = (0xFF * opacity_value
+                                                                                  + (writebuf[(write_off + j) * dc_bytes_per_pixel + 3] * (255 - opacity_value))) / 255 ;
+                            writebuf[(write_off + j) * dc_bytes_per_pixel + 2] = (((pixel >> 11) << 3) * opacity_value
+                                                                                  + (writebuf[(write_off + j) * dc_bytes_per_pixel + 2] * (255 - opacity_value))) / 255 ;
+                            writebuf[(write_off + j) * dc_bytes_per_pixel + 1] = ((((pixel & 0x07e0) >> 5) << 2) * opacity_value
+                                                                                  + (writebuf[(write_off + j) * dc_bytes_per_pixel + 1] * (255 - opacity_value))) / 255 ;
+                            writebuf[(write_off + j) * dc_bytes_per_pixel] = (((pixel & 0x001f) << 3) * opacity_value
+                                                                              + writebuf[(write_off + j) * dc_bytes_per_pixel] * (255 - opacity_value)) / 255 ;
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
+                    break;
                 }
-                break;
             }
         }
     }

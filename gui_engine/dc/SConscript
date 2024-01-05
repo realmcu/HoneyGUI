@@ -9,6 +9,6 @@ src = Glob('*.c')
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
 
 Return('group')

@@ -11,7 +11,7 @@ cwd = GetCurrentDir() # get current dir path
 port_src = Glob('*.c')
 port_inc = [cwd]
 CPPDEFINE = ['ENABLE_LVGL_GUI']
-group = group + DefineGroup('LVGL-port', port_src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = port_inc, CPPDEFINES = CPPDEFINE)
+group = group + DefineGroup('LVGL-port', port_src, depend = ['CONFIG_REALTEK_BUILD_LVGL_GUI'], CPPPATH = port_inc, CPPDEFINES = CPPDEFINE)
 
 # check if .h or .hpp files exsit
 def check_h_hpp_exsit(path):
@@ -33,7 +33,7 @@ for root, dirs, files in os.walk(lvgl_src_cwd):
             inc = inc + [current_path]
 
 
-if GetDepend('BUILD_USING_LVGL_EXAMPLES'):
+if GetDepend('CONFIG_REALTEK_BUILD_LVGL_EXAMPLES'):
     lvgl_src_cwd = lvgl_cwd + 'examples/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):
@@ -43,7 +43,7 @@ if GetDepend('BUILD_USING_LVGL_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-if GetDepend('PKG_LVGL_USING_RLOTTIE'):
+if GetDepend('CONFIG_REALTEK_PKG_LVGL_USING_RLOTTIE'):
     lvgl_src_cwd = lvgl_cwd + 'rlottie/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):
@@ -54,7 +54,7 @@ if GetDepend('PKG_LVGL_USING_RLOTTIE'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-if GetDepend('BUILD_USING_LVGL_EXAMPLES'):
+if GetDepend('CONFIG_REALTEK_BUILD_LVGL_EXAMPLES'):
     lvgl_src_cwd = lvgl_cwd + 'demos/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):
@@ -71,15 +71,15 @@ LOCAL_CFLAGS = ''
 if PLATFORM == 'gcc' or PLATFORM == 'armclang': # GCC or Keil AC6
     LOCAL_CFLAGS += ' -std=c99'
     LOCAL_CPPDEFINES = []
-    if GetDepend('BUILD_USING_RTK_PPE'):
+    if GetDepend('CONFIG_REALTEK_BUILD_PPE'):
         LOCAL_CPPDEFINES = ['LV_USE_GPU_RTK_PPE']
-    group = group + DefineGroup('LVGL', src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS, CPPDEFINES = LOCAL_CPPDEFINES)
+    group = group + DefineGroup('LVGL', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS, CPPDEFINES = LOCAL_CPPDEFINES)
 elif PLATFORM == 'armcc': # Keil AC5
     LOCAL_CPPDEFINES = ['PRIX32=\\"x\\"']
-    if GetDepend('BUILD_USING_RTK_PPE'):
+    if GetDepend('CONFIG_REALTEK_BUILD_PPE'):
         LOCAL_CPPDEFINES += 'LV_USE_GPU_RTK_PPE'
     LOCAL_CFLAGS += ' --c99 --gnu --diag_suppress=188 --diag_suppress=546 --diag_suppress=550 --diag_suppress=111 --diag_suppress=68 --diag_suppress=870'
-    group = group + DefineGroup('LVGL', src, depend = ['BUILD_USING_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS, LOCAL_CPPDEFINES = LOCAL_CPPDEFINES)
+    group = group + DefineGroup('LVGL', src, depend = ['CONFIG_REALTEK_BUILD_LVGL_GUI'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS, LOCAL_CPPDEFINES = LOCAL_CPPDEFINES)
 
 
 

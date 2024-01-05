@@ -13,16 +13,28 @@ static void gui_font_stb_load(gui_text_t *text)
     {
         gui_font_stb_init(text->path);
     }
-    uint16_t *p_buf = gui_malloc(text->len * sizeof(uint16_t));
-    if (p_buf == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-        return;
-    }
+    uint16_t *p_buf = NULL;
     uint16_t unicode_len = 0;
-    if (p_buf)
+    switch (text->charset)
     {
-        unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    case UTF_8_CHARSET:
+        p_buf = gui_malloc(text->len * sizeof(uint16_t));
+        if (p_buf == NULL)
+        {
+            GUI_ASSERT(NULL != NULL);
+            return;
+        }
+        else
+        {
+            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
+        }
+        break;
+    case UTF_16_CHARSET:
+        unicode_len = text->len;
+        p_buf = (uint16_t *)text->content;
+        break;
+    default:
+        break;
     }
     text->font_len = unicode_len;
     float all_char_w = 0;
@@ -58,7 +70,16 @@ static void gui_font_stb_load(gui_text_t *text)
             break;
         }
     }
-    gui_free(p_buf);
+    switch (text->charset)
+    {
+    case UTF_8_CHARSET:
+        gui_free(p_buf);
+        break;
+    case UTF_16_CHARSET:
+        break;
+    default:
+        break;
+    }
 }
 
 static void gui_font_stb_unload(gui_text_t *text)
@@ -224,6 +245,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 if (alpha != 0)
                 {
                     color_back = writebuf[write_off + j];
+                    alpha = text->color.color.rgba.a * alpha / 0xff;
                     writebuf[write_off + j] = alphaBlendRGBA(text->color, color_back, alpha);
                 }
             }
@@ -241,6 +263,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                 if (alpha != 0)
                 {
+                    alpha = text->color.color.rgba.a * alpha / 0xff;
                     color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                     color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
                     color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
@@ -266,6 +289,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
                 if (alpha != 0)
                 {
+                    alpha = text->color.color.rgba.a * alpha / 0xff;
                     color_back = writebuf[write_off + j];
                     writebuf[write_off + j] = alphaBlendRGB565(rgba2565(text->color), color_back, alpha);
                 }
@@ -313,16 +337,28 @@ static void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
     baseline = ascent * scale;
     // baseline = 900 * scale;
     gui_dispdev_t *dc = gui_get_dc();
-    uint16_t *p_buf = gui_malloc(text->len * sizeof(uint16_t));
-    if (p_buf == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-        return;
-    }
+    uint16_t *p_buf = NULL;
     uint16_t unicode_len = 0;
-    if (p_buf)
+    switch (text->charset)
     {
-        unicode_len = utf8_to_unicode(text->utf_8, text->len, p_buf, text->len);
+    case UTF_8_CHARSET:
+        p_buf = gui_malloc(text->len * sizeof(uint16_t));
+        if (p_buf == NULL)
+        {
+            GUI_ASSERT(NULL != NULL);
+            return;
+        }
+        else
+        {
+            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
+        }
+        break;
+    case UTF_16_CHARSET:
+        unicode_len = text->len;
+        p_buf = (uint16_t *)text->content;
+        break;
+    default:
+        break;
     }
 
 #ifdef RTK_GUI_FONT_ENABLE_TTF_SVG
@@ -575,7 +611,16 @@ static void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
     }
     font_stb_draw_bitmap(text, text->data, rect);
 #endif
-    gui_free(p_buf);
+    switch (text->charset)
+    {
+    case UTF_8_CHARSET:
+        gui_free(p_buf);
+        break;
+    case UTF_16_CHARSET:
+        break;
+    default:
+        break;
+    }
 }
 
 struct gui_font_engine gui_font_stb_engine =

@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include "acc_engine.h"
 #include "acc_sw_rle.h"
-#include "acc_sw_blend.h"
 #include "acc_sw_bypass.h"
 #include "acc_sw_bypass_matrix.h"
 #include "acc_sw_filter.h"
@@ -166,6 +165,55 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
+    if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == false))
+    {
+        if (dc_bytes_per_pixel == 2)
+        {
+            if (img_type == RGB565)
+            {
+                bypass_matrix_blit_rgb565_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                bypass_matrix_blit_rgb888_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                bypass_matrix_blit_argb8888_2_rgb565(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+            if (img_type == RGB565)
+            {
+                bypass_matrix_blit_rgb565_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                bypass_matrix_blit_rgb888_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+
+                bypass_matrix_blit_argb8888_2_rgb888(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 4)
+        {
+            if (img_type == RGB565)
+            {
+                bypass_matrix_blit_rgb565_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                bypass_matrix_blit_rgb888_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                bypass_matrix_blit_argb8888_2_argb8888(image, dc, rect);
+            }
+        }
+    }
     if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)
@@ -270,6 +318,10 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             {
                 alpha_matrix_blit_rgb565_2_rgb565(image, dc, rect);
             }
+            if (img_type == ARGB8565)
+            {
+                //alpha_matrix_blitargb8565_to_rgb565(image, dc, rect);
+            }
             else if (img_type == RGB888)
             {
                 alpha_matrix_blit_rgb888_2_rgb565(image, dc, rect);
@@ -317,6 +369,10 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             if (img_type == RGB565)
             {
                 alpha_blend_blit_rgb565_2_rgb565(image, dc, rect);
+            }
+            if (img_type == ARGB8565)
+            {
+                alpha_blend_blit_argb8565_to_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {

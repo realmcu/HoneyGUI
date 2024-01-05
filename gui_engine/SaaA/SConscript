@@ -7,12 +7,12 @@ src = Split("""
 """)
 
 
-if GetDepend(['BUILD_USING_SCRIPT_AS_A_APP']):
+if GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
     src += Glob('./*.c')
     src += Glob('./js_ui/*.c')
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
 
 Return('group')

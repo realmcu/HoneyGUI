@@ -20,10 +20,9 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
 #include "acc_sw_blend.h"
 #include "acc_sw.h"
-
+#include "math.h"
 
 void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                            gui_rect_t *rect)
@@ -61,6 +60,7 @@ void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
+
             float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
             float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
             float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
@@ -71,15 +71,15 @@ void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev
             {
                 continue;
             }
+
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
             uint8_t opacity_value = image->opacity_value;
 
-            gui_color_t color = {.color.rgba.r = pixel[2],
+            gui_color_t color = {.color.rgba.r = pixel[0],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[0],
+                                 .color.rgba.b = pixel[2],
                                  .color.rgba.a = pixel[3],
                                 };
-
             switch (opacity_value)
             {
             case 0:
@@ -143,9 +143,9 @@ void alpha_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *
             }
             // pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[2],
+            gui_color_t color = {.color.rgba.r = pixel[0],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[0],
+                                 .color.rgba.b = pixel[2],
                                  .color.rgba.a = 255,
                                 };
             uint8_t opacity_value = image->opacity_value;
@@ -216,9 +216,9 @@ void alpha_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *
                 continue;
             }
             uint16_t pixel = *((uint16_t *)image_off + y * source_w + x);
-            gui_color_t color = {.color.rgba.b = (pixel & 0x001f) << 3,
+            gui_color_t color = {.color.rgba.r = (pixel & 0x001f) << 3,
                                  .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
-                                 .color.rgba.r = (pixel >> 11) << 3,
+                                 .color.rgba.b = (pixel >> 11) << 3,
                                  .color.rgba.a = 255,
                                 };
             switch (opacity_value)
@@ -289,31 +289,21 @@ void alpha_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc
                 continue;
             }
             uint16_t pixel = *((uint16_t *)image_off + y * source_w + x);
-            gui_color_t color = {.color.rgba.a = 255,
-                                 .color.rgba.b = (pixel & 0x001f) << 3,
-                                 .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
-                                 .color.rgba.r = (pixel >> 11) << 3,
-                                };
+            uint16_t *d = writebuf + (write_off + j);
             switch (opacity_value)
             {
             case 0:
                 break;
             case 255:
                 {
-                    uint16_t *d = writebuf + (write_off + j);
-                    do_blending_rgb565_2_rgb565(d, &color);
+                    *d = pixel;
                 }
                 break;
             default:
                 {
                     if (opacity_value < 255)
                     {
-                        uint16_t *d = writebuf + (write_off + j);
-                        do_blending_rgb565_2_rgb565_opacity(d, &color, opacity_value);
-                    }
-                    else
-                    {
-                        break;
+                        *d = do_blending_rgb565_2_rgb565_opacity((uint32_t)pixel, (uint32_t) * d, opacity_value);
                     }
                 }
                 break;
@@ -350,28 +340,63 @@ void alpha_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc
     uint8_t source_bytes_per_pixel = 3;
     //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct gui_matrix *inverse = image->inverse;
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
     uint8_t opacity_value = image->opacity_value;
+    int32_t y1, y2, z1, z2;
+    y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
+               inverse->m[1][2]);
+    z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
+               inverse->m[2][2]);
+    y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
+               inverse->m[1][2]);
+    z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
+               inverse->m[2][2]);
 
-    for (uint32_t i = y_start; i < y_end; i++)
+    y1 = y1 / z1;
+    y2 = y2 / z2;
+
+    uint32_t start_line = 0, end_line = image->img_h - 1;
+    if (y1 < 0)
+    {
+        start_line = 0;
+    }
+    else if (y1 >= image->img_h)
+    {
+        return;
+    }
+    else
+    {
+        start_line = y1;
+    }
+
+    if (y2 < 0)
+    {
+        return;
+    }
+    else if (y2 + 4 >= image->img_h)
+    {
+        end_line = image->img_h - 1;
+    }
+    else
+    {
+        end_line = y2 + 4;
+    }
+    for (uint32_t i = y_start; i < end_line; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
-            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
-            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = X / Z;
-            int y = Y / Z;
-
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+            float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * i + image->inverse->m[0][2];
+            float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * i + image->inverse->m[1][2];
+            float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * i + image->inverse->m[2][2];
+            int x_matric = round(X / Z);
+            int y_matric = round(Y / Z);
+            if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
             {
                 continue;
             }
-            int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
-                           source_bytes_per_pixel * x_start;
-            uint8_t *pixel = (uint8_t *)(read_off + x * source_bytes_per_pixel);
+            uint8_t *pixel = (uint8_t *)(image_off + ((y_matric - start_line) * source_w + x_matric) *
+                                         source_bytes_per_pixel);
             gui_color_t color = {.color.rgba.r = pixel[2],
                                  .color.rgba.g = pixel[1],
                                  .color.rgba.b = pixel[0],
@@ -405,6 +430,7 @@ void alpha_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc
     }
     return;
 }
+
 void alpha_matrix_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                          gui_rect_t *rect)
 {
@@ -433,28 +459,64 @@ void alpha_matrix_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *
     uint8_t source_bytes_per_pixel = 4;
     //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct gui_matrix *inverse = image->inverse;
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
     uint8_t opacity_value = image->opacity_value;
 
-    for (uint32_t i = y_start; i < y_end; i++)
+    int32_t y1, y2, z1, z2;
+    y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
+               inverse->m[1][2]);
+    z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
+               inverse->m[2][2]);
+    y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
+               inverse->m[1][2]);
+    z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
+               inverse->m[2][2]);
+
+    y1 = y1 / z1;
+    y2 = y2 / z2;
+
+    uint32_t start_line = 0, end_line = image->img_h - 1;
+    if (y1 < 0)
+    {
+        start_line = 0;
+    }
+    else if (y1 >= image->img_h)
+    {
+        return;
+    }
+    else
+    {
+        start_line = y1;
+    }
+
+    if (y2 < 0)
+    {
+        return;
+    }
+    else if (y2 + 4 >= image->img_h)
+    {
+        end_line = image_y + image->img_h - 1;
+    }
+    else
+    {
+        end_line = y2 + 4;
+    }
+    for (uint32_t i = y_start; i < end_line; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
-            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
-            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
-            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
-            int x = X / Z;
-            int y = Y / Z;
-
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+            float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * i + image->inverse->m[0][2];
+            float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * i + image->inverse->m[1][2];
+            float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * i + image->inverse->m[2][2];
+            int x_matric = round(X / Z);
+            int y_matric = round(Y / Z);
+            if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
             {
                 continue;
             }
-            int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
-                           source_bytes_per_pixel * x_start;
-            uint8_t *pixel = (uint8_t *)(read_off + x * source_bytes_per_pixel);
+            uint8_t *pixel = (uint8_t *)(image_off + ((y_matric - start_line) * source_w + x_matric) *
+                                         source_bytes_per_pixel);
             gui_color_t color = {.color.rgba.r = pixel[2],
                                  .color.rgba.g = pixel[1],
                                  .color.rgba.b = pixel[0],
@@ -488,6 +550,7 @@ void alpha_matrix_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *
     }
     return;
 }
+
 void alpha_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                        gui_rect_t *rect)
 {
@@ -536,9 +599,9 @@ void alpha_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc
             uint16_t pixel = *(uint16_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
 
             gui_color_t color = {.color.rgba.a = 255,
-                                 .color.rgba.b = (pixel & 0x001f) << 3,
+                                 .color.rgba.r = (pixel & 0x001f) << 3,
                                  .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
-                                 .color.rgba.r = (pixel >> 11) << 3,
+                                 .color.rgba.b = (pixel >> 11) << 3,
                                 };
             switch (opacity_value)
             {
@@ -607,9 +670,9 @@ void alpha_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc
             }
 
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[2],
+            gui_color_t color = {.color.rgba.r = pixel[0],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[0],
+                                 .color.rgba.b = pixel[2],
                                  .color.rgba.a = 255,
                                 };
             switch (opacity_value)
@@ -679,9 +742,9 @@ void alpha_matrix_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *
             }
 
             uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[2],
+            gui_color_t color = {.color.rgba.r = pixel[0],
                                  .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[0],
+                                 .color.rgba.b = pixel[2],
                                  .color.rgba.a = pixel[3],
                                 };
             switch (opacity_value)

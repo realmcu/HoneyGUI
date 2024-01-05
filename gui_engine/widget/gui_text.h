@@ -56,6 +56,14 @@ typedef enum
     SCROLL_Y,
 } TEXT_MODE;
 
+/** @brief  text mode enum */
+typedef enum
+{
+    UTF_8_CHARSET = 0,
+    UTF_16_CHARSET = 1,
+    UNICODE_ENCODING = 1,
+} TEXT_CHARSET;
+
 /** @brief  text widget structure */
 typedef struct gui_text
 {
@@ -66,9 +74,10 @@ typedef struct gui_text
     uint16_t len;
     uint16_t font_len;
     uint16_t text_offset;
+    TEXT_CHARSET charset;
     uint8_t font_height;
     //uint8_t font_width;
-    uint8_t *utf_8;
+    void *content;
     void *data;
     char *text_type;//!< "rtk from mem" or "rtk from fs"
     gui_animate_t *animate;
@@ -144,7 +153,7 @@ typedef struct gui_text_line
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t *this, const char *text, char *text_type, gui_color_t color,
+void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t color,
                   uint16_t length, uint8_t font_size);
 
 /**
@@ -188,9 +197,17 @@ void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width);
  * @brief set font type
  * @note The type must match the font size!
  * @param this the text widget pointer
- * @param type the addr of .ttf or .bin
+ * @param font_source the addr of .ttf or .bin
  */
-void gui_text_type_set(gui_text_t *this, void *type);
+void gui_text_type_set(gui_text_t *this, void *font_source);
+
+/**
+ * @brief set font encoding
+ * @note utf-8 or unicode
+ * @param this the text widget pointer
+ * @param encoding_type encoding_type
+ */
+void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset);
 
 /**
  * @brief create a text box widget.

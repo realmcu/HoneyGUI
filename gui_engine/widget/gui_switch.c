@@ -140,6 +140,24 @@ static void sw_turn_off(gui_switch_t *this)
 
     }
 }
+void gui_switch_turn_on(gui_switch_t *this)
+{
+    sw_turn_on(this);
+}
+void gui_switch_turn_off(gui_switch_t *this)
+{
+    sw_turn_off(this);
+}
+void gui_switch_is_on(gui_switch_t *this)
+{
+    this->ifon = true;
+    gui_switch_change_switch(this);
+}
+void gui_switch_is_off(gui_switch_t *this)
+{
+    this->ifon = false;
+    gui_switch_change_switch(this);
+}
 /*static void sw_turn_off2(gui_switch_t *this)
 {
     this->ifon = false;
@@ -420,7 +438,7 @@ static void switch_prepare(gui_obj_t *obj)
                 }
                 // for case: grid->switch. avoid pic switch stuck
                 gui_obj_t *parent = b->base.parent;
-                if (!strcmp(parent->name, "grid"))
+                if (!strcmp(parent->name, "grid") || parent->type == PAGELIST)
                 {
                     if (b->press_flag == true && (tp->type == TOUCH_HOLD_Y || tp->type == TOUCH_ORIGIN_FROM_Y))
                     {

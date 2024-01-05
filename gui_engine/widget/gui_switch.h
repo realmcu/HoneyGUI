@@ -159,6 +159,32 @@ gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
  */
 gui_switch_t *gui_switch_create_from_fs(void *parent, int16_t x, int16_t y,
                                         int16_t w, int16_t h, void *off_pic, void *on_pic);
+/**
+ * @brief Turn on the switch
+ *
+ * @param this
+ */
+void gui_switch_turn_on(gui_switch_t *this);
+/**
+ * @brief Turn off the switch
+ *
+ * @param this
+ */
+void gui_switch_turn_off(gui_switch_t *this);
+/**
+ * @brief If the switch has been turned on somehow, it can upadte the status to on status.
+ *
+ * @param this
+ */
+void gui_switch_is_on(gui_switch_t *this);
+
+/**
+ * @brief If the switch has been turned off somehow, it can upadte the status to off status.
+ *
+ * @param this
+ */
+void gui_switch_is_off(gui_switch_t *this);
+
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

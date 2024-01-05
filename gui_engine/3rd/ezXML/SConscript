@@ -10,6 +10,6 @@ src += ['ezxml.c']
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH)
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP'], CPPPATH = CPPPATH)
 
 Return('group')

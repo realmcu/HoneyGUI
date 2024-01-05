@@ -76,6 +76,12 @@ extern "C" {
   */
 /** @brief white color in gui_color_t structure */
 #define APP_COLOR_WHITE gui_rgba(UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX)
+/** @brief red color in gui_color_t structure */
+#define APP_COLOR_RED gui_rgba(UINT8_MAX, 0, 0, UINT8_MAX)
+/** @brief green color in gui_color_t structure */
+#define APP_COLOR_GREEN gui_rgba(0, UINT8_MAX, 0, UINT8_MAX)
+/** @brief blue color in gui_color_t structure */
+#define APP_COLOR_BLUE gui_rgba(0, 0, UINT8_MAX, UINT8_MAX)
 
 
 

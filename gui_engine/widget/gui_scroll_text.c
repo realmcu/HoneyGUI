@@ -21,7 +21,7 @@
 #include <gui_scroll_text.h>
 #include <string.h>
 #include <draw_font.h>
-
+#include <gui_fb.h>
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -68,7 +68,12 @@
   */
 
 static uint32_t cur_time_ms;
-
+/**
+ * @brief The number of frames that need to be skipped.
+ * If the value is 2, then scrolling text will skip two frames and scroll one frame.
+ */
+static uint8_t skip_frame = 1;
+static uint8_t skip_frame_count;
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -82,6 +87,15 @@ static uint32_t cur_time_ms;
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
+    if (skip_frame_count < skip_frame)
+    {
+        skip_frame_count++;
+    }
+    else
+    {
+        skip_frame_count = 0;
+        gui_fb_change();
+    }
     gui_scroll_text_t *object = (gui_scroll_text_t *)obj;
 
     if (object->base.animate && object->base.animate->animate)
@@ -148,16 +162,16 @@ static void scrolltext_draw(gui_obj_t *obj)
     }
     else if (text->base.mode == SCROLL_Y && (offset > obj->h || offset == 0))
     {
-        draw_rect.x1 = obj->dx;
+        draw_rect.x1 = obj->ax + obj->dx + obj->tx;
         draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y1 = obj->dy - text->cnt_value + text->start_value;
+        draw_rect.y1 = obj->ay + obj->dy + obj->ty - text->cnt_value + text->start_value;
         draw_rect.y2 = draw_rect.y1 + text->base.text_offset;
     }
     else
     {
-        draw_rect.x1 = obj->dx;
+        draw_rect.x1 = obj->ax + obj->dx + obj->tx;
+        draw_rect.y1 = obj->ay + obj->dy + obj->ty;
         draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y1 = obj->dy;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
     //draw_rect.xboundleft = obj->dx;
@@ -180,9 +194,8 @@ static void scrolltext_draw(gui_obj_t *obj)
             font_text_draw(&text->base, &draw_rect);
         }
     }
-    uint32_t total_section_count = dc->screen_height / dc->fb_height - ((dc->screen_height %
-                                                                         dc->fb_height) ?
-                                                                        0 : 1);
+    uint32_t total_section_count = dc->screen_height / dc->fb_height -
+                                   ((dc->screen_height % dc->fb_height) ? 0 : 1);
     if (dc->section_count == total_section_count)
     {
         font_text_destroy(&text->base);
@@ -225,7 +238,7 @@ void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *te
                              gui_color_t color, uint16_t length, uint8_t font_size)
 {
     this->base.text_type = text_type;
-    this->base.utf_8 = (uint8_t *)text;
+    this->base.content = (uint8_t *)text;
     this->base.color = color;
     this->base.len = length;
     this->base.font_height = font_size;

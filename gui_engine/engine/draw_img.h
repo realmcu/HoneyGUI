@@ -28,6 +28,7 @@ struct gui_rgb_data_head
 typedef enum
 {
     RGB565 = 0,
+    ARGB8565 = 1,
     RGB888 = 3,
     RGBA8888 = 4,
     BINARY = 5,
@@ -70,6 +71,7 @@ typedef struct draw_img
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
     uint32_t src_mode : 3;
+    uint32_t high_quality : 1;
 } draw_img_t;
 
 typedef struct gui_image_engine

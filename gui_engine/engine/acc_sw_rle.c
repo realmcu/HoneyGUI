@@ -20,8 +20,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "acc_engine.h"
-#include "acc_sw_blend.h"
-#include "acc_sw.h"
 #include "acc_sw_rle.h"
 #include "acc_sw_rle_bypass.h"
 #include "acc_sw_rle_bypass_matrix.h"
@@ -234,4 +232,3 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
     return;
 
 }
-

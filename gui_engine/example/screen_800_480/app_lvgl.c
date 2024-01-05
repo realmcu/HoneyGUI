@@ -16,7 +16,7 @@
 #include "utils.h"
 #include "trace.h"
 #include "gui_win.h"
-#include "app_cluster_data.h"
+#include "app_dashboard_data.h"
 #include "gui_app.h"
 #include "rtl876x.h"
 #include "app_launcher.h"

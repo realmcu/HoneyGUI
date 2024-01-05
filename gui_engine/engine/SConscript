@@ -29,14 +29,14 @@ src += ['acc_sw_rle_filter_matrix.c']
 src += ['acc_sw_rle_source_over.c']
 src += ['acc_sw_rle_source_over_matrix.c']
 
-if GetDepend(['BUILD_USING_VG_LITE']):
+if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
     src += ['acc_vg_lite.c']
 
-if GetDepend(['BUILD_USING_RTK_PPE']):
+if GetDepend(['CONFIG_REALTEK_BUILD_PPE']):
     src += ['acc_rtk_ppe.c']
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['BUILD_USING_RTK_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
 
 Return('group')
