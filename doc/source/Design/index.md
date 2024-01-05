@@ -403,7 +403,7 @@ filter_matrix_opacity_case8888 --> |no opacity|filter_matrix_opacity_value8888_2
 filter_matrix_opacity_case8888 --> |break|filter_matrix_opacity_value8888_0(0)
 ```
 * Additional information: In non-compressed filter matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
-### Overview Source_over
+### Overview No RLE Source_over
 ```{mermaid}
 graph TD
 alpha --> b{Identity matrix judgment}
@@ -427,6 +427,11 @@ alpha_565_565 --> alpha_opacity_case565{opacity}
 alpha_opacity_case565 --> |opacity + alpha| alpha_opacity_value0_255(0-255)
 alpha_opacity_case565 --> |alpha|alpha_opacity_value255(255)
 alpha_opacity_case565 --> |break|alpha_opacity_value0(0)
+alpha_565 --> | |alpha_8565_565
+alpha_8565_565 --> alpha_opacity_case8565{opacity}
+alpha_opacity_case8565 --> |opacity + alpha| alpha_opacity_argb8565value0_255(0-255)
+alpha_opacity_case8565 --> |alpha|alpha_opacity_argb8565value255(255)
+alpha_opacity_case8565 --> |break|alpha_opacity_argb8565value0(0)
 alpha_565 --> | |alpha_565_888
 alpha_565_888--> alpha_opacity_case888{opacity}
 alpha_opacity_case888 --> |opacity + alpha|alpha_opacity_value888_0_255(0-255)
@@ -448,6 +453,11 @@ alpha_matrix_565_565 --> alpha_matrix_opacity_case565{opacity}
 alpha_matrix_opacity_case565 --> |opacity + alpha| alpha_matrix_opacity_value0_255(0-255)
 alpha_matrix_opacity_case565 --> |alpha|alpha_matrix_opacity_value255(255)
 alpha_matrix_opacity_case565 --> |break|alpha_matrix_opacity_value0(0)
+alpha_matrix_565 --> | |alpha_matrix_8565_565
+alpha_matrix_8565_565 --> alpha_matrix_opacity_case8565{opacity}
+alpha_matrix_opacity_case8565 --> |opacity + alpha| alpha_matrix_opacity_argb8565value0_255(0-255)
+alpha_matrix_opacity_case8565 --> |alpha|alpha_matrix_opacity_argb8565value255(255)
+alpha_matrix_opacity_case8565 --> |break|alpha_matrix_argb8565opacity_value0(0)
 alpha_matrix_565 --> | |alpha_matrix_565_888
 alpha_matrix_565_888--> alpha_matrix_opacity_case888{opacity}
 alpha_matrix_opacity_case888 --> |opacity + alpha|alpha_matrix_opacity_value888_0_255(0-255)
@@ -598,6 +608,11 @@ rle_alpha_565_565 --> rle_alpha_opacity_case565{opacity}
 rle_alpha_opacity_case565 --> |opacity + alpha| rle_alpha_opacity_value0_255(0-255)
 rle_alpha_opacity_case565 --> |alpha|rle_alpha_opacity_value255(255)
 rle_alpha_opacity_case565 --> |break|rle_alpha_opacity_value0(0)
+rle_alpha_565 --> | |rle_alpha_8565_565
+rle_alpha_8565_565 --> rle_alpha_opacity_case8565{opacity}
+rle_alpha_opacity_case8565 --> |opacity + alpha| rle_alpha_opacity_argb8565value0_255(0-255)
+rle_alpha_opacity_case8565 --> |alpha|rle_alpha_opacity_argb8565value255(255)
+rle_alpha_opacity_case8565 --> |break|rle_alpha_opacity_argb8565value0(0)
 rle_alpha_565 --> | |rle_alpha_565_888
 rle_alpha_565_888--> rle_alpha_opacity_case888{opacity}
 rle_alpha_opacity_case888 --> |opacity + alpha|rle_alpha_opacity_value888_0_255(0-255)
@@ -619,6 +634,11 @@ rle_alpha_matrix_565_565 --> rle_alpha_matrix_opacity_case565{opacity}
 rle_alpha_matrix_opacity_case565 --> |opacity + alpha| rle_alpha_matrix_opacity_value0_255(0-255)
 rle_alpha_matrix_opacity_case565 --> |alpha|rle_alpha_matrix_opacity_value255(255)
 rle_alpha_matrix_opacity_case565 --> |break|rle_alpha_matrix_opacity_value0(0)
+rle_alpha_matrix_565 --> | |rle_alpha_matrix_8565_565
+rle_alpha_matrix_8565_565 --> rle_alpha_matrix_opacity_case8565{opacity}
+rle_alpha_matrix_opacity_case8565 --> |opacity + alpha| rle_alpha_matrix_opacity_argb8565value0_255(0-255)
+rle_alpha_matrix_opacity_case8565 --> |alpha|rle_alpha_matrix_opacity_argb8565value255(255)
+rle_alpha_matrix_opacity_case8565 --> |break|rle_alpha_matrix_opacity_argb8565value0(0)
 rle_alpha_matrix_565 --> | |rle_alpha_matrix_565_888
 rle_alpha_matrix_565_888--> rle_alpha_matrix_opacity_case888{opacity}
 rle_alpha_matrix_opacity_case888 --> |opacity + alpha|rle_alpha_matrix_opacity_value888_0_255(0-255)
@@ -632,6 +652,8 @@ rle_alpha_matrix_opacity_case8888 --> |break|rle_alpha_matrix_opacity_value8888_
 ```
 
 * Additional information: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
+
+
 
 
 
