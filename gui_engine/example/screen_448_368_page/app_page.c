@@ -35,7 +35,25 @@ void *get_app_page(void)
 {
     return &app_page;
 }
+static void app_app_ui_design(gui_app_t *app);
+static gui_app_t app_app =
+{
+    .screen =
+    {
+        .name = "app_app",
+        .x    = 0,
+        .y    = 0,
+        .parent = NULL,
+    },
+    .ui_design = app_app_ui_design,
+    .thread_entry = NULL,
+    .active_ms = 1000000,
+};
 
+void *get_app_app(void)
+{
+    return &app_app;
+}
 static void kb_button_cb(void *obj, gui_event_t e)
 {
     gui_log("line = %d \n", __LINE__);
@@ -106,6 +124,10 @@ static void event_cb_release(gui_button_t *button)
 {
     gui_button_set_animate(button, 1000, 0, callback_release, button);
 }
+static void event_cb_click(gui_button_t *button)
+{
+    gui_app_startup(get_app_app());
+}
 static void deal_img_in_root(gui_obj_t *object)
 {
     gui_list_t *node = NULL;
@@ -159,6 +181,7 @@ const static void *array[] =
     WALLET_BIN,
     WLAN_BIN,
 };
+static gui_button_t *button_array[sizeof(array) / sizeof(array[0])];
 static void app_page_ui_design(gui_app_t *app)
 {
     gui_log("app_page_ui_design\n");
@@ -175,10 +198,61 @@ static void app_page_ui_design(gui_app_t *app)
         gui_obj_add_event_cb(button, event_cb_release, GUI_EVENT_TOUCH_RELEASED, button);
         //gui_img_set_opacity(button->img, 200);
         gui_img_set_mode(button->img, IMG_SRC_OVER_MODE);
+        button_array[i] = button;
     }
+    gui_obj_add_event_cb(button_array[0], event_cb_click, GUI_EVENT_TOUCH_CLICKED, button_array[0]);
     gui_page_set_animate(page, 1000, -1, page_callback, page);
 }
+#include "gui_win.h"
+static void app_app_animate_exit(gui_win_t *win)
+{
+    touch_info_t *tp = tp_get_info();
+    if (tp->deltaX > gui_get_screen_width() / 3 || GET_BASE(win)->x > gui_get_screen_width() / 3 * 2)
+    {
+        GET_BASE(win)->x = gui_get_screen_width();
+    }
 
+    if (tp->type != TOUCH_INVALIDE)
+    {
+        GET_BASE(win)->x = tp->deltaX;
+    }
+
+
+}
+static void app_app_animate(gui_win_t *win)
+{
+    GET_BASE(win)->x = win->animate->progress_percent * (-((float)gui_get_screen_width())) +
+                       (float)gui_get_screen_width();
+    gui_log("x:%d\n", GET_BASE(win)->x);
+    if (win->animate->progress_percent == 1)
+    {
+        gui_win_set_animate(win, 200, -1, app_app_animate_exit, win);
+    }
+
+}
+static void app_app_ui_design(gui_app_t *app)
+{
+    gui_log("app_app_ui_design\n");
+    gui_win_t *win = gui_win_create(&(app->screen), 0, gui_get_screen_width(), 0, 0, 0);
+    gui_img_create_from_mem(win, 0, BACK_BIN, 0, 0, 0, 0);
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, REALGUI_BIN, 3, 3, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, DEVICE_NAME_BIN, 185, 3, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, STORAGE_BIN, 185, 187, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+
+
+
+    gui_win_set_animate(win, 200, 0, app_app_animate, win);
+
+}
 
 uint8_t resource_root[1024 * 1024 * 20];
 static int app_init(void)
