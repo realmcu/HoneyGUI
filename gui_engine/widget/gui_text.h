@@ -28,7 +28,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
+#include <string.h>
+#include "guidef.h"
+#include "gui_obj.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -64,24 +66,29 @@ typedef enum
     UNICODE_ENCODING = 1,
 } TEXT_CHARSET;
 
+/** @brief  font type enum */
+typedef enum
+{
+    GUI_FONT_SOURCE_BMP = 0,
+    GUI_FONT_SOURCE_TTF = 1,
+} FONT_SOUCE_TYPE;
+
 /** @brief  text widget structure */
 typedef struct gui_text
 {
     gui_obj_t base;
-    const struct gui_font_engine *engine;
     gui_color_t color;
-    TEXT_MODE mode;
     uint16_t len;
     uint16_t font_len;
     uint16_t text_offset;
+    TEXT_MODE mode;
     TEXT_CHARSET charset;
+    FONT_SOUCE_TYPE font_type;
     uint8_t font_height;
     uint8_t checksum;
-    //uint8_t font_width;
+    gui_animate_t *animate;
     void *content;
     void *data;
-    char *text_type;//!< "rtk from mem" or "rtk from fs"
-    gui_animate_t *animate;
     void *path;//!<  address or path
 } gui_text_t;
 

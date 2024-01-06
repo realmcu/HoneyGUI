@@ -174,8 +174,6 @@ int gui_server_init(void)
 
     gui_acc_init();
 
-    gui_system_image_init();
-    gui_system_font_init();
     gui_fb_change();
 
     gui_thread_create(GUI_SERVER_THREAD_NAME,

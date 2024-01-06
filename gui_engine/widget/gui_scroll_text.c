@@ -17,11 +17,9 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_scroll_text.h>
-#include <string.h>
-#include <draw_font.h>
-#include <gui_fb.h>
+#include "gui_scroll_text.h"
+#include "font_mem.h"
+#include "font_stb.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -84,6 +82,48 @@ static uint8_t skip_frame_count;
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static void gui_font_load(gui_text_t *text)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_load(text);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_load(text);
+        break;
+    default:
+        break;
+    }
+}
+static void gui_font_draw(gui_text_t *text, gui_rect_t *rect)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_draw(text, rect);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_draw(text, rect);
+        break;
+    default:
+        break;
+    }
+}
+static void gui_font_unload(gui_text_t *text)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_unload(text);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_unload(text);
+        break;
+    default:
+        break;
+    }
+}
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
@@ -143,7 +183,7 @@ static void scrolltext_draw(gui_obj_t *obj)
     if (dc->section_count == 0)
     {
         cur_time_ms = gui_ms_get();
-        font_text_create(&text->base);
+        gui_font_load(&text->base);
     }
     uint32_t offset = text->base.text_offset;
     uint32_t index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
@@ -153,10 +193,8 @@ static void scrolltext_draw(gui_obj_t *obj)
     if (text->base.mode == SCROLL_X && offset > obj->w)
     {
 
-        //draw_rect.x1 = obj->dx - text->cnt_value + text->start_value;
         draw_rect.x1 = obj->ax + obj->dx + obj->tx - text->cnt_value + text->start_value;
         draw_rect.x2 = draw_rect.x1 + text->base.text_offset;
-        //draw_rect.y1 = obj->dy;
         draw_rect.y1 = obj->ay + obj->dy + obj->ty;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
@@ -174,10 +212,6 @@ static void scrolltext_draw(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
-    //draw_rect.xboundleft = obj->dx;
-    // draw_rect.xboundright = obj->dx + obj->w;
-    // draw_rect.yboundtop = obj->dy;
-    // draw_rect.yboundbottom = obj->dy + obj->h;
 
     draw_rect.xboundleft = obj->ax + obj->dx + obj->tx;
     draw_rect.xboundright = obj->ax + obj->dx + obj->tx + obj->w;
@@ -185,31 +219,26 @@ static void scrolltext_draw(gui_obj_t *obj)
     draw_rect.yboundbottom = obj->ay + obj->dy + obj->ty + obj->h;
     if (text->duration_time_ms == 0)
     {
-        font_text_draw(&text->base, &draw_rect);
+        gui_font_draw(&text->base, &draw_rect);
     }
     else
     {
         if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
         {
-            font_text_draw(&text->base, &draw_rect);
+            gui_font_draw(&text->base, &draw_rect);
         }
     }
     uint32_t total_section_count = dc->screen_height / dc->fb_height -
                                    ((dc->screen_height % dc->fb_height) ? 0 : 1);
     if (dc->section_count == total_section_count)
     {
-        font_text_destroy(&text->base);
+        gui_font_unload(&text->base);
     }
 }
 
 static void scrolltext_end(gui_obj_t *obj)
 {
-    // gui_text_t *text = (gui_text_t *)obj;
-    // if (text->len == 0)
-    // {
-    //     return;
-    // }
-    // font_text_destroy(text);
+
 }
 
 static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char *name,
@@ -234,19 +263,24 @@ static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, cons
  *                           Public Functions
  *============================================================================*/
 
-void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
+void gui_scrolltext_text_set(gui_scroll_text_t *this, void *text, char *text_type,
                              gui_color_t color, uint16_t length, uint8_t font_size)
 {
-    this->base.text_type = text_type;
-    this->base.content = (uint8_t *)text;
-    this->base.color = color;
-    this->base.len = length;
-    this->base.font_height = font_size;
-    this->base.text_offset = 0;
+    gui_text_set(&this->base, text, text_type, color, length, font_size);
 }
 
-void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t start_value,
-                               uint8_t end_value,
+void gui_scrolltext_type_set(gui_scroll_text_t *this, void *font_source)
+{
+    this->base.path = font_source;
+}
+
+void gui_scrolltext_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
+{
+    this->base.charset = charset;
+}
+
+void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode,
+                               uint8_t start_value, uint8_t end_value,
                                uint32_t interval_time_ms, uint32_t duration_time_ms)
 {
     this->base.mode = mode;

@@ -17,11 +17,9 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_text.h>
-#include <string.h>
-#include "gui_obj.h"
-#include <draw_font.h>
+#include "gui_text.h"
+#include "font_mem.h"
+#include "font_stb.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -79,6 +77,48 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static void gui_font_load(gui_text_t *text)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_load(text);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_load(text);
+        break;
+    default:
+        break;
+    }
+}
+static void gui_font_draw(gui_text_t *text, gui_rect_t *rect)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_draw(text, rect);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_draw(text, rect);
+        break;
+    default:
+        break;
+    }
+}
+static void gui_font_unload(gui_text_t *text)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_unload(text);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_unload(text);
+        break;
+    default:
+        break;
+    }
+}
 
 static void text_prepare(gui_obj_t *o)
 {
@@ -140,14 +180,14 @@ static void text_draw(gui_obj_t *obj)
     draw_rect.y2 = draw_rect.y1 + obj->h;
     if (dc->section_count == 0)
     {
-        font_text_create(text);
+        gui_font_load(text);
     }
-    font_text_draw(text, &draw_rect);
+    gui_font_draw(text, &draw_rect);
     uint32_t total_section_count = dc->screen_height / dc->fb_height -
                                    ((dc->screen_height % dc->fb_height) ? 0 : 1);
     if (dc->section_count == total_section_count)
     {
-        font_text_destroy(text);
+        gui_font_unload(text);
     }
 }
 
@@ -181,7 +221,14 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
 void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t color,
                   uint16_t length, uint8_t font_size)
 {
-    this->text_type = text_type;
+    if (strncmp(text_type, "rtk_font_mem", strlen("rtk_font_mem")) == 0)
+    {
+        this->font_type = GUI_FONT_SOURCE_BMP;
+    }
+    else if (strncmp(text_type, "rtk_font_stb", strlen("rtk_font_stb")) == 0)
+    {
+        this->font_type = GUI_FONT_SOURCE_TTF;
+    }
     this->content = (uint8_t *)text;
     this->color = color;
     this->len = length;

@@ -28,9 +28,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <draw_font.h>
-#include <gui_text.h>
+#include <string.h>
+#include "guidef.h"
+#include "gui_text.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -154,9 +154,25 @@ void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t 
 * @return void
 *
 */
-void gui_scrolltext_text_set(gui_scroll_text_t *this, const char *text, char *text_type,
+void gui_scrolltext_text_set(gui_scroll_text_t *this, void *text, char *text_type,
                              gui_color_t color,
                              uint16_t length, uint8_t font_size);
+
+/**
+ * @brief set font encoding
+ * @note utf-8 or unicode
+ * @param this the scroll text box widget pointer
+ * @param encoding_type encoding_type
+ */
+void gui_scrolltext_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset);
+
+/**
+ * @brief set font type
+ * @note The type must match the font size!
+ * @param this the scroll text widget pointer
+ * @param font_source the addr of .ttf or .bin
+ */
+void gui_scrolltext_type_set(gui_scroll_text_t *this, void *font_source);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

@@ -1,125 +1,6 @@
 #include <draw_img.h>
 #include <string.h>
 
-extern void gui_image_bmp_init(void);
-extern void gui_image_rgb_init(void);
-extern void gui_image_rgb_compress_init(void);
-extern void gui_image_compress_mem_init(void);
-extern void gui_image_evo_init(void);
-extern void gui_image_path_init(void);
-extern void gui_image_bitmap_init(void);
-static gui_list_t _gui_system_image_list = {NULL};
-
-/* initialize rtgui image system */
-void gui_system_image_init(void)
-{
-    gui_list_init(&_gui_system_image_list);
-}
-
-static struct gui_image_engine *gui_image_get_engine_from_mem(draw_img_t *img)
-{
-    gui_img_file_head_t head;
-    memcpy(&head, img->data, sizeof(head));
-    char *string = NULL;
-    switch (head.type)
-    {
-    case 6:
-        string = "evo_mem";
-        break;
-    case 0:
-    case 1:
-    case 2:
-
-    case 4:
-        if (head.compress)
-        {
-            string = "compress_mem";
-        }
-        else
-        {
-            string = "rgb_mem";
-        }
-        break;
-    case 5:
-        string = "bitmap";
-        break;
-    case 7:
-    case 9:
-    case 10:
-    case 11:
-        string = "stb";
-        break;
-    case 8:
-        string = "dynamic";
-        break;
-    default:
-        string = "not_support";
-        break;
-    }
-    gui_list_t *node = NULL;
-    struct gui_image_engine *engine;
-    gui_list_for_each(node, &_gui_system_image_list)
-    {
-        GUI_ASSERT(node != NULL);
-        engine = gui_list_entry(node, struct gui_image_engine, list);
-
-        if (strlen(engine->name) == strlen(string))
-        {
-            if (strncasecmp(engine->name, string, strlen(engine->name)) == 0)
-            {
-                return engine;
-            }
-        }
-    }
-
-    bool match_no_image_engine = false;
-    GUI_ASSERT(match_no_image_engine);
-    return NULL;
-}
-
-#if 0
-static struct gui_image_engine *gui_image_get_engine_by_filename(const char *fn)
-{
-    gui_list_t *node = NULL;
-    struct gui_image_engine *engine;
-    const char *ext;
-
-    ext = fn + strlen(fn);
-    while (ext != fn)
-    {
-        if (*ext == '.')
-        {
-            ext ++;
-            if (*(ext - 3) == '.')//check '9.png'
-            {
-                ext -= 2;
-            }
-            break;
-        }
-        ext --;
-    }
-    if (ext == fn) { return NULL; } /* no ext */
-    if ((strncasecmp("jpg", ext, strlen("jpg")) == 0) ||
-        (strncasecmp("jpeg", ext, strlen("jpeg")) == 0) ||
-        (strncasecmp("JPG", ext, strlen("JPG")) == 0) ||
-        (strncasecmp("JPEG", ext, strlen("JPEG")) == 0))
-    {
-        ext = "jpeg";
-    }
-    gui_list_for_each(node, &_gui_system_image_list)
-    {
-        engine = gui_list_entry(node, struct gui_image_engine, list);
-        if (strncasecmp(engine->name, ext, strlen(engine->name)) == 0)
-        {
-            return engine;
-        }
-    }
-
-    return NULL;
-}
-#endif
-
-
 void gui_image_load_scale(draw_img_t *img)
 {
     struct gui_rgb_data_head head = {0};
@@ -141,18 +22,6 @@ void gui_image_load_scale(draw_img_t *img)
 
     img->img_w = head.w;
     img->img_h = head.h;
-}
-
-bool gui_image_create(draw_img_t *img, bool load)
-{
-    struct gui_image_engine *engine;
-
-    engine = gui_image_get_engine_from_mem(img);
-    engine->image_load(img, load);
-    img->engine = engine;
-
-
-    return true;
 }
 
 bool gui_image_new_area(draw_img_t *img)
@@ -247,32 +116,3 @@ bool gui_image_new_area(draw_img_t *img)
     img->target_h = (int16_t)y_max - (int16_t)y_min;
     return true;
 }
-
-
-
-void gui_image_destroy(draw_img_t *image)
-{
-    GUI_ASSERT(image != NULL);
-
-    image->engine->image_unload(image);
-
-}
-
-/* register an image engine */
-void gui_image_register_engine(struct gui_image_engine *engine)
-{
-    GUI_ASSERT(engine != NULL);
-
-    gui_list_append(&_gui_system_image_list, &(engine->list));
-}
-
-void gui_image_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
-{
-    if (image != NULL && image->engine != NULL)
-    {
-        /* use image engine to blit */
-        image->engine->image_blit(image, dc, rect);
-    }
-}
-
-

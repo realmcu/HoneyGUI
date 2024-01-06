@@ -74,38 +74,8 @@ typedef struct draw_img
     uint32_t high_quality : 1;
 } draw_img_t;
 
-typedef struct gui_image_engine
-{
-    const char *name;
-    gui_list_t list;
-
-    /* image engine function */
-    bool (*image_check)(draw_img_t *image);
-
-    bool (*image_load)(draw_img_t *image, bool load);
-    void (*image_unload)(draw_img_t *image);
-
-    void (*image_blit)(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
-
-
-} gui_image_engine_t;
-
-
-
-/* init rtgui image system */
-void gui_system_image_init(void);
 void gui_image_load_scale(draw_img_t *img);
 bool gui_image_new_area(draw_img_t *img);
-bool gui_image_create(draw_img_t *img, bool load);
-void gui_image_destroy(draw_img_t *image);
-void gui_image_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
-
-/* register an image engine */
-void gui_image_register_engine(struct gui_image_engine *engine);
-
-
-
-
 
 #ifdef __cplusplus
 }
