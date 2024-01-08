@@ -91,8 +91,8 @@ static void tab_prepare(gui_obj_t *obj)
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     if (this->style == CLASSIC)
     {
-        obj->tx = (this->id.x - parent->cur_id.x) * (int)this->base.w;
-        obj->ty = (this->id.y - parent->cur_id.y) * (int)this->base.h;
+        obj->tx += (this->id.x - parent->cur_id.x) * (int)this->base.w;
+        obj->ty += (this->id.y - parent->cur_id.y) * (int)this->base.h;
         return;
     }
     else if (this->style == FADE)
