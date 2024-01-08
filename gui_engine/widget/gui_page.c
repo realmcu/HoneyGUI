@@ -93,7 +93,7 @@ static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
         {
             obj->ax = obj->x + obj->parent->ax;
             obj->ay = obj->y + obj->parent->ay;
-            ayend = obj->ay + obj->h;
+            if (ayend < obj->ay + obj->h) { ayend = obj->ay + obj->h; }
             if (*out < ayend)
             {
                 *out = ayend;
