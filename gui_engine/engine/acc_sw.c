@@ -320,7 +320,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
             if (img_type == ARGB8565)
             {
-                //alpha_matrix_blitargb8565_to_rgb565(image, dc, rect);
+                alpha_matrix_blit_argb8565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {

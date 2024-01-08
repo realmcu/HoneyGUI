@@ -31,11 +31,12 @@ uint16_t do_blending_rgb565_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8_t a
     // with mask 00000111111000001111100000011111
     // This is useful because it makes space for a parallel fixed-point multiply
     alpha = (alpha + 4) >> 3;
-    bg = ((bg | (bg << 16)) & 0x07C5F81F);
-    fg = ((fg | (fg << 16)) & 0x07C5F81F);
-    uint32_t result = (((((fg - bg) * alpha) >> 5) + bg) & 0x07C5F81F);
+    bg = ((bg | (bg << 16)) & 0x07e0f81f);
+    fg = ((fg | (fg << 16)) & 0x07e0f81f);
+    uint32_t result = (((((fg - bg) * alpha) >> 5) + bg) & 0x07e0f81f);
     return (uint16_t)((result >> 16) | result);
 }
+#if 0
 void  do_blending_argb8565_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t alpha)
 {
     uint8_t Sa = alpha;
@@ -53,7 +54,7 @@ void  do_blending_argb8565_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t
 
     *d = red + green + blue ;
 }
-
+#endif
 void do_blending_rgb888_2_rgb565(uint16_t *d, gui_color_t *s)
 {
     uint8_t Sa = 255;

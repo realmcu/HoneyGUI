@@ -30,6 +30,8 @@ void alpha_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *
                                          gui_rect_t *rect);
 void alpha_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                        gui_rect_t *rect);
+void alpha_matrix_blit_argb8565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                         gui_rect_t *rect);
 void alpha_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                        gui_rect_t *rect);
 void alpha_matrix_blit_rgba8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
