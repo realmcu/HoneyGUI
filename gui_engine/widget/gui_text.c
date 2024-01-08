@@ -287,6 +287,12 @@ void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
     this->charset = charset;
 }
 
+void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
+{
+    this->content = (uint8_t *)text;
+    this->len = length;
+}
+
 gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
                             int16_t w, int16_t h)
 {

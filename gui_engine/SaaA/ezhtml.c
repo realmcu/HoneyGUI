@@ -419,10 +419,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     font_type2 = "rtk_font_stb";
                                     t->path = gui_get_file_address(font);
                                     t->font_height = fontSize;
+                                    t->font_type = GUI_FONT_SOURCE_TTF;
 #elif defined RTL8772F
                                     font_type2 = "rtk_font_stb";
                                     t->path = gui_get_file_address(font);
                                     t->font_height = fontSize;
+                                    t->font_type = GUI_FONT_SOURCE_TTF;
 #else
                                     font_type =
                                         "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
@@ -438,11 +440,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         void *addr2 = gui_get_file_address(b);
                                         gui_set_font_mem_resourse(fontSize, addr1,  addr2);
                                         t->path = 0;
-
+                                        t->font_type = GUI_FONT_SOURCE_BMP;
                                     }
 #endif
                                 }
-                                GUI_TYPE(gui_text_t, t)->text_type = font_type2;
 
                             }
                         }
@@ -1854,9 +1855,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 #ifdef __WIN32
                             font_type2 = "rtk_font_stb";
                             GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
+                            GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SOURCE_TTF;
 #elif defined RTL8772F
                             font_type2 = "rtk_font_stb";
                             GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
+                            GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SOURCE_TTF;
 #else
                             font_type =
                                 "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
@@ -1872,10 +1875,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 void *addr2 = gui_get_file_address(b);
                                 gui_set_font_mem_resourse(32, addr1,  addr2);
                                 GUI_TYPE(gui_button_t, parent)->text->path = 0;
+                                GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SOURCE_BMP;
                             }
 #endif
                         }
-                        GUI_TYPE(gui_button_t, parent)->text->text_type = font_type2;
 
                     }
 

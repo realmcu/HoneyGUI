@@ -218,6 +218,15 @@ void gui_text_type_set(gui_text_t *this, void *font_source);
 void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset);
 
 /**
+ * @brief set text content
+ *
+ * @param this the text widget pointer
+ * @param text the text string.
+ * @param length the text string's length
+ */
+void gui_text_content_set(gui_text_t *this, void *text, uint16_t length);
+
+/**
  * @brief create a text box widget.
  * @note The area of the text box should be larger than that of the string to be shown, otherwise, part of the text will be hidden.
  * @param parent the father widget which the text nested in.

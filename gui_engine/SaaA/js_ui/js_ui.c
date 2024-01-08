@@ -72,8 +72,7 @@ DECLARE_HANDLER(write)
         jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); ////gui_log("jerryenter4\n");
         strbuf1[length] = '\0';
         gui_free(txtbox->content);
-        gui_text_set(txtbox, (void *)strbuf1, txtbox->text_type, txtbox->color, length,
-                     txtbox->font_height);
+        gui_text_content_set(txtbox, (void *)strbuf1, length);
         jerry_release_value(s);
     }
     return jerry_create_undefined();
