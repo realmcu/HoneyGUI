@@ -1,4 +1,5 @@
-#include <draw_font.h>
+#include "draw_font.h"
+#include "font_stb.h"
 #define STB_TRUETYPE_IMPLEMENTATION
 #define STB_REDUCE_MEMORY
 // #define ALLOW_UNALIGNED_TRUETYPE
@@ -7,7 +8,7 @@
 
 static stbtt_fontinfo font;
 void gui_font_stb_init(void *font_ttf_addr);
-static void gui_font_stb_load(gui_text_t *text)
+void gui_font_stb_load(gui_text_t *text)
 {
     if (text->path)
     {
@@ -82,7 +83,7 @@ static void gui_font_stb_load(gui_text_t *text)
     }
 }
 
-static void gui_font_stb_unload(gui_text_t *text)
+void gui_font_stb_unload(gui_text_t *text)
 {
     gui_free(((FONT_STB_SCREEN *)text->data)->buf);
     gui_free((FONT_STB_SCREEN *)text->data);
@@ -328,7 +329,7 @@ static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_cou
     shape->paths = path;
 }
 #endif
-static void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
+void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
 {
     int ascent = 0, descent = 0, lineGap = 0, ch = 0, line_num = 0;
     float scale = 0, xpos = 0, ypos = 0, baseline = 0;
@@ -622,15 +623,6 @@ static void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
         break;
     }
 }
-
-struct gui_font_engine gui_font_stb_engine =
-{
-    "rtk_font_stb",
-    { NULL },
-    gui_font_stb_load,
-    gui_font_stb_unload,
-    gui_font_stb_draw,
-};
 
 void gui_font_stb_init(void *font_ttf_addr)
 {

@@ -82,7 +82,8 @@ void gui_app_startup(gui_app_t *app)
     {
         current_app = app;
     }
-
+    app->screen.opacity_value = UINT8_MAX;
+    app->screen.create_done = true;
 
 }
 
