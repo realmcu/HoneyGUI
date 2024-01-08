@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"painterengine_application.h": "c",
+			"px_file.h": "c",
+			"painterengine.h": "c"
+		}
+	}
+}
