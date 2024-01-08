@@ -11,57 +11,50 @@
 
 typedef enum
 {
-    PX_OBJECT_MESSAGEBOX_MODE_EXPAND,
-    PX_OBJECT_MESSAGEBOX_MODE_CLOSE
-} PX_OBJECT_MESSAGEBOX_MODE;
+	PX_OBJECT_MESSAGEBOX_MODE_EXPAND,
+	PX_OBJECT_MESSAGEBOX_MODE_CLOSE
+}PX_OBJECT_MESSAGEBOX_MODE;
 
 
 typedef enum
 {
-    PX_MESSAGEBOX_COLORMOD_LIGHT,
-    PX_MESSAGEBOX_COLORMOD_NIGHT,
-} PX_MESSAGEBOX_COLORMOD;
+	PX_MESSAGEBOX_COLORMOD_LIGHT,
+	PX_MESSAGEBOX_COLORMOD_NIGHT,
+}PX_MESSAGEBOX_COLORMOD;
 
 struct _PX_Object_MessageBox;
 
-typedef px_void(*PX_Object_MessageBoxCallBack)(PX_Object *pmessagebox, PX_Object_Event e,
-                                               px_void *ptr);
+typedef px_void  (*PX_Object_MessageBoxCallBack)(PX_Object *pmessagebox,PX_Object_Event e, px_void *ptr);
 
 typedef struct _PX_Object_MessageBox
 {
-    px_int schedule;
+	px_int schedule;
 
-    PX_OBJECT_MESSAGEBOX_MODE mode;
-    PX_MESSAGEBOX_COLORMOD colormod;
+	PX_OBJECT_MESSAGEBOX_MODE mode;
+	PX_MESSAGEBOX_COLORMOD colormod;
 
-    px_int PX_MESSAGEBOX_STAGE_1_HEIGHT;
-    px_int PX_MESSAGEBOX_STAGE_2_HEIGHT;
+	px_int PX_MESSAGEBOX_STAGE_1_HEIGHT;
+	px_int PX_MESSAGEBOX_STAGE_2_HEIGHT;
 
-    PX_Object_MessageBoxCallBack function_yes, function_no;
-    px_void *function_yes_ptr, *function_no_ptr;
-    px_char Message[PX_OBJECT_MESSAGEBOX_MAX_MESSAGESIZE];
-    PX_FontModule *fontmodule;
-    PX_Object *btn_Ok, *btn_Cancel, *edit_inputbox;
+	PX_Object_MessageBoxCallBack function_yes,function_no;
+	px_void *function_yes_ptr,*function_no_ptr;
+	px_char Message[PX_OBJECT_MESSAGEBOX_MAX_MESSAGESIZE];
+	PX_FontModule *fontmodule;
+	PX_Object *btn_Ok,*btn_Cancel,*edit_inputbox;
 
-    px_color fillbackgroundcolor;
-} PX_Object_MessageBox;
+	px_color fillbackgroundcolor;
+}PX_Object_MessageBox;
 
 
 PX_Object_MessageBox *PX_Object_GetMessageBox(PX_Object *pObject);
 px_void PX_Object_MessageBoxClose(PX_Object *pObject);
-px_void PX_Object_MessageBoxAlertOk(PX_Object *pObject, const px_char *message,
-                                    PX_Object_MessageBoxCallBack func_callback, px_void *ptr);
-px_void PX_Object_MessageBoxAlert(PX_Object *pObject, const px_char *message);
-px_void PX_Object_MessageBoxAlertYesNo(PX_Object *pObject, const char *Message,
-                                       PX_Object_MessageBoxCallBack func_yescallback, px_void *yesptr,
-                                       PX_Object_MessageBoxCallBack func_nocallback, px_void *noptr);
-px_void PX_Object_MessageBoxInputBox(PX_Object *pObject, const char *Message,
-                                     PX_Object_MessageBoxCallBack func_yescallback, px_void *yesptr,
-                                     PX_Object_MessageBoxCallBack func_cancelcallback, px_void *cancelptr);
-px_char *PX_Object_MessageBoxGetInput(PX_Object *pObject);
-PX_Object *PX_Object_MessageBoxCreate(px_memorypool *mp, PX_Object *parent,
-                                      PX_FontModule *fontmodule);
-px_void PX_Object_MessageBoxSetMode(PX_Object *pObject, PX_MESSAGEBOX_COLORMOD mode);
-px_void PX_Object_MessageBoxSetFillColor(PX_Object *pObject, px_color color);
+px_void PX_Object_MessageBoxAlertOk(PX_Object *pObject,const px_char *message,PX_Object_MessageBoxCallBack func_callback,px_void *ptr);
+px_void PX_Object_MessageBoxAlert(PX_Object *pObject,const px_char *message);
+px_void PX_Object_MessageBoxAlertYesNo(PX_Object *pObject,const char *Message,PX_Object_MessageBoxCallBack func_yescallback,px_void *yesptr,PX_Object_MessageBoxCallBack func_nocallback,px_void *noptr);
+px_void PX_Object_MessageBoxInputBox(PX_Object *pObject,const char *Message,PX_Object_MessageBoxCallBack func_yescallback,px_void *yesptr,PX_Object_MessageBoxCallBack func_cancelcallback,px_void *cancelptr);
+px_char * PX_Object_MessageBoxGetInput(PX_Object *pObject);
+PX_Object * PX_Object_MessageBoxCreate(px_memorypool *mp,PX_Object *parent,PX_FontModule *fontmodule);
+px_void PX_Object_MessageBoxSetMode(PX_Object* pObject, PX_MESSAGEBOX_COLORMOD mode);
+px_void PX_Object_MessageBoxSetFillColor(PX_Object* pObject, px_color color);
 #endif
 

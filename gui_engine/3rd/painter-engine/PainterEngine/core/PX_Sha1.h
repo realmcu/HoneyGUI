@@ -42,10 +42,10 @@ typedef struct
 //  Combines Sha1Initialise, Sha1Update, and Sha1Finalise into one function. Calculates the SHA1 hash of the buffer.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 px_void
-PX_Sha1Calculate
-(
-    px_void  const        *Buffer,         // [in]
-    px_uint32            BufferSize,     // [in]
-    PX_SHA1_HASH          *Digest          // [in]
-);
+    PX_Sha1Calculate
+    (
+        px_void  const*        Buffer,         // [in]
+        px_uint32            BufferSize,     // [in]
+        PX_SHA1_HASH*          Digest          // [in]
+    );
 #endif

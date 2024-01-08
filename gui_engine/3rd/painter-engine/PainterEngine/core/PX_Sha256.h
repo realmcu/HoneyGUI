@@ -44,13 +44,13 @@ typedef struct
 //  buffer.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-PX_Sha256Calculate
-(
-    void        *Buffer,         // [in]
-    px_uint32            BufferSize,     // [in]
-    PX_SHA256_HASH        *Digest          // [in]
-);
+    PX_Sha256Calculate
+    (
+        void*        Buffer,         // [in]
+        px_uint32            BufferSize,     // [in]
+        PX_SHA256_HASH*        Digest          // [in]
+    );
 
-void PX_Sha256CalculateHashString(px_void *buffer, px_uint32 bufferSize, px_char stringKey[32]);
+void PX_Sha256CalculateHashString(px_void *buffer,px_uint32 bufferSize,px_char stringKey[32]);
 #endif
 

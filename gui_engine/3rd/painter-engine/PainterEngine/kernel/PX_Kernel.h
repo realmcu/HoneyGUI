@@ -2,7 +2,7 @@
 /*
   PainterEngine Kernel
   (C)2019 DBinary <matrixcascade@gmail.com tel-18959060883>
-
+  
   This program is free software; you can redistribute it and/or modify
   it under the terms of the BSD3 General Public License
 */

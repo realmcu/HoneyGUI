@@ -25,28 +25,27 @@
 #define MIN(x, y) ( ((x)<(y))?(x):(y) )
 
 #define STORE32H(x, y)                                                                     \
-    { (y)[0] = (px_uchar)(((x)>>24)&255); (y)[1] = (px_uchar)(((x)>>16)&255);   \
-        (y)[2] = (px_uchar)(((x)>>8)&255); (y)[3] = (px_uchar)((x)&255); }
+     { (y)[0] = (px_uchar)(((x)>>24)&255); (y)[1] = (px_uchar)(((x)>>16)&255);   \
+       (y)[2] = (px_uchar)(((x)>>8)&255); (y)[3] = (px_uchar)((x)&255); }
 
 #define LOAD32H(x, y)                            \
-    { x = ((px_uint32)((y)[0] & 255)<<24) | \
-          ((px_uint32)((y)[1] & 255)<<16) | \
-          ((px_uint32)((y)[2] & 255)<<8)  | \
-          ((px_uint32)((y)[3] & 255)); }
+     { x = ((px_uint32)((y)[0] & 255)<<24) | \
+           ((px_uint32)((y)[1] & 255)<<16) | \
+           ((px_uint32)((y)[2] & 255)<<8)  | \
+           ((px_uint32)((y)[3] & 255)); }
 
 #define STORE64H(x, y)                                                                     \
-    { (y)[0] = (px_uchar)(((x)>>56)&255); (y)[1] = (px_uchar)(((x)>>48)&255);     \
-        (y)[2] = (px_uchar)(((x)>>40)&255); (y)[3] = (px_uchar)(((x)>>32)&255);     \
-        (y)[4] = (px_uchar)(((x)>>24)&255); (y)[5] = (px_uchar)(((x)>>16)&255);     \
-        (y)[6] = (px_uchar)(((x)>>8)&255); (y)[7] = (px_uchar)((x)&255); }
+   { (y)[0] = (px_uchar)(((x)>>56)&255); (y)[1] = (px_uchar)(((x)>>48)&255);     \
+     (y)[2] = (px_uchar)(((x)>>40)&255); (y)[3] = (px_uchar)(((x)>>32)&255);     \
+     (y)[4] = (px_uchar)(((x)>>24)&255); (y)[5] = (px_uchar)(((x)>>16)&255);     \
+     (y)[6] = (px_uchar)(((x)>>8)&255); (y)[7] = (px_uchar)((x)&255); }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  CONSTANTS
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // The K array
-static const px_uint32 K[64] =
-{
+static const px_uint32 K[64] = {
     0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL, 0x3956c25bUL,
     0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL, 0xd807aa98UL, 0x12835b01UL,
     0x243185beUL, 0x550c7dc3UL, 0x72be5d74UL, 0x80deb1feUL, 0x9bdc06a7UL,
@@ -79,10 +78,10 @@ static const px_uint32 K[64] =
 #define Gamma1( x )       (S(x, 17) ^ S(x, 19) ^ R(x, 10))
 
 #define Sha256Round( a, b, c, d, e, f, g, h, i )       \
-    t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[i];   \
-    t1 = Sigma0(a) + Maj(a, b, c);                    \
-    d += t0;                                          \
-    h  = t0 + t1;
+     t0 = h + Sigma1(e) + Ch(e, f, g) + K[i] + W[i];   \
+     t1 = Sigma0(a) + Maj(a, b, c);                    \
+     d += t0;                                          \
+     h  = t0 + t1;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  TransformFunction
@@ -91,11 +90,11 @@ static const px_uint32 K[64] =
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static
 void
-PX_TransformFunction
-(
-    PX_Sha256Context      *Context,
-    px_uchar const      *Buffer
-)
+    PX_TransformFunction
+    (
+        PX_Sha256Context*      Context,
+        px_uchar const*      Buffer
+    )
 {
     px_uint32    S[8];
     px_uint32    W[64];
@@ -105,27 +104,27 @@ PX_TransformFunction
     px_int         i;
 
     // Copy state into S
-    for (i = 0; i < 8; i++)
+    for( i=0; i<8; i++ )
     {
         S[i] = Context->state[i];
     }
 
     // Copy the state into 512-bits into W[0..15]
-    for (i = 0; i < 16; i++)
+    for( i=0; i<16; i++ )
     {
-        LOAD32H(W[i], Buffer + (4 * i));
+        LOAD32H( W[i], Buffer + (4*i) );
     }
 
     // Fill W[16..63]
-    for (i = 16; i < 64; i++)
+    for( i=16; i<64; i++ )
     {
-        W[i] = Gamma1(W[i - 2]) + W[i - 7] + Gamma0(W[i - 15]) + W[i - 16];
+        W[i] = Gamma1( W[i-2]) + W[i-7] + Gamma0( W[i-15] ) + W[i-16];
     }
 
     // Compress
-    for (i = 0; i < 64; i++)
+    for( i=0; i<64; i++ )
     {
-        Sha256Round(S[0], S[1], S[2], S[3], S[4], S[5], S[6], S[7], i);
+        Sha256Round( S[0], S[1], S[2], S[3], S[4], S[5], S[6], S[7], i );
         t = S[7];
         S[7] = S[6];
         S[6] = S[5];
@@ -138,7 +137,7 @@ PX_TransformFunction
     }
 
     // Feedback
-    for (i = 0; i < 8; i++)
+    for( i=0; i<8; i++ )
     {
         Context->state[i] = Context->state[i] + S[i];
     }
@@ -154,10 +153,10 @@ PX_TransformFunction
 //  Initialises a SHA256 Context. Use this to initialise/reset a context.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-PX_Sha256Initialise
-(
-    PX_Sha256Context      *Context         // [out]
-)
+    PX_Sha256Initialise
+    (
+        PX_Sha256Context*      Context         // [out]
+    )
 {
     Context->curlen = 0;
     Context->length = 0;
@@ -178,43 +177,43 @@ PX_Sha256Initialise
 //  calling this function until all the data has been added. Then call Sha256Finalise to calculate the hash.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-PX_Sha256Update
-(
-    PX_Sha256Context      *Context,        // [in out]
-    void                 *Buffer,         // [in]
-    px_uint32            BufferSize      // [in]
-)
+    PX_Sha256Update
+    (
+        PX_Sha256Context*      Context,        // [in out]
+        void		*         Buffer,         // [in]
+        px_uint32            BufferSize      // [in]
+    )
 {
     px_uint32 n;
 
-    if (Context->curlen > sizeof(Context->buf))
+    if( Context->curlen > sizeof(Context->buf) )
     {
-        return;
+       return;
     }
 
-    while (BufferSize > 0)
+    while( BufferSize > 0 )
     {
-        if (Context->curlen == 0 && BufferSize >= BLOCK_SIZE)
+        if( Context->curlen == 0 && BufferSize >= BLOCK_SIZE )
         {
-            PX_TransformFunction(Context, (px_uchar *)Buffer);
-            Context->length += BLOCK_SIZE * 8;
-            Buffer = (px_uchar *)Buffer + BLOCK_SIZE;
-            BufferSize -= BLOCK_SIZE;
+           PX_TransformFunction( Context, (px_uchar*)Buffer );
+           Context->length += BLOCK_SIZE * 8;
+           Buffer = (px_uchar*)Buffer + BLOCK_SIZE;
+           BufferSize -= BLOCK_SIZE;
         }
         else
         {
-            n = MIN(BufferSize, (BLOCK_SIZE - Context->curlen));
-            PX_memcpy(Context->buf + Context->curlen, (px_void *)Buffer, (px_int)n);
-            Context->curlen += n;
-            Buffer = (px_uchar *)Buffer + n;
-            BufferSize -= n;
-            if (Context->curlen == BLOCK_SIZE)
-            {
-                PX_TransformFunction(Context, Context->buf);
-                Context->length += 8 * BLOCK_SIZE;
-                Context->curlen = 0;
-            }
-        }
+           n = MIN( BufferSize, (BLOCK_SIZE - Context->curlen) );
+           PX_memcpy( Context->buf + Context->curlen, (px_void *)Buffer, (px_int)n );
+           Context->curlen += n;
+           Buffer = (px_uchar*)Buffer + n;
+           BufferSize -= n;
+           if( Context->curlen == BLOCK_SIZE )
+           {
+              PX_TransformFunction( Context, Context->buf );
+              Context->length += 8*BLOCK_SIZE;
+              Context->curlen = 0;
+           }
+       }
     }
 }
 
@@ -225,17 +224,17 @@ PX_Sha256Update
 //  calling this, Sha256Initialised must be used to reuse the context.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-PX_Sha256Finalise
-(
-    PX_Sha256Context      *Context,        // [in out]
-    PX_SHA256_HASH        *Digest          // [out]
-)
+    PX_Sha256Finalise
+    (
+        PX_Sha256Context*      Context,        // [in out]
+        PX_SHA256_HASH*        Digest          // [out]
+    )
 {
     px_int i;
 
-    if (Context->curlen >= sizeof(Context->buf))
+    if( Context->curlen >= sizeof(Context->buf) )
     {
-        return;
+       return;
     }
 
     // Increase the length of the message
@@ -247,9 +246,9 @@ PX_Sha256Finalise
     // if the length is currently above 56 bytes we append zeros
     // then compress.  Then we can fall back to padding zeros and length
     // encoding like normal.
-    if (Context->curlen > 56)
+    if( Context->curlen > 56 )
     {
-        while (Context->curlen < 64)
+        while( Context->curlen < 64 )
         {
             Context->buf[Context->curlen++] = (px_uchar)0;
         }
@@ -258,19 +257,19 @@ PX_Sha256Finalise
     }
 
     // Pad up to 56 bytes of zeroes
-    while (Context->curlen < 56)
+    while( Context->curlen < 56 )
     {
         Context->buf[Context->curlen++] = (px_uchar)0;
     }
 
     // Store length
-    STORE64H(Context->length, Context->buf + 56);
-    PX_TransformFunction(Context, Context->buf);
+    STORE64H( Context->length, Context->buf+56 );
+    PX_TransformFunction( Context, Context->buf );
 
     // Copy output
-    for (i = 0; i < 8; i++)
+    for( i=0; i<8; i++ )
     {
-        STORE32H(Context->state[i], Digest->bytes + (4 * i));
+        STORE32H( Context->state[i], Digest->bytes+(4*i) );
     }
 }
 
@@ -281,32 +280,32 @@ PX_Sha256Finalise
 //  buffer.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void
-PX_Sha256Calculate
-(
-    px_void        *Buffer,         // [in]
-    px_uint32            BufferSize,     // [in]
-    PX_SHA256_HASH        *Digest          // [in]
-)
+    PX_Sha256Calculate
+    (
+        px_void*        Buffer,         // [in]
+        px_uint32            BufferSize,     // [in]
+        PX_SHA256_HASH*        Digest          // [in]
+    )
 {
     PX_Sha256Context context;
 
-    PX_Sha256Initialise(&context);
-    PX_Sha256Update(&context, Buffer, BufferSize);
-    PX_Sha256Finalise(&context, Digest);
+    PX_Sha256Initialise( &context );
+    PX_Sha256Update( &context, Buffer, BufferSize );
+    PX_Sha256Finalise( &context, Digest );
 }
 
-void PX_Sha256CalculateHashString(px_void *buffer, px_uint32 bufferSize, px_char stringKey[32])
+void PX_Sha256CalculateHashString(px_void *buffer,px_uint32 bufferSize,px_char stringKey[32])
 {
-    px_int i;
-    PX_SHA256_HASH hash;
-    PX_Sha256Calculate(buffer, bufferSize, &hash);
-    for (i = 0; i < 31; i++)
-    {
-        if (hash.bytes[i] == 0)
-        {
-            hash.bytes[i] = 1;
-        }
-    }
-    hash.bytes[31] = 0;
-    PX_memcpy(stringKey, hash.bytes, sizeof(hash.bytes));
+	px_int i;
+	PX_SHA256_HASH hash;
+	PX_Sha256Calculate(buffer,bufferSize,&hash);
+	for (i=0;i<31;i++)
+	{
+		if (hash.bytes[i]==0)
+		{
+			hash.bytes[i]=1;
+		}
+	}
+	hash.bytes[31]=0;
+	PX_memcpy(stringKey,hash.bytes,sizeof(hash.bytes));
 }

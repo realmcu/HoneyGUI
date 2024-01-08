@@ -14,16 +14,15 @@ typedef struct
     px_dword Elapsed;
 } PX_Object_Timer;
 
-PX_Object *PX_Object_TimerCreate(px_memorypool *mp, PX_Object *parent, px_int execCount,
-                                 px_dword interval);
+PX_Object *PX_Object_TimerCreate(px_memorypool *mp, PX_Object *parent, px_int execCount, px_dword interval);
 PX_Object_Timer *PX_Object_GetTimer(PX_Object *);
 
 px_bool PX_Object_TimerPause(PX_Object *);
 px_bool PX_Object_TimerResume(PX_Object *);
 px_bool PX_Object_TimerClear(PX_Object *);
 
-px_void PX_Object_TimerDeleteAfterTrigger(PX_Object *pObject, px_bool b);
-px_void PX_Object_TimerTimeOutTriggerOnce(PX_Object *pObject, px_bool b);
+px_void PX_Object_TimerDeleteAfterTrigger(PX_Object *pObject,px_bool b);
+px_void PX_Object_TimerTimeOutTriggerOnce(PX_Object* pObject, px_bool b);
 
 
 #endif

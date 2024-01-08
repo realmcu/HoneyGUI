@@ -68,11 +68,9 @@ PX_Object *PX_Object_JoystickCreate(
     joystick.Angle = 0.0;
     joystick.ActionAreaRadius = actionAreaRadius;
     joystick.JoystickRadius = joystickRadius;
-    joystick.SenseRadius = senseRadius > actionAreaRadius + joystickRadius ? senseRadius :
-                           actionAreaRadius + joystickRadius;
+    joystick.SenseRadius = senseRadius > actionAreaRadius + joystickRadius ? senseRadius : actionAreaRadius + joystickRadius;
 
-    pObject = PX_ObjectCreateEx(mp, Parent, x, y, z, 0.0f, 0.0f, 0.0f, PX_OBJECT_TYPE_JOYSTICK, PX_NULL,
-                                Func_JoystickRender, PX_NULL, &joystick, sizeof(PX_Object_Joystick));
+    pObject = PX_ObjectCreateEx(mp, Parent, x, y, z, 0.0f, 0.0f, 0.0f, PX_OBJECT_TYPE_JOYSTICK, PX_NULL, Func_JoystickRender, PX_NULL, &joystick, sizeof(PX_Object_Joystick));
 
     if (pObject == PX_NULL)
     {

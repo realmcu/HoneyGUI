@@ -12,15 +12,15 @@
  */
 #define PX_VK_BACK           0x08
 #define PX_VK_TAB            0x09
-/*
- * 0x0A - 0x0B : reserved
- */
+ /*
+  * 0x0A - 0x0B : reserved
+  */
 
 #define PX_VK_CLEAR          0x0C
 #define PX_VK_RETURN         0x0D
-/*
- * 0x0E - 0x0F : unassigned
- */
+  /*
+   * 0x0E - 0x0F : unassigned
+   */
 #define PX_VK_SHIFT          0x10
 #define PX_VK_CONTROL        0x11
 #define PX_VK_MENU           0x12
@@ -56,17 +56,17 @@
 #define PX_VK_INSERT         0x2D
 #define PX_VK_DELETE         0x2E
 #define PX_VK_HELP           0x2F
-/*
-* PX_VK_0 - PX_VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
-* 0x3A - 0x40 : unassigned
-* PX_VK_A - PX_VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
-*/
+   /*
+	* PX_VK_0 - PX_VK_9 are the same as ASCII '0' - '9' (0x30 - 0x39)
+	* 0x3A - 0x40 : unassigned
+	* PX_VK_A - PX_VK_Z are the same as ASCII 'A' - 'Z' (0x41 - 0x5A)
+	*/
 #define PX_VK_LWIN           0x5B
 #define PX_VK_RWIN           0x5C
 #define PX_VK_APPS           0x5D
-/*
- * 0x5E : reserved
- */
+	/*
+	 * 0x5E : reserved
+	 */
 #define PX_VK_SLEEP          0x5F
 #define PX_VK_NUMPAD0        0x60
 #define PX_VK_NUMPAD1        0x61
@@ -110,37 +110,37 @@
 #define PX_VK_F24            0x87
 #define PX_VK_NUMLOCK        0x90
 #define PX_VK_SCROLL         0x91
-/*
- * NEC PC-9800 kbd definitions
- */
+	 /*
+	  * NEC PC-9800 kbd definitions
+	  */
 #define PX_VK_OEM_NEC_EQUAL  0x92   // '=' key on numpad
-/*
- * Fujitsu/OASYS kbd definitions
- */
+	  /*
+	   * Fujitsu/OASYS kbd definitions
+	   */
 #define PX_VK_OEM_FJ_JISHO   0x92   // 'Dictionary' key
 #define PX_VK_OEM_FJ_MASSHOU 0x93   // 'Unregister word' key
 #define PX_VK_OEM_FJ_TOUROKU 0x94   // 'Register word' key
 #define PX_VK_OEM_FJ_LOYA    0x95   // 'Left OYAYUBI' key
 #define PX_VK_OEM_FJ_ROYA    0x96   // 'Right OYAYUBI' key
-/*
-* 0x97 - 0x9F : unassigned
-*/
-/*
- * PX_VK_L* & PX_VK_R* - left and right Alt, Ctrl and Shift virtual keys.
- * Used only as parameters to GetAsyncKeyState() and GetKeyState().
- * No other API or message will distinguish left and right keys in this way.
- */
+	   /*
+		* 0x97 - 0x9F : unassigned
+		*/
+		/*
+		 * PX_VK_L* & PX_VK_R* - left and right Alt, Ctrl and Shift virtual keys.
+		 * Used only as parameters to GetAsyncKeyState() and GetKeyState().
+		 * No other API or message will distinguish left and right keys in this way.
+		 */
 #define PX_VK_LSHIFT         0xA0
 #define PX_VK_RSHIFT         0xA1
 #define PX_VK_LCONTROL       0xA2
 #define PX_VK_RCONTROL       0xA3
 
-typedef struct
+typedef struct  
 {
-    px_char content1[8];
-    px_char content2[8];
-    px_byte vk_code;
-} PX_KeyboardKey;
+	px_char content1[8];
+	px_char content2[8];
+	px_byte vk_code;
+}PX_KeyboardKey;
 
 ///////////////////////////////////////////////////////////////////////////////
 //keyboard

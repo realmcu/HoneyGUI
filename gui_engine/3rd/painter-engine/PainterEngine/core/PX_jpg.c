@@ -1,8 +1,7 @@
 #include "PX_jpg.h"
 
 
-const px_byte zigZagMap[] =
-{
+const px_byte zigZagMap[] = {
     0,   1,  8, 16,  9,  2,  3, 10,
     17, 24, 32, 25, 18, 11,  4,  5,
     12, 19, 26, 33, 40, 48, 41, 34,
@@ -16,22 +15,19 @@ const px_byte zigZagMap[] =
 
 
 
-PX_JpgHuffmanTable hDCTableY =
-{
+PX_JpgHuffmanTable hDCTableY = {
     { 0, 0, 1, 6, 7, 8, 9, 10, 11, 12, 12, 12, 12, 12, 12, 12, 12 },
     { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b },
     {0}
 };
 
-PX_JpgHuffmanTable hDCTableCbCr =
-{
+PX_JpgHuffmanTable hDCTableCbCr = {
     { 0, 0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 12, 12, 12, 12 },
     { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b },
     {0}
 };
 
-PX_JpgHuffmanTable hACTableY =
-{
+PX_JpgHuffmanTable hACTableY = {
     { 0, 0, 2, 3, 6, 9, 11, 15, 18, 23, 28, 32, 36, 36, 36, 37, 162 },
     {
         0x01, 0x02, 0x03, 0x00, 0x04, 0x11, 0x05, 0x12,
@@ -59,8 +55,7 @@ PX_JpgHuffmanTable hACTableY =
     {0}
 };
 
-PX_JpgHuffmanTable hACTableCbCr =
-{
+PX_JpgHuffmanTable hACTableCbCr = {
     { 0, 0, 2, 3, 5, 9, 13, 16, 20, 27, 32, 36, 40, 40, 41, 43, 162 },
     {
         0x00, 0x01, 0x02, 0x03, 0x11, 0x04, 0x05, 0x21,
@@ -88,12 +83,12 @@ PX_JpgHuffmanTable hACTableCbCr =
     {0}
 };
 
-PX_JpgHuffmanTable  *dcTables[] = { &hDCTableY, &hDCTableCbCr, &hDCTableCbCr };
-PX_JpgHuffmanTable  *acTables[] = { &hACTableY, &hACTableCbCr, &hACTableCbCr };
+PX_JpgHuffmanTable*  dcTables[] = { &hDCTableY, &hDCTableCbCr, &hDCTableCbCr };
+PX_JpgHuffmanTable*  acTables[] = { &hACTableY, &hACTableCbCr, &hACTableCbCr };
 
-px_byte PX_JpgReadBit(PX_MemoryStream *pstream)
+px_byte PX_JpgReadBit(PX_MemoryStream* pstream)
 {
-    if (pstream->bitpointer % 8 == 0 && pstream->bitpointer)
+    if (pstream->bitpointer%8==0&&pstream->bitpointer)
     {
         px_int byteindex = pstream->bitpointer / 8;
 
@@ -107,15 +102,14 @@ px_byte PX_JpgReadBit(PX_MemoryStream *pstream)
             }
             else if (pstream->bitstream[byteindex] == 0xFF)
             {
-                if (pstream->bitstream[byteindex + 1] == 0xFF)
+                if(pstream->bitstream[byteindex + 1] == 0xFF)
                 {
                     pstream->bitpointer += 8;
                     byteindex++;
                     continue;
                 }
 
-                if (pstream->bitstream[byteindex + 1] >= PX_JPG_MARKER_RST0 &&
-                    pstream->bitstream[byteindex + 1] <= PX_JPG_MARKER_RST7)
+                if (pstream->bitstream[byteindex + 1] >= PX_JPG_MARKER_RST0 && pstream->bitstream[byteindex + 1] <= PX_JPG_MARKER_RST7)
                 {
                     pstream->bitpointer += 16;
                 }
@@ -130,20 +124,18 @@ px_byte PX_JpgReadBit(PX_MemoryStream *pstream)
             break;
         }
 
-
+            
     }
     return PX_MemoryStreamReadBitBE(pstream);
 }
 
-px_uint PX_JpgReadBits(PX_MemoryStream *pstream, const px_uint length)
-{
+px_uint PX_JpgReadBits(PX_MemoryStream* pstream,const px_uint length) {
     px_uint bits = 0;
     px_uint i;
-    for (i = 0; i < length; ++i)
+    for (i = 0; i < length; ++i) 
     {
         px_uint bit = PX_JpgReadBit(pstream);
-        if (bit == -1)
-        {
+        if (bit == -1) {
             bits = -1;
             break;
         }
@@ -153,32 +145,30 @@ px_uint PX_JpgReadBits(PX_MemoryStream *pstream, const px_uint length)
 }
 
 // SOF specifies frame type, dimensions, and number of color components
-px_bool PX_JpgReadStartOfFrame(PX_JpgDecoder *pJpgdecoder)
+px_bool PX_JpgReadStartOfFrame(PX_JpgDecoder* pJpgdecoder) 
 {
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     px_byte precision;
     px_int i;
     //Reading SOF Marker";
     px_uint length;
-    if (pJpgdecoder->numComponents != 0)
-    {
-        //"Error - Multiple SOFs detected\n";
+    if (pJpgdecoder->numComponents != 0) {
+       //"Error - Multiple SOFs detected\n";
         return PX_FALSE;
     }
 
     length = PX_MemoryStreamReadWord(pstream);
 
     precision = PX_MemoryStreamReadByte(pstream);
-    if (precision != 8)
-    {
-        //"Error - Invalid precision: " << (px_uint)precision << '\n';
+    if (precision != 8) {
+       //"Error - Invalid precision: " << (px_uint)precision << '\n';
         return PX_FALSE;
     }
 
     pJpgdecoder->height = PX_MemoryStreamReadWord(pstream);
     pJpgdecoder->width = PX_MemoryStreamReadWord(pstream);
 
-    if (pJpgdecoder->height == 0 || pJpgdecoder->width == 0)
+    if (pJpgdecoder->height == 0 || pJpgdecoder->width == 0) 
     {
         //"Error - Invalid dimensions\n";
         return PX_FALSE;
@@ -190,39 +180,35 @@ px_bool PX_JpgReadStartOfFrame(PX_JpgDecoder *pJpgdecoder)
     pJpgdecoder->blockWidthReal = pJpgdecoder->blockWidth;
 
     pJpgdecoder->numComponents = PX_MemoryStreamReadByte(pstream);
-    if (pJpgdecoder->numComponents == 4)
+    if (pJpgdecoder->numComponents == 4) 
     {
         //"Error - CMYK color mode not supported\n";
         return PX_FALSE;
     }
-    if (pJpgdecoder->numComponents != 1 && pJpgdecoder->numComponents != 3)
+    if (pJpgdecoder->numComponents != 1 && pJpgdecoder->numComponents != 3) 
     {
         // "Error - " << (px_uint)pJpgdecoder->numComponents << " color components given (1 or 3 required)\n";
         return PX_FALSE;
     }
-    for (i = 0; i < pJpgdecoder->numComponents; ++i)
+    for (i = 0; i < pJpgdecoder->numComponents; ++i) 
     {
-        PX_JpgColorComponent *component;
-        px_byte samplingFactor;
+        PX_JpgColorComponent* component;
+		px_byte samplingFactor;
         px_byte componentID = PX_MemoryStreamReadByte(pstream);
         // component IDs are usually 1, 2, 3 but rarely can be seen as 0, 1, 2
         // always force them into 1, 2, 3 for consistency
-        if (componentID == 0 && i == 0)
-        {
+        if (componentID == 0 && i == 0) {
             pJpgdecoder->zeroBased = PX_TRUE;
         }
-        if (pJpgdecoder->zeroBased)
-        {
+        if (pJpgdecoder->zeroBased) {
             componentID += 1;
         }
-        if (componentID == 0 || componentID > pJpgdecoder->numComponents)
-        {
+        if (componentID == 0 || componentID > pJpgdecoder->numComponents) {
             // "Error - Invalid component ID: " << (px_uint)componentID << '\n';
             return PX_FALSE;
         }
         component = &pJpgdecoder->colorComponents[componentID - 1];
-        if (component->usedInFrame)
-        {
+        if (component->usedInFrame) {
             //"Error - Duplicate color component ID: " << (px_uint)componentID << '\n';
             return PX_FALSE;
         }
@@ -231,45 +217,39 @@ px_bool PX_JpgReadStartOfFrame(PX_JpgDecoder *pJpgdecoder)
         samplingFactor = PX_MemoryStreamReadByte(pstream);
         component->horizontalSamplingFactor = samplingFactor >> 4;
         component->verticalSamplingFactor = samplingFactor & 0x0F;
-        if (componentID == 1)
-        {
+        if (componentID == 1) {
             if ((component->horizontalSamplingFactor != 1 && component->horizontalSamplingFactor != 2) ||
-                (component->verticalSamplingFactor != 1 && component->verticalSamplingFactor != 2))
-            {
+                (component->verticalSamplingFactor != 1 && component->verticalSamplingFactor != 2)) {
                 // "Error - Sampling factors not supported\n";
                 return PX_FALSE;
             }
-            if (component->horizontalSamplingFactor == 2 && pJpgdecoder->blockWidth % 2 == 1)
-            {
+            if (component->horizontalSamplingFactor == 2 && pJpgdecoder->blockWidth % 2 == 1) {
                 pJpgdecoder->blockWidthReal += 1;
             }
-            if (component->verticalSamplingFactor == 2 && pJpgdecoder->blockHeight % 2 == 1)
-            {
+            if (component->verticalSamplingFactor == 2 && pJpgdecoder->blockHeight % 2 == 1) {
                 pJpgdecoder->blockHeightReal += 1;
             }
 
             pJpgdecoder->horizontalSamplingFactor = component->horizontalSamplingFactor;
             pJpgdecoder->verticalSamplingFactor = component->verticalSamplingFactor;
         }
-        else
-        {
-            if (component->horizontalSamplingFactor != 1 || component->verticalSamplingFactor != 1)
-            {
+        else {
+            if (component->horizontalSamplingFactor != 1 || component->verticalSamplingFactor != 1) {
                 // "Error - Sampling factors not supported\n";
-
+           
                 return PX_FALSE;
             }
         }
 
         component->quantizationTableID = PX_MemoryStreamReadByte(pstream);
-        if (component->quantizationTableID > 3)
+        if (component->quantizationTableID > 3) 
         {
             // "Error - Invalid quantization table ID: " << (px_uint)component->quantizationTableID << '\n';
             return PX_FALSE;
         }
     }
 
-    if (length - 8 - (3 * pJpgdecoder->numComponents) != 0)
+    if (length - 8 - (3 * pJpgdecoder->numComponents) != 0) 
     {
         return PX_FALSE;
     }
@@ -277,49 +257,41 @@ px_bool PX_JpgReadStartOfFrame(PX_JpgDecoder *pJpgdecoder)
 }
 
 // DQT contains one or more quantization tables
-px_bool PX_JpgReadQuantizationTable(PX_JpgDecoder *pJpgdecoder)
-{
-    PX_JpgQuantizationTable *qTable;
+px_bool PX_JpgReadQuantizationTable(PX_JpgDecoder* pJpgdecoder) {
+    PX_JpgQuantizationTable* qTable;
     px_int i;
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     px_int length = PX_MemoryStreamReadWord(pstream);
     length -= 2;
 
-    while (length > 0)
-    {
+    while (length > 0) {
         px_byte tableInfo = PX_MemoryStreamReadByte(pstream);
-        px_byte tableID;
+		px_byte tableID;
         length -= 1;
         tableID = tableInfo & 0x0F;
 
-        if (tableID > 3)
-        {
+        if (tableID > 3) {
             // "Error - Invalid quantization table ID: " << (px_uint)tableID << '\n';
             return PX_FALSE;
         }
-        qTable = &pJpgdecoder->quantizationTables[tableID];
+        qTable =&pJpgdecoder->quantizationTables[tableID];
         qTable->set = PX_TRUE;
 
-        if (tableInfo >> 4 != 0)
-        {
-            for (i = 0; i < 64; ++i)
-            {
+        if (tableInfo >> 4 != 0) {
+            for (i = 0; i < 64; ++i) {
                 qTable->table[zigZagMap[i]] = PX_MemoryStreamReadWord(pstream);
             }
             length -= 128;
         }
-        else
-        {
-            for (i = 0; i < 64; ++i)
-            {
+        else {
+            for (i = 0; i < 64; ++i) {
                 qTable->table[zigZagMap[i]] = PX_MemoryStreamReadByte(pstream);
             }
             length -= 64;
         }
     }
 
-    if (length != 0)
-    {
+    if (length != 0) {
         return PX_FALSE;
     }
     return PX_TRUE;
@@ -328,14 +300,11 @@ px_bool PX_JpgReadQuantizationTable(PX_JpgDecoder *pJpgdecoder)
 
 
 // generate all Huffman codes based on symbols from a Huffman table
-px_void PX_JPG_generateCodes(PX_JpgHuffmanTable *hTable)
-{
+px_void PX_JPG_generateCodes(PX_JpgHuffmanTable* hTable) {
     px_uint code = 0;
-    px_uint i, j;
-    for (i = 0; i < 16; ++i)
-    {
-        for (j = hTable->offsets[i]; j < hTable->offsets[i + 1]; ++j)
-        {
+    px_uint i,j;
+    for (i = 0; i < 16; ++i) {
+        for (j = hTable->offsets[i]; j < hTable->offsets[i + 1]; ++j) {
             hTable->codes[j] = code;
             code += 1;
         }
@@ -344,49 +313,43 @@ px_void PX_JPG_generateCodes(PX_JpgHuffmanTable *hTable)
 }
 
 // DHT contains one or more Huffman tables
-px_bool PX_JpgReadHuffmanTable(PX_JpgDecoder *pJpgdecoder)
-{
+px_bool PX_JpgReadHuffmanTable(PX_JpgDecoder* pJpgdecoder) {
     // "Reading DHT Marker\n";
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
-    PX_JpgHuffmanTable *hTable;
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
+    PX_JpgHuffmanTable* hTable;
     px_uint allSymbols;
     px_uint i;
     px_int length = PX_MemoryStreamReadWord(pstream);
     length -= 2;
 
-    while (length > 0)
-    {
+    while (length > 0) {
         px_byte tableInfo = PX_MemoryStreamReadByte(pstream);
         px_byte tableID = tableInfo & 0x0F;
         px_bool acTable = tableInfo >> 4;
 
-        if (tableID > 3)
-        {
+        if (tableID > 3) {
             return PX_FALSE;
         }
 
         hTable = (acTable) ?
-                 &(pJpgdecoder->huffmanACTables[tableID]) :
-                 &(pJpgdecoder->huffmanDCTables[tableID]);
+            &(pJpgdecoder->huffmanACTables[tableID]) :
+            &(pJpgdecoder->huffmanDCTables[tableID]);
 
         hTable->set = PX_TRUE;
 
         hTable->offsets[0] = 0;
         allSymbols = 0;
-        for (i = 1; i <= 16; ++i)
-        {
+        for (i = 1; i <= 16; ++i) {
             allSymbols += PX_MemoryStreamReadByte(pstream);
             hTable->offsets[i] = allSymbols;
         }
-        if (allSymbols > 176)
-        {
-            // "Error - Too many symbols in Huffman table: " << allSymbols << '\n';
-
+        if (allSymbols > 176) {
+          // "Error - Too many symbols in Huffman table: " << allSymbols << '\n';
+            
             return PX_FALSE;
         }
 
-        for (i = 0; i < allSymbols; ++i)
-        {
+        for (i = 0; i < allSymbols; ++i) {
             hTable->symbols[i] = PX_MemoryStreamReadByte(pstream);
         }
 
@@ -395,196 +358,151 @@ px_bool PX_JpgReadHuffmanTable(PX_JpgDecoder *pJpgdecoder)
         length -= 17 + allSymbols;
     }
 
-    if (length != 0)
-    {
+    if (length != 0) {
         return PX_FALSE;
     }
     return PX_TRUE;
 }
 
 // restart interval is needed to stay synchronized during data scans
-px_bool PX_JpgReadRestartInterval(PX_JpgDecoder *pJpgdecoder)
+px_bool PX_JpgReadRestartInterval(PX_JpgDecoder* pJpgdecoder) 
 {
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     // "Reading DRI Marker\n";
     px_uint length = PX_MemoryStreamReadWord(pstream);
 
     pJpgdecoder->restartInterval = PX_MemoryStreamReadWord(pstream);
-    if (length - 4 != 0)
-    {
-
+    if (length - 4 != 0) {
+     
         return PX_FALSE;
     }
     return PX_TRUE;
 }
 
 // APPNs simply get skipped based on length
-px_bool PX_JpgReadAPPN(PX_JpgDecoder *pJpgdecoder)
-{
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+px_bool PX_JpgReadAPPN(PX_JpgDecoder* pJpgdecoder) {
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     px_uint i;
     //"Reading APPN Marker\n";
     px_uint length = PX_MemoryStreamReadWord(pstream);
-    if (length < 2)
-    {
+    if (length < 2) {
         // "Error - APPN invalid\n";
         return PX_FALSE;
     }
 
-    for (i = 0; i < length - 2; ++i)
-    {
+    for ( i = 0; i < length - 2; ++i) {
         PX_MemoryStreamReadByte(pstream);
     }
     return PX_TRUE;
 }
 
 // comments simply get skipped based on length
-px_bool PX_JpgReadComment(PX_JpgDecoder *pJpgdecoder)
-{
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+px_bool PX_JpgReadComment(PX_JpgDecoder* pJpgdecoder) {
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     // "Reading COM Marker\n";
     px_uint length = PX_MemoryStreamReadWord(pstream);
     px_uint i;
-    if (length < 2)
-    {
+    if (length < 2) {
         //  "Error - COM invalid\n";
 
         return PX_FALSE;
     }
 
-    for (i = 0; i < length - 2; ++i)
-    {
+    for (i = 0; i < length - 2; ++i) {
         PX_MemoryStreamReadByte(pstream);
     }
     return PX_TRUE;
 }
 
 
-static px_bool PX_JpgReadFrameHeader(PX_JpgDecoder *pJpgdecoder)
-{
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+static px_bool PX_JpgReadFrameHeader( PX_JpgDecoder* pJpgdecoder) {
+    PX_MemoryStream* pstream=&pJpgdecoder->stream;
     // first two bytes must be 0xFF, SOI
     px_byte last = PX_MemoryStreamReadByte(pstream);
     px_byte current = PX_MemoryStreamReadByte(pstream);
-    if (last != 0xFF || current != PX_JPG_MARKER_SOI)
-    {
+    if (last != 0xFF || current != PX_JPG_MARKER_SOI) {
         return PX_FALSE;
     }
     last = PX_MemoryStreamReadByte(pstream);
     current = PX_MemoryStreamReadByte(pstream);
 
     // read markers until first scan
-    while (PX_TRUE)
+    while (PX_TRUE) 
     {
-        if (PX_MemoryStreamIsEnd(pstream))
-        {
+        if (PX_MemoryStreamIsEnd(pstream)) {
             return PX_FALSE;
         }
-        if (last != 0xFF)
-        {
+        if (last != 0xFF) {
             return PX_FALSE;
         }
 
-        if (current == PX_JPG_MARKER_SOF0)
-        {
+        if (current == PX_JPG_MARKER_SOF0) {
             pJpgdecoder->frameType = PX_JPG_MARKER_SOF0;
             if (!PX_JpgReadStartOfFrame(pJpgdecoder))
-            {
                 return PX_FALSE;
-            }
         }
-        else if (current == PX_JPG_MARKER_SOF2)
-        {
+        else if (current == PX_JPG_MARKER_SOF2) {
             pJpgdecoder->frameType = PX_JPG_MARKER_SOF2;
             if (!PX_JpgReadStartOfFrame(pJpgdecoder))
-            {
                 return PX_FALSE;
-            }
         }
-        else if (current == PX_JPG_MARKER_DQT)
-        {
+        else if (current == PX_JPG_MARKER_DQT) {
             if (!PX_JpgReadQuantizationTable(pJpgdecoder))
-            {
                 return PX_FALSE;
-            }
         }
-        else if (current == PX_JPG_MARKER_DHT)
-        {
+        else if (current == PX_JPG_MARKER_DHT) {
             if (!PX_JpgReadHuffmanTable(pJpgdecoder))
-            {
                 return PX_FALSE;
-            }
         }
-        else if (current == PX_JPG_MARKER_SOS)
-        {
+        else if (current == PX_JPG_MARKER_SOS) {
             // break from while loop at SOS
             break;
         }
-        else if (current == PX_JPG_MARKER_DRI)
-        {
+        else if (current == PX_JPG_MARKER_DRI) {
             if (!PX_JpgReadRestartInterval(pJpgdecoder))
-            {
                 return PX_FALSE;
-            }
         }
-        else if (current >= PX_JPG_MARKER_APP0 && current <= PX_JPG_MARKER_APP15)
-        {
+        else if (current >= PX_JPG_MARKER_APP0 && current <= PX_JPG_MARKER_APP15) {
             if (!PX_JpgReadAPPN(pJpgdecoder))
-            {
                 return PX_FALSE;
-            }
         }
-        else if (current == PX_JPG_MARKER_COM)
-        {
+        else if (current == PX_JPG_MARKER_COM) {
             if (!PX_JpgReadComment(pJpgdecoder))
-            {
                 return PX_FALSE;
-            }
         }
         // unused markers that can be skipped
         else if ((current >= PX_JPG_MARKER_JPG0 && current <= PX_JPG_MARKER_JPG13) ||
-                 current == PX_JPG_MARKER_DNL ||
-                 current == PX_JPG_MARKER_DHP ||
-                 current == PX_JPG_MARKER_EXP)
-        {
-            if (!PX_JpgReadComment(pJpgdecoder))
-            {
+            current == PX_JPG_MARKER_DNL ||
+            current == PX_JPG_MARKER_DHP ||
+            current == PX_JPG_MARKER_EXP) {
+            if(!PX_JpgReadComment( pJpgdecoder))
                 return PX_FALSE;
-            }
         }
-        else if (current == PX_JPG_MARKER_TEM)
-        {
+        else if (current == PX_JPG_MARKER_TEM) {
             // TEM has no size
         }
         // any number of 0xFF in a row is allowed and should be ignored
-        else if (current == 0xFF)
-        {
+        else if (current == 0xFF) {
             current = PX_MemoryStreamReadByte(pstream);
             continue;
         }
 
-        else if (current == PX_JPG_MARKER_SOI)
-        {
+        else if (current == PX_JPG_MARKER_SOI) {
             return PX_FALSE;
         }
-        else if (current == PX_JPG_MARKER_EOI)
-        {
+        else if (current == PX_JPG_MARKER_EOI) {
             return PX_FALSE;
         }
-        else if (current == PX_JPG_MARKER_DAC)
-        {
+        else if (current == PX_JPG_MARKER_DAC) {
             return PX_FALSE;
         }
-        else if (current >= PX_JPG_MARKER_SOF0 && current <= PX_JPG_MARKER_SOF15)
-        {
+        else if (current >= PX_JPG_MARKER_SOF0 && current <= PX_JPG_MARKER_SOF15) {
             return PX_FALSE;
         }
-        else if (current >= PX_JPG_MARKER_RST0 && current <= PX_JPG_MARKER_RST7)
-        {
+        else if (current >= PX_JPG_MARKER_RST0 && current <= PX_JPG_MARKER_RST7) {
             return PX_FALSE;
         }
-        else
-        {
+        else {
             return PX_FALSE;
         }
         last = PX_MemoryStreamReadByte(pstream);
@@ -593,29 +511,26 @@ static px_bool PX_JpgReadFrameHeader(PX_JpgDecoder *pJpgdecoder)
     return PX_TRUE;
 }
 
-px_bool PX_JpgVerify(px_byte *pbuffer, px_int size)
+px_bool PX_JpgVerify(px_byte* pbuffer, px_int size)
 {
-    px_uint32 p = 0;
+    px_uint32 p=0;
     // first two bytes must be 0xFF, SOI
-    px_byte last = PX_ReadBitsLE(&p, pbuffer, 8);
+    px_byte last = PX_ReadBitsLE(&p,pbuffer,8);
     px_byte current = PX_ReadBitsLE(&p, pbuffer, 8);
-    if (last != 0xFF || current != PX_JPG_MARKER_SOI)
-    {
+    if (last != 0xFF || current != PX_JPG_MARKER_SOI) {
         return PX_FALSE;
     }
     return PX_TRUE;
 }
 
 // SOS contains color component info for the next scan
-px_bool PX_JpgReadStartOfScan(PX_JpgDecoder *pJpgdecoder)
-{
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
-    PX_JpgColorComponent *component;
-    px_int length, i;
+px_bool PX_JpgReadStartOfScan(PX_JpgDecoder* pJpgdecoder) {
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
+    PX_JpgColorComponent* component;
+    px_int length,i;
     px_byte successiveApproximation;
     //"Reading SOS Marker\n";
-    if (pJpgdecoder->numComponents == 0)
-    {
+    if (pJpgdecoder->numComponents == 0) {
         //"Error - SOS detected before SOF\n";
 
         return PX_FALSE;
@@ -623,40 +538,33 @@ px_bool PX_JpgReadStartOfScan(PX_JpgDecoder *pJpgdecoder)
 
     length = PX_MemoryStreamReadWord(pstream);
 
-    for (i = 0; i < pJpgdecoder->numComponents; ++i)
-    {
+    for (i = 0; i < pJpgdecoder->numComponents; ++i) {
         pJpgdecoder->colorComponents[i].usedInScan = PX_FALSE;
     }
 
     // the number of components in the next scan might not be all
     //   components in the pJpgdecoder
     pJpgdecoder->componentsInScan = PX_MemoryStreamReadByte(pstream);
-    if (pJpgdecoder->componentsInScan == 0)
-    {
+    if (pJpgdecoder->componentsInScan == 0) {
         return PX_FALSE;
     }
-    for (i = 0; i < pJpgdecoder->componentsInScan; ++i)
-    {
+    for (i = 0; i < pJpgdecoder->componentsInScan; ++i) {
         px_byte huffmanTableIDs;
         px_byte componentID = PX_MemoryStreamReadByte(pstream);
         // component IDs are usually 1, 2, 3 but rarely can be seen as 0, 1, 2
-        if (pJpgdecoder->zeroBased)
-        {
+        if (pJpgdecoder->zeroBased) {
             componentID += 1;
         }
-        if (componentID == 0 || componentID > pJpgdecoder->numComponents)
-        {
+        if (componentID == 0 || componentID > pJpgdecoder->numComponents) {
             // "Error - Invalid color component ID: " << (px_uint)componentID << '\n';
             return PX_FALSE;
         }
         component = &pJpgdecoder->colorComponents[componentID - 1];
-        if (!component->usedInFrame)
-        {
+        if (!component->usedInFrame) {
             //"Error - Invalid color component ID: " << (px_uint)componentID << '\n';
             return PX_FALSE;
         }
-        if (component->usedInScan)
-        {
+        if (component->usedInScan) {
             //"Error - Duplicate color component ID: " << (px_uint)componentID << '\n';
             return PX_FALSE;
         }
@@ -665,13 +573,11 @@ px_bool PX_JpgReadStartOfScan(PX_JpgDecoder *pJpgdecoder)
         huffmanTableIDs = PX_MemoryStreamReadByte(pstream);
         component->huffmanDCTableID = huffmanTableIDs >> 4;
         component->huffmanACTableID = huffmanTableIDs & 0x0F;
-        if (component->huffmanDCTableID > 3)
-        {
+        if (component->huffmanDCTableID > 3) {
             // "Error - Invalid Huffman DC table ID: " << (px_uint)component->huffmanDCTableID << '\n';
             return PX_FALSE;
         }
-        if (component->huffmanACTableID > 3)
-        {
+        if (component->huffmanACTableID > 3) {
             // "Error - Invalid Huffman AC table ID: " << (px_uint)component->huffmanACTableID << '\n';
             return PX_FALSE;
         }
@@ -683,72 +589,56 @@ px_bool PX_JpgReadStartOfScan(PX_JpgDecoder *pJpgdecoder)
     pJpgdecoder->successiveApproximationHigh = successiveApproximation >> 4;
     pJpgdecoder->successiveApproximationLow = successiveApproximation & 0x0F;
 
-    if (pJpgdecoder->frameType == PX_JPG_MARKER_SOF0)
-    {
+    if (pJpgdecoder->frameType == PX_JPG_MARKER_SOF0) {
         // Baseline JPGs don't use spectral selection or successive approximtion
-        if (pJpgdecoder->startOfSelection != 0 || pJpgdecoder->endOfSelection != 63)
-        {
+        if (pJpgdecoder->startOfSelection != 0 || pJpgdecoder->endOfSelection != 63) {
             //"Error - Invalid spectral selection\n";
             return PX_FALSE;
         }
-        if (pJpgdecoder->successiveApproximationHigh != 0 || pJpgdecoder->successiveApproximationLow != 0)
-        {
+        if (pJpgdecoder->successiveApproximationHigh != 0 || pJpgdecoder->successiveApproximationLow != 0) {
             // "Error - Invalid successive approximation\n";
             return PX_FALSE;
         }
     }
-    else if (pJpgdecoder->frameType == PX_JPG_MARKER_SOF2)
-    {
-        if (pJpgdecoder->startOfSelection > pJpgdecoder->endOfSelection)
-        {
+    else if (pJpgdecoder->frameType == PX_JPG_MARKER_SOF2) {
+        if (pJpgdecoder->startOfSelection > pJpgdecoder->endOfSelection) {
             // "Error - Invalid spectral selection (start greater than end)\n";
             return PX_FALSE;
         }
-        if (pJpgdecoder->endOfSelection > 63)
-        {
+        if (pJpgdecoder->endOfSelection > 63) {
             // "Error - Invalid spectral selection (end greater than 63)\n";
             return PX_FALSE;
         }
-        if (pJpgdecoder->startOfSelection == 0 && pJpgdecoder->endOfSelection != 0)
-        {
+        if (pJpgdecoder->startOfSelection == 0 && pJpgdecoder->endOfSelection != 0) {
             // "Error - Invalid spectral selection (contains DC and AC)\n";
             return PX_FALSE;
         }
-        if (pJpgdecoder->startOfSelection != 0 && pJpgdecoder->componentsInScan != 1)
-        {
+        if (pJpgdecoder->startOfSelection != 0 && pJpgdecoder->componentsInScan != 1) {
             // "Error - Invalid spectral selection (AC scan contains multiple components)\n";
             return PX_FALSE;
         }
         if (pJpgdecoder->successiveApproximationHigh != 0 &&
-            pJpgdecoder->successiveApproximationLow != pJpgdecoder->successiveApproximationHigh - 1)
-        {
+            pJpgdecoder->successiveApproximationLow != pJpgdecoder->successiveApproximationHigh - 1) {
             // "Error - Invalid successive approximation\n";
             return PX_FALSE;
         }
     }
 
-    for (i = 0; i < pJpgdecoder->numComponents; ++i)
-    {
-        PX_JpgColorComponent *component = &pJpgdecoder->colorComponents[i];
-        if (pJpgdecoder->colorComponents[i].usedInScan)
-        {
-            if (pJpgdecoder->quantizationTables[component->quantizationTableID].set == PX_FALSE)
-            {
+    for (i = 0; i < pJpgdecoder->numComponents; ++i) {
+         PX_JpgColorComponent* component = &pJpgdecoder->colorComponents[i];
+        if (pJpgdecoder->colorComponents[i].usedInScan) {
+            if (pJpgdecoder->quantizationTables[component->quantizationTableID].set == PX_FALSE) {
                 // "Error - Color component using uninitialized quantization table\n";
                 return PX_FALSE;
             }
-            if (pJpgdecoder->startOfSelection == 0)
-            {
-                if (pJpgdecoder->huffmanDCTables[component->huffmanDCTableID].set == PX_FALSE)
-                {
+            if (pJpgdecoder->startOfSelection == 0) {
+                if (pJpgdecoder->huffmanDCTables[component->huffmanDCTableID].set == PX_FALSE) {
                     // "Error - Color component using uninitialized Huffman DC table\n";
                     return PX_FALSE;
                 }
             }
-            if (pJpgdecoder->endOfSelection > 0)
-            {
-                if (pJpgdecoder->huffmanACTables[component->huffmanACTableID].set == PX_FALSE)
-                {
+            if (pJpgdecoder->endOfSelection > 0) {
+                if (pJpgdecoder->huffmanACTables[component->huffmanACTableID].set == PX_FALSE) {
                     // "Error - Color component using uninitialized Huffman AC table\n";
                     return PX_FALSE;
                 }
@@ -756,8 +646,7 @@ px_bool PX_JpgReadStartOfScan(PX_JpgDecoder *pJpgdecoder)
         }
     }
 
-    if (length - 6 - (2 * pJpgdecoder->componentsInScan) != 0)
-    {
+    if (length - 6 - (2 * pJpgdecoder->componentsInScan) != 0) {
         // "Error - SOS invalid\n";
         return PX_FALSE;
     }
@@ -766,24 +655,19 @@ px_bool PX_JpgReadStartOfScan(PX_JpgDecoder *pJpgdecoder)
 
 // return the symbol from the Huffman table that corresponds to
 //   the next Huffman code read from the BitReader
-px_byte PX_JpgGetNextSymbol(PX_JpgDecoder *pJpgdecoder,  PX_JpgHuffmanTable *hTable)
-{
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+px_byte PX_JpgGetNextSymbol(PX_JpgDecoder* pJpgdecoder,  PX_JpgHuffmanTable* hTable) {
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     px_uint currentCode = 0;
-    px_uint i, j;
-    for (i = 0; i < 16; ++i)
-    {
+    px_uint i,j;
+    for (i = 0; i < 16; ++i) {
         px_int bit = PX_JpgReadBit(pstream);
-        if (bit == -1)
-        {
+        if (bit == -1) {
             return -1;
         }
 
         currentCode = (currentCode << 1) | bit;
-        for (j = hTable->offsets[i]; j < hTable->offsets[i + 1]; ++j)
-        {
-            if (currentCode == hTable->codes[j])
-            {
+        for (j = hTable->offsets[i]; j < hTable->offsets[i + 1]; ++j) {
+            if (currentCode == hTable->codes[j]) {
                 return hTable->symbols[j];
             }
         }
@@ -794,61 +678,54 @@ px_byte PX_JpgGetNextSymbol(PX_JpgDecoder *pJpgdecoder,  PX_JpgHuffmanTable *hTa
 // fill the coefficients of a block component based on Huffman codes
 //   read from the BitReader
 px_bool PX_JpgDecodeBlockComponent(
-    PX_JpgDecoder *pJpgdecoder,
-    px_int  *component,
-    px_int *previousDC,
-    px_uint *skips,
-    PX_JpgHuffmanTable *dcTable,
-    PX_JpgHuffmanTable *acTable
-)
+    PX_JpgDecoder* pJpgdecoder,
+    px_int*  component,
+    px_int* previousDC,
+    px_uint* skips,
+     PX_JpgHuffmanTable* dcTable,
+     PX_JpgHuffmanTable* acTable
+) 
 {
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
-    px_uint i, j;
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
+    px_uint i,j;
 
-    if (pJpgdecoder->frameType == PX_JPG_MARKER_SOF0)
+    if (pJpgdecoder->frameType == PX_JPG_MARKER_SOF0) 
     {
         // get the DC value for this block component
         px_int coeff, numZeroes, coeffLength;
         px_byte length = PX_JpgGetNextSymbol(pJpgdecoder, dcTable);
 
-        if (length == (px_byte) - 1)
-        {
+        if (length == (px_byte)-1) {
             // "Error - Invalid DC value\n";
             return PX_FALSE;
         }
-        if (length > 11)
-        {
+        if (length > 11) {
             // "Error - DC coefficient length greater than 11\n";
             return PX_FALSE;
         }
 
-        coeff = PX_JpgReadBits(pstream, length);
-        if (coeff == -1)
-        {
+        coeff = PX_JpgReadBits(pstream,length);
+        if (coeff == -1) {
             // "Error - Invalid DC value\n";
             return PX_FALSE;
         }
-        if (length != 0 && coeff < (1 << (length - 1)))
-        {
+        if (length != 0 && coeff < (1 << (length - 1))) {
             coeff -= (1 << length) - 1;
         }
         component[0] = coeff + (*previousDC);
         (*previousDC) = component[0];
 
         // get the AC values for this block component
-        for (i = 1; i < 64; ++i)
-        {
+        for (i = 1; i < 64; ++i) {
             px_byte symbol = PX_JpgGetNextSymbol(pJpgdecoder, acTable);
 
-            if (symbol == (px_byte) - 1)
-            {
+            if (symbol == (px_byte)-1) {
                 // "Error - Invalid AC value\n";
                 return PX_FALSE;
             }
 
             // symbol 0x00 means fill remainder of component with 0
-            if (symbol == 0x00)
-            {
+            if (symbol == 0x00) {
                 return PX_TRUE;
             }
 
@@ -857,58 +734,49 @@ px_bool PX_JpgDecodeBlockComponent(
             coeffLength = symbol & 0x0F;
             coeff = 0;
 
-            if (i + numZeroes >= 64)
-            {
+            if (i + numZeroes >= 64) {
                 // "Error - Zero run-length exceeded block component\n";
                 return PX_FALSE;
             }
             i += numZeroes;
 
-            if (coeffLength > 10)
-            {
+            if (coeffLength > 10) {
                 // "Error - AC coefficient length greater than 10\n";
                 return PX_FALSE;
             }
-            coeff = PX_JpgReadBits(pstream, coeffLength);
-            if (coeff == -1)
-            {
+            coeff = PX_JpgReadBits(pstream,coeffLength);
+            if (coeff == -1) {
                 // "Error - Invalid AC value\n";
                 return PX_FALSE;
             }
-            if (coeff < (1 << (coeffLength - 1)))
-            {
+            if (coeff < (1 << (coeffLength - 1))) {
                 coeff -= (1 << coeffLength) - 1;
             }
             component[zigZagMap[i]] = coeff;
         }
         return PX_TRUE;
     }
-    else   // pJpgdecoder->frameType == SOF2
-    {
-        if (pJpgdecoder->startOfSelection == 0 && pJpgdecoder->successiveApproximationHigh == 0)
+    else { // pJpgdecoder->frameType == SOF2
+        if (pJpgdecoder->startOfSelection == 0 && pJpgdecoder->successiveApproximationHigh == 0) 
         {
             // DC first visit
             px_byte length = PX_JpgGetNextSymbol(pJpgdecoder, dcTable);
             px_int coeff;
-            if (length == (px_byte) - 1)
-            {
+            if (length == (px_byte)-1) {
                 // "Error - Invalid DC value\n";
                 return PX_FALSE;
             }
-            if (length > 11)
-            {
+            if (length > 11) {
                 // "Error - DC coefficient length greater than 11\n";
                 return PX_FALSE;
             }
 
             coeff = PX_JpgReadBits(pstream, length);
-            if (coeff == -1)
-            {
+            if (coeff == -1) {
                 // "Error - Invalid DC value\n";
                 return PX_FALSE;
             }
-            if (length != 0 && coeff < (1 << (length - 1)))
-            {
+            if (length != 0 && coeff < (1 << (length - 1))) {
                 coeff -= (1 << length) - 1;
             }
             coeff += (*previousDC);
@@ -916,33 +784,28 @@ px_bool PX_JpgDecodeBlockComponent(
             component[0] = coeff << pJpgdecoder->successiveApproximationLow;
             return PX_TRUE;
         }
-        else if (pJpgdecoder->startOfSelection == 0 && pJpgdecoder->successiveApproximationHigh != 0)
+        else if (pJpgdecoder->startOfSelection == 0 && pJpgdecoder->successiveApproximationHigh != 0) 
         {
             // DC refinement
             int bit = PX_JpgReadBit(pstream);
-            if (bit == -1)
-            {
+            if (bit == -1) {
                 // "Error - Invalid DC value\n";
                 return PX_FALSE;
             }
             component[0] |= bit << pJpgdecoder->successiveApproximationLow;
             return PX_TRUE;
         }
-        else if (pJpgdecoder->startOfSelection != 0 && pJpgdecoder->successiveApproximationHigh == 0)
-        {
+        else if (pJpgdecoder->startOfSelection != 0 && pJpgdecoder->successiveApproximationHigh == 0) {
             // AC first visit
-            if ((*skips) > 0)
-            {
+            if ((*skips) > 0) {
                 (*skips) -= 1;
                 return PX_TRUE;
             }
-            for (i = pJpgdecoder->startOfSelection; i <= pJpgdecoder->endOfSelection; ++i)
-            {
+            for (i = pJpgdecoder->startOfSelection; i <= pJpgdecoder->endOfSelection; ++i) {
                 px_byte numZeroes, coeffLength;
 
                 px_byte symbol = PX_JpgGetNextSymbol(pJpgdecoder, acTable);
-                if (symbol == (px_byte) - 1)
-                {
+                if (symbol == (px_byte)-1) {
                     // "Error - Invalid AC value\n";
                     return PX_FALSE;
                 }
@@ -950,57 +813,45 @@ px_bool PX_JpgDecodeBlockComponent(
                 numZeroes = symbol >> 4;
                 coeffLength = symbol & 0x0F;
 
-                if (coeffLength != 0)
-                {
+                if (coeffLength != 0) {
                     px_int coeff;
-                    if (i + numZeroes > pJpgdecoder->endOfSelection)
-                    {
+                    if (i + numZeroes > pJpgdecoder->endOfSelection) {
                         // "Error - Zero run-length exceeded spectral selection\n";
                         return PX_FALSE;
                     }
-                    for (j = 0; j < numZeroes; ++j, ++i)
-                    {
+                    for (j = 0; j < numZeroes; ++j, ++i) {
                         component[zigZagMap[i]] = 0;
                     }
-                    if (coeffLength > 10)
-                    {
+                    if (coeffLength > 10) {
                         // "Error - AC coefficient length greater than 10\n";
                         return PX_FALSE;
                     }
 
                     coeff = PX_JpgReadBits(pstream, coeffLength);
-                    if (coeff == -1)
-                    {
+                    if (coeff == -1) {
                         // "Error - Invalid AC value\n";
                         return PX_FALSE;
                     }
-                    if (coeff < (1 << (coeffLength - 1)))
-                    {
+                    if (coeff < (1 << (coeffLength - 1))) {
                         coeff -= (1 << coeffLength) - 1;
                     }
                     component[zigZagMap[i]] = coeff << pJpgdecoder->successiveApproximationLow;
                 }
-                else
-                {
-                    if (numZeroes == 15)
-                    {
-                        if (i + numZeroes > pJpgdecoder->endOfSelection)
-                        {
+                else {
+                    if (numZeroes == 15) {
+                        if (i + numZeroes > pJpgdecoder->endOfSelection) {
                             // "Error - Zero run-length exceeded spectral selection\n";
                             return PX_FALSE;
                         }
-                        for (j = 0; j < numZeroes; ++j, ++i)
-                        {
+                        for (j = 0; j < numZeroes; ++j, ++i) {
                             component[zigZagMap[i]] = 0;
                         }
                     }
-                    else
-                    {
+                    else {
                         px_uint extraSkips;
                         (*skips) = (1 << numZeroes) - 1;
                         extraSkips = PX_JpgReadBits(pstream, numZeroes);
-                        if (extraSkips == (px_uint) - 1)
-                        {
+                        if (extraSkips == (px_uint)-1) {
                             // "Error - Invalid AC value\n";
                             return PX_FALSE;
                         }
@@ -1011,21 +862,17 @@ px_bool PX_JpgDecodeBlockComponent(
             }
             return PX_TRUE;
         }
-        else   // pJpgdecoder->startOfSelection != 0 && pJpgdecoder->successiveApproximationHigh != 0
-        {
+        else { // pJpgdecoder->startOfSelection != 0 && pJpgdecoder->successiveApproximationHigh != 0
             // AC refinement
             px_int positive = 1 << pJpgdecoder->successiveApproximationLow;
-            px_int negative = ((px_uint) - 1) << pJpgdecoder->successiveApproximationLow;
+            px_int negative = ((px_uint)-1) << pJpgdecoder->successiveApproximationLow;
             px_int i = pJpgdecoder->startOfSelection;
-            if ((*skips) == 0)
-            {
-                for (; i <= pJpgdecoder->endOfSelection; ++i)
-                {
+            if ((*skips) == 0) {
+                for (; i <= pJpgdecoder->endOfSelection; ++i) {
                     px_byte numZeroes, coeffLength;
                     px_int coeff;
                     px_byte symbol = PX_JpgGetNextSymbol(pJpgdecoder, acTable);
-                    if (symbol == (px_byte) - 1)
-                    {
+                    if (symbol == (px_byte)-1) {
                         // "Error - Invalid AC value\n";
                         return PX_FALSE;
                     }
@@ -1034,15 +881,12 @@ px_bool PX_JpgDecodeBlockComponent(
                     coeffLength = symbol & 0x0F;
                     coeff = 0;
 
-                    if (coeffLength != 0)
-                    {
-                        if (coeffLength != 1)
-                        {
+                    if (coeffLength != 0) {
+                        if (coeffLength != 1) {
                             // "Error - Invalid AC value\n";
                             return PX_FALSE;
                         }
-                        switch (PX_JpgReadBit(pstream))
-                        {
+                        switch (PX_JpgReadBit(pstream)) {
                         case 1:
                             coeff = positive;
                             break;
@@ -1054,15 +898,12 @@ px_bool PX_JpgDecodeBlockComponent(
                             return PX_FALSE;
                         }
                     }
-                    else
-                    {
-                        if (numZeroes != 15)
-                        {
+                    else {
+                        if (numZeroes != 15) {
                             px_uint extraSkips;
                             (*skips) = 1 << numZeroes;
                             extraSkips = PX_JpgReadBits(pstream, numZeroes);
-                            if (extraSkips == (px_uint) - 1)
-                            {
+                            if (extraSkips == (px_uint)-1) {
                                 // "Error - Invalid AC value\n";
                                 return PX_FALSE;
                             }
@@ -1071,21 +912,15 @@ px_bool PX_JpgDecodeBlockComponent(
                         }
                     }
 
-                    do
-                    {
-                        if (component[zigZagMap[i]] != 0)
-                        {
-                            switch (PX_JpgReadBit(pstream))
-                            {
+                    do {
+                        if (component[zigZagMap[i]] != 0) {
+                            switch (PX_JpgReadBit(pstream)) {
                             case 1:
-                                if ((component[zigZagMap[i]] & positive) == 0)
-                                {
-                                    if (component[zigZagMap[i]] >= 0)
-                                    {
+                                if ((component[zigZagMap[i]] & positive) == 0) {
+                                    if (component[zigZagMap[i]] >= 0) {
                                         component[zigZagMap[i]] += positive;
                                     }
-                                    else
-                                    {
+                                    else {
                                         component[zigZagMap[i]] += negative;
                                     }
                                 }
@@ -1098,43 +933,32 @@ px_bool PX_JpgDecodeBlockComponent(
                                 return PX_FALSE;
                             }
                         }
-                        else
-                        {
-                            if (numZeroes == 0)
-                            {
+                        else {
+                            if (numZeroes == 0) {
                                 break;
                             }
                             numZeroes -= 1;
                         }
 
                         i += 1;
-                    }
-                    while (i <= pJpgdecoder->endOfSelection);
+                    } while (i <= pJpgdecoder->endOfSelection);
 
-                    if (coeff != 0 && i <= pJpgdecoder->endOfSelection)
-                    {
+                    if (coeff != 0 && i <= pJpgdecoder->endOfSelection) {
                         component[zigZagMap[i]] = coeff;
                     }
                 }
             }
 
-            if ((*skips) > 0)
-            {
-                for (; i <= pJpgdecoder->endOfSelection; ++i)
-                {
-                    if (component[zigZagMap[i]] != 0)
-                    {
-                        switch (PX_JpgReadBit(pstream))
-                        {
+            if ((*skips) > 0) {
+                for (; i <= pJpgdecoder->endOfSelection; ++i) {
+                    if (component[zigZagMap[i]] != 0) {
+                        switch (PX_JpgReadBit(pstream)) {
                         case 1:
-                            if ((component[zigZagMap[i]] & positive) == 0)
-                            {
-                                if (component[zigZagMap[i]] >= 0)
-                                {
+                            if ((component[zigZagMap[i]] & positive) == 0) {
+                                if (component[zigZagMap[i]] >= 0) {
                                     component[zigZagMap[i]] += positive;
                                 }
-                                else
-                                {
+                                else {
                                     component[zigZagMap[i]] += negative;
                                 }
                             }
@@ -1157,24 +981,20 @@ px_bool PX_JpgDecodeBlockComponent(
 }
 // decode all the Huffman data and fill all MCUs
 
-px_bool PX_JpgDecodeHuffmanData(PX_JpgDecoder *pJpgdecoder)
+px_bool PX_JpgDecodeHuffmanData(PX_JpgDecoder* pJpgdecoder)
 {
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     px_int previousDCs[3] = { 0 };
     px_uint skips = 0;
-    px_int i, x, y, v, h;
-    px_bool luminanceOnly = pJpgdecoder->componentsInScan == 1 &&
-                            pJpgdecoder->colorComponents[0].usedInScan;
+    px_int i,x,y,v,h;
+    px_bool luminanceOnly = pJpgdecoder->componentsInScan == 1 && pJpgdecoder->colorComponents[0].usedInScan;
     px_uint yStep = luminanceOnly ? 1 : pJpgdecoder->verticalSamplingFactor;
     px_uint xStep = luminanceOnly ? 1 : pJpgdecoder->horizontalSamplingFactor;
     px_uint restartInterval = pJpgdecoder->restartInterval * xStep * yStep;
-
-    for (y = 0; y < pJpgdecoder->blockHeight; y += yStep)
-    {
-        for (x = 0; x < pJpgdecoder->blockWidth; x += xStep)
-        {
-            if (restartInterval != 0 && (y * pJpgdecoder->blockWidthReal + x) % restartInterval == 0)
-            {
+    
+    for (y = 0; y < pJpgdecoder->blockHeight; y += yStep) {
+        for (x = 0; x < pJpgdecoder->blockWidth; x += xStep) {
+            if (restartInterval != 0 && (y * pJpgdecoder->blockWidthReal + x) % restartInterval == 0) {
                 previousDCs[0] = 0;
                 previousDCs[1] = 0;
                 previousDCs[2] = 0;
@@ -1184,53 +1004,50 @@ px_bool PX_JpgDecodeHuffmanData(PX_JpgDecoder *pJpgdecoder)
 
             for (i = 0; i < pJpgdecoder->numComponents; ++i)
             {
-                PX_JpgColorComponent *component = &pJpgdecoder->colorComponents[i];
-                if (component->usedInScan)
-                {
+                 PX_JpgColorComponent* component = &pJpgdecoder->colorComponents[i];
+                if (component->usedInScan) {
                     px_int vMax = luminanceOnly ? 1 : component->verticalSamplingFactor;
                     px_int hMax = luminanceOnly ? 1 : component->horizontalSamplingFactor;
-                    for (v = 0; v < vMax; ++v)
-                    {
-                        for (h = 0; h < hMax; ++h)
+                    for (v = 0; v < vMax; ++v) {
+                        for (h = 0; h < hMax; ++h) 
                         {
 
-                            if (i == 0)
+                            if(i==0)
                                 if (!PX_JpgDecodeBlockComponent(
-                                        pJpgdecoder,
-                                        pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].y,
-                                        &previousDCs[i],
-                                        &skips,
-                                        &pJpgdecoder->huffmanDCTables[component->huffmanDCTableID],
-                                        &pJpgdecoder->huffmanACTables[component->huffmanACTableID]))
+                                    pJpgdecoder,
+                                    pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].y,
+                                    &previousDCs[i],
+                                    &skips,
+                                    &pJpgdecoder->huffmanDCTables[component->huffmanDCTableID],
+                                    &pJpgdecoder->huffmanACTables[component->huffmanACTableID])) 
                                 {
                                     return PX_FALSE;
                                 }
-
+                             
 
                             if (i == 1)
                                 if (!PX_JpgDecodeBlockComponent(
-                                        pJpgdecoder,
-                                        pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cb,
-                                        &previousDCs[i],
-                                        &skips,
-                                        &pJpgdecoder->huffmanDCTables[component->huffmanDCTableID],
-                                        &pJpgdecoder->huffmanACTables[component->huffmanACTableID]))
+                                    pJpgdecoder,
+                                    pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cb,
+                                    &previousDCs[i],
+                                    &skips,
+                                    &pJpgdecoder->huffmanDCTables[component->huffmanDCTableID],
+                                    &pJpgdecoder->huffmanACTables[component->huffmanACTableID])) 
                                 {
                                     return PX_FALSE;
                                 }
-
+                           
                             if (i == 2)
                                 if (!PX_JpgDecodeBlockComponent(
-                                        pJpgdecoder,
-                                        pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cr,
-                                        &previousDCs[i],
-                                        &skips,
-                                        &pJpgdecoder->huffmanDCTables[component->huffmanDCTableID],
-                                        &pJpgdecoder->huffmanACTables[component->huffmanACTableID]))
-                                {
+                                    pJpgdecoder,
+                                    pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cr,
+                                    &previousDCs[i],
+                                    &skips,
+                                    &pJpgdecoder->huffmanDCTables[component->huffmanDCTableID],
+                                    &pJpgdecoder->huffmanACTables[component->huffmanACTableID])) {
                                     return PX_FALSE;
                                 }
-
+                              
                         }
                     }
                 }
@@ -1241,23 +1058,19 @@ px_bool PX_JpgDecodeHuffmanData(PX_JpgDecoder *pJpgdecoder)
 }
 
 
-px_bool PX_JpgReadScans(PX_JpgDecoder *pJpgdecoder)
+px_bool PX_JpgReadScans(PX_JpgDecoder* pJpgdecoder) 
 {
-    PX_MemoryStream *pstream = &pJpgdecoder->stream;
+    PX_MemoryStream* pstream = &pJpgdecoder->stream;
     px_byte last, current;
     // decode first scan
     if (!PX_JpgReadStartOfScan(pJpgdecoder))
-    {
         return PX_FALSE;
-    }
 
     if (!PX_JpgDecodeHuffmanData(pJpgdecoder))
-    {
         return PX_FALSE;
-    }
 
     PX_MemoryStreamAlign(&pJpgdecoder->stream);
-    while (pstream->bitpointer % 8 == 0 && pstream->bitpointer)
+    while (pstream->bitpointer%8==0&& pstream->bitpointer)
     {
         if (pstream->bitstream[pstream->bitpointer / 8 - 1] == 0xff)
         {
@@ -1265,19 +1078,18 @@ px_bool PX_JpgReadScans(PX_JpgDecoder *pJpgdecoder)
         }
         else
         {
-            break;
-        }
+			break;
+		}
     }
 
     last = PX_MemoryStreamReadByte(pstream);
     current = PX_MemoryStreamReadByte(pstream);
 
-    if (last != 0xFF)
-    {
+    if (last != 0xFF) {
         // "Error - Expected a marker\n";
         return PX_FALSE;
     }
-
+  
     return PX_TRUE;
 }
 
@@ -1285,39 +1097,31 @@ px_bool PX_JpgReadScans(PX_JpgDecoder *pJpgdecoder)
 
 
 // dequantize a block component based on a quantization table
-px_void PX_JpgDequantizeBlockComponent(PX_JpgQuantizationTable *qTable, px_int *component)
-{
+px_void PX_JpgDequantizeBlockComponent(PX_JpgQuantizationTable* qTable, px_int* component) {
     px_uint i;
-    for (i = 0; i < 64; ++i)
-    {
+    for (i = 0; i < 64; ++i) {
         component[i] *= qTable->table[i];
     }
 }
 
 // dequantize all MCUs
-px_bool PX_JpgDequantize(PX_JpgDecoder *pJpgdecoder)
-{
+px_bool PX_JpgDequantize(PX_JpgDecoder* pJpgdecoder) {
     px_int y, x, i, v, h;
-    for (y = 0; y < pJpgdecoder->blockHeight; y += pJpgdecoder->verticalSamplingFactor)
-    {
-        for (x = 0; x < pJpgdecoder->blockWidth; x += pJpgdecoder->horizontalSamplingFactor)
-        {
-            for (i = 0; i < pJpgdecoder->numComponents; ++i)
-            {
-                PX_JpgColorComponent *component = &pJpgdecoder->colorComponents[i];
-                for (v = 0; v < component->verticalSamplingFactor; ++v)
-                {
-                    for (h = 0; h < component->horizontalSamplingFactor; ++h)
-                    {
+    for (y = 0; y < pJpgdecoder->blockHeight; y += pJpgdecoder->verticalSamplingFactor) {
+        for (x = 0; x < pJpgdecoder->blockWidth; x += pJpgdecoder->horizontalSamplingFactor) {
+            for (i = 0; i < pJpgdecoder->numComponents; ++i) {
+                PX_JpgColorComponent* component = &pJpgdecoder->colorComponents[i];
+                for (v = 0; v < component->verticalSamplingFactor; ++v) {
+                    for (h = 0; h < component->horizontalSamplingFactor; ++h) {
                         if (i == 0)
                             PX_JpgDequantizeBlockComponent(&pJpgdecoder->quantizationTables[component->quantizationTableID],
-                                                           pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].y);
+                                pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].y);
                         else if (i == 1)
                             PX_JpgDequantizeBlockComponent(&pJpgdecoder->quantizationTables[component->quantizationTableID],
-                                                           pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cb);
+                                pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cb);
                         else if (i == 2)
                             PX_JpgDequantizeBlockComponent(&pJpgdecoder->quantizationTables[component->quantizationTableID],
-                                                           pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cr);
+                                pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cr);
                         else
                         {
                             return PX_FALSE;
@@ -1332,8 +1136,7 @@ px_bool PX_JpgDequantize(PX_JpgDecoder *pJpgdecoder)
 
 // perform 1-D IDCT on all columns and rows of a block component
 //   resulting in 2-D IDCT
-px_void PX_JpgInverseDCTBlockComponent(px_int *component)
-{
+px_void PX_JpgInverseDCTBlockComponent(px_int* component) {
     // IDCT scaling factors
     px_uint i;
     px_float m0 = 1.8477590650225739f;
@@ -1352,8 +1155,7 @@ px_void PX_JpgInverseDCTBlockComponent(px_int *component)
     px_float s6 = 0.19134171618254486f;
     px_float s7 = 0.097545161008064124f;
 
-    for (i = 0; i < 8; ++i)
-    {
+    for (i = 0; i < 8; ++i) {
         px_float g0 = component[0 * 8 + i] * s0;
         px_float g1 = component[4 * 8 + i] * s4;
         px_float g2 = component[2 * 8 + i] * s2;
@@ -1420,8 +1222,7 @@ px_void PX_JpgInverseDCTBlockComponent(px_int *component)
         component[6 * 8 + i] = (px_int)(b1 - b6);
         component[7 * 8 + i] = (px_int)(b0 - b7);
     }
-    for (i = 0; i < 8; ++i)
-    {
+    for (i = 0; i < 8; ++i) {
         px_float g0 = component[i * 8 + 0] * s0;
         px_float g1 = component[i * 8 + 4] * s4;
         px_float g2 = component[i * 8 + 2] * s2;
@@ -1491,40 +1292,23 @@ px_void PX_JpgInverseDCTBlockComponent(px_int *component)
 }
 
 // perform IDCT on all MCUs
-px_bool PX_JpgInverseDCT(PX_JpgDecoder *pJpgdecoder)
-{
+px_bool PX_JpgInverseDCT(PX_JpgDecoder* pJpgdecoder) {
 
     px_int y, x, i, v, h;
-    for (y = 0; y < pJpgdecoder->blockHeight; y += pJpgdecoder->verticalSamplingFactor)
-    {
-        for (x = 0; x < pJpgdecoder->blockWidth; x += pJpgdecoder->horizontalSamplingFactor)
-        {
-            for (i = 0; i < pJpgdecoder->numComponents; ++i)
-            {
-                PX_JpgColorComponent *component = &pJpgdecoder->colorComponents[i];
-                for (v = 0; v < component->verticalSamplingFactor; ++v)
-                {
-                    for (h = 0; h < component->horizontalSamplingFactor; ++h)
-                    {
+    for (y = 0; y < pJpgdecoder->blockHeight; y += pJpgdecoder->verticalSamplingFactor) {
+        for (x = 0; x < pJpgdecoder->blockWidth; x += pJpgdecoder->horizontalSamplingFactor) {
+            for (i = 0; i < pJpgdecoder->numComponents; ++i) {
+                PX_JpgColorComponent* component = &pJpgdecoder->colorComponents[i];
+                for (v = 0; v < component->verticalSamplingFactor; ++v) {
+                    for (h = 0; h < component->horizontalSamplingFactor; ++h) {
                         if (i == 0)
-                        {
-                            PX_JpgInverseDCTBlockComponent(pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal +
-                                                                                       (x + h)].y);
-                        }
+                            PX_JpgInverseDCTBlockComponent(pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].y);
                         else if (i == 1)
-                        {
-                            PX_JpgInverseDCTBlockComponent(pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal +
-                                                                                       (x + h)].cb);
-                        }
+                            PX_JpgInverseDCTBlockComponent(pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cb);
                         else if (i == 2)
-                        {
-                            PX_JpgInverseDCTBlockComponent(pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal +
-                                                                                       (x + h)].cr);
-                        }
+                            PX_JpgInverseDCTBlockComponent(pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)].cr);
                         else
-                        {
                             return PX_FALSE;
-                        }
                     }
                 }
             }
@@ -1534,28 +1318,24 @@ px_bool PX_JpgInverseDCT(PX_JpgDecoder *pJpgdecoder)
 }
 
 // convert all pixels in a block from YCbCr color space to RGB
-px_void PX_JpgYCbCrToRGBBlock(PX_JpgBlock *yBlock, PX_JpgBlock *cbcrBlock, px_uint vSamp,
-                              px_uint hSamp, px_uint v, px_uint h)
+px_void PX_JpgYCbCrToRGBBlock(PX_JpgBlock* yBlock, PX_JpgBlock* cbcrBlock, px_uint vSamp, px_uint hSamp, px_uint v, px_uint h)
 {
     px_uint x, y;
-    for (y = 7; y < 8; --y)
-    {
-        for (x = 7; x < 8; --x)
-        {
+    for (y = 7; y < 8; --y) {
+        for (x = 7; x < 8; --x) {
             px_uint pixel = y * 8 + x;
             px_uint cbcrPixelRow = y / vSamp + 4 * v;
             px_uint cbcrPixelColumn = x / hSamp + 4 * h;
             px_uint cbcrPixel = cbcrPixelRow * 8 + cbcrPixelColumn;
             px_int r = (px_int)(yBlock->y[pixel] + 1.402f * cbcrBlock->cr[cbcrPixel] + 128);
-            px_int g = (px_int)(yBlock->y[pixel] - 0.344f * cbcrBlock->cb[cbcrPixel] - 0.714f *
-                                cbcrBlock->cr[cbcrPixel] + 128);
+            px_int g = (px_int)(yBlock->y[pixel] - 0.344f * cbcrBlock->cb[cbcrPixel] - 0.714f * cbcrBlock->cr[cbcrPixel] + 128);
             px_int b = (px_int)(yBlock->y[pixel] + 1.772f * cbcrBlock->cb[cbcrPixel] + 128);
-            if (r < 0) { r = 0; }
-            if (r > 255) { r = 255; }
-            if (g < 0) { g = 0; }
-            if (g > 255) { g = 255; }
-            if (b < 0) { b = 0; }
-            if (b > 255) { b = 255; }
+            if (r < 0)   r = 0;
+            if (r > 255) r = 255;
+            if (g < 0)   g = 0;
+            if (g > 255) g = 255;
+            if (b < 0)   b = 0;
+            if (b > 255) b = 255;
             yBlock->r[pixel] = r;
             yBlock->g[pixel] = g;
             yBlock->b[pixel] = b;
@@ -1564,7 +1344,7 @@ px_void PX_JpgYCbCrToRGBBlock(PX_JpgBlock *yBlock, PX_JpgBlock *cbcrBlock, px_ui
 }
 
 // convert all pixels from YCbCr color space to RGB
-px_void PX_JpgYCbCrToRGB(PX_JpgDecoder *pJpgdecoder)
+px_void PX_JpgYCbCrToRGB(PX_JpgDecoder* pJpgdecoder)
 {
     px_int x, y, v, h;
     px_int vSamp = pJpgdecoder->verticalSamplingFactor;
@@ -1573,12 +1353,12 @@ px_void PX_JpgYCbCrToRGB(PX_JpgDecoder *pJpgdecoder)
     {
         for (x = 0; x < pJpgdecoder->blockWidth; x += hSamp)
         {
-            PX_JpgBlock *cbcrBlock = &pJpgdecoder->blocks[y * pJpgdecoder->blockWidthReal + x];
-            for (v = vSamp - 1; v >= 0 ; --v)
+            PX_JpgBlock* cbcrBlock = &pJpgdecoder->blocks[y * pJpgdecoder->blockWidthReal + x];
+            for (v = vSamp - 1; v >=0 ; --v) 
             {
-                for (h = hSamp - 1; h >= 0; --h)
+                for (h = hSamp - 1; h >=0; --h) 
                 {
-                    PX_JpgBlock *yBlock = &pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)];
+                    PX_JpgBlock* yBlock = &pJpgdecoder->blocks[(y + v) * pJpgdecoder->blockWidthReal + (x + h)];
                     PX_JpgYCbCrToRGBBlock(yBlock, cbcrBlock, vSamp, hSamp, v, h);
                 }
             }
@@ -1587,10 +1367,9 @@ px_void PX_JpgYCbCrToRGB(PX_JpgDecoder *pJpgdecoder)
 }
 
 
-px_bool PX_JpgDecoderInitialize(px_memorypool *mp, PX_JpgDecoder *decoder, px_byte *pbuffer,
-                                px_int size)
+px_bool PX_JpgDecoderInitialize(px_memorypool* mp, PX_JpgDecoder* decoder, px_byte* pbuffer, px_int size)
 {
-
+    
     PX_memset(decoder, 0, sizeof(PX_JpgDecoder));
     decoder->mp = mp;
     PX_MemoryStreamInitialize(&decoder->stream, pbuffer, size);
@@ -1600,14 +1379,11 @@ px_bool PX_JpgDecoderInitialize(px_memorypool *mp, PX_JpgDecoder *decoder, px_by
         return PX_FALSE;
     }
 
-    decoder->blocks = (PX_JpgBlock *)MP_Malloc(mp,
-                                               sizeof(PX_JpgBlock) * decoder->blockHeightReal * decoder->blockWidthReal);
-    if (decoder->blocks == 0)
-    {
+    decoder->blocks =(PX_JpgBlock *)MP_Malloc(mp,sizeof(PX_JpgBlock)* decoder->blockHeightReal * decoder->blockWidthReal);
+    if (decoder->blocks == 0) {
         return PX_FALSE;
     }
-    PX_memset(decoder->blocks, 0, sizeof(PX_JpgBlock) * decoder->blockHeightReal *
-              decoder->blockWidthReal);
+    PX_memset(decoder->blocks, 0, sizeof(PX_JpgBlock) * decoder->blockHeightReal * decoder->blockWidthReal);
     if (!PX_JpgReadScans(decoder))
     {
         goto _ERROR;
@@ -1633,37 +1409,35 @@ _ERROR:
     return PX_FALSE;
 }
 
-px_int PX_JpgDecoderGetWidth(PX_JpgDecoder *decoder)
+px_int PX_JpgDecoderGetWidth(PX_JpgDecoder* decoder)
 {
     return decoder->width;
 }
-px_int PX_JpgDecoderGetHeight(PX_JpgDecoder *decoder)
+px_int PX_JpgDecoderGetHeight(PX_JpgDecoder* decoder)
 {
     return decoder->height;
 }
 
-px_void PX_JpgDecoderFree(PX_JpgDecoder *decoder)
+px_void PX_JpgDecoderFree(PX_JpgDecoder* decoder)
 {
     MP_Free(decoder->mp, decoder->blocks);
 }
 
-px_void PX_JpgDecoderRenderToSurface(PX_JpgDecoder *decoder, px_surface *prendersurface)
+px_void PX_JpgDecoderRenderToSurface(PX_JpgDecoder* decoder, px_surface* prendersurface)
 {
     px_int height = decoder->height < prendersurface->height ? decoder->height : prendersurface->height;
     px_int width = decoder->width < prendersurface->width ? decoder->width : prendersurface->width;
     px_int x, y;
 
-    for (y = 0; y < height; y++)
-    {
-        px_int blockRow = y / 8;
-        px_int pixelRow = y % 8;
-        for (x = 0; x < width; ++x)
-        {
-            px_int blockColumn = x / 8;
-            px_int pixelColumn = x % 8;
-            px_int blockIndex = blockRow * decoder->blockWidthReal + blockColumn;
-            px_int pixelIndex = pixelRow * 8 + pixelColumn;
-            px_byte a, r, g, b;
+    for (y = 0; y < height;y++) {
+         px_int blockRow = y / 8;
+         px_int pixelRow = y % 8;
+        for (x = 0; x < width; ++x) {
+             px_int blockColumn = x / 8;
+             px_int pixelColumn = x % 8;
+             px_int blockIndex = blockRow * decoder->blockWidthReal + blockColumn;
+             px_int pixelIndex = pixelRow * 8 + pixelColumn;
+             px_byte a, r, g, b;
             b = (px_byte)(decoder->blocks[blockIndex].b[pixelIndex]);
             g = (px_byte)(decoder->blocks[blockIndex].g[pixelIndex]);
             r = (px_byte)(decoder->blocks[blockIndex].r[pixelIndex]);
@@ -1671,6 +1445,6 @@ px_void PX_JpgDecoderRenderToSurface(PX_JpgDecoder *decoder, px_surface *prender
             PX_SurfaceSetPixel(prendersurface, x, y, PX_COLOR(a, r, g, b));
         }
     }
-
+    
 }
 

@@ -3,32 +3,32 @@
 #include "../core/PX_Core.h"
 typedef struct
 {
-    px_dword magic;
-    px_dword framecount;
-    px_dword animationCount;
-} PX_2DX_Header;
+	px_dword magic;
+	px_dword framecount;
+	px_dword animationCount;
+}PX_2DX_Header;
 
 
-typedef struct
+typedef struct  
 {
-    px_dword size;
-} PX_2DX_CODE_Header;
+	px_dword size;
+}PX_2DX_CODE_Header;
 
 typedef enum
 {
-    PX_2DX_OPCODE_FRAME = 1,
-    PX_2DX_OPCODE_SLEEP,
-    PX_2DX_OPCODE_GOTO,
-    PX_2DX_OPCODE_LOOP,
-    PX_2DX_OPCODE_END,
-    PX_2DX_OPCODE_CLIPX,
-    PX_2DX_OPCODE_CLIPY,
-    PX_2DX_OPCODE_CLIPW,
-    PX_2DX_OPCODE_CLIPH,
-    PX_2DX_OPCODE_CLIPI,
-    PX_2DX_OPCODE_CLIPINC,
-    PX_2DX_OPCODE_CLIPDEC,
-} PX_2DX_OPCODE;
+	PX_2DX_OPCODE_FRAME =1,
+	PX_2DX_OPCODE_SLEEP,
+	PX_2DX_OPCODE_GOTO,
+	PX_2DX_OPCODE_LOOP,
+	PX_2DX_OPCODE_END,
+	PX_2DX_OPCODE_CLIPX,
+	PX_2DX_OPCODE_CLIPY,
+	PX_2DX_OPCODE_CLIPW,
+	PX_2DX_OPCODE_CLIPH,
+	PX_2DX_OPCODE_CLIPI,
+	PX_2DX_OPCODE_CLIPINC,
+	PX_2DX_OPCODE_CLIPDEC,
+}PX_2DX_OPCODE;
 
 //Instrument format
 //opcode 1byte
@@ -36,9 +36,9 @@ typedef enum
 
 typedef struct
 {
-    px_word  opcode;
-    px_word  param;
-} PX_2DX_INSTR;
+	px_word  opcode;
+	px_word  param;
+}PX_2DX_INSTR;
 
 //frame [index] //opcode 1 byte //param  3 byte
 //clipx [x] //opcode 1 byte //param  3 byte
