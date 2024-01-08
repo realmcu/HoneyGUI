@@ -291,11 +291,11 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
     {
         end_line = y2 + 4;
     }
-    for (uint32_t i = start_line; i < end_line; i++)
+    for (uint32_t i = y_start; i < end_line; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        for (uint32_t j = x_start; j < end_line; j++)
+        for (uint32_t j = x_start; j < x_end; j++)
         {
             float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * i + image->inverse->m[0][2];
             float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * i + image->inverse->m[1][2];
@@ -420,6 +420,7 @@ void cpu_filter_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispde
             }
         }
     }
+    return;
 }
 void cpu_filter_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                             gui_rect_t *rect)

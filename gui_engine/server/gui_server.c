@@ -145,10 +145,12 @@ static void gui_server_entry(void *parameter)
             gui_log("line %d, aemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n",
                     __LINE__, daemon_start_ms, gui_ms_get(), app->active_ms);
             gui_msg_t msg;
+            gui_display_off();
             if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0xFFFFFFFF))
             {
                 gui_server_msg_handler(&msg);
             }
+            gui_display_on();
             daemon_cnt = 0;
             daemon_start_ms = 0;
         }

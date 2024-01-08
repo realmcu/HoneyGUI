@@ -258,6 +258,7 @@ static void tabview_prepare(gui_obj_t *obj)
         }
         tabview->cur_id.y = tabview->cur_id.y - 1;
         this->release_y = this->release_y - tabview->base.h;
+        gui_obj_event_set(obj, GUI_EVENT_1);
         break;
     case TOUCH_UP_SLIDE:
         gui_log("TOUCH_UP_SLIDE\n");
@@ -272,6 +273,7 @@ static void tabview_prepare(gui_obj_t *obj)
         }
         tabview->cur_id.y = tabview->cur_id.y + 1;
         this->release_y = this->release_y + tabview->base.h;
+        gui_obj_event_set(obj, GUI_EVENT_2);
         break;
     case TOUCH_ORIGIN_FROM_X:
     case TOUCH_ORIGIN_FROM_Y:

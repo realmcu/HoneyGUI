@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "acc_sw_blend.h"
-#include "acc_sw.h"
 #include "math.h"
 
 void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
@@ -304,6 +303,80 @@ void alpha_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc
                     if (opacity_value < 255)
                     {
                         *d = do_blending_rgb565_2_rgb565_opacity((uint32_t)pixel, (uint32_t) * d, opacity_value);
+                    }
+                }
+                break;
+            }
+        }
+    }
+    return;
+}
+void alpha_matrix_blit_argb8565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                                         gui_rect_t *rect)
+{
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
+    int source_w = image->img_w;
+    int source_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+    struct gui_matrix *inverse = image->inverse;
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t opacity_value = image->opacity_value;
+    for (uint32_t i = y_start; i < y_end; i++)
+    {
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+        for (uint32_t j = x_start; j < x_end; j++)
+        {
+            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+            int x = X / Z;
+            int y = Y / Z;
+
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+            {
+                continue;
+            }
+            uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * 3);
+            uint8_t alpha = pixel[2];
+            uint16_t color_t = (uint16_t)(((uint16_t)(pixel[1]) << 8) + pixel[0]);
+            uint16_t *d = writebuf + (write_off + j);
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    *d = do_blending_rgb565_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
+                }
+                break;
+            default:
+                {
+                    if (opacity_value < 255)
+                    {
+                        opacity_value = alpha * opacity_value / 255;
+                        *d = do_blending_rgb565_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
                 break;
