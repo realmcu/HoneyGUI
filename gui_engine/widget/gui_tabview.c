@@ -294,8 +294,10 @@ static void tabview_prepare(gui_obj_t *obj)
     {
         this->release_x = 0;
     }
-    obj->dx = this->release_x;
-
+    if (!(tabview->tab_cnt_left == 0 && tabview->tab_cnt_right == 0))
+    {
+        obj->dx = this->release_x;
+    }
     if (this->release_y >= GUI_FRAME_STEP)
     {
         this->release_y -= GUI_FRAME_STEP;
