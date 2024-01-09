@@ -322,8 +322,8 @@ void page_update(gui_obj_t *obj)
 
         if (((gui_page_t *)obj)->scroll_bar)
         {
-            ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
-                                                       gui_get_screen_height() / obj->h);
+            // ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
+            //                                            gui_get_screen_height() / obj->h);
         }
         // gui_log("obj->y:%d,%d, %d\n", obj->y, obj->ay, obj->parent->ay);
         if (obj->y == ((gui_page_t *)obj)->start_y)
@@ -560,8 +560,8 @@ static void page_update_rebound(gui_obj_t *obj)
 
         if (((gui_page_t *)obj)->scroll_bar)
         {
-            ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
-                                                       gui_get_screen_height() / obj->h);
+            // ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
+            //                                            gui_get_screen_height() / obj->h);
         }
         // gui_log("obj->y:%d,%d, %d\n", obj->y, obj->ay, obj->parent->ay);
         if (obj->y == ((gui_page_t *)obj)->start_y)
