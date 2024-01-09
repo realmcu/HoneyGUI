@@ -96,6 +96,10 @@ static void gui_font_draw(gui_text_t *text, gui_rect_t *rect)
     switch (text->font_type)
     {
     case GUI_FONT_SOURCE_BMP:
+        if (text->base.sx != 1.0f || text->base.sy != 1.0f)
+        {
+            return;
+        }
         gui_font_mem_draw(text, rect);
         break;
     case GUI_FONT_SOURCE_TTF:
@@ -173,9 +177,13 @@ static void text_draw(gui_obj_t *obj)
         return;
     }
     struct gui_dispdev *dc = gui_get_dc();
+    int tab_x = 0;
+    int tab_y = 0;
+    tab_y = (int)(gui_get_screen_height() / 2 - obj->ay) * (1.0f - obj->sy);
+    tab_x = (int)(gui_get_screen_width() / 2 - obj->ax) * (1.0f - obj->sx);
     gui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->ax + obj->dx + obj->tx;
-    draw_rect.y1 = obj->ay + obj->dy + obj->ty;
+    draw_rect.x1 = obj->ax + obj->dx + obj->tx + tab_x;
+    draw_rect.y1 = obj->ay + obj->dy + obj->ty + tab_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
     if (dc->section_count == 0)
@@ -234,6 +242,7 @@ void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t col
     this->len = length;
     this->font_height = font_size;
     this->text_offset = 0;
+    gui_fb_change();
 }
 
 void gui_text_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p)
@@ -291,6 +300,7 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
 {
     this->content = (uint8_t *)text;
     this->len = length;
+    gui_fb_change();
 }
 
 gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
