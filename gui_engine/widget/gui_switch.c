@@ -87,22 +87,25 @@
   */
 void gui_switch_change_switch(gui_switch_t *sw)
 {
-
+    gui_imgconfig_t config =
+    {
+        .src_mode = sw->src_mode,
+        .addr = NULL,
+        .x = 0,
+        .y = 0,
+    };
     //sw->off->base.not_show = (sw->ifon);
     //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->on_pic_addr, 0, 0);
+        config.addr = sw->on_pic_addr;
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->off_pic_addr, 0, 0);
+        config.addr = sw->off_pic_addr;
     }
     //gui_app_exec(gui_current_app());
-
-
+    gui_img_set_config(sw->switch_picture, &config);
 }
 static void sw_turn_on(gui_switch_t *this)
 {
@@ -203,66 +206,93 @@ static void (onOff)(gui_switch_t *b, void *callback, void *parameter)
 
 static void gui_switch_hl(gui_switch_t *sw)
 {
-
+    gui_imgconfig_t config =
+    {
+        .src_mode = sw->src_mode,
+        .addr = NULL,
+        .x = 0,
+        .y = 0,
+    };
     //sw->off->base.not_show = (sw->ifon);
     //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_hl_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->on_hl_pic_addr, 0, 0);
+        config.addr = sw->on_hl_pic_addr;
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_hl_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->off_hl_pic_addr, 0, 0);
+        config.addr = sw->off_hl_pic_addr;
     }
     //gui_app_exec(gui_current_app());
-
+    gui_img_set_config(sw->switch_picture, &config);
 
 }
 
 static void gui_switch_hl_back(gui_switch_t *sw)
 {
-
+    gui_imgconfig_t config =
+    {
+        .src_mode = sw->src_mode,
+        .addr = NULL,
+        .x = 0,
+        .y = 0,
+    };
     //sw->off->base.not_show = (sw->ifon);
     //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->on_pic_addr, 0, 0);
+        config.addr = sw->on_pic_addr;
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->off_pic_addr, 0, 0);
+        config.addr = sw->off_pic_addr;
     }
     //gui_app_exec(gui_current_app());
+    gui_img_set_config(sw->switch_picture, &config);
 }
 
 static void gui_switch_long_touch(gui_switch_t *sw)
 {
-    gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->long_touch_state_pic_addr : NULL, \
-                          sw->flg_fs ? NULL : sw->long_touch_state_pic_addr, 0, 0);
+    gui_imgconfig_t config =
+    {
+        .src_mode = sw->src_mode,
+        .addr = sw->long_touch_state_pic_addr,
+        .x = 0,
+        .y = 0,
+    };
+    gui_img_set_config(sw->switch_picture, &config);
 }
 
 static void gui_switch_long_touch_back(gui_switch_t *sw)
 {
+    gui_imgconfig_t config =
+    {
+        .src_mode = sw->src_mode,
+        .addr = NULL,
+        .x = 0,
+        .y = 0,
+    };
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->on_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->on_pic_addr, 0, 0);
+        config.addr = sw->on_pic_addr;
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->off_pic_addr : NULL, \
-                              sw->flg_fs ? NULL : sw->off_pic_addr, 0, 0);
+        config.addr = sw->off_pic_addr;
     }
+    gui_img_set_config(sw->switch_picture, &config);
 }
 
 static void gui_switch_hl_long_touch(gui_switch_t *sw)
 {
-    gui_img_set_attribute(sw->switch_picture, sw->flg_fs ? sw->long_touch_state_hl_pic_addr : NULL, \
-                          sw->flg_fs ? NULL : sw->long_touch_state_hl_pic_addr, 0, 0);
+    gui_imgconfig_t config =
+    {
+        .src_mode = sw->src_mode,
+        .addr = sw->long_touch_state_hl_pic_addr,
+        .x = 0,
+        .y = 0,
+    };
+    gui_img_set_config(sw->switch_picture, &config);
 }
 
 void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
@@ -537,24 +567,28 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->long_touch_state_hl_pic_addr = this->off_pic_addr;
 }
 static gui_switch_t *gui_switch_create_core(void *parent, int16_t x, int16_t y,
-                                            int16_t w, int16_t h, void *off_pic, void *on_pic, bool flg_fs)
+                                            int16_t w, int16_t h, void *off_pic, void *on_pic, IMG_SOURCE_MODE_TYPE src_mode)
 {
     //gui_log("gui_switch_create:%p,%d,%d,%d,%d,%p,%p\n", parent, x, y, w, h, off_pic, on_pic);
     gui_switch_t *this = gui_malloc(sizeof(gui_switch_t));
     memset(this, 0, sizeof(gui_switch_t));
-    this->flg_fs = flg_fs;
+    this->src_mode = src_mode;
     gui_switch_ctor(this, parent, x, y, w, h, off_pic, on_pic);
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     { gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list), &(((gui_obj_t *)this)->brother_list)); }
 
-    if (flg_fs)
+    if (src_mode == IMG_SRC_FILESYS)
     {
         this->switch_picture = (void *)gui_img_create_from_fs(this, off_pic, 0, 0);
     }
-    else
+    else if (src_mode == IMG_SRC_MEMADDR)
     {
         this->switch_picture = (void *)gui_img_create_from_mem(this, "switch_picture", off_pic, 0, 0, 0, 0);
+    }
+    else if (src_mode == IMG_SRC_RLE)
+    {
+        this->switch_picture = (void *)gui_img_create_from_rle(this, off_pic, 0, 0);
     }
     ((gui_obj_t *)this)->create_done = 1;
     return this;
@@ -563,13 +597,13 @@ static gui_switch_t *gui_switch_create_core(void *parent, int16_t x, int16_t y,
 gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
                                 int16_t w, int16_t h, void *off_pic, void *on_pic)
 {
-    return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, false);
+    return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, IMG_SRC_MEMADDR);
 }
 
 gui_switch_t *gui_switch_create_from_fs(void *parent, int16_t x, int16_t y,
                                         int16_t w, int16_t h, void *off_pic, void *on_pic)
 {
-    return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, true);
+    return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, IMG_SRC_FILESYS);
 }
 
 /** End of WIDGET_Exported_Functions

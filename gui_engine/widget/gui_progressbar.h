@@ -60,8 +60,7 @@ struct gui_progressbar
     void (*ctor)(gui_progressbar_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y,
                  int16_t w, int16_t h);
-    bool flg_fs;
-
+    IMG_SOURCE_MODE_TYPE src_mode;   // scroll_bar
 };
 
 

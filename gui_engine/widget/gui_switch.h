@@ -71,7 +71,7 @@ struct gui_switch
     void (*ctor)(gui_switch_t *this, gui_obj_t *parent,
                  int16_t x,
                  int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
-    bool flg_fs;
+    IMG_SOURCE_MODE_TYPE src_mode;
 } ;
 
 

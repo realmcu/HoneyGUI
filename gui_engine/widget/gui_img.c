@@ -472,6 +472,42 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
     }
 }
 
+void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config)
+{
+    GUI_ASSERT(img != NULL);
+    gui_img_t *this = img;
+    draw_img_t *draw_img = &img->draw_img;
+
+    if (!config->file)
+    {
+        return;
+    }
+    this->base.x = config->x;
+    this->base.y = config->y;
+
+    // free filepath on win
+    if (draw_img->src_mode == IMG_SRC_FILESYS)
+    {
+#ifdef _WIN32
+        gui_free(draw_img->data);
+#endif
+    }
+
+    draw_img->src_mode = config->src_mode;
+    if (config->src_mode == IMG_SRC_MEMADDR)
+    {
+        draw_img->data = (void *)config->addr;
+    }
+    else if (config->src_mode == IMG_SRC_FILESYS)
+    {
+        void *path = (void *)config->file;
+#ifdef _WIN32
+        path = gui_img_filepath_transforming(path);
+#endif
+        draw_img->data = path;
+    }
+}
+
 void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)
 {
     GUI_ASSERT(img != NULL);

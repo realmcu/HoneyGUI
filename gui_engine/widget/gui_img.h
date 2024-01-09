@@ -146,6 +146,13 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
                            int16_t y);
 
 /**
+ * @brief set image configure
+ *
+ * @param img image widget
+ * @param config img configure
+ */
+void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config);
+/**
  * @brief Rotate the image around the center of the circle
  *
  * @param img the image widget pointer.
