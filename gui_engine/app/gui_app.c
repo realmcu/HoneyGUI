@@ -12,8 +12,19 @@
 
 gui_app_t *current_app;
 gui_app_t *next_app;
-
-
+static bool app_layer;
+void gui_app_layer_top()
+{
+    app_layer = true;
+}
+void gui_app_layer_buttom()
+{
+    app_layer = false;
+}
+bool gui_app_get_layer()
+{
+    return app_layer;
+}
 gui_app_t *gui_current_app(void)
 {
     return current_app;

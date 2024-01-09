@@ -127,6 +127,7 @@ static void event_cb_release(gui_button_t *button)
 static void event_cb_click(gui_button_t *button)
 {
     gui_app_startup(get_app_app());
+    gui_app_layer_top();
 }
 static void deal_img_in_root(gui_obj_t *object)
 {
@@ -207,13 +208,34 @@ static void app_page_ui_design(gui_app_t *app)
 static void app_app_animate_exit(gui_win_t *win)
 {
     touch_info_t *tp = tp_get_info();
-    if (tp->deltaX > gui_get_screen_width() / 3 || GET_BASE(win)->x > gui_get_screen_width() / 3 * 2)
+    static bool end;
+    if ((tp->deltaX > gui_get_screen_width() / 3 ||
+         GET_BASE(win)->x > gui_get_screen_width() / 3 * 2) && (tp->type == TOUCH_HOLD_X) && tp->deltaX > 0)
     {
         GET_BASE(win)->x = gui_get_screen_width();
-    }
+        end = true;
 
-    if (tp->type != TOUCH_INVALIDE)
+    }
+    static bool press;
+    if (tp->pressed)
     {
+        press = true;
+    }
+    if (tp->released && end)
+    {
+        GET_BASE(win)->x = gui_get_screen_width();
+        gui_app_shutdown(get_app_app());
+        end = false;
+    }
+    if (tp->type == TOUCH_HOLD_X && tp->deltaX > 0)
+    {
+        if (press)
+        {
+            gui_app_startup(get_app_page());
+            gui_app_layer_buttom();
+            press = false;
+        }
+
         GET_BASE(win)->x = tp->deltaX;
     }
 
@@ -226,6 +248,7 @@ static void app_app_animate(gui_win_t *win)
     gui_log("x:%d\n", GET_BASE(win)->x);
     if (win->animate->progress_percent == 1)
     {
+        gui_app_shutdown(get_app_page());
         gui_win_set_animate(win, 200, -1, app_app_animate_exit, win);
     }
 

@@ -94,33 +94,78 @@ static void gui_server_entry(void *parameter)
         {
             continue;
         }
-        if (app_next && (&(app_next->screen)))
+        bool layer = gui_app_get_layer();
+        if (layer)
         {
-            if (app->close)
+            if (app_next && (&(app_next->screen)))
             {
-                extern gui_app_t *next_app;
-                extern gui_app_t *current_app;
-                current_app->close = false;
-                gui_list_remove(&(app->screen.brother_list));
-                app->screen.parent = 0;
-                gui_tree_free(&((gui_app_t *)app)->screen);
-                current_app = next_app;
-                next_app = 0;
-                app = current_app;
+                if (app->close)
+                {
+                    extern gui_app_t *next_app;
+                    extern gui_app_t *current_app;
+                    current_app->close = false;
+                    gui_list_remove(&(app->screen.brother_list));
+                    app->screen.parent = 0;
+                    gui_tree_free(&((gui_app_t *)app)->screen);
+                    current_app = next_app;
+                    next_app = 0;
+                    app = current_app;
+                }
+                else
+                {
+                    gui_list_insert_before(&((screen)->child_list), &(app_next->screen.brother_list));
+                    app_next->screen.parent = screen;
+                }
             }
-            else
-            {
-                gui_list_insert_before(&((screen)->child_list), &(app_next->screen.brother_list));
-                app_next->screen.parent = screen;
-            }
+            screen = &app->screen;
         }
-        screen = &app->screen;
+        else
+        {
+            if (app_next && (&(app_next->screen)))
+            {
+                if (app->close)
+                {
+                    extern gui_app_t *next_app;
+                    extern gui_app_t *current_app;
+                    current_app->close = false;
+                    gui_list_remove(&(app->screen.brother_list));
+                    app->screen.parent = 0;
+                    gui_tree_free(&((gui_app_t *)app)->screen);
+                    current_app = next_app;
+                    next_app = 0;
+                    app = current_app;
+                }
+                else
+                {
+
+                    gui_list_insert_before(&((app_next->screen).child_list), &(screen->brother_list));
+                    screen->parent = &(app_next->screen);
+                    screen = &(app_next->screen);
+                }
+            }
+
+        }
+
+
+
         gui_fb_disp(screen);
         app_next = gui_next_app();
-        if (app_next && (&(app_next->screen)))
+        if (layer)
         {
-            gui_list_remove(&(app_next->screen.brother_list));
+            if (app_next && (&(app_next->screen)))
+            {
+                gui_list_remove(&(app_next->screen.brother_list));
+            }
         }
+        else
+        {
+            if (app_next && (&(app_next->screen)))
+            {
+                gui_list_remove(&(app->screen.brother_list));
+            }
+        }
+
+
 #ifdef _WIN32
         gui_thread_mdelay(17);
 #endif
