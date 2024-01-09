@@ -139,36 +139,26 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
         return false;
     }
     bool use_LLI = true;
-//    bool use_support = false, support_LLI = false;
     uint32_t dma_height = p_rect->h;
-//  uint32_t support_height = 0;
-//    if(p_rect->h > 1 && support_dma_num != 0xa5)
-//    {
-//        use_support = true;
-//        support_height = dma_height / 2;
-//        dma_height = dma_height - support_height;
-//        if(support_height > 1)
-//            support_LLI = true;
-//    }
+
     if (p_rect->w == source->width || dma_height == 1)
     {
         use_LLI = false;
-//        support_LLI = false;
     }
     GDMA_LLIDef *GDMA_LLIStruct;
-//    GDMA_LLIDef *SP_LLIStruct;
     if (use_LLI)
     {
         GDMA_LLIStruct = os_mem_alloc(RAM_TYPE_DATA_ON, p_rect->h * sizeof(GDMA_LLIDef));
+        if (GDMA_LLIStruct == NULL)
+        {
+            GUI_ASSERT("no ram for LLI");
+        }
         memset(GDMA_LLIStruct, 0, p_rect->h * sizeof(GDMA_LLIDef));
-//        SP_LLIStruct = &GDMA_LLIStruct[dma_height];
     }
     uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->width) * 2;
-    //fmc_flash_set_seq_trans(FMC_FLASH_NOR_IDX0, true);
+
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_ChannelTypeDef *dma_channel = DMA_CH_BASE(memcpy_dma_num);
-//    GDMA_ChannelTypeDef *support_channel = DMA_CH_BASE(support_dma_num);
-//    GDMA_InitTypeDef SP_GDMA_InitStruct;
     GDMA_InitTypeDef RX_GDMA_InitStruct;
     /*--------------GDMA init-----------------------------*/
     GDMA_StructInit(&RX_GDMA_InitStruct);
@@ -230,84 +220,11 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
         }
     }
 
-//    if(use_support)
-//    {
-//        /*--------------GDMA init-----------------------------*/
-//        GDMA_StructInit(&SP_GDMA_InitStruct);
-//        SP_GDMA_InitStruct.GDMA_ChannelNum          = support_dma_num;
-//        SP_GDMA_InitStruct.GDMA_BufferSize          = p_rect->w * support_height;
-//        SP_GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToMemory;
-//        SP_GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
-//        SP_GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Inc;
-//        SP_GDMA_InitStruct.GDMA_SourceMsize         =
-//            GDMA_Msize_16;                         // 8 msize for source msize
-//        SP_GDMA_InitStruct.GDMA_DestinationMsize    =
-//            GDMA_Msize_16;                         // 8 msize for destiantion msize
-//        SP_GDMA_InitStruct.GDMA_DestinationDataSize =
-//            GDMA_DataSize_HalfWord;                   // 32 bit width for destination transaction
-//        SP_GDMA_InitStruct.GDMA_SourceDataSize      =
-//            GDMA_DataSize_HalfWord;                   // 32 bit width for source transaction
-//        uint32_t support_start_address = start_address + source->width * dma_height * 2;
-//        uint8_t* support_buf = temp_buf + p_rect->w * dma_height * 2;
-//        SP_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)support_start_address;
-//        SP_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)support_buf;
-//
-//        if(support_LLI)
-//        {
-//            SP_GDMA_InitStruct.GDMA_Multi_Block_Mode = LLI_TRANSFER;
-//            SP_GDMA_InitStruct.GDMA_Multi_Block_En = 1;
-//            SP_GDMA_InitStruct.GDMA_Multi_Block_Struct = (uint32_t)SP_LLIStruct;
-//        }
-//
-//        GDMA_Init(support_channel, &SP_GDMA_InitStruct);
-//        if(support_LLI)
-//        {
-//            for (int i = 0; i < support_height; i++)
-//            {
-//                if (i == support_height - 1)
-//                {
-//                    SP_LLIStruct[i].SAR = support_start_address + source->width * i * 2;
-//                    SP_LLIStruct[i].DAR = (uint32_t)support_buf + p_rect->w * i * 2;
-//                    SP_LLIStruct[i].LLP = 0;
-//                    /* configure low 32 bit of CTL register */
-//                    SP_LLIStruct[i].CTL_LOW = (BIT(0)
-//                                                        | (SP_GDMA_InitStruct.GDMA_DestinationDataSize << 1)
-//                                                        | (GDMA_DataSize_HalfWord << 4)
-//                                                        | (SP_GDMA_InitStruct.GDMA_DestinationInc << 7)
-//                                                        | (SP_GDMA_InitStruct.GDMA_SourceInc << 9)
-//                                                        | (SP_GDMA_InitStruct.GDMA_DestinationMsize << 11)
-//                                                        | (SP_GDMA_InitStruct.GDMA_SourceMsize << 14)
-//                                                        | (SP_GDMA_InitStruct.GDMA_DIR << 20));
-//                    /* configure high 32 bit of CTL register */
-//                    SP_LLIStruct[i].CTL_HIGH = p_rect->w;
-//                }
-//                else
-//                {
-//                    SP_LLIStruct[i].SAR = support_start_address+ source->width * i * 2;
-//                    SP_LLIStruct[i].DAR = (uint32_t)support_buf + p_rect->w * i * 2;
-//                    SP_LLIStruct[i].LLP = (uint32_t)&SP_LLIStruct[i + 1];
-//                    /* configure low 32 bit of CTL register */
-//                    SP_LLIStruct[i].CTL_LOW = dma_channel->CTL_LOW;
-//                    /* configure high 32 bit of CTL register */
-//                    SP_LLIStruct[i].CTL_HIGH = p_rect->w;
-//                }
-//            }
-//        }
-//        GDMA_INTConfig(support_dma_num, GDMA_INT_Transfer, ENABLE);
-//        GDMA_Cmd(support_dma_num, ENABLE);
-//    }
-
-
     GDMA_INTConfig(memcpy_dma_num, GDMA_INT_Transfer, ENABLE);
     GDMA_Cmd(memcpy_dma_num, ENABLE);
     while (GDMA_GetTransferINTStatus(memcpy_dma_num) != SET);
     GDMA_ClearINTPendingBit(memcpy_dma_num, GDMA_INT_Transfer);
-//    if(use_support)
-//    {
-//        while (GDMA_GetTransferINTStatus(support_dma_num) != SET);
-//        GDMA_ClearINTPendingBit(support_dma_num, GDMA_INT_Transfer);
-//    }
-    //fmc_flash_set_seq_trans(FMC_FLASH_NOR_IDX0, false);
+
     if (use_LLI)
     {
         os_mem_free(GDMA_LLIStruct);
@@ -351,20 +268,23 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     float y_min = 0.0f;
     float y_max = 0.0f;
 
-    pox.p[0] = source_rect->x;
-    pox.p[1] = source_rect->y;
+    pox.p[0] = source_rect->x * 1.0f;
+    pox.p[1] = source_rect->y * 1.0f;
     pox.p[2] = 1.0f;
     pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
     x_min = pox.p[0];
     x_max = pox.p[0];
     y_min = pox.p[1];
     y_max = pox.p[1];
+    DBG_DIRECT("(%f, %f), point 1 %f, %f", 1.0f * source_rect->x, 1.0f * source_rect->y, pox.p[0],
+               pox.p[1]);
 
-
-    pox.p[0] = source_rect->x + source_rect->w - 1;
-    pox.p[1] = source_rect->y;
+    pox.p[0] = (source_rect->x + source_rect->w - 1) * 1.0f;
+    pox.p[1] = source_rect->y * 1.0f;
     pox.p[2] = 1.0f;
     pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
+    DBG_DIRECT("(%f, %f), point 2 %f, %f", 1.0f * (source_rect->x + source_rect->w - 1),
+               1.0f * source_rect->y, pox.p[0], pox.p[1]);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -383,10 +303,12 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     }
 
 
-    pox.p[0] = source_rect->x;
-    pox.p[1] = source_rect->y + source_rect->h - 1;
+    pox.p[0] = source_rect->x * 1.0f;
+    pox.p[1] = (source_rect->y + source_rect->h - 1) * 1.0f;
     pox.p[2] = 1.0f;
     pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
+    DBG_DIRECT("(%f, %f), point 3 %f, %f", 1.0f * source_rect->x,
+               1.0f * (source_rect->y + source_rect->h - 1), pox.p[0], pox.p[1]);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -404,10 +326,12 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
         y_max = pox.p[1];
     }
 
-    pox.p[0] = source_rect->x + source_rect->w - 1;
-    pox.p[1] = source_rect->y + source_rect->h - 1;
+    pox.p[0] = (source_rect->x + source_rect->w - 1) * 1.0f;
+    pox.p[1] = (source_rect->y + source_rect->h - 1) * 1.0f;
     pox.p[2] = 1.0f;
     pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
+    DBG_DIRECT("(%f, %f), point 4 %f, %f", 1.0f * (source_rect->x + source_rect->w - 1),
+               1.0f * (source_rect->y + source_rect->h - 1), pox.p[0], pox.p[1]);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -474,8 +398,8 @@ static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buff
     {
         rect->h = image->height - rect->y;
     }
-//    DBG_DIRECT("x min %f max %f, %d - %d = %d", x_min, x_max, (int16_t)x_max, rect->x, rect->w);
-//    DBG_DIRECT("y min %f max %f, %d - %d = %d", y_min, y_max, (int16_t)y_max, rect->y, rect->h);
+    DBG_DIRECT("x min %f max %f, %d - %d = %d", x_min, x_max, (int16_t)x_max, rect->x, rect->w);
+    DBG_DIRECT("y min %f max %f, %d - %d = %d", y_min, y_max, (int16_t)y_max, rect->y, rect->h);
     return true;
 }
 
@@ -760,8 +684,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         }
         else
         {
-            Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE,
-                       PAD_OUT_LOW);
             if ((rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1)
                 || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
             {
@@ -793,7 +715,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
             else
             {
-                ppe_rect.w = rect->x2 - dc->section.x1 - ppe_rect.x;
+                ppe_rect.w = rect->x2 - dc->section.x1 - ppe_rect.x + 1;
             }
             if (rect->y2 > dc->section.y1 + dc->fb_height)
             {
@@ -801,11 +723,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
             else
             {
-                ppe_rect.h = rect->y2 - dc->section.y1 - ppe_rect.y;
+                ppe_rect.h = rect->y2 - dc->section.y1 - ppe_rect.y + 1;
             }
-//            DBG_DIRECT("****section %d->%d",dc->section.y1, dc->section.y2);
-//            DBG_DIRECT("rect x %d -> %d | y %d -> %d", rect->x1, rect->x2, rect->y1, rect->y2);
-//            DBG_DIRECT("image x %d y %d, w %d h %d", image->img_x, image->img_y, image->target_w, image->target_h);
             source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
 #if PPE_ACC_CACHE_SOURCE
             memcpy_by_dma(ppe_cache_buf, (void *)source.address, image_size);
@@ -823,14 +742,16 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             else if (image->blend_mode == IMG_BYPASS_MODE)
             {
                 source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-//                source.color_key_min = 0;
-//                source.color_key_max = 0x010101;
                 target.use_bg = false;
             }
-            else
+            else if (image->blend_mode == IMG_SRC_OVER_MODE)
             {
                 source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
                 target.use_bg = true;
+            }
+            else
+            {
+                return;
             }
 
             memcpy(&source.matrix, image->matrix, sizeof(float) * 9);
@@ -841,44 +762,22 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             ppe_rect.y += dc->section.y1;
             ppe_rect_t old_rect;
             bool ret = ppe_get_old_area(&old_rect, &ppe_rect, &source);
-//            DBG_DIRECT("before rect x %d | y %d | w %d | h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
             if (!ret)
             {
                 return;
             }
-//            if(old_rect.y + old_rect.h < source.height - 1)
-//            {
-//                old_rect.h += 1;
-//            }
-            ppe_rect.x -= dc->section.x1;
-            ppe_rect.y -= dc->section.y1;
-//            DBG_DIRECT("ppe rect x %d | y %d | w %d | h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
-//            DBG_DIRECT("old rect x %d | y %d | w %d | h %d", old_rect.x, old_rect.y, old_rect.w, old_rect.h);
-
-
-//            if (dc->type == DC_RAMLESS)
-//            {
-//                ppe_matrix_t temp;
-//                ppe_get_identity(&temp);
-//                ppe_translate(0, dc->section.y1 * (-1.0f), &temp);
-//                ppe_mat_multiply(&temp, &pre_trans);
-//                memcpy(&pre_trans, &temp, sizeof(float) * 9);
-//            }
-            //ppe_matrix_inverse(&pre_trans);
-
-//            Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE,
-//               PAD_OUT_HIGH);
-//            for(int i = 0; i < 1024; i++)
-//                memcpy(temp_buf, (void*)source.address, 40 * 1024);
-//            Pad_Config(P1_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE,PAD_OUT_HIGH);
             if (head->type == IMDC_COMPRESS)
             {
+                DBG_DIRECT("ppe x %d, y %d, w %d, h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
+                DBG_DIRECT("old x %d, y %d, w %d, h %d", old_rect.x, old_rect.y, old_rect.w, old_rect.h);
                 ret = memcpy_by_imdc(&old_rect, &source);
             }
             else
             {
                 ret = memcpy_by_dma(&old_rect, &source);
             }
+            ppe_rect.x -= dc->section.x1;
+            ppe_rect.y -= dc->section.y1;
             if (ret)
             {
                 ppe_get_identity(&pre_trans);
@@ -902,10 +801,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 }
                 ppe_translate(x_ref, y_ref, &source.inv_matrix);
             }
-            Pad_Config(P1_1, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_NONE, PAD_OUT_ENABLE,
-                       PAD_OUT_LOW);
-//            DBG_DIRECT("x_ref %f, y_ref %f", x_ref, y_ref);
-//            DBG_DIRECT("x_t %f, y_t %f", source.inv_matrix.m[0][2], source.inv_matrix.m[1][2]);
             source.high_quality = image->high_quality;
             if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
                  image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
