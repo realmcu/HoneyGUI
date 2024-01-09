@@ -30,60 +30,121 @@ struct acc_engine *gui_get_acc(void)
     return &acc;
 }
 
-static const char *gui_load_imgfile_acc(draw_img_t *draw_img)
+void gui_load_imgfile_acc(draw_img_t *draw_img, void *data, uint8_t source_bytes_per_pixel)
 {
-    const char *file_path = draw_img->data;
-    if (gui_get_dc()->type == DC_SINGLE)
-    {
-        int fd = gui_fs_open(file_path,  0);
-        if (fd <= 0)
-        {
-            gui_log("open file fail:%s!\n", file_path);
-            return file_path;
-        }
+    const char *path = draw_img->data;
+    uint32_t gpu_width = ((draw_img->img_w + 15) >> 4) << 4;
+    uint32_t gpu_height = draw_img->img_h;
 
-        int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
-        // gui_log("img size: %d \n", size);
-        draw_img->data = gui_malloc(size);
-        GUI_ASSERT(draw_img->data != NULL);
-        memset(draw_img->data, 0, size);
-        gui_fs_read(fd, draw_img->data, size);
-        gui_fs_close(fd);
-    }
-    else
+    int fd = gui_fs_open(path,  0);
+    if (fd <= 0)
     {
-        draw_img->data = gui_get_file_address(file_path);
+        gui_log("open file fail:%s!\n", path);
+        return ;
     }
-    return file_path;
+    gui_fs_read(fd, data, sizeof(struct gui_rgb_data_head));
+
+
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)data;
+    for (uint32_t i = 0; i < gpu_height; i++)
+    {
+        gui_fs_lseek(fd, sizeof(struct gui_rgb_data_head) + i * draw_img->img_w * source_bytes_per_pixel,
+                     SEEK_SET);
+        gui_fs_read(fd, (void *)(image_off + i * gpu_width * source_bytes_per_pixel),
+                    draw_img->img_w * source_bytes_per_pixel);
+    }
+    gui_fs_close(fd);
+
+    draw_img->data = data;
 }
 
-static void gui_release_imgfile_acc(draw_img_t *draw_img, const char *path)
+static void gui_release_imgfile_acc(draw_img_t *draw_img, const void *img_info, void *img_buff)
 {
-    if (gui_get_dc()->type == DC_SINGLE)
-    {
-        gui_free(draw_img->data);
-    }
-    else
-    {
-
-    }
-    draw_img->data = (void *)path;
+    gui_free(img_buff);
+    draw_img->data = (void *)img_info;
 }
 
 
 void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    const char *path = NULL;
-    if (image->src_mode == IMG_SRC_FILESYS)
+    const void *img_info = image->data;
+    void *img_buff = NULL;
+    bool flg_cache = false;
+
+    if (gui_get_dc()->type == DC_SINGLE)
     {
-        path = gui_load_imgfile_acc(image);
+        uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
+        uint32_t gpu_height = image->img_h;
+        struct gui_rgb_data_head head = rtgui_image_get_head(image);
+        uint8_t source_bytes_per_pixel = 0;
+
+        switch (head.type)
+        {
+        case RGB565:
+            source_bytes_per_pixel = 2;
+            break;
+        case RGB888:
+            source_bytes_per_pixel = 3;
+            break;
+        case RGBA8888:
+            source_bytes_per_pixel = 4;
+            break;
+        default:
+            break;
+        }
+
+        if (image->src_mode == IMG_SRC_FILESYS)
+        {
+            uint32_t size = gpu_width * gpu_height * source_bytes_per_pixel;
+            void *data = NULL;
+
+            img_buff = gui_malloc(size + 63);
+            GUI_ASSERT(img_buff != NULL);
+            data = (void *)(((((uint32_t)img_buff + 63) >> 6) << 6) - sizeof(struct gui_rgb_data_head));
+            if (data < img_buff)
+            {
+                data = (void *)((uint32_t)data + 64);
+            }
+
+            gui_load_imgfile_acc(image, data, source_bytes_per_pixel);
+            flg_cache = true;
+        }
+        else if (image->src_mode == IMG_SRC_MEMADDR)
+        {
+            void *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
+            if (gpu_width != image->img_w || (int)data % 64 != 0)
+            {
+                uint32_t size = gpu_width * gpu_height * source_bytes_per_pixel;
+
+                img_buff = gui_malloc(size + 63);
+                GUI_ASSERT(img_buff != NULL);
+                data = (void *)(((((uint32_t)img_buff + 63) >> 6) << 6) - sizeof(struct gui_rgb_data_head));
+                if (data < img_buff)
+                {
+                    data = (void *)((uint32_t)data + 64);
+                }
+
+                uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+                for (uint32_t i = 0; i < gpu_height; i++)
+                {
+                    memcpy((void *)((uint32_t)data + i * gpu_width * source_bytes_per_pixel),
+                           (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
+                           image->img_w * source_bytes_per_pixel);
+                }
+                flg_cache = true;
+            }
+        }
+        else if (image->src_mode == IMG_SRC_RLE)
+        {
+            // TODO
+        }
     }
 
     acc.blit(image, dc, rect);
 
-    if (image->src_mode == IMG_SRC_FILESYS)
+    if (flg_cache)
     {
-        gui_release_imgfile_acc(image, path);
+        gui_release_imgfile_acc(image, img_info, img_buff);
+        flg_cache = false;
     }
-
 }

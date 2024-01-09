@@ -76,6 +76,7 @@ typedef struct draw_img
 
 void gui_image_load_scale(draw_img_t *img);
 bool gui_image_new_area(draw_img_t *img);
+struct gui_rgb_data_head rtgui_image_get_head(draw_img_t *img);
 
 #ifdef __cplusplus
 }

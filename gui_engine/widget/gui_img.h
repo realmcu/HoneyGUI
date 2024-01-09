@@ -223,6 +223,17 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
 gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
 
 /**
+ * @brief creat an image widget from rle source
+ *
+ * @param parent the father widget it nested in.
+ * @param file image
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @return gui_magic_img_t*
+ */
+gui_img_t *gui_img_create_from_rle(void *parent, const char *file, int16_t x, int16_t y);
+
+/**
  * @brief
  *
  * @param this
