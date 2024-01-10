@@ -67,8 +67,8 @@
 //#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>
 
-// <c> RTK GUI Enable Painter Engine
-// #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
+// <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
+#define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 #endif

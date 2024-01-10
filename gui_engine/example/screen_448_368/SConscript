@@ -8,8 +8,12 @@ src = Split("""
 
 src = Glob('*.c')
 SrcRemove(src,'app_calculator.c')
+
 if not GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
     SrcRemove(src,'app_lvgl.c')
+if not GetDepend('CONFIG_REALTEK_BUILD_PAINTER_ENGINE'):
+    SrcRemove(src,'app_px.c')
+
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_hongkong']
 print(CPPPATH)

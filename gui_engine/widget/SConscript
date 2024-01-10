@@ -14,6 +14,8 @@ SrcRemove(src,'gui_stb_img.c')
 if not GetDepend(['CONFIG_REALTEK_BUILD_LVGL_GUI']):
     SrcRemove(src,'gui_lvgl.c')
 
+if not GetDepend(['CONFIG_REALTEK_BUILD_PAINTER_ENGINE']):
+    SrcRemove(src,'gui_px.c')
 
 CPPPATH = [cwd]
 
