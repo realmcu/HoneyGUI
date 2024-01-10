@@ -1,0 +1,34 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 05.04.2013 06:08:57
+
+#
+# object 20255_Triangular_Prism
+#
+
+v  1 -1 -0.0000
+v  -1 -1 -0.0000
+v  -1 1 -0.0000 
+v  1 1 -0.0000
+# 6 vertices
+
+vn -0.0000 -0.0000 -1.0000
+# 1 vertex normals
+
+vt 0.4167 0.0000
+vt 0.0833 0.0000
+vt -0.2500 0.0000
+vt 0.0833 1.0000
+vt -0.2500 1.0000
+vt 0.4167 1.0000
+vt 0.7500 0.0000
+vt 0.7500 1.0000
+vt 0.3333 1.0000
+# 9 texture coords
+
+g 20255_Triangular_Prism
+
+s 8
+f 1/1/1 2/2/1 3/3/1 4/4/1
+
+# 3 polygons - 2 triangles
+

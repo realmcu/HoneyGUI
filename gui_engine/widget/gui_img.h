@@ -146,6 +146,13 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
                            int16_t y);
 
 /**
+ * @brief set image configure
+ *
+ * @param img image widget
+ * @param config img configure
+ */
+void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config);
+/**
  * @brief Rotate the image around the center of the circle
  *
  * @param img the image widget pointer.
@@ -221,6 +228,17 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
  * @return gui_magic_img_t*
  */
 gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
+
+/**
+ * @brief creat an image widget from rle source
+ *
+ * @param parent the father widget it nested in.
+ * @param file image
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @return gui_magic_img_t*
+ */
+gui_img_t *gui_img_create_from_rle(void *parent, const char *file, int16_t x, int16_t y);
 
 /**
  * @brief

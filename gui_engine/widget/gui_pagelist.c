@@ -302,15 +302,22 @@ static void pagelist_ctor(gui_pagelist_t *this, gui_obj_t *parent, const char *n
  *============================================================================*/
 void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic)
 {
-    this->flg_fs = false;
+    this->src_mode = IMG_SRC_MEMADDR;
     this->scroll_bar = gui_img_create_from_mem(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
 void gui_pagelist_add_scroll_bar_from_fs(gui_pagelist_t *this, void *bar_pic)
 {
-    this->flg_fs = true;
+    this->src_mode = IMG_SRC_FILESYS;
     this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
+    gui_img_get_height(this->scroll_bar);
+    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
+}
+void gui_pagelist_add_scroll_bar_from_rle(gui_pagelist_t *this, void *bar_pic)
+{
+    this->src_mode = IMG_SRC_RLE;
+    this->scroll_bar = gui_img_create_from_rle(this->base.parent, bar_pic, 0, 0);
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }

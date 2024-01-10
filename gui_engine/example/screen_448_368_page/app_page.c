@@ -11,6 +11,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include <stdio.h>
+#include "gui_progressbar.h"
 
 static void app_page_ui_design(gui_app_t *app);
 
@@ -127,6 +128,7 @@ static void event_cb_release(gui_button_t *button)
 static void event_cb_click(gui_button_t *button)
 {
     gui_app_startup(get_app_app());
+    gui_app_layer_top();
 }
 static void deal_img_in_root(gui_obj_t *object)
 {
@@ -163,10 +165,99 @@ static void deal_img_in_root(gui_obj_t *object)
         deal_img_in_root(obj);
     }
 }
+const static void *scrollbar_array_top[] =
+{
+    BARS1_BIN,
+    BARS2_BIN,
+    BARS3_BIN,
+};
+const static void *scrollbar_array_buttom[] =
+{
+    BAR40_BIN,
+    BAR41_BIN,
+    BAR42_BIN,
+    BAR43_BIN,
+};
+const static void *scrollbar_array[] =
+{
+    BAR1_BIN, BAR2_BIN,    BAR3_BIN,  BAR4_BIN,   BAR5_BIN,
+    BAR6_BIN,
+    BAR7_BIN,
+    BAR8_BIN,
+    BAR9_BIN,
+    BAR10_BIN,
+    BAR11_BIN,
+    BAR12_BIN,
+    BAR13_BIN,
+    BAR14_BIN,
+    BAR15_BIN,
+    BAR16_BIN,
+    BAR17_BIN,
+    BAR18_BIN,
+    BAR19_BIN,
+
+    BAR20_BIN,
+    BAR21_BIN,
+    BAR22_BIN,
+    BAR23_BIN,
+    BAR24_BIN,
+    BAR25_BIN,
+    BAR26_BIN,
+    BAR27_BIN,
+    BAR28_BIN,
+    BAR29_BIN,
+
+    BAR30_BIN,
+    BAR31_BIN,
+    BAR32_BIN,
+    BAR33_BIN,
+    BAR34_BIN,
+    BAR35_BIN,
+    BAR36_BIN,
+    BAR37_BIN,
+    BAR38_BIN,
+    BAR39_BIN,
+};
+
+static gui_progressbar_t *pro;
 static void page_callback(gui_page_t *page)
 {
     deal_img_in_root(page); GET_BASE(page)->opacity_value = 200;
-    //gui_log("-------\n");
+    gui_log("%f,%d,%d\n", ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
+            page)->h - gui_get_screen_height()), page->start_y, GET_BASE(page)->y);
+    float progress = ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
+                                                                                page)->h - gui_get_screen_height());
+    if (pro)
+    {
+        if (progress >= 0 && progress <= 1)
+        {
+            {
+                pro->color_hl = (uint32_t)scrollbar_array;
+                pro->max = sizeof(scrollbar_array) / sizeof(void *);
+            }
+            gui_progressbar_set_percentage(pro, progress) ;
+        }
+        else if (progress < 0)
+        {
+            {
+                pro->color_hl = (uint32_t)scrollbar_array_top;
+                pro->max = sizeof(scrollbar_array_top) / sizeof(void *);
+            }
+            float progress_top = -progress;
+            gui_progressbar_set_percentage(pro, progress_top) ;
+        }
+        else if (progress > 1)
+        {
+            {
+                pro->color_hl = (uint32_t)scrollbar_array_buttom;
+                pro->max = sizeof(scrollbar_array_buttom) / sizeof(void *);
+            }
+            float progress_buttom = progress - 1;
+            gui_progressbar_set_percentage(pro, progress_buttom) ;
+        }
+    }
+
+
 }
 const static void *array[] =
 {
@@ -181,11 +272,13 @@ const static void *array[] =
     WALLET_BIN,
     WLAN_BIN,
 };
+
+
 static gui_button_t *button_array[sizeof(array) / sizeof(array[0])];
 static void app_page_ui_design(gui_app_t *app)
 {
     gui_log("app_page_ui_design\n");
-    gui_img_create_from_mem(&(app->screen), 0, BACK_BIN, 0, 0, 0, 0);
+    //gui_img_create_from_mem(&(app->screen), 0, BACK_BIN, 0, 0, 0, 0);
     gui_page_t *page = gui_page_create(&(app->screen), 0, 4, 0, 0, 0);
     gui_page_rebound(page, true);
     int array_size = sizeof(array) / sizeof(array[0]);
@@ -202,18 +295,41 @@ static void app_page_ui_design(gui_app_t *app)
     }
     gui_obj_add_event_cb(button_array[0], event_cb_click, GUI_EVENT_TOUCH_CLICKED, button_array[0]);
     gui_page_set_animate(page, 1000, -1, page_callback, page);
+    pro = gui_progressbar_movie_create(&(app->screen), scrollbar_array, 39, 300, 10);
+    gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
 }
 #include "gui_win.h"
 static void app_app_animate_exit(gui_win_t *win)
 {
     touch_info_t *tp = tp_get_info();
-    if (tp->deltaX > gui_get_screen_width() / 3 || GET_BASE(win)->x > gui_get_screen_width() / 3 * 2)
+    static bool end;
+    if ((tp->deltaX > gui_get_screen_width() / 3 ||
+         GET_BASE(win)->x > gui_get_screen_width() / 3 * 2) && (tp->type == TOUCH_HOLD_X) && tp->deltaX > 0)
     {
         GET_BASE(win)->x = gui_get_screen_width();
-    }
+        end = true;
 
-    if (tp->type != TOUCH_INVALIDE)
+    }
+    static bool press;
+    if (tp->pressed)
     {
+        press = true;
+    }
+    if (tp->released && end)
+    {
+        GET_BASE(win)->x = gui_get_screen_width();
+        gui_app_shutdown(get_app_app());
+        end = false;
+    }
+    if (tp->type == TOUCH_HOLD_X && tp->deltaX > 0)
+    {
+        if (press)
+        {
+            gui_app_startup(get_app_page());
+            gui_app_layer_buttom();
+            press = false;
+        }
+
         GET_BASE(win)->x = tp->deltaX;
     }
 
@@ -226,6 +342,7 @@ static void app_app_animate(gui_win_t *win)
     gui_log("x:%d\n", GET_BASE(win)->x);
     if (win->animate->progress_percent == 1)
     {
+        gui_app_shutdown(get_app_page());
         gui_win_set_animate(win, 200, -1, app_app_animate_exit, win);
     }
 

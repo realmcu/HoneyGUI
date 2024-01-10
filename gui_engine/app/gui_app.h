@@ -134,7 +134,23 @@ void gui_app_delete(gui_app_t *app);
  * @param to B pointer
  */
 void gui_switch_app(gui_app_t *from, gui_app_t *to);
-
+/**
+ * @brief set next app top layer
+ *
+ */
+void gui_app_layer_top(void);
+/**
+ * @brief set next app button layer
+ *
+ */
+void gui_app_layer_buttom(void);
+/**
+ * @brief get next app layer
+ *
+ * @return true top layer
+ * @return false button layer
+ */
+bool gui_app_get_layer(void);
 /** End of APP_Exported_Functions
   * @}
   */

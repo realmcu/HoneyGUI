@@ -281,6 +281,7 @@ char *gui_img_filepath_transforming(void *addr)
 {
     // simulator on WIN32: address transforming and check existence
     char *path = gui_malloc(strlen(addr) + strlen(GUI_ROOT_FOLDER) + 1);
+    GUI_ASSERT(path != NULL);
     sprintf(path, "%s%s", GUI_ROOT_FOLDER, (char *)addr);
     gui_log("img path: %s\n", path);
     // check existence
@@ -288,12 +289,10 @@ char *gui_img_filepath_transforming(void *addr)
     if (!fd)
     {
         gui_log("file not exist\n");
+        gui_free(path);
         return NULL;
     }
-    if (fd > 0)
-    {
-        fclose(fd);
-    }
+    fclose(fd);
     return path;
 }
 
@@ -321,6 +320,10 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
         draw_img->data = (void *)path;
     }
     else if (config->src_mode == IMG_SRC_MEMADDR)
+    {
+        draw_img->data = (void *)config->addr;
+    }
+    else if (config->src_mode == IMG_SRC_RLE)
     {
         draw_img->data = (void *)config->addr;
     }
@@ -367,12 +370,13 @@ uint16_t gui_img_get_width(gui_img_t *img)
     draw_img_t *draw_img = &img->draw_img;
     struct gui_rgb_data_head head;
 
+    head.w = 0;
     if (draw_img->src_mode == IMG_SRC_FILESYS)
     {
         int fd = gui_fs_open(draw_img->data,  0);
         if (fd <= 0)
         {
-            gui_log("open file fail:%s !\n", draw_img->data);
+            gui_log("open file fail:%s !\n", (char *)draw_img->data);
         }
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
@@ -389,12 +393,13 @@ uint16_t gui_img_get_height(gui_img_t *img)
     draw_img_t *draw_img = &img->draw_img;
     struct gui_rgb_data_head head;
 
+    head.h = 0;
     if (draw_img->src_mode == IMG_SRC_FILESYS)
     {
         int fd = gui_fs_open(draw_img->data,  0);
         if (fd <= 0)
         {
-            gui_log("open file fail:%s !\n", draw_img->data);
+            gui_log("open file fail:%s !\n", (char *)draw_img->data);
         }
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
@@ -461,6 +466,42 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
         draw_img->src_mode = IMG_SRC_FILESYS;
 
         void *path = (void *)filename;
+#ifdef _WIN32
+        path = gui_img_filepath_transforming(path);
+#endif
+        draw_img->data = path;
+    }
+}
+
+void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config)
+{
+    GUI_ASSERT(img != NULL);
+    gui_img_t *this = img;
+    draw_img_t *draw_img = &img->draw_img;
+
+    if (!config->file)
+    {
+        return;
+    }
+    this->base.x = config->x;
+    this->base.y = config->y;
+
+    // free filepath on win
+    if (draw_img->src_mode == IMG_SRC_FILESYS)
+    {
+#ifdef _WIN32
+        gui_free(draw_img->data);
+#endif
+    }
+
+    draw_img->src_mode = config->src_mode;
+    if (config->src_mode == IMG_SRC_MEMADDR)
+    {
+        draw_img->data = (void *)config->addr;
+    }
+    else if (config->src_mode == IMG_SRC_FILESYS)
+    {
+        void *path = (void *)config->file;
 #ifdef _WIN32
         path = gui_img_filepath_transforming(path);
 #endif
@@ -537,6 +578,18 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
     return gui_img_create_core(parent, &config);
 }
 
+gui_img_t *gui_img_create_from_rle(void *parent, const char *file, int16_t x, int16_t y)
+{
+    gui_imgconfig_t config = {   .name = "image",
+                                 .file = file,
+                                 .src_mode = IMG_SRC_RLE,
+                                 .x    = x,
+                                 .y    = y,
+                                 .w    = 0,
+                                 .h    = 0,
+                             };
+    return gui_img_create_core(parent, &config);
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

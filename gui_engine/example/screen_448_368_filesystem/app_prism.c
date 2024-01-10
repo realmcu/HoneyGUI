@@ -97,16 +97,27 @@ void callback_prism(void *obj, gui_event_t e)
     //     .img_path[5] = "Activity.bin"
     // };
 #else
+    // gui_perspective_imgfile_t imgfile =
+    // {
+    //     .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
+    //     .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
+    //     .data_addr[0] = CLOCKN_BIN,
+    //     .data_addr[1] = WEATHER_BIN,
+    //     .data_addr[2] = MUSIC_BIN,
+    //     .data_addr[3] = QUICKCARD_BIN,
+    //     .data_addr[4] = HEARTRATE_BIN,
+    //     .data_addr[5] = ACTIVITY_BIN
+    // };
     gui_perspective_imgfile_t imgfile =
     {
-        .src_mode[0] = IMG_SRC_MEMADDR, .src_mode[1] = IMG_SRC_MEMADDR, .src_mode[2] = IMG_SRC_MEMADDR,
-        .src_mode[3] = IMG_SRC_MEMADDR, .src_mode[4] = IMG_SRC_MEMADDR, .src_mode[5] = IMG_SRC_MEMADDR,
-        .data_addr[0] = CLOCKN_BIN,
-        .data_addr[1] = WEATHER_BIN,
-        .data_addr[2] = MUSIC_BIN,
-        .data_addr[3] = QUICKCARD_BIN,
-        .data_addr[4] = HEARTRATE_BIN,
-        .data_addr[5] = ACTIVITY_BIN
+        .src_mode[0] = IMG_SRC_FILESYS, .src_mode[1] = IMG_SRC_FILESYS, .src_mode[2] = IMG_SRC_FILESYS,
+        .src_mode[3] = IMG_SRC_FILESYS, .src_mode[4] = IMG_SRC_FILESYS, .src_mode[5] = IMG_SRC_FILESYS,
+        .img_path[0] = "Clockn.bin",
+        .img_path[1] = "Weather.bin",
+        .img_path[2] = "Music.bin",
+        .img_path[3] = "QuickCard.bin",
+        .img_path[4] = "HeartRate.bin",
+        .img_path[5] = "Activity.bin"
     };
 #endif
     img_test = gui_perspective_create(canvas, "test", &imgfile, 0, 0);

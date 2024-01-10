@@ -137,30 +137,39 @@ void scroll_wheel_update_att(gui_obj_t *obj)
     if ((current_row + 1 >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic))
     {
         struct scroll_wheel_picture *picture = &this->picture[current_row + 1];
-        gui_img_set_attribute(picture->pic,
-                              (IMG_SRC_FILESYS == this->src_mode) ? picture->pic_hl_addr : NULL,
-                              (IMG_SRC_FILESYS == this->src_mode) ? NULL : picture->pic_hl_addr,
-                              picture->pic->base.x,
-                              picture->pic->base.y);
+        gui_imgconfig_t config =
+        {
+            .src_mode = this->src_mode,
+            .addr = picture->pic_hl_addr,
+            .x = picture->pic->base.x,
+            .y = picture->pic->base.y,
+        };
+        gui_img_set_config(picture->pic, &config);
     }
     if ((current_row >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row].pic))
     {
         struct scroll_wheel_picture *picture = &this->picture[current_row];
-        gui_img_set_attribute(picture->pic,
-                              (IMG_SRC_FILESYS == this->src_mode) ? picture->pic_addr : NULL,
-                              (IMG_SRC_FILESYS == this->src_mode) ? NULL : picture->pic_addr,
-                              picture->pic->base.x,
-                              picture->pic->base.y);
+        gui_imgconfig_t config =
+        {
+            .src_mode = this->src_mode,
+            .addr = picture->pic_addr,
+            .x = picture->pic->base.x,
+            .y = picture->pic->base.y,
+        };
+        gui_img_set_config(picture->pic, &config);
     }
     if ((current_row + 2 >= 0) && (current_row + 2 < ((gui_scroll_wheel_t *)obj)->row_count) &&
         (((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic))
     {
         struct scroll_wheel_picture *picture = &this->picture[current_row + 2];
-        gui_img_set_attribute(picture->pic,
-                              (IMG_SRC_FILESYS == this->src_mode) ? picture->pic_addr : NULL,
-                              (IMG_SRC_FILESYS == this->src_mode) ? NULL : picture->pic_addr,
-                              picture->pic->base.x,
-                              picture->pic->base.y);
+        gui_imgconfig_t config =
+        {
+            .src_mode = this->src_mode,
+            .addr = picture->pic_addr,
+            .x = picture->pic->base.x,
+            .y = picture->pic->base.y,
+        };
+        gui_img_set_config(picture->pic, &config);
     }
     // gui_log("current_row:%d\n",current_row);
     ((gui_scroll_wheel_t *)obj)->index = current_row + 1;
@@ -180,6 +189,11 @@ void gui_scrollwheel_append_core(gui_scroll_wheel_t *this, void *num_pic, void *
     {
         this->picture[this->row_count].pic = gui_img_create_from_mem(this, "num_pic", num_pic, 0, 0, 0, 0);
     }
+    else if (IMG_SRC_RLE == src_mode)
+    {
+        *img = gui_img_create_from_rle(this, num_pic, 0, 0);
+    }
+
     gui_image_load_scale(&this->picture[this->row_count].pic->draw_img);
 
     this->picture[this->row_count].pic->base.x = (this->base.base.w -

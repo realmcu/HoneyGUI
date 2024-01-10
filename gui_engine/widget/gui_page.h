@@ -66,8 +66,8 @@ typedef struct gui_page
     void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
     bool release;
-    bool flg_fs;  // scroll_bar
     uint8_t status;
+    IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
 } gui_page_t;
 
 /** @brief  PAGE widget api structure */
@@ -75,6 +75,7 @@ typedef struct _gui_api_page
 {
     void (*gui_page_add_scroll_bar)(gui_page_t *this, void *bar_pic);
     void (*gui_page_add_scroll_bar_from_fs)(gui_page_t *this, void *bar_pic);
+    void (*gui_page_add_scroll_bar_from_rle)(gui_page_t *this, void *bar_pic);
     void (*set_offset)(gui_page_t *this, int offset);
     int (*get_offset)(gui_page_t *this);
 } _gui_api_page_t;

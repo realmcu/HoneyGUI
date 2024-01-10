@@ -105,19 +105,25 @@ static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
 
 static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
 {
-    this->flg_fs = false;
+    this->src_mode = IMG_SRC_MEMADDR;
     this->scroll_bar = gui_img_create_from_mem(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
 static void gui_page_add_scroll_bar_from_fs(gui_page_t *this, void *bar_pic)
 {
-    this->flg_fs = true;
+    this->src_mode = IMG_SRC_FILESYS;
     this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
-
+static void gui_page_add_scroll_bar_from_rle(gui_page_t *this, void *bar_pic)
+{
+    this->src_mode = IMG_SRC_FILESYS;
+    this->scroll_bar = gui_img_create_from_rle(this->base.parent, bar_pic, 0, 0);
+    gui_img_get_height(this->scroll_bar);
+    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
+}
 static void set_offset(gui_page_t *this, int offset)
 {
     this->yold = offset;
@@ -135,6 +141,7 @@ _gui_api_page_t gui_page_api =
     .get_offset = get_offset,
     .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
     .gui_page_add_scroll_bar_from_fs = gui_page_add_scroll_bar_from_fs,
+    .gui_page_add_scroll_bar_from_rle = gui_page_add_scroll_bar_from_rle,
 };
 
 /*============================================================================*
@@ -315,8 +322,8 @@ void page_update(gui_obj_t *obj)
 
         if (((gui_page_t *)obj)->scroll_bar)
         {
-            ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
-                                                       gui_get_screen_height() / obj->h);
+            // ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
+            //                                            gui_get_screen_height() / obj->h);
         }
         // gui_log("obj->y:%d,%d, %d\n", obj->y, obj->ay, obj->parent->ay);
         if (obj->y == ((gui_page_t *)obj)->start_y)
@@ -553,8 +560,8 @@ static void page_update_rebound(gui_obj_t *obj)
 
         if (((gui_page_t *)obj)->scroll_bar)
         {
-            ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
-                                                       gui_get_screen_height() / obj->h);
+            // ((gui_page_t *)obj)->scroll_bar->base.y = ((((gui_page_t *)obj)->start_y - obj->y) *
+            //                                            gui_get_screen_height() / obj->h);
         }
         // gui_log("obj->y:%d,%d, %d\n", obj->y, obj->ay, obj->parent->ay);
         if (obj->y == ((gui_page_t *)obj)->start_y)
