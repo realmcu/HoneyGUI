@@ -70,8 +70,9 @@ static uint32_t cur_time_ms;
  * @brief The number of frames that need to be skipped.
  * If the value is 2, then scrolling text will skip two frames and scroll one frame.
  */
-static uint8_t skip_frame = 1;
-static uint8_t skip_frame_count;
+static uint8_t scroll_text_count = 0;
+static uint8_t scroll_skip_frame = 1;
+static uint8_t scroll_skip_frame_count = 0;
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -127,13 +128,13 @@ static void gui_font_unload(gui_text_t *text)
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
-    if (skip_frame_count < skip_frame)
+    if (scroll_skip_frame_count < (scroll_skip_frame + 1) * scroll_text_count - 1)
     {
-        skip_frame_count++;
+        scroll_skip_frame_count++;
     }
     else
     {
-        skip_frame_count = 0;
+        scroll_skip_frame_count = 0;
         gui_fb_change();
     }
     gui_scroll_text_t *object = (gui_scroll_text_t *)obj;
@@ -241,6 +242,11 @@ static void scrolltext_end(gui_obj_t *obj)
 
 }
 
+static void scrolltext_destory(gui_obj_t *obj)
+{
+    scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
+}
+
 static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char *name,
                                 int16_t x, int16_t y, int16_t w, int16_t h)
 {
@@ -255,6 +261,7 @@ static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, cons
     root->obj_prepare = scrolltext_prepare;
     root->obj_draw = scrolltext_draw;
     root->obj_end = scrolltext_end;
+    root->obj_destory = scrolltext_destory;
 
     this->init_time_ms = gui_ms_get();
 }
@@ -262,6 +269,11 @@ static void gui_scrolltext_ctor(gui_scroll_text_t *this, gui_obj_t *parent, cons
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
+void gui_scrolltext_skip_frame_set(uint8_t skip_frame)
+{
+    scroll_skip_frame = skip_frame;
+}
 
 void gui_scrolltext_text_set(gui_scroll_text_t *this, void *text, char *text_type,
                              gui_color_t color, uint16_t length, uint8_t font_size)
@@ -310,6 +322,7 @@ gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t
                                &(GET_BASE(scrolltext)->brother_list));
     }
     GET_BASE(scrolltext)->create_done = true;
+    scroll_text_count++;
     return scrolltext;
 }
 
