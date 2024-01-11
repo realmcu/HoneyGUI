@@ -59,7 +59,12 @@ struct gui_touch_data *port_touchpad_get_data()
     return &raw_data;
 }
 
+static gui_kb_port_data_t kb_port_data = {0};
 
+gui_kb_port_data_t *port_kb_get_data(void)
+{
+    return &kb_port_data;
+}
 static struct gui_indev indev =
 {
     .tp_get_data = port_touchpad_get_data,
@@ -69,6 +74,9 @@ static struct gui_indev indev =
     .long_button_time_ms = 800,
     .short_button_time_ms = 300,
     .quick_slide_time_ms = 50,
+    .kb_get_port_data = port_kb_get_data,
+    .kb_short_button_time_ms = 300,
+    .kb_long_button_time_ms = 800,
 };
 
 

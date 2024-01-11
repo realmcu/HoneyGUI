@@ -35,7 +35,7 @@
 // </c>
 
 // <c> RTK GUI Use OS Heap
-#define CONFIG_REALTEK_BUILD_GUI_OS_HEAP
+//#define CONFIG_REALTEK_BUILD_GUI_OS_HEAP
 // </c>
 
 // <c> RTK GUI Font Enable STB
@@ -68,7 +68,7 @@
 // </c>
 
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
-#define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
+//#define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 #endif
@@ -76,7 +76,7 @@
 // </e>
 
 // <e> HoneyGUI Enable LVGL
-#define CONFIG_REALTEK_BUILD_LVGL_GUI     1
+#define CONFIG_REALTEK_BUILD_LVGL_GUI     0
 
 #if (CONFIG_REALTEK_BUILD_LVGL_GUI == 1)
 

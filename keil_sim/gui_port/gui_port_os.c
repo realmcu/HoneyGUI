@@ -43,7 +43,7 @@ void port_free(void *rmem)
     free(rmem);
 }
 
-#define PORT_MEMHEAP_SIZE       (1024*10)
+#define PORT_MEMHEAP_SIZE       (1024*1024*2)
 static uint8_t port_memheap[PORT_MEMHEAP_SIZE] = {0};
 static struct gui_os_api os_api =
 {
