@@ -1,79 +1,43 @@
 #include "../modules/px_time.h"
 #include "time.h"
-#include <unistd.h>
+#include "gui_api.h"
 
 unsigned int PX_TimeGetTime()
 {
-    unsigned int uptime = 0;
-    struct timespec on;
-    if (clock_gettime(CLOCK_MONOTONIC, &on) == 0)
-    {
-        uptime = on.tv_sec * 1000 + on.tv_nsec / 1000000;
-    }
-    return uptime;
+    return gui_ms_get();
 }
 
 int PX_TimeGetYear()
 {
-    time_t timep;
-    struct tm *p;
-    time(&timep);
-    p = gmtime(&timep);
-
-    return 1900 + p->tm_year;
+    return 2024;
 }
 
 int PX_TimeGetMouth()
 {
-    time_t timep;
-    struct tm *p;
-    time(&timep);
-    p = gmtime(&timep);
-
-    return 1900 + p->tm_year;
+    return 1;
 }
 
 int PX_TimeGetDay()
 {
-    time_t timep;
-    struct tm *p;
-    time(&timep);
-    p = gmtime(&timep);
-
-    return 1900 + p->tm_mon;
+    return 11;
 }
 
 int PX_TimeGetHour()
 {
-    time_t timep;
-    struct tm *p;
-    time(&timep);
-    p = gmtime(&timep);
-
-    return 1900 + p->tm_hour;
+    return 9;
 }
 
 int PX_TimeGetMinute()
 {
-    time_t timep;
-    struct tm *p;
-    time(&timep);
-    p = gmtime(&timep);
-
-    return 1900 + p->tm_min;
+    return 44;
 }
 
 int PX_TimeGetSecond()
 {
-    time_t timep;
-    struct tm *p;
-    time(&timep);
-    p = gmtime(&timep);
-
-    return 1900 + p->tm_sec;
+    return 50;
 }
 
 void PX_Sleep(unsigned int ms)
 {
-    usleep(ms * 1000);
+    gui_thread_mdelay(ms);
 }

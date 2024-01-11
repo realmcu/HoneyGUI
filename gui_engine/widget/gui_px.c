@@ -187,10 +187,7 @@ static px_bool GUI_PX_ApplicationInitialize(gui_px_t *this, px_int screen_width,
     {
         GUI_ASSERT(NULL != NULL);
     }
-
-
-
-
+    return PX_TRUE;
 
 }
 

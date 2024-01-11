@@ -14,14 +14,15 @@
 #include "rtl876x_pinmux.h"
 #include "math.h"
 #include "fmc_api_ext.h"
+#include "os_sync.h"
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
-//static void prepare_data(uint8_t *data, ppe_rect_t *p_rect, ppe_buffer_t *source);
 #define PPE_ACC_CACHE_SOURCE        0
 
 #define PPEV2_ACC_MIN_OPA       3
 #define PPEV2_MIN_PIXEL         100
 #define TEMP_BUF_SIZE           (50 * 1024)
+
 static uint8_t temp_buf[TEMP_BUF_SIZE];
 #if PPE_ACC_CACHE_SOURCE
 #define PPEV2_CACHE_BUF_SIZE       (1 * 1024)
@@ -258,150 +259,6 @@ static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
     }
 }
 
-
-
-static bool ppe_get_old_area(ppe_rect_t *rect, ppe_rect_t *source_rect, ppe_buffer_t *image)
-{
-    struct gui_pox pox = {0.0f};
-    float x_min = 0.0f;
-    float x_max = 0.0f;
-    float y_min = 0.0f;
-    float y_max = 0.0f;
-
-    pox.p[0] = source_rect->x * 1.0f;
-    pox.p[1] = source_rect->y * 1.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
-    x_min = pox.p[0];
-    x_max = pox.p[0];
-    y_min = pox.p[1];
-    y_max = pox.p[1];
-    DBG_DIRECT("(%f, %f), point 1 %f, %f", 1.0f * source_rect->x, 1.0f * source_rect->y, pox.p[0],
-               pox.p[1]);
-
-    pox.p[0] = (source_rect->x + source_rect->w - 1) * 1.0f;
-    pox.p[1] = source_rect->y * 1.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
-    DBG_DIRECT("(%f, %f), point 2 %f, %f", 1.0f * (source_rect->x + source_rect->w - 1),
-               1.0f * source_rect->y, pox.p[0], pox.p[1]);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-
-    pox.p[0] = source_rect->x * 1.0f;
-    pox.p[1] = (source_rect->y + source_rect->h - 1) * 1.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
-    DBG_DIRECT("(%f, %f), point 3 %f, %f", 1.0f * source_rect->x,
-               1.0f * (source_rect->y + source_rect->h - 1), pox.p[0], pox.p[1]);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    pox.p[0] = (source_rect->x + source_rect->w - 1) * 1.0f;
-    pox.p[1] = (source_rect->y + source_rect->h - 1) * 1.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->inv_matrix, &pox);
-    DBG_DIRECT("(%f, %f), point 4 %f, %f", 1.0f * (source_rect->x + source_rect->w - 1),
-               1.0f * (source_rect->y + source_rect->h - 1), pox.p[0], pox.p[1]);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    if (x_min < 0)
-    {
-        x_min = 0;
-    }
-    else if (x_min >= image->width)
-    {
-        x_min = image->width - 1;
-    }
-    if (y_min < 0)
-    {
-        y_min = 0;
-    }
-    else if (y_min >= image->height)
-    {
-        y_min = image->height - 1;
-    }
-    rect->x = (int16_t)x_min;
-    rect->y = (int16_t)y_min;
-//    if (y_max < 0 || x_max < 0 || x_min >= image->width || y_min >= image->height)
-//        return false;
-    if (x_max >= image->width)
-    {
-        x_max = image->width - 1;
-    }
-    else if (x_max < 0)
-    {
-        x_max = 0;
-    }
-
-    if (y_max >= image->height)
-    {
-        y_max = image->height - 1;
-    }
-    else if (y_max < 0)
-    {
-        y_max = 0;
-    }
-
-    rect->w = ceil(x_max) - rect->x + 1;
-    rect->h = ceil(y_max) - rect->y + 1;
-
-    if (rect->x + rect->w > image->width)
-    {
-        rect->w = image->width - rect->x;
-    }
-    if (rect->y + rect->h > image->height)
-    {
-        rect->h = image->height - rect->y;
-    }
-    DBG_DIRECT("x min %f max %f, %d - %d = %d", x_min, x_max, (int16_t)x_max, rect->x, rect->w);
-    DBG_DIRECT("y min %f max %f, %d - %d = %d", y_min, y_max, (int16_t)y_max, rect->y, rect->h);
-    return true;
-}
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect)
 {
@@ -761,15 +618,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             ppe_rect.x += dc->section.x1;
             ppe_rect.y += dc->section.y1;
             ppe_rect_t old_rect;
-            bool ret = ppe_get_old_area(&old_rect, &ppe_rect, &source);
+            bool ret = ppe_get_area(&old_rect, &ppe_rect, &source);
             if (!ret)
             {
                 return;
             }
             if (head->type == IMDC_COMPRESS)
             {
-                DBG_DIRECT("ppe x %d, y %d, w %d, h %d", ppe_rect.x, ppe_rect.y, ppe_rect.w, ppe_rect.h);
-                DBG_DIRECT("old x %d, y %d, w %d, h %d", old_rect.x, old_rect.y, old_rect.w, old_rect.h);
                 ret = memcpy_by_imdc(&old_rect, &source);
             }
             else

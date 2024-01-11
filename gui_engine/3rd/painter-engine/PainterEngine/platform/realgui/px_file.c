@@ -4,10 +4,13 @@
 #include "stdlib.h"
 #include "string.h"
 #include <errno.h>
+#if defined _WIN32
 #include "dirent.h"
+#endif
 
 int PX_SaveDataToFile(void *buffer, int size, const char path[])
 {
+#if defined _WIN32
     FILE *pf = fopen(path, "rwb");
     if (pf)
     {
@@ -16,12 +19,16 @@ int PX_SaveDataToFile(void *buffer, int size, const char path[])
         return 1;
     }
     return 0;
+#else
+    return 0;
+#endif
 }
 
 
 PX_IO_Data PX_LoadFileToIOData(const char path[])
 {
 
+#if defined _WIN32
     PX_IO_Data io;
     int fileoft = 0;
     FILE *pf = fopen(path, "rb");
@@ -53,6 +60,12 @@ _ERROR:
     io.buffer = 0;
     io.size = 0;
     return io;
+#else
+    PX_IO_Data io;
+    io.buffer = NULL;
+    io.size = 0;
+    return io;
+#endif
 }
 
 void PX_FreeIOData(PX_IO_Data *io)
@@ -67,6 +80,7 @@ void PX_FreeIOData(PX_IO_Data *io)
 
 int PX_FileExist(const char path[])
 {
+#if defined _WIN32
     FILE *pf = fopen(path, "rb");
     if (pf)
     {
@@ -74,6 +88,9 @@ int PX_FileExist(const char path[])
         return 1;
     }
     return 0;
+#else
+    return 0;
+#endif
 }
 
 
@@ -513,3 +530,4 @@ _ERROR:
     PX_FreeIOData(&io);
     return PX_FALSE;
 }
+
