@@ -71,7 +71,7 @@ static uint32_t cur_time_ms;
  * If the value is 2, then scrolling text will skip two frames and scroll one frame.
  */
 static uint8_t scroll_text_count = 0;
-static uint8_t scroll_skip_frame = 1;
+static uint8_t scroll_skip_frame = 10;
 static uint8_t scroll_skip_frame_count = 0;
 /** End of WIDGET_Exported_Variables
   * @}
@@ -128,14 +128,26 @@ static void gui_font_unload(gui_text_t *text)
 
 static void scrolltext_prepare(gui_obj_t *obj)
 {
-    if (scroll_skip_frame_count < (scroll_skip_frame + 1) * scroll_text_count - 1)
+
+    if (scroll_skip_frame == 0)
     {
-        scroll_skip_frame_count++;
+        gui_fb_change();
     }
     else
     {
-        scroll_skip_frame_count = 0;
-        gui_fb_change();
+        if (scroll_skip_frame_count < (scroll_skip_frame) * scroll_text_count - 1)
+        {
+            gui_fb_change();
+            scroll_skip_frame_count++;
+        }
+        else if (scroll_skip_frame_count < (scroll_skip_frame + 1) * scroll_text_count - 1)
+        {
+            scroll_skip_frame_count++;
+        }
+        else
+        {
+            scroll_skip_frame_count = 0;
+        }
     }
     gui_scroll_text_t *object = (gui_scroll_text_t *)obj;
 
