@@ -1,15 +1,55 @@
-# for module compiling
-import os
 from building import *
+import os
+Import('PLATFORM')
 
-objs = []
-cwd  = GetCurrentDir()
+
+src = []
+inc = []
+group = []
+
+cwd = GetCurrentDir() # get current dir path
+
+
+# check if .h or .hpp files exsit
+def check_h_hpp_exsit(path):
+    file_dirs = os.listdir(path)
+    for file_dir in file_dirs:
+        if os.path.splitext(file_dir)[1] in ['.h', '.hpp']:
+            return True
+    return False
+
+px_cwd = cwd + '/PainterEngine/'
+
+inc = inc + [px_cwd]
+for root, dirs, files in os.walk(px_cwd):
+    for dir in dirs:
+        current_path = os.path.join(root, dir)
+        src = src + Glob(os.path.join(current_path,'*.c')) # add all .c files
+        if check_h_hpp_exsit(current_path): # add .h and .hpp path
+            inc = inc + [current_path]
+
+
+
+
+if PLATFORM == 'gcc': # GCC
+    LOCAL_CFLAGS = ''
+    LOCAL_CFLAGS += ' -std=c11'
+    group = group + DefineGroup('painter-engine', src, depend = ['CONFIG_REALTEK_BUILD_PAINTER_ENGINE'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS)
+elif PLATFORM == 'armclang': # Keil AC6
+    LOCAL_CFLAGS = ''
+    LOCAL_CFLAGS += ' -std=c11'
+    group = group + DefineGroup('painter-engine', src, depend = ['CONFIG_REALTEK_BUILD_PAINTER_ENGINE'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS)
+elif PLATFORM == 'armcc': # Keil AC5
+    LOCAL_CFLAGS = ''
+    LOCAL_CFLAGS += ' --c99 --gnu --diag_suppress=188 --diag_suppress=546 --diag_suppress=550 --diag_suppress=111 --diag_suppress=68 --diag_suppress=870'
+    group = group + DefineGroup('painter-engine', src, depend = ['CONFIG_REALTEK_BUILD_PAINTER_ENGINE'], CPPPATH = inc, LOCAL_CCFLAGS = LOCAL_CFLAGS)
+
+
+
 list = os.listdir(cwd)
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        group = group + SConscript(os.path.join(d, 'SConscript'))
 
-if GetDepend('CONFIG_REALTEK_BUILD_PAINTER_ENGINE'):
-    for d in list:
-        path = os.path.join(cwd, d)
-        if os.path.isfile(os.path.join(path, 'SConscript')):
-            objs = objs + SConscript(os.path.join(d, 'SConscript'))
-
-Return('objs')
+Return('group')

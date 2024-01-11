@@ -54,27 +54,27 @@ static PX_OBJECT_RENDER_FUNCTION(PX_Object_3DModelRender)
 static void px_main(gui_px_t *this)
 {
     gui_log("line = %d, func = %s \n", __LINE__, __FUNCTION__);
-    // PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 100, 300);
-    // PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 200, 300);
-    // PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 300, 300);
+    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 100, 300);
+    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 200, 300);
+    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 300, 300);
 
-    PX_3D_ObjectData data;
-    PX_IO_Data io;
-    PX_Object *pObject;
+//    PX_3D_ObjectData data;
+//    PX_IO_Data io;
+//    PX_Object *pObject;
 
-    io = PX_LoadFileToIOData("win32_sim/assets/bunny.obj");
-    if (io.size == 0) { return PX_FALSE; }
-    PX_3D_ObjectDataInitialize(this->mp_static, &data);
-    if (!PX_3D_ObjectDataLoad(&data, io.buffer, io.size)) { return PX_FALSE; }
+//    io = PX_LoadFileToIOData("win32_sim/assets/bunny.obj");
+//    if (io.size == 0) { return PX_FALSE; }
+//    PX_3D_ObjectDataInitialize(this->mp_static, &data);
+//    if (!PX_3D_ObjectDataLoad(&data, io.buffer, io.size)) { return PX_FALSE; }
 
-    pObject = PX_Object_3DModelCreate(this->mp_dynamic, this->px_root, 368 / 2, 448 / 2, 368, 448,
-                                      &data);
+//    pObject = PX_Object_3DModelCreate(this->mp_dynamic, this->px_root, 368 / 2, 448 / 2, 368, 448,
+//                                      &data);
 
-    pObject->Func_ObjectRender = PX_Object_3DModelRender;
+//    pObject->Func_ObjectRender = PX_Object_3DModelRender;
 
-    PX_Object_3DModelSetWorld(pObject, 0, 0, 1.2f, 0, 200, 0, 1);
-    PX_Object_3DModel *pdesc = PX_ObjectGetDesc(PX_Object_3DModel, pObject);
-    PX_3D_RenderListSetPixelShader(&pdesc->renderlist, PX_Object_3DModel_PixelShader);
+//    PX_Object_3DModelSetWorld(pObject, 0, 0, 1.2f, 0, 200, 0, 1);
+//    PX_Object_3DModel *pdesc = PX_ObjectGetDesc(PX_Object_3DModel, pObject);
+//    PX_3D_RenderListSetPixelShader(&pdesc->renderlist, PX_Object_3DModel_PixelShader);
 }
 
 static void app_dialing_ui_design(gui_app_t *app)
@@ -103,6 +103,7 @@ static gui_app_t rtk_gui_demo =
         .y    = 0,
     },
     .ui_design = app_dialing_ui_design,
+    .active_ms = 1000 * 60 * 60,
 };
 
 

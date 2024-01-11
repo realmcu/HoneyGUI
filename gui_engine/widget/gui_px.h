@@ -43,9 +43,10 @@ extern "C" {
 /** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @brief
   * @{
+  */
 
 
-/** @brief  ... */
+/** @brief  structure */
 typedef struct _gui_px
 {
     gui_obj_t base;

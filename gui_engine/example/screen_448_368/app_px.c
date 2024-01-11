@@ -1,8 +1,7 @@
 #include <gui_app.h>
 #include "PainterEngine.h"
 #include "gui_components_init.h"
-#include <sys/types.h>
-#include <pthread.h>
+
 
 static void app_px_ui_design(gui_app_t *app);
 
