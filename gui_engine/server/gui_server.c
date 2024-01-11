@@ -22,6 +22,7 @@
 
 static void *gui_server_mq = NULL;
 static void (*gui_task_ext_execution_hook)(void) = NULL;
+bool GUI_SERVER_ALLOW_DLPS = false;
 
 
 static void gui_server_msg_handler(gui_msg_t *msg)
@@ -177,7 +178,7 @@ static void gui_server_entry(void *parameter)
 
         touch_info_t *tp = tp_get_info();
 
-        if (tp->pressed == true)
+        if (tp->pressed == true || tp->pressing == true)
         {
             daemon_start_ms = gui_ms_get();
         }
@@ -191,17 +192,24 @@ static void gui_server_entry(void *parameter)
                     __LINE__, daemon_start_ms, gui_ms_get(), app->active_ms);
             gui_msg_t msg;
             gui_display_off();
+            GUI_SERVER_ALLOW_DLPS = true;
             if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0xFFFFFFFF))
             {
                 gui_server_msg_handler(&msg);
             }
+            GUI_SERVER_ALLOW_DLPS = false;
             gui_display_on();
+            gui_fb_change();
             daemon_cnt = 0;
             daemon_start_ms = 0;
         }
     }
 }
 
+bool gui_server_dlps_check(void)
+{
+    return GUI_SERVER_ALLOW_DLPS;
+}
 
 /**
  * @brief

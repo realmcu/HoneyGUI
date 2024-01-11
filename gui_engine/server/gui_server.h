@@ -15,6 +15,7 @@ extern "C" {
 typedef void (* touch_sync_cb)(void);
 int gui_server_init(void);
 void gui_debug_sethook(void (*hook)(void));
+bool gui_server_dlps_check(void);
 
 void js_run_file_on_server(const char *file, gui_app_t *app);
 
