@@ -12,7 +12,7 @@
 #include "gui_components_init.h"
 #include <stdio.h>
 #include "gui_progressbar.h"
-
+#include <tp_algo.h>
 static void app_page_ui_design(gui_app_t *app);
 
 
@@ -88,6 +88,27 @@ static void callback(gui_button_t *button)
     if (button->animate->progress_percent == 1)
     {
         first_flag = false;
+        float scale = 1;
+        {
+            gui_img_scale(button->img, scale, scale);
+            gui_img_rotation(button->img, 0, gui_img_get_width(button->img) / 2,
+                             gui_img_get_height(button->img) / 2);
+            gui_img_translate(button->img, gui_img_get_width(button->img) / 2,
+                              gui_img_get_height(button->img) / 2);
+        }
+    }
+    if (tp_get_info()->type == TOUCH_HOLD_Y || tp_get_info()->released)
+    {
+        first_flag = false;
+        float scale = 1;
+        {
+            gui_img_scale(button->img, scale, scale);
+            gui_img_rotation(button->img, 0, gui_img_get_width(button->img) / 2,
+                             gui_img_get_height(button->img) / 2);
+            gui_img_translate(button->img, gui_img_get_width(button->img) / 2,
+                              gui_img_get_height(button->img) / 2);
+        }
+        button->animate->animate = 0;
     }
 
 }
@@ -121,10 +142,7 @@ static void callback_release(gui_button_t *button)
         first_flag = false;
     }
 }
-static void event_cb_release(gui_button_t *button)
-{
-    gui_button_set_animate(button, 1000, 0, callback_release, button);
-}
+
 static void event_cb_click(gui_button_t *button)
 {
     gui_app_startup(get_app_app());
@@ -288,8 +306,6 @@ static void app_page_ui_design(gui_app_t *app)
 
         gui_button_t *button = gui_button_create(grid, 0, 0, 368, 100, array[i], array[i], 0, 0, 0);
         gui_obj_add_event_cb(button, event_cb, GUI_EVENT_TOUCH_PRESSED, button);
-        gui_obj_add_event_cb(button, event_cb_release, GUI_EVENT_TOUCH_RELEASED, button);
-        //gui_img_set_opacity(button->img, 200);
         gui_img_set_mode(button->img, IMG_SRC_OVER_MODE);
         button_array[i] = button;
     }
@@ -298,7 +314,7 @@ static void app_page_ui_design(gui_app_t *app)
     pro = gui_progressbar_movie_create(&(app->screen), scrollbar_array, 39, 300, 10);
     gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
 }
-#include "gui_win.h"
+
 static void app_app_animate_exit(gui_win_t *win)
 {
     touch_info_t *tp = tp_get_info();
