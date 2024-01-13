@@ -241,8 +241,8 @@ static gui_progressbar_t *pro;
 static void page_callback(gui_page_t *page)
 {
     deal_img_in_root(page); GET_BASE(page)->opacity_value = 200;
-    gui_log("%f,%d,%d\n", ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
-            page)->h - gui_get_screen_height()), page->start_y, GET_BASE(page)->y);
+    //gui_log("%f,%d,%d\n", ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
+    //        page)->h - gui_get_screen_height()), page->start_y, GET_BASE(page)->y);
     float progress = ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
                                                                                 page)->h - gui_get_screen_height());
     if (pro)

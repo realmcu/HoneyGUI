@@ -375,6 +375,10 @@ static void page_update_rebound(gui_obj_t *obj)
                 if ((tp->type == TOUCH_HOLD_Y))
                 {
                     // gui_log("obj->y:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-gui_get_screen_height()));
+                    if (tp->deltaY + tp->y < 0)
+                    {
+                        tp->deltaY = -tp->y;
+                    }
                     obj->y = tp->deltaY + ((gui_page_t *)obj)->yold;
                     if (obj->y > ((gui_page_t *)obj)->start_y)
                     {
