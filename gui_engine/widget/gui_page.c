@@ -271,6 +271,10 @@ void page_update(gui_obj_t *obj)
                     GUI_TYPE(gui_page_t, obj)->count = 0;
                     GUI_TYPE(gui_page_t, obj)->y_last = 0;
                 }
+                else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed == 0)
+                {
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
                 else if (tp->pressed)
                 {
                     GUI_TYPE(gui_page_t, obj)->release = false;
@@ -298,7 +302,14 @@ void page_update(gui_obj_t *obj)
                             obj->y += GUI_TYPE(gui_page_t, obj)->speed;
                             GUI_TYPE(gui_page_t, obj)->speed += 1;
                         }
-                        gui_obj_event_set(obj, GUI_EVENT_8);
+                        if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                        {
+                            gui_obj_event_set(obj, GUI_EVENT_7);
+                        }
+                        else
+                        {
+                            gui_obj_event_set(obj, GUI_EVENT_8);
+                        }
 
 
                     }
@@ -306,6 +317,7 @@ void page_update(gui_obj_t *obj)
                     {
                         obj->y = ((gui_page_t *)obj)->start_y;
                         GUI_TYPE(gui_page_t, obj)->release = false;
+                        gui_obj_event_set(obj, GUI_EVENT_7);
                     }
                     else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
                              obj->y != 0)
@@ -313,6 +325,7 @@ void page_update(gui_obj_t *obj)
                         GUI_TYPE(gui_page_t, obj)->release = false;
                         // gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                         obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
+                        gui_obj_event_set(obj, GUI_EVENT_7);
                     }
                     ((gui_page_t *)obj)->yold = obj->y;
                 }
@@ -420,6 +433,10 @@ static void page_update_rebound(gui_obj_t *obj)
                     GUI_TYPE(gui_page_t, obj)->count = 0;
                     GUI_TYPE(gui_page_t, obj)->y_last = 0;
                 }
+                else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed == 0)
+                {
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
                 else if (tp->pressed)
                 {
                     GUI_TYPE(gui_page_t, obj)->release = false;
@@ -452,7 +469,15 @@ static void page_update_rebound(gui_obj_t *obj)
                                     obj->y += GUI_TYPE(gui_page_t, obj)->speed;
                                     GUI_TYPE(gui_page_t, obj)->speed += 1;
                                 }
-                                gui_obj_event_set(obj, GUI_EVENT_8);
+                                if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                                {
+                                    gui_obj_event_set(obj, GUI_EVENT_7);
+                                }
+                                else
+                                {
+                                    gui_obj_event_set(obj, GUI_EVENT_8);
+                                }
+
 
 
                             }
@@ -460,6 +485,7 @@ static void page_update_rebound(gui_obj_t *obj)
                             {
                                 obj->y = ((gui_page_t *)obj)->start_y;
                                 GUI_TYPE(gui_page_t, obj)->release = false;
+                                gui_obj_event_set(obj, GUI_EVENT_7);
                             }
                             else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
                                      obj->y != 0)
@@ -467,6 +493,7 @@ static void page_update_rebound(gui_obj_t *obj)
                                 GUI_TYPE(gui_page_t, obj)->release = false;
                                 // gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                                 obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
+                                gui_obj_event_set(obj, GUI_EVENT_7);
                             }
                         }
                         break;
@@ -490,6 +517,7 @@ static void page_update_rebound(gui_obj_t *obj)
                                     obj->y += GUI_TYPE(gui_page_t, obj)->speed;
                                     GUI_TYPE(gui_page_t, obj)->speed += 1;
                                 }
+
                                 gui_obj_event_set(obj, GUI_EVENT_8);
 
 
@@ -498,6 +526,7 @@ static void page_update_rebound(gui_obj_t *obj)
                             {
                                 obj->y = ((gui_page_t *)obj)->start_y;
                                 GUI_TYPE(gui_page_t, obj)->release = false;
+                                gui_obj_event_set(obj, GUI_EVENT_7);
                             }
                             else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
                                      obj->y != 0)
@@ -529,6 +558,7 @@ static void page_update_rebound(gui_obj_t *obj)
                                     obj->y += GUI_TYPE(gui_page_t, obj)->speed;
                                     GUI_TYPE(gui_page_t, obj)->speed += 1;
                                 }
+
                                 gui_obj_event_set(obj, GUI_EVENT_8);
 
 
@@ -544,6 +574,7 @@ static void page_update_rebound(gui_obj_t *obj)
                                 GUI_TYPE(gui_page_t, obj)->release = false;
                                 // gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                                 obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
+                                gui_obj_event_set(obj, GUI_EVENT_7);
 
                             }
                         }
