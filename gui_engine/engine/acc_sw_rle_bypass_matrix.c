@@ -112,14 +112,14 @@ void rle_bypass_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint16_t pixel = *((uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint16_t pixel = *((uint16_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                                 source_bytes_per_pixel));
                 uint8_t opacity_value = image->opacity_value;
                 switch (opacity_value)
@@ -172,14 +172,14 @@ void rle_bypass_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 uint8_t opacity_value = image->opacity_value;
                 switch (opacity_value)
@@ -234,14 +234,14 @@ void rle_bypass_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 uint8_t opacity_value = image->opacity_value;
                 switch (opacity_value)
@@ -351,7 +351,7 @@ void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         end_line = y2 + 4;
     }
     //TODO: y2 + ceil(1 / scale_y_ratio)
-    if (img_type == 132)//rle_bypass_matric_rgba8888_2_rgb888
+    if (img_type == 132)//rle_bypass_matrix_rgba8888_2_rgb888
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
@@ -371,14 +371,14 @@ void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
 
                 switch (opacity_value)
@@ -427,14 +427,14 @@ void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 switch (opacity_value)
                 {
@@ -483,14 +483,14 @@ void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint16_t pixel = *(uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint16_t pixel = *(uint16_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                                source_bytes_per_pixel);
                 switch (opacity_value)
                 {
@@ -595,7 +595,7 @@ void rle_bypass_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
         end_line = y2 + 4;
     }
     //TODO: y2 + ceil(1 / scale_y_ratio)
-    if (img_type == 132)//rle_bypass_matric_rgba8888_2_argb8888
+    if (img_type == 132)//rle_bypass_matrix_rgba8888_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
@@ -615,14 +615,14 @@ void rle_bypass_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
 
                 switch (opacity_value)
@@ -674,14 +674,14 @@ void rle_bypass_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 switch (opacity_value)
                 {
@@ -732,14 +732,14 @@ void rle_bypass_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
                 float X = image->inverse->m[0][0] * x_j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * x_j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * x_j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint16_t pixel = *(uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint16_t pixel = *(uint16_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                                source_bytes_per_pixel);
                 switch (opacity_value)
                 {
