@@ -1,0 +1,78 @@
+
+menu "HoneyGUI Framework Config"
+        
+    menuconfig REALTEK_BUILD_GUI
+        bool "Enalbe RealGUI"
+        default n
+
+        if REALTEK_BUILD_GUI
+            config REALTEK_BUILD_GUI_OS_HEAP
+            bool "Enable OS Heap"
+            default n
+
+            config REALTEK_BUILD_GUI_FONT_STB
+            bool "Enable STB FONT"
+            default n
+
+            config REALTEK_BUILD_GUI_FONT_FREETYPE
+            bool "Enable FreeTYPE FONT"
+            default n
+
+            config REALTEK_BUILD_GUI_FONT_RTK_MEM
+            bool "Enable RTK MEM FONT"
+            default n
+
+            config REALTEK_BUILD_GUI_FONT_TTF_SVG
+            bool "Enable TTF SVG FONT"
+            default n
+        
+            config REALTEK_BUILD_VG_LITE
+            bool "Enable VG LITE GPU acc"
+            default n
+
+            config REALTEK_BUILD_PPE
+            bool "Enable PPE ACC"
+            default n
+
+            config REALTEK_NANOVG_HW_VGLITE
+            bool "Enable NANOVG GPU MODE"
+            default n
+
+            config REALTEK_BUILD_SCRIPT_AS_A_APP
+            bool "Enable SaaA"
+            default n
+
+            config REALTEK_BUILD_PAINTER_ENGINE
+            bool "Enable Painter engine"
+            default n
+
+            choice
+                prompt "select gui demo"
+                default REALTEK_BUILD_GUI_448_368_DEMO
+
+                config REALTEK_BUILD_GUI_448_368_DEMO
+                    bool "Enable 448_368_DEMO"
+
+                config REALTEK_BUILD_GUI_DEMO
+                    bool "Enable Simple GUI_DEMO"
+                    
+                config REALTEK_BUILD_GUI_320_384_DEMO
+                    bool "Enable 320_384_DEMO"
+            endchoice
+        endif
+
+    menuconfig REALTEK_BUILD_LVGL_GUI
+        bool "Enalbe LVGL"
+        default n
+
+        if REALTEK_BUILD_LVGL_GUI
+            config REALTEK_BUILD_LVGL_EXAMPLES
+            bool "Enable lvgl"
+            default n
+
+            config REALTEK_BUILD_LVGL_EXAMPLES
+            bool "Enable OS Heap"
+            default n
+
+        endif
+endmenu
