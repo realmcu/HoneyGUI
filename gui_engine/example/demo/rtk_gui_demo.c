@@ -114,7 +114,17 @@ static int app_init(void)
     return 0;
 }
 
+
+
+#ifdef __RTTHREAD__
+
+#include "rtthread.h"
+
+MSH_CMD_EXPORT(app_init, audio audio test);
+
+#else
 GUI_INIT_APP_EXPORT(app_init);
+#endif
 
 
 

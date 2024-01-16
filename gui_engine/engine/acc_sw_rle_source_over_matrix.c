@@ -112,14 +112,14 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint16_t pixel = *((uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint16_t pixel = *((uint16_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                                 source_bytes_per_pixel));
                 uint8_t opacity_value = image->opacity_value;
                 uint16_t *d = writebuf + (write_off + j);
@@ -164,14 +164,14 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 uint8_t opacity_value = image->opacity_value;
                 gui_color_t color = {.color.rgba.r = pixel[2],
@@ -227,14 +227,14 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 uint8_t opacity_value = image->opacity_value;
                 gui_color_t color = {.color.rgba.r = pixel[2],
@@ -342,7 +342,7 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         end_line = y2 + 4;
     }
-    if (img_type == 132)//rle_alpha_matric_rgba8888_2_rgb888
+    if (img_type == 132)//rle_alpha_matrix_rgba8888_2_rgb888
     {
         uint8_t source_bytes_per_pixel = 4;
 
@@ -365,14 +365,14 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 gui_color_t color = {.color.rgba.r = pixel[0],
                                      .color.rgba.g = pixel[1],
@@ -421,14 +421,14 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 gui_color_t color = {.color.rgba.r = pixel[0],
                                      .color.rgba.g = pixel[1],
@@ -477,14 +477,14 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint16_t pixel = *(uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint16_t pixel = *(uint16_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                                source_bytes_per_pixel);
                 gui_color_t color = {.color.rgba.a = 255,
                                      .color.rgba.r = (pixel & 0x001f) << 3,
@@ -586,7 +586,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         end_line = y2 + 4;
     }
     //TODO: y2 + ceil(1 / scale_y_ratio)
-    if (img_type == 132)//rle_alpha_matric_rgba8888_2_argb8888
+    if (img_type == 132)//rle_alpha_matrix_rgba8888_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
@@ -606,14 +606,14 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
 
                 gui_color_t color = {.color.rgba.r = pixel[0],
@@ -643,7 +643,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    else if (img_type == 68) //rle_alpha_matric_rgb888_2_argb8888
+    else if (img_type == 68) //rle_alpha_matrix_rgb888_2_argb8888
     {
 
         uint8_t source_bytes_per_pixel = 3;
@@ -664,14 +664,14 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint8_t *pixel = (uint8_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                              source_bytes_per_pixel);
                 gui_color_t color = {.color.rgba.r = pixel[0],
                                      .color.rgba.g = pixel[1],
@@ -699,7 +699,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         }
 
     }
-    else if (img_type == 4) //rle_alpha_matric_rgb565_2_argb8888
+    else if (img_type == 4) //rle_alpha_matrix_rgb565_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
@@ -719,14 +719,14 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
                 float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
                 float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
-                int x_matric = round(X / Z);
-                int y_matric = round(Y / Z);
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
 
-                if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
                 {
                     continue;
                 }
-                uint16_t pixel = *(uint16_t *)(read_off + ((y_matric - start_line) * source_w + x_matric) *
+                uint16_t pixel = *(uint16_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
                                                source_bytes_per_pixel);
                 gui_color_t color = {.color.rgba.r = (pixel & 0x001f) << 3,
                                      .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,

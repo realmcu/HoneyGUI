@@ -91,16 +91,13 @@ void cpu_filter_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispde
                                                       ((((((pixel & 0x001f) << 3) * opacity_value) + ((writebuf[write_off + j]  & 0x001f) << 3) *
                                                          (0xFF - opacity_value)) / 0xFF) >> 3);
                         }
-                        else
-                        {
-                            break;
-                        }
                     }
                     break;
                 }
             }
         }
     }
+    return;
 }
 void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                             gui_rect_t *rect)
@@ -128,65 +125,28 @@ void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispde
 
 
     uint8_t source_bytes_per_pixel = 3;
-    //uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     struct gui_matrix *inverse = image->inverse;
     uint8_t opacity_value = image->opacity_value;
-    int32_t y1, y2, z1, z2;
-    y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
-               inverse->m[1][2]);
-    z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
-               inverse->m[2][2]);
-    y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
-               inverse->m[1][2]);
-    z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
-               inverse->m[2][2]);
 
-    y1 = y1 / z1;
-    y2 = y2 / z2;
-
-    uint32_t start_line = 0, end_line = image->img_h - 1;
-    if (y1 < 0)
-    {
-        start_line = 0;
-    }
-    else if (y1 >= image->img_h)
-    {
-        return;
-    }
-    else
-    {
-        start_line = y1;
-    }
-
-    if (y2 < 0)
-    {
-        return;
-    }
-    else if (y2 + 4 >= image->img_h)
-    {
-        end_line = image->img_h - 1;
-    }
-    else
-    {
-        end_line = y2 + 4;
-    }
-    for (uint32_t i = start_line; i < end_line; i++)
+    for (uint32_t i = y_start; i < y_end; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
-            float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * i + image->inverse->m[0][2];
-            float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * i + image->inverse->m[1][2];
-            float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * i + image->inverse->m[2][2];
-            int x_matric = round(X / Z);
-            int y_matric = round(Y / Z);
-            if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+
+            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+            int x = X / Z;
+            int y = Y / Z;
+
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
             {
                 continue;
             }
-            uint8_t *pixel = (uint8_t *)(image_off + ((y_matric - start_line) * source_w + x_matric) *
-                                         source_bytes_per_pixel);
+
+            uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
                 switch (opacity_value)
@@ -196,23 +156,20 @@ void cpu_filter_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispde
                 case 255:
                     {
                         writebuf[write_off + j] = (uint16_t)(((pixel[2]) >> 3) << 11) + (uint16_t)(((pixel[1]) >> 2) << 5)
-                                                  + (uint16_t)(((pixel[0]) >> 3)); //RGB  565  565
+                                                  + (uint16_t)(((pixel[0]) >> 3)); //RGB  565
                     }
                     break;
                 default:
                     {
                         if (opacity_value < 255)
                         {
-                            writebuf[write_off + j] = (((((uint16_t)(pixel[0]) * opacity_value) + ((
-                                                                                                       writebuf[write_off + j]  & 0x001f) << 3) * (0xFF - opacity_value)) / 255) >> 3) +
+                            writebuf[write_off + j] = (((((uint16_t)(pixel[0]) * opacity_value) + ((writebuf[write_off + j]  &
+                                                                                                    0x001f)
+                                                                                                   << 3) * (0xFF - opacity_value)) / 0xFF) >> 3) +
                                                       ((((((uint16_t)(pixel[1]) * opacity_value) + (((writebuf[write_off + j] & 0x07e0) >> 5) << 2) *
-                                                          (0xFF - opacity_value)) / 255) >> 2) << 5) +
+                                                          (0xFF - opacity_value)) / 0xFF) >> 2) << 5) +
                                                       ((((((uint16_t)(pixel[2]) * (opacity_value)) + ((writebuf[write_off + j] >> 11) << 3) *
-                                                          (0xFF - opacity_value)) / 255) >> 3) << 11);
-                        }
-                        else
-                        {
-                            break;
+                                                          (0xFF - opacity_value)) / 0xFF) >> 3) << 11);
                         }
                     }
                     break;
@@ -252,62 +209,26 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
     struct gui_matrix *inverse = image->inverse;
     uint8_t opacity_value = image->opacity_value;
 
-    int32_t y1, y2, z1, z2;
-    y1 = round(inverse->m[1][0] * dc->section.x1 + inverse->m[1][1] * dc->section.y1 +
-               inverse->m[1][2]);
-    z1 = round(inverse->m[2][0] * dc->section.x1 + inverse->m[2][1] * dc->section.y1 +
-               inverse->m[2][2]);
-    y2 = round(inverse->m[1][0] * dc->section.x2 + inverse->m[1][1] * (dc->section.y2 - 1) +
-               inverse->m[1][2]);
-    z2 = round(inverse->m[2][0] * dc->section.x2 + inverse->m[2][1] * (dc->section.y2 - 1) +
-               inverse->m[2][2]);
-
-    y1 = y1 / z1;
-    y2 = y2 / z2;
-
-    uint32_t start_line = 0, end_line = image->img_h - 1;
-    if (y1 < 0)
-    {
-        start_line = 0;
-    }
-    else if (y1 >= image->img_h)
-    {
-        return;
-    }
-    else
-    {
-        start_line = y1;
-    }
-
-    if (y2 < 0)
-    {
-        return;
-    }
-    else if (y2 + 4 >= image->img_h)
-    {
-        end_line = image_y + image->img_h - 1;
-    }
-    else
-    {
-        end_line = y2 + 4;
-    }
-    for (uint32_t i = y_start; i < end_line; i++)
+    for (uint32_t i = y_start; i < y_end; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
-            float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * i + image->inverse->m[0][2];
-            float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * i + image->inverse->m[1][2];
-            float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * i + image->inverse->m[2][2];
-            int x_matric = round(X / Z);
-            int y_matric = round(Y / Z);
-            if ((x_matric >= source_w - 1) || (x_matric < 0) || (y_matric < 0) || (y_matric >= source_h - 1))
+
+            float X = inverse->m[0][0] * j + inverse->m[0][1] * i + inverse->m[0][2];
+            float Y = inverse->m[1][0] * j + inverse->m[1][1] * i + inverse->m[1][2];
+            float Z = inverse->m[2][0] * j + inverse->m[2][1] * i + inverse->m[2][2];
+            int x = X / Z;
+            int y = Y / Z;
+
+            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
             {
                 continue;
             }
-            uint8_t *pixel = (uint8_t *)(image_off + ((y_matric - start_line) * source_w + x_matric) *
-                                         source_bytes_per_pixel);
+
+            uint8_t *pixel = (uint8_t *)(image_off + (y * source_w + x) * source_bytes_per_pixel);
+
             if (pixel[0] != 0 || pixel[1] != 0 || pixel[2] != 0)
             {
                 switch (opacity_value)
@@ -332,10 +253,6 @@ void cpu_filter_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_disp
                                                           (0xFF - alpha)) / 0xFF) >> 2) << 5) +
                                                       ((((((uint16_t)(pixel[2]) * (alpha)) + ((writebuf[write_off + j] >> 11) << 3) *
                                                           (0xFF - alpha)) / 0xFF) >> 3) << 11);
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
                     break;

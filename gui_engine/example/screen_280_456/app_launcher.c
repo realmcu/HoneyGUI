@@ -34,7 +34,7 @@ static gui_app_t app_launcher =
         .y    = 0,
     },
     .ui_design = app_launcher_ui_design,
-    .active_ms = 1000 * 60,
+    .active_ms = 1000 * 5,
 };
 
 gui_app_t *get_launcher_app(void)
@@ -235,7 +235,6 @@ static void curtain_center(gui_curtainview_t *curtainview)
     gui_curtain_t *curtain_center = gui_curtain_create(curtainview, "curtain_center", 0, 0, 280, 456,
                                                        CURTAIN_MIDDLE, 1);
     gui_img_t *tree = gui_img_create_from_mem(curtain_center, "tree", TREE_BIN, 0, 0, 0, 0);
-    gui_img_set_mode(tree, IMG_BYPASS_MODE);
     gui_img_set_opacity((gui_img_t *)tree, 96);
     gui_text_t *time = gui_text_create(curtain_center,  "time",  0, 80, 280, 128);
     gui_text_set(time, "15:30", "rtk_font_stb", COLOR_WHITE, 5, 128);
@@ -288,7 +287,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_font_mem_init(HARMONYOS_SIZE32_BITS8_FONT_BIN);
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, REDUCTION);
+    gui_tabview_set_style(tv, CLASSIC);
     // gui_tab_t *tabn = gui_tab_create(tv, "tab0", 0, 0, 0, 0, -1, 0);
     gui_tab_t *tab0 = gui_tab_create(tv, "tab0", 0, 0, 0, 0, 0, 0);
     gui_tab_t *tab1 = gui_tab_create(tv, "tab1", 0, 0, 0, 0, 1, 0);
