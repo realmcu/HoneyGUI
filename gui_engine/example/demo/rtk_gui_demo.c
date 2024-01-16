@@ -31,7 +31,7 @@ static px_void PX_Object_3DModel_PixelShader(px_surface *psurface, px_int x, px_
     }
 }
 
-static px_float rotX = 0;
+static px_float rotY = 0;
 static PX_OBJECT_RENDER_FUNCTION(PX_Object_3DModelRender)
 {
     PX_Object_3DModel *pDesc = PX_ObjectGetDesc(PX_Object_3DModel, pObject);
@@ -44,7 +44,7 @@ static PX_OBJECT_RENDER_FUNCTION(PX_Object_3DModelRender)
     objHeight = pObject->Height;
 
     PX_SurfaceClearAll(& pDesc->renderSurface, PX_COLOR(0, 255, 255, 255));
-    PX_Object_3DModelSetWorld(pObject, 0, 0, 1.2f, rotX++, 200, 0, 1);
+    PX_Object_3DModelSetWorld(pObject, 0, 0, 1.2f, 0, rotY++, 0, 1);
     PX_3D_Scene(&pDesc->renderlist, &pDesc->world, &pDesc->camera);
     PX_3D_Present(&pDesc->renderSurface, &pDesc->renderlist, &pDesc->camera);
     PX_SurfaceRender(psurface, &pDesc->renderSurface, (px_int)objx, (px_int)objy, PX_ALIGN_CENTER,
@@ -54,27 +54,39 @@ static PX_OBJECT_RENDER_FUNCTION(PX_Object_3DModelRender)
 static void px_main(gui_px_t *this)
 {
     gui_log("line = %d, func = %s \n", __LINE__, __FUNCTION__);
-    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 100, 300);
-    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 200, 300);
-    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 300, 300);
+//    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 100, 300);
+//    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 200, 300);
+//    PX_Object_Firework01Create(this->mp_dynamic, this->px_root, 300, 300);
 
-//    PX_3D_ObjectData data;
-//    PX_IO_Data io;
-//    PX_Object *pObject;
+    PX_3D_ObjectData data;
+    PX_IO_Data io;
+    PX_Object *pObject;
 
-//    io = PX_LoadFileToIOData("win32_sim/assets/bunny.obj");
-//    if (io.size == 0) { return PX_FALSE; }
-//    PX_3D_ObjectDataInitialize(this->mp_static, &data);
-//    if (!PX_3D_ObjectDataLoad(&data, io.buffer, io.size)) { return PX_FALSE; }
+#if defined _WIN32
+    io = PX_LoadFileToIOData("win32_sim/assets/bunny.obj");
+#else
+    io = PX_LoadFileToIOData("/win32_sim/assets/bunny.obj");
+#endif
+    if (io.size == 0)
+    {
+        gui_log("line = %d, func = %s \n", __LINE__, __FUNCTION__);
+        return;
+    }
+    PX_3D_ObjectDataInitialize(this->mp_static, &data);
+    if (!PX_3D_ObjectDataLoad(&data, io.buffer, io.size))
+    {
+        gui_log("line = %d, func = %s \n", __LINE__, __FUNCTION__);
+        return;
+    }
 
-//    pObject = PX_Object_3DModelCreate(this->mp_dynamic, this->px_root, 368 / 2, 448 / 2, 368, 448,
-//                                      &data);
+    pObject = PX_Object_3DModelCreate(this->mp_dynamic, this->px_root, 368 / 2, 448 / 2, 368, 448,
+                                      &data);
 
-//    pObject->Func_ObjectRender = PX_Object_3DModelRender;
+    pObject->Func_ObjectRender = PX_Object_3DModelRender;
 
-//    PX_Object_3DModelSetWorld(pObject, 0, 0, 1.2f, 0, 200, 0, 1);
-//    PX_Object_3DModel *pdesc = PX_ObjectGetDesc(PX_Object_3DModel, pObject);
-//    PX_3D_RenderListSetPixelShader(&pdesc->renderlist, PX_Object_3DModel_PixelShader);
+    PX_Object_3DModelSetWorld(pObject, 0, 0, 1.2f, 0, 200, 0, 1);
+    PX_Object_3DModel *pdesc = PX_ObjectGetDesc(PX_Object_3DModel, pObject);
+    PX_3D_RenderListSetPixelShader(&pdesc->renderlist, PX_Object_3DModel_PixelShader);
 }
 
 static void app_dialing_ui_design(gui_app_t *app)
@@ -125,6 +137,8 @@ MSH_CMD_EXPORT(app_init, audio audio test);
 #else
 GUI_INIT_APP_EXPORT(app_init);
 #endif
+
+
 
 
 
