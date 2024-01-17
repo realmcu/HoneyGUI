@@ -7,6 +7,7 @@
 #if defined _WIN32
 #include "dirent.h"
 #endif
+#include "gui_api.h"
 
 int PX_SaveDataToFile(void *buffer, int size, const char path[])
 {
@@ -20,6 +21,8 @@ int PX_SaveDataToFile(void *buffer, int size, const char path[])
     }
     return 0;
 #else
+    int fd = gui_fs_open(path,  0);
+    gui_fs_write(fd, buffer, size);
     return 0;
 #endif
 }
@@ -62,7 +65,25 @@ _ERROR:
     return io;
 #else
     PX_IO_Data io;
-    io.buffer = NULL;
+    int fd = gui_fs_open(path,  00 | 0100000);
+    if (fd <= 0)
+    {
+        gui_log("fd = %d, open file fail:%s!\n", fd, path);
+    }
+    int filesize = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+    io.buffer = (unsigned char *)malloc(filesize + 1);
+    if (!io.buffer)
+    {
+        goto _ERROR;
+    }
+    gui_fs_lseek(fd, 0, SEEK_SET);
+    gui_fs_read(fd, io.buffer, filesize);
+    gui_fs_close(fd);
+    io.buffer[filesize] = '\0';
+    io.size = filesize;
+    return io;
+_ERROR:
+    io.buffer = 0;
     io.size = 0;
     return io;
 #endif
@@ -89,6 +110,12 @@ int PX_FileExist(const char path[])
     }
     return 0;
 #else
+    int fd = gui_fs_open(path,  0);
+    if (fd >= 0)
+    {
+        gui_fs_close(fd);
+        return 1;
+    }
     return 0;
 #endif
 }

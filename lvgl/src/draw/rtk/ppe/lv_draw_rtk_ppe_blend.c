@@ -103,7 +103,7 @@ lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
     source.format = PPE_A8;
 
     ppe_translate_t trans = {.x = coords->x1, .y = coords->y1};
-    PPE_ERR err = PPE_blend(&source, &target, &trans);
+    PPE_ERR err = PPE_blend(&source, &target, &trans, PPE_SRC_OVER_MODE);
     if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;
@@ -136,6 +136,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     source.width = source_width;
     source.height = source_height;
     uint8_t pixel_byte = 2;
+    PPE_BLEND_MODE mode = PPE_BYPASS_MODE;
     if (LV_COLOR_DEPTH == 16)
     {
         if (cf == LV_IMG_CF_TRUE_COLOR)
@@ -147,6 +148,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         {
             source.format = PPE_ARGB8565;
             pixel_byte = 3;
+            mode = PPE_SRC_OVER_MODE;
         }
         else if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
         {
@@ -154,6 +156,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
             pixel_byte = 2;
             source.color_key_en = ENABLE;
             source.color_key_value = LV_COLOR_CHROMA_KEY.full;
+            mode = PPE_SRC_OVER_MODE;
         }
         else
         {
@@ -163,6 +166,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     else if (LV_COLOR_DEPTH == 32)
     {
         source.format = PPE_ARGB8888;
+        mode = PPE_SRC_OVER_MODE;
     }
     else if (cf == LV_IMG_CF_RGB888)
     {
@@ -181,6 +185,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         {
             zoom.global_alpha_en = ENABLE;
             zoom.global_alpha = dsc->opa;
+            mode = PPE_SRC_OVER_MODE;
         }
         if (cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
         {
@@ -207,7 +212,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 return LV_RES_INV;
             }
 
-            err = PPE_blend(&zoom, &target, &trans);
+            err = PPE_blend(&zoom, &target, &trans, mode);
             if (err == PPE_SUCCESS)
             {
                 return LV_RES_OK;
@@ -236,7 +241,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                     return LV_RES_INV;
                 }
                 trans.y = coords->y1 + y;
-                err = PPE_blend(&zoom, &target, &trans);
+                err = PPE_blend(&zoom, &target, &trans, mode);
                 if (err != PPE_SUCCESS)
                 {
                     return LV_RES_INV;
@@ -255,6 +260,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         {
             source.global_alpha_en = ENABLE;
             source.global_alpha = dsc->opa;
+            mode = PPE_SRC_OVER_MODE;
         }
 
 #if PPE_CACHE_BG
@@ -296,7 +302,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         else
 #endif
         {
-            PPE_ERR err = PPE_blend(&source, &target, &trans);
+            PPE_ERR err = PPE_blend(&source, &target, &trans, mode);
             if (err == PPE_SUCCESS)
             {
                 return LV_RES_OK;
@@ -367,7 +373,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
         }
         recolor.global_alpha_en = ENABLE;
         recolor.global_alpha = dsc->opa;
-        err = PPE_blend(&recolor, &target, &trans);
+        err = PPE_blend(&recolor, &target, &trans, PPE_SRC_OVER_MODE);
         if (err == PPE_SUCCESS)
         {
             return LV_RES_OK;
@@ -394,7 +400,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
                 return LV_RES_INV;
             }
             trans.y = coords->y1 + y;
-            err = PPE_blend(&recolor, &target, &trans);
+            err = PPE_blend(&recolor, &target, &trans, PPE_SRC_OVER_MODE);
             if (err != PPE_SUCCESS)
             {
                 return LV_RES_INV;
@@ -426,7 +432,7 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
     source.format = PPE_A8;
 
     ppe_translate_t trans = {.x = dsc->mask_area->x1, .y = dsc->mask_area->y1};
-    PPE_ERR err = PPE_blend(&source, &target, &trans);
+    PPE_ERR err = PPE_blend(&source, &target, &trans, PPE_SRC_OVER_MODE);
     if (err == PPE_SUCCESS)
     {
         return LV_RES_OK;

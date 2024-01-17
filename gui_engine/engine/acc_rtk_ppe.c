@@ -26,8 +26,8 @@ static double acc_ppe_ceil(double _x)
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    if ((rect->x1 >= dc->screen_width - 1) || (rect->y1 >= dc->screen_height - 1) ||
-        (rect->x1 + image->img_w <= 0) || (rect->y1 + image->img_h <= 0))
+    if ((rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y2) ||
+        (rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1))
     {
         return;
     }
@@ -95,16 +95,34 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     source.memory = (void *)source.address;
     source.global_alpha_en = true;
     source.global_alpha = image->opacity_value;
-    if (image->blend_mode == IMG_SRC_OVER_MODE || image->blend_mode == IMG_FILTER_BLACK)
+    PPE_BLEND_MODE mode = PPE_BYPASS_MODE;
+    if (image->blend_mode == IMG_FILTER_BLACK)
     {
-        if (image->blend_mode == IMG_FILTER_BLACK)
+        source.color_key_en = true;
+        source.color_key_value = 0x00000000;
+        mode = PPE_SRC_OVER_MODE;
+    }
+    else if (image->blend_mode == IMG_BYPASS_MODE)
+    {
+        mode = PPE_BYPASS_MODE;
+    }
+    else
+    {
+        if (source.format < PPE_BGR888 || source.format > PPE_RGB565 || \
+            (source.global_alpha_en == DISABLE && source.global_alpha != 0xFF))
         {
-            source.color_key_en = true;
-            source.color_key_value = 0x00000000;
+            mode = PPE_SRC_OVER_MODE;
         }
+        else
+        {
+            mode = PPE_BYPASS_MODE;
+        }
+    }
+    if (1)
+    {
         if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
         {
-            if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1) && 1)
+            if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1))
             {
                 float scale_x = image->matrix->m[0][0], scale_y = image->matrix->m[1][1];
                 if ((image->img_w == (int)(image->img_w * scale_x)) &&
@@ -167,7 +185,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                             return;
                         }
                     }
-                    PPE_blend(&source, &target, &trans);
+                    PPE_blend(&source, &target, &trans, mode);
                     return;
                 }
                 ppe_buffer_t scaled_img;
@@ -175,55 +193,41 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 ppe_rect_t range;
                 ppe_rect_t scale_rect;
                 memset(&scaled_img, 0, sizeof(ppe_buffer_t));
-                scaled_img.width = image->img_w * scale_x;
-                scaled_img.height = image->img_h * scale_y > (dc->section.y2 - dc->section.y1) ?
-                                    (dc->section.y2 - dc->section.y1) : image->img_h * scale_y;
-                scaled_img.height += acc_ppe_ceil(scale_y);
-                uint32_t modified_height = image->img_h * scale_y;
 
-                trans.x = (int)image->matrix->m[0][2];
+                trans.x = rect->x1 - dc->section.x1;
                 trans.y = 0;
-                range.left = 0;
-                range.right = scaled_img.width - 1;
-                range.top = 0;
-                range.bottom = scaled_img.height - 1;
-                scaled_img.global_alpha_en = true;
-                scaled_img.global_alpha = image->opacity_value;
-                if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
-                {
-                    scale_rect.top = 0;
-                    if ((rect->y1 + modified_height) <= dc->section.y2)
-                    {
-                        scale_rect.bottom = source.height - 1;
-                    }
-                    else
-                    {
-                        scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_y;
-                    }
-                    trans.y = (int)image->matrix->m[1][2] - dc->section.y1;
-                    scale_rect.left = 0;
-                    scale_rect.right = source.width - 1;
-                }
-                else if ((dc->section.y2 < (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1))
+                if (rect->y1 < dc->section.y1)
                 {
                     scale_rect.top = (dc->section.y1 - rect->y1) / scale_y;
-                    scale_rect.bottom = (dc->section.y2 - rect->y1) / scale_y;
-                    scale_rect.left = 0;
-                    scale_rect.right = source.width - 1;
-                }
-                else if ((dc->section.y2 >= (rect->y1 + modified_height)) && (dc->section.y1 > rect->y1)
-                         && (dc->section.y1 < (rect->y1 + modified_height)))
-                {
-                    scale_rect.top = (dc->section.y1 - rect->y1) / scale_y;
-                    scale_rect.bottom = source.height - 1;
-                    scaled_img.height = rect->y1 + modified_height - dc->section.y1;
-                    scale_rect.left = 0;
-                    scale_rect.right = source.width - 1;
                 }
                 else
                 {
+                    scale_rect.top = 0;
+                    trans.y = rect->y1 - dc->section.y1;
+                }
+                if (rect->y2 > dc->section.y1 + dc->fb_height)
+                {
+                    scale_rect.bottom = ceil((dc->section.y1 + dc->fb_height - rect->y1 - 1) / scale_y) + ceil(
+                                            1 / scale_y);
+                }
+                else
+                {
+                    scale_rect.bottom = ceil((rect->y2 - rect->y1 + 1) / scale_y);
+                }
+                if (scale_rect.bottom >= image->img_h)
+                {
+                    scale_rect.bottom = image->img_h - 1;
+                }
+                scale_rect.left = 0;
+                scale_rect.right = image->img_w - 1;
+                scaled_img.width = (uint32_t)image->img_w * scale_x;
+                scaled_img.height = (uint32_t)((scale_rect.bottom - scale_rect.top + 1) * scale_y);
+                if (scaled_img.height < 1)
+                {
                     return;
                 }
+                scaled_img.global_alpha_en = true;
+                scaled_img.global_alpha = image->opacity_value;
                 if (head->type == IMDC_COMPRESS)
                 {
                     source.height = scale_rect.bottom - scale_rect.top + 1;
@@ -254,8 +258,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         return;
                     }
                 }
-                uint32_t scaled_width = (uint32_t)source.width * scale_x;
-                uint32_t scaled_height  = (uint32_t)source.height * scale_y;
+
                 switch (source.format)
                 {
                 case PPE_BGR565:
@@ -266,7 +269,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_width * scaled_height * 2);
+                        scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * 2);
                     }
                     break;
                 case PPE_BGR888:
@@ -277,7 +280,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_width * scaled_height * 3);
+                        scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * 3);
                     }
                     break;
                 case PPE_BGRA8888:
@@ -288,7 +291,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     }
                     else if (dc->type == DC_RAMLESS)
                     {
-                        scaled_img.memory = gui_malloc(scaled_width * scaled_height * 4);
+                        scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * 4);
                     }
                     break;
                 default:
@@ -297,7 +300,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 PPE_ERR err = PPE_Scale_Rect(&source, &scaled_img, scale_x, scale_y, &scale_rect);
                 if (err == PPE_SUCCESS)
                 {
-                    PPE_blend(&scaled_img, &target, &trans);
+                    err = PPE_blend(&scaled_img, &target, &trans, mode);
                 }
                 if (dc->type == DC_SINGLE)
                 {
@@ -371,7 +374,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         return;
                     }
                 }
-                PPE_blend(&source, &target, &trans);
+                PPE_ERR err = PPE_blend(&source, &target, &trans, PPE_SRC_OVER_MODE);
                 if (head->type == IMDC_COMPRESS)
                 {
                     gui_free(source.memory);
@@ -448,7 +451,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 return;
             }
         }
-        PPE_blend(&source, &target, &trans);
+        PPE_blend(&source, &target, &trans, mode);
         if (head->type == IMDC_COMPRESS)
         {
             gui_free(source.memory);

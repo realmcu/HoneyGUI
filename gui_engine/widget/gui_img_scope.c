@@ -91,30 +91,96 @@
 static void img_prepare(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-    gui_img_t *img = (gui_img_t *)obj;
+    GUI_TYPE(gui_img_t, obj)->draw_img.opacity_value = obj->parent->opacity_value * GUI_TYPE(gui_img_t,
+                                                       obj)->opacity / UINT8_MAX;
+
+    {
+        gui_dispdev_t *dc = gui_get_dc();
+        touch_info_t *tp = tp_get_info();
+
+        if (((obj->ax + obj->tx) < (int)gui_get_screen_width()) && (((obj->ax + obj->tx) + obj->w) >= 0) &&
+            \
+            ((obj->ay + obj->ty) < (int)gui_get_screen_height()) && (((obj->ay + obj->ty) + obj->h) >= 0))
+
+        {
+            gui_img_t *b = (void *)obj;
+            if (tp->pressed)
+            {
+
+                if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx  + obj->w)) &&
+                    (tp->y >= obj->ay + obj->ty && tp->y <= (obj->ay + obj->ty + obj->h)))
+                {
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                    b->press_flag = true;
+                }
+            }
+
+            if (b->release_flag)
+            {
+                b->press_flag = false;
+                b->release_flag = false;
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+            }
+            if (tp->released && b->press_flag)
+            {
+                b->release_flag = true;
+            }
+        }
+    }
+    gui_img_t *this = (gui_img_t *)obj;
+    gui_obj_t *root = (gui_obj_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
-    draw_img_t *draw_img = &img->draw_img;
+    draw_img_t *draw_img = &this->draw_img;
 
-    struct gui_rgb_data_head head;
-    memcpy(&head, draw_img->data, sizeof(head));
+    gui_image_load_scale(draw_img);
+    root->w = draw_img->img_w;
+    root->h = draw_img->img_h;
+    matrix_identity(draw_img->matrix);
+    matrix_identity(draw_img->matrix);
+    matrix_translate(root->dx, root->dy, draw_img->matrix);
+    matrix_translate(root->tx, root->ty, draw_img->matrix);
 
-    /* set image information */
-    draw_img->img_w = head.w;
-    draw_img->img_h = head.h;
-    obj->w = draw_img->img_w;
-    obj->h = draw_img->img_h;
 
-    if (tp->type == TOUCH_SHORT)
+    matrix_translate(dc->screen_width / 2, dc->screen_height / 2, draw_img->matrix);
+    matrix_scale(root->sx, root->sy, draw_img->matrix);
+    matrix_translate(-dc->screen_width / 2, -dc->screen_height / 2, draw_img->matrix);
+    matrix_translate(root->ax, root->ay, draw_img->matrix);
+
+    matrix_translate(this->t_x, this->t_y, draw_img->matrix);
+    matrix_rotate(this->degrees, draw_img->matrix);
+    matrix_scale(this->scale_x, this->scale_y, draw_img->matrix);
+
+    matrix_translate(-this->c_x, -this->c_y, draw_img->matrix);
+
+    memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(draw_img->inverse);
+    gui_image_new_area(draw_img);
+
+    int sx = obj->dx + obj->ax + obj->tx;
+    int sy = obj->dy + obj->ay + obj->ty;
+    int ex = sx + obj->w;
+    int ey = sy + obj->h;
+
+    if ((tp->x >= sx && tp->x <= ex) && (tp->y >= sy && tp->y <= ey))
     {
-        if (tp->x > obj->x && tp->x < obj->x + obj->w && tp->y > obj->y && tp->y < obj->y + obj->h)
+        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
         {
             gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
         }
+
+    }
+
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+
+    if (last != this->checksum)
+    {
+        gui_fb_change();
     }
 }
-
 static void img_scope_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);

@@ -13,9 +13,28 @@
 #include <stdio.h>
 #include "gui_progressbar.h"
 #include <tp_algo.h>
+#define GUI_APP_DEFINE(APP_NAME,UI_DESIGN)\
+    \
+    static void UI_DESIGN(gui_app_t*);\
+    static gui_app_t _app_##APP_NAME =\
+                                      {\
+                                       .screen =\
+                                                {\
+                                                 .name = #APP_NAME,\
+                                                },\
+                                       .ui_design = UI_DESIGN,\
+                                       .active_ms = 1000000,\
+                                      };\
+    \
+    gui_app_t *_get_app_##APP_NAME(void)\
+    {\
+        return &_app_##APP_NAME;\
+    }
+#define GUI_APP_HANDLE(APP_NAME) _get_app_##APP_NAME()
 static void app_page_ui_design(gui_app_t *app);
 
-
+GUI_APP_DEFINE(battery, app_battery_ui_design)
+GUI_APP_DEFINE(app, app_app_ui_design)
 gui_tabview_t *tv;
 
 static gui_app_t app_page =
@@ -36,25 +55,8 @@ void *get_app_page(void)
 {
     return &app_page;
 }
-static void app_app_ui_design(gui_app_t *app);
-static gui_app_t app_app =
-{
-    .screen =
-    {
-        .name = "app_app",
-        .x    = 0,
-        .y    = 0,
-        .parent = NULL,
-    },
-    .ui_design = app_app_ui_design,
-    .thread_entry = NULL,
-    .active_ms = 1000000,
-};
 
-void *get_app_app(void)
-{
-    return &app_app;
-}
+
 static void kb_button_cb(void *obj, gui_event_t e)
 {
     gui_log("line = %d \n", __LINE__);
@@ -145,7 +147,13 @@ static void callback_release(gui_button_t *button)
 
 static void event_cb_click(gui_button_t *button)
 {
-    gui_app_startup(get_app_app());
+    gui_app_startup(GUI_APP_HANDLE(app));
+    gui_app_layer_top();
+}
+static void battery_cb(gui_button_t *button)
+{
+    gui_app_shutdown(get_app_page());
+    gui_app_startup(GUI_APP_HANDLE(battery));
     gui_app_layer_top();
 }
 static void deal_img_in_root(gui_obj_t *object)
@@ -313,6 +321,7 @@ static void app_page_ui_design(gui_app_t *app)
     gui_page_set_animate(page, 1000, -1, page_callback, page);
     pro = gui_progressbar_movie_create(&(app->screen), scrollbar_array, 39, 300, 10);
     gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
+    gui_obj_add_event_cb(button_array[1], battery_cb, GUI_EVENT_TOUCH_CLICKED, button_array[1]);
 }
 
 static void app_app_animate_exit(gui_win_t *win)
@@ -334,7 +343,7 @@ static void app_app_animate_exit(gui_win_t *win)
     if (tp->released && end)
     {
         GET_BASE(win)->x = gui_get_screen_width();
-        gui_app_shutdown(get_app_app());
+        gui_app_shutdown(GUI_APP_HANDLE(app));
         end = false;
     }
     if (tp->type == TOUCH_HOLD_X && tp->deltaX > 0)
@@ -412,4 +421,125 @@ static int app_init(void)
 }
 
 GUI_INIT_APP_EXPORT(app_init);
+
+static void deal_img_in_root_highlight(gui_obj_t *object)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        obj->ay = obj->y + obj->parent->ay;
+        if (obj->type == TEXTBOX)
+        {
+
+
+
+#define _normal_opacity 100
+#define _threshold 50
+#define _reverse_line ((int)(gui_get_screen_height()/2)-40)
+
+            if (obj->ay > _reverse_line - _threshold && obj->ay < _reverse_line)
+            {
+                //y=(255-100)/50*x+100
+                GUI_TYPE(gui_text_t, obj)->color = gui_rgba(GUI_TYPE(gui_text_t, obj)->color.color.rgba.r,
+                                                            GUI_TYPE(gui_text_t, obj)->color.color.rgba.g,
+                                                            GUI_TYPE(gui_text_t, obj)->color.color.rgba.b,
+                                                            (UINT8_MAX - _normal_opacity) / _threshold * (_threshold - (_reverse_line - obj->ay)) +
+                                                            _normal_opacity);
+                //GUI_TYPE(gui_text_t,obj)->color=gui_rgba(100,100,100,255);
+                //gui_log("%d,%d\n",_reverse_line-obj->ay,(UINT8_MAX-_normal_opacity)/_threshold*(_threshold-(_reverse_line-obj->ay))+_normal_opacity);
+            }
+            else if (obj->ay >= _reverse_line && obj->ay < _reverse_line + _threshold)
+            {
+                //y=-(255-100)/50*x+255
+                GUI_TYPE(gui_text_t, obj)->color = gui_rgba(GUI_TYPE(gui_text_t, obj)->color.color.rgba.r,
+                                                            GUI_TYPE(gui_text_t, obj)->color.color.rgba.g,
+                                                            GUI_TYPE(gui_text_t, obj)->color.color.rgba.b,
+                                                            -(UINT8_MAX - _normal_opacity) / _threshold * (-(_reverse_line - obj->ay)) + UINT8_MAX);
+            }
+            else
+            {
+                GUI_TYPE(gui_text_t, obj)->color = gui_rgba(GUI_TYPE(gui_text_t, obj)->color.color.rgba.r,
+                                                            GUI_TYPE(gui_text_t, obj)->color.color.rgba.g,
+                                                            GUI_TYPE(gui_text_t, obj)->color.color.rgba.b,
+                                                            _normal_opacity);
+            }
+
+
+
+
+        }
+
+
+        deal_img_in_root_highlight(obj);
+    }
+}
+
+static void page_highlight(gui_page_t *page)
+{
+    deal_img_in_root_highlight(page);
+}
+static void app_battery_ui_design(gui_app_t *app)
+{
+    {
+        gui_page_t *page1 = gui_page_create(&(app->screen), "page", 0, 0, 100, 0);
+        static int row = 24;
+        gui_grid_t *grid = gui_grid_create(page1, 0, 0, row, 1, 0, 100);
+        for (size_t i = 0; i < row; i++)
+        {
+            static char text_array[24][3];
+            sprintf(text_array[i], "%d", (int)i);
+            char *text = text_array[i];
+            int font_size = 80;
+            gui_text_t *t = gui_text_create(grid, "txt", 0, 0, gui_get_screen_width(), font_size);
+            gui_text_set(t, text, "rtk_font_mem", gui_rgba(255, 0, 0, _normal_opacity), strlen(text),
+                         font_size);
+            void *addr1 = ARIALBD_SIZE80_BITS8_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+            gui_page_set_animate(page1, 1000, -1, page_highlight, page1);
+        }
+    }
+    {
+        gui_page_t *page1 = gui_page_create(&(app->screen), "page", 105, 0, 100, 0);
+        static int row = 60;
+        gui_grid_t *grid = gui_grid_create(page1, 0, 0, row, 1, 0, 100);
+        for (size_t i = 0; i < row; i++)
+        {
+            static char text_array[60][3];
+            sprintf(text_array[i], "%d", (int)i);
+            char *text = text_array[i];
+            int font_size = 80;
+            gui_text_t *t = gui_text_create(grid, "txt", 0, 0, gui_get_screen_width(), font_size);
+            gui_text_set(t, text, "rtk_font_mem", gui_rgba(255, 0, 0, _normal_opacity), strlen(text),
+                         font_size);
+            void *addr1 = ARIALBD_SIZE80_BITS8_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+            gui_page_set_animate(page1, 1000, -1, page_highlight, page1);
+        }
+    }
+    {
+        gui_page_t *page1 = gui_page_create(&(app->screen), "page", 210, 0, 100, 0);
+        static int row = 60;
+        gui_grid_t *grid = gui_grid_create(page1, 0, 0, row, 1, 0, 100);
+        for (size_t i = 0; i < row; i++)
+        {
+            static char text_array[60][3];
+            sprintf(text_array[i], "%d", (int)i);
+            char *text = text_array[i];
+            int font_size = 80;
+            gui_text_t *t = gui_text_create(grid, "txt", 0, 0, gui_get_screen_width(), font_size);
+            gui_text_set(t, text, "rtk_font_mem", gui_rgba(255, 0, 0, _normal_opacity), strlen(text),
+                         font_size);
+            void *addr1 = ARIALBD_SIZE80_BITS8_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+            gui_page_set_animate(page1, 1000, -1, page_highlight, page1);
+        }
+    }
+}
+
+
+
 

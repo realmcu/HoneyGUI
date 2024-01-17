@@ -1,0 +1,11 @@
+file(GLOB gui_widget_sources *.c)
+set(gui_widget_sources ${gui_widget_sources} CACHE INTERNAL  "gui widget sources ")
+
+HEADER_DIRECTORIES(gui_widget_headers ./)
+set(gui_widget_headers ${gui_widget_headers} CACHE INTERNAL  "gui widget headers ")
+if(gui_debug_enable)  
+   message(--------------gui widget sources-------------)
+foreach(ITEM ${gui_widget_sources})
+   message(${ITEM})
+endforeach()
+endif()

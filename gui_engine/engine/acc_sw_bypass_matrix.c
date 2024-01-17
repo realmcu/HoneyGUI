@@ -30,25 +30,33 @@ void bypass_matrix_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *d
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;//for more data,20220104,howie
-    int image_h = image->target_h + 1;//for more data,20220104,howie
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-
-    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-
-    struct gui_matrix *inverse = image->inverse;
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
+
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+    struct gui_matrix *inverse = image->inverse;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t opacity_value = image->opacity_value;
@@ -110,10 +118,19 @@ void bypass_matrix_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *d
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -189,10 +206,19 @@ void bypass_matrix_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev 
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -270,10 +296,19 @@ void bypass_matrix_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *d
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -336,23 +371,32 @@ void bypass_matrix_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;//for more data,20220104,howie
-    int image_h = image->target_h + 1;//for more data,20220104,howie
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
 
-    struct gui_matrix *inverse = image->inverse;
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
+
+    struct gui_matrix *inverse = image->inverse;
+
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t *writebuf = dc->frame_buf;
 
@@ -413,23 +457,32 @@ void bypass_matrix_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev 
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;//for more data,20220104,howie
-    int image_h = image->target_h + 1;//for more data,20220104,howie
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
 
-    struct gui_matrix *inverse = image->inverse;
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
+
+    struct gui_matrix *inverse = image->inverse;
+
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t *writebuf = dc->frame_buf;
 
@@ -487,25 +540,33 @@ void bypass_matrix_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev 
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;//for more data,20220104,howie
-    int image_h = image->target_h + 1;//for more data,20220104,howie
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-
-    uint8_t *writebuf = dc->frame_buf;
-
-    struct gui_matrix *inverse = image->inverse;
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
+
+    uint8_t *writebuf = dc->frame_buf;
+
+    struct gui_matrix *inverse = image->inverse;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
@@ -570,23 +631,32 @@ void bypass_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev 
 {
     int image_x = rect->x1;
     int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;//for more data,20220104,howie
-    int image_h = image->target_h + 1;//for more data,20220104,howie
+    int image_w = image->target_w + 1;
+    int image_h = image->target_h + 1;
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
 
-    struct gui_matrix *inverse = image->inverse;
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
+
+    struct gui_matrix *inverse = image->inverse;
+
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t *writebuf = dc->frame_buf;
 
@@ -653,17 +723,27 @@ void bypass_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispde
     int source_w = image->img_w;
     int source_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
 
-    struct gui_matrix *inverse = image->inverse;
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
+
+    struct gui_matrix *inverse = image->inverse;
+
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t *writebuf = dc->frame_buf;
     uint8_t source_bytes_per_pixel = 4;

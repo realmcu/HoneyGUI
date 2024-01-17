@@ -102,6 +102,10 @@ static void gui_font_draw(gui_text_t *text, gui_rect_t *rect)
     switch (text->font_type)
     {
     case GUI_FONT_SOURCE_BMP:
+        if (text->base.sx != 1.0f || text->base.sy != 1.0f)
+        {
+            return;
+        }
         gui_font_mem_draw(text, rect);
         break;
     case GUI_FONT_SOURCE_TTF:

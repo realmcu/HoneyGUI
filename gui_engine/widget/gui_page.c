@@ -207,7 +207,6 @@ void page_update(gui_obj_t *obj)
     int ay = 0;
     deal_img_in_root(obj, obj->y + obj->h, &ay);
     obj->h = ay - obj->y;
-    obj->w = 320;
     if (obj->parent->ay != 0)
     {
         return;
@@ -360,7 +359,6 @@ static void page_update_rebound(gui_obj_t *obj)
     int ay = 0;
     deal_img_in_root(obj, obj->y + obj->h, &ay);
     obj->h = ay - obj->y;
-    obj->w = 320;
     if (obj->parent->ay != 0)
     {
         return;

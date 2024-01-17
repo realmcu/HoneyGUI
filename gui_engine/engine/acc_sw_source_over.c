@@ -33,10 +33,19 @@ void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -91,10 +100,19 @@ void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -156,10 +174,19 @@ void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -223,10 +250,19 @@ void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *d
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     uint8_t source_bytes_per_pixel = 4;
     if ((x_start >= x_end) || (y_start >= y_end))
@@ -293,10 +329,19 @@ void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
     uint8_t opacity_value = image->opacity_value;
 
     if ((x_start >= x_end) || (y_start >= y_end))
@@ -357,10 +402,19 @@ void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -421,10 +475,19 @@ void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -485,10 +548,19 @@ void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *d
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -558,10 +630,19 @@ void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *d
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -623,10 +704,19 @@ void alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev 
     int image_w = image->img_w;
     int image_h = image->img_h;
 
-    int x_start = _UI_MAX(image_x, 0);
+    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
+    if (rect->xboundright > 0)
+    {
+        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
+    }
 
     if ((x_start >= x_end) || (y_start >= y_end))
     {
