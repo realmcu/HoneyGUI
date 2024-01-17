@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+
+
 struct gui_rgb_data_head
 {
     unsigned char scan : 1;
@@ -76,6 +78,8 @@ typedef struct draw_img
 
 void gui_image_load_scale(draw_img_t *img);
 bool gui_image_new_area(draw_img_t *img);
+bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
+                           int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end);
 struct gui_rgb_data_head rtgui_image_get_head(draw_img_t *img);
 
 #ifdef __cplusplus

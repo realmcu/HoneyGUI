@@ -244,8 +244,8 @@ static void img_draw_cb(gui_obj_t *obj)
     gui_rect_t draw_rect = {0};
     draw_rect.x1 = draw_img->img_x;
     draw_rect.y1 = draw_img->img_y;
-    draw_rect.x2 = draw_rect.x1 + draw_img->target_w;
-    draw_rect.y2 = draw_rect.y1 + draw_img->target_h;
+    draw_rect.x2 = draw_rect.x1 + draw_img->target_w - 1;
+    draw_rect.y2 = draw_rect.y1 + draw_img->target_h - 1;
     if (gui_get_acc() != NULL)
     {
         gui_acc_blit(draw_img, dc, &draw_rect);

@@ -1,6 +1,35 @@
 #include <draw_img.h>
 #include <string.h>
 
+bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
+                           int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end)
+{
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
+
+    int16_t image_w = image->target_w + 1;
+    int16_t image_h = image->target_h + 1;
+
+    *x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
+    *x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+
+    if (rect->xboundright > 0)
+    {
+        *x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
+    }
+
+    *y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
+    *y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    if (rect->yboundbottom > 0)
+    {
+        *y_end = _UI_MIN(*y_end, image_y + rect->yboundbottom);
+    }
+    if ((*x_start >= *x_end) || (*y_start >= *y_end))
+    {
+        return false;
+    }
+    return true;
+}
 void gui_image_load_scale(draw_img_t *img)
 {
     struct gui_rgb_data_head head = {0};
@@ -134,7 +163,7 @@ bool gui_image_new_area(draw_img_t *img)
 
     img->img_x = (int16_t)x_min;
     img->img_y = (int16_t)y_min;
-    img->target_w = (int16_t)x_max - (int16_t)x_min;
-    img->target_h = (int16_t)y_max - (int16_t)y_min;
+    img->target_w = (int16_t)x_max - (int16_t)x_min + 1;
+    img->target_h = (int16_t)y_max - (int16_t)y_min + 1;
     return true;
 }

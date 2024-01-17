@@ -493,8 +493,8 @@ static void draw_cb(gui_obj_t *obj)
                 gui_rect_t rect = {0};
                 rect.x1 = obj->dx + draw_img->img_x;
                 rect.y1 = obj->dy + draw_img->img_y;
-                rect.x2 = rect.x1 + obj->w;
-                rect.y2 = rect.y1 + obj->h;
+                rect.x2 = rect.x1 + obj->w - 1;
+                rect.y2 = rect.y1 + obj->h - 1;
 
                 gui_acc_blit(draw_img, dc, &rect);
             }

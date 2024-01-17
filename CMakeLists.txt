@@ -2,7 +2,7 @@ include(cmake/gui_build.cmake)
 set(gui_debug_enable OFF)
 
 add_subdirectory(gui_engine)
-add_subdirectory(lvgl)
+#add_subdirectory(lvgl)
 
 #gui_sources/gui_headers was set as cache variable
 #if gui sources is desired, for example
