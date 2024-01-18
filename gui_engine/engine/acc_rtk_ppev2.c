@@ -17,129 +17,41 @@
 #include "os_sync.h"
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
-#define PPE_ACC_CACHE_SOURCE        0
 
 #define PPEV2_ACC_MIN_OPA       3
 #define PPEV2_MIN_PIXEL         100
 #define TEMP_BUF_SIZE           (50 * 1024)
 
 static uint8_t temp_buf[TEMP_BUF_SIZE];
-#if PPE_ACC_CACHE_SOURCE
-#define PPEV2_CACHE_BUF_SIZE       (1 * 1024)
-#define PPEV2_PFB_SIZE             (PPEV2_CACHE_BUF_SIZE/2)
-static uint8_t ppe_cache_buf[PPEV2_CACHE_BUF_SIZE];
-static uint8_t *ppe_fb_port1, *ppe_fb_port2, *pfb_buffer;
-
-static void ppe_get_new_area(ppe_rect_t *rect, ppe_buffer_t *image)
-{
-    struct gui_pox pox = {0.0f};
-    float x_min = 0.0f;
-    float x_max = 0.0f;
-    float y_min = 0.0f;
-    float y_max = 0.0f;
-
-    pox.p[0] = 0.0f;
-    pox.p[1] = 0.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->matrix, &pox);
-    x_min = pox.p[0];
-    x_max = pox.p[0];
-    y_min = pox.p[1];
-    y_max = pox.p[1];
-
-
-    pox.p[0] = image->width - 1;
-    pox.p[1] = 0.0f;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-
-    pox.p[0] = 0.0f;
-    pox.p[1] = image->height - 1;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    pox.p[0] = image->width - 1;
-    pox.p[1] = image->height - 1;
-    pox.p[2] = 1.0f;
-    pox_mul((gui_matrix_t *)&image->matrix, &pox);
-    if (x_min > pox.p[0])
-    {
-        x_min = pox.p[0];
-    }
-    if (x_max < pox.p[0])
-    {
-        x_max = pox.p[0];
-    }
-    if (y_min > pox.p[1])
-    {
-        y_min = pox.p[1];
-    }
-    if (y_max < pox.p[1])
-    {
-        y_max = pox.p[1];
-    }
-
-    if (x_min < 0)
-    {
-        rect->x = 0;
-    }
-    else
-    {
-        rect->x = (int16_t)x_min;
-    }
-    if (y_min < 0)
-    {
-        rect->y = 0;
-    }
-    else
-    {
-        rect->y = (int16_t)y_min;
-    }
-    rect->w = (int16_t)x_max - rect->x + 1;
-    rect->h = (int16_t)y_max - rect->y + 1;
-}
-#endif
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
-    if (p_rect->w * p_rect->h * 2 > TEMP_BUF_SIZE)
+    uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
+    if (p_rect->w * p_rect->h * pixel_size > TEMP_BUF_SIZE)
     {
         return false;
     }
     bool use_LLI = true;
+    uint8_t m_size = 0, data_size = 0;
+    if (pixel_size == 4)
+    {
+        data_size = GDMA_DataSize_Word;
+        m_size = GDMA_Msize_16;
+    }
+    else if (pixel_size == 2)
+    {
+        data_size = GDMA_DataSize_HalfWord;
+        m_size = GDMA_Msize_32;
+    }
+    else if (pixel_size == 3)
+    {
+        data_size = GDMA_DataSize_Byte;
+        m_size = GDMA_Msize_64;
+    }
+    else
+    {
+        return false;
+    }
     uint32_t dma_height = p_rect->h;
 
     if (p_rect->w == source->width || dma_height == 1)
@@ -156,7 +68,7 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
         }
         memset(GDMA_LLIStruct, 0, p_rect->h * sizeof(GDMA_LLIDef));
     }
-    uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->width) * 2;
+    uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->width) * pixel_size;
 
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_ChannelTypeDef *dma_channel = DMA_CH_BASE(memcpy_dma_num);
@@ -164,18 +76,25 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
     /*--------------GDMA init-----------------------------*/
     GDMA_StructInit(&RX_GDMA_InitStruct);
     RX_GDMA_InitStruct.GDMA_ChannelNum          = memcpy_dma_num;
-    RX_GDMA_InitStruct.GDMA_BufferSize          = p_rect->w * dma_height;
+    if (pixel_size == 3)
+    {
+        RX_GDMA_InitStruct.GDMA_BufferSize          = p_rect->w * dma_height * 3;
+    }
+    else
+    {
+        RX_GDMA_InitStruct.GDMA_BufferSize          = p_rect->w * dma_height;
+    }
     RX_GDMA_InitStruct.GDMA_DIR                 = GDMA_DIR_MemoryToMemory;
     RX_GDMA_InitStruct.GDMA_SourceInc           = DMA_SourceInc_Inc;
     RX_GDMA_InitStruct.GDMA_DestinationInc      = DMA_DestinationInc_Inc;
     RX_GDMA_InitStruct.GDMA_SourceMsize         =
-        GDMA_Msize_32;                         // 8 msize for source msize
+        m_size;                         // 8 msize for source msize
     RX_GDMA_InitStruct.GDMA_DestinationMsize    =
         GDMA_Msize_32;                         // 8 msize for destiantion msize
     RX_GDMA_InitStruct.GDMA_DestinationDataSize =
         GDMA_DataSize_HalfWord;                   // 32 bit width for destination transaction
     RX_GDMA_InitStruct.GDMA_SourceDataSize      =
-        GDMA_DataSize_HalfWord;                   // 32 bit width for source transaction
+        data_size;                   // 32 bit width for source transaction
     RX_GDMA_InitStruct.GDMA_SourceAddr          = (uint32_t)start_address;
     RX_GDMA_InitStruct.GDMA_DestinationAddr     = (uint32_t)temp_buf;
 
@@ -193,30 +112,44 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
         {
             if (i == dma_height - 1)
             {
-                GDMA_LLIStruct[i].SAR = start_address + source->width * i * 2;
-                GDMA_LLIStruct[i].DAR = (uint32_t)temp_buf + p_rect->w * i * 2;
+                GDMA_LLIStruct[i].SAR = start_address + source->width * i * pixel_size;
+                GDMA_LLIStruct[i].DAR = (uint32_t)temp_buf + p_rect->w * i * pixel_size;
                 GDMA_LLIStruct[i].LLP = 0;
                 /* configure low 32 bit of CTL register */
                 GDMA_LLIStruct[i].CTL_LOW = (BIT(0)
                                              | (RX_GDMA_InitStruct.GDMA_DestinationDataSize << 1)
-                                             | (GDMA_DataSize_HalfWord << 4)
+                                             | (data_size << 4)
                                              | (RX_GDMA_InitStruct.GDMA_DestinationInc << 7)
                                              | (RX_GDMA_InitStruct.GDMA_SourceInc << 9)
                                              | (RX_GDMA_InitStruct.GDMA_DestinationMsize << 11)
                                              | (RX_GDMA_InitStruct.GDMA_SourceMsize << 14)
                                              | (RX_GDMA_InitStruct.GDMA_DIR << 20));
                 /* configure high 32 bit of CTL register */
-                GDMA_LLIStruct[i].CTL_HIGH = p_rect->w;
+                if (pixel_size == 3)
+                {
+                    GDMA_LLIStruct[i].CTL_HIGH = p_rect->w * 3;
+                }
+                else
+                {
+                    GDMA_LLIStruct[i].CTL_HIGH = p_rect->w;
+                }
             }
             else
             {
-                GDMA_LLIStruct[i].SAR = start_address + source->width * i * 2;
-                GDMA_LLIStruct[i].DAR = (uint32_t)temp_buf + p_rect->w * i * 2;
+                GDMA_LLIStruct[i].SAR = start_address + source->width * i * pixel_size;
+                GDMA_LLIStruct[i].DAR = (uint32_t)temp_buf + p_rect->w * i * pixel_size;
                 GDMA_LLIStruct[i].LLP = (uint32_t)&GDMA_LLIStruct[i + 1];
                 /* configure low 32 bit of CTL register */
                 GDMA_LLIStruct[i].CTL_LOW = dma_channel->CTL_LOW;
                 /* configure high 32 bit of CTL register */
-                GDMA_LLIStruct[i].CTL_HIGH = p_rect->w;
+                if (pixel_size == 3)
+                {
+                    GDMA_LLIStruct[i].CTL_HIGH = p_rect->w * 3;
+                }
+                else
+                {
+                    GDMA_LLIStruct[i].CTL_HIGH = p_rect->w;
+                }
             }
         }
     }
@@ -270,6 +203,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     ppe_buffer_t target, source;
     memset(&target, 0, sizeof(ppe_buffer_t));
     memset(&source, 0, sizeof(ppe_buffer_t));
+    PPEV2_BLEND_MODE mode = PPEV2_BYPASS_MODE;
 
     switch (dc->bit_depth)
     {
@@ -295,7 +229,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     target.win_y_max = target.height;
     target.use_bg = true;
     struct gui_rgb_data_head *head = image->data;
-    if (1)    //Not compressed
+    if (1)
     {
         switch (head->type)
         {
@@ -307,6 +241,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             break;
         case RGBA8888:
             source.format = PPEV2_ARGB8888;
+            break;
+        case ARGB8565:
+            source.format = PPEV2_ARGB8565;
             break;
         case IMDC_COMPRESS:
             {
@@ -333,345 +270,174 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         default:
             return;
         }
-        if (0)
+        if (image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
+            image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
+            image->matrix->m[2][1] == 0)
         {
-            if ((image->target_w + image->img_x < dc->section.x1) ||
-                (image->target_h + image->img_y < dc->section.y1)
-                || (image->img_x >= dc->section.x1 + dc->fb_width) ||
-                (image->img_y >= dc->section.y1 + dc->fb_height))
+            if (image->blend_mode == IMG_BYPASS_MODE)
             {
-                return;
-            }
-#if PPE_ACC_CACHE_SOURCE
-            uint32_t image_size = image->img_w * image->img_h * PPEV2_Get_Pixel_Size(source.format);
-            if (image_size <= PPEV2_CACHE_BUF_SIZE)
-            {
-#endif
-                ppe_rect_t ppe_rect = {.x = 0, .y = 0, .w = dc->fb_width, .h = dc->fb_height};
-                if (image->img_x - dc->section.x1 < 0)
+                if (image->opacity_value < 0xFF)
                 {
-                    ppe_rect.x = 0;
-                }
-                else if (image->img_x > dc->section.x1)
-                {
-                    ppe_rect.x = image->img_x - dc->section.x1;
-                }
-                if (image->img_y < 0)
-                {
-                    ppe_rect.y = 0;
-                }
-                else if (image->img_y > dc->section.y1)
-                {
-                    ppe_rect.y = image->img_y - dc->section.y1;
-                }
-                if (image->img_x + image->target_w >= dc->fb_width)
-                {
-                    ppe_rect.w = dc->fb_width - ppe_rect.x;
-                }
-                if (image->img_y + image->target_h >= dc->fb_height)
-                {
-                    ppe_rect.h = dc->fb_height - ppe_rect.y;
-                }
-                source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
-#if PPE_ACC_CACHE_SOURCE
-                memcpy_by_dma(ppe_cache_buf, (void *)source.address, image_size);
-                source.address = (uint32_t)ppe_cache_buf;
-#endif
-                source.opacity = image->opacity_value;
-                source.width = image->img_w;
-                source.height = image->img_h;
-                if (image->blend_mode == IMG_FILTER_BLACK)
-                {
-                    source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
-                    source.color_key_min = 0;
-                    source.color_key_max = 0x010101;
+                    mode = PPEV2_TRANSPARENT_MODE;
                 }
                 else
                 {
-                    source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+                    mode = PPEV2_BYPASS_MODE;
                 }
-                source.win_x_min = 0;
-                source.win_x_max = target.width;
-                source.win_y_min = 0;
-                source.win_y_max = target.height;
-                memcpy(&source.matrix, image->matrix, sizeof(float) * 9);
-                memcpy(&source.inv_matrix, image->inverse, sizeof(float) * 9);
-                ppe_matrix_t pre_trans;
-                ppe_get_identity(&pre_trans);
-                ppe_translate(ppe_rect.x * (-1.0f), ppe_rect.y * (-1.0f), &pre_trans);
-                ppe_mat_multiply(&pre_trans, &source.matrix);
-                if (dc->type == DC_RAMLESS)
-                {
-                    ppe_matrix_t temp;
-                    ppe_get_identity(&temp);
-                    ppe_translate(0, dc->section.y1 * (-1.0f), &temp);
-                    ppe_mat_multiply(&temp, &pre_trans);
-                    memcpy(&pre_trans, &temp, sizeof(float) * 9);
-                }
-                memcpy(&source.matrix, &pre_trans, sizeof(float) * 9);
-                ppe_matrix_inverse(&pre_trans);
-                memcpy(&source.inv_matrix, &pre_trans, sizeof(float) * 9);
-                PPEV2_err err = PPEV2_Blend(&target, &source, &ppe_rect);
-                if (err != PPEV2_SUCCESS)
-                {
-                    sw_acc_blit(image, dc, rect);
-                }
-#if PPE_ACC_CACHE_SOURCE
+            }
+            else if (image->blend_mode == IMG_FILTER_BLACK)
+            {
+                mode = PPEV2_SRC_OVER_MODE;
             }
             else
             {
-                uint16_t blend_count = image_size / PPEV2_PFB_SIZE;
-                if (image_size % PPEV2_PFB_SIZE)
+                if (source.format >= PPEV2_BGR888 && source.format <= PPEV2_RGB565)
                 {
-                    blend_count += 1;
-                }
-                uint16_t new_image_height = image->img_h / blend_count ;
-                uint16_t rest_image_height = image->img_h - (blend_count - 1) * new_image_height;
-                if (rest_image_height > new_image_height)
-                {
-                    blend_count += rest_image_height / new_image_height;
-                    rest_image_height = rest_image_height % new_image_height;
-                }
-                uint32_t image_data_address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
-                if (image->img_h % new_image_height)
-                {
-                    blend_count = image->img_h / new_image_height;
+                    mode = PPEV2_BYPASS_MODE;
                 }
                 else
                 {
-                    blend_count = image->img_h / new_image_height + 1;
-                }
-                for (int i = 0; i < blend_count; i++)
-                {
-                    ppe_rect_t ppe_rect;
-                    source.width = image->img_w;
-                    if (i < blend_count - 1)
-                    {
-                        source.height = new_image_height;
-                    }
-                    else
-                    {
-                        source.height = rest_image_height;
-                    }
-                    source.address = image_data_address + i * image->img_w * new_image_height * PPEV2_Get_Pixel_Size(
-                                         source.format);
-                    if (i == 0)
-                    {
-                        pfb_buffer = ppe_fb_port1;
-                        memcpy_by_dma(pfb_buffer, (void *)source.address,
-                                      source.width * source.height * PPEV2_Get_Pixel_Size(source.format));
-                        wait_memcpy_dma();
-                    }
-                    else
-                    {
-                        wait_memcpy_dma();
-                    }
-                    source.address = (uint32_t)pfb_buffer;
-                    source.opacity = image->opacity_value;
-                    if (image->blend_mode == IMG_FILTER_BLACK)
-                    {
-                        source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
-                        source.color_key_min = 0;
-                        source.color_key_max = 0;
-                    }
-                    else
-                    {
-                        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-                    }
-                    source.win_x_min = 0;
-                    source.win_x_max = target.width;
-                    source.win_y_min = 0;
-                    source.win_y_max = target.height;
-                    memcpy(&source.matrix, image->matrix, sizeof(float) * 9);
-                    ppe_translate(0, new_image_height * i, &source.matrix);
-                    ppe_get_new_area(&ppe_rect, &source);
-                    if (ppe_rect.x + ppe_rect.w >= dc->fb_width)
-                    {
-                        ppe_rect.w = dc->fb_width - ppe_rect.x;
-                    }
-                    if (ppe_rect.y + ppe_rect.h >= dc->fb_height)
-                    {
-                        ppe_rect.h = dc->fb_height - ppe_rect.y;
-                    }
-                    ppe_matrix_t pre_trans;
-                    ppe_get_identity(&pre_trans);
-                    ppe_translate(ppe_rect.x * (-1.0f), ppe_rect.y * (-1.0f), &pre_trans);
-                    ppe_mat_multiply(&pre_trans, &source.matrix);
-                    if (dc->type == DC_RAMLESS)
-                    {
-                        ppe_matrix_t temp;
-                        ppe_get_identity(&temp);
-                        ppe_translate(0, dc->section.y1 * (-1.0f), &temp);
-                        ppe_mat_multiply(&temp, &pre_trans);
-                        memcpy(&pre_trans, &temp, sizeof(float) * 9);
-                    }
-                    memcpy(&source.matrix, &pre_trans, sizeof(float) * 9);
-                    ppe_matrix_inverse(&pre_trans);
-                    memcpy(&source.inv_matrix, &pre_trans, sizeof(float) * 9);
-                    if ((i + 1) % 2 == 0)
-                    {
-                        pfb_buffer = ppe_fb_port1;
-                    }
-                    else
-                    {
-                        pfb_buffer = ppe_fb_port2;
-                    }
-                    if (i < blend_count - 1)
-                    {
-                        uint32_t next_addr = image_data_address + (i + 1) * image->img_w * new_image_height *
-                                             PPEV2_Get_Pixel_Size(source.format);
-                        memcpy_by_dma(pfb_buffer, (void *)next_addr,
-                                      source.width * new_image_height * PPEV2_Get_Pixel_Size(source.format));
-                    }
-                    else
-                    {
-                        uint32_t next_addr = image_data_address + (i + 1) * image->img_w * new_image_height *
-                                             PPEV2_Get_Pixel_Size(source.format);
-                        memcpy_by_dma(pfb_buffer, (void *)next_addr,
-                                      source.width * rest_image_height * PPEV2_Get_Pixel_Size(source.format));
-                    }
-                    PPEV2_err err = PPEV2_Blend(&target, &source, &ppe_rect);
-                    if (err != PPEV2_SUCCESS)
-                    {
-                        sw_acc_blit(image, dc, rect);
-                    }
+                    mode = PPEV2_SRC_OVER_MODE;
                 }
             }
-#endif
         }
         else
         {
-            if ((rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1)
-                || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
-            {
-                return;
-            }
-            source.win_x_min = 0;
-            source.win_x_max = target.width;
-            source.win_y_min = 0;
-            source.win_y_max = target.height;
-            float x_ref = 0, y_ref = 0;
-            uint32_t blend_area = 0;
-            int x1 = rect->x1 < 0 ? 0 : rect->x1;
-            int y1 = rect->y1 < 0 ? 0 : rect->y1;
-            int x2 = rect->x2 > dc->screen_width ? dc->screen_width : rect->x2;
-            int y2 = rect->x2 > dc->screen_height ? dc->screen_height : rect->x2;
-            blend_area = (y2 - y1) * (x2 - x1);
-            ppe_rect_t ppe_rect = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
-            if (ppe_rect.x < 0)
-            {
-                ppe_rect.x = 0;
-            }
-            if (ppe_rect.y < 0)
-            {
-                ppe_rect.y = 0;
-            }
-            if (rect->x2 >= dc->fb_width)
-            {
-                ppe_rect.w = dc->fb_width - ppe_rect.x;
-            }
-            else
-            {
-                ppe_rect.w = rect->x2 - dc->section.x1 - ppe_rect.x + 1;
-            }
-            if (rect->y2 > dc->section.y1 + dc->fb_height)
-            {
-                ppe_rect.h = dc->fb_height - ppe_rect.y;
-            }
-            else
-            {
-                ppe_rect.h = rect->y2 - dc->section.y1 - ppe_rect.y + 1;
-            }
-            source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
-#if PPE_ACC_CACHE_SOURCE
-            memcpy_by_dma(ppe_cache_buf, (void *)source.address, image_size);
-            source.address = (uint32_t)ppe_cache_buf;
-#endif
-            source.opacity = image->opacity_value;
-            source.width = image->img_w;
-            source.height = image->img_h;
-            if (image->blend_mode == IMG_FILTER_BLACK)
-            {
-                source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
-                source.color_key_min = 0;
-                source.color_key_max = 0x010101;
-            }
-            else if (image->blend_mode == IMG_BYPASS_MODE)
-            {
-                source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-                target.use_bg = false;
-            }
-            else if (image->blend_mode == IMG_SRC_OVER_MODE)
-            {
-                source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-                target.use_bg = true;
-            }
-            else
-            {
-                return;
-            }
+            mode = PPEV2_SRC_OVER_MODE;
+        }
+        uint32_t x_max = (image->target_w + rect->x1 - 1) > rect->x2 ? rect-> x2 :
+                         (image->target_w + rect->x1 - 1);
+        uint32_t y_max = (image->target_h + rect->y1 - 1) > rect->y2 ? rect-> y2 :
+                         (image->target_h + rect->y1 - 1);
 
-            memcpy(&source.matrix, image->matrix, sizeof(float) * 9);
-            memcpy(&source.inv_matrix, image->inverse, sizeof(float) * 9);
-            ppe_matrix_t pre_trans;
+        if ((x_max < dc->section.x1) || (y_max < dc->section.y1)
+            || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
+        {
+            return;
+        }
+        source.win_x_min = 0;
+        source.win_x_max = target.width;
+        source.win_y_min = 0;
+        source.win_y_max = target.height;
+        float x_ref = 0, y_ref = 0;
+        uint32_t blend_area = 0;
+        ppe_rect_t ppe_rect = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
+        if (ppe_rect.x < 0)
+        {
+            ppe_rect.x = 0;
+        }
+        if (ppe_rect.y < 0)
+        {
+            ppe_rect.y = 0;
+        }
+        if (x_max >= dc->section.x1 + dc->fb_width)
+        {
+            ppe_rect.w = dc->fb_width - ppe_rect.x;
+        }
+        else
+        {
+            ppe_rect.w = x_max - dc->section.x1 - ppe_rect.x + 1;
+        }
+        if (y_max >= dc->section.y1 + dc->fb_height)
+        {
+            ppe_rect.h = dc->fb_height - ppe_rect.y;
+        }
+        else
+        {
+            ppe_rect.h = y_max - dc->section.y1 - ppe_rect.y + 1;
+        }
+        blend_area = ppe_rect.w * ppe_rect.h;
+        source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
+        source.opacity = image->opacity_value;
+        source.width = image->img_w;
+        source.height = image->img_h;
+        if (image->blend_mode == IMG_FILTER_BLACK)
+        {
+            source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
+            source.color_key_min = 0;
+            source.color_key_max = 0x010101;
+        }
+        else if (image->blend_mode == IMG_BYPASS_MODE)
+        {
+            source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+            target.use_bg = false;
+        }
+        else if (image->blend_mode == IMG_SRC_OVER_MODE)
+        {
+            source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+            target.use_bg = true;
+        }
+        else
+        {
+            return;
+        }
 
-            ppe_rect.x += dc->section.x1;
-            ppe_rect.y += dc->section.y1;
-            ppe_rect_t old_rect;
-            bool ret = ppe_get_area(&old_rect, &ppe_rect, &source);
-            if (!ret)
-            {
-                return;
-            }
+        memcpy(&source.matrix, image->matrix, sizeof(float) * 9);
+        memcpy(&source.inv_matrix, image->inverse, sizeof(float) * 9);
+        ppe_matrix_t pre_trans;
+        ppe_rect_t old_rect;
+
+        uint32_t lock_s = os_lock();
+        ppe_rect.x += dc->section.x1;
+        ppe_rect.y += dc->section.y1;
+        bool ret = ppe_get_area(&old_rect, &ppe_rect, &source);
+        if (!ret)
+        {
+            DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
+            return;
+        }
+        if (head->type == IMDC_COMPRESS)
+        {
+            ret = memcpy_by_imdc(&old_rect, &source);
+        }
+        else
+        {
+            ret = memcpy_by_dma(&old_rect, &source);
+        }
+        ppe_rect.x -= dc->section.x1;
+        ppe_rect.y -= dc->section.y1;
+        if (ret)
+        {
+            ppe_get_identity(&pre_trans);
+            ppe_translate(old_rect.x * -1.0f, old_rect.y * -1.0f, &pre_trans);
+            ppe_mat_multiply(&pre_trans, &source.inv_matrix);
+            x_ref = ppe_rect.x + dc->section.x1;
+            y_ref = ppe_rect.y + dc->section.y1;
+            ppe_translate(x_ref, y_ref, &pre_trans);
+            memcpy(&source.inv_matrix, &pre_trans, sizeof(float) * 9);
+            source.address = (uint32_t)temp_buf;
+            source.width = old_rect.w;
+            source.height = old_rect.h;
+        }
+        else
+        {
             if (head->type == IMDC_COMPRESS)
             {
-                ret = memcpy_by_imdc(&old_rect, &source);
+                return;
             }
-            else
+            ppe_get_identity(&pre_trans);
+            if (dc->type == DC_RAMLESS)
             {
-                ret = memcpy_by_dma(&old_rect, &source);
-            }
-            ppe_rect.x -= dc->section.x1;
-            ppe_rect.y -= dc->section.y1;
-            if (ret)
-            {
-                ppe_get_identity(&pre_trans);
-                ppe_translate(old_rect.x * -1.0f, old_rect.y * -1.0f, &pre_trans);
-                ppe_mat_multiply(&pre_trans, &source.inv_matrix);
                 x_ref = ppe_rect.x + dc->section.x1;
                 y_ref = ppe_rect.y + dc->section.y1;
-                ppe_translate(x_ref, y_ref, &pre_trans);
-                memcpy(&source.inv_matrix, &pre_trans, sizeof(float) * 9);
-                source.address = (uint32_t)temp_buf;
-                source.width = old_rect.w;
-                source.height = old_rect.h;
             }
-            else
-            {
-                ppe_get_identity(&pre_trans);
-                if (dc->type == DC_RAMLESS)
-                {
-                    x_ref = ppe_rect.x + dc->section.x1;
-                    y_ref = ppe_rect.y + dc->section.y1;
-                }
-                ppe_translate(x_ref, y_ref, &source.inv_matrix);
-            }
-            source.high_quality = image->high_quality;
-            if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
-                 image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
-                 image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
-                 image->matrix->m[2][1] == 0) || (blend_area > 250 * 250))
-            {
-                source.high_quality = false;
-            }
-            PPEV2_err err = PPEV2_Blend(&target, &source, &ppe_rect);
+            ppe_translate(x_ref, y_ref, &source.inv_matrix);
+        }
+        source.high_quality = image->high_quality;
+        if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
+             image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
+             image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
+             image->matrix->m[2][1] == 0) || (blend_area > 250 * 250))
+        {
+            source.high_quality = false;
+        }
+        PPEV2_err err = PPEV2_Blend(&target, &source, &ppe_rect, mode);
 
 
-            if (err != PPEV2_SUCCESS)
-            {
+        if (err != PPEV2_SUCCESS)
+        {
 //                DBG_DIRECT("PPE err %d", err);
 //                sw_acc_blit(image, dc, rect);
-            }
         }
     }
     else
@@ -782,7 +548,7 @@ void hw_acc_init(void)
     }
     if (!GDMA_channel_request(&support_dma_num, NULL, false))
     {
-        DBG_DIRECT("no dma for support");
+        GUI_ASSERT("no dma for support");
         return;
     }
 #if PPE_ACC_CACHE_SOURCE
