@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include "gui_progressbar.h"
 #include <tp_algo.h>
+#include "gui_fps.h"
 #define GUI_APP_DEFINE(APP_NAME,UI_DESIGN)\
     \
     static void UI_DESIGN(gui_app_t*);\
@@ -322,6 +323,8 @@ static void app_page_ui_design(gui_app_t *app)
     pro = gui_progressbar_movie_create(&(app->screen), scrollbar_array, 39, 300, 10);
     gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
     gui_obj_add_event_cb(button_array[1], battery_cb, GUI_EVENT_TOUCH_CLICKED, button_array[1]);
+
+    gui_fps_create(&(app->screen));
 }
 
 static void app_app_animate_exit(gui_win_t *win)
@@ -393,7 +396,7 @@ static void app_app_ui_design(gui_app_t *app)
 
 
     gui_win_set_animate(win, 200, 0, app_app_animate, win);
-
+    gui_fps_create(&(app->screen));
 }
 
 uint8_t resource_root[1024 * 1024 * 20];
@@ -537,7 +540,7 @@ static void app_battery_ui_design(gui_app_t *app)
             gui_text_type_set(t, addr1);
             gui_page_set_animate(page1, 1000, -1, page_highlight, page1);
         }
-    }
+    } gui_fps_create(&(app->screen));
 }
 
 
