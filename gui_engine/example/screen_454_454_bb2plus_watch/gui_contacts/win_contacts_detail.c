@@ -97,7 +97,7 @@ static void text_contacts_details_name_animate_cb(void *obj)
         return;
     }
 
-    char *string_title = (char *)file_name->utf_8;
+    char *string_title = (char *)file_name->content;
     gui_text_set(text_contacts_details_name, string_title, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(string_title),
                  FONT_H_32);
