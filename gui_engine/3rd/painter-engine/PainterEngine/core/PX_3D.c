@@ -1,4 +1,5 @@
 #include "PX_3D.h"
+#include "PX_3D_GPU.h"
 
 px_void PX_3D_RenderListTransform_LocalToGlobal(PX_3D_RenderList *list,PX_3D_World *world);
 px_void PX_3D_RenderListTransform_Camera(PX_3D_RenderList *list,PX_3D_Camera *camera);
@@ -937,7 +938,8 @@ px_void PX_3D_Present(px_surface *psurface, PX_3D_RenderList *list,PX_3D_Camera 
 			{
 				if (list->PX_3D_PRESENTMODE&PX_3D_PRESENTMODE_PURE)
 				{
-					PX_3D_RenderListRasterization(psurface,list,pface->transform_vertex[0],pface->transform_vertex[1],pface->transform_vertex[2],list->ptexture,clr,(px_int)camera->viewport_width,(px_int)camera->viewport_height,camera->zbuffer,(px_int)camera->viewport_width);
+					//PX_3D_RenderListRasterization(psurface,list,pface->transform_vertex[0],pface->transform_vertex[1],pface->transform_vertex[2],list->ptexture,clr,(px_int)camera->viewport_width,(px_int)camera->viewport_height,camera->zbuffer,(px_int)camera->viewport_width);
+                    PX_3D_GPU_RenderListRasterization(psurface,list,pface->transform_vertex[0],pface->transform_vertex[1],pface->transform_vertex[2]);
 				}
 				else
 				{
