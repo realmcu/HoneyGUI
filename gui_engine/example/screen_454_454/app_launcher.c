@@ -4,14 +4,13 @@
 #include <gui_win.h>
 #include <gui_text.h>
 #include <gui_curtain.h>
-#include "root_image/resource_8772f.h"
+#include "root_image/ui_resource.h"
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "gui_card.h"
 #include "gui_perspective.h"
 #include "draw_font.h"
-#include <gui_magic_img.h>
-
+#include "gui_components_init.h"
 
 static void app_launcher_ui_design(gui_app_t *app);
 static gui_tabview_t *tv_main;
@@ -70,7 +69,6 @@ static void callback(void *obj, gui_event_t e)
 static void app_launcher_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_ui_design\n");
-    gui_font_stb_init(TANGYUANTI_TTF);
 
     win_main = gui_win_create(&(app->screen), "win", 0, 0, 320, 320);
     gui_obj_add_event_cb(win_main, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, NULL);
@@ -101,3 +99,28 @@ static void app_launcher_ui_design(gui_app_t *app)
     page_tb_wave(tb_wave);
 }
 
+uint8_t resource_root[1024 * 1024 * 20];
+static int app_init(void)
+{
+#if defined _WIN32
+    int fd;
+    fd = open("./gui_engine/example/screen_454_454/root_image/root(0x4400000).bin", 0);
+    if (fd > 0)
+    {
+        printf("open root(0x4400000).bin Successful!\n");
+        read(fd, resource_root, 1024 * 1024 * 20);
+    }
+    else
+    {
+        printf("open root(0x4400000).bin Fail!\n");
+        printf("open root(0x4400000).bin Fail!\n");
+        printf("open root(0x4400000).bin Fail!\n");
+        return 0;
+    }
+#endif
+    gui_server_init();
+    gui_app_startup(get_app_launcher());
+    return 0;
+}
+
+GUI_INIT_APP_EXPORT(app_init);
