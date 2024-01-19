@@ -226,7 +226,11 @@ void gui_fb_change(void)
 {
     fb_change = true;
 }
-
+static uint32_t spf = 5;
+uint32_t gui_spf()
+{
+    return spf;
+}
 void gui_fb_disp(gui_obj_t *root)
 {
     if (root == NULL)
@@ -244,15 +248,27 @@ void gui_fb_disp(gui_obj_t *root)
 
     obj_draw_prepare(root);
 
-
+    static int last_ms;
     if (fb_change == true)
     {
         gui_fb_draw(root);
         fb_change = false;
+        {
+
+            int ms = gui_ms_get();
+            if (last_ms)
+            {
+                spf = ms - last_ms;
+                gui_log("spf:%d ms", spf);
+            }
+            else { spf = 0; }
+            last_ms = ms;
+        }
     }
     else
     {
         gui_thread_mdelay(17);
+        last_ms = gui_ms_get();
     }
 
 

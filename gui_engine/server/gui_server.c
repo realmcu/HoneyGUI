@@ -54,11 +54,7 @@ bool send_msg_to_gui_server(gui_msg_t *msg)
 
 static uint32_t daemon_start_ms = 0;
 static uint32_t daemon_cnt = 0;
-static uint32_t spf = 20;
-uint32_t gui_spf()
-{
-    return spf;
-}
+
 /**
  * @brief
  *
@@ -186,15 +182,7 @@ static void gui_server_entry(void *parameter)
         {
             daemon_start_ms = gui_ms_get();
         }
-        {
-            static int last_ms;
-            int ms = gui_ms_get();
-            if (last_ms)
-            {
-                spf = ms - last_ms;
-            }
-            last_ms = ms;
-        }
+
 #if defined __WIN32
         continue;
 #endif
