@@ -26,25 +26,19 @@
 void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                      struct gui_rect *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;
-    int image_h = image->target_h + 1;
-    int source_w = image->img_w;
-    int source_h = image->img_h;
-
-    int x_start = _UI_MAX(image_x, 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-
-    struct gui_matrix *inverse = image->inverse;
-    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
+
+    struct gui_matrix *inverse = image->inverse;
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
@@ -293,25 +287,18 @@ void rle_filter_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void rle_filter_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                      struct gui_rect *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;
-    int image_h = image->target_h + 1;
-    int source_w = image->img_w;
-    int source_h = image->img_h;
-
-    int x_start = _UI_MAX(image_x, 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-
-    struct gui_matrix *inverse = image->inverse;
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
+
+    struct gui_matrix *inverse = image->inverse;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
@@ -547,25 +534,18 @@ void rle_filter_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void rle_filter_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                        struct gui_rect *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-
-    int image_w = image->target_w + 1;
-    int image_h = image->target_h + 1;
-    int source_w = image->img_w;
-    int source_h = image->img_h;
-
-    int x_start = _UI_MAX(image_x, 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    int y_start = _UI_MAX(dc->section.y1, image_y);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-
-    struct gui_matrix *inverse = image->inverse;
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
+
+    struct gui_matrix *inverse = image->inverse;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
