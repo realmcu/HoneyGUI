@@ -377,7 +377,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         ppe_matrix_t pre_trans;
         ppe_rect_t old_rect;
 
-        uint32_t lock_s = os_lock();
         ppe_rect.x += dc->section.x1;
         ppe_rect.y += dc->section.y1;
         bool ret = ppe_get_area(&old_rect, &ppe_rect, &source);
