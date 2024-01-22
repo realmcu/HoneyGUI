@@ -4,7 +4,7 @@ DECLARE_HANDLER(dataRst)
 {
 #ifdef RTL87x2G
     // Factory reset matter
-#ifdef BUILD_USING_MATTER_SWITCH
+#ifdef CONFIG_REALTEK_BUILD_MATTER_SWITCH
     gui_log("Erase matter flash \n");
     Bee4_KvsClean();
     otPlatFlashErase(NULL, 0);

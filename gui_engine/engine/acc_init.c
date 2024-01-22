@@ -2,6 +2,7 @@
 #include <stdio.h>
 //#include <gui_matrix.h>
 #include "acc_engine.h"
+#include "acc_sw_rle.h"
 
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
@@ -30,7 +31,53 @@ struct acc_engine *gui_get_acc(void)
     return &acc;
 }
 
-void gui_load_imgfile_acc(draw_img_t *draw_img, void *data, uint8_t source_bytes_per_pixel)
+imdc_file_header_t rtgui_image_get_imdc_header(draw_img_t *img)
+{
+    imdc_file_header_t head = {0};
+
+    if (img->src_mode == IMG_SRC_FILESYS)
+    {
+        int fd = gui_fs_open(img->data,  0);
+        if (fd <= 0)
+        {
+            gui_log("open file fail:%s !\n", (char *)img->data);
+        }
+        gui_fs_lseek(fd, sizeof(struct gui_rgb_data_head), SEEK_SET);
+        gui_fs_read(fd, &head, sizeof(head));
+        gui_fs_close(fd);
+    }
+    else if (img->src_mode == IMG_SRC_MEMADDR)
+    {
+        memcpy(&head, (void *)((uint8_t *)(img->data) + sizeof(struct gui_rgb_data_head)), sizeof(head));
+    }
+
+    return head;
+}
+
+static void *gui_load_imgfile(draw_img_t *draw_img)
+{
+    const char *path = draw_img->data;
+    uint8_t *data = NULL;
+
+    int fd = gui_fs_open(path,  0);
+    if (fd <= 0)
+    {
+        gui_log("open file fail:%s!\n", path);
+        return NULL;
+    }
+
+    uint32_t size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+    data = (uint8_t *)gui_malloc(size);
+    GUI_ASSERT(data != NULL);
+    memset(data, 0, size);
+    gui_fs_read(fd, data, size);
+    gui_fs_close(fd);
+
+    return data;
+}
+
+static void gui_load_imgfile_align(draw_img_t *draw_img, uint8_t *data,
+                                   uint8_t source_bytes_per_pixel)
 {
     const char *path = draw_img->data;
     uint32_t gpu_width = ((draw_img->img_w + 15) >> 4) << 4;
@@ -40,7 +87,7 @@ void gui_load_imgfile_acc(draw_img_t *draw_img, void *data, uint8_t source_bytes
     if (fd <= 0)
     {
         gui_log("open file fail:%s!\n", path);
-        return ;
+        return;
     }
     gui_fs_read(fd, data, sizeof(struct gui_rgb_data_head));
 
@@ -58,24 +105,38 @@ void gui_load_imgfile_acc(draw_img_t *draw_img, void *data, uint8_t source_bytes
     draw_img->data = data;
 }
 
+static uint8_t *gui_malloc_align_img(uint8_t *offset, uint32_t size)
+{
+    uint8_t *img_buff = (uint8_t *)gui_malloc(size + 63);
+    GUI_ASSERT(img_buff != NULL);
+    // align data address by 64
+    uint8_t *data = (uint8_t *)(((((uint32_t)img_buff + 63) >> 6) << 6) - sizeof(
+                                    struct gui_rgb_data_head));
+    if (data < img_buff)
+    {
+        data = (uint8_t *)(data + 64);
+    }
+    *offset = data - img_buff;
+    return img_buff;
+}
+
 static void gui_release_imgfile_acc(draw_img_t *draw_img, const void *img_info, void *img_buff)
 {
     gui_free(img_buff);
     draw_img->data = (void *)img_info;
 }
 
-
 void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     const void *img_info = image->data;
-    void *img_buff = NULL;
+    uint8_t *img_buff = NULL;
     bool flg_cache = false;
 
     if (gui_get_dc()->type == DC_SINGLE)
     {
         uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
         uint32_t gpu_height = image->img_h;
-        struct gui_rgb_data_head head = rtgui_image_get_head(image);
+        struct gui_rgb_data_head head = rtgui_image_get_header(image);
         uint8_t source_bytes_per_pixel = 0;
 
         switch (head.type)
@@ -89,54 +150,72 @@ void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         case RGBA8888:
             source_bytes_per_pixel = 4;
             break;
+        case IMDC_COMPRESS:
+            {
+                imdc_file_header_t header = rtgui_image_get_imdc_header(image);
+                uint8_t imdc_type = 0;
+                memcpy(&imdc_type, &header, 1);
+                source_bytes_per_pixel = (imdc_type == IMDC_SRC_RGB565) ? 2 : \
+                                         (imdc_type == IMDC_SRC_RGB888) ? 3 : \
+                                         (imdc_type == IMDC_SRC_ARGB8888) ? 4 : 0; // 0 as error
+                break;
+            }
         default:
             break;
         }
+        GUI_ASSERT(source_bytes_per_pixel != 0);
 
         if (image->src_mode == IMG_SRC_FILESYS)
         {
             uint32_t size = gpu_width * gpu_height * source_bytes_per_pixel;
-            void *data = NULL;
+            uint8_t *data = NULL;
+            uint8_t offset = 0; // header address offset after image data address alignment
 
-            img_buff = gui_malloc(size + 63);
-            GUI_ASSERT(img_buff != NULL);
-            data = (void *)(((((uint32_t)img_buff + 63) >> 6) << 6) - sizeof(struct gui_rgb_data_head));
-            if (data < img_buff)
+            img_buff = gui_malloc_align_img(&offset, size);
+            data = img_buff + offset;
+            if (head.type == IMDC_COMPRESS)
             {
-                data = (void *)((uint32_t)data + 64);
+                // gui_log("IMG_SRC_FILESYS IMDC_COMPRESS %s\n", img_info);
+                uint8_t *src_buff = (uint8_t *)gui_load_imgfile(image);
+                image->data = src_buff;
+                sw_acc_rle_uncompress(image, data);
+                gui_free(src_buff);
+                image->data = data;
             }
-
-            gui_load_imgfile_acc(image, data, source_bytes_per_pixel);
+            else
+            {
+                gui_load_imgfile_align(image, data, source_bytes_per_pixel);
+            }
             flg_cache = true;
         }
         else if (image->src_mode == IMG_SRC_MEMADDR)
         {
-            void *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
-            if (gpu_width != image->img_w || (int)data % 64 != 0)
+            uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
+            if (gpu_width != image->img_w || (int)data % 64 != 0 || head.type == IMDC_COMPRESS)
             {
                 uint32_t size = gpu_width * gpu_height * source_bytes_per_pixel;
+                uint8_t offset = 0;
 
-                img_buff = gui_malloc(size + 63);
-                GUI_ASSERT(img_buff != NULL);
-                data = (void *)(((((uint32_t)img_buff + 63) >> 6) << 6) - sizeof(struct gui_rgb_data_head));
-                if (data < img_buff)
+                img_buff = gui_malloc_align_img(&offset, size);
+                data = img_buff + offset;
+                if (head.type == IMDC_COMPRESS)
                 {
-                    data = (void *)((uint32_t)data + 64);
+                    // gui_log("IMG_SRC_MEMADDR IMDC_COMPRESS\n");
+                    sw_acc_rle_uncompress(image, data);
+                    image->data = data;
                 }
-
-                uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-                for (uint32_t i = 0; i < gpu_height; i++)
+                else
                 {
-                    memcpy((void *)((uint32_t)data + i * gpu_width * source_bytes_per_pixel),
-                           (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
-                           image->img_w * source_bytes_per_pixel);
+                    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+                    for (uint32_t i = 0; i < gpu_height; i++)
+                    {
+                        memcpy((void *)((uint32_t)data + i * gpu_width * source_bytes_per_pixel),
+                               (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
+                               image->img_w * source_bytes_per_pixel);
+                    }
                 }
                 flg_cache = true;
             }
-        }
-        else if (image->src_mode == IMG_SRC_RLE)
-        {
-            // TODO
         }
     }
 
@@ -145,6 +224,5 @@ void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     if (flg_cache)
     {
         gui_release_imgfile_acc(image, img_info, img_buff);
-        flg_cache = false;
     }
 }

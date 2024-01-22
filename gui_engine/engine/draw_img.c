@@ -53,7 +53,7 @@ void gui_image_load_scale(draw_img_t *img)
     img->img_h = head.h;
 }
 
-struct gui_rgb_data_head rtgui_image_get_head(draw_img_t *img)
+struct gui_rgb_data_head rtgui_image_get_header(draw_img_t *img)
 {
     struct gui_rgb_data_head head = {0};
 
