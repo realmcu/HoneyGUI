@@ -144,6 +144,12 @@ void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         case RGB565:
             source_bytes_per_pixel = 2;
             break;
+        case RTKARGB8565:
+            source_bytes_per_pixel = 3;
+            break;
+        case ARGB8565:
+            source_bytes_per_pixel = 3;
+            break;
         case RGB888:
             source_bytes_per_pixel = 3;
             break;

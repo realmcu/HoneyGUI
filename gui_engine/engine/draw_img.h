@@ -40,6 +40,7 @@ typedef enum
     JPEG = 12,
     PNG = 13,
     GIF = 14,
+    RTKARGB8565 = 15,
 } GUI_FormatType;
 
 

@@ -318,9 +318,13 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             {
                 alpha_matrix_blit_rgb565_2_rgb565(image, dc, rect);
             }
-            if (img_type == ARGB8565)
+            else if (img_type == ARGB8565)
             {
                 alpha_matrix_blit_argb8565_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RTKARGB8565)
+            {
+                alpha_matrix_blit_rtkargb8565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
@@ -352,9 +356,13 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             {
                 alpha_matrix_blit_rgb565_2_argb8888(image, dc, rect);
             }
-            if (img_type == ARGB8565)
+            else if (img_type == ARGB8565)
             {
                 alpha_matrix_blit_argb8565_2_rgba8888(image, dc, rect);
+            }
+            else if (img_type == RTKARGB8565)
+            {
+                alpha_matrix_blit_rtkargb8565_2_rgba8888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
@@ -374,9 +382,13 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             {
                 alpha_blend_blit_rgb565_2_rgb565(image, dc, rect);
             }
-            if (img_type == ARGB8565)
+            else if (img_type == ARGB8565)
             {
                 alpha_blend_blit_argb8565_to_rgb565(image, dc, rect);
+            }
+            else if (img_type == RTKARGB8565)
+            {
+                alpha_blend_blit_rtkargb8565_to_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
@@ -407,6 +419,10 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             if (img_type == RGB565)
             {
                 alpha_blend_blit_rgb565_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RTKARGB8565)
+            {
+                alpha_blend_blit_rtkargb8565_2_argb8888(image, dc, rect);
             }
             else if (img_type == ARGB8565)
             {
