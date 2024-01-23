@@ -80,7 +80,7 @@ void rle_alpha_blend_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                     {
                         if (opacity_value < 255)
                         {
-                            *d = do_blending_rgb565_2_rgb565_opacity((uint32_t)pixel, (uint32_t) * d, opacity_value);
+                            *d = do_blending_acc_2_rgb565_opacity((uint32_t)pixel, (uint32_t) * d, opacity_value);
                         }
                     }
                     break;
@@ -117,7 +117,7 @@ void rle_alpha_blend_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         uint16_t *d = writebuf + (write_off + j);
-                        do_blending_rgb888_2_rgb565(d, &color);
+                        do_blending_2_rgb565(d, &color);
                     }
                     break;
                 default:
@@ -125,7 +125,7 @@ void rle_alpha_blend_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                         if (opacity_value < 255)
                         {
                             uint16_t *d = writebuf + (write_off + j);
-                            do_blending_rgb888_2_rgb565_opacity(d, &color, opacity_value);
+                            do_blending_2_rgb565_opacity(d, &color, opacity_value);
                         }
                         else
                         {
@@ -166,7 +166,7 @@ void rle_alpha_blend_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         uint16_t *d = writebuf + (write_off + j);
-                        do_blending_argb8888_2_rgb565(d, &color);
+                        do_blending_2_rgb565(d, &color);
                     }
                     break;
                 default:
@@ -174,7 +174,7 @@ void rle_alpha_blend_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                         if (opacity_value < 255)
                         {
                             uint16_t *d = writebuf + (write_off + j);
-                            do_blending_argb8888_2_rgb565_opacity(d, &color, opacity_value);
+                            do_blending_2_rgb565_opacity(d, &color, opacity_value);
                         }
                         else
                         {
@@ -238,13 +238,13 @@ void rle_alpha_blend_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_argb8888_2_rgb888(d, &color);
+                        do_blending_2_rgb888(d, &color);
                     }
                     break;
                 default:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_argb8888_2_rgb888_opacity(d, &color, opacity_value);
+                        do_blending_2_rgb888_opacity(d, &color, opacity_value);
                     }
                     break;
                 }
@@ -279,13 +279,13 @@ void rle_alpha_blend_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb888_2_rgb888(d, &color);
+                        do_blending_2_rgb888(d, &color);
                     }
                     break;
                 default:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb888_2_rgb888_opacity(d, &color, opacity_value);
+                        do_blending_2_rgb888_opacity(d, &color, opacity_value);
                     }
                     break;
                 }
@@ -321,13 +321,13 @@ void rle_alpha_blend_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb565_2_rgb888(d, &color);
+                        do_blending_2_rgb888(d, &color);
                     }
                     break;
                 default:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb565_2_rgb888_opacity(d, &color, opacity_value);
+                        do_blending_2_rgb888_opacity(d, &color, opacity_value);
                     }
                     break;
                 }
@@ -387,13 +387,13 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_argb8888_2_argb8888(d, &color);
+                        do_blending_2_argb8888(d, &color);
                     }
                     break;
                 default:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_argb8888_2_argb8888_opacity(d, &color, opacity_value);
+                        do_blending_2_argb8888_opacity(d, &color, opacity_value);
                     }
                     break;
                 }
@@ -429,13 +429,13 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb888_2_argb8888(d, &color);
+                        do_blending_2_argb8888(d, &color);
                     }
                     break;
                 default:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb888_2_argb8888_opacity(d, &color, opacity_value);
+                        do_blending_2_argb8888_opacity(d, &color, opacity_value);
                     }
                     break;
                 }
@@ -472,13 +472,13 @@ void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                 case 255:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb565_2_argb8888(d, &color);
+                        do_blending_2_argb8888(d, &color);
                     }
                     break;
                 default:
                     {
                         gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_rgb565_2_argb8888_opacity(d, &color, opacity_value);
+                        do_blending_2_argb8888_opacity(d, &color, opacity_value);
                     }
                     break;
                 }

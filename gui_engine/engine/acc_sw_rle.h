@@ -21,6 +21,14 @@
 extern "C" {
 #endif
 
+typedef enum
+{
+    IMDC_SRC_RGB565 = 0x04, // 4,
+    IMDC_SRC_RGB888 = 0x44, // 68,
+    IMDC_SRC_ARGB8888 = 0x84, // 132,
+
+} imdc_src_type;
+
 typedef struct imdc_file_header
 {
     struct
@@ -74,7 +82,7 @@ void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len);
 void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
-
+void sw_acc_rle_uncompress(draw_img_t *image, void *buf);
 
 #ifdef __cplusplus
 }

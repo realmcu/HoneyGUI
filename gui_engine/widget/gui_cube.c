@@ -355,8 +355,8 @@ static void cube_draw_cb(gui_obj_t *obj)
     {
         draw_rect.x1 = this->draw_img_front.img_x;
         draw_rect.y1 = this->draw_img_front.img_y;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        draw_rect.x2 = draw_rect.x1 + this->draw_img_front.target_w - 1;
+        draw_rect.y2 = draw_rect.y1 + this->draw_img_front.target_h - 1;
         CUBE_JUDEG_FULL_RANK(front)
         gui_acc_blit(front, dc, &draw_rect);
 
@@ -366,8 +366,8 @@ static void cube_draw_cb(gui_obj_t *obj)
     {
         draw_rect.x1 = this->draw_img_back.img_x;
         draw_rect.y1 = this->draw_img_back.img_y;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        draw_rect.x2 = draw_rect.x1 + this->draw_img_back.target_w - 1;
+        draw_rect.y2 = draw_rect.y1 + this->draw_img_back.target_h - 1;
         CUBE_JUDEG_FULL_RANK(back)
         gui_acc_blit(back, dc, &draw_rect);
     }
@@ -376,8 +376,8 @@ static void cube_draw_cb(gui_obj_t *obj)
     {
         draw_rect.x1 = this->draw_img_up.img_x;
         draw_rect.y1 = this->draw_img_up.img_y;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        draw_rect.x2 = draw_rect.x1 + this->draw_img_up.target_w - 1;
+        draw_rect.y2 = draw_rect.y1 + this->draw_img_up.target_h - 1;
         CUBE_JUDEG_FULL_RANK(up)
         gui_acc_blit(up, dc, &draw_rect);
     }
@@ -386,8 +386,8 @@ static void cube_draw_cb(gui_obj_t *obj)
     {
         draw_rect.x1 = this->draw_img_down.img_x;
         draw_rect.y1 = this->draw_img_down.img_y;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        draw_rect.x2 = draw_rect.x1 + this->draw_img_down.target_w - 1;
+        draw_rect.y2 = draw_rect.y1 + this->draw_img_down.target_h - 1;
         CUBE_JUDEG_FULL_RANK(down)
         gui_acc_blit(down, dc, &draw_rect);
     }
@@ -396,8 +396,8 @@ static void cube_draw_cb(gui_obj_t *obj)
     {
         draw_rect.x1 = this->draw_img_left.img_x;
         draw_rect.y1 = this->draw_img_left.img_y;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        draw_rect.x2 = draw_rect.x1 + this->draw_img_left.target_w - 1;
+        draw_rect.y2 = draw_rect.y1 + this->draw_img_left.target_h - 1;
         CUBE_JUDEG_FULL_RANK(left)
         gui_acc_blit(left, dc, &draw_rect);
     }
@@ -406,8 +406,8 @@ static void cube_draw_cb(gui_obj_t *obj)
     {
         draw_rect.x1 = this->draw_img_right.img_x;
         draw_rect.y1 = this->draw_img_right.img_y;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        draw_rect.x2 = draw_rect.x1 + this->draw_img_right.target_w - 1;
+        draw_rect.y2 = draw_rect.y1 + this->draw_img_right.target_h - 1;
         CUBE_JUDEG_FULL_RANK(right)
         gui_acc_blit(right, dc, &draw_rect);
     }
@@ -497,7 +497,7 @@ static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
 
         cube_img[i]->src_mode = img_file->src_mode[i];
         cube_img[i]->opacity_value = UINT8_MAX;
-        cube_img[i]->blend_mode = IMG_FILTER_BLACK;
+        cube_img[i]->blend_mode = IMG_SRC_OVER_MODE;
         cube_img[i]->matrix = gui_malloc(sizeof(struct gui_matrix));
         cube_img[i]->inverse = gui_malloc(sizeof(struct gui_matrix));
     }

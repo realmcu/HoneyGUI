@@ -22,11 +22,15 @@
 #if (CONFIG_REALTEK_BUILD_GUI == 1)
 
 // <c> RTK GUI Demo
-#define CONFIG_REALTEK_BUILD_GUI_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_DEMO
 // </c>
 
 // <c> RTK GUI Demo 368 448
-// #define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
+#define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
+// </c>
+
+// <c> RTK GUI Demo 454 454
+// #define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
 
 // <c> RTK GUI Demo 280 456
@@ -61,6 +65,9 @@
 #define CONFIG_REALTEK_BUILD_GUI_FONT_RTK_MEM
 // </c>
 
+
+
+//#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // <c> RTK GUI Font Enable TTF SVG
 //#define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
 // </c>
@@ -84,7 +91,7 @@
 // </c>
 
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
-#define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
+// #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 #endif

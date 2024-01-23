@@ -67,9 +67,11 @@ void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
     uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
     uint16_t *linebuf = (uint16_t *)buf;
 
+    // gui_log("file->compressed_addr[%d] %d\n", line, file->compressed_addr[line]);
     for (uint32_t addr = start; addr < end;)
     {
         imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)addr;
+        // gui_log("%d 0x%x\n", node->len, node->pixel16);
         gui_memset16(linebuf, node->pixel16, node->len);
 
         addr = addr + sizeof(imdc_rgb565_node_t);
@@ -111,6 +113,49 @@ void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
         addr = addr + sizeof(imdc_argb8888_node_t);
         linebuf = linebuf + node->len;
     }
+}
+
+void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
+{
+    int source_w = image->img_w;
+    int source_h = image->img_h;
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint8_t img_type = *((uint8_t *)image_off);
+    imdc_file_t *file = (imdc_file_t *)image_off;
+    uint8_t *line_buf = buf;
+    struct gui_rgb_data_head *head = image->data;
+
+    memcpy(buf, head, sizeof(struct gui_rgb_data_head));
+    head = buf;
+    line_buf = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(buf));
+    if (img_type == 4)//rle_rgb565
+    {
+        uint8_t source_bytes_per_pixel = 2;
+        for (int k = 0; k < source_h; k++)
+        {
+            uncompressed_rle_rgb565(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
+        }
+        head->type = RGB565;
+    }
+    else if (img_type == 68)//rle_rgb888
+    {
+        uint8_t source_bytes_per_pixel = 3;
+        for (int k = 0; k < source_h; k++)
+        {
+            uncompressed_rle_rgb888(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
+        }
+        head->type = RGB888;
+    }
+    else if (img_type == 132)//rle_rgba8888
+    {
+        uint8_t source_bytes_per_pixel = 4;
+        for (int k = 0; k < source_h; k++)
+        {
+            uncompressed_rle_argb8888(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
+        }
+        head->type = RGBA8888;
+    }
+    return;
 }
 
 void rle(draw_img_t *image, struct gui_dispdev *dc,

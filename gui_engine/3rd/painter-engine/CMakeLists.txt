@@ -1,0 +1,2 @@
+set(CURRENT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+message("HoneyGUI base path ${CURRENT_PATH}")

@@ -21,24 +21,16 @@
 extern "C" {
 #endif
 
-uint16_t do_blending_rgb565_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8_t alpha);
+uint16_t do_blending_acc_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8_t alpha);
 void  do_blending_argb8565_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t alpha);
-void do_blending_argb8888_2_argb8888(gui_color_t *d, gui_color_t *s);
-void do_blending_rgb888_2_argb8888(gui_color_t *d, gui_color_t *s);
-void do_blending_rgb565_2_argb8888(gui_color_t *d, gui_color_t *s);
-void do_blending_argb8888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_rgb888_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_rgb565_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_rgb888_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_rgb888_2_rgb565(uint16_t *d, gui_color_t *s);
-void do_blending_argb8888_2_rgb565(uint16_t *d, gui_color_t *s);
-void do_blending_argb8888_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_rgb565_2_rgb888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_rgb565_2_rgb888(gui_color_t *d, gui_color_t *s);
-void do_blending_rgb888_2_rgb888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
-void do_blending_rgb888_2_rgb888(gui_color_t *d, gui_color_t *s);
-void do_blending_argb8888_2_rgb888(gui_color_t *d, gui_color_t *s);
-void do_blending_argb8888_2_rgb888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
+
+void do_blending_2_rgb565(uint16_t *d, gui_color_t *s);
+void do_blending_2_rgb565_opacity(uint16_t *d, gui_color_t *s, uint8_t opacity);
+void do_blending_2_rgb888(gui_color_t *d, gui_color_t *s);
+void do_blending_2_rgb888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
+void do_blending_2_argb8888(gui_color_t *d, gui_color_t *s);
+void do_blending_2_argb8888_opacity(gui_color_t *d, gui_color_t *s, uint8_t opacity);
+
 
 #ifdef __cplusplus
 }

@@ -463,10 +463,9 @@ static void prepare(gui_obj_t *obj)
     }
 
     uint8_t last = this->checksum;
-    this->checksum = 0;
     this->checksum = this->release_x;
 
-    if ((last != this->checksum) || (this->release_x == 0))
+    if (last != this->checksum)
     {
         gui_fb_change();
     }
@@ -493,8 +492,8 @@ static void draw_cb(gui_obj_t *obj)
                 gui_rect_t rect = {0};
                 rect.x1 = obj->dx + draw_img->img_x;
                 rect.y1 = obj->dy + draw_img->img_y;
-                rect.x2 = rect.x1 + obj->w;
-                rect.y2 = rect.y1 + obj->h;
+                rect.x2 = rect.x1 + draw_img->target_w - 1;
+                rect.y2 = rect.y1 + draw_img->target_h - 1;
 
                 gui_acc_blit(draw_img, dc, &rect);
             }

@@ -21,7 +21,8 @@
 extern "C" {
 #endif
 
-
+void alpha_matrix_blit_argb8565_2_rgba8888(draw_img_t *image, struct gui_dispdev *dc,
+                                           gui_rect_t *rect);
 void alpha_matrix_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                            gui_rect_t *rect);
 void alpha_matrix_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,

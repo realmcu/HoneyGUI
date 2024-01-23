@@ -182,6 +182,7 @@ static void gui_server_entry(void *parameter)
         {
             daemon_start_ms = gui_ms_get();
         }
+
 #if defined __WIN32
         continue;
 #endif
