@@ -189,10 +189,6 @@ void gui_scrollwheel_append_core(gui_scroll_wheel_t *this, void *num_pic, void *
     {
         this->picture[this->row_count].pic = gui_img_create_from_mem(this, "num_pic", num_pic, 0, 0, 0, 0);
     }
-    else if (IMG_SRC_RLE == src_mode)
-    {
-        *img = gui_img_create_from_rle(this, num_pic, 0, 0);
-    }
 
     gui_image_load_scale(&this->picture[this->row_count].pic->draw_img);
 

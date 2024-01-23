@@ -323,10 +323,6 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
     {
         draw_img->data = (void *)config->addr;
     }
-    else if (config->src_mode == IMG_SRC_RLE)
-    {
-        draw_img->data = (void *)config->addr;
-    }
 
     draw_img->opacity_value = 255;
     draw_img->blend_mode = IMG_FILTER_BLACK;
@@ -570,19 +566,6 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
     gui_imgconfig_t config = {   .name = "image",
                                  .file = file,
                                  .src_mode = IMG_SRC_FILESYS,
-                                 .x    = x,
-                                 .y    = y,
-                                 .w    = 0,
-                                 .h    = 0,
-                             };
-    return gui_img_create_core(parent, &config);
-}
-
-gui_img_t *gui_img_create_from_rle(void *parent, const char *file, int16_t x, int16_t y)
-{
-    gui_imgconfig_t config = {   .name = "image",
-                                 .file = file,
-                                 .src_mode = IMG_SRC_RLE,
                                  .x    = x,
                                  .y    = y,
                                  .w    = 0,

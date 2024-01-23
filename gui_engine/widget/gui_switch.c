@@ -586,10 +586,6 @@ static gui_switch_t *gui_switch_create_core(void *parent, int16_t x, int16_t y,
     {
         this->switch_picture = (void *)gui_img_create_from_mem(this, "switch_picture", off_pic, 0, 0, 0, 0);
     }
-    else if (src_mode == IMG_SRC_RLE)
-    {
-        this->switch_picture = (void *)gui_img_create_from_rle(this, off_pic, 0, 0);
-    }
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 }

@@ -1100,7 +1100,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         if (arc)
                         {
-                            gui_log("here %d\n", __LINE__);
                             parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
                                                                           cx, cy, 100, 100, sd, ed);
                             gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), IMG_SRC_OVER_MODE);
@@ -1110,12 +1109,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             if (vh)
                             {
-                                gui_log("here %d\n", __LINE__);
                                 parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
                             }
                             else
                             {
-                                gui_log("here %d\n", __LINE__);
                                 parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
                             }
                         }
@@ -1821,7 +1818,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         char *font_type2 = NULL;
                         if (strstr(font_type, ".bin") != NULL)
                         {
-
                             if (strstr(font_type, ".bin;") != NULL)
                             {
                                 font_type2 = "rtk_font_mem";
@@ -1879,17 +1875,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
 #endif
                         }
-
                     }
-
-
-
-
-
-
-
-
-
+                    break;
                 }
             case RADIO:
                 {
