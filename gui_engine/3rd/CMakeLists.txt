@@ -26,6 +26,10 @@ list(APPEND gui_3rd_headers
 			${gui_3rd_stb_headers})
 set(gui_3rd_headers ${gui_3rd_headers} CACHE INTERNAL  "gui 3rd headers ")
 
+
+HEADER_DIRECTORIES(gui_3rd_headers ./)
+set(gui_3rd_headers ${gui_3rd_headers} CACHE INTERNAL  "gui 3rd headers ")
+
 foreach(ITEM ${gui_3rd_sources})
    message(${ITEM})
 endforeach()

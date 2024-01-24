@@ -22,7 +22,11 @@ list(APPEND gui_headers
 			${gui_engine_headers}
 			${gui_input_headers} 
 			${gui_server_headers} 
-			${gui_widget_headers})
+			${gui_widget_headers}
+			${gui_3rd_nanovg_headers}
+			${gui_misc_headers}
+                        ${gui_3rd_common_headers}
+                        ${gui_3rd_headers}))
 set(gui_headers ${gui_headers} CACHE INTERNAL  "gui headers ")
 
 if(gui_debug_enable)
