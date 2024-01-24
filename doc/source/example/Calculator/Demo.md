@@ -3,11 +3,9 @@
 This example demostrates how to develop a simple "Calculator APP", from which you can learn and understand the basic methods and processes of developing a ui application.
 The "Calculator" works just like a traditional calculator, using button widget for user input and text widget for display. Watch the demo video below to see its full functionality.
 
-```eval_rst
-.. raw:: html
-
-    <iframe src="https://drive.google.com/file/d/1bYeDFMwqZZv-E_dL26H8uvvoNiRp4x6A/preview" width="640" height="480" allow="autoplay"></iframe>
-```
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1706089242549970186/448f9137_10641540.gif " width = "300" /></div>
+<br>
 
 ### Source File
 To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
