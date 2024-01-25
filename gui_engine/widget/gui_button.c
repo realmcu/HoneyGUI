@@ -388,10 +388,6 @@ static gui_button_t *gui_button_create_core(
             {
                 button->img = (void *)gui_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
             }
-            else if (src_mode == IMG_SRC_RLE)
-            {
-                button->img = (void *)gui_img_create_from_rle(button, background_pic, 0, 0);
-            }
             break;
         case 1:
             if (src_mode == IMG_SRC_FILESYS)
@@ -403,10 +399,6 @@ static gui_button_t *gui_button_create_core(
                 button->img = (void *)gui_img_create_from_mem((void *)button, "g", ((void **)background_pic)[0], 0,
                                                               0,
                                                               0, 0);
-            }
-            else if (src_mode == IMG_SRC_RLE)
-            {
-                button->img = (void *)gui_img_create_from_rle((void *)button, ((void **)background_pic)[0], 0, 0);
             }
             break;
         case 2:

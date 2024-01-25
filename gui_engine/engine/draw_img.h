@@ -54,7 +54,6 @@ typedef enum
 {
     IMG_SRC_MEMADDR = 0,
     IMG_SRC_FILESYS,
-    IMG_SRC_RLE,
 } IMG_SOURCE_MODE_TYPE;
 
 typedef struct draw_img
