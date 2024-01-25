@@ -10,7 +10,7 @@ The image widget is the basic widget used to display image. You can set a left, 
 
 ### Create widget
 
-You can use [gui_stbimg_create_from_mem(void *parent,  const char *name, void uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) to create an STB image widget from memory.Please confirm that the type and size are correct.
+You can use [gui_stbimg_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) to create an STB image widget from memory.Please confirm that the type and size are correct.
 
 ### Set attribute
 
