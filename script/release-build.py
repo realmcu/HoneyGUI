@@ -271,9 +271,9 @@ class HoneyGUIRelease(WindowsToolRelease):
 
     def before_build(self):
 
-        self.uncomment_code_line(line_content=r'#define BUILD_USING_SCRIPT_AS_A_APP',
+        self.uncomment_code_line(line_content=r'#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP',
                                  file_path=os.path.join(os.getcwd(), r"win32_sim/menu_config.h"))
-        self.add_comment_code_line(line_content=r'#define BUILD_USING_RTK_GUI_448_368_DEMO',
+        self.add_comment_code_line(line_content=r'#define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO',
                                  file_path=os.path.join(os.getcwd(), r"win32_sim/menu_config.h"))
         self.print_git_diff()
 
