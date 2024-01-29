@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="454mm"
+   height="454mm"
+   viewBox="0 0 454 454"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="clock_background.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.18507471"
+     inkscape:cx="183.7096"
+     inkscape:cy="313.38696"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <linearGradient
+       id="linearGradient29460"
+       inkscape:swatch="solid">
+      <stop
+         style="stop-color:#ffdd55;stop-opacity:1;"
+         offset="0"
+         id="stop29458" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="图层 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:#cccccc;stroke:#0000ff;stroke-width:0;stroke-linecap:square;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="path846"
+       sodipodi:type="arc"
+       sodipodi:cx="227"
+       sodipodi:cy="227"
+       sodipodi:rx="227"
+       sodipodi:ry="227"
+       sodipodi:start="0"
+       sodipodi:end="6.2831329"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="M 454,227 A 227,227 0 0 1 227.00297,454 227,227 0 0 1 7.7932299e-8,227.00595 227,227 0 0 1 226.99108,1.7534765e-7 227,227 0 0 1 454,226.9881" />
+    <path
+       sodipodi:type="star"
+       style="fill:#e9afaf;stroke:#0000ff;stroke-width:0;stroke-linecap:square;stroke-linejoin:round"
+       id="path856"
+       inkscape:flatsided="false"
+       sodipodi:sides="5"
+       sodipodi:cx="-133.05438"
+       sodipodi:cy="57.409248"
+       sodipodi:r1="120.33919"
+       sodipodi:r2="119.61528"
+       sodipodi:arg1="2.541017"
+       sodipodi:arg2="1.400131"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M -232.33547,125.41503 -112.73916,175.28676 -228.41126,-15.997734 -238.8848,113.15633 -92.707091,-55.964541 -218.77641,-26.014669 -12.761502,60.747375 -80.203084,-49.896649 -99.056586,172.84611 -14.66846,74.514474 Z"
+       transform="matrix(0.88510403,-1.5061032,1.5668948,0.92082994,254.21623,-34.315221)"
+       inkscape:transform-center-x="5.3848529"
+       inkscape:transform-center-y="0.23381876" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:107.334px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.68337"
+       x="144.17786"
+       y="594.41266"
+       id="text7760-8"
+       transform="scale(1.3603318,0.73511477)"><tspan
+         sodipodi:role="line"
+         id="tspan7758-8"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Viner Hand ITC';-inkscape-font-specification:'Viner Hand ITC';stroke-width:2.68337"
+         x="144.17786"
+         y="594.41266">6</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="4.7355595"
+       y="40.922382"
+       id="text2506"><tspan
+         sodipodi:role="line"
+         id="tspan2504"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
+         x="4.7355595"
+         y="40.922382" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:90.6074px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.26519"
+       x="337.36658"
+       y="286.53183"
+       id="text7760"
+       transform="scale(1.151455,0.86846641)"><tspan
+         sodipodi:role="line"
+         id="tspan7758"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Viner Hand ITC';-inkscape-font-specification:'Viner Hand ITC';stroke-width:2.26519"
+         x="337.36658"
+         y="286.53183">3</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:68.3564px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.70891"
+       x="226.39671"
+       y="57.617233"
+       id="text7760-84"
+       transform="scale(0.87103933,1.1480538)"><tspan
+         sodipodi:role="line"
+         id="tspan7758-4"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Viner Hand ITC';-inkscape-font-specification:'Viner Hand ITC';stroke-width:1.70891"
+         x="226.39671"
+         y="57.617233">12</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:95.4409px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.38602"
+       x="6.7805352"
+       y="321.43637"
+       id="text7760-849"
+       transform="scale(1.2818585,0.78011731)"><tspan
+         sodipodi:role="line"
+         id="tspan7758-1"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Viner Hand ITC';-inkscape-font-specification:'Viner Hand ITC';stroke-width:2.38602"
+         x="6.7805352"
+         y="321.43637">9</tspan></text>
+  </g>
+</svg>
