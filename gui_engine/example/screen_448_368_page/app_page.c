@@ -12,8 +12,12 @@
 #include "gui_components_init.h"
 #include <stdio.h>
 #include "gui_progressbar.h"
-#include <tp_algo.h>
-#include "gui_fps.h"
+#include "gui_win.h"
+#include "gui_page.h"
+#include "gui_grid.h"
+#include "gui_button.h"
+static void app_page_ui_design(gui_app_t *app);
+
 #define GUI_APP_DEFINE(APP_NAME,UI_DESIGN)\
     \
     static void UI_DESIGN(gui_app_t*);\
@@ -32,39 +36,27 @@
         return &_app_##APP_NAME;\
     }
 #define GUI_APP_HANDLE(APP_NAME) _get_app_##APP_NAME()
+#define GUI_APP_SHUTDOWM(APP_NAME) gui_app_shutdown(_get_app_##APP_NAME());
+#define GUI_APP_STARTUP(APP_NAME) gui_app_startup(_get_app_##APP_NAME());
+#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME(), _get_app_##APP_NAME_NEXT());
 static void app_page_ui_design(gui_app_t *app);
 
 GUI_APP_DEFINE(battery, app_battery_ui_design)
 GUI_APP_DEFINE(app, app_app_ui_design)
+GUI_APP_DEFINE(page, app_page_ui_design)
 gui_tabview_t *tv;
+static gui_curtain_t *curtain_down_menu;
+static gui_page_t *page;
 
-static gui_app_t app_page =
-{
-    .screen =
-    {
-        .name = "app_page",
-        .x    = 0,
-        .y    = 0,
-        .parent = NULL,
-    },
-    .ui_design = app_page_ui_design,
-    .thread_entry = NULL,
-    .active_ms = 1000000,
-};
+static void app_app_ui_design(gui_app_t *app);
 
-void *get_app_page(void)
-{
-    return &app_page;
-}
 
 
 static void kb_button_cb(void *obj, gui_event_t e)
 {
     gui_log("line = %d \n", __LINE__);
 }
-#include "gui_page.h"
-#include "gui_grid.h"
-#include "gui_button.h"
+
 
 static void callback(gui_button_t *button)
 {
@@ -91,27 +83,6 @@ static void callback(gui_button_t *button)
     if (button->animate->progress_percent == 1)
     {
         first_flag = false;
-        float scale = 1;
-        {
-            gui_img_scale(button->img, scale, scale);
-            gui_img_rotation(button->img, 0, gui_img_get_width(button->img) / 2,
-                             gui_img_get_height(button->img) / 2);
-            gui_img_translate(button->img, gui_img_get_width(button->img) / 2,
-                              gui_img_get_height(button->img) / 2);
-        }
-    }
-    if (tp_get_info()->type == TOUCH_HOLD_Y || tp_get_info()->released)
-    {
-        first_flag = false;
-        float scale = 1;
-        {
-            gui_img_scale(button->img, scale, scale);
-            gui_img_rotation(button->img, 0, gui_img_get_width(button->img) / 2,
-                             gui_img_get_height(button->img) / 2);
-            gui_img_translate(button->img, gui_img_get_width(button->img) / 2,
-                              gui_img_get_height(button->img) / 2);
-        }
-        button->animate->animate = 0;
     }
 
 }
@@ -145,16 +116,13 @@ static void callback_release(gui_button_t *button)
         first_flag = false;
     }
 }
-
+static void event_cb_release(gui_button_t *button)
+{
+    gui_button_set_animate(button, 1000, 0, callback_release, button);
+}
 static void event_cb_click(gui_button_t *button)
 {
     gui_app_startup(GUI_APP_HANDLE(app));
-    gui_app_layer_top();
-}
-static void battery_cb(gui_button_t *button)
-{
-    gui_app_shutdown(get_app_page());
-    gui_app_startup(GUI_APP_HANDLE(battery));
     gui_app_layer_top();
 }
 static void deal_img_in_root(gui_obj_t *object)
@@ -247,11 +215,18 @@ const static void *scrollbar_array[] =
 };
 
 static gui_progressbar_t *pro;
+static void battery_cb(gui_button_t *button)
+{
+    //gui_app_shutdown(GUI_APP_HANDLE(page));
+    //gui_app_startup(GUI_APP_HANDLE(battery));
+    GUI_APP_SWAP(page, battery);
+    gui_app_layer_top();
+}
 static void page_callback(gui_page_t *page)
 {
     deal_img_in_root(page); GET_BASE(page)->opacity_value = 200;
-    //gui_log("%f,%d,%d\n", ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
-    //        page)->h - gui_get_screen_height()), page->start_y, GET_BASE(page)->y);
+    gui_log("%f,%d,%d\n", ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
+            page)->h - gui_get_screen_height()), page->start_y, GET_BASE(page)->y);
     float progress = ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
                                                                                 page)->h - gui_get_screen_height());
     if (pro)
@@ -299,14 +274,49 @@ const static void *array[] =
     WALLET_BIN,
     WLAN_BIN,
 };
+static void curtain_ani(gui_img_t *img)
+{
+    //@1 <0 @5>0
+    gui_log("y:%d,@%d\n", GET_BASE(curtain_down_menu)->parent->x, GUI_TYPE(gui_curtainview_t,
+                                                                           GET_BASE(curtain_down_menu)->parent)->cur_curtain);
+    int offset = 0;
+    if (GUI_TYPE(gui_curtainview_t, GET_BASE(curtain_down_menu)->parent)->cur_curtain == CURTAIN_LEFT)
+    {
+        offset = (int)gui_get_screen_width() + GET_BASE(curtain_down_menu)->parent->x;
+        if (offset == 0)
+        {
+            offset = gui_get_screen_width();
+
+        }
+    }
+    else if (GUI_TYPE(gui_curtainview_t, GET_BASE(curtain_down_menu)->parent)->cur_curtain == 5)
+    {
+        offset = GET_BASE(curtain_down_menu)->parent->x;
+
+        if (offset > gui_get_screen_width())
+        {
+            offset = gui_get_screen_width();
+        }
+    }
 
 
+    gui_log("x:%d\n", offset);
+    gui_img_set_opacity(img, offset * UINT8_MAX / gui_get_screen_width());
+
+
+
+
+}
+static void win_ct_cb()
+{
+
+}
 static gui_button_t *button_array[sizeof(array) / sizeof(array[0])];
 static void app_page_ui_design(gui_app_t *app)
 {
     gui_log("app_page_ui_design\n");
     //gui_img_create_from_mem(&(app->screen), 0, BACK_BIN, 0, 0, 0, 0);
-    gui_page_t *page = gui_page_create(&(app->screen), 0, 4, 0, 0, 0);
+    page = gui_page_create(&(app->screen), 0, 4, 0, 0, 0);
     gui_page_rebound(page, true);
     int array_size = sizeof(array) / sizeof(array[0]);
     gui_grid_t *grid = gui_grid_create(page, 0, 0, array_size, 1, 0, 104);
@@ -315,16 +325,24 @@ static void app_page_ui_design(gui_app_t *app)
 
         gui_button_t *button = gui_button_create(grid, 0, 0, 368, 100, array[i], array[i], 0, 0, 0);
         gui_obj_add_event_cb(button, event_cb, GUI_EVENT_TOUCH_PRESSED, button);
+        gui_obj_add_event_cb(button, event_cb_release, GUI_EVENT_TOUCH_RELEASED, button);
+        //gui_img_set_opacity(button->img, 200);
         gui_img_set_mode(button->img, IMG_SRC_OVER_MODE);
         button_array[i] = button;
     }
     gui_obj_add_event_cb(button_array[0], event_cb_click, GUI_EVENT_TOUCH_CLICKED, button_array[0]);
+    gui_obj_add_event_cb(button_array[1], battery_cb, GUI_EVENT_TOUCH_CLICKED, button_array[1]);
     gui_page_set_animate(page, 1000, -1, page_callback, page);
     pro = gui_progressbar_movie_create(&(app->screen), scrollbar_array, 39, 300, 10);
     gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
-    gui_obj_add_event_cb(button_array[1], battery_cb, GUI_EVENT_TOUCH_CLICKED, button_array[1]);
+    // gui_curtainview_t *ctv = gui_curtainview_create(&(app->screen), 0,0,0,0,0);
+    // gui_curtain_create(ctv, 0,0,0,0,0,CURTAIN_MIDDLE, 0.6);
+    // curtain_down_menu = gui_curtain_create(ctv, 0,0,0,0,0,CURTAIN_LEFT, 0.5);
+    // gui_img_t *bg = gui_img_create_from_mem(curtain_down_menu, 0,DEVICE_NAME_BIN, 368*0.5,300,0,0);
+    // gui_img_set_animate(bg,1000, -1, curtain_ani, bg);
+    // gui_win_t *win_ct = gui_win_create(bg, 0,0,0,200,200);
+    // gui_obj_add_event_cb(win_ct, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, 0);
 
-    gui_fps_create(&(app->screen));
 }
 
 static void app_app_animate_exit(gui_win_t *win)
@@ -353,7 +371,7 @@ static void app_app_animate_exit(gui_win_t *win)
     {
         if (press)
         {
-            gui_app_startup(get_app_page());
+            gui_app_startup(GUI_APP_HANDLE(page));
             gui_app_layer_buttom();
             press = false;
         }
@@ -370,7 +388,7 @@ static void app_app_animate(gui_win_t *win)
     gui_log("x:%d\n", GET_BASE(win)->x);
     if (win->animate->progress_percent == 1)
     {
-        gui_app_shutdown(get_app_page());
+        gui_app_shutdown(GUI_APP_HANDLE(page));
         gui_win_set_animate(win, 200, -1, app_app_animate_exit, win);
     }
 
@@ -396,7 +414,7 @@ static void app_app_ui_design(gui_app_t *app)
 
 
     gui_win_set_animate(win, 200, 0, app_app_animate, win);
-    gui_fps_create(&(app->screen));
+
 }
 
 uint8_t resource_root[1024 * 1024 * 20];
@@ -419,7 +437,7 @@ static int app_init(void)
     }
 #endif
     gui_server_init();
-    gui_app_startup(get_app_page());
+    gui_app_startup(GUI_APP_HANDLE(page));
     return 0;
 }
 
@@ -482,6 +500,11 @@ static void page_highlight(gui_page_t *page)
 {
     deal_img_in_root_highlight(page);
 }
+static void win_callback()
+{
+    //gui_switch_app(_get_app_battery(), _get_app_page());
+    GUI_APP_SWAP(battery, page)
+}
 static void app_battery_ui_design(gui_app_t *app)
 {
     {
@@ -540,9 +563,10 @@ static void app_battery_ui_design(gui_app_t *app)
             gui_text_type_set(t, addr1);
             gui_page_set_animate(page1, 1000, -1, page_highlight, page1);
         }
-    } gui_fps_create(&(app->screen));
+    }
+
+
+    gui_win_t *win = gui_win_create(&(app->screen), 0, 0, 0, 368, 448);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)win_callback, GUI_EVENT_2, win);
+
 }
-
-
-
-
