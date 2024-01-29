@@ -112,9 +112,7 @@
 #endif
 
 // </e>
-// <c> RTK GUI Enable DEMO PAGE
-//#define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO_PAGE
-// </c>
+
 
 // </h>
 
