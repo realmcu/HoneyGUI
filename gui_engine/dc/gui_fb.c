@@ -259,7 +259,7 @@ void gui_fb_disp(gui_obj_t *root)
             if (last_ms)
             {
                 spf = ms - last_ms;
-                gui_log("spf:%d ms", spf);
+                //gui_log("spf:%d ms", spf);
             }
             else { spf = 0; }
             last_ms = ms;
