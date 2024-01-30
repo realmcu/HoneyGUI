@@ -15,14 +15,24 @@
 #include "math.h"
 #include "fmc_api_ext.h"
 #include "os_sync.h"
+#include "section.h"
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
 
 #define PPEV2_ACC_MIN_OPA       3
 #define PPEV2_MIN_PIXEL         100
-#define TEMP_BUF_SIZE           (50 * 1024)
 
+#if (F_APP_GUI_USE_DSP_SHARE_RAM == 0)
+#define TEMP_BUF_SIZE           (50 * 1024)
+#else
+#define TEMP_BUF_SIZE           (40 * 1024)
+#endif
+
+#if (F_APP_GUI_USE_DSP_SHARE_RAM == 0)
 static uint8_t temp_buf[TEMP_BUF_SIZE];
+#else
+SHM_DATA_SECTION static uint8_t temp_buf[TEMP_BUF_SIZE];
+#endif
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {

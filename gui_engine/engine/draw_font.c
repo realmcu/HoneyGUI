@@ -60,7 +60,8 @@ uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
             }
         case 4:
             {
-                //TODO
+                //Because it is outside the standard unicode range, replace the character with a whitespace character.
+                unicode_array[k] = 0x0;
                 k++;
                 i = i + 3;
                 break;

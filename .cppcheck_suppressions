@@ -1,6 +1,7 @@
 
 
 *:gui_engine\3rd\*
+*:gui_engine\example\screen_454_454\*
 *:lvgl\*
 
 

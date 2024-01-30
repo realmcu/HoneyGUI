@@ -103,7 +103,7 @@ static void cb(gui_img_t *img)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void *gui_fps_create(void *parent)
+void gui_fps_create(void *parent)
 {
 
     static const unsigned char afont[1228] =
@@ -396,7 +396,7 @@ void *gui_fps_create(void *parent)
     int font_size = 16;
     t = gui_text_create(img, "WIDGET gui_fps_text", 35, 0, gui_get_screen_width(), font_size);
     gui_text_set(t, text, "rtk_font_mem", gui_rgb(255, 0xfe, 00), strlen(text), font_size);
-    void *addr1 = afont;
+    void *addr1 = (void *)afont;
     gui_font_mem_init(addr1);
     gui_text_type_set(t, addr1);
 

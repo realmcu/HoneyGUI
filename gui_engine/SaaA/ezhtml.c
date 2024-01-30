@@ -371,7 +371,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             t = gui_text_create(parent, ptxt, x, y, gui_get_screen_width(), h);
                             gui_color_t color_temporary;
                             color_temporary.color.rgba_full = color;
-                            gui_text_set(t, gui_strdup(text), "rtk_font_stb", color_temporary, strlen(text), 32);
+                            gui_text_set(t, gui_strdup(text), "rtk_font_mem", color_temporary, strlen(text), 32);
 
 
 
@@ -394,6 +394,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         gui_set_font_mem_resourse(fontSize, addr1,  addr2);
                                         t->font_height = fontSize;
                                         t->path = 0;
+                                        t->font_type = GUI_FONT_SOURCE_BMP;
                                     }
                                     else
                                     {
@@ -402,6 +403,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         gui_font_mem_init(addr1);
                                         t->font_height = fontSize;
                                         t->path = 0;
+                                        t->font_type = GUI_FONT_SOURCE_BMP;
                                         gui_text_type_set(t, addr1);
                                         gui_text_mode_set(t, LEFT);
                                         // t->font_height = fontSize;

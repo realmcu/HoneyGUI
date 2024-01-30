@@ -26,11 +26,11 @@
 // </c>
 
 // <c> RTK GUI Demo 368 448
-#define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
 // </c>
 
 // <c> RTK GUI Demo 454 454
-// #define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
+#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
 
 // <c> RTK GUI Demo 280 456
@@ -78,11 +78,9 @@
 
 // <c> RTK GUI Enable PPE1.0
 //#define CONFIG_REALTEK_BUILD_PPE
-//#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>
 
 // <c> MODULE NANOVG VGLITE
-//#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 //#define CONFIG_REALTEK_NANOVG_HW_VGLITE
 // </c>
 
@@ -114,9 +112,7 @@
 #endif
 
 // </e>
-// <c> RTK GUI Enable DEMO PAGE
-//#define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO_PAGE
-// </c>
+
 
 // </h>
 

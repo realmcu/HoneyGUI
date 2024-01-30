@@ -1,0 +1,21 @@
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+if not GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
+    src += ['app_launcher.c']
+    src += ['app_launcher_tb_watch.c']
+    src += ['app_launcher_tb_sport.c']
+    src += ['app_launcher_tb_colorwheel.c']
+    src += ['app_launcher_tb_cube.c']
+    src += ['app_launcher_tb_svg.c']
+    src += ['app_launcher_tb_wave.c']
+    src += ['app_launcher_tb_grid.c']
+    src += ['app_launcher_tb_carousel.c']
+    src += ['app_launcher_tb_3d.c']
+CPPPATH = [cwd,cwd + '/root_image']
+
+group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_454_454_BAK'], CPPPATH = CPPPATH)
+
+Return('group')
