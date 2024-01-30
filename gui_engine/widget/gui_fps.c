@@ -24,6 +24,7 @@
 #include "gui_img.h"
 #include "tp_algo.h"
 #include "gui_text.h"
+#include "font_mem.h"
 
 /** @defgroup WIDGET WIDGET
   * @{

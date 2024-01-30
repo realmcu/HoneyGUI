@@ -89,7 +89,7 @@ void design_tab_watchface(void *parent)
     gui_img_set_quality(watchface_second, 1);
     gui_img_set_quality(watchface_minute, 1);
 
-    gui_img_set_animate(watchface_second, 1, -1, img_animate_watchface_callback, NULL);
+    //gui_img_set_animate(watchface_second, 1, -1, img_animate_watchface_callback, NULL);
 
     curtainview_menu = gui_curtainview_create(parent, "curtainview_menu", 0, 0, 454, 454);
     void design_curtain_menu(void *parent);

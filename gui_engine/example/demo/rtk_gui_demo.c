@@ -5,7 +5,7 @@
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "gui_canvas.h"
-#include "gui_px.h"
+
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -14,7 +14,8 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 
-
+#if 0
+#include "gui_px.h"
 
 static px_void PX_Object_3DModel_PixelShader(px_surface *psurface, px_int x, px_int y,
                                              px_point position, px_float u, px_float v, px_point4D normal, px_texture *pTexture, px_color color)
@@ -96,6 +97,7 @@ static void canvas_cb_black(gui_canvas_t *canvas)
     nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 200));
     nvgFill(canvas->vg);
 }
+#endif
 static void app_dialing_ui_design(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
@@ -108,7 +110,7 @@ static void app_dialing_ui_design(gui_app_t *app)
     // gui_canvas_t *canvas = gui_canvas_create(&app->screen, "canvas", 0, 0, 0, 368, 448);
     // gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
 
-    gui_px_t *px = gui_px_create(&app->screen, "px-test", px_main, 0, 0, 368, 448);
+    // gui_px_t *px = gui_px_create(&app->screen, "px-test", px_main, 0, 0, 368, 448);
 
 }
 

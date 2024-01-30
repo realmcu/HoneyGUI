@@ -71,11 +71,6 @@ static void design_app_cube_ui(gui_app_t *app)
 
     gui_font_mem_init(FONT_BIN);
 
-#ifndef _WIN32
-#include "mem_config.h"
-    //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
-#endif
-
     gui_cube_imgfile_t image_file;
     memset(&image_file, 0, sizeof(gui_cube_imgfile_t));
     for (int i = 0; i < 6; i++)

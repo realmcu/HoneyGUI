@@ -100,6 +100,8 @@ static void switch_dial_num_touch_cb(void *obj, gui_event_t event)
         }
         this->long_touch_state = false;
         break;
+    default:
+        break;
     }
 
     if (dial_num_index < BUFFER_DIAL_NUM_MAX - 1)
