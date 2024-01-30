@@ -107,7 +107,7 @@ extern "C" {
  * @fps fps the widget object pointer.
  *
  */
-void *gui_fps_create(void *parent);
+void gui_fps_create(void *parent);
 
 
 /** End of WIDGET_Exported_GUI_Functions
