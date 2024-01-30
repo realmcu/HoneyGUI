@@ -242,7 +242,7 @@ void design_curtain_record_files(void *parent)
                  strlen(string_title_record_files), FONT_H_32);
 
     grid_record_files = gui_grid_create(page_record_files, 83, 111, 1, 1, 50, 64 + 18);
-    //touch "录音文件" to add a record file
+    //touch title to add a record file
     example_add_record_files();
 
 }

@@ -61,7 +61,6 @@ static void switch_dial_num_touch_cb(void *obj, gui_event_t event)
     {
     case GUI_EVENT_1:
     case GUI_EVENT_2:
-        //free后再次进入win dial页面，create的widget地址和上次会不同?
         //offset_num = ((uint32_t)this - (uint32_t)switch_dial_num[0]) / 0x370; // sizeof gui_switch_t and gui_img_t
         for (uint8_t i = 0; i < 10; i++)
         {
