@@ -116,7 +116,7 @@ static void switch_dial_num_touch_cb(void *obj, gui_event_t event)
     {
         p_display_dial_num++;
     }
-    gui_text_set(text_dial_num, (const char *)p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_dial_num, p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
 }
 
@@ -134,7 +134,7 @@ static void switch_dial_delete_touch_cb(void *obj, gui_event_t event)
     }
     buffer_dial_num[dial_num_index] = '\0';
 
-    gui_text_set(text_dial_num, (const char *)p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_dial_num, p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
 }
 
@@ -169,7 +169,7 @@ void design_win_dial(void *parent)
                          NULL);
 
     text_dial_num = gui_text_create(parent, "text_dial_num", 0, 79, LCD_W, FONT_H_32);
-    gui_text_set(text_dial_num, (const char *)p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_dial_num, p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
     gui_text_mode_set(text_dial_num, CENTER);
 

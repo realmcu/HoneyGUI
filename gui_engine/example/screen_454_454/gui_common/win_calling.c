@@ -267,6 +267,8 @@ static void win_calling_volume_touch_cb(void *parent, gui_event_t event)
         gui_obj_show(switch_calling_hangup, true);
         gui_obj_show(switch_calling_mute, true);
         break;
+    default:
+        break;
     }
 }
 
