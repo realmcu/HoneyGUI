@@ -76,7 +76,7 @@ static void design_app_watch_ui(gui_app_t *app)
 
 
 uint8_t resource_root[1024 * 1024 * 20];
-static int wath_app_init(void)
+static int watch_app_init(void)
 {
 #if defined _WIN32
     int fd;
@@ -99,5 +99,5 @@ static int wath_app_init(void)
     return 0;
 }
 
-GUI_INIT_APP_EXPORT(wath_app_init);
+GUI_INIT_APP_EXPORT(watch_app_init);
 

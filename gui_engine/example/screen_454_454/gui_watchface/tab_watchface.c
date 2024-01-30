@@ -1,10 +1,12 @@
 #include "app_gui_main.h"
+#include "app_gui_perspective.h"
 #include "root_image/ui_resource.h"
 #include "gui_img.h"
 #include "gui_curtainview.h"
 #include <time.h>
 #include <stdio.h>
 #include "gui_text.h"
+#include "gui_win.h"
 
 #define MY_PI   (180)
 
@@ -19,6 +21,30 @@ gui_img_t *watchface_second;
 float angle_hour;
 float angle_min;
 float angle_sec;
+static uint16_t longtouch_count = 0;
+
+static void win_switch_to_perspective_app_touch_cb(void *obj, gui_event_t event)
+{
+    switch (event)
+    {
+    case GUI_EVENT_TOUCH_LONG:
+        gui_log("win_switch_to_perspective_app_touch_cb event = %d longtouch_count = %d\n", event,
+                longtouch_count);
+        longtouch_count++;
+        if (longtouch_count > 30)
+        {
+            longtouch_count = 0;
+            gui_switch_app(get_app_watch_ui(), get_app_perspective_ui());
+        }
+        break;
+    case GUI_EVENT_TOUCH_RELEASED:
+        longtouch_count = 0;
+        break;
+    default:
+        break;
+
+    }
+}
 
 static void img_animate_watchface_callback(void *obj)
 {
@@ -51,16 +77,27 @@ void design_tab_watchface(void *parent)
 {
     img_clock = gui_img_create_from_mem(parent, "img_clock", CLOCK_BASE_BIN, 0, 0, 454, 454);
 
-    watchface_hour = gui_img_create_from_mem(parent, "hour", ICON_CLOCK_HOUR_HAND_BIN, 223, 131, 8, 96);
-    watchface_minute = gui_img_create_from_mem(parent, "minute", ICON_CLOCK_MINUTE_HAND_BIN, 223, 99, 8,
-                                               128);
-    watchface_second = gui_img_create_from_mem(parent, "second", ICON_CLOCK_SECOND_HAND_BIN, 225, 83, 4,
-                                               144);
+    watchface_hour = gui_img_create_from_mem(parent, "hour", ICON_CLOCK_HOUR_HAND_BIN, 220, 129, 12,
+                                             100);
+    watchface_minute = gui_img_create_from_mem(parent, "minute", ICON_CLOCK_MINUTE_HAND_BIN, 220, 97,
+                                               12,
+                                               132);
+    watchface_second = gui_img_create_from_mem(parent, "second", ICON_CLOCK_SECOND_HAND_BIN, 222, 81, 8,
+                                               148);
     watchface_hand = gui_img_create_from_mem(parent, "hand", ICON_CLOCK_HAND_DOT_BIN, 218, 218, 0, 0);
+    gui_img_set_quality(watchface_hour, 1);
+    gui_img_set_quality(watchface_second, 1);
+    gui_img_set_quality(watchface_minute, 1);
 
     gui_img_set_animate(watchface_second, 1, -1, img_animate_watchface_callback, NULL);
 
     curtainview_menu = gui_curtainview_create(parent, "curtainview_menu", 0, 0, 454, 454);
     void design_curtain_menu(void *parent);
     design_curtain_menu(curtainview_menu);
+
+
+    gui_win_t *win_switch_to_perspective_app = gui_win_create(parent, "win_switch_to_perspective_app",
+                                                              0, 0, 454, 454);
+    gui_win_onLong(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
+    gui_win_onRelease(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
 }
