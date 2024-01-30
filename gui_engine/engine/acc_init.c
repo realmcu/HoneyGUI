@@ -191,7 +191,12 @@ void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         else if (image->src_mode == IMG_SRC_MEMADDR)
         {
             uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
+#ifdef __WIN32
+            // PC simulator: data alignment is unnecessary.
+            if (head.type == IMDC_COMPRESS)
+#else
             if (gpu_width != image->img_w || (int)data % 64 != 0 || head.type == IMDC_COMPRESS)
+#endif
             {
                 uint32_t size = gpu_width * gpu_height * source_bytes_per_pixel;
                 uint8_t offset = 0;

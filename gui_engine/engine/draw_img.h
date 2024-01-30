@@ -67,7 +67,7 @@ typedef struct draw_img
     void *data;
     struct gui_matrix *matrix;
     struct gui_matrix *inverse;
-    unsigned char opacity_value;
+    uint8_t opacity_value;
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
     uint32_t src_mode : 3;

@@ -23,6 +23,9 @@
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include "gui_tab.h"
+#include "gui_curtain.h"
+#include "gui_img.h"
+#include "gui_cube.h"
 
 
 
@@ -82,6 +85,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static void tab_prepare_fade(gui_obj_t *obj);
 
 static void tab_prepare(gui_obj_t *obj)
 {
@@ -89,6 +93,7 @@ static void tab_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+
     if (this->style == CLASSIC)
     {
         obj->tx += (this->id.x - parent->cur_id.x) * (int)this->base.w;
@@ -97,31 +102,31 @@ static void tab_prepare(gui_obj_t *obj)
     }
     else if (this->style == FADE)
     {
-        float x = 1.0f - (float)abs(obj->dx) / this->base.w;
-        if (x < 0.2f)
-        {
-            x = 0.2f;
-        }
-        if (x >= 1.0f)
-        {
-            x = 1.0f;
-        }
-        obj->sx = x;
-        obj->sy = x;
+        obj->tx += (this->id.x - parent->cur_id.x) * (int)this->base.w;
+        obj->ty += (this->id.y - parent->cur_id.y) * (int)this->base.h;
+
+        tab_prepare_fade(obj);
     }
     else if (this->style == REDUCTION_FADE)
     {
-        float x = 1.0f - (float)abs(obj->dx) / this->base.w;
-        if (x < 0.2f)
+        float s;
+        obj->tx = (this->id.x - parent->cur_id.x) * (int)this->base.w;
+        obj->ty = (this->id.y - parent->cur_id.y) * (int)this->base.h;
+        int sx = abs(obj->dx + obj->ax + obj->tx);
+        sx = sx % this->base.w;
+        s = 1.0f - (float)sx / this->base.w;
+
+        if (s < 0.2f)
         {
-            x = 0.2f;
+            s = 0.2f;
         }
-        if (x >= 1.0f)
+        if (s >= 1.0f)
         {
-            x = 1.0f;
+            s = 1.0f;
         }
-        obj->sx = x;
-        obj->sy = x;
+        obj->sx = s;
+        obj->sy = s;
+        tab_prepare_fade(obj);
     }
     else if (this->style == REDUCTION)
     {
@@ -142,7 +147,80 @@ static void tab_prepare(gui_obj_t *obj)
         }
         obj->sx = s;
         obj->sy = s;
+    }
+}
 
+static void tab_root_img_fade(gui_obj_t *object, float xx, float yy)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    float x = xx * 0.6f + 0.4f;
+    float y = yy * 0.6f + 0.4f;
+
+    gui_list_for_each_safe(node, tmp, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if ((!(obj->parent->type == CURTAIN &&
+               ((gui_curtain_t *)obj->parent)->orientation != CURTAIN_MIDDLE)) &&
+            (!(obj->parent->parent->type == CURTAIN &&
+               ((gui_curtain_t *)obj->parent->parent)->orientation != CURTAIN_MIDDLE)))
+        {
+            switch (obj->type)
+            {
+            case IMAGE_FROM_MEM:
+                {
+                    gui_img_t *img = (void *)obj;
+                    gui_img_set_opacity(img, x * UINT8_MAX);
+                    break;
+                }
+            case VG_LITE_CUBE:
+                {
+                    gui_cube_t *cube = (void *)obj;
+                    gui_cube_set_opacity(cube, CUBE_SIDE_ALL, x * UINT8_MAX);
+                    break;
+                }
+            case CANVAS:
+                {
+                    break;
+                }
+
+            default:
+                break;
+            }
+        }
+        tab_root_img_fade(obj, xx, yy);
+    }
+}
+
+#define TAB_ASIDE(id, cur) (abs(id - cur) <= 1)
+static void tab_prepare_fade(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_tab_t *tab = (gui_tab_t *)obj;
+    gui_tab_t *this = (gui_tab_t *)obj;
+    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+    /**
+     * @note tp->deltaX >0 means slide right, the left tab shows
+     *       tp->deltaX <0 means slide left, the right tab shows
+     *       the left tab's dx -320~0
+     *       the right tab's dx 320~0
+     */
+    if (((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_LEFT_SLIDE) ||
+         (tp->type == TOUCH_RIGHT_SLIDE) || (tp->type == TOUCH_INVALIDE))  &&
+        TAB_ASIDE(tab->id.x, parent->cur_id.x) && tab->id.y == 0)
+    {
+        // gui_log("TOUCH_HOLD_X: %d, TOUCH_LEFT_SLIDE: %d, TOUCH_RIGHT_SLIDE: %d, TOUCH_INVALIDE: %d, %d\n", \
+        // (tp->type == TOUCH_HOLD_X), (tp->type == TOUCH_LEFT_SLIDE), (tp->type == TOUCH_RIGHT_SLIDE),(tp->type == TOUCH_INVALIDE),\
+        // tab->id.x - parent->cur_id.x );
+
+        // current tab decline, aside tab enhance.
+        float fade_dir = (tab->id.x == parent->cur_id.x) ? -1.f : 1.f;
+        // slide right delta > 0, slide left delta < 0
+        float slide_dir = (tp->deltaX > 0) ? 1.f : (tp->deltaX < 0) ? -1.f : 0;
+        // slide right dx > 0, slide left dx < 0
+        float fade_percent = 1.f + (fade_dir * slide_dir * obj->dx) / this->base.w;
+
+        tab_root_img_fade(obj, fade_percent, fade_percent);
     }
 }
 

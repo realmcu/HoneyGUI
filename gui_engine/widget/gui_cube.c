@@ -532,7 +532,30 @@ void gui_cube_set_size(gui_cube_t *this, float size)
     this->cbsize = size;
 }
 
-void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)
+BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side)
+{
+    GUI_ASSERT(cube != NULL);
+    draw_img_t *cube_img[6];
+
+    cube_img[0] = &cube->draw_img_front;
+    cube_img[1] = &cube->draw_img_back;
+    cube_img[2] = &cube->draw_img_up;
+    cube_img[3] = &cube->draw_img_down;
+    cube_img[4] = &cube->draw_img_left;
+    cube_img[5] = &cube->draw_img_right;
+
+    if (side == CUBE_SIDE_ALL)
+    {
+        // not supported
+        return (BLEND_MODE_TYPE)0;
+    }
+    else
+    {
+        return (BLEND_MODE_TYPE)cube_img[side]->blend_mode;
+    }
+}
+
+void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side, BLEND_MODE_TYPE mode)
 {
     GUI_ASSERT(cube != NULL);
     draw_img_t *cube_img[6];
@@ -543,7 +566,64 @@ void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TY
     cube_img[4] = &cube->draw_img_left;
     cube_img[5] = &cube->draw_img_right;
 
-    cube_img[cube_side]->blend_mode = mode;
+    if (side == CUBE_SIDE_ALL)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            cube_img[i]->blend_mode = mode;
+        }
+    }
+    else
+    {
+        cube_img[side]->blend_mode = mode;
+    }
+}
+
+uint8_t gui_cube_get_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side)
+{
+    GUI_ASSERT(cube != NULL);
+    draw_img_t *cube_img[6];
+
+    cube_img[0] = &cube->draw_img_front;
+    cube_img[1] = &cube->draw_img_back;
+    cube_img[2] = &cube->draw_img_up;
+    cube_img[3] = &cube->draw_img_down;
+    cube_img[4] = &cube->draw_img_left;
+    cube_img[5] = &cube->draw_img_right;
+
+    if (side == CUBE_SIDE_ALL)
+    {
+        // not supported
+        return 0;
+    }
+    else
+    {
+        return cube_img[side]->opacity_value;
+    }
+}
+
+void gui_cube_set_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side, uint8_t opacity)
+{
+    GUI_ASSERT(cube != NULL);
+    draw_img_t *cube_img[6];
+    cube_img[0] = &cube->draw_img_front;
+    cube_img[1] = &cube->draw_img_back;
+    cube_img[2] = &cube->draw_img_up;
+    cube_img[3] = &cube->draw_img_down;
+    cube_img[4] = &cube->draw_img_left;
+    cube_img[5] = &cube->draw_img_right;
+
+    if (side == CUBE_SIDE_ALL)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            cube_img[i]->opacity_value = opacity;
+        }
+    }
+    else
+    {
+        cube_img[side]->opacity_value = opacity;
+    }
 }
 
 void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
