@@ -697,8 +697,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             if (image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1)
             {
-                if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format) ||
-                    image->blend_mode == IMG_TRANSPARENT_MASK)
+                if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format))
                 {
                     uint32_t x_max = (image->target_w + rect->x1 - 1) > rect->x2 ? rect-> x2 :
                                      (image->target_w + rect->x1 - 1);
