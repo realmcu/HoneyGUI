@@ -85,7 +85,7 @@
   */
 
 
-
+#include "gui_tab.h"
 static void tabview_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -142,30 +142,105 @@ static void tabview_prepare(gui_obj_t *obj)
     switch (tp->type)
     {
     case TOUCH_HOLD_X:
-        if (tabview->tab_cnt_left == 0 && tabview->tab_cnt_right == 0)
+        if (tabview->loop)
         {
+
+            obj->dx = tp->deltaX;
+            this->release_x = obj->dx;
+
+            {
+                //left edge
+                if (!tabview->loop_status && tabview->cur_id.x ==  -tabview->tab_cnt_left)
+                {
+                    tabview->loop_status = 1;
+                    gui_list_t *node = NULL;
+                    gui_list_for_each(node, &obj->child_list)
+                    {
+                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                        if (GUI_TYPE(gui_tab_t, obj)->id.x == tabview->tab_cnt_right)
+                        {
+                            GUI_TYPE(gui_tab_t, obj)->id.x = -tabview->tab_cnt_left - 1;
+                        }
+                    }
+                }
+                if (tabview->loop_status && tabview->cur_id.x !=  -tabview->tab_cnt_left)
+                {
+                    gui_list_t *node = NULL;
+                    gui_list_for_each(node, &obj->child_list)
+                    {
+                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                        if (GUI_TYPE(gui_tab_t, obj)->id.x == -tabview->tab_cnt_left - 1)
+                        {
+                            GUI_TYPE(gui_tab_t, obj)->id.x = tabview->tab_cnt_right;
+                        }
+                        tabview->loop_status = 0;
+                    }
+                }
+            }
+
+            {
+                //right edge
+                if (!tabview->loop_status2 && tabview->cur_id.x ==  tabview->tab_cnt_right)
+                {
+                    tabview->loop_status2 = 1;
+                    gui_list_t *node = NULL;
+                    gui_list_for_each(node, &obj->child_list)
+                    {
+                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                        if (GUI_TYPE(gui_tab_t, obj)->id.x == -tabview->tab_cnt_left)
+                        {
+                            GUI_TYPE(gui_tab_t, obj)->id.x = tabview->tab_cnt_right + 1;
+                        }
+                    }
+                }
+                if (tabview->loop_status2 && tabview->cur_id.x !=  tabview->tab_cnt_right)
+                {
+                    gui_list_t *node = NULL;
+                    gui_list_for_each(node, &obj->child_list)
+                    {
+                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                        if (GUI_TYPE(gui_tab_t, obj)->id.x == tabview->tab_cnt_right + 1)
+                        {
+                            GUI_TYPE(gui_tab_t, obj)->id.x = -tabview->tab_cnt_left;
+                        }
+                        tabview->loop_status2 = 0;
+                    }
+                }
+            }
+
+
+
+
+        }
+        else
+        {
+            if (tabview->tab_cnt_left == 0 && tabview->tab_cnt_right == 0)
+            {
+                break;
+            }
+            obj->dx = tp->deltaX;
+            this->release_x = obj->dx;
+            if (tabview->cur_id.x == 0 && tabview->tab_cnt_right == 0)
+            {
+                if (obj->dx < 0)
+                {
+                    obj->dx = 0;
+                    break;
+                }
+            }
+            if (tabview->cur_id.x == 0 && tabview->tab_cnt_left == 0)
+            {
+                if (obj->dx > 0)
+                {
+                    obj->dx = 0;
+                    this->release_x = 0;
+                    break;
+                }
+            }
             break;
         }
-        obj->dx = tp->deltaX;
-        this->release_x = obj->dx;
-        if (tabview->cur_id.x == 0 && tabview->tab_cnt_right == 0)
-        {
-            if (obj->dx < 0)
-            {
-                obj->dx = 0;
-                break;
-            }
-        }
-        if (tabview->cur_id.x == 0 && tabview->tab_cnt_left == 0)
-        {
-            if (obj->dx > 0)
-            {
-                obj->dx = 0;
-                this->release_x = 0;
-                break;
-            }
-        }
-        break;
+
+
     case TOUCH_HOLD_Y:
         if (tabview->tab_cnt_down == 0 && tabview->tab_cnt_up == 0)
         {
@@ -203,6 +278,19 @@ static void tabview_prepare(gui_obj_t *obj)
         {
             if (tabview->loop)
             {
+                if (tabview->loop_status2 && tabview->cur_id.x ==  tabview->tab_cnt_right)
+                {
+                    gui_list_t *node = NULL;
+                    gui_list_for_each(node, &obj->child_list)
+                    {
+                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                        if (GUI_TYPE(gui_tab_t, obj)->id.x == tabview->tab_cnt_right + 1)
+                        {
+                            GUI_TYPE(gui_tab_t, obj)->id.x = -tabview->tab_cnt_left;
+                        }
+                        tabview->loop_status2 = 0;
+                    }
+                }
                 gui_tabview_jump_tab(tabview, 0, 0);
                 if (tabview->jump.jump_flag)
                 {
@@ -226,6 +314,19 @@ static void tabview_prepare(gui_obj_t *obj)
         {
             if (tabview->loop)
             {
+                if (tabview->loop_status && tabview->cur_id.x ==  -tabview->tab_cnt_left)
+                {
+                    gui_list_t *node = NULL;
+                    gui_list_for_each(node, &obj->child_list)
+                    {
+                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                        if (GUI_TYPE(gui_tab_t, obj)->id.x == -tabview->tab_cnt_left - 1)
+                        {
+                            GUI_TYPE(gui_tab_t, obj)->id.x = tabview->tab_cnt_right;
+                        }
+                        tabview->loop_status = 0;
+                    }
+                }
                 gui_tabview_jump_tab(tabview, tabview->tab_cnt_right, 0);
                 if (tabview->jump.jump_flag)
                 {
