@@ -28,30 +28,18 @@
 void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
-
     uint8_t source_bytes_per_pixel = 2;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
@@ -62,7 +50,7 @@ void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
@@ -95,26 +83,15 @@ void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                             gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+//    int16_t image_x = 0;
+//    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -129,8 +106,8 @@ void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispde
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
-            uint8_t alpha = *(uint8_t *)(image_off + j + i * image_w);
-            uint16_t color_t = *(uint16_t *)(image_off + j * 2 + image_w * image_h);
+            uint8_t alpha = *(uint8_t *)(image_off + j + i * source_w);
+            uint16_t color_t = *(uint16_t *)(image_off + j * 2 + source_w * source_h);
             uint16_t *d = writebuf + (write_off + j);
             switch (opacity_value)
             {
@@ -162,26 +139,15 @@ void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispde
 void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                          gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -196,7 +162,7 @@ void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
@@ -236,26 +202,15 @@ void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *
 void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -268,7 +223,7 @@ void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -312,40 +267,28 @@ void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    uint8_t source_bytes_per_pixel = 4;
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
+    uint8_t source_bytes_per_pixel = 4;
     int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
     uint8_t opacity_value = image->opacity_value;
     for (uint32_t i = y_start; i < y_end; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -390,31 +333,18 @@ void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-    uint8_t opacity_value = image->opacity_value;
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
-
     uint8_t source_bytes_per_pixel = 2;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
 
@@ -426,9 +356,9 @@ void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
-
+        uint8_t opacity_value = image->opacity_value;
         uint8_t *writebuf = dc->frame_buf;
         uint16_t pixel;
         for (uint32_t j = x_start; j < x_end; j++)
@@ -463,26 +393,15 @@ void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -498,7 +417,7 @@ void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
@@ -536,26 +455,15 @@ void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -571,7 +479,7 @@ void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
@@ -609,26 +517,15 @@ void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -646,7 +543,7 @@ void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *d
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         for (uint32_t j = x_start; j < x_end; j++)
@@ -690,26 +587,15 @@ void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                              gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+//    int16_t image_x = 0;
+//    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -724,8 +610,8 @@ void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispd
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
-            uint8_t alpha = *(uint8_t *)(image_off + j + i * image_w);
-            uint16_t color_t = *(uint16_t *)(image_off + j * 2 + image_w * image_h);
+            uint8_t alpha = *(uint8_t *)(image_off + j + i * source_w);
+            uint16_t color_t = *(uint16_t *)(image_off + j * 2 + source_w * source_h);
             gui_color_t color = {.color.rgba.b = (color_t >> 11) << 3,
                                  .color.rgba.g = ((color_t & 0x07e0) >> 5) << 2,
                                  .color.rgba.r = (color_t & 0x001f) << 3,
@@ -763,30 +649,18 @@ void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispd
 void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                           gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
-
     uint8_t source_bytes_per_pixel = 3;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
@@ -798,7 +672,7 @@ void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev 
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
         for (uint32_t j = x_start; j < x_end; j++)
         {
@@ -843,26 +717,15 @@ void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev 
 void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -878,7 +741,7 @@ void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *d
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
@@ -917,26 +780,15 @@ void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                           gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int16_t image_x = 0;
+    int16_t image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -952,7 +804,7 @@ void alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev 
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;

@@ -26,26 +26,15 @@
 void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                  gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -60,7 +49,7 @@ void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -102,26 +91,15 @@ void bypass_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                  gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -134,7 +112,7 @@ void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -179,26 +157,15 @@ void bypass_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                    gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -211,7 +178,7 @@ void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -257,26 +224,15 @@ void bypass_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -292,7 +248,7 @@ void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
@@ -329,26 +285,15 @@ void bypass_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                  gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -364,7 +309,7 @@ void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
@@ -403,26 +348,15 @@ void bypass_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                    gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -438,7 +372,7 @@ void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
@@ -477,26 +411,15 @@ void bypass_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -514,7 +437,7 @@ void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         for (uint32_t j = x_start; j < x_end; j++)
@@ -560,26 +483,15 @@ void bypass_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                    gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -595,7 +507,7 @@ void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
@@ -633,26 +545,15 @@ void bypass_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 void bypass_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                      gui_rect_t *rect)
 {
-    int image_x = rect->x1;
-    int image_y = rect->y1;
-    int image_w = image->img_w;
-    int image_h = image->img_h;
-
-    int x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
-    if (rect->xboundright > 0)
-    {
-        x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    int y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
-    if (rect->yboundbottom > 0)
-    {
-        y_end = _UI_MIN(y_end, image_y + rect->yboundbottom);
-    }
-
-    if ((x_start >= x_end) || (y_start >= y_end))
+    int image_x = 0;
+    int image_y = 0;
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+    int16_t source_w = image->img_w;
+//    int16_t source_h = image->img_h;
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
@@ -668,7 +569,7 @@ void bypass_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
-        int read_off = ((i - image_y) * image_w) * source_bytes_per_pixel + read_x_off -
+        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
                        source_bytes_per_pixel * x_start;
 
         uint8_t *writebuf = dc->frame_buf;
