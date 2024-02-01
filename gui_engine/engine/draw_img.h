@@ -49,6 +49,7 @@ typedef enum
     IMG_BYPASS_MODE = 0,
     IMG_FILTER_BLACK,
     IMG_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
+    IMG_COVER_MODE,
 } BLEND_MODE_TYPE;
 
 typedef enum

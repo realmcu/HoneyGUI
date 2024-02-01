@@ -23,6 +23,7 @@
 #include "acc_engine.h"
 #include "acc_sw_rle.h"
 #include "acc_sw_bypass.h"
+#include "acc_sw_cover.h"
 #include "acc_sw_bypass_matrix.h"
 #include "acc_sw_filter.h"
 #include "acc_sw_filter_matrix.h"
@@ -115,7 +116,55 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
     {
         identity = false;
     }
+    if ((image->blend_mode == IMG_COVER_MODE) && (identity == true))
+    {
+        if (dc_bytes_per_pixel == 2)
+        {
+            if (img_type == RGB565)
+            {
+                cover_blit_rgb565_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                cover_blit_rgb888_2_rgb565(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                cover_blit_argb8888_2_rgb565(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+            if (img_type == RGB565)
+            {
+                cover_blit_rgb565_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                cover_blit_rgb888_2_rgb888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
 
+                cover_blit_argb8888_2_rgb888(image, dc, rect);
+            }
+        }
+        else if (dc_bytes_per_pixel == 4)
+        {
+            if (img_type == RGB565)
+            {
+                cover_blit_rgb565_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGB888)
+            {
+                cover_blit_rgb888_2_argb8888(image, dc, rect);
+            }
+            else if (img_type == RGBA8888)
+            {
+                cover_blit_argb8888_2_argb8888(image, dc, rect);
+            }
+        }
+    }
     if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == true))
     {
         if (dc_bytes_per_pixel == 2)
@@ -165,7 +214,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == false))
+    else if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == false))
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -214,7 +263,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == true))//no matrix
+    else if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -262,7 +311,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == false))//matrix
+    else if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == false))//matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -310,7 +359,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if ((image->blend_mode == IMG_SRC_OVER_MODE) && (identity == false))//matrix
+    else if ((image->blend_mode == IMG_SRC_OVER_MODE) && (identity == false))//matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -321,10 +370,6 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             else if (img_type == ARGB8565)
             {
                 alpha_matrix_blit_argb8565_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RTKARGB8565)
-            {
-                alpha_matrix_blit_rtkargb8565_2_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
@@ -360,9 +405,9 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             {
                 alpha_matrix_blit_argb8565_2_rgba8888(image, dc, rect);
             }
-            else if (img_type == RTKARGB8565)
+            else if (img_type == ARGB8565)
             {
-                alpha_matrix_blit_rtkargb8565_2_rgba8888(image, dc, rect);
+                // alpha_matrix_blit_argb8565_2_argb8888(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
@@ -374,7 +419,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    if ((image->blend_mode == IMG_SRC_OVER_MODE) && (identity == true))//no matrix
+    else if ((image->blend_mode == IMG_SRC_OVER_MODE) && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -385,10 +430,6 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             else if (img_type == ARGB8565)
             {
                 alpha_blend_blit_argb8565_to_rgb565(image, dc, rect);
-            }
-            else if (img_type == RTKARGB8565)
-            {
-                alpha_blend_blit_rtkargb8565_to_rgb565(image, dc, rect);
             }
             else if (img_type == RGB888)
             {
@@ -419,10 +460,6 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             if (img_type == RGB565)
             {
                 alpha_blend_blit_rgb565_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RTKARGB8565)
-            {
-                alpha_blend_blit_rtkargb8565_2_argb8888(image, dc, rect);
             }
             else if (img_type == ARGB8565)
             {

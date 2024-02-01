@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>GUI_KEIL_SIM ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI_FONT_RTK_MEM ENABLE_RTK_GUI ENABLE_RTK_GUI_DEMO</Define>
+              <Define>ENABLE_RTK_GUI_FONT_STB GUI_KEIL_SIM ENABLE_RTK_GUI_DEMO ENABLE_RTK_GUI ENABLE_RTK_GUI_FONT_RTK_MEM</Define>
               <Undefine></Undefine>
               <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;..\gui_engine;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget;..\gui_engine\example\demo</IncludePath>
             </VariousControls>
@@ -519,6 +519,11 @@
               <FilePath>..\gui_engine\engine\acc_sw_rle.c</FilePath>
             </File>
             <File>
+              <FileName>acc_sw_cover.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\acc_sw_cover.c</FilePath>
+            </File>
+            <File>
               <FileName>acc_sw_bypass.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\acc_sw_bypass.c</FilePath>
@@ -552,6 +557,11 @@
               <FileName>acc_sw_rle_bypass.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\acc_sw_rle_bypass.c</FilePath>
+            </File>
+            <File>
+              <FileName>acc_sw_rle_cover.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\acc_sw_rle_cover.c</FilePath>
             </File>
             <File>
               <FileName>acc_sw_rle_filter.c</FileName>
@@ -779,7 +789,7 @@
           <GroupName>gui_demo</GroupName>
           <Files>
             <File>
-              <FileName>demo_rtk_gui_demo.c</FileName>
+              <FileName>rtk_gui_demo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\example\demo\rtk_gui_demo.c</FilePath>
             </File>

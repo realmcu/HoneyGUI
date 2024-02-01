@@ -22,6 +22,7 @@
 #include "acc_engine.h"
 #include "acc_sw_rle.h"
 #include "acc_sw_rle_bypass.h"
+#include "acc_sw_rle_cover.h"
 #include "acc_sw_rle_bypass_matrix.h"
 #include "acc_sw_rle_filter.h"
 #include "acc_sw_rle_filter_matrix.h"
@@ -76,6 +77,26 @@ void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 
         addr = addr + sizeof(imdc_rgb565_node_t);
         linebuf = linebuf + node->len;
+    }
+}
+void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
+{
+    //imdc_file_header_t *header = (imdc_file_header_t *)file;
+    uint32_t start = (uint32_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint8_t *linebuf = (uint8_t *)buf;
+
+    for (uint32_t addr = start; addr < end;)
+    {
+        imdc_argb8565_node_t *node = (imdc_argb8565_node_t *)addr;
+        for (uint32_t i = 0; i < node->len; i++)
+        {
+            linebuf[i * 3 + 0] = node->pixel & 0xff;
+            linebuf[i * 3 + 1] = (node->pixel >> 8) & 0xff;
+            linebuf[i * 3 + 2] = node->alpha;
+        }
+        addr = addr + sizeof(imdc_argb8565_node_t);
+        linebuf = linebuf + node->len * 3;
     }
 }
 void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
@@ -180,7 +201,23 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
     {
         identity = false;
     }
-    if (image->blend_mode == IMG_BYPASS_MODE && (identity == true))//no matrix
+    if (image->blend_mode == IMG_COVER_MODE && (identity == true))//no matrix
+    {
+        if (dc_bytes_per_pixel == 2)
+        {
+            rle_cover_blit_2_rgb565(image, dc, rect);
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+            rle_cover_blit_2_rgb888(image, dc, rect);
+        }
+        else if (dc_bytes_per_pixel == 4)
+        {
+            rle_cover_blit_2_argb8888(image, dc, rect);
+        }
+
+    }
+    else if (image->blend_mode == IMG_BYPASS_MODE && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -196,7 +233,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
         }
 
     }
-    if (image->blend_mode == IMG_BYPASS_MODE && (identity == false))//matrix
+    else if (image->blend_mode == IMG_BYPASS_MODE && (identity == false))//matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
