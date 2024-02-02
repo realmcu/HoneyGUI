@@ -4,13 +4,13 @@ DECLARE_HANDLER(dataRst)
 {
 #ifdef RTL87x2G
     // Factory reset matter
-#ifdef CONFIG_REALTEK_BUILD_MATTER_SWITCH
+#ifdef ENABLE_MATTER_SWITCH
     gui_log("Erase matter flash \n");
     Bee4_KvsClean();
     otPlatFlashErase(NULL, 0);
 #endif
     gui_log("Reset from ui\n");
-    //WDG_SystemReset(RESET_ALL, RESET_REASON_FACTORY_RESET);
+    WDG_SystemReset(RESET_ALL, RESET_REASON_FACTORY_RESET);
 #endif
     return jerry_create_undefined();
 }
