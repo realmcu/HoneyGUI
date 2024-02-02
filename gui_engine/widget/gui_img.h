@@ -225,7 +225,7 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
  * @param file image file path
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
- * @return gui_magic_img_t*
+ * @return return the widget object pointer.
  */
 gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
 

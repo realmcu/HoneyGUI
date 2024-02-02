@@ -60,6 +60,7 @@ typedef struct gui_page
 
     int start_x;
     int start_y;
+    int align_hight;
     gui_img_t *scroll_bar;
     int get_yend;
     gui_animate_t *animate;
@@ -185,6 +186,13 @@ void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeatCount, void *ca
  * @param rebound true: config rebound; false: not rebound;
  */
 void gui_page_rebound(gui_page_t *this, bool rebound);
+/**
+ * @brief automatic center alignment
+ *
+ * @param page widget pointer
+ * @param align_hight
+ */
+void gui_page_center_alignment(gui_page_t *page, int align_hight);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

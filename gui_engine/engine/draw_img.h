@@ -40,6 +40,7 @@ typedef enum
     JPEG = 12,
     PNG = 13,
     GIF = 14,
+    RTKARGB8565 = 15,
 } GUI_FormatType;
 
 
@@ -48,6 +49,7 @@ typedef enum
     IMG_BYPASS_MODE = 0,
     IMG_FILTER_BLACK,
     IMG_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
+    IMG_COVER_MODE,
 } BLEND_MODE_TYPE;
 
 typedef enum
@@ -67,7 +69,7 @@ typedef struct draw_img
     void *data;
     struct gui_matrix *matrix;
     struct gui_matrix *inverse;
-    unsigned char opacity_value;
+    uint8_t opacity_value;
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
     uint32_t src_mode : 3;

@@ -28,7 +28,6 @@ config = ['./menu_config.h']
 DefineGroup('menuconfig', config, depend = [''], CPPPATH = path, CPPDEFINES = CPPDEFINES)
 
 src = ['main.c']
-src += ['rtk_gui_demo.c']
 
 
 CPPPATH = [cwd, 

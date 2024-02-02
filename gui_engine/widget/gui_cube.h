@@ -52,7 +52,8 @@ typedef enum
     CUBE_SIDE_UP,
     CUBE_SIDE_DOWN,
     CUBE_SIDE_LEFT,
-    CUBE_SIDE_RIGHT
+    CUBE_SIDE_RIGHT,
+    CUBE_SIDE_ALL
 } CUBE_SIDE_TYPE;
 
 typedef struct
@@ -171,6 +172,15 @@ typedef struct gui_cube
   * @{
   */
 
+/**
+ * @brief get the cube image's blend mode
+ *
+ * @param cube the cube widget pointer
+ * @param cube_side the cube image's side, CUBE_SIDE_ALL is not supported
+ * @return the cube image's blend mode
+ *
+ */
+BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side);
 
 /**
  * @brief set the cube image's blend mode
@@ -181,6 +191,26 @@ typedef struct gui_cube
  *
  */
 void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode);
+
+/**
+ * @brief get the cube image's opacity
+ *
+ * @param cube the cube widget pointer
+ * @param cube_side the cube image's side, CUBE_SIDE_ALL is not supported
+ * @return the cube image's opacity
+ *
+ */
+uint8_t gui_cube_get_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side);
+
+/**
+ * @brief set the cube image's opacity
+ *
+ * @param cube the cube widget pointer
+ * @param cube_side the cube image's side
+ * @param opacity the cube image's opacity
+ *
+ */
+void gui_cube_set_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side, uint8_t opacity);
 
 /**
  * @brief set cube image

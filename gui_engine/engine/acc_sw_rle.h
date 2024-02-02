@@ -56,6 +56,12 @@ typedef struct imdc_rgb565_node
     uint8_t len;
     uint16_t pixel16;  //rgb565
 } imdc_rgb565_node_t;
+typedef struct imdc_argb8565_node
+{
+    uint8_t len;
+    uint16_t pixel;  //argb8565
+    uint8_t alpha;
+} imdc_argb8565_node_t;
 typedef struct imdc_rgb888_node
 {
     uint8_t len;
@@ -80,6 +86,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc,
 void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len);
 void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len);
 void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf);
+void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void sw_acc_rle_uncompress(draw_img_t *image, void *buf);

@@ -138,6 +138,68 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
+    else if (img_type == 68)
+    {
+        uint8_t source_bytes_per_pixel = 3;
+
+        uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
+        imdc_file_t *file = (imdc_file_t *)image_off;
+        for (uint32_t y_i = y_start; y_i < y_end; y_i++)
+        {
+            int write_off = (y_i - dc->section.y1) * dc->fb_width ;
+//            int line = y_i - image_y;
+            for (int k = start_line; k <= end_line; k++)
+            {
+                uncompressed_rle_rgb888(file, k, line_buf + (k - start_line) * source_w * source_bytes_per_pixel);
+            }
+            uint32_t read_off = (uint32_t)line_buf ;
+            for (uint32_t j = x_start; j < x_end; j++)
+            {
+                float X = image->inverse->m[0][0] * j + image->inverse->m[0][1] * y_i + image->inverse->m[0][2];
+                float Y = image->inverse->m[1][0] * j + image->inverse->m[1][1] * y_i + image->inverse->m[1][2];
+                float Z = image->inverse->m[2][0] * j + image->inverse->m[2][1] * y_i + image->inverse->m[2][2];
+                int x_matrix = round(X / Z);
+                int y_matrix = round(Y / Z);
+
+                if ((x_matrix > source_w - 1) || (x_matrix < 0) || (y_matrix < 0) || (y_matrix > source_h - 1))
+                {
+                    continue;
+                }
+                uint8_t *pixel = (uint8_t *)(read_off + ((y_matrix - start_line) * source_w + x_matrix) *
+                                             source_bytes_per_pixel);
+                uint8_t alpha = pixel[2];
+                uint16_t color_t = (uint16_t)((((uint16_t)(pixel[1] & 0xff)) << 8) + (pixel[0] & 0xff));
+                uint8_t opacity_value = image->opacity_value;
+
+                switch (opacity_value)
+                {
+                case 0:
+                    break;
+                case 255:
+                    {
+                        uint16_t *d = writebuf + (write_off + j);
+                        *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
+                    }
+
+                    break;
+                default:
+                    {
+                        if (opacity_value < 255)
+                        {
+                            uint16_t *d = writebuf + (write_off + j);
+                            *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    break;
+                }
+
+            }
+        }
+    }
     else if (img_type == 68) //rle_alpha_matrix_rgb888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 3;

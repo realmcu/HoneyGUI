@@ -5,9 +5,9 @@ Convert pictures in various formats into RGB raw pictures
 * Open the converter. Please download from [```ImageConvert\ImageConverter.exe```](https://wiki.realtek.com/display/BTMKT/BLE+Soc+Image+Convert+Tool) 
 * The operation steps and detailed instructions are as follows: 
 
-
-![Image description](https://foruda.gitee.com/images/1686896876324689552/b3be8646_10088396.png "converter.png")
-
+<br/>
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1706602071562881120/e9191194_13671125.png "></div>
+<br/>
 
 ### Configuration
 - compress : Enable image compression

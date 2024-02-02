@@ -53,10 +53,6 @@ static void design_app_watch_ui(gui_app_t *app)
 
     gui_font_mem_init(FONT_BIN);
 
-#ifndef _WIN32
-#include "mem_config.h"
-    memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
-#endif
     tabview_main = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tabview_main, REDUCTION);
 
@@ -74,9 +70,11 @@ static void design_app_watch_ui(gui_app_t *app)
 
 }
 
-
+#if defined _WIN32
 uint8_t resource_root[1024 * 1024 * 20];
-static int wath_app_init(void)
+#endif
+
+static int watch_app_init(void)
 {
 #if defined _WIN32
     int fd;
@@ -99,5 +97,5 @@ static int wath_app_init(void)
     return 0;
 }
 
-GUI_INIT_APP_EXPORT(wath_app_init);
+GUI_INIT_APP_EXPORT(watch_app_init);
 

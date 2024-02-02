@@ -65,6 +65,8 @@ typedef struct gui_tabview
     gui_jump_t jump;
     SLIDE_STYLE style;
     bool loop;
+    bool loop_status;
+    bool loop_status2;
     int16_t release_x;
     int16_t release_y;
     uint8_t checksum;
