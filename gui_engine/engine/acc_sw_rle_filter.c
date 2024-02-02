@@ -25,15 +25,17 @@
 void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                               struct gui_rect *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
@@ -46,7 +48,7 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     if (img_type == 4)//rle_filter_565_2_565
     {
         uint8_t source_bytes_per_pixel = 2;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
 
         for (uint32_t i = y_start; i < y_end; i++)
         {
@@ -99,7 +101,7 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     else if (img_type == 68) //rle_filter_rgb888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 3;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -151,7 +153,7 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     else if (img_type == 132) //rle_filter_argb8888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 4;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         for (uint32_t i = y_start; i < y_end; i++)
         {
             int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -206,15 +208,17 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void rle_filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                               struct gui_rect *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
@@ -226,7 +230,7 @@ void rle_filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     if (img_type == 132)//rle_filter_rgba888_rgb888
     {
         uint8_t source_bytes_per_pixel = 4;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -271,7 +275,7 @@ void rle_filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     else if (img_type == 68) //rle_filter_rgb888_2_rgb888
     {
         uint8_t source_bytes_per_pixel = 3;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -316,7 +320,7 @@ void rle_filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     else if (img_type == 4) //rle_filter_rgb565_2_rgb888
     {
         uint8_t source_bytes_per_pixel = 2;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -366,15 +370,17 @@ void rle_filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                 struct gui_rect *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    int image_x = rect->x1;
+    int image_y = rect->y1;
+    int image_w = image->img_w;
+    int image_h = image->img_h;
+
+    int x_start = _UI_MAX(image_x, 0);
+    int x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    int y_start = _UI_MAX(dc->section.y1, image_y);
+    int y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+
+    if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
     }
@@ -386,7 +392,7 @@ void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     if (img_type == 132)
     {
         uint8_t source_bytes_per_pixel = 4;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -434,7 +440,7 @@ void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     else if (img_type == 68) //rle_filter_rgb888_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 3;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
@@ -482,7 +488,7 @@ void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     else if (img_type == 4) //rgb565_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 2;
-        uint8_t line_buf[source_bytes_per_pixel * source_w];
+        uint8_t line_buf[source_bytes_per_pixel * image_w];
         imdc_file_t *file = (imdc_file_t *)image_off;
         for (uint32_t y_i = y_start; y_i < y_end; y_i++)
         {
