@@ -5,7 +5,7 @@
 The canvas widget is the basic widget used to drawing graphics in nanovg.***Limitations: Sufficient memory is needed to open a framebuffer.***
 
 ## Usage
-### Creat a cube
+### Creat a canvas
 [gui_canvas_create(parent, name, addr, x, y, w, h)](#api) creates a canvas. This `addr` can be a null pointer.
 
 ### Add callback function
