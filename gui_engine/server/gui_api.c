@@ -488,6 +488,99 @@ uint32_t gui_ms_get(void)
     return os_api->thread_ms_get();
 }
 
+#if defined(_WIN32)
+struct file_load_node
+{
+    struct file_load_node *nxt;
+    uint32_t file_id;
+    void *mem_addr;
+};
+typedef struct file_load_node FIEL_LOAD_NODE;
+
+FIEL_LOAD_NODE *fielload_root;
+
+static uint32_t fileload_get_id(const char *str)
+{
+    uint32_t seed = 131;
+    uint32_t id = 0;
+
+    while (*str != '\0')
+    {
+        id = id * seed + *str;
+        str++;
+    }
+    return id;
+}
+
+static void fileload_insert_node(FIEL_LOAD_NODE *node)
+{
+    if (node == fielload_root)
+    {
+        return;
+    }
+    else
+    {
+        FIEL_LOAD_NODE *cur = fielload_root;
+        FIEL_LOAD_NODE *nxt = fielload_root;
+        while (nxt)
+        {
+            if (nxt->file_id > node->file_id)
+            {
+                if (nxt == fielload_root)
+                {
+                    fielload_root = node;
+                }
+                else
+                {
+                    cur->nxt = node;
+                }
+                node->nxt = nxt;
+                return;
+            }
+            cur = nxt;
+            nxt = cur->nxt;
+        }
+        cur->nxt = node;
+        return;
+    }
+}
+
+static FIEL_LOAD_NODE *fileload_get_node(const char *file)
+{
+    uint32_t file_id = fileload_get_id(file);
+    FIEL_LOAD_NODE *root = fielload_root;
+    FIEL_LOAD_NODE *node = NULL;
+
+    if (!root)
+    {
+        // empty file load list
+        fielload_root = (FIEL_LOAD_NODE *)gui_malloc(sizeof(FIEL_LOAD_NODE));
+        node = fielload_root;
+    }
+    else
+    {
+        root = fielload_root;
+        node = root;
+        // search node by file_id
+        while (node && (node->file_id < file_id))
+        {
+            node = node->nxt;
+        }
+        if (node && node->file_id == file_id)
+        {
+            return node;
+        }
+        node = (FIEL_LOAD_NODE *)gui_malloc(sizeof(FIEL_LOAD_NODE));
+    }
+
+    // GUI_ASSERT(node != NULL);
+    memset(node, 0, sizeof(FIEL_LOAD_NODE));
+    node->file_id = file_id;
+    fileload_insert_node(node);
+    return node;
+}
+#endif
+
 void *gui_get_file_address(const char *file)
 {
     if (file == NULL)
@@ -496,6 +589,15 @@ void *gui_get_file_address(const char *file)
     }
 #if defined(_WIN32)
     {
+        gui_log("get file: %s\n", file);
+        // check whether file has already been loaded
+        FIEL_LOAD_NODE *file_node = fileload_get_node(file);
+        if (file_node->mem_addr)
+        {
+            gui_log(">loaded\n");
+            return file_node->mem_addr;
+        }
+
         char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
         sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
 #ifndef O_BINARY
@@ -509,10 +611,12 @@ void *gui_get_file_address(const char *file)
         }
 
         int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+        gui_log(">malloc: %d\n", size);
         void *imgbuf = gui_malloc(size);
         memset(imgbuf, 0, size);
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, imgbuf, size);
+        file_node->mem_addr = imgbuf;
         return imgbuf;
     }
 #else

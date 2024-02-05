@@ -1807,15 +1807,20 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
                     gui_button_text_move((void *)parent, text_x, text_y);
-                    gui_color_t color_temporary;
-                    color_temporary.color.rgba_full = font_color;
-                    GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
+
+                    if (strlen(text))
+                    {
+                        gui_color_t color_temporary;
+                        color_temporary.color.rgba_full = font_color;
+                        GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
+                    }
                     if (style)
                     {
                         gui_button_api.onPress((void *)parent, sport_button_press, parent);
                         gui_button_api.onRelease((void *)parent, sport_button_release, parent);
                     }
 
+                    if (strlen(text))
                     {
                         char *font_type2 = NULL;
                         if (strstr(font_type, ".bin") != NULL)
