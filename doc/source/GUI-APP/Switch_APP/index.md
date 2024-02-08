@@ -6,15 +6,10 @@
 - The first app will gradually become transparent until it disappears when switching, and the second app will enlarge to fill the screen. 
 - Swipe on the second app interface to switch back to the first app.
 - The second app will gradually shrink and become transparent as you drag it until it disappears. The first app will shrink from very large to the screen size and gradually become opaque.
+<br>
 
-
-
-
-```eval_rst
-.. raw:: html
-
-    <iframe src="https://drive.google.com/file/d/1wGSv0POhBqSFntuhLz2p6x_5f_EUw3Ru/preview" width="640" height="480" allow="autoplay"></iframe>
-```
+<center><img width= "300" src="https://foruda.gitee.com/images/1707364376277366786/f2c74bf6_13671147.gif" /></center>
+<br>
 
 #### Source code of the first app
 - In the animation frame callback, execute app switching and implement the animation effect of app switching
