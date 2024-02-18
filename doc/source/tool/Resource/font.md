@@ -1,27 +1,22 @@
 # GUI-APP: UI resource font
 
-## Font bin generate
+Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table.txt file, custom.cST file), and find the vector font data corresponding characters according to the Unicode code from the font file (such as.ttf). Convert to a bitmap, and the output is a.bin file.
 
-### Generate a font library example
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1708226065411340283/b7deeeff_13674272.png  " ></div>
 
-#### The following uses the Font Convert Tool-v0.0.0.3 version as an example
+## Font bin generation
+Please refer to the following steps for how to generate files:
+* Copy the Font library file to the directory (`\Font Convert Tool\font`).
 
- 1. Copy the Font library file to the Font Convert Tool -v0.0.0.3 \Font
-   ![Alt text](image.png)
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1708422430971385686/cf46cfc0_13674272.png " ></div>
 
- 2. Edit FontConfig.json
-    Take HarmonyOS_Sans_SC_Regular.ttf with width 20 and height 20, ASCII display characters and Chinese today is Thursday as an example
-    ![Alt text](image-1.png)
+* You can refer to the documentation under the directory (`\Font Convert Tool\doc`) for the specific meanings of each parameter to config font parameters by edit FontConfig.json.
 
- 3. Double-click fontDirctionary.exe
- 4. Generated successfully
-   ![Alt text](image-2.png)
-   
-    Build failure
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1708422408570201826/3a92b27d_13674272.png " ></div>
 
-    ![Alt text](image-3.png)
-    
-    You need to check whether FontConfig.json is correctly configured
+* Double-click fontDirctionary.exe and then font bin will be Generated.
+
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1708422452689814303/44ce06d7_13674272.png " ></div>
 
 ## FontConfig.json Parameter description
 
