@@ -4,6 +4,7 @@ widgets
 ==================                   ==================
 Widgets                              Brief
 ------------------                   ------------------
+`glossary`_                          Widgets glossary
 `obj`_                               The root widget of the widget tree
 `window`_                            A rectangular container widget
 `img`_                               display image on the screen
@@ -24,6 +25,7 @@ Widgets                              Brief
 `perspective`_                       Slide to extend and retract curtains
 ==================                   ==================
 
+.. _glossary: widgets_glossary.html
 .. _obj: gui_obj.html
 .. _window: gui_window.html
 .. _img: gui_img.html
@@ -49,6 +51,7 @@ Widgets                              Brief
 .. toctree::
     :maxdepth: 2
 
+    glossary <widgets_glossary>
     obj <gui_obj>
     window <gui_window>
     img <gui_img>
