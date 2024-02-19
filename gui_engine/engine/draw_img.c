@@ -7,8 +7,8 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
     int16_t image_x = rect->x1;
     int16_t image_y = rect->y1;
 
-    int16_t image_w = image->target_w + 1;
-    int16_t image_h = image->target_h + 1;
+    int16_t image_w = image->target_w ;
+    int16_t image_h = image->target_h ;
 
     *x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     *x_end = _UI_MIN(image_x + image_w, dc->fb_width);
