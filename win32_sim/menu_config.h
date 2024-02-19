@@ -26,11 +26,11 @@
 // </c>
 
 // <c> RTK GUI Demo 368 448
-// #define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
+#define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
 // </c>
 
 // <c> RTK GUI Demo 454 454
-#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
+//#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
 
 // <c> RTK GUI Demo 280 456
@@ -110,7 +110,9 @@
 // </c>
 
 #endif
-
+// <c> RTK GUI Enable SasA
+#define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
+// </c>
 // </e>
 
 

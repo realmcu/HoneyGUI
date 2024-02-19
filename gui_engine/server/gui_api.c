@@ -587,19 +587,16 @@ void *gui_get_file_address(const char *file)
     {
         return NULL;
     }
+    char *root_folder = GUI_ROOT_FOLDER;
+#ifdef ENABLE_RTK_GUI_WATCHFACE_UPDATE
+#ifdef _WIN32
+    root_folder = "gui_engine\\example\\screen_448_368\\root_image_hongkong\\watch_face_update\\";
+#endif
+#endif
 #if defined(_WIN32)
     {
-        gui_log("get file: %s\n", file);
-        // check whether file has already been loaded
-        FIEL_LOAD_NODE *file_node = fileload_get_node(file);
-        if (file_node->mem_addr)
-        {
-            gui_log(">loaded\n");
-            return file_node->mem_addr;
-        }
-
-        char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
-        sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
+        char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
+        sprintf(path, "%s%s", root_folder, file);
 #ifndef O_BINARY
 #define O_BINARY 0100000
 #endif
@@ -611,18 +608,16 @@ void *gui_get_file_address(const char *file)
         }
 
         int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
-        gui_log(">malloc: %d\n", size);
         void *imgbuf = gui_malloc(size);
         memset(imgbuf, 0, size);
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, imgbuf, size);
-        file_node->mem_addr = imgbuf;
         return imgbuf;
     }
 #else
     {
-        char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
-        sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
+        char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
+        sprintf(path, "%s%s", root_folder, file);
         int fd = gui_fs_open(path,  0);
         gui_free(path);
         if (fd == -1)
@@ -639,4 +634,3 @@ void *gui_get_file_address(const char *file)
     }
 #endif
 }
-

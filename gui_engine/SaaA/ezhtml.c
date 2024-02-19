@@ -44,7 +44,9 @@ struct widget_create
     char *name;
     obj_type_t type;
 };
-#define WIDGETS_NUM 19
+
+#define WIDGETS_NUM 20
+#define MACRO_ANIMATETRANSFORM 9001
 struct widget_create widget[] =
 {
     { "win", WINDOW }, //
@@ -67,9 +69,17 @@ struct widget_create widget[] =
     {"radio", RADIO},
     {"appendTexts", RADIOSWITCH},
     {"arc", ARC},
-    {"movie", MOVIE}
+    {"movie", MOVIE},
+    {"animateTransform", MACRO_ANIMATETRANSFORM}
 };
+static void img_rotate_cb(gui_img_t *img)
+{
+    gui_img_translate(img, img->base.w / 2,
+                      img->base.h);
 
+    gui_img_rotation(img, 360 * img->animate->progress_percent, img->base.w / 2,
+                     img->base.h);
+}
 gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                        int16_t x,
                                        int16_t y)
@@ -549,6 +559,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         void *imgbuf = gui_get_file_address(file);
                         parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
+                        gui_img_set_mode(parent, IMG_SRC_OVER_MODE);
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);
@@ -2185,6 +2196,143 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
 
                 }
+                break;
+            case MACRO_ANIMATETRANSFORM:
+                {
+                    char *type = 0;
+                    char *from = 0;
+                    char *to = 0;
+                    char *dur = 0;
+                    char *repeatCount = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        //gui_log("p->attr[i]:%x\n",p->attr[i]);
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "from"))
+                        {
+                            from = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "dur"))
+                        {
+                            dur = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "repeatCount"))
+                        {
+                            repeatCount = (p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    if (type && from && to && dur && repeatCount)
+                    {
+                        int dur_num = 0;
+                        int from_num[3];
+                        int to_num[3];
+                        int repeat_num = 0;
+                        if (!strcmp(type, "rotate"))
+                        {
+                            {
+                                //from
+                                int from_length = strlen(from);
+                                int index[4];
+                                index[0] = 0;
+                                int idcount = 1;
+                                for (size_t i = 0; i < from_length + 1; i++)
+                                {
+                                    if (from[i] == ' ' || from[i] == '\0')
+                                    {
+                                        index[idcount] = i;
+                                        int num_length = index[idcount] - index[idcount - 1] + 1;
+                                        char num_char[num_length + 1];
+                                        num_char[num_length] = '\0';
+                                        memcpy(num_char, from + index[idcount - 1], num_length);
+                                        from_num[idcount - 1] = atoi(num_char);
+                                        idcount++;
+                                    }
+
+                                }
+                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                            }
+                            {
+                                //to
+                                int from_length = strlen(to);
+                                int index[4];
+                                index[0] = 0;
+
+                                int idcount = 1;
+                                for (size_t i = 0; i < from_length + 1; i++)
+                                {
+                                    if (to[i] == ' ' || to[i] == '\0')
+                                    {
+                                        index[idcount] = i;
+                                        int num_length = index[idcount] - index[idcount - 1] + 1;
+                                        char num_char[num_length + 1];
+                                        num_char[num_length] = '\0';
+                                        memcpy(num_char, to + index[idcount - 1], num_length);
+                                        to_num[idcount - 1] = atoi(num_char);
+                                        idcount++;
+                                    }
+
+                                }
+                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                            }
+                            {
+                                //dur
+                                int from_length = strlen(dur);
+                                int ms = 0;
+                                for (size_t i = 0; i < from_length + 1; i++)
+                                {
+                                    if (dur[i] == 'm')
+                                    {
+                                        ms = 1;
+                                        break;
+                                    }
+
+                                }
+                                dur_num = atoi(dur);
+                                if (!ms)
+                                {
+                                    dur_num = dur_num * 1000;
+                                }
+
+                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                            }
+                            {
+                                //repeatCount
+                                int repeatCount_num = 0;
+                                if (!strcmp(repeatCount, "indefinite"))
+                                {
+                                    repeatCount_num = -1;
+                                }
+                                else
+                                {
+                                    repeatCount_num = atoi(repeatCount);
+                                }
+                                repeat_num = repeatCount_num;
+
+                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                            }
+                        }
+                        {
+                            gui_img_set_animate(parent, dur_num, repeat_num, img_rotate_cb, parent);
+                        }
+
+
+                    }
+                }
+                break;
             default:
                 break;
             }
@@ -2292,11 +2440,13 @@ void foreach_count(ezxml_t p, size_t *widget_count)
         //handle_launcher_msg();
     }
 }*/
+
 void create_tree(gui_app_t *app)
 {
     ezxml_t f1 = ezxml_parse_file(app->xml);
     js = NULL;
     foreach_create(f1, &app->screen);
+#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_run_file(const char *file, gui_app_t  *app);
     if (js)
     {
@@ -2307,7 +2457,9 @@ void create_tree(gui_app_t *app)
 
         gui_free(path);
     }
+#endif
 }
+
 const char *get_child_ele_attr(char *xml, char *ele, char *txt, char *chile_ele, char *attr)
 {
     ezxml_t f1 = ezxml_parse_file(xml);
@@ -2454,6 +2606,11 @@ char *get_app_name(const char *xml)
         return s;
     }
     return NULL;
+}
+void create_tree_nest(char *xml, void *obj)
+{
+    ezxml_t f1 = ezxml_parse_file(xml);
+    foreach_create(f1, obj);
 }
 /*static gui_list_t app_list;
 static void screen_backfunc(gui_app_t *app)
