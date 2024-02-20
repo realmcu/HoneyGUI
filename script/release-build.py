@@ -313,21 +313,23 @@ class HoneyGUIRelease(WindowsToolRelease):
         comment = comment + self.release_notes
         jira.add_comment(subtask, comment)
 
-def update_version(ftp_helper, win_sftp, sdk_path, zip_file, version, update_latest_version):
+def update_version(ftp_helper, win_sftp, sdk_path, zip_file, version, update_latest_version, remote_path):
     print("Update {} to ali cloud server".format(version))
     #upoad html output to root folder
     win_sftp.upload(os.path.join(sdk_path, zip_file), "")
-    if win_sftp.isdir(version):
-        win_sftp.rm(version)
+    version_path = "{}/{}".format(remote_path, version)
+    if win_sftp.isdir(version_path):
+        win_sftp.rm(version_path)
     #unzip to version folder
-    win_sftp.unzip(zip_file, version)
+    win_sftp.unzip(zip_file, version_path)
     #update latest version
     if update_latest_version:
         print("Update latest version")
         latest_version = "latest"
-        if win_sftp.isdir(latest_version):
-            win_sftp.rm(latest_version)
-        win_sftp.unzip(zip_file, latest_version)
+        latest_version_path = "{}/{}".format(remote_path, latest_version)
+        if win_sftp.isdir(latest_version_path):
+            win_sftp.rm(latest_version_path)
+        win_sftp.unzip(zip_file, latest_version_path)
     win_sftp.disconnect()
     #remove html output zip
     win_sftp.connect()
@@ -335,7 +337,8 @@ def update_version(ftp_helper, win_sftp, sdk_path, zip_file, version, update_lat
     #update version list
     #download version list first
     version_list = "versionlist.txt"
-    win_sftp.download(version_list, os.getcwd())
+    version_list_path = "{}/{}".format(remote_path, version_list)
+    win_sftp.download(version_list_path, os.getcwd())
     with open(version_list, mode='r', newline='', errors='surrogateescape') as fd:
         stream = fd.read()
     if re.search(version + "\n", stream):
@@ -345,25 +348,28 @@ def update_version(ftp_helper, win_sftp, sdk_path, zip_file, version, update_lat
         with open(version_list, mode='w+', newline='', errors='surrogateescape') as fd:
             fd.write(stream + version + "\n")
         #upload version list to alicloud server
+        win_sftp.sftp.chdir(remote_path)
         win_sftp.upload(version_list, "")
     win_sftp.disconnect()
 
-def backup_old_version(ftp_helper, win_sftp, version, update_latest_version):
+def backup_old_version(ftp_helper, win_sftp, version, update_latest_version, remote_path):
     backup_path = os.path.join(os.getcwd(), "backup")
     if os.path.exists(backup_path):
         shutil.rmtree(backup_path)
     os.makedirs(backup_path)
-    if win_sftp.isdir(version):
+    version_path = "{}/{}".format(remote_path, version)
+    if win_sftp.isdir(version_path):
         print("backup {} first".format(version))
         zip_name = version + ".tar.gz"
-        win_sftp.zip(version, version)
+        win_sftp.zip(version, version_path)
         win_sftp.download(zip_name, backup_path)
         win_sftp.sftp.remove(zip_name)
     latest_version = "latest"
-    if update_latest_version and win_sftp.isdir(latest_version):
+    latest_version_path = "{}/{}".format(remote_path, latest_version)
+    if update_latest_version and win_sftp.isdir(latest_version_path):
         print("backup latest version")
         zip_name = latest_version + ".tar.gz"
-        win_sftp.zip(latest_version, latest_version)
+        win_sftp.zip(latest_version, latest_version_path)
         win_sftp.download(zip_name, backup_path)
         win_sftp.sftp.remove(zip_name)
     current_node = os.environ["node_name"]
@@ -378,7 +384,7 @@ def backup_old_version(ftp_helper, win_sftp, version, update_latest_version):
 
 def push_ali_cloud_server_version():
     version = os.getenv("Release_Version")
-    update_latest_version = False
+    honeygui_path = "HoneyGUI"
     version_rule = r'(v\d+\.\d+\.\d+\.\d+)(\.\w+)*'
     if not re.search(version_rule, version) and version not in ["master", "latest"]:
         sys.exit("Please check release version")
@@ -397,12 +403,12 @@ def push_ali_cloud_server_version():
     win_sftp.connect()
 
     #backup old version
-    backup_old_version(ftp_helper, win_sftp, version, update_latest_version)
+    backup_old_version(ftp_helper, win_sftp, version, update_latest_version, honeygui_path)
     #zip html output
     zip_name = version + ".tar.gz"
     shutil.make_archive(base_name=os.path.splitext(os.path.splitext(zip_name)[0])[0], format='gztar', root_dir=html_output_path)
     #update doc version
-    update_version(ftp_helper, win_sftp, sdk_path, zip_name, version, update_latest_version)
+    update_version(ftp_helper, win_sftp, sdk_path, zip_name, version, update_latest_version, honeygui_path)
 
 
 if __name__ == '__main__':
