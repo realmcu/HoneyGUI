@@ -77,7 +77,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_font_load(gui_text_t *text)
+static void gui_text_font_load(gui_text_t *text)
 {
     switch (text->font_type)
     {
@@ -91,7 +91,7 @@ static void gui_font_load(gui_text_t *text)
         break;
     }
 }
-static void gui_font_draw(gui_text_t *text, gui_rect_t *rect)
+static void gui_text_font_draw(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -109,7 +109,7 @@ static void gui_font_draw(gui_text_t *text, gui_rect_t *rect)
         break;
     }
 }
-static void gui_font_unload(gui_text_t *text)
+static void gui_text_font_unload(gui_text_t *text)
 {
     switch (text->font_type)
     {
@@ -124,9 +124,10 @@ static void gui_font_unload(gui_text_t *text)
     }
 }
 
-static void text_prepare(gui_obj_t *o)
+static void (obj_update_att)(struct _gui_obj_t *this)
 {
-    gui_text_t *obj = (void *)o;
+    gui_text_t *obj = (void *)this;
+
     if (obj->animate && obj->animate->animate)
     {
         size_t frame_count = obj->animate->dur * 30 / (1000);
@@ -159,7 +160,14 @@ static void text_prepare(gui_obj_t *o)
         obj->animate->progress_percent = ((float)(obj->animate->current_frame)) /
                                          ((float)(frame_count));
     }
+}
+
+static void gui_text_prepare(gui_obj_t *o)
+{
+    gui_text_t *obj = (void *)o;
     uint8_t last = obj->checksum;
+
+    obj_update_att(o);
     obj->checksum = 0;
     obj->checksum = gui_checksum(0, (uint8_t *)obj, sizeof(gui_text_t));
 
@@ -169,7 +177,7 @@ static void text_prepare(gui_obj_t *o)
     }
 }
 
-static void text_draw(gui_obj_t *obj)
+static void gui_text_draw(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
     if (text->len == 0)
@@ -188,18 +196,18 @@ static void text_draw(gui_obj_t *obj)
     draw_rect.y2 = draw_rect.y1 + obj->h;
     if (dc->section_count == 0)
     {
-        gui_font_load(text);
+        gui_text_font_load(text);
     }
-    gui_font_draw(text, &draw_rect);
+    gui_text_font_draw(text, &draw_rect);
     uint32_t total_section_count = dc->screen_height / dc->fb_height -
                                    ((dc->screen_height % dc->fb_height) ? 0 : 1);
     if (dc->section_count == total_section_count)
     {
-        gui_font_unload(text);
+        gui_text_font_unload(text);
     }
 }
 
-static void text_end(gui_obj_t *obj)
+static void gui_text_end(gui_obj_t *obj)
 {
 
 }
@@ -214,9 +222,9 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = TEXTBOX;
-    root->obj_prepare = text_prepare;
-    root->obj_draw = text_draw;
-    root->obj_end = text_end;
+    root->obj_prepare = gui_text_prepare;
+    root->obj_draw = gui_text_draw;
+    root->obj_end = gui_text_end;
 
     //for self
     this->mode = LEFT;
