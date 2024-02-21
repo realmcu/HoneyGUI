@@ -135,14 +135,14 @@ static void tab_text(void *tab)
     gui_text_set(text5, "abcdefg", "rtk_font_mem", APP_COLOR_WHITE, 7, 64);
     gui_text_mode_set(text5, LEFT);
 
-    gui_scroll_text_t *scrool_text1 = gui_scrolltext_create(tab,  "scrool_text1",  80, 300, 100, 50);
-    gui_scrolltext_scroll_set(scrool_text1, SCROLL_X, 100, 0, 3000, 1500000);
-    gui_scrolltext_text_set(scrool_text1, "0123456789", "rtk_font_mem", gui_rgb(0, 0xff, 0), 10, 32);
+    gui_scroll_text_t *scrool_text1 = gui_scroll_text_create(tab,  "scrool_text1",  80, 300, 100, 50);
+    gui_scroll_text_scroll_set(scrool_text1, SCROLL_X, 100, 0, 3000, 1500000);
+    gui_scroll_text_set(scrool_text1, "0123456789", "rtk_font_mem", gui_rgb(0, 0xff, 0), 10, 32);
 
-    gui_scroll_text_t *scrool_text2 = gui_scrolltext_create(tab,  "scrool_text2",  80, 360, 100, 60);
-    gui_scrolltext_scroll_set(scrool_text2, SCROLL_Y, 100, 0, 3000, 1500000);
-    gui_scrolltext_text_set(scrool_text2, "123456789012345678901234567890", "rtk_font_mem",
-                            APP_COLOR_WHITE, 30, 32);
+    gui_scroll_text_t *scrool_text2 = gui_scroll_text_create(tab,  "scrool_text2",  80, 360, 100, 60);
+    gui_scroll_text_scroll_set(scrool_text2, SCROLL_Y, 100, 0, 3000, 1500000);
+    gui_scroll_text_set(scrool_text2, "123456789012345678901234567890", "rtk_font_mem",
+                        APP_COLOR_WHITE, 30, 32);
 #else
     gui_color_t color[FONT_NUM];
     color[0] = gui_rgba(0xff, 0, 0, 0xff);

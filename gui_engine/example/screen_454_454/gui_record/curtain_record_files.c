@@ -182,11 +182,11 @@ static void win_add_record_files_touch_cb(void *obj, gui_event_t event)
                              GUI_EVENT_TOUCH_LONG, NULL);
 
         char *string_record_files = record_files_name[record_file_num];
-        scroll_text_record_files[record_file_num] = gui_scrolltext_create(
+        scroll_text_record_files[record_file_num] = gui_scroll_text_create(
                                                         switch_record_files[record_file_num], "scroll_text_record_files", 39, 11, 192, FONT_H_32);
-        gui_scrolltext_text_set(scroll_text_record_files[record_file_num], string_record_files,
-                                "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_record_files), FONT_H_32);
-        gui_scrolltext_scroll_set(scroll_text_record_files[record_file_num], SCROLL_X, 0, 0, 5000, 0);
+        gui_scroll_text_set(scroll_text_record_files[record_file_num], string_record_files,
+                            "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_record_files), FONT_H_32);
+        gui_scroll_text_scroll_set(scroll_text_record_files[record_file_num], SCROLL_X, 0, 0, 5000, 0);
         gui_log("win_add_record_files_touch_cb scroll_text_record_files = 0x%x, num = %d\n",
                 (uint32_t *)scroll_text_record_files[record_file_num], record_file_num);
 

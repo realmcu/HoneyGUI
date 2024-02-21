@@ -71,8 +71,8 @@ static void scroll_text_record_play_title_animate_cb(void *obj)
     gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", (uint32_t *)file_name);
 
     char *string_title = (char *)file_name->base.content;
-    gui_scrolltext_text_set(scroll_text_record_play_title, string_title, "rtk_font_mem",
-                            gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_title), FONT_H_32);
+    gui_scroll_text_set(scroll_text_record_play_title, string_title, "rtk_font_mem",
+                        gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_title), FONT_H_32);
 }
 
 static void text_record_play_time_animate_cb(void *obj)
@@ -101,11 +101,11 @@ void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_fil
     gui_obj_add_event_cb(switch_record_play_pause, (gui_event_cb_t)switch_record_play_pause_touch_cb,
                          GUI_EVENT_2, NULL);
 
-    scroll_text_record_play_title = gui_scrolltext_create(parent, "scroll_text_record_play_title", 170,
-                                                          24, 128, FONT_H_32);
-    gui_scrolltext_scroll_set(scroll_text_record_play_title, SCROLL_X, 0, 0, 5000, 0);
-    gui_scrolltext_text_set(scroll_text_record_play_title, "录音文件123456", "rtk_font_mem",
-                            gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen("录音文件123456"), FONT_H_32);
+    scroll_text_record_play_title = gui_scroll_text_create(parent, "scroll_text_record_play_title", 170,
+                                                           24, 128, FONT_H_32);
+    gui_scroll_text_scroll_set(scroll_text_record_play_title, SCROLL_X, 0, 0, 5000, 0);
+    gui_scroll_text_set(scroll_text_record_play_title, "录音文件123456", "rtk_font_mem",
+                        gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen("录音文件123456"), FONT_H_32);
     gui_text_set_animate(scroll_text_record_play_title, 1000, 2,
                          scroll_text_record_play_title_animate_cb, selected_record_file);
 

@@ -462,14 +462,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         else
                         {
-                            gui_scroll_text_t *scroll_text = gui_scrolltext_create(parent,  ptxt, x, y,
-                                                                                   strlen(text) * (fontSize / 4), h);
-                            gui_scrolltext_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
+                            gui_scroll_text_t *scroll_text = gui_scroll_text_create(parent,  ptxt, x, y,
+                                                                                    strlen(text) * (fontSize / 4), h);
+                            gui_scroll_text_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
                             gui_color_t color_temporary;
                             color_temporary.color.rgba_full = color;
-                            gui_scrolltext_text_set(scroll_text, gui_strdup(text), "rtk_font_stb", color_temporary,
-                                                    strlen(text),
-                                                    fontSize);
+                            gui_scroll_text_set(scroll_text, gui_strdup(text), "rtk_font_stb", color_temporary,
+                                                strlen(text),
+                                                fontSize);
                             t = (void *)scroll_text;
                         }
 

@@ -113,7 +113,7 @@ typedef struct gui_scroll_text
  * @brief Creat a scroll text widget.
  * @note Scroll text widget can show horizontal and vertical scroll text.
  * @note If the width of the text is less than the width of the text box, the text will stand still.
- * @note Scroll and text properties need to be set by gui_scrolltext_scroll_set and gui_scrolltext_text_set.
+ * @note Scroll and text properties need to be set by gui_scroll_text_scroll_set and gui_scroll_text_set.
  * @param parent The father widget which the scroll text nested in.
  * @param name The widget's name.
  * @param x The X-axis coordinate of the text box.
@@ -123,8 +123,8 @@ typedef struct gui_scroll_text
  * @return Return the widget object pointer: gui_scroll_text_t*
  *
  */
-gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t x,
-                                         int16_t y, int16_t w, int16_t h);
+gui_scroll_text_t *gui_scroll_text_create(void *parent, const char *name, int16_t x,
+                                          int16_t y, int16_t w, int16_t h);
 
 /**
  * @brief Set the text scroll property of the scroll text box.
@@ -138,9 +138,9 @@ gui_scroll_text_t *gui_scrolltext_create(void *parent, const char *name, int16_t
  * @return void
  *
  */
-void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t start_value,
-                               uint8_t end_value,
-                               uint32_t interval_time_ms, uint32_t duration_time_ms);
+void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t start_value,
+                                uint8_t end_value,
+                                uint32_t interval_time_ms, uint32_t duration_time_ms);
 
 /**
 * @brief set the string in a scroll text box widget.
@@ -154,17 +154,16 @@ void gui_scrolltext_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t 
 * @return void
 *
 */
-void gui_scrolltext_text_set(gui_scroll_text_t *this, void *text, char *text_type,
-                             gui_color_t color,
-                             uint16_t length, uint8_t font_size);
+void gui_scroll_text_set(gui_scroll_text_t *this, void *text, char *text_type,
+                         gui_color_t color,
+                         uint16_t length, uint8_t font_size);
 
-/**
- * @brief set font encoding
+/** * @brief set font encoding
  * @note utf-8 or unicode
  * @param this the scroll text box widget pointer
  * @param encoding_type encoding_type
  */
-void gui_scrolltext_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset);
+void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset);
 
 /**
  * @brief set font type
@@ -172,7 +171,7 @@ void gui_scrolltext_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset);
  * @param this the scroll text widget pointer
  * @param font_source the addr of .ttf or .bin
  */
-void gui_scrolltext_type_set(gui_scroll_text_t *this, void *font_source);
+void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source);
 
 /**
  * @brief set scroll text skip frame
@@ -180,7 +179,7 @@ void gui_scrolltext_type_set(gui_scroll_text_t *this, void *font_source);
  * @param skip_frame The number of frames that need to be skipped.
  * If the value is 2, then scrolling text will skip two frames and scroll one frame.
  */
-void gui_scrolltext_skip_frame_set(uint8_t skip_frame);
+void gui_scroll_text_skip_frame_set(uint8_t skip_frame);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
