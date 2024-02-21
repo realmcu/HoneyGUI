@@ -142,6 +142,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
     int source_h = image->img_h;
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     uint8_t img_type = *((uint8_t *)image_off);
+    uint8_t img_color_type = *((uint8_t *)image_off + 1);
     imdc_file_t *file = (imdc_file_t *)image_off;
     uint8_t *line_buf = buf;
     struct gui_rgb_data_head *head = image->data;
@@ -158,7 +159,16 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
         }
         head->type = RGB565;
     }
-    else if (img_type == 68)//rle_rgb888
+    else if (img_type == 68 && img_color_type == ARGB8565)//rle_argb8565
+    {
+        uint8_t source_bytes_per_pixel = 3;
+        for (int k = 0; k < source_h; k++)
+        {
+            uncompressed_rle_argb8565(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
+        }
+        head->type = ARGB8565;
+    }
+    else if (img_type == 68 && img_color_type == RGB888)//rle_rgb888
     {
         uint8_t source_bytes_per_pixel = 3;
         for (int k = 0; k < source_h; k++)

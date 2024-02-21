@@ -122,7 +122,7 @@ void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispde
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
+                        // opacity_value = alpha * opacity_value / 255;
                         *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
                     }
                     else
@@ -185,7 +185,7 @@ void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
+                        // opacity_value = alpha * opacity_value / 255;
                         *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
                     }
                     else
@@ -632,7 +632,7 @@ void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispd
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
+                        // opacity_value = alpha * opacity_value / 255;
                         do_blending_2_argb8888_opacity(d, &color, opacity_value);
                     }
                     else
@@ -699,7 +699,6 @@ void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev 
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
                         do_blending_2_argb8888_opacity(d, &color, opacity_value);
                     }
                     else
