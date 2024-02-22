@@ -28,8 +28,8 @@
 void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -83,8 +83,8 @@ void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                             gui_rect_t *rect)
 {
-//    int16_t image_x = 0;
-//    int16_t image_y = 0;
+    // int16_t image_x = rect->x1;
+    // int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -122,7 +122,7 @@ void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispde
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
+                        // opacity_value = alpha * opacity_value / 255;
                         *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
                     }
                     else
@@ -139,8 +139,8 @@ void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispde
 void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                          gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -185,7 +185,7 @@ void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
+                        // opacity_value = alpha * opacity_value / 255;
                         *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
                     }
                     else
@@ -202,8 +202,8 @@ void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *
 void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -267,8 +267,8 @@ void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -333,8 +333,8 @@ void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -393,8 +393,8 @@ void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -455,8 +455,8 @@ void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -517,8 +517,8 @@ void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -587,8 +587,8 @@ void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                              gui_rect_t *rect)
 {
-//    int16_t image_x = 0;
-//    int16_t image_y = 0;
+    // int16_t image_x = rect->x1;
+    // int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -632,7 +632,7 @@ void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispd
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
+                        // opacity_value = alpha * opacity_value / 255;
                         do_blending_2_argb8888_opacity(d, &color, opacity_value);
                     }
                     else
@@ -649,8 +649,8 @@ void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispd
 void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                           gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -699,7 +699,6 @@ void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev 
                 {
                     if (opacity_value < 255)
                     {
-                        opacity_value = alpha * opacity_value / 255;
                         do_blending_2_argb8888_opacity(d, &color, opacity_value);
                     }
                     else
@@ -717,8 +716,8 @@ void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev 
 void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -780,8 +779,8 @@ void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *d
 void alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                           gui_rect_t *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;

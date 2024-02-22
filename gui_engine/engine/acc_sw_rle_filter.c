@@ -25,8 +25,8 @@
 void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                               struct gui_rect *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -206,8 +206,8 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void rle_filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                               struct gui_rect *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -366,8 +366,8 @@ void rle_filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void rle_filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                 struct gui_rect *rect)
 {
-    int16_t image_x = 0;
-    int16_t image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;

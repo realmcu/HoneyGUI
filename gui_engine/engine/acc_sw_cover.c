@@ -26,8 +26,8 @@
 void cover_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                 gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -64,8 +64,8 @@ void cover_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                 gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -103,8 +103,8 @@ void cover_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                                   gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -142,8 +142,8 @@ void cover_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                 gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -184,8 +184,8 @@ void cover_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                 gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -227,8 +227,8 @@ void cover_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                   gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -270,8 +270,8 @@ void cover_blit_argb8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                   gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -313,8 +313,8 @@ void cover_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                   gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -355,8 +355,8 @@ void cover_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 void cover_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                     gui_rect_t *rect)
 {
-    int image_x = 0;
-    int image_y = 0;
+    int16_t image_x = rect->x1;
+    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
