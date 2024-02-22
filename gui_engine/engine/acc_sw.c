@@ -120,243 +120,75 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
     {
         if (dc_bytes_per_pixel == 2)
         {
-            if (img_type == RGB565)
-            {
-                cover_blit_rgb565_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                cover_blit_rgb888_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                cover_blit_argb8888_2_rgb565(image, dc, rect);
-            }
+            cover_blit_2_rgb565(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 3)
         {
-            if (img_type == RGB565)
-            {
-                cover_blit_rgb565_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                cover_blit_rgb888_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-
-                cover_blit_argb8888_2_rgb888(image, dc, rect);
-            }
+            cover_blit_2_rgb888(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 4)
         {
-            if (img_type == RGB565)
-            {
-                cover_blit_rgb565_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                cover_blit_rgb888_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                cover_blit_argb8888_2_argb8888(image, dc, rect);
-            }
+            cover_blit_2_argb8888(image, dc, rect);
         }
     }
     if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == true))
     {
         if (dc_bytes_per_pixel == 2)
         {
-            if (img_type == RGB565)
-            {
-                bypass_blit_rgb565_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                bypass_blit_rgb888_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                bypass_blit_argb8888_2_rgb565(image, dc, rect);
-            }
+            bypass_blit_2_rgb565(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 3)
         {
-            if (img_type == RGB565)
-            {
-                bypass_blit_rgb565_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                bypass_blit_rgb888_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-
-                bypass_blit_argb8888_2_rgb888(image, dc, rect);
-            }
+            bypass_blit_2_rgb888(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 4)
         {
-            if (img_type == RGB565)
-            {
-                bypass_blit_rgb565_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                bypass_blit_rgb888_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                bypass_blit_argb8888_2_argb8888(image, dc, rect);
-            }
+            bypass_blit_2_argb8888(image, dc, rect);
         }
     }
     else if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == false))
     {
         if (dc_bytes_per_pixel == 2)
         {
-            if (img_type == RGB565)
-            {
-                bypass_matrix_blit_rgb565_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                bypass_matrix_blit_rgb888_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                bypass_matrix_blit_argb8888_2_rgb565(image, dc, rect);
-            }
+            bypass_matrix_blit_2_rgb565(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 3)
         {
-            if (img_type == RGB565)
-            {
-                bypass_matrix_blit_rgb565_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                bypass_matrix_blit_rgb888_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-
-                bypass_matrix_blit_argb8888_2_rgb888(image, dc, rect);
-            }
+            bypass_matrix_blit_2_rgb888(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 4)
         {
-            if (img_type == RGB565)
-            {
-                bypass_matrix_blit_rgb565_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                bypass_matrix_blit_rgb888_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                bypass_matrix_blit_argb8888_2_argb8888(image, dc, rect);
-            }
+            bypass_matrix_blit_2_argb8888(image, dc, rect);
         }
     }
     else if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == true))//no matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
-            if (img_type == RGB565)
-            {
-                filter_blit_rgb565_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                filter_blit_rgb888_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                filter_blit_rgba8888_2_rgb565(image, dc, rect);
-            }
+            filter_blit_2_rgb565(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 3)
         {
-            if (img_type == RGB565)
-            {
-                filter_blit_rgb565_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                filter_blit_rgb888_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                filter_blit_argb8888_2_rgb888(image, dc, rect);
-            }
+            filter_blit_2_rgb888(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 4)
         {
-            if (img_type == RGB565)
-            {
-                filter_blit_rgb565_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                filter_blit_rgb888_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                filter_blit_rgba8888_2_argb8888(image, dc, rect);
-            }
+            filter_blit_2_argb8888(image, dc, rect);
         }
     }
     else if ((image->blend_mode == IMG_FILTER_BLACK) && (identity == false))//matrix
     {
         if (dc_bytes_per_pixel == 2)
         {
-            if (img_type == RGB565)
-            {
-                cpu_filter_matrix_blit_rgb565_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                cpu_filter_matrix_blit_rgb888_2_rgb565(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                cpu_filter_matrix_blit_argb8888_2_rgb565(image, dc, rect);
-            }
+            filter_matrix_blit_2_rgb565(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 3)
         {
-            if (img_type == RGB565)
-            {
-                cpu_filter_matrix_blit_rgb565_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                cpu_filter_matrix_blit_rgb888_2_rgb888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                cpu_filter_matrix_blit_argb8888_2_rgb888(image, dc, rect);
-            }
+            filter_matrix_blit_2_rgb888(image, dc, rect);
         }
         else if (dc_bytes_per_pixel == 4)
         {
-            if (img_type == RGB565)
-            {
-                cpu_filter_matrix_blit_rgb565_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGB888)
-            {
-                cpu_filter_matrix_blit_rgb888_2_argb8888(image, dc, rect);
-            }
-            else if (img_type == RGBA8888)
-            {
-                cpu_filter_matrix_blit_argb8888_2_argb8888(image, dc, rect);
-            }
+            filter_matrix_blit_2_argb8888(image, dc, rect);
         }
     }
     else if ((image->blend_mode == IMG_SRC_OVER_MODE) && (identity == false))//matrix
