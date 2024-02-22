@@ -14,8 +14,8 @@
 #define DRV_LCD_WIDTH   320
 #define DRV_LCD_HIGHT   384
 #else
-#define DRV_LCD_WIDTH   368
-#define DRV_LCD_HIGHT   448
+#define DRV_LCD_WIDTH   454
+#define DRV_LCD_HIGHT   454
 #endif // 0
 #define DRV_PIXEL_BITS  32
 #define LCD_SECTION_HEIGHT 10
@@ -234,7 +234,7 @@ void *rtk_gui_sdl(void *arg)
             break;
         case SDL_KEYDOWN:
             {
-                //gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
+                // gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_DOWN;
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
@@ -243,9 +243,11 @@ void *rtk_gui_sdl(void *arg)
             break;
         case SDL_KEYUP:
             {
-                //gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
+                // gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_UP;
                 memset(kb_port_data.name, 0x00, 10);
+                memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
+                       strlen(SDL_GetKeyName(event.key.keysym.sym)));
             }
             break;
         case SDL_QUIT:
@@ -318,6 +320,11 @@ struct gui_touch_data *port_touchpad_get_data()
 
 gui_kb_port_data_t *port_kb_get_data(void)
 {
+    unsigned long now = (unsigned long) time(NULL);
+    struct timeval tv;
+    mingw_gettimeofday(&tv, NULL);
+
+    kb_port_data.timestamp_ms = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
     return &kb_port_data;
 }
 
@@ -333,7 +340,7 @@ static struct gui_indev indev =
     .short_button_time_ms = 800,
     .quick_slide_time_ms = 50,
 
-    .kb_short_button_time_ms = 300,
+    .kb_short_button_time_ms = 30,
     .kb_long_button_time_ms = 800,
 };
 

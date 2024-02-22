@@ -12,20 +12,6 @@ extern "C" {
 #endif
 
 
-//#define GUI_EVENT_PRESSED               (1<<0)
-//#define GUI_EVENT_PRESSING              (1<<1)
-//#define GUI_EVENT_CLICKED               (1<<2)
-//#define GUI_EVENT_TOUCH_RIGHT_SLIDE     (1<<3)
-//#define GUI_EVENT_TOUCH_LEFT_SLIDE      (1<<4)
-
-//#define GUI_EVENT_KB_UP_PRESSED         (1<<5)
-//#define GUI_EVENT_KB_UP_RELEASED        (1<<6)
-//#define GUI_EVENT_KB_DOWN_PRESSED       (1<<7)
-//#define GUI_EVENT_KB_DOWN_RELEASED      (1<<8)
-
-//#define GUI_EVENT_PROCESSED             (0xFFFFFFFF)
-
-
 typedef enum
 {
     GUI_EVENT_INVALIDE,
@@ -42,6 +28,9 @@ typedef enum
     GUI_EVENT_KB_UP_RELEASED,
     GUI_EVENT_KB_DOWN_PRESSED,
     GUI_EVENT_KB_DOWN_RELEASED,
+
+    GUI_EVENT_KB_SHORT_CLICKED,
+    GUI_EVENT_KB_LONG_CLICKED,
     /** Special events*/
     /** Other events*/
     GUI_EVENT_1,
