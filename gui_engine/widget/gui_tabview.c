@@ -301,10 +301,14 @@ static void tabview_prepare(gui_obj_t *obj)
                     return;
                 }
             }
-            return;
         }
-        tabview->cur_id.x = tabview->cur_id.x + 1;
-        this->release_x = this->release_x + tabview->base.w;
+        else
+        {
+            tabview->cur_id.x = tabview->cur_id.x + 1;
+            this->release_x = this->release_x + tabview->base.w;
+        }
+
+
         break;
     case TOUCH_RIGHT_SLIDE:
         gui_log("TOUCH_RIGHT_SLIDE0\n");
@@ -337,14 +341,19 @@ static void tabview_prepare(gui_obj_t *obj)
                     return;
                 }
             }
-            return;
+
         }
-        if (tabview->tab_cnt_left == 0 && tabview->cur_id.x == 0)
+        else
         {
-            break;
+            if (tabview->tab_cnt_left == 0 && tabview->cur_id.x == 0)
+            {
+                break;
+            }
+            tabview->cur_id.x = tabview->cur_id.x - 1;
+            this->release_x = this->release_x - tabview->base.w;
         }
-        tabview->cur_id.x = tabview->cur_id.x - 1;
-        this->release_x = this->release_x - tabview->base.w;
+
+
         break;
     case TOUCH_DOWN_SLIDE:
         gui_log("TOUCH_DOWN_SLIDE\n");
