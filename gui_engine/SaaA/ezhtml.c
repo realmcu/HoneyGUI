@@ -46,7 +46,7 @@ struct widget_create
 };
 
 #define WIDGETS_NUM 20
-#define MACRO_ANIMATETRANSFORM 9001
+
 struct widget_create widget[] =
 {
     { "win", WINDOW }, //
@@ -559,7 +559,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         void *imgbuf = gui_get_file_address(file);
                         parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
-                        gui_img_set_mode(parent, IMG_SRC_OVER_MODE);
+                        gui_img_set_mode((gui_img_t *)parent, IMG_SRC_OVER_MODE);
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);
@@ -2326,7 +2326,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
                         }
                         {
-                            gui_img_set_animate(parent, dur_num, repeat_num, img_rotate_cb, parent);
+                            gui_img_set_animate((gui_img_t *)parent, dur_num, repeat_num, img_rotate_cb, parent);
                         }
 
 

@@ -332,6 +332,7 @@ typedef enum obj_type
     CARD,
     PAGELIST,
     PAGELISTVIEW,
+    MACRO_ANIMATETRANSFORM,
 } obj_type_t;
 typedef struct gui_msg
 {
