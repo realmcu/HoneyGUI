@@ -145,9 +145,11 @@ void gui_indev_info_register(struct gui_indev *info);
 
 void ext_button_set_indicate(void (*callback)(void));
 
-struct gui_touch_data *touchpad_get_data(void);
+gui_touch_port_data_t *touchpad_get_data(void);
 
 gui_kb_port_data_t *kb_get_data(void);
+
+gui_wheel_port_data_t *wheel_get_data(void);
 
 struct gui_indev *gui_get_indev(void);
 struct gui_dispdev *gui_get_dc(void);

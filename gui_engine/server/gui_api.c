@@ -68,7 +68,7 @@ void ext_button_set_indicate(void (*callback)(void))
 }
 
 
-struct gui_touch_data *touchpad_get_data(void)
+gui_touch_port_data_t *touchpad_get_data(void)
 {
     if (indev->tp_get_data)
     {
@@ -88,6 +88,15 @@ gui_kb_port_data_t *kb_get_data(void)
     return NULL;
 }
 
+gui_wheel_port_data_t *wheel_get_data(void)
+{
+    if (indev->wheel_get_port_data)
+    {
+        return indev->wheel_get_port_data();
+    }
+    GUI_ASSERT(NULL != NULL);
+    return NULL;
+}
 
 
 struct gui_dispdev *gui_get_dc(void)

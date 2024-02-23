@@ -62,7 +62,7 @@ extern "C" {
 
 
 
-typedef struct gui_touch_data
+typedef struct gui_touch_port_data
 {
     uint8_t          event;                 /* The touch event of the data */
     uint8_t          track_id;              /* Track id of point */
@@ -71,7 +71,7 @@ typedef struct gui_touch_data
     uint16_t         y_coordinate;          /* Point of y coordinate */
     uint32_t         timestamp_ms;             /* The timestamp when the data was received */
     void            *data;
-} gui_touch_data_t;
+} gui_touch_port_data_t;
 
 typedef struct touch_info
 {
@@ -101,21 +101,18 @@ typedef struct kb_info
     uint8_t pressing : 1;
 } kb_info_t;
 
-typedef enum
+typedef struct gui_wheel_port_data
 {
-    GUI_SRV_EXEC,
-    GUI_SRV_TP,
-    GUI_SRV_CB,
-    GUI_SRV_CB_TREEFREE,
-    GUI_SRV_TP_INT,
-    GUI_SRV_TP_TIMEOUT,
-    GUI_SRV_CB_JS,
-    GUI_SRV_RUN_JS,
-    GUI_SRV_CB_CHILDTREEFREE,
-    GUI_SRV_EXT_BUTTON,
-    GUI_SRV_WAKEUP,
-} GUI_SRV_TYPE;
+    uint8_t       event;
+    int16_t       delta;
+    uint32_t      timestamp_ms;             /* The timestamp when the data was received */
+} gui_wheel_port_data_t;
 
+typedef struct wheel_info
+{
+    uint32_t type;
+    int16_t delta;
+} wheel_info_t;
 
 
 typedef struct gui_rect
@@ -208,12 +205,13 @@ struct gui_indev
     uint16_t kb_short_button_time_ms;
     uint16_t quick_slide_time_ms;
 
-    struct gui_touch_data *(*tp_get_data)(void);
-
     void (*ext_button_indicate)(void (*callback)(void));
 
-    //next for kb keyboard or hw button
+    gui_touch_port_data_t *(*tp_get_data)(void);
+
     gui_kb_port_data_t *(*kb_get_port_data)(void);
+
+    gui_wheel_port_data_t *(*wheel_get_port_data)(void);
 };
 
 typedef void (* log_func_t)(const char *fmt, ...);
@@ -276,6 +274,13 @@ typedef enum
     KB_SHORT,
     KB_LONG,
     KB_INVALIDE,
+
+    WHEEL_INIT   = 0x300,
+    WHEEL_ING,
+    WHEEL_FINISHED,
+    WHEEL_INVALIDE,
+
+
 } GUI_InputType;
 
 typedef enum gui_tab_style

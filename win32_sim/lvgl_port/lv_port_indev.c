@@ -294,7 +294,7 @@ static void keypad_init(void)
 }
 
 /*Will be called by the library to read the mouse*/
-#include "gui_kb.h"
+#include "kb_algo.h"
 static void keypad_read(lv_indev_drv_t *indev_drv, lv_indev_data_t *data)
 {
     kb_info_t *kb = kb_get_info();

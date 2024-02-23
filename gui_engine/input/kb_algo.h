@@ -7,8 +7,8 @@
  * Date           Author        Notes
  * 2020-11-18     howie  first version
  */
-#ifndef __GUI_KB_H__
-#define __GUI_KB_H__
+#ifndef __KB_ALGO_H__
+#define __KB_ALGO_H__
 #include <string.h>
 #include "guidef.h"
 

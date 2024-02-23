@@ -15,7 +15,8 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-#include <gui_kb.h>
+#include <kb_algo.h>
+#include <wheel_algo.h>
 #include <string.h>
 #include <gui_app.h>
 #include "acc_engine.h"
@@ -90,6 +91,8 @@ static void gui_server_entry(void *parameter)
         tp_algo_process(touchpad_get_data());
 
         kb_algo_process(kb_get_data());
+
+        wheel_algo_process(wheel_get_data());
 
         if (app->lvgl == true)
         {

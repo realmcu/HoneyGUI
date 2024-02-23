@@ -36,7 +36,6 @@ gui_app_t *gui_next_app(void)
 void gui_app_exec(gui_app_t *app)
 {
     gui_msg_t msg;
-    msg.type = GUI_SRV_EXEC;
     msg.app = app;
     GUI_UNUSED(msg);
 }

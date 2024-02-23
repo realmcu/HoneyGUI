@@ -22,7 +22,7 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
-#include <gui_kb.h>
+#include <kb_algo.h>
 #include "gui_tab.h"
 #include "gui_curtain.h"
 #include "gui_img.h"

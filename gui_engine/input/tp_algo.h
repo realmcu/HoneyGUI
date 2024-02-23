@@ -106,7 +106,7 @@
  * @param raw_data from gui_port_indev
  * @return struct touch_info*
  */
-struct touch_info *tp_algo_process(struct gui_touch_data *raw_data);
+struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data);
 
 /**
  * @brief read the output
