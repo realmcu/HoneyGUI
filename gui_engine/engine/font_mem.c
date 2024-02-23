@@ -771,3 +771,107 @@ void gui_font_mem_init(uint8_t *font_bin_addr)
     font_lib_tab[i].bmp_addr = (uint8_t *)(font_bin_addr + index_area_size + head_length);
     font_lib_tab[i].font_mode_detail.value =  * (uint8_t *)(font_bin_addr + 8);
 }
+
+uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr)
+{
+    return gui_get_mem_char_width(content, font_bin_addr, UTF_8_CHARSET);
+}
+
+uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset)
+{
+    GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)font_bin_addr;
+    uint32_t string_len = strlen(content);
+    uint32_t table_offset = (uint32_t)((uint8_t *)font_bin_addr + font->head_length);
+    uint32_t dot_offset = table_offset + font->index_area_size;
+
+    uint8_t aliened_font_size = font->font_size;
+    if (font->font_size % 8 != 0)
+    {
+        aliened_font_size = 8 - font->font_size % 8 + font->font_size;
+    }
+    uint32_t font_area = aliened_font_size * font->font_size / 8 * font->rendor_mode + 4;
+
+    uint16_t *unicode_buffer = NULL;
+    uint16_t unicode_len = 0;
+    switch (charset)
+    {
+    case UTF_8_CHARSET:
+        unicode_buffer = gui_malloc(string_len * sizeof(uint16_t));
+        if (unicode_buffer == NULL)
+        {
+            GUI_ASSERT(NULL != NULL);
+            return 0;
+        }
+        else
+        {
+            unicode_len = utf8_to_unicode(content, string_len, unicode_buffer, string_len);
+        }
+        break;
+    case UTF_16_CHARSET:
+        unicode_len = string_len;
+        unicode_buffer = (uint16_t *)content;
+        break;
+    default:
+        break;
+    }
+    uint32_t all_char_w = 0;
+    uint32_t line_flag = 0;
+    switch (font->font_mode_detail.detail.index_method)
+    {
+    case 0: //address
+        for (uint32_t i = 0; i < unicode_len; i++)
+        {
+            uint16_t offset = 0;
+            uint16_t char_w = 0;
+            if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
+            {
+                char_w = font->font_size / 2;
+            }
+            else if (unicode_buffer[i] == 0x0A)
+            {
+                line_flag ++;
+                char_w = 0;
+            }
+            else
+            {
+                offset = *(uint16_t *)(unicode_buffer[i] * 2 + table_offset);
+                if (offset == 0xFFFF) { continue; }
+                uint8_t *dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                char_w = (int16_t)(*(dot_addr - 2));
+            }
+            all_char_w += char_w;
+        }
+        break;
+    case 1: //offset
+        for (uint32_t i = 0; i < unicode_len; i++)
+        {
+            uint16_t char_w = 0;
+            uint32_t index = 0;
+            if (unicode_buffer[i] == 0x0A)
+            {
+                line_flag ++;
+                char_w = 0;
+            }
+            else if (unicode_buffer[i] == 0x20)
+            {
+                char_w = font->font_size / 2;
+            }
+            else
+            {
+                for (; index < font->index_area_size / 2; index ++)
+                {
+                    if (unicode_buffer[i] == *(uint16_t *)(table_offset + index * 2))
+                    {
+                        uint8_t *dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
+                        char_w = (int16_t)(*(dot_addr - 2));
+                    }
+                }
+            }
+            all_char_w += char_w;
+        }
+        break;
+    default:
+        break;
+    }
+    return all_char_w;
+}

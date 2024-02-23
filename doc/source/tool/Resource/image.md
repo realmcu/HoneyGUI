@@ -2,39 +2,76 @@
 
 ## Image format conversion
 Convert pictures in various formats into RGB raw pictures
-* Open the converter. Please download from [```ImageConvert\ImageConverter.exe```](https://wiki.realtek.com/display/BTMKT/BLE+Soc+Image+Convert+Tool) 
-* The operation steps and detailed instructions are as follows: 
+* Open the converter. Please download from [```ImageConvert\ImageConverter.exe```](https://wiki.realtek.com/display/BTMKT/BLE+Soc+Image+Convert+Tool)
+* The operation steps and detailed instructions are as follows:
 
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1706602071562881120/e9191194_13671125.png "></div>
 <br/>
 
 ### Configuration
-- compress : Enable image compression
+- Color head : BeeGUI wants this head to display.
+- Big-endian : Whether the input image is big-endian
+- Compress : Enable image compression
+- MixAlphaChannel Flag : Whether to mix alpha channel to rgb when converting rgba to rgb or rgb565.
 - scanMode : Select whether the scan direction is horizontal or vertical, BeeGUI only wants horizontal.
 - Color Space : Select colorSpace (RGB565, RGBA, BINARY...), BeeGUI can display all of them.
-- Color head : BeeGUI wants this head to display.
 
 ### Color Space
 
 - RGB565: Colorful but with low rendering cost and storage. 2 bytes per pixel.
 
-
 |  Red |  Green |  Blue |
 |----------|------------|-----------|
 |  5bit|  6bit  |  5bit |
 
-- RGB : True color. 3 bytes per pixel.
+- ARGB8565: 24-bit ARGB mode.
+
+|  Opacity |  Red |  Green |  Blue |
+|----------|------------|-----------|--------------|
+|  8bit|  5bit  |  6bit |    5bit  |
+
+- RTKRGAB: 16-bit RGAB mode.
+
+|  Red |  Green |  Opacity |  Blue |
+|----------|------------|-----------|--------------|
+|  5bit|  5bit  |  1bit |    5bit  |
+
+- RGB : 24-bit RGB mode. 3 bytes per pixel.
 
 |  Red |  Green |  Blue |
 |----------|------------|-----------|
 |  8bit|  8bit  |  8bit |
-- RGBA : True color with opacity. Enhance the display quality with transparency effects. 4 bytes per pixel.
 
-|  Red |  Green |  Blue |  Opacity |
+- ARGB : True color with opacity. Enhance the display quality with transparency effects. 4 bytes per pixel.
+
+|  Opacity |  Red |  Green |  Blue |
 |----------|------------|-----------|--------------|
 |  8bit|  8bit  |  8bit |    8bit  |
+
 - BINARY : Use one bit for a pixel.
+
+- RTKARGB8656 : RTK 24-bit ARGB8565 mode.
+
+|  Opacity |  Red |  Green |  Blue |
+|----------|------------|-----------|--------------|
+|  8bit|  5bit  |  6bit |    5bit  |
+
+
+## Output Files
+The following files will be generated.
+<br/>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1707029841066421625/08de60b3_13671125.png "></div>
+<br/>
+
+By using the image conversion tool, we can convert the three `JPG files a, b, and c` into three `binary files a, b, and c`.
+
+Place the `binary file` into the `root` folder of the packaging directory. For the packaging process, please refer to the "**How to packing resource**" section.
+
+<br/>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1707029849505947540/c20a1748_13671125.png "></div>
+<br/>
+
 
 
 

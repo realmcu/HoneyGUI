@@ -691,6 +691,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         default:
             return;
         }
+        if (image->blend_mode == IMG_COVER_MODE)
+        {
+            mode = PPEV2_BYPASS_MODE;
+        }
         if (image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
             image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
             image->matrix->m[2][1] == 0)

@@ -57,6 +57,7 @@ html_logo = './_static/image/bbpro-h55px.jpg'
 html_favicon = "./_static/image/favicon.ico"
 
 html_show_sourcelink = False
+html_show_copyright = False
 
 html_theme_options = {
     'collapse_navigation' : False,

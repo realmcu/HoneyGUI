@@ -1199,7 +1199,6 @@ void js_run_file_on_server(const char *file, gui_app_t *app)
     {
         gui_msg_t msg;
         memset(&msg, 0, sizeof(gui_msg_t));
-        msg.type = GUI_SRV_RUN_JS;
         msg.u.payload = (void *)file;
         msg.cb = app;
     }

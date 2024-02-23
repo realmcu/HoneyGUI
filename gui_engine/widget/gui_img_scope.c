@@ -23,7 +23,7 @@
 #include <gui_obj.h>
 #include <draw_img.h>
 #include <tp_algo.h>
-#include <gui_kb.h>
+#include <kb_algo.h>
 #include "acc_engine.h"
 
 
@@ -197,6 +197,13 @@ static void img_scope_draw_cb(gui_obj_t *obj)
     draw_rect.xboundright = GUI_TYPE(gui_img_scope_t, obj)->scope_x2;
     draw_rect.yboundbottom = GUI_TYPE(gui_img_scope_t, obj)->scope_y2;
     draw_rect.yboundtop = GUI_TYPE(gui_img_scope_t, obj)->scope_y1;
+
+    if ((draw_rect.xboundleft == draw_rect.xboundright) ||
+        (draw_rect.yboundbottom == draw_rect.yboundtop))
+    {
+        return;
+    }
+
     if (gui_get_acc() != NULL)
     {
         gui_get_acc()->blit(draw_img, dc, &draw_rect);

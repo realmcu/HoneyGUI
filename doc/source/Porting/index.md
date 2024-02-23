@@ -9,7 +9,7 @@ The porting files are in the gui_port folder.
 - The input information is abstracted as touch screen contacts, and the input information structure is as follows
 
 ```C
-typedef struct gui_touch_data
+typedef struct gui_touch_port_data
 {
     uint8_t          event;                 /* The touch event of the data */
     uint8_t          track_id;              /* Track id of point */
@@ -18,7 +18,7 @@ typedef struct gui_touch_data
     uint16_t         y_coordinate;          /* Point of y coordinate */
     uint32_t         timestamp;             /* The timestamp when the data was received */
     void            *data;
-} gui_touch_data_t;
+} gui_touch_port_data_t;
 ```
 
 ## Display device

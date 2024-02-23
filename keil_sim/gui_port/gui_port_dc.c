@@ -11,7 +11,7 @@
 
 uint8_t resource_root[1024] = {0};
 
-static struct gui_touch_data raw_data = {0};
+static struct gui_touch_port_data raw_data = {0};
 static uint8_t framebuffer[320 * 240 * 2] = {0};
 
 
@@ -54,7 +54,7 @@ void gui_port_dc_init(void)
 
 
 
-struct gui_touch_data *port_touchpad_get_data()
+gui_touch_port_data_t *port_touchpad_get_data()
 {
     return &raw_data;
 }

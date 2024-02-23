@@ -296,17 +296,26 @@ static void gui_button_ctor(
 
 void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y)
 {
-    this->text->base.x = text_x;
-    this->text->base.y = text_y;
+    if (this->text)
+    {
+        this->text->base.x = text_x;
+        this->text->base.y = text_y;
+    }
 }
 void gui_button_text_color(gui_button_t *this, gui_color_t color)
 {
-    this->text->color = color;
+    if (this->text)
+    {
+        this->text->color = color;
+    }
 }
 void gui_button_img_move(gui_button_t *this, int16_t img_x, int16_t img_y)
 {
-    this->img->base.x = img_x;
-    this->img->base.y = img_y;
+    if (this->img)
+    {
+        this->img->base.x = img_x;
+        this->img->base.y = img_y;
+    }
 }
 
 void gui_button_click(gui_button_t *this, gui_event_cb_t event_cb)
@@ -408,7 +417,7 @@ static gui_button_t *gui_button_create_core(
             break;
         }
     }
-    if (text)
+    if (strlen(text))
     {
         gui_img_get_height(button->img);
 

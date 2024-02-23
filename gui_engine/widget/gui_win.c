@@ -22,7 +22,7 @@
 #include <string.h>
 #include <tp_algo.h>
 #include "gui_obj.h"
-#include <gui_kb.h>
+#include <kb_algo.h>
 
 
 /** @defgroup WIDGET WIDGET

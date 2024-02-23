@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>ENABLE_RTK_GUI_FONT_STB GUI_KEIL_SIM ENABLE_RTK_GUI_DEMO ENABLE_RTK_GUI ENABLE_RTK_GUI_FONT_RTK_MEM</Define>
+              <Define>ENABLE_RTK_GUI_DEMO ENABLE_RTK_GUI_FONT_STB GUI_KEIL_SIM ENABLE_RTK_GUI_FONT_RTK_MEM ENABLE_RTK_GUI</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;..\gui_engine;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget;..\gui_engine\example\demo</IncludePath>
+              <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;..\gui_engine;..\gui_engine\3rd\ezXML;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget;..\gui_engine\example\demo</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -589,14 +589,19 @@
               <FilePath>..\gui_engine\engine\acc_sw_rle_source_over_matrix.c</FilePath>
             </File>
             <File>
-              <FileName>gui_kb.c</FileName>
+              <FileName>kb_algo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\gui_engine\input\gui_kb.c</FilePath>
+              <FilePath>..\gui_engine\input\kb_algo.c</FilePath>
             </File>
             <File>
               <FileName>tp_algo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\input\tp_algo.c</FilePath>
+            </File>
+            <File>
+              <FileName>wheel_algo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\input\wheel_algo.c</FilePath>
             </File>
             <File>
               <FileName>tlsf.c</FileName>

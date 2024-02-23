@@ -68,7 +68,7 @@ void ext_button_set_indicate(void (*callback)(void))
 }
 
 
-struct gui_touch_data *touchpad_get_data(void)
+gui_touch_port_data_t *touchpad_get_data(void)
 {
     if (indev->tp_get_data)
     {
@@ -88,6 +88,15 @@ gui_kb_port_data_t *kb_get_data(void)
     return NULL;
 }
 
+gui_wheel_port_data_t *wheel_get_data(void)
+{
+    if (indev->wheel_get_port_data)
+    {
+        return indev->wheel_get_port_data();
+    }
+    GUI_ASSERT(NULL != NULL);
+    return NULL;
+}
 
 
 struct gui_dispdev *gui_get_dc(void)
@@ -488,16 +497,115 @@ uint32_t gui_ms_get(void)
     return os_api->thread_ms_get();
 }
 
+#if defined(_WIN32)
+struct file_load_node
+{
+    struct file_load_node *nxt;
+    uint32_t file_id;
+    void *mem_addr;
+};
+typedef struct file_load_node FIEL_LOAD_NODE;
+
+FIEL_LOAD_NODE *fielload_root;
+
+static uint32_t fileload_get_id(const char *str)
+{
+    uint32_t seed = 131;
+    uint32_t id = 0;
+
+    while (*str != '\0')
+    {
+        id = id * seed + *str;
+        str++;
+    }
+    return id;
+}
+
+static void fileload_insert_node(FIEL_LOAD_NODE *node)
+{
+    if (node == fielload_root)
+    {
+        return;
+    }
+    else
+    {
+        FIEL_LOAD_NODE *cur = fielload_root;
+        FIEL_LOAD_NODE *nxt = fielload_root;
+        while (nxt)
+        {
+            if (nxt->file_id > node->file_id)
+            {
+                if (nxt == fielload_root)
+                {
+                    fielload_root = node;
+                }
+                else
+                {
+                    cur->nxt = node;
+                }
+                node->nxt = nxt;
+                return;
+            }
+            cur = nxt;
+            nxt = cur->nxt;
+        }
+        cur->nxt = node;
+        return;
+    }
+}
+
+static FIEL_LOAD_NODE *fileload_get_node(const char *file)
+{
+    uint32_t file_id = fileload_get_id(file);
+    FIEL_LOAD_NODE *root = fielload_root;
+    FIEL_LOAD_NODE *node = NULL;
+
+    if (!root)
+    {
+        // empty file load list
+        fielload_root = (FIEL_LOAD_NODE *)gui_malloc(sizeof(FIEL_LOAD_NODE));
+        node = fielload_root;
+    }
+    else
+    {
+        root = fielload_root;
+        node = root;
+        // search node by file_id
+        while (node && (node->file_id < file_id))
+        {
+            node = node->nxt;
+        }
+        if (node && node->file_id == file_id)
+        {
+            return node;
+        }
+        node = (FIEL_LOAD_NODE *)gui_malloc(sizeof(FIEL_LOAD_NODE));
+    }
+
+    // GUI_ASSERT(node != NULL);
+    memset(node, 0, sizeof(FIEL_LOAD_NODE));
+    node->file_id = file_id;
+    fileload_insert_node(node);
+    return node;
+}
+#endif
+
 void *gui_get_file_address(const char *file)
 {
     if (file == NULL)
     {
         return NULL;
     }
+    char *root_folder = GUI_ROOT_FOLDER;
+#ifdef ENABLE_RTK_GUI_WATCHFACE_UPDATE
+#ifdef _WIN32
+    root_folder = "gui_engine\\example\\screen_448_368\\root_image_hongkong\\watch_face_update\\";
+#endif
+#endif
 #if defined(_WIN32)
     {
-        char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
-        sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
+        char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
+        sprintf(path, "%s%s", root_folder, file);
 #ifndef O_BINARY
 #define O_BINARY 0100000
 #endif
@@ -517,8 +625,8 @@ void *gui_get_file_address(const char *file)
     }
 #else
     {
-        char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
-        sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
+        char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
+        sprintf(path, "%s%s", root_folder, file);
         int fd = gui_fs_open(path,  0);
         gui_free(path);
         if (fd == -1)
@@ -535,4 +643,3 @@ void *gui_get_file_address(const char *file)
     }
 #endif
 }
-

@@ -7,7 +7,7 @@
 #include "unistd.h"
 #include "time.h"
 #include "tp_algo.h"
-#include "gui_kb.h"
+#include "kb_algo.h"
 
 
 #if 0
@@ -37,9 +37,13 @@ static uint32_t Rmask, Gmask, Bmask, Amask;  /* masks for pixel format passed in
 static pthread_mutex_t sdl_ok_mutex;
 static pthread_cond_t sdl_ok_event;
 
-static struct gui_touch_data raw_data = {0};
+static gui_touch_port_data_t tp_port_data = {0};
 
 static gui_kb_port_data_t kb_port_data = {0};
+
+static gui_wheel_port_data_t wheel_port_data = {0};
+
+
 int sim_screen_width = DRV_LCD_WIDTH;
 int sim_screen_hight = DRV_LCD_HIGHT;
 int32_t sim_get_width()
@@ -201,8 +205,8 @@ void *rtk_gui_sdl(void *arg)
                 /* save to (x,y) in the motion */
                 //gui_log("line = %d \n",__LINE__);
                 //gui_log("mouse motion:(%d,%d)\n",event.button.x,event.button.y);
-                raw_data.x_coordinate = event.button.x;
-                raw_data.y_coordinate = event.button.y;
+                tp_port_data.x_coordinate = event.button.x;
+                tp_port_data.y_coordinate = event.button.y;
             }
             break;
 
@@ -210,9 +214,9 @@ void *rtk_gui_sdl(void *arg)
             {
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
-                raw_data.event = GUI_TOUCH_EVENT_DOWN;
-                raw_data.x_coordinate = event.button.x;
-                raw_data.y_coordinate = event.button.y;
+                tp_port_data.event = GUI_TOUCH_EVENT_DOWN;
+                tp_port_data.x_coordinate = event.button.x;
+                tp_port_data.y_coordinate = event.button.y;
                 //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
             }
             break;
@@ -221,20 +225,21 @@ void *rtk_gui_sdl(void *arg)
             {
                 SDL_MouseButtonEvent *mb;
                 mb = (SDL_MouseButtonEvent *)&event;
-                raw_data.event = GUI_TOUCH_EVENT_UP;
-                raw_data.x_coordinate = event.button.x;
-                raw_data.y_coordinate = event.button.y;
+                tp_port_data.event = GUI_TOUCH_EVENT_UP;
+                tp_port_data.x_coordinate = event.button.x;
+                tp_port_data.y_coordinate = event.button.y;
                 //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
             }
             break;
         case SDL_MOUSEWHEEL:
             {
                 gui_log("[SDL_MOUSEWHEEL]:(%d,%d)\n", event.button.x, event.button.y);
+                wheel_port_data.delta = event.button.x;
             }
             break;
         case SDL_KEYDOWN:
             {
-                //gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
+                // gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_DOWN;
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
@@ -243,9 +248,11 @@ void *rtk_gui_sdl(void *arg)
             break;
         case SDL_KEYUP:
             {
-                //gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
+                // gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_UP;
                 memset(kb_port_data.name, 0x00, 10);
+                memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
+                       strlen(SDL_GetKeyName(event.key.keysym.sym)));
             }
             break;
         case SDL_QUIT:
@@ -302,7 +309,7 @@ void gui_port_dc_init(void)
 
 
 
-struct gui_touch_data *port_touchpad_get_data()
+struct gui_touch_port_data *port_touchpad_get_data()
 {
     unsigned long now = (unsigned long) time(NULL);
     struct timeval tv;
@@ -310,15 +317,30 @@ struct gui_touch_data *port_touchpad_get_data()
     uint32_t tp_tick = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
 
 
-    raw_data.timestamp_ms = tp_tick;//todo
+    tp_port_data.timestamp_ms = tp_tick;//todo
 
 
-    return &raw_data;
+    return &tp_port_data;
 }
 
 gui_kb_port_data_t *port_kb_get_data(void)
 {
+    unsigned long now = (unsigned long) time(NULL);
+    struct timeval tv;
+    mingw_gettimeofday(&tv, NULL);
+
+    kb_port_data.timestamp_ms = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
     return &kb_port_data;
+}
+
+gui_wheel_port_data_t *port_wheel_get_data(void)
+{
+    unsigned long now = (unsigned long) time(NULL);
+    struct timeval tv;
+    mingw_gettimeofday(&tv, NULL);
+
+    wheel_port_data.timestamp_ms = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
+    return &wheel_port_data;
 }
 
 
@@ -326,6 +348,7 @@ static struct gui_indev indev =
 {
     .tp_get_data = port_touchpad_get_data,
     .kb_get_port_data = port_kb_get_data,
+    .wheel_get_port_data = port_wheel_get_data,
     .tp_height = 0,
     .tp_witdh = 0,
     .touch_timeout_ms = 110,
@@ -333,14 +356,13 @@ static struct gui_indev indev =
     .short_button_time_ms = 800,
     .quick_slide_time_ms = 50,
 
-    .kb_short_button_time_ms = 300,
+    .kb_short_button_time_ms = 30,
     .kb_long_button_time_ms = 800,
 };
 
 
 void gui_port_indev_init(void)
 {
-
     gui_indev_info_register(&indev);
 }
 

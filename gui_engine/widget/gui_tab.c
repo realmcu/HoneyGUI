@@ -22,6 +22,7 @@
 #include <gui_server.h>
 #include <gui_obj.h>
 #include <tp_algo.h>
+#include <kb_algo.h>
 #include "gui_tab.h"
 #include "gui_curtain.h"
 #include "gui_img.h"
@@ -147,6 +148,11 @@ static void tab_prepare(gui_obj_t *obj)
         }
         obj->sx = s;
         obj->sy = s;
+    }
+    kb_info_t *kb = kb_get_info();
+    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
+    {
+        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
 }
 

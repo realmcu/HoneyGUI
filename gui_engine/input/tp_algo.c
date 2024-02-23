@@ -25,11 +25,11 @@
 
 //static bool new_touch = true;
 static uint32_t start_tick;
-static struct gui_touch_data x_min_record = {0};
-static struct gui_touch_data y_min_record = {0};
-static struct gui_touch_data x_max_record = {0};
-static struct gui_touch_data y_max_record = {0};
-static struct gui_touch_data first_record = {0};
+static struct gui_touch_port_data x_min_record = {0};
+static struct gui_touch_port_data y_min_record = {0};
+static struct gui_touch_port_data x_max_record = {0};
+static struct gui_touch_port_data y_max_record = {0};
+static struct gui_touch_port_data first_record = {0};
 
 typedef enum _TOUCH_DIR
 {
@@ -51,7 +51,7 @@ static void tp_do_reset(void)
     down_cnt = 0;
 }
 
-static uint8_t tp_judge_relese_or_press(struct gui_touch_data *raw_data)
+static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
 {
     uint8_t tp_local_event = 0;
     tp.pressed = false;
@@ -145,7 +145,7 @@ static bool tp_judge_same_point(void)
     }
 }
 
-static bool tp_judge_short_press(struct gui_touch_data *raw_data)
+static bool tp_judge_short_press(struct gui_touch_port_data *raw_data)
 {
     struct gui_indev *indev = gui_get_indev();
     if ((raw_data->timestamp_ms - start_tick) > indev->short_button_time_ms)
@@ -155,7 +155,7 @@ static bool tp_judge_short_press(struct gui_touch_data *raw_data)
     return true;
 }
 
-static bool tp_judge_long_press(struct gui_touch_data *raw_data)
+static bool tp_judge_long_press(struct gui_touch_port_data *raw_data)
 {
     struct gui_indev *indev = gui_get_indev();
     if ((raw_data->timestamp_ms - start_tick) > indev->long_button_time_ms)
@@ -165,7 +165,7 @@ static bool tp_judge_long_press(struct gui_touch_data *raw_data)
     return false;
 }
 
-static bool tp_judge_quick_x_left_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_quick_x_left_slide(struct gui_touch_port_data *raw_data)
 {
     struct gui_indev *indev = gui_get_indev();
     if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
@@ -183,7 +183,7 @@ static bool tp_judge_quick_x_left_slide(struct gui_touch_data *raw_data)
     return false;
 }
 
-static bool tp_judge_quick_x_right_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_quick_x_right_slide(struct gui_touch_port_data *raw_data)
 {
     struct gui_indev *indev = gui_get_indev();
     if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
@@ -201,7 +201,7 @@ static bool tp_judge_quick_x_right_slide(struct gui_touch_data *raw_data)
     return false;
 }
 
-static bool tp_judge_quick_y_down_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_quick_y_down_slide(struct gui_touch_port_data *raw_data)
 {
     struct gui_indev *indev = gui_get_indev();
     if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
@@ -219,7 +219,7 @@ static bool tp_judge_quick_y_down_slide(struct gui_touch_data *raw_data)
     return false;
 }
 
-static bool tp_judge_quick_y_up_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_quick_y_up_slide(struct gui_touch_port_data *raw_data)
 {
     struct gui_indev *indev = gui_get_indev();
     if ((raw_data->timestamp_ms - start_tick) < indev->quick_slide_time_ms)
@@ -237,7 +237,7 @@ static bool tp_judge_quick_y_up_slide(struct gui_touch_data *raw_data)
     return false;
 }
 
-static bool tp_judge_slow_x_left_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_slow_x_left_slide(struct gui_touch_port_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_X)
     {
@@ -253,7 +253,7 @@ static bool tp_judge_slow_x_left_slide(struct gui_touch_data *raw_data)
     }
     return false;
 }
-static bool tp_judge_slow_x_right_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_slow_x_right_slide(struct gui_touch_port_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_X)
     {
@@ -269,7 +269,7 @@ static bool tp_judge_slow_x_right_slide(struct gui_touch_data *raw_data)
     }
     return false;
 }
-static bool tp_judge_slow_x_orign_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_slow_x_orign_slide(struct gui_touch_port_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_X)
     {
@@ -282,7 +282,7 @@ static bool tp_judge_slow_x_orign_slide(struct gui_touch_data *raw_data)
     }
     return false;
 }
-static bool tp_judge_slow_y_down_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_slow_y_down_slide(struct gui_touch_port_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_Y)
     {
@@ -298,7 +298,7 @@ static bool tp_judge_slow_y_down_slide(struct gui_touch_data *raw_data)
     }
     return false;
 }
-static bool tp_judge_slow_y_up_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_slow_y_up_slide(struct gui_touch_port_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_Y)
     {
@@ -314,7 +314,7 @@ static bool tp_judge_slow_y_up_slide(struct gui_touch_data *raw_data)
     }
     return false;
 }
-static bool tp_judge_slow_y_orign_slide(struct gui_touch_data *raw_data)
+static bool tp_judge_slow_y_orign_slide(struct gui_touch_port_data *raw_data)
 {
     if (tp.type == TOUCH_HOLD_Y)
     {
@@ -328,7 +328,7 @@ static bool tp_judge_slow_y_orign_slide(struct gui_touch_data *raw_data)
     return false;
 }
 
-static bool tp_judge_hold_x(struct gui_touch_data *raw_data)
+static bool tp_judge_hold_x(struct gui_touch_port_data *raw_data)
 {
     if (tp_judge_same_point() == false)
     {
@@ -351,7 +351,7 @@ static bool tp_judge_hold_x(struct gui_touch_data *raw_data)
     }
     return false;
 }
-static bool tp_judge_hold_y(struct gui_touch_data *raw_data)
+static bool tp_judge_hold_y(struct gui_touch_port_data *raw_data)
 {
     if (tp_judge_same_point() == false)
     {
@@ -374,7 +374,7 @@ static bool tp_judge_hold_y(struct gui_touch_data *raw_data)
     }
     return false;
 }
-static bool tp_judge_long_pressed(struct gui_touch_data *raw_data)
+static bool tp_judge_long_pressed(struct gui_touch_port_data *raw_data)
 {
     if ((tp_judge_same_point() == true) && (tp_judge_long_press(raw_data) == true) &&
         (long_button_flag == false))
@@ -387,7 +387,7 @@ static bool tp_judge_long_pressed(struct gui_touch_data *raw_data)
     return false;
 }
 
-static bool tp_judge_short_click(struct gui_touch_data *raw_data)
+static bool tp_judge_short_click(struct gui_touch_port_data *raw_data)
 {
     if ((tp_judge_same_point() == true) && (tp_judge_short_press(raw_data) == true))
     {
@@ -400,7 +400,7 @@ static bool tp_judge_short_click(struct gui_touch_data *raw_data)
 
 
 
-struct touch_info *tp_algo_process(struct gui_touch_data *raw_data)
+struct touch_info *tp_algo_process(struct gui_touch_port_data *raw_data)
 {
 
     GUI_ASSERT(raw_data != NULL);
@@ -487,7 +487,7 @@ struct touch_info *tp_algo_process(struct gui_touch_data *raw_data)
 
 }
 
-struct touch_info *tp_get_info(void)
+touch_info_t *tp_get_info(void)
 {
     return &tp;
 }

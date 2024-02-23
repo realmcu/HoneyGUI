@@ -58,7 +58,7 @@ typedef enum
     SCROLL_Y,
 } TEXT_MODE;
 
-/** @brief  text mode enum */
+/** @brief  text encoding format enum */
 typedef enum
 {
     UTF_8_CHARSET = 0,

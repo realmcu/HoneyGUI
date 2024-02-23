@@ -342,11 +342,7 @@ void page_update(gui_obj_t *obj)
                         gui_obj_event_set(obj, GUI_EVENT_7);
                         center_alignment((void *)obj);
                     }
-
-
-
-
-                    ((gui_page_t *)obj)->yold = obj->y; gui_log("4");
+                    ((gui_page_t *)obj)->yold = obj->y;
                 }
             }
         }

@@ -62,7 +62,7 @@ In the `port_touchpad_get_data` function, the touch information will be fetched 
 <details> <summary>port_touchpad_get_data</summary>
 
 ```C
-struct gui_touch_data *port_touchpad_get_data()
+struct gui_touch_port_data *port_touchpad_get_data()
 {
     uint16_t x = 0;
     uint16_t y = 0;
@@ -95,7 +95,7 @@ struct gui_touch_data *port_touchpad_get_data()
 
 </details>
 
-The data structure of the raw data is `gui_touch_data_t`.
+The data structure of the raw data is `gui_touch_port_data_t`.
 
 #### Touchpad Algorithm Processor
 
