@@ -46,6 +46,8 @@ void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                       gui_rect_t *rect);
 void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                                         gui_rect_t *rect);
+void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                     gui_rect_t *rect);
 #ifdef __cplusplus
 }
 #endif

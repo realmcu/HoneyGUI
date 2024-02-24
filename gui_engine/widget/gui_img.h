@@ -249,7 +249,18 @@ void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *c
  *
  */
 void gui_img_set_quality(gui_img_t *img, bool high_quality);
-
+/**
+ * @brief
+ *
+ * @param parent
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @param color
+ * @return gui_img_t*
+ */
+gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color);
 #ifdef __cplusplus
 }
 #endif

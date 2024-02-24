@@ -15,17 +15,7 @@ extern "C" {
 
 
 
-struct gui_rgb_data_head
-{
-    unsigned char scan : 1;
-    unsigned char rsvd : 4;
-    unsigned char compress : 3;
-    char type;
-    short w;
-    short h;
-    char version;
-    char rsvd2;
-};
+
 
 typedef enum
 {
@@ -50,6 +40,7 @@ typedef enum
     IMG_FILTER_BLACK,
     IMG_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
     IMG_COVER_MODE,
+    IMG_RECT,
 } BLEND_MODE_TYPE;
 
 typedef enum

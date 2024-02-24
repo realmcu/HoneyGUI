@@ -573,6 +573,21 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
                              };
     return gui_img_create_core(parent, &config);
 }
+
+gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color)
+{
+    gui_rect_file_head_t *array = gui_malloc(sizeof(gui_rect_file_head_t));
+    memset(array, 0, sizeof(gui_rect_file_head_t));
+    struct gui_rgb_data_head *head = &(array->head);
+    head->type = RGBA8888;
+    head->w = w;
+    head->h = h;
+    array->color.color.rgba_full = color.color.rgba_full;
+    gui_img_t *img = gui_img_create_from_mem(parent, "RECT", array, x, y, w, h);
+    img->draw_img.blend_mode = IMG_RECT;
+    return img;
+}
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

@@ -307,7 +307,24 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
+    else if ((image->blend_mode == IMG_RECT) && (identity == true))//no matrix
+    {
+        if (dc_bytes_per_pixel == 2)
+        {
 
+        }
+        else if (dc_bytes_per_pixel == 3)
+        {
+
+        }
+        if (dc_bytes_per_pixel == 4)
+        {
+            if (img_type == RGBA8888)
+            {
+                rect_2_argb8888(image, dc, rect);
+            }
+        }
+    }
 }
 
 
