@@ -99,6 +99,7 @@ void gui_font_mem_load(gui_text_t *text)
                 if (offset == 0xFFFF) { continue; }
                 chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
                 chr[i].char_w = text->font_height / 2;
+                chr[i].h = 1;
             }
             else if (chr[i].unicode == 0x0A)
             {
@@ -107,6 +108,7 @@ void gui_font_mem_load(gui_text_t *text)
                 if (offset == 0xFFFF) { continue; }
                 chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
                 chr[i].char_w = 0;
+                chr[i].h = 0;
             }
             else
             {
@@ -114,6 +116,7 @@ void gui_font_mem_load(gui_text_t *text)
                 if (offset == 0xFFFF) { continue; }
                 chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
                 chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+                chr[i].h = (int16_t)(*(chr[i].dot_addr - 1));
             }
             all_char_w += chr[i].char_w;
         }
@@ -133,10 +136,12 @@ void gui_font_mem_load(gui_text_t *text)
                 {
                     line_flag ++;
                     chr[i].char_w = 0;
+                    chr[i].h = 0;
                 }
                 else if (chr[i].unicode == 0x20)
                 {
                     chr[i].char_w = text->font_height / 2;
+                    chr[i].h = 1;
                 }
                 else
                 {
@@ -146,6 +151,7 @@ void gui_font_mem_load(gui_text_t *text)
                         {
                             chr[i].dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
                             chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+                            chr[i].h = (int16_t)(*(chr[i].dot_addr - 1));
                             break;
                         }
                     }
