@@ -77,15 +77,15 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_text_font_load(gui_text_t *text)
+static void gui_text_font_load(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
     case GUI_FONT_SOURCE_BMP:
-        gui_font_mem_load(text);
+        gui_font_mem_load(text, rect);
         break;
     case GUI_FONT_SOURCE_TTF:
-        gui_font_stb_load(text);
+        gui_font_stb_load(text, rect);
         break;
     default:
         break;
@@ -194,14 +194,25 @@ static void gui_text_draw(gui_obj_t *obj)
     draw_rect.y1 = obj->ay + obj->dy + obj->ty + tab_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
-    if (dc->section_count == 0)
+
+    if (draw_rect.y1 >= (dc->section_count + 1)*dc->fb_height)
     {
-        gui_text_font_load(text);
+        return;
+    }
+
+    if (draw_rect.y2 < (dc->section_count)*dc->fb_height)
+    {
+        return;
+    }
+
+    if (draw_rect.y1 >= dc->section_count * dc->fb_height && \
+        draw_rect.y1 < (dc->section_count + 1)*dc->fb_height)
+    {
+        gui_text_font_load(text, &draw_rect);
     }
     gui_text_font_draw(text, &draw_rect);
-    uint32_t total_section_count = dc->screen_height / dc->fb_height -
-                                   ((dc->screen_height % dc->fb_height) ? 0 : 1);
-    if (dc->section_count == total_section_count)
+    if (draw_rect.y2 >= dc->section_count * dc->fb_height && \
+        draw_rect.y2 < (dc->section_count + 1)*dc->fb_height)
     {
         gui_text_font_unload(text);
     }

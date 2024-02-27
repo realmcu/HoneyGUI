@@ -7,7 +7,7 @@
 #include "acc_engine.h"
 
 static stbtt_fontinfo font;
-void gui_font_stb_load(gui_text_t *text)
+void gui_font_stb_load(gui_text_t *text, gui_rect_t *rect)
 {
     if (text->path)
     {
