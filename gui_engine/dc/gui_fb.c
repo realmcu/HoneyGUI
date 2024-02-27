@@ -69,6 +69,7 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
+        obj->active = false;
         obj_is_active(obj);
         obj_draw_prepare(obj);
     }

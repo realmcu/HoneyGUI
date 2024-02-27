@@ -91,6 +91,12 @@ static void win_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
+    if (GUI_TYPE(gui_win_t, obj)->event5_flag)
+    {
+        gui_obj_event_set(obj, GUI_EVENT_5);
+        GUI_TYPE(gui_win_t, obj)->event5_flag = false;
+    }
+
     if (kb->pressed == true)
     {
         gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);
