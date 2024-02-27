@@ -245,13 +245,16 @@ void gui_fb_disp(gui_obj_t *root)
         GUI_ASSERT(NULL != NULL);
         return;
     }
-
+    int time = gui_ms_get();
     obj_draw_prepare(root);
-
+    int prepare_cost = gui_ms_get() - time;
     static int last_ms;
     if (fb_change == true)
     {
+        time = gui_ms_get();
         gui_fb_draw(root);
+        int draw_cost = gui_ms_get() - time;
+        gui_log("cost prepare:%dms, draw:%dms\n", prepare_cost, draw_cost);
         fb_change = false;
         {
 
