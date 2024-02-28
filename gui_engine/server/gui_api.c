@@ -613,10 +613,16 @@ void *gui_get_file_address(const char *file)
         gui_free(path);
         if (fd == -1)
         {
+            gui_log("open file failed.\n");
             return NULL;
         }
 
         int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+        {
+            static uint32_t used = 0;
+            used += size;
+            gui_log(">malloc: %d -- %d\n", size, used);
+        }
         void *imgbuf = gui_malloc(size);
         memset(imgbuf, 0, size);
         gui_fs_lseek(fd, 0, SEEK_SET);
