@@ -7,16 +7,13 @@
 #include <gui_curtain.h>
 #include "root_image/ui_resource.h"
 #include <gui_app.h>
-#include "gui_tab.h"
 #include "draw_font.h"
-#include <gui_img.h>
 #include "gui_canvas.h"
 #include "app_gui_main.h"
 #include "app_gui_cube.h"
 #include "gui_cube.h"
 #include "gui_win.h"
 #include "gui_server.h"
-#include "gui_components_init.h"
 #include <stdio.h>
 
 #define DOUBLE_CLICK_INTERVAL 600

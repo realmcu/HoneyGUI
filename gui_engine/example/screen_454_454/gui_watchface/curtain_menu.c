@@ -8,7 +8,6 @@
 #include "app_gui_main.h"
 #include "gui_tabview.h"
 #include "gui_obj.h"
-#include "gui_img_scope.h"
 
 #define MODE_SOURCE true
 #define MODE_SINK false

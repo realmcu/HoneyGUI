@@ -2,7 +2,6 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_text.h"
-#include "gui_scroll_text.h"
 #include "gui_switch.h"
 #include "gui_app.h"
 #include "gui_win.h"

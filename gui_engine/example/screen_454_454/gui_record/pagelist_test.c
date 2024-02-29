@@ -5,12 +5,10 @@
 #include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_page.h"
-#include "gui_grid.h"
 #include "gui_text.h"
 #include "gui_switch.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
-#include "gui_img_scope.h"
 #include "gui_scroll_text.h"
 #include "gui_pagelistview.h"
 #include "gui_pagelist.h"
@@ -38,7 +36,7 @@ int16_t index_last = 0;
 
 static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_t *list_first)
 {
-    gui_log("pagelist_test_update_list_first_cb, list_first = 0x%x\n", list_first);
+    gui_log("pagelist_test_update_list_first_cb, list_first = 0x%x\n", (uint32_t *)list_first);
     gui_scroll_text_t *list_scroll_text = NULL;
 
     gui_list_t *node = NULL;
@@ -68,7 +66,7 @@ static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_
 
 static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t *list_last)
 {
-    gui_log("pagelist_test_update_list_last_cb, list_first = 0x%x\n", list_last);
+    gui_log("pagelist_test_update_list_last_cb, list_first = 0x%x\n", (uint32_t *)list_last);
     gui_scroll_text_t *list_scroll_text = NULL;
 
     gui_list_t *node = NULL;

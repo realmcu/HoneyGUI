@@ -2,16 +2,12 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_curtainview.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
-#include "gui_page.h"
 #include "gui_grid.h"
 #include "gui_text.h"
 #include "gui_switch.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
-#include "gui_img_scope.h"
-#include "gui_scroll_text.h"
 
 gui_win_t *win_contacts_details = NULL;
 gui_switch_t *switch_contacts_details_back = NULL;
@@ -43,7 +39,7 @@ static void contacts_details_back_touch_cb(void *obj, gui_event_t event)
 
 static void switch_contacts_details_call_touch_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_contacts_details_call_touch_cb, obj = 0x%x\n", obj);
+    gui_log("switch_contacts_details_call_touch_cb, obj = 0x%x\n", (uint32_t *)obj);
 
     //gui_switch_t *this = (gui_switch_t *)obj;
     gui_app_t *app = get_app_watch_ui();
@@ -55,7 +51,7 @@ static void switch_contacts_details_call_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_1:
     case GUI_EVENT_2:
         // jump to win_calling
-        gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", obj);
+        gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", (uint32_t *)obj);
         extern gui_win_t *win_calling;
         //gui_app_t *app = get_app_watch_ui();
 

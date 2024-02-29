@@ -1,6 +1,5 @@
 #include "root_image/ui_resource.h"
 #include "gui_curtainview.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_switch.h"
@@ -26,7 +25,7 @@ extern gui_win_t *win_confirm;
 char *txet_sw_reset = "确认重启？";
 char *txet_factory_data_reset = "确认恢复出厂？";
 
-static void switch_back_menu_setting_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_back_menu_setting_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_back_menu_setting_touch_cb, event = %d\n", event);
     win_menu_setting->base.not_show = true;
@@ -50,7 +49,7 @@ static void switch_sw_reset_no_action(void *obj)
     win_confirm = NULL;
 }
 
-static void switch_text_base_sw_reset_touch_cb(void *obj, gui_event_cb_t event)//base?
+static void switch_text_base_sw_reset_touch_cb(void *obj, gui_event_t event)//base?
 {
     gui_log("switch_text_base_sw_reset_touch_cb, event = %d\n", event);
 
@@ -71,19 +70,19 @@ static void switch_text_base_sw_reset_touch_cb(void *obj, gui_event_cb_t event)/
 
 static void switch_factory_data_reset_yes_action(void *obj)
 {
-    gui_log("switch_factory_data_reset_yes_action, obj = 0x%x\n", obj);
+    gui_log("switch_factory_data_reset_yes_action, obj = 0x%x\n", (uint32_t *)obj);
     //trrigrt by event
 }
 static void switch_factory_data_reset_no_action(void *obj)
 {
-    gui_log("switch_factory_data_reset_no_action, obj = 0x%x\n", obj);
+    gui_log("switch_factory_data_reset_no_action, obj = 0x%x\n", (uint32_t *)obj);
     win_menu_setting->base.not_show = false;
 
     gui_tree_free(win_confirm);
     win_confirm = NULL;
 }
 
-static void switch_text_base_factory_data_reset_touch_cb(void *obj, gui_event_cb_t event)//base?
+static void switch_text_base_factory_data_reset_touch_cb(void *obj, gui_event_t event)//base?
 {
     gui_log("switch_text_base_factory_data_reset_touch_cb, event = %d\n", event);
     push_current_widget(win_menu_setting);
@@ -101,12 +100,12 @@ static void switch_text_base_factory_data_reset_touch_cb(void *obj, gui_event_cb
     design_win_confirm(win_confirm);
 }
 
-static void switch_connect_more_off_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_connect_more_off_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_connect_more_off_touch_cb, event = %d\n", event);
 }
 
-static void switch_connect_more_on_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_connect_more_on_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_connect_more_on_touch_cb, event = %d\n", event);
 }

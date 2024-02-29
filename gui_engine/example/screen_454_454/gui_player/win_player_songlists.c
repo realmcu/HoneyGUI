@@ -7,7 +7,6 @@
 #include "gui_win.h"
 #include "gui_tabview.h"
 #include "gui_switch.h"
-#include "gui_scroll_text.h"
 
 gui_text_t *text_song_list_title = NULL;
 gui_text_t *text_song[3] = {NULL};
@@ -24,12 +23,12 @@ char *song_files_name[3] = {"song name 1", "song name 2", "song name 3"};
 //if current view has a "delete icon", need to set delete info before create a win_delete
 static void switch_song_delete_yes_action(void *obj)
 {
-    gui_log("switch_song_delete_yes_action, obj = 0x%x\n", obj);
+    gui_log("switch_song_delete_yes_action, obj = 0x%x\n", (uint32_t *)obj);
     //delete selected record file
 }
 static void switch_song_delete_no_action(void *obj)
 {
-    gui_log("switch_song_delete_no_action, obj = 0x%x\n", obj);
+    gui_log("switch_song_delete_no_action, obj = 0x%x\n", (uint32_t *)obj);
     win_song_lists->base.not_show = false;
 
     gui_tree_free(win_confirm);
@@ -63,7 +62,7 @@ static void switch_song_back_cb(void *obj, gui_event_t event)
 
 static void switch_song_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_song_1_cb event = %d\n", event);
+    gui_log("switch_song_1_cb event = %d\n", (uint32_t *)event);
     //gui_switch_t *this = (gui_switch_t *)obj;
     gui_app_t *app = get_app_watch_ui();
     extern gui_win_t *win_confirm;
@@ -80,7 +79,7 @@ static void switch_song_cb(void *obj, gui_event_t event)
         gui_obj_show(object_return, true);
         break;
     case GUI_EVENT_TOUCH_LONG:
-        gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x\n", obj);
+        gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x\n", (uint32_t *)obj);
         switch_song_delete->base.not_show = true;
         for (int j = 0; j < 3; j ++)
         {
