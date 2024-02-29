@@ -176,8 +176,15 @@ static void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filen
 
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->type = CARD;
+    if (parent->type == CARDVIEW)
+    {
+        gui_cardview_t *parent_ext = (gui_cardview_t *)parent;
+        if (idy >= 0)
+        {
+            parent_ext->tab_cnt_down++;
+        }
+    }
 
-    //gui_cardview_t *parent_ext = (gui_cardview_t *)parent;
 
     this->id = idy;
 
