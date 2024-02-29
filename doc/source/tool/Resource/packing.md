@@ -61,12 +61,26 @@ Generate process as follows:
 RTL8773E is the name of a series IC type, including RTL8773EWE/RTL8773EWE-VP, The packaging process is as follows
 
 ### Generate root bin
-1. Copy all the generated bin files to the folder ```\src\app\HoneyGUI\gui_engine\example\screen_454_454_bb2plus_watch\root_image\root```.
-2. Double-click ```mkromfs_0x4400000.bat``` in the ```\src\app\HoneyGUI\gui_engine\example\screen_454_454_bb2plus_watch\root_image``` directory to execute the script and generate an image of the root folder. A new `.bin: root(0x4400000).bin` file and `.h: ui_resource.h` file will appear in the directory.
-3. Between them, `.bin` is the image file, and `.h` is the address offset of each file in the file system, which can be accessed directly without using the file system.
+1. Copy generated images bin to this folder ```\src\app\watch\gui_application\root_image\root\8773e_watch``` and Copy generated font bin to this folder ```\src\app\watch\gui_application\root_image\root\font```.
+2. Modify build address: You need to adjust the address to ```0x238b400``` by modifying this file ```mkromfs_0x4400000.bat``` (python_bin_mkromfs_0x4400000.py --binary `--addr 0x238b400` root root(0x4400000).bin). The --addr corresponds to the flash map userdata address +0x400 (image header size)
+3. Double-click ```mkromfs_0x4400000.bat``` in the ```\src\app\watch\gui_application\root_image``` directory to execute the script and generate an image of the root folder. A new bin `root(0x4400000).bin` file and h file `ui_resource.h` will appear in the directory.
+4. Between them, `.bin` is the image file, and `.h` is the address offset of each file in the file system, which can be accessed directly without using the file system.
 <br/>
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1707042532979406541/35eceac9_13674272.png " ></div>
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1709192993908116296/15fb26e4_13674272.png " ></div>
 <br/>
+Note: The generated ui_resource.h requires the following code to be added manually
+
+```C
+#if defined _WIN32
+#else
+#include "flash_map.h"
+
+#define   MUSIC_NAME_BIN_ADDR       APP_DEFINED_SECTION_ADDR
+#define   MUSIC_HEADER_BIN_ADDR     (MUSIC_NAME_BIN_ADDR + 0xA000)
+#define   MUSIC_NAME_BIN_SIZE       (MUSIC_HEADER_BIN_ADDR - MUSIC_NAME_BIN_ADDR)
+#define   MUSIC_HEADER_BIN_SIZE     0x5000
+#endif
+```
 
 ### Generate userdata bin
 It needs to use MPPGTOOL to generate user data Generate process as follows:
