@@ -637,66 +637,103 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         }
         break;
     case 1:
+#if 1 //0 - Stable slow processing , 1 - Fast processing in tests
         if (dc_bytes_per_pixel == 2)
         {
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
             uint16_t color_output = rgba2565(color);
+
             uint32_t *p_dot32 = (uint32_t *)(dots + (y_start - font_y) * (font_w / 8));
             int write_off = (y_start - dc->section.y1) * dc->fb_width;
             for (uint32_t i = y_start; i < y_end; i++, write_off += dc->fb_width)
             {
                 uint8_t *temp_p = (uint8_t *)p_dot32;
                 uint8_t temp;
-                p_dot32++;
-                for (uint32_t j = x_start; j < x_end;)
+                p_dot32 += font_w / 32;
+                if (x_start > font_x)
+                {
+                    temp_p += (x_start - font_x) / 8;
+                    temp = *temp_p;
+                    uint8_t skip_bits = (x_start - font_x) % 8;
+                    temp &= ~(((1 << skip_bits) - 1) << (8 - skip_bits));
+                }
+                else
                 {
                     temp = *temp_p;
+                }
+
+                uint32_t scan_end = font_x + font_w - (font_x + font_w - x_end) / 8 * 8;
+
+                for (uint32_t j = x_start; j < scan_end;)
+                {
                     if (temp)
                     {
+                        uint16_t offset = write_off + font_x + (j - font_x) / 8 * 8;
+
                         if (temp & 0x0F)
                         {
                             if (temp & 0x01)
                             {
-                                writebuf[write_off + j + 7] = color_output;
+                                writebuf[offset + 7] = color_output;
                             }
                             if (temp & 0x02)
                             {
-                                writebuf[write_off + j + 6] = color_output;
+                                writebuf[offset + 6] = color_output;
                             }
                             if (temp & 0x04)
                             {
-                                writebuf[write_off + j + 5] = color_output;
+                                writebuf[offset + 5] = color_output;
                             }
                             if (temp & 0x08)
                             {
-                                writebuf[write_off + j + 4] = color_output;
+                                writebuf[offset + 4] = color_output;
                             }
                         }
                         if (temp & 0xF0)
                         {
                             if (temp & 0x20)
                             {
-                                writebuf[write_off + j + 2] = color_output;
+                                writebuf[offset + 2] = color_output;
                             }
                             if (temp & 0x10)
                             {
-                                writebuf[write_off + j + 3] = color_output;
+                                writebuf[offset + 3] = color_output;
                             }
                             if (temp & 0x40)
                             {
-                                writebuf[write_off + j + 1] = color_output;
+                                writebuf[offset + 1] = color_output;
                             }
                             if (temp & 0x80)
                             {
-                                writebuf[write_off + j] = color_output;
+                                writebuf[offset] = color_output;
                             }
                         }
                     }
                     temp_p++;
+                    temp = *temp_p;
                     j += 8;
                 }
             }
         }
+#else
+        if (dc_bytes_per_pixel == 2)
+        {
+            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+            uint16_t color_output = rgba2565(color);
+            for (uint32_t i = y_start; i < y_end; i++)
+            {
+                int write_off = (i - dc->section.y1) * dc->fb_width;
+                int dots_off = (i - font_y) * (font_w / 8);
+                for (uint32_t j = x_start; j < x_end; j++)
+                {
+                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    {
+                        writebuf[write_off + j] = color_output;
+                    }
+                }
+            }
+        }
+#endif
         else if (dc_bytes_per_pixel == 3)
         {
             uint8_t *writebuf = (uint8_t *)dc->frame_buf;

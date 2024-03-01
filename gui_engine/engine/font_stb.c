@@ -86,6 +86,7 @@ void gui_font_stb_unload(gui_text_t *text)
 {
     gui_free(((FONT_STB_SCREEN *)text->data)->buf);
     gui_free((FONT_STB_SCREEN *)text->data);
+    text->data = NULL;
 }
 #ifndef RTK_GUI_FONT_ENABLE_TTF_SVG
 gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
@@ -173,7 +174,7 @@ static bool creat_stb_screen(gui_text_t *text, gui_rect_t *rect, FONT_STB_SCREEN
         GUI_ASSERT(NULL != NULL);
         return false;
     }
-    memset(buffer, 0, (screen->width) * (screen->height)*sizeof(uint8_t));
+    memset(buffer, 0, (screen->width) * (screen->height) * sizeof(uint8_t));
     // gui_log("creat_stb_screen width %d , height %d \n", screen->width, screen->height);
     screen->buf = buffer;
     return true;
@@ -542,7 +543,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
         ++ch;
     }
 #else
-    if (dc->section_count == 0)
+    if (text->data == NULL)
     {
         FONT_STB_SCREEN *stb_screen = gui_malloc(sizeof(FONT_STB_SCREEN));
         bool flag = creat_stb_screen(text, rect, stb_screen);
