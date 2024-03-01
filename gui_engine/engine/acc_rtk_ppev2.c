@@ -703,17 +703,18 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             {
                 if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format))
                 {
-                    uint32_t x_max = (image->target_w + rect->x1 - 1) > rect->x2 ? rect-> x2 :
-                                     (image->target_w + rect->x1 - 1);
-                    uint32_t y_max = (image->target_h + rect->y1 - 1) > rect->y2 ? rect-> y2 :
-                                     (image->target_h + rect->y1 - 1);
-
+                    uint32_t x_max = (image->target_w + image->img_x - 1) > rect->x2 ? rect-> x2 :
+                                     (image->target_w + image->img_x - 1);
+                    uint32_t y_max = (image->target_h + image->img_y - 1) > rect->y2 ? rect-> y2 :
+                                     (image->target_h + image->img_y - 1);
+                    int32_t x_min = image->img_x < rect->x1 ? rect->x1 : image->img_x;
+                    int32_t y_min = image->img_y < rect->y1 ? rect->y1 : image->img_y;
                     if ((x_max < dc->section.x1) || (y_max < dc->section.y1)
-                        || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
+                        || (x_min >= dc->section.x1 + dc->fb_width) || (y_min >= dc->section.y1 + dc->fb_height))
                     {
                         return;
                     }
-                    ppe_rect_t dst_rect = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
+                    ppe_rect_t dst_rect = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
                     if (dst_rect.x < 0)
                     {
                         dst_rect.x = 0;
@@ -808,9 +809,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                          (image->target_w + rect->x1 - 1);
         uint32_t y_max = (image->target_h + rect->y1 - 1) > rect->y2 ? rect-> y2 :
                          (image->target_h + rect->y1 - 1);
-
+        int32_t x_min = image->img_x < rect->x1 ? rect->x1 : image->img_x;
+        int32_t y_min = image->img_y < rect->y1 ? rect->y1 : image->img_y;
         if ((x_max < dc->section.x1) || (y_max < dc->section.y1)
-            || (rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y1 + dc->fb_height))
+            || (x_min >= dc->section.x1 + dc->fb_width) || (y_min >= dc->section.y1 + dc->fb_height))
         {
             return;
         }
@@ -820,7 +822,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         source.win_y_max = target.height;
         float x_ref = 0, y_ref = 0;
         uint32_t blend_area = 0;
-        ppe_rect_t ppe_rect = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
+        ppe_rect_t ppe_rect = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
         if (ppe_rect.x < 0)
         {
             ppe_rect.x = 0;
