@@ -1890,19 +1890,15 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_img_set_mode(GUI_TYPE(gui_button_t, parent)->img, blendMode);
                     gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
 
-                    if (strlen(text))
-                    {
-                        gui_color_t color_temporary;
-                        color_temporary.color.rgba_full = font_color;
-                        GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
-                    }
+                    gui_color_t color_temporary;
+                    color_temporary.color.rgba_full = font_color;
+                    GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
                         gui_button_api.onPress((void *)parent, sport_button_press, parent);
                         gui_button_api.onRelease((void *)parent, sport_button_release, parent);
                     }
 
-                    if (strlen(text))
                     {
                         char *font_type2 = NULL;
                         if (strstr(font_type, ".bin") != NULL)

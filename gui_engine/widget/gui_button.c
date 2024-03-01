@@ -417,7 +417,7 @@ static gui_button_t *gui_button_create_core(
             break;
         }
     }
-    if (strlen(text))
+    if (text)
     {
         gui_img_get_height(button->img);
 
