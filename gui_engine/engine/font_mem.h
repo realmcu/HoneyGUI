@@ -100,7 +100,7 @@ void gui_font_mem_init(uint8_t *font_bin_addr);
  *
  * @param text Widget pointer
  */
-void gui_font_mem_load(gui_text_t *text);
+void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect);
 
 /**
  * @brief Drawing of bitmap fonts using internal engine

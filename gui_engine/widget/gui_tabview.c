@@ -125,6 +125,10 @@ static void tabview_prepare(gui_obj_t *obj)
     {
         return;
     }
+    if (tabview->tp_disable)
+    {
+        return;
+    }
     if (tabview->cur_id.x != 0)
     {
         if (tp->type == TOUCH_HOLD_Y || tp->type == TOUCH_DOWN_SLIDE || tp->type == TOUCH_UP_SLIDE)
@@ -476,6 +480,11 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
 void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not)
 {
     tabview->loop = loop_or_not;
+}
+
+void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp)
+{
+    tabview->tp_disable = disable_tp;
 }
 /** End of WIDGET_Exported_Functions
   * @}

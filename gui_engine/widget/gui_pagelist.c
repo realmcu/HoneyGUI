@@ -120,7 +120,7 @@ static void pagelist_prepare(gui_pagelist_t *this)
             if (tp->y > this->y_init && tp->y < (this->y_init + root->h))
             {
                 //cal axis of pagelist
-                //gui_log("tp->y = %d, tp->deltaY = %d, this->y_stop_scroll = %d\n", tp->y , tp->deltaY, this->y_stop_scroll);
+                //gui_log("root->y = %d, tp->y = %d, tp->deltaY = %d, this->y_stop_scroll = %d, this->y_init = %d\n", root->y, tp->y , tp->deltaY, this->y_stop_scroll, this->y_init);
                 if (tp->type == TOUCH_HOLD_Y)
                 {
                     //update pagelist y
@@ -131,7 +131,7 @@ static void pagelist_prepare(gui_pagelist_t *this)
                     //update y_stop_scroll
                     this->y_stop_scroll = root->y;
                 }
-                if (root->y > this->y_init) //this.y_init
+                if (root->y > this->y_init || root->h <= (int)gui_get_screen_width()) //this.y_init
                 {
                     //pagelist reach top
                     root->y = this->y_init;
@@ -141,12 +141,15 @@ static void pagelist_prepare(gui_pagelist_t *this)
                 //     //pagelist reach bottom
                 //     root->y = 0 - (root->h - this->show_border_bottom - this->list_gap_y - list_h);
                 // }
-                else if (root->y < (0 - (root->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
-                                                                                  this->show_border_bottom) - this->list_gap_y)))//0 - root.h
+                else if (root->h > (int)gui_get_screen_width())
                 {
-                    //pagelist reach bottom
-                    root->y = 0 - (root->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
-                                                                            this->show_border_bottom) - this->list_gap_y);
+                    if (root->y < (0 - (root->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
+                                                                                 this->show_border_bottom) - this->list_gap_y)))//0 - root.h
+                    {
+                        //pagelist reach bottom
+                        root->y = 0 - (root->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
+                                                                                this->show_border_bottom) - this->list_gap_y);
+                    }
                 }
 
 

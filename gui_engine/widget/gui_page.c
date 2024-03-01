@@ -83,7 +83,26 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
+// static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
+// {
+//     gui_list_t *node = NULL;
+//     gui_list_for_each(node, &object->child_list)
+//     {
+//         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+//         if (!obj->not_show)
+//         {
+//             obj->ax = obj->x + obj->parent->ax;
+//             obj->ay = obj->y + obj->parent->ay;
+//             if (ayend < obj->ay + obj->h) { ayend = obj->ay + obj->h; }
+//             if (*out < ayend)
+//             {
+//                 *out = ayend;
+//             }
+//         }
+//         deal_img_in_root(obj, ayend, out);
+//     }
+// }
+static void page_height(gui_obj_t *object, gui_obj_t *page)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
@@ -91,18 +110,18 @@ static void deal_img_in_root(gui_obj_t *object, int ayend, int *out)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (!obj->not_show)
         {
-            obj->ax = obj->x + obj->parent->ax;
             obj->ay = obj->y + obj->parent->ay;
-            if (ayend < obj->ay + obj->h) { ayend = obj->ay + obj->h; }
-            if (*out < ayend)
+            int buttom = obj->ay + obj->h - page->ay;
+            //gui_log("buttom:%d\n",buttom);
+            if (page->h < buttom)
             {
-                *out = ayend;
+                page->h = buttom;
             }
+
         }
-        deal_img_in_root(obj, ayend, out);
+        page_height(obj, page);
     }
 }
-
 static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
 {
     this->src_mode = IMG_SRC_MEMADDR;
@@ -214,9 +233,12 @@ void page_update(gui_obj_t *obj)
     obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    int ay = 0;
-    deal_img_in_root(obj, obj->y + obj->h, &ay);
-    obj->h = ay - obj->y;
+    // int ay = 0;
+    // deal_img_in_root(obj, obj->y + obj->h, &ay);
+    // obj->h = ay - obj->y;
+    obj->h = gui_get_screen_height();
+    page_height(obj, obj);
+    //gui_log("objh:%d\n",obj->h);
     if (obj->parent->ay != 0)
     {
         return;
@@ -372,9 +394,11 @@ static void page_update_rebound(gui_obj_t *obj)
     obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    int ay = 0;
-    deal_img_in_root(obj, obj->y + obj->h, &ay);
-    obj->h = ay - obj->y;
+    // int ay = 0;
+    // deal_img_in_root(obj, obj->y + obj->h, &ay);
+    // obj->h = ay - obj->y;
+    obj->h = gui_get_screen_height();
+    page_height(obj, obj);
     if (obj->parent->ay != 0)
     {
         return;

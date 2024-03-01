@@ -448,7 +448,22 @@ struct _gui_color
     } color;
 };
 typedef struct _gui_color gui_color_t;
-
+struct gui_rgb_data_head
+{
+    unsigned char scan : 1;
+    unsigned char rsvd : 4;
+    unsigned char compress : 3;
+    char type;
+    short w;
+    short h;
+    char version;
+    char rsvd2;
+};
+typedef struct _gui_rect_file_head
+{
+    struct gui_rgb_data_head head;
+    gui_color_t color;
+} gui_rect_file_head_t;
 /** End of SUBMOUDLE_Exported_Types
   * @}
   */

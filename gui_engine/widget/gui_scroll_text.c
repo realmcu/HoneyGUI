@@ -83,15 +83,15 @@ static uint8_t scroll_skip_frame_count = 0;
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_font_load(gui_text_t *text)
+static void gui_font_load(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
     case GUI_FONT_SOURCE_BMP:
-        gui_font_mem_load(text);
+        gui_font_mem_load(text, rect);
         break;
     case GUI_FONT_SOURCE_TTF:
-        gui_font_stb_load(text);
+        gui_font_stb_load(text, rect);
         break;
     default:
         break;
@@ -200,7 +200,6 @@ static void scrolltext_draw(gui_obj_t *obj)
     if (dc->section_count == 0)
     {
         cur_time_ms = gui_ms_get();
-        gui_font_load(&text->base);
     }
     uint32_t offset = text->base.text_offset;
     uint32_t index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
@@ -234,6 +233,10 @@ static void scrolltext_draw(gui_obj_t *obj)
     draw_rect.xboundright = obj->ax + obj->dx + obj->tx + obj->w;
     draw_rect.yboundtop = obj->ay + obj->dy + obj->ty;
     draw_rect.yboundbottom = obj->ay + obj->dy + obj->ty + obj->h;
+    if (dc->section_count == 0)
+    {
+        gui_font_load(&text->base, &draw_rect);
+    }
     if (text->duration_time_ms == 0)
     {
         gui_font_draw(&text->base, &draw_rect);

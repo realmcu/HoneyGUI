@@ -69,6 +69,7 @@ typedef struct gui_tabview
     bool loop_status2;
     int16_t release_x;
     int16_t release_y;
+    bool tp_disable;
     uint8_t checksum;
 } gui_tabview_t;
 
@@ -162,6 +163,14 @@ void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style);
  * @param loop_or_not Loops when set to true, does not loop when set to false.
  */
 void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not);
+
+/**
+ * @brief disable tp action for this tabview.
+ *
+ * @param tabview tabview pointer.
+ * @param disable_tp true: disable tp action,  false: enable tp action.
+ */
+void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

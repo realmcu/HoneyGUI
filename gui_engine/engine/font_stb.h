@@ -33,7 +33,7 @@ void gui_font_stb_init(void *font_ttf_addr);
  *
  * @param text Widget pointer
  */
-void gui_font_stb_load(gui_text_t *text);
+void gui_font_stb_load(gui_text_t *text, gui_rect_t *rect);
 
 /**
  * @brief Drawing of ttf fonts using stb

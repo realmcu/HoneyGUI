@@ -90,8 +90,26 @@ typedef enum
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-
-
+static void hide_child(gui_obj_t *object)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        obj->not_show = true;
+        hide_child(obj);
+    }
+}
+static void show_child(gui_obj_t *object)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        obj->not_show = false;
+        hide_child(obj);
+    }
+}
 
 static void tab_prepare(gui_obj_t *obj)
 {
@@ -156,10 +174,14 @@ static void tab_prepare(gui_obj_t *obj)
     }
 
 
-    // if(location >= h)
-    // {
-    //     obj->not_show = true;
-    // }
+    if (location >= h)
+    {
+        hide_child(obj);
+    }
+    else
+    {
+        show_child(obj);
+    }
 
 
 
@@ -176,8 +198,15 @@ static void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filen
 
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->type = CARD;
+    if (parent->type == CARDVIEW)
+    {
+        gui_cardview_t *parent_ext = (gui_cardview_t *)parent;
+        if (idy >= 0)
+        {
+            parent_ext->tab_cnt_down++;
+        }
+    }
 
-    //gui_cardview_t *parent_ext = (gui_cardview_t *)parent;
 
     this->id = idy;
 

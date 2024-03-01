@@ -34,7 +34,7 @@ static uint8_t get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
     }
     return 0;
 }
-void gui_font_mem_load(gui_text_t *text)
+void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
 {
     uint8_t font_name = get_fontlib_name(text->path, text->font_height);
     uint32_t dot_offset = (uint32_t)(font_lib_tab[font_name].bmp_addr);
@@ -93,12 +93,13 @@ void gui_font_mem_load(gui_text_t *text)
             chr[i].w = aliened_font_size;
             chr[i].h = text->font_height;
             uint16_t offset = 0;
-            if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D || offset == 0xFFFF)
+            if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
             {
                 offset = *(uint16_t *)(0x20 * 2 + table_offset);
                 if (offset == 0xFFFF) { continue; }
                 chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
                 chr[i].char_w = text->font_height / 2;
+                chr[i].h = 1;
             }
             else if (chr[i].unicode == 0x0A)
             {
@@ -107,6 +108,7 @@ void gui_font_mem_load(gui_text_t *text)
                 if (offset == 0xFFFF) { continue; }
                 chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
                 chr[i].char_w = 0;
+                chr[i].h = 0;
             }
             else
             {
@@ -114,6 +116,7 @@ void gui_font_mem_load(gui_text_t *text)
                 if (offset == 0xFFFF) { continue; }
                 chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
                 chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+                chr[i].h = (int16_t)(*(chr[i].dot_addr - 1));
             }
             all_char_w += chr[i].char_w;
         }
@@ -133,10 +136,12 @@ void gui_font_mem_load(gui_text_t *text)
                 {
                     line_flag ++;
                     chr[i].char_w = 0;
+                    chr[i].h = 0;
                 }
                 else if (chr[i].unicode == 0x20)
                 {
                     chr[i].char_w = text->font_height / 2;
+                    chr[i].h = 1;
                 }
                 else
                 {
@@ -146,6 +151,7 @@ void gui_font_mem_load(gui_text_t *text)
                         {
                             chr[i].dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
                             chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+                            chr[i].h = (int16_t)(*(chr[i].dot_addr - 1));
                             break;
                         }
                     }
@@ -157,29 +163,7 @@ void gui_font_mem_load(gui_text_t *text)
     default:
         break;
     }
-    if (text->text_offset == 0)
-    {
-        switch (text->mode)
-        {
-        case LEFT:
-        case CENTER:
-        case RIGHT:
-            text->text_offset = (text->base.w - all_char_w) / 2;
-            break;
-        case MUTI_LEFT:
-        case MUTI_CENTER:
-        case MUTI_RIGHT:
-            text->text_offset = all_char_w / text->base.w + 1 + line_flag;
-            break;
-        case SCROLL_X:
-            text->text_offset = all_char_w;
-            break;
-        case SCROLL_Y:
-        // text->text_offset = (all_char_w / text->base.w + 1 + line_flag)*text->font_height;
-        default:
-            break;
-        }
-    }
+
     text->font_len = unicode_len;
     switch (text->charset)
     {
@@ -191,7 +175,153 @@ void gui_font_mem_load(gui_text_t *text)
     default:
         break;
     }
+
+    switch (text->mode)
+    {
+    case LEFT:
+    case CENTER:
+    case RIGHT:
+        {
+            if (text->text_offset == 0)
+            {
+                text->text_offset = (text->base.w - all_char_w) / 2;
+            }
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                chr[i].y = rect->y1;
+                if (i == 0)
+                {
+                    chr[i].x = rect->x1 + (text->base.w - all_char_w) / 2 * text->mode;
+                }
+                else
+                {
+                    chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
+                }
+                if ((chr[i].x + chr[i].char_w) > rect->x2)
+                {
+                    text->font_len = i;
+                    break;
+                }
+            }
+            break;
+        }
+    case MUTI_LEFT:
+    case MUTI_CENTER:
+    case MUTI_RIGHT:
+        {
+            gui_text_line_t *line_buf;
+            uint32_t line = 0;
+            if (text->text_offset == 0)
+            {
+                text->text_offset = all_char_w / text->base.w + 1 + line_flag;
+            }
+            line_buf = gui_malloc((text->text_offset + 1) * sizeof(gui_text_line_t));
+            memset(line_buf, 0, (text->text_offset + 1) * sizeof(gui_text_line_t));
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
+                if (i == 0)
+                {
+                    chr[i].x = rect->x1;
+                }
+                else
+                {
+                    chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
+                }
+                if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
+                {
+                    line_buf[line].line_char = i - 1;
+                    line_buf[line].line_dx = (text->base.w - chr[i].x + rect->x1) / 2 * (text->mode - 3);
+                    line++;
+                    chr[i].x = rect->x1;
+                }
+                chr[i].y = rect->y1 + line * chr[i].h;
+                if (chr[i].y >= rect->y2)
+                {
+                    text->font_len = i;
+                    break;
+                }
+            }
+            line_buf[line].line_char = text->font_len - 1;
+            line_buf[line].line_dx = (text->base.w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
+                                      1].char_w) / 2 * (text->mode - 3);
+            line = 0;
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                chr[i].x += line_buf[line].line_dx;
+                if (i > line_buf[line].line_char)
+                {
+                    line++;
+                }
+            }
+            gui_free(line_buf);
+            break;
+        }
+    case SCROLL_X:
+        {
+            if (text->text_offset == 0)
+            {
+                text->text_offset = all_char_w;
+            }
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                chr[i].y = rect->y1;
+                if (i == 0)
+                {
+                    chr[i].x = rect->x1;
+                }
+                else
+                {
+                    chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
+                }
+                if (chr[i].x > rect->xboundright)
+                {
+                    text->font_len = i;
+                    break;
+                }
+            }
+            break;
+        }
+    case SCROLL_Y:
+        {
+            uint32_t line = 0;
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
+                if (i == 0)
+                {
+                    chr[i].x = rect->x1;
+                }
+                else
+                {
+                    chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
+                }
+                if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
+                {
+                    line++;
+                    chr[i].x = rect->x1;
+                }
+                chr[i].y = rect->y1 + line * chr[i].h;
+                if (text->text_offset != 0)
+                {
+                    if (chr[i].y >= rect->yboundbottom)
+                    {
+                        text->font_len = i;
+                        break;
+                    }
+                }
+            }
+            if (text->text_offset == 0)
+            {
+                text->text_offset = line * text->font_height;
+            }
+            break;
+        }
+    default:
+        break;
+    }
 }
+
 void gui_font_mem_unload(gui_text_t *text)
 {
     gui_free(text->data);
@@ -441,17 +571,19 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         {
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
             uint16_t color_back;
+            uint16_t color_output = rgba2565(color);
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * dc->fb_width;
+                int dots_off = (i - font_y) * font_w - font_x;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
+                    uint8_t alpha = dots[dots_off + j];
                     if (alpha != 0)
                     {
                         alpha = color.color.rgba.a * alpha / 0xff;
                         color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = alphaBlendRGB565(rgba2565(color), color_back, alpha);
+                        writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha);
                     }
                 }
             }
@@ -463,9 +595,10 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int dots_off = (i - font_y) * font_w - font_x;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
+                    uint8_t alpha = dots[dots_off + j];
                     if (alpha != 0)
                     {
                         alpha = color.color.rgba.a * alpha / 0xff;
@@ -489,9 +622,10 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int dots_off = (i - font_y) * font_w - font_x;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
+                    uint8_t alpha = dots[dots_off + j];
                     if (alpha != 0)
                     {
                         color_back = writebuf[write_off + j];
@@ -503,36 +637,116 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         }
         break;
     case 1:
+#if 1 //0 - Stable slow processing , 1 - Fast processing in tests
         if (dc_bytes_per_pixel == 2)
         {
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-            uint16_t color_back;
+            uint16_t color_output = rgba2565(color);
+
+            uint32_t *p_dot32 = (uint32_t *)(dots + (y_start - font_y) * (font_w / 8));
+            int write_off = (y_start - dc->section.y1) * dc->fb_width;
+            for (uint32_t i = y_start; i < y_end; i++, write_off += dc->fb_width)
+            {
+                uint8_t *temp_p = (uint8_t *)p_dot32;
+                uint8_t temp;
+                p_dot32 += font_w / 32;
+                if (x_start > font_x)
+                {
+                    temp_p += (x_start - font_x) / 8;
+                    temp = *temp_p;
+                    uint8_t skip_bits = (x_start - font_x) % 8;
+                    temp &= ~(((1 << skip_bits) - 1) << (8 - skip_bits));
+                }
+                else
+                {
+                    temp = *temp_p;
+                }
+
+                uint32_t scan_end = font_x + font_w - (font_x + font_w - x_end) / 8 * 8;
+
+                for (uint32_t j = x_start; j < scan_end;)
+                {
+                    if (temp)
+                    {
+                        uint16_t offset = write_off + font_x + (j - font_x) / 8 * 8;
+
+                        if (temp & 0x0F)
+                        {
+                            if (temp & 0x01)
+                            {
+                                writebuf[offset + 7] = color_output;
+                            }
+                            if (temp & 0x02)
+                            {
+                                writebuf[offset + 6] = color_output;
+                            }
+                            if (temp & 0x04)
+                            {
+                                writebuf[offset + 5] = color_output;
+                            }
+                            if (temp & 0x08)
+                            {
+                                writebuf[offset + 4] = color_output;
+                            }
+                        }
+                        if (temp & 0xF0)
+                        {
+                            if (temp & 0x20)
+                            {
+                                writebuf[offset + 2] = color_output;
+                            }
+                            if (temp & 0x10)
+                            {
+                                writebuf[offset + 3] = color_output;
+                            }
+                            if (temp & 0x40)
+                            {
+                                writebuf[offset + 1] = color_output;
+                            }
+                            if (temp & 0x80)
+                            {
+                                writebuf[offset] = color_output;
+                            }
+                        }
+                    }
+                    temp_p++;
+                    temp = *temp_p;
+                    j += 8;
+                }
+            }
+        }
+#else
+        if (dc_bytes_per_pixel == 2)
+        {
+            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+            uint16_t color_output = rgba2565(color);
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * dc->fb_width;
+                int dots_off = (i - font_y) * (font_w / 8);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
                     {
-                        color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = alphaBlendRGB565(rgba2565(color), color_back, color.color.rgba.a);
+                        writebuf[write_off + j] = color_output;
                     }
                 }
             }
         }
+#endif
         else if (dc_bytes_per_pixel == 3)
         {
             uint8_t *writebuf = (uint8_t *)dc->frame_buf;
             uint8_t color_back[3];
+            uint8_t alpha = color.color.rgba.a;
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
-                uint8_t alpha = 0xff;
+                int dots_off = (i - font_y) * (font_w / 8);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
                     {
-                        alpha = color.color.rgba.a;
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
                         color_back[2] = writebuf[write_off * 3 + j * 3 + 0];
@@ -553,9 +767,10 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int dots_off = (i - font_y) * (font_w / 8);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    if ((dots[(i - font_y) * (font_w / 8) + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
                     {
                         color_back = writebuf[write_off + j];
                         writebuf[write_off + j] = alphaBlendRGBA(color, color_back, color.color.rgba.a);
@@ -571,136 +786,11 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
 void gui_font_mem_draw(gui_text_t *text, gui_rect_t *rect)
 {
     mem_char_t *chr = text->data;
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_text_line_t *line_buf;
-    uint16_t dx = 0;
-    uint32_t line = 0;
     uint8_t font_name = get_fontlib_name(text->path, text->font_height);
     uint8_t rendor_mode = font_lib_tab[font_name].rendor_mode;
-    switch (text->mode)
+    for (uint16_t i = 0; i < text->font_len; i++)
     {
-    case LEFT:
-    case CENTER:
-    case RIGHT:
-        dx = text->text_offset * text->mode;
-        for (uint16_t i = 0; i < text->font_len; i++)
-        {
-            chr[i].y = rect->y1;
-            if (i == 0)
-            {
-                chr[i].x = rect->x1;
-            }
-            else
-            {
-                chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
-            }
-            if ((chr[i].x + chr[i].char_w) > rect->x2)
-            {
-                text->font_len = i;
-                break;
-            }
-            rtk_draw_unicode(dx, chr + i, text->color, rendor_mode, rect);
-        }
-        break;
-    case MUTI_LEFT:
-    case MUTI_CENTER:
-    case MUTI_RIGHT:
-        line_buf = gui_malloc((text->text_offset + 1) * sizeof(gui_text_line_t));
-        memset(line_buf, 0, (text->text_offset + 1) * sizeof(gui_text_line_t));
-        for (uint16_t i = 0; i < text->font_len; i++)
-        {
-            // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
-            if (i == 0)
-            {
-                chr[i].x = rect->x1;
-            }
-            else
-            {
-                chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
-            }
-            if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
-            {
-                line_buf[line].line_char = i - 1;
-                line_buf[line].line_dx = (text->base.w - chr[i].x + rect->x1) / 2 * (text->mode - 3);
-                line++;
-                chr[i].x = rect->x1;
-            }
-            chr[i].y = rect->y1 + line * chr[i].h;
-            if (chr[i].y >= rect->y2)
-            {
-                text->font_len = i;
-                break;
-            }
-        }
-        line_buf[line].line_char = text->font_len - 1;
-        line_buf[line].line_dx = (text->base.w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
-                                  1].char_w) / 2 * (text->mode - 3);
-        line = 0;
-        for (uint16_t i = 0; i < text->font_len; i++)
-        {
-            if (i > line_buf[line].line_char)
-            {
-                line++;
-            }
-            rtk_draw_unicode(line_buf[line].line_dx, chr + i, text->color, rendor_mode, rect);
-        }
-        gui_free(line_buf);
-        break;
-    case SCROLL_X:
-        for (uint16_t i = 0; i < text->font_len; i++)
-        {
-            chr[i].y = rect->y1;
-            if (i == 0)
-            {
-                chr[i].x = rect->x1;
-            }
-            else
-            {
-                chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
-            }
-            if (chr[i].x > rect->xboundright)
-            {
-                text->font_len = i;
-                break;
-            }
-            rtk_draw_unicode(0, chr + i, text->color, rendor_mode, rect);
-        }
-        break;
-    case SCROLL_Y:
-        for (uint16_t i = 0; i < text->font_len; i++)
-        {
-            // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
-            if (i == 0)
-            {
-                chr[i].x = rect->x1;
-            }
-            else
-            {
-                chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
-            }
-            if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
-            {
-                line++;
-                chr[i].x = rect->x1;
-            }
-            chr[i].y = rect->y1 + line * chr[i].h;
-            if (text->text_offset != 0)
-            {
-                if (chr[i].y >= rect->yboundbottom)
-                {
-                    text->font_len = i;
-                    break;
-                }
-            }
-            rtk_draw_unicode(0, chr + i, text->color, rendor_mode, rect);
-        }
-        if (text->text_offset == 0)
-        {
-            text->text_offset = line * text->font_height;
-        }
-        break;
-    default:
-        break;
+        rtk_draw_unicode(0, chr + i, text->color, rendor_mode, rect);
     }
 }
 

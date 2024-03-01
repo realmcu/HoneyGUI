@@ -137,6 +137,21 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
     }
 }
+static void obj_is_active(gui_obj_t *obj)
+{
+
+    int sx = obj->dx + obj->ax + obj->tx;
+    int sy = obj->dy + obj->ay + obj->ty;
+    int ex = sx + obj->w;
+    int ey = sy + obj->h;
+
+
+    if ((sx < (int)gui_get_screen_width()) && ((ex > 0) || sx == 0) && \
+        (sy < (int)gui_get_screen_height()) && ((ey > 0) || sy == 0))
+    {
+        obj->active = true;
+    }
+}
 
 static void img_prepare(gui_obj_t *obj)
 {
@@ -187,22 +202,41 @@ static void img_prepare(gui_obj_t *obj)
     gui_image_load_scale(draw_img);
     root->w = draw_img->img_w;
     root->h = draw_img->img_h;
+    if (root->sx != 1 || root->sy != 1)
+    {
+        this->matrix_flag = true;
+    }
+    // gui_log("matrix_flag:%d@%s\n", this->matrix_flag, root->name);
+    obj_is_active(root);
+    if (!root->active)
+    {
+        return;
+    }
+
+
     matrix_identity(draw_img->matrix);
     matrix_identity(draw_img->matrix);
     matrix_translate(root->dx, root->dy, draw_img->matrix);
     matrix_translate(root->tx, root->ty, draw_img->matrix);
 
+    if (this->matrix_flag)
+    {
+        matrix_translate(dc->screen_width / 2, dc->screen_height / 2, draw_img->matrix);
+        matrix_scale(root->sx, root->sy, draw_img->matrix);
+        matrix_translate(-dc->screen_width / 2, -dc->screen_height / 2, draw_img->matrix);
+    }
 
-    matrix_translate(dc->screen_width / 2, dc->screen_height / 2, draw_img->matrix);
-    matrix_scale(root->sx, root->sy, draw_img->matrix);
-    matrix_translate(-dc->screen_width / 2, -dc->screen_height / 2, draw_img->matrix);
+
     matrix_translate(root->ax, root->ay, draw_img->matrix);
+    //if (this->matrix_flag)
+    {
+        matrix_translate(this->t_x, this->t_y, draw_img->matrix);
+        matrix_rotate(this->degrees, draw_img->matrix);
+        matrix_scale(this->scale_x, this->scale_y, draw_img->matrix);
 
-    matrix_translate(this->t_x, this->t_y, draw_img->matrix);
-    matrix_rotate(this->degrees, draw_img->matrix);
-    matrix_scale(this->scale_x, this->scale_y, draw_img->matrix);
+        matrix_translate(-this->c_x, -this->c_y, draw_img->matrix);
+    }
 
-    matrix_translate(-this->c_x, -this->c_y, draw_img->matrix);
 
     memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(draw_img->inverse);
@@ -230,6 +264,10 @@ static void img_prepare(gui_obj_t *obj)
     if (last != this->checksum)
     {
         gui_fb_change();
+    }
+    if (!(root->sx != 1 || root->sy != 1))
+    {
+        this->matrix_flag = false;
     }
 }
 
@@ -511,6 +549,7 @@ void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)
     img->degrees = degrees;
     img->c_x = c_x;
     img->c_y = c_y;
+    img->matrix_flag = 1;
 }
 
 void gui_img_scale(gui_img_t *img, float scale_x, float scale_y)
@@ -521,6 +560,7 @@ void gui_img_scale(gui_img_t *img, float scale_x, float scale_y)
         img->scale_x = scale_x;
         img->scale_y = scale_y;
     }
+    img->matrix_flag = 1;
 }
 
 void gui_img_translate(gui_img_t *img, float t_x, float t_y)
@@ -528,6 +568,7 @@ void gui_img_translate(gui_img_t *img, float t_x, float t_y)
     GUI_ASSERT(img != NULL);
     img->t_x = t_x;
     img->t_y = t_y;
+    img->matrix_flag = 1;
 }
 
 void gui_img_skew_x(gui_img_t *img, float degrees)
