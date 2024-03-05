@@ -1,7 +1,8 @@
 #include "draw_font.h"
 #include "font_stb.h"
 #define STB_TRUETYPE_IMPLEMENTATION
-#define STB_REDUCE_MEMORY
+// #define STB_REDUCE_MEMORY
+#define STB_REDUCE_MEMORY_FIXD
 // #define ALLOW_UNALIGNED_TRUETYPE
 #include "stb_truetype.h"
 #include "acc_engine.h"

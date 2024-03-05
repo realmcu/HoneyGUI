@@ -3203,6 +3203,11 @@ static void *stbtt__hheap_alloc(stbtt__hheap *hh, size_t size, void *userdata)
             //To save memory, reduce the count by half.By luke.
             //modified, sim 32 * 400 + 8 = 12808B, soc 28 * 1000 + 4 = 28004B
             int count = (size < 32 ? 1000 : size < 128 ? 400 : 100);
+#elif defined STB_REDUCE_MEMORY_FIXD
+            //To save memory, fix the count to 100.By luke.
+            //If it is not enough, the system will reapply.
+            //modified, sim 32 * 100 + 8 = 3208B, soc 28 * 100 + 4 = 2804B
+            int count = 100;
 #else
             //original, sim 32 * 800 + 8 = 25608B, soc 28 * 2000 + 4 = 56004B
             int count = (size < 32 ? 2000 : size < 128 ? 800 : 100);
