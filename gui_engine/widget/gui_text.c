@@ -211,8 +211,11 @@ static void gui_text_draw(gui_obj_t *obj)
         gui_text_font_load(text, &draw_rect);
     }
     gui_text_font_draw(text, &draw_rect);
+    uint32_t total_section_count = dc->screen_height / dc->fb_height -
+                                   ((dc->screen_height % dc->fb_height) ? 0 : 1);
     if (draw_rect.y2 >= dc->section_count * dc->fb_height && \
-        draw_rect.y2 < (dc->section_count + 1)*dc->fb_height)
+        draw_rect.y2 < (dc->section_count + 1)*dc->fb_height || \
+        dc->section_count == total_section_count)
     {
         gui_text_font_unload(text);
     }

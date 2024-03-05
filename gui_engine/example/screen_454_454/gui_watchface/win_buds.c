@@ -1,6 +1,5 @@
 #include "root_image/ui_resource.h"
 #include "gui_curtainview.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_switch.h"
@@ -27,7 +26,7 @@ extern gui_win_t *win_confirm;
 
 char *txet_disconnect = "确认断开连接？";
 
-static void switch_back_menu_buds_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_back_menu_buds_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_back_menu_buds_touch_cb, event = %d\n", event);
     win_menu_buds->base.not_show = true;
@@ -37,7 +36,7 @@ static void switch_back_menu_buds_touch_cb(void *obj, gui_event_cb_t event)
     win_menu_buds = NULL;
 }
 
-static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_text_base_buds_device_touch_cb, event = %d\n", event);
     push_current_widget(win_menu_buds);
@@ -55,7 +54,7 @@ static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t even
 
 }
 
-static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_text_base_search_buds_touch_cb, event = %d\n", event);
     extern gui_win_t *win_menu_buds;
@@ -74,19 +73,19 @@ static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t even
 
 static void switch_disconnect_yes_action(void *obj)
 {
-    gui_log("switch_disconnect_yes_action, obj = 0x%x\n", obj);
+    gui_log("switch_disconnect_yes_action, obj = 0x%x\n", (uint32_t *)obj);
 }
 
 static void switch_disconnect_no_action(void *obj)
 {
-    gui_log("switch_disconnect_no_action, obj = 0x%x\n", obj);
+    gui_log("switch_disconnect_no_action, obj = 0x%x\n", (uint32_t *)obj);
     win_menu_buds->base.not_show = false;
 
     gui_tree_free(win_confirm);
     win_confirm = NULL;
 }
 
-static void switch_disconnect_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_disconnect_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_disconnect_touch_cb, event = %d\n", event);
     push_current_widget(win_menu_buds);

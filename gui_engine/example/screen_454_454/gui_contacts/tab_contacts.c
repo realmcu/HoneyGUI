@@ -6,7 +6,6 @@
 #include "gui_obj.h"
 #include "gui_common.h"
 #include "gui_grid.h"
-#include "gui_tab.h"
 
 gui_text_t *text_contacts_title = NULL;
 gui_img_t *img_touch_contacts = NULL;
@@ -31,7 +30,7 @@ static void switch_incoming_call_answer_touch_cb()
 
 static void switch_contacts_touch_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_contacts_touch_cb, obj = 0x%x\n", obj);
+    gui_log("switch_contacts_touch_cb, obj = 0x%x\n", (uint32_t *)obj);
 
     //gui_switch_t *this = (gui_switch_t *)obj;
     //for contracts list window creation

@@ -198,6 +198,9 @@ static void img_scope_draw_cb(gui_obj_t *obj)
     draw_rect.yboundbottom = GUI_TYPE(gui_img_scope_t, obj)->scope_y2;
     draw_rect.yboundtop = GUI_TYPE(gui_img_scope_t, obj)->scope_y1;
 
+    draw_rect.x2 = _UI_MIN(draw_rect.x2, draw_rect.x1 + draw_rect.xboundright);
+    draw_rect.y2 = _UI_MIN(draw_rect.y2, draw_rect.y1 + draw_rect.yboundbottom);
+
     if ((draw_rect.xboundleft == draw_rect.xboundright) ||
         (draw_rect.yboundbottom == draw_rect.yboundtop))
     {

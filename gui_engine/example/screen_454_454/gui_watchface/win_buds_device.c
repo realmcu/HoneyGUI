@@ -234,12 +234,12 @@ static void switch_text_base_bonding_buds_3_touch_cb(void *obj, gui_event_t even
 
 void device_buds_confirm_yes_action(void *obj)
 {
-    gui_log("device_buds_confirm_yes_action, obj = 0x%x\n", obj);
+    gui_log("device_buds_confirm_yes_action, obj = 0x%x\n", (uint32_t *)obj);
 }
 
 void device_buds_confirm_no_action(void *obj)
 {
-    gui_log("device_buds_confirm_no_action, obj = 0x%x\n", obj);
+    gui_log("device_buds_confirm_no_action, obj = 0x%x\n", (uint32_t *)obj);
     win_buds_device->base.not_show = false;
 
     gui_tree_free(win_confirm);

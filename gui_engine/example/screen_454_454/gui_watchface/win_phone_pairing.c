@@ -1,12 +1,9 @@
 #include "root_image/ui_resource.h"
 #include "gui_curtainview.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_switch.h"
 #include "gui_win.h"
-#include "app_gui_main.h"
-#include "gui_tabview.h"
 #include "gui_obj.h"
 
 gui_switch_t *switch_back_menu_conn_new_phone = NULL;
@@ -18,7 +15,7 @@ gui_text_t *text_watch_device_addr = NULL;
 extern gui_win_t *win_menu_phone_pairing;
 extern gui_win_t *win_menu_phone;
 
-static void switch_back_menu_conn_new_phone_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_back_menu_conn_new_phone_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_back_menu_conn_new_phone_touch_cb, event = %d\n", event);
     win_menu_phone_pairing->base.not_show = true;

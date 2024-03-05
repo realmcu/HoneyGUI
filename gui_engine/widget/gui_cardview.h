@@ -67,10 +67,8 @@ typedef struct gui_cardview
     SLIDE_STYLE style;
     int16_t release_y;
     int16_t remain_y;
-    int16_t y_last;
-    int16_t count;
     int16_t speed;
-
+    int16_t recode[5];
     bool mute;
     void (*status_cb)(struct gui_cardview *this);
 } gui_cardview_t;

@@ -113,46 +113,33 @@ static void cardview_prepare(gui_obj_t *obj)
             this->release_y = 0;
         }
         {
-            if (GUI_TYPE(gui_cardview_t, obj)->count == 5)
+            for (size_t i = 0; i < 4; i++)
             {
-                GUI_TYPE(gui_cardview_t, obj)->count = 0;
+                this->recode[i] = this->recode[i + 1];
             }
-            GUI_TYPE(gui_cardview_t, obj)->count++;
-
-            if (GUI_TYPE(gui_cardview_t, obj)->count == 1)
+            this->recode[4] = tp->deltaY ;
+            this->speed = this->recode[4] - this->recode[0];
+            if (this->speed > 60)
             {
-                GUI_TYPE(gui_cardview_t, obj)->y_last = tp->deltaY;
+                this->speed = 60;
             }
-            if (GUI_TYPE(gui_cardview_t, obj)->count == 5)
+            else if (this->speed < -60)
             {
-                //gui_log("((gui_cardview_t *)obj)->yold:%d,%d,%d\n",obj->y-GUI_TYPE(gui_cardview_t, obj)->y_last, obj->y, GUI_TYPE(gui_cardview_t, obj)->y_last);
-                if (GUI_TYPE(gui_cardview_t, obj)->y_last != 0)
-                {
-                    GUI_TYPE(gui_cardview_t, obj)->speed = tp->deltaY - GUI_TYPE(gui_cardview_t, obj)->y_last;
-                }
-                if (GUI_TYPE(gui_cardview_t, obj)->speed > 40)
-                {
-                    GUI_TYPE(gui_cardview_t, obj)->speed = 40;
-                }
-                if (GUI_TYPE(gui_cardview_t, obj)->speed < -40)
-                {
-                    GUI_TYPE(gui_cardview_t, obj)->speed = -40;
-                }
-                GUI_TYPE(gui_cardview_t, obj)->y_last = 0;
-            }//gui_log("%d,%d,%d\n",tp->deltaY,GUI_TYPE(gui_cardview_t, obj)->y_last,GUI_TYPE(gui_cardview_t, obj)->speed);
+                this->speed = -60;
+            }
         }
 
         break;
     case TOUCH_DOWN_SLIDE:
         this->remain_y = this->release_y;
-        GUI_TYPE(gui_cardview_t, obj)->y_last = 0;
+        memset(this->recode, 0, 10);
         break;
     case TOUCH_UP_SLIDE:
         this->remain_y = this->release_y;
-        GUI_TYPE(gui_cardview_t, obj)->y_last = 0;
+        memset(this->recode, 0, 10);
         break;
     default:
-        GUI_TYPE(gui_cardview_t, obj)->y_last = 0;
+        memset(this->recode, 0, 10);
         {
             if (GUI_TYPE(gui_cardview_t, obj)->speed > 0)
             {
@@ -169,9 +156,9 @@ static void cardview_prepare(gui_obj_t *obj)
         {
             this->release_y = 0;
         }
-        if (this->release_y < -((GUI_TYPE(gui_cardview_t, obj)->tab_cnt_down - 1)*obj->h))
+        if (this->release_y < -((GUI_TYPE(gui_cardview_t, obj)->tab_cnt_down - 1)*obj->h) / 2)
         {
-            this->release_y = -((GUI_TYPE(gui_cardview_t, obj)->tab_cnt_down - 1) * obj->h);
+            this->release_y = -((GUI_TYPE(gui_cardview_t, obj)->tab_cnt_down - 1) * obj->h / 2);
         }
 
         this->remain_y = this->release_y;

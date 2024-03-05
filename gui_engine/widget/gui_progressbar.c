@@ -247,6 +247,7 @@ void gui_progressbar_h_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void
     GET_BASE(this)->w = w;
     GET_BASE(this)->h = gui_img_get_height((void *)this->c);
     GUI_TYPE(gui_img_scope_t, this->c)->scope_x2 = this->max * this->per;
+    GUI_TYPE(gui_img_scope_t, this->c)->scope_y2 = GET_BASE(this)->h;
 
 
 }

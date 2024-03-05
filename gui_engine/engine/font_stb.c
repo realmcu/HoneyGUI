@@ -1,7 +1,8 @@
 #include "draw_font.h"
 #include "font_stb.h"
 #define STB_TRUETYPE_IMPLEMENTATION
-#define STB_REDUCE_MEMORY
+// #define STB_REDUCE_MEMORY
+#define STB_REDUCE_MEMORY_FIXD
 // #define ALLOW_UNALIGNED_TRUETYPE
 #include "stb_truetype.h"
 #include "acc_engine.h"
@@ -84,9 +85,12 @@ void gui_font_stb_load(gui_text_t *text, gui_rect_t *rect)
 
 void gui_font_stb_unload(gui_text_t *text)
 {
-    gui_free(((FONT_STB_SCREEN *)text->data)->buf);
-    gui_free((FONT_STB_SCREEN *)text->data);
-    text->data = NULL;
+    if (text->data)
+    {
+        gui_free(((FONT_STB_SCREEN *)text->data)->buf);
+        gui_free((FONT_STB_SCREEN *)text->data);
+        text->data = NULL;
+    }
 }
 #ifndef RTK_GUI_FONT_ENABLE_TTF_SVG
 gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)

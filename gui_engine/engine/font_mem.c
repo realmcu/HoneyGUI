@@ -324,7 +324,11 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
 
 void gui_font_mem_unload(gui_text_t *text)
 {
-    gui_free(text->data);
+    if (text->data)
+    {
+        gui_free(text->data);
+        text->data = NULL;
+    }
     return;
 }
 // Fast RGB565 pixel blending

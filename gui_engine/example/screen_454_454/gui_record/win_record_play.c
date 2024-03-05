@@ -67,8 +67,8 @@ static void scroll_text_record_play_title_animate_cb(void *obj)
         }
     }
 
-    gui_log("scroll_text_record_play_title_animate_cb obj = 0x%x\n", obj);
-    gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", file_name);
+    gui_log("scroll_text_record_play_title_animate_cb obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", (uint32_t *)file_name);
 
     char *string_title = (char *)file_name->base.content;
     gui_scrolltext_text_set(scroll_text_record_play_title, string_title, "rtk_font_mem",
@@ -82,7 +82,7 @@ static void text_record_play_time_animate_cb(void *obj)
 
 void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_file)
 {
-    gui_log("design_win_record_play win_record_play = 0x%x\n", win_record_play);
+    gui_log("design_win_record_play win_record_play = 0x%x\n", (uint32_t *)win_record_play);
     switch_record_play_back = gui_switch_create(parent, 129, 24, 48, 48, ICON_BACK_BIN,
                                                 ICON_BACK_BIN);
     gui_obj_add_event_cb(switch_record_play_back, (gui_event_cb_t)record_play_back_touch_cb,
