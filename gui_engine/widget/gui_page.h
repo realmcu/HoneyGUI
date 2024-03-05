@@ -54,8 +54,7 @@ typedef struct gui_page
     uint32_t widget_count;
     uint32_t width;
     int yold;
-    int y_last;
-    int count;
+    int16_t recode[5];
     int speed;
 
     int start_x;

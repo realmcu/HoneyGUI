@@ -238,7 +238,8 @@ void page_update(gui_obj_t *obj)
     // obj->h = ay - obj->y;
     obj->h = gui_get_screen_height();
     page_height(obj, obj);
-    //gui_log("objh:%d\n",obj->h);
+    gui_page_t *page = (gui_page_t *)obj;
+    //gui_log("obj->y:%d,speed:%d,type%d,%d,%d,%d\n",obj->y, GUI_TYPE(gui_page_t, obj)->speed, tp->type,tp->deltaY,tp->released,tp->y);
     if (obj->parent->ay != 0)
     {
         return;
@@ -266,54 +267,72 @@ void page_update(gui_obj_t *obj)
                         // gui_log("obj->yyyy:%d,%d",obj->y, ((gui_page_t *)obj)->start_y-(obj->h-(int)gui_get_screen_height()));
                         obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
                     }
-                    if (GUI_TYPE(gui_page_t, obj)->count == 5)
+                    for (size_t i = 0; i < 4; i++)
                     {
-                        GUI_TYPE(gui_page_t, obj)->count = 0;
+                        page->recode[i] = page->recode[i + 1];
                     }
-                    GUI_TYPE(gui_page_t, obj)->count++;
+                    page->recode[4] = tp->deltaY;
+                    GUI_TYPE(gui_page_t, obj)->speed = page->recode[4] - page->recode[0];
+                    if (GUI_TYPE(gui_page_t, obj)->speed > 60)
+                    {
+                        GUI_TYPE(gui_page_t, obj)->speed = 60;
+                    }
+                    else if (GUI_TYPE(gui_page_t, obj)->speed < -60)
+                    {
+                        GUI_TYPE(gui_page_t, obj)->speed = -60;
+                    }
 
-                    if (GUI_TYPE(gui_page_t, obj)->count == 1)
-                    {
-                        GUI_TYPE(gui_page_t, obj)->y_last = obj->y;
-                    }
-                    if (GUI_TYPE(gui_page_t, obj)->count == 5)
-                    {
-                        //gui_log("((gui_page_t *)obj)->yold:%d,%d,%d\n",obj->y-GUI_TYPE(gui_page_t, obj)->y_last, obj->y, GUI_TYPE(gui_page_t, obj)->y_last);
-                        if (GUI_TYPE(gui_page_t, obj)->y_last != 0)
-                        {
-                            GUI_TYPE(gui_page_t, obj)->speed = obj->y - GUI_TYPE(gui_page_t, obj)->y_last;
-                        }
-                        if (GUI_TYPE(gui_page_t, obj)->speed > 40)
-                        {
-                            GUI_TYPE(gui_page_t, obj)->speed = 40;
-                        }
-                        if (GUI_TYPE(gui_page_t, obj)->speed < -40)
-                        {
-                            GUI_TYPE(gui_page_t, obj)->speed = -40;
-                        }
-                        //GUI_TYPE(gui_page_t, obj)->y_last = 0;
-                    }
+
                     gui_obj_event_set(obj, GUI_EVENT_8);
 
                 }
                 else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed != 0)
                 {
                     GUI_TYPE(gui_page_t, obj)->release = true;
-                    GUI_TYPE(gui_page_t, obj)->count = 0;
-                    GUI_TYPE(gui_page_t, obj)->y_last = 0;
+                    if (GUI_TYPE(gui_page_t, obj)->release)
+                    {
+                        //gui_log("release ");
+                        if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                        {
+                            GUI_TYPE(gui_page_t, obj)->release = false;
+                            center_alignment((void *)obj);
+                        }
+                        //gui_log("%d,%d\n",obj->y, GUI_TYPE(gui_page_t, obj)->speed);
+
+                        if (GUI_TYPE(gui_page_t, obj)->speed > 0)
+                        {
+                            obj->y += GUI_TYPE(gui_page_t, obj)->speed;
+                            GUI_TYPE(gui_page_t, obj)->speed -= 1;
+                        }
+                        else if (GUI_TYPE(gui_page_t, obj)->speed < 0)
+                        {
+                            obj->y += GUI_TYPE(gui_page_t, obj)->speed;
+                            GUI_TYPE(gui_page_t, obj)->speed += 1;
+                        }
+                        if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                        {
+                            gui_obj_event_set(obj, GUI_EVENT_7);
+                            center_alignment((void *)obj);
+                        }
+                        else
+                        {
+                            gui_obj_event_set(obj, GUI_EVENT_8);
+                        }
+
+
+                    }
                 }
                 else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed == 0)
                 {
                     gui_obj_event_set(obj, GUI_EVENT_7);
                     center_alignment((void *)obj);
-
+//gui_log("release ");
                 }
                 else if (tp->pressed)
                 {
                     GUI_TYPE(gui_page_t, obj)->release = false;
-                    GUI_TYPE(gui_page_t, obj)->count = 0;
                     GUI_TYPE(gui_page_t, obj)->speed = 0;
-                    GUI_TYPE(gui_page_t, obj)->y_last = 0;
+                    memset(page->recode, 0, 10);
                 }
                 else
                 {
@@ -366,6 +385,8 @@ void page_update(gui_obj_t *obj)
                     }
                     ((gui_page_t *)obj)->yold = obj->y;
                 }
+                //gui_log("%d,%d,%d\n",obj->y, GUI_TYPE(gui_page_t, obj)->speed, tp->type);
+
             }
         }
 
@@ -403,7 +424,7 @@ static void page_update_rebound(gui_obj_t *obj)
     {
         return;
     }
-
+    gui_page_t *page = (gui_page_t *)obj;
     if ((obj->ax + obj->tx < (int)gui_get_screen_width()) && ((obj->ax + obj->tx + obj->w) >= 0))
     {
         if ((tp->x > ((gui_page_t *)obj)->start_x) && (tp->x < ((gui_page_t *)obj)->start_x + obj->w))
@@ -430,33 +451,22 @@ static void page_update_rebound(gui_obj_t *obj)
                         // obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
                         GUI_TYPE(gui_page_t, obj)->status = 2;
                     }
-                    if (GUI_TYPE(gui_page_t, obj)->count == 5)
-                    {
-                        GUI_TYPE(gui_page_t, obj)->count = 0;
-                    }
-                    GUI_TYPE(gui_page_t, obj)->count++;
 
-                    if (GUI_TYPE(gui_page_t, obj)->count == 1)
+                    for (size_t i = 0; i < 4; i++)
                     {
-                        GUI_TYPE(gui_page_t, obj)->y_last = obj->y;
+                        page->recode[i] = page->recode[i + 1];
                     }
-                    if (GUI_TYPE(gui_page_t, obj)->count == 5)
+                    page->recode[4] = tp->deltaY ;
+                    GUI_TYPE(gui_page_t, obj)->speed = page->recode[4] - page->recode[0];
+                    if (GUI_TYPE(gui_page_t, obj)->speed > 60)
                     {
-                        //gui_log("((gui_page_t *)obj)->yold:%d,%d,%d\n",obj->y-GUI_TYPE(gui_page_t, obj)->y_last, obj->y, GUI_TYPE(gui_page_t, obj)->y_last);
-                        if (GUI_TYPE(gui_page_t, obj)->y_last != 0)
-                        {
-                            GUI_TYPE(gui_page_t, obj)->speed = obj->y - GUI_TYPE(gui_page_t, obj)->y_last;
-                        }
-                        if (GUI_TYPE(gui_page_t, obj)->speed > 40)
-                        {
-                            GUI_TYPE(gui_page_t, obj)->speed = 40;
-                        }
-                        if (GUI_TYPE(gui_page_t, obj)->speed < -40)
-                        {
-                            GUI_TYPE(gui_page_t, obj)->speed = -40;
-                        }
-                        //GUI_TYPE(gui_page_t, obj)->y_last = 0;
+                        GUI_TYPE(gui_page_t, obj)->speed = 60;
                     }
+                    else if (GUI_TYPE(gui_page_t, obj)->speed < -60)
+                    {
+                        GUI_TYPE(gui_page_t, obj)->speed = -60;
+                    }
+                    //gui_log("status:%d,%d,%d,%d,%d,%d\n",GUI_TYPE(gui_page_t, obj)->status, page->recode[0], page->recode[1],page->recode[2],page->recode[3],page->recode[4]);
                     gui_obj_event_set(obj, GUI_EVENT_8);
                     if (GUI_TYPE(gui_page_t, obj)->status == 1)
                     {
@@ -472,8 +482,38 @@ static void page_update_rebound(gui_obj_t *obj)
                 else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed != 0)
                 {
                     GUI_TYPE(gui_page_t, obj)->release = true;
-                    GUI_TYPE(gui_page_t, obj)->count = 0;
-                    GUI_TYPE(gui_page_t, obj)->y_last = 0;
+                    if (GUI_TYPE(gui_page_t, obj)->release)
+                    {
+                        //gui_log("release ");
+                        if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                        {
+                            GUI_TYPE(gui_page_t, obj)->release = false;
+                            center_alignment((void *)obj);
+                        }
+                        //gui_log("%d,%d\n",obj->y, GUI_TYPE(gui_page_t, obj)->speed);
+
+                        if (GUI_TYPE(gui_page_t, obj)->speed > 0)
+                        {
+                            obj->y += GUI_TYPE(gui_page_t, obj)->speed;
+                            GUI_TYPE(gui_page_t, obj)->speed -= 1;
+                        }
+                        else if (GUI_TYPE(gui_page_t, obj)->speed < 0)
+                        {
+                            obj->y += GUI_TYPE(gui_page_t, obj)->speed;
+                            GUI_TYPE(gui_page_t, obj)->speed += 1;
+                        }
+                        if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                        {
+                            gui_obj_event_set(obj, GUI_EVENT_7);
+                            center_alignment((void *)obj);
+                        }
+                        else
+                        {
+                            gui_obj_event_set(obj, GUI_EVENT_8);
+                        }
+
+
+                    }
                 }
                 else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed == 0)
                 {
@@ -483,10 +523,9 @@ static void page_update_rebound(gui_obj_t *obj)
                 else if (tp->pressed)
                 {
                     GUI_TYPE(gui_page_t, obj)->release = false;
-                    GUI_TYPE(gui_page_t, obj)->count = 0;
                     GUI_TYPE(gui_page_t, obj)->speed = 0;
-                    GUI_TYPE(gui_page_t, obj)->y_last = 0;
                     GUI_TYPE(gui_page_t, obj)->status = 0;
+                    memset(page->recode, 0, 10);
                 }
                 else
                 {
