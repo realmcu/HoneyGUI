@@ -104,6 +104,10 @@ static void button_prepare(gui_obj_t *obj)
     obj_update_att(obj);
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    if (GUI_TYPE(gui_button_t, obj)->flag == 1)
+    {
+        gui_obj_event_set(obj, GUI_EVENT_5);
+    }
 
     if (((obj->ax + obj->tx) < (int)gui_get_screen_width()) && (((obj->ax + obj->tx) + obj->w) >= 0) &&
         \
