@@ -555,7 +555,7 @@ var textAnimateConfig = {
 }
 var speed = 888;
 function textAnimateCallback(params) {
-    speed=speed + 1;
+    speed=speed + 1
 //    textbox.write(wifi.readSpeed()+'bit/s')
 	textbox.write(speed.toString()+' bit/s')
 }
@@ -570,7 +570,7 @@ function stopSpeed(params) {
     textbox.pauseAnimate()
 	wifi.stopSpeed()
 	textbox.write('Click')
-	speed = 0;
+	speed = 0
     }
 sw.getElementById('sw_wifi')
 sw.onOn(startSpeed)

@@ -13,16 +13,11 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "gui_grid.h"
-//#include "gui_progressbar.h"
-//#include "gui_seekbar.h"
-//#include "tp_algo.h"
 #include "gui_return.h"
-//#include <math.h>
 #ifdef MODULE_VG_LITE
 #include "gui_vg_lite_clock.h"
 #include "gui_cube.h"
 #else
-//#include "gui_cube.h"
 #endif
 #include "gui_components_init.h"
 static void app_launcher_frontend_ui_design(gui_app_t *app);
@@ -34,6 +29,7 @@ static gui_app_t app_launcher_frontend =
         .x    = 0,
         .y    = 0,
     },
+    .active_ms = (uint32_t) - 1,
     .ui_design = app_launcher_frontend_ui_design,
 };
 
@@ -50,6 +46,11 @@ static gui_app_t app_xml =
         .x    = 0,
         .y    = 0,
     },
+    /*
+    * Default no sleep, no active time limitation.
+    * Please set active time by api(gui_set_app_active_time) if power control is needed.
+    */
+    .active_ms = (uint32_t) - 1,
     .ui_design = app_xml_ui_design,
 };
 
@@ -85,7 +86,9 @@ void button_release_cb(gui_button_t *b)
 {
     gui_img_set_opacity((void *)b->img, 255);
     button_click_cb(b);
+#ifdef RTL87x2G_DASHBOARD
     b->flag = 0;
+#endif
 }
 void searchXmlFiles(char *dirPath, gui_app_t *app)
 {
@@ -136,9 +139,10 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
 
                     gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, 0, 0);
                     gui_button_api.onPress(button, button_cb, button);
-                    // gui_button_api.onRelease(button, button_release_cb, button);
-//                    gui_obj_event_set((void *)button, GUI_EVENT_TOUCH_RELEASED);
+                    gui_button_api.onRelease(button, button_release_cb, button);
+
 #ifdef RTL87x2G_DASHBOARD
+                    gui_obj_event_set((void *)button, GUI_EVENT_TOUCH_RELEASED);
                     button->flag = 1;
                     gui_obj_add_event_cb(button, (gui_event_cb_t)button_release_cb, GUI_EVENT_5, button);
 #endif
@@ -233,8 +237,6 @@ static void app_launcher_frontend_ui_design(gui_app_t *app)
 }
 static void app_xml_ui_design(gui_app_t *app)
 {
-
-
     extern void create_tree(gui_app_t *app);
     create_tree(app);
 #if defined(_WIN32)

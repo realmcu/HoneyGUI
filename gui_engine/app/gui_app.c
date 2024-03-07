@@ -144,4 +144,7 @@ void gui_switch_app(gui_app_t *from, gui_app_t *to)
     gui_log("gui_switch_app from %s to %s\n", from->screen.name, to->screen.name);
 }
 
-
+void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms)
+{
+    app->active_ms = active_ms;
+}

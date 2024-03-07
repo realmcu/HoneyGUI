@@ -240,9 +240,8 @@ static void gui_server_entry(void *parameter)
 #if defined __WIN32
         continue;
 #endif
-
         gui_msg_t msg;
-        if ((gui_ms_get() - daemon_start_ms) > app->active_ms)
+        if (((gui_ms_get() - daemon_start_ms) > app->active_ms) && (app->active_ms != (uint32_t) - 1))
         {
             gui_log("line %d, aemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n",
                     __LINE__, daemon_start_ms, gui_ms_get(), app->active_ms);
