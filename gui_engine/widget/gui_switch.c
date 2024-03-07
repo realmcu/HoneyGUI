@@ -110,38 +110,14 @@ void gui_switch_change_switch(gui_switch_t *sw)
 static void sw_turn_on(gui_switch_t *this)
 {
     this->ifon = true;
-    {
-
-        gui_switch_change_switch(this);
-
-        if (this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_1);
-        }
-        else if (!this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_2);
-        }
-
-    }
+    gui_switch_change_switch(this);
+    gui_obj_event_set((void *)this, GUI_EVENT_1);
 }
 static void sw_turn_off(gui_switch_t *this)
 {
     this->ifon = false;
-    {
-
-        gui_switch_change_switch(this);
-
-        if (this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_1);
-        }
-        else if (!this->ifon)
-        {
-            gui_obj_event_set((void *)this, GUI_EVENT_2);
-        }
-
-    }
+    gui_switch_change_switch(this);
+    gui_obj_event_set((void *)this, GUI_EVENT_2);
 }
 void gui_switch_turn_on(gui_switch_t *this)
 {
@@ -496,20 +472,23 @@ static void switch_prepare(gui_obj_t *obj)
                                      tp->x + tp->deltaX <= ((obj->ax + obj->tx) + obj->w)) &&
                                     (tp->y + tp->deltaY >= (obj->ay + obj->ty) && tp->y + tp->deltaY <= ((obj->ay + obj->ty) + obj->h)))
                                 {
-                                    gui_switch_t *sw = (gui_switch_t *)obj;
-                                    sw->ifon = !(sw->ifon);
-                                    gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
-                                    if (sw->ifon)
+                                    if ((tp->deltaX == 0) && (tp->deltaY == 0))
                                     {
-                                        //gui_log("switch_prepare4\n");
-                                        gui_obj_event_set(obj, GUI_EVENT_1);
+                                        gui_switch_t *sw = (gui_switch_t *)obj;
+                                        sw->ifon = !(sw->ifon);
+                                        gui_switch_change_switch(sw);//gui_log("switch_prepare3\n");
+                                        if (sw->ifon)
+                                        {
+                                            //gui_log("switch_prepare4\n");
+                                            gui_obj_event_set(obj, GUI_EVENT_1);
+                                        }
+                                        else if (!sw->ifon)
+                                        {
+                                            //gui_log("switch_prepare5\n");
+                                            gui_obj_event_set(obj, GUI_EVENT_2);
+                                        }
+                                        gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
                                     }
-                                    else if (!sw->ifon)
-                                    {
-                                        //gui_log("switch_prepare5\n");
-                                        gui_obj_event_set(obj, GUI_EVENT_2);
-                                    }
-                                    gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
                                 }
                             //gui_send_callback_p_to_server(b->press_cb, b->press_cb_p);
                             //gui_log("%d\n", __LINE__);
