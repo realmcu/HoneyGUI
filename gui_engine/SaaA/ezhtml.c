@@ -38,6 +38,8 @@
 #else
 
 #endif
+
+#include "gui_api.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
 struct widget_create
 {
@@ -1105,6 +1107,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             parent = (void *)gui_seekbar_create_img_h(parent, gui_get_file_address(picture), x, y);
                         }
+                        gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                        gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                     }
                     else if (folder)
                     {
@@ -1170,6 +1174,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
                             }
+                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                            gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                         }
 
 
