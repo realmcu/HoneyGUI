@@ -7,7 +7,8 @@ src = Split("""
 """)
 
 src = Glob('*.c')
-
+if not GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
+    SrcRemove(src,'app_lvgl.c')
 SrcRemove(src,'app_dashboard_480_272.c')
 SrcRemove(src,'app_dashboard_800_400.c')
 CPPPATH = [cwd]

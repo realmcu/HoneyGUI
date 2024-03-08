@@ -72,19 +72,22 @@ void app_dashboard_launcher_update_thread(void *this)
         gui_thread_mdelay(25);
     }
 }
-
+#ifdef CONFIG_REALTEK_BUILD_LVGL_GUI
 static void kb_button_cb(void *obj, gui_event_t e)
 {
     gui_log("gui_switch_app_to lvgl line = %d \n", __LINE__);
     extern gui_app_t *get_app_lvgl(void);
     gui_switch_app(gui_current_app(), get_app_lvgl());
 }
+#endif
 void app_dashboard_launcher_ui_design(gui_app_t *app)
 {
     win_connected_display = gui_win_create(&(app->screen), "win_connected_display", 0, 0, 800, 480);
     win_main_display = gui_win_create(&(app->screen), "win_main_display", 0, 0, 800, 480);
+#ifdef CONFIG_REALTEK_BUILD_LVGL_GUI
     gui_obj_add_event_cb(win_main_display, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_DOWN_PRESSED,
                          NULL);//switch app
+#endif
     gui_set_font_mem_resourse(28, QUICKSAND_SEMIBOLD_28_BIN, CP500_TABLE_BIN);
     gui_set_font_mem_resourse(32, GBK_32_32_DOT_BIN, GBK_UNICODE_TABLE_BIN);
     gui_set_font_mem_resourse(56, QUICKSAND_SEMIBOLD_56_BIN, CP500_TABLE_BIN);
