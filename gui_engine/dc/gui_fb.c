@@ -255,7 +255,7 @@ void gui_fb_disp(gui_obj_t *root)
         time = gui_ms_get();
         gui_fb_draw(root);
         int draw_cost = gui_ms_get() - time;
-        gui_log("cost prepare:%dms, draw:%dms\n", prepare_cost, draw_cost);
+        // gui_log("cost prepare:%dms, draw:%dms\n", prepare_cost, draw_cost);
         fb_change = false;
         {
 

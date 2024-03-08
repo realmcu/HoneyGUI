@@ -56,7 +56,7 @@ typedef struct gui_page
     int yold;
     int16_t recode[5];
     int speed;
-
+    int target;
     int start_x;
     int start_y;
     int align_hight;

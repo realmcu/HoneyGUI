@@ -422,25 +422,18 @@ static void dashboard_message_timer_cb(void *p_handle)
 void app_dashboard_data_update_message_status(const uint8_t *pValue, uint16_t length,
                                               uint8_t messaye_type)
 {
-    if ((messaye_type == MESSGAE_INFO_QQ) ||
-        (messaye_type == MESSGAE_INFO_WECHAT) ||
-        (messaye_type == MESSGAE_INFO_MESSAGE))
-    {
-        app_message_data current_message_status;
-        app_dashboard_data_get_message_data_update(&current_message_status);
 
-        memset(current_message_status.wechat_msg, 0x0, sizeof(current_message_status.wechat_msg));
+    app_message_data current_message_status;
+    app_dashboard_data_get_message_data_update(&current_message_status);
 
-        current_message_status.wechat_msg_len = length;
-        memcpy(&current_message_status.wechat_msg[0], &pValue[0], length);
-        current_message_status.wechat_notify_message = true;
-        app_dashboard_data_set_message_data_update(current_message_status);
+    memset(current_message_status.wechat_msg, 0x0, sizeof(current_message_status.wechat_msg));
 
-        os_timer_create(&dashboard_message_timer, "gui-tick", 0, 3000, true, dashboard_message_timer_cb);
-        os_timer_start(&dashboard_message_timer);
-    }
-    else
-    {
-        APP_PRINT_INFO0("app_dashboard_data_update_message_status message type ni support");
-    }
+    current_message_status.wechat_msg_len = length;
+    memcpy(&current_message_status.wechat_msg[0], &pValue[0], length);
+    current_message_status.wechat_notify_message = true;
+    app_dashboard_data_set_message_data_update(current_message_status);
+
+    os_timer_create(&dashboard_message_timer, "gui-tick", 0, 3000, true, dashboard_message_timer_cb);
+    os_timer_start(&dashboard_message_timer);
+
 }

@@ -151,6 +151,13 @@ void gui_app_layer_buttom(void);
  * @return false button layer
  */
 bool gui_app_get_layer(void);
+/**
+ * @brief set app active ms time
+ *
+ * @param app app set
+ * @param active_ms active ms times
+ */
+void gui_set_app_active_time(gui_app_t *app, uint32_t active_ms);
 /** End of APP_Exported_Functions
   * @}
   */

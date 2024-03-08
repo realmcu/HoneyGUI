@@ -81,6 +81,7 @@ struct gui_button
         char *text
     );
     IMG_SOURCE_MODE_TYPE src_mode;
+    bool flag;
 };
 typedef struct gui_api_button
 {
