@@ -1,0 +1,1300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ui version="1.0">
+  <widget class="Screen" name="screen0" layer="0" isLocked="False">
+    <property name="geometry">
+      <width>480</width>
+      <height>320</height>
+      <x>0</x>
+      <y>0</y>
+    </property>
+    <widget class="TabView" name="tabview0" layer="1" isLocked="False">
+      <property name="geometry">
+        <width>480</width>
+        <height>320</height>
+        <x>0</x>
+        <y>0</y>
+      </property>
+      <widget class="Tab" name="tab_0_home" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>0</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="home_bg" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>320</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/0_home/home_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Image" name="img_spot_0" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>84</x>
+            <y>278</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/6_point/1_white.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_0_1" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>144</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_0_2" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>204</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_0_3" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>264</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_0_4" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>324</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_0_5" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>384</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_1_sw1" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>1</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="img_bg_sw1" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>320</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/1_switch_1/sw_1_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_0" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>24</x>
+            <y>53</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/0_Living_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/0_Living_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_3" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>24</x>
+            <y>165</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/3_Wash_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/3_Wash_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_1" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>173</x>
+            <y>53</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/1_Dining_Off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/1_Dining_ON.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_2" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>324</x>
+            <y>53</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/2_Syudy_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/2_Syudy_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_4" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>173</x>
+            <y>165</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/4_Kitchen_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/4_Kitchen_ON.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_5" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>323</x>
+            <y>165</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/5_Bathroom_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/5_Bathroom_ON.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_1_0" layer="7" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>84</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Image" name="img_spot_1" layer="8" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>144</x>
+            <y>278</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/6_point/1_white.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_1_2" layer="9" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>204</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_1_3" layer="10" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>264</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_1_4" layer="11" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>324</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_1_5" layer="12" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>384</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_2_sw2" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>2</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="img_bg_sw2" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>320</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/2_switch_2/sw_2_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_0" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>24</x>
+            <y>53</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/0_Bedroom_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/0_Bedroom_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_1" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>173</x>
+            <y>53</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/1_Children_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/1_Children_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_4" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>87</width>
+            <height>84</height>
+            <x>173</x>
+            <y>166</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/4_socket1_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/4_socket1_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_5" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>87</width>
+            <height>84</height>
+            <x>272</x>
+            <y>166</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/5_socket2_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/5_socket2_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="switch0" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>87</width>
+            <height>84</height>
+            <x>371</x>
+            <y>166</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/6_socket3_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/6_socket3_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_all_on" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>323</x>
+            <y>53</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/2_All_on.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/2_All_on.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_all_off" layer="7" isLocked="False">
+          <property name="geometry">
+            <width>134</width>
+            <height>84</height>
+            <x>24</x>
+            <y>166</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/3_All_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/3_All_off.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_2_0" layer="8" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>84</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_2_1" layer="9" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>144</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Image" name="img_spot_2" layer="10" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>204</x>
+            <y>278</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/6_point/1_white.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_2_3" layer="11" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>264</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_2_4" layer="12" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>324</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_2_5" layer="13" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>384</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_3_ac" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>3</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="ImageSeekBar" name="skbr_ac" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>251</width>
+            <height>131</height>
+            <x>119</x>
+            <y>35</y>
+          </property>
+          <property name="imageSeekBarData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <isArc>horizontal</isArc>
+            <centralX>240</centralX>
+            <centralY>160</centralY>
+            <startDegree>0</startDegree>
+            <endDegree>0</endDegree>
+            <folder>3_air_cold</folder>
+          </property>
+        </widget>
+        <widget class="Image" name="img_bg_cold" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>320</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/3_air/air_cold_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_dn" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>28</height>
+            <x>53</x>
+            <y>143</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/0_0_down.png</picture>
+            <highlightPicture>Resources/image/3_air/0_0_down.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_up" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>28</height>
+            <x>397</x>
+            <y>143</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/0_1_up.png</picture>
+            <highlightPicture>Resources/image/3_air/0_1_up.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_heat" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>34</width>
+            <height>33</height>
+            <x>130</x>
+            <y>224</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/0_heating_off.png</picture>
+            <highlightPicture>Resources/image/3_air/0_heating_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_cold" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>34</width>
+            <height>33</height>
+            <x>192</x>
+            <y>224</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/1_cold_on.png</picture>
+            <highlightPicture>Resources/image/3_air/1_cold_off.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_fan" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>34</width>
+            <height>33</height>
+            <x>254</x>
+            <y>224</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/2_fan_off.png</picture>
+            <highlightPicture>Resources/image/3_air/2_fan_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_dry" layer="7" isLocked="False">
+          <property name="geometry">
+            <width>34</width>
+            <height>33</height>
+            <x>316</x>
+            <y>224</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/3_dry_off.png</picture>
+            <highlightPicture>Resources/image/3_air/3_dry_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_3_0" layer="8" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>84</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_3_1" layer="9" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>144</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_3_2" layer="10" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>204</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Image" name="img_spot_3" layer="11" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>264</x>
+            <y>278</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/6_point/1_white.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_3_4" layer="12" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>324</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_3_5" layer="13" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>384</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_4_curtain" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>4</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="img_bg_curtain" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>320</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/4_curtain/curtain_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_curtain" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>11</width>
+            <height>13</height>
+            <x>234</x>
+            <y>229</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/4_curtain/0_start.png</picture>
+            <highlightPicture>Resources/image/4_curtain/1_stop.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="ImageSeekBar" name="skbr_curtain" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>323</width>
+            <height>164</height>
+            <x>79</x>
+            <y>43</y>
+          </property>
+          <property name="imageSeekBarData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <isArc>horizontal</isArc>
+            <centralX>240</centralX>
+            <centralY>160</centralY>
+            <startDegree>0</startDegree>
+            <endDegree>0</endDegree>
+            <folder>4_curtain_ani</folder>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_4_0" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>84</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_4_1" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>144</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_4_2" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>204</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_4_3" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>264</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Image" name="img_spot_4" layer="7" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>324</x>
+            <y>278</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/6_point/1_white.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_4_5" layer="8" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>384</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_5_wifi" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>5</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Switch" name="sw_wifi" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>320</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/5_speed/0_speed_off.png</picture>
+            <highlightPicture>Resources/image/5_speed/1_speed_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_5_0" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>84</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_5_1" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>144</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_5_2" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>204</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_5_3" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>264</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_5_4" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>324</x>
+            <y>278</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/6_point/0_grey.png</picture>
+            <highlightPicture>Resources/image/6_point/0_grey.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Image" name="img_spot_5" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>12</width>
+            <height>12</height>
+            <x>384</x>
+            <y>278</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/6_point/1_white.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Text" name="txt_wifi" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>105</width>
+            <height>51</height>
+            <x>195</x>
+            <y>58</y>
+          </property>
+          <property name="text">
+            <string>Click</string>
+            <fontColor>#ffffffff</fontColor>
+            <font>fontSetting0</font>
+          </property>
+        </widget>
+      </widget>
+    </widget>
+  </widget>
+</ui>

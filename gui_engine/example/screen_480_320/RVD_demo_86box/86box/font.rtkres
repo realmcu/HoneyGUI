@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<FontConfigXmlData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <FontConfigData FontSettingName="fontSetting0">
+    <FontConvertSetting>
+      <fontName>times.ttf</fontName>
+      <fontType>Rasterized</fontType>
+      <codePage>
+        <string>CP037</string>
+      </codePage>
+      <textType>Random</textType>
+      <fontSet>
+        <isBold>false</isBold>
+        <isItalic>false</isItalic>
+        <scanMode>Horizontal</scanMode>
+        <fontSize>30</fontSize>
+        <renderMode>Bit_8</renderMode>
+        <indexMethod>Address</indexMethod>
+      </fontSet>
+    </FontConvertSetting>
+  </FontConfigData>
+</FontConfigXmlData>
