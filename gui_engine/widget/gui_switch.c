@@ -526,6 +526,10 @@ static void switch_prepare(gui_obj_t *obj)
         }
     }
 }
+static void cb_null()
+{
+
+}
 void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
                      int16_t x,
                      int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)
@@ -544,6 +548,8 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     this->on_hl_pic_addr = this->on_pic_addr;
     this->long_touch_state_pic_addr = this->off_pic_addr;
     this->long_touch_state_hl_pic_addr = this->off_pic_addr;
+    gui_obj_add_event_cb(&(this->base), (gui_event_cb_t)cb_null, GUI_EVENT_1, 0);
+    gui_obj_add_event_cb(&(this->base), (gui_event_cb_t)cb_null, GUI_EVENT_2, 0);
 }
 static gui_switch_t *gui_switch_create_core(void *parent, int16_t x, int16_t y,
                                             int16_t w, int16_t h, void *off_pic, void *on_pic, IMG_SOURCE_MODE_TYPE src_mode)
