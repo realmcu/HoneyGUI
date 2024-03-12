@@ -398,7 +398,7 @@ static gui_button_t *gui_button_create_core(
 
         button->text = gui_text_create(button, "icon_text", 0, button->img->draw_img.img_h + 40,
                                        gui_get_screen_width(), h);
-        gui_text_set(button->text, text, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+        gui_text_set(button->text, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      strlen(text), 32);
         gui_text_mode_set(button->text, LEFT);
     }

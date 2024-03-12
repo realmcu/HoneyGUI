@@ -145,21 +145,21 @@ void design_win_menu_setting(void *parent)
 
     int16_t font_size = 32;
     text_setting_title = gui_text_create(parent, "text_setting_title", 196, 24, 64, font_size);
-    gui_text_set(text_setting_title, "设置", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 6, font_size);
+    gui_text_set(text_setting_title, "设置", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 6, font_size);
     gui_text_type_set(text_setting_title, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_connect_more = gui_text_create(parent, "text_connect_more", 84, 123, 126, font_size);
-    gui_text_set(text_connect_more, "连接更多", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
+    gui_text_set(text_connect_more, "连接更多", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12,
                  font_size);
     gui_text_type_set(text_connect_more, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_sw_reset = gui_text_create(parent, "text_sw_reset", 188, 204, 78, font_size);
-    gui_text_set(text_sw_reset, "Reset", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 5, font_size);
+    gui_text_set(text_sw_reset, "Reset", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 5, font_size);
     gui_text_type_set(text_sw_reset, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_factory_data_reset = gui_text_create(parent, "text_factory_data_reset", 131, 286, 192,
                                               font_size);
-    gui_text_set(text_factory_data_reset, "恢复出厂设置", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
+    gui_text_set(text_factory_data_reset, "恢复出厂设置", GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  18,
                  font_size);
     gui_text_type_set(text_factory_data_reset, SIMKAI_SIZE32_BITS1_FONT_BIN);

@@ -88,7 +88,7 @@ static void gui_text_talk_time_animate_cb(void *obj)
     {
         //gui_log("gui_text_talk_time_animate_cb update talk time\n");
         update_talk_time();
-        gui_text_set(text_talk_time, string_talk_time, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
+        gui_text_set(text_talk_time, string_talk_time, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(string_talk_time), FONT_H_32);
         //todo: update record time
     }
@@ -156,14 +156,14 @@ void design_win_calling(void *parent, char *dial_num)
     //todo: displaying name or num depends on pbap
     text_calling_num = gui_text_create(parent, "text_calling_num", 0, 59,
                                        LCD_W, FONT_H_32);
-    gui_text_set(text_calling_num, string_dial_num, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
+    gui_text_set(text_calling_num, string_dial_num, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(string_dial_num), FONT_H_32);
     gui_text_mode_set(text_calling_num, CENTER);
 
     img_calling = gui_img_create_from_mem(parent, "img_calling", ICON_CALLER_BIN, 165, 111, 124, 124);
 
     text_talk_time = gui_text_create(parent, "text_talk_time", 0, 259, LCD_W, FONT_H_32);
-    gui_text_set(text_talk_time, string_talk_time, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
+    gui_text_set(text_talk_time, string_talk_time, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(string_talk_time), FONT_H_32);
     gui_text_mode_set(text_talk_time, CENTER);
     //set animate for updating display string of text_record_tips

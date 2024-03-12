@@ -31,8 +31,8 @@ void design_tab_call(void *parent)
     char *string_call_title = "电话";
     text_call_title = gui_text_create(parent, "text_call_title", 195, 24,
                                       strlen(string_call_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, FONT_H_32);
-    gui_text_set(text_call_title, string_call_title, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
-                                                                                  UINT8_MAX), strlen(string_call_title), FONT_H_32);
+    gui_text_set(text_call_title, string_call_title, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
+                                                                               UINT8_MAX), strlen(string_call_title), FONT_H_32);
 
     switch_call = gui_switch_create(parent, 129, 129, 196, 196, ICON_CALL_BIN, ICON_CALL_BIN);
     switch_call->on_hl_pic_addr = ICON_CALL_TOUCH_BIN;

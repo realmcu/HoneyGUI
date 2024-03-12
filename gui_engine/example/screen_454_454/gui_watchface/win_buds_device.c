@@ -98,25 +98,25 @@ static void searching_buds_general_touch_cb(void)
     int16_t font_size = 32;
     text_device_buds_title = gui_text_create(win_buds_device, "text_device_buds_title", 179, 24, 128,
                                              font_size);
-    gui_text_set(text_device_buds_title, "绑定信息", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
+    gui_text_set(text_device_buds_title, "绑定信息", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12,
                  font_size);
     gui_text_type_set(text_device_buds_title, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_bonding_buds_1 = gui_text_create(win_buds_device, "text_bonding_buds_1", 154, 122, 160,
                                           font_size);
-    gui_text_set(text_bonding_buds_1, "绑定耳机1", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 13,
+    gui_text_set(text_bonding_buds_1, "绑定耳机1", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 13,
                  font_size);
     gui_text_type_set(text_bonding_buds_1, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_bonding_buds_2 = gui_text_create(win_buds_device, "text_bonding_buds_2", 154, 204, 160,
                                           font_size);
-    gui_text_set(text_bonding_buds_2, "绑定耳机2", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 13,
+    gui_text_set(text_bonding_buds_2, "绑定耳机2", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 13,
                  font_size);
     gui_text_type_set(text_bonding_buds_2, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_bonding_buds_3 = gui_text_create(win_buds_device, "text_bonding_buds_3", 154, 284, 160,
                                           font_size);
-    gui_text_set(text_bonding_buds_3, "绑定耳机3", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 13,
+    gui_text_set(text_bonding_buds_3, "绑定耳机3", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 13,
                  font_size);
     gui_text_type_set(text_bonding_buds_3, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
@@ -334,27 +334,27 @@ void design_win_buds_device(void *parent)
 
     int16_t font_size = 32;
     text_device_buds_title = gui_text_create(parent, "text_device_buds_title", 179, 24, 128, font_size);
-    gui_text_set(text_device_buds_title, "绑定信息", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
+    gui_text_set(text_device_buds_title, "绑定信息", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12,
                  font_size);
     gui_text_type_set(text_device_buds_title, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_bonding_buds_1 = gui_text_create(parent, "text_bonding_buds_1", 154, 122, 160, font_size);
-    gui_text_set(text_bonding_buds_1, "绑定耳机1", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 13,
+    gui_text_set(text_bonding_buds_1, "绑定耳机1", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 13,
                  font_size);
     gui_text_type_set(text_bonding_buds_1, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_bonding_buds_2 = gui_text_create(parent, "text_bonding_buds_2", 154, 204, 160, font_size);
-    gui_text_set(text_bonding_buds_2, "绑定耳机2", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 13,
+    gui_text_set(text_bonding_buds_2, "绑定耳机2", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 13,
                  font_size);
     gui_text_type_set(text_bonding_buds_2, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_bonding_buds_3 = gui_text_create(parent, "text_bonding_buds_3", 154, 284, 160, font_size);
-    gui_text_set(text_bonding_buds_3, "绑定耳机3", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 13,
+    gui_text_set(text_bonding_buds_3, "绑定耳机3", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 13,
                  font_size);
     gui_text_type_set(text_bonding_buds_3, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_delete_bonding_buds = gui_text_create(parent, "text_disconnect", 163, 392, 128, font_size);
-    gui_text_set(text_delete_bonding_buds, "删除绑定", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
+    gui_text_set(text_delete_bonding_buds, "删除绑定", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12,
                  font_size);
     gui_text_type_set(text_delete_bonding_buds, SIMKAI_SIZE32_BITS1_FONT_BIN);
     text_delete_bonding_buds->base.not_show = true;

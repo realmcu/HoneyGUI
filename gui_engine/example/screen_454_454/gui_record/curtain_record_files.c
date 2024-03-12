@@ -185,7 +185,7 @@ static void win_add_record_files_touch_cb(void *obj, gui_event_t event)
         scroll_text_record_files[record_file_num] = gui_scroll_text_create(
                                                         switch_record_files[record_file_num], "scroll_text_record_files", 39, 11, 192, FONT_H_32);
         gui_scroll_text_set(scroll_text_record_files[record_file_num], string_record_files,
-                            GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_record_files),
+                            GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_record_files),
                             FONT_H_32);
         gui_scroll_text_scroll_set(scroll_text_record_files[record_file_num], SCROLL_X, 0, 0, 5000, 0);
         gui_log("win_add_record_files_touch_cb scroll_text_record_files = 0x%x, num = %d\n",
@@ -238,7 +238,7 @@ void design_curtain_record_files(void *parent)
     char *string_title_record_files = "录音文件";
     text_title_record_files = gui_text_create(page_record_files, "text_title_record_files", 177, 24,
                                               strlen(string_title_record_files) / FONT_CHINESE_BYTE * FONT_CHINESE_W, FONT_H_32);
-    gui_text_set(text_title_record_files, string_title_record_files, GUI_FONT_SOURCE_BMP,
+    gui_text_set(text_title_record_files, string_title_record_files, GUI_FONT_SRC_BMP,
                  APP_COLOR_WHITE,
                  strlen(string_title_record_files), FONT_H_32);
 

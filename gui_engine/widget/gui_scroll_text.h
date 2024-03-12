@@ -154,7 +154,7 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t
 * @return void
 *
 */
-void gui_scroll_text_set(gui_scroll_text_t *this, void *text, FONT_SOUCE_TYPE text_type,
+void gui_scroll_text_set(gui_scroll_text_t *this, void *text, FONT_SOURCE_TYPE text_type,
                          gui_color_t color,
                          uint16_t length, uint8_t font_size);
 

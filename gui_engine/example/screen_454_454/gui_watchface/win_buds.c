@@ -144,20 +144,20 @@ void design_win_menu_buds(void *parent)
 
     int16_t font_size = 32;
     text_buds_title = gui_text_create(parent, "text_buds_title", 179, 24, 128, font_size);
-    gui_text_set(text_buds_title, "连接耳机", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12, font_size);
+    gui_text_set(text_buds_title, "连接耳机", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12, font_size);
     gui_text_type_set(text_buds_title, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_buds_device = gui_text_create(parent, "text_buds_device", 128, 122, 192, font_size);
-    gui_text_set(text_buds_device, "耳机设备名称", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 18,
+    gui_text_set(text_buds_device, "耳机设备名称", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 18,
                  font_size);
     gui_text_type_set(text_buds_device, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_search_buds = gui_text_create(parent, "text_search_buds", 163, 204, 128, font_size);
-    gui_text_set(text_search_buds, "搜索耳机", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12, font_size);
+    gui_text_set(text_search_buds, "搜索耳机", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12, font_size);
     gui_text_type_set(text_search_buds, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_disconnect = gui_text_create(parent, "text_disconnect", 163, 392, 128, font_size);
-    gui_text_set(text_disconnect, "断开连接", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12, font_size);
+    gui_text_set(text_disconnect, "断开连接", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12, font_size);
     gui_text_type_set(text_disconnect, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
 }

@@ -61,18 +61,18 @@ typedef enum
 /** @brief  text encoding format enum */
 typedef enum
 {
-    UTF_8_CHARSET = 0,
-    UTF_16_CHARSET = 1,
+    UTF_8_CHARSET    = 0,
+    UTF_16_CHARSET   = 1,
     UNICODE_ENCODING = 1,
 } TEXT_CHARSET;
 
 /** @brief  font type enum */
 typedef enum
 {
-    GUI_FONT_SOURCE_BMP = 0,
-    GUI_FONT_SOURCE_TTF = 1,
-    GUI_FONT_SOURCE_IMG = 2,
-} FONT_SOUCE_TYPE;
+    GUI_FONT_SRC_BMP = 0,
+    GUI_FONT_SRC_TTF = 1,
+    GUI_FONT_SRC_IMG = 2,
+} FONT_SOURCE_TYPE;
 
 /** @brief  text widget structure */
 typedef struct gui_text
@@ -84,7 +84,7 @@ typedef struct gui_text
     uint16_t text_offset;
     TEXT_MODE mode;
     TEXT_CHARSET charset;
-    FONT_SOUCE_TYPE font_type;
+    FONT_SOURCE_TYPE font_type;
     uint8_t font_height;
     uint8_t checksum;
     gui_animate_t *animate;
@@ -165,7 +165,7 @@ typedef struct gui_text_line
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t *this, void *text, FONT_SOUCE_TYPE text_type, gui_color_t color,
+void gui_text_set(gui_text_t *this, void *text, FONT_SOURCE_TYPE text_type, gui_color_t color,
                   uint16_t length, uint8_t font_size);
 
 /**

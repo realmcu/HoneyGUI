@@ -90,13 +90,13 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
+    case GUI_FONT_SRC_BMP:
         {
             gui_font_mem_load(text, rect);
         }
         break;
 
-    case GUI_FONT_SOURCE_TTF:
+    case GUI_FONT_SRC_TTF:
         {
             gui_font_stb_load(text, rect);
         }
@@ -111,13 +111,13 @@ static void gui_scroll_text_font_draw(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
+    case GUI_FONT_SRC_BMP:
         {
             gui_font_mem_draw(text, rect);
         }
         break;
 
-    case GUI_FONT_SOURCE_TTF:
+    case GUI_FONT_SRC_TTF:
         {
             gui_font_stb_draw(text, rect);
         }
@@ -132,13 +132,13 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
+    case GUI_FONT_SRC_BMP:
         {
             gui_font_mem_unload(text);
         }
         break;
 
-    case GUI_FONT_SOURCE_TTF:
+    case GUI_FONT_SRC_TTF:
         {
             gui_font_stb_unload(text);
         }
@@ -329,7 +329,7 @@ void gui_scroll_text_skip_frame_set(uint8_t skip_frame)
     scroll_skip_frame = skip_frame;
 }
 
-void gui_scroll_text_set(gui_scroll_text_t *this, void *text, FONT_SOUCE_TYPE text_type,
+void gui_scroll_text_set(gui_scroll_text_t *this, void *text, FONT_SOURCE_TYPE text_type,
                          gui_color_t color, uint16_t length, uint8_t font_size)
 {
     gui_text_set(&this->base, text, text_type, color, length, font_size);

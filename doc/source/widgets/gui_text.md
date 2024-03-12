@@ -138,23 +138,23 @@ static void app_launcher_ui_design(gui_app_t *app)
     void *screen = &app->screen;
 
     gui_text_t *text1 = gui_text_create(screen,  "text1",  10, 10, 100, 50);
-    gui_text_set(text1, chinese, GUI_FONT_SOURCE_BMP, 0xffffffff, strlen(chinese), 24);
+    gui_text_set(text1, chinese, GUI_FONT_SRC_BMP, 0xffffffff, strlen(chinese), 24);
     gui_text_type_set(text1, HARMONYOS_SIZE24_BITS1_FONT_BIN);
     gui_text_mode_set(text1, LEFT);
 
     gui_text_t *text2 = gui_text_create(screen,  "text2",  0, 50, 300, 50);
-    gui_text_set(text2, "english", GUI_FONT_SOURCE_BMP, 0xff0000ff, 7, 16);
+    gui_text_set(text2, "english", GUI_FONT_SRC_BMP, 0xff0000ff, 7, 16);
     gui_text_type_set(text2, HARMONYOS_SIZE16_BITS4_FONT_BIN);
     gui_text_mode_set(text2, LEFT);
 
     char *string = "TEXT_WIDGET";
     gui_text_t *text3 = gui_text_create(screen,  "text3",  0, 90, 300, 50);
-    gui_text_set(text3, string, GUI_FONT_SOURCE_BMP, 0x0000ffff, strlen(string), 32);
+    gui_text_set(text3, string, GUI_FONT_SRC_BMP, 0x0000ffff, strlen(string), 32);
     gui_text_type_set(text3, GBK_32_32_DOT_BIN);
     gui_text_mode_set(text3, CENTER);
 
     gui_text_t *text4 = gui_text_create(screen,  "text4",  0, 150, 100, 200);
-    gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SOURCE_BMP, 0xffff0000, 24, 24);
+    gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, 0xffff0000, 24, 24);
     gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN);
     gui_text_mode_set(text4, MUTI_CENTER);
 }
@@ -204,7 +204,7 @@ void page_tb_activity(void *parent)
     gui_font_mem_init(SIMKAI_SIZE24_BITS4_FONT_BIN);
 
     gui_text_t *text = gui_text_create(parent,  "text",  0, 0, 100, 200);
-    gui_text_set(text, "ABCDEFGHI", GUI_FONT_SOURCE_BMP, 0xffff0000, 9, 24);
+    gui_text_set(text, "ABCDEFGHI", GUI_FONT_SRC_BMP, 0xffff0000, 9, 24);
     gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN);
     gui_text_mode_set(text, MUTI_CENTER);
     gui_text_set_animate(text, 5000, 15, change_text_cb, text);

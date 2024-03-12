@@ -100,12 +100,12 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     short_tel_number = gui_text_create(target_main_display,  "short_tel_number",  322, 415, 158, 30);
     memcpy(&show_tel_number[0], &current_phone_status.current_phone_number[0],
            current_phone_status.current_phone_number_len);
-    gui_text_set(short_tel_number, (char *)show_tel_number, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX,
+    gui_text_set(short_tel_number, (char *)show_tel_number, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), current_phone_status.current_phone_number_len, 28);
     gui_text_mode_set(short_tel_number, CENTER);
     short_tel_accept = gui_text_create(target_main_display, "short_tel_accept", 360, 415, 800, 30);
-    gui_text_set(short_tel_accept, "calling", GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
-                                                                           UINT8_MAX),
+    gui_text_set(short_tel_accept, "calling", GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
+                                                                        UINT8_MAX),
                  7, 32);
 
     app_message_data current_message_status;
@@ -113,7 +113,7 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     memcpy(&show_message_data[0], &current_message_status.wechat_msg[0],
            current_message_status.wechat_msg_len);
     short_message_data = gui_text_create(target_main_display,  "short_message_data",  300, 10, 240, 50);
-    gui_text_set(short_message_data, (char *)show_message_data, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX,
+    gui_text_set(short_message_data, (char *)show_message_data, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), (current_message_status.wechat_msg_len - 1), 32);
     gui_text_mode_set(short_message_data, MUTI_LEFT);
 
@@ -336,7 +336,7 @@ void app_dashboard_update_main_display_message_infor(app_message_data *app_messa
 
     memcpy(&show_message_data[0], &app_message_information->wechat_msg[0],
            app_message_information->wechat_msg_len);
-    gui_text_set(short_message_data, (char *)show_message_data, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX,
+    gui_text_set(short_message_data, (char *)show_message_data, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), (app_message_information->wechat_msg_len - 1), 32);
 }
 
@@ -376,7 +376,7 @@ void app_dashboard_update_main_display_phone_infor(app_phone_data *app_call_info
 
     memcpy(&show_tel_number[0], &app_call_information->current_phone_number[0],
            app_call_information->current_phone_number_len);
-    gui_text_set(short_tel_number, (char *)show_tel_number, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX,
+    gui_text_set(short_tel_number, (char *)show_tel_number, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), app_call_information->current_phone_number_len, 28);
 
 }

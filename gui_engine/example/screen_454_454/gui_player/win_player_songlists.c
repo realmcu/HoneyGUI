@@ -155,7 +155,7 @@ void design_win_song_lists(gui_win_t *parent)
                                                  48, 48);
     text_song_list_title = gui_text_create(parent, "text_song_list_title", 177, 30,
                                            strlen(string_song_list_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
-    gui_text_set(text_song_list_title, string_song_list_title, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
+    gui_text_set(text_song_list_title, string_song_list_title, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(string_song_list_title), font_size);
 
     for (uint8_t i = 0; i < 3; i++)
@@ -177,7 +177,7 @@ void design_win_song_lists(gui_win_t *parent)
 
         text_song[i] = gui_text_create(parent, "text_songs", 100, 123 + i * 82,
                                        strlen(song_files_name[i]) * FONT_NUM_ALPHA_W, font_size);
-        gui_text_set(text_song[i], song_files_name[i], GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
+        gui_text_set(text_song[i], song_files_name[i], GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(song_files_name[i]), font_size);
     }
 

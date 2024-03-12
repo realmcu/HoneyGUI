@@ -71,7 +71,7 @@ static void scroll_text_record_play_title_animate_cb(void *obj)
     gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", (uint32_t *)file_name);
 
     char *string_title = (char *)file_name->base.content;
-    gui_scroll_text_set(scroll_text_record_play_title, string_title, GUI_FONT_SOURCE_BMP,
+    gui_scroll_text_set(scroll_text_record_play_title, string_title, GUI_FONT_SRC_BMP,
                         gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_title), FONT_H_32);
 }
 
@@ -104,14 +104,14 @@ void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_fil
     scroll_text_record_play_title = gui_scroll_text_create(parent, "scroll_text_record_play_title", 170,
                                                            24, 128, FONT_H_32);
     gui_scroll_text_scroll_set(scroll_text_record_play_title, SCROLL_X, 0, 0, 5000, 0);
-    gui_scroll_text_set(scroll_text_record_play_title, "录音文件123456", GUI_FONT_SOURCE_BMP,
+    gui_scroll_text_set(scroll_text_record_play_title, "录音文件123456", GUI_FONT_SRC_BMP,
                         gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen("录音文件123456"), FONT_H_32);
     gui_text_set_animate(scroll_text_record_play_title, 1000, 2,
                          scroll_text_record_play_title_animate_cb, selected_record_file);
 
     char *string_record_play_time = "00:00:00/00:00:00";
     text_record_play_time = gui_text_create(parent, "text_record_play_time", 108, 281, 248, FONT_H_32);
-    gui_text_set(text_record_play_time, string_record_play_time, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
+    gui_text_set(text_record_play_time, string_record_play_time, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(string_record_play_time), FONT_H_32);
     gui_text_set_animate(text_record_play_time, 1000, 0, text_record_play_time_animate_cb,
                          text_record_play_time);

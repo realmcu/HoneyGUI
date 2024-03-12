@@ -58,11 +58,11 @@ void page_tb_one(void *parent)
     gui_progressbar_set_percentage(test_bar_two, 0.5);
 
     gui_text_t *text1 = gui_text_create(parent, "vertical1", 50, 250, 300, 24);
-    gui_text_set(text1, "100%    50%  vertical", GUI_FONT_SOURCE_BMP, 0xffffffff, 21, 24);
+    gui_text_set(text1, "100%    50%  vertical", GUI_FONT_SRC_BMP, 0xffffffff, 21, 24);
     gui_text_mode_set(text1, LEFT);
 
     gui_text_t *text2 = gui_text_create(parent, "vertical2", 10, 300, 330, 24);
-    gui_text_set(text2, "gui_progressbar_img_v_create", GUI_FONT_SOURCE_BMP, 0xff0000ff, 28, 24);
+    gui_text_set(text2, "gui_progressbar_img_v_create", GUI_FONT_SRC_BMP, 0xff0000ff, 28, 24);
     gui_text_mode_set(text2, LEFT);
 }
 
@@ -77,11 +77,11 @@ void page_tb_two(void *parent)
     gui_progressbar_set_percentage(test_bar_four, 0.5);
 
     gui_text_t *text3 = gui_text_create(parent, "horizontal1", 50, 250, 300, 24);
-    gui_text_set(text3, "100%    50%  horizontal", GUI_FONT_SOURCE_BMP, 0xffffffff, 23, 24);
+    gui_text_set(text3, "100%    50%  horizontal", GUI_FONT_SRC_BMP, 0xffffffff, 23, 24);
     gui_text_mode_set(text3, LEFT);
 
     gui_text_t *text4 = gui_text_create(parent, "horizontal2", 10, 300, 330, 24);
-    gui_text_set(text4, "gui_progressbar_img_h_create", GUI_FONT_SOURCE_BMP, 0xff0000ff, 28, 24);
+    gui_text_set(text4, "gui_progressbar_img_h_create", GUI_FONT_SRC_BMP, 0xff0000ff, 28, 24);
     gui_text_mode_set(text4, LEFT);
 }
 
@@ -95,11 +95,11 @@ void page_tb_three(void *parent)
     gui_progressbar_set_progress(test_bar_six, 4);
 
     gui_text_t *text5 = gui_text_create(parent, "movie1", 80, 250, 300, 24);
-    gui_text_set(text5, "pic0   pic4  movie", GUI_FONT_SOURCE_BMP, 0xffffffff, 18, 24);
+    gui_text_set(text5, "pic0   pic4  movie", GUI_FONT_SRC_BMP, 0xffffffff, 18, 24);
     gui_text_mode_set(text5, LEFT);
 
     gui_text_t *text6 = gui_text_create(parent, "movie2", 10, 300, 330, 24);
-    gui_text_set(text6, "gui_progressbar_movie_create", GUI_FONT_SOURCE_BMP, 0xff0000ff, 28, 24);
+    gui_text_set(text6, "gui_progressbar_movie_create", GUI_FONT_SRC_BMP, 0xff0000ff, 28, 24);
     gui_text_mode_set(text6, LEFT);
 }
 ```
