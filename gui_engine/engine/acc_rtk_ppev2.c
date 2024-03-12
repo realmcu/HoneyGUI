@@ -16,7 +16,7 @@
 #include "fmc_api_ext.h"
 #include "os_sync.h"
 
-#define USE_TESSALLATION 1
+#define USE_TESSALLATION 0
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
 
@@ -699,9 +699,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
         image->matrix->m[2][1] == 0)
     {
-        if (image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1)
+        if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1) || image->blend_mode == IMG_RECT)
         {
-            if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format))
+            if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format) ||
+                image->blend_mode == IMG_RECT)
             {
                 uint32_t x_max = (image->target_w + image->img_x - 1) > rect->x2 ? rect-> x2 :
                                  (image->target_w + image->img_x - 1);
@@ -743,23 +744,26 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 dst_rect.y += dc->section.y1;
                 ppe_rect_t src_rect;
                 ppe_matrix_t inv_matrix;
-                memcpy(&inv_matrix, image->inverse, sizeof(float) * 9);
-                source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
-                source.width = image->img_w;
-                source.height = image->img_h;
-                bool ret = ppe_get_area(&src_rect, &dst_rect, &inv_matrix, &source);
-                if (src_rect.w % 2)
+                if (image->blend_mode == IMG_BYPASS_MODE)
                 {
-                    src_rect.w -= 1;
-                    if (src_rect.w == 0)
+                    memcpy(&inv_matrix, image->inverse, sizeof(float) * 9);
+                    source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
+                    source.width = image->img_w;
+                    source.height = image->img_h;
+                    bool ret = ppe_get_area(&src_rect, &dst_rect, &inv_matrix, &source);
+                    if (src_rect.w % 2)
                     {
+                        src_rect.w -= 1;
+                        if (src_rect.w == 0)
+                        {
+                            return;
+                        }
+                    }
+                    if (!ret)
+                    {
+                        //DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
                         return;
                     }
-                }
-                if (!ret)
-                {
-                    //DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
-                    return;
                 }
                 dst_rect.x -= dc->section.x1;
                 dst_rect.y -= dc->section.y1;
@@ -774,6 +778,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                         bare_blit_by_dma(&target, &source, &src_rect, &dst_rect);
                     }
                 }
+                else if (image->blend_mode == IMG_RECT)
+                {
+                    gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
+                    PPEV2_Mask(&target, rect_header->color.color.rgba_full, &dst_rect);
+
+                }
                 return;
             }
             else
@@ -784,6 +794,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         else if (image->blend_mode == IMG_BYPASS_MODE)
         {
             mode = PPEV2_BYPASS_MODE;
+        }
+        else if (image->blend_mode == IMG_RECT)
+        {
+            mode = PPEV2_CONST_MASK_MODE;
         }
         else
         {
@@ -963,7 +977,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             x_ref = section_x1;
             y_ref = section_y1;
             ppe_translate(0, y_ref, &inverse);
-            source.const_color = *(uint32_t *)((uint32_t)image->data + 8);
+            gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
+            source.const_color = rect_header->color.color.rgba_full;
         }
         source.high_quality = image->high_quality;
         if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
