@@ -621,6 +621,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     {
         return;
     }
+
     temp_buf_offset = 0;
     ppe_buffer_t target, source;
     memset(&target, 0, sizeof(ppe_buffer_t));
@@ -757,7 +758,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 }
                 if (!ret)
                 {
-                    DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
+                    //DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
                     return;
                 }
                 dst_rect.x -= dc->section.x1;
@@ -826,6 +827,32 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     uint32_t tessalation_len = dc->fb_width; \
     uint32_t block_num = 1;
 #endif
+    if (image->blend_mode == IMG_FILTER_BLACK)
+    {
+        source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
+        source.color_key_min = 0;
+        source.color_key_max = 0x010101;
+    }
+    else if (image->blend_mode == IMG_BYPASS_MODE)
+    {
+        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+    }
+    else if (image->blend_mode == IMG_SRC_OVER_MODE)
+    {
+        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+    }
+    else if (image->blend_mode == IMG_RECT)
+    {
+        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+    }
+    else if (image->blend_mode == IMG_COVER_MODE)
+    {
+        source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
+    }
+    else
+    {
+        return;
+    }
     for (int i = 0; i < block_num; i++)
     {
         int32_t section_x1 = tessalation_len * i;
@@ -874,32 +901,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             ppe_rect.h = y_max - section_y1 - ppe_rect.y + 1;
         }
         blend_area = ppe_rect.w * ppe_rect.h;
-        if (image->blend_mode == IMG_FILTER_BLACK)
-        {
-            source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
-            source.color_key_min = 0;
-            source.color_key_max = 0x010101;
-        }
-        else if (image->blend_mode == IMG_BYPASS_MODE)
-        {
-            source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-        }
-        else if (image->blend_mode == IMG_SRC_OVER_MODE)
-        {
-            source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-        }
-        else if (image->blend_mode == IMG_RECT)
-        {
-            source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-        }
-        else if (image->blend_mode == IMG_COVER_MODE)
-        {
-            source.color_key_enable = PPEV2_COLOR_KEY_DISABLE;
-        }
-        else
-        {
-            return;
-        }
         ppe_matrix_t inverse;
         memcpy(&inverse, image->inverse, sizeof(float) * 9);
         ppe_matrix_t pre_trans;
@@ -911,8 +912,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             bool ret = ppe_get_area(&old_rect, &ppe_rect, &inverse, &source);
             if (!ret)
             {
-                DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
-                return;
+                //DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
+                if (i == block_num - 1)
+                {
+                    return;
+                }
+                else
+                {
+                    continue;
+                }
             }
             if (head->type == IMDC_COMPRESS)
             {
