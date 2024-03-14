@@ -368,13 +368,26 @@ void page_update(gui_obj_t *obj)
                     gui_obj_event_set(obj, GUI_EVENT_8);
 
                 }
-                else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed != 0)
+                else if (tp->released)
                 {
-                    GUI_TYPE(gui_page_t, obj)->release = true;
-                }
-                else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed == 0)
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    if (tp->type == TOUCH_UP_SLIDE)
+                    {
+                        gui_log("page TOUCH_UP_SLIDE\n");
+                    }
+                    else if (tp->type == TOUCH_DOWN_SLIDE)
+                    {
+                        gui_log("page TOUCH_DOWN_SLIDE\n");
+                    }
+                    if (GUI_TYPE(gui_page_t, obj)->speed != 0)
+                    {
+                        GUI_TYPE(gui_page_t, obj)->release = true;
+
+
+                    }
+                    else if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                    {
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+                    }
                 }
                 else if (tp->pressed)
                 {
@@ -384,7 +397,6 @@ void page_update(gui_obj_t *obj)
                 }
                 else
                 {
-                    ////gui_log("%d\n",__LINE__);
                     if (GUI_TYPE(gui_page_t, obj)->release)
                     {
                         ////gui_log("target:%d,%d,%d\n",GUI_TYPE(gui_page_t, obj)->target,page->speed,obj->y);
@@ -420,7 +432,8 @@ void page_update(gui_obj_t *obj)
                             }
 
                         }
-                        if (GUI_TYPE(gui_page_t, obj)->speed <= 3 && GUI_TYPE(gui_page_t, obj)->speed >= -3)
+                        if (page->align_hight > 0 && GUI_TYPE(gui_page_t, obj)->speed <= 3 &&
+                            GUI_TYPE(gui_page_t, obj)->speed >= -3)
                         {
                             gui_obj_event_set(obj, GUI_EVENT_7);
                             if (GUI_TYPE(gui_page_t, obj)->speed > 0 && obj->y >= page->target)
@@ -631,13 +644,29 @@ static void page_update_rebound(gui_obj_t *obj)
 
 
                 }
-                else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed != 0)
+                else if (tp->released)
                 {
-                    GUI_TYPE(gui_page_t, obj)->release = true;
-                }
-                else if (tp->released && GUI_TYPE(gui_page_t, obj)->speed == 0)
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_7);
+                    if (tp->type == TOUCH_UP_SLIDE)
+                    {
+                        gui_log("page TOUCH_UP_SLIDE\n");
+                    }
+                    else if (tp->type == TOUCH_DOWN_SLIDE)
+                    {
+                        gui_log("page TOUCH_DOWN_SLIDE\n");
+                    }
+
+
+
+                    if (GUI_TYPE(gui_page_t, obj)->speed != 0)
+                    {
+                        GUI_TYPE(gui_page_t, obj)->release = true;
+
+
+                    }
+                    else if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+                    {
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+                    }
                 }
                 else if (tp->pressed)
                 {
@@ -685,7 +714,8 @@ static void page_update_rebound(gui_obj_t *obj)
                                     }
 
                                 }
-                                if (GUI_TYPE(gui_page_t, obj)->speed <= 3 && GUI_TYPE(gui_page_t, obj)->speed >= -3)
+                                if (page->align_hight > 0 && GUI_TYPE(gui_page_t, obj)->speed <= 3 &&
+                                    GUI_TYPE(gui_page_t, obj)->speed >= -3)
                                 {
                                     gui_obj_event_set(obj, GUI_EVENT_7);
                                     if (GUI_TYPE(gui_page_t, obj)->speed > 0 && obj->y >= page->target)
@@ -760,7 +790,8 @@ static void page_update_rebound(gui_obj_t *obj)
                                     }
 
                                 }
-                                if (GUI_TYPE(gui_page_t, obj)->speed <= 3 && GUI_TYPE(gui_page_t, obj)->speed >= -3)
+                                if (page->align_hight > 0 && GUI_TYPE(gui_page_t, obj)->speed <= 3 &&
+                                    GUI_TYPE(gui_page_t, obj)->speed >= -3)
                                 {
                                     gui_obj_event_set(obj, GUI_EVENT_7);
                                     if (GUI_TYPE(gui_page_t, obj)->speed > 0 && obj->y >= page->target)
@@ -834,7 +865,8 @@ static void page_update_rebound(gui_obj_t *obj)
                                     }
 
                                 }
-                                if (GUI_TYPE(gui_page_t, obj)->speed <= 3 && GUI_TYPE(gui_page_t, obj)->speed >= -3)
+                                if (page->align_hight > 0 && GUI_TYPE(gui_page_t, obj)->speed <= 3 &&
+                                    GUI_TYPE(gui_page_t, obj)->speed >= -3)
                                 {
                                     gui_obj_event_set(obj, GUI_EVENT_7);
                                     if (GUI_TYPE(gui_page_t, obj)->speed > 0 && obj->y >= page->target)
