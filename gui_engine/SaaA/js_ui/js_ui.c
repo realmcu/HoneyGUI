@@ -2,21 +2,13 @@
 #include "js_user.h"
 
 
-static void js_cb_with_args(gui_obj_t *obj)
+static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code)
 {
     //gui_log("enter js_cb_with_args\n");
     cb_arg_t *args = NULL;
     gui_event_dsc_t *event = obj->event_dsc;
-    int event_code = 0;
-    for (size_t i = 0; i < obj->event_dsc_cnt; i++)
-    {
-        if (event[i].event_code)
-        {
-            event_code = event[i].event_code;
-            break;
-        }
 
-    }
+    // same event only handle the first register one
     for (size_t i = 0; i < obj->event_dsc_cnt; i++)
     {
         if (event[i].filter == event_code)
@@ -77,9 +69,26 @@ DECLARE_HANDLER(write)
     }
     return jerry_create_undefined();
 }
-
+DECLARE_HANDLER(setPosition)
+{
+    if (args_cnt != 1 || !jerry_value_is_object(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_text_t *txtbox = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
+    if (txtbox)
+    {
+        int x = jerry_get_number_value(js_get_property(args[0], "x"));
+        int y = jerry_get_number_value(js_get_property(args[0], "y"));
+        // gui_log("setPosition %d %d\n", x, y);
+        gui_text_move(txtbox, x, y);
+    }
+    return jerry_create_undefined();
+}
 DECLARE_HANDLER(jump)
 {
+    // gui_log("enter jump\n");
     if (args_cnt != 1 || !jerry_value_is_number(args[0]))
     {
         return jerry_create_undefined();
@@ -89,6 +98,7 @@ DECLARE_HANDLER(jump)
     ////gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
     if (txtbox)
     {
+        // gui_log("jump %f\n", jerry_get_number_value(args[0]));
         gui_tabview_jump_tab((void *)txtbox, jerry_get_number_value(args[0]), 0);
     }
     return jerry_create_undefined();
@@ -110,7 +120,7 @@ void gui_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **o
 }
 DECLARE_HANDLER(getElementById)
 {
-    //gui_log("enter getElementById\n");
+    // gui_log("enter getElementById\n");
     if (args_cnt != 1 || !jerry_value_is_string(args[0]))
     {
         return jerry_create_undefined();
@@ -331,7 +341,7 @@ DECLARE_HANDLER(onClick)
         }
         for (size_t i = 0; i < cb_arg->args_count; i++)
         {
-            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+            cb_arg->args_p[i] = args[i + 1];
         }
 
         cb_arg->func = args[0];
@@ -706,7 +716,7 @@ DECLARE_HANDLER(onOn)
         }
         for (size_t i = 0; i < cb_arg->args_count; i++)
         {
-            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+            cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
         GUI_TYPE(gui_switch_t, obj)->onOn((void *)obj, js_cb_with_args, (void *)(cb_arg));
@@ -734,7 +744,7 @@ DECLARE_HANDLER(onOff)
         }
         for (size_t i = 0; i < cb_arg->args_count; i++)
         {
-            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+            cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
         GUI_TYPE(gui_switch_t, obj)->onOff((void *)obj, js_cb_with_args, (void *)(cb_arg));
@@ -742,6 +752,54 @@ DECLARE_HANDLER(onOff)
 
     return jerry_create_undefined();
 }
+
+// tabview
+DECLARE_HANDLER(OnChange)
+{
+    gui_log("enter OnChange\n");
+    if (args_cnt >= 1 && jerry_value_is_function(args[0]))
+    {
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //////gui_log("enter onclick %s\n",obj->name);
+
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        ////gui_log("cb_arg:%x\n", cb_arg);
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = args[i + 1];
+            // gui_log("param: %u", cb_arg->args_p[i]);
+        }
+        cb_arg->func = args[0];
+        gui_tabview_tabChange((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        // GUI_TYPE(gui_switch_t, obj)->onOn((void *)obj, js_cb_with_args, (void *)(cb_arg));
+    }
+    return jerry_create_undefined();
+}
+// tabview
+DECLARE_HANDLER(getCurTab)
+{
+    gui_obj_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    jerry_value_t x = GUI_TYPE(gui_tabview_t, obj)->cur_id.x;
+    jerry_value_t y = GUI_TYPE(gui_tabview_t, obj)->cur_id.y;
+    jerry_value_t z = GUI_TYPE(gui_tabview_t, obj)->cur_id.z;
+
+    jerry_value_t tab_cur_id = jerry_create_object();
+    js_set_property(tab_cur_id, "x", jerry_create_number((double) x));
+    js_set_property(tab_cur_id, "y", jerry_create_number((double) y));
+    js_set_property(tab_cur_id, "z", jerry_create_number((double) z));
+    return tab_cur_id;
+}
+
+
 #include "gui_seekbar.h"
 DECLARE_HANDLER(onpress_seekbar)
 {
@@ -1046,7 +1104,7 @@ DECLARE_HANDLER(win_setAttribute)
             gui_obj_t *obj = NULL;
             jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
             (obj->not_show) = true;
-
+            gui_fb_change();
 
 
         }
@@ -1124,6 +1182,8 @@ void js_gui_init()
     js_set_property(global_obj, "tab", tab);
     REGISTER_METHOD(tab, getElementById);
     REGISTER_METHOD(tab, jump);
+    REGISTER_METHOD_NAME(tab, "onChange", OnChange);
+    REGISTER_METHOD_NAME(tab, "getCurTab", getCurTab);
 
     jerry_value_t icon = jerry_create_object();
     js_set_property(global_obj, "icon", icon);
@@ -1155,6 +1215,7 @@ void js_gui_init()
     js_set_property(global_obj, "textbox", document);
     REGISTER_METHOD(document, write);
     REGISTER_METHOD(document, getElementById);
+    REGISTER_METHOD(document, setPosition);
     REGISTER_METHOD_NAME(document, "palyAnimate", play_animate_text);
     REGISTER_METHOD_NAME(document, "setAnimate", setAnimate_text);
 

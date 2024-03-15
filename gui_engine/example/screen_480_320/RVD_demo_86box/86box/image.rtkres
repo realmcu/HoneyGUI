@@ -18,7 +18,6 @@
     </ImageConvertSetting>
   </FontConfigData>
   <ImageConvertSettingInfo ImagePath="0_home\home_bg.png" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="0_home\point_1.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\0_Living_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\0_Living_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\1_Dining_Off.png" ImageSettingName="GlobalSetting" />
@@ -31,21 +30,21 @@
   <ImageConvertSettingInfo ImagePath="1_switch_1\4_Kitchen_ON.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\5_Bathroom_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\5_Bathroom_ON.png" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="1_switch_1\point-2.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\sw_1_bg.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\0_Bedroom_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\0_Bedroom_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\1_Children_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\1_Children_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\2_All_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="2_switch_2\2_All_on_click.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\3_All_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="2_switch_2\3_All_off_click.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\4_socket1_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\4_socket1_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\5_socket2_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\5_socket2_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\6_socket3_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\6_socket3_on.png" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="2_switch_2\point-3.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\sw_2_bg.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\0_0_down.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\0_1_up.png" ImageSettingName="GlobalSetting" />
@@ -59,7 +58,14 @@
   <ImageConvertSettingInfo ImagePath="3_air\3_dry_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\air_cold_bg.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\air_heat_bg.png" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air\point-4.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_02.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_03.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_04.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_05.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_06.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_07.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_08.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_09.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_10.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_11.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_12.jpg" ImageSettingName="GlobalSetting" />
@@ -70,19 +76,19 @@
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_17.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_18.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_19.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_2.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_20.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_21.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_22.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_23.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_24.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_3.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_4.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_5.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_6.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_7.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_8.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_cold\air_cold_9.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_02.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_03.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_04.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_05.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_06.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_07.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_08.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_09.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_10.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_11.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_12.jpg" ImageSettingName="GlobalSetting" />
@@ -93,23 +99,14 @@
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_17.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_18.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_19.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_2.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_20.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_21.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_22.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_23.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_24.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_3.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_4.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_5.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_6.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_7.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_8.jpg" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_9.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain\0_start.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain\1_stop.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain\curtain_bg.png" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="4_curtain\point-5.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain_ani\curtain_00000.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain_ani\curtain_00002.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain_ani\curtain_00004.jpg" ImageSettingName="GlobalSetting" />
@@ -135,7 +132,6 @@
   <ImageConvertSettingInfo ImagePath="4_curtain_ani\curtain_00044.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="5_speed\0_speed_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="5_speed\1_speed_on.png" ImageSettingName="GlobalSetting" />
-  <ImageConvertSettingInfo ImagePath="5_speed\point-5.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="6_point\0_grey.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="6_point\1_white.png" ImageSettingName="GlobalSetting" />
 </ImageConvertXmlData>

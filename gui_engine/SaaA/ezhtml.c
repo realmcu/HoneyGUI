@@ -350,7 +350,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         else if (!strcmp(p->attr[i], "color"))
                         {
                             color = string_rgb888(p->attr[++i]);
-                            gui_log("color %s,%x\n", p->attr[i], color);
                         }
                         else if (!strcmp(p->attr[i], "mode"))
                         {

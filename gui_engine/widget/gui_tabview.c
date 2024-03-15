@@ -92,6 +92,7 @@ static void tabview_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_tabview_t *tabview = (gui_tabview_t *)obj;
     gui_tabview_t *this = (gui_tabview_t *)obj;
+    gui_tabview_tab_id_t last_cur_id = this->cur_id;
 
     if (tabview->jump.jump_flag)
     {
@@ -302,6 +303,7 @@ static void tabview_prepare(gui_obj_t *obj)
                     tabview->cur_id.x = tabview->jump.jump_id.x;
                     tabview->jump.jump_flag = false;
                     this->release_x = 0;
+                    gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
                     return;
                 }
             }
@@ -342,6 +344,7 @@ static void tabview_prepare(gui_obj_t *obj)
                     tabview->cur_id.x = tabview->jump.jump_id.x;
                     tabview->jump.jump_flag = false;
                     this->release_x = 0;
+                    gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
                     return;
                 }
             }
@@ -434,6 +437,12 @@ static void tabview_prepare(gui_obj_t *obj)
     {
         gui_fb_change();
     }
+
+    if ((last_cur_id.x != this->cur_id.x) || (last_cur_id.y != this->cur_id.y) ||
+        (last_cur_id.z != this->cur_id.z))
+    {
+        gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
+    }
 }
 
 /*============================================================================*
@@ -443,7 +452,6 @@ void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
 {
     this->style = style;
 }
-
 
 gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h)
@@ -486,6 +494,13 @@ void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp)
 {
     tabview->tp_disable = disable_tp;
 }
+
+void gui_tabview_tabChange(gui_tabview_t *tabview, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(tabview, (gui_event_cb_t)callback, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE,
+                         parameter);
+}
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

@@ -610,13 +610,14 @@ void *gui_get_file_address(const char *file)
 #define O_BINARY 0100000
 #endif
         int fd = gui_fs_open(path,  O_BINARY);
-        gui_free(path);
-        if (fd == -1)
+
+        if (fd <= 0)
         {
-            gui_log("open file failed.\n");
+            gui_log("open file failed: %s\n", path);
+            gui_free(path);
             return NULL;
         }
-
+        gui_free(path);
         int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
         {
             static uint32_t used = 0;
@@ -635,7 +636,7 @@ void *gui_get_file_address(const char *file)
         sprintf(path, "%s%s", root_folder, file);
         int fd = gui_fs_open(path,  0);
         gui_free(path);
-        if (fd == -1)
+        if (fd <= 0)
         {
             gui_log("!!!filename = %s, open fail!\n", path);
             return NULL;

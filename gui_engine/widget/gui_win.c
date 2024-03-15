@@ -91,6 +91,8 @@ static void win_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
+    gui_win_t *this = (gui_win_t *)obj;
+
     if (GUI_TYPE(gui_win_t, obj)->event5_flag)
     {
         gui_obj_event_set(obj, GUI_EVENT_5);
@@ -196,6 +198,15 @@ static void win_prepare(gui_obj_t *obj)
         }
         ob->animate->progress_percent = ((float)(ob->animate->current_frame)) / ((float)(
                                                                                      frame_count));
+    }
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_win_t));
+
+    if (last != this->checksum)
+    {
+        gui_fb_change();
     }
 }
 
