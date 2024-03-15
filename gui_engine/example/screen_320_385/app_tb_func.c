@@ -39,11 +39,11 @@ void page_tb_func(void *parent)
                  24);
     //gui_text_type_set(t5, SIMKAI_SIZE24_BITS4_FONT_BIN);
 
-    gui_button_t *button1 = gui_button_create(parent, 80, 250, 100, 100, VOL_INC_BIN, VOL_INC_BLUE_BIN,
+    T_GUI_BUTTON *button1 = gui_button_create(parent, 80, 250, 100, 100, VOL_INC_BIN, VOL_INC_BLUE_BIN,
                                               "",
-                                              0, 0);
-    gui_button_t *button2 = gui_button_create(parent, 220, 250, 100, 100, VOL_DEC_BIN, VOL_DEC_BLUE_BIN,
+                                              0, 0, 0);
+    T_GUI_BUTTON *button2 = gui_button_create(parent, 220, 250, 100, 100, VOL_DEC_BIN, VOL_DEC_BLUE_BIN,
                                               "",
-                                              0, 0);
+                                              0, 0, 0);
 
 }

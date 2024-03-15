@@ -71,18 +71,18 @@ void *get_app_xml(void)
 #endif
 #include "draw_font.h"
 gui_grid_t *g;
-void button_cb(gui_button_t *b)
+void button_cb(T_GUI_BUTTON *b)
 {
     gui_img_set_opacity((void *)b->img, 100);
 
 }
-void button_click_cb(gui_button_t *b)
+void button_click_cb(T_GUI_BUTTON *b)
 {
     gui_app_t *app = get_app_xml();
     app->xml = b->data;
     gui_switch_app(get_app_launcher_frontend(), app);
 }
-void button_release_cb(gui_button_t *b)
+void button_release_cb(T_GUI_BUTTON *b)
 {
     gui_img_set_opacity((void *)b->img, 255);
     button_click_cb(b);
@@ -137,9 +137,9 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         continue;
                     }
 
-                    gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, 0, 0);
-                    gui_button_api.onPress(button, button_cb, button);
-                    gui_button_api.onRelease(button, button_release_cb, button);
+                    T_GUI_BUTTON *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, 0, 0, 0);
+                    gui_button_press(button, button_cb, button);
+                    gui_button_release(button, button_release_cb, button);
 
 #ifdef RTL87x2G_DASHBOARD
                     gui_obj_event_set((void *)button, GUI_EVENT_TOUCH_RELEASED);

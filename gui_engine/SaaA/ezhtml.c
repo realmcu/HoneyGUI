@@ -193,7 +193,7 @@ uint32_t string_rgb888(const char *color)
 
     return (c);
 }
-static void sport_button_press_ani_cb(gui_button_t *button)
+static void sport_button_press_ani_cb(T_GUI_BUTTON *button)
 {
     float per = (button->animate->progress_percent);
     float alpha_to = 100;
@@ -239,7 +239,7 @@ static void draw_arc(gui_canvas_t *c)
     nvgStroke(c->vg);
 
 }
-static void sport_button_release_ani_cb(gui_button_t *button)
+static void sport_button_release_ani_cb(T_GUI_BUTTON *button)
 {
     float per = (button->animate->progress_percent);
     float alpha_to = UINT8_MAX;
@@ -267,13 +267,13 @@ static void sport_button_release_ani_cb(gui_button_t *button)
         gui_img_scale((void *)button->img, scale,  scale);
     }
 }
-static void sport_button_press(gui_button_t *b)
+static void sport_button_press(T_GUI_BUTTON *b)
 {
-    gui_button_api.set_animate(b, 200, 0, sport_button_press_ani_cb, b);
+    gui_button_set_animate(b, 200, 0, sport_button_press_ani_cb, b);
 }
-static void sport_button_release(gui_button_t *b)
+static void sport_button_release(T_GUI_BUTTON *b)
 {
-    gui_button_api.set_animate(b, 200, 0, sport_button_release_ani_cb, b);
+    gui_button_set_animate(b, 200, 0, sport_button_release_ani_cb, b);
 }
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
@@ -422,7 +422,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         char b[100] = {0};
                                         strncpy(b, font_type, strstr(font_type, ".bin;") - font_type + strlen(".bin"));
                                         void *addr1 = gui_get_file_address(b);
-                                        memset(b, 0, sizeof(b));
+                                        memset(b, 0, sizeof(b));    // cppcheck-suppress
                                         char *a = font_type;
                                         strncpy(b, strstr(a, ".bin;") + strlen(".bin;"), strlen(a) - (strstr(a,
                                                                                                              ".bin;") - a + strlen(".bin;")));
@@ -1863,21 +1863,21 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //font_size = 32;
-                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, 0, 0);
-                    GUI_TYPE(gui_button_t, parent)->style = style;
+                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, 0, 0, 0);
+                    GUI_TYPE(T_GUI_BUTTON, parent)->style = style;
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
                     gui_button_text_move((void *)parent, text_x, text_y);
-                    gui_img_set_mode(GUI_TYPE(gui_button_t, parent)->img, blendMode);
-                    gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
+                    gui_img_set_mode(GUI_TYPE(T_GUI_BUTTON, parent)->img, blendMode);
+                    gui_img_set_opacity(GUI_TYPE(T_GUI_BUTTON, parent)->img, opacity);
 
                     gui_color_t color_temporary;
                     color_temporary.color.rgba_full = font_color;
-                    GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
+                    GUI_TYPE(T_GUI_BUTTON, parent)->text->color = color_temporary;
                     if (style)
                     {
-                        gui_button_api.onPress((void *)parent, sport_button_press, parent);
-                        gui_button_api.onRelease((void *)parent, sport_button_release, parent);
+                        gui_button_press((void *)parent, sport_button_press, parent);
+                        gui_button_release((void *)parent, sport_button_release, parent);
                     }
 
                     {
@@ -1887,10 +1887,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             font_type2 = GUI_FONT_SRC_BMP;
                             void *addr1 = gui_get_file_address(font_type);
                             gui_font_mem_init(addr1);
-                            GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
-                            GUI_TYPE(gui_button_t, parent)->text->path = 0;
-                            gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1);
-                            gui_text_mode_set(GUI_TYPE(gui_button_t, parent)->text, LEFT);
+                            GUI_TYPE(T_GUI_BUTTON, parent)->text->font_height = font_size;
+                            GUI_TYPE(T_GUI_BUTTON, parent)->text->path = 0;
+                            gui_text_type_set(GUI_TYPE(T_GUI_BUTTON, parent)->text, addr1);
+                            gui_text_mode_set(GUI_TYPE(T_GUI_BUTTON, parent)->text, LEFT);
                             // t->font_height = fontSize;
                             //t->path = 0;
                         }
@@ -1898,12 +1898,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
 #ifdef __WIN32
                             font_type2 = GUI_FONT_SRC_TTF;
-                            GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
-                            GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_TTF;
+                            GUI_TYPE(T_GUI_BUTTON, parent)->text->path = gui_get_file_address(font_type);
+                            GUI_TYPE(T_GUI_BUTTON, parent)->text->font_type = GUI_FONT_SRC_TTF;
 #elif defined RTL8772F
                             font_type2 = GUI_FONT_SRC_TTF;
-                            GUI_TYPE(gui_button_t, parent)->text->path = gui_get_file_address(font_type);
-                            GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_TTF;
+                            GUI_TYPE(T_GUI_BUTTON, parent)->text->path = gui_get_file_address(font_type);
+                            GUI_TYPE(T_GUI_BUTTON, parent)->text->font_type = GUI_FONT_SRC_TTF;
 #else
                             font_type =
                                 "app/system/resource/font/gbk_32_32_dot.bin;app/system/resource/font/gbk_unicode_table.bin";
@@ -1918,8 +1918,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                                                                      ".bin;") - a + strlen(".bin;")));
                                 void *addr2 = gui_get_file_address(b);
                                 // gui_set_font_mem_resourse(32, addr1,  addr2);
-                                GUI_TYPE(gui_button_t, parent)->text->path = 0;
-                                GUI_TYPE(gui_button_t, parent)->text->font_type = GUI_FONT_SRC_BMP;
+                                GUI_TYPE(T_GUI_BUTTON, parent)->text->path = 0;
+                                GUI_TYPE(T_GUI_BUTTON, parent)->text->font_type = GUI_FONT_SRC_BMP;
                             }
 #endif
                         }

@@ -16,12 +16,10 @@ extern "C" {
 
 typedef enum
 {
-    BYTE_PIXEL_RGB565 = 2,
-    BYTE_PIXEL_RGB888 = 3,
+    BYTE_PIXEL_RGB565   = 2,
+    BYTE_PIXEL_RGB888   = 3,
     BYTE_PIXEL_RGBA8888 = 4,
 } GUI_BYTE_PIXEL_ENUM;
-
-
 
 typedef enum
 {
@@ -38,7 +36,6 @@ typedef enum
     RTKARGB8565 = 15,
 } GUI_FormatType;
 
-
 typedef enum
 {
     IMG_BYPASS_MODE = 0,
@@ -53,6 +50,13 @@ typedef enum
     IMG_SRC_MEMADDR = 0,
     IMG_SRC_FILESYS,
 } IMG_SOURCE_MODE_TYPE;
+
+typedef enum
+{
+    IMG_SRC_ICON = 0,
+    IMG_SRC_LVG,
+    IMG_SRC_CANVAS,
+} T_IMG_SOURCE_IMG_TYPE;
 
 typedef struct draw_img
 {
@@ -86,4 +90,3 @@ uint32_t gui_image_get_pixel(draw_img_t *img);
 #endif
 
 #endif
-
