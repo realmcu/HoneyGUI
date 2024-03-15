@@ -771,11 +771,17 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 {
                     if (head->type == IMDC_COMPRESS)
                     {
+                        uint32_t s;
+                        s = os_lock();
                         bare_blit_by_imdc(&target, &source, &src_rect, &dst_rect);
+                        os_unlock(s);
                     }
                     else
                     {
+                        uint32_t s;
+                        s = os_lock();
                         bare_blit_by_dma(&target, &source, &src_rect, &dst_rect);
+                        os_unlock(s);
                     }
                 }
                 else if (image->blend_mode == IMG_RECT)
@@ -938,11 +944,17 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
             if (head->type == IMDC_COMPRESS)
             {
+                uint32_t s;
+                s = os_lock();
                 ret = memcpy_by_imdc(&old_rect, &source);
+                os_unlock(s);
             }
             else
             {
+                uint32_t s;
+                s = os_lock();
                 ret = memcpy_by_dma(&old_rect, &source);
+                os_unlock(s);
             }
             ppe_rect.y -= section_y1;
             if (ret)
