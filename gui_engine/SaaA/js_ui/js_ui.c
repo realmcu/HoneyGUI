@@ -93,13 +93,14 @@ DECLARE_HANDLER(jump)
     {
         return jerry_create_undefined();
     }
-    gui_obj_t *txtbox = NULL;
-    jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
+    gui_obj_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &obj, NULL);
     ////gui_log("jerry_get_object_native_pointer = %s",txtbox->base.name);
-    if (txtbox)
+    if (obj)
     {
         // gui_log("jump %f\n", jerry_get_number_value(args[0]));
         gui_tabview_jump_tab((void *)txtbox, jerry_get_number_value(args[0]), 0);
+        gui_fb_change();
     }
     return jerry_create_undefined();
 }
@@ -1105,8 +1106,6 @@ DECLARE_HANDLER(win_setAttribute)
             jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
             (obj->not_show) = true;
             gui_fb_change();
-
-
         }
         gui_free(a);
     }
