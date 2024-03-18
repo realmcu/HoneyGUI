@@ -10,6 +10,7 @@
 #include "app_chargebox.h"
 #include "gui_win.h"
 #include "gui_server.h"
+#include "draw_font.h"
 #include "gui_components_init.h"
 #include <stdio.h>
 
@@ -61,7 +62,7 @@ static void app_chargebox_ui_design(gui_app_t *app)
     gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
     gui_tabview_set_style(tv, CLASSIC);
 
-    gui_set_font_mem_resourse(32, GBK_32_32_DOT_BIN, GBK_UNICODE_TABLE_BIN);
+    gui_font_mem_init(SIMKAI_SIZE24_BITS4_FONT_BIN);
 
     gui_tab_t *tb_conn = gui_tab_create(tv, "tb_conn",     0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_func = gui_tab_create(tv, "tb_func",     0, 0, 0, 0, 1, 0);

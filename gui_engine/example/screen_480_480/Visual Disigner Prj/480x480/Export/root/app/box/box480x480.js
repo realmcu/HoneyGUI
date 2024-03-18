@@ -195,55 +195,76 @@ function lampSwitchOnFunc(params) {
     //console.log('lampSwitchOnFunc')
     sw.getElementById('kitchen_switch')
     sw.turnOn()
+	LED1.writeSync(0)
     sw.getElementById('parlor_switch')
     sw.turnOn()
+	LED2.writeSync(0)
     sw.getElementById('bedroom_switch')
     sw.turnOn()   
+	LED3.writeSync(0)
 	sw.getElementById('bedroom_switch1')
     sw.turnOn()
+	LED4.writeSync(0)
     sw.getElementById('bedroom_switch2')
     sw.turnOn()
+	LED5.writeSync(0)
     sw.getElementById('porch_switch')
-    sw.turnOn()  
+    sw.turnOn() 
+	LED6.writeSync(0)	
     sw.getElementById('bedroom_off')
     sw.turnOn()
+	LED7.writeSync(0)
     sw.getElementById('children')
-    sw.turnOn()     
+    sw.turnOn()
+	LED8.writeSync(0)	
     sw.getElementById('socket1')
-    sw.turnOn()  
+    sw.turnOn()
+	plug1.writeSync(0)	
     sw.getElementById('socket3')
-    sw.turnOn()  
+    sw.turnOn()
+	plug2.writeSync(0)	
     sw.getElementById('switch0')
-    sw.turnOn()  
-    LED9.writeSync(0) 
-
+    sw.turnOn()
+	plug3.writeSync(0)	
+    //LED9.writeSync(0) 
 }
 function lampSwitchOffFunc(params) {
     sleep_flag = false;
     //console.log('lampSwitchOffFunc')
     sw.getElementById('kitchen_switch')
     sw.turnOff()
+	LED1.writeSync(1)
     sw.getElementById('parlor_switch')
     sw.turnOff()
+	LED2.writeSync(1)
     sw.getElementById('bedroom_switch')
-    sw.turnOff()  
+    sw.turnOff()
+	LED3.writeSync(1)	
 	sw.getElementById('bedroom_switch1')
     sw.turnOff()
+	LED4.writeSync(1)
     sw.getElementById('bedroom_switch2')
     sw.turnOff()
+	LED5.writeSync(1)
     sw.getElementById('porch_switch')
-    sw.turnOff()      
+    sw.turnOff()
+	LED6.writeSync(1)	
     sw.getElementById('bedroom_off')
     sw.turnOff()
+	LED7.writeSync(1)
     sw.getElementById('children')
-    sw.turnOff()  
+    sw.turnOff()
+	LED8.writeSync(1)	
     sw.getElementById('socket1')
-    sw.turnOff()  
+    sw.turnOff()
+	plug1.writeSync(1)	
     sw.getElementById('socket3')
-    sw.turnOff()  
+    sw.turnOff()
+	plug2.writeSync(1)	
     sw.getElementById('switch0')
-    sw.turnOff()  
-    LED9.writeSync(1) 
+    sw.turnOff()
+	plug3.writeSync(1)	
+    //LED9.writeSync(1) 
 
 }
 sw.getElementById('kitchen_switch')
@@ -298,6 +319,7 @@ icon.onClick(lampSwitchOffFunc)
 /**
  * ac
  */
+console.log('ac start')
 var acStatus = 1
 var acOnOffStatus = 0;
 function coolingFunc(params) {
@@ -465,16 +487,13 @@ var testAnimateTiming = {
 var curtain_open = 0;
 seekbar.getElementById('curtain_bar')
 function curtainFrame(params) {
-
    // console.log('curtainFrame')
-    
      animate= seekbar.animateProgress()
     if (curtain_open==1) {
-        seekbar.setAttribute("progress", 1.0-animate)
-    } else {
         seekbar.setAttribute("progress", animate)
+    } else {
+        seekbar.setAttribute("progress", 1.0-animate)
     }
-    
 }
 
 function swCurtain(params) {
@@ -486,55 +505,7 @@ function swCurtain(params) {
         curtain_open = 1;
     }
 }
-
-
-icon.getElementById('resetBtn')
-function resetPressFunc(params) {
-    //console.log('resetPressFunc')
-
-    matter.dataRst();
-}
-icon.onPress(resetPressFunc)
-
-
-
-
-tab.getElementById('tabview0')
-icon.getElementById('icon123')
-function icon123OnPressFunc(params) {
-  //  console.log('iconNromalOnPressFunc')
-    tab.jump(0);
-}
-icon.onPress(icon123OnPressFunc)
-icon.getElementById('icon1231')
-function icon1231OnPressFunc(params) {
-   // console.log('iconNromalOnPressFunc')
-    tab.jump(1);
-}
-icon.onPress(icon1231OnPressFunc)
-
-icon.getElementById('icon1232')
-function icon1232OnPressFunc(params) {
-  //  console.log('iconNromalOnPressFunc')
-    tab.jump(2);
-}
-icon.onPress(icon1232OnPressFunc)
-
-icon.getElementById('icon1233')
-function icon1233OnPressFunc(params) {
-  //  console.log('iconNromalOnPressFunc')
-    tab.jump(3);
-}
-icon.onPress(icon1233OnPressFunc)
-
-icon.getElementById('icon1234')
-function icon1234OnPressFunc(params) {
-  //  console.log('iconNromalOnPressFunc')
-    tab.jump(4);
-}
-icon.onPress(icon1234OnPressFunc)
 seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
-
 sw.getElementById('open_switch')
 sw.onOn(swCurtain)
 sw.onOff(swCurtain)
@@ -545,3 +516,174 @@ sw.getElementById('close_switch')
 sw.onOn(swCurtain)
 sw.onOff(swCurtain)
 
+
+// reset button
+icon.getElementById('resetBtn')
+function resetPressFunc(params) {
+    //console.log('resetPressFunc')
+    matter.dataRst();
+}
+icon.onHold(resetPressFunc)
+
+
+
+//-------------------------------------------
+//// tab  control
+
+// common func
+var Id_prefix = 'sw';
+function sw_getId(params) {
+	var id_str = Id_prefix + params.toString();
+	// console.log(id_str)
+	return id_str;
+}
+
+sw.getElementById('sw_tab0')
+sw.turnOn()
+
+tab.getElementById('tabview0')
+var tabJump = {
+    cur_tab_x: 0,
+    nxt_tab_x: 0,
+	cur_tab_y: 0,
+    nxt_tab_y: 0
+}
+
+function sw_turnOff(params) {
+	Id_prefix = 'sw_tab';
+	sw.getElementById(sw_getId(params));
+	sw.turnOff()
+}
+function sw_turnOn(params) {
+	Id_prefix = 'sw_tab';
+	sw.getElementById(sw_getId(params));
+	sw.turnOn()
+}
+function sw_jump_turnoff(params) {
+	Id_prefix = 'sw_tab';
+	sw.getElementById(sw_getId(tabJump.cur_tab_x));
+	sw.turnOff()
+}
+
+function sw_jump_tab(params) {
+	// console.log('jump', params)
+	tabJump.nxt_tab_x = params
+	
+	if(tabJump.nxt_tab_x != tabJump.cur_tab_x)
+	{
+		sw_jump_turnoff();
+		tab.jump(params);
+		tabJump.cur_tab_x = tabJump.nxt_tab_x
+	}
+}
+
+function sw_jump_keep_on(params) {
+	// console.log('sw_jump_keep_on ', params)
+	Id_prefix = 'sw_tab';
+	if(params == tabJump.nxt_tab_x)
+	{
+		sw.getElementById(sw_getId(params));
+		sw.turnOn();
+	}
+}
+
+function tab_slide(params) {
+	// console.log('tab_slide')
+	var cur_tab = tab.getCurTab()
+
+	tabJump.nxt_tab_x = cur_tab.x;
+	sw_turnOn(tabJump.nxt_tab_x);
+	sw_turnOff(tabJump.cur_tab_x);
+	tabJump.cur_tab_x = cur_tab.x;
+}
+
+// console.log('[JS] change')
+// tab change
+tab.onChange(tab_slide)
+
+// console.log('[JS] jump')
+// jump tab0
+sw.getElementById('sw_tab0')
+sw.onOn(sw_jump_tab, 0)
+sw.onOff(sw_jump_keep_on, 0)
+
+// jump tab1
+sw.getElementById('sw_tab1')
+sw.onOn(sw_jump_tab, 1)
+sw.onOff(sw_jump_keep_on, 1)
+
+// jump tab2
+sw.getElementById('sw_tab2')
+sw.onOn(sw_jump_tab, 2)
+sw.onOff(sw_jump_keep_on, 2)
+
+// jump tab3
+sw.getElementById('sw_tab3')
+sw.onOn(sw_jump_tab, 3)
+sw.onOff(sw_jump_keep_on, 3)
+
+// jump tab4
+sw.getElementById('sw_tab4')
+sw.onOn(sw_jump_tab, 4)
+sw.onOff(sw_jump_keep_on, 4)
+
+// jump tab5
+sw.getElementById('sw_tab5')
+sw.onOn(sw_jump_tab, 5)
+sw.onOff(sw_jump_keep_on, 5)
+
+// console.log('[JS] end jump')
+
+
+///////////////////////////////////
+console.log('wifi speed')
+
+textbox.getElementById('txt_click')
+textbox.write('Click')
+textbox.getElementById('txt_speed')
+textbox.write(' ')
+textbox.getElementById('txt_unit')
+textbox.write(' ')
+var textAnimateConfig = {
+    duration: 2000,
+    iterations:-1,
+    from: 1,
+    to: 0
+}
+var speed = 888;
+function textAnimateCallback(params) {
+    textbox.getElementById('txt_speed')
+    speed=speed + 1
+//    textbox.write(wifi.readSpeed())
+	textbox.write(speed.toString())
+}
+
+function startSpeed(params) {
+    textbox.getElementById('txt_click')
+    textbox.write(' ')
+    textbox.getElementById('txt_unit')
+    textbox.write('bit/s')
+
+    textbox.getElementById('txt_speed')
+    textbox.setAnimate(textAnimateCallback, textAnimateConfig)
+    textbox.palyAnimate()
+    wifi.startSpeed()
+}
+function stopSpeed(params) {
+    textbox.getElementById('txt_speed')
+    textbox.setAnimate(textAnimateCallback, textAnimateConfig)
+    textbox.pauseAnimate()
+	wifi.stopSpeed()
+	speed = 0
+
+    textbox.getElementById('txt_click')
+    textbox.write('Click')
+    textbox.getElementById('txt_speed')
+    textbox.write(' ')
+    textbox.getElementById('txt_unit')
+    textbox.write(' ')
+}
+sw.getElementById('sw_wifi')
+sw.onOn(startSpeed)
+sw.onOff(stopSpeed)
+console.log('end wifi speed')

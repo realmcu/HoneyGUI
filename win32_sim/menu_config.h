@@ -108,7 +108,7 @@
 
 #endif
 // <c> RTK GUI Enable SasA
-#define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
+//#define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
 // </c>
 // </e>
 

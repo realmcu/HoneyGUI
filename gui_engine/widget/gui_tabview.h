@@ -113,7 +113,12 @@ typedef struct gui_tabview
   * @brief
   * @{
   */
+typedef enum
+{
+    TABVIEW_EVENT_TAB_CHANGE = GUI_EVENT_3,
 
+
+} gui_tabview_event_t;
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -172,6 +177,14 @@ void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not);
  */
 void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp);
 
+/**
+ * @brief Register callback for tab change.
+ *
+ * @param tabview tabview pointer.
+ * @param callback callback func.
+ * @param parameter callback parameter.
+ */
+void gui_tabview_tabChange(gui_tabview_t *tabview, void *callback, void *parameter);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

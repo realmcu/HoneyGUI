@@ -21,19 +21,13 @@
           x="0"
           y="0"
           w="480"
-          h="480"
-          rotationAngle="0"
-          scaleX="1"
-          scaleY="1">home_bg img
-</img><img
-          x="0"
-          y="0"
-          w="480"
-          h="480"
+          h="411"
+          opacity="255"
           file="app/box/resource/home/home_1.bin"
+          blendMode="imgBypassMode"
           rotationAngle="0"
           scaleX="1"
-          scaleY="1">image0
+          scaleY="1">img_home_bg
 </img></tab><tab
         idx="1"
         idy="0"
@@ -44,6 +38,8 @@
           y="48"
           picture="app/box/resource/lamp/Living_off.bin"
           highlightPicture="app/box/resource/lamp/Living_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">kitchen_switch
 </switch><switch
@@ -51,6 +47,8 @@
           y="48"
           picture="app/box/resource/lamp/Dining_off.bin"
           highlightPicture="app/box/resource/lamp/Dining_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">parlor_switch
 </switch><switch
@@ -58,6 +56,8 @@
           y="175"
           picture="app/box/resource/lamp/Study_off.bin"
           highlightPicture="app/box/resource/lamp/Study_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">bedroom_switch
 </switch><switch
@@ -65,6 +65,8 @@
           y="175"
           picture="app/box/resource/lamp/Wash_off.bin"
           highlightPicture="app/box/resource/lamp/Wash_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">bedroom_switch1
 </switch><switch
@@ -72,6 +74,8 @@
           y="302"
           picture="app/box/resource/lamp/Kitchen_off.bin"
           highlightPicture="app/box/resource/lamp/Kitchen_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">bedroom_switch2
 </switch><switch
@@ -79,18 +83,11 @@
           y="302"
           picture="app/box/resource/lamp/Bathroom_off.bin"
           highlightPicture="app/box/resource/lamp/Bathroom_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">porch_switch
-</switch><img
-          x="110"
-          y="432"
-          w="260"
-          h="12"
-          file="app/box/resource/lamp/2bg.bin"
-          rotationAngle="0"
-          scaleX="1"
-          scaleY="1">diot
-</img></tab><tab
+</switch></tab><tab
         idx="2"
         idy="0"
         x="0"
@@ -100,6 +97,8 @@
           y="48"
           picture="app/box/resource/lamp2/Bedroom_off.bin"
           highlightPicture="app/box/resource/lamp2/Bedroom_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">bedroom_off
 </switch><switch
@@ -107,19 +106,23 @@
           y="48"
           picture="app/box/resource/lamp2/Children_off.bin"
           highlightPicture="app/box/resource/lamp2/Children_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="184"
           h="97">children
 </switch><icon
           picture="app/box/resource/lamp2/AllTurnon_off.bin"
           highlightPicture="app/box/resource/lamp2/AllTurnon_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           pictureX="0"
           pictureY="0"
           rotationAngle="0"
-          text=""
           textX="0"
           textY="0"
           fontColor="#ffffff"
           mode="normal"
+          text=""
           w="184"
           h="97"
           x="42"
@@ -127,32 +130,27 @@
 </icon><icon
           picture="app/box/resource/lamp2/sleep_off-1.bin"
           highlightPicture="app/box/resource/lamp2/sleep_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           pictureX="0"
           pictureY="0"
           rotationAngle="0"
-          text=""
           textX="0"
           textY="0"
           fontColor="#ffffff"
           mode="normal"
+          text=""
           w="184"
           h="97"
           x="254"
           y="175">sleep
-</icon><img
-          x="110"
-          y="432"
-          w="260"
-          h="12"
-          file="app/box/resource/lamp/3bg.bin"
-          rotationAngle="0"
-          scaleX="1"
-          scaleY="1">image1
-</img><switch
+</icon><switch
           x="42"
           y="302"
           picture="app/box/resource/lamp2/socket1_off.bin"
           highlightPicture="app/box/resource/lamp2/socket1_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="124"
           h="97">socket1
 </switch><switch
@@ -160,6 +158,8 @@
           y="302"
           picture="app/box/resource/lamp2/socket3_off.bin"
           highlightPicture="app/box/resource/lamp2/socket3_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="124"
           h="97">socket3
 </switch><switch
@@ -167,6 +167,8 @@
           y="302"
           picture="app/box/resource/lamp2/socket2_off.bin"
           highlightPicture="app/box/resource/lamp2/socket2_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="124"
           h="97">switch0
 </switch></tab><tab
@@ -175,61 +177,71 @@
         x="0"
         y="0">ac_tab
 <win
-          x="0"
-          y="0"
           w="480"
-          h="480">cool_win
+          h="480"
+          x="0"
+          y="0">cool_win
 <img
             x="78"
             y="68"
             w="355"
             h="297"
+            opacity="255"
             file="app/box/resource/new_folder/aa3.bin"
+            blendMode="imgFilterBlack"
             rotationAngle="0"
             scaleX="1"
             scaleY="1">image2
 </img><seekbar
-            x="83"
-            y="30"
-            w="312"
-            h="164"
-            folder="app/box/resource/cooling"
             orientation="arc"
             centralX="156"
             centralY="164"
+            folder="app/box/resource/cooling"
             startDegree="270"
-            endDegree="90">cool_bar
+            endDegree="90"
+            blendMode="imgFilterBlack"
+            opacity="255"
+            w="312"
+            h="164"
+            x="83"
+            y="30">cool_bar
 </seekbar></win><win
-          x="0"
-          y="0"
+          hidden="hidden"
           w="480"
           h="480"
-          hidden="hidden">heat_win
+          x="0"
+          y="0">heat_win
 <img
-            x="82"
+            x="80"
             y="70"
             w="303"
             h="239"
-            file="app/box/resource/new_folder/aa1.bin"
+            opacity="255"
+            file="app/box/resource/new_folder/aa2.bin"
+            blendMode="imgFilterBlack"
             rotationAngle="0"
             scaleX="1"
             scaleY="1">image3
 </img><seekbar
-            x="83"
-            y="30"
-            w="312"
-            h="164"
-            folder="app/box/resource/heating"
             orientation="arc"
             centralX="156"
             centralY="164"
+            folder="app/box/resource/heating"
             startDegree="270"
-            endDegree="90">heat_bar
+            endDegree="90"
+            blendMode="imgFilterBlack"
+            opacity="255"
+            w="312"
+            h="164"
+            x="83"
+            y="30">heat_bar
 </seekbar></win><switch
           x="118"
           y="341"
           picture="app/box/resource/air_condition/cooling_on.bin"
           highlightPicture="app/box/resource/air_condition/cooling_off.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="30"
           h="34">cool_switch
 </switch><switch
@@ -237,6 +249,8 @@
           y="341"
           picture="app/box/resource/air_condition/heating_off.bin"
           highlightPicture="app/box/resource/air_condition/heating_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="33"
           h="34">heat_switch
 </switch><switch
@@ -244,38 +258,35 @@
           y="341"
           picture="app/box/resource/air_condition/switch_off.bin"
           highlightPicture="app/box/resource/air_condition/switch_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="30"
           h="34">ac_on_off_switch
-</switch><img
-          x="106"
-          y="426"
-          w="350"
-          h="100"
-          file="app/box/resource/new_folder/aa1.bin"
-          rotationAngle="0"
-          scaleX="1"
-          scaleY="1">image4
-</img></tab><tab
+</switch></tab><tab
         idx="4"
         idy="0"
         x="0"
         y="0">curain_tab
 <seekbar
-          x="85"
-          y="74"
-          w="314"
-          h="229"
-          folder="app/box/resource/curtain_list"
           orientation="vertical"
           centralX="0"
           centralY="0"
+          folder="app/box/resource/curtain_list"
           startDegree="0"
-          endDegree="0">curtain_bar
+          endDegree="0"
+          blendMode="imgBypassMode"
+          opacity="255"
+          w="314"
+          h="229"
+          x="85"
+          y="74">curtain_bar
 </seekbar><switch
           x="117"
           y="354"
           picture="app/box/resource/cutain/open.bin"
           highlightPicture="app/box/resource/cutain/close.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="27"
           h="25">open_switch
 </switch><switch
@@ -283,6 +294,8 @@
           y="354"
           picture="app/box/resource/cutain/close.bin"
           highlightPicture="app/box/resource/cutain/open.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="27"
           h="25">close_switch
 </switch><switch
@@ -290,30 +303,123 @@
           y="351"
           picture="app/box/resource/cutain/switch_off.bin"
           highlightPicture="app/box/resource/cutain/switch_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           w="30"
           h="32">curtain_on_off_switch
-</switch><img
-          x="110"
-          y="432"
-          w="260"
-          h="12"
-          file="app/box/resource/lamp/5bg.bin"
-          rotationAngle="0"
-          scaleX="1"
-          scaleY="1">diot2
-</img><icon
+</switch><icon
           picture="app/box/resource/other/default.bin"
           highlightPicture="app/box/resource/other/high.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
           pictureX="0"
           pictureY="0"
           rotationAngle="0"
-          text=""
           textX="0"
           textY="0"
           fontColor="#ffffff"
           mode="normal"
+          text=""
           w="35"
           h="30"
           x="21"
           y="20">resetBtn
-</icon></tab></tabview></screen></app>
+</icon></tab><tab
+        idx="5"
+        idy="0"
+        x="0"
+        y="0">wifi_tab
+<switch
+          x="0"
+          y="0"
+          picture="app/box/resource/wifi/speed_off.bin"
+          highlightPicture="app/box/resource/wifi/speed_on.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="480"
+          h="415">sw_wifi
+</switch><textbox
+          color="#ffffffff"
+          mode="truncate"
+          text=" Click"
+          fontSize="40"
+          font="app/box/resource/font/times_size40_bits8_font.bin"
+          w="108"
+          h="49"
+          x="185"
+          y="72">txt_click
+</textbox><textbox
+          color="#ffffffff"
+          mode="truncate"
+          text="bit/s"
+          fontSize="40"
+          font="app/box/resource/font/times_size40_bits8_font.bin"
+          w="108"
+          h="49"
+          x="279"
+          y="71">txt_unit
+</textbox><textbox
+          color="#ffffffff"
+          mode="truncate"
+          text="12345"
+          fontSize="40"
+          font="app/box/resource/font/times_size40_bits8_font.bin"
+          w="108"
+          h="49"
+          x="147"
+          y="72">txt_speed
+</textbox></tab></tabview><switch
+      x="82"
+      y="432"
+      picture="app/box/resource/6_point/0_grey.bin"
+      highlightPicture="app/box/resource/6_point/1_white.bin"
+      blendMode="imgBypassMode"
+      opacity="255"
+      w="60"
+      h="46">sw_tab0
+</switch><switch
+      x="144"
+      y="432"
+      picture="app/box/resource/6_point/0_grey.bin"
+      highlightPicture="app/box/resource/6_point/1_white.bin"
+      blendMode="imgBypassMode"
+      opacity="255"
+      w="60"
+      h="46">sw_tab1
+</switch><switch
+      x="206"
+      y="432"
+      picture="app/box/resource/6_point/0_grey.bin"
+      highlightPicture="app/box/resource/6_point/1_white.bin"
+      blendMode="imgBypassMode"
+      opacity="255"
+      w="60"
+      h="46">sw_tab2
+</switch><switch
+      x="268"
+      y="432"
+      picture="app/box/resource/6_point/0_grey.bin"
+      highlightPicture="app/box/resource/6_point/1_white.bin"
+      blendMode="imgBypassMode"
+      opacity="255"
+      w="60"
+      h="46">sw_tab3
+</switch><switch
+      x="330"
+      y="432"
+      picture="app/box/resource/6_point/0_grey.bin"
+      highlightPicture="app/box/resource/6_point/1_white.bin"
+      blendMode="imgBypassMode"
+      opacity="255"
+      w="60"
+      h="46">sw_tab4
+</switch><switch
+      x="392"
+      y="432"
+      picture="app/box/resource/6_point/0_grey.bin"
+      highlightPicture="app/box/resource/6_point/1_white.bin"
+      blendMode="imgBypassMode"
+      opacity="255"
+      w="60"
+      h="46">sw_tab5
+</switch></screen></app>

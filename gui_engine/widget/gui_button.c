@@ -261,10 +261,6 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
     }
 }
-static void event_cb()
-{
-
-}
 static void gui_button_ctor(
     gui_button_t *this,
     gui_obj_t *parent,
@@ -289,8 +285,6 @@ static void gui_button_ctor(
     // for self
     this->off_pic_addr = background_pic;
     this->on_pic_addr = highlight_pic;
-    gui_obj_add_event_cb(this, (gui_event_cb_t)event_cb, GUI_EVENT_TOUCH_LONG, 0);
-    gui_obj_add_event_cb(this, (gui_event_cb_t)event_cb, GUI_EVENT_TOUCH_PRESSED, 0);
 }
 
 

@@ -59,9 +59,9 @@ static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_
     {
         index_first = MAX_FILE_LIST_NUM - MAX_SHOW_FILE_LIST_NUM ;
     }
-    gui_scrolltext_text_set(list_scroll_text, files_name_test[index_last],
-                            "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[index_last]),
-                            FONT_H_32);
+    gui_scroll_text_set(list_scroll_text, files_name_test[index_last],
+                        "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[index_last]),
+                        FONT_H_32);
 }
 
 static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t *list_last)
@@ -89,9 +89,9 @@ static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t 
     {
         index_last = MAX_SHOW_FILE_LIST_NUM - 1;
     }
-    gui_scrolltext_text_set(list_scroll_text, files_name_test[index_first],
-                            "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[index_first]),
-                            FONT_H_32);
+    gui_scroll_text_set(list_scroll_text, files_name_test[index_first],
+                        "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[index_first]),
+                        FONT_H_32);
 }
 
 static void win_increase_touch_cb(void *obj, gui_event_t e)
@@ -154,11 +154,11 @@ void design_pagelist_test(void *parent)
                                                     ICON_TEXT_BASE_DARK_BIN, ICON_TEXT_BASE_DARK_BIN);
         switch_pagelist_test[i]->off_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
         switch_pagelist_test[i]->on_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
-        scroll_text_pagelist_test[i] = gui_scrolltext_create(switch_pagelist_test[i],
-                                                             "scroll_text_record_files", 0, 0, 128, FONT_H_32);
-        gui_scrolltext_text_set(scroll_text_pagelist_test[i], files_name_test[i],
-                                "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]), FONT_H_32);
-        gui_scrolltext_scroll_set(scroll_text_pagelist_test[i], SCROLL_X, 0, 0, 5000, 0);
+        scroll_text_pagelist_test[i] = gui_scroll_text_create(switch_pagelist_test[i],
+                                                              "scroll_text_record_files", 0, 0, 128, FONT_H_32);
+        gui_scroll_text_set(scroll_text_pagelist_test[i], files_name_test[i],
+                            "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]), FONT_H_32);
+        gui_scroll_text_scroll_set(scroll_text_pagelist_test[i], SCROLL_X, 0, 0, 5000, 0);
         gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_1,
                              NULL);
         gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_2,
