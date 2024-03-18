@@ -26,14 +26,9 @@ extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_re
 #define PPEV2_TESS_LENGTH       100
 #endif
 
-#if (F_APP_GUI_USE_DSP_SHARE_RAM == 0)
-#define TEMP_BUF_SIZE           (50 * 1024)
-static uint8_t temp_buf[TEMP_BUF_SIZE];
-#else
 #include "section.h"
 #define TEMP_BUF_SIZE           (40 * 1024)
 SHM_DATA_SECTION static uint8_t temp_buf[TEMP_BUF_SIZE];
-#endif
 
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static uint32_t temp_buf_offset = 0;
