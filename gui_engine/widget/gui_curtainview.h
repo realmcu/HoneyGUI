@@ -91,11 +91,19 @@ typedef struct gui_curtainview
     bool release_flag;
     int spring_value;
     void (*done_cb)(struct gui_curtainview *this);
-    void (*ctor)(struct gui_curtainview *this, gui_obj_t *parent, const char *filename, int16_t x,
-                 int16_t y, int16_t w, int16_t h);
-    bool mute;
-    int16_t release_y;
+
+    uint16_t has_center_curtain          : 1;
+    uint16_t has_left_curtain            : 1;
+    uint16_t has_right_curtain           : 1;
+    uint16_t has_up_curtain              : 1;
+    uint16_t has_down_curtain            : 1;
+    uint16_t cur_curtain_flag            : 1;
+
+
+
     uint8_t checksum;
+    int release_y;
+    int release_x;
 } gui_curtainview_t;
 /** End of WIDGET_Exported_Types
   * @}

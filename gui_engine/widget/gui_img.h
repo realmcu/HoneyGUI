@@ -76,7 +76,6 @@ typedef struct gui_img
     uint8_t opacity;
     bool press_flag;                    //!< press to change picture to the highlighted
     bool release_flag;
-    bool matrix_flag;
 } gui_img_t;
 
 

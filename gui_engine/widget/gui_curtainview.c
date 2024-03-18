@@ -83,20 +83,76 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static gui_curtain_t *get_child(gui_obj_t *object, gui_curtain_enum_t orientation)
+
+static void input_prepare(gui_obj_t *obj)
 {
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    gui_list_for_each_safe(node, tmp, &object->child_list)
+    touch_info_t *tp = tp_get_info();
+    gui_curtainview_t *this = (gui_curtainview_t *)obj;
+    GUI_UNUSED(tp);
+
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
     {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->type == CURTAIN && GUI_TYPE(gui_curtain_t, obj)->orientation == orientation)
+        return;
+    }
+    switch (this->cur_curtain)
+    {
+    case CURTAIN_MIDDLE:
         {
-            return (void *)obj;
+            if (this->has_up_curtain == true)
+            {
+                gui_obj_skip_all_down_hold(obj);
+                obj->skip_tp_down_hold = false;
+            }
+            if (this->has_down_curtain == true)
+            {
+                if (this->cur_curtain_flag)
+                {
+                    gui_obj_skip_all_down_hold(obj);
+                }
+                gui_obj_skip_all_up_hold(obj);
+                obj->skip_tp_up_hold = false;
+            }
+            if (this->has_left_curtain == true)
+            {
+                if (this->cur_curtain_flag)
+                {
+                    gui_obj_skip_all_left_hold(obj);
+                }
+                gui_obj_skip_all_right_hold(obj);
+                obj->skip_tp_right_hold = false;
+            }
+            if (this->has_right_curtain == true)
+            {
+                gui_obj_skip_all_left_hold(obj);
+                obj->skip_tp_left_hold = false;
+            }
+            break;
+        }
+    case CURTAIN_UP:
+        {
+            break;
+        }
+    case CURTAIN_DOWN:
+        {
+            gui_obj_skip_all_down_hold(obj);
+            gui_obj_skip_all_up_hold(obj);
+            break;
+        }
+    case CURTAIN_LEFT:
+        {
+            gui_obj_skip_all_left_hold(obj);
+            gui_obj_skip_all_right_hold(obj);
+            break;
+        }
+    case CURTAIN_RIGHT:
+        {
+            break;
         }
 
+    default:
+        break;
     }
-    return NULL;
+
 }
 
 static void curtainview_prepare(gui_obj_t *obj)
@@ -117,16 +173,6 @@ static void curtainview_prepare(gui_obj_t *obj)
     gui_curtain_t *c_down = NULL;
     gui_curtain_t *c_left = NULL;
     gui_curtain_t *c_right = NULL;
-    if (tp->released)
-    {
-        this->release_flag = true;
-    }
-    if (tp->pressed)
-    {
-        this->release_flag = false;
-    }
-
-
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -178,312 +224,144 @@ static void curtainview_prepare(gui_obj_t *obj)
         }
         this->init_flag = true;
     }
-    if (!((obj->parent->dx == 0) && (obj->parent->dy == 0)))
+
+
+    switch (tp->type)
     {
-        this->cur_curtain = CURTAIN_MIDDLE;
-        obj->cover = false;
-        return;
-    }
-    if (obj->parent->parent && obj->parent->parent->type == TABVIEW)
-    {
-        if (!(((gui_tabview_t *)(obj->parent->parent))->cur_id.x == ((gui_tab_t *)(obj->parent))->id.x &&
-              ((gui_tabview_t *)(obj->parent->parent))->cur_id.y == ((gui_tab_t *)(obj->parent))->id.y))
+    case TOUCH_HOLD_X:
         {
-            this->cur_curtain = CURTAIN_MIDDLE;
-            obj->cover = false;
-            return;
-        }
 
-    }
-    if (this->mute == true)
-    {
-        return;
-    }
-    bool cover1 = false;
-    gui_tree_get_cover(obj, PAGE, &cover1);
-    if (cover1)
-    {
-        return;
-    }
-
-
-    switch (this->cur_curtain)
-    {
-    case CURTAIN_MIDDLE:
-        {
-            obj->cover = false;
-            if ((tp->type == TOUCH_HOLD_Y) || (tp->type == TOUCH_ORIGIN_FROM_Y) ||
-                (tp->type == TOUCH_DOWN_SLIDE) || (tp->type == TOUCH_UP_SLIDE) || this->down_flag)
+            if (this->cur_curtain == CURTAIN_LEFT && tp->deltaX < 0)
             {
-                if (!this->down_flag)
+                this->release_x = tp->deltaX;
+                if (_UI_ABS(tp->deltaX) > (int)((float)gui_get_screen_width() / 2.0f * 1))
                 {
-                    obj->y = tp->deltaY;
-                }
-                if (c_up)
-                {
-                    GET_BASE(c_up)->not_show = false;
-                }
-                if (c_down)
-                {
-                    GET_BASE(c_down)->not_show = false;
-                }
-                if (obj->y > 0 && this->orientations.up == false)
-                {
-                    obj->y = 0;
-                    if (c_up)
-                    {
-                        GET_BASE(c_up)->not_show = true;
-                    }
-                    if (c_down)
-                    {
-                        GET_BASE(c_down)->not_show = true;
-                    }
-                }
-                if (obj->y < 0 && this->orientations.down == false)
-                {
-                    obj->y = 0;
-                    if (c_up)
-                    {
-                        GET_BASE(c_up)->not_show = true;
-                    }
-                    if (c_down)
-                    {
-                        GET_BASE(c_down)->not_show = true;
-                    }
-                }
-                if (obj->y < 0 && this->release_flag)
-                {
-                    this->down_flag = true;
-                    this->spring_value -= GUI_FRAME_STEP;
-                    obj->y += this->spring_value;
-                    gui_curtain_t *child =  get_child(obj, CURTAIN_DOWN);
-                    float scope = 1;
-                    if (child)
-                    {
-                        scope = child->scope;
-                    }
-
-                    if (obj->y <= -(int)gui_get_screen_height()*scope)
-                    {
-                        this->down_flag = false;
-                        this->cur_curtain = CURTAIN_DOWN;
-                        if (this->done_cb != NULL)
-                        {
-                            this->done_cb(this);
-                        }
-                        obj->y = 0;
-                        this->spring_value = 0;
-                        this->release_flag = false;
-                    }
-
-                }
-                else if (obj->y > 0 && this->release_flag)
-                {
-                    this->down_flag = true;
-                    this->spring_value += GUI_FRAME_STEP;
-                    obj->y += this->spring_value;
-                    gui_curtain_t *child =  get_child(obj, CURTAIN_UP);
-                    float scope = 1;
-                    if (child)
-                    {
-                        scope = child->scope;
-                    }
-                    if (obj->y >= (int)gui_get_screen_height()*scope)
-                    {
-                        this->down_flag = false;
-                        this->cur_curtain = CURTAIN_UP;
-                        obj->y = 0;
-                        this->spring_value = 0;
-                        this->release_flag = false;
-                    }
+                    this->release_x = 0;
+                    this->cur_curtain = CURTAIN_MIDDLE;
+                    this->cur_curtain_flag = 1;
                 }
             }
-            else if ((tp->type == TOUCH_HOLD_X) || this->left_flag)
+
+            else if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
             {
-                if (tp->deltaX >= 2 || tp->deltaX <= -2)
+                break;
+            }
+            if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
+            {
+                break;
+            }
+            this->release_x = tp->deltaX;
+            if (this->release_x != 0 && this->cur_curtain == CURTAIN_MIDDLE)
+            {
+                if (this->release_x > 0)
                 {
                     if (c_left)
                     {
                         GET_BASE(c_left)->not_show = false;
                     }
-                    if (c_right)
-                    {
-                        GET_BASE(c_right)->not_show = false;
-                    }
-                }
-
-
-                if (!this->left_flag)
-                {
-                    obj->x = tp->deltaX;
-                }
-                if (obj->x < 0 && this->orientations.right == false)
-                {
-                    obj->x = 0;
-                    if (c_left)
-                    {
-                        GET_BASE(c_left)->not_show = true;
-                    }
-                    if (c_right)
-                    {
-                        GET_BASE(c_right)->not_show = true;
-                    }
-                }
-                if (obj->x > 0 && this->orientations.left == false)
-                {
-                    obj->x = 0;
-                    if (c_left)
-                    {
-                        GET_BASE(c_left)->not_show = true;
-                    }
-                    if (c_right)
-                    {
-                        GET_BASE(c_right)->not_show = true;
-                    }
-                }
-                if (obj->x < -(int)gui_get_screen_width() * this->scoperight * 0.5f)
-                {
-                    this->cur_curtain = CURTAIN_RIGHT;
-                    obj->x = 0;
-                }
-                else if (obj->x > (int)gui_get_screen_width() * this->scopeleft * 0.5f)
-                {
-                    this->left_flag = true;
-                    this->spring_value += GUI_FRAME_STEP;
-                    obj->x += this->spring_value;
-                    if (obj->x >= (int)gui_get_screen_width()* this->scopeleft)
-                    {
-                        this->left_flag = false;
-                        this->cur_curtain = CURTAIN_LEFT;
-                        obj->x = 0;
-                        this->spring_value = 0;
-                    }
                 }
             }
-            else
+
+            if (this->cur_curtain == CURTAIN_MIDDLE && tp->deltaX > 0 &&
+                tp->deltaX > (int)((float)gui_get_screen_width() / 2.0f * 1))
             {
-                obj->x = 0;
-                obj->y = 0;
+                this->release_x = 0;
+                this->cur_curtain = CURTAIN_LEFT;
             }
+            if (this->cur_curtain == CURTAIN_LEFT && tp->deltaX < 0)
+            {
+                this->release_x = tp->deltaX;
+            }
+
             break;
         }
-    case CURTAIN_UP:
+    case TOUCH_HOLD_Y:
         {
-            obj->cover = true;
-            if (c_up)
+            this->release_x = 0;
+            if (this->cur_curtain == CURTAIN_DOWN && tp->deltaY > 0)
             {
-                GET_BASE(c_up)->not_show = false;
-            }
-            if ((tp->type == TOUCH_HOLD_Y))
-            {
-                if (tp->deltaY < 0)
+                this->release_y = tp->deltaY;
+                if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * 1))
                 {
-                    obj->y = tp->deltaY;
+                    this->release_y = 0;
+                    this->cur_curtain = CURTAIN_MIDDLE;
+                    this->cur_curtain_flag = 1;
                 }
             }
-            else if (tp->type == TOUCH_UP_SLIDE)
+            if (this->cur_curtain == CURTAIN_MIDDLE && tp->deltaY < 0)
             {
-                this->cur_curtain = CURTAIN_MIDDLE;
-                obj->y = 0;
-            }
-            else
-            {
-                obj->y = 0;
-            }
-            break;
-        }
-    case CURTAIN_DOWN:
-        {
-            obj->cover = true;
-            if (c_down)
-            {
-                GET_BASE(c_down)->not_show = false;
+                this->release_y = tp->deltaY;
+                if (c_down)
+                {
+                    GET_BASE(c_down)->not_show = false;
+                }
             }
 
-            if ((tp->type == TOUCH_HOLD_Y))
+            if (this->cur_curtain == CURTAIN_MIDDLE && tp->deltaY < 0 &&
+                _UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_width() / 2.0f * 1))
             {
-                if (tp->deltaY > 0)
-                {
-                    obj->y = tp->deltaY;
-                }
+                this->release_y = 0;
+                this->cur_curtain = CURTAIN_DOWN;
             }
-            else if (tp->type == TOUCH_DOWN_SLIDE)
+            if (this->cur_curtain == CURTAIN_DOWN && tp->deltaY > 0)
             {
-                this->cur_curtain = CURTAIN_MIDDLE;
-                if (this->done_cb != NULL)
-                {
-                    this->done_cb(this);
-                }
-                obj->y = 0;
+                this->release_y = tp->deltaY;
             }
-            else
-            {
-                obj->y = 0;
-            }
-
             break;
         }
-    case CURTAIN_LEFT:
+    case TOUCH_LEFT_SLIDE:
         {
-            obj->cover = true;
-            if (c_left)
-            {
-                GET_BASE(c_left)->not_show = false;
-            }
-            if ((tp->type == TOUCH_HOLD_X))
-            {
-                if (tp->deltaX < 0)
-                {
-                    obj->x = tp->deltaX;
-                }
-            }
-            else if (tp->type == TOUCH_LEFT_SLIDE)
-            {
-                this->cur_curtain = CURTAIN_MIDDLE;
-                obj->x = 0;
-            }
-            else
-            {
-                obj->x = 0;
-            }
             break;
         }
-    case CURTAIN_RIGHT:
+    case TOUCH_RIGHT_SLIDE:
         {
-            obj->cover = true;
-            if (c_right)
-            {
-                GET_BASE(c_right)->not_show = false;
-            }
-            if ((tp->type == TOUCH_HOLD_X))
-            {
-                if (tp->deltaX > 0)
-                {
-                    obj->x = tp->deltaX;
-                }
-            }
-            else if (tp->type == TOUCH_RIGHT_SLIDE)
-            {
-                this->cur_curtain = CURTAIN_MIDDLE;
-                obj->x = 0;
-            }
-            else
-            {
-                obj->x = 0;
-            }
             break;
         }
-
+    case TOUCH_DOWN_SLIDE:
+        {
+            break;
+        }
+    case TOUCH_UP_SLIDE:
+        {
+            break;
+        }
+    case TOUCH_ORIGIN_FROM_X:
+        {
+            break;
+        }
+    case TOUCH_ORIGIN_FROM_Y:
+        {
+            break;
+        }
     default:
+        this->cur_curtain_flag = 0;
         break;
     }
-    if (this->cur_curtain == CURTAIN_MIDDLE)
+
+    if (this->release_x >= GUI_FRAME_STEP)
     {
-        obj->cover = false;
+        this->release_x -= GUI_FRAME_STEP;
+    }
+    else if (this->release_x <= -GUI_FRAME_STEP)
+    {
+        this->release_x += GUI_FRAME_STEP;
     }
     else
     {
-        obj->cover = true;
+        this->release_x = 0;
+    }
+
+    if (this->release_y >= GUI_FRAME_STEP)
+    {
+        this->release_y -= GUI_FRAME_STEP;
+    }
+    else if (this->release_y <= -GUI_FRAME_STEP)
+    {
+        this->release_y += GUI_FRAME_STEP;
+    }
+    else
+    {
+        this->release_y = 0;
     }
     uint8_t last = this->checksum;
     this->checksum = 0;
@@ -502,8 +380,8 @@ static void gui_curtainview_ctor(gui_curtainview_t *this, gui_obj_t *parent, con
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     ((gui_obj_t *)this)->obj_prepare = curtainview_prepare;
     ((gui_obj_t *)this)->type = CURTAINVIEW;
+    ((gui_obj_t *)this)->obj_input_prepare = input_prepare;
     this->cur_curtain = CURTAIN_MIDDLE;
-    this->mute = false;
 }
 
 /*============================================================================*

@@ -73,9 +73,6 @@ static uint32_t cur_time_ms;
 static uint8_t scroll_text_count = 0;
 static uint8_t scroll_skip_frame = 10;
 static uint8_t scroll_skip_frame_count = 0;
-
-extern void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
-                          int16_t y, int16_t w, int16_t h);
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -86,81 +83,77 @@ extern void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name,
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_scroll_text_font_load(gui_text_t *text, gui_rect_t *rect)
+static void gui_font_load(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
     case GUI_FONT_SOURCE_BMP:
-        {
-            gui_font_mem_load(text, rect);
-        }
+        gui_font_mem_load(text, rect);
         break;
-
     case GUI_FONT_SOURCE_TTF:
-        {
-            gui_font_stb_load(text, rect);
-        }
+        gui_font_stb_load(text, rect);
         break;
-
+    default:
+        break;
+    }
+}
+static void gui_font_draw(gui_text_t *text, gui_rect_t *rect)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_draw(text, rect);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_draw(text, rect);
+        break;
+    default:
+        break;
+    }
+}
+static void gui_font_unload(gui_text_t *text)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        gui_font_mem_unload(text);
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        gui_font_stb_unload(text);
+        break;
     default:
         break;
     }
 }
 
-static void gui_scroll_text_font_draw(gui_text_t *text, gui_rect_t *rect)
+static void scrolltext_prepare(gui_obj_t *obj)
 {
-    switch (text->font_type)
+
+    if (scroll_skip_frame == 0)
     {
-    case GUI_FONT_SOURCE_BMP:
-        {
-            if (text->base.sx != 1.0f || text->base.sy != 1.0f)
-            {
-                return;
-            }
-            gui_font_mem_draw(text, rect);
-        }
-        break;
-
-    case GUI_FONT_SOURCE_TTF:
-        {
-            gui_font_stb_draw(text, rect);
-        }
-        break;
-
-    default:
-        break;
+        gui_fb_change();
     }
-}
-
-static void gui_scroll_text_font_unload(gui_text_t *text)
-{
-    switch (text->font_type)
+    else
     {
-    case GUI_FONT_SOURCE_BMP:
+        if (scroll_skip_frame_count < (scroll_skip_frame) * scroll_text_count - 1)
         {
-            gui_font_mem_unload(text);
+            gui_fb_change();
+            scroll_skip_frame_count++;
         }
-        break;
-
-    case GUI_FONT_SOURCE_TTF:
+        else if (scroll_skip_frame_count < (scroll_skip_frame + 1) * scroll_text_count - 1)
         {
-            gui_font_stb_unload(text);
+            scroll_skip_frame_count++;
         }
-        break;
-
-    default:
-        break;
+        else
+        {
+            scroll_skip_frame_count = 0;
+        }
     }
-}
-
-static void gui_scroll_text_update_att(struct _gui_obj_t *this)
-{
-    gui_scroll_text_t *object = (gui_scroll_text_t *)this;
-    size_t frame_count;
+    gui_scroll_text_t *object = (gui_scroll_text_t *)obj;
 
     if (object->base.animate && object->base.animate->animate)
     {
-        frame_count = object->base.animate->dur * 30 / (1000);
+        size_t frame_count = object->base.animate->dur * 30 / (1000);
         object->base.animate->callback(object->base.animate->p);
         object->base.animate->current_frame++;
 
@@ -192,115 +185,83 @@ static void gui_scroll_text_update_att(struct _gui_obj_t *this)
     }
 }
 
-static void gui_scroll_text_prepare(gui_obj_t *obj)
-{
-    if (scroll_skip_frame == 0)
-    {
-        gui_fb_change();
-    }
-    else
-    {
-        if (scroll_skip_frame_count < (scroll_skip_frame) * scroll_text_count - 1)
-        {
-            gui_fb_change();
-            scroll_skip_frame_count++;
-        }
-        else if (scroll_skip_frame_count < (scroll_skip_frame + 1) * scroll_text_count - 1)
-        {
-            scroll_skip_frame_count++;
-        }
-        else
-        {
-            scroll_skip_frame_count = 0;
-        }
-    }
-    gui_scroll_text_update_att(obj);
-}
-
-static void gui_scroll_text_draw(gui_obj_t *obj)
+static void scrolltext_draw(gui_obj_t *obj)
 {
     gui_scroll_text_t *text = (gui_scroll_text_t *)obj;
-    struct gui_dispdev *dc;
-    uint32_t offset;
-    uint32_t index;
-    gui_rect_t draw_rect = {0};
-    uint32_t total_section_count;
-
     if (text->base.len == 0)
     {
         return;
     }
-
-    dc = gui_get_dc();
+    struct gui_dispdev *dc = gui_get_dc();
     if (dc->section_count == 0)
     {
         cur_time_ms = gui_ms_get();
     }
-    offset = text->base.text_offset;
-    index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+    uint32_t offset = text->base.text_offset;
+    uint32_t index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
     text->cnt_value = (text->end_value + text->start_value + offset) * index
                       / text->interval_time_ms;
-
+    gui_rect_t draw_rect = {0};
     if (text->base.mode == SCROLL_X && offset > obj->w)
     {
 
-        draw_rect.x1 = obj->ax + obj->dx + obj->tx - text->cnt_value + text->start_value;
+        draw_rect.x1 = 0 - text->cnt_value + text->start_value;
         draw_rect.x2 = draw_rect.x1 + text->base.text_offset;
-        draw_rect.y1 = obj->ay + obj->dy + obj->ty;
+        draw_rect.y1 = 0;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
     else if (text->base.mode == SCROLL_Y && (offset > obj->h || offset == 0))
     {
-        draw_rect.x1 = obj->ax + obj->dx + obj->tx;
+        draw_rect.x1 = 0;
         draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y1 = obj->ay + obj->dy + obj->ty - text->cnt_value + text->start_value;
+        draw_rect.y1 = 0 - text->cnt_value + text->start_value;
         draw_rect.y2 = draw_rect.y1 + text->base.text_offset;
     }
     else
     {
-        draw_rect.x1 = obj->ax + obj->dx + obj->tx;
-        draw_rect.y1 = obj->ay + obj->dy + obj->ty;
+        draw_rect.x1 = 0;
+        draw_rect.y1 = 0;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
 
-    draw_rect.xboundleft = obj->ax + obj->dx + obj->tx;
-    draw_rect.xboundright = obj->ax + obj->dx + obj->tx + obj->w;
-    draw_rect.yboundtop = obj->ay + obj->dy + obj->ty;
-    draw_rect.yboundbottom = obj->ay + obj->dy + obj->ty + obj->h;
-
+    draw_rect.xboundleft = 0;
+    draw_rect.xboundright = 0 + obj->w;
+    draw_rect.yboundtop = 0;
+    draw_rect.yboundbottom = 0 + obj->h;
     if (dc->section_count == 0)
     {
-        gui_scroll_text_font_load(&text->base, &draw_rect);
+        gui_font_load(&text->base, &draw_rect);
     }
-
+    if (dc->section_count == 0)
+    {
+        gui_font_load(&text->base, &draw_rect);
+    }
     if (text->duration_time_ms == 0)
     {
-        gui_scroll_text_font_draw(&text->base, &draw_rect);
+        gui_font_draw(&text->base, &draw_rect);
     }
     else
     {
         if (cur_time_ms < (text->init_time_ms + text->duration_time_ms))
         {
-            gui_scroll_text_font_draw(&text->base, &draw_rect);
+            gui_font_draw(&text->base, &draw_rect);
         }
     }
-
-    total_section_count = dc->screen_height / dc->fb_height -
-                          ((dc->screen_height % dc->fb_height) ? 0 : 1);
-
+    uint32_t total_section_count = dc->screen_height / dc->fb_height -
+                                   ((dc->screen_height % dc->fb_height) ? 0 : 1);
     if (dc->section_count == total_section_count)
     {
-        gui_scroll_text_font_unload(&text->base);
+        gui_font_unload(&text->base);
     }
 }
 
-static void gui_scroll_text_end(gui_obj_t *obj)
+static void scrolltext_end(gui_obj_t *obj)
 {
 
 }
 
-static void gui_scroll_text_destory(gui_obj_t *obj)
+static void scrolltext_destory(gui_obj_t *obj)
 {
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
 }
@@ -309,17 +270,17 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *this, gui_obj_t *parent, con
                                  int16_t x, int16_t y, int16_t w, int16_t h)
 {
     gui_text_t *base = (gui_text_t *)this;
-    gui_obj_t *root = (gui_obj_t *)this;
-    //for base class
+    extern void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
+                              int16_t y, int16_t w, int16_t h);
     gui_text_ctor(base, parent, name, x, y, w, h);
     base->mode = SCROLL_X;
 
-    //for root class
+    gui_obj_t *root = (gui_obj_t *)this;
     root->type = SCROLLTEXTBOX;
-    root->obj_prepare = gui_scroll_text_prepare;
-    root->obj_draw = gui_scroll_text_draw;
-    root->obj_end = gui_scroll_text_end;
-    root->obj_destory = gui_scroll_text_destory;
+    root->obj_prepare = scrolltext_prepare;
+    root->obj_draw = scrolltext_draw;
+    root->obj_end = scrolltext_end;
+    root->obj_destory = scrolltext_destory;
 
     this->init_time_ms = gui_ms_get();
 }
@@ -363,16 +324,12 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode,
 gui_scroll_text_t *gui_scroll_text_create(void *parent, const char *name, int16_t x, int16_t y,
                                           int16_t w, int16_t h)
 {
-    gui_scroll_text_t *scrolltext;
-
     GUI_ASSERT(parent != NULL);
-
     if (name == NULL)
     {
         name = "DEFAULT_SCROLLTEXTBOX";
     }
-
-    scrolltext = gui_malloc(sizeof(gui_scroll_text_t));
+    gui_scroll_text_t *scrolltext = gui_malloc(sizeof(gui_scroll_text_t));
     GUI_ASSERT(scrolltext != NULL);
     memset(scrolltext, 0, sizeof(gui_scroll_text_t));
 
@@ -383,10 +340,8 @@ gui_scroll_text_t *gui_scroll_text_create(void *parent, const char *name, int16_
         gui_list_insert_before(&((GET_BASE(scrolltext)->parent)->child_list),
                                &(GET_BASE(scrolltext)->brother_list));
     }
-
     GET_BASE(scrolltext)->create_done = true;
     scroll_text_count++;
-
     return scrolltext;
 }
 

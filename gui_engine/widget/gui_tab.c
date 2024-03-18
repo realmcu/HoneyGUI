@@ -93,27 +93,36 @@ static void tab_prepare(gui_obj_t *obj)
     gui_tab_t *this = (gui_tab_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
 
     if (this->style == CLASSIC)
     {
-        obj->tx += (this->id.x - parent->cur_id.x) * (int)this->base.w;
-        obj->ty += (this->id.y - parent->cur_id.y) * (int)this->base.h;
-        return;
+        matrix_translate((this->id.x - parent->cur_id.x) * (int)this->base.w + parent->release_x, \
+                         (this->id.y - parent->cur_id.y) * (int)this->base.h + parent->release_y, \
+                         obj->matrix);
+    }
+    else if (this->style == TAB_CUBE)
+    {
+        gui_tab_cube(obj);
+    }
+    else if (this->style == TAB_ROTATE)
+    {
+        gui_tab_rotate(obj);
+    }
+    else if (this->style == REDUCTION)
+    {
+        gui_tab_reduction(obj);
     }
     else if (this->style == FADE)
     {
-        obj->tx += (this->id.x - parent->cur_id.x) * (int)this->base.w;
-        obj->ty += (this->id.y - parent->cur_id.y) * (int)this->base.h;
-
         tab_prepare_fade(obj);
     }
     else if (this->style == REDUCTION_FADE)
     {
         float s;
-        obj->tx = (this->id.x - parent->cur_id.x) * (int)this->base.w;
-        obj->ty = (this->id.y - parent->cur_id.y) * (int)this->base.h;
-        int sx = abs(obj->dx + obj->ax + obj->tx);
+
+        int sx = abs((this->id.x - parent->cur_id.x) * (int)this->base.w + parent->release_x);
         sx = sx % this->base.w;
         s = 1.0f - (float)sx / this->base.w;
 
@@ -125,31 +134,11 @@ static void tab_prepare(gui_obj_t *obj)
         {
             s = 1.0f;
         }
-        obj->sx = s;
-        obj->sy = s;
+
         tab_prepare_fade(obj);
     }
-    else if (this->style == REDUCTION)
-    {
-        float s;
-        obj->tx = (this->id.x - parent->cur_id.x) * (int)this->base.w;
-        obj->ty = (this->id.y - parent->cur_id.y) * (int)this->base.h;
-        int sx = abs(obj->dx + obj->ax + obj->tx);
-        sx = sx % this->base.w;
-        s = 1.0f - (float)sx / this->base.w;
 
-        if (s < 0.2f)
-        {
-            s = 0.2f;
-        }
-        if (s >= 1.0f)
-        {
-            s = 1.0f;
-        }
-        obj->sx = s;
-        obj->sy = s;
-    }
-    kb_info_t *kb = kb_get_info();
+
     if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
     {
         gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
@@ -224,7 +213,7 @@ static void tab_prepare_fade(gui_obj_t *obj)
         // slide right delta > 0, slide left delta < 0
         float slide_dir = (tp->deltaX > 0) ? 1.f : (tp->deltaX < 0) ? -1.f : 0;
         // slide right dx > 0, slide left dx < 0
-        float fade_percent = 1.f + (fade_dir * slide_dir * obj->dx) / this->base.w;
+        float fade_percent = 1.f + (fade_dir * slide_dir * 0/*todo*/) / this->base.w;
 
         tab_root_img_fade(obj, fade_percent, fade_percent);
     }
@@ -245,6 +234,11 @@ static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filenam
     this->id.x = idx;
     this->id.y = idy;
     this->id.z = idy;
+
+    this->normal.x = 0;
+    this->normal.y = 0;
+    this->normal.z = -1.0f;
+
     parent_ext->tab_cnt++;
     if (idx > 0)
     {

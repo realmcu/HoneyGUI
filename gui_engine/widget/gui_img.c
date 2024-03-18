@@ -137,21 +137,6 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
     }
 }
-static void obj_is_active(gui_obj_t *obj)
-{
-
-    int sx = obj->dx + obj->ax + obj->tx;
-    int sy = obj->dy + obj->ay + obj->ty;
-    int ex = sx + obj->w;
-    int ey = sy + obj->h;
-
-
-    if ((sx < (int)gui_get_screen_width()) && ((ex > 0) || sx == 0) && \
-        (sy < (int)gui_get_screen_height()) && ((ey > 0) || sy == 0))
-    {
-        obj->active = true;
-    }
-}
 
 static void img_prepare(gui_obj_t *obj)
 {
@@ -164,17 +149,13 @@ static void img_prepare(gui_obj_t *obj)
         gui_dispdev_t *dc = gui_get_dc();
         touch_info_t *tp = tp_get_info();
 
-        if (((obj->ax + obj->tx) < (int)gui_get_screen_width()) && (((obj->ax + obj->tx) + obj->w) >= 0) &&
-            \
-            ((obj->ay + obj->ty) < (int)gui_get_screen_height()) && (((obj->ay + obj->ty) + obj->h) >= 0))
 
+        if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
         {
             gui_img_t *b = (void *)obj;
             if (tp->pressed)
             {
-
-                if ((tp->x >= obj->ax + obj->tx && tp->x <= (obj->ax + obj->tx  + obj->w)) &&
-                    (tp->y >= obj->ay + obj->ty && tp->y <= (obj->ay + obj->ty + obj->h)))
+                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
                     b->press_flag = true;
@@ -202,52 +183,21 @@ static void img_prepare(gui_obj_t *obj)
     gui_image_load_scale(draw_img);
     root->w = draw_img->img_w;
     root->h = draw_img->img_h;
-    if (root->sx != 1 || root->sy != 1)
-    {
-        this->matrix_flag = true;
-    }
-    // gui_log("matrix_flag:%d@%s\n", this->matrix_flag, root->name);
-    obj_is_active(root);
-    if (!root->active)
-    {
-        return;
-    }
 
 
-    matrix_identity(draw_img->matrix);
-    matrix_identity(draw_img->matrix);
-    matrix_translate(root->dx, root->dy, draw_img->matrix);
-    matrix_translate(root->tx, root->ty, draw_img->matrix);
+    matrix_translate(this->t_x, this->t_y, obj->matrix);
+    matrix_rotate(this->degrees, obj->matrix);
+    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+    matrix_translate(-this->c_x, -this->c_y, obj->matrix);
 
-    if (this->matrix_flag)
-    {
-        matrix_translate(dc->screen_width / 2, dc->screen_height / 2, draw_img->matrix);
-        matrix_scale(root->sx, root->sy, draw_img->matrix);
-        matrix_translate(-dc->screen_width / 2, -dc->screen_height / 2, draw_img->matrix);
-    }
+    memcpy(draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    memcpy(draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
-
-    matrix_translate(root->ax, root->ay, draw_img->matrix);
-    //if (this->matrix_flag)
-    {
-        matrix_translate(this->t_x, this->t_y, draw_img->matrix);
-        matrix_rotate(this->degrees, draw_img->matrix);
-        matrix_scale(this->scale_x, this->scale_y, draw_img->matrix);
-
-        matrix_translate(-this->c_x, -this->c_y, draw_img->matrix);
-    }
-
-
-    memcpy(draw_img->inverse, draw_img->matrix, sizeof(struct gui_matrix));
     matrix_inverse(draw_img->inverse);
     gui_image_new_area(draw_img);
 
-    int sx = obj->dx + obj->ax + obj->tx;
-    int sy = obj->dy + obj->ay + obj->ty;
-    int ex = sx + obj->w;
-    int ey = sy + obj->h;
 
-    if ((tp->x >= sx && tp->x <= ex) && (tp->y >= sy && tp->y <= ey))
+    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
         {
@@ -264,10 +214,6 @@ static void img_prepare(gui_obj_t *obj)
     if (last != this->checksum)
     {
         gui_fb_change();
-    }
-    if (!(root->sx != 1 || root->sy != 1))
-    {
-        this->matrix_flag = false;
     }
 }
 
@@ -370,6 +316,7 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
 
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
+
     this->opacity = draw_img->opacity_value;
 }
 
@@ -549,7 +496,6 @@ void gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)
     img->degrees = degrees;
     img->c_x = c_x;
     img->c_y = c_y;
-    img->matrix_flag = 1;
 }
 
 void gui_img_scale(gui_img_t *img, float scale_x, float scale_y)
@@ -560,7 +506,6 @@ void gui_img_scale(gui_img_t *img, float scale_x, float scale_y)
         img->scale_x = scale_x;
         img->scale_y = scale_y;
     }
-    img->matrix_flag = 1;
 }
 
 void gui_img_translate(gui_img_t *img, float t_x, float t_y)
@@ -568,7 +513,6 @@ void gui_img_translate(gui_img_t *img, float t_x, float t_y)
     GUI_ASSERT(img != NULL);
     img->t_x = t_x;
     img->t_y = t_y;
-    img->matrix_flag = 1;
 }
 
 void gui_img_skew_x(gui_img_t *img, float degrees)
@@ -614,6 +558,7 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
                              };
     return gui_img_create_core(parent, &config);
 }
+
 gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color)
 {
     gui_rect_file_head_t *array = gui_malloc(sizeof(gui_rect_file_head_t));

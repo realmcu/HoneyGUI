@@ -246,10 +246,10 @@ typedef struct gui_matrix
     float m[3][3];
 } gui_matrix_t;
 
-struct gui_pox
+typedef struct gui_point
 {
     float p[3];
-};
+} gui_point_t;
 
 typedef enum
 {
@@ -290,6 +290,10 @@ typedef enum gui_tab_style
     FADE,
     REDUCTION_FADE,
     STACKING,
+
+    TAB_ROTATE,
+    TAB_CUBE,
+    TAB_PAGE,
 } SLIDE_STYLE;
 
 
@@ -407,6 +411,7 @@ typedef struct _gui_obj_t
     gui_list_t  brother_list;
 
     //run time
+    void (* obj_input_prepare)(struct _gui_obj_t *obj);
     void (* obj_prepare)(struct _gui_obj_t *obj);
     void (* obj_draw)(struct _gui_obj_t *obj);
     void (* obj_end)(struct _gui_obj_t *obj);
@@ -415,23 +420,34 @@ typedef struct _gui_obj_t
     //void (* obj_cb)(struct _gui_obj_t *obj); todo
     //run time
     obj_type_t type; //no need this , only use name
-    uint16_t active         : 1;    // this flag means obj location in screen
-    uint16_t not_show       : 1;
-    uint16_t cover          : 1;
-    uint16_t create_done    : 1;
+    uint32_t active         : 1;    // this flag means obj location in screen
+    uint32_t not_show       : 1;
+    uint32_t cover          : 1;
+    //uint32_t focused        : 1;
+    uint32_t skip_tp_left_hold    : 1;
+    uint32_t skip_tp_right_hold   : 1;
+    uint32_t skip_tp_up_hold      : 1;
+    uint32_t skip_tp_down_hold    : 1;
+    //uint32_t skip_tp_left_quick   : 1;
 
-    uint16_t event_dsc_cnt  : 5;
+
+    uint32_t create_done    : 1;
+    uint32_t flag_3d        : 1;
+    uint32_t event_dsc_cnt  : 5;
+
     gui_event_dsc_t *event_dsc;
-    int16_t dx;//for touch
-    int16_t dy;//for touch
-    int16_t ax;//absolute value
-    int16_t ay;//absolute value
-    float sx;
-    float sy;
-    int16_t tx;//for tab, diffent view use this value
-    int16_t ty;//for tab, diffent view use this value
+
+
+    // int16_t dx;//for touch
+    // int16_t dy;//for touch
+    // int16_t ax;//absolute value
+    // int16_t ay;//absolute value
+    // float sx;
+    // float sy;
+    // int16_t tx;//for tab, diffent view use this value
+    // int16_t ty;//for tab, diffent view use this value
     unsigned char opacity_value;
-    //gui_matrix_t *matrix;
+    gui_matrix_t *matrix;
 
 } gui_obj_t;
 
@@ -548,7 +564,7 @@ extern char *defaultPath;
 
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
-#define GUI_FRAME_STEP 50
+#define GUI_FRAME_STEP 1
 #else
 #define GUI_FRAME_STEP 50
 #endif

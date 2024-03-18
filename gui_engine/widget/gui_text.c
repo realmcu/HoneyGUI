@@ -18,6 +18,7 @@
  *                        Header Files
  *============================================================================*/
 #include "gui_text.h"
+#include "gui_matrix.h"
 #include "font_mem.h"
 #include "font_stb.h"
 
@@ -96,10 +97,6 @@ static void gui_text_font_draw(gui_text_t *text, gui_rect_t *rect)
     switch (text->font_type)
     {
     case GUI_FONT_SOURCE_BMP:
-        if (text->base.sx != 1.0f || text->base.sy != 1.0f)
-        {
-            return;
-        }
         gui_font_mem_draw(text, rect);
         break;
     case GUI_FONT_SOURCE_TTF:
@@ -162,16 +159,22 @@ static void (obj_update_att)(struct _gui_obj_t *this)
     }
 }
 
-static void gui_text_prepare(gui_obj_t *o)
+static void gui_text_prepare(gui_obj_t *obj)
 {
-    gui_text_t *obj = (void *)o;
-    uint8_t last = obj->checksum;
+    gui_text_t *this = (void *)obj;
 
-    obj_update_att(o);
-    obj->checksum = 0;
-    obj->checksum = gui_checksum(0, (uint8_t *)obj, sizeof(gui_text_t));
 
-    if (last != obj->checksum)
+    obj_update_att(obj);
+    gui_point_t point = {0, 0, 1};
+    matrix_multiply_point(obj->matrix, &point);
+    this->offset_x = point.p[0];
+    this->offset_y = point.p[1];
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
+
+    if (last != this->checksum)
     {
         gui_fb_change();
     }
@@ -185,13 +188,10 @@ static void gui_text_draw(gui_obj_t *obj)
         return;
     }
     struct gui_dispdev *dc = gui_get_dc();
-    int tab_x = 0;
-    int tab_y = 0;
-    tab_y = (int)(gui_get_screen_height() / 2 - obj->ay) * (1.0f - obj->sy);
-    tab_x = (int)(gui_get_screen_width() / 2 - obj->ax) * (1.0f - obj->sx);
+
     gui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->ax + obj->dx + obj->tx + tab_x;
-    draw_rect.y1 = obj->ay + obj->dy + obj->ty + tab_y;
+    draw_rect.x1 = text->offset_x;
+    draw_rect.y1 = text->offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
 
