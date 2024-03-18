@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "gui_obj.h"
-
+#include "gui_matrix.h"
 
 gui_app_t *current_app;
 gui_app_t *next_app;
@@ -91,6 +91,8 @@ void gui_app_startup(gui_app_t *app)
         current_app = app;
     }
     app->screen.opacity_value = UINT8_MAX;
+    app->screen.matrix = gui_malloc(sizeof(struct gui_matrix));
+    matrix_identity(app->screen.matrix);
     app->screen.create_done = true;
 
 }
@@ -109,6 +111,7 @@ void gui_app_shutdown(gui_app_t *app)
     else
     {
         gui_tree_free(&app->screen);
+        gui_free(app->screen.matrix);
         app->close_sync = true;
     }
 }
