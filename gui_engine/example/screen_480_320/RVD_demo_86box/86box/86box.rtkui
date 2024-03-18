@@ -528,10 +528,10 @@
         </widget>
         <widget class="Switch" name="sw_curtain" layer="0" isLocked="False">
           <property name="geometry">
-            <width>11</width>
-            <height>13</height>
-            <x>234</x>
-            <y>229</y>
+            <width>43</width>
+            <height>25</height>
+            <x>237</x>
+            <y>226</y>
           </property>
           <property name="switchData">
             <blendMode>imgFilterBlack</blendMode>

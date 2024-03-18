@@ -18,16 +18,16 @@
         x="0"
         y="0">tab_0_home
 <img
-          file="app/86box/resource/0_home/home_bg.bin"
-          rotationAngle="0"
-          scaleX="1"
-          scaleY="1"
-          blendMode="imgFilterBlack"
-          opacity="255"
+          x="0"
+          y="0"
           w="480"
           h="320"
-          x="0"
-          y="0">home_bg
+          opacity="255"
+          file="app/86box/resource/0_home/home_bg.bin"
+          blendMode="imgFilterBlack"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">home_bg
 </img></tab><tab
         idx="1"
         idy="0"
@@ -360,14 +360,14 @@
           scaleX="1"
           scaleY="1">img_bg_curtain
 </img><switch
-          x="234"
-          y="229"
+          x="237.333333333333"
+          y="226.333333333333"
           picture="app/86box/resource/4_curtain/0_start.bin"
           highlightPicture="app/86box/resource/4_curtain/1_stop.bin"
           blendMode="imgFilterBlack"
           opacity="255"
-          w="11"
-          h="13">sw_curtain
+          w="43"
+          h="25">sw_curtain
 </switch><seekbar
           orientation="horizontal"
           centralX="240"
@@ -396,25 +396,25 @@
           w="480"
           h="277">sw_wifi
 </switch><textbox
+          x="207"
+          y="58"
           color="#ffffffff"
-          mode="truncate"
+          w="105"
+          h="37"
           text="Click"
           fontSize="30"
           font="app/86box/resource/font/times_size30_bits8_font.bin"
-          w="105"
-          h="37"
-          x="207"
-          y="58">txt_wifi
+          mode="truncate">txt_wifi
 </textbox><textbox
+          x="266"
+          y="58"
           color="#ffffffff"
-          mode="truncate"
+          w="105"
+          h="38"
           text="bit/s"
           fontSize="30"
           font="app/86box/resource/font/times_size30_bits8_font.bin"
-          w="105"
-          h="38"
-          x="266"
-          y="58">txt_unit
+          mode="truncate">txt_unit
 </textbox></tab></tabview><switch
       x="84"
       y="278"
