@@ -100,7 +100,6 @@ DECLARE_HANDLER(jump)
     {
         // gui_log("jump %f\n", jerry_get_number_value(args[0]));
         gui_tabview_jump_tab((void *)obj, jerry_get_number_value(args[0]), 0);
-        gui_fb_change();
     }
     return jerry_create_undefined();
 }

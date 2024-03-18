@@ -491,7 +491,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     float scalex = 1;
                     float scaley = 1;
                     float angle = 0;
-                    int mode = 0;
+                    // default image blend_mode
+                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -527,18 +529,29 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             angle = atof(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "mode"))
+                        else if (!strcmp(p->attr[i], "blendMode"))
                         {
-                            char *s = p->attr[++i];
-                            if (!strcmp(p->attr[i], "normal"))
+                            i++;
+                            if (!strcmp(p->attr[i], "imgBypassMode"))
                             {
-                                mode = IMG_FILTER_BLACK;
+                                blendMode = IMG_BYPASS_MODE;
                             }
-                            else if (!strcmp(p->attr[i], "blendSrcBlack"))
+                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
                             {
-                                mode = IMG_BYPASS_MODE;
+                                blendMode = IMG_FILTER_BLACK;
                             }
-
+                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                            {
+                                blendMode = IMG_SRC_OVER_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgCoverMode"))
+                            {
+                                blendMode = IMG_COVER_MODE;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "opacity"))
+                        {
+                            opacity = atof(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "file"))
                         {
@@ -570,6 +583,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_img_get_height((void *)parent);
                             gui_img_rotation((void *)parent, angle, parent->w / 2, parent->h / 2);
                         }
+                        gui_img_set_mode((gui_img_t *)parent, blendMode);
+                        gui_img_set_opacity((gui_img_t *)parent, opacity);
                     }
                 }
                 break;
@@ -937,6 +952,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     float sd = 0;
                     float ed = 0;
+                    // default image blend_mode
+                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1031,6 +1049,30 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             ed = atof(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "blendMode"))
+                        {
+                            i++;
+                            if (!strcmp(p->attr[i], "imgBypassMode"))
+                            {
+                                blendMode = IMG_BYPASS_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                            {
+                                blendMode = IMG_FILTER_BLACK;
+                            }
+                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                            {
+                                blendMode = IMG_SRC_OVER_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgCoverMode"))
+                            {
+                                blendMode = IMG_COVER_MODE;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "opacity"))
+                        {
+                            opacity = atof(p->attr[++i]);
+                        }
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
@@ -1118,8 +1160,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
                                                                           cx, cy, 100, 100, sd, ed);
-                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), IMG_SRC_OVER_MODE);
-
+                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                            gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                         }
                         else
                         {
@@ -1721,6 +1763,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *picture = NULL;
                     char *hl_picture = NULL;
                     int style = 0;
+                    // default image blend_mode
+                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1806,6 +1851,30 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
 
                         }
+                        else if (!strcmp(p->attr[i], "blendMode"))
+                        {
+                            i++;
+                            if (!strcmp(p->attr[i], "imgBypassMode"))
+                            {
+                                blendMode = IMG_BYPASS_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                            {
+                                blendMode = IMG_FILTER_BLACK;
+                            }
+                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                            {
+                                blendMode = IMG_SRC_OVER_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgCoverMode"))
+                            {
+                                blendMode = IMG_COVER_MODE;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "opacity"))
+                        {
+                            opacity = atof(p->attr[++i]);
+                        }
                         i++;
                     }
                     void *img1;
@@ -1823,6 +1892,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
                     gui_button_text_move((void *)parent, text_x, text_y);
+                    gui_img_set_mode(GUI_TYPE(gui_button_t, parent)->img, blendMode);
+                    gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
 
                     gui_color_t color_temporary;
                     color_temporary.color.rgba_full = font_color;
@@ -1976,6 +2047,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *hl_pictureHl = NULL;
                     int picture_x = 0;
                     int picture_y = 0;
+                    // default image blend_mode
+                    BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -2023,6 +2097,30 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             picture_y = atoi(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "blendMode"))
+                        {
+                            i++;
+                            if (!strcmp(p->attr[i], "imgBypassMode"))
+                            {
+                                blendMode = IMG_BYPASS_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                            {
+                                blendMode = IMG_FILTER_BLACK;
+                            }
+                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                            {
+                                blendMode = IMG_SRC_OVER_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgCoverMode"))
+                            {
+                                blendMode = IMG_COVER_MODE;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "opacity"))
+                        {
+                            opacity = atof(p->attr[++i]);
+                        }
                         i++;
                     }
                     void *img1;
@@ -2054,6 +2152,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.x = picture_x;
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
+                    gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);
+                    gui_img_set_opacity(GUI_TYPE(gui_switch_t, parent)->switch_picture, opacity);
                 }
                 break;
             // case MOVIE:
