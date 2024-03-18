@@ -51,6 +51,10 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
     {
         memset(chr, 0, sizeof(mem_char_t) * text->len);
     }
+    if (text->data != NULL)
+    {
+        gui_free(text->data);
+    }
     text->data = chr;
     uint8_t aliened_font_size;
     aliened_font_size = text->font_height;
@@ -330,6 +334,17 @@ void gui_font_mem_unload(gui_text_t *text)
         text->data = NULL;
     }
     return;
+}
+
+void gui_font_scale_destory(gui_text_t *text)
+{
+    if (text->scale_img != NULL)
+    {
+        if (text->scale_img->draw_img.data != NULL)
+        {
+            FONT_FREE_PSRAM(text->scale_img->draw_img.data);
+        }
+    }
 }
 // Fast RGB565 pixel blending
 // Found in a pull request for the Adafruit framebuffer library. Clever!
@@ -641,7 +656,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         }
         break;
     case 1:
-#if 1 //0 - Stable slow processing , 1 - Fast processing in tests
+#if 0 //0 - Stable slow processing , 1 - Fast processing in tests
         if (dc_bytes_per_pixel == 2)
         {
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -797,6 +812,261 @@ void gui_font_mem_draw(gui_text_t *text, gui_rect_t *rect)
         rtk_draw_unicode(0, chr + i, text->color, rendor_mode, rect);
     }
 }
+
+static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
+                                      gui_rect_t *rect, uint8_t *buffer, int buf_width, uint8_t buffer_bytes)
+{
+    if (chr->dot_addr == NULL || buffer == NULL)
+    {
+        return;
+    }
+    uint8_t *dots = chr->dot_addr;
+    gui_dispdev_t *dc = gui_get_dc();
+
+    int font_x = chr->x;
+    int font_y = chr->y;
+    int font_w = chr->w;
+    int font_h = chr->h;
+    int x_start = font_x;
+    int x_end = _UI_MIN(font_x + chr->char_w, buf_width);
+    int y_start = font_y;
+    int y_end = font_y + font_h;
+
+    if ((x_start >= x_end) || (y_start >= y_end))
+    {
+        return;
+    }
+
+    switch (rendor_mode)
+    {
+    case 2:
+        {
+            if (buffer_bytes == 2)
+            {
+                uint16_t *writebuf = (uint16_t *)buffer + chr->x;
+
+                uint16_t color_output[4];
+                color_output[3] = rgba2565(color);
+                color_output[2] = alphaBlendRGB565(color_output[3], 0x0,
+                                                   0xA0);  // Normal is 0x80, modify to 0xA0.By Luke
+                color_output[1] = alphaBlendRGB565(color_output[3], 0x0, 0x40);
+                color_output[0] = 0;
+
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * (i - y_start) ;
+                    int dots_off = (i - font_y) * (font_w / 4);
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        uint8_t alpha = dots[dots_off + (j - font_x) / 4] >> ((j - font_x) % 4 * 2);
+                        if (alpha != 0)
+                        {
+                            writebuf[write_off + j - x_start] = color_output[alpha & 0x03];
+                        }
+                    }
+                }
+            }
+            else if (buffer_bytes == 3)
+            {
+                gui_log("this type font scale no support now!!! \n");
+                GUI_ASSERT(NULL != NULL);
+            }
+            else if (buffer_bytes == 4)
+            {
+                gui_log("this type font scale no support now!!! \n");
+                GUI_ASSERT(NULL != NULL);
+            }
+        }
+        break;
+    case 4:
+        {
+            if (buffer_bytes == 2)
+            {
+                uint16_t *writebuf = (uint16_t *)buffer + chr->x;
+
+                uint16_t color_output[16];
+                int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
+
+                color_output[0] = 0 ;
+                color_output[15] = rgba2565(color);
+                for (int i = 1; i + 1 < 1 << rendor_mode; i++)
+                {
+                    color_output[i] = alphaBlendRGB565(color_output[15], 0x0, pre_alpha * i);
+                }
+
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * (i - y_start) ;
+                    int dots_off = (i - font_y) * (font_w / 2);
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> (rendor_mode - (j - font_x) % 2 * 4);
+                        if (alpha != 0)
+                        {
+                            writebuf[write_off + j - x_start] = color_output[alpha & 0x0f];
+                        }
+                    }
+                }
+            }
+            else if (buffer_bytes == 3)
+            {
+                gui_log("this type font scale no support now!!! \n");
+                GUI_ASSERT(NULL != NULL);
+            }
+            else if (buffer_bytes == 4)
+            {
+                gui_log("this type font scale no support now!!! \n");
+                GUI_ASSERT(NULL != NULL);
+            }
+        }
+        break;
+    case 8:
+        {
+            if (buffer_bytes == 2)
+            {
+                gui_log("this type font scale no support !!! \n");
+                GUI_ASSERT(NULL != NULL);
+            }
+            else if (buffer_bytes == 3)
+            {
+                gui_log("this type font scale no support !!! \n");
+                GUI_ASSERT(NULL != NULL);
+            }
+            else if (buffer_bytes == 4)
+            {
+                uint32_t *writebuf = (uint32_t *)buffer + chr->x;
+                gui_color_t write_color = color;
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * (i - y_start) ;
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
+                        if (alpha != 0)
+                        {
+                            write_color.color.rgba.a = alpha;
+                            writebuf[write_off + j - x_start] = write_color.color.rgba_full;
+                            // gui_log("write_off + j - x_start %d \n",write_off + j - x_start);
+                        }
+                    }
+                }
+            }
+        }
+        break;
+    case 1:
+        if (buffer_bytes == 2)
+        {
+            uint16_t *writebuf = (uint16_t *)buffer + chr->x;
+            uint16_t color_output = rgba2565(color);
+            for (uint32_t i = y_start; i < y_end; i++)
+            {
+                int write_off = buf_width * (i - y_start) ;
+                int dots_off = (i - font_y) * (font_w / 8);
+
+                for (uint32_t j = x_start; j < x_end; j++)
+                {
+                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    {
+                        writebuf[write_off + j - x_start] = color_output;
+                    }
+                }
+            }
+        }
+        else if (buffer_bytes == 3)
+        {
+            gui_log("this type font scale no support now!!! \n");
+            GUI_ASSERT(NULL != NULL);
+        }
+        else if (buffer_bytes == 4)
+        {
+            gui_log("this type font scale no support now!!! \n");
+            GUI_ASSERT(NULL != NULL);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
+{
+    int16_t buf_width = 0;
+    int16_t buf_height = 0;
+    uint8_t font_img_pixel_bytes;
+
+    gui_rect_t rect = {0};
+    rect.x1 = 0;
+    rect.y1 = 0;
+    rect.x2 = rect.x1 + text->base.w;
+    rect.y2 = rect.y1 + text->base.h;
+
+    gui_font_mem_load(text, &rect);
+
+    switch (font_img_type)
+    {
+    case RGB565:
+        font_img_pixel_bytes = 2;
+        break;
+    // case ARGB8565:
+    case RGB888:
+        font_img_pixel_bytes = 3;
+        break;
+    case RGBA8888:
+        font_img_pixel_bytes = 4;
+        break;
+    default:
+        font_img_pixel_bytes = 0;
+        break;
+    }
+    if (font_img_pixel_bytes == 0)
+    {
+        return NULL;
+    }
+    switch (text->mode)
+    {
+    case LEFT:
+        buf_width = text->base.w - text->text_offset * 2;
+        buf_height = text->font_height;
+        break;
+    case MUTI_LEFT:
+        buf_width = text->base.w;
+        buf_height = text->font_height * text->text_offset;
+        break;
+    // case CENTER:
+    // case RIGHT:
+    // case MUTI_CENTER:
+    // case MUTI_RIGHT:
+    // case SCROLL_X:
+    // case SCROLL_Y:
+    default:
+        break;
+    }
+
+    uint32_t size = buf_width * buf_height * font_img_pixel_bytes + sizeof(struct gui_rgb_data_head);
+    void *img_buf = FONT_MALLOC_PSRAM(size);
+    memset(img_buf, 0x00, size);
+
+    struct gui_rgb_data_head head;
+    memset(&head, 0x0, sizeof(head));
+    head.w = buf_width;
+    head.h = buf_height;
+    head.type = font_img_type;
+    memcpy(img_buf, &head, sizeof(head));
+
+    mem_char_t *chr = text->data;
+    uint8_t font_name = get_fontlib_name(text->path, text->font_height);
+    uint8_t rendor_mode = font_lib_tab[font_name].rendor_mode;
+    uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
+
+    for (uint16_t i = 0; i < text->font_len; i++)
+    {
+        gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,
+                                  font_img_pixel_bytes);
+    }
+    gui_font_mem_unload(text);
+    return img_buf;
+}
+
 
 void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
                                void *font_table_addr)

@@ -42,7 +42,7 @@ void gui_font_stb_load(gui_text_t *text, gui_rect_t *rect)
     float scale = 0;
     int ch = 0, advance = 0, lsb = 0;
     int line_flag = 0;
-    scale = stbtt_ScaleForPixelHeight(&font, text->font_height);
+    scale = stbtt_ScaleForPixelHeight(&font, text->font_height * text->base.matrix->m[0][0]);
     while (ch < unicode_len)
     {
         stbtt_GetCodepointHMetrics(&font, p_buf[ch++], &advance, &lsb);
@@ -337,7 +337,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
 {
     int ascent = 0, descent = 0, lineGap = 0, ch = 0, line_num = 0;
     float scale = 0, xpos = 0, ypos = 0, baseline = 0;
-    scale = stbtt_ScaleForPixelHeight(&font, text->font_height);
+    scale = stbtt_ScaleForPixelHeight(&font, text->font_height * text->base.matrix->m[0][0]);
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     baseline = ascent * scale;
     // baseline = 900 * scale;

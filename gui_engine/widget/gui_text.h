@@ -31,7 +31,7 @@ extern "C" {
 #include <string.h>
 #include "guidef.h"
 #include "gui_obj.h"
-
+#include "gui_img.h"
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{
@@ -71,6 +71,7 @@ typedef enum
 {
     GUI_FONT_SOURCE_BMP = 0,
     GUI_FONT_SOURCE_TTF = 1,
+    GUI_FONT_SOURCE_IMG = 2,
 } FONT_SOUCE_TYPE;
 
 /** @brief  text widget structure */
@@ -92,6 +93,7 @@ typedef struct gui_text
     void *path;//!<  address or path
     int16_t offset_x;
     int16_t offset_y;
+    gui_img_t *scale_img;
 } gui_text_t;
 
 /** @brief  text line structure */
@@ -227,6 +229,14 @@ void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset);
  * @param length the text string's length
  */
 void gui_text_content_set(gui_text_t *this, void *text, uint16_t length);
+
+/**
+ * @brief to draw text by img, so that text can be scaled
+ *
+ * @param this the text widget pointer
+ * @param font_img_type color format
+ */
+void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type);
 
 /**
  * @brief create a text box widget.

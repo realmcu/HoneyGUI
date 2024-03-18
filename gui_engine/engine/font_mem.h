@@ -11,6 +11,15 @@
 extern "C" {
 #endif
 
+// #define USE_PSRAM_HEAP
+#ifdef USE_PSRAM_HEAP
+#define FONT_MALLOC_PSRAM(x)  psRamPortMalloc(x)
+#define FONT_FREE_PSRAM(x)  psRamFree(x)
+#else
+#define FONT_MALLOC_PSRAM(x)  gui_malloc(x)
+#define FONT_FREE_PSRAM(x)  gui_free(x)
+#endif // USE_PSRAM_HEAP
+
 typedef struct
 {
     uint16_t unicode;
@@ -135,6 +144,22 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
  * @return uint32_t
  */
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
+
+/**
+ * @brief Post-processing work for drawing bitmap fonts using internal engines
+ *
+ * @param text Widget pointer
+ */
+void gui_font_scale_destory(gui_text_t *text);
+
+/**
+ * @brief transform bmp text to img
+ *
+ * @param text text pointer
+ * @param font_img_type img type
+ * @return void* text img buffer
+ */
+void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type);
 
 #ifdef __cplusplus
 }

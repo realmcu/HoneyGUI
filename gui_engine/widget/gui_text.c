@@ -88,6 +88,7 @@ static void gui_text_font_load(gui_text_t *text, gui_rect_t *rect)
     case GUI_FONT_SOURCE_TTF:
         gui_font_stb_load(text, rect);
         break;
+    case GUI_FONT_SOURCE_IMG:
     default:
         break;
     }
@@ -102,6 +103,7 @@ static void gui_text_font_draw(gui_text_t *text, gui_rect_t *rect)
     case GUI_FONT_SOURCE_TTF:
         gui_font_stb_draw(text, rect);
         break;
+    case GUI_FONT_SOURCE_IMG:
     default:
         break;
     }
@@ -116,6 +118,21 @@ static void gui_text_font_unload(gui_text_t *text)
     case GUI_FONT_SOURCE_TTF:
         gui_font_stb_unload(text);
         break;
+    case GUI_FONT_SOURCE_IMG:
+    default:
+        break;
+    }
+}
+static void gui_text_font_destory(gui_text_t *text)
+{
+    switch (text->font_type)
+    {
+    case GUI_FONT_SOURCE_BMP:
+        break;
+    case GUI_FONT_SOURCE_TTF:
+        break;
+    case GUI_FONT_SOURCE_IMG:
+        gui_font_scale_destory(text);
     default:
         break;
     }
@@ -226,6 +243,12 @@ static void gui_text_end(gui_obj_t *obj)
 
 }
 
+static void text_destory(gui_obj_t *obj)
+{
+    gui_text_t *text = (gui_text_t *)obj;
+    gui_text_font_destory(text);
+}
+
 void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
                    int16_t y, int16_t w, int16_t h)
 {
@@ -239,6 +262,7 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
     root->obj_prepare = gui_text_prepare;
     root->obj_draw = gui_text_draw;
     root->obj_end = gui_text_end;
+    root->obj_destory = text_destory;
 
     //for self
     this->mode = LEFT;
@@ -323,6 +347,14 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->content = (uint8_t *)text;
     this->len = length;
     gui_fb_change();
+}
+
+void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
+{
+    void *img = gui_text_bmp2img(this, font_img_type);
+    gui_img_t *text_img = gui_img_create_from_mem(this, "text_img", img, 0, 0, 0, 0);
+    this->scale_img = text_img;
+    this->font_type = GUI_FONT_SOURCE_IMG;
 }
 
 gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
