@@ -6,7 +6,7 @@
 #include <string.h>
 #include <gui_api.h>
 #include <stdarg.h>
-#if ENABLE_RTK_GUI_OS_HEAP == 0
+#ifndef ENABLE_RTK_GUI_OS_HEAP
 #include "tlsf.h"
 #endif
 
@@ -38,12 +38,12 @@ void gui_fs_info_register(struct gui_fs *info)
 }
 
 
-#if ENABLE_RTK_GUI_OS_HEAP == 0
+#ifndef ENABLE_RTK_GUI_OS_HEAP
 static tlsf_t tlsf;
 #endif
 void gui_os_api_register(struct gui_os_api *info)
 {
-#if ENABLE_RTK_GUI_OS_HEAP == 0
+#ifndef ENABLE_RTK_GUI_OS_HEAP
     tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
 #endif
     os_api = info;
@@ -230,7 +230,7 @@ bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 void *gui_malloc(uint32_t n)
 {
     void *ptr = NULL;
-#if ENABLE_RTK_GUI_OS_HEAP == 1
+#ifdef ENABLE_RTK_GUI_OS_HEAP
     if (os_api->f_malloc)
     {
         ptr = os_api->f_malloc(n);
@@ -262,7 +262,7 @@ void *gui_malloc(uint32_t n)
 void *gui_realloc(void *ptr_old, uint32_t n)
 {
     void *ptr = NULL;
-#if ENABLE_RTK_GUI_OS_HEAP == 1
+#ifdef ENABLE_RTK_GUI_OS_HEAP
     if (os_api->f_realloc)
     {
         ptr = os_api->f_realloc(ptr_old, n);
@@ -293,7 +293,7 @@ void *gui_realloc(void *ptr_old, uint32_t n)
 
 void gui_free(void *rmem)
 {
-#if ENABLE_RTK_GUI_OS_HEAP == 1
+#ifdef ENABLE_RTK_GUI_OS_HEAP
     if (os_api->f_free)
     {
         os_api->f_free(rmem);
@@ -305,7 +305,7 @@ void gui_free(void *rmem)
 
 void gui_mem_debug(void)
 {
-#if ENABLE_RTK_GUI_OS_HEAP == 1
+#ifdef ENABLE_RTK_GUI_OS_HEAP
     gui_log("can't use thie func");
 #else
     tlsf_walk_pool(tlsf_get_pool(tlsf), NULL, NULL);
