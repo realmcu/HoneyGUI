@@ -88,7 +88,6 @@
 static void pagelist_prepare(gui_pagelist_t *this)
 {
     touch_info_t *tp = tp_get_info();
-    gui_obj_t *root = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
     gui_obj_t *obj = (gui_obj_t *)this;
     //set pagelist h according to list_gap_y real_list_max
@@ -96,55 +95,54 @@ static void pagelist_prepare(gui_pagelist_t *this)
     {
         if (this->list_first != NULL && this->list_last != NULL)
         {
-            root->h = (int)gui_get_screen_height() + (this->list_first->base.h + this->list_gap_y) *
-                      this->real_list_max;
+            obj->h = (int)gui_get_screen_height() + (this->list_first->base.h + this->list_gap_y) *
+                     this->real_list_max;
         }
         this->h_set_done = true;
-        gui_log("root->h = %d\n", root->h);
+        gui_log("obj->h = %d\n", obj->h);
     }
-    if (0/*todo*/ != 0)
+    if (obj->parent->y/*todo*/ != 0)
     {
         return;
     }
 
-
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         // valid touch range xy
-        if (tp->x > this->x_init && tp->x < (this->x_init + root->w))
+        if (tp->x > this->x_init && tp->x < (this->x_init + obj->w))
         {
-            if (tp->y > this->y_init && tp->y < (this->y_init + root->h))
+            if (tp->y > this->y_init && tp->y < (this->y_init + obj->h))
             {
                 //cal axis of pagelist
                 //gui_log("root->y = %d, tp->y = %d, tp->deltaY = %d, this->y_stop_scroll = %d, this->y_init = %d\n", root->y, tp->y , tp->deltaY, this->y_stop_scroll, this->y_init);
                 if (tp->type == TOUCH_HOLD_Y)
                 {
                     //update pagelist y
-                    root->y = tp->deltaY + this->y_stop_scroll;
+                    obj->y = tp->deltaY + this->y_stop_scroll;
                 }
                 else
                 {
                     //update y_stop_scroll
-                    this->y_stop_scroll = root->y;
+                    this->y_stop_scroll = obj->y;
                 }
-                if (root->y > this->y_init || root->h <= (int)gui_get_screen_width()) //this.y_init
+                if (obj->y > this->y_init || obj->h <= (int)gui_get_screen_width()) //this.y_init
                 {
                     //pagelist reach top
-                    root->y = this->y_init;
+                    obj->y = this->y_init;
                 }
                 // else if(root->y < (0 - (root->h - this->show_border_bottom - this->list_gap_y - list_h)))//0 - root.h
                 // {
                 //     //pagelist reach bottom
                 //     root->y = 0 - (root->h - this->show_border_bottom - this->list_gap_y - list_h);
                 // }
-                else if (root->h > (int)gui_get_screen_width())
+                else if (obj->h > (int)gui_get_screen_width())
                 {
-                    if (root->y < (0 - (root->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
-                                                                                 this->show_border_bottom) - this->list_gap_y)))//0 - root.h
+                    if (obj->y < (0 - (obj->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
+                                                                               this->show_border_bottom) - this->list_gap_y)))//0 - root.h
                     {
                         //pagelist reach bottom
-                        root->y = 0 - (root->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
-                                                                                this->show_border_bottom) - this->list_gap_y);
+                        obj->y = 0 - (obj->h - (int)gui_get_screen_width() - ((int)gui_get_screen_width() -
+                                                                              this->show_border_bottom) - this->list_gap_y);
                     }
                 }
 
@@ -152,7 +150,7 @@ static void pagelist_prepare(gui_pagelist_t *this)
                 if (this->list_first != NULL)
                 {
                     gui_obj_t *list_next = NULL;
-                    int16_t ay_list_first = 0/*todo*/ + this->list_first->base.y;
+                    int16_t ay_list_first = this->base.y/*todo*/ + this->list_first->base.y;
                     this->list_first->touch_disable = false;
                     if (ay_list_first + this->list_first->base.h < this->show_border_top)
                     {
@@ -196,7 +194,7 @@ static void pagelist_prepare(gui_pagelist_t *this)
                 if (this->list_last != NULL)
                 {
                     gui_obj_t *list_prev = NULL;
-                    int16_t ay_list_last = 0/*todo*/ + this->list_last->base.y;
+                    int16_t ay_list_last = this->base.y/*todo*/ + this->list_last->base.y;
                     this->list_last->touch_disable = false;
                     if (ay_list_last > this->show_border_bottom)
                     {
@@ -306,6 +304,7 @@ void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic)
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
+
 void gui_pagelist_add_scroll_bar_from_fs(gui_pagelist_t *this, void *bar_pic)
 {
     this->src_mode = IMG_SRC_FILESYS;
