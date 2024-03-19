@@ -53,8 +53,8 @@ static void win_switch_main_to_app_touch_cb(void *obj, gui_event_t event)
             is_first_click = 1;
         }
 
-        //gui_log("333first_click = %d, second_click = %d, is_first_click = %d\n", first_click, second_click,
-        //        is_first_click);
+        gui_log("333first_click = %d, second_click = %d, is_first_click = %d\n", first_click, second_click,
+                is_first_click);
         if (second_click - first_click < DOUBLE_CLICK_INTERVAL && second_click != 0)
         {
             gui_switch_app(get_app_perspective_ui(), get_app_cube_ui());
@@ -68,8 +68,8 @@ static void win_switch_main_to_app_touch_cb(void *obj, gui_event_t event)
             first_click = second_click;
             second_click = 0;
         }
-        //gui_log("444first_click = %d, second_click = %d, is_first_click = %d\n", first_click, second_click,
-        //        is_first_click);
+        gui_log("444first_click = %d, second_click = %d, is_first_click = %d\n", first_click, second_click,
+                is_first_click);
         break;
     default:
         break;
@@ -102,6 +102,11 @@ static void design_app_perspective_ui(gui_app_t *app)
     gui_log("design_app_perspective_ui\n");
 
     gui_font_mem_init(FONT_BIN);
+
+#ifndef _WIN32
+#include "mem_config.h"
+    //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
+#endif
 
     gui_perspective_imgfile_t image_list;
     memset(&image_list, 0, sizeof(gui_perspective_imgfile_t));

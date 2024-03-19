@@ -67,12 +67,14 @@ static void scroll_text_record_play_title_animate_cb(void *obj)
         }
     }
 
-    gui_log("scroll_text_record_play_title_animate_cb obj = 0x%x\n", (uint32_t *)obj);
-    gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", (uint32_t *)file_name);
+    gui_log("scroll_text_record_play_title_animate_cb obj = 0x%x\n", obj);
+    gui_log("scroll_text_record_play_title_animate_cb title = 0x%x\n", file_name);
 
     char *string_title = (char *)file_name->base.content;
     gui_scroll_text_set(scroll_text_record_play_title, string_title, GUI_FONT_SRC_BMP,
-                        gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_title), FONT_H_32);
+                        APP_COLOR_WHITE,
+                        strlen(string_title),
+                        FONT_H_32);
 }
 
 static void text_record_play_time_animate_cb(void *obj)
@@ -82,7 +84,7 @@ static void text_record_play_time_animate_cb(void *obj)
 
 void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_file)
 {
-    gui_log("design_win_record_play win_record_play = 0x%x\n", (uint32_t *)win_record_play);
+    gui_log("design_win_record_play win_record_play = 0x%x\n", win_record_play);
     switch_record_play_back = gui_switch_create(parent, 129, 24, 48, 48, ICON_BACK_BIN,
                                                 ICON_BACK_BIN);
     gui_obj_add_event_cb(switch_record_play_back, (gui_event_cb_t)record_play_back_touch_cb,
@@ -105,7 +107,7 @@ void design_win_record_play(gui_win_t *parent, gui_switch_t *selected_record_fil
                                                            24, 128, FONT_H_32);
     gui_scroll_text_scroll_set(scroll_text_record_play_title, SCROLL_X, 0, 0, 5000, 0);
     gui_scroll_text_set(scroll_text_record_play_title, "录音文件123456", GUI_FONT_SRC_BMP,
-                        gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen("录音文件123456"), FONT_H_32);
+                        APP_COLOR_WHITE, strlen("录音文件123456"), FONT_H_32);
     gui_text_set_animate(scroll_text_record_play_title, 1000, 2,
                          scroll_text_record_play_title_animate_cb, selected_record_file);
 

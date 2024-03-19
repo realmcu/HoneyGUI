@@ -10,6 +10,7 @@
 #include "gui_switch.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
+#include "gui_img_scope.h"
 #include "gui_scroll_text.h"
 
 #define MAX_FILES_NUM        20
@@ -37,12 +38,12 @@ char *txet_record_delete_file = "确认删除录音？";
 //if current view has a "delete icon", need to set delete info before create a win_delete
 static void switch_record_file_delete_yes_action(void *obj)
 {
-    gui_log("switch_record_file_delete_yes_action, obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("switch_record_file_delete_yes_action, obj = 0x%x\n", obj);
     //delete selected record file
 }
 static void switch_record_file_delete_no_action(void *obj)
 {
-    gui_log("switch_record_file_delete_no_action, obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("switch_record_file_delete_no_action, obj = 0x%x\n", obj);
     //do nothing
 }
 //static void switch_record_file_delete_text(void *obj)
@@ -53,7 +54,7 @@ static void switch_record_file_delete_no_action(void *obj)
 
 static void switch_record_files_touch_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_record_files_touch_cb, obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("switch_record_files_touch_cb, obj = 0x%x\n", obj);
 
     gui_switch_t *this = (gui_switch_t *)obj;
     //for delete and record play windows creation
@@ -62,7 +63,7 @@ static void switch_record_files_touch_cb(void *obj, gui_event_t event)
     extern gui_win_t *win_confirm;
     extern gui_text_t *text_confirm;
 
-    gui_log("switch_record_files_touch_cb win_record_play = 0x%x\n", (uint32_t *)win_record_play);
+    gui_log("switch_record_files_touch_cb win_record_play = 0x%x\n", win_record_play);
     switch (event)
     {
 
@@ -70,7 +71,7 @@ static void switch_record_files_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_2:
         // jump to win_record_play
         //create record play window
-        gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", (uint32_t *)obj);
+        gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", obj);
         if (win_record_play != NULL)
         {
             gui_tree_free(win_record_play);
@@ -89,7 +90,7 @@ static void switch_record_files_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_TOUCH_LONG:
         // delete
         //change color
-        gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x\n", (uint32_t *)obj);
+        gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x\n", obj);
         switch_record_files_delete->base.not_show = !switch_record_files_delete->base.not_show;
         for (int j = 0; j < record_file_num; j ++)
         {
@@ -170,7 +171,7 @@ static void win_add_record_files_touch_cb(void *obj, gui_event_t event)
         switch_record_files[record_file_num]->long_touch_state_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
         switch_record_files[record_file_num]->long_touch_enable = true;
         gui_log("win_add_record_files_touch_cb switch_record_files = 0x%x, num = %d\n",
-                (uint32_t *)switch_record_files[record_file_num], record_file_num);
+                switch_record_files[record_file_num], record_file_num);
         gui_obj_add_event_cb(switch_record_files[record_file_num],
                              (gui_event_cb_t)switch_record_files_touch_cb,
                              GUI_EVENT_1, NULL);
@@ -185,11 +186,11 @@ static void win_add_record_files_touch_cb(void *obj, gui_event_t event)
         scroll_text_record_files[record_file_num] = gui_scroll_text_create(
                                                         switch_record_files[record_file_num], "scroll_text_record_files", 39, 11, 192, FONT_H_32);
         gui_scroll_text_set(scroll_text_record_files[record_file_num], string_record_files,
-                            GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(string_record_files),
+                            GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(string_record_files),
                             FONT_H_32);
         gui_scroll_text_scroll_set(scroll_text_record_files[record_file_num], SCROLL_X, 0, 0, 5000, 0);
         gui_log("win_add_record_files_touch_cb scroll_text_record_files = 0x%x, num = %d\n",
-                (uint32_t *)scroll_text_record_files[record_file_num], record_file_num);
+                scroll_text_record_files[record_file_num], record_file_num);
 
         record_file_num++;
 
@@ -243,7 +244,7 @@ void design_curtain_record_files(void *parent)
                  strlen(string_title_record_files), FONT_H_32);
 
     grid_record_files = gui_grid_create(page_record_files, 83, 111, 1, 1, 50, 64 + 18);
-    //touch title to add a record file
+    //touch "录音文件" to add a record file
     example_add_record_files();
 
 }

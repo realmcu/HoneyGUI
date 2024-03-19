@@ -2,9 +2,14 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_text.h"
+#include "gui_scroll_text.h"
 #include "gui_switch.h"
 #include "gui_app.h"
 #include "gui_win.h"
+#ifndef _WIN32
+#include "app_task.h"
+#include "app_mmi.h"
+#endif
 
 gui_win_t *win_incoming_call = NULL;
 gui_text_t *text_incoming_call_title = NULL;
@@ -27,8 +32,20 @@ static void switch_incoming_call_answer_touch_cb(void *obj, gui_event_t event)
     extern void design_win_calling(void *obj, char *dial_num);
     design_win_calling(win_calling, dial_num);
 
-    push_current_widget(win_incoming_call);
-    gui_obj_show(win_incoming_call, false);
+    //push win_incoming call is unnecessary
+    // push_current_widget(win_incoming_call);
+    // gui_obj_show(win_incoming_call, false);
+    gui_tree_free(win_calling);
+    win_calling = NULL;
+
+#ifndef _WIN32
+    //send to app task
+    T_IO_MSG answer_call_msg;
+    answer_call_msg.type = IO_MSG_TYPE_WRISTBNAD;
+    answer_call_msg.subtype = IO_MSG_MMI;
+    answer_call_msg.u.param = MMI_HF_ANSWER_CALL;
+    app_send_msg_to_apptask(&answer_call_msg);
+#endif
 }
 
 static void switch_incoming_call_hangup_touch_cb(void *obj, gui_event_t event)
@@ -39,6 +56,15 @@ static void switch_incoming_call_hangup_touch_cb(void *obj, gui_event_t event)
     gui_obj_show(object_return, true);
     gui_tree_free(win_incoming_call);
     win_incoming_call = NULL;
+
+#ifndef _WIN32
+    //send to app task
+    T_IO_MSG reject_call_msg;
+    reject_call_msg.type = IO_MSG_TYPE_WRISTBNAD;
+    reject_call_msg.subtype = IO_MSG_MMI;
+    reject_call_msg.u.param = MMI_HF_REJECT_CALL;
+    app_send_msg_to_apptask(&reject_call_msg);
+#endif
 }
 
 void design_win_incoming_call(void *parent, char *dial_num)
@@ -49,7 +75,7 @@ void design_win_incoming_call(void *parent, char *dial_num)
     gui_text_set(text_incoming_call_title, string_incoming_call_title, GUI_FONT_SRC_BMP,
                  APP_COLOR_WHITE,
                  strlen(string_incoming_call_title), FONT_H_32);
-    //incoming call number
+    //get incoming call number
     char *string_dial_num = dial_num;
     //char *string_dial_name = "";
     gui_log("string_dial_num = %s\n", string_dial_num);
@@ -82,3 +108,18 @@ void design_win_incoming_call(void *parent, char *dial_num)
                          (gui_event_cb_t)switch_incoming_call_hangup_touch_cb, GUI_EVENT_2, NULL);
 }
 
+void gui_incoming_call_create(void)
+{
+#ifndef _WIN32
+    gui_log("gui_incoming_call_create\n");
+    gui_app_t *app = get_app_watch_ui();
+    gui_obj_t *current_widget = get_current_active_widget();
+    push_current_widget(current_widget);
+    gui_obj_show(current_widget, false);
+
+    extern gui_win_t *win_incoming_call;
+    win_incoming_call = gui_win_create(&(app->screen), "win_incoming_call", 0, 0, LCD_W, LCD_H);
+    extern void design_win_incoming_call(void *parent, char *dial_num);
+    design_win_incoming_call(win_incoming_call, get_dial_num());
+#endif
+}

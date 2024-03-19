@@ -85,6 +85,7 @@ static void switch_record_touch_cb(void *obj, gui_event_t event)
     gui_log("switch_record_touch_cb\n");
 
     char *string_record_title;
+    char *string_record_tips = "轻触录音";
     switch (event)
     {
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
@@ -95,7 +96,6 @@ static void switch_record_touch_cb(void *obj, gui_event_t event)
         gui_text_set(text_record_title, string_record_title, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(string_record_title), FONT_H_32);
 
-        char *string_record_tips = "轻触录音";
         text_record_tips->base.w = strlen(string_record_tips) / FONT_CHINESE_BYTE * FONT_CHINESE_W;
         gui_text_move(text_record_tips, 163, 314);
         gui_text_set(text_record_tips, string_record_tips, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,

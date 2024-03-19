@@ -10,6 +10,8 @@
 #include "gui_switch.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
+#include "gui_img_scope.h"
+#include "gui_scroll_text.h"
 
 #define MAX_CINTACTS_NUM        3
 
@@ -32,12 +34,12 @@ char *text_contacts_list_delete_text = "确认删除联系人？";
 //if current view has a "delete icon", need to set delete info before create a win_delete
 static void switch_contacts_list_delete_yes_action(void *obj)
 {
-    gui_log("switch_contacts_list_delete_yes_action, obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("switch_contacts_list_delete_yes_action, obj = 0x%x\n", obj);
     //delete selected contacts
 }
 static void switch_contacts_list_delete_no_action(void *obj)
 {
-    gui_log("switch_contacts_list_delete_no_action, obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("switch_contacts_list_delete_no_action, obj = 0x%x\n", obj);
     win_contacts_list->base.not_show = false;
 
     gui_tree_free(win_confirm);
@@ -63,7 +65,7 @@ static void contacts_list_back_touch_cb(void *obj, gui_event_t event)
 
 static void switch_designated_contact_touch_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_designated_contact_touch_cb, obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("switch_designated_contact_touch_cb, obj = 0x%x\n", obj);
 
     gui_switch_t *this = (gui_switch_t *)obj;
     //for delete and contact details windows creation
@@ -78,7 +80,7 @@ static void switch_designated_contact_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_2:
         // jump to win_contact_details
         //create contact details window
-        gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", (uint32_t *)obj);
+        gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", obj);
         if (win_contacts_details != NULL)
         {
             gui_tree_free(win_contacts_details);
@@ -96,7 +98,7 @@ static void switch_designated_contact_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_TOUCH_LONG:
         // delete
         //change color
-        gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x\n", (uint32_t *)obj);
+        gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x\n", obj);
         switch_contacts_list_delete->base.not_show = !switch_contacts_list_delete->base.not_show;
         for (int j = 0; j < contacts_num; j ++)
         {

@@ -8,6 +8,11 @@
 #include "app_gui_main.h"
 #include "gui_tabview.h"
 #include "gui_obj.h"
+#include "gui_img_scope.h"
+#include "gui_common.h"
+#ifndef _WIN32
+#include "app_task.h"
+#endif
 
 #define MODE_SOURCE true
 #define MODE_SINK false
@@ -24,46 +29,70 @@ gui_win_t *win_menu_buds  = NULL;
 gui_win_t *win_menu_phone = NULL;
 gui_win_t *win_menu_setting = NULL;
 
-//static void curtain_down_menu_update_cb(void *obj)
-//{
-//    gui_log("curtain_down_menu_update_cb\n");
-//    if (cfg_mode == MODE_SOURCE)
-//    {
-//        switch_menu_buds->base.not_show = false;
-
-//        switch_menu_phone->base.x = 51;
-//        switch_menu_phone->base.y = 177;
-//    }
-//    else
-//    {
-//        switch_menu_buds->base.not_show = true;
-
-//        switch_menu_phone->base.x = 177;
-//        switch_menu_phone->base.y = 177;
-//    }
-//}
 
 static void switch_menu_bluetooth_released_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_menu_bluetooth_released_cb\n");
-    if (switch_menu_bluetooth->ifon)
-    {
-        switch_menu_buds->base.not_show = false;
-        switch_menu_phone->base.not_show = false;
-        switch_menu_setting->base.not_show = false;
-    }
-    else
-    {
-        switch_menu_buds->base.not_show = true;
-        switch_menu_phone->base.not_show = true;
-        switch_menu_setting->base.not_show = true;
-    }
+    gui_log("switch_menu_bluetooth_released_cb, event = %d\n", event);
 
+#ifndef _WIN32
+    T_AUDIO_SUPPORT audio_support = gui_get_audio_support();
+    //turn on bluetooth
+    switch (event)
+    {
+    case GUI_EVENT_1:
+        gui_obj_show(switch_menu_phone, true);
+        gui_obj_show(switch_menu_setting, true);
+        if (audio_support >= AUDIO_SUPPORT_SOURCE)
+        {
+            gui_obj_show(switch_menu_buds, true);
+            switch_menu_phone->base.x = 51;
+        }
+        else
+        {
+            gui_obj_show(switch_menu_buds, false);
+            switch_menu_phone->base.x = 177;
+        }
+        // send to app task
+        app_bt_policy_event_handle(EVENT_BT_STARTUP, NULL);
+
+        break;
+    //turn off bluetooth
+    case GUI_EVENT_2:
+        gui_obj_show(switch_menu_phone, false);
+        gui_obj_show(switch_menu_setting, true);
+        if (audio_support >= AUDIO_SUPPORT_SOURCE)
+        {
+            gui_obj_show(switch_menu_buds, false);
+            switch_menu_phone->base.x = 51;
+        }
+        else
+        {
+            gui_obj_show(switch_menu_buds, false);
+            switch_menu_phone->base.x = 177;
+        }
+        // send to app task
+        app_bt_policy_event_handle(EVENT_BT_IDLE, NULL);
+        break;
+
+    default:
+        break;
+    }
+#endif
 }
 
 static void switch_menu_buds_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_buds_released_cb\n");
+#ifndef _WIN32
+    if (app_db.audio_play_mode != MODE_APP_A2DP_SRC)
+    {
+        T_IO_MSG set_mode_msg;
+        set_mode_msg.type = IO_MSG_TYPE_WRISTBNAD;
+        set_mode_msg.subtype = IO_MSG_SET_PLAY_MODE;
+        set_mode_msg.u.param = MODE_APP_A2DP_SRC;
+        app_send_msg_to_apptask(&set_mode_msg);
+    }
+#endif
     tabview_main->base.not_show = true;
     if (win_menu_buds == NULL)
     {
@@ -77,6 +106,28 @@ static void switch_menu_buds_released_cb(void *obj, gui_event_t event)
 static void switch_menu_phone_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_phone_released_cb\n");
+#ifndef _WIN32
+    uint8_t app_bond_phone_index = app_bt_bond_check_exist_device_info(T_DEVICE_TYPE_PHONE);
+    if (app_bond_phone_index != 0xff && !app_db.bond_device[app_bond_phone_index].used)
+    {
+        if (app_audio_cfg.support_sink && (app_db.audio_play_mode == MODE_NONE))//sink only
+        {
+            T_IO_MSG set_mode_msg;
+            set_mode_msg.type = IO_MSG_TYPE_WRISTBNAD;
+            set_mode_msg.subtype = IO_MSG_SET_PLAY_MODE;
+            set_mode_msg.u.param = MODE_APP_A2DP_SNK;
+            app_send_msg_to_apptask(&set_mode_msg);
+        }
+        else
+        {
+            T_IO_MSG con_msg;
+            con_msg.type = IO_MSG_TYPE_WRISTBNAD;
+            con_msg.subtype = IO_MSG_CONNECT_PHONE;
+            con_msg.u.buf = app_db.bond_device[app_bond_phone_index].bd_addr;
+            app_send_msg_to_apptask(&con_msg);
+        }
+    }
+#endif
     tabview_main->base.not_show = true;
     if (win_menu_phone == NULL)
     {
@@ -145,12 +196,43 @@ void design_curtain_menu(void *parent)
     gui_obj_add_event_cb(switch_menu_setting, (gui_event_cb_t)switch_menu_setting_released_cb,
                          GUI_EVENT_2, NULL);
 
-    switch_menu_buds->base.not_show = true;
-    switch_menu_phone->base.not_show = true;
-    switch_menu_setting->base.not_show = true;
-
-
-    gui_curtain_t *curtain_left_menu = gui_curtain_create(ct, "curtain_left_menu", 0, 0, 454, 454,
-                                                          CURTAIN_LEFT, 1.0f);
-    gui_img_create_from_mem(curtain_left_menu, "xxx", WATCH_BASE_GREY_70_ALPHA_BIN, 0, 0, 454, 454);
+#ifndef _WIN32
+    //get bt status
+    T_STATE bt_status = gui_get_bt_status();
+    T_AUDIO_SUPPORT audio_support = gui_get_audio_support();
+    if (bt_status == STATE_INIT)
+    {
+        switch_menu_bluetooth->ifon = false;
+        gui_obj_show(switch_menu_phone, false);
+        gui_obj_show(switch_menu_setting, true);
+        //get sink\source mode
+        if (audio_support >= AUDIO_SUPPORT_SOURCE)
+        {
+            gui_obj_show(switch_menu_buds, false);
+            switch_menu_phone->base.x = 51;
+        }
+        else
+        {
+            gui_obj_show(switch_menu_buds, false);
+            switch_menu_phone->base.x = 177;
+        }
+    }
+    else
+    {
+        switch_menu_bluetooth->ifon = true;
+        gui_obj_show(switch_menu_phone, true);
+        gui_obj_show(switch_menu_setting, true);
+        //get sink\source mode
+        if (audio_support >= AUDIO_SUPPORT_SOURCE)
+        {
+            gui_obj_show(switch_menu_buds, true);
+            switch_menu_phone->base.x = 51;
+        }
+        else
+        {
+            gui_obj_show(switch_menu_buds, false);
+            switch_menu_phone->base.x = 177;
+        }
+    }
+#endif
 }

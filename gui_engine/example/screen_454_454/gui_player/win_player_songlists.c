@@ -7,39 +7,123 @@
 #include "gui_win.h"
 #include "gui_tabview.h"
 #include "gui_switch.h"
+#include "gui_scroll_text.h"
+#include "gui_pagelistview.h"
+#include "gui_pagelist.h"
+#ifndef _WIN32
+#include "fs_if.h"
+#include "app_task.h"
+#include "gui_interface.h"
+#endif
 
-gui_text_t *text_song_list_title = NULL;
-gui_text_t *text_song[3] = {NULL};
+#define MAX_SHOW_FILE_LIST_NUM 4
+
 gui_win_t *win_song_lists = NULL;
 gui_win_t *win_song_lists_back = NULL;
-gui_switch_t *switch_song_files[3] = {NULL};
-gui_switch_t *switch_song_delete = NULL;
+gui_switch_t *switch_song_files[MAX_SHOW_FILE_LIST_NUM] = {NULL};
+gui_scroll_text_t *scroll_text_pagelist_song[MAX_SHOW_FILE_LIST_NUM] = {NULL};
 gui_img_t *img_song_list_back = NULL;
-extern gui_win_t *win_confirm;
+gui_text_t *text_song_list_title = NULL;
 
-char *txet_delete_songs = "确认删除歌曲？";
-char *song_files_name[3] = {"song name 1", "song name 2", "song name 3"};
 
-//if current view has a "delete icon", need to set delete info before create a win_delete
-static void switch_song_delete_yes_action(void *obj)
+gui_pagelistview_t *pagelistview_song = NULL;
+gui_pagelist_t *pagelist_song = NULL;
+static int8_t show_num = MAX_SHOW_FILE_LIST_NUM;
+static int16_t real_num;
+static int16_t list_gap_y = 20;
+static int16_t slide_index = 0;
+static int16_t play_index = 0;
+
+#define MAX_NAME_LEN        50
+#ifndef _WIN32
+extern T_HEAD_INFO  *header_info;
+T_HEAD_INFO  *header_info = (T_HEAD_INFO *)(MUSIC_HEADER_BIN_ADDR +
+                                            FS_HEADER_INFO_START);
+//delete songs by ble/spp transfer,header bin total num is not updated
+uint16_t  *song_count = (uint16_t *)MUSIC_HEADER_BIN_ADDR;
+#endif
+
+
+static uint8_t utf8_name[MAX_SHOW_FILE_LIST_NUM][MAX_NAME_LEN];
+
+#ifndef _WIN32
+uint16_t get_song_count(void)
 {
-    gui_log("switch_song_delete_yes_action, obj = 0x%x\n", (uint32_t *)obj);
-    //delete selected record file
+    return *song_count;
 }
-static void switch_song_delete_no_action(void *obj)
-{
-    gui_log("switch_song_delete_no_action, obj = 0x%x\n", (uint32_t *)obj);
-    win_song_lists->base.not_show = false;
+#endif
 
-    gui_tree_free(win_confirm);
-    win_confirm = NULL;
-    //do nothing
+void play_next_music(void)
+{
+#ifndef _WIN32
+    play_index++;
+
+    if (play_index >= *song_count)
+    {
+        play_index = 0;
+    }
+
+    APP_PRINT_INFO2("play next:play_index = %d, song_count = %d",
+                    play_index, (*song_count));
+
+    T_IO_MSG play_msg;
+    play_msg.type = IO_MSG_TYPE_WRISTBNAD;
+    play_msg.subtype = IO_MSG_PLAY_BY_NAME;
+    play_msg.u.param = (uint32_t)(header_info + play_index);
+    app_send_msg_to_apptask(&play_msg);
+#endif
 }
-//static void switch_song_delete_text(void *obj)
-//{
-//    gui_log("switch_song_delete_text, obj = 0x%x\n", obj);
-//    // set delete text
-//}
+
+void play_prev_music(void)
+{
+#ifndef _WIN32
+    play_index--;
+
+    if (play_index <= 0)
+    {
+        play_index = 0;
+    }
+    APP_PRINT_INFO2("play prev:play_num = %d, song_count = %d,",
+                    play_index, (*song_count));
+
+    T_IO_MSG play_msg;
+    play_msg.type = IO_MSG_TYPE_WRISTBNAD;
+    play_msg.subtype = IO_MSG_PLAY_BY_NAME;
+    play_msg.u.param = (uint32_t)(header_info + play_index);
+    app_send_msg_to_apptask(&play_msg);
+#endif
+}
+
+void play_select_music(uint16_t index)
+{
+#ifndef _WIN32
+    play_index = index;
+
+    if (play_index <= 0)
+    {
+        play_index = 0;
+    }
+    if (play_index >= *song_count)
+    {
+        play_index = 0;
+    }
+    APP_PRINT_INFO2("play select:play_num = %d, song_count = %d,",
+                    play_index, (*song_count));
+
+    T_IO_MSG play_msg;
+    play_msg.type = IO_MSG_TYPE_WRISTBNAD;
+    play_msg.subtype = IO_MSG_PLAY_BY_NAME;
+    play_msg.u.param = (uint32_t)(header_info + play_index);
+    app_send_msg_to_apptask(&play_msg);
+#endif
+}
+
+#ifndef _WIN32
+T_HEAD_INFO *get_cur_play_header_info(void)
+{
+    return (header_info + play_index);
+}
+#endif
 
 static void switch_song_back_cb(void *obj, gui_event_t event)
 {
@@ -47,12 +131,12 @@ static void switch_song_back_cb(void *obj, gui_event_t event)
     switch (event)
     {
     case GUI_EVENT_TOUCH_RELEASED:
-        //if (win_song_lists != NULL)
+        if (win_song_lists != NULL)
         {
             gui_tree_free(win_song_lists);
             win_song_lists = NULL;
+            gui_obj_show(tabview_main, true);
         }
-        gui_obj_show(tabview_main, true);
         break;
 
     default:
@@ -62,90 +146,185 @@ static void switch_song_back_cb(void *obj, gui_event_t event)
 
 static void switch_song_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_song_1_cb event = %d\n", (uint32_t *)event);
-    //gui_switch_t *this = (gui_switch_t *)obj;
+    gui_log("switch_song_1_cb event = %d\n", event);
     gui_app_t *app = get_app_watch_ui();
-    extern gui_win_t *win_confirm;
     gui_obj_t *object_return = NULL;
+    gui_switch_t *this = (gui_switch_t *)obj;
 
     switch (event)
     {
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
-        gui_tree_free(win_song_lists);
-        win_song_lists = NULL;
-
-        object_return = pop_current_widget();
-        gui_obj_show(object_return, true);
-        break;
-    case GUI_EVENT_TOUCH_LONG:
-        gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x\n", (uint32_t *)obj);
-        switch_song_delete->base.not_show = true;
-        for (int j = 0; j < 3; j ++)
         {
-            gui_log("GUI_EVENT_TOUCH_LONG obj = 0x%x, j = %d, long touch = %d\n", switch_song_files[j], j,
-                    switch_song_files[j]->long_touch_state);
-            if (switch_song_files[j]->long_touch_state)
+            if (win_song_lists == NULL)
             {
-                switch_song_delete->base.not_show = false;
+                break;
             }
+            gui_tree_free(win_song_lists);
+            win_song_lists = NULL;
+
+            object_return = pop_current_widget();
+            if (object_return)
+            {
+                gui_obj_show(object_return, true);
+            }
+            uint8_t i;
+            for (i = 0; i < MAX_SHOW_FILE_LIST_NUM; i++)
+            {
+                if (switch_song_files[i] == this)
+                {
+                    break;
+                }
+            }
+            int16_t m = slide_index / MAX_SHOW_FILE_LIST_NUM;
+            int16_t n = slide_index % MAX_SHOW_FILE_LIST_NUM;
+            int16_t index_to_play;
+            if (i < n)
+            {
+                index_to_play = (m + 1) * 4 + i;
+            }
+            else
+            {
+                index_to_play = m * 4 + i;
+            }
+
+            play_select_music(index_to_play);
         }
         break;
-
     default:
         break;
     }
 }
 
-static void switch_song_delete_cb(void *obj, gui_event_t event)
+static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_t *list_first)
 {
-    gui_log("switch_song_3_cb event = %d\n", event);
-    extern gui_win_t *win_confirm;
-    gui_app_t *app = get_app_watch_ui();
+    gui_log("pagelist_test_update_list_first_cb, list_first = 0x%x\n", list_first);
 
-    switch (event)
+#ifndef _WIN32
+    slide_index++;
+    if (slide_index > 0x7FFF  - MAX_SHOW_FILE_LIST_NUM)
     {
-    case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
-    case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
-        //create delete window, set delete action
-        if (!switch_song_delete->base.not_show)
-        {
-            if (win_confirm != NULL)
-            {
-                gui_tree_free(win_confirm);
-                win_confirm = NULL;
-                set_confirm_yes(NULL, NULL);
-                set_confirm_no(NULL, NULL);
-                set_confirm_text(NULL, 0, 0, 0);
-            }
-            win_confirm = gui_win_create(&(app->screen), "win_confirm", 0, 0, LCD_W, LCD_H);
-
-            set_confirm_yes(switch_song_delete_yes_action, NULL);
-            set_confirm_no(switch_song_delete_no_action, NULL);
-            set_confirm_text(txet_delete_songs, 123, 131, 7);
-
-            void design_win_confirm(void *parent);
-            design_win_confirm(win_confirm);
-            gui_obj_show(win_confirm, true);
-        }
-        push_current_widget(win_song_lists);
-        win_song_lists->base.not_show = true;
-        break;
-
-    default:
-        break;
+        slide_index = 0x7FFF  - MAX_SHOW_FILE_LIST_NUM;
     }
+
+    if (*(uint16_t *)MUSIC_HEADER_BIN_ADDR != 0xFFFF)
+    {
+        unicode_to_utf8(utf8_name[(slide_index - 1) % 4], MAX_NAME_LEN - 1, \
+                        (uint16_t *)(MUSIC_NAME_BIN_ADDR + header_info[MAX_SHOW_FILE_LIST_NUM - 1 + slide_index].offset), \
+                        header_info[MAX_SHOW_FILE_LIST_NUM - 1 + slide_index].length / 2);
+
+        gui_scroll_text_set(scroll_text_pagelist_song[(slide_index - 1) % 4],
+                            (void *)utf8_name[(slide_index - 1) % 4],
+                            "rtk_font_mem", APP_COLOR_WHITE, strlen((const char *)utf8_name[(slide_index - 1) % 4]), FONT_H_32);
+    }
+#endif
+}
+
+static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t *list_last)
+{
+    gui_log("pagelist_test_update_list_last_cb, list_first = 0x%x\n", list_last);
+
+#ifndef _WIN32
+    slide_index--;
+    if (slide_index < 0)
+    {
+        slide_index = 0;
+    }
+
+    if (*(uint16_t *)MUSIC_HEADER_BIN_ADDR != 0xFFFF)
+    {
+        unicode_to_utf8(utf8_name[slide_index % 4], MAX_NAME_LEN - 1, \
+                        (uint16_t *)(MUSIC_NAME_BIN_ADDR + header_info[slide_index].offset), \
+                        header_info[slide_index].length / 2);
+
+        gui_scroll_text_set(scroll_text_pagelist_song[slide_index % 4],
+                            (void *)utf8_name[slide_index % 4],
+                            "rtk_font_mem", APP_COLOR_WHITE, strlen((const char *)utf8_name[slide_index % 4]), FONT_H_32);
+    }
+#endif
 }
 
 
 void design_win_song_lists(gui_win_t *parent)
 {
     char *string_song_list_title = "播放列表";
-    //char *string_song_1 = "Feels";
-    //char *string_song_2 = "Atentions";
-    //char *string_song_3 = "Hello";
     int font_size = 32;
 
+#ifndef _WIN32
+    if (*(uint16_t *)MUSIC_HEADER_BIN_ADDR != 0xFFFF)
+    {
+        for (uint8_t i = 0; i < MAX_SHOW_FILE_LIST_NUM; i++)
+        {
+            if (i >= *(uint16_t *)MUSIC_HEADER_BIN_ADDR)
+            {
+                break;
+            }
+            memset(utf8_name[i], 0, MAX_NAME_LEN);
+            unicode_to_utf8(utf8_name[i], MAX_NAME_LEN - 1, \
+                            (uint16_t *)(MUSIC_NAME_BIN_ADDR + header_info[i].offset), \
+                            header_info[i].length / 2);
+        }
+
+        real_num = *(uint16_t *)MUSIC_HEADER_BIN_ADDR;
+    }
+#endif
+
+    img_song_list_back = gui_img_create_from_mem(parent, "img_back", ICON_BACK_BIN, 131, 24,
+                                                 48, 48);
+    text_song_list_title = gui_text_create(parent, "text_song_list_title", 177, 30,
+                                           strlen(string_song_list_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
+    gui_text_set(text_song_list_title, string_song_list_title, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                 strlen(string_song_list_title), font_size);
+    //mask should be the brother of pagelistview
+    //mask image rgb should be larger than 00 00 00
+    pagelistview_song = gui_pagelistview_create(parent, "pagelistview", 0, 0, LCD_W, LCD_H);
+    gui_img_t *img_top_mask = gui_img_create_from_mem(parent, "top_mask", WATCH_BASE_MASK_BLACK_BIN, 0,
+                                                      0,
+                                                      LCD_W, 100);
+    gui_img_t *img_bottom_mask = gui_img_create_from_mem(parent, "bottom_mask",
+                                                         WATCH_BASE_MASK_BLACK_BIN,
+                                                         0, 354, LCD_W, 100);
+
+    gui_pagelistview_add_top_mask(pagelistview_song, img_top_mask);
+    gui_pagelistview_add_bottom_mask(pagelistview_song, img_bottom_mask);
+
+    pagelist_song = gui_pagelist_create(pagelistview_song, "pagelist", 0, 0, LCD_W, LCD_H);
+
+#ifndef _WIN32
+    for (int8_t i = 0; i < MAX_SHOW_FILE_LIST_NUM; i++)
+    {
+        if (i >= *(uint16_t *)MUSIC_HEADER_BIN_ADDR)
+        {
+            break;
+        }
+        switch_song_files[i] = gui_switch_create(pagelist_song, 83, 111 + i * (list_gap_y + 64), 288, 64,
+                                                 ICON_TEXT_BASE_DARK_BIN, ICON_TEXT_BASE_DARK_BIN);
+        switch_song_files[i]->off_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
+        switch_song_files[i]->on_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
+        //add touch event callback
+        //GUI_EVENT_1 for switch is off(turn-on action)
+        //GUI_EVENT_2 for switch is on(turn-off action)
+        gui_obj_add_event_cb(switch_song_files[i], (gui_event_cb_t)switch_song_cb, GUI_EVENT_1, NULL);
+        gui_obj_add_event_cb(switch_song_files[i], (gui_event_cb_t)switch_song_cb, GUI_EVENT_2, NULL);
+
+        if (*(uint16_t *)MUSIC_HEADER_BIN_ADDR != 0xFFFF)
+        {
+            scroll_text_pagelist_song[i] = gui_scroll_text_create(switch_song_files[i],
+                                                                  "scroll_text_record_files", 10, 12, 268, FONT_H_32);
+            gui_scroll_text_set(scroll_text_pagelist_song[i], (void *)utf8_name[i],
+                                GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen((const char *)utf8_name[i]), FONT_H_32);
+            gui_scroll_text_scroll_set(scroll_text_pagelist_song[i], SCROLL_X, 0, 0, 5000, 0);
+        }
+    }
+#endif
+
+    gui_pagelist_set_att(pagelist_song, real_num, show_num, list_gap_y, switch_song_files[0],
+                         switch_song_files[MAX_SHOW_FILE_LIST_NUM - 1]);
+    //pagelist_test->show_border_bottom = 354;
+    //pagelist_test->show_border_top = 100;
+    gui_pagelist_add_list_update_cb(pagelist_song,
+                                    (gui_pagelist_update_cb_t)pagelist_test_update_list_first_cb,
+                                    (gui_pagelist_update_cb_t)pagelist_test_update_list_last_cb);
 
     win_song_lists_back = gui_win_create(parent, "win_song_lists_back", 131, 24, 176, 48);
     gui_obj_add_event_cb(win_song_lists_back, (gui_event_cb_t)switch_song_back_cb,
@@ -158,36 +337,7 @@ void design_win_song_lists(gui_win_t *parent)
     gui_text_set(text_song_list_title, string_song_list_title, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(string_song_list_title), font_size);
 
-    for (uint8_t i = 0; i < 3; i++)
-    {
-        switch_song_files[i] = gui_switch_create(parent, 83, 111 + i * 82, 288, 64, ICON_TEXT_BASE_DARK_BIN,
-                                                 ICON_TEXT_BASE_DARK_BIN);
-        switch_song_files[i]->off_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
-        switch_song_files[i]->on_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
-        switch_song_files[i]->long_touch_enable = true;
-        switch_song_files[i]->long_touch_state_pic_addr = ICON_TEXT_BASE_RED_BIN;
-        switch_song_files[i]->long_touch_state_hl_pic_addr = ICON_TEXT_BASE_BLUE_BIN;
-        //add touch event callback
-        //GUI_EVENT_1 for switch is off(turn-on action)
-        //GUI_EVENT_2 for switch is on(turn-off action)
-        gui_obj_add_event_cb(switch_song_files[i], (gui_event_cb_t)switch_song_cb, GUI_EVENT_1, NULL);
-        gui_obj_add_event_cb(switch_song_files[i], (gui_event_cb_t)switch_song_cb, GUI_EVENT_2, NULL);
-        gui_obj_add_event_cb(switch_song_files[i], (gui_event_cb_t)switch_song_cb, GUI_EVENT_TOUCH_LONG,
-                             NULL);
+    slide_index = 0;
 
-        text_song[i] = gui_text_create(parent, "text_songs", 100, 123 + i * 82,
-                                       strlen(song_files_name[i]) * FONT_NUM_ALPHA_W, font_size);
-        gui_text_set(text_song[i], song_files_name[i], GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                     strlen(song_files_name[i]), font_size);
-    }
-
-    switch_song_delete = gui_switch_create(parent, 88, 373, 277, 81,
-                                           ICON_RECORD_DELETE_BIN, ICON_RECORD_DELETE_BIN);
-    switch_song_delete->on_hl_pic_addr = ICON_RECORD_DELETE_TOUCH_BIN;
-    switch_song_delete->off_hl_pic_addr = ICON_RECORD_DELETE_TOUCH_BIN;
-    gui_obj_add_event_cb(switch_song_delete, (gui_event_cb_t)switch_song_delete_cb, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(switch_song_delete, (gui_event_cb_t)switch_song_delete_cb, GUI_EVENT_2, NULL);
-    switch_song_delete->base.not_show = true;
 }
-
 

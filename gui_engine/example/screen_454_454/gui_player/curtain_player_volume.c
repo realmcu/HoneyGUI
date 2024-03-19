@@ -5,6 +5,10 @@
 #include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_switch.h"
+#ifndef _WIN32
+#include "app_task.h"
+#include "app_mmi.h"
+#endif
 
 gui_curtain_t *curtain_down_player_vol = NULL;
 gui_img_t *img_base_player_vol = NULL;
@@ -12,21 +16,49 @@ gui_img_t *img_vol_bar = NULL;
 gui_switch_t *switch_vol_down = NULL;
 gui_switch_t *switch_vol_up = NULL;
 
-static void switch_player_vol_touch_cb(void *obj, gui_event_t event)
+static void switch_player_vol_up_touch_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_play_pause_touch_cb\n");
+    gui_log("switch_player_vol_up_touch_cb\n");
 
     //char *string_record_title;
     switch (event)
     {
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
-        //todo: add record stop action
+    case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
+        {
+#ifndef _WIN32
+            T_IO_MSG play_msg;
+            play_msg.type = IO_MSG_TYPE_WRISTBNAD;
+            play_msg.subtype = IO_MSG_MMI;
+            play_msg.u.param = MMI_DEV_SPK_VOL_UP;
+            app_send_msg_to_apptask(&play_msg);
+#endif
+        }
         break;
 
+    default:
+        break;
+    }
+}
 
+static void switch_player_vol_down_touch_cb(void *obj, gui_event_t event)
+{
+    gui_log("switch_player_vol_down_touch_cb\n");
+
+    //char *string_record_title;
+    switch (event)
+    {
+    case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
-
-        //todo: add record start action
+        {
+#ifndef _WIN32
+            T_IO_MSG play_msg;
+            play_msg.type = IO_MSG_TYPE_WRISTBNAD;
+            play_msg.subtype = IO_MSG_MMI;
+            play_msg.u.param = MMI_DEV_SPK_VOL_DOWN;
+            app_send_msg_to_apptask(&play_msg);
+#endif
+        }
         break;
 
     default:
@@ -52,9 +84,9 @@ void design_curtain_player_vol(void *parent)
     //add touch event callback
     //GUI_EVENT_1 for switch is off(turn-on action)
     //GUI_EVENT_2 for switch is on(turn-off action)
-    gui_obj_add_event_cb(switch_vol_down, (gui_event_cb_t)switch_player_vol_touch_cb, GUI_EVENT_1,
+    gui_obj_add_event_cb(switch_vol_down, (gui_event_cb_t)switch_player_vol_down_touch_cb, GUI_EVENT_1,
                          NULL);
-    gui_obj_add_event_cb(switch_vol_down, (gui_event_cb_t)switch_player_vol_touch_cb, GUI_EVENT_2,
+    gui_obj_add_event_cb(switch_vol_down, (gui_event_cb_t)switch_player_vol_down_touch_cb, GUI_EVENT_2,
                          NULL);
 
     switch_vol_up = gui_switch_create(curtain_down_player_vol, 375, 46, 48, 48, ICON_VOLUME_UP_BIN,
@@ -64,7 +96,9 @@ void design_curtain_player_vol(void *parent)
     //add touch event callback
     //GUI_EVENT_1 for switch is off(turn-on action)
     //GUI_EVENT_2 for switch is on(turn-off action)
-    gui_obj_add_event_cb(switch_vol_up, (gui_event_cb_t)switch_player_vol_touch_cb, GUI_EVENT_1, NULL);
-    gui_obj_add_event_cb(switch_vol_up, (gui_event_cb_t)switch_player_vol_touch_cb, GUI_EVENT_2, NULL);
+    gui_obj_add_event_cb(switch_vol_up, (gui_event_cb_t)switch_player_vol_up_touch_cb, GUI_EVENT_1,
+                         NULL);
+    gui_obj_add_event_cb(switch_vol_up, (gui_event_cb_t)switch_player_vol_up_touch_cb, GUI_EVENT_2,
+                         NULL);
 
 }

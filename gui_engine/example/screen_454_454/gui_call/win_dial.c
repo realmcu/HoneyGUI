@@ -7,6 +7,10 @@
 #include "gui_curtainview.h"
 #include "gui_app.h"
 #include "gui_win.h"
+#ifndef _WIN32
+#include "app_task.h"
+#include "app_mmi.h"
+#endif
 
 #define GUI_DIAL_NUM_MAX 24
 #define BUFFER_DIAL_NUM_MAX 64
@@ -26,6 +30,7 @@ void *icon_dial_num_touch_bin[10] = {ICON_DIAL_TOUCH_0_BIN, ICON_DIAL_TOUCH_1_BI
                                     };
 
 char buffer_dial_num[BUFFER_DIAL_NUM_MAX];
+//for gui
 char *p_display_dial_num = buffer_dial_num;
 int8_t dial_num_index = 0;
 
@@ -154,6 +159,16 @@ static void switch_dial_outgoing_call_touch_cb(void *obj, gui_event_t event)
 
     push_current_widget(win_dial);
     gui_obj_show(win_dial, false);
+#ifndef _WIN32
+    //set dial num
+    set_dial_num(buffer_dial_num);
+    //send msg to app task
+    T_IO_MSG outgoing_call_msg;
+    outgoing_call_msg.type = IO_MSG_TYPE_WRISTBNAD;
+    outgoing_call_msg.subtype = IO_MSG_MMI;
+    outgoing_call_msg.u.param = MMI_HF_OUTGOING_CALL;
+    app_send_msg_to_apptask(&outgoing_call_msg);
+#endif
 }
 
 void design_win_dial(void *parent)

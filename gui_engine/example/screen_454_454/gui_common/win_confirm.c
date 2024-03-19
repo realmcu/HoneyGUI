@@ -1,6 +1,7 @@
 #include "root_image/ui_resource.h"
 #include "gui_common.h"
 #include "gui_curtainview.h"
+#include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_switch.h"
@@ -65,16 +66,34 @@ void set_confirm_text(char *confirm_text_display, int16_t x, int16_t y, uint16_t
     text_display.length = length;
 }
 
-static void img_success_animate_callback(gui_img_t *img)
+
+static void img_success_touch_cb(void *obj, gui_event_t event)
 {
-    gui_log("img_success_animate_callback");
-    if (img->animate->progress_percent == 1.0f)
+    gui_log("img_success_touch_cb");
+    if (event == GUI_EVENT_TOUCH_CLICKED)
     {
-        img->animate->dur = 0;
-        win_confirm->base.not_show = true;
         gui_obj_t *object_return = pop_current_widget();
         gui_obj_show(object_return, true);
-        // to do free
+        if (win_confirm != NULL)
+        {
+            gui_tree_free(win_confirm);
+            win_confirm = NULL;
+        }
+    }
+}
+
+static void img_fail_touch_cb(void *obj, gui_event_t event)
+{
+    gui_log("img_fail_touch_cb");
+    if (event == GUI_EVENT_TOUCH_CLICKED)
+    {
+        gui_obj_t *object_return = pop_current_widget();
+        gui_obj_show(object_return, true);
+        if (win_confirm != NULL)
+        {
+            gui_tree_free(win_confirm);
+            win_confirm = NULL;
+        }
     }
 }
 
@@ -85,18 +104,21 @@ static void img_loading_animate_callback(gui_img_t *img)
     gui_img_rotation(img, 360 * img->animate->progress_percent, img->base.w / 2, img->base.h / 2);
     if (img->animate->progress_percent == 1.0f)
     {
-        bool test_flag = 1;
+        bool test_flag = 1;//todo
         img->animate->dur = 0;
         if (test_flag)
         {
             img_success = gui_img_create_from_mem(win_confirm, "img_success", ICON_SUCCESS_BIN, 163, 163,
                                                   128, 128);
-            gui_img_set_animate(img_success, 500, 0, img_success_animate_callback, img_success);
+            gui_obj_add_event_cb(img_success, (gui_event_cb_t)img_success_touch_cb, GUI_EVENT_TOUCH_CLICKED,
+                                 NULL);
         }
         else
         {
             img_fail = gui_img_create_from_mem(win_confirm, "img_fail", ICON_FAIL_BIN, 163, 163,
                                                128, 128);
+            gui_obj_add_event_cb(img_success, (gui_event_cb_t)img_fail_touch_cb, GUI_EVENT_TOUCH_CLICKED,
+                                 NULL);
         }
     }
 }
@@ -121,7 +143,8 @@ static void switch_confirm_yes_touch_cb(void *obj, gui_event_cb_t event)
     text_confirm = gui_text_create(win_confirm, "text_confirm", text_display.x, text_display.y,
                                    text_display.length * 32, FONT_H_32);
     gui_text_set(text_confirm, text_display.text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                 (text_display.length * 3), FONT_H_32);
+                 (text_display.length * 3),
+                 FONT_H_32);
     win_confirm_action.confirm_yes_action(win_confirm_action.yes_action_obj);
 
     gui_obj_show(switch_confirm_yes, false);
@@ -136,10 +159,16 @@ static void switch_confirm_no_touch_cb(void *obj, gui_event_cb_t event)
 {
     gui_log("switch_confirm_no_touch_cb\n");
     win_confirm_action.confirm_no_action(win_confirm_action.no_action_obj);
-
+    gui_obj_t *object_return = pop_current_widget();
+    gui_obj_show(object_return, true);
     set_confirm_yes(NULL, NULL);
     set_confirm_no(NULL, NULL);
     set_confirm_text(NULL, 0, 0, 0);
+    if (win_confirm != NULL)
+    {
+        gui_tree_free(win_confirm);
+        win_confirm = NULL;
+    }
 }
 
 //static void text_confirm_update_cb(void *obj)
@@ -154,7 +183,8 @@ void design_win_confirm(void *parent)
     text_confirm = gui_text_create(parent, "text_confirm", text_display.x, text_display.y,
                                    text_display.length * 32, FONT_H_32);
     gui_text_set(text_confirm, text_display.text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                 (text_display.length * 3), FONT_H_32);
+                 (text_display.length * 3),
+                 FONT_H_32);
 
     switch_confirm_yes = gui_switch_create(parent, 75, 249, 96, 96, ICON_CONFIRM_BIN, ICON_CONFIRM_BIN);
     switch_confirm_yes->off_hl_pic_addr = ICON_CONFIRM_TOUCH_BIN;
