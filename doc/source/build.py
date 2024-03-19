@@ -24,7 +24,7 @@ def download_tools():
   tool_jira_id = "BTSOCGUI-213"
   print("Release build, need downd tools from {}".format(tool_jira_id))
   download_tool_list = list()
-  for file_name in ["Font Convert Tool", "ImageConverter"]:
+  for file_name in ["Font Convert Tool", "ImageConverter", "RVisualDesigner"]:
     tool_list = Jira().find_packages_from_jira(tool_jira_id, file_name)
     if not tool_list:
       sys.exit("Cannot find {} in {}".format(file_name, tool_jira_id))
@@ -33,7 +33,7 @@ def download_tools():
   return download_tool_list
 
 def add_download_link(download_tool_list):
-  if len(download_tool_list) != 2:
+  if len(download_tool_list) != 3:
     sys.exit("Invalid tool list: {}".format(download_tool_list))
   print("Start add download link")
   index_file = os.path.join(source_path, "tool/index.md")
@@ -46,8 +46,10 @@ def add_download_link(download_tool_list):
 Image Convert Tool: :download:`Image Convert Tool <../{}>`
 
 Font Convert Tool: :download:`Font Convert Tool <../{}>`
+
+RVisualDesigner Tool: :download:`RVisualDesigner Tool <../{}>`
 ```
-'''.format(download_tool_list[0], download_tool_list[1])
+'''.format(download_tool_list[0], download_tool_list[1], download_tool_list[2])
     stream = re.sub(r'(<!-- Add tool downlod link here -->\n)', lambda objs: objs.group(1) + download_link, stream, count=0, flags=re.M)
   with open(index_file, mode='w+', newline='', errors='surrogateescape') as fd:
     fd.write(stream)
