@@ -16,7 +16,7 @@
 #include "fmc_api_ext.h"
 #include "os_sync.h"
 
-#define USE_TESSALLATION 0
+#define USE_TESSALLATION 1
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
 
@@ -27,15 +27,21 @@ extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_re
 #endif
 
 #include "section.h"
-#define TEMP_BUF_SIZE           (40 * 1024)
-SHM_DATA_SECTION static uint8_t temp_buf[TEMP_BUF_SIZE];
+#if USE_TESSALLATION
+#define CACHE_BUF_SIZE           (40 * 1024)
+SHM_DATA_SECTION static uint8_t cache_buf1[CACHE_BUF_SIZE];
+static uint8_t *cache_buf = cache_buf1;
+#else
+#define CACHE_BUF_SIZE           (40 * 1024)
+SHM_DATA_SECTION static uint8_t cache_buf[CACHE_BUF_SIZE];
+#endif
 
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static uint32_t temp_buf_offset = 0;
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
-    if (p_rect->w * p_rect->h * pixel_size > TEMP_BUF_SIZE)
+    if (p_rect->w * p_rect->h * pixel_size > CACHE_BUF_SIZE)
     {
         return false;
     }
@@ -77,7 +83,7 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
         memset(GDMA_LLIStruct, 0, p_rect->h * sizeof(GDMA_LLIDef));
     }
     uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->width) * pixel_size;
-    uint32_t dest_address = (uint32_t)temp_buf + temp_buf_offset;
+    uint32_t dest_address = (uint32_t)cache_buf + temp_buf_offset;
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_ChannelTypeDef *dma_channel = DMA_CH_BASE(memcpy_dma_num);
     GDMA_InitTypeDef RX_GDMA_InitStruct;
@@ -185,9 +191,7 @@ static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
     range.end_line = p_rect->y + p_rect->h - 1;
     IMDC_DMA_config dma_cfg;
 
-    uint32_t dest_address = ((((uint32_t)temp_buf + temp_buf_offset + 63) >> 6) << 6);
-
-    dma_cfg.output_buf = (uint32_t *)dest_address;
+    dma_cfg.output_buf = (uint32_t *)cache_buf;
     dma_cfg.RX_DMA_channel_num = support_dma_num;
     dma_cfg.TX_DMA_channel_num = memcpy_dma_num;
     dma_cfg.RX_DMA_channel = DMA_CH_BASE(support_dma_num);
@@ -199,7 +203,7 @@ static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
     }
     else
     {
-        source->address = (uint32_t)dest_address;
+        source->address = (uint32_t)cache_buf;
         return true;
     }
 }
@@ -610,8 +614,78 @@ void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *s
     }
 }
 
+void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *dst,
+                           struct gui_dispdev *dc)
+{
+    memcpy(new_rect, dst, sizeof(ppe_rect_t));
+    float left = dst->x * 1.0f, right = (dst->x + dst->w - 1) * 1.0f;
+    float top = dst->y * 1.0f;
+    float bottom = (dst->y + dst->h - 1) * 1.0f;
+    float x_min = dc->fb_width, x_max = -1;
+    for (int i = 0; i < 4; i++)
+    {
+        float x;
+        if (image->line[i * 3] == 0)
+        {
+            continue;
+        }
+        else if (image->line[i * 3 + 1] == 0)
+        {
+            x = -image->line[i * 3 + 2];
+        }
+        else
+        {
+            x = (-image->line[i * 3 + 2] - image->line[i * 3 + 1] * top) / image->line[i * 3];
+        }
+        if (x < x_min)
+        {
+            x_min = x;
+        }
+        if (x > x_max)
+        {
+            x_max = x;
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        float x;
+        if (image->line[i * 3] == 0)
+        {
+            continue;
+        }
+        else if (image->line[i * 3 + 1] == 0)
+        {
+            x = -image->line[i * 3 + 2];
+        }
+        else
+        {
+            x = (-image->line[i * 3 + 2] - image->line[i * 3 + 1] * bottom) / image->line[i * 3];
+        }
+        if (x < x_min)
+        {
+            x_min = x;
+        }
+        if (x > x_max)
+        {
+            x_max = x;
+        }
+    }
+    if (x_min > left)
+    {
+        new_rect->x = floor(x_min);
+    }
+    if (x_max < right)
+    {
+        new_rect->w = ceil(x_max - new_rect->x) + 1;
+    }
+}
+
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect)
 {
+    if (dc->section.y2 < rect->y1 || dc->section.y1 > rect->y2)
+    {
+        return;
+    }
     if (image->opacity_value <= PPEV2_ACC_MIN_OPA)
     {
         return;
@@ -675,7 +749,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
             else if (header->algorithm_type.pixel_bytes == 2)
             {
-                source.format = PPEV2_ARGB8888;
+                source.format = PPEV2_ARGB8565;
             }
             else if (header->algorithm_type.pixel_bytes == 1)
             {
@@ -690,10 +764,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     default:
         return;
     }
+
+    bool shape_transform = true;
     if (image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
         image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
         image->matrix->m[2][1] == 0)
     {
+        shape_transform = false;
         if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1) || image->blend_mode == IMG_RECT)
         {
             if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format) ||
@@ -782,7 +859,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 else if (image->blend_mode == IMG_RECT)
                 {
                     gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
-                    PPEV2_Mask(&target, rect_header->color.color.rgba_full, &dst_rect);
+                    gui_color_t color;
+                    color.color.rgba_full = rect_header->color.color.rgba_full;
+                    color.color.rgba.a = rect_header->color.color.rgba.a * (image->opacity_value * 1.0f / 255);
+                    PPEV2_Mask(&target, color.color.rgba_full, &dst_rect);
 
                 }
                 return;
@@ -799,6 +879,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         else if (image->blend_mode == IMG_RECT)
         {
             mode = PPEV2_CONST_MASK_MODE;
+        }
+        else if (image->blend_mode == IMG_FILTER_BLACK)
+        {
+            mode = PPEV2_SRC_OVER_MODE;
         }
         else
         {
@@ -831,17 +915,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     (image->target_h + rect->y1 - 1);
     int32_t x_min = image->img_x < rect->x1 ? rect->x1 : image->img_x;
     int32_t y_min = image->img_y < rect->y1 ? rect->y1 : image->img_y;
-#if USE_TESSALLATION
-    int32_t tessalation_len = PPEV2_TESS_LENGTH;
-    uint32_t block_num = dc->fb_width / tessalation_len;
-    if (dc->fb_width % tessalation_len)
-    {
-        block_num++;
-    }
-#else
-    uint32_t tessalation_len = dc->fb_width; \
-    uint32_t block_num = 1;
-#endif
     if (image->blend_mode == IMG_FILTER_BLACK)
     {
         source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
@@ -868,6 +941,91 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     {
         return;
     }
+#if USE_TESSALLATION
+    int32_t tessalation_len = PPEV2_TESS_LENGTH;
+    uint32_t block_num = dc->fb_width / tessalation_len;
+    if (dc->fb_width % tessalation_len)
+    {
+        block_num++;
+    }
+    if (image->blend_mode == IMG_RECT)
+    {
+        tessalation_len = dc->fb_width;
+        block_num = 1;
+    }
+#else
+    uint32_t tessalation_len = dc->fb_width;
+    uint32_t block_num = 1;
+#endif
+    ppe_rect_t constraint, old_rect;
+    if (shape_transform && image->line != NULL)
+    {
+        ppe_rect_t section_rect = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
+        if (section_rect.x < 0)
+        {
+            section_rect.x = 0;
+        }
+        if (section_rect.y < 0)
+        {
+            section_rect.y = 0;
+        }
+        if (x_max >= dc->section.x1 + dc->fb_width)
+        {
+            section_rect.w = dc->section.x1 + dc->fb_width - section_rect.x;
+        }
+        else
+        {
+            section_rect.w = x_max - dc->section.x1 - section_rect.x + 1;
+        }
+        if (y_max >= dc->section.y1 + dc->fb_height)
+        {
+            section_rect.h = dc->fb_height - section_rect.y;
+        }
+        else
+        {
+            section_rect.h = y_max - dc->section.y1 - section_rect.y + 1;
+        }
+        section_rect.y += dc->section.y1;
+        acc_get_interact_area(image, &constraint, &section_rect, dc);
+    }
+    else
+    {
+        constraint = (ppe_rect_t) {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
+        if (constraint.x < 0)
+        {
+            constraint.x = 0;
+        }
+        if (constraint.y < 0)
+        {
+            constraint.y = 0;
+        }
+        if (x_max >= dc->section.x1 + dc->fb_width)
+        {
+            constraint.w = dc->section.x1 + dc->fb_width - constraint.x;
+        }
+        else
+        {
+            constraint.w = x_max - dc->section.x1 - constraint.x + 1;
+        }
+        if (y_max >= dc->section.y1 + dc->fb_height)
+        {
+            constraint.h = dc->fb_height - constraint.y;
+        }
+        else
+        {
+            constraint.h = y_max - dc->section.y1 - constraint.y + 1;
+        }
+        constraint.y += dc->section.y1;
+    }
+    bool ret = ppe_get_area(&old_rect, &constraint, (ppe_matrix_t *)image->inverse, &source);
+    if (ret)
+    {
+        if (old_rect.w * old_rect.h * PPEV2_Get_Pixel_Size(source.format) < CACHE_BUF_SIZE)
+        {
+            block_num = 1;
+            tessalation_len = dc->fb_width;
+        }
+    }
     for (int i = 0; i < block_num; i++)
     {
         int32_t section_x1 = tessalation_len * i;
@@ -876,8 +1034,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             tessalation_len = dc->fb_width % tessalation_len;
         }
-        if ((x_max < section_x1) || (y_max < section_y1)
-            || (x_min >= section_x1 + tessalation_len) || (y_min >= section_y1 + dc->fb_height))
+        if ((constraint.x + constraint.w <= section_x1) || (constraint.y + constraint.h <= section_y1)
+            || (constraint.x >= section_x1 + tessalation_len) || (constraint.y >= section_y1 + dc->fb_height))
         {
             continue;
         }
@@ -890,51 +1048,39 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         source.height = image->img_h;
         float x_ref = 0, y_ref = 0;
         uint32_t blend_area = 0;
-        ppe_rect_t ppe_rect = {.x = x_min - section_x1, .y = y_min - section_y1, .w = tessalation_len, .h = dc->fb_height};
-        if (ppe_rect.x < 0)
+        ppe_rect_t ppe_rect = {0};
+        memcpy(&ppe_rect, &constraint, sizeof(ppe_rect_t));
+        if (ppe_rect.x - section_x1 < 0)
         {
-            ppe_rect.x = 0;
+            ppe_rect.x = section_x1;
         }
-        if (ppe_rect.y < 0)
+        if (constraint.x + constraint.w > section_x1 + tessalation_len)
         {
-            ppe_rect.y = 0;
-        }
-        if (x_max >= section_x1 + tessalation_len)
-        {
-            ppe_rect.w = tessalation_len - ppe_rect.x;
+            ppe_rect.w = section_x1 + tessalation_len - ppe_rect.x;
         }
         else
         {
-            ppe_rect.w = x_max - section_x1 - ppe_rect.x + 1;
-        }
-        if (y_max >= section_y1 + dc->fb_height)
-        {
-            ppe_rect.h = dc->fb_height - ppe_rect.y;
-        }
-        else
-        {
-            ppe_rect.h = y_max - section_y1 - ppe_rect.y + 1;
+            ppe_rect.w = constraint.x + constraint.w - ppe_rect.x;
         }
         blend_area = ppe_rect.w * ppe_rect.h;
         ppe_matrix_t inverse;
         memcpy(&inverse, image->inverse, sizeof(float) * 9);
         ppe_matrix_t pre_trans;
-        ppe_rect.x += section_x1;
         if (mode != PPEV2_CONST_MASK_MODE)
         {
-            ppe_rect_t old_rect;
-            ppe_rect.y += section_y1;
-            bool ret = ppe_get_area(&old_rect, &ppe_rect, &inverse, &source);
-            if (!ret)
+            if (block_num != 1)
             {
-                //DBG_DIRECT("MAT err! addr %x, section %x", image->data, dc->section_count);
-                if (i == block_num - 1)
+                ret = ppe_get_area(&old_rect, &ppe_rect, &inverse, &source);
+                if (!ret)
                 {
-                    return;
-                }
-                else
-                {
-                    continue;
+                    if (i == block_num - 1)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
             }
             if (head->type == IMDC_COMPRESS)
@@ -986,6 +1132,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             ppe_translate(0, y_ref, &inverse);
             gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
             source.const_color = rect_header->color.color.rgba_full;
+            ppe_rect.y -= dc->section.y1;
         }
         source.high_quality = image->high_quality;
         if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
@@ -1017,6 +1164,7 @@ void hw_acc_init(void)
         GUI_ASSERT("no dma for support");
         return;
     }
+    PPEV2_CLK_ENABLE(ENABLE);
     DBG_DIRECT("zip rx %d", memcpy_dma_num);
     DBG_DIRECT("zip tx %d", support_dma_num);
 }

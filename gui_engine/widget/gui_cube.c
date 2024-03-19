@@ -434,7 +434,25 @@ static void cube_draw_cb(gui_obj_t *obj)
 
 static void cube_end(gui_obj_t *obj)
 {
+    GUI_ASSERT(obj != NULL);
+    gui_cube_t *cube = (gui_cube_t *)obj;
+    draw_img_t *cube_img[6];
 
+    cube_img[0] = &cube->draw_img_front;
+    cube_img[1] = &cube->draw_img_back;
+    cube_img[2] = &cube->draw_img_up;
+    cube_img[3] = &cube->draw_img_down;
+    cube_img[4] = &cube->draw_img_left;
+    cube_img[5] = &cube->draw_img_right;
+
+    for (int i = 0; i < 6; i++)
+    {
+        if (cube_img[i]->line != NULL)
+        {
+            gui_free(cube_img[i]->line);
+            cube_img[i]->line = NULL;
+        }
+    }
 }
 static void cube_destory(gui_obj_t *obj)
 {

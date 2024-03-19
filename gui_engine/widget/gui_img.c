@@ -243,6 +243,12 @@ static void img_draw_cb(gui_obj_t *obj)
 static void img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (img->draw_img.line != NULL)
+    {
+        gui_free(img->draw_img.line);
+        img->draw_img.line = NULL;
+    }
 }
 
 static void magic_img_destory(gui_obj_t *obj)
@@ -558,7 +564,6 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
                              };
     return gui_img_create_core(parent, &config);
 }
-
 gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color)
 {
     gui_rect_file_head_t *array = gui_malloc(sizeof(gui_rect_file_head_t));

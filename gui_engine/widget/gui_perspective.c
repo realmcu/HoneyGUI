@@ -244,8 +244,19 @@ static void draw_cb(gui_obj_t *obj)
 
 static void end(gui_obj_t *obj)
 {
+    GUI_ASSERT(obj != NULL);
+    gui_perspective_t *perspective = (gui_perspective_t *)obj;
 
+    for (int i = 0; i < 6; i++)
+    {
+        if (perspective->img[i].line != NULL)
+        {
+            gui_free(perspective->img[i].line);
+            perspective->img[i].line = NULL;
+        }
+    }
 }
+
 static void destory(gui_obj_t *obj)
 {
     // gui_log("perspective %s \n", __FUNCTION__);
