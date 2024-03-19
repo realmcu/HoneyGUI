@@ -366,16 +366,6 @@ static void curtainview_prepare(gui_obj_t *obj)
         this->cur_curtain_flag = 0;
         break;
     }
-    if (tp->released)
-    {
-        if (!this->middle_flag && this->release_y < 0 && this->cur_curtain == CURTAIN_MIDDLE)
-        {
-            this->release_y = 0;
-        }
-
-    }
-
-
     if (this->middle_flag)
     {
         if (this->release_y >= -(int)gui_get_screen_height())
@@ -391,8 +381,22 @@ static void curtainview_prepare(gui_obj_t *obj)
             GET_BASE(c_down)->not_show = false;
         }
     }
-
-
+    else if (!this->middle_flag && this->release_y < 0 && this->cur_curtain == CURTAIN_MIDDLE)
+    {
+        if (this->release_y <= 0)
+        {
+            this->release_y += GUI_FRAME_STEP;
+            GET_BASE(c_down)->not_show = false;
+        }
+    }
+    else if (this->cur_curtain == CURTAIN_MIDDLE && this->release_x > 0 && !this->middle_flag_left)
+    {
+        if (this->release_x >= 0)
+        {
+            this->release_x -= GUI_FRAME_STEP;
+            GET_BASE(c_left)->not_show = false;
+        }
+    }
     else if (this->middle_flag_left)
     {
         if (this->release_x <= (int)gui_get_screen_height())
