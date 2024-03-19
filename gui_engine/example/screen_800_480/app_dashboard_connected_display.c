@@ -99,7 +99,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
     short_c_navi_message_1 = gui_text_create(target_connected_display,  "short_c_navi_message_1", 490,
                                              88, 150,
                                              60);
-    gui_text_set(short_c_navi_message_1, (char *)show_c_navigation_msg, "rtk_font_mem",
+    gui_text_set(short_c_navi_message_1, (char *)show_c_navigation_msg, GUI_FONT_SOURCE_BMP,
                  gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), current_navi_data.navigation_num_len, 56);
     gui_text_mode_set(short_c_navi_message_1, RIGHT);
 
@@ -108,8 +108,9 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
     short_c_navi_message_3 = gui_text_create(target_connected_display,  "short_c_navi_message_3", 640,
                                              108, 150,
                                              40);
-    gui_text_set(short_c_navi_message_3, (char *)show_c_navigation_unit, "rtk_font_mem", gui_rgb(0xcc,
-                 0xcc, 0xcc), current_navi_data.navigation_unit_len, 32);
+    gui_text_set(short_c_navi_message_3, (char *)show_c_navigation_unit, GUI_FONT_SOURCE_BMP,
+                 gui_rgb(0xcc,
+                         0xcc, 0xcc), current_navi_data.navigation_unit_len, 32);
     gui_text_mode_set(short_c_navi_message_3, LEFT);
 
     memcpy(&show_c_road_names[0], &current_navi_data.road_names[0],
@@ -117,7 +118,8 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
     short_c_navi_message_2 = gui_text_create(target_connected_display,  "short_c_navi_message_2", 490,
                                              148, 300,
                                              40);
-    gui_text_set(short_c_navi_message_2, (char *)show_c_road_names, "rtk_font_mem", gui_rgb(0xcc, 0xcc,
+    gui_text_set(short_c_navi_message_2, (char *)show_c_road_names, GUI_FONT_SOURCE_BMP, gui_rgb(0xcc,
+                 0xcc,
                  0xcc), current_navi_data.road_num_len, 32);
     gui_text_mode_set(short_c_navi_message_2, CENTER);
 
@@ -127,21 +129,22 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
                                          158, 30);
     memcpy(&show_c_tel_number[0], &current_phone_status.current_phone_number[0],
            current_phone_status.current_phone_number_len);
-    gui_text_set(short_c_tel_number, (char *)show_c_tel_number, "rtk_font_mem", gui_rgb(UINT8_MAX,
+    gui_text_set(short_c_tel_number, (char *)show_c_tel_number, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), current_phone_status.current_phone_number_len, 28);
     gui_text_mode_set(short_c_tel_number, CENTER);
     short_c_tel_accept = gui_text_create(target_connected_display,  "short_c_tel_accept",  600, 410,
                                          800, 30);
-    gui_text_set(short_c_tel_accept, "calling", "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX,
-                                                                        UINT8_MAX), 7, 28);
+    gui_text_set(short_c_tel_accept, "calling", GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
+                                                                             UINT8_MAX), 7, 28);
     app_message_data current_message_status;
     app_dashboard_data_get_message_data_update(&current_message_status);
     memcpy(&show_c_message_data[0], &current_message_status.wechat_msg[0],
            current_message_status.wechat_msg_len);
     short_c_message_data = gui_text_create(target_connected_display,  "short_c_message_data",  300, 10,
                                            240, 50);
-    gui_text_set(short_c_message_data, (char *)show_c_message_data, "rtk_font_mem", gui_rgb(UINT8_MAX,
-                 UINT8_MAX, UINT8_MAX), (current_message_status.wechat_msg_len - 1), 32);
+    gui_text_set(short_c_message_data, (char *)show_c_message_data, GUI_FONT_SOURCE_BMP,
+                 gui_rgb(UINT8_MAX,
+                         UINT8_MAX, UINT8_MAX), (current_message_status.wechat_msg_len - 1), 32);
     gui_text_mode_set(short_c_message_data, MUTI_LEFT);
 
     /* Prepare the intial data */
@@ -332,8 +335,9 @@ void app_dashboard_update_connected_display_message_infor(app_message_data *app_
     }
     memcpy(&show_c_message_data[0], &app_message_information->wechat_msg[0],
            app_message_information->wechat_msg_len);
-    gui_text_set(short_c_message_data, (char *)show_c_message_data, "rtk_font_mem", gui_rgb(UINT8_MAX,
-                 UINT8_MAX, UINT8_MAX), (app_message_information->wechat_msg_len - 1), 32);
+    gui_text_set(short_c_message_data, (char *)show_c_message_data, GUI_FONT_SOURCE_BMP,
+                 gui_rgb(UINT8_MAX,
+                         UINT8_MAX, UINT8_MAX), (app_message_information->wechat_msg_len - 1), 32);
 }
 
 void app_dashboard_update_connected_display_phone_infor(app_phone_data *app_call_information)
@@ -360,7 +364,7 @@ void app_dashboard_update_connected_display_phone_infor(app_phone_data *app_call
 
     memcpy(&show_c_tel_number[0], &app_call_information->current_phone_number[0],
            app_call_information->current_phone_number_len);
-    gui_text_set(short_c_tel_number, (char *)show_c_tel_number, "rtk_font_mem", gui_rgb(UINT8_MAX,
+    gui_text_set(short_c_tel_number, (char *)show_c_tel_number, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX,
                  UINT8_MAX, UINT8_MAX), app_call_information->current_phone_number_len, 28);
 
 }
@@ -382,16 +386,18 @@ void app_dashboard_update_connected_display_navi_infor(T_NAVI_INFO navi_informat
     app_dashboard_data_get_navi_data_update(&current_navi_data);
     memcpy(&show_c_navigation_msg[0], &current_navi_data.navigation_msg[0],
            current_navi_data.navigation_num_len);
-    gui_text_set(short_c_navi_message_1, (char *)show_c_navigation_msg, "rtk_font_mem",
+    gui_text_set(short_c_navi_message_1, (char *)show_c_navigation_msg, GUI_FONT_SOURCE_BMP,
                  gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), current_navi_data.navigation_num_len, 56);
 
     memcpy(&show_c_navigation_unit[0], &current_navi_data.navigation_unit[0],
            current_navi_data.navigation_unit_len);
-    gui_text_set(short_c_navi_message_3, (char *)show_c_navigation_unit, "rtk_font_mem", gui_rgb(0xcc,
-                 0xcc, 0xcc), current_navi_data.navigation_unit_len, 32);
+    gui_text_set(short_c_navi_message_3, (char *)show_c_navigation_unit, GUI_FONT_SOURCE_BMP,
+                 gui_rgb(0xcc,
+                         0xcc, 0xcc), current_navi_data.navigation_unit_len, 32);
 
     memcpy(&show_c_road_names[0], &current_navi_data.road_names[0],
            current_navi_data.road_num_len);
-    gui_text_set(short_c_navi_message_2, (char *)show_c_road_names, "rtk_font_mem", gui_rgb(0xcc, 0xcc,
+    gui_text_set(short_c_navi_message_2, (char *)show_c_road_names, GUI_FONT_SOURCE_BMP, gui_rgb(0xcc,
+                 0xcc,
                  0xcc), current_navi_data.road_num_len, 32);
 }

@@ -132,26 +132,27 @@ void design_win_menu_phone(void *parent)
 
     int16_t font_size = 32;
     text_phone_title = gui_text_create(parent, "text_phone_title", 179, 24, 128, font_size);
-    gui_text_set(text_phone_title, "连接手机", "rtk_font_mem", APP_COLOR_WHITE, 12, font_size);
+    gui_text_set(text_phone_title, "连接手机", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12, font_size);
     gui_text_type_set(text_phone_title, SIMKAI_SIZE32_BITS1_FONT_BIN);
     /*to do some changes when combining BT*/
     text_phone_device_name = gui_text_create(parent, "text_buds_device", 128, 122, 192, font_size);
-    gui_text_set(text_phone_device_name, "手机设备名称", "rtk_font_mem", APP_COLOR_WHITE, 18,
+    gui_text_set(text_phone_device_name, "手机设备名称", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 18,
                  font_size);
     gui_text_type_set(text_phone_device_name, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_connect_to_new_phone = gui_text_create(parent, "text_search_buds", 147, 204, 160, font_size);
-    gui_text_set(text_connect_to_new_phone, "连接新手机", "rtk_font_mem", APP_COLOR_WHITE, 15,
+    gui_text_set(text_connect_to_new_phone, "连接新手机", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 15,
                  font_size);
     gui_text_type_set(text_connect_to_new_phone, SIMKAI_SIZE32_BITS1_FONT_BIN);
     /*when phone is connected , to display*/
     text_phone_media_audio = gui_text_create(parent, "text_search_buds", 128, 289, 128, font_size);
-    gui_text_set(text_phone_media_audio, "媒体音频", "rtk_font_mem", APP_COLOR_WHITE, 12,
+    gui_text_set(text_phone_media_audio, "媒体音频", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
                  font_size);
     gui_text_type_set(text_phone_media_audio, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_disconnect_phone = gui_text_create(parent, "text_disconnect_phone", 163, 392, 128, font_size);
-    gui_text_set(text_disconnect_phone, "断开连接", "rtk_font_mem", APP_COLOR_WHITE, 12, font_size);
+    gui_text_set(text_disconnect_phone, "断开连接", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
+                 font_size);
     gui_text_type_set(text_disconnect_phone, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
 }

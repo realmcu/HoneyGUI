@@ -272,17 +272,10 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
  *                           Public Functions
  *============================================================================*/
 
-void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t color,
+void gui_text_set(gui_text_t *this, void *text, FONT_SOUCE_TYPE text_type, gui_color_t color,
                   uint16_t length, uint8_t font_size)
 {
-    if (strncmp(text_type, "rtk_font_mem", strlen("rtk_font_mem")) == 0)
-    {
-        this->font_type = GUI_FONT_SOURCE_BMP;
-    }
-    else if (strncmp(text_type, "rtk_font_stb", strlen("rtk_font_stb")) == 0)
-    {
-        this->font_type = GUI_FONT_SOURCE_TTF;
-    }
+    this->font_type = text_type;
     this->content = (uint8_t *)text;
     this->color = color;
     this->len = length;

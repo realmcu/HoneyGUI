@@ -92,13 +92,13 @@ static void switch_record_touch_cb(void *obj, gui_event_t event)
         string_record_title = "录音";
         text_record_title->base.w = strlen(string_record_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W;
         gui_text_move(text_record_title, 195, 24);
-        gui_text_set(text_record_title, string_record_title, "rtk_font_mem", APP_COLOR_WHITE,
+        gui_text_set(text_record_title, string_record_title, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                      strlen(string_record_title), FONT_H_32);
 
         char *string_record_tips = "轻触录音";
         text_record_tips->base.w = strlen(string_record_tips) / FONT_CHINESE_BYTE * FONT_CHINESE_W;
         gui_text_move(text_record_tips, 163, 314);
-        gui_text_set(text_record_tips, string_record_tips, "rtk_font_mem", APP_COLOR_WHITE,
+        gui_text_set(text_record_tips, string_record_tips, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                      strlen(string_record_tips), FONT_H_32);
         //shut down animate
         text_record_tips->animate->animate = false;
@@ -113,7 +113,7 @@ static void switch_record_touch_cb(void *obj, gui_event_t event)
         string_record_title = "正在录音";
         text_record_title->base.w = strlen(string_record_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W;
         gui_text_move(text_record_title, 165, 24);
-        gui_text_set(text_record_title, string_record_title, "rtk_font_mem", APP_COLOR_WHITE,
+        gui_text_set(text_record_title, string_record_title, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                      strlen(string_record_title), FONT_H_32);
 
         string_record_time = (char *)record_time_display;
@@ -121,7 +121,7 @@ static void switch_record_touch_cb(void *obj, gui_event_t event)
 
         text_record_tips->base.w = strlen(string_record_time) * FONT_NUM_ALPHA_W;
         gui_text_move(text_record_tips, 142, 314);
-        gui_text_set(text_record_tips, string_record_time, "rtk_font_mem", APP_COLOR_WHITE,
+        gui_text_set(text_record_tips, string_record_time, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                      strlen(string_record_time), FONT_H_32);
         //gui_obj_set_update_att(text_record_tips, 250, true, NULL);
         gui_text_set_animate(text_record_tips, 1000, -1, text_record_tips_animate_cb, text_record_tips);
@@ -164,13 +164,13 @@ void design_tab_record(void *parent)
     char *string_record_title = "录音";
     text_record_title = gui_text_create(parent, "text_record_title", 195, 24,
                                         strlen(string_record_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, FONT_H_32);
-    gui_text_set(text_record_title, string_record_title, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_record_title, string_record_title, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                  strlen(string_record_title), FONT_H_32);
 
     char *string_record_tips = "轻触录音";
     text_record_tips = gui_text_create(parent, "text_record_tips", 163, 314,
                                        strlen(string_record_tips) / FONT_CHINESE_BYTE * FONT_CHINESE_W, FONT_H_32);
-    gui_text_set(text_record_tips, string_record_tips, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_record_tips, string_record_tips, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                  strlen(string_record_tips), FONT_H_32);
     //set animate for updating display string of text_record_tips
     gui_text_set_animate(text_record_tips, 1000, -1, text_record_tips_animate_cb, text_record_tips);

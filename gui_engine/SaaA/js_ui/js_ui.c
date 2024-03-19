@@ -189,7 +189,7 @@ DECLARE_HANDLER(icon_write)
     if (txtbox)
     {
         char *strbuf1 = js_value_to_string(args[0]);
-        gui_text_set(txtbox->text, strbuf1, "rtk_font_stb", txtbox->text->color, strlen(strbuf1),
+        gui_text_set(txtbox->text, strbuf1, GUI_FONT_SOURCE_TTF, txtbox->text->color, strlen(strbuf1),
                      txtbox->text->font_height);
         //jerry_release_value(s);
         jerry_value_t global_obj = jerry_get_global_object();

@@ -10,27 +10,32 @@ void page_tb_func(void *parent)
 
     char *text1 = "Name:     RTL8763ESE";
     gui_text_t *t1 = gui_text_create(parent, "txt", 20, 15, gui_get_screen_width(), 24);
-    gui_text_set(t1, text1, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(text1),
+    gui_text_set(t1, text1, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                 strlen(text1),
                  24);
     //gui_text_type_set(t1, SIMKAI_SIZE24_BITS4_FONT_BIN);
     char *text2 = "Battery:  Case 96%,L 100%,R 100%";
     gui_text_t *t2 = gui_text_create(parent, "txt", 20, 55, gui_get_screen_width(), 24);
-    gui_text_set(t2, text2, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(text2),
+    gui_text_set(t2, text2, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                 strlen(text2),
                  24);
     //gui_text_type_set(t2, SIMKAI_SIZE24_BITS4_FONT_BIN);
     char *text3 = "BT:       Connection";
     gui_text_t *t3 = gui_text_create(parent, "txt", 20, 95, gui_get_screen_width(), 24);
-    gui_text_set(t3, text3, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(text3),
+    gui_text_set(t3, text3, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                 strlen(text3),
                  24);
     //gui_text_type_set(t3, SIMKAI_SIZE24_BITS4_FONT_BIN);
     char *text4 = "Volume:    50%";
     gui_text_t *t4 = gui_text_create(parent, "txt", 20, 135, gui_get_screen_width(), 24);
-    gui_text_set(t4, text4, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(text4),
+    gui_text_set(t4, text4, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                 strlen(text4),
                  24);
     // gui_text_type_set(t4, SIMKAI_SIZE24_BITS4_FONT_BIN);
     char *text5 = "ANC:      ON";
     gui_text_t *t5 = gui_text_create(parent, "txt", 20, 175, gui_get_screen_width(), 24);
-    gui_text_set(t5, text5, "rtk_font_mem", gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(text5),
+    gui_text_set(t5, text5, GUI_FONT_SOURCE_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                 strlen(text5),
                  24);
     //gui_text_type_set(t5, SIMKAI_SIZE24_BITS4_FONT_BIN);
 

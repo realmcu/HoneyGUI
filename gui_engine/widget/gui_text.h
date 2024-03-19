@@ -159,13 +159,13 @@ typedef struct gui_text_line
 * @note The font size must match the font file!
 * @param this the text box widget pointer.
 * @param text the text string.
-* @param font_type the font's name.
+* @param text_type text type.
 * @param color the text's color.
 * @param length the text string's length.
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t color,
+void gui_text_set(gui_text_t *this, void *text, FONT_SOUCE_TYPE text_type, gui_color_t color,
                   uint16_t length, uint8_t font_size);
 
 /**

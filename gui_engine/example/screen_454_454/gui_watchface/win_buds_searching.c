@@ -92,25 +92,25 @@ static void searching_buds_general_touch_cb(void)
     int16_t font_size = 32;
     text_search_buds_title = gui_text_create(win_search_buds, "text_search_buds_title", 179, 24, 128,
                                              font_size);
-    gui_text_set(text_search_buds_title, "搜索耳机", "rtk_font_mem", APP_COLOR_WHITE, 12,
+    gui_text_set(text_search_buds_title, "搜索耳机", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
                  font_size);
     gui_text_type_set(text_search_buds_title, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_search_buds_1 = gui_text_create(win_search_buds, "text_bonding_buds_1", 138, 122, 178,
                                          font_size);
-    gui_text_set(text_search_buds_1, "搜索到设备1", "rtk_font_mem", APP_COLOR_WHITE, 16,
+    gui_text_set(text_search_buds_1, "搜索到设备1", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 16,
                  font_size);
     gui_text_type_set(text_search_buds_1, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_search_buds_2 = gui_text_create(win_search_buds, "text_search_buds_2", 138, 204, 178,
                                          font_size);
-    gui_text_set(text_search_buds_2, "搜索到设备2", "rtk_font_mem", APP_COLOR_WHITE, 16,
+    gui_text_set(text_search_buds_2, "搜索到设备2", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 16,
                  font_size);
     gui_text_type_set(text_search_buds_2, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_search_buds_3 = gui_text_create(win_search_buds, "text_search_buds_3", 138, 286, 178,
                                          font_size);
-    gui_text_set(text_search_buds_3, "搜索到设备3", "rtk_font_mem", APP_COLOR_WHITE, 16,
+    gui_text_set(text_search_buds_3, "搜索到设备3", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 16,
                  font_size);
     gui_text_type_set(text_search_buds_3, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
@@ -209,22 +209,22 @@ void design_win_buds_searching(void *parent)
 
     int16_t font_size = 32;
     text_search_buds_title = gui_text_create(parent, "text_search_buds_title", 179, 24, 128, font_size);
-    gui_text_set(text_search_buds_title, "搜索耳机", "rtk_font_mem", APP_COLOR_WHITE, 12,
+    gui_text_set(text_search_buds_title, "搜索耳机", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 12,
                  font_size);
     gui_text_type_set(text_search_buds_title, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_search_buds_1 = gui_text_create(parent, "text_bonding_buds_1", 138, 122, 178, font_size);
-    gui_text_set(text_search_buds_1, "搜索到设备1", "rtk_font_mem", APP_COLOR_WHITE, 16,
+    gui_text_set(text_search_buds_1, "搜索到设备1", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 16,
                  font_size);
     gui_text_type_set(text_search_buds_1, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_search_buds_2 = gui_text_create(parent, "text_search_buds_2", 138, 204, 178, font_size);
-    gui_text_set(text_search_buds_2, "搜索到设备2", "rtk_font_mem", APP_COLOR_WHITE, 16,
+    gui_text_set(text_search_buds_2, "搜索到设备2", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 16,
                  font_size);
     gui_text_type_set(text_search_buds_2, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
     text_search_buds_3 = gui_text_create(parent, "text_search_buds_3", 138, 286, 178, font_size);
-    gui_text_set(text_search_buds_3, "搜索到设备3", "rtk_font_mem", APP_COLOR_WHITE, 16,
+    gui_text_set(text_search_buds_3, "搜索到设备3", GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE, 16,
                  font_size);
     gui_text_type_set(text_search_buds_3, SIMKAI_SIZE32_BITS1_FONT_BIN);
 }

@@ -329,7 +329,7 @@ void gui_scroll_text_skip_frame_set(uint8_t skip_frame)
     scroll_skip_frame = skip_frame;
 }
 
-void gui_scroll_text_set(gui_scroll_text_t *this, void *text, char *text_type,
+void gui_scroll_text_set(gui_scroll_text_t *this, void *text, FONT_SOUCE_TYPE text_type,
                          gui_color_t color, uint16_t length, uint8_t font_size)
 {
     gui_text_set(&this->base, text, text_type, color, length, font_size);

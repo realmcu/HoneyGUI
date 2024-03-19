@@ -147,14 +147,14 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t
 * @note
 * @param this the scroll text box widget pointer.
 * @param text the scroll text string.
-* @param font_type the font's name.
+* @param text_type text type.
 * @param color the text's color.
 * @param length the text string's length.
 * @param font_size the text string's font size.
 * @return void
 *
 */
-void gui_scroll_text_set(gui_scroll_text_t *this, void *text, char *text_type,
+void gui_scroll_text_set(gui_scroll_text_t *this, void *text, FONT_SOUCE_TYPE text_type,
                          gui_color_t color,
                          uint16_t length, uint8_t font_size);
 

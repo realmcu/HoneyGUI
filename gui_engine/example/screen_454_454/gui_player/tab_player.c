@@ -92,7 +92,7 @@ void design_tab_player(void *parent)
     int font_size = 32;
     text_player_title = gui_text_create(parent, "text_player_title", 195, 24,
                                         strlen(string_player_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
-    gui_text_set(text_player_title, string_player_title, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_player_title, string_player_title, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                  strlen(string_player_title), font_size);
 
 
@@ -110,7 +110,7 @@ void design_tab_player(void *parent)
                                              ICON_SONG_LOCAL_BIN, 330, 125, 32, 32);
     text_song_name = gui_text_create(parent, "text_song_name", 156, 125,
                                      strlen(string_song_name) * FONT_NUM_ALPHA_W, font_size);
-    gui_text_set(text_song_name, string_song_name, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_song_name, string_song_name, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                  strlen(string_song_name), font_size);
 
     switch_play_pause = gui_switch_create(parent, 197, 213, 64, 64, ICON_SONG_PLAY_BIN,

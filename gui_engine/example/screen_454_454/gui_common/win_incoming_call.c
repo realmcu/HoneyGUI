@@ -46,7 +46,8 @@ void design_win_incoming_call(void *parent, char *dial_num)
     char *string_incoming_call_title = "来电";
     text_incoming_call_title = gui_text_create(parent, "text_incoming_call_title", 195, 24,
                                                strlen(string_incoming_call_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, FONT_H_32);
-    gui_text_set(text_incoming_call_title, string_incoming_call_title, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_incoming_call_title, string_incoming_call_title, GUI_FONT_SOURCE_BMP,
+                 APP_COLOR_WHITE,
                  strlen(string_incoming_call_title), FONT_H_32);
     //incoming call number
     char *string_dial_num = dial_num;
@@ -55,7 +56,7 @@ void design_win_incoming_call(void *parent, char *dial_num)
     //todo: displaying name or num depends on pbap
     text_incoming_call_num = gui_text_create(parent, "text_incoming_call_num", 0, 59,
                                              LCD_W, FONT_H_32);
-    gui_text_set(text_incoming_call_num, string_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_incoming_call_num, string_dial_num, GUI_FONT_SOURCE_BMP, APP_COLOR_WHITE,
                  strlen(string_dial_num), FONT_H_32);
     gui_text_mode_set(text_incoming_call_num, CENTER);
     //incoming call image
