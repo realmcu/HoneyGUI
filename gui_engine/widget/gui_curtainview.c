@@ -117,17 +117,15 @@ static void input_prepare(gui_obj_t *obj)
             }
             if (this->has_left_curtain == true)
             {
-                if (this->cur_curtain_flag || this->middle_flag_left)
+                if (this->cur_curtain_flag || this->middle_flag_left || this->left_flag)
                 {
                     gui_obj_skip_other_left_hold(obj);
                 }
                 gui_obj_skip_other_right_hold(obj);
-                obj->skip_tp_right_hold = false;
             }
             if (this->has_right_curtain == true)
             {
                 gui_obj_skip_other_left_hold(obj);
-                obj->skip_tp_left_hold = false;
             }
             break;
         }
@@ -235,7 +233,7 @@ static void curtainview_prepare(gui_obj_t *obj)
     {
     case TOUCH_HOLD_X:
         {
-            if (this->middle_flag || this->down_flag)
+            if (this->middle_flag || this->down_flag || this->cur_curtain == CURTAIN_DOWN)
             {
                 this->release_x = 0;
                 this->middle_flag_left = 0;
@@ -247,13 +245,18 @@ static void curtainview_prepare(gui_obj_t *obj)
             }
 
             this->release_y = 0;
-            if (this->cur_curtain == CURTAIN_LEFT && tp->deltaX < 0)
+            if (this->cur_curtain == CURTAIN_LEFT)
             {
-                this->release_x = tp->deltaX;
-                if (_UI_ABS(tp->deltaX) > (int)((float)gui_get_screen_width() / 2.0f * 1))
+                if (tp->deltaX < 0)
                 {
-                    this->left_flag = 1;
+                    this->release_x = tp->deltaX;
+                    if (_UI_ABS(tp->deltaX) > (int)((float)gui_get_screen_width() / 2.0f * c_left->scope))
+                    {
+                        this->left_flag = 1;
+                    }
+
                 }
+                break;
             }
 
             else if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
@@ -265,6 +268,10 @@ static void curtainview_prepare(gui_obj_t *obj)
                 break;
             }
             this->release_x = tp->deltaX;
+            if (this->release_x > (int)((float)gui_get_screen_width() *c_left->scope))
+            {
+                this->release_x = (int)((float)gui_get_screen_width() * c_left->scope);
+            }
             if (this->release_x != 0 && this->cur_curtain == CURTAIN_MIDDLE)
             {
                 if (this->release_x > 0)
@@ -277,7 +284,7 @@ static void curtainview_prepare(gui_obj_t *obj)
             }
 
             if (this->cur_curtain == CURTAIN_MIDDLE && tp->deltaX > 0 &&
-                tp->deltaX > (int)((float)gui_get_screen_width() / 2.0f * 1))
+                tp->deltaX > (int)((float)gui_get_screen_width() / 2.0f * c_left->scope))
             {
                 this->middle_flag_left = 1;
             }
@@ -297,7 +304,7 @@ static void curtainview_prepare(gui_obj_t *obj)
             if (this->cur_curtain == CURTAIN_DOWN && tp->deltaY > 0)
             {
                 this->release_y = tp->deltaY;
-                if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * 1))
+                if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * c_down->scope))
                 {
                     this->down_flag = 1;
                 }
@@ -324,7 +331,7 @@ static void curtainview_prepare(gui_obj_t *obj)
             if (this->cur_curtain == CURTAIN_MIDDLE && tp->deltaY < 0
                )
             {
-                if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_width() / 2.0f * 1))
+                if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * c_down->scope))
                 {
                     this->middle_flag = 1;
                 }
@@ -368,7 +375,7 @@ static void curtainview_prepare(gui_obj_t *obj)
     }
     if (this->middle_flag)
     {
-        if (this->release_y >= -(int)gui_get_screen_height())
+        if (this->release_y >= -(float)gui_get_screen_height()*c_down->scope)
         {
             this->release_y -= GUI_FRAME_STEP;
             GET_BASE(c_down)->not_show = false;
@@ -399,7 +406,7 @@ static void curtainview_prepare(gui_obj_t *obj)
     }
     else if (this->middle_flag_left)
     {
-        if (this->release_x <= (int)gui_get_screen_height())
+        if (this->release_x <= (float)gui_get_screen_width()*c_left->scope)
         {
             this->release_x += GUI_FRAME_STEP;
             GET_BASE(c_left)->not_show = false;
@@ -416,7 +423,7 @@ static void curtainview_prepare(gui_obj_t *obj)
     {
 
 
-        if (this->release_y <= gui_get_screen_height())
+        if (this->release_y <= (float)gui_get_screen_height()*c_down->scope)
         {
             this->release_y += GUI_FRAME_STEP;
         }
@@ -431,7 +438,7 @@ static void curtainview_prepare(gui_obj_t *obj)
     {
 
 
-        if (this->release_x >= -gui_get_screen_height())
+        if (this->release_x >= -(int)((float)gui_get_screen_width()*c_left->scope))
         {
             this->release_x -= GUI_FRAME_STEP;
         }
@@ -440,6 +447,7 @@ static void curtainview_prepare(gui_obj_t *obj)
             this->release_x = 0;
             this->left_flag = 0;
             this->cur_curtain = CURTAIN_MIDDLE;
+            this->cur_curtain_flag = 1;
         }
     }
     else
@@ -472,7 +480,6 @@ static void curtainview_prepare(gui_obj_t *obj)
             this->release_x = 0;
         }
     }
-
 
 
     uint8_t last = this->checksum;
