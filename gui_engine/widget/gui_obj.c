@@ -114,12 +114,7 @@ void gui_obj_ctor(gui_obj_t *this, gui_obj_t *parent, const char *name, int16_t 
     matrix_identity(this->matrix);
 
 }
-void gui_obj_dtor(gui_obj_t *this)
-{
-    volatile int a;
-    a = this->x;
-    return;
-}
+
 
 uint8_t gui_checksum(uint8_t seed, uint8_t *data, uint8_t len)
 {
@@ -134,6 +129,10 @@ uint8_t gui_checksum(uint8_t seed, uint8_t *data, uint8_t len)
 static void gui_obj_destory_cb(gui_obj_t *obj)
 {
     gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
+    if (obj->matrix != NULL)
+    {
+        gui_free(obj->matrix);
+    }
     if (obj->obj_destory)
     {
         obj->obj_destory(obj);

@@ -50,6 +50,9 @@ int main(int argc, char **argv)
         time_t now;
         now = time(NULL);
         printf("World Time: %.*s\n", 25, ctime(&now));
+        // int age;
+        // scanf("%d", &age);
+        // printf("Your age is %d \n", age);
         sleep(10);
     }
 

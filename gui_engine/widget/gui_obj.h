@@ -134,12 +134,6 @@ void gui_obj_ctor(struct _gui_obj_t *this, struct _gui_obj_t *parent, const char
 
 
 /**
-  * @param  this
-  * @return void
-  */
-void gui_obj_dtor(struct _gui_obj_t *this);
-
-/**
   * @brief create event widget
   * @param  obj
   * @param  event_cb switching events

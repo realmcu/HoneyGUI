@@ -251,7 +251,7 @@ void *gui_malloc(uint32_t n)
     {
         GUI_ASSERT(NULL != NULL);
     }
-    // if (ptr == (void *)0x00000000009196C8)
+    // if (ptr == (void *)0x0000000000957578)
     // {
     //     GUI_ASSERT(NULL != NULL);
     // }
