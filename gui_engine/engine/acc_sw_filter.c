@@ -20,10 +20,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-// #include "acc_sw_blend.h"
-// #include "acc_sw.h"
-// #include "acc_sw_rle.h"
-
 void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                           gui_rect_t *rect)
 {
@@ -34,7 +30,7 @@ void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     int16_t y_start = 0;
     int16_t y_end = 0;
     int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
+
     if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
@@ -44,51 +40,66 @@ void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     struct gui_rgb_data_head *head = image->data;
     char img_type = head->type;
     uint8_t opacity_value = image ->opacity_value;
+
+    if (opacity_value == 0)
+    {
+        return;
+    }
+
     if (img_type == RGB565)
     {
-        uint8_t source_bytes_per_pixel = 2;
-        int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
-        for (uint32_t i = y_start; i < y_end; i++)
+        int read_x_off = -_UI_MIN(image_x, 0) * BYTE_PIXEL_RGB565  + image_off;
+        if (opacity_value == 255)
         {
-            int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-            int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                           source_bytes_per_pixel * x_start;
-            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-
-            for (uint32_t j = x_start; j < x_end; j++)
+            uint32_t pixel;
+            uint32_t line_len = x_end - x_start;
+            for (uint32_t i = y_start; i < y_end; i++)
             {
-                uint16_t pixel = (*((uint16_t *)read_off + j));
+                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int read_off = read_x_off + ((i - image_y) * source_w) * BYTE_PIXEL_RGB565;
+                uint16_t *writebuf = (uint16_t *)dc->frame_buf + write_off + x_start;
 
-                if (pixel != 0)
+                for (uint32_t j = 0; j < line_len;)
                 {
-                    switch (opacity_value)
+                    pixel = *((uint32_t *)((uint16_t *)read_off + j));
+                    if (pixel)
                     {
-                    case 0:
-                        break;
-                    case 255:
+                        if ((uint16_t)pixel)
                         {
-                            writebuf[write_off + j] = pixel;
+                            writebuf[j] = pixel;
                         }
-                        break;
-                    default:
+                        j++;
+                        if ((uint16_t)(pixel >> 16) && (j < line_len))
                         {
-                            if (opacity_value < 255)
-                            {
-                                writebuf[write_off + j] = ((((((pixel >> 11) << 3) * opacity_value + ((
-                                                                                                          writebuf[write_off + j] >> 11) << 3) * (0xFF - opacity_value)) / 255) >> 3) << 11) +
-                                                          ((((((((pixel & 0x07e0) >> 5) << 2) * opacity_value) + (((writebuf[write_off + j] & 0x07e0) >> 5) <<
-                                                                  2) * (0xFF - opacity_value)) / 0xFF) >> 2) << 5) +
-                                                          ((((((pixel & 0x001f) << 3) * opacity_value) + ((writebuf[write_off + j]  & 0x001f) << 3) *
-                                                             (0xFF - opacity_value)) / 0xFF) >> 3);
-                            }
-                            else
-                            {
-                                break;
-                            }
+                            writebuf[j] = pixel >> 16;
                         }
-                        break;
+                        j++;
+                        continue;
+                    }
+                    j += 2;
+                }
+            }
+        }
+        else
+        {
+            for (uint32_t i = y_start; i < y_end; i++)
+            {
+                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int read_off = ((i - image_y) * source_w) * BYTE_PIXEL_RGB565 + read_x_off -
+                               BYTE_PIXEL_RGB565 * x_start;
+                uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
+                for (uint32_t j = x_start; j < x_end; j++)
+                {
+                    uint16_t pixel = (*((uint16_t *)read_off + j));
+                    if (pixel != 0)
+                    {
+                        writebuf[write_off + j] = ((((((pixel >> 11) << 3) * opacity_value + ((
+                                                                                                  writebuf[write_off + j] >> 11) << 3) * (0xFF - opacity_value)) / 255) >> 3) << 11) +
+                                                  ((((((((pixel & 0x07e0) >> 5) << 2) * opacity_value) + (((writebuf[write_off + j] & 0x07e0) >> 5) <<
+                                                          2) * (0xFF - opacity_value)) / 0xFF) >> 2) << 5) +
+                                                  ((((((pixel & 0x001f) << 3) * opacity_value) + ((writebuf[write_off + j]  & 0x001f) << 3) *
+                                                     (0xFF - opacity_value)) / 0xFF) >> 3);
                     }
                 }
             }

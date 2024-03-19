@@ -460,7 +460,7 @@ static void switch_prepare(gui_obj_t *obj)
                         else if (!b->long_touch_state && !b->long_flag
                                  || !b->long_touch_enable)
                         {
-                            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                            if (((tp->deltaX == 0) && (tp->deltaY == 0)) && gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
                             {
                                 gui_switch_t *sw = (gui_switch_t *)obj;
                                 sw->ifon = !(sw->ifon);

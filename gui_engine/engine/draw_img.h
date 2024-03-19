@@ -14,6 +14,12 @@ extern "C" {
 #endif
 
 
+typedef enum
+{
+    BYTE_PIXEL_RGB565 = 2,
+    BYTE_PIXEL_RGB888 = 3,
+    BYTE_PIXEL_RGBA8888 = 4,
+} GUI_BYTE_PIXEL_ENUM;
 
 
 

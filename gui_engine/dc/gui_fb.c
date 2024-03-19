@@ -227,7 +227,6 @@ static void gui_fb_draw(gui_obj_t *root)
     uint32_t hbp_line = dc->driver_ic_hbp;
     uint32_t fps = dc->driver_ic_fps;
     uint32_t line_time = 1000000 / (fps * (active_line + hfp_line + hbp_line));
-
     uint32_t read_time = 0;
     uint32_t write_time = 0;
 
@@ -240,7 +239,6 @@ static void gui_fb_draw(gui_obj_t *root)
     {
         dc->lcd_te_wait();
     }
-
 
     if (dc->type == DC_RAMLESS)
     {
@@ -274,7 +272,6 @@ static void gui_fb_draw(gui_obj_t *root)
                 }
                 //gui_log("read = %dus, write = %d us\n", read_time, write_time);
             }
-
             dc->lcd_update(dc);
         }
 
@@ -334,7 +331,6 @@ void gui_fb_disp(gui_obj_t *root)
         gui_fb_draw(root);
         fb_change = false;
         {
-
             int ms = gui_ms_get();
             if (last_ms)
             {

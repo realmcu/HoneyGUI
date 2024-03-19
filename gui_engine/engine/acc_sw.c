@@ -99,7 +99,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
     struct gui_rgb_data_head *head = image->data;
     char img_type = head->type;
     gui_matrix_t *matrix = image->matrix;
-    bool identity = true;
+    bool identity = false;
     if (
         (matrix->m[0][0] == 1) && \
         (matrix->m[1][1] == 1) && \
@@ -111,10 +111,6 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
     )
     {
         identity = true;
-    }
-    else
-    {
-        identity = false;
     }
     if ((image->blend_mode == IMG_COVER_MODE) && (identity == true))
     {
@@ -131,7 +127,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
             cover_blit_2_argb8888(image, dc, rect);
         }
     }
-    if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == true))
+    else if ((image->blend_mode == IMG_BYPASS_MODE) && (identity == true))
     {
         if (dc_bytes_per_pixel == 2)
         {
@@ -342,12 +338,9 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
  */
 
 
-
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    struct gui_rgb_data_head *head = image->data;
-
-    char img_type = head->type;
+    char img_type = ((struct gui_rgb_data_head *)(image->data))->type;
 
     if (img_type == IMDC_COMPRESS)
     {
@@ -357,7 +350,6 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     {
         no_rle(image, dc, rect);
     }
-
 }
 /** End of ENGINE_Exported_Functions
   * @}
