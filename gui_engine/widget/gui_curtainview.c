@@ -90,41 +90,31 @@ static void input_prepare(gui_obj_t *obj)
     gui_curtainview_t *this = (gui_curtainview_t *)obj;
     GUI_UNUSED(tp);
 
+    //gui_log("cv name = %s \n", obj->name);
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
     {
         return;
     }
+
     switch (this->cur_curtain)
     {
     case CURTAIN_MIDDLE:
         {
             if (this->has_up_curtain == true)
             {
-                gui_obj_skip_all_down_hold(obj);
-                obj->skip_tp_down_hold = false;
+                gui_obj_skip_other_down_hold(obj);
             }
             if (this->has_down_curtain == true)
             {
-                if (this->cur_curtain_flag)
-                {
-                    gui_obj_skip_all_down_hold(obj);
-                }
-                gui_obj_skip_all_up_hold(obj);
-                obj->skip_tp_up_hold = false;
+                gui_obj_skip_other_up_hold(obj);
             }
             if (this->has_left_curtain == true)
             {
-                if (this->cur_curtain_flag)
-                {
-                    gui_obj_skip_all_left_hold(obj);
-                }
-                gui_obj_skip_all_right_hold(obj);
-                obj->skip_tp_right_hold = false;
+                gui_obj_skip_other_right_hold(obj);
             }
             if (this->has_right_curtain == true)
             {
-                gui_obj_skip_all_left_hold(obj);
-                obj->skip_tp_left_hold = false;
+                gui_obj_skip_other_left_hold(obj);
             }
             break;
         }
@@ -134,14 +124,10 @@ static void input_prepare(gui_obj_t *obj)
         }
     case CURTAIN_DOWN:
         {
-            gui_obj_skip_all_down_hold(obj);
-            gui_obj_skip_all_up_hold(obj);
             break;
         }
     case CURTAIN_LEFT:
         {
-            gui_obj_skip_all_left_hold(obj);
-            gui_obj_skip_all_right_hold(obj);
             break;
         }
     case CURTAIN_RIGHT:
@@ -250,6 +236,7 @@ static void curtainview_prepare(gui_obj_t *obj)
             {
                 break;
             }
+
             this->release_x = tp->deltaX;
             if (this->release_x != 0 && this->cur_curtain == CURTAIN_MIDDLE)
             {
@@ -288,6 +275,15 @@ static void curtainview_prepare(gui_obj_t *obj)
                     this->cur_curtain_flag = 1;
                 }
             }
+            else if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
+            {
+                break;
+            }
+            if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
+            {
+                break;
+            }
+
             if (this->cur_curtain == CURTAIN_MIDDLE && tp->deltaY < 0)
             {
                 this->release_y = tp->deltaY;

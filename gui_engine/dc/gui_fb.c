@@ -101,12 +101,19 @@ static void obj_input_prepare(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-
+        if ((obj->matrix != NULL) && (obj->parent->matrix))
+        {
+            memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
+            matrix_translate(obj->x, obj->y, obj->matrix);
+        }
         if (obj->obj_input_prepare != NULL)
         {
             obj->obj_input_prepare(obj);
         }
-
+        if (obj_is_active(obj) == false)
+        {
+            continue;
+        }
         obj_input_prepare(obj);
     }
 }
@@ -120,7 +127,6 @@ static void obj_draw_prepare(gui_obj_t *object)
     {
         GUI_ASSERT(node != NULL);
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-
         if (!(obj->create_done))
         {
             continue;
@@ -202,7 +208,7 @@ static void obj_draw_end(gui_obj_t *obj)
             }
         }
 
-        //matrix_identity(obj->matrix);
+        matrix_identity(obj->matrix);
         obj->active = false;
         //obj->not_show = false;// no need this insduction
         obj->skip_tp_left_hold = true;

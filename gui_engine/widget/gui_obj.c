@@ -413,15 +413,7 @@ void gui_obj_skip_all_child_left_hold(gui_obj_t *obj)
     }
 }
 
-void gui_obj_skip_all_left_hold(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-    gui_obj_skip_all_child_left_hold(o);
-}
+
 
 void gui_obj_skip_all_parent_right_hold(gui_obj_t *obj)
 {
@@ -442,15 +434,7 @@ void gui_obj_skip_all_child_right_hold(gui_obj_t *obj)
     }
 }
 
-void gui_obj_skip_all_right_hold(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-    gui_obj_skip_all_child_right_hold(o);
-}
+
 
 void gui_obj_skip_all_parent_up_hold(gui_obj_t *obj)
 {
@@ -471,15 +455,7 @@ void gui_obj_skip_all_child_up_hold(gui_obj_t *obj)
     }
 }
 
-void gui_obj_skip_all_up_hold(gui_obj_t *obj)
-{
-    gui_obj_t *o = obj;
-    while (o->parent != NULL)
-    {
-        o = o->parent;
-    }
-    gui_obj_skip_all_child_up_hold(o);
-}
+
 
 void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj)
 {
@@ -500,7 +476,21 @@ void gui_obj_skip_all_child_down_hold(gui_obj_t *obj)
     }
 }
 
-void gui_obj_skip_all_down_hold(gui_obj_t *obj)
+
+
+void gui_obj_skip_other_up_hold(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+    gui_obj_skip_all_child_up_hold(o);
+    obj->skip_tp_up_hold = false;
+    // gui_log("%s get up hold sem \n",obj->name);
+}
+
+void gui_obj_skip_other_down_hold(gui_obj_t *obj)
 {
     gui_obj_t *o = obj;
     while (o->parent != NULL)
@@ -508,8 +498,33 @@ void gui_obj_skip_all_down_hold(gui_obj_t *obj)
         o = o->parent;
     }
     gui_obj_skip_all_child_down_hold(o);
+    obj->skip_tp_down_hold = false;
+    // gui_log("%s get down hold sem \n",obj->name);
 }
 
+void gui_obj_skip_other_left_hold(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+    gui_obj_skip_all_child_left_hold(o);
+    obj->skip_tp_left_hold = false;
+    // gui_log("%s get left hold sem \n",obj->name);
+}
+
+void gui_obj_skip_other_right_hold(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+    gui_obj_skip_all_child_right_hold(o);
+    obj->skip_tp_right_hold = false;
+    // gui_log("%s get right hold sem \n",obj->name);
+}
 
 gui_color_t gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
                      unsigned char opacity)

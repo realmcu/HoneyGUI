@@ -85,7 +85,91 @@
   * @{
   */
 
+static void input_prepare(gui_obj_t *obj)
+{
+    gui_curtain_t *this = (gui_curtain_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_curtainview_t *curtainview = (gui_curtainview_t *)obj->parent;
+    int16_t dy = 0;
+    int16_t dx = 0;
+    int8_t cur_idy = 0;
+    int8_t cur_idx = 0;
+    int8_t idy = 0;
+    int8_t idx = 0;
+    switch (curtainview->cur_curtain)
+    {
+    case CURTAIN_UP:
+        cur_idy = -1;
+        cur_idx = 0;
+        break;
+    case CURTAIN_DOWN:
+        cur_idy = 1;
+        cur_idx = 0;
+        break;
+    case CURTAIN_LEFT:
+        cur_idy = 0;
+        cur_idx = -1;
+        break;
+    case CURTAIN_RIGHT:
+        cur_idy = 0;
+        cur_idx = 1;
+        break;
+    case CURTAIN_MIDDLE:
+        cur_idy = 0;
+        cur_idx = 0;
+        break;
+    default:
+        break;
+    }
+    switch (this->orientation)
+    {
+    case CURTAIN_UP:
+        idy = -1;
+        idx = 0;
+        break;
+    case CURTAIN_DOWN:
+        idy = 1;
+        idx = 0;
+        break;
+    case CURTAIN_LEFT:
+        idy = 0;
+        idx = -1;
+        break;
+    case CURTAIN_RIGHT:
+        idy = 0;
+        idx = 1;
+        break;
+    case CURTAIN_MIDDLE:
+        idy = 0;
+        idx = 0;
+        break;
+    default:
+        break;
+    }
+    if (cur_idy == idy)
+    {
+        dy = (int)gui_get_screen_height() * idy * (1 - this->scope);
+    }
+    else
+    {
+        dy = (idy - cur_idy) * (int)gui_get_screen_height();
+    }
+    dy += curtainview->release_y;
 
+
+
+    if (cur_idx == idx)
+    {
+        dx = (int)gui_get_screen_width() * idx * (1 - this->scope);
+    }
+    else
+    {
+        dx = (idx - cur_idx) * (int)gui_get_screen_width();
+    }
+
+    matrix_translate(dx, dy, obj->matrix);
+}
 
 static void curtain_prepare(gui_obj_t *obj)
 {
@@ -164,7 +248,6 @@ static void curtain_prepare(gui_obj_t *obj)
 
 
 
-
     if (cur_idx == idx)
     {
         dx = (int)gui_get_screen_width() * idx * (1 - this->scope);
@@ -192,6 +275,7 @@ void gui_curtain_ctor(gui_curtain_t *this, gui_obj_t *parent, const char *filena
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     ((gui_obj_t *)this)->obj_prepare = curtain_prepare;
+    ((gui_obj_t *)this)->obj_input_prepare = input_prepare;
     ((gui_obj_t *)this)->type = CURTAIN;
     if (scope == 0)
     {

@@ -88,6 +88,17 @@
   */
 static void tab_prepare_fade(gui_obj_t *obj);
 
+static void input_prepare(gui_obj_t *obj)
+{
+    gui_tab_t *this = (gui_tab_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
+    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+    matrix_translate((this->id.x - parent->cur_id.x) * (int)this->base.w, \
+                     (this->id.y - parent->cur_id.y) * (int)this->base.h, \
+                     obj->matrix);
+}
 static void tab_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
@@ -227,6 +238,7 @@ static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filenam
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
     GET_BASE(this)->obj_prepare = tab_prepare;
+    GET_BASE(this)->obj_input_prepare = input_prepare;
     GET_BASE(this)->type = TAB;
 
     gui_tabview_t *parent_ext = (gui_tabview_t *)parent;

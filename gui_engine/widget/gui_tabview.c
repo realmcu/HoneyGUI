@@ -92,14 +92,10 @@ static void input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     GUI_UNUSED(tp);
-    gui_obj_skip_all_up_hold(obj);
-    gui_obj_skip_all_down_hold(obj);
-    gui_obj_skip_all_left_hold(obj);
-    gui_obj_skip_all_right_hold(obj);
-    obj->skip_tp_left_hold = false;
-    obj->skip_tp_right_hold = false;
-    obj->skip_tp_up_hold = false;
-    obj->skip_tp_down_hold = false;
+    gui_obj_skip_other_up_hold(obj);
+    gui_obj_skip_other_down_hold(obj);
+    gui_obj_skip_other_left_hold(obj);
+    gui_obj_skip_other_right_hold(obj);
 }
 
 static void tabview_loop_unpadding(gui_tabview_t *tabview)
@@ -170,7 +166,6 @@ static void tabview_prepare(gui_obj_t *obj)
     switch (tp->type)
     {
     case TOUCH_HOLD_X:
-        gui_log("skip_tp_right_hold:%d\n", obj->skip_tp_right_hold);
         if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
         {
             break;

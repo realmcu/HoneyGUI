@@ -315,19 +315,19 @@ void gui_obj_skip_all_child_left_hold(gui_obj_t *obj);
  *
  * @param obj
  */
-void gui_obj_skip_all_left_hold(gui_obj_t *obj);
+void gui_obj_skip_other_left_hold(gui_obj_t *obj);
 
 void gui_obj_skip_all_parent_right_hold(gui_obj_t *obj);
 void gui_obj_skip_all_child_right_hold(gui_obj_t *obj);
-void gui_obj_skip_all_right_hold(gui_obj_t *obj);
+void gui_obj_skip_other_right_hold(gui_obj_t *obj);
 
 void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj);
 void gui_obj_skip_all_child_down_hold(gui_obj_t *obj);
-void gui_obj_skip_all_down_hold(gui_obj_t *obj);
+void gui_obj_skip_other_down_hold(gui_obj_t *obj);
 
 void gui_obj_skip_all_parent_up_hold(gui_obj_t *obj);
 void gui_obj_skip_all_child_up_hold(gui_obj_t *obj);
-void gui_obj_skip_all_up_hold(gui_obj_t *obj);
+void gui_obj_skip_other_up_hold(gui_obj_t *obj);
 
 /**
  * @brief judge the point if in range of this obj rect

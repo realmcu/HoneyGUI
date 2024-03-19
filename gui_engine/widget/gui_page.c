@@ -409,6 +409,21 @@ static void alien(gui_obj_t *obj)
 }
 #define GUI_PAGE_MAX_SPEED 60
 #define GUI_PAGE_MIN_SPEED 7
+
+static void input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    GUI_UNUSED(tp);
+
+    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == false)
+    {
+        return;
+    }
+
+    gui_obj_skip_other_up_hold(obj);
+    gui_obj_skip_other_down_hold(obj);
+}
+
 void page_update(gui_obj_t *obj)
 {
     obj_update_att(obj);
@@ -667,6 +682,7 @@ void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, in
                 );
     GET_BASE(this)->type = PAGE;
     GET_BASE(this)->obj_prepare = page_update;
+    GET_BASE(this)->obj_input_prepare = input_prepare;
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;

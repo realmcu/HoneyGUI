@@ -8,6 +8,7 @@
 #include "gui_text.h"
 #include "gui_win.h"
 #include "gui_api.h"
+#include "gui_page.h"
 
 #define MY_PI   (180)
 #define DOUBLE_CLICK_INTERVAL 600
@@ -113,6 +114,7 @@ void design_tab_watchface(void *parent)
 {
     img_clock = gui_img_create_from_mem(parent, "img_clock", CLOCK_BASE_BIN, 0, 0, 454, 454);
 
+
     watchface_hour = gui_img_create_from_mem(parent, "hour", ICON_CLOCK_HOUR_HAND_BIN, 220, 129, 12,
                                              100);
     watchface_minute = gui_img_create_from_mem(parent, "minute", ICON_CLOCK_MINUTE_HAND_BIN, 220, 97,
@@ -130,7 +132,6 @@ void design_tab_watchface(void *parent)
     curtainview_menu = gui_curtainview_create(parent, "curtainview_menu", 0, 0, 454, 454);
     void design_curtain_menu(void *parent);
     design_curtain_menu(curtainview_menu);
-
 
     gui_win_t *win_switch_to_perspective_app = gui_win_create(parent, "win_switch_to_perspective_app",
                                                               0, 0, 454, 454);
