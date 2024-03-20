@@ -72,7 +72,7 @@ typedef enum
     GUI_FONT_SRC_BMP = 0,
     GUI_FONT_SRC_TTF = 1,
     GUI_FONT_SRC_IMG = 2,
-} FONT_SOURCE_TYPE;
+} FONT_SRC_TYPE;
 
 /** @brief  text widget structure */
 typedef struct gui_text
@@ -84,7 +84,7 @@ typedef struct gui_text
     uint16_t text_offset;
     TEXT_MODE mode;
     TEXT_CHARSET charset;
-    FONT_SOURCE_TYPE font_type;
+    FONT_SRC_TYPE font_type;
     uint8_t font_height;
     uint8_t checksum;
     gui_animate_t *animate;
@@ -165,8 +165,12 @@ typedef struct gui_text_line
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t *this, void *text, FONT_SOURCE_TYPE text_type, gui_color_t color,
-                  uint16_t length, uint8_t font_size);
+void gui_text_set(gui_text_t   *this,
+                  void         *text,
+                  FONT_SRC_TYPE text_type,
+                  gui_color_t   color,
+                  uint16_t      length,
+                  uint8_t       font_size);
 
 /**
  * @brief set animate
@@ -177,7 +181,11 @@ void gui_text_set(gui_text_t *this, void *text, FONT_SOURCE_TYPE text_type, gui_
  * @param callback happens at every frame
  * @param p callback's parameter
  */
-void gui_text_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p);
+void gui_text_set_animate(void    *o,
+                          uint32_t dur,
+                          int      repeatCount,
+                          void    *callback,
+                          void    *p);
 
 /**
  * @brief set text mode of this text widget
@@ -250,9 +258,12 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type);
  * @return return the widget object pointer
  *
  */
-gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
-                            int16_t w, int16_t h);
-
+gui_text_t *gui_text_create(void       *parent,
+                            const char *name,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

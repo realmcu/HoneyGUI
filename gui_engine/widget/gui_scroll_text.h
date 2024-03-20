@@ -123,8 +123,12 @@ typedef struct gui_scroll_text
  * @return Return the widget object pointer: gui_scroll_text_t*
  *
  */
-gui_scroll_text_t *gui_scroll_text_create(void *parent, const char *name, int16_t x,
-                                          int16_t y, int16_t w, int16_t h);
+gui_scroll_text_t *gui_scroll_text_create(void       *parent,
+                                          const char *name,
+                                          int16_t     x,
+                                          int16_t     y,
+                                          int16_t     w,
+                                          int16_t     h);
 
 /**
  * @brief Set the text scroll property of the scroll text box.
@@ -138,9 +142,12 @@ gui_scroll_text_t *gui_scroll_text_create(void *parent, const char *name, int16_
  * @return void
  *
  */
-void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t start_value,
-                                uint8_t end_value,
-                                uint32_t interval_time_ms, uint32_t duration_time_ms);
+void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
+                                TEXT_MODE          mode,
+                                uint8_t            start_value,
+                                uint8_t            end_value,
+                                uint32_t           interval_time_ms,
+                                uint32_t           duration_time_ms);
 
 /**
 * @brief set the string in a scroll text box widget.
@@ -154,9 +161,12 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode, uint8_t
 * @return void
 *
 */
-void gui_scroll_text_set(gui_scroll_text_t *this, void *text, FONT_SOURCE_TYPE text_type,
-                         gui_color_t color,
-                         uint16_t length, uint8_t font_size);
+void gui_scroll_text_set(gui_scroll_text_t *this,
+                         void              *text,
+                         FONT_SRC_TYPE      text_type,
+                         gui_color_t        color,
+                         uint16_t           length,
+                         uint8_t            font_size);
 
 /** * @brief set font encoding
  * @note utf-8 or unicode

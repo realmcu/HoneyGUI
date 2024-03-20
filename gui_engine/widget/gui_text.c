@@ -164,6 +164,7 @@ static void gui_text_font_destory(gui_text_t *text)
     {
         gui_free(text->animate);
     }
+
     switch (text->font_type)
     {
     case GUI_FONT_SRC_BMP:
@@ -235,6 +236,7 @@ static void gui_text_prepare(gui_obj_t *obj)
 
     gui_text_update_att(obj);
     matrix_multiply_point(obj->matrix, &point);
+
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
 
@@ -283,6 +285,7 @@ static void gui_text_draw(gui_obj_t *obj)
     }
 
     gui_text_font_draw(text, &draw_rect);
+
     total_section_count = dc->screen_height / dc->fb_height -
                           ((dc->screen_height % dc->fb_height) ? 0 : 1);
 
@@ -302,11 +305,17 @@ static void gui_text_end(gui_obj_t *obj)
 static void gui_text_destory(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
+
     gui_text_font_destory(text);
 }
 
-void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
-                   int16_t y, int16_t w, int16_t h)
+void gui_text_ctor(gui_text_t *this,
+                   gui_obj_t  *parent,
+                   const char *name,
+                   int16_t     x,
+                   int16_t     y,
+                   int16_t     w,
+                   int16_t     h)
 {
     gui_obj_t *root = (gui_obj_t *)this;
     gui_obj_ctor(root, parent, name, x, y, w, h);
@@ -324,8 +333,12 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
  *                           Public Functions
  *============================================================================*/
 
-void gui_text_set(gui_text_t *this, void *text, FONT_SOURCE_TYPE text_type, gui_color_t color,
-                  uint16_t length, uint8_t font_size)
+void gui_text_set(gui_text_t   *this,
+                  void         *text,
+                  FONT_SRC_TYPE text_type,
+                  gui_color_t   color,
+                  uint16_t      length,
+                  uint8_t       font_size)
 {
     this->font_type = text_type;
     this->content = (uint8_t *)text;
@@ -337,7 +350,11 @@ void gui_text_set(gui_text_t *this, void *text, FONT_SOURCE_TYPE text_type, gui_
     gui_fb_change();
 }
 
-void gui_text_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p)
+void gui_text_set_animate(void    *o,
+                          uint32_t dur,
+                          int      repeatCount,
+                          void    *callback,
+                          void    *p)
 {
     gui_animate_t *animate = ((gui_text_t *)o)->animate;
     if (!(animate))
@@ -384,14 +401,18 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
 {
     this->content = (uint8_t *)text;
     this->len = length;
+
     gui_fb_change();
 }
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
 {
-    gui_font_scale_destory(this);
-    void *img = gui_text_bmp2img(this, font_img_type);
+    void *img;
     gui_img_t *text_img;
+
+    gui_font_scale_destory(this);
+    img = gui_text_bmp2img(this, font_img_type);
+
     if (this->scale_img == NULL)
     {
         text_img = gui_img_create_from_mem(this, "text_img", img, 0, 0, 0, 0);
@@ -401,25 +422,37 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
         text_img = this->scale_img;
         gui_img_set_attribute(text_img, "text_img", img, 0, 0);
     }
+
     switch (font_img_type)
     {
     case RGB565:
     case RGB888:
-        text_img->draw_img.blend_mode = IMG_FILTER_BLACK;
+        {
+            text_img->draw_img.blend_mode = IMG_FILTER_BLACK;
+        }
         break;
+
     case ARGB8565:
     case RGBA8888:
-        text_img->draw_img.blend_mode = IMG_SRC_OVER_MODE;
+        {
+            text_img->draw_img.blend_mode = IMG_SRC_OVER_MODE;
+        }
         break;
+
     default:
         break;
     }
+
     this->scale_img = text_img;
     this->font_type = GUI_FONT_SRC_IMG;
 }
 
-gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
-                            int16_t w, int16_t h)
+gui_text_t *gui_text_create(void       *parent,
+                            const char *name,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h)
 {
     gui_text_t *text;
 
