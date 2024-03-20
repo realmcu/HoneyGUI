@@ -119,22 +119,27 @@ char *text_string[FONT_NUM] =
 static void tab_text(void *tab)
 {
     gui_img_t *tree = gui_img_create_from_mem(tab, "tree", TREE_BIN, 0, 0, 0, 0);
-#if 0
-    gui_text_t *text2 = gui_text_create(tab,  "text2",  20, 35, 280, 50);
+#if 1
+    gui_text_t *text2 = gui_text_create(tab,  "text2",  0, 35, 280, 50);
     gui_text_set(text2, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_GREEN, 7, 48);
     gui_text_mode_set(text2, LEFT);
-    gui_text_t *text3 = gui_text_create(tab,  "text3",  20, 85, 280, 50);
-    gui_text_set(text3, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_BLUE, 7, 48);
-    gui_text_mode_set(text3, LEFT);
-    gui_text_t *text4 = gui_text_create(tab,  "text4",  20, 145, 280, 50);
-    gui_text_set(text4, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_RED, 7, 64);
-    gui_text_mode_set(text4, LEFT);
-    gui_text_t *text5 = gui_text_create(tab,  "text5",  20, 205, 280, 50);
-    gui_text_set(text5, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 7, 64);
-    gui_text_mode_set(text5, LEFT);
+
+    gui_text_t *text3 = gui_text_create(tab,  "text3",  0, 85, 280, 50);
+    gui_text_set(text3, "1234567", GUI_FONT_SRC_BMP, APP_COLOR_BLUE, 7, 48);
+    gui_text_mode_set(text3, CENTER);
+
+    gui_text_t *text4 = gui_text_create(tab,  "text4",  0, 145, 280, 50);
+    gui_text_set(text4, "!@#$", GUI_FONT_SRC_BMP, APP_COLOR_RED, 4, 64);
+    gui_text_mode_set(text4, RIGHT);
+
+    gui_text_t *text5 = gui_text_create(tab,  "text5",  0, 205, 280, 48 * 3);
+    gui_text_set(text5, "12345678901234567890", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 20, 48);
+    gui_text_mode_set(text5, MULTI_LEFT);
+
     gui_scroll_text_t *scrool_text1 = gui_scroll_text_create(tab,  "scrool_text1",  80, 300, 100, 50);
     gui_scroll_text_scroll_set(scrool_text1, SCROLL_X, 100, 0, 3000, 1500000);
     gui_scroll_text_set(scrool_text1, "0123456789", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0), 10, 32);
+
     gui_scroll_text_t *scrool_text2 = gui_scroll_text_create(tab,  "scrool_text2",  80, 360, 100, 60);
     gui_scroll_text_scroll_set(scrool_text2, SCROLL_Y, 100, 0, 3000, 1500000);
     gui_scroll_text_set(scrool_text2, "123456789012345678901234567890", GUI_FONT_SRC_BMP,
@@ -236,7 +241,7 @@ static void curtain_center(gui_curtainview_t *curtainview)
     gui_img_set_opacity((gui_img_t *)tree, 96);
 
     gui_text_t *time = gui_text_create(curtain_center, "time",  0, 80, 280, 128);
-    gui_text_set(time, "15:30", GUI_FONT_SRC_TTF, COLOR_WHITE, 5, 128);
+    gui_text_set(time, "15:30", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 5, 128);
     gui_text_type_set(time, QUICKSAND_MEDIUM_TTF);
     gui_text_mode_set(time, CENTER);
 
