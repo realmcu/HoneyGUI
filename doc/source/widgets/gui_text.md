@@ -77,9 +77,9 @@ All nine typesetting modes are as follows.
 |`LEFT`|Single-line text. Left align. |Text widget. Default.|
 |`CENTER`|Single-line text.Center align.|Text widget.|
 |`RIGHT`|Single-line text. Right align.|Text widget.|
-|`MUTI_LEFT`|Multiline text. Left align.|Text widget.|
-|`MUTI_CENTER`|Multiline text. Center align.|Text widget.|
-|`MUTI_RIGHT`|Multiline text. Right align.|Text widget.|
+|`MULTI_LEFT`|Multiline text. Left align.|Text widget.|
+|`MULTI_CENTER`|Multiline text. Center align.|Text widget.|
+|`MULTI_RIGHT`|Multiline text. Right align.|Text widget.|
 |`SCROLL_X`|Horizontal scroll single-line text. Right to left.|Only on scroll text widget.|
 |`SCROLL_Y`|Vertical scroll multiline text. Bottom-up.|Only on scroll text widget.|
 
@@ -89,9 +89,9 @@ typedef enum
     LEFT = 0,
     CENTER,
     RIGHT,
-    MUTI_LEFT,
-    MUTI_CENTER,
-    MUTI_RIGHT,
+    MULTI_LEFT,
+    MULTI_CENTER,
+    MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
 } TEXT_MODE;
@@ -156,7 +156,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_text_t *text4 = gui_text_create(screen,  "text4",  0, 150, 100, 200);
     gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, 0xffff0000, 24, 24);
     gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN);
-    gui_text_mode_set(text4, MUTI_CENTER);
+    gui_text_mode_set(text4, MULTI_CENTER);
 }
 
 ```
@@ -206,7 +206,7 @@ void page_tb_activity(void *parent)
     gui_text_t *text = gui_text_create(parent,  "text",  0, 0, 100, 200);
     gui_text_set(text, "ABCDEFGHI", GUI_FONT_SRC_BMP, 0xffff0000, 9, 24);
     gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN);
-    gui_text_mode_set(text, MUTI_CENTER);
+    gui_text_mode_set(text, MULTI_CENTER);
     gui_text_set_animate(text, 5000, 15, change_text_cb, text);
 }
 

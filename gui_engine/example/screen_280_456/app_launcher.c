@@ -108,75 +108,73 @@ static void tab_dynamic(void *tab)
 {
 
 }
-#define COLOR_WHITE gui_rgba(0xff, 0xff, 0xff, 0xff)
 #define FONT_NUM 4
 char *text_string[FONT_NUM] =
 {
-    "abcd",
-    "gui_rgba(0, 0xff, 0, 0)",
-    "gui_rgba(0, 0, 0xff, 0)",
-    "gui_rgba(0, 0, 0, 0xff)",
+    "abcdefg",
+    "1234567",
+    "!@#$%^&",
+    "QWERTYU",
 };
 static void tab_text(void *tab)
 {
     gui_img_t *tree = gui_img_create_from_mem(tab, "tree", TREE_BIN, 0, 0, 0, 0);
-
 #if 0
     gui_text_t *text2 = gui_text_create(tab,  "text2",  20, 35, 280, 50);
-    gui_text_set(text2, "abcdefg", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0), 7, 48);
+    gui_text_set(text2, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_GREEN, 7, 48);
     gui_text_mode_set(text2, LEFT);
     gui_text_t *text3 = gui_text_create(tab,  "text3",  20, 85, 280, 50);
-    gui_text_set(text3, "abcdefg", GUI_FONT_SRC_BMP, gui_rgb(0, 0, 0xff), 7, 48);
+    gui_text_set(text3, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_BLUE, 7, 48);
     gui_text_mode_set(text3, LEFT);
     gui_text_t *text4 = gui_text_create(tab,  "text4",  20, 145, 280, 50);
-    gui_text_set(text4, "abcdefg", GUI_FONT_SRC_BMP, gui_rgb(0xff, 0, 0), 7, 64);
+    gui_text_set(text4, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_RED, 7, 64);
     gui_text_mode_set(text4, LEFT);
     gui_text_t *text5 = gui_text_create(tab,  "text5",  20, 205, 280, 50);
     gui_text_set(text5, "abcdefg", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 7, 64);
     gui_text_mode_set(text5, LEFT);
-
     gui_scroll_text_t *scrool_text1 = gui_scroll_text_create(tab,  "scrool_text1",  80, 300, 100, 50);
     gui_scroll_text_scroll_set(scrool_text1, SCROLL_X, 100, 0, 3000, 1500000);
     gui_scroll_text_set(scrool_text1, "0123456789", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0), 10, 32);
-
     gui_scroll_text_t *scrool_text2 = gui_scroll_text_create(tab,  "scrool_text2",  80, 360, 100, 60);
     gui_scroll_text_scroll_set(scrool_text2, SCROLL_Y, 100, 0, 3000, 1500000);
     gui_scroll_text_set(scrool_text2, "123456789012345678901234567890", GUI_FONT_SRC_BMP,
                         APP_COLOR_WHITE, 30, 32);
 #else
     gui_color_t color[FONT_NUM];
-    color[0] = gui_rgba(0xff, 0, 0, 0xff);
-    color[1] = gui_rgba(0, 0xff, 0, 0xff);
-    color[2] = gui_rgba(0, 0, 0xff, 0xff);
-    color[3] = gui_rgba(0xff, 0xff, 0xff, 0xff);
+    color[0] = APP_COLOR_WHITE;
+    color[1] = APP_COLOR_RED;
+    color[2] = APP_COLOR_GREEN;
+    color[3] = APP_COLOR_BLUE;
     gui_text_t *text1[FONT_NUM];
     gui_text_t *text4[FONT_NUM];
     gui_text_t *text8[FONT_NUM];
+#if 0
     for (int i = 0; i < FONT_NUM; i++)
     {
         text1[i] = gui_text_create(tab, "text1", 32 * i, 32 * i, 280, 32);
         gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_TTF, color[i], strlen(text_string[i]), 32);
         gui_text_type_set(text1[i], QUICKSAND_MEDIUM_TTF);
     }
-
-    // for (int i = 0; i < FONT_NUM; i++)
-    // {
-    //     text1[i] = gui_text_create(tab, "text1", 0, 32 * i, 300, 32);
-    //     gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
-    //     gui_text_type_set(text1[i], HARMONYOS_SIZE32_BITS1_FONT_BIN);
-    // }
-    // for (int i = 0; i < FONT_NUM; i++)
-    // {
-    //     text4[i] = gui_text_create(tab, "text4", 0, 32 * i + 32 * 5, 300, 32);
-    //     gui_text_set(text4[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
-    //     gui_text_type_set(text4[i], HARMONYOS_SIZE32_BITS4_FONT_BIN);
-    // }
-    // for (int i = 0; i < FONT_NUM; i++)
-    // {
-    //     text8[i] = gui_text_create(tab, "text8", 0, 32 * i + 32 * 10, 300, 32);
-    //     gui_text_set(text8[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
-    //     gui_text_type_set(text8[i], HARMONYOS_SIZE32_BITS8_FONT_BIN);
-    // }
+#else
+    for (int i = 0; i < FONT_NUM; i++)
+    {
+        text1[i] = gui_text_create(tab, "text1", 0, 32 * i, 300, 32);
+        gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
+        gui_text_type_set(text1[i], HARMONYOS_SIZE32_BITS1_FONT_BIN);
+    }
+    for (int i = 0; i < FONT_NUM; i++)
+    {
+        text4[i] = gui_text_create(tab, "text4", 0, 32 * i + 32 * 5, 300, 32);
+        gui_text_set(text4[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
+        gui_text_type_set(text4[i], HARMONYOS_SIZE32_BITS4_FONT_BIN);
+    }
+    for (int i = 0; i < FONT_NUM; i++)
+    {
+        text8[i] = gui_text_create(tab, "text8", 0, 32 * i + 32 * 10, 300, 32);
+        gui_text_set(text8[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
+        gui_text_type_set(text8[i], HARMONYOS_SIZE32_BITS8_FONT_BIN);
+    }
+#endif
 #endif
 }
 #define ICON_NUM 6
@@ -236,19 +234,25 @@ static void curtain_center(gui_curtainview_t *curtainview)
                                                        CURTAIN_MIDDLE, 1);
     gui_img_t *tree = gui_img_create_from_mem(curtain_center, "tree", TREE_BIN, 0, 0, 0, 0);
     gui_img_set_opacity((gui_img_t *)tree, 96);
-    gui_text_t *time = gui_text_create(curtain_center,  "time",  0, 80, 280, 128);
+
+    gui_text_t *time = gui_text_create(curtain_center, "time",  0, 80, 280, 128);
     gui_text_set(time, "15:30", GUI_FONT_SRC_TTF, COLOR_WHITE, 5, 128);
     gui_text_type_set(time, QUICKSAND_MEDIUM_TTF);
     gui_text_mode_set(time, CENTER);
-    gui_text_t *date = gui_text_create(curtain_center,  "time",  0, 180, 280, 100);
-    gui_text_set(date, "Sun 6/6/2023", GUI_FONT_SRC_BMP, COLOR_WHITE, 12, 32);
-    gui_text_mode_set(date, CENTER);
+
+    int w_offset = gui_get_mem_utf8_char_width("Sun 6/6/2023", HARMONYOS_SIZE32_BITS4_FONT_BIN);
+    gui_text_t *date = gui_text_create(curtain_center, "date", (280 - w_offset) / 2, 180, 280, 100);
+    gui_text_set(date, "Sun 6/6/2023", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12, 32);
+    gui_text_mode_set(date, LEFT);
     gui_text_type_set(date, HARMONYOS_SIZE32_BITS8_FONT_BIN);
+    gui_text_convert_to_img(date, RGBA8888);
+
     gui_img_t *bt = gui_img_create_from_mem(curtain_center, "bt", ICBLECONNECT24_BIN, 150, 3, 0, 0);
     gui_img_t *bat = gui_img_create_from_mem(curtain_center, "bat", ICBATTERYLVL4_BIN, 185, 6, 0, 0);
-    gui_text_t *electric_quantity = gui_text_create(curtain_center,  "electric_quantity",  228, -2, 52,
+
+    gui_text_t *electric_quantity = gui_text_create(curtain_center, "electric_quantity", 228, 0, 52,
                                                     20);
-    gui_text_set(electric_quantity, "80", GUI_FONT_SRC_BMP, COLOR_WHITE, 2, 32);
+    gui_text_set(electric_quantity, "80", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 2, 32);
 }
 static void curtain_up(gui_curtainview_t *curtainview)
 {
@@ -287,8 +291,8 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_font_mem_init(HARMONYOS_SIZE32_BITS8_FONT_BIN);
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, CLASSIC);
-    // gui_tab_t *tabn = gui_tab_create(tv, "tab0", 0, 0, 0, 0, -1, 0);
+    gui_tabview_set_style(tv, REDUCTION);
+    gui_tab_t *tabn = gui_tab_create(tv, "tab0", 0, 0, 0, 0, -1, 0);
     gui_tab_t *tab0 = gui_tab_create(tv, "tab0", 0, 0, 0, 0, 0, 0);
     gui_tab_t *tab1 = gui_tab_create(tv, "tab1", 0, 0, 0, 0, 1, 0);
     gui_tab_t *tab2 = gui_tab_create(tv, "tab2", 0, 0, 0, 0, 2, 0);
@@ -297,7 +301,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_tab_t *tab5 = gui_tab_create(tv, "tab5", 0, 0, 0, 0, 5, 0);
     gui_tab_t *tab6 = gui_tab_create(tv, "tab6", 0, 0, 0, 0, 6, 0);
 
-    // tab_two(tabn);
+    tab_two(tabn);
     tab_home(tab0);
     tab_lake(tab1);
     tab_tree(tab2);

@@ -51,9 +51,9 @@ typedef enum
     LEFT = 0,
     CENTER,
     RIGHT,
-    MUTI_LEFT,
-    MUTI_CENTER,
-    MUTI_RIGHT,
+    MULTI_LEFT,
+    MULTI_CENTER,
+    MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
 } TEXT_MODE;

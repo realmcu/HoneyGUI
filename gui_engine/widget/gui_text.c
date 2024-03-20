@@ -160,6 +160,10 @@ static void gui_text_font_unload(gui_text_t *text)
 
 static void gui_text_font_destory(gui_text_t *text)
 {
+    if (text->animate)
+    {
+        gui_free(text->animate);
+    }
     switch (text->font_type)
     {
     case GUI_FONT_SRC_BMP:
@@ -385,8 +389,31 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
 {
+    gui_font_scale_destory(this);
     void *img = gui_text_bmp2img(this, font_img_type);
-    gui_img_t *text_img = gui_img_create_from_mem(this, "text_img", img, 0, 0, 0, 0);
+    gui_img_t *text_img;
+    if (this->scale_img == NULL)
+    {
+        text_img = gui_img_create_from_mem(this, "text_img", img, 0, 0, 0, 0);
+    }
+    else
+    {
+        text_img = this->scale_img;
+        gui_img_set_attribute(text_img, "text_img", img, 0, 0);
+    }
+    switch (font_img_type)
+    {
+    case RGB565:
+    case RGB888:
+        text_img->draw_img.blend_mode = IMG_FILTER_BLACK;
+        break;
+    case ARGB8565:
+    case RGBA8888:
+        text_img->draw_img.blend_mode = IMG_SRC_OVER_MODE;
+        break;
+    default:
+        break;
+    }
     this->scale_img = text_img;
     this->font_type = GUI_FONT_SRC_IMG;
 }

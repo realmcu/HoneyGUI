@@ -57,9 +57,9 @@ void gui_font_stb_load(gui_text_t *text, gui_rect_t *rect)
         case RIGHT:
             text->text_offset = _UI_MAX((text->base.w - all_char_w) / 2, 0);
             break;
-        case MUTI_LEFT:
-        case MUTI_CENTER:
-        case MUTI_RIGHT:
+        case MULTI_LEFT:
+        case MULTI_CENTER:
+        case MULTI_RIGHT:
             text->text_offset = all_char_w / text->base.w + 1 + line_flag;
             break;
         case SCROLL_X:
@@ -151,7 +151,7 @@ static bool creat_stb_screen(gui_text_t *text, gui_rect_t *rect, FONT_STB_SCREEN
         screen->width = _UI_MIN(rect->x2 - rect->x1, _UI_MAX(text->base.w - text->text_offset * 2, 0));
         screen->height = _UI_MIN(text->font_height, rect->y2 - rect->y1);
     }
-    else if (text->mode == MUTI_LEFT || text->mode == MUTI_CENTER || text->mode == MUTI_RIGHT)
+    else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
     {
         screen->width =  rect->x2 - rect->x1;
         screen->height = rect->y2 - rect->y1;
@@ -197,9 +197,9 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     case RIGHT:
         offset = text->text_offset * text->mode;
         break;
-    case MUTI_LEFT:
-    case MUTI_CENTER:
-    case MUTI_RIGHT:
+    case MULTI_LEFT:
+    case MULTI_CENTER:
+    case MULTI_RIGHT:
         break;
     case SCROLL_X:
         break;
@@ -380,7 +380,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
                 break;
             }
         }
-        else if (text->mode == MUTI_LEFT || text->mode == MUTI_CENTER || text->mode == MUTI_RIGHT)
+        else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
         {
             if (xpos + advance * scale > text->base.w)
             {
@@ -527,9 +527,9 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
         case RIGHT:
             offset = text->text_offset * text->mode;
             break;
-        case MUTI_LEFT:
-        case MUTI_CENTER:
-        case MUTI_RIGHT:
+        case MULTI_LEFT:
+        case MULTI_CENTER:
+        case MULTI_RIGHT:
             break;
         case SCROLL_X:
             break;
@@ -570,7 +570,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
                     break;
                 }
             }
-            else if (text->mode == MUTI_LEFT || text->mode == MUTI_CENTER || text->mode == MUTI_RIGHT)
+            else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
             {
                 if (xpos + advance * scale > stb_screen->width)
                 {

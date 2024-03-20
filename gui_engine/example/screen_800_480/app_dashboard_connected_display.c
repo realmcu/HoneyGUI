@@ -145,7 +145,7 @@ void app_dashboard_create_connected_display(gui_win_t *target_connected_display)
     gui_text_set(short_c_message_data, (char *)show_c_message_data, GUI_FONT_SRC_BMP,
                  gui_rgb(UINT8_MAX,
                          UINT8_MAX, UINT8_MAX), (current_message_status.wechat_msg_len - 1), 32);
-    gui_text_mode_set(short_c_message_data, MUTI_LEFT);
+    gui_text_mode_set(short_c_message_data, MULTI_LEFT);
 
     /* Prepare the intial data */
     app_dashboard_update_connected_display_time_info();
