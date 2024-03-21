@@ -109,11 +109,12 @@ static void obj_input_prepare(gui_obj_t *obj)
         if (obj->obj_input_prepare != NULL)
         {
             obj->obj_input_prepare(obj);
+            if (obj_is_active(obj) == false)
+            {
+                continue;
+            }
         }
-        if (obj_is_active(obj) == false)
-        {
-            continue;
-        }
+
         obj_input_prepare(obj);
     }
 }
