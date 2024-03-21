@@ -16,25 +16,39 @@
 #include "fmc_api_ext.h"
 #include "os_sync.h"
 
-#define USE_TESSALLATION 1
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
 
 #define PPEV2_ACC_MIN_OPA       3
 #define PPEV2_MIN_PIXEL         100
-#if USE_TESSALLATION
 #define PPEV2_TESS_LENGTH       100
-#endif
 
 #include "section.h"
-#if USE_TESSALLATION
-#define CACHE_BUF_SIZE           (40 * 1024)
+#define CACHE_BUF_SIZE           (42 * 1024)
 SHM_DATA_SECTION static uint8_t cache_buf1[CACHE_BUF_SIZE];
+SHM_DATA_SECTION static uint8_t *cache_buf2;
 static uint8_t *cache_buf = cache_buf1;
-#else
-#define CACHE_BUF_SIZE           (40 * 1024)
-SHM_DATA_SECTION static uint8_t cache_buf[CACHE_BUF_SIZE];
-#endif
+static uint32_t last_cache_size = 0;
+static void change_cache_buf(uint32_t cache_size)
+{
+    if (cache_buf == cache_buf1)
+    {
+        cache_buf2 = cache_buf1 + cache_size;
+        cache_buf = cache_buf2;
+    }
+    else if (cache_buf == cache_buf2)
+    {
+        cache_buf = cache_buf1;
+    }
+    else
+    {
+        cache_buf = cache_buf1;
+    }
+}
+static void restore_cache_buf(void)
+{
+    cache_buf = cache_buf1;
+}
 
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static uint32_t temp_buf_offset = 0;
@@ -863,7 +877,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     color.color.rgba_full = rect_header->color.color.rgba_full;
                     color.color.rgba.a = rect_header->color.color.rgba.a * (image->opacity_value * 1.0f / 255);
                     PPEV2_Mask(&target, color.color.rgba_full, &dst_rect);
-
                 }
                 return;
             }
@@ -941,7 +954,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     {
         return;
     }
-#if USE_TESSALLATION
+    ppe_rect_t constraint, old_rect;
     int32_t tessalation_len = PPEV2_TESS_LENGTH;
     uint32_t block_num = dc->fb_width / tessalation_len;
     if (dc->fb_width % tessalation_len)
@@ -953,11 +966,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         tessalation_len = dc->fb_width;
         block_num = 1;
     }
-#else
-    uint32_t tessalation_len = dc->fb_width;
-    uint32_t block_num = 1;
-#endif
-    ppe_rect_t constraint, old_rect;
+
     if (shape_transform && image->line != NULL)
     {
         ppe_rect_t section_rect = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
@@ -1050,17 +1059,20 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         uint32_t blend_area = 0;
         ppe_rect_t ppe_rect = {0};
         memcpy(&ppe_rect, &constraint, sizeof(ppe_rect_t));
-        if (ppe_rect.x - section_x1 < 0)
+        if (block_num != 1)
         {
-            ppe_rect.x = section_x1;
-        }
-        if (constraint.x + constraint.w > section_x1 + tessalation_len)
-        {
-            ppe_rect.w = section_x1 + tessalation_len - ppe_rect.x;
-        }
-        else
-        {
-            ppe_rect.w = constraint.x + constraint.w - ppe_rect.x;
+            if (ppe_rect.x - section_x1 < 0)
+            {
+                ppe_rect.x = section_x1;
+            }
+            if (constraint.x + constraint.w > section_x1 + tessalation_len)
+            {
+                ppe_rect.w = section_x1 + tessalation_len - ppe_rect.x;
+            }
+            else
+            {
+                ppe_rect.w = constraint.x + constraint.w - ppe_rect.x;
+            }
         }
         blend_area = ppe_rect.w * ppe_rect.h;
         ppe_matrix_t inverse;
@@ -1083,25 +1095,32 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     }
                 }
             }
-            if (head->type == IMDC_COMPRESS)
+            uint32_t new_cache_size = old_rect.w * old_rect.h * PPEV2_Get_Pixel_Size(source.format) + 4;
+            if (new_cache_size < (CACHE_BUF_SIZE - last_cache_size - 4))
             {
-                uint32_t s;
-                s = os_lock();
-                ret = memcpy_by_imdc(&old_rect, &source);
-                os_unlock(s);
+                change_cache_buf(new_cache_size);
             }
             else
             {
-                uint32_t s;
-                s = os_lock();
+                PPEV2_Finish();
+                restore_cache_buf();
+            }
+            last_cache_size = new_cache_size;
+            if (head->type == IMDC_COMPRESS)
+            {
+                ret = memcpy_by_imdc(&old_rect, &source);
+            }
+            else
+            {
                 ret = memcpy_by_dma(&old_rect, &source);
-                os_unlock(s);
             }
             ppe_rect.y -= section_y1;
             if (ret)
             {
                 ppe_get_identity(&pre_trans);
-                ppe_translate(old_rect.x * -1.0f, old_rect.y * -1.0f, &pre_trans);
+                //ppe_translate(old_rect.x * -1.0f, old_rect.y * -1.0f, &pre_trans);
+                pre_trans.m[0][2] = old_rect.x * -1.0f;
+                pre_trans.m[1][2] = old_rect.y * -1.0f;
                 ppe_mat_multiply(&pre_trans, &inverse);
                 y_ref = section_y1;
                 ppe_translate(0, y_ref, &pre_trans);
@@ -1126,12 +1145,11 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         }
         else
         {
-            ppe_get_identity(&pre_trans);
-            x_ref = section_x1;
-            y_ref = section_y1;
             ppe_translate(0, y_ref, &inverse);
             gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
-            source.const_color = rect_header->color.color.rgba_full;
+            gui_color_t color = {.color.rgba_full = rect_header->color.color.rgba_full};
+            color.color.rgba.a = rect_header->color.color.rgba.a * (image->opacity_value * 1.0f / 255);
+            source.const_color = color.color.rgba_full;
             ppe_rect.y -= dc->section.y1;
         }
         source.high_quality = image->high_quality;
@@ -1142,6 +1160,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             source.high_quality = false;
         }
+        PPEV2_Finish();
         PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &ppe_rect, mode);
 
         if (err != PPEV2_SUCCESS)
