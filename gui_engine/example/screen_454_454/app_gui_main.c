@@ -28,7 +28,7 @@ gui_tab_t *tab_player = NULL;
 gui_tab_t *tab_call = NULL;
 gui_tab_t *tab_contacts = NULL;
 gui_tab_t *tab_record = NULL;
-
+gui_tab_t *tab_menu = NULL;
 static void design_app_watch_ui(gui_app_t *app);
 extern void gui_task_ext_execution_sethook(void (*hook)(void));
 
@@ -79,12 +79,13 @@ static void design_app_watch_ui(gui_app_t *app)
     tab_call = gui_tab_create(tabview_main, "tab_call",           0, 0, 0, 0, 2, 0);
     tab_contacts = gui_tab_create(tabview_main, "tab_contacts",        0, 0, 0, 0, 3, 0);
     tab_record = gui_tab_create(tabview_main, "tab_record",       0, 0, 0, 0, 4, 0);
-
+    tab_menu = gui_tab_create(tabview_main, "tab_menu",       0, 0, 0, 0, -1, 0);
     design_tab_watchface(tab_watchface);
     design_tab_player(tab_player);
     design_tab_call(tab_call);
     design_tab_contacts(tab_contacts);
     design_tab_record(tab_record);
+    design_tab_menu(tab_menu);
 }
 
 #if defined _WIN32

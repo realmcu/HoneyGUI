@@ -25,7 +25,7 @@ extern void design_tab_player(void *parent);
 extern void design_tab_call(void *parent);
 extern void design_tab_contacts(void *parent);
 extern void design_tab_record(void *parent);
-
+extern void design_tab_menu(void *parent);
 extern gui_tabview_t *tabview_main;
 
 #ifdef __cplusplus

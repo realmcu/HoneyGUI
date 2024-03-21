@@ -23,7 +23,7 @@
 #include <tp_algo.h>
 #include "gui_obj.h"
 #include <kb_algo.h>
-
+#include "gui_matrix.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -95,10 +95,10 @@ static void win_prepare(gui_obj_t *obj)
     {
         gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);
     }
-
+    gui_win_t *this = (void *)obj;
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
-        gui_win_t *b = (void *)obj;
+
         switch (tp->type)
         {
         case TOUCH_SHORT:
@@ -128,7 +128,7 @@ static void win_prepare(gui_obj_t *obj)
             break;
         case TOUCH_LONG:
             {
-                b->long_flag = true;
+                this->long_flag = true;
                 gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
             }
             break;
@@ -139,22 +139,33 @@ static void win_prepare(gui_obj_t *obj)
         if (tp->pressed)
         {
             gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
-            b->long_flag = false;
-            b->press_flag = true;
+            this->long_flag = false;
+            this->press_flag = true;
         }
-        if (b->release_flag)
-        {
-            b->press_flag = false;
-            b->release_flag = false;
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-            b->long_flag = false;
-        }
-        if (tp->released && b->press_flag)
-        {
-            b->release_flag = true;
-        }
+
     }
+    if (this->release_flag)
+    {
+        this->press_flag = false;
+        this->release_flag = false;
+        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        this->long_flag = false;
+    }
+    if (tp->released && this->press_flag)
+    {
+        this->release_flag = true;
+    }
+
+
     gui_win_t *ob = (void *)obj;
+    if (ob->scale != 0)
+    {
+        matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
+        matrix_scale(ob->scale, 1, GET_BASE(obj)->matrix);
+        matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
+        gui_log("ob->scale:%f\n", ob->scale);
+        ob->scale = 0;
+    }
     if (ob->animate && ob->animate->animate)
     {
         size_t frame_count = ob->animate->dur * (1000 / 15) / (1000);
