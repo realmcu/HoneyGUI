@@ -16,8 +16,16 @@
 
 #if defined ENABLE_MESH_SWITCH
 #include "app_msg.h"
+
+#ifdef RTL87x2G
 T_IO_MSG led_msg = {.type = IO_MSG_TYPE_LED_ON};
 T_IO_MSG led_off_msg = {.type = IO_MSG_TYPE_LED_OFF};
+#endif
+
+#ifdef RTL8762D
+T_IO_MSG led_msg = {.type = IO_MSG_TYPE_MESH_LIGHT, .subtype = IO_MSG_MESH_LIGHT_ON_GUI};
+#endif
+
 #endif
 
 #if defined ENABLE_MATTER_SWITCH
@@ -42,7 +50,7 @@ DECLARE_HANDLER(writeSync)
 
         if (gpio >= 0)
         {
-            gui_log("gpio%d, %d, %d", gpio, mode, write_value);
+            gui_log("gpio %d, mode %d, write_value %d", gpio, mode, write_value);
             /**
              * GPIO
             */
@@ -64,7 +72,7 @@ DECLARE_HANDLER(writeSync)
              * MESH
             */
 #ifdef ENABLE_MESH_SWITCH
-#ifdef RTL87x2G
+#if (defined RTL87x2G)
             extern bool app_send_msg_to_apptask(T_IO_MSG * p_msg);
             if (write_value == 0)
             {
@@ -76,6 +84,19 @@ DECLARE_HANDLER(writeSync)
                 led_off_msg.u.param = 0x64 + gpio;
                 app_send_msg_to_apptask(&led_off_msg);
             }
+#else if (defined RTL8762D)
+            extern bool app_send_msg_to_apptask(T_IO_MSG * p_msg);
+
+            led_msg.u.param = 0x64 + gpio;
+            if (write_value == 0)
+            {
+                led_msg.subtype = IO_MSG_MESH_LIGHT_ON_GUI;
+            }
+            else
+            {
+                led_msg.subtype = IO_MSG_MESH_LIGHT_OFF_GUI;
+            }
+            app_send_msg_to_apptask(&led_msg);
 #endif
 #endif
             /**

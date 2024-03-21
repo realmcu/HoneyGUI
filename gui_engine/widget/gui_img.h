@@ -146,10 +146,17 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
                            int16_t y);
 
 /**
- * @brief set image configure
+ * @brief get image current configuration
  *
  * @param img image widget
- * @param config img configure
+ * @return gui_imgconfig_t image configuration
+ */
+gui_imgconfig_t gui_img_get_config(gui_img_t *img);
+/**
+ * @brief set image configuration
+ *
+ * @param img image widget
+ * @param config img configuration
  */
 void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config);
 /**

@@ -462,6 +462,24 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
     }
 }
 
+gui_imgconfig_t gui_img_get_config(gui_img_t *img)
+{
+    gui_imgconfig_t config = {0};
+    gui_img_t *this = img;
+    draw_img_t *draw_img = &img->draw_img;
+
+    config.src_mode = (IMG_SOURCE_MODE_TYPE)draw_img->src_mode;
+    // when src_mode is IMG_SRC_MEMADDR, return memory address
+    // when src_mode is IMG_SRC_FILESYS, return file path
+    config.addr = draw_img->data;
+    config.x = this->base.x;
+    config.y = this->base.y;
+    config.w = this->base.w;
+    config.h = this->base.h;
+
+    return config;
+}
+
 void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config)
 {
     GUI_ASSERT(img != NULL);
