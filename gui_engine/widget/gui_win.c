@@ -155,48 +155,44 @@ static void win_prepare(gui_obj_t *obj)
     {
         this->release_flag = true;
     }
-
-
-    gui_win_t *ob = (void *)obj;
-    if (ob->scale != 0)
+    if (this->scale != 0)
     {
         matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
-        matrix_scale(ob->scale, 1, GET_BASE(obj)->matrix);
+        matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
         matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
-        gui_log("ob->scale:%f\n", ob->scale);
-        ob->scale = 0;
+        this->scale = 0;
     }
-    if (ob->animate && ob->animate->animate)
+    if (this->animate && this->animate->animate)
     {
-        size_t frame_count = ob->animate->dur * (1000 / 15) / (1000);
-        ob->animate->callback(ob->animate->p);
-        ob->animate->current_frame++;
+        size_t frame_count = this->animate->dur * (1000 / 15) / (1000);
+        this->animate->callback(this->animate->p);
+        this->animate->current_frame++;
 
-        if (ob->animate->current_frame > frame_count)
+        if (this->animate->current_frame > frame_count)
         {
-            if (ob->animate->repeatCount == 0)
+            if (this->animate->repeatCount == 0)
             {
-                ob->animate->animate = false;
+                this->animate->animate = false;
             }
-            else if (ob->animate->repeatCount < 0)
+            else if (this->animate->repeatCount < 0)
             {
-                ob->animate->current_frame = 0;
+                this->animate->current_frame = 0;
             }
-            else if (ob->animate->repeatCount > 0)
+            else if (this->animate->repeatCount > 0)
             {
-                ob->animate->current_repeat_count++;
-                if (ob->animate->current_repeat_count >= ob->animate->repeatCount)
+                this->animate->current_repeat_count++;
+                if (this->animate->current_repeat_count >= this->animate->repeatCount)
                 {
-                    ob->animate->animate = false;
+                    this->animate->animate = false;
                 }
                 else
                 {
-                    ob->animate->current_frame = 0;
+                    this->animate->current_frame = 0;
                 }
             }
         }
-        ob->animate->progress_percent = ((float)(ob->animate->current_frame)) / ((float)(
-                                                                                     frame_count));
+        this->animate->progress_percent = ((float)(this->animate->current_frame)) / ((float)(
+                frame_count));
     }
 }
 

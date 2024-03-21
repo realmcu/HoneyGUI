@@ -28,18 +28,18 @@ void design_tab_menu(void *parent)
     //gui_page_rebound(page, true);
     static void *array[] =
     {
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
-        ICON_SONG_NEXT_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
     };
     int array_size = sizeof(array) / sizeof(array[0]);
     static gui_win_t *button_array[sizeof(array) / sizeof(array[0])];
