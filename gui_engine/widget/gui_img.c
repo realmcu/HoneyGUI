@@ -251,7 +251,7 @@ static void img_end(gui_obj_t *obj)
     }
 }
 
-static void magic_img_destory(gui_obj_t *obj)
+void magic_img_destory(gui_obj_t *obj)
 {
     gui_img_t *this = (gui_img_t *)obj;
 
@@ -564,77 +564,7 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
                              };
     return gui_img_create_core(parent, &config);
 }
-gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color)
-{
-    gui_rect_file_head_t *array = gui_malloc(sizeof(gui_rect_file_head_t));
-    memset(array, 0, sizeof(gui_rect_file_head_t));
-    struct gui_rgb_data_head *head = &(array->head);
-    head->type = RGBA8888;
-    head->w = w;
-    head->h = h;
-    array->color.color.rgba_full = color.color.rgba_full;
-    gui_img_t *img = gui_img_create_from_mem(parent, "RECT", array, x, y, w, h);
-    img->draw_img.blend_mode = IMG_RECT;
-    return img;
-}
-gui_img_t *gui_rect_round(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color,
-                          uint32_t *image_file_addr)
-{
-    int16_t rx, ry,  rect_w_1, rect_y_1, rect_h_1, rect_x_1,
-            rect_w_2, rect_y_2, rect_h_2, rect_x_2,
-            rect_w_3, rect_y_3, rect_h_3, rect_x_3,
-            x2, y2, x3, y3, x4, y4;
 
-    gui_img_t *img_left_top = gui_img_create_from_mem(parent, "leftup", image_file_addr, x, y, 0, 0);
-    gui_img_set_mode(img_left_top, IMG_SRC_OVER_MODE);
-    ry = gui_img_get_height(img_left_top);
-    rx = gui_img_get_width(img_left_top);
-    rect_w_1 = w - rx * 2;
-    rect_y_1 = 0;
-    rect_h_1 = ry;
-    rect_x_1 = rx;
-    rect_w_2 = w;
-    rect_y_2 = ry;
-    rect_h_2 = h - 2 * ry;
-    rect_x_2 = 0;
-    rect_w_3 = rect_w_1;
-    rect_y_3 = ry + rect_h_2;
-    rect_h_3 = rect_h_1;
-    rect_x_3 = rect_x_1;
-    x2 = 0;
-    y2 = ry + rect_h_2;
-    x3 = rx + rect_w_1;
-    y3 = 0;
-    x4 = x3;
-    y4 = y2;
-    gui_rect((void *)img_left_top, rect_x_1, rect_y_1, rect_w_1, rect_h_1, color);
-    gui_rect((void *)img_left_top, rect_x_2, rect_y_2, rect_w_2, rect_h_2, color);
-    gui_rect((void *)img_left_top, rect_x_3, rect_y_3, rect_w_3, rect_h_3, color);
-
-    {
-        gui_img_t *img = gui_img_create_from_mem(img_left_top, "left buttom", image_file_addr, x2, y2, 0,
-                                                 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_translate(img, rx / 2, ry / 2 - 1);
-        gui_img_rotation(img, -90, rx / 2, ry / 2);
-    }
-    {
-        gui_img_t *img = gui_img_create_from_mem(img_left_top, "right top", image_file_addr, x3, y3, 0, 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_translate(img, rx / 2 - 1, ry / 2);
-        gui_img_rotation(img, 90, rx / 2, ry / 2);
-    }
-    {
-        gui_img_t *img = gui_img_create_from_mem(img_left_top, "right buttom", image_file_addr, x4, y4, 0,
-                                                 0);
-        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_translate(img, rx / 2 - 1, ry / 2 - 1);
-        gui_img_rotation(img, -180, rx / 2, ry / 2);
-    }
-    return img_left_top;
-
-
-}
 /** End of WIDGET_Exported_Functions
   * @}
   */

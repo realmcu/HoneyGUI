@@ -83,6 +83,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static void dtor(gui_obj_t *obj);
 static void page_height(gui_obj_t *object, gui_obj_t *page)
 {
     gui_list_t *node = NULL;
@@ -683,6 +684,7 @@ void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, in
     GET_BASE(this)->type = PAGE;
     GET_BASE(this)->obj_prepare = page_update;
     GET_BASE(this)->obj_input_prepare = input_prepare;
+    GET_BASE(this)->obj_destory = dtor;
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;
@@ -710,6 +712,10 @@ void gui_page_rebound(gui_page_t *this, bool rebound)
 void gui_page_center_alignment(gui_page_t *page, int align_hight)
 {
     page->align_hight = align_hight;
+}
+static void dtor(gui_obj_t *obj)
+{
+    gui_free(GUI_TYPE(gui_page_t, obj)->animate);
 }
 /** End of WIDGET_Exported_Functions
   * @}
