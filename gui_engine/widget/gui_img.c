@@ -324,6 +324,8 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
     this->scale_y = 1.0f;
 
     this->opacity = draw_img->opacity_value;
+    root->w = gui_img_get_width(this);
+    root->h = gui_img_get_height(this);
 }
 
 static gui_img_t *gui_img_create_core(void *parent, gui_imgconfig_t *config)
