@@ -259,7 +259,7 @@ static void curtainview_prepare(gui_obj_t *obj)
                 break;
             }
 
-            else if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
+            if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
             {
                 break;
             }
@@ -309,7 +309,7 @@ static void curtainview_prepare(gui_obj_t *obj)
                     this->down_flag = 1;
                 }
             }
-            else if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
+            if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
             {
                 break;
             }

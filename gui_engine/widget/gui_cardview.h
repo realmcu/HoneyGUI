@@ -46,31 +46,20 @@ extern "C" {
   */
 
 
-typedef struct
-{
-    int32_t x;
-    int32_t y;
-    int32_t z;
-} gui_card_id_t;
 /** @brief  cardview structure */
 typedef struct gui_cardview
 {
     gui_obj_t base;
-    gui_list_t  tab_list;
-    gui_card_id_t id;
-    uint16_t tab_cnt;
-    int8_t tab_cnt_left;
-    int8_t tab_cnt_right;
-    int8_t tab_cnt_up;
-    int8_t tab_cnt_down;
-    gui_card_id_t cur_id;
+    uint16_t height;
+    uint16_t total_cnt;
+    uint16_t cur_id;
     SLIDE_STYLE style;
     int16_t release_y;
     int16_t remain_y;
     int16_t speed;
     int16_t recode[5];
-    bool mute;
     void (*status_cb)(struct gui_cardview *this);
+    uint8_t checksum;
 } gui_cardview_t;
 
 
@@ -147,13 +136,6 @@ gui_cardview_t *gui_cardview_create(void *parent,  const char *name,
  * @param style refer to SLIDE_STYLE
  */
 void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style);
-
-/**
- * @brief disable cardview
- *
- * @param this widget pointer
- */
-void gui_cardview_mute(gui_cardview_t *this);
 
 /**
  * @brief listen to cardview's event

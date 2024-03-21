@@ -105,24 +105,4 @@ void curtain_down_design(void *parent_widget)
 
 }
 
-void test_cv(void *p)
-{
-    cv = gui_cardview_create(p, "cardview", 0, 0, 0, 124);
-    cv->mute = false;
 
-
-
-    gui_card_t *tb_music = gui_card_create(cv, "tb_music",         0, 0, 0, 124, 0, 5);
-    gui_card_t *tb_weather = gui_card_create(cv, "tb_weather",     0, 0, 0, 124, 0, 4);
-    gui_card_t *tb_blood = gui_card_create(cv, "tb_tb_bloodcube",  0, 0, 0, 124, 0, 3);
-    gui_card_t *tb_heart = gui_card_create(cv, "tb_heart",         0, 0, 0, 124, 0, 2);
-    gui_card_t *tb_activity = gui_card_create(cv, "tb_activity",   0, 0, 0, 124, 0, 1);
-    gui_card_t *tb_clock = gui_card_create(cv, "tb_clock",         0, 0, 0, 124, 0, 0);
-
-    cardlist_clock(tb_clock);
-    cardlist_activity(tb_activity);
-    cardlist_heart(tb_heart);
-    cardlist_blood(tb_blood);
-    cardlist_weather(tb_weather);
-    cardlist_music(tb_music);
-}
