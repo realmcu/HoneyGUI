@@ -66,6 +66,7 @@ typedef struct gui_page
     void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
     bool release;
+    bool press;
     uint8_t status;
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
 } gui_page_t;
