@@ -3,27 +3,14 @@
 #include "font_mem.h"
 
 MEM_FONT_LIB font_lib_tab[10];
-static uint8_t get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
+static uint8_t get_fontlib_name(uint8_t font_size)
 {
     uint8_t tab_size = sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB);
-    if (dot_addr)
+    for (size_t i = 0; i < tab_size; i++)
     {
-        for (size_t i = 0; i < tab_size; i++)
+        if (font_lib_tab[i].font_size == font_size)
         {
-            if (font_lib_tab[i].bmp_addr == dot_addr || font_lib_tab[i].font_file == dot_addr)
-            {
-                return i;
-            }
-        }
-    }
-    else if (font_size)
-    {
-        for (size_t i = 0; i < tab_size; i++)
-        {
-            if (font_lib_tab[i].font_size == font_size)
-            {
-                return i;
-            }
+            return i;
         }
     }
     gui_log("Can not match font file, use default \n");
@@ -36,11 +23,19 @@ static uint8_t get_fontlib_name(uint8_t *dot_addr, uint8_t font_size)
 }
 void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
 {
-    uint8_t font_name = get_fontlib_name(text->path, text->font_height);
-    uint32_t dot_offset = (uint32_t)(font_lib_tab[font_name].bmp_addr);
-    uint32_t table_offset = (uint32_t)(font_lib_tab[font_name].table_addr);
-    uint8_t rendor_mode = font_lib_tab[font_name].rendor_mode;
-    uint8_t index_method = font_lib_tab[font_name].font_mode_detail.detail.index_method;
+    if (text->path == NULL)
+    {
+        text->path = font_lib_tab[get_fontlib_name(text->font_height)].font_file;
+    }
+    GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
+
+    uint32_t table_offset = (uint32_t)((uint8_t *)font + font->head_length);
+    uint32_t dot_offset = table_offset + font->index_area_size;
+    uint8_t rendor_mode = font->rendor_mode;
+    uint8_t index_method = font->font_mode_detail.detail.index_method;
+    uint8_t index_unit_length = 4; //now set to 4 , todo
+    bool crop = font->font_mode_detail.detail.crop;
+
     mem_char_t *chr = gui_malloc(sizeof(mem_char_t) * text->len);
     if (chr == NULL)
     {
@@ -56,13 +51,6 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
         gui_free(text->data);
     }
     text->data = chr;
-    uint8_t aliened_font_size;
-    aliened_font_size = text->font_height;
-    if (text->font_height % 8 != 0)
-    {
-        aliened_font_size = 8 - text->font_height % 8 + text->font_height;
-    }
-    uint32_t font_area = aliened_font_size * text->font_height / 8 * rendor_mode + 4;
     uint16_t *p_buf = NULL;
     uint16_t unicode_len = 0;
     switch (text->charset)
@@ -88,85 +76,133 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
     }
     uint32_t all_char_w = 0;
     uint32_t line_flag = 0;
-    switch (index_method)
+
+    if (crop)
     {
-    case 0: //address
-        for (uint32_t i = 0; i < unicode_len; i++)
+        switch (index_method)
         {
-            chr[i].unicode = p_buf[i];
-            chr[i].w = aliened_font_size;
-            chr[i].h = text->font_height;
-            uint16_t offset = 0;
-            if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
-            {
-                offset = *(uint16_t *)(0x20 * 2 + table_offset);
-                if (offset == 0xFFFF) { continue; }
-                chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
-                chr[i].char_w = text->font_height / 2;
-                chr[i].char_h = 1;
-            }
-            else if (chr[i].unicode == 0x0A)
-            {
-                line_flag ++;
-                offset = *(uint16_t *)(0x20 * 2 + table_offset);
-                if (offset == 0xFFFF) { continue; }
-                chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
-                chr[i].char_w = 0;
-                chr[i].char_h = 0;
-            }
-            else
-            {
-                offset = *(uint16_t *)(chr[i].unicode * 2 + table_offset);
-                if (offset == 0xFFFF) { continue; }
-                chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
-                chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
-                chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
-            }
-            all_char_w += chr[i].char_w;
-        }
-        break;
-    case 1: //offset
-        {
-            void *index_area_size_addr = ((uint8_t *)(font_lib_tab[font_name].font_file) + 9);
-            uint32_t index_area_size = *(uint32_t *)index_area_size_addr;
+        case 0: //address
             for (uint32_t i = 0; i < unicode_len; i++)
             {
                 chr[i].unicode = p_buf[i];
-                chr[i].w = aliened_font_size;
+                chr[i].w = 0;
                 chr[i].h = text->font_height;
-                chr[i].char_w = text->font_height / 2;
-                chr[i].char_h = text->font_height;
-                uint32_t index = 0;
-                if (chr[i].unicode == 0x0A)
+                uint32_t offset = 0;
+                if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
+                {
+                    chr[i].char_w = text->font_height / 2;
+                    chr[i].char_h = 1;
+                }
+                else if (chr[i].unicode == 0x0A)
                 {
                     line_flag ++;
                     chr[i].char_w = 0;
                     chr[i].char_h = 0;
                 }
-                else if (chr[i].unicode == 0x20)
+                else
+                {
+                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)table_offset + chr[i].unicode * index_unit_length);
+                    offset = *offset_addr;
+                    if (offset == 0xFFFFFFFF) { continue; }
+                    chr[i].dot_addr = (uint8_t *)text->path + offset + 4;
+                    chr[i].char_w = (uint8_t)(*(chr[i].dot_addr - 2));
+                    chr[i].char_y = (uint8_t)(*(chr[i].dot_addr - 4));
+                    chr[i].char_h = (uint8_t)(*(chr[i].dot_addr - 1)) - chr[i].char_y;
+                }
+                all_char_w += chr[i].char_w;
+            }
+            break;
+        case 1: //offset
+            {
+                //todo by luke
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        uint8_t aliened_font_size;
+        aliened_font_size = text->font_height;
+        if (text->font_height % 8 != 0)
+        {
+            aliened_font_size = 8 - text->font_height % 8 + text->font_height;
+        }
+        uint32_t font_area = aliened_font_size * text->font_height / 8 * rendor_mode + 4;
+        switch (index_method)
+        {
+        case 0: //address
+            for (uint32_t i = 0; i < unicode_len; i++)
+            {
+                chr[i].unicode = p_buf[i];
+                chr[i].w = aliened_font_size;
+                chr[i].h = text->font_height;
+                uint16_t offset = 0;
+                if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
                 {
                     chr[i].char_w = text->font_height / 2;
                     chr[i].char_h = 1;
                 }
+                else if (chr[i].unicode == 0x0A)
+                {
+                    line_flag ++;
+                    chr[i].char_w = 0;
+                    chr[i].char_h = 0;
+                }
                 else
                 {
-                    for (; index < index_area_size / 2; index ++)
-                    {
-                        if (chr[i].unicode == *(uint16_t *)(table_offset + index * 2))
-                        {
-                            chr[i].dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
-                            chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
-                            chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
-                            break;
-                        }
-                    }
+                    offset = *(uint16_t *)(chr[i].unicode * 2 + table_offset);
+                    if (offset == 0xFFFF) { continue; }
+                    chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                    chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+                    chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
                 }
                 all_char_w += chr[i].char_w;
             }
+            break;
+        case 1: //offset
+            {
+                uint32_t index_area_size = font->index_area_size;
+                for (uint32_t i = 0; i < unicode_len; i++)
+                {
+                    chr[i].unicode = p_buf[i];
+                    chr[i].w = aliened_font_size;
+                    chr[i].h = text->font_height;
+                    chr[i].char_w = text->font_height / 2;
+                    chr[i].char_h = text->font_height;
+                    uint32_t index = 0;
+                    if (chr[i].unicode == 0x0A)
+                    {
+                        line_flag ++;
+                        chr[i].char_w = 0;
+                        chr[i].char_h = 0;
+                    }
+                    else if (chr[i].unicode == 0x20)
+                    {
+                        chr[i].char_w = text->font_height / 2;
+                        chr[i].char_h = 1;
+                    }
+                    else
+                    {
+                        for (; index < index_area_size / 2; index ++)
+                        {
+                            if (chr[i].unicode == *(uint16_t *)(table_offset + index * 2))
+                            {
+                                chr[i].dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
+                                chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
+                                chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
+                                break;
+                            }
+                        }
+                    }
+                    all_char_w += chr[i].char_w;
+                }
+            }
+            break;
+        default:
+            break;
         }
-        break;
-    default:
-        break;
     }
 
     text->font_len = unicode_len;
@@ -396,8 +432,8 @@ gui_inline uint16_t rgba2565(gui_color_t rgba)
     uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
     return red + gre + blu;
 }
-static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
-                             gui_rect_t *rect)
+static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
+                             gui_rect_t *rect, bool crop)
 {
     if (chr->dot_addr == NULL)
     {
@@ -405,10 +441,14 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
     }
     uint8_t *dots = chr->dot_addr;
     gui_dispdev_t *dc = gui_get_dc();
-    int font_x = chr->x + dx;
-    int font_y = chr->y;
+    int font_x = chr->x;
+    int font_y = chr->y + chr->char_y;
     int font_w = chr->w;
-    // int font_h = chr->h;
+    if (crop)
+    {
+        int line_byte = (chr->char_w * rendor_mode + 8 - 1) / 8;
+        font_w = line_byte * 8 / rendor_mode;
+    }
     int x_start = _UI_MAX(_UI_MAX(font_x, rect->xboundleft), 0);
     int x_end;
     if (rect->xboundright != 0)
@@ -437,10 +477,110 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
     switch (rendor_mode)
     {
     case 2:
+#if 1
         if (dc_bytes_per_pixel == 2)
         {
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+            int write_off = (y_start - dc->section.y1) * dc->fb_width;
+
             uint16_t color_back;
+            uint16_t color_output = rgba2565(color);
+
+            uint8_t *p_dots = &dots[(y_start - font_y) * (font_w / 4) ];
+            uint8_t alpha_2bit;
+            for (uint32_t i = y_start; i < y_end; i++, write_off += dc->fb_width, p_dots += font_w / 4)
+            {
+                for (uint32_t j = x_start; j < x_end;)
+                {
+                    uint8_t alpha = *(p_dots + (j - font_x) / 4);
+                    if (alpha != 0)
+                    {
+//                        if(j+3>=x_end)
+//                        {
+//                            uint8_t bit_mask = 0xFF;
+//                            for(uint8_t k=0;k<j+3-x_end+1;k++)
+//                            {
+//                                bit_mask = bit_mask>>2;
+//                            }
+//                            alpha &= bit_mask;
+//                        }
+                        if (alpha & 0x03)
+                        {
+                            alpha_2bit = alpha & 0x03;
+                            if (alpha_2bit == 0x03)
+                            {
+                                writebuf[write_off + j] = color_output;
+                            }
+                            else
+                            {
+                                alpha_2bit *= 85;
+//                              alpha = color.color.rgba.a * alpha / 0xff;
+                                color_back = writebuf[write_off + j];
+                                writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
+                            }
+                        }
+                        if (alpha & 0x0C)
+                        {
+                            alpha_2bit = (alpha >> 2) & 0x03;
+                            if (alpha_2bit == 0x03)
+                            {
+                                writebuf[write_off + j + 1] = color_output;
+                            }
+                            else
+                            {
+                                alpha_2bit *= 85;
+//                              alpha = color.color.rgba.a * alpha / 0xff;
+                                color_back = writebuf[write_off + j + 1];
+                                writebuf[write_off + j + 1] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
+                            }
+                        }
+                        if (alpha & 0x30)
+                        {
+                            alpha_2bit = (alpha >> 4) & 0x03;
+                            if (alpha_2bit == 0x03)
+                            {
+                                writebuf[write_off + j + 2] = color_output;
+                            }
+                            else
+                            {
+                                alpha_2bit *= 85;
+//                              alpha = color.color.rgba.a * alpha / 0xff;
+                                color_back = writebuf[write_off + j + 2];
+                                writebuf[write_off + j + 2] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
+                            }
+                        }
+                        if (alpha & 0xC0)
+                        {
+                            alpha_2bit = (alpha >> 6) & 0x03;
+                            if (alpha_2bit == 0x03)
+                            {
+                                writebuf[write_off + j + 3] = color_output;
+                            }
+                            else
+                            {
+                                alpha_2bit *= 85;
+//                              alpha = color.color.rgba.a * alpha / 0xff;
+                                color_back = writebuf[write_off + j + 3];
+                                writebuf[write_off + j + 3] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
+                            }
+                        }
+                    }
+                    j += 4;
+                }
+            }
+        }
+#else
+        if (dc_bytes_per_pixel == 2)
+        {
+            uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+            uint16_t color_output = rgba2565(color);
+            uint16_t color_back;
+            uint8_t alpha_list[1 << rendor_mode];
+            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
+            for (int i = 0; i < 1 << rendor_mode; i++)
+            {
+                alpha_list[i] = i * pre_alpha;
+            }
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -451,18 +591,25 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x03;
-                        alpha *= 85;
+                        alpha = alpha_list[alpha];
                         alpha = color.color.rgba.a * alpha / 0xff;
                         color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = alphaBlendRGB565(rgba2565(color), color_back, alpha);
+                        writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha);
                     }
                 }
             }
         }
+#endif
         else if (dc_bytes_per_pixel == 3)
         {
             uint8_t *writebuf = (uint8_t *)dc->frame_buf;
             uint8_t color_back[3];
+            uint8_t alpha_list[1 << rendor_mode];
+            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
+            for (int i = 0; i < 1 << rendor_mode; i++)
+            {
+                alpha_list[i] = i * pre_alpha;
+            }
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -473,7 +620,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x03;
-                        alpha *= 85;
+                        alpha = alpha_list[alpha];
                         alpha = color.color.rgba.a * alpha / 0xff;
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
@@ -492,6 +639,12 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         {
             uint32_t *writebuf = (uint32_t *)dc->frame_buf;
             uint32_t color_back;
+            uint8_t alpha_list[1 << rendor_mode];
+            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
+            for (int i = 0; i < 1 << rendor_mode; i++)
+            {
+                alpha_list[i] = i * pre_alpha;
+            }
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
@@ -502,7 +655,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x03;
-                        alpha *= 85;
+                        alpha = alpha_list[alpha];
                         alpha = color.color.rgba.a * alpha / 0xff;
                         color_back = writebuf[write_off + j];
                         writebuf[write_off + j] = alphaBlendRGBA(color, color_back, alpha);
@@ -516,20 +669,27 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         {
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
             uint16_t color_back;
+            uint16_t color_output = rgba2565(color);
+            uint8_t alpha_list[1 << rendor_mode];
+            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
+            for (int i = 0; i < 1 << rendor_mode; i++)
+            {
+                alpha_list[i] = i * pre_alpha;
+            }
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >>
-                                    (4 - (j - font_x) % 2 * 4);
+                                    ((j - font_x) % 2 * 4);
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x0f;
-                        alpha *= 17;
+                        alpha = alpha_list[alpha];
                         alpha = color.color.rgba.a * alpha / 0xff;
                         color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = alphaBlendRGB565(rgba2565(color), color_back, alpha);
+                        writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha);
                     }
                 }
             }
@@ -538,17 +698,23 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         {
             uint8_t *writebuf = (uint8_t *)dc->frame_buf;
             uint8_t color_back[3];
+            uint8_t alpha_list[1 << rendor_mode];
+            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
+            for (int i = 0; i < 1 << rendor_mode; i++)
+            {
+                alpha_list[i] = i * pre_alpha;
+            }
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = (dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >>
-                                     (4 - (j - font_x) % 2 * 4));
+                                     ((j - font_x) % 2 * 4));
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x0f;
-                        alpha *= 17;
+                        alpha = alpha_list[alpha];
                         alpha = color.color.rgba.a * alpha / 0xff;
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
@@ -567,17 +733,23 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
         {
             uint32_t *writebuf = (uint32_t *)dc->frame_buf;
             uint32_t color_back;
+            uint8_t alpha_list[1 << rendor_mode];
+            int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
+            for (int i = 0; i < 1 << rendor_mode; i++)
+            {
+                alpha_list[i] = i * pre_alpha;
+            }
             for (uint32_t i = y_start; i < y_end; i++)
             {
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = (dots[(i - font_y) * (font_w / 2) + (j - font_x) / 2] >>
-                                     (4 - (j - font_x) % 2 * 4));
+                                     ((j - font_x) % 2 * 4));
                     if (alpha != 0)
                     {
                         alpha = alpha & 0x0f;
-                        alpha *= 17;
+                        alpha = alpha_list[alpha];
                         alpha = color.color.rgba.a * alpha / 0xff;
                         color_back = writebuf[write_off + j];
                         writebuf[write_off + j] = alphaBlendRGBA(color, color_back, alpha);
@@ -746,7 +918,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
                 int dots_off = (i - font_y) * (font_w / 8);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
                     {
                         writebuf[write_off + j] = color_output;
                     }
@@ -765,7 +937,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
                 int dots_off = (i - font_y) * (font_w / 8);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
                     {
                         color_back[0] = writebuf[write_off * 3 + j * 3 + 2];
                         color_back[1] = writebuf[write_off * 3 + j * 3 + 1];
@@ -790,7 +962,7 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
                 int dots_off = (i - font_y) * (font_w / 8);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
-                    if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                    if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
                     {
                         color_back = writebuf[write_off + j];
                         writebuf[write_off + j] = alphaBlendRGBA(color, color_back, color.color.rgba.a);
@@ -806,11 +978,11 @@ static void rtk_draw_unicode(int dx, mem_char_t *chr, gui_color_t color, uint8_t
 void gui_font_mem_draw(gui_text_t *text, gui_rect_t *rect)
 {
     mem_char_t *chr = text->data;
-    uint8_t font_name = get_fontlib_name(text->path, text->font_height);
-    uint8_t rendor_mode = font_lib_tab[font_name].rendor_mode;
+    GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
+    uint8_t rendor_mode = font->rendor_mode;
     for (uint16_t i = 0; i < text->font_len; i++)
     {
-        rtk_draw_unicode(0, chr + i, text->color, rendor_mode, rect);
+        rtk_draw_unicode(chr + i, text->color, rendor_mode, rect, font->font_mode_detail.detail.crop);
     }
 }
 
@@ -1095,8 +1267,8 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
     memcpy(img_buf, &head, sizeof(head));
 
     mem_char_t *chr = text->data;
-    uint8_t font_name = get_fontlib_name(text->path, text->font_height);
-    uint8_t rendor_mode = font_lib_tab[font_name].rendor_mode;
+    GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
+    uint8_t rendor_mode = font->rendor_mode;
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
 
     for (uint16_t i = 0; i < text->font_len; i++)
@@ -1106,35 +1278,6 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
     }
     gui_font_mem_unload(text);
     return img_buf;
-}
-
-
-void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
-                               void *font_table_addr)
-{
-    int i = 0;
-    for (; i < sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB); i++)
-    {
-        if (font_lib_tab[i].bmp_addr == 0 && font_lib_tab[i].font_size == 0 &&
-            font_lib_tab[i].table_addr == 0)
-        {
-            break;
-        }
-        if (font_lib_tab[i].bmp_addr == font_bitmap_addr)
-        {
-            break;
-        }
-    }
-    if (i >= sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB))
-    {
-        return;
-    }
-    font_lib_tab[i].font_file = font_bitmap_addr;
-    font_lib_tab[i].bmp_addr = font_bitmap_addr;
-    font_lib_tab[i].font_size = font_size;
-    font_lib_tab[i].table_addr = font_table_addr;
-    font_lib_tab[i].rendor_mode = 1;
-    font_lib_tab[i].font_mode_detail.value = 0;
 }
 
 void gui_font_mem_init(uint8_t *font_bin_addr)
@@ -1152,7 +1295,7 @@ void gui_font_mem_init(uint8_t *font_bin_addr)
     int i = 0;
     for (; i < sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB); i++)
     {
-        if (font_lib_tab[i].bmp_addr == 0)
+        if (font_lib_tab[i].font_file == NULL)
         {
             break;
         }
@@ -1168,10 +1311,6 @@ void gui_font_mem_init(uint8_t *font_bin_addr)
 
     font_lib_tab[i].font_file = font_bin_addr;
     font_lib_tab[i].font_size = font->font_size;
-    font_lib_tab[i].rendor_mode = font->rendor_mode;
-    font_lib_tab[i].table_addr = (uint8_t *)(font_bin_addr + font->head_length);
-    font_lib_tab[i].bmp_addr = (uint8_t *)(font_bin_addr + font->index_area_size + font->head_length);
-    font_lib_tab[i].font_mode_detail.value = font->font_mode_detail.value;
 }
 
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr)
@@ -1192,7 +1331,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
         aliened_font_size = 8 - font->font_size % 8 + font->font_size;
     }
     uint32_t font_area = aliened_font_size * font->font_size / 8 * font->rendor_mode + 4;
-
+    uint8_t index_unit_length = 4; //now set to 4 , todo
     uint16_t *unicode_buffer = NULL;
     uint16_t unicode_len = 0;
     switch (charset)
@@ -1218,62 +1357,106 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
     }
     uint32_t all_char_w = 0;
     uint32_t line_flag = 0;
-    switch (font->font_mode_detail.detail.index_method)
+
+    if (font->font_mode_detail.detail.crop)
     {
-    case 0: //address
-        for (uint32_t i = 0; i < unicode_len; i++)
+        switch (font->font_mode_detail.detail.index_method)
         {
-            uint16_t offset = 0;
-            uint16_t char_w = 0;
-            if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
+        case 0: //address
+            for (uint32_t i = 0; i < unicode_len; i++)
             {
-                char_w = font->font_size / 2;
-            }
-            else if (unicode_buffer[i] == 0x0A)
-            {
-                line_flag ++;
-                char_w = 0;
-            }
-            else
-            {
-                offset = *(uint16_t *)(unicode_buffer[i] * 2 + table_offset);
-                if (offset == 0xFFFF) { continue; }
-                uint8_t *dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
-                char_w = (int16_t)(*(dot_addr - 2));
-            }
-            all_char_w += char_w;
-        }
-        break;
-    case 1: //offset
-        for (uint32_t i = 0; i < unicode_len; i++)
-        {
-            uint16_t char_w = 0;
-            uint32_t index = 0;
-            if (unicode_buffer[i] == 0x0A)
-            {
-                line_flag ++;
-                char_w = 0;
-            }
-            else if (unicode_buffer[i] == 0x20)
-            {
-                char_w = font->font_size / 2;
-            }
-            else
-            {
-                for (; index < font->index_area_size / 2; index ++)
+                uint16_t offset = 0;
+                uint16_t char_w = 0;
+                if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
                 {
-                    if (unicode_buffer[i] == *(uint16_t *)(table_offset + index * 2))
+                    char_w = font->font_size / 2;
+                }
+                else if (unicode_buffer[i] == 0x0A)
+                {
+                    line_flag ++;
+                    char_w = 0;
+                }
+                else
+                {
+                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)table_offset + unicode_buffer[i] *
+                                                         index_unit_length);
+                    offset = *offset_addr;
+                    if (offset == 0xFFFFFFFF) { continue; }
+                    uint8_t *dot_addr = (uint8_t *)font_bin_addr + offset + 4;
+                    char_w = (uint8_t)(*(dot_addr - 2));
+                }
+                all_char_w += char_w;
+            }
+            break;
+        case 1: //offset
+            for (uint32_t i = 0; i < unicode_len; i++)
+            {
+                //todo by luke
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch (font->font_mode_detail.detail.index_method)
+        {
+        case 0: //address
+            for (uint32_t i = 0; i < unicode_len; i++)
+            {
+                uint16_t offset = 0;
+                uint16_t char_w = 0;
+                if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
+                {
+                    char_w = font->font_size / 2;
+                }
+                else if (unicode_buffer[i] == 0x0A)
+                {
+                    line_flag ++;
+                    char_w = 0;
+                }
+                else
+                {
+                    offset = *(uint16_t *)(unicode_buffer[i] * 2 + table_offset);
+                    if (offset == 0xFFFF) { continue; }
+                    uint8_t *dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                    char_w = (int16_t)(*(dot_addr - 2));
+                }
+                all_char_w += char_w;
+            }
+            break;
+        case 1: //offset
+            for (uint32_t i = 0; i < unicode_len; i++)
+            {
+                uint16_t char_w = 0;
+                uint32_t index = 0;
+                if (unicode_buffer[i] == 0x0A)
+                {
+                    line_flag ++;
+                    char_w = 0;
+                }
+                else if (unicode_buffer[i] == 0x20)
+                {
+                    char_w = font->font_size / 2;
+                }
+                else
+                {
+                    for (; index < font->index_area_size / 2; index ++)
                     {
-                        uint8_t *dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
-                        char_w = (int16_t)(*(dot_addr - 2));
+                        if (unicode_buffer[i] == *(uint16_t *)(table_offset + index * 2))
+                        {
+                            uint8_t *dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
+                            char_w = (int16_t)(*(dot_addr - 2));
+                        }
                     }
                 }
+                all_char_w += char_w;
             }
-            all_char_w += char_w;
+            break;
+        default:
+            break;
         }
-        break;
-    default:
-        break;
     }
     return all_char_w;
 }

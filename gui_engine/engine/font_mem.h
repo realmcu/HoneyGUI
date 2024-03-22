@@ -22,44 +22,29 @@ extern "C" {
 
 typedef struct
 {
+    uint8_t char_y;
+    uint8_t baseline;
+    uint8_t char_w;
+    uint8_t char_h;
+} GUI_CHAR_HEAD;
+
+typedef struct
+{
     uint16_t unicode;
     int16_t x;
     int16_t y;
     int16_t w;
     int16_t h;
-    int16_t char_w;
-    int16_t char_h;
+    uint8_t char_y;
+    uint8_t char_w;
+    uint8_t char_h;
     uint8_t *dot_addr;
 } mem_char_t;
 
 typedef struct
 {
-    uint8_t *font_lib_name;
-    uint8_t *font_lib_tab_name;
-    uint8_t rendor_mode : 4;
-    uint8_t index_method : 1;
-} fontlib_name_t;
-
-typedef struct
-{
     uint8_t *font_file;
-    uint8_t *bmp_addr;
-    uint8_t *table_addr;
     uint8_t font_size;
-    uint8_t rendor_mode;  // support 1 4 8
-    union
-    {
-        uint8_t value;
-        struct
-        {
-            uint8_t bold : 1;
-            uint8_t italic : 1;
-            uint8_t scanMode : 1;
-            uint8_t index_method : 1;   // 0 offset ; 1 address
-            uint8_t crop : 1;          /*enable crop can crop font file*/
-            uint8_t rsvd : 3;          /*rsvd*/
-        } detail;
-    } font_mode_detail;
 } MEM_FONT_LIB;
 
 #pragma pack(1)
@@ -89,16 +74,6 @@ typedef struct
 } GUI_FONT_HEAD;
 #pragma pack()
 
-/**
- * @brief Initialize the character binary file and store the font and
- * corresponding information in the font list
- *
- * @param font_size the size of this font file
- * @param font_bitmap_addr the bitmap file address of this font type
- * @param font_table_addr the table file address of this font type
- */
-void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
-                               void *font_table_addr);
 /**
  * @brief Initialize the character binary file and store the font and
  * corresponding information in the font list

@@ -50,7 +50,7 @@ gui_app_t *get_app_dashboard(void)
 
 static void gui_font_init()
 {
-    gui_set_font_mem_resourse(32, GBK_32_32_DOT_BIN, GBK_UNICODE_TABLE_BIN);
+
 }
 
 static void change_speed_mode()

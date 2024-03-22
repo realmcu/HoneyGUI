@@ -151,6 +151,7 @@ static void tab_text(void *tab)
     color[2] = APP_COLOR_GREEN;
     color[3] = APP_COLOR_BLUE;
     gui_text_t *text1[FONT_NUM];
+    gui_text_t *text2[FONT_NUM];
     gui_text_t *text4[FONT_NUM];
     gui_text_t *text8[FONT_NUM];
 #if 0
@@ -163,19 +164,25 @@ static void tab_text(void *tab)
 #else
     for (int i = 0; i < FONT_NUM; i++)
     {
-        text1[i] = gui_text_create(tab, "text1", 0, 32 * i, 300, 32);
+        text1[i] = gui_text_create(tab, "text1", 0, 32 * i + 32 * FONT_NUM * 0, 300, 32);
         gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
         gui_text_type_set(text1[i], HARMONYOS_SIZE32_BITS1_FONT_BIN);
     }
     for (int i = 0; i < FONT_NUM; i++)
     {
-        text4[i] = gui_text_create(tab, "text4", 0, 32 * i + 32 * 5, 300, 32);
+        text2[i] = gui_text_create(tab, "text2", 0, 32 * i + 32 * FONT_NUM * 1, 300, 32);
+        gui_text_set(text2[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
+        gui_text_type_set(text2[i], HARMONYOS_SIZE32_BITS1_FONT_BIN);
+    }
+    for (int i = 0; i < FONT_NUM; i++)
+    {
+        text4[i] = gui_text_create(tab, "text4", 0, 32 * i + 32 * FONT_NUM * 2, 300, 32);
         gui_text_set(text4[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
         gui_text_type_set(text4[i], HARMONYOS_SIZE32_BITS4_FONT_BIN);
     }
     for (int i = 0; i < FONT_NUM; i++)
     {
-        text8[i] = gui_text_create(tab, "text8", 0, 32 * i + 32 * 10, 300, 32);
+        text8[i] = gui_text_create(tab, "text8", 0, 32 * i + 32 * FONT_NUM * 3, 300, 32);
         gui_text_set(text8[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
         gui_text_type_set(text8[i], HARMONYOS_SIZE32_BITS8_FONT_BIN);
     }
@@ -287,13 +294,13 @@ static void app_launcher_ui_design(gui_app_t *app)
     size_t heap;
     gui_log("before ui unused mem head is %d", heap = os_mem_peek(RAM_TYPE_DATA_ON));
 #endif
-    gui_set_font_mem_resourse(32, GBK_32_32_DOT_BIN, GBK_UNICODE_TABLE_BIN);
-    gui_set_font_mem_resourse(48, QUICKSAND_MEDIUM_48_BIN, CP500_TABLE_BIN);
-    gui_set_font_mem_resourse(64, QUICKSAND_SEMIBOLD_64_BIN, CP500_TABLE_BIN);
     gui_font_stb_init(QUICKSAND_MEDIUM_TTF);
     gui_font_mem_init(HARMONYOS_SIZE32_BITS1_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE32_BITS2_FONT_BIN);
     gui_font_mem_init(HARMONYOS_SIZE32_BITS4_FONT_BIN);
     gui_font_mem_init(HARMONYOS_SIZE32_BITS8_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE48_BITS4_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE64_BITS4_FONT_BIN);
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);
