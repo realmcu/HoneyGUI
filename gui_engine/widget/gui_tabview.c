@@ -91,11 +91,24 @@
 static void input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
+    gui_tabview_t *this = (gui_tabview_t *)obj;
     GUI_UNUSED(tp);
-    gui_obj_skip_other_up_hold(obj);
-    gui_obj_skip_other_down_hold(obj);
-    gui_obj_skip_other_left_hold(obj);
-    gui_obj_skip_other_right_hold(obj);
+    if (this->tab_cnt_left != 0)
+    {
+        gui_obj_skip_other_left_hold(obj);
+    }
+    if (this->tab_cnt_right != 0)
+    {
+        gui_obj_skip_other_right_hold(obj);
+    }
+    if (this->tab_cnt_up != 0)
+    {
+        gui_obj_skip_other_up_hold(obj);
+    }
+    if (this->tab_cnt_down != 0)
+    {
+        gui_obj_skip_other_down_hold(obj);
+    }
 }
 
 static void tabview_loop_unpadding(gui_tabview_t *tabview)
