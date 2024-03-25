@@ -45,7 +45,7 @@ static void win_phone_update_cb(void *p)
     if (app_bond_phone_index != 0xff)
     {
         gui_text_set(text_phone_device_name, app_db.bond_device[app_bond_phone_index].device_name,
-                     "rtk_font_mem", APP_COLOR_WHITE,
+                     GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      app_db.bond_device[app_bond_phone_index].device_name_len,
                      FONT_H_32);
         gui_text_encoding_set(text_phone_device_name, UNICODE_ENCODING);
@@ -83,7 +83,7 @@ static void win_phone_update_cb(void *p)
     }
     else
     {
-        gui_text_set(text_phone_device_name, "无手机设备", "rtk_font_mem", APP_COLOR_WHITE, 15,
+        gui_text_set(text_phone_device_name, "无手机设备", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 15,
                      FONT_H_32);
         gui_text_type_set(text_phone_device_name, SIMKAI_SIZE32_BITS1_FONT_BIN);
         switch_text_base_phone->base.not_show = true;
@@ -353,7 +353,7 @@ void design_win_menu_phone(void *parent)
     if (app_bond_phone_index != 0xff)
     {
         gui_text_set(text_phone_device_name, app_db.bond_device[app_bond_phone_index].device_name,
-                     "rtk_font_mem", APP_COLOR_WHITE,
+                     GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      app_db.bond_device[app_bond_phone_index].device_name_len,
                      FONT_H_32);
         gui_text_encoding_set(text_phone_device_name, UNICODE_ENCODING);

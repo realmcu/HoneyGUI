@@ -56,7 +56,7 @@ void tab_player_update_cb(void *p)
                     header_info->length / 2);
 
     gui_scroll_text_set(scroll_text_song_name, (void *)utf8_name,
-                        "rtk_font_mem", APP_COLOR_WHITE, strlen((const char *)utf8_name), FONT_H_32);
+                        GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen((const char *)utf8_name), FONT_H_32);
 
     if (app_audio_get_play_status() == APP_AUDIO_STATE_PLAY)
     {
@@ -244,7 +244,7 @@ void design_tab_player(void *parent)
                         (uint16_t *)(MUSIC_NAME_BIN_ADDR + header_info->offset), \
                         header_info->length / 2);
         gui_scroll_text_set(scroll_text_song_name, (void *)utf8_name,
-                            "rtk_font_mem", APP_COLOR_WHITE, strlen((const char *)utf8_name), FONT_H_32);
+                            GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen((const char *)utf8_name), FONT_H_32);
     }
 #endif
 

@@ -54,12 +54,12 @@ static void win_buds_animate_cb(void *p)
                     app_db.bond_device[app_bond_earphone_index].bd_addr[2],
                     app_db.bond_device[app_bond_earphone_index].bd_addr[1],
                     app_db.bond_device[app_bond_earphone_index].bd_addr[0]);
-            gui_text_set(text_buds_device, bond_bd_addr, "rtk_font_mem", APP_COLOR_WHITE, 17, FONT_H_32);
+            gui_text_set(text_buds_device, bond_bd_addr, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 17, FONT_H_32);
         }
         else
         {
             gui_text_set(text_buds_device, app_db.bond_device[app_bond_earphone_index].device_name,
-                         "rtk_font_mem", APP_COLOR_WHITE, app_db.bond_device[app_bond_earphone_index].device_name_len,
+                         GUI_FONT_SRC_BMP, APP_COLOR_WHITE, app_db.bond_device[app_bond_earphone_index].device_name_len,
                          FONT_H_32);
             gui_text_encoding_set(text_buds_device, UNICODE_ENCODING);
         }
@@ -77,7 +77,7 @@ static void win_buds_animate_cb(void *p)
     }
     else
     {
-        gui_text_set(text_buds_device, "无耳机设备", "rtk_font_mem", APP_COLOR_WHITE, 15, FONT_H_32);
+        gui_text_set(text_buds_device, "无耳机设备", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 15, FONT_H_32);
         gui_obj_show(switch_disconnect, false);
         gui_obj_show(text_disconnect, false);
     }
@@ -280,12 +280,12 @@ void design_win_menu_buds(void *parent)
                     app_db.bond_device[app_bond_earphone_index].bd_addr[2],
                     app_db.bond_device[app_bond_earphone_index].bd_addr[1],
                     app_db.bond_device[app_bond_earphone_index].bd_addr[0]);
-            gui_text_set(text_buds_device, bond_bd_addr, "rtk_font_mem", APP_COLOR_WHITE, 17, font_size);
+            gui_text_set(text_buds_device, bond_bd_addr, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 17, font_size);
         }
         else
         {
             gui_text_set(text_buds_device, app_db.bond_device[app_bond_earphone_index].device_name,
-                         "rtk_font_mem", APP_COLOR_WHITE, \
+                         GUI_FONT_SRC_BMP, APP_COLOR_WHITE, \
                          app_db.bond_device[app_bond_earphone_index].device_name_len, font_size);
             gui_text_encoding_set(text_buds_device, UNICODE_ENCODING);
         }
@@ -303,7 +303,7 @@ void design_win_menu_buds(void *parent)
     }
     else
     {
-        gui_text_set(text_buds_device, "无耳机设备", "rtk_font_mem", APP_COLOR_WHITE, 15, font_size);
+        gui_text_set(text_buds_device, "无耳机设备", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 15, font_size);
         gui_obj_show(switch_disconnect, false);
         gui_obj_show(text_disconnect, false);
     }

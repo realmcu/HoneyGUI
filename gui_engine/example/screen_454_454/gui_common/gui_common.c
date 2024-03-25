@@ -196,6 +196,8 @@ void gui_update_by_event2(void *obj, T_GUI_UPDATE_EVENT *gui_update_event, bool 
 
 void gui_update_by_event(gui_event_t event, void *data, bool force_update)
 {
+    extern bool send_msg_to_gui_server(gui_msg_t *msg);
+
     if (force_update)
     {
         if (gui_server_dlps_check())

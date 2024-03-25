@@ -145,7 +145,7 @@ static void win_buds_device_update_cb(void *p)
         text_bonding_buds[i] = gui_text_create(switch_text_base_bonding_buds[i], "text_bonding_buds", 16,
                                                16, 192, FONT_H_32);
         gui_text_set(text_bonding_buds[i], app_db.bond_device[bond_device_index[i]].device_name,
-                     "rtk_font_mem", APP_COLOR_WHITE,
+                     GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      app_db.bond_device[bond_device_index[i]].device_name_len,
                      FONT_H_32);
         gui_text_encoding_set(text_bonding_buds[i], UNICODE_ENCODING);

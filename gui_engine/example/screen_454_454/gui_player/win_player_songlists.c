@@ -215,7 +215,8 @@ static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_
 
         gui_scroll_text_set(scroll_text_pagelist_song[(slide_index - 1) % 4],
                             (void *)utf8_name[(slide_index - 1) % 4],
-                            "rtk_font_mem", APP_COLOR_WHITE, strlen((const char *)utf8_name[(slide_index - 1) % 4]), FONT_H_32);
+                            GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen((const char *)utf8_name[(slide_index - 1) % 4]),
+                            FONT_H_32);
     }
 #endif
 }
@@ -239,7 +240,7 @@ static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t 
 
         gui_scroll_text_set(scroll_text_pagelist_song[slide_index % 4],
                             (void *)utf8_name[slide_index % 4],
-                            "rtk_font_mem", APP_COLOR_WHITE, strlen((const char *)utf8_name[slide_index % 4]), FONT_H_32);
+                            GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen((const char *)utf8_name[slide_index % 4]), FONT_H_32);
     }
 #endif
 }

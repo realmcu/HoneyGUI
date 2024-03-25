@@ -50,11 +50,11 @@ static void win_search_buds_update_cb(void *p)
                     temp_search_device[0]->bd_addr[2],
                     temp_search_device[0]->bd_addr[1],
                     temp_search_device[0]->bd_addr[0]);
-            gui_text_set(text_search_buds_1, bd_addr, "rtk_font_mem", APP_COLOR_WHITE, 17, FONT_H_32);
+            gui_text_set(text_search_buds_1, bd_addr, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 17, FONT_H_32);
         }
         else
         {
-            gui_text_set(text_search_buds_1, &temp_search_device[0]->device_name, "rtk_font_mem",
+            gui_text_set(text_search_buds_1, &temp_search_device[0]->device_name, GUI_FONT_SRC_BMP,
                          APP_COLOR_WHITE,
                          temp_search_device[0]->device_name_len,
                          FONT_H_32);
@@ -72,11 +72,11 @@ static void win_search_buds_update_cb(void *p)
                     temp_search_device[1]->bd_addr[2],
                     temp_search_device[1]->bd_addr[1],
                     temp_search_device[1]->bd_addr[0]);
-            gui_text_set(text_search_buds_2, bd_addr, "rtk_font_mem", APP_COLOR_WHITE, 17, FONT_H_32);
+            gui_text_set(text_search_buds_2, bd_addr, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 17, FONT_H_32);
         }
         else
         {
-            gui_text_set(text_search_buds_2, &temp_search_device[1]->device_name, "rtk_font_mem",
+            gui_text_set(text_search_buds_2, &temp_search_device[1]->device_name, GUI_FONT_SRC_BMP,
                          APP_COLOR_WHITE,
                          temp_search_device[1]->device_name_len,
                          FONT_H_32);
@@ -458,7 +458,7 @@ void design_win_buds_searching(void *parent)
                     temp_search_device[0]->bd_addr[2],
                     temp_search_device[0]->bd_addr[1],
                     temp_search_device[0]->bd_addr[0]);
-            gui_text_set(text_search_buds_1, bd_addr, "rtk_font_mem", APP_COLOR_WHITE, 17, font_size);
+            gui_text_set(text_search_buds_1, bd_addr, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 17, font_size);
         }
         else
         {
