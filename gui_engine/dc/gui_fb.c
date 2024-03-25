@@ -275,6 +275,10 @@ static void gui_fb_draw(gui_obj_t *root)
                 }
                 //gui_log("read = %dus, write = %d us\n", read_time, write_time);
             }
+            if (dc->lcd_draw_sync != NULL)
+            {
+                dc->lcd_draw_sync();
+            }
             dc->lcd_update(dc);
         }
 
@@ -285,6 +289,10 @@ static void gui_fb_draw(gui_obj_t *root)
         memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
 
         obj_draw_scan(root);
+        if (dc->lcd_draw_sync != NULL)
+        {
+            dc->lcd_draw_sync();
+        }
         dc->lcd_update(dc);
 
     }

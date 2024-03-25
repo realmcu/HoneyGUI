@@ -165,6 +165,7 @@ typedef struct gui_dispdev
     void (*lcd_te_wait)(void);
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
+    void (*lcd_draw_sync)(void);
 } gui_dispdev_t;
 typedef struct
 {
