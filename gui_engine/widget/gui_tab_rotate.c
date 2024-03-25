@@ -103,8 +103,26 @@ void gui_tab_rotate(gui_obj_t *obj)
     Vertex_t tv0, tv1, tv2, tv3;
     Vertex_t rv0, rv1, rv2, rv3;
 
+    int32_t id_x = parent->cur_id.x;
+    int32_t id_y = parent->cur_id.y;
+    int32_t release_x = parent->release_x;
+
+    gui_log("parent->cur_id.x = %d \n", parent->cur_id.x);
+
+    if (release_x > this->base.w / 2)
+    {
+        id_x--;
+        release_x = release_x - this->base.w;
+    }
+
+    if (release_x < -this->base.w / 2)
+    {
+        id_x++;
+        release_x = release_x + this->base.w;
+    }
+
     gui_matrix_t rotate_3D;
-    float rotate_degree = 90 * parent->release_x / (this->base.w / 2);
+    float rotate_degree = 90 * release_x / (this->base.w / 2);
 
     matrix_compute_rotate(0, rotate_degree, 0, &rotate_3D);
 
@@ -132,21 +150,20 @@ void gui_tab_rotate(gui_obj_t *obj)
     //     obj->not_show = true;
     // }
 
-    int32_t id_x = parent->cur_id.x;
-    int32_t id_y = parent->cur_id.y;
-    if (rotate_degree > 90)
-    {
-        id_x--;
-    }
-    if (rotate_degree < -90)
-    {
-        id_x++;
-    }
+
+    // if (rotate_degree > 90)
+    // {
+    //     id_x--;
+    // }
+    // if (rotate_degree < -90)
+    // {
+    //     id_x++;
+    // }
 
 
-    matrix_translate((this->id.x - id_x) * (int)this->base.w, \
-                     (this->id.y - id_y) * (int)this->base.h, \
-                     obj->matrix);
+    matrix_translate((this->id.x - id_x) * 2 * (int)this->base.w, \
+                     (this->id.y - id_y) * 2 * (int)this->base.h, \
+                     obj->matrix); //todo multi 2 for bug fix
 
     matrix_multiply(obj->matrix, &temp);
 }
