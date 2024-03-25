@@ -66,7 +66,7 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-
+static bool content_change = false;
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -244,9 +244,10 @@ static void gui_text_prepare(gui_obj_t *obj)
     this->checksum = 0;
     this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
 
-    if (last != this->checksum)
+    if (last != this->checksum || content_change)
     {
         gui_fb_change();
+        content_change = false;
     }
 }
 
@@ -348,6 +349,7 @@ void gui_text_set(gui_text_t   *this,
     this->text_offset = 0;
 
     gui_fb_change();
+    content_change = true;
 }
 
 void gui_text_set_animate(void    *o,
@@ -403,6 +405,7 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->len = length;
 
     gui_fb_change();
+    content_change = true;
 }
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
