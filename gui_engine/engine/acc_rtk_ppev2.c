@@ -679,7 +679,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
             else if (header->algorithm_type.pixel_bytes == 1)
             {
-                source.format = PPEV2_RGB888;
+                source.format = PPEV2_ARGB8565;
             }
             else
             {
@@ -800,6 +800,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             mode = PPEV2_CONST_MASK_MODE;
         }
+        else if (image->blend_mode == IMG_FILTER_BLACK)
+        {
+            mode = PPEV2_SRC_OVER_MODE;
+        }
         else
         {
             if (source.format >= PPEV2_BGR888 && source.format <= PPEV2_RGB565 && image->opacity_value == 0xFF)
@@ -839,7 +843,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         block_num++;
     }
 #else
-    uint32_t tessalation_len = dc->fb_width; \
+    int32_t tessalation_len = dc->fb_width; \
     uint32_t block_num = 1;
 #endif
     if (image->blend_mode == IMG_FILTER_BLACK)
