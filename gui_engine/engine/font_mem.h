@@ -11,14 +11,9 @@
 extern "C" {
 #endif
 
-// #define USE_PSRAM_HEAP
-#ifdef USE_PSRAM_HEAP
-#define FONT_MALLOC_PSRAM(x)  psRamPortMalloc(x)
-#define FONT_FREE_PSRAM(x)  psRamFree(x)
-#else
 #define FONT_MALLOC_PSRAM(x)  gui_malloc(x)
 #define FONT_FREE_PSRAM(x)  gui_free(x)
-#endif // USE_PSRAM_HEAP
+
 
 typedef struct
 {

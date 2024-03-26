@@ -705,7 +705,6 @@ typedef unsigned char validate_uint32[sizeof(stbi__uint32) == 4 ? 1 : -1];
 #error "Must define all or none of STBI_MALLOC, STBI_FREE, and STBI_REALLOC (or STBI_REALLOC_SIZED)."
 #endif
 #include <gui_api.h>
-// #include <rtthread.h>
 #ifndef STBI_MALLOC
 // extern struct rt_memheap psram_heap;
 #define STBI_MALLOC(sz)           gui_malloc(sz)
