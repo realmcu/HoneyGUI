@@ -477,7 +477,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
     switch (rendor_mode)
     {
     case 2:
-#if 1
+#if 1 //0 - Stable slow processing , 1 - Fast processing in tests
         if (dc_bytes_per_pixel == 2)
         {
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -987,7 +987,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_rect_t *rect)
 }
 
 static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
-                                      gui_rect_t *rect, uint8_t *buffer, int buf_width, uint8_t buffer_bytes)
+                                      gui_rect_t *rect, uint8_t *buffer, int buf_width, uint8_t buffer_bytes, uint8_t crop)
 {
     if (chr->dot_addr == NULL || buffer == NULL)
     {
@@ -997,14 +997,18 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
     gui_dispdev_t *dc = gui_get_dc();
 
     int font_x = chr->x;
-    int font_y = chr->y;
+    int font_y = chr->y + chr->char_y;
     int font_w = chr->w;
-    int font_h = chr->h;
+    // int font_h = chr->h;
     int x_start = font_x;
     int x_end = _UI_MIN(font_x + chr->char_w, buf_width);
     int y_start = font_y;
-    int y_end = font_y + font_h;
-
+    int y_end = font_y + chr->char_h;
+    if (crop)
+    {
+        int line_byte = (chr->char_w * rendor_mode + 8 - 1) / 8;
+        font_w = line_byte * 8 / rendor_mode;
+    }
     if ((x_start >= x_end) || (y_start >= y_end))
     {
         return;
@@ -1027,7 +1031,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
 
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
-                    int write_off = buf_width * (i - y_start) ;
+                    int write_off = buf_width * i;
                     int dots_off = (i - font_y) * (font_w / 4);
                     for (uint32_t j = x_start; j < x_end; j++)
                     {
@@ -1058,7 +1062,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                 }
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
-                    int write_off = buf_width * (i - y_start) ;
+                    int write_off = buf_width * i;
                     int dots_off = (i - font_y) * (font_w / 4);
                     for (uint32_t j = x_start; j < x_end; j++)
                     {
@@ -1090,11 +1094,11 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
 
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
-                    int write_off = buf_width * (i - y_start) ;
+                    int write_off = buf_width * i ;
                     int dots_off = (i - font_y) * (font_w / 2);
                     for (uint32_t j = x_start; j < x_end; j++)
                     {
-                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> (rendor_mode - (j - font_x) % 2 * 4);
+                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
                         if (alpha != 0)
                         {
                             writebuf[write_off + j - x_start] = color_output[alpha & 0x0f];
@@ -1132,7 +1136,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                 gui_color_t write_color = color;
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
-                    int write_off = buf_width * (i - y_start) ;
+                    int write_off = buf_width * i;
                     for (uint32_t j = x_start; j < x_end; j++)
                     {
                         uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
@@ -1155,12 +1159,12 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                 uint16_t color_output = rgba2565(color);
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
-                    int write_off = buf_width * (i - y_start) ;
+                    int write_off = buf_width * i;
                     int dots_off = (i - font_y) * (font_w / 8);
 
                     for (uint32_t j = x_start; j < x_end; j++)
                     {
-                        if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                        if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
                         {
                             writebuf[write_off + j - x_start] = color_output;
                         }
@@ -1177,11 +1181,11 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
-                    int write_off = buf_width * (i - y_start) ;
+                    int write_off = buf_width * i ;
                     int dots_off = (i - font_y) * (font_w / 8);
                     for (uint32_t j = x_start; j < x_end; j++)
                     {
-                        if ((dots[dots_off + (j - font_x) / 8] >> (7 - (j - font_x) % 8)) & 0x01)
+                        if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
                         {
                             writebuf[write_off + j - x_start] = color.color.rgba_full;
                         }
@@ -1274,7 +1278,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
     for (uint16_t i = 0; i < text->font_len; i++)
     {
         gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,
-                                  font_img_pixel_bytes);
+                                  font_img_pixel_bytes, font->font_mode_detail.detail.crop);
     }
     gui_font_mem_unload(text);
     return img_buf;

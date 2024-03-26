@@ -237,6 +237,12 @@ static void gui_text_prepare(gui_obj_t *obj)
     gui_text_update_att(obj);
     matrix_multiply_point(obj->matrix, &point);
 
+    if (this->mode == LEFT ||
+        this->mode == CENTER ||
+        this->mode == RIGHT)
+    {
+        this->base.h = this->font_height;
+    }
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
 
