@@ -100,6 +100,8 @@ typedef struct gui_curtainview
     uint16_t cur_curtain_flag            : 1;
     uint16_t middle_flag                 : 1;
     uint16_t middle_flag_left            : 1;
+    uint16_t middle_flag_up              : 1;
+    uint16_t up_flag                     : 1;
 
     uint8_t checksum;
     int release_y;
