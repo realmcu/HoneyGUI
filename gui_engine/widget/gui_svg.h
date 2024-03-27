@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -128,8 +128,13 @@ typedef struct gui_svg
  * @param h height
  * @return gui_svg_t*
  */
-gui_svg_t *gui_svg_create_from_file(void *parent,  const char *name, const char *filename,
-                                    int16_t x, int16_t y, int16_t w, int16_t h);
+gui_svg_t *gui_svg_create_from_file(void       *parent,
+                                    const char *name,
+                                    const char *filename,
+                                    int16_t     x,
+                                    int16_t     y,
+                                    int16_t     w,
+                                    int16_t     h);
 
 /**
  * @brief create a svg widget from memory,which should be display an SVG image
@@ -144,8 +149,14 @@ gui_svg_t *gui_svg_create_from_file(void *parent,  const char *name, const char 
  * @param h height
  * @return gui_svg_t*
  */
-gui_svg_t *gui_svg_create_from_mem(void *parent,  const char *name, uint8_t *addr, uint32_t size,
-                                   int16_t x, int16_t y, int16_t w, int16_t h);
+gui_svg_t *gui_svg_create_from_mem(void       *parent,
+                                   const char *name,
+                                   uint8_t    *addr,
+                                   uint32_t    size,
+                                   int16_t     x,
+                                   int16_t     y,
+                                   int16_t     w,
+                                   int16_t     h);
 /**
  * @brief set svg rotation angle
  *
@@ -154,7 +165,11 @@ gui_svg_t *gui_svg_create_from_mem(void *parent,  const char *name, uint8_t *add
  * @param c_x the X-axis coordinate of the rotation center
  * @param c_y the Y-axis coordinate of the rotation center
  */
-void gui_svg_rotation(gui_svg_t *svg, float degrees, float c_x, float c_y);
+void gui_svg_rotation(gui_svg_t *svg,
+                      float      degrees,
+                      float      c_x,
+                      float      c_y);
+
 /**
  * @brief scale the svg
  *
@@ -163,6 +178,7 @@ void gui_svg_rotation(gui_svg_t *svg, float degrees, float c_x, float c_y);
  * @param scale_y scale in the Y-axis direction
  */
 void gui_svg_scale(gui_svg_t *svg, float scale_x, float scale_y);
+
 /**
  * @brief translate the svg
  *
@@ -171,6 +187,7 @@ void gui_svg_scale(gui_svg_t *svg, float scale_x, float scale_y);
  * @param t_y translation in the Y-axis direction
  */
 void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y);
+
 /**
  * @brief set the opacity value of svg
  *
@@ -178,7 +195,6 @@ void gui_svg_translate(gui_svg_t *svg, float t_x, float t_y);
  * @param opacity_value the opacity value of svg to be set
  */
 void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value);
-
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
@@ -194,4 +210,3 @@ void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value);
 #endif
 
 #endif
-
