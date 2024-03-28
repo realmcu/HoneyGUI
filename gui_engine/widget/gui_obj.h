@@ -134,12 +134,6 @@ void gui_obj_ctor(struct _gui_obj_t *this, struct _gui_obj_t *parent, const char
 
 
 /**
-  * @param  this
-  * @return void
-  */
-void gui_obj_dtor(struct _gui_obj_t *this);
-
-/**
   * @brief create event widget
   * @param  obj
   * @param  event_cb switching events
@@ -282,6 +276,63 @@ gui_color_t gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
  * @return gui_color_t
  */
 gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
+
+/**
+ * @brief judge the obj if in range of this rect
+ *
+ * @param obj
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return true
+ * @return false
+ */
+bool gui_obj_in_rect(gui_obj_t *obj, int16_t x, int16_t y, int16_t w, int16_t h);
+
+/**
+ * @brief
+ *
+ * @param obj
+ */
+void gui_obj_skip_all_parent_left_hold(gui_obj_t *obj);
+
+/**
+ * @brief
+ *
+ * @param obj
+ */
+void gui_obj_skip_all_child_left_hold(gui_obj_t *obj);
+
+/**
+ * @brief
+ *
+ * @param obj
+ */
+void gui_obj_skip_other_left_hold(gui_obj_t *obj);
+
+void gui_obj_skip_all_parent_right_hold(gui_obj_t *obj);
+void gui_obj_skip_all_child_right_hold(gui_obj_t *obj);
+void gui_obj_skip_other_right_hold(gui_obj_t *obj);
+
+void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj);
+void gui_obj_skip_all_child_down_hold(gui_obj_t *obj);
+void gui_obj_skip_other_down_hold(gui_obj_t *obj);
+
+void gui_obj_skip_all_parent_up_hold(gui_obj_t *obj);
+void gui_obj_skip_all_child_up_hold(gui_obj_t *obj);
+void gui_obj_skip_other_up_hold(gui_obj_t *obj);
+
+/**
+ * @brief judge the point if in range of this obj rect
+ *
+ * @param obj
+ * @param x
+ * @param y
+ * @return true
+ * @return false
+ */
+bool gui_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
 
 /**
  * @brief

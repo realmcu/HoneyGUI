@@ -50,9 +50,6 @@ typedef struct gui_curtain
     gui_obj_t base; //!< base structure
     gui_curtain_enum_t orientation;
     float scope;
-    void (*ctor)(struct gui_curtain *this, gui_obj_t *parent, const char *filename, int16_t x,
-                 int16_t y,
-                 int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope); //!< constructor
 } gui_curtain_t;
 /** End of WIDGET_Exported_Types
   * @}

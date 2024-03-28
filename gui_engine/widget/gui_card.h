@@ -44,16 +44,18 @@ extern "C" {
   * @{
   */
 
-typedef struct _gui_card_stacking_t
+typedef struct _gui_card_status_t
 {
     float scale;
     float location;
     uint8_t opacity;
-} gui_card_stacking_t;
+} gui_card_status_t;
 /** @brief  card structure */
 typedef struct gui_card
 {
     gui_obj_t base;
+    gui_card_status_t status;
+    int16_t ay;//absolute value
     int32_t id;
 } gui_card_t;
 
@@ -111,14 +113,6 @@ typedef struct gui_card
   * @{
   */
 
-/**
- * @brief set card style
- *
- * @param this the widget object pointer.
- * @param style
- */
-void gui_card_set_style(gui_card_t *this, SLIDE_STYLE style);
-
 
 /**
  * @brief create a card widget
@@ -128,13 +122,11 @@ void gui_card_set_style(gui_card_t *this, SLIDE_STYLE style);
  * @param x the Y-axis coordinate of the widget.
  * @param w the width of the widget.
  * @param h the hight of the widget.
- * @param idx the X-axis index.
- * @param idy the Y-axis index.
  * @return return the widget object pointer.
  *
  */
-gui_card_t *gui_card_create(void *parent, const char *filename, int16_t x, int16_t y,
-                            int16_t w, int16_t h, int16_t idx, int16_t idy);
+gui_card_t *gui_card_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w,
+                            int16_t h);
 
 
 

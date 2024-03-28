@@ -88,9 +88,9 @@ void app_dashboard_launcher_ui_design(gui_app_t *app)
     gui_obj_add_event_cb(win_main_display, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_DOWN_PRESSED,
                          NULL);//switch app
 #endif
-    gui_set_font_mem_resourse(28, QUICKSAND_SEMIBOLD_28_BIN, CP500_TABLE_BIN);
-    gui_set_font_mem_resourse(32, GBK_32_32_DOT_BIN, GBK_UNICODE_TABLE_BIN);
-    gui_set_font_mem_resourse(56, QUICKSAND_SEMIBOLD_56_BIN, CP500_TABLE_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE28_BITS1_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE32_BITS1_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE56_BITS1_FONT_BIN);
 
     app_dashboard_create_main_display(win_main_display);
     app_dashboard_create_connected_display(win_connected_display);

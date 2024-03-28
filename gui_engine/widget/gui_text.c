@@ -18,6 +18,7 @@
  *                        Header Files
  *============================================================================*/
 #include "gui_text.h"
+#include "gui_matrix.h"
 #include "font_mem.h"
 #include "font_stb.h"
 
@@ -65,7 +66,7 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-
+static bool content_change = false;
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -81,56 +82,121 @@ static void gui_text_font_load(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
-        gui_font_mem_load(text, rect);
+    case GUI_FONT_SRC_BMP:
+        {
+            gui_font_mem_load(text, rect);
+        }
         break;
-    case GUI_FONT_SOURCE_TTF:
-        gui_font_stb_load(text, rect);
+
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_stb_load(text, rect);
+        }
         break;
+
+    case GUI_FONT_SRC_IMG:
+        {
+
+        }
+        break;
+
     default:
         break;
     }
 }
+
 static void gui_text_font_draw(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
-        if (text->base.sx != 1.0f || text->base.sy != 1.0f)
+    case GUI_FONT_SRC_BMP:
         {
-            return;
+            gui_font_mem_draw(text, rect);
         }
-        gui_font_mem_draw(text, rect);
         break;
-    case GUI_FONT_SOURCE_TTF:
-        gui_font_stb_draw(text, rect);
+
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_stb_draw(text, rect);
+        }
         break;
+
+    case GUI_FONT_SRC_IMG:
+        {
+
+        }
+        break;
+
     default:
         break;
     }
 }
+
 static void gui_text_font_unload(gui_text_t *text)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
-        gui_font_mem_unload(text);
+    case GUI_FONT_SRC_BMP:
+        {
+            gui_font_mem_unload(text);
+        }
         break;
-    case GUI_FONT_SOURCE_TTF:
-        gui_font_stb_unload(text);
+
+    case GUI_FONT_SRC_TTF:
+        {
+            gui_font_stb_unload(text);
+        }
+        break;
+
+    case GUI_FONT_SRC_IMG:
+        {
+
+        }
         break;
     default:
         break;
     }
 }
 
-static void (obj_update_att)(struct _gui_obj_t *this)
+static void gui_text_font_destory(gui_text_t *text)
+{
+    if (text->animate)
+    {
+        gui_free(text->animate);
+    }
+
+    switch (text->font_type)
+    {
+    case GUI_FONT_SRC_BMP:
+        {
+
+        }
+        break;
+
+    case GUI_FONT_SRC_TTF:
+        {
+
+        }
+        break;
+
+    case GUI_FONT_SRC_IMG:
+        {
+            gui_font_scale_destory(text);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+static void gui_text_update_att(struct _gui_obj_t *this)
 {
     gui_text_t *obj = (void *)this;
+    size_t frame_count;
 
     if (obj->animate && obj->animate->animate)
     {
-        size_t frame_count = obj->animate->dur * 30 / (1000);
+        frame_count = obj->animate->dur * 30 / (1000);
         obj->animate->callback(obj->animate->p);
         obj->animate->current_frame++;
 
@@ -162,36 +228,50 @@ static void (obj_update_att)(struct _gui_obj_t *this)
     }
 }
 
-static void gui_text_prepare(gui_obj_t *o)
+static void gui_text_prepare(gui_obj_t *obj)
 {
-    gui_text_t *obj = (void *)o;
-    uint8_t last = obj->checksum;
+    gui_text_t *this = (void *)obj;
+    gui_point_t point = {0, 0, 1};
+    uint8_t last;
 
-    obj_update_att(o);
-    obj->checksum = 0;
-    obj->checksum = gui_checksum(0, (uint8_t *)obj, sizeof(gui_text_t));
+    gui_text_update_att(obj);
+    matrix_multiply_point(obj->matrix, &point);
 
-    if (last != obj->checksum)
+    if (this->mode == LEFT ||
+        this->mode == CENTER ||
+        this->mode == RIGHT)
+    {
+        this->base.h = this->font_height;
+    }
+    this->offset_x = point.p[0];
+    this->offset_y = point.p[1];
+
+    last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
+
+    if (last != this->checksum || content_change)
     {
         gui_fb_change();
+        content_change = false;
     }
 }
 
 static void gui_text_draw(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
+    struct gui_dispdev *dc;
+    gui_rect_t draw_rect = {0};
+    uint32_t total_section_count;
+
     if (text->len == 0)
     {
         return;
     }
-    struct gui_dispdev *dc = gui_get_dc();
-    int tab_x = 0;
-    int tab_y = 0;
-    tab_y = (int)(gui_get_screen_height() / 2 - obj->ay) * (1.0f - obj->sy);
-    tab_x = (int)(gui_get_screen_width() / 2 - obj->ax) * (1.0f - obj->sx);
-    gui_rect_t draw_rect = {0};
-    draw_rect.x1 = obj->ax + obj->dx + obj->tx + tab_x;
-    draw_rect.y1 = obj->ay + obj->dy + obj->ty + tab_y;
+
+    dc = gui_get_dc();
+    draw_rect.x1 = text->offset_x;
+    draw_rect.y1 = text->offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
 
@@ -210,9 +290,12 @@ static void gui_text_draw(gui_obj_t *obj)
     {
         gui_text_font_load(text, &draw_rect);
     }
+
     gui_text_font_draw(text, &draw_rect);
-    uint32_t total_section_count = dc->screen_height / dc->fb_height -
-                                   ((dc->screen_height % dc->fb_height) ? 0 : 1);
+
+    total_section_count = dc->screen_height / dc->fb_height -
+                          ((dc->screen_height % dc->fb_height) ? 0 : 1);
+
     if (draw_rect.y2 >= dc->section_count * dc->fb_height && \
         draw_rect.y2 < (dc->section_count + 1)*dc->fb_height || \
         dc->section_count == total_section_count)
@@ -226,20 +309,29 @@ static void gui_text_end(gui_obj_t *obj)
 
 }
 
-void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
-                   int16_t y, int16_t w, int16_t h)
+static void gui_text_destory(gui_obj_t *obj)
 {
-    //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
+    gui_text_t *text = (gui_text_t *)obj;
 
-    //for root class
+    gui_text_font_destory(text);
+}
+
+void gui_text_ctor(gui_text_t *this,
+                   gui_obj_t  *parent,
+                   const char *name,
+                   int16_t     x,
+                   int16_t     y,
+                   int16_t     w,
+                   int16_t     h)
+{
     gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
     root->type = TEXTBOX;
     root->obj_prepare = gui_text_prepare;
     root->obj_draw = gui_text_draw;
     root->obj_end = gui_text_end;
-
+    root->obj_destory = gui_text_destory;
     //for self
     this->mode = LEFT;
 }
@@ -248,32 +340,36 @@ void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_
  *                           Public Functions
  *============================================================================*/
 
-void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t color,
-                  uint16_t length, uint8_t font_size)
+void gui_text_set(gui_text_t   *this,
+                  void         *text,
+                  FONT_SRC_TYPE text_type,
+                  gui_color_t   color,
+                  uint16_t      length,
+                  uint8_t       font_size)
 {
-    if (strncmp(text_type, "rtk_font_mem", strlen("rtk_font_mem")) == 0)
-    {
-        this->font_type = GUI_FONT_SOURCE_BMP;
-    }
-    else if (strncmp(text_type, "rtk_font_stb", strlen("rtk_font_stb")) == 0)
-    {
-        this->font_type = GUI_FONT_SOURCE_TTF;
-    }
+    this->font_type = text_type;
     this->content = (uint8_t *)text;
     this->color = color;
     this->len = length;
     this->font_height = font_size;
     this->text_offset = 0;
+
     gui_fb_change();
+    content_change = true;
 }
 
-void gui_text_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p)
+void gui_text_set_animate(void    *o,
+                          uint32_t dur,
+                          int      repeatCount,
+                          void    *callback,
+                          void    *p)
 {
     gui_animate_t *animate = ((gui_text_t *)o)->animate;
     if (!(animate))
     {
         animate = gui_malloc(sizeof(gui_animate_t));
     }
+
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
@@ -287,15 +383,6 @@ void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 {
     this->mode = mode;
 }
-
-// void gui_text_scale(gui_text_t *this, float scale_x, float scale_y)
-// {
-//     if (scale_x > 0 && scale_y > 0)
-//     {
-//         img->scale_x = scale_x;
-//         img->scale_y = scale_y;
-//     }
-// }
 
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
 {
@@ -322,18 +409,69 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
 {
     this->content = (uint8_t *)text;
     this->len = length;
+
     gui_fb_change();
+    content_change = true;
 }
 
-gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
-                            int16_t w, int16_t h)
+void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
 {
+    void *img;
+    gui_img_t *text_img;
+
+    gui_font_scale_destory(this);
+    img = gui_text_bmp2img(this, font_img_type);
+
+    if (this->scale_img == NULL)
+    {
+        text_img = gui_img_create_from_mem(this, "text_img", img, 0, 0, 0, 0);
+    }
+    else
+    {
+        text_img = this->scale_img;
+        gui_img_set_attribute(text_img, "text_img", img, 0, 0);
+    }
+
+    switch (font_img_type)
+    {
+    case RGB565:
+    case RGB888:
+        {
+            text_img->draw_img.blend_mode = IMG_FILTER_BLACK;
+        }
+        break;
+
+    case ARGB8565:
+    case RGBA8888:
+        {
+            text_img->draw_img.blend_mode = IMG_SRC_OVER_MODE;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    this->scale_img = text_img;
+    this->font_type = GUI_FONT_SRC_IMG;
+}
+
+gui_text_t *gui_text_create(void       *parent,
+                            const char *name,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h)
+{
+    gui_text_t *text;
+
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
     {
         name = "DEFAULT_TEXT";
     }
-    gui_text_t *text = gui_malloc(sizeof(gui_text_t));
+
+    text = gui_malloc(sizeof(gui_text_t));
     GUI_ASSERT(text != NULL);
     memset(text, 0, sizeof(gui_text_t));
 
@@ -344,6 +482,7 @@ gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y
         gui_list_insert_before(&((GET_BASE(text)->parent)->child_list), &(GET_BASE(text)->brother_list));
     }
     GET_BASE(text)->create_done = true;
+
     return text;
 }
 

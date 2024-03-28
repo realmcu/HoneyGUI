@@ -77,6 +77,10 @@
 //#define CONFIG_REALTEK_BUILD_PPE
 // </c>
 
+// <c> RTK GUI Enable PPE2.0
+// #define CONFIG_REALTEK_BUILD_PPEV2
+// </c>
+
 // <c> MODULE NANOVG VGLITE
 //#define CONFIG_REALTEK_NANOVG_HW_VGLITE
 // </c>

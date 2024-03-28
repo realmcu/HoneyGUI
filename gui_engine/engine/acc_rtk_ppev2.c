@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <gui_matrix.h>
 #include "acc_engine.h"
+#ifndef __WIN32
 #include <rtl_PPEV2.h>
 #include <rtl_imdc.h>
 #include <rtl876x_rcc.h>
@@ -15,6 +16,10 @@
 #include "math.h"
 #include "fmc_api_ext.h"
 #include "os_sync.h"
+#include "section.h"
+#else
+#include "ppev2_sim.h"
+#endif
 
 #define USE_TESSALLATION 0
 
@@ -26,17 +31,14 @@ extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_re
 #define PPEV2_TESS_LENGTH       100
 #endif
 
-#if (F_APP_GUI_USE_DSP_SHARE_RAM == 0)
-#define TEMP_BUF_SIZE           (50 * 1024)
-static uint8_t temp_buf[TEMP_BUF_SIZE];
-#else
-#include "section.h"
+
 #define TEMP_BUF_SIZE           (40 * 1024)
 SHM_DATA_SECTION static uint8_t temp_buf[TEMP_BUF_SIZE];
-#endif
 
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static uint32_t temp_buf_offset = 0;
+
+#ifndef __WIN32
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
@@ -209,8 +211,8 @@ static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
     }
 }
 
-void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
-                      ppe_rect_t *dst_trans)
+static void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
+                             ppe_rect_t *dst_trans)
 {
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(target->format);
     uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->width) *
@@ -350,8 +352,8 @@ void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *sr
     }
 }
 
-void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
-                       ppe_rect_t *dst_trans)
+static void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
+                              ppe_rect_t *dst_trans)
 {
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(target->format);
     uint32_t dst_start_address = target->address + (dst_trans->x + dst_trans->y * target->width) *
@@ -615,6 +617,26 @@ void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *s
     }
 }
 
+#else
+static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
+{
+    return false;
+}
+static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
+{
+    return false;
+}
+static void bare_blit_by_dma(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
+                             ppe_rect_t *dst_trans)
+{
+    return;
+}
+static void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *src_rect,
+                              ppe_rect_t *dst_trans)
+{
+    return;
+}
+#endif
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect)
 {
     if (image->opacity_value <= PPEV2_ACC_MIN_OPA)
@@ -684,7 +706,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
             else if (header->algorithm_type.pixel_bytes == 1)
             {
-                source.format = PPEV2_RGB888;
+                source.format = PPEV2_ARGB8565;
             }
             else
             {
@@ -805,6 +827,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             mode = PPEV2_CONST_MASK_MODE;
         }
+        else if (image->blend_mode == IMG_FILTER_BLACK)
+        {
+            mode = PPEV2_SRC_OVER_MODE;
+        }
         else
         {
             if (source.format >= PPEV2_BGR888 && source.format <= PPEV2_RGB565 && image->opacity_value == 0xFF)
@@ -844,7 +870,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         block_num++;
     }
 #else
-    uint32_t tessalation_len = dc->fb_width; \
+    int32_t tessalation_len = dc->fb_width; \
     uint32_t block_num = 1;
 #endif
     if (image->blend_mode == IMG_FILTER_BLACK)
@@ -1004,14 +1030,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
 
         if (err != PPEV2_SUCCESS)
         {
-            DBG_DIRECT("PPE err %d", err);
-//                sw_acc_blit(image, dc, rect);
+            GUI_ASSERT(NULL != NULL);
         }
     }
 }
 
 void hw_acc_init(void)
 {
+#ifndef __WIN32
     if (!GDMA_channel_request(&memcpy_dma_num, NULL, true))
     {
         GUI_ASSERT("no dma for tx");
@@ -1022,6 +1048,7 @@ void hw_acc_init(void)
         GUI_ASSERT("no dma for support");
         return;
     }
-    DBG_DIRECT("zip rx %d", memcpy_dma_num);
-    DBG_DIRECT("zip tx %d", support_dma_num);
+#endif
+    gui_log("zip rx %d", memcpy_dma_num);
+    gui_log("zip tx %d", support_dma_num);
 }

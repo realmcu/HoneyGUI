@@ -14,6 +14,12 @@ extern "C" {
 #endif
 
 
+typedef enum
+{
+    BYTE_PIXEL_RGB565 = 2,
+    BYTE_PIXEL_RGB888 = 3,
+    BYTE_PIXEL_RGBA8888 = 4,
+} GUI_BYTE_PIXEL_ENUM;
 
 
 
@@ -65,6 +71,7 @@ typedef struct draw_img
     uint32_t checksum : 8;
     uint32_t src_mode : 3;
     uint32_t high_quality : 1;
+    float *line;
 } draw_img_t;
 
 void gui_image_load_scale(draw_img_t *img);

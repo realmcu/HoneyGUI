@@ -106,7 +106,6 @@ bool send_msg_to_gui_server(gui_msg_t *msg)
         return false;
     }
 }
-
 /**
  * @brief
  *
@@ -200,8 +199,6 @@ static void gui_server_entry(void *parameter)
             }
 
         }
-
-
 
         gui_fb_disp(screen);
         app_next = gui_next_app();

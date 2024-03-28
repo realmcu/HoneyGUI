@@ -7,6 +7,10 @@
 #include "gui_curtainview.h"
 #include "gui_app.h"
 #include "gui_win.h"
+#ifndef _WIN32
+#include "app_task.h"
+#include "app_mmi.h"
+#endif
 
 #define GUI_DIAL_NUM_MAX 24
 #define BUFFER_DIAL_NUM_MAX 64
@@ -26,6 +30,7 @@ void *icon_dial_num_touch_bin[10] = {ICON_DIAL_TOUCH_0_BIN, ICON_DIAL_TOUCH_1_BI
                                     };
 
 char buffer_dial_num[BUFFER_DIAL_NUM_MAX];
+//for gui
 char *p_display_dial_num = buffer_dial_num;
 int8_t dial_num_index = 0;
 
@@ -118,7 +123,7 @@ static void switch_dial_num_touch_cb(void *obj, gui_event_t event)
     {
         p_display_dial_num++;
     }
-    gui_text_set(text_dial_num, p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_dial_num, p_display_dial_num, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
 }
 
@@ -136,7 +141,7 @@ static void switch_dial_delete_touch_cb(void *obj, gui_event_t event)
     }
     buffer_dial_num[dial_num_index] = '\0';
 
-    gui_text_set(text_dial_num, p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_dial_num, p_display_dial_num, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
 }
 
@@ -154,6 +159,16 @@ static void switch_dial_outgoing_call_touch_cb(void *obj, gui_event_t event)
 
     push_current_widget(win_dial);
     gui_obj_show(win_dial, false);
+#ifndef _WIN32
+    //set dial num
+    set_dial_num(buffer_dial_num);
+    //send msg to app task
+    T_IO_MSG outgoing_call_msg;
+    outgoing_call_msg.type = IO_MSG_TYPE_WRISTBNAD;
+    outgoing_call_msg.subtype = IO_MSG_MMI;
+    outgoing_call_msg.u.param = MMI_HF_OUTGOING_CALL;
+    app_send_msg_to_apptask(&outgoing_call_msg);
+#endif
 }
 
 void design_win_dial(void *parent)
@@ -161,7 +176,7 @@ void design_win_dial(void *parent)
     char *string_dial_title = "电话";
     text_dial_title = gui_text_create(parent, "text_dial_title", 204, 24,
                                       strlen(string_dial_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, FONT_H_32);
-    gui_text_set(text_dial_title, string_dial_title, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_dial_title, string_dial_title, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(string_dial_title), FONT_H_32);
 
     switch_dial_back = gui_switch_create(parent, 129, 24, 48, 48, ICON_BACK_BIN, ICON_BACK_BIN);
@@ -171,7 +186,7 @@ void design_win_dial(void *parent)
                          NULL);
 
     text_dial_num = gui_text_create(parent, "text_dial_num", 0, 79, LCD_W, FONT_H_32);
-    gui_text_set(text_dial_num, p_display_dial_num, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_dial_num, p_display_dial_num, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
     gui_text_mode_set(text_dial_num, CENTER);
 

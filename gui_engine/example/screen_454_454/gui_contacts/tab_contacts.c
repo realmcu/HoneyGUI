@@ -6,6 +6,7 @@
 #include "gui_obj.h"
 #include "gui_common.h"
 #include "gui_grid.h"
+#include "gui_tab.h"
 
 gui_text_t *text_contacts_title = NULL;
 gui_img_t *img_touch_contacts = NULL;
@@ -30,7 +31,7 @@ static void switch_incoming_call_answer_touch_cb()
 
 static void switch_contacts_touch_cb(void *obj, gui_event_t event)
 {
-    gui_log("switch_contacts_touch_cb, obj = 0x%x\n", (uint32_t *)obj);
+    gui_log("switch_contacts_touch_cb, obj = 0x%x\n", obj);
 
     //gui_switch_t *this = (gui_switch_t *)obj;
     //for contracts list window creation
@@ -71,7 +72,7 @@ void design_tab_contacts(void *parent)
     int font_size = 32;
     text_contacts_title = gui_text_create(parent, "text_contacts_title", 179, 24,
                                           strlen(string_contacts_title) / FONT_CHINESE_BYTE * FONT_CHINESE_W, font_size);
-    gui_text_set(text_contacts_title, string_contacts_title, "rtk_font_mem", APP_COLOR_WHITE,
+    gui_text_set(text_contacts_title, string_contacts_title, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(string_contacts_title), font_size);
 
     switch_touch_contacts = gui_switch_create(parent, 129, 129, 196, 196,

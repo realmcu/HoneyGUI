@@ -44,6 +44,7 @@ typedef struct gui_win
     void (*ctor)(struct gui_win *this, gui_obj_t *parent, const char *filename, int16_t x,
                  int16_t y, int16_t w, int16_t h);
     gui_animate_t *animate;
+    float scale;
     bool press_flag;
     bool long_flag;
     bool release_flag;

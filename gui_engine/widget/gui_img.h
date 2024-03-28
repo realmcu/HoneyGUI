@@ -76,7 +76,6 @@ typedef struct gui_img
     uint8_t opacity;
     bool press_flag;                    //!< press to change picture to the highlighted
     bool release_flag;
-    bool matrix_flag;
 } gui_img_t;
 
 
@@ -147,10 +146,17 @@ void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int
                            int16_t y);
 
 /**
- * @brief set image configure
+ * @brief get image current configuration
  *
  * @param img image widget
- * @param config img configure
+ * @return gui_imgconfig_t image configuration
+ */
+gui_imgconfig_t gui_img_get_config(gui_img_t *img);
+/**
+ * @brief set image configuration
+ *
+ * @param img image widget
+ * @param config img configuration
  */
 void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config);
 /**
@@ -250,32 +256,7 @@ void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *c
  *
  */
 void gui_img_set_quality(gui_img_t *img, bool high_quality);
-/**
- * @brief
- *
- * @param parent
- * @param x
- * @param y
- * @param w
- * @param h
- * @param color
- * @return gui_img_t*
- */
-gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color);
-/**
- * @brief
- *
- * @param parent
- * @param x
- * @param y
- * @param w
- * @param h
- * @param color
- * @param image_file_addr
- * @return gui_img_t*
- */
-gui_img_t *gui_rect_round(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color,
-                          uint32_t *image_file_addr);
+
 #ifdef __cplusplus
 }
 #endif

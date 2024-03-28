@@ -17,6 +17,7 @@ Widgets                              Brief
 `cardview`_                          Display a 3d card set
 `card`_                              Display a 3d card set
 `page`_                               Swipe up and down to display the creation of controls in different vertical directions
+`pagelist`_                          Slide like page widget, could use less ram to display child widget
 `switch`_                            Listen to on and off gesture
 `grid`_                              Display widgets set in a grid view(Evenly layout vertically and horizontally)
 `progressbar`_                       Show progress by showing part of picture, or one frame of pictures, or drawing bar of specified length
@@ -38,6 +39,7 @@ Widgets                              Brief
 .. _cardview: gui_cardview.html
 .. _card: gui_card.html
 .. _page: gui_page.html
+.. _pagelist: gui_pagelist.html
 .. _switch: gui_switch.html
 .. _grid: gui_grid.html
 .. _progressbar: gui_progressbar.html
@@ -64,6 +66,7 @@ Widgets                              Brief
     cardview <gui_cardview>
     card <gui_card>
     page <gui_page>
+    pagelist <gui_pagelist>
     switch <gui_switch>
     grid <gui_grid>
     progressbar <gui_progressbar>

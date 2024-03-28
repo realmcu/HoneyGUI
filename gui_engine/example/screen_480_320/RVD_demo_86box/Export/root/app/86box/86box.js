@@ -72,7 +72,7 @@ function icon_gpio_turnAllOn(params) {
 function icon_gpio_turnAllOff(params) {
 	// console.log('icon_gpio_turnAllOn ', params)
 
-	swArray[params].writeSync(gpio_val_on) 
+	swArray[params].writeSync(gpio_val_off) 
 
 	gpio_en = false;
 	Id_prefix = 'sw_1_';

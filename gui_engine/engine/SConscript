@@ -36,6 +36,9 @@ if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
 
 if GetDepend(['CONFIG_REALTEK_BUILD_PPE']):
     src += ['acc_rtk_ppe.c']
+    
+if GetDepend(['CONFIG_REALTEK_BUILD_PPEV2']):
+    src += ['acc_rtk_ppev2.c']
 
 CPPPATH = [cwd]
 

@@ -11,6 +11,18 @@
 extern "C" {
 #endif
 
+#define FONT_MALLOC_PSRAM(x)  gui_malloc(x)
+#define FONT_FREE_PSRAM(x)  gui_free(x)
+
+
+typedef struct
+{
+    uint8_t char_y;
+    uint8_t baseline;
+    uint8_t char_w;
+    uint8_t char_h;
+} GUI_CHAR_HEAD;
+
 typedef struct
 {
     uint16_t unicode;
@@ -18,75 +30,45 @@ typedef struct
     int16_t y;
     int16_t w;
     int16_t h;
-    int16_t char_w;
+    uint8_t char_y;
+    uint8_t char_w;
+    uint8_t char_h;
     uint8_t *dot_addr;
 } mem_char_t;
 
 typedef struct
 {
-    uint8_t *font_lib_name;
-    uint8_t *font_lib_tab_name;
-    uint8_t rendor_mode : 4;
-    uint8_t index_method : 1;
-} fontlib_name_t;
-
-typedef struct
-{
     uint8_t *font_file;
-    uint8_t *bmp_addr;
-    uint8_t *table_addr;
     uint8_t font_size;
-    uint8_t rendor_mode;  // support 1 4 8
-    union
-    {
-        uint8_t value;
-        struct
-        {
-            uint8_t bold : 1;
-            uint8_t italic : 1;
-            uint8_t scanMode : 1;
-            uint8_t index_method : 1;   // 0 offset ; 1 address
-            uint8_t reserve : 4;
-        } detail;
-    } font_mode_detail;
 } MEM_FONT_LIB;
 
 #pragma pack(1)
 typedef struct
 {
-    uint8_t head_length;
-    uint8_t file_type; //0x1 is font file
-    uint8_t version[4];
-    uint8_t font_size;
-    uint8_t rendor_mode;  // support 1 4 8
+    uint8_t head_length;               /*font file head length*/
+    uint8_t file_type;                 /*0x1 is font file*/
+    uint8_t version[4];                /*version*/
+    uint8_t font_size;                 /*font size*/
+    uint8_t rendor_mode;               /*support 1/2/4/8*/
     union
     {
         uint8_t value;
         struct
         {
-            uint8_t bold : 1;
-            uint8_t italic : 1;
-            uint8_t scanMode : 1;
-            uint8_t index_method : 1;   // 0 offset ; 1 address
-            uint8_t reserve : 4;
+            uint8_t bold : 1;          /*bold*/
+            uint8_t italic : 1;        /*italic*/
+            uint8_t scan_mode : 1;     /*scan_mode*/
+            uint8_t index_method : 1;  /*0 offset ; 1 address*/
+            uint8_t crop : 1;          /*enable crop can crop font file*/
+            uint8_t rsvd : 3;          /*rsvd*/
         } detail;
-    } font_mode_detail;
-    uint32_t index_area_size;
-    uint8_t font_name_length;
+    } font_mode_detail;                /*detail information*/
+    uint32_t index_area_size;          /*length of index area*/
+    uint8_t font_name_length;          /*length of font name*/
     // uint8_t* font_name;
 } GUI_FONT_HEAD;
 #pragma pack()
 
-/**
- * @brief Initialize the character binary file and store the font and
- * corresponding information in the font list
- *
- * @param font_size the size of this font file
- * @param font_bitmap_addr the bitmap file address of this font type
- * @param font_table_addr the table file address of this font type
- */
-void gui_set_font_mem_resourse(unsigned char font_size, void *font_bitmap_addr,
-                               void *font_table_addr);
 /**
  * @brief Initialize the character binary file and store the font and
  * corresponding information in the font list
@@ -135,6 +117,22 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
  * @return uint32_t
  */
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
+
+/**
+ * @brief Post-processing work for drawing bitmap fonts using internal engines
+ *
+ * @param text Widget pointer
+ */
+void gui_font_scale_destory(gui_text_t *text);
+
+/**
+ * @brief transform bmp text to img
+ *
+ * @param text text pointer
+ * @param font_img_type img type
+ * @return void* text img buffer
+ */
+void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type);
 
 #ifdef __cplusplus
 }

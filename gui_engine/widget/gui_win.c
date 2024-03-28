@@ -23,7 +23,7 @@
 #include <tp_algo.h>
 #include "gui_obj.h"
 #include <kb_algo.h>
-
+#include "gui_matrix.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -91,122 +91,108 @@ static void win_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
-    gui_win_t *this = (gui_win_t *)obj;
-
-    if (GUI_TYPE(gui_win_t, obj)->event5_flag)
-    {
-        gui_obj_event_set(obj, GUI_EVENT_5);
-        GUI_TYPE(gui_win_t, obj)->event5_flag = false;
-    }
-
     if (kb->pressed == true)
     {
         gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);
     }
-    if ((obj->ax < (int)gui_get_screen_width()) && ((obj->ax + obj->w) >= 0) && \
-        (obj->ay < (int)gui_get_screen_height()) && ((obj->ay + obj->h) >= 0))
+    gui_win_t *this = (void *)obj;
+    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
-        if (((tp->x >= obj->ax && tp->x <= (obj->ax + obj->w)) &&
-             (tp->y >= obj->ay && tp->y <= (obj->ay + obj->h))))
-        {
-            gui_win_t *b = (void *)obj;
-            switch (tp->type)
-            {
-            case TOUCH_SHORT:
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
-                }
-                break;
-            case TOUCH_UP_SLIDE:
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_3);
-                }
-                break;
-            case TOUCH_DOWN_SLIDE:
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_4);
-                }
-                break;
-            case TOUCH_LEFT_SLIDE:
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_1);
-                }
-                break;
-            case TOUCH_RIGHT_SLIDE:
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_2);
-                }
-                break;
-            case TOUCH_LONG:
-                {
-                    b->long_flag = true;
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
-                }
-                break;
 
-            default:
-                break;
-            }
-            if (tp->pressed)
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
             {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
-                b->long_flag = false;
-                b->press_flag = true;
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
             }
-            if (b->release_flag)
+            break;
+        case TOUCH_UP_SLIDE:
             {
-                b->press_flag = false;
-                b->release_flag = false;
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-                b->long_flag = false;
+                gui_obj_event_set(obj, GUI_EVENT_3);
             }
-            if (tp->released && b->press_flag)
+            break;
+        case TOUCH_DOWN_SLIDE:
             {
-                b->release_flag = true;
+                gui_obj_event_set(obj, GUI_EVENT_4);
             }
+            break;
+        case TOUCH_LEFT_SLIDE:
+            {
+                gui_obj_event_set(obj, GUI_EVENT_1);
+            }
+            break;
+        case TOUCH_RIGHT_SLIDE:
+            {
+                gui_obj_event_set(obj, GUI_EVENT_2);
+            }
+            break;
+        case TOUCH_LONG:
+            {
+                this->long_flag = true;
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+            }
+            break;
+
+        default:
+            break;
         }
-    }
-    gui_win_t *ob = (void *)obj;
-    if (ob->animate && ob->animate->animate)
-    {
-        size_t frame_count = ob->animate->dur * (1000 / 15) / (1000);
-        ob->animate->callback(ob->animate->p);
-        ob->animate->current_frame++;
-
-        if (ob->animate->current_frame > frame_count)
+        if (tp->pressed)
         {
-            if (ob->animate->repeatCount == 0)
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+            this->long_flag = false;
+            this->press_flag = true;
+        }
+
+    }
+    if (this->release_flag)
+    {
+        this->press_flag = false;
+        this->release_flag = false;
+        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        this->long_flag = false;
+    }
+    if (tp->released && this->press_flag)
+    {
+        this->release_flag = true;
+    }
+    if (this->scale != 0)
+    {
+        matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
+        matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
+        matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
+        this->scale = 0;
+    }
+    if (this->animate && this->animate->animate)
+    {
+        size_t frame_count = this->animate->dur * (1000 / 15) / (1000);
+        this->animate->callback(this->animate->p);
+        this->animate->current_frame++;
+
+        if (this->animate->current_frame > frame_count)
+        {
+            if (this->animate->repeatCount == 0)
             {
-                ob->animate->animate = false;
+                this->animate->animate = false;
             }
-            else if (ob->animate->repeatCount < 0)
+            else if (this->animate->repeatCount < 0)
             {
-                ob->animate->current_frame = 0;
+                this->animate->current_frame = 0;
             }
-            else if (ob->animate->repeatCount > 0)
+            else if (this->animate->repeatCount > 0)
             {
-                ob->animate->current_repeat_count++;
-                if (ob->animate->current_repeat_count >= ob->animate->repeatCount)
+                this->animate->current_repeat_count++;
+                if (this->animate->current_repeat_count >= this->animate->repeatCount)
                 {
-                    ob->animate->animate = false;
+                    this->animate->animate = false;
                 }
                 else
                 {
-                    ob->animate->current_frame = 0;
+                    this->animate->current_frame = 0;
                 }
             }
         }
-        ob->animate->progress_percent = ((float)(ob->animate->current_frame)) / ((float)(
-                                                                                     frame_count));
-    }
-
-    uint8_t last = this->checksum;
-    this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_win_t));
-
-    if (last != this->checksum)
-    {
-        gui_fb_change();
+        this->animate->progress_percent = ((float)(this->animate->current_frame)) / ((float)(
+                frame_count));
     }
 }
 

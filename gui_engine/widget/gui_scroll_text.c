@@ -74,8 +74,14 @@ static uint8_t scroll_text_count = 0;
 static uint8_t scroll_skip_frame = 10;
 static uint8_t scroll_skip_frame_count = 0;
 
-extern void gui_text_ctor(gui_text_t *this, gui_obj_t *parent, const char *name, int16_t x,
-                          int16_t y, int16_t w, int16_t h);
+extern void gui_text_ctor(gui_text_t *this,
+                          gui_obj_t  *parent,
+                          const char *name,
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h);
+
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -90,13 +96,13 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
+    case GUI_FONT_SRC_BMP:
         {
             gui_font_mem_load(text, rect);
         }
         break;
 
-    case GUI_FONT_SOURCE_TTF:
+    case GUI_FONT_SRC_TTF:
         {
             gui_font_stb_load(text, rect);
         }
@@ -111,17 +117,13 @@ static void gui_scroll_text_font_draw(gui_text_t *text, gui_rect_t *rect)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
+    case GUI_FONT_SRC_BMP:
         {
-            if (text->base.sx != 1.0f || text->base.sy != 1.0f)
-            {
-                return;
-            }
             gui_font_mem_draw(text, rect);
         }
         break;
 
-    case GUI_FONT_SOURCE_TTF:
+    case GUI_FONT_SRC_TTF:
         {
             gui_font_stb_draw(text, rect);
         }
@@ -136,13 +138,13 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
 {
     switch (text->font_type)
     {
-    case GUI_FONT_SOURCE_BMP:
+    case GUI_FONT_SRC_BMP:
         {
             gui_font_mem_unload(text);
         }
         break;
 
-    case GUI_FONT_SOURCE_TTF:
+    case GUI_FONT_SRC_TTF:
         {
             gui_font_stb_unload(text);
         }
@@ -155,45 +157,48 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
 
 static void gui_scroll_text_update_att(struct _gui_obj_t *this)
 {
-    gui_scroll_text_t *object = (gui_scroll_text_t *)this;
+    gui_scroll_text_t *obj = (void *)this;
     size_t frame_count;
 
-    if (object->base.animate && object->base.animate->animate)
+    if (obj->base.animate && obj->base.animate->animate)
     {
-        frame_count = object->base.animate->dur * 30 / (1000);
-        object->base.animate->callback(object->base.animate->p);
-        object->base.animate->current_frame++;
+        frame_count = obj->base.animate->dur * 30 / (1000);
+        obj->base.animate->callback(obj->base.animate->p);
+        obj->base.animate->current_frame++;
 
-        if (object->base.animate->current_frame > frame_count)
+        if (obj->base.animate->current_frame > frame_count)
         {
-            if (object->base.animate->repeatCount == 0)
+            if (obj->base.animate->repeatCount == 0)
             {
-                object->base.animate->animate = false;
+                obj->base.animate->animate = false;
             }
-            else if (object->base.animate->repeatCount < 0)
+            else if (obj->base.animate->repeatCount < 0)
             {
-                object->base.animate->current_frame = 0;
+                obj->base.animate->current_frame = 0;
             }
-            else if (object->base.animate->repeatCount > 0)
+            else if (obj->base.animate->repeatCount > 0)
             {
-                object->base.animate->current_repeat_count++;
-                if (object->base.animate->current_repeat_count >= object->base.animate->repeatCount)
+                obj->base.animate->current_repeat_count++;
+                if (obj->base.animate->current_repeat_count >= obj->base.animate->repeatCount)
                 {
-                    object->base.animate->animate = false;
+                    obj->base.animate->animate = false;
                 }
                 else
                 {
-                    object->base.animate->current_frame = 0;
+                    obj->base.animate->current_frame = 0;
                 }
             }
         }
-        object->base.animate->progress_percent = ((float)(object->base.animate->current_frame)) /
-                                                 ((float)(frame_count));
+        obj->base.animate->progress_percent = ((float)(obj->base.animate->current_frame)) /
+                                              ((float)(frame_count));
     }
 }
 
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
+    gui_text_t *this = (void *)obj;
+    gui_point_t point = {0, 0, 1};
+
     if (scroll_skip_frame == 0)
     {
         gui_fb_change();
@@ -214,7 +219,12 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
             scroll_skip_frame_count = 0;
         }
     }
+
     gui_scroll_text_update_att(obj);
+    matrix_multiply_point(obj->matrix, &point);
+
+    this->offset_x = point.p[0];
+    this->offset_y = point.p[1];
 }
 
 static void gui_scroll_text_draw(gui_obj_t *obj)
@@ -244,30 +254,30 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     if (text->base.mode == SCROLL_X && offset > obj->w)
     {
 
-        draw_rect.x1 = obj->ax + obj->dx + obj->tx - text->cnt_value + text->start_value;
+        draw_rect.x1 = text->base.offset_x - text->cnt_value + text->start_value;
         draw_rect.x2 = draw_rect.x1 + text->base.text_offset;
-        draw_rect.y1 = obj->ay + obj->dy + obj->ty;
+        draw_rect.y1 = text->base.offset_y;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
     else if (text->base.mode == SCROLL_Y && (offset > obj->h || offset == 0))
     {
-        draw_rect.x1 = obj->ax + obj->dx + obj->tx;
+        draw_rect.x1 = text->base.offset_x;
         draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y1 = obj->ay + obj->dy + obj->ty - text->cnt_value + text->start_value;
+        draw_rect.y1 = text->base.offset_y - text->cnt_value + text->start_value;
         draw_rect.y2 = draw_rect.y1 + text->base.text_offset;
     }
     else
     {
-        draw_rect.x1 = obj->ax + obj->dx + obj->tx;
-        draw_rect.y1 = obj->ay + obj->dy + obj->ty;
+        draw_rect.x1 = text->base.offset_x;
+        draw_rect.y1 = text->base.offset_x;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
 
-    draw_rect.xboundleft = obj->ax + obj->dx + obj->tx;
-    draw_rect.xboundright = obj->ax + obj->dx + obj->tx + obj->w;
-    draw_rect.yboundtop = obj->ay + obj->dy + obj->ty;
-    draw_rect.yboundbottom = obj->ay + obj->dy + obj->ty + obj->h;
+    draw_rect.xboundleft = text->base.offset_x;
+    draw_rect.xboundright = text->base.offset_x + obj->w;
+    draw_rect.yboundtop = text->base.offset_y;
+    draw_rect.yboundbottom = text->base.offset_y + obj->h;
 
     if (dc->section_count == 0)
     {
@@ -305,11 +315,17 @@ static void gui_scroll_text_destory(gui_obj_t *obj)
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
 }
 
-static void gui_scroll_text_ctor(gui_scroll_text_t *this, gui_obj_t *parent, const char *name,
-                                 int16_t x, int16_t y, int16_t w, int16_t h)
+static void gui_scroll_text_ctor(gui_scroll_text_t *this,
+                                 gui_obj_t         *parent,
+                                 const char        *name,
+                                 int16_t            x,
+                                 int16_t            y,
+                                 int16_t            w,
+                                 int16_t            h)
 {
     gui_text_t *base = (gui_text_t *)this;
     gui_obj_t *root = (gui_obj_t *)this;
+
     //for base class
     gui_text_ctor(base, parent, name, x, y, w, h);
     base->mode = SCROLL_X;
@@ -333,8 +349,12 @@ void gui_scroll_text_skip_frame_set(uint8_t skip_frame)
     scroll_skip_frame = skip_frame;
 }
 
-void gui_scroll_text_set(gui_scroll_text_t *this, void *text, char *text_type,
-                         gui_color_t color, uint16_t length, uint8_t font_size)
+void gui_scroll_text_set(gui_scroll_text_t *this,
+                         void              *text,
+                         FONT_SRC_TYPE      text_type,
+                         gui_color_t        color,
+                         uint16_t           length,
+                         uint8_t            font_size)
 {
     gui_text_set(&this->base, text, text_type, color, length, font_size);
 }
@@ -349,9 +369,12 @@ void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
     this->base.charset = charset;
 }
 
-void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode,
-                                uint8_t start_value, uint8_t end_value,
-                                uint32_t interval_time_ms, uint32_t duration_time_ms)
+void gui_scroll_text_scroll_set(gui_scroll_text_t *this,
+                                TEXT_MODE          mode,
+                                uint8_t            start_value,
+                                uint8_t            end_value,
+                                uint32_t           interval_time_ms,
+                                uint32_t           duration_time_ms)
 {
     this->base.mode = mode;
     this->start_value = start_value;
@@ -360,10 +383,14 @@ void gui_scroll_text_scroll_set(gui_scroll_text_t *this, TEXT_MODE mode,
     this->duration_time_ms = duration_time_ms;
 }
 
-gui_scroll_text_t *gui_scroll_text_create(void *parent, const char *name, int16_t x, int16_t y,
-                                          int16_t w, int16_t h)
+gui_scroll_text_t *gui_scroll_text_create(void       *parent,
+                                          const char *name,
+                                          int16_t     x,
+                                          int16_t     y,
+                                          int16_t     w,
+                                          int16_t     h)
 {
-    gui_scroll_text_t *scrolltext;
+    gui_scroll_text_t *scroll_text;
 
     GUI_ASSERT(parent != NULL);
 
@@ -372,22 +399,22 @@ gui_scroll_text_t *gui_scroll_text_create(void *parent, const char *name, int16_
         name = "DEFAULT_SCROLLTEXTBOX";
     }
 
-    scrolltext = gui_malloc(sizeof(gui_scroll_text_t));
-    GUI_ASSERT(scrolltext != NULL);
-    memset(scrolltext, 0, sizeof(gui_scroll_text_t));
+    scroll_text = gui_malloc(sizeof(gui_scroll_text_t));
+    GUI_ASSERT(scroll_text != NULL);
+    memset(scroll_text, 0, sizeof(gui_scroll_text_t));
 
-    gui_scroll_text_ctor(scrolltext, parent, name, x, y, w, h);
-    gui_list_init(&(GET_BASE(scrolltext)->child_list));
-    if ((GET_BASE(scrolltext)->parent) != NULL)
+    gui_scroll_text_ctor(scroll_text, parent, name, x, y, w, h);
+    gui_list_init(&(GET_BASE(scroll_text)->child_list));
+    if ((GET_BASE(scroll_text)->parent) != NULL)
     {
-        gui_list_insert_before(&((GET_BASE(scrolltext)->parent)->child_list),
-                               &(GET_BASE(scrolltext)->brother_list));
+        gui_list_insert_before(&((GET_BASE(scroll_text)->parent)->child_list),
+                               &(GET_BASE(scroll_text)->brother_list));
     }
 
-    GET_BASE(scrolltext)->create_done = true;
+    GET_BASE(scroll_text)->create_done = true;
     scroll_text_count++;
 
-    return scrolltext;
+    return scroll_text;
 }
 
 /** End of WIDGET_Exported_Functions

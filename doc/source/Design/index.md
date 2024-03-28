@@ -271,387 +271,265 @@ After configuring display controller, it will transfer the frame buffer data to 
 
 ## Software Accelerate
 
-
-
 ### Overall Flow Chart
-```{mermaid}
-graph TD
-source[source] -->C{judge compress}
-C -->|N| no_rle[no rle]
-C -->|Y| rle[rle]
-no_rle --> img_type{image type}
-img_type -->bypass
-img_type -->filter
-img_type -->source_over
-rle --> rle_img_type{image type}
-rle_img_type --> rle_bypass
-rle_img_type --> rle_filter
-rle_img_type --> rle_source_over
+The flowchart depicts the image resource processing flow accelerated by software. When processing images, different processing methods are selected based on the compression status and type of image:
+
+- **Bypass**: Write the source image data directly to the corresponding position in the frame buffer. Bypass mode is incapable of handling the transparency of images. It applies a global opacity value to the entire image, thereby affecting the overall transparency. When it comes to creating transparency effects, bypass mode is more space-efficient compared to source_over mode.
+- **Filter**: The filtering technique effectively sifts out pixel data with a value of zero from the originating image data, which essentially means that black pixels are precluded from being inscribed into the frame buffer. This mechanism induces much swifter refresh dynamics. Pixels of any color other than black undergo the standard processing method and are duly recorded into the frame buffer.
+- **Source_over**: A blending method that combines image color data and frame buffer pixel color data to calculate the final color based on the opacity_value value `Sa`, and writes it to the corresponding location in the frame buffer. The formula is `((255 - Sa) * D + Sa * S) / 255)`, where `Sa` is the opacity_value of the original image, `D` is the frame buffer pixel data, and `S` is the source image pixel data.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710412187386597657/3b668eac_13671125.png"/></div><br/>
+
+- The `img_type` can be obtained from the `head` of the image, where the structure of the image head is as follows.
 ```
+struct gui_rgb_data_head
+{
+    unsigned char scan : 1;
+    unsigned char rsvd : 4;
+    unsigned char compress : 3;
+    char type;
+    short w;
+    short h;
+    char version;
+    char rsvd2;
+};
+```
+- The value of `img_type` is depicted in the enum below. If the value is `IMDC_COMPRESS`, it indicates that the image is compressed and enters the `rle `processing flow; otherwise, it enters the `no rle `processing flow.
+```
+typedef enum
+{
+    RGB565 = 0,
+    ARGB8565 = 1,
+    RGB888 = 3,
+    RGBA8888 = 4,
+    BINARY = 5,
+    ALPHAMASK = 9,
+    IMDC_COMPRESS = 10,
+    BMP = 11,
+    JPEG = 12,
+    PNG = 13,
+    GIF = 14,
+    RTKARGB8565 = 15,
+} GUI_FormatType;
+```
+
+- Execute the corresponding `blit` process based on different `blend_mode`.
+```
+typedef enum
+{
+    IMG_BYPASS_MODE = 0,
+    IMG_FILTER_BLACK,
+    IMG_SRC_OVER_MODE, //S * Sa + (1 - Sa) * D
+    IMG_COVER_MODE,
+    IMG_RECT,
+} BLEND_MODE_TYPE;
+```
+
+- When the image is compressed, it is necessary to obtain the compression header from the address of the compressed data. The `algorithm_type` parameter of this header contains the actual image type. The types of compressed images are described in the `imdc_src_type` struct, which includes three types: `IMDC_SRC_RGB565`, `IMDC_SRC_RGB888`, and `IMDC_SRC_ARGB8888`.
+```
+typedef struct imdc_file_header
+{
+    struct
+    {
+        uint8_t algorithm: 2;
+        uint8_t feature_1: 2;
+        uint8_t feature_2: 2;
+        uint8_t pixel_bytes: 2;
+    } algorithm_type;
+    uint8_t reserved[3];
+    uint32_t raw_pic_width;
+    uint32_t raw_pic_height;
+} imdc_file_header_t;
+```
+```
+typedef enum
+{
+    IMDC_SRC_RGB565 = 0x04, // 4,
+    IMDC_SRC_RGB888 = 0x44, // 68,
+    IMDC_SRC_ARGB8888 = 0x84, // 132,
+
+} imdc_src_type;
+```
+
 ### Overview No RLE Bypass Mode
-```{mermaid}
-graph TD
-bypass --> b{Identity matrix judgment}
-b --> |N|bypass__no_matrix
-bypass__no_matrix -->bypass_no_matrix_output{output}
-bypass_no_matrix_output -->bypass_rgb565
-bypass_no_matrix_output -->bypass_rgb888
-bypass_no_matrix_output -->bypass_rgba8888
-b --> |Y|bypass_matrix
-bypass_matrix --> bypass_matrix_output{output}
-bypass_matrix_output -->bypass_matrix_rgb565
-bypass_matrix_output -->bypass_matirx_rgb888
-bypass_matrix_output -->bypass_matrix_rgba8888
-```
+
+The following flow describes the `bypass mode` process for `No RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327745470292085/b2ffb40d_13671125.png"/></div><br/>
+
+- If the matrix is an identity matrix, a blit process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
+- The `dc_bytes_per_pixel` is pixel bytes of  display device, calculated as `dc->bit_depth >> 3`, where `bit_depth` is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
+
 #### No RLE Bypass Mode
-```{mermaid}
-graph TD
-bypass_rgb565 --> bypass_565{input}
-bypass_565 --> | |bypass_565_565
-bypass_565_565 --> bypass_opacity_case565{opacity}
-bypass_opacity_case565 --> |opacity| bypass_opacity_value0_255(0-255)
-bypass_opacity_case565 --> |no opacity|bypass_opacity_value255(255)
-bypass_opacity_case565 --> |break|bypass_opacity_value0(0)
-bypass_565 --> | |bypass_565_888
-bypass_565_888--> bypass_opacity_case888{opacity}
-bypass_opacity_case888 --> |opacity|bypass_opacity_value888_0_255(0-255)
-bypass_opacity_case888 --> |no opacity|bypass_opacity_value888_255(255)
-bypass_opacity_case888 --> |break|bypass_opacity_value888_0(0)
-bypass_565 --> | |bypass_565_8888
-bypass_565_8888 --> bypass_opacity_case8888{opacity}
-bypass_opacity_case8888 --> |opacity|bypass_opacity_value8888_0_255(0-255)
-bypass_opacity_case8888 --> |no opacity|bypass_opacity_value8888_255(255)
-bypass_opacity_case8888 --> |break|bypass_opacity_value8888_0(0)
-```
-* Additional information: In non-compressed bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer in `bypass mode`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318765186128026/16894745_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type`.
+2. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
+
 #### No RLE Bypass Matrix
-```{mermaid}
-graph TD
-bypass_matrix_rgb565 --> bypass_matrix_565{input}
-bypass_matrix_565 --> | |bypass_matrix_565_565
-bypass_matrix_565_565 --> bypass_matrix_opacity_case565{opacity}
-bypass_matrix_opacity_case565 --> |opacity| bypass_matrix_opacity_value0_255(0-255)
-bypass_matrix_opacity_case565 --> |no opacity|bypass_matrix_opacity_value255(255)
-bypass_matrix_opacity_case565 --> |break|bypass_matrix_opacity_value0(0)
-bypass_matrix_565 --> | |bypass_matrix_565_888
-bypass_matrix_565_888--> bypass_matrix_opacity_case888{opacity}
-bypass_matrix_opacity_case888 --> |opacity|bypass_matrix_opacity_value888_0_255(0-255)
-bypass_matrix_opacity_case888 --> |no opacity|bypass_matrix_opacity_value888_255(255)
-bypass_matrix_opacity_case888 --> |break|bypass_matrix_opacity_value888_0(0)
-bypass_matrix_565 --> | |bypass_matrix_565_8888
-bypass_matrix_565_8888 --> bypass_matrix_opacity_case8888{opacity}
-bypass_matrix_opacity_case8888 --> |opacity|bypass_matrix_opacity_value8888_0_255(0-255)
-bypass_matrix_opacity_case8888 --> |no opacity|bypass_matrix_opacity_value8888_255(255)
-bypass_matrix_opacity_case8888 --> |break|bypass_matrix_opacity_value8888_0(0)
-```
-* Additional information: In non-compressed bypass matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `blend mode with matrix operations`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318778978528410/26fe6091_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type`.
+2. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+3. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
 
 ### Overview No RLE Filter
-```{mermaid}
-graph TD
-filter --> b{Identity matrix judgment}
-b --> |N|filter__no_matrix
-filter__no_matrix -->fiter_no_matrix_output{output}
-fiter_no_matrix_output -->filter_rgb565
-fiter_no_matrix_output -->filter_rgb888
-fiter_no_matrix_output -->filter_rgba8888
-b --> |Y|filter_matrix
-filter_matrix --> fiter_matrix_output{output}
-fiter_matrix_output -->filter_matrix_rgb565
-fiter_matrix_output -->filter_matirx_rgb888
-fiter_matrix_output -->filter_matrix_rgba8888
-```
-#### No RLE Filter
-```{mermaid}
-graph TD
-filter_rgb565 --> filter_565{input}
-filter_565 --> | |filter_565_565
-filter_565_565 --> filter_opacity_case565{opacity}
-filter_opacity_case565 --> |opacity| filter_opacity_value0_255(0-255)
-filter_opacity_case565 --> |no opacity|filter_opacity_value255(255)
-filter_opacity_case565 --> |break|filter_opacity_value0(0)
-filter_565 --> | |filter_565_888
-filter_565_888--> filter_opacity_case888{opacity}
-filter_opacity_case888 --> |opacity|filter_opacity_value888_0_255(0-255)
-filter_opacity_case888 --> |no opacity|filter_opacity_value888_255(255)
-filter_opacity_case888 --> |break|filter_opacity_value888_0(0)
-filter_565 --> | |filter_565_8888
-filter_565_8888 --> filter_opacity_case8888{opacity}
-filter_opacity_case8888 --> |opacity|filter_opacity_value8888_0_255(0-255)
-filter_opacity_case8888 --> |no opacity|filter_opacity_value8888_255(255)
-filter_opacity_case8888 --> |break|filter_opacity_value8888_0(0)
-```
-* Additional information: In non-compressed filter mode output rgb888 and rgba8888 equivalent to output as rgb565.
-#### No RLE Filter Matrix
-```{mermaid}
-graph TD
-filter_matrix_rgb565 --> filter_matrix_565{input}
-filter_matrix_565 --> | |filter_matrix_565_565
-filter_matrix_565_565 --> filter_matrix_opacity_case565{opacity}
-filter_matrix_opacity_case565 --> |opacity| filter_matrix_opacity_value0_255(0-255)
-filter_matrix_opacity_case565 --> |no opacity|filter_matrix_opacity_value255(255)
-filter_matrix_opacity_case565 --> |break|filter_matrix_opacity_value0(0)
-filter_matrix_565 --> | |filter_matrix_565_888
-filter_matrix_565_888--> filter_matrix_opacity_case888{opacity}
-filter_matrix_opacity_case888 --> |opacity|filter_matrix_opacity_value888_0_255(0-255)
-filter_matrix_opacity_case888 --> |no opacity|filter_matrix_opacity_value888_255(255)
-filter_matrix_opacity_case888 --> |break|filter_matrix_opacity_value888_0(0)
-filter_matrix_565 --> | |filter_matrix_565_8888
-filter_matrix_565_8888 --> filter_matrix_opacity_case8888{opacity}
-filter_matrix_opacity_case8888 --> |opacity|filter_matrix_opacity_value8888_0_255(0-255)
-filter_matrix_opacity_case8888 --> |no opacity|filter_matrix_opacity_value8888_255(255)
-filter_matrix_opacity_case8888 --> |break|filter_matrix_opacity_value8888_0(0)
-```
-* Additional information: In non-compressed filter matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
-### Overview No RLE Source_over
-```{mermaid}
-graph TD
-alpha --> b{Identity matrix judgment}
-b --> |N|alpha__no_matrix
-alpha__no_matrix -->fiter_no_matrix_output{output}
-fiter_no_matrix_output -->alpha_rgb565
-fiter_no_matrix_output -->alpha_rgb888
-fiter_no_matrix_output -->alpha_rgba8888
-b --> |Y|alpha_matrix
-alpha_matrix --> fiter_matrix_output{output}
-fiter_matrix_output -->alpha_matrix_rgb565
-fiter_matrix_output -->alpha_matirx_rgb888
-fiter_matrix_output -->alpha_matrix_rgba8888
-```
-#### No RLE Alpha No Matrix
-```{mermaid}
-graph TD
-alpha_rgb565 --> alpha_565{input}
-alpha_565 --> | |alpha_565_565
-alpha_565_565 --> alpha_opacity_case565{opacity}
-alpha_opacity_case565 --> |opacity + alpha| alpha_opacity_value0_255(0-255)
-alpha_opacity_case565 --> |alpha|alpha_opacity_value255(255)
-alpha_opacity_case565 --> |break|alpha_opacity_value0(0)
-alpha_565 --> | |alpha_8565_565
-alpha_8565_565 --> alpha_opacity_case8565{opacity}
-alpha_opacity_case8565 --> |opacity + alpha| alpha_opacity_argb8565value0_255(0-255)
-alpha_opacity_case8565 --> |alpha|alpha_opacity_argb8565value255(255)
-alpha_opacity_case8565 --> |break|alpha_opacity_argb8565value0(0)
-alpha_565 --> | |alpha_565_888
-alpha_565_888--> alpha_opacity_case888{opacity}
-alpha_opacity_case888 --> |opacity + alpha|alpha_opacity_value888_0_255(0-255)
-alpha_opacity_case888 --> |alpha|alpha_opacity_value888_255(255)
-alpha_opacity_case888 --> |break|alpha_opacity_value888_0(0)
-alpha_565 --> | |alpha_565_8888
-alpha_565_8888 --> alpha_opacity_case8888{opacity}
-alpha_opacity_case8888 --> |opacity + alpha|alpha_opacity_value8888_0_255(0-255)
-alpha_opacity_case8888 --> |alpha|alpha_opacity_value8888_255(255)
-alpha_opacity_case8888 --> |break|alpha_opacity_value8888_0(0)
-```
-* Additional information: In non-compressed source_over mode output rgb888 and rgba8888 equivalent to output as rgb565.
-#### No RLE Alpha Matrix
-```{mermaid}
-graph TD
-alpha_matrix_rgb565 --> alpha_matrix_565{input}
-alpha_matrix_565 --> | |alpha_matrix_565_565
-alpha_matrix_565_565 --> alpha_matrix_opacity_case565{opacity}
-alpha_matrix_opacity_case565 --> |opacity + alpha| alpha_matrix_opacity_value0_255(0-255)
-alpha_matrix_opacity_case565 --> |alpha|alpha_matrix_opacity_value255(255)
-alpha_matrix_opacity_case565 --> |break|alpha_matrix_opacity_value0(0)
-alpha_matrix_565 --> | |alpha_matrix_8565_565
-alpha_matrix_8565_565 --> alpha_matrix_opacity_case8565{opacity}
-alpha_matrix_opacity_case8565 --> |opacity + alpha| alpha_matrix_opacity_argb8565value0_255(0-255)
-alpha_matrix_opacity_case8565 --> |alpha|alpha_matrix_opacity_argb8565value255(255)
-alpha_matrix_opacity_case8565 --> |break|alpha_matrix_argb8565opacity_value0(0)
-alpha_matrix_565 --> | |alpha_matrix_565_888
-alpha_matrix_565_888--> alpha_matrix_opacity_case888{opacity}
-alpha_matrix_opacity_case888 --> |opacity + alpha|alpha_matrix_opacity_value888_0_255(0-255)
-alpha_matrix_opacity_case888 --> |alpha|alpha_matrix_opacity_value888_255(255)
-alpha_matrix_opacity_case888 --> |break|alpha_matrix_opacity_value888_0(0)
-alpha_matrix_565 --> | |alpha_matrix_565_8888
-alpha_matrix_565_8888 --> alpha_matrix_opacity_case8888{opacity}
-alpha_matrix_opacity_case8888 --> |opacity + alpha|alpha_matrix_opacity_value8888_0_255(0-255)
-alpha_matrix_opacity_case8888 --> |alpha|alpha_matrix_opacity_value8888_255(255)
-alpha_matrix_opacity_case8888 --> |break|alpha_matrix_opacity_value8888_0(0)
-```
-* Additional information: In non-compressed source_over matrix mode output rgb888 and rgba8888 equivalent to output as rgb565.
-### Overview RLE Bypass Mode
-```{mermaid}
-graph TD
-rle_bypass --> b{Identity matrix judgment}
-b --> |N|rle_bypass__no_matrix
-rle_bypass__no_matrix -->rle_bypass_no_matrix_output{output}
-rle_bypass_no_matrix_output -->rle_bypass_rgb565
-rle_bypass_no_matrix_output -->rle_bypass_rgb888
-rle_bypass_no_matrix_output -->rle_bypass_rgba8888
-b --> |Y|rle_bypass_matrix
-rle_bypass_matrix --> rle_bypass_matrix_output{output}
-rle_bypass_matrix_output -->rle_bypass_matrix_rgb565
-rle_bypass_matrix_output -->rle_bypass_matirx_rgb888
-rle_bypass_matrix_output -->rle_bypass_matrix_rgba8888
-```
-#### RLE Bypass Matrix
-```{mermaid}
-graph TD
-rle_bypass_rgb565 --> rle_bypass_565{input}
-rle_bypass_565 --> | |rle_bypass_565_565
-rle_bypass_565_565 --> rle_bypass_opacity_case565{opacity}
-rle_bypass_opacity_case565 --> |opacity| rle_bypass_opacity_value0_255(0-255)
-rle_bypass_opacity_case565 --> |no opacity|rle_bypass_opacity_value255(255)
-rle_bypass_opacity_case565 --> |break|rle_bypass_opacity_value0(0)
-rle_bypass_565 --> | |rle_bypass_565_888
-rle_bypass_565_888--> rle_bypass_opacity_case888{opacity}
-rle_bypass_opacity_case888 --> |opacity|rle_bypass_opacity_value888_0_255(0-255)
-rle_bypass_opacity_case888 --> |no opacity|rle_bypass_opacity_value888_255(255)
-rle_bypass_opacity_case888 --> |break|rle_bypass_opacity_value888_0(0)
-rle_bypass_565 --> | |rle_bypass_565_8888
-rle_bypass_565_8888 --> rle_bypass_opacity_case8888{opacity}
-rle_bypass_opacity_case8888 --> |opacity|rle_bypass_opacity_value8888_0_255(0-255)
-rle_bypass_opacity_case8888 --> |no opacity|rle_bypass_opacity_value8888_255(255)
-rle_bypass_opacity_case8888 --> |break|rle_bypass_opacity_value8888_0(0)
-```
-* Additional information: In compressed rle bypass mode output rgb888 and rgba8888 equivalent to output as rgb565.
-#### RLE Bypass Matrix
-```{mermaid}
-graph TD
-rle_bypass_matrix_rgb565 --> rle_bypass_matrix_565{input}
-rle_bypass_matrix_565 --> | |rle_bypass_matrix_565_565
-rle_bypass_matrix_565_565 --> rle_bypass_matrix_opacity_case565{opacity}
-rle_bypass_matrix_opacity_case565 --> |opacity| rle_bypass_matrix_opacity_value0_255(0-255)
-rle_bypass_matrix_opacity_case565 --> |no opacity|rle_bypass_matrix_opacity_value255(255)
-rle_bypass_matrix_opacity_case565 --> |break|rle_bypass_matrix_opacity_value0(0)
-rle_bypass_matrix_565 --> | |rle_bypass_matrix_565_888
-rle_bypass_matrix_565_888--> rle_bypass_matrix_opacity_case888{opacity}
-rle_bypass_matrix_opacity_case888 --> |opacity|rle_bypass_matrix_opacity_value888_0_255(0-255)
-rle_bypass_matrix_opacity_case888 --> |no opacity|rle_bypass_matrix_opacity_value888_255(255)
-rle_bypass_matrix_opacity_case888 --> |break|rle_bypass_matrix_opacity_value888_0(0)
-rle_bypass_matrix_565 --> | |rle_bypass_matrix_565_8888
-rle_bypass_matrix_565_8888 --> rle_bypass_matrix_opacity_case8888{opacity}
-rle_bypass_matrix_opacity_case8888 --> |opacity|rle_bypass_matrix_opacity_value8888_0_255(0-255)
-rle_bypass_matrix_opacity_case8888 --> |no opacity|rle_bypass_matrix_opacity_value8888_255(255)
-rle_bypass_matrix_opacity_case8888 --> |break|rle_bypass_matrix_opacity_value8888_0(0)
-```
-* Additional information: In compressed bypass mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
-### Overview RLE Filter
-```{mermaid}
-graph TD
-rle_filter --> b{Identity matrix judgment}
-b --> |N| rle_filter_no_matrix
-rle_filter_no_matrix --> rle_fiter_no_matrix_output{output}
-rle_fiter_no_matrix_output -->rle_filter_rgb565
-rle_fiter_no_matrix_output -->rle_filter_rgb888
-rle_fiter_no_matrix_output -->rle_filter_rgba8888
-b --> |Y| rle_filter_matrix
-rle_filter_matrix --> rle_fiter_matrix_output{output}
-rle_fiter_matrix_output -->rle_filter_matrix_rgb565
-rle_fiter_matrix_output -->rle_filter_matirx_rgb888
-rle_fiter_matrix_output -->rle_filter_matrix_rgba8888
-```
-#### RLE Filter
-```{mermaid}
-graph TD
-rle_filter_rgb565 --> rle_filter_565{input}
-rle_filter_565 --> | |rle_filter_565_565
-rle_filter_565_565 --> rle_filter_opacity_case565{opacity}
-rle_filter_opacity_case565 --> |opacity| rle_filter_opacity_value0_255(0-255)
-rle_filter_opacity_case565 --> |no opacity|rle_filter_opacity_value255(255)
-rle_filter_opacity_case565 --> |break|rle_filter_opacity_value0(0)
-rle_filter_565 --> | |rle_filter_565_888
-rle_filter_565_888--> rle_filter_opacity_case888{opacity}
-rle_filter_opacity_case888 --> |opacity|rle_filter_opacity_value888_0_255(0-255)
-rle_filter_opacity_case888 --> |no opacity|rle_filter_opacity_value888_255(255)
-rle_filter_opacity_case888 --> |break|rle_filter_opacity_value888_0(0)
-rle_filter_565 --> | |rle_filter_565_8888
-rle_filter_565_8888 --> rle_filter_opacity_case8888{opacity}
-rle_filter_opacity_case8888 --> |opacity|rle_filter_opacity_value8888_0_255(0-255)
-rle_filter_opacity_case8888 --> |no opacity|rle_filter_opacity_value8888_255(255)
-rle_filter_opacity_case8888 --> |break|rle_filter_opacity_value8888_0(0)
-```
-* Additional information: In compressed filter mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
-#### RLE Filter Matrix
-```{mermaid}
-graph TD
-rle_filter_matrix_rgb565 --> rle_filter_matrix_565{input}
-rle_filter_matrix_565 --> | |rle_filter_matrix_565_565
-rle_filter_matrix_565_565 --> rle_filter_matrix_opacity_case565{opacity}
-rle_filter_matrix_opacity_case565 --> |opacity| rle_filter_matrix_opacity_value0_255(0-255)
-rle_filter_matrix_opacity_case565 --> |no opacity|rle_filter_matrix_opacity_value255(255)
-rle_filter_matrix_opacity_case565 --> |break|rle_filter_matrix_opacity_value0(0)
-rle_filter_matrix_565 --> | |rle_filter_matrix_565_888
-rle_filter_matrix_565_888--> rle_filter_matrix_opacity_case888{opacity}
-rle_filter_matrix_opacity_case888 --> |opacity|rle_filter_matrix_opacity_value888_0_255(0-255)
-rle_filter_matrix_opacity_case888 --> |no opacity|rle_filter_matrix_opacity_value888_255(255)
-rle_filter_matrix_opacity_case888 --> |break|rle_filter_matrix_opacity_value888_0(0)
-rle_filter_matrix_565 --> | |rle_filter_matrix_565_8888
-rle_filter_matrix_565_8888 --> rle_filter_matrix_opacity_case8888{opacity}
-rle_filter_matrix_opacity_case8888 --> |opacity|rle_filter_matrix_opacity_value8888_0_255(0-255)
-rle_filter_matrix_opacity_case8888 --> |no opacity|rle_filter_matrix_opacity_value8888_255(255)
-rle_filter_matrix_opacity_case8888 --> |break|rle_filter_matrix_opacity_value8888_0(0)
-```
-* Additional information: In compressed filter matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
-### Overview RLE Source_over
-```{mermaid}
-graph TD
-rle_alpha --> b{Identity matrix judgment}
-b --> |N|rle_alpha__no_matrix
-rle_alpha__no_matrix -->fiter_no_matrix_output{output}
-fiter_no_matrix_output -->rle_alpha_rgb565
-fiter_no_matrix_output -->rle_alpha_rgb888
-fiter_no_matrix_output -->rle_alpha_rgba8888
-b --> |Y|rle_alpha_matrix
-rle_alpha_matrix --> fiter_matrix_output{output}
-fiter_matrix_output -->rle_alpha_matrix_rgb565
-fiter_matrix_output -->rle_alpha_matirx_rgb888
-fiter_matrix_output -->rle_alpha_matrix_rgba8888
-```
-#### RLE Source_over No Matrix
-```{mermaid}
-graph TD
-rle_alpha_rgb565 --> rle_alpha_565{input}
-rle_alpha_565 --> | |rle_alpha_565_565
-rle_alpha_565_565 --> rle_alpha_opacity_case565{opacity}
-rle_alpha_opacity_case565 --> |opacity + alpha| rle_alpha_opacity_value0_255(0-255)
-rle_alpha_opacity_case565 --> |alpha|rle_alpha_opacity_value255(255)
-rle_alpha_opacity_case565 --> |break|rle_alpha_opacity_value0(0)
-rle_alpha_565 --> | |rle_alpha_8565_565
-rle_alpha_8565_565 --> rle_alpha_opacity_case8565{opacity}
-rle_alpha_opacity_case8565 --> |opacity + alpha| rle_alpha_opacity_argb8565value0_255(0-255)
-rle_alpha_opacity_case8565 --> |alpha|rle_alpha_opacity_argb8565value255(255)
-rle_alpha_opacity_case8565 --> |break|rle_alpha_opacity_argb8565value0(0)
-rle_alpha_565 --> | |rle_alpha_565_888
-rle_alpha_565_888--> rle_alpha_opacity_case888{opacity}
-rle_alpha_opacity_case888 --> |opacity + alpha|rle_alpha_opacity_value888_0_255(0-255)
-rle_alpha_opacity_case888 --> |alpha|rle_alpha_opacity_value888_255(255)
-rle_alpha_opacity_case888 --> |break|rle_alpha_opacity_value888_0(0)
-rle_alpha_565 --> | |rle_alpha_565_8888
-rle_alpha_565_8888 --> rle_alpha_opacity_case8888{opacity}
-rle_alpha_opacity_case8888 --> |opacity + alpha|rle_alpha_opacity_value8888_0_255(0-255)
-rle_alpha_opacity_case8888 --> |alpha|rle_alpha_opacity_value8888_255(255)
-rle_alpha_opacity_case8888 --> |break|rle_alpha_opacity_value8888_0(0)
-```
-* Additional information: In compressed source_over mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
-#### RLE Source_over Matrix
-```{mermaid}
-graph TD
-rle_alpha_matrix_rgb565 --> rle_alpha_matrix_565{input}
-rle_alpha_matrix_565 --> | |rle_alpha_matrix_565_565
-rle_alpha_matrix_565_565 --> rle_alpha_matrix_opacity_case565{opacity}
-rle_alpha_matrix_opacity_case565 --> |opacity + alpha| rle_alpha_matrix_opacity_value0_255(0-255)
-rle_alpha_matrix_opacity_case565 --> |alpha|rle_alpha_matrix_opacity_value255(255)
-rle_alpha_matrix_opacity_case565 --> |break|rle_alpha_matrix_opacity_value0(0)
-rle_alpha_matrix_565 --> | |rle_alpha_matrix_8565_565
-rle_alpha_matrix_8565_565 --> rle_alpha_matrix_opacity_case8565{opacity}
-rle_alpha_matrix_opacity_case8565 --> |opacity + alpha| rle_alpha_matrix_opacity_argb8565value0_255(0-255)
-rle_alpha_matrix_opacity_case8565 --> |alpha|rle_alpha_matrix_opacity_argb8565value255(255)
-rle_alpha_matrix_opacity_case8565 --> |break|rle_alpha_matrix_opacity_argb8565value0(0)
-rle_alpha_matrix_565 --> | |rle_alpha_matrix_565_888
-rle_alpha_matrix_565_888--> rle_alpha_matrix_opacity_case888{opacity}
-rle_alpha_matrix_opacity_case888 --> |opacity + alpha|rle_alpha_matrix_opacity_value888_0_255(0-255)
-rle_alpha_matrix_opacity_case888 --> |alpha|rle_alpha_matrix_opacity_value888_255(255)
-rle_alpha_matrix_opacity_case888 --> |break|rle_alpha_matrix_opacity_value888_0(0)
-rle_alpha_matrix_565 --> | |rle_alpha_matrix_565_8888
-rle_alpha_matrix_565_8888 --> rle_alpha_matrix_opacity_case8888{opacity}
-rle_alpha_matrix_opacity_case8888 --> |opacity + alpha|rle_alpha_matrix_opacity_value8888_0_255(0-255)
-rle_alpha_matrix_opacity_case8888 --> |alpha|rle_alpha_matrix_opacity_value8888_255(255)
-rle_alpha_matrix_opacity_case8888 --> |break|rle_alpha_matrix_opacity_value8888_0(0)
-```
+The following flow describes the `filter mode` process for `No RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-* Additional information: In compressed source_over matrix mode output rle_rgb888 and rle_rgba8888 equivalent to output as rle rgb565.
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327755412119622/87231a49_13671125.png"/></div><br/>
+
+#### No RLE Filter
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `filter mode`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318784445569859/c4bf1075_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type`.
+2. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+3. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
+
+#### No RLE Filter Matrix
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `filter mode with matrix operations`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318788829157429/3ca92cb9_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type`.
+2. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+3. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+4. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
+
+### Overview No RLE Source_over
+The following flow describes the `source_over mode` process for `No RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327760371625897/982f575e_13671125.png"/></div><br/>
+
+#### No RLE Alpha No Matrix
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `source_over mode`. Taking the target device image type as RGB565 and the source image type as RGB565 as an example.
+
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1710318794490000646/1da4e0a2_13671125.png"/></div><br/>
+
+Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform `do_blending_acc_2_rgb565_opacity` to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+#### No RLE Alpha Matrix
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `source_over mode with matrix operations`. Taking the target device image type as RGB565 and the source image type as RGB565 as an example.
+
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1710318799964556869/22c5cdfb_13671125.png"/></div><br/>
+
+1. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+2. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform `do_blending_acc_2_rgb565_opacity` to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+### Overview RLE Bypass Mode
+The following flow describes the `bypass mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327763804701147/539b16fd_13671125.png"/></div><br/>
+
+#### RLE Bypass No Matrix
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `bypass mode`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318858967603728/74fc9285_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
+
+#### RLE Bypass Matrix
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `bypass mode with matrix operations`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318868326988985/8e089811_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
+
+### Overview RLE Filter
+The following flow describes the `filter mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327772848839544/88fe64aa_13671125.png"/></div><br/>
+
+#### RLE Filter
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `filter mode`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318872306891932/9145c589_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+4. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
+
+#### RLE Filter Matrix
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `filter mode with matrix operations`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318876464804105/64471b6b_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. If the pixel value is 0, skip the processing; otherwise, perform the subsequent writing operation.
+5. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform an alpha blending operation to blend the source image pixels with the corresponding frame buffer pixels. The blending formula is `((255 - Sa) * D + Sa * S) / 255)`. Write the blended result to the frame buffer.
+
+### Overview RLE Source_over
+The following flow describes the `source_over mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327781855932915/3ce7e711_13671125.png"/></div><br/>
+
+#### RLE Source_over No Matrix
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `source_over mode`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318880764265303/dee05307_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity_value` is `255`: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding `do blend` operation and write the blend result to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform the appropriate `do_blending` operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+#### RLE Source_over Matrix
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `source_over mode with matrix operations`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318886248980211/a668df5f_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
+    - If the `opacity_value` is `0`, the image is not displayed and the process is break.
+    - If the `opacity value` level is `255`: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding `do blend` operation and write the blend result to the frame buffer.
+    - If the `opacity_value` is between `0 and 255`, perform the appropriate `do_blending` operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
 
 
 

@@ -31,7 +31,7 @@ extern "C" {
 #include <string.h>
 #include "guidef.h"
 #include "gui_obj.h"
-
+#include "gui_img.h"
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{
@@ -51,9 +51,9 @@ typedef enum
     LEFT = 0,
     CENTER,
     RIGHT,
-    MUTI_LEFT,
-    MUTI_CENTER,
-    MUTI_RIGHT,
+    MULTI_LEFT,
+    MULTI_CENTER,
+    MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
 } TEXT_MODE;
@@ -61,17 +61,18 @@ typedef enum
 /** @brief  text encoding format enum */
 typedef enum
 {
-    UTF_8_CHARSET = 0,
-    UTF_16_CHARSET = 1,
+    UTF_8_CHARSET    = 0,
+    UTF_16_CHARSET   = 1,
     UNICODE_ENCODING = 1,
 } TEXT_CHARSET;
 
 /** @brief  font type enum */
 typedef enum
 {
-    GUI_FONT_SOURCE_BMP = 0,
-    GUI_FONT_SOURCE_TTF = 1,
-} FONT_SOUCE_TYPE;
+    GUI_FONT_SRC_BMP = 0,
+    GUI_FONT_SRC_TTF = 1,
+    GUI_FONT_SRC_IMG = 2,
+} FONT_SRC_TYPE;
 
 /** @brief  text widget structure */
 typedef struct gui_text
@@ -83,13 +84,16 @@ typedef struct gui_text
     uint16_t text_offset;
     TEXT_MODE mode;
     TEXT_CHARSET charset;
-    FONT_SOUCE_TYPE font_type;
+    FONT_SRC_TYPE font_type;
     uint8_t font_height;
     uint8_t checksum;
     gui_animate_t *animate;
     void *content;
     void *data;
     void *path;//!<  address or path
+    int16_t offset_x;
+    int16_t offset_y;
+    gui_img_t *scale_img;
 } gui_text_t;
 
 /** @brief  text line structure */
@@ -155,14 +159,18 @@ typedef struct gui_text_line
 * @note The font size must match the font file!
 * @param this the text box widget pointer.
 * @param text the text string.
-* @param font_type the font's name.
+* @param text_type text type.
 * @param color the text's color.
 * @param length the text string's length.
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t color,
-                  uint16_t length, uint8_t font_size);
+void gui_text_set(gui_text_t   *this,
+                  void         *text,
+                  FONT_SRC_TYPE text_type,
+                  gui_color_t   color,
+                  uint16_t      length,
+                  uint8_t       font_size);
 
 /**
  * @brief set animate
@@ -173,7 +181,11 @@ void gui_text_set(gui_text_t *this, void *text, char *text_type, gui_color_t col
  * @param callback happens at every frame
  * @param p callback's parameter
  */
-void gui_text_set_animate(void *o, uint32_t dur, int repeatCount, void *callback, void *p);
+void gui_text_set_animate(void    *o,
+                          uint32_t dur,
+                          int      repeatCount,
+                          void    *callback,
+                          void    *p);
 
 /**
  * @brief set text mode of this text widget
@@ -227,6 +239,14 @@ void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset);
 void gui_text_content_set(gui_text_t *this, void *text, uint16_t length);
 
 /**
+ * @brief to draw text by img, so that text can be scaled
+ *
+ * @param this the text widget pointer
+ * @param font_img_type color format
+ */
+void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type);
+
+/**
  * @brief create a text box widget.
  * @note The area of the text box should be larger than that of the string to be shown, otherwise, part of the text will be hidden.
  * @param parent the father widget which the text nested in.
@@ -238,9 +258,12 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length);
  * @return return the widget object pointer
  *
  */
-gui_text_t *gui_text_create(void *parent, const char *name, int16_t x, int16_t y,
-                            int16_t w, int16_t h);
-
+gui_text_t *gui_text_create(void       *parent,
+                            const char *name,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

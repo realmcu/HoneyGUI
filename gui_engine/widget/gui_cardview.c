@@ -84,114 +84,75 @@
   * @{
   */
 
-
-static void cardview_prepare(gui_obj_t *obj)
+static void input_prepare(gui_obj_t *obj)
 {
-    GUI_UNUSED(obj);
-    gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    gui_obj_t *root = (gui_obj_t *)obj;
-    gui_cardview_t *this = (gui_cardview_t *)obj;
-
-    uint32_t cx = dc->fb_width / 2;
-    uint32_t cy = dc->fb_height / 2;
-    GUI_UNUSED(root);
-    GUI_UNUSED(cx);
-    GUI_UNUSED(cy);
-    if (this->mute == true)
+    GUI_UNUSED(tp);
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
     {
         return;
     }
+    gui_obj_skip_other_up_hold(obj);
+    gui_obj_skip_other_down_hold(obj);
+}
+
+static void cardview_prepare(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_cardview_t *this = (gui_cardview_t *)obj;
+
 
 
     switch (tp->type)
     {
     case TOUCH_HOLD_Y:
-        this->release_y = tp->deltaY + this->remain_y;
-        if (this->release_y > 0)
+        if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
         {
-            this->release_y = 0;
+            break;
         }
+        if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
         {
-            for (size_t i = 0; i < 4; i++)
-            {
-                this->recode[i] = this->recode[i + 1];
-            }
-            this->recode[4] = tp->deltaY ;
-            this->speed = this->recode[4] - this->recode[0];
-            if (this->speed > 60)
-            {
-                this->speed = 60;
-            }
-            else if (this->speed < -60)
-            {
-                this->speed = -60;
-            }
+            break;
         }
-
+        this->release_y = tp->deltaY;
         break;
     case TOUCH_DOWN_SLIDE:
-        this->remain_y = this->release_y;
-        memset(this->recode, 0, 10);
         break;
     case TOUCH_UP_SLIDE:
-        this->remain_y = this->release_y;
-        memset(this->recode, 0, 10);
         break;
     default:
-        memset(this->recode, 0, 10);
-        {
-            if (GUI_TYPE(gui_cardview_t, obj)->speed > 0)
-            {
-                this->release_y += GUI_TYPE(gui_cardview_t, obj)->speed;
-                GUI_TYPE(gui_cardview_t, obj)->speed -= 1;
-            }
-            else if (GUI_TYPE(gui_cardview_t, obj)->speed < 0)
-            {
-                this->release_y += GUI_TYPE(gui_cardview_t, obj)->speed;
-                GUI_TYPE(gui_cardview_t, obj)->speed += 1;
-            }
-        }
-        if (this->release_y > 0)
-        {
-            this->release_y = 0;
-        }
-        if (this->release_y < -((GUI_TYPE(gui_cardview_t, obj)->tab_cnt_down - 1)*obj->h) / 2)
-        {
-            this->release_y = -((GUI_TYPE(gui_cardview_t, obj)->tab_cnt_down - 1) * obj->h / 2);
-        }
-
-        this->remain_y = this->release_y;
         break;
     }
-    int offset = (gui_get_screen_width() % this->base.h) / 2 - obj->y;
-    if (_UI_ABS((this->release_y - offset) % (this->base.h)) > 10)
+
+    if (this->release_y >= GUI_FRAME_STEP)
     {
-        if (this->release_y > 10)
-        {
-            this->release_y -= 10;
-        }
-        else if (this->release_y < -10)
-        {
-            this->release_y += 10;
-        }
-        else
-        {
-            this->release_y = 0;
-        }
+        this->release_y -= GUI_FRAME_STEP;
+    }
+    else if (this->release_y <= -GUI_FRAME_STEP)
+    {
+        this->release_y += GUI_FRAME_STEP;
     }
     else
     {
-        this->release_y += _UI_ABS((this->release_y - offset) % (this->base.h));
+        this->release_y = 0;
+    }
+
+    //gui_log("[cardveiew] release_y = %d, this->checksum =%d \n", this->release_y, this->checksum);
+
+    uint8_t last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_cardview_t));
+
+    if (last != this->checksum)
+    {
+        gui_fb_change();
     }
 
     if (this->status_cb != NULL)
     {
         this->status_cb(this);
     }
-// gui_log("%d ",this->release_y);
-
-
 
 }
 
@@ -224,10 +185,6 @@ void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *thi
     this->status_cb = cb;
 }
 
-void gui_cardview_mute(gui_cardview_t *this)
-{
-
-}
 
 void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style)
 {
@@ -254,6 +211,7 @@ gui_cardview_t *gui_cardview_create(void *parent,  const char *name,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = CARDVIEW;
+    root->obj_input_prepare = input_prepare;
     root->obj_prepare = cardview_prepare;
     root->obj_draw = cardview_draw_cb;
     root->obj_end = cardview_end;
@@ -268,9 +226,6 @@ gui_cardview_t *gui_cardview_create(void *parent,  const char *name,
         gui_list_insert_before(&((GET_BASE(this)->parent)->child_list),
                                &(GET_BASE(this)->brother_list));
     }
-
-    gui_list_init(&this->tab_list);
-    this->mute = true;
 
 
 
