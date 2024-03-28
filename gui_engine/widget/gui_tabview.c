@@ -162,6 +162,10 @@ static void tabview_prepare(gui_obj_t *obj)
         return;
     }
 
+    if (tabview->tp_disable)
+    {
+        return;
+    }
 
     if (tabview->cur_id.x != 0)
     {
