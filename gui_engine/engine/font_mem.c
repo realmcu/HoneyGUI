@@ -1369,7 +1369,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
         case 0: //address
             for (uint32_t i = 0; i < unicode_len; i++)
             {
-                uint16_t offset = 0;
+                uint32_t offset = 0;
                 uint16_t char_w = 0;
                 if (unicode_buffer[i] == 0x20 || unicode_buffer[i] == 0x0D)
                 {

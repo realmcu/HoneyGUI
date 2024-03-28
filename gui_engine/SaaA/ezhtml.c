@@ -387,7 +387,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                             {
-                                char *font_type2 = NULL;
+                                FONT_SRC_TYPE font_type2 = NULL;
                                 char *font_type = font;
                                 if (strstr(font_type, ".bin") != NULL)
                                 {
@@ -1881,7 +1881,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
 
                     {
-                        char *font_type2 = NULL;
+                        FONT_SRC_TYPE font_type2 = NULL;
                         if (strstr(font_type, ".bin") != NULL)
                         {
                             font_type2 = GUI_FONT_SRC_BMP;
