@@ -84,7 +84,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *callback,
+void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeat_count, void *callback,
                          void *p)
 {
 
@@ -97,7 +97,7 @@ void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *c
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
+    animate->repeat_count = repeat_count;
     animate->p = p;
     this->animate = animate;
 }
@@ -112,7 +112,7 @@ static void img_update_att(struct _gui_obj_t *o)
         {
             obj->animate->init_time_ms += cur_time_gap;
         }
-        if (obj->animate->repeatCount == 0)
+        if (obj->animate->repeat_count == 0)
         {
             if ((obj->animate->cur_time_ms - obj->animate->init_time_ms) >= obj->animate->dur)
             {
@@ -126,7 +126,7 @@ static void img_update_att(struct _gui_obj_t *o)
                                                  (float)obj->animate->dur;
             }
         }
-        else if (obj->animate->repeatCount < 0)
+        else if (obj->animate->repeat_count < 0)
         {
             if ((obj->animate->cur_time_ms - obj->animate->init_time_ms) >= obj->animate->dur)
             {
@@ -140,13 +140,13 @@ static void img_update_att(struct _gui_obj_t *o)
                                                  (float)obj->animate->dur;
             }
         }
-        else if (obj->animate->repeatCount > 0)
+        else if (obj->animate->repeat_count > 0)
         {
             if (obj->animate->cur_time_ms - obj->animate->init_time_ms -
                 obj->animate->current_repeat_count * obj->animate->dur >=
                 obj->animate->dur)
             {
-                if (obj->animate->current_repeat_count < obj->animate->repeatCount)
+                if (obj->animate->current_repeat_count < obj->animate->repeat_count)
                 {
                     obj->animate->callback(obj->animate->p);
                     obj->animate->current_repeat_count ++;

@@ -69,7 +69,6 @@ gui_app_t *get_app_dashboard_launcher(void)
 
 extern gui_win_t *win_connected_display;
 extern gui_win_t *win_main_display;
-
 void app_dashboard_launcher_update_thread(void *this)
 {
     while (1)

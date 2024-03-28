@@ -212,18 +212,18 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
         if (obj->animate->current_frame > frame_count)
         {
-            if (obj->animate->repeatCount == 0)
+            if (obj->animate->repeat_count == 0)
             {
                 obj->animate->animate = false;
             }
-            else if (obj->animate->repeatCount < 0)
+            else if (obj->animate->repeat_count < 0)
             {
                 obj->animate->current_frame = 0;
             }
-            else if (obj->animate->repeatCount > 0)
+            else if (obj->animate->repeat_count > 0)
             {
                 obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
                 {
                     obj->animate->animate = false;
                 }
@@ -310,7 +310,8 @@ void gui_button_release(gui_button_t *this, gui_event_cb_t event_cb, void *param
     gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_RELEASED, parameter);
 }
 
-void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
+void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeat_count, void *callback,
+                            void *p)
 {
     gui_animate_t *animate = ((gui_button_t *)o)->animate;
     if (!(animate))
@@ -321,7 +322,7 @@ void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
+    animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_button_t *)o)->animate = animate;
 }

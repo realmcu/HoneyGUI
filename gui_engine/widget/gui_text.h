@@ -178,13 +178,13 @@ void gui_text_set(gui_text_t   *this,
  *
  * @param o text widget
  * @param dur durtion. time length of the animate
- * @param repeatCount  0:one shoot -1:endless
+ * @param repeat_count  0:one shoot -1:endless
  * @param callback happens at every frame
  * @param p callback's parameter
  */
 void gui_text_set_animate(void    *o,
                           uint32_t dur,
-                          int      repeatCount,
+                          int      repeat_count,
                           void    *callback,
                           void    *p);
 

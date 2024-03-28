@@ -391,7 +391,7 @@ typedef struct gui_jump
 typedef struct gui_animate
 {
     uint32_t dur;
-    int repeatCount;
+    int repeat_count;
     uint32_t init_time_ms;
     uint32_t cur_time_ms;
     uint32_t current_repeat_count;

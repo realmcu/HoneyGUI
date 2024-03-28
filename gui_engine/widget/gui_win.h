@@ -28,10 +28,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 #include "gui_curtainview.h"
-
 
 /*============================================================================*
  *                         Types
@@ -41,8 +40,6 @@ extern "C" {
 typedef struct gui_win
 {
     gui_obj_t base;
-    void (*ctor)(struct gui_win *this, gui_obj_t *parent, const char *filename, int16_t x,
-                 int16_t y, int16_t w, int16_t h);
     gui_animate_t *animate;
     float scale;
     bool press_flag;
@@ -53,33 +50,17 @@ typedef struct gui_win
     uint8_t checksum;
 } gui_win_t;
 
-typedef struct gui_api_win
-{
-    void (*set_animate)(gui_win_t *b, uint32_t dur, int repeatCount, void *callback, void *p);
-    void (*onPress)(gui_win_t *b, void *callback, void *parameter);
-    void (*onRelease)(gui_win_t *b, void *callback, void *parameter);
-    void (*onLong)(gui_win_t *b, void *callback, void *parameter);
-    void (*onClick)(gui_win_t *b, void *callback, void *parameter);
-    void (*onLeft)(gui_win_t *b, void *callback, void *parameter);
-    void (*onRight)(gui_win_t *b, void *callback, void *parameter);
-    void (*onUp)(gui_win_t *b, void *callback, void *parameter);
-    void (*onDown)(gui_win_t *b, void *callback, void *parameter);
-} gui_api_win_t;
-
 /*============================================================================*
  *                         Constants
  *============================================================================*/
-
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
 
-
 /*============================================================================*
  *                         Variables
  *============================================================================*/
-
 
 /*============================================================================*
  *                         Functions
@@ -96,19 +77,27 @@ typedef struct gui_api_win
  * @return return the widget object pointer
  *
  */
-gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t y,
-                          int16_t w, int16_t h);
+gui_win_t *gui_win_create(void       *parent,
+                          const char *filename,
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h);
 
 /**
  * @brief
  *
  * @param o widget object pointer
  * @param dur Animation duration
- * @param repeatCount Repeat play times, -1 means play on repeat forever
+ * @param repeat_count Repeat play times, -1 means play on repeat forever
  * @param callback animate frame callback
  * @param p parameter
  */
-void gui_win_set_animate(gui_win_t *o, uint32_t dur, int repeatCount, void *callback, void *p);
+void gui_win_set_animate(gui_win_t *this,
+                         uint32_t   dur,
+                         int        repeat_count,
+                         void      *callback,
+                         void      *p);
 
 /**
  * @brief
@@ -117,71 +106,73 @@ void gui_win_set_animate(gui_win_t *o, uint32_t dur, int repeatCount, void *call
  * @param callback
  * @param parameter
  */
-void gui_win_onLeft(gui_win_t *b, void *callback, void *parameter);
-/**
- * @brief
- *
- * @param b
- * @param callback
- * @param parameter
- */
-void gui_win_onRight(gui_win_t *b, void *callback, void *parameter);
-/**
- * @brief
- *
- * @param b
- * @param callback
- * @param parameter
- */
-void gui_win_onUp(gui_win_t *b, void *callback, void *parameter);
-/**
- * @brief
- *
- * @param b
- * @param callback
- * @param parameter
- */
-void gui_win_onDown(gui_win_t *b, void *callback, void *parameter);
-/**
- * @brief
- *
- * @param b
- * @param callback
- * @param parameter
- */
-void gui_win_onPress(gui_win_t *b, void *callback, void *parameter);
-/**
- * @brief
- *
- * @param b
- * @param callback
- * @param parameter
- */
-void gui_win_onRelease(gui_win_t *b, void *callback, void *parameter);
-/**
- * @brief
- *
- * @param b
- * @param callback
- * @param parameter
- */
-void gui_win_onLong(gui_win_t *b, void *callback, void *parameter);
-/**
- * @brief
- *
- * @param b
- * @param callback
- * @param parameter
- */
-void gui_win_onClick(gui_win_t *b, void *callback, void *parameter);
+void gui_win_left(gui_win_t *this, void *callback, void *parameter);
 
+/**
+ * @brief
+ *
+ * @param b
+ * @param callback
+ * @param parameter
+ */
+void gui_win_right(gui_win_t *this, void *callback, void *parameter);
 
+/**
+ * @brief
+ *
+ * @param b
+ * @param callback
+ * @param parameter
+ */
+void gui_win_up(gui_win_t *this, void *callback, void *parameter);
+
+/**
+ * @brief
+ *
+ * @param b
+ * @param callback
+ * @param parameter
+ */
+void gui_win_down(gui_win_t *this, void *callback, void *parameter);
+
+/**
+ * @brief
+ *
+ * @param b
+ * @param callback
+ * @param parameter
+ */
+void gui_win_press(gui_win_t *this, void *callback, void *parameter);
+
+/**
+ * @brief
+ *
+ * @param b
+ * @param callback
+ * @param parameter
+ */
+void gui_win_release(gui_win_t *this, void *callback, void *parameter);
+
+/**
+ * @brief
+ *
+ * @param b
+ * @param callback
+ * @param parameter
+ */
+void gui_win_long(gui_win_t *this, void *callback, void *parameter);
+
+/**
+ * @brief
+ *
+ * @param b
+ * @param callback
+ * @param parameter
+ */
+void gui_win_click(gui_win_t *this, void *callback, void *parameter);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
-

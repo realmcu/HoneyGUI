@@ -157,18 +157,18 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
         if (obj->animate->current_frame > frame_count)
         {
-            if (obj->animate->repeatCount == 0)
+            if (obj->animate->repeat_count == 0)
             {
                 obj->animate->animate = false;
             }
-            else if (obj->animate->repeatCount < 0)
+            else if (obj->animate->repeat_count < 0)
             {
                 obj->animate->current_frame = 0;
             }
-            else if (obj->animate->repeatCount > 0)
+            else if (obj->animate->repeat_count > 0)
             {
                 obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
                 {
                     obj->animate->animate = false;
                 }
@@ -183,7 +183,7 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
     }
 }
-void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
+void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeat_count, void *callback, void *p)
 {
     gui_animate_t *animate = ((gui_page_t *)o)->animate;
     if (!(animate))
@@ -194,7 +194,7 @@ void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeatCount, void *ca
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
+    animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_page_t *)o)->animate = animate;
 }

@@ -17,13 +17,13 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_win.h>
 #include <string.h>
-#include <tp_algo.h>
-#include "gui_obj.h"
-#include <kb_algo.h>
+#include "guidef.h"
+#include "tp_algo.h"
+#include "kb_algo.h"
 #include "gui_matrix.h"
+#include "gui_obj.h"
+#include "gui_win.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -34,8 +34,6 @@
 /** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @{
   */
-
-
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -48,7 +46,6 @@
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -60,9 +57,6 @@
   * @{
   */
 
-
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -72,7 +66,6 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -85,103 +78,32 @@
   * @{
   */
 
-
-static void win_prepare(gui_obj_t *obj)
+static void gui_win_update_att(struct _gui_obj_t *obj)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
-    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
-    {
-        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
-    }
     gui_win_t *this = (void *)obj;
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
-    {
+    size_t frame_count;
 
-        switch (tp->type)
-        {
-        case TOUCH_SHORT:
-            {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
-            }
-            break;
-        case TOUCH_UP_SLIDE:
-            {
-                gui_obj_event_set(obj, GUI_EVENT_3);
-            }
-            break;
-        case TOUCH_DOWN_SLIDE:
-            {
-                gui_obj_event_set(obj, GUI_EVENT_4);
-            }
-            break;
-        case TOUCH_LEFT_SLIDE:
-            {
-                gui_obj_event_set(obj, GUI_EVENT_1);
-            }
-            break;
-        case TOUCH_RIGHT_SLIDE:
-            {
-                gui_obj_event_set(obj, GUI_EVENT_2);
-            }
-            break;
-        case TOUCH_LONG:
-            {
-                this->long_flag = true;
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
-            }
-            break;
-
-        default:
-            break;
-        }
-        if (tp->pressed)
-        {
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
-            this->long_flag = false;
-            this->press_flag = true;
-        }
-
-    }
-    if (this->release_flag)
-    {
-        this->press_flag = false;
-        this->release_flag = false;
-        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-        this->long_flag = false;
-    }
-    if (tp->released && this->press_flag)
-    {
-        this->release_flag = true;
-    }
-    if (this->scale != 0)
-    {
-        matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
-        matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
-        matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
-        this->scale = 0;
-    }
     if (this->animate && this->animate->animate)
     {
-        size_t frame_count = this->animate->dur * (1000 / 15) / (1000);
+        frame_count = this->animate->dur * (1000 / 15) / (1000);
         this->animate->callback(this->animate->p);
         this->animate->current_frame++;
 
         if (this->animate->current_frame > frame_count)
         {
-            if (this->animate->repeatCount == 0)
+            if (this->animate->repeat_count == 0)
             {
                 this->animate->animate = false;
             }
-            else if (this->animate->repeatCount < 0)
+            else if (this->animate->repeat_count < 0)
             {
                 this->animate->current_frame = 0;
             }
-            else if (this->animate->repeatCount > 0)
+            else if (this->animate->repeat_count > 0)
             {
                 this->animate->current_repeat_count++;
-                if (this->animate->current_repeat_count >= this->animate->repeatCount)
+
+                if (this->animate->current_repeat_count >= this->animate->repeat_count)
                 {
                     this->animate->animate = false;
                 }
@@ -196,7 +118,95 @@ static void win_prepare(gui_obj_t *obj)
     }
 }
 
-static void win_destory(gui_obj_t *obj)
+static void gui_win_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
+    gui_win_t *this = (void *)obj;
+
+    gui_win_update_att(obj);
+
+    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
+    {
+        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
+    }
+
+    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    {
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
+            {
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+            }
+            break;
+
+        case TOUCH_UP_SLIDE:
+            {
+                gui_obj_event_set(obj, GUI_EVENT_3);
+            }
+            break;
+
+        case TOUCH_DOWN_SLIDE:
+            {
+                gui_obj_event_set(obj, GUI_EVENT_4);
+            }
+            break;
+
+        case TOUCH_LEFT_SLIDE:
+            {
+                gui_obj_event_set(obj, GUI_EVENT_1);
+            }
+            break;
+
+        case TOUCH_RIGHT_SLIDE:
+            {
+                gui_obj_event_set(obj, GUI_EVENT_2);
+            }
+            break;
+
+        case TOUCH_LONG:
+            {
+                this->long_flag = true;
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        if (tp->pressed)
+        {
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+            this->long_flag = false;
+            this->press_flag = true;
+        }
+    }
+
+    if (this->release_flag)
+    {
+        this->press_flag = false;
+        this->release_flag = false;
+        gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        this->long_flag = false;
+    }
+
+    if (tp->released && this->press_flag)
+    {
+        this->release_flag = true;
+    }
+
+    if (this->scale != 0)
+    {
+        matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
+        matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
+        matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
+        this->scale = 0;
+    }
+}
+
+static void gui_win_destory(gui_obj_t *obj)
 {
     gui_win_t *this = (void *)obj;
     if (this->animate)
@@ -205,12 +215,17 @@ static void win_destory(gui_obj_t *obj)
     }
 }
 
-void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                  int16_t y, int16_t w, int16_t h)
+void gui_win_ctor(gui_win_t  *this,
+                  gui_obj_t  *parent,
+                  const char *filename,
+                  int16_t     x,
+                  int16_t     y,
+                  int16_t     w,
+                  int16_t     h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
-    GET_BASE(this)->obj_prepare = win_prepare;
-    GET_BASE(this)->obj_destory = win_destory;
+    GET_BASE(this)->obj_prepare = gui_win_prepare;
+    GET_BASE(this)->obj_destory = gui_win_destory;
     GET_BASE(this)->type = WINDOW;
 }
 
@@ -218,68 +233,89 @@ void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int1
  *                           Public Functions
  *============================================================================*/
 
-void gui_win_set_animate(gui_win_t *o, uint32_t dur, int repeatCount, void *callback, void *p)
+void gui_win_set_animate(gui_win_t *this,
+                         uint32_t   dur,
+                         int        repeat_count,
+                         void      *callback,
+                         void      *p)
 {
-    gui_animate_t *animate = ((gui_win_t *)o)->animate;
+    gui_animate_t *animate = ((gui_win_t *)this)->animate;
+
     if (!(animate))
     {
         animate = gui_malloc(sizeof(gui_animate_t));
     }
+
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
+    animate->repeat_count = repeat_count;
     animate->p = p;
-    ((gui_win_t *)o)->animate = animate;
+    ((gui_win_t *)this)->animate = animate;
 }
 
-void gui_win_onLeft(gui_win_t *b, void *callback, void *parameter)
+void gui_win_left(gui_win_t *this, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
-}
-void gui_win_onRight(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
-}
-void gui_win_onUp(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
-}
-void gui_win_onDown(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
-}
-void gui_win_onPress(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED, parameter);
-}
-void gui_win_onRelease(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_RELEASED, parameter);
-}
-void gui_win_onLong(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, parameter);
-}
-void gui_win_onClick(gui_win_t *b, void *callback, void *parameter)
-{
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
 }
 
-gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t y,
-                          int16_t w, int16_t h)
+void gui_win_right(gui_win_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+}
+
+void gui_win_up(gui_win_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_3, parameter);
+}
+
+void gui_win_down(gui_win_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
+}
+
+void gui_win_press(gui_win_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED, parameter);
+}
+
+void gui_win_release(gui_win_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_RELEASED, parameter);
+}
+
+void gui_win_long(gui_win_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, parameter);
+}
+
+void gui_win_click(gui_win_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
+}
+
+gui_win_t *gui_win_create(void       *parent,
+                          const char *filename,
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h)
 {
     gui_win_t *this = gui_malloc(sizeof(gui_win_t));
+
     memset(this, 0, sizeof(gui_win_t));
     gui_win_ctor(this, parent, filename, x, y, w, h);
+
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))
     {
         gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
                                &(((gui_obj_t *)this)->brother_list));
     }
+
     ((gui_obj_t *)this)->create_done = true;
+
     return this;
 }
 
@@ -290,9 +326,3 @@ gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-

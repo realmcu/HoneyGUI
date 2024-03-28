@@ -85,8 +85,8 @@ void design_tab_menu(void *parent)
     {
 
         gui_win_t *button = gui_win_create(grid, 0, 0, 0, 400, 70);
-        gui_win_onPress(button, press_animate_cb, button);
-        gui_win_onRelease(button, release_animate_callback, button);
+        gui_win_press(button, press_animate_cb, button);
+        gui_win_release(button, release_animate_callback, button);
         //
         {
             gui_img_t *img = gui_img_create_from_mem(button, 0, RECT1_BIN, 0, 0, 0, 0);
@@ -111,12 +111,12 @@ void design_tab_menu(void *parent)
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
     }
-    gui_win_onClick(button_array[0], heart_rate_cb, button_array[0]);
-    gui_win_onClick(button_array[1], menu_cb, button_array[1]);
-    gui_win_onClick(button_array[2], stopwatch_cb, button_array[2]);
-    gui_win_onClick(button_array[3], map_cb, button_array[3]);
-    // gui_win_onClick(button_array[3], calculator_cb, button_array[3]);
-    // gui_win_onClick(button_array[4], sport_cb, button_array[4]);
+    gui_win_click(button_array[0], heart_rate_cb, button_array[0]);
+    gui_win_click(button_array[1], menu_cb, button_array[1]);
+    gui_win_click(button_array[2], stopwatch_cb, button_array[2]);
+    gui_win_click(button_array[3], map_cb, button_array[3]);
+    // gui_win_click(button_array[3], calculator_cb, button_array[3]);
+    // gui_win_click(button_array[4], sport_cb, button_array[4]);
 
 }
 

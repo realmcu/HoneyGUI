@@ -202,18 +202,18 @@ static void gui_text_update_att(struct _gui_obj_t *this)
 
         if (obj->animate->current_frame > frame_count)
         {
-            if (obj->animate->repeatCount == 0)
+            if (obj->animate->repeat_count == 0)
             {
                 obj->animate->animate = false;
             }
-            else if (obj->animate->repeatCount < 0)
+            else if (obj->animate->repeat_count < 0)
             {
                 obj->animate->current_frame = 0;
             }
-            else if (obj->animate->repeatCount > 0)
+            else if (obj->animate->repeat_count > 0)
             {
                 obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
                 {
                     obj->animate->animate = false;
                 }
@@ -349,7 +349,7 @@ void gui_text_set(gui_text_t   *this,
 
 void gui_text_set_animate(void    *o,
                           uint32_t dur,
-                          int      repeatCount,
+                          int      repeat_count,
                           void    *callback,
                           void    *p)
 {
@@ -363,7 +363,7 @@ void gui_text_set_animate(void    *o,
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
+    animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_text_t *)o)->animate = animate;
 }

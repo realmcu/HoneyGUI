@@ -180,7 +180,7 @@ gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16
                             int16_t w, int16_t h);
 
 extern _gui_api_page_t gui_page_api;
-void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeatCount, void *callback, void *p);
+void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeat_count, void *callback, void *p);
 /**
  * @brief config rebound
  *

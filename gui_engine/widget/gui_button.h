@@ -85,7 +85,7 @@ struct gui_button
 };
 typedef struct gui_api_button
 {
-    void (*set_animate)(gui_button_t *b, uint32_t dur, int repeatCount, void *callback, void *p);
+    void (*set_animate)(gui_button_t *b, uint32_t dur, int repeat_count, void *callback, void *p);
     void (*onPress)(gui_button_t *b, void *callback, void *parameter);
     void (*onRelease)(gui_button_t *b, void *callback, void *parameter);
     void (*onLong)(gui_button_t *b, void *callback, void *parameter);
@@ -267,11 +267,11 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y);
  *
  * @param o
  * @param dur
- * @param repeatCount
+ * @param repeat_count
  * @param callback
  * @param p
  */
-void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeatCount, void *callback,
+void gui_button_set_animate(gui_button_t *o, uint32_t dur, int repeat_count, void *callback,
                             void *p);
 
 /** End of WIDGET_Exported_GUI_Functions
