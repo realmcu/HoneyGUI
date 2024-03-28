@@ -450,7 +450,7 @@ static void curtainview_prepare(gui_obj_t *obj)
         this->cur_curtain_flag = 0;
         break;
     }
-    if (this->middle_flag || this->middle_flag_up)
+    if ((this->middle_flag || this->middle_flag_up) && tp->type != TOUCH_HOLD_Y)
     {
         if (this->middle_flag)
         {
@@ -459,7 +459,7 @@ static void curtainview_prepare(gui_obj_t *obj)
             {
                 scope = c_down->scope;
             }
-            if (this->release_y >= -(float)gui_get_screen_height()*scope)
+            if (this->release_y >= -((float)gui_get_screen_height()*scope - GUI_FRAME_STEP))
             {
                 this->release_y -= GUI_FRAME_STEP;
                 if (c_down)
@@ -478,14 +478,14 @@ static void curtainview_prepare(gui_obj_t *obj)
                 }
             }
         }
-        if (this->middle_flag_up)
+        if (this->middle_flag_up && tp->type != TOUCH_HOLD_Y)
         {
             float scope = 1.0f;
             if (c_up)
             {
                 scope = c_up->scope;
             }
-            if (this->release_y <= (float)gui_get_screen_height()*scope)
+            if (this->release_y <= ((float)gui_get_screen_height()*scope - GUI_FRAME_STEP))
             {
                 this->release_y += GUI_FRAME_STEP;
                 if (c_up)
@@ -505,7 +505,8 @@ static void curtainview_prepare(gui_obj_t *obj)
             }
         }
     }
-    else if (!this->middle_flag && this->release_y < 0 && this->cur_curtain == CURTAIN_MIDDLE)
+    else if (!this->middle_flag && this->release_y < 0 && this->cur_curtain == CURTAIN_MIDDLE &&
+             tp->type != TOUCH_HOLD_Y)
     {
         if (this->release_y <= 0)
         {
@@ -516,7 +517,8 @@ static void curtainview_prepare(gui_obj_t *obj)
             }
         }
     }
-    else if (!this->middle_flag_up && this->release_y > 0 && this->cur_curtain == CURTAIN_MIDDLE)
+    else if (!this->middle_flag_up && this->release_y > 0 && this->cur_curtain == CURTAIN_MIDDLE &&
+             tp->type != TOUCH_HOLD_Y)
     {
         if (this->release_y >= 0)
         {
@@ -545,7 +547,7 @@ static void curtainview_prepare(gui_obj_t *obj)
         {
             scope = c_left->scope;
         }
-        if (this->release_x <= (float)gui_get_screen_width()*scope)
+        if (this->release_x <= ((float)gui_get_screen_width()*scope - GUI_FRAME_STEP))
         {
             this->release_x += GUI_FRAME_STEP;
             if (c_left)
@@ -564,14 +566,14 @@ static void curtainview_prepare(gui_obj_t *obj)
             }
         }
     }
-    else if (this->down_flag)
+    else if (this->down_flag && tp->type != TOUCH_HOLD_Y)
     {
         float scope = 1.0f;
         if (c_down)
         {
             scope = c_down->scope;
         }
-        if (this->release_y <= (float)gui_get_screen_height()*scope)
+        if (this->release_y <= ((float)gui_get_screen_height()*scope - GUI_FRAME_STEP))
         {
             this->release_y += GUI_FRAME_STEP;
         }
@@ -582,14 +584,14 @@ static void curtainview_prepare(gui_obj_t *obj)
             this->cur_curtain = CURTAIN_MIDDLE;
         }
     }
-    else if (this->up_flag)
+    else if (this->up_flag && tp->type != TOUCH_HOLD_Y)
     {
         float scope = 1.0f;
         if (c_up)
         {
             scope = c_up->scope;
         }
-        if (this->release_y >= -(float)gui_get_screen_height()*scope)
+        if (this->release_y >= -((float)gui_get_screen_height()*scope - GUI_FRAME_STEP))
         {
             this->release_y -= GUI_FRAME_STEP;
         }
@@ -600,7 +602,7 @@ static void curtainview_prepare(gui_obj_t *obj)
             this->cur_curtain = CURTAIN_MIDDLE;
         }
     }
-    else if (this->left_flag)
+    else if (this->left_flag && tp->type != TOUCH_HOLD_X)
     {
 
         float scope = 1.0f;
@@ -608,7 +610,7 @@ static void curtainview_prepare(gui_obj_t *obj)
         {
             scope = c_left->scope;
         }
-        if (this->release_x >= -(int)((float)gui_get_screen_width()*scope))
+        if (this->release_x >= -(int)(((float)gui_get_screen_width()*scope - GUI_FRAME_STEP)))
         {
             this->release_x -= GUI_FRAME_STEP;
         }
