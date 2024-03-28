@@ -38,7 +38,6 @@
   * @{
   */
 
-
 /** End of WIDGET_Exported_Types
   * @}
   */
@@ -50,7 +49,6 @@
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -61,7 +59,7 @@
 /** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @{
   */
-#define CUBE_JUDEG_FULL_RANK(m) if(full_rank(m->matrix))  //!< JUDGE IF THIS IS FULL RANK
+#define CUBE_JUDEG_FULL_RANK(m) if(gui_cube_full_rank(m->matrix))  //!< JUDGE IF THIS IS FULL RANK
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -73,8 +71,6 @@
   * @{
   */
 
-
-
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -85,20 +81,18 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void scale_cube(Vertex_t *vertex, float scale)
+static void gui_cube_scale(Vertex_t *vertex, float scale)
 {
     // Scale cube vertex coordinates to proper size.
-    //
     vertex->x *= scale;
     vertex->y *= scale;
     vertex->z *= scale;
 }
 
-static void compute_rotate(float rx, float ry, float rz, struct gui_matrix *rotate)
+static void gui_cube_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rotate)
 {
     // Rotation angles rx, ry, rz (degree) for axis X, Y, Z
     // Compute 3D rotation matrix base on rotation angle rx, ry, rz about axis X, Y, Z.
-    //
     rotate->m[0][0] = cos(RAD(rz)) * cos(RAD(ry));
     rotate->m[0][1] = cos(RAD(rz)) * sin(RAD(ry)) * sin(RAD(rx)) - sin(RAD(rz)) * cos(RAD(rx));
     rotate->m[0][2] = cos(RAD(rz)) * sin(RAD(ry)) * cos(RAD(rx)) + sin(RAD(rz)) * sin(RAD(rx));
@@ -110,25 +104,23 @@ static void compute_rotate(float rx, float ry, float rz, struct gui_matrix *rota
     rotate->m[2][2] = cos(RAD(ry)) * cos(RAD(rx));
 }
 
-static void transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
-                             float ty)
+static void gui_cube_transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc,
+                                      float tx,
+                                      float ty)
 {
     // Compute the new cube vertex coordinates transformed by the rotation matrix.
-    //
     rc->x = rotate->m[0][0] * vertex->x + rotate->m[0][1] * vertex->y + rotate->m[0][2] * vertex->z;
     rc->y = rotate->m[1][0] * vertex->x + rotate->m[1][1] * vertex->y + rotate->m[1][2] * vertex->z;
     rc->z = rotate->m[2][0] * vertex->x + rotate->m[2][1] * vertex->y + rotate->m[2][2] * vertex->z;
 
     // Translate the vertex in XY plane.
-    //
     rc->x += tx;
     rc->y += ty;
 }
 
-static void transfrom_normalZ(struct gui_matrix *rotate, Normal_t *nVec, float *nZ)
+static void gui_cube_transfrom_normalZ(struct gui_matrix *rotate, Normal_t *nVec, float *nZ)
 {
     // Compute the new normal Z coordinate transformed by the rotation matrix.
-    //
     *nZ = rotate->m[2][0] * nVec->x + rotate->m[2][1] * nVec->y + rotate->m[2][2] * nVec->z;
 }
 
@@ -146,14 +138,18 @@ static void transfrom_normalZ(struct gui_matrix *rotate, Normal_t *nVec, float *
 //
 // So the homogeneous matrix sx, sy, shx, shy, tx, ty can be easily solved from above equations.
 //
-static void transfrom_blit(float w, float h, Vertex_t *v0, Vertex_t *v1, Vertex_t *v2, Vertex_t *v3,
-                           struct gui_matrix *matrix)
+static void gui_cube_transfrom_blit(float              w,
+                                    float              h,
+                                    Vertex_t          *v0,
+                                    Vertex_t          *v1,
+                                    Vertex_t          *v2,
+                                    Vertex_t          *v3,
+                                    struct gui_matrix *matrix)
 {
     float sx, sy, shx, shy, tx, ty;
 
     // Compute 3x3 image transform matrix to map a rectangle image (w,h) to
     // a parallelogram (x0,y0), (x1,y1), (x2,y2), (x3,y3) counterclock wise.
-    //
     sx = (v1->x - v0->x) / w;
     sy = (v3->y - v0->y) / h;
     shx = (v3->x - v0->x) / h;
@@ -174,30 +170,26 @@ static void transfrom_blit(float w, float h, Vertex_t *v0, Vertex_t *v1, Vertex_
 }
 
 
-static bool full_rank(struct gui_matrix *m)
+static bool gui_cube_full_rank(struct gui_matrix *m)
 {
     for (int i = 0; i < 3; i++)
     {
-        //gui_log("%f, %f, %f, ", m->m[0][i], m->m[1][i], m->m[2][i]);
-        //gui_log("%f,%f,%f,", m->m[i][0], m->m[i][1], m->m[i][2]);
         if (m->m[i][0] == 0 && m->m[i][1] == 0 && m->m[i][2] == 0)
         {
-            //gui_log("\n");
             return false;
         }
-        //
-        if ((m->m[0][i] * 10000.0f < 1000.0f && m->m[0][i] * 10000.0f > -1000.0f) &&
-            (m->m[1][i] * 10000.0f < 1000.0f && m->m[1][i] * 10000.0f > -1000.0f) &&
-            (m->m[2][i] * 10000.0f < 1000.0f && m->m[2][i] * 10000.0f > -1000.0f))
+
+        if ((m->m[0][i] * 10000.0f < 1000.0f && m->m[0][i] * 10000.0f > -1000.0f)
+            && (m->m[1][i] * 10000.0f < 1000.0f && m->m[1][i] * 10000.0f > -1000.0f)
+            && (m->m[2][i] * 10000.0f < 1000.0f && m->m[2][i] * 10000.0f > -1000.0f))
         {
-            //gui_log("\n");
             return false;
         }
-    } //gui_log("\n");
+    }
     return true;
 }
 
-static void cube_prepare(gui_obj_t *obj)
+static void gui_cube_prepare(gui_obj_t *obj)
 {
     struct gui_matrix rotate_3D;
     struct gui_matrix matrix;
@@ -219,27 +211,27 @@ static void cube_prepare(gui_obj_t *obj)
 
     gui_cube_t *this = (gui_cube_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = (touch_info_t *)tp_get_info();
     gui_obj_t *root = (gui_obj_t *)obj;
     GUI_UNUSED(root);
+
     // Scale the cube to proper size
     float cbsize = this->cbsize;
+
     // Translate the cube to the center of framebuffer.
     float xoff = (this->c_x - dc->screen_width / 2) + dc->screen_width / 2;
     float yoff = (this->c_y - dc->screen_height / 2) + dc->screen_height / 2;
 
-    scale_cube(&cube_v0, cbsize);
-    scale_cube(&cube_v1, cbsize);
-    scale_cube(&cube_v2, cbsize);
-    scale_cube(&cube_v3, cbsize);
-    scale_cube(&cube_v4, cbsize);
-    scale_cube(&cube_v5, cbsize);
-    scale_cube(&cube_v6, cbsize);
-    scale_cube(&cube_v7, cbsize);
-
+    gui_cube_scale(&cube_v0, cbsize);
+    gui_cube_scale(&cube_v1, cbsize);
+    gui_cube_scale(&cube_v2, cbsize);
+    gui_cube_scale(&cube_v3, cbsize);
+    gui_cube_scale(&cube_v4, cbsize);
+    gui_cube_scale(&cube_v5, cbsize);
+    gui_cube_scale(&cube_v6, cbsize);
+    gui_cube_scale(&cube_v7, cbsize);
 
     // Rotation angles (degree) for axis X, Y, Z
-    compute_rotate(this->xrot, this->yrot, this->zrot, &rotate_3D);
+    gui_cube_compute_rotate(this->xrot, this->yrot, this->zrot, &rotate_3D);
 
     if (this->auto_flag == true)
     {
@@ -248,22 +240,22 @@ static void cube_prepare(gui_obj_t *obj)
     }
 
     // Compute the new cube vertex coordinates transformed by the rotation matrix.
-    transfrom_rotate(&rotate_3D, &cube_v0, &rv0, xoff, yoff);
-    transfrom_rotate(&rotate_3D, &cube_v1, &rv1, xoff, yoff);
-    transfrom_rotate(&rotate_3D, &cube_v2, &rv2, xoff, yoff);
-    transfrom_rotate(&rotate_3D, &cube_v3, &rv3, xoff, yoff);
-    transfrom_rotate(&rotate_3D, &cube_v4, &rv4, xoff, yoff);
-    transfrom_rotate(&rotate_3D, &cube_v5, &rv5, xoff, yoff);
-    transfrom_rotate(&rotate_3D, &cube_v6, &rv6, xoff, yoff);
-    transfrom_rotate(&rotate_3D, &cube_v7, &rv7, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v0, &rv0, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v1, &rv1, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v2, &rv2, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v3, &rv3, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v4, &rv4, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v5, &rv5, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v6, &rv6, xoff, yoff);
+    gui_cube_transfrom_rotate(&rotate_3D, &cube_v7, &rv7, xoff, yoff);
 
     // Compute the surface normal direction to determine the front/back face.
-    transfrom_normalZ(&rotate_3D, &normal0321, &this->nz0321);
-    transfrom_normalZ(&rotate_3D, &normal4567, &this->nz4567);
-    transfrom_normalZ(&rotate_3D, &normal1265, &this->nz5126);
-    transfrom_normalZ(&rotate_3D, &normal0473, &this->nz0473);
-    transfrom_normalZ(&rotate_3D, &normal2376, &this->nz7623);
-    transfrom_normalZ(&rotate_3D, &normal0154, &this->nz0154);
+    gui_cube_transfrom_normalZ(&rotate_3D, &normal0321, &this->nz0321);
+    gui_cube_transfrom_normalZ(&rotate_3D, &normal4567, &this->nz4567);
+    gui_cube_transfrom_normalZ(&rotate_3D, &normal1265, &this->nz5126);
+    gui_cube_transfrom_normalZ(&rotate_3D, &normal0473, &this->nz0473);
+    gui_cube_transfrom_normalZ(&rotate_3D, &normal2376, &this->nz7623);
+    gui_cube_transfrom_normalZ(&rotate_3D, &normal0154, &this->nz0154);
 
     draw_img_t *front = &this->draw_img_front;
     draw_img_t *back = &this->draw_img_back;
@@ -279,10 +271,9 @@ static void cube_prepare(gui_obj_t *obj)
     gui_image_load_scale(left);
     gui_image_load_scale(right);
 
-
     if (this->nz0321 > 0.0f)
     {
-        transfrom_blit(front->img_w, front->img_h, &rv0, &rv3, &rv2, &rv1, &matrix);
+        gui_cube_transfrom_blit(front->img_w, front->img_h, &rv0, &rv3, &rv2, &rv1, &matrix);
 
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
@@ -296,7 +287,7 @@ static void cube_prepare(gui_obj_t *obj)
 
     if (this->nz4567 > 0.0f)
     {
-        transfrom_blit(back->img_w, back->img_h, &rv4, &rv5, &rv6, &rv7, &matrix);
+        gui_cube_transfrom_blit(back->img_w, back->img_h, &rv4, &rv5, &rv6, &rv7, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
@@ -308,7 +299,7 @@ static void cube_prepare(gui_obj_t *obj)
 
     if (this->nz5126 > 0.0f)
     {
-        transfrom_blit(up->img_w, up->img_h, &rv5, &rv1, &rv2, &rv6, &matrix);
+        gui_cube_transfrom_blit(up->img_w, up->img_h, &rv5, &rv1, &rv2, &rv6, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
@@ -320,7 +311,7 @@ static void cube_prepare(gui_obj_t *obj)
 
     if (this->nz0473 > 0.0f)
     {
-        transfrom_blit(down->img_w, down->img_h, &rv0, &rv4, &rv7, &rv3, &matrix);
+        gui_cube_transfrom_blit(down->img_w, down->img_h, &rv0, &rv4, &rv7, &rv3, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
@@ -332,7 +323,7 @@ static void cube_prepare(gui_obj_t *obj)
 
     if (this->nz7623 > 0.0f)
     {
-        transfrom_blit(left->img_w, left->img_h, &rv7, &rv6, &rv2, &rv3, &matrix);
+        gui_cube_transfrom_blit(left->img_w, left->img_h, &rv7, &rv6, &rv2, &rv3, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
@@ -344,7 +335,7 @@ static void cube_prepare(gui_obj_t *obj)
 
     if (this->nz0154 > 0.0f)
     {
-        transfrom_blit(right->img_w, right->img_h, &rv0, &rv1, &rv5, &rv4, &matrix);
+        gui_cube_transfrom_blit(right->img_w, right->img_h, &rv0, &rv1, &rv5, &rv4, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
@@ -355,7 +346,7 @@ static void cube_prepare(gui_obj_t *obj)
     }
 }
 
-static void cube_draw_cb(gui_obj_t *obj)
+static void gui_cube_draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     gui_cube_t *this = (gui_cube_t *)obj;
@@ -375,9 +366,9 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_front.img_y;
         draw_rect.x2 = draw_rect.x1 + this->draw_img_front.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_front.target_h - 1;
+
         CUBE_JUDEG_FULL_RANK(front)
         gui_acc_blit_to_dc(front, dc, &draw_rect);
-
     }
 
     if (this->nz4567 > 0.0f)
@@ -386,6 +377,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_back.img_y;
         draw_rect.x2 = draw_rect.x1 + this->draw_img_back.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_back.target_h - 1;
+
         CUBE_JUDEG_FULL_RANK(back)
         gui_acc_blit_to_dc(back, dc, &draw_rect);
     }
@@ -396,6 +388,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_up.img_y;
         draw_rect.x2 = draw_rect.x1 + this->draw_img_up.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_up.target_h - 1;
+
         CUBE_JUDEG_FULL_RANK(up)
         gui_acc_blit_to_dc(up, dc, &draw_rect);
     }
@@ -406,6 +399,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_down.img_y;
         draw_rect.x2 = draw_rect.x1 + this->draw_img_down.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_down.target_h - 1;
+
         CUBE_JUDEG_FULL_RANK(down)
         gui_acc_blit_to_dc(down, dc, &draw_rect);
     }
@@ -416,6 +410,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_left.img_y;
         draw_rect.x2 = draw_rect.x1 + this->draw_img_left.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_left.target_h - 1;
+
         CUBE_JUDEG_FULL_RANK(left)
         gui_acc_blit_to_dc(left, dc, &draw_rect);
     }
@@ -426,13 +421,13 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.y1 = this->draw_img_right.img_y;
         draw_rect.x2 = draw_rect.x1 + this->draw_img_right.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_right.target_h - 1;
+
         CUBE_JUDEG_FULL_RANK(right)
         gui_acc_blit_to_dc(right, dc, &draw_rect);
     }
 }
 
-
-static void cube_end(gui_obj_t *obj)
+static void gui_cube_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
     gui_cube_t *cube = (gui_cube_t *)obj;
@@ -454,9 +449,9 @@ static void cube_end(gui_obj_t *obj)
         }
     }
 }
-static void cube_destory(gui_obj_t *obj)
+
+static void gui_cube_destory(gui_obj_t *obj)
 {
-    // gui_log("%s \n", __FUNCTION__);
     gui_cube_t *this = (gui_cube_t *)obj;
     draw_img_t *cube_img[6];
 
@@ -482,23 +477,28 @@ static void cube_destory(gui_obj_t *obj)
 }
 
 extern char *gui_img_filepath_transforming(void *addr);
-static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
+static void gui_cube_ctor(gui_cube_t          *this,
+                          gui_obj_t           *parent,
+                          const char          *name,
                           gui_cube_imgfile_t *img_file,
-                          int16_t x,
-                          int16_t y, int16_t w, int16_t h)
+                          int16_t              x,
+                          int16_t              y,
+                          int16_t              w,
+                          int16_t              h)
 {
+    gui_obj_t *base = (gui_obj_t *)this;
+    gui_obj_t *root = (gui_obj_t *)this;
 
     //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
     gui_obj_ctor(base, parent, name, x, y, w, h);
 
     //for root class
-    gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CUBE;
-    root->obj_prepare = cube_prepare;
-    root->obj_draw = cube_draw_cb;
-    root->obj_end = cube_end;
-    root->obj_destory = cube_destory;
+    root->obj_prepare = gui_cube_prepare;
+    root->obj_draw = gui_cube_draw_cb;
+    root->obj_end = gui_cube_end;
+    root->obj_destory = gui_cube_destory;
+
     //for self
     draw_img_t *cube_img[6];
     cube_img[0] = &this->draw_img_front;
@@ -546,8 +546,8 @@ static void gui_cube_ctor(gui_cube_t *this, gui_obj_t *parent, const char *name,
     this->xrot = 20.0f;
     this->yrot = 0.0f;
     this->zrot = 20.0f;
-
 }
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -558,17 +558,19 @@ void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float d
     this->interval_ms_y = internal_ms;
     this->step_degree_y = degree;
 }
+
 void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y)
 {
     this->c_x = c_x;
     this->c_y = c_y;
 }
+
 void gui_cube_set_size(gui_cube_t *this, float size)
 {
     this->cbsize = size;
 }
 
-BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side)
+BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE side)
 {
     GUI_ASSERT(cube != NULL);
     draw_img_t *cube_img[6];
@@ -591,7 +593,7 @@ BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side)
     }
 }
 
-void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side, BLEND_MODE_TYPE mode)
+void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE side, BLEND_MODE_TYPE mode)
 {
     GUI_ASSERT(cube != NULL);
     draw_img_t *cube_img[6];
@@ -615,7 +617,7 @@ void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side, BLEND_MODE_TYPE mo
     }
 }
 
-uint8_t gui_cube_get_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side)
+uint8_t gui_cube_get_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side)
 {
     GUI_ASSERT(cube != NULL);
     draw_img_t *cube_img[6];
@@ -638,7 +640,7 @@ uint8_t gui_cube_get_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side)
     }
 }
 
-void gui_cube_set_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side, uint8_t opacity)
+void gui_cube_set_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side, uint8_t opacity)
 {
     GUI_ASSERT(cube != NULL);
     draw_img_t *cube_img[6];
@@ -712,15 +714,19 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
     }
 }
 
-gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file,
-                            int16_t x,
-                            int16_t y)
+gui_cube_t *gui_cube_create(void                *parent,
+                            const char          *name,
+                            gui_cube_imgfile_t *img_file,
+                            int16_t              x,
+                            int16_t              y)
 {
     GUI_ASSERT(parent != NULL);
+
     if (name == NULL)
     {
         name = "DEFAULT_CUBE";
     }
+
     gui_cube_t *cube = gui_malloc(sizeof(gui_cube_t));
     GUI_ASSERT(cube != NULL);
     memset(cube, 0x00, sizeof(gui_cube_t));
@@ -742,8 +748,3 @@ gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t 
 /** End of WIDGET
   * @}
   */
-
-
-
-
-

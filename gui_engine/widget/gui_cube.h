@@ -54,7 +54,7 @@ typedef enum
     CUBE_SIDE_LEFT,
     CUBE_SIDE_RIGHT,
     CUBE_SIDE_ALL
-} CUBE_SIDE_TYPE;
+} T_CUBE_SIDE_TYPE;
 
 typedef struct
 {
@@ -159,7 +159,6 @@ typedef struct gui_cube
   * @{
   */
 
-
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -180,7 +179,7 @@ typedef struct gui_cube
  * @return the cube image's blend mode
  *
  */
-BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side);
+BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE side);
 
 /**
  * @brief set the cube image's blend mode
@@ -190,7 +189,7 @@ BLEND_MODE_TYPE gui_cube_get_mode(gui_cube_t *cube, CUBE_SIDE_TYPE side);
  * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
  *
  */
-void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode);
+void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode);
 
 /**
  * @brief get the cube image's opacity
@@ -200,7 +199,7 @@ void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TY
  * @return the cube image's opacity
  *
  */
-uint8_t gui_cube_get_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side);
+uint8_t gui_cube_get_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side);
 
 /**
  * @brief set the cube image's opacity
@@ -210,7 +209,7 @@ uint8_t gui_cube_get_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side);
  * @param opacity the cube image's opacity
  *
  */
-void gui_cube_set_opacity(gui_cube_t *cube, CUBE_SIDE_TYPE side, uint8_t opacity);
+void gui_cube_set_opacity(gui_cube_t *cube, T_CUBE_SIDE_TYPE side, uint8_t opacity);
 
 /**
  * @brief set cube image
@@ -249,9 +248,12 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file);
  *}
  * \endcode
  */
-gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file,
-                            int16_t x,
-                            int16_t y);
+gui_cube_t *gui_cube_create(void                *parent,
+                            const char          *name,
+                            gui_cube_imgfile_t *img_file,
+                            int16_t              x,
+                            int16_t              y);
+
 /**
  * @brief set center
  *
@@ -260,6 +262,7 @@ gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t 
  * @param c_y center y
  */
 void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
+
 /**
  * @brief set size
  *
@@ -300,10 +303,8 @@ void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float d
   * @}
   */
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
