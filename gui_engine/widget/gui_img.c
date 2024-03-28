@@ -326,6 +326,27 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
     this->opacity = draw_img->opacity_value;
     root->w = gui_img_get_width(this);
     root->h = gui_img_get_height(this);
+
+    gui_rgb_data_head_t head = rtgui_image_get_header(draw_img);
+    if (head.resize == 0)
+    {
+        gui_img_scale(this, 1, 1);
+    }
+    else if (head.resize == 1) //unsigned char resize:2;//0-no resize;1-50%(x&y);2-70%;3-80%
+    {
+        gui_img_scale(this, 2, 2);
+        gui_log("resize image!!");
+    }
+    else if (head.resize == 2)
+    {
+        gui_img_scale(this, 10.0f / 7.0f, 10.0f / 7.0f);
+        gui_log("resize image!!");
+    }
+    else if (head.resize == 3)
+    {
+        gui_img_scale(this, 10.0f / 8.0f, 10.0f / 8.0f);
+        gui_log("resize image!!");
+    }
 }
 
 static gui_img_t *gui_img_create_core(void *parent, gui_imgconfig_t *config)

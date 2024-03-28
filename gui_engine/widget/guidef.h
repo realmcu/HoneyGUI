@@ -464,17 +464,18 @@ struct _gui_color
     } color;
 };
 typedef struct _gui_color gui_color_t;
-struct gui_rgb_data_head
+typedef struct gui_rgb_data_head
 {
     unsigned char scan : 1;
+    unsigned char align : 1;
+    unsigned char resize: 2; //0-no resize;1-50%(x&y);2-70%;3-80%
     unsigned char rsvd : 4;
-    unsigned char compress : 3;
     char type;
     short w;
     short h;
     char version;
     char rsvd2;
-};
+} gui_rgb_data_head_t;
 typedef struct _gui_rect_file_head
 {
     struct gui_rgb_data_head head;
@@ -564,7 +565,7 @@ extern char *defaultPath;
 
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
-#define GUI_FRAME_STEP 2
+#define GUI_FRAME_STEP 50
 #else
 #define GUI_FRAME_STEP 50
 #endif

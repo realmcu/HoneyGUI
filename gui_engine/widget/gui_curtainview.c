@@ -174,11 +174,7 @@ static void curtainview_prepare(gui_obj_t *obj)
     gui_curtainview_t *this = (gui_curtainview_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    int frame_step = GUI_FRAME_STEP;
-    if (frame_step / 10 >= 1)
-    {
-        frame_step = frame_step / 10;
-    }
+
     gui_list_t *node = NULL;
     gui_list_t *tmp = NULL;
     gui_curtain_t *c_middle = NULL;
