@@ -17,13 +17,12 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
-#include <gui_matrix.h>
-#include <gui_obj.h>
-#include <nanovg.h>
+#include "guidef.h"
+#include "gui_matrix.h"
+#include "gui_obj.h"
+#include "nanovg.h"
 #include "gui_canvas.h"
-
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -34,8 +33,6 @@
 /** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @{
   */
-
-
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -48,7 +45,6 @@
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -60,8 +56,6 @@
   * @{
   */
 
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -71,7 +65,6 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -84,8 +77,7 @@
   * @{
   */
 
-
-static void prepare(gui_canvas_t *this)
+static void gui_canvas_prepare(gui_canvas_t *this)
 {
     GUI_UNUSED(this);
     gui_dispdev_t *dc = gui_get_dc();
@@ -99,18 +91,23 @@ static void prepare(gui_canvas_t *this)
     GUI_UNUSED(cy);
 }
 
-static void widget_nanovg_draw_cb(gui_obj_t *obj)
+static void gui_canvas_widget_nanovg_draw_cb(gui_obj_t *obj)
 {
     gui_canvas_t *this = (gui_canvas_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
+    NVGcontext *vg;
 
     if (this->nanovg_canvas_cb != NULL)
     {
-        extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
+        extern NVGcontext *nvgCreateAGGE(uint32_t w,
+                                         uint32_t h,
+                                         uint32_t stride,
+                                         enum     NVGtexture format,
                                          uint8_t *data);
         extern void nvgDeleteAGGE(NVGcontext * ctx);
-        NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
-                                       (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+
+        vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                           (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
         nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
         this->vg = vg;
@@ -119,60 +116,63 @@ static void widget_nanovg_draw_cb(gui_obj_t *obj)
         nvgTransform(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
                      obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
 
-
         this->nanovg_canvas_cb(this);
 
         nvgEndFrame(vg);
         nvgDeleteAGGE(vg);
     }
 }
-static void widget_nanovg_end(gui_obj_t *obj)
+
+static void gui_canvas_widget_nanovg_end(gui_obj_t *obj)
 {
     gui_canvas_t *this = (gui_canvas_t *)obj;
     GUI_UNUSED(this);
-
 }
-static void widget_nanovg_destory(gui_obj_t *obj)
+
+static void gui_canvas_widget_nanovg_destory(gui_obj_t *obj)
 {
 
 }
 
-static void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
-                               void *data,
-                               int16_t x,
-                               int16_t y, int16_t w, int16_t h)
+static void gui_canvas_widget_nanovg_ctor(gui_canvas_t *this,
+                                          gui_obj_t    *parent,
+                                          const char   *name,
+                                          void         *data,
+                                          int16_t       x,
+                                          int16_t       y,
+                                          int16_t       w,
+                                          int16_t       h)
 {
-    //for base class
     gui_obj_t *base = (gui_obj_t *)this;
+    gui_obj_t *root = (gui_obj_t *)this;
+
+    //for base class
     gui_obj_ctor(base, parent, name, x, y, w, h);
 
     //for root class
-    gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
-    root->obj_draw = widget_nanovg_draw_cb;
-    root->obj_end = widget_nanovg_end;
-    root->obj_destory = widget_nanovg_destory;
-
-    //for self
-
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_canvas_prepare;
+    root->obj_draw = gui_canvas_widget_nanovg_draw_cb;
+    root->obj_end = gui_canvas_widget_nanovg_end;
+    root->obj_destory = gui_canvas_widget_nanovg_destory;
 }
-
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
 
-void gui_canvas_set_canvas_cb(gui_canvas_t *this,
-                              void (*cb)(gui_canvas_t *this))
+void gui_canvas_set_canvas_cb(gui_canvas_t *this, void (*cb)(gui_canvas_t *this))
 {
     this->nanovg_canvas_cb = cb;
 }
 
-
-gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
-                                int16_t x,
-                                int16_t y, int16_t w, int16_t h)
+gui_canvas_t *gui_canvas_create(void       *parent,
+                                const char *name,
+                                void       *data,
+                                int16_t     x,
+                                int16_t     y,
+                                int16_t     w,
+                                int16_t     h)
 {
     gui_dispdev_t *dc = gui_get_dc();
     GUI_ASSERT(dc->type == DC_SINGLE);
@@ -182,11 +182,12 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
     {
         name = "WIDGET_nanovg";
     }
+
     gui_canvas_t *this = gui_malloc(sizeof(gui_canvas_t));
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_canvas_t));
 
-    widget_nanovg_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
+    gui_canvas_widget_nanovg_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -199,7 +200,6 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
     return this;
 }
 
-
 /** End of WIDGET_Exported_Functions
   * @}
   */
@@ -207,9 +207,3 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *data,
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-

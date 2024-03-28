@@ -28,9 +28,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <nanovg.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "nanovg.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -46,13 +46,12 @@ extern "C" {
   */
 
 /** @brief  canvas structure */
-typedef struct _gui_canvas
+typedef struct gui_canvas
 {
     gui_obj_t base;
     NVGcontext *vg;
-    void (*nanovg_canvas_cb)(struct _gui_canvas *this);
+    void (*nanovg_canvas_cb)(struct gui_canvas *this);
 } gui_canvas_t;
-
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -66,7 +65,6 @@ typedef struct _gui_canvas
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -79,10 +77,6 @@ typedef struct _gui_canvas
   * @{
   */
 
-
-
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -94,7 +88,6 @@ typedef struct _gui_canvas
   * @brief
   * @{
   */
-
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -120,8 +113,13 @@ typedef struct _gui_canvas
  * @param h height
  * @return gui_canvas_t*
  */
-gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *addr,
-                                int16_t x, int16_t y, int16_t w, int16_t h);
+gui_canvas_t *gui_canvas_create(void       *parent,
+                                const char *name,
+                                void       *addr,
+                                int16_t     x,
+                                int16_t     y,
+                                int16_t     w,
+                                int16_t     h);
 
 /**
  * @brief set the callback function for drawing specific shapes.
@@ -129,9 +127,7 @@ gui_canvas_t *gui_canvas_create(void *parent,  const char *name, void *addr,
  * @param this this widget pointer
  * @param cb the callback function for drawing specific shapes
  */
-void gui_canvas_set_canvas_cb(gui_canvas_t *this,
-                              void (*cb)(gui_canvas_t *this));
-
+void gui_canvas_set_canvas_cb(gui_canvas_t *this, void (*cb)(gui_canvas_t *this));
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
@@ -141,10 +137,8 @@ void gui_canvas_set_canvas_cb(gui_canvas_t *this,
   * @}
   */
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
