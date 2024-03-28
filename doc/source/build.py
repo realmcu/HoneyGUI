@@ -24,7 +24,7 @@ def download_tools():
   tool_jira_id = "BTSOCGUI-213"
   print("Release build, need downd tools from {}".format(tool_jira_id))
   download_tool_list = list()
-  for file_name in ["Font Convert Tool", "ImageConverter", "RVisualDesigner"]:
+  for file_name in ["ImageConverter", "Font Convert Tool", "RVisualDesigner"]:
     tool_list = Jira().find_packages_from_jira(tool_jira_id, file_name)
     if not tool_list:
       sys.exit("Cannot find {} in {}".format(file_name, tool_jira_id))
