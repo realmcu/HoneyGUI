@@ -114,7 +114,6 @@ static void obj_input_prepare(gui_obj_t *obj)
                 continue;
             }
         }
-
         obj_input_prepare(obj);
     }
 }
@@ -170,13 +169,16 @@ static void obj_draw_scan(gui_obj_t *obj)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->active)
         {
-            dc->section.y1 = dc->section_count * dc->fb_height;
-            dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height, dc->screen_height);
             if (obj->obj_draw != NULL)
             {
+                dc->section.y1 = dc->section_count * dc->fb_height;
+                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height, dc->screen_height);
                 obj->obj_draw(obj);
             }
-
+        }
+        else
+        {
+            continue;
         }
         obj_draw_scan(obj);
     }
@@ -282,19 +284,9 @@ static void gui_fb_draw(gui_obj_t *root)
     {
         memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
 
-#if 0
-        uint32_t start_tick = rt_tick_get_millisecond();
-        obj_draw_scan(root);
-        uint32_t end_tick = rt_tick_get_millisecond();
-        gui_log("draw time :%dms \n", end_tick - start_tick);
-        uint32_t lcd_start_tick = rt_tick_get_millisecond();
-        dc->lcd_update(dc);
-        uint32_t lcd_end_tick = rt_tick_get_millisecond();
-        gui_log("lcd time :%dms \n", lcd_end_tick - lcd_start_tick);
-#else
         obj_draw_scan(root);
         dc->lcd_update(dc);
-#endif
+
     }
 }
 
