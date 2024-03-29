@@ -506,11 +506,23 @@ static void curtainview_prepare(gui_obj_t *obj)
     {
         if (this->release_y <= 0)
         {
-            this->release_y += GUI_FRAME_STEP;
-            if (c_down)
+            if (_UI_ABS(this->release_y + GUI_FRAME_STEP) < GUI_FRAME_STEP)
             {
-                GET_BASE(c_down)->not_show = false;
+                this->release_y = 0;
+                if (c_down)
+                {
+                    GET_BASE(c_down)->not_show = true;
+                }
             }
+            else
+            {
+                this->release_y += GUI_FRAME_STEP;
+                if (c_down)
+                {
+                    GET_BASE(c_down)->not_show = false;
+                }
+            }
+
         }
     }
     else if (!this->middle_flag_up && this->release_y > 0 && this->cur_curtain == CURTAIN_MIDDLE &&
@@ -518,16 +530,28 @@ static void curtainview_prepare(gui_obj_t *obj)
     {
         if (this->release_y >= 0)
         {
-            this->release_y -= GUI_FRAME_STEP;
-            if (c_up)
+            if (_UI_ABS(this->release_y - GUI_FRAME_STEP) < GUI_FRAME_STEP)
             {
-                GET_BASE(c_up)->not_show = false;
+                this->release_y = 0;
+                if (c_up)
+                {
+                    GET_BASE(c_up)->not_show = true;
+                }
             }
+            else
+            {
+                this->release_y -= GUI_FRAME_STEP;
+                if (c_up)
+                {
+                    GET_BASE(c_up)->not_show = false;
+                }
+            }
+
         }
     }
     else if (this->cur_curtain == CURTAIN_MIDDLE && this->release_x > 0 && !this->middle_flag_left)
     {
-        if (this->release_x >= 0)
+        if (this->release_x >= 0 + GUI_FRAME_STEP)
         {
             this->release_x -= GUI_FRAME_STEP;
             if (c_left)
@@ -648,7 +672,6 @@ static void curtainview_prepare(gui_obj_t *obj)
             this->release_x = 0;
         }
     }
-
 
     uint8_t last = this->checksum;
     this->checksum = 0;
