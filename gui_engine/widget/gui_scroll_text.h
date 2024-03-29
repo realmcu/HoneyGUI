@@ -184,12 +184,28 @@ void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
 void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source);
 
 /**
+ * @brief set content of text widget
+ *
+ * @param this the scroll text widget pointer
+ * @param text the text string
+ * @param length the text string's length
+ */
+void gui_scroll_text_content_set(gui_scroll_text_t *this, void *text, uint16_t length);
+
+/**
  * @brief set scroll text skip frame
  *
  * @param skip_frame The number of frames that need to be skipped.
  * If the value is 2, then scrolling text will skip two frames and scroll one frame.
  */
 void gui_scroll_text_skip_frame_set(uint8_t skip_frame);
+
+/**
+ * @brief Reset scrolling effects
+ *
+ * @param this the scroll text widget pointer
+ */
+void gui_scroll_text_restart(gui_scroll_text_t *this);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

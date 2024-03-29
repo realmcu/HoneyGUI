@@ -269,7 +269,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     else
     {
         draw_rect.x1 = text->base.offset_x;
-        draw_rect.y1 = text->base.offset_x;
+        draw_rect.y1 = text->base.offset_y;
         draw_rect.x2 = draw_rect.x1 + obj->w;
         draw_rect.y2 = draw_rect.y1 + obj->h;
     }
@@ -357,11 +357,25 @@ void gui_scroll_text_set(gui_scroll_text_t *this,
                          uint8_t            font_size)
 {
     gui_text_set(&this->base, text, text_type, color, length, font_size);
+    gui_scroll_text_restart(this);
 }
 
 void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source)
 {
     this->base.path = font_source;
+}
+
+void gui_scroll_text_content_set(gui_scroll_text_t *this, void *text, uint16_t length)
+{
+    gui_text_content_set(&this->base, text, length);
+    gui_scroll_text_restart(this);
+}
+
+void gui_scroll_text_restart(gui_scroll_text_t *this)
+{
+    this->base.text_offset = 0;
+    this->init_time_ms = gui_ms_get();
+    gui_fb_change();
 }
 
 void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
