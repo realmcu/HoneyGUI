@@ -48,7 +48,7 @@ extern "C" {
 typedef struct gui_curtain
 {
     gui_obj_t base; //!< base structure
-    gui_curtain_enum_t orientation;
+    T_GUI_CURTAIN_ENUM orientation;
     float scope;
 } gui_curtain_t;
 /** End of WIDGET_Exported_Types
@@ -113,12 +113,12 @@ typedef struct gui_curtain
  * @param y the Y-axis coordinate relative to parent widget
  * @param w width
  * @param h height
- * @param orientation  the orientation of the curtain,refer to gui_curtain_enum_t.
+ * @param orientation  the orientation of the curtain,refer to T_GUI_CURTAIN_ENUM.
  * @param scope The range in which curtains can be expanded
  * @return gui_curtain_t*
  */
 gui_curtain_t *gui_curtain_create(void *parent, const char *filename, int16_t x, int16_t y,
-                                  int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope);
+                                  int16_t w, int16_t h, T_GUI_CURTAIN_ENUM orientation, float scope);
 
 
 /** End of WIDGET_Exported_GUI_Functions

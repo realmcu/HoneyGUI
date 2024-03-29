@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -49,6 +49,7 @@ typedef struct
     int32_t x;
     int32_t y;
 } gui_curtain_ext_id_t;
+
 typedef struct
 {
     bool up;
@@ -56,6 +57,7 @@ typedef struct
     bool left;
     bool right;
 } gui_curtain_bool_t;
+
 typedef struct
 {
     float up;
@@ -63,7 +65,8 @@ typedef struct
     float left;
     float right;
 } gui_curtain_float_t;
-typedef enum CURTAIN_ORIENTATION
+
+typedef enum
 {
     CURTAIN_UNDEFINED,
     CURTAIN_UP,
@@ -71,20 +74,21 @@ typedef enum CURTAIN_ORIENTATION
     CURTAIN_LEFT,
     CURTAIN_RIGHT,
     CURTAIN_MIDDLE,
-} gui_curtain_enum_t;
+} T_GUI_CURTAIN_ENUM;
+
 /** @brief  curtainview structure */
 typedef struct gui_curtainview
 {
     gui_obj_t base;
     uint16_t curtain_cnt;
     uint16_t style;
-    gui_curtain_enum_t cur_curtain;
+    T_GUI_CURTAIN_ENUM cur_curtain;
     gui_curtain_float_t scopes;
     gui_curtain_bool_t orientations;
-    float scopeup;
-    float scopedown;
-    float scopeleft;
-    float scoperight;
+    float scope_up;
+    float scope_down;
+    float scope_left;
+    float scope_right;
     bool down_flag;
     bool left_flag;
     bool init_flag;
@@ -119,7 +123,6 @@ typedef struct gui_curtainview
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -132,7 +135,6 @@ typedef struct gui_curtainview
   * @{
   */
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -144,7 +146,6 @@ typedef struct gui_curtainview
   * @brief
   * @{
   */
-
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -169,9 +170,13 @@ typedef struct gui_curtainview
  * @return return the widget object pointer.
  *
  */
-gui_curtainview_t *gui_curtainview_create(void *parent, const char *filename, int16_t x,
-                                          int16_t y,
-                                          int16_t w, int16_t h);
+gui_curtainview_t *gui_curtainview_create(void       *parent,
+                                          const char *filename,
+                                          int16_t     x,
+                                          int16_t     y,
+                                          int16_t     w,
+                                          int16_t     h);
+
 /**
  * @brief Curtain expanding completed event
  *
@@ -179,8 +184,6 @@ gui_curtainview_t *gui_curtainview_create(void *parent, const char *filename, in
  * @param cb event callback
  */
 void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this));
-
-
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
@@ -190,12 +193,8 @@ void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtain
   * @}
   */
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
-

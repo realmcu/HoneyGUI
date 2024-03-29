@@ -271,7 +271,7 @@ static void curtain_prepare(gui_obj_t *obj)
 
 void gui_curtain_ctor(gui_curtain_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                       int16_t y,
-                      int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope)
+                      int16_t w, int16_t h, T_GUI_CURTAIN_ENUM orientation, float scope)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     ((gui_obj_t *)this)->obj_prepare = curtain_prepare;
@@ -292,19 +292,19 @@ void gui_curtain_ctor(gui_curtain_t *this, gui_obj_t *parent, const char *filena
         {
         case CURTAIN_UP:
             parent_ext->orientations.up = true;
-            parent_ext->scopeup = this->scope;
+            parent_ext->scope_up = this->scope;
             break;
         case CURTAIN_DOWN:
             parent_ext->orientations.down = true;
-            parent_ext->scopedown = this->scope;
+            parent_ext->scope_down = this->scope;
             break;
         case CURTAIN_LEFT:
             parent_ext->orientations.left = true;
-            parent_ext->scopeleft = this->scope;
+            parent_ext->scope_left = this->scope;
             break;
         case CURTAIN_RIGHT:
             parent_ext->orientations.right = true;
-            parent_ext->scoperight = this->scope;
+            parent_ext->scope_right = this->scope;
             break;
         default:
             break;
@@ -317,7 +317,7 @@ void gui_curtain_ctor(gui_curtain_t *this, gui_obj_t *parent, const char *filena
  *============================================================================*/
 
 gui_curtain_t *gui_curtain_create(void *parent, const char *filename, int16_t x, int16_t y,
-                                  int16_t w, int16_t h, gui_curtain_enum_t orientation, float scope)
+                                  int16_t w, int16_t h, T_GUI_CURTAIN_ENUM orientation, float scope)
 {
     gui_curtainview_t *curtainview = (gui_curtainview_t *)parent;
     if (orientation == CURTAIN_MIDDLE)

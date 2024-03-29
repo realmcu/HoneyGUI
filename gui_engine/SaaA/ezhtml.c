@@ -1518,7 +1518,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t w = 0;
                     int16_t h = 0;
                     float scope = 1.0f;
-                    gui_curtain_enum_t orientation = CURTAIN_MIDDLE;
+                    T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
                     int style = 0;
                     while (true)
                     {
