@@ -17,16 +17,14 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_img_scope.h>
 #include <string.h>
-#include <gui_obj.h>
-#include <draw_img.h>
-#include <tp_algo.h>
-#include <kb_algo.h>
-#include <acc_init.h>
+#include "gui_img_scope.h"
+#include "gui_obj.h"
+#include "draw_img.h"
+#include "tp_algo.h"
+#include "kb_algo.h"
+#include "acc_init.h"
 #include "acc_engine.h"
-
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -86,20 +84,23 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-
-
-
-static void img_prepare(gui_obj_t *obj)
+static void gui_img_scope_prepare(gui_obj_t *obj)
 {
+    uint8_t last;
+    touch_info_t *tp;
+    gui_img_t *this;
+    gui_obj_t *root;
+
     GUI_ASSERT(obj != NULL);
-    gui_img_t *this = (gui_img_t *)obj;
-    gui_obj_t *root = (gui_obj_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
+    this = (gui_img_t *)obj;
+    root = (gui_obj_t *)obj;
+    tp = tp_get_info();
+
     matrix_translate(this->t_x, this->t_y, obj->matrix);
     matrix_rotate(this->degrees, obj->matrix);
     matrix_scale(this->scale_x, this->scale_y, obj->matrix);
     matrix_translate(-this->c_x, -this->c_y, obj->matrix);
+
     float m00 = obj->matrix->m[0][0];
     float m01 = obj->matrix->m[0][1];
     float m02 = obj->matrix->m[0][2];
@@ -110,20 +111,21 @@ static void img_prepare(gui_obj_t *obj)
     float m21 = obj->matrix->m[2][1];
     float m22 = obj->matrix->m[2][2];
 
-    if ((m01 == 0) && \
-        (m10 == 0) && \
-        (m20 == 0) && \
-        (m21 == 0) && \
-        (m22 == 1)) //scale and translate, no rotate
+    if ((m01 == 0)
+        && (m10 == 0)
+        && (m20 == 0)
+        && (m21 == 0)
+        && (m22 == 1)) //scale and translate, no rotate
     {
         float x_min = m02;
         float x_max = m02 + m00 * obj->w;
         float y_min = m12;
         float y_max = m12 + m11 * obj->h;
-        if ((x_min > (int)gui_get_screen_width()) || \
-            (x_max < 0) || \
-            (y_min > (int)gui_get_screen_height()) || \
-            (y_max < 0))
+
+        if ((x_min > (int)gui_get_screen_width())
+            || (x_max < 0)
+            || (y_min > (int)gui_get_screen_height())
+            || (y_max < 0))
         {
             return;
         }
@@ -135,7 +137,6 @@ static void img_prepare(gui_obj_t *obj)
     this->draw_img->blend_mode = this->blend_mode;
     this->draw_img->high_quality = this->high_quality;
     this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
-
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
@@ -161,11 +162,10 @@ static void img_prepare(gui_obj_t *obj)
         }
     }
 
-
-
     gui_image_load_scale(this->draw_img);
     root->w = this->draw_img->img_w;
     root->h = this->draw_img->img_h;
+
     matrix_translate(this->t_x, this->t_y, obj->matrix);
     matrix_rotate(this->degrees, obj->matrix);
     matrix_scale(this->scale_x, this->scale_y, obj->matrix);
@@ -178,15 +178,14 @@ static void img_prepare(gui_obj_t *obj)
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
-        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+        if ((tp->type == TOUCH_SHORT)
+            && (obj->event_dsc_cnt > 0))
         {
             gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
         }
-
     }
 
-
-    uint8_t last = this->checksum;
+    last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
 
@@ -195,13 +194,14 @@ static void img_prepare(gui_obj_t *obj)
         gui_fb_change();
     }
 }
-static void img_scope_draw_cb(gui_obj_t *obj)
+
+static void gui_img_scope_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
     gui_img_t *this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
-
     gui_rect_t draw_rect = {0};
+
     draw_rect.x1 = this->draw_img->img_x;
     draw_rect.y1 = this->draw_img->img_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
@@ -214,8 +214,8 @@ static void img_scope_draw_cb(gui_obj_t *obj)
     draw_rect.x2 = _UI_MIN(draw_rect.x2, draw_rect.x1 + draw_rect.xboundright);
     draw_rect.y2 = _UI_MIN(draw_rect.y2, draw_rect.y1 + draw_rect.yboundbottom);
 
-    if ((draw_rect.xboundleft == draw_rect.xboundright) ||
-        (draw_rect.yboundbottom == draw_rect.yboundtop))
+    if ((draw_rect.xboundleft == draw_rect.xboundright)
+        || (draw_rect.yboundbottom == draw_rect.yboundtop))
     {
         return;
     }
@@ -229,30 +229,36 @@ static void img_scope_draw_cb(gui_obj_t *obj)
         GUI_ASSERT(NULL != NULL);
     }
 }
-static void img_end(gui_obj_t *obj)
+
+static void gui_img_scope_img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
 }
-static void img_destory(gui_obj_t *obj)
+
+static void gui_img_scope_img_destory(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
     gui_log("do obj %s free\n", obj->name);
 }
 
-void gui_img_scope_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, void *addr,
-                        int16_t x,
-                        int16_t y, int16_t w, int16_t h)
+void gui_img_scope_ctor(gui_img_t  *this,
+                        gui_obj_t  *parent,
+                        const char *name,
+                        void       *addr,
+                        int16_t     x,
+                        int16_t     y,
+                        int16_t     w,
+                        int16_t     h)
 {
-
     //for base class
     gui_obj_ctor(GET_BASE(this), parent, name, x, y, w, h);
 
     //for root class
     GET_BASE(this)->type = IMAGE_SCOPE;
-    GET_BASE(this)->obj_prepare = img_prepare;
-    GET_BASE(this)->obj_draw = img_scope_draw_cb;
-    GET_BASE(this)->obj_end = img_end;
-    GET_BASE(this)->obj_destory = img_destory;
+    GET_BASE(this)->obj_prepare = gui_img_scope_prepare;
+    GET_BASE(this)->obj_draw = gui_img_scope_draw_cb;
+    GET_BASE(this)->obj_end = gui_img_scope_img_end;
+    GET_BASE(this)->obj_destory = gui_img_scope_img_destory;
     //for self
 
     GUI_ASSERT(NULL != NULL);
@@ -263,26 +269,30 @@ void gui_img_scope_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, vo
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-
-gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16_t y)
+gui_img_scope_t *gui_img_scope_create(void    *parent,
+                                      void    *addr,
+                                      int16_t  x,
+                                      int16_t  y)
 {
     GUI_ASSERT(parent != NULL);
-    char     *name = "DEFAULT_IMG";
+    char *name = "DEFAULT_IMG";
 
     gui_img_scope_t *img = gui_malloc(sizeof(gui_img_scope_t));
     GUI_ASSERT(img != NULL);
-    memset(img, 0x00, sizeof(gui_img_scope_t));
 
+    memset(img, 0x00, sizeof(gui_img_scope_t));
     gui_img_scope_ctor((void *)img, (gui_obj_t *)parent, name, addr, x, y, 0, 0);
+
     gui_list_init(&(GET_BASE(img)->child_list));
     if ((GET_BASE(img)->parent) != NULL)
     {
         gui_list_insert_before(&((GET_BASE(img)->parent)->child_list), &(GET_BASE(img)->brother_list));
     }
+
     GET_BASE(img)->create_done = true;
+
     return img;
 }
-
 
 /** End of WIDGET_Exported_Functions
   * @}
@@ -291,11 +301,3 @@ gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-
-
-
