@@ -266,24 +266,25 @@ void matrix_multiply_normal(struct gui_matrix *matrix, Normal_t *normal)
 
 void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
 {
-    struct gui_matrix temp;
     int row, column;
 
     /* Process all rows. */
     for (row = 0; row < 3; row++)
     {
+        float t1, t2, t3;
+        t1 = matrix->m[row][0];
+        t2 = matrix->m[row][1];
+        t3 = matrix->m[row][2];
         /* Process all columns. */
         for (column = 0; column < 3; column++)
         {
             /* Compute matrix entry. */
-            temp.m[row][column] = (matrix->m[row][0] * mult->m[0][column])
-                                  + (matrix->m[row][1] * mult->m[1][column])
-                                  + (matrix->m[row][2] * mult->m[2][column]);
+            matrix->m[row][column] = (t1 * mult->m[0][column])
+                                     + (t2 * mult->m[1][column])
+                                     + (t3 * mult->m[2][column]);
         }
     }
 
-    /* Copy temporary matrix into result. */
-    memcpy(matrix, &temp, sizeof(temp));
 }
 
 
