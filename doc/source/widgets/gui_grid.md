@@ -13,11 +13,11 @@ You can use [gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#api) t
 There are two style in grid widget [gui_grid_style(grid, style)](#api)
 
 ```
-enum gui_grid_style
+typedef enum
 {
     GRID_CLASSIC,         //!< Evenly layout vertically and horizontally
     GRID_SCALE,           //!< scale by slide
-};
+} T_GUI_GRID_STYLE;
 ```
 
 ## Example

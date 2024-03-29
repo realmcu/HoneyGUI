@@ -82,15 +82,13 @@
   * @{
   */
 
-static void obj_update_att(struct _gui_obj_t *obj)
+static void gui_grid_update_att(struct _gui_obj_t *obj)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
     uint32_t member_count = 0;
-    struct gui_grid *this = (void *)obj;
-
+    gui_grid_t *this = (void *)obj;
     gui_list_t *node = NULL;
     gui_list_t *tmp = NULL;
+
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -98,11 +96,13 @@ static void obj_update_att(struct _gui_obj_t *obj)
         obj->y = member_count % this->row * this->gap_row_scale;
         member_count++;
     }
+
     if (!this->row_count_flag)
     {
         this->row_count = member_count;
         this->row_count_flag = true;
     }
+
     if (!this->col_count_flag)
     {
         this->col_count = member_count;
@@ -110,10 +110,11 @@ static void obj_update_att(struct _gui_obj_t *obj)
     }
 }
 
-static void deal_img_in_root(gui_obj_t *object, float x, float y)
+static void gui_grid_deal_img_in_root(gui_obj_t *object, float x, float y)
 {
     gui_list_t *node = NULL;
     gui_list_t *tmp = NULL;
+
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
@@ -121,52 +122,54 @@ static void deal_img_in_root(gui_obj_t *object, float x, float y)
         {
         case IMAGE_FROM_MEM:
             {
-
-
             }
             break;
+
         case CANVAS:
             {
                 gui_canvas_t *img = (void *)obj;
                 GUI_UNUSED(img);
             }
             break;
+
         default:
             break;
         }
-        deal_img_in_root(obj, x, y);
+        gui_grid_deal_img_in_root(obj, x, y);
     }
-
-
 }
 
-static void tab_prepare_scale(gui_obj_t *obj)
+static void gui_grid_prepare(gui_obj_t *obj)
 {
-    obj_update_att(obj);
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = (touch_info_t *)tp_get_info();
-    struct gui_grid *this = (void *)obj;
+    gui_grid_t *this = (void *)obj;
+
+    gui_grid_update_att(obj);
+
     switch (this->style)
     {
     case GRID_CLASSIC:
+        {
+        }
         break;
+
     default:
         break;
     }
-
-
 }
-static void gui_grid_ctor(struct gui_grid *this,
-                          gui_obj_t *parent, int16_t x,
-                          int16_t y,
-                          int16_t row,
-                          int16_t col,
-                          uint16_t gap_col,
-                          uint16_t gap_row)
+
+static void gui_grid_ctor(gui_grid_t *this,
+                          gui_obj_t  *parent,
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     row,
+                          int16_t     col,
+                          uint16_t    gap_col,
+                          uint16_t    gap_row)
 {
     gui_obj_ctor(&this->base, parent, "grid", x, y, gap_col * col, 700);
+
     //GET_BASE(this)->obj_update_att = obj_update_att;
-    GET_BASE(this)->obj_prepare = tab_prepare_scale;
+    GET_BASE(this)->obj_prepare = gui_grid_prepare;
     this->row = row;
     this->col = col;
     this->gap_col = gap_col;
@@ -177,23 +180,24 @@ static void gui_grid_ctor(struct gui_grid *this,
     this->start_x = x;
     this->start_y = y;
 }
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
 
-
-gui_grid_t *gui_grid_create(void *parent,
-                            int16_t x,
-                            int16_t y,
-                            int16_t row,
-                            int16_t col,
+gui_grid_t *gui_grid_create(void    *parent,
+                            int16_t  x,
+                            int16_t  y,
+                            int16_t  row,
+                            int16_t  col,
                             uint16_t gap_col,
                             uint16_t gap_row)
 {
 #define _GUI_NEW_gui_grid_createparam this, parent, x, y, row,col,gap_col,gap_row
     GUI_NEW(gui_grid_t, gui_grid_ctor, _GUI_NEW_gui_grid_createparam)
 }
-void gui_grid_style(gui_grid_t *grid, enum gui_grid_style style)
+
+void gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style)
 {
     grid->style = style;
 }
@@ -204,8 +208,3 @@ void gui_grid_style(gui_grid_t *grid, enum gui_grid_style style)
 /** End of WIDGET
   * @}
   */
-
-
-
-
-

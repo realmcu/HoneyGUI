@@ -22,8 +22,6 @@
 #ifndef __GUI_GRID_H__
 #define __GUI_GRID_H__
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,8 +29,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 #include "gui_obj.h"
 
 /** @defgroup WIDGET WIDGET
@@ -49,11 +47,11 @@ extern "C" {
   */
 
 /** @brief  support two style */
-enum gui_grid_style
+typedef enum
 {
     GRID_CLASSIC,         //!< Evenly layout vertically and horizontally
     GRID_SCALE,           //!< scale by slide
-};
+} T_GUI_GRID_STYLE;
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -67,7 +65,6 @@ enum gui_grid_style
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -79,8 +76,6 @@ enum gui_grid_style
   * @brief
   * @{
   */
-
-
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -96,7 +91,11 @@ enum gui_grid_style
 typedef struct gui_grid
 {
     gui_obj_t base;
-    int16_t row; int16_t col; uint16_t gap_col; uint16_t gap_row; uint16_t gap_col_scale;
+    int16_t row;
+    int16_t col;
+    uint16_t gap_col;
+    uint16_t gap_row;
+    uint16_t gap_col_scale;
     uint16_t gap_row_scale;
     float scale;
     int yold;
@@ -106,11 +105,9 @@ typedef struct gui_grid
     int row_count;
     bool row_count_flag;
     bool col_count_flag;
-    enum gui_grid_style style;
+    T_GUI_GRID_STYLE style;
     int col_count;
     int change_threshold;
-    void (*ctor)(struct gui_grid *this, gui_obj_t *parent, int16_t x,
-                 int16_t y, int16_t row, int16_t col, uint16_t gap_col, uint16_t gap_row);
 } gui_grid_t;
 
 /** End of WIDGET_Exported_Variables
@@ -158,13 +155,14 @@ typedef struct gui_grid
  *   }}
  * \endcode
  */
-gui_grid_t *gui_grid_create(void *parent,
-                            int16_t x,
-                            int16_t y,
-                            int16_t row,
-                            int16_t col,
+gui_grid_t *gui_grid_create(void    *parent,
+                            int16_t  x,
+                            int16_t  y,
+                            int16_t  row,
+                            int16_t  col,
                             uint16_t gap_col,
                             uint16_t gap_row);
+
 /**
  * @brief config grid style
  *
@@ -194,8 +192,7 @@ gui_grid_t *gui_grid_create(void *parent,
  *   }}
  * \endcode
  */
-void gui_grid_style(gui_grid_t *grid, enum gui_grid_style style);
-
+void gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
@@ -208,9 +205,4 @@ void gui_grid_style(gui_grid_t *grid, enum gui_grid_style style);
 }
 #endif
 
-
-
 #endif
-
-
-
