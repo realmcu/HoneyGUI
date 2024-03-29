@@ -25,7 +25,7 @@ extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_re
 #include "section.h"
 #define CACHE_BUF_SIZE           (42 * 1024)
 SHM_DATA_SECTION static uint8_t cache_buf1[CACHE_BUF_SIZE];
-SHM_DATA_SECTION static uint8_t *cache_buf2;
+static uint8_t *cache_buf2;
 static uint8_t *cache_buf = cache_buf1;
 static uint32_t last_cache_size = 0;
 static void change_cache_buf(uint32_t cache_size)
@@ -39,6 +39,13 @@ static void change_cache_buf(uint32_t cache_size)
     {
         cache_buf = cache_buf1;
     }
+#if F_APP_GUI_USE_PSRAM
+    else if ((uint32_t)cache_buf > PSRAM_GUI_HEAP_ADDR)
+    {
+        gui_free(cache_buf);
+        cache_buf = cache_buf1;
+    }
+#endif
     else
     {
         cache_buf = cache_buf1;
@@ -46,18 +53,37 @@ static void change_cache_buf(uint32_t cache_size)
 }
 static void restore_cache_buf(void)
 {
+#if F_APP_GUI_USE_PSRAM
+    if ((uint32_t)cache_buf > PSRAM_GUI_HEAP_ADDR)
+    {
+        gui_free(cache_buf);
+    }
+#endif
     cache_buf = cache_buf1;
 }
+#if F_APP_GUI_USE_PSRAM
+static void cache_on_psram(uint32_t size)
+{
+    if ((uint32_t)cache_buf > PSRAM_GUI_HEAP_ADDR)
+    {
+        gui_free(cache_buf);
+    }
+    cache_buf = gui_malloc(size);
+}
+#endif
 
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static uint32_t temp_buf_offset = 0;
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
+#if !F_APP_GUI_USE_PSRAM
+
     if (p_rect->w * p_rect->h * pixel_size > CACHE_BUF_SIZE)
     {
         return false;
     }
+#endif
     bool use_LLI = true;
     uint8_t m_size = 0, data_size = 0;
     if (pixel_size == 4)
@@ -196,13 +222,13 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 
 static bool memcpy_by_imdc(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
+#if !F_APP_GUI_USE_PSRAM
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
     if (p_rect->w * p_rect->h * pixel_size > CACHE_BUF_SIZE)
     {
-        DBG_DIRECT("w %d, h %d, size %d, exceed cache", p_rect->w, p_rect->h,
-                   p_rect->w * p_rect->h * pixel_size);
         return false;
     }
+#endif
     IMDC_file_header *header = (IMDC_file_header *)source->address;
     IMDC_decode_range range;
     range.start_column = p_rect->x;
@@ -698,6 +724,10 @@ void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *
     {
         new_rect->w = ceil(x_max - new_rect->x) + 1;
     }
+    else
+    {
+        new_rect->w = right - new_rect->x + 1;
+    }
 }
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect)
@@ -1105,26 +1135,48 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             if (new_cache_size < (CACHE_BUF_SIZE - last_cache_size - 4))
             {
                 change_cache_buf(new_cache_size);
+                last_cache_size = new_cache_size;
             }
-            else
+            else if (new_cache_size < CACHE_BUF_SIZE)
             {
                 PPEV2_Finish();
                 restore_cache_buf();
+                last_cache_size = new_cache_size;
             }
-            last_cache_size = new_cache_size;
+#if F_APP_GUI_USE_PSRAM
+            else
+            {
+                PPEV2_Finish();
+                cache_on_psram(new_cache_size);
+                last_cache_size = 0;
+            }
+#else
+            else
+            {
+                if (head->type == IMDC_COMPRESS)
+                {
+                    GUI_ASSERT(new_cache_size < CACHE_BUF_SIZE);
+                    return;
+                }
+            }
+#endif
+
             if (head->type == IMDC_COMPRESS)
             {
+                uint32_t s = os_lock();
                 ret = memcpy_by_imdc(&old_rect, &source);
+                os_unlock(s);
             }
             else
             {
+                uint32_t s = os_lock();
                 ret = memcpy_by_dma(&old_rect, &source);
+                os_unlock(s);
             }
             ppe_rect.y -= section_y1;
             if (ret)
             {
                 ppe_get_identity(&pre_trans);
-                //ppe_translate(old_rect.x * -1.0f, old_rect.y * -1.0f, &pre_trans);
                 pre_trans.m[0][2] = old_rect.x * -1.0f;
                 pre_trans.m[1][2] = old_rect.y * -1.0f;
                 ppe_mat_multiply(&pre_trans, &inverse);
@@ -1183,12 +1235,12 @@ void hw_acc_init(void)
 {
     if (!GDMA_channel_request(&memcpy_dma_num, NULL, true))
     {
-        GUI_ASSERT("no dma for tx");
+        GUI_ASSERT(memcpy_dma_num != 0xA5);
         return;
     }
     if (!GDMA_channel_request(&support_dma_num, NULL, false))
     {
-        GUI_ASSERT("no dma for support");
+        GUI_ASSERT(support_dma_num != 0xA5);
         return;
     }
     PPEV2_CLK_ENABLE(ENABLE);
