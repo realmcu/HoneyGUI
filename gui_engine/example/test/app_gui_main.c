@@ -20,7 +20,7 @@
 GUI_APP_DEFINE(APP_TEST, test)  // cppcheck-suppress syntaxError
 static void test(gui_app_t *app)
 {
-    gui_rect(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER);
+    gui_rect_create(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER);
     {
         char *text = "565:";
         int font_size = 16;
@@ -154,9 +154,9 @@ static void test(gui_app_t *app)
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
-        gui_img_t *img =  gui_rect(GUI_APP_ROOT_SCREEN, 200 + 10, 16, 200, 120, COLOR_FIREBRICK);
-        gui_rect_round(img, 100, 10, 6, 100, gui_rgb(163, 163, 163), PATH111_BIN);
-        gui_rect_round(img, 50, 10, 30, 100, gui_rgb(163, 163, 163), PATH111_BIN);
+        gui_img_t *img =  gui_rect_create(GUI_APP_ROOT_SCREEN, 200 + 10, 16, 200, 120, COLOR_FIREBRICK);
+        gui_rect_round_create(img, 100, 10, 6, 100, gui_rgb(163, 163, 163), PATH111_BIN);
+        gui_rect_round_create(img, 50, 10, 30, 100, gui_rgb(163, 163, 163), PATH111_BIN);
     }
 }
 

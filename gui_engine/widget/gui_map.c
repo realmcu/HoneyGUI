@@ -217,9 +217,9 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
             gui_stbimg_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
                                      (x - startX)*tile_size, (y - startY)*tile_size);
 #else
-            gui_rect((gui_obj_t *)parent, (x - startX)*tile_size, (y - startY)*tile_size, TILE_SIZE - 1,
-                     TILE_SIZE - 1,
-                     APP_COLOR_SILVER);
+            gui_rect_create((gui_obj_t *)parent, (x - startX)*tile_size, (y - startY)*tile_size, TILE_SIZE - 1,
+                            TILE_SIZE - 1,
+                            APP_COLOR_SILVER);
 #endif
         }
     }
@@ -551,13 +551,13 @@ gui_map_t *gui_map_create(void *parent)
     {
         gui_button_t *zoom = gui_button_create(parent, 50, 200 - 30, 40, 40, 0, 0, 0, 0, 0);
 
-        gui_rect((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
+        gui_rect_create((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
         gui_button_click((void *)zoom, (gui_event_cb_t)zoom_cb);
     }
     {
         gui_button_t *zoom = gui_button_create(parent, 50, 300 - 30, 40, 40, 0, 0, 0, 0, 0);
 
-        gui_rect((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
+        gui_rect_create((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
         gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb);
     }
     return 0;

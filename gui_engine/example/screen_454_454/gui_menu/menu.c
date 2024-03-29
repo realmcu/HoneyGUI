@@ -35,8 +35,8 @@ static gui_progressbar_t *pro;
 const static void *scrollbar_array[SCROLLBAR_SIZE];
 void design_tab_menu(void *parent)
 {
-    gui_rect(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
-             UINT8_MAX, UINT8_MAX, 100));
+    gui_rect_create(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
+                    UINT8_MAX, UINT8_MAX, 100));
     gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
     gui_page_rebound(page, 1);
     GET_BASE(page)->obj_destory = page_dtor;

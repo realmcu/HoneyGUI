@@ -29,36 +29,70 @@ extern "C" {
  *                        Header Files
  *============================================================================*/
 
-
-
-
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 
-
-
+/** End of WIDGET_Exported_Types
+  * @}
+  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Macros
+ * @}
+ */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
-
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
 /**
  * @brief
@@ -71,7 +105,13 @@ extern "C" {
  * @param color
  * @return gui_img_t*
  */
-gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color);
+gui_img_t *gui_rect_create(gui_obj_t   *parent,
+                           int          x,
+                           int          y,
+                           int          w,
+                           int          h,
+                           gui_color_t  color);
+
 /**
  * @brief
  *
@@ -84,8 +124,13 @@ gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t c
  * @param image_file_addr
  * @return gui_img_t*
  */
-gui_img_t *gui_rect_round(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color,
-                          uint32_t *image_file_addr);
+gui_img_t *gui_rect_round_create(gui_obj_t   *parent,
+                                 int          x,
+                                 int          y,
+                                 int          w,
+                                 int          h,
+                                 gui_color_t  color,
+                                 uint32_t    *image_file_addr);
 
 /**
  * @brief
@@ -96,9 +141,17 @@ gui_img_t *gui_rect_round(gui_obj_t *parent, int x, int y, int w, int h, gui_col
  */
 void gui_rect_set_size(gui_img_t *this, int w, int h);
 
+/** End of WIDGET_Exported_GUI_Functions
+  * @}
+  */
+
+/** End of WIDGET
+ * @}
+ */
+
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

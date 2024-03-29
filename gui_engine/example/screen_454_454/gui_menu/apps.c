@@ -55,19 +55,20 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_page_center_alignment(page, SCREEN_H);
 
     {
-        gui_img_t *rect = gui_rect((void *)page, 0, SCREEN_H, SCREEN_W, SCREEN_H, COLOR_RED);
-        gui_rect((void *)rect, 10, 100, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10, 200, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10, 300, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10, 400, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 2, 100, 2, 400 - 100,
-                 COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 3, 100, 2, 400 - 100,
-                 COLOR_SILVER_OPACITY(100));
-        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 4, 100, 2, 400 - 100,
-                 COLOR_SILVER_OPACITY(100));
+        gui_img_t *rect = gui_rect_create((void *)page, 0, SCREEN_H, SCREEN_W, SCREEN_H, COLOR_RED);
+        gui_rect_create((void *)rect, 10, 100, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10, 200, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10, 300, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10, 400, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4, 100, 2, 400 - 100,
+                        COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 2, 100, 2, 400 - 100,
+                        COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 3, 100, 2, 400 - 100,
+                        COLOR_SILVER_OPACITY(100));
+        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 4, 100, 2, 400 - 100,
+                        COLOR_SILVER_OPACITY(100));
         {
             char *text = "198";
             int font_size = 16;
@@ -130,17 +131,17 @@ static void app_hr_ui_design(gui_app_t *app)
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
             gui_text_type_set(t, addr1);
         }
-        gui_rect((void *)rect, 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
-        gui_rect((void *)rect, 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
-        gui_rect((void *)rect, 10 + 10 + 200, 280, 5, 400 - 280, COLOR_SILVER);
-        gui_rect((void *)rect, 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
+        gui_rect_create((void *)rect, 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
+        gui_rect_create((void *)rect, 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
+        gui_rect_create((void *)rect, 10 + 10 + 200, 280, 5, 400 - 280, COLOR_SILVER);
+        gui_rect_create((void *)rect, 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
     }
     {
-        gui_img_t *rect = gui_rect((void *)page, 0, SCREEN_H * 2, SCREEN_W, SCREEN_H, COLOR_CRIMSON);
-        gui_rect((void *)rect, 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
+        gui_img_t *rect = gui_rect_create((void *)page, 0, SCREEN_H * 2, SCREEN_W, SCREEN_H, COLOR_CRIMSON);
+        gui_rect_create((void *)rect, 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
 
     }
-    gui_rect((void *)page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
+    gui_rect_create((void *)page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
     gui_img_t *heart_ani = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, HEARTRATE04_BIN,
                                                    (SCREEN_W - HEART_ANI_W) / 2, 100, 0, 0);
     gui_img_set_animate(heart_ani, 1000, -1, heart_ani_cb, heart_ani);
@@ -258,7 +259,7 @@ static gui_img_t *rect;
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-    rect = gui_rect((void *)status_bar, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER_OPACITY(230));
+    rect = gui_rect_create((void *)status_bar, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER_OPACITY(230));
     GET_BASE(rect)->not_show = 1;
     gui_img_set_opacity(rect, 0);
     gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
