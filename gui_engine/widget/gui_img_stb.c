@@ -17,14 +17,13 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_img.h>
 #include <string.h>
-#include <gui_obj.h>
-#include <draw_img.h>
-#include <tp_algo.h>
+#include "gui_img.h"
+#include "gui_obj.h"
+#include "draw_img.h"
+#include "tp_algo.h"
 #include "acc_engine.h"
-#include <gui_img_stb.h>
+#include "gui_img_stb.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "acc_init.h"
@@ -86,37 +85,41 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static uint8_t *decode_image(gui_stb_img_t *img)
+static uint8_t *gui_img_stb_decode_image(gui_stb_img_t *img)
 {
     uint8_t *output;
-    int source_w = 0;
-    int source_h = 0;
-    int num_components = 0;
+    int source_w = 0, source_h = 0, num_components = 0;
+    gui_rgb_data_head_t head;
+
     output = stbi_load_from_memory(img->data_buffer, img->data_length, &source_w, &source_h,
                                    &num_components, 0);
-    gui_rgb_data_head_t head;
     memset(&head, 0x0, sizeof(head));
     head.w = source_w;
     head.h = source_h;
     head.type = RGB888;
     memcpy(output, &head, sizeof(head));
+
     return output;
 }
-static void modify_img(gui_obj_t *obj)
+
+static void gui_img_stb_modify_img(gui_obj_t *obj)
 {
     gui_stb_img_t *img = (gui_stb_img_t *)obj;
-    if (img->data_buffer == NULL ||
-        img->data_length == 0 ||
-        img->src_changed == false)
+
+    if ((img->data_buffer == NULL)
+        || (img->data_length == 0)
+        || (img->src_changed == false))
     {
         return;
     }
-    if (img->image_format != JPEG &&
-        img->image_format != BMP &&
-        img->image_format != PNG)
+
+    if ((img->image_format != JPEG)
+        && (img->image_format != BMP)
+        && (img->image_format != PNG))
     {
         return;
     }
+
     if (img->img)
     {
         if (img->img->data != 0)
@@ -124,17 +127,20 @@ static void modify_img(gui_obj_t *obj)
             gui_free(img->img->data);
             img->img->data = NULL;
         }
-        img->img->data = decode_image(img);
+        img->img->data = gui_img_stb_decode_image(img);
     }
     else
     {
-        img->img = gui_img_create_from_mem(obj, "stb_img", decode_image(img), 0, 0, 0, 0);
+        img->img = gui_img_create_from_mem(obj, "stb_img", gui_img_stb_decode_image(img), 0, 0, 0, 0);
     }
+
     img->src_changed = false;
 }
-static void stb_image_destory(gui_obj_t *obj)
+
+static void gui_img_stb_image_destory(gui_obj_t *obj)
 {
     gui_stb_img_t *img = (gui_stb_img_t *)obj;
+
     if (img->img != NULL)
     {
         if (img->img->data != NULL)
@@ -143,20 +149,21 @@ static void stb_image_destory(gui_obj_t *obj)
         }
     }
 }
-static void gui_stbimg_from_mem_ctor(gui_stb_img_t *this,
-                                     gui_obj_t *parent,
-                                     const char *name,
-                                     void *addr,
-                                     uint32_t size,
-                                     GUI_FormatType type,
-                                     int16_t x,
-                                     int16_t y)
+
+static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
+                                      gui_obj_t      *parent,
+                                      const char     *name,
+                                      void           *addr,
+                                      uint32_t        size,
+                                      GUI_FormatType  type,
+                                      int16_t         x,
+                                      int16_t         y)
 {
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     gui_obj_ctor(root, parent, name, x, y, 0, 0);
     root->type = IMAGE_FROM_MEM;
-    root->obj_destory = stb_image_destory;
+    root->obj_destory = gui_img_stb_image_destory;
 
     //for self
     this->src_changed = true;
@@ -164,16 +171,16 @@ static void gui_stbimg_from_mem_ctor(gui_stb_img_t *this,
     this->data_length = size;
     this->image_format = type;
 }
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-
-void gui_stbimg_set_attribute(gui_stb_img_t *this,
-                              void *addr,
-                              uint32_t size,
-                              GUI_FormatType type,
-                              int16_t x,
-                              int16_t y)
+void gui_img_stb_set_attribute(gui_stb_img_t  *this,
+                               void           *addr,
+                               uint32_t        size,
+                               GUI_FormatType  type,
+                               int16_t         x,
+                               int16_t         y)
 {
     this->src_changed = true;
     this->data_buffer = addr;
@@ -181,32 +188,39 @@ void gui_stbimg_set_attribute(gui_stb_img_t *this,
     this->image_format = type;
     this->base.x = x;
     this->base.y = y;
-    modify_img((gui_obj_t *)this);
+    gui_img_stb_modify_img((gui_obj_t *)this);
 }
-gui_stb_img_t *gui_stbimg_create_from_mem(void *parent,
-                                          const char *name,
-                                          void *addr,
-                                          uint32_t size,
-                                          GUI_FormatType type,
-                                          int16_t x,
-                                          int16_t y)
+
+gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
+                                           const char     *name,
+                                           void           *addr,
+                                           uint32_t        size,
+                                           GUI_FormatType  type,
+                                           int16_t         x,
+                                           int16_t         y)
 {
     GUI_ASSERT(parent != NULL);
+
     if (name == NULL)
     {
         name = "DEFAULT_STB_IMAGE";
     }
+
     gui_stb_img_t *img = gui_malloc(sizeof(gui_stb_img_t));
     GUI_ASSERT(img != NULL);
+
     memset(img, 0x00, sizeof(gui_stb_img_t));
-    gui_stbimg_from_mem_ctor(img, (gui_obj_t *)parent, name, addr, size, type, x, y);
+    gui_img_stb_from_mem_ctor(img, (gui_obj_t *)parent, name, addr, size, type, x, y);
+
     gui_list_init(&(GET_BASE(img)->child_list));
     if ((GET_BASE(img)->parent) != NULL)
     {
         gui_list_insert_before(&((GET_BASE(img)->parent)->child_list), &(GET_BASE(img)->brother_list));
     }
+
     GET_BASE(img)->create_done = true;
-    modify_img((gui_obj_t *)img);
+    gui_img_stb_modify_img((gui_obj_t *)img);
+
     return img;
 }
 /** End of WIDGET_Exported_Functions

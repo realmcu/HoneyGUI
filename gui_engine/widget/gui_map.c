@@ -176,8 +176,8 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
             }
             parent->tile[y - startY][x - startX].x = x;
             parent->tile[y - startY][x - startX].y = y;
-            gui_stbimg_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
-                                     (x - startX)*tile_size, (y - startY)*tile_size);
+            gui_img_stb_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
+                                      (x - startX)*tile_size, (y - startY)*tile_size);
 #elif defined RTL8772F
             typedef long off_t;
             char path[100];
@@ -265,8 +265,8 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, jpg, filesize);
     }
-    gui_stbimg_set_attribute(tile->img, jpg, filesize, JPEG, tile->img->base.x,
-                             tile->img->base.y);
+    gui_img_stb_set_attribute(tile->img, jpg, filesize, JPEG, tile->img->base.x,
+                              tile->img->base.y);
 #elif defined RTL8772F
     typedef long off_t;
     char path[100];
@@ -354,7 +354,7 @@ static void wincb(gui_map_t *this)
                         gui_free(this->tile[i][j].img->data_buffer);
                     }
 
-                    gui_stbimg_set_attribute(
+                    gui_img_stb_set_attribute(
                         this->tile[i][j].img,
                         this->tile[i][j - 1].img->data_buffer,
                         this->tile[i][j - 1].img->data_length,
@@ -385,7 +385,7 @@ static void wincb(gui_map_t *this)
                         gui_free(this->tile[i][j].img->data_buffer);
                     }
 
-                    gui_stbimg_set_attribute(
+                    gui_img_stb_set_attribute(
                         this->tile[i][j].img,
                         this->tile[i][j + 1].img->data_buffer,
                         this->tile[i][j + 1].img->data_length,
@@ -417,7 +417,7 @@ static void wincb(gui_map_t *this)
                         gui_free(this->tile[j][i].img->data_buffer);
                     }
 
-                    gui_stbimg_set_attribute(
+                    gui_img_stb_set_attribute(
                         this->tile[j][i].img,
                         this->tile[j - 1][i].img->data_buffer,
                         this->tile[j - 1][i].img->data_length,
@@ -448,7 +448,7 @@ static void wincb(gui_map_t *this)
                         gui_free(this->tile[j][i].img->data_buffer);
                     }
 
-                    gui_stbimg_set_attribute(
+                    gui_img_stb_set_attribute(
                         this->tile[j][i].img,
                         this->tile[j + 1][i].img->data_buffer,
                         this->tile[j + 1][i].img->data_length,
@@ -544,7 +544,7 @@ gui_map_t *gui_map_create(void *parent)
     {
         for (size_t j = 0; j < 3; j++)
         {
-            this->tile[i][j].img = gui_stbimg_create_from_mem(win, 0, 0, 0, JPEG, 0, 0);
+            this->tile[i][j].img = gui_img_stb_create_from_mem(win, 0, 0, 0, JPEG, 0, 0);
         }
     }
     generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);
