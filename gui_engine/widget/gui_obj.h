@@ -31,8 +31,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -75,22 +75,22 @@ extern "C" {
   * @{
   */
 /** @brief white color in gui_color_t structure */
-#define APP_COLOR_WHITE gui_rgba(UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX)
+#define APP_COLOR_WHITE                     gui_obj_rgba(UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX)
 /** @brief red color in gui_color_t structure */
-#define APP_COLOR_RED gui_rgba(UINT8_MAX, 0, 0, UINT8_MAX)
+#define APP_COLOR_RED                       gui_obj_rgba(UINT8_MAX, 0, 0, UINT8_MAX)
 /** @brief green color in gui_color_t structure */
-#define APP_COLOR_GREEN gui_rgba(0, UINT8_MAX, 0, UINT8_MAX)
+#define APP_COLOR_GREEN                     gui_obj_rgba(0, UINT8_MAX, 0, UINT8_MAX)
 /** @brief blue color in gui_color_t structure */
-#define APP_COLOR_BLUE gui_rgba(0, 0, UINT8_MAX, UINT8_MAX)
+#define APP_COLOR_BLUE                      gui_obj_rgba(0, 0, UINT8_MAX, UINT8_MAX)
 
 /**
  * @link https://www.rapidtables.com/web/color/RGB_Color.html
 */
-#define APP_COLOR_CRIMSON gui_rgb(220,20,60)
-#define APP_COLOR_FIREBRICK gui_rgb(178,34,34)
-#define APP_COLOR_WHITE_OPACITY gui_rgba(255,255,255,150)
-#define APP_COLOR_SILVER gui_rgb(192,192,192)
-#define APP_COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
+#define APP_COLOR_CRIMSON                   gui_obj_rgb(220,20,60)
+#define APP_COLOR_FIREBRICK                 gui_obj_rgb(178,34,34)
+#define APP_COLOR_WHITE_OPACITY             gui_obj_rgba(255,255,255,150)
+#define APP_COLOR_SILVER                    gui_obj_rgb(192,192,192)
+#define APP_COLOR_SILVER_OPACITY(opacity)   gui_obj_rgba(192,192,192, opacity)
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -136,9 +136,13 @@ extern "C" {
   * }
   * \endcode
   */
-void gui_obj_ctor(struct _gui_obj_t *this, struct _gui_obj_t *parent, const char *filename,
-                  int16_t x, int16_t y, int16_t w, int16_t h);
-
+void gui_obj_ctor(gui_obj_t  *this,
+                  gui_obj_t  *parent,
+                  const char *filename,
+                  int16_t     x,
+                  int16_t     y,
+                  int16_t     w,
+                  int16_t     h);
 
 /**
  * @brief
@@ -151,8 +155,12 @@ void gui_obj_ctor(struct _gui_obj_t *this, struct _gui_obj_t *parent, const char
  * @param h
  * @return gui_obj_t*
  */
-gui_obj_t *gui_obj_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w,
-                          int16_t h);
+gui_obj_t *gui_obj_create(void       *parent,
+                          const char *filename,
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h);
 /**
   * @brief create event widget
   * @param  obj
@@ -170,7 +178,10 @@ gui_obj_t *gui_obj_create(void *parent, const char *filename, int16_t x, int16_t
   * }
   * \endcode
   */
-void gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter, void *user_data);
+void gui_obj_add_event_cb(void           *obj,
+                          gui_event_cb_t  event_cb,
+                          gui_event_t     filter,
+                          void           *user_data);
 
 /**
   * @brief    this API only for Widget, not for Application
@@ -196,13 +207,13 @@ void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code);
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
   * {
-  *    gui_tree_free(&app->screen);
+  *    gui_obj_tree_free(&app->screen);
   *
   * }
   *
   * \endcode
   */
-void gui_tree_free(void *obj);
+void gui_obj_tree_free(void *obj);
 
 /**
   * @brief    print the widget tree recursively,from the root to the leaves.Preorder traversal.
@@ -212,32 +223,26 @@ void gui_tree_free(void *obj);
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
   * {
-  *    gui_tree_print(&app->screen);
+  *    gui_obj_tree_print(&app->screen);
   *
   * }
   *
   * \endcode
   */
-void gui_tree_print(gui_obj_t *obj);
+void gui_obj_tree_print(gui_obj_t *obj);
 
 /**
-  * @brief   hide widget
+  * @brief   show or hide the widget
   * @param  obj the root of the widget tree.
+  * @param  enable true for show, false for hide.
   * @return void
   */
-void gui_tree_not_show(gui_obj_t *obj);
+void gui_obj_tree_show(gui_obj_t *obj, bool enable);
 
 /**
-  * @brief   show widget
-  * @param  obj the root of the widget tree.
-  * @return void
-  */
-void gui_tree_show(gui_obj_t *obj, bool enable);
-
-/**
-  * @brief  object show is not
+  * @brief  object show or not
   * @param  obj
-  * @param  show_info
+  * @param  enable
   * @return void
   * * <b>Example usage</b>
   * \code{.c}
@@ -251,22 +256,22 @@ void gui_tree_show(gui_obj_t *obj, bool enable);
   *
   * \endcode
   */
-void gui_obj_show(void *obj, bool show_info);
+void gui_obj_show(void *obj, bool enable);
 
 /**
   * @brief   show the root of this tree
-  * @param  obj
+  * @param  obj the root of the widget tree.
   * @return gui_obj_t*
   */
-gui_obj_t *gui_tree_get_root(gui_obj_t *obj);
+gui_obj_t *gui_obj_tree_get_root(gui_obj_t *obj);
 
 /**
   * @brief   get child type
-  * @param  obj
+  * @param  obj the root of the widget tree.
   * @param  child_type
   * @return gui_obj_t*
   */
-gui_obj_t *gui_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
+gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 
 /**
  * @brief Get a color value from red, green, blue and opacity values.
@@ -277,8 +282,11 @@ gui_obj_t *gui_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
  * @param opacity Range of unsigned char
  * @return gui_color_t
  */
-gui_color_t gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
-                     unsigned char opacity);
+gui_color_t gui_obj_rgba(unsigned char red,
+                         unsigned char green,
+                         unsigned char blue,
+                         unsigned char opacity);
+
 /**
  * @brief Get a color value from red, green, blue and opacity values.
  *
@@ -287,7 +295,7 @@ gui_color_t gui_rgba(unsigned char red, unsigned char green, unsigned char blue,
  * @param blue Range of unsigned char
  * @return gui_color_t
  */
-gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
+gui_color_t gui_obj_rgb(unsigned char red, unsigned char green, unsigned char blue);
 
 /**
  * @brief judge the obj if in range of this rect
@@ -300,43 +308,98 @@ gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
  * @return true
  * @return false
  */
-bool gui_obj_in_rect(gui_obj_t *obj, int16_t x, int16_t y, int16_t w, int16_t h);
+bool gui_obj_in_rect(gui_obj_t *obj,
+                     int16_t    x,
+                     int16_t    y,
+                     int16_t    w,
+                     int16_t    h);
 
 /**
- * @brief
+ * @brief skip all left slide hold actions of the parent object
  *
- * @param obj
+ * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_parent_left_hold(gui_obj_t *obj);
 
 /**
- * @brief
+ * @brief skip all left slide hold actions of the child object
  *
- * @param obj
+ * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_left_hold(gui_obj_t *obj);
 
 /**
- * @brief
+ * @brief skip all left slide hold actions of the other object
  *
- * @param obj
+ * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_left_hold(gui_obj_t *obj);
 
+/**
+ * @brief skip all right slide hold actions of the parent object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_all_parent_right_hold(gui_obj_t *obj);
+
+/**
+ * @brief skip all right slide hold actions of the child object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_all_child_right_hold(gui_obj_t *obj);
+
+/**
+ * @brief skip all right slide hold actions of the other object
+ *
+ * @param obj
+ */
 void gui_obj_skip_other_right_hold(gui_obj_t *obj);
 
+/**
+ * @brief skip all down slide hold actions of the parent object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj);
+
+/**
+ * @briefskip all down slide hold actions of the child object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_all_child_down_hold(gui_obj_t *obj);
+
+/**
+ * @brief skip all down slide hold actions of the other object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_other_down_hold(gui_obj_t *obj);
 
+/**
+ * @brief skip all up slide hold actions of the parent object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_all_parent_up_hold(gui_obj_t *obj);
+
+/**
+ * @brief skip all up slide hold actions of the child object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_all_child_up_hold(gui_obj_t *obj);
+
+/**
+ * @brief skip all up slide hold actions of the other object
+ *
+ * @param obj the root of the widget tree.
+ */
 void gui_obj_skip_other_up_hold(gui_obj_t *obj);
 
 /**
- * @brief
+ * @brief get the area of this obj
  *
  * @param obj
  * @param x
@@ -344,7 +407,11 @@ void gui_obj_skip_other_up_hold(gui_obj_t *obj);
  * @param w
  * @param h
  */
-void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_t *h);
+void gui_obj_get_area(gui_obj_t *obj,
+                      int16_t   *x,
+                      int16_t   *y,
+                      int16_t   *w,
+                      int16_t   *h);
 
 /**
  * @brief judge the point if in range of this obj rect
@@ -355,7 +422,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
  * @return true
  * @return false
  */
-bool gui_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
+bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
 
 /**
  * @brief
@@ -365,7 +432,7 @@ bool gui_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
  * @param len
  * @return uint8_t
  */
-uint8_t gui_checksum(uint8_t seed, uint8_t *data, uint8_t len);
+uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len);
 
 /**
  * @brief  get widget in tree by name
@@ -375,7 +442,8 @@ uint8_t gui_checksum(uint8_t seed, uint8_t *data, uint8_t len);
  * @param output widget
  * @return uint8_t
  */
-void gui_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
+void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
@@ -390,4 +458,3 @@ void gui_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **o
 #endif
 
 #endif
-

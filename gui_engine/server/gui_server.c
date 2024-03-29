@@ -195,7 +195,7 @@ static void gui_server_entry(void *parameter)
                     current_app->close = false;
                     gui_list_remove(&(app->screen.brother_list));
                     app->screen.parent = 0;
-                    gui_tree_free(&((gui_app_t *)app)->screen);
+                    gui_obj_tree_free(&((gui_app_t *)app)->screen);
                     current_app = next_app;
                     next_app = 0;
                     app = current_app;
@@ -219,7 +219,7 @@ static void gui_server_entry(void *parameter)
                     current_app->close = false;
                     gui_list_remove(&(app->screen.brother_list));
                     app->screen.parent = 0;
-                    gui_tree_free(&((gui_app_t *)app)->screen);
+                    gui_obj_tree_free(&((gui_app_t *)app)->screen);
                     current_app = next_app;
                     next_app = 0;
                     app = current_app;

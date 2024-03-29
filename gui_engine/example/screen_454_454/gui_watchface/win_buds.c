@@ -90,7 +90,7 @@ static void switch_back_menu_buds_touch_cb(void *obj, gui_event_cb_t event)
     win_menu_buds->base.not_show = true;
     tabview_main->base.not_show = false;
 
-    gui_tree_free(win_menu_buds);
+    gui_obj_tree_free(win_menu_buds);
     win_menu_buds = NULL;
 }
 
@@ -109,7 +109,7 @@ static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t even
         extern void design_win_buds_device(void *parent);
         design_win_buds_device(win_buds_device);
 
-        gui_tree_free(win_menu_buds);
+        gui_obj_tree_free(win_menu_buds);
         win_menu_buds = NULL;
     }
 #endif
@@ -131,7 +131,7 @@ static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t even
         extern void design_win_buds_searching(void *parent);
         design_win_buds_searching(win_search_buds);
 
-        gui_tree_free(win_menu_buds);
+        gui_obj_tree_free(win_menu_buds);
         win_menu_buds = NULL;
     }
 #endif
@@ -154,7 +154,7 @@ static void switch_disconnect_yes_action(void *obj)
     gui_log("switch_disconnect_yes_action, obj = 0x%x\n", obj);
 
     win_menu_buds->base.not_show = false;
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
 
     gui_obj_show(switch_disconnect, false);
@@ -179,7 +179,7 @@ static void switch_disconnect_no_action(void *obj)
     gui_log("switch_disconnect_no_action, obj = 0x%x\n", obj);
     win_menu_buds->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
 #ifdef _ENABLE_RTK_SOC_WATCH_
     gui_update_by_event2(win_menu_buds, NULL, true);

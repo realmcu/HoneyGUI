@@ -413,7 +413,7 @@ void gui_page_input_prepare(gui_obj_t *obj)
 
     GUI_UNUSED(tp);
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == false)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false)
     {
         return;
     }
@@ -458,7 +458,7 @@ void gui_page_update(gui_obj_t *obj)
         return;
     }
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
         {
@@ -539,7 +539,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
         return;
     }
 
-    if (tp->pressed && gui_point_in_obj_rect(obj, tp->x, tp->y))
+    if (tp->pressed && gui_obj_point_in_obj_rect(obj, tp->x, tp->y))
     {
         this->press = true;
     }

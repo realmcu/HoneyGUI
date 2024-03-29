@@ -141,7 +141,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
         gui_img_t *b = (void *)obj;
         if (tp->pressed)
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
                 b->press_flag = true;
@@ -225,7 +225,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
 
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         if ((tp->type == TOUCH_SHORT)
             && (obj->event_dsc_cnt > 0))
@@ -236,7 +236,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     last = this->checksum;
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
 
     if (last != this->checksum)
     {

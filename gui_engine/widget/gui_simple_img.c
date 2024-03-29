@@ -134,7 +134,7 @@ static void gui_simple_img_prepare(gui_obj_t *obj)
 
         if (tp->pressed)
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
                 this->press_flag = true;
@@ -168,7 +168,7 @@ static void gui_simple_img_prepare(gui_obj_t *obj)
     this->draw_img->img_target_h = m_h;
     this->draw_img->img_target_w = m_w;
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
         {
@@ -178,7 +178,7 @@ static void gui_simple_img_prepare(gui_obj_t *obj)
 
     last = this->checksum;
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_simple_img_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_simple_img_t));
 
     if (last != this->checksum)
     {

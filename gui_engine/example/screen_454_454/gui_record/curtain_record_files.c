@@ -74,7 +74,7 @@ static void switch_record_files_touch_cb(void *obj, gui_event_t event)
         gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", obj);
         if (win_record_play != NULL)
         {
-            gui_tree_free(win_record_play);
+            gui_obj_tree_free(win_record_play);
             win_record_play = NULL;
         }
         win_record_play = gui_win_create(&(app->screen), "win_record_play", 0, 0, LCD_W, LCD_H);
@@ -113,7 +113,7 @@ static void switch_record_files_touch_cb(void *obj, gui_event_t event)
         {
             if (win_confirm != NULL)
             {
-                gui_tree_free(win_confirm);
+                gui_obj_tree_free(win_confirm);
                 win_confirm = NULL;
                 set_confirm_yes(NULL, NULL);
                 set_confirm_no(NULL, NULL);

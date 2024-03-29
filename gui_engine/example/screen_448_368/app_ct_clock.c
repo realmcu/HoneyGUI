@@ -29,7 +29,7 @@ static void callback_time()
     gui_log("idx:%d\n", idx);
     gui_app_t *app = (gui_app_t *)get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
-    gui_tree_free(screen);
+    gui_obj_tree_free(screen);
     app->ui_design(app);
     switch (idx)
     {
@@ -79,7 +79,7 @@ static void callback_touch_long(void *obj, gui_event_t e)
         idx = 2;
     }
 
-    gui_tree_free(screen);
+    gui_obj_tree_free(screen);
     gui_win_t *win = gui_win_create(screen, "win", 0, 0, 320, 320);
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback_time, GUI_EVENT_TOUCH_CLICKED, NULL);
 

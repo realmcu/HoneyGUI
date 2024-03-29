@@ -42,7 +42,7 @@ static void switch_contacts_list_delete_no_action(void *obj)
     gui_log("switch_contacts_list_delete_no_action, obj = 0x%x\n", obj);
     win_contacts_list->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
     //do nothing
 }
@@ -58,7 +58,7 @@ static void contacts_list_back_touch_cb(void *obj, gui_event_t event)
 
 
     gui_log("contacts_list_back_touch_cb object->parent->name = %s\n", object->parent->name);
-    gui_tree_free(win_contacts_list);
+    gui_obj_tree_free(win_contacts_list);
     win_contacts_list = NULL;
     contacts_num = 0;
 }
@@ -83,7 +83,7 @@ static void switch_designated_contact_touch_cb(void *obj, gui_event_t event)
         gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", obj);
         if (win_contacts_details != NULL)
         {
-            gui_tree_free(win_contacts_details);
+            gui_obj_tree_free(win_contacts_details);
             win_contacts_details = NULL;
         }
         win_contacts_details = gui_win_create(&(app->screen), "win_contacts_details", 0, 0, LCD_W, LCD_H);
@@ -128,7 +128,7 @@ static void switch_contacts_list_delete_touch_cb(void *obj, gui_event_t event)
     gui_log("switch_contacts_list_delete_touch_cb\n");
     if (win_confirm != NULL)
     {
-        gui_tree_free(win_confirm);
+        gui_obj_tree_free(win_confirm);
         win_confirm = NULL;
         set_confirm_yes(NULL, NULL);
         set_confirm_no(NULL, NULL);

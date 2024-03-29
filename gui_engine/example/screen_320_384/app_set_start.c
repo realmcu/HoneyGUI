@@ -84,7 +84,7 @@ static void app_set_start_ui_design(gui_app_t *app)
     tablist_digital = gui_img_create_from_mem(tab_digital, "add", APP_DIGITAL_BIN, 0, 0, 0, 0);
     //GET_BASE(tablist_sos_call)->not_show = true;
     //GET_BASE(tablist_digital)->not_show = true;
-    //gui_tree_free(tablist_tab);
+    //gui_obj_tree_free(tablist_tab);
     // gui_tabview_jump_tab(tab_all, idx, 0);
     gui_win_t *win_start = gui_win_create(tab_all, "win_start", 0, 173, 320, 70);
     gui_obj_add_event_cb(win_start, (gui_event_cb_t)tab_go_to1, GUI_EVENT_TOUCH_CLICKED, NULL);

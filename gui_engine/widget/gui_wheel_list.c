@@ -339,7 +339,7 @@ void gui_wheel_list_set_icon(gui_wheel_list_t *this,
     {
         if (this->icon_list[layer][index] != NULL)
         {
-            gui_tree_free(this->icon_list[layer][index]);
+            gui_obj_tree_free(this->icon_list[layer][index]);
         }
         if (layer == 0 && index == 0)
         {

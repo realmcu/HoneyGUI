@@ -131,7 +131,7 @@ static void gui_win_prepare(gui_obj_t *obj)
         gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         switch (tp->type)
         {

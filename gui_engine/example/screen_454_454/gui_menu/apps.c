@@ -31,13 +31,13 @@ GUI_APP_DEFINE_NAME(APP_MAP)
 /**
  * @link https://www.rapidtables.com/web/color/RGB_Color.html
 */
-#define COLOR_RED gui_rgb(255, 0, 0)
-#define COLOR_CRIMSON gui_rgb(220,20,60)
-#define COLOR_FIREBRICK gui_rgb(178,34,34)
-#define COLOR_WHITE gui_rgb(255,255,255)
-#define COLOR_WHITE_OPACITY gui_rgba(255,255,255,150)
-#define COLOR_SILVER gui_rgb(192,192,192)
-#define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
+#define COLOR_RED gui_obj_rgb(255, 0, 0)
+#define COLOR_CRIMSON gui_obj_rgb(220,20,60)
+#define COLOR_FIREBRICK gui_obj_rgb(178,34,34)
+#define COLOR_WHITE gui_obj_rgb(255,255,255)
+#define COLOR_WHITE_OPACITY gui_obj_rgba(255,255,255,150)
+#define COLOR_SILVER gui_obj_rgb(192,192,192)
+#define COLOR_SILVER_OPACITY(opacity) gui_obj_rgba(192,192,192, opacity)
 #define HEART_ANI_NAME "_HEART_ANI"
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
@@ -53,7 +53,7 @@ extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
-    gui_rect_create((void *)app_win, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0, 100));
+    gui_rect_create((void *)app_win, 0, 0, SCREEN_W, SCREEN_H, gui_obj_rgba(0, 0, 0, 100));
     gui_win_set_animate(app_win, 1000, 0, app_win_cb, app_win);
     gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
@@ -221,7 +221,7 @@ static void heart_ani_cb(gui_win_t *win)
         HEARTRATE48_BIN,
     };
     gui_img_t *img = 0;
-    gui_tree_get_widget_by_name(win, HEART_ANI_NAME, (void *)&img);
+    gui_obj_tree_get_widget_by_name(win, HEART_ANI_NAME, (void *)&img);
     if (odd)
     {
         gui_img_set_attribute(img, HEART_ANI_NAME,
@@ -240,7 +240,7 @@ static void page_cb(gui_page_t *page)
 {
     gui_img_t *img = 0;
     gui_app_t *app = GUI_APP_HANDLE(APP_HEART_RATE);
-    gui_tree_get_widget_by_name(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, (void *)&img);
+    gui_obj_tree_get_widget_by_name(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, (void *)&img);
 
     int offset = page->base.y;
     if (offset < -SCREEN_H)
@@ -261,7 +261,7 @@ static void win_cb(gui_win_t *win)
 {
     GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_watch_ui())
     gui_tabview_t *tabview = 0;
-    gui_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", (void *)&tabview);
+    gui_obj_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", (void *)&tabview);
     if (tabview)
     {
         gui_tabview_jump_tab(tabview, -1, 0);
@@ -332,11 +332,13 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 static void status_bar_ani(gui_obj_t *ignore_gesture)
 {
     gui_text_t *time_txt = 0;
-    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_TIME_TEXT, (void *)&time_txt);
+    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_TIME_TEXT,
+                                    (void *)&time_txt);
     gui_text_t *date_txt = 0;
-    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_DATE_TEXT, (void *)&date_txt);
+    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_DATE_TEXT,
+                                    (void *)&date_txt);
     gui_win_t *win = 0;
-    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_WINDOW, (void *)&win);
+    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_WINDOW, (void *)&win);
     if (time_txt)
     {
 
@@ -635,7 +637,7 @@ static void stop_watch_win_ani_cb()
     static char buffer[9];
     get_stopwatch_string(buffer);
     gui_text_t *time_txt = 0;
-    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
+    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
     gui_text_content_set(time_txt, buffer, strlen(buffer));
     gui_text_convert_to_img(time_txt, RGBA8888);
 }

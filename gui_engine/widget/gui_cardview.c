@@ -248,7 +248,7 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     skip = false;
 
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_cardview_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_cardview_t));
 
     if (last != this->checksum)
     {

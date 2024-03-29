@@ -50,7 +50,7 @@ static void switch_dial_back_touch_cb(void *obj, gui_event_t event)
     gui_obj_show(object_return, true);
 
     gui_log("switch_dial_back_touch_cb object->parent->name = %s\n", object->parent->name);
-    gui_tree_free(win_dial);
+    gui_obj_tree_free(win_dial);
     win_dial = NULL;
     //dial num reset
     reset_dial_num();
@@ -255,5 +255,5 @@ void design_win_dial(void *parent)
                          GUI_EVENT_2, NULL);
 
     reset_dial_num();
-    //gui_tree_print((gui_obj_t *)win_dial);
+    //gui_obj_tree_print((gui_obj_t *)win_dial);
 }

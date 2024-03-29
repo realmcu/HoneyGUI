@@ -76,7 +76,7 @@ static void img_success_touch_cb(void *obj, gui_event_t event)
         gui_obj_show(object_return, true);
         if (win_confirm != NULL)
         {
-            gui_tree_free(win_confirm);
+            gui_obj_tree_free(win_confirm);
             win_confirm = NULL;
         }
     }
@@ -91,7 +91,7 @@ static void img_fail_touch_cb(void *obj, gui_event_t event)
         gui_obj_show(object_return, true);
         if (win_confirm != NULL)
         {
-            gui_tree_free(win_confirm);
+            gui_obj_tree_free(win_confirm);
             win_confirm = NULL;
         }
     }
@@ -166,7 +166,7 @@ static void switch_confirm_no_touch_cb(void *obj, gui_event_cb_t event)
     set_confirm_text(NULL, 0, 0, 0);
     if (win_confirm != NULL)
     {
-        gui_tree_free(win_confirm);
+        gui_obj_tree_free(win_confirm);
         win_confirm = NULL;
     }
 }

@@ -99,7 +99,7 @@ static void gui_pagelist_prepare(gui_obj_t *obj)
         return;
     }
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         // valid touch range xy
         if ((tp->x > this->x_init) && (tp->x < (this->x_init + obj->w)))

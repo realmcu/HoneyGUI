@@ -46,13 +46,13 @@ void gui_free_win_buds_device(void)
     {
         if (switch_text_base_bonding_buds[i] != NULL)
         {
-            gui_tree_free(switch_text_base_bonding_buds[i]);
+            gui_obj_tree_free(switch_text_base_bonding_buds[i]);
             switch_text_base_bonding_buds[i] = NULL;
         }
     }
     if (win_buds_device != NULL)
     {
-        gui_tree_free(win_buds_device);
+        gui_obj_tree_free(win_buds_device);
         win_buds_device = NULL;
     }
 }
@@ -114,7 +114,7 @@ static void win_buds_device_update_cb(void *p)
     {
         if (switch_text_base_bonding_buds[i] != NULL)
         {
-            gui_tree_free(switch_text_base_bonding_buds[i]);
+            gui_obj_tree_free(switch_text_base_bonding_buds[i]);
             switch_text_base_bonding_buds[i] = NULL;
         }
         bond_device_index[i] = -1;
@@ -312,7 +312,7 @@ void device_buds_confirm_yes_action(void *obj)
     gui_log("device_buds_confirm_yes_action, obj = 0x%x\n", obj);
     win_buds_device->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
     //delete bondlist action
 
@@ -341,7 +341,7 @@ void device_buds_confirm_no_action(void *obj)
     gui_log("device_buds_confirm_no_action, obj = 0x%x\n", obj);
     win_buds_device->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
     //cancel delete bondlist action
 
@@ -417,7 +417,7 @@ void design_win_buds_device(void *parent)
     {
         if (switch_text_base_bonding_buds[i] != NULL)
         {
-            gui_tree_free(switch_text_base_bonding_buds[i]);
+            gui_obj_tree_free(switch_text_base_bonding_buds[i]);
             switch_text_base_bonding_buds[i] = NULL;
         }
         bond_device_index[i] = -1;

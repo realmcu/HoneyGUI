@@ -47,7 +47,7 @@ static void switch_contacts_touch_cb(void *obj, gui_event_t event)
         gui_log("GUI_EVENT_TOUCH_PRESSED obj = 0x%x\n", obj);
         if (win_contacts_list != NULL)
         {
-            gui_tree_free(win_contacts_list);
+            gui_obj_tree_free(win_contacts_list);
             win_contacts_list = NULL;
         }
         win_contacts_list = gui_win_create(&(app->screen), "win_contacts_list", 0, 0, LCD_W, LCD_H);

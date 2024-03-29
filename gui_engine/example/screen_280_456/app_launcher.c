@@ -154,7 +154,7 @@ static void tab_text(void *tab)
 
     gui_scroll_text_t *scrool_text1 = gui_scroll_text_create(tab,  "scrool_text1",  80, 300, 100, 50);
     gui_scroll_text_scroll_set(scrool_text1, SCROLL_X, 100, 0, 3000, 1500000);
-    gui_scroll_text_set(scrool_text1, "0123456789", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0), 10, 32);
+    gui_scroll_text_set(scrool_text1, "0123456789", GUI_FONT_SRC_BMP, gui_obj_rgb(0, 0xff, 0), 10, 32);
 
     gui_scroll_text_t *scrool_text2 = gui_scroll_text_create(tab,  "scrool_text2",  80, 360, 100, 60);
     gui_scroll_text_scroll_set(scrool_text2, SCROLL_Y, 100, 0, 3000, 1500000);

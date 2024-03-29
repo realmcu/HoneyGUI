@@ -101,7 +101,7 @@ static void switch_back_menu_phone_touch_cb(void *obj, gui_event_cb_t event)
     win_menu_phone->base.not_show = true;
     tabview_main->base.not_show = false;
 
-    gui_tree_free(win_menu_phone);
+    gui_obj_tree_free(win_menu_phone);
     win_menu_phone = NULL;
 }
 
@@ -110,7 +110,7 @@ static void switch_disconnect_yes_action(void *obj)
     gui_log("switch_disconnect_yes_action, obj = 0x%x\n", obj);
     win_menu_phone->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
 
 #ifdef _ENABLE_RTK_SOC_WATCH_
@@ -130,7 +130,7 @@ static void switch_disconnect_no_action(void *obj)
     gui_log("switch_disconnect_no_action, obj = 0x%x\n", obj);
     win_menu_phone->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
 }
 
@@ -182,7 +182,7 @@ static void switch_text_base_connect_new_phone_touch_cb(void *obj, gui_event_cb_
     gui_log("switch_text_base_connect_new_phone_touch_cb, event = %d\n", event);
 
 #ifdef _ENABLE_RTK_SOC_WATCH_
-    gui_tree_free(win_menu_phone);
+    gui_obj_tree_free(win_menu_phone);
     win_menu_phone = NULL;
 
     if (win_menu_phone_pairing == NULL)

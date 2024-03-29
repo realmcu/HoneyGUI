@@ -141,7 +141,7 @@ static void gui_button_prepare(gui_obj_t *obj)
     {
     case TOUCH_SHORT:
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
             }
@@ -152,7 +152,7 @@ static void gui_button_prepare(gui_obj_t *obj)
         {
             if (this->long_flag == false)
             {
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     this->long_flag = true;
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
@@ -167,7 +167,7 @@ static void gui_button_prepare(gui_obj_t *obj)
 
     if (tp->pressed)
     {
-        if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+        if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
         {
             if (this->on_pic_addr && this->style == 0)
             {
@@ -396,7 +396,7 @@ static gui_button_t *gui_button_create_core(void                 *parent,
 
         button->text = gui_text_create(button, "icon_text", 0, gui_img_get_height(button->img) + 40,
                                        gui_get_screen_width(), h);
-        gui_text_set(button->text, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+        gui_text_set(button->text, text, GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      strlen(text), 32);
         gui_text_mode_set(button->text, LEFT);
     }

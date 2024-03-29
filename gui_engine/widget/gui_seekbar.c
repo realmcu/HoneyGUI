@@ -143,7 +143,7 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
     {
         if (tp->type == TOUCH_HOLD_Y)
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 int pro = tp->y + tp->deltaY;//todo
 
@@ -191,7 +191,7 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
                     }
                 }
 
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
@@ -210,7 +210,7 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
 
         if (tp->pressed)
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
                 gui_obj_event_set(obj, GUI_EVENT_1);
@@ -275,7 +275,7 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
             || (tp->type == TOUCH_HOLD_Y)
             || (tp->pressed))
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 float pro = gui_seekbar_get_gegree_to_center(circle->arcx + 0, circle->arcy + 0, tp->x + tp->deltaX,
                                                              tp->y + tp->deltaY);
@@ -341,7 +341,7 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
                     }
                 }
 
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
@@ -360,7 +360,7 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
 
         if (tp->pressed)
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
 
@@ -396,7 +396,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
             || (tp->type == TOUCH_HOLD_Y)
             || (tp->pressed))
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 int pro = tp->x + tp->deltaX - 0;
                 if (pro <= 0) { pro = 1; }
@@ -433,7 +433,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
                     }
                 }
 
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
@@ -452,7 +452,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
 
         if (tp->pressed)
         {
-            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
                 gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);

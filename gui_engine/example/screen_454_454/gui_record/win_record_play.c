@@ -25,7 +25,7 @@ static void record_play_back_touch_cb(void *obj, gui_event_t event)
     //object_return->not_show = false;
 
     gui_log("record_play_back_touch_cb object->parent->name = %s\n", object->parent->name);
-    gui_tree_free(win_record_play);
+    gui_obj_tree_free(win_record_play);
     win_record_play = NULL;
 }
 

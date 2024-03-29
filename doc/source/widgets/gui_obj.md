@@ -21,15 +21,15 @@ You can set an event of widget by this api [gui_obj_event_set(gui_obj_t *obj, gu
 
 ### Free widget
 
-Using [gui_tree_free(void *obj)](#api) to free the widget tree recursively from the root to the leaves(Preorder traversal).
+Using [gui_obj_tree_free(void *obj)](#api) to free the widget tree recursively from the root to the leaves(Preorder traversal).
 
 ### Print widget
 
-Using [gui_tree_print(gui_obj_t *obj)](#api) to print the widget tree recursively from the root to the leaves.
+Using [gui_obj_tree_print(gui_obj_t *obj)](#api) to print the widget tree recursively from the root to the leaves.
 
 ### Hide/Show widget
 
-You can show or hide the widget by these apis: [gui_tree_show(gui_obj_t *obj)](#api) and [gui_tree_not_show(gui_obj_t *obj, bool enable)](#api).
+You can show or hide the widget by these apis: [gui_obj_tree_show(gui_obj_t *obj)](#api) and [gui_tree_not_show(gui_obj_t *obj, bool enable)](#api).
 
 ### Set object show or not
 
@@ -37,11 +37,11 @@ You can set the object show or not with [gui_obj_show(void *obj, bool show_info)
 
 ### Get root
 
-You can get the root object of tree using [gui_obj_t *gui_tree_get_root(gui_obj_t *obj)](#api).
+You can get the root object of tree using [gui_obj_t *gui_obj_tree_get_root(gui_obj_t *obj)](#api).
 
 ### Get child
 
-To get the child object of tree by this api [gui_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)](#api).
+To get the child object of tree by this api [gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)](#api).
 
 <br>
 

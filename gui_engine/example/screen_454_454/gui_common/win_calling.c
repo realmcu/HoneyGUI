@@ -389,11 +389,11 @@ void gui_win_calling_destruct(void)
     // {
     //     //pop again, if previous view is incoming call
     //     object_return = pop_current_widget();
-    //     gui_tree_free(win_incoming_call);
+    //     gui_obj_tree_free(win_incoming_call);
     //     win_incoming_call = NULL;
     // }
     gui_obj_show(object_return, true);
-    gui_tree_free(win_calling);
+    gui_obj_tree_free(win_calling);
     win_calling = NULL;
     win_calling_volume = NULL;
 

@@ -30,7 +30,7 @@ static void switch_back_menu_conn_new_phone_touch_cb(void *obj, gui_event_cb_t e
 {
     gui_log("switch_back_menu_conn_new_phone_touch_cb, event = %d\n", event);
 
-    gui_tree_free(win_menu_phone_pairing);
+    gui_obj_tree_free(win_menu_phone_pairing);
     win_menu_phone_pairing = NULL;
 
     if (win_menu_phone == NULL)

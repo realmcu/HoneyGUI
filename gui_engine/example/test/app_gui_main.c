@@ -10,13 +10,13 @@
 /**
  * @link https://www.rapidtables.com/web/color/RGB_Color.html
 */
-#define COLOR_RED gui_rgb(255, 0, 0)
-#define COLOR_CRIMSON gui_rgb(220,20,60)
-#define COLOR_FIREBRICK gui_rgb(178,34,34)
-#define COLOR_WHITE gui_rgb(255,255,255)
-#define COLOR_WHITE_OPACITY gui_rgba(255,255,255,150)
-#define COLOR_SILVER gui_rgb(192,192,192)
-#define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
+#define COLOR_RED gui_obj_rgb(255, 0, 0)
+#define COLOR_CRIMSON gui_obj_rgb(220,20,60)
+#define COLOR_FIREBRICK gui_obj_rgb(178,34,34)
+#define COLOR_WHITE gui_obj_rgb(255,255,255)
+#define COLOR_WHITE_OPACITY gui_obj_rgba(255,255,255,150)
+#define COLOR_SILVER gui_obj_rgb(192,192,192)
+#define COLOR_SILVER_OPACITY(opacity) gui_obj_rgba(192,192,192, opacity)
 GUI_APP_DEFINE(APP_TEST, test)  // cppcheck-suppress syntaxError
 static void test(gui_app_t *app)
 {
@@ -27,7 +27,7 @@ static void test(gui_app_t *app)
         gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, "txt", 0, 0, gui_get_screen_width(),
                                         font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 255), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 255), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -40,7 +40,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -54,7 +54,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -67,7 +67,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -81,7 +81,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -95,7 +95,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -109,7 +109,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -123,7 +123,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -137,7 +137,7 @@ static void test(gui_app_t *app)
         int font_size = 16;
         gui_text_t *t = gui_text_create(img, "txt", 0, 80, gui_get_screen_width(), font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
@@ -149,14 +149,14 @@ static void test(gui_app_t *app)
         gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, "txt", 200 + 10, 0, gui_get_screen_width(),
                                         font_size);
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(0, 255, 0), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(0, 255, 0), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
         gui_img_t *img =  gui_rect_create(GUI_APP_ROOT_SCREEN, 200 + 10, 16, 200, 120, COLOR_FIREBRICK);
-        gui_rect_round_create(img, 100, 10, 6, 100, gui_rgb(163, 163, 163), PATH111_BIN);
-        gui_rect_round_create(img, 50, 10, 30, 100, gui_rgb(163, 163, 163), PATH111_BIN);
+        gui_rect_round_create(img, 100, 10, 6, 100, gui_obj_rgb(163, 163, 163), PATH111_BIN);
+        gui_rect_round_create(img, 50, 10, 30, 100, gui_obj_rgb(163, 163, 163), PATH111_BIN);
     }
 }
 

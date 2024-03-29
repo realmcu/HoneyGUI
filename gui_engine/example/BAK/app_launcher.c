@@ -39,7 +39,7 @@ static void callback(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
 
-    gui_tree_free(tv_main);
+    gui_obj_tree_free(tv_main);
 
 
     gui_cardview_t *tv = gui_cardview_create(win_main, "cardview", 0, 0, 0, 0);

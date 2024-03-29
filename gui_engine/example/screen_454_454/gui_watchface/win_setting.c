@@ -33,7 +33,7 @@ static void switch_back_menu_setting_touch_cb(void *obj, gui_event_cb_t event)
     win_menu_setting->base.not_show = true;
     tabview_main->base.not_show = false;
 
-    gui_tree_free(win_menu_setting);
+    gui_obj_tree_free(win_menu_setting);
     win_menu_setting = NULL;
 }
 
@@ -49,7 +49,7 @@ static void switch_sw_reset_no_action(void *obj)
     gui_log("switch_sw_reset_no_action, obj = 0x%x\n", obj);
     win_menu_setting->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
 }
 
@@ -88,7 +88,7 @@ static void switch_factory_data_reset_no_action(void *obj)
     gui_log("switch_factory_data_reset_no_action, obj = 0x%x\n", obj);
     win_menu_setting->base.not_show = false;
 
-    gui_tree_free(win_confirm);
+    gui_obj_tree_free(win_confirm);
     win_confirm = NULL;
 }
 

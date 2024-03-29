@@ -442,7 +442,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     }
 
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
 
     if (last != this->checksum)
     {

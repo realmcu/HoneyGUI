@@ -34,7 +34,7 @@ static void callback_prism_touch_clicked()
         angle = 0;
     }
 
-    gui_tree_free(screen);
+    gui_obj_tree_free(screen);
     app->ui_design(get_app_hongkong());
 
 
@@ -45,7 +45,7 @@ void callback_prism(void *obj, gui_event_t e)
     gui_app_t *app = get_app_hongkong();
     gui_obj_t *screen = &(app->screen);
 
-    gui_tree_free(screen);
+    gui_obj_tree_free(screen);
 
     gui_win_t *win = gui_win_create(screen, "win", 0, 0, 368, 448);
     gui_canvas_t *canvas = gui_canvas_create(win, "canvas", 0, 0, 0, 368, 448);

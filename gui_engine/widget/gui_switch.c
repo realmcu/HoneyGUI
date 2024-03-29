@@ -222,7 +222,7 @@ static void gui_switch_prepare(gui_obj_t *obj)
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
-        if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+        if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
         {
             b = (void *)obj;
             switch (tp->type)
@@ -261,7 +261,7 @@ static void gui_switch_prepare(gui_obj_t *obj)
                 {
                     if (b->long_flag == false)
                     {
-                        if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                        if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                         {
                             b->long_flag = true;
                             if (b->long_touch_enable)
@@ -292,7 +292,7 @@ static void gui_switch_prepare(gui_obj_t *obj)
 
             if (tp->pressed)
             {
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     gui_log("pressed\n");
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
@@ -335,7 +335,8 @@ static void gui_switch_prepare(gui_obj_t *obj)
                     }
                     else if ((!b->long_touch_state && !b->long_flag) || (!b->long_touch_enable))
                     {
-                        if (((tp->deltaX == 0) && (tp->deltaY == 0)) && (gui_point_in_obj_rect(obj, tp->x, tp->y) == true))
+                        if (((tp->deltaX == 0) && (tp->deltaY == 0)) &&
+                            (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true))
                         {
                             sw = (gui_switch_t *)obj;
                             sw->ifon = !(sw->ifon);

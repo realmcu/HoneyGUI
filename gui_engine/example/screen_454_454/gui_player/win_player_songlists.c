@@ -133,7 +133,7 @@ static void switch_song_back_cb(void *obj, gui_event_t event)
     case GUI_EVENT_TOUCH_RELEASED:
         if (win_song_lists != NULL)
         {
-            gui_tree_free(win_song_lists);
+            gui_obj_tree_free(win_song_lists);
             win_song_lists = NULL;
             gui_obj_show(tabview_main, true);
         }
@@ -160,7 +160,7 @@ static void switch_song_cb(void *obj, gui_event_t event)
             {
                 break;
             }
-            gui_tree_free(win_song_lists);
+            gui_obj_tree_free(win_song_lists);
             win_song_lists = NULL;
 
             object_return = pop_current_widget();

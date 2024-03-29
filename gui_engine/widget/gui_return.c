@@ -134,7 +134,7 @@ static void gui_return_prepare(gui_obj_t *obj)
                 || (tp->type == TOUCH_HOLD_Y)
                 || (tp->pressed))
             {
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     pro = tp->x + tp->deltaX - 0;
 

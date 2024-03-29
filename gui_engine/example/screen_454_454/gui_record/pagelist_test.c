@@ -60,7 +60,7 @@ static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_
         index_first = MAX_FILE_LIST_NUM - MAX_SHOW_FILE_LIST_NUM ;
     }
     gui_scroll_text_set(list_scroll_text, files_name_test[index_last],
-                        GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[index_last]),
+                        GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[index_last]),
                         FONT_H_32);
 }
 
@@ -90,7 +90,8 @@ static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t 
         index_last = MAX_SHOW_FILE_LIST_NUM - 1;
     }
     gui_scroll_text_set(list_scroll_text, files_name_test[index_first],
-                        GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[index_first]),
+                        GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                        strlen(files_name_test[index_first]),
                         FONT_H_32);
 }
 
@@ -134,11 +135,11 @@ void design_pagelist_test(void *parent)
     gui_win_t *win_increase = gui_win_create(img_top_mask, "win_increase", 0, 0, 32, 32);
     gui_win_t *win_decrease = gui_win_create(img_top_mask, "win_decrease", 400, 0, 32, 32);
     gui_text_t *text_increase = gui_text_create(win_increase, "text_increase", 0, 0, 32, 32);
-    gui_text_set(text_increase, "加", GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+    gui_text_set(text_increase, "加", GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                  32,
                  32);
     gui_text_t *text_decrease = gui_text_create(win_decrease, "text_decrease", 0, 0, 32, 32);
-    gui_text_set(text_decrease, "减", GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+    gui_text_set(text_decrease, "减", GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                  32,
                  32);
     gui_obj_add_event_cb(win_increase, (gui_event_cb_t)win_increase_touch_cb, GUI_EVENT_TOUCH_RELEASED,
@@ -159,7 +160,7 @@ void design_pagelist_test(void *parent)
         scroll_text_pagelist_test[i] = gui_scroll_text_create(switch_pagelist_test[i],
                                                               "scroll_text_record_files", 0, 0, 128, FONT_H_32);
         gui_scroll_text_set(scroll_text_pagelist_test[i], files_name_test[i],
-                            GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]),
+                            GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]),
                             FONT_H_32);
         gui_scroll_text_scroll_set(scroll_text_pagelist_test[i], SCROLL_X, 0, 0, 5000, 0);
         gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_1,

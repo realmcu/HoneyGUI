@@ -35,7 +35,7 @@ static void switch_incoming_call_answer_touch_cb(void *obj, gui_event_t event)
     //push win_incoming call is unnecessary
     // push_current_widget(win_incoming_call);
     // gui_obj_show(win_incoming_call, false);
-    gui_tree_free(win_calling);
+    gui_obj_tree_free(win_calling);
     win_calling = NULL;
 
 #ifdef _ENABLE_RTK_SOC_WATCH_
@@ -54,7 +54,7 @@ static void switch_incoming_call_hangup_touch_cb(void *obj, gui_event_t event)
 
     gui_obj_t *object_return = pop_current_widget();
     gui_obj_show(object_return, true);
-    gui_tree_free(win_incoming_call);
+    gui_obj_tree_free(win_incoming_call);
     win_incoming_call = NULL;
 
 #ifdef _ENABLE_RTK_SOC_WATCH_

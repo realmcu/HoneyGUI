@@ -37,7 +37,7 @@ static void contacts_details_back_touch_cb(void *obj, gui_event_t event)
     //object_return->not_show = false;
 
     gui_log("contacts_details_back_touch_cb object->parent->name = %s\n", object->parent->name);
-    gui_tree_free(win_contacts_details);
+    gui_obj_tree_free(win_contacts_details);
     win_contacts_details = NULL;
 }
 

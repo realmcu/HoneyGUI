@@ -85,7 +85,7 @@ static void switch_song_name_cb(void *obj, gui_event_t event)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
         if (win_song_lists != NULL)
         {
-            gui_tree_free(win_song_lists);
+            gui_obj_tree_free(win_song_lists);
             win_song_lists = NULL;
         }
         win_song_lists = gui_win_create(&(app->screen), "win_song_lists", 0, 0, LCD_W, LCD_H);

@@ -114,7 +114,7 @@ void gui_app_shutdown(gui_app_t *app)
     else
     {
         app->screen.parent = 0;
-        gui_tree_free(&app->screen);
+        gui_obj_tree_free(&app->screen);
         gui_free(app->screen.matrix);
         app->close_sync = true;
     }
@@ -122,7 +122,7 @@ void gui_app_shutdown(gui_app_t *app)
 
 void gui_app_uninstall(gui_app_t *app)
 {
-    gui_tree_free(&app->screen);
+    gui_obj_tree_free(&app->screen);
 }
 
 gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_entry)

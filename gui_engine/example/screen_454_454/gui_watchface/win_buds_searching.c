@@ -109,7 +109,7 @@ static void switch_back_buds_searching_touch_cb(void *obj, gui_event_t event)
         extern void design_win_menu_buds(void *parent);
         design_win_menu_buds(win_menu_buds);
     }
-    gui_tree_free(win_search_buds);
+    gui_obj_tree_free(win_search_buds);
     win_search_buds = NULL;
     temp_search_device[0] = NULL;
     temp_search_device[1] = NULL;
@@ -137,7 +137,7 @@ static void img_success_touch_cb(void *obj, gui_event_t e)
             extern void design_win_menu_buds(void *parent);
             design_win_menu_buds(win_menu_buds);
         }
-        gui_tree_free(win_search_buds);
+        gui_obj_tree_free(win_search_buds);
         win_search_buds = NULL;
         temp_search_device[0] = NULL;
         temp_search_device[1] = NULL;
@@ -156,7 +156,7 @@ static void img_fail_touch_cb(void *obj, gui_event_t e)
             extern void design_win_menu_buds(void *parent);
             design_win_menu_buds(win_menu_buds);
         }
-        gui_tree_free(win_search_buds);
+        gui_obj_tree_free(win_search_buds);
         win_search_buds = NULL;
         temp_search_device[0] = NULL;
         temp_search_device[1] = NULL;

@@ -269,12 +269,12 @@ static void page_cb(gui_win_t *win)
         if (tp->y > 454 - 100)
         {
             gui_page_t *page = 0;
-            gui_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
+            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
             GUI_BASE(page)->gesture = 1;
             gui_curtainview_t *ct = 0;
-            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtainview_menu", (void *)&ct);
+            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "curtainview_menu", (void *)&ct);
             gui_curtain_t *c_up = 0;
-            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtain_up_menu", (void *)&c_up);
+            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "curtain_up_menu", (void *)&c_up);
             if (ct)
             {
                 GUI_BASE(ct)->gesture = 0;
@@ -288,12 +288,12 @@ static void page_cb(gui_win_t *win)
         else
         {
             gui_page_t *page = 0;
-            gui_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
+            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
             GUI_BASE(page)->gesture = 0;
             gui_curtainview_t *ct = 0;
-            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtainview_menu", (void *)&ct);
+            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "curtainview_menu", (void *)&ct);
             gui_curtain_t *c_up = 0;
-            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtain_up_menu", (void *)&c_up);
+            gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "curtain_up_menu", (void *)&c_up);
             if (ct)
             {
                 GUI_BASE(ct)->gesture = 1;

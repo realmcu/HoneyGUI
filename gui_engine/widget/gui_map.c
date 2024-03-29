@@ -493,7 +493,7 @@ static void wincb(gui_map_t *this)
 static void update_zoom(bool zoom)
 {
     gui_map_t *map = 0;
-    gui_tree_get_widget_by_name(&gui_current_app()->screen, MAP_WIDGET_NAME, (void *)&map);
+    gui_obj_tree_get_widget_by_name(&gui_current_app()->screen, MAP_WIDGET_NAME, (void *)&map);
 
     if (zoom)
     {
