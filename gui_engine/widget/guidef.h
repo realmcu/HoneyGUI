@@ -338,6 +338,8 @@ typedef enum obj_type
     PAGELIST,
     PAGELISTVIEW,
     MACRO_ANIMATETRANSFORM,
+    HONEYCOMB_LIST,
+    WHEEL_LIST,
 } obj_type_t;
 typedef struct gui_msg
 {
