@@ -319,7 +319,7 @@ static void map_cb()
 // }
 static void page_dtor(gui_obj_t *obj)
 {
-    extern void gui_page_dtor(gui_obj_t *obj);
-    gui_page_dtor(obj);
+    extern void gui_page_destory(gui_obj_t *obj);
+    gui_page_destory(obj);
     page_y_recode = obj->y;
 }

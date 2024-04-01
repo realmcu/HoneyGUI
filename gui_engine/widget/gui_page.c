@@ -36,7 +36,6 @@
   * @{
   */
 
-
 /** End of WIDGET_Exported_Types
   * @}
   */
@@ -47,7 +46,6 @@
 /** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
   * @{
   */
-
 
 /** End of WIDGET_Exported_Constants
   * @}
@@ -60,7 +58,6 @@
   * @{
   */
 
-
 /** End of SUBMOUDLE_Exported_Macros
   * @}
   */
@@ -72,7 +69,6 @@
   * @{
   */
 
-
 /** End of SUBMOUDLE_Exported_Variables
   * @}
   */
@@ -83,13 +79,14 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void dtor(gui_obj_t *obj);
-static void page_height(gui_obj_t *object, gui_obj_t *page)
+
+static void gui_page_set_height(gui_obj_t *object, gui_obj_t *page)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+
         if (!obj->not_show)
         {
             if ((obj->matrix != NULL) && (obj->parent->matrix))
@@ -100,276 +97,281 @@ static void page_height(gui_obj_t *object, gui_obj_t *page)
 
             int ay = obj->matrix->m[1][2];
             int buttom = ay + obj->h - page->matrix->m[1][2];
+
             //gui_log("buttom:%d\n",buttom);
+
             if (page->h < buttom)
             {
                 page->h = buttom;
             }
-
         }
-        page_height(obj, page);
+        gui_page_set_height(obj, page);
     }
 }
-static void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic)
+
+void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode)
 {
-    this->src_mode = IMG_SRC_MEMADDR;
-    this->scroll_bar = gui_img_create_from_mem(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
+    if (src_mode == IMG_SRC_MEMADDR)
+    {
+        this->src_mode = IMG_SRC_MEMADDR;
+        this->scroll_bar = gui_img_create_from_mem(this->base.parent,
+                                                   "scroll_bar",
+                                                   bar_pic,
+                                                   0, 0, 0, 0);
+    }
+    else
+    {
+        this->src_mode = IMG_SRC_FILESYS;
+        this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
+    }
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
 }
-static void gui_page_add_scroll_bar_from_fs(gui_page_t *this, void *bar_pic)
-{
-    this->src_mode = IMG_SRC_FILESYS;
-    this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
-    gui_img_get_height(this->scroll_bar);
-    this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
-}
-static void set_offset(gui_page_t *this, int offset)
+
+void gui_page_set_offset(gui_page_t *this, int offset)
 {
     this->yold = offset;
     this->base.y = offset;
 }
 
-static int get_offset(gui_page_t *this)
+int gui_page_get_offset(gui_page_t *this)
 {
     return this->base.y;
 }
 
-_gui_api_page_t gui_page_api =
-{
-    .set_offset = set_offset,
-    .get_offset = get_offset,
-    .gui_page_add_scroll_bar = gui_page_add_scroll_bar,
-    .gui_page_add_scroll_bar_from_fs = gui_page_add_scroll_bar_from_fs,
-};
-
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-static void (obj_update_att)(struct _gui_obj_t *o)
+static void gui_page_update_att(gui_obj_t *obj)
 {
-    gui_page_t *obj = (void *)o;
-    if (obj->animate && obj->animate->animate)
-    {
-        size_t frame_count = obj->animate->dur * (1000 / 15) / (1000);
-        obj->animate->callback(obj->animate->p);
-        obj->animate->current_frame++;
+    gui_page_t *this = (void *)obj;
+    size_t frame_count;
 
-        if (obj->animate->current_frame > frame_count)
+    if (this->animate && this->animate->animate)
+    {
+        frame_count = this->animate->dur * (1000 / 15) / (1000);
+        this->animate->callback(this->animate->p);
+        this->animate->current_frame++;
+
+        if (this->animate->current_frame > frame_count)
         {
-            if (obj->animate->repeat_count == 0)
+            if (this->animate->repeat_count == 0)
             {
-                obj->animate->animate = false;
+                this->animate->animate = false;
             }
-            else if (obj->animate->repeat_count < 0)
+            else if (this->animate->repeat_count < 0)
             {
-                obj->animate->current_frame = 0;
+                this->animate->current_frame = 0;
             }
-            else if (obj->animate->repeat_count > 0)
+            else if (this->animate->repeat_count > 0)
             {
-                obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
+                this->animate->current_repeat_count++;
+                if (this->animate->current_repeat_count >= this->animate->repeat_count)
                 {
-                    obj->animate->animate = false;
+                    this->animate->animate = false;
                 }
                 else
                 {
-                    obj->animate->current_frame = 0;
+                    this->animate->current_frame = 0;
                 }
             }
         }
-        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
-                                                                                       frame_count));
 
+        this->animate->progress_percent = ((float)(this->animate->current_frame)) / ((float)(
+                frame_count));
     }
 }
-void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeat_count, void *callback, void *p)
+
+void gui_page_set_animate(gui_page_t *this,
+                          uint32_t    dur,
+                          int         repeat_count,
+                          void       *callback,
+                          void       *p)
 {
-    gui_animate_t *animate = ((gui_page_t *)o)->animate;
+    gui_animate_t *animate = this->animate;
+
     if (!(animate))
     {
         animate = gui_malloc(sizeof(gui_animate_t));
     }
+
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
-    ((gui_page_t *)o)->animate = animate;
+    this->animate = animate;
 }
-//static void center_alignment(gui_page_t *page)
-//{
-//    if (page->align_hight)
-//    {
-//        gui_obj_t *obj = GET_BASE(page);
-//        int alien = _UI_ABS(obj->y) % page->align_hight;
-//        if (alien > page->align_hight / 2)
-//        {
-//            page->target = obj->y - page->align_hight + alien;
-//        }
-//        else
-//        {
-//            page->target = obj->y + alien;
-//        }
 
-//    }
-
-
-//}
-static void speed(gui_obj_t *obj)
+static void gui_page_update_speed(gui_obj_t *obj)
 {
-    gui_page_t *page = (gui_page_t *)obj;
+    gui_page_t *this = (gui_page_t *)obj;
     touch_info_t *tp = tp_get_info();
     int recode_num = 4;
+
     for (size_t i = 0; i < recode_num; i++)
     {
-        page->recode[i] = page->recode[i + 1];
+        this->recode[i] = this->recode[i + 1];
     }
-    page->recode[recode_num] = tp->deltaY;
-    GUI_TYPE(gui_page_t, obj)->speed = page->recode[recode_num] - page->recode[0];
+
+    this->recode[recode_num] = tp->deltaY;
+    this->speed = this->recode[recode_num] - this->recode[0];
     int max_speed = 60;
     int min_speed = 7;
-    if (GUI_TYPE(gui_page_t, obj)->speed > max_speed)
+
+    if (this->speed > max_speed)
     {
-        GUI_TYPE(gui_page_t, obj)->speed = max_speed;
+        this->speed = max_speed;
     }
-    else if (GUI_TYPE(gui_page_t, obj)->speed < -max_speed)
+    else if (this->speed < -max_speed)
     {
-        GUI_TYPE(gui_page_t, obj)->speed = -max_speed;
+        this->speed = -max_speed;
     }
-    if (GUI_TYPE(gui_page_t, obj)->speed > 0 && GUI_TYPE(gui_page_t, obj)->speed < min_speed)
+
+    if ((this->speed > 0) && (this->speed < min_speed))
     {
-        GUI_TYPE(gui_page_t, obj)->speed = min_speed;
+        this->speed = min_speed;
     }
-    else if (GUI_TYPE(gui_page_t, obj)->speed < 0 && GUI_TYPE(gui_page_t, obj)->speed > -min_speed)
+    else if ((this->speed < 0) && (this->speed > -min_speed))
     {
-        GUI_TYPE(gui_page_t, obj)->speed = -min_speed;
+        this->speed = -min_speed;
     }
-    GUI_TYPE(gui_page_t, obj)->target = (GUI_TYPE(gui_page_t, obj)->speed * GUI_TYPE(gui_page_t,
-                                         obj)->speed + _UI_ABS(GUI_TYPE(gui_page_t, obj)->speed)) / 2;
+
+    this->target = (this->speed * this->speed + _UI_ABS(this->speed)) / 2;
 
     int top_height = -obj->y;
     int buttom_height = obj->h + obj->y - (int)gui_get_screen_height();
-    if (GUI_TYPE(gui_page_t, obj)->speed > 0)
-    {
-        if (GUI_TYPE(gui_page_t, obj)->target > top_height)
-        {
-            GUI_TYPE(gui_page_t, obj)->target = top_height;
-        }
-        GUI_TYPE(gui_page_t, obj)->target = obj->y + GUI_TYPE(gui_page_t, obj)->target;
 
-    }
-    else if (GUI_TYPE(gui_page_t, obj)->speed < 0)
+    if (this->speed > 0)
     {
-        if (GUI_TYPE(gui_page_t, obj)->target > buttom_height)
+        if (this->target > top_height)
         {
-            GUI_TYPE(gui_page_t, obj)->target = buttom_height;
+            this->target = top_height;
         }
-        GUI_TYPE(gui_page_t, obj)->target = obj->y - GUI_TYPE(gui_page_t, obj)->target;
+        this->target = obj->y + this->target;
+    }
+    else if (this->speed < 0)
+    {
+        if (this->target > buttom_height)
+        {
+            this->target = buttom_height;
+        }
+        this->target = obj->y - this->target;
     }
     else
     {
-        GUI_TYPE(gui_page_t, obj)->target = obj->y;
+        this->target = obj->y;
     }
 
-
-    if (page->align_hight > 0)
+    if (this->align_hight > 0)
     {
-        int alien = _UI_ABS(GUI_TYPE(gui_page_t, obj)->target) % page->align_hight;
-        if (alien > page->align_hight / 2)
+        int alien = _UI_ABS(this->target) % this->align_hight;
+        if (alien > this->align_hight / 2)
         {
-            page->target = page->target - page->align_hight + alien;
-            if (_UI_ABS(page->speed) == min_speed || _UI_ABS(page->speed) == 0)
+            this->target = this->target - this->align_hight + alien;
+
+            if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
             {
-                if (page->target > obj->y)
+                if (this->target > obj->y)
                 {
-                    page->speed = min_speed;
+                    this->speed = min_speed;
                 }
                 else
                 {
-                    page->speed = -min_speed;
+                    this->speed = -min_speed;
                 }
             }
         }
         else
         {
-            page->target = page->target + alien;
-            if (_UI_ABS(page->speed) == min_speed || _UI_ABS(page->speed) == 0)
+            this->target = this->target + alien;
+            if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
             {
                 /* code */
-
-
-                if (page->target > obj->y)
+                if (this->target > obj->y)
                 {
-                    page->speed = min_speed;
+                    this->speed = min_speed;
                 }
                 else
                 {
-                    page->speed = -min_speed;
+                    this->speed = -min_speed;
                 }
             }
         }
     }
 }
-static void hold_y(gui_obj_t *obj)
+
+static void gui_page_hold_y(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
-    obj->y = tp->deltaY + ((gui_page_t *)obj)->yold;
+    gui_page_t *this = (gui_page_t *)obj;
+
+    obj->y = tp->deltaY + this->yold;
     gui_obj_event_set(obj, GUI_EVENT_8);
-    if (obj->y > ((gui_page_t *)obj)->start_y)/*@TOP*/
-    {
-        obj->y = ((gui_page_t *)obj)->start_y;
-        gui_obj_event_set(obj, GUI_EVENT_7);
-    }
-    else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-             obj->y != 0)/*@BOTTOM*/
-    {
-        gui_obj_event_set(obj, GUI_EVENT_7);
-        obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
-    }
-    speed(obj);
 
-}
-static void inertial(gui_obj_t *obj)
-{
-    if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+    if (obj->y > this->start_y)/*@TOP*/
     {
-        GUI_TYPE(gui_page_t, obj)->release = false;
+        obj->y = this->start_y;
+        gui_obj_event_set(obj, GUI_EVENT_7);
+    }
+    else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height()))
+             && obj->y != 0)/*@BOTTOM*/
+    {
+        gui_obj_event_set(obj, GUI_EVENT_7);
+        obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
+    }
 
-    }
-    if (GUI_TYPE(gui_page_t, obj)->speed > 3)
+    gui_page_update_speed(obj);
+}
+
+static void gui_page_update_inertial(gui_obj_t *obj)
+{
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if (this->speed == 0)
     {
-        obj->y += GUI_TYPE(gui_page_t, obj)->speed;
-        gui_obj_event_set(obj, GUI_EVENT_8);
-        GUI_TYPE(gui_page_t, obj)->speed -= 1;
+        this->release = false;
     }
-    else if (GUI_TYPE(gui_page_t, obj)->speed < -3)
+
+    if (this->speed > 3)
     {
-        obj->y += GUI_TYPE(gui_page_t, obj)->speed;
+        obj->y += this->speed;
         gui_obj_event_set(obj, GUI_EVENT_8);
-        GUI_TYPE(gui_page_t, obj)->speed += 1;
+        this->speed -= 1;
+    }
+    else if (this->speed < -3)
+    {
+        obj->y += this->speed;
+        gui_obj_event_set(obj, GUI_EVENT_8);
+        this->speed += 1;
     }
 }
-static void boundary(gui_obj_t *obj)
+
+static void gui_page_update_boundary(gui_obj_t *obj)
 {
-    if (obj->y > ((gui_page_t *)obj)->start_y)/*@TOP*/
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if (obj->y > this->start_y)/*@TOP*/
     {
-        obj->y = ((gui_page_t *)obj)->start_y;
+        obj->y = this->start_y;
         gui_obj_event_set(obj, GUI_EVENT_7);
-        GUI_TYPE(gui_page_t, obj)->release = false;
+        this->release = false;
     }
-    else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-             obj->y != 0)/*@BOTTOM*/
+    else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height()))
+             && obj->y != 0)/*@BOTTOM*/
     {
-        GUI_TYPE(gui_page_t, obj)->release = false;
-        obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
+        this->release = false;
+        obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
         gui_obj_event_set(obj, GUI_EVENT_7);
     }
 }
-static void layer(gui_obj_t *obj)
+
+static void gui_page_update_layer(gui_obj_t *obj)
 {
-    if (obj->y == ((gui_page_t *)obj)->start_y)
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if (obj->y == this->start_y)
     {
         obj->cover = false;
     }
@@ -378,365 +380,400 @@ static void layer(gui_obj_t *obj)
         obj->cover = true;
     }
 }
-static void alien(gui_obj_t *obj)
+
+static void gui_page_update_alien(gui_obj_t *obj)
 {
-    gui_page_t *page = (gui_page_t *)obj;
-    if (GUI_TYPE(gui_page_t, obj)->speed <= 3 && GUI_TYPE(gui_page_t, obj)->speed >= -3)
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if ((this->speed <= 3) && (this->speed >= -3))
     {
-        if (page->align_hight > 0)
+        if (this->align_hight > 0)
         {
-            if ((GUI_TYPE(gui_page_t, obj)->speed > 0 && obj->y >= page->target) ||
-                (GUI_TYPE(gui_page_t, obj)->speed < 0 && obj->y <= page->target))
+            if (((this->speed > 0) && (obj->y >= this->target))
+                || ((this->speed < 0) && (obj->y <= this->target)))
             {
-                GUI_TYPE(gui_page_t, obj)->speed = 0;
-                GUI_TYPE(gui_page_t, obj)->release = false;
-                obj->y = page->target;
+                this->speed = 0;
+                this->release = false;
+                obj->y = this->target;
                 gui_obj_event_set(obj, GUI_EVENT_7);
             }
-            obj->y += GUI_TYPE(gui_page_t, obj)->speed;
-            if (GUI_TYPE(gui_page_t, obj)->speed != 0)
+
+            obj->y += this->speed;
+
+            if (this->speed != 0)
             {
                 gui_obj_event_set(obj, GUI_EVENT_8);
             }
-
         }
         else
         {
-            GUI_TYPE(gui_page_t, obj)->speed = 0;
-            GUI_TYPE(gui_page_t, obj)->release = false;
+            this->speed = 0;
+            this->release = false;
             gui_obj_event_set(obj, GUI_EVENT_7);
         }
     }
 }
-#define GUI_PAGE_MAX_SPEED 60
-#define GUI_PAGE_MIN_SPEED 7
 
-static void input_prepare(gui_obj_t *obj)
+static void gui_page_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
+    gui_page_t *this = (gui_page_t *)obj;
+
     GUI_UNUSED(tp);
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == false)
     {
         return;
     }
+
     if (obj->parent->matrix && obj->parent->matrix->m[1][2] != 0)
     {
         return;
     }
-    if (obj->y != ((gui_page_t *)obj)->start_y)
+
+    if (obj->y != this->start_y)
     {
         gui_obj_skip_other_down_hold(obj);
-        if (((gui_page_t *)obj)->top_slide_only)
+        if (this->top_slide_only)
         {
             gui_obj_skip_other_left_hold(obj);
             gui_obj_skip_other_right_hold(obj);
         }
     }
-    if (obj->y != ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height()))
+
+    if (obj->y != (this->start_y - (obj->h - (int)gui_get_screen_height())))
     {
         gui_obj_skip_other_up_hold(obj);
     }
-
-
 }
 
-void page_update(gui_obj_t *obj)
+void gui_page_update(gui_obj_t *obj)
 {
-    obj_update_att(obj);
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
+    gui_page_update_att(obj);
     obj->h = gui_get_screen_height();
-    page_height(obj, obj);
-    gui_page_t *page = (gui_page_t *)obj;
-    if (page->gesture_flag)
+    gui_page_set_height(obj, obj);
+
+    touch_info_t *tp = tp_get_info();
+    gui_page_t *this = (gui_page_t *)obj;
+
+    if (this->gesture_flag)
     {
         return;
     }
+
     if (obj->parent->matrix && obj->parent->matrix->m[1][2] != 0)
     {
         return;
     }
+
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
-        if ((tp->x > ((gui_page_t *)obj)->start_x) && (tp->x < ((gui_page_t *)obj)->start_x + obj->w))
+        if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
         {
-            if ((tp->y > ((gui_page_t *)obj)->start_y) && (tp->y < ((gui_page_t *)obj)->start_y + obj->h))
+            if ((tp->y > this->start_y) && (tp->y < this->start_y + obj->h))
             {
                 if ((tp->type == TOUCH_HOLD_Y))
                 {
-                    hold_y(obj);
+                    gui_page_hold_y(obj);
                 }
                 else if (tp->released)
                 {
                     int max_speed = GUI_PAGE_MAX_SPEED;
+
                     if (tp->type == TOUCH_UP_SLIDE)
                     {
                         gui_log("page TOUCH_UP_SLIDE\n");
-                        if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+
+                        if (this->speed == 0)
                         {
-                            GUI_TYPE(gui_page_t, obj)->speed = -max_speed;
+                            this->speed = -max_speed;
                         }
                     }
                     else if (tp->type == TOUCH_DOWN_SLIDE)
                     {
                         gui_log("page TOUCH_DOWN_SLIDE\n");
-                        if (GUI_TYPE(gui_page_t, obj)->speed == 0)
+
+                        if (this->speed == 0)
                         {
-                            GUI_TYPE(gui_page_t, obj)->speed = max_speed;
+                            this->speed = max_speed;
                         }
                     }
-                    if (GUI_TYPE(gui_page_t, obj)->speed != 0)
+
+                    if (this->speed != 0)
                     {
-                        GUI_TYPE(gui_page_t, obj)->release = true;
+                        this->release = true;
                         gui_obj_event_set(obj, GUI_EVENT_8);
                     }
                     else
                     {
                         gui_obj_event_set(obj, GUI_EVENT_7);
                     }
-
                 }
                 else if (tp->pressed)
                 {
-                    GUI_TYPE(gui_page_t, obj)->release = false;
-                    GUI_TYPE(gui_page_t, obj)->speed = 0;
-                    memset(page->recode, 0, 10);
+                    this->release = false;
+                    this->speed = 0;
+                    memset(this->recode, 0, 10);
                     gui_obj_event_set(obj, GUI_EVENT_7);
                 }
+
                 if (tp->type != TOUCH_HOLD_Y)
                 {
-                    if (GUI_TYPE(gui_page_t, obj)->release)
+                    if (this->release)
                     {
-                        inertial(obj);
-                        alien(obj);
+                        gui_page_update_inertial(obj);
+                        gui_page_update_alien(obj);
                     }
-                    boundary(obj);
-                    ((gui_page_t *)obj)->yold = obj->y;
+                    gui_page_update_boundary(obj);
+                    this->yold = obj->y;
                 }
             }
         }
-        layer(obj);
+        gui_page_update_layer(obj);
     }
 }
-static void page_update_rebound(gui_obj_t *obj)
+
+static void gui_page_update_rebound(gui_obj_t *obj)
 {
-    obj_update_att(obj);
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
+    gui_page_update_att(obj);
+
     obj->h = gui_get_screen_height();
-    page_height(obj, obj);
+    gui_page_set_height(obj, obj);
+
+    touch_info_t *tp = tp_get_info();
+    gui_page_t *this = (gui_page_t *)obj;
+
     if (obj->parent->matrix && obj->parent->matrix->m[1][2] != 0)
     {
         return;
     }
-    gui_page_t *page = (gui_page_t *)obj;
+
     if (tp->pressed && gui_point_in_obj_rect(obj, tp->x, tp->y))
     {
-        page->press = true;
+        this->press = true;
     }
-    if ((tp->x > ((gui_page_t *)obj)->start_x) && (tp->x < ((gui_page_t *)obj)->start_x + obj->w))
+
+    if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
     {
+        if ((tp->type == TOUCH_HOLD_Y) && (this->press == true))
         {
-            if ((tp->type == TOUCH_HOLD_Y) && (page->press == true))
+            if (tp->deltaY + tp->y < 0)
             {
-                if (tp->deltaY + tp->y < 0)
-                {
-                    tp->deltaY = -tp->y;
-                }
-                obj->y = tp->deltaY + ((gui_page_t *)obj)->yold;
-                gui_obj_event_set(obj, GUI_EVENT_8);
-                if (obj->y > ((gui_page_t *)obj)->start_y)
-                {
-                    GUI_TYPE(gui_page_t, obj)->status = 1;
-                }
-                else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-                         obj->y != 0)
-                {
-                    GUI_TYPE(gui_page_t, obj)->status = 2;
-                }
-                speed(obj);
-                if (GUI_TYPE(gui_page_t, obj)->status == 1)
-                {
-                    GUI_TYPE(gui_page_t, obj)->speed = -40;
-                }
-                else if (GUI_TYPE(gui_page_t, obj)->status == 2)
-                {
-                    GUI_TYPE(gui_page_t, obj)->speed = 40;
-                }
+                tp->deltaY = -tp->y;
             }
-            else if (tp->released)
-            {
-                int max_speed = 60;
-                page->press = 0;
-                if (tp->type == TOUCH_UP_SLIDE)
-                {
-                    gui_log("page TOUCH_UP_SLIDE\n");
-                    if (GUI_TYPE(gui_page_t, obj)->speed == 0)
-                    {
-                        GUI_TYPE(gui_page_t, obj)->speed = -max_speed;
-                    }
-                }
-                else if (tp->type == TOUCH_DOWN_SLIDE)
-                {
-                    gui_log("page TOUCH_DOWN_SLIDE\n");
-                    if (GUI_TYPE(gui_page_t, obj)->speed == 0)
-                    {
-                        GUI_TYPE(gui_page_t, obj)->speed = max_speed;
-                    }
-                }
-                if (GUI_TYPE(gui_page_t, obj)->speed != 0)
-                {
-                    GUI_TYPE(gui_page_t, obj)->release = true;
-                    gui_obj_event_set(obj, GUI_EVENT_8);
-                }
-                else
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_7);
-                }
-            }
-            else if (tp->pressed)
-            {
-                GUI_TYPE(gui_page_t, obj)->release = false;
-                GUI_TYPE(gui_page_t, obj)->speed = 0;
-                GUI_TYPE(gui_page_t, obj)->status = 0;
-                memset(page->recode, 0, 10);
-                gui_obj_event_set(obj, GUI_EVENT_7);
-            }
-            if (tp->type != TOUCH_HOLD_Y)
-            {
-                switch (GUI_TYPE(gui_page_t, obj)->status)
-                {
-                case 0:
-                    {
-                        if (GUI_TYPE(gui_page_t, obj)->release)
-                        {
-                            inertial(obj);
-                            alien(obj);
-                        }
-                        if (obj->y > ((gui_page_t *)obj)->start_y)/*@TOP*/
-                        {
-                            obj->y = ((gui_page_t *)obj)->start_y;
-                            GUI_TYPE(gui_page_t, obj)->release = false;
-                            gui_obj_event_set(obj, GUI_EVENT_7);
-                        }
-                        else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-                                 obj->y != 0)/*@BOTTOM*/
-                        {
-                            GUI_TYPE(gui_page_t, obj)->release = false;
-                            obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
-                            gui_obj_event_set(obj, GUI_EVENT_7);
-                        }
-                    }
-                    break;
-                case 1:
-                    {
-                        if (GUI_TYPE(gui_page_t, obj)->release)
-                        {
-                            inertial(obj);
-                            alien(obj);
-                        }
-                        if (obj->y < ((gui_page_t *)obj)->start_y)/*@TOP*/
-                        {
-                            obj->y = ((gui_page_t *)obj)->start_y;
-                            GUI_TYPE(gui_page_t, obj)->release = false;
-                            gui_obj_event_set(obj, GUI_EVENT_7);
-                        }
-                        else if (obj->y < (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-                                 obj->y != 0)/*@BOTTOM*/
-                        {
-                            GUI_TYPE(gui_page_t, obj)->release = false;
-                            obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
-                            gui_obj_event_set(obj, GUI_EVENT_7);
-                        }
-                    }
-                    break;
-                case 2:
-                    {
-                        if (GUI_TYPE(gui_page_t, obj)->release)
-                        {
-                            inertial(obj);
-                            alien(obj);
-                        }
-                        if (obj->y > ((gui_page_t *)obj)->start_y)/*@TOP*/
-                        {
-                            obj->y = ((gui_page_t *)obj)->start_y;
-                            GUI_TYPE(gui_page_t, obj)->release = false;
-                            gui_obj_event_set(obj, GUI_EVENT_7);
-                        }
-                        else if (obj->y > (((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height())) &&
-                                 obj->y != 0)/*@BOTTOM*/
-                        {
-                            GUI_TYPE(gui_page_t, obj)->release = false;
-                            obj->y = ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height());
-                            gui_obj_event_set(obj, GUI_EVENT_7);
 
-                        }
-                    }
-                    break;
-                default:
-                    break;
-                }
+            obj->y = tp->deltaY + this->yold;
+            gui_obj_event_set(obj, GUI_EVENT_8);
 
-                ((gui_page_t *)obj)->yold = obj->y;
+            if (obj->y > this->start_y)
+            {
+                this->status = 1;
+            }
+            else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                     obj->y != 0)
+            {
+                this->status = 2;
+            }
+
+            gui_page_update_speed(obj);
+
+            if (this->status == 1)
+            {
+                this->speed = -40;
+            }
+            else if (this->status == 2)
+            {
+                this->speed = 40;
             }
         }
+        else if (tp->released)
+        {
+            int max_speed = 60;
+            this->press = 0;
+
+            if (tp->type == TOUCH_UP_SLIDE)
+            {
+                gui_log("page TOUCH_UP_SLIDE\n");
+                if (this->speed == 0)
+                {
+                    this->speed = -max_speed;
+                }
+            }
+
+            else if (tp->type == TOUCH_DOWN_SLIDE)
+            {
+                gui_log("page TOUCH_DOWN_SLIDE\n");
+                if (this->speed == 0)
+                {
+                    this->speed = max_speed;
+                }
+            }
+
+            if (this->speed != 0)
+            {
+                this->release = true;
+                gui_obj_event_set(obj, GUI_EVENT_8);
+            }
+            else
+            {
+                gui_obj_event_set(obj, GUI_EVENT_7);
+            }
+        }
+        else if (tp->pressed)
+        {
+            this->release = false;
+            this->speed = 0;
+            this->status = 0;
+            memset(this->recode, 0, 10);
+            gui_obj_event_set(obj, GUI_EVENT_7);
+        }
+
+        if (tp->type != TOUCH_HOLD_Y)
+        {
+            switch (this->status)
+            {
+            case PAGE_REBOUND_NOT:
+                {
+                    if (this->release)
+                    {
+                        gui_page_update_inertial(obj);
+                        gui_page_update_alien(obj);
+                    }
+
+                    if (obj->y > this->start_y)/*@TOP*/
+                    {
+                        obj->y = this->start_y;
+                        this->release = false;
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+                    }
+                    else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                             obj->y != 0)/*@BOTTOM*/
+                    {
+                        this->release = false;
+                        obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+                    }
+                }
+                break;
+
+            case PAGE_REBOUND_UP:
+                {
+                    if (this->release)
+                    {
+                        gui_page_update_inertial(obj);
+                        gui_page_update_alien(obj);
+                    }
+
+                    if (obj->y < this->start_y)/*@TOP*/
+                    {
+                        obj->y = this->start_y;
+                        this->release = false;
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+                    }
+                    else if (obj->y < (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                             obj->y != 0)/*@BOTTOM*/
+                    {
+                        this->release = false;
+                        obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+                    }
+                }
+                break;
+
+            case PAGE_REBOUND_DOWN:
+                {
+                    if (this->release)
+                    {
+                        gui_page_update_inertial(obj);
+                        gui_page_update_alien(obj);
+                    }
+
+                    if (obj->y > this->start_y)/*@TOP*/
+                    {
+                        obj->y = this->start_y;
+                        this->release = false;
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+                    }
+                    else if (obj->y > (this->start_y - (obj->h - (int)gui_get_screen_height())) &&
+                             obj->y != 0)/*@BOTTOM*/
+                    {
+                        this->release = false;
+                        obj->y = this->start_y - (obj->h - (int)gui_get_screen_height());
+                        gui_obj_event_set(obj, GUI_EVENT_7);
+
+                    }
+                }
+                break;
+
+            default:
+                break;
+            }
+            this->yold = obj->y;
+        }
     }
-    layer(obj);
+    gui_page_update_layer(obj);
 }
 
-void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                   int16_t y, int16_t w, int16_t h)
+void gui_page_destory(gui_obj_t *obj)
 {
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h
-                );
+    gui_page_t *this = (gui_page_t *)obj;
+    if (this->animate)
+    {
+        gui_free(this->animate);
+    }
+}
+
+void gui_page_ctor(gui_page_t *this,
+                   gui_obj_t  *parent,
+                   const char *filename,
+                   int16_t     x,
+                   int16_t     y,
+                   int16_t     w,
+                   int16_t     h)
+{
+    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     GET_BASE(this)->type = PAGE;
-    GET_BASE(this)->obj_prepare = page_update;
-    GET_BASE(this)->obj_input_prepare = input_prepare;
-    GET_BASE(this)->obj_destory = dtor;
+    GET_BASE(this)->obj_prepare = gui_page_update;
+    GET_BASE(this)->obj_input_prepare = gui_page_input_prepare;
+    GET_BASE(this)->obj_destory = gui_page_destory;
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;
 }
 
-gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16_t y,
-                            int16_t w, int16_t h)
+gui_page_t *gui_page_create(void       *parent,
+                            const char *filename,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h)
 {
 #define _GUI_NEW_gui_page_create_param this, parent, filename, x, y, w, h
     GUI_NEW(gui_page_t, gui_page_ctor, _GUI_NEW_gui_page_create_param)
 }
+
 void gui_page_rebound(gui_page_t *this, bool rebound)
 {
     if (rebound)
     {
-        GET_BASE(this)->obj_prepare = page_update_rebound;
+        GET_BASE(this)->obj_prepare = gui_page_update_rebound;
     }
     else
     {
-        GET_BASE(this)->obj_prepare = page_update;
-    }
-
-
-}
-void gui_page_center_alignment(gui_page_t *page, int align_hight)
-{
-    page->align_hight = align_hight;
-}
-void gui_page_set_only_top_slide(gui_page_t *page, bool flag)
-{
-    page->top_slide_only = flag;
-}
-static void dtor(gui_obj_t *obj)
-{
-    if (GUI_TYPE(gui_page_t, obj)->animate)
-    {
-        gui_free(GUI_TYPE(gui_page_t, obj)->animate);
+        GET_BASE(this)->obj_prepare = gui_page_update;
     }
 }
-void gui_page_dtor(gui_obj_t *obj)
+
+void gui_page_center_alignment(gui_page_t *this, int align_hight)
 {
-    dtor(obj);
+    this->align_hight = align_hight;
 }
+
+void gui_page_set_only_top_slide(gui_page_t *this, bool flag)
+{
+    this->top_slide_only = flag;
+}
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

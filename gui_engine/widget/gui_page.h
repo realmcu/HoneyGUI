@@ -28,10 +28,10 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
-#include <gui_curtain.h>
-#include <gui_img.h>
+#include "guidef.h"
+#include "gui_fb.h"
+#include "gui_curtain.h"
+#include "gui_img.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -73,15 +73,12 @@ typedef struct gui_page
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
 } gui_page_t;
 
-/** @brief  PAGE widget api structure */
-typedef struct _gui_api_page
+typedef enum
 {
-    void (*gui_page_add_scroll_bar)(gui_page_t *this, void *bar_pic);
-    void (*gui_page_add_scroll_bar_from_fs)(gui_page_t *this, void *bar_pic);
-    void (*set_offset)(gui_page_t *this, int offset);
-    int (*get_offset)(gui_page_t *this);
-} _gui_api_page_t;
-
+    PAGE_REBOUND_NOT  = 0,
+    PAGE_REBOUND_UP   = 1,
+    PAGE_REBOUND_DOWN = 2,
+} T_PAGE_REBOUND_TYPE;
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -95,7 +92,6 @@ typedef struct _gui_api_page
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -108,6 +104,8 @@ typedef struct _gui_api_page
   * @{
   */
 
+#define GUI_PAGE_MAX_SPEED 60
+#define GUI_PAGE_MIN_SPEED 7
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -120,7 +118,6 @@ typedef struct _gui_api_page
   * @brief
   * @{
   */
-
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -140,7 +137,15 @@ typedef struct _gui_api_page
  * @param obj widget pointer.
  *
  */
-void page_update(gui_obj_t *obj);
+void gui_page_update(gui_obj_t *obj);
+
+/**
+ * @brief destory the page widget.
+ *
+ * @param obj widget pointer.
+ *
+ */
+void gui_page_destory(gui_obj_t *obj);
 
 /**
  * @brief construct a page widget.
@@ -154,9 +159,14 @@ void page_update(gui_obj_t *obj);
  * @param h the hight.
  *
  */
-void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                   int16_t y, int16_t w, int16_t h);
-//gui_grid
+void gui_page_ctor(gui_page_t *this,
+                   gui_obj_t  *parent,
+                   const char *filename,
+                   int16_t     x,
+                   int16_t     y,
+                   int16_t     w,
+                   int16_t     h);
+
 /**
  * @brief create a page widget.
  *
@@ -176,11 +186,53 @@ void gui_page_ctor(gui_page_t *this, gui_obj_t *parent, const char *filename, in
  *}
  * \endcode
  */
-gui_page_t *gui_page_create(void *parent, const char *filename, int16_t x, int16_t y,
-                            int16_t w, int16_t h);
+gui_page_t *gui_page_create(void       *parent,
+                            const char *filename,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h);
 
-extern _gui_api_page_t gui_page_api;
-void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeat_count, void *callback, void *p);
+/**
+ * @brief
+ *
+ * @param this widget object pointer
+ * @param bar_pic bar picture address
+ * @param src_mode image source mode, 0 memory and 1 file system
+ */
+void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode);
+
+/**
+ * @brief
+ *
+ * @param this widget object pointer
+ * @param offset page offset
+ */
+void gui_page_set_offset(gui_page_t *this, int offset);
+
+/**
+ * @brief
+ *
+ * @param  this widget object pointer
+ * @return page offset
+ */
+int gui_page_get_offset(gui_page_t *this);
+
+/**
+ * @brief
+ *
+ * @param o widget object pointer
+ * @param dur Animation duration
+ * @param repeat_count Repeat play times, -1 means play on repeat forever
+ * @param callback animate frame callback
+ * @param p parameter
+ */
+void gui_page_set_animate(gui_page_t *this,
+                          uint32_t    dur,
+                          int         repeat_count,
+                          void       *callback,
+                          void       *p);
+
 /**
  * @brief config rebound
  *
@@ -188,6 +240,7 @@ void gui_page_set_animate(gui_page_t *o, uint32_t dur, int repeat_count, void *c
  * @param rebound true: config rebound; false: not rebound;
  */
 void gui_page_rebound(gui_page_t *this, bool rebound);
+
 /**
  * @brief automatic center alignment
  *
@@ -216,4 +269,3 @@ void gui_page_set_only_top_slide(gui_page_t *page, bool flag);
 #endif
 
 #endif
-

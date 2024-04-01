@@ -95,7 +95,7 @@ void gui_scroll_wheel_update_att(gui_obj_t *obj)
         o->y = (child_count++) * child_gap;
     }
 
-    page_update(obj);
+    gui_page_update(obj);
     if ((((gui_page_t *)obj)->start_y - obj->y - ((gui_scroll_wheel_t *)obj)->child_gap / 2) <= 0)
     {
         current_row = 0;
