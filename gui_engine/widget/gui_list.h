@@ -32,7 +32,6 @@ extern "C" {
 #error not supported tool chain
 #endif
 
-
 struct gui_list_node
 {
     struct gui_list_node *next;                          /**< point to next node. */
@@ -47,10 +46,12 @@ gui_inline void gui_list_init(gui_list_t *l)
 
 gui_inline void gui_list_append(gui_list_t *l, gui_list_t *n)
 {
-    gui_list_t *node;
+    gui_list_t *node = l;
 
-    node = l;
-    while (node->next != l) { node = node->next; }
+    while (node->next != l)
+    {
+        node = node->next;
+    }
 
     /* append the node to the tail */
     node->next = n;
@@ -71,7 +72,6 @@ gui_inline void gui_list_insert_before(gui_list_t *l, gui_list_t *n)
     l->prev = n;
     n->next = l;
 }
-
 
 gui_inline void gui_list_insert(gui_list_t *l, gui_list_t *n)
 {
