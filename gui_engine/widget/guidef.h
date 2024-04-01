@@ -380,27 +380,6 @@ typedef struct gui_animate
 } gui_animate_t;
 
 
-typedef struct _gui_img_file_head
-{
-    unsigned char scan : 1;
-    unsigned char align : 1;
-    unsigned char rsvd : 3;
-    unsigned char compress : 3;
-    char type;
-
-    union
-    {
-        int vector_size;
-        struct
-        {
-            short img_w;
-            short img_h;
-        } img_size;
-    } size;
-    char version;
-    char rsvd2;
-} gui_img_file_head_t;
-
 typedef struct _gui_obj_t
 {
     const char *name;

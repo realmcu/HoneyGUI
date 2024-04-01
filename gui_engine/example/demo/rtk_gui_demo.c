@@ -108,9 +108,27 @@ static void px_main(gui_px_t *this)
 //}
 
 #include "gui_cube.h"
+#include "tiger_blue_compressed.c"
+#include "acc_sw_rle.h"
 
 static void app_dialing_ui_design(gui_app_t *app)
 {
+    gui_img_file_t *file = (gui_img_file_t *)_actiger_blue_compressed;
+    imdc_file_t *compressed = (imdc_file_t *)(&(file->data.idc_file));
+
+    uint8_t test_buf[10 * 10 * 2 * 100];
+
+    // uncompressed_rle_rect(compressed, 0, 0, 10, 10, test_buf);
+
+    //uncompressed_rle_line(compressed, 0, 0, 100, test_buf);
+    uncompressed_rle_rgb565(compressed, 0, test_buf);
+
+    gui_img_t *img = gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue, 0, 0,
+                                             0, 0);
+
+    //gui_img_rotation(img, 45, 0, 0);
+    //return;
+
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, REDUCTION);
     gui_tab_t *tab_1 = gui_tab_create(tv, "tb_1",    0, 0, 0, 0, 0, 0);

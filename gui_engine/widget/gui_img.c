@@ -175,14 +175,12 @@ static void img_prepare(gui_obj_t *obj)
         }
     }
     gui_img_t *this = (gui_img_t *)obj;
-    gui_obj_t *root = (gui_obj_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     draw_img_t *draw_img = &this->draw_img;
 
     gui_image_load_scale(draw_img);
-    root->w = draw_img->img_w;
-    root->h = draw_img->img_h;
+
 
 
     matrix_translate(this->t_x, this->t_y, obj->matrix);
@@ -195,6 +193,11 @@ static void img_prepare(gui_obj_t *obj)
 
     matrix_inverse(draw_img->inverse);
     gui_image_new_area(draw_img);
+
+    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
+    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
+    draw_img->target_h = m_h;
+    draw_img->target_w = m_w;
 
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
@@ -225,14 +228,14 @@ static void img_draw_cb(gui_obj_t *obj)
     struct gui_dispdev *dc = gui_get_dc();
     draw_img_t *draw_img = &img->draw_img;
 
-    gui_rect_t draw_rect = {0};
-    draw_rect.x1 = draw_img->img_x;
-    draw_rect.y1 = draw_img->img_y;
-    draw_rect.x2 = draw_rect.x1 + draw_img->target_w - 1;
-    draw_rect.y2 = draw_rect.y1 + draw_img->target_h - 1;
+    gui_rect_t rect = {0};
+    rect.x1 = draw_img->img_x;
+    rect.y1 = draw_img->img_y;
+    rect.x2 = rect.x1 + draw_img->target_w - 1;
+    rect.y2 = rect.y1 + draw_img->target_h - 1;
     if (gui_get_acc() != NULL)
     {
-        gui_acc_blit(draw_img, dc, &draw_rect);
+        gui_acc_blit(draw_img, dc, &rect);
     }
     else
     {
@@ -324,8 +327,8 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
     this->scale_y = 1.0f;
 
     this->opacity = draw_img->opacity_value;
-    root->w = gui_img_get_width(this);
-    root->h = gui_img_get_height(this);
+    root->w = _UI_MIN(gui_img_get_width(this), root->w);
+    root->h = _UI_MIN(gui_img_get_height(this), root->h);
 
     gui_rgb_data_head_t head = rtgui_image_get_header(draw_img);
     if (head.resize == 0)

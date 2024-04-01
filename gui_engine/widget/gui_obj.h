@@ -324,6 +324,17 @@ void gui_obj_skip_all_child_up_hold(gui_obj_t *obj);
 void gui_obj_skip_other_up_hold(gui_obj_t *obj);
 
 /**
+ * @brief
+ *
+ * @param obj
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ */
+void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_t *h);
+
+/**
  * @brief judge the point if in range of this obj rect
  *
  * @param obj
