@@ -48,7 +48,6 @@
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -70,7 +69,16 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-
+extern void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
+                                 int16_t x, int16_t y, int16_t w, int16_t h);
+extern void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
+                                   int16_t x, int16_t y, int16_t w, int16_t h);
+extern void gui_progressbar_v_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void *picture,
+                                       int16_t x, int16_t y);
+extern void gui_progressbar_h_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void *picture,
+                                       int16_t x, int16_t y);
+extern void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent,
+                                       void **picture_array, uint16_t array_number, int16_t x, int16_t y);
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -518,9 +526,6 @@ void gui_seekbar_ctor_img_v(gui_seekbar_t *this,
                             int16_t        x,
                             int16_t        y)
 {
-    extern void gui_progressbar_v_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void *picture,
-                                           int16_t x,
-                                           int16_t y);
     gui_progressbar_v_img_ctor(&(this->base), parent, picture, x, y);
 
     this->base.base.type = SEEKBAR;
@@ -534,9 +539,6 @@ void gui_seekbar_ctor_img_h(gui_seekbar_t *this,
                             int16_t        x,
                             int16_t        y)
 {
-    extern void gui_progressbar_h_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void *picture,
-                                           int16_t x,
-                                           int16_t y);
     gui_progressbar_h_img_ctor(&(this->base), parent, picture, x, y);
 
     this->base.base.type = SEEKBAR;
@@ -551,10 +553,6 @@ void gui_seekbar_ctor_movie_h(gui_seekbar_t  *this,
                               int16_t         x,
                               int16_t         y)
 {
-    extern void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent,
-                                           void  **picture_array, uint16_t array_number,
-                                           int16_t x,
-                                           int16_t y);
     gui_progressbar_movie_ctor(&(this->base), parent, picture_array, array_length, x, y);
 
     this->base.base.type = SEEKBAR;
@@ -573,10 +571,6 @@ void gui_seekbar_ctor_movie_v(gui_seekbar_t  *this,
                               int16_t         x,
                               int16_t         y)
 {
-    extern void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent,
-                                           void  **picture_array, uint16_t array_number,
-                                           int16_t x,
-                                           int16_t y);
     gui_progressbar_movie_ctor(&(this->base), parent, picture_array, array_length, x, y);
 
     this->base.base.type = SEEKBAR;
@@ -603,10 +597,6 @@ void gui_seekbar_ctor_movie_arc(gui_seekbar_t  *this,
 {
     uint16_t w, h;
 
-    extern void gui_progressbar_movie_ctor(gui_progressbar_t *this, gui_obj_t *parent,
-                                           void  **picture_array, uint16_t array_number,
-                                           int16_t x,
-                                           int16_t y);
     gui_progressbar_movie_ctor(&(this->base), parent, picture_array, array_length, x, y);
 
     this->arc_end = arc_end;
