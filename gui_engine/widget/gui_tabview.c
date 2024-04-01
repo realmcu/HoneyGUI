@@ -339,6 +339,14 @@ static void tabview_prepare(gui_obj_t *obj)
         break;
     case TOUCH_RIGHT_SLIDE:
         gui_log("[TV]TOUCH_RIGHT_SLIDE\n");
+        if (tabview->tab_cnt_left == 0 && tabview->cur_id.x == 0)
+        {
+            break;
+        }
+        if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
+        {
+            break;
+        }
         //when current tab is the end,come back to current tab if sliding.
         if (tabview->cur_id.x == tabview->tab_cnt_left)
         {
