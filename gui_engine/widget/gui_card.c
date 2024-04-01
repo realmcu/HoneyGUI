@@ -17,16 +17,13 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
-#include <gui_server.h>
-#include <gui_obj.h>
-#include <tp_algo.h>
+#include "guidef.h"
+#include "gui_server.h"
+#include "tp_algo.h"
+#include "gui_obj.h"
 #include "gui_card.h"
 #include "gui_matrix.h"
-
-
-
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -64,7 +61,6 @@
   */
 
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -87,29 +83,20 @@
   * @{
   */
 
-static void input_prepare(gui_obj_t *obj)
+static void gui_card_input_prepare(gui_obj_t *obj)
 {
     gui_card_t *this = (gui_card_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
     matrix_translate(0, this->id * obj->h, obj->matrix);
 }
 
-static void prepare(gui_obj_t *obj)
+static void gui_card_prepare(gui_obj_t *obj)
 {
     gui_card_t *this = (gui_card_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
     gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
-
-    float h = gui_get_screen_height();
-
-
-
     int32_t location = this->ay + parent->hold_y + parent->offset_y;
-
-
-
+    float h = gui_get_screen_height();
+    float t;
+    float scale;
 
     if (location < h / 2)
     {
@@ -117,29 +104,20 @@ static void prepare(gui_obj_t *obj)
     }
     else if (location < (h / 2 + obj->h))
     {
-        float t = (location - h / 2) / (h / 2);
-
-        float scale = (1.0f - t) * 0.2f + 0.8f;
-
-
+        t = (location - h / 2) / (h / 2);
+        scale = (1.0f - t) * 0.2f + 0.8f;
 
         matrix_translate(0, location, obj->matrix);
-
-
         matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
         matrix_scale(scale, scale, obj->matrix);
         matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
     }
     else if (location < (h / 2 + obj->h + obj->h))
     {
-        float t = (location - h / 2) / (h / 2);
-
-        float scale = (1.0f - t) * 0.2f + 0.8f;
-
+        t = (location - h / 2) / (h / 2);
+        scale = (1.0f - t) * 0.2f + 0.8f;
 
         matrix_translate(0,  h / 2 + obj->h, obj->matrix);
-
-
         matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
         matrix_scale(scale, scale, obj->matrix);
         matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
@@ -148,28 +126,26 @@ static void prepare(gui_obj_t *obj)
     {
         //out of rang
         matrix_translate(0, location, obj->matrix);
-
         matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
         matrix_scale(0.7, 0.7, obj->matrix);
         matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
     }
-
-
 }
 
-
-
-static void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                          int16_t y,
-                          int16_t w, int16_t h)
+static void gui_card_ctor(gui_card_t *this,
+                          gui_obj_t  *parent,
+                          const char *filename,
+                          int16_t    x,
+                          int16_t    y,
+                          int16_t    w,
+                          int16_t    h)
 {
-
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     gui_cardview_t *cardview = (gui_cardview_t *)parent;
     gui_obj_t *obj = GET_BASE(this);
 
-    GET_BASE(this)->obj_input_prepare = input_prepare;
-    GET_BASE(this)->obj_prepare = prepare;
+    GET_BASE(this)->obj_input_prepare = gui_card_input_prepare;
+    GET_BASE(this)->obj_prepare = gui_card_prepare;
     GET_BASE(this)->type = CARD;
     if (parent->type != CARDVIEW)
     {
@@ -184,21 +160,23 @@ static void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filen
 
     gui_log("card[%s] id is = %d, ay = %d, cardview->height = %d \n", obj->name, this->id, this->ay,
             cardview->height);
-
-
 }
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-
-gui_card_t *gui_card_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w,
-                            int16_t h)
+gui_card_t *gui_card_create(void       *parent,
+                            const char *name,
+                            int16_t    x,
+                            int16_t    y,
+                            int16_t    w,
+                            int16_t    h)
 {
     if (w == 0)
     {
         w = (int)gui_get_screen_width();
     }
+
     if (h == 0)
     {
         h = (int)gui_get_screen_height();
@@ -216,6 +194,7 @@ gui_card_t *gui_card_create(void *parent, const char *name, int16_t x, int16_t y
         gui_list_insert(&((GET_BASE(this)->parent)->child_list),
                         &(GET_BASE(this)->brother_list));
     }
+
     GET_BASE(this)->create_done = true;
     return this;
 }
@@ -226,12 +205,3 @@ gui_card_t *gui_card_create(void *parent, const char *name, int16_t x, int16_t y
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-
-
-
-
