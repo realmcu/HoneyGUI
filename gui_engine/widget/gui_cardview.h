@@ -29,8 +29,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -44,7 +44,6 @@ extern "C" {
   * @brief
   * @{
   */
-
 
 /** @brief  cardview structure */
 typedef struct gui_cardview
@@ -63,7 +62,6 @@ typedef struct gui_cardview
     void (*status_cb)(struct gui_cardview *this);
     uint8_t checksum;
 } gui_cardview_t;
-
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -89,7 +87,6 @@ typedef struct gui_cardview
   * @brief
   * @{
   */
-
 
 
 /** End of WIDGET_Exported_Macros
@@ -128,8 +125,12 @@ typedef struct gui_cardview
  * @param h the hight of the widget.
  * @return gui_cardview_t*
  */
-gui_cardview_t *gui_cardview_create(void *parent,  const char *name,
-                                    int16_t x, int16_t y, int16_t w, int16_t h);
+gui_cardview_t *gui_cardview_create(void       *parent,
+                                    const char *name,
+                                    int16_t    x,
+                                    int16_t    y,
+                                    int16_t    w,
+                                    int16_t    h);
 
 /**
  * @brief set cardview style
@@ -147,8 +148,6 @@ void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style);
  */
 void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this));
 
-
-
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
@@ -157,14 +156,8 @@ void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *thi
   * @}
   */
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
-
-
-
