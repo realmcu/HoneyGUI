@@ -73,7 +73,6 @@ static void cache_on_psram(uint32_t size)
 #endif
 
 static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
-static uint32_t temp_buf_offset = 0;
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
@@ -122,7 +121,7 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
         memset(GDMA_LLIStruct, 0, p_rect->h * sizeof(GDMA_LLIDef));
     }
     uint32_t start_address = source->address + (p_rect->x + p_rect->y * source->width) * pixel_size;
-    uint32_t dest_address = (uint32_t)cache_buf + temp_buf_offset;
+    uint32_t dest_address = (uint32_t)cache_buf;
     RCC_PeriphClockCmd(APBPeriph_GDMA, APBPeriph_GDMA_CLOCK, ENABLE);
     GDMA_ChannelTypeDef *dma_channel = DMA_CH_BASE(memcpy_dma_num);
     GDMA_InitTypeDef RX_GDMA_InitStruct;
@@ -212,7 +211,6 @@ static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
     while (GDMA_GetTransferINTStatus(memcpy_dma_num) != SET);
     GDMA_ClearINTPendingBit(memcpy_dma_num, GDMA_INT_Transfer);
     source->address = (uint32_t)dest_address;
-    temp_buf_offset += p_rect->w * p_rect->h * pixel_size;
     if (use_LLI)
     {
         os_mem_free(GDMA_LLIStruct);
@@ -741,7 +739,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         return;
     }
 
-    temp_buf_offset = 0;
     ppe_buffer_t target, source;
     memset(&target, 0, sizeof(ppe_buffer_t));
     memset(&source, 0, sizeof(ppe_buffer_t));
@@ -1197,8 +1194,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 ppe_get_identity(&pre_trans);
                 if (dc->type == DC_RAMLESS)
                 {
-                    x_ref = ppe_rect.x + section_x1;
-                    y_ref = ppe_rect.y + section_y1;
+                    x_ref = 0;
+                    y_ref = section_y1;
                 }
                 ppe_translate(x_ref, y_ref, &inverse);
             }
