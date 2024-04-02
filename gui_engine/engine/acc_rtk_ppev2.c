@@ -1217,9 +1217,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             source.high_quality = false;
         }
-        PPEV2_Finish();
         PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &ppe_rect, mode);
-
+        PPEV2_Finish();
         if (err != PPEV2_SUCCESS)
         {
             DBG_DIRECT("PPE err %d", err);
