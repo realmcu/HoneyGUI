@@ -326,7 +326,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
     matrix_multiply_point(obj->matrix, p + 3);
 
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[0] < x_min)
@@ -335,7 +335,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
         }
     }
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[0] > x_max)
@@ -344,7 +344,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
         }
     }
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[1] < y_min)
@@ -353,7 +353,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
         }
     }
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[1] > y_max)
