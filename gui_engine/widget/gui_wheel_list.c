@@ -110,7 +110,7 @@ static void wheel_list_prepare(gui_obj_t *obj)
     gui_wheel_list_t *this = (void *)obj;
 
     float cur_angle;
-    uint8_t cur_tier = 0;
+    uint8_t cur_layer = 0;
     if (tp->pressed || tp->pressing || tp->released)
     {
         float x_length_start = (tp->x - dc->fb_width / 2);
@@ -119,25 +119,25 @@ static void wheel_list_prepare(gui_obj_t *obj)
 
 #if 1
         float distance_cur = x_length_start / cos(tp_angle_start);
-        while ((int)distance_cur > this->distence * cur_tier + this->distence / 2)
+        while ((int)distance_cur > this->distence * cur_layer + this->distence / 2)
         {
-            cur_tier++;
+            cur_layer++;
         }
 #else
         int distance_squ_cur = x_length_start * x_length_start + y_length_start * y_length_start;
         int distance_squ = this->distence * this->distence;
-        while (distance_squ_cur > distance_squ * cur_tier * (cur_tier + 1) + distance_squ / 4)
+        while (distance_squ_cur > distance_squ * cur_layer * (cur_layer + 1) + distance_squ / 4)
         {
-            cur_tier++;
+            cur_layer++;
         }
 #endif
         float x_length = (tp->x + tp->deltaX - dc->fb_width / 2);
         float y_length = (tp->y + tp->deltaY - dc->fb_height / 2);
         float tp_angle_cur = atan2(y_length, x_length);
 
-        cur_angle = this->rotation[cur_tier].angle + tp_angle_cur - tp_angle_start;
+        cur_angle = this->rotation[cur_layer].angle + tp_angle_cur - tp_angle_start;
         // gui_log("tp_angle_start_angle %f,  tp_angle_cur_angle %f\n", (tp_angle_start)/M_PI * 180, (tp_angle_cur)/M_PI * 180);
-        if (cur_tier == 0)
+        if (cur_layer == 0)
         {
             // if (this->icon_list[0][0] != NULL)
             // {
@@ -145,27 +145,28 @@ static void wheel_list_prepare(gui_obj_t *obj)
             //     gui_img_rotation(this->icon_list[0][0], (tp_angle_cur)/M_PI * 180, this->radius, this->radius);
             // }
         }
-        else if (cur_tier <= this->tier)
+        else if (cur_layer <= this->layer)
         {
-            if (this->icon_list[cur_tier] != NULL)
+            if (this->icon_list[cur_layer] != NULL)
             {
-                for (int j = 0; j < 6 * cur_tier; j++)
+                for (int j = 0; j < 6 * cur_layer; j++)
                 {
-                    if (this->icon_list[cur_tier][j] == NULL)
+                    if (this->icon_list[cur_layer][j] == NULL)
                     {
                         continue;
                     }
-                    int x = dc->screen_width / 2 + this->distence * cur_tier * cos(RADIAN_60 * j / cur_tier + cur_angle)
+                    int x = dc->screen_width / 2 + this->distence * cur_layer * cos(RADIAN_60 * j / cur_layer +
+                                                                                    cur_angle)
                             - this->radius;
-                    int y = dc->screen_height / 2 + this->distence * cur_tier * sin(RADIAN_60 * j / cur_tier +
-                                                                                    cur_angle) - this->radius;
-                    gui_img_set_location(this->icon_list[cur_tier][j], x, y);
+                    int y = dc->screen_height / 2 + this->distence * cur_layer * sin(RADIAN_60 * j / cur_layer +
+                                                                                     cur_angle) - this->radius;
+                    gui_img_set_location(this->icon_list[cur_layer][j], x, y);
                 }
             }
         }
         if (tp->released)
         {
-            this->rotation[cur_tier].angle = cur_angle;
+            this->rotation[cur_layer].angle = cur_angle;
         }
     }
     else
@@ -173,7 +174,7 @@ static void wheel_list_prepare(gui_obj_t *obj)
         adjust_radian(&this->rotation[0].angle);
         int base_x = dc->screen_width / 2 - this->radius;
         int base_y = dc->screen_height / 2 - this->radius;
-        for (int i = 1; i <= this->tier; i++)
+        for (int i = 1; i <= this->layer; i++)
         {
             adjust_radian(&this->rotation[i].angle);
             cur_angle = this->rotation[i].angle;
@@ -197,7 +198,7 @@ static void wheel_list_destory(gui_obj_t *obj)
 {
     gui_wheel_list_t *this = (void *)obj;
     gui_free(this->rotation);
-    for (int i = 0; i <= this->tier; i++)
+    for (int i = 0; i <= this->layer; i++)
     {
         gui_free(this->icon_list[i]);
     }
@@ -206,7 +207,7 @@ static void wheel_list_destory(gui_obj_t *obj)
 
 static void gui_wheel_list_ctor(gui_wheel_list_t *this,
                                 gui_obj_t *parent,
-                                uint8_t tier,
+                                uint8_t layer,
                                 uint8_t radius,
                                 uint8_t distence)
 {
@@ -221,15 +222,15 @@ static void gui_wheel_list_ctor(gui_wheel_list_t *this,
     root->obj_prepare = wheel_list_prepare;
     root->obj_destory = wheel_list_destory;
 
-    this->tier = tier;
+    this->layer = layer;
     this->distence = distence;
     this->radius = radius;
-    this->rotation = gui_malloc(sizeof(WHEEL_ANGLE_T) * (tier + 1));
-    this->icon_list = gui_malloc(sizeof(gui_img_t **) * tier);
-    memset(this->icon_list, 0, sizeof(gui_img_t **) * tier);
+    this->rotation = gui_malloc(sizeof(WHEEL_ANGLE_T) * (layer + 1));
+    this->icon_list = gui_malloc(sizeof(gui_img_t **) * layer);
+    memset(this->icon_list, 0, sizeof(gui_img_t **) * layer);
     this->icon_list[0] = gui_malloc(sizeof(gui_img_t *));
     memset(this->icon_list[0], 0, sizeof(gui_img_t *));
-    for (int i = 1; i <= tier ; i++)
+    for (int i = 1; i <= layer ; i++)
     {
         this->icon_list[i] = gui_malloc(sizeof(gui_img_t *) * 6 * i);
         memset(this->icon_list[i], 0, sizeof(gui_img_t *) * 6 * i);
@@ -241,7 +242,7 @@ static void gui_wheel_list_ctor(gui_wheel_list_t *this,
 
 
 gui_wheel_list_t *gui_wheel_list_create(void *parent,
-                                        uint8_t tier,
+                                        uint8_t layer,
                                         uint8_t radius,
                                         uint8_t distence)
 {
@@ -250,7 +251,7 @@ gui_wheel_list_t *gui_wheel_list_create(void *parent,
     GUI_ASSERT(wheel_list != NULL);
     memset(wheel_list, 0x00, sizeof(gui_wheel_list_t));
 
-    gui_wheel_list_ctor(wheel_list, (gui_obj_t *)parent, tier, radius, distence);
+    gui_wheel_list_ctor(wheel_list, (gui_obj_t *)parent, layer, radius, distence);
     gui_list_init(&(GET_BASE(wheel_list)->child_list));
     if ((GET_BASE(wheel_list)->parent) != NULL)
     {
@@ -280,7 +281,7 @@ void gui_wheel_list_add_icon_default(gui_wheel_list_t *this,
             return;
         }
     }
-    for (int i = 1; i <= this->tier; i++)
+    for (int i = 1; i <= this->layer; i++)
     {
         if (this->icon_list[i] != NULL)
         {
@@ -305,23 +306,33 @@ void gui_wheel_list_add_icon_default(gui_wheel_list_t *this,
 void gui_wheel_list_set_icon(gui_wheel_list_t *this,
                              void *icon_addr,
                              gui_event_cb_t event_cb,
-                             uint8_t tier,
+                             uint8_t layer,
                              uint8_t index)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    if (this->icon_list[tier] != NULL)
+    int x = 0;
+    int y = 0;
+    if (this->icon_list[layer] != NULL)
     {
-        if (this->icon_list[tier][index] != NULL)
+        if (this->icon_list[layer][index] != NULL)
         {
-            gui_tree_free(this->icon_list[tier][index]);
+            gui_tree_free(this->icon_list[layer][index]);
         }
-        int x = dc->screen_width / 2 + this->distence * tier * cos(RADIAN_60 * index / tier) - this->radius;
-        int y = dc->screen_height / 2 + this->distence * tier * sin(RADIAN_60 * index / tier) -
+        if (layer == 0 && index == 0)
+        {
+            x = dc->screen_width / 2 - this->radius;
+            y = dc->screen_height / 2 - this->radius;
+        }
+        else
+        {
+            x = dc->screen_width / 2 + this->distence * layer * cos(RADIAN_60 * index / layer) - this->radius;
+            y = dc->screen_height / 2 + this->distence * layer * sin(RADIAN_60 * index / layer) -
                 this->radius;
-        this->icon_list[tier][index] = gui_img_create_from_mem(this, "wl_img_c", icon_addr, x, y, 0, 0);
+        }
+        this->icon_list[layer][index] = gui_img_create_from_mem(this, "wl_img_c", icon_addr, x, y, 0, 0);
         if (event_cb != NULL)
         {
-            gui_obj_add_event_cb(this->icon_list[tier][index], event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
+            gui_obj_add_event_cb(this->icon_list[layer][index], event_cb, GUI_EVENT_TOUCH_CLICKED, NULL);
         }
     }
 }

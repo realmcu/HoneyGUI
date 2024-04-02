@@ -90,23 +90,23 @@ extern "C" {
   * @brief
   * @{
   */
-typedef enum tier_state
+typedef enum layer_state
 {
     RESTING,
     ANTICLOCKWISE,
     CLOCKWISE,
-} TIER_STATE_T;
+} LAYER_STATE_T;
 
 typedef struct wheel_angle
 {
-    TIER_STATE_T state;
+    LAYER_STATE_T state;
     float angle;
 } WHEEL_ANGLE_T;
 
 typedef struct gui_wheel_list
 {
     gui_obj_t base;
-    uint8_t tier;
+    uint8_t layer;
     uint8_t radius;
     uint8_t distence;
     WHEEL_ANGLE_T *rotation;
@@ -129,13 +129,13 @@ typedef struct gui_wheel_list
  * @brief Create a scroll wheel icon list widget.
  *
  * @param parent the father widget the page nested in.
- * @param tier the tier of the wheel list, 0 means there is only one icon in the middle.
+ * @param layer the layer of the wheel list, 0 means there is only one icon in the middle.
  * @param radius Icon image radius.
  * @param distence Distance between the shortest circle center of two layer icon images.
  * @return gui_wheel_list_t*
  */
 gui_wheel_list_t *gui_wheel_list_create(void *parent,
-                                        uint8_t tier,
+                                        uint8_t layer,
                                         uint8_t radius,
                                         uint8_t distence);
 
@@ -157,13 +157,13 @@ void gui_wheel_list_add_icon_default(gui_wheel_list_t *this,
  * @param this widget object pointer
  * @param icon_addr picture address
  * @param event_cb click cb of this image
- * @param tier tier
+ * @param layer layer
  * @param index index
  */
 void gui_wheel_list_set_icon(gui_wheel_list_t *this,
                              void *icon_addr,
                              gui_event_cb_t event_cb,
-                             uint8_t tier,
+                             uint8_t layer,
                              uint8_t index);
 
 
