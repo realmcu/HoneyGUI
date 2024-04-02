@@ -416,6 +416,10 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
 {
+    if (this->len == 0 || this->font_height == 0)
+    {
+        return;
+    }
     void *img;
     gui_img_t *text_img;
 
