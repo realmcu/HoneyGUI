@@ -17,12 +17,11 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
 #include <math.h>
-#include <gui_matrix.h>
-#include <gui_obj.h>
-#include <nanovg.h>
+#include "gui_matrix.h"
+#include "gui_obj.h"
+#include "nanovg.h"
 #include "gui_eq.h"
 
 
@@ -61,7 +60,6 @@
   */
 
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -73,6 +71,10 @@
   */
 
 static float time = 0;
+
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
+                                 uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -84,8 +86,12 @@ static float time = 0;
   * @{
   */
 
-
-static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float t)
+static void gui_eq_draw_graph(NVGcontext *vg,
+                              float       x,
+                              float       y,
+                              float       w,
+                              float       h,
+                              float       t)
 {
     float samples[6];
     float sx[6], sy[6];
@@ -105,20 +111,19 @@ static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float 
         sy[i] = y + h * samples[i] * 0.8f;
     }
 
-
     nvgBeginPath(vg);
     nvgMoveTo(vg, sx[0], sy[0]);
     for (i = 1; i < 6; i++)
     {
         nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
     }
+
     nvgStrokeColor(vg, nvgRGBA(0, 160, 192, 255));
     nvgStrokeWidth(vg, 3.0f);
     nvgStroke(vg);
-
 }
 
-static void eq_prepare(gui_obj_t *obj)
+static void gui_eq_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
     gui_dispdev_t *dc = gui_get_dc();
@@ -131,21 +136,20 @@ static void eq_prepare(gui_obj_t *obj)
     GUI_UNUSED(cy);
 }
 
-static void eq_draw_cb(gui_obj_t *obj)
+static void gui_eq_draw_cb(gui_obj_t *obj)
 {
     gui_eq_t *this = (gui_eq_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
+    NVGcontext *vg;
     GUI_UNUSED(this);
     GUI_UNUSED(dc);
     float x = this->x;
     float y = this->y;
     float w = this->w;
     float h = this->h;
-    extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
-                                     uint8_t *data);
-    extern void nvgDeleteAGGE(NVGcontext * ctx);
-    NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
-                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+
+    vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
+                       (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
     nvgResetTransform(vg);
@@ -153,48 +157,50 @@ static void eq_draw_cb(gui_obj_t *obj)
                  obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
 
     time = time + 0.01f;
-    drawGraph(vg, x, y, w, h, time);
+    gui_eq_draw_graph(vg, x, y, w, h, time);
 
     nvgEndFrame(vg);
     nvgDeleteAGGE(vg);
-
-
 }
-static void eq_end(gui_obj_t *obj)
-{
 
-}
-static void eq_destory(gui_obj_t *obj)
+static void gui_eq_end(gui_obj_t *obj)
 {
 
 }
 
-static void eq_ctor(gui_eq_t *this, gui_obj_t *parent, const char *name,
-                    int16_t x,
-                    int16_t y, int16_t w, int16_t h)
+static void gui_eq_destory(gui_obj_t *obj)
 {
-    //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
 
-    //for root class
+}
+
+static void gui_eq_ctor(gui_eq_t   *this,
+                        gui_obj_t  *parent,
+                        const char *name,
+                        int16_t     x,
+                        int16_t     y,
+                        int16_t     w,
+                        int16_t     h)
+{
     gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = eq_prepare;
-    root->obj_draw = eq_draw_cb;
-    root->obj_end = eq_end;
-    root->obj_destory = eq_destory;
-
-    //for self
-
+    root->obj_prepare = gui_eq_prepare;
+    root->obj_draw = gui_eq_draw_cb;
+    root->obj_end = gui_eq_end;
+    root->obj_destory = gui_eq_destory;
 }
-
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
 
-void gui_eq_set(gui_eq_t *this, float x, float y, float w, float h, float t)
+void gui_eq_set(gui_eq_t *this,
+                float     x,
+                float     y,
+                float     w,
+                float     h,
+                float     t)
 {
     this->x = x;
     this->y = y;
@@ -203,20 +209,26 @@ void gui_eq_set(gui_eq_t *this, float x, float y, float w, float h, float t)
     this->t = t;
 }
 
-gui_eq_t *gui_eq_create(void *parent,  const char *name,
-                        int16_t x,
-                        int16_t y, int16_t w, int16_t h)
+gui_eq_t *gui_eq_create(void       *parent,
+                        const char *name,
+                        int16_t     x,
+                        int16_t     y,
+                        int16_t     w,
+                        int16_t     h)
 {
+    gui_eq_t *this;
+
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
     {
         name = "eq";
     }
-    gui_eq_t *this = gui_malloc(sizeof(gui_eq_t));
+
+    this = gui_malloc(sizeof(gui_eq_t));
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_eq_t));
 
-    eq_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
+    gui_eq_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -231,7 +243,6 @@ gui_eq_t *gui_eq_create(void *parent,  const char *name,
     this->w = w;
     this->t = 0;
 
-
     GET_BASE(this)->create_done = true;
     return this;
 }
@@ -243,9 +254,3 @@ gui_eq_t *gui_eq_create(void *parent,  const char *name,
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-
