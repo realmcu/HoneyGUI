@@ -22,10 +22,12 @@ GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
 /**
  * @link https://www.rapidtables.com/web/color/RGB_Color.html
 */
-#define COLOR_RED gui_rgb(0, 0, 255)
-#define COLOR_CRIMSON gui_rgb(60,20,220)
-#define COLOR_FIREBRICK gui_rgb(34,34,178)
+#define COLOR_RED gui_rgb(255, 0, 0)
+#define COLOR_CRIMSON gui_rgb(220,20,60)
+#define COLOR_FIREBRICK gui_rgb(178,34,34)
 #define COLOR_WHITE gui_rgb(255,255,255)
+#define COLOR_SILVER gui_rgb(192,192,192)
+#define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
 #define HEART_ANI_NAME "_HEART_ANI"
 #define HEART_ANI_W 180
 static void heart_ani_cb(gui_img_t *img);
@@ -36,8 +38,97 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
     gui_page_center_alignment(page, SCREEN_H);
-    gui_rect(page, 0, SCREEN_H, SCREEN_W, SCREEN_H, COLOR_RED);
-    gui_rect(page, 0, SCREEN_H * 2, SCREEN_W, SCREEN_H, COLOR_CRIMSON);
+
+    {
+        gui_img_t *rect = gui_rect(page, 0, SCREEN_H, SCREEN_W, SCREEN_H, COLOR_RED);
+        gui_rect(rect, 10, 100, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10, 200, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10, 300, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10, 400, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4 * 2, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4 * 3, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4 * 4, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        {
+            char *text = "198";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(rect, "txt", 10 + (SCREEN_W - 10 * 2) / 4 * 4 - 30, 100,
+                                            gui_get_screen_width(), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+        }
+        {
+            char *text = "132";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(rect, "txt", 10 + (SCREEN_W - 10 * 2) / 4 * 4 - 30, 200,
+                                            gui_get_screen_width(), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+        }
+        {
+            char *text = "66";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(rect, "txt", 10 + (SCREEN_W - 10 * 2) / 4 * 4 - 30, 300,
+                                            gui_get_screen_width(), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+        }
+        {
+            char *text = "12AM";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(rect, "txt", 10, 400 - 18, gui_get_screen_width(), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+        }
+        {
+            char *text = " 6AM";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(rect, "txt", 10 + (SCREEN_W - 10 * 2) / 4, 400 - 18,
+                                            gui_get_screen_width(), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+        }
+        {
+            char *text = "12PM";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(rect, "txt", 10 + (SCREEN_W - 10 * 2) / 4 * 2, 400 - 18,
+                                            gui_get_screen_width(), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+        }
+        {
+            char *text = " 6PM";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(rect, "txt", 10 + (SCREEN_W - 10 * 2) / 4 * 3, 400 - 18,
+                                            gui_get_screen_width(), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_font_mem_init(addr1);
+            gui_text_type_set(t, addr1);
+        }
+        gui_rect(rect, 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
+        gui_rect(rect, 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
+        gui_rect(rect, 10 + 10 + 200, 280, 5, 400 - 280, COLOR_SILVER);
+        gui_rect(rect, 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
+    }
+    {
+        gui_img_t *rect = gui_rect(page, 0, SCREEN_H * 2, SCREEN_W, SCREEN_H, COLOR_CRIMSON);
+        gui_rect(rect, 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
+
+    }
     gui_rect(page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
     gui_img_t *heart_ani = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, HEARTRATE04_BIN,
                                                    (SCREEN_W - HEART_ANI_W) / 2, 100, 0, 0);
@@ -46,8 +137,35 @@ static void app_hr_ui_design(gui_app_t *app)
     {
         char *text = "Current";
         int font_size = 16;
-        gui_text_t *t = gui_text_create(page, "txt", 50, 300, gui_get_screen_width(), font_size);
+        gui_text_t *t = gui_text_create(page, "txt", 100, 300, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_font_mem_init(addr1);
+        gui_text_type_set(t, addr1);
+    }
+    {
+        char *text = "68";
+        int font_size = 48;
+        gui_text_t *t = gui_text_create(page, "txt", 100, 320, gui_get_screen_width(), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
+        gui_font_mem_init(addr1);
+        gui_text_type_set(t, addr1);
+    }
+    {
+        char *text = "BPM";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(page, "txt", 157, 347, gui_get_screen_width(), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_font_mem_init(addr1);
+        gui_text_type_set(t, addr1);
+    }
+    {
+        char *text = "75 BPM, 2m ago";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(page, "txt", 100, 370, gui_get_screen_width(), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
