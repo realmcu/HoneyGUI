@@ -230,6 +230,49 @@ static void tab_prepare_fade(gui_obj_t *obj)
     }
 }
 
+static void tab_destroy(gui_obj_t *obj)
+{
+    if (obj->parent != NULL)
+    {
+        gui_tab_t *tab = (gui_tab_t *)obj;
+        gui_tabview_t *tabview = (gui_tabview_t *)obj->parent;
+
+        if (tabview->tab_cnt > 0)
+        {
+            tabview->tab_cnt--;
+        }
+        if (tab->id.x > 0)
+        {
+            if (tabview->tab_cnt_right > 0)
+            {
+                tabview->tab_cnt_right--;
+            }
+        }
+        else if (tab->id.x < 0)
+        {
+            if (tabview->tab_cnt_left < 0)
+            {
+                tabview->tab_cnt_left++;
+            }
+        }
+
+        if (tab->id.y > 0)
+        {
+            if (tabview->tab_cnt_down > 0)
+            {
+                tabview->tab_cnt_down--;
+            }
+        }
+        else if (tab->id.y < 0)
+        {
+            if (tabview->tab_cnt_up < 0)
+            {
+                tabview->tab_cnt_up++;
+            }
+        }
+    }
+}
+
 static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                          int16_t y,
                          int16_t w, int16_t h, int16_t idx, int16_t idy)
@@ -239,6 +282,7 @@ static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filenam
 
     GET_BASE(this)->obj_prepare = tab_prepare;
     GET_BASE(this)->obj_input_prepare = input_prepare;
+    GET_BASE(this)->obj_destory = tab_destroy;
     GET_BASE(this)->type = TAB;
 
     gui_tabview_t *parent_ext = (gui_tabview_t *)parent;
