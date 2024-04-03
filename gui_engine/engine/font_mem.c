@@ -1462,5 +1462,15 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
             break;
         }
     }
+    switch (charset)
+    {
+    case UTF_8_CHARSET:
+        gui_free(unicode_buffer);
+        break;
+    case UTF_16_CHARSET:
+        break;
+    default:
+        break;
+    }
     return all_char_w;
 }
