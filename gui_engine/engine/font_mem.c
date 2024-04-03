@@ -290,7 +290,7 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
             for (uint16_t i = 0; i < text->font_len; i++)
             {
                 chr[i].x += line_buf[line].line_dx;
-                if (i > line_buf[line].line_char)
+                if (i >= line_buf[line].line_char)
                 {
                     line++;
                 }
