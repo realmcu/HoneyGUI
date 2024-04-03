@@ -30,8 +30,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -127,8 +127,12 @@ typedef struct gui_wave
  *}
  * \endcode
  */
-gui_wave_t *gui_wave_create(void *parent,  const char *name, int16_t x, int16_t y, int16_t w,
-                            int16_t h);
+gui_wave_t *gui_wave_create(void       *parent,
+                            const char *name,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h);
 
 /**
  * @brief set wave size
@@ -140,7 +144,12 @@ gui_wave_t *gui_wave_create(void *parent,  const char *name, int16_t x, int16_t 
  * @param h  hight
  * @param t  one frame time
  */
-void gui_wave_set(gui_wave_t *this, float x, float y, float w, float h, float t);
+void gui_wave_set(gui_wave_t *this,
+                  float       x,
+                  float       y,
+                  float       w,
+                  float       h,
+                  float       t);
 
 
 /** End of WIDGET_Exported_GUI_Functions
@@ -155,4 +164,3 @@ void gui_wave_set(gui_wave_t *this, float x, float y, float w, float h, float t)
 #endif
 
 #endif
-

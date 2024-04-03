@@ -17,16 +17,12 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
 #include <math.h>
-#include <gui_matrix.h>
-#include <gui_obj.h>
-//#include <tp_algo.h>
-//#include <kb_algo.h>
-#include <nanovg.h>
+#include "gui_matrix.h"
+#include "gui_obj.h"
+#include "nanovg.h"
 #include "gui_wave.h"
-
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -74,7 +70,9 @@
   * @{
   */
 
-
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
+                                 uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
 /** End of SUBMOUDLE_Exported_Variables
   * @}
   */
@@ -85,7 +83,12 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float t)
+static void gui_wave_draw_graph(NVGcontext *vg,
+                                float       x,
+                                float       y,
+                                float       w,
+                                float       h,
+                                float       t)
 {
     NVGpaint bg;
     float samples[6];
@@ -114,6 +117,7 @@ static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float 
     {
         nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
     }
+
     nvgLineTo(vg, x + w, y + h);
     nvgLineTo(vg, x, y + h);
     nvgFillPaint(vg, bg);
@@ -137,6 +141,7 @@ static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float 
     {
         nvgBezierTo(vg, sx[i - 1] + dx * 0.5f, sy[i - 1], sx[i] - dx * 0.5f, sy[i], sx[i], sy[i]);
     }
+
     nvgStrokeColor(vg, nvgRGBA(0, 160, 192, 255));
     nvgStrokeWidth(vg, 3.0f);
     nvgStroke(vg);
@@ -156,6 +161,7 @@ static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float 
     {
         nvgCircle(vg, sx[i], sy[i], 4.0f);
     }
+
     nvgFillColor(vg, nvgRGBA(0, 160, 192, 255));
     nvgFill(vg);
     nvgBeginPath(vg);
@@ -163,13 +169,14 @@ static void drawGraph(NVGcontext *vg, float x, float y, float w, float h, float 
     {
         nvgCircle(vg, sx[i], sy[i], 2.0f);
     }
+
     nvgFillColor(vg, nvgRGBA(220, 220, 220, 255));
     nvgFill(vg);
 
     nvgStrokeWidth(vg, 1.0f);
 }
 
-static void wave_prepare(gui_obj_t *obj)
+static void gui_wave_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
     gui_dispdev_t *dc = gui_get_dc();
@@ -182,10 +189,11 @@ static void wave_prepare(gui_obj_t *obj)
     GUI_UNUSED(cy);
 }
 
-static void wave_draw_cb(gui_obj_t *obj)
+static void gui_wave_draw_cb(gui_obj_t *obj)
 {
     gui_wave_t *this = (gui_wave_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
+
     GUI_UNUSED(this);
     GUI_UNUSED(dc);
     float x = this->x;
@@ -193,62 +201,59 @@ static void wave_draw_cb(gui_obj_t *obj)
     float w = this->w;
     float h = this->h;
     float t = this->t;
-    extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
-                                     uint8_t *data);
-    extern void nvgDeleteAGGE(NVGcontext * ctx);
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
                                    (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
+
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
     nvgResetTransform(vg);
     nvgTransform(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
                  obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
 
-
-    drawGraph(vg, x, y, w, h, t);
+    gui_wave_draw_graph(vg, x, y, w, h, t);
 
     nvgEndFrame(vg);
     nvgDeleteAGGE(vg);
-
-
 }
-static void wave_end(gui_obj_t *obj)
-{
 
-}
-static void wave_destory(gui_obj_t *obj)
+static void gui_wave_end(gui_obj_t *obj)
 {
 
 }
 
-
-
-static void wave_ctor(gui_wave_t *this, gui_obj_t *parent, const char *name,
-                      int16_t x,
-                      int16_t y, int16_t w, int16_t h)
+static void gui_wave_destory(gui_obj_t *obj)
 {
-    //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
 
-    //for root class
+}
+
+static void gui_wave_ctor(gui_wave_t *this,
+                          gui_obj_t  *parent,
+                          const char *name,
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h)
+{
     gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = wave_prepare;
-    root->obj_draw = wave_draw_cb;
-    root->obj_end = wave_end;
-    root->obj_destory = wave_destory;
-
-    //for self
-
+    root->obj_prepare = gui_wave_prepare;
+    root->obj_draw = gui_wave_draw_cb;
+    root->obj_end = gui_wave_end;
+    root->obj_destory = gui_wave_destory;
 }
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
 
-
-void gui_wave_set(gui_wave_t *this, float x, float y, float w, float h, float t)
+void gui_wave_set(gui_wave_t *this,
+                  float       x,
+                  float       y,
+                  float       w,
+                  float       h,
+                  float       t)
 {
     this->x = x;
     this->y = y;
@@ -257,20 +262,26 @@ void gui_wave_set(gui_wave_t *this, float x, float y, float w, float h, float t)
     this->t = t;
 }
 
-gui_wave_t *gui_wave_create(void *parent,  const char *name,
-                            int16_t x,
-                            int16_t y, int16_t w, int16_t h)
+gui_wave_t *gui_wave_create(void       *parent,
+                            const char *name,
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h)
 {
+    gui_wave_t *this;
+
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
     {
         name = "wave";
     }
-    gui_wave_t *this = gui_malloc(sizeof(gui_wave_t));
+
+    this = gui_malloc(sizeof(gui_wave_t));
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_wave_t));
 
-    wave_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
+    gui_wave_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -285,7 +296,6 @@ gui_wave_t *gui_wave_create(void *parent,  const char *name,
     this->w = w;
     this->t = 0;
 
-
     GET_BASE(this)->create_done = true;
     return this;
 }
@@ -297,5 +307,3 @@ gui_wave_t *gui_wave_create(void *parent,  const char *name,
 /** End of WIDGET
   * @}
   */
-
-
