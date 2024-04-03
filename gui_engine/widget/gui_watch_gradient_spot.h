@@ -31,9 +31,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_canvas.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "gui_canvas.h"
 #include "gui_watch_gradient_spot.h"
 
 /** @defgroup WIDGET WIDGET
@@ -50,12 +50,12 @@ extern "C" {
   */
 
 /** @brief  ... */
-typedef struct gui_watch_gradient_spot
+typedef struct
 {
     gui_obj_t base;
     float c_x;
     float c_y;
-} gui_watch_gradient_spot_t;
+} T_GUI_WATCH_GRADIENT_SPOT;
 
 
 /** End of WIDGET_Exported_Types
@@ -82,6 +82,12 @@ typedef struct gui_watch_gradient_spot
   * @brief
   * @{
   */
+#define WATCH_GRADIENT_SPOT_BASE      454.0f
+#define WATCH_GRADIENT_SPOT_SCLAE     ((float)(GET_BASE(this)->w)/WATCH_GRADIENT_SPOT_BASE)
+
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride,
+                                 enum NVGtexture format, uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -115,24 +121,28 @@ typedef struct gui_watch_gradient_spot
   * @param  y       top
   * @param  w       width
   * @param  h       high
-  * @return         gui_watch_gradient_spot_t* widget pointer
+  * @return         T_GUI_WATCH_GRADIENT_SPOT* widget pointer
   *
   * <b>Example usage</b>
   * \code{.c}
   * void example_watch(void *parent)
   * {
   *     win_watch = gui_win_create(parent, "win", 0, 0, 368, 448);
-  *     gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
+  *     T_GUI_WATCH_GRADIENT_SPOT *watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
   *
   * }
   * \endcode
   */
-gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const char *name,
-                                                          int16_t x, int16_t y, int16_t w, int16_t h);
+T_GUI_WATCH_GRADIENT_SPOT *gui_watch_gradient_spot_create(void       *parent,
+                                                          const char *name,
+                                                          int16_t    x,
+                                                          int16_t    y,
+                                                          int16_t    w,
+                                                          int16_t    h);
 
 /**
   * @brief  set watch center
-  * @param  this  gui_watch_gradient_spot_t widget
+  * @param  this  T_GUI_WATCH_GRADIENT_SPOT widget
   * @param  c_x   left
   * @param  c_y   top
   * @return       void
@@ -142,14 +152,13 @@ gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const c
   * void example_watch(void *parent)
   * {
   *     win_watch = gui_win_create(parent, "win", 0, 0, 368, 448);
-  *     gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
-  *    gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
+  *     T_GUI_WATCH_GRADIENT_SPOT *watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
+  *    T_GUI_WATCH_GRADIENT_SPOT *watch = gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
   *
   * }
   * \endcode
   */
-void gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c_x, float c_y);
-
+void gui_watch_gradient_spot_set_center(T_GUI_WATCH_GRADIENT_SPOT *this, float c_x, float c_y);
 
 
 /** End of WIDGET_Exported_GUI_Functions

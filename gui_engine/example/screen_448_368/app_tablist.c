@@ -14,7 +14,7 @@ void tablist_clock(void *parent)
 }
 void tablist_watch(void *parent)
 {
-    gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_create(parent, "watchface", 0, 0, 221,
+    T_GUI_WATCH_GRADIENT_SPOT *watch = gui_watch_gradient_spot_create(parent, "watchface", 0, 0, 221,
                                                                       269);
     gui_watch_gradient_spot_set_center(watch, 221, 269);
     gui_img_t *rect = gui_img_create_from_mem(parent, "rect", RECT_221_269_BIN, 0, 0, 0, 0);

@@ -11,7 +11,7 @@
 
 gui_win_t *win_watch;
 gui_img_t *img;
-gui_watch_gradient_spot_t *watch;
+T_GUI_WATCH_GRADIENT_SPOT *watch;
 gui_text_t *rate;
 static T_GUI_WATCHFACE_GRADIENT *canvas;
 gui_tabview_t *tablist_tab;
