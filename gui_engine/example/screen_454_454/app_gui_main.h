@@ -19,7 +19,7 @@ extern "C" {
 #define GUI_FRAME               30
 
 
-void *get_app_watch_ui(void);
+gui_app_t *get_app_watch_ui(void);
 extern void design_tab_watchface(void *parent);
 extern void design_tab_player(void *parent);
 extern void design_tab_call(void *parent);

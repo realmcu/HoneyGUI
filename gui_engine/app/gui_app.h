@@ -85,9 +85,31 @@ struct gui_app
   * @brief
   * @{
   */
-
-
-
+#define GUI_APP_DEFINE(APP_NAME,UI_DESIGN)\
+    \
+    static void UI_DESIGN(gui_app_t*);\
+    static gui_app_t _app_##APP_NAME =\
+                                      {\
+                                       .screen =\
+                                                {\
+                                                 .name = #APP_NAME,\
+                                                },\
+                                       .ui_design = UI_DESIGN,\
+                                       .active_ms = 1000000,\
+                                      };\
+    \
+    gui_app_t *_get_app_##APP_NAME(void)\
+    {\
+        return &_app_##APP_NAME;\
+    }
+#define GUI_APP_HANDLE(APP_NAME) _get_app_##APP_NAME()
+#define GUI_APP_SHUTDOWM(APP_NAME) gui_app_shutdown(_get_app_##APP_NAME());
+#define GUI_APP_STARTUP(APP_NAME) gui_app_startup(_get_app_##APP_NAME());
+#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME(), _get_app_##APP_NAME_NEXT());
+#define GUI_APP_ROOT_SCREEN &(app->screen)
+#define GUI_APP_SWAP_HANDLE(HANDLE_FUNC, HANDLE_NEXT_FUNC)     extern gui_app_t *HANDLE_FUNC;\
+    extern gui_app_t *HANDLE_NEXT_FUNC;\
+    gui_switch_app(HANDLE_FUNC, HANDLE_NEXT_FUNC);
 /** End of APP_Exported_Macros
   * @}
   */

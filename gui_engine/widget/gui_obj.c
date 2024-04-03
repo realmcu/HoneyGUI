@@ -547,7 +547,20 @@ gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
     color.color.rgba.a = UINT8_MAX ;
     return color;
 }
-
+void gui_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if ((strlen(name) == strlen(obj->name)) && (strcmp(name, obj->name) == 0))
+        {
+            *output = obj;
+            return;
+        }
+        gui_tree_get_widget_by_name(obj, name, output);
+    }
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

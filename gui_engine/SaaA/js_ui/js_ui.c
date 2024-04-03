@@ -104,20 +104,7 @@ DECLARE_HANDLER(jump)
     return jerry_create_undefined();
 }
 
-void gui_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output)
-{
-    gui_list_t *node = NULL;
-    gui_list_for_each(node, &obj->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if ((strlen(name) == strlen(obj->name)) && (strcmp(name, obj->name) == 0))
-        {
-            *output = obj;
-            return;
-        }
-        gui_tree_get_widget_by_name(obj, name, output);
-    }
-}
+
 DECLARE_HANDLER(getElementById)
 {
     // gui_log("enter getElementById\n");

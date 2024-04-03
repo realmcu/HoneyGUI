@@ -354,6 +354,16 @@ bool gui_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
  * @return uint8_t
  */
 uint8_t gui_checksum(uint8_t seed, uint8_t *data, uint8_t len);
+
+/**
+ * @brief  get widget in tree by name
+ *
+ * @param obj tree
+ * @param name widget name
+ * @param output widget
+ * @return uint8_t
+ */
+void gui_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

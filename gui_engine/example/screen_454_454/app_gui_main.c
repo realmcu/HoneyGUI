@@ -54,7 +54,7 @@ static gui_app_t app_watch_ui =
     .active_ms = 60000,
 };
 
-void *get_app_watch_ui(void)
+gui_app_t *get_app_watch_ui(void)
 {
     return &app_watch_ui;
 }
