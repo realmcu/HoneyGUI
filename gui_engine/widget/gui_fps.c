@@ -17,8 +17,8 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fps.h>
+#include "guidef.h"
+#include "gui_fps.h"
 #include "gui_obj.h"
 #include "gui_server.h"
 #include "gui_img.h"
@@ -35,7 +35,6 @@
 /** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @{
   */
-
 
 
 /** End of WIDGET_Exported_Types
@@ -62,7 +61,6 @@
   */
 
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -84,18 +82,21 @@ static char fps[10];
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void cb(gui_img_t *img)
+static void gui_fps_cb(gui_img_t *img)
 {
     int spf = gui_spf();
     int fps_num = 20;
+
     if (spf)
     {
         fps_num = 1000 / gui_spf();
     }
+
     if (fps_num > 99999)
     {
         fps_num = 99999;
     }
+
     gui_log("%d ", fps_num);
     sprintf(fps, "%d", fps_num);
     gui_text_content_set(t, fps, strlen(fps));
@@ -106,7 +107,6 @@ static void cb(gui_img_t *img)
  *============================================================================*/
 void gui_fps_create(void *parent)
 {
-
     static const unsigned char afont[1228] =
     {
         0x16, 0x01, 0x00, 0x00, 0x00, 0x00, 0x10, 0x04, 0x08, 0x12, 0x00, 0x00, 0x00, 0x08, 0x61, 0x72,
@@ -187,6 +187,7 @@ void gui_fps_create(void *parent)
         0x00, 0x00, 0x00, 0x00, 0x00, 0x8d, 0xfd, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     };
+
     static  unsigned char rect1[3144] =
     {
         0x00, 0x04, 0x38, 0x00, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x49, 0x00, 0x00, 0x00, 0x49,
@@ -387,23 +388,23 @@ void gui_fps_create(void *parent)
         0x00, 0x00, 0x00, 0x49, 0x00, 0x00, 0x00, 0x49, 0x00, 0x00, 0x00, 0x49, 0x00, 0x00, 0x00, 0x49,
         0x00, 0x00, 0x00, 0x49, 0x00, 0x00, 0x00, 0x49,
     };
+
+    void *addr1 = (void *)afont;
+    char *text;
+    int font_size = 16;
     gui_img_t *img = gui_img_create_from_mem(parent, "WIDGET gui_fps_img", rect1,
                                              gui_get_screen_width() / 3, 0, 0, 0);
+
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    gui_img_set_animate(img, 1000, -1, cb, img);
+    gui_img_set_animate(img, 1000, -1, gui_fps_cb, img);
 
     sprintf(fps, "%d", 1000 / gui_spf());
-    char *text = fps;
-    int font_size = 16;
+    text = fps;
     t = gui_text_create(img, "WIDGET gui_fps_text", 35, 0, gui_get_screen_width(), font_size);
     gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(255, 0xfe, 00), strlen(text), font_size);
-    void *addr1 = (void *)afont;
     gui_font_mem_init(addr1);
     gui_text_type_set(t, addr1);
-
 }
-
-
 
 /** End of WIDGET_Exported_Functions
   * @}
@@ -412,8 +413,3 @@ void gui_fps_create(void *parent)
 /** End of WIDGET
   * @}
   */
-
-
-
-
-

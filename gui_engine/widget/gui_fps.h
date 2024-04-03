@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_img.h>
+#include "guidef.h"
+#include "gui_img.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -43,8 +43,6 @@ extern "C" {
   * @brief
   * @{
   */
-
-
 
 
 /** End of WIDGET_Exported_Types
@@ -71,9 +69,6 @@ extern "C" {
   * @brief
   * @{
   */
-
-
-
 
 
 /** End of WIDGET_Exported_Macros
@@ -124,5 +119,3 @@ void gui_fps_create(void *parent);
 #endif
 
 #endif
-
-
