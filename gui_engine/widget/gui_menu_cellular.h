@@ -107,7 +107,7 @@ typedef struct gui_menu_cellular
  * @param parent the father widget nested in
  * @param icon_size icon's width(px)
  * @param icon_array icons set's file address array
- * @param parent the array_size
+ * @param array_size the array's size
  * @return gui_menu_cellular_t*
  */
 gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],

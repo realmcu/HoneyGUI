@@ -85,6 +85,6 @@ static void design_app_watch_ui(gui_app_t *app)
 
 ```eval_rst
 
-.. doxygenfile:: gui_menu_cellular_create.h
+.. doxygenfile:: gui_menu_cellular.h
 
 ```
