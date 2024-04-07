@@ -247,7 +247,7 @@ void matrix_identity(struct gui_matrix *matrix)
     matrix->m[2][1] = 0.0f;
     matrix->m[2][2] = 1.0f;
 }
-
+#if 0
 void matrix_multiply_normal(struct gui_matrix *matrix, Normal_t *normal)
 {
     Normal_t temp;
@@ -263,7 +263,6 @@ void matrix_multiply_normal(struct gui_matrix *matrix, Normal_t *normal)
 
     memcpy(normal, &temp, sizeof(temp));
 }
-
 void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
 {
     int row, column;
@@ -287,7 +286,6 @@ void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
 
 }
 
-
 void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point *pox)
 {
     struct gui_point temp;
@@ -306,40 +304,6 @@ void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point *pox)
 
     memcpy(pox, &temp, sizeof(temp));
 }
-
-void matrix_translate(float x, float y, struct gui_matrix *matrix)
-{
-    /* Set translation matrix. */
-    struct gui_matrix t = { { {1.0f, 0.0f, x},
-            {0.0f, 1.0f, y},
-            {0.0f, 0.0f, 1.0f}
-        }
-    };
-
-    /* Multiply with current matrix. */
-    matrix_multiply(matrix, &t);
-}
-
-void matrix_rotate(float degrees, struct gui_matrix *matrix)
-{
-    /* Convert degrees into radians. */
-    float angle = degrees / 180.0f * 3.1415926f;
-
-    /* Compuet cosine and sine values. */
-    float cos_angle = cosf(angle);
-    float sin_angle = sinf(angle);
-
-    /* Set rotation matrix. */
-    struct gui_matrix r = { { {cos_angle, -sin_angle, 0.0f},
-            {sin_angle, cos_angle, 0.0f},
-            {0.0f, 0.0f, 1.0f}
-        }
-    };
-
-    /* Multiply with current matrix. */
-    matrix_multiply(matrix, &r);
-}
-
 void matrix_inverse(struct gui_matrix *matrix)
 {
     struct gui_matrix temp;
@@ -366,31 +330,6 @@ void matrix_inverse(struct gui_matrix *matrix)
 
     /* Copy temporary matrix into result. */
     memcpy(matrix, &temp, sizeof(temp));
-}
-
-void matrix_scale(float scale_x, float scale_y, struct gui_matrix *matrix)
-{
-    /* Set scale matrix. */
-    struct gui_matrix s = { { {scale_x, 0.0f, 0.0f},
-            {0.0f, scale_y, 0.0f},
-            {0.0f, 0.0f, 1.0f}
-        }
-    };
-
-    /* Multiply with current matrix. */
-    matrix_multiply(matrix, &s);
-}
-
-void matrix_perspective(float px, float py, struct gui_matrix *matrix)
-{
-    /* set prespective matrix */
-    struct gui_matrix p = { { {1.0f, 0.0f, 0.0f},
-            {0.0f, 1.0f, 0.0f},
-            {px, py, 1.0f}
-        }
-    };
-    /* Multiply with current matrix. */
-    matrix_multiply(matrix, &p);
 }
 
 void matrix_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rotate)
@@ -425,6 +364,248 @@ void matrix_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rota
     rotate->m[2][2] = cos(RAD(ry)) * cos(RAD(rx));
 #endif
 }
+#else
+void matrix_multiply_normal(struct gui_matrix *matrix, Normal_t *normal)
+{
+    //Normal_t temp;
+
+    float m00, m01, m02, m10, m11, m12, m20, m21, m22, x, y, z;
+    m00 = matrix->m[0][0];
+    m01 = matrix->m[0][1];
+    m02 = matrix->m[0][2];
+
+    m10 = matrix->m[1][0];
+    m11 = matrix->m[1][1];
+    m12 = matrix->m[1][2];
+
+    m20 = matrix->m[2][0];
+    m21 = matrix->m[2][1];
+    m22 = matrix->m[2][2];
+
+    x = normal->x;
+    y = normal->y;
+    z = normal->z;
+    /* Process all rows. */
+
+    normal->x = (m00 * x) + (m01 * y) + (m02 * z);
+    normal->y = (m10 * x) + (m11 * y) + (m12 * z);
+    normal->z = (m20 * x) + (m21 * y) + (m22 * z);
+
+}
+void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
+{
+    //int row, column;
+
+    float m00, m01, m02, m10, m11, m12, m20, m21, m22;
+    m00 = matrix->m[0][0];
+    m01 = matrix->m[0][1];
+    m02 = matrix->m[0][2];
+
+    m10 = matrix->m[1][0];
+    m11 = matrix->m[1][1];
+    m12 = matrix->m[1][2];
+
+    m20 = matrix->m[2][0];
+    m21 = matrix->m[2][1];
+    m22 = matrix->m[2][2];
+
+    float t00, t01, t02, t10, t11, t12, t20, t21, t22;
+    t00 = mult->m[0][0];
+    t01 = mult->m[0][1];
+    t02 = mult->m[0][2];
+
+    t10 = mult->m[1][0];
+    t11 = mult->m[1][1];
+    t12 = mult->m[1][2];
+
+    t20 = mult->m[2][0];
+    t21 = mult->m[2][1];
+    t22 = mult->m[2][2];
+    /* Compute matrix entry. */
+    //row = 0;
+    matrix->m[0][0] = (m00 * t00) + (m01 * t10) + (m02 * t20);
+    matrix->m[0][1] = (m00 * t01) + (m01 * t11) + (m02 * t21);
+    matrix->m[0][2] = (m00 * t02) + (m01 * t12) + (m02 * t22);
+    //row = 1;
+    matrix->m[1][0] = (m10 * t00) + (m11 * t10) + (m12 * t20);
+    matrix->m[1][1] = (m10 * t01) + (m11 * t11) + (m12 * t21);
+    matrix->m[1][2] = (m10 * t02) + (m11 * t12) + (m12 * t22);
+    ///row = 2;
+    matrix->m[2][0] = (m20 * t00) + (m21 * t10) + (m22 * t20);
+    matrix->m[2][1] = (m20 * t01) + (m21 * t11) + (m22 * t21);
+    matrix->m[2][2] = (m20 * t02) + (m21 * t12) + (m22 * t22);
+}
+void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point *pox)
+{
+    //struct gui_point temp;
+    //int row;
+    float m_row0, m_row1, m_row2;
+
+    float a = pox->p[0];
+    float b = pox->p[1];
+    float c = pox->p[2];
+
+    /* Process all rows. */
+    m_row0 = matrix->m[0][0];
+    m_row1 = matrix->m[0][1];
+    m_row2 = matrix->m[0][2];
+    pox->p[0] = (m_row0 * a) + (m_row1 * b) + (m_row2 * c);
+
+    m_row0 = matrix->m[1][0];
+    m_row1 = matrix->m[1][1];
+    m_row2 = matrix->m[1][2];
+    pox->p[1] = (m_row0 * a) + (m_row1 * b) + (m_row2 * c);
+
+    m_row0 = matrix->m[2][0];
+    m_row1 = matrix->m[2][1];
+    m_row2 = matrix->m[2][2];
+    pox->p[2] = (m_row0 * a) + (m_row1 * b) + (m_row2 * c);
+
+    pox->p[0] = pox->p[0] / pox->p[2];
+    pox->p[1] = pox->p[1] / pox->p[2];
+    pox->p[2] = 1;
+
+    //memcpy(pox, &temp, sizeof(temp));
+}
+void matrix_inverse(struct gui_matrix *matrix)
+{
+    //struct gui_matrix temp;
+
+    float m00, m01, m02, m10, m11, m12, m20, m21, m22;
+    m00 = matrix->m[0][0];
+    m01 = matrix->m[0][1];
+    m02 = matrix->m[0][2];
+
+    m10 = matrix->m[1][0];
+    m11 = matrix->m[1][1];
+    m12 = matrix->m[1][2];
+
+    m20 = matrix->m[2][0];
+    m21 = matrix->m[2][1];
+    m22 = matrix->m[2][2];
+
+    float detal = m00 * m11 * m22 + \
+                  m01 * m12 * m20 + \
+                  m02 * m10 * m21 - \
+                  m00 * m12 * m21 - \
+                  m01 * m10 * m22 - \
+                  m02 * m11 * m20;
+
+    matrix->m[0][0] = (m11 * m22 - m12 * m21) / detal;
+    matrix->m[1][0] = -(m22 * m10 - m12 * m20) / detal;
+    matrix->m[2][0] = (m10 * m21 - m20 * m11) / detal;
+
+    matrix->m[0][1] = -(m01 * m22 - m02 * m21) / detal;
+    matrix->m[1][1] = (m22 * m00 - m20 * m02) / detal;
+    matrix->m[2][1] = -(m00 * m21 - m20 * m01) / detal;
+
+    matrix->m[0][2] = (m01 * m12 - m11 * m02) / detal;
+    matrix->m[1][2] = -(m00 * m12 - m02 * m10) / detal;
+    matrix->m[2][2] = (m00 * m11 - m01 * m10) / detal;
+
+
+    /* Copy temporary matrix into result. */
+    //memcpy(matrix, &temp, sizeof(temp));
+}
+
+void matrix_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rotate)
+{
+    // Rotation angles rx, ry, rz (degree) for axis X, Y, Z
+    // Compute 3D rotation matrix base on rotation angle rx, ry, rz about axis X, Y, Z.
+    //
+#if USE_FIX_SIN
+    int frz = round(rz), frx = round(rx), fry = round(ry);
+    float fxcos = fix_cos((int)(frx));
+    float fxsin = fix_sin((int)(frx));
+    float fycos = fix_cos((int)(fry));
+    float fysin = fix_sin((int)(fry));
+    float fzcos = fix_cos((int)(frz));
+    float fzsin = fix_sin((int)(frz));
+
+    rotate->m[0][0] = fzcos * fycos;
+    rotate->m[0][1] = fzcos * fysin * fxsin - fzsin * fxcos;
+    rotate->m[0][2] = fzcos * fysin * fxcos + fzsin * fxsin;
+    rotate->m[1][0] = fzsin * fycos;
+    rotate->m[1][1] = fzsin * fysin * fxsin + fzcos * fxcos;
+    rotate->m[1][2] = fzsin * fysin * fxcos - fzcos * fxsin;
+    rotate->m[2][0] = -fysin;
+    rotate->m[2][1] = fycos * fxsin;
+    rotate->m[2][2] = fycos * fxcos;
+#else
+    rotate->m[0][0] = cos(RAD(rz)) * cos(RAD(ry));
+    rotate->m[0][1] = cos(RAD(rz)) * sin(RAD(ry)) * sin(RAD(rx)) - sin(RAD(rz)) * cos(RAD(rx));
+    rotate->m[0][2] = cos(RAD(rz)) * sin(RAD(ry)) * cos(RAD(rx)) + sin(RAD(rz)) * sin(RAD(rx));
+    rotate->m[1][0] = sin(RAD(rz)) * cos(RAD(ry));
+    rotate->m[1][1] = sin(RAD(rz)) * sin(RAD(ry)) * sin(RAD(rx)) + cos(RAD(rz)) * cos(RAD(rx));
+    rotate->m[1][2] = sin(RAD(rz)) * sin(RAD(ry)) * cos(RAD(rx)) - cos(RAD(rz)) * sin(RAD(rx));
+    rotate->m[2][0] = -sin(RAD(ry));
+    rotate->m[2][1] = cos(RAD(ry)) * sin(RAD(rx));
+    rotate->m[2][2] = cos(RAD(ry)) * cos(RAD(rx));
+#endif
+}
+#endif
+
+
+void matrix_translate(float x, float y, struct gui_matrix *matrix)
+{
+    /* Set translation matrix. */
+    struct gui_matrix t = { { {1.0f, 0.0f, x},
+            {0.0f, 1.0f, y},
+            {0.0f, 0.0f, 1.0f}
+        }
+    };
+
+    /* Multiply with current matrix. */
+    matrix_multiply(matrix, &t);
+}
+
+void matrix_rotate(float degrees, struct gui_matrix *matrix)
+{
+    /* Convert degrees into radians. */
+    float angle = degrees / 180.0f * 3.1415926f;
+
+    /* Compuet cosine and sine values. */
+    float cos_angle = cosf(angle);
+    float sin_angle = sinf(angle);
+
+    /* Set rotation matrix. */
+    struct gui_matrix r = { { {cos_angle, -sin_angle, 0.0f},
+            {sin_angle, cos_angle, 0.0f},
+            {0.0f, 0.0f, 1.0f}
+        }
+    };
+
+    /* Multiply with current matrix. */
+    matrix_multiply(matrix, &r);
+}
+
+
+
+void matrix_scale(float scale_x, float scale_y, struct gui_matrix *matrix)
+{
+    /* Set scale matrix. */
+    struct gui_matrix s = { { {scale_x, 0.0f, 0.0f},
+            {0.0f, scale_y, 0.0f},
+            {0.0f, 0.0f, 1.0f}
+        }
+    };
+
+    /* Multiply with current matrix. */
+    matrix_multiply(matrix, &s);
+}
+
+void matrix_perspective(float px, float py, struct gui_matrix *matrix)
+{
+    /* set prespective matrix */
+    struct gui_matrix p = { { {1.0f, 0.0f, 0.0f},
+            {0.0f, 1.0f, 0.0f},
+            {px, py, 1.0f}
+        }
+    };
+    /* Multiply with current matrix. */
+    matrix_multiply(matrix, &p);
+}
+
 
 void matrix_transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
                              float ty, float tz)
@@ -441,3 +622,493 @@ void matrix_transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex
     rc->y += ty;
     rc->z += tz;
 }
+
+
+
+///////////////////////////////////////////// matrix func test //////////////////////////////////////////////////
+#if 0
+#include "trace.h"
+uint32_t cnt = 1000;
+void matrix_func_test(void)
+{
+    uint32_t l = os_lock();
+#if 1//all
+#if 1 //matrix_multiply() test
+    struct gui_matrix *matrix = gui_malloc(sizeof(struct gui_matrix));
+    struct gui_matrix *matrixB = gui_malloc(sizeof(struct gui_matrix));
+    {
+
+        matrix->m[0][0] = 1.0f;
+        matrix->m[0][1] = 2.0f;
+        matrix->m[0][2] = 3.0f;
+        matrix->m[1][0] = 0.0f;
+        matrix->m[1][1] = 1.0f;
+        matrix->m[1][2] = 4.0f;
+        matrix->m[2][0] = 5.0f;
+        matrix->m[2][1] = 6.0f;
+        matrix->m[2][2] = 1.0f;
+
+        matrixB->m[0][0] = 1.0f;
+        matrixB->m[0][1] = 2.0f;
+        matrixB->m[0][2] = 3.0f;
+        matrixB->m[1][0] = 0.0f;
+        matrixB->m[1][1] = 1.0f;
+        matrixB->m[1][2] = 4.0f;
+        matrixB->m[2][0] = 5.0f;
+        matrixB->m[2][1] = 6.0f;
+        matrixB->m[2][2] = 1.0f;
+
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_multiply(matrix, matrixB);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("====>");
+        float *fp = ((float *)matrix);
+        for (uint8_t index = 0; index < 9; index ++)
+        {
+            DBG_DIRECT("normal %f", fp[index]);
+        }
+        DBG_DIRECT("<====");
+    }
+    {
+        void matrix_multiply_new(struct gui_matrix * matrix, struct gui_matrix * mult);
+        matrix->m[0][0] = 1.0f;
+        matrix->m[0][1] = 2.0f;
+        matrix->m[0][2] = 3.0f;
+        matrix->m[1][0] = 0.0f;
+        matrix->m[1][1] = 1.0f;
+        matrix->m[1][2] = 4.0f;
+        matrix->m[2][0] = 5.0f;
+        matrix->m[2][1] = 6.0f;
+        matrix->m[2][2] = 1.0f;
+
+        matrixB->m[0][0] = 1.0f;
+        matrixB->m[0][1] = 2.0f;
+        matrixB->m[0][2] = 3.0f;
+        matrixB->m[1][0] = 0.0f;
+        matrixB->m[1][1] = 1.0f;
+        matrixB->m[1][2] = 4.0f;
+        matrixB->m[2][0] = 5.0f;
+        matrixB->m[2][1] = 6.0f;
+        matrixB->m[2][2] = 1.0f;
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_multiply_new(matrix, matrixB);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("==0==>");
+        float *fp0 = ((float *)matrix);
+        for (uint8_t index = 0; index < 9; index ++)
+        {
+            DBG_DIRECT("new %f", fp0[index]);
+        }
+        DBG_DIRECT("<==0==");
+    }
+    gui_free(matrix);
+    gui_free(matrixB);
+#elif 1//matrix_compute_rotate test
+    struct gui_matrix *matrix = gui_malloc(sizeof(struct gui_matrix));
+    {
+        float rx = 0;
+        float ry = 1.0;
+        float rz = 0;
+//          matrix.m[0][0] = 1.0f;
+//          matrix.m[0][1] = 2.0f;
+//          matrix.m[0][2] = 3.0f;
+//          matrix.m[1][0] = 0.0f;
+//          matrix.m[1][1] = 1.0f;
+//          matrix.m[1][2] = 4.0f;
+//          matrix.m[2][0] = 5.0f;
+//          matrix.m[2][1] = 6.0f;
+//          matrix.m[2][2] = 1.0f;
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_compute_rotate(rx, ry, rz, matrix);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("====>");
+        float *fp = ((float *)matrix);
+        for (uint8_t index = 0; index < 9; index ++)
+        {
+            DBG_DIRECT("normal %f", fp[index]);
+        }
+        DBG_DIRECT("<====");
+    }
+    {
+        void matrix_compute_rotate_new(float rx, float ry, float rz, struct gui_matrix * rotate);
+        float rx = 0;
+        float ry = 1.0;
+        float rz = 0;
+//          matrix.m[0][0] = 1.0f;
+//          matrix.m[0][1] = 2.0f;
+//          matrix.m[0][2] = 3.0f;
+//          matrix.m[1][0] = 0.0f;
+//          matrix.m[1][1] = 1.0f;
+//          matrix.m[1][2] = 4.0f;
+//          matrix.m[2][0] = 5.0f;
+//          matrix.m[2][1] = 6.0f;
+//          matrix.m[2][2] = 1.0f;
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_compute_rotate_new(rx, ry, rz, matrix);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("==0==>");
+        float *fp0 = ((float *)matrix);
+        for (uint8_t index = 0; index < 9; index ++)
+        {
+            DBG_DIRECT("new %f", fp0[index]);
+        }
+        DBG_DIRECT("<==0==");
+    }
+    gui_free(matrix);
+#elif 0//matrix_multiply_normal test
+    Normal_t *normal_matrix = gui_malloc(sizeof(Normal_t));
+    {
+        matrix.m[0][0] = 1.0f;
+        matrix.m[0][1] = 2.0f;
+        matrix.m[0][2] = 3.0f;
+        matrix.m[1][0] = 0.0f;
+        matrix.m[1][1] = 1.0f;
+        matrix.m[1][2] = 4.0f;
+        matrix.m[2][0] = 5.0f;
+        matrix.m[2][1] = 6.0f;
+        matrix.m[2][2] = 1.0f;
+
+        normal_matrix->x = 2.0;
+        normal_matrix->y = 5.0;
+        normal_matrix->z = 11.0;
+
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_multiply_normal(&matrix, normal_matrix);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("====>");
+        float *fp = ((float *)normal_matrix);
+        for (uint8_t index = 0; index < 3; index ++)
+        {
+            DBG_DIRECT("normal %f", fp[index]);
+        }
+        DBG_DIRECT("<====");
+    }
+    {
+        void matrix_multiply_normal_new(struct gui_matrix * matrix, Normal_t *normal);
+        matrix.m[0][0] = 1.0f;
+        matrix.m[0][1] = 2.0f;
+        matrix.m[0][2] = 3.0f;
+        matrix.m[1][0] = 0.0f;
+        matrix.m[1][1] = 1.0f;
+        matrix.m[1][2] = 4.0f;
+        matrix.m[2][0] = 5.0f;
+        matrix.m[2][1] = 6.0f;
+        matrix.m[2][2] = 1.0f;
+
+        normal_matrix->x = 2.0;
+        normal_matrix->y = 5.0;
+        normal_matrix->z = 11.0;
+
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_multiply_normal_new(&matrix, normal_matrix);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("====>");
+        float *fp = ((float *)normal_matrix);
+        for (uint8_t index = 0; index < 3; index ++)
+        {
+            DBG_DIRECT("new %f", fp[index]);
+        }
+        DBG_DIRECT("<====");
+
+    }
+    gui_free(normal_matrix);
+#elif 0 //matrix_inverse test
+    //struct gui_matrix *matrix = gui_malloc(sizeof(struct gui_matrix));
+    {
+        matrix.m[0][0] = 1.0f;
+        matrix.m[0][1] = 2.0f;
+        matrix.m[0][2] = 3.0f;
+        matrix.m[1][0] = 0.0f;
+        matrix.m[1][1] = 1.0f;
+        matrix.m[1][2] = 4.0f;
+        matrix.m[2][0] = 5.0f;
+        matrix.m[2][1] = 6.0f;
+        matrix.m[2][2] = 1.0f;
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_inverse(&matrix);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("====>");
+        float *fp = ((float *)&matrix);
+        for (uint8_t index = 0; index < 9; index ++)
+        {
+            DBG_DIRECT("normal %f", fp[index]);
+        }
+        DBG_DIRECT("<====");
+    }
+    {
+        void matrix_inverse_new(struct gui_matrix * matrix);
+        matrix.m[0][0] = 1.0f;
+        matrix.m[0][1] = 2.0f;
+        matrix.m[0][2] = 3.0f;
+        matrix.m[1][0] = 0.0f;
+        matrix.m[1][1] = 1.0f;
+        matrix.m[1][2] = 4.0f;
+        matrix.m[2][0] = 5.0f;
+        matrix.m[2][1] = 6.0f;
+        matrix.m[2][2] = 1.0f;
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_inverse_new(&matrix);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        DBG_DIRECT("==0==>");
+        float *fp0 = ((float *)&matrix);
+        for (uint8_t index = 0; index < 9; index ++)
+        {
+            DBG_DIRECT("new %f", fp0[index]);
+        }
+        DBG_DIRECT("<==0==");
+    }
+    //gui_free(matrix);
+#elif 1 // matrix_multiply_point test
+    struct gui_matrix *matrix = gui_malloc(sizeof(struct gui_matrix));
+    struct gui_point *pox = gui_malloc(sizeof(struct gui_point));
+    {
+
+        matrix->m[0][0] = 1.0f;
+        matrix->m[0][1] = 0.0f;
+        matrix->m[0][2] = 0.0f;
+        matrix->m[1][0] = 0.0f;
+        matrix->m[1][1] = 1.0f;
+        matrix->m[1][2] = 0.0f;
+        matrix->m[2][0] = 0.0f;
+        matrix->m[2][1] = 0.0f;
+        matrix->m[2][2] = 1.0f;
+
+        pox->p[0] = 1.0f;
+        pox->p[1] = 1.0f;
+        pox->p[2] = 1.0f;
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_multiply_point(matrix, pox);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+
+        DBG_DIRECT("====>");
+        float *fp = ((float *)pox);
+        for (uint8_t index = 0; index < 3; index ++)
+        {
+            DBG_DIRECT("pox %f", fp[index]);
+        }
+        DBG_DIRECT("<====");
+    }
+    {
+        matrix->m[0][0] = 1.0f;
+        matrix->m[0][1] = 0.0f;
+        matrix->m[0][2] = 0.0f;
+        matrix->m[1][0] = 0.0f;
+        matrix->m[1][1] = 1.0f;
+        matrix->m[1][2] = 0.0f;
+        matrix->m[2][0] = 0.0f;
+        matrix->m[2][1] = 0.0f;
+        matrix->m[2][2] = 1.0f;
+        pox->p[0] = 1.0f;
+        pox->p[1] = 1.0f;
+        pox->p[2] = 1.0f;
+
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        for (uint32_t index = 0; index < (cnt); index++)
+        {
+            matrix_multiply_point_new(matrix, pox);
+        }
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+        Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+
+        DBG_DIRECT("==0==>");
+        float *fp0 = ((float *)pox);
+        for (uint8_t index = 0; index < 3; index ++)
+        {
+            DBG_DIRECT("pox %f", fp0[index]);
+        }
+        DBG_DIRECT("<==0==");
+    }
+    gui_free(matrix);
+    gui_free(pox);
+#else // dsp matrix_multiply test
+    float (*pA_matrix)[3] = gui_malloc(3 * 3 * sizeof(float));
+    pA_matrix[0][0] = 1.0f;
+    pA_matrix[0][1] = 0.0f;
+    pA_matrix[0][2] = 0.0f;
+    pA_matrix[1][0] = 0.0f;
+    pA_matrix[1][1] = 1.0f;
+    pA_matrix[1][2] = 0.0f;
+    pA_matrix[2][0] = 0.0f;
+    pA_matrix[2][1] = 0.0f;
+    pA_matrix[2][2] = 1.0f;
+    arm_matrix_instance_f32 MA = {3, 3, (float *)pA_matrix};
+
+    float (*pB_matrix)[3] = gui_malloc(3 * 3 * sizeof(float));
+    pB_matrix[0][0] = 1.0f;
+    pB_matrix[0][1] = 0.0f;
+    pB_matrix[0][2] = 0.0f;
+    pB_matrix[1][0] = 0.0f;
+    pB_matrix[1][1] = 1.0f;
+    pB_matrix[1][2] = 0.0f;
+    pB_matrix[2][0] = 0.0f;
+    pB_matrix[2][1] = 0.0f;
+    pB_matrix[2][2] = 1.0f;
+    arm_matrix_instance_f32 MB = {3, 3, (float *)pB_matrix};
+
+    arm_matrix_instance_f32 *MD = gui_malloc(sizeof(arm_matrix_instance_f32) + 3 * 3 * sizeof(float));
+    MD->numCols = 3;
+    MD->numRows = 3;
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    for (uint32_t index = 0; index < (cnt); index++)
+    {
+        arm_mat_mult_f32(&MA, &MB, MD);
+    }
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+
+    DBG_DIRECT("====>");
+    for (uint8_t index = 0; index < 9; index ++)
+    {
+        DBG_DIRECT("MD->data %f", MD->pData[index]);
+    }
+
+    DBG_DIRECT("<====");
+    struct gui_matrix *gma = (struct gui_matrix *)pA_matrix;
+    float *pf = (float *)gma;
+//          for (uint8_t index = 0; index < 9; index ++)
+//          {
+//              DBG_DIRECT("gma %f", pf[index]);
+//          }
+    struct gui_matrix *gmb = (struct gui_matrix *)pB_matrix;
+    void matrix_multiply(struct gui_matrix * matrix, struct gui_matrix * mult);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+
+    for (uint32_t index = 0; index < (cnt); index++)
+    {
+        matrix_multiply(gma, gmb);
+    }
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_UP, PAD_OUT_ENABLE, PAD_OUT_HIGH);
+    Pad_Config(P1_0, PAD_SW_MODE, PAD_IS_PWRON, PAD_PULL_DOWN, PAD_OUT_ENABLE, PAD_OUT_LOW);
+    DBG_DIRECT("==1==>");
+    for (uint8_t index = 0; index < 9; index ++)
+    {
+        DBG_DIRECT("result %f", pf[index]);
+    }
+
+    DBG_DIRECT("<==1== cnt %d", cnt);
+    cnt = cnt + 100;
+
+    gui_free(pA_matrix);
+    gui_free(pB_matrix);
+    gui_free(MD);
+
+
+#endif
+
+#endif//all
+    os_unlock(l);
+}
+
+#endif
