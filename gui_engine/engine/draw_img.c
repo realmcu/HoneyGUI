@@ -13,6 +13,7 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
 
     *x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
     *x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    *x_end = _UI_MIN(*x_end, rect->x2);
 
     if (rect->xboundright > 0)
     {
@@ -21,6 +22,7 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
 
     *y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
     *y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    *y_end = _UI_MIN(*y_end, rect->y2);
     if (rect->yboundbottom > 0)
     {
         *y_end = _UI_MIN(*y_end, image_y + rect->yboundbottom);
@@ -78,9 +80,6 @@ struct gui_rgb_data_head rtgui_image_get_header(draw_img_t *img)
 
 bool gui_image_new_area(draw_img_t *img)
 {
-
-    memcpy(img->inverse, img->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(img->inverse);
     float point[4][2];
     struct gui_point pox = {0.0f};
     float x_min = 0.0f;

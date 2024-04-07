@@ -506,7 +506,7 @@ bool hw_acc_imdc_decode(draw_img_t *image, gui_rect_t *rect, uint8_t *output)
 
     if (err == IMDC_SUCCESS)
     {
-        memcpy(output, &output_header, sizeof(gui_img_file_head_t));
+        memcpy(output, &output_header, sizeof(gui_rgb_data_head_t));
         return true;
     }
     else

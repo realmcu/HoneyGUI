@@ -165,6 +165,7 @@ typedef struct gui_dispdev
     void (*lcd_te_wait)(void);
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
+    void (*lcd_draw_sync)(void);
 } gui_dispdev_t;
 typedef struct
 {
@@ -337,6 +338,8 @@ typedef enum obj_type
     PAGELIST,
     PAGELISTVIEW,
     MACRO_ANIMATETRANSFORM,
+    HONEYCOMB_LIST,
+    WHEEL_LIST,
 } obj_type_t;
 typedef struct gui_msg
 {
@@ -376,27 +379,6 @@ typedef struct gui_animate
     bool animate;
 } gui_animate_t;
 
-
-typedef struct _gui_img_file_head
-{
-    unsigned char scan : 1;
-    unsigned char align : 1;
-    unsigned char rsvd : 3;
-    unsigned char compress : 3;
-    char type;
-
-    union
-    {
-        int vector_size;
-        struct
-        {
-            short img_w;
-            short img_h;
-        } img_size;
-    } size;
-    char version;
-    char rsvd2;
-} gui_img_file_head_t;
 
 typedef struct _gui_obj_t
 {
@@ -464,17 +446,18 @@ struct _gui_color
     } color;
 };
 typedef struct _gui_color gui_color_t;
-struct gui_rgb_data_head
+typedef struct gui_rgb_data_head
 {
     unsigned char scan : 1;
+    unsigned char align : 1;
+    unsigned char resize: 2; //0-no resize;1-50%(x&y);2-70%;3-80%
     unsigned char rsvd : 4;
-    unsigned char compress : 3;
     char type;
     short w;
     short h;
     char version;
     char rsvd2;
-};
+} gui_rgb_data_head_t;
 typedef struct _gui_rect_file_head
 {
     struct gui_rgb_data_head head;
@@ -564,7 +547,7 @@ extern char *defaultPath;
 
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
-#define GUI_FRAME_STEP 2
+#define GUI_FRAME_STEP 50
 #else
 #define GUI_FRAME_STEP 50
 #endif

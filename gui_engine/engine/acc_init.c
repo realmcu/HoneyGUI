@@ -19,6 +19,7 @@ void gui_acc_init(void)
 #elif defined RTK_MODULE_RTK_PPE
     acc.blit = hw_acc_blit;
 #elif defined RTK_MODULE_RTK_PPEV2
+    hw_acc_init();
     acc.blit = hw_acc_blit;
 #else
     acc.blit = sw_acc_blit;

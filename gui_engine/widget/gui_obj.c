@@ -326,7 +326,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
     matrix_multiply_point(obj->matrix, p + 3);
 
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[0] < x_min)
@@ -335,7 +335,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
         }
     }
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[0] > x_max)
@@ -344,7 +344,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
         }
     }
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[1] < y_min)
@@ -353,7 +353,7 @@ void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_
         }
     }
 
-    for (uint32_t i = 1; i < 3; i++)
+    for (uint32_t i = 1; i <= 3; i++)
     {
         gui_point_t *point = p + i;
         if (point->p[1] > y_max)
@@ -547,7 +547,20 @@ gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
     color.color.rgba.a = UINT8_MAX ;
     return color;
 }
-
+void gui_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if ((strlen(name) == strlen(obj->name)) && (strcmp(name, obj->name) == 0))
+        {
+            *output = obj;
+            return;
+        }
+        gui_tree_get_widget_by_name(obj, name, output);
+    }
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

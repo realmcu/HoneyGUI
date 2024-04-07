@@ -228,7 +228,7 @@ static void curtain_prepare(gui_obj_t *obj)
     case CURTAIN_MIDDLE:
         idy = 0;
         idx = 0;
-        break;
+        return;
     default:
         break;
     }

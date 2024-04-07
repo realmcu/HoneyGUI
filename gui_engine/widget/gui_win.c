@@ -196,12 +196,21 @@ static void win_prepare(gui_obj_t *obj)
     }
 }
 
+static void win_destory(gui_obj_t *obj)
+{
+    gui_win_t *this = (void *)obj;
+    if (this->animate)
+    {
+        gui_free(this->animate);
+    }
+}
 
 static void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                          int16_t y, int16_t w, int16_t h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     GET_BASE(this)->obj_prepare = win_prepare;
+    GET_BASE(this)->obj_destory = win_destory;
     GET_BASE(this)->type = WINDOW;
 }
 

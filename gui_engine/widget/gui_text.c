@@ -274,31 +274,20 @@ static void gui_text_draw(gui_obj_t *obj)
     draw_rect.y1 = text->offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
-
-    if (draw_rect.y1 >= (dc->section_count + 1)*dc->fb_height)
-    {
-        return;
-    }
-
-    if (draw_rect.y2 < (dc->section_count)*dc->fb_height)
-    {
-        return;
-    }
-
-    if (draw_rect.y1 >= dc->section_count * dc->fb_height && \
-        draw_rect.y1 < (dc->section_count + 1)*dc->fb_height)
+    if (dc->section_count == 0)
     {
         gui_text_font_load(text, &draw_rect);
     }
-
+    if (draw_rect.y1 >= (int)(dc->section_count + 1)*dc->fb_height || \
+        draw_rect.y2 < (int)(dc->section_count)*dc->fb_height)
+    {
+        return;
+    }
     gui_text_font_draw(text, &draw_rect);
 
     total_section_count = dc->screen_height / dc->fb_height -
                           ((dc->screen_height % dc->fb_height) ? 0 : 1);
-
-    if (draw_rect.y2 >= dc->section_count * dc->fb_height && \
-        draw_rect.y2 < (dc->section_count + 1)*dc->fb_height || \
-        dc->section_count == total_section_count)
+    if (dc->section_count == total_section_count)
     {
         gui_text_font_unload(text);
     }
@@ -416,6 +405,10 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
 {
+    if (this->len == 0 || this->font_height == 0)
+    {
+        return;
+    }
     void *img;
     gui_img_t *text_img;
 

@@ -290,7 +290,7 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
             for (uint16_t i = 0; i < text->font_len; i++)
             {
                 chr[i].x += line_buf[line].line_dx;
-                if (i > line_buf[line].line_char)
+                if (i >= line_buf[line].line_char)
                 {
                     line++;
                 }
@@ -1461,6 +1461,16 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
         default:
             break;
         }
+    }
+    switch (charset)
+    {
+    case UTF_8_CHARSET:
+        gui_free(unicode_buffer);
+        break;
+    case UTF_16_CHARSET:
+        break;
+    default:
+        break;
     }
     return all_char_w;
 }

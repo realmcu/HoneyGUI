@@ -13,12 +13,18 @@
 #include "gui_page.h"
 #include "gui_grid.h"
 #include "gui_button.h"
+#include "gui_app.h"
 static void press_callback(gui_win_t *button);
 static void press_animate_cb(gui_win_t *button);
 static void release_callback(gui_win_t *button);
 static void release_animate_callback(gui_win_t *button);
 static void deal_win_in_page(gui_obj_t *object);
 static void page_callback(gui_page_t *page);
+static void heart_rate_cb();
+static void clock_cb();
+static void watch_face_cb();
+static void calculator_cb();
+static void sport_cb();
 void design_tab_menu(void *parent)
 {
     gui_rect(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
@@ -41,6 +47,22 @@ void design_tab_menu(void *parent)
         ICON_MENU_BIN,
         ICON_MENU_BIN,
     };
+    static char *text_array[] =
+    {
+        "Heart Rate",
+        "Clock",
+        "Watch Face",
+        "Calculator",
+        "Sport",
+        "Heart Rate",
+        "Clock",
+        "Watch Face",
+        "Calculator",
+        "Sport",
+        "Watch Face",
+        "Calculator",
+        "Sport",
+    };
     int array_size = sizeof(array) / sizeof(array[0]);
     static gui_win_t *button_array[sizeof(array) / sizeof(array[0])];
     gui_grid_t *grid = gui_grid_create(page, 27, 0, array_size, 1, 0, 74);
@@ -60,8 +82,6 @@ void design_tab_menu(void *parent)
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
         }
         button_array[i] = button;
-        static char text_array[24][6];
-        sprintf(text_array[i], "APP%d", (int)i);
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
@@ -70,6 +90,15 @@ void design_tab_menu(void *parent)
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
+    {
+
+
+    }
+    gui_win_onClick(button_array[0], heart_rate_cb, button_array[0]);
+    // gui_win_onClick(button_array[1], clock_cb, button_array[1]);
+    // gui_win_onClick(button_array[2], watch_face_cb, button_array[2]);
+    // gui_win_onClick(button_array[3], calculator_cb, button_array[3]);
+    // gui_win_onClick(button_array[4], sport_cb, button_array[4]);
 
 }
 
@@ -198,3 +227,23 @@ static void page_callback(gui_page_t *page)
 
 
 }
+static void heart_rate_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_HEART_RATE))
+}
+// static void clock_cb()
+// {
+//     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CLOCK))
+// }
+// static void watch_face_cb()
+// {
+//     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_WATCH_FACE))
+// }
+// static void calculator_cb()
+// {
+//     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CALCULATOR))
+// }
+// static void sport_cb()
+// {
+//     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_SPORT))
+// }

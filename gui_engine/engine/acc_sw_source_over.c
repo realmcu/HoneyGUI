@@ -857,7 +857,7 @@ void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
 //    uint8_t source_bytes_per_pixel = 4;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-
+    gui_color_t reverse = {.color.rgba.a = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.a, .color.rgba.r = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.b, .color.rgba.b = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.r, .color.rgba.g = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.g};
 
     for (uint32_t i = y_start; i < y_end; i++)
     {
@@ -869,8 +869,7 @@ void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
         for (uint32_t j = x_start; j < x_end; j++)
         {
-            gui_color_t color ;
-            color.color.rgba_full = ((gui_rect_file_head_t *)(image->data))->color.color.rgba_full;
+
             uint8_t opacity_value = image->opacity_value;
             switch (opacity_value)
             {
@@ -879,13 +878,15 @@ void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             case 255:
                 {
                     gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_argb8888(d, &color);
+
+                    do_blending_2_argb8888(d, &reverse);
                 }
                 break;
             default:
                 {
                     gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_argb8888_opacity(d, &color, opacity_value);
+                    gui_color_t reverse = {.color.rgba.a = d->color.rgba.a, .color.rgba.r = d->color.rgba.b, .color.rgba.b = d->color.rgba.r, .color.rgba.g = d->color.rgba.g};
+                    do_blending_2_argb8888_opacity(d, &reverse, opacity_value);
                 }
                 break;
             }

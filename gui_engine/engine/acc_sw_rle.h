@@ -49,6 +49,18 @@ typedef struct imdc_file
     uint32_t compressed_addr[1024];
 
 } imdc_file_t;
+
+typedef struct gui_img_file
+{
+    gui_rgb_data_head_t img_header;
+    union
+    {
+        imdc_file_t idc_file;
+        uint32_t unzip_data[1024];
+    } data;
+
+} gui_img_file_t;
+
 #pragma pack(1)
 
 typedef struct imdc_rgb565_node
@@ -90,6 +102,10 @@ void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf);
 void sw_acc_rle_uncompress(draw_img_t *image, void *buf);
+
+void uncompressed_rle_line(imdc_file_t *file, uint32_t line, int16_t x, int16_t w, uint8_t *buf);
+void uncompressed_rle_rect(imdc_file_t *file, int16_t x, int16_t y, int16_t w, int16_t h,
+                           uint8_t *buf);
 
 #ifdef __cplusplus
 }

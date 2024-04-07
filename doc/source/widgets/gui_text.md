@@ -1,4 +1,5 @@
 # Text widget
+
 <br>
 
 ## Overview
@@ -31,9 +32,7 @@ Using functions to load font files and display text
 
 In order to draw text, font files containing glyph information need to be loaded into the system.
 
-The font file can be standard .ttf file or customized .bin file. It must to be initialized before use the text widget.
-
-+ To initialize the old version customized bin font file, you need to use [gui_set_font_mem_resourse(font_size, font_bitmap_addr, font_table_addr)](#api) . The font size and two files must be matched.
+The font file can be standard .ttf file or customized .bin file. The font file can be initialized ahead of time to avoid having to set the font type for each text widget.
 
 + To initialize the new version customized bin font file, you need to use [gui_font_mem_init(font_bin_addr)](#api) .
 
@@ -41,7 +40,7 @@ The font file can be standard .ttf file or customized .bin file. It must to be i
 
 All customized bin font files are available from RTK technicians.
 
-`DOT_BIN`,`TABLE_BIN`,`FONT_BIN`,`FONT_TTF` are all address of the files stored in flash.
+`FONT_BIN`,`FONT_TTF` are all address of the files stored in flash.
 
 If you want to know more about file storage, please read userdata.md.
 
@@ -64,10 +63,28 @@ To add some texts or characters to a text widget and set text attributes with: [
 Note that text length must be the same as the set character length, text frontsize should must be the same as the type size
 
 #### Font type
-Text widget support the type setting. You can use this function to set type
+
+Text widget support the type setting. You can use this function to set type.Type is bin/ttf file address.
 [gui_text_type_set(this, type)](#api).
 
+#### Text content
+
+This interface can be used to set the content that needs to be displayed by the text widget.
+[gui_text_content_set(this, text, length)](#api).
+
+#### Text encoding
+
+The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, and this interface can be used to change the decoding method.
+[gui_text_encoding_set(this, charset)](#api).
+
+#### Convert to img
+
+By using this interface, the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
+[gui_text_convert_to_img(this, font_img_type)](#api).
+Because the content and font size information of the text widget is needed, it should be called after set text.If the content, font size, position and other attributes of the text have been modified, you need to reuse this interface for conversion.
+
 #### Text mode
+
 Text widget support seven typesetting modes, to set text typesetting mode with: [gui_text_mode_set(this, mode)](#api).
 
 All nine typesetting modes are as follows.
@@ -98,9 +115,11 @@ typedef enum
 ```
 
 ### Text move
+
 You can use this function [gui_text_move(this, x, y)](#api) to move text to a specified location, but x and y cannot be larger than w and h of the text
 
 ### Set animate
+
 Using this function [gui_text_set_animate(o, dur, repeatCount, callback, p)](#api) to set the animation and implement the animation effect in the corresponding callback function
 
 To use scroll text, you can read scrolltext.md.
@@ -131,30 +150,29 @@ static void app_launcher_ui_design(gui_app_t *app)
 {
     gui_font_mem_init(HARMONYOS_SIZE24_BITS1_FONT_BIN);
     gui_font_mem_init(HARMONYOS_SIZE16_BITS4_FONT_BIN);
+    gui_font_mem_init(HARMONYOS_SIZE32_BITS1_FONT_BIN);
     gui_font_mem_init(SIMKAI_SIZE24_BITS4_FONT_BIN);
-    gui_set_font_mem_resourse(32, GBK_32_32_DOT_BIN, GBK_UNICODE_TABLE_BIN);
-    gui_set_font_mem_resourse(28, QUICKSAND_SEMIBOLD_28_BIN, CP500_TABLE_BIN);
 
     void *screen = &app->screen;
 
     gui_text_t *text1 = gui_text_create(screen,  "text1",  10, 10, 100, 50);
-    gui_text_set(text1, chinese, GUI_FONT_SRC_BMP, 0xffffffff, strlen(chinese), 24);
+    gui_text_set(text1, chinese, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen(chinese), 24);
     gui_text_type_set(text1, HARMONYOS_SIZE24_BITS1_FONT_BIN);
     gui_text_mode_set(text1, LEFT);
 
     gui_text_t *text2 = gui_text_create(screen,  "text2",  0, 50, 300, 50);
-    gui_text_set(text2, "english", GUI_FONT_SRC_BMP, 0xff0000ff, 7, 16);
+    gui_text_set(text2, "english", GUI_FONT_SRC_BMP, APP_COLOR_RED, 7, 16);
     gui_text_type_set(text2, HARMONYOS_SIZE16_BITS4_FONT_BIN);
     gui_text_mode_set(text2, LEFT);
 
     char *string = "TEXT_WIDGET";
     gui_text_t *text3 = gui_text_create(screen,  "text3",  0, 90, 300, 50);
-    gui_text_set(text3, string, GUI_FONT_SRC_BMP, 0x0000ffff, strlen(string), 32);
-    gui_text_type_set(text3, GBK_32_32_DOT_BIN);
+    gui_text_set(text3, string, GUI_FONT_SRC_BMP, APP_COLOR_BLUE, strlen(string), 32);
+    gui_text_type_set(text3, HARMONYOS_SIZE32_BITS1_FONT_BIN);
     gui_text_mode_set(text3, CENTER);
 
     gui_text_t *text4 = gui_text_create(screen,  "text4",  0, 150, 100, 200);
-    gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, 0xffff0000, 24, 24);
+    gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0xff), 24, 24);
     gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN);
     gui_text_mode_set(text4, MULTI_CENTER);
 }
@@ -204,7 +222,7 @@ void page_tb_activity(void *parent)
     gui_font_mem_init(SIMKAI_SIZE24_BITS4_FONT_BIN);
 
     gui_text_t *text = gui_text_create(parent,  "text",  0, 0, 100, 200);
-    gui_text_set(text, "ABCDEFGHI", GUI_FONT_SRC_BMP, 0xffff0000, 9, 24);
+    gui_text_set(text, "ABCDEFGHI", GUI_FONT_SRC_BMP, APP_COLOR_RED, 9, 24);
     gui_text_type_set(text, SIMKAI_SIZE24_BITS4_FONT_BIN);
     gui_text_mode_set(text, MULTI_CENTER);
     gui_text_set_animate(text, 5000, 15, change_text_cb, text);

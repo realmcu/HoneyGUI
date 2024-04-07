@@ -20,6 +20,7 @@
 #include "gui_page.h"
 #include "gui_components_init.h"
 #include "app_launcher.h"
+#include "gui_wheel_list.h"
 #ifndef _WIN32
 #include "os_mem.h"
 #endif // !_WIN32
@@ -40,6 +41,24 @@ static gui_app_t app_launcher =
 gui_app_t *get_launcher_app(void)
 {
     return &app_launcher;
+}
+
+static void app_wheel_ui_design(gui_app_t *app);
+static gui_app_t app_wheel =
+{
+    .screen =
+    {
+        .name = "app_wheel",
+        .x    = 0,
+        .y    = 0,
+    },
+    .ui_design = app_wheel_ui_design,
+    .active_ms = 1000 * 5,
+};
+
+gui_app_t *get_wheel_app(void)
+{
+    return &app_wheel;
 }
 
 static void *addr_list[] =
@@ -103,10 +122,6 @@ static void tab_img(void *tab)
     gui_img_t *ppe_test = gui_img_create_from_mem(tab, "ppe", TREE_BIN, 0, 0, 0, 0);
     gui_img_scale(ppe_test, (float)xscale / 256, (float)yscale / 256);
     // gui_img_set_animate(ppe_test, 1000, -1, change_size, ppe_test);
-}
-static void tab_dynamic(void *tab)
-{
-
 }
 #define FONT_NUM 4
 char *text_string[FONT_NUM] =
@@ -266,6 +281,10 @@ static void curtain_center(gui_curtainview_t *curtainview)
                                                     20);
     gui_text_set(electric_quantity, "80", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 2, 32);
 }
+static void switch_to_wheel(void *obj, gui_event_t event)
+{
+    gui_switch_app(get_launcher_app(), get_wheel_app());
+}
 static void curtain_up(gui_curtainview_t *curtainview)
 {
     gui_curtain_t *curtain_up = gui_curtain_create(curtainview, "curtain_up", 0, 0, 0, 0, CURTAIN_UP,
@@ -273,6 +292,7 @@ static void curtain_up(gui_curtainview_t *curtainview)
     gui_img_t *bg = gui_img_create_from_mem(curtain_up, "bg", CURTAIN_HALF_BACKGROUND_90_BIN, -20, 228,
                                             0, 0);
     gui_img_t *app1 = gui_img_create_from_mem(curtain_up, "app1", APP_GOOGLE_BIN, 5, 238, 0, 0);
+    gui_obj_add_event_cb(app1, switch_to_wheel, GUI_EVENT_TOUCH_CLICKED, NULL);
     gui_img_t *app2 = gui_img_create_from_mem(curtain_up, "app2", APP_FACEBOOK_BIN, 74, 238, 0, 0);
     gui_img_t *app3 = gui_img_create_from_mem(curtain_up, "app3", APP_GMAIL_BIN, 142, 238, 0, 0);
     gui_img_t *app4 = gui_img_create_from_mem(curtain_up, "app4", APP_INSTAGRAM_BIN, 211, 238, 0, 0);
@@ -311,19 +331,53 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_tab_t *tab3 = gui_tab_create(tv, "tab3", 0, 0, 0, 0, 3, 0);
     gui_tab_t *tab4 = gui_tab_create(tv, "tab4", 0, 0, 0, 0, 4, 0);
     gui_tab_t *tab5 = gui_tab_create(tv, "tab5", 0, 0, 0, 0, 5, 0);
-    gui_tab_t *tab6 = gui_tab_create(tv, "tab6", 0, 0, 0, 0, 6, 0);
 
     tab_two(tabn);
     tab_home(tab0);
     tab_lake(tab1);
     tab_tree(tab2);
-    tab_img(tab4);
-    tab_dynamic(tab5);
-    tab_iconlist(tab3);
-    tab_text(tab6);
+    tab_img(tab3);
+    tab_text(tab5);
+    tab_iconlist(tab5);
 #ifndef _WIN32
     gui_log("after ui unused mem head is %d", heap = os_mem_peek(RAM_TYPE_DATA_ON));
 #endif
+}
+
+static void wheel_cb(void *obj, gui_event_t event)
+{
+    gui_img_t *img = (gui_img_t *)obj;
+    gui_log("img p %p, x %d, y %d \n", obj, img->base.x, img->base.y);
+}
+static void switch_to_launcher(void *obj, gui_event_t event)
+{
+    gui_switch_app(get_wheel_app(), get_launcher_app());
+}
+static void app_wheel_ui_design(gui_app_t *app)
+{
+    gui_wheel_list_t *hc = gui_wheel_list_create(&app->screen, 2, 32, 80);
+    gui_wheel_list_add_icon_default(hc, ICMENUALARM_BIN, switch_to_launcher);
+
+    gui_wheel_list_add_icon_default(hc, ICMENUBIRD_BIN, wheel_cb);
+    gui_wheel_list_add_icon_default(hc, ICMENUALBUM_BIN, wheel_cb);
+    gui_wheel_list_add_icon_default(hc, ICMENUHEARTRATE_BIN, wheel_cb);
+    gui_wheel_list_add_icon_default(hc, ICMENUMUSIC_BIN, wheel_cb);
+    gui_wheel_list_add_icon_default(hc, ICMENUALARM_BIN, wheel_cb);
+    gui_wheel_list_add_icon_default(hc, ICMENUBIRD_BIN, wheel_cb);
+    gui_wheel_list_set_icon(hc, ICMENUALARM_BIN, wheel_cb, 1, 0);
+
+    gui_wheel_list_add_icon_default(hc, ICMENUALBUM_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUHEARTRATE_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUMUSIC_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUALARM_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUBIRD_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUALBUM_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUHEARTRATE_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUMUSIC_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUALARM_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUBIRD_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUALBUM_BIN, NULL);
+    gui_wheel_list_add_icon_default(hc, ICMENUHEARTRATE_BIN, NULL);
 }
 
 uint8_t resource_root[1024 * 1024 * 20];

@@ -61,6 +61,71 @@ void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
     }
 #endif
 }
+
+void uncompressed_rle_line(imdc_file_t *file, uint32_t line, int16_t x, int16_t w, uint8_t *buf)
+{
+#if 0
+    uint32_t start = (uint32_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+
+    uint16_t *linebuf = (uint16_t *)buf;
+    uint16_t section = 0;
+    for (uint32_t addr = start; addr < end; addr = addr + sizeof(imdc_rgb565_node_t))
+    {
+        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)addr;
+
+        uint16_t right = section + node->len;
+        uint16_t left = section;
+
+        if ((left < x) && (right < x))
+        {
+            ;
+        }
+        else if ((left > (x + w)) && (right > (x + w)))
+        {
+            break;
+        }
+        else if ((left < x) && (right > x))
+        {
+            gui_memset16(linebuf, node->pixel16, right - x);
+            linebuf++;
+        }
+        else if ((left < (x + w)) && (right > (x + w)))
+        {
+            gui_memset16(linebuf, node->pixel16, 1);
+            linebuf++;
+        }
+        else if ((left < x) && (right > (x + w)))
+        {
+            gui_memset16(linebuf, node->pixel16, 1);
+            linebuf++;
+        }
+        else
+        {
+            gui_memset16(linebuf, node->pixel16, node->len);
+            linebuf = linebuf + node->len;
+        }
+
+        section = section + node->len;
+
+    }
+#endif
+    uint8_t linebuf[1024 * 2];
+    uncompressed_rle_rgb565(file, line, linebuf);
+    memcpy(buf, linebuf + x * 2, w * 2);
+}
+
+void uncompressed_rle_rect(imdc_file_t *file, int16_t x, int16_t y, int16_t w, int16_t h,
+                           uint8_t *buf)
+{
+    for (uint32_t i = 0; i < h; i++)
+    {
+        uncompressed_rle_line(file, i + y, x, w, buf + i * 2 * w);
+    }
+}
+
+
+
 void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
