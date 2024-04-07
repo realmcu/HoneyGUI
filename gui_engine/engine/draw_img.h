@@ -25,10 +25,10 @@ typedef enum
 
 typedef enum
 {
-    RGB565 = 0,
-    ARGB8565 = 1,
-    RGB888 = 3,
-    RGBA8888 = 4,
+    RGB565 = 0, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red
+    ARGB8565 = 1, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha
+    RGB888 = 3, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red
+    RGBA8888 = 4, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for Alpha
     BINARY = 5,
     ALPHAMASK = 9,
     IMDC_COMPRESS = 10,
