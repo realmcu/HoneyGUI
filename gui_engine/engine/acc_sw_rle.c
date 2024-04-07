@@ -205,17 +205,16 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
 {
     int source_w = image->img_w;
     int source_h = image->img_h;
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t img_type = *((uint8_t *)image_off);
-    uint8_t img_color_type = *((uint8_t *)image_off + 1);
-    imdc_file_t *file = (imdc_file_t *)image_off;
+
     uint8_t *line_buf = buf;
-    struct gui_rgb_data_head *head = image->data;
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)image->data;
+    gui_img_file_t *img_file = (gui_img_file_t *)image->data;
+    imdc_file_t *file = (imdc_file_t *)img_file->data.unzip_data;
 
     memcpy(buf, head, sizeof(struct gui_rgb_data_head));
     head = buf;
     line_buf = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(buf));
-    if (img_type == 4)//rle_rgb565
+    if (head->type == RGB565)//rle_rgb565
     {
         uint8_t source_bytes_per_pixel = 2;
         for (int k = 0; k < source_h; k++)
@@ -224,7 +223,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
         }
         head->type = RGB565;
     }
-    else if (img_type == 68 && img_color_type == ARGB8565)//rle_argb8565
+    else if (head->type == ARGB8565)//rle_argb8565
     {
         uint8_t source_bytes_per_pixel = 3;
         for (int k = 0; k < source_h; k++)
@@ -233,7 +232,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
         }
         head->type = ARGB8565;
     }
-    else if (img_type == 68 && img_color_type == RGB888)//rle_rgb888
+    else if (head->type == RGB888)//rle_rgb888
     {
         uint8_t source_bytes_per_pixel = 3;
         for (int k = 0; k < source_h; k++)
@@ -242,7 +241,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
         }
         head->type = RGB888;
     }
-    else if (img_type == 132)//rle_rgba8888
+    else if (head->type == RGBA8888)//rle_rgba8888
     {
         uint8_t source_bytes_per_pixel = 4;
         for (int k = 0; k < source_h; k++)
@@ -251,6 +250,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
         }
         head->type = RGBA8888;
     }
+    head->compress = 0;
     return;
 }
 
