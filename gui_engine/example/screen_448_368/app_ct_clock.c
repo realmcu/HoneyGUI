@@ -1,5 +1,5 @@
 #include "root_image_hongkong/ui_resource.h"
-#include <gui_img.h>
+#include "gui_img.h"
 #include "gui_win.h"
 #include "gui_watch_gradient_spot.h"
 #include "gui_text.h"
@@ -13,7 +13,7 @@ gui_win_t *win_watch;
 gui_img_t *img;
 gui_watch_gradient_spot_t *watch;
 gui_text_t *rate;
-static gui_watchface_gradient_t *canvas;
+static T_GUI_WATCHFACE_GRADIENT *canvas;
 gui_tabview_t *tablist_tab;
 
 // static void canvas_cb(gui_canvas_t *canvas)

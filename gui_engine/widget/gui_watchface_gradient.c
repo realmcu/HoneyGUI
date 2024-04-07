@@ -17,9 +17,9 @@
  * File      : gui_watchface_gradient.c
  *
  */
-#include <gui_obj.h>
+#include <math.h>
+#include "gui_obj.h"
 #include "gui_watchface_gradient.h"
-#include "math.h"
 
 
 /** @defgroup WIDGET WIDGET
@@ -57,13 +57,6 @@
   * @{
   */
 
-#define WATCHFACE_GRADIENT_RING1 296.52f
-#define WATCHFACE_GRADIENT_RING2 192.17f
-#define WATCHFACE_GRADIENT_RING3 87.83f
-#define WATCHFACE_GRADIENT_BASE 368.0f
-#define WATCHFACE_GRADIENT_SCLAE     (GET_BASE(canvas)->w/WATCHFACE_GRADIENT_BASE)
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -86,7 +79,7 @@
   * @{
   */
 
-static void canvas_design(gui_canvas_t *canvas)
+static void gui_watchface_gradient_canvas_design(gui_canvas_t *canvas)
 {
     gui_dispdev_t *dc = gui_get_dc();
     NVGcontext *vg = canvas->vg;
@@ -117,6 +110,7 @@ static void canvas_design(gui_canvas_t *canvas)
     nvgFill(canvas->vg);
     static float d = 0;
     d += 0.005f;
+
     {
         //for hour point
         nvgResetTransform(vg);
@@ -138,6 +132,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 1 * 255));
         nvgFill(vg);
     }
+
     {
         float r0, r1, ax, ay, bx, by, cx, cy;
         float a0, a1;
@@ -187,6 +182,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
         nvgFill(vg);
     }
+
     {
         //for hour point
         nvgResetTransform(vg);
@@ -209,8 +205,6 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFill(vg);
     }
 
-
-
     {
         //for minuts point
         nvgResetTransform(vg);
@@ -232,6 +226,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 1 * 255));
         nvgFill(vg);
     }
+
     {
         float r0, r1, ax, ay, bx, by, cx, cy;
         float a0, a1;
@@ -262,10 +257,10 @@ static void canvas_design(gui_canvas_t *canvas)
                                                                        92, 230, 1 * 255), nvgRGBA(94,
                                                                                92, 230, 0));
 #endif
-
         nvgFillPaint(vg, paint);
         nvgFill(vg);
     }
+
     {
         //for minuts point
         nvgResetTransform(vg);
@@ -287,6 +282,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
         nvgFill(vg);
     }
+
     {
         //for minuts point
         nvgResetTransform(vg);
@@ -308,6 +304,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFillColor(vg, nvgRGBA(94, 92, 230, 1 * 255));
         nvgFill(vg);
     }
+
     {
         //for sceond point
         float cx, cy;
@@ -331,9 +328,9 @@ static void canvas_design(gui_canvas_t *canvas)
                                            1 * 255), nvgRGBA(255, 51, 119, 0));
 #endif
         nvgFillPaint(vg, paint);
-
         nvgFill(vg);
     }
+
     {
         //for sceond point
         nvgResetTransform(vg);
@@ -345,6 +342,7 @@ static void canvas_design(gui_canvas_t *canvas)
         nvgFillColor(vg, nvgRGBA(255, 255, 255, 1 * 255));
         nvgFill(vg);
     }
+
     {
         //for sceond point
         nvgResetTransform(vg);
@@ -383,7 +381,7 @@ static void canvas_design(gui_canvas_t *canvas)
     nvgFill(vg);
 }
 
-static void prepare(gui_canvas_t *this)
+static void gui_watchface_gradient_prepare(gui_canvas_t *this)
 {
     GUI_UNUSED(this);
     gui_dispdev_t *dc = gui_get_dc();
@@ -397,16 +395,13 @@ static void prepare(gui_canvas_t *this)
     GUI_UNUSED(cy);
 }
 
-static void widget_nanovg_draw_cb(gui_obj_t *obj)
+static void gui_watchface_gradient_widget_nanovg_draw_cb(gui_obj_t *obj)
 {
     gui_canvas_t *this = (gui_canvas_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
 
     if (this->nanovg_canvas_cb != NULL)
     {
-        extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
-                                         uint8_t *data);
-        extern void nvgDeleteAGGE(NVGcontext * ctx);
         NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
                                        (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
         nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
@@ -419,27 +414,32 @@ static void widget_nanovg_draw_cb(gui_obj_t *obj)
         nvgTransform(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
                      obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
 
-
         this->nanovg_canvas_cb(this);
 
         nvgEndFrame(vg);
         nvgDeleteAGGE(vg);
     }
 }
-static void widget_nanovg_end(gui_obj_t *obj)
+
+static void gui_watchface_gradient_widget_nanovg_end(gui_obj_t *obj)
 {
     gui_canvas_t *this = (gui_canvas_t *)obj;
     GUI_UNUSED(this);
-
 }
-static void widget_nanovg_destory(gui_obj_t *obj)
+
+static void gui_watchface_gradient_widget_nanovg_destory(gui_obj_t *obj)
 {
 
 }
-static void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char *name,
-                               void *data,
-                               int16_t x,
-                               int16_t y, int16_t w, int16_t h)
+
+static void gui_watchface_gradient_widget_nanovg_ctor(gui_canvas_t *this,
+                                                      gui_obj_t    *parent,
+                                                      const char   *name,
+                                                      void         *data,
+                                                      int16_t      x,
+                                                      int16_t      y,
+                                                      int16_t      w,
+                                                      int16_t      h)
 {
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
@@ -448,42 +448,47 @@ static void widget_nanovg_ctor(gui_canvas_t *this, gui_obj_t *parent, const char
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
-    root->obj_draw = widget_nanovg_draw_cb;
-    root->obj_end = widget_nanovg_end;
-    root->obj_destory = widget_nanovg_destory;
-
-    //for self
-
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_watchface_gradient_prepare;
+    root->obj_draw = gui_watchface_gradient_widget_nanovg_draw_cb;
+    root->obj_end = gui_watchface_gradient_widget_nanovg_end;
+    root->obj_destory = gui_watchface_gradient_widget_nanovg_destory;
 }
 
-static void watchface_gradient_ctor(gui_watchface_gradient_t *this, gui_obj_t *parent,
-                                    const char *name,
-                                    int16_t x,
-                                    int16_t y, int16_t w, int16_t h)
+static void gui_watchface_gradient_ctor(T_GUI_WATCHFACE_GRADIENT *this,
+                                        gui_obj_t                *parent,
+                                        const char               *name,
+                                        int16_t                  x,
+                                        int16_t                  y,
+                                        int16_t                  w,
+                                        int16_t                  h)
 {
-    widget_nanovg_ctor((gui_canvas_t *)this, parent, name, NULL, x, y, w, h);
-    gui_canvas_set_canvas_cb((gui_canvas_t *)this, canvas_design);
+    gui_watchface_gradient_widget_nanovg_ctor((gui_canvas_t *)this, parent, name, NULL, x, y, w, h);
+    gui_canvas_set_canvas_cb((gui_canvas_t *)this, gui_watchface_gradient_canvas_design);
 }
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
 
-
-gui_watchface_gradient_t *gui_watchface_gradient_create(void *parent,  const char *name,
-                                                        int16_t x, int16_t y, int16_t w, int16_t h)
+T_GUI_WATCHFACE_GRADIENT *gui_watchface_gradient_create(void       *parent,
+                                                        const char *name,
+                                                        int16_t    x,
+                                                        int16_t    y,
+                                                        int16_t    w,
+                                                        int16_t    h)
 {
     GUI_ASSERT(parent != NULL);
+
     if (name == NULL)
     {
         name = "watchface_gradient";
     }
-    gui_watchface_gradient_t *this = gui_malloc(sizeof(gui_watchface_gradient_t));
-    GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(gui_watchface_gradient_t));
 
-    watchface_gradient_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
+    T_GUI_WATCHFACE_GRADIENT *this = gui_malloc(sizeof(T_GUI_WATCHFACE_GRADIENT));
+    GUI_ASSERT(this != NULL);
+    memset(this, 0x00, sizeof(T_GUI_WATCHFACE_GRADIENT));
+
+    gui_watchface_gradient_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
