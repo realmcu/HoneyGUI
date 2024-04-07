@@ -1,0 +1,341 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file gui_curtain.c
+  * @brief create a curtain effect widget,which should be nested in a curtainview.
+  * @details Slide to extend and retract curtains
+  * @author triton_yu@realsil.com.cn
+  * @date 2023/10/24
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
+
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
+#include <guidef.h>
+#include <gui_menu_cellular.h>
+#include <string.h>
+#include <gui_server.h>
+#include "gui_obj.h"
+#include <tp_algo.h>
+#include <gui_img.h>
+#include "gui_win.h"
+#include "math.h"
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
+
+
+
+/** End of WIDGET_Exported_Types
+  * @}
+  */
+
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+
+#define SCREEN_W ((float)gui_get_screen_width()-25.0f)
+#define SCREEN_H ((float)gui_get_screen_height()-25.0f)
+#define SPEED_MAX 50
+#define SPEED_MIN 5
+
+
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
+
+static int x, y ;
+static int16_t speed[2];
+static int16_t left, right, top, bottom;
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
+#define CIRCLE_BOUNDARY (180.0f/454.0F*((float)gui_get_screen_width()))
+static void image(gui_obj_t *object)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &object->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == IMAGE_FROM_MEM)
+        {
+            touch_info_t *tp = tp_get_info();
+
+            if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y)
+            {
+
+                obj->x += tp->deltaX - x;
+                obj->y += tp->deltaY - y;
+            }
+            else
+            {
+                if (speed[0] != 0 || speed[1] != 0)
+                {
+                    obj->x += speed[0];
+                    obj->y += speed[1];
+                }
+            }
+            if (obj->x < left)
+            {
+                left = obj->x;
+            }
+            if (obj->x > right)
+            {
+                right = obj->x;
+            }
+            if (obj->y < top)
+            {
+                top = obj->y;
+            }
+            if (obj->y > bottom)
+            {
+                bottom = obj->y;
+            }
+            float x = sqrtf((SCREEN_W / 2.0f - (float)obj->x) * (SCREEN_W / 2.0f - (float)obj->x) +
+                            (SCREEN_H / 2.0f - (float)obj->y) * (SCREEN_H / 2.0f - (float)obj->y));
+
+            float scale = -1.0f / (1.8f * SCREEN_W) * x + 1.0f;
+            if (_UI_ABS(x) > CIRCLE_BOUNDARY)
+            {
+                scale = scale - (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY);
+            }
+            if (scale <= 0)
+            {
+                scale = 0.01f;
+            }
+            gui_img_scale(obj, scale, scale);
+            gui_img_rotation(obj, 0, gui_img_get_width(obj) / 2,
+                             gui_img_get_height(obj) / 2);
+            gui_img_translate(obj, gui_img_get_width(obj) / 2,
+                              gui_img_get_height(obj) / 2);
+            float tx, ty;
+            if (_UI_ABS(x) > CIRCLE_BOUNDARY)
+            {
+                tx = (SCREEN_W / 2.0f - (float)obj->x) *
+                     (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
+                     * (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
+                     + ((float)(gui_img_get_width(obj) / 2))
+                     * (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)
+                     * ((SCREEN_W / 2.0f
+                         - (float)obj->x) / (SCREEN_W / 2.0f));
+                ty = (SCREEN_H / 2.0f - (float)obj->y)  *
+                     (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
+                     * (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
+                     + ((float)(gui_img_get_height(obj) / 2))
+                     * (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_H / 2.0f - CIRCLE_BOUNDARY)
+                     * ((SCREEN_H / 2.0f
+                         - (float)obj->y) / (SCREEN_H / 2.0f));
+            }
+            else
+            {
+                tx = (SCREEN_W / 2.0f - (float)obj->x) * (1.0f - (scale)) * (1.0f - (scale)) ;
+                ty = (SCREEN_H / 2.0f - (float)obj->y) * (1.0f - (scale)) * (1.0f - (scale)) ;
+            }
+            gui_img_translate(obj, tx, ty);
+        }
+
+        image(obj);
+    }
+}
+static void wincb(gui_win_t *win)
+{
+    touch_info_t *tp = tp_get_info();
+    static bool move_flag = 1;
+    left = INT16_MAX; right = 0; top = INT16_MAX; bottom = 0;
+    if (move_flag)
+    {
+        image(win);
+    }
+    else
+    {
+        move_flag = 1;
+    }
+    x = tp->deltaX;
+    y = tp->deltaY;
+
+    static int16_t recode[2][5];
+    int recode_num = sizeof(recode[0]) / sizeof(int16_t) - 1;
+
+    if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y)
+    {
+
+        for (size_t i = 0; i < recode_num; i++)
+        {
+            recode[0][i] = recode[0][i + 1];
+            recode[1][i] = recode[1][i + 1];
+        }
+        recode[0][recode_num] = tp->deltaX;
+        recode[1][recode_num] = tp->deltaY;
+        speed[0] = recode[0] [recode_num] - recode[0][0];
+        speed[1] = recode[1] [recode_num] - recode[1][0];
+        for (size_t i = 0; i < 2; i++)
+        {
+            if (speed[i] > SPEED_MAX)
+            {
+                speed[i] = SPEED_MAX;
+            }
+            else if (speed[i] < -SPEED_MAX)
+            {
+                speed[i] = -SPEED_MAX;
+            }
+            if (speed[i] > 0 && speed[i] < SPEED_MIN)
+            {
+                speed[i] = SPEED_MIN;
+            }
+            else if (speed[i] < 0 && speed[i] > -SPEED_MIN)
+            {
+                speed[i] = -SPEED_MIN;
+            }
+        }
+    }
+    else
+    {
+        if (left > SCREEN_W / 2 || right < SCREEN_W / 2 || top > SCREEN_H / 2 || bottom < SCREEN_H / 2)
+        {
+            for (size_t i = 0; i < recode_num + 1; i++)
+            {
+                recode[0][i] = 0;
+                recode[1][i] = 0;
+            }
+            speed[0] = 0;
+            speed[1] = 0;
+            move_flag = 0;
+            return;
+        }
+        for (size_t i = 0; i < recode_num + 1; i++)
+        {
+            recode[0][i] = 0;
+            recode[1][i] = 0;
+        }
+        if (speed[0] > 0)
+        {
+            speed[0]--;
+        }
+        else if (speed[0] < 0)
+        {
+            speed[0]++;
+        }
+        if (speed[1] > 0)
+        {
+            speed[1]--;
+        }
+        else if (speed[1] < 0)
+        {
+            speed[1]++;
+        }
+    }
+
+
+
+}
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
+gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],
+                                              int array_size)
+{
+    gui_win_t *win = gui_win_create(parent, 0, 0, 0, gui_get_screen_width(),
+                                    gui_get_screen_height());
+    gui_win_set_animate(win, 1000, -1, wincb, win);
+#define ICON_SIZE (icon_size)
+#define WIDTH_GAP (ICON_SIZE)
+#define HEIGHT_GAP (ICON_SIZE-ICON_SIZE/7)
+    for (size_t i = 0; i < array_size; i++)
+    {
+        if (i < 3)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * 2, 0, 0, 0);
+        }
+        else if (i < 9)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 3) + (WIDTH_GAP / 2),
+                                    HEIGHT_GAP, 0, 0);
+        }
+        else if (i < 16)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 9) + (WIDTH_GAP / 2) * 0,
+                                    HEIGHT_GAP * 2, 0, 0);
+        }
+        else if (i < 24)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 17) + (WIDTH_GAP / 2) * 1,
+                                    HEIGHT_GAP * 3, 0, 0);
+        }
+        else if (i < 31)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 24) + (WIDTH_GAP / 2) * 0,
+                                    HEIGHT_GAP * 4, 0, 0);
+        }
+        else if (i < 37)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 31) + (WIDTH_GAP / 2) * 1,
+                                    HEIGHT_GAP * 5, 0, 0);
+        }
+        else if (i < 42)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 36) + (WIDTH_GAP / 2) * 0,
+                                    HEIGHT_GAP * 6, 0, 0);
+        }
+        else if (i < 46)
+        {
+            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 41) + (WIDTH_GAP / 2) * 1,
+                                    HEIGHT_GAP * 7, 0, 0);
+        }
+    }
+
+}
+
+
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
+
+
+
