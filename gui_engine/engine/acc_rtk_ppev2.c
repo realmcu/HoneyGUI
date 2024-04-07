@@ -20,7 +20,7 @@
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
 
 #define PPEV2_ACC_MIN_OPA       3
-#define PPEV2_TESS_LENGTH       100
+#define PPEV2_TESS_LENGTH       92
 
 #include "section.h"
 #define CACHE_BUF_SIZE           (42 * 1024)
@@ -32,7 +32,7 @@ static void change_cache_buf(uint32_t cache_size)
 {
     if (cache_buf == cache_buf1)
     {
-        cache_buf2 = cache_buf1 + last_cache_size;
+        cache_buf2 = cache_buf1 + (CACHE_BUF_SIZE - cache_size - 4);
         cache_buf = cache_buf2;
     }
     else if (cache_buf == cache_buf2)
@@ -61,6 +61,7 @@ static void restore_cache_buf(void)
 #endif
     cache_buf = cache_buf1;
 }
+
 #if F_APP_GUI_USE_PSRAM
 static void cache_on_psram(uint32_t size)
 {
@@ -76,13 +77,10 @@ static uint8_t memcpy_dma_num = 0xa5, support_dma_num = 0xa5;
 static bool memcpy_by_dma(ppe_rect_t *p_rect, ppe_buffer_t *source)
 {
     uint8_t pixel_size = PPEV2_Get_Pixel_Size(source->format);
-#if !F_APP_GUI_USE_PSRAM
-
     if (p_rect->w * p_rect->h * pixel_size > CACHE_BUF_SIZE)
     {
         return false;
     }
-#endif
     bool use_LLI = true;
     uint8_t m_size = 0, data_size = 0;
     if (pixel_size == 4)
@@ -786,28 +784,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     case ARGB8565:
         source.format = PPEV2_ARGB8565;
         break;
-    case IMDC_COMPRESS:
-        {
-            const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
-                                                                      struct gui_rgb_data_head));
-            if (header->algorithm_type.pixel_bytes == 0)
-            {
-                source.format = PPEV2_RGB565;
-            }
-            else if (header->algorithm_type.pixel_bytes == 2)
-            {
-                source.format = PPEV2_ARGB8565;
-            }
-            else if (header->algorithm_type.pixel_bytes == 1)
-            {
-                source.format = PPEV2_RGB888;
-            }
-            else
-            {
-                return;
-            }
-            break;
-        }
     default:
         return;
     }
@@ -888,7 +864,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 dst_rect.y -= dc->section.y1;
                 if (image->blend_mode == IMG_BYPASS_MODE)
                 {
-                    if (head->type == IMDC_COMPRESS)
+                    if (head->compress)
                     {
                         uint32_t s;
                         s = os_lock();
@@ -1059,13 +1035,21 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         }
         constraint.y += dc->section.y1;
     }
-    bool ret = ppe_get_area(&old_rect, &constraint, (ppe_matrix_t *)image->inverse, &source);
-    if (ret)
+    bool ret = false;
+    if ((image->matrix->m[2][0] == 0 && image->matrix->m[2][1] == 0))
     {
-        if (old_rect.w * old_rect.h * PPEV2_Get_Pixel_Size(source.format) < CACHE_BUF_SIZE)
+        ret = ppe_get_area(&old_rect, &constraint, (ppe_matrix_t *)image->inverse, &source);
+        if (ret)
         {
-            block_num = 1;
-            tessalation_len = dc->fb_width;
+            if (old_rect.w * old_rect.h * PPEV2_Get_Pixel_Size(source.format) < CACHE_BUF_SIZE)
+            {
+                block_num = 1;
+                tessalation_len = dc->fb_width;
+            }
+        }
+        else
+        {
+            return;
         }
     }
     for (int i = 0; i < block_num; i++)
@@ -1089,7 +1073,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         source.width = image->img_w;
         source.height = image->img_h;
         float x_ref = 0, y_ref = 0;
-        uint32_t blend_area = 0;
         ppe_rect_t ppe_rect = {0};
         memcpy(&ppe_rect, &constraint, sizeof(ppe_rect_t));
         if (block_num != 1)
@@ -1107,7 +1090,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 ppe_rect.w = constraint.x + constraint.w - ppe_rect.x;
             }
         }
-        blend_area = ppe_rect.w * ppe_rect.h;
         ppe_matrix_t inverse;
         memcpy(&inverse, image->inverse, sizeof(float) * 9);
         ppe_matrix_t pre_trans;
@@ -1143,14 +1125,21 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
 #if F_APP_GUI_USE_PSRAM
             else
             {
-                PPEV2_Finish();
-                cache_on_psram(new_cache_size);
-                last_cache_size = 0;
+                if (head->compress)
+                {
+                    PPEV2_Finish();
+                    cache_on_psram(new_cache_size);
+                    last_cache_size = 0;
+                }
+                else
+                {
+                    restore_cache_buf();
+                }
             }
 #else
             else
             {
-                if (head->type == IMDC_COMPRESS)
+                if (head->compress)
                 {
                     GUI_ASSERT(new_cache_size < CACHE_BUF_SIZE);
                     return;
@@ -1158,7 +1147,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
 #endif
 
-            if (head->type == IMDC_COMPRESS)
+            if (head->compress)
             {
                 uint32_t s = os_lock();
                 ret = memcpy_by_imdc(&old_rect, &source);
@@ -1187,11 +1176,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             {
                 last_cache_size = 0;
                 restore_cache_buf();
-                if (head->type == IMDC_COMPRESS)
+                if (head->compress)
                 {
                     return;
                 }
-                ppe_get_identity(&pre_trans);
                 if (dc->type == DC_RAMLESS)
                 {
                     x_ref = 0;
@@ -1213,17 +1201,74 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
              image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
              image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
-             image->matrix->m[2][1] == 0) || (blend_area > 250 * 250))
+             image->matrix->m[2][1] == 0))
         {
             source.high_quality = false;
         }
-        PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &ppe_rect, mode);
         PPEV2_Finish();
+        PPEV2_err err = PPEV2_Blit_Inverse(&target, &source, &inverse, &ppe_rect, mode);
         if (err != PPEV2_SUCCESS)
         {
             DBG_DIRECT("PPE err %d", err);
 //                sw_acc_blit(image, dc, rect);
         }
+    }
+    PPEV2_Finish();
+}
+
+bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
+{
+    if (image == NULL || rect == NULL || output == NULL)
+    {
+        GUI_ASSERT(image != NULL && rect != NULL && output != NULL);
+        return false;
+    }
+    struct gui_rgb_data_head output_header;
+    struct gui_rgb_data_head *head = (struct gui_rgb_data_head *)image;
+    memset(&output_header, 0, sizeof(struct gui_rgb_data_head));
+    const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image + sizeof(
+                                                              struct gui_rgb_data_head));
+    switch (head->type)
+    {
+    case RGB565:
+        output_header.type = PPEV2_RGB565;
+        break;
+    case RGB888:
+        output_header.type = PPEV2_RGB888;
+        break;
+    case RGBA8888:
+        output_header.type = PPEV2_ARGB8888;
+        break;
+    case ARGB8565:
+        output_header.type = PPEV2_ARGB8565;
+        break;
+    default:
+        return false;
+    }
+    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
+    IMDC_decode_range range;
+    range.start_column = rect->x1;
+    range.end_column = rect->x2;
+    range.start_line = rect->y1;
+    range.end_line = rect->y2;
+    output_header.w = range.end_column - range.start_column + 1;
+    output_header.h = range.end_line - range.start_line + 1;
+    IMDC_DMA_config dma_cfg;
+    dma_cfg.output_buf = (uint32_t *)(output + 8);
+    dma_cfg.RX_DMA_channel_num = support_dma_num;
+    dma_cfg.TX_DMA_channel_num = memcpy_dma_num;
+    dma_cfg.RX_DMA_channel = DMA_CH_BASE(support_dma_num);
+    dma_cfg.TX_DMA_channel = DMA_CH_BASE(memcpy_dma_num);
+    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
+
+    if (err == IMDC_SUCCESS)
+    {
+        memcpy(output, &output_header, sizeof(struct gui_rgb_data_head));
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 

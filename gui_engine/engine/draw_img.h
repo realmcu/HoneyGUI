@@ -31,7 +31,6 @@ typedef enum
     RGBA8888 = 4, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for Alpha
     BINARY = 5,
     ALPHAMASK = 9,
-    IMDC_COMPRESS = 10,
     BMP = 11,
     JPEG = 12,
     PNG = 13,

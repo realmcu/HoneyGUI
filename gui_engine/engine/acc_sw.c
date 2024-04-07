@@ -340,13 +340,13 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
 
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    char img_type = ((struct gui_rgb_data_head *)(image->data))->type;
+    struct gui_rgb_data_head *header = (struct gui_rgb_data_head *)image->data;
 
-    if (img_type == IMDC_COMPRESS)
+    if (header->compress)
     {
         rle(image, dc, rect);
     }
-    else if (img_type != IMDC_COMPRESS)
+    else
     {
         no_rle(image, dc, rect);
     }
