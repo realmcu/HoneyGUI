@@ -102,9 +102,12 @@ typedef struct gui_menu_cellular
   */
 
 /**
- * @brief Create a menu_cellular effect widget, which should be nested in a menu_cellularview.
+ * @brief Create a honeycomb effect widget,
  *
  * @param parent the father widget nested in
+ * @param icon_size icon's width(px)
+ * @param icon_array icons set's file address array
+ * @param parent the array_size
  * @return gui_menu_cellular_t*
  */
 gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],
