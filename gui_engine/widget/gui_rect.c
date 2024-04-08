@@ -168,6 +168,16 @@ gui_img_t *gui_rect_round(gui_obj_t *parent, int x, int y, int w, int h, gui_col
 
 
 }
+
+void gui_rect_set_size(gui_img_t *this, int w, int h)
+{
+    gui_rect_file_head_t *array = (gui_rect_file_head_t *)this->draw_img.data;
+    array->head.w = w;
+    array->head.h = h;
+    this->base.w = w;
+    this->base.h = h;
+}
+
 /** End of WIDGET_Exported_Functions
   * @}
   */
