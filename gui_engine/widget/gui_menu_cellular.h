@@ -30,6 +30,7 @@ extern "C" {
  *============================================================================*/
 #include <guidef.h>
 #include <gui_fb.h>
+#include "gui_win.h"
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{
@@ -46,7 +47,7 @@ extern "C" {
 /** @brief  menu_cellular structure */
 typedef struct gui_menu_cellular
 {
-    gui_obj_t base; //!< base structure
+    gui_win_t base; //!< base structure
 } gui_menu_cellular_t;
 /** End of WIDGET_Exported_Types
   * @}
@@ -112,8 +113,14 @@ typedef struct gui_menu_cellular
  */
 gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],
                                               int array_size);
-
-
+/**
+ * @brief config offset
+ *
+ * @param menu_cellular the menu_cellular pointer
+ * @param offset_x  offset_x
+ * @param offset_y  offset_y
+ */
+void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

@@ -24,7 +24,6 @@
 #include "gui_obj.h"
 #include <tp_algo.h>
 #include <gui_img.h>
-#include "gui_win.h"
 #include "math.h"
 /** @defgroup WIDGET WIDGET
   * @{
@@ -193,6 +192,19 @@ static void wincb(gui_win_t *win)
     }
     x = tp->deltaX;
     y = tp->deltaY;
+    // static int offset,offset_old,offsety,offset_oldy;
+
+    // if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y)
+    // {
+    //     offset = tp->deltaX+offset_old;
+    //     offsety = tp->deltaY+offset_old;
+    // }
+    // if (tp->released)
+    // {
+    //     offset_old = offset;
+    //     offset_oldy = offsety;
+    // }
+    // gui_log("offset:%d,%d\n",offsety,tp->type);
 
     static int16_t recode[2][5];
     int recode_num = sizeof(recode[0]) / sizeof(int16_t) - 1;
@@ -282,51 +294,73 @@ gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint3
 #define ICON_SIZE (icon_size)
 #define WIDTH_GAP (ICON_SIZE)
 #define HEIGHT_GAP (ICON_SIZE-ICON_SIZE/7)
+#define INIT_OFFSET_X (0)
+#define INIT_OFFSET_Y (0)
     for (size_t i = 0; i < array_size; i++)
     {
         if (i < 3)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * 2, 0, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i], INIT_OFFSET_X + WIDTH_GAP * 2, INIT_OFFSET_Y, 0, 0);
         }
         else if (i < 9)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 3) + (WIDTH_GAP / 2),
-                                    HEIGHT_GAP, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 3) + (WIDTH_GAP / 2),
+                                    INIT_OFFSET_Y + HEIGHT_GAP, 0, 0);
         }
         else if (i < 16)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 9) + (WIDTH_GAP / 2) * 0,
-                                    HEIGHT_GAP * 2, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 9) + (WIDTH_GAP / 2) * 0,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 2, 0, 0);
         }
         else if (i < 24)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 17) + (WIDTH_GAP / 2) * 1,
-                                    HEIGHT_GAP * 3, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 17) + (WIDTH_GAP / 2) * 1,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 3, 0, 0);
         }
         else if (i < 31)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 24) + (WIDTH_GAP / 2) * 0,
-                                    HEIGHT_GAP * 4, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 24) + (WIDTH_GAP / 2) * 0,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 4, 0, 0);
         }
         else if (i < 37)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 31) + (WIDTH_GAP / 2) * 1,
-                                    HEIGHT_GAP * 5, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 31) + (WIDTH_GAP / 2) * 1,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 5, 0, 0);
         }
         else if (i < 42)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 36) + (WIDTH_GAP / 2) * 0,
-                                    HEIGHT_GAP * 6, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 36) + (WIDTH_GAP / 2) * 0,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 6, 0, 0);
         }
         else if (i < 46)
         {
-            gui_img_create_from_mem(win, 0, icon_array[i], WIDTH_GAP * (i - 41) + (WIDTH_GAP / 2) * 1,
-                                    HEIGHT_GAP * 7, 0, 0);
+            gui_img_create_from_mem(win, 0, icon_array[i],
+                                    INIT_OFFSET_X + WIDTH_GAP * (i - 41) + (WIDTH_GAP / 2) * 1,
+                                    INIT_OFFSET_Y + HEIGHT_GAP * 7, 0, 0);
         }
     }
-
+    return (void *)win;
 }
-
+void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &menu_cellular->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == IMAGE_FROM_MEM)
+        {
+            obj->x += offset_x;
+            obj->y += offset_y;
+        }
+        gui_menu_cellular_offset(obj, offset_x, offset_y);
+    }
+}
 
 /** End of WIDGET_Exported_Functions
   * @}
