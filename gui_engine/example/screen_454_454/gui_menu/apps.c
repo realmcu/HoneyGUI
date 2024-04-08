@@ -33,6 +33,7 @@ GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
 static void heart_ani_cb(gui_img_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
+static void status_bar(void *parent);
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
@@ -172,6 +173,7 @@ static void app_hr_ui_design(gui_app_t *app)
     }
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_onRight(win, win_cb, win);
+    status_bar(GUI_APP_ROOT_SCREEN);
 }
 static uint32_t *heart_ani_array[] =
 {
@@ -242,4 +244,34 @@ static void win_cb(gui_win_t *win)
 
 
 }
+#define TIME_SCALE_RATE (0.35F)
+static void status_bar(void *parent)
+{
+    gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
 
+    {
+        char *text = "7:55";
+        int font_size = 48;
+        gui_text_t *t = gui_text_create(status_bar, "txt", SCREEN_W - 100, 10, gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
+        gui_font_mem_init(addr1);
+        gui_text_type_set(t, addr1);
+        gui_text_convert_to_img(t, RGBA8888);
+        gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+    }
+    gui_win_t *win = gui_win_create(status_bar, 0, 0, 0, SCREEN_W, SCREEN_H);
+    GET_BASE(win)->not_show = 1;
+    gui_img_t *rect = gui_rect(win, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE);
+
+}
+// static status_bar_ani(gui_win_t *win)
+// {
+//     touch_info_t *tp = tp_get_info();
+//     if ()
+//     {
+//         /* code */
+//     }
+
+// }

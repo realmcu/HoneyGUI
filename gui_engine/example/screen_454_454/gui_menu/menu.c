@@ -90,10 +90,6 @@ void design_tab_menu(void *parent)
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
-    {
-
-
-    }
     gui_win_onClick(button_array[0], heart_rate_cb, button_array[0]);
     // gui_win_onClick(button_array[1], clock_cb, button_array[1]);
     // gui_win_onClick(button_array[2], watch_face_cb, button_array[2]);
