@@ -620,7 +620,7 @@ extern char *defaultPath;
  * @param y
  * @param w
  * @param h
- * @return gui_widget_template_t*
+ * @return T_GUI_WIDGET_TEMPLATE*
  */
 
 

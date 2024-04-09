@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -45,11 +45,11 @@ extern "C" {
   */
 
 /** @brief  ... */
-typedef struct gui_widget_template
+typedef struct
 {
     gui_obj_t base;
     void *user_data;
-} gui_widget_template_t;
+} T_GUI_WIDGET_TEMPLATE;
 
 
 /** End of WIDGET_Exported_Types
@@ -117,10 +117,15 @@ typedef struct gui_widget_template
  * @param y
  * @param w
  * @param h
- * @return gui_widget_template_t*
+ * @return T_GUI_WIDGET_TEMPLATE*
  */
-gui_widget_template_t *gui_widget_template_create(void *parent,  const char *name, void *addr,
-                                                  int16_t x, int16_t y, int16_t w, int16_t h);
+T_GUI_WIDGET_TEMPLATE *gui_widget_template_create(void       *parent,
+                                                  const char *name,
+                                                  void       *addr,
+                                                  int16_t    x,
+                                                  int16_t    y,
+                                                  int16_t    w,
+                                                  int16_t    h);
 
 
 /** End of WIDGET_Exported_GUI_Functions
@@ -137,4 +142,3 @@ gui_widget_template_t *gui_widget_template_create(void *parent,  const char *nam
 #endif
 
 #endif
-
