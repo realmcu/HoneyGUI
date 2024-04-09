@@ -885,7 +885,6 @@ void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             default:
                 {
                     gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    gui_color_t reverse = {.color.rgba.a = d->color.rgba.a, .color.rgba.r = d->color.rgba.b, .color.rgba.b = d->color.rgba.r, .color.rgba.g = d->color.rgba.g};
                     do_blending_2_argb8888_opacity(d, &reverse, opacity_value);
                 }
                 break;

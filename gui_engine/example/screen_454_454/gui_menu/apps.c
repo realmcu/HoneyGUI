@@ -26,17 +26,20 @@ GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
 #define COLOR_CRIMSON gui_rgb(220,20,60)
 #define COLOR_FIREBRICK gui_rgb(178,34,34)
 #define COLOR_WHITE gui_rgb(255,255,255)
+#define COLOR_WHITE_OPACITY gui_rgba(255,255,255,150)
 #define COLOR_SILVER gui_rgb(192,192,192)
 #define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
 #define HEART_ANI_NAME "_HEART_ANI"
 #define HEART_ANI_W 180
+#define PAGE_NAME "_heart_rate_page"
 static void heart_ani_cb(gui_img_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
 static void status_bar(void *parent);
+static status_bar_ani(gui_win_t *win);
 static void app_hr_ui_design(gui_app_t *app)
 {
-    gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
+    gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
     gui_page_center_alignment(page, SCREEN_H);
 
@@ -245,33 +248,146 @@ static void win_cb(gui_win_t *win)
 
 }
 #define TIME_SCALE_RATE (0.35F)
+#define STATUS_BAR_HEIGHT 20
+static gui_win_t *canvas_win;
+static gui_img_t *rect;
+static gui_text_t *t;
 static void status_bar(void *parent)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-
+    canvas_win = gui_win_create(status_bar, 0, 0, 0, SCREEN_W, SCREEN_H);
+    gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, status_bar);
     {
         char *text = "7:55";
         int font_size = 48;
-        gui_text_t *t = gui_text_create(status_bar, "txt", SCREEN_W - 100, 10, gui_get_screen_width(),
-                                        font_size);
+        t = gui_text_create(status_bar, "txt", SCREEN_W / 2 - 40, 2, gui_get_screen_width(),
+                            font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
         gui_text_convert_to_img(t, RGBA8888);
+
         gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+        gui_img_rotation(t->scale_img, 0, gui_img_get_width(t->scale_img) / 2,
+                         0);
+        gui_img_translate(t->scale_img, gui_img_get_width(t->scale_img) / 2,
+                          0);
     }
-    gui_win_t *win = gui_win_create(status_bar, 0, 0, 0, SCREEN_W, SCREEN_H);
-    GET_BASE(win)->not_show = 1;
-    gui_img_t *rect = gui_rect(win, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE);
+
+    GET_BASE(canvas_win)->not_show = 1;
+    rect = gui_rect(canvas_win, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE_OPACITY);
+    gui_img_set_opacity(rect, 0);
 
 }
-// static status_bar_ani(gui_win_t *win)
-// {
-//     touch_info_t *tp = tp_get_info();
-//     if ()
-//     {
-//         /* code */
-//     }
+static status_bar_ani(gui_win_t *win)
+{
 
-// }
+    touch_info_t *tp = tp_get_info();
+    static bool press, expand, shrink, expand_press;
+    if (tp->y < STATUS_BAR_HEIGHT && !expand)
+    {
+        if (tp->pressed)
+        {
+            press = 1;
+        }
+    }
+    int deltaY = tp->deltaY;
+    if (press)
+    {
+        gui_page_t *page = 0;
+        gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
+        page->gesture_flag = 1;
+        GET_BASE(canvas_win)->not_show = 0;
+        if (deltaY > 0)
+        {
+            if (deltaY > 100)
+            {
+                deltaY = 100;
+            }
+
+            int opacity = deltaY * 255 / 100;
+            if (opacity > 255)
+            {
+                opacity = 255;
+            }
+            gui_img_set_opacity(rect, opacity);
+            float scale = deltaY * deltaY * ((1.0f - TIME_SCALE_RATE) / 10000.0f) + TIME_SCALE_RATE;
+            if (scale > 1)
+            {
+                scale = 1;
+            }
+            gui_img_scale(t->scale_img, scale, scale);
+        }
+        if (tp->released)
+        {
+            if (deltaY >= 100)
+            {
+                expand = 1;
+                gui_img_set_opacity(rect, 255);
+            }
+            else
+            {
+                shrink = 1;
+            }
+            press = 0;
+        }
+
+    }
+    if (shrink)
+    {
+        gui_img_set_opacity(rect, 0);
+        GET_BASE(canvas_win)->not_show = 1;
+        gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+        shrink = 0;
+        gui_page_t *page = 0;
+        gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
+        page->gesture_flag = 0;
+    }
+    if (expand)
+    {
+        if (tp->pressed)
+        {
+            expand_press = 1;
+        }
+        gui_page_t *page = 0;
+        gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
+        page->gesture_flag = 1;
+        if (expand_press)
+        {
+            if (deltaY < 0)
+            {
+                if (deltaY < -100)
+                {
+                    deltaY = -100;
+                }
+                int opacity = (100 - (-deltaY)) * 255 / 100;
+                gui_img_set_opacity(rect, opacity);
+                float scale = (100 - (-deltaY)) * ((1.0f - TIME_SCALE_RATE) / 100.0f) + TIME_SCALE_RATE;
+                gui_img_scale(t->scale_img, scale, scale);
+
+            }
+
+
+
+            if (tp->released)
+            {
+                if (deltaY < 0)
+                {
+                    expand = 0;
+                    gui_img_set_opacity(rect, 0);
+                    GET_BASE(canvas_win)->not_show = 1;
+                    gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+                    gui_page_t *page = 0;
+                    gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
+                    page->gesture_flag = 0;
+                }
+                expand_press = 0;
+            }
+
+        }
+    }
+
+
+
+}

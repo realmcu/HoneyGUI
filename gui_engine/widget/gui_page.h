@@ -67,6 +67,7 @@ typedef struct gui_page
                  int16_t y, int16_t w, int16_t h);
     bool release;
     bool press;
+    bool gesture_flag;
     uint8_t status;
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
 } gui_page_t;
