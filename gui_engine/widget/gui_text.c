@@ -312,6 +312,8 @@ void gui_text_ctor(gui_text_t *this,
                    int16_t     h)
 {
     gui_obj_t *root = (gui_obj_t *)this;
+    w = (w == 0 ? parent->w : w);
+    h = (h == 0 ? parent->h : h);
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
     root->type = TEXTBOX;
