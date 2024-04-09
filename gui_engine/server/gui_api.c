@@ -98,6 +98,11 @@ gui_wheel_port_data_t *wheel_get_data(void)
     return NULL;
 }
 
+gui_dispdev_t *gui_set_virtual_dc(uint8_t *frame_buf)
+{
+    //todo
+    return NULL;
+}
 
 struct gui_dispdev *gui_get_dc(void)
 {

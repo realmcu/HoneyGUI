@@ -1,6 +1,5 @@
 #include <draw_img.h>
 #include <stdio.h>
-//#include <gui_matrix.h>
 #include "acc_engine.h"
 #include "acc_sw_rle.h"
 
@@ -126,7 +125,9 @@ static void gui_release_imgfile_acc(draw_img_t *draw_img, const void *img_info, 
     draw_img->data = (void *)img_info;
 }
 
-void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+
+
+void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     const void *img_info = image->data;
     uint8_t *img_buff = NULL;
@@ -136,7 +137,7 @@ void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     {
         uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
         uint32_t gpu_height = image->img_h;
-        struct gui_rgb_data_head head = rtgui_image_get_header(image);
+        gui_rgb_data_head_t head = rtgui_image_get_header(image);
         uint8_t source_bytes_per_pixel = 0;
 
         switch (head.type)

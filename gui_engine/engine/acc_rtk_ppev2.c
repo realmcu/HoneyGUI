@@ -17,8 +17,6 @@
 #include "os_sync.h"
 
 
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect);
-
 #define PPEV2_ACC_MIN_OPA       3
 #define PPEV2_TESS_LENGTH       92
 
@@ -1210,7 +1208,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         if (err != PPEV2_SUCCESS)
         {
             DBG_DIRECT("PPE err %d", err);
-//                sw_acc_blit(image, dc, rect);
         }
     }
     PPEV2_Finish();

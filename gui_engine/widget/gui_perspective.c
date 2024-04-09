@@ -22,6 +22,7 @@
 #include <gui_obj.h>
 #include <tp_algo.h>
 #include <draw_img.h>
+#include <acc_init.h>
 #include <gui_matrix.h>
 #include "gui_perspective.h"
 #include "acc_engine.h"
@@ -212,7 +213,7 @@ static void prepare(gui_obj_t *obj)
 
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+
 static void draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -235,7 +236,7 @@ static void draw_cb(gui_obj_t *obj)
                 rect.x2 = rect.x1 + draw_img->target_w - 1;
                 rect.y2 = rect.y1 + draw_img->target_h - 1;
 
-                gui_acc_blit(draw_img, dc, &rect);
+                gui_acc_blit_to_dc(draw_img, dc, &rect);
             }
         }
     }

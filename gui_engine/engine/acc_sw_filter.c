@@ -215,53 +215,7 @@ void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     return;
 }
 
-#if 0
-static void filter_blit_rgb565_2_rgb565_with_alpha(draw_img_t *image, struct gui_dispdev *dc,
-                                                   gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
 
-    uint8_t source_bytes_per_pixel = 2;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-        GUI_ASSERT(NULL != NULL);
-        GUI_UNUSED(write_off);
-        GUI_UNUSED(read_off);
-        GUI_UNUSED(writebuf);
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            if (*((uint16_t *)read_off + j) != 0)
-            {
-                //blend_565withalpha_to_screen(writebuf + write_off + j, (*((uint16_t *)read_off + j)),image->alpha_value);
-            }
-        }
-    }
-
-}
-#endif
 
 void filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
                           gui_rect_t *rect)
@@ -273,7 +227,6 @@ void filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     int16_t y_start = 0;
     int16_t y_end = 0;
     int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
     if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
@@ -433,7 +386,7 @@ void filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     int16_t y_start = 0;
     int16_t y_end = 0;
     int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
+
     if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
@@ -441,10 +394,11 @@ void filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
     struct gui_rgb_data_head *head = image->data;
-    char img_type = head->type;
+
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     uint8_t opacity_value = image->opacity_value;
-    if (img_type == RGB565)
+
+    if (head->type == RGB565)
     {
         uint8_t source_bytes_per_pixel = 2;
         int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
@@ -501,7 +455,7 @@ void filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    else if (img_type == RGB888)
+    else if (head->type == RGB888)
     {
         uint8_t source_bytes_per_pixel = 3;
         int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
@@ -548,7 +502,7 @@ void filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    else if (img_type == RGBA8888)
+    else if (head->type == RGBA8888)
     {
         uint8_t source_bytes_per_pixel = 4;
         int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;

@@ -20,9 +20,7 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-// #include "acc_sw_blend.h"
-// #include "acc_sw.h"
-// #include "acc_sw_rle.h"
+
 void cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                          gui_rect_t *rect)
 {

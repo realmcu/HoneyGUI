@@ -70,6 +70,7 @@ typedef struct draw_img
     uint32_t checksum : 8;
     uint32_t src_mode : 3;
     uint32_t high_quality : 1;
+    //uint32_t color_mix; //todo for QuDai
     float *line;
 } draw_img_t;
 
@@ -78,6 +79,7 @@ bool gui_image_new_area(draw_img_t *img);
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end);
 struct gui_rgb_data_head rtgui_image_get_header(draw_img_t *img);
+uint32_t gui_image_get_pixel(draw_img_t *img);
 
 #ifdef __cplusplus
 }

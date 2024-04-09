@@ -92,11 +92,10 @@
 
 
 
-void no_rle(draw_img_t *image, struct gui_dispdev *dc,
-            gui_rect_t *rect)
+void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    struct gui_rgb_data_head *head = image->data;
+    gui_rgb_data_head_t *head = image->data;
     char img_type = head->type;
     gui_matrix_t *matrix = image->matrix;
     bool identity = false;
@@ -340,7 +339,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc,
 
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    struct gui_rgb_data_head *header = (struct gui_rgb_data_head *)image->data;
+    gui_rgb_data_head_t *header = (gui_rgb_data_head_t *)image->data;
 
     if (header->compress)
     {

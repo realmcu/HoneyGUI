@@ -254,8 +254,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
     return;
 }
 
-void rle(draw_img_t *image, struct gui_dispdev *dc,
-         gui_rect_t *rect)
+void rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_matrix_t *matrix = image->matrix;
