@@ -25,7 +25,11 @@
 #define DRV_PIXEL_BITS  16
 #endif
 
-
+// #define USE_DC_800_480
+#ifdef USE_DC_800_480
+#define DRV_LCD_WIDTH   800
+#define DRV_LCD_HIGHT   480
+#endif
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;

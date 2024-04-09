@@ -1,6 +1,6 @@
 #include "app_launcher.h"
 #include <time.h>
-#include "trace.h"
+// #include "trace.h"
 
 static gui_app_t app_dashboard =
 {

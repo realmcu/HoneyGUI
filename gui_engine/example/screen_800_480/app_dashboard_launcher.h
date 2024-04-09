@@ -21,8 +21,7 @@ extern "C" {
 #include <time.h>
 #include <stdio.h>
 #include "gui_server.h"
-//#include "app_dialing.h"
-#include "resource_8762g.h"
+#include "root_image_800_480/ui_resource.h"
 #include <gui_app.h>
 #include <stdlib.h>
 #include "acc_engine.h"
