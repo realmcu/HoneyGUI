@@ -315,35 +315,19 @@ void gui_port_dc_init(void)
 
 struct gui_touch_port_data *port_touchpad_get_data()
 {
-    unsigned long now = (unsigned long) time(NULL);
-    struct timeval tv;
-    mingw_gettimeofday(&tv, NULL);
-    uint32_t tp_tick = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
-
-
-    tp_port_data.timestamp_ms = tp_tick;//todo
-
-
+    tp_port_data.timestamp_ms = gui_ms_get();//todo
     return &tp_port_data;
 }
 
 gui_kb_port_data_t *port_kb_get_data(void)
 {
-    unsigned long now = (unsigned long) time(NULL);
-    struct timeval tv;
-    mingw_gettimeofday(&tv, NULL);
-
-    kb_port_data.timestamp_ms = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
+    kb_port_data.timestamp_ms = gui_ms_get();
     return &kb_port_data;
 }
 
 gui_wheel_port_data_t *port_wheel_get_data(void)
 {
-    unsigned long now = (unsigned long) time(NULL);
-    struct timeval tv;
-    mingw_gettimeofday(&tv, NULL);
-
-    wheel_port_data.timestamp_ms = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
+    wheel_port_data.timestamp_ms = gui_ms_get();
     return &wheel_port_data;
 }
 
