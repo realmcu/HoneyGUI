@@ -89,7 +89,9 @@ typedef struct gui_kb_port_data
 {
     uint8_t       event;
     uint8_t       name[10];
-    uint32_t      timestamp_ms;             /* The timestamp when the data was received */
+    uint32_t      timestamp_ms_press;             /* The timestamp when the data was received */
+    uint32_t            timestamp_ms_release;
+    uint32_t      timestamp_ms_pressing;
 } gui_kb_port_data_t;
 
 typedef struct kb_info

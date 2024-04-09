@@ -245,6 +245,8 @@ void *rtk_gui_sdl(void *arg)
             {
                 // gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_DOWN;
+                kb_port_data.timestamp_ms_press = gui_ms_get();
+                kb_port_data.timestamp_ms_pressing = gui_ms_get();
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
                        strlen(SDL_GetKeyName(event.key.keysym.sym)));
@@ -254,6 +256,7 @@ void *rtk_gui_sdl(void *arg)
             {
                 // gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_UP;
+                kb_port_data.timestamp_ms_release = gui_ms_get();
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
                        strlen(SDL_GetKeyName(event.key.keysym.sym)));
@@ -321,7 +324,6 @@ struct gui_touch_port_data *port_touchpad_get_data()
 
 gui_kb_port_data_t *port_kb_get_data(void)
 {
-    kb_port_data.timestamp_ms = gui_ms_get();
     return &kb_port_data;
 }
 
