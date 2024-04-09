@@ -1,4 +1,10 @@
 # **Welcome to the RTKIOT GUI wiki!!**
+
+## Source project download
+
+- Download on GitHub: <https://github.com/realmcu/HoneyGUI>
+- Download on Gitee: <https://gitee.com/realmcu/HoneyGUI>
+
 ## Description
 
 There are two ways to develop an application, SaaA(Script as a APP) and Native C API.
