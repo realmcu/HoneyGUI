@@ -481,16 +481,13 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
         {
 #if 1 //0 - Stable slow processing , 1 - Fast processing in tests
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+            uint16_t color_output = rgba2565(color);
             uint8_t ppb = 4;//pixel_per_byte = 8 / rendor_mode
             int write_off = (y_start - dc->section.y1) * dc->fb_width;
-
-            uint16_t color_back;
-            uint16_t color_output = rgba2565(color);
-
-            uint8_t *p_dots = &dots[(y_start - font_y) * (font_w / ppb) ];
-            uint8_t alpha_2bit;
-
+            int dots_off = (y_start - font_y) * (font_w / ppb);
             int left_offset = 0, right_offset = 0, byte = 0;
+            uint16_t color_back;
+            uint8_t alpha_2bit;
             if (font_x < x_start)
             {
                 byte = 0;
@@ -502,15 +499,17 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             if (font_x + chr->char_w > x_end)
             {
-                byte = 0;
                 while (font_x + ppb * byte < x_end)
                 {
                     byte++;
                 }
                 right_offset = x_end - font_x - ppb * byte + ppb;
+                byte = 0;
             }
-            for (uint32_t i = y_start; i < y_end; i++, write_off += dc->fb_width, p_dots += font_w / ppb)
+            for (uint32_t i = y_start; i < y_end; i++)
             {
+                uint8_t *temp_p = &dots[dots_off + byte];
+
                 for (uint32_t j = x_start; j < x_start + left_offset; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
@@ -526,7 +525,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                 }
                 for (uint32_t j = x_start + left_offset; j < x_end - right_offset;)
                 {
-                    uint8_t alpha = *(p_dots + (j - font_x) / ppb);
+                    uint8_t alpha = *temp_p;
                     if (alpha != 0)
                     {
                         if (alpha & 0x03)
@@ -539,7 +538,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                             else
                             {
                                 alpha_2bit *= 85;
-//                              alpha = color.color.rgba.a * alpha / 0xff;
+//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
                                 color_back = writebuf[write_off + j];
                                 writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
                             }
@@ -554,7 +553,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                             else
                             {
                                 alpha_2bit *= 85;
-//                              alpha = color.color.rgba.a * alpha / 0xff;
+//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
                                 color_back = writebuf[write_off + j + 1];
                                 writebuf[write_off + j + 1] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
                             }
@@ -569,7 +568,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                             else
                             {
                                 alpha_2bit *= 85;
-//                              alpha = color.color.rgba.a * alpha / 0xff;
+//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
                                 color_back = writebuf[write_off + j + 2];
                                 writebuf[write_off + j + 2] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
                             }
@@ -584,12 +583,13 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                             else
                             {
                                 alpha_2bit *= 85;
-//                              alpha = color.color.rgba.a * alpha / 0xff;
+//                              alpha_2bit = color.color.rgba.a * alpha_2bit / 0xff;
                                 color_back = writebuf[write_off + j + 3];
                                 writebuf[write_off + j + 3] = alphaBlendRGB565(color_output, color_back, alpha_2bit);
                             }
                         }
                     }
+                    temp_p++;
                     j += ppb;
                 }
                 for (uint32_t j = x_end - right_offset; j < x_end; j++)
@@ -605,6 +605,8 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                         writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha);
                     }
                 }
+                write_off += dc->fb_width;
+                dots_off += (font_w / ppb);
             }
 #else
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
@@ -879,10 +881,10 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             int write_off = (y_start - dc->section.y1) * dc->fb_width;
             int dots_off = (y_start - font_y) * (font_w / ppb);
             int left_offset = 0, right_offset = 0, byte = 0;
-            uint32_t x_start_right = x_end;
+            uint32_t x_start_right = x_start;
             if (font_x < x_start)
             {
-                while (font_x + ppb * byte <= x_start)
+                while (font_x + ppb * byte < x_start)
                 {
                     byte++;
                 }
@@ -900,7 +902,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                uint8_t *temp_p = &dots[dots_off + (x_start - font_x) / ppb + byte];
+                uint8_t *temp_p = &dots[dots_off + byte];
 
                 for (uint32_t j = x_start; j < x_start_right; j++)
                 {
