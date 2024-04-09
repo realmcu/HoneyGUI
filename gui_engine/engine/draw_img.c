@@ -77,7 +77,27 @@ struct gui_rgb_data_head rtgui_image_get_header(draw_img_t *img)
 
     return head;
 }
-
+uint32_t gui_image_get_pixel(draw_img_t *img)
+{
+    struct gui_rgb_data_head *head = img->data;
+    if (head->type == RGB565)
+    {
+        return 2;
+    }
+    else if (head->type == RGB888)
+    {
+        return 3;
+    }
+    else if (head->type == ARGB8565)
+    {
+        return 3;
+    }
+    else if (head->type == RGBA8888)
+    {
+        return 4;
+    }
+    return 0;
+}
 bool gui_image_new_area(draw_img_t *img)
 {
     float point[4][2];

@@ -21,6 +21,7 @@
 #include <string.h>
 #include <gui_obj.h>
 #include <draw_img.h>
+#include <acc_init.h>
 #include <gui_matrix.h>
 #include "gui_cube.h"
 #include "tp_algo.h"
@@ -354,7 +355,6 @@ static void cube_prepare(gui_obj_t *obj)
     }
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 static void cube_draw_cb(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -376,7 +376,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_front.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_front.target_h - 1;
         CUBE_JUDEG_FULL_RANK(front)
-        gui_acc_blit(front, dc, &draw_rect);
+        gui_acc_blit_to_dc(front, dc, &draw_rect);
 
     }
 
@@ -387,7 +387,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_back.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_back.target_h - 1;
         CUBE_JUDEG_FULL_RANK(back)
-        gui_acc_blit(back, dc, &draw_rect);
+        gui_acc_blit_to_dc(back, dc, &draw_rect);
     }
 
     if (this->nz5126 > 0.0f)
@@ -397,7 +397,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_up.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_up.target_h - 1;
         CUBE_JUDEG_FULL_RANK(up)
-        gui_acc_blit(up, dc, &draw_rect);
+        gui_acc_blit_to_dc(up, dc, &draw_rect);
     }
 
     if (this->nz0473 > 0.0f)
@@ -407,7 +407,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_down.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_down.target_h - 1;
         CUBE_JUDEG_FULL_RANK(down)
-        gui_acc_blit(down, dc, &draw_rect);
+        gui_acc_blit_to_dc(down, dc, &draw_rect);
     }
 
     if (this->nz7623 > 0.0f)
@@ -417,7 +417,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_left.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_left.target_h - 1;
         CUBE_JUDEG_FULL_RANK(left)
-        gui_acc_blit(left, dc, &draw_rect);
+        gui_acc_blit_to_dc(left, dc, &draw_rect);
     }
 
     if (this->nz0154 > 0.0f)
@@ -427,7 +427,7 @@ static void cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_right.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_right.target_h - 1;
         CUBE_JUDEG_FULL_RANK(right)
-        gui_acc_blit(right, dc, &draw_rect);
+        gui_acc_blit_to_dc(right, dc, &draw_rect);
     }
 }
 

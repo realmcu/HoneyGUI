@@ -1,5 +1,8 @@
+
 #include "app_dashboard_data.h"
+#ifndef _WIN32
 #include "trace.h"
+
 #include "communicate_parse_navigation.h"
 #include "communicate_parse_notify.h"
 #include "os_timer.h"
@@ -8,7 +11,7 @@
 #include "os_sync.h"
 #include "communicate_protocol.h"
 #include "communicate_parse.h"
-
+#endif
 uint32_t current_counter = 0x0;
 bool is_blink_the_right_light = false;
 bool is_the_light_on = false;
@@ -217,6 +220,7 @@ void app_dashboard_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
 {
     if (event == BP_UPDATE_VALUE_EVENT)
     {
+#ifndef _WIN32
         if (Value == NAVI_START)
         {
             app_current_dashboard_data.show_main_display = false;
@@ -225,6 +229,7 @@ void app_dashboard_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
         {
             app_current_dashboard_data.show_main_display = true;
         }
+#endif
     }
     else if (event == BP_LE_DISC_EVENT)
     {

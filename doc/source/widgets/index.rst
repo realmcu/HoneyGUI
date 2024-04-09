@@ -25,6 +25,7 @@ Widgets                              Brief
 `cube`_                              Display a cube
 `wheellist`_                         Wheel-shaped application list
 `perspective`_                       Slide to extend and retract curtains
+`menu_cellular`_                     Display icons set as a honeycomb shape menu
 ==================                   ==================
 
 .. _glossary: widgets_glossary.html
@@ -52,6 +53,7 @@ Widgets                              Brief
 .. _stbimage: gui_img_stb.html
 .. _watch gradient spot: gui_watch_gradient_spot.html
 .. _watchface gradient: gui_watchface_gradient.html
+.. _menu cellular: gui_menu_cellular.html
 .. toctree::
     :maxdepth: 2
 
@@ -79,4 +81,4 @@ Widgets                              Brief
     svg <gui_svg>
     watch gradient spot <gui_watch_gradient_spot>
     watchface gradient <gui_watchface_gradient>
-
+    menu cellular <gui_menu_cellular>

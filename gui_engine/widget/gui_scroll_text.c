@@ -199,24 +199,27 @@ static void gui_scroll_text_prepare(gui_obj_t *obj)
     gui_text_t *this = (void *)obj;
     gui_point_t point = {0, 0, 1};
 
-    if (scroll_skip_frame == 0)
+    if (!this->base.not_show)
     {
-        gui_fb_change();
-    }
-    else
-    {
-        if (scroll_skip_frame_count < (scroll_skip_frame) * scroll_text_count - 1)
+        if (scroll_skip_frame == 0)
         {
             gui_fb_change();
-            scroll_skip_frame_count++;
-        }
-        else if (scroll_skip_frame_count < (scroll_skip_frame + 1) * scroll_text_count - 1)
-        {
-            scroll_skip_frame_count++;
         }
         else
         {
-            scroll_skip_frame_count = 0;
+            if (scroll_skip_frame_count < (scroll_skip_frame) * scroll_text_count - 1)
+            {
+                gui_fb_change();
+                scroll_skip_frame_count++;
+            }
+            else if (scroll_skip_frame_count < (scroll_skip_frame + 1) * scroll_text_count - 1)
+            {
+                scroll_skip_frame_count++;
+            }
+            else
+            {
+                scroll_skip_frame_count = 0;
+            }
         }
     }
 

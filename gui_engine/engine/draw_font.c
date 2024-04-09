@@ -16,6 +16,26 @@ static int get_utf8_byte_num(uint8_t firstCh)
     return num;
 }
 
+uint32_t get_len_by_char_num(uint8_t *utf8, uint32_t char_num)
+{
+    uint32_t num = 0;
+    uint32_t len = 0;
+    uint32_t temp = 0;
+    while (num++ < char_num)
+    {
+        temp = get_utf8_byte_num(utf8[len]);
+        if (temp == 0)
+        {
+            len ++;
+        }
+        else
+        {
+            len += temp;
+        }
+    }
+    return len;
+}
+
 uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
                          uint16_t unicode_buf_len)
 {

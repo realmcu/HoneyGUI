@@ -444,6 +444,10 @@ void page_update(gui_obj_t *obj)
     obj->h = gui_get_screen_height();
     page_height(obj, obj);
     gui_page_t *page = (gui_page_t *)obj;
+    if (page->gesture_flag)
+    {
+        return;
+    }
     if (obj->parent->matrix && obj->parent->matrix->m[1][2] != 0)
     {
         return;

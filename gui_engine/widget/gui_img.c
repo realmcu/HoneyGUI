@@ -22,6 +22,7 @@
 #include <string.h>
 #include <gui_obj.h>
 #include <draw_img.h>
+#include <acc_init.h>
 #include <tp_algo.h>
 #include "acc_engine.h"
 
@@ -220,7 +221,7 @@ static void img_prepare(gui_obj_t *obj)
     }
 }
 
-extern void gui_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+
 static void img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
@@ -235,7 +236,7 @@ static void img_draw_cb(gui_obj_t *obj)
     rect.y2 = rect.y1 + draw_img->target_h - 1;
     if (gui_get_acc() != NULL)
     {
-        gui_acc_blit(draw_img, dc, &rect);
+        gui_acc_blit_to_dc(draw_img, dc, &rect);
     }
     else
     {

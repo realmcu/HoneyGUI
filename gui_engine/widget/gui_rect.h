@@ -86,6 +86,16 @@ gui_img_t *gui_rect(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t c
  */
 gui_img_t *gui_rect_round(gui_obj_t *parent, int x, int y, int w, int h, gui_color_t color,
                           uint32_t *image_file_addr);
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param w
+ * @param h
+ */
+void gui_rect_set_size(gui_img_t *this, int w, int h);
+
 #ifdef __cplusplus
 }
 #endif

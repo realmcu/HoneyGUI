@@ -2,7 +2,6 @@
 #include <gui_win.h>
 #include <gui_text.h>
 #include <gui_curtain.h>
-#include "resource_8762g.h"
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "draw_font.h"

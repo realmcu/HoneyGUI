@@ -245,6 +245,15 @@ static void gui_server_entry(void *parameter)
 
             gui_display_off();
             GUI_SERVER_ALLOW_DLPS = true;
+
+            kb_algo_process(kb_get_data());
+            kb_info_t *kb = kb_get_info();
+            if (kb->pressed)
+            {
+                msg.type = GUI_EVENT_DISPLAY_ON;
+                send_msg_to_gui_server(&msg);
+            }
+
             while (GUI_SERVER_ALLOW_DLPS)
             {
                 if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0xFFFFFFFF))

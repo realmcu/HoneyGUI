@@ -16,7 +16,9 @@
 			"string_view": "c",
 			"*.tcc": "c",
 			"cstdlib": "c",
-			"memory": "c"
+			"memory": "c",
+			"resource_8762g.h": "c",
+			"time.h": "c"
 		}
 	}
 }

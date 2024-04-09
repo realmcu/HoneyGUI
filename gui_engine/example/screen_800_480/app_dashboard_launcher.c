@@ -2,7 +2,6 @@
 #include <gui_win.h>
 #include <gui_text.h>
 #include <gui_curtain.h>
-#include "resource_8762g.h"
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "draw_font.h"
@@ -13,6 +12,9 @@
 #include "gui_button.h"
 #include "app_dashboard_launcher.h"
 #include "app_dashboard_main_display.h"
+#include "gui_win.h"
+#include "gui_components_init.h"
+#ifndef _WIN32
 #include "app_dashboard_connected_display.h"
 #include "app_dashboard_data.h"
 #include <trace.h>
@@ -24,10 +26,10 @@
 #include "gap_bond_le.h"
 #include "app_msg.h"
 #include "gap_conn_le.h"
-#include "app_dashboard_data.h"
 #include "watch_msg.h"
-#include "gui_win.h"
-//#include "app_lvgl.h"
+#include "os_mem.h"
+#endif // !_WIN32
+
 /*============================================================================*
  *                              Variables
  *============================================================================*/
@@ -35,6 +37,7 @@
     * @brief Handle profile server callback event
     * @{
     */
+#ifndef _WIN32
 T_SERVER_ID simp_srv_id; /**< Simple ble service id*/
 T_SERVER_ID bas_srv_id;  /**< Battery service id */
 /** @} */ /* End of group PERIPH_SEVER_CALLBACK */
@@ -44,7 +47,7 @@ T_SERVER_ID bas_srv_id;  /**< Battery service id */
     */
 T_GAP_DEV_STATE gap_dev_state = {0, 0, 0, 0};                 /**< GAP device state */
 T_GAP_CONN_STATE gap_conn_state = GAP_CONN_STATE_DISCONNECTED; /**< GAP connection state */
-
+#endif
 gui_app_t app_dashboard_launcher =
 {
     .screen =
@@ -55,6 +58,8 @@ gui_app_t app_dashboard_launcher =
     },
     .thread_entry = app_dashboard_launcher_update_thread,
     .ui_design = app_dashboard_launcher_ui_design,
+    .active_ms = 0xffffffff,
+
 };
 
 gui_app_t *get_app_dashboard_launcher(void)
@@ -64,11 +69,14 @@ gui_app_t *get_app_dashboard_launcher(void)
 
 extern gui_win_t *win_connected_display;
 extern gui_win_t *win_main_display;
+
 void app_dashboard_launcher_update_thread(void *this)
 {
     while (1)
     {
+#ifndef _WIN32
         app_dashboard_auto_refresh_data_demo();
+#endif
         gui_thread_mdelay(25);
     }
 }
@@ -93,8 +101,37 @@ void app_dashboard_launcher_ui_design(gui_app_t *app)
     gui_font_mem_init(HARMONYOS_SIZE56_BITS1_FONT_BIN);
 
     app_dashboard_create_main_display(win_main_display);
+#ifndef _WIN32
     app_dashboard_create_connected_display(win_connected_display);
     win_main_display->base.not_show = false;
     win_connected_display->base.not_show = true;
+
     app_dashboard_initialize_data();
+#endif
 }
+
+uint8_t resource_root[1024 * 1024 * 20];
+static int app_init(void)
+{
+#if defined _WIN32
+    int fd;
+    fd = open("./gui_engine/example/screen_800_480/root_image_800_480/root(0x4400000).bin", 0);
+    if (fd > 0)
+    {
+        printf("open root(0x4400000).bin Successful!\n");
+        read(fd, resource_root, 1024 * 1024 * 20);
+    }
+    else
+    {
+        printf("open root(0x4400000).bin Fail!\n");
+        printf("open root(0x4400000).bin Fail!\n");
+        printf("open root(0x4400000).bin Fail!\n");
+        return 0;
+    }
+#endif
+    gui_server_init();
+    gui_app_startup(get_app_dashboard_launcher());
+    return 0;
+}
+
+GUI_INIT_APP_EXPORT(app_init);

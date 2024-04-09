@@ -25,7 +25,11 @@
 #define DRV_PIXEL_BITS  16
 #endif
 
-
+// #define USE_DC_800_480
+#ifdef USE_DC_800_480
+#define DRV_LCD_WIDTH   800
+#define DRV_LCD_HIGHT   480
+#endif
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -241,6 +245,8 @@ void *rtk_gui_sdl(void *arg)
             {
                 // gui_log("[SDL_KEYDOWN]key %s down!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_DOWN;
+                kb_port_data.timestamp_ms_press = gui_ms_get();
+                kb_port_data.timestamp_ms_pressing = gui_ms_get();
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
                        strlen(SDL_GetKeyName(event.key.keysym.sym)));
@@ -250,6 +256,7 @@ void *rtk_gui_sdl(void *arg)
             {
                 // gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_UP;
+                kb_port_data.timestamp_ms_release = gui_ms_get();
                 memset(kb_port_data.name, 0x00, 10);
                 memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
                        strlen(SDL_GetKeyName(event.key.keysym.sym)));
@@ -311,35 +318,18 @@ void gui_port_dc_init(void)
 
 struct gui_touch_port_data *port_touchpad_get_data()
 {
-    unsigned long now = (unsigned long) time(NULL);
-    struct timeval tv;
-    mingw_gettimeofday(&tv, NULL);
-    uint32_t tp_tick = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
-
-
-    tp_port_data.timestamp_ms = tp_tick;//todo
-
-
+    tp_port_data.timestamp_ms = gui_ms_get();//todo
     return &tp_port_data;
 }
 
 gui_kb_port_data_t *port_kb_get_data(void)
 {
-    unsigned long now = (unsigned long) time(NULL);
-    struct timeval tv;
-    mingw_gettimeofday(&tv, NULL);
-
-    kb_port_data.timestamp_ms = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
     return &kb_port_data;
 }
 
 gui_wheel_port_data_t *port_wheel_get_data(void)
 {
-    unsigned long now = (unsigned long) time(NULL);
-    struct timeval tv;
-    mingw_gettimeofday(&tv, NULL);
-
-    wheel_port_data.timestamp_ms = (0xFFFF & tv.tv_sec) * 1000 + tv.tv_usec / 1000;
+    wheel_port_data.timestamp_ms = gui_ms_get();
     return &wheel_port_data;
 }
 

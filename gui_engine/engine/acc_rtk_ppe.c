@@ -64,28 +64,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     case RGBA8888:
         source.format = PPE_ABGR8888;
         break;
-    case IMDC_COMPRESS:
-        {
-            const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
-                                                                      struct gui_rgb_data_head));
-            if (header->algorithm_type.pixel_bytes == 0)
-            {
-                source.format = PPE_BGR565;
-            }
-            else if (header->algorithm_type.pixel_bytes == 2)
-            {
-                source.format = PPE_ABGR8888;
-            }
-            else if (header->algorithm_type.pixel_bytes == 1)
-            {
-                source.format = PPE_BGR888;
-            }
-            else
-            {
-                return;
-            }
-            break;
-        }
+    case ARGB8565:
+        source.format = PPE_ABGR8565;
+        break;
     default:
         return;
     }
@@ -129,7 +110,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     (image->img_h == (int)(image->img_h * scale_y)))
                 {
                     ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
-                    if (head->type == IMDC_COMPRESS)
+                    if (head->compress)
                     {
                         RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
                         uint32_t start_line = 0, end_line = 0;
@@ -228,7 +209,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 }
                 scaled_img.global_alpha_en = true;
                 scaled_img.global_alpha = image->opacity_value;
-                if (head->type == IMDC_COMPRESS)
+                if (head->compress)
                 {
                     source.height = scale_rect.bottom - scale_rect.top + 1;
                     const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
@@ -273,6 +254,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     }
                     break;
                 case PPE_BGR888:
+                case PPE_ABGR8565:
                     scaled_img.format = PPE_BGR888;
                     if (dc->type == DC_SINGLE)
                     {
@@ -308,7 +290,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 }
                 else if (dc->type == DC_RAMLESS)
                 {
-                    if (head->type == IMDC_COMPRESS)
+                    if (head->compress)
                     {
                         gui_free(source.memory);
                     }
@@ -318,7 +300,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             else
             {
                 ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
-                if (head->type == IMDC_COMPRESS)
+                if (head->compress)
                 {
                     RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
                     uint32_t start_line = 0, end_line = 0;
@@ -375,7 +357,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     }
                 }
                 PPE_ERR err = PPE_blend(&source, &target, &trans, PPE_SRC_OVER_MODE);
-                if (head->type == IMDC_COMPRESS)
+                if (head->compress)
                 {
                     gui_free(source.memory);
                 }
@@ -395,7 +377,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         }
 
         ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
-        if (head->type == IMDC_COMPRESS)
+        if (head->compress)
         {
             RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
             uint32_t start_line = 0, end_line = 0;
@@ -452,7 +434,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             }
         }
         PPE_blend(&source, &target, &trans, mode);
-        if (head->type == IMDC_COMPRESS)
+        if (head->compress)
         {
             gui_free(source.memory);
         }

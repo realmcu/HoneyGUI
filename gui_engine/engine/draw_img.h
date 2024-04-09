@@ -25,13 +25,12 @@ typedef enum
 
 typedef enum
 {
-    RGB565 = 0,
-    ARGB8565 = 1,
-    RGB888 = 3,
-    RGBA8888 = 4,
+    RGB565 = 0, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red
+    ARGB8565 = 1, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha
+    RGB888 = 3, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red
+    RGBA8888 = 4, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for Alpha
     BINARY = 5,
     ALPHAMASK = 9,
-    IMDC_COMPRESS = 10,
     BMP = 11,
     JPEG = 12,
     PNG = 13,
@@ -71,6 +70,7 @@ typedef struct draw_img
     uint32_t checksum : 8;
     uint32_t src_mode : 3;
     uint32_t high_quality : 1;
+    //uint32_t color_mix; //todo for QuDai
     float *line;
 } draw_img_t;
 
@@ -79,6 +79,7 @@ bool gui_image_new_area(draw_img_t *img);
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end);
 struct gui_rgb_data_head rtgui_image_get_header(draw_img_t *img);
+uint32_t gui_image_get_pixel(draw_img_t *img);
 
 #ifdef __cplusplus
 }

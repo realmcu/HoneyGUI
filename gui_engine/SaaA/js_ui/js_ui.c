@@ -59,12 +59,13 @@ DECLARE_HANDLER(write)
     if (txtbox)
     {
         jerry_value_t s = jerry_value_to_string(args[0]);////gui_log("jerryenter1\n");
-        jerry_length_t length = jerry_get_utf8_string_length(s); ////gui_log("jerryenter2\n");
-        jerry_char_t *strbuf1 = gui_malloc(length + 1); ////gui_log("jerryenter3\n");
-        jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); ////gui_log("jerryenter4\n");
-        strbuf1[length] = '\0';
+        jerry_length_t char_length = jerry_get_utf8_string_length(s); ////gui_log("jerryenter2\n");
+        jerry_size_t byte_size = jerry_get_utf8_string_size(s);
+        jerry_char_t *strbuf1 = gui_malloc(byte_size + 1); ////gui_log("jerryenter3\n");
+        jerry_string_to_utf8_char_buffer(s, strbuf1, byte_size + 1); ////gui_log("jerryenter4\n");
+        strbuf1[byte_size] = '\0';
         gui_free(txtbox->content);
-        gui_text_content_set(txtbox, (void *)strbuf1, length);
+        gui_text_content_set(txtbox, (void *)strbuf1, byte_size);
         jerry_release_value(s);
     }
     return jerry_create_undefined();
