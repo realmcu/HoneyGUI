@@ -12,11 +12,13 @@
 #define APP_WATCH_FACE
 #define APP_CALCULATOR
 #define APP_SPORT
+#define APP_MENU
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design)
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
 GUI_APP_DEFINE(APP_CALCULATOR, app_hr_ui_design)
 GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
+GUI_APP_DEFINE(APP_MENU,       app_menu)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -35,8 +37,8 @@ GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
 static void heart_ani_cb(gui_img_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
-static void status_bar(void *parent);
-static status_bar_ani(gui_win_t *win);
+static void status_bar(void *parent, gui_obj_t *ignore_gesture);
+static status_bar_ani(gui_obj_t *ignore_gesture);
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, PAGE_NAME, 0, 0, 0, 0);
@@ -176,25 +178,8 @@ static void app_hr_ui_design(gui_app_t *app)
     }
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_onRight(win, win_cb, win);
-    status_bar(GUI_APP_ROOT_SCREEN);
+    status_bar(GUI_APP_ROOT_SCREEN, page);
 }
-static uint32_t *heart_ani_array[] =
-{
-    HEARTRATE04_BIN,
-    HEARTRATE08_BIN,
-    HEARTRATE12_BIN,
-    HEARTRATE16_BIN,
-    HEARTRATE20_BIN,
-    HEARTRATE24_BIN,
-    HEARTRATE28_BIN,
-    HEARTRATE32_BIN,
-    HEARTRATE36_BIN,
-    HEARTRATE40_BIN,
-    HEARTRATE44_BIN,
-    HEARTRATE48_BIN,
-
-
-};
 static void heart_ani_cb(gui_img_t *img)
 {
     static bool odd;
@@ -202,6 +187,21 @@ static void heart_ani_cb(gui_img_t *img)
     {
         odd = !odd;
     }
+    uint32_t *heart_ani_array[] =
+    {
+        HEARTRATE04_BIN,
+        HEARTRATE08_BIN,
+        HEARTRATE12_BIN,
+        HEARTRATE16_BIN,
+        HEARTRATE20_BIN,
+        HEARTRATE24_BIN,
+        HEARTRATE28_BIN,
+        HEARTRATE32_BIN,
+        HEARTRATE36_BIN,
+        HEARTRATE40_BIN,
+        HEARTRATE44_BIN,
+        HEARTRATE48_BIN,
+    };
     if (odd)
     {
         gui_img_set_attribute(img, 0, heart_ani_array[(int)((1.0f - img->animate->progress_percent) *
@@ -237,7 +237,7 @@ static void page_cb(gui_page_t *page)
 }
 static void win_cb(gui_win_t *win)
 {
-    GUI_APP_SWAP_HANDLE(GUI_APP_HANDLE(APP_HEART_RATE), get_app_watch_ui())
+    GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_watch_ui())
     gui_tabview_t *tabview = 0;
     gui_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", &tabview);
     if (tabview)
@@ -247,16 +247,17 @@ static void win_cb(gui_win_t *win)
 
 
 }
+
 #define TIME_SCALE_RATE (0.35F)
 #define STATUS_BAR_HEIGHT 20
 static gui_win_t *canvas_win;
 static gui_img_t *rect;
 static gui_text_t *t;
-static void status_bar(void *parent)
+static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
     canvas_win = gui_win_create(status_bar, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, status_bar);
+    gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
     {
         char *text = "7:55";
         int font_size = 48;
@@ -280,7 +281,7 @@ static void status_bar(void *parent)
     gui_img_set_opacity(rect, 0);
 
 }
-static status_bar_ani(gui_win_t *win)
+static status_bar_ani(gui_obj_t *ignore_gesture)
 {
 
     touch_info_t *tp = tp_get_info();
@@ -293,11 +294,13 @@ static status_bar_ani(gui_win_t *win)
         }
     }
     int deltaY = tp->deltaY;
+
     if (press)
     {
-        gui_page_t *page = 0;
-        gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
-        page->gesture_flag = 1;
+        if (ignore_gesture)
+        {
+            ignore_gesture->gesture = 1;
+        }
         GET_BASE(canvas_win)->not_show = 0;
         if (deltaY > 0)
         {
@@ -340,9 +343,10 @@ static status_bar_ani(gui_win_t *win)
         GET_BASE(canvas_win)->not_show = 1;
         gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
         shrink = 0;
-        gui_page_t *page = 0;
-        gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
-        page->gesture_flag = 0;
+        if (ignore_gesture)
+        {
+            ignore_gesture->gesture = 0;
+        }
     }
     if (expand)
     {
@@ -350,9 +354,10 @@ static status_bar_ani(gui_win_t *win)
         {
             expand_press = 1;
         }
-        gui_page_t *page = 0;
-        gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
-        page->gesture_flag = 1;
+        if (ignore_gesture)
+        {
+            ignore_gesture->gesture = 1;
+        }
         if (expand_press)
         {
             if (deltaY < 0)
@@ -378,16 +383,101 @@ static status_bar_ani(gui_win_t *win)
                     gui_img_set_opacity(rect, 0);
                     GET_BASE(canvas_win)->not_show = 1;
                     gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
-                    gui_page_t *page = 0;
-                    gui_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_HEART_RATE)->screen), PAGE_NAME, &page);
-                    page->gesture_flag = 0;
+                    if (ignore_gesture)
+                    {
+                        ignore_gesture->gesture = 0;
+                    }
                 }
                 expand_press = 0;
             }
 
         }
     }
-
-
-
 }
+#include "gui_menu_cellular.h"
+static void app_menu(gui_app_t *app)
+{
+    /**
+     * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
+    */
+    uint32_t *array[] =
+    {
+        ICON_BLUETOOTH_OFF_BIN,
+        ICON_BLUETOOTH_ON_BIN,
+        ICON_BLUETOOTH_TOUCH_BIN,
+        ICON_BUDS_OFF_BIN,
+        ICON_BUDS_ON_BIN,
+        ICON_BUDS_TOUCH_BIN,
+        ICON_MORE_OFF_BIN,
+        ICON_MORE_ON_BIN,
+        ICON_MORE_TOUCH_BIN,
+        ICON_PHONE_OFF_BIN,
+        ICON_PHONE_ON_BIN,
+        ICON_PHONE_TOUCH_BIN,
+        ICON_BLUETOOTH_OFF_BIN,
+        ICON_BLUETOOTH_ON_BIN,
+        ICON_BLUETOOTH_TOUCH_BIN,
+        ICON_BUDS_OFF_BIN,
+        ICON_BUDS_ON_BIN,
+        ICON_BUDS_TOUCH_BIN,
+        ICON_MORE_OFF_BIN,
+        ICON_MORE_ON_BIN,
+        ICON_MORE_TOUCH_BIN,
+        ICON_PHONE_OFF_BIN,
+        ICON_PHONE_ON_BIN,
+        ICON_PHONE_TOUCH_BIN,
+        ICON_BLUETOOTH_OFF_BIN,
+        ICON_BLUETOOTH_ON_BIN,
+        ICON_BLUETOOTH_TOUCH_BIN,
+        ICON_BUDS_OFF_BIN,
+        ICON_BUDS_ON_BIN,
+        ICON_BUDS_TOUCH_BIN,
+        ICON_MORE_OFF_BIN,
+        ICON_MORE_ON_BIN,
+        ICON_MORE_TOUCH_BIN,
+        ICON_PHONE_OFF_BIN,
+        ICON_PHONE_ON_BIN,
+        ICON_PHONE_TOUCH_BIN,
+        ICON_BLUETOOTH_OFF_BIN,
+        ICON_BLUETOOTH_ON_BIN,
+        ICON_BLUETOOTH_TOUCH_BIN,
+        ICON_BUDS_OFF_BIN,
+        ICON_BUDS_ON_BIN,
+        ICON_BUDS_TOUCH_BIN,
+        ICON_MORE_OFF_BIN,
+        ICON_MORE_ON_BIN,
+        ICON_MORE_TOUCH_BIN,
+        ICON_PHONE_OFF_BIN,
+        ICON_PHONE_ON_BIN,
+        ICON_PHONE_TOUCH_BIN,
+    };
+    gui_menu_cellular_t *cell = gui_menu_cellular_create(GUI_APP_ROOT_SCREEN, 100, array,
+                                                         sizeof(array) / sizeof(uint32_t *));
+    gui_menu_cellular_offset(cell, -36, -216);
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
+    gui_win_onRight(win, win_cb, win);
+    status_bar(GUI_APP_ROOT_SCREEN, cell);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

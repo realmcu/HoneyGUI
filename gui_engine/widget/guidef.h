@@ -418,7 +418,7 @@ typedef struct _gui_obj_t
     uint32_t create_done    : 1;
     uint32_t flag_3d        : 1;
     uint32_t event_dsc_cnt  : 5;
-
+    uint32_t gesture        : 1;
     gui_event_dsc_t *event_dsc;
 
 

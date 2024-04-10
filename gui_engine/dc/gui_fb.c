@@ -146,7 +146,10 @@ static void obj_draw_prepare(gui_obj_t *object)
 
         if (obj->obj_prepare != NULL)
         {
-            obj->obj_prepare(obj);
+            if (!obj->gesture)
+            {
+                obj->obj_prepare(obj);
+            }
         }
         if (obj->not_show)
         {
