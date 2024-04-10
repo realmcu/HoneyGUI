@@ -266,15 +266,13 @@ int js_read_file(const char *filename, char **script)
 
     if (!length) { return 0; }
 
-    *script = (char *)gui_malloc(length + 1);
     if (!(*script)) { return 0; }
+
     (*script)[length] = '\0';
 
     fp = fopen(filename, "rb");
     if (!fp)
     {
-        gui_free(*script);
-        *script = NULL;
         printf("open %s failed!\n", filename);
         return 0;
     }
@@ -282,8 +280,6 @@ int js_read_file(const char *filename, char **script)
     if (fread(*script, length, 1, fp) != 1)
     {
         length = 0;
-        gui_free(*script);
-        *script = NULL;
         printf("read %s failed!\n", filename);
     }
     fclose(fp);
@@ -303,17 +299,15 @@ int js_read_file(const char *filename, char **script)
     int fd = 0;
     fd = open(filename, 0);
     length = gui_fs_lseek(fd, 0, SEEK_END) - lseek(fd, 0, SEEK_SET);
-    *script = (char *)gui_malloc(length + 1);
+
     if (!(*script)) { return 0; }
     (*script)[length] = '\0';
 
     read(fd, *script, length);
 
     //rt_kprintf("length:%d",length);
-    if (fd == 0)
+    if (fd <= 0)
     {
-        gui_free(*script);
-        *script = NULL;
         printf("open %s failed!\n", filename);
         return 0;
     }

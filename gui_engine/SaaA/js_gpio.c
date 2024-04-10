@@ -50,7 +50,7 @@ DECLARE_HANDLER(writeSync)
 
         if (gpio >= 0)
         {
-            gui_log("gpio %d, mode %d, write_value %d", gpio, mode, write_value);
+            gui_log("gpio %d, mode %d, write_value %d\n", gpio, mode, write_value);
             /**
              * GPIO
             */
@@ -120,7 +120,7 @@ DECLARE_HANDLER(writeSync)
                     matter_send_msg_to_app(1, param);
                 }
 
-                gui_log("gpio%d, %d, %d param %d", gpio, mode, write_value, param);
+                gui_log("gpio%d, %d, %d param %d\n", gpio, mode, write_value, param);
             }
 #endif
 #endif
