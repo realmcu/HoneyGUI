@@ -18,4 +18,22 @@
       </fontSet>
     </FontConvertSetting>
   </FontConfigData>
+  <FontConfigData FontSettingName="fontSetting1">
+    <FontConvertSetting>
+      <fontName>arialbd.ttf</fontName>
+      <fontType>Rasterized</fontType>
+      <codePage>
+        <string>CP037</string>
+      </codePage>
+      <textType>Random</textType>
+      <fontSet>
+        <isBold>false</isBold>
+        <isItalic>false</isItalic>
+        <scanMode>Horizontal</scanMode>
+        <fontSize>16</fontSize>
+        <renderMode>Bit_4</renderMode>
+        <indexMethod>Address</indexMethod>
+      </fontSet>
+    </FontConvertSetting>
+  </FontConfigData>
 </FontConfigXmlData>
