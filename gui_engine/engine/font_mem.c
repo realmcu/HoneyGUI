@@ -1066,9 +1066,9 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
     int font_w = chr->w;
     // int font_h = chr->h;
     int x_start = font_x;
-    int x_end = _UI_MIN(font_x + chr->char_w, buf_width);
+    int x_end = _UI_MIN(font_x + chr->char_w, rect->x2);
     int y_start = font_y;
-    int y_end = font_y + chr->char_h;
+    int y_end = _UI_MIN((font_y + chr->char_h), rect->y2);
     if (crop)
     {
         int line_byte = (chr->char_w * rendor_mode + 8 - 1) / 8;
@@ -1119,6 +1119,9 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
 
                 gui_color_t write_color = color;
                 uint32_t color_output[4];
+                uint8_t temp_b = write_color.color.rgba.b;
+                write_color.color.rgba.b = write_color.color.rgba.r;
+                write_color.color.rgba.r = temp_b;
                 int pre_alpha = 0x100 / ((1 << rendor_mode) - 1);
                 for (int i = 0; i < 1 << rendor_mode; i++)
                 {
@@ -1199,6 +1202,9 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             {
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
                 gui_color_t write_color = color;
+                uint8_t temp_b = write_color.color.rgba.b;
+                write_color.color.rgba.b = write_color.color.rgba.r;
+                write_color.color.rgba.r = temp_b;
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
                     int write_off = buf_width * i;
@@ -1339,7 +1345,8 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
     GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
     uint8_t rendor_mode = font->rendor_mode;
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
-
+    rect.x2 = rect.x1 + buf_width;
+    rect.y2 = rect.y1 + buf_height;
     for (uint16_t i = 0; i < text->font_len; i++)
     {
         gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,
