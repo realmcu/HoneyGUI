@@ -42,7 +42,7 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t img_type = *((uint8_t *)image_off);
+    uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
     int32_t y1, y2, z1, z2;
 //        x1 = round(inverse->m[0][0] * dc->section.x1 + inverse->m[0][1] * dc->section.y1 +
 //                   inverse->m[0][2]);
@@ -88,7 +88,7 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         end_line = y2 + 4;
     }
     //TODO: y2 + ceil(1 / scale_y_ratio)
-    if (img_type == 4)//rle_alpha_matrix_rgb565_2_rgb565
+    if (img_type == RGB565)//rle_alpha_matrix_rgb565_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
@@ -138,7 +138,7 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    else if (img_type == 68) //rle_alpha_matrix_rgb888_2_rgb565
+    else if (img_type == RGB888) //rle_alpha_matrix_rgb888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 3;
 
@@ -201,7 +201,7 @@ void rle_alpha_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
         }
     }
-    else if (img_type == 132) //rle_alpha_matrix_argb8888_2_rgb565
+    else if (img_type == RGBA8888) //rle_alpha_matrix_argb8888_2_rgb565
     {
         uint8_t source_bytes_per_pixel = 4;
 
@@ -281,7 +281,7 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
 
     struct gui_matrix *inverse = image->inverse;
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t img_type = *((uint8_t *)image_off);
+    uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     uint8_t opacity_value = image->opacity_value;
     int32_t  y1, y2, z1, z2;
@@ -328,7 +328,7 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     {
         end_line = y2 + 4;
     }
-    if (img_type == 132)//rle_alpha_matrix_rgba8888_2_rgb888
+    if (img_type == RGBA8888)//rle_alpha_matrix_rgba8888_2_rgb888
     {
         uint8_t source_bytes_per_pixel = 4;
 
@@ -386,7 +386,7 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    else if (img_type == 68) //rle_alpha_matrix_rgb888_2_rgb888
+    else if (img_type == RGB888) //rle_alpha_matrix_rgb888_2_rgb888
     {
 
         uint8_t source_bytes_per_pixel = 3;
@@ -443,7 +443,7 @@ void rle_alpha_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
         }
 
     }
-    else if (img_type == 4) //rle_alpha_matrix_rgb565_2_rgb888
+    else if (img_type == RGB565) //rle_alpha_matrix_rgb565_2_rgb888
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
@@ -517,7 +517,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     struct gui_matrix *inverse = image->inverse;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t img_type = *((uint8_t *)image_off);
+    uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     uint8_t opacity_value = image->opacity_value;
     int32_t  y1, y2, z1, z2;
@@ -565,7 +565,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         end_line = y2 + 4;
     }
     //TODO: y2 + ceil(1 / scale_y_ratio)
-    if (img_type == 132)//rle_alpha_matrix_rgba8888_2_argb8888
+    if (img_type == RGBA8888)//rle_alpha_matrix_rgba8888_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 4;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];
@@ -622,7 +622,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
             }
         }
     }
-    else if (img_type == 68) //rle_alpha_matrix_rgb888_2_argb8888
+    else if (img_type == RGB888) //rle_alpha_matrix_rgb888_2_argb8888
     {
 
         uint8_t source_bytes_per_pixel = 3;
@@ -678,7 +678,7 @@ void rle_alpha_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         }
 
     }
-    else if (img_type == 4) //rle_alpha_matrix_rgb565_2_argb8888
+    else if (img_type == RGB565) //rle_alpha_matrix_rgb565_2_argb8888
     {
         uint8_t source_bytes_per_pixel = 2;
         uint8_t line_buf[source_bytes_per_pixel * source_w * (end_line - start_line + 1)];

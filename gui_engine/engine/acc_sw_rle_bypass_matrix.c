@@ -40,7 +40,7 @@ void rle_bypass_matrix_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     struct gui_matrix *inverse = image->inverse;
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint16_t img_type = *((uint16_t *)image_off + 1);
+    uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
 
     int32_t y1, y2, z1, z2;
 //        x1 = round(inverse->m[0][0] * dc->section.x1 + inverse->m[0][1] * dc->section.y1 +
@@ -289,7 +289,7 @@ void rle_bypass_matrix_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
     struct gui_matrix *inverse = image->inverse;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint16_t img_type = *((uint16_t *)image_off + 1);
+    uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     uint8_t opacity_value = image->opacity_value;
     int32_t  y1, y2, z1, z2;
@@ -526,7 +526,7 @@ void rle_bypass_matrix_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc
     struct gui_matrix *inverse = image->inverse;
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint16_t img_type = *((uint16_t *)image_off + 1);
+    uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     uint8_t opacity_value = image->opacity_value;
     int32_t  y1, y2, z1, z2;
