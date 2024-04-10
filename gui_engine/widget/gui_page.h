@@ -68,6 +68,7 @@ typedef struct gui_page
     bool release;
     bool press;
     bool gesture_flag;
+    bool top_slide_only;
     uint8_t status;
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
 } gui_page_t;
@@ -194,6 +195,15 @@ void gui_page_rebound(gui_page_t *this, bool rebound);
  * @param align_hight
  */
 void gui_page_center_alignment(gui_page_t *page, int align_hight);
+
+/**
+ * @brief set only top slide flag
+ *
+ * @param page widget pointer
+ * @param flag true:only top slide; false:all slide
+ */
+void gui_page_set_only_top_slide(gui_page_t *page, bool flag);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
