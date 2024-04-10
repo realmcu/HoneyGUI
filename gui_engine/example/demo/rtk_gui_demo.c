@@ -126,6 +126,10 @@ static void app_dialing_ui_design(gui_app_t *app)
     gui_img_t *img = gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue, 0, 0,
                                              0, 0);
 
+    gui_img_t *img0 = gui_img_create_from_mem(&(app->screen),  "img_2_test",
+                                              (void *)_actiger_blue_compressed, 256, 256,
+                                              0, 0);
+
     //gui_img_rotation(img, 45, 0, 0);
     //return;
 

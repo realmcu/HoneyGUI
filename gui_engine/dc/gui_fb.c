@@ -175,7 +175,7 @@ static void obj_draw_scan(gui_obj_t *obj)
             if (obj->obj_draw != NULL)
             {
                 dc->section.y1 = dc->section_count * dc->fb_height;
-                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height, dc->screen_height);
+                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
                 obj->obj_draw(obj);
             }
         }
