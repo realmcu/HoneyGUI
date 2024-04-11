@@ -502,6 +502,16 @@ uint32_t gui_ms_get(void)
     return os_api->thread_ms_get();
 }
 
+uint32_t gui_us_get(void)
+{
+    if (os_api->thread_us_get == NULL)
+    {
+        return 0;
+    }
+
+    return os_api->thread_us_get();
+}
+
 #if defined(_WIN32)
 struct file_load_node
 {
