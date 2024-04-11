@@ -87,7 +87,7 @@
   * @{
   */
 
-void gui_tab_cube(gui_obj_t *obj)
+void gui_tab_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
@@ -107,7 +107,7 @@ void gui_tab_cube(gui_obj_t *obj)
     gui_matrix_t rotate_3D;
     int16_t release_x = parent->release_x;
 
-    float rotate_degree = 90 * release_x / (this->base.w) + 90.0 * (this->id.x - parent->cur_id.x);
+    float rotate_degree = 90 * release_x / (this->base.w) + 90.0 * (tab_x_gap);
 
     matrix_compute_rotate(0, rotate_degree, 0, &rotate_3D);
 
@@ -136,8 +136,8 @@ void gui_tab_cube(gui_obj_t *obj)
     matrix_transfrom_blit(this->base.w, this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
                           &temp);
 
-    int32_t id_x = parent->cur_id.x;
-    int32_t id_y = parent->cur_id.y;
+    // int32_t id_x = parent->cur_id.x;
+    // int32_t id_y = parent->cur_id.y;
 
 #if 1
     if (rv0.x > rv1.x)
@@ -166,14 +166,14 @@ void gui_tab_cube(gui_obj_t *obj)
 
     if (rotate_degree > 90)
     {
-        matrix_translate((this->id.x - id_x) * (int)this->base.w, \
-                         (this->id.y - id_y) * (int)this->base.h, \
+        matrix_translate((tab_x_gap) * (int)this->base.w, \
+                         (tab_y_gap) * (int)this->base.h, \
                          obj->matrix);
     }
     if (rotate_degree < -90)
     {
-        matrix_translate((this->id.x - id_x) * (int)this->base.w, \
-                         (this->id.y - id_y) * (int)this->base.h, \
+        matrix_translate((tab_x_gap) * (int)this->base.w, \
+                         (tab_y_gap) * (int)this->base.h, \
                          obj->matrix);
     }
 
