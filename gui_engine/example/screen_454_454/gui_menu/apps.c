@@ -38,7 +38,8 @@ static void heart_ani_cb(gui_img_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
 static void status_bar(void *parent, gui_obj_t *ignore_gesture);
-static status_bar_ani(gui_obj_t *ignore_gesture);
+static void status_bar_ani(gui_obj_t *ignore_gesture);
+static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture);
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, PAGE_NAME, 0, 0, 0, 0);
@@ -46,16 +47,19 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_page_center_alignment(page, SCREEN_H);
 
     {
-        gui_img_t *rect = gui_rect(page, 0, SCREEN_H, SCREEN_W, SCREEN_H, COLOR_RED);
-        gui_rect(rect, 10, 100, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10, 200, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10, 300, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10, 400, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4 * 2, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4 * 3, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
-        gui_rect(rect, 10 + (SCREEN_W - 10 * 2) / 4 * 4, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_img_t *rect = gui_rect((void *)page, 0, SCREEN_H, SCREEN_W, SCREEN_H, COLOR_RED);
+        gui_rect((void *)rect, 10, 100, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10, 200, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10, 300, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10, 400, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 2, 100, 2, 400 - 100,
+                 COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 3, 100, 2, 400 - 100,
+                 COLOR_SILVER_OPACITY(100));
+        gui_rect((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 4, 100, 2, 400 - 100,
+                 COLOR_SILVER_OPACITY(100));
         {
             char *text = "198";
             int font_size = 16;
@@ -63,7 +67,6 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_font_mem_init(addr1);
             gui_text_type_set(t, addr1);
         }
         {
@@ -73,7 +76,6 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_font_mem_init(addr1);
             gui_text_type_set(t, addr1);
         }
         {
@@ -83,7 +85,6 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_font_mem_init(addr1);
             gui_text_type_set(t, addr1);
         }
         {
@@ -92,7 +93,6 @@ static void app_hr_ui_design(gui_app_t *app)
             gui_text_t *t = gui_text_create(rect, "txt", 10, 400 - 18, gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_font_mem_init(addr1);
             gui_text_type_set(t, addr1);
         }
         {
@@ -102,7 +102,6 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_font_mem_init(addr1);
             gui_text_type_set(t, addr1);
         }
         {
@@ -112,7 +111,6 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_font_mem_init(addr1);
             gui_text_type_set(t, addr1);
         }
         {
@@ -122,20 +120,19 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_font_mem_init(addr1);
             gui_text_type_set(t, addr1);
         }
-        gui_rect(rect, 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
-        gui_rect(rect, 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
-        gui_rect(rect, 10 + 10 + 200, 280, 5, 400 - 280, COLOR_SILVER);
-        gui_rect(rect, 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
+        gui_rect((void *)rect, 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
+        gui_rect((void *)rect, 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
+        gui_rect((void *)rect, 10 + 10 + 200, 280, 5, 400 - 280, COLOR_SILVER);
+        gui_rect((void *)rect, 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
     }
     {
-        gui_img_t *rect = gui_rect(page, 0, SCREEN_H * 2, SCREEN_W, SCREEN_H, COLOR_CRIMSON);
-        gui_rect(rect, 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
+        gui_img_t *rect = gui_rect((void *)page, 0, SCREEN_H * 2, SCREEN_W, SCREEN_H, COLOR_CRIMSON);
+        gui_rect((void *)rect, 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
 
     }
-    gui_rect(page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
+    gui_rect((void *)page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
     gui_img_t *heart_ani = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, HEARTRATE04_BIN,
                                                    (SCREEN_W - HEART_ANI_W) / 2, 100, 0, 0);
     gui_img_set_animate(heart_ani, 1000, -1, heart_ani_cb, heart_ani);
@@ -146,7 +143,6 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 100, 300, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
     {
@@ -155,7 +151,6 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 100, 320, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
-        gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
     {
@@ -164,7 +159,6 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 157, 347, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
     {
@@ -173,12 +167,11 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 100, 370, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_onRight(win, win_cb, win);
-    status_bar(GUI_APP_ROOT_SCREEN, page);
+    status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
 }
 static void heart_ani_cb(gui_img_t *img)
 {
@@ -218,7 +211,7 @@ static void page_cb(gui_page_t *page)
 {
     gui_img_t *img = 0;
     gui_app_t *app = GUI_APP_HANDLE(APP_HEART_RATE);
-    gui_tree_get_widget_by_name(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, &img);
+    gui_tree_get_widget_by_name(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, (void *)&img);
 
     int offset = page->base.y;
     if (offset < -SCREEN_H)
@@ -239,7 +232,7 @@ static void win_cb(gui_win_t *win)
 {
     GUI_APP_SWAP_HANDLE(gui_current_app(), get_app_watch_ui())
     gui_tabview_t *tabview = 0;
-    gui_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", &tabview);
+    gui_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", (void *)&tabview);
     if (tabview)
     {
         gui_tabview_jump_tab(tabview, -1, 0);
@@ -265,7 +258,6 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
                             font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
-        gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
         gui_text_convert_to_img(t, RGBA8888);
 
@@ -277,11 +269,12 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
     }
 
     GET_BASE(canvas_win)->not_show = 1;
-    rect = gui_rect(canvas_win, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE_OPACITY);
+    rect = gui_rect((void *)canvas_win, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE_OPACITY);
     gui_img_set_opacity(rect, 0);
 
 }
-static status_bar_ani(gui_obj_t *ignore_gesture)
+#include "tp_algo.h"
+static void status_bar_ani(gui_obj_t *ignore_gesture)
 {
 
     touch_info_t *tp = tp_get_info();
@@ -453,12 +446,105 @@ static void app_menu(gui_app_t *app)
     };
     gui_menu_cellular_t *cell = gui_menu_cellular_create(GUI_APP_ROOT_SCREEN, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
-    gui_menu_cellular_offset(cell, -36, -216);
+    gui_menu_cellular_offset((void *)cell, -36, -216);
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_onRight(win, win_cb, win);
-    status_bar(GUI_APP_ROOT_SCREEN, cell);
+    status_bar(GUI_APP_ROOT_SCREEN, (void *)cell);
+    return_widget(GUI_APP_ROOT_SCREEN, 0);
 }
+#include "gui_seekbar.h"
+#include "gui_img.h"
+#define RETURN_HEIGHT 100
+static void seekbar_h_preapre(gui_obj_t *obj)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = tp_get_info();
+    gui_seekbar_t *circle = (gui_seekbar_t *)obj;
 
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
+    {
+        static bool enable;
+        int pro = 0;
+#define RETURN_THREHOLD 10
+        if (tp->pressed && tp->x < RETURN_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
+        {
+            enable = 1;
+            GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
+            if (GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y > SCREEN_H)
+            {
+                GET_BASE(circle->base.c)->y = SCREEN_H - RETURN_HEIGHT - obj->y;
+            }
+            gui_progressbar_set_progress((void *)circle, pro);
+        }
+        if (tp->released)
+        {
+            enable = 0;
+            gui_progressbar_set_progress((void *)circle, pro);
+        }
+        if (enable)
+        {
+            if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
+            {
+                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                {
+                    pro = tp->x + tp->deltaX - 0;
+                    if (pro <= 0) { pro = 1; }
+                    if (pro >= obj->w) { pro = obj->w; }
+                    if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
+                    {
+                        pro = pro * (circle->base.max - 2) / obj->w;
+                        gui_log("pro:%d\n", pro);
+                    }
+                    gui_progressbar_set_progress((void *)circle, pro);
+                }
+            }
+        }
+
+
+    }
+}
+static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture)
+{
+
+    static uint32_t *array[] =
+    {
+        PATH04_BIN,
+        PATH05_BIN,
+        PATH06_BIN,
+        PATH07_BIN,
+        PATH08_BIN,
+        PATH09_BIN,
+        PATH10_BIN,
+        PATH11_BIN,
+        PATH12_BIN,
+        PATH13_BIN,
+        PATH14_BIN,
+        PATH15_BIN,
+        PATH16_BIN,
+        PATH17_BIN,
+        PATH18_BIN,
+        PATH19_BIN,
+        PATH20_BIN,
+        PATH21_BIN,
+        PATH22_BIN,
+        PATH23_BIN,
+        PATH24_BIN,
+        PATH25_BIN,
+    };
+    gui_seekbar_t *bar = gui_seekbar_create_movie_h(parent, (void *)array,
+                                                    sizeof(array) / sizeof(uint32_t *), 0, SCREEN_H - SCREEN_H * 2 / 3);
+    GET_BASE(bar)->obj_prepare = seekbar_h_preapre;
+    gui_obj_add_event_cb(bar, (gui_event_cb_t)win_cb, GUI_EVENT_1, bar);
+    GET_BASE(bar)->w = RETURN_HEIGHT;
+    GET_BASE(bar)->h = SCREEN_H * 2 / 3;
+    gui_img_set_mode((void *)bar->base.c, IMG_SRC_OVER_MODE);
+    if (ignore_gesture)
+    {
+        ignore_gesture->gesture = 1;
+    }
+
+
+}
 
 
 
