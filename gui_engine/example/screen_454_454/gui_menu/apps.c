@@ -172,6 +172,7 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_onRight(win, win_cb, win);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
+    return_widget(GUI_APP_ROOT_SCREEN, (void *)page);
 }
 static void heart_ani_cb(gui_img_t *img)
 {
@@ -450,11 +451,12 @@ static void app_menu(gui_app_t *app)
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_onRight(win, win_cb, win);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)cell);
-    return_widget(GUI_APP_ROOT_SCREEN, 0);
+    return_widget(GUI_APP_ROOT_SCREEN, cell);
 }
 #include "gui_seekbar.h"
 #include "gui_img.h"
 #define RETURN_HEIGHT 100
+static gui_obj_t *return_ignore_gesture;
 static void seekbar_h_preapre(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
@@ -464,11 +466,14 @@ static void seekbar_h_preapre(gui_obj_t *obj)
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
         static bool enable;
+        static bool return_flag;
         int pro = 0;
-#define RETURN_THREHOLD 10
-        if (tp->pressed && tp->x < RETURN_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
+#define RETURN_ENABLE_THREHOLD 10
+#define RETURN_THREHOLD 80
+        if (tp->pressed && tp->x < RETURN_ENABLE_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
         {
             enable = 1;
+            return_ignore_gesture->gesture = 1;
             GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
             if (GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y > SCREEN_H)
             {
@@ -479,7 +484,14 @@ static void seekbar_h_preapre(gui_obj_t *obj)
         if (tp->released)
         {
             enable = 0;
+            return_ignore_gesture->gesture = 0;
             gui_progressbar_set_progress((void *)circle, pro);
+            if (return_flag)
+            {
+                return_flag = 0;
+                gui_obj_event_set(obj, GUI_EVENT_1);
+            }
+
         }
         if (enable)
         {
@@ -493,14 +505,21 @@ static void seekbar_h_preapre(gui_obj_t *obj)
                     if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
                     {
                         pro = pro * (circle->base.max - 2) / obj->w;
-                        gui_log("pro:%d\n", pro);
-                    }
+
+                    } gui_log("pro:%d\n", tp->deltaX);
                     gui_progressbar_set_progress((void *)circle, pro);
+                    if (tp->deltaX >= RETURN_THREHOLD)
+                    {
+                        return_flag = 1;
+                    }
+                    else
+                    {
+                        return_flag = 0;
+                    }
+
                 }
             }
         }
-
-
     }
 }
 static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture)
@@ -538,12 +557,7 @@ static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture)
     GET_BASE(bar)->w = RETURN_HEIGHT;
     GET_BASE(bar)->h = SCREEN_H * 2 / 3;
     gui_img_set_mode((void *)bar->base.c, IMG_SRC_OVER_MODE);
-    if (ignore_gesture)
-    {
-        ignore_gesture->gesture = 1;
-    }
-
-
+    return_ignore_gesture = ignore_gesture;
 }
 
 
