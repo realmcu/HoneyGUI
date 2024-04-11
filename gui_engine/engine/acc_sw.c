@@ -131,7 +131,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             return;
         }
     }
-    else if (img_type == RGBA8888)
+    else if ((img_type == RGBA8888) && (image->blend_mode == IMG_RECT) && (identity == true))
     {
         rect_2_argb8888(image, dc, rect);
         return;

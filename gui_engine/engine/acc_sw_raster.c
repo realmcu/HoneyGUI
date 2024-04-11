@@ -161,7 +161,8 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
         target_alpha = ((255 - source_alpha) * target_alpha + source_alpha * source_alpha) / 255;
         target_red   = ((255 - source_alpha) * target_red + source_alpha * source_red) / 255;
         target_green = ((255 - source_alpha) * target_green + source_alpha * source_green) / 255;
-        target_blue  = ((255 - source_alpha) * target_blue + source_alpha * target_blue) / 255;
+        target_blue  = ((255 - source_alpha) * target_blue + source_alpha * source_green) / 255;
+
 
     }
     else
