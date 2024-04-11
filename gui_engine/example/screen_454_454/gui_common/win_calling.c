@@ -8,7 +8,7 @@
 #include "gui_win.h"
 #include "gui_progressbar.h"
 #include "gui_interface.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_task.h"
 #include "app_mmi.h"
 #include "app_hfp.h"
@@ -121,7 +121,7 @@ static void win_calling_volume_animate_cb(void *data)
 static void win_calling_update_cb(void *p)
 {
     gui_log("win_calling_update_cb\n");
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //update volume
     uint8_t temp_gui_curr_volume = app_audio_get_volume();
     if (temp_gui_curr_volume != gui_curr_volume)
@@ -174,7 +174,7 @@ static void switch_calling_hangup_touch_cb(void *obj, gui_event_t event)
     //reset talk time
     gui_win_calling_destruct();
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //send msg to app task
     T_IO_MSG end_call_msg;
     end_call_msg.type = IO_MSG_TYPE_WRISTBNAD;
@@ -187,7 +187,7 @@ static void switch_calling_hangup_touch_cb(void *obj, gui_event_t event)
 static void switch_calling_mute_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_calling_mute_touch_cb\n");
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     T_IO_MSG mic_mute_msg;
 #endif
     switch (event)
@@ -195,7 +195,7 @@ static void switch_calling_mute_touch_cb(void *obj, gui_event_t event)
     // switch is off(touch to do some turn-on action)
     case GUI_EVENT_1:
         gui_log("switch_calling_mute_touch_cb mic mute on\n");
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
         //send msg to app task
         mic_mute_msg.type = IO_MSG_TYPE_WRISTBNAD;
         mic_mute_msg.subtype = IO_MSG_MMI;
@@ -206,7 +206,7 @@ static void switch_calling_mute_touch_cb(void *obj, gui_event_t event)
     // switch is on(touch to do some turn-off action)
     case GUI_EVENT_2:
         gui_log("switch_calling_mute_touch_cb mic mute off\n");
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
         mic_mute_msg.type = IO_MSG_TYPE_WRISTBNAD;
         mic_mute_msg.subtype = IO_MSG_MMI;
         mic_mute_msg.u.param = MMI_DEV_MIC_UNMUTE;
@@ -292,7 +292,7 @@ static void switch_calling_volume_up_touch_cb(void *parent, gui_event_t event)
     }
     gui_progressbar_set_percentage(progressbar_calling_volume, volume_percentage);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     T_IO_MSG calling_volume_down_msg;
     calling_volume_down_msg.type = IO_MSG_TYPE_WRISTBNAD;
     calling_volume_down_msg.subtype = IO_MSG_MMI;
@@ -312,7 +312,7 @@ static void switch_calling_volume_down_touch_cb(void *parent, gui_event_t event)
     }
     gui_progressbar_set_percentage(progressbar_calling_volume, volume_percentage);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     T_IO_MSG calling_volume_down_msg;
     calling_volume_down_msg.type = IO_MSG_TYPE_WRISTBNAD;
     calling_volume_down_msg.subtype = IO_MSG_MMI;
@@ -373,7 +373,7 @@ void design_win_calling_volume(void *parent)
                                                               ICON_CALL_VOLUME_BAR_2_BIN, 107, 62);
     //todo get volume from profile
     //curr_volume 0~15
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     gui_curr_volume = app_audio_get_volume();
     volume_percentage = (float)(gui_curr_volume / 0xf);
     gui_progressbar_set_percentage(progressbar_calling_volume, volume_percentage);

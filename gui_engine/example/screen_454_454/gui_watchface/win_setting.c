@@ -9,7 +9,7 @@
 #include "gui_tabview.h"
 #include "gui_obj.h"
 #include "gui_common.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_task.h"
 #endif
 
@@ -40,7 +40,7 @@ static void switch_back_menu_setting_touch_cb(void *obj, gui_event_cb_t event)
 static void switch_sw_reset_yes_action(void *obj)
 {
     gui_log("switch_sw_reset_yes_action, obj = 0x%x\n", obj);
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     chip_reset(RESET_ALL);
 #endif
 }
@@ -76,7 +76,7 @@ static void switch_factory_data_reset_yes_action(void *obj)
 {
     gui_log("switch_factory_data_reset_yes_action, obj = 0x%x\n", obj);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     T_IO_MSG factory_reset_msg;
     factory_reset_msg.type = IO_MSG_TYPE_WRISTBNAD;
     factory_reset_msg.subtype = IO_MSG_FACTORY_RESET;

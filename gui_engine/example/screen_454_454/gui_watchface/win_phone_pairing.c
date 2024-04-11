@@ -1,4 +1,4 @@
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "root_image/ui_resource.h"
 #include "gui_curtainview.h"
 #include "gui_curtain.h"

@@ -5,7 +5,7 @@
 #include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_switch.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_task.h"
 #include "app_mmi.h"
 #endif
@@ -26,7 +26,7 @@ static void switch_player_vol_up_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
         {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
             T_IO_MSG play_msg;
             play_msg.type = IO_MSG_TYPE_WRISTBNAD;
             play_msg.subtype = IO_MSG_MMI;
@@ -51,7 +51,7 @@ static void switch_player_vol_down_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
         {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
             T_IO_MSG play_msg;
             play_msg.type = IO_MSG_TYPE_WRISTBNAD;
             play_msg.subtype = IO_MSG_MMI;

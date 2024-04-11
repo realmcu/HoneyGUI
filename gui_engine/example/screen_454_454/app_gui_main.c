@@ -18,7 +18,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include <stdio.h>
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "wdg.h"
 #endif
 
@@ -34,7 +34,7 @@ extern void gui_task_ext_execution_sethook(void (*hook)(void));
 
 static void gui_task_kick_wdg(void)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     WDG_Kick();
 #endif
 }
@@ -67,7 +67,7 @@ static void design_app_watch_ui(gui_app_t *app)
 
     gui_font_mem_init(FONT_BIN);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "mem_config.h"
     //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
 #endif

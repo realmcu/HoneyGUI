@@ -10,7 +10,7 @@
 #include "gui_scroll_text.h"
 #include "gui_pagelistview.h"
 #include "gui_pagelist.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "fs_if.h"
 #include "app_task.h"
 #include "gui_interface.h"
@@ -35,7 +35,7 @@ static int16_t slide_index = 0;
 static int16_t play_index = 0;
 
 #define MAX_NAME_LEN        50
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 extern T_HEAD_INFO  *header_info;
 T_HEAD_INFO  *header_info = (T_HEAD_INFO *)(MUSIC_HEADER_BIN_ADDR +
                                             FS_HEADER_INFO_START);
@@ -46,7 +46,7 @@ uint16_t  *song_count = (uint16_t *)MUSIC_HEADER_BIN_ADDR;
 
 static uint8_t utf8_name[MAX_SHOW_FILE_LIST_NUM][MAX_NAME_LEN];
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 uint16_t get_song_count(void)
 {
     return *song_count;
@@ -55,7 +55,7 @@ uint16_t get_song_count(void)
 
 void play_next_music(void)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     play_index++;
 
     if (play_index >= *song_count)
@@ -76,7 +76,7 @@ void play_next_music(void)
 
 void play_prev_music(void)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     play_index--;
 
     if (play_index <= 0)
@@ -96,7 +96,7 @@ void play_prev_music(void)
 
 void play_select_music(uint16_t index)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     play_index = index;
 
     if (play_index <= 0)
@@ -118,7 +118,7 @@ void play_select_music(uint16_t index)
 #endif
 }
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 T_HEAD_INFO *get_cur_play_header_info(void)
 {
     return (header_info + play_index);
@@ -200,7 +200,7 @@ static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_
 {
     gui_log("pagelist_test_update_list_first_cb, list_first = 0x%x\n", list_first);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     slide_index++;
     if (slide_index > 0x7FFF  - MAX_SHOW_FILE_LIST_NUM)
     {
@@ -225,7 +225,7 @@ static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t 
 {
     gui_log("pagelist_test_update_list_last_cb, list_first = 0x%x\n", list_last);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     slide_index--;
     if (slide_index < 0)
     {
@@ -251,7 +251,7 @@ void design_win_song_lists(gui_win_t *parent)
     char *string_song_list_title = "播放列表";
     int font_size = 32;
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     if (*(uint16_t *)MUSIC_HEADER_BIN_ADDR != 0xFFFF)
     {
         for (uint8_t i = 0; i < MAX_SHOW_FILE_LIST_NUM; i++)
@@ -291,7 +291,7 @@ void design_win_song_lists(gui_win_t *parent)
 
     pagelist_song = gui_pagelist_create(pagelistview_song, "pagelist", 0, 0, LCD_W, LCD_H);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     for (int8_t i = 0; i < MAX_SHOW_FILE_LIST_NUM; i++)
     {
         if (i >= *(uint16_t *)MUSIC_HEADER_BIN_ADDR)

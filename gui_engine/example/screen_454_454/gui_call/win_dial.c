@@ -7,7 +7,7 @@
 #include "gui_curtainview.h"
 #include "gui_app.h"
 #include "gui_win.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_task.h"
 #include "app_mmi.h"
 #endif
@@ -159,7 +159,7 @@ static void switch_dial_outgoing_call_touch_cb(void *obj, gui_event_t event)
 
     push_current_widget(win_dial);
     gui_obj_show(win_dial, false);
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //set dial num
     set_dial_num(buffer_dial_num);
     //send msg to app task
