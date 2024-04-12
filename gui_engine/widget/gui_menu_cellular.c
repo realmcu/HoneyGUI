@@ -177,8 +177,24 @@ static void image(gui_obj_t *object)
         image(obj);
     }
 }
+
 static void wincb(gui_win_t *win)
 {
+    typedef int (*overwrite)(gui_obj_t *obj);
+
+    if (GUI_TYPE(gui_menu_cellular_t, win)->overwrite)
+    {
+        int rst = ((overwrite)(GUI_TYPE(gui_menu_cellular_t, win)->overwrite))((void *)win);
+        if (rst != 0)
+        {
+            touch_info_t *tp = tp_get_info();
+            x = tp->deltaX;
+            y = tp->deltaY;
+            speed[0] = 0;
+            speed[1] = 0;
+            //return;
+        }
+    }
     touch_info_t *tp = tp_get_info();
     static bool move_flag = 1;
     left = INT16_MAX; right = 0; top = INT16_MAX; bottom = 0;
