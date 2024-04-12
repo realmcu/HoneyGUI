@@ -108,6 +108,9 @@ static void set_progress(gui_progressbar_t *this, size_t progress)
         }
 
         GUI_TYPE(gui_img_t, this->c)->draw_img.data = ((void **)(this->color_hl))[p];
+        GET_BASE(this->c)->w = gui_img_get_width((void *)(this->c)) + 1;
+        GET_BASE(this->c)->h = gui_img_get_height((void *)(this->c));
+
     }
 
 
@@ -175,6 +178,7 @@ static void gui_progressbar_movie_ctor_core(gui_progressbar_t *this, gui_obj_t *
         this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
     }
     this->color_hl = (uint32_t)picture_array;
+    gui_log("color_hl:%d\n", this->color_hl);
 }
 /*============================================================================*
  *                           Public Functions

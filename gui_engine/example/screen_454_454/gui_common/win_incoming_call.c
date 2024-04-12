@@ -6,7 +6,7 @@
 #include "gui_switch.h"
 #include "gui_app.h"
 #include "gui_win.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_task.h"
 #include "app_mmi.h"
 #endif
@@ -38,7 +38,7 @@ static void switch_incoming_call_answer_touch_cb(void *obj, gui_event_t event)
     gui_tree_free(win_calling);
     win_calling = NULL;
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //send to app task
     T_IO_MSG answer_call_msg;
     answer_call_msg.type = IO_MSG_TYPE_WRISTBNAD;
@@ -57,7 +57,7 @@ static void switch_incoming_call_hangup_touch_cb(void *obj, gui_event_t event)
     gui_tree_free(win_incoming_call);
     win_incoming_call = NULL;
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //send to app task
     T_IO_MSG reject_call_msg;
     reject_call_msg.type = IO_MSG_TYPE_WRISTBNAD;
@@ -110,7 +110,7 @@ void design_win_incoming_call(void *parent, char *dial_num)
 
 void gui_incoming_call_create(void)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     gui_log("gui_incoming_call_create\n");
     gui_app_t *app = get_app_watch_ui();
     gui_obj_t *current_widget = get_current_active_widget();

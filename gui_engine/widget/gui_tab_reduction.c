@@ -87,17 +87,18 @@
   * @{
   */
 
-void gui_tab_reduction(gui_obj_t *obj)
+void gui_tab_reduction(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
-    matrix_translate((this->id.x - parent->cur_id.x) * (int)this->base.w + parent->release_x, \
-                     (this->id.y - parent->cur_id.y) * (int)this->base.h + parent->release_y, \
+
+    matrix_translate((tab_x_gap) * (int)this->base.w + parent->release_x, \
+                     (tab_y_gap) * (int)this->base.h + parent->release_y, \
                      obj->matrix);
 
 
-    int sx = abs((this->id.x - parent->cur_id.x) * (int)this->base.w + parent->release_x);
+    int sx = abs((tab_x_gap) * (int)this->base.w + parent->release_x);
     sx = sx % this->base.w;
     float s = 1.0f - (float)sx / this->base.w;
 

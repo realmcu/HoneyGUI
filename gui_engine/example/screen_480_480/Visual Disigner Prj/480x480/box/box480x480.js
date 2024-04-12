@@ -653,8 +653,8 @@ var textAnimateConfig = {
 var speed = 888;
 function textAnimateCallback(params) {
     textbox.getElementById('txt_speed')
-    speed=speed + 1
-//    textbox.write(wifi.readSpeed())
+    speed=wifi.readSpeed()
+    // textbox.write(wifi.readSpeed())
 	textbox.write(speed.toString())
 }
 
@@ -662,7 +662,7 @@ function startSpeed(params) {
     textbox.getElementById('txt_click')
     textbox.write(' ')
     textbox.getElementById('txt_unit')
-    textbox.write('bit/s')
+    textbox.write('Kbit/s')
 
     textbox.getElementById('txt_speed')
     textbox.setAnimate(textAnimateCallback, textAnimateConfig)

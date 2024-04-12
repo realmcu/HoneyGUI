@@ -22,9 +22,11 @@ static void deal_win_in_page(gui_obj_t *object);
 static void page_callback(gui_page_t *page);
 static void heart_rate_cb();
 static void clock_cb();
+static void menu_cb();
 static void watch_face_cb();
 static void calculator_cb();
 static void sport_cb();
+#define MENU_GAP 74
 void design_tab_menu(void *parent)
 {
     gui_rect(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
@@ -32,6 +34,7 @@ void design_tab_menu(void *parent)
     gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_callback, page);
     //gui_page_rebound(page, true);
+    gui_page_center_alignment(page, MENU_GAP);
     static void *array[] =
     {
         ICON_MENU_BIN,
@@ -50,7 +53,7 @@ void design_tab_menu(void *parent)
     static char *text_array[] =
     {
         "Heart Rate",
-        "Clock",
+        "Menu",
         "Watch Face",
         "Calculator",
         "Sport",
@@ -65,7 +68,7 @@ void design_tab_menu(void *parent)
     };
     int array_size = sizeof(array) / sizeof(array[0]);
     static gui_win_t *button_array[sizeof(array) / sizeof(array[0])];
-    gui_grid_t *grid = gui_grid_create(page, 27, 0, array_size, 1, 0, 74);
+    gui_grid_t *grid = gui_grid_create(page, 27, 0, array_size, 1, 0, MENU_GAP);
     for (size_t i = 0; i < array_size; i++)
     {
 
@@ -85,13 +88,20 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
+        if (i < 2)
+        {
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
+        }
+        else
+        {
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(200, 200, 200), strlen(text), font_size);
+        }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
     gui_win_onClick(button_array[0], heart_rate_cb, button_array[0]);
-    // gui_win_onClick(button_array[1], clock_cb, button_array[1]);
+    gui_win_onClick(button_array[1], menu_cb, button_array[1]);
     // gui_win_onClick(button_array[2], watch_face_cb, button_array[2]);
     // gui_win_onClick(button_array[3], calculator_cb, button_array[3]);
     // gui_win_onClick(button_array[4], sport_cb, button_array[4]);
@@ -226,6 +236,10 @@ static void page_callback(gui_page_t *page)
 static void heart_rate_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_HEART_RATE))
+}
+static void menu_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MENU))
 }
 // static void clock_cb()
 // {

@@ -174,6 +174,7 @@ static void tabview_prepare(gui_obj_t *obj)
             return;
         }
     }
+
     if (tabview->cur_id.y != 0)
     {
         if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_LEFT_SLIDE || tp->type == TOUCH_RIGHT_SLIDE)
@@ -181,71 +182,29 @@ static void tabview_prepare(gui_obj_t *obj)
             return;
         }
     }
+
     switch (tp->type)
     {
     case TOUCH_HOLD_X:
-        if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
+        if (!this->loop)
         {
-            break;
-        }
-        if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
-        {
-            break;
-        }
-        if (tabview->loop)
-        {
-            this->release_x = tp->deltaX;
+            if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
             {
-                //left edge
-                if (!tabview->loop_status && tabview->cur_id.x ==  -tabview->tab_cnt_left)
-                {
-                    tabview->loop_status = 1;
-                    gui_list_t *node = NULL;
-                    gui_list_for_each(node, &obj->child_list)
-                    {
-                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-                        // modify right edge tab's id to left edge for temp
-                        if (GUI_TYPE(gui_tab_t, obj)->id.x == tabview->tab_cnt_right)
-                        {
-                            GUI_TYPE(gui_tab_t, obj)->id.x = -tabview->tab_cnt_left - 1;
-                        }
-                    }
-                }
-                if (tabview->loop_status && tabview->cur_id.x !=  -tabview->tab_cnt_left)
-                {
-                    tabview_loop_unpadding(tabview);
-                }
+                break;
             }
 
+            if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
             {
-                //right edge
-                if (!tabview->loop_status2 && tabview->cur_id.x ==  tabview->tab_cnt_right)
-                {
-                    tabview->loop_status2 = 1;
-                    gui_list_t *node = NULL;
-                    gui_list_for_each(node, &obj->child_list)
-                    {
-                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-                        if (GUI_TYPE(gui_tab_t, obj)->id.x == -tabview->tab_cnt_left)
-                        {
-                            GUI_TYPE(gui_tab_t, obj)->id.x = tabview->tab_cnt_right + 1;
-                        }
-                    }
-                }
-                if (tabview->loop_status2 && tabview->cur_id.x !=  tabview->tab_cnt_right)
-                {
-                    tabview_loop_unpadding(tabview);
-                }
+                break;
             }
-        }
-        else
-        {
+
             if (tabview->tab_cnt_left == 0 && tabview->tab_cnt_right == 0)
             {
                 break;
             }
 
             this->release_x = tp->deltaX;
+
             if (tabview->cur_id.x == 0 && tabview->tab_cnt_right == 0)
             {
                 if (this->release_x < 0)
@@ -253,6 +212,7 @@ static void tabview_prepare(gui_obj_t *obj)
                     break;
                 }
             }
+
             if (tabview->cur_id.x == 0 && tabview->tab_cnt_left == 0)
             {
                 if (this->release_x > 0)
@@ -261,9 +221,12 @@ static void tabview_prepare(gui_obj_t *obj)
                     break;
                 }
             }
-            break;
         }
-
+        else
+        {
+            this->release_x = tp->deltaX;
+        }
+        break;
 
     case TOUCH_HOLD_Y:
         if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
@@ -302,33 +265,31 @@ static void tabview_prepare(gui_obj_t *obj)
         break;
     case TOUCH_LEFT_SLIDE:
         gui_log("[TV]TOUCH_LEFT_SLIDE\n");
-        if (tabview->tab_cnt_right == 0 && tabview->cur_id.x == 0)
+        if (!this->loop)
         {
-            break;
-        }
-        if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
-        {
-            break;
+            if (tabview->tab_cnt_right == 0 && tabview->cur_id.x == 0)
+            {
+                break;
+            }
+            if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
+            {
+                break;
+            }
         }
         //when current tab is the end,come back to current tab if sliding.
-        if (tabview->cur_id.x == tabview->tab_cnt_right)
+        if ((tabview->cur_id.x == tabview->tab_cnt_right))
         {
             if (tabview->loop)
             {
-                if (tabview->loop_status2)
+                if (tabview->tab_cnt_left != 0)
                 {
-                    tabview_loop_unpadding(tabview);
+                    tabview->cur_id.x = tabview->tab_cnt_left;
                 }
-                gui_tabview_jump_tab(tabview, 0, 0);
-                if (tabview->jump.jump_flag)
+                else
                 {
-                    tabview->cur_id.y = tabview->jump.jump_id.y;
-                    tabview->cur_id.x = tabview->jump.jump_id.x;
-                    tabview->jump.jump_flag = false;
-                    this->release_x = 0;
-                    gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
-                    return;
+                    tabview->cur_id.x = 0;
                 }
+                this->release_x = this->release_x + tabview->base.w;
             }
         }
         else
@@ -337,49 +298,42 @@ static void tabview_prepare(gui_obj_t *obj)
             this->release_x = this->release_x + tabview->base.w;
         }
         break;
+
     case TOUCH_RIGHT_SLIDE:
         gui_log("[TV]TOUCH_RIGHT_SLIDE\n");
-        if (tabview->tab_cnt_left == 0 && tabview->cur_id.x == 0)
-        {
-            break;
-        }
-        if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
-        {
-            break;
-        }
-        //when current tab is the end,come back to current tab if sliding.
-        if (tabview->cur_id.x == tabview->tab_cnt_left)
-        {
-            if (tabview->loop)
-            {
-                if (tabview->loop_status)
-                {
-                    tabview_loop_unpadding(tabview);
-                }
-                gui_tabview_jump_tab(tabview, tabview->tab_cnt_right, 0);
-                if (tabview->jump.jump_flag)
-                {
-                    tabview->cur_id.y = tabview->jump.jump_id.y;
-                    tabview->cur_id.x = tabview->jump.jump_id.x;
-                    tabview->jump.jump_flag = false;
-                    this->release_x = 0;
-                    gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
-                    return;
-                }
-            }
-
-        }
-        else
+        if (!this->loop)
         {
             if (tabview->tab_cnt_left == 0 && tabview->cur_id.x == 0)
             {
                 break;
             }
+            if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
+            {
+                break;
+            }
+        }
+
+        //when current tab is the end,come back to current tab if sliding.
+        if (tabview->cur_id.x == tabview->tab_cnt_left)
+        {
+            if (tabview->loop)
+            {
+                if (tabview->tab_cnt_right != 0)
+                {
+                    tabview->cur_id.x = tabview->tab_cnt_right;
+                }
+                else
+                {
+                    tabview->cur_id.x = 0;
+                }
+                this->release_x = this->release_x - tabview->base.w;
+            }
+        }
+        else
+        {
             tabview->cur_id.x = tabview->cur_id.x - 1;
             this->release_x = this->release_x - tabview->base.w;
         }
-
-
         break;
     case TOUCH_DOWN_SLIDE:
         gui_log("[TV]TOUCH_DOWN_SLIDE\n");

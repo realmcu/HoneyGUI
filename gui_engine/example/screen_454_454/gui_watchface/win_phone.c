@@ -9,7 +9,7 @@
 #include "gui_tabview.h"
 #include "gui_obj.h"
 #include "gui_common.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 //for bt
 #include "app_task.h"
 #endif
@@ -39,7 +39,7 @@ static uint8_t app_bond_phone_index = 0xff;
 static void win_phone_update_cb(void *p)
 {
     gui_log("win_phone_update_cb\n");
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //check phone connection status
     app_bond_phone_index = app_bt_bond_check_exist_device_info(T_DEVICE_TYPE_PHONE);
     if (app_bond_phone_index != 0xff)
@@ -113,7 +113,7 @@ static void switch_disconnect_yes_action(void *obj)
     gui_tree_free(win_confirm);
     win_confirm = NULL;
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //disconnect phone
     app_bond_phone_index = app_bt_bond_get_active_num_by_type(T_DEVICE_TYPE_PHONE);
     if (app_bond_phone_index != 0xff)
@@ -137,7 +137,7 @@ static void switch_disconnect_no_action(void *obj)
 static void switch_text_base_phone_touch_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_text_base_phone_touch_cb, event = %d\n", event);
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     switch (event)
     {
     case GUI_EVENT_1:
@@ -181,7 +181,7 @@ static void switch_text_base_connect_new_phone_touch_cb(void *obj, gui_event_cb_
 {
     gui_log("switch_text_base_connect_new_phone_touch_cb, event = %d\n", event);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     gui_tree_free(win_menu_phone);
     win_menu_phone = NULL;
 
@@ -208,7 +208,7 @@ static void switch_switch_media_audio_off_touch_cb(void *obj, gui_event_cb_t eve
     gui_log("switch_switch_media_audio_off_touch_cb, event = %d\n", event);
     gui_switch_is_off(switch_media_audio);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     if (app_audio_cfg.support_local_source)
     {
         T_IO_MSG set_mode_msg;
@@ -233,7 +233,7 @@ static void switch_switch_media_audio_on_touch_cb(void *obj, gui_event_cb_t even
     gui_log("switch_switch_media_audio_on_touch_cb, event = %d\n", event);
     gui_switch_is_on(switch_media_audio);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     if (app_audio_cfg.support_local_source)
     {
         T_IO_MSG set_mode_msg;
@@ -348,7 +348,7 @@ void design_win_menu_phone(void *parent)
                  font_size);
     gui_text_type_set(text_disconnect_phone, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     app_bond_phone_index = app_bt_bond_check_exist_device_info(T_DEVICE_TYPE_PHONE);
     if (app_bond_phone_index != 0xff)
     {

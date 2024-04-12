@@ -12,7 +12,7 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
     int16_t image_h = image->target_h ;
 
     *x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
-    *x_end = _UI_MIN(image_x + image_w, dc->fb_width);
+    *x_end = _UI_MIN(image_x + image_w - 1, dc->fb_width - 1);
     *x_end = _UI_MIN(*x_end, rect->x2);
 
     if (rect->xboundright > 0)
@@ -21,7 +21,7 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
     }
 
     *y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
-    *y_end = _UI_MIN(dc->section.y2, image_y + image_h);
+    *y_end = _UI_MIN(dc->section.y2, image_y + image_h - 1);
     *y_end = _UI_MIN(*y_end, rect->y2);
     if (rect->yboundbottom > 0)
     {

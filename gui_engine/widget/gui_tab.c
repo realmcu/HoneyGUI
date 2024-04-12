@@ -86,7 +86,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void tab_prepare_fade(gui_obj_t *obj);
+static void tab_prepare_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 static void input_prepare(gui_obj_t *obj)
 {
@@ -95,8 +95,41 @@ static void input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
-    matrix_translate((this->id.x - parent->cur_id.x) * (int)this->base.w, \
-                     (this->id.y - parent->cur_id.y) * (int)this->base.h, \
+
+    int16_t tab_x_gap = this->id.x - parent->cur_id.x;
+    int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+
+    if (parent->loop)
+    {
+        int16_t tab_x_count = -parent->tab_cnt_left + parent->tab_cnt_right + 1;
+        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
+        int16_t right_count = tab_x_count / 2;
+
+        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
+        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
+        int16_t down_count = tab_y_count / 2;
+
+        if (tab_x_gap > right_count)
+        {
+            tab_x_gap -= tab_x_count;
+        }
+        else if (tab_x_gap < -left_count)
+        {
+            tab_x_gap += tab_x_count;
+        }
+
+        if (tab_y_gap > down_count)
+        {
+            tab_y_gap -= tab_y_count;
+        }
+        else if (tab_x_gap < -up_count)
+        {
+            tab_y_gap += tab_y_count;
+        }
+    }
+
+    matrix_translate((tab_x_gap) * (int)this->base.w, \
+                     (tab_y_gap) * (int)this->base.h, \
                      obj->matrix);
 }
 static void tab_prepare(gui_obj_t *obj)
@@ -107,33 +140,65 @@ static void tab_prepare(gui_obj_t *obj)
     kb_info_t *kb = kb_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
 
+    int16_t tab_x_gap = this->id.x - parent->cur_id.x;
+    int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+
+    if (parent->loop)
+    {
+        int16_t tab_x_count = - parent->tab_cnt_left + parent->tab_cnt_right + 1;
+        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
+        int16_t right_count = tab_x_count / 2;
+
+        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
+        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
+        int16_t down_count = tab_y_count / 2;
+
+        if (tab_x_gap > right_count)
+        {
+            tab_x_gap -= tab_x_count;
+        }
+        else if (tab_x_gap < -left_count)
+        {
+            tab_x_gap += tab_x_count;
+        }
+
+        if (tab_y_gap > down_count)
+        {
+            tab_y_gap -= tab_y_count;
+        }
+        else if (tab_x_gap < -up_count)
+        {
+            tab_y_gap += tab_y_count;
+        }
+    }
+
     if (this->style == CLASSIC)
     {
-        matrix_translate((this->id.x - parent->cur_id.x) * (int)this->base.w + parent->release_x, \
-                         (this->id.y - parent->cur_id.y) * (int)this->base.h + parent->release_y, \
+        matrix_translate(tab_x_gap * (int)this->base.w + parent->release_x, \
+                         tab_y_gap * (int)this->base.h + parent->release_y, \
                          obj->matrix);
     }
     else if (this->style == TAB_CUBE)
     {
-        gui_tab_cube(obj);
+        gui_tab_cube(obj, tab_x_gap, tab_y_gap);
     }
     else if (this->style == TAB_ROTATE)
     {
-        gui_tab_rotate(obj);
+        gui_tab_rotate(obj, tab_x_gap, tab_y_gap);
     }
     else if (this->style == REDUCTION)
     {
-        gui_tab_reduction(obj);
+        gui_tab_reduction(obj, tab_x_gap, tab_y_gap);
     }
     else if (this->style == FADE)
     {
-        tab_prepare_fade(obj);
+        tab_prepare_fade(obj, tab_x_gap, tab_y_gap);
     }
     else if (this->style == REDUCTION_FADE)
     {
         float s;
 
-        int sx = abs((this->id.x - parent->cur_id.x) * (int)this->base.w + parent->release_x);
+        int sx = abs((tab_x_gap) * (int)this->base.w + parent->release_x);
         sx = sx % this->base.w;
         s = 1.0f - (float)sx / this->base.w;
 
@@ -146,7 +211,7 @@ static void tab_prepare(gui_obj_t *obj)
             s = 1.0f;
         }
 
-        tab_prepare_fade(obj);
+        tab_prepare_fade(obj, tab_x_gap, tab_y_gap);
     }
 
 
@@ -199,7 +264,7 @@ static void tab_root_img_fade(gui_obj_t *object, float xx, float yy)
 }
 
 #define TAB_ASIDE(id, cur) (abs(id - cur) <= 1)
-static void tab_prepare_fade(gui_obj_t *obj)
+static void tab_prepare_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
 {
     touch_info_t *tp = tp_get_info();
     gui_tab_t *tab = (gui_tab_t *)obj;

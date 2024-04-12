@@ -427,6 +427,11 @@ static void input_prepare(gui_obj_t *obj)
     if (obj->y != ((gui_page_t *)obj)->start_y)
     {
         gui_obj_skip_other_down_hold(obj);
+        if (((gui_page_t *)obj)->top_slide_only)
+        {
+            gui_obj_skip_other_left_hold(obj);
+            gui_obj_skip_other_right_hold(obj);
+        }
     }
     if (obj->y != ((gui_page_t *)obj)->start_y - (obj->h - (int)gui_get_screen_height()))
     {
@@ -716,6 +721,10 @@ void gui_page_rebound(gui_page_t *this, bool rebound)
 void gui_page_center_alignment(gui_page_t *page, int align_hight)
 {
     page->align_hight = align_hight;
+}
+void gui_page_set_only_top_slide(gui_page_t *page, bool flag)
+{
+    page->top_slide_only = flag;
 }
 static void dtor(gui_obj_t *obj)
 {

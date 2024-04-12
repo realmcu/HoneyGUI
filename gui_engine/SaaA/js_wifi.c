@@ -3,23 +3,32 @@
 DECLARE_HANDLER(startSpeed)
 {
     gui_log("enter startSpeed\n");
+#ifdef ENABLE_WIFI_NIC
     extern void iperf_start(char *ip, char *port);
-    //iperf_start(NULL, NULL);
+    iperf_start(NULL, NULL);
+#endif
     return jerry_create_undefined();
 }
 DECLARE_HANDLER(stopSpeed)
 {
     gui_log("enter stopSpeed\n");
+#ifdef ENABLE_WIFI_NIC
     extern void iperf_stop(void);
-    //iperf_stop();
+    iperf_stop();
+#endif
     return jerry_create_undefined();
 }
 DECLARE_HANDLER(readSpeed)
 {
-    gui_log("enter readSpeed\n");
+//    gui_log("enter readSpeed\n");
+    static uint32_t speed = 10;
+#ifdef ENABLE_WIFI_NIC
     extern uint32_t iperf_get_current_speed(void);
-    uint32_t speed = 1000;
-    //speed = iperf_get_current_speed();
+    speed = iperf_get_current_speed();
+#else
+    speed++;
+    speed = speed > 2000 ?  10 : speed;
+#endif
     return jerry_create_number((double)speed);
 }
 void wifi_init()

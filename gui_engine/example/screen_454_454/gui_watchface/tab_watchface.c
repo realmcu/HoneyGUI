@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "gui_text.h"
 #include "gui_win.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "hub_clock.h"
 #include "module_global_data.h"
 #endif
@@ -30,7 +30,7 @@ float angle_sec;
 
 static void img_animate_watchface_callback(void *obj)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     uint16_t seconds = get_system_clock_second();
     uint16_t minute = RtkWristbandSys.Global_Time.minutes;
     uint16_t hour = RtkWristbandSys.Global_Time.hour;

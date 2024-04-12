@@ -6,8 +6,9 @@ DECLARE_HANDLER(dataRst)
     // Factory reset matter
 #ifdef ENABLE_MATTER_SWITCH
     gui_log("Erase matter flash \n");
-    Bee4_KvsClean();
+    matter_kvs_clean();
     otPlatFlashErase(NULL, 0);
+    otPlatFlashErase(NULL, 1);
 #endif
     gui_log("Reset from ui\n");
     WDG_SystemReset(RESET_ALL, RESET_REASON_FACTORY_RESET);

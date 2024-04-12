@@ -8,7 +8,7 @@
 #include "gui_common.h"
 #include "gui_scroll_text.h"
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_audio_if.h"
 #include "app_mmi.h"
 #include "app_task.h"
@@ -34,7 +34,7 @@ gui_curtainview_t *curtainview_player_vol = NULL;
 gui_scroll_text_t *scroll_text_song_name = NULL;
 
 extern void play_next_music(void);
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 extern T_HEAD_INFO *get_cur_play_header_info(void);
 #endif
 
@@ -44,7 +44,7 @@ void tab_player_update_cb(void *p)
 {
     gui_log("tab_player_update_cb\n");
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 
     if (*(uint16_t *)MUSIC_HEADER_BIN_ADDR == 0xFFFF)
     {
@@ -110,7 +110,7 @@ static void switch_play_pause_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
         {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
             if (playback_db.sd_play_state < APP_AUDIO_STATE_TRY_STOPPING)
             {
                 if (app_audio_get_play_status() != APP_AUDIO_STATE_STOP)
@@ -149,7 +149,7 @@ static void switch_next_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
         {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
             if (playback_db.sd_play_state < APP_AUDIO_STATE_TRY_STOPPING)
             {
                 T_IO_MSG play_msg;
@@ -176,7 +176,7 @@ static void switch_prev_touch_cb(void *obj, gui_event_t event)
     case GUI_EVENT_2: // switch is on(touch to do some turn-off action)
     case GUI_EVENT_1: // switch is off(touch to do some turn-on action)
         {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
             if (playback_db.sd_play_state < APP_AUDIO_STATE_TRY_STOPPING)
             {
                 T_IO_MSG play_msg;
@@ -235,7 +235,7 @@ void design_tab_player(void *parent)
     scroll_text_song_name = gui_scroll_text_create(parent, "scroll_text_song_name", 94, 122, 231,
                                                    FONT_H_32);
     gui_scroll_text_scroll_set(scroll_text_song_name, SCROLL_X, 0, 0, 5000, 0);
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     if (*(uint16_t *)MUSIC_HEADER_BIN_ADDR != 0xFFFF)
     {
 

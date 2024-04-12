@@ -229,6 +229,7 @@ struct gui_os_api
     bool (*thread_resume)(void *handle);
     bool (*thread_mdelay)(uint32_t ms);
     uint32_t (*thread_ms_get)(void);
+    uint32_t (*thread_us_get)(void);
     bool (*mq_create)(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs);
     bool (*mq_send)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
     bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
@@ -418,7 +419,7 @@ typedef struct _gui_obj_t
     uint32_t create_done    : 1;
     uint32_t flag_3d        : 1;
     uint32_t event_dsc_cnt  : 5;
-
+    uint32_t gesture        : 1;
     gui_event_dsc_t *event_dsc;
 
 

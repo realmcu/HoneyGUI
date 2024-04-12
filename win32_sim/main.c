@@ -25,7 +25,7 @@
 #define COMPANY_NAME                    "Realtek Semiconductor Corporation"
 
 char *defaultPath = "gui_engine\\example\\screen_480_480\\root\\";
-// char *defaultPath = "D:\\Project\\HoneyCombRepo\\sdk\\src\\app\\86box\\application\\root_image\\root\\";
+// char *defaultPath = "gui_engine\\example\\screen_480_480\\Visual Disigner Prj\\480x480\\Export\\root\\";
 int main(int argc, char **argv)
 {
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", COMPANY_NAME,

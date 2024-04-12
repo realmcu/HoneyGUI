@@ -151,21 +151,21 @@ void gui_tab_set_style(gui_tab_t *this, SLIDE_STYLE style);
  *
  * @param obj
  */
-void gui_tab_rotate(gui_obj_t *obj);
+void gui_tab_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
  * @brief
  *
  * @param obj
  */
-void gui_tab_reduction(gui_obj_t *obj);
+void gui_tab_reduction(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
  * @brief
  *
  * @param obj
  */
-void gui_tab_cube(gui_obj_t *obj);
+void gui_tab_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

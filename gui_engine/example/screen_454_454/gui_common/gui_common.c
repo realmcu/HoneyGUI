@@ -1,6 +1,6 @@
 #include "gui_common.h"
 #include "app_gui_main.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "gui_interface.h"
 #include "app_gap.h"
 #include "gui_server.h"
@@ -62,7 +62,7 @@ gui_obj_t *pop_current_widget(void)
     return NULL;
 }
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 uint32_t unicode_to_utf8(uint8_t *utf8, uint32_t len, uint16_t *unicode_array,
                          uint32_t unicode_buf_len)
 {
