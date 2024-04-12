@@ -463,11 +463,11 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
     int y_end;
     if (rect->yboundbottom != 0)
     {
-        y_end = _UI_MIN(_UI_MIN(dc->section.y2, font_y + chr->char_h), rect->yboundbottom);
+        y_end = _UI_MIN(_UI_MIN(dc->section.y2 + 1, font_y + chr->char_h), rect->yboundbottom);
     }
     else
     {
-        y_end = _UI_MIN(dc->section.y2, font_y + chr->char_h);
+        y_end = _UI_MIN(dc->section.y2 + 1, font_y + chr->char_h);
     }
     if ((x_start >= x_end) || (y_start >= y_end))
     {
