@@ -22,12 +22,18 @@
 #include "acc_engine.h"
 #include "gui_win.h"
 
+#define MAX_MSG_EVENT_CNT   32
 static void *gui_server_mq = NULL;
 static void (*gui_task_ext_execution_hook)(void) = NULL;
 bool GUI_SERVER_ALLOW_DLPS = false;
 static uint32_t daemon_start_ms = 0;
 static uint32_t daemon_cnt = 0;
+
 static gui_event_t server_event_code;
+static gui_event_cb_t msg_event_cb[MAX_MSG_EVENT_CNT];
+static gui_event_t msg_event_code[MAX_MSG_EVENT_CNT];
+static void *msg_event_obj[MAX_MSG_EVENT_CNT];
+static uint32_t msg_event_cnt = 0;
 
 bool gui_server_dlps_check(void)
 {
@@ -47,7 +53,14 @@ static void gui_server_event_handler(gui_obj_t *obj)
                 gui_event_dsc_t *event_dsc = obj->event_dsc + i;
                 if (event_dsc->filter == server_event_code)
                 {
-                    event_dsc->event_cb(obj, server_event_code);
+                    msg_event_cb[msg_event_cnt] = event_dsc->event_cb;
+                    msg_event_code[msg_event_cnt] = server_event_code;
+                    msg_event_obj[msg_event_cnt] = obj;
+                    msg_event_cnt++;
+                    if (msg_event_cnt > MAX_MSG_EVENT_CNT)
+                    {
+                        GUI_ASSERT(NULL != NULL);
+                    }
                 }
             }
         }
@@ -79,6 +92,11 @@ static void gui_server_msg_handler(gui_obj_t *screen, gui_msg_t *msg)
     if (event_handle)
     {
         gui_server_event_handler(screen);
+        for (uint32_t i = 0; i < msg_event_cnt; i++)
+        {
+            msg_event_cb[i](msg_event_obj[i], msg_event_code[i]);
+        }
+        msg_event_cnt = 0;
         server_event_code = GUI_EVENT_INVALIDE;
     }
 }
