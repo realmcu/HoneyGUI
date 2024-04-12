@@ -144,7 +144,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
     }
     else if (blend_mode == IMG_FILTER_BLACK)
     {
-        if ((source_alpha == 0) && (source_red == 0) && (source_green == 0) && (source_blue == 0))
+        if ((source_red == 0) && (source_green == 0) && (source_blue == 0))
         {
             return;
         }
