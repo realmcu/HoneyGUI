@@ -859,7 +859,7 @@ void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_color_t reverse = {.color.rgba.a = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.a, .color.rgba.r = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.b, .color.rgba.b = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.r, .color.rgba.g = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.g};
 
-    for (uint32_t i = y_start; i < y_end; i++)
+    for (uint32_t i = y_start; i <= y_end; i++)
     {
         int write_off = (i - dc->section.y1) * dc->fb_width ;
 
@@ -867,7 +867,7 @@ void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
         uint8_t *writebuf = dc->frame_buf;
         //uint8_t *pixel;
 
-        for (uint32_t j = x_start; j < x_end; j++)
+        for (uint32_t j = x_start; j <= x_end; j++)
         {
 
             uint8_t opacity_value = image->opacity_value;
