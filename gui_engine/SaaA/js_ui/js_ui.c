@@ -108,7 +108,6 @@ DECLARE_HANDLER(jump)
 
 DECLARE_HANDLER(getElementById)
 {
-    // gui_log("enter getElementById\n");
     if (args_cnt != 1 || !jerry_value_is_string(args[0]))
     {
         return jerry_create_undefined();
@@ -119,9 +118,8 @@ DECLARE_HANDLER(getElementById)
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
     gui_obj_t *widget = NULL;
     char *a = js_value_to_string(args[0]);
-    gui_tree_get_widget_by_name(&app->screen, a, &widget); //gui_log("name:%s,widget:%p\n", a, widget);
+    gui_tree_get_widget_by_name(&app->screen, a, &widget);
     gui_free(a);
-    ////gui_log("getElementById:%x\n",widget);
     jerry_set_object_native_pointer(this_value, widget, NULL);
     jerry_release_value(global_obj);
     jerry_release_value(app_property);
@@ -1120,19 +1118,14 @@ DECLARE_HANDLER(win_removeAttribute)
 
 DECLARE_HANDLER(progress)
 {
-    //gui_log("enter progress\n");
     gui_obj_t *obj = NULL;
     jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
     if (args_cnt >= 1 && jerry_value_is_number(args[0]))
     {
-        //js_add_event_listener(this_value, "onclick", args[0]);
-
-        ////gui_log("enter onclick %s\n",obj->name);
         gui_progressbar_set_percentage((void *)obj, jerry_get_number_value(args[0]));
     }
     float per = gui_progressbar_get_percentage((void *)obj);
     return jerry_create_number(per);
-    //return jerry_create_undefined();
 }
 DECLARE_HANDLER(sw_close)
 {

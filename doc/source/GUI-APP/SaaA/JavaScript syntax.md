@@ -30,6 +30,28 @@ function winNromalOnReleaseFunc(params) {
 win.onRelease(winNromalOnReleaseFunc)
 ```
 
+* click to swap windows between ```'cool_win'``` and ```'heat_win'```
+```javascript
+win.getElementById('cool_win')
+function hideCool(params) {
+    console.log('hideCool')
+    win.getElementById('cool_win')
+    win.setAttribute("hidden", "hidden");
+    win.getElementById('heat_win')
+    win.removeAttribute("hidden") 
+}
+win.onClick(hideCool)
+win.getElementById('heat_win')
+function hideHeat(params) {
+    console.log('hideHeat')
+    win.getElementById('heat_win')
+    win.setAttribute("hidden", "hidden");
+    win.getElementById('cool_win')
+    win.removeAttribute("hidden") 
+}
+win.onClick(hideHeat)
+```
+
 * API
 ```javascript
     getElementById : function (win_name : string) {}
@@ -90,7 +112,7 @@ icon.onPress(iconNromalOnPressFunc)
 ```
 ## ImageSeekbar
 
-* API Drag the progress bar and then the text shows the current progress.
+* Drag the progress bar and then the text shows the current progress.
 ```javascript
 seekbar.getElementById('tab10Seek1')
 function seekbarOnPress(params) {
@@ -108,7 +130,21 @@ function seekbarOnPressing(params) {
 }
 seekbar.onPressing(seekbarOnPressing)
 ```
-
+* Animation based on imageSeekbar
+```javascript
+var curtainAnimateTiming = {
+    duration: 2000,
+    iterations:-1,
+}
+var curtain_open = 0;
+seekbar.getElementById('curtain_bar')
+function curtainFrame(params) {
+    animate= seekbar.animateProgress()
+    seekbar.setAttribute("progress", animate)
+}
+seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
+seekbar.palyAnimate()
+```
 
 * API
 

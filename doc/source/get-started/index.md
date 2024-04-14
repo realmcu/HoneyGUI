@@ -7,9 +7,9 @@
 
 ## Description
 
-There are two ways to develop an application, SaaA(Script as a APP) and Native C API.
+There are two ways to develop an application, SaaA(Script as a APP) and Native C-APP.
 - SaaA(Script as a APP) consists of JavaScript and XML. Recommended ```RVisualDesigner``` as a  PC designer to do low-code development.
-- Native C API development using C/C++ language, directly call the API of GUI engine.
+- Native C-APP development using C/C++ language, directly call the API of GUI engine.
 - Also can directly call the API of [LVGL](https://lvgl.io/).
 
 The GUI framework has good portability, which can run on a variety of chips and OS. PC Windows version is provided.
