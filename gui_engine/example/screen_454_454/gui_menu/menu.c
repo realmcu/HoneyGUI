@@ -14,6 +14,7 @@
 #include "gui_grid.h"
 #include "gui_button.h"
 #include "gui_app.h"
+#include "gui_progressbar.h"
 static void press_callback(gui_win_t *button);
 static void press_animate_cb(gui_win_t *button);
 static void release_callback(gui_win_t *button);
@@ -28,16 +29,22 @@ static void calculator_cb();
 static void sport_cb();
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
+static gui_progressbar_t *pro;
 #define MENU_GAP 74
+#define SCROLLBAR_SIZE 14
+const static void *scrollbar_array[SCROLLBAR_SIZE];
 void design_tab_menu(void *parent)
 {
     gui_rect(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
              UINT8_MAX, UINT8_MAX, 100));
     gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
+    gui_page_rebound(page, 1);
     GET_BASE(page)->obj_destory = page_dtor;
     GET_BASE(page)->y = page_y_recode;
     page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);
+    pro = gui_progressbar_movie_create(parent, scrollbar_array, SCROLLBAR_SIZE, 435, 200);
+    gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
     //gui_page_rebound(page, true);
     gui_page_center_alignment(page, MENU_GAP);
     static void *array[] =
@@ -196,45 +203,85 @@ static void deal_win_in_page(gui_obj_t *object)
         deal_win_in_page(obj);
     }
 }
+const static void *scrollbar_array_top[] =
+{
+    BARS1_BIN,
+    BARS2_BIN,
+    BARS3_BIN,
+};
+const static void *scrollbar_array_buttom[] =
+{
+    BAR40_BIN,
+    BAR41_BIN,
+    BAR42_BIN,
+    BAR43_BIN,
+};
+const static void *scrollbar_array[SCROLLBAR_SIZE] =
+{
+    BAR1_BIN,  BAR4_BIN,
+
+    BAR7_BIN,
+
+    BAR10_BIN,
+
+    BAR13_BIN,
+
+    BAR16_BIN,
+
+    BAR19_BIN,
+
+    BAR22_BIN,
+
+    BAR25_BIN,
+
+    BAR28_BIN,
+
+    BAR31_BIN,
+
+    BAR34_BIN,
+
+    BAR38_BIN,
+    BAR39_BIN,
+};
 static void page_callback(gui_page_t *page)
 {
     deal_win_in_page(page);
 
 
 
-    // gui_log("%f,%d,%d\n", ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
-    //         page)->h - gui_get_screen_height()), page->start_y, GET_BASE(page)->y);
-    // float progress = ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
-    //                                                                             page)->h - gui_get_screen_height());
-    // if (pro)
-    // {
-    //     if (progress >= 0 && progress <= 1)
-    //     {
-    //         {
-    //             pro->color_hl = (uint32_t)scrollbar_array;
-    //             pro->max = sizeof(scrollbar_array) / sizeof(void *);
-    //         }
-    //         gui_progressbar_set_percentage(pro, progress) ;
-    //     }
-    //     else if (progress < 0)
-    //     {
-    //         {
-    //             pro->color_hl = (uint32_t)scrollbar_array_top;
-    //             pro->max = sizeof(scrollbar_array_top) / sizeof(void *);
-    //         }
-    //         float progress_top = -progress;
-    //         gui_progressbar_set_percentage(pro, progress_top) ;
-    //     }
-    //     else if (progress > 1)
-    //     {
-    //         {
-    //             pro->color_hl = (uint32_t)scrollbar_array_buttom;
-    //             pro->max = sizeof(scrollbar_array_buttom) / sizeof(void *);
-    //         }
-    //         float progress_buttom = progress - 1;
-    //         gui_progressbar_set_percentage(pro, progress_buttom) ;
-    //     }
-    // }
+    gui_log("%f,%d,%d\n", ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
+            page)->h - gui_get_screen_height()), page->start_y, GET_BASE(page)->y);
+    float progress = ((float)(page->start_y - GET_BASE(page)->y)) / (float)(GET_BASE(
+                                                                                page)->h - gui_get_screen_height());
+    if (pro)
+    {
+        if (progress >= 0 && progress <= 1)
+        {
+            {
+                pro->color_hl = (uint32_t)scrollbar_array;
+                pro->max = sizeof(scrollbar_array) / sizeof(void *);
+            }
+            gui_progressbar_set_percentage(pro, progress) ;
+        }
+        else if (progress < 0)
+        {
+            {
+                pro->color_hl = (uint32_t)scrollbar_array_top;
+                pro->max = sizeof(scrollbar_array_top) / sizeof(void *);
+            }
+            float progress_top = -progress;
+            gui_progressbar_set_percentage(pro, progress_top) ;
+        }
+        else if (progress > 1)
+        {
+            {
+                pro->color_hl = (uint32_t)scrollbar_array_buttom;
+                pro->max = sizeof(scrollbar_array_buttom) / sizeof(void *);
+            }
+            float progress_buttom = progress - 1;
+            gui_progressbar_set_percentage(pro, progress_buttom) ;
+        }
+    }
 
 
 }
