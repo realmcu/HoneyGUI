@@ -1144,7 +1144,74 @@ DECLARE_HANDLER(sw_open)
     sw->turn_on(sw);
     return jerry_create_undefined();
 }
+struct timer_args
+{
+    jerry_value_t func;
+    uint32_t timeout;
+    bool one_short;
+};
+#if _WIN32
+#include "stdio.h"
+#include "stdlib.h"
+#include <pthread.h>
+static void *rtk_gui_timer(struct timer_args *arg)
+{
+    if (arg->one_short)
+    {
+        usleep((int)(arg->timeout) * 1000); //10ms
+        gui_free(arg);
+        jerry_value_t res = jerry_call_function(arg->func, jerry_create_undefined(), 0, 0);
+        jerry_release_value(res);
+    }
+    else
+    {
+        while (1)
+        {
+            usleep((int)(arg->timeout) * 1000); //10ms
+            jerry_value_t res = jerry_call_function(arg->func, jerry_create_undefined(), 0, 0);
+            jerry_release_value(res);
+        }
 
+    }
+
+
+
+}
+#endif
+
+DECLARE_HANDLER(setTimeout)
+{
+    if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_number(args[1]))
+    {
+#ifdef _WIN32
+        pthread_t thread;
+        struct timer_args *arg = gui_malloc(sizeof(struct timer_args));
+        memset(arg, 0, sizeof(struct timer_args));
+        arg->func = args[0];
+        arg->timeout = (uint32_t)jerry_get_number_value(args[1]);
+        arg->one_short = 1;
+        pthread_create(&thread, NULL, rtk_gui_timer, arg);
+
+#endif
+    }
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(setInterval)
+{
+    if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_number(args[1]))
+    {
+#ifdef _WIN32
+        pthread_t thread;
+        struct timer_args *arg = gui_malloc(sizeof(struct timer_args));
+        memset(arg, 0, sizeof(struct timer_args));
+        arg->func = args[0];
+        arg->timeout = (uint32_t)jerry_get_number_value(args[1]);
+        pthread_create(&thread, NULL, rtk_gui_timer, arg);
+
+#endif
+    }
+    return jerry_create_undefined();
+}
 void js_gui_init()
 {
     jerry_value_t global_obj = jerry_get_global_object();
@@ -1228,7 +1295,8 @@ void js_gui_init()
     REGISTER_METHOD_NAME(sw, "turnOn", sw_open);
     REGISTER_METHOD_NAME(sw, "turnOff", sw_close);
     REGISTER_METHOD_NAME(sw, "onPress", onPress_switch);
-
+    REGISTER_METHOD(global_obj, setTimeout);
+    REGISTER_METHOD(global_obj, setInterval);
     jerry_release_value(global_obj);
 }
 
