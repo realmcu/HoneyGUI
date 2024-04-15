@@ -169,8 +169,6 @@ static void app_hr_ui_design(gui_app_t *app)
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
     }
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_onRight(win, win_cb, win);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
     return_widget(GUI_APP_ROOT_SCREEN, (void *)page);
 }
@@ -447,8 +445,6 @@ static void app_menu(gui_app_t *app)
     gui_menu_cellular_t *cell = gui_menu_cellular_create(GUI_APP_ROOT_SCREEN, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_onRight(win, win_cb, win);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)cell);
     return_widget(GUI_APP_ROOT_SCREEN, cell);
 }

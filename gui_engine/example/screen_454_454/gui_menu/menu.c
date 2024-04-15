@@ -26,12 +26,17 @@ static void menu_cb();
 static void watch_face_cb();
 static void calculator_cb();
 static void sport_cb();
+static int page_y_recode;
+static void page_dtor(gui_obj_t *obj);
 #define MENU_GAP 74
 void design_tab_menu(void *parent)
 {
     gui_rect(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
              UINT8_MAX, UINT8_MAX, 100));
     gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
+    GET_BASE(page)->obj_destory = page_dtor;
+    GET_BASE(page)->y = page_y_recode;
+    page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);
     //gui_page_rebound(page, true);
     gui_page_center_alignment(page, MENU_GAP);
@@ -257,3 +262,9 @@ static void menu_cb()
 // {
 //     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_SPORT))
 // }
+static void page_dtor(gui_obj_t *obj)
+{
+    extern void gui_page_dtor(gui_obj_t *obj);
+    gui_page_dtor(obj);
+    page_y_recode = obj->y;
+}
