@@ -16,65 +16,69 @@ Function is [void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_
 
 ## Example
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1712471972466315426/a615a7a8_10088396.png " width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1713163873846849088/8d706369_10088396.png" width = "300" /></div>
 <br>
 
 ```c
 #include "gui_menu_cellular.h"
-static void design_app_watch_ui(gui_app_t *app)
+static void app_menu(gui_app_t *app)
 {
-    static uint32_t *array[] = 
+    /**
+     * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
+    */
+    uint32_t *array[] =
     {
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN, 
-        ICON_PHONE_ON_BIN, 
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN, 
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN, 
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN, 
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_ON_BIN,
+        I4500009_BIN, 
+        I4500011_BIN, 
+        I4500015_BIN, 
+        I4500020_BIN, 
+        I4500028_BIN, 
+        I4500034_BIN, 
+        I4500035_BIN, 
+        I4500037_BIN, 
+        I4500040_BIN, 
+        I4500042_BIN, 
+        I4500047_BIN, 
+        I4500049_BIN, 
+        I4500052_BIN, 
+        I4500064_BIN, 
+        I4500009_BIN, 
+        I4500011_BIN, 
+        I4500015_BIN, 
+        I4500020_BIN, 
+        I4500028_BIN, 
+        I4500034_BIN, 
+        I4500035_BIN, 
+        I4500037_BIN, 
+        I4500040_BIN, 
+        I4500042_BIN, 
+        I4500047_BIN, 
+        I4500049_BIN, 
+        I4500052_BIN, 
+        I4500064_BIN, 
+        I4500009_BIN, 
+        I4500011_BIN, 
+        I4500015_BIN, 
+        I4500020_BIN, 
+        I4500028_BIN, 
+        I4500034_BIN, 
+        I4500035_BIN, 
+        I4500037_BIN, 
+        I4500040_BIN, 
+        I4500042_BIN, 
+        I4500047_BIN, 
+        I4500049_BIN, 
+        I4500052_BIN, 
+        I4500064_BIN, 
+        I4500009_BIN, 
+        I4500011_BIN, 
+        I4500015_BIN, 
+        I4500020_BIN, 
 
     };
-    gui_menu_cellular_t *honeycomb = gui_menu_cellular_create(&(app->screen), 100, array, sizeof(array)/sizeof(uint32_t *));
-    gui_menu_cellular_offset(honeycomb, -36, -216);
+    gui_menu_cellular_t *cell = gui_menu_cellular_create(GUI_APP_ROOT_SCREEN, 100, array,
+                                                         sizeof(array) / sizeof(uint32_t *));
+    gui_menu_cellular_offset((void *)cell, -36, -216);
 }
 ```
 

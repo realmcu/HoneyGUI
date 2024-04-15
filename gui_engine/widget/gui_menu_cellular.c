@@ -301,7 +301,7 @@ static void ctor(gui_menu_cellular_t *this, gui_obj_t *parent)
 {
     extern void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                              int16_t y, int16_t w, int16_t h);
-    gui_win_ctor(this, parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height());
+    gui_win_ctor((void *)this, parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height());
 }
 /*============================================================================*
  *                           Public Functions
