@@ -297,6 +297,12 @@ static void wincb(gui_win_t *win)
 
 
 }
+static void ctor(gui_menu_cellular_t *this, gui_obj_t *parent)
+{
+    extern void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
+                             int16_t y, int16_t w, int16_t h);
+    gui_win_ctor(this, parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height());
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -304,8 +310,9 @@ static void wincb(gui_win_t *win)
 gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],
                                               int array_size)
 {
-    gui_win_t *win = gui_win_create(parent, 0, 0, 0, gui_get_screen_width(),
-                                    gui_get_screen_height());
+#define _GUI_NEW_GUI_MENU_CELLULAR_PARAM this, parent
+    GUI_CREATE_HELPER(gui_menu_cellular_t, ctor, _GUI_NEW_GUI_MENU_CELLULAR_PARAM)
+    gui_win_t *win = &(this->base);
     gui_win_set_animate(win, 1000, -1, wincb, win);
 #define ICON_SIZE (icon_size)
 #define WIDTH_GAP (ICON_SIZE)

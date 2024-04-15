@@ -548,7 +548,16 @@ extern char *defaultPath;
     GET_BASE(this)->create_done = true;\
     /*todo exit critical section*/\
     return this;
-
+#define GUI_CREATE_HELPER(type, constructor_cb, param) type *this = gui_malloc(sizeof(type));\
+    memset(this, 0, sizeof(type));\
+    constructor_cb(param);\
+    /*todo enter critical section*/\
+    gui_list_init(&(GET_BASE(this)->child_list));\
+    if ((GET_BASE(this)->parent) != NULL)\
+    {\
+        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));\
+    }\
+    GET_BASE(this)->create_done = true;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
 #define GUI_FRAME_STEP 50

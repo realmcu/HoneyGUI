@@ -13,7 +13,7 @@
 #define APP_CALCULATOR
 #define APP_SPORT
 #define APP_MENU
-GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design)
+GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
 GUI_APP_DEFINE(APP_CALCULATOR, app_hr_ui_design)
@@ -473,7 +473,10 @@ static void seekbar_h_preapre(gui_obj_t *obj)
         if (tp->pressed && tp->x < RETURN_ENABLE_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
         {
             enable = 1;
-            return_ignore_gesture->gesture = 1;
+            if (return_ignore_gesture)
+            {
+                return_ignore_gesture->gesture = 1;
+            }
             GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
             if (GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y > SCREEN_H)
             {
@@ -484,7 +487,10 @@ static void seekbar_h_preapre(gui_obj_t *obj)
         if (tp->released)
         {
             enable = 0;
-            return_ignore_gesture->gesture = 0;
+            if (return_ignore_gesture)
+            {
+                return_ignore_gesture->gesture = 0;
+            }
             gui_progressbar_set_progress((void *)circle, pro);
             if (return_flag)
             {
