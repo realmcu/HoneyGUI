@@ -3,41 +3,45 @@
 ## Overall Flow Chart
 The flowchart depicts the image resource processing flow accelerated by software. When processing images, different processing methods are selected based on the compression status and type of image:
 
+- **Cover**: Write the source image data directly to the corresponding position in the frame buffer. Do not perform any processing, just overwrite it.
 - **Bypass**: Write the source image data directly to the corresponding position in the frame buffer. Bypass mode is incapable of handling the transparency of images. It applies a global opacity value to the entire image, thereby affecting the overall transparency. When it comes to creating transparency effects, bypass mode is more space-efficient compared to source_over mode.
 - **Filter**: The filtering technique effectively sifts out pixel data with a value of zero from the originating image data, which essentially means that black pixels are precluded from being inscribed into the frame buffer. This mechanism induces much swifter refresh dynamics. Pixels of any color other than black undergo the standard processing method and are duly recorded into the frame buffer.
 - **Source_over**: A blending method that combines image color data and frame buffer pixel color data to calculate the final color based on the opacity_value value `Sa`, and writes it to the corresponding location in the frame buffer. The formula is `((255 - Sa) * D + Sa * S) / 255)`, where `Sa` is the opacity_value of the original image, `D` is the frame buffer pixel data, and `S` is the source image pixel data.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710412187386597657/3b668eac_13671125.png"/></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714378645744054188/753790c4_13671125.png"/></div><br/>
 
 - The `img_type` can be obtained from the `head` of the image, where the structure of the image head is as follows.
+
 ```
-struct gui_rgb_data_head
+typedef struct gui_rgb_data_head
 {
     unsigned char scan : 1;
-    unsigned char rsvd : 4;
-    unsigned char compress : 3;
+    unsigned char align : 1;
+    unsigned char resize: 2; //0-no resize;1-50%(x&y);2-70%;3-80%
+    unsigned char compress: 1;
+    unsigned char rsvd : 3;
     char type;
     short w;
     short h;
     char version;
     char rsvd2;
-};
+} gui_rgb_data_head_t;
 ```
 - The value of `img_type` is depicted in the enum below. If the value is `IMDC_COMPRESS`, it indicates that the image is compressed and enters the `rle `processing flow; otherwise, it enters the `no rle `processing flow.
+
 ```
 typedef enum
 {
-    RGB565 = 0,
-    ARGB8565 = 1,
-    RGB888 = 3,
-    RGBA8888 = 4,
-    BINARY = 5,
-    ALPHAMASK = 9,
-    IMDC_COMPRESS = 10,
-    BMP = 11,
-    JPEG = 12,
-    PNG = 13,
-    GIF = 14,
+    RGB565      = 0, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red
+    ARGB8565    = 1, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha
+    RGB888      = 3, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red
+    RGBA8888    = 4, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for Alpha
+    BINARY      = 5,
+    ALPHAMASK   = 9,
+    BMP         = 11,
+    JPEG        = 12,
+    PNG         = 13,
+    GIF         = 14,
     RTKARGB8565 = 15,
 } GUI_FormatType;
 ```
@@ -79,6 +83,24 @@ typedef enum
 
 } imdc_src_type;
 ```
+
+## Overview No RLE Cover Mode
+The following flow describes the `cover mode` process for `No RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714375761122113396/e0e01095_13671125.png"/></div><br/>
+
+- If the matrix is an identity matrix, a blit process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
+- The `dc_bytes_per_pixel` is pixel bytes of  display device, calculated as `dc->bit_depth >> 3`, where `bit_depth` is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
+
+### No RLE Cover
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer in `cover mode`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1714375777765665290/25d64da9_13671125.png"/></div><br/>
+
+### No RLE Cover Matrix
+The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `cover mode with matrix operations`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img width="550" src ="https://foruda.gitee.com/images/1714455839216373200/304e06b6_13671125.png"/></div><br/>
 
 ## Overview No RLE Bypass Mode
 
@@ -167,6 +189,30 @@ The following flowchart describes the process of writing `uncompressed images` t
     - If the `opacity_value` is `0`, the image is not displayed and the process is break.
     - If the `opacity_value` is `255`, convert the source image pixels to RGB565 format and write them to the frame buffer.
     - If the `opacity_value` is between `0 and 255`, perform `do_blending_acc_2_rgb565_opacity` to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
+
+## Overview RLE Cover Mode
+The following flow describes the `cover mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714376646404378867/18b85d40_13671125.png"/></div><br/>
+
+### RLE Cover No Matrix
+The following flow describes the `cover mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+
+<div style="text-align: center"><img width="650" src ="https://foruda.gitee.com/images/1714455786263653108/4f957293_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. Write the pixel result to the frame buffer.
+
+### RLE Cover Matrix
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `cover mode with matrix operations`. Taking the target device image type as RGB565 as an example.
+
+<div style="text-align: center"><img width="650" src ="https://foruda.gitee.com/images/1714455799554861994/cbe7fe2e_13671125.png"/></div><br/>
+
+1. Perform different processing steps based on the `img_type` from the head of compression data.
+2. Decompress the compressed image data.
+3. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
+4. Write the pixel result to the frame buffer.
 
 ## Overview RLE Bypass Mode
 The following flow describes the `bypass mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
@@ -260,9 +306,11 @@ The following flowchart describes the process of writing `compressed images` to 
     - If the `opacity value` level is `255`: When the source image is in RGB565 format, directly write it to the frame buffer. Otherwise, perform the corresponding `do blend` operation and write the blend result to the frame buffer.
     - If the `opacity_value` is between `0 and 255`, perform the appropriate `do_blending` operation to blend the source image pixels with the corresponding frame buffer pixels. Write the blended result to the frame buffer.
 
-
-
-
+## Flowchart download
+If you need to modify the vision file of the flowchart, please download it from the following path.
+[acc](https://gitee.com/langhao-luo/gui_images/blob/master/visio/design/acc.vsdx)
+[rle](https://gitee.com/langhao-luo/gui_images/blob/master/visio/design/rle.vsdx)
+[no rle](https://gitee.com/langhao-luo/gui_images/blob/master/visio/design/no_rle.vsdx)
 
 
 ```{eval-rst}
