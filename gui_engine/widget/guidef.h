@@ -136,6 +136,20 @@ typedef enum dc_type
     DC_DOUBLE,
 } gui_dc_type_t;
 
+typedef struct _gui_frame_monitor_t
+{
+    uint32_t start;
+    void (*start_cb)(void);
+    uint32_t input_prepare;
+    void (*input_prepare_cb)(void);
+    uint32_t draw_prepare;
+    void (*draw_prepare_cb)(void);
+    uint32_t draw;
+    void (*draw_cb)(void);
+    uint32_t end;
+    void (*end_cb)(void);
+} gui_frame_monitor_t;
+
 typedef struct gui_dispdev
 {
     /* width and height */
@@ -170,6 +184,7 @@ typedef struct gui_dispdev
     void (*lcd_power_off)(void);
     void (*lcd_draw_sync)(void);
     uint32_t frame_count;
+    gui_frame_monitor_t (*lcd_frame_monitor);
 } gui_dispdev_t;
 typedef struct
 {

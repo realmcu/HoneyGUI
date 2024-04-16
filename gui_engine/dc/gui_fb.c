@@ -316,6 +316,11 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     gui_dispdev_t *dc = gui_get_dc();
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->start_cb();
+    }
+
     if ((dc->frame_buf == NULL) && (dc->disp_buf_1 == NULL) && (dc->disp_buf_2 == NULL))
     {
         GUI_ASSERT(NULL != NULL);
@@ -323,7 +328,15 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     obj_input_prepare(root);
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->input_prepare_cb();
+    }
     obj_draw_prepare(root);
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->draw_prepare_cb();
+    }
 
     static int last_ms;
     if (fb_change == true)
@@ -346,7 +359,10 @@ void gui_fb_disp(gui_obj_t *root)
         gui_thread_mdelay(17);
         last_ms = gui_ms_get();
     }
-
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->draw_cb();
+    }
 
     obj_draw_end(root);
     for (uint8_t i = 0; i < event_cnt; i++)
@@ -355,6 +371,11 @@ void gui_fb_disp(gui_obj_t *root)
     }
     event_cnt = 0;
     dc->frame_count++;
+
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->end_cb();
+    }
 
 }
 
