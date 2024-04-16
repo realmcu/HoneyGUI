@@ -8,6 +8,8 @@
 #include "gui_win.h"
 #include "gui_tabview.h"
 #include "gui_return.h"
+#include<stdio.h>
+#include<time.h>
 #define APP_HEART_RATE
 #define APP_CLOCK
 #define APP_WATCH_FACE
@@ -245,40 +247,101 @@ static void win_cb(gui_win_t *win)
 
 #define TIME_SCALE_RATE (0.35F)
 #define STATUS_BAR_HEIGHT 20
+#define STATUS_BAR_TIME_TEXT "STATUS_BAR_TIME_TEXT"
+#define STATUS_BAR_DATE_TEXT "STATUS_BAR_DATE_TEXT"
+#define STATUS_BAR_WINDOW "STATUS_BAR_WINDOW"
 static gui_win_t *canvas_win;
 static gui_img_t *rect;
-static gui_text_t *t;
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
     canvas_win = gui_win_create(status_bar, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
     {
-        char *text = "7:55";
+        char *text = "07:55";
         int font_size = 48;
-        t = gui_text_create(status_bar, "txt", SCREEN_W / 2 - 40, 2, gui_get_screen_width(),
-                            font_size);
+        gui_text_t *t = gui_text_create(status_bar, STATUS_BAR_TIME_TEXT, SCREEN_W / 2 - 56, 2,
+                                        gui_get_screen_width(),
+                                        font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
         gui_text_convert_to_img(t, RGBA8888);
 
         gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
-        gui_img_rotation(t->scale_img, 0, gui_img_get_width(t->scale_img) / 2,
-                         0);
-        gui_img_translate(t->scale_img, gui_img_get_width(t->scale_img) / 2,
-                          0);
+        gui_img_rotation(t->scale_img, 0, gui_img_get_width(t->scale_img) / 2, 0);
+        gui_img_translate(t->scale_img, gui_img_get_width(t->scale_img) / 2, 0);
     }
+    {
+        gui_win_t *win = gui_win_create(status_bar, STATUS_BAR_WINDOW, 0, 0, SCREEN_W, SCREEN_H);
+        GET_BASE(win)->not_show = 1;
 
+        {
+            char *text = "Tue, Apr 16";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, STATUS_BAR_DATE_TEXT, 0, 52, gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1);
+            gui_text_mode_set(t, CENTER);
+
+        }
+        {
+            char *text = "NO NOTIFICATIONS";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0, 0, 200, gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1);
+            gui_text_mode_set(t, CENTER);
+
+        }
+    }
     GET_BASE(canvas_win)->not_show = 1;
-    rect = gui_rect((void *)canvas_win, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE_OPACITY);
+    rect = gui_rect((void *)canvas_win, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER_OPACITY(230));
     gui_img_set_opacity(rect, 0);
 
 }
 #include "tp_algo.h"
 static void status_bar_ani(gui_obj_t *ignore_gesture)
 {
+    gui_text_t *time_txt = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_TIME_TEXT, (void *)&time_txt);
+    gui_text_t *date_txt = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_DATE_TEXT, (void *)&date_txt);
+    gui_win_t *win = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_WINDOW, (void *)&win);
+    if (time_txt)
+    {
 
+        static char buffer_text[6] = "07:55";
+#if _WIN32
+        time_t rawtime;
+        struct tm *timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        strftime(buffer_text, 6, "%H:%M", timeinfo);
+        //puts(buffer_text);
+#endif
+        gui_text_content_set(time_txt, buffer_text, strlen(buffer_text));
+        gui_text_convert_to_img(time_txt, RGBA8888);
+    }
+    if (date_txt)
+    {
+        static char buffer[20] = "Tue, Apr 16";
+#if _WIN32
+        time_t rawtime;
+        struct tm *timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        strftime(buffer, 20, "%a, %b %d", timeinfo); // output date in "Tue, Apr 16" format
+        //puts(buffer);
+#endif
+        gui_text_content_set(date_txt, buffer, strlen(buffer));
+    }
     touch_info_t *tp = tp_get_info();
     static bool press, expand, shrink, expand_press;
     if (tp->y < STATUS_BAR_HEIGHT && !expand)
@@ -299,10 +362,12 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
         GET_BASE(canvas_win)->not_show = 0;
         if (deltaY > 0)
         {
-            if (deltaY > 100)
+            if (deltaY >= 100)
             {
                 deltaY = 100;
+                //GET_BASE(win)->not_show = 0;
             }
+
 
             int opacity = deltaY * 255 / 100;
             if (opacity > 255)
@@ -315,7 +380,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             {
                 scale = 1;
             }
-            gui_img_scale(t->scale_img, scale, scale);
+            gui_img_scale(time_txt->scale_img, scale, scale);
         }
         if (tp->released)
         {
@@ -327,6 +392,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             else
             {
                 shrink = 1;
+                //GET_BASE(win)->not_show = 1;
             }
             press = 0;
         }
@@ -336,7 +402,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
     {
         gui_img_set_opacity(rect, 0);
         GET_BASE(canvas_win)->not_show = 1;
-        gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+        gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
         shrink = 0;
         if (ignore_gesture)
         {
@@ -364,8 +430,8 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
                 int opacity = (100 - (-deltaY)) * 255 / 100;
                 gui_img_set_opacity(rect, opacity);
                 float scale = (100 - (-deltaY)) * ((1.0f - TIME_SCALE_RATE) / 100.0f) + TIME_SCALE_RATE;
-                gui_img_scale(t->scale_img, scale, scale);
-
+                gui_img_scale(time_txt->scale_img, scale, scale);
+                //GET_BASE(win)->not_show = 1;
             }
 
 
@@ -377,7 +443,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
                     expand = 0;
                     gui_img_set_opacity(rect, 0);
                     GET_BASE(canvas_win)->not_show = 1;
-                    gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+                    gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
                     if (ignore_gesture)
                     {
                         ignore_gesture->gesture = 0;
@@ -387,7 +453,17 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             }
 
         }
+
     }
+    if ((deltaY >= 100 && (press)) || (deltaY >= 0 && expand))
+    {
+        GET_BASE(win)->not_show = 0;
+    }
+    else
+    {
+        GET_BASE(win)->not_show = 1;
+    }
+
 }
 #include "gui_menu_cellular.h"
 
