@@ -15,18 +15,16 @@
 #include "gui_button.h"
 #include "gui_app.h"
 #include "gui_progressbar.h"
+#include "gui_rect.h"
+#include "tp_algo.h"
 static void press_callback(gui_win_t *button);
 static void press_animate_cb(gui_win_t *button);
 static void release_callback(gui_win_t *button);
 static void release_animate_callback(gui_win_t *button);
 static void deal_win_in_page(gui_obj_t *object);
 static void page_callback(gui_page_t *page);
-static void heart_rate_cb();
-static void clock_cb();
-static void menu_cb();
-static void watch_face_cb();
-static void calculator_cb();
-static void sport_cb();
+static void heart_rate_cb(void);
+static void menu_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -43,7 +41,7 @@ void design_tab_menu(void *parent)
     GET_BASE(page)->y = page_y_recode;
     page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);
-    pro = gui_progressbar_movie_create(parent, scrollbar_array, SCROLLBAR_SIZE, 435, 200);
+    pro = gui_progressbar_movie_create(parent, (void *)scrollbar_array, SCROLLBAR_SIZE, 435, 200);
     gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
     //gui_page_rebound(page, true);
     gui_page_center_alignment(page, MENU_GAP);
@@ -109,7 +107,6 @@ void design_tab_menu(void *parent)
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(200, 200, 200), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
     }
     gui_win_onClick(button_array[0], heart_rate_cb, button_array[0]);
@@ -134,7 +131,7 @@ static void press_callback(gui_win_t *button)
      * @brief Shrunk current scale to 0.7 in animation duration
      *  y = (0.7-scale)x+scale;
      */
-    float scale = (0.7 - current_scale) * button->animate->progress_percent + current_scale;
+    float scale = (0.7f - current_scale) * button->animate->progress_percent + current_scale;
     if (tp->deltaX == 0)
     {
         matrix_translate(GET_BASE(button)->w / 2, GET_BASE(button)->h / 2, GET_BASE(button)->matrix);
@@ -190,8 +187,8 @@ static void deal_win_in_page(gui_obj_t *object)
             if (obj->matrix->m[1][2] >= (float)(0 - obj->h) &&
                 obj->matrix->m[1][2] < (float)gui_get_screen_height())
             {
-                float scale = (1 - 0.5 * _UI_ABS(((float)(obj->matrix->m[1][2] + (float)(obj->h / 2)) -
-                                                  (float)gui_get_screen_height() / 2) / (float)(gui_get_screen_height() / 2)));
+                float scale = (1 - 0.5f * _UI_ABS(((float)(obj->matrix->m[1][2] + (float)(obj->h / 2)) -
+                                                   (float)gui_get_screen_height() / 2) / (float)(gui_get_screen_height() / 2)));
                 GUI_TYPE(gui_win_t, obj)->scale = scale;
                 obj->not_show = false;
             }
@@ -245,7 +242,7 @@ const static void *scrollbar_array[SCROLLBAR_SIZE] =
 };
 static void page_callback(gui_page_t *page)
 {
-    deal_win_in_page(page);
+    deal_win_in_page((void *)page);
 
 
 

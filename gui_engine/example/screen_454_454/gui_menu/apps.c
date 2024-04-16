@@ -446,7 +446,7 @@ static void app_menu(gui_app_t *app)
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)cell);
-    return_widget(GUI_APP_ROOT_SCREEN, cell);
+    return_widget(GUI_APP_ROOT_SCREEN, (void *)cell);
 }
 #include "gui_seekbar.h"
 #include "gui_img.h"
