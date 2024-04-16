@@ -347,7 +347,7 @@ typedef enum obj_type
 typedef struct gui_msg
 {
     /* the event type */
-    uint8_t type;
+    uint16_t type;
     /* user field of event */
     union
     {
