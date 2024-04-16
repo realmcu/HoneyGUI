@@ -123,14 +123,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                             }
                             else
                             {
-                                end_line = dc->section.y2 - rect->y1 - 1;
+                                end_line = dc->section.y2 - rect->y1;
                             }
                         }
                         else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
                         {
                             trans.y = 0;
                             start_line = dc->section.y1 - rect->y1;
-                            end_line = dc->section.y2 - rect->y1 - 1;
+                            end_line = dc->section.y2 - rect->y1;
                         }
                         else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
                                  && (dc->section.y1 < (rect->y1 + image->img_h)))
@@ -313,14 +313,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         }
                         else
                         {
-                            end_line = dc->section.y2 - rect->y1 - 1;
+                            end_line = dc->section.y2 - rect->y1;
                         }
                     }
                     else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
                     {
                         trans.y = 0;
                         start_line = dc->section.y1 - rect->y1;
-                        end_line = dc->section.y2 - rect->y1 - 1;
+                        end_line = dc->section.y2 - rect->y1;
                     }
                     else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
                              && (dc->section.y1 < (rect->y1 + image->img_h)))
@@ -390,14 +390,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 }
                 else
                 {
-                    end_line = dc->section.y2 - rect->y1 - 1;
+                    end_line = dc->section.y2 - rect->y1;
                 }
             }
             else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
             {
                 trans.y = 0;
                 start_line = dc->section.y1 - rect->y1;
-                end_line = dc->section.y2 - rect->y1 - 1;
+                end_line = dc->section.y2 - rect->y1;
             }
             else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
                      && (dc->section.y1 < (rect->y1 + image->img_h)))
