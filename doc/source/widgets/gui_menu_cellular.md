@@ -16,7 +16,7 @@ Function is [void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_
 
 ## Example
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1713163873846849088/8d706369_10088396.png" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1713248192190019543/a2d10c29_10088396.gif"  /></div>
 <br>
 
 ```c

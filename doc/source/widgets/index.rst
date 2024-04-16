@@ -26,6 +26,7 @@ Widgets                              Brief
 `wheellist`_                         Wheel-shaped application list
 `perspective`_                       Slide to extend and retract curtains
 `menu_cellular`_                     Display icons set as a honeycomb shape menu
+`return`_                            The bubble-shaped curve that can be dragged out 
 ==================                   ==================
 
 .. _glossary: widgets_glossary.html
@@ -54,6 +55,7 @@ Widgets                              Brief
 .. _watch gradient spot: gui_watch_gradient_spot.html
 .. _watchface gradient: gui_watchface_gradient.html
 .. _menu cellular: gui_menu_cellular.html
+.. _return: gui_return.html
 .. toctree::
     :maxdepth: 2
 
@@ -82,3 +84,4 @@ Widgets                              Brief
     watch gradient spot <gui_watch_gradient_spot>
     watchface gradient <gui_watchface_gradient>
     menu cellular <gui_menu_cellular>
+    return <gui_return> 
