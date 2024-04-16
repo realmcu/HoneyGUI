@@ -28,18 +28,23 @@ description on the ```JavaScript syntax``` page.
 * In a javascript file, there are some variable definitions, function definitions, and function calls. When the app starts, as mentioned above, the JavaScript file will be executed at the end of the XML parsing, and the function calls in it will be executed, mainly some initialization behaviors and the registration of event listeners. The callback functions of those events will not be executed until the event occurs.
 ## EXAMPLE
 ### Progressbar API
+```javascript
+//Read and write the progress value of a progressbar tag called 'tag name'
+progressbar.getElementById('tag name')
+var proress = progressbar.progress(0.7)
+```
 #### Define a progressbar object
 In fact, this object is added to the global object. Using property of the global object does not require explicitly calling the global object.
 ```c
 jerry_value_t progress = jerry_create_object();
 js_set_property(global_obj, "progressbar", progress);
 ```
-#### Add three functions to the progressbar object
+#### Add 2 functions to the progressbar object
 ```c
 REGISTER_METHOD(progress, progress);
 REGISTER_METHOD(progress, getElementById);
 ```
-#### Defines two functions
+#### Define 2 functions
 * The ```progress``` is used to write and read the progressbar's progress.
 * Input formal parameters are in the array ```args```. The first in it is the progress number. If this parameter exists, which means that the progress needs to be set. Using ```jerry_get_number_value()``` to convert javascript parameter to c language variable.
 * The return value is the progress you want to get, using ```jerry_create_number``` to convert c language variable to javascript variable. By the way, the form of these javascript variables in C language is an index of an unsigned integer.
@@ -83,6 +88,12 @@ DECLARE_HANDLER(getElementById)
 ```
  ### Light control
 This page shows how the  UI switch corresponds to the peripheral switch.
+```javascript
+//IO P1_1 is set to low level
+var P1_1 = 9
+var LED1 = new Gpio(P1_1, 'out');
+LED1.writeSync(0)
+```
 #### Light swtich data
 
 |data|value type|brief|
