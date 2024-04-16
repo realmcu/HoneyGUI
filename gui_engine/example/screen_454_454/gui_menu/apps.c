@@ -7,6 +7,7 @@
 #include "gui_text.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
+#include "gui_return.h"
 #define APP_HEART_RATE
 #define APP_CLOCK
 #define APP_WATCH_FACE
@@ -39,7 +40,8 @@ static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
 static void status_bar(void *parent, gui_obj_t *ignore_gesture);
 static void status_bar_ani(gui_obj_t *ignore_gesture);
-static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture);
+#define RETURN_ARRAY_SIZE 17
+extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, PAGE_NAME, 0, 0, 0, 0);
@@ -170,7 +172,8 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_type_set(t, addr1);
     }
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
-    return_widget(GUI_APP_ROOT_SCREEN, (void *)page);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)page);
 }
 static void heart_ani_cb(gui_img_t *img)
 {
@@ -387,6 +390,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
     }
 }
 #include "gui_menu_cellular.h"
+
 static void app_menu(gui_app_t *app)
 {
     /**
@@ -446,115 +450,32 @@ static void app_menu(gui_app_t *app)
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)cell);
-    return_widget(GUI_APP_ROOT_SCREEN, (void *)cell);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)cell);
 }
 #include "gui_seekbar.h"
 #include "gui_img.h"
 #define RETURN_HEIGHT 100
-static gui_obj_t *return_ignore_gesture;
-static void seekbar_h_preapre(gui_obj_t *obj)
+const uint32_t *gui_app_return_array[] =
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
-    gui_seekbar_t *circle = (gui_seekbar_t *)obj;
-
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
-    {
-        static bool enable;
-        static bool return_flag;
-        int pro = 0;
-#define RETURN_ENABLE_THREHOLD 10
-#define RETURN_THREHOLD 80
-        if (tp->pressed && tp->x < RETURN_ENABLE_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
-        {
-            enable = 1;
-            if (return_ignore_gesture)
-            {
-                return_ignore_gesture->gesture = 1;
-            }
-            GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
-            if (GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y > SCREEN_H)
-            {
-                GET_BASE(circle->base.c)->y = SCREEN_H - RETURN_HEIGHT - obj->y;
-            }
-            gui_progressbar_set_progress((void *)circle, pro);
-        }
-        if (tp->released)
-        {
-            enable = 0;
-            if (return_ignore_gesture)
-            {
-                return_ignore_gesture->gesture = 0;
-            }
-            gui_progressbar_set_progress((void *)circle, pro);
-            if (return_flag)
-            {
-                return_flag = 0;
-                gui_obj_event_set(obj, GUI_EVENT_1);
-            }
-
-        }
-        if (enable)
-        {
-            if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
-            {
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                {
-                    pro = tp->x + tp->deltaX - 0;
-                    if (pro <= 0) { pro = 1; }
-                    if (pro >= obj->w) { pro = obj->w; }
-                    if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
-                    {
-                        pro = pro * (circle->base.max - 2) / obj->w;
-
-                    } gui_log("pro:%d\n", tp->deltaX);
-                    gui_progressbar_set_progress((void *)circle, pro);
-                    if (tp->deltaX >= RETURN_THREHOLD)
-                    {
-                        return_flag = 1;
-                    }
-                    else
-                    {
-                        return_flag = 0;
-                    }
-
-                }
-            }
-        }
-    }
-}
-static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture)
-{
-
-    static uint32_t *array[] =
-    {
-        PATH04_BIN,
-        PATH05_BIN,
-        PATH07_BIN,
-        PATH08_BIN,
-        PATH09_BIN,
-        PATH11_BIN,
-        PATH12_BIN,
-        PATH14_BIN,
-        PATH15_BIN,
-        PATH16_BIN,
-        PATH18_BIN,
-        PATH19_BIN,
-        PATH20_BIN,
-        PATH22_BIN,
-        PATH23_BIN,
-        PATH24_BIN,
-        PATH25_BIN,
-    };
-    gui_seekbar_t *bar = gui_seekbar_create_movie_h(parent, (void *)array,
-                                                    sizeof(array) / sizeof(uint32_t *), 0, SCREEN_H - SCREEN_H * 2 / 3);
-    GET_BASE(bar)->obj_prepare = seekbar_h_preapre;
-    gui_obj_add_event_cb(bar, (gui_event_cb_t)win_cb, GUI_EVENT_1, bar);
-    GET_BASE(bar)->w = RETURN_HEIGHT;
-    GET_BASE(bar)->h = SCREEN_H * 2 / 3;
-    gui_img_set_mode((void *)bar->base.c, IMG_SRC_OVER_MODE);
-    return_ignore_gesture = ignore_gesture;
-}
+    PATH04_BIN,
+    PATH05_BIN,
+    PATH07_BIN,
+    PATH08_BIN,
+    PATH09_BIN,
+    PATH11_BIN,
+    PATH12_BIN,
+    PATH14_BIN,
+    PATH15_BIN,
+    PATH16_BIN,
+    PATH18_BIN,
+    PATH19_BIN,
+    PATH20_BIN,
+    PATH22_BIN,
+    PATH23_BIN,
+    PATH24_BIN,
+    PATH25_BIN,
+};
 
 
 
