@@ -160,6 +160,7 @@ typedef struct gui_dispdev
     uint32_t section_count;
     uint8_t bit_depth;
     void (*lcd_update)(struct gui_dispdev *dc);
+    void (*virtual_lcd_update)(struct gui_dispdev *dc);
     int (*flash_seq_trans_enable)(void);
     int (*flash_seq_trans_disable)(void);
     uint32_t (*get_lcd_us)(void);

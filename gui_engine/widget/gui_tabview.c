@@ -438,6 +438,18 @@ void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
 void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
 {
     this->enable_pre_load = enable;
+    gui_dispdev_t *dc = gui_get_dc();
+    if (enable == true)
+    {
+        uint16_t w = this->base.w;
+        uint16_t h = this->base.h;
+        this->center_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + w * h * dc->bit_depth /
+                                       8);
+        this->left_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + w * h * dc->bit_depth / 8);
+        this->right_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + w * h * dc->bit_depth /
+                                      8);
+    }
+
 }
 gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h)
@@ -454,13 +466,6 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
         h = (int)gui_get_screen_height();
     }
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
-
-
-    this->center_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + 0.7f * 0.7f * w * h * dc->bit_depth /
-                                   8);
-    this->left_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + 0.7f * 0.7f * w * h * dc->bit_depth / 8);
-    this->right_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + 0.7f * 0.7f * w * h * dc->bit_depth /
-                                  8);
 
     GET_BASE(this)->obj_input_prepare = input_prepare;
     GET_BASE(this)->obj_prepare = tabview_prepare;

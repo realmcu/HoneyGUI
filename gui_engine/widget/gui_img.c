@@ -581,17 +581,58 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
     this->draw_img.opacity_value = opacity_value;
     this->opacity = opacity_value;
 }
+static void rect_copy(uint8_t *target, uint8_t *source, uint32_t x, uint32_t y, uint32_t w,
+                      uint32_t h, gui_dispdev_t *dc)
+{
+    uint16_t byte = dc->bit_depth / 8;
+    for (uint32_t i = 0; i < h; i++)
+    {
+        memcpy(target + i * w * byte, source + i * dc->fb_width * byte, w * byte);
+    }
+}
 static void virtual_dc_update(struct gui_dispdev *dc)
 {
-
-    uint16_t w = dc->fb_width * 0.7f;
-    uint16_t h = dc->fb_height * 0.7f;
-    uint16_t byte = dc->bit_depth / 8;
-
-    for (uint16_t y = 0; y < h; y++)
+    if (dc->virtual_lcd_update != NULL)
     {
-        memcpy(dc->shot_buf + 8 + y * w * byte, dc->frame_buf + y * dc->fb_width * byte, w * byte);
+        dc->virtual_lcd_update(dc);
+        return;
     }
+    float scale = 0.7f;
+    uint16_t w = dc->fb_width * scale;
+    uint16_t h = dc->fb_height * scale;
+    uint16_t byte = dc->bit_depth / 8;
+    uint32_t total_section_cnt = (dc->screen_height / dc->fb_height + ((
+                                                                           dc->screen_height % dc->fb_height) ? 1 : 0));
+    if (dc->type == DC_SINGLE)
+    {
+        for (uint16_t y = 0; y < h; y++)
+        {
+            memcpy(dc->shot_buf + 8 + y * w * byte, dc->frame_buf + y * dc->fb_width * byte, w * byte);
+        }
+        gui_log("[GUI warning] please use user method for improve! \n");
+    }
+    else if (dc->type == DC_RAMLESS)
+    {
+        if (dc->section_count == 0)
+        {
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
+        }
+        else if (dc->section_count == total_section_cnt - 1)
+        {
+            uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
+            gui_log("[GUI warning] please use user method for improve! \n");
+        }
+        else
+        {
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
+        }
+    }
+
+
 }
 void gui_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)
 {
