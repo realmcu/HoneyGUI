@@ -113,33 +113,34 @@ static void px_main(gui_px_t *this)
 
 static void app_dialing_ui_design(gui_app_t *app)
 {
-    gui_img_file_t *file = (gui_img_file_t *)_actiger_blue_compressed;
-    imdc_file_t *compressed = (imdc_file_t *)(&(file->data.idc_file));
 
-    uint8_t test_buf[10 * 10 * 2 * 100];
+    // gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)_actiger_blue;
 
-    // uncompressed_rle_rect(compressed, 0, 0, 10, 10, test_buf);
+    // gui_img_t *img = gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue, 0, 0,
+    //                                          0, 0);
 
-    //uncompressed_rle_line(compressed, 0, 0, 100, test_buf);
-    uncompressed_rle_rgb565(compressed, 0, test_buf);
-
-    gui_img_t *img = gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue, 0, 0,
-                                             0, 0);
-
-    gui_img_t *img0 = gui_img_create_from_mem(&(app->screen),  "img_2_test",
-                                              (void *)_actiger_blue_compressed, 256, 256,
-                                              0, 0);
-
-    //gui_img_rotation(img, 45, 0, 0);
-    //return;
+    // return;
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, REDUCTION);
+    gui_tabview_set_style(tv, TAB_CUBE);
     gui_tab_t *tab_1 = gui_tab_create(tv, "tb_1",    0, 0, 0, 0, 0, 0);
     gui_tab_t *tab_2 = gui_tab_create(tv, "tb_2",    0, 0, 0, 0, 1, 0);
 
-    gui_img_t *img_1 = gui_img_create_from_mem(tab_1,  "img_1_test", (void *)_actiger_blue, 0, 0, 0, 0);
-    gui_img_create_from_mem(tab_1,  "img_1", (void *)_actiger_yellow, 250, 250, 0, 0);
+
+    gui_img_t *img_blue = gui_img_create_from_mem(tab_1,  "img_1_test", (void *)_actiger_blue, 0, 0, 0,
+                                                  0);
+    gui_img_t *img_yellow = gui_img_create_from_mem(tab_1,  "img_1", (void *)_actiger_yellow, 250, 250,
+                                                    0, 0);
+
+    // uint8_t *shot = gui_tree_convert_to_img((gui_obj_t *)tab_1, NULL);
+
+    // gui_img_create_from_mem(tab_1,  "shot", (void *)shot, 0, 0, 0, 0);
+
+    gui_obj_show(img_blue, false);
+    gui_obj_show(img_yellow, false);
+
+
+
     gui_img_t *img_2 = gui_img_create_from_mem(tab_2,  "img_2", (void *)_actiger_turk, 100, 100, 0, 0);
 
 //    gui_canvas_t *canvas = gui_canvas_create(tab_1, "canvas", 0, 0, 0, 454, 454);

@@ -72,7 +72,8 @@ static void design_app_watch_ui(gui_app_t *app)
     //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
 #endif
     tabview_main = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tabview_main, REDUCTION);
+    gui_tabview_set_style(tabview_main, CLASSIC);
+    gui_tabview_enable_pre_load(tabview_main, true);
 
     tab_watchface = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 0, 0);
     tab_player = gui_tab_create(tabview_main, "tab_player",      0, 0, 0, 0, 1, 0);
@@ -80,12 +81,12 @@ static void design_app_watch_ui(gui_app_t *app)
     tab_contacts = gui_tab_create(tabview_main, "tab_contacts",        0, 0, 0, 0, 3, 0);
     tab_record = gui_tab_create(tabview_main, "tab_record",       0, 0, 0, 0, 4, 0);
     tab_menu = gui_tab_create(tabview_main, "tab_menu",       0, 0, 0, 0, -1, 0);
-    design_tab_watchface(tab_watchface);
-    design_tab_player(tab_player);
-    design_tab_call(tab_call);
-    design_tab_contacts(tab_contacts);
-    design_tab_record(tab_record);
-    design_tab_menu(tab_menu);
+    design_tab_watchface(gui_tab_get_rte_obj(tab_watchface));
+    design_tab_player(gui_tab_get_rte_obj(tab_player));
+    design_tab_call(gui_tab_get_rte_obj(tab_call));
+    design_tab_contacts(gui_tab_get_rte_obj(tab_contacts));
+    design_tab_record(gui_tab_get_rte_obj(tab_record));
+    design_tab_menu(gui_tab_get_rte_obj(tab_menu));
 }
 
 #if defined _WIN32

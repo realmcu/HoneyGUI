@@ -407,11 +407,25 @@ static void tabview_prepare(gui_obj_t *obj)
         gui_fb_change();
     }
 
-    if ((last_cur_id.x != this->cur_id.x) || (last_cur_id.y != this->cur_id.y) ||
-        (last_cur_id.z != this->cur_id.z))
+
+    if ((last_cur_id.x != this->cur_id.x) || (last_cur_id.y != this->cur_id.y))
+    {
+        this->tab_change_ready = true;
+    }
+    if (((this->tab_change_ready == true) && (this->release_x == 0) && (this->release_y == 0)) ||
+        (dc->frame_count == 1))
     {
         gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
+        this->tab_change_ready = false;
+        this->tab_need_pre_load = true;
+
+        gui_log("do cache right and left \n");
     }
+    else
+    {
+        this->tab_need_pre_load = false;
+    }
+
 }
 
 /*============================================================================*
@@ -421,11 +435,15 @@ void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
 {
     this->style = style;
 }
-
+void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
+{
+    this->enable_pre_load = enable;
+}
 gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x, int16_t y,
                                   int16_t w, int16_t h)
 {
     gui_tabview_t *this = gui_malloc(sizeof(gui_tabview_t));
+    gui_dispdev_t *dc = gui_get_dc();
     memset(this, 0, sizeof(gui_tabview_t));
     if (w == 0)
     {
@@ -436,6 +454,14 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
         h = (int)gui_get_screen_height();
     }
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+
+
+    this->center_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + 0.7f * 0.7f * w * h * dc->bit_depth /
+                                   8);
+    this->left_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + 0.7f * 0.7f * w * h * dc->bit_depth / 8);
+    this->right_shot = gui_malloc(sizeof(gui_rgb_data_head_t) + 0.7f * 0.7f * w * h * dc->bit_depth /
+                                  8);
+
     GET_BASE(this)->obj_input_prepare = input_prepare;
     GET_BASE(this)->obj_prepare = tabview_prepare;
     GET_BASE(this)->type = TABVIEW;

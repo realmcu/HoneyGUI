@@ -151,12 +151,12 @@ typedef struct gui_dispdev
     char gpu_type;
     /* pixel data */
     uint8_t *frame_buf;
+    uint8_t *shot_buf;
     uint8_t *disp_buf_1;
     uint8_t *disp_buf_2;
     float scale_x;
     float scale_y;
     gui_rect_t section;
-    //uint16_t section_height;
     uint32_t section_count;
     uint8_t bit_depth;
     void (*lcd_update)(struct gui_dispdev *dc);
@@ -168,6 +168,7 @@ typedef struct gui_dispdev
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
     void (*lcd_draw_sync)(void);
+    uint32_t frame_count;
 } gui_dispdev_t;
 typedef struct
 {
@@ -560,7 +561,7 @@ extern char *defaultPath;
     GET_BASE(this)->create_done = true;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
-#define GUI_FRAME_STEP 50
+#define GUI_FRAME_STEP 0.1
 #else
 #define GUI_FRAME_STEP 50
 #endif

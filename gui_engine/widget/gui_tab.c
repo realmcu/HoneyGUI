@@ -86,7 +86,6 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void tab_prepare_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 static void input_prepare(gui_obj_t *obj)
 {
@@ -143,6 +142,70 @@ static void tab_prepare(gui_obj_t *obj)
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
 
+    if (parent->enable_pre_load)
+    {
+        if (parent->tab_need_pre_load == true)
+        {
+            if (tab_x_gap == 0)
+            {
+                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
+                if (this->shot_obj == NULL)
+                {
+                    this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->center_shot, 0,
+                                                                          0, 0, 0);
+                }
+                else
+                {
+                    gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->center_shot, 0, 0);
+                }
+            }
+            else if (tab_x_gap == 1)
+            {
+                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
+                if (this->shot_obj == NULL)
+                {
+                    this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->right_shot, 0,
+                                                                          0, 0, 0);
+                }
+                else
+                {
+                    gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->right_shot, 0, 0);
+                }
+            }
+            else if (tab_x_gap == -1)
+            {
+                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
+                if (this->shot_obj == NULL)
+                {
+                    this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->left_shot, 0, 0,
+                                                                          0, 0);
+                }
+                else
+                {
+                    gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->left_shot, 0, 0);
+                }
+            }
+
+        }
+
+        if (parent->release_x != 0)
+        {
+            if ((tab_x_gap == 0) || (tab_x_gap == -1) || (tab_x_gap == 1))
+            {
+                gui_obj_show(this->shot_obj, true);
+                gui_obj_show(this->rte_obj, false);
+            }
+        }
+        else
+        {
+            if ((tab_x_gap == 0) || (tab_x_gap == -1) || (tab_x_gap == 1))
+            {
+                gui_obj_show(this->shot_obj, false);
+                gui_obj_show(this->rte_obj, true);
+            }
+        }
+    }
+
     if (parent->loop)
     {
         int16_t tab_x_count = - parent->tab_cnt_left + parent->tab_cnt_right + 1;
@@ -192,26 +255,11 @@ static void tab_prepare(gui_obj_t *obj)
     }
     else if (this->style == FADE)
     {
-        tab_prepare_fade(obj, tab_x_gap, tab_y_gap);
+        gui_tab_fade(obj, tab_x_gap, tab_y_gap);
     }
     else if (this->style == REDUCTION_FADE)
     {
-        float s;
-
-        int sx = abs((tab_x_gap) * (int)this->base.w + parent->release_x);
-        sx = sx % this->base.w;
-        s = 1.0f - (float)sx / this->base.w;
-
-        if (s < 0.2f)
-        {
-            s = 0.2f;
-        }
-        if (s >= 1.0f)
-        {
-            s = 1.0f;
-        }
-
-        tab_prepare_fade(obj, tab_x_gap, tab_y_gap);
+        gui_tab_reduction_fade(obj, tab_x_gap, tab_y_gap);
     }
 
 
@@ -221,79 +269,9 @@ static void tab_prepare(gui_obj_t *obj)
     }
 }
 
-static void tab_root_img_fade(gui_obj_t *object, float xx, float yy)
-{
-    gui_list_t *node = NULL;
-    gui_list_t *tmp = NULL;
-    float x = xx * 0.6f + 0.4f;
-    float y = yy * 0.6f + 0.4f;
 
-    gui_list_for_each_safe(node, tmp, &object->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if ((!(obj->parent->type == CURTAIN &&
-               ((gui_curtain_t *)obj->parent)->orientation != CURTAIN_MIDDLE)) &&
-            (!(obj->parent->parent->type == CURTAIN &&
-               ((gui_curtain_t *)obj->parent->parent)->orientation != CURTAIN_MIDDLE)))
-        {
-            switch (obj->type)
-            {
-            case IMAGE_FROM_MEM:
-                {
-                    gui_img_t *img = (void *)obj;
-                    gui_img_set_opacity(img, x * UINT8_MAX);
-                    break;
-                }
-            case VG_LITE_CUBE:
-                {
-                    gui_cube_t *cube = (void *)obj;
-                    gui_cube_set_opacity(cube, CUBE_SIDE_ALL, x * UINT8_MAX);
-                    break;
-                }
-            case CANVAS:
-                {
-                    break;
-                }
 
-            default:
-                break;
-            }
-        }
-        tab_root_img_fade(obj, xx, yy);
-    }
-}
 
-#define TAB_ASIDE(id, cur) (abs(id - cur) <= 1)
-static void tab_prepare_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
-{
-    touch_info_t *tp = tp_get_info();
-    gui_tab_t *tab = (gui_tab_t *)obj;
-    gui_tab_t *this = (gui_tab_t *)obj;
-    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
-    /**
-     * @note tp->deltaX >0 means slide right, the left tab shows
-     *       tp->deltaX <0 means slide left, the right tab shows
-     *       the left tab's dx -320~0
-     *       the right tab's dx 320~0
-     */
-    if (((tp->type == TOUCH_HOLD_X) || (tp->type == TOUCH_LEFT_SLIDE) ||
-         (tp->type == TOUCH_RIGHT_SLIDE) || (tp->type == TOUCH_INVALIDE))  &&
-        TAB_ASIDE(tab->id.x, parent->cur_id.x) && tab->id.y == 0)
-    {
-        // gui_log("TOUCH_HOLD_X: %d, TOUCH_LEFT_SLIDE: %d, TOUCH_RIGHT_SLIDE: %d, TOUCH_INVALIDE: %d, %d\n", \
-        // (tp->type == TOUCH_HOLD_X), (tp->type == TOUCH_LEFT_SLIDE), (tp->type == TOUCH_RIGHT_SLIDE),(tp->type == TOUCH_INVALIDE),\
-        // tab->id.x - parent->cur_id.x );
-
-        // current tab decline, aside tab enhance.
-        float fade_dir = (tab->id.x == parent->cur_id.x) ? -1.f : 1.f;
-        // slide right delta > 0, slide left delta < 0
-        float slide_dir = (tp->deltaX > 0) ? 1.f : (tp->deltaX < 0) ? -1.f : 0;
-        // slide right dx > 0, slide left dx < 0
-        float fade_percent = 1.f + (fade_dir * slide_dir * 0/*todo*/) / this->base.w;
-
-        tab_root_img_fade(obj, fade_percent, fade_percent);
-    }
-}
 
 static void tab_destroy(gui_obj_t *obj)
 {
@@ -384,6 +362,16 @@ static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filenam
  *                           Public Functions
  *============================================================================*/
 
+gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this)
+{
+    gui_tabview_t *tabview = (gui_tabview_t *)(this->base.parent);
+    if (tabview->enable_pre_load == false)
+    {
+        return (gui_obj_t *)this;
+    }
+    return this->rte_obj;
+}
+
 gui_tab_t *gui_tab_create(void *parent, const char *name, int16_t x, int16_t y,
                           int16_t w, int16_t h, int16_t idx, int16_t idy)
 {
@@ -409,6 +397,9 @@ gui_tab_t *gui_tab_create(void *parent, const char *name, int16_t x, int16_t y,
                                &(GET_BASE(this)->brother_list));
     }
     GET_BASE(this)->create_done = true;
+    this->rte_obj = gui_obj_create(this, "tab_rte", this->base.x, this->base.y, this->base.w,
+                                   this->base.h);
+
     return this;
 }
 
