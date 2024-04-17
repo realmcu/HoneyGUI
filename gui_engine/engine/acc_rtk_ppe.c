@@ -27,8 +27,6 @@ static double acc_ppe_ceil(double _x)
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    uint8_t dma_channl1 = 1, dma_channel2 = 3;
-    hal_dma_channel_init(&dma_channl1, &dma_channel2);
     if ((rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y2) ||
         (rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1))
     {
@@ -443,40 +441,19 @@ bool hw_acc_imdc_decode(draw_img_t *image, gui_rect_t *rect, uint8_t *output)
     memset(&output_header, 0, sizeof(struct gui_rgb_data_head));
     const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                               struct gui_rgb_data_head));
-    if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_16BIT)
-    {
-        output_header.type = RGB565;
-    }
-    else if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_32BIT)
-    {
-        output_header.type = RGBA8888;
-    }
-    else if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_24BIT)
-    {
-        output_header.type = RGB888;
-    }
-    else
-    {
-        return false;
-    }
+    output_header.type = head->type;
 
-    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
-    IMDC_decode_range range;
-    range.start_column = rect->x1;
-    range.end_column = rect->x2;
-    range.start_line = rect->y1;
-    range.end_line = rect->y2;
-    output_header.w = range.end_column - range.start_column + 1;
-    output_header.h = range.end_line - range.start_line + 1;
-    IMDC_DMA_config dma_cfg;
-    dma_cfg.output_buf = (uint32_t *)(output + 8);
-    dma_cfg.RX_DMA_channel_num = 3;
-    dma_cfg.TX_DMA_channel_num = 1;
-    dma_cfg.RX_DMA_channel = GDMA_Channel3;
-    dma_cfg.TX_DMA_channel = GDMA_Channel1;
-    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
+    hal_imdc_decompress_info info;
+    info.start_column = rect->x1;
+    info.end_column = rect->x2;
+    info.start_line = rect->y1;
+    info.end_line = rect->y2;
+    info.raw_data_address = (uint32_t)header;
+    output_header.w = info.end_column - info.start_column + 1;
+    output_header.h = info.end_line - info.start_line + 1;
+    bool ret = hal_imdc_decompress(&info, (uint8_t *)(output + 8));
 
-    if (err == IMDC_SUCCESS)
+    if (!ret)
     {
         memcpy(output, &output_header, sizeof(gui_rgb_data_head_t));
         return true;
@@ -485,4 +462,12 @@ bool hw_acc_imdc_decode(draw_img_t *image, gui_rect_t *rect, uint8_t *output)
     {
         return false;
     }
+}
+
+void hw_acc_init(void)
+{
+    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
+    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
+    uint8_t dma_channl1 = 1, dma_channel2 = 3;
+    hal_dma_channel_init(&dma_channl1, &dma_channel2);
 }
