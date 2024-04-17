@@ -250,12 +250,13 @@ static void win_cb(gui_win_t *win)
 #define STATUS_BAR_TIME_TEXT "STATUS_BAR_TIME_TEXT"
 #define STATUS_BAR_DATE_TEXT "STATUS_BAR_DATE_TEXT"
 #define STATUS_BAR_WINDOW "STATUS_BAR_WINDOW"
-static gui_win_t *canvas_win;
 static gui_img_t *rect;
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-    canvas_win = gui_win_create(status_bar, 0, 0, 0, SCREEN_W, SCREEN_H);
+    rect = gui_rect((void *)status_bar, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER_OPACITY(230));
+    GET_BASE(rect)->not_show = 1;
+    gui_img_set_opacity(rect, 0);
     gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
     {
         char *text = "07:55";
@@ -299,9 +300,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 
         }
     }
-    GET_BASE(canvas_win)->not_show = 1;
-    rect = gui_rect((void *)canvas_win, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER_OPACITY(230));
-    gui_img_set_opacity(rect, 0);
+
 
 }
 #include "tp_algo.h"
@@ -359,7 +358,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
         {
             ignore_gesture->gesture = 1;
         }
-        GET_BASE(canvas_win)->not_show = 0;
+        GET_BASE(rect)->not_show = 0;
         if (deltaY > 0)
         {
             if (deltaY >= 100)
@@ -401,7 +400,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
     if (shrink)
     {
         gui_img_set_opacity(rect, 0);
-        GET_BASE(canvas_win)->not_show = 1;
+        GET_BASE(rect)->not_show = 1;
         gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
         shrink = 0;
         if (ignore_gesture)
@@ -442,7 +441,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
                 {
                     expand = 0;
                     gui_img_set_opacity(rect, 0);
-                    GET_BASE(canvas_win)->not_show = 1;
+                    GET_BASE(rect)->not_show = 1;
                     gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
                     if (ignore_gesture)
                     {
