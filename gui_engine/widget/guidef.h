@@ -344,6 +344,7 @@ typedef enum obj_type
     MACRO_ANIMATETRANSFORM,
     HONEYCOMB_LIST,
     WHEEL_LIST,
+    QRCODE,
 } obj_type_t;
 typedef struct gui_msg
 {

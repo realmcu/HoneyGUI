@@ -27,6 +27,7 @@ Widgets                              Brief
 `perspective`_                       Slide to extend and retract curtains
 `menu_cellular`_                     Display icons set as a honeycomb shape menu
 `return`_                            The bubble-shaped curve that can be dragged out 
+`qbcode`_                            Display qrcode and barcode 
 ==================                   ==================
 
 .. _glossary: widgets_glossary.html
@@ -56,6 +57,7 @@ Widgets                              Brief
 .. _watchface gradient: gui_watchface_gradient.html
 .. _menu cellular: gui_menu_cellular.html
 .. _return: gui_return.html
+.. qbcode: qbcode.html
 .. toctree::
     :maxdepth: 2
 
@@ -85,3 +87,4 @@ Widgets                              Brief
     watchface gradient <gui_watchface_gradient>
     menu cellular <gui_menu_cellular>
     return <gui_return> 
+	qbcode <gui_qbcode> 
