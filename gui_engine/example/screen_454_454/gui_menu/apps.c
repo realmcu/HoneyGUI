@@ -16,11 +16,13 @@
 #define APP_CALCULATOR
 #define APP_SPORT
 #define APP_MENU
+#define APP_STOPWATCH
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
 GUI_APP_DEFINE(APP_CALCULATOR, app_hr_ui_design)
 GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
+GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
@@ -551,9 +553,60 @@ const uint32_t *gui_app_return_array[] =
     PATH24_BIN,
     PATH25_BIN,
 };
+static void stop_watch_win_ani_cb(void);
+#define STOPWATCHTEXT "STOPWATCHTEXT"
+GUI_APP_ENTRY(APP_STOPWATCH)
+{
+    gui_win_t *stop = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
+    gui_win_set_animate(stop, 1000, -1, stop_watch_win_ani_cb, 0);
+    {
+        char *text = "07:55";
+        int font_size = 48;
+        gui_text_t *t = gui_text_create(stop, STOPWATCHTEXT,  0, 200,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1);
+        gui_text_convert_to_img(t, RGBA8888);
+        gui_text_mode_set(t, CENTER);
 
+    }
+    status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}
+static void get_stopwatch_string(char *buffer)
+{
+#if _WIN32
+    static bool enter;
+    static struct timeval start;
+    if (!enter)
+    {
+        enter = 1;
+        gettimeofday(&start, NULL);
+    }
+    struct timeval end;
+    long mtime, secs, usecs;
+    {
+        gettimeofday(&end, NULL);
+        secs  = end.tv_sec  - start.tv_sec;
+        usecs = end.tv_usec - start.tv_usec;
+        mtime = ((secs) * 1000 + usecs / 1000.0) + 0.5;
+        sprintf(buffer, "\r%02ld:%02ld:%02ld", secs / 60, secs % 60, (mtime % 1000) / 10);
+    }
+#endif
+}
+static void stop_watch_win_ani_cb()
+{
 
-
+    static char buffer[9];
+    get_stopwatch_string(buffer);
+    gui_text_t *time_txt = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
+    gui_text_content_set(time_txt, buffer, strlen(buffer));
+    gui_text_convert_to_img(time_txt, RGBA8888);
+}
 
 
 

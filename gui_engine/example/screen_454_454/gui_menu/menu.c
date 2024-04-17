@@ -25,6 +25,7 @@ static void deal_win_in_page(gui_obj_t *object);
 static void page_callback(gui_page_t *page);
 static void heart_rate_cb(void);
 static void menu_cb(void);
+static void stopwatch_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -64,7 +65,7 @@ void design_tab_menu(void *parent)
     {
         "Heart Rate",
         "Menu",
-        "Watch Face",
+        "Stopwatch",
         "Calculator",
         "Sport",
         "Heart Rate",
@@ -111,7 +112,7 @@ void design_tab_menu(void *parent)
     }
     gui_win_onClick(button_array[0], heart_rate_cb, button_array[0]);
     gui_win_onClick(button_array[1], menu_cb, button_array[1]);
-    // gui_win_onClick(button_array[2], watch_face_cb, button_array[2]);
+    gui_win_onClick(button_array[2], stopwatch_cb, button_array[2]);
     // gui_win_onClick(button_array[3], calculator_cb, button_array[3]);
     // gui_win_onClick(button_array[4], sport_cb, button_array[4]);
 
@@ -290,6 +291,11 @@ static void menu_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MENU))
 }
+static void stopwatch_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_STOPWATCH))
+}
+
 // static void clock_cb()
 // {
 //     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CLOCK))
