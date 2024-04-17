@@ -38,15 +38,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 
     if (dc->bit_depth == 16)
     {
-        target.format = PPE_BGR565;
+        target.format = PPE_RGB565;
     }
     else if (dc->bit_depth == 32)
     {
-        target.format = PPE_ABGR8888;
+        target.format = PPE_ARGB8888;
     }
     else if (dc->bit_depth == 24)
     {
-        target.format = PPE_BGR888;
+        target.format = PPE_RGB888;
     }
     target.memory = (void *)dc->frame_buf;
     target.address = (uint32_t)dc->frame_buf;
@@ -56,16 +56,16 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     switch (head->type)
     {
     case RGB565:
-        source.format = PPE_BGR565;
+        source.format = PPE_RGB565;
         break;
     case RGB888:
-        source.format = PPE_BGR888;
+        source.format = PPE_RGB888;
         break;
     case RGBA8888:
-        source.format = PPE_ABGR8888;
+        source.format = PPE_ARGB8888;
         break;
     case ARGB8565:
-        source.format = PPE_ABGR8565;
+        source.format = PPE_ARGB8565;
         break;
     default:
         return;
@@ -106,8 +106,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1))
             {
                 float scale_x = image->matrix->m[0][0], scale_y = image->matrix->m[1][1];
-                if ((image->img_w == (int)(image->img_w * scale_x)) &&
-                    (image->img_h == (int)(image->img_h * scale_y)))
+                if ((image->img_w == image->target_w) &&
+                    (image->img_h == image->target_h))
                 {
                     ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
                     if (head->compress)
@@ -244,11 +244,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         return;
                     }
                 }
-
+                scaled_img.format = source.format;
                 switch (source.format)
                 {
-                case PPE_BGR565:
-                    scaled_img.format = PPE_BGR565;
+                case PPE_RGB565:
                     if (dc->type == DC_SINGLE)
                     {
                         //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 2);
@@ -258,9 +257,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * 2);
                     }
                     break;
-                case PPE_BGR888:
-                case PPE_ABGR8565:
-                    scaled_img.format = PPE_BGR888;
+                case PPE_RGB888:
+                case PPE_ARGB8565:
                     if (dc->type == DC_SINGLE)
                     {
                         //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 3);
@@ -270,8 +268,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * 3);
                     }
                     break;
-                case PPE_BGRA8888:
-                    scaled_img.format = PPE_BGRA8888;
+                case PPE_ARGB8888:
                     if (dc->type == DC_SINGLE)
                     {
                         //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 4);
