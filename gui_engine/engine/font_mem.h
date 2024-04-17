@@ -130,9 +130,12 @@ void gui_font_scale_destory(gui_text_t *text);
  *
  * @param text text pointer
  * @param font_img_type img type
+ * @param img_x img x
+ * @param img_y img y
  * @return void* text img buffer
  */
-void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type);
+void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *img_x,
+                       int16_t *img_y);
 
 #ifdef __cplusplus
 }

@@ -81,7 +81,8 @@ typedef struct gui_text
     gui_color_t color;
     uint16_t len;
     uint16_t font_len;
-    uint16_t text_offset;
+    int16_t char_width_sum;
+    int16_t char_line_sum;
     TEXT_MODE mode;
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;

@@ -74,7 +74,7 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
     default:
         break;
     }
-    uint32_t all_char_w = 0;
+    int32_t all_char_w = 0;
     uint32_t line_flag = 0;
 
     if (crop)
@@ -223,22 +223,21 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
     case CENTER:
     case RIGHT:
         {
-            if (text->text_offset == 0)
-            {
-                text->text_offset = (text->base.w - all_char_w) / 2;
-            }
+            text->char_width_sum = all_char_w;
+            text->char_line_sum = 1;
+            int offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0);
             for (uint16_t i = 0; i < text->font_len; i++)
             {
                 chr[i].y = rect->y1;
                 if (i == 0)
                 {
-                    chr[i].x = rect->x1 + (text->base.w - all_char_w) / 2 * text->mode;
+                    chr[i].x = rect->x1 + offset * text->mode;
                 }
                 else
                 {
                     chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
                 }
-                if ((chr[i].x + chr[i].char_w) > rect->x2)
+                if ((chr[i].x + chr[i].char_w) >= rect->x2)
                 {
                     text->font_len = i;
                     break;
@@ -252,12 +251,13 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
         {
             gui_text_line_t *line_buf;
             uint32_t line = 0;
-            if (text->text_offset == 0)
+            if (text->char_line_sum == 0)
             {
-                text->text_offset = all_char_w / text->base.w + 1 + line_flag;
+                text->char_line_sum = all_char_w / text->base.w + 1 + line_flag;
+                text->char_width_sum = all_char_w;
             }
-            line_buf = gui_malloc((text->text_offset + 1) * sizeof(gui_text_line_t));
-            memset(line_buf, 0, (text->text_offset + 1) * sizeof(gui_text_line_t));
+            line_buf = gui_malloc((text->char_line_sum + 1) * sizeof(gui_text_line_t));
+            memset(line_buf, 0, (text->char_line_sum + 1) * sizeof(gui_text_line_t));
             for (uint16_t i = 0; i < text->font_len; i++)
             {
                 // gui_log("chr[i].y_bound is %d, chr[i].h_bound is %d\n",chr[i].y_bound,chr[i].h_bound);
@@ -295,15 +295,14 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
                     line++;
                 }
             }
+            text->char_line_sum = line;
             gui_free(line_buf);
             break;
         }
     case SCROLL_X:
         {
-            if (text->text_offset == 0)
-            {
-                text->text_offset = all_char_w;
-            }
+            text->char_width_sum = all_char_w;
+            text->char_line_sum = 1;
             for (uint16_t i = 0; i < text->font_len; i++)
             {
                 chr[i].y = rect->y1;
@@ -343,7 +342,7 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
                     chr[i].x = rect->x1;
                 }
                 chr[i].y = rect->y1 + line * chr[i].h;
-                if (text->text_offset != 0)
+                if (text->char_line_sum != 0)
                 {
                     if (chr[i].y >= rect->yboundbottom)
                     {
@@ -352,9 +351,10 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
                     }
                 }
             }
-            if (text->text_offset == 0)
+            if (text->char_line_sum == 0)
             {
-                text->text_offset = line * text->font_height;
+                text->char_line_sum = line;
+                text->char_width_sum = all_char_w;
             }
             break;
         }
@@ -1110,15 +1110,37 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             }
             else if (buffer_bytes == 3)
             {
-                gui_log("this type font scale no support now!!! \n");
-                GUI_ASSERT(NULL != NULL);
+                uint8_t *writebuf = (uint8_t *)buffer + chr->x * buffer_bytes;
+
+                uint16_t write_color = rgba2565(color);
+                //Normal is 0x00,0x40,0x80,0xFF, modify to 0x00,0x40,0xA0,0xFF.By Luke
+                uint8_t alpha_output[4];
+                alpha_output[3] = 0xFF;
+                alpha_output[2] = 0xA0;
+                alpha_output[1] = 0x40;
+                alpha_output[0] = 0x00;
+
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * i * 3;
+                    int dots_off = (i - font_y) * (font_w / 4);
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        uint8_t alpha = dots[dots_off + (j - font_x) / 4] >> ((j - font_x) % 4 * 2);
+                        if (alpha != 0)
+                        {
+                            memcpy(writebuf + write_off + (j - x_start) * 3, &write_color, 2);
+                            writebuf[write_off + (j - x_start) * 3 + 2] = alpha_output[alpha & 0x03];
+                        }
+                    }
+                }
             }
             else if (buffer_bytes == 4)
             {
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
 
-                gui_color_t write_color = color;
                 uint32_t color_output[4];
+                gui_color_t write_color = color;
                 uint8_t temp_b = write_color.color.rgba.b;
                 write_color.color.rgba.b = write_color.color.rgba.r;
                 write_color.color.rgba.r = temp_b;
@@ -1176,13 +1198,45 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             }
             else if (buffer_bytes == 3)
             {
-                gui_log("this type font scale no support now!!! \n");
-                GUI_ASSERT(NULL != NULL);
+                uint8_t *writebuf = (uint8_t *)buffer + chr->x * buffer_bytes;
+
+                uint16_t write_color = rgba2565(color);
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * i * 3;
+                    int dots_off = (i - font_y) * (font_w / 2);
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
+                        if (alpha != 0)
+                        {
+                            memcpy(writebuf + write_off + (j - x_start) * 3, &write_color, 2);
+                            writebuf[write_off + (j - x_start) * 3 + 2] = (alpha & 0x0f) * 17;
+                        }
+                    }
+                }
             }
             else if (buffer_bytes == 4)
             {
-                gui_log("this type font scale no support now!!! \n");
-                GUI_ASSERT(NULL != NULL);
+                uint32_t *writebuf = (uint32_t *)buffer + chr->x;
+                gui_color_t write_color = color;
+                uint8_t temp_b = write_color.color.rgba.b;
+                write_color.color.rgba.b = write_color.color.rgba.r;
+                write_color.color.rgba.r = temp_b;
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * i;
+                    int dots_off = (i - font_y) * (font_w / 2);
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        uint8_t alpha = dots[dots_off + (j - font_x) / 2] >> ((j - font_x) % 2 * 4);
+                        if (alpha != 0)
+                        {
+                            write_color.color.rgba.a = (alpha & 0x0f) * 17;
+                            writebuf[write_off + j - x_start] = write_color.color.rgba_full;
+                        }
+                    }
+                }
             }
         }
         break;
@@ -1195,8 +1249,23 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             }
             else if (buffer_bytes == 3)
             {
-                gui_log("this type font scale no support !!! \n");
-                GUI_ASSERT(NULL != NULL);
+                uint8_t *writebuf = (uint8_t *)buffer + chr->x * buffer_bytes;
+
+                uint16_t write_color = rgba2565(color);
+                for (uint32_t i = y_start; i < y_end; i++)
+                {
+                    int write_off = buf_width * i * 3;
+                    int dots_off = (i - font_y) * font_w;
+                    for (uint32_t j = x_start; j < x_end; j++)
+                    {
+                        uint8_t alpha = dots[dots_off + j - font_x];
+                        if (alpha != 0)
+                        {
+                            memcpy(writebuf + write_off + (j - x_start) * 3, &write_color, 2);
+                            writebuf[write_off + (j - x_start) * 3 + 2] = alpha;
+                        }
+                    }
+                }
             }
             else if (buffer_bytes == 4)
             {
@@ -1208,14 +1277,14 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
                     int write_off = buf_width * i;
+                    int dots_off = (i - font_y) * font_w;
                     for (uint32_t j = x_start; j < x_end; j++)
                     {
-                        uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
+                        uint8_t alpha = dots[dots_off + j - font_x];
                         if (alpha != 0)
                         {
                             write_color.color.rgba.a = alpha;
                             writebuf[write_off + j - x_start] = write_color.color.rgba_full;
-                            // gui_log("write_off + j - x_start %d \n",write_off + j - x_start);
                         }
                     }
                 }
@@ -1250,6 +1319,10 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
             else if (buffer_bytes == 4)
             {
                 uint32_t *writebuf = (uint32_t *)buffer + chr->x;
+                gui_color_t write_color = color;
+                uint8_t temp_b = write_color.color.rgba.b;
+                write_color.color.rgba.b = write_color.color.rgba.r;
+                write_color.color.rgba.r = temp_b;
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
                     int write_off = buf_width * i ;
@@ -1258,7 +1331,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                     {
                         if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
                         {
-                            writebuf[write_off + j - x_start] = color.color.rgba_full;
+                            writebuf[write_off + j - x_start] = write_color.color.rgba_full;
                         }
                     }
                 }
@@ -1270,7 +1343,8 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
     }
 }
 
-void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
+void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *img_x,
+                       int16_t *img_y)
 {
     int16_t buf_width = 0;
     int16_t buf_height = 0;
@@ -1281,16 +1355,20 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
     rect.y1 = 0;
     rect.x2 = rect.x1 + text->base.w;
     rect.y2 = rect.y1 + text->base.h;
-
+    TEXT_MODE mode = text->mode;
+    if (text->mode == CENTER || RIGHT)
+    {
+        text->mode  = LEFT;
+    }
     gui_font_mem_load(text, &rect);
-
+    text->mode = mode;
     switch (font_img_type)
     {
     case RGB565:
         font_img_pixel_bytes = 2;
         break;
-    // case ARGB8565:
-    case RGB888:
+    case ARGB8565:
+        // case RGB888:
         font_img_pixel_bytes = 3;
         break;
     case RGBA8888:
@@ -1307,23 +1385,23 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type)
     switch (text->mode)
     {
     case LEFT:
-        buf_width = text->base.w - text->text_offset * 2;
-        buf_height = text->font_height;
-        break;
     case CENTER:
-        buf_width = text->base.w - text->text_offset;
-        buf_height = text->font_height;
-        break;
     case RIGHT:
-        buf_width = text->base.w;
-        buf_height = text->font_height;
-        break;
+        {
+            int offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0);
+            buf_width = text->base.w - offset * 2;
+            buf_height = text->font_height;
+            *img_x = offset * text->mode;
+            break;
+        }
     case MULTI_LEFT:
     case MULTI_CENTER:
     case MULTI_RIGHT:
-        buf_width = text->base.w;
-        buf_height = text->font_height * text->text_offset;
-        break;
+        {
+            buf_width = text->base.w;
+            buf_height = text->font_height * text->char_line_sum;
+            break;
+        }
     // case SCROLL_X:
     // case SCROLL_Y:
     default:
@@ -1425,7 +1503,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
         }
         break;
     case UTF_16_CHARSET:
-        unicode_len = string_len;
+        unicode_len = string_len / 2;
         unicode_buffer = (uint16_t *)content;
         break;
     default:
