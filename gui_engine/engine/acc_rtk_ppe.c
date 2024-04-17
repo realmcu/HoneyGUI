@@ -174,7 +174,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 ppe_rect_t range;
                 ppe_rect_t scale_rect;
                 memset(&scaled_img, 0, sizeof(ppe_buffer_t));
-
+                if (image->blend_mode == IMG_FILTER_BLACK)
+                {
+                    scaled_img.color_key_en = true;
+                    scaled_img.color_key_value = 0x00000000;
+                    mode = PPE_SRC_OVER_MODE;
+                }
                 trans.x = rect->x1 - dc->section.x1;
                 trans.y = 0;
                 if (rect->y1 < dc->section.y1)
