@@ -22,6 +22,10 @@
 #include "acc_engine.h"
 #include "gui_win.h"
 
+#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+#include "js_extern_io.h"
+#endif
+
 #define MAX_MSG_EVENT_CNT   32
 static void *gui_server_mq = NULL;
 static void (*gui_task_ext_execution_hook)(void) = NULL;
@@ -84,6 +88,12 @@ static void gui_server_msg_handler(gui_obj_t *screen, gui_msg_t *msg)
         }
         event_handle = false;
     }
+#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+    else if (msg->type == GUI_EVENT_EXTERN_IO_JS)
+    {
+        gui_extern_event_js_handler(msg);
+    }
+#endif
     else
     {
         server_event_code = (gui_event_t)msg->type;

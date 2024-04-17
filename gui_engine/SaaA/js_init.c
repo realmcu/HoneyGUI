@@ -102,6 +102,7 @@ void js_init(void)
     js_gpio_init();
     //js_fs_init();
     wifi_init();
+    js_smarthome_init();
     js_matter_init();
     extern gui_app_t *get_app_launcher_frontend(void);
     gui_app_startup(get_app_launcher_frontend());

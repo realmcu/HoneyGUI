@@ -30,6 +30,7 @@
 #include "gui_server.h"
 #include "gui_switch.h"
 #include "gui_img.h"
+#include "guidef.h"
 
 #ifdef RTL87x2G
 #include "wdt.h"
@@ -51,8 +52,13 @@ typedef struct cb_arg
     jerry_value_t *args_p;
     jerry_size_t args_count;
 } cb_arg_t;
+
+
 void js_gpio_init();
 void wifi_init();
+void js_smarthome_init(void);
+
+
 #ifdef __cplusplus
 }
 #endif

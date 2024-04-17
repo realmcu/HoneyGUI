@@ -43,6 +43,7 @@ typedef enum
     GUI_EVENT_8,
 
     GUI_EVENT_DISPLAY_ON,
+    GUI_EVENT_EXTERN_IO_JS,  // extern io event: route to js middle layer
 
     GUI_EVENT_USER_DEFINE    = 0x100,
 } gui_event_t;
