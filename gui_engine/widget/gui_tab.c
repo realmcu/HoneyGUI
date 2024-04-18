@@ -146,7 +146,7 @@ static void tab_prepare(gui_obj_t *obj)
     {
         if (parent->tab_need_pre_load == true)
         {
-            gui_fb_change();
+
             if (tab_x_gap == 0)
             {
                 gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);

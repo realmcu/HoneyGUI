@@ -649,6 +649,7 @@ void gui_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot
     dc->shot_buf = shot_buf;
 
 
+    gui_fb_change();
     gui_fb_disp(obj);
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
 
