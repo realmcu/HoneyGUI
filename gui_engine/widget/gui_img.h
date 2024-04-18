@@ -257,6 +257,15 @@ void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *c
  */
 void gui_img_set_quality(gui_img_t *img, bool high_quality);
 
+/**
+ * @brief
+ *
+ * @param obj
+ * @param matrix
+ * @return gui_img_t*
+ */
+void gui_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
+
 #ifdef __cplusplus
 }
 #endif

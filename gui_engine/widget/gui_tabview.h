@@ -49,7 +49,6 @@ typedef struct
 {
     int32_t x;
     int32_t y;
-    int32_t z;
 } gui_tabview_tab_id_t;
 
 /** @brief  tabview structure */
@@ -64,12 +63,18 @@ typedef struct gui_tabview
     gui_tabview_tab_id_t cur_id;
     gui_jump_t jump;
     SLIDE_STYLE style;
+    int16_t release_x;
+    int16_t release_y;
     bool loop;
     bool loop_status;
     bool loop_status2;
-    int16_t release_x;
-    int16_t release_y;
+    bool enable_pre_load;
+    bool tab_change_ready;
+    bool tab_need_pre_load;
     bool tp_disable;
+    uint8_t *left_shot;
+    uint8_t *center_shot;
+    uint8_t *right_shot;
     uint8_t checksum;
 } gui_tabview_t;
 
@@ -176,6 +181,14 @@ void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not);
  * @param disable_tp true: disable tp action,  false: enable tp action.
  */
 void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp);
+
+/**
+ * @brief enable tab widget cache
+ *
+ * @param this
+ * @param cache
+ */
+void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable);
 
 /**
  * @brief Register callback for tab change.

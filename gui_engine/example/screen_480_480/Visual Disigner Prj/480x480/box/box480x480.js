@@ -34,13 +34,15 @@ function sleepflagTrue(params) {
     sleep_flag = true;
     //console.log('sleep_flag;'+sleep_flag)
 }
+// var sh_test = new SMTHM;
+
 function led1OnFunc(params) {
     //console.log('led1OnFunc')
     //console.log('sleep_flag;'+sleep_flag)
     if (sleep_flag) {
         LED1.writeSync(0)
     }
-    
+    // sh_test.test();
 }
 function led1OffFunc(params) {
     //console.log('led1OffFunc')
@@ -687,3 +689,45 @@ sw.getElementById('sw_wifi')
 sw.onOn(startSpeed)
 sw.onOff(stopSpeed)
 console.log('end wifi speed')
+
+//-------------------------------------------
+// wifi sync switch
+
+var sh_wifi = new SMTHM;
+
+var all_sw_id =[
+	'kitchen_switch',
+	'parlor_switch',
+	'bedroom_switch',
+	'bedroom_switch1',
+    'bedroom_switch2',
+    'porch_switch',
+	'bedroom_off',
+	'children',
+	'socket1',
+    'switch0',
+    'socket3'
+];
+
+function Wifi_sw(params) {
+    // console.log('enter  Wifi_sw')
+
+    var idx = params.idx;
+    var val = params.val;
+
+    // console.log(idx, '  ', val, ' ', all_sw_id[idx])
+
+    sw.getElementById(all_sw_id[idx]);
+    if(val)
+    {
+        sw.turnOn()
+    }
+    else
+    {
+        sw.turnOff()
+    }
+
+}
+sh_wifi.OnSyncSW(Wifi_sw);
+
+console.log('end js')

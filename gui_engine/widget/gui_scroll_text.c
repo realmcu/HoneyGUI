@@ -234,7 +234,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
 {
     gui_scroll_text_t *text = (gui_scroll_text_t *)obj;
     struct gui_dispdev *dc;
-    uint32_t offset;
+    int32_t offset;
     uint32_t index;
     gui_rect_t draw_rect = {0};
     uint32_t total_section_count;
@@ -249,25 +249,34 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     {
         cur_time_ms = gui_ms_get();
     }
-    offset = text->base.text_offset;
-    index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
-    text->cnt_value = (text->end_value + text->start_value + offset) * index
-                      / text->interval_time_ms;
 
-    if (text->base.mode == SCROLL_X && offset > obj->w)
+    if (text->base.mode == SCROLL_X)
     {
-
-        draw_rect.x1 = text->base.offset_x - text->cnt_value + text->start_value;
-        draw_rect.x2 = draw_rect.x1 + text->base.text_offset;
-        draw_rect.y1 = text->base.offset_y;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        offset = text->base.char_width_sum;
+        if (offset > obj->w)
+        {
+            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+            text->cnt_value = (text->end_value + text->start_value + offset) * index
+                              / text->interval_time_ms;
+            draw_rect.x1 = text->base.offset_x - text->cnt_value + text->start_value;
+            draw_rect.x2 = draw_rect.x1 + offset;
+            draw_rect.y1 = text->base.offset_y;
+            draw_rect.y2 = draw_rect.y1 + obj->h;
+        }
     }
-    else if (text->base.mode == SCROLL_Y && (offset > obj->h || offset == 0))
+    else if (text->base.mode == SCROLL_Y)
     {
-        draw_rect.x1 = text->base.offset_x;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y1 = text->base.offset_y - text->cnt_value + text->start_value;
-        draw_rect.y2 = draw_rect.y1 + text->base.text_offset;
+        offset = text->base.char_line_sum * text->base.font_height;
+        if (offset > obj->h || offset == 0)
+        {
+            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+            text->cnt_value = (text->end_value + text->start_value + offset) * index
+                              / text->interval_time_ms;
+            draw_rect.x1 = text->base.offset_x;
+            draw_rect.x2 = draw_rect.x1 + obj->w;
+            draw_rect.y1 = text->base.offset_y - text->cnt_value + text->start_value;
+            draw_rect.y2 = draw_rect.y1 + offset;
+        }
     }
     else
     {
@@ -376,7 +385,8 @@ void gui_scroll_text_content_set(gui_scroll_text_t *this, void *text, uint16_t l
 
 void gui_scroll_text_restart(gui_scroll_text_t *this)
 {
-    this->base.text_offset = 0;
+    this->base.char_width_sum = 0;
+    this->base.char_line_sum = 0;
     this->init_time_ms = gui_ms_get();
     gui_fb_change();
 }

@@ -7,6 +7,7 @@
 #include "trace.h"
 #include "draw_img.h"
 #include "guidef.h"
+#include "hal_imdc.h"
 
 #define _UI_MIN(x, y)           (((x)<(y))?(x):(y))
 #define _UI_MAX(x, y)           (((x)>(y))?(x):(y))
@@ -38,15 +39,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 
     if (dc->bit_depth == 16)
     {
-        target.format = PPE_BGR565;
+        target.format = PPE_RGB565;
     }
     else if (dc->bit_depth == 32)
     {
-        target.format = PPE_ABGR8888;
+        target.format = PPE_ARGB8888;
     }
     else if (dc->bit_depth == 24)
     {
-        target.format = PPE_BGR888;
+        target.format = PPE_RGB888;
     }
     target.memory = (void *)dc->frame_buf;
     target.address = (uint32_t)dc->frame_buf;
@@ -56,16 +57,16 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     switch (head->type)
     {
     case RGB565:
-        source.format = PPE_BGR565;
+        source.format = PPE_RGB565;
         break;
     case RGB888:
-        source.format = PPE_BGR888;
+        source.format = PPE_RGB888;
         break;
     case RGBA8888:
-        source.format = PPE_ABGR8888;
+        source.format = PPE_ARGB8888;
         break;
     case ARGB8565:
-        source.format = PPE_ABGR8565;
+        source.format = PPE_ARGB8565;
         break;
     default:
         return;
@@ -106,8 +107,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1))
             {
                 float scale_x = image->matrix->m[0][0], scale_y = image->matrix->m[1][1];
-                if ((image->img_w == (int)(image->img_w * scale_x)) &&
-                    (image->img_h == (int)(image->img_h * scale_y)))
+                if ((image->img_w == image->target_w) &&
+                    (image->img_h == image->target_h))
                 {
                     ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
                     if (head->compress)
@@ -123,14 +124,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                             }
                             else
                             {
-                                end_line = dc->section.y2 - rect->y1 - 1;
+                                end_line = dc->section.y2 - rect->y1;
                             }
                         }
                         else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
                         {
                             trans.y = 0;
                             start_line = dc->section.y1 - rect->y1;
-                            end_line = dc->section.y2 - rect->y1 - 1;
+                            end_line = dc->section.y2 - rect->y1;
                         }
                         else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
                                  && (dc->section.y1 < (rect->y1 + image->img_h)))
@@ -142,25 +143,20 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         source.height = end_line - start_line + 1;
                         const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                                                   struct gui_rgb_data_head));
-                        IMDC_decode_range range;
-                        range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
-                        range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
-                                           - range.start_column : header->raw_pic_width - 1;
-                        range.start_line = start_line;
-                        range.end_line = end_line;
-                        IMDC_DMA_config dma_cfg;
-                        source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
+                        hal_imdc_decompress_info info;
+                        info.start_column = rect->x1 < 0 ? -rect->x1 : 0;
+                        info.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                                          - info.start_column : header->raw_pic_width - 1;
+                        info.start_line = start_line;
+                        info.end_line = end_line;
+                        info.raw_data_address = (uint32_t)header;
+                        source.memory = gui_malloc((end_line - start_line + 1) * (info.end_column - info.start_column + 1)
                                                    * (header->algorithm_type.pixel_bytes + 2));
                         source.address = (uint32_t)source.memory;
-                        source.width = range.end_column - range.start_column + 1;
-                        dma_cfg.output_buf = (uint32_t *)source.memory;
-                        dma_cfg.RX_DMA_channel_num = 3;
-                        dma_cfg.TX_DMA_channel_num = 1;
-                        dma_cfg.RX_DMA_channel = GDMA_Channel3;
-                        dma_cfg.TX_DMA_channel = GDMA_Channel1;
+                        source.width = info.end_column - info.start_column + 1;
                         trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
-                        IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
-                        if (err)
+                        bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+                        if (!ret)
                         {
                             gui_free(source.memory);
                             return;
@@ -174,7 +170,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 ppe_rect_t range;
                 ppe_rect_t scale_rect;
                 memset(&scaled_img, 0, sizeof(ppe_buffer_t));
-
+                if (image->blend_mode == IMG_FILTER_BLACK)
+                {
+                    scaled_img.color_key_en = true;
+                    scaled_img.color_key_value = 0x00000000;
+                    mode = PPE_SRC_OVER_MODE;
+                }
                 trans.x = rect->x1 - dc->section.x1;
                 trans.y = 0;
                 if (rect->y1 < dc->section.y1)
@@ -214,36 +215,30 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     source.height = scale_rect.bottom - scale_rect.top + 1;
                     const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                                               struct gui_rgb_data_head));
-                    IMDC_decode_range range;
-                    range.start_column = scale_rect.left;
-                    range.end_column = scale_rect.right;
-                    range.start_line = scale_rect.top;
-                    range.end_line = scale_rect.bottom;
+                    hal_imdc_decompress_info info;
+                    info.start_column = scale_rect.left;
+                    info.end_column = scale_rect.right;
+                    info.start_line = scale_rect.top;
+                    info.end_line = scale_rect.bottom;
                     scale_rect.left = 0;
-                    scale_rect.right = range.end_column - range.start_column;
+                    scale_rect.right = info.end_column - info.start_column;
                     scale_rect.top = 0;
-                    scale_rect.bottom = range.end_line - range.start_line;
-                    IMDC_DMA_config dma_cfg;
+                    scale_rect.bottom = info.end_line - info.start_line;
+                    info.raw_data_address = (uint32_t)header;
                     source.memory = gui_malloc(source.height * header->raw_pic_width *
                                                (header->algorithm_type.pixel_bytes + 2));
                     source.address = (uint32_t)source.memory;
-                    dma_cfg.output_buf = (uint32_t *)source.memory;
-                    dma_cfg.RX_DMA_channel_num = 3;
-                    dma_cfg.TX_DMA_channel_num = 1;
-                    dma_cfg.RX_DMA_channel = GDMA_Channel3;
-                    dma_cfg.TX_DMA_channel = GDMA_Channel1;
-                    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
-                    if (err)
+                    bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+                    if (!ret)
                     {
                         gui_free(source.memory);
                         return;
                     }
                 }
-
+                scaled_img.format = source.format;
                 switch (source.format)
                 {
-                case PPE_BGR565:
-                    scaled_img.format = PPE_BGR565;
+                case PPE_RGB565:
                     if (dc->type == DC_SINGLE)
                     {
                         //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 2);
@@ -253,9 +248,8 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * 2);
                     }
                     break;
-                case PPE_BGR888:
-                case PPE_ABGR8565:
-                    scaled_img.format = PPE_BGR888;
+                case PPE_RGB888:
+                case PPE_ARGB8565:
                     if (dc->type == DC_SINGLE)
                     {
                         //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 3);
@@ -265,8 +259,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         scaled_img.memory = gui_malloc(scaled_img.width * scaled_img.height * 3);
                     }
                     break;
-                case PPE_BGRA8888:
-                    scaled_img.format = PPE_BGRA8888;
+                case PPE_ARGB8888:
                     if (dc->type == DC_SINGLE)
                     {
                         //scaled_img.memory = tlsf_malloc(tlsf, scaled_img.width * (dc->section.y2 - dc->section.y1 + (int)acc_ppe_ceil(scale_y)) * 4);
@@ -313,14 +306,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                         }
                         else
                         {
-                            end_line = dc->section.y2 - rect->y1 - 1;
+                            end_line = dc->section.y2 - rect->y1;
                         }
                     }
                     else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
                     {
                         trans.y = 0;
                         start_line = dc->section.y1 - rect->y1;
-                        end_line = dc->section.y2 - rect->y1 - 1;
+                        end_line = dc->section.y2 - rect->y1;
                     }
                     else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
                              && (dc->section.y1 < (rect->y1 + image->img_h)))
@@ -332,25 +325,20 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     source.height = end_line - start_line + 1;
                     const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                                               struct gui_rgb_data_head));
-                    IMDC_decode_range range;
-                    range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
-                    range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
-                                       - range.start_column : header->raw_pic_width - 1;
-                    range.start_line = start_line;
-                    range.end_line = end_line;
-                    IMDC_DMA_config dma_cfg;
-                    source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
+                    hal_imdc_decompress_info info;
+                    info.start_column = rect->x1 < 0 ? -rect->x1 : 0;
+                    info.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                                      - info.start_column : header->raw_pic_width - 1;
+                    info.start_line = start_line;
+                    info.end_line = end_line;
+                    info.raw_data_address = (uint32_t)header;
+                    source.memory = gui_malloc((end_line - start_line + 1) * (info.end_column - info.start_column + 1)
                                                * (header->algorithm_type.pixel_bytes + 2));
                     source.address = (uint32_t)source.memory;
-                    source.width = range.end_column - range.start_column + 1;
-                    dma_cfg.output_buf = (uint32_t *)source.memory;
-                    dma_cfg.RX_DMA_channel_num = 3;
-                    dma_cfg.TX_DMA_channel_num = 1;
-                    dma_cfg.RX_DMA_channel = GDMA_Channel3;
-                    dma_cfg.TX_DMA_channel = GDMA_Channel1;
+                    source.width = info.end_column - info.start_column + 1;
                     trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
-                    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
-                    if (err)
+                    bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+                    if (!ret)
                     {
                         gui_free(source.memory);
                         return;
@@ -390,14 +378,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                 }
                 else
                 {
-                    end_line = dc->section.y2 - rect->y1 - 1;
+                    end_line = dc->section.y2 - rect->y1;
                 }
             }
             else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
             {
                 trans.y = 0;
                 start_line = dc->section.y1 - rect->y1;
-                end_line = dc->section.y2 - rect->y1 - 1;
+                end_line = dc->section.y2 - rect->y1;
             }
             else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
                      && (dc->section.y1 < (rect->y1 + image->img_h)))
@@ -453,40 +441,19 @@ bool hw_acc_imdc_decode(draw_img_t *image, gui_rect_t *rect, uint8_t *output)
     memset(&output_header, 0, sizeof(struct gui_rgb_data_head));
     const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                               struct gui_rgb_data_head));
-    if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_16BIT)
-    {
-        output_header.type = RGB565;
-    }
-    else if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_32BIT)
-    {
-        output_header.type = RGBA8888;
-    }
-    else if (header->algorithm_type.pixel_bytes == PIXEL_SIZE_24BIT)
-    {
-        output_header.type = RGB888;
-    }
-    else
-    {
-        return false;
-    }
+    output_header.type = head->type;
 
-    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
-    IMDC_decode_range range;
-    range.start_column = rect->x1;
-    range.end_column = rect->x2;
-    range.start_line = rect->y1;
-    range.end_line = rect->y2;
-    output_header.w = range.end_column - range.start_column + 1;
-    output_header.h = range.end_line - range.start_line + 1;
-    IMDC_DMA_config dma_cfg;
-    dma_cfg.output_buf = (uint32_t *)(output + 8);
-    dma_cfg.RX_DMA_channel_num = 3;
-    dma_cfg.TX_DMA_channel_num = 1;
-    dma_cfg.RX_DMA_channel = GDMA_Channel3;
-    dma_cfg.TX_DMA_channel = GDMA_Channel1;
-    IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
+    hal_imdc_decompress_info info;
+    info.start_column = rect->x1;
+    info.end_column = rect->x2;
+    info.start_line = rect->y1;
+    info.end_line = rect->y2;
+    info.raw_data_address = (uint32_t)header;
+    output_header.w = info.end_column - info.start_column + 1;
+    output_header.h = info.end_line - info.start_line + 1;
+    bool ret = hal_imdc_decompress(&info, (uint8_t *)(output + 8));
 
-    if (err == IMDC_SUCCESS)
+    if (!ret)
     {
         memcpy(output, &output_header, sizeof(gui_rgb_data_head_t));
         return true;
@@ -495,4 +462,12 @@ bool hw_acc_imdc_decode(draw_img_t *image, gui_rect_t *rect, uint8_t *output)
     {
         return false;
     }
+}
+
+void hw_acc_init(void)
+{
+    RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
+    RCC_PeriphClockCmd(APBPeriph_PPE, APBPeriph_PPE_CLOCK, ENABLE);
+    uint8_t dma_channl1 = 1, dma_channel2 = 3;
+    hal_dma_channel_init(&dma_channl1, &dma_channel2);
 }

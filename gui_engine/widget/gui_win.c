@@ -205,8 +205,8 @@ static void win_destory(gui_obj_t *obj)
     }
 }
 
-static void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                         int16_t y, int16_t w, int16_t h)
+void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
+                  int16_t y, int16_t w, int16_t h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     GET_BASE(this)->obj_prepare = win_prepare;
@@ -270,8 +270,17 @@ void gui_win_onClick(gui_win_t *b, void *callback, void *parameter)
 gui_win_t *gui_win_create(void *parent, const char *filename, int16_t x, int16_t y,
                           int16_t w, int16_t h)
 {
-#define _GUI_NEW_gui_win_create_param this, parent, filename, x, y, w, h
-    GUI_NEW(gui_win_t, gui_win_ctor, _GUI_NEW_gui_win_create_param)
+    gui_win_t *this = gui_malloc(sizeof(gui_win_t));
+    memset(this, 0, sizeof(gui_win_t));
+    gui_win_ctor(this, parent, filename, x, y, w, h);
+    gui_list_init(&(((gui_obj_t *)this)->child_list));
+    if ((((gui_obj_t *)this)->parent) != ((void *)0))
+    {
+        gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
+                               &(((gui_obj_t *)this)->brother_list));
+    }
+    ((gui_obj_t *)this)->create_done = true;
+    return this;
 }
 
 /** End of WIDGET_Exported_Functions

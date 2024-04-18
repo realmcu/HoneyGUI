@@ -134,6 +134,19 @@ void gui_obj_ctor(struct _gui_obj_t *this, struct _gui_obj_t *parent, const char
 
 
 /**
+ * @brief
+ *
+ * @param parent
+ * @param filename
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ * @return gui_obj_t*
+ */
+gui_obj_t *gui_obj_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w,
+                          int16_t h);
+/**
   * @brief create event widget
   * @param  obj
   * @param  event_cb switching events

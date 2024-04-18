@@ -136,6 +136,20 @@ typedef enum dc_type
     DC_DOUBLE,
 } gui_dc_type_t;
 
+typedef struct _gui_frame_monitor_t
+{
+    uint32_t start;
+    void (*start_cb)(void);
+    uint32_t input_prepare;
+    void (*input_prepare_cb)(void);
+    uint32_t draw_prepare;
+    void (*draw_prepare_cb)(void);
+    uint32_t draw;
+    void (*draw_cb)(void);
+    uint32_t end;
+    void (*end_cb)(void);
+} gui_frame_monitor_t;
+
 typedef struct gui_dispdev
 {
     /* width and height */
@@ -151,15 +165,16 @@ typedef struct gui_dispdev
     char gpu_type;
     /* pixel data */
     uint8_t *frame_buf;
+    uint8_t *shot_buf;
     uint8_t *disp_buf_1;
     uint8_t *disp_buf_2;
     float scale_x;
     float scale_y;
     gui_rect_t section;
-    //uint16_t section_height;
     uint32_t section_count;
     uint8_t bit_depth;
     void (*lcd_update)(struct gui_dispdev *dc);
+    void (*virtual_lcd_update)(struct gui_dispdev *dc);
     int (*flash_seq_trans_enable)(void);
     int (*flash_seq_trans_disable)(void);
     uint32_t (*get_lcd_us)(void);
@@ -168,6 +183,8 @@ typedef struct gui_dispdev
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
     void (*lcd_draw_sync)(void);
+    uint32_t frame_count;
+    gui_frame_monitor_t (*lcd_frame_monitor);
 } gui_dispdev_t;
 typedef struct
 {
@@ -343,11 +360,12 @@ typedef enum obj_type
     MACRO_ANIMATETRANSFORM,
     HONEYCOMB_LIST,
     WHEEL_LIST,
+    QRCODE,
 } obj_type_t;
 typedef struct gui_msg
 {
     /* the event type */
-    uint8_t type;
+    uint16_t type;
     /* user field of event */
     union
     {
@@ -548,7 +566,16 @@ extern char *defaultPath;
     GET_BASE(this)->create_done = true;\
     /*todo exit critical section*/\
     return this;
-
+#define GUI_CREATE_HELPER(type, constructor_cb, param) type *this = gui_malloc(sizeof(type));\
+    memset(this, 0, sizeof(type));\
+    constructor_cb(param);\
+    /*todo enter critical section*/\
+    gui_list_init(&(GET_BASE(this)->child_list));\
+    if ((GET_BASE(this)->parent) != NULL)\
+    {\
+        gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));\
+    }\
+    GET_BASE(this)->create_done = true;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
 #define GUI_FRAME_STEP 50

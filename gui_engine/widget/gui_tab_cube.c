@@ -94,7 +94,7 @@ void gui_tab_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     float w = this->base.w;
     float h = this->base.h;
-    float d = w;
+    float d = (w + h) / 2;
 
     Vertex_t v0 = {-w, -h, d};
     Vertex_t v1 = {w,  -h, d};
@@ -135,9 +135,6 @@ void gui_tab_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     gui_matrix_t temp;
     matrix_transfrom_blit(this->base.w, this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
                           &temp);
-
-    // int32_t id_x = parent->cur_id.x;
-    // int32_t id_y = parent->cur_id.y;
 
 #if 1
     if (rv0.x > rv1.x)

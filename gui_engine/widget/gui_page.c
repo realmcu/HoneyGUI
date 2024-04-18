@@ -728,7 +728,14 @@ void gui_page_set_only_top_slide(gui_page_t *page, bool flag)
 }
 static void dtor(gui_obj_t *obj)
 {
-    gui_free(GUI_TYPE(gui_page_t, obj)->animate);
+    if (GUI_TYPE(gui_page_t, obj)->animate)
+    {
+        gui_free(GUI_TYPE(gui_page_t, obj)->animate);
+    }
+}
+void gui_page_dtor(gui_obj_t *obj)
+{
+    dtor(obj);
 }
 /** End of WIDGET_Exported_Functions
   * @}

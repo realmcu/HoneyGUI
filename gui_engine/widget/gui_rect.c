@@ -148,20 +148,20 @@ gui_img_t *gui_rect_round(gui_obj_t *parent, int x, int y, int w, int h, gui_col
         gui_img_t *img = gui_img_create_from_mem(img_left_top, "left buttom", image_file_addr, x2, y2, 0,
                                                  0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_translate(img, rx / 2, ry / 2 - 1);
+        gui_img_translate(img, rx / 2, ry / 2);
         gui_img_rotation(img, -90, rx / 2, ry / 2);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(img_left_top, "right top", image_file_addr, x3, y3, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_translate(img, rx / 2 - 1, ry / 2);
+        gui_img_translate(img, rx / 2, ry / 2);
         gui_img_rotation(img, 90, rx / 2, ry / 2);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(img_left_top, "right buttom", image_file_addr, x4, y4, 0,
                                                  0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        gui_img_translate(img, rx / 2 - 1, ry / 2 - 1);
+        gui_img_translate(img, rx / 2, ry / 2);
         gui_img_rotation(img, -180, rx / 2, ry / 2);
     }
     return img_left_top;

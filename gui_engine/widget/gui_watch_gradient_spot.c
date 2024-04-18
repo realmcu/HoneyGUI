@@ -17,12 +17,12 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
-#include <gui_matrix.h>
-#include <gui_obj.h>
-#include "gui_watch_gradient_spot.h"
 #include <math.h>
+#include "guidef.h"
+#include "gui_matrix.h"
+#include "gui_obj.h"
+#include "gui_watch_gradient_spot.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -60,9 +60,6 @@
   * @{
   */
 
-#define WATCH_GRADIENT_SPOT_BASE 454.0f
-#define WATCH_GRADIENT_SPOT_SCLAE     ((float)(GET_BASE(this)->w)/WATCH_GRADIENT_SPOT_BASE)
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -85,7 +82,7 @@
   * @{
   */
 
-static void watch_gradient_spot_prepare(gui_obj_t *obj)
+static void gui_watch_gradient_spot_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
     gui_dispdev_t *dc = gui_get_dc();
@@ -98,7 +95,7 @@ static void watch_gradient_spot_prepare(gui_obj_t *obj)
     GUI_UNUSED(cy);
 }
 
-static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext *vg)
+static void gui_watch_gradient_spot_draw(T_GUI_WATCH_GRADIENT_SPOT *this, NVGcontext *vg)
 {
     uint32_t cx = this->c_x;
     uint32_t cy = this->c_y;
@@ -178,7 +175,6 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgFill(vg);
     }
 
-
     {
         nvgBeginPath(vg);
         nvgMoveTo(vg, arc_data2[0], arc_data2[1]);
@@ -222,7 +218,6 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         float x = width / 2;
         float y = height - 40 * WATCH_GRADIENT_SPOT_SCLAE;
 
-
         nvgResetTransform(vg);
         nvgTransform(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
                      obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
@@ -253,7 +248,6 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgFill(vg);
     }
 
-
     {
         //for hour point
         nvgResetTransform(vg);
@@ -274,7 +268,6 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgFill(vg);
     }
 
-
     {
         //for center point
         nvgResetTransform(vg);
@@ -285,42 +278,42 @@ static void draw_watch_gradient_spot(gui_watch_gradient_spot_t *this, NVGcontext
         nvgFillColor(vg, nvgRGBA(0x41, 0x5d, 0x1E, 255));
         nvgFill(vg);
     }
-
 }
 
-static void watch_gradient_spot_draw_cb(gui_obj_t *obj)
+static void gui_watch_gradient_spot_draw_cb(gui_obj_t *obj)
 {
-    gui_watch_gradient_spot_t *this = (gui_watch_gradient_spot_t *)obj;
+    T_GUI_WATCH_GRADIENT_SPOT *this = (T_GUI_WATCH_GRADIENT_SPOT *)obj;
     gui_dispdev_t *dc = gui_get_dc();
-    extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
-                                     uint8_t *data);
-    extern void nvgDeleteAGGE(NVGcontext * ctx);
+
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
                                    (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
 
     nvgResetTransform(vg);
 
-    draw_watch_gradient_spot(this, vg);
+    gui_watch_gradient_spot_draw(this, vg);
 
     nvgEndFrame(vg);
     nvgDeleteAGGE(vg);
 }
-static void watch_gradient_spot_end(gui_obj_t *obj)
+
+static void gui_watch_gradient_spot_end(gui_obj_t *obj)
 {
 
 }
-static void watch_gradient_spot_destory(gui_obj_t *obj)
+
+static void gui_watch_gradient_spot_destory(gui_obj_t *obj)
 {
 
 }
 
-
-
-static void watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this, gui_obj_t *parent,
-                                     const char *name,
-                                     int16_t x,
-                                     int16_t y, int16_t w, int16_t h)
+static void gui_watch_gradient_spot_ctor(T_GUI_WATCH_GRADIENT_SPOT *this,
+                                         gui_obj_t                 *parent,
+                                         const char                *name,
+                                         int16_t                   x,
+                                         int16_t                   y,
+                                         int16_t                   w,
+                                         int16_t                   h)
 {
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
@@ -329,13 +322,10 @@ static void watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this, gui_obj_t 
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = watch_gradient_spot_prepare;
-    root->obj_draw = watch_gradient_spot_draw_cb;
-    root->obj_end = watch_gradient_spot_end;
-    root->obj_destory = watch_gradient_spot_destory;
-
-    //for self
-
+    root->obj_prepare = gui_watch_gradient_spot_prepare;
+    root->obj_draw = gui_watch_gradient_spot_draw_cb;
+    root->obj_end = gui_watch_gradient_spot_end;
+    root->obj_destory = gui_watch_gradient_spot_destory;
 }
 
 
@@ -343,25 +333,31 @@ static void watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this, gui_obj_t 
  *                           Public Functions
  *============================================================================*/
 
-void gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c_x, float c_y)
+void gui_watch_gradient_spot_set_center(T_GUI_WATCH_GRADIENT_SPOT *this, float c_x, float c_y)
 {
     this->c_x = c_x;
     this->c_y = c_y;
 }
 
-gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const char *name,
-                                                          int16_t x, int16_t y, int16_t w, int16_t h)
+T_GUI_WATCH_GRADIENT_SPOT *gui_watch_gradient_spot_create(void       *parent,
+                                                          const char *name,
+                                                          int16_t    x,
+                                                          int16_t    y,
+                                                          int16_t    w,
+                                                          int16_t    h)
 {
     GUI_ASSERT(parent != NULL);
+
     if (name == NULL)
     {
         name = "watch_gradient_spot";
     }
-    gui_watch_gradient_spot_t *this = gui_malloc(sizeof(gui_watch_gradient_spot_t));
-    GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(gui_watch_gradient_spot_t));
 
-    watch_gradient_spot_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
+    T_GUI_WATCH_GRADIENT_SPOT *this = gui_malloc(sizeof(T_GUI_WATCH_GRADIENT_SPOT));
+    GUI_ASSERT(this != NULL);
+    memset(this, 0x00, sizeof(T_GUI_WATCH_GRADIENT_SPOT));
+
+    gui_watch_gradient_spot_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -381,9 +377,3 @@ gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const c
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-

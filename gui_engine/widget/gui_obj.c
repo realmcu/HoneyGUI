@@ -83,6 +83,21 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+gui_obj_t *gui_obj_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w,
+                          int16_t h)
+{
+    gui_obj_t *this = gui_malloc(sizeof(gui_obj_t));
+    memset(this, 0, sizeof(gui_obj_t));
+    gui_obj_ctor(this, parent, filename, x, y, w, h);
+
+    gui_list_init(&(this->child_list));
+    if ((this->parent) != ((void *)0))
+    {
+        gui_list_insert_before(&(this->parent->child_list), &(this->brother_list));
+    }
+    this->create_done = true;
+    return this;
+}
 void gui_obj_ctor(gui_obj_t *this, gui_obj_t *parent, const char *name, int16_t x, int16_t y,
                   int16_t w, int16_t h)
 {
@@ -259,7 +274,6 @@ gui_obj_t *gui_tree_get_root(gui_obj_t *obj)
 
 void gui_obj_show(void *obj, bool show_info)
 {
-    // gui_log("%p",obj);
     if (obj != NULL)
     {
         GET_BASE(obj)->not_show = !show_info;

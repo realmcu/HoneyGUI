@@ -19,14 +19,8 @@
  *============================================================================*/
 #include <guidef.h>
 #include <gui_return.h>
-#include "gui_obj.h"
-#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-#include "gui_app.h"
-#endif
-#include "gui_img.h"
 #include "tp_algo.h"
-
-
+#include <gui_obj.h>
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -85,92 +79,104 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+#define RETURN_HEIGHT 100
 
-static void screen_backfunc()
-{
-#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    gui_app_t *app = gui_current_app();
-    extern void *get_app_launcher_frontend(void);
-    gui_switch_app(app, get_app_launcher_frontend());
-#endif
-}
-void return_update_att(gui_obj_t *obj)
+static void preapre(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    gui_return_t *this = (gui_return_t *)obj;
-    if (tp->type == TOUCH_HOLD_X)
-    {
-        if (tp->x > 0 && tp->x < 20 && tp->deltaX < 100 && tp->y > (gui_get_screen_height() - 100))
-        {
-            gui_img_set_attribute(this->return_img_left, NULL, NULL, tp->deltaX - 100,
-                                  this->return_img_left->base.y);
-            this->hit = true;
-        }
-        else if (tp->x > (gui_get_screen_width() - 20) && tp->x < gui_get_screen_width() &&
-                 tp->deltaX > -100 && tp->y > (gui_get_screen_height() - 100))
-        {
-            gui_img_set_attribute(this->return_img_right, NULL, NULL, tp->deltaX + gui_get_screen_width(),
-                                  this->return_img_right->base.y);
-            this->hit = true;
-        }
-        else
-        {
-            //this->hit = false;
-        }
+    gui_seekbar_t *circle = &(((gui_return_t *)obj)->base);
 
-    }
-    else if (tp->released)
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
-        if (this->hit)
+        static bool enable;
+        static bool return_flag;
+        int pro = 0;
+#define RETURN_ENABLE_THREHOLD 10
+#define RETURN_THREHOLD 80
+        if (tp->pressed && tp->x < RETURN_ENABLE_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
         {
-            this->hit = false;
-            if (tp->deltaX > 99 || tp->deltaX < -99)
+            enable = 1;
+            if (GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget)
             {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 1;
             }
-            gui_img_set_attribute(this->return_img_left, NULL, NULL, -100, this->return_img_left->base.y);
-            gui_img_set_attribute(this->return_img_right, NULL, NULL, gui_get_screen_width(),
-                                  this->return_img_right->base.y);
+            GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
+            if (GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y > (int)gui_get_screen_height())
+            {
+                GET_BASE(circle->base.c)->y = (int)gui_get_screen_height() - RETURN_HEIGHT - obj->y;
+            }
+            gui_progressbar_set_progress((void *)circle, pro);
         }
+        if (tp->released)
+        {
+            enable = 0;
+            if (GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget)
+            {
+                GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 0;
+            }
+            gui_progressbar_set_progress((void *)circle, pro);
+            if (return_flag)
+            {
+                return_flag = 0;
+                gui_obj_event_set(obj, GUI_EVENT_1);
+            }
 
+        }
+        if (enable)
+        {
+            if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
+            {
+                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                {
+                    pro = tp->x + tp->deltaX - 0;
+                    if (pro <= 0) { pro = 1; }
+                    if (pro >= obj->w) { pro = obj->w; }
+                    if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
+                    {
+                        pro = pro * (circle->base.max - 2) / obj->w;
 
+                    }
+                    gui_progressbar_set_progress((void *)circle, pro);
+                    if (tp->deltaX >= RETURN_THREHOLD)
+                    {
+                        return_flag = 1;
+                    }
+                    else
+                    {
+                        return_flag = 0;
+                    }
+
+                }
+            }
+        }
     }
-
 }
 
-
-void gui_return_ctor(gui_return_t *this, gui_obj_t *parent, const char *widgetame)
+static void ctor(gui_return_t *this, gui_obj_t *parent, const uint32_t *frame_array[],
+                 int array_size, void *return_cb, gui_obj_t *ignore_gesture_widget)
 {
-    gui_obj_ctor(&this->base, parent, widgetame, 0, 0, 0, 0);
-    ((gui_obj_t *)this)->type = RETURNWIDGET;
-    this->base.obj_prepare = return_update_att;
+    extern void gui_seekbar_ctor_movie_h(gui_seekbar_t *this, gui_obj_t *parent, void  **picture_array,
+                                         uint16_t array_length, int16_t x, int16_t y);
+    gui_seekbar_ctor_movie_h((void *)this, parent, (void *)frame_array, array_size, 0,
+                             (int)gui_get_screen_height() - (int)gui_get_screen_height() * 2 / 3);
+    this->ignore_gesture_widget = ignore_gesture_widget;
+    GET_BASE(this)->obj_prepare = preapre;
+    gui_obj_add_event_cb(this, (gui_event_cb_t)return_cb, GUI_EVENT_1, this);
+    GET_BASE(this)->w = RETURN_HEIGHT;
+    GET_BASE(this)->h = (int)gui_get_screen_height() * 2 / 3;
+    gui_img_set_mode((void *)this->base.base.c, IMG_SRC_OVER_MODE);
 }
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-gui_return_t *gui_return_create(void *parent)
+gui_return_t *gui_return_create(void *parent, const uint32_t *frame_array[], int array_size,
+                                void *return_cb, gui_obj_t *ignore_gesture_widget)
 {
-
     gui_return_t *this = gui_malloc(sizeof(gui_return_t));
     memset(this, 0, sizeof(gui_return_t));
-    gui_return_ctor(this, parent, "return");
-    gui_list_init(&(((gui_obj_t *)this)->child_list));
-    if ((((gui_obj_t *)this)->parent) != ((void *)0))
-    {
-        gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
-                               &(((gui_obj_t *)this)->brother_list));
-
-    }
-    gui_obj_add_event_cb(this, (gui_event_cb_t)screen_backfunc, GUI_EVENT_TOUCH_CLICKED, NULL);
-    this->return_img_left = (void *)gui_img_create_from_mem(this, "image",
-                                                            gui_get_file_address("app/system/resource/back_left.bin"),
-                                                            -100, gui_get_screen_height() - 200, 0, 0);
-    this->return_img_right = (void *)gui_img_create_from_mem(this, "image",
-                                                             gui_get_file_address("app/system/resource/back_right.bin"),
-                                                             gui_get_screen_width(), gui_get_screen_height() - 200, 0, 0);
-
+    ctor(this, parent, frame_array, array_size, return_cb, ignore_gesture_widget);
     ((gui_obj_t *)this)->create_done = 1;
     return this;
 

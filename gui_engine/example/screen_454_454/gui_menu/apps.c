@@ -7,17 +7,22 @@
 #include "gui_text.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
+#include "gui_return.h"
+#include<stdio.h>
+#include<time.h>
 #define APP_HEART_RATE
 #define APP_CLOCK
 #define APP_WATCH_FACE
 #define APP_CALCULATOR
 #define APP_SPORT
 #define APP_MENU
-GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design)
+#define APP_STOPWATCH
+GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
 GUI_APP_DEFINE(APP_CALCULATOR, app_hr_ui_design)
 GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
+GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
@@ -39,7 +44,8 @@ static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
 static void status_bar(void *parent, gui_obj_t *ignore_gesture);
 static void status_bar_ani(gui_obj_t *ignore_gesture);
-static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture);
+#define RETURN_ARRAY_SIZE 17
+extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, PAGE_NAME, 0, 0, 0, 0);
@@ -169,10 +175,9 @@ static void app_hr_ui_design(gui_app_t *app)
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
     }
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_onRight(win, win_cb, win);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
-    return_widget(GUI_APP_ROOT_SCREEN, (void *)page);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)page);
 }
 static void heart_ani_cb(gui_img_t *img)
 {
@@ -244,40 +249,100 @@ static void win_cb(gui_win_t *win)
 
 #define TIME_SCALE_RATE (0.35F)
 #define STATUS_BAR_HEIGHT 20
-static gui_win_t *canvas_win;
+#define STATUS_BAR_TIME_TEXT "STATUS_BAR_TIME_TEXT"
+#define STATUS_BAR_DATE_TEXT "STATUS_BAR_DATE_TEXT"
+#define STATUS_BAR_WINDOW "STATUS_BAR_WINDOW"
 static gui_img_t *rect;
-static gui_text_t *t;
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-    canvas_win = gui_win_create(status_bar, 0, 0, 0, SCREEN_W, SCREEN_H);
+    rect = gui_rect((void *)status_bar, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER_OPACITY(230));
+    GET_BASE(rect)->not_show = 1;
+    gui_img_set_opacity(rect, 0);
     gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
     {
-        char *text = "7:55";
+        char *text = "07:55";
         int font_size = 48;
-        t = gui_text_create(status_bar, "txt", SCREEN_W / 2 - 40, 2, gui_get_screen_width(),
-                            font_size);
+        gui_text_t *t = gui_text_create(status_bar, STATUS_BAR_TIME_TEXT, SCREEN_W / 2 - 56, 2,
+                                        gui_get_screen_width(),
+                                        font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
         gui_text_convert_to_img(t, RGBA8888);
 
         gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
-        gui_img_rotation(t->scale_img, 0, gui_img_get_width(t->scale_img) / 2,
-                         0);
-        gui_img_translate(t->scale_img, gui_img_get_width(t->scale_img) / 2,
-                          0);
+        gui_img_rotation(t->scale_img, 0, gui_img_get_width(t->scale_img) / 2, 0);
+        gui_img_translate(t->scale_img, gui_img_get_width(t->scale_img) / 2, 0);
+    }
+    {
+        gui_win_t *win = gui_win_create(status_bar, STATUS_BAR_WINDOW, 0, 0, SCREEN_W, SCREEN_H);
+        GET_BASE(win)->not_show = 1;
+
+        {
+            char *text = "Tue, Apr 16";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, STATUS_BAR_DATE_TEXT, 0, 52, gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1);
+            gui_text_mode_set(t, CENTER);
+
+        }
+        {
+            char *text = "NO NOTIFICATIONS";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0, 0, 200, gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1);
+            gui_text_mode_set(t, CENTER);
+
+        }
     }
 
-    GET_BASE(canvas_win)->not_show = 1;
-    rect = gui_rect((void *)canvas_win, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE_OPACITY);
-    gui_img_set_opacity(rect, 0);
 
 }
 #include "tp_algo.h"
 static void status_bar_ani(gui_obj_t *ignore_gesture)
 {
+    gui_text_t *time_txt = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_TIME_TEXT, (void *)&time_txt);
+    gui_text_t *date_txt = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_DATE_TEXT, (void *)&date_txt);
+    gui_win_t *win = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STATUS_BAR_WINDOW, (void *)&win);
+    if (time_txt)
+    {
 
+        static char buffer_text[6] = "07:55";
+#if _WIN32
+        time_t rawtime;
+        struct tm *timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        strftime(buffer_text, 6, "%H:%M", timeinfo);
+        //puts(buffer_text);
+#endif
+        gui_text_content_set(time_txt, buffer_text, strlen(buffer_text));
+        gui_text_convert_to_img(time_txt, RGBA8888);
+    }
+    if (date_txt)
+    {
+        static char buffer[20] = "Tue, Apr 16";
+#if _WIN32
+        time_t rawtime;
+        struct tm *timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        strftime(buffer, 20, "%a, %b %d", timeinfo); // output date in "Tue, Apr 16" format
+        //puts(buffer);
+#endif
+        gui_text_content_set(date_txt, buffer, strlen(buffer));
+    }
     touch_info_t *tp = tp_get_info();
     static bool press, expand, shrink, expand_press;
     if (tp->y < STATUS_BAR_HEIGHT && !expand)
@@ -295,13 +360,15 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
         {
             ignore_gesture->gesture = 1;
         }
-        GET_BASE(canvas_win)->not_show = 0;
+        GET_BASE(rect)->not_show = 0;
         if (deltaY > 0)
         {
-            if (deltaY > 100)
+            if (deltaY >= 100)
             {
                 deltaY = 100;
+                //GET_BASE(win)->not_show = 0;
             }
+
 
             int opacity = deltaY * 255 / 100;
             if (opacity > 255)
@@ -314,7 +381,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             {
                 scale = 1;
             }
-            gui_img_scale(t->scale_img, scale, scale);
+            gui_img_scale(time_txt->scale_img, scale, scale);
         }
         if (tp->released)
         {
@@ -326,6 +393,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             else
             {
                 shrink = 1;
+                //GET_BASE(win)->not_show = 1;
             }
             press = 0;
         }
@@ -334,8 +402,8 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
     if (shrink)
     {
         gui_img_set_opacity(rect, 0);
-        GET_BASE(canvas_win)->not_show = 1;
-        gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+        GET_BASE(rect)->not_show = 1;
+        gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
         shrink = 0;
         if (ignore_gesture)
         {
@@ -363,8 +431,8 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
                 int opacity = (100 - (-deltaY)) * 255 / 100;
                 gui_img_set_opacity(rect, opacity);
                 float scale = (100 - (-deltaY)) * ((1.0f - TIME_SCALE_RATE) / 100.0f) + TIME_SCALE_RATE;
-                gui_img_scale(t->scale_img, scale, scale);
-
+                gui_img_scale(time_txt->scale_img, scale, scale);
+                //GET_BASE(win)->not_show = 1;
             }
 
 
@@ -375,8 +443,8 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
                 {
                     expand = 0;
                     gui_img_set_opacity(rect, 0);
-                    GET_BASE(canvas_win)->not_show = 1;
-                    gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+                    GET_BASE(rect)->not_show = 1;
+                    gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
                     if (ignore_gesture)
                     {
                         ignore_gesture->gesture = 0;
@@ -386,9 +454,20 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             }
 
         }
+
     }
+    if ((deltaY >= 100 && (press)) || (deltaY >= 0 && expand))
+    {
+        GET_BASE(win)->not_show = 0;
+    }
+    else
+    {
+        GET_BASE(win)->not_show = 1;
+    }
+
 }
 #include "gui_menu_cellular.h"
+
 static void app_menu(gui_app_t *app)
 {
     /**
@@ -396,172 +475,138 @@ static void app_menu(gui_app_t *app)
     */
     uint32_t *array[] =
     {
-        ICON_BLUETOOTH_OFF_BIN,
-        ICON_BLUETOOTH_ON_BIN,
-        ICON_BLUETOOTH_TOUCH_BIN,
-        ICON_BUDS_OFF_BIN,
-        ICON_BUDS_ON_BIN,
-        ICON_BUDS_TOUCH_BIN,
-        ICON_MORE_OFF_BIN,
-        ICON_MORE_ON_BIN,
-        ICON_MORE_TOUCH_BIN,
-        ICON_PHONE_OFF_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_TOUCH_BIN,
-        ICON_BLUETOOTH_OFF_BIN,
-        ICON_BLUETOOTH_ON_BIN,
-        ICON_BLUETOOTH_TOUCH_BIN,
-        ICON_BUDS_OFF_BIN,
-        ICON_BUDS_ON_BIN,
-        ICON_BUDS_TOUCH_BIN,
-        ICON_MORE_OFF_BIN,
-        ICON_MORE_ON_BIN,
-        ICON_MORE_TOUCH_BIN,
-        ICON_PHONE_OFF_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_TOUCH_BIN,
-        ICON_BLUETOOTH_OFF_BIN,
-        ICON_BLUETOOTH_ON_BIN,
-        ICON_BLUETOOTH_TOUCH_BIN,
-        ICON_BUDS_OFF_BIN,
-        ICON_BUDS_ON_BIN,
-        ICON_BUDS_TOUCH_BIN,
-        ICON_MORE_OFF_BIN,
-        ICON_MORE_ON_BIN,
-        ICON_MORE_TOUCH_BIN,
-        ICON_PHONE_OFF_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_TOUCH_BIN,
-        ICON_BLUETOOTH_OFF_BIN,
-        ICON_BLUETOOTH_ON_BIN,
-        ICON_BLUETOOTH_TOUCH_BIN,
-        ICON_BUDS_OFF_BIN,
-        ICON_BUDS_ON_BIN,
-        ICON_BUDS_TOUCH_BIN,
-        ICON_MORE_OFF_BIN,
-        ICON_MORE_ON_BIN,
-        ICON_MORE_TOUCH_BIN,
-        ICON_PHONE_OFF_BIN,
-        ICON_PHONE_ON_BIN,
-        ICON_PHONE_TOUCH_BIN,
+        I4500009_BIN,
+        I4500011_BIN,
+        I4500015_BIN,
+        I4500020_BIN,
+        I4500028_BIN,
+        I4500034_BIN,
+        I4500035_BIN,
+        I4500037_BIN,
+        I4500040_BIN,
+        I4500042_BIN,
+        I4500047_BIN,
+        I4500049_BIN,
+        I4500052_BIN,
+        I4500064_BIN,
+        I4500009_BIN,
+        I4500011_BIN,
+        I4500015_BIN,
+        I4500020_BIN,
+        I4500028_BIN,
+        I4500034_BIN,
+        I4500035_BIN,
+        I4500037_BIN,
+        I4500040_BIN,
+        I4500042_BIN,
+        I4500047_BIN,
+        I4500049_BIN,
+        I4500052_BIN,
+        I4500064_BIN,
+        I4500009_BIN,
+        I4500011_BIN,
+        I4500015_BIN,
+        I4500020_BIN,
+        I4500028_BIN,
+        I4500034_BIN,
+        I4500035_BIN,
+        I4500037_BIN,
+        I4500040_BIN,
+        I4500042_BIN,
+        I4500047_BIN,
+        I4500049_BIN,
+        I4500052_BIN,
+        I4500064_BIN,
+        I4500009_BIN,
+        I4500011_BIN,
+        I4500015_BIN,
+        I4500020_BIN,
+
     };
     gui_menu_cellular_t *cell = gui_menu_cellular_create(GUI_APP_ROOT_SCREEN, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_onRight(win, win_cb, win);
     status_bar(GUI_APP_ROOT_SCREEN, (void *)cell);
-    return_widget(GUI_APP_ROOT_SCREEN, cell);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)cell);
 }
 #include "gui_seekbar.h"
 #include "gui_img.h"
 #define RETURN_HEIGHT 100
-static gui_obj_t *return_ignore_gesture;
-static void seekbar_h_preapre(gui_obj_t *obj)
+const uint32_t *gui_app_return_array[] =
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
-    gui_seekbar_t *circle = (gui_seekbar_t *)obj;
-
-    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
+    PATH04_BIN,
+    PATH05_BIN,
+    PATH07_BIN,
+    PATH08_BIN,
+    PATH09_BIN,
+    PATH11_BIN,
+    PATH12_BIN,
+    PATH14_BIN,
+    PATH15_BIN,
+    PATH16_BIN,
+    PATH18_BIN,
+    PATH19_BIN,
+    PATH20_BIN,
+    PATH22_BIN,
+    PATH23_BIN,
+    PATH24_BIN,
+    PATH25_BIN,
+};
+static void stop_watch_win_ani_cb(void);
+#define STOPWATCHTEXT "STOPWATCHTEXT"
+GUI_APP_ENTRY(APP_STOPWATCH)
+{
+    gui_win_t *stop = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
+    gui_win_set_animate(stop, 1000, -1, stop_watch_win_ani_cb, 0);
     {
-        static bool enable;
-        static bool return_flag;
-        int pro = 0;
-#define RETURN_ENABLE_THREHOLD 10
-#define RETURN_THREHOLD 80
-        if (tp->pressed && tp->x < RETURN_ENABLE_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
-        {
-            enable = 1;
-            return_ignore_gesture->gesture = 1;
-            GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
-            if (GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y > SCREEN_H)
-            {
-                GET_BASE(circle->base.c)->y = SCREEN_H - RETURN_HEIGHT - obj->y;
-            }
-            gui_progressbar_set_progress((void *)circle, pro);
-        }
-        if (tp->released)
-        {
-            enable = 0;
-            return_ignore_gesture->gesture = 0;
-            gui_progressbar_set_progress((void *)circle, pro);
-            if (return_flag)
-            {
-                return_flag = 0;
-                gui_obj_event_set(obj, GUI_EVENT_1);
-            }
+        char *text = "07:55";
+        int font_size = 48;
+        gui_text_t *t = gui_text_create(stop, STOPWATCHTEXT,  0, 200,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1);
+        gui_text_convert_to_img(t, RGBA8888);
+        gui_text_mode_set(t, CENTER);
 
-        }
-        if (enable)
-        {
-            if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
-            {
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                {
-                    pro = tp->x + tp->deltaX - 0;
-                    if (pro <= 0) { pro = 1; }
-                    if (pro >= obj->w) { pro = obj->w; }
-                    if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
-                    {
-                        pro = pro * (circle->base.max - 2) / obj->w;
-
-                    } gui_log("pro:%d\n", tp->deltaX);
-                    gui_progressbar_set_progress((void *)circle, pro);
-                    if (tp->deltaX >= RETURN_THREHOLD)
-                    {
-                        return_flag = 1;
-                    }
-                    else
-                    {
-                        return_flag = 0;
-                    }
-
-                }
-            }
-        }
     }
+    status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
-static void return_widget(gui_obj_t *parent, gui_obj_t *ignore_gesture)
+static void get_stopwatch_string(char *buffer)
+{
+#if _WIN32
+    static bool enter;
+    static struct timeval start;
+    if (!enter)
+    {
+        enter = 1;
+        gettimeofday(&start, NULL);
+    }
+    struct timeval end;
+    long mtime, secs, usecs;
+    {
+        gettimeofday(&end, NULL);
+        secs  = end.tv_sec  - start.tv_sec;
+        usecs = end.tv_usec - start.tv_usec;
+        mtime = ((secs) * 1000 + usecs / 1000.0) + 0.5;
+        sprintf(buffer, "\r%02ld:%02ld:%02ld", secs / 60, secs % 60, (mtime % 1000) / 10);
+    }
+#endif
+}
+static void stop_watch_win_ani_cb()
 {
 
-    static uint32_t *array[] =
-    {
-        PATH04_BIN,
-        PATH05_BIN,
-        PATH06_BIN,
-        PATH07_BIN,
-        PATH08_BIN,
-        PATH09_BIN,
-        PATH10_BIN,
-        PATH11_BIN,
-        PATH12_BIN,
-        PATH13_BIN,
-        PATH14_BIN,
-        PATH15_BIN,
-        PATH16_BIN,
-        PATH17_BIN,
-        PATH18_BIN,
-        PATH19_BIN,
-        PATH20_BIN,
-        PATH21_BIN,
-        PATH22_BIN,
-        PATH23_BIN,
-        PATH24_BIN,
-        PATH25_BIN,
-    };
-    gui_seekbar_t *bar = gui_seekbar_create_movie_h(parent, (void *)array,
-                                                    sizeof(array) / sizeof(uint32_t *), 0, SCREEN_H - SCREEN_H * 2 / 3);
-    GET_BASE(bar)->obj_prepare = seekbar_h_preapre;
-    gui_obj_add_event_cb(bar, (gui_event_cb_t)win_cb, GUI_EVENT_1, bar);
-    GET_BASE(bar)->w = RETURN_HEIGHT;
-    GET_BASE(bar)->h = SCREEN_H * 2 / 3;
-    gui_img_set_mode((void *)bar->base.c, IMG_SRC_OVER_MODE);
-    return_ignore_gesture = ignore_gesture;
+    static char buffer[9];
+    get_stopwatch_string(buffer);
+    gui_text_t *time_txt = 0;
+    gui_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
+    gui_text_content_set(time_txt, buffer, strlen(buffer));
+    gui_text_convert_to_img(time_txt, RGBA8888);
 }
-
-
-
 
 
 

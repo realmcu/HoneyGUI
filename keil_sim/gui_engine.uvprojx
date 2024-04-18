@@ -813,6 +813,16 @@
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_win.c</FilePath>
             </File>
+            <File>
+              <FileName>gui_tab_fade.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_tab_fade.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_reduction_fade.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_tab_reduction_fade.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
