@@ -88,7 +88,7 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     {
         if (opacity_value == 255)
         {
-            for (uint32_t i = y_start; i < y_end; i++)
+            for (uint32_t i = y_start; i <= y_end; i++)
             {
                 int line = i - image_y;
                 int write_off = (i - dc->section.y1) * dc->fb_width ;
