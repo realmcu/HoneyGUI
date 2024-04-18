@@ -100,8 +100,8 @@ typedef struct gui_text
 /** @brief  text line structure */
 typedef struct gui_text_line
 {
-    uint8_t line_char;
-    uint8_t line_dx;
+    uint16_t line_char;
+    uint16_t line_dx;
 } gui_text_line_t;
 
 /** End of WIDGET_Exported_Types

@@ -68,7 +68,7 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
         }
         break;
     case UTF_16_CHARSET:
-        unicode_len = text->len;
+        unicode_len = text->len / 2;
         p_buf = (uint16_t *)text->content;
         break;
     default:
@@ -251,11 +251,8 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
         {
             gui_text_line_t *line_buf;
             uint32_t line = 0;
-            if (text->char_line_sum == 0)
-            {
-                text->char_line_sum = all_char_w / text->base.w + 1 + line_flag;
-                text->char_width_sum = all_char_w;
-            }
+            text->char_line_sum = all_char_w / text->base.w + 1 + line_flag;
+            text->char_width_sum = all_char_w;
             line_buf = gui_malloc((text->char_line_sum + 1) * sizeof(gui_text_line_t));
             memset(line_buf, 0, (text->char_line_sum + 1) * sizeof(gui_text_line_t));
             for (uint16_t i = 0; i < text->font_len; i++)
@@ -1356,9 +1353,9 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     rect.x2 = rect.x1 + text->base.w;
     rect.y2 = rect.y1 + text->base.h;
     TEXT_MODE mode = text->mode;
-    if (text->mode == CENTER || RIGHT)
+    if (text->mode == CENTER || text->mode == RIGHT)
     {
-        text->mode  = LEFT;
+        text->mode = LEFT;
     }
     gui_font_mem_load(text, &rect);
     text->mode = mode;
