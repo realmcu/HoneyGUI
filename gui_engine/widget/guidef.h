@@ -578,7 +578,7 @@ extern char *defaultPath;
     GET_BASE(this)->create_done = true;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
-#define GUI_FRAME_STEP 0.1
+#define GUI_FRAME_STEP 50
 #else
 #define GUI_FRAME_STEP 50
 #endif
