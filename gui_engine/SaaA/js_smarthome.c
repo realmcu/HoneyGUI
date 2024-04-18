@@ -4,7 +4,7 @@
 
 typedef struct
 {
-    void *cb;
+    jerry_value_t cb;
     uint32_t param;
 } js_sh_sw_cb_t;
 static js_sh_sw_cb_t js_sh_switch_cb;
@@ -92,7 +92,8 @@ void gui_sh_event_sw_handler(msg_sh_base_t *msg_sw)
     js_set_property(sw, "val", jerry_create_number(val));
 
     // call func with param
-    jerry_value_t res = jerry_call_function(js_sh_switch_cb.cb, jerry_create_undefined(), &sw, 1);
+    jerry_value_t res = jerry_call_function((const jerry_value_t)(js_sh_switch_cb.cb),
+                                            jerry_create_undefined(), &sw, 1);
 
     jerry_release_value(res);
 }
@@ -123,7 +124,7 @@ typedef struct
 // smarthome event
 void gui_extern_event_sh_handler(gui_msg_js_t *js_msg)
 {
-    gui_msg_sh_t *sh_msg = (gui_msg_js_t *)js_msg;
+    gui_msg_sh_t *sh_msg = (gui_msg_sh_t *)js_msg;
 
     gui_log("sh_event_type: %d", sh_msg->sh_event_type);
     switch (sh_msg->sh_event_type)

@@ -776,12 +776,10 @@ DECLARE_HANDLER(getCurTab)
     jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
     jerry_value_t x = GUI_TYPE(gui_tabview_t, obj)->cur_id.x;
     jerry_value_t y = GUI_TYPE(gui_tabview_t, obj)->cur_id.y;
-    jerry_value_t z = GUI_TYPE(gui_tabview_t, obj)->cur_id.z;
 
     jerry_value_t tab_cur_id = jerry_create_object();
     js_set_property(tab_cur_id, "x", jerry_create_number((double) x));
     js_set_property(tab_cur_id, "y", jerry_create_number((double) y));
-    js_set_property(tab_cur_id, "z", jerry_create_number((double) z));
     return tab_cur_id;
 }
 
