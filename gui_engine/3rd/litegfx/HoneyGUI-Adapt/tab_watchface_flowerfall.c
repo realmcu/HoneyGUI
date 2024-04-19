@@ -1,6 +1,6 @@
 #include "gui_widget_litegfx.h"
 #include "root_image/ui_resource.h"
-#if 0
+#if 1
 
 static uintptr_t watchface_flowerfall_user_cb(uint16_t cmd, uintptr_t param, uintptr_t user_data)
 {
@@ -31,6 +31,7 @@ static uintptr_t watchface_flowerfall_user_cb(uint16_t cmd, uintptr_t param, uin
         gui_widget_litegfx_set_param(obj, LX_CMD_ID_FIXED_BUTTON,
                                      (uint32_t)false);//表盘固定按钮开关，默认关
     }
+    return 0;
 }
 
 void design_tab_watchface_flowerfall(void *parent)
