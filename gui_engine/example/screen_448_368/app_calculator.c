@@ -671,7 +671,7 @@ static void calculator_draw_button(void *parent)
     int8_t i = 0;
     int8_t j = 0;
 
-    T_GUI_BUTTON *button[21];
+    gui_button_t *button[21];
     // grid
     int16_t pos_x[4] = {offset_x, offset_x + del_x, offset_x + del_x * 2, offset_x + del_x * 3};
     int16_t pos_y[4] = {offset_y, offset_y + del_y, offset_y + del_y * 2, offset_y + del_y * 3};
@@ -709,12 +709,12 @@ static void calculator_draw_button(void *parent)
             }
         }
         button[i] = gui_button_create(parent, offset_x + del_x * (i % 4), offset_y + del_y * j, btn_delx,
-                                      del_y, background_pic, highlight_pic, "text", 0, 0, 0);
+                                      del_y, background_pic, highlight_pic, "text", 0, 0);
         j += ((i + 1) % 4 == 0);
     }
     // delete key
     button[20] = gui_button_create(parent, offset_x + del_x * 3 + 42 - 22, offset_y / 2 - 10, del_x,
-                                   del_y, BUTTON_CAL_DEL_BIN, BUTTON_CAL_DEL_BIN, "text", 0, 0, 0);
+                                   del_y, BUTTON_CAL_DEL_BIN, BUTTON_CAL_DEL_BIN, "text", 0, 0);
 
     // load Font data
     void *addr_font = SIMKAI_SIZE24_BITS4_FONT_BIN;
@@ -739,17 +739,17 @@ static void calculator_draw_button(void *parent)
         if (i == 17) { continue; }
 
         // btn text config
-        GUI_TYPE(T_GUI_BUTTON, button[i])->text->font_height = 24;
-        GUI_TYPE(T_GUI_BUTTON, button[i])->text->path = 0;
-        gui_text_type_set(GUI_TYPE(T_GUI_BUTTON, button[i])->text, addr_font);
-        gui_text_mode_set(GUI_TYPE(T_GUI_BUTTON, button[i])->text, LEFT);
-        GET_BASE(GUI_TYPE(T_GUI_BUTTON, button[i])->text)->x = 36;
-        GET_BASE(GUI_TYPE(T_GUI_BUTTON, button[i])->text)->y = 18;
-        GUI_TYPE(T_GUI_BUTTON, button[i])->text->utf_8 = btn_char + i;
-        GUI_TYPE(T_GUI_BUTTON, button[i])->text->len = 1;
+        GUI_TYPE(gui_button_t, button[i])->text->font_height = 24;
+        GUI_TYPE(gui_button_t, button[i])->text->path = 0;
+        gui_text_type_set(GUI_TYPE(gui_button_t, button[i])->text, addr_font);
+        gui_text_mode_set(GUI_TYPE(gui_button_t, button[i])->text, LEFT);
+        GET_BASE(GUI_TYPE(gui_button_t, button[i])->text)->x = 36;
+        GET_BASE(GUI_TYPE(gui_button_t, button[i])->text)->y = 18;
+        GUI_TYPE(gui_button_t, button[i])->text->utf_8 = btn_char + i;
+        GUI_TYPE(gui_button_t, button[i])->text->len = 1;
 
         // setup btn callback
-        gui_button_click(button[i], (gui_event_cb_t)cb_btn[i], NULL);
+        gui_button_click(button[i], (gui_event_cb_t)cb_btn[i]);
     }
 
     // reset as ac

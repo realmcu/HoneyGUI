@@ -170,7 +170,7 @@ DECLARE_HANDLER(icon_write)
     {
         return jerry_create_undefined();
     }
-    T_GUI_BUTTON *txtbox = NULL;
+    gui_button_t *txtbox = NULL;
     jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
     if (txtbox)
     {
@@ -331,7 +331,7 @@ DECLARE_HANDLER(onClick)
         }
 
         cb_arg->func = args[0];
-        gui_button_click((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_api.onClick((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -359,7 +359,7 @@ DECLARE_HANDLER(onPress)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_press((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_api.onPress((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -387,7 +387,7 @@ DECLARE_HANDLER(onHold)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_long((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_api.onLong((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -676,7 +676,7 @@ DECLARE_HANDLER(onRelease)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_release((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_api.onRelease((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
