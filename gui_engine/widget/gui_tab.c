@@ -17,18 +17,16 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
-#include <gui_server.h>
-#include <gui_obj.h>
-#include <tp_algo.h>
-#include <kb_algo.h>
+#include "guidef.h"
+#include "gui_server.h"
+#include "gui_obj.h"
+#include "tp_algo.h"
+#include "kb_algo.h"
 #include "gui_tab.h"
 #include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_cube.h"
-
-
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -87,14 +85,10 @@
   * @{
   */
 
-static void input_prepare(gui_obj_t *obj)
+static void gui_tab_input_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
-    kb_info_t *kb = kb_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
-
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
 
@@ -131,11 +125,10 @@ static void input_prepare(gui_obj_t *obj)
                      (tab_y_gap) * (int)this->base.h, \
                      obj->matrix);
 }
-static void tab_prepare(gui_obj_t *obj)
+
+static void gui_tab_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
-    gui_dispdev_t *dc = gui_get_dc();
-    touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
 
@@ -146,10 +139,10 @@ static void tab_prepare(gui_obj_t *obj)
     {
         if (parent->tab_need_pre_load == true)
         {
-
             if (tab_x_gap == 0)
             {
                 gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
+
                 if (this->shot_obj == NULL)
                 {
                     this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->center_shot, 0,
@@ -163,6 +156,7 @@ static void tab_prepare(gui_obj_t *obj)
             else if (tab_x_gap == 1)
             {
                 gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
+
                 if (this->shot_obj == NULL)
                 {
                     this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->right_shot, 0,
@@ -176,6 +170,7 @@ static void tab_prepare(gui_obj_t *obj)
             else if (tab_x_gap == -1)
             {
                 gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
+
                 if (this->shot_obj == NULL)
                 {
                     this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->left_shot, 0, 0,
@@ -186,7 +181,6 @@ static void tab_prepare(gui_obj_t *obj)
                     gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->left_shot, 0, 0);
                 }
             }
-
         }
 
         if (parent->release_x != 0)
@@ -263,18 +257,13 @@ static void tab_prepare(gui_obj_t *obj)
         gui_tab_reduction_fade(obj, tab_x_gap, tab_y_gap);
     }
 
-
     if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
     {
         gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
 }
 
-
-
-
-
-static void tab_destroy(gui_obj_t *obj)
+static void gui_tab_destroy(gui_obj_t *obj)
 {
     if (obj->parent != NULL)
     {
@@ -285,6 +274,7 @@ static void tab_destroy(gui_obj_t *obj)
         {
             tabview->tab_cnt--;
         }
+
         if (tab->id.x > 0)
         {
             if (tabview->tab_cnt_right > 0)
@@ -317,16 +307,22 @@ static void tab_destroy(gui_obj_t *obj)
     }
 }
 
-static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filename, int16_t x,
-                         int16_t y,
-                         int16_t w, int16_t h, int16_t idx, int16_t idy)
+static void gui_tab_ctor(gui_tab_t  *this,
+                         gui_obj_t  *parent,
+                         const char *filename,
+                         int16_t    x,
+                         int16_t    y,
+                         int16_t    w,
+                         int16_t    h,
+                         int16_t    idx,
+                         int16_t    idy)
 {
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_prepare = tab_prepare;
-    GET_BASE(this)->obj_input_prepare = input_prepare;
-    GET_BASE(this)->obj_destory = tab_destroy;
+    GET_BASE(this)->obj_prepare = gui_tab_prepare;
+    GET_BASE(this)->obj_input_prepare = gui_tab_input_prepare;
+    GET_BASE(this)->obj_destory = gui_tab_destroy;
     GET_BASE(this)->type = TAB;
 
     gui_tabview_t *parent_ext = (gui_tabview_t *)parent;
@@ -348,6 +344,7 @@ static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filenam
     {
         parent_ext->tab_cnt_left--;
     }
+
     if (idy > 0)
     {
         parent_ext->tab_cnt_down++;
@@ -356,30 +353,37 @@ static void gui_tab_ctor(gui_tab_t *this, gui_obj_t *parent, const char *filenam
     {
         parent_ext->tab_cnt_up--;
     }
-
 }
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-
 gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this)
 {
     gui_tabview_t *tabview = (gui_tabview_t *)(this->base.parent);
+
     if (tabview->enable_pre_load == false)
     {
         return (gui_obj_t *)this;
     }
+
     return this->rte_obj;
 }
 
-gui_tab_t *gui_tab_create(void *parent, const char *name, int16_t x, int16_t y,
-                          int16_t w, int16_t h, int16_t idx, int16_t idy)
+gui_tab_t *gui_tab_create(void       *parent,
+                          const char *name,
+                          int16_t    x,
+                          int16_t    y,
+                          int16_t    w,
+                          int16_t    h,
+                          int16_t    idx,
+                          int16_t    idy)
 {
     if (w == 0)
     {
         w = (int)gui_get_screen_width();
     }
+
     if (h == 0)
     {
         h = (int)gui_get_screen_height();
@@ -400,7 +404,6 @@ gui_tab_t *gui_tab_create(void *parent, const char *name, int16_t x, int16_t y,
     GET_BASE(this)->create_done = true;
     this->rte_obj = gui_obj_create(this, "tab_rte", this->base.x, this->base.y, this->base.w,
                                    this->base.h);
-
     return this;
 }
 
