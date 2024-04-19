@@ -428,6 +428,31 @@ static void tabview_prepare(gui_obj_t *obj)
 
 }
 
+
+void tabview_destory(gui_obj_t *obj)
+{
+    gui_tabview_t *this = (gui_tabview_t *)obj;
+    if (this->enable_pre_load == true)
+    {
+        if (this->center_shot != NULL)
+        {
+            gui_free(this->center_shot);
+            this->center_shot = NULL;
+        }
+        if (this->right_shot != NULL)
+        {
+            gui_free(this->right_shot);
+            this->right_shot = NULL;
+        }
+        if (this->left_shot != NULL)
+        {
+            gui_free(this->left_shot);
+            this->left_shot = NULL;
+        }
+    }
+
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -469,6 +494,8 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
 
     GET_BASE(this)->obj_input_prepare = input_prepare;
     GET_BASE(this)->obj_prepare = tabview_prepare;
+    GET_BASE(this)->obj_end = NULL;
+    GET_BASE(this)->obj_destory = tabview_destory;
     GET_BASE(this)->type = TABVIEW;
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)

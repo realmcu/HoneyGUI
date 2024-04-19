@@ -36,15 +36,11 @@ static void cardlist_music(void *parent)
 static void canvas_cb_black(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 128));
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 128));
     nvgFill(canvas->vg);
 }
 
 static gui_cardview_t *cv;
-static void done_cb(gui_curtainview_t *this)
-{
-    //gui_log("cv release value = %d \n", this->release_y);
-}
 
 static void cv_status_cb(gui_cardview_t *this)
 {
@@ -55,7 +51,6 @@ void curtain_down_design(void *parent_widget)
 {
     gui_curtain_t *ct_card = parent_widget;
     gui_curtainview_t *curtainview = (gui_curtainview_t *)ct_card->base.parent;
-    gui_curtainview_set_done_cb(curtainview, done_cb);
 
     gui_canvas_t *canvas = gui_canvas_create(parent_widget, "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_black);

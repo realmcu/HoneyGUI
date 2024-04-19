@@ -87,13 +87,25 @@
 static void input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
+    gui_cardview_t *this = (gui_cardview_t *)obj;
     GUI_UNUSED(tp);
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false)
     {
         return;
     }
-    gui_obj_skip_other_up_hold(obj);
-    gui_obj_skip_other_down_hold(obj);
+    if (this->offset_y == 0)
+    {
+        gui_obj_skip_other_up_hold(obj);
+    }
+    else
+    {
+        gui_obj_skip_other_up_hold(obj);
+        gui_obj_skip_other_down_hold(obj);
+    }
+
+
+
+
 }
 
 static void cardview_prepare(gui_obj_t *obj)
@@ -101,6 +113,8 @@ static void cardview_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_cardview_t *this = (gui_cardview_t *)obj;
+
+    bool skip = false;
 
 
 
@@ -115,30 +129,73 @@ static void cardview_prepare(gui_obj_t *obj)
         {
             break;
         }
-        this->release_y = tp->deltaY;
+        this->hold_y = tp->deltaY;
+
+        skip = true;
         break;
     case TOUCH_DOWN_SLIDE:
-        break;
     case TOUCH_UP_SLIDE:
+    case TOUCH_ORIGIN_FROM_Y:
+        // GUI_LINE(1);
+        if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
+        {
+            break;
+        }
+        if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
+        {
+            break;
+        }
+        this->offset_y += this->target_y;
+        gui_log("this->target_y = %d, this->offset_y = %d \n", this->target_y, this->offset_y);
         break;
     default:
         break;
     }
 
-    if (this->release_y >= GUI_FRAME_STEP)
+    if (skip == false)
     {
-        this->release_y -= GUI_FRAME_STEP;
-    }
-    else if (this->release_y <= -GUI_FRAME_STEP)
-    {
-        this->release_y += GUI_FRAME_STEP;
+        if (this->hold_y >= GUI_FRAME_STEP)
+        {
+            this->hold_y -= GUI_FRAME_STEP;
+        }
+        else if (this->hold_y <= -GUI_FRAME_STEP)
+        {
+            this->hold_y += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->hold_y = 0;
+        }
     }
     else
     {
-        this->release_y = 0;
-    }
+        int tmp = abs(this->hold_y);
 
-    //gui_log("[cardveiew] release_y = %d, this->checksum =%d \n", this->release_y, this->checksum);
+        int v = abs(tmp) % 128;
+        if (v > 64)
+        {
+            tmp = ((tmp / 128) + 1) * 128;
+        }
+        else
+        {
+            tmp = ((tmp / 128)) * 128;
+        }
+
+        if (this->hold_y  < 0)
+        {
+            this->target_y = -tmp;
+        }
+        else
+        {
+            this->target_y = tmp;
+        }
+
+
+        //this->hold_y = this->hold_y - this->target_y;
+        // gui_log("this->target_y = %d \n", this->target_y);
+    }
+    skip = false;
+
 
     uint8_t last = this->checksum;
     this->checksum = 0;

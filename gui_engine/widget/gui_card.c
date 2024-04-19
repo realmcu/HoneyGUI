@@ -106,7 +106,7 @@ static void prepare(gui_obj_t *obj)
 
 
 
-    int32_t location = this->ay + parent->release_y;
+    int32_t location = this->ay + parent->hold_y + parent->offset_y;
 
 
 
@@ -181,7 +181,8 @@ static void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filen
     this->ay = cardview->height;
     cardview->height += obj->h;
 
-    gui_log("card[%s] id is = %d \n", obj->name, this->id);
+    gui_log("card[%s] id is = %d, ay = %d, cardview->height = %d \n", obj->name, this->id, this->ay,
+            cardview->height);
 
 
 }

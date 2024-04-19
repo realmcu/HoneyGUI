@@ -54,8 +54,9 @@ typedef struct gui_cardview
     uint16_t total_cnt;
     uint16_t cur_id;
     SLIDE_STYLE style;
-    int16_t release_y;
-    int16_t remain_y;
+    int16_t hold_y;
+    int16_t target_y; //means stop at this location
+    int16_t offset_y; //means stop at this location
     int16_t speed;
     int16_t recode[5];
     void (*status_cb)(struct gui_cardview *this);
