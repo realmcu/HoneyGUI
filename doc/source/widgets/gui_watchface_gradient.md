@@ -26,7 +26,7 @@ If you want to create a new watchface_gradient widget, please call the function 
 #include "gui_app.h"
 gui_win_t *win_watch;
 gui_img_t *img;
-T_GUI_WATCH_GRADIENT_SPOT *watch;
+gui_watch_gradient_spot_t *watch;
 gui_text_t *rate;
 static gui_watchface_gradient_t *canvas;
 gui_tabview_t *tablist_tab;
