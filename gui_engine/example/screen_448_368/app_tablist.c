@@ -22,7 +22,7 @@ void tablist_watch(void *parent)
 }
 void tablist_watchface(void *parent)
 {
-    T_GUI_WATCHFACE_GRADIENT *canvas = gui_watchface_gradient_create(parent, "watchface_gradient",
+    gui_watchface_gradient_t *canvas = gui_watchface_gradient_create(parent, "watchface_gradient",
                                                                      (368 - 368) / 2,
                                                                      (448 - 448) / 2, 221, 269);
     gui_img_t *rect = gui_img_create_from_mem(parent, "rect", RECT_221_269_BIN, 0, 0, 0, 0);

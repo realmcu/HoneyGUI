@@ -28,7 +28,7 @@ gui_win_t *win_watch;
 gui_img_t *img;
 T_GUI_WATCH_GRADIENT_SPOT *watch;
 gui_text_t *rate;
-static T_GUI_WATCHFACE_GRADIENT *canvas;
+static gui_watchface_gradient_t *canvas;
 gui_tabview_t *tablist_tab;
 
 void page_ct_clock(void *parent)
