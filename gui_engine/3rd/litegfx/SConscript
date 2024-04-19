@@ -1,0 +1,34 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+libs = ['lx_vglite_gcc']
+libpath = [cwd + '/vglite']
+
+src += Glob("platform/*.cpp")
+src += Glob("platform/*.c")
+src += Glob("HoneyGUI-Adapt/*.c")
+src += Glob("vglite/source/interface/*.cpp")
+src += Glob("vglite/source/lib/*.cpp")
+src += Glob("vglite/source/widgets/*.cpp")
+src += Glob("vglite/source/transitions/*.cpp")
+
+CPPPATH = [cwd, os.path.join(cwd, 'platform'),
+           os.path.join(cwd, 'HoneyGUI-Adapt'),
+           os.path.join(cwd, 'vglite/include'),
+           os.path.join(cwd, 'vglite/include/interface'),
+           os.path.join(cwd, 'vglite/include/lib'),
+           os.path.join(cwd, 'vglite/include/widgets'),
+           os.path.join(cwd, 'vglite/source/widgets'),
+           os.path.join(cwd, 'vglite/include/transitions'),
+           os.path.join(cwd, 'vglite/source/transitions'),           
+           ]
+
+# add src and include to group.
+group = DefineGroup('rtk_gui', src,depend = ['CONFIG_REALTEK_BUILD_LITE_GFX'],CPPPATH = CPPPATH, LIBS = libs, LIBPATH = libpath)
+    
+Return('group')

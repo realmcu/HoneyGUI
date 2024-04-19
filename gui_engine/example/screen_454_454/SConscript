@@ -15,6 +15,7 @@ src += Glob('./gui_common/*.c')
 src += Glob('./gui_call/*.c')
 src += Glob('./gui_record/*.c')
 src += Glob('./gui_menu/*.c') 
+src += Glob('./gui_watchface_litegfx/*.c') 
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\gui_common']
 print(CPPPATH)
