@@ -611,21 +611,6 @@ extern char *defaultPath;
   * @{
   */
 
-
-/**
- * @brief
- *
- * @param parent
- * @param name
- * @param addr
- * @param x
- * @param y
- * @param w
- * @param h
- * @return T_GUI_WIDGET_TEMPLATE*
- */
-
-
 /** End of SUBMOUDLE_Exported_Functions
   * @}
   */
