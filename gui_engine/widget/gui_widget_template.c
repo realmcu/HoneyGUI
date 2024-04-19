@@ -84,7 +84,7 @@
   */
 
 
-static void gui_widget_template_prepare(T_GUI_WIDGET_TEMPLATE *this)
+static void gui_widget_template_prepare(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -96,7 +96,7 @@ static void gui_widget_template_prepare(T_GUI_WIDGET_TEMPLATE *this)
     GUI_UNUSED(dc);
 }
 
-static void gui_widget_template_draw(T_GUI_WIDGET_TEMPLATE *this)
+static void gui_widget_template_draw(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -108,7 +108,7 @@ static void gui_widget_template_draw(T_GUI_WIDGET_TEMPLATE *this)
     GUI_UNUSED(dc);
 }
 
-static void gui_widget_template_end(T_GUI_WIDGET_TEMPLATE *this)
+static void gui_widget_template_end(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -120,7 +120,7 @@ static void gui_widget_template_end(T_GUI_WIDGET_TEMPLATE *this)
     GUI_UNUSED(dc);
 }
 
-static void gui_widget_template_destory(T_GUI_WIDGET_TEMPLATE *this)
+static void gui_widget_template_destory(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -132,7 +132,7 @@ static void gui_widget_template_destory(T_GUI_WIDGET_TEMPLATE *this)
     GUI_UNUSED(dc);
 }
 
-static void gui_widget_template_ctor(T_GUI_WIDGET_TEMPLATE *this,
+static void gui_widget_template_ctor(gui_widget_template_t *this,
                                      gui_obj_t              *parent,
                                      const char             *name,
                                      void                   *data,
@@ -165,9 +165,9 @@ static void gui_widget_template_ctor(T_GUI_WIDGET_TEMPLATE *this,
  * @param y
  * @param w
  * @param h
- * @return T_GUI_WIDGET_TEMPLATE*
+ * @return gui_widget_template_t*
  */
-T_GUI_WIDGET_TEMPLATE *gui_widget_template_create(void       *parent,
+gui_widget_template_t *gui_widget_template_create(void       *parent,
                                                   const char *name,
                                                   void       *data,
                                                   int16_t    x,
@@ -182,9 +182,9 @@ T_GUI_WIDGET_TEMPLATE *gui_widget_template_create(void       *parent,
         name = "WIDGET_TEMPLATE";
     }
 
-    T_GUI_WIDGET_TEMPLATE *this = gui_malloc(sizeof(T_GUI_WIDGET_TEMPLATE));
+    gui_widget_template_t *this = gui_malloc(sizeof(gui_widget_template_t));
     GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(T_GUI_WIDGET_TEMPLATE));
+    memset(this, 0x00, sizeof(gui_widget_template_t));
 
     gui_widget_template_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
 

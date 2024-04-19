@@ -49,7 +49,7 @@ typedef struct
 {
     gui_obj_t base;
     void *user_data;
-} T_GUI_WIDGET_TEMPLATE;
+} gui_widget_template_t;
 
 
 /** End of WIDGET_Exported_Types
@@ -117,9 +117,9 @@ typedef struct
  * @param y
  * @param w
  * @param h
- * @return T_GUI_WIDGET_TEMPLATE*
+ * @return gui_widget_template_t*
  */
-T_GUI_WIDGET_TEMPLATE *gui_widget_template_create(void       *parent,
+gui_widget_template_t *gui_widget_template_create(void       *parent,
                                                   const char *name,
                                                   void       *addr,
                                                   int16_t    x,
