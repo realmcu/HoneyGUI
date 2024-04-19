@@ -106,36 +106,65 @@ static void (obj_update_att)(struct _gui_obj_t *o)
     gui_img_t *obj = (void *)o;
     if (obj->animate && obj->animate->animate)
     {
-        size_t frame_count = obj->animate->dur * 30 / (1000);
-        obj->animate->callback(obj->animate->p);
-        obj->animate->current_frame++;
-
-        if (obj->animate->current_frame > frame_count)
+        uint32_t cur_time_gap = gui_ms_get() - obj->animate->cur_time_ms;
+        obj->animate->cur_time_ms = gui_ms_get();
+        if (cur_time_gap >= 2 * obj->animate->dur)
         {
-            if (obj->animate->repeatCount == 0)
+            obj->animate->init_time_ms += cur_time_gap;
+        }
+        if (obj->animate->repeatCount == 0)
+        {
+            if ((obj->animate->cur_time_ms - obj->animate->init_time_ms) >= obj->animate->dur)
             {
+                obj->animate->callback(obj->animate->p);
                 obj->animate->animate = false;
+                obj->animate->progress_percent = 1.0f;
             }
-            else if (obj->animate->repeatCount < 0)
+            else
             {
-                obj->animate->current_frame = 0;
+                obj->animate->progress_percent = (float)(obj->animate->cur_time_ms - obj->animate->init_time_ms) /
+                                                 (float)obj->animate->dur;
             }
-            else if (obj->animate->repeatCount > 0)
+        }
+        else if (obj->animate->repeatCount < 0)
+        {
+            if ((obj->animate->cur_time_ms - obj->animate->init_time_ms) >= obj->animate->dur)
             {
-                obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                obj->animate->callback(obj->animate->p);
+                obj->animate->init_time_ms += obj->animate->dur;
+                obj->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                obj->animate->progress_percent = (float)(obj->animate->cur_time_ms - obj->animate->init_time_ms) /
+                                                 (float)obj->animate->dur;
+            }
+        }
+        else if (obj->animate->repeatCount > 0)
+        {
+            if (obj->animate->cur_time_ms - obj->animate->init_time_ms -
+                obj->animate->current_repeat_count * obj->animate->dur >=
+                obj->animate->dur)
+            {
+                if (obj->animate->current_repeat_count < obj->animate->repeatCount)
                 {
-                    obj->animate->animate = false;
+                    obj->animate->callback(obj->animate->p);
+                    obj->animate->current_repeat_count ++;
                 }
                 else
                 {
-                    obj->animate->current_frame = 0;
+                    obj->animate->callback(obj->animate->p);
+                    obj->animate->animate = false;
                 }
+                obj->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                obj->animate->progress_percent = (float)(obj->animate->cur_time_ms - obj->animate->init_time_ms -
+                                                         obj->animate->current_repeat_count * obj->animate->dur) /
+                                                 (float)obj->animate->dur;
             }
         }
-        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
-                                                                                       frame_count));
-
     }
 }
 

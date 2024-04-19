@@ -392,6 +392,8 @@ typedef struct gui_animate
 {
     uint32_t dur;
     int repeatCount;
+    uint32_t init_time_ms;
+    uint32_t cur_time_ms;
     uint32_t current_repeat_count;
     uint32_t current_frame;
     float progress_percent;
