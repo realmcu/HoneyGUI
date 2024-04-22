@@ -1,0 +1,696 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ui version="1.0">
+  <widget class="Screen" name="screen0" layer="0" isLocked="False">
+    <property name="geometry">
+      <width>320</width>
+      <height>240</height>
+      <x>0</x>
+      <y>0</y>
+    </property>
+    <widget class="TabView" name="tabview0" layer="0" isLocked="False">
+      <property name="geometry">
+        <width>320</width>
+        <height>240</height>
+        <x>0</x>
+        <y>0</y>
+      </property>
+      <widget class="Tab" name="tab_0_home" layer="-1" isLocked="False">
+        <property name="tabData">
+          <idX>0</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="home_bg" layer="-1" isLocked="False">
+          <property name="geometry">
+            <width>320</width>
+            <height>240</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/0_home/home_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_1_sw1" layer="-1" isLocked="False">
+        <property name="tabData">
+          <idX>1</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="img_bg_sw1" layer="-1" isLocked="False">
+          <property name="geometry">
+            <width>320</width>
+            <height>28</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/1_switch_1/sw_1_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_0" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>14</x>
+            <y>44</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/0_Living_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/0_Living_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_1" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>115</x>
+            <y>44</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/1_Dining_Off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/1_Dining_ON.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_2" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>216</x>
+            <y>44</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/2_Study_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/2_Study_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_3" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>14</x>
+            <y>126</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/3_Wash_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/3_Wash_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_4" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>115</x>
+            <y>126</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/4_Kitchen_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/4_Kitchen_ON.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_1_5" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>216</x>
+            <y>126</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/1_switch_1/5_Bathroom_off.png</picture>
+            <highlightPicture>Resources/image/1_switch_1/5_Bathroom_ON.png</highlightPicture>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_2_sw2" layer="-1" isLocked="False">
+        <property name="tabData">
+          <idX>2</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="img_bg_sw2" layer="-1" isLocked="False">
+          <property name="geometry">
+            <width>320</width>
+            <height>28</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/1_switch_1/sw_1_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_0" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>14</x>
+            <y>44</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/0_Bedroom_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/0_Bedroom_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_1" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>115</x>
+            <y>44</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/1_Children_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/1_Children_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_2" layer="2" isLocked="False">
+          <property name="geometry">
+            <width>58</width>
+            <height>70</height>
+            <x>116</x>
+            <y>126</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/4_socket1_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/4_socket1_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_3" layer="3" isLocked="False">
+          <property name="geometry">
+            <width>58</width>
+            <height>70</height>
+            <x>182</x>
+            <y>126</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/5_socket2_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/5_socket2_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_2_4" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>58</width>
+            <height>70</height>
+            <x>248</x>
+            <y>126</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/6_socket3_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/6_socket3_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_all_on" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>216</x>
+            <y>44</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/2_All_on.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/2_All_on_click.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="btn_all_off" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>89</width>
+            <height>70</height>
+            <x>14</x>
+            <y>126</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/2_switch_2/3_All_off.png</picture>
+            <highlightPicture>Resources/image/2_switch_2/3_All_off_click.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_3_ac" layer="-1" isLocked="False">
+        <property name="tabData">
+          <idX>3</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="img_bg_ac" layer="-1" isLocked="False">
+          <property name="geometry">
+            <width>320</width>
+            <height>28</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/1_switch_1/sw_1_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_heat" layer="4" isLocked="False">
+          <property name="geometry">
+            <width>34</width>
+            <height>30</height>
+            <x>38</x>
+            <y>81</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/0_heating_off.png</picture>
+            <highlightPicture>Resources/image/3_air/0_heating_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_cold" layer="5" isLocked="False">
+          <property name="geometry">
+            <width>31</width>
+            <height>30</height>
+            <x>38</x>
+            <y>41</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/1_cold_off.png</picture>
+            <highlightPicture>Resources/image/3_air/1_cold_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_fan" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>31</width>
+            <height>30</height>
+            <x>38</x>
+            <y>123</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/2_fan_off.png</picture>
+            <highlightPicture>Resources/image/3_air/2_fan_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_dry" layer="7" isLocked="False">
+          <property name="geometry">
+            <width>31</width>
+            <height>30</height>
+            <x>38</x>
+            <y>163</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/3_air/3_dry_off.png</picture>
+            <highlightPicture>Resources/image/3_air/3_dry_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Win" name="win_ac" layer="8" isLocked="False">
+          <property name="geometry">
+            <width>320</width>
+            <height>210</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="winData">
+            <hidden>False</hidden>
+          </property>
+          <widget class="Win" name="win_heat" layer="8" isLocked="False">
+            <property name="geometry">
+              <width>320</width>
+              <height>220</height>
+              <x>0</x>
+              <y>0</y>
+            </property>
+            <property name="winData">
+              <hidden>True</hidden>
+            </property>
+            <widget class="Image" name="img_bg_heat" layer="8" isLocked="False">
+              <property name="geometry">
+                <width>310</width>
+                <height>190</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/3_air/air_heat_bg.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="ImageSeekBar" name="skbr_heat" layer="9" isLocked="False">
+              <property name="geometry">
+                <width>174</width>
+                <height>174</height>
+                <x>100</x>
+                <y>26</y>
+              </property>
+              <property name="imageSeekBarData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <isArc>horizontal</isArc>
+                <centralX>240</centralX>
+                <centralY>160</centralY>
+                <startDegree>0</startDegree>
+                <endDegree>0</endDegree>
+                <folder>3_air_ani</folder>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win_cold" layer="9" isLocked="False">
+            <property name="geometry">
+              <width>320</width>
+              <height>220</height>
+              <x>0</x>
+              <y>0</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+            </property>
+            <widget class="Image" name="img_bg_cold" layer="9" isLocked="False">
+              <property name="geometry">
+                <width>320</width>
+                <height>220</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/3_air/air_cold_bg.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="ImageSeekBar" name="skbr_cold" layer="10" isLocked="False">
+              <property name="geometry">
+                <width>174</width>
+                <height>174</height>
+                <x>100</x>
+                <y>26</y>
+              </property>
+              <property name="imageSeekBarData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <isArc>horizontal</isArc>
+                <centralX>0</centralX>
+                <centralY>120</centralY>
+                <startDegree>0</startDegree>
+                <endDegree>0</endDegree>
+                <folder>3_air_ani</folder>
+              </property>
+            </widget>
+          </widget>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_4_curtain" layer="-1" isLocked="False">
+        <property name="tabData">
+          <idX>4</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Image" name="img_bg_curtain" layer="-1" isLocked="False">
+          <property name="geometry">
+            <width>320</width>
+            <height>240</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/1_switch_1/sw_1_bg.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Switch" name="sw_curtain" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>35</width>
+            <height>35</height>
+            <x>143</x>
+            <y>167</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/4_curtain/0_ON.png</picture>
+            <highlightPicture>Resources/image/4_curtain/1_OFF.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="ImageSeekBar" name="skbr_curtain" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>209</width>
+            <height>120</height>
+            <x>58</x>
+            <y>38</y>
+          </property>
+          <property name="imageSeekBarData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <isArc>horizontal</isArc>
+            <centralX>58</centralX>
+            <centralY>38</centralY>
+            <startDegree>0</startDegree>
+            <endDegree>0</endDegree>
+            <folder>4_curtain_ani</folder>
+          </property>
+        </widget>
+        <widget class="Button" name="button0" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>30</height>
+            <x>80</x>
+            <y>170</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+            <font>fontSetting0</font>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/4_curtain/2_CLOSE.png</picture>
+            <highlightPicture>Resources/image/4_curtain/2_CLOSE.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+        <widget class="Button" name="button1" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>30</height>
+            <x>212</x>
+            <y>170</y>
+          </property>
+          <property name="text">
+            <string />
+            <fontColor>#ffffff</fontColor>
+            <font>fontSetting0</font>
+          </property>
+          <property name="buttonData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/4_curtain/3_OPEN.png</picture>
+            <highlightPicture>Resources/image/4_curtain/3_OPEN.png</highlightPicture>
+            <pictureX>0</pictureX>
+            <pictureY>0</pictureY>
+            <rotationAngle>0</rotationAngle>
+            <textX>0</textX>
+            <textY>0</textY>
+          </property>
+        </widget>
+      </widget>
+      <widget class="Tab" name="tab_5_wifi" layer="-1" isLocked="False">
+        <property name="tabData">
+          <idX>5</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Switch" name="sw_wifi" layer="-1" isLocked="False">
+          <property name="geometry">
+            <width>320</width>
+            <height>210</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/5_speed/0_speed_off.png</picture>
+            <highlightPicture>Resources/image/5_speed/1_speed_on.png</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Text" name="txt_wifi" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>105</width>
+            <height>37</height>
+            <x>140</x>
+            <y>64</y>
+          </property>
+          <property name="text">
+            <string>Click</string>
+            <fontColor>#ffffffff</fontColor>
+            <font>fontSetting0</font>
+          </property>
+        </widget>
+        <widget class="Text" name="txt_unit" layer="6" isLocked="False">
+          <property name="geometry">
+            <width>105</width>
+            <height>38</height>
+            <x>170</x>
+            <y>64</y>
+          </property>
+          <property name="text">
+            <string>kbit/s</string>
+            <fontColor>#ffffffff</fontColor>
+            <font>fontSetting0</font>
+          </property>
+        </widget>
+      </widget>
+    </widget>
+    <widget class="Switch" name="sw_tab0" layer="1" isLocked="False">
+      <property name="geometry">
+        <width>34</width>
+        <height>23</height>
+        <x>69</x>
+        <y>216</y>
+      </property>
+      <property name="switchData">
+        <blendMode>imgFilterBlack</blendMode>
+        <opacity>255</opacity>
+        <picture>Resources/image/6_point/0_grey.png</picture>
+        <highlightPicture>Resources/image/6_point/1_white.png</highlightPicture>
+      </property>
+    </widget>
+    <widget class="Switch" name="sw_tab1" layer="2" isLocked="False">
+      <property name="geometry">
+        <width>34</width>
+        <height>23</height>
+        <x>104</x>
+        <y>216</y>
+      </property>
+      <property name="switchData">
+        <blendMode>imgFilterBlack</blendMode>
+        <opacity>255</opacity>
+        <picture>Resources/image/6_point/0_grey.png</picture>
+        <highlightPicture>Resources/image/6_point/1_white.png</highlightPicture>
+      </property>
+    </widget>
+    <widget class="Switch" name="sw_tab2" layer="3" isLocked="False">
+      <property name="geometry">
+        <width>34</width>
+        <height>23</height>
+        <x>139</x>
+        <y>216</y>
+      </property>
+      <property name="switchData">
+        <blendMode>imgFilterBlack</blendMode>
+        <opacity>255</opacity>
+        <picture>Resources/image/6_point/0_grey.png</picture>
+        <highlightPicture>Resources/image/6_point/1_white.png</highlightPicture>
+      </property>
+    </widget>
+    <widget class="Switch" name="sw_tab3" layer="4" isLocked="False">
+      <property name="geometry">
+        <width>34</width>
+        <height>23</height>
+        <x>174</x>
+        <y>216</y>
+      </property>
+      <property name="switchData">
+        <blendMode>imgFilterBlack</blendMode>
+        <opacity>255</opacity>
+        <picture>Resources/image/6_point/0_grey.png</picture>
+        <highlightPicture>Resources/image/6_point/1_white.png</highlightPicture>
+      </property>
+    </widget>
+    <widget class="Switch" name="sw_tab4" layer="5" isLocked="False">
+      <property name="geometry">
+        <width>34</width>
+        <height>23</height>
+        <x>209</x>
+        <y>216</y>
+      </property>
+      <property name="switchData">
+        <blendMode>imgFilterBlack</blendMode>
+        <opacity>255</opacity>
+        <picture>Resources/image/6_point/0_grey.png</picture>
+        <highlightPicture>Resources/image/6_point/1_white.png</highlightPicture>
+      </property>
+    </widget>
+    <widget class="Switch" name="sw_tab5" layer="6" isLocked="False">
+      <property name="geometry">
+        <width>34</width>
+        <height>23</height>
+        <x>244</x>
+        <y>216</y>
+      </property>
+      <property name="switchData">
+        <blendMode>imgFilterBlack</blendMode>
+        <opacity>255</opacity>
+        <picture>Resources/image/6_point/0_grey.png</picture>
+        <highlightPicture>Resources/image/6_point/1_white.png</highlightPicture>
+      </property>
+    </widget>
+  </widget>
+</ui>
