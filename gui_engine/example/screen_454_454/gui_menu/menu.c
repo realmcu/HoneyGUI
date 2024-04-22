@@ -26,6 +26,7 @@ static void page_callback(gui_page_t *page);
 static void heart_rate_cb(void);
 static void menu_cb(void);
 static void stopwatch_cb(void);
+static void map_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -66,7 +67,7 @@ void design_tab_menu(void *parent)
         "Heart Rate",
         "Menu",
         "Stopwatch",
-        "Calculator",
+        "Map",
         "Sport",
         "Heart Rate",
         "Clock",
@@ -99,7 +100,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 2)
+        if (i < 4)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -113,6 +114,7 @@ void design_tab_menu(void *parent)
     gui_win_onClick(button_array[0], heart_rate_cb, button_array[0]);
     gui_win_onClick(button_array[1], menu_cb, button_array[1]);
     gui_win_onClick(button_array[2], stopwatch_cb, button_array[2]);
+    gui_win_onClick(button_array[3], map_cb, button_array[3]);
     // gui_win_onClick(button_array[3], calculator_cb, button_array[3]);
     // gui_win_onClick(button_array[4], sport_cb, button_array[4]);
 
@@ -295,7 +297,10 @@ static void stopwatch_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_STOPWATCH))
 }
-
+static void map_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MAP))
+}
 // static void clock_cb()
 // {
 //     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CLOCK))
