@@ -627,7 +627,7 @@ STBIDEF int   stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const ch
 
 #ifndef STBI_ASSERT
 #include <assert.h>
-#define STBI_ASSERT(x) assert(x)
+#define STBI_ASSERT(x) GUI_ASSERT(x)
 #endif
 
 #ifdef __cplusplus
@@ -4261,13 +4261,13 @@ static stbi_uc *load_jpeg_image(stbi__jpeg *z, int *out_x, int *out_y, int *comp
         }
 
         // can't error after this so, this is safe
-        output = (stbi_uc *) stbi__malloc_mad3(n, z->s->img_x, z->s->img_y, 1);
+        output = (stbi_uc *) stbi__malloc_mad3(n, z->s->img_x, z->s->img_y, 1 + 8);
         if (!output) { stbi__cleanup_jpeg(z); return stbi__errpuc("outofmem", "Out of memory"); }
 
         // now go ahead and resample
         for (j = 0; j < z->s->img_y; ++j)
         {
-            stbi_uc *out = output + n * z->s->img_x * j;
+            stbi_uc *out = output + n * z->s->img_x * j + 8;
             for (k = 0; k < decode_n; ++k)
             {
                 stbi__resample *r = &res_comp[k];
