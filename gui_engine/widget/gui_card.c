@@ -176,6 +176,7 @@ static void gui_card_ctor(gui_card_t *this, gui_obj_t *parent, const char *filen
         GUI_ASSERT(NULL != NULL);
     }
     cardview->total_cnt++;
+    cardview->card_height = obj->h;
 
     this->id = cardview->total_cnt - 1;
     this->ay = cardview->height;

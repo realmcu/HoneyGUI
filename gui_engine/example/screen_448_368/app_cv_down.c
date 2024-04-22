@@ -68,6 +68,13 @@ void curtain_down_design(void *parent_widget)
     gui_card_t *tb_activity = gui_card_create(cv, "tb_activity",   0, 0, 0, 124);
     gui_card_t *tb_clock = gui_card_create(cv, "tb_clock",         0, 0, 0, 124);
 
+    gui_card_t *test_tb_music = gui_card_create(cv, "tb_music",         0, 0, 0, 124);
+    gui_card_t *test_tb_weather = gui_card_create(cv, "tb_weather",     0, 0, 0, 124);
+    gui_card_t *test_tb_blood = gui_card_create(cv, "tb_tb_bloodcube",  0, 0, 0, 124);
+    gui_card_t *test_tb_heart = gui_card_create(cv, "tb_heart",         0, 0, 0, 124);
+    gui_card_t *test_tb_activity = gui_card_create(cv, "tb_activity",   0, 0, 0, 124);
+    gui_card_t *test_tb_clock = gui_card_create(cv, "tb_clock",         0, 0, 0, 124);
+
     cardlist_clock(tb_clock);
     cardlist_activity(tb_activity);
     cardlist_heart(tb_heart);
@@ -75,4 +82,10 @@ void curtain_down_design(void *parent_widget)
     cardlist_weather(tb_weather);
     cardlist_music(tb_music);
 
+    cardlist_clock(test_tb_clock);
+    cardlist_activity(test_tb_activity);
+    cardlist_heart(test_tb_heart);
+    cardlist_blood(test_tb_blood);
+    cardlist_weather(test_tb_weather);
+    cardlist_music(test_tb_music);
 }

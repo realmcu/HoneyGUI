@@ -131,12 +131,29 @@ static void cardview_prepare(gui_obj_t *obj)
         }
         this->hold_y = tp->deltaY;
 
+        for (size_t i = 0; i < 4; i++)
+        {
+            this->recode[i] = this->recode[i + 1];
+        }
+        this->recode[4] = tp->deltaY ;
+        this->speed = this->recode[4] - this->recode[0];
+        if (this->speed > 60)
+        {
+            this->speed = 60;
+        }
+        else if (this->speed < -60)
+        {
+            this->speed = -60;
+        }
+
         skip = true;
         break;
     case TOUCH_DOWN_SLIDE:
     case TOUCH_UP_SLIDE:
     case TOUCH_ORIGIN_FROM_Y:
         // GUI_LINE(1);
+        memset(this->recode, 0, sizeof(this->recode));
+
         if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
         {
             break;
@@ -145,12 +162,38 @@ static void cardview_prepare(gui_obj_t *obj)
         {
             break;
         }
+        //int16_t tmp= this->hold_y;
         this->offset_y += this->target_y;
 
         this->hold_y = this->hold_y - this->target_y;
 
-        gui_log("this->hold_y = %d, this->target_y = %d, this->offset_y = %d \n", this->hold_y,
-                this->target_y, this->offset_y);
+        if (this->offset_y > 0)
+        {
+            this->target_y = this->target_y - this->offset_y;
+            this->offset_y = 0;
+            this->hold_y = this->hold_y - this->target_y;
+        }
+
+        if (this->speed > 30)
+        {
+            this->target_y = this->target_y - this->offset_y;
+            this->offset_y = 0;
+            this->hold_y = this->hold_y - this->target_y;
+        }
+        if (this->speed < -30)
+        {
+
+            this->offset_y = -(this->height - this->card_height);
+
+            this->hold_y = this->height - 2 * this->card_height;
+        }
+
+        gui_log("this->speed = %d, this->hold_y = %d, this->target_y = %d, this->offset_y = %d, this->total_cnt = %d \n",
+                \
+                this->speed, this->hold_y, this->target_y, this->offset_y, this->total_cnt);
+
+
+
         break;
     default:
         break;
@@ -194,9 +237,6 @@ static void cardview_prepare(gui_obj_t *obj)
             this->target_y = tmp;
         }
 
-
-        //this->hold_y = this->hold_y - this->target_y;
-        // gui_log("this->target_y = %d \n", this->target_y);
     }
     skip = false;
 

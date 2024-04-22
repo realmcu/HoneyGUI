@@ -51,6 +51,7 @@ typedef struct gui_cardview
 {
     gui_obj_t base;
     uint16_t height;
+    uint16_t card_height;
     uint16_t total_cnt;
     uint16_t cur_id;
     SLIDE_STYLE style;
