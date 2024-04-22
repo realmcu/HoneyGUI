@@ -146,7 +146,11 @@ static void cardview_prepare(gui_obj_t *obj)
             break;
         }
         this->offset_y += this->target_y;
-        gui_log("this->target_y = %d, this->offset_y = %d \n", this->target_y, this->offset_y);
+
+        this->hold_y = this->hold_y - this->target_y;
+
+        gui_log("this->hold_y = %d, this->target_y = %d, this->offset_y = %d \n", this->hold_y,
+                this->target_y, this->offset_y);
         break;
     default:
         break;

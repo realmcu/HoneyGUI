@@ -53,7 +53,7 @@ int main(int argc, char **argv)
         // int age;
         // scanf("%d", &age);
         // printf("Your age is %d \n", age);
-        sleep(10);
+        sleep(1000);
     }
 
     return 0;
