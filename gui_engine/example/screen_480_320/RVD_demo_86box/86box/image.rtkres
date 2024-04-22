@@ -4,6 +4,7 @@
     <ImageConvertSetting>
       <colorHeadFlag>true</colorHeadFlag>
       <bigEndianFlag>false</bigEndianFlag>
+      <mixAlphaChannelFlag>false</mixAlphaChannelFlag>
       <compressFlag>true</compressFlag>
       <scanMode>Horizontal</scanMode>
       <colorMode>RGB565</colorMode>
@@ -22,6 +23,8 @@
   <ImageConvertSettingInfo ImagePath="1_switch_1\0_Living_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\1_Dining_Off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\1_Dining_ON.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="1_switch_1\2_Study_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="1_switch_1\2_Study_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\2_Syudy_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\2_Syudy_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="1_switch_1\3_Wash_off.png" ImageSettingName="GlobalSetting" />
@@ -47,7 +50,9 @@
   <ImageConvertSettingInfo ImagePath="2_switch_2\6_socket3_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="2_switch_2\sw_2_bg.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\0_0_down.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air\0_0_down_clik.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\0_1_up.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="3_air\0_1_up_click.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\0_heating_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\0_heating_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="3_air\1_cold_off.png" ImageSettingName="GlobalSetting" />
@@ -106,7 +111,9 @@
   <ImageConvertSettingInfo ImagePath="3_air_heating\air_heating_24.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain\0_start.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain\1_stop.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="4_curtain\CLOSE.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain\curtain_bg.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="4_curtain\OPEN.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain_ani\curtain_00000.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain_ani\curtain_00002.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="4_curtain_ani\curtain_00004.jpg" ImageSettingName="GlobalSetting" />
