@@ -150,12 +150,10 @@ static void gui_stbimg_from_mem_ctor(gui_stb_img_t *this,
     root->obj_destory = stb_image_destory;
 
     //for self
-    this->image_format = type;
-    void *source_buf = gui_malloc(size);
-    memcpy((char *)source_buf, addr, size);
-    this->data_length = size;
-    this->data_buffer = source_buf;
     this->src_changed = true;
+    this->data_buffer = addr;
+    this->data_length = size;
+    this->image_format = type;
 }
 /*============================================================================*
  *                           Public Functions
