@@ -462,9 +462,13 @@ void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
 }
 void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
 {
-    this->enable_pre_load = enable;
+    if (this->style == TAB_CUBE)
+    {
+        this->enable_pre_load = enable;
+    }
+
     gui_dispdev_t *dc = gui_get_dc();
-    if (enable == true)
+    if (this->enable_pre_load == true)
     {
         uint16_t w = this->base.w;
         uint16_t h = this->base.h;

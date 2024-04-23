@@ -176,9 +176,9 @@ static void cardview_prepare(gui_obj_t *obj)
 
         if (this->speed > 20)
         {
-            this->target_y = this->target_y - this->offset_y;
+            int16_t tmp = this->hold_y + this->offset_y;
             this->offset_y = 0;
-            this->hold_y = this->hold_y - this->target_y;
+            this->hold_y = tmp;
         }
         if (this->speed < -20)
         {
