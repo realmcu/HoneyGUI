@@ -17,6 +17,11 @@ if not GetDepend('CONFIG_REALTEK_BUILD_PAINTER_ENGINE'):
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_hongkong']
 print(CPPPATH)
-group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_448_368_DEMO'], CPPPATH = CPPPATH)
+
+CPPDEFINES = []
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_448_368_DEMO'):
+    CPPDEFINES += ['ENABLE_RTK_GUI_448_368_DEMO']
+
+group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_448_368_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')
