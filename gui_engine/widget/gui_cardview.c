@@ -162,7 +162,7 @@ static void cardview_prepare(gui_obj_t *obj)
         {
             break;
         }
-        //int16_t tmp= this->hold_y;
+
         this->offset_y += this->target_y;
 
         this->hold_y = this->hold_y - this->target_y;
@@ -174,25 +174,21 @@ static void cardview_prepare(gui_obj_t *obj)
             this->hold_y = this->hold_y - this->target_y;
         }
 
-        if (this->speed > 30)
+        if (this->speed > 20)
         {
             this->target_y = this->target_y - this->offset_y;
             this->offset_y = 0;
             this->hold_y = this->hold_y - this->target_y;
         }
-        if (this->speed < -30)
+        if (this->speed < -20)
         {
 
-            this->offset_y = -(this->height - this->card_height);
+            int16_t tmp = this->hold_y + this->offset_y;
 
-            this->hold_y = this->height - 2 * this->card_height;
+            this->offset_y = -(this->height - 2 * this->card_height);
+
+            this->hold_y = tmp - this->offset_y;
         }
-
-        gui_log("this->speed = %d, this->hold_y = %d, this->target_y = %d, this->offset_y = %d, this->total_cnt = %d \n",
-                \
-                this->speed, this->hold_y, this->target_y, this->offset_y, this->total_cnt);
-
-
 
         break;
     default:
@@ -248,12 +244,14 @@ static void cardview_prepare(gui_obj_t *obj)
     if (last != this->checksum)
     {
         gui_fb_change();
+        gui_log("detal = %d \n", this->hold_y + this->offset_y);
     }
 
     if (this->status_cb != NULL)
     {
         this->status_cb(this);
     }
+
 
 }
 
