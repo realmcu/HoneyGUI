@@ -158,8 +158,8 @@ static void gui_card_ctor(gui_card_t *this,
     this->ay = cardview->height;
     cardview->height += obj->h;
 
-    gui_log("card[%s] id is = %d, ay = %d, cardview->height = %d \n", obj->name, this->id, this->ay,
-            cardview->height);
+    // gui_log("card[%s] id is = %d, ay = %d, cardview->height = %d \n", obj->name, this->id, this->ay,
+    //         cardview->height);
 }
 
 /*============================================================================*

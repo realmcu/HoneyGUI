@@ -413,10 +413,11 @@ static void tabview_prepare(gui_obj_t *obj)
         this->tab_change_ready = true;
     }
     if (((this->tab_change_ready == true) && (this->release_x == 0) && (this->release_y == 0)) ||
-        (dc->frame_count == 1))
+        (dc->frame_count == 1) || this->initial)
     {
         gui_obj_event_set(obj, (gui_event_t)TABVIEW_EVENT_TAB_CHANGE);
         this->tab_change_ready = false;
+        this->initial = false;
         this->tab_need_pre_load = true;
 
         gui_log("do cache right and left \n");
@@ -501,6 +502,7 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
     GET_BASE(this)->obj_end = NULL;
     GET_BASE(this)->obj_destory = tabview_destory;
     GET_BASE(this)->type = TABVIEW;
+    this->initial = true;
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
     {

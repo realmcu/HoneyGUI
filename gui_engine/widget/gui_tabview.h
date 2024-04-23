@@ -72,6 +72,7 @@ typedef struct gui_tabview
     bool tab_change_ready;
     bool tab_need_pre_load;
     bool tp_disable;
+    bool initial;
     uint8_t *left_shot;
     uint8_t *center_shot;
     uint8_t *right_shot;

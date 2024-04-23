@@ -49,7 +49,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
     tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_win_t *win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
     gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
-    gui_tabview_set_style(tv, REDUCTION);
+    gui_tabview_set_style(tv, TAB_CUBE);
+    gui_tabview_enable_pre_load(tv, true);
 
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
@@ -58,12 +59,12 @@ static void app_hongkong_ui_design(gui_app_t *app)
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
     gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
-    page_tb_clock(tb_clock);
-    page_tb_activity(tb_activity);
-    page_tb_heart(tb_heart);
-    page_tb_cube(tb_cube);
-    page_tb_weather(tb_weather);
-    page_tb_music(tb_music);
+    page_tb_clock(gui_tab_get_rte_obj(tb_clock));
+    page_tb_activity(gui_tab_get_rte_obj(tb_activity));
+    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
+    page_tb_cube(gui_tab_get_rte_obj(tb_cube));
+    page_tb_weather(gui_tab_get_rte_obj(tb_weather));
+    page_tb_music(gui_tab_get_rte_obj(tb_music));
 }
 
 
