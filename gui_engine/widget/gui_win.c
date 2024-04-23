@@ -91,9 +91,9 @@ static void win_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
-    if (kb->pressed == true)
+    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
     {
-        gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);
+        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
     }
     gui_win_t *this = (void *)obj;
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
