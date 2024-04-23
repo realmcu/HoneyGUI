@@ -30,6 +30,7 @@
 static void *gui_server_mq = NULL;
 static void (*gui_task_ext_execution_hook)(void) = NULL;
 bool GUI_SERVER_ALLOW_DLPS = false;
+bool force_display_off = false;
 static uint32_t daemon_start_ms = 0;
 static uint32_t daemon_cnt = 0;
 
@@ -88,10 +89,16 @@ static void gui_server_msg_handler(gui_obj_t *screen, gui_msg_t *msg)
         }
         event_handle = false;
     }
+    else if (msg->type == GUI_EVENT_DISPLAY_OFF)
+    {
+        force_display_off = true;
+        event_handle = false;
+    }
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     else if (msg->type == GUI_EVENT_EXTERN_IO_JS)
     {
         gui_extern_event_js_handler(msg);
+        event_handle = false;
     }
 #endif
     else
@@ -266,13 +273,15 @@ static void gui_server_entry(void *parameter)
         continue;
 #endif
         gui_msg_t msg;
-        if (((gui_ms_get() - daemon_start_ms) > app->active_ms) && (app->active_ms != (uint32_t) - 1))
+        if ((((gui_ms_get() - daemon_start_ms) > app->active_ms) && (app->active_ms != (uint32_t) - 1)) ||
+            force_display_off)
         {
             gui_log("line %d, aemon_start_ms time = %dms, current = %dms, app->active_ms = %dms \n",
                     __LINE__, daemon_start_ms, gui_ms_get(), app->active_ms);
 
             gui_display_off();
             GUI_SERVER_ALLOW_DLPS = true;
+            force_display_off = false;
 
             kb_algo_process(kb_get_data());
             kb_info_t *kb = kb_get_info();
