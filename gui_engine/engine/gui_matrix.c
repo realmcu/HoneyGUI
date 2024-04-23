@@ -548,6 +548,10 @@ void matrix_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rota
 
 void matrix_translate(float x, float y, struct gui_matrix *matrix)
 {
+    if ((x == 0) && (y == 0))
+    {
+        return;
+    }
     /* Set translation matrix. */
     struct gui_matrix t = { { {1.0f, 0.0f, x},
             {0.0f, 1.0f, y},
@@ -561,6 +565,10 @@ void matrix_translate(float x, float y, struct gui_matrix *matrix)
 
 void matrix_rotate(float degrees, struct gui_matrix *matrix)
 {
+    if (degrees == 0)
+    {
+        return;
+    }
     /* Convert degrees into radians. */
     float angle = degrees / 180.0f * 3.1415926f;
 
@@ -583,6 +591,10 @@ void matrix_rotate(float degrees, struct gui_matrix *matrix)
 
 void matrix_scale(float scale_x, float scale_y, struct gui_matrix *matrix)
 {
+    if ((scale_x == 1.0f) && (scale_x == 1.0f))
+    {
+        return;
+    }
     /* Set scale matrix. */
     struct gui_matrix s = { { {scale_x, 0.0f, 0.0f},
             {0.0f, scale_y, 0.0f},

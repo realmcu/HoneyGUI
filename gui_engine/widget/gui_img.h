@@ -69,8 +69,8 @@ typedef struct gui_img
     float c_y;//!< center of image y
     float scale_x;
     float scale_y;
-    float t_x;//!< center of screen x
-    float t_y;//!< center of screen y
+    float t_x;//!< translate of screen x
+    float t_y;//!< translate of screen y
     gui_animate_t *animate;
     uint8_t checksum;
     uint8_t opacity;
