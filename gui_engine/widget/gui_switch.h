@@ -29,8 +29,8 @@ extern "C" {
  *                        Header Files
  *============================================================================*/
 
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 #include "gui_img.h"
 
 /** @defgroup WIDGET WIDGET
@@ -66,13 +66,12 @@ struct gui_switch
     bool touch_disable;
     void (*turn_off)(gui_switch_t *sw);
     void (*turn_on)(gui_switch_t *sw);
-    void (*onOn)(gui_switch_t *this, void *cb, void *p);
-    void (*onOff)(gui_switch_t *this, void *cb, void *p);
-    void (*ctor)(gui_switch_t *this, gui_obj_t *parent,
-                 int16_t x,
+    void (*switch_on)(gui_switch_t *this, void *cb, void *p);
+    void (*switch_off)(gui_switch_t *this, void *cb, void *p);
+    void (*ctor)(gui_switch_t *this, gui_obj_t *parent, int16_t x,
                  int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
     IMG_SOURCE_MODE_TYPE src_mode;
-} ;
+};
 
 
 /** End of WIDGET_Exported_Types
@@ -142,8 +141,13 @@ struct gui_switch
  * @return return the widget object pointer.
  *
  */
-gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
-                                int16_t w, int16_t h, void *off_pic, void *on_pic);
+gui_switch_t *gui_switch_create(void    *parent,
+                                int16_t  x,
+                                int16_t  y,
+                                int16_t  w,
+                                int16_t  h,
+                                void    *off_pic,
+                                void    *on_pic);
 
 /**
  * @brief create a switch widget, file source is filesystem.
@@ -157,20 +161,28 @@ gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
  * @return return the widget object pointer.
  *
  */
-gui_switch_t *gui_switch_create_from_fs(void *parent, int16_t x, int16_t y,
-                                        int16_t w, int16_t h, void *off_pic, void *on_pic);
+gui_switch_t *gui_switch_create_from_fs(void    *parent,
+                                        int16_t  x,
+                                        int16_t  y,
+                                        int16_t  w,
+                                        int16_t  h,
+                                        void    *off_pic,
+                                        void    *on_pic);
+
 /**
  * @brief Turn on the switch
  *
  * @param this
  */
 void gui_switch_turn_on(gui_switch_t *this);
+
 /**
  * @brief Turn off the switch
  *
  * @param this
  */
 void gui_switch_turn_off(gui_switch_t *this);
+
 /**
  * @brief If the switch has been turned on somehow, it can upadte the status to on status.
  *
@@ -200,6 +212,3 @@ void gui_switch_is_off(gui_switch_t *this);
 #endif
 
 #endif
-
-
-

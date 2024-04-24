@@ -62,16 +62,16 @@ extern "C" {
 
 typedef struct gui_touch_port_data
 {
-    uint8_t          event;                 /* The touch event of the data */
-    uint8_t          track_id;              /* Track id of point */
-    uint16_t         width;                 /* Point of width */
-    uint16_t         x_coordinate;          /* Point of x coordinate */
-    uint16_t         y_coordinate;          /* Point of y coordinate */
-    uint32_t         timestamp_ms;          /* The timestamp when pressing, update periodically*/
-    uint16_t         x_coordinate_start;    /* Point of x when pressed, update once, for tp algo v2*/
-    uint16_t         y_coordinate_start;    /* Point of y when pressed, update once, for tp algo v2*/
-    uint32_t         timestamp_ms_start;    /* The timestamp when pressed, update once, for tp algo v2*/
-    void            *data;
+    uint8_t  event;                 /* The touch event of the data */
+    uint8_t  track_id;              /* Track id of point */
+    uint16_t width;                 /* Point of width */
+    uint16_t x_coordinate;          /* Point of x coordinate */
+    uint16_t y_coordinate;          /* Point of y coordinate */
+    uint32_t timestamp_ms;          /* The timestamp when pressing, update periodically*/
+    uint16_t x_coordinate_start;    /* Point of x when pressed, update once, for tp algo v2*/
+    uint16_t y_coordinate_start;    /* Point of y when pressed, update once, for tp algo v2*/
+    uint32_t timestamp_ms_start;    /* The timestamp when pressed, update once, for tp algo v2*/
+    void *data;
 } gui_touch_port_data_t;
 
 typedef struct touch_info

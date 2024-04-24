@@ -270,49 +270,49 @@ function lampSwitchOffFunc(params) {
 
 }
 sw.getElementById('kitchen_switch')
-sw.onOn(led1OnFunc)
-sw.onOff(led1OffFunc)
+sw.switch_on(led1OnFunc)
+sw.switch_off(led1OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('parlor_switch')
-sw.onOn(led2OnFunc)
-sw.onOff(led2OffFunc)
+sw.switch_on(led2OnFunc)
+sw.switch_off(led2OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('bedroom_switch')
-sw.onOn(led3OnFunc)
-sw.onOff(led3OffFunc)
+sw.switch_on(led3OnFunc)
+sw.switch_off(led3OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('bedroom_switch1')
-sw.onOn(led4OnFunc)
-sw.onOff(led4OffFunc)
+sw.switch_on(led4OnFunc)
+sw.switch_off(led4OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('bedroom_switch2')
-sw.onOn(led5OnFunc)
-sw.onOff(led5OffFunc)
+sw.switch_on(led5OnFunc)
+sw.switch_off(led5OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('porch_switch')
-sw.onOn(led6OnFunc)
-sw.onOff(led6OffFunc)
+sw.switch_on(led6OnFunc)
+sw.switch_off(led6OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('bedroom_off')
-sw.onOn(led7OnFunc)
-sw.onOff(led7OffFunc)
+sw.switch_on(led7OnFunc)
+sw.switch_off(led7OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('children')
-sw.onOn(led8OnFunc)
-sw.onOff(led8OffFunc)
+sw.switch_on(led8OnFunc)
+sw.switch_off(led8OffFunc)
 sw.onPress(sleepflagTrue)
 
 sw.getElementById('socket1')
-sw.onOn(plug1OnFunc)
-sw.onOff(plug1OffFunc)
+sw.switch_on(plug1OnFunc)
+sw.switch_off(plug1OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('switch0')
-sw.onOn(plug2OnFunc)
-sw.onOff(plug2OffFunc)
+sw.switch_on(plug2OnFunc)
+sw.switch_off(plug2OffFunc)
 sw.onPress(sleepflagTrue)
 sw.getElementById('socket3')
-sw.onOn(plug3OnFunc)
-sw.onOff(plug3OffFunc)
+sw.switch_on(plug3OnFunc)
+sw.switch_off(plug3OffFunc)
 sw.onPress(sleepflagTrue)
 icon.getElementById('allturnon')
 icon.onClick(lampSwitchOnFunc)
@@ -458,17 +458,17 @@ function acOffFunc1(params) {
 
 }
 sw.getElementById('cool_switch')
-sw.onOn(coolingFunc)
-sw.onOff(acOffFunc1)
+sw.switch_on(coolingFunc)
+sw.switch_off(acOffFunc1)
 
 
 sw.getElementById('heat_switch')
-sw.onOn(heatingFunc)
-sw.onOff(acOffFunc1)
+sw.switch_on(heatingFunc)
+sw.switch_off(acOffFunc1)
 
 sw.getElementById('ac_on_off_switch')
-sw.onOn(acOnFunc)
-sw.onOff(acOffFunc)
+sw.switch_on(acOnFunc)
+sw.switch_off(acOffFunc)
 //sw.turnOn()
 
 /**
@@ -509,14 +509,14 @@ function swCurtain(params) {
 }
 seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
 sw.getElementById('open_switch')
-sw.onOn(swCurtain)
-sw.onOff(swCurtain)
+sw.switch_on(swCurtain)
+sw.switch_off(swCurtain)
 sw.getElementById('curtain_on_off_switch')
-sw.onOn(swCurtain)
-sw.onOff(swCurtain)
+sw.switch_on(swCurtain)
+sw.switch_off(swCurtain)
 sw.getElementById('close_switch')
-sw.onOn(swCurtain)
-sw.onOff(swCurtain)
+sw.switch_on(swCurtain)
+sw.switch_off(swCurtain)
 
 
 // reset button
@@ -606,33 +606,33 @@ tab.onChange(tab_slide)
 // console.log('[JS] jump')
 // jump tab0
 sw.getElementById('sw_tab0')
-sw.onOn(sw_jump_tab, 0)
-sw.onOff(sw_jump_keep_on, 0)
+sw.switch_on(sw_jump_tab, 0)
+sw.switch_off(sw_jump_keep_on, 0)
 
 // jump tab1
 sw.getElementById('sw_tab1')
-sw.onOn(sw_jump_tab, 1)
-sw.onOff(sw_jump_keep_on, 1)
+sw.switch_on(sw_jump_tab, 1)
+sw.switch_off(sw_jump_keep_on, 1)
 
 // jump tab2
 sw.getElementById('sw_tab2')
-sw.onOn(sw_jump_tab, 2)
-sw.onOff(sw_jump_keep_on, 2)
+sw.switch_on(sw_jump_tab, 2)
+sw.switch_off(sw_jump_keep_on, 2)
 
 // jump tab3
 sw.getElementById('sw_tab3')
-sw.onOn(sw_jump_tab, 3)
-sw.onOff(sw_jump_keep_on, 3)
+sw.switch_on(sw_jump_tab, 3)
+sw.switch_off(sw_jump_keep_on, 3)
 
 // jump tab4
 sw.getElementById('sw_tab4')
-sw.onOn(sw_jump_tab, 4)
-sw.onOff(sw_jump_keep_on, 4)
+sw.switch_on(sw_jump_tab, 4)
+sw.switch_off(sw_jump_keep_on, 4)
 
 // jump tab5
 sw.getElementById('sw_tab5')
-sw.onOn(sw_jump_tab, 5)
-sw.onOff(sw_jump_keep_on, 5)
+sw.switch_on(sw_jump_tab, 5)
+sw.switch_off(sw_jump_keep_on, 5)
 
 // console.log('[JS] end jump')
 
@@ -686,8 +686,8 @@ function stopSpeed(params) {
     textbox.write(' ')
 }
 sw.getElementById('sw_wifi')
-sw.onOn(startSpeed)
-sw.onOff(stopSpeed)
+sw.switch_on(startSpeed)
+sw.switch_off(stopSpeed)
 console.log('end wifi speed')
 
 //-------------------------------------------
