@@ -56,6 +56,8 @@ typedef enum
     MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
+    VERTICAL_LEFT,
+    VERTICAL_RIGHT,
 } TEXT_MODE;
 
 /** @brief  text encoding format enum */
