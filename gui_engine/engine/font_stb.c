@@ -157,7 +157,7 @@ static bool creat_stb_screen(gui_text_t *text, gui_rect_t *rect, FONT_STB_SCREEN
     }
     else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
     {
-        screen->width =  rect->x2 - rect->x1;
+        screen->width = (rect->x2 - rect->x1) * text->base.matrix->m[0][0];
         screen->height = rect->y2 - rect->y1;
     }
     else if (text->mode == SCROLL_X)
@@ -576,7 +576,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
             }
             else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
             {
-                if (xpos + advance * scale > stb_screen->width)
+                if ((xpos + advance * scale > stb_screen->width) || p_buf[ch] == 0x0A)
                 {
                     line_num ++;
                     xpos = 0;
