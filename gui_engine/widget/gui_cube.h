@@ -248,11 +248,11 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file);
  *}
  * \endcode
  */
-gui_cube_t *gui_cube_create(void                *parent,
-                            const char          *name,
+gui_cube_t *gui_cube_create(void               *parent,
+                            const char         *name,
                             gui_cube_imgfile_t *img_file,
-                            int16_t              x,
-                            int16_t              y);
+                            int16_t             x,
+                            int16_t             y);
 
 /**
  * @brief set center
