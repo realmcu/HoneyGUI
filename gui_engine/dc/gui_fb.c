@@ -121,13 +121,13 @@ static void obj_input_prepare(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if ((obj->matrix != NULL) && (obj->parent->matrix))
-        {
-            memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
-            matrix_translate(obj->x, obj->y, obj->matrix);
-        }
         if (obj->obj_input_prepare != NULL)
         {
+            if ((obj->matrix != NULL) && (obj->parent->matrix))
+            {
+                memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
+                matrix_translate(obj->x, obj->y, obj->matrix);
+            }
             obj->obj_input_prepare(obj);
             if (obj_is_active(obj) == false)
             {

@@ -85,8 +85,12 @@ static void design_app_watch_ui(gui_app_t *app)
     design_tab_player(gui_tab_get_rte_obj(tab_player));
     design_tab_call(gui_tab_get_rte_obj(tab_call));
     design_tab_contacts(gui_tab_get_rte_obj(tab_contacts));
+#ifdef ENABLE_LITE_GFX
+    design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_record));
+#else
     design_tab_record(gui_tab_get_rte_obj(tab_record));
-    // design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_record));
+#endif
+
     design_tab_menu(gui_tab_get_rte_obj(tab_menu));
 
 }

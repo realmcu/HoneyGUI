@@ -100,12 +100,12 @@ static void px_main(gui_px_t *this)
 
 #endif
 
-//static void canvas_cb_black(gui_canvas_t *canvas)
-//{
-//    nvgRect(canvas->vg, 20, 256, 200, 180);
-//    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 200));
-//    nvgFill(canvas->vg);
-//}
+static void canvas_cb_black(gui_canvas_t *canvas)
+{
+    nvgRect(canvas->vg, 20, 256, 200, 180);
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 200));
+    nvgFill(canvas->vg);
+}
 
 #include "gui_cube.h"
 #include "tiger_blue_compressed.c"
@@ -146,8 +146,8 @@ static void app_dialing_ui_design(gui_app_t *app)
     gui_img_t *img_2 = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_2),  "img_2",
                                                (void *)_actiger_turk, 100, 100, 0, 0);
 
-//    gui_canvas_t *canvas = gui_canvas_create(tab_1, "canvas", 0, 0, 0, 454, 454);
-//    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
+    gui_canvas_t *canvas = gui_canvas_create(tab_1, "canvas", 0, 0, 0, 454, 454);
+    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
 
     // gui_px_t *px = gui_px_create(&app->screen, "px-test", px_main, 0, 0, 454, 454);
 

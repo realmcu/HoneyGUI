@@ -16,9 +16,6 @@ if not GetDepend(['CONFIG_REALTEK_BUILD_LVGL_GUI']):
 
 if not GetDepend(['CONFIG_REALTEK_BUILD_PAINTER_ENGINE']):
     SrcRemove(src,'gui_px.c')
-    
-if not GetDepend(['CONFIG_REALTEK_BUILD_LITE_GFX']):
-    SrcRemove(src,'gui_widget_litegfx.c')
 
 CPPPATH = [cwd]
 
