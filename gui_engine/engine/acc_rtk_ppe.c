@@ -397,25 +397,20 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             source.height = end_line - start_line + 1;
             const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                                       struct gui_rgb_data_head));
-            IMDC_decode_range range;
-            range.start_column = rect->x1 < 0 ? -rect->x1 : 0;
-            range.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
-                               - range.start_column : header->raw_pic_width - 1;
-            range.start_line = start_line;
-            range.end_line = end_line;
-            IMDC_DMA_config dma_cfg;
-            source.memory = gui_malloc((end_line - start_line + 1) * (range.end_column - range.start_column + 1)
+            hal_imdc_decompress_info info;
+            info.start_column = rect->x1 < 0 ? -rect->x1 : 0;
+            info.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                              - info.start_column : header->raw_pic_width - 1;
+            info.start_line = start_line;
+            info.end_line = end_line;
+            info.raw_data_address = (uint32_t)header;
+            source.memory = gui_malloc((end_line - start_line + 1) * (info.end_column - info.start_column + 1)
                                        * (header->algorithm_type.pixel_bytes + 2));
             source.address = (uint32_t)source.memory;
-            source.width = range.end_column - range.start_column + 1;
-            dma_cfg.output_buf = (uint32_t *)source.memory;
-            dma_cfg.RX_DMA_channel_num = 3;
-            dma_cfg.TX_DMA_channel_num = 1;
-            dma_cfg.RX_DMA_channel = GDMA_Channel3;
-            dma_cfg.TX_DMA_channel = GDMA_Channel1;
+            source.width = info.end_column - info.start_column + 1;
             trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
-            IMDC_ERROR err = IMDC_Decode((uint8_t *)header, &range, &dma_cfg);
-            if (err)
+            bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
+            if (!ret)
             {
                 gui_free(source.memory);
                 return;
