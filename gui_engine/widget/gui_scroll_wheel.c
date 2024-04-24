@@ -17,10 +17,8 @@
  *                        Header Files
  *============================================================================*/
 
-#include <guidef.h>
-#include <gui_scroll_wheel.h>
-#include <tp_algo.h>
-
+#include "gui_scroll_wheel.h"
+#include "tp_algo.h"
 
 
 /** @defgroup WIDGET WIDGET
@@ -32,7 +30,6 @@
 /** @defgroup WIDGET_Exported_Types WIDGET Exported Types
   * @{
   */
-
 
 
 /** End of WIDGET_Exported_Types
@@ -59,8 +56,6 @@
   */
 
 
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -83,25 +78,24 @@
   * @{
   */
 
-
-
-void scroll_wheel_update_att(gui_obj_t *obj)
+void gui_scroll_wheel_update_att(gui_obj_t *obj)
 {
-    gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_scroll_wheel_t *this = (gui_scroll_wheel_t *)obj;
+    gui_list_t *node = NULL;
+    scroll_wheel_picture_t *picture;
 
     int child_count = 0;
     int child_gap = ((gui_scroll_wheel_t *)obj)->child_gap;
-    gui_list_t *node = NULL;
+    int current_row = 0;
+
     gui_list_for_each(node, &obj->child_list)
     {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        //obj->x = 0;
-        obj->y = (child_count++) * child_gap;
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        o->y = (child_count++) * child_gap;
     }
+
     page_update(obj);
-    int current_row = 0;
     if ((((gui_page_t *)obj)->start_y - obj->y - ((gui_scroll_wheel_t *)obj)->child_gap / 2) <= 0)
     {
         current_row = 0;
@@ -111,12 +105,12 @@ void scroll_wheel_update_att(gui_obj_t *obj)
         current_row = ((((gui_page_t *)obj)->start_y - obj->y - ((gui_scroll_wheel_t *)obj)->child_gap /
                         2) / (((gui_scroll_wheel_t *)obj)->child_gap) + 1);
     }
+
     if (current_row + 2 > ((gui_scroll_wheel_t *)obj)->row_count)
     {
         current_row = ((gui_scroll_wheel_t *)obj)->row_count - 2;
     }
 
-    //gui_log("tp->type:%d\n", tp->type);
     if (tp->type == TOUCH_INVALIDE)
     {
         ((gui_scroll_wheel_t *)obj)->press_flag = true;
@@ -124,7 +118,7 @@ void scroll_wheel_update_att(gui_obj_t *obj)
     else if (((gui_scroll_wheel_t *)obj)->press_flag && tp->type == 0)
     {
         ((gui_scroll_wheel_t *)obj)->press_flag = false;
-        //obj->y = obj->y + (((gui_page_t *)obj)->start_y - obj->y) % (((gui_scroll_wheel_t *)obj)->child_gap/2);
+
         if ((((gui_page_t *)obj)->start_y - obj->y - ((gui_scroll_wheel_t *)obj)->child_gap / 2) <= 0)
         {
             obj->y = ((gui_page_t *)obj)->start_y;
@@ -134,9 +128,10 @@ void scroll_wheel_update_att(gui_obj_t *obj)
             obj->y = ((gui_page_t *)obj)->start_y - current_row * ((gui_scroll_wheel_t *)obj)->child_gap;
         }
     }
+
     if ((current_row + 1 >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic))
     {
-        struct scroll_wheel_picture *picture = &this->picture[current_row + 1];
+        picture = &this->picture[current_row + 1];
         gui_imgconfig_t config =
         {
             .src_mode = this->src_mode,
@@ -146,9 +141,10 @@ void scroll_wheel_update_att(gui_obj_t *obj)
         };
         gui_img_set_config(picture->pic, &config);
     }
+
     if ((current_row >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row].pic))
     {
-        struct scroll_wheel_picture *picture = &this->picture[current_row];
+        picture = &this->picture[current_row];
         gui_imgconfig_t config =
         {
             .src_mode = this->src_mode,
@@ -158,10 +154,11 @@ void scroll_wheel_update_att(gui_obj_t *obj)
         };
         gui_img_set_config(picture->pic, &config);
     }
-    if ((current_row + 2 >= 0) && (current_row + 2 < ((gui_scroll_wheel_t *)obj)->row_count) &&
-        (((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic))
+
+    if ((current_row + 2 >= 0) && (current_row + 2 < ((gui_scroll_wheel_t *)obj)->row_count)
+        && (((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic))
     {
-        struct scroll_wheel_picture *picture = &this->picture[current_row + 2];
+        picture = &this->picture[current_row + 2];
         gui_imgconfig_t config =
         {
             .src_mode = this->src_mode,
@@ -171,12 +168,14 @@ void scroll_wheel_update_att(gui_obj_t *obj)
         };
         gui_img_set_config(picture->pic, &config);
     }
-    // gui_log("current_row:%d\n",current_row);
+
     ((gui_scroll_wheel_t *)obj)->index = current_row + 1;
 }
 
-void gui_scrollwheel_append_core(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl,
-                                 IMG_SOURCE_MODE_TYPE src_mode)
+void gui_scroll_wheel_append_core(gui_scroll_wheel_t   *this,
+                                  void                 *num_pic,
+                                  void                 *num_pic_hl,
+                                  IMG_SOURCE_MODE_TYPE  src_mode)
 {
     gui_img_t **img = &this->picture[this->row_count].pic;
 
@@ -196,27 +195,30 @@ void gui_scrollwheel_append_core(gui_scroll_wheel_t *this, void *num_pic, void *
                                                   this->picture[this->row_count].pic->draw_img.img_h) / 2;
     this->picture[this->row_count].pic_addr = num_pic;
     this->picture[this->row_count].pic_hl_addr = num_pic_hl;
-    //gui_log("num:%d\n", (this->base.base.w - this->picture[this->row_count].pic->w) / 2);
     this->row_count++;
 }
 
-void gui_scrollwheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl)
+void gui_scroll_wheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl)
 {
-    gui_scrollwheel_append_core(this, num_pic, num_pic_hl, IMG_SRC_MEMADDR);
+    gui_scroll_wheel_append_core(this, num_pic, num_pic_hl, IMG_SRC_MEMADDR);
 }
 
-void gui_scrollwheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl)
+void gui_scroll_wheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl)
 {
-    gui_scrollwheel_append_core(this, num_pic, num_pic_hl, IMG_SRC_FILESYS);
+    gui_scroll_wheel_append_core(this, num_pic, num_pic_hl, IMG_SRC_FILESYS);
 }
 
-static uint32_t (get_index)(struct gui_scroll_wheel *this)
+static uint32_t gui_scoll_wheel_get_index(struct gui_scroll_wheel *this)
 {
     return this->index;
 }
 
-void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this, gui_obj_t *parent, int16_t x, int16_t y,
-                           int16_t w, int16_t h)
+void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this,
+                           gui_obj_t               *parent,
+                           int16_t                  x,
+                           int16_t                  y,
+                           int16_t                  w,
+                           int16_t                  h)
 {
     //for base class
     gui_page_t *base = (gui_page_t *)this;
@@ -224,40 +226,41 @@ void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this, gui_obj_t *parent, int
 
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
-    root->obj_prepare = scroll_wheel_update_att;
+    root->obj_prepare = gui_scroll_wheel_update_att;
     root->type = SCROLL_WHEEL;
 
     //for self
     this->child_gap = 200 / 3;
-    // this->highlight_start = (w - this->child_gap) / 2;
     this->highlight_start = (w + this->child_gap) / 2;
-    this->get_index = get_index;
+    this->get_index = gui_scoll_wheel_get_index;
 }
-
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
 
-gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent, void *addr, int16_t x, int16_t y,
-                                            int16_t w,
-                                            int16_t h)
+gui_scroll_wheel_t *gui_scroll_wheel_create(void    *parent,
+                                            void    *addr,
+                                            int16_t  x,
+                                            int16_t  y,
+                                            int16_t  w,
+                                            int16_t  h)
 {
     GUI_ASSERT(parent != NULL);
     gui_scroll_wheel_t *this = gui_malloc(sizeof(gui_scroll_wheel_t));
-    memset(this, 0, sizeof(gui_scroll_wheel_t));
 
+    memset(this, 0, sizeof(gui_scroll_wheel_t));
     gui_scroll_wheel_ctor(this, parent, x, y, w, h);
+
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
     {
         gui_list_insert_before(&((GET_BASE(this)->parent)->child_list), &(GET_BASE(this)->brother_list));
     }
-    // gui_img_create_from_mem(parent, "scroll_bg", addr, x, y, w, h);
+
     GET_BASE(this)->create_done = true;
     return this;
 }
-
 
 /** End of WIDGET_Exported_Functions
   * @}
@@ -266,7 +269,3 @@ gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent, void *addr, int16_t x,
 /** End of WIDGET
   * @}
   */
-
-
-
-

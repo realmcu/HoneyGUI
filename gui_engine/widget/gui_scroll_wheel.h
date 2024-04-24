@@ -25,8 +25,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 #include "gui_page.h"
 
 /** @defgroup WIDGET WIDGET
@@ -63,14 +63,13 @@ typedef struct scroll_wheel_picture
     void *pic_hl_addr;
     gui_img_t *pic;
 } scroll_wheel_picture_t;
+
 typedef struct gui_scroll_wheel
 {
     gui_page_t base;
     int child_gap;
     int highlight_start;
     int highlight_end;
-    void (*ctor)(struct gui_scroll_wheel *this, gui_obj_t *parent, int16_t x, int16_t y, int16_t w,
-                 int16_t h);
     uint32_t index;
     uint32_t (*get_index)(struct gui_scroll_wheel *this);
     struct scroll_wheel_picture picture[SCROLL_WHEEL_ROW];
@@ -96,7 +95,6 @@ typedef struct gui_scroll_wheel
 /** End of WIDGET_Exported_Constants
   * @}
   */
-
 
 
 /*============================================================================*
@@ -130,8 +128,12 @@ typedef struct gui_scroll_wheel
  * @param h the hight of the widget.
  * @return return the widget object pointer.
  */
-gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent,  void *addr, int16_t x, int16_t y,
-                                            int16_t w, int16_t h);
+gui_scroll_wheel_t *gui_scroll_wheel_create(void    *parent,
+                                            void    *addr,
+                                            int16_t  x,
+                                            int16_t  y,
+                                            int16_t  w,
+                                            int16_t  h);
 /**
  * @brief Append a picture in the wheel, images are loaded from memory address.
  *
@@ -139,7 +141,7 @@ gui_scroll_wheel_t *gui_scroll_wheel_create(void *parent,  void *addr, int16_t x
  * @param num_pic The picture array memory address.
  * @param num_pic_hl The picture(highlight) array memory address.
  */
-void gui_scrollwheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
+void gui_scroll_wheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
 
 /**
  * @brief Append a picture in the wheel, images are loaded from filesystem.
@@ -148,7 +150,7 @@ void gui_scrollwheel_append(gui_scroll_wheel_t *this, void *num_pic, void *num_p
  * @param num_pic The picture filepath.
  * @param num_pic_hl The picture(highlight) filepath.
  */
-void gui_scrollwheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
+void gui_scroll_wheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, void *num_pic_hl);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
@@ -164,4 +166,3 @@ void gui_scrollwheel_append_from_fs(gui_scroll_wheel_t *this, void *num_pic, voi
 #endif
 
 #endif
-
