@@ -31,6 +31,7 @@ extern "C" {
 #include <guidef.h>
 #include <gui_fb.h>
 #include "gui_win.h"
+#include "gui_img_stb.h"
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{
@@ -43,11 +44,19 @@ extern "C" {
   * @brief
   * @{
   */
+typedef struct map_tile
+{
+    int x;
+    int y;
+    int zoom;
+    gui_stb_img_t *img;
+} map_tile_t;
 
 /** @brief  map structure */
 typedef struct gui_map
 {
     gui_win_t base; //!< base structure
+    map_tile_t tile[3][3];
     int16_t start_x, start_y;
     bool press, release;
 } gui_map_t;

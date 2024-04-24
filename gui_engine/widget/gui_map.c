@@ -64,8 +64,8 @@
 #define SCREEN_H ((int)gui_get_screen_height())
 #define TILE_SIZE (256)
 #define EARTH_LONGITUDE_RANGE 360.0
-#define BEIJING_CITY_LONGITUDE 116.4074
-#define BEIJING_CITY_LATITUDE 39.9042
+#define BEIJING_CITY_LONGITUDE 104.0668
+#define BEIJING_CITY_LATITUDE 30.5728
 #define TILE_ZOOM_LEVEL (8)
 #define WIN_W (SCREEN_W*3/2)
 #define WIN_H (SCREEN_H*3/2)
@@ -115,7 +115,7 @@ void generateTileURL(int tileX, int tileY, int zoom)
     gui_log("http://mt0.google.com/vt/lyrs=m@221097413,traffic&x=%d&y=%d&z=%d\n", tileX, tileY, zoom);
 }
 void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat, double center_lon,
-                            int zoom, void *parent)
+                            int zoom, gui_map_t *parent)
 {
     // Calculate how many tiles are needed for each direction
     int tileCountX = ceil((double)windowWidth / TILE_SIZE);
@@ -159,12 +159,21 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
             else
             {
                 gui_log("open %s Fail!\n", path);
-                return 0;
+                //return 0;
             }
-            gui_stbimg_create_from_mem(parent, 0, jpg, filesize, JPEG, (x - startX)*tile_size,
-                                       (y - startY)*tile_size);
+            if (parent->tile[y - startY][x - startX].img->data_buffer)
+            {
+                gui_free(parent->tile[y - startY][x - startX].img->data_buffer);
+            }
+            parent->tile[y - startY][x - startX].x = x;
+            parent->tile[y - startY][x - startX].y = y;
+            parent->tile[y - startY][x - startX].zoom = zoom;
+            gui_stbimg_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
+                                     (x - startX)*tile_size, (y - startY)*tile_size);
+
 #else
-            gui_rect(parent, (x - startX)*tile_size, (y - startY)*tile_size, TILE_SIZE - 1, TILE_SIZE - 1,
+            gui_rect((gui_obj_t *)parent, (x - startX)*tile_size, (y - startY)*tile_size, TILE_SIZE - 1,
+                     TILE_SIZE - 1,
                      APP_COLOR_SILVER);
 #endif
         }
@@ -179,6 +188,8 @@ static void ctor(gui_map_t *this, gui_obj_t *parent)
     this->start_x = GET_BASE(this)->x;
     this->start_y = GET_BASE(this)->y;
 }
+
+
 static void wincb(gui_map_t *this)
 {
     if (this->base.animate->progress_percent == 1)
@@ -196,11 +207,271 @@ static void wincb(gui_map_t *this)
         this->press = 0;
         this->release = 1;
     }
+    static bool deltaX_right_flag, deltaX_left_flag;
     if (this->press)
     {
         GUI_BASE(this)->x = this->start_x + tp->deltaX;
         GUI_BASE(this)->y = this->start_y + tp->deltaY;
+        static int deltaX_old;
+
+        if (deltaX_old < tp->deltaX)
+        {
+            deltaX_right_flag = 1;
+            deltaX_left_flag = 0;
+        }
+        else if (deltaX_old > tp->deltaX)
+        {
+            deltaX_left_flag = 1;
+            deltaX_right_flag = 0;
+        }
+
+        //gui_log("deltaX_old:%d, d:%d\n", deltaX_old, tp->deltaX);
+        if (GUI_BASE(this)->x >= 0 && (tp->deltaX > 0 || deltaX_right_flag) && !deltaX_left_flag)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 2; j > 0; j--)
+                {
+                    if (j == 2)
+                    {
+                        gui_free(this->tile[i][j].img->data_buffer);
+                    }
+
+                    gui_stbimg_set_attribute(
+                        this->tile[i][j].img,
+                        this->tile[i][j - 1].img->data_buffer,
+                        this->tile[i][j - 1].img->data_length,
+                        JPEG,
+                        this->tile[i][j].img->base.x,
+                        this->tile[i][j].img->base.y
+                    );
+
+                    this->tile[i][j].x--;
+                }
+                {
+#if _WIN32
+                    char path[100];
+                    memset(path, 0, 100);
+                    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
+                            this->tile[i][0].zoom,
+                            this->tile[i][0].x - 1, this->tile[i][0].y);
+                    int fd;
+                    fd = gui_fs_open(path, 0);
+
+                    char *jpg = 0;
+                    off_t filesize = 0;
+                    if (fd > 0)
+                    {
+                        filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                        jpg = gui_malloc(filesize);
+                        //gui_log("open %s Successful!\n", path);
+                        gui_fs_lseek(fd, 0, SEEK_SET);
+                        gui_fs_read(fd, jpg, filesize);
+                    }
+                    else
+                    {
+                        //gui_log("open %s Fail!\n", path);
+                    }
+                    gui_stbimg_set_attribute(this->tile[i][0].img, jpg, filesize, JPEG, this->tile[i][0].img->base.x,
+                                             this->tile[i][0].img->base.y);
+                    this->tile[i][0].x--;
+#else
+#endif
+                }
+            }
+
+
+            GUI_BASE(this)->x = -256 ;
+            this->start_x = -256 - tp->deltaX;
+        }
+        if (GUI_BASE(this)->x <= -(GUI_BASE(this)->w - SCREEN_W)  && (tp->deltaX < 0 || deltaX_left_flag) &&
+            !deltaX_right_flag)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    if (j == 0)
+                    {
+                        gui_free(this->tile[i][j].img->data_buffer);
+                    }
+
+                    gui_stbimg_set_attribute(
+                        this->tile[i][j].img,
+                        this->tile[i][j + 1].img->data_buffer,
+                        this->tile[i][j + 1].img->data_length,
+                        JPEG,
+                        this->tile[i][j].img->base.x,
+                        this->tile[i][j].img->base.y
+                    );
+
+                    this->tile[i][j].x++;
+                }
+
+                // Load new image data to "tile[i][2]"
+#if _WIN32
+                char path[100];
+                memset(path, 0, 100);
+                sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
+                        this->tile[i][2].zoom, this->tile[i][2].x + 1, this->tile[i][2].y);
+                int fd;
+                fd = gui_fs_open(path, 0);
+
+                char *jpg = 0;
+                off_t filesize = 0;
+                if (fd > 0)
+                {
+                    filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                    jpg = gui_malloc(filesize);
+                    //gui_log("open %s Successful!\n", path);
+                    gui_fs_lseek(fd, 0, SEEK_SET);
+                    gui_fs_read(fd, jpg, filesize);
+                }
+                else
+                {
+                    //gui_log("open %s Fail!\n", path);
+                }
+                gui_stbimg_set_attribute(this->tile[i][2].img, jpg, filesize, JPEG, this->tile[i][2].img->base.x,
+                                         this->tile[i][2].img->base.y);
+                this->tile[i][2].x++;
+#else
+#endif
+            }
+
+            GUI_BASE(this)->x = 0;
+            this->start_x = - tp->deltaX;
+        }
+
+        if (GUI_BASE(this)->y >= 0 && (tp->deltaY > 0))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 2; j > 0; j--)
+                {
+                    if (j == 2)
+                    {
+                        gui_free(this->tile[j][i].img->data_buffer);
+                    }
+
+                    gui_stbimg_set_attribute(
+                        this->tile[j][i].img,
+                        this->tile[j - 1][i].img->data_buffer,
+                        this->tile[j - 1][i].img->data_length,
+                        JPEG,
+                        this->tile[j][i].img->base.x,
+                        this->tile[j][i].img->base.y
+                    );
+
+                    this->tile[j][i].y--;
+                }
+                {
+#if _WIN32
+                    char path[100];
+                    memset(path, 0, 100);
+                    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
+                            this->tile[0][i].zoom,
+                            this->tile[0][i].x, this->tile[0][i].y - 1);
+                    int fd;
+                    fd = gui_fs_open(path, 0);
+
+                    char *jpg = 0;
+                    off_t filesize = 0;
+                    if (fd > 0)
+                    {
+                        filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                        jpg = gui_malloc(filesize);
+                        //gui_log("open %s Successful!\n", path);
+                        gui_fs_lseek(fd, 0, SEEK_SET);
+                        gui_fs_read(fd, jpg, filesize);
+                    }
+                    else
+                    {
+                        //gui_log("open %s Fail!\n", path);
+                    }
+                    gui_stbimg_set_attribute(this->tile[0][i].img, jpg, filesize, JPEG, this->tile[0][i].img->base.x,
+                                             this->tile[0][i].img->base.y);
+                    this->tile[0][i].y--;
+#else
+#endif
+                }
+            }
+
+
+            GUI_BASE(this)->y = -256 ;
+            this->start_y = -256 - tp->deltaY;
+        }
+
+        if (GUI_BASE(this)->y <= -(256 * 3 - SCREEN_H) && (tp->deltaY < 0))
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    if (j == 0)
+                    {
+                        gui_free(this->tile[j][i].img->data_buffer);
+                    }
+
+                    gui_stbimg_set_attribute(
+                        this->tile[j][i].img,
+                        this->tile[j + 1][i].img->data_buffer,
+                        this->tile[j + 1][i].img->data_length,
+                        JPEG,
+                        this->tile[j][i].img->base.x,
+                        this->tile[j][i].img->base.y
+                    );
+
+                    this->tile[j][i].y++;
+                }
+                {
+#if _WIN32
+                    char path[100];
+                    memset(path, 0, 100);
+                    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
+                            this->tile[2][i].zoom,
+                            this->tile[2][i].x, this->tile[2][i].y + 1);
+                    int fd;
+                    fd = gui_fs_open(path, 0);
+
+                    char *jpg = 0;
+                    off_t filesize = 0;
+                    if (fd > 0)
+                    {
+                        filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                        jpg = gui_malloc(filesize);
+                        //gui_log("open %s Successful!\n", path);
+                        gui_fs_lseek(fd, 0, SEEK_SET);
+                        gui_fs_read(fd, jpg, filesize);
+                    }
+                    else
+                    {
+                        //gui_log("open %s Fail!\n", path);
+                    }
+                    gui_stbimg_set_attribute(this->tile[2][i].img, jpg, filesize, JPEG,
+                                             this->tile[2][i].img->base.x, this->tile[2][i].img->base.y);
+                    this->tile[2][i].y++;
+#else
+#endif
+                }
+            }
+
+
+            GUI_BASE(this)->y = -(256 * 3 - SCREEN_H - 256) ;
+            this->start_y = -(256 * 3 - SCREEN_H - 256) - tp->deltaY;
+        }
+
+
+        deltaX_old = tp->deltaX;
     }
+    if (this->release)
+    {
+        this->start_x = GUI_BASE(this)->x;
+        this->start_y = GUI_BASE(this)->y;
+        deltaX_right_flag = 0;
+        deltaX_left_flag = 0;
+    }
+
+    //gui_log("x:%d,%d\n",GUI_BASE(this)->x, tp->deltaX);
 
 
 
@@ -226,8 +497,14 @@ gui_map_t *gui_map_create(void *parent)
 
     // Zoom level
     int zoom = TILE_ZOOM_LEVEL;
-
-    generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, win);
+    for (size_t i = 0; i < 3; i++)
+    {
+        for (size_t j = 0; j < 3; j++)
+        {
+            this->tile[i][j].img = gui_stbimg_create_from_mem(win, 0, 0, 0, JPEG, 0, 0);
+        }
+    }
+    generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);
 
 
     return 0;
