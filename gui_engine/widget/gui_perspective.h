@@ -22,16 +22,14 @@
 #ifndef __GUI_PERSPECTIVE_H__
 #define __GUI_PERSPECTIVE_H__
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 #include "gui_img.h"
 
 /** @defgroup WIDGET WIDGET
@@ -53,6 +51,7 @@ extern "C" {
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
+
 typedef struct
 {
     IMG_SOURCE_MODE_TYPE src_mode[6];                    //!< flag: indicate file src
@@ -98,9 +97,7 @@ typedef struct gui_perspective
   * @{
   */
 
-
 #define RAD(d)        (d*3.1415926f/180.0f)     //!< angle to rad
-
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -136,8 +133,9 @@ typedef struct gui_perspective
  * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
  *
  */
-void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index,
-                              BLEND_MODE_TYPE mode);
+void gui_perspective_set_mode(gui_perspective_t *perspective,
+                              uint8_t            img_index,
+                              BLEND_MODE_TYPE    mode);
 
 /**
  * @brief set perspective image
@@ -155,9 +153,6 @@ void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_img
   * @param  x  left
   * @param  y top
   * @return gui_perspective_t* widget pointer
-  *
-  *
-  *
   *
   *
   * <b>Example usage</b>
@@ -178,10 +173,11 @@ void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_img
   * }
   * \endcode
   */
-gui_perspective_t *gui_perspective_create(void *parent,  const char *name,
+gui_perspective_t *gui_perspective_create(void                      *parent,
+                                          const char                *name,
                                           gui_perspective_imgfile_t *img_file,
-                                          int16_t x,
-                                          int16_t y);
+                                          int16_t                    x,
+                                          int16_t                    y);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
