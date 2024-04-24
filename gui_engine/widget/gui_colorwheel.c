@@ -17,14 +17,10 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
-//#include <gui_matrix.h>
-#include <gui_obj.h>
-//#include <tp_algo.h>
-//#include <kb_algo.h>
-#include "gui_colorwheel.h"
 #include <math.h>
+#include "gui_obj.h"
+#include "gui_colorwheel.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -72,6 +68,9 @@
   * @{
   */
 
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
+                                 uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
 
 /** End of SUBMOUDLE_Exported_Variables
   * @}
@@ -84,7 +83,7 @@
   * @{
   */
 
-static void colorwheel_prepare(gui_obj_t *obj)
+static void gui_colorwheel_prepare(gui_obj_t *obj)
 {
     GUI_UNUSED(obj);
     gui_dispdev_t *dc = gui_get_dc();
@@ -97,19 +96,19 @@ static void colorwheel_prepare(gui_obj_t *obj)
     GUI_UNUSED(cy);
 }
 
-static void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, float t)
+static void gui_colorwheel_draw(NVGcontext *vg,
+                                float       x,
+                                float       y,
+                                float       w,
+                                float       h,
+                                float       t)
 {
     int i;
-    float r0, r1, ax, ay, bx, by, cx, cy, aeps, r;
+    float r0, r1, ax, ay, bx, by, cx, cy, aeps, r, a0, a1;
     float hue = sinf(t * 0.12f);
     NVGpaint paint;
 
     nvgSave(vg);
-
-    /*  nvgBeginPath(vg);
-        nvgRect(vg, x,y,w,h);
-        nvgFillColor(vg, nvgRGBA(255,0,0,128));
-        nvgFill(vg);*/
 
     cx = x + w * 0.5f;
     cy = y + h * 0.5f;
@@ -119,18 +118,21 @@ static void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, f
 
     for (i = 0; i < 6; i++)
     {
-        float a0 = (float)i / 6.0f * NVG_PI * 2.0f - aeps;
-        float a1 = (float)(i + 1.0f) / 6.0f * NVG_PI * 2.0f + aeps;
+        a0 = (float)i / 6.0f * NVG_PI * 2.0f - aeps;
+        a1 = (float)(i + 1.0f) / 6.0f * NVG_PI * 2.0f + aeps;
+
         nvgBeginPath(vg);
         nvgArc(vg, cx, cy, r0, a0, a1, NVG_CW);
         nvgArc(vg, cx, cy, r1, a1, a0, NVG_CCW);
         nvgClosePath(vg);
+
         ax = cx + cosf(a0) * (r0 + r1) * 0.5f;
         ay = cy + sinf(a0) * (r0 + r1) * 0.5f;
         bx = cx + cosf(a1) * (r0 + r1) * 0.5f;
         by = cy + sinf(a1) * (r0 + r1) * 0.5f;
         paint = nvgLinearGradient(vg, ax, ay, bx, by, nvgHSLA(a0 / (NVG_PI * 2), 1.0f, 0.55f, 255),
                                   nvgHSLA(a1 / (NVG_PI * 2), 1.0f, 0.55f, 255));
+
         nvgFillPaint(vg, paint);
         nvgFill(vg);
     }
@@ -169,11 +171,13 @@ static void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, f
     ay = sinf(120.0f / 180.0f * NVG_PI) * r;
     bx = cosf(-120.0f / 180.0f * NVG_PI) * r;
     by = sinf(-120.0f / 180.0f * NVG_PI) * r;
+
     nvgBeginPath(vg);
     nvgMoveTo(vg, r, 0);
     nvgLineTo(vg, ax, ay);
     nvgLineTo(vg, bx, by);
     nvgClosePath(vg);
+
     paint = nvgLinearGradient(vg, r, 0, ax, ay, nvgHSLA(hue, 1.0f, 0.5f, 255), nvgRGBA(255, 255, 255,
                               255));
     nvgFillPaint(vg, paint);
@@ -207,7 +211,7 @@ static void drawColorwheel(NVGcontext *vg, float x, float y, float w, float h, f
     nvgRestore(vg);
 }
 
-static void colorwheel_draw_cb(gui_obj_t *obj)
+static void gui_colorwheel_draw_cb(gui_obj_t *obj)
 {
     gui_colorwheel_t *this = (gui_colorwheel_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
@@ -216,9 +220,6 @@ static void colorwheel_draw_cb(gui_obj_t *obj)
     float w = this->w;
     float h = this->h;
     float t = this->t;
-    extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
-                                     uint8_t *data);
-    extern void nvgDeleteAGGE(NVGcontext * ctx);
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
                                    (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
@@ -227,50 +228,51 @@ static void colorwheel_draw_cb(gui_obj_t *obj)
     nvgTransform(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
                  obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
 
-    drawColorwheel(vg, x, y, w, h, t);
+    gui_colorwheel_draw(vg, x, y, w, h, t);
 
     nvgEndFrame(vg);
     nvgDeleteAGGE(vg);
 }
-static void colorwheel_end(gui_obj_t *obj)
+
+static void gui_colorwheel_end(gui_obj_t *obj)
 {
 
 }
-static void colorwheel_destory(gui_obj_t *obj)
+
+static void gui_colorwheel_destory(gui_obj_t *obj)
 {
 
 }
 
-
-
-static void colorwheel_ctor(gui_colorwheel_t *this, gui_obj_t *parent, const char *name,
-                            void *data,
-                            int16_t x,
-                            int16_t y, int16_t w, int16_t h)
+static void gui_colorwheel_ctor(gui_colorwheel_t *this,
+                                gui_obj_t        *parent,
+                                const char       *name,
+                                void             *data,
+                                int16_t           x,
+                                int16_t           y,
+                                int16_t           w,
+                                int16_t           h)
 {
-    //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
-
-    //for root class
     gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_ctor(root, parent, name, x, y, w, h);
+
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = colorwheel_prepare;
-    root->obj_draw = colorwheel_draw_cb;
-    root->obj_end = colorwheel_end;
-    root->obj_destory = colorwheel_destory;
-
-    //for self
-
+    root->obj_prepare = gui_colorwheel_prepare;
+    root->obj_draw = gui_colorwheel_draw_cb;
+    root->obj_end = gui_colorwheel_end;
+    root->obj_destory = gui_colorwheel_destory;
 }
-
-
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
 
-void gui_colorwheel_set(gui_colorwheel_t *this, float x, float y, float w, float h, float t)
+void gui_colorwheel_set(gui_colorwheel_t *this,
+                        float             x,
+                        float             y,
+                        float             w,
+                        float             h,
+                        float             t)
 {
     this->x = x;
     this->y = y;
@@ -279,22 +281,27 @@ void gui_colorwheel_set(gui_colorwheel_t *this, float x, float y, float w, float
     this->t = t;
 }
 
-
-
-gui_colorwheel_t *gui_colorwheel_create(void *parent,  const char *name, void *data,
-                                        int16_t x,
-                                        int16_t y, int16_t w, int16_t h)
+gui_colorwheel_t *gui_colorwheel_create(void       *parent,
+                                        const char *name,
+                                        void       *data,
+                                        int16_t     x,
+                                        int16_t     y,
+                                        int16_t     w,
+                                        int16_t     h)
 {
+    gui_colorwheel_t *this;
+
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
     {
         name = "colorwheel";
     }
-    gui_colorwheel_t *this = gui_malloc(sizeof(gui_colorwheel_t));
+
+    this = gui_malloc(sizeof(gui_colorwheel_t));
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_colorwheel_t));
 
-    colorwheel_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
+    gui_colorwheel_ctor(this, (gui_obj_t *)parent, name, data, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -309,7 +316,6 @@ gui_colorwheel_t *gui_colorwheel_create(void *parent,  const char *name, void *d
     this->w = w;
     this->t = 0;
 
-
     GET_BASE(this)->create_done = true;
     return this;
 }
@@ -321,6 +327,3 @@ gui_colorwheel_t *gui_colorwheel_create(void *parent,  const char *name, void *d
 /** End of WIDGET
   * @}
   */
-
-
-
