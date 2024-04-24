@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 #include "PainterEngine.h"
 
 /** @defgroup WIDGET WIDGET
@@ -47,7 +47,7 @@ extern "C" {
 
 
 /** @brief  structure */
-typedef struct _gui_px
+typedef struct gui_px
 {
     gui_obj_t base;
     void (*px_main)(void);
@@ -89,9 +89,6 @@ typedef struct _gui_px
   */
 
 
-
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -130,8 +127,13 @@ typedef struct _gui_px
  * @param h
  * @return gui_px_t*
  */
-gui_px_t *gui_px_create(void *parent,  const char *name, void (*main_cb)(gui_px_t *this),
-                        int16_t x, int16_t y, int16_t w, int16_t h);
+gui_px_t *gui_px_create(void        *parent,
+                        const char  *name,
+                        void (*main_cb)(gui_px_t *this),
+                        int16_t      x,
+                        int16_t      y,
+                        int16_t      w,
+                        int16_t      h);
 
 
 /** End of WIDGET_Exported_GUI_Functions
@@ -148,4 +150,3 @@ gui_px_t *gui_px_create(void *parent,  const char *name, void (*main_cb)(gui_px_
 #endif
 
 #endif
-
