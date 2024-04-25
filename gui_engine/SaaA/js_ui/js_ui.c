@@ -764,7 +764,7 @@ DECLARE_HANDLER(OnChange)
             // gui_log("param: %u", cb_arg->args_p[i]);
         }
         cb_arg->func = args[0];
-        gui_tabview_tabChange((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_tabview_tab_change((void *)obj, js_cb_with_args, (void *)(cb_arg));
         // GUI_TYPE(gui_switch_t, obj)->onOn((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
     return jerry_create_undefined();
