@@ -48,7 +48,6 @@ typedef struct map_tile
 {
     int x;
     int y;
-    int zoom;
     gui_stb_img_t *img;
 } map_tile_t;
 
@@ -58,6 +57,7 @@ typedef struct gui_map
     gui_win_t base; //!< base structure
     map_tile_t tile[3][3];
     int16_t start_x, start_y;
+    int16_t zoom;
     bool press, release;
 } gui_map_t;
 /** End of WIDGET_Exported_Types

@@ -25,6 +25,8 @@
 #include "gui_img_stb.h"
 #include "gui_rect.h"
 #include "tp_algo.h"
+#include "gui_button.h"
+#include "gui_app.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -66,9 +68,10 @@
 #define EARTH_LONGITUDE_RANGE 360.0
 #define BEIJING_CITY_LONGITUDE 104.0668
 #define BEIJING_CITY_LATITUDE 30.5728
-#define TILE_ZOOM_LEVEL (8-2)
+#define TILE_ZOOM_LEVEL (2)
 #define WIN_W (SCREEN_W*3/2)
 #define WIN_H (SCREEN_H*3/2)
+#define MAP_WIDGET_NAME "_MAP"
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -124,7 +127,7 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
     // Calculate the position of the center tile
     int centerX = long2tilex(center_lon, zoom);
     int centerY = lat2tiley(center_lat, zoom);
-
+    gui_log("centerX:%d,centerY:%d\n", centerX, centerY);
     // Calculate the range of x,y of the needed tiles
     int startX = centerX - tileCountX / 2;
     int startY = centerY - tileCountY / 2;
@@ -159,7 +162,12 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
             else
             {
                 gui_log("open %s Fail!\n", path);
-                //return 0;
+                fd = gui_fs_open("./gui_engine/example/screen_454_454/root_image/SDCARD/map/Tiles not found.jpg",
+                                 0);
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
             }
             if (parent->tile[y - startY][x - startX].img->data_buffer)
             {
@@ -167,7 +175,6 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
             }
             parent->tile[y - startY][x - startX].x = x;
             parent->tile[y - startY][x - startX].y = y;
-            parent->tile[y - startY][x - startX].zoom = zoom;
             gui_stbimg_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
                                      (x - startX)*tile_size, (y - startY)*tile_size);
 
@@ -179,22 +186,24 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
         }
     }
 }
+
 static void ctor(gui_map_t *this, gui_obj_t *parent)
 {
     extern void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                              int16_t y, int16_t w, int16_t h);
-    gui_win_ctor((void *)this, parent, 0, -(WIN_W - SCREEN_W) / 2, -(WIN_H - SCREEN_H) / 2, WIN_W,
+    gui_win_ctor((void *)this, parent, MAP_WIDGET_NAME, -(WIN_W - SCREEN_W) / 2,
+                 -(WIN_H - SCREEN_H) / 2, WIN_W,
                  WIN_H);
     this->start_x = GET_BASE(this)->x;
     this->start_y = GET_BASE(this)->y;
 }
-static void load_new_tile(map_tile_t *tile)
+static void load_new_tile(map_tile_t *tile, int16_t zoom)
 {
 #if _WIN32
     char path[100];
     memset(path, 0, 100);
     sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
-            tile->zoom, tile->x, tile->y);
+            zoom, tile->x, tile->y);
     int fd;
     fd = gui_fs_open(path, 0);
 
@@ -288,7 +297,7 @@ static void wincb(gui_map_t *this)
                     this->tile[i][j].x--;
                 }
                 this->tile[i][0].x--;
-                load_new_tile(&this->tile[i][0]);
+                load_new_tile(&this->tile[i][0], this->zoom);
             }
 
 
@@ -321,7 +330,7 @@ static void wincb(gui_map_t *this)
 
                 // Load new image data to "tile[i][2]"
                 this->tile[i][2].x++;
-                load_new_tile(&this->tile[i][2]);
+                load_new_tile(&this->tile[i][2], this->zoom);
             }
 
             GUI_BASE(this)->x = 0;
@@ -351,7 +360,7 @@ static void wincb(gui_map_t *this)
                     this->tile[j][i].y--;
                 }
                 this->tile[0][i].y--;
-                load_new_tile(&this->tile[0][i]);
+                load_new_tile(&this->tile[0][i], this->zoom);
             }
 
 
@@ -382,7 +391,7 @@ static void wincb(gui_map_t *this)
                     this->tile[j][i].y++;
                 }
                 this->tile[2][i].y++;
-                load_new_tile(&this->tile[2][i]);
+                load_new_tile(&this->tile[2][i], this->zoom);
             }
 
 
@@ -410,7 +419,41 @@ static void wincb(gui_map_t *this)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+static void update_zoom(bool zoom)
+{
+    gui_map_t *map = 0;
+    gui_tree_get_widget_by_name(&gui_current_app()->screen, MAP_WIDGET_NAME, (void *)&map);
 
+    if (zoom)
+    {
+        map->zoom++;
+    }
+    else
+    {
+        map->zoom--;
+    }
+    if (map->zoom < 0)
+    {
+        map->zoom = 0;
+    }
+    else if (map->zoom > 21)
+    {
+        map->zoom = 21;
+    }
+
+    generateTilesForWindow(WIN_W, WIN_H, BEIJING_CITY_LATITUDE, BEIJING_CITY_LONGITUDE, map->zoom, map);
+
+
+}
+
+static void zoom_cb()
+{
+    update_zoom(1);
+}
+static void zoom_minus_cb()
+{
+    update_zoom(0);
+}
 gui_map_t *gui_map_create(void *parent)
 {
 #define _GUI_NEW_GUI_MAP_PARAM this, parent
@@ -435,8 +478,18 @@ gui_map_t *gui_map_create(void *parent)
         }
     }
     generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);
+    {
+        gui_button_t *zoom = gui_button_create(parent, 50, 200 - 30, 40, 40, 0, 0, 0, 0, 0);
 
+        gui_rect((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_cb);
+    }
+    {
+        gui_button_t *zoom = gui_button_create(parent, 50, 300 - 30, 40, 40, 0, 0, 0, 0, 0);
 
+        gui_rect((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb);
+    }
     return 0;
 }
 

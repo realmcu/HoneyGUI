@@ -76,7 +76,11 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
         {
             tp.type = TOUCH_INVALIDE;
         }
+#ifdef _WIN32
+        if ((up_cnt == 1) && (down_cnt > 0))
+#else
         if ((up_cnt == 4) && (down_cnt > 0))
+#endif
         {
             tp_local_event = GUI_TOUCH_EVENT_UP;
             down_cnt = 0;
