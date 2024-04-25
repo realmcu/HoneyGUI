@@ -459,8 +459,8 @@
           </widget>
           <widget class="Button" name="btn_dn" layer="10" isLocked="False">
             <property name="geometry">
-              <width>30</width>
-              <height>28</height>
+              <width>36</width>
+              <height>33</height>
               <x>53</x>
               <y>143</y>
             </property>
@@ -472,7 +472,7 @@
               <blendMode>imgBypassMode</blendMode>
               <opacity>255</opacity>
               <picture>Resources/image/3_air/0_0_down.png</picture>
-              <highlightPicture>Resources/image/3_air/0_0_down.png</highlightPicture>
+              <highlightPicture>Resources/image/3_air/0_0_down_clik.png</highlightPicture>
               <pictureX>0</pictureX>
               <pictureY>0</pictureY>
               <rotationAngle>0</rotationAngle>
@@ -482,8 +482,8 @@
           </widget>
           <widget class="Button" name="btn_up" layer="11" isLocked="False">
             <property name="geometry">
-              <width>30</width>
-              <height>28</height>
+              <width>36</width>
+              <height>33</height>
               <x>397</x>
               <y>143</y>
             </property>
@@ -495,7 +495,7 @@
               <blendMode>imgBypassMode</blendMode>
               <opacity>255</opacity>
               <picture>Resources/image/3_air/0_1_up.png</picture>
-              <highlightPicture>Resources/image/3_air/0_1_up.png</highlightPicture>
+              <highlightPicture>Resources/image/3_air/0_1_up_click.png</highlightPicture>
               <pictureX>0</pictureX>
               <pictureY>0</pictureY>
               <rotationAngle>0</rotationAngle>

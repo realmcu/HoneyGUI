@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "acc_engine.h"
 #include "acc_sw_rle.h"
+#include "acc_init.h"
 
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
@@ -125,6 +126,7 @@ static void gui_release_imgfile_acc(draw_img_t *draw_img, const void *img_info, 
     gui_free(img_buff);
     draw_img->data = (void *)img_info;
 }
+
 
 
 

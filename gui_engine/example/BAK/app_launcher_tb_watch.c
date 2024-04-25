@@ -14,7 +14,7 @@ void page_tb_watch(void *parent)
     gui_img_translate(img, (454) / 2, (454) / 2);
     gui_img_rotation(img, 45, 256 / 2, 256 / 2);
 
-    T_GUI_WATCH_GRADIENT_SPOT *watch = gui_watch_gradient_spot_create(parent,  "tb_00", 0, 0,
+    gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_create(parent,  "tb_00", 0, 0,
                                                                       454, 454);
     gui_watch_gradient_spot_set_center(watch, 454 / 2, 454 / 2);
 

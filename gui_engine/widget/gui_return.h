@@ -28,9 +28,10 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_img.h>
+#include "guidef.h"
+#include "gui_img.h"
 #include "gui_seekbar.h"
+
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{
@@ -44,12 +45,12 @@ extern "C" {
   * @{
   */
 
-typedef struct gui_return gui_return_t;
-struct gui_return
+
+typedef struct gui_return
 {
     gui_seekbar_t base;
     gui_obj_t *ignore_gesture_widget;
-};
+} gui_return_t;
 
 
 /** End of WIDGET_Exported_Types
@@ -76,10 +77,9 @@ struct gui_return
   * @brief
   * @{
   */
-
-
-
-
+#define RETURN_HEIGHT           100
+#define RETURN_ENABLE_THREHOLD  10
+#define RETURN_THREHOLD         80
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -116,8 +116,11 @@ struct gui_return
  * @return return the widget object pointer.
  *
  */
-gui_return_t *gui_return_create(void *parent, const uint32_t *frame_array[], int array_size,
-                                void *return_cb, gui_obj_t *ignore_gesture_widget);
+gui_return_t *gui_return_create(void           *parent,
+                                const uint32_t *frame_array[],
+                                int             array_size,
+                                void           *return_cb,
+                                gui_obj_t      *ignore_gesture_widget);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

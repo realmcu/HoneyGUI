@@ -25,6 +25,25 @@ static bool fb_change = false;
 
 static bool obj_is_active(gui_obj_t *obj)
 {
+    if ((obj->matrix->m[0][1] == 0) && \
+        (obj->matrix->m[1][0] == 0) && \
+        (obj->matrix->m[2][0] == 0) && \
+        (obj->matrix->m[2][1] == 0) && \
+        (obj->matrix->m[2][2] == 1)) //scale and translate, no rotate
+    {
+        float x_min = obj->matrix->m[0][2];
+        float x_max = obj->matrix->m[0][2] + obj->matrix->m[0][0] * obj->w;
+        float y_min = obj->matrix->m[1][2];
+        float y_max = obj->matrix->m[1][2] + obj->matrix->m[1][1] * obj->h;
+        if ((x_min > (int)gui_get_screen_width()) || \
+            (x_max < 0) || \
+            (y_min > (int)gui_get_screen_height()) || \
+            (y_max < 0))
+        {
+            obj->active = false;
+            return false;
+        }
+    }
 
     gui_point_t p[4] =
     {
@@ -91,6 +110,7 @@ static bool obj_is_active(gui_obj_t *obj)
         obj->active = true;
         return true;
     }
+    obj->active = false;
 
     return false;
 }
@@ -101,13 +121,13 @@ static void obj_input_prepare(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if ((obj->matrix != NULL) && (obj->parent->matrix))
-        {
-            memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
-            matrix_translate(obj->x, obj->y, obj->matrix);
-        }
         if (obj->obj_input_prepare != NULL)
         {
+            if ((obj->matrix != NULL) && (obj->parent->matrix))
+            {
+                memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
+                matrix_translate(obj->x, obj->y, obj->matrix);
+            }
             obj->obj_input_prepare(obj);
             if (obj_is_active(obj) == false)
             {

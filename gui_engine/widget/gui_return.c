@@ -17,10 +17,11 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_return.h>
+#include "guidef.h"
+#include "gui_return.h"
 #include "tp_algo.h"
-#include <gui_obj.h>
+#include "gui_obj.h"
+
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -57,7 +58,6 @@
   */
 
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -79,65 +79,82 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-#define RETURN_HEIGHT 100
 
-static void preapre(gui_obj_t *obj)
+static void gui_return_preapre(gui_obj_t *obj)
 {
-    gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = &(((gui_return_t *)obj)->base);
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
-        static bool enable;
-        static bool return_flag;
+        static bool enable, return_flag;
         int pro = 0;
-#define RETURN_ENABLE_THREHOLD 10
-#define RETURN_THREHOLD 80
-        if (tp->pressed && tp->x < RETURN_ENABLE_THREHOLD && tp->y > obj->y + RETURN_HEIGHT / 2)
+
+        if ((tp->pressed)
+            && (tp->x < RETURN_ENABLE_THREHOLD)
+            && (tp->y > obj->y + RETURN_HEIGHT / 2))
         {
             enable = 1;
+
             if (GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget)
             {
                 GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 1;
             }
+
             GET_BASE(circle->base.c)->y = tp->y - RETURN_HEIGHT / 2 - obj->y;
-            if (GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y > (int)gui_get_screen_height())
+
+            if ((GET_BASE(circle->base.c)->y + RETURN_HEIGHT + obj->y) > (int)gui_get_screen_height())
             {
                 GET_BASE(circle->base.c)->y = (int)gui_get_screen_height() - RETURN_HEIGHT - obj->y;
             }
             gui_progressbar_set_progress((void *)circle, pro);
         }
+
         if (tp->released)
         {
             enable = 0;
+
             if (GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget)
             {
                 GUI_TYPE(gui_return_t, obj)->ignore_gesture_widget->gesture = 0;
             }
+
             gui_progressbar_set_progress((void *)circle, pro);
+
             if (return_flag)
             {
                 return_flag = 0;
                 gui_obj_event_set(obj, GUI_EVENT_1);
             }
-
         }
+
         if (enable)
         {
-            if (tp->type == TOUCH_HOLD_X || tp->type == TOUCH_HOLD_Y || tp->pressed)
+            if ((tp->type == TOUCH_HOLD_X)
+                || (tp->type == TOUCH_HOLD_Y)
+                || (tp->pressed))
             {
                 if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     pro = tp->x + tp->deltaX - 0;
-                    if (pro <= 0) { pro = 1; }
-                    if (pro >= obj->w) { pro = obj->w; }
+
+                    if (pro <= 0)
+                    {
+                        pro = 1;
+                    }
+
+                    if (pro >= obj->w)
+                    {
+                        pro = obj->w;
+                    }
+
                     if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
                     {
                         pro = pro * (circle->base.max - 2) / obj->w;
-
                     }
+
                     gui_progressbar_set_progress((void *)circle, pro);
+
                     if (tp->deltaX >= RETURN_THREHOLD)
                     {
                         return_flag = 1;
@@ -146,23 +163,28 @@ static void preapre(gui_obj_t *obj)
                     {
                         return_flag = 0;
                     }
-
                 }
             }
         }
     }
 }
 
-static void ctor(gui_return_t *this, gui_obj_t *parent, const uint32_t *frame_array[],
-                 int array_size, void *return_cb, gui_obj_t *ignore_gesture_widget)
+static void gui_return_ctor(gui_return_t   *this,
+                            gui_obj_t      *parent,
+                            const uint32_t *frame_array[],
+                            int             array_size,
+                            void           *return_cb,
+                            gui_obj_t      *ignore_gesture_widget)
 {
     extern void gui_seekbar_ctor_movie_h(gui_seekbar_t *this, gui_obj_t *parent, void  **picture_array,
                                          uint16_t array_length, int16_t x, int16_t y);
     gui_seekbar_ctor_movie_h((void *)this, parent, (void *)frame_array, array_size, 0,
                              (int)gui_get_screen_height() - (int)gui_get_screen_height() * 2 / 3);
+
     this->ignore_gesture_widget = ignore_gesture_widget;
-    GET_BASE(this)->obj_prepare = preapre;
+    GET_BASE(this)->obj_prepare = gui_return_preapre;
     gui_obj_add_event_cb(this, (gui_event_cb_t)return_cb, GUI_EVENT_1, this);
+
     GET_BASE(this)->w = RETURN_HEIGHT;
     GET_BASE(this)->h = (int)gui_get_screen_height() * 2 / 3;
     gui_img_set_mode((void *)this->base.base.c, IMG_SRC_OVER_MODE);
@@ -171,18 +193,20 @@ static void ctor(gui_return_t *this, gui_obj_t *parent, const uint32_t *frame_ar
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-gui_return_t *gui_return_create(void *parent, const uint32_t *frame_array[], int array_size,
-                                void *return_cb, gui_obj_t *ignore_gesture_widget)
+gui_return_t *gui_return_create(void           *parent,
+                                const uint32_t *frame_array[],
+                                int             array_size,
+                                void           *return_cb,
+                                gui_obj_t      *ignore_gesture_widget)
 {
     gui_return_t *this = gui_malloc(sizeof(gui_return_t));
+
     memset(this, 0, sizeof(gui_return_t));
-    ctor(this, parent, frame_array, array_size, return_cb, ignore_gesture_widget);
+    gui_return_ctor(this, parent, frame_array, array_size, return_cb, ignore_gesture_widget);
     ((gui_obj_t *)this)->create_done = 1;
+
     return this;
-
 }
-
-
 
 /** End of WIDGET_Exported_Functions
   * @}
@@ -191,8 +215,3 @@ gui_return_t *gui_return_create(void *parent, const uint32_t *frame_array[], int
 /** End of WIDGET
   * @}
   */
-
-
-
-
-

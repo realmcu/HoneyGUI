@@ -10,16 +10,24 @@
 #include "kb_algo.h"
 
 
-#if 0
-#define DRV_LCD_WIDTH   320
-#define DRV_LCD_HIGHT   384
-#else
+#ifdef ENABLE_RTK_GUI_448_368_DEMO
+#define DRV_LCD_WIDTH   368
+#define DRV_LCD_HIGHT   448
+#endif
+
+#ifdef ENABLE_RTK_GUI_454_454_DEMO
 #define DRV_LCD_WIDTH   454
 #define DRV_LCD_HIGHT   454
-#endif // 0
+#endif
+
+#ifdef ENABLE_RTK_GUI_DEMO
+#define DRV_LCD_WIDTH   454
+#define DRV_LCD_HIGHT   454
+#endif
+
 #define DRV_PIXEL_BITS  32
 #define LCD_SECTION_HEIGHT 10
-#define USE_DC_PFB
+// #define USE_DC_PFB
 #ifdef USE_DC_PFB
 #undef DRV_PIXEL_BITS
 #define DRV_PIXEL_BITS  16

@@ -391,7 +391,9 @@ typedef struct gui_jump
 typedef struct gui_animate
 {
     uint32_t dur;
-    int repeatCount;
+    int repeat_count;
+    uint32_t init_time_ms;
+    uint32_t cur_time_ms;
     uint32_t current_repeat_count;
     uint32_t current_frame;
     float progress_percent;
@@ -577,6 +579,7 @@ extern char *defaultPath;
     }\
     GET_BASE(this)->create_done = true;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
+#define GUI_BASE(_p) ((gui_obj_t *)_p)
 #if defined _WIN32
 #define GUI_FRAME_STEP 50
 #else
@@ -608,21 +611,6 @@ extern char *defaultPath;
   * @brief
   * @{
   */
-
-
-/**
- * @brief
- *
- * @param parent
- * @param name
- * @param addr
- * @param x
- * @param y
- * @param w
- * @param h
- * @return gui_widget_template_t*
- */
-
 
 /** End of SUBMOUDLE_Exported_Functions
   * @}

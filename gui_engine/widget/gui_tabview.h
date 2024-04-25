@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -43,7 +43,6 @@ extern "C" {
   * @brief
   * @{
   */
-
 
 typedef struct
 {
@@ -72,12 +71,12 @@ typedef struct gui_tabview
     bool tab_change_ready;
     bool tab_need_pre_load;
     bool tp_disable;
+    bool initial;
     uint8_t *left_shot;
     uint8_t *center_shot;
     uint8_t *right_shot;
     uint8_t checksum;
 } gui_tabview_t;
-
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -105,8 +104,6 @@ typedef struct gui_tabview
   */
 
 
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -121,8 +118,6 @@ typedef struct gui_tabview
 typedef enum
 {
     TABVIEW_EVENT_TAB_CHANGE = GUI_EVENT_3,
-
-
 } gui_tabview_event_t;
 
 /** End of WIDGET_Exported_Variables
@@ -148,8 +143,13 @@ typedef enum
  * @return return the widget object pointer.
  *
  */
-gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x, int16_t y,
-                                  int16_t w, int16_t h);
+gui_tabview_t *gui_tabview_create(void       *parent,
+                                  const char *filename,
+                                  int16_t    x,
+                                  int16_t    y,
+                                  int16_t    w,
+                                  int16_t    h);
+
 /**
  * @brief jump to a specify tab
  *
@@ -158,6 +158,7 @@ gui_tabview_t *gui_tabview_create(void *parent, const char *filename, int16_t x,
  * @param idy Vertical index value
  */
 void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy);
+
 /**
  * @brief config slide effect
  *
@@ -197,7 +198,8 @@ void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable);
  * @param callback callback func.
  * @param parameter callback parameter.
  */
-void gui_tabview_tabChange(gui_tabview_t *tabview, void *callback, void *parameter);
+void gui_tabview_tab_change(gui_tabview_t *tabview, void *callback, void *parameter);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
@@ -206,13 +208,8 @@ void gui_tabview_tabChange(gui_tabview_t *tabview, void *callback, void *paramet
   * @}
   */
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
-
-

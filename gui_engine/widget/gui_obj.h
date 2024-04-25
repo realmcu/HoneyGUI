@@ -83,7 +83,14 @@ extern "C" {
 /** @brief blue color in gui_color_t structure */
 #define APP_COLOR_BLUE gui_rgba(0, 0, UINT8_MAX, UINT8_MAX)
 
-
+/**
+ * @link https://www.rapidtables.com/web/color/RGB_Color.html
+*/
+#define APP_COLOR_CRIMSON gui_rgb(220,20,60)
+#define APP_COLOR_FIREBRICK gui_rgb(178,34,34)
+#define APP_COLOR_WHITE_OPACITY gui_rgba(255,255,255,150)
+#define APP_COLOR_SILVER gui_rgb(192,192,192)
+#define APP_COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
 
 /** End of WIDGET_Exported_Macros
   * @}

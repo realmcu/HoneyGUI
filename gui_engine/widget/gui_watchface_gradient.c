@@ -454,7 +454,7 @@ static void gui_watchface_gradient_widget_nanovg_ctor(gui_canvas_t *this,
     root->obj_destory = gui_watchface_gradient_widget_nanovg_destory;
 }
 
-static void gui_watchface_gradient_ctor(T_GUI_WATCHFACE_GRADIENT *this,
+static void gui_watchface_gradient_ctor(gui_watchface_gradient_t *this,
                                         gui_obj_t                *parent,
                                         const char               *name,
                                         int16_t                  x,
@@ -470,7 +470,7 @@ static void gui_watchface_gradient_ctor(T_GUI_WATCHFACE_GRADIENT *this,
  *                           Public Functions
  *============================================================================*/
 
-T_GUI_WATCHFACE_GRADIENT *gui_watchface_gradient_create(void       *parent,
+gui_watchface_gradient_t *gui_watchface_gradient_create(void       *parent,
                                                         const char *name,
                                                         int16_t    x,
                                                         int16_t    y,
@@ -484,9 +484,9 @@ T_GUI_WATCHFACE_GRADIENT *gui_watchface_gradient_create(void       *parent,
         name = "watchface_gradient";
     }
 
-    T_GUI_WATCHFACE_GRADIENT *this = gui_malloc(sizeof(T_GUI_WATCHFACE_GRADIENT));
+    gui_watchface_gradient_t *this = gui_malloc(sizeof(gui_watchface_gradient_t));
     GUI_ASSERT(this != NULL);
-    memset(this, 0x00, sizeof(T_GUI_WATCHFACE_GRADIENT));
+    memset(this, 0x00, sizeof(gui_watchface_gradient_t));
 
     gui_watchface_gradient_ctor(this, (gui_obj_t *)parent, name, x, y, w, h);
 

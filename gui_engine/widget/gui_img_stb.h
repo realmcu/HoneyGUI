@@ -52,9 +52,12 @@ typedef struct gui_gif_info
 /** @brief  stb img widget information structure */
 typedef struct gui_stb_img
 {
-    gui_img_t base;
+    gui_obj_t base;
+    gui_img_t *img;
     bool src_changed;
-    void *buffer;
+    GUI_FormatType image_format;
+    void *data_buffer;
+    uint32_t data_length;
     gui_gif_info_t *gif_info;
 } gui_stb_img_t;
 
@@ -84,13 +87,13 @@ typedef struct gui_stb_img
  * @param name The widget's name.
  * @param addr The data address of image.
  * @param size The data size of image.The unit is bytes.
- * @param type The type of image. jpeg 7, png 9, bmp 10
+ * @param type The type of image. bmp 11, jpeg 12, png 13,
  * @param x The X-axis coordinate of the text box.
  * @param x The Y-axis coordinate of the text box.
  * @return gui_stb_img_t*
  */
-gui_stb_img_t *gui_stbimg_create_from_mem(void *parent,  const char *name, void *addr,
-                                          uint32_t size, uint8_t type, int16_t x, int16_t y);
+gui_stb_img_t *gui_stbimg_create_from_mem(void *parent, const char *name, void *addr,
+                                          uint32_t size, GUI_FormatType type, int16_t x, int16_t y);
 /**
  * @brief set stb image widget attribute
  *
@@ -101,7 +104,7 @@ gui_stb_img_t *gui_stbimg_create_from_mem(void *parent,  const char *name, void 
  * @param x X-axis coordinate
  * @param y Y-axis coordinate
  */
-void gui_stbimg_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type,
+void gui_stbimg_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, GUI_FormatType type,
                               int16_t x, int16_t y);
 
 #ifdef __cplusplus

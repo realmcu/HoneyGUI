@@ -109,6 +109,7 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     app_dashboard_update_main_display_message_infor(&current_message_status);
 #endif
 }
+
 #ifndef _WIN32
 extern gui_win_t *win_connected_display;
 void paint_main_display_cb(gui_win_t *win)

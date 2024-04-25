@@ -17,6 +17,7 @@
 #define APP_SPORT
 #define APP_MENU
 #define APP_STOPWATCH
+#define APP_MAP
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
@@ -24,6 +25,7 @@ GUI_APP_DEFINE(APP_CALCULATOR, app_hr_ui_design)
 GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
 GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
+GUI_APP_DEFINE_NAME(APP_MAP)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -607,8 +609,22 @@ static void stop_watch_win_ani_cb()
     gui_text_content_set(time_txt, buffer, strlen(buffer));
     gui_text_convert_to_img(time_txt, RGBA8888);
 }
+#include "gui_map.h"
+GUI_APP_ENTRY(APP_MAP)
+{
+    gui_map_create(GUI_APP_ROOT_SCREEN);
+    {
+        char *text = "MAP";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, text, 0, 52, gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1);
+        gui_text_mode_set(t, CENTER);
 
-
+    }
+}
 
 
 

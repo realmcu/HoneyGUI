@@ -100,12 +100,12 @@ static void px_main(gui_px_t *this)
 
 #endif
 
-//static void canvas_cb_black(gui_canvas_t *canvas)
-//{
-//    nvgRect(canvas->vg, 20, 256, 200, 180);
-//    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 200));
-//    nvgFill(canvas->vg);
-//}
+static void canvas_cb_black(gui_canvas_t *canvas)
+{
+    nvgRect(canvas->vg, 20, 256, 200, 180);
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 200));
+    nvgFill(canvas->vg);
+}
 
 #include "gui_cube.h"
 #include "tiger_blue_compressed.c"
@@ -123,28 +123,31 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, TAB_CUBE);
+
+    gui_tabview_enable_pre_load(tv, true);
+
     gui_tab_t *tab_1 = gui_tab_create(tv, "tb_1",    0, 0, 0, 0, 0, 0);
     gui_tab_t *tab_2 = gui_tab_create(tv, "tb_2",    0, 0, 0, 0, 1, 0);
 
 
-    gui_img_t *img_blue = gui_img_create_from_mem(tab_1,  "img_1_test", (void *)_actiger_blue, 0, 0, 0,
+    gui_img_t *img_blue = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_1),  "img_1_test",
+                                                  (void *)_actiger_blue, 0, 0, 0,
                                                   0);
-    gui_img_t *img_yellow = gui_img_create_from_mem(tab_1,  "img_1", (void *)_actiger_yellow, 250, 250,
+    gui_img_t *img_yellow = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_1),  "img_1",
+                                                    (void *)_actiger_yellow, 250, 250,
                                                     0, 0);
 
     // uint8_t *shot = gui_tree_convert_to_img((gui_obj_t *)tab_1, NULL);
 
     // gui_img_create_from_mem(tab_1,  "shot", (void *)shot, 0, 0, 0, 0);
 
-    gui_obj_show(img_blue, false);
-    gui_obj_show(img_yellow, false);
 
 
+    gui_img_t *img_2 = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_2),  "img_2",
+                                               (void *)_actiger_turk, 100, 100, 0, 0);
 
-    gui_img_t *img_2 = gui_img_create_from_mem(tab_2,  "img_2", (void *)_actiger_turk, 100, 100, 0, 0);
-
-//    gui_canvas_t *canvas = gui_canvas_create(tab_1, "canvas", 0, 0, 0, 454, 454);
-//    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
+    gui_canvas_t *canvas = gui_canvas_create(tab_1, "canvas", 0, 0, 0, 454, 454);
+    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
 
     // gui_px_t *px = gui_px_create(&app->screen, "px-test", px_main, 0, 0, 454, 454);
 

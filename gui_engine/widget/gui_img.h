@@ -69,8 +69,8 @@ typedef struct gui_img
     float c_y;//!< center of image y
     float scale_x;
     float scale_y;
-    float t_x;//!< center of screen x
-    float t_y;//!< center of screen y
+    float t_x;//!< translate of screen x
+    float t_y;//!< translate of screen y
     gui_animate_t *animate;
     uint8_t checksum;
     uint8_t opacity;
@@ -241,11 +241,11 @@ gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int
  *
  * @param this
  * @param dur
- * @param repeatCount
+ * @param repeat_count
  * @param callback
  * @param p
  */
-void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *callback,
+void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeat_count, void *callback,
                          void *p);
 
 /**

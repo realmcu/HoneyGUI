@@ -168,18 +168,18 @@ static void gui_scroll_text_update_att(struct _gui_obj_t *this)
 
         if (obj->base.animate->current_frame > frame_count)
         {
-            if (obj->base.animate->repeatCount == 0)
+            if (obj->base.animate->repeat_count == 0)
             {
                 obj->base.animate->animate = false;
             }
-            else if (obj->base.animate->repeatCount < 0)
+            else if (obj->base.animate->repeat_count < 0)
             {
                 obj->base.animate->current_frame = 0;
             }
-            else if (obj->base.animate->repeatCount > 0)
+            else if (obj->base.animate->repeat_count > 0)
             {
                 obj->base.animate->current_repeat_count++;
-                if (obj->base.animate->current_repeat_count >= obj->base.animate->repeatCount)
+                if (obj->base.animate->current_repeat_count >= obj->base.animate->repeat_count)
                 {
                     obj->base.animate->animate = false;
                 }

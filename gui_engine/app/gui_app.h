@@ -104,9 +104,9 @@ struct gui_app
     }
 
 #define GUI_APP_HANDLE(APP_NAME) _get_app_##APP_NAME##_handle()
-#define GUI_APP_SHUTDOWM(APP_NAME) gui_app_shutdown(_get_app_##APP_NAME());
-#define GUI_APP_STARTUP(APP_NAME) gui_app_startup(_get_app_##APP_NAME());
-#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME(), _get_app_##APP_NAME_NEXT());
+#define GUI_APP_SHUTDOWM(APP_NAME) gui_app_shutdown(_get_app_##APP_NAME##_handle());
+#define GUI_APP_STARTUP(APP_NAME) gui_app_startup(_get_app_##APP_NAME##_handle());
+#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME##_handle(), _get_app_##APP_NAME_NEXT##_handle());
 #define GUI_APP_ROOT_SCREEN &(app->screen)
 #define GUI_APP_SWAP_HANDLE(HANDLE_FUNC, HANDLE_NEXT_FUNC)     extern gui_app_t *HANDLE_FUNC;\
     extern gui_app_t *HANDLE_NEXT_FUNC;\

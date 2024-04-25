@@ -3,7 +3,7 @@
 
 ## Overview
 
-The curtain widget enables you to create curtains in five directions: up, down, left, right, and middle. (refer to [gui_curtain_enum_t](#gui_curtain_enum_t)). Before creating the curtain widget, you must first create a curtainview widget to accommodate the curtain.
+The curtain widget enables you to create curtains in five directions: up, down, left, right, and middle. (refer to [T_GUI_CURTAIN_ENUM](#T_GUI_CURTAIN_ENUM)). Before creating the curtain widget, you must first create a curtainview widget to accommodate the curtain.
 
 ## Usage
 
@@ -13,7 +13,7 @@ If you wish to create a curtain widget with a defined direction, you may opt to 
 `Orientation` field offers various directions for the curtain, allowing for the creation of a middle or right curtain widget.
 `Scope` refers to the curtain range that can be extended, which falls between 0 and 1
 
-<span id = "gui_curtain_enum_t">
+<span id = "T_GUI_CURTAIN_ENUM">
 
 ### Orientation
 
@@ -30,7 +30,7 @@ typedef enum CURTAIN_ORIENTATION
     CURTAIN_LEFT,
     CURTAIN_RIGHT,
     CURTAIN_MIDDLE,
-} gui_curtain_enum_t;
+} T_GUI_CURTAIN_ENUM;
 ```
 
 

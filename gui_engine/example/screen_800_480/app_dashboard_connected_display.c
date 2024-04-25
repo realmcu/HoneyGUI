@@ -265,7 +265,6 @@ void app_dashboard_update_connected_display_battery_info(uint8_t battery_level)
 
 void app_dashboard_update_connected_display_speed_info(uint8_t current_speed)
 {
-    DBG_DIRECT("app_dashboard_update_connected_display_speed_info:%d", __LINE__);
     app_update_gui_widget(speed_high_c_digital,
                           current_speed / 10,
                           connected_display_speed_resource_def,

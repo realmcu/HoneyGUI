@@ -355,6 +355,60 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
             }
             break;
         }
+    case VERTICAL_LEFT:
+        {
+            uint32_t line = 0;
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                if (i == 0)
+                {
+                    chr[i].y = rect->y1;
+                }
+                else
+                {
+                    chr[i].y = chr[i - 1].y + chr[i - 1].char_h + 2;
+                }
+                if ((chr[i].y + chr[i].char_y + chr[i].char_h) >= rect->y2 || chr[i - 1].unicode == 0x0A)
+                {
+                    line++;
+                    chr[i].y = rect->y1;
+                }
+                chr[i].x = rect->x1 - line * chr[i].w;
+                if (chr[i].x <= 0)
+                {
+                    text->font_len = i;
+                    break;
+                }
+            }
+            break;
+        }
+    case VERTICAL_RIGHT:
+        {
+            uint32_t line = 0;
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                if (i == 0)
+                {
+                    chr[i].y = rect->y2 - chr[i].char_h;
+                }
+                else
+                {
+                    chr[i].y = chr[i - 1].y - chr[i - 1].char_h - 2;
+                }
+                if (chr[i].y  <= rect->y1 || chr[i - 1].unicode == 0x0A)
+                {
+                    line++;
+                    chr[i].y = rect->y2 - chr[i].char_h;
+                }
+                chr[i].x = rect->x1 + line * chr[i].w;
+                if (chr[i].x >= rect->x2)
+                {
+                    text->font_len = i;
+                    break;
+                }
+            }
+            break;
+        }
     default:
         break;
     }

@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 #include "gui_cardview.h"
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -44,14 +44,15 @@ extern "C" {
   * @{
   */
 
-typedef struct _gui_card_status_t
+typedef struct
 {
     float scale;
     float location;
     uint8_t opacity;
 } gui_card_status_t;
+
 /** @brief  card structure */
-typedef struct gui_card
+typedef struct
 {
     gui_obj_t base;
     gui_card_status_t status;
@@ -83,9 +84,6 @@ typedef struct gui_card
   * @brief
   * @{
   */
-
-
-
 
 
 /** End of WIDGET_Exported_Macros
@@ -125,13 +123,12 @@ typedef struct gui_card
  * @return return the widget object pointer.
  *
  */
-gui_card_t *gui_card_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w,
-                            int16_t h);
-
-
-
-
-
+gui_card_t *gui_card_create(void       *parent,
+                            const char *filename,
+                            int16_t    x,
+                            int16_t    y,
+                            int16_t    w,
+                            int16_t    h);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
@@ -141,11 +138,8 @@ gui_card_t *gui_card_create(void *parent, const char *filename, int16_t x, int16
   * @}
   */
 
-
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
-
