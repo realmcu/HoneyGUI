@@ -66,7 +66,7 @@
 #define EARTH_LONGITUDE_RANGE 360.0
 #define BEIJING_CITY_LONGITUDE 104.0668
 #define BEIJING_CITY_LATITUDE 30.5728
-#define TILE_ZOOM_LEVEL (8)
+#define TILE_ZOOM_LEVEL (8-2)
 #define WIN_W (SCREEN_W*3/2)
 #define WIN_H (SCREEN_H*3/2)
 /** End of WIDGET_Exported_Macros
@@ -188,8 +188,47 @@ static void ctor(gui_map_t *this, gui_obj_t *parent)
     this->start_x = GET_BASE(this)->x;
     this->start_y = GET_BASE(this)->y;
 }
+static void load_new_tile(map_tile_t *tile)
+{
+#if _WIN32
+    char path[100];
+    memset(path, 0, 100);
+    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
+            tile->zoom, tile->x, tile->y);
+    int fd;
+    fd = gui_fs_open(path, 0);
 
-
+    char *jpg = 0;
+    off_t filesize = 0;
+    if (fd > 0)
+    {
+        filesize = gui_fs_lseek(fd, 0, SEEK_END);
+        jpg = gui_malloc(filesize);
+        //gui_log("open %s Successful!\n", path);
+        gui_fs_lseek(fd, 0, SEEK_SET);
+        gui_fs_read(fd, jpg, filesize);
+    }
+    else
+    {
+        gui_log("open %s Fail!\n", path);
+        fd = gui_fs_open("./gui_engine/example/screen_454_454/root_image/SDCARD/map/Tiles not found.jpg",
+                         0);
+        filesize = gui_fs_lseek(fd, 0, SEEK_END);
+        jpg = gui_malloc(filesize);
+        gui_fs_lseek(fd, 0, SEEK_SET);
+        gui_fs_read(fd, jpg, filesize);
+    }
+    gui_stbimg_set_attribute(tile->img, jpg, filesize, JPEG, tile->img->base.x,
+                             tile->img->base.y);
+#else
+#endif
+}
+/**
+ * @brief Check if the screen is being pressed and released, and record these states
+ * If the screen is being pressed and moved, this code will move the map according to the slide of the finger and handle page turning issues (when the user slides beyond the currently displayed map area). When the map moves to the edge, it will load new tiles
+ * When the slide is released, record the final position of the map
+ * An important thing to note here is that the logic of moving the map includes how to handle it when the map slides to the edge. That is, when there are no more map tiles to display, the code will load new tiles for display. If no more map tiles can be loaded, the code will attempt to open a default image ("./gui_engine/example/screen_454_454/root_image/SDCARD/map/Tiles not found.jpg").
+*/
 static void wincb(gui_map_t *this)
 {
     if (this->base.animate->progress_percent == 1)
@@ -248,36 +287,8 @@ static void wincb(gui_map_t *this)
 
                     this->tile[i][j].x--;
                 }
-                {
-#if _WIN32
-                    char path[100];
-                    memset(path, 0, 100);
-                    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
-                            this->tile[i][0].zoom,
-                            this->tile[i][0].x - 1, this->tile[i][0].y);
-                    int fd;
-                    fd = gui_fs_open(path, 0);
-
-                    char *jpg = 0;
-                    off_t filesize = 0;
-                    if (fd > 0)
-                    {
-                        filesize = gui_fs_lseek(fd, 0, SEEK_END);
-                        jpg = gui_malloc(filesize);
-                        //gui_log("open %s Successful!\n", path);
-                        gui_fs_lseek(fd, 0, SEEK_SET);
-                        gui_fs_read(fd, jpg, filesize);
-                    }
-                    else
-                    {
-                        //gui_log("open %s Fail!\n", path);
-                    }
-                    gui_stbimg_set_attribute(this->tile[i][0].img, jpg, filesize, JPEG, this->tile[i][0].img->base.x,
-                                             this->tile[i][0].img->base.y);
-                    this->tile[i][0].x--;
-#else
-#endif
-                }
+                this->tile[i][0].x--;
+                load_new_tile(&this->tile[i][0]);
             }
 
 
@@ -309,33 +320,8 @@ static void wincb(gui_map_t *this)
                 }
 
                 // Load new image data to "tile[i][2]"
-#if _WIN32
-                char path[100];
-                memset(path, 0, 100);
-                sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
-                        this->tile[i][2].zoom, this->tile[i][2].x + 1, this->tile[i][2].y);
-                int fd;
-                fd = gui_fs_open(path, 0);
-
-                char *jpg = 0;
-                off_t filesize = 0;
-                if (fd > 0)
-                {
-                    filesize = gui_fs_lseek(fd, 0, SEEK_END);
-                    jpg = gui_malloc(filesize);
-                    //gui_log("open %s Successful!\n", path);
-                    gui_fs_lseek(fd, 0, SEEK_SET);
-                    gui_fs_read(fd, jpg, filesize);
-                }
-                else
-                {
-                    //gui_log("open %s Fail!\n", path);
-                }
-                gui_stbimg_set_attribute(this->tile[i][2].img, jpg, filesize, JPEG, this->tile[i][2].img->base.x,
-                                         this->tile[i][2].img->base.y);
                 this->tile[i][2].x++;
-#else
-#endif
+                load_new_tile(&this->tile[i][2]);
             }
 
             GUI_BASE(this)->x = 0;
@@ -364,36 +350,8 @@ static void wincb(gui_map_t *this)
 
                     this->tile[j][i].y--;
                 }
-                {
-#if _WIN32
-                    char path[100];
-                    memset(path, 0, 100);
-                    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
-                            this->tile[0][i].zoom,
-                            this->tile[0][i].x, this->tile[0][i].y - 1);
-                    int fd;
-                    fd = gui_fs_open(path, 0);
-
-                    char *jpg = 0;
-                    off_t filesize = 0;
-                    if (fd > 0)
-                    {
-                        filesize = gui_fs_lseek(fd, 0, SEEK_END);
-                        jpg = gui_malloc(filesize);
-                        //gui_log("open %s Successful!\n", path);
-                        gui_fs_lseek(fd, 0, SEEK_SET);
-                        gui_fs_read(fd, jpg, filesize);
-                    }
-                    else
-                    {
-                        //gui_log("open %s Fail!\n", path);
-                    }
-                    gui_stbimg_set_attribute(this->tile[0][i].img, jpg, filesize, JPEG, this->tile[0][i].img->base.x,
-                                             this->tile[0][i].img->base.y);
-                    this->tile[0][i].y--;
-#else
-#endif
-                }
+                this->tile[0][i].y--;
+                load_new_tile(&this->tile[0][i]);
             }
 
 
@@ -423,36 +381,8 @@ static void wincb(gui_map_t *this)
 
                     this->tile[j][i].y++;
                 }
-                {
-#if _WIN32
-                    char path[100];
-                    memset(path, 0, 100);
-                    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
-                            this->tile[2][i].zoom,
-                            this->tile[2][i].x, this->tile[2][i].y + 1);
-                    int fd;
-                    fd = gui_fs_open(path, 0);
-
-                    char *jpg = 0;
-                    off_t filesize = 0;
-                    if (fd > 0)
-                    {
-                        filesize = gui_fs_lseek(fd, 0, SEEK_END);
-                        jpg = gui_malloc(filesize);
-                        //gui_log("open %s Successful!\n", path);
-                        gui_fs_lseek(fd, 0, SEEK_SET);
-                        gui_fs_read(fd, jpg, filesize);
-                    }
-                    else
-                    {
-                        //gui_log("open %s Fail!\n", path);
-                    }
-                    gui_stbimg_set_attribute(this->tile[2][i].img, jpg, filesize, JPEG,
-                                             this->tile[2][i].img->base.x, this->tile[2][i].img->base.y);
-                    this->tile[2][i].y++;
-#else
-#endif
-                }
+                this->tile[2][i].y++;
+                load_new_tile(&this->tile[2][i]);
             }
 
 
