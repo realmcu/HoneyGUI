@@ -138,8 +138,8 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     }
 
                     gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, 0, 0);
-                    gui_button_api.onPress(button, button_cb, button);
-                    gui_button_api.onRelease(button, button_release_cb, button);
+                    gui_button_press(button, button_cb, button);
+                    gui_button_release(button, button_release_cb, button);
 
 #ifdef RTL87x2G_DASHBOARD
                     gui_obj_event_set((void *)button, GUI_EVENT_TOUCH_RELEASED);

@@ -269,11 +269,11 @@ static void sport_button_release_ani_cb(gui_button_t *button)
 }
 static void sport_button_press(gui_button_t *b)
 {
-    gui_button_api.set_animate(b, 200, 0, sport_button_press_ani_cb, b);
+    gui_button_set_animate(b, 200, 0, sport_button_press_ani_cb, b);
 }
 static void sport_button_release(gui_button_t *b)
 {
-    gui_button_api.set_animate(b, 200, 0, sport_button_release_ani_cb, b);
+    gui_button_set_animate(b, 200, 0, sport_button_release_ani_cb, b);
 }
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
@@ -1876,8 +1876,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
-                        gui_button_api.onPress((void *)parent, sport_button_press, parent);
-                        gui_button_api.onRelease((void *)parent, sport_button_release, parent);
+                        gui_button_press((void *)parent, sport_button_press, parent);
+                        gui_button_release((void *)parent, sport_button_release, parent);
                     }
 
                     {

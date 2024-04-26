@@ -549,16 +549,16 @@ gui_map_t *gui_map_create(void *parent)
     }
     generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);
     {
-        gui_button_t *zoom = gui_button_create(parent, 50, 200 - 30, 40, 40, 0, 0, 0, 0, 0);
+        gui_button_t *zoom = gui_button_create(parent, 50, 200 - 30, 40, 40, 0, 0, 0, BUTTON_BG_ICON, 0);
 
         gui_rect_create((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
-        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_cb);
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_cb, NULL);
     }
     {
-        gui_button_t *zoom = gui_button_create(parent, 50, 300 - 30, 40, 40, 0, 0, 0, 0, 0);
+        gui_button_t *zoom = gui_button_create(parent, 50, 300 - 30, 40, 40, 0, 0, 0, BUTTON_BG_ICON, 0);
 
         gui_rect_create((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
-        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb);
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb, NULL);
     }
     return 0;
 }
