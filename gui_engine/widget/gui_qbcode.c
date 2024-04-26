@@ -293,8 +293,8 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
     else if (qbcode->encodeType == BARCODE_ENCODE_TEXT)
     {
         if (qbcode->data) { gui_free(qbcode->data); }
-        barcode_symbol_t *barcode_encode(unsigned char source[], int length);
-        qbcode->data = barcode_encode(data, data_len);
+        barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int length);
+        qbcode->data = gui_barcode_gen_barcode_encode(data, data_len);
     }
 
     qbcode->border_size = border_size;
