@@ -157,4 +157,3 @@ gui_watchface_gradient_t *gui_watchface_gradient_create(void       *parent,
 #endif
 
 #endif
-
