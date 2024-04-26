@@ -233,9 +233,15 @@ static void gui_text_prepare(gui_obj_t *obj)
     gui_text_t *this = (void *)obj;
     gui_point_t point = {0, 0, 1};
     uint8_t last;
+    if (this->font_type == GUI_FONT_SRC_IMG)
+    {
+        return;
+    }
+    matrix_multiply_point(obj->matrix, &point);
+    this->offset_x = point.p[0];
+    this->offset_y = point.p[1];
 
     gui_text_update_att(obj);
-    matrix_multiply_point(obj->matrix, &point);
 
     if (this->mode == LEFT ||
         this->mode == CENTER ||
@@ -243,8 +249,7 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         this->base.h = this->font_height;
     }
-    this->offset_x = point.p[0];
-    this->offset_y = point.p[1];
+
 
     last = this->checksum;
     this->checksum = 0;

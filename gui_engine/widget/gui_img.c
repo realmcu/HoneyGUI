@@ -180,16 +180,26 @@ static void img_prepare(gui_obj_t *obj)
     matrix_rotate(this->degrees, obj->matrix);
     matrix_scale(this->scale_x, this->scale_y, obj->matrix);
     matrix_translate(-this->c_x, -this->c_y, obj->matrix);
-    if ((obj->matrix->m[0][1] == 0) && \
-        (obj->matrix->m[1][0] == 0) && \
-        (obj->matrix->m[2][0] == 0) && \
-        (obj->matrix->m[2][1] == 0) && \
-        (obj->matrix->m[2][2] == 1)) //scale and translate, no rotate
+    float m00 = obj->matrix->m[0][0];
+    float m01 = obj->matrix->m[0][1];
+    float m02 = obj->matrix->m[0][2];
+    float m10 = obj->matrix->m[1][0];
+    float m11 = obj->matrix->m[1][1];
+    float m12 = obj->matrix->m[1][2];
+    float m20 = obj->matrix->m[2][0];
+    float m21 = obj->matrix->m[2][1];
+    float m22 = obj->matrix->m[2][2];
+
+    if ((m01 == 0) && \
+        (m10 == 0) && \
+        (m20 == 0) && \
+        (m21 == 0) && \
+        (m22 == 1)) //scale and translate, no rotate
     {
-        float x_min = obj->matrix->m[0][2];
-        float x_max = obj->matrix->m[0][2] + obj->matrix->m[0][0] * obj->w;
-        float y_min = obj->matrix->m[1][2];
-        float y_max = obj->matrix->m[1][2] + obj->matrix->m[1][1] * obj->h;
+        float x_min = m02;
+        float x_max = m02 + m00 * obj->w;
+        float y_min = m12;
+        float y_max = m12 + m11 * obj->h;
         if ((x_min > (int)gui_get_screen_width()) || \
             (x_max < 0) || \
             (y_min > (int)gui_get_screen_height()) || \
