@@ -383,6 +383,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
                 if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * scope))
                 {
                     this->down_flag = 1;
+                    if (this->done_cb != NULL)
+                    {
+                        this->done_cb(this);
+                    }
                 }
             }
 
@@ -399,6 +403,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
                 if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * scope))
                 {
                     this->up_flag = 1;
+                    if (this->done_cb != NULL)
+                    {
+                        this->done_cb(this);
+                    }
                 }
             }
 
@@ -434,6 +442,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
                 if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * scope))
                 {
                     this->middle_flag = 1;
+                    if (this->done_cb != NULL)
+                    {
+                        this->done_cb(this);
+                    }
                 }
                 else
                 {
