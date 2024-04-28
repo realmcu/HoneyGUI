@@ -370,6 +370,65 @@ gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this)
     return this->rte_obj;
 }
 
+void gui_tab_update_preload(gui_obj_t *obj)
+{
+    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+    gui_tab_t *this = (gui_tab_t *)obj;
+    int16_t tab_x_gap = this->id.x - parent->cur_id.x;
+    int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+    GUI_UNUSED(tab_y_gap);
+
+    if (parent->enable_pre_load)
+    {
+        if (tab_x_gap == 0)
+        {
+            gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
+
+            if (this->shot_obj == NULL)
+            {
+                this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->center_shot, 0,
+                                                                      0, 0, 0);
+            }
+            else
+            {
+                gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->center_shot, 0, 0);
+            }
+        }
+        else if (tab_x_gap == 1)
+        {
+            gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
+
+            if (this->shot_obj == NULL)
+            {
+                this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->right_shot, 0,
+                                                                      0, 0, 0);
+            }
+            else
+            {
+                gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->right_shot, 0, 0);
+            }
+        }
+        else if (tab_x_gap == -1)
+        {
+            gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
+
+            if (this->shot_obj == NULL)
+            {
+                this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->left_shot, 0, 0,
+                                                                      0, 0);
+            }
+            else
+            {
+                gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->left_shot, 0, 0);
+            }
+        }
+    }
+    else
+    {
+        GUI_ASSERT(parent->enable_pre_load == true);
+    }
+}
+
 gui_tab_t *gui_tab_create(void       *parent,
                           const char *name,
                           int16_t    x,

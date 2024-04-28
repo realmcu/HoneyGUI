@@ -163,6 +163,13 @@ gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this);
 void gui_tab_set_style(gui_tab_t *this, SLIDE_STYLE style);
 
 /**
+ * @brief when enable preload, call this API can update preload buffer
+ *
+ * @param obj
+ */
+void gui_tab_update_preload(gui_obj_t *obj);
+
+/**
  * @brief
  *
  * @param obj
