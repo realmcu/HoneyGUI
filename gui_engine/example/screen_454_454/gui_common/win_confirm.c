@@ -136,10 +136,10 @@ static void switch_confirm_yes_touch_cb(void *obj, gui_event_cb_t event)
 
     img_confirm_yes = gui_img_create_from_mem(win_confirm, "img_confirm_yes", ICON_CONFIRM_BIN, 75, 249,
                                               96, 96);
-    img_confirm_yes->draw_img.opacity_value = 128;
+    gui_img_set_opacity(img_confirm_yes, 128);
     img_confirm_no = gui_img_create_from_mem(win_confirm, "img_confirm_no", ICON_CANCEL_BIN, 283, 249,
                                              96, 96);
-    img_confirm_no->draw_img.opacity_value = 128;
+    gui_img_set_opacity(img_confirm_no, 128);
     text_confirm = gui_text_create(win_confirm, "text_confirm", text_display.x, text_display.y,
                                    text_display.length * 32, FONT_H_32);
     gui_text_set(text_confirm, text_display.text, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,

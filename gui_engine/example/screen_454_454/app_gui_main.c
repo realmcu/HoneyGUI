@@ -72,7 +72,7 @@ static void design_app_watch_ui(gui_app_t *app)
     //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
 #endif
     tabview_main = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tabview_main, CLASSIC);
+    gui_tabview_set_style(tabview_main, TAB_CUBE);
     gui_tabview_enable_pre_load(tabview_main, true);
 
     tab_watchface = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 0, 0);

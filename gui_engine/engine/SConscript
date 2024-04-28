@@ -20,17 +20,10 @@ src += ['acc_sw_rle.c']
 src += ['acc_sw_cover.c']
 src += ['acc_sw_bypass.c']
 src += ['acc_sw_filter.c']
-src += ['acc_sw_bypass_matrix.c']
-src += ['acc_sw_filter_matrix.c']
 src += ['acc_sw_source_over.c']
-src += ['acc_sw_source_over_matrix.c']
 src += ['acc_sw_rle_bypass.c']
 src += ['acc_sw_rle_cover.c']
 src += ['acc_sw_rle_filter.c']
-src += ['acc_sw_rle_bypass_matrix.c']
-src += ['acc_sw_rle_filter_matrix.c']
-src += ['acc_sw_rle_source_over.c']
-src += ['acc_sw_rle_source_over_matrix.c']
 
 if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
     src += ['acc_vg_lite.c']
@@ -43,6 +36,6 @@ if GetDepend(['CONFIG_REALTEK_BUILD_PPEV2']):
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
 
 Return('group')

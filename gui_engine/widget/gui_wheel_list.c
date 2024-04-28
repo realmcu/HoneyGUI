@@ -212,15 +212,13 @@ static void gui_wheel_list_ctor(gui_wheel_list_t *this,
                                 uint8_t distence)
 {
     //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
     gui_obj_ctor(&this->base, parent, "wheel_list", 0, 0, 0, 0);
 
     //for root class
-    gui_obj_t *root = (gui_obj_t *)this;
-    root->type = WHEEL_LIST;
-    root->obj_input_prepare = wheel_list_input_prepare;
-    root->obj_prepare = wheel_list_prepare;
-    root->obj_destory = wheel_list_destory;
+    GET_BASE(this)->type = WHEEL_LIST;
+    GET_BASE(this)->obj_input_prepare = wheel_list_input_prepare;
+    GET_BASE(this)->obj_prepare = wheel_list_prepare;
+    GET_BASE(this)->obj_destory = wheel_list_destory;
 
     this->layer = layer;
     this->distence = distence;

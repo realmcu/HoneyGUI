@@ -119,12 +119,12 @@ static void modify_img(gui_obj_t *obj)
     }
     if (img->img)
     {
-        if (img->img->draw_img.data != 0)
+        if (img->img->data != 0)
         {
-            gui_free(img->img->draw_img.data);
-            img->img->draw_img.data = NULL;
+            gui_free(img->img->data);
+            img->img->data = NULL;
         }
-        img->img->draw_img.data = decode_image(img);
+        img->img->data = decode_image(img);
     }
     else
     {
@@ -137,9 +137,9 @@ static void stb_image_destory(gui_obj_t *obj)
     gui_stb_img_t *img = (gui_stb_img_t *)obj;
     if (img->img != NULL)
     {
-        if (img->img->draw_img.data != NULL)
+        if (img->img->data != NULL)
         {
-            gui_free(img->img->draw_img.data);
+            gui_free(img->img->data);
         }
     }
 }

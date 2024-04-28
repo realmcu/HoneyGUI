@@ -154,17 +154,9 @@ static void button_prepare(gui_obj_t *obj)
 
                     if (b->on_pic_addr && b->style == 0)
                     {
-                        gui_imgconfig_t config =
-                        {
-                            .src_mode = b->src_mode,
-                            .addr = b->on_pic_addr,
-                            .x = b->img->base.x,
-                            .y = b->img->base.y,
-                        };
-                        gui_img_set_config(b->img, &config);
+                        gui_img_set_attribute(b->img, b->img->base.name, b->on_pic_addr, b->img->base.x, b->img->base.y);
                     }
-                    //gui_log("%d\n", __LINE__);
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);  ////gui_log("%d\n", __LINE__);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
                     b->long_flag = false;
                     b->press_flag = true;
                 }
@@ -178,14 +170,7 @@ static void button_prepare(gui_obj_t *obj)
                     b->release_flag = false;
                     if (b->off_pic_addr && b->style == 0)
                     {
-                        gui_imgconfig_t config =
-                        {
-                            .src_mode = b->src_mode,
-                            .addr = b->off_pic_addr,
-                            .x = b->img->base.x,
-                            .y = b->img->base.y,
-                        };
-                        gui_img_set_config(b->img, &config);
+                        gui_img_set_attribute(b->img, b->img->base.name, b->off_pic_addr, b->img->base.x, b->img->base.y);
                     }
                     {
                         gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
@@ -367,7 +352,7 @@ static gui_button_t *gui_button_create_core(
         case 0:
             if (src_mode == IMG_SRC_FILESYS)
             {
-                button->img = (void *)gui_img_create_from_fs(button, background_pic, 0, 0);
+                button->img = (void *)gui_img_create_from_fs(button, "icon_img", background_pic, 0, 0, 0, 0);
             }
             else if (src_mode == IMG_SRC_MEMADDR)
             {
@@ -377,7 +362,8 @@ static gui_button_t *gui_button_create_core(
         case 1:
             if (src_mode == IMG_SRC_FILESYS)
             {
-                button->img = (void *)gui_img_create_from_fs((void *)button, ((void **)background_pic)[0], 0, 0);
+                button->img = (void *)gui_img_create_from_fs((void *)button, "g", ((void **)background_pic)[0], 0,
+                                                             0, 0, 0);
             }
             else if (src_mode == IMG_SRC_MEMADDR)
             {
@@ -397,7 +383,7 @@ static gui_button_t *gui_button_create_core(
     {
         gui_img_get_height(button->img);
 
-        button->text = gui_text_create(button, "icon_text", 0, button->img->draw_img.img_h + 40,
+        button->text = gui_text_create(button, "icon_text", 0, gui_img_get_height(button->img) + 40,
                                        gui_get_screen_width(), h);
         gui_text_set(button->text, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      strlen(text), 32);

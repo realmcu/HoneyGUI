@@ -203,8 +203,9 @@ int gui_fs_ioctl(int fd, int cmd);
 gui_fs_DIR *gui_fs_opendir(const char *name);
 struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d);
 void *gui_get_file_address(const char *file);
-
 char *gui_strdup(const char *s);
+char *gui_filepath_transforming(void *addr);
+
 void gui_log(const char *format, ...);
 void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size);
 void gui_display_on(void);

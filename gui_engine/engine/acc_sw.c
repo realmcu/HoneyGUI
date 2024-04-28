@@ -98,7 +98,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
     char img_type = head->type;
-    gui_matrix_t *matrix = image->matrix;
+    gui_matrix_t *matrix = &image->matrix;
     bool identity = false;
     if (
         (matrix->m[0][0] == 1) && \

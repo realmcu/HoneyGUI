@@ -140,7 +140,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
     {
         uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
         uint32_t gpu_height = image->img_h;
-        gui_rgb_data_head_t head = rtgui_image_get_header(image);
+        gui_rgb_data_head_t head = gui_image_get_header(image);
         uint8_t source_bytes_per_pixel = 0;
 
         switch (head.type)

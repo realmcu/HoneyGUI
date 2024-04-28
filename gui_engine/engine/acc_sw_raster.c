@@ -221,7 +221,7 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
 
     uint8_t *writebuf = dc->frame_buf;
     uint32_t blend_mode = image->blend_mode;
-    gui_matrix_t *inverse = image->inverse;
+    gui_matrix_t *inverse = &image->inverse;
 
 
     for (uint32_t i = y_start; i <= y_end; i++)
@@ -294,7 +294,7 @@ void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *re
 
     uint8_t *writebuf = dc->frame_buf;
     uint32_t blend_mode = image->blend_mode;
-    gui_matrix_t *inverse = image->inverse;
+    gui_matrix_t *inverse = &image->inverse;
 
 
     for (uint32_t i = y_start; i <= y_end; i++)

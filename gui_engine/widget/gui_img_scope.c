@@ -24,6 +24,7 @@
 #include <draw_img.h>
 #include <tp_algo.h>
 #include <kb_algo.h>
+#include <acc_init.h>
 #include "acc_engine.h"
 
 
@@ -91,55 +92,89 @@
 static void img_prepare(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-    GUI_TYPE(gui_img_t, obj)->draw_img.opacity_value = obj->parent->opacity_value * GUI_TYPE(gui_img_t,
-                                                       obj)->opacity / UINT8_MAX;
-
-    {
-        gui_dispdev_t *dc = gui_get_dc();
-        touch_info_t *tp = tp_get_info();
-
-        if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
-        {
-            gui_img_t *b = (void *)obj;
-            if (tp->pressed)
-            {
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
-                    b->press_flag = true;
-                }
-            }
-
-            if (b->release_flag)
-            {
-                b->press_flag = false;
-                b->release_flag = false;
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-            }
-            if (tp->released && b->press_flag)
-            {
-                b->release_flag = true;
-            }
-        }
-    }
     gui_img_t *this = (gui_img_t *)obj;
     gui_obj_t *root = (gui_obj_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    draw_img_t *draw_img = &this->draw_img;
+    matrix_translate(this->t_x, this->t_y, obj->matrix);
+    matrix_rotate(this->degrees, obj->matrix);
+    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+    matrix_translate(-this->c_x, -this->c_y, obj->matrix);
+    float m00 = obj->matrix->m[0][0];
+    float m01 = obj->matrix->m[0][1];
+    float m02 = obj->matrix->m[0][2];
+    float m10 = obj->matrix->m[1][0];
+    float m11 = obj->matrix->m[1][1];
+    float m12 = obj->matrix->m[1][2];
+    float m20 = obj->matrix->m[2][0];
+    float m21 = obj->matrix->m[2][1];
+    float m22 = obj->matrix->m[2][2];
 
-    gui_image_load_scale(draw_img);
-    root->w = draw_img->img_w;
-    root->h = draw_img->img_h;
+    if ((m01 == 0) && \
+        (m10 == 0) && \
+        (m20 == 0) && \
+        (m21 == 0) && \
+        (m22 == 1)) //scale and translate, no rotate
+    {
+        float x_min = m02;
+        float x_max = m02 + m00 * obj->w;
+        float y_min = m12;
+        float y_max = m12 + m11 * obj->h;
+        if ((x_min > (int)gui_get_screen_width()) || \
+            (x_max < 0) || \
+            (y_min > (int)gui_get_screen_height()) || \
+            (y_max < 0))
+        {
+            return;
+        }
+    }
+
+    this->draw_img = gui_malloc(sizeof(draw_img_t));
+    memset(this->draw_img, 0x00, sizeof(draw_img_t));
+    this->draw_img->data = this->data;
+    this->draw_img->blend_mode = this->blend_mode;
+    this->draw_img->high_quality = this->high_quality;
+    this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
+
+
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
+    {
+        gui_img_t *b = (void *)obj;
+        if (tp->pressed)
+        {
+            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                b->press_flag = true;
+            }
+        }
+
+        if (b->release_flag)
+        {
+            b->press_flag = false;
+            b->release_flag = false;
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        }
+        if (tp->released && b->press_flag)
+        {
+            b->release_flag = true;
+        }
+    }
+
+
+
+    gui_image_load_scale(this->draw_img);
+    root->w = this->draw_img->img_w;
+    root->h = this->draw_img->img_h;
     matrix_translate(this->t_x, this->t_y, obj->matrix);
     matrix_rotate(this->degrees, obj->matrix);
     matrix_scale(this->scale_x, this->scale_y, obj->matrix);
     matrix_translate(-this->c_x, -this->c_y, obj->matrix);
 
-    memcpy(draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    memcpy(draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
-    matrix_inverse(draw_img->inverse);
-    gui_image_new_area(draw_img);
+    memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
+    matrix_inverse(&this->draw_img->inverse);
+    gui_image_new_area(this->draw_img);
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
@@ -163,13 +198,12 @@ static void img_prepare(gui_obj_t *obj)
 static void img_scope_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-    gui_img_t *img = (gui_img_t *)obj;
+    gui_img_t *this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
-    draw_img_t *draw_img = &img->draw_img;
 
     gui_rect_t draw_rect = {0};
-    draw_rect.x1 = draw_img->img_x;
-    draw_rect.y1 = draw_img->img_y;
+    draw_rect.x1 = this->draw_img->img_x;
+    draw_rect.y1 = this->draw_img->img_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
     draw_rect.xboundleft = GUI_TYPE(gui_img_scope_t, obj)->scope_x1;
@@ -188,7 +222,7 @@ static void img_scope_draw_cb(gui_obj_t *obj)
 
     if (gui_get_acc() != NULL)
     {
-        gui_get_acc()->blit(draw_img, dc, &draw_rect);
+        gui_acc_blit_to_dc(this->draw_img, dc, &draw_rect);
     }
     else
     {
@@ -203,36 +237,28 @@ static void img_destory(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
     gui_log("do obj %s free\n", obj->name);
-    //gui_free(obj);
 }
 
 void gui_img_scope_ctor(gui_img_t *this, gui_obj_t *parent, const char *name, void *addr,
                         int16_t x,
                         int16_t y, int16_t w, int16_t h)
 {
-    draw_img_t *draw_img = &this->draw_img;
+
     //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
-    gui_obj_ctor(base, parent, name, x, y, w, h);
+    gui_obj_ctor(GET_BASE(this), parent, name, x, y, w, h);
 
     //for root class
-    gui_obj_t *root = (gui_obj_t *)this;
-    root->type = IMAGE_SCOPE;
-    root->obj_prepare = img_prepare;
-    root->obj_draw = img_scope_draw_cb;
-    root->obj_end = img_end;
-    root->obj_destory = img_destory;
+    GET_BASE(this)->type = IMAGE_SCOPE;
+    GET_BASE(this)->obj_prepare = img_prepare;
+    GET_BASE(this)->obj_draw = img_scope_draw_cb;
+    GET_BASE(this)->obj_end = img_end;
+    GET_BASE(this)->obj_destory = img_destory;
     //for self
 
-    draw_img->data = addr;
-    draw_img->blend_mode = IMG_FILTER_BLACK;
-    draw_img->matrix = gui_malloc(sizeof(struct gui_matrix));
-    draw_img->inverse = gui_malloc(sizeof(struct gui_matrix));
-    draw_img->opacity_value = UINT8_MAX;
+    GUI_ASSERT(NULL != NULL);
 
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
-    this->opacity = draw_img->opacity_value;
 }
 /*============================================================================*
  *                           Public Functions

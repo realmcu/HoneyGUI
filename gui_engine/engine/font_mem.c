@@ -428,9 +428,9 @@ void gui_font_scale_destory(gui_text_t *text)
 {
     if (text->scale_img != NULL)
     {
-        if (text->scale_img->draw_img.data != NULL)
+        if (text->scale_img->data != NULL)
         {
-            FONT_FREE_PSRAM(text->scale_img->draw_img.data);
+            FONT_FREE_PSRAM(text->scale_img->data);
         }
     }
 }

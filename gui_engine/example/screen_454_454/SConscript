@@ -24,6 +24,6 @@ CPPDEFINES = []
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'):
     CPPDEFINES += ['ENABLE_RTK_GUI_454_454_DEMO']
 
-group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

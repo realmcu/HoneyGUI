@@ -279,9 +279,9 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
 
-        memcpy(front->matrix, &tmp, sizeof(struct gui_matrix));
-        memcpy(front->inverse, &tmp, sizeof(struct gui_matrix));
-        matrix_inverse(front->inverse);
+        memcpy(&front->matrix, &tmp, sizeof(struct gui_matrix));
+        memcpy(&front->inverse, &tmp, sizeof(struct gui_matrix));
+        matrix_inverse(&front->inverse);
         gui_image_new_area(front);
     }
 
@@ -291,9 +291,9 @@ static void gui_cube_prepare(gui_obj_t *obj)
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
-        memcpy(back->matrix, &tmp, sizeof(struct gui_matrix));
-        memcpy(back->inverse, &tmp, sizeof(struct gui_matrix));
-        matrix_inverse(back->inverse);
+        memcpy(&back->matrix, &tmp, sizeof(struct gui_matrix));
+        memcpy(&back->inverse, &tmp, sizeof(struct gui_matrix));
+        matrix_inverse(&back->inverse);
         gui_image_new_area(back);
     }
 
@@ -303,9 +303,9 @@ static void gui_cube_prepare(gui_obj_t *obj)
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
-        memcpy(up->matrix, &tmp, sizeof(struct gui_matrix));
-        memcpy(up->inverse, &tmp, sizeof(struct gui_matrix));
-        matrix_inverse(up->inverse);
+        memcpy(&up->matrix, &tmp, sizeof(struct gui_matrix));
+        memcpy(&up->inverse, &tmp, sizeof(struct gui_matrix));
+        matrix_inverse(&up->inverse);
         gui_image_new_area(up);
     }
 
@@ -315,9 +315,9 @@ static void gui_cube_prepare(gui_obj_t *obj)
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
-        memcpy(down->matrix, &tmp, sizeof(struct gui_matrix));
-        memcpy(down->inverse, &tmp, sizeof(struct gui_matrix));
-        matrix_inverse(down->inverse);
+        memcpy(&down->matrix, &tmp, sizeof(struct gui_matrix));
+        memcpy(&down->inverse, &tmp, sizeof(struct gui_matrix));
+        matrix_inverse(&down->inverse);
         gui_image_new_area(down);
     }
 
@@ -327,9 +327,9 @@ static void gui_cube_prepare(gui_obj_t *obj)
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
-        memcpy(left->matrix, &tmp, sizeof(struct gui_matrix));
-        memcpy(left->inverse, &tmp, sizeof(struct gui_matrix));
-        matrix_inverse(left->inverse);
+        memcpy(&left->matrix, &tmp, sizeof(struct gui_matrix));
+        memcpy(&left->inverse, &tmp, sizeof(struct gui_matrix));
+        matrix_inverse(&left->inverse);
         gui_image_new_area(left);
     }
 
@@ -339,9 +339,9 @@ static void gui_cube_prepare(gui_obj_t *obj)
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
         matrix_multiply(&tmp, &matrix);
-        memcpy(right->matrix, &tmp, sizeof(struct gui_matrix));
-        memcpy(right->inverse, &tmp, sizeof(struct gui_matrix));
-        matrix_inverse(right->inverse);
+        memcpy(&right->matrix, &tmp, sizeof(struct gui_matrix));
+        memcpy(&right->inverse, &tmp, sizeof(struct gui_matrix));
+        matrix_inverse(&right->inverse);
         gui_image_new_area(right);
     }
 }
@@ -367,7 +367,7 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_front.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_front.target_h - 1;
 
-        CUBE_JUDEG_FULL_RANK(front)
+        CUBE_JUDEG_FULL_RANK(&front)
         gui_acc_blit_to_dc(front, dc, &draw_rect);
     }
 
@@ -378,7 +378,7 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_back.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_back.target_h - 1;
 
-        CUBE_JUDEG_FULL_RANK(back)
+        CUBE_JUDEG_FULL_RANK(&back)
         gui_acc_blit_to_dc(back, dc, &draw_rect);
     }
 
@@ -389,7 +389,7 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_up.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_up.target_h - 1;
 
-        CUBE_JUDEG_FULL_RANK(up)
+        CUBE_JUDEG_FULL_RANK(&up)
         gui_acc_blit_to_dc(up, dc, &draw_rect);
     }
 
@@ -400,7 +400,7 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_down.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_down.target_h - 1;
 
-        CUBE_JUDEG_FULL_RANK(down)
+        CUBE_JUDEG_FULL_RANK(&down)
         gui_acc_blit_to_dc(down, dc, &draw_rect);
     }
 
@@ -411,7 +411,7 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_left.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_left.target_h - 1;
 
-        CUBE_JUDEG_FULL_RANK(left)
+        CUBE_JUDEG_FULL_RANK(&left)
         gui_acc_blit_to_dc(left, dc, &draw_rect);
     }
 
@@ -422,7 +422,7 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         draw_rect.x2 = draw_rect.x1 + this->draw_img_right.target_w - 1;
         draw_rect.y2 = draw_rect.y1 + this->draw_img_right.target_h - 1;
 
-        CUBE_JUDEG_FULL_RANK(right)
+        CUBE_JUDEG_FULL_RANK(&right)
         gui_acc_blit_to_dc(right, dc, &draw_rect);
     }
 }
@@ -464,8 +464,6 @@ static void gui_cube_destory(gui_obj_t *obj)
 
     for (int i = 0; i < 6; i++)
     {
-        gui_free(cube_img[i]->inverse);
-        gui_free(cube_img[i]->matrix);
         if (cube_img[i]->src_mode)
         {
 #ifdef _WIN32
@@ -476,7 +474,7 @@ static void gui_cube_destory(gui_obj_t *obj)
     }
 }
 
-extern char *gui_img_filepath_transforming(void *addr);
+
 static void gui_cube_ctor(gui_cube_t         *this,
                           gui_obj_t          *parent,
                           const char         *name,
@@ -522,7 +520,7 @@ static void gui_cube_ctor(gui_cube_t         *this,
         {
             char *path = img_path[i];
 #ifdef _WIN32
-            path = gui_img_filepath_transforming(path);
+            path = gui_filepath_transforming(path);
 #endif
             cube_img[i]->data = path;
         }
@@ -534,8 +532,6 @@ static void gui_cube_ctor(gui_cube_t         *this,
         cube_img[i]->src_mode = img_file->src_mode[i];
         cube_img[i]->opacity_value = UINT8_MAX;
         cube_img[i]->blend_mode = IMG_SRC_OVER_MODE;
-        cube_img[i]->matrix = gui_malloc(sizeof(struct gui_matrix));
-        cube_img[i]->inverse = gui_malloc(sizeof(struct gui_matrix));
     }
 
     gui_dispdev_t *dc = gui_get_dc();
@@ -703,7 +699,7 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
         {
             char *path = img_path[i];
 #ifdef _WIN32
-            path = gui_img_filepath_transforming(path);
+            path = gui_filepath_transforming(path);
 #endif
             cube_img[i]->data = path;
         }

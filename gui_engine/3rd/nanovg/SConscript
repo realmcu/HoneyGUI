@@ -29,6 +29,6 @@ path = [cwd,
         cwd + '/agge', 
         cwd + '/vglite']
 
-group = DefineGroup('rtk_gui', src, depend = [''], CPPPATH = path)
+group = DefineGroup('realgui/3rd', src, depend = [''], CPPPATH = path)
 
 Return('group')

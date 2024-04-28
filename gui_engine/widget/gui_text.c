@@ -439,14 +439,14 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
     case RGB565:
     case RGB888:
         {
-            text_img->draw_img.blend_mode = IMG_FILTER_BLACK;
+            text_img->blend_mode = IMG_FILTER_BLACK;
         }
         break;
 
     case ARGB8565:
     case RGBA8888:
         {
-            text_img->draw_img.blend_mode = IMG_SRC_OVER_MODE;
+            text_img->blend_mode = IMG_SRC_OVER_MODE;
         }
         break;
 

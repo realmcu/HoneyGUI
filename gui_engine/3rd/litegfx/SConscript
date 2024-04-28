@@ -32,6 +32,6 @@ CPPPATH = [cwd, os.path.join(cwd, 'platform'),
 CPPDEFINES = []
 if GetDepend('CONFIG_REALTEK_BUILD_LITE_GFX'):
     CPPDEFINES += ['ENABLE_LITE_GFX']
-group = DefineGroup('rtk_gui', src,depend = ['CONFIG_REALTEK_BUILD_LITE_GFX'],CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES, LIBS = libs, LIBPATH = libpath)
+group = DefineGroup('realgui/3rd', src,depend = ['CONFIG_REALTEK_BUILD_LITE_GFX'],CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES, LIBS = libs, LIBPATH = libpath)
     
 Return('group')

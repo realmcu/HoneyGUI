@@ -74,7 +74,6 @@
   * @{
   */
 
-extern char *gui_img_filepath_transforming(void *addr);
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -127,7 +126,7 @@ static void gui_perspective_prepare(gui_obj_t *obj)
     for (uint8_t i = 0; i < 6; i++)
     {
         gui_image_load_scale(&this->img[i]);
-        matrix_identity(this->img[i].matrix);
+        matrix_identity(&this->img[i].matrix);
     }
 
     gui_perspective_scale_3d(&v0, 1.0f);
@@ -192,10 +191,10 @@ static void gui_perspective_prepare(gui_obj_t *obj)
 
         Vertex_t p = {(float)(dc->screen_width) / 2, 0, 2 * d};
         matrix_transfrom_blit(this->img[i].img_w, this->img[i].img_h, &p, &rv0, &rv1, &rv2, &rv3,
-                              this->img[i].matrix);
+                              &this->img[i].matrix);
 
-        memcpy(this->img[i].inverse, this->img[i].matrix, sizeof(struct gui_matrix));
-        matrix_inverse(this->img[i].inverse);
+        memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(struct gui_matrix));
+        matrix_inverse(&this->img[i].inverse);
         gui_image_new_area(&this->img[i]);
     }
 
@@ -257,8 +256,6 @@ static void gui_perspective_destory(gui_obj_t *obj)
     for (uint8_t i = 0; i < 6; i++)
     {
         draw_img = &((gui_perspective_t *)obj)->img[i];
-        gui_free(draw_img->inverse);
-        gui_free(draw_img->matrix);
 
         if (draw_img->src_mode == IMG_SRC_FILESYS)
         {
@@ -303,7 +300,7 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
         {
             path = array[i];
 #ifdef _WIN32
-            path = gui_img_filepath_transforming(array[i]);
+            path = gui_filepath_transforming(array[i]);
 #endif
             draw_img->data = path;
         }
@@ -314,8 +311,6 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
 
         draw_img->opacity_value = UINT8_MAX;
         draw_img->blend_mode = IMG_SRC_OVER_MODE;
-        draw_img->matrix = gui_malloc(sizeof(struct gui_matrix));
-        draw_img->inverse = gui_malloc(sizeof(struct gui_matrix));
         this->temp[i] = i * 30;
         this->ry[i] = i * 30;
     }
@@ -359,7 +354,7 @@ void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_img
         {
             path = (void *)img_file->img_path[i];
 #ifdef _WIN32
-            path = gui_img_filepath_transforming(path);
+            path = gui_filepath_transforming(path);
 #endif
             draw_img->data = path;
         }

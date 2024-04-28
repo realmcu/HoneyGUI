@@ -56,7 +56,7 @@ void gui_image_load_scale(draw_img_t *img)
     img->img_h = head.h;
 }
 
-struct gui_rgb_data_head rtgui_image_get_header(draw_img_t *img)
+struct gui_rgb_data_head gui_image_get_header(draw_img_t *img)
 {
     struct gui_rgb_data_head head = {0};
 
@@ -110,7 +110,7 @@ bool gui_image_new_area(draw_img_t *img)
     pox.p[0] = 0.0f;
     pox.p[1] = 0.0f;
     pox.p[2] = 1.0f;
-    matrix_multiply_point(img->matrix, &pox);
+    matrix_multiply_point(&img->matrix, &pox);
     x_min = pox.p[0];
     x_max = pox.p[0];
     y_min = pox.p[1];
@@ -121,7 +121,7 @@ bool gui_image_new_area(draw_img_t *img)
     pox.p[0] = (float)img->img_w - 1;
     pox.p[1] = 0.0f;
     pox.p[2] = 1.0f;
-    matrix_multiply_point(img->matrix, &pox);
+    matrix_multiply_point(&img->matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -144,7 +144,7 @@ bool gui_image_new_area(draw_img_t *img)
     pox.p[0] = (float)img->img_w - 1;
     pox.p[1] = (float)img->img_h - 1;
     pox.p[2] = 1.0f;
-    matrix_multiply_point(img->matrix, &pox);
+    matrix_multiply_point(&img->matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -167,7 +167,7 @@ bool gui_image_new_area(draw_img_t *img)
     pox.p[0] = 0;
     pox.p[1] = (float)img->img_h - 1;
     pox.p[2] = 1.0f;
-    matrix_multiply_point(img->matrix, &pox);
+    matrix_multiply_point(&img->matrix, &pox);
     if (x_min > pox.p[0])
     {
         x_min = pox.p[0];
@@ -187,9 +187,9 @@ bool gui_image_new_area(draw_img_t *img)
     point[3][0] = pox.p[0];
     point[3][1] = pox.p[1];
 
-    if (img->matrix->m[2][2] != 1 || img->matrix->m[0][1] != 0 || \
-        img->matrix->m[1][0] != 0 || img->matrix->m[2][0] != 0 || \
-        img->matrix->m[2][1] != 0)
+    if (img->matrix.m[2][2] != 1 || img->matrix.m[0][1] != 0 || \
+        img->matrix.m[1][0] != 0 || img->matrix.m[2][0] != 0 || \
+        img->matrix.m[2][1] != 0)
     {
         img->line = gui_malloc(12 * sizeof(float));
         if (point[0][0] == point[1][0])
@@ -278,7 +278,7 @@ bool gui_image_new_area(draw_img_t *img)
 
 static uint8_t gui_get_srcbpp(draw_img_t *image)
 {
-    struct gui_rgb_data_head head = rtgui_image_get_header(image);
+    struct gui_rgb_data_head head = gui_image_get_header(image);
     uint8_t source_bytes_per_pixel = 0;
 
     switch (head.type)

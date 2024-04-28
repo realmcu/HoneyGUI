@@ -44,38 +44,30 @@ extern "C" {
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
-typedef struct
-{
-    const char *name;
-    IMG_SOURCE_MODE_TYPE src_mode;
-    union
-    {
-        const char *file;
-        const void *addr;
-    };
-    int16_t x;
-    int16_t y;
-    int16_t w;
-    int16_t h;
-} gui_imgconfig_t;
+
 
 typedef struct gui_img
 {
     gui_obj_t base;
-    draw_img_t draw_img;
+    draw_img_t *draw_img;
 
     float degrees;
-    float c_x;//!< center of image x
-    float c_y;//!< center of image y
+    float c_x;          //!< center of image x
+    float c_y;          //!< center of image y
     float scale_x;
     float scale_y;
-    float t_x;//!< translate of screen x
-    float t_y;//!< translate of screen y
+    float t_x;                          //!< translate of screen x
+    float t_y;                          //!< translate of screen y
+    void *data;                         // this means address or filesystem path
     gui_animate_t *animate;
-    uint8_t checksum;
-    uint8_t opacity;
+
     bool press_flag;                    //!< press to change picture to the highlighted
     bool release_flag;
+    uint32_t opacity_value : 8;
+    uint32_t blend_mode    : 3;
+    uint32_t src_mode      : 3;
+    uint32_t high_quality  : 1;
+    uint8_t checksum;
 } gui_img_t;
 
 
@@ -137,28 +129,13 @@ void gui_img_set_mode(gui_img_t *img, BLEND_MODE_TYPE mode);
  * @brief set x,y and file path
  *
  * @param img image widget
- * @param filename change filename if using filesystem picture
+ * @param name change widget name
  * @param addr change picture address
  * @param x X-axis coordinate
  * @param y Y-axis coordinate
  */
-void gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int16_t x,
+void gui_img_set_attribute(gui_img_t *img, const char *name, void *addr, int16_t x,
                            int16_t y);
-
-/**
- * @brief get image current configuration
- *
- * @param img image widget
- * @return gui_imgconfig_t image configuration
- */
-gui_imgconfig_t gui_img_get_config(gui_img_t *img);
-/**
- * @brief set image configuration
- *
- * @param img image widget
- * @param config img configuration
- */
-void gui_img_set_config(gui_img_t *img, gui_imgconfig_t *config);
 /**
  * @brief Rotate the image around the center of the circle
  *
@@ -234,7 +211,26 @@ gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,
  * @param y the Y-axis coordinate of the widget.
  * @return return the widget object pointer.
  */
-gui_img_t *gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y);
+
+/**
+ * @brief
+ *
+ * @param parent the father widget it nested in.
+ * @param name image widget name
+ * @param file image file path
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @param w
+ * @param h
+ * @return gui_img_t*
+ */
+gui_img_t *gui_img_create_from_fs(void *parent,
+                                  const char *name,
+                                  void *file,
+                                  int16_t x,
+                                  int16_t y,
+                                  int16_t w,
+                                  int16_t h);
 
 /**
  * @brief

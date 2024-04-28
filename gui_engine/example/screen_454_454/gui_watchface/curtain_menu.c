@@ -157,8 +157,9 @@ void design_curtain_menu(void *parent)
     curtain_down_menu = gui_curtain_create(ct, "curtain_down_menu", 0, 0, 454, 454, CURTAIN_DOWN, 1.0f);
     img_base_menu = gui_img_create_from_mem(curtain_down_menu, "", WATCH_BASE_GREY_70_ALPHA_BIN, 0, 0,
                                             454, 454);
-    img_base_menu->draw_img.blend_mode = IMG_BYPASS_MODE;
-    img_base_menu->draw_img.opacity_value = 128;
+
+    gui_img_set_mode(img_base_menu, IMG_BYPASS_MODE);
+    gui_img_set_opacity(img_base_menu, 128);
 
     switch_menu_bluetooth = gui_switch_create(img_base_menu, 177, 38, 100, 100, ICON_BLUETOOTH_OFF_BIN,
                                               ICON_BLUETOOTH_ON_BIN);

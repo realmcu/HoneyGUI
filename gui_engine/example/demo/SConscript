@@ -6,7 +6,7 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-src = Glob('*.c')
+src += ['rtk_gui_demo.c']
 
 
 CPPPATH = [cwd]
@@ -15,6 +15,6 @@ CPPDEFINES = []
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_DEMO'):
     CPPDEFINES += ['ENABLE_RTK_GUI_DEMO']
 
-group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

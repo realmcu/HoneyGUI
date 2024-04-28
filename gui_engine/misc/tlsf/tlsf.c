@@ -261,8 +261,9 @@ enum tlsf_private
 /*
 ** Set assert macro, if it has not been provided by the user.
 */
+#include "gui_api.h"
 #if !defined (tlsf_assert)
-#define tlsf_assert assert
+#define tlsf_assert GUI_ASSERT
 #endif
 
 /*

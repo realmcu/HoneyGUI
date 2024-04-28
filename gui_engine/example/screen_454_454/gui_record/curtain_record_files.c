@@ -220,7 +220,7 @@ void design_curtain_record_files(void *parent)
     // to solve:
     // 1. set blend_mode as IMG_BYPASS_MODE
     // 2. load pic WATCH_BASE_BLACK_BIN with a little bit higher rgb (05 05 05 for example)
-    img_base_record_files->draw_img.blend_mode = IMG_BYPASS_MODE;
+    gui_img_set_mode(img_base_record_files, IMG_BYPASS_MODE);
 
     switch_record_files_delete = gui_switch_create(img_base_record_files, 88, 373, 277, 81,
                                                    ICON_RECORD_DELETE_BIN, ICON_RECORD_DELETE_BIN);

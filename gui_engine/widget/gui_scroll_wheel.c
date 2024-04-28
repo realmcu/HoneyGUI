@@ -132,41 +132,23 @@ void gui_scroll_wheel_update_att(gui_obj_t *obj)
     if ((current_row + 1 >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row + 1].pic))
     {
         picture = &this->picture[current_row + 1];
-        gui_imgconfig_t config =
-        {
-            .src_mode = this->src_mode,
-            .addr = picture->pic_hl_addr,
-            .x = picture->pic->base.x,
-            .y = picture->pic->base.y,
-        };
-        gui_img_set_config(picture->pic, &config);
+        gui_img_set_attribute(picture->pic, picture->pic->base.name, picture->pic_hl_addr,
+                              picture->pic->base.x, picture->pic->base.y);
     }
 
     if ((current_row >= 0) && (((gui_scroll_wheel_t *)obj)->picture[current_row].pic))
     {
         picture = &this->picture[current_row];
-        gui_imgconfig_t config =
-        {
-            .src_mode = this->src_mode,
-            .addr = picture->pic_addr,
-            .x = picture->pic->base.x,
-            .y = picture->pic->base.y,
-        };
-        gui_img_set_config(picture->pic, &config);
+        gui_img_set_attribute(picture->pic, picture->pic->base.name, picture->pic_addr,
+                              picture->pic->base.x, picture->pic->base.y);
     }
 
     if ((current_row + 2 >= 0) && (current_row + 2 < ((gui_scroll_wheel_t *)obj)->row_count)
         && (((gui_scroll_wheel_t *)obj)->picture[current_row + 2].pic))
     {
         picture = &this->picture[current_row + 2];
-        gui_imgconfig_t config =
-        {
-            .src_mode = this->src_mode,
-            .addr = picture->pic_addr,
-            .x = picture->pic->base.x,
-            .y = picture->pic->base.y,
-        };
-        gui_img_set_config(picture->pic, &config);
+        gui_img_set_attribute(picture->pic, picture->pic->base.name, picture->pic_addr,
+                              picture->pic->base.x, picture->pic->base.y);
     }
 
     ((gui_scroll_wheel_t *)obj)->index = current_row + 1;
@@ -182,7 +164,7 @@ void gui_scroll_wheel_append_core(gui_scroll_wheel_t   *this,
     this->src_mode = src_mode;
     if (IMG_SRC_FILESYS == src_mode)
     {
-        *img = gui_img_create_from_fs(this, num_pic, 0, 0);
+        *img = gui_img_create_from_fs(this, "num_pic", num_pic, 0, 0, 0, 0);
     }
     else if (IMG_SRC_MEMADDR == src_mode)
     {

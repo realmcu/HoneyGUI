@@ -87,25 +87,14 @@
   */
 void gui_switch_change_switch(gui_switch_t *sw)
 {
-    gui_imgconfig_t config =
-    {
-        .src_mode = sw->src_mode,
-        .addr = NULL,
-        .x = 0,
-        .y = 0,
-    };
-    //sw->off->base.not_show = (sw->ifon);
-    //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        config.addr = sw->on_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr, 0, 0);
     }
     else
     {
-        config.addr = sw->off_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr, 0, 0);
     }
-    //gui_app_exec(gui_current_app());
-    gui_img_set_config(sw->switch_picture, &config);
 }
 static void sw_turn_on(gui_switch_t *this)
 {
@@ -206,93 +195,51 @@ static void (onOff)(gui_switch_t *b, void *callback, void *parameter)
 
 static void gui_switch_hl(gui_switch_t *sw)
 {
-    gui_imgconfig_t config =
-    {
-        .src_mode = sw->src_mode,
-        .addr = NULL,
-        .x = 0,
-        .y = 0,
-    };
-    //sw->off->base.not_show = (sw->ifon);
-    //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        config.addr = sw->on_hl_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_hl_pic_addr, 0, 0);
     }
     else
     {
-        config.addr = sw->off_hl_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_hl_pic_addr, 0, 0);
     }
-    //gui_app_exec(gui_current_app());
-    gui_img_set_config(sw->switch_picture, &config);
 
 }
 
 static void gui_switch_hl_back(gui_switch_t *sw)
 {
-    gui_imgconfig_t config =
-    {
-        .src_mode = sw->src_mode,
-        .addr = NULL,
-        .x = 0,
-        .y = 0,
-    };
-    //sw->off->base.not_show = (sw->ifon);
-    //sw->on->base.not_show = !(sw->ifon);
     if (sw->ifon)
     {
-        config.addr = sw->on_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr, 0, 0);
     }
     else
     {
-        config.addr = sw->off_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr, 0, 0);
     }
-    //gui_app_exec(gui_current_app());
-    gui_img_set_config(sw->switch_picture, &config);
 }
 
 static void gui_switch_long_touch(gui_switch_t *sw)
 {
-    gui_imgconfig_t config =
-    {
-        .src_mode = sw->src_mode,
-        .addr = sw->long_touch_state_pic_addr,
-        .x = 0,
-        .y = 0,
-    };
-    gui_img_set_config(sw->switch_picture, &config);
+    gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name,
+                          sw->long_touch_state_pic_addr, 0, 0);
 }
 
 static void gui_switch_long_touch_back(gui_switch_t *sw)
 {
-    gui_imgconfig_t config =
-    {
-        .src_mode = sw->src_mode,
-        .addr = NULL,
-        .x = 0,
-        .y = 0,
-    };
     if (sw->ifon)
     {
-        config.addr = sw->on_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr, 0, 0);
     }
     else
     {
-        config.addr = sw->off_pic_addr;
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr, 0, 0);
     }
-    gui_img_set_config(sw->switch_picture, &config);
 }
 
 static void gui_switch_hl_long_touch(gui_switch_t *sw)
 {
-    gui_imgconfig_t config =
-    {
-        .src_mode = sw->src_mode,
-        .addr = sw->long_touch_state_hl_pic_addr,
-        .x = 0,
-        .y = 0,
-    };
-    gui_img_set_config(sw->switch_picture, &config);
+    gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name,
+                          sw->long_touch_state_hl_pic_addr, 0, 0);
 }
 
 void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
@@ -530,7 +477,7 @@ static gui_switch_t *gui_switch_create_core(void *parent, int16_t x, int16_t y,
 
     if (src_mode == IMG_SRC_FILESYS)
     {
-        this->switch_picture = (void *)gui_img_create_from_fs(this, off_pic, 0, 0);
+        this->switch_picture = (void *)gui_img_create_from_fs(this, "switch_picture", off_pic, 0, 0, 0, 0);
     }
     else if (src_mode == IMG_SRC_MEMADDR)
     {

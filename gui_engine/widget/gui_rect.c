@@ -79,17 +79,6 @@
   * @{
   */
 
-static void gui_rect_destory(gui_obj_t *this)
-{
-    extern void magic_img_destory(gui_obj_t *obj);
-    magic_img_destory(this);
-
-    if (GUI_TYPE(gui_img_t, this)->draw_img.data)
-    {
-        gui_free(GUI_TYPE(gui_img_t, this)->draw_img.data);
-    }
-}
-
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -114,8 +103,7 @@ gui_img_t *gui_rect_create(gui_obj_t   *parent,
 
     array->color.color.rgba_full = color.color.rgba_full;
     img = gui_img_create_from_mem(parent, "RECT", array, x, y, w, h);
-    img->draw_img.blend_mode = IMG_RECT;
-    GET_BASE(img)->obj_destory = gui_rect_destory;
+    img->blend_mode = IMG_RECT;
 
     return img;
 }
@@ -189,7 +177,7 @@ gui_img_t *gui_rect_round_create(gui_obj_t   *parent,
 
 void gui_rect_set_size(gui_img_t *this, int w, int h)
 {
-    gui_rect_file_head_t *array = (gui_rect_file_head_t *)this->draw_img.data;
+    gui_rect_file_head_t *array = (gui_rect_file_head_t *)this->draw_img->data;
     array->head.w = w;
     array->head.h = h;
     this->base.w = w;
