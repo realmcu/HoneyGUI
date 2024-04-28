@@ -139,12 +139,12 @@ typedef struct
  */
 gui_tab_t *gui_tab_create(void       *parent,
                           const char *filename,
-                          int16_t    x,
-                          int16_t    y,
-                          int16_t    w,
-                          int16_t    h,
-                          int16_t    idx,
-                          int16_t    idy);
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h,
+                          int16_t     idx,
+                          int16_t     idy);
 
 /**
  * @brief get run time envriment obj

@@ -464,10 +464,10 @@ static void gui_watchface_gradient_widget_nanovg_ctor(gui_canvas_t *this,
                                                       gui_obj_t    *parent,
                                                       const char   *name,
                                                       void         *data,
-                                                      int16_t      x,
-                                                      int16_t      y,
-                                                      int16_t      w,
-                                                      int16_t      h)
+                                                      int16_t       x,
+                                                      int16_t       y,
+                                                      int16_t       w,
+                                                      int16_t       h)
 {
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
@@ -486,10 +486,10 @@ static void gui_watchface_gradient_widget_nanovg_ctor(gui_canvas_t *this,
 static void gui_watchface_gradient_ctor(gui_watchface_gradient_t *this,
                                         gui_obj_t                *parent,
                                         const char               *name,
-                                        int16_t                  x,
-                                        int16_t                  y,
-                                        int16_t                  w,
-                                        int16_t                  h)
+                                        int16_t                   x,
+                                        int16_t                   y,
+                                        int16_t                   w,
+                                        int16_t                   h)
 {
     gui_watchface_gradient_widget_nanovg_ctor((gui_canvas_t *)this, parent, name, NULL, x, y, w, h);
     gui_canvas_set_canvas_cb((gui_canvas_t *)this, gui_watchface_gradient_canvas_design);
@@ -501,10 +501,10 @@ static void gui_watchface_gradient_ctor(gui_watchface_gradient_t *this,
 
 gui_watchface_gradient_t *gui_watchface_gradient_create(void       *parent,
                                                         const char *name,
-                                                        int16_t    x,
-                                                        int16_t    y,
-                                                        int16_t    w,
-                                                        int16_t    h)
+                                                        int16_t     x,
+                                                        int16_t     y,
+                                                        int16_t     w,
+                                                        int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 

@@ -551,10 +551,10 @@ void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
 
 gui_tabview_t *gui_tabview_create(void       *parent,
                                   const char *filename,
-                                  int16_t    x,
-                                  int16_t    y,
-                                  int16_t    w,
-                                  int16_t    h)
+                                  int16_t     x,
+                                  int16_t     y,
+                                  int16_t     w,
+                                  int16_t     h)
 {
     gui_tabview_t *this = gui_malloc(sizeof(gui_tabview_t));
     gui_dispdev_t *dc = gui_get_dc();

@@ -164,10 +164,10 @@ static void gui_widget_template_ctor(gui_widget_template_t *this,
                                      gui_obj_t              *parent,
                                      const char             *name,
                                      void                   *data,
-                                     int16_t                x,
-                                     int16_t                y,
-                                     int16_t                w,
-                                     int16_t                h)
+                                     int16_t                 x,
+                                     int16_t                 y,
+                                     int16_t                 w,
+                                     int16_t                 h)
 {
     //for obj class
     gui_obj_t *obj = (gui_obj_t *)this;
@@ -199,10 +199,10 @@ static void gui_widget_template_ctor(gui_widget_template_t *this,
 gui_widget_template_t *gui_widget_template_create(void       *parent,
                                                   const char *name,
                                                   void       *data,
-                                                  int16_t    x,
-                                                  int16_t    y,
-                                                  int16_t    w,
-                                                  int16_t    h)
+                                                  int16_t     x,
+                                                  int16_t     y,
+                                                  int16_t     w,
+                                                  int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 

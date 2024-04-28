@@ -138,10 +138,10 @@ extern void nvgDeleteAGGE(NVGcontext *ctx);
   */
 gui_watchface_gradient_t *gui_watchface_gradient_create(void       *parent,
                                                         const char *name,
-                                                        int16_t    x,
-                                                        int16_t    y,
-                                                        int16_t    w,
-                                                        int16_t    h);
+                                                        int16_t     x,
+                                                        int16_t     y,
+                                                        int16_t     w,
+                                                        int16_t     h);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

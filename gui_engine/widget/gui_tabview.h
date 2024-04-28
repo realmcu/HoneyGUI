@@ -118,7 +118,7 @@ typedef struct gui_tabview
 typedef enum
 {
     TABVIEW_EVENT_TAB_CHANGE = GUI_EVENT_3,
-} gui_tabview_event_t;
+} T_GUI_TABVIEW_EVENT;
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -145,10 +145,10 @@ typedef enum
  */
 gui_tabview_t *gui_tabview_create(void       *parent,
                                   const char *filename,
-                                  int16_t    x,
-                                  int16_t    y,
-                                  int16_t    w,
-                                  int16_t    h);
+                                  int16_t     x,
+                                  int16_t     y,
+                                  int16_t     w,
+                                  int16_t     h);
 
 /**
  * @brief jump to a specify tab

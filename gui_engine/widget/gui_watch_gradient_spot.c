@@ -338,10 +338,10 @@ static void gui_watch_gradient_spot_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
 static void gui_watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this,
                                          gui_obj_t                 *parent,
                                          const char                *name,
-                                         int16_t                   x,
-                                         int16_t                   y,
-                                         int16_t                   w,
-                                         int16_t                   h)
+                                         int16_t                    x,
+                                         int16_t                    y,
+                                         int16_t                    w,
+                                         int16_t                    h)
 {
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
@@ -370,10 +370,10 @@ void gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c
 
 gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void       *parent,
                                                           const char *name,
-                                                          int16_t    x,
-                                                          int16_t    y,
-                                                          int16_t    w,
-                                                          int16_t    h)
+                                                          int16_t     x,
+                                                          int16_t     y,
+                                                          int16_t     w,
+                                                          int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 
