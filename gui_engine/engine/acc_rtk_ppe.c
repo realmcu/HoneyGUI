@@ -102,11 +102,11 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     }
     if (1)
     {
-        if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
+        if ((image->matrix.m[0][1] == 0) && (image->matrix.m[1][0] == 0))
         {
-            if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1))
+            if ((image->matrix.m[0][0] != 1) || (image->matrix.m[1][1] != 1))
             {
-                float scale_x = image->matrix->m[0][0], scale_y = image->matrix->m[1][1];
+                float scale_x = image->matrix.m[0][0], scale_y = image->matrix.m[1][1];
                 if ((image->img_w == image->target_w) &&
                     (image->img_h == image->target_h))
                 {

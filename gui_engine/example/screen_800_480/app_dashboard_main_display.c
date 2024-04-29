@@ -57,8 +57,10 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     bat_low_digital = gui_img_create_from_mem(target_main_display, "bat_low_digital", TIMER0_BIN, 406,
                                               360, 9, 18);
     tel_box = gui_img_create_from_mem(target_main_display, "tel_box", TELBOX_BIN, 253, 410, 295, 49);
-    tel_accept = gui_img_create_from_mem(target_main_display, "tel_box", TELBOX_BIN, 253, 410, 295, 49);
-    tel_reject_end = gui_img_create_from_mem(target_main_display, "tel_box", TELBOX_BIN, 253, 410, 295,
+    tel_accept = gui_img_create_from_mem(target_main_display, "tel_accept", TELBOX_BIN, 253, 410, 295,
+                                         49);
+    tel_reject_end = gui_img_create_from_mem(target_main_display, "tel_reject_end", TELBOX_BIN, 253,
+                                             410, 295,
                                              49);
     refuse_button = gui_img_create_from_mem(target_main_display, "refuse_button", REFUS_BIN, 263, 416,
                                             36, 36);

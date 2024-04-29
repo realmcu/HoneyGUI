@@ -58,7 +58,7 @@ gui_app_t app_dashboard_launcher =
     },
     .thread_entry = app_dashboard_launcher_update_thread,
     .ui_design = app_dashboard_launcher_ui_design,
-    .active_ms = 0xffffffff,
+    .active_ms = 10000,
 
 };
 

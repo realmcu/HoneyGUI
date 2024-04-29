@@ -270,6 +270,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
 {
     int32_t distance = 0;
     uint8_t navi_type = 0;
+    gui_indev_wakeup();
 
     navi_type = ((uint8_t *)pValue)[0];
     if (navi_type == TURN_LEFT || navi_type == LEFT_FRONT || navi_type == LEFT_BACK
@@ -381,6 +382,7 @@ void app_dashboard_data_update_phone_status(uint8_t key, const uint8_t *pValue, 
 {
     if (length <= 11)
     {
+        gui_indev_wakeup();
         app_phone_data current_phone_status;
         app_dashboard_data_get_phone_status(&current_phone_status);
 
@@ -427,7 +429,7 @@ static void dashboard_message_timer_cb(void *p_handle)
 void app_dashboard_data_update_message_status(const uint8_t *pValue, uint16_t length,
                                               uint8_t messaye_type)
 {
-
+    gui_indev_wakeup();
     app_message_data current_message_status;
     app_dashboard_data_get_message_data_update(&current_message_status);
 
