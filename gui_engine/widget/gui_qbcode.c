@@ -373,11 +373,11 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
     //generate qbcode data
     if (qbcode->encodeType == QRCODE_ENCODE_TEXT)
     {
-        qbcode->data = qrcode_get_data(data, data_len, 0);
+        qbcode->data = gui_qrcode_gen_get_data(data, data_len, 0);
     }
     else if (qbcode->encodeType == QRCODE_ENCODE_BINARY)
     {
-        qbcode->data = qrcode_get_data(data, data_len, 1);
+        qbcode->data = gui_qrcode_gen_get_data(data, data_len, 1);
     }
     else if (qbcode->encodeType == BARCODE_ENCODE_TEXT)
     {
@@ -399,7 +399,7 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
         GUI_ASSERT(img_data);
         memset(img_data, 0, qbcode->base.w * qbcode->base.h * 2 + 8);
 
-        uint16_t qbcode_size = qrcodegen_getSize(qbcode->data);
+        uint16_t qbcode_size = gui_qrcode_gen_get_size(qbcode->data);
         uint16_t image_wsize = qbcode->base.w;
         uint16_t image_hsize = qbcode->base.h;
         uint16_t *write_buf = (uint16_t *)(img_data + 8);
@@ -412,8 +412,8 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
             for (uint32_t j = 0; j < image_wsize; j++)
             {
                 int16_t findex = (j) * (qbcode_size + border_size + border_size) / image_wsize - border_size;
-                write_buf[write_off + j] = qrcodegen_getModule((uint8_t *)qbcode->data, findex,
-                                                               findey) ? 0 : 0xffff;
+                write_buf[write_off + j] = gui_qrcode_gen_get_module((uint8_t *)qbcode->data, findex,
+                                                                     findey) ? 0 : 0xffff;
             }
         }
 
