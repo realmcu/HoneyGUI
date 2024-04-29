@@ -162,8 +162,15 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
         target_red   = ((255 - source_alpha) * target_red + source_alpha * source_red) / 255;
         target_green = ((255 - source_alpha) * target_green + source_alpha * source_green) / 255;
         target_blue  = ((255 - source_alpha) * target_blue + source_alpha * source_blue) / 255;
+    }
+    else if (blend_mode == IMG_RECT)
+    {
+        source_alpha = source_alpha * opacity_value / 255;
 
-
+        target_alpha = ((255 - source_alpha) * target_alpha + source_alpha * source_alpha) / 255;
+        target_red   = ((255 - source_alpha) * target_red + source_alpha * source_red) / 255;
+        target_green = ((255 - source_alpha) * target_green + source_alpha * source_green) / 255;
+        target_blue  = ((255 - source_alpha) * target_blue + source_alpha * source_blue) / 255;
     }
     else
     {
@@ -241,9 +248,19 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
             int image_off = y * source_w + x;
             int write_off = (i - dc->section.y1) * dc->fb_width + j;
 
-            do_raster_pixel(writebuf, write_off, image_base, image_off, input_type, dc_bytes_per_pixel,
-                            opacity_value,
-                            blend_mode);
+
+            if (image->blend_mode == IMG_RECT)
+            {
+                do_raster_pixel(writebuf, write_off, image_base, 0, input_type, dc_bytes_per_pixel,
+                                opacity_value,
+                                blend_mode);
+            }
+            else
+            {
+                do_raster_pixel(writebuf, write_off, image_base, image_off, input_type, dc_bytes_per_pixel,
+                                opacity_value,
+                                blend_mode);
+            }
         }
     }
 

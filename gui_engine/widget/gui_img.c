@@ -283,14 +283,9 @@ static void img_draw_cb(gui_obj_t *obj)
     gui_img_t *this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
 
-    gui_rect_t rect = {0};
-    rect.x1 = this->draw_img->img_x;
-    rect.y1 = this->draw_img->img_y;
-    rect.x2 = rect.x1 + this->draw_img->target_w - 1;
-    rect.y2 = rect.y1 + this->draw_img->target_h - 1;
     if (gui_get_acc() != NULL)
     {
-        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
     }
     else
     {

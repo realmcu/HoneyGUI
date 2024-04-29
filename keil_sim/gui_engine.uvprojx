@@ -554,11 +554,6 @@
               <FilePath>..\gui_engine\engine\acc_sw_filter.c</FilePath>
             </File>
             <File>
-              <FileName>acc_sw_source_over.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_source_over.c</FilePath>
-            </File>
-            <File>
               <FileName>acc_sw_rle_bypass.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\acc_sw_rle_bypass.c</FilePath>

@@ -5,27 +5,21 @@
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end)
 {
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
+    int16_t image_x = image->img_x;
+    int16_t image_y = image->img_y;
 
     int16_t image_w = image->target_w ;
     int16_t image_h = image->target_h ;
 
-    *x_start = _UI_MAX(_UI_MAX(image_x, image_x + rect->xboundleft), 0);
+    *x_start = _UI_MAX(image_x, 0);
     *x_end = _UI_MIN(image_x + image_w - 1, dc->fb_width - 1);
-    *x_end = _UI_MIN(*x_end, rect->x2);
 
-    if (rect->xboundright > 0)
-    {
-        *x_end = _UI_MIN(_UI_MIN(image_x + image_w, image_x + rect->xboundright), dc->fb_width);
-    }
-
-    *y_start = _UI_MAX(_UI_MAX(dc->section.y1, image_y), image_y + rect->yboundtop);
+    *y_start = _UI_MAX(dc->section.y1, image_y);
     *y_end = _UI_MIN(dc->section.y2, image_y + image_h - 1);
-    *y_end = _UI_MIN(*y_end, rect->y2);
-    if (rect->yboundbottom > 0)
+
+    if (rect != NULL)
     {
-        *y_end = _UI_MIN(*y_end, image_y + rect->yboundbottom);
+
     }
     if ((*x_start >= *x_end) || (*y_start >= *y_end))
     {

@@ -213,7 +213,6 @@ static void gui_perspective_draw_cb(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_perspective_t *this = (gui_perspective_t *)obj;
     draw_img_t *draw_img;
-    gui_rect_t rect = {0};
 
     for (uint8_t j = 0; j < 6; j++)
     {
@@ -222,13 +221,7 @@ static void gui_perspective_draw_cb(gui_obj_t *obj)
             if (this->temp[j] == this->ry[i])
             {
                 draw_img = &this->img[i];
-
-                rect.x1 = draw_img->img_x;
-                rect.y1 = draw_img->img_y;
-                rect.x2 = rect.x1 + draw_img->target_w - 1;
-                rect.y2 = rect.y1 + draw_img->target_h - 1;
-
-                gui_acc_blit_to_dc(draw_img, dc, &rect);
+                gui_acc_blit_to_dc(draw_img, dc, NULL);
             }
         }
     }
