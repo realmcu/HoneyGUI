@@ -266,7 +266,7 @@ gui_obj_t *gui_tree_get_root(gui_obj_t *obj);
   * @param  child_type
   * @return gui_obj_t*
   */
-gui_obj_t *gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type);
+gui_obj_t *gui_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 
 /**
  * @brief Get a color value from red, green, blue and opacity values.

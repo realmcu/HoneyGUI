@@ -153,7 +153,7 @@ static void destory(gui_widget_litegfx_t *this)
     lx_vglite_deinit(this->handler);
 }
 
-static void gui_widget_litegfx_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_widget_litegfx_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

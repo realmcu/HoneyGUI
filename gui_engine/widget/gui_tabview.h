@@ -61,7 +61,7 @@ typedef struct gui_tabview
     int8_t tab_cnt_down;
     gui_tabview_tab_id_t cur_id;
     gui_jump_t jump;
-    SLIDE_STYLE style;
+    T_SLIDE_STYLE style;
     int16_t release_x;
     int16_t release_y;
     bool loop;
@@ -163,9 +163,9 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
  * @brief config slide effect
  *
  * @param this tabview pointer
- * @param style refer to SLIDE_STYLE
+ * @param style refer to T_SLIDE_STYLE
  */
-void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style);
+void gui_tabview_set_style(gui_tabview_t *this, T_SLIDE_STYLE style);
 
 /**
  * @brief Config tabview loop sliding feature. The default setting is no looping.

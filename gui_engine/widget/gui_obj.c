@@ -282,7 +282,7 @@ void gui_obj_show(void *obj, bool show_info)
 
 
 
-gui_obj_t *gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type)
+gui_obj_t *gui_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &obj->child_list)

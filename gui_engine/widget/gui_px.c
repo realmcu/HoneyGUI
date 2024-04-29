@@ -186,7 +186,7 @@ static px_bool gui_px_application_initialize(gui_px_t *this,
     return PX_TRUE;
 }
 
-static void gui_px_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_px_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

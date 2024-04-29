@@ -41,7 +41,7 @@ You can get the root object of tree using [gui_obj_t *gui_tree_get_root(gui_obj_
 
 ### Get child
 
-To get the child object of tree by this api [gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type)](#api).
+To get the child object of tree by this api [gui_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)](#api).
 
 <br>
 

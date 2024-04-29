@@ -308,7 +308,7 @@ static void gui_text_destory(gui_obj_t *obj)
     gui_text_font_destory(text);
 }
 
-static void gui_text_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

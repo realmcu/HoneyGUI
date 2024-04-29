@@ -44,7 +44,7 @@
 struct widget_create
 {
     char *name;
-    obj_type_t type;
+    T_OBJ_TYPE type;
 };
 
 #define WIDGETS_NUM 20

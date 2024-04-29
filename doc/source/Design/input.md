@@ -66,7 +66,7 @@ Gesture recognition is performed by judging changes in X-axis and Y-axis coordin
 
 The input types obtained after the algorithm processing are as follows.
 
-<details> <summary>GUI_InputType</summary>
+<details> <summary>T_GUI_INPUT_TYPE</summary>
 
 ```C
 typedef enum
@@ -92,7 +92,7 @@ typedef enum
     KB_SHORT,
     KB_LONG,
     KB_INVALIDE,
-} GUI_InputType;
+} T_GUI_INPUT_TYPE;
 ```
 
 </details>

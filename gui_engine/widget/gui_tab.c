@@ -307,7 +307,7 @@ static void gui_tab_destroy(gui_obj_t *obj)
     }
 }
 
-static void gui_tab_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_tab_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
@@ -491,7 +491,7 @@ gui_tab_t *gui_tab_create(void       *parent,
     return this;
 }
 
-void gui_tab_set_style(gui_tab_t *this, SLIDE_STYLE style)
+void gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style)
 {
     this->style = style;
 }

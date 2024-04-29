@@ -34,7 +34,7 @@ static gui_progressbar_t *pro;
 #define SCROLLBAR_SIZE 14
 const static void *scrollbar_array[SCROLLBAR_SIZE];
 
-static void gui_page_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

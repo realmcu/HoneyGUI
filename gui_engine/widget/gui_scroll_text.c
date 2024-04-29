@@ -327,7 +327,7 @@ static void gui_scroll_text_destory(gui_obj_t *obj)
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
 }
 
-static void gui_scroll_text_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_scroll_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

@@ -708,7 +708,7 @@ void gui_page_destory(gui_obj_t *obj)
     }
 }
 
-static void gui_page_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
@@ -732,7 +732,7 @@ static void gui_page_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
     }
 }
 
-static void gui_page_rebound_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_page_rebound_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

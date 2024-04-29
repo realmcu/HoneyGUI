@@ -53,7 +53,7 @@ typedef struct gui_cardview
     uint16_t card_height;
     uint16_t total_cnt;
     uint16_t cur_id;
-    SLIDE_STYLE style;
+    T_SLIDE_STYLE style;
     int16_t hold_y;
     int16_t target_y; //means stop at this location
     int16_t offset_y; //means stop at this location
@@ -136,9 +136,9 @@ gui_cardview_t *gui_cardview_create(void       *parent,
  * @brief set cardview style
  *
  * @param this widget pointer
- * @param style refer to SLIDE_STYLE
+ * @param style refer to T_SLIDE_STYLE
  */
-void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style);
+void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style);
 
 /**
  * @brief listen to cardview's event

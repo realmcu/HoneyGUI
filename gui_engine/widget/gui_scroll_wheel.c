@@ -195,7 +195,7 @@ static uint32_t gui_scoll_wheel_get_index(struct gui_scroll_wheel *this)
     return this->index;
 }
 
-static void gui_scroll_wheel_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_scroll_wheel_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

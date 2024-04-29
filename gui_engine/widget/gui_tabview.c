@@ -496,7 +496,7 @@ void gui_tabview_destory(gui_obj_t *obj)
     }
 }
 
-static void gui_tabview_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_tabview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
@@ -523,7 +523,7 @@ static void gui_tabview_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
+void gui_tabview_set_style(gui_tabview_t *this, T_SLIDE_STYLE style)
 {
     this->style = style;
 }

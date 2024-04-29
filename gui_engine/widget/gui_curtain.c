@@ -317,7 +317,7 @@ static void gui_curtain_prepare(gui_obj_t *obj)
     matrix_translate(dx, dy, obj->matrix);
 }
 
-static void gui_curtain_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_curtain_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

@@ -204,7 +204,7 @@ static void gui_button_prepare(gui_obj_t *obj)
     }
 }
 
-static void gui_button_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_button_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

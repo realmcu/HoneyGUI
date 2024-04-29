@@ -243,7 +243,7 @@ static void gui_img_scope_img_destory(gui_obj_t *obj)
     gui_log("do obj %s free\n", obj->name);
 }
 
-static void gui_img_scope_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_img_scope_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

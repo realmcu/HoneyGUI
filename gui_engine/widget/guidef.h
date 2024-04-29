@@ -60,17 +60,15 @@ extern "C" {
   * @{
   */
 
-
-
 typedef struct gui_touch_port_data
 {
-    uint8_t          event;                 /* The touch event of the data */
-    uint8_t          track_id;              /* Track id of point */
-    uint16_t         width;                 /* Point of width */
-    uint16_t         x_coordinate;          /* Point of x coordinate */
-    uint16_t         y_coordinate;          /* Point of y coordinate */
-    uint32_t         timestamp_ms;             /* The timestamp when the data was received */
-    void            *data;
+    uint8_t   event;                 /* The touch event of the data */
+    uint8_t   track_id;              /* Track id of point */
+    uint16_t  width;                 /* Point of width */
+    uint16_t  x_coordinate;          /* Point of x coordinate */
+    uint16_t  y_coordinate;          /* Point of y coordinate */
+    uint32_t  timestamp_ms;           /* The timestamp when the data was received */
+    void *data;
 } gui_touch_port_data_t;
 
 typedef struct touch_info
@@ -80,34 +78,34 @@ typedef struct touch_info
     int16_t x;
     int16_t y;
     uint32_t type;
-    uint8_t pressed : 1;
+    uint8_t pressed  : 1;
     uint8_t released : 1;
     uint8_t pressing : 1;
 } touch_info_t;
 
 typedef struct gui_kb_port_data
 {
-    uint8_t       event;
-    uint8_t       name[10];
-    uint32_t      timestamp_ms_press;             /* The timestamp when the data was received */
-    uint32_t            timestamp_ms_release;
-    uint32_t      timestamp_ms_pressing;
+    uint8_t  event;
+    uint8_t  name[10];
+    uint32_t timestamp_ms_press;             /* The timestamp when the data was received */
+    uint32_t timestamp_ms_release;
+    uint32_t timestamp_ms_pressing;
 } gui_kb_port_data_t;
 
 typedef struct kb_info
 {
     uint32_t type;
     char *string[20];
-    uint8_t pressed : 1;
+    uint8_t pressed  : 1;
     uint8_t released : 1;
     uint8_t pressing : 1;
 } kb_info_t;
 
 typedef struct gui_wheel_port_data
 {
-    uint8_t       event;
-    int16_t       delta;
-    uint32_t      timestamp_ms;             /* The timestamp when the data was received */
+    uint8_t  event;
+    int16_t  delta;
+    uint32_t timestamp_ms;             /* The timestamp when the data was received */
 } gui_wheel_port_data_t;
 
 typedef struct wheel_info
@@ -115,7 +113,6 @@ typedef struct wheel_info
     uint32_t type;
     int16_t delta;
 } wheel_info_t;
-
 
 typedef struct gui_rect
 {
@@ -129,12 +126,12 @@ typedef struct gui_rect
     int16_t yboundbottom;
 } gui_rect_t;
 
-typedef enum dc_type
+typedef enum t_gui_dc_type
 {
     DC_RAMLESS,
     DC_SINGLE,
     DC_DOUBLE,
-} gui_dc_type_t;
+} T_GUI_DC_TYPE;
 
 typedef struct _gui_frame_monitor_t
 {
@@ -161,7 +158,7 @@ typedef struct gui_dispdev
     uint16_t driver_ic_hfp;
     uint16_t driver_ic_hbp;
     uint16_t driver_ic_active_width;
-    gui_dc_type_t type;
+    T_GUI_DC_TYPE type;
     char gpu_type;
     /* pixel data */
     uint8_t *frame_buf;
@@ -186,20 +183,23 @@ typedef struct gui_dispdev
     uint32_t frame_count;
     gui_frame_monitor_t (*lcd_frame_monitor);
 } gui_dispdev_t;
+
 typedef struct
 {
-    int fd;     /* directory file */
+    int fd;                  /* directory file */
     char buf[512];
     int num;
     int cur;
 } gui_fs_DIR;
+
 struct gui_fs_dirent
 {
     uint8_t d_type;           /* The type of the file */
     uint8_t d_namlen;         /* The length of the not including the terminating null file name */
     uint16_t d_reclen;        /* length of this record */
-    char d_name[256];   /* The null-terminated file name */
+    char d_name[256];         /* The null-terminated file name */
 };
+
 struct gui_fs
 {
     int (*open)(const char *file, int flags, ...);
@@ -252,7 +252,6 @@ struct gui_os_api
     bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
     bool (*mq_recv)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 
-
     void *(*f_malloc)(uint32_t);
     void *(*f_realloc)(void *ptr, uint32_t);
     void (*f_free)(void *rmem);
@@ -274,94 +273,91 @@ typedef struct gui_point
 
 typedef enum
 {
-    TOUCH_INIT      = 0x100,
-    TOUCH_HOLD_X,
-    TOUCH_HOLD_Y,
-    TOUCH_SHORT,
-    TOUCH_LONG,
-    TOUCH_ORIGIN_FROM_X,
-    TOUCH_ORIGIN_FROM_Y,
-    TOUCH_LEFT_SLIDE,
-    TOUCH_RIGHT_SLIDE,
-    TOUCH_UP_SLIDE,
-    TOUCH_DOWN_SLIDE,
-    TOUCH_SHORT_BUTTON,
-    TOUCH_LONG_BUTTON,
-    TOUCH_UP_SLIDE_TWO_PAGE,
-    TOUCH_DOWN_SLIDE_TWO_PAGE,
-    TOUCH_INVALIDE,
+    TOUCH_INIT                  = 0x100,
+    TOUCH_HOLD_X                = 0x101,
+    TOUCH_HOLD_Y                = 0x102,
+    TOUCH_SHORT                 = 0x103,
+    TOUCH_LONG                  = 0x104,
+    TOUCH_ORIGIN_FROM_X         = 0x105,
+    TOUCH_ORIGIN_FROM_Y         = 0x106,
+    TOUCH_LEFT_SLIDE            = 0x107,
+    TOUCH_RIGHT_SLIDE           = 0x108,
+    TOUCH_UP_SLIDE              = 0x109,
+    TOUCH_DOWN_SLIDE            = 0x10A,
+    TOUCH_SHORT_BUTTON          = 0x10B,
+    TOUCH_LONG_BUTTON           = 0x10C,
+    TOUCH_UP_SLIDE_TWO_PAGE     = 0x10D,
+    TOUCH_DOWN_SLIDE_TWO_PAGE   = 0x10E,
+    TOUCH_INVALIDE              = 0x10F,
 
-    KB_INIT      = 0x200,
-    KB_SHORT,
-    KB_LONG,
-    KB_INVALIDE,
+    KB_INIT                     = 0x200,
+    KB_SHORT                    = 0x201,
+    KB_LONG                     = 0x202,
+    KB_INVALIDE                 = 0x203,
 
-    WHEEL_INIT   = 0x300,
-    WHEEL_ING,
-    WHEEL_FINISHED,
-    WHEEL_INVALIDE,
+    WHEEL_INIT                  = 0x300,
+    WHEEL_ING                   = 0x301,
+    WHEEL_FINISHED              = 0x302,
+    WHEEL_INVALIDE              = 0x303,
+} T_GUI_INPUT_TYPE;
 
-
-} GUI_InputType;
-
-typedef enum gui_tab_style
+typedef enum t_slide_style
 {
-    CLASSIC,
-    REDUCTION,
-    FADE,
-    REDUCTION_FADE,
-    STACKING,
+    CLASSIC          = 0x0000,
+    REDUCTION        = 0x0001,
+    FADE             = 0x0002,
+    REDUCTION_FADE   = 0x0003,
+    STACKING         = 0x0004,
 
-    TAB_ROTATE,
-    TAB_CUBE,
-    TAB_PAGE,
-} SLIDE_STYLE;
+    TAB_ROTATE       = 0x0005,
+    TAB_CUBE         = 0x0006,
+    TAB_PAGE         = 0x0007,
+} T_SLIDE_STYLE;
 
-
-
-typedef enum obj_type
+typedef enum t_obj_type
 {
-    SCREEN,
-    WINDOW,
-    TABVIEW,
-    TAB,
-    CURTAINVIEW,
-    CURTAIN,
-    IMAGE,
-    BUTTON,
-    ICONLIST,
-    ICON,
-    IMAGE_FROM_MEM,
-    TEXTBOX,
-    SCROLLTEXTBOX,
-    SEEKBAR,
-    PROGRESSBAR,
-    CLICKSWITCH,
-    PAGE,
-    SCROLL_WHEEL,
-    PAGEBAR,
-    RETURNWIDGET,
-    RECTANGLE,
-    WINDOWWITHBORDER,
-    CANVAS,
-    VG_LITE_CLOCK,
-    VG_LITE_CUBE,
-    GRID,
-    RADIO,
-    RADIOSWITCH,
-    ARC,
-    JAVASCRIPT,
-    MOVIE,
-    IMAGE_SCOPE,
-    CARDVIEW,
-    CARD,
-    PAGELIST,
-    PAGELISTVIEW,
-    MACRO_ANIMATETRANSFORM,
-    HONEYCOMB_LIST,
-    WHEEL_LIST,
-    QRCODE,
-} obj_type_t;
+    SCREEN                   = 0x0000,
+    WINDOW                   = 0x0001,
+    TABVIEW                  = 0x0002,
+    TAB                      = 0x0003,
+    CURTAINVIEW              = 0x0004,
+    CURTAIN                  = 0x0005,
+    IMAGE                    = 0x0006,
+    BUTTON                   = 0x0007,
+    ICONLIST                 = 0x0008,
+    ICON                     = 0x0009,
+    IMAGE_FROM_MEM           = 0x000A,
+    TEXTBOX                  = 0x000B,
+    SCROLLTEXTBOX            = 0x000C,
+    SEEKBAR                  = 0x000D,
+    PROGRESSBAR              = 0x000E,
+    CLICKSWITCH              = 0x000F,
+    PAGE                     = 0x0010,
+    SCROLL_WHEEL             = 0x0011,
+    PAGEBAR                  = 0x0012,
+    RETURNWIDGET             = 0x0013,
+    RECTANGLE                = 0x0014,
+    WINDOWWITHBORDER         = 0x0015,
+    CANVAS                   = 0x0016,
+    VG_LITE_CLOCK            = 0x0017,
+    VG_LITE_CUBE             = 0x0018,
+    GRID                     = 0x0019,
+    RADIO                    = 0x001A,
+    RADIOSWITCH              = 0x001B,
+    ARC                      = 0x001C,
+    JAVASCRIPT               = 0x001D,
+    MOVIE                    = 0x001E,
+    IMAGE_SCOPE              = 0x001F,
+    CARDVIEW                 = 0x0020,
+    CARD                     = 0x0021,
+    PAGELIST                 = 0x0022,
+    PAGELISTVIEW             = 0x0023,
+    MACRO_ANIMATETRANSFORM   = 0x0024,
+    HONEYCOMB_LIST           = 0x0025,
+    WHEEL_LIST               = 0x0026,
+    QRCODE                   = 0x0027,
+} T_OBJ_TYPE;
+
 typedef struct gui_msg
 {
     /* the event type */
@@ -374,7 +370,6 @@ typedef struct gui_msg
     } u;
     void *app;
     void *cb;
-
 } gui_msg_t;
 
 typedef struct gui_index
@@ -382,6 +377,7 @@ typedef struct gui_index
     int8_t x;
     int8_t y;
 } gui_index_t;
+
 typedef struct gui_jump
 {
     bool jump_flag;
@@ -409,7 +405,7 @@ typedef enum
     OBJ_DRAW,
     OBJ_END,
     OBJ_DESTORY,
-} obj_cb_type_t;
+} T_OBJ_CB_TYPE;
 
 typedef struct _gui_obj_t
 {
@@ -424,9 +420,9 @@ typedef struct _gui_obj_t
     gui_list_t  brother_list;
 
     //start of run time
-    void (* obj_cb)(struct _gui_obj_t *obj, obj_cb_type_t cb_type);
+    void (* obj_cb)(struct _gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
     //end of run time
-    obj_type_t type; //no need this , only use name
+    T_OBJ_TYPE type; //no need this , only use name
     uint32_t active               : 1;    // this flag means obj location in screen
     uint32_t not_show             : 1;
 
@@ -477,11 +473,13 @@ typedef struct gui_rgb_data_head
     char version;
     char rsvd2;
 } gui_rgb_data_head_t;
+
 typedef struct _gui_rect_file_head
 {
     struct gui_rgb_data_head head;
     gui_color_t color;
 } gui_rect_file_head_t;
+
 /** End of SUBMOUDLE_Exported_Types
   * @}
   */

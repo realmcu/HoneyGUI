@@ -20,14 +20,14 @@ When the state of the cardview changes, it triggers a callback, and you can use 
 There are five style in cardview widget [gui_cardview_set_style(this, style)](#api)
 
 ```
-typedef enum gui_tab_style
+typedef enum t_slide_style
 {
     CLASSIC,
     REDUCTION,
     FADE,
     REDUCTION_FADE,
     STACKING,
-} SLIDE_STYLE;
+} T_SLIDE_STYLE;
 ```
 
 ## Example

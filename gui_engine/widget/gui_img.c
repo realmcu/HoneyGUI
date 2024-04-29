@@ -344,7 +344,7 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *this)
     return head;
 }
 
-static void gui_img_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {

@@ -269,7 +269,7 @@ static void gui_cardview_destory(gui_obj_t *obj)
 
 }
 
-static void gui_cardview_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+static void gui_cardview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
     {
@@ -309,7 +309,7 @@ void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *thi
     this->status_cb = cb;
 }
 
-void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style)
+void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style)
 {
     this->style = style;
 }
