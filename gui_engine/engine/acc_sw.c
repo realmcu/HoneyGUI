@@ -131,12 +131,16 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             return;
         }
     }
-    else if ((img_type == RGBA8888) && (image->blend_mode == IMG_RECT))
+    else if ((dc_bytes_per_pixel == 4) && (img_type == RGBA8888) && (image->blend_mode == IMG_RECT))
     {
         rect_2_argb8888(image, dc, rect);
         return;
     }
-
+    else if ((dc_bytes_per_pixel == 2) && (img_type == RGBA8888) && (image->blend_mode == IMG_RECT))
+    {
+        rect_2_rgb565(image, dc, rect);
+        return;
+    }
     do_raster_no_rle(image, dc, rect);
     return;
 }

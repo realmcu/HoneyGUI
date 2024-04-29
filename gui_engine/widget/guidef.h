@@ -456,7 +456,7 @@ typedef struct _gui_obj_t
 
 } gui_obj_t;
 
-struct _gui_color
+typedef struct _gui_color
 {
     union
     {
@@ -467,8 +467,8 @@ struct _gui_color
         } rgba;
         uint32_t rgba_full;
     } color;
-};
-typedef struct _gui_color gui_color_t;
+} gui_color_t;
+
 typedef struct gui_rgb_data_head
 {
     unsigned char scan : 1;

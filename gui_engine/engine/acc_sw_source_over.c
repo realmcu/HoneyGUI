@@ -23,841 +23,27 @@
 #include "acc_engine.h"
 #include "acc_sw_blend.h"
 
-
-
-void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect)
+void rect_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
+                   gui_rect_t *rect)
 {
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
     int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-    uint8_t source_bytes_per_pixel = 2;
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t opacity_value = image ->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            uint16_t pixel = *((uint16_t *)read_off + j);
-            uint16_t *d = writebuf + (write_off + j);
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    *d = pixel;
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        *d = do_blending_acc_2_rgb565_opacity((uint32_t)pixel, (uint32_t) * d, opacity_value);
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            gui_rect_t *rect)
-{
-    // int16_t image_x = rect->x1;
-    // int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    // uint8_t source_bytes_per_pixel = 3;
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t opacity_value = image ->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            uint8_t alpha = *(uint8_t *)(image_off + j + i * source_w);
-            uint16_t color_t = *(uint16_t *)(image_off + j * 2 + source_w * source_h);
-            uint16_t *d = writebuf + (write_off + j);
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        // opacity_value = alpha * opacity_value / 255;
-                        *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                         gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint8_t source_bytes_per_pixel = 3;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t opacity_value = image ->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            uint8_t *pixel = (uint8_t *)(read_off + j * 3);
-            uint8_t alpha = pixel[2];
-            uint16_t color_t = (uint16_t)(((uint16_t)(pixel[1]) << 8) + pixel[0]);
-            uint16_t *d = writebuf + (write_off + j);
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        // opacity_value = alpha * opacity_value / 255;
-                        *d = do_blending_acc_2_rgb565_opacity((uint32_t)color_t, (uint32_t) * d, alpha);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t source_bytes_per_pixel = 3;
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t opacity_value = image->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[2],
-                                 .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[0],
-                                 .color.rgba.a = 255,
-                                };
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    uint16_t *d = writebuf + (write_off + j);
-                    do_blending_2_rgb565(d, &color);
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        uint16_t *d = writebuf + (write_off + j);
-                        do_blending_2_rgb565_opacity(d, &color, opacity_value);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t source_bytes_per_pixel = 4;
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t opacity_value = image->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            uint8_t *pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[2],
-                                 .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[0],
-                                 .color.rgba.a = pixel[3],
-                                };
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    uint16_t *d = writebuf + (write_off + j);
-                    do_blending_2_rgb565(d, &color);
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        uint16_t *d = writebuf + (write_off + j);
-                        do_blending_2_rgb565_opacity(d, &color, opacity_value);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-
-void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-    uint8_t source_bytes_per_pixel = 2;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-        uint8_t opacity_value = image->opacity_value;
-        uint8_t *writebuf = dc->frame_buf;
-        uint16_t pixel;
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            pixel = *((uint16_t *)read_off + j);
-            gui_color_t color = {.color.rgba.a = 255,
-                                 .color.rgba.r = (pixel & 0x001f) << 3,
-                                 .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
-                                 .color.rgba.b = (pixel >> 11) << 3,
-                                };
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_rgb888(d, &color);
-                }
-                break;
-            default:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_rgb888_opacity(d, &color, opacity_value);
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint8_t source_bytes_per_pixel = 3;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t opacity_value = image->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        uint8_t *writebuf = dc->frame_buf;
-        uint8_t *pixel;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
-                                 .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
-                                 .color.rgba.a = 255,
-                                };
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_rgb888(d, &color);
-                }
-                break;
-            default:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_rgb888_opacity(d, &color, opacity_value);
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint8_t source_bytes_per_pixel = 4;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t opacity_value = image->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        uint8_t *writebuf = dc->frame_buf;
-        uint8_t *pixel;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
-                                 .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
-                                 .color.rgba.a = pixel[3],
-                                };
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_rgb888(d, &color);
-                }
-                break;
-            default:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_rgb888_opacity(d, &color, opacity_value);
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint8_t source_bytes_per_pixel = 2;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t *writebuf = dc->frame_buf;
-    uint16_t pixel;
-    uint8_t opacity_value = image->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            pixel = *((uint16_t *)read_off + j);
-            gui_color_t color = {.color.rgba.r = (pixel & 0x001f) << 3 | (pixel & 0x001f) >> 2,
-                                 .color.rgba.g = ((pixel & 0x07e0) >> 5) << 2,
-                                 .color.rgba.b = (pixel >> 11) << 3,
-                                 .color.rgba.a = 255,
-                                };
-
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_argb8888(d, &color);
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                        do_blending_2_argb8888_opacity(d, &color, opacity_value);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-
-        }
-    }
-    return;
-}
-void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                             gui_rect_t *rect)
-{
-    // int16_t image_x = rect->x1;
-    // int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
     if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
 
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-    uint8_t opacity_value = image ->opacity_value;
-    for (uint32_t i = y_start; i < y_end; i++)
+    gui_color_t reverse =
     {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-        uint8_t *writebuf = dc->frame_buf;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            uint8_t alpha = *(uint8_t *)(image_off + j + i * source_w);
-            uint16_t color_t = *(uint16_t *)(image_off + j * 2 + source_w * source_h);
-            gui_color_t color = {.color.rgba.b = (color_t >> 11) << 3,
-                                 .color.rgba.g = ((color_t & 0x07e0) >> 5) << 2,
-                                 .color.rgba.r = (color_t & 0x001f) << 3,
-                                 .color.rgba.a = alpha,
-                                };
-            gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-
-                    do_blending_2_argb8888(d, &color);
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        // opacity_value = alpha * opacity_value / 255;
-                        do_blending_2_argb8888_opacity(d, &color, opacity_value);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-    uint8_t source_bytes_per_pixel = 3;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-    uint8_t opacity_value = image ->opacity_value;
-    uint8_t *writebuf = dc->frame_buf;
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            uint8_t *pixel = (uint8_t *)(read_off + j * 3);
-            uint8_t alpha = pixel[2];
-            uint16_t color_t = (uint16_t)(((uint16_t)(pixel[1]) << 8) + pixel[0]);
-            gui_color_t color = {.color.rgba.b = (color_t >> 11) << 3,
-                                 .color.rgba.g = ((color_t & 0x07e0) >> 5) << 2,
-                                 .color.rgba.r = (color_t & 0x001f) << 3,
-                                 .color.rgba.a = alpha,
-                                };
-            gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-
-                    do_blending_2_argb8888(d, &color);
-                }
-                break;
-            default:
-                {
-                    if (opacity_value < 255)
-                    {
-                        do_blending_2_argb8888_opacity(d, &color, opacity_value);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-
-void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint8_t source_bytes_per_pixel = 3;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        uint8_t *writebuf = dc->frame_buf;
-        uint8_t *pixel;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.b = pixel[2],
-                                 .color.rgba.g = pixel[1],
-                                 .color.rgba.r = pixel[0],
-                                 .color.rgba.a = 255,
-                                };
-            uint8_t opacity_value = image->opacity_value;
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_argb8888(d, &color);
-                }
-                break;
-            default:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_argb8888_opacity(d, &color, opacity_value);
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          gui_rect_t *rect)
-{
-    int16_t image_x = rect->x1;
-    int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-    uint8_t source_bytes_per_pixel = 4;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-
-    int read_x_off = -_UI_MIN(image_x, 0) * source_bytes_per_pixel  + image_off;
-
-    for (uint32_t i = y_start; i < y_end; i++)
-    {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-
-        int read_off = ((i - image_y) * source_w) * source_bytes_per_pixel + read_x_off -
-                       source_bytes_per_pixel * x_start;
-
-        uint8_t *writebuf = dc->frame_buf;
-        uint8_t *pixel;
-
-        for (uint32_t j = x_start; j < x_end; j++)
-        {
-            pixel = (uint8_t *)(read_off + j * source_bytes_per_pixel);
-            gui_color_t color = {.color.rgba.r = pixel[0],
-                                 .color.rgba.g = pixel[1],
-                                 .color.rgba.b = pixel[2],
-                                 .color.rgba.a = pixel[3],
-                                };
-            uint8_t opacity_value = image->opacity_value;
-            switch (opacity_value)
-            {
-            case 0:
-                break;
-            case 255:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_argb8888(d, &color);
-                }
-                break;
-            default:
-                {
-                    gui_color_t *d = (gui_color_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
-                    do_blending_2_argb8888_opacity(d, &color, opacity_value);
-                }
-                break;
-            }
-        }
-    }
-    return;
-}
-void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                     gui_rect_t *rect)
-{
-    //int16_t image_x = rect->x1;
-    //int16_t image_y = rect->y1;
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
-//    int16_t source_w = image->img_w;
-//    int16_t source_h = image->img_h;
-    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
-    {
-        return;
-    }
-
-//    uint8_t source_bytes_per_pixel = 4;
-    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
-    gui_color_t reverse = {.color.rgba.a = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.a, .color.rgba.r = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.b, .color.rgba.b = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.r, .color.rgba.g = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.g};
+        .color.rgba.a = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.a,
+        .color.rgba.r = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.b,
+        .color.rgba.b = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.r,
+        .color.rgba.g = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.g
+    };
 
     for (uint32_t i = y_start; i <= y_end; i++)
     {
@@ -865,7 +51,63 @@ void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
 
 
         uint8_t *writebuf = dc->frame_buf;
-        //uint8_t *pixel;
+
+        for (uint32_t j = x_start; j <= x_end; j++)
+        {
+
+            uint8_t opacity_value = image->opacity_value;
+            switch (opacity_value)
+            {
+            case 0:
+                break;
+            case 255:
+                {
+                    uint16_t *d = (uint16_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+
+                    do_blending_2_rgb565(d, &reverse);
+                }
+                break;
+            default:
+                {
+                    uint16_t *d = (uint16_t *)(writebuf + (write_off + j) * dc_bytes_per_pixel);
+                    do_blending_2_rgb565_opacity(d, &reverse, opacity_value);
+                }
+                break;
+            }
+        }
+    }
+    return;
+}
+
+
+void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
+                     gui_rect_t *rect)
+{
+    int16_t x_start = 0;
+    int16_t x_end = 0;
+    int16_t y_start = 0;
+    int16_t y_end = 0;
+
+    if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
+    {
+        return;
+    }
+
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+    gui_color_t reverse =
+    {
+        .color.rgba.a = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.a,
+        .color.rgba.r = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.b,
+        .color.rgba.b = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.r,
+        .color.rgba.g = ((gui_rect_file_head_t *)(image->data))->color.color.rgba.g
+    };
+
+    for (uint32_t i = y_start; i <= y_end; i++)
+    {
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+
+
+        uint8_t *writebuf = dc->frame_buf;
 
         for (uint32_t j = x_start; j <= x_end; j++)
         {
