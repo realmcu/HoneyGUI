@@ -87,11 +87,11 @@
 static void gui_widget_template_prepare(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
-    gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_t *obj = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
 
     GUI_UNUSED(this);
-    GUI_UNUSED(root);
+    GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 }
@@ -99,11 +99,11 @@ static void gui_widget_template_prepare(gui_widget_template_t *this)
 static void gui_widget_template_draw(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
-    gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_t *obj = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
 
     GUI_UNUSED(this);
-    GUI_UNUSED(root);
+    GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 }
@@ -111,11 +111,11 @@ static void gui_widget_template_draw(gui_widget_template_t *this)
 static void gui_widget_template_end(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
-    gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_t *obj = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
 
     GUI_UNUSED(this);
-    GUI_UNUSED(root);
+    GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 }
@@ -123,11 +123,11 @@ static void gui_widget_template_end(gui_widget_template_t *this)
 static void gui_widget_template_destory(gui_widget_template_t *this)
 {
     touch_info_t *tp = tp_get_info();
-    gui_obj_t *root = (gui_obj_t *)this;
+    gui_obj_t *obj = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
 
     GUI_UNUSED(this);
-    GUI_UNUSED(root);
+    GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 }
@@ -141,14 +141,14 @@ static void gui_widget_template_ctor(gui_widget_template_t *this,
                                      int16_t                w,
                                      int16_t                h)
 {
-    //for root class
-    gui_obj_t *root = (gui_obj_t *)this;
-    gui_obj_ctor(root, parent, name, x, y, w, h);
+    //for obj class
+    gui_obj_t *obj = (gui_obj_t *)this;
+    gui_obj_ctor(obj, parent, name, x, y, w, h);
 
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_widget_template_prepare;
-    root->obj_draw = (void (*)(struct _gui_obj_t *))gui_widget_template_draw;
-    root->obj_end = (void (*)(struct _gui_obj_t *))gui_widget_template_end;
-    root->obj_destory = (void (*)(struct _gui_obj_t *))gui_widget_template_destory;
+    obj->obj_prepare = (void (*)(struct _gui_obj_t *))gui_widget_template_prepare;
+    obj->obj_draw = (void (*)(struct _gui_obj_t *))gui_widget_template_draw;
+    obj->obj_end = (void (*)(struct _gui_obj_t *))gui_widget_template_end;
+    obj->obj_destory = (void (*)(struct _gui_obj_t *))gui_widget_template_destory;
 }
 
 /*============================================================================*

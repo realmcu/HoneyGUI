@@ -19,7 +19,7 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
 
     if (rect != NULL)
     {
-
+        GUI_ASSERT(rect == NULL);
     }
     if ((*x_start >= *x_end) || (*y_start >= *y_end))
     {
