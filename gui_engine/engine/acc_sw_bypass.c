@@ -20,7 +20,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-// #include "trace.h"
 
 void bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                           gui_rect_t *rect)

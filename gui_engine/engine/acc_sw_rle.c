@@ -24,11 +24,7 @@
 #include <acc_sw_raster.h>
 #include "acc_sw_rle_bypass.h"
 #include "acc_sw_rle_cover.h"
-#include "acc_sw_rle_bypass_matrix.h"
 #include "acc_sw_rle_filter.h"
-#include "acc_sw_rle_filter_matrix.h"
-#include "acc_sw_rle_source_over.h"
-#include "acc_sw_rle_source_over_matrix.h"
 
 
 #if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E)

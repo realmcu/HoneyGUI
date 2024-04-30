@@ -24,11 +24,7 @@
 #include "acc_sw_rle.h"
 #include "acc_sw_bypass.h"
 #include "acc_sw_cover.h"
-#include "acc_sw_bypass_matrix.h"
 #include "acc_sw_filter.h"
-#include "acc_sw_filter_matrix.h"
-#include "acc_sw_source_over.h"
-#include "acc_sw_source_over_matrix.h"
 #include <acc_sw_raster.h>
 #include "acc_sw.h"
 
