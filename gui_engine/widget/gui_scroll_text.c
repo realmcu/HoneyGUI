@@ -327,6 +327,34 @@ static void gui_scroll_text_destory(gui_obj_t *obj)
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
 }
 
+static void gui_scroll_text_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_scroll_text_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_scroll_text_draw(obj);
+            break;
+
+        case OBJ_END:
+            gui_scroll_text_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_scroll_text_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_scroll_text_ctor(gui_scroll_text_t *this,
                                  gui_obj_t         *parent,
                                  const char        *name,
@@ -344,10 +372,11 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *this,
 
     //for root class
     root->type = SCROLLTEXTBOX;
-    root->obj_prepare = gui_scroll_text_prepare;
-    root->obj_draw = gui_scroll_text_draw;
-    root->obj_end = gui_scroll_text_end;
-    root->obj_destory = gui_scroll_text_destory;
+    root->obj_cb = gui_scroll_text_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     this->init_time_ms = gui_ms_get();
 }

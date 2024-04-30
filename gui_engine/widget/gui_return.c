@@ -80,7 +80,7 @@
   * @{
   */
 
-static void gui_return_preapre(gui_obj_t *obj)
+static void gui_return_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_seekbar_t *circle = &(((gui_return_t *)obj)->base);
@@ -169,6 +169,22 @@ static void gui_return_preapre(gui_obj_t *obj)
     }
 }
 
+static void gui_return_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_return_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_return_ctor(gui_return_t   *this,
                             gui_obj_t      *parent,
                             const uint32_t *frame_array[],
@@ -182,7 +198,8 @@ static void gui_return_ctor(gui_return_t   *this,
                              (int)gui_get_screen_height() - (int)gui_get_screen_height() * 2 / 3);
 
     this->ignore_gesture_widget = ignore_gesture_widget;
-    GET_BASE(this)->obj_prepare = gui_return_preapre;
+    GET_BASE(this)->obj_cb = gui_return_cb;
+    GET_BASE(this)->has_prepare_cb = true;
     gui_obj_add_event_cb(this, (gui_event_cb_t)return_cb, GUI_EVENT_1, this);
 
     GET_BASE(this)->w = RETURN_HEIGHT;

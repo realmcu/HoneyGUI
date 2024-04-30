@@ -186,6 +186,34 @@ static px_bool gui_px_application_initialize(gui_px_t *this,
     return PX_TRUE;
 }
 
+static void gui_px_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_px_prepare((gui_px_t *)obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_px_draw((gui_px_t *)obj);
+            break;
+
+        case OBJ_END:
+            gui_px_end((gui_px_t *)obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_px_destory((gui_px_t *)obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_px_ctor(gui_px_t   *this,
                         gui_obj_t  *parent,
                         const char *name,
@@ -201,10 +229,11 @@ static void gui_px_ctor(gui_px_t   *this,
 
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_px_prepare;
-    root->obj_draw = (void (*)(struct _gui_obj_t *))gui_px_draw;
-    root->obj_end = (void (*)(struct _gui_obj_t *))gui_px_end;
-    root->obj_destory = (void (*)(struct _gui_obj_t *))gui_px_destory;
+    root->obj_cb = gui_px_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     dc = gui_get_dc();

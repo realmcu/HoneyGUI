@@ -307,6 +307,34 @@ static void gui_watch_gradient_spot_destory(gui_obj_t *obj)
 
 }
 
+static void gui_watch_gradient_spot_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_watch_gradient_spot_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_watch_gradient_spot_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_watch_gradient_spot_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_watch_gradient_spot_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this,
                                          gui_obj_t                 *parent,
                                          const char                *name,
@@ -322,10 +350,11 @@ static void gui_watch_gradient_spot_ctor(gui_watch_gradient_spot_t *this,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = gui_watch_gradient_spot_prepare;
-    root->obj_draw = gui_watch_gradient_spot_draw_cb;
-    root->obj_end = gui_watch_gradient_spot_end;
-    root->obj_destory = gui_watch_gradient_spot_destory;
+    root->obj_cb = gui_watch_gradient_spot_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 }
 
 

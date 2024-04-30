@@ -173,6 +173,34 @@ static void gui_eq_destory(gui_obj_t *obj)
 
 }
 
+static void gui_eq_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_eq_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_eq_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_eq_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_eq_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_eq_ctor(gui_eq_t   *this,
                         gui_obj_t  *parent,
                         const char *name,
@@ -185,10 +213,11 @@ static void gui_eq_ctor(gui_eq_t   *this,
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = gui_eq_prepare;
-    root->obj_draw = gui_eq_draw_cb;
-    root->obj_end = gui_eq_end;
-    root->obj_destory = gui_eq_destory;
+    root->obj_cb = gui_eq_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 }
 
 /*============================================================================*

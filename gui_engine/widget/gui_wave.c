@@ -226,6 +226,34 @@ static void gui_wave_destory(gui_obj_t *obj)
 
 }
 
+static void gui_wave_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_wave_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_wave_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_wave_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_wave_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_wave_ctor(gui_wave_t *this,
                           gui_obj_t  *parent,
                           const char *name,
@@ -238,10 +266,11 @@ static void gui_wave_ctor(gui_wave_t *this,
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = gui_wave_prepare;
-    root->obj_draw = gui_wave_draw_cb;
-    root->obj_end = gui_wave_end;
-    root->obj_destory = gui_wave_destory;
+    root->obj_cb = gui_wave_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 }
 
 /*============================================================================*

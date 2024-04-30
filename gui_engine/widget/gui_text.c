@@ -308,6 +308,34 @@ static void gui_text_destory(gui_obj_t *obj)
     gui_text_font_destory(text);
 }
 
+static void gui_text_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_text_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_text_draw(obj);
+            break;
+
+        case OBJ_END:
+            gui_text_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_text_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_text_ctor(gui_text_t *this,
                    gui_obj_t  *parent,
                    const char *name,
@@ -322,10 +350,11 @@ void gui_text_ctor(gui_text_t *this,
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
     root->type = TEXTBOX;
-    root->obj_prepare = gui_text_prepare;
-    root->obj_draw = gui_text_draw;
-    root->obj_end = gui_text_end;
-    root->obj_destory = gui_text_destory;
+    root->obj_cb = gui_text_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
     //for self
     this->mode = LEFT;
 }

@@ -141,14 +141,44 @@ static void draw(gui_widget_litegfx_t *this)
 
     lx_vglite_render(this->handler, dc->section.x1, dc->section.y1, dc->section.x2, dc->section.y2);
 }
+
 static void end(gui_widget_litegfx_t *this)
 {
     GUI_UNUSED(this);
 }
+
 static void destory(gui_widget_litegfx_t *this)
 {
     lx_vglite_teardown(this->handler);
     lx_vglite_deinit(this->handler);
+}
+
+static void gui_widget_litegfx_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            prepare((gui_widget_litegfx_t *)obj);
+            break;
+
+        case OBJ_DRAW:
+            draw((gui_widget_litegfx_t *)obj);
+            break;
+
+        case OBJ_END:
+            end((gui_widget_litegfx_t *)obj);
+            break;
+
+        case OBJ_DESTORY:
+            destory((gui_widget_litegfx_t *)obj);
+            break;
+
+        default:
+            break;
+        }
+    }
 }
 
 static void widget_litegfx_ctor(gui_widget_litegfx_t *this, gui_obj_t *parent, const char *name,
@@ -161,10 +191,11 @@ static void widget_litegfx_ctor(gui_widget_litegfx_t *this, gui_obj_t *parent, c
     gui_obj_t *root = (gui_obj_t *)this;
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
-    root->obj_draw = (void (*)(struct _gui_obj_t *))draw;
-    root->obj_end = (void (*)(struct _gui_obj_t *))end;
-    root->obj_destory = (void (*)(struct _gui_obj_t *))destory;
+    root->obj_cb = gui_widget_litegfx_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->handler = 0;

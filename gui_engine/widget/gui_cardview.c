@@ -269,6 +269,38 @@ static void gui_cardview_destory(gui_obj_t *obj)
 
 }
 
+static void gui_cardview_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_cardview_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_cardview_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_cardview_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_cardview_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_cardview_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -307,11 +339,12 @@ gui_cardview_t *gui_cardview_create(void       *parent,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = CARDVIEW;
-    root->obj_input_prepare = gui_cardview_input_prepare;
-    root->obj_prepare = gui_cardview_prepare;
-    root->obj_draw = gui_cardview_draw_cb;
-    root->obj_end = gui_cardview_end;
-    root->obj_destory = gui_cardview_destory;
+    root->obj_cb = gui_cardview_cb;
+    root->has_input_prepare_cb = true;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)

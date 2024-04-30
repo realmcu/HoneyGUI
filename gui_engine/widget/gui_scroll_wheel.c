@@ -195,6 +195,22 @@ static uint32_t gui_scoll_wheel_get_index(struct gui_scroll_wheel *this)
     return this->index;
 }
 
+static void gui_scroll_wheel_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_scroll_wheel_update_att(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this,
                            gui_obj_t               *parent,
                            int16_t                  x,
@@ -208,7 +224,8 @@ void gui_scroll_wheel_ctor(struct gui_scroll_wheel *this,
 
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
-    root->obj_prepare = gui_scroll_wheel_update_att;
+    root->obj_cb = gui_scroll_wheel_cb;
+    root->has_prepare_cb = true;
     root->type = SCROLL_WHEEL;
 
     //for self

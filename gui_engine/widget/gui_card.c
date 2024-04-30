@@ -179,6 +179,26 @@ static void gui_card_prepare(gui_obj_t *obj)
 }
 #endif
 
+static void gui_card_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_card_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_card_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_card_ctor(gui_card_t *this,
                           gui_obj_t  *parent,
                           const char *filename,
@@ -191,8 +211,9 @@ static void gui_card_ctor(gui_card_t *this,
     gui_cardview_t *cardview = (gui_cardview_t *)parent;
     gui_obj_t *obj = GET_BASE(this);
 
-    GET_BASE(this)->obj_input_prepare = gui_card_input_prepare;
-    GET_BASE(this)->obj_prepare = gui_card_prepare;
+    GET_BASE(this)->obj_cb = gui_card_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->type = CARD;
     if (parent->type != CARDVIEW)
     {

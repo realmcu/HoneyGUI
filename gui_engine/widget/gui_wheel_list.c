@@ -205,6 +205,30 @@ static void wheel_list_destory(gui_obj_t *obj)
     gui_free(this->icon_list);
 }
 
+static void gui_wheel_list_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            wheel_list_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            wheel_list_prepare(obj);
+            break;
+
+        case OBJ_DESTORY:
+            wheel_list_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_wheel_list_ctor(gui_wheel_list_t *this,
                                 gui_obj_t *parent,
                                 uint8_t layer,
@@ -216,9 +240,10 @@ static void gui_wheel_list_ctor(gui_wheel_list_t *this,
 
     //for root class
     GET_BASE(this)->type = WHEEL_LIST;
-    GET_BASE(this)->obj_input_prepare = wheel_list_input_prepare;
-    GET_BASE(this)->obj_prepare = wheel_list_prepare;
-    GET_BASE(this)->obj_destory = wheel_list_destory;
+    GET_BASE(this)->obj_cb = gui_wheel_list_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
 
     this->layer = layer;
     this->distence = distence;

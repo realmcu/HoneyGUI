@@ -444,6 +444,23 @@ static void switch_prepare(gui_obj_t *obj)
         }
     }
 }
+
+static void gui_switch_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            switch_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
                      int16_t x,
                      int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)
@@ -451,7 +468,8 @@ void gui_switch_ctor(gui_switch_t *this, gui_obj_t *parent,
     gui_obj_ctor(&(this->base), parent, "switch", x, y, w, h);
 
     this->base.type = CLICKSWITCH;
-    GET_BASE(this)->obj_prepare = switch_prepare;
+    GET_BASE(this)->obj_cb = gui_switch_cb;
+    GET_BASE(this)->has_prepare_cb = true;
     this->turn_off = sw_turn_off;
     this->turn_on = sw_turn_on;
     this->onOn = onOn;

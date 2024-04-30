@@ -307,6 +307,30 @@ static void gui_tab_destroy(gui_obj_t *obj)
     }
 }
 
+static void gui_tab_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_tab_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_tab_prepare(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_tab_destroy(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_tab_ctor(gui_tab_t  *this,
                          gui_obj_t  *parent,
                          const char *filename,
@@ -320,9 +344,10 @@ static void gui_tab_ctor(gui_tab_t  *this,
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_prepare = gui_tab_prepare;
-    GET_BASE(this)->obj_input_prepare = gui_tab_input_prepare;
-    GET_BASE(this)->obj_destory = gui_tab_destroy;
+    GET_BASE(this)->obj_cb = gui_tab_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = TAB;
 
     gui_tabview_t *parent_ext = (gui_tabview_t *)parent;

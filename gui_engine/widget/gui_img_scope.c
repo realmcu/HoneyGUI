@@ -241,6 +241,34 @@ static void gui_img_scope_img_destory(gui_obj_t *obj)
     gui_log("do obj %s free\n", obj->name);
 }
 
+static void gui_img_scope_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_img_scope_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_img_scope_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_img_scope_img_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_img_scope_img_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_img_scope_ctor(gui_img_t  *this,
                         gui_obj_t  *parent,
                         const char *name,
@@ -255,10 +283,11 @@ void gui_img_scope_ctor(gui_img_t  *this,
 
     //for root class
     GET_BASE(this)->type = IMAGE_SCOPE;
-    GET_BASE(this)->obj_prepare = gui_img_scope_prepare;
-    GET_BASE(this)->obj_draw = gui_img_scope_draw_cb;
-    GET_BASE(this)->obj_end = gui_img_scope_img_end;
-    GET_BASE(this)->obj_destory = gui_img_scope_img_destory;
+    GET_BASE(this)->obj_cb = gui_img_scope_cb;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_draw_cb = true;
+    GET_BASE(this)->has_end_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     //for self
 
     GUI_ASSERT(NULL != NULL);

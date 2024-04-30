@@ -134,6 +134,34 @@ static void gui_canvas_widget_nanovg_destory(gui_obj_t *obj)
 
 }
 
+static void gui_canvas_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_canvas_prepare((gui_canvas_t *)obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_canvas_widget_nanovg_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_canvas_widget_nanovg_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_canvas_widget_nanovg_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_canvas_widget_nanovg_ctor(gui_canvas_t *this,
                                           gui_obj_t    *parent,
                                           const char   *name,
@@ -151,10 +179,11 @@ static void gui_canvas_widget_nanovg_ctor(gui_canvas_t *this,
 
     //for root class
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_canvas_prepare;
-    root->obj_draw = gui_canvas_widget_nanovg_draw_cb;
-    root->obj_end = gui_canvas_widget_nanovg_end;
-    root->obj_destory = gui_canvas_widget_nanovg_destory;
+    root->obj_cb = gui_canvas_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 }
 
 /*============================================================================*

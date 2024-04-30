@@ -148,9 +148,9 @@ static void gui_obj_destory_cb(gui_obj_t *obj)
     {
         gui_free(obj->matrix);
     }
-    if (obj->obj_destory)
+    if (obj->has_destroy_cb)
     {
-        obj->obj_destory(obj);
+        obj->obj_cb(obj, OBJ_DESTORY);
     }
 }
 

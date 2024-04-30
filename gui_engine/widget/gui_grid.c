@@ -157,6 +157,22 @@ static void gui_grid_prepare(gui_obj_t *obj)
     }
 }
 
+static void gui_grid_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_grid_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_grid_ctor(gui_grid_t *this,
                           gui_obj_t  *parent,
                           int16_t     x,
@@ -169,7 +185,8 @@ static void gui_grid_ctor(gui_grid_t *this,
     gui_obj_ctor(&this->base, parent, "grid", x, y, gap_col * col, 700);
 
     //GET_BASE(this)->obj_update_att = obj_update_att;
-    GET_BASE(this)->obj_prepare = gui_grid_prepare;
+    GET_BASE(this)->obj_cb = gui_grid_cb;
+    GET_BASE(this)->has_prepare_cb = true;
     this->row = row;
     this->col = col;
     this->gap_col = gap_col;

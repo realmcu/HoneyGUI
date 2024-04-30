@@ -346,6 +346,34 @@ static gui_rgb_data_head_t gui_img_get_header(gui_img_t *this)
     return head;
 }
 
+static void gui_img_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            img_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            img_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            img_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            img_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_img_ctor(gui_img_t *this,
                          gui_obj_t *parent,
                          const char *name,
@@ -363,10 +391,11 @@ static void gui_img_ctor(gui_img_t *this,
 
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
-    obj->obj_prepare = img_prepare;
-    obj->obj_draw = img_draw_cb;
-    obj->obj_end = img_end;
-    obj->obj_destory = img_destory;
+    obj->obj_cb = gui_img_cb;
+    obj->has_prepare_cb = true;
+    obj->has_draw_cb = true;
+    obj->has_end_cb = true;
+    obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
     if (src_mode == IMG_SRC_FILESYS)

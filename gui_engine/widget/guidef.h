@@ -402,6 +402,14 @@ typedef struct gui_animate
     bool animate;
 } gui_animate_t;
 
+typedef enum
+{
+    OBJ_INPUT_PREPARE,
+    OBJ_PREPARE,
+    OBJ_DRAW,
+    OBJ_END,
+    OBJ_DESTORY,
+} obj_cb_type_t;
 
 typedef struct _gui_obj_t
 {
@@ -415,43 +423,31 @@ typedef struct _gui_obj_t
     gui_list_t  child_list;
     gui_list_t  brother_list;
 
-    //run time
-    void (* obj_input_prepare)(struct _gui_obj_t *obj);
-    void (* obj_prepare)(struct _gui_obj_t *obj);
-    void (* obj_draw)(struct _gui_obj_t *obj);
-    void (* obj_end)(struct _gui_obj_t *obj);
-    void (* obj_destory)(struct _gui_obj_t *obj);
-
-    //void (* obj_cb)(struct _gui_obj_t *obj); todo
-    //run time
+    //start of run time
+    void (* obj_cb)(struct _gui_obj_t *obj, obj_cb_type_t cb_type);
+    //end of run time
     obj_type_t type; //no need this , only use name
-    uint32_t active         : 1;    // this flag means obj location in screen
-    uint32_t not_show       : 1;
-    uint32_t cover          : 1;
-    //uint32_t focused        : 1;
+    uint32_t active               : 1;    // this flag means obj location in screen
+    uint32_t not_show             : 1;
+    uint32_t cover                : 1;
+
     uint32_t skip_tp_left_hold    : 1;
     uint32_t skip_tp_right_hold   : 1;
     uint32_t skip_tp_up_hold      : 1;
     uint32_t skip_tp_down_hold    : 1;
-    //uint32_t skip_tp_left_quick   : 1;
+    uint32_t create_done          : 1;
+    uint32_t flag_3d              : 1;
+    uint32_t gesture              : 1;
+    uint32_t event_dsc_cnt        : 5;
+    uint32_t opacity_value        : 8;
+    uint32_t has_input_prepare_cb : 1;
+    uint32_t has_prepare_cb       : 1;
+    uint32_t has_draw_cb          : 1;
+    uint32_t has_end_cb           : 1;
+    uint32_t has_destroy_cb       : 1;
 
-
-    uint32_t create_done    : 1;
-    uint32_t flag_3d        : 1;
-    uint32_t event_dsc_cnt  : 5;
-    uint32_t gesture        : 1;
     gui_event_dsc_t *event_dsc;
 
-
-    // int16_t dx;//for touch
-    // int16_t dy;//for touch
-    // int16_t ax;//absolute value
-    // int16_t ay;//absolute value
-    // float sx;
-    // float sy;
-    // int16_t tx;//for tab, diffent view use this value
-    // int16_t ty;//for tab, diffent view use this value
-    unsigned char opacity_value;
     gui_matrix_t *matrix;
 
 } gui_obj_t;

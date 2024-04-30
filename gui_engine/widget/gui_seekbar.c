@@ -122,7 +122,7 @@ static void gui_seekbar_update_att(struct _gui_obj_t *o)
     }
 }
 
-static void gui_seekbar_preapre(gui_obj_t *obj)
+static void gui_seekbar_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp;
     gui_seekbar_t *circle;
@@ -254,7 +254,7 @@ static float gui_seekbar_get_gegree_to_center(uint16_t cx,
     return 0.0f;
 }
 
-static void gui_seekbar_preapre_arc(gui_obj_t *obj)
+static void gui_seekbar_prepare_arc(gui_obj_t *obj)
 {
     touch_info_t *tp;
     gui_seekbar_t *circle;
@@ -377,7 +377,7 @@ static void gui_seekbar_preapre_arc(gui_obj_t *obj)
     }
 }
 
-static void gui_seekbar_h_preapre(gui_obj_t *obj)
+static void gui_seekbar_h_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp;
     gui_seekbar_t *circle;
@@ -469,6 +469,55 @@ static void gui_seekbar_h_preapre(gui_obj_t *obj)
     }
 }
 
+static void gui_seekbar_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_seekbar_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+static void gui_seekbar_h_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_seekbar_h_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+static void gui_seekbar_arc_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_seekbar_prepare_arc(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+
 void gui_seekbar_ctor_img_v(gui_seekbar_t *this,
                             gui_obj_t     *parent,
                             void          *picture,
@@ -481,7 +530,8 @@ void gui_seekbar_ctor_img_v(gui_seekbar_t *this,
     gui_progressbar_v_img_ctor(&(this->base), parent, picture, x, y);
 
     this->base.base.type = SEEKBAR;
-    GET_BASE(this)->obj_prepare = gui_seekbar_preapre;
+    GET_BASE(this)->obj_cb = gui_seekbar_cb;
+    GET_BASE(this)->has_prepare_cb = true;
 }
 
 void gui_seekbar_ctor_img_h(gui_seekbar_t *this,
@@ -496,7 +546,8 @@ void gui_seekbar_ctor_img_h(gui_seekbar_t *this,
     gui_progressbar_h_img_ctor(&(this->base), parent, picture, x, y);
 
     this->base.base.type = SEEKBAR;
-    GET_BASE(this)->obj_prepare = gui_seekbar_h_preapre;
+    GET_BASE(this)->obj_cb = gui_seekbar_h_cb;
+    GET_BASE(this)->has_prepare_cb = true;
 }
 
 void gui_seekbar_ctor_movie_h(gui_seekbar_t  *this,
@@ -513,7 +564,8 @@ void gui_seekbar_ctor_movie_h(gui_seekbar_t  *this,
     gui_progressbar_movie_ctor(&(this->base), parent, picture_array, array_length, x, y);
 
     this->base.base.type = SEEKBAR;
-    GET_BASE(this)->obj_prepare = gui_seekbar_h_preapre;
+    GET_BASE(this)->obj_cb = gui_seekbar_h_cb;
+    GET_BASE(this)->has_prepare_cb = true;
     uint16_t w = gui_img_get_width((void *)this->base.c);
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
@@ -534,7 +586,8 @@ void gui_seekbar_ctor_movie_v(gui_seekbar_t  *this,
     gui_progressbar_movie_ctor(&(this->base), parent, picture_array, array_length, x, y);
 
     this->base.base.type = SEEKBAR;
-    GET_BASE(this)->obj_prepare = gui_seekbar_preapre;
+    GET_BASE(this)->obj_cb = gui_seekbar_cb;
+    GET_BASE(this)->has_prepare_cb = true;
     uint16_t w = gui_img_get_width((void *)this->base.c);
     uint16_t h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
@@ -570,7 +623,8 @@ void gui_seekbar_ctor_movie_arc(gui_seekbar_t  *this,
     this->arcy = arc_y;
     this->base.base.type = SEEKBAR;
 
-    GET_BASE(this)->obj_prepare = gui_seekbar_preapre_arc;
+    GET_BASE(this)->obj_cb = gui_seekbar_arc_cb;
+    GET_BASE(this)->has_prepare_cb = true;
     w = gui_img_get_width((void *)this->base.c);
     h = gui_img_get_height((void *)this->base.c);
     GET_BASE(this)->w = w;
@@ -588,7 +642,8 @@ void gui_seekbar_ctor(gui_seekbar_t *this,
     this->base.ctor = gui_progressbar_v_ctor;
     this->base.ctor(&(this->base), parent, filename, x, y, w, h);
     this->base.base.type = SEEKBAR;
-    GET_BASE(this)->obj_prepare = gui_seekbar_preapre;
+    GET_BASE(this)->obj_cb = gui_seekbar_cb;
+    GET_BASE(this)->has_prepare_cb = true;
 }
 
 void gui_seekbar_h_ctor(gui_seekbar_t *this,
@@ -602,7 +657,8 @@ void gui_seekbar_h_ctor(gui_seekbar_t *this,
     this->base.ctor = gui_progressbar_ctor;
     this->base.ctor(&(this->base), parent, filename, x, y, w, h);
     this->base.base.type = SEEKBAR;
-    GET_BASE(this)->obj_prepare = gui_seekbar_h_preapre;
+    GET_BASE(this)->obj_cb = gui_seekbar_h_cb;
+    GET_BASE(this)->has_prepare_cb = true;
 }
 
 /*============================================================================*

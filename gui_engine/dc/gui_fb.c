@@ -131,14 +131,15 @@ static void obj_input_prepare(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->obj_input_prepare != NULL)
+        if (obj->has_input_prepare_cb)
         {
             if ((obj->matrix != NULL) && (obj->parent->matrix))
             {
                 memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
                 matrix_translate(obj->x, obj->y, obj->matrix);
             }
-            obj->obj_input_prepare(obj);
+
+            obj->obj_cb(obj, OBJ_INPUT_PREPARE);
             if (obj_is_active(obj) == false)
             {
                 continue;
@@ -170,11 +171,11 @@ static void obj_draw_prepare(gui_obj_t *object)
             matrix_translate(obj->x, obj->y, obj->matrix);
         }
 
-        if (obj->obj_prepare != NULL)
+        if (obj->has_prepare_cb)
         {
             if (!obj->gesture)
             {
-                obj->obj_prepare(obj);
+                obj->obj_cb(obj, OBJ_PREPARE);
             }
         }
         if (obj->not_show)
@@ -198,11 +199,11 @@ static void obj_draw_scan(gui_obj_t *obj)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->active)
         {
-            if (obj->obj_draw != NULL)
+            if (obj->has_draw_cb)
             {
                 dc->section.y1 = dc->section_count * dc->fb_height;
                 dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
-                obj->obj_draw(obj);
+                obj->obj_cb(obj, OBJ_DRAW);
             }
         }
         else
@@ -220,9 +221,9 @@ static void obj_draw_end(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->obj_end != NULL)
+        if (obj->has_end_cb)
         {
-            obj->obj_end(obj);
+            obj->obj_cb(obj, OBJ_END);
         }
         if (obj->active)
         {

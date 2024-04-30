@@ -180,6 +180,34 @@ static void gui_canvas_rect_destory(gui_canvas_rect_t *this)
     GUI_UNUSED(dc);
 }
 
+static void gui_canvas_rect_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_canvas_rect_prepare((gui_canvas_rect_t *)obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_canvas_rect_draw((gui_canvas_rect_t *)obj);
+            break;
+
+        case OBJ_END:
+            gui_canvas_rect_end((gui_canvas_rect_t *)obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_canvas_rect_destory((gui_canvas_rect_t *)obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -199,10 +227,11 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
     GUI_ASSERT(canvas_rect != NULL);
     memset(canvas_rect, 0x00, sizeof(gui_canvas_rect_t));
     gui_obj_ctor((gui_obj_t *)canvas_rect, parent, name, x, y, w, h);
-    GET_BASE(canvas_rect)->obj_prepare = (void (*)(struct _gui_obj_t *))gui_canvas_rect_prepare;
-    GET_BASE(canvas_rect)->obj_draw = (void (*)(struct _gui_obj_t *))gui_canvas_rect_draw;
-    GET_BASE(canvas_rect)->obj_end = (void (*)(struct _gui_obj_t *))gui_canvas_rect_end;
-    GET_BASE(canvas_rect)->obj_destory = (void (*)(struct _gui_obj_t *))gui_canvas_rect_destory;
+    GET_BASE(canvas_rect)->obj_cb = gui_canvas_rect_cb;
+    GET_BASE(canvas_rect)->has_prepare_cb = true;
+    GET_BASE(canvas_rect)->has_draw_cb = true;
+    GET_BASE(canvas_rect)->has_end_cb = true;
+    GET_BASE(canvas_rect)->has_destroy_cb = true;
     gui_list_init(&(GET_BASE(canvas_rect)->child_list));
     if ((GET_BASE(canvas_rect)->parent) != NULL)
     {

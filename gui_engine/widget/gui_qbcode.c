@@ -240,6 +240,34 @@ void qbcode_destroy(gui_obj_t *obj)
     }
 }
 
+static void gui_qbcode_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            qbcode_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            qbcode_draw(obj);
+            break;
+
+        case OBJ_END:
+            qbcode_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            qbcode_destroy(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 
 void gui_qbcode_ctor(gui_qbcode_t *this, gui_obj_t *parent, const char *name, int16_t x,
                      int16_t y, int16_t w, int16_t h)
@@ -251,10 +279,11 @@ void gui_qbcode_ctor(gui_qbcode_t *this, gui_obj_t *parent, const char *name, in
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = QRCODE;
-    root->obj_prepare = qbcode_prepare;
-    root->obj_draw = qbcode_draw;
-    root->obj_end = qbcode_end;
-    root->obj_destory = qbcode_destroy;
+    root->obj_cb = gui_qbcode_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     //for qrcodeself
     if (this->type == QRCODE_DISPLAY_IMAGE)

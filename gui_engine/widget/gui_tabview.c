@@ -496,6 +496,30 @@ void gui_tabview_destory(gui_obj_t *obj)
     }
 }
 
+static void gui_tabview_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_tabview_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_tabview_prepare(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_tabview_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -548,10 +572,10 @@ gui_tabview_t *gui_tabview_create(void       *parent,
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_input_prepare = gui_tabview_input_prepare;
-    GET_BASE(this)->obj_prepare = gui_tabview_prepare;
-    GET_BASE(this)->obj_end = NULL;
-    GET_BASE(this)->obj_destory = gui_tabview_destory;
+    GET_BASE(this)->obj_cb = gui_tabview_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = TABVIEW;
     this->initial = true;
     gui_list_init(&(GET_BASE(this)->child_list));

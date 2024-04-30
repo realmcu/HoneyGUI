@@ -33,13 +33,41 @@ static gui_progressbar_t *pro;
 #define MENU_GAP 74
 #define SCROLLBAR_SIZE 14
 const static void *scrollbar_array[SCROLLBAR_SIZE];
+
+static void gui_page_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_page_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_page_update_rebound(obj);
+            break;
+
+        case OBJ_DESTORY:
+            page_dtor(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void design_tab_menu(void *parent)
 {
     gui_rect_create(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
                     UINT8_MAX, UINT8_MAX, 100));
     gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
-    gui_page_rebound(page, 1);
-    GET_BASE(page)->obj_destory = page_dtor;
+    //gui_page_rebound(page, 1);
+    GET_BASE(page)->obj_cb = gui_page_cb;
+    GET_BASE(page)->has_input_prepare_cb = true;
+    GET_BASE(page)->has_prepare_cb = true;
+    GET_BASE(page)->has_destroy_cb = true;
     GET_BASE(page)->y = page_y_recode;
     page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);

@@ -328,6 +328,34 @@ void gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value)
 
 }
 
+static void gui_svg_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            svg_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            svg_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            svg_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            svg_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 gui_svg_t *gui_svg_create_from_mem(void *parent,  const char *name, uint8_t *addr, uint32_t size,
                                    int16_t x, int16_t y, int16_t w, int16_t h)
 {
@@ -348,10 +376,11 @@ gui_svg_t *gui_svg_create_from_mem(void *parent,  const char *name, uint8_t *add
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = svg_prepare;
-    root->obj_draw = svg_draw_cb;
-    root->obj_end = svg_end;
-    root->obj_destory = svg_destory;
+    root->obj_cb = gui_svg_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->addr = addr;
@@ -394,10 +423,11 @@ gui_svg_t *gui_svg_create_from_file(void *parent,  const char *name, const char 
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = svg_prepare;
-    root->obj_draw = svg_draw_cb;
-    root->obj_end = svg_end;
-    root->obj_destory = svg_destory;
+    root->obj_cb = gui_svg_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->filename = filename;

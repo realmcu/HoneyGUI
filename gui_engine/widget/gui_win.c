@@ -215,6 +215,26 @@ static void gui_win_destory(gui_obj_t *obj)
     }
 }
 
+static void gui_win_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_win_prepare(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_win_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_win_ctor(gui_win_t  *this,
                   gui_obj_t  *parent,
                   const char *filename,
@@ -224,8 +244,9 @@ void gui_win_ctor(gui_win_t  *this,
                   int16_t     h)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
-    GET_BASE(this)->obj_prepare = gui_win_prepare;
-    GET_BASE(this)->obj_destory = gui_win_destory;
+    GET_BASE(this)->obj_cb = gui_win_cb;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = WINDOW;
 }
 

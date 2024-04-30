@@ -414,7 +414,7 @@ static void gui_page_update_alien(gui_obj_t *obj)
     }
 }
 
-static void gui_page_input_prepare(gui_obj_t *obj)
+void gui_page_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_page_t *this = (gui_page_t *)obj;
@@ -533,7 +533,7 @@ void gui_page_update(gui_obj_t *obj)
     }
 }
 
-static void gui_page_update_rebound(gui_obj_t *obj)
+void gui_page_update_rebound(gui_obj_t *obj)
 {
     gui_page_update_att(obj);
 
@@ -723,6 +723,54 @@ void gui_page_destory(gui_obj_t *obj)
     }
 }
 
+static void gui_page_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_page_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_page_update(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_page_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+static void gui_page_rebound_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_page_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_page_update_rebound(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_page_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_page_ctor(gui_page_t *this,
                    gui_obj_t  *parent,
                    const char *filename,
@@ -733,9 +781,10 @@ void gui_page_ctor(gui_page_t *this,
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     GET_BASE(this)->type = PAGE;
-    GET_BASE(this)->obj_prepare = gui_page_update;
-    GET_BASE(this)->obj_input_prepare = gui_page_input_prepare;
-    GET_BASE(this)->obj_destory = gui_page_destory;
+    GET_BASE(this)->obj_cb = gui_page_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;
@@ -756,11 +805,17 @@ void gui_page_rebound(gui_page_t *this, bool rebound)
 {
     if (rebound)
     {
-        GET_BASE(this)->obj_prepare = gui_page_update_rebound;
+        GET_BASE(this)->obj_cb = gui_page_rebound_cb;
+        GET_BASE(this)->has_input_prepare_cb = true;
+        GET_BASE(this)->has_prepare_cb = true;
+        GET_BASE(this)->has_destroy_cb = true;
     }
     else
     {
-        GET_BASE(this)->obj_prepare = gui_page_update;
+        GET_BASE(this)->obj_cb = gui_page_cb;
+        GET_BASE(this)->has_input_prepare_cb = true;
+        GET_BASE(this)->has_prepare_cb = true;
+        GET_BASE(this)->has_destroy_cb = true;
     }
 }
 

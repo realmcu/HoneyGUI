@@ -150,6 +150,22 @@ static void gui_img_stb_image_destory(gui_obj_t *obj)
     }
 }
 
+static void gui_stb_image_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_DESTORY:
+            gui_img_stb_image_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
                                       gui_obj_t      *parent,
                                       const char     *name,
@@ -163,7 +179,8 @@ static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
     gui_obj_t *root = (gui_obj_t *)this;
     gui_obj_ctor(root, parent, name, x, y, 0, 0);
     root->type = IMAGE_FROM_MEM;
-    root->obj_destory = gui_img_stb_image_destory;
+    root->obj_cb = gui_stb_image_cb;
+    root->has_destroy_cb = true;
 
     //for self
     this->src_changed = true;

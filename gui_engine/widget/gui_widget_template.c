@@ -132,6 +132,34 @@ static void gui_widget_template_destory(gui_widget_template_t *this)
     GUI_UNUSED(dc);
 }
 
+static void gui_widget_template_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_widget_template_prepare((gui_widget_template_t *)obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_widget_template_draw((gui_widget_template_t *)obj);
+            break;
+
+        case OBJ_END:
+            gui_widget_template_end((gui_widget_template_t *)obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_widget_template_destory((gui_widget_template_t *)obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_widget_template_ctor(gui_widget_template_t *this,
                                      gui_obj_t              *parent,
                                      const char             *name,
@@ -145,10 +173,11 @@ static void gui_widget_template_ctor(gui_widget_template_t *this,
     gui_obj_t *obj = (gui_obj_t *)this;
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
-    obj->obj_prepare = (void (*)(struct _gui_obj_t *))gui_widget_template_prepare;
-    obj->obj_draw = (void (*)(struct _gui_obj_t *))gui_widget_template_draw;
-    obj->obj_end = (void (*)(struct _gui_obj_t *))gui_widget_template_end;
-    obj->obj_destory = (void (*)(struct _gui_obj_t *))gui_widget_template_destory;
+    obj->obj_cb = gui_widget_template_cb;
+    obj->has_prepare_cb = true;
+    obj->has_draw_cb = true;
+    obj->has_end_cb = true;
+    obj->has_destroy_cb = true;
 }
 
 /*============================================================================*

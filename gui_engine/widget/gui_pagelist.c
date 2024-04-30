@@ -262,6 +262,34 @@ static void gui_pagelist_destory(gui_pagelist_t *this)
 
 }
 
+static void gui_pagelist_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_pagelist_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_pagelist_draw((gui_pagelist_t *)obj);
+            break;
+
+        case OBJ_END:
+            gui_pagelist_end((gui_pagelist_t *)obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_pagelist_destory((gui_pagelist_t *)obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_pagelist_ctor(gui_pagelist_t *this,
                               gui_obj_t      *parent,
                               const char     *name,
@@ -274,10 +302,11 @@ static void gui_pagelist_ctor(gui_pagelist_t *this,
     gui_obj_t *root = (gui_obj_t *)this;
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_pagelist_prepare;
-    root->obj_draw = (void (*)(struct _gui_obj_t *))gui_pagelist_draw;
-    root->obj_end = (void (*)(struct _gui_obj_t *))gui_pagelist_end;
-    root->obj_destory = (void (*)(struct _gui_obj_t *))gui_pagelist_destory;
+    root->obj_cb = gui_pagelist_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     //for self
     this->base.type = PAGELIST;

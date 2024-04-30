@@ -756,6 +756,26 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
     }
 }
 
+static void gui_curtainview_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_curtainview_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_curtainview_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_curtainview_ctor(gui_curtainview_t *this,
                                  gui_obj_t         *parent,
                                  const char        *filename,
@@ -766,9 +786,10 @@ static void gui_curtainview_ctor(gui_curtainview_t *this,
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    ((gui_obj_t *)this)->obj_prepare = gui_curtainview_prepare;
     ((gui_obj_t *)this)->type = CURTAINVIEW;
-    ((gui_obj_t *)this)->obj_input_prepare = gui_curtainview_input_prepare;
+    ((gui_obj_t *)this)->obj_cb = gui_curtainview_cb;
+    ((gui_obj_t *)this)->has_input_prepare_cb = true;
+    ((gui_obj_t *)this)->has_prepare_cb = true;
     this->cur_curtain = CURTAIN_MIDDLE;
 }
 

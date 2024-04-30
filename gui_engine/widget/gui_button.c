@@ -204,6 +204,22 @@ static void gui_button_prepare(gui_obj_t *obj)
     }
 }
 
+static void gui_button_cb(gui_obj_t *obj, obj_cb_type_t cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_button_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_button_ctor(gui_button_t *this,
                             gui_obj_t    *parent,
                             int16_t       x,
@@ -222,7 +238,8 @@ static void gui_button_ctor(gui_button_t *this,
 
     //for root class
     root->type = BUTTON;
-    root->obj_prepare = gui_button_prepare;
+    root->obj_cb = gui_button_cb;
+    root->has_prepare_cb = true;
 
     // for self
     this->off_pic_addr = background_pic;
