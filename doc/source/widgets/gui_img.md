@@ -12,30 +12,30 @@ You can use [gui_img_create_from_mem(void *parent,  const char *name, void *addr
 
 ### Set location
 
-If you need to update the location of image widget, use [gui_img_set_location(gui_img_t *img, uint16_t x, uint16_t y)](#api) to relocate.
+If you need to update the location of image widget, use [gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y)](#api) to relocate.
 `x, y` is the new coordinate.
 
 ### Set attribute
 
-You can use [gui_img_set_attribute(gui_img_t *img, const char *filename, void *addr, int16_t x, int16_t y)](#api) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
+You can use [gui_img_set_attribute(gui_img_t *this, const char *filename, void *addr, int16_t x, int16_t y)](#api) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
 
 ### Get height/width
 
-If you want to get the height/width of image widget, you can do so with [gui_img_get_height(gui_img_t *img)](#api) or [gui_img_get_width(gui_img_t *img)](#api).
+If you want to get the height/width of image widget, you can do so with [gui_img_get_height(gui_img_t *this)](#api) or [gui_img_get_width(gui_img_t *this)](#api).
 
 ### Translate
 
-Using [gui_img_translate(gui_img_t *img, float t_x, float t_y)](#api) to move the image widget.
+Using [gui_img_translate(gui_img_t *this, float t_x, float t_y)](#api) to move the image widget.
 It can move an image widget to a new coordinate without changing the original coordinate in the widget's attribute.
 
 ### Rotate
 
-You can rotate the image widget around the center of the circle by this api [gui_img_rotation(gui_img_t *img, float degrees, float c_x, float c_y)](#api).
+You can rotate the image widget around the center of the circle by this api [gui_img_rotation(gui_img_t *this, float degrees, float c_x, float c_y)](#api).
 The `c_x, c_y` is the relative to origin of the image widget, not the origin of screen.
 
 ### Zoom
 
-You can adjust the size of the image widget to fit your requirements by this api [gui_img_scale(gui_img_t *img, float scale_x, float scale_y)](#api).
+You can adjust the size of the image widget to fit your requirements by this api [gui_img_scale(gui_img_t *this, float scale_x, float scale_y)](#api).
 
 ## Example
 

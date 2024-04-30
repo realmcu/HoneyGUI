@@ -137,7 +137,7 @@ static void app_dialing_ui_design(gui_app_t *app)
                                                     (void *)_actiger_yellow, 250, 250,
                                                     0, 0);
 
-    // uint8_t *shot = gui_tree_convert_to_img((gui_obj_t *)tab_1, NULL);
+    // uint8_t *shot = gui_img_tree_convert_to_img((gui_obj_t *)tab_1, NULL);
 
     // gui_img_create_from_mem(tab_1,  "shot", (void *)shot, 0, 0, 0, 0);
 

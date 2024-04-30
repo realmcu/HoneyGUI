@@ -170,7 +170,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
         {
             if (tab_x_gap == 0)
             {
-                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
+                gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
 
                 if (this->shot_obj == NULL)
                 {
@@ -184,7 +184,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
             }
             else if (tab_x_gap == 1)
             {
-                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
+                gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
 
                 if (this->shot_obj == NULL)
                 {
@@ -198,7 +198,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
             }
             else if (tab_x_gap == -1)
             {
-                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
+                gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
 
                 if (this->shot_obj == NULL)
                 {
@@ -413,7 +413,7 @@ void gui_tab_update_preload(gui_obj_t *obj)
     {
         if (tab_x_gap == 0)
         {
-            gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
+            gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
 
             if (this->shot_obj == NULL)
             {
@@ -427,7 +427,7 @@ void gui_tab_update_preload(gui_obj_t *obj)
         }
         else if (tab_x_gap == 1)
         {
-            gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
+            gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
 
             if (this->shot_obj == NULL)
             {
@@ -441,7 +441,7 @@ void gui_tab_update_preload(gui_obj_t *obj)
         }
         else if (tab_x_gap == -1)
         {
-            gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
+            gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
 
             if (this->shot_obj == NULL)
             {
