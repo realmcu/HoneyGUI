@@ -241,13 +241,11 @@ static void img_prepare(gui_obj_t *obj)
         }
     }
 
-    gui_image_load_scale(this->draw_img);
-
-
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&this->draw_img->inverse);
+    gui_image_load_scale(this->draw_img);
     gui_image_new_area(this->draw_img);
 
     int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix

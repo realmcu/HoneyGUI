@@ -295,22 +295,6 @@ gui_obj_t *gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type)
     }
     return NULL;
 }
-void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst)
-{
-    gui_list_t *node = NULL;
-    gui_list_for_each(node, &obj->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->type == target)
-        {
-            if (!(*rst))
-            {
-                *rst =  obj->cover;
-            }
-        }
-        gui_tree_get_cover(obj, target, rst);
-    }
-}
 
 void gui_obj_get_area(gui_obj_t *obj, int16_t *x, int16_t *y, int16_t *w, int16_t *h)
 {

@@ -180,7 +180,7 @@ void design_tab_record(void *parent)
                                                277, 81);
 
     curtainview_record = gui_curtainview_create(parent, "curtainview_record", 0, 0, LCD_W, LCD_H);
-    curtainview_record->base.cover = true;
+
     gui_curtainview_set_done_cb(curtainview_record, curtainview_set_done_cb_record);
 
     extern void design_curtain_record_files(void *parent);

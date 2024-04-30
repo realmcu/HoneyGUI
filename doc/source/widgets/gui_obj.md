@@ -43,9 +43,6 @@ You can get the root object of tree using [gui_obj_t *gui_tree_get_root(gui_obj_
 
 To get the child object of tree by this api [gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type)](#api).
 
-### Get cover
-
-To get cover widget by this api [gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst)](#api).
 <br>
 
 <span id="api">

@@ -114,13 +114,12 @@ static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
     head->h = this->base.h;
 
     const_color->color = this->color;
-    gui_image_load_scale(this->draw_img);
-
 
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&this->draw_img->inverse);
+    gui_image_load_scale(this->draw_img);
     gui_image_new_area(this->draw_img);
 
 }

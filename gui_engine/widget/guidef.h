@@ -429,7 +429,6 @@ typedef struct _gui_obj_t
     obj_type_t type; //no need this , only use name
     uint32_t active               : 1;    // this flag means obj location in screen
     uint32_t not_show             : 1;
-    uint32_t cover                : 1;
 
     uint32_t skip_tp_left_hold    : 1;
     uint32_t skip_tp_right_hold   : 1;

@@ -292,7 +292,6 @@ void design_tab_player(void *parent)
                                       36, 48);
     curtainview_player_vol = gui_curtainview_create(parent, "curtainview_player_vol", 0, 0, LCD_W,
                                                     LCD_H);
-    curtainview_player_vol->base.cover = true;
     gui_curtainview_set_done_cb(curtainview_player_vol, curtainview_set_done_cb_player_vol);
 
     extern void design_curtain_player_vol(void *parent);

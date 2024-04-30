@@ -162,9 +162,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
         }
     }
 
-    gui_image_load_scale(this->draw_img);
-    root->w = this->draw_img->img_w;
-    root->h = this->draw_img->img_h;
+
 
     matrix_translate(this->t_x, this->t_y, obj->matrix);
     matrix_rotate(this->degrees, obj->matrix);
@@ -173,8 +171,12 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
+
     matrix_inverse(&this->draw_img->inverse);
+    gui_image_load_scale(this->draw_img);
     gui_image_new_area(this->draw_img);
+    root->w = this->draw_img->img_w;
+    root->h = this->draw_img->img_h;
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {

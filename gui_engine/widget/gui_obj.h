@@ -269,14 +269,6 @@ gui_obj_t *gui_tree_get_root(gui_obj_t *obj);
 gui_obj_t *gui_get_child_handle(gui_obj_t *obj, obj_type_t child_type);
 
 /**
-  * @brief   get child type
-  * @param  obj
-  * @param  target
-  * @param  rst
-  * @return gui_obj_t*
-  */
-void gui_tree_get_cover(gui_obj_t *obj, obj_type_t target, bool *rst);
-/**
  * @brief Get a color value from red, green, blue and opacity values.
  *
  * @param red  Range of unsigned char

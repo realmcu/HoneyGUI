@@ -264,12 +264,6 @@ static void gui_cube_prepare(gui_obj_t *obj)
     draw_img_t *left = &this->draw_img_left;
     draw_img_t *right = &this->draw_img_right;
 
-    gui_image_load_scale(front);
-    gui_image_load_scale(back);
-    gui_image_load_scale(up);
-    gui_image_load_scale(down);
-    gui_image_load_scale(left);
-    gui_image_load_scale(right);
 
     if (this->nz0321 > 0.0f)
     {
@@ -282,6 +276,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&front->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&front->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&front->inverse);
+        gui_image_load_scale(front);
         gui_image_new_area(front);
     }
 
@@ -294,6 +289,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&back->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&back->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&back->inverse);
+        gui_image_load_scale(back);
         gui_image_new_area(back);
     }
 
@@ -306,6 +302,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&up->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&up->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&up->inverse);
+        gui_image_load_scale(up);
         gui_image_new_area(up);
     }
 
@@ -318,6 +315,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&down->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&down->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&down->inverse);
+        gui_image_load_scale(down);
         gui_image_new_area(down);
     }
 
@@ -330,6 +328,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&left->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&left->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&left->inverse);
+        gui_image_load_scale(left);
         gui_image_new_area(left);
     }
 
@@ -342,6 +341,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&right->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&right->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&right->inverse);
+        gui_image_load_scale(right);
         gui_image_new_area(right);
     }
 }

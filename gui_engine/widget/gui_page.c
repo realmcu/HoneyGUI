@@ -367,19 +367,6 @@ static void gui_page_update_boundary(gui_obj_t *obj)
     }
 }
 
-static void gui_page_update_layer(gui_obj_t *obj)
-{
-    gui_page_t *this = (gui_page_t *)obj;
-
-    if (obj->y == this->start_y)
-    {
-        obj->cover = false;
-    }
-    else
-    {
-        obj->cover = true;
-    }
-}
 
 static void gui_page_update_alien(gui_obj_t *obj)
 {
@@ -529,7 +516,6 @@ void gui_page_update(gui_obj_t *obj)
                 }
             }
         }
-        gui_page_update_layer(obj);
     }
 }
 
@@ -711,7 +697,6 @@ void gui_page_update_rebound(gui_obj_t *obj)
             this->yold = obj->y;
         }
     }
-    gui_page_update_layer(obj);
 }
 
 void gui_page_destory(gui_obj_t *obj)

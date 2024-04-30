@@ -206,7 +206,6 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
             {
                 b->press_flag = true;
                 gui_obj_event_set(obj, GUI_EVENT_1);
-                obj->cover = true;
             }
         }
 
@@ -214,7 +213,6 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
         {
             b->press_flag = false;
             gui_obj_event_set(obj, GUI_EVENT_2);
-            obj->cover = false;
         }
 
         if (b->press_flag)
@@ -359,7 +357,6 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
                 b->press_flag = true;
 
                 gui_obj_event_set(obj, GUI_EVENT_1);
-                obj->cover = true;
             }
         }
 
@@ -367,7 +364,6 @@ static void gui_seekbar_prepare_arc(gui_obj_t *obj)
         {
             b->press_flag = false;
             gui_obj_event_set(obj, GUI_EVENT_2);
-            obj->cover = false;
         }
 
         if (b->press_flag)
@@ -452,7 +448,6 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
             {
                 b->press_flag = true;
                 gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
-                obj->cover = true;
             }
         }
 
@@ -460,7 +455,6 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
         {
             b->press_flag = false;
             gui_obj_event_set(obj, GUI_EVENT_2);
-            obj->cover = false;
         }
         if (b->press_flag)
         {
