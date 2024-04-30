@@ -156,6 +156,24 @@ void bare_blit_by_imdc(ppe_buffer_t *target, ppe_buffer_t *source, ppe_rect_t *s
     hal_imdc_decompress_rect(&info, (uint8_t *)dst_start_address);
 }
 
+static float get_x(float *line, float y)
+{
+    float x;
+    if (line[0] == 0)
+    {
+        x = 0;
+    }
+    else if (line[1] == 0)
+    {
+        x = -line[2];
+    }
+    else
+    {
+        x = (-line[2] - line[1] * y) / line[0];
+    }
+    return x;
+}
+
 void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *dst,
                            struct gui_dispdev *dc)
 {
@@ -166,19 +184,7 @@ void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *
     float x_min = dc->fb_width, x_max = -1;
     for (int i = 0; i < 4; i++)
     {
-        float x;
-        if (image->line[i * 3] == 0)
-        {
-            continue;
-        }
-        else if (image->line[i * 3 + 1] == 0)
-        {
-            x = -image->line[i * 3 + 2];
-        }
-        else
-        {
-            x = (-image->line[i * 3 + 2] - image->line[i * 3 + 1] * top) / image->line[i * 3];
-        }
+        float x = get_x(&image->line[i * 3], top);
         if (x < x_min)
         {
             x_min = x;
@@ -190,19 +196,7 @@ void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *
     }
     for (int i = 0; i < 4; i++)
     {
-        float x;
-        if (image->line[i * 3] == 0)
-        {
-            continue;
-        }
-        else if (image->line[i * 3 + 1] == 0)
-        {
-            x = -image->line[i * 3 + 2];
-        }
-        else
-        {
-            x = (-image->line[i * 3 + 2] - image->line[i * 3 + 1] * bottom) / image->line[i * 3];
-        }
+        float x = get_x(&image->line[i * 3], bottom);
         if (x < x_min)
         {
             x_min = x;
@@ -289,12 +283,12 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     }
 
     bool shape_transform = true;
-    if ((image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
-         image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
-         image->matrix->m[2][1] == 0) || image->blend_mode == IMG_COVER_MODE)
+    if ((image->matrix.m[2][2] == 1 && image->matrix.m[0][1] == 0 && \
+         image->matrix.m[1][0] == 0 && image->matrix.m[2][0] == 0 && \
+         image->matrix.m[2][1] == 0) || image->blend_mode == IMG_COVER_MODE)
     {
         shape_transform = false;
-        if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1) || image->blend_mode == IMG_RECT)
+        if ((image->matrix.m[0][0] == 1 && image->matrix.m[1][1] == 1) || image->blend_mode == IMG_RECT)
         {
             if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format) ||
                 image->blend_mode == IMG_RECT || image->blend_mode == IMG_COVER_MODE)
@@ -341,7 +335,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 ppe_matrix_t inv_matrix;
                 if (image->blend_mode == IMG_BYPASS_MODE || image->blend_mode == IMG_COVER_MODE)
                 {
-                    memcpy(&inv_matrix, image->inverse, sizeof(float) * 9);
+                    memcpy(&inv_matrix, &image->inverse, sizeof(float) * 9);
                     source.address = (uint32_t)image->data + sizeof(struct gui_rgb_data_head);
                     source.width = image->img_w;
                     source.height = image->img_h;
@@ -536,9 +530,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         constraint.y += dc->section.y1;
     }
     bool ret = false;
-    if ((image->matrix->m[2][0] == 0 && image->matrix->m[2][1] == 0))
+    if ((image->matrix.m[2][0] == 0 && image->matrix.m[2][1] == 0))
     {
-        ret = ppe_get_area(&old_rect, &constraint, (ppe_matrix_t *)image->inverse, &source);
+        ret = ppe_get_area(&old_rect, &constraint, (ppe_matrix_t *)&image->inverse, &source);
         if (ret)
         {
             if (old_rect.w * old_rect.h * PPEV2_Get_Pixel_Size(source.format) < CACHE_BUF_SIZE)
@@ -591,7 +585,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             }
         }
         ppe_matrix_t inverse;
-        memcpy(&inverse, image->inverse, sizeof(float) * 9);
+        memcpy(&inverse, &image->inverse, sizeof(float) * 9);
         ppe_matrix_t pre_trans;
         if (mode != PPEV2_CONST_MASK_MODE)
         {
@@ -698,10 +692,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             ppe_rect.y -= dc->section.y1;
         }
         source.high_quality = image->high_quality;
-        if ((image->matrix->m[0][0] == 1 && image->matrix->m[1][1] == 1 && \
-             image->matrix->m[2][2] == 1 && image->matrix->m[0][1] == 0 && \
-             image->matrix->m[1][0] == 0 && image->matrix->m[2][0] == 0 && \
-             image->matrix->m[2][1] == 0))
+        if ((image->matrix.m[0][0] == 1 && image->matrix.m[1][1] == 1 && \
+             image->matrix.m[2][2] == 1 && image->matrix.m[0][1] == 0 && \
+             image->matrix.m[1][0] == 0 && image->matrix.m[2][0] == 0 && \
+             image->matrix.m[2][1] == 0))
         {
             source.high_quality = false;
         }
