@@ -222,7 +222,12 @@ void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect)
 {
-    if (dc->section.y2 < rect->y1 || dc->section.y1 > rect->y2)
+    int32_t x_max = (image->target_w + image->img_x - 1);
+    int32_t y_max = (image->target_h + image->img_y - 1);
+    int32_t x_min = image->img_x;
+    int32_t y_min = image->img_y;
+    if (dc->section.y2 < y_min || dc->section.y1 > y_max || dc->section.x2 < x_min ||
+        dc->section.x1 > x_max)
     {
         return;
     }
@@ -293,12 +298,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             if ((image->blend_mode == IMG_BYPASS_MODE && source.format == target.format) ||
                 image->blend_mode == IMG_RECT || image->blend_mode == IMG_COVER_MODE)
             {
-                uint32_t x_max = (image->target_w + image->img_x - 1) > rect->x2 ? rect-> x2 :
-                                 (image->target_w + image->img_x - 1);
-                uint32_t y_max = (image->target_h + image->img_y - 1) > rect->y2 ? rect-> y2 :
-                                 (image->target_h + image->img_y - 1);
-                int32_t x_min = image->img_x < rect->x1 ? rect->x1 : image->img_x;
-                int32_t y_min = image->img_y < rect->y1 ? rect->y1 : image->img_y;
+
                 if ((x_max < dc->section.x1) || (y_max < dc->section.y1)
                     || (x_min >= dc->section.x1 + dc->fb_width) || (y_min >= dc->section.y1 + dc->fb_height))
                 {
@@ -425,12 +425,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         mode = PPEV2_SRC_OVER_MODE;
     }
 
-    int32_t x_max = (image->target_w + rect->x1 - 1) > rect->x2 ? rect-> x2 :
-                    (image->target_w + rect->x1 - 1);
-    int32_t y_max = (image->target_h + rect->y1 - 1) > rect->y2 ? rect-> y2 :
-                    (image->target_h + rect->y1 - 1);
-    int32_t x_min = image->img_x < rect->x1 ? rect->x1 : image->img_x;
-    int32_t y_min = image->img_y < rect->y1 ? rect->y1 : image->img_y;
     if (image->blend_mode == IMG_FILTER_BLACK)
     {
         source.color_key_enable = PPEV2_COLOR_KEY_INSIDE;
