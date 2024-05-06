@@ -75,4 +75,17 @@ void curtain_down_design(void *parent_widget)
     cardlist_weather(tb_weather);
     cardlist_music(tb_music);
 
+    gui_card_t *tb_music_test = gui_card_create(cv, "tb_music",         0, 0, 0, 124);
+    gui_card_t *tb_weather_test = gui_card_create(cv, "tb_weather",     0, 0, 0, 124);
+    gui_card_t *tb_blood_test = gui_card_create(cv, "tb_tb_bloodcube",  0, 0, 0, 124);
+    gui_card_t *tb_heart_test = gui_card_create(cv, "tb_heart",         0, 0, 0, 124);
+    gui_card_t *tb_activity_test = gui_card_create(cv, "tb_activity",   0, 0, 0, 124);
+    gui_card_t *tb_clock_test = gui_card_create(cv, "tb_clock",         0, 0, 0, 124);
+
+    cardlist_clock(tb_clock_test);
+    cardlist_activity(tb_activity_test);
+    cardlist_heart(tb_heart_test);
+    cardlist_blood(tb_blood_test);
+    cardlist_weather(tb_weather_test);
+    cardlist_music(tb_music_test);
 }

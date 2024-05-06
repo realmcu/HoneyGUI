@@ -31,63 +31,63 @@ static void reset_animate()
 static void callback_vibrate_on()
 {
     reset_animate();
-    img->draw_img.data = ZHENDONGKAI_BIN;
+    img->draw_img->data = ZHENDONGKAI_BIN;
 }
 static void callback_vibrate_off()
 {
     reset_animate();
-    img->draw_img.data = ZHENDONGGUAN_BIN;
+    img->draw_img->data = ZHENDONGGUAN_BIN;
 }
 static void callback_ring_on()
 {
     reset_animate();
-    img->draw_img.data = LINGSHENGKAI_BIN;
+    img->draw_img->data = LINGSHENGKAI_BIN;
 }
 static void callback_ring_off()
 {
     reset_animate();
-    img->draw_img.data = LINGSHENGGUAN_BIN;
+    img->draw_img->data = LINGSHENGGUAN_BIN;
 }
 static void callback_theatre_on()
 {
     reset_animate();
-    img->draw_img.data = JUYUANMOSHIKAI_BIN;
+    img->draw_img->data = JUYUANMOSHIKAI_BIN;
 }
 static void callback_theatre_off()
 {
     reset_animate();
-    img->draw_img.data = JUYUANMOSHIGUAN_BIN;
+    img->draw_img->data = JUYUANMOSHIGUAN_BIN;
 }
 
 static void callback_flashlight_on()
 {
     reset_animate();
-    img->draw_img.data = SHOUDIANTONGKAI_BIN;
+    img->draw_img->data = SHOUDIANTONGKAI_BIN;
 }
 static void callback_flashlight_off()
 {
     reset_animate();
-    img->draw_img.data = SHOUDIANTONGGUAN_BIN;
+    img->draw_img->data = SHOUDIANTONGGUAN_BIN;
 }
 static void callback_signal_on()
 {
     reset_animate();
-    img->draw_img.data = XINHAOKAI_BIN;
+    img->draw_img->data = XINHAOKAI_BIN;
 }
 static void callback_signal_off()
 {
     reset_animate();
-    img->draw_img.data = XINHAOGUAN_BIN;
+    img->draw_img->data = XINHAOGUAN_BIN;
 }
 static void callback_alarm_on()
 {
     reset_animate();
-    img->draw_img.data = NAOZHONGKAI_BIN;
+    img->draw_img->data = NAOZHONGKAI_BIN;
 }
 static void callback_alarm_off()
 {
     reset_animate();
-    img->draw_img.data = NAOZHONGGUAN_BIN;
+    img->draw_img->data = NAOZHONGGUAN_BIN;
 }
 void page_tb_control1(void *parent)
 {

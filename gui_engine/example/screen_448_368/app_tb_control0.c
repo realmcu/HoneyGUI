@@ -31,63 +31,63 @@ static void reset_animate()
 static void callback_disturb_on()
 {
     reset_animate();
-    img->draw_img.data = WURAOKAI_BIN;
+    img->draw_img->data = WURAOKAI_BIN;
 }
 static void callback_disturb_off()
 {
     reset_animate();
-    img->draw_img.data = WURAOGUAN_BIN;
+    img->draw_img->data = WURAOGUAN_BIN;
 }
 static void callback_mute_on()
 {
     reset_animate();
-    img->draw_img.data = JINGYINKAI_BIN;
+    img->draw_img->data = JINGYINKAI_BIN;
 }
 static void callback_mute_off()
 {
     reset_animate();
-    img->draw_img.data = JINGYINGUAN_BIN;
+    img->draw_img->data = JINGYINGUAN_BIN;
 }
 static void callback_call_on()
 {
     reset_animate();
-    img->draw_img.data = DIANHUAKAI_BIN;
+    img->draw_img->data = DIANHUAKAI_BIN;
 }
 static void callback_call_off()
 {
     reset_animate();
-    img->draw_img.data = DIANHUAGUAN_BIN;
+    img->draw_img->data = DIANHUAGUAN_BIN;
 }
 
 static void callback_bright_on()
 {
     reset_animate();
-    img->draw_img.data = LIANGDUKAI_BIN;
+    img->draw_img->data = LIANGDUKAI_BIN;
 }
 static void callback_bright_off()
 {
     reset_animate();
-    img->draw_img.data = LIANGDUGUAN_BIN;
+    img->draw_img->data = LIANGDUGUAN_BIN;
 }
 static void callback_watch_on()
 {
     reset_animate();
-    img->draw_img.data = SHIZHONGKAI_BIN;
+    img->draw_img->data = SHIZHONGKAI_BIN;
 }
 static void callback_watch_off()
 {
     reset_animate();
-    img->draw_img.data = SHIZHONGGUAN_BIN;
+    img->draw_img->data = SHIZHONGGUAN_BIN;
 }
 static void callback_set_on()
 {
     reset_animate();
-    img->draw_img.data = SHEZHIKAI_BIN;
+    img->draw_img->data = SHEZHIKAI_BIN;
 }
 static void callback_set_off()
 {
     reset_animate();
-    img->draw_img.data = SHEZHIGUAN_BIN;
+    img->draw_img->data = SHEZHIGUAN_BIN;
 }
 void page_tb_control0(void *parent)
 {

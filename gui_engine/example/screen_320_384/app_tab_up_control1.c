@@ -35,65 +35,65 @@ static void reset_animate()
 static void callback_brightness_on()
 {
     reset_animate();
-    img->draw_img.data = TEXT_BRIGHT_ADJUST_BIN;
+    img->draw_img->data = TEXT_BRIGHT_ADJUST_BIN;
 }
 static void callback_brightness_off()
 {
     reset_animate();
-    img->draw_img.data = TEXT_BRIGHT_ADJUST_BIN;
+    img->draw_img->data = TEXT_BRIGHT_ADJUST_BIN;
 }
 static void callback_alarm_on()
 {
     reset_animate();
-    img->draw_img.data = TEXT_ALARM_ON_BIN;
+    img->draw_img->data = TEXT_ALARM_ON_BIN;
 }
 static void callback_alarm_off()
 {
     reset_animate();
-    img->draw_img.data = TEXT_ALARM_OFF_BIN;
+    img->draw_img->data = TEXT_ALARM_OFF_BIN;
 }
 
 #else
 static void callback_sound_on()
 {
     reset_animate();
-    img->draw_img.data = LINGSHENGKAI_BIN;
+    img->draw_img->data = LINGSHENGKAI_BIN;
 }
 static void callback_sound_off()
 {
     reset_animate();
-    img->draw_img.data = LINGSHENGGUAN_BIN;
+    img->draw_img->data = LINGSHENGGUAN_BIN;
 }
 static void callback_set_on()
 {
     reset_animate();
-    img->draw_img.data = JUYUANMOSHIKAI_BIN;
+    img->draw_img->data = JUYUANMOSHIKAI_BIN;
 }
 static void callback_set_off()
 {
     reset_animate();
-    img->draw_img.data = JUYUANMOSHIGUAN_BIN;
+    img->draw_img->data = JUYUANMOSHIGUAN_BIN;
 }
 
 static void callback_lock_on()
 {
     reset_animate();
-    img->draw_img.data = SHOUDIANTONGKAI_BIN;
+    img->draw_img->data = SHOUDIANTONGKAI_BIN;
 }
 static void callback_lock_off()
 {
     reset_animate();
-    img->draw_img.data = SHOUDIANTONGGUAN_BIN;
+    img->draw_img->data = SHOUDIANTONGGUAN_BIN;
 }
 static void callback_find_off()
 {
     reset_animate();
-    img->draw_img.data = NAOZHONGGUAN_BIN;
+    img->draw_img->data = NAOZHONGGUAN_BIN;
 }
 static void callback_find_on()
 {
     reset_animate();
-    img->draw_img.data = NAOZHONGKAI_BIN;
+    img->draw_img->data = NAOZHONGKAI_BIN;
 }
 #endif
 void page_tb_up_control1(void *parent)

@@ -6,7 +6,6 @@
 void page_tb_clock(void *parent)
 {
     gui_curtainview_t *ct = gui_curtainview_create(parent, "ct", 0, 0, 368, 448);
-    GET_BASE(ct)->cover = true;
     gui_curtain_t *ct_clock = gui_curtain_create(ct, "1", 0, 0, 368, 448, CURTAIN_MIDDLE, 1);
     gui_curtain_t *ct_control0 = gui_curtain_create(ct, "2", 0, 0, 368, 448, CURTAIN_UP, 1);
     gui_curtain_t *ct_left = gui_curtain_create(ct, "3", 0, 0, 368, 448, CURTAIN_LEFT, 0.65f);

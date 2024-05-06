@@ -59,6 +59,7 @@
   * @{
   */
 
+#define CARDVIEW_SLIDE_SPEED 20
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -125,6 +126,11 @@ static void gui_cardview_prepare(gui_obj_t *obj)
             {
                 break;
             }
+
+            if ((abs(this->offset_y) > (this->total_cnt - 2) * this->card_height) && (tp->deltaY  < 0))
+            {
+                break;
+            }
             this->hold_y = tp->deltaY;
 
             for (size_t i = 0; i < 4; i++)
@@ -135,13 +141,13 @@ static void gui_cardview_prepare(gui_obj_t *obj)
             this->recode[4] = tp->deltaY ;
             this->speed = this->recode[4] - this->recode[0];
 
-            if (this->speed > 60)
+            if (this->speed >= CARDVIEW_SLIDE_SPEED)
             {
-                this->speed = 60;
+                this->speed = CARDVIEW_SLIDE_SPEED;
             }
-            else if (this->speed < -60)
+            else if (this->speed <= -CARDVIEW_SLIDE_SPEED)
             {
-                this->speed = -60;
+                this->speed = -CARDVIEW_SLIDE_SPEED;
             }
 
             skip = true;
@@ -165,6 +171,10 @@ static void gui_cardview_prepare(gui_obj_t *obj)
             {
                 break;
             }
+            if ((abs(this->offset_y) > (this->total_cnt - 2) * this->card_height) && (tp->deltaY  < 0))
+            {
+                break;
+            }
 
             this->offset_y += this->target_y;
             this->hold_y = this->hold_y - this->target_y;
@@ -176,14 +186,14 @@ static void gui_cardview_prepare(gui_obj_t *obj)
                 this->hold_y = this->hold_y - this->target_y;
             }
 
-            if (this->speed > 20)
+            if (this->speed >= CARDVIEW_SLIDE_SPEED)
             {
                 tmp = this->hold_y + this->offset_y;
                 this->offset_y = 0;
                 this->hold_y = tmp;
             }
 
-            if (this->speed < -20)
+            if (this->speed <= -CARDVIEW_SLIDE_SPEED)
             {
                 tmp = this->hold_y + this->offset_y;
                 this->offset_y = -(this->height - 2 * this->card_height);
@@ -213,16 +223,17 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     }
     else
     {
-        int tmp = abs(this->hold_y);
-        int v = abs(tmp) % 128;
 
-        if (v > 64)
+        int tmp = abs(this->hold_y);
+        int v = abs(tmp) % this->card_height;
+
+        if (v > this->card_height / 2)
         {
-            tmp = ((tmp / 128) + 1) * 128;
+            tmp = ((tmp / this->card_height) + 1) * this->card_height;
         }
         else
         {
-            tmp = ((tmp / 128)) * 128;
+            tmp = ((tmp / this->card_height)) * this->card_height;
         }
 
         if (this->hold_y  < 0)
@@ -242,7 +253,6 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     if (last != this->checksum)
     {
         gui_fb_change();
-        gui_log("detal = %d \n", this->hold_y + this->offset_y);
     }
 
     if (this->status_cb != NULL)
