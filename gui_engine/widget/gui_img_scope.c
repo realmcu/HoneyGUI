@@ -174,9 +174,16 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
+
     gui_image_new_area(this->draw_img);
-    root->w = this->draw_img->img_w;
-    root->h = this->draw_img->img_h;
+
+    root->w = _UI_MIN(GUI_TYPE(gui_img_scope_t, obj)->scope_x2, this->draw_img->img_w);
+    root->h = _UI_MIN(GUI_TYPE(gui_img_scope_t, obj)->scope_x2, this->draw_img->img_h);
+
+    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
+    gui_obj_get_area(root, &m_x, &m_y, &m_w, &m_h);
+    this->draw_img->target_h = m_h;
+    this->draw_img->target_w = m_w;
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
@@ -202,29 +209,10 @@ static void gui_img_scope_draw_cb(gui_obj_t *obj)
     GUI_ASSERT(obj != NULL);
     gui_img_t *this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
-    gui_rect_t draw_rect = {0};
-
-    draw_rect.x1 = this->draw_img->img_x;
-    draw_rect.y1 = this->draw_img->img_y;
-    draw_rect.x2 = draw_rect.x1 + obj->w;
-    draw_rect.y2 = draw_rect.y1 + obj->h;
-    draw_rect.xboundleft = GUI_TYPE(gui_img_scope_t, obj)->scope_x1;
-    draw_rect.xboundright = GUI_TYPE(gui_img_scope_t, obj)->scope_x2;
-    draw_rect.yboundbottom = GUI_TYPE(gui_img_scope_t, obj)->scope_y2;
-    draw_rect.yboundtop = GUI_TYPE(gui_img_scope_t, obj)->scope_y1;
-
-    draw_rect.x2 = _UI_MIN(draw_rect.x2, draw_rect.x1 + draw_rect.xboundright);
-    draw_rect.y2 = _UI_MIN(draw_rect.y2, draw_rect.y1 + draw_rect.yboundbottom);
-
-    if ((draw_rect.xboundleft == draw_rect.xboundright)
-        || (draw_rect.yboundbottom == draw_rect.yboundtop))
-    {
-        return;
-    }
 
     if (gui_get_acc() != NULL)
     {
-        gui_acc_blit_to_dc(this->draw_img, dc, &draw_rect);
+        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
     }
     else
     {
@@ -235,6 +223,17 @@ static void gui_img_scope_draw_cb(gui_obj_t *obj)
 static void gui_img_scope_img_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
+    gui_img_t *img = (gui_img_t *)obj;
+    if (img->draw_img != NULL)
+    {
+        if (img->draw_img->line != NULL)
+        {
+            gui_free(img->draw_img->line);
+            img->draw_img->line = NULL;
+        }
+        gui_free(img->draw_img);
+        img->draw_img = NULL;
+    }
 }
 
 static void gui_img_scope_img_destory(gui_obj_t *obj)
@@ -292,7 +291,9 @@ void gui_img_scope_ctor(gui_img_t  *this,
     GET_BASE(this)->has_destroy_cb = true;
     //for self
 
-    GUI_ASSERT(NULL != NULL);
+    this->data = addr;
+    this->blend_mode = IMG_FILTER_BLACK;
+    this->opacity_value = UINT8_MAX;
 
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
