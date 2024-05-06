@@ -203,6 +203,8 @@ static void obj_draw_scan(gui_obj_t *obj)
             {
                 dc->section.y1 = dc->section_count * dc->fb_height;
                 dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
+                dc->section.x1 = 0;
+                dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
                 obj->obj_cb(obj, OBJ_DRAW);
             }
         }
