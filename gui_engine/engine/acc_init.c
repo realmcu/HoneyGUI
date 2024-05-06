@@ -93,12 +93,12 @@ static void gui_load_imgfile_align(draw_img_t *draw_img, uint8_t *data,
     gui_fs_read(fd, data, sizeof(struct gui_rgb_data_head));
 
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)data;
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)data;
     for (uint32_t i = 0; i < gpu_height; i++)
     {
         gui_fs_lseek(fd, sizeof(struct gui_rgb_data_head) + i * draw_img->img_w * source_bytes_per_pixel,
                      SEEK_SET);
-        gui_fs_read(fd, (void *)(image_off + i * gpu_width * source_bytes_per_pixel),
+        gui_fs_read(fd, (void *)(uintptr_t)(image_off + i * gpu_width * source_bytes_per_pixel),
                     draw_img->img_w * source_bytes_per_pixel);
     }
     gui_fs_close(fd);
@@ -111,7 +111,7 @@ static uint8_t *gui_malloc_align_img(uint8_t *offset, uint32_t size)
     uint8_t *img_buff = (uint8_t *)gui_malloc(size + 63);
     GUI_ASSERT(img_buff != NULL);
     // align data address by 64
-    uint8_t *data = (uint8_t *)(((((uint32_t)img_buff + 63) >> 6) << 6) - sizeof(
+    uint8_t *data = (uint8_t *)(((((uint32_t)(uintptr_t)img_buff + 63) >> 6) << 6) - sizeof(
                                     struct gui_rgb_data_head));
     if (data < img_buff)
     {
@@ -190,7 +190,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
         }
         else if (image->src_mode == IMG_SRC_MEMADDR)
         {
-            uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
+            uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data));
 #ifdef __WIN32
             // PC simulator: data alignment is unnecessary.
             if (head.compress)

@@ -86,9 +86,9 @@ static struct gui_fs fs_api =
     /* file api port*/
     .open      = open,
     .close     = close,
-    .read      = read,
-    .write     = write,
-    .lseek     = lseek,
+    .read      = (int (*)(int, void *, size_t))read,
+    .write     = (int (*)(int, const void *, size_t))write,
+    .lseek     = (int (*)(int, int, int))lseek,
     /* directory api port*/
     .opendir   = (gui_fs_DIR * (*)(const char *name))opendir,
     .closedir  = (int (*)(gui_fs_DIR * d))closedir,
@@ -96,6 +96,7 @@ static struct gui_fs fs_api =
 
 };
 
+extern void gui_fs_info_register(struct gui_fs *info);
 void gui_port_fs_init(void)
 {
     gui_fs_info_register(&fs_api);

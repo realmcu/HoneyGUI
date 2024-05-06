@@ -36,7 +36,7 @@ void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         return;
     }
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
     struct gui_rgb_data_head *head = image->data;
     char img_type = head->type;
     uint8_t opacity_value = image ->opacity_value;
@@ -61,7 +61,7 @@ void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
                 for (uint32_t j = 0; j < line_len;)
                 {
-                    pixel = *((uint32_t *)((uint16_t *)read_off + j));
+                    pixel = *((uint32_t *)((uint16_t *)(uintptr_t)read_off + j));
                     if (pixel)
                     {
                         if ((uint16_t)pixel)
@@ -91,7 +91,7 @@ void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
                 for (uint32_t j = x_start; j <= x_end; j++)
                 {
-                    uint16_t pixel = (*((uint16_t *)read_off + j));
+                    uint16_t pixel = (*((uint16_t *)(uintptr_t)read_off + j));
                     if (pixel != 0)
                     {
                         writebuf[write_off + j] = ((((((pixel >> 11) << 3) * opacity_value + ((

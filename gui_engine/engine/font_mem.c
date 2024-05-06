@@ -29,7 +29,7 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
     }
     GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
 
-    uint32_t table_offset = (uint32_t)((uint8_t *)font + font->head_length);
+    uint32_t table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
     uint32_t dot_offset = table_offset + font->index_area_size;
     uint8_t rendor_mode = font->rendor_mode;
     uint8_t index_method = font->font_mode_detail.detail.index_method;
@@ -101,7 +101,8 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
                 }
                 else
                 {
-                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)table_offset + chr[i].unicode * index_unit_length);
+                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + chr[i].unicode *
+                                                         index_unit_length);
                     offset = *offset_addr;
                     if (offset == 0xFFFFFFFF) { continue; }
                     chr[i].dot_addr = (uint8_t *)text->path + offset + 4;
@@ -152,9 +153,9 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
                 }
                 else
                 {
-                    offset = *(uint16_t *)(chr[i].unicode * 2 + table_offset);
+                    offset = *(uint16_t *)(uintptr_t)(chr[i].unicode * 2 + table_offset);
                     if (offset == 0xFFFF) { continue; }
-                    chr[i].dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                    chr[i].dot_addr = (uint8_t *)(uintptr_t)(offset * font_area + dot_offset + 4);
                     chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
                     chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
                 }
@@ -187,9 +188,9 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
                     {
                         for (; index < index_area_size / 2; index ++)
                         {
-                            if (chr[i].unicode == *(uint16_t *)(table_offset + index * 2))
+                            if (chr[i].unicode == *(uint16_t *)(uintptr_t)(table_offset + index * 2))
                             {
-                                chr[i].dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
+                                chr[i].dot_addr = (uint8_t *)(uintptr_t)(index * font_area + dot_offset + 4);
                                 chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
                                 chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
                                 break;
@@ -1527,7 +1528,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
 {
     GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)font_bin_addr;
     uint32_t string_len = strlen(content);
-    uint32_t table_offset = (uint32_t)((uint8_t *)font_bin_addr + font->head_length);
+    uint32_t table_offset = (uint32_t)(uintptr_t)((uint8_t *)font_bin_addr + font->head_length);
     uint32_t dot_offset = table_offset + font->index_area_size;
 
     uint8_t aliened_font_size = font->font_size;
@@ -1583,7 +1584,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 }
                 else
                 {
-                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)table_offset + unicode_buffer[i] *
+                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + unicode_buffer[i] *
                                                          index_unit_length);
                     offset = *offset_addr;
                     if (offset == 0xFFFFFFFF) { continue; }
@@ -1623,9 +1624,9 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 }
                 else
                 {
-                    offset = *(uint16_t *)(unicode_buffer[i] * 2 + table_offset);
+                    offset = *(uint16_t *)(uintptr_t)(unicode_buffer[i] * 2 + table_offset);
                     if (offset == 0xFFFF) { continue; }
-                    uint8_t *dot_addr = (uint8_t *)(offset * font_area + dot_offset + 4);
+                    uint8_t *dot_addr = (uint8_t *)(uintptr_t)(offset * font_area + dot_offset + 4);
                     char_w = (int16_t)(*(dot_addr - 2));
                 }
                 all_char_w += char_w;
@@ -1649,9 +1650,9 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
                 {
                     for (; index < font->index_area_size / 2; index ++)
                     {
-                        if (unicode_buffer[i] == *(uint16_t *)(table_offset + index * 2))
+                        if (unicode_buffer[i] == *(uint16_t *)(uintptr_t)(table_offset + index * 2))
                         {
-                            uint8_t *dot_addr = (uint8_t *)(index * font_area + dot_offset + 4);
+                            uint8_t *dot_addr = (uint8_t *)(uintptr_t)(index * font_area + dot_offset + 4);
                             char_w = (int16_t)(*(dot_addr - 2));
                         }
                     }

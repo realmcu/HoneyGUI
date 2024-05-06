@@ -587,12 +587,12 @@ static void get_stopwatch_string(char *buffer)
     if (!enter)
     {
         enter = 1;
-        gettimeofday(&start, NULL);
+        mingw_gettimeofday(&start, NULL);
     }
     struct timeval end;
     long mtime, secs, usecs;
     {
-        gettimeofday(&end, NULL);
+        mingw_gettimeofday(&end, NULL);
         secs  = end.tv_sec  - start.tv_sec;
         usecs = end.tv_usec - start.tv_usec;
         mtime = ((secs) * 1000 + usecs / 1000.0) + 0.5;

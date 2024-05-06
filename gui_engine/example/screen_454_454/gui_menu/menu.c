@@ -42,11 +42,17 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         switch (cb_type)
         {
         case OBJ_INPUT_PREPARE:
-            gui_page_input_prepare(obj);
+            {
+                extern void gui_page_input_prepare(gui_obj_t *obj);
+                gui_page_input_prepare(obj);
+            }
             break;
 
         case OBJ_PREPARE:
-            gui_page_update_rebound(obj);
+            {
+                extern void gui_page_update_rebound(gui_obj_t *obj);
+                gui_page_update_rebound(obj);
+            }
             break;
 
         case OBJ_DESTORY:
@@ -290,7 +296,7 @@ static void page_callback(gui_page_t *page)
         if (progress >= 0 && progress <= 1)
         {
             {
-                pro->color_hl = (uint32_t)scrollbar_array;
+                pro->color_hl = (uint32_t)(uintptr_t)scrollbar_array;
                 pro->max = sizeof(scrollbar_array) / sizeof(void *);
             }
             gui_progressbar_set_percentage(pro, progress) ;
@@ -298,7 +304,7 @@ static void page_callback(gui_page_t *page)
         else if (progress < 0)
         {
             {
-                pro->color_hl = (uint32_t)scrollbar_array_top;
+                pro->color_hl = (uint32_t)(uintptr_t)scrollbar_array_top;
                 pro->max = sizeof(scrollbar_array_top) / sizeof(void *);
             }
             float progress_top = -progress;
@@ -307,7 +313,7 @@ static void page_callback(gui_page_t *page)
         else if (progress > 1)
         {
             {
-                pro->color_hl = (uint32_t)scrollbar_array_buttom;
+                pro->color_hl = (uint32_t)(uintptr_t)scrollbar_array_buttom;
                 pro->max = sizeof(scrollbar_array_buttom) / sizeof(void *);
             }
             float progress_buttom = progress - 1;

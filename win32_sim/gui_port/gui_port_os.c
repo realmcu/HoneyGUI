@@ -5,6 +5,7 @@
 #include "stdlib.h"
 #include <pthread.h>
 #include "gui_queue.h"
+#include <unistd.h>
 
 static uint32_t gui_tick = 0;
 
@@ -12,7 +13,7 @@ static void *port_thread_create(const char *name, void (*entry)(void *param), vo
                                 uint32_t stack_size, uint8_t priority)
 {
     pthread_t *thread = malloc(sizeof(pthread_t));
-    pthread_create(thread, NULL, entry, param);
+    pthread_create(thread, NULL, (void *(*)(void *))entry, param);
     pthread_setname_np(*thread, name);
     return thread;
 }
@@ -64,7 +65,9 @@ static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t tim
     if (QueueEmpty(&q) == true)
     {
         pthread_mutex_lock(&port_mutex);
-        pthread_cond_timedwait(&port_cond, &port_mutex, &timeout);
+        struct timespec timeout_time;
+        timeout_time.tv_sec = timeout;
+        pthread_cond_timedwait(&port_cond, &port_mutex, &timeout_time);
         pthread_mutex_unlock(&port_mutex);
     }
     pthread_mutex_lock(&queue_mutex);
@@ -121,7 +124,7 @@ static struct gui_os_api os_api =
     .lower_mem_size = PORT_GUI_MEMHEAP_SIZE,
     .mem_threshold_size = 10 * 1024,
 
-    .log = printf,
+    .log = (void *)printf,
 };
 
 

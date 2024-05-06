@@ -38,9 +38,9 @@ void rle_cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         return;
     }
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
     uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
-    imdc_file_t *file = (imdc_file_t *)image_off;
+    imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
 
     if (img_type == RGB565)//rle_cover_565_2_565
     {
@@ -55,13 +55,13 @@ void rle_cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
             uncompressed_rle_rgb565(file, line, line_buf);
 
-            int read_off = (int)line_buf - source_bytes_per_pixel * image_x;
+            int read_off = (int)(uintptr_t)line_buf - source_bytes_per_pixel * image_x;
 
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
             for (uint32_t j = x_start; j <= x_end; j++)
             {
-                uint16_t pixel = *((uint16_t *)read_off + j);
+                uint16_t pixel = *((uint16_t *)(uintptr_t)read_off + j);
                 writebuf[write_off + j] = pixel;
             }
         }

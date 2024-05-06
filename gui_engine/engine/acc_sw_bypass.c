@@ -36,7 +36,7 @@ void bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         return;
     }
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
     uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
     uint8_t opacity_value = image->opacity_value;
 
@@ -56,7 +56,7 @@ void bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         // full screen background image, memcpy once
         if ((source_w == dc->fb_width) && (dc->fb_width == (x_end - x_start)) && (opacity_value == 255))
         {
-            memcpy((writebuf + x_start), ((uint16_t *)read_buf + x_start),
+            memcpy((writebuf + x_start), ((uint16_t *)(uintptr_t)read_buf + x_start),
                    BYTE_PIXEL_RGB565 * (x_end - x_start) * (y_end - y_start));
         }
         else
@@ -66,7 +66,7 @@ void bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 for (uint32_t i = y_start; i <= y_end; i++)
                 {
                     // memcpy line
-                    memcpy((writebuf + x_start), ((uint16_t *)read_buf + x_start),
+                    memcpy((writebuf + x_start), ((uint16_t *)(uintptr_t)read_buf + x_start),
                            BYTE_PIXEL_RGB565 * (x_end - x_start));
                     // next line
                     writebuf += dc->fb_width;
@@ -79,7 +79,7 @@ void bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                 {
                     for (uint32_t j = x_start; j <= x_end; j++)
                     {
-                        uint16_t pixel = (*((uint16_t *)read_buf + j));
+                        uint16_t pixel = (*((uint16_t *)(uintptr_t)read_buf + j));
                         writebuf[j] = ((((((pixel >> 11) << 3) * opacity_value + ((writebuf[j] >> 11) << 3) *
                                           (0xFF - opacity_value)) / 255) >> 3) << 11) +
                                       ((((((((pixel & 0x07e0) >> 5) << 2) * opacity_value) + (((writebuf[j] & 0x07e0) >> 5) <<

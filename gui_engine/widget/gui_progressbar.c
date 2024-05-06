@@ -107,7 +107,7 @@ static void set_progress(gui_progressbar_t *this, size_t progress)
             p = this->max - 2;
         }
 
-        GUI_TYPE(gui_img_t, this->c)->data = ((void **)(this->color_hl))[p];
+        GUI_TYPE(gui_img_t, this->c)->data = ((void **)(uintptr_t)(this->color_hl))[p];
         GET_BASE(this->c)->w = gui_img_get_width((void *)(this->c)) + 1;
         GET_BASE(this->c)->h = gui_img_get_height((void *)(this->c));
         //gui_log("%x ,%d,%d\n", GUI_TYPE(gui_img_t, this->c)->draw_img.data,GET_BASE(this->c)->w,GET_BASE(this->c)->h);
@@ -142,7 +142,7 @@ static void set_percentage(gui_progressbar_t *this, float percentage)
             p = this->max - 2;
         }
 
-        GUI_TYPE(gui_img_t, this->c)->data = ((void **)(this->color_hl))[p];
+        GUI_TYPE(gui_img_t, this->c)->data = ((void **)(uintptr_t)(this->color_hl))[p];
     }
 }
 static float get_percentage(gui_progressbar_t *this)
@@ -178,7 +178,7 @@ static void gui_progressbar_movie_ctor_core(gui_progressbar_t *this, gui_obj_t *
     {
         this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
     }
-    this->color_hl = (uint32_t)picture_array;
+    this->color_hl = (uint32_t)(uintptr_t)picture_array;
     //gui_log("color_hl:%d\n", this->color_hl);
 }
 /*============================================================================*

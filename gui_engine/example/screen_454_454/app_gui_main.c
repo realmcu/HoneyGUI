@@ -102,10 +102,12 @@ static int watch_app_init(void)
 {
 #if defined _WIN32
     int fd;
+    extern int open(const char *file, int flags, ...);
     fd = open("./gui_engine/example/screen_454_454/root_image/root(0x4400000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
+        extern int read(int fd, void *buf, size_t len);
         read(fd, resource_root, 1024 * 1024 * 20);
     }
     else

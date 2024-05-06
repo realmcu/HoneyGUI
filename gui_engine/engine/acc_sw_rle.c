@@ -126,14 +126,14 @@ void uncompressed_rle_rect(imdc_file_t *file, int16_t x, int16_t y, int16_t w, i
 void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint16_t *linebuf = (uint16_t *)buf;
 
     // gui_log("file->compressed_addr[%d] %d\n", line, file->compressed_addr[line]);
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)addr;
+        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)(uintptr_t)addr;
         // gui_log("%d 0x%x\n", node->len, node->pixel16);
         gui_memset16(linebuf, node->pixel16, node->len);
 
@@ -144,13 +144,13 @@ void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint8_t *linebuf = (uint8_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_argb8565_node_t *node = (imdc_argb8565_node_t *)addr;
+        imdc_argb8565_node_t *node = (imdc_argb8565_node_t *)(uintptr_t)addr;
         for (uint32_t i = 0; i < node->len; i++)
         {
             linebuf[i * 3 + 0] = node->pixel & 0xff;
@@ -164,13 +164,13 @@ void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint8_t *linebuf = (uint8_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_rgb888_node_t *node = (imdc_rgb888_node_t *)addr;
+        imdc_rgb888_node_t *node = (imdc_rgb888_node_t *)(uintptr_t)addr;
         for (uint32_t i = 0; i < node->len; i++)
         {
             linebuf[i * 3]     = node->pixel_b;
@@ -184,13 +184,13 @@ void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint32_t *linebuf = (uint32_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)addr;
+        imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)(uintptr_t)addr;
         gui_memset32(linebuf, node->pixel32, node->len);
 
         addr = addr + sizeof(imdc_argb8888_node_t);
@@ -210,7 +210,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
 
     memcpy(buf, head, sizeof(struct gui_rgb_data_head));
     head = buf;
-    line_buf = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(buf));
+    line_buf = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(buf));
     if (head->type == RGB565)//rle_rgb565
     {
         uint8_t source_bytes_per_pixel = 2;
