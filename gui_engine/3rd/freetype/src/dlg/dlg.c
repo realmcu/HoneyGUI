@@ -120,7 +120,7 @@ bool dlg_is_tty(FILE *stream)
 static unsigned get_msecs(void)
 {
     struct timeval tv;
-    gettimeofday(&tv, NULL);
+    mingw_gettimeofday(&tv, NULL);
     return tv.tv_usec;
 }
 
