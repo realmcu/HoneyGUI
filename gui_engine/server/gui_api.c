@@ -39,13 +39,20 @@ void gui_fs_info_register(struct gui_fs *info)
 
 
 #ifndef ENABLE_RTK_GUI_OS_HEAP
-static tlsf_t tlsf;
+static tlsf_t tlsf = NULL;
 #endif
+static tlsf_t lower_tlsf = NULL;
+
 void gui_os_api_register(struct gui_os_api *info)
 {
 #ifndef ENABLE_RTK_GUI_OS_HEAP
     tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
 #endif
+    if ((info->lower_mem_addr != NULL) && (info->lower_mem_size != 0))
+    {
+        lower_tlsf = tlsf_create_with_pool(info->lower_mem_addr, info->lower_mem_size);
+    }
+
     os_api = info;
 }
 
@@ -235,74 +242,57 @@ bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 void *gui_malloc(uint32_t n)
 {
     void *ptr = NULL;
+    if ((n > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
+    {
+        ptr = gui_lower_malloc(n);
+        return ptr;
+    }
 #ifdef ENABLE_RTK_GUI_OS_HEAP
-    if (os_api->f_malloc)
-    {
-        ptr = os_api->f_malloc(n);
-        if (ptr == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-        }
-        return ptr;
-    }
-    else
-    {
-        GUI_ASSERT(NULL != NULL);
-        return ptr;
-    }
+    GUI_ASSERT(os_api->f_malloc != NULL);
+    ptr = os_api->f_malloc(n);
 #else
     ptr = tlsf_malloc(tlsf, n);
+#endif
     if (ptr == NULL)
     {
-        GUI_ASSERT(NULL != NULL);
+        ptr = gui_lower_malloc(n);
     }
-    // if (ptr == (void *)0x0000000000957578)
-    // {
-    //     GUI_ASSERT(NULL != NULL);
-    // }
     return ptr;
-#endif
 }
 
 void *gui_realloc(void *ptr_old, uint32_t n)
 {
     void *ptr = NULL;
+    if ((n > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
+    {
+        ptr = gui_lower_malloc(n);
+        return ptr;
+    }
 #ifdef ENABLE_RTK_GUI_OS_HEAP
-    if (os_api->f_realloc)
-    {
-        ptr = os_api->f_realloc(ptr_old, n);
-        if (ptr == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-        }
-        return ptr;
-    }
-    else
-    {
-        GUI_ASSERT(NULL != NULL);
-        return ptr;
-    }
+    GUI_ASSERT(os_api->f_realloc != NULL);
+    ptr = os_api->f_realloc(ptr_old, n);
 #else
     ptr = tlsf_realloc(tlsf, ptr_old, n);
+#endif
     if (ptr == NULL)
     {
-        GUI_ASSERT(NULL != NULL);
+        ptr = gui_lower_realloc(ptr_old, n);
     }
-    // if (ptr == (void *)0x00000000009196C8)
-    // {
-    //     GUI_ASSERT(NULL != NULL);
-    // }
     return ptr;
-#endif
 }
 
 void gui_free(void *rmem)
 {
-#ifdef ENABLE_RTK_GUI_OS_HEAP
-    if (os_api->f_free)
+    if (((uint32_t)rmem >= (uint32_t)os_api->lower_mem_addr) && \
+        ((uint32_t)rmem <= (uint32_t)os_api->lower_mem_addr + (uint32_t)os_api->lower_mem_size)
+       )
     {
-        os_api->f_free(rmem);
+        gui_lower_free(rmem);
+        return;
     }
+#ifdef ENABLE_RTK_GUI_OS_HEAP
+    GUI_ASSERT(os_api->f_free != NULL);
+    os_api->f_free(rmem);
 #else
     tlsf_free(tlsf, rmem);
 #endif
@@ -314,6 +304,49 @@ void gui_mem_debug(void)
     gui_log("can't use thie func");
 #else
     tlsf_walk_pool(tlsf_get_pool(tlsf), NULL, NULL);
+#endif
+}
+
+
+void *gui_lower_malloc(uint32_t n)
+{
+    void *ptr = NULL;
+    GUI_ASSERT(lower_tlsf != NULL);
+    ptr = tlsf_malloc(lower_tlsf, n);
+    if (ptr == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
+    return ptr;
+}
+
+void *gui_lower_realloc(void *ptr_old, uint32_t n)
+{
+    void *ptr = NULL;
+    GUI_ASSERT(lower_tlsf != NULL);
+    ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
+    if (ptr == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
+    return ptr;
+}
+
+void gui_lower_free(void *rmem)
+{
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_free(lower_tlsf, rmem);
+}
+
+
+
+void gui_lower_mem_debug(void)
+{
+#ifdef ENABLE_RTK_GUI_OS_HEAP
+    gui_log("can't use thie func");
+#else
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(lower_tlsf), NULL, NULL);
 #endif
 }
 

@@ -257,6 +257,11 @@ struct gui_os_api
     void (*f_free)(void *rmem);
     void *mem_addr;
     uint32_t mem_size;
+
+    uint32_t mem_threshold_size;
+    void *lower_mem_addr;
+    uint32_t lower_mem_size;
+
     log_func_t log;
     void (*gui_tick_hook)(void);
 };
