@@ -42,6 +42,7 @@ typedef struct gui_win
     gui_obj_t base;
     gui_animate_t *animate;
     float scale;
+    float scale_y;
     bool press_flag;
     bool long_flag;
     bool release_flag;

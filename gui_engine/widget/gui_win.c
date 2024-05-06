@@ -197,10 +197,21 @@ static void gui_win_prepare(gui_obj_t *obj)
         this->release_flag = true;
     }
 
-    if (this->scale != 0)
+    if (this->scale != 0 || this->scale_y != 0)
     {
         matrix_translate(GET_BASE(obj)->w / 2, GET_BASE(obj)->h / 2, GET_BASE(obj)->matrix);
-        matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
+        if (this->scale == 0)
+        {
+            matrix_scale(1, this->scale_y, GET_BASE(obj)->matrix);
+        }
+        else if (this->scale_y == 0)
+        {
+            matrix_scale(this->scale, 1, GET_BASE(obj)->matrix);
+        }
+        else
+        {
+            matrix_scale(this->scale, this->scale_y, GET_BASE(obj)->matrix);
+        }
         matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
         this->scale = 0;
     }

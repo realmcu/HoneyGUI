@@ -21,7 +21,7 @@ static void press_callback(gui_win_t *button);
 static void press_animate_cb(gui_win_t *button);
 static void release_callback(gui_win_t *button);
 static void release_animate_callback(gui_win_t *button);
-static void deal_win_in_page(gui_obj_t *object);
+static void deal_win_in_page(gui_obj_t *object, int page_y);
 static void page_callback(gui_page_t *page);
 static void heart_rate_cb(void);
 static void menu_cb(void);
@@ -30,6 +30,7 @@ static void map_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
+static int window_index;
 #define MENU_GAP 74
 #define SCROLLBAR_SIZE 14
 const static void *scrollbar_array[SCROLLBAR_SIZE];
@@ -207,7 +208,7 @@ static void release_animate_callback(gui_win_t *button)
 {
     gui_win_set_animate(button, 1000, 0, release_callback, button);
 }
-static void deal_win_in_page(gui_obj_t *object)
+static void deal_win_in_page(gui_obj_t *object, int page_y)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
@@ -215,10 +216,12 @@ static void deal_win_in_page(gui_obj_t *object)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->type == WINDOW)
         {
-            if (obj->matrix->m[1][2] >= (float)(0 - obj->h) &&
-                obj->matrix->m[1][2] < (float)gui_get_screen_height())
+            int ay = window_index * MENU_GAP + page_y;
+            window_index++;
+            if (ay >= (float)(0 - obj->h) &&
+                ay < (float)gui_get_screen_height())
             {
-                float scale = (1 - 0.5f * _UI_ABS(((float)(obj->matrix->m[1][2] + (float)(obj->h / 2)) -
+                float scale = (1 - 0.5f * _UI_ABS(((float)(ay + (float)(obj->h / 2)) -
                                                    (float)gui_get_screen_height() / 2) / (float)(gui_get_screen_height() / 2)));
                 GUI_TYPE(gui_win_t, obj)->scale = scale;
                 obj->not_show = false;
@@ -228,7 +231,7 @@ static void deal_win_in_page(gui_obj_t *object)
                 obj->not_show = true;
             }
         }
-        deal_win_in_page(obj);
+        deal_win_in_page(obj, page_y);
     }
 }
 const static void *scrollbar_array_top[] =
@@ -273,7 +276,8 @@ const static void *scrollbar_array[SCROLLBAR_SIZE] =
 };
 static void page_callback(gui_page_t *page)
 {
-    deal_win_in_page((void *)page);
+    window_index = 0;
+    deal_win_in_page((void *)page, GUI_BASE(page)->y);
 
 
 
