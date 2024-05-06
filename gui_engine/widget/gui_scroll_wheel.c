@@ -171,10 +171,10 @@ void gui_scroll_wheel_append_core(gui_scroll_wheel_t   *this,
         this->picture[this->row_count].pic = gui_img_create_from_mem(this, "num_pic", num_pic, 0, 0, 0, 0);
     }
 
-    gui_image_load_scale(&this->picture[this->row_count].pic->draw_img);
+    gui_image_load_scale(this->picture[this->row_count].pic->draw_img);
 
     this->picture[this->row_count].pic->base.x = (this->base.base.w -
-                                                  this->picture[this->row_count].pic->draw_img.img_h) / 2;
+                                                  this->picture[this->row_count].pic->draw_img->img_h) / 2;
     this->picture[this->row_count].pic_addr = num_pic;
     this->picture[this->row_count].pic_hl_addr = num_pic_hl;
     this->row_count++;
