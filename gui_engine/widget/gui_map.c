@@ -116,7 +116,7 @@ double calculateScale(double latitude, int zoomLevel)
 // function to generate tile URL path given the tile indices and zoom level
 void generateTileURL(int tileX, int tileY, int zoom)
 {
-    gui_log("http://mt0.google.com/vt/lyrs=m@221097413,traffic&x=%d&y=%d&z=%d\n", tileX, tileY, zoom);
+    //gui_log("http://mt0.google.com/vt/lyrs=m@221097413,traffic&x=%d&y=%d&z=%d\n", tileX, tileY, zoom);
 }
 void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat, double center_lon,
                             int zoom, gui_map_t *parent)
@@ -128,7 +128,7 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
     // Calculate the position of the center tile
     int centerX = long2tilex(center_lon, zoom);
     int centerY = lat2tiley(center_lat, zoom);
-    gui_log("centerX:%d,centerY:%d\n", centerX, centerY);
+    //gui_log("centerX:%d,centerY:%d\n", centerX, centerY);
     // Calculate the range of x,y of the needed tiles
     int startX = centerX - tileCountX / 2;
     int startY = centerY - tileCountY / 2;
@@ -141,7 +141,7 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
         for (int y = startY; y < endY; y++)
         {
             generateTileURL(x, y, zoom);
-            gui_log("Relative coordinates: (%d, %d)\n", (x - startX)*tile_size, (y - startY)*tile_size);
+            //gui_log("Relative coordinates: (%d, %d)\n", (x - startX)*tile_size, (y - startY)*tile_size);
 #if _WIN32
             char path[100];
             memset(path, 0, 100);
@@ -197,13 +197,13 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
             {
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
                 jpg = gui_malloc(filesize);
-                gui_log("open %s Successful!\n", path);
+                //gui_log("open %s Successful!\n", path);
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
             }
             else
             {
-                gui_log("open %s Fail!\n", path);
+                //gui_log("open %s Fail!\n", path);
                 fd = gui_fs_open("map/Tiles not found.jpg",
                                  0);
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
@@ -269,7 +269,7 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
                               tile->img->base.y);
 #elif defined RTL8772F
     typedef long off_t;
-    char path[100];
+    static char path[100];
     memset(path, 0, 100);
     sprintf(path, "map/%d/%d/%d/tile.jpg",
             zoom, tile->x, tile->y);
@@ -282,19 +282,21 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
     {
         filesize = gui_fs_lseek(fd, 0, SEEK_END);
         jpg = gui_malloc(filesize);
-        //gui_log("open %s Successful!\n", path);
+
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, jpg, filesize);
+        gui_fs_close(fd);
     }
     else
     {
-        gui_log("open %s Fail!\n", path);
+        //gui_log("open %s Fail!\n", path);
         fd = gui_fs_open("map/Tiles not found.jpg",
                          0);
         filesize = gui_fs_lseek(fd, 0, SEEK_END);
         jpg = gui_malloc(filesize);
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, jpg, filesize);
+        gui_fs_close(fd);
     }
     gui_stbimg_set_attribute(tile->img, jpg, filesize, JPEG, tile->img->base.x,
                              tile->img->base.y);
@@ -311,7 +313,7 @@ static void wincb(gui_map_t *this)
 {
     if (this->base.animate->progress_percent == 1)
     {
-        gui_log("wincb\n");
+        //gui_log("wincb\n");
     }
     touch_info_t *tp = tp_get_info();
     if (tp->pressed)
@@ -549,16 +551,71 @@ gui_map_t *gui_map_create(void *parent)
     }
     generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);
     {
-        gui_button_t *zoom = gui_button_create(parent, 50, 200 - 30, 40, 40, 0, 0, 0, BUTTON_BG_ICON, 0);
+        gui_button_t *zoom = gui_button_create(parent, 50, 200 - 30, 80, 80, 0, 0, 0, BUTTON_BG_ICON, 0);
+        {
 
-        gui_rect_create((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
-        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_cb, NULL);
+#if _WIN32
+            char *path = "./gui_engine/example/screen_454_454/root_image/SDCARD/map/icon/zoom plus.bin";
+#elif defined RTL8772F
+            typedef long off_t;
+            char *path = "map/icon/zoom plus.bin";
+#else
+            typedef long off_t;
+            char *path = "map/icon/zoom plus.bin";
+#endif
+            int fd;
+            fd = gui_fs_open(path, 0);
+
+            char *jpg = 0;
+            off_t filesize = 0;
+            if (fd > 0)
+            {
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
+                gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+            }
+
+
+        }
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_cb, 0);
     }
     {
-        gui_button_t *zoom = gui_button_create(parent, 50, 300 - 30, 40, 40, 0, 0, 0, BUTTON_BG_ICON, 0);
+        gui_button_t *zoom = gui_button_create(parent, 50, 300 - 30, 80, 80, 0, 0, 0, BUTTON_BG_ICON, 0);
 
-        gui_rect_create((void *)zoom, 0, 0, 20, 20, APP_COLOR_SILVER_OPACITY(200));
-        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb, NULL);
+        {
+
+#if _WIN32
+            char *path = "./gui_engine/example/screen_454_454/root_image/SDCARD/map/icon/zoom minus.bin";
+#elif defined RTL8772F
+            typedef long off_t;
+            char *path = "map/icon/zoom minus.bin";
+#else
+            typedef long off_t;
+            char *path = "map/icon/zoom minus.bin";
+#endif
+            int fd;
+            fd = gui_fs_open(path, 0);
+
+            char *jpg = 0;
+            off_t filesize = 0;
+            if (fd > 0)
+            {
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
+                gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+            }
+
+
+        }
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb, 0);
     }
     return 0;
 }
