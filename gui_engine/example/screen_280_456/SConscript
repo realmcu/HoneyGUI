@@ -9,6 +9,11 @@ src = Split("""
 src = Glob('*.c')
 CPPPATH = [cwd]
 print(CPPPATH)
-group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_280_456_DEMO'], CPPPATH = CPPPATH)
+
+CPPDEFINES = []
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_280_456_DEMO'):
+    CPPDEFINES += ['ENABLE_RTK_GUI_280_456_DEMO']
+
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_280_456_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

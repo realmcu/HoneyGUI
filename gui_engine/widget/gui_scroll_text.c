@@ -92,7 +92,7 @@ extern void gui_text_ctor(gui_text_t *this,
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_scroll_text_font_load(gui_text_t *text, gui_rect_t *rect)
+static void gui_scroll_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -113,7 +113,7 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_rect_t *rect)
     }
 }
 
-static void gui_scroll_text_font_draw(gui_text_t *text, gui_rect_t *rect)
+static void gui_scroll_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -236,7 +236,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     struct gui_dispdev *dc;
     int32_t offset;
     uint32_t index;
-    gui_rect_t draw_rect = {0};
+    gui_text_rect_t draw_rect = {0};
     uint32_t total_section_count;
 
     if (text->base.len == 0)

@@ -78,7 +78,7 @@ static bool content_change = false;
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_text_font_load(gui_text_t *text, gui_rect_t *rect)
+static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -105,7 +105,7 @@ static void gui_text_font_load(gui_text_t *text, gui_rect_t *rect)
     }
 }
 
-static void gui_text_font_draw(gui_text_t *text, gui_rect_t *rect)
+static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -266,7 +266,7 @@ static void gui_text_draw(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
     struct gui_dispdev *dc;
-    gui_rect_t draw_rect = {0};
+    gui_text_rect_t draw_rect = {0};
     uint32_t total_section_count;
 
     if (text->len == 0)

@@ -21,7 +21,7 @@ static uint8_t get_fontlib_name(uint8_t font_size)
     }
     return 0;
 }
-void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
+void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     if (text->path == NULL)
     {
@@ -485,7 +485,7 @@ gui_inline uint16_t rgba2565(gui_color_t rgba)
     return red + gre + blu;
 }
 static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
-                             gui_rect_t *rect, bool crop)
+                             gui_text_rect_t *rect, bool crop)
 {
     if (chr->dot_addr == NULL)
     {
@@ -1092,7 +1092,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
         break;
     }
 }
-void gui_font_mem_draw(gui_text_t *text, gui_rect_t *rect)
+void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
     GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
@@ -1104,7 +1104,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_rect_t *rect)
 }
 
 static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_t rendor_mode,
-                                      gui_rect_t *rect, uint8_t *buffer, int buf_width, uint8_t buffer_bytes, uint8_t crop)
+                                      gui_text_rect_t *rect, uint8_t *buffer, int buf_width, uint8_t buffer_bytes, uint8_t crop)
 {
     if (chr->dot_addr == NULL || buffer == NULL)
     {
@@ -1402,7 +1402,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     int16_t buf_height = 0;
     uint8_t font_img_pixel_bytes;
 
-    gui_rect_t rect = {0};
+    gui_text_rect_t rect = {0};
     rect.x1 = 0;
     rect.y1 = 0;
     rect.x2 = rect.x1 + text->base.w;

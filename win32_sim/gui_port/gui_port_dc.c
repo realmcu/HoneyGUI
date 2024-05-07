@@ -10,6 +10,11 @@
 #include "kb_algo.h"
 
 
+#ifdef ENABLE_RTK_GUI_280_456_DEMO
+#define DRV_LCD_WIDTH   280
+#define DRV_LCD_HIGHT   456
+#endif
+
 #ifdef ENABLE_RTK_GUI_448_368_DEMO
 #define DRV_LCD_WIDTH   368
 #define DRV_LCD_HIGHT   448

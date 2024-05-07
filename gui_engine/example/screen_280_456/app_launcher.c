@@ -108,11 +108,11 @@ void change_size(gui_img_t *obj)
     gui_img_scale(obj, (float)xscale / 256, (float)yscale / 256);
     if (a <= 255 && a >= 0)
     {
-        obj->draw_img.opacity_value = a;
+        gui_img_set_opacity(obj, a);;
     }
     else
     {
-        obj->draw_img.opacity_value = 0;
+        gui_img_set_opacity(obj, 0);;
     }
 }
 static void tab_img(void *tab)
@@ -334,10 +334,10 @@ static void app_launcher_ui_design(gui_app_t *app)
 
     tab_two(tabn);
     tab_home(tab0);
-    tab_lake(tab1);
+    tab_text(tab1);
     tab_tree(tab2);
     tab_img(tab3);
-    tab_text(tab5);
+    tab_lake(tab4);
     tab_iconlist(tab5);
 #ifndef _WIN32
     gui_log("after ui unused mem head is %d", heap = os_mem_peek(RAM_TYPE_DATA_ON));
