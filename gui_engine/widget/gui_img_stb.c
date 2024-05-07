@@ -127,11 +127,9 @@ static void gui_img_stb_modify_img(gui_obj_t *obj)
 #if _WIN32
             gui_free(img->img->data);
 #elif defined RTL8772F
-            tlsf_free(tlsf, img->img->data);
-            else
-            {
-                gui_free(img->img->data);
-            }
+            gui_lower_free(img->img->data);
+#else
+            gui_free(img->img->data);
 #endif
             img->img->data = NULL;
         }

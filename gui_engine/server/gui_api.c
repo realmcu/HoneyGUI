@@ -9,9 +9,7 @@
 #ifndef ENABLE_RTK_GUI_OS_HEAP
 #include "tlsf.h"
 #endif
-#ifdef RTL8772F
-#include "tlsf.h"
-#endif
+
 static struct gui_indev *indev;
 static struct gui_os_api *os_api;
 static struct gui_dispdev *dc = NULL;
@@ -39,9 +37,7 @@ void gui_fs_info_register(struct gui_fs *info)
     fs = info;
 }
 
-#if defined RTL8772F
-tlsf_t tlsf = NULL;
-#endif
+
 #ifndef ENABLE_RTK_GUI_OS_HEAP
 static tlsf_t tlsf = NULL;
 #endif
@@ -49,9 +45,6 @@ static tlsf_t lower_tlsf = NULL;
 
 void gui_os_api_register(struct gui_os_api *info)
 {
-#if defined RTL8772F
-    tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
-#endif
 #ifndef ENABLE_RTK_GUI_OS_HEAP
     tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
 #endif
