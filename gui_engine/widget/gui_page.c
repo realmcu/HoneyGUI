@@ -705,6 +705,7 @@ void gui_page_destory(gui_obj_t *obj)
     if (this->animate)
     {
         gui_free(this->animate);
+        this->animate = NULL;
     }
 }
 

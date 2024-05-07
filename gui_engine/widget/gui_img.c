@@ -312,7 +312,12 @@ static void img_destory(gui_obj_t *obj)
 {
     gui_img_t *this = (gui_img_t *)obj;
 
-    gui_free(this->animate);
+    if (this->animate)
+    {
+        gui_free(this->animate);
+        this->animate = NULL;
+    }
+
     if (this->src_mode == IMG_SRC_FILESYS)
     {
 #ifdef _WIN32
