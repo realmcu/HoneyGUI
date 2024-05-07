@@ -283,11 +283,16 @@ void *gui_realloc(void *ptr_old, uint32_t n)
 
 void gui_free(void *rmem)
 {
-    if (((uint32_t)(uintptr_t)rmem >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
+
+    if (
+        ((uint32_t)(uintptr_t)rmem >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
         ((uint32_t)(uintptr_t)rmem <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
          (uint32_t)os_api->lower_mem_size)
-       )
+    )
     {
+        GUI_ASSERT(rmem != NULL);
+        GUI_ASSERT((uint32_t)(uintptr_t)os_api->lower_mem_addr != 0);
+        GUI_ASSERT((uint32_t)(uintptr_t)os_api->lower_mem_size != 0);
         gui_lower_free(rmem);
         return;
     }

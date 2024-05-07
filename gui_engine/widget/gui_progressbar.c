@@ -115,7 +115,7 @@ static void gui_progressbar_movie_ctor_core(gui_progressbar_t     *this,
         this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
     }
 
-    this->color_hl = (uint32_t)picture_array;
+    this->color_hl = (uint32_t)(uintptr_t)picture_array;
 }
 
 /*============================================================================*
