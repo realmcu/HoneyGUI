@@ -269,10 +269,14 @@ static void gui_server_entry(void *parameter)
             daemon_start_ms = gui_ms_get();
         }
 
+        gui_msg_t msg;
 #if defined __WIN32
+        while (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0))
+        {
+            gui_server_msg_handler(screen, &msg);
+        }
         continue;
 #endif
-        gui_msg_t msg;
         if ((((gui_ms_get() - daemon_start_ms) > app->active_ms) && (app->active_ms != (uint32_t) - 1)) ||
             force_display_off)
         {

@@ -671,6 +671,15 @@ void *gui_get_file_address(const char *file)
 #endif
 #if defined(_WIN32)
     {
+        // gui_log("get file: %s\n", file);
+        // check whether file has already been loaded
+        FIEL_LOAD_NODE *file_node = fileload_get_node(file);
+        if (file_node->mem_addr)
+        {
+            gui_log(">loaded before\n");
+            return file_node->mem_addr;
+        }
+
         char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
         sprintf(path, "%s%s", root_folder, file);
 #ifndef O_BINARY
@@ -695,6 +704,7 @@ void *gui_get_file_address(const char *file)
         memset(imgbuf, 0, size);
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, imgbuf, size);
+        file_node->mem_addr = imgbuf;
         return imgbuf;
     }
 #else

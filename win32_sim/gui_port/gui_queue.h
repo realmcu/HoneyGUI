@@ -2,8 +2,9 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include "guidef.h"
 
-typedef int QuDataType;
+typedef gui_msg_t QuDataType;
 
 typedef struct QListNode
 {

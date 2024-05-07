@@ -24,7 +24,7 @@ typedef enum
 // js extern io event define
     EXTERN_EVENT_NULL,
     EXTERN_EVENT_SMARTHOME = 1,
-
+    EXTERN_EVENT_TIMER     = 2,
 // js smarthome event define
     SH_EVENT_WIFI_SWITCH   = 1,
 
@@ -48,7 +48,11 @@ typedef struct
         uint32_t  param;
         uint8_t extern_event_type;
     };
-    uint8_t data_rsv[8];   // reserve
+    union
+    {
+        void  *data[2];
+        uint8_t *data_rsv;   // reserve
+    };
 } gui_msg_js_t;
 
 

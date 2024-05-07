@@ -1,6 +1,7 @@
 
 #include "js_user.h"
-
+#include <semaphore.h>
+sem_t sem_timer;
 
 static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code)
 {
@@ -1143,74 +1144,257 @@ DECLARE_HANDLER(sw_open)
     sw->turn_on(sw);
     return jerry_create_undefined();
 }
-struct timer_args
+
+
+
+#include "js_extern_io.h"
+void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
 {
-    jerry_value_t func;
-    uint32_t timeout;
-    bool one_short;
-};
+    gui_msg_t msg;
+    jerry_value_t js_cb = NULL;
+    jerry_value_t res = 0;
+
+    memcpy(&(msg.u.param), js_msg, sizeof(gui_msg_js_t));
+    js_cb = (jerry_value_t)msg.cb;
+    // gui_log("timer msg cb 0x%x\n", js_cb);
+
+    res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
+    jerry_release_value(res);
+}
+
 #if _WIN32
-#include "stdio.h"
-#include "stdlib.h"
 #include <pthread.h>
-static void *rtk_gui_timer(struct timer_args *arg)
+
+typedef struct
 {
-    if (arg->one_short)
+    pthread_t *hdl;
+    uint32_t time_ms;
+    bool isPeriodic;
+    void *js_cb;
+} JS_TIMER_T;
+
+void js_ui_timerThread(void *param)
+{
+    JS_TIMER_T *js_timer = (JS_TIMER_T *)param;
+    const jerry_value_t js_cb = js_timer->js_cb;
+    uint32_t time_ms = js_timer->time_ms;
+    gui_msg_t msg = {.type = GUI_EVENT_EXTERN_IO_JS, .u.param = EXTERN_EVENT_TIMER, .cb = js_cb};
+
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
+    do
     {
-        usleep((int)(arg->timeout) * 1000); //10ms
-        gui_free(arg);
-        jerry_value_t res = jerry_call_function(arg->func, jerry_create_undefined(), 0, 0);
+        usleep(time_ms * 1000); // us
+
+        pthread_testcancel();
+        // send_msg_to_gui_server(&msg);
+
+        int res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
         jerry_release_value(res);
+
+        pthread_testcancel();
     }
-    else
-    {
-        while (1)
-        {
-            usleep((int)(arg->timeout) * 1000); //10ms
-            jerry_value_t res = jerry_call_function(arg->func, jerry_create_undefined(), 0, 0);
-            jerry_release_value(res);
-        }
+    while (js_timer->isPeriodic);
 
-    }
+    pthread_exit(NULL);
+}
+#else
+#include "os_timer.h"
+#include "trace.h"
 
+#if defined (RTL87x2G)
+void arm_js_timercb(void *p_handle)
+{
+    // DBG_DIRECT("Timercb 0x%x 0x%x\n", &p_handle, p_handle);
+    uint32_t timer_id;
+    void *js_cb;
 
+    os_timer_id_get(&p_handle, &timer_id);
+    // DBG_DIRECT("timer_id 0x%x\n", timer_id);
 
+    js_cb = (void *)timer_id;
+    // DBG_DIRECT("js_cb 0x%x\n", js_cb);
+
+    gui_msg_t msg = {.type = GUI_EVENT_EXTERN_IO_JS, .u.param = EXTERN_EVENT_TIMER, .cb = js_cb};
+    send_msg_to_gui_server(&msg);
 }
 #endif
+
+#endif
+
 
 DECLARE_HANDLER(setTimeout)
 {
+    // gui_log("setTimeout \n");
     if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_number(args[1]))
     {
-#ifdef _WIN32
-        pthread_t thread;
-        struct timer_args *arg = gui_malloc(sizeof(struct timer_args));
-        memset(arg, 0, sizeof(struct timer_args));
-        arg->func = args[0];
-        arg->timeout = (uint32_t)jerry_get_number_value(args[1]);
-        arg->one_short = 1;
-        pthread_create(&thread, NULL, rtk_gui_timer, arg);
+        uint32_t time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        jerry_value_t js_cb = args[0];
+        double js_timerID = 0;
+        gui_log("js_cb 0x%x\n", (uint32_t)js_cb);
 
+#ifdef _WIN32
+        pthread_t *thread_hdl;
+        JS_TIMER_T *js_timer = gui_malloc(sizeof(JS_TIMER_T));
+        memset(js_timer, 0, sizeof(JS_TIMER_T));
+        js_timer->js_cb = js_cb;
+        js_timer->time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        js_timer->isPeriodic = false;
+
+        thread_hdl = gui_thread_create("Timer", js_ui_timerThread, js_timer,
+                                       0, 0);
+        js_timer->hdl = thread_hdl;
+
+        // gui_log("hdl 0x%x, timerID 0x%x\n", thread_hdl, js_timer);
+
+        js_timerID = (uint32_t)js_timer;
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#else
+#if defined (RTL87x2G)
+        void *p_handle = NULL;
+
+        if (os_timer_create(&p_handle, "timer", (uint32_t)js_cb,
+                            time_ms, false, arm_js_timercb) == true)
+        {
+            // Timer created successfully, start the timer.
+            os_timer_start(&p_handle);
+            js_timerID = (uint32_t)p_handle;
+        }
+        else
+        {
+            // Timer failed to create.
+            js_timerID = 0;
+        }
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#endif
 #endif
     }
     return jerry_create_undefined();
 }
+
+DECLARE_HANDLER(clearTimeout)
+{
+    // gui_log("clearTimeout \n");
+    if (args_cnt == 1 && jerry_value_is_number(args[0]))
+    {
+        uint32_t js_timerID = (uint32_t)jerry_get_number_value(args[0]);
+        gui_log("js_timerID 0x%x\n", js_timerID);
+
+#ifdef _WIN32
+        JS_TIMER_T *js_timer = (JS_TIMER_T *)js_timerID;
+        int res = 0;
+
+        // gui_log("hdl 0x%x js_timer 0x%x\n", js_timer->hdl, js_timer);
+        res = gui_thread_delete(js_timer->hdl);
+        if (0 == res)
+        {
+            gui_free(js_timer);
+        }
+        else
+        {
+            gui_log("res %d %s\n", res, strerror(res));
+        }
+
+#else
+#if defined (RTL87x2G)
+        os_timer_delete((void **)&js_timerID);
+#endif
+#endif
+    }
+    return jerry_create_undefined();
+}
+
+
 DECLARE_HANDLER(setInterval)
 {
+    // gui_log("setInterval \n");
     if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_number(args[1]))
     {
-#ifdef _WIN32
-        pthread_t thread;
-        struct timer_args *arg = gui_malloc(sizeof(struct timer_args));
-        memset(arg, 0, sizeof(struct timer_args));
-        arg->func = args[0];
-        arg->timeout = (uint32_t)jerry_get_number_value(args[1]);
-        pthread_create(&thread, NULL, rtk_gui_timer, arg);
+        uint32_t time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        jerry_value_t js_cb = args[0];
+        double js_timerID = 0;
+        gui_log("js_cb 0x%x\n", (uint32_t)js_cb);
 
+#ifdef _WIN32
+        pthread_t *thread_hdl;
+        JS_TIMER_T *js_timer = gui_malloc(sizeof(JS_TIMER_T));
+        memset(js_timer, 0, sizeof(JS_TIMER_T));
+        js_timer->js_cb = args[0];
+        js_timer->time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        js_timer->isPeriodic = true;
+
+        thread_hdl = gui_thread_create("Timer", js_ui_timerThread, js_timer,
+                                       0, 0);
+        js_timer->hdl = thread_hdl;
+
+        // gui_log("hdl 0x%x, timerID 0x%x\n", thread_hdl, js_timer);
+
+        js_timerID = (uint32_t)js_timer;
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#else
+#if defined (RTL87x2G)
+        void *p_handle = NULL;
+
+        if (os_timer_create(&p_handle, "timer", (uint32_t)js_cb,
+                            time_ms, true, arm_js_timercb) == true)
+        {
+            // Timer created successfully, start the timer.
+            os_timer_start(&p_handle);
+            js_timerID = (uint32_t)p_handle;
+        }
+        else
+        {
+            // Timer failed to create.
+            js_timerID = 0;
+        }
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#endif
 #endif
     }
     return jerry_create_undefined();
 }
+
+
+DECLARE_HANDLER(clearInterval)
+{
+    // gui_log("clearInterval \n");
+    if (args_cnt == 1 && jerry_value_is_number(args[0]))
+    {
+        uint32_t js_timerID = (uint32_t)jerry_get_number_value(args[0]);
+        gui_log("js_timerID 0x%x\n", js_timerID);
+
+#ifdef _WIN32
+        JS_TIMER_T *js_timer = (JS_TIMER_T *)js_timerID;
+        int res = 0;
+
+        // gui_log("hdl 0x%x\n", js_timer->hdl);
+        res = gui_thread_delete(js_timer->hdl);
+        if (0 == res)
+        {
+            gui_free(js_timer);
+        }
+        else
+        {
+            gui_log("res %d %s\n", res, strerror(res));
+        }
+#else
+#if defined (RTL87x2G)
+        os_timer_delete((void **)&js_timerID);
+#endif
+#endif
+    }
+    return jerry_create_undefined();
+}
+
+
 void js_gui_init()
 {
     jerry_value_t global_obj = jerry_get_global_object();
@@ -1295,8 +1479,16 @@ void js_gui_init()
     REGISTER_METHOD_NAME(sw, "turnOff", sw_close);
     REGISTER_METHOD_NAME(sw, "onPress", onPress_switch);
     REGISTER_METHOD(global_obj, setTimeout);
+    REGISTER_METHOD(global_obj, clearTimeout);
     REGISTER_METHOD(global_obj, setInterval);
+    REGISTER_METHOD(global_obj, clearInterval);
+
     jerry_release_value(global_obj);
+
+#ifdef __WIN32
+    sem_init(&sem_timer, 0, 1);
+#endif
+
 }
 
 

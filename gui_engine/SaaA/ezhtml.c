@@ -96,43 +96,6 @@ gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *ad
                                    y, 0, 0);
 }
 
-gui_img_t *xml_gui_img_create(void *parent, const char *file, int16_t x, int16_t y)
-{
-    if (file == NULL)
-    {
-        file = gui_get_file_address("app/system/resource/icMenuBird.bin");
-    }
-
-    // check image size
-    char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
-    sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
-    gui_log("xml imgfile>%s \n", path);
-
-    int fd = gui_fs_open(path,  0);
-    if (fd == -1)
-    {
-        gui_log("open file fail !\n");
-        return NULL;
-    }
-    int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
-    gui_log("img size: %d \n", size);
-    gui_fs_close(fd);
-    // gui_free(path);
-
-    if (size < 100000)
-    {
-#ifdef __WIN32
-        path = file;
-#endif
-        return parent = (void *)gui_img_create_from_fs(parent, path, x, y);
-    }
-    else
-    {
-        void *imgbuf = gui_get_file_address(file);
-        return parent = (void *)gui_img_create_from_mem(parent, "image", imgbuf, x, y, 0, 0);
-    }
-}
-
 char *get_space_string_head(const char *string)
 {
     char *s = gui_strdup(string);
@@ -202,7 +165,7 @@ static void sport_button_press_ani_cb(gui_button_t *button)
     if (per == 0.0f)
     {
         from = ((gui_img_t *)(button->img))->scale_x;
-        alpha_from = button->img->draw_img.opacity_value;
+        alpha_from = button->img->draw_img->opacity_value;
     }
     from = 1.0f;
     float scale = (-0.5f * from) * per + from;
@@ -248,7 +211,7 @@ static void sport_button_release_ani_cb(gui_button_t *button)
     if (per == 0.0f)
     {
         from = ((gui_img_t *)(button->img))->scale_x;
-        alpha_from = button->img->draw_img.opacity_value;
+        alpha_from = button->img->draw_img->opacity_value;
     }
     //from = 1.25f;
     float scale = (1.0f - from) * per + from;
@@ -278,7 +241,7 @@ static void sport_button_release(gui_button_t *b)
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
-    gui_log("%s\n", name);
+    gui_log("%s: %s", name, p->txt);
     for (size_t i = 0; i < WIDGETS_NUM; i++)
     {
         if (!strcmp(widget[i].name, name))
@@ -2106,8 +2069,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     parent = (void *)gui_switch_create(parent, x, y, w, h, img1, img2);
                     parent->name = get_space_string_head(p->txt);
-                    GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = gui_get_file_address(hl_pictureHl);
-                    GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
+                    if (hl_pictureHl)
+                    {
+                        GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = gui_get_file_address(hl_pictureHl);
+                    }
+                    if (pictureHl)
+                    {
+                        GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
+                    }
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.x = picture_x;
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
                     gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);

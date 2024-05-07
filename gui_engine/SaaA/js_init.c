@@ -18,8 +18,14 @@ static void *context_alloc(size_t size, void *cb_data_p)
     return (void *)js_buffer;
 #elif defined RTL8762D
     return (void *)(0x6900000);
+
+#elif defined __WIN32
+    static uint8_t js_buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
+#else
+    js_buffer = malloc(size);
 #endif
-    return malloc(size);
+
+    return (void *)js_buffer;
 }
 
 // Only for js script loading !

@@ -20,13 +20,15 @@ static void *port_thread_create(const char *name, void (*entry)(void *param), vo
 
 static bool port_thread_delete(void *handle)
 {
-    pthread_t *thread = handle;
+    pthread_t thread = *((pthread_t *)handle);
     void *ret = NULL;
+    int res = 0;
     //pthread_detach(*thread);
     //pthread_kill(*thread, 3);
-    pthread_cancel(*thread);
-    pthread_join(*thread, &ret);
-    return true;
+    res = pthread_cancel(thread);
+    pthread_join(thread, &ret);
+    free(handle);
+    return res;
 }
 static bool port_thread_mdelay(uint32_t ms)
 {
@@ -42,16 +44,21 @@ static Queue q;
 
 static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs)
 {
+    void **queue = handle;
     pthread_mutex_init(&port_mutex, NULL);
     pthread_cond_init(&port_cond, NULL);
 
     pthread_mutex_init(&queue_mutex, NULL);
     QueueInit(&q);
+    *queue = &q;
 }
 static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 {
+    QuDataType data = {0};
+
+    memcpy(&data, buffer, size);
     pthread_mutex_lock(&queue_mutex);
-    QueuePush(&q, 1);
+    QueuePush(&q, data);
     pthread_mutex_unlock(&queue_mutex);
 
     pthread_mutex_lock(&port_mutex);
@@ -64,15 +71,22 @@ static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t tim
 {
     if (QueueEmpty(&q) == true)
     {
-        pthread_mutex_lock(&port_mutex);
-        struct timespec timeout_time;
-        timeout_time.tv_sec = timeout;
-        pthread_cond_timedwait(&port_cond, &port_mutex, &timeout_time);
-        pthread_mutex_unlock(&port_mutex);
+        return false;
     }
-    pthread_mutex_lock(&queue_mutex);
-    QueuePop(&q);
-    pthread_mutex_unlock(&queue_mutex);
+    else
+    {
+        QuDataType data;
+
+        pthread_mutex_lock(&queue_mutex);
+        data = QueueFront(&q);
+        QueuePop(&q);
+        pthread_mutex_unlock(&queue_mutex);
+
+        memcpy(buffer, &data, size);
+
+        return true;
+    }
+
 }
 
 

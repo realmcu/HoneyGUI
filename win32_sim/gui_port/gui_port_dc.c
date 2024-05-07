@@ -44,6 +44,33 @@
 #define DRV_LCD_HIGHT   480
 #endif
 
+#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+
+// default demo 480_480
+#define ENABLE_RTK_GUI_480_480_DEMO
+// #define ENABLE_RTK_GUI_480_320_DEMO
+// #define ENABLE_RTK_GUI_320_240_DEMO
+
+
+#ifdef ENABLE_RTK_GUI_480_480_DEMO
+#define DRV_LCD_WIDTH   480
+#define DRV_LCD_HIGHT   480
+#endif
+
+#ifdef ENABLE_RTK_GUI_480_320_DEMO
+#define DRV_LCD_WIDTH   480
+#define DRV_LCD_HIGHT   320
+#endif
+
+#ifdef ENABLE_RTK_GUI_320_240_DEMO
+#define DRV_LCD_WIDTH   320
+#define DRV_LCD_HIGHT   240
+#endif
+
+#endif
+
+
+
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
