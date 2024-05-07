@@ -89,11 +89,9 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
     uint8_t last;
     touch_info_t *tp;
     gui_img_t *this;
-    gui_obj_t *root;
 
     GUI_ASSERT(obj != NULL);
     this = (gui_img_t *)obj;
-    root = (gui_obj_t *)obj;
     tp = tp_get_info();
 
     matrix_translate(this->t_x, this->t_y, obj->matrix);
@@ -174,15 +172,23 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
-    gui_image_new_area(this->draw_img, NULL);
+    gui_rect_t rect =
+    {
+        .x1 = GUI_TYPE(gui_img_scope_t, obj)->scope_x1,
+        .x2 = GUI_TYPE(gui_img_scope_t, obj)->scope_x2,
+        .y1 = GUI_TYPE(gui_img_scope_t, obj)->scope_y1,
+        .y2 = GUI_TYPE(gui_img_scope_t, obj)->scope_y2,
+    };
+    if ((rect.x2 > rect.x1) && (rect.y2 > rect.y1))
+    {
+        gui_image_new_area(this->draw_img, &rect);
+    }
+    else
+    {
+        gui_image_new_area(this->draw_img, NULL);
+    }
 
-    root->w = _UI_MIN(GUI_TYPE(gui_img_scope_t, obj)->scope_x2, this->draw_img->img_w);
-    root->h = _UI_MIN(GUI_TYPE(gui_img_scope_t, obj)->scope_x2, this->draw_img->img_h);
 
-    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
-    gui_obj_get_area(root, &m_x, &m_y, &m_w, &m_h);
-    this->draw_img->img_target_h = m_h;
-    this->draw_img->img_target_w = m_w;
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
@@ -300,13 +306,20 @@ void gui_img_scope_ctor(gui_img_t  *this,
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+void gui_img_scope_set_range(gui_img_scope_t *this, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+{
+    this->scope_x1 = x1;
+    this->scope_x2 = x2;
+    this->scope_y1 = y1;
+    this->scope_y2 = y2;
+}
 gui_img_scope_t *gui_img_scope_create(void    *parent,
+                                      const char *name,
                                       void    *addr,
                                       int16_t  x,
                                       int16_t  y)
 {
     GUI_ASSERT(parent != NULL);
-    char *name = "DEFAULT_IMG";
 
     gui_img_scope_t *img = gui_malloc(sizeof(gui_img_scope_t));
     GUI_ASSERT(img != NULL);

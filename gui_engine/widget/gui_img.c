@@ -179,7 +179,6 @@ static void gui_img_update_att(gui_obj_t *o)
 static void gui_img_prepare(gui_obj_t *obj)
 {
     uint8_t last;
-    int16_t m_x, m_y, m_w, m_h;
     gui_img_t *this;
     touch_info_t *tp;
 
@@ -264,11 +263,6 @@ static void gui_img_prepare(gui_obj_t *obj)
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
     gui_image_new_area(this->draw_img, NULL);
-
-    //caculate by obj matrix
-    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
-    this->draw_img->img_target_h = m_h;
-    this->draw_img->img_target_w = m_w;
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {

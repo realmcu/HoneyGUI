@@ -238,8 +238,7 @@ void gui_progressbar_h_img_ctor(gui_progressbar_t *this,
         gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
                                &(((gui_obj_t *)this)->brother_list));
     }
-
-    this->c = (void *)gui_img_scope_create(this, picture, 0, 0);
+    this->c = (void *)gui_img_scope_create(this, "progressbar_h", picture, 0, 0);
 
     int w = gui_img_get_width((void *)this->c);
     this->max = w;
@@ -266,8 +265,7 @@ void gui_progressbar_v_img_ctor(gui_progressbar_t *this,
         gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
                                &(((gui_obj_t *)this)->brother_list));
     }
-
-    this->c = (void *)gui_img_scope_create(this, picture, 0, 0);
+    this->c = (void *)gui_img_scope_create(this, "progressbar_v", picture, 0, 0);
 
     int w = gui_img_get_height((void *)this->c);
     this->max = w;

@@ -105,8 +105,28 @@ bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
     float y_min = 0.0f;
     float y_max = 0.0f;
 
-    pox.p[0] = 0.0f;
-    pox.p[1] = 0.0f;
+    float x1 = 0;
+    float y1 = 0;
+    float x2 = 0;
+    float y2 = 0;
+
+    if (rect == NULL)
+    {
+        x1 = 0;
+        y1 = 0;
+        x2 = img->img_w - 1;
+        y2 = img->img_h - 1;
+    }
+    else
+    {
+        x1 = _UI_MAX(0, rect->x1);
+        y1 = _UI_MAX(0, rect->y1);
+        x2 = _UI_MIN(img->img_w - 1, rect->x2);
+        y2 = _UI_MIN(img->img_h - 1, rect->y2);
+    }
+
+    pox.p[0] = x1;
+    pox.p[1] = y1;
     pox.p[2] = 1.0f;
     matrix_multiply_point(&img->matrix, &pox);
     x_min = pox.p[0];
@@ -116,8 +136,8 @@ bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
     point[0][0] = pox.p[0];
     point[0][1] = pox.p[1];
 
-    pox.p[0] = (float)img->img_w - 1;
-    pox.p[1] = 0.0f;
+    pox.p[0] = x2;
+    pox.p[1] = y1;
     pox.p[2] = 1.0f;
     matrix_multiply_point(&img->matrix, &pox);
     if (x_min > pox.p[0])
@@ -139,8 +159,8 @@ bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
     point[1][0] = pox.p[0];
     point[1][1] = pox.p[1];
 
-    pox.p[0] = (float)img->img_w - 1;
-    pox.p[1] = (float)img->img_h - 1;
+    pox.p[0] = x2;
+    pox.p[1] = y2;
     pox.p[2] = 1.0f;
     matrix_multiply_point(&img->matrix, &pox);
     if (x_min > pox.p[0])
@@ -162,8 +182,8 @@ bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
     point[2][0] = pox.p[0];
     point[2][1] = pox.p[1];
 
-    pox.p[0] = 0;
-    pox.p[1] = (float)img->img_h - 1;
+    pox.p[0] = x1;
+    pox.p[1] = y2;
     pox.p[2] = 1.0f;
     matrix_multiply_point(&img->matrix, &pox);
     if (x_min > pox.p[0])
