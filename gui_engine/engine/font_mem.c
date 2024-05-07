@@ -394,7 +394,7 @@ void gui_font_mem_load(gui_text_t *text, gui_rect_t *rect)
                 }
                 else
                 {
-                    chr[i].y = chr[i - 1].y - chr[i - 1].char_h - 2;
+                    chr[i].y = chr[i - 1].y - chr[i].char_h - 2;
                 }
                 if (chr[i].y  <= rect->y1 || chr[i - 1].unicode == 0x0A)
                 {
