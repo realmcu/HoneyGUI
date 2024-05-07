@@ -503,15 +503,21 @@ static void gui_tabview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         switch (cb_type)
         {
         case OBJ_INPUT_PREPARE:
-            gui_tabview_input_prepare(obj);
+            {
+                gui_tabview_input_prepare(obj);
+            }
             break;
 
         case OBJ_PREPARE:
-            gui_tabview_prepare(obj);
+            {
+                gui_tabview_prepare(obj);
+            }
             break;
 
         case OBJ_DESTORY:
-            gui_tabview_destory(obj);
+            {
+                gui_tabview_destory(obj);
+            }
             break;
 
         default:

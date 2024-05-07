@@ -135,6 +135,35 @@ static void gui_tab_prepare(gui_obj_t *obj)
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
 
+    if (parent->loop)
+    {
+        int16_t tab_x_count = - parent->tab_cnt_left + parent->tab_cnt_right + 1;
+        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
+        int16_t right_count = tab_x_count / 2;
+
+        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
+        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
+        int16_t down_count = tab_y_count / 2;
+
+        if (tab_x_gap > right_count)
+        {
+            tab_x_gap -= tab_x_count;
+        }
+        else if (tab_x_gap < -left_count)
+        {
+            tab_x_gap += tab_x_count;
+        }
+
+        if (tab_y_gap > down_count)
+        {
+            tab_y_gap -= tab_y_count;
+        }
+        else if (tab_x_gap < -up_count)
+        {
+            tab_y_gap += tab_y_count;
+        }
+    }
+
     if (parent->enable_pre_load)
     {
         if (parent->tab_need_pre_load == true)
@@ -198,35 +227,6 @@ static void gui_tab_prepare(gui_obj_t *obj)
                 gui_obj_show(this->shot_obj, false);
                 gui_obj_show(this->rte_obj, true);
             }
-        }
-    }
-
-    if (parent->loop)
-    {
-        int16_t tab_x_count = - parent->tab_cnt_left + parent->tab_cnt_right + 1;
-        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
-        int16_t right_count = tab_x_count / 2;
-
-        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
-        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
-        int16_t down_count = tab_y_count / 2;
-
-        if (tab_x_gap > right_count)
-        {
-            tab_x_gap -= tab_x_count;
-        }
-        else if (tab_x_gap < -left_count)
-        {
-            tab_x_gap += tab_x_count;
-        }
-
-        if (tab_y_gap > down_count)
-        {
-            tab_y_gap -= tab_y_count;
-        }
-        else if (tab_x_gap < -up_count)
-        {
-            tab_y_gap += tab_y_count;
         }
     }
 
@@ -314,15 +314,21 @@ static void gui_tab_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         switch (cb_type)
         {
         case OBJ_INPUT_PREPARE:
-            gui_tab_input_prepare(obj);
+            {
+                gui_tab_input_prepare(obj);
+            }
             break;
 
         case OBJ_PREPARE:
-            gui_tab_prepare(obj);
+            {
+                gui_tab_prepare(obj);
+            }
             break;
 
         case OBJ_DESTORY:
-            gui_tab_destroy(obj);
+            {
+                gui_tab_destroy(obj);
+            }
             break;
 
         default:
