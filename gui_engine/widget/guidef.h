@@ -120,10 +120,6 @@ typedef struct gui_rect
     int16_t y1;
     int16_t x2;
     int16_t y2;
-    int16_t xboundleft;
-    int16_t xboundright;
-    int16_t yboundtop;
-    int16_t yboundbottom;
 } gui_rect_t;
 
 typedef enum t_gui_dc_type

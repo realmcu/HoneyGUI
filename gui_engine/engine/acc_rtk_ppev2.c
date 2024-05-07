@@ -222,10 +222,10 @@ void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rect)
 {
-    int32_t x_max = (image->target_w + image->img_x - 1);
-    int32_t y_max = (image->target_h + image->img_y - 1);
-    int32_t x_min = image->img_x;
-    int32_t y_min = image->img_y;
+    int32_t x_max = (image->target_w + image->target_x - 1);
+    int32_t y_max = (image->target_h + image->target_y - 1);
+    int32_t x_min = image->target_x;
+    int32_t y_min = image->target_y;
     if (dc->section.y2 < y_min || dc->section.y1 > y_max || dc->section.x2 < x_min ||
         dc->section.x1 > x_max)
     {

@@ -27,8 +27,12 @@ static double acc_ppe_ceil(double _x)
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    if ((rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y2) ||
-        (rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1))
+    int32_t x_max = (image->target_w + image->target_x - 1);
+    int32_t y_max = (image->target_h + image->target_y - 1);
+    int32_t x_min = image->target_x;
+    int32_t y_min = image->target_y;
+    if (dc->section.y2 < y_min || dc->section.y1 > y_max || dc->section.x2 < x_min ||
+        dc->section.x1 > x_max)
     {
         return;
     }

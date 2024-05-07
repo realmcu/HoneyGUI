@@ -136,8 +136,8 @@ static void gui_canvas_rect_draw(gui_canvas_rect_t *this)
     GUI_UNUSED(dc);
 
     gui_rect_t rect = {0};
-    rect.x1 = this->draw_img->img_x;
-    rect.y1 = this->draw_img->img_y;
+    rect.x1 = this->draw_img->target_x;
+    rect.y1 = this->draw_img->target_y;
     rect.x2 = rect.x1 + this->draw_img->target_w - 1;
     rect.y2 = rect.y1 + this->draw_img->target_h - 1;
 
