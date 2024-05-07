@@ -120,7 +120,7 @@ static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
-    gui_image_new_area(this->draw_img);
+    gui_image_new_area(this->draw_img, NULL);
 
 }
 
@@ -136,10 +136,10 @@ static void gui_canvas_rect_draw(gui_canvas_rect_t *this)
     GUI_UNUSED(dc);
 
     gui_rect_t rect = {0};
-    rect.x1 = this->draw_img->target_x;
-    rect.y1 = this->draw_img->target_y;
-    rect.x2 = rect.x1 + this->draw_img->target_w - 1;
-    rect.y2 = rect.y1 + this->draw_img->target_h - 1;
+    rect.x1 = this->draw_img->img_target_x;
+    rect.y1 = this->draw_img->img_target_y;
+    rect.x2 = rect.x1 + this->draw_img->img_target_w - 1;
+    rect.y2 = rect.y1 + this->draw_img->img_target_h - 1;
 
     gui_acc_blit_to_dc(this->draw_img, dc, &rect);
 }

@@ -58,12 +58,16 @@ typedef struct draw_img
 {
     uint16_t img_w;
     uint16_t img_h;
-    int16_t target_x; //display start X
-    int16_t target_y;  //display start Y
-    uint16_t target_w;
-    uint16_t target_h;
+    int16_t img_target_x; //display start X
+    int16_t img_target_y;  //display start Y
+    uint16_t img_target_w;
+    uint16_t img_target_h;
+    // int16_t rect_x; //display start X
+    // int16_t rect_y;  //display start Y
+    // uint16_t rect_w;
+    // uint16_t rect_h;
     void *data;
-    gui_matrix_t matrix;
+    gui_matrix_t matrix; //seems can remve by howie
     gui_matrix_t inverse;
     uint8_t opacity_value;
     uint32_t blend_mode : 3;
@@ -75,7 +79,7 @@ typedef struct draw_img
 } draw_img_t;
 
 void gui_image_load_scale(draw_img_t *img);
-bool gui_image_new_area(draw_img_t *img);
+bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect);
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end);
 gui_rgb_data_head_t gui_image_get_header(draw_img_t *img);

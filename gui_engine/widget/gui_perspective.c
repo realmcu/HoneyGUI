@@ -195,7 +195,7 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(struct gui_matrix));
         matrix_inverse(&this->img[i].inverse);
         gui_image_load_scale(&this->img[i]);
-        gui_image_new_area(&this->img[i]);
+        gui_image_new_area(&this->img[i], NULL);
     }
 
     last = this->checksum;

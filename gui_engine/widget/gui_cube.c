@@ -277,7 +277,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&front->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&front->inverse);
         gui_image_load_scale(front);
-        gui_image_new_area(front);
+        gui_image_new_area(front, NULL);
     }
 
     if (this->nz4567 > 0.0f)
@@ -290,7 +290,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&back->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&back->inverse);
         gui_image_load_scale(back);
-        gui_image_new_area(back);
+        gui_image_new_area(back, NULL);
     }
 
     if (this->nz5126 > 0.0f)
@@ -303,7 +303,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&up->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&up->inverse);
         gui_image_load_scale(up);
-        gui_image_new_area(up);
+        gui_image_new_area(up, NULL);
     }
 
     if (this->nz0473 > 0.0f)
@@ -316,7 +316,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&down->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&down->inverse);
         gui_image_load_scale(down);
-        gui_image_new_area(down);
+        gui_image_new_area(down, NULL);
     }
 
     if (this->nz7623 > 0.0f)
@@ -329,7 +329,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&left->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&left->inverse);
         gui_image_load_scale(left);
-        gui_image_new_area(left);
+        gui_image_new_area(left, NULL);
     }
 
     if (this->nz0154 > 0.0f)
@@ -342,7 +342,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&right->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&right->inverse);
         gui_image_load_scale(right);
-        gui_image_new_area(right);
+        gui_image_new_area(right, NULL);
     }
 }
 

@@ -174,16 +174,15 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
-
-    gui_image_new_area(this->draw_img);
+    gui_image_new_area(this->draw_img, NULL);
 
     root->w = _UI_MIN(GUI_TYPE(gui_img_scope_t, obj)->scope_x2, this->draw_img->img_w);
     root->h = _UI_MIN(GUI_TYPE(gui_img_scope_t, obj)->scope_x2, this->draw_img->img_h);
 
     int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
     gui_obj_get_area(root, &m_x, &m_y, &m_w, &m_h);
-    this->draw_img->target_h = m_h;
-    this->draw_img->target_w = m_w;
+    this->draw_img->img_target_h = m_h;
+    this->draw_img->img_target_w = m_w;
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {

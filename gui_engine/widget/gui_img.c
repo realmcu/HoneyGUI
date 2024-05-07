@@ -246,12 +246,12 @@ static void img_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
-    gui_image_new_area(this->draw_img);
+    gui_image_new_area(this->draw_img, NULL);
 
     int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
     gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
-    this->draw_img->target_h = m_h;
-    this->draw_img->target_w = m_w;
+    this->draw_img->img_target_h = m_h;
+    this->draw_img->img_target_w = m_w;
 
 
     if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)

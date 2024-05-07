@@ -5,11 +5,11 @@
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end)
 {
-    int16_t image_x = image->target_x;
-    int16_t image_y = image->target_y;
+    int16_t image_x = image->img_target_x;
+    int16_t image_y = image->img_target_y;
 
-    int16_t image_w = image->target_w ;
-    int16_t image_h = image->target_h ;
+    int16_t image_w = image->img_target_w ;
+    int16_t image_h = image->img_target_h ;
 
     *x_start = _UI_MAX(image_x, 0);
     *x_end = _UI_MIN(image_x + image_w - 1, dc->fb_width - 1);
@@ -54,7 +54,7 @@ void gui_image_load_scale(draw_img_t *img)
     img->img_h = head.h;
 }
 
-struct gui_rgb_data_head gui_image_get_header(draw_img_t *img)
+gui_rgb_data_head_t gui_image_get_header(draw_img_t *img)
 {
     struct gui_rgb_data_head head = {0};
 
@@ -96,10 +96,10 @@ uint32_t gui_image_get_pixel(draw_img_t *img)
     }
     return 0;
 }
-bool gui_image_new_area(draw_img_t *img)
+bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
 {
     float point[4][2];
-    struct gui_point pox = {0.0f};
+    gui_point_t pox = {0.0f};
     float x_min = 0.0f;
     float x_max = 0.0f;
     float y_min = 0.0f;
@@ -267,10 +267,10 @@ bool gui_image_new_area(draw_img_t *img)
         }
     }
 
-    img->target_x = (int16_t)x_min;
-    img->target_y = (int16_t)y_min;
-    img->target_w = ceil(x_max) - (int16_t)x_min + 1;
-    img->target_h = ceil(y_max) - (int16_t)y_min + 1;
+    img->img_target_x = (int16_t)x_min;
+    img->img_target_y = (int16_t)y_min;
+    img->img_target_w = ceil(x_max) - (int16_t)x_min + 1;
+    img->img_target_h = ceil(y_max) - (int16_t)y_min + 1;
     return true;
 }
 
