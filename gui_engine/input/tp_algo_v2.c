@@ -2,9 +2,9 @@
 /*
  * File      : tp_algo.c
  */
-
-#ifndef RTK_TP_ALGO_V2
 //#include <string.h>
+
+#ifdef RTK_TP_ALGO_V2
 #include <gui_server.h>
 #include <guidef.h>
 #include <gui_api.h>
@@ -31,7 +31,6 @@ static struct gui_touch_port_data x_min_record = {0};
 static struct gui_touch_port_data y_min_record = {0};
 static struct gui_touch_port_data x_max_record = {0};
 static struct gui_touch_port_data y_max_record = {0};
-static struct gui_touch_port_data first_record = {0};
 
 typedef enum _TOUCH_DIR
 {
@@ -43,27 +42,24 @@ static TOUCH_DIR touch_direct = TOUCH_NONE;
 
 static touch_info_t tp;
 //static touch_info_t invalide_tp;
-static uint32_t up_cnt = 0;
-static uint32_t down_cnt = 0;
 static bool long_button_flag = false;
 
 
 static void tp_do_reset(void)
 {
-    down_cnt = 0;
+    //do noting
 }
 
 static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
 {
-    uint8_t tp_local_event = 0;
+    static bool is_first_read_down = true;
+    uint8_t tp_local_event = GUI_TOUCH_EVENT_NONE;
     tp.pressed = false;
     tp.released = false;
     if (raw_data->event == GUI_TOUCH_EVENT_DOWN)
     {
         tp_local_event = GUI_TOUCH_EVENT_DOWN;
-        up_cnt = 0;
-        down_cnt++;
-        if (down_cnt == 1)
+        if (is_first_read_down)
         {
             long_button_flag = false;
             tp.pressed = true;
@@ -73,36 +69,32 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
     }
     else
     {
-        up_cnt++;
-        if (down_cnt == 0)
+        if (is_first_read_down)
         {
             tp.type = TOUCH_INVALIDE;
         }
-#ifdef _WIN32
-        if ((up_cnt == 1) && (down_cnt > 0))
-#else
-        if ((up_cnt == 4) && (down_cnt > 0))
-#endif
+        else
         {
             tp_local_event = GUI_TOUCH_EVENT_UP;
-            down_cnt = 0;
+            is_first_read_down = true;
             tp.released = true;
             tp.pressing = false;
+
             TP_LOG("=====END UP====== tick = %d\n", raw_data->timestamp_ms);
         }
         return tp_local_event;
     }
 
-    if (down_cnt == 1)
+    if (is_first_read_down)
     {
-        start_tick = raw_data->timestamp_ms;
+        start_tick = raw_data->timestamp_ms_start;
         x_min_record = *raw_data;
         x_max_record = *raw_data;
         y_min_record = *raw_data;
         y_max_record = *raw_data;
-        first_record = *raw_data;
         tp.type = TOUCH_INVALIDE;
         touch_direct = TOUCH_NONE;
+        is_first_read_down = false;
     }
     else
     {
@@ -123,10 +115,10 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
             y_max_record = *raw_data;
         }
     }
-    tp.deltaX = raw_data->x_coordinate - first_record.x_coordinate;
-    tp.deltaY = raw_data->y_coordinate - first_record.y_coordinate;
-    tp.x = first_record.x_coordinate;
-    tp.y = first_record.y_coordinate;
+    tp.deltaX = raw_data->x_coordinate - raw_data->x_coordinate_start;
+    tp.deltaY = raw_data->y_coordinate - raw_data->y_coordinate_start;
+    tp.x = raw_data->x_coordinate_start;
+    tp.y = raw_data->y_coordinate_start;
     return tp_local_event;
 }
 
