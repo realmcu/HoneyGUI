@@ -113,6 +113,7 @@ void gui_app_shutdown(gui_app_t *app)
     }
     else
     {
+        app->screen.parent = 0;
         gui_tree_free(&app->screen);
         gui_free(app->screen.matrix);
         app->close_sync = true;

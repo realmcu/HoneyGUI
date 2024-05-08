@@ -46,11 +46,16 @@ static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
 static void status_bar(void *parent, gui_obj_t *ignore_gesture);
 static void status_bar_ani(gui_obj_t *ignore_gesture);
+static void app_win_cb(gui_win_t *win);
+extern gui_app_t *get_app_watch_ui(void);
 #define RETURN_ARRAY_SIZE 17
 extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
-    gui_page_t *page = gui_page_create(GUI_APP_ROOT_SCREEN, PAGE_NAME, 0, 0, 0, 0);
+    gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
+    gui_rect_create((void *)app_win, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0, 100));
+    gui_win_set_animate(app_win, 1000, 0, app_win_cb, app_win);
+    gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
     gui_page_center_alignment(page, SCREEN_H);
 
@@ -143,7 +148,7 @@ static void app_hr_ui_design(gui_app_t *app)
     }
     gui_rect_create((void *)page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
 
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
+    gui_win_t *win = gui_win_create(app_win, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_img_t *heart_ani = gui_img_create_from_mem(win, HEART_ANI_NAME, HEARTRATE04_BIN,
                                                    (SCREEN_W - HEART_ANI_W) / 2, 100, 0, 0);
     gui_win_set_animate(win, 1000, -1, heart_ani_cb, win);
@@ -183,6 +188,15 @@ static void app_hr_ui_design(gui_app_t *app)
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)page);
+}
+static void app_win_cb(gui_win_t *win)
+{
+    GUI_BASE(win)->x = (1.0f - win->animate->progress_percent) * SCREEN_W;
+    if (win->animate->progress_percent >= 1.0f)
+    {
+        gui_app_shutdown(get_app_watch_ui());
+    }
+
 }
 static void heart_ani_cb(gui_win_t *win)
 {
@@ -390,7 +404,11 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             {
                 scale = 1;
             }
-            gui_img_scale(time_txt->scale_img, scale, scale);
+            if (time_txt)
+            {
+                gui_img_scale(time_txt->scale_img, scale, scale);
+            }
+
         }
         if (tp->released)
         {
@@ -465,14 +483,19 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
         }
 
     }
-    if ((deltaY >= 100 && (press)) || (deltaY >= 0 && expand))
+    if (win)
     {
-        GET_BASE(win)->not_show = 0;
+        if ((deltaY >= 100 && (press)) || (deltaY >= 0 && expand))
+        {
+            GET_BASE(win)->not_show = 0;
+        }
+        else
+        {
+            GET_BASE(win)->not_show = 1;
+        }
     }
-    else
-    {
-        GET_BASE(win)->not_show = 1;
-    }
+
+
 
 }
 #include "gui_menu_cellular.h"

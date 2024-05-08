@@ -325,7 +325,9 @@ static void page_callback(gui_page_t *page)
 }
 static void heart_rate_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_HEART_RATE))
+    //GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_HEART_RATE))
+    GUI_APP_STARTUP(APP_HEART_RATE) // cppcheck-suppress unknownMacro
+    gui_app_layer_top();
 }
 static void menu_cb()
 {
