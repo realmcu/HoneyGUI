@@ -6,9 +6,7 @@
 #include <string.h>
 #include <gui_api.h>
 #include <stdarg.h>
-#ifndef ENABLE_RTK_GUI_OS_HEAP
 #include "tlsf.h"
-#endif
 
 static struct gui_indev *indev;
 static struct gui_os_api *os_api;
