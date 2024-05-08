@@ -2,6 +2,9 @@
 #include <string.h>
 #include <math.h>
 
+void (* gui_image_acc_prepare_cb)(struct draw_img *image) = NULL;
+void (* gui_image_acc_end_cb)(struct draw_img *image) = NULL;
+
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end)
 {
@@ -285,6 +288,10 @@ bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
             img->line[9] = (point[3][1] - point[2][1]) / (point[3][0] - point[2][0]);
             img->line[11] = point[3][1] - img->line[9] * point[3][0];
         }
+    }
+    if (gui_image_acc_prepare_cb != NULL)
+    {
+        gui_image_acc_prepare_cb(img);
     }
 
     img->img_target_x = (int16_t)x_min;

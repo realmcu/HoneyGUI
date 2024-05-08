@@ -5,10 +5,11 @@
 #include "acc_init.h"
 
 
-extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
-
-extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+extern void sw_acc_init(void);
 extern void hw_acc_init(void);
+extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+
 
 static struct acc_engine acc = {0};
 
@@ -23,6 +24,7 @@ void gui_acc_init(void)
     hw_acc_init();
     acc.blit = hw_acc_blit;
 #else
+    sw_acc_init();
     acc.blit = sw_acc_blit;
 #endif
 }

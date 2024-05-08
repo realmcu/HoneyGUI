@@ -62,10 +62,6 @@ typedef struct draw_img
     int16_t img_target_y;  //display start Y
     uint16_t img_target_w;
     uint16_t img_target_h;
-    // int16_t rect_x; //display start X
-    // int16_t rect_y;  //display start Y
-    // uint16_t rect_w;
-    // uint16_t rect_h;
     void *data;
     gui_matrix_t matrix; //seems can remve by howie
     gui_matrix_t inverse;
@@ -76,6 +72,7 @@ typedef struct draw_img
     uint32_t high_quality : 1;
     //uint32_t color_mix; //todo for QuDai
     float *line;
+    void *acc_user;
 } draw_img_t;
 
 void gui_image_load_scale(draw_img_t *img);
@@ -84,6 +81,9 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end);
 gui_rgb_data_head_t gui_image_get_header(draw_img_t *img);
 uint32_t gui_image_get_pixel(draw_img_t *img);
+
+extern void (* gui_image_acc_prepare_cb)(struct draw_img *image);
+extern void (* gui_image_acc_end_cb)(struct draw_img *image);
 
 #ifdef __cplusplus
 }
