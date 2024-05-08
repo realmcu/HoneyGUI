@@ -668,7 +668,7 @@ function startSpeed(params) {
 
     textbox.getElementById('txt_speed')
     textbox.setAnimate(textAnimateCallback, textAnimateConfig)
-    textbox.palyAnimate()
+    textbox.playAnimate()
     wifi.startSpeed()
 }
 function stopSpeed(params) {
@@ -729,5 +729,43 @@ function Wifi_sw(params) {
 
 }
 sh_wifi.OnSyncSW(Wifi_sw);
+
+
+//-------------------------------------------
+// cd demo
+
+
+var imgAnimateConfig = {
+    duration: 80,
+    iterations:-1,
+    from: 1,
+    to: 0
+}
+var degree = 0;
+function imgAnimateCallback(params) {
+    degree = degree + 1;
+
+    img.getElementById('img_cd')
+    img.setLocation(378, 274)
+    img.rotation(degree, 74, 74)
+}
+
+function playCD(params) {
+    img.getElementById('img_cd')
+    img.setAnimate(imgAnimateCallback, imgAnimateConfig)
+    
+    img.playAnimate()
+}
+
+function stopCD(params) {
+    img.getElementById('img_cd')
+    img.pauseAnimate()
+}
+sw.getElementById('sw_cd')
+sw.onOn(playCD)
+sw.onOff(stopCD)
+
+
+//-------------------------------------------
 
 console.log('end js')

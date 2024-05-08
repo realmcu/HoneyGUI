@@ -511,7 +511,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     if (file)
                     {
                         void *imgbuf = gui_get_file_address(file);
-                        parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
+                        parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
                         gui_img_set_mode((gui_img_t *)parent, IMG_SRC_OVER_MODE);
                         if (scalex != 1 || scaley != 1)
                         {
@@ -1839,8 +1839,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
-                        gui_button_press((void *)parent, sport_button_press, parent);
-                        gui_button_release((void *)parent, sport_button_release, parent);
+                        gui_button_press((void *)parent, (gui_event_cb_t)sport_button_press, parent);
+                        gui_button_release((void *)parent, (gui_event_cb_t)sport_button_release, parent);
                     }
 
                     {

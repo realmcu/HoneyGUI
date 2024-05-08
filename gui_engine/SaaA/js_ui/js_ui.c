@@ -1,7 +1,9 @@
 
 #include "js_user.h"
+#ifdef __WIN32
 #include <semaphore.h>
 sem_t sem_timer;
+#endif
 
 static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code)
 {
@@ -238,6 +240,27 @@ DECLARE_HANDLER(notShow)
     return jerry_create_undefined();
 }
 
+DECLARE_HANDLER(setLocation)
+{
+    if (args_cnt != 2 || !jerry_value_is_number(args[0]) || !jerry_value_is_number(args[1]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_obj_t *obj = NULL;
+    float x = 0.f;
+    float y = 0.f;
+
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    x = jerry_get_number_value(args[0]);
+    y = jerry_get_number_value(args[1]);
+
+    if (obj)
+    {
+        obj->x = x;
+        obj->y = y;
+    }
+    return jerry_create_undefined();
+}
 
 DECLARE_HANDLER(rotation)
 {
@@ -247,11 +270,18 @@ DECLARE_HANDLER(rotation)
         return jerry_create_undefined();
     }
     gui_img_t *img = NULL;
-    jerry_get_object_native_pointer(this_value, (void *)img, NULL);
-    if (!img)
+    float degree = 0.f;
+    float c_x = 0.f;
+    float c_y = 0.f;
+
+    jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
+    degree = jerry_get_number_value(args[0]);
+    c_x = jerry_get_number_value(args[1]);
+    c_y = jerry_get_number_value(args[2]);
+
+    if (img)
     {
-        gui_img_rotation((void *)img, jerry_get_number_value(args[0]),
-                         jerry_get_number_value(args[1]), jerry_get_number_value(args[2]));
+        gui_img_rotation((void *)img, degree, c_x, c_y);
     }
     return jerry_create_undefined();
 }
@@ -263,7 +293,7 @@ DECLARE_HANDLER(scale)
     }
     gui_img_t *img = NULL;
     jerry_get_object_native_pointer(this_value, (void *)img, NULL);
-    if (!img)
+    if (img)
     {
         gui_img_scale((void *)img, jerry_get_number_value(args[0]),
                       jerry_get_number_value(args[1]));
@@ -278,7 +308,7 @@ DECLARE_HANDLER(setMode)
     }
     gui_img_t *img = NULL;
     jerry_get_object_native_pointer(this_value, (void *)img, NULL);
-    if (!img)
+    if (img)
     {
         gui_img_set_mode(img, jerry_get_number_value(args[0]));
     }
@@ -332,7 +362,7 @@ DECLARE_HANDLER(onClick)
         }
 
         cb_arg->func = args[0];
-        gui_button_click((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_click((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -360,7 +390,7 @@ DECLARE_HANDLER(onPress)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_press((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_press((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -388,7 +418,7 @@ DECLARE_HANDLER(onHold)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_long((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_long((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -677,7 +707,7 @@ DECLARE_HANDLER(onRelease)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_release((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_release((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -766,7 +796,6 @@ DECLARE_HANDLER(OnChange)
         }
         cb_arg->func = args[0];
         gui_tabview_tab_change((void *)obj, js_cb_with_args, (void *)(cb_arg));
-        // GUI_TYPE(gui_switch_t, obj)->onOn((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
     return jerry_create_undefined();
 }
@@ -995,6 +1024,58 @@ DECLARE_HANDLER(pause_animate_text)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(pause_animate_img)
+{
+    gui_img_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    obj->animate->animate = false;
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(play_animate_img)
+{
+    gui_img_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    obj->animate->animate = true;
+    obj->animate->current_frame = 0;
+    obj->animate->progress_percent = 0;
+    obj->animate->current_repeat_count = 0;
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(setAnimate_img)
+{
+    if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_object(args[1]))
+    {
+        gui_img_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        //gui_log("cb_arg:%x\n", cb_arg);
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+        }
+        cb_arg->func = args[0];
+
+        float from = jerry_get_number_value(js_get_property(args[1], "from"));
+        float to = jerry_get_number_value(js_get_property(args[1], "to"));
+        int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
+        int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
+        gui_img_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
+                            (void *)(cb_arg));
+        obj->animate->animate = false;
+    }
+
+    return jerry_create_undefined();
+}
+
 DECLARE_HANDLER(win_getAttribute)
 {
     //gui_log("enter onPress\n");
@@ -1402,10 +1483,15 @@ void js_gui_init()
     jerry_value_t img = jerry_create_object();
     js_set_property(global_obj, "img", img);
     REGISTER_METHOD(img, getElementById);
+    REGISTER_METHOD(img, setLocation);
     REGISTER_METHOD(img, rotation);
     REGISTER_METHOD(img, scale);
     REGISTER_METHOD(img, setMode);
     REGISTER_METHOD(img, setAttribute);
+    REGISTER_METHOD_NAME(img,  "setAnimate", setAnimate_img);
+    REGISTER_METHOD_NAME(img,  "playAnimate", play_animate_img);
+    REGISTER_METHOD_NAME(img,  "pauseAnimate", pause_animate_img);
+
 
     jerry_value_t tab = jerry_create_object();
     js_set_property(global_obj, "tab", tab);
@@ -1438,14 +1524,14 @@ void js_gui_init()
     REGISTER_METHOD_NAME(seekbar, "setAnimate", setAnimate_seekbar);
     REGISTER_METHOD_NAME(seekbar, "setAttribute", seekbar_setAttribute);
     REGISTER_METHOD_NAME(seekbar, "getAttribute", seekbar_getAttribute);
-    REGISTER_METHOD_NAME(seekbar, "palyAnimate", play_animate_seekbar);
+    REGISTER_METHOD_NAME(seekbar, "playAnimate", play_animate_seekbar);
     REGISTER_METHOD_NAME(seekbar, "animateProgress", seekbar_getAnimateProgress);
     jerry_value_t document = jerry_create_object();
     js_set_property(global_obj, "textbox", document);
     REGISTER_METHOD(document, write);
     REGISTER_METHOD(document, getElementById);
     REGISTER_METHOD(document, setPosition);
-    REGISTER_METHOD_NAME(document, "palyAnimate", play_animate_text);
+    REGISTER_METHOD_NAME(document, "playAnimate", play_animate_text);
     REGISTER_METHOD_NAME(document, "setAnimate", setAnimate_text);
 
     REGISTER_METHOD_NAME(document, "pauseAnimate", pause_animate_text);

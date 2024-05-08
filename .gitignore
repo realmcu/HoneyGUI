@@ -72,3 +72,5 @@ doc/_build
 # editor config
 .vscode/
 win32_sim/gui.bin
+gui_engine/example/screen_480_480/Visual Disigner Prj/480x480/Simulate/
+gui_engine/example/screen_480_480/Visual Disigner Prj/480x480/Export/
