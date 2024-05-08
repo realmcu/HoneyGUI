@@ -41,7 +41,7 @@ GUI_APP_DEFINE_NAME(APP_MAP)
 #define HEART_ANI_NAME "_HEART_ANI"
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
-static void heart_ani_cb(gui_img_t *img);
+static void heart_ani_cb(gui_win_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
 static void status_bar(void *parent, gui_obj_t *ignore_gesture);
@@ -142,9 +142,11 @@ static void app_hr_ui_design(gui_app_t *app)
 
     }
     gui_rect_create((void *)page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
-    gui_img_t *heart_ani = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, HEART_ANI_NAME, HEARTRATE04_BIN,
+
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
+    gui_img_t *heart_ani = gui_img_create_from_mem(win, HEART_ANI_NAME, HEARTRATE04_BIN,
                                                    (SCREEN_W - HEART_ANI_W) / 2, 100, 0, 0);
-    gui_img_set_animate(heart_ani, 1000, -1, heart_ani_cb, heart_ani);
+    gui_win_set_animate(win, 1000, -1, heart_ani_cb, win);
     gui_img_set_mode(heart_ani, IMG_BYPASS_MODE);
     {
         char *text = "Current";
@@ -182,10 +184,10 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)page);
 }
-static void heart_ani_cb(gui_img_t *img)
+static void heart_ani_cb(gui_win_t *win)
 {
     static bool odd;
-    if (img->animate->progress_percent == 0)
+    if (win->animate->progress_percent == 0)
     {
         odd = !odd;
     }
@@ -204,16 +206,20 @@ static void heart_ani_cb(gui_img_t *img)
         HEARTRATE44_BIN,
         HEARTRATE48_BIN,
     };
+    gui_img_t *img = 0;
+    gui_tree_get_widget_by_name(win, HEART_ANI_NAME, (void *)&img);
     if (odd)
     {
-        gui_img_set_attribute(img, 0, heart_ani_array[(int)((1.0f - img->animate->progress_percent) *
-                                                                        (float)(sizeof(heart_ani_array) / sizeof(uint32_t *) - 2)) + 1], GET_BASE(img)->x,
+        gui_img_set_attribute(img, HEART_ANI_NAME,
+                              heart_ani_array[(int)((1.0f - win->animate->progress_percent) *
+                                                                (float)(sizeof(heart_ani_array) / sizeof(uint32_t *) - 2)) + 1], GET_BASE(img)->x,
                               GET_BASE(img)->y);
     }
     else
     {
-        gui_img_set_attribute(img, 0, heart_ani_array[(int)(img->animate->progress_percent * (float)(sizeof(
-                                                                                                     heart_ani_array) / sizeof(uint32_t *) - 1))], GET_BASE(img)->x, GET_BASE(img)->y);
+        gui_img_set_attribute(img, HEART_ANI_NAME,
+                              heart_ani_array[(int)(win->animate->progress_percent * (float)(sizeof(
+                                                                                             heart_ani_array) / sizeof(uint32_t *) - 1))], GET_BASE(img)->x, GET_BASE(img)->y);
     }
 }
 static void page_cb(gui_page_t *page)
