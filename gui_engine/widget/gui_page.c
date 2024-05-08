@@ -403,6 +403,11 @@ static void gui_page_update_alien(gui_obj_t *obj)
 
 void gui_page_input_prepare(gui_obj_t *obj)
 {
+    if (obj->gesture)
+    {
+        return;
+    }
+
     touch_info_t *tp = tp_get_info();
     gui_page_t *this = (gui_page_t *)obj;
 

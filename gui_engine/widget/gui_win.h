@@ -49,6 +49,7 @@ typedef struct gui_win
     bool enter_auto_scale;
     bool event5_flag;
     uint8_t checksum;
+    bool scope;
 } gui_win_t;
 
 /*============================================================================*

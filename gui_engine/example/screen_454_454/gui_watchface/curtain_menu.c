@@ -13,10 +13,11 @@
 #ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_task.h"
 #endif
-
+#include "gui_page.h"
+#include "gui_rect.h"
 #define MODE_SOURCE true
 #define MODE_SINK false
-
+#define PAGE_NAME "_page_name"
 extern gui_tabview_t *tabview_main;
 bool cfg_mode = MODE_SOURCE;
 gui_curtain_t *curtain_down_menu = NULL;
@@ -28,7 +29,7 @@ gui_switch_t *switch_menu_setting = NULL;
 gui_win_t *win_menu_buds  = NULL;
 gui_win_t *win_menu_phone = NULL;
 gui_win_t *win_menu_setting = NULL;
-
+static void page_cb(gui_win_t *win);
 
 static void switch_menu_bluetooth_released_cb(void *obj, gui_event_t event)
 {
@@ -236,4 +237,75 @@ void design_curtain_menu(void *parent)
         }
     }
 #endif
+    gui_curtain_t *c_up  = gui_curtain_create(ct, "curtain_up_menu", 0, 0, 454, 454, CURTAIN_UP, 1.0f);
+    gui_rect_create(c_up, 0, 0, 454, 454, APP_COLOR_WHITE);
+    gui_win_t *win = gui_win_create(c_up, 0, 0, 0, 454, 454);
+    win->scope = 1;
+
+    gui_page_t *page = gui_page_create(win, PAGE_NAME, 0, 0, 454, 454);
+    gui_win_set_animate(win, 1000, -1, page_cb, win);
+    gui_img_scope_t *img1 = gui_img_scope_create(page, 0, A1_BIN, 0, 0);
+    gui_img_scope_create(page, 0, A2_BIN, 0, 130 * 1);
+    gui_img_scope_create(page, 0, A3_BIN, 0, 130 * 2);
+    gui_img_scope_create(page, 0, A4_BIN, 0, 130 * 3);
+    gui_img_scope_create(page, 0, A5_BIN, 0, 130 * 4);
+    gui_img_scope_create(page, 0, A6_BIN, 0, 130 * 5);
+
+}
+static void page_cb(gui_win_t *win)
+{
+    touch_info_t *tp = tp_get_info();
+    static bool hold;
+    if (tp->pressed)
+    {
+        hold = 1;
+    }
+    if (tp->released)
+    {
+        hold = 0;
+    }
+    if (hold)
+    {
+        if (tp->y > 454 - 100)
+        {
+            gui_page_t *page = 0;
+            gui_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
+            GUI_BASE(page)->gesture = 1;
+            gui_curtainview_t *ct = 0;
+            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtainview_menu", (void *)&ct);
+            gui_curtain_t *c_up = 0;
+            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtain_up_menu", (void *)&c_up);
+            if (ct)
+            {
+                GUI_BASE(ct)->gesture = 0;
+            }
+            if (c_up)
+            {
+                GUI_BASE(c_up)->gesture = 0;
+            }
+            gui_log(">\n");
+        }
+        else
+        {
+            gui_page_t *page = 0;
+            gui_tree_get_widget_by_name(&(gui_current_app()->screen), PAGE_NAME, (void *)&page);
+            GUI_BASE(page)->gesture = 0;
+            gui_curtainview_t *ct = 0;
+            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtainview_menu", (void *)&ct);
+            gui_curtain_t *c_up = 0;
+            gui_tree_get_widget_by_name(&(gui_current_app()->screen), "curtain_up_menu", (void *)&c_up);
+            if (ct)
+            {
+                GUI_BASE(ct)->gesture = 1;
+            }
+            if (c_up)
+            {
+                GUI_BASE(c_up)->gesture = 1;
+            }
+            gui_log("<\n");
+        }
+
+
+    }
+
 }

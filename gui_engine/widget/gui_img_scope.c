@@ -25,7 +25,7 @@
 #include "kb_algo.h"
 #include "acc_init.h"
 #include "acc_engine.h"
-
+#include "gui_win.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -172,6 +172,56 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
+    gui_obj_t *o = obj;
+    gui_win_t *win_scope = 0;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+        if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+        {
+            win_scope = (void *)o;
+            break;
+        }
+    }
+    if (win_scope)
+    {
+        int ax = o->matrix->m[0][2];
+        int ay = o->matrix->m[1][2];
+        int w_w = o->w;
+        int w_h = o->h;
+        int img_x = obj->matrix->m[0][2];
+        int img_y = obj->matrix->m[1][2];
+        int img_w = this->draw_img->img_w;
+        int img_h = this->draw_img->img_h;
+        //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
+        GUI_TYPE(gui_img_scope_t, obj)->scope_x1 = 0;
+        GUI_TYPE(gui_img_scope_t, obj)->scope_x2 = img_w;
+        GUI_TYPE(gui_img_scope_t, obj)->scope_y1 = 0;
+        GUI_TYPE(gui_img_scope_t, obj)->scope_y2 = img_h;
+        obj->not_show = 0;
+        if (ax > img_x)
+        {
+            GUI_TYPE(gui_img_scope_t, obj)->scope_x1 = ax - img_x;
+        }
+        if (ay > img_y)
+        {
+            GUI_TYPE(gui_img_scope_t, obj)->scope_y1 = ay - img_y;
+        }
+        if (ax + w_w < img_x + img_w)
+        {
+            GUI_TYPE(gui_img_scope_t, obj)->scope_x2 = -(img_x - (ax + w_w));
+        }
+        if (ay + w_h < img_y + img_h)
+        {
+            GUI_TYPE(gui_img_scope_t, obj)->scope_y2 = -(img_y - (ay + w_h));
+        }
+        if (ay + w_h < img_y)
+        {
+            obj->not_show = 1;
+        }
+
+    }
+
     gui_rect_t rect =
     {
         .x1 = GUI_TYPE(gui_img_scope_t, obj)->scope_x1,
@@ -179,6 +229,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
         .y1 = GUI_TYPE(gui_img_scope_t, obj)->scope_y1,
         .y2 = GUI_TYPE(gui_img_scope_t, obj)->scope_y2,
     };
+
     if ((rect.x2 > rect.x1) && (rect.y2 > rect.y1))
     {
         gui_image_new_area(this->draw_img, &rect);
