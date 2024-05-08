@@ -182,6 +182,10 @@ static void gui_win_prepare(gui_obj_t *obj)
             this->long_flag = false;
             this->press_flag = true;
         }
+        if (tp->pressing)
+        {
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSING);
+        }
     }
 
     if (this->release_flag)

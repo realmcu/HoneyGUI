@@ -15,7 +15,8 @@
 #include "tp_algo.h"
 #include <math.h>
 #include "gui_cube.h"
-#include "draw_font.h"
+#include "font_mem.h"
+#include "font_stb.h"
 #include "gui_scroll_text.h"
 #include "gui_page.h"
 #include "gui_components_init.h"

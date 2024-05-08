@@ -7,7 +7,7 @@
 #include <guidef.h>
 #include <gui_api.h>
 #include <draw_font.h>
-
+#include "gui_text.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
