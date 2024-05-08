@@ -31,8 +31,8 @@
 #endif
 
 #define DRV_PIXEL_BITS  32
-#define LCD_SECTION_HEIGHT 10
-// #define USE_DC_PFB
+#define LCD_SECTION_HEIGHT 20
+#define USE_DC_PFB
 #ifdef USE_DC_PFB
 #undef DRV_PIXEL_BITS
 #define DRV_PIXEL_BITS  16

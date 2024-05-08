@@ -263,22 +263,36 @@ void *gui_malloc(uint32_t n)
 void *gui_realloc(void *ptr_old, uint32_t n)
 {
     void *ptr = NULL;
-    if ((n > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
-    {
-        ptr = gui_lower_malloc(n);
-        return ptr;
-    }
 #ifdef ENABLE_RTK_GUI_OS_HEAP
     GUI_ASSERT(os_api->f_realloc != NULL);
     ptr = os_api->f_realloc(ptr_old, n);
-#else
-    ptr = tlsf_realloc(tlsf, ptr_old, n);
-#endif
     if (ptr == NULL)
     {
-        ptr = gui_lower_realloc(ptr_old, n);
+        return NULL;
     }
     return ptr;
+#else
+    if (
+        ((uint32_t)(uintptr_t)ptr_old >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
+        ((uint32_t)(uintptr_t)ptr_old <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
+         (uint32_t)os_api->lower_mem_size)
+    )
+    {
+        ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
+        return ptr;
+    }
+    else
+    {
+        ptr = tlsf_realloc(tlsf, ptr_old, n);
+        if (ptr == NULL)
+        {
+            ptr = tlsf_malloc(lower_tlsf, n);
+            memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
+            tlsf_free(tlsf, ptr_old);
+        }
+        return ptr;
+    }
+#endif
 }
 
 void gui_free(void *rmem)
