@@ -642,11 +642,11 @@ static void stop_watch_win_ani_cb()
 #include "gui_map.h"
 GUI_APP_ENTRY(APP_MAP)
 {
-    gui_map_create(GUI_APP_ROOT_SCREEN);
+    gui_obj_t *map = gui_map_create(GUI_APP_ROOT_SCREEN);
     {
         char *text = "MAP";
         int font_size = 16;
-        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, text, 0, 52, gui_get_screen_width(),
+        gui_text_t *t = gui_text_create(map, text, 0, 52, gui_get_screen_width(),
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
