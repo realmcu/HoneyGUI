@@ -640,7 +640,7 @@ gui_map_t *gui_map_create(void *parent)
         }
         gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb, 0);
     }
-    return 0;
+    return this;
 }
 
 
