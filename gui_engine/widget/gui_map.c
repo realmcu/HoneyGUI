@@ -374,7 +374,6 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->x = -256 ;
             this->start_x = -256 - tp->deltaX;
-            GUI_BASE(this)->matrix->m[0][2] = GUI_BASE(this)->x;
         }
         if (GUI_BASE(this)->x <= -(GUI_BASE(this)->w - SCREEN_W)  && (tp->deltaX < 0 || deltaX_left_flag) &&
             !deltaX_right_flag)
@@ -407,7 +406,6 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->x = 0;
             this->start_x = - tp->deltaX;
-            GUI_BASE(this)->matrix->m[0][2] = GUI_BASE(this)->x;
         }
 
         if (GUI_BASE(this)->y >= 0 && (tp->deltaY > 0))
@@ -439,7 +437,6 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->y = -256 ;
             this->start_y = -256 - tp->deltaY;
-            GUI_BASE(this)->matrix->m[1][2] = GUI_BASE(this)->y;
         }
 
         if (GUI_BASE(this)->y <= -(256 * 3 - SCREEN_H) && (tp->deltaY < 0))
@@ -471,7 +468,6 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->y = -(256 * 3 - SCREEN_H - 256) ;
             this->start_y = -(256 * 3 - SCREEN_H - 256) - tp->deltaY;
-            GUI_BASE(this)->matrix->m[1][2] = GUI_BASE(this)->y;
         }
 
 
@@ -621,7 +617,7 @@ gui_map_t *gui_map_create(void *parent)
         }
         gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb, 0);
     }
-    return (void *)win;
+    return 0;
 }
 
 

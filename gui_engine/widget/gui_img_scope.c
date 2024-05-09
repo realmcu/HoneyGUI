@@ -273,10 +273,9 @@ static void gui_img_scope_img_end(gui_obj_t *obj)
     gui_img_t *img = (gui_img_t *)obj;
     if (img->draw_img != NULL)
     {
-        if (img->draw_img->line != NULL)
+        if (gui_image_acc_end_cb != NULL)
         {
-            gui_free(img->draw_img->line);
-            img->draw_img->line = NULL;
+            gui_image_acc_end_cb(img->draw_img);
         }
         gui_free(img->draw_img);
         img->draw_img = NULL;

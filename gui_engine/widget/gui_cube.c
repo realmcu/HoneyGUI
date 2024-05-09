@@ -410,10 +410,9 @@ static void gui_cube_end(gui_obj_t *obj)
 
     for (int i = 0; i < 6; i++)
     {
-        if (cube_img[i]->line != NULL)
+        if (gui_image_acc_end_cb != NULL)
         {
-            gui_free(cube_img[i]->line);
-            cube_img[i]->line = NULL;
+            gui_image_acc_end_cb(cube_img[i]);
         }
     }
 }

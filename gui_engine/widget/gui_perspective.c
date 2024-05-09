@@ -234,10 +234,9 @@ static void gui_perspective_end(gui_obj_t *obj)
 
     for (uint8_t i = 0; i < 6; i++)
     {
-        if (perspective->img[i].line != NULL)
+        if (gui_image_acc_end_cb != NULL)
         {
-            gui_free(perspective->img[i].line);
-            perspective->img[i].line = NULL;
+            gui_image_acc_end_cb(&perspective->img[i]);
         }
     }
 }

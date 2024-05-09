@@ -307,16 +307,10 @@ static void gui_img_end(gui_obj_t *obj)
 
     if (this->draw_img != NULL)
     {
-        if (this->draw_img->line != NULL)
-        {
-            gui_free(this->draw_img->line);
-            this->draw_img->line = NULL;
-        }
         if (gui_image_acc_end_cb != NULL)
         {
             gui_image_acc_end_cb(this->draw_img);
         }
-
         gui_free(this->draw_img);
         this->draw_img = NULL;
     }

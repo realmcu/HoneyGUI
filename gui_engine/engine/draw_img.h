@@ -71,7 +71,6 @@ typedef struct draw_img
     uint32_t src_mode : 3;
     uint32_t high_quality : 1;
     //uint32_t color_mix; //todo for QuDai
-    float *line;
     void *acc_user;
 } draw_img_t;
 
@@ -82,7 +81,7 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
 gui_rgb_data_head_t gui_image_get_header(draw_img_t *img);
 uint32_t gui_image_get_pixel(draw_img_t *img);
 
-extern void (* gui_image_acc_prepare_cb)(struct draw_img *image);
+extern void (* gui_image_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect);
 extern void (* gui_image_acc_end_cb)(struct draw_img *image);
 
 #ifdef __cplusplus

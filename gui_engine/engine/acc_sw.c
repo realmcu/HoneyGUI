@@ -146,7 +146,7 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
  * @param rect scope
  */
 
-void sw_acc_prepare_cb(draw_img_t *image)
+void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
 {
     // GUI_LINE(1);
     return;
@@ -173,7 +173,7 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 }
 void sw_acc_init(void)
 {
-    extern void (* gui_image_acc_prepare_cb)(struct draw_img * image);
+    extern void (* gui_image_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
     extern void (* gui_image_acc_end_cb)(struct draw_img * image);
     gui_image_acc_prepare_cb = sw_acc_prepare_cb;
     gui_image_acc_end_cb = sw_acc_end_cb;

@@ -182,9 +182,10 @@ void acc_get_intersect_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t 
     float top = dst->y * 1.0f;
     float bottom = (dst->y + dst->h - 1) * 1.0f;
     float x_min = dc->fb_width, x_max = -1;
+    float *lines = (float *)image->acc_user;
     for (int i = 0; i < 4; i++)
     {
-        float x = get_x(&image->line[i * 3], top);
+        float x = get_x(&lines[i * 3], top);
         if (x < x_min)
         {
             x_min = x;
@@ -196,7 +197,7 @@ void acc_get_intersect_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t 
     }
     for (int i = 0; i < 4; i++)
     {
-        float x = get_x(&image->line[i * 3], bottom);
+        float x = get_x(&lines[i * 3], bottom);
         if (x < x_min)
         {
             x_min = x;
@@ -503,7 +504,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         block_num = 1;
     }
 
-    if (shape_transform && image->line != NULL)
+    if (shape_transform && image->acc_user != NULL)
     {
         ppe_rect_t section_rect = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1, .w = dc->fb_width, .h = dc->fb_height};
         if (section_rect.x < 0)
@@ -807,9 +808,160 @@ bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
     }
 }
 
+void hw_acc_prepare_cb(draw_img_t *img, gui_rect_t *rect)
+{
+    if (img->matrix.m[2][2] != 1 || img->matrix.m[0][1] != 0 || \
+        img->matrix.m[1][0] != 0 || img->matrix.m[2][0] != 0 || \
+        img->matrix.m[2][1] != 0)
+    {
+        gui_point_t pox = {0.0f};
+        float point[4][2];
+        float *line = gui_malloc(12 * sizeof(float));
+        float x1 = 0;
+        float y1 = 0;
+        float x2 = 0;
+        float y2 = 0;
+
+        if (rect == NULL)
+        {
+            x1 = 0;
+            y1 = 0;
+            x2 = img->img_w - 1;
+            y2 = img->img_h - 1;
+        }
+        else
+        {
+            x1 = _UI_MAX(0, rect->x1);
+            y1 = _UI_MAX(0, rect->y1);
+            x2 = _UI_MIN(img->img_w - 1, rect->x2);
+            y2 = _UI_MIN(img->img_h - 1, rect->y2);
+        }
+
+        pox.p[0] = x1;
+        pox.p[1] = y1;
+        pox.p[2] = 1.0f;
+        matrix_multiply_point(&img->matrix, &pox);
+        point[0][0] = pox.p[0];
+        point[0][1] = pox.p[1];
+
+        pox.p[0] = x2;
+        pox.p[1] = y1;
+        pox.p[2] = 1.0f;
+        matrix_multiply_point(&img->matrix, &pox);
+        point[1][0] = pox.p[0];
+        point[1][1] = pox.p[1];
+
+        pox.p[0] = x2;
+        pox.p[1] = y2;
+        pox.p[2] = 1.0f;
+        matrix_multiply_point(&img->matrix, &pox);
+        point[2][0] = pox.p[0];
+        point[2][1] = pox.p[1];
+
+        pox.p[0] = x1;
+        pox.p[1] = y2;
+        pox.p[2] = 1.0f;
+        matrix_multiply_point(&img->matrix, &pox);
+
+        point[3][0] = pox.p[0];
+        point[3][1] = pox.p[1];
+
+        if (point[0][0] == point[1][0])
+        {
+            line[0] = 1;
+            line[1] = 0;
+            line[2] = -point[0][0];
+        }
+        else if (point[0][1] == point[1][1])
+        {
+            line[0] = 0;
+            line[1] = 1;
+            line[2] = -point[0][1];
+        }
+        else
+        {
+            line[1] = -1;
+            line[0] = (point[1][1] - point[0][1]) / (point[1][0] - point[0][0]);
+            line[2] = point[1][1] - line[0] * point[1][0];
+        }
+
+        if (point[0][0] == point[3][0])
+        {
+            line[3] = 1;
+            line[4] = 0;
+            line[5] = -point[0][0];
+        }
+        else if (point[0][1] == point[3][1])
+        {
+            line[3] = 0;
+            line[4] = 1;
+            line[5] = -point[0][1];
+        }
+        else
+        {
+            line[4] = -1;
+            line[3] = (point[3][1] - point[0][1]) / (point[3][0] - point[0][0]);
+            line[5] = point[3][1] - line[3] * point[3][0];
+        }
+
+        if (point[2][0] == point[1][0])
+        {
+            line[6] = 1;
+            line[7] = 0;
+            line[8] = -point[2][0];
+        }
+        else if (point[2][1] == point[1][1])
+        {
+            line[6] = 0;
+            line[7] = 1;
+            line[8] = -point[2][1];
+        }
+        else
+        {
+            line[7] = -1;
+            line[6] = (point[1][1] - point[2][1]) / (point[1][0] - point[2][0]);
+            line[8] = point[1][1] - line[6] * point[1][0];
+        }
+
+        if (point[2][0] == point[3][0])
+        {
+            line[9] = 1;
+            line[10] = 0;
+            line[11] = -point[2][0];
+        }
+        else if (point[2][1] == point[3][1])
+        {
+            line[9] = 0;
+            line[10] = 1;
+            line[11] = -point[2][1];
+        }
+        else
+        {
+            line[10] = -1;
+            line[9] = (point[3][1] - point[2][1]) / (point[3][0] - point[2][0]);
+            line[11] = point[3][1] - line[9] * point[3][0];
+        }
+        img->acc_user = line;
+    }
+}
+
+void hw_acc_end_cb(draw_img_t *image)
+{
+    if (image->acc_user != NULL)
+    {
+        gui_free(image->acc_user);
+        image->acc_user = NULL;
+    }
+    return;
+}
+
 void hw_acc_init(void)
 {
     PPEV2_CLK_ENABLE(ENABLE);
     uint8_t dma_channel_1, dma_channel_2;
     hal_dma_channel_init(&dma_channel_1, &dma_channel_2);
+    extern void (* gui_image_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
+    extern void (* gui_image_acc_end_cb)(struct draw_img * image);
+    gui_image_acc_prepare_cb = hw_acc_prepare_cb;
+    gui_image_acc_end_cb = hw_acc_end_cb;
 }
