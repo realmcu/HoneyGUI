@@ -3,7 +3,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_canvas_rect.h
+  * @file gui_canvas_round_rect.h
   * @brief image canvas rect widget header file
   * @details image widget is used to show image on the screen
   * @author howie_wang@realsil.com.cn
@@ -19,8 +19,8 @@
 /*============================================================================*
  *               Define to prevent recursive inclusion
  *============================================================================*/
-#ifndef __GUI_CANVAS_RECT_H__
-#define __GUI_CANVAS_RECT_H__
+#ifndef __GUI_CANVAS_ROUND_RECT_H__
+#define __GUI_CANVAS_ROUND_RECT_H__
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,12 +45,21 @@ extern "C" {
   * @brief
   * @{
   */
-typedef struct gui_canvas_rect
+typedef struct gui_canvas_round_rect
 {
     gui_obj_t base;
-    draw_img_t *draw_img;
+    draw_img_t *circle_00;
+    draw_img_t *circle_01;
+    draw_img_t *circle_10;
+    draw_img_t *circle_11;
+    uint8_t *circle_data;
+    draw_img_t *rect_0;
+    draw_img_t *rect_1;
+    draw_img_t *rect_2;
+    uint8_t *rect_data;
+    int  r;
     gui_color_t color;
-} gui_canvas_rect_t;
+} gui_canvas_round_rect_t;
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -111,13 +120,14 @@ typedef struct gui_canvas_rect
  * @param color
  * @return gui_canvas_rect_t*
  */
-gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
-                                          const char *name,
-                                          int          x,
-                                          int          y,
-                                          int          w,
-                                          int          h,
-                                          gui_color_t  color);
+gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
+                                                      const char *name,
+                                                      int          x,
+                                                      int          y,
+                                                      int          w,
+                                                      int          h,
+                                                      int          r,
+                                                      gui_color_t  color);
 
 
 /** End of WIDGET_Exported_GUI_Functions

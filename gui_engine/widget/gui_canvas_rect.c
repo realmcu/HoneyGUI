@@ -135,13 +135,7 @@ static void gui_canvas_rect_draw(gui_canvas_rect_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 
-    gui_rect_t rect = {0};
-    rect.x1 = this->draw_img->img_target_x;
-    rect.y1 = this->draw_img->img_target_y;
-    rect.x2 = rect.x1 + this->draw_img->img_target_w - 1;
-    rect.y2 = rect.y1 + this->draw_img->img_target_h - 1;
-
-    gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+    gui_acc_blit_to_dc(this->draw_img, dc, NULL);
 }
 
 static void gui_canvas_rect_end(gui_canvas_rect_t *this)
@@ -218,7 +212,6 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
                                           int          y,
                                           int          w,
                                           int          h,
-                                          int          r,
                                           gui_color_t  color)
 {
     GUI_ASSERT(parent != NULL);
@@ -238,7 +231,6 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
                                &(GET_BASE(canvas_rect)->brother_list));
     }
     GET_BASE(canvas_rect)->create_done = true;
-    canvas_rect->r = r;
     canvas_rect->color = color;
     return canvas_rect;
 }
