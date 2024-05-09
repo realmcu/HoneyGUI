@@ -115,9 +115,11 @@ static void canvas_cb_black(gui_canvas_t *canvas)
 static void app_dialing_ui_design(gui_app_t *app)
 {
 
-    // gui_img_scope_t *img = gui_img_scope_create(&(app->screen),  "img_1_test", (void *)_actiger_blue, 0, 0);
+    // gui_img_scope_t *img = gui_img_scope_create(&(app->screen),  "img_1_test", (void *)_actiger_blue, 0,
+    //                                             0);
     // gui_img_scope_set_range(img, 50, 50, 200, 200);
-    // gui_img_scale((gui_img_t *)img, 1.3, 1.3);
+    // //gui_img_scale((gui_img_t *)img, 1.3, 1.3);
+    // gui_img_rotation((gui_img_t *)img, 20, 0, 0);
 
     // return;
 

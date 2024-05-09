@@ -221,23 +221,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
         }
 
     }
-
-    gui_rect_t rect =
-    {
-        .x1 = GUI_TYPE(gui_img_scope_t, obj)->scope_x1,
-        .x2 = GUI_TYPE(gui_img_scope_t, obj)->scope_x2,
-        .y1 = GUI_TYPE(gui_img_scope_t, obj)->scope_y1,
-        .y2 = GUI_TYPE(gui_img_scope_t, obj)->scope_y2,
-    };
-
-    if ((rect.x2 > rect.x1) && (rect.y2 > rect.y1))
-    {
-        gui_image_new_area(this->draw_img, &rect);
-    }
-    else
-    {
-        gui_image_new_area(this->draw_img, NULL);
-    }
+    gui_image_new_area(this->draw_img, NULL);
 
 
 
@@ -268,7 +252,14 @@ static void gui_img_scope_draw_cb(gui_obj_t *obj)
 
     if (gui_get_acc() != NULL)
     {
-        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+        gui_rect_t rect =
+        {
+            .x1 = GUI_TYPE(gui_img_scope_t, obj)->scope_x1,
+            .x2 = GUI_TYPE(gui_img_scope_t, obj)->scope_x2,
+            .y1 = GUI_TYPE(gui_img_scope_t, obj)->scope_y1,
+            .y2 = GUI_TYPE(gui_img_scope_t, obj)->scope_y2,
+        };
+        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
     }
     else
     {
@@ -377,6 +368,10 @@ gui_img_scope_t *gui_img_scope_create(void    *parent,
 
     memset(img, 0x00, sizeof(gui_img_scope_t));
     gui_img_scope_ctor((void *)img, (gui_obj_t *)parent, name, addr, x, y, 0, 0);
+    img->scope_x1 = 0;
+    img->scope_y1 = 0;
+    img->scope_x2 = gui_img_get_width(&img->base);
+    img->scope_y2 = gui_img_get_height(&img->base);
 
     gui_list_init(&(GET_BASE(img)->child_list));
     if ((GET_BASE(img)->parent) != NULL)

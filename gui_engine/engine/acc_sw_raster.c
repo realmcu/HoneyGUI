@@ -245,6 +245,14 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
             {
                 continue;
             }
+            if (rect != NULL)
+            {
+                if ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))
+                {
+                    continue;
+                }
+            }
+
             int image_off = y * source_w + x;
             int write_off = (i - dc->section.y1) * dc->fb_width + j;
 
@@ -327,6 +335,13 @@ void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *re
             if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
             {
                 continue;
+            }
+            if (rect != NULL)
+            {
+                if ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))
+                {
+                    continue;
+                }
             }
             int write_off = (i - dc->section.y1) * dc->fb_width + j;
 
