@@ -174,8 +174,8 @@ static float get_x(float *line, float y)
     return x;
 }
 
-void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *dst,
-                           struct gui_dispdev *dc)
+void acc_get_intersect_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *dst,
+                            struct gui_dispdev *dc)
 {
     memcpy(new_rect, dst, sizeof(ppe_rect_t));
     float left = dst->x * 1.0f, right = (dst->x + dst->w - 1) * 1.0f;
@@ -217,6 +217,45 @@ void acc_get_interact_area(draw_img_t *image, ppe_rect_t *new_rect, ppe_rect_t *
     else
     {
         new_rect->w = right - new_rect->x + 1;
+    }
+}
+
+bool acc_get_src_rect_area(ppe_rect_t *src_rect, gui_rect_t *rect)
+{
+    int32_t src_hor_end = src_rect->x + src_rect->w - 1;
+    int32_t src_ver_end = src_rect->y + src_rect->h - 1;
+    if (src_rect->x > rect->x2 || src_rect->y > rect->y2 || src_hor_end < rect->x1 ||
+        src_ver_end < rect->y1)
+    {
+        return false;
+    }
+    if (src_rect->x < rect->x1)
+    {
+        src_rect->x = rect->x1;
+    }
+    if (src_rect->y < rect->y1)
+    {
+        src_rect->y = rect->y1;
+    }
+    if (src_hor_end > rect->x2)
+    {
+        src_hor_end = rect->x2;
+    }
+    if (src_ver_end > rect->y2)
+    {
+        src_ver_end = rect->y2;
+    }
+    int new_w = src_hor_end - src_rect->x + 1;
+    int new_h = src_ver_end - src_rect->y + 1;
+    if (new_w <= 0 || new_h <= 0)
+    {
+        return false;
+    }
+    else
+    {
+        src_rect->w = new_w;
+        src_rect->h = new_h;
+        return true;
     }
 }
 
@@ -492,7 +531,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             section_rect.h = y_max - dc->section.y1 - section_rect.y + 1;
         }
         section_rect.y += dc->section.y1;
-        acc_get_interact_area(image, &constraint, &section_rect, dc);
+        acc_get_intersect_area(image, &constraint, &section_rect, dc);
     }
     else
     {
@@ -587,6 +626,21 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             {
                 ret = ppe_get_area(&old_rect, &ppe_rect, &inverse, &source);
                 if (!ret)
+                {
+                    if (i == block_num - 1)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            if (rect != NULL)
+            {
+                bool res = acc_get_src_rect_area(&old_rect, rect);
+                if (!res)
                 {
                     if (i == block_num - 1)
                     {
