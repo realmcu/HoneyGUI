@@ -150,7 +150,40 @@ static void gui_img_stb_modify_img(gui_obj_t *obj)
 
     img->src_changed = false;
 }
+static void gui_img_stb_modify_img_static(gui_obj_t *obj)
+{
+    gui_stb_img_t *img = (gui_stb_img_t *)obj;
 
+    if ((img->data_buffer == NULL)
+        || (img->data_length == 0)
+        || (img->src_changed == false))
+    {
+        return;
+    }
+#ifdef TJPG
+    if (img->image_format == JPEG)
+    {
+        return;
+    }
+#endif
+    if ((img->image_format != JPEG)
+        && (img->image_format != BMP)
+        && (img->image_format != PNG))
+    {
+        return;
+    }
+
+    if (img->img)
+    {
+        img->img->data = gui_img_stb_decode_image(img);
+    }
+    else
+    {
+        img->img = gui_img_create_from_mem(obj, "stb_img", gui_img_stb_decode_image(img), 0, 0, 0, 0);
+    }
+
+    img->src_changed = false;
+}
 static void gui_img_stb_image_destory(gui_obj_t *obj)
 {
     gui_stb_img_t *img = (gui_stb_img_t *)obj;
@@ -350,7 +383,21 @@ void gui_img_stb_set_attribute(gui_stb_img_t  *this,
     this->base.y = y;
     gui_img_stb_modify_img((gui_obj_t *)this);
 }
-
+void gui_img_stb_set_attribute_static(gui_stb_img_t  *this,
+                                      void           *addr,
+                                      uint32_t        size,
+                                      GUI_FormatType  type,
+                                      int16_t         x,
+                                      int16_t         y)
+{
+    this->src_changed = true;
+    this->data_buffer = addr;
+    this->data_length = size;
+    this->image_format = type;
+    this->base.x = x;
+    this->base.y = y;
+    gui_img_stb_modify_img_static((gui_obj_t *)this);
+}
 gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
                                            const char     *name,
                                            void           *addr,

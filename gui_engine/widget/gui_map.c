@@ -95,31 +95,28 @@ static int tile_size = TILE_SIZE;
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-#// Convert longitude to tileX index at a certain zoom level
-int long2tilex(double lon, int z)
+static void free_for_rgb(void *p);
+// Convert longitude to tileX index at a certain zoom level
+static int long2tilex(double lon, int z)
 {
     return (int)(floor((lon + EARTH_LONGITUDE_RANGE / 2) / EARTH_LONGITUDE_RANGE * pow(2.0, z)));
 }
 // Convert latitude to tileY index at a certain zoom level
-int lat2tiley(double lat, int z)
+static int lat2tiley(double lat, int z)
 {
     // The formula includes taking tan of latitude then log's  the value . After that it's scaled to 2's pow of zoom level
     return (int)(floor((1.0 - log(tan(lat * M_PI / 180.0) + 1.0 / cos(lat * M_PI / 180.0)) / M_PI) / 2.0
                        * pow(2.0, z)));
 }
 
-double calculateScale(double latitude, int zoomLevel)
-{
-    double scale = 156543.03 * cos(latitude * (M_PI / 180)) / pow(2, zoomLevel);
-    return scale;
-}
 // function to generate tile URL path given the tile indices and zoom level
-void generateTileURL(int tileX, int tileY, int zoom)
+static void generateTileURL(int tileX, int tileY, int zoom)
 {
     //gui_log("http://mt0.google.com/vt/lyrs=m@221097413,traffic&x=%d&y=%d&z=%d\n", tileX, tileY, zoom);
 }
-void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat, double center_lon,
-                            int zoom, gui_map_t *parent)
+static void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat,
+                                   double center_lon,
+                                   int zoom, gui_map_t *parent)
 {
     // Calculate how many tiles are needed for each direction
     int tileCountX = ceil((double)windowWidth / TILE_SIZE);
@@ -265,8 +262,8 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, jpg, filesize);
     }
-    gui_img_stb_set_attribute(tile->img, jpg, filesize, JPEG, tile->img->base.x,
-                              tile->img->base.y);
+    gui_img_stb_set_attribute_static(tile->img, jpg, filesize, JPEG, tile->img->base.x,
+                                     tile->img->base.y);
 #elif defined RTL8772F
     typedef long off_t;
     static char path[100];
@@ -354,17 +351,21 @@ static void wincb(gui_map_t *this)
                     if (j == 2)
                     {
                         gui_free(this->tile[i][j].img->data_buffer);
+                        free_for_rgb(this->tile[i][j].img->img->data);
+                        this->tile[i][j].img->img->data = 0;
                     }
 
-                    gui_img_stb_set_attribute(
-                        this->tile[i][j].img,
-                        this->tile[i][j - 1].img->data_buffer,
-                        this->tile[i][j - 1].img->data_length,
-                        JPEG,
-                        this->tile[i][j].img->base.x,
-                        this->tile[i][j].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[i][j].img,
+                    //     this->tile[i][j - 1].img->data_buffer,
+                    //     this->tile[i][j - 1].img->data_length,
+                    //     JPEG,
+                    //     this->tile[i][j].img->base.x,
+                    //     this->tile[i][j].img->base.y
+                    // );
+                    this->tile[i][j].img->data_buffer = this->tile[i][j - 1].img->data_buffer;
+                    this->tile[i][j].img->data_length = this->tile[i][j - 1].img->data_length;
+                    this->tile[i][j].img->img->data = this->tile[i][j - 1].img->img->data;
                     this->tile[i][j].x--;
                 }
                 this->tile[i][0].x--;
@@ -385,17 +386,21 @@ static void wincb(gui_map_t *this)
                     if (j == 0)
                     {
                         gui_free(this->tile[i][j].img->data_buffer);
+                        free_for_rgb(this->tile[i][j].img->img->data);
+                        this->tile[i][j].img->img->data = 0;
                     }
 
-                    gui_img_stb_set_attribute(
-                        this->tile[i][j].img,
-                        this->tile[i][j + 1].img->data_buffer,
-                        this->tile[i][j + 1].img->data_length,
-                        JPEG,
-                        this->tile[i][j].img->base.x,
-                        this->tile[i][j].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[i][j].img,
+                    //     this->tile[i][j + 1].img->data_buffer,
+                    //     this->tile[i][j + 1].img->data_length,
+                    //     JPEG,
+                    //     this->tile[i][j].img->base.x,
+                    //     this->tile[i][j].img->base.y
+                    // );
+                    this->tile[i][j].img->data_buffer = this->tile[i][j + 1].img->data_buffer;
+                    this->tile[i][j].img->data_length = this->tile[i][j + 1].img->data_length;
+                    this->tile[i][j].img->img->data = this->tile[i][j + 1].img->img->data;
                     this->tile[i][j].x++;
                 }
 
@@ -417,17 +422,21 @@ static void wincb(gui_map_t *this)
                     if (j == 2)
                     {
                         gui_free(this->tile[j][i].img->data_buffer);
+                        free_for_rgb(this->tile[j][i].img->img->data);
+                        this->tile[j][i].img->img->data = 0;
                     }
 
-                    gui_img_stb_set_attribute(
-                        this->tile[j][i].img,
-                        this->tile[j - 1][i].img->data_buffer,
-                        this->tile[j - 1][i].img->data_length,
-                        JPEG,
-                        this->tile[j][i].img->base.x,
-                        this->tile[j][i].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[j][i].img,
+                    //     this->tile[j - 1][i].img->data_buffer,
+                    //     this->tile[j - 1][i].img->data_length,
+                    //     JPEG,
+                    //     this->tile[j][i].img->base.x,
+                    //     this->tile[j][i].img->base.y
+                    // );
+                    this->tile[j][i].img->data_buffer = this->tile[j - 1][i].img->data_buffer;
+                    this->tile[j][i].img->data_length = this->tile[j - 1][i].img->data_length;
+                    this->tile[j][i].img->img->data = this->tile[j - 1][i].img->img->data;
                     this->tile[j][i].y--;
                 }
                 this->tile[0][i].y--;
@@ -448,17 +457,21 @@ static void wincb(gui_map_t *this)
                     if (j == 0)
                     {
                         gui_free(this->tile[j][i].img->data_buffer);
+                        free_for_rgb(this->tile[j][i].img->img->data);
+                        this->tile[j][i].img->img->data = 0;
                     }
 
-                    gui_img_stb_set_attribute(
-                        this->tile[j][i].img,
-                        this->tile[j + 1][i].img->data_buffer,
-                        this->tile[j + 1][i].img->data_length,
-                        JPEG,
-                        this->tile[j][i].img->base.x,
-                        this->tile[j][i].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[j][i].img,
+                    //     this->tile[j + 1][i].img->data_buffer,
+                    //     this->tile[j + 1][i].img->data_length,
+                    //     JPEG,
+                    //     this->tile[j][i].img->base.x,
+                    //     this->tile[j][i].img->base.y
+                    // );
+                    this->tile[j][i].img->data_buffer = this->tile[j + 1][i].img->data_buffer;
+                    this->tile[j][i].img->data_length = this->tile[j + 1][i].img->data_length;
+                    this->tile[j][i].img->img->data = this->tile[j + 1][i].img->img->data;
                     this->tile[j][i].y++;
                 }
                 this->tile[2][i].y++;
@@ -486,6 +499,16 @@ static void wincb(gui_map_t *this)
 
 
 
+}
+static void free_for_rgb(void *p)
+{
+#ifdef _WIN32
+    gui_free(p);
+#elif defined RTL8772F
+    gui_lower_free(p);
+#else
+    gui_free(p);
+#endif
 }
 /*============================================================================*
  *                           Public Functions

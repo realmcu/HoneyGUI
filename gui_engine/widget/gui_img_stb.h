@@ -149,7 +149,22 @@ void gui_img_stb_set_attribute(gui_stb_img_t  *this,
                                GUI_FormatType  type,
                                int16_t         x,
                                int16_t         y);
-
+/**
+ * @brief set stb image widget attribute without free rgb data
+ *
+ * @param this stb image widget
+ * @param addr image address
+ * @param size image file size by Byte
+ * @param type image type
+ * @param x X-axis coordinate
+ * @param y Y-axis coordinate
+ */
+void gui_img_stb_set_attribute_static(gui_stb_img_t  *this,
+                                      void           *addr,
+                                      uint32_t        size,
+                                      GUI_FormatType  type,
+                                      int16_t         x,
+                                      int16_t         y);
 /**
  * @brief Creat a image widget with buffer.
  * @note This widget is use to display image which needs to decode.
