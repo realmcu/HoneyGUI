@@ -255,6 +255,7 @@ void rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
+    uint8_t opacity = image ->opacity_value;
     char img_type = head->type;
     gui_matrix_t *matrix = &image->matrix;
     bool identity = true;
@@ -275,7 +276,8 @@ void rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         identity = false;
     }
 
-    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565))
+    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565) && (opacity == 255) &&
+        (rect == NULL))
     {
         if (image->blend_mode == IMG_COVER_MODE)
         {

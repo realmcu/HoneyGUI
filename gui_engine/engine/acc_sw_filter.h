@@ -24,10 +24,6 @@ extern "C" {
 
 void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                           gui_rect_t *rect);
-void filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                          gui_rect_t *rect);
-void filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                            gui_rect_t *rect);
 
 #ifdef __cplusplus
 }
