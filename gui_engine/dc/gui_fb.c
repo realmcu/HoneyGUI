@@ -25,6 +25,25 @@ static bool fb_change = false;
 
 static bool obj_is_active(gui_obj_t *obj)
 {
+    if ((obj->matrix->m[0][1] == 0) && \
+        (obj->matrix->m[1][0] == 0) && \
+        (obj->matrix->m[2][0] == 0) && \
+        (obj->matrix->m[2][1] == 0) && \
+        (obj->matrix->m[2][2] == 1)) //scale and translate, no rotate
+    {
+        float x_min = obj->matrix->m[0][2];
+        float x_max = obj->matrix->m[0][2] + obj->matrix->m[0][0] * obj->w;
+        float y_min = obj->matrix->m[1][2];
+        float y_max = obj->matrix->m[1][2] + obj->matrix->m[1][1] * obj->h;
+        if ((x_min > (int)gui_get_screen_width()) || \
+            (x_max < 0) || \
+            (y_min > (int)gui_get_screen_height()) || \
+            (y_max < 0))
+        {
+            obj->active = false;
+            return false;
+        }
+    }
 
     gui_point_t p[4] =
     {
@@ -91,6 +110,7 @@ static bool obj_is_active(gui_obj_t *obj)
         obj->active = true;
         return true;
     }
+    obj->active = false;
 
     return false;
 }
@@ -101,13 +121,13 @@ static void obj_input_prepare(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if ((obj->matrix != NULL) && (obj->parent->matrix))
-        {
-            memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
-            matrix_translate(obj->x, obj->y, obj->matrix);
-        }
         if (obj->obj_input_prepare != NULL)
         {
+            if ((obj->matrix != NULL) && (obj->parent->matrix))
+            {
+                memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
+                matrix_translate(obj->x, obj->y, obj->matrix);
+            }
             obj->obj_input_prepare(obj);
             if (obj_is_active(obj) == false)
             {
@@ -131,10 +151,6 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
-        // if (obj->not_show) //todo seems can comment it by howie
-        // {
-        //     continue;
-        // }
 
         obj->opacity_value = obj->parent->opacity_value;
 
@@ -146,7 +162,10 @@ static void obj_draw_prepare(gui_obj_t *object)
 
         if (obj->obj_prepare != NULL)
         {
-            obj->obj_prepare(obj);
+            if (!obj->gesture)
+            {
+                obj->obj_prepare(obj);
+            }
         }
         if (obj->not_show)
         {
@@ -172,7 +191,7 @@ static void obj_draw_scan(gui_obj_t *obj)
             if (obj->obj_draw != NULL)
             {
                 dc->section.y1 = dc->section_count * dc->fb_height;
-                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height, dc->screen_height);
+                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
                 obj->obj_draw(obj);
             }
         }
@@ -213,7 +232,7 @@ static void obj_draw_end(gui_obj_t *obj)
 
         matrix_identity(obj->matrix);
         obj->active = false;
-        //obj->not_show = false;// no need this insduction
+
         obj->skip_tp_left_hold = true;
         obj->skip_tp_right_hold = true;
         obj->skip_tp_up_hold = true;
@@ -317,6 +336,11 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     gui_dispdev_t *dc = gui_get_dc();
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->start_cb();
+    }
+
     if ((dc->frame_buf == NULL) && (dc->disp_buf_1 == NULL) && (dc->disp_buf_2 == NULL))
     {
         GUI_ASSERT(NULL != NULL);
@@ -324,7 +348,15 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     obj_input_prepare(root);
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->input_prepare_cb();
+    }
     obj_draw_prepare(root);
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->draw_prepare_cb();
+    }
 
     static int last_ms;
     if (fb_change == true)
@@ -347,7 +379,10 @@ void gui_fb_disp(gui_obj_t *root)
         gui_thread_mdelay(17);
         last_ms = gui_ms_get();
     }
-
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->draw_cb();
+    }
 
     obj_draw_end(root);
     for (uint8_t i = 0; i < event_cnt; i++)
@@ -355,6 +390,12 @@ void gui_fb_disp(gui_obj_t *root)
         event_cb[i](event_obj[i], event_code[i]);
     }
     event_cnt = 0;
+    dc->frame_count++;
+
+    if (dc->lcd_frame_monitor)
+    {
+        dc->lcd_frame_monitor->end_cb();
+    }
 
 }
 

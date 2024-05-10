@@ -28,8 +28,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_img.h>
+#include "guidef.h"
+#include "gui_img.h"
+#include "gui_seekbar.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -44,16 +45,12 @@ extern "C" {
   * @{
   */
 
-typedef struct gui_return gui_return_t;
-struct gui_return
+
+typedef struct gui_return
 {
-    gui_obj_t base;
-    gui_img_t *return_img_left;
-    gui_img_t *return_img_right;
-    void (*onReturn)(void *func);
-    bool hit;
-    void (*ctor)(gui_return_t *this, gui_obj_t *parent, const char *widgetame);
-};
+    gui_seekbar_t base;
+    gui_obj_t *ignore_gesture_widget;
+} gui_return_t;
 
 
 /** End of WIDGET_Exported_Types
@@ -80,10 +77,9 @@ struct gui_return
   * @brief
   * @{
   */
-
-
-
-
+#define RETURN_HEIGHT           100
+#define RETURN_ENABLE_THREHOLD  10
+#define RETURN_THREHOLD         80
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -111,13 +107,20 @@ struct gui_return
   */
 
 /**
- * @brief create a return widget.
- * @param parent the father widget it nested in.
+ * @brief Create a return widget.
+ * @param parent The parent widget it nested in.
+ * @param frame_array Return effect image frame array.
+ * @param array_size Return effect image frame array's index count.
+ * @param return_cb Return behavior instance .
+ * @param ignore_gesture_widget The widget that need to be blocked for gesture response.
  * @return return the widget object pointer.
  *
  */
-gui_return_t *gui_return_create(void *parent);
-
+gui_return_t *gui_return_create(void           *parent,
+                                const uint32_t *frame_array[],
+                                int             array_size,
+                                void           *return_cb,
+                                gui_obj_t      *ignore_gesture_widget);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

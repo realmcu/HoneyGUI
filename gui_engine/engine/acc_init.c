@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "acc_engine.h"
 #include "acc_sw_rle.h"
+#include "acc_init.h"
 
 
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
@@ -16,6 +17,7 @@ void gui_acc_init(void)
 #ifdef RTK_MODULE_VG_LITE
     acc.blit = hw_acc_blit;
 #elif defined RTK_MODULE_RTK_PPE
+    hw_acc_init();
     acc.blit = hw_acc_blit;
 #elif defined RTK_MODULE_RTK_PPEV2
     hw_acc_init();
@@ -124,6 +126,7 @@ static void gui_release_imgfile_acc(draw_img_t *draw_img, const void *img_info, 
     gui_free(img_buff);
     draw_img->data = (void *)img_info;
 }
+
 
 
 

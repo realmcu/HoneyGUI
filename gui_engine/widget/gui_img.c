@@ -84,7 +84,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *callback,
+void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeat_count, void *callback,
                          void *p)
 {
 
@@ -97,97 +97,138 @@ void gui_img_set_animate(gui_img_t *this, uint32_t dur, int repeatCount, void *c
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
+    animate->repeat_count = repeat_count;
     animate->p = p;
     this->animate = animate;
 }
-static void (obj_update_att)(struct _gui_obj_t *o)
+static void img_update_att(struct _gui_obj_t *o)
 {
     gui_img_t *obj = (void *)o;
     if (obj->animate && obj->animate->animate)
     {
-        size_t frame_count = obj->animate->dur * 30 / (1000);
-        obj->animate->callback(obj->animate->p);
-        obj->animate->current_frame++;
-
-        if (obj->animate->current_frame > frame_count)
+        uint32_t cur_time_gap = gui_ms_get() - obj->animate->cur_time_ms;
+        obj->animate->cur_time_ms = gui_ms_get();
+        if (cur_time_gap >= 2 * obj->animate->dur)
         {
-            if (obj->animate->repeatCount == 0)
+            obj->animate->init_time_ms += cur_time_gap;
+        }
+        if (obj->animate->repeat_count == 0)
+        {
+            if ((obj->animate->cur_time_ms - obj->animate->init_time_ms) >= obj->animate->dur)
             {
+                obj->animate->callback(obj->animate->p);
                 obj->animate->animate = false;
+                obj->animate->progress_percent = 1.0f;
             }
-            else if (obj->animate->repeatCount < 0)
+            else
             {
-                obj->animate->current_frame = 0;
+                obj->animate->progress_percent = (float)(obj->animate->cur_time_ms - obj->animate->init_time_ms) /
+                                                 (float)obj->animate->dur;
             }
-            else if (obj->animate->repeatCount > 0)
+        }
+        else if (obj->animate->repeat_count < 0)
+        {
+            if ((obj->animate->cur_time_ms - obj->animate->init_time_ms) >= obj->animate->dur)
             {
-                obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                obj->animate->callback(obj->animate->p);
+                obj->animate->init_time_ms += obj->animate->dur;
+                obj->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                obj->animate->progress_percent = (float)(obj->animate->cur_time_ms - obj->animate->init_time_ms) /
+                                                 (float)obj->animate->dur;
+            }
+        }
+        else if (obj->animate->repeat_count > 0)
+        {
+            if (obj->animate->cur_time_ms - obj->animate->init_time_ms -
+                obj->animate->current_repeat_count * obj->animate->dur >=
+                obj->animate->dur)
+            {
+                if (obj->animate->current_repeat_count < obj->animate->repeat_count)
                 {
-                    obj->animate->animate = false;
+                    obj->animate->callback(obj->animate->p);
+                    obj->animate->current_repeat_count ++;
                 }
                 else
                 {
-                    obj->animate->current_frame = 0;
+                    obj->animate->callback(obj->animate->p);
+                    obj->animate->animate = false;
                 }
+                obj->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                obj->animate->progress_percent = (float)(obj->animate->cur_time_ms - obj->animate->init_time_ms -
+                                                         obj->animate->current_repeat_count * obj->animate->dur) /
+                                                 (float)obj->animate->dur;
             }
         }
-        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
-                                                                                       frame_count));
-
     }
 }
 
 static void img_prepare(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-    GUI_TYPE(gui_img_t, obj)->draw_img.opacity_value = obj->parent->opacity_value * GUI_TYPE(gui_img_t,
-                                                       obj)->opacity / UINT8_MAX;
-
-    obj_update_att(obj);
-    {
-        gui_dispdev_t *dc = gui_get_dc();
-        touch_info_t *tp = tp_get_info();
-
-
-        if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
-        {
-            gui_img_t *b = (void *)obj;
-            if (tp->pressed)
-            {
-                if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
-                {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
-                    b->press_flag = true;
-                }
-            }
-
-            if (b->release_flag)
-            {
-                b->press_flag = false;
-                b->release_flag = false;
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
-            }
-            if (tp->released && b->press_flag)
-            {
-                b->release_flag = true;
-            }
-        }
-    }
     gui_img_t *this = (gui_img_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
     draw_img_t *draw_img = &this->draw_img;
 
-    gui_image_load_scale(draw_img);
-
-
-
     matrix_translate(this->t_x, this->t_y, obj->matrix);
     matrix_rotate(this->degrees, obj->matrix);
     matrix_scale(this->scale_x, this->scale_y, obj->matrix);
     matrix_translate(-this->c_x, -this->c_y, obj->matrix);
+    if ((obj->matrix->m[0][1] == 0) && \
+        (obj->matrix->m[1][0] == 0) && \
+        (obj->matrix->m[2][0] == 0) && \
+        (obj->matrix->m[2][1] == 0) && \
+        (obj->matrix->m[2][2] == 1)) //scale and translate, no rotate
+    {
+        float x_min = obj->matrix->m[0][2];
+        float x_max = obj->matrix->m[0][2] + obj->matrix->m[0][0] * obj->w;
+        float y_min = obj->matrix->m[1][2];
+        float y_max = obj->matrix->m[1][2] + obj->matrix->m[1][1] * obj->h;
+        if ((x_min > (int)gui_get_screen_width()) || \
+            (x_max < 0) || \
+            (y_min > (int)gui_get_screen_height()) || \
+            (y_max < 0))
+        {
+            return;
+        }
+    }
+
+    this->draw_img.opacity_value = obj->parent->opacity_value * this->opacity / UINT8_MAX;
+
+    img_update_att(obj);
+
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
+    {
+        gui_img_t *b = (void *)obj;
+        if (tp->pressed)
+        {
+            if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                b->press_flag = true;
+            }
+        }
+
+        if (b->release_flag)
+        {
+            b->press_flag = false;
+            b->release_flag = false;
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+        }
+        if (tp->released && b->press_flag)
+        {
+            b->release_flag = true;
+        }
+    }
+
+    gui_image_load_scale(draw_img);
+
 
     memcpy(draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
@@ -339,17 +380,17 @@ static void gui_img_ctor(gui_img_t *this, gui_obj_t *parent, gui_imgconfig_t *co
     else if (head.resize == 1) //unsigned char resize:2;//0-no resize;1-50%(x&y);2-70%;3-80%
     {
         gui_img_scale(this, 2, 2);
-        gui_log("resize image!!");
+        gui_log("resize image!! \n");
     }
     else if (head.resize == 2)
     {
         gui_img_scale(this, 10.0f / 7.0f, 10.0f / 7.0f);
-        gui_log("resize image!!");
+        gui_log("resize image!! \n");
     }
     else if (head.resize == 3)
     {
         gui_img_scale(this, 10.0f / 8.0f, 10.0f / 8.0f);
-        gui_log("resize image!!");
+        gui_log("resize image!! \n");
     }
 }
 
@@ -580,6 +621,95 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 {
     this->draw_img.opacity_value = opacity_value;
     this->opacity = opacity_value;
+}
+static void rect_copy(uint8_t *target, uint8_t *source, uint32_t x, uint32_t y, uint32_t w,
+                      uint32_t h, gui_dispdev_t *dc)
+{
+    uint16_t byte = dc->bit_depth / 8;
+    for (uint32_t i = 0; i < h; i++)
+    {
+        memcpy(target + i * w * byte, source + i * dc->fb_width * byte, w * byte);
+    }
+}
+static void virtual_dc_update(struct gui_dispdev *dc)
+{
+    if (dc->virtual_lcd_update != NULL)
+    {
+        dc->virtual_lcd_update(dc);
+        return;
+    }
+    float scale = 0.7f;
+    uint16_t w = dc->fb_width * scale;
+    uint16_t h = dc->fb_height * scale;
+    uint16_t byte = dc->bit_depth / 8;
+    uint32_t total_section_cnt = (dc->screen_height / dc->fb_height + ((
+                                                                           dc->screen_height % dc->fb_height) ? 1 : 0));
+    if (dc->type == DC_SINGLE)
+    {
+        for (uint16_t y = 0; y < h; y++)
+        {
+            memcpy(dc->shot_buf + 8 + y * w * byte, dc->frame_buf + y * dc->fb_width * byte, w * byte);
+        }
+        gui_log("[GUI warning] please use user method for improve! \n");
+    }
+    else if (dc->type == DC_RAMLESS)
+    {
+        if (dc->section_count == 0)
+        {
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
+        }
+        else if (dc->section_count == total_section_cnt - 1)
+        {
+            uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
+            gui_log("[GUI warning] please use user method for improve! \n");
+        }
+        else
+        {
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
+        }
+    }
+
+
+}
+void gui_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_dispdev_t *dc_bak = gui_malloc(sizeof(gui_dispdev_t));
+    gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
+    memcpy(dc_bak, dc, sizeof(gui_dispdev_t));
+    memcpy(matrix_bak, obj->matrix, sizeof(gui_matrix_t));
+    matrix_scale(0.7f, 0.7f, obj->matrix);
+
+    dc->bit_depth = 16;
+
+    dc->lcd_update = virtual_dc_update;
+    dc->shot_buf = shot_buf;
+
+
+    gui_fb_change();
+    gui_fb_disp(obj);
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
+
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 2;//0-no resize;1-50%(x&y);2-70%;3-80%
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = 0;
+    head->version = 0;
+    head->rsvd2 = 0;
+    head->w = obj->w * 0.7f;
+    head->h = obj->h * 0.7f;
+
+    memcpy(dc, dc_bak, sizeof(gui_dispdev_t));
+    memcpy(obj->matrix, matrix_bak, sizeof(gui_matrix_t));
+    gui_free(dc_bak);
+    gui_free(matrix_bak);
+
 }
 
 gui_img_t *gui_img_create_from_mem(void *parent,  const char *name, void *addr,

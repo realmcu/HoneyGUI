@@ -10,7 +10,7 @@
 #include "gui_obj.h"
 #include "gui_img_scope.h"
 #include "gui_common.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "app_task.h"
 #endif
 
@@ -34,7 +34,7 @@ static void switch_menu_bluetooth_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_bluetooth_released_cb, event = %d\n", event);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     T_AUDIO_SUPPORT audio_support = gui_get_audio_support();
     //turn on bluetooth
     switch (event)
@@ -83,7 +83,7 @@ static void switch_menu_bluetooth_released_cb(void *obj, gui_event_t event)
 static void switch_menu_buds_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_buds_released_cb\n");
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     if (app_db.audio_play_mode != MODE_APP_A2DP_SRC)
     {
         T_IO_MSG set_mode_msg;
@@ -106,7 +106,7 @@ static void switch_menu_buds_released_cb(void *obj, gui_event_t event)
 static void switch_menu_phone_released_cb(void *obj, gui_event_t event)
 {
     gui_log("switch_menu_phone_released_cb\n");
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     uint8_t app_bond_phone_index = app_bt_bond_check_exist_device_info(T_DEVICE_TYPE_PHONE);
     if (app_bond_phone_index != 0xff && !app_db.bond_device[app_bond_phone_index].used)
     {
@@ -196,7 +196,7 @@ void design_curtain_menu(void *parent)
     gui_obj_add_event_cb(switch_menu_setting, (gui_event_cb_t)switch_menu_setting_released_cb,
                          GUI_EVENT_2, NULL);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //get bt status
     T_STATE bt_status = gui_get_bt_status();
     T_AUDIO_SUPPORT audio_support = gui_get_audio_support();

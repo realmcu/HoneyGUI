@@ -31,9 +31,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_canvas.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "gui_canvas.h"
 #include "gui_watchface_gradient.h"
 
 /** @defgroup WIDGET WIDGET
@@ -50,7 +50,7 @@ extern "C" {
   */
 
 /** @brief  ... */
-typedef struct gui_watchface_gradient
+typedef struct
 {
     gui_canvas_t base;
 } gui_watchface_gradient_t;
@@ -80,9 +80,15 @@ typedef struct gui_watchface_gradient
   * @brief
   * @{
   */
+#define WATCHFACE_GRADIENT_RING1     296.52f
+#define WATCHFACE_GRADIENT_RING2     192.17f
+#define WATCHFACE_GRADIENT_RING3     87.83f
+#define WATCHFACE_GRADIENT_BASE      368.0f
+#define WATCHFACE_GRADIENT_SCLAE     (GET_BASE(canvas)->w/WATCHFACE_GRADIENT_BASE)
 
-
-
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride,
+                                 enum NVGtexture format, uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -130,10 +136,12 @@ typedef struct gui_watchface_gradient
   *
   * \endcode
   */
-gui_watchface_gradient_t *gui_watchface_gradient_create(void *parent,  const char *name,
-                                                        int16_t x, int16_t y, int16_t w, int16_t h);
-
-
+gui_watchface_gradient_t *gui_watchface_gradient_create(void       *parent,
+                                                        const char *name,
+                                                        int16_t    x,
+                                                        int16_t    y,
+                                                        int16_t    w,
+                                                        int16_t    h);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

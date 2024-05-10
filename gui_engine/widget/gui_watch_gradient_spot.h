@@ -31,9 +31,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_canvas.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "gui_canvas.h"
 #include "gui_watch_gradient_spot.h"
 
 /** @defgroup WIDGET WIDGET
@@ -50,7 +50,7 @@ extern "C" {
   */
 
 /** @brief  ... */
-typedef struct gui_watch_gradient_spot
+typedef struct
 {
     gui_obj_t base;
     float c_x;
@@ -82,6 +82,12 @@ typedef struct gui_watch_gradient_spot
   * @brief
   * @{
   */
+#define WATCH_GRADIENT_SPOT_BASE      454.0f
+#define WATCH_GRADIENT_SPOT_SCLAE     ((float)(GET_BASE(this)->w)/WATCH_GRADIENT_SPOT_BASE)
+
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride,
+                                 enum NVGtexture format, uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -127,8 +133,12 @@ typedef struct gui_watch_gradient_spot
   * }
   * \endcode
   */
-gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const char *name,
-                                                          int16_t x, int16_t y, int16_t w, int16_t h);
+gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void       *parent,
+                                                          const char *name,
+                                                          int16_t    x,
+                                                          int16_t    y,
+                                                          int16_t    w,
+                                                          int16_t    h);
 
 /**
   * @brief  set watch center
@@ -150,8 +160,6 @@ gui_watch_gradient_spot_t *gui_watch_gradient_spot_create(void *parent,  const c
   */
 void gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c_x, float c_y);
 
-
-
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
@@ -166,4 +174,3 @@ void gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c
 #endif
 
 #endif
-

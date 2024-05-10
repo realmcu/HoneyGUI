@@ -17,13 +17,10 @@
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
 #include <string.h>
-#include <gui_obj.h>
+#include "gui_obj.h"
 #include "gui_px.h"
-#include <tp_algo.h>
-
-
+#include "tp_algo.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -60,7 +57,6 @@
   */
 
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -83,8 +79,7 @@
   * @{
   */
 
-
-static void prepare(gui_px_t *this)
+static void gui_px_prepare(gui_px_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -97,27 +92,27 @@ static void prepare(gui_px_t *this)
     gui_fb_change();
 }
 
-static px_void PX_ApplicationUpdate(gui_px_t *this, px_dword elapsed)
+static px_void gui_px_application_update(gui_px_t *this, px_dword elapsed)
 {
     PX_ObjectUpdate(this->px_root, elapsed);
 }
 
-static px_void PX_ApplicationRender(gui_px_t *this, px_dword elapsed)
+static px_void gui_px_application_render(gui_px_t *this, px_dword elapsed)
 {
     px_surface *pRenderSurface = &this->RenderSurface;
 
     PX_SurfaceClear(pRenderSurface, 0, 0, pRenderSurface->width - 1, pRenderSurface->height - 1,
                     PX_COLOR_BACKGROUNDCOLOR);
 
-
     PX_ObjectRender(pRenderSurface, this->px_root, elapsed);
 }
 
-static void draw(gui_px_t *this)
+static void gui_px_draw(gui_px_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
     gui_dispdev_t *dc = gui_get_dc();
+    px_surface *pRenderSurface;
 
     GUI_UNUSED(this);
     GUI_UNUSED(root);
@@ -125,19 +120,18 @@ static void draw(gui_px_t *this)
     GUI_UNUSED(dc);
 
     //time
-
     this->elapsed = PX_TimeGetTime() - this->timelasttime;
     this->timelasttime = PX_TimeGetTime();
 
-
-    PX_ApplicationUpdate(this, this->elapsed);
-    PX_ApplicationRender(this, this->elapsed);
-    px_surface *pRenderSurface = &this->RenderSurface;
+    gui_px_application_update(this, this->elapsed);
+    gui_px_application_render(this, this->elapsed);
+    pRenderSurface = &this->RenderSurface;
 
     memcpy(dc->frame_buf, pRenderSurface->surfaceBuffer,
            dc->fb_width * dc->fb_height * dc->bit_depth / 8);
 }
-static void end(gui_px_t *this)
+
+static void gui_px_end(gui_px_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -148,7 +142,8 @@ static void end(gui_px_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
 }
-static void destory(gui_px_t *this)
+
+static void gui_px_destory(gui_px_t *this)
 {
     touch_info_t *tp = tp_get_info();
     gui_obj_t *root = (gui_obj_t *)this;
@@ -160,10 +155,11 @@ static void destory(gui_px_t *this)
     GUI_UNUSED(dc);
 }
 
-static px_bool GUI_PX_ApplicationInitialize(gui_px_t *this, px_int screen_width,
-                                            px_int screen_height, void (*main_cb)(gui_px_t *this))
+static px_bool gui_px_application_initialize(gui_px_t *this,
+                                             px_int    screen_width,
+                                             px_int    screen_height,
+                                             void (*main_cb)(gui_px_t *this))
 {
-
     this->mem_static = MP_Create(gui_malloc(1024 * 1024 * 2), 1024 * 1024 * 2);
     this->mp_static = &this->mem_static;
     this->mem_dynamic = MP_Create(gui_malloc(1024 * 1024 * 5), 1024 * 1024 * 5);
@@ -188,31 +184,31 @@ static px_bool GUI_PX_ApplicationInitialize(gui_px_t *this, px_int screen_width,
         GUI_ASSERT(NULL != NULL);
     }
     return PX_TRUE;
-
 }
 
-static void px_ctor(gui_px_t *this, gui_obj_t *parent, const char *name,
-                    void (*main_cb)(gui_px_t *this),
-                    int16_t x,
-                    int16_t y, int16_t w, int16_t h)
+static void gui_px_ctor(gui_px_t   *this,
+                        gui_obj_t  *parent,
+                        const char *name,
+                        void (*main_cb)(gui_px_t *this),
+                        int16_t     x,
+                        int16_t     y,
+                        int16_t     w,
+                        int16_t     h)
 {
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
+    gui_dispdev_t *dc;
+
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))prepare;
-    root->obj_draw = (void (*)(struct _gui_obj_t *))draw;
-    root->obj_end = (void (*)(struct _gui_obj_t *))end;
-    root->obj_destory = (void (*)(struct _gui_obj_t *))destory;
+    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_px_prepare;
+    root->obj_draw = (void (*)(struct _gui_obj_t *))gui_px_draw;
+    root->obj_end = (void (*)(struct _gui_obj_t *))gui_px_end;
+    root->obj_destory = (void (*)(struct _gui_obj_t *))gui_px_destory;
 
     //for self
-
-    gui_dispdev_t *dc = gui_get_dc();
-
-
-    GUI_PX_ApplicationInitialize(this, dc->fb_width, dc->fb_height, main_cb);
-
-
+    dc = gui_get_dc();
+    gui_px_application_initialize(this, dc->fb_width, dc->fb_height, main_cb);
 }
 
 /*============================================================================*
@@ -231,20 +227,27 @@ static void px_ctor(gui_px_t *this, gui_obj_t *parent, const char *name,
  * @param h
  * @return gui_px_t*
  */
-gui_px_t *gui_px_create(void *parent,  const char *name, void (*main_cb)(gui_px_t *this),
-                        int16_t x,
-                        int16_t y, int16_t w, int16_t h)
+gui_px_t *gui_px_create(void       *parent,
+                        const char *name,
+                        void (*main_cb)(gui_px_t *this),
+                        int16_t     x,
+                        int16_t     y,
+                        int16_t     w,
+                        int16_t     h)
 {
+    gui_px_t *this;
+
     GUI_ASSERT(parent != NULL);
     if (name == NULL)
     {
         name = "PAINTER_ENGINE";
     }
-    gui_px_t *this = gui_malloc(sizeof(gui_px_t));
+
+    this = gui_malloc(sizeof(gui_px_t));
     GUI_ASSERT(this != NULL);
     memset(this, 0x00, sizeof(gui_px_t));
 
-    px_ctor(this, (gui_obj_t *)parent, name, main_cb, x, y, w, h);
+    gui_px_ctor(this, (gui_obj_t *)parent, name, main_cb, x, y, w, h);
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -253,11 +256,9 @@ gui_px_t *gui_px_create(void *parent,  const char *name, void (*main_cb)(gui_px_
                                &(GET_BASE(this)->brother_list));
     }
 
-
     GET_BASE(this)->create_done = true;
     return this;
 }
-
 
 /** End of WIDGET_Exported_Functions
   * @}
@@ -266,9 +267,3 @@ gui_px_t *gui_px_create(void *parent,  const char *name, void (*main_cb)(gui_px_
 /** End of WIDGET
   * @}
   */
-
-
-
-
-
-

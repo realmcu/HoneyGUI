@@ -1,7 +1,7 @@
 
-#include <gui_obj.h>
-#include <gui_watch_gradient_spot.h>
-#include <gui_img.h>
+#include "gui_obj.h"
+#include "gui_watch_gradient_spot.h"
+#include "gui_img.h"
 #include "root_image/ui_resource.h"
 
 

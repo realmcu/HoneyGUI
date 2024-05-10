@@ -15,7 +15,7 @@ By default, the cube's size is `dc->fb_height / 8.0`. If you want to change the 
 By default, the center is `((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`. You can use [void gui_cube_set_center(cube, c_x, c_y)](#api) to set the center coordinates of the cube.
 
 ### Set image mode
-By default, the cube's image blend mode is `IMG_FILTER_BLACK`, you can change the blend mode of image by calling [void gui_cube_set_mode(gui_cube_t *cube, CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api).
+By default, the cube's image blend mode is `IMG_FILTER_BLACK`, you can change the blend mode of image by calling [void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api).
 
 ### Set cube image
 The images of cube can be configured by calling [void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#api).

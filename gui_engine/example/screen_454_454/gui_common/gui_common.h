@@ -8,7 +8,7 @@ extern "C" {
 #include "gui_obj.h"
 #include "gui_win.h"
 #include "gui_list.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "gui_interface.h"
 
 //for bt status
@@ -36,7 +36,7 @@ gui_obj_t *pop_current_widget(void);
 //return child of app_watch_ui, which is showed
 gui_obj_t *get_current_active_widget(void);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 //for curtain_menu
 T_STATE gui_get_bt_status(void);
 T_AUDIO_SUPPORT gui_get_audio_support(void);

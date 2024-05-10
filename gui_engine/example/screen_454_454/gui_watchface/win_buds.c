@@ -10,7 +10,7 @@
 #include "gui_obj.h"
 #include "gui_common.h"
 #include "draw_font.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 //for bt buds
 #include "app_bond.h"
 #include "app_gap.h"
@@ -40,7 +40,7 @@ char bond_bd_addr[20];
 //todo:
 static void win_buds_animate_cb(void *p)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //todo:
     app_bond_earphone_index = app_bt_bond_check_exist_device_info(T_DEVICE_TYPE_EARPHONE);
     if (app_bond_earphone_index != 0xff)
@@ -99,7 +99,7 @@ static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t even
     gui_log("switch_text_base_buds_device_touch_cb, event = %d\n", event);
     // push_current_widget(win_menu_buds);
     // gui_obj_show(win_menu_buds, false);
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     gui_app_t *app = get_app_watch_ui();
     if (win_buds_device == NULL)
     {
@@ -121,7 +121,7 @@ static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t even
     //extern gui_win_t *win_menu_buds;
     //push_current_widget(win_menu_buds);
     //gui_obj_show(win_menu_buds, false);
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     gui_app_t *app = get_app_watch_ui();
     if (win_search_buds == NULL)//when to free ?
     {
@@ -138,7 +138,7 @@ static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t even
     //start search
     //stop: only happens at init state
     //finish: search complete
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     if (get_search_status() != SEARCH_START)
     {
         T_IO_MSG inquiry_msg;
@@ -159,7 +159,7 @@ static void switch_disconnect_yes_action(void *obj)
 
     gui_obj_show(switch_disconnect, false);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //disconnect buds
     app_bond_earphone_index = app_bt_bond_get_active_num_by_type(T_DEVICE_TYPE_EARPHONE);
     if (app_bond_earphone_index != 0xff)
@@ -181,7 +181,7 @@ static void switch_disconnect_no_action(void *obj)
 
     gui_tree_free(win_confirm);
     win_confirm = NULL;
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     gui_update_by_event2(win_menu_buds, NULL, true);
 #endif
 }
@@ -266,7 +266,7 @@ void design_win_menu_buds(void *parent)
     gui_text_set(text_disconnect, "断开连接", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12, font_size);
     gui_text_type_set(text_disconnect, SIMKAI_SIZE32_BITS1_FONT_BIN);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     //check if already connected buds
     app_bond_earphone_index = app_bt_bond_check_exist_device_info(T_DEVICE_TYPE_EARPHONE);
     if (app_bond_earphone_index != 0xff)

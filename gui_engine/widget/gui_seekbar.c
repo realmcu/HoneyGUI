@@ -474,18 +474,18 @@ static void (obj_update_att)(struct _gui_obj_t *o)
 
         if (obj->animate->current_frame > frame_count)
         {
-            if (obj->animate->repeatCount == 0)
+            if (obj->animate->repeat_count == 0)
             {
                 obj->animate->animate = false;
             }
-            else if (obj->animate->repeatCount < 0)
+            else if (obj->animate->repeat_count < 0)
             {
                 obj->animate->current_frame = 0;
             }
-            else if (obj->animate->repeatCount > 0)
+            else if (obj->animate->repeat_count > 0)
             {
                 obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
                 {
                     obj->animate->animate = false;
                 }

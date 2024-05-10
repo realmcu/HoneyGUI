@@ -120,7 +120,7 @@ You can use this function [gui_text_move(this, x, y)](#api) to move text to a sp
 
 ### Set animate
 
-Using this function [gui_text_set_animate(o, dur, repeatCount, callback, p)](#api) to set the animation and implement the animation effect in the corresponding callback function
+Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#api) to set the animation and implement the animation effect in the corresponding callback function
 
 To use scroll text, you can read scrolltext.md.
 

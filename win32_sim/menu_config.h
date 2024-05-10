@@ -26,13 +26,15 @@
 // </c>
 
 // <c> RTK GUI Demo 368 448
-//#define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
+// #define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
 // </c>
 
 // <c> RTK GUI Demo 454 454
 #define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
-
+// <c> RTK GUI TEST
+//#define CONFIG_REALTEK_BUILD_TEST
+// </c>
 // <c> RTK GUI Demo 280 456
 // #define CONFIG_REALTEK_BUILD_GUI_280_456_DEMO
 // </c>
@@ -95,6 +97,10 @@
 
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
 // #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
+// </c>
+
+// <c> RTK GUI Enable LiteGFX
+// #define CONFIG_REALTEK_BUILD_LITE_GFX
 // </c>
 
 #endif

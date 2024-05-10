@@ -48,6 +48,7 @@ extern "C" {
 typedef struct gui_menu_cellular
 {
     gui_win_t base; //!< base structure
+    void *overwrite;
 } gui_menu_cellular_t;
 /** End of WIDGET_Exported_Types
   * @}

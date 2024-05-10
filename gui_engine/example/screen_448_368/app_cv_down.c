@@ -36,15 +36,11 @@ static void cardlist_music(void *parent)
 static void canvas_cb_black(gui_canvas_t *canvas)
 {
     nvgRect(canvas->vg, 0, 0, 368, 448);
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 128));
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 128));
     nvgFill(canvas->vg);
 }
 
 static gui_cardview_t *cv;
-static void done_cb(gui_curtainview_t *this)
-{
-    //gui_log("cv release value = %d \n", this->release_y);
-}
 
 static void cv_status_cb(gui_cardview_t *this)
 {
@@ -55,7 +51,6 @@ void curtain_down_design(void *parent_widget)
 {
     gui_curtain_t *ct_card = parent_widget;
     gui_curtainview_t *curtainview = (gui_curtainview_t *)ct_card->base.parent;
-    gui_curtainview_set_done_cb(curtainview, done_cb);
 
     gui_canvas_t *canvas = gui_canvas_create(parent_widget, "canvas", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
@@ -73,6 +68,13 @@ void curtain_down_design(void *parent_widget)
     gui_card_t *tb_activity = gui_card_create(cv, "tb_activity",   0, 0, 0, 124);
     gui_card_t *tb_clock = gui_card_create(cv, "tb_clock",         0, 0, 0, 124);
 
+    gui_card_t *test_tb_music = gui_card_create(cv, "tb_music",         0, 0, 0, 124);
+    gui_card_t *test_tb_weather = gui_card_create(cv, "tb_weather",     0, 0, 0, 124);
+    gui_card_t *test_tb_blood = gui_card_create(cv, "tb_tb_bloodcube",  0, 0, 0, 124);
+    gui_card_t *test_tb_heart = gui_card_create(cv, "tb_heart",         0, 0, 0, 124);
+    gui_card_t *test_tb_activity = gui_card_create(cv, "tb_activity",   0, 0, 0, 124);
+    gui_card_t *test_tb_clock = gui_card_create(cv, "tb_clock",         0, 0, 0, 124);
+
     cardlist_clock(tb_clock);
     cardlist_activity(tb_activity);
     cardlist_heart(tb_heart);
@@ -80,4 +82,10 @@ void curtain_down_design(void *parent_widget)
     cardlist_weather(tb_weather);
     cardlist_music(tb_music);
 
+    cardlist_clock(test_tb_clock);
+    cardlist_activity(test_tb_activity);
+    cardlist_heart(test_tb_heart);
+    cardlist_blood(test_tb_blood);
+    cardlist_weather(test_tb_weather);
+    cardlist_music(test_tb_music);
 }

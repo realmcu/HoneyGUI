@@ -202,18 +202,18 @@ static void gui_text_update_att(struct _gui_obj_t *this)
 
         if (obj->animate->current_frame > frame_count)
         {
-            if (obj->animate->repeatCount == 0)
+            if (obj->animate->repeat_count == 0)
             {
                 obj->animate->animate = false;
             }
-            else if (obj->animate->repeatCount < 0)
+            else if (obj->animate->repeat_count < 0)
             {
                 obj->animate->current_frame = 0;
             }
-            else if (obj->animate->repeatCount > 0)
+            else if (obj->animate->repeat_count > 0)
             {
                 obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeatCount)
+                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
                 {
                     obj->animate->animate = false;
                 }
@@ -341,15 +341,15 @@ void gui_text_set(gui_text_t   *this,
     this->color = color;
     this->len = length;
     this->font_height = font_size;
-    this->text_offset = 0;
-
+    this->char_width_sum = 0;
+    this->char_line_sum = 0;
     gui_fb_change();
     content_change = true;
 }
 
 void gui_text_set_animate(void    *o,
                           uint32_t dur,
-                          int      repeatCount,
+                          int      repeat_count,
                           void    *callback,
                           void    *p)
 {
@@ -363,7 +363,7 @@ void gui_text_set_animate(void    *o,
     animate->animate = true;
     animate->dur = dur;
     animate->callback = (void (*)(void *))callback;
-    animate->repeatCount = repeatCount;
+    animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_text_t *)o)->animate = animate;
 }
@@ -398,7 +398,8 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
 {
     this->content = (uint8_t *)text;
     this->len = length;
-
+    this->char_width_sum = 0;
+    this->char_line_sum = 0;
     gui_fb_change();
     content_change = true;
 }
@@ -411,18 +412,21 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
     }
     void *img;
     gui_img_t *text_img;
+    int16_t img_x = 0, img_y = 0;
 
     gui_font_scale_destory(this);
-    img = gui_text_bmp2img(this, font_img_type);
+    img = gui_text_bmp2img(this, font_img_type, &img_x, &img_y);
 
     if (this->scale_img == NULL)
     {
-        text_img = gui_img_create_from_mem(this, "text_img", img, 0, 0, 0, 0);
+        text_img = gui_img_create_from_mem(this, "text_img", img, img_x, img_y, 0, 0);
     }
     else
     {
         text_img = this->scale_img;
-        gui_img_set_attribute(text_img, "text_img", img, 0, 0);
+        gui_img_set_attribute(text_img, "text_img", img, img_x, img_y);
+        text_img->base.w = gui_get_screen_width();
+        text_img->base.h = gui_get_screen_height();
     }
 
     switch (font_img_type)

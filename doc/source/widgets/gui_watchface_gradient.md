@@ -14,8 +14,8 @@ If you want to create a new watchface_gradient widget, please call the function 
 ## Example
 
 ```c
+#include "gui_img.h"
 #include "root_image_hongkong/ui_resource.h"
-#include <gui_img.h>
 #include "gui_win.h"
 #include "gui_watch_gradient_spot.h"
 #include "gui_text.h"

@@ -387,7 +387,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                             {
-                                FONT_SRC_TYPE font_type2 = NULL;
+                                FONT_SRC_TYPE font_type2;
                                 char *font_type = font;
                                 if (strstr(font_type, ".bin") != NULL)
                                 {
@@ -1518,7 +1518,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t w = 0;
                     int16_t h = 0;
                     float scope = 1.0f;
-                    gui_curtain_enum_t orientation = CURTAIN_MIDDLE;
+                    T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
                     int style = 0;
                     while (true)
                     {
@@ -1881,7 +1881,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
 
                     {
-                        FONT_SRC_TYPE font_type2 = NULL;
+                        FONT_SRC_TYPE font_type2;
                         if (strstr(font_type, ".bin") != NULL)
                         {
                             font_type2 = GUI_FONT_SRC_BMP;

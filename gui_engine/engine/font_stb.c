@@ -48,25 +48,29 @@ void gui_font_stb_load(gui_text_t *text, gui_rect_t *rect)
         stbtt_GetCodepointHMetrics(&font, p_buf[ch++], &advance, &lsb);
         all_char_w += advance * scale;
     }
-    if (text->text_offset == 0)
+    if (text->char_width_sum == 0)
     {
         switch (text->mode)
         {
         case LEFT:
         case CENTER:
         case RIGHT:
-            text->text_offset = _UI_MAX((text->base.w - all_char_w) / 2, 0);
+            text->char_width_sum = all_char_w + 1;
+            text->char_line_sum = 1;
             break;
         case MULTI_LEFT:
         case MULTI_CENTER:
         case MULTI_RIGHT:
-            text->text_offset = all_char_w / text->base.w + 1 + line_flag;
+            text->char_width_sum = all_char_w;
+            text->char_line_sum = all_char_w / text->base.w + 1 + line_flag;
             break;
         case SCROLL_X:
-            text->text_offset = (int)(all_char_w + 1);
+            text->char_width_sum = (int)(all_char_w + 1);
+            text->char_line_sum = 1;
             break;
         case SCROLL_Y:
-            text->text_offset = (all_char_w / text->base.w + 1) * text->font_height;
+            text->char_width_sum = all_char_w;
+            text->char_line_sum = all_char_w / text->base.w + 1;
         default:
             break;
         }
@@ -148,12 +152,12 @@ static bool creat_stb_screen(gui_text_t *text, gui_rect_t *rect, FONT_STB_SCREEN
 {
     if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
     {
-        screen->width = _UI_MIN(rect->x2 - rect->x1, _UI_MAX(text->base.w - text->text_offset * 2, 0));
+        screen->width = _UI_MIN(rect->x2 - rect->x1, _UI_MAX(text->char_width_sum, 0));
         screen->height = _UI_MIN(text->font_height, rect->y2 - rect->y1);
     }
     else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
     {
-        screen->width =  rect->x2 - rect->x1;
+        screen->width = (rect->x2 - rect->x1) * text->base.matrix->m[0][0];
         screen->height = rect->y2 - rect->y1;
     }
     else if (text->mode == SCROLL_X)
@@ -195,7 +199,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     case LEFT:
     case CENTER:
     case RIGHT:
-        offset = text->text_offset * text->mode;
+        offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0) * text->mode;
         break;
     case MULTI_LEFT:
     case MULTI_CENTER:
@@ -226,11 +230,11 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
     int y_end;
     if (rect->yboundbottom != 0)
     {
-        y_end = _UI_MIN(_UI_MIN(dc->section.y2, font_y + font_h), rect->yboundbottom);
+        y_end = _UI_MIN(_UI_MIN(dc->section.y2 + 1, font_y + font_h), rect->yboundbottom);
     }
     else
     {
-        y_end = _UI_MIN(dc->section.y2, font_y + font_h);
+        y_end = _UI_MIN(dc->section.y2 + 1, font_y + font_h);
     }
     if ((x_start >= x_end) || (y_start >= y_end))
     {
@@ -525,7 +529,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
         case LEFT:
         case CENTER:
         case RIGHT:
-            offset = text->text_offset * text->mode;
+            offset = _UI_MAX((text->base.w - text->char_width_sum) / 2, 0) * text->mode;
             break;
         case MULTI_LEFT:
         case MULTI_CENTER:
@@ -572,7 +576,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_rect_t *rect)
             }
             else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
             {
-                if (xpos + advance * scale > stb_screen->width)
+                if ((xpos + advance * scale > stb_screen->width) || p_buf[ch] == 0x0A)
                 {
                     line_num ++;
                     xpos = 0;

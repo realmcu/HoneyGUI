@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "gui_text.h"
 #include "gui_win.h"
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "hub_clock.h"
 #include "module_global_data.h"
 #endif
@@ -30,7 +30,7 @@ float angle_sec;
 
 static void img_animate_watchface_callback(void *obj)
 {
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
     uint16_t seconds = get_system_clock_second();
     uint16_t minute = RtkWristbandSys.Global_Time.minutes;
     uint16_t hour = RtkWristbandSys.Global_Time.hour;
@@ -136,7 +136,7 @@ void design_tab_watchface(void *parent)
 
     gui_win_t *win_switch_to_perspective_app = gui_win_create(parent, "win_switch_to_perspective_app",
                                                               0, 0, 454, 454);
-    //gui_win_onLong(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
-    //gui_win_onRelease(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
-    gui_win_onClick(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
+    //gui_win_long(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
+    //gui_win_release(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
+    gui_win_click(win_switch_to_perspective_app, win_switch_to_perspective_app_touch_cb, NULL);
 }

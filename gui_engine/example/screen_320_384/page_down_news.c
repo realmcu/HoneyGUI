@@ -82,12 +82,10 @@ static void done_cb(gui_curtainview_t *this)
     if (this->cur_curtain == CURTAIN_DOWN)
     {
         gui_log("CURTAIN_DOWN done!!! \n");
-        cv->mute = false;
     }
     if (this->cur_curtain == CURTAIN_MIDDLE)
     {
         gui_log("CURTAIN_DOWN Reset!!! \n");
-        cv->mute = true;
         cv->release_y = 0;
         cv->remain_y = 0;
     }
@@ -95,18 +93,7 @@ static void done_cb(gui_curtainview_t *this)
 }
 static void cv_status_cb(gui_cardview_t *this)
 {
-    //gui_log("cv release value = %d \n", this->release_y);
-
-    gui_curtainview_t *curtainview = (gui_curtainview_t *)this->base.parent->parent;
-
-    if (this->release_y != 0)
-    {
-        curtainview->mute = true;
-    }
-    else
-    {
-        curtainview->mute = false;
-    }
+    gui_log("cv release value = %d \n", this->release_y);
 }
 void  page_down_message_design(void *parent)
 {
@@ -127,13 +114,13 @@ void  page_down_message_design(void *parent)
     //gui_cardview_set_style(cd, STACKING);
     gui_cardview_status_cb(cv, cv_status_cb);
 
-    gui_card_t *tb_all = gui_card_create(cv, "tb_all", 0, 0, 0, 128, 0, 6);
-    gui_card_t *tb_more = gui_card_create(cv, "tb_more", 0, 0, 0, 128, 0, 5);
-    gui_card_t *tb_weather2 = gui_card_create(cv, "tb_weather2", 0, 0, 0, 128, 0, 4);
-    gui_card_t *tb_music = gui_card_create(cv, "tb_music", 0, 0, 0, 128, 0, 3);
-    gui_card_t *tb_weather1 = gui_card_create(cv, "tb_weather1", 0, 0, 0, 128, 0, 2);
-    gui_card_t *tb_health = gui_card_create(cv, "tb_health", 0, 0, 0, 128, 0, 1);
-    gui_card_t *tb_time = gui_card_create(cv, "tb_time", 0, 0, 0, 128, 0, 0);
+    gui_card_t *tb_all = gui_card_create(cv, "tb_all", 0, 0, 0, 128);
+    gui_card_t *tb_more = gui_card_create(cv, "tb_more", 0, 0, 0, 128);
+    gui_card_t *tb_weather2 = gui_card_create(cv, "tb_weather2", 0, 0, 0, 128);
+    gui_card_t *tb_music = gui_card_create(cv, "tb_music", 0, 0, 0, 128);
+    gui_card_t *tb_weather1 = gui_card_create(cv, "tb_weather1", 0, 0, 0, 128);
+    gui_card_t *tb_health = gui_card_create(cv, "tb_health", 0, 0, 0, 128);
+    gui_card_t *tb_time = gui_card_create(cv, "tb_time", 0, 0, 0, 128);
 
     page_down_message_time(tb_time);
     page_down_message_health(tb_health);

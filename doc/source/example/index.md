@@ -18,4 +18,5 @@ GUI_INIT_APP_EXPORT(app_init);
 
     Demo An Calculator Application <Calculator/Demo>
     Demo An 86box Application <86box/86box>
+    Status bar <Status bar>
 ```

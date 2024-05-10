@@ -1,11 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <app>launcher
-	<script src="app/system/launcher.js"></script>
-	<screen w="480" h="480">screen_launcher
+	<script src="app/system/launcher.js"></script><screen w="480" h="320">screen_launcher
 				<win>win_launcher
-					<textbox text="APP列表,点击进入" fontColor="#ff0072">t1</textbox>
-					<iconlist y="100">ic_launcher
-					</iconlist>
-				</win>
-	</screen>
-</app>
+					<textbox text="APP列表,点击进入" fontColor="#ff0072">t1</textbox><iconlist y="100">ic_launcher
+					</iconlist></win></screen></app>

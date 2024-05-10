@@ -56,6 +56,8 @@ typedef enum
     MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
+    VERTICAL_LEFT,
+    VERTICAL_RIGHT,
 } TEXT_MODE;
 
 /** @brief  text encoding format enum */
@@ -81,7 +83,8 @@ typedef struct gui_text
     gui_color_t color;
     uint16_t len;
     uint16_t font_len;
-    uint16_t text_offset;
+    int16_t char_width_sum;
+    int16_t char_line_sum;
     TEXT_MODE mode;
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
@@ -99,8 +102,8 @@ typedef struct gui_text
 /** @brief  text line structure */
 typedef struct gui_text_line
 {
-    uint8_t line_char;
-    uint8_t line_dx;
+    uint16_t line_char;
+    uint16_t line_dx;
 } gui_text_line_t;
 
 /** End of WIDGET_Exported_Types
@@ -177,13 +180,13 @@ void gui_text_set(gui_text_t   *this,
  *
  * @param o text widget
  * @param dur durtion. time length of the animate
- * @param repeatCount  0:one shoot -1:endless
+ * @param repeat_count  0:one shoot -1:endless
  * @param callback happens at every frame
  * @param p callback's parameter
  */
 void gui_text_set_animate(void    *o,
                           uint32_t dur,
-                          int      repeatCount,
+                          int      repeat_count,
                           void    *callback,
                           void    *p);
 

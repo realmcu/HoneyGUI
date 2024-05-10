@@ -745,7 +745,7 @@ static void calculator_draw_button(void *parent)
         gui_text_mode_set(GUI_TYPE(gui_button_t, button[i])->text, LEFT);
         GET_BASE(GUI_TYPE(gui_button_t, button[i])->text)->x = 36;
         GET_BASE(GUI_TYPE(gui_button_t, button[i])->text)->y = 18;
-        GUI_TYPE(gui_button_t, button[i])->text->utf_8 = btn_char + i;
+        GUI_TYPE(gui_button_t, button[i])->text->content = btn_char + i;
         GUI_TYPE(gui_button_t, button[i])->text->len = 1;
 
         // setup btn callback

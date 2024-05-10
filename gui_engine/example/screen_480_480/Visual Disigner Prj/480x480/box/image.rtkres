@@ -4,6 +4,7 @@
     <ImageConvertSetting>
       <colorHeadFlag>true</colorHeadFlag>
       <bigEndianFlag>false</bigEndianFlag>
+      <mixAlphaChannelFlag>false</mixAlphaChannelFlag>
       <compressFlag>true</compressFlag>
       <scanMode>Horizontal</scanMode>
       <colorMode>RGB565</colorMode>

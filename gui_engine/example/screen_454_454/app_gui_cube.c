@@ -17,7 +17,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include <stdio.h>
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "wdg.h"
 #endif
 
@@ -106,7 +106,7 @@ static void design_app_cube_ui(gui_app_t *app)
 
     gui_font_mem_init(FONT_BIN);
 
-#ifndef _WIN32
+#ifdef _ENABLE_RTK_SOC_WATCH_
 #include "mem_config.h"
     //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
 #endif
@@ -130,9 +130,9 @@ static void design_app_cube_ui(gui_app_t *app)
 
     gui_win_t *win_switch_to_main_app = gui_win_create(&(app->screen), "win_switch_to_main_app", 0, 0,
                                                        454, 454);
-    //gui_win_onLong(win_switch_to_main_app, win_switch_main_to_app_touch_cb, NULL);
-    //gui_win_onRelease(win_switch_to_main_app, win_switch_main_to_app_touch_cb, NULL);
-    gui_win_onClick(win_switch_to_main_app, win_switch_main_to_app_touch_cb, NULL);
+    //gui_win_long(win_switch_to_main_app, win_switch_main_to_app_touch_cb, NULL);
+    //gui_win_release(win_switch_to_main_app, win_switch_main_to_app_touch_cb, NULL);
+    gui_win_click(win_switch_to_main_app, win_switch_main_to_app_touch_cb, NULL);
     gui_fb_change();
 }
 

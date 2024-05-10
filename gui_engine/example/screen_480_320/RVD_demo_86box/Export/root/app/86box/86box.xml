@@ -311,7 +311,7 @@
               scaleY="1">img_bg_cold
 </img></win><icon
             picture="app/86box/resource/3_air/0_0_down.bin"
-            highlightPicture="app/86box/resource/3_air/0_0_down.bin"
+            highlightPicture="app/86box/resource/3_air/0_0_down_clik.bin"
             blendMode="imgBypassMode"
             opacity="255"
             pictureX="0"
@@ -322,13 +322,13 @@
             fontColor="#ffffff"
             mode="normal"
             text=""
-            w="30"
-            h="28"
+            w="36"
+            h="33"
             x="53"
             y="143">btn_dn
 </icon><icon
             picture="app/86box/resource/3_air/0_1_up.bin"
-            highlightPicture="app/86box/resource/3_air/0_1_up.bin"
+            highlightPicture="app/86box/resource/3_air/0_1_up_click.bin"
             blendMode="imgBypassMode"
             opacity="255"
             pictureX="0"
@@ -339,8 +339,8 @@
             fontColor="#ffffff"
             mode="normal"
             text=""
-            w="30"
-            h="28"
+            w="36"
+            h="33"
             x="397"
             y="143">btn_up
 </icon></win></tab><tab
@@ -360,8 +360,8 @@
           scaleX="1"
           scaleY="1">img_bg_curtain
 </img><switch
-          x="237.333333333333"
-          y="226.333333333333"
+          x="237"
+          y="226"
           picture="app/86box/resource/4_curtain/0_start.bin"
           highlightPicture="app/86box/resource/4_curtain/1_stop.bin"
           blendMode="imgFilterBlack"
@@ -396,25 +396,25 @@
           w="480"
           h="277">sw_wifi
 </switch><textbox
-          x="207"
-          y="58"
           color="#ffffffff"
-          w="105"
-          h="37"
+          mode="truncate"
           text="Click"
           fontSize="30"
           font="app/86box/resource/font/times_size30_bits8_font.bin"
-          mode="truncate">txt_wifi
-</textbox><textbox
-          x="266"
-          y="58"
-          color="#ffffffff"
           w="105"
-          h="38"
+          h="37"
+          x="207"
+          y="58">txt_wifi
+</textbox><textbox
+          color="#ffffffff"
+          mode="truncate"
           text="bit/s"
           fontSize="30"
           font="app/86box/resource/font/times_size30_bits8_font.bin"
-          mode="truncate">txt_unit
+          w="105"
+          h="38"
+          x="266"
+          y="58">txt_unit
 </textbox></tab></tabview><switch
       x="84"
       y="278"

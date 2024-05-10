@@ -143,25 +143,25 @@ static void image(gui_obj_t *object)
             {
                 scale = 0.01f;
             }
-            gui_img_scale(obj, scale, scale);
-            gui_img_rotation(obj, 0, gui_img_get_width(obj) / 2,
-                             gui_img_get_height(obj) / 2);
-            gui_img_translate(obj, gui_img_get_width(obj) / 2,
-                              gui_img_get_height(obj) / 2);
+            gui_img_scale((void *)obj, scale, scale);
+            gui_img_rotation((void *)obj, 0, gui_img_get_width((void *)obj) / 2,
+                             gui_img_get_height((void *)obj) / 2);
+            gui_img_translate((void *)obj, gui_img_get_width((void *)obj) / 2,
+                              gui_img_get_height((void *)obj) / 2);
             float tx, ty;
             if (_UI_ABS(x) > CIRCLE_BOUNDARY)
             {
                 tx = (SCREEN_W / 2.0f - (float)obj->x) *
                      (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
                      * (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
-                     + ((float)(gui_img_get_width(obj) / 2))
+                     + ((float)(gui_img_get_width((void *)obj) / 2))
                      * (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)
                      * ((SCREEN_W / 2.0f
                          - (float)obj->x) / (SCREEN_W / 2.0f));
                 ty = (SCREEN_H / 2.0f - (float)obj->y)  *
                      (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
                      * (1.0f - (scale + (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_W / 2.0f - CIRCLE_BOUNDARY)))
-                     + ((float)(gui_img_get_height(obj) / 2))
+                     + ((float)(gui_img_get_height((void *)obj) / 2))
                      * (_UI_ABS(x) - CIRCLE_BOUNDARY) / (SCREEN_H / 2.0f - CIRCLE_BOUNDARY)
                      * ((SCREEN_H / 2.0f
                          - (float)obj->y) / (SCREEN_H / 2.0f));
@@ -171,20 +171,36 @@ static void image(gui_obj_t *object)
                 tx = (SCREEN_W / 2.0f - (float)obj->x) * (1.0f - (scale)) * (1.0f - (scale)) ;
                 ty = (SCREEN_H / 2.0f - (float)obj->y) * (1.0f - (scale)) * (1.0f - (scale)) ;
             }
-            gui_img_translate(obj, tx, ty);
+            gui_img_translate((void *)obj, tx, ty);
         }
 
         image(obj);
     }
 }
+
 static void wincb(gui_win_t *win)
 {
+    typedef int (*overwrite)(gui_obj_t *obj);
+
+    if (GUI_TYPE(gui_menu_cellular_t, win)->overwrite)
+    {
+        int rst = ((overwrite)(GUI_TYPE(gui_menu_cellular_t, win)->overwrite))((void *)win);
+        if (rst != 0)
+        {
+            touch_info_t *tp = tp_get_info();
+            x = tp->deltaX;
+            y = tp->deltaY;
+            speed[0] = 0;
+            speed[1] = 0;
+            //return;
+        }
+    }
     touch_info_t *tp = tp_get_info();
     static bool move_flag = 1;
     left = INT16_MAX; right = 0; top = INT16_MAX; bottom = 0;
     if (move_flag)
     {
-        image(win);
+        image((void *)win);
     }
     else
     {
@@ -281,6 +297,12 @@ static void wincb(gui_win_t *win)
 
 
 }
+static void ctor(gui_menu_cellular_t *this, gui_obj_t *parent)
+{
+    extern void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
+                             int16_t y, int16_t w, int16_t h);
+    gui_win_ctor((void *)this, parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height());
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -288,8 +310,9 @@ static void wincb(gui_win_t *win)
 gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],
                                               int array_size)
 {
-    gui_win_t *win = gui_win_create(parent, 0, 0, 0, gui_get_screen_width(),
-                                    gui_get_screen_height());
+#define _GUI_NEW_GUI_MENU_CELLULAR_PARAM this, parent
+    GUI_CREATE_HELPER(gui_menu_cellular_t, ctor, _GUI_NEW_GUI_MENU_CELLULAR_PARAM)
+    gui_win_t *win = &(this->base);
     gui_win_set_animate(win, 1000, -1, wincb, win);
 #define ICON_SIZE (icon_size)
 #define WIDTH_GAP (ICON_SIZE)

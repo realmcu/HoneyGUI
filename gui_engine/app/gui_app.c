@@ -93,7 +93,10 @@ void gui_app_startup(gui_app_t *app)
     app->screen.opacity_value = UINT8_MAX;
     app->screen.matrix = gui_malloc(sizeof(struct gui_matrix));
     matrix_identity(app->screen.matrix);
+    app->screen.w = gui_get_screen_width();
+    app->screen.h = gui_get_screen_height();
     app->screen.create_done = true;
+
 
 }
 
