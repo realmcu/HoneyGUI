@@ -12,7 +12,9 @@
 #include "gui_button.h"
 #include "app_dashboard_connected_display.h"
 #include "app_dashboard_data.h"
+#ifndef _WIN32
 #include "trace.h"
+#endif
 
 uint8_t show_c_navigation_msg[40];
 uint8_t show_c_navigation_unit[40];

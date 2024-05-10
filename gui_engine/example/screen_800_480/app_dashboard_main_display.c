@@ -22,9 +22,7 @@ uint8_t show_tel_number[11];
 void app_dashboard_create_main_display(gui_win_t *target_main_display)
 {
     /* set update callback */
-#ifndef _WIN32
     gui_win_set_animate(target_main_display, 1000, -1, paint_main_display_cb, target_main_display);
-#endif
     /* set Image data */
     dashboard_background = gui_img_create_from_mem(target_main_display, "dashboard_background",
                                                    BACKGROUND_BIN, 0, 0, 800, 480);
@@ -75,9 +73,7 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     short_message = gui_img_create_from_mem(target_main_display, "short_message", MESSAGE_BIN, 221,
                                             0, 359, 80);
 
-    gui_log("gui_test\n");
     /* set font data */
-#ifndef _WIN32
     app_phone_data current_phone_status;
     app_dashboard_data_get_phone_status(&current_phone_status);
     short_tel_number = gui_text_create(target_main_display,  "short_tel_number",  322, 415, 158, 30);
@@ -109,10 +105,8 @@ void app_dashboard_create_main_display(gui_win_t *target_main_display)
     app_dashboard_update_main_display_bluetooth_info(app_dashboard_data_get_bluetooth_status());
     app_dashboard_update_main_display_phone_infor(&current_phone_status);
     app_dashboard_update_main_display_message_infor(&current_message_status);
-#endif
 }
 
-#ifndef _WIN32
 extern gui_win_t *win_connected_display;
 void paint_main_display_cb(gui_win_t *win)
 {
@@ -140,8 +134,6 @@ void paint_main_display_cb(gui_win_t *win)
     app_dashboard_update_main_display_message_infor(&current_message_status);
 
 }
-#endif
-#ifndef _WIN32
 void app_dashboard_update_main_display_time_info(void)
 {
     uint32_t main_display_hour = app_dashboard_data_get_current_timer() / 3600;
@@ -367,4 +359,4 @@ void app_dashboard_update_main_display_phone_infor(app_phone_data *app_call_info
                  UINT8_MAX, UINT8_MAX), app_call_information->current_phone_number_len, 28);
 
 }
-#endif
+

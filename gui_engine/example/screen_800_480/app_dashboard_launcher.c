@@ -14,9 +14,9 @@
 #include "app_dashboard_main_display.h"
 #include "gui_win.h"
 #include "gui_components_init.h"
-#ifndef _WIN32
 #include "app_dashboard_connected_display.h"
 #include "app_dashboard_data.h"
+#ifndef _WIN32
 #include <trace.h>
 #include "gap.h"
 #include "profile_server.h"
@@ -73,9 +73,8 @@ void app_dashboard_launcher_update_thread(void *this)
 {
     while (1)
     {
-#ifndef _WIN32
+
         app_dashboard_auto_refresh_data_demo();
-#endif
         gui_thread_mdelay(25);
     }
 }
@@ -100,13 +99,12 @@ void app_dashboard_launcher_ui_design(gui_app_t *app)
     gui_font_mem_init(HARMONYOS_SIZE56_BITS1_FONT_BIN);
 
     app_dashboard_create_main_display(win_main_display);
-#ifndef _WIN32
     app_dashboard_create_connected_display(win_connected_display);
     win_main_display->base.not_show = false;
     win_connected_display->base.not_show = true;
 
     app_dashboard_initialize_data();
-#endif
+
 }
 
 uint8_t resource_root[1024 * 1024 * 20];
