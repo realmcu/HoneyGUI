@@ -68,61 +68,20 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     int16_t x_end = 0;
     int16_t y_start = 0;
     int16_t y_end = 0;
-    int16_t source_w = image->img_w;
+
     if (gui_image_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
-    uint8_t img_type = ((struct gui_rgb_data_head *)(image->data))->type;
     imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
-    uint8_t opacity_value = image->opacity_value;
-
-    if (opacity_value == 0)
+    for (uint32_t i = y_start; i <= y_end; i++)
     {
-        return;
-    }
-
-    if (img_type == RGB565)//rle_bypass_565_2_565
-    {
-        if (opacity_value == 255)
-        {
-            for (uint32_t i = y_start; i <= y_end; i++)
-            {
-                int line = i - image_y;
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
-                uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-                // memset line
-                rle_bypass_rgb565_draw(file, line,  &(writebuf[write_off + x_start]), image_x, (x_end - x_start));
-            }
-        }
-        else
-        {
-            for (uint32_t i = y_start; i <= y_end; i++)
-            {
-                int line = i - image_y;
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
-                uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-                // memcpy line
-                uint8_t line_buf[BYTE_PIXEL_RGB565 * source_w];
-                uncompressed_rle_rgb565(file, line, line_buf);
-                int read_off = (int)(uintptr_t)line_buf - BYTE_PIXEL_RGB565 * image_x;
-                for (uint32_t j = x_start; j <= x_end; j++)
-                {
-                    uint16_t pixel = *((uint16_t *)(uintptr_t)read_off + j);
-                    if (pixel != 0)
-                    {
-                        writebuf[write_off + j] = ((((((pixel >> 11) << 3) * opacity_value + ((
-                                                                                                  writebuf[write_off + j] >> 11) << 3) * (0xFF - opacity_value)) / 255) >> 3) << 11) +
-                                                  ((((((((pixel & 0x07e0) >> 5) << 2) * opacity_value) + (((writebuf[write_off + j] & 0x07e0) >> 5) <<
-                                                          2) * (0xFF - opacity_value)) / 0xFF) >> 2) << 5) +
-                                                  ((((((pixel & 0x001f) << 3) * opacity_value) + ((writebuf[write_off + j]  & 0x001f) << 3) *
-                                                     (0xFF - opacity_value)) / 0xFF) >> 3);
-                    }
-                }
-            }
-        }
+        int line = i - image_y;
+        int write_off = (i - dc->section.y1) * dc->fb_width ;
+        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+        // memset line
+        rle_bypass_rgb565_draw(file, line,  &(writebuf[write_off + x_start]), image_x, (x_end - x_start));
     }
 }
-
