@@ -68,8 +68,8 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 void design_tab_menu(void *parent)
 {
     gui_rect_create(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(),
-                    gui_obj_rgba(UINT8_MAX,
-                                 UINT8_MAX, UINT8_MAX, 100));
+                    gui_rgba(UINT8_MAX,
+                             UINT8_MAX, UINT8_MAX, 100));
     gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
     //gui_page_rebound(page, 1);
     GET_BASE(page)->obj_cb = gui_page_cb;
@@ -138,11 +138,11 @@ void design_tab_menu(void *parent)
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
         if (i < 4)
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(42, 5, 79), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
         else
         {
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_obj_rgb(200, 200, 200), strlen(text), font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(200, 200, 200), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);

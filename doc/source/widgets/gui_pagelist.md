@@ -39,7 +39,7 @@ void design_pagelist_test(void *parent)
         scroll_text_pagelist_test[i] = gui_scroll_text_create(switch_pagelist_test[i],
                                                               "scroll_text_record_files", 0, 0, 128, FONT_H_32);
         gui_scroll_text_set(scroll_text_pagelist_test[i], files_name_test[i],
-                            GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]),
+                            GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]),
                             FONT_H_32);
         gui_scroll_text_scroll_set(scroll_text_pagelist_test[i], SCROLL_X, 0, 0, 5000, 0);
         gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_1,

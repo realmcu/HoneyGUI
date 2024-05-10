@@ -744,3 +744,32 @@ void *gui_get_file_address(const char *file)
     }
 #endif
 }
+
+gui_color_t gui_rgba(unsigned char red,
+                     unsigned char green,
+                     unsigned char blue,
+                     unsigned char opacity)
+{
+    gui_color_t color;
+
+    // Use longer initialization to suppress warning.
+    color.color.rgba.r = red;
+    color.color.rgba.g = green;
+    color.color.rgba.b = blue;
+    color.color.rgba.a = opacity;
+
+    return color;
+}
+
+gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
+{
+    gui_color_t color;
+
+    // Use longer initialization to suppress warning.
+    color.color.rgba.r = red;
+    color.color.rgba.g = green;
+    color.color.rgba.b = blue;
+    color.color.rgba.a = UINT8_MAX;
+
+    return color;
+}

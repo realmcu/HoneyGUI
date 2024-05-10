@@ -31,13 +31,13 @@ GUI_APP_DEFINE_NAME(APP_MAP)
 /**
  * @link https://www.rapidtables.com/web/color/RGB_Color.html
 */
-#define COLOR_RED gui_obj_rgb(255, 0, 0)
-#define COLOR_CRIMSON gui_obj_rgb(220,20,60)
-#define COLOR_FIREBRICK gui_obj_rgb(178,34,34)
-#define COLOR_WHITE gui_obj_rgb(255,255,255)
-#define COLOR_WHITE_OPACITY gui_obj_rgba(255,255,255,150)
-#define COLOR_SILVER gui_obj_rgb(192,192,192)
-#define COLOR_SILVER_OPACITY(opacity) gui_obj_rgba(192,192,192, opacity)
+#define COLOR_RED gui_rgb(255, 0, 0)
+#define COLOR_CRIMSON gui_rgb(220,20,60)
+#define COLOR_FIREBRICK gui_rgb(178,34,34)
+#define COLOR_WHITE gui_rgb(255,255,255)
+#define COLOR_WHITE_OPACITY gui_rgba(255,255,255,150)
+#define COLOR_SILVER gui_rgb(192,192,192)
+#define COLOR_SILVER_OPACITY(opacity) gui_rgba(192,192,192, opacity)
 #define HEART_ANI_NAME "_HEART_ANI"
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
@@ -53,7 +53,7 @@ extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
-    gui_rect_create((void *)app_win, 0, 0, SCREEN_W, SCREEN_H, gui_obj_rgba(0, 0, 0, 100));
+    gui_rect_create((void *)app_win, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0, 100));
     gui_win_set_animate(app_win, 1000, 0, app_win_cb, app_win);
     gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);

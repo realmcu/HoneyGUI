@@ -172,7 +172,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_text_mode_set(text3, CENTER);
 
     gui_text_t *text4 = gui_text_create(screen,  "text4",  0, 150, 100, 200);
-    gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, gui_obj_rgb(0, 0xff, 0xff), 24, 24);
+    gui_text_set(text4, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", GUI_FONT_SRC_BMP, gui_rgb(0, 0xff, 0xff), 24, 24);
     gui_text_type_set(text4, SIMKAI_SIZE24_BITS4_FONT_BIN);
     gui_text_mode_set(text4, MULTI_CENTER);
 }

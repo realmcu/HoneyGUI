@@ -288,21 +288,21 @@ static void cal_display_update(void)
     if (len <= line_len)
     {
         // single line
-        gui_text_set(text_display_up, NULL, GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+        gui_text_set(text_display_up, NULL, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      0,
                      CAL_TEXT_FONT_SIZE_DISPLAY);
-        gui_text_set(text_display_dn, pstr, GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+        gui_text_set(text_display_dn, pstr, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      len,
                      CAL_TEXT_FONT_SIZE_DISPLAY);
     }
     else
     {
         // double line
-        gui_text_set(text_display_up, pstr, GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+        gui_text_set(text_display_up, pstr, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      line_len,
                      CAL_TEXT_FONT_SIZE_DISPLAY);
-        gui_text_set(text_display_dn, pstr + line_len, GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX,
-                                                                                     UINT8_MAX), len - line_len,
+        gui_text_set(text_display_dn, pstr + line_len, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
+                                                                                 UINT8_MAX), len - line_len,
                      CAL_TEXT_FONT_SIZE_DISPLAY);
     }
 }
@@ -727,7 +727,7 @@ static void calculator_draw_button(void *parent)
                                       font_size);
     text_display_dn = gui_text_create(parent, "txt", 0, offset_y / 2 - 9, offset_x + del_x * 3 + 20,
                                       font_size);
-    gui_text_set(text_display_dn, text, GUI_FONT_SRC_BMP, gui_obj_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+    gui_text_set(text_display_dn, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                  strlen(text), font_size);
     gui_text_type_set(text_display_up, addr_font);
     gui_text_mode_set(text_display_up, RIGHT);

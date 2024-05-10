@@ -119,6 +119,23 @@ extern "C" {
     gui_log("%f  \n",(pox)->p[2]); \
     gui_log("-----------------------------------------------\n"); //!< print position
 
+/** @brief white color in gui_color_t structure */
+#define APP_COLOR_WHITE                     gui_rgba(UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX)
+/** @brief red color in gui_color_t structure */
+#define APP_COLOR_RED                       gui_rgba(UINT8_MAX, 0, 0, UINT8_MAX)
+/** @brief green color in gui_color_t structure */
+#define APP_COLOR_GREEN                     gui_rgba(0, UINT8_MAX, 0, UINT8_MAX)
+/** @brief blue color in gui_color_t structure */
+#define APP_COLOR_BLUE                      gui_rgba(0, 0, UINT8_MAX, UINT8_MAX)
+
+/**
+ * @link https://www.rapidtables.com/web/color/RGB_Color.html
+*/
+#define APP_COLOR_CRIMSON                   gui_rgb(220,20,60)
+#define APP_COLOR_FIREBRICK                 gui_rgb(178,34,34)
+#define APP_COLOR_WHITE_OPACITY             gui_rgba(255,255,255,150)
+#define APP_COLOR_SILVER                    gui_rgb(192,192,192)
+#define APP_COLOR_SILVER_OPACITY(opacity)   gui_rgba(192,192,192, opacity)
 /** End of SERVER_Exported_Macros
   * @}
   */
@@ -217,6 +234,29 @@ uint32_t gui_ms_get(void);
 uint32_t gui_us_get(void);
 void gui_task_ext_execution_sethook(void (*hook)(void));
 
+/**
+ * @brief Get a color value from red, green, blue and opacity values.
+ *
+ * @param red  Range of unsigned char
+ * @param green Range of unsigned char
+ * @param blue Range of unsigned char
+ * @param opacity Range of unsigned char
+ * @return gui_color_t
+ */
+gui_color_t gui_rgba(unsigned char red,
+                     unsigned char green,
+                     unsigned char blue,
+                     unsigned char opacity);
+
+/**
+ * @brief Get a color value from red, green and blue.
+ *
+ * @param red  Range of unsigned char
+ * @param green Range of unsigned char
+ * @param blue Range of unsigned char
+ * @return gui_color_t
+ */
+gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
 /** End of SERVER_Exported_Functions
   * @}
   */

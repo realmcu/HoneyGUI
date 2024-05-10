@@ -539,35 +539,6 @@ void gui_obj_skip_other_right_hold(gui_obj_t *obj)
     obj->skip_tp_right_hold = false;
 }
 
-gui_color_t gui_obj_rgba(unsigned char red,
-                         unsigned char green,
-                         unsigned char blue,
-                         unsigned char opacity)
-{
-    gui_color_t color;
-
-    // Use longer initialization to suppress warning.
-    color.color.rgba.r = red;
-    color.color.rgba.g = green;
-    color.color.rgba.b = blue;
-    color.color.rgba.a = opacity;
-
-    return color;
-}
-
-gui_color_t gui_obj_rgb(unsigned char red, unsigned char green, unsigned char blue)
-{
-    gui_color_t color;
-
-    // Use longer initialization to suppress warning.
-    color.color.rgba.r = red;
-    color.color.rgba.g = green;
-    color.color.rgba.b = blue;
-    color.color.rgba.a = UINT8_MAX;
-
-    return color;
-}
-
 void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
 {
     gui_list_t *node = NULL;
