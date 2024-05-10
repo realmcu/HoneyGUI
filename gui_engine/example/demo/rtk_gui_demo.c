@@ -109,6 +109,8 @@ static void canvas_cb_black(gui_canvas_t *canvas)
 }
 
 #include "gui_cube.h"
+#include "gui_canvas_arc.h"
+#include "gui_canvas_round_rect.h"
 #include "tiger_blue_compressed.c"
 #include "acc_sw_rle.h"
 
@@ -121,6 +123,9 @@ static void app_dialing_ui_design(gui_app_t *app)
     // //gui_img_scale((gui_img_t *)img, 1.3, 1.3);
     // gui_img_rotation((gui_img_t *)img, 20, 0, 0);
 
+    // gui_canvas_round_rect_t *rect = gui_canvas_round_rect_create(&(app->screen), "t", 454 / 2 - 200, 454 / 2 - 200, 400, 400, 20, gui_rgba(0, 255, 0, 100));
+
+    // gui_canvas_arc_t *arc = gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 200, 90, 20, gui_rgba(255, 0, 0, 255));
     // return;
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
