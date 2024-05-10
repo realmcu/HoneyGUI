@@ -15,9 +15,16 @@ src += Glob('./gui_common/*.c')
 src += Glob('./gui_call/*.c')
 src += Glob('./gui_record/*.c')
 src += Glob('./gui_menu/*.c') 
+src += Glob('./gui_benchmark/*.c') 
 src += Glob('./gui_watchface_litegfx/*.c') 
 CPPPATH = [cwd]
+CPPPATH += [cwd + '\\gui_benchmark']
+CPPPATH += [cwd + '\\gui_call']
 CPPPATH += [cwd + '\\gui_common']
+CPPPATH += [cwd + '\\gui_contacts']
+CPPPATH += [cwd + '\\gui_player']
+CPPPATH += [cwd + '\\gui_record']
+CPPPATH += [cwd + '\\gui_watchface']
 print(CPPPATH)
 
 CPPDEFINES = []
