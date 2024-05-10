@@ -221,7 +221,7 @@ static void heart_ani_cb(gui_win_t *win)
         HEARTRATE48_BIN,
     };
     gui_img_t *img = 0;
-    gui_obj_tree_get_widget_by_name(win, HEART_ANI_NAME, (void *)&img);
+    gui_obj_tree_get_widget_by_name((void *)win, HEART_ANI_NAME, (void *)&img);
     if (odd)
     {
         gui_img_set_attribute(img, HEART_ANI_NAME,
@@ -644,7 +644,7 @@ static void stop_watch_win_ani_cb()
 #include "gui_map.h"
 GUI_APP_ENTRY(APP_MAP)
 {
-    gui_obj_t *map = gui_map_create(GUI_APP_ROOT_SCREEN);
+    gui_obj_t *map = (void *)gui_map_create(GUI_APP_ROOT_SCREEN);
     {
         char *text = "MAP";
         int font_size = 16;

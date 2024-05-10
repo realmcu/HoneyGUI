@@ -211,8 +211,8 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
 
             parent->tile[y - startY][x - startX].x = x;
             parent->tile[y - startY][x - startX].y = y;
-            gui_stbimg_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
-                                     (x - startX)*tile_size, (y - startY)*tile_size);
+            gui_img_stb_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
+                                      (x - startX)*tile_size, (y - startY)*tile_size);
 #else
             gui_rect_create((gui_obj_t *)parent, (x - startX)*tile_size, (y - startY)*tile_size, TILE_SIZE - 1,
                             TILE_SIZE - 1,
@@ -295,8 +295,8 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
         gui_fs_read(fd, jpg, filesize);
         gui_fs_close(fd);
     }
-    gui_stbimg_set_attribute(tile->img, jpg, filesize, JPEG, tile->img->base.x,
-                             tile->img->base.y);
+    gui_img_stb_set_attribute_static(tile->img, jpg, filesize, JPEG, tile->img->base.x,
+                                     tile->img->base.y);
 #else
 #endif
 }
@@ -375,6 +375,7 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->x = -256 ;
             this->start_x = -256 - tp->deltaX;
+            GUI_BASE(this)->matrix->m[0][2] = GUI_BASE(this)->x;
         }
         if (GUI_BASE(this)->x <= -(GUI_BASE(this)->w - SCREEN_W)  && (tp->deltaX < 0 || deltaX_left_flag) &&
             !deltaX_right_flag)
@@ -411,6 +412,7 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->x = 0;
             this->start_x = - tp->deltaX;
+            GUI_BASE(this)->matrix->m[0][2] = GUI_BASE(this)->x;
         }
 
         if (GUI_BASE(this)->y >= 0 && (tp->deltaY > 0))
@@ -446,6 +448,7 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->y = -256 ;
             this->start_y = -256 - tp->deltaY;
+            GUI_BASE(this)->matrix->m[1][2] = GUI_BASE(this)->y;
         }
 
         if (GUI_BASE(this)->y <= -(256 * 3 - SCREEN_H) && (tp->deltaY < 0))
@@ -481,6 +484,7 @@ static void wincb(gui_map_t *this)
 
             GUI_BASE(this)->y = -(256 * 3 - SCREEN_H - 256) ;
             this->start_y = -(256 * 3 - SCREEN_H - 256) - tp->deltaY;
+            GUI_BASE(this)->matrix->m[1][2] = GUI_BASE(this)->y;
         }
 
 

@@ -4014,9 +4014,9 @@ static void stbi__YCbCr_to_RGB_row(stbi_uc *out, const stbi_uc *y, const stbi_uc
         if ((unsigned) r > 255) { if (r < 0) r = 0; else r = 255; }
         if ((unsigned) g > 255) { if (g < 0) g = 0; else g = 255; }
         if ((unsigned) b > 255) { if (b < 0) b = 0; else b = 255; }
-        out[0] = (stbi_uc)r;
+        out[2] = (stbi_uc)r;
         out[1] = (stbi_uc)g;
-        out[2] = (stbi_uc)b;
+        out[0] = (stbi_uc)b;
         out[3] = 255;
         out += step;
     }
@@ -4155,9 +4155,9 @@ static void stbi__YCbCr_to_RGB_simd(stbi_uc *out, stbi_uc const *y, stbi_uc cons
         if ((unsigned) r > 255) { if (r < 0) r = 0; else r = 255; }
         if ((unsigned) g > 255) { if (g < 0) g = 0; else g = 255; }
         if ((unsigned) b > 255) { if (b < 0) b = 0; else b = 255; }
-        out[0] = (stbi_uc)r;
+        out[2] = (stbi_uc)r;
         out[1] = (stbi_uc)g;
-        out[2] = (stbi_uc)b;
+        out[0] = (stbi_uc)b;
         out[3] = 255;
         out += step;
     }
@@ -4306,9 +4306,9 @@ static stbi_uc *load_jpeg_image(stbi__jpeg *z, int *out_x, int *out_y, int *comp
                     {
                         for (i = 0; i < z->s->img_x; ++i)
                         {
-                            out[0] = y[i];
+                            out[2] = y[i];
                             out[1] = coutput[1][i];
-                            out[2] = coutput[2][i];
+                            out[0] = coutput[2][i];
                             out[3] = 255;
                             out += n;
                         }
@@ -4325,9 +4325,9 @@ static stbi_uc *load_jpeg_image(stbi__jpeg *z, int *out_x, int *out_y, int *comp
                         for (i = 0; i < z->s->img_x; ++i)
                         {
                             stbi_uc m = coutput[3][i];
-                            out[0] = stbi__blinn_8x8(coutput[0][i], m);
+                            out[2] = stbi__blinn_8x8(coutput[0][i], m);
                             out[1] = stbi__blinn_8x8(coutput[1][i], m);
-                            out[2] = stbi__blinn_8x8(coutput[2][i], m);
+                            out[0] = stbi__blinn_8x8(coutput[2][i], m);
                             out[3] = 255;
                             out += n;
                         }
@@ -4338,9 +4338,9 @@ static stbi_uc *load_jpeg_image(stbi__jpeg *z, int *out_x, int *out_y, int *comp
                         for (i = 0; i < z->s->img_x; ++i)
                         {
                             stbi_uc m = coutput[3][i];
-                            out[0] = stbi__blinn_8x8(255 - out[0], m);
+                            out[2] = stbi__blinn_8x8(255 - out[0], m);
                             out[1] = stbi__blinn_8x8(255 - out[1], m);
-                            out[2] = stbi__blinn_8x8(255 - out[2], m);
+                            out[0] = stbi__blinn_8x8(255 - out[2], m);
                             out += n;
                         }
                     }
@@ -4380,9 +4380,9 @@ static stbi_uc *load_jpeg_image(stbi__jpeg *z, int *out_x, int *out_y, int *comp
                     for (i = 0; i < z->s->img_x; ++i)
                     {
                         stbi_uc m = coutput[3][i];
-                        stbi_uc r = stbi__blinn_8x8(coutput[0][i], m);
+                        stbi_uc b = stbi__blinn_8x8(coutput[0][i], m);
                         stbi_uc g = stbi__blinn_8x8(coutput[1][i], m);
-                        stbi_uc b = stbi__blinn_8x8(coutput[2][i], m);
+                        stbi_uc r = stbi__blinn_8x8(coutput[2][i], m);
                         out[0] = stbi__compute_y(r, g, b);
                         out[1] = 255;
                         out += n;
