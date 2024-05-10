@@ -108,13 +108,14 @@ static void wheel_list_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = (touch_info_t *)tp_get_info();
     gui_wheel_list_t *this = (void *)obj;
-
+    int half_screen_w = (int)(gui_get_screen_width)() / 2;
+    int half_screen_h = (int)(gui_get_screen_height)() / 2;
     float cur_angle;
     uint8_t cur_layer = 0;
     if (tp->pressed || tp->pressing || tp->released)
     {
-        float x_length_start = (tp->x - dc->fb_width / 2);
-        float y_length_start = (tp->y - dc->fb_height / 2);
+        float x_length_start = (tp->x - half_screen_w);
+        float y_length_start = (tp->y - half_screen_h);
         float tp_angle_start = atan2(y_length_start, x_length_start);
 
 #if 1
@@ -131,8 +132,8 @@ static void wheel_list_prepare(gui_obj_t *obj)
             cur_layer++;
         }
 #endif
-        float x_length = (tp->x + tp->deltaX - dc->fb_width / 2);
-        float y_length = (tp->y + tp->deltaY - dc->fb_height / 2);
+        float x_length = (tp->x + tp->deltaX - half_screen_w);
+        float y_length = (tp->y + tp->deltaY - half_screen_h);
         float tp_angle_cur = atan2(y_length, x_length);
 
         cur_angle = this->rotation[cur_layer].angle + tp_angle_cur - tp_angle_start;
@@ -156,8 +157,7 @@ static void wheel_list_prepare(gui_obj_t *obj)
                         continue;
                     }
                     int x = dc->screen_width / 2 + this->distence * cur_layer * cos(RADIAN_60 * j / cur_layer +
-                                                                                    cur_angle)
-                            - this->radius;
+                                                                                    cur_angle)  - this->radius;
                     int y = dc->screen_height / 2 + this->distence * cur_layer * sin(RADIAN_60 * j / cur_layer +
                                                                                      cur_angle) - this->radius;
                     gui_img_set_location(this->icon_list[cur_layer][j], x, y);
