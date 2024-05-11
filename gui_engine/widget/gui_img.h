@@ -142,6 +142,13 @@ uint16_t gui_img_get_width(gui_img_t *this);
 uint16_t gui_img_get_height(gui_img_t *this);
 
 /**
+ * @brief refresh the image size from src
+ *
+ * @param this the image widget pointer.
+ */
+void gui_img_refresh_size(gui_img_t *this);
+
+/**
  * @brief set the image's location
  *
  * @param this the image widget pointer.

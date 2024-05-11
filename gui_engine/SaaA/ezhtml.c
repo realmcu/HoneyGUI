@@ -8,6 +8,7 @@
 #include "gui_button.h"
 #include <gui_seekbar.h>
 #include <gui_page.h>
+#include "gui_gallery.h"
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
@@ -68,6 +69,7 @@ struct widget_create widget[] =
     //{ "pagebar", PAGEBAR },
     { "screen", SCREEN },
     { "grid",  GRID},
+    {"gallery", GALLERY},
     {"radio", RADIO},
     {"appendTexts", RADIOSWITCH},
     {"arc", ARC},
@@ -662,7 +664,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
-                    gui_tabview_loop((void *)parent, true);
+                    gui_tabview_loop((void *)parent, false);
                 }
                 break;
             case ARC:
@@ -1242,6 +1244,36 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,idx:%d,idy:%d\n", x, y, w, h, idx, idy);
                     parent = (void *)gui_tab_create(parent, ptxt, x, y, w, h, idx, idy);
+                }
+
+
+                {
+                    // if(strcmp(parent->name, "home_tab") == 0)
+                    // {
+                    //     uint8_t num_pic = 6;
+                    //     void** img_arr = gui_malloc(num_pic * sizeof(void*));
+                    //     img_arr[0] = gui_get_file_address("app/box/resource/other/img_01.bin");
+                    //     img_arr[1] = gui_get_file_address("app/box/resource/other/img_02.bin");
+                    //     img_arr[2] = gui_get_file_address("app/box/resource/other/img_03.bin");
+                    //     img_arr[3] = gui_get_file_address("app/box/resource/other/img_04.bin");
+                    //     img_arr[4] = gui_get_file_address("app/box/resource/other/img_02.bin");
+                    //     img_arr[5] = gui_get_file_address("app/box/resource/other/img_03.bin");
+                    //     gui_gallery_config_t img_file = {
+                    //         .data_main_bg = gui_get_file_address("app/box/resource/other/main_bg.bin"),
+                    //         .data_center_bg = gui_get_file_address("app/box/resource/other/center_bg.bin"),
+                    //         .img_array = img_arr,
+                    //         .num_pic = num_pic
+                    //     };
+                    //     gui_gallery_create(parent,
+                    //                     "gallery_t",
+                    //                     &img_file,
+                    //                     0,
+                    //                     0,
+                    //                     480,
+                    //                     321);
+
+                    // }
+
                 }
                 break;
             case CURTAINVIEW:
@@ -2081,6 +2113,161 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
                     gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);
                     gui_img_set_opacity(GUI_TYPE(gui_switch_t, parent)->switch_picture, opacity);
+                }
+                break;
+            case GALLERY:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+
+                    gui_gallery_config_t config = {0};
+                    char *picture = "app/system/resource/Progress bar_full.bin";
+                    char *folder = NULL;
+
+                    // default image blend_mode
+                    uint8_t blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
+
+                    memset(&config, 0, sizeof(config));
+                    while (true)
+                    {
+                        // #define IS_STR(str) (!strcmp(p->attr[i], str))
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "folder"))
+                        {
+                            folder = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "mainBg"))
+                        {
+                            config.data_main_bg = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "centerBg"))
+                        {
+                            config.data_center_bg = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "centerPercent"))
+                        {
+                            config.center_percent = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sideScale"))
+                        {
+                            config.side_scale = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sidePosPercent"))
+                        {
+                            config.side_pos_percent = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "blendMode"))
+                        {
+                            i++;
+                            if (!strcmp(p->attr[i], "imgBypassMode"))
+                            {
+                                blendMode = IMG_BYPASS_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                            {
+                                blendMode = IMG_FILTER_BLACK;
+                            }
+                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                            {
+                                blendMode = IMG_SRC_OVER_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgCoverMode"))
+                            {
+                                blendMode = IMG_COVER_MODE;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "opacity"))
+                        {
+                            opacity = atof(p->attr[++i]);
+                        }
+                        i++;
+                    }
+
+                    char *ptxt = get_space_string_head(p->txt);
+                    if (!folder)
+                    {
+                        gui_log("gallery folder is not found!\n");
+                    }
+                    else if (folder)
+                    {
+                        int file_count = 0;
+                        DIR *dir = 0;
+                        struct dirent *entry;
+                        char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+                        // init image array
+                        sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+                        if ((dir = opendir(dir_path)) == NULL)
+                        {
+                            gui_free(dir_path);
+                            //perror("opendir() failed"); return;
+                        }
+                        gui_free(dir_path);
+
+                        while ((entry = readdir(dir)) != NULL)
+                        {
+                            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                            {
+                                char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                                void *addr = NULL;
+                                void *data = NULL;
+
+                                file_count++;
+                                sprintf(file_path, "%s/%s", folder, entry->d_name);
+                                addr = gui_get_file_address(file_path);
+                                if (!config.img_array)
+                                {
+                                    data = gui_malloc(sizeof(void *));
+                                }
+                                else
+                                {
+                                    data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                                }
+                                config.img_array = data;
+                                config.img_array[file_count - 1] = addr;
+
+                                gui_free(file_path);
+                            }
+                        }
+                        closedir(dir);
+
+                        config.num_pic = file_count;
+                    }
+
+                    if (config.data_main_bg)
+                    {
+                        config.data_main_bg = gui_get_file_address(config.data_main_bg);
+                    }
+                    if (config.data_center_bg)
+                    {
+                        config.data_center_bg = gui_get_file_address(config.data_center_bg);
+                    }
+
+                    gui_gallery_create(parent, ptxt, &config,
+                                       x, y, w, h);
                 }
                 break;
             // case MOVIE:

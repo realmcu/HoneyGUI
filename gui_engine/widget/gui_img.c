@@ -629,6 +629,13 @@ uint16_t gui_img_get_height(gui_img_t *this)
     return 0;
 }
 
+void gui_img_refresh_size(gui_img_t *this)
+{
+    // gui_image_load_scale(this->draw_img);
+    this->base.w = gui_img_get_width(this);
+    this->base.h = gui_img_get_height(this);
+}
+
 void gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y)
 {
     gui_obj_t *root = (gui_obj_t *)this;
