@@ -217,11 +217,8 @@ typedef struct acc_engine
 
 } acc_engine_t;
 
-
+void gui_acc_info_register(struct acc_engine *info);
 struct acc_engine *gui_get_acc(void);
-void gui_acc_init(void);
-
-
 
 
 #ifdef __cplusplus

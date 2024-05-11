@@ -7,23 +7,23 @@
 
   <Targets>
     <Target>
-      <TargetName>gui_sim</TargetName>
+      <TargetName>gui_lib</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>CMSDK_CM4_FP</Device>
+          <Device>ARMCM3</Device>
           <Vendor>ARM</Vendor>
-          <PackID>Keil.V2M-MPS2_CMx_BSP.1.8.0</PackID>
+          <PackID>ARM.CMSIS.5.9.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000,0x00400000) IROM(0x00000000,0x00400000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M3") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
           <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000)</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:CMSDK_CM4_FP$Device\CMSDK_CM4\Include\CMSDK_CM4_FP.h</RegisterFile>
+          <RegisterFile>$$Device:ARMCM3$Device\ARM\ARMCM3\Include\ARMCM3.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -33,7 +33,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:CMSDK_CM4_FP$SVD\CMSDK_CM4_FP.svd</SFDFile>
+          <SFDFile></SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -49,9 +49,9 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\build\</OutputDirectory>
-          <OutputName>app</OutputName>
-          <CreateExecutable>1</CreateExecutable>
-          <CreateLib>0</CreateLib>
+          <OutputName>gui_lib</OutputName>
+          <CreateExecutable>0</CreateExecutable>
+          <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>0</BrowseInformation>
@@ -112,11 +112,11 @@
           <SimDllName>SARMCM3.DLL</SimDllName>
           <SimDllArguments>  -MPU</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
+          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments> -MPU</TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
+          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -174,23 +174,23 @@
             <AdsLsxf>1</AdsLsxf>
             <RvctClst>0</RvctClst>
             <GenPPlst>0</GenPPlst>
-            <AdsCpuType>"Cortex-M4"</AdsCpuType>
+            <AdsCpuType>"Cortex-M3"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
-            <mOS>1</mOS>
+            <mOS>0</mOS>
             <uocRom>0</uocRom>
             <uocRam>0</uocRam>
             <hadIROM>1</hadIROM>
             <hadIRAM>1</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>2</RvdsVP>
+            <RvdsVP>0</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
             <useUlib>0</useUlib>
-            <EndSel>0</EndSel>
+            <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>2</nSecure>
             <RoSelD>3</RoSelD>
@@ -246,12 +246,12 @@
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x400000</Size>
+                <Size>0x20000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x400000</Size>
+                <Size>0x40000</Size>
               </IROM>
               <XRAM>
                 <Type>1</Type>
@@ -276,7 +276,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x400000</Size>
+                <Size>0x40000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -301,7 +301,7 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x400000</Size>
+                <Size>0x20000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>ENABLE_RTK_GUI_DEMO ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI_FONT_RTK_MEM ENABLE_RTK_GUI GUI_KEIL_SIM</Define>
+              <Define>ENABLE_RTK_GUI_FONT_RTK_MEM TARGET_RTL8773E ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;..\gui_engine;..\gui_engine\3rd\ezXML;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\3rd\tjpgd;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\example\demo;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget</IncludePath>
+              <IncludePath>.;.;..\gui_engine;..\gui_engine\3rd\ezXML;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\3rd\tjpgd;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -387,46 +387,6 @@
               <FileName>menu_config.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\menu_config.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>application</GroupName>
-          <Files>
-            <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\main.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>gui_port</GroupName>
-          <Files>
-            <File>
-              <FileName>gui_port_dc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>gui_port\gui_port_dc.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_port_filesystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>gui_port\gui_port_filesystem.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_port_os.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>gui_port\gui_port_os.c</FilePath>
-            </File>
-            <File>
-              <FileName>romfs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>gui_port\romfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_port_acc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\gui_port\gui_port_acc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -581,16 +541,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>realgui/demo</GroupName>
-          <Files>
-            <File>
-              <FileName>rtk_gui_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\example\demo\rtk_gui_demo.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>realgui/input</GroupName>
           <Files>
             <File>
@@ -602,6 +552,11 @@
               <FileName>tp_algo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\input\tp_algo.c</FilePath>
+            </File>
+            <File>
+              <FileName>tp_algo_v2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\input\tp_algo_v2.c</FilePath>
             </File>
             <File>
               <FileName>wheel_algo.c</FileName>
@@ -880,18 +835,6 @@
             </File>
           </Files>
         </Group>
-        <Group>
-          <GroupName>::Board Support</GroupName>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
-        </Group>
-        <Group>
-          <GroupName>::Compiler</GroupName>
-        </Group>
-        <Group>
-          <GroupName>::Device</GroupName>
-        </Group>
       </Groups>
     </Target>
   </Targets>
@@ -907,102 +850,32 @@
         </targetInfos>
       </package>
     </packages>
-    <apis>
-      <api Capiversion="1.0.0" Cclass="Board Support" Cgroup="Graphic LCD" exclusive="0">
-        <package name="MDK-Middleware" schemaVersion="1.4" url="http://www.keil.com/pack/" vendor="Keil" version="7.14.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </api>
-      <api Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" exclusive="1">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </api>
-    </apis>
-    <components>
-      <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.6.0" condition="ARMv6_7_8-M Device">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-      <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.14.1" condition="CMSISCORE">
-        <package name="CMSIS-DSP" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="ARM" version="1.14.1"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-      <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Source" Cvendor="ARM" Cversion="5.5.4" condition="RTOS2 RTX5">
-        <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-      <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="Event Recorder" Cvariant="DAP" Cvendor="Keil" Cversion="1.5.1" condition="Cortex-M Device">
-        <package name="ARM_Compiler" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="Keil" version="1.7.2"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-      <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="I/O" Csub="STDOUT" Cvariant="EVR" Cvendor="Keil" Cversion="1.2.0" condition="ARMCC Cortex-M with EVR">
-        <package name="ARM_Compiler" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="Keil" version="1.7.2"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-      <component Cbundle="V2M-MPS2" Cclass="Board Support" Cgroup="Common" Cvendor="Keil" Cversion="2.0.0" condition="CMSDK CMSIS">
-        <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.8.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-      <component Capiversion="1.0.0" Cbundle="V2M-MPS2" Cclass="Board Support" Cgroup="Graphic LCD" Cvendor="Keil" Cversion="2.0.0" condition="V2M-MPS2 Common">
-        <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.8.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-      <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="Keil" Cversion="1.1.0" condition="CMSDK_CM4 CMSIS">
-        <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.8.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
-      </component>
-    </components>
+    <apis/>
+    <components/>
     <files>
       <file attr="config" category="source" name="CMSIS\RTOS2\RTX\Config\RTX_Config.c" version="5.1.1">
-        <instance index="0">RTE\CMSIS\RTX_Config.c</instance>
+        <instance index="0" removed="1">RTE\CMSIS\RTX_Config.c</instance>
         <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Source" Cvendor="ARM" Cversion="5.5.4" condition="RTOS2 RTX5"/>
         <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="header" name="CMSIS\RTOS2\RTX\Config\RTX_Config.h" version="5.5.2">
-        <instance index="0">RTE\CMSIS\RTX_Config.h</instance>
+        <instance index="0" removed="1">RTE\CMSIS\RTX_Config.h</instance>
         <component Capiversion="2.1.3" Cclass="CMSIS" Cgroup="RTOS2" Csub="Keil RTX5" Cvariant="Source" Cvendor="ARM" Cversion="5.5.4" condition="RTOS2 RTX5"/>
         <package name="CMSIS" schemaVersion="1.7.7" url="http://www.keil.com/pack/" vendor="ARM" version="5.9.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="header" name="Config\EventRecorderConf.h" version="1.1.0">
-        <instance index="0">RTE\Compiler\EventRecorderConf.h</instance>
+        <instance index="0" removed="1">RTE\Compiler\EventRecorderConf.h</instance>
         <component Cbundle="ARM Compiler" Cclass="Compiler" Cgroup="Event Recorder" Cvariant="DAP" Cvendor="Keil" Cversion="1.4.0" condition="Cortex-M Device"/>
         <package name="ARM_Compiler" schemaVersion="1.6.3" url="http://www.keil.com/pack/" vendor="Keil" version="1.6.3"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="header" name="CMSIS\Config\RTE_Device.h" version="1.0.0">
-        <instance index="0">RTE\Device\CMSDK_CM4_FP\RTE_Device.h</instance>
+        <instance index="0" removed="1">RTE\Device\CMSDK_CM4_FP\RTE_Device.h</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="Keil" Cversion="1.1.0" condition="CMSDK_CM4 CMSIS" isDefaultVariant="1"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.8.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="linkerScript" condition="ARMCC" name="Device\CMSDK_CM4\Source\ARM\ac6_arm.sct" version="1.0.0">
         <instance index="0" removed="1">RTE\Device\CMSDK_CM4_FP\ac6_arm.sct</instance>
@@ -1011,20 +884,16 @@
         <targetInfos/>
       </file>
       <file attr="config" category="sourceC" name="Device\CMSDK_CM4\Source\startup_CMSDK_CM4.c" version="1.1.0">
-        <instance index="0">RTE\Device\CMSDK_CM4_FP\startup_CMSDK_CM4.c</instance>
+        <instance index="0" removed="1">RTE\Device\CMSDK_CM4_FP\startup_CMSDK_CM4.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="Keil" Cversion="1.1.0" condition="CMSDK_CM4 CMSIS" isDefaultVariant="1"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.8.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="sourceC" name="Device\CMSDK_CM4\Source\system_CMSDK_CM4.c" version="1.1.0">
-        <instance index="0">RTE\Device\CMSDK_CM4_FP\system_CMSDK_CM4.c</instance>
+        <instance index="0" removed="1">RTE\Device\CMSDK_CM4_FP\system_CMSDK_CM4.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="Keil" Cversion="1.1.0" condition="CMSDK_CM4 CMSIS" isDefaultVariant="1"/>
         <package name="V2M-MPS2_CMx_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="Keil" version="1.8.0"/>
-        <targetInfos>
-          <targetInfo name="gui_sim"/>
-        </targetInfos>
+        <targetInfos/>
       </file>
       <file attr="config" category="header" name="CMSIS_Driver\Config\RTE_Device.h" version="1.1.0">
         <instance index="0" removed="1">RTE\Device\SSE-300-MPS3\RTE_Device.h</instance>

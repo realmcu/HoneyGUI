@@ -6,32 +6,23 @@
 
 
 extern void sw_acc_init(void);
-extern void hw_acc_init(void);
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
-extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
 
-static struct acc_engine acc = {0};
+static struct acc_engine *acc;
 
-void gui_acc_init(void)
+void gui_acc_info_register(struct acc_engine *info)
 {
-#ifdef RTK_MODULE_VG_LITE
-    acc.blit = hw_acc_blit;
-#elif defined RTK_MODULE_RTK_PPE
-    hw_acc_init();
-    acc.blit = hw_acc_blit;
-#elif defined RTK_MODULE_RTK_PPEV2
-    hw_acc_init();
-    acc.blit = hw_acc_blit;
-#else
-    sw_acc_init();
-    acc.blit = sw_acc_blit;
-#endif
+    if (info != NULL)
+    {
+        acc = info;
+    }
 }
 
 struct acc_engine *gui_get_acc(void)
 {
-    return &acc;
+    GUI_ASSERT(acc != NULL);
+    return acc;
 }
 
 imdc_file_header_t rtgui_image_get_imdc_header(draw_img_t *img)
@@ -230,7 +221,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
         }
     }
 
-    acc.blit(image, dc, rect);
+    acc->blit(image, dc, rect);
 
     if (flg_cache)
     {

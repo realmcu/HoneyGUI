@@ -321,12 +321,12 @@ int gui_server_init(void)
     extern void gui_port_indev_init(void);
     extern void gui_port_os_init(void);
     extern void gui_port_fs_init(void);
+    extern void gui_port_acc_init(void);
     gui_port_os_init();
     gui_port_indev_init();
     gui_port_dc_init();
     gui_port_fs_init();
-
-    gui_acc_init();
+    gui_port_acc_init();
 
     gui_fb_change();
 

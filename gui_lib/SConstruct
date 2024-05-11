@@ -1,0 +1,51 @@
+import os
+import sys
+import menu_config
+from SCons.Script import *
+
+TOOL_ROOT="../tool/scons-tool"
+
+sys.path = sys.path + [os.path.join(TOOL_ROOT, '')]
+try:
+    from building import *
+except:
+    print('Cannot found Scons tool root directory, please check TOOL_ROOT')
+    exit(-1)
+
+
+TARGET = 'gui.' + menu_config.TARGET_EXT
+
+
+env = Environment(tools = ['mingw'],
+                  CC=menu_config.CC, CCFLAGS = menu_config.CFLAGS,
+                  LINKFLAGS = menu_config.LFLAGS)
+
+
+
+
+
+RTK_GUI_ENGINE = os.path.abspath('./../gui_engine/')
+LVGL_ROOT = os.path.abspath('./../lvgl/')
+PLATFORM = menu_config.PLATFORM
+
+Export('PLATFORM')
+
+Export('TOOL_ROOT')
+Export('RTK_GUI_ENGINE')
+
+
+print('TOOL ROOT = ' + TOOL_ROOT)
+print('RTK WEARABLE ROOT = ' + RTK_GUI_ENGINE)
+
+# prepare building environment
+objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
+
+
+# include app
+objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
+objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
+
+# bsp_vdir = 'build'
+
+# make a building
+DoBuilding(TARGET, objs)
