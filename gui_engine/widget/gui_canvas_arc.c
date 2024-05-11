@@ -111,8 +111,8 @@ static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
 
 
 
-static void set_arc_60_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_img,
-                           float rotate_degree, float image_angle, int img_w, int img_h)
+static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_img,
+                        float rotate_degree, float image_angle, int img_w, int img_h)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = NULL;
@@ -183,25 +183,130 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
     this->arc_data_10 = gui_malloc(img_10_w * img_10_h * 4 + sizeof(gui_rgb_data_head_t));
 
 
-    set_arc_60_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
-    set_arc_60_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
-    set_arc_60_img(this, this->arc_data_60, &this->arc_60_03, 120, img_60_angle, img_60_w, img_60_h);
-    set_arc_60_img(this, this->arc_data_60, &this->arc_60_04, 180, img_60_angle, img_60_w, img_60_h);
-    set_arc_60_img(this, this->arc_data_60, &this->arc_60_05, 240, img_60_angle, img_60_w, img_60_h);
-    set_arc_60_img(this, this->arc_data_60, &this->arc_60_06, 300, img_60_angle, img_60_w, img_60_h);
+    set_arc_img(this, this->arc_data_10, &this->arc_10, 0, img_10_angle, img_10_w, img_10_h);
+
+    set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
+    set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
+    set_arc_img(this, this->arc_data_60, &this->arc_60_03, 120, img_60_angle, img_60_w, img_60_h);
+    set_arc_img(this, this->arc_data_60, &this->arc_60_04, 180, img_60_angle, img_60_w, img_60_h);
+    set_arc_img(this, this->arc_data_60, &this->arc_60_05, 240, img_60_angle, img_60_w, img_60_h);
+    set_arc_img(this, this->arc_data_60, &this->arc_60_06, 300, img_60_angle, img_60_w, img_60_h);
+
+    if (this->degree < 60)
+    {
+        set_arc_img(this, this->arc_data_10, &this->arc_10, 5, img_10_angle, img_10_w, img_10_h);
+
+    }
+    else if (this->degree < 120)
+    {
+        set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
+    }
+    else if (this->degree < 180)
+    {
+        set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_03, 120, img_60_angle, img_60_w, img_60_h);
+    }
+    else if (this->degree < 240)
+    {
+        set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_03, 120, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_04, 180, img_60_angle, img_60_w, img_60_h);
+    }
+    else if (this->degree < 300)
+    {
+        set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_03, 120, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_04, 180, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_05, 240, img_60_angle, img_60_w, img_60_h);
+    }
+    else if (this->degree < 360)
+    {
+        set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_03, 120, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_04, 180, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_05, 240, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_06, 300, img_60_angle, img_60_w, img_60_h);
+    }
+    else if (this->degree = 360)
+    {
+        set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_03, 120, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_04, 180, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_05, 240, img_60_angle, img_60_w, img_60_h);
+        set_arc_img(this, this->arc_data_60, &this->arc_60_06, 300, img_60_angle, img_60_w, img_60_h);
+    }
+    else
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
 }
 
 static void gui_canvas_arc_draw(gui_canvas_arc_t *this)
 {
     gui_dispdev_t *dc = gui_get_dc();
 
+    if (this->degree < 60)
+    {
+        gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
+    }
+    else if (this->degree < 120)
+    {
+        gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
+    }
+    else if (this->degree < 180)
+    {
+        gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_03, dc, NULL);
+    }
+    else if (this->degree < 240)
+    {
+        gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_03, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_04, dc, NULL);
+    }
+    else if (this->degree < 300)
+    {
+        gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_03, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_04, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_05, dc, NULL);
+    }
+    else if (this->degree < 360)
+    {
+        gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_03, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_04, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_05, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_06, dc, NULL);
+    }
+    else if (this->degree = 360)
+    {
+        gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_03, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_04, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_05, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_60_06, dc, NULL);
+    }
+    else
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
 
-    gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
-    gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
-    gui_acc_blit_to_dc(this->arc_60_03, dc, NULL);
-    // gui_acc_blit_to_dc(this->arc_60_04, dc, NULL);
-    // gui_acc_blit_to_dc(this->arc_60_05, dc, NULL);
-    // gui_acc_blit_to_dc(this->arc_60_06, dc, NULL);
+    gui_acc_blit_to_dc(this->arc_10, dc, NULL);
+
+
 }
 
 static void gui_canvas_arc_end(gui_canvas_arc_t *this)
