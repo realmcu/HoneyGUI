@@ -81,42 +81,76 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_button_update_att(gui_obj_t *this)
+static void gui_button_update_att(gui_obj_t *obj)
 {
-    gui_button_t *obj = (void *)this;
-    size_t frame_count;
+    gui_button_t *this = (void *)obj;
+    uint32_t cur_time_gap;
 
-    if (obj->animate && obj->animate->animate)
+    if (this->animate && this->animate->animate)
     {
-        frame_count = obj->animate->dur * (1000 / 15) / (1000);
-        obj->animate->callback(obj->animate->p);
-        obj->animate->current_frame++;
+        cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
+        this->animate->cur_time_ms = gui_ms_get();
 
-        if (obj->animate->current_frame > frame_count)
+        if (cur_time_gap >= 2 * this->animate->dur)
         {
-            if (obj->animate->repeat_count == 0)
+            this->animate->init_time_ms += cur_time_gap;
+        }
+
+        if (this->animate->repeat_count == 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
             {
-                obj->animate->animate = false;
+                this->animate->callback(this->animate->p);
+                this->animate->animate = false;
+                this->animate->progress_percent = 1.0f;
             }
-            else if (obj->animate->repeat_count < 0)
+            else
             {
-                obj->animate->current_frame = 0;
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
+                                                          this->animate->init_time_ms) /
+                                                  (float)this->animate->dur;
             }
-            else if (obj->animate->repeat_count > 0)
+        }
+        else if (this->animate->repeat_count < 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
             {
-                obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
+                this->animate->callback(this->animate->p);
+                this->animate->init_time_ms += this->animate->dur;
+                this->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
+                                                          this->animate->init_time_ms) /
+                                                  (float)this->animate->dur;
+            }
+        }
+        else if (this->animate->repeat_count > 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms -
+                 this->animate->current_repeat_count * this->animate->dur) >=
+                this->animate->dur)
+            {
+                if (this->animate->current_repeat_count < this->animate->repeat_count)
                 {
-                    obj->animate->animate = false;
+                    this->animate->callback(this->animate->p);
+                    this->animate->current_repeat_count ++;
                 }
                 else
                 {
-                    obj->animate->current_frame = 0;
+                    this->animate->callback(this->animate->p);
+                    this->animate->animate = false;
                 }
+                this->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms - this->animate->init_time_ms -
+                                                          this->animate->current_repeat_count * this->animate->dur) /
+                                                  (float)this->animate->dur;
             }
         }
-        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) / ((float)(
-                                                                                       frame_count));
     }
 }
 

@@ -78,43 +78,76 @@
   * @{
   */
 
-static void gui_win_update_att(struct _gui_obj_t *obj)
+static void gui_win_update_att(gui_obj_t *obj)
 {
     gui_win_t *this = (void *)obj;
-    size_t frame_count;
+    uint32_t cur_time_gap;
 
     if (this->animate && this->animate->animate)
     {
-        frame_count = this->animate->dur * (1000 / 15) / (1000);
-        this->animate->callback(this->animate->p);
-        this->animate->current_frame++;
+        cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
+        this->animate->cur_time_ms = gui_ms_get();
 
-        if (this->animate->current_frame > frame_count)
+        if (cur_time_gap >= 2 * this->animate->dur)
         {
-            if (this->animate->repeat_count == 0)
-            {
-                this->animate->animate = false;
-            }
-            else if (this->animate->repeat_count < 0)
-            {
-                this->animate->current_frame = 0;
-            }
-            else if (this->animate->repeat_count > 0)
-            {
-                this->animate->current_repeat_count++;
+            this->animate->init_time_ms += cur_time_gap;
+        }
 
-                if (this->animate->current_repeat_count >= this->animate->repeat_count)
+        if (this->animate->repeat_count == 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
+            {
+                this->animate->callback(this->animate->p);
+                this->animate->animate = false;
+                this->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
+                                                          this->animate->init_time_ms) /
+                                                  (float)this->animate->dur;
+            }
+        }
+        else if (this->animate->repeat_count < 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
+            {
+                this->animate->callback(this->animate->p);
+                this->animate->init_time_ms += this->animate->dur;
+                this->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
+                                                          this->animate->init_time_ms) /
+                                                  (float)this->animate->dur;
+            }
+        }
+        else if (this->animate->repeat_count > 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms -
+                 this->animate->current_repeat_count * this->animate->dur) >=
+                this->animate->dur)
+            {
+                if (this->animate->current_repeat_count < this->animate->repeat_count)
                 {
-                    this->animate->animate = false;
+                    this->animate->callback(this->animate->p);
+                    this->animate->current_repeat_count ++;
                 }
                 else
                 {
-                    this->animate->current_frame = 0;
+                    this->animate->callback(this->animate->p);
+                    this->animate->animate = false;
                 }
+                this->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms - this->animate->init_time_ms -
+                                                          this->animate->current_repeat_count * this->animate->dur) /
+                                                  (float)this->animate->dur;
             }
         }
-        this->animate->progress_percent = ((float)(this->animate->current_frame)) / ((float)(
-                frame_count));
     }
 }
 

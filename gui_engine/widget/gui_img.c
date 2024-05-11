@@ -107,10 +107,11 @@ void gui_img_set_animate(gui_img_t *this,
 static void gui_img_update_att(gui_obj_t *o)
 {
     gui_img_t *this = (void *)o;
+    uint32_t cur_time_gap;
 
     if (this->animate && this->animate->animate)
     {
-        uint32_t cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
+        cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
         this->animate->cur_time_ms = gui_ms_get();
 
         if (cur_time_gap >= 2 * this->animate->dur)
