@@ -57,7 +57,7 @@ struct AGGENVGcontext {
     this->ctextures = 0;
     this->textureId = 0;
 
-    this->line_style.set_cap(agge::caps::triangle());
+    this->line_style.set_cap(agge::caps::round());
     this->line_style.set_join(agge::joins::bevel());
   }
 
