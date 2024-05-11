@@ -84,6 +84,69 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static bool gui_tab_loop_prepare(gui_tabview_t *parent, int16_t *tab_gap)
+{
+    touch_info_t *tp = tp_get_info();
+    int16_t tab_x_count, left_count, right_count;
+    int16_t tab_y_count, down_count, up_count;
+
+    if (parent->loop_x)
+    {
+        tab_x_count = -parent->tab_cnt_left + parent->tab_cnt_right + 1;
+        left_count = tab_x_count / 2 + tab_x_count % 2;
+        right_count = tab_x_count / 2;
+
+        if (tab_x_count == 1)
+        {
+            return false;
+        }
+        else
+        {
+            if (tab_gap[0] > right_count)
+            {
+                tab_gap[0] -= tab_x_count;
+            }
+            else if (tab_gap[0] <= -left_count)
+            {
+                tab_gap[0] += tab_x_count;
+            }
+        }
+
+        if ((tab_x_count == 2) && (tp->type == TOUCH_HOLD_X) && (tp->deltaX > 0))
+        {
+            tab_gap[0] = -tab_gap[0];
+        }
+    }
+    else if (parent->loop_y)
+    {
+        tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
+        up_count = tab_y_count / 2 + tab_y_count % 2;
+        down_count = tab_y_count / 2;
+
+        if (tab_y_count == 1)
+        {
+            return false;
+        }
+        else
+        {
+            if (tab_gap[1] > down_count)
+            {
+                tab_gap[1] -= tab_y_count;
+            }
+            else if (tab_gap[1] <= -up_count)
+            {
+                tab_gap[1] += tab_y_count;
+            }
+        }
+
+        if ((tab_y_count == 2) && (tp->type == TOUCH_HOLD_Y) && (tp->deltaY > 0))
+        {
+            tab_gap[1] = -tab_gap[1];
+        }
+    }
+
+    return true;
+}
 
 static void gui_tab_input_prepare(gui_obj_t *obj)
 {
@@ -91,35 +154,15 @@ static void gui_tab_input_prepare(gui_obj_t *obj)
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+    int16_t tab_gap[2] = {tab_x_gap, tab_y_gap};
 
-    if (parent->loop)
+    if (!(gui_tab_loop_prepare(parent, tab_gap)))
     {
-        int16_t tab_x_count = -parent->tab_cnt_left + parent->tab_cnt_right + 1;
-        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
-        int16_t right_count = tab_x_count / 2;
-
-        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
-        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
-        int16_t down_count = tab_y_count / 2;
-
-        if (tab_x_gap > right_count)
-        {
-            tab_x_gap -= tab_x_count;
-        }
-        else if (tab_x_gap < -left_count)
-        {
-            tab_x_gap += tab_x_count;
-        }
-
-        if (tab_y_gap > down_count)
-        {
-            tab_y_gap -= tab_y_count;
-        }
-        else if (tab_x_gap < -up_count)
-        {
-            tab_y_gap += tab_y_count;
-        }
+        return;
     }
+
+    tab_x_gap = tab_gap[0];
+    tab_y_gap = tab_gap[1];
 
     matrix_translate((tab_x_gap) * (int)this->base.w, \
                      (tab_y_gap) * (int)this->base.h, \
@@ -130,39 +173,20 @@ static void gui_tab_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
     kb_info_t *kb = kb_get_info();
+    touch_info_t *tp = tp_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
 
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+    int16_t tab_gap[2] = {tab_x_gap, tab_y_gap};
 
-    if (parent->loop)
+    if (!(gui_tab_loop_prepare(parent, tab_gap)))
     {
-        int16_t tab_x_count = - parent->tab_cnt_left + parent->tab_cnt_right + 1;
-        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
-        int16_t right_count = tab_x_count / 2;
-
-        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
-        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
-        int16_t down_count = tab_y_count / 2;
-
-        if (tab_x_gap > right_count)
-        {
-            tab_x_gap -= tab_x_count;
-        }
-        else if (tab_x_gap < -left_count)
-        {
-            tab_x_gap += tab_x_count;
-        }
-
-        if (tab_y_gap > down_count)
-        {
-            tab_y_gap -= tab_y_count;
-        }
-        else if (tab_x_gap < -up_count)
-        {
-            tab_y_gap += tab_y_count;
-        }
+        return;
     }
+
+    tab_x_gap = tab_gap[0];
+    tab_y_gap = tab_gap[1];
 
     if (parent->enable_pre_load)
     {

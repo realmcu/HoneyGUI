@@ -64,9 +64,8 @@ typedef struct gui_tabview
     T_SLIDE_STYLE style;
     int16_t release_x;
     int16_t release_y;
-    bool loop;
-    bool loop_status;
-    bool loop_status2;
+    uint8_t loop_x : 1;
+    uint8_t loop_y : 1;
     bool enable_pre_load;
     bool tab_change_ready;
     bool tab_need_pre_load;
@@ -168,12 +167,20 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
 void gui_tabview_set_style(gui_tabview_t *this, T_SLIDE_STYLE style);
 
 /**
- * @brief Config tabview loop sliding feature. The default setting is no looping.
+ * @brief Config tabview loop_x sliding feature. The default setting is no looping.
  *
  * @param tabview tabview pointer.
- * @param loop_or_not Loops when set to true, does not loop when set to false.
+ * @param loop Loops when set to true, does not loop when set to false.
  */
-void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not);
+void gui_tabview_loop_x(gui_tabview_t *tabview, bool loop);
+
+/**
+ * @brief Config tabview loop_y sliding feature. The default setting is no looping.
+ *
+ * @param tabview tabview pointer.
+ * @param loop Loops when set to true, does not loop when set to false.
+ */
+void gui_tabview_loop_y(gui_tabview_t *tabview, bool loop);
 
 /**
  * @brief disable tp action for this tabview.
