@@ -18,6 +18,7 @@
 #include "unistd.h"
 #include "time.h"
 #include "gui_components_init.h"
+#include "shell_port.h"
 
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__
@@ -45,6 +46,10 @@ int main(int argc, char **argv)
     // TODO: SASA auto get screen size
 
     gui_components_init();
+
+    userShellInit();
+    shellTask(&shell);
+
     while (1)
     {
         time_t now;

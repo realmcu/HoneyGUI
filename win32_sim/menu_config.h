@@ -103,6 +103,10 @@
 // #define CONFIG_REALTEK_BUILD_LITE_GFX
 // </c>
 
+// <c> RTK GUI Enable LetterShell
+#define CONFIG_REALTEK_BUILD_LETTER_SHELL
+// </c>
+
 #endif
 
 // </e>
