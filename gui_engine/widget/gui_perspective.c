@@ -102,6 +102,27 @@ static void gui_perspective_scale_3d(Vertex_t *vertex, float scale)
     vertex->z *= scale;
 }
 
+static bool gui_perspective_point_in_rect(draw_img_t *img, int16_t x, int16_t y)
+{
+    if (x < img->img_target_x)
+    {
+        return false;
+    }
+    if (x > img->img_target_x + img->img_target_x)
+    {
+        return false;
+    }
+    if (y < img->img_target_y)
+    {
+        return false;
+    }
+    if (y > img->img_target_y + img->img_target_h)
+    {
+        return false;
+    }
+    return true;
+}
+
 static void gui_perspective_prepare(gui_obj_t *obj)
 {
     struct gui_matrix rotate_3D;
@@ -196,6 +217,19 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         matrix_inverse(&this->img[i].inverse);
         gui_image_load_scale(&this->img[i]);
         gui_image_new_area(&this->img[i], NULL);
+        if (gui_perspective_point_in_rect(&this->img[i], tp->x, tp->y) == true)
+        {
+            switch (tp->type)
+            {
+            case TOUCH_SHORT:
+                {
+                    gui_obj_event_set(obj, (gui_event_t)(GUI_EVENT_1 + i));
+                }
+                break;
+            default:
+                break;
+            }
+        }
     }
 
     last = this->checksum;
