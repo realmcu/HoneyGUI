@@ -12,12 +12,12 @@
 
 #if SHELL_USING_COMPANION == 1
 /**
- * @brief shell添加伴生对象
+ * @brief Add accompanying objects to the shell
  *
- * @param shell shell对象
- * @param id 伴生对象ID
- * @param object 伴生对象
- * @return signed char 0 添加成功 -1 添加失败
+ * @param shell
+ * @param id
+ * @param object
+ * @return signed char
  */
 signed char shellCompanionAdd(Shell *shell, int id, void *object)
 {
@@ -32,11 +32,11 @@ signed char shellCompanionAdd(Shell *shell, int id, void *object)
 }
 
 /**
- * @brief shell删除伴生对象
+ * @brief Shell deletion of companion objects
  *
- * @param shell shell对象
- * @param id 伴生对象ID
- * @return signed char 0 删除成功 -1 无匹配对象
+ * @param shell
+ * @param id
+ * @return signed char
  */
 signed char shellCompanionDel(Shell *shell, int id)
 {
@@ -64,11 +64,11 @@ signed char shellCompanionDel(Shell *shell, int id)
 }
 
 /**
- * @brief shell获取伴生对象
+ * @brief Shell retrieves companion objects
  *
- * @param shell shell对象
- * @param id 伴生对象ID
- * @return void* 伴生对象，无匹配对象时返回NULL
+ * @param shell
+ * @param id
+ * @return void*
  */
 void *shellCompanionGet(Shell *shell, int id)
 {

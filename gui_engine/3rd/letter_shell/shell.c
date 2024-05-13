@@ -19,7 +19,7 @@
 #if SHELL_USING_CMD_EXPORT == 1
 
 /**
- * @brief 默认用户
+ * @brief Default user
  */
 const char shellCmdDefaultUser[] = SHELL_DEFAULT_USER;
 const char shellPasswordDefaultUser[] = SHELL_DEFAULT_USER_PASSWORD;
@@ -50,53 +50,51 @@ extern const unsigned short shellCommandCount;
 
 
 /**
- * @brief shell 常量文本索引
+ * @brief Shell constant text index
  */
 enum
 {
 #if SHELL_SHOW_INFO == 1
-    SHELL_TEXT_INFO,                                    /**< shell信息 */
+    SHELL_TEXT_INFO,                                    /**< shell information */
 #endif
-    SHELL_TEXT_CMD_TOO_LONG,                            /**< 命令过长 */
-    SHELL_TEXT_CMD_LIST,                                /**< 可执行命令列表标题 */
-    SHELL_TEXT_VAR_LIST,                                /**< 变量列表标题 */
-    SHELL_TEXT_USER_LIST,                               /**< 用户列表标题 */
-    SHELL_TEXT_KEY_LIST,                                /**< 按键列表标题 */
-    SHELL_TEXT_CMD_NOT_FOUND,                           /**< 命令未找到 */
-    SHELL_TEXT_POINT_CANNOT_MODIFY,                     /**< 指针变量不允许修改 */
-    SHELL_TEXT_VAR_READ_ONLY_CANNOT_MODIFY,             /**< 只读变量不允许修改 */
-    SHELL_TEXT_NOT_VAR,                                 /**< 命令不是变量 */
-    SHELL_TEXT_VAR_NOT_FOUND,                           /**< 变量未找到 */
-    SHELL_TEXT_HELP_HEADER,                             /**< help头 */
-    SHELL_TEXT_PASSWORD_HINT,                           /**< 密码输入提示 */
-    SHELL_TEXT_PASSWORD_ERROR,                          /**< 密码错误 */
-    SHELL_TEXT_CLEAR_CONSOLE,                           /**< 清空控制台 */
-    SHELL_TEXT_CLEAR_LINE,                              /**< 清空当前行 */
-    SHELL_TEXT_TYPE_CMD,                                /**< 命令类型 */
-    SHELL_TEXT_TYPE_VAR,                                /**< 变量类型 */
-    SHELL_TEXT_TYPE_USER,                               /**< 用户类型 */
-    SHELL_TEXT_TYPE_KEY,                                /**< 按键类型 */
-    SHELL_TEXT_TYPE_NONE,                               /**< 非法类型 */
+    SHELL_TEXT_CMD_TOO_LONG,                            /**< Command too long */
+    SHELL_TEXT_CMD_LIST,                                /**< Executable command list title */
+    SHELL_TEXT_VAR_LIST,                                /**< Variable list title */
+    SHELL_TEXT_USER_LIST,                               /**< User list title */
+    SHELL_TEXT_KEY_LIST,                                /**< Key list title */
+    SHELL_TEXT_CMD_NOT_FOUND,                           /**< Command not found */
+    SHELL_TEXT_POINT_CANNOT_MODIFY,                     /**< Pointer variables are not allowed to be modified */
+    SHELL_TEXT_VAR_READ_ONLY_CANNOT_MODIFY,             /**< Read-only variables are not allowed to be modified */
+    SHELL_TEXT_NOT_VAR,                                 /**< Command is not a variable */
+    SHELL_TEXT_VAR_NOT_FOUND,                           /**< Variable not found */
+    SHELL_TEXT_HELP_HEADER,                             /**< Help header */
+    SHELL_TEXT_PASSWORD_HINT,                           /**< Password input prompt */
+    SHELL_TEXT_PASSWORD_ERROR,                          /**< Password error */
+    SHELL_TEXT_CLEAR_CONSOLE,                           /**< Clear console */
+    SHELL_TEXT_CLEAR_LINE,                              /**< Clear current line */
+    SHELL_TEXT_TYPE_CMD,                                /**< Command type */
+    SHELL_TEXT_TYPE_VAR,                                /**< Variable type */
+    SHELL_TEXT_TYPE_USER,                               /**< User type */
+    SHELL_TEXT_TYPE_KEY,                                /**< Key type */
+    SHELL_TEXT_TYPE_NONE,                               /**< Illegal type */
 #if SHELL_EXEC_UNDEF_FUNC == 1
-    SHELL_TEXT_PARAM_ERROR,                             /**< 参数错误 */
+    SHELL_TEXT_PARAM_ERROR,                             /**< Parameter error */
 #endif
 };
-
 
 static const char *shellText[] =
 {
 #if SHELL_SHOW_INFO == 1
     [SHELL_TEXT_INFO] =
     "\r\n"
-    " _         _   _                  _          _ _ \r\n"
-    "| |    ___| |_| |_ ___ _ __   ___| |__   ___| | |\r\n"
-    "| |   / _ \\ __| __/ _ \\ '__| / __| '_ \\ / _ \\ | |\r\n"
-    "| |__|  __/ |_| ||  __/ |    \\__ \\ | | |  __/ | |\r\n"
-    "|_____\\___|\\__|\\__\\___|_|    |___/_| |_|\\___|_|_|\r\n"
+    "    __  __                       ________  ______\r\n"
+    "   / / / /___  ____  ___  __  __/ ____/ / / /  _/\r\n"
+    "  / /_/ / __ \\/ __ \\/ _ \\/ / / / / __/ / / // /\r\n"
+    " / __  / /_/ / / / /  __/ /_/ / /_/ / /_/ // /\r\n"
+    "/_/ /_/\\____/_/ /_/\\___/\\__, /\\____/\\____/___/\r\n"
+    "                       /____/                 \r\n"
     "\r\n"
-    "Build:       "__DATE__" "__TIME__"\r\n"
-    "Version:     "SHELL_VERSION"\r\n"
-    "Copyright:   (c) 2020 Letter\r\n",
+    "Build:       "__DATE__" "__TIME__"\r\n",
 #endif
     [SHELL_TEXT_CMD_TOO_LONG] =
     "\r\nWarning: Command is too long\r\n",
@@ -160,7 +158,7 @@ unsigned char pairedChars[][2] =
 
 
 /**
- * @brief shell对象表
+ * @brief Shell object list
  */
 static Shell *shellList[SHELL_MAX_NUMBER] = {NULL};
 
@@ -177,9 +175,9 @@ ShellCommand *shellSeekCommand(Shell *shell,
 static void shellWriteCommandHelp(Shell *shell, char *cmd);
 
 /**
- * @brief shell 初始化
+ * @brief Shell initialization
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellInit(Shell *shell, char *buffer, unsigned short size)
 {
@@ -237,9 +235,9 @@ void shellInit(Shell *shell, char *buffer, unsigned short size)
 
 
 /**
- * @brief 添加shell
+ * @brief Add shell
  *
- * @param shell shell对象
+ * @param shell
  */
 static void shellAdd(Shell *shell)
 {
@@ -254,9 +252,9 @@ static void shellAdd(Shell *shell)
 }
 
 /**
- * @brief 移除shell
+ * @brief Remove shell
  *
- * @param shell shell对象
+ * @param shell
  *
  */
 void shellRemove(Shell *shell)
@@ -272,9 +270,9 @@ void shellRemove(Shell *shell)
 }
 
 /**
- * @brief 获取当前活动shell
+ * @brief Get the current active shell
  *
- * @return Shell* 当前活动shell对象
+ * @return Shell*
  */
 Shell *shellGetCurrent(void)
 {
@@ -290,10 +288,10 @@ Shell *shellGetCurrent(void)
 
 
 /**
- * @brief shell写字符
+ * @brief Shell write characters
  *
- * @param shell shell对象
- * @param data 字符数据
+ * @param shell
+ * @param data
  */
 static void shellWriteByte(Shell *shell, char data)
 {
@@ -302,12 +300,12 @@ static void shellWriteByte(Shell *shell, char data)
 
 
 /**
- * @brief shell 写字符串
+ * @brief Shell write string
  *
- * @param shell shell对象
- * @param string 字符串数据
+ * @param shell
+ * @param string
  *
- * @return unsigned short 写入字符的数量
+ * @return unsigned short
  */
 unsigned short shellWriteString(Shell *shell, const char *string)
 {
@@ -323,12 +321,12 @@ unsigned short shellWriteString(Shell *shell, const char *string)
 
 
 /**
- * @brief shell 写命令描述字符串
+ * @brief Shell Write Command Description String
  *
- * @param shell shell对象
- * @param string 字符串数据
+ * @param shell
+ * @param string
  *
- * @return unsigned short 写入字符的数量
+ * @return unsigned short
  */
 static unsigned short shellWriteCommandDesc(Shell *shell, const char *string)
 {
@@ -355,10 +353,10 @@ static unsigned short shellWriteCommandDesc(Shell *shell, const char *string)
 
 
 /**
- * @brief shell写命令提示符
+ * @brief Shell write command prompt
  *
- * @param shell shell对象
- * @param newline 新行
+ * @param shell
+ * @param newline
  *
  */
 static void shellWritePrompt(Shell *shell, unsigned char newline)
@@ -383,11 +381,11 @@ static void shellWritePrompt(Shell *shell, unsigned char newline)
 
 #if SHELL_PRINT_BUFFER > 0
 /**
- * @brief shell格式化输出
+ * @brief Shell formatted output
  *
- * @param shell shell对象
- * @param fmt 格式化字符串
- * @param ... 参数
+ * @param shell
+ * @param fmt
+ * @param ...
  */
 void shellPrint(Shell *shell, const char *fmt, ...)
 {
@@ -411,11 +409,11 @@ void shellPrint(Shell *shell, const char *fmt, ...)
 
 #if SHELL_SCAN_BUFFER > 0
 /**
- * @brief shell格式化输入
+ * @brief Shell formatted input
  *
- * @param shell shell对象
- * @param fmt 格式化字符串
- * @param ... 参数
+ * @param shell
+ * @param fmt
+ * @param ...
  */
 void shellScan(Shell *shell, char *fmt, ...)
 {
@@ -448,13 +446,12 @@ void shellScan(Shell *shell, char *fmt, ...)
 
 
 /**
- * @brief shell 检查命令权限
+ * @brief Shell Check Command Permissions
  *
- * @param shell shell对象
- * @param command ShellCommand
+ * @param shell
+ * @param command
  *
- * @return signed char 0 当前用户具有该命令权限
- * @return signec char -1 当前用户不具有该命令权限
+ * @return signed char
  */
 signed char shellCheckPermission(Shell *shell, ShellCommand *command)
 {
@@ -470,12 +467,12 @@ signed char shellCheckPermission(Shell *shell, ShellCommand *command)
 
 
 /**
- * @brief int转16进制字符串
+ * @brief Convert int to hexadecimal string
  *
- * @param value 数值
- * @param buffer 缓冲
+ * @param value
+ * @param buffer
  *
- * @return signed char 转换后有效数据长度
+ * @return signed char
  */
 signed char shellToHex(unsigned int value, char *buffer)
 {
@@ -493,12 +490,12 @@ signed char shellToHex(unsigned int value, char *buffer)
 
 
 /**
-* @brief int转10进制字符串
+* @brief Convert int to decimal string
  *
- * @param value 数值
- * @param buffer 缓冲
+ * @param value
+ * @param buffer
  *
- * @return signed char 转换后有效数据长度
+ * @return signed char
  */
 signed char shellToDec(int value, char *buffer)
 {
@@ -527,11 +524,11 @@ signed char shellToDec(int value, char *buffer)
 
 
 /**
- * @brief shell字符串复制
+ * @brief Shell string copying
  *
- * @param dest 目标字符串
- * @param src 源字符串
- * @return unsigned short 字符串长度
+ * @param dest
+ * @param src
+ * @return unsigned short
  */
 static unsigned short shellStringCopy(char *dest, char *src)
 {
@@ -547,11 +544,11 @@ static unsigned short shellStringCopy(char *dest, char *src)
 
 
 /**
- * @brief shell字符串比较
+ * @brief Shell string comparison
  *
- * @param dest 目标字符串
- * @param src 源字符串
- * @return unsigned short 匹配长度
+ * @param dest
+ * @param src
+ * @return unsigned short
  */
 static unsigned short shellStringCompare(char *dest, char *src)
 {
@@ -572,10 +569,10 @@ static unsigned short shellStringCompare(char *dest, char *src)
 
 
 /**
- * @brief shell获取命令名
+ * @brief Get command name
  *
- * @param command 命令
- * @return const char* 命令名
+ * @param command
+ * @return const char*
  */
 static const char *shellGetCommandName(ShellCommand *command)
 {
@@ -611,10 +608,10 @@ static const char *shellGetCommandName(ShellCommand *command)
 
 
 /**
- * @brief shell获取命令描述
+ * @brief Get command description
  *
- * @param command 命令
- * @return const char* 命令描述
+ * @param command
+ * @return const char*
  */
 static const char *shellGetCommandDesc(ShellCommand *command)
 {
@@ -637,10 +634,10 @@ static const char *shellGetCommandDesc(ShellCommand *command)
 }
 
 /**
- * @brief shell 列出命令条目
+ * @brief List command entries
  *
- * @param shell shell对象
- * @param item 命令条目
+ * @param shell
+ * @param item
  */
 void shellListItem(Shell *shell, ShellCommand *item)
 {
@@ -687,9 +684,9 @@ void shellListItem(Shell *shell, ShellCommand *item)
 
 
 /**
- * @brief shell列出可执行命令
+ * @brief Lists executable commands
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellListCommand(Shell *shell)
 {
@@ -707,9 +704,9 @@ void shellListCommand(Shell *shell)
 
 
 /**
- * @brief shell列出变量
+ * @brief List variables
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellListVar(Shell *shell)
 {
@@ -728,9 +725,9 @@ void shellListVar(Shell *shell)
 
 
 /**
- * @brief shell列出用户
+ * @brief List users
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellListUser(Shell *shell)
 {
@@ -749,9 +746,9 @@ void shellListUser(Shell *shell)
 
 
 /**
- * @brief shell列出按键
+ * @brief List keys
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellListKey(Shell *shell)
 {
@@ -770,9 +767,9 @@ void shellListKey(Shell *shell)
 
 
 /**
- * @brief shell列出所有命令
+ * @brief List all commands
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellListAll(Shell *shell)
 {
@@ -790,10 +787,10 @@ void shellListAll(Shell *shell)
 
 
 /**
- * @brief shell删除命令行数据
+ * @brief Delete dommand line data
  *
- * @param shell shell对象
- * @param length 删除长度
+ * @param shell
+ * @param length
  */
 void shellDeleteCommandLine(Shell *shell, unsigned char length)
 {
@@ -805,9 +802,9 @@ void shellDeleteCommandLine(Shell *shell, unsigned char length)
 
 
 /**
- * @brief shell 清空命令行输入
+ * @brief Clear command line input
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellClearCommandLine(Shell *shell)
 {
@@ -820,14 +817,14 @@ void shellClearCommandLine(Shell *shell)
 
 
 /**
- * @brief shell插入一个字符到光标位置
+ * @brief Insert a character to the cursor position
  *
- * @param shell shell对象
- * @param data 字符数据
+ * @param shell
+ * @param data
  */
 void shellInsertByte(Shell *shell, char data)
 {
-    /* 判断输入数据是否过长 */
+    /* Check if the input data is too long */
     if (shell->parser.length >= shell->parser.bufferSize - 1)
     {
         shellWriteString(shell, shellText[SHELL_TEXT_CMD_TOO_LONG]);
@@ -836,13 +833,13 @@ void shellInsertByte(Shell *shell, char data)
         return;
     }
 
-    /* 插入数据 */
+    /* Insert Byte */
     if (shell->parser.cursor == shell->parser.length)
     {
         shell->parser.buffer[shell->parser.length++] = data;
         shell->parser.buffer[shell->parser.length] = 0;
         shell->parser.cursor++;
-        shellWriteByte(shell, shell->status.isChecked ? data : '*');
+        //shellWriteByte(shell, shell->status.isChecked ? data : '*');
     }
     else if (shell->parser.cursor < shell->parser.length)
     {
@@ -867,10 +864,10 @@ void shellInsertByte(Shell *shell, char data)
 
 
 /**
- * @brief shell 删除字节
+ * @brief Delete Bytes
  *
- * @param shell shell对象
- * @param direction 删除方向 {@code 1}删除光标前字符 {@code -1}删除光标处字符
+ * @param shell
+ * @param direction
  */
 void shellDeleteByte(Shell *shell, signed char direction)
 {
@@ -916,14 +913,14 @@ void shellDeleteByte(Shell *shell, signed char direction)
 
 
 /**
- * @brief shell 字符串分割
+ * @brief String split
  *
- * @param string 字符串
- * @param array 分割后保存的字符串数组
- * @param splitKey 分隔符
- * @param maxNum 最大分割数量
+ * @param string
+ * @param array
+ * @param splitKey
+ * @param maxNum
  *
- * @return int 分割得到的字串数量
+ * @return int
  */
 int shellSplit(char *string, unsigned short strLen, char *array[], char splitKey, short maxNum)
 {
@@ -984,9 +981,9 @@ int shellSplit(char *string, unsigned short strLen, char *array[], char splitKey
 
 
 /**
- * @brief shell 解析参数
+ * @brief Parse parameters
  *
- * @param shell shell对象
+ * @param shell
  */
 static void shellParserParam(Shell *shell)
 {
@@ -997,9 +994,9 @@ static void shellParserParam(Shell *shell)
 
 
 /**
- * @brief shell去除字符串参数头尾的双引号
+ * @brief Remove double quotes at the beginning and end of string parameters
  *
- * @param shell shell对象
+ * @param shell
  */
 static void shellRemoveParamQuotes(Shell *shell)
 {
@@ -1021,13 +1018,13 @@ static void shellRemoveParamQuotes(Shell *shell)
 
 
 /**
- * @brief shell匹配命令
+ * @brief Match command
  *
- * @param shell shell对象
- * @param cmd 命令
- * @param base 匹配命令表基址
- * @param compareLength 匹配字符串长度
- * @return ShellCommand* 匹配到的命令
+ * @param shell
+ * @param cmd
+ * @param base
+ * @param compareLength
+ * @return ShellCommand*
  */
 ShellCommand *shellSeekCommand(Shell *shell,
                                const char *cmd,
@@ -1065,11 +1062,11 @@ ShellCommand *shellSeekCommand(Shell *shell,
 
 
 /**
- * @brief shell 获取变量值
+ * @brief Get variable values
  *
- * @param shell shell对象
- * @param command 命令
- * @return int 变量值
+ * @param shell
+ * @param command
+ * @return int
  */
 int shellGetVarValue(Shell *shell, ShellCommand *command)
 {
@@ -1103,12 +1100,12 @@ int shellGetVarValue(Shell *shell, ShellCommand *command)
 
 
 /**
- * @brief shell设置变量值
+ * @brief Set variable values
  *
- * @param shell shell对象
- * @param command 命令
- * @param value 值
- * @return int 返回变量值
+ * @param shell
+ * @param command
+ * @param value
+ * @return int
  */
 int shellSetVarValue(Shell *shell, ShellCommand *command, int value)
 {
@@ -1159,11 +1156,11 @@ int shellSetVarValue(Shell *shell, ShellCommand *command, int value)
 
 
 /**
- * @brief shell变量输出
+ * @brief Variable output
  *
- * @param shell shell对象
- * @param command 命令
- * @return int 返回变量值
+ * @param shell
+ * @param command
+ * @return int
  */
 static int shellShowVar(Shell *shell, ShellCommand *command)
 {
@@ -1202,11 +1199,11 @@ static int shellShowVar(Shell *shell, ShellCommand *command)
 
 
 /**
- * @brief shell设置变量
+ * @brief Set variable
  *
- * @param name 变量名
- * @param value 变量值
- * @return int 返回变量值
+ * @param name
+ * @param value
+ * @return int
  */
 int shellSetVar(char *name, int value)
 {
@@ -1239,12 +1236,12 @@ SHELL_EXPORT_CMD(
 
 
 /**
- * @brief shell运行命令
+ * @brief Run command
  *
- * @param shell shell对象
- * @param command 命令
+ * @param shell
+ * @param command
  *
- * @return unsigned int 命令返回值
+ * @return unsigned int
  */
 unsigned int shellRunCommand(Shell *shell, ShellCommand *command)
 {
@@ -1257,7 +1254,7 @@ unsigned int shellRunCommand(Shell *shell, ShellCommand *command)
         returnValue = func(shell->parser.paramCount, shell->parser.param);
         if (!command->attr.attrs.disableReturn)
         {
-            shellWriteReturnValue(shell, returnValue);
+            // shellWriteReturnValue(shell, returnValue);
         }
     }
     else if (command->attr.attrs.type == SHELL_TYPE_CMD_FUNC)
@@ -1268,7 +1265,7 @@ unsigned int shellRunCommand(Shell *shell, ShellCommand *command)
                                   shell->parser.param);
         if (!command->attr.attrs.disableReturn)
         {
-            shellWriteReturnValue(shell, returnValue);
+            // shellWriteReturnValue(shell, returnValue);
         }
     }
     else if (command->attr.attrs.type >= SHELL_TYPE_VAR_INT
@@ -1287,9 +1284,9 @@ unsigned int shellRunCommand(Shell *shell, ShellCommand *command)
 
 
 /**
- * @brief shell校验密码
+ * @brief Verify password
  *
- * @param shell shell对象
+ * @param shell
  */
 static void shellCheckPassword(Shell *shell)
 {
@@ -1310,10 +1307,10 @@ static void shellCheckPassword(Shell *shell)
 
 
 /**
- * @brief shell设置用户
+ * @brief Set user
  *
- * @param shell shell对象
- * @param user 用户
+ * @param shell
+ * @param user
  */
 void shellSetUser(Shell *shell, const ShellCommand *user)
 {
@@ -1337,10 +1334,10 @@ void shellSetUser(Shell *shell, const ShellCommand *user)
 
 
 /**
- * @brief shell写返回值
+ * @brief Write return value
  *
- * @param shell shell对象
- * @param value 返回值
+ * @param shell
+ * @param value
  */
 static void shellWriteReturnValue(Shell *shell, int value)
 {
@@ -1363,9 +1360,9 @@ static void shellWriteReturnValue(Shell *shell, int value)
 
 #if SHELL_HISTORY_MAX_NUMBER > 0
 /**
- * @brief shell历史记录添加
+ * @brief Add history
  *
- * @param shell shell对象
+ * @param shell
  */
 static void shellHistoryAdd(Shell *shell)
 {
@@ -1394,10 +1391,10 @@ static void shellHistoryAdd(Shell *shell)
 
 
 /**
- * @brief shell历史记录查找
+ * @brief Search history
  *
- * @param shell shell对象
- * @param dir 方向 {@code <0}往上查找 {@code >0}往下查找
+ * @param shell
+ * @param dir
  */
 static void shellHistory(Shell *shell, signed char dir)
 {
@@ -1445,10 +1442,10 @@ static void shellHistory(Shell *shell, signed char dir)
 
 
 /**
- * @brief shell 常规输入
+ * @brief Normal input
  *
- * @param shell shell 对象
- * @param data 输入字符
+ * @param shell
+ * @param data
  */
 void shellNormalInput(Shell *shell, char data)
 {
@@ -1457,9 +1454,9 @@ void shellNormalInput(Shell *shell, char data)
 }
 
 /**
- * @brief shell运行命令
+ * @brief Run command
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellExec(Shell *shell)
 {
@@ -1506,9 +1503,9 @@ void shellExec(Shell *shell)
 
 #if SHELL_HISTORY_MAX_NUMBER > 0
 /**
- * @brief shell上方向键输入
+ * @brief Up arrow key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellUp(Shell *shell)
 {
@@ -1518,9 +1515,9 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0), 0x1B5B4100, shellUp, up);
 
 
 /**
- * @brief shell下方向键输入
+ * @brief Down arrow key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellDown(Shell *shell)
 {
@@ -1531,9 +1528,9 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0), 0x1B5B4200, shellDown, down);
 
 
 /**
- * @brief shell右方向键输入
+ * @brief Right arrow key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellRight(Shell *shell)
 {
@@ -1547,9 +1544,9 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0) | SHELL_CMD_ENABLE_UNCHECKED,
 
 
 /**
- * @brief shell左方向键输入
+ * @brief Left arrow key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellLeft(Shell *shell)
 {
@@ -1564,9 +1561,9 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0) | SHELL_CMD_ENABLE_UNCHECKED,
 
 
 /**
- * @brief shell Tab按键处理
+ * @brief Tab key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellTab(Shell *shell)
 {
@@ -1666,9 +1663,9 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0), 0x09000000, shellTab, tab);
 
 
 /**
- * @brief shell 退格
+ * @brief Backspace key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellBackspace(Shell *shell)
 {
@@ -1681,9 +1678,9 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0) | SHELL_CMD_ENABLE_UNCHECKED,
 
 
 /**
- * @brief shell 删除
+ * @brief Delete key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellDelete(Shell *shell)
 {
@@ -1694,9 +1691,9 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0) | SHELL_CMD_ENABLE_UNCHECKED,
 
 
 /**
- * @brief shell 回车处理
+ * @brief Enter key
  *
- * @param shell shell对象
+ * @param shell
  */
 void shellEnter(Shell *shell)
 {
@@ -1717,10 +1714,10 @@ SHELL_EXPORT_KEY(SHELL_CMD_PERMISSION(0) | SHELL_CMD_ENABLE_UNCHECKED,
 #endif
 
 /**
- * @brief shell 写命令帮助信息
+ * @brief Write command help information
  *
- * @param shell shell对象
- * @param cmd 命令字符串
+ * @param shell
+ * @param cmd
  */
 static void shellWriteCommandHelp(Shell *shell, char *cmd)
 {
@@ -1743,10 +1740,10 @@ static void shellWriteCommandHelp(Shell *shell, char *cmd)
 }
 
 /**
- * @brief shell help
+ * @brief Help
  *
- * @param argc 参数个数
- * @param argv 参数
+ * @param argc
+ * @param argv
  */
 void shellHelp(int argc, char *argv[])
 {
@@ -1766,10 +1763,10 @@ SHELL_EXPORT_CMD(
     help, shellHelp, show command info\r\nhelp [cmd]);
 
 /**
- * @brief shell 输入处理
+ * @brief Handle input
  *
- * @param shell shell对象
- * @param data 输入数据
+ * @param shell
+ * @param data
  */
 void shellHandler(Shell *shell, char data)
 {
@@ -1788,7 +1785,7 @@ void shellHandler(Shell *shell, char data)
     }
 #endif
 
-    /* 根据记录的按键键值计算当前字节在按键键值中的偏移 */
+    /* Calculate the offset of the current byte in the key value based on the recorded key value */
     char keyByteOffset = 24;
     int keyFilter = 0x00000000;
     if ((shell->parser.keyValue & 0x0000FF00) != 0x00000000)
@@ -1807,15 +1804,15 @@ void shellHandler(Shell *shell, char data)
         keyFilter = 0xFF000000;
     }
 
-    /* 遍历ShellCommand列表，尝试进行按键键值匹配 */
+    /* Traverse the ShellCommand list and attempt to match key values */
     ShellCommand *base = (ShellCommand *)shell->commandList.base;
     for (short i = 0; i < shell->commandList.count; i++)
     {
-        /* 判断是否是按键定义并验证权限 */
+        /* Determine if it is a key definition and verify permissions */
         if (base[i].attr.attrs.type == SHELL_TYPE_KEY
             && shellCheckPermission(shell, &(base[i])) == 0)
         {
-            /* 对输入的字节同按键键值进行匹配 */
+            /* Match input bytes with key values */
             if ((base[i].data.key.value & keyFilter) == shell->parser.keyValue
                 && (base[i].data.key.value & (0xFF << keyByteOffset))
                 == (data << keyByteOffset))
@@ -1879,9 +1876,9 @@ void shellWriteEndLine(Shell *shell, char *buffer, int len)
 
 
 /**
- * @brief shell 任务
+ * @brief Shell Task
  *
- * @param param 参数(shell对象)
+ * @param param
  *
  */
 void shellTask(void *param)
@@ -1894,15 +1891,7 @@ void shellTask(void *param)
 #endif
         if (shell->read && shell->read(&data, 1) == 1)
         {
-            if (data == '\n')
-            {
-                shellHandler(shell, 0x0A);
-            }
-            else
-            {
-                shellHandler(shell, data);
-            }
-
+            shellHandler(shell, data);
         }
 #if SHELL_TASK_WHILE == 1
     }
@@ -1911,7 +1900,7 @@ void shellTask(void *param)
 
 
 /**
- * @brief shell 输出用户列表(shell调用)
+ * @brief Output user list
  */
 void shellUsers(void)
 {
@@ -1927,7 +1916,7 @@ SHELL_EXPORT_CMD(
 
 
 /**
- * @brief shell 输出命令列表(shell调用)
+ * @brief Output command list
  */
 void shellCmds(void)
 {
@@ -1943,7 +1932,7 @@ SHELL_EXPORT_CMD(
 
 
 /**
- * @brief shell 输出变量列表(shell调用)
+ * @brief Output variable llist
  */
 void shellVars(void)
 {
@@ -1959,7 +1948,7 @@ SHELL_EXPORT_CMD(
 
 
 /**
- * @brief shell 输出按键列表(shell调用)
+ * @brief Output key list
  */
 void shellKeys(void)
 {
@@ -1975,7 +1964,7 @@ SHELL_EXPORT_CMD(
 
 
 /**
- * @brief shell 清空控制台(shell调用)
+ * @brief Clear console
  */
 void shellClear(void)
 {
@@ -1991,11 +1980,11 @@ SHELL_EXPORT_CMD(
 
 
 /**
- * @brief shell执行命令
+ * @brief Run command
  *
- * @param shell shell对象
- * @param cmd 命令字符串
- * @return int 返回值
+ * @param shell
+ * @param cmd
+ * @return int
  */
 int shellRun(Shell *shell, const char *cmd)
 {
@@ -2017,11 +2006,11 @@ int shellRun(Shell *shell, const char *cmd)
 
 #if SHELL_EXEC_UNDEF_FUNC == 1
 /**
- * @brief shell执行未定义函数
+ * @brief Execute undefined functions
  *
- * @param argc 参数个数
- * @param argv 参数
- * @return int 返回值
+ * @param argc
+ * @param argv
+ * @return int
  */
 int shellExecute(int argc, char *argv[])
 {
@@ -2056,10 +2045,9 @@ SHELL_EXPORT_CMD(
 
 #if SHELL_KEEP_RETURN_VALUE == 1
 /**
- * @brief shell返回值获取
- *        获取上一次执行的命令的返回值
+ * @brief Get return value
  *
- * @return int 返回值
+ * @return int
  */
 static int shellRetValGet()
 {

@@ -17,4 +17,6 @@
 extern Shell shell;
 
 void userShellInit(void);
+
+void gui_port_console_init(void);
 #endif

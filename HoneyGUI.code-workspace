@@ -18,7 +18,8 @@
 			"cstdlib": "c",
 			"memory": "c",
 			"resource_8762g.h": "c",
-			"time.h": "c"
+			"time.h": "c",
+			"shell.h": "c"
 		}
 	}
 }

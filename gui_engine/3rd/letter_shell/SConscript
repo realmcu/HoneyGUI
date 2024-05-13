@@ -6,6 +6,10 @@ src = Glob('*.c')
 
 CPPPATH = [cwd]
 
-group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_BUILD_LETTER_SHELL'], CPPPATH = CPPPATH)
+CPPDEFINES = []
+if GetDepend('CONFIG_REALTEK_BUILD_LETTER_SHELL'):
+    CPPDEFINES += ['ENABLE_RTK_GUI_CONSOLE']
+
+group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_BUILD_LETTER_SHELL'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

@@ -9,19 +9,20 @@
  *
  */
 
-#include "shell.h"
-#include "shell_port.h"
 #include <sys/time.h>
 #include <stdio.h>
-
+#include <dirent.h>
+#include "shell.h"
+#include "shell_port.h"
+#include "shell_fs.h"
 
 Shell shell;
 char shellBuffer[512];
+ShellFs shellFs;
+char shellPathBuffer[512] = "/";
 
 /**
- * @brief 获取系统tick
- *
- * @return unsigned int 系统tick
+ * @brief Get system tick
  */
 unsigned int userGetTick()
 {
@@ -31,12 +32,10 @@ unsigned int userGetTick()
 }
 
 /**
- * @brief 用户shell写
+ * @brief Shell write for user
  *
- * @param data 数据
- * @param len 数据长度
- *
- * @return short 实际写入的数据长度
+ * @param data
+ * @param len
  */
 signed short userShellWrite(char *data, unsigned short len)
 {
@@ -48,14 +47,11 @@ signed short userShellWrite(char *data, unsigned short len)
     return len;
 }
 
-
 /**
- * @brief 用户shell读
+ * @brief Shell read for user
  *
- * @param data 数据
- * @param len 数据长度
- *
- * @return short 实际读取到
+ * @param data
+ * @param len
  */
 signed short userShellRead(char *data, unsigned short len)
 {
@@ -66,16 +62,51 @@ signed short userShellRead(char *data, unsigned short len)
     }
     return len;
 }
+
 /**
- * @brief 用户shell初始化
+ * @brief List directory
  *
+ * @param path
+ * @param buffer
+ * @param maxLen
+ * @return size_t
+ */
+size_t userShellListDir(char *path, char *buffer, size_t maxLen)
+{
+    DIR *dir;
+    struct dirent *ptr;
+    int i;
+    dir = opendir(path);
+    memset(buffer, 0, maxLen);
+    while ((ptr = readdir(dir)) != NULL)
+    {
+        strcat(buffer, ptr->d_name);
+        strcat(buffer, "\t");
+    }
+    closedir(dir);
+    return 0;
+}
+
+/**
+ * @brief User shell initialization
  */
 void userShellInit(void)
 {
+    shellFs.getcwd = getcwd;
+    shellFs.chdir = chdir;
+    shellFs.listdir = userShellListDir;
+    shellFsInit(&shellFs, shellPathBuffer, 512);
+
     shell.write = userShellWrite;
     shell.read = userShellRead;
-
+    shellSetPath(&shell, shellPathBuffer);
     shellInit(&shell, shellBuffer, 512);
+    shellCompanionAdd(&shell, SHELL_COMPANION_ID_FS, &shellFs);
 }
 //CEVENT_EXPORT(EVENT_INIT_STAGE2, userShellInit);
 
+void gui_port_console_init(void)
+{
+    userShellInit();
+    shellTask(&shell);
+}

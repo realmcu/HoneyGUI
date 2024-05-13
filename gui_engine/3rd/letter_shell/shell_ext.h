@@ -16,16 +16,16 @@
 #include <stddef.h>
 
 /**
- * @brief 数字类型
+ * @brief ShellNumType
  *
  */
 typedef enum
 {
-    NUM_TYPE_DEC,                                           /**< 十进制整型 */
-    NUM_TYPE_BIN,                                           /**< 二进制整型 */
-    NUM_TYPE_OCT,                                           /**< 八进制整型 */
-    NUM_TYPE_HEX,                                           /**< 十六进制整型 */
-    NUM_TYPE_FLOAT                                          /**< 浮点型 */
+    NUM_TYPE_DEC,                                           /**< Decimal integer */
+    NUM_TYPE_BIN,                                           /**< Binary integer */
+    NUM_TYPE_OCT,                                           /**< Octal integer */
+    NUM_TYPE_HEX,                                           /**< Hexadecimal integer */
+    NUM_TYPE_FLOAT                                          /**< Float */
 } ShellNumType;
 
 #if SHELL_SUPPORT_ARRAY_PARAM == 1

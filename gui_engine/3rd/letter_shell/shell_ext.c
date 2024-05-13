@@ -30,13 +30,13 @@ static int shellExtCleanerArray(Shell *shell, char *type, void *param);
 
 #if SHELL_USING_FUNC_SIGNATURE == 1
 /**
- * @brief 获取下一个参数类型
+ * @brief Get the next parameter type
  *
- * @param signature 函数签名
- * @param index 参数遍历在签名中的起始索引
- * @param type 获取到的参数类型
+ * @param signature
+ * @param index
+ * @param type
  *
- * @return int 下一个参数在签名中的索引
+ * @return int
  */
 static int shellGetNextParamType(const char *signature, int index, char *type)
 {
@@ -68,11 +68,11 @@ static int shellGetNextParamType(const char *signature, int index, char *type)
 }
 
 /**
- * @brief 获取期待的参数个数
+ * @brief Obtain the expected number of parameters
  *
- * @param signature 函数签名
+ * @param signature
  *
- * @return int 参数个数
+ * @return int
  */
 static int shellGetParamNumExcept(const char *signature)
 {
@@ -106,10 +106,10 @@ static int shellGetParamNumExcept(const char *signature)
 #endif
 
 /**
- * @brief 判断数字进制
+ * @brief Judge the number type
  *
- * @param string 参数字符串
- * @return ShellNumType 进制
+ * @param string
+ * @return ShellNumType
  */
 static ShellNumType shellExtNumType(char *string)
 {
@@ -143,10 +143,10 @@ static ShellNumType shellExtNumType(char *string)
 
 
 /**
- * @brief 字符转数字
+ * @brief Character to number conversion
  *
- * @param code 字符
- * @return char 数字
+ * @param code
+ * @return char
  */
 static char shellExtToNum(char code)
 {
@@ -170,10 +170,10 @@ static char shellExtToNum(char code)
 
 
 /**
- * @brief 解析字符参数
+ * @brief Parse character parameters
  *
- * @param string 字符串参数
- * @return char 解析出的字符
+ * @param string
+ * @return char
  */
 static char shellExtParseChar(char *string)
 {
@@ -213,10 +213,10 @@ static char shellExtParseChar(char *string)
 
 
 /**
- * @brief 解析字符串参数
+ * @brief Parse string parameters
  *
- * @param string 字符串参数
- * @return char* 解析出的字符串
+ * @param string
+ * @return char*
  */
 static char *shellExtParseString(char *string)
 {
@@ -252,10 +252,10 @@ static char *shellExtParseString(char *string)
 
 
 /**
- * @brief 解析数字参数
+ * @brief Parse numerical parameters
  *
- * @param string 字符串参数
- * @return size_t 解析出的数字
+ * @param string
+ * @return size_t
  */
 static size_t shellExtParseNumber(char *string)
 {
@@ -324,11 +324,11 @@ static size_t shellExtParseNumber(char *string)
 
 
 /**
- * @brief 解析变量参数
+ * @brief Parse variable parameters
  *
- * @param shell shell对象
- * @param var 变量
- * @return size_t 变量值
+ * @param shell
+ * @param var
+ * @return size_t
  */
 static size_t shellExtParseVar(Shell *shell, char *var)
 {
@@ -348,14 +348,14 @@ static size_t shellExtParseVar(Shell *shell, char *var)
 
 
 /**
- * @brief 解析参数
+ * @brief Parse parameters
  *
- * @param shell shell对象
- * @param string 参数
- * @param type 参数类型
- * @param result 解析结果
+ * @param shell
+ * @param string
+ * @param type
+ * @param result
  *
- * @return int 0 解析成功 --1 解析失败
+ * @return int
  */
 int shellExtParsePara(Shell *shell, char *string, char *type, size_t *result)
 {
@@ -453,13 +453,13 @@ int shellExtParsePara(Shell *shell, char *string, char *type, size_t *result)
 
 #if SHELL_USING_FUNC_SIGNATURE == 1
 /**
- * @brief 清理参数
+ * @brief Clean parameters
  *
- * @param shell shell
- * @param type 参数类型
- * @param param 参数
+ * @param shell
+ * @param type
+ * @param param
  *
- * @return int 0 清理成功 -1 清理失败
+ * @return int
  */
 int shellExtCleanerPara(Shell *shell, char *type, size_t param)
 {
@@ -504,11 +504,11 @@ int shellExtCleanerPara(Shell *shell, char *type, size_t param)
 
 #if SHELL_SUPPORT_ARRAY_PARAM == 1
 /**
- * @brief 估算数组长度
+ * @brief Estimate array length
  *
- * @param string 数组参数
+ * @param string
  *
- * @return int 估算的数组长度
+ * @return int
  */
 static int shellEstimateArrayLength(char *string)
 {
@@ -526,12 +526,12 @@ static int shellEstimateArrayLength(char *string)
 }
 
 /**
- * @brief 分割数组参数
+ * @brief Split array parameters
  *
- * @param string 数组参数
- * @param array 分割后的字符串数组
+ * @param string
+ * @param array
  *
- * @return int 数组长度
+ * @return int
  */
 static int shellSplitArray(char *string, char ***array)
 {
@@ -551,14 +551,14 @@ static int shellSplitArray(char *string, char ***array)
 }
 
 /**
- * @brief 解析数组参数
+ * @brief Parse array parameters
  *
- * @param shell shell 对象
- * @param string 数组参数
- * @param type 参数类型
- * @param result 解析结果
+ * @param shell
+ * @param string
+ * @param type
+ * @param result
  *
- * @return int 0 解析成功 -1 解析失败
+ * @return int
  */
 static int shellExtParseArray(Shell *shell, char *string, char *type, size_t *result)
 {
@@ -603,13 +603,13 @@ static int shellExtParseArray(Shell *shell, char *string, char *type, size_t *re
 }
 
 /**
- * @brief 清理数组参数
+ * @brief Clean array parameters
  *
- * @param shell shell 对象
- * @param type 参数类型
- * @param param 参数
+ * @param shell
+ * @param type
+ * @param param
  *
- * @return int 0 清理成功 -1 清理失败
+ * @return int
  */
 static int shellExtCleanerArray(Shell *shell, char *type, void *param)
 {
@@ -627,11 +627,11 @@ static int shellExtCleanerArray(Shell *shell, char *type, void *param)
 }
 
 /**
- * @brief 获取数组大小
+ * @brief Get array size
  *
- * @param param 数组
+ * @param param
  *
- * @return int 数组大小
+ * @return int
  */
 int shellGetArrayParamSize(void *param)
 {
@@ -642,13 +642,13 @@ int shellGetArrayParamSize(void *param)
 
 
 /**
- * @brief 执行命令
+ * @brief Execute commands
  *
- * @param shell shell对象
- * @param command 命令
- * @param argc 参数个数
- * @param argv 参数
- * @return int 返回值
+ * @param shell
+ * @param command
+ * @param argc
+ * @param argv
+ * @return int
  */
 int shellExtRun(Shell *shell, ShellCommand *command, int argc, char *argv[])
 {
