@@ -141,12 +141,25 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
 
     nvgEndFrame(vg);
     nvgDeleteAGGE(vg);
+
+    for (uint32_t i = 0; i < img_h; i++)
+    {
+        for (uint32_t j = 0; j < img_w; j++)
+        {
+            gui_color_t *pixel = (gui_color_t *)img->data + i * img_w + j;
+            if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
+            {
+                pixel->color.rgba.a = this->color.color.rgba.a;
+            }
+        }
+    }
+
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
 
     set_arc_w_and_h(head, img_w, img_h);
 
 
-    img->blend_mode = IMG_FILTER_BLACK;
+    img->blend_mode = IMG_SRC_OVER_MODE;
     img->opacity_value = UINT8_MAX;
     memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
 
@@ -232,7 +245,7 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
         set_arc_img(this, this->arc_data_60, &this->arc_60_05, 240, img_60_angle, img_60_w, img_60_h);
         set_arc_img(this, this->arc_data_60, &this->arc_60_06, 300, img_60_angle, img_60_w, img_60_h);
     }
-    else if (this->degree = 360)
+    else if (this->degree == 360)
     {
         set_arc_img(this, this->arc_data_60, &this->arc_60_01, 0,  img_60_angle, img_60_w, img_60_h);
         set_arc_img(this, this->arc_data_60, &this->arc_60_02, 60, img_60_angle, img_60_w, img_60_h);
@@ -290,7 +303,7 @@ static void gui_canvas_arc_draw(gui_canvas_arc_t *this)
         gui_acc_blit_to_dc(this->arc_60_05, dc, NULL);
         gui_acc_blit_to_dc(this->arc_60_06, dc, NULL);
     }
-    else if (this->degree = 360)
+    else if (this->degree == 360)
     {
         gui_acc_blit_to_dc(this->arc_60_01, dc, NULL);
         gui_acc_blit_to_dc(this->arc_60_02, dc, NULL);
