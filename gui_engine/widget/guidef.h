@@ -361,6 +361,7 @@ typedef enum t_obj_type
     WHEEL_LIST               = 0x0026,
     QRCODE                   = 0x0027,
     GALLERY                  = 0x0028,
+    TURN_TABLE               = 0x0029,
 } T_OBJ_TYPE;
 
 typedef struct gui_msg

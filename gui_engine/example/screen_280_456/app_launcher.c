@@ -302,6 +302,61 @@ static void curtain_up(gui_curtainview_t *curtainview)
     gui_img_t *app7 = gui_img_create_from_mem(curtain_up, "app7", APP_WHATSAPP_BIN, 142, 310, 0, 0);
     gui_img_t *app8 = gui_img_create_from_mem(curtain_up, "app8", APP_YOUTUBE_BIN, 211, 310, 0, 0);
 }
+#include "gui_turn_table.h"
+const gui_turn_table_coordinate_t point[12] =
+{
+    //left
+    {50, 250},
+    {50, 150},
+    //up
+    {100, 50},
+    {205, 50},
+    {310, 50},
+    //right
+    {360, 150},
+    {360, 250},
+    {360, 350},
+    //down
+    {310, 450},
+    {205, 450},
+    {100, 450},
+    //left
+    {50, 350}
+};
+
+static void tab_tt(void *tab)
+{
+    gui_turn_table_t *tt = gui_turn_table_create(tab, 20, 32, 3, 3);
+    gui_turn_table_set_icon_scale(tt, 1.0f, 2.0f);
+    gui_turn_table_set_highlight_index(tt, 9);
+    gui_turn_table_generate_layout_by_array(tt, point, 12);
+
+    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
+
+    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
+
+    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
+
+    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
+
+    gui_turn_table_add_icon_static(tt, ICMENUHEARTRATE_BIN);
+}
 static void tab_home(void *tab)
 {
     gui_curtainview_t *curtainview = gui_curtainview_create(tab, "curtainview", 0, 0, 0, 0);
@@ -333,7 +388,7 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_tab_t *tab4 = gui_tab_create(tv, "tab4", 0, 0, 0, 0, 4, 0);
     gui_tab_t *tab5 = gui_tab_create(tv, "tab5", 0, 0, 0, 0, 5, 0);
 
-    tab_two(tabn);
+    tab_tt(tabn);
     tab_home(tab0);
     tab_text(tab1);
     tab_tree(tab2);
