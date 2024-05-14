@@ -49,17 +49,16 @@ extern "C" {
 typedef struct gui_canvas_arc
 {
     gui_obj_t base;
-    uint8_t *arc_data_60;
-    uint8_t *arc_data_10;
+    uint8_t *arc_data;
 
-    draw_img_t *arc_60_01;
-    draw_img_t *arc_60_02;
-    draw_img_t *arc_60_03;
-    draw_img_t *arc_60_04;
-    draw_img_t *arc_60_05;
-    draw_img_t *arc_60_06;
-    draw_img_t *arc_10;
-    float  degree;
+    draw_img_t *arc_img_01;
+    draw_img_t *arc_img_02;
+    draw_img_t *arc_img_03;
+    draw_img_t *arc_img_04;
+    draw_img_t *arc_img_05;
+    draw_img_t *arc_img_06;
+    float  from;
+    float  to;
     int  r;
     int  stroke_width;
     int  cx;
@@ -140,7 +139,8 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
                                         int          cx,
                                         int          cy,
                                         int          r,
-                                        float  degree,
+                                        float        from,
+                                        float        to,
                                         int  stroke_width,
                                         gui_color_t  color);
 
