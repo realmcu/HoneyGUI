@@ -19,10 +19,6 @@
 #include "time.h"
 #include "gui_components_init.h"
 
-#ifdef ENABLE_RTK_GUI_CONSOLE
-#include "shell_port.h"
-#endif
-
 #define LOG_VERSION_NUM                "x.x.x"
 #define COMPILE_TIME                    __DATE__", "__TIME__
 #define PROJECT_NAME                   "GUI Simulator"
@@ -50,9 +46,7 @@ int main(int argc, char **argv)
 
     gui_components_init();
 
-#ifdef ENABLE_RTK_GUI_CONSOLE
-    gui_port_console_init();
-#endif
+
 
     while (1)
     {

@@ -500,7 +500,7 @@ static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
         {
             memcpy(dc->shot_buf + 8 + y * w * byte, dc->frame_buf + y * dc->fb_width * byte, w * byte);
         }
-        gui_log("[GUI warning] please use user method for improve! \n");
+        // gui_log("[GUI warning] please use user method for improve! \n");
     }
     else if (dc->type == DC_RAMLESS)
     {
@@ -514,7 +514,7 @@ static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
             uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
             uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
-            gui_log("[GUI warning] please use user method for improve! \n");
+            // gui_log("[GUI warning] please use user method for improve! \n");
         }
         else
         {

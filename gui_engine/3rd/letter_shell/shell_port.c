@@ -105,8 +105,45 @@ void userShellInit(void)
 }
 //CEVENT_EXPORT(EVENT_INIT_STAGE2, userShellInit);
 
-void gui_port_console_init(void)
+
+
+#include <pthread.h>
+#include <stdbool.h>
+static void *shell_task(void *arg)
 {
-    userShellInit();
-    shellTask(&shell);
+    char data;
+    while (true)
+    {
+        if (shell.read && shell.read(&data, 1) == 1)
+        {
+            shellHandler(&shell, data);
+        }
+    }
 }
+static int gui_port_console_init(void)
+{
+    pthread_t thread;
+    userShellInit();
+    pthread_create(&thread, NULL, shell_task, NULL);
+    return 0;
+}
+
+
+#ifdef ENABLE_RTK_GUI_CONSOLE
+#include "gui_components_init.h"
+GUI_INIT_APP_EXPORT(gui_port_console_init);
+
+void func(int i, char ch, char *str)
+{
+    printf("\033[1;31m");
+    printf("Hello, World!\n");
+
+    printf("\033[0m");
+    printf("Hello, World again!\n");
+}
+SHELL_EXPORT_CMD(
+    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC) | SHELL_CMD_DISABLE_RETURN,
+    io, func, test);
+
+#endif
+
