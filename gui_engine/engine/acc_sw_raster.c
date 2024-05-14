@@ -277,21 +277,50 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
 static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 {
     gui_img_file_t *file = (gui_img_file_t *)image->data;
+    gui_rgb_data_head_t *head = image->data;
+    char input_type = head->type;
     imdc_file_t *compressed = (imdc_file_t *)(&(file->data.idc_file));
     uint32_t line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
     int location = 0;
-    imdc_rgb565_node_t *node = NULL;
-
-
-    do
+    if (input_type == RGB565)
     {
-        node = (imdc_rgb565_node_t *)(uintptr_t)line;
-        location += node->len;
-        line = line + sizeof(imdc_rgb565_node_t);
-    }
-    while (location < x);
+        imdc_rgb565_node_t *node = NULL;
+        do
+        {
+            node = (imdc_rgb565_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_rgb565_node_t);
+        }
+        while (location < x);
 
-    memcpy(pixel, &(node->pixel16), sizeof(node->pixel16));
+        memcpy(pixel, &(node->pixel16), sizeof(node->pixel16));
+    }
+    else if (input_type == RGB888)
+    {
+        imdc_rgb888_node_t *node = NULL;
+        do
+        {
+            node = (imdc_rgb888_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_rgb888_node_t);
+        }
+        while (location < x);
+        pixel[2] = node->pixel_r;
+        pixel[1] = node->pixel_g;
+        pixel[0] = node->pixel_b;
+    }
+    else if (input_type == RGBA8888)
+    {
+        imdc_argb8888_node_t *node = NULL;
+        do
+        {
+            node = (imdc_argb8888_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_argb8888_node_t);
+        }
+        while (location < x);
+        memcpy(pixel, &(node->pixel32), sizeof(node->pixel32));
+    }
 
 }
 
@@ -346,6 +375,7 @@ void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *re
             int write_off = (i - dc->section.y1) * dc->fb_width + j;
 
             uint8_t rle_pixel[4];
+
             get_rle_pixel(image, x, y, rle_pixel);
 
             do_raster_pixel(writebuf, write_off, (int)(uintptr_t)rle_pixel, 0, input_type, dc_bytes_per_pixel,
