@@ -149,10 +149,10 @@ typedef uintptr_t (*lx_vglite_user_cb_t)(uint16_t cmd, uintptr_t param, uintptr_
 /**********************
 * GLOBAL PROTOTYPES
 **********************/
-uintptr_t lx_vglite_load_demo_widget();
-uintptr_t lx_vglite_load_butterfly_widget();
-uintptr_t lx_vglite_load_soccer_widget();
-uintptr_t lx_vglite_load_flower_fall_widget();
+uintptr_t lx_vglite_load_demo_widget(void);
+uintptr_t lx_vglite_load_butterfly_widget(void);
+uintptr_t lx_vglite_load_soccer_widget(void);
+uintptr_t lx_vglite_load_flower_fall_widget(void);
 
 /*
     功能：特效实例初始化
@@ -245,7 +245,7 @@ void lx_vglite_set_param(uintptr_t handler, uint16_t cmd, uintptr_t param);
 void lx_vglite_set_user_callback(uintptr_t handler, lx_vglite_user_cb_t callback,
                                  uintptr_t user_data);
 
-uintptr_t lx_vglite_load_demo_transition();
+uintptr_t lx_vglite_load_demo_transition(void);
 
 /*
     功能：过场特效构建
@@ -292,7 +292,7 @@ void lx_vglite_trans_set_src(uintptr_t handler, uint16_t index, void *data, lx_i
 **********************/
 void *lx_vglite_malloc(size_t sz);
 void lx_vglite_free(void *ptr);
-lx_vglite_context_t *lx_vglite_context_create();
+lx_vglite_context_t *lx_vglite_context_create(void);
 void lx_vglite_context_free(lx_vglite_context_t *context_p);
 void lx_vglite_set_event_callback(lx_vglite_context_t *ctx, lx_vglite_event_cb_t callback,
                                   uintptr_t user_data);

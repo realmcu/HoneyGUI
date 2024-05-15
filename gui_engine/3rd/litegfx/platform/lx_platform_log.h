@@ -37,7 +37,7 @@ extern "C" {
 #define LX_LOG_LEVEL_NONE  5 /**< Do not log anything*/
 #define _LX_LOG_LEVEL_NUM  6 /**< Number of log levels*/
 
-#define LX_LOG_LEVEL LX_LOG_LEVEL_INFO
+#define LX_LOG_LEVEL LX_LOG_LEVEL_WARN
 
 #define LX_PRINTF   gui_log
 

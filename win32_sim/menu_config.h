@@ -100,7 +100,7 @@
 // </c>
 
 // <c> RTK GUI Enable LiteGFX
-// #define CONFIG_REALTEK_BUILD_LITE_GFX
+#define CONFIG_REALTEK_BUILD_LITE_GFX
 // </c>
 
 // <c> RTK GUI Enable LetterShell

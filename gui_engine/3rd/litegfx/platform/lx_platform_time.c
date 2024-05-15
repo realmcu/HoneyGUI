@@ -82,7 +82,7 @@ void lx_platform_get_time(lx_platform_time_t *time_p)
     time_p->hour = RtkWristbandSys.Global_Time.hour;
     time_p->minute = RtkWristbandSys.Global_Time.minutes;
     time_p->second = get_system_clock_second();
-    time_p->millisecond = 0;
+    time_p->millisecond = gui_ms_get();
 #endif /* CONFIG_RTC_ACTS */
 }
 
