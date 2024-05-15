@@ -421,7 +421,22 @@ void nvgReinitAgge(NVGcontext* ctx, uint32_t w, uint32_t h, uint32_t stride, enu
 
   nvgInitAGGE(agge, params, w, h, stride, format, data);
 }
-
+static void aggenvg__setLineCap(void* uptr, int lineCap)
+{
+    AGGENVGcontext* agge = (AGGENVGcontext*)uptr;
+    if(lineCap == NVG_BUTT)
+    {
+        agge->line_style.set_cap(agge::caps::butt());
+    }
+    else if(lineCap == NVG_ROUND)
+    {
+        agge->line_style.set_cap(agge::caps::round());
+    }
+    else if(lineCap == NVG_SQUARE)
+    {
+        agge->line_style.set_cap(agge::caps::square());
+    }
+}
 NVGcontext* nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format, uint8_t* data) {
   NVGparams params;
   NVGcontext* ctx = NULL;
@@ -439,6 +454,7 @@ NVGcontext* nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtextu
   params.renderCancel = aggenvg__renderCancel;
   params.renderFlush = aggenvg__renderFlush;
   params.renderDelete = aggenvg__renderDelete;
+  params.setLineCap = aggenvg__setLineCap;
   params.userPtr = agge;
   params.edgeAntiAlias = 1;
 

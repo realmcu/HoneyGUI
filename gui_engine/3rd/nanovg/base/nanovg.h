@@ -702,6 +702,7 @@ struct NVGparams
     void (*renderTriangles)(void *uptr, NVGpaint *paint, NVGcompositeOperationState compositeOperation,
                             NVGscissor *scissor, const NVGvertex *verts, int nverts);
     void (*renderDelete)(void *uptr);
+    void (*setLineCap)(void *uptr, int lineCap);
 };
 typedef struct NVGparams NVGparams;
 
