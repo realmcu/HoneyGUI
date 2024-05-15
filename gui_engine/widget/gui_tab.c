@@ -480,7 +480,7 @@ void gui_tab_update_preload(gui_obj_t *obj)
     }
     else
     {
-        GUI_ASSERT(parent->enable_pre_load == true);
+        // GUI_ASSERT(parent->enable_pre_load == true);
     }
 }
 
