@@ -46,6 +46,15 @@ extern "C" {
   * @{
   */
 
+typedef enum t_canvas_arc_cap
+{
+    CANVAS_ARC_BUTT,
+    CANVAS_ARC_ROUND,
+    CANVAS_ARC_SQUARE,
+    CANVAS_ARC_BEVEL,
+    CANVAS_ARC_MITER,
+} T_CANVAS_ARC_CAP;
+
 typedef struct gui_canvas_arc
 {
     gui_obj_t base;
@@ -63,6 +72,7 @@ typedef struct gui_canvas_arc
     int  stroke_width;
     int  cx;
     int  cy;
+    T_CANVAS_ARC_CAP cap;
     gui_color_t color;
 } gui_canvas_arc_t;
 
@@ -144,6 +154,14 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
                                         int  stroke_width,
                                         gui_color_t  color);
 
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param cap
+ */
+void gui_canvas_arc_set_cap(gui_canvas_arc_t *this, T_CANVAS_ARC_CAP cap);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

@@ -29,6 +29,9 @@ Widgets                              Brief
 `menu_cellular`_                     Display icons set as a honeycomb shape menu
 `return`_                            The bubble-shaped curve that can be dragged out 
 `qbcode`_                            Display qrcode and barcode 
+`canvas_rect`_                       Display a rectangular
+`canvas_round_rect`_                 Display a round rectangular
+`canvas_arc`_                        Display a arc
 ==================                   ==================
 
 .. _glossary: widgets_glossary.html
@@ -59,7 +62,7 @@ Widgets                              Brief
 .. _watchface gradient: gui_watchface_gradient.html
 .. _menu cellular: gui_menu_cellular.html
 .. _return: gui_return.html
-.. qbcode: qbcode.html
+.. _qbcode: qbcode.html
 .. toctree::
     :maxdepth: 2
 

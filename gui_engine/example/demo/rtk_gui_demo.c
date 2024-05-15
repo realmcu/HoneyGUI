@@ -125,7 +125,8 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     // gui_canvas_round_rect_t *rect = gui_canvas_round_rect_create(&(app->screen), "t", 454 / 2 - 200, 454 / 2 - 200, 400, 400, 20, gui_rgba(0, 255, 0, 100));
 
-    // gui_canvas_arc_t *arc = gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 200, 90, 20, gui_rgba(255, 0, 0, 255));
+    // gui_canvas_arc_t *arc = gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 200, 0, 90, 20, gui_rgba(255, 0, 0, 255));
+    // gui_canvas_arc_set_cap(arc, CANVAS_ARC_ROUND);
     // return;
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);

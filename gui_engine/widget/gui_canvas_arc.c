@@ -133,6 +133,8 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
 
     nvgStrokeWidth(vg, this->stroke_width);
 
+    nvgLineCap(vg, this->cap);
+
     nvgStrokeColor(vg, nvgRGBA(this->color.color.rgba.r, this->color.color.rgba.g,
                                this->color.color.rgba.b, this->color.color.rgba.a));
 
@@ -434,6 +436,11 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
     GET_BASE(this)->create_done = true;
 
     return this;
+}
+
+void gui_canvas_arc_set_cap(gui_canvas_arc_t *this, T_CANVAS_ARC_CAP cap)
+{
+    this->cap = cap;
 }
 
 
