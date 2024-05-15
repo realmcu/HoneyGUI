@@ -29,6 +29,7 @@ T_AUDIO_SUPPORT gui_get_audio_support(void)
 void gui_update_by_event(gui_event_user_t event, void *data, bool force_update)
 {
     extern bool send_msg_to_gui_server(gui_msg_t *msg);
+    extern bool gui_server_dlps_check(void);
 
     if (force_update)
     {

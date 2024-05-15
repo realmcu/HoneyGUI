@@ -92,8 +92,8 @@ size_t userShellListDir(char *path, char *buffer, size_t maxLen)
  */
 void userShellInit(void)
 {
-    shellFs.getcwd = getcwd;
-    shellFs.chdir = chdir;
+    shellFs.getcwd = (size_t (*)(char *, size_t))getcwd;
+    shellFs.chdir = (size_t (*)(char *))chdir;
     shellFs.listdir = userShellListDir;
     shellFsInit(&shellFs, shellPathBuffer, 512);
 

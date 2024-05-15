@@ -14,6 +14,7 @@
 #include "gui_page.h"
 #include "gui_rect.h"
 #include "gui_img_scope.h"
+#include "tp_algo.h"
 #define MODE_SOURCE true
 #define MODE_SINK false
 #define PAGE_NAME "_page_name"
@@ -213,7 +214,7 @@ void design_curtain_menu(void *parent)
     }
 #endif
     gui_curtain_t *c_up  = gui_curtain_create(ct, "curtain_up_menu", 0, 0, 454, 454, CURTAIN_UP, 1.0f);
-    gui_rect_create(c_up, 0, 0, 454, 454, APP_COLOR_WHITE);
+    gui_rect_create((void *)c_up, 0, 0, 454, 454, APP_COLOR_WHITE);
     gui_win_t *win = gui_win_create(c_up, 0, 0, 0, 454, 454);
     win->scope = 1;
 
@@ -229,7 +230,7 @@ void design_curtain_menu(void *parent)
 }
 static void page_cb(gui_win_t *win)
 {
-    touch_info_t *tp = tp_get_info();
+    touch_info_t *tp = (touch_info_t *)(uintptr_t)tp_get_info();
     static bool hold;
     if (tp->pressed)
     {

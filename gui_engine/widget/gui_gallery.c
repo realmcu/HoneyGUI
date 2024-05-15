@@ -428,7 +428,7 @@ static void gui_gallery_destory(gui_obj_t *obj)
 
     for (uint8_t i = 0; i < 6; i++)
     {
-        draw_img = &((gui_gallery_t *)obj)->img[i];
+        draw_img = (draw_img_t *) & ((gui_gallery_t *)obj)->img[i];
 
         if (draw_img->src_mode == IMG_SRC_FILESYS)
         {

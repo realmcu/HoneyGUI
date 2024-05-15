@@ -137,7 +137,6 @@ typedef struct
 
 typedef enum
 {
-
     GALLERY_IMG_IDX_LEFT = 0,
     GALLERY_IMG_IDX_CENTER = 1,
     GALLERY_IMG_IDX_RIGHT = 2,
@@ -147,7 +146,7 @@ typedef enum
     GALLERY_LEFT  = 0,
     GALLERY_RIGHT = 1,
     GALLERY_CENTER = 2,
-};
+} GALLERY_IMG_IDX;
 
 
 

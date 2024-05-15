@@ -94,6 +94,7 @@ static void design_app_watch_ui(gui_app_t *app)
     design_record_mgr(gui_tab_get_rte_obj(tab_record));
 #endif
 
+    extern void design_tab_menu(void *parent);
     design_tab_menu(gui_tab_get_rte_obj(tab_menu));
     design_benchmark_mgr(gui_tab_get_rte_obj(tab_benchmark));
 
