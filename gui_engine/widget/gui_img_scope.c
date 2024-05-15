@@ -174,6 +174,8 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
     gui_image_load_scale(this->draw_img);
     gui_obj_t *o = obj;
     gui_win_t *win_scope = 0;
+    GUI_TYPE(gui_img_scope_t, obj)->ax = obj->x;
+    GUI_TYPE(gui_img_scope_t, obj)->ay = obj->y;
     while (o->parent != NULL)
     {
         o = o->parent;
@@ -183,14 +185,22 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
             break;
         }
     }
+    o = obj;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+        GUI_TYPE(gui_img_scope_t, obj)->ax += o->x;
+        GUI_TYPE(gui_img_scope_t, obj)->ay += o->y;
+    }
     if (win_scope)
     {
-        int ax = o->matrix->m[0][2];
+        int ax = o->matrix->m[0][2] ;
         int ay = o->matrix->m[1][2];
+
         int w_w = o->w;
         int w_h = o->h;
-        int img_x = obj->matrix->m[0][2];
-        int img_y = obj->matrix->m[1][2];
+        int img_x = GUI_TYPE(gui_img_scope_t, obj)->ax;
+        int img_y = GUI_TYPE(gui_img_scope_t, obj)->ay;
         int img_w = this->draw_img->img_w;
         int img_h = this->draw_img->img_h;
         //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
