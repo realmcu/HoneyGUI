@@ -110,6 +110,7 @@ void js_init(void)
     wifi_init();
     js_smarthome_init();
     js_matter_init();
+    js_mesh_init();
     extern gui_app_t *get_app_launcher_frontend(void);
     gui_app_startup(get_app_launcher_frontend());
 }
