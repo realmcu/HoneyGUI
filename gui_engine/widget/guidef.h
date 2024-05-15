@@ -398,10 +398,14 @@ typedef struct gui_animate
     uint32_t cur_time_ms;
     uint32_t current_repeat_count;
     uint32_t current_frame;
+    uint32_t last_round;
     float progress_percent;
     void (* callback)(void *p);
     void *p;
     bool animate;
+    bool init;
+    bool Beginning_frame;
+    bool end_frame;
 } gui_animate_t;
 
 typedef enum
