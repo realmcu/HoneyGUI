@@ -64,13 +64,19 @@ typedef struct gui_img
     float t_y;                          //!< translate of screen y
     void *data;                         // this means address or filesystem path
     gui_animate_t *animate;
-
+    uint16_t scope_x1;
+    uint16_t scope_x2;
+    uint16_t scope_y1;
+    uint16_t scope_y2;
+    int16_t ax, ay;
     uint32_t opacity_value : 8;
     uint32_t blend_mode    : 3;
     uint32_t src_mode      : 3;
     uint32_t high_quality  : 1;
     uint32_t press_flag    : 1;         //!< press to change picture to the highlighted
     uint32_t release_flag  : 1;
+    uint32_t scope         : 1;
+    uint32_t scope_flag         : 1;
     uint8_t checksum;
 } gui_img_t;
 

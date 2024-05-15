@@ -55,7 +55,7 @@ typedef struct gui_img_scope
     uint16_t scope_x2;
     uint16_t scope_y1;
     uint16_t scope_y2;
-    int ax, ay;
+    int16_t ax, ay;
 } gui_img_scope_t;
 
 

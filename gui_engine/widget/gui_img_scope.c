@@ -139,6 +139,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
         gui_img_t *b = (void *)obj;
+
         if (tp->pressed)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
@@ -154,6 +155,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
             b->release_flag = false;
             gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
         }
+
         if (tp->released && b->press_flag)
         {
             b->release_flag = true;

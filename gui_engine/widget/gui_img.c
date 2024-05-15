@@ -23,7 +23,7 @@
 #include "acc_init.h"
 #include "tp_algo.h"
 #include "acc_engine.h"
-
+#include "gui_win.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -263,6 +263,85 @@ static void gui_img_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img);
+    if (!this->scope_flag)
+    {
+        {
+            gui_obj_t *o = obj;
+            this->scope_flag = 1;
+            while (o->parent != NULL)
+            {
+                o = o->parent;
+                if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+                {
+                    this->scope = 1;
+                    break;
+                }
+            }
+        }
+    }
+    if (this->scope)
+    {
+        gui_obj_t *o = obj;
+        gui_win_t *win_scope = 0;
+        GUI_TYPE(gui_img_t, obj)->ax = obj->x;
+        GUI_TYPE(gui_img_t, obj)->ay = obj->y;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+            {
+                win_scope = (void *)o;
+                break;
+            }
+        }
+        o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            GUI_TYPE(gui_img_t, obj)->ax += o->x;
+            GUI_TYPE(gui_img_t, obj)->ay += o->y;
+        }
+        if (win_scope)
+        {
+            int ax = o->matrix->m[0][2] ;
+            int ay = o->matrix->m[1][2];
+
+            int w_w = o->w;
+            int w_h = o->h;
+            int img_x = GUI_TYPE(gui_img_t, obj)->ax;
+            int img_y = GUI_TYPE(gui_img_t, obj)->ay;
+            int img_w = this->draw_img->img_w;
+            int img_h = this->draw_img->img_h;
+            //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
+            GUI_TYPE(gui_img_t, obj)->scope_x1 = 0;
+            GUI_TYPE(gui_img_t, obj)->scope_x2 = img_w;
+            GUI_TYPE(gui_img_t, obj)->scope_y1 = 0;
+            GUI_TYPE(gui_img_t, obj)->scope_y2 = img_h;
+            obj->not_show = 0;
+            if (ax > img_x)
+            {
+                GUI_TYPE(gui_img_t, obj)->scope_x1 = ax - img_x;
+            }
+            if (ay > img_y)
+            {
+                GUI_TYPE(gui_img_t, obj)->scope_y1 = ay - img_y;
+            }
+            if (ax + w_w < img_x + img_w)
+            {
+                GUI_TYPE(gui_img_t, obj)->scope_x2 = -(img_x - (ax + w_w));
+            }
+            if (ay + w_h < img_y + img_h)
+            {
+                GUI_TYPE(gui_img_t, obj)->scope_y2 = -(img_y - (ay + w_h));
+            }
+            if (ay + w_h < img_y)
+            {
+                obj->not_show = 1;
+            }
+
+        }
+    }
+
     gui_image_new_area(this->draw_img, NULL);
 
     if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
@@ -292,7 +371,23 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
     if (gui_get_acc() != NULL)
     {
-        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+        if (this->scope)
+        {
+            gui_rect_t rect =
+            {
+                .x1 = this->scope_x1,
+                .x2 = this->scope_x2,
+                .y1 = this->scope_y1,
+                .y2 = this->scope_y2,
+            };
+            gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+        }
+        else
+        {
+            gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+        }
+
+
     }
     else
     {
@@ -461,6 +556,10 @@ static void gui_img_ctor(gui_img_t            *this,
         gui_img_scale(this, 10.0f / 8.0f, 10.0f / 8.0f);
         gui_log("resize image!! \n");
     }
+    this->scope_x1 = 0;
+    this->scope_y1 = 0;
+    this->scope_x2 = gui_img_get_width(this);
+    this->scope_y2 = gui_img_get_height(this);
 }
 
 static void gui_img_rect_copy(uint8_t       *target,
