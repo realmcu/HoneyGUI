@@ -326,34 +326,37 @@ const gui_turn_table_coordinate_t point[12] =
 
 static void tab_tt(void *tab)
 {
-    gui_turn_table_t *tt = gui_turn_table_create(tab, 20, 32, 3, 3);
+    gui_turn_table_t *tt = gui_turn_table_create(tab, 24, 32, 3, 3);
     gui_turn_table_set_icon_scale(tt, 1.0f, 2.0f);
     gui_turn_table_set_highlight_index(tt, 9);
     gui_turn_table_generate_layout_by_array(tt, point, 12);
 
-    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUALARM_BIN, NULL);
-
-    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUBIRD_BIN, NULL);
-
-    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUMUSIC_BIN, NULL);
-
-    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
-    gui_turn_table_add_icon_default(tt, ICMENUSLEEP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_FACEBOOK_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_FACEBOOK_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_FACEBOOK_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GOOGLE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GOOGLE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GOOGLE_BIN, NULL);
 
     gui_turn_table_add_icon_static(tt, ICMENUHEARTRATE_BIN);
 }

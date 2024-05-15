@@ -105,6 +105,7 @@ typedef struct gui_turn_table_coordinate
 typedef struct gui_turn_table
 {
     gui_obj_t base;
+    uint8_t checksum;
 //icon
     uint8_t current_icon_index;
     uint8_t icon_quantity;
@@ -166,7 +167,7 @@ gui_turn_table_t *gui_turn_table_create(void *parent,
  *
  * This function sets the quantities of different icons appearing on the top/bottom and left/right edges of the GUI turn table.
  *
- * @param this Pointer to the GUI turn table object on which the operation is performed.
+ * @param this Pointer to the GUI turn table object.
  * @param top_bottom_quantity The desired quantity of icons to be displayed on the top and bottom edges of the turn table.
  * @param left_right_quantity The desired quantity of icons to be displayed on the left and right edges of the turn table.
  *
@@ -189,6 +190,21 @@ void gui_turn_table_generate_layout_by_calculate(gui_turn_table_t *this,
                                                  uint8_t screen_fillet_radius);
 
 /**
+ * @brief Set turn table tp.
+ *
+ * @param this Pointer to the GUI turn table object
+ * @param up If up is true, touchpad 'up' sustain is allowed.
+ * @param down If down is true, touchpad 'down' sustain is allowed.
+ * @param left If left is true, touchpad 'left' sustain is allowed.
+ * @param right If right is true, touchpad 'right' sustain is allowed.
+ */
+void gui_turn_table_set_tp(gui_turn_table_t *this,
+                           bool up,
+                           bool down,
+                           bool left,
+                           bool right);
+
+/**
  * @brief Generates a layout for the turn table GUI using a specified array.
  *
  * This function sets up the layout configuration of the GUI turn table using a given
@@ -196,7 +212,7 @@ void gui_turn_table_generate_layout_by_calculate(gui_turn_table_t *this,
  * If the supplied active icon quantity does not match the one set on the turn table,
  * it logs an error message and returns without creating the layout.
  *
- * @param this Pointer to the GUI turn table object on which the operation is performed.
+ * @param this Pointer to the GUI turn table object.
  * @param fixed_point The array of coordinates used to generate the layout of the turn table.
  * @param active_icon_quantity The quantity of active icons that will be displayed on the turn table.
  *
@@ -217,7 +233,7 @@ void gui_turn_table_generate_layout_by_array(gui_turn_table_t *this,
  * The function also scales the added icon according to the `icon_scale` of the table.
  * If the highlight index matches the current index, it will generate a highlighted icon at screen center.
  *
- * @param this Pointer to the GUI turn table object on which the operation is performed.
+ * @param this Pointer to the GUI turn table object.
  * @param icon_addr The address of the icon to be added.
  * @param event_cb This is the callback function that will be called when the icon is clicked.
  *
@@ -235,7 +251,7 @@ void gui_turn_table_add_icon_default(gui_turn_table_t *this,
  *
  * This function sets the index at which the icon will be highlighted in the GUI turn table.
  *
- * @param this Pointer to the GUI turn table object on which the operation is performed.
+ * @param this Pointer to the GUI turn table object.
  * @param highlight_index Index of the icon to be highlighted.
  *
  * @return Void
