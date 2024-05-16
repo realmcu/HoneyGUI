@@ -57,4 +57,9 @@ namespace agge
 		noncopyable(const noncopyable &other);
 		const noncopyable &operator =(const noncopyable &rhs);
 	};
+
+	extern "C"
+	{
+		float nvg__sqrtf(float a);
+	};
 }

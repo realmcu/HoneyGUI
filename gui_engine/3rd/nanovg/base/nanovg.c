@@ -146,7 +146,7 @@ struct NVGcontext
     int textTriCount;
 };
 
-static float nvg__sqrtf(float a) { return sqrtf(a); }
+float nvg__sqrtf(float a) { return sqrtf(a); }
 static float nvg__modf(float a, float b) { return fmodf(a, b); }
 static float nvg__sinf(float a) { return sinf(a); }
 static float nvg__cosf(float a) { return cosf(a); }

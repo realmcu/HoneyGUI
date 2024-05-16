@@ -30,7 +30,7 @@ namespace agge
 	{
 		bx -= ax;
 		by -= ay;
-		return agge::sqrt(bx * bx + by * by);
+		return nvg__sqrtf(bx * bx + by * by);
 	}
 
 	inline real_t distance(const point_r &lhs, const point_r &rhs)
