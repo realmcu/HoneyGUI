@@ -177,12 +177,28 @@ static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, u
 
     nvgEndFrame(vg);
     nvgDeleteAGGE(vg);
+
+    for (uint32_t i = 0; i < this->r; i++)
+    {
+        for (uint32_t j = 0; j < this->r; j++)
+        {
+            gui_color_t *pixel = (gui_color_t *)img->data + i * this->r + j + 2;
+            if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
+            {
+                pixel->color.rgba.a = this->color.color.rgba.a;
+                pixel->color.rgba.r = this->color.color.rgba.r;
+                pixel->color.rgba.g = this->color.color.rgba.g;
+                pixel->color.rgba.b = this->color.color.rgba.b;
+            }
+        }
+    }
+
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
 
     set_arc_w_and_h(head, this->r, this->r, this->color);
 
 
-    img->blend_mode = IMG_BYPASS_MODE;
+    img->blend_mode = IMG_SRC_OVER_MODE;
     img->opacity_value = UINT8_MAX;
     memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
     matrix_translate(x, y, &img->matrix);
