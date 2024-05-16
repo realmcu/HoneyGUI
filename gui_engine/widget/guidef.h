@@ -461,10 +461,12 @@ typedef struct _gui_color
 {
     union
     {
-        unsigned char array[4];
         struct
         {
-            unsigned char b, g, r, a;
+            uint8_t b; ///< Blue color component, at the lowest address
+            uint8_t g; ///< Green color component
+            uint8_t r; ///< Red color component
+            uint8_t a; ///< Alpha channel for transparency, at the highest address
         } rgba;
         uint32_t rgba_full;
     } color;

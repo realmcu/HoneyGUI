@@ -48,10 +48,10 @@ typedef struct _color_argb8565
 
 typedef struct _color_argb88888
 {
-    uint8_t b;
-    uint8_t g;
-    uint8_t r;
-    uint8_t a;
+    uint8_t b; ///< Blue color component, at the lowest address
+    uint8_t g; ///< Green color component
+    uint8_t r; ///< Red color component
+    uint8_t a; ///< Alpha channel for transparency, at the highest address
 } color_argb8888_t;
 #pragma pack()
 

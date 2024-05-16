@@ -419,6 +419,10 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                     gui_color_t color;
                     color.color.rgba_full = rect_header->color.color.rgba_full;
                     color.color.rgba.a = rect_header->color.color.rgba.a * (image->opacity_value * 1.0f / 255);
+
+                    uint8_t tmp = color.color.rgba.b;
+                    color.color.rgba.b = color.color.rgba.r;
+                    color.color.rgba.r = tmp;
                     PPEV2_Mask(&target, color.color.rgba_full, &dst_rect);
                 }
                 return;
@@ -736,6 +740,11 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
             ppe_translate(0, y_ref, &inverse);
             gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
             gui_color_t color = {.color.rgba_full = rect_header->color.color.rgba_full};
+
+            uint8_t tmp = color.color.rgba.b;
+            color.color.rgba.b = color.color.rgba.r;
+            color.color.rgba.r = tmp;
+
             color.color.rgba.a = rect_header->color.color.rgba.a * (image->opacity_value * 1.0f / 255);
             source.const_color = color.color.rgba_full;
             ppe_rect.y -= dc->section.y1;
