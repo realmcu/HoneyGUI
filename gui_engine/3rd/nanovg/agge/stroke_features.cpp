@@ -31,8 +31,8 @@ namespace agge
 			else
 			{
 				k = (v1.y - v0.y) / (v1.x - v0.x);
-				x = sqrt(w * w / (1 + k * k)) * (dy > 0 ? -1 : 1);
-				y = sqrt(k * k * w * w / (1 + k * k)) * (dx > 0 ? -1 : 1);
+				x = agge::sqrt(w * w / (1 + k * k)) * (dy > 0 ? -1 : 1);
+				y = agge::sqrt(k * k * w * w / (1 + k * k)) * (dx > 0 ? -1 : 1);
 			}
 
 			output.push_back(create_point(v0.x - dx, v0.y + dy));
@@ -131,8 +131,8 @@ namespace agge
 			else
 			{
 				k = (yx - v1.y) / (xx - v1.x);
-				m_x1 = sqrt(dx * dx / (1 + k * k)) * (xx > v1.x ? 1 : -1);
-				m_y1 = sqrt(k * k * dx * dx / (1 + k * k)) * (yx > v1.y ? 1 : -1);
+				m_x1 = agge::sqrt(dx * dx / (1 + k * k)) * (xx > v1.x ? 1 : -1);
+				m_y1 = agge::sqrt(k * k * dx * dx / (1 + k * k)) * (yx > v1.y ? 1 : -1);
 			}
 			m_x1 += v1.x;
 			m_y1 += v1.y;
@@ -262,9 +262,9 @@ namespace agge
 				A = (v0.y - v1.y) / (v0.x - v1.x);
 				k = -1 / A;
 				B = -1.0f;
-				mod = sqrt(A*A + B*B);
-				x = sqrt(w * w / (1 + k * k));
-				y = sqrt(k * k * w * w / (1 + k * k));
+				mod = agge::sqrt(A*A + B*B);
+				x = agge::sqrt(w * w / (1 + k * k));
+				y = agge::sqrt(k * k * w * w / (1 + k * k));
 
 
 				if (k < 0)

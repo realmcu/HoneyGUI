@@ -31,16 +31,12 @@
 #include <string.h>
 #define printf(...)
 #endif/*WITH_NANOVG_GPU*/
-#ifdef ENABLE_RTK_GUI
+
 #include "gui_api.h"
 #define NANOVG_MALLOC gui_malloc
 #define NANOVG_REALLOC gui_realloc
 #define NANOVG_FREE gui_free
-#else
-#define NANOVG_MALLOC malloc
-#define NANOVG_REALLOC realloc
-#define NANOVG_FREE free
-#endif
+
 #ifdef _MSC_VER
 #pragma warning(disable: 4100)  // unreferenced formal parameter
 #pragma warning(disable: 4127)  // conditional expression is constant
