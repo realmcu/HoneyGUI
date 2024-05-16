@@ -25,6 +25,7 @@
 #include "gui_tabview.h"
 #include "gui_matrix.h"
 #include "gui_tab.h"
+#include "kb_algo.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -116,11 +117,16 @@ static void gui_tabview_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
     gui_tabview_t *tabview = (gui_tabview_t *)obj;
     gui_tabview_t *this = (gui_tabview_t *)obj;
     gui_tabview_tab_id_t last_cur_id = this->cur_id;
     uint8_t last = this->checksum;
 
+    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
+    {
+        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
+    }
     if (tabview->jump.jump_flag)
     {
         tabview->cur_id.y = tabview->jump.jump_id.y;
