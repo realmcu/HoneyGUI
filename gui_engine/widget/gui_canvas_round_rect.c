@@ -266,15 +266,15 @@ static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)
 
 static void gui_canvas_round_rect_end(gui_canvas_round_rect_t *this)
 {
-    gui_free(this->rect_data);
-    gui_free(this->circle_data);
-    gui_free(this->rect_0); this->rect_0 = NULL;
-    gui_free(this->rect_1); this->rect_1 = NULL;
-    gui_free(this->rect_2); this->rect_2 = NULL;
-    gui_free(this->circle_00); this->circle_00 = NULL;
-    gui_free(this->circle_01); this->circle_01 = NULL;
-    gui_free(this->circle_10); this->circle_10 = NULL;
-    gui_free(this->circle_11); this->circle_11 = NULL;
+    if (this->rect_data != NULL) {gui_free(this->rect_data); this->rect_data = NULL;}
+    if (this->circle_data != NULL) {gui_free(this->circle_data); this->circle_data = NULL;}
+    if (this->rect_0 != NULL) {gui_free(this->rect_0); this->rect_0 = NULL;}
+    if (this->rect_1 != NULL) {gui_free(this->rect_1); this->rect_1 = NULL;}
+    if (this->rect_2 != NULL) {gui_free(this->rect_2); this->rect_2 = NULL;}
+    if (this->circle_00 != NULL) {gui_free(this->circle_00); this->circle_00 = NULL;}
+    if (this->circle_01 != NULL) {gui_free(this->circle_01); this->circle_01 = NULL;}
+    if (this->circle_10 != NULL) {gui_free(this->circle_10); this->circle_10 = NULL;}
+    if (this->circle_11 != NULL) {gui_free(this->circle_11); this->circle_11 = NULL;}
 }
 
 static void gui_canvas_round_rect_destory(gui_canvas_round_rect_t *this)

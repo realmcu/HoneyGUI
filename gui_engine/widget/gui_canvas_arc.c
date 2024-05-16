@@ -322,7 +322,7 @@ static void gui_canvas_arc_end(gui_canvas_arc_t *this)
     GUI_UNUSED(obj);
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
-    gui_free(this->arc_data);
+    if (this->arc_data != NULL)    {gui_free(this->arc_data); this->arc_data = NULL;}
 
     if (this->arc_img_01 != NULL) {gui_free(this->arc_img_01); this->arc_img_01 = NULL;}
     if (this->arc_img_01 != NULL) {gui_free(this->arc_img_02); this->arc_img_02 = NULL;}
