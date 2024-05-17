@@ -123,7 +123,7 @@ static void app_dialing_ui_design(gui_app_t *app)
     // //gui_img_scale((gui_img_t *)img, 1.3, 1.3);
     // gui_img_rotation((gui_img_t *)img, 20, 0, 0);
 
-    // gui_canvas_round_rect_t *rect = gui_canvas_round_rect_create(&(app->screen), "t", 454 / 2 - 200, 454 / 2 - 200, 400, 400, 20, gui_rgba(0, 255, 0, 100));
+    // gui_canvas_round_rect_t *rect = gui_canvas_round_rect_create(&(app->screen), "t", 84, 100, 298, 78, 38, gui_rgba(255, 0, 0, 100));
 
     // gui_canvas_arc_t *arc = gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 200, 0, 90, 20, gui_rgba(255, 0, 0, 255));
     // gui_canvas_arc_set_cap(arc, CANVAS_ARC_ROUND);
@@ -145,6 +145,12 @@ static void app_dialing_ui_design(gui_app_t *app)
                                                     (void *)_actiger_yellow, 250, 250,
                                                     0, 0);
 
+    // gui_canvas_round_rect_create(gui_tab_get_rte_obj(tab_1), "t", 84, 100, 298, 78, 38, gui_rgba(255, 0,
+    //                              0, 100));
+
+    // gui_canvas_arc_t *arc = gui_canvas_arc_create(gui_tab_get_rte_obj(tab_1), "t", 454 / 2, 454 / 2,
+    //                                               200, 0, 90, 20, gui_rgba(255, 0, 0, 255));
+    // gui_canvas_arc_set_cap(arc, CANVAS_ARC_ROUND);
     // uint8_t *shot = gui_img_tree_convert_to_img((gui_obj_t *)tab_1, NULL);
 
     // gui_img_create_from_mem(tab_1,  "shot", (void *)shot, 0, 0, 0, 0);

@@ -136,7 +136,7 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
  * @param this
  * @param data
  */
-void gui_canvas_round_set_external_picture(gui_canvas_round_rect_t *this, void *data);
+void gui_canvas_round_rect_set_external_picture(gui_canvas_round_rect_t *this, void *data);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

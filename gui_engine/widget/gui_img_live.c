@@ -21,7 +21,6 @@
 #include "gui_img.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
-#include "acc_engine.h"
 #include "gui_img_live.h"
 
 #ifdef IMG_LIVE_TJPGDEC

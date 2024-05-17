@@ -148,30 +148,7 @@ static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, 
 
 }
 
-static void set_external_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, uint16_t x,
-                                 uint16_t y, float degree)
-{
-    gui_obj_t *obj = (gui_obj_t *)this;
-    draw_img_t *img = NULL;
-    img = gui_malloc(sizeof(draw_img_t));
-    memset(img, 0x00, sizeof(draw_img_t));
 
-    img->data = this->circle_data;
-
-    img->blend_mode = IMG_SRC_OVER_MODE;
-    img->opacity_value = UINT8_MAX;
-    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-    matrix_translate(x, y, &img->matrix);
-
-    matrix_translate(this->r, this->r, &img->matrix);
-    matrix_rotate(degree, &img->matrix);
-    matrix_translate(-this->r, -this->r, &img->matrix);
-    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
-
-    matrix_inverse(&img->inverse);
-    gui_image_load_scale(img);
-    gui_image_new_area(img, NULL);
-}
 static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, uint16_t x,
                         uint16_t y, float degree)
 {
@@ -181,46 +158,6 @@ static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, u
     memset(img, 0x00, sizeof(draw_img_t));
 
     img->data = this->circle_data;
-
-    memset(img->data, 0x00, this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
-
-    NVGcontext *vg = nvgCreateAGGE(this->r, this->r, this->r * 4 /*ARGB 4 byte*/, NVG_TEXTURE_BGRA,
-                                   (uint8_t *)img->data + sizeof(gui_rgb_data_head_t));
-    nvgBeginFrame(vg, this->r, this->r, 1);
-
-    // Draw 1/4 circle
-    nvgArc(vg, this->r, this->r, this->r, -NVG_PI / 2, 0, NVG_CCW);
-
-    // Set fill color to blue
-    nvgFillColor(vg, nvgRGBA(this->color.color.rgba.r, this->color.color.rgba.g,
-                             this->color.color.rgba.b, this->color.color.rgba.a));
-
-    // Fill the shape
-    nvgFill(vg);
-
-    nvgEndFrame(vg);
-    nvgDeleteAGGE(vg);
-
-    for (uint32_t i = 0; i < this->r; i++)
-    {
-        for (uint32_t j = 0; j < this->r; j++)
-        {
-            gui_color_t *pixel = (gui_color_t *)img->data + i * this->r + j + 2;
-            if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
-            {
-                pixel->color.rgba.a = this->color.color.rgba.a;
-                pixel->color.rgba.r = this->color.color.rgba.r;
-                pixel->color.rgba.g = this->color.color.rgba.g;
-                pixel->color.rgba.b = this->color.color.rgba.b;
-            }
-        }
-    }
-
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
-
-    set_arc_w_and_h(head, this->r, this->r, this->color);
-
-
     img->blend_mode = IMG_SRC_OVER_MODE;
     img->opacity_value = UINT8_MAX;
     memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -277,20 +214,49 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
     if (this->use_external_picture == false)
     {
         this->circle_data = gui_malloc(this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
-        set_arc_img(this, &this->circle_00, 0, 0, 0);
-        set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 1, 0, 90);
-        set_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
-        set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1, this->base.h - 2 * this->r - 1,
-                    180);
+        memset(this->circle_data, 0x00, this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
+
+        NVGcontext *vg = nvgCreateAGGE(this->r, this->r, this->r * 4 /*ARGB 4 byte*/, NVG_TEXTURE_BGRA,
+                                       (uint8_t *)this->circle_data + sizeof(gui_rgb_data_head_t));
+        nvgBeginFrame(vg, this->r, this->r, 1);
+
+        // Draw 1/4 circle
+        nvgArc(vg, this->r, this->r, this->r, -NVG_PI / 2, 0, NVG_CCW);
+
+        // Set fill color to blue
+        nvgFillColor(vg, nvgRGBA(this->color.color.rgba.r, this->color.color.rgba.g,
+                                 this->color.color.rgba.b, this->color.color.rgba.a));
+
+        // Fill the shape
+        nvgFill(vg);
+
+        nvgEndFrame(vg);
+        nvgDeleteAGGE(vg);
+
+        for (uint32_t i = 0; i < this->r; i++)
+        {
+            for (uint32_t j = 0; j < this->r; j++)
+            {
+                gui_color_t *pixel = (gui_color_t *)this->circle_data + i * this->r + j + 2;
+                if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
+                {
+                    pixel->color.rgba.a = this->color.color.rgba.a;
+                    pixel->color.rgba.r = this->color.color.rgba.r;
+                    pixel->color.rgba.g = this->color.color.rgba.g;
+                    pixel->color.rgba.b = this->color.color.rgba.b;
+                }
+            }
+        }
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->circle_data;
+
+        set_arc_w_and_h(head, this->r, this->r, this->color);
+
     }
-    else
-    {
-        set_external_arc_img(this, &this->circle_00, 0, 0, 0);
-        set_external_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 1, 0, 90);
-        set_external_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
-        set_external_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1,
-                             this->base.h - 2 * this->r - 1, 180);
-    }
+    set_arc_img(this, &this->circle_00, 0, 0, 0);
+    set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 1, 0, 90);
+    set_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
+    set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1, this->base.h - 2 * this->r - 1,
+                180);
 
 
 
@@ -406,7 +372,7 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
     return canvas_round_rect;
 }
 
-void gui_canvas_round_set_external_picture(gui_canvas_round_rect_t *this, void *data)
+void gui_canvas_round_rect_set_external_picture(gui_canvas_round_rect_t *this, void *data)
 {
     this->use_external_picture = true;
     this->circle_data = data;

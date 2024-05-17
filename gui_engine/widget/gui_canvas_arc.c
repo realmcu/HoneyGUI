@@ -119,50 +119,6 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
     memset(img, 0x00, sizeof(draw_img_t));
 
     img->data = data;
-
-    memset(img->data, 0x0, img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
-
-    NVGcontext *vg = nvgCreateAGGE(img_w, img_h, img_w * 4 /*ARGB 4 byte*/, NVG_TEXTURE_BGRA,
-                                   (uint8_t *)img->data + sizeof(gui_rgb_data_head_t));
-    nvgBeginFrame(vg, img_w, img_h, 1);
-
-    // Draw 1/4 circle
-    nvgArc(vg, img_w / 2, this->r + this->stroke_width / 2, this->r, -NVG_PI / 2 - image_angle,
-           -NVG_PI / 2 + image_angle, NVG_CW);
-
-    nvgStrokeWidth(vg, this->stroke_width);
-
-    nvgLineCap(vg, this->cap);
-
-    nvgStrokeColor(vg, nvgRGBA(this->color.color.rgba.r, this->color.color.rgba.g,
-                               this->color.color.rgba.b, this->color.color.rgba.a));
-
-    nvgStroke(vg);
-
-
-    nvgEndFrame(vg);
-    nvgDeleteAGGE(vg);
-
-    for (uint32_t i = 0; i < img_h; i++)
-    {
-        for (uint32_t j = 0; j < img_w; j++)
-        {
-            gui_color_t *pixel = (gui_color_t *)img->data + i * img_w + j + 2;
-            if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
-            {
-                pixel->color.rgba.a = this->color.color.rgba.a;
-                pixel->color.rgba.r = this->color.color.rgba.r;
-                pixel->color.rgba.g = this->color.color.rgba.g;
-                pixel->color.rgba.b = this->color.color.rgba.b;
-            }
-        }
-    }
-
-    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)img->data;
-
-    set_arc_w_and_h(head, img_w, img_h);
-
-
     img->blend_mode = IMG_SRC_OVER_MODE;
     img->opacity_value = UINT8_MAX;
     memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
@@ -199,9 +155,83 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
     float img_angle = (degree / 2) / 180.0f * 3.1415926f;
     int img_w = this->stroke_width + 2 * this->r * sin(img_angle);
     int img_h = this->stroke_width + this->r - this->r * cos(img_angle) + 1;
-    this->arc_data = gui_malloc(img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
 
-    degree = this->to - this->from;
+    if (this->use_external_picture == false)
+    {
+        this->arc_data = gui_malloc(img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
+        degree = this->to - this->from;
+
+        memset(this->arc_data, 0x0, img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
+
+        NVGcontext *vg = nvgCreateAGGE(img_w, img_h, img_w * 4 /*ARGB 4 byte*/, NVG_TEXTURE_BGRA,
+                                       (uint8_t *)this->arc_data + sizeof(gui_rgb_data_head_t));
+        nvgBeginFrame(vg, img_w, img_h, 1);
+
+        // Draw 1/4 circle
+        nvgArc(vg, img_w / 2, this->r + this->stroke_width / 2, this->r, -NVG_PI / 2 - img_angle,
+               -NVG_PI / 2 + img_angle, NVG_CW);
+
+        nvgStrokeWidth(vg, this->stroke_width);
+
+        nvgLineCap(vg, this->cap);
+
+        nvgStrokeColor(vg, nvgRGBA(this->color.color.rgba.r, this->color.color.rgba.g,
+                                   this->color.color.rgba.b, this->color.color.rgba.a));
+
+        nvgStroke(vg);
+
+
+        nvgEndFrame(vg);
+        nvgDeleteAGGE(vg);
+
+        for (uint32_t i = 0; i < img_h; i++)
+        {
+            for (uint32_t j = 0; j < img_w; j++)
+            {
+                gui_color_t *pixel = (gui_color_t *)this->arc_data + i * img_w + j + 2;
+                if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
+                {
+                    pixel->color.rgba.a = this->color.color.rgba.a;
+                    pixel->color.rgba.r = this->color.color.rgba.r;
+                    pixel->color.rgba.g = this->color.color.rgba.g;
+                    pixel->color.rgba.b = this->color.color.rgba.b;
+                }
+            }
+        }
+        gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->arc_data;
+
+        set_arc_w_and_h(head, img_w, img_h);
+    }
+    else
+    {
+        if (degree <= 10)
+        {
+            this->arc_data = this->data[0];
+        }
+        else if (degree <= 20)
+        {
+            this->arc_data = this->data[1];
+        }
+        else if (degree <= 30)
+        {
+            this->arc_data = this->data[2];
+        }
+        else if (degree <= 40)
+        {
+            this->arc_data = this->data[3];
+        }
+        else if (degree <= 50)
+        {
+            this->arc_data = this->data[4];
+        }
+        else
+        {
+            this->arc_data = this->data[5];
+        }
+
+    }
+
+
 
     if (degree <= 60)
     {
@@ -210,6 +240,7 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
     }
     else if (degree <= 120)
     {
+
         set_arc_img(this, this->arc_data, &this->arc_img_01, this->from + 30, img_angle, img_w, img_h);
         set_arc_img(this, this->arc_data, &this->arc_img_02, this->from + 30 + (degree - 60), img_angle,
                     img_w, img_h);
@@ -440,6 +471,12 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
 void gui_canvas_arc_set_cap(gui_canvas_arc_t *this, T_CANVAS_ARC_CAP cap)
 {
     this->cap = cap;
+}
+
+void gui_canvas_arc_set_external_picture(gui_canvas_arc_t *this, void **data)
+{
+    this->use_external_picture = true;
+    this->data = data;
 }
 
 

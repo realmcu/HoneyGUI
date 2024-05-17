@@ -74,6 +74,8 @@ typedef struct gui_canvas_arc
     int  cy;
     T_CANVAS_ARC_CAP cap;
     gui_color_t color;
+    bool use_external_picture;
+    void **data;
 } gui_canvas_arc_t;
 
 
@@ -162,6 +164,14 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
  * @param cap
  */
 void gui_canvas_arc_set_cap(gui_canvas_arc_t *this, T_CANVAS_ARC_CAP cap);
+
+/**
+ * @brief
+ *
+ */
+void gui_canvas_arc_set_external_picture(gui_canvas_arc_t *this, \
+                                         void *data[]
+                                        );
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
