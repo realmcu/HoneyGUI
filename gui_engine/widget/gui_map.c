@@ -80,7 +80,7 @@
 #else
 #define ROOT_PATH "/"
 #endif
-#define PATH404 "map/Tiles not found.jpg"
+#define PATH404 "map/icon/404.jpg"
 typedef long off_t;
 /** End of WIDGET_Exported_Macros
   * @}
@@ -573,7 +573,7 @@ gui_map_t *gui_map_create(void *parent)
         {
             static char path[100];
             memset(path, 0, 100);
-            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/zoom plus.bin");
+            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/plus.bin");
             int fd;
             fd = gui_fs_open(path, 0);
 
@@ -602,7 +602,7 @@ gui_map_t *gui_map_create(void *parent)
 
             static char path[100];
             memset(path, 0, 100);
-            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/zoom minus.bin");
+            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/minus.bin");
             int fd;
             fd = gui_fs_open(path, 0);
 
