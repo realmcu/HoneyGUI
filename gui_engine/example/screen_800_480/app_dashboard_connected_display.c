@@ -5,7 +5,6 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "draw_font.h"
-#include "acc_engine.h"
 #include "nanosvg.h"
 #include "gui_img.h"
 #include "time.h"

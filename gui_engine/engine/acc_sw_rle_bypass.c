@@ -19,7 +19,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
 #include "acc_sw_rle.h"
 
 static void rle_bypass_rgb565_draw(imdc_file_t *file, uint32_t line,  uint16_t *buf, int32_t img_x,

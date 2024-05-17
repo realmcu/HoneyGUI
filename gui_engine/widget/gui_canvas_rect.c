@@ -24,7 +24,6 @@
 #include <draw_img.h>
 #include "acc_init.h"
 #include <tp_algo.h>
-#include "acc_engine.h"
 
 
 /** @defgroup WIDGET WIDGET

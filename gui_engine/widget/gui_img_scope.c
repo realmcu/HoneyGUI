@@ -24,7 +24,6 @@
 #include "tp_algo.h"
 #include "kb_algo.h"
 #include "acc_init.h"
-#include "acc_engine.h"
 #include "gui_win.h"
 /** @defgroup WIDGET WIDGET
   * @{
@@ -262,21 +261,15 @@ static void gui_img_scope_draw_cb(gui_obj_t *obj)
     gui_img_t *this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
 
-    if (gui_get_acc() != NULL)
+    gui_rect_t rect =
     {
-        gui_rect_t rect =
-        {
-            .x1 = GUI_TYPE(gui_img_scope_t, obj)->scope_x1,
-            .x2 = GUI_TYPE(gui_img_scope_t, obj)->scope_x2,
-            .y1 = GUI_TYPE(gui_img_scope_t, obj)->scope_y1,
-            .y2 = GUI_TYPE(gui_img_scope_t, obj)->scope_y2,
-        };
-        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
-    }
-    else
-    {
-        GUI_ASSERT(NULL != NULL);
-    }
+        .x1 = GUI_TYPE(gui_img_scope_t, obj)->scope_x1,
+        .x2 = GUI_TYPE(gui_img_scope_t, obj)->scope_x2,
+        .y1 = GUI_TYPE(gui_img_scope_t, obj)->scope_y1,
+        .y2 = GUI_TYPE(gui_img_scope_t, obj)->scope_y2,
+    };
+    gui_acc_blit_to_dc(this->draw_img, dc, &rect);
+
 }
 
 static void gui_img_scope_img_end(gui_obj_t *obj)

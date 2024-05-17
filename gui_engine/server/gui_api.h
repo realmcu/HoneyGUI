@@ -153,12 +153,12 @@ extern "C" {
 extern float gui_get_scale_x(void);
 extern float gui_get_scale_y(void);
 void gui_dc_info_register(struct gui_dispdev *info);
-char gui_dc_get_gpu_type(void);
-unsigned char *gui_dc_get_fb(void);
-void gui_dc_set_gpu_type(char type);
+void gui_acc_info_register(struct acc_engine *info);
 void gui_os_api_register(struct gui_os_api *info);
-
 void gui_indev_info_register(struct gui_indev *info);
+
+
+
 
 void ext_button_set_indicate(void (*callback)(void));
 
@@ -170,6 +170,7 @@ gui_wheel_port_data_t *wheel_get_data(void);
 
 struct gui_indev *gui_get_indev(void);
 struct gui_dispdev *gui_get_dc(void);
+struct acc_engine *gui_get_acc(void);
 
 float gui_get_scale_x(void);
 

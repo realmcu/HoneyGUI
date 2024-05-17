@@ -54,25 +54,7 @@ typedef enum
     IMG_SRC_FILESYS,
 } IMG_SOURCE_MODE_TYPE;
 
-typedef struct draw_img
-{
-    uint16_t img_w;
-    uint16_t img_h;
-    int16_t img_target_x; //display start X
-    int16_t img_target_y;  //display start Y
-    uint16_t img_target_w;
-    uint16_t img_target_h;
-    void *data;
-    gui_matrix_t matrix; //seems can remve by howie
-    gui_matrix_t inverse;
-    uint8_t opacity_value;
-    uint32_t blend_mode : 3;
-    uint32_t checksum : 8;
-    uint32_t src_mode : 3;
-    uint32_t high_quality : 1;
-    //uint32_t color_mix; //todo for QuDai
-    void *acc_user;
-} draw_img_t;
+
 
 void gui_image_load_scale(draw_img_t *img);
 bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect);

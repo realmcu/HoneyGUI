@@ -26,7 +26,6 @@
 #include "gui_cube.h"
 #include "tp_algo.h"
 #include <math.h>
-#include "acc_engine.h"
 
 /** @defgroup WIDGET WIDGET
   * @{

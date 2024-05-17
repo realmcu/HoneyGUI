@@ -25,7 +25,6 @@
 #include "acc_init.h"
 #include "gui_matrix.h"
 #include "gui_gallery.h"
-#include "acc_engine.h"
 
 /** @defgroup WIDGET WIDGET
   * @{

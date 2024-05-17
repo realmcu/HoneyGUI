@@ -8,26 +8,19 @@
 #include <stdarg.h>
 #include "tlsf.h"
 
-static struct gui_indev *indev;
-static struct gui_os_api *os_api;
+static struct gui_indev *indev = NULL;
+static struct gui_os_api *os_api = NULL;
 static struct gui_dispdev *dc = NULL;
 static struct gui_fs *fs = NULL;
+static struct acc_engine *acc = NULL;
 
 void gui_dc_info_register(struct gui_dispdev *info)
 {
     dc = info;
 }
-char gui_dc_get_gpu_type(void)
+void gui_acc_info_register(struct acc_engine *info)
 {
-    return dc->gpu_type;
-}
-unsigned char *gui_dc_get_fb(void)
-{
-    return dc->frame_buf;
-}
-void gui_dc_set_gpu_type(char type)
-{
-    dc->gpu_type = type;
+    acc = info;
 }
 
 void gui_fs_info_register(struct gui_fs *info)
@@ -112,6 +105,11 @@ gui_dispdev_t *gui_set_virtual_dc(uint8_t *frame_buf)
 struct gui_dispdev *gui_get_dc(void)
 {
     return dc;
+}
+
+struct acc_engine *gui_get_acc(void)
+{
+    return acc;
 }
 
 float gui_get_scale_x(void)

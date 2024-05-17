@@ -275,6 +275,49 @@ typedef struct gui_point
     float p[3];
 } gui_point_t;
 
+typedef struct draw_img
+{
+    uint16_t img_w;
+    uint16_t img_h;
+    int16_t img_target_x; //display start X
+    int16_t img_target_y;  //display start Y
+    uint16_t img_target_w;
+    uint16_t img_target_h;
+    void *data;
+    gui_matrix_t matrix; //seems can remve by howie
+    gui_matrix_t inverse;
+    uint8_t opacity_value;
+    uint32_t blend_mode : 3;
+    uint32_t checksum : 8;
+    uint32_t src_mode : 3;
+    uint32_t high_quality : 1;
+    //uint32_t color_mix; //todo for QuDai
+    void *acc_user;
+} draw_img_t;
+
+typedef struct acc_engine
+{
+    void (*blit)(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+    //todo
+    // void (*draw_circle)(canvas_circle_t *circle, struct gui_dispdev *dc);
+    // void (*draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
+    // void (*draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
+    // void (*draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
+    // void (*draw_polyline)(canvas_polyline_t *p, struct gui_dispdev *dc);
+    // void (*draw_path)(draw_path_t *path, struct gui_dispdev *dc);
+    // void (*draw_wave)(canvas_wave_t *w, struct gui_dispdev *dc);
+    // void (*draw_palette_wheel)(canvas_palette_wheel_t *pw, struct gui_dispdev *dc);
+
+    // void (*draw_svg)(void *svg, uint32_t data_length, struct gui_dispdev *dc, int x, int y,
+    //                  float scale, float rotate_degree, float rotate_center_x, float rotate_center_y);
+    // void (*begin_path)(canvas_path_t *data);
+    // void (*move_to)(canvas_path_t *data, float x, float y);
+    // void (*bezier_to)(canvas_path_t *data, float c1x, float c1y, float c2x, float c2y, float x,
+    //                   float y);
+    // void (*LineTo)(canvas_path_t *data, float x, float y);
+
+} acc_engine_t;
+
 typedef enum
 {
     TOUCH_INIT                  = 0x100,

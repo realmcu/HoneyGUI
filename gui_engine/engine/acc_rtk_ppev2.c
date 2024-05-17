@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <gui_matrix.h>
-#include "acc_engine.h"
 #include <rtl_PPEV2.h>
 #include <rtl_imdc.h>
 #include <rtl876x_rcc.h>

@@ -5,7 +5,6 @@
 #define STB_REDUCE_MEMORY_FIXD
 // #define ALLOW_UNALIGNED_TRUETYPE
 #include "stb_truetype.h"
-#include "acc_engine.h"
 
 static stbtt_fontinfo font;
 void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)

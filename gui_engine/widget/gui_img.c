@@ -22,7 +22,6 @@
 #include "gui_obj.h"
 #include "acc_init.h"
 #include "tp_algo.h"
-#include "acc_engine.h"
 #include "gui_win.h"
 /** @defgroup WIDGET WIDGET
   * @{
@@ -369,29 +368,20 @@ static void gui_img_draw_cb(gui_obj_t *obj)
     gui_img_t *this = (gui_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
 
-    if (gui_get_acc() != NULL)
+    if (this->scope)
     {
-        if (this->scope)
+        gui_rect_t rect =
         {
-            gui_rect_t rect =
-            {
-                .x1 = this->scope_x1,
-                .x2 = this->scope_x2,
-                .y1 = this->scope_y1,
-                .y2 = this->scope_y2,
-            };
-            gui_acc_blit_to_dc(this->draw_img, dc, &rect);
-        }
-        else
-        {
-            gui_acc_blit_to_dc(this->draw_img, dc, NULL);
-        }
-
-
+            .x1 = this->scope_x1,
+            .x2 = this->scope_x2,
+            .y1 = this->scope_y1,
+            .y2 = this->scope_y2,
+        };
+        gui_acc_blit_to_dc(this->draw_img, dc, &rect);
     }
     else
     {
-        GUI_ASSERT(NULL != NULL);
+        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
     }
 }
 

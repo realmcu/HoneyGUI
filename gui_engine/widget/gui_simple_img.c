@@ -22,7 +22,6 @@
 #include "draw_img.h"
 #include "acc_init.h"
 #include "tp_algo.h"
-#include "acc_engine.h"
 #include "gui_simple_img.h"
 
 /** @defgroup WIDGET WIDGET
@@ -193,14 +192,8 @@ static void gui_simple_img_draw_cb(gui_obj_t *obj)
     gui_simple_img_t *this = (gui_simple_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
 
-    if (gui_get_acc() != NULL)
-    {
-        gui_acc_blit_to_dc(this->draw_img, dc, NULL);
-    }
-    else
-    {
-        GUI_ASSERT(NULL != NULL);
-    }
+    gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+
 }
 
 static void gui_simple_img_end(gui_obj_t *obj)

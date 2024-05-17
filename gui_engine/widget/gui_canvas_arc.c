@@ -25,7 +25,6 @@
 #include "acc_init.h"
 #include <tp_algo.h>
 #include "nanovg.h"
-#include "acc_engine.h"
 #include "math.h"
 
 
@@ -148,7 +147,7 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
     {
         for (uint32_t j = 0; j < img_w; j++)
         {
-            gui_color_t *pixel = (gui_color_t *)img->data + i * img_w + j;
+            gui_color_t *pixel = (gui_color_t *)img->data + i * img_w + j + 2;
             if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
             {
                 pixel->color.rgba.a = this->color.color.rgba.a;

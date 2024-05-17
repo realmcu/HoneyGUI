@@ -16,7 +16,6 @@
 #include <gui_img.h>
 #include <gui_app.h>
 #include <stdlib.h>
-#include "acc_engine.h"
 #include "gui_grid.h"
 #include "gui_scroll_text.h"
 #include "gui_switch.h"

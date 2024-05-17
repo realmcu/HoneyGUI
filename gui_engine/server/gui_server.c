@@ -19,7 +19,6 @@
 #include <wheel_algo.h>
 #include <string.h>
 #include <gui_app.h>
-#include "acc_engine.h"
 #include "gui_win.h"
 
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP

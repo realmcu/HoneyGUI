@@ -23,7 +23,6 @@ extern "C" {
 #include "root_image_800_480/ui_resource.h"
 #include <gui_app.h>
 #include <stdlib.h>
-#include "acc_engine.h"
 #ifndef _WIN32
 #include "communicate_parse_navigation.h"
 #endif

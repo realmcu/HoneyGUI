@@ -1,6 +1,5 @@
 #include <draw_img.h>
 #include <stdio.h>
-#include "acc_engine.h"
 #include "acc_sw_rle.h"
 #include "acc_init.h"
 
@@ -9,44 +8,9 @@ extern void sw_acc_init(void);
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
 
-static struct acc_engine *acc;
 
-void gui_acc_info_register(struct acc_engine *info)
-{
-    if (info != NULL)
-    {
-        acc = info;
-    }
-}
 
-struct acc_engine *gui_get_acc(void)
-{
-    GUI_ASSERT(acc != NULL);
-    return acc;
-}
 
-imdc_file_header_t rtgui_image_get_imdc_header(draw_img_t *img)
-{
-    imdc_file_header_t head = {0};
-
-    if (img->src_mode == IMG_SRC_FILESYS)
-    {
-        int fd = gui_fs_open(img->data,  0);
-        if (fd <= 0)
-        {
-            gui_log("open file fail:%s !\n", (char *)img->data);
-        }
-        gui_fs_lseek(fd, sizeof(struct gui_rgb_data_head), SEEK_SET);
-        gui_fs_read(fd, &head, sizeof(head));
-        gui_fs_close(fd);
-    }
-    else if (img->src_mode == IMG_SRC_MEMADDR)
-    {
-        memcpy(&head, (void *)((uint8_t *)(img->data) + sizeof(struct gui_rgb_data_head)), sizeof(head));
-    }
-
-    return head;
-}
 
 static void *gui_load_imgfile(draw_img_t *draw_img)
 {
@@ -221,7 +185,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
         }
     }
 
-    acc->blit(image, dc, rect);
+    gui_get_acc()->blit(image, dc, rect);
 
     if (flg_cache)
     {
