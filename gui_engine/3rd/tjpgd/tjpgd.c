@@ -953,9 +953,9 @@ static JRESULT mcu_output(
                         pc++;                       /* Step forward chroma pointer every pixel */
                     }
                     yy = *py++;         /* Get Y component */
-                    *pix++ = /*R*/ BYTECLIP(yy + ((int)(1.402 * CVACC) * cr) / CVACC);
-                    *pix++ = /*G*/ BYTECLIP(yy - ((int)(0.344 * CVACC) * cb + (int)(0.714 * CVACC) * cr) / CVACC);
                     *pix++ = /*B*/ BYTECLIP(yy + ((int)(1.772 * CVACC) * cb) / CVACC);
+                    *pix++ = /*G*/ BYTECLIP(yy - ((int)(0.344 * CVACC) * cb + (int)(0.714 * CVACC) * cr) / CVACC);
+                    *pix++ = /*R*/ BYTECLIP(yy + ((int)(1.402 * CVACC) * cr) / CVACC);
                 }
             }
         }
@@ -1038,9 +1038,9 @@ static JRESULT mcu_output(
                 py += 64;
                 if (JD_FORMAT != 2)
                 {
-                    *pix++ = /*R*/ BYTECLIP(yy + ((int)(1.402 * CVACC) * cr / CVACC));
-                    *pix++ = /*G*/ BYTECLIP(yy - ((int)(0.344 * CVACC) * cb + (int)(0.714 * CVACC) * cr) / CVACC);
                     *pix++ = /*B*/ BYTECLIP(yy + ((int)(1.772 * CVACC) * cb / CVACC));
+                    *pix++ = /*G*/ BYTECLIP(yy - ((int)(0.344 * CVACC) * cb + (int)(0.714 * CVACC) * cr) / CVACC);
+                    *pix++ = /*R*/ BYTECLIP(yy + ((int)(1.402 * CVACC) * cr / CVACC));
                 }
                 else
                 {
@@ -1082,9 +1082,9 @@ static JRESULT mcu_output(
 
         do
         {
-            w = (*s++ & 0xF8) << 8;     /* RRRRR----------- */
+            w =  *s++ >> 3;             /* -----------BBBBB */
             w |= (*s++ & 0xFC) << 3;    /* -----GGGGGG----- */
-            w |= *s++ >> 3;             /* -----------BBBBB */
+            w |= (*s++ & 0xF8) << 8;    /* RRRRR----------- */
             *d++ = w;
         }
         while (--n);
