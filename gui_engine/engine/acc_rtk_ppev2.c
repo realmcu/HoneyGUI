@@ -322,6 +322,9 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     case ARGB8565:
         source.format = PPEV2_ARGB8565;
         break;
+    case XRGB8888:
+        source.format = PPEV2_XRGB8888;
+        break;
     default:
         return;
     }

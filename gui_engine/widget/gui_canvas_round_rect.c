@@ -25,6 +25,7 @@
 #include "acc_init.h"
 #include <tp_algo.h>
 #include "nanovg.h"
+#include "math.h"
 
 
 /** @defgroup WIDGET WIDGET
@@ -99,7 +100,7 @@ static void set_rect_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, 
     head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
     head->rsvd = 0;
-    head->type = RGBA8888;
+    head->type = XRGB8888;
     head->version = 0;
     head->rsvd2 = 0;
     head->w = w;
@@ -148,6 +149,39 @@ static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, 
 
 }
 
+static void prepare_arc_img(gui_canvas_round_rect_t *this)
+{
+    gui_obj_t *obj = (gui_obj_t *)this;
+    uint32_t *data = (uint32_t *)(this->circle_data + sizeof(gui_rgb_data_head_t));
+    float boundary[this->r];
+    memset(boundary, 0, this->r * sizeof(float));
+    for (int i = 0; i < this->r; i++)
+    {
+        float y = i + 0.5 - this->r;
+        boundary[i] = this->r - sqrtf(this->r * this->r - y * y);
+
+    }
+    for (int i = 0; i < this->r; i++)
+    {
+        uint16_t right = (int)boundary[i];
+        uint32_t offset = this->r * i;
+        if (right < this->r - 1)
+        {
+            for (int j = right + 1; j < this->r; j++)
+            {
+                data[offset + j] = this->color.color.rgba_full;
+            }
+        }
+        float portion = ceil(boundary[i]) - boundary[i];
+        gui_color_t color = this->color;
+        color.color.rgba.a = round(portion * color.color.rgba.a);
+        data[offset + right] = color.color.rgba_full;
+        if (i > this->r / 2 - 1)
+        {
+            data[right * this->r + i] = color.color.rgba_full;
+        }
+    }
+}
 
 static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, uint16_t x,
                         uint16_t y, float degree)
@@ -216,37 +250,7 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
         this->circle_data = gui_malloc(this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
         memset(this->circle_data, 0x00, this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
 
-        NVGcontext *vg = nvgCreateAGGE(this->r, this->r, this->r * 4 /*ARGB 4 byte*/, NVG_TEXTURE_BGRA,
-                                       (uint8_t *)this->circle_data + sizeof(gui_rgb_data_head_t));
-        nvgBeginFrame(vg, this->r, this->r, 1);
-
-        // Draw 1/4 circle
-        nvgArc(vg, this->r, this->r, this->r, -NVG_PI / 2, 0, NVG_CCW);
-
-        // Set fill color to blue
-        nvgFillColor(vg, nvgRGBA(this->color.color.rgba.r, this->color.color.rgba.g,
-                                 this->color.color.rgba.b, this->color.color.rgba.a));
-
-        // Fill the shape
-        nvgFill(vg);
-
-        nvgEndFrame(vg);
-        nvgDeleteAGGE(vg);
-
-        for (uint32_t i = 0; i < this->r; i++)
-        {
-            for (uint32_t j = 0; j < this->r; j++)
-            {
-                gui_color_t *pixel = (gui_color_t *)this->circle_data + i * this->r + j + 2;
-                if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
-                {
-                    pixel->color.rgba.a = this->color.color.rgba.a;
-                    pixel->color.rgba.r = this->color.color.rgba.r;
-                    pixel->color.rgba.g = this->color.color.rgba.g;
-                    pixel->color.rgba.b = this->color.color.rgba.b;
-                }
-            }
-        }
+        prepare_arc_img(this);
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->circle_data;
 
         set_arc_w_and_h(head, this->r, this->r, this->color);
@@ -257,9 +261,6 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
     set_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
     set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1, this->base.h - 2 * this->r - 1,
                 180);
-
-
-
 }
 
 static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)

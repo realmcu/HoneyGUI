@@ -101,7 +101,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
         source_green = pixel->g;
         source_blue = pixel->b;
     }
-    else if (input_type == RGBX8888)
+    else if (input_type == XRGB8888)
     {
         color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)image_base + image_off;
         source_alpha = (255 - pixel->a);
