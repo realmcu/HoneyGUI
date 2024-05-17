@@ -269,6 +269,7 @@ void *gui_realloc(void *ptr_old, uint32_t n)
     return ptr;
 #else
     if (
+        (os_api->lower_mem_size != 0) && \
         ((uint32_t)(uintptr_t)ptr_old >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
         ((uint32_t)(uintptr_t)ptr_old <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
          (uint32_t)os_api->lower_mem_size)
