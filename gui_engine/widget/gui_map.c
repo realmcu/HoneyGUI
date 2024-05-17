@@ -67,8 +67,8 @@
 #define SCREEN_H ((int)gui_get_screen_height())
 #define TILE_SIZE (256)
 #define EARTH_LONGITUDE_RANGE 360.0
-#define BEIJING_CITY_LONGITUDE 104.0668
-#define BEIJING_CITY_LATITUDE 30.5728
+#define GPS_LONGITUDE 120.58
+#define GPS_LATITUDE 31.3
 #define TILE_ZOOM_LEVEL (7)
 #define WIN_W (SCREEN_W*3/2)
 #define WIN_H (SCREEN_H*3/2)
@@ -247,6 +247,18 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
 #else
 #endif
 }
+
+
+void pixel_to_latlon(double px_dx, double px_dy, double lat_prev, double lon_prev, int zoom,
+                     double *lat, double *lon)
+{
+    double tiles_at_this_zoom = pow(2.0, (double)zoom);
+    double lon_deg_per_px = 360.0 / (tiles_at_this_zoom * TILE_SIZE);
+    double lat_deg_per_px = 2 * atan(exp(M_PI)) / (tiles_at_this_zoom * TILE_SIZE) * 180.0 / M_PI;
+
+    *lon = lon_prev + px_dx * lon_deg_per_px;
+    *lat = lat_prev - px_dy * lat_deg_per_px;
+}
 /**
  * @brief Check if the screen is being pressed and released, and record these states
  * If the screen is being pressed and moved, this code will move the map according to the slide of the finger and handle page turning issues (when the user slides beyond the currently displayed map area). When the map moves to the edge, it will load new tiles
@@ -269,6 +281,12 @@ static void wincb(gui_map_t *this)
     {
         this->press = 0;
         this->release = 1;
+        double latitude;
+        double longitude;
+        pixel_to_latlon(-tp->deltaX, -tp->deltaY, this->latitude, this->longitude, this->zoom, &latitude,
+                        &longitude);
+        this->latitude = latitude;
+        this->longitude = longitude;
     }
     static bool deltaX_right_flag, deltaX_left_flag;
     if (this->press)
@@ -464,19 +482,29 @@ static void free_for_rgb(void *p)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-static void update_zoom(bool zoom)
+static void update_zoom(int zoom)
 {
     gui_map_t *map = 0;
     gui_obj_tree_get_widget_by_name(&gui_current_app()->screen, MAP_WIDGET_NAME, (void *)&map);
-
-    if (zoom)
+    //float longitude;
+    //float latitude;
+    //tile_to_latlon(map->tile[1][1].x, map->tile[1][1].y, map->zoom, &latitude, &longitude);
+    if (zoom == 1)
     {
         map->zoom++;
     }
-    else
+    else if (zoom == 0)
     {
         map->zoom--;
     }
+    else if (zoom == -1)
+    {
+        map->latitude = GPS_LATITUDE;
+        map->longitude = GPS_LONGITUDE;
+        GUI_BASE(map)->x = -TILE_SIZE / 2;
+        GUI_BASE(map)->y = -TILE_SIZE / 2;
+    }
+
     if (map->zoom < 0)
     {
         map->zoom = 0;
@@ -486,7 +514,8 @@ static void update_zoom(bool zoom)
         map->zoom = 21;
     }
 
-    generateTilesForWindow(WIN_W, WIN_H, BEIJING_CITY_LATITUDE, BEIJING_CITY_LONGITUDE, map->zoom, map);
+    //gui_log("%d,%d,%f,%f\n", map->tile[1][1].x, map->tile[1][1].y, latitude, longitude);
+    generateTilesForWindow(WIN_W, WIN_H, map->latitude, map->longitude, map->zoom, map);
 
 
 }
@@ -499,6 +528,10 @@ static void zoom_minus_cb()
 {
     update_zoom(0);
 }
+static void gps_cb()
+{
+    update_zoom(-1);
+}
 gui_map_t *gui_map_create(void *parent)
 {
 #define _GUI_NEW_GUI_MAP_PARAM this, parent
@@ -510,9 +543,10 @@ gui_map_t *gui_map_create(void *parent)
     int windowHeight = WIN_H;
 
     // The longitude and latitude to be displayed
-    double center_lat = BEIJING_CITY_LATITUDE;
-    double center_lon = BEIJING_CITY_LONGITUDE;
-
+    double center_lat = GPS_LATITUDE;
+    double center_lon = GPS_LONGITUDE;
+    this->longitude = GPS_LONGITUDE;
+    this->latitude = GPS_LATITUDE;
     // Zoom level
     int zoom = TILE_ZOOM_LEVEL;
     this->zoom = zoom;
@@ -543,7 +577,8 @@ gui_map_t *gui_map_create(void *parent)
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
                 gui_fs_close(fd);
-                gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_t *img = gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             }
 
 
@@ -571,12 +606,42 @@ gui_map_t *gui_map_create(void *parent)
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
                 gui_fs_close(fd);
-                gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_t *img = gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
             }
 
 
         }
         gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb, 0);
+    }
+    {
+        gui_button_t *zoom = gui_button_create(parent, 300, 300 - 30, 80, 80, 0, 0, 0, BUTTON_BG_ICON, 0);
+
+        {
+
+            static char path[100];
+            memset(path, 0, 100);
+            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/GPS.bin");
+            int fd;
+            fd = gui_fs_open(path, 0);
+
+            char *jpg = 0;
+            off_t filesize = 0;
+            if (fd > 0)
+            {
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
+                gui_img_t *img = gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            }
+
+
+        }
+        gui_button_click((void *)zoom, (gui_event_cb_t)gps_cb, 0);
     }
     return this;
 }

@@ -56,6 +56,8 @@ typedef struct gui_map
 {
     gui_win_t base; //!< base structure
     map_tile_t tile[3][3];
+    float longitude;
+    float latitude;
     int16_t start_x, start_y;
     int16_t zoom;
     bool press, release;
