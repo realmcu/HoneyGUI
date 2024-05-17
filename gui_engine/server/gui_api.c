@@ -27,6 +27,24 @@ void gui_fs_info_register(struct gui_fs *info)
 {
     fs = info;
 }
+void gui_indev_info_register(struct gui_indev *info)
+{
+    indev = info;
+}
+
+struct gui_dispdev *gui_get_dc(void)
+{
+    return dc;
+}
+
+struct acc_engine *gui_get_acc(void)
+{
+    return acc;
+}
+struct gui_indev *gui_get_indev(void)
+{
+    return indev;
+}
 
 
 #ifndef ENABLE_RTK_GUI_OS_HEAP
@@ -47,14 +65,8 @@ void gui_os_api_register(struct gui_os_api *info)
     os_api = info;
 }
 
-void gui_indev_info_register(struct gui_indev *info)
-{
-    indev = info;
-}
-struct gui_indev *gui_get_indev(void)
-{
-    return indev;
-}
+
+
 
 
 void ext_button_set_indicate(void (*callback)(void))
@@ -96,31 +108,6 @@ gui_wheel_port_data_t *wheel_get_data(void)
     return NULL;
 }
 
-gui_dispdev_t *gui_set_virtual_dc(uint8_t *frame_buf)
-{
-    //todo
-    return NULL;
-}
-
-struct gui_dispdev *gui_get_dc(void)
-{
-    return dc;
-}
-
-struct acc_engine *gui_get_acc(void)
-{
-    return acc;
-}
-
-float gui_get_scale_x(void)
-{
-    return dc->scale_x;
-}
-
-float gui_get_scale_y(void)
-{
-    return dc->scale_y;
-}
 
 uint32_t gui_get_screen_width(void)
 {
@@ -462,7 +449,7 @@ int gui_fs_ioctl(int fd, int cmd)
 
     return 0;
 }
-int gui_fs_closedir(gui_fs_DIR *d)
+int gui_fs_closedir(gui_fs_dir *d)
 {
     if (fs)
     {
@@ -474,7 +461,7 @@ int gui_fs_closedir(gui_fs_DIR *d)
 
     return 0;
 }
-gui_fs_DIR *gui_fs_opendir(const char *name)
+gui_fs_dir *gui_fs_opendir(const char *name)
 {
     if (fs)
     {
@@ -486,7 +473,7 @@ gui_fs_DIR *gui_fs_opendir(const char *name)
 
     return 0;
 }
-struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d)
+struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d)
 {
     if (fs)
     {

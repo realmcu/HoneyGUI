@@ -29,7 +29,8 @@ typedef enum
     ARGB8565 = 1, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha
     RGB888 = 3, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red
     RGBA8888 = 4, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for Alpha
-    BINARY = 5,
+    RGBX8888 = 5, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for (255 - Alpha)
+    BINARY = 6,
     ALPHAMASK = 9,
     BMP = 11,
     JPEG = 12,

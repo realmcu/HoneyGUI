@@ -150,8 +150,6 @@ extern "C" {
   * @{
   */
 
-extern float gui_get_scale_x(void);
-extern float gui_get_scale_y(void);
 void gui_dc_info_register(struct gui_dispdev *info);
 void gui_acc_info_register(struct acc_engine *info);
 void gui_os_api_register(struct gui_os_api *info);
@@ -172,9 +170,6 @@ struct gui_indev *gui_get_indev(void);
 struct gui_dispdev *gui_get_dc(void);
 struct acc_engine *gui_get_acc(void);
 
-float gui_get_scale_x(void);
-
-float gui_get_scale_y(void);
 
 uint32_t gui_get_screen_width(void);
 
@@ -219,10 +214,10 @@ int gui_fs_close(int d);
 int gui_fs_read(int fd, void *buf, size_t len);
 int gui_fs_write(int fd, const void *buf, size_t len);
 int gui_fs_lseek(int fd, int offset, int whence);
-int gui_fs_closedir(gui_fs_DIR *d);
+int gui_fs_closedir(gui_fs_dir *d);
 int gui_fs_ioctl(int fd, int cmd);
-gui_fs_DIR *gui_fs_opendir(const char *name);
-struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d);
+gui_fs_dir *gui_fs_opendir(const char *name);
+struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d);
 void *gui_get_file_address(const char *file);
 char *gui_strdup(const char *s);
 char *gui_filepath_transforming(void *addr);

@@ -59,6 +59,7 @@ typedef struct gui_canvas_round_rect
     uint8_t *rect_data;
     int  r;
     gui_color_t color;
+    bool use_external_picture;
 } gui_canvas_round_rect_t;
 
 /** End of WIDGET_Exported_Types
@@ -129,6 +130,13 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
                                                       int          r,
                                                       gui_color_t  color);
 
+/**
+ * @brief
+ *
+ * @param this
+ * @param data
+ */
+void gui_canvas_round_set_external_picture(gui_canvas_round_rect_t *this, void *data);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

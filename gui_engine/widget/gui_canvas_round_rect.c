@@ -148,6 +148,30 @@ static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, 
 
 }
 
+static void set_external_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, uint16_t x,
+                                 uint16_t y, float degree)
+{
+    gui_obj_t *obj = (gui_obj_t *)this;
+    draw_img_t *img = NULL;
+    img = gui_malloc(sizeof(draw_img_t));
+    memset(img, 0x00, sizeof(draw_img_t));
+
+    img->data = this->circle_data;
+
+    img->blend_mode = IMG_SRC_OVER_MODE;
+    img->opacity_value = UINT8_MAX;
+    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    matrix_translate(x, y, &img->matrix);
+
+    matrix_translate(this->r, this->r, &img->matrix);
+    matrix_rotate(degree, &img->matrix);
+    matrix_translate(-this->r, -this->r, &img->matrix);
+    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
+
+    matrix_inverse(&img->inverse);
+    gui_image_load_scale(img);
+    gui_image_new_area(img, NULL);
+}
 static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, uint16_t x,
                         uint16_t y, float degree)
 {
@@ -226,18 +250,48 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
     GUI_UNUSED(dc);
 
     this->rect_data = gui_malloc(sizeof(gui_rect_file_head_t));
-    this->circle_data = gui_malloc(this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
 
-    set_rect_img(this, &this->rect_0, this->r, 0, this->base.w - 2 * this->r, this->r);
-    set_rect_img(this, &this->rect_1, 0, this->r, this->base.w, this->base.h - 2 * this->r);
-    set_rect_img(this, &this->rect_2, this->r, this->base.h - this->r, this->base.w - 2 * this->r,
-                 this->r);
 
-    set_arc_img(this, &this->circle_00, 0, 0, 0);
-    set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 1, 0, 90);
-    set_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
-    set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1, this->base.h - 2 * this->r - 1,
-                180);
+    // set_rect_img(this, &this->rect_0, this->r, 0, this->base.w - 2 * this->r, this->r);
+    // set_rect_img(this, &this->rect_1, 0, this->r, this->base.w, this->base.h - 2 * this->r);
+    // set_rect_img(this, &this->rect_2, this->r, this->base.h - this->r, this->base.w - 2 * this->r,
+    //              this->r);
+    set_rect_img(this, &this->rect_0, \
+                 this->r - 1,  \
+                 0,
+                 this->base.w - 2 * this->r + 2, \
+                 this->r + 1);
+
+    set_rect_img(this, &this->rect_1, \
+                 0, \
+                 this->r - 1, \
+                 this->base.w, \
+                 this->base.h - 2 * this->r + 2);
+
+    set_rect_img(this, &this->rect_2, \
+                 this->r - 1,  \
+                 this->base.h - this->r - 1,
+                 this->base.w - 2 * this->r + 2, \
+                 this->r + 1);
+
+    if (this->use_external_picture == false)
+    {
+        this->circle_data = gui_malloc(this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
+        set_arc_img(this, &this->circle_00, 0, 0, 0);
+        set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 1, 0, 90);
+        set_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
+        set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1, this->base.h - 2 * this->r - 1,
+                    180);
+    }
+    else
+    {
+        set_external_arc_img(this, &this->circle_00, 0, 0, 0);
+        set_external_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 1, 0, 90);
+        set_external_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
+        set_external_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1,
+                             this->base.h - 2 * this->r - 1, 180);
+    }
+
 
 
 }
@@ -266,7 +320,7 @@ static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)
 static void gui_canvas_round_rect_end(gui_canvas_round_rect_t *this)
 {
     if (this->rect_data != NULL) {gui_free(this->rect_data); this->rect_data = NULL;}
-    if (this->circle_data != NULL) {gui_free(this->circle_data); this->circle_data = NULL;}
+    if (this->use_external_picture == false) {if (this->circle_data != NULL) {gui_free(this->circle_data); this->circle_data = NULL;}}
     if (this->rect_0 != NULL) {gui_free(this->rect_0); this->rect_0 = NULL;}
     if (this->rect_1 != NULL) {gui_free(this->rect_1); this->rect_1 = NULL;}
     if (this->rect_2 != NULL) {gui_free(this->rect_2); this->rect_2 = NULL;}
@@ -350,6 +404,12 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
     canvas_round_rect->r = r;
     canvas_round_rect->color = color;
     return canvas_round_rect;
+}
+
+void gui_canvas_round_set_external_picture(gui_canvas_round_rect_t *this, void *data)
+{
+    this->use_external_picture = true;
+    this->circle_data = data;
 }
 
 /** End of WIDGET_Exported_Functions

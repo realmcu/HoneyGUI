@@ -189,7 +189,7 @@ typedef struct
     char buf[512];
     int num;
     int cur;
-} gui_fs_DIR;
+} gui_fs_dir;
 
 struct gui_fs_dirent
 {
@@ -207,9 +207,9 @@ struct gui_fs
     int (*write)(int fd, const void *buf, size_t len);
     int (*lseek)(int fd, int offset, int whence);
     /* directory api*/
-    gui_fs_DIR *(*opendir)(const char *name);
-    struct gui_fs_dirent *(*readdir)(gui_fs_DIR *d);
-    int (*closedir)(gui_fs_DIR *d);
+    gui_fs_dir *(*opendir)(const char *name);
+    struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
+    int (*closedir)(gui_fs_dir *d);
     int (*ioctl)(int fildes, int cmd, ...);
 };
 

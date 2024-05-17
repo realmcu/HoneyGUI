@@ -65,17 +65,17 @@ static int port_ftruncate(int fd, off_t length)
 }
 
 /* directory api port*/
-static int port_closedir(gui_fs_DIR *d)
+static int port_closedir(gui_fs_dir *d)
 {
     return closedir((DIR *)d);
 }
 
-static gui_fs_DIR *port_opendir(const char *name)
+static gui_fs_dir *port_opendir(const char *name)
 {
-    return (gui_fs_DIR *)opendir(name);
+    return (gui_fs_dir *)opendir(name);
 }
 
-static struct gui_fs_dirent *port_readdir(gui_fs_DIR *d)
+static struct gui_fs_dirent *port_readdir(gui_fs_dir *d)
 {
     return (struct gui_fs_dirent *)readdir((DIR *)d);
 }
@@ -90,9 +90,9 @@ static struct gui_fs fs_api =
     .write     = (int (*)(int, const void *, size_t))write,
     .lseek     = (int (*)(int, int, int))lseek,
     /* directory api port*/
-    .opendir   = (gui_fs_DIR * (*)(const char *name))opendir,
-    .closedir  = (int (*)(gui_fs_DIR * d))closedir,
-    .readdir   = (struct gui_fs_dirent * (*)(gui_fs_DIR * d))readdir,
+    .opendir   = (gui_fs_dir * (*)(const char *name))opendir,
+    .closedir  = (int (*)(gui_fs_dir * d))closedir,
+    .readdir   = (struct gui_fs_dirent * (*)(gui_fs_dir * d))readdir,
 
 };
 
