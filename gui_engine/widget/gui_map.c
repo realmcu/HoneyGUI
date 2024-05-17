@@ -76,7 +76,7 @@
 #if _WIN32
 #define ROOT_PATH "./gui_engine/example/screen_454_454/root_image/SDCARD/"
 #elif defined RTL8772F
-#define ROOT_PATH "/"
+#define ROOT_PATH "/sdcard/"
 #else
 #define ROOT_PATH "/"
 #endif
@@ -159,10 +159,7 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
 
             char *jpg = 0;
             off_t filesize = 0;
-            if (parent->tile[y - startY][x - startX].img->data_buffer)
-            {
-                gui_free(parent->tile[y - startY][x - startX].img->data_buffer);
-            }
+
             if (fd > 0)
             {
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
@@ -170,6 +167,7 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
                 //gui_log("open %s Successful!\n", path);
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
             }
             else
             {
@@ -177,12 +175,20 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
                 memset(path, 0, 100);
                 sprintf(path, "%s/%s", ROOT_PATH, PATH404);
                 fd = gui_fs_open(path, 0);
+                if (fd <= 0)
+                {
+                    return;
+                }
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
                 jpg = gui_malloc(filesize);
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
             }
-
+            if (parent->tile[y - startY][x - startX].img->data_buffer)
+            {
+                gui_free(parent->tile[y - startY][x - startX].img->data_buffer);
+            }
             parent->tile[y - startY][x - startX].x = x;
             parent->tile[y - startY][x - startX].y = y;
             gui_img_stb_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
@@ -236,6 +242,10 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
         sprintf(path, "%s/%s", ROOT_PATH, PATH404);
         fd = gui_fs_open(path,
                          0);
+        if (fd <= 0)
+        {
+            return;
+        }
         filesize = gui_fs_lseek(fd, 0, SEEK_END);
         jpg = gui_malloc(filesize);
         gui_fs_lseek(fd, 0, SEEK_SET);
