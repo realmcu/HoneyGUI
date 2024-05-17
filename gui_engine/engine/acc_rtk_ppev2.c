@@ -737,7 +737,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         }
         else
         {
-            ppe_translate(0, y_ref, &inverse);
+            ppe_translate(0, dc->section.y1, &inverse);
             gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
             gui_color_t color = {.color.rgba_full = rect_header->color.color.rgba_full};
 
