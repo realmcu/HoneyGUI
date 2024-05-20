@@ -50,8 +50,7 @@ typedef enum
 {
     IMG_LIVE_MJPEG,
 
-
-};
+} GUI_IMG_LIVE_ENUM;
 
 
 
@@ -68,7 +67,7 @@ typedef struct
     float fps;
     uint32_t frame_cur;
     uint8_t img_type: 3;
-    uint8_t src_mode: 3
+    uint8_t src_mode: 3;
 
 } gui_img_live_t;
 

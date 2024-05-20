@@ -94,7 +94,7 @@ static bool is_mjpeg(void *pdata)
 }
 
 
-static uint8_t *mjpeg2jpeg_slicer(uint8_t *mjpeg, uint32_t size, uint32_t *slice_cnt)
+static uint8_t **mjpeg2jpeg_slicer(uint8_t *mjpeg, uint32_t size, uint32_t *slice_cnt)
 {
     int ret = 0;
     int input_skip = 0, output_size = 0;
@@ -304,6 +304,7 @@ void gui_img_live_play_cb(void *p)
 }
 
 
+
 static void gui_img_live_draw(gui_obj_t *obj)
 {
     gui_img_live_t *this = (gui_img_live_t *)obj;
@@ -318,6 +319,7 @@ static void gui_img_live_draw(gui_obj_t *obj)
         if (this->frame_buff)
         {
             // free(this->frame_buff);
+            extern void stbi_image_free(void *retval_from_stbi_load);
             stbi_image_free(this->frame_buff);
             this->frame_buff = NULL;
         }
@@ -327,7 +329,11 @@ static void gui_img_live_draw(gui_obj_t *obj)
         // stb decode
         {
             int x, y, n, ok;
-            this->frame_buff = stbi_load_from_memory(this->array[this->frame_cur], 40248, &x, &y, &n, 0);
+            typedef unsigned char stbi_uc;
+            extern stbi_uc *stbi_load_from_memory(stbi_uc const * buffer, int len, int *x, int *y,
+                                                  int *channels_in_file, int desired_channels);
+            this->frame_buff = (void *)stbi_load_from_memory(this->array[this->frame_cur], 40248, &x, &y, &n,
+                                                             0);
             if (this->frame_buff)
             {
                 gui_log("x %d y %d n %d\n", x, y, n);
