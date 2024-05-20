@@ -11,11 +11,12 @@ libpath = [cwd + '/vglite']
 
 src += Glob("platform/*.cpp")
 src += Glob("platform/*.c")
-src += Glob("HoneyGUI-Adapt/*.c")
 src += Glob("vglite/source/interface/*.cpp")
 src += Glob("vglite/source/lib/*.cpp")
 src += Glob("vglite/source/widgets/*.cpp")
 src += Glob("vglite/source/transitions/*.cpp")
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'):
+    src += Glob("HoneyGUI-Adapt/*.c")
 
 CPPPATH = [cwd, os.path.join(cwd, 'platform'),
            os.path.join(cwd, 'HoneyGUI-Adapt'),
