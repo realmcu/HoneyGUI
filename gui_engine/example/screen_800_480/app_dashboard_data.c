@@ -1,13 +1,13 @@
 
 #include "app_dashboard_data.h"
+#include <gui_api.h>
+#include "app_dashboard_main_display.h"
+#include "app_dashboard_connected_display.h"
 #ifndef _WIN32
 #include "trace.h"
-
 #include "communicate_parse_navigation.h"
 #include "communicate_parse_notify.h"
 #include "os_timer.h"
-#include "app_dashboard_main_display.h"
-#include "app_dashboard_connected_display.h"
 #include "os_sync.h"
 #include "communicate_protocol.h"
 #include "communicate_parse.h"
@@ -21,6 +21,14 @@ char str_def1[] = {0xe5, 0x85, 0xac, 0xe9, 0x87, 0x8c, '\0'};
 char str_def2[] = {0xe8, 0xbf, 0x9b, 0xe5, 0x85, 0xa5, '\0'};
 char str_def3[] = {0xe7, 0xb1, 0xb3, '\0'};
 char str_def4[] = {0x20, 0xe8, 0xbf, 0x9b, 0xe5, 0x85, 0xa5, '\0'};
+
+bool COMMUNICATE_ALLOW_DLPS = true;
+
+bool communicate_navi_dlps_check(void)
+{
+    return COMMUNICATE_ALLOW_DLPS;
+}
+extern void reset_daemon_time(uint32_t value);
 
 void app_dashboard_auto_refresh_data_demo(void)
 {
@@ -232,6 +240,7 @@ void app_dashboard_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
         }
         else if (Value == NAVI_IDLE)
         {
+            COMMUNICATE_ALLOW_DLPS = true;
             app_current_dashboard_data.show_main_display = true;
         }
 
@@ -278,6 +287,8 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
     int32_t distance = 0;
 #ifndef _WIN32
     gui_indev_wakeup();
+    COMMUNICATE_ALLOW_DLPS = false;
+    reset_daemon_time(gui_ms_get());
     uint8_t navi_type = 0;
     navi_type = ((uint8_t *)pValue)[0];
     if (navi_type == TURN_LEFT || navi_type == LEFT_FRONT || navi_type == LEFT_BACK

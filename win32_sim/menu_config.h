@@ -52,7 +52,7 @@
 // </c>
 
 // <c> RTK GUI Demo 800 480
-// #define CONFIG_REALTEK_BUILD_GUI_800_480
+// #define CONFIG_REALTEK_BUILD_GUI_800_480_DEMO
 // </c>
 
 // <c> RTK GUI Use OS Heap

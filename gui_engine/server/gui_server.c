@@ -44,6 +44,11 @@ bool gui_server_dlps_check(void)
     return GUI_SERVER_ALLOW_DLPS;
 }
 
+void reset_daemon_time(uint32_t value)
+{
+    daemon_start_ms = value;
+}
+
 static void gui_server_event_handler(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
@@ -258,14 +263,14 @@ static void gui_server_entry(void *parameter)
         daemon_cnt++;
         if (daemon_cnt == 1)
         {
-            daemon_start_ms = gui_ms_get();
+            reset_daemon_time(gui_ms_get());
         }
 
         touch_info_t *tp = tp_get_info();
 
         if (tp->pressed == true || tp->pressing == true)
         {
-            daemon_start_ms = gui_ms_get();
+            reset_daemon_time(gui_ms_get());
         }
 
         gui_msg_t msg;
