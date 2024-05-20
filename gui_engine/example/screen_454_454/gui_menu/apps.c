@@ -18,6 +18,7 @@
 #define APP_MENU
 #define APP_STOPWATCH
 #define APP_MAP
+#define APP_CARDVIEW
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
@@ -26,6 +27,7 @@ GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
 GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
 GUI_APP_DEFINE_NAME(APP_MAP)
+GUI_APP_DEFINE_NAME(APP_CARDVIEW)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -657,8 +659,42 @@ GUI_APP_ENTRY(APP_MAP)
 
     }
 }
+#include "gui_cardview.h"
+#include "gui_card.h"
+#include "gui_curtainview.h"
+#include "gui_curtain.h"
+GUI_APP_ENTRY(APP_CARDVIEW)
+{
+    gui_curtainview_t *ct = gui_curtainview_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 454, 454);
+    gui_curtain_t *ct_middle = gui_curtain_create(ct, 0, 0, 0, 454, 454, CURTAIN_MIDDLE, 1.0f);
+
+    gui_curtain_t *ct_down = gui_curtain_create(ct, 0, 0, 0, 454, 454, CURTAIN_DOWN, 1.0f);
+    gui_rect_create(ct_middle, 454 / 2, 454 - 50, 10, 10, COLOR_WHITE);
+    gui_rect_create(ct_middle, 454 / 2, 454 - 30, 10, 10, COLOR_WHITE);
+    gui_rect_create(ct_middle, 454 / 2, 454 - 10, 10, 10, COLOR_WHITE);
+    gui_cardview_t *cv = gui_cardview_create(ct_down, "cardview", 0, 0, 0, 0);
+    uint32_t *image_array[] =
+    {
+        A1_BIN,
+        A2_BIN,
+        A3_BIN,
+        A4_BIN,
+        A5_BIN,
+        A6_BIN,
+        A5_BIN,
+        A4_BIN,
+        A3_BIN,
+        A2_BIN,
+    };
+    for (size_t i = 0; i < 10; i++)
+    {
+        gui_card_t *card = gui_card_create(cv, 0, 0, 0, 0, 140);
+        gui_img_create_from_mem(card, 0, image_array[i], (454 - 128) / 2, 0, 0, 0);
+    }
 
 
+
+}
 
 
 
