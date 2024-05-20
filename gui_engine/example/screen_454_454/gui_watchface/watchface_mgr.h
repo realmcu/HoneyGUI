@@ -61,6 +61,7 @@ void design_tab_cube(void *parent);
 
 //watchface perspective apis
 void design_tab_perspective(void *parent);
+void free_watchface_mgr(void);
 
 
 

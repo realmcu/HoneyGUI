@@ -21,6 +21,7 @@ typedef enum
 
 //player mgr apis
 int app_player_switch_tabs(player_ids id);
+void free_player_mgr(void);
 
 //player main apis
 void design_tab_player_main(void *parent);

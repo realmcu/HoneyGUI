@@ -33,6 +33,7 @@ void design_tab_record_files(void *parent);
 //record play apis
 void design_tab_record_play(void *parent);
 void switch_record_play_pause_touch_cb(void *obj, uint16_t event);
+void free_record_mgr(void);
 
 #ifdef __cplusplus
 }

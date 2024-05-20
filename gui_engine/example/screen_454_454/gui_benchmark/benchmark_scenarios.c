@@ -183,7 +183,7 @@ static void design_app_benchmark(gui_app_t *app)
 
     /*add switch scenario event*/
     gui_win_t *win_count_frame = gui_win_create(&(app->screen), "win_count_frame", 0, 0, 0, 0);
-    gui_win_set_animate(win_count_frame, 0, -1, win_count_frame_cb, win_count_frame);
+    gui_win_set_animate(win_count_frame, 1, -1, win_count_frame_cb, win_count_frame);
     gui_obj_add_event_cb(win_count_frame, (gui_event_cb_t)win_count_frame_update_frame_cost_cb,
                          (gui_event_t)GUI_EVENT_BENCHMARK_UPDATE_FRAME_COST, NULL);
     gui_obj_add_event_cb(win_count_frame, (gui_event_cb_t)win_count_frame_switch_scenario_cb,
@@ -370,7 +370,7 @@ void benchmark_perspective(void *parent)
 
     /*todo: add animate to rotate automaticlly*/
     gui_win_t *win = gui_win_create(ppp, "win_perspective_animate", 0, 0, 0, 0);
-    gui_win_set_animate(win, 0, -1, win_perspective_animate_cb, win);
+    gui_win_set_animate(win, 1, -1, win_perspective_animate_cb, win);
 
 
 }
@@ -525,6 +525,7 @@ void app_benchmark_start(void)
     rtk_lcd_hal_set_TE_type(LCDC_TE_TYPE_NO_TE);
 #endif
     /*free all tabs before switch gui app*/
+    benchmark_free_all_other_mgrs();
     //to do
     gui_switch_app(get_app_watch_ui(), get_app_benchmark());
 }
@@ -537,6 +538,6 @@ void app_benchmark_finish(void)
     /*show cost ms on lcd*/
     //design_benchmark_show(get_app_benchmark());
     //to do
-    //gui_switch_app(get_app_benchmark(), get_app_watch_ui());
+    gui_switch_app(get_app_benchmark(), get_app_watch_ui());
 }
 

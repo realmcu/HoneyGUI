@@ -57,3 +57,13 @@ void design_player_mgr(void *parent)
 
     app_tab_manager_ctor(tabview_player_mgr, &player_tabs[PLAYER_MAIN]);
 }
+
+void free_player_mgr(void)
+{
+    for (uint16_t i = 0; i < PLAYER_MAX; i++)
+    {
+        app_tab_manager_free(&player_tabs[i]);
+    }
+
+    gui_obj_tree_free(tabview_player_mgr);
+}

@@ -15,6 +15,7 @@ typedef enum
 
 //player main apis
 void design_tab_benchmark_main(void *parent);
+void free_benchmark_mgr(void);
 
 #ifdef __cplusplus
 }

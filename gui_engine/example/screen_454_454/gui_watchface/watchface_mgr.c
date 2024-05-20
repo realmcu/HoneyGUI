@@ -78,3 +78,14 @@ void design_watchface_mgr(void *parent)
 
     app_tab_manager_ctor(tabview_watchface_mgr, &watchface_tabs[WATCHFACE_MAIN]);
 }
+
+void free_watchface_mgr(void)
+{
+    for (uint16_t i = 0; i < WATCHFACE_MAX; i++)
+    {
+        app_tab_manager_free(&watchface_tabs[i]);
+    }
+
+    gui_obj_tree_free(tabview_watchface_mgr);
+}
+

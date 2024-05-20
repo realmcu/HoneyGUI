@@ -22,6 +22,7 @@ typedef enum
 
 //contacts mgr apis
 int app_contacts_switch_tabs(contacts_ids id);
+void free_contacts_mgr(void);
 
 //contacts main apis
 void design_tab_contacts_main(void *parent);

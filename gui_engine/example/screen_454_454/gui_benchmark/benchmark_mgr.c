@@ -22,3 +22,14 @@ void design_benchmark_mgr(void *parent)
 
     app_tab_manager_ctor(tabview_benchmark_mgr, &benchmark_tabs[BENCHMARK_MAIN]);
 }
+
+void free_benchmark_mgr(void)
+{
+    for (uint16_t i = 0; i < BENCHMARK_MAX; i++)
+    {
+        app_tab_manager_free(&benchmark_tabs[i]);
+    }
+
+    gui_obj_tree_free(tabview_benchmark_mgr);
+}
+

@@ -59,3 +59,14 @@ void design_contacts_mgr(void *parent)
 
     app_tab_manager_ctor(tabview_contacts_mgr, &contacts_tabs[CONTACTS_MAIN]);
 }
+
+void free_contacts_mgr(void)
+{
+    for (uint16_t i = 0; i < CONTACTS_MAX; i++)
+    {
+        app_tab_manager_free(&contacts_tabs[i]);
+    }
+
+    gui_obj_tree_free(tabview_contacts_mgr);
+}
+

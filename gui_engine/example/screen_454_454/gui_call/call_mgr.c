@@ -92,3 +92,13 @@ void design_call_mgr(void *parent)
     gui_tabview_tp_disable(tabview_call_mgr, true);
     app_tab_manager_ctor(tabview_call_mgr, &call_tabs[CALL_MAIN]);
 }
+
+void free_call_mgr(void)
+{
+    for (uint16_t i = 0; i < CALL_MAX; i++)
+    {
+        app_tab_manager_free(&call_tabs[i]);
+    }
+
+    gui_obj_tree_free(tabview_call_mgr);
+}

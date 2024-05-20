@@ -24,6 +24,7 @@ typedef enum
 
 //call mgr apis
 int app_call_switch_tabs(call_ids id);
+void free_call_mgr(void);
 
 //call main apis
 void design_tab_call_main(void *parent);

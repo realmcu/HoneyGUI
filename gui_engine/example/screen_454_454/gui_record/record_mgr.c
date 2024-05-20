@@ -59,3 +59,13 @@ void design_record_mgr(void *parent)
 
     app_tab_manager_ctor(tabview_record_mgr, &record_tabs[RECORD_MAIN]);
 }
+
+void free_record_mgr(void)
+{
+    for (uint16_t i = 0; i < RECORD_MAX; i++)
+    {
+        app_tab_manager_free(&record_tabs[i]);
+    }
+
+    gui_obj_tree_free(tabview_record_mgr);
+}

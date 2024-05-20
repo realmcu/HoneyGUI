@@ -30,6 +30,7 @@ gui_tab_t *tab_contacts = NULL;
 gui_tab_t *tab_record = NULL;
 gui_tab_t *tab_benchmark = NULL;
 gui_tab_t *tab_menu = NULL;
+gui_tab_t *tab_gfx_demo = NULL;
 static void design_app_watch_ui(gui_app_t *app);
 extern void gui_task_ext_execution_sethook(void (*hook)(void));
 
@@ -88,12 +89,12 @@ static void design_app_watch_ui(gui_app_t *app)
     design_player_mgr(gui_tab_get_rte_obj(tab_player));
     design_call_mgr(gui_tab_get_rte_obj(tab_call));
     design_contacts_mgr(gui_tab_get_rte_obj(tab_contacts));
-#ifdef ENABLE_LITE_GFX
-    // design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_record));
-    design_tab_app_soccer(gui_tab_get_rte_obj(tab_record));
-    // design_tab_watchface_flowerfall(gui_tab_get_rte_obj(tab_record));
-#else
     design_record_mgr(gui_tab_get_rte_obj(tab_record));
+#ifdef ENABLE_LITE_GFX
+    tab_gfx_demo = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 6, 0);
+    // design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_gfx_demo));
+    design_tab_app_soccer(gui_tab_get_rte_obj(tab_gfx_demo));
+    // design_tab_watchface_flowerfall(gui_tab_get_rte_obj(tab_gfx_demo));
 #endif
 
     extern void design_tab_menu(void *parent);

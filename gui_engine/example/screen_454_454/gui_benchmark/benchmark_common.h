@@ -74,6 +74,8 @@ void benchmark_single_scroll_text(void *parent);
 void app_benchmark_start(void);
 void app_benchmark_finish(void);
 
+void benchmark_free_all_other_mgrs(void);
+
 
 #ifdef __cplusplus
 }
