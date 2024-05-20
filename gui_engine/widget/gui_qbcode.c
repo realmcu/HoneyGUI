@@ -284,11 +284,6 @@ static void gui_qbcode_destroy(gui_obj_t *obj)
     {
         gui_free(qbcode->data);
     }
-
-    if (qbcode)
-    {
-        gui_free(qbcode);
-    }
 }
 
 static void gui_qbcode_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
