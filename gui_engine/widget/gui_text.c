@@ -21,6 +21,8 @@
 #include "gui_matrix.h"
 #include "font_mem.h"
 #include "font_stb.h"
+#include "font_mem_img.h"
+#include "font_mem_matrix.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -78,6 +80,21 @@ static bool content_change = false;
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static bool gui_text_matrix_is_identity(gui_matrix_t *matrix)
+{
+    if (matrix == NULL)
+    {
+        return false;
+    }
+    if (matrix->m[0][0] == 1.0f && matrix->m[1][1] == 1.0f)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
@@ -97,6 +114,19 @@ static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
     case GUI_FONT_SRC_IMG:
         {
 
+        }
+        break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+            if (gui_text_matrix_is_identity(text->base.matrix))
+            {
+                gui_font_mem_load(text, rect);
+            }
+            else
+            {
+                gui_font_mat_load(text, rect);
+            }
         }
         break;
 
@@ -127,6 +157,19 @@ static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         break;
 
+    case GUI_FONT_SRC_MAT:
+        {
+            if (gui_text_matrix_is_identity(text->base.matrix))
+            {
+                gui_font_mem_draw(text, rect);
+            }
+            else
+            {
+                gui_font_mat_draw(text, rect);
+            }
+        }
+        break;
+
     default:
         break;
     }
@@ -153,6 +196,13 @@ static void gui_text_font_unload(gui_text_t *text)
 
         }
         break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+            gui_font_mat_unload(text);
+        }
+        break;
+
     default:
         break;
     }
@@ -182,6 +232,12 @@ static void gui_text_font_destory(gui_text_t *text)
     case GUI_FONT_SRC_IMG:
         {
             gui_font_scale_destory(text);
+        }
+        break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+
         }
         break;
 

@@ -404,6 +404,11 @@
           <GroupName>gui_port</GroupName>
           <Files>
             <File>
+              <FileName>gui_port_acc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>gui_port\gui_port_acc.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_port_dc.c</FileName>
               <FileType>1</FileType>
               <FilePath>gui_port\gui_port_dc.c</FilePath>
@@ -422,11 +427,6 @@
               <FileName>romfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>gui_port\romfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_port_acc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\gui_port\gui_port_acc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -519,6 +519,16 @@
               <FilePath>..\gui_engine\engine\font_mem.c</FilePath>
             </File>
             <File>
+              <FileName>font_mem_img.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\font_mem_img.c</FilePath>
+            </File>
+            <File>
+              <FileName>font_mem_matrix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\font_mem_matrix.c</FilePath>
+            </File>
+            <File>
               <FileName>font_stb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\font_stb.c</FilePath>
@@ -604,6 +614,11 @@
               <FilePath>..\gui_engine\input\tp_algo.c</FilePath>
             </File>
             <File>
+              <FileName>tp_algo_v2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\input\tp_algo_v2.c</FilePath>
+            </File>
+            <File>
               <FileName>wheel_algo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\input\wheel_algo.c</FilePath>
@@ -659,9 +674,19 @@
               <FilePath>..\gui_engine\widget\gui_canvas.c</FilePath>
             </File>
             <File>
+              <FileName>gui_canvas_arc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_canvas_arc.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_canvas_rect.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_canvas_rect.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_canvas_round_rect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_canvas_round_rect.c</FilePath>
             </File>
             <File>
               <FileName>gui_card.c</FileName>
@@ -847,6 +872,11 @@
               <FileName>gui_text.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_text.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_turn_table.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_turn_table.c</FilePath>
             </File>
             <File>
               <FileName>gui_watch_gradient_spot.c</FileName>

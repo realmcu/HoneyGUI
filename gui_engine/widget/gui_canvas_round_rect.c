@@ -151,7 +151,6 @@ static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, 
 
 static void prepare_arc_img(gui_canvas_round_rect_t *this)
 {
-    gui_obj_t *obj = (gui_obj_t *)this;
     uint32_t *data = (uint32_t *)(this->circle_data + sizeof(gui_rgb_data_head_t));
     float boundary[this->r];
     memset(boundary, 0, this->r * sizeof(float));

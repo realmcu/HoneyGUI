@@ -82,7 +82,8 @@ void gui_font_mem_init(uint8_t *font_bin_addr);
  * @brief Preprocessing of bitmap fonts using internal engines
  *
  * @param text Widget pointer
- */
+ * @param rect Widget boundary
+*/
 void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect);
 
 /**
@@ -120,23 +121,27 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
 
 /**
- * @brief Post-processing work for drawing bitmap fonts using internal engines
+ * @brief Get the fontlib name object
+ *
+ * @param font_size font szie
+ * @return uint8_t font lib index
+ */
+uint8_t get_fontlib_name(uint8_t font_size);
+
+/**
+ * @brief text layout by mode
+ *
+ * @param text Widget pointer
+ * @param rect Widget boundary
+ */
+void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect);
+
+/**
+ * @brief get dot info by utf-8 or utf-16
  *
  * @param text Widget pointer
  */
-void gui_font_scale_destory(gui_text_t *text);
-
-/**
- * @brief transform bmp text to img
- *
- * @param text text pointer
- * @param font_img_type img type
- * @param img_x img x
- * @param img_y img y
- * @return void* text img buffer
- */
-void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *img_x,
-                       int16_t *img_y);
+void gui_font_get_dot_info(gui_text_t *text);
 
 #ifdef __cplusplus
 }

@@ -11,6 +11,8 @@ src += ['draw_img.c']
 src += ['gui_matrix.c']
 src += ['draw_font.c']
 src += ['font_mem.c']
+src += ['font_mem_img.c']
+src += ['font_mem_matrix.c']
 src += ['font_stb.c']
 src += ['acc_sw.c']
 src += ['acc_sw_raster.c']
@@ -29,7 +31,7 @@ if GetDepend(['CONFIG_REALTEK_BUILD_VG_LITE']):
 
 if GetDepend(['CONFIG_REALTEK_BUILD_PPE']):
     src += ['acc_rtk_ppe.c']
-    
+
 if GetDepend(['CONFIG_REALTEK_BUILD_PPEV2']):
     src += ['acc_rtk_ppev2.c']
 
