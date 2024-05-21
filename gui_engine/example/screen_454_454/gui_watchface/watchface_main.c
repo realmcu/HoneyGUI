@@ -29,7 +29,7 @@ static float angle_sec;
 
 static void img_animate_watchface_callback(void *obj)
 {
-    extern bool send_msg_to_gui_server(gui_msg_t *msg);
+    extern bool gui_send_msg_to_server(gui_msg_t *msg);
 #ifndef _WIN32
     uint16_t seconds = get_system_clock_second();
     uint16_t minute = RtkWristbandSys.Global_Time.minutes;
@@ -54,8 +54,8 @@ static void img_animate_watchface_callback(void *obj)
                      watchface_second->base.h);
 
     gui_msg_t msg;
-    msg.type = GUI_EVENT_WATCHFACE_UPDATE;
-    send_msg_to_gui_server(&msg);
+    msg.event = GUI_EVENT_WATCHFACE_UPDATE;
+    gui_send_msg_to_server(&msg);
 }
 
 static void tab_watchface_update_cb(void *obj, uint16_t event)

@@ -50,6 +50,7 @@ struct gui_app
     gui_obj_t screen;               //!< widget tree root
     const char *xml;                //!< widget tree design file
     uint32_t active_ms;             //!< screen shut dowm delay
+    uint32_t start_ms;             //!< screen shut dowm delay
     void *thread_id;                //!< thread handle(optional)
     void (* thread_entry)(void *this); //!< thread entry
     void (* ctor)(void *this);      //!< constructor
@@ -155,7 +156,6 @@ struct gui_app
   */
 gui_app_t *gui_current_app(void);
 gui_app_t *gui_next_app(void);
-void gui_app_exec(gui_app_t *app);
 
 void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry);
 

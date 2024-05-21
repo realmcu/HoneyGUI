@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_rect_round_create.c
+  * @file gui_canvas_round_rect.c
   * @brief image rect widget
   * @details image rect widget is used to show rect on the screen
   * @author howie_wang@realsil.com.cn

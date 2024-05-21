@@ -2854,7 +2854,7 @@ static void screen_prepare(gui_obj_t *obj, struct gui_dispdev *dc, gui_rect_t *r
                 msg.type = GUI_SRV_CB;
                 msg.cb = obj->callback.link_cb;
                 msg.u.payload = obj->callback.param;
-                send_msg_to_gui_server(&msg);
+                gui_send_msg_to_server(&msg);
         }
 
     }

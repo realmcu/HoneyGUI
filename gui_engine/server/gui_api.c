@@ -240,6 +240,10 @@ void *gui_malloc(uint32_t n)
     {
         ptr = gui_lower_malloc(n);
     }
+    // if (ptr == (void *)0x0000000000749D30)
+    // {
+    //     GUI_ASSERT(NULL != NULL);
+    // }
     return ptr;
 }
 
@@ -274,6 +278,10 @@ void *gui_realloc(void *ptr_old, uint32_t n)
             memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
             tlsf_free(tlsf, ptr_old);
         }
+        // if (ptr == (void *)0x0000000000749D30)
+        // {
+        //     GUI_ASSERT(NULL != NULL);
+        // }
         return ptr;
     }
 #endif

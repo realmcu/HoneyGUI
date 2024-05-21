@@ -407,18 +407,12 @@ typedef enum t_obj_type
     TURN_TABLE               = 0x0029,
 } T_OBJ_TYPE;
 
+typedef void (*gui_msg_cb)(void *);
 typedef struct gui_msg
 {
-    /* the event type */
-    uint16_t type;
-    /* user field of event */
-    union
-    {
-        uint32_t  param;
-        void      *payload;
-    } u;
-    void *app;
-    void *cb;
+    uint16_t event;
+    gui_msg_cb cb;
+    void *payload;
 } gui_msg_t;
 
 typedef struct gui_index

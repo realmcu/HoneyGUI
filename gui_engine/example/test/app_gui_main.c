@@ -2,8 +2,9 @@
 #include "gui_app.h"
 #include "root_image\ui_resource.h"
 #include "gui_grid.h"
-#include "gui_rect.h"
+#include "gui_canvas_round_rect.h"
 #include "gui_text.h"
+#include "gui_api.h"
 #define APP_TEST
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
@@ -20,7 +21,7 @@
 GUI_APP_DEFINE(APP_TEST, test)  // cppcheck-suppress syntaxError
 static void test(gui_app_t *app)
 {
-    gui_rect_create(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER);
+    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, "canvas_rect", 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER);
     {
         char *text = "565:";
         int font_size = 16;
@@ -154,9 +155,12 @@ static void test(gui_app_t *app)
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
         gui_text_type_set(t, addr1);
-        gui_img_t *img =  gui_rect_create(GUI_APP_ROOT_SCREEN, 200 + 10, 16, 200, 120, COLOR_FIREBRICK);
-        gui_rect_round_create(img, 100, 10, 6, 100, gui_rgb(163, 163, 163), PATH111_BIN);
-        gui_rect_round_create(img, 50, 10, 30, 100, gui_rgb(163, 163, 163), PATH111_BIN);
+
+        gui_canvas_round_rect_create(GUI_APP_ROOT_SCREEN, "r_r", 100, 10, 6, 100, 5, gui_rgba(163, 163, 163,
+                                     255));
+
+        gui_canvas_round_rect_create(GUI_APP_ROOT_SCREEN, "r_r", 50, 10, 30, 100, 5, gui_rgba(163, 163, 163,
+                                     255));
     }
 }
 

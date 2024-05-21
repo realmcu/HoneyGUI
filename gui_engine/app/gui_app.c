@@ -33,12 +33,6 @@ gui_app_t *gui_next_app(void)
 {
     return next_app;
 }
-void gui_app_exec(gui_app_t *app)
-{
-    gui_msg_t msg;
-    msg.app = app;
-    GUI_UNUSED(msg);
-}
 
 
 
@@ -74,7 +68,6 @@ void gui_app_startup(gui_app_t *app)
     {
         app->active_ms = 10000;
     }
-    gui_app_exec(app);
     if (app->thread_entry != NULL)
     {
         app->thread_id = gui_thread_create(app->screen.name,
@@ -96,6 +89,7 @@ void gui_app_startup(gui_app_t *app)
     app->screen.w = gui_get_screen_width();
     app->screen.h = gui_get_screen_height();
     app->screen.create_done = true;
+    app->start_ms = gui_ms_get();
 
 
 }

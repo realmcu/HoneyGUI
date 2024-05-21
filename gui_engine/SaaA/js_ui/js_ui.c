@@ -1268,7 +1268,7 @@ void js_ui_timerThread(void *param)
         usleep(time_ms * 1000); // us
 
         pthread_testcancel();
-        // send_msg_to_gui_server(&msg);
+        // gui_send_msg_to_server(&msg);
 
         int res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
         jerry_release_value(res);
@@ -1297,7 +1297,7 @@ void arm_js_timercb(void *p_handle)
     // DBG_DIRECT("js_cb 0x%x\n", js_cb);
 
     gui_msg_t msg = {.type = GUI_EVENT_EXTERN_IO_JS, .u.param = EXTERN_EVENT_TIMER, .cb = js_cb};
-    send_msg_to_gui_server(&msg);
+    gui_send_msg_to_server(&msg);
 }
 #endif
 

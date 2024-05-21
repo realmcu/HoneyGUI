@@ -28,7 +28,7 @@ T_AUDIO_SUPPORT gui_get_audio_support(void)
 
 void gui_update_by_event(gui_event_user_t event, void *data, bool force_update)
 {
-    extern bool send_msg_to_gui_server(gui_msg_t *msg);
+    extern bool gui_send_msg_to_server(gui_msg_t *msg);
     extern bool gui_server_dlps_check(void);
 
     if (force_update)
@@ -36,21 +36,21 @@ void gui_update_by_event(gui_event_user_t event, void *data, bool force_update)
         if (gui_server_dlps_check())
         {
             gui_msg_t p_msg_on;
-            p_msg_on.type = GUI_EVENT_DISPLAY_ON;
-            send_msg_to_gui_server(&p_msg_on);
+            p_msg_on.event = GUI_EVENT_DISPLAY_ON;
+            gui_send_msg_to_server(&p_msg_on);
         }
 
         gui_msg_t p_msg;
-        p_msg.type = event;
-        p_msg.u.payload = data;
-        send_msg_to_gui_server(&p_msg);
+        p_msg.event = event;
+        p_msg.payload = data;
+        gui_send_msg_to_server(&p_msg);
     }
     else
     {
         gui_msg_t p_msg;
-        p_msg.type = event;
-        p_msg.u.payload = data;
-        send_msg_to_gui_server(&p_msg);
+        p_msg.event = event;
+        p_msg.payload = data;
+        gui_send_msg_to_server(&p_msg);
     }
 }
 

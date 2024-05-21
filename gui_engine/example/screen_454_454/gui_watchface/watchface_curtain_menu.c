@@ -4,6 +4,7 @@
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_switch.h"
+#include "gui_canvas_rect.h"
 #include "app_gui_main.h"
 #include "gui_obj.h"
 #include "gui_common.h"
@@ -12,7 +13,6 @@
 #include "app_task.h"
 #endif
 #include "gui_page.h"
-#include "gui_rect.h"
 #include "gui_img_scope.h"
 #include "tp_algo.h"
 #define MODE_SOURCE true
@@ -214,7 +214,7 @@ void design_curtain_menu(void *parent)
     }
 #endif
     gui_curtain_t *c_up  = gui_curtain_create(ct, "curtain_up_menu", 0, 0, 454, 454, CURTAIN_UP, 1.0f);
-    gui_rect_create((void *)c_up, 0, 0, 454, 454, APP_COLOR_WHITE);
+    gui_canvas_rect_create((void *)c_up, "canvas_rect", 0, 0, 454, 454, APP_COLOR_WHITE);
     gui_win_t *win = gui_win_create(c_up, 0, 0, 0, 454, 454);
     win->scope = 1;
 

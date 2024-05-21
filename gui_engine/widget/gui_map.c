@@ -23,9 +23,9 @@
 #include "gui_map.h"
 #include "gui_text.h"
 #include "gui_img_stb.h"
-#include "gui_rect.h"
 #include "tp_algo.h"
 #include "gui_button.h"
+#include "gui_canvas_rect.h"
 #include "gui_app.h"
 #include "gui_api.h"
 /** @defgroup WIDGET WIDGET
@@ -195,9 +195,10 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
                                       (x - startX)*tile_size, (y - startY)*tile_size);
 
 #else
-            gui_rect_create((gui_obj_t *)parent, (x - startX)*tile_size, (y - startY)*tile_size, TILE_SIZE - 1,
-                            TILE_SIZE - 1,
-                            APP_COLOR_SILVER);
+            gui_canvas_rect_create((gui_obj_t *)parent, "canvas_rect", (x - startX)*tile_size,
+                                   (y - startY)*tile_size, TILE_SIZE - 1,
+                                   TILE_SIZE - 1,
+                                   APP_COLOR_SILVER);
 #endif
         }
     }

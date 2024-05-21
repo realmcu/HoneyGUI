@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <pthread.h>
+#include <time.h>
 #include "gui_queue.h"
 #include <unistd.h>
 
@@ -71,6 +72,24 @@ static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t tim
 {
     if (QueueEmpty(&q) == true)
     {
+        pthread_mutex_lock(&port_mutex);
+
+        struct timeval now;
+        struct timespec outtime;
+        mingw_gettimeofday(&now, NULL);
+        outtime.tv_sec = now.tv_sec + timeout;
+        outtime.tv_nsec = now.tv_usec * 1000;
+
+        int rc = pthread_cond_timedwait(&port_cond, &port_mutex, &outtime);
+        if (rc == ETIMEDOUT)
+        {
+            printf("Condition wait timed out.\n");
+        }
+        else if (rc == 0)
+        {
+            printf("Condition was signaled.\n");
+        }
+        pthread_mutex_unlock(&port_mutex);
         return false;
     }
     else

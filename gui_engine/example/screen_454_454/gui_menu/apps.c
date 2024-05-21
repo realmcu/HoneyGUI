@@ -2,12 +2,12 @@
 #include <gui_app.h>
 #include "gui_page.h"
 #include "gui_img.h"
-#include "gui_rect.h"
 #include "gui_obj.h"
 #include "gui_text.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
 #include "gui_return.h"
+#include "gui_canvas_rect.h"
 #include<stdio.h>
 #include<time.h>
 #define APP_HEART_RATE
@@ -55,27 +55,37 @@ extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
-    gui_rect_create((void *)app_win, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0, 100));
+    gui_canvas_rect_create((void *)app_win, "canvas_rect", 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0,
+                           100));
     gui_win_set_animate(app_win, 1000, 0, app_win_cb, app_win);
     gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
     gui_page_center_alignment(page, SCREEN_H);
 
     {
-        gui_img_t *rect = gui_rect_create((void *)page, 0, SCREEN_H, SCREEN_W, SCREEN_H, COLOR_RED);
-        gui_rect_create((void *)rect, 10, 100, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10, 200, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10, 300, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10, 400, SCREEN_W - 10 * 2, 2, COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10, 100, 2, 400 - 100, COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4, 100, 2, 400 - 100,
-                        COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 2, 100, 2, 400 - 100,
-                        COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 3, 100, 2, 400 - 100,
-                        COLOR_SILVER_OPACITY(100));
-        gui_rect_create((void *)rect, 10 + (SCREEN_W - 10 * 2) / 4 * 4, 100, 2, 400 - 100,
-                        COLOR_SILVER_OPACITY(100));
+        gui_img_t *rect = gui_canvas_rect_create((void *)page, "canvas_rect", 0, SCREEN_H, SCREEN_W,
+                                                 SCREEN_H, COLOR_RED);
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 100, SCREEN_W - 10 * 2, 2,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 200, SCREEN_W - 10 * 2, 2,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 300, SCREEN_W - 10 * 2, 2,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 400, SCREEN_W - 10 * 2, 2,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 100, 2, 400 - 100,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + (SCREEN_W - 10 * 2) / 4, 100, 2, 400 - 100,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + (SCREEN_W - 10 * 2) / 4 * 2, 100, 2,
+                               400 - 100,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + (SCREEN_W - 10 * 2) / 4 * 3, 100, 2,
+                               400 - 100,
+                               COLOR_SILVER_OPACITY(100));
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + (SCREEN_W - 10 * 2) / 4 * 4, 100, 2,
+                               400 - 100,
+                               COLOR_SILVER_OPACITY(100));
         {
             char *text = "198";
             int font_size = 16;
@@ -138,17 +148,19 @@ static void app_hr_ui_design(gui_app_t *app)
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
             gui_text_type_set(t, addr1);
         }
-        gui_rect_create((void *)rect, 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
-        gui_rect_create((void *)rect, 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
-        gui_rect_create((void *)rect, 10 + 10 + 200, 280, 5, 400 - 280, COLOR_SILVER);
-        gui_rect_create((void *)rect, 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + 10 + 200, 280, 5, 400 - 280, COLOR_SILVER);
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
     }
     {
-        gui_img_t *rect = gui_rect_create((void *)page, 0, SCREEN_H * 2, SCREEN_W, SCREEN_H, COLOR_CRIMSON);
-        gui_rect_create((void *)rect, 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
+        gui_img_t *rect = gui_canvas_rect_create((void *)page, "canvas_rect", 0, SCREEN_H * 2, SCREEN_W,
+                                                 SCREEN_H, COLOR_CRIMSON);
+        gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
 
     }
-    gui_rect_create((void *)page, 0, SCREEN_H * 3, SCREEN_W, SCREEN_H, COLOR_FIREBRICK);
+    gui_canvas_rect_create((void *)page, "canvas_rect", 0, SCREEN_H * 3, SCREEN_W, SCREEN_H,
+                           COLOR_FIREBRICK);
 
     gui_win_t *win = gui_win_create(app_win, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_img_t *heart_ani = gui_img_create_from_mem(win, HEART_ANI_NAME, HEARTRATE04_BIN,
@@ -281,7 +293,8 @@ static gui_img_t *rect;
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-    rect = gui_rect_create((void *)status_bar, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER_OPACITY(230));
+    rect = gui_canvas_rect_create((void *)status_bar, "canvas_rect", 0, 0, SCREEN_W, SCREEN_H,
+                                  COLOR_SILVER_OPACITY(230));
     GET_BASE(rect)->not_show = 1;
     gui_img_set_opacity(rect, 0);
     gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
@@ -669,9 +682,9 @@ GUI_APP_ENTRY(APP_CARDVIEW)
     gui_curtain_t *ct_middle = gui_curtain_create(ct, 0, 0, 0, 454, 454, CURTAIN_MIDDLE, 1.0f);
 
     gui_curtain_t *ct_down = gui_curtain_create(ct, 0, 0, 0, 454, 454, CURTAIN_DOWN, 1.0f);
-    gui_rect_create(ct_middle, 454 / 2, 454 - 50, 10, 10, COLOR_WHITE);
-    gui_rect_create(ct_middle, 454 / 2, 454 - 30, 10, 10, COLOR_WHITE);
-    gui_rect_create(ct_middle, 454 / 2, 454 - 10, 10, 10, COLOR_WHITE);
+    gui_canvas_rect_create(ct_middle, "canvas_rect", 454 / 2, 454 - 50, 10, 10, COLOR_WHITE);
+    gui_canvas_rect_create(ct_middle, "canvas_rect", 454 / 2, 454 - 30, 10, 10, COLOR_WHITE);
+    gui_canvas_rect_create(ct_middle, "canvas_rect", 454 / 2, 454 - 10, 10, 10, COLOR_WHITE);
     gui_cardview_t *cv = gui_cardview_create(ct_down, "cardview", 0, 0, 0, 0);
     uint32_t *image_array[] =
     {
