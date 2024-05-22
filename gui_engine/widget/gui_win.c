@@ -311,6 +311,10 @@ void gui_win_set_animate(gui_win_t *this,
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
+    if (dur == 0)
+    {
+        animate->dur = 1;
+    }
     animate->callback = (void (*)(void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
