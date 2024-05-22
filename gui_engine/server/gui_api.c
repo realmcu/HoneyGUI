@@ -362,6 +362,14 @@ void gui_lower_mem_debug(void)
 #endif
 }
 
+void gui_sleep_cb(void)
+{
+    if (os_api->gui_sleep_cb != NULL)
+    {
+        os_api->gui_sleep_cb();
+    }
+}
+
 void gui_log(const char *format, ...)
 {
     if (os_api->log == NULL)

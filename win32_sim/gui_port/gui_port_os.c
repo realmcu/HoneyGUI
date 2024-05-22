@@ -80,15 +80,7 @@ static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t tim
         outtime.tv_sec = now.tv_sec + timeout;
         outtime.tv_nsec = now.tv_usec * 1000;
 
-        int rc = pthread_cond_timedwait(&port_cond, &port_mutex, &outtime);
-        if (rc == ETIMEDOUT)
-        {
-            printf("Condition wait timed out.\n");
-        }
-        else if (rc == 0)
-        {
-            printf("Condition was signaled.\n");
-        }
+        pthread_cond_timedwait(&port_cond, &port_mutex, &outtime);
         pthread_mutex_unlock(&port_mutex);
         return false;
     }

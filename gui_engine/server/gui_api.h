@@ -206,6 +206,7 @@ void *gui_lower_malloc(uint32_t n);
 void *gui_lower_realloc(void *ptr_old, uint32_t n);
 void gui_lower_free(void *rmem);
 void gui_lowr_mem_debug(void);
+void gui_sleep_cb(void);
 
 void gui_assert_handler(const char *ex_string, const char *func, uint32_t line);
 

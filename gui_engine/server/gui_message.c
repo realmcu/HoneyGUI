@@ -27,14 +27,6 @@
 
 
 static void *gui_server_mq = NULL;
-static void (*gui_sleep_hook)(void) = NULL;
-
-
-void gui_sleep_sethook(void (*hook)(void))
-{
-    gui_sleep_hook = hook;
-}
-
 
 void gui_server_msg_init(void)
 {
@@ -52,7 +44,7 @@ void gui_recv_msg_to_server(void)
     }
     if ((gui_ms_get() - app->start_ms) > app->active_ms)
     {
-        gui_sleep_hook();
+        gui_sleep_cb();
         if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0x0FFFFFFF))
         {
             gui_server_msg_handler(&msg);
@@ -119,6 +111,11 @@ void gui_server_msg_handler(gui_msg_t *msg)
         {
             app->start_ms = gui_ms_get();
             msg->cb(msg->payload);
+            break;
+        }
+    case GUI_EVENT_RESET_ACTIVE_TIME:
+        {
+            app->start_ms = gui_ms_get();
             break;
         }
     default:

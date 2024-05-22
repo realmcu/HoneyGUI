@@ -254,6 +254,9 @@ struct gui_os_api
     void *(*f_malloc)(uint32_t);
     void *(*f_realloc)(void *ptr, uint32_t);
     void (*f_free)(void *rmem);
+
+    void (*gui_sleep_cb)(void);
+
     void *mem_addr;
     uint32_t mem_size;
 

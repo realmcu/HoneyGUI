@@ -70,11 +70,20 @@ static void gui_server_entry(void *parameter)
             gui_task_ext_execution_hook();
         }
 
-        tp_algo_process(touchpad_get_data());
+        touch_info_t *tp = tp_algo_process(touchpad_get_data());
+        GUI_UNUSED(tp);
 
-        kb_algo_process(kb_get_data());
+        kb_info_t *kb = kb_algo_process(kb_get_data());
+        GUI_UNUSED(kb);
 
-        wheel_algo_process(wheel_get_data());
+        wheel_info_t *wheel = wheel_algo_process(wheel_get_data());
+        GUI_UNUSED(wheel);
+
+        if ((tp->pressing == true) || (kb->pressing == true))
+        {
+            gui_msg_t msg = {.event = GUI_EVENT_RESET_ACTIVE_TIME};
+            gui_send_msg_to_server(&msg);
+        }
 
         if (app->lvgl == true)
         {
