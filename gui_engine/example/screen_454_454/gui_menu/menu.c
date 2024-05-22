@@ -16,6 +16,7 @@
 #include "gui_app.h"
 #include "gui_progressbar.h"
 #include "tp_algo.h"
+#include "gui_canvas_rect.h"
 static void press_callback(gui_win_t *button);
 static void press_animate_cb(gui_win_t *button);
 static void release_callback(gui_win_t *button);
