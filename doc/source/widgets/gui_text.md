@@ -99,6 +99,8 @@ All nine typesetting modes are as follows.
 |`MULTI_RIGHT`|Multiline text. Right align.|Text widget.|
 |`SCROLL_X`|Horizontal scroll single-line text. Right to left.|Only on scroll text widget.|
 |`SCROLL_Y`|Vertical scroll multiline text. Bottom-up.|Only on scroll text widget.|
+|`VERTICAL_LEFT`|Vertical multiline text. To left.|Text widget.|
+|`VERTICAL_RIGHT`|Vertical multiline text. To right.|Text widget.|
 
 ```C
 typedef enum
@@ -111,6 +113,8 @@ typedef enum
     MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
+    VERTICAL_LEFT,
+    VERTICAL_RIGHT,
 } TEXT_MODE;
 ```
 
