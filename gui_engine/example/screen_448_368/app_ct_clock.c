@@ -81,6 +81,12 @@ static void callback_touch_long(void *obj, gui_event_t e)
 
     gui_obj_tree_free(screen);
     gui_win_t *win = gui_win_create(screen, "win", 0, 0, 320, 320);
+#if ENABLE_RTK_GUI_WATCHFACE_UPDATE
+    extern void create_tree_nest(char *xml, void *obj);
+    create_tree_nest("gui_engine\\example\\screen_448_368\\root_image_hongkong\\watch_face_update\\app\\wf\\wf.xml",
+                     win);
+    return;
+#endif
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback_time, GUI_EVENT_TOUCH_CLICKED, NULL);
 
     tablist_tab = gui_tabview_create(win, "tabview", 59, 84, 250, 300);

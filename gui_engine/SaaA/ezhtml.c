@@ -19,6 +19,7 @@
 #include "gui_grid.h"
 #include "gui_scroll_text.h"
 #include "gui_switch.h"
+#include "gui_tab.h"
 #include "string.h"
 #include "stdio.h"
 #include <stdlib.h>
@@ -357,7 +358,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 {
                                     font_type2 = GUI_FONT_SRC_BMP;
                                     void *addr1 = gui_get_file_address(font_type);
-                                    gui_font_mem_init(addr1);
+                                    //gui_font_mem_init(addr1);
                                     t->font_height = fontSize;
                                     t->path = 0;
                                     t->font_type = GUI_FONT_SRC_BMP;
@@ -663,7 +664,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
-                    gui_tabview_loop((void *)parent, false);
+                    gui_tabview_loop_x((void *)parent, false);
                 }
                 break;
             case ARC:
@@ -714,15 +715,15 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "butt"))
                             {
-                                cap = CAP_BUTT;
+                                cap = NVG_BUTT;
                             }
                             else if (!strcmp(p->attr[i], "round"))
                             {
-                                cap = CAP_ROUND;
+                                cap = NVG_ROUND;
                             }
                             else if (!strcmp(p->attr[i], "square"))
                             {
-                                cap = CAP_SQUARE;
+                                cap = NVG_SQUARE;
                             }
 
 
