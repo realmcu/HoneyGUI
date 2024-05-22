@@ -57,13 +57,6 @@ struct gui_switch
     void *off_hl_pic_addr;
     void *long_touch_state_pic_addr;
     void *long_touch_state_hl_pic_addr;
-    bool ifon;
-    bool long_touch_state;
-    bool long_touch_enable;
-    bool press_flag;
-    bool long_flag;
-    bool release_flag;
-    bool touch_disable;
     void (*turn_off)(gui_switch_t *sw);
     void (*turn_on)(gui_switch_t *sw);
     void (*switch_on)(gui_switch_t *this, void *cb, void *p);
@@ -71,6 +64,14 @@ struct gui_switch
     void (*ctor)(gui_switch_t *this, gui_obj_t *parent, int16_t x,
                  int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
     IMG_SOURCE_MODE_TYPE src_mode;
+    uint32_t ifon : 1;
+    uint32_t long_touch_state : 1;
+    uint32_t long_touch_enable : 1;
+    uint32_t press_flag : 1;
+    uint32_t long_flag : 1;
+    uint32_t release_flag : 1;
+    uint32_t touch_disable : 1;
+    uint32_t checksum : 8;
 };
 
 

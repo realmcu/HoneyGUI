@@ -214,17 +214,28 @@ void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
 
 static void gui_switch_prepare(gui_obj_t *obj)
 {
+    gui_switch_t *this = (gui_switch_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
-    gui_switch_t *sw;
-    gui_switch_t *b;
-    gui_obj_t *parent;
+    uint8_t last = this->checksum;
+
+    if (obj->not_show)
+    {
+        last = this->checksum;
+        this->checksum = 0;
+        this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+
+        if (last != this->checksum)
+        {
+            gui_fb_change();
+        }
+        return;
+    }
 
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
         if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
         {
-            b = (void *)obj;
             switch (tp->type)
             {
             case TOUCH_SHORT:
@@ -259,26 +270,26 @@ static void gui_switch_prepare(gui_obj_t *obj)
 
             case TOUCH_LONG:
                 {
-                    if (b->long_flag == false)
+                    if (this->long_flag == false)
                     {
                         if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                         {
-                            b->long_flag = true;
-                            if (b->long_touch_enable)
+                            this->long_flag = true;
+                            if (this->long_touch_enable)
                             {
-                                gui_log("TOUCH_LONG b->long_touch_state = %d\n", b->long_touch_state);
+                                gui_log("TOUCH_LONG b->long_touch_state = %d\n", this->long_touch_state);
 
-                                b->long_touch_state = !b->long_touch_state;
+                                this->long_touch_state = !this->long_touch_state;
                                 gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
-                                gui_switch_hl_back(b);
+                                gui_switch_hl_back(this);
 
-                                if (b->long_touch_state)
+                                if (this->long_touch_state)
                                 {
-                                    gui_switch_long_touch(b);
+                                    gui_switch_long_touch(this);
                                 }
                                 else
                                 {
-                                    gui_switch_long_touch_back(b);
+                                    gui_switch_long_touch_back(this);
                                 }
                             }
                         }
@@ -289,67 +300,59 @@ static void gui_switch_prepare(gui_obj_t *obj)
             default:
                 break;
             }
-
             if (tp->pressed)
             {
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    gui_log("pressed\n");
+                    //gui_log("pressed type 0x%x\n", tp->type);
                     gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
 
-                    b->long_flag = false;
-                    b->press_flag = true;
+                    this->long_flag = false;
+                    this->press_flag = true;
 
-                    if (!b->long_touch_state)
+                    if (!this->long_touch_state)
                     {
-                        gui_switch_hl(b);
+                        gui_switch_hl(this);
                     }
                     else
                     {
-                        gui_switch_hl_long_touch(b);
+                        gui_switch_hl_long_touch(this);
                     }
                 }
             }
 
-            // for case: grid->switch. avoid pic switch stuck
-            parent = b->base.parent;
-            if (!strcmp(parent->name, "grid") || (parent->type == PAGELIST))
+            //pic can change back if slide happens on pic
+            if (tp->pressing)
             {
-                if ((b->press_flag == true) && ((tp->type == TOUCH_HOLD_Y) || (tp->type == TOUCH_ORIGIN_FROM_Y)))
+                if (tp->deltaX != 0 || tp->deltaY != 0 || tp->type == TOUCH_HOLD_X ||
+                    tp->type == TOUCH_HOLD_Y)
                 {
-                    gui_log("pressed TOUCH_HOLD_Y\n");
-                    if (!b->long_touch_state)
-                    {
-                        gui_switch_hl_back(b);
-                    }
+                    gui_switch_hl_back(this);
                 }
             }
 
-            if (b->release_flag)
+            if (this->release_flag)
             {
                 if ((tp->type != TOUCH_HOLD_Y) && (tp->type != TOUCH_ORIGIN_FROM_Y))
                 {
-                    if (b->long_touch_state)
+                    if (this->long_touch_state)
                     {
-                        gui_switch_long_touch(b);
+                        gui_switch_long_touch(this);
                     }
-                    else if ((!b->long_touch_state && !b->long_flag) || (!b->long_touch_enable))
+                    else if ((!this->long_touch_state && !this->long_flag) || (!this->long_touch_enable))
                     {
                         if (((tp->deltaX == 0) && (tp->deltaY == 0)) &&
                             (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true))
                         {
-                            sw = (gui_switch_t *)obj;
-                            sw->ifon = !(sw->ifon);
-                            gui_switch_change_switch(sw);
+                            this->ifon = !(this->ifon);
+                            gui_switch_change_switch(this);
 
-                            if (sw->ifon)
+                            if (this->ifon)
                             {
-
                                 gui_obj_event_set(obj, GUI_EVENT_1);
                             }
-                            else if (!sw->ifon)
+                            else if (!this->ifon)
                             {
-
                                 gui_obj_event_set(obj, GUI_EVENT_2);
                             }
 
@@ -358,21 +361,28 @@ static void gui_switch_prepare(gui_obj_t *obj)
                     }
                 }
 
-                b->press_flag = false;
-                b->release_flag = false;
-                b->long_flag = false;
+                this->press_flag = false;
+                this->release_flag = false;
+                this->long_flag = false;
             }
 
-            if (tp->released && b->press_flag)
+            if (tp->released && this->press_flag)
             {
-                b->release_flag = true;
+                this->release_flag = true;
             }
 
-            if (b->touch_disable)
+            if (this->touch_disable)
             {
                 gui_obj_event_set(obj, (gui_event_t)0);
             }
         }
+    }
+    this->checksum = 0;
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+
+    if (last != this->checksum)
+    {
+        gui_fb_change();
     }
 }
 
