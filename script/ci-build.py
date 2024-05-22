@@ -47,7 +47,12 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     #win32_sim scons
     os.chdir('./win32_sim')
     try:
-        subprocess.check_call(["scons.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
+        result_lines = subprocess.check_output(["scons.exe"], universal_newlines=True, stderr=subprocess.STDOUT)
+        print("./win32_sim > scons.exe\r\n{}".format(result_lines))
+        if 'warning:' in result_lines:
+            os.chdir('./..')
+            print("win32_sim: 'scons' fail: has warning")
+            return False
     except Exception as e:
         os.chdir('./..')
         print("win32_sim: 'scons' fail: {}".format(e))
@@ -60,7 +65,12 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
     try:
-        subprocess.check_call(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+        result_lines = subprocess.check_output(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
+        print("./keil_sim > scons.exe\r\n{}".format(result_lines))
+        if 'warning:' in result_lines:
+            os.chdir('./..')
+            print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: has warning")
+            return False
     except Exception as e:
         os.chdir('./..')
         print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: {}".format(e))
