@@ -26,22 +26,10 @@ static bool GUI_SERVER_ALLOW_DLPS = false;
 
 
 
+
 bool gui_server_dlps_check(void)
 {
     return GUI_SERVER_ALLOW_DLPS;
 }
 
-
-void gui_pm_judge_active(gui_app_t *app)
-{
-    if ((gui_ms_get() - app->start_ms) < app->active_ms)
-    {
-        gui_msg_t msg = {.event = GUI_EVENT_SERVER_ACTIVE};
-        gui_send_msg_to_server(&msg);
-    }
-    else
-    {
-        gui_log("!!!gui app out of active time!!!");
-    }
-}
 

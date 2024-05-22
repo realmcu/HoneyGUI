@@ -27,6 +27,13 @@
 
 
 static void *gui_server_mq = NULL;
+static void (*gui_sleep_hook)(void) = NULL;
+
+
+void gui_sleep_sethook(void (*hook)(void))
+{
+    gui_sleep_hook = hook;
+}
 
 
 void gui_server_msg_init(void)
@@ -37,10 +44,22 @@ void gui_server_msg_init(void)
 void gui_recv_msg_to_server(void)
 {
     gui_msg_t msg;
-    if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0xFFFFFFFF))
+    gui_app_t *app = gui_current_app();
+
+    while (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0))
     {
         gui_server_msg_handler(&msg);
     }
+    if ((gui_ms_get() - app->start_ms) > app->active_ms)
+    {
+        gui_sleep_hook();
+        if (true == gui_mq_recv(gui_server_mq, &msg, sizeof(gui_msg_t), 0x0FFFFFFF))
+        {
+            gui_server_msg_handler(&msg);
+        }
+    }
+
+
 }
 bool gui_send_msg_to_server(gui_msg_t *msg)
 {
@@ -79,6 +98,7 @@ void gui_server_msg_handler(gui_msg_t *msg)
         }
     case GUI_EVENT_DISPLAY_OFF:
         {
+            //also need clear all message
             break;
         }
     case GUI_EVENT_FREE_ALL:
@@ -97,6 +117,7 @@ void gui_server_msg_handler(gui_msg_t *msg)
         }
     case GUI_EVENT_USER_DEFINE:
         {
+            app->start_ms = gui_ms_get();
             msg->cb(msg->payload);
             break;
         }

@@ -63,8 +63,8 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_page_center_alignment(page, SCREEN_H);
 
     {
-        gui_img_t *rect = gui_canvas_rect_create((void *)page, "canvas_rect", 0, SCREEN_H, SCREEN_W,
-                                                 SCREEN_H, COLOR_RED);
+        gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)page, "canvas_rect", 0, SCREEN_H, SCREEN_W,
+                                                         SCREEN_H, COLOR_RED);
         gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 100, SCREEN_W - 10 * 2, 2,
                                COLOR_SILVER_OPACITY(100));
         gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 200, SCREEN_W - 10 * 2, 2,
@@ -154,8 +154,9 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + 10 + 280, 275, 5, 400 - 275, COLOR_SILVER);
     }
     {
-        gui_img_t *rect = gui_canvas_rect_create((void *)page, "canvas_rect", 0, SCREEN_H * 2, SCREEN_W,
-                                                 SCREEN_H, COLOR_CRIMSON);
+        gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)page, "canvas_rect", 0, SCREEN_H * 2,
+                                                         SCREEN_W,
+                                                         SCREEN_H, COLOR_CRIMSON);
         gui_canvas_rect_create((void *)rect, "canvas_rect", 10, 100, SCREEN_W - 10 * 2, 1, COLOR_SILVER);
 
     }
@@ -289,7 +290,7 @@ static void win_cb(gui_win_t *win)
 #define STATUS_BAR_TIME_TEXT "STATUS_BAR_TIME_TEXT"
 #define STATUS_BAR_DATE_TEXT "STATUS_BAR_DATE_TEXT"
 #define STATUS_BAR_WINDOW "STATUS_BAR_WINDOW"
-static gui_img_t *rect;
+static gui_canvas_rect_t *rect;
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -682,9 +683,12 @@ GUI_APP_ENTRY(APP_CARDVIEW)
     gui_curtain_t *ct_middle = gui_curtain_create(ct, 0, 0, 0, 454, 454, CURTAIN_MIDDLE, 1.0f);
 
     gui_curtain_t *ct_down = gui_curtain_create(ct, 0, 0, 0, 454, 454, CURTAIN_DOWN, 1.0f);
-    gui_canvas_rect_create(ct_middle, "canvas_rect", 454 / 2, 454 - 50, 10, 10, COLOR_WHITE);
-    gui_canvas_rect_create(ct_middle, "canvas_rect", 454 / 2, 454 - 30, 10, 10, COLOR_WHITE);
-    gui_canvas_rect_create(ct_middle, "canvas_rect", 454 / 2, 454 - 10, 10, 10, COLOR_WHITE);
+    gui_canvas_rect_create((gui_obj_t *)ct_middle, "canvas_rect", 454 / 2, 454 - 50, 10, 10,
+                           COLOR_WHITE);
+    gui_canvas_rect_create((gui_obj_t *)ct_middle, "canvas_rect", 454 / 2, 454 - 30, 10, 10,
+                           COLOR_WHITE);
+    gui_canvas_rect_create((gui_obj_t *)ct_middle, "canvas_rect", 454 / 2, 454 - 10, 10, 10,
+                           COLOR_WHITE);
     gui_cardview_t *cv = gui_cardview_create(ct_down, "cardview", 0, 0, 0, 0);
     uint32_t *image_array[] =
     {

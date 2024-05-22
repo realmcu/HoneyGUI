@@ -22,7 +22,6 @@ void gui_server_msg_handler(gui_msg_t *msg);
 void gui_server_msg_init(void);
 bool gui_send_msg_to_server(gui_msg_t *msg);
 void gui_recv_msg_to_server(void);
-void gui_pm_judge_active(gui_app_t *app);
 
 #ifdef __cplusplus
 }

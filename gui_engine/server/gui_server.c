@@ -153,8 +153,6 @@ static void gui_server_entry(void *parameter)
 #ifdef _WIN32
         gui_thread_mdelay(17);
 #endif
-
-        gui_pm_judge_active(app);
         gui_recv_msg_to_server();
     }
 }

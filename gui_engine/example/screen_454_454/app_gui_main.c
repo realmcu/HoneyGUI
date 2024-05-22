@@ -53,7 +53,7 @@ static gui_app_t app_watch_ui =
     },
     .ui_design = design_app_watch_ui,
     .thread_entry = NULL,
-    .active_ms = 60000,
+    .active_ms = 10000,
 };
 
 gui_app_t *get_app_watch_ui(void)
