@@ -523,8 +523,8 @@ static void gui_img_ctor(gui_img_t            *this,
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
 
-    obj->w = _UI_MIN(gui_img_get_width(this), obj->w);
-    obj->h = _UI_MIN(gui_img_get_height(this), obj->h);
+    obj->w = gui_img_get_width(this);
+    obj->h = gui_img_get_height(this);
 
     gui_rgb_data_head_t head = gui_img_get_header(this);
     if (head.resize == 0)
