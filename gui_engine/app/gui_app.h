@@ -163,11 +163,8 @@ void gui_app_startup(gui_app_t *app);
 
 void gui_app_shutdown(gui_app_t *app);
 
-void gui_app_uninstall(gui_app_t *app);
-
 gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_entry);
 
-void gui_app_delete(gui_app_t *app);
 /**
  * @brief switch app from A to B
  *
