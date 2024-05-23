@@ -310,13 +310,27 @@ void gui_free(void *rmem)
 #endif
 }
 
+static uint32_t total_used_size = 0;
+static void gui_walker(void *ptr, size_t size, int used, void *user)
+{
+    if (used)
+    {
+        total_used_size = total_used_size + size;
+    }
+
+    gui_log("\t%p %s size: %x; total = %d\n", ptr, used ? "used" : "free", (unsigned int)size,
+            total_used_size);
+}
+
 void gui_mem_debug(void)
 {
+    total_used_size = 0;
 #ifdef ENABLE_RTK_GUI_OS_HEAP
     gui_log("can't use thie func");
 #else
-    tlsf_walk_pool(tlsf_get_pool(tlsf), NULL, NULL);
+    tlsf_walk_pool(tlsf_get_pool(tlsf), gui_walker, &total_used_size);
 #endif
+    total_used_size = 0;
 }
 
 
