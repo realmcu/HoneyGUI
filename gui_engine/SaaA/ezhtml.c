@@ -1881,7 +1881,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             font_type2 = GUI_FONT_SRC_BMP;
                             void *addr1 = gui_get_file_address(font_type);
-                            gui_font_mem_init(addr1);
+                            //gui_font_mem_init(addr1);
                             GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
                             GUI_TYPE(gui_button_t, parent)->text->path = 0;
                             gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1);

@@ -1,7 +1,8 @@
 #include "js_user.h"
-#include "app_msg.h"
+
 
 #if (defined RTL87x2G)||(defined RTL8762D)
+#include "app_msg.h"
 T_IO_MSG cmd_msg = {.type = IO_MSG_TYPE_UART, .subtype = 0x0d};
 #endif
 

@@ -1235,7 +1235,7 @@ void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
     jerry_value_t js_cb = NULL;
     jerry_value_t res = 0;
 
-    memcpy(&(msg.u.param), js_msg, sizeof(gui_msg_js_t));
+    memcpy(&(msg.payload), js_msg, sizeof(gui_msg_js_t));
     js_cb = (jerry_value_t)msg.cb;
     // gui_log("timer msg cb 0x%x\n", js_cb);
 
@@ -1259,7 +1259,7 @@ void js_ui_timerThread(void *param)
     JS_TIMER_T *js_timer = (JS_TIMER_T *)param;
     const jerry_value_t js_cb = js_timer->js_cb;
     uint32_t time_ms = js_timer->time_ms;
-    gui_msg_t msg = {.type = GUI_EVENT_EXTERN_IO_JS, .u.param = EXTERN_EVENT_TIMER, .cb = js_cb};
+    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS, .payload = EXTERN_EVENT_TIMER, .cb = js_cb};
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
@@ -1584,7 +1584,7 @@ void js_run_file_on_server(const char *file, gui_app_t *app)
     {
         gui_msg_t msg;
         memset(&msg, 0, sizeof(gui_msg_t));
-        msg.u.payload = (void *)file;
+        msg.payload = (void *)file;
         msg.cb = app;
     }
 }

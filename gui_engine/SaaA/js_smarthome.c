@@ -19,10 +19,10 @@ DECLARE_HANDLER(test)
 {
     gui_log("enter test \n");
 
-    gui_msg_t msg = {.type = GUI_EVENT_EXTERN_IO_JS};
+    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS};
     uint8_t data[] = {0x01, 0x01, 0x05, 0x01};
 
-    memcpy(&(msg.u.param), data, sizeof(data));
+    memcpy(&(msg.payload), data, sizeof(data));
     gui_extern_event_js_handler(&msg);
 
     return jerry_create_undefined();
