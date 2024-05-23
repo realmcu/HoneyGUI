@@ -134,20 +134,3 @@ static int watch_app_init(void)
 }
 
 GUI_INIT_APP_EXPORT(watch_app_init);
-
-#include "shell.h"
-
-void debug_hook(void)
-{
-    gui_obj_tree_free(&app_watch_ui.screen);
-    gui_mem_debug();
-}
-void dump_mem_status(void)
-{
-    gui_msg_t msg = {.event = GUI_EVENT_FREE_ALL};
-    gui_send_msg_to_server(&msg);
-}
-SHELL_EXPORT_CMD(
-    SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC) | SHELL_CMD_DISABLE_RETURN,
-    mem_status, dump_mem_status, status);
-

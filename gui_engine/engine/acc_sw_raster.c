@@ -303,6 +303,20 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 
         memcpy(pixel, &(node->pixel16), sizeof(node->pixel16));
     }
+    else if (input_type == ARGB8565)
+    {
+        imdc_argb8565_node_t *node = NULL;
+        do
+        {
+            node = (imdc_argb8565_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_argb8565_node_t);
+        }
+        while (location < x);
+
+        memcpy(pixel, &(node->pixel), sizeof(node->pixel));
+        pixel[2] = node->alpha;
+    }
     else if (input_type == RGB888)
     {
         imdc_rgb888_node_t *node = NULL;

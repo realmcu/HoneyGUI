@@ -42,6 +42,7 @@ void gui_recv_msg_to_server(void)
     {
         gui_server_msg_handler(&msg);
     }
+#ifndef _WIN32
     if ((gui_ms_get() - app->start_ms) > app->active_ms)
     {
         gui_sleep_cb();
@@ -50,6 +51,7 @@ void gui_recv_msg_to_server(void)
             gui_server_msg_handler(&msg);
         }
     }
+#endif
 
 
 }
@@ -103,7 +105,6 @@ void gui_server_msg_handler(gui_msg_t *msg)
         {
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
             gui_extern_event_js_handler(msg);
-            event_handle = false;
 #endif
             break;
         }

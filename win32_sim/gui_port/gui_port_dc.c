@@ -30,44 +30,22 @@
 #define DRV_LCD_HIGHT   454
 #endif
 
-#define DRV_PIXEL_BITS  32
-#define LCD_SECTION_HEIGHT 20
-#define USE_DC_PFB
-#ifdef USE_DC_PFB
-#undef DRV_PIXEL_BITS
-#define DRV_PIXEL_BITS  16
-#endif
-
-// #define USE_DC_800_480
-#ifdef USE_DC_800_480
+#ifdef ENABLE_RTK_GUI_800_480_DEMO
 #define DRV_LCD_WIDTH   800
 #define DRV_LCD_HIGHT   480
 #endif
 
-#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-
-// default demo 480_480
-#define ENABLE_RTK_GUI_480_480_DEMO
-// #define ENABLE_RTK_GUI_480_320_DEMO
-// #define ENABLE_RTK_GUI_320_240_DEMO
+#define DRV_PIXEL_BITS  32
 
 
-#ifdef ENABLE_RTK_GUI_480_480_DEMO
-#define DRV_LCD_WIDTH   480
-#define DRV_LCD_HIGHT   480
+// #define USE_DC_PFB
+
+#ifdef USE_DC_PFB
+#define LCD_SECTION_HEIGHT 20
+#undef DRV_PIXEL_BITS
+#define DRV_PIXEL_BITS  16
 #endif
 
-#ifdef ENABLE_RTK_GUI_480_320_DEMO
-#define DRV_LCD_WIDTH   480
-#define DRV_LCD_HIGHT   320
-#endif
-
-#ifdef ENABLE_RTK_GUI_320_240_DEMO
-#define DRV_LCD_WIDTH   320
-#define DRV_LCD_HIGHT   240
-#endif
-
-#endif
 
 
 
@@ -150,11 +128,12 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
 }
 
 static uint8_t sim_framebuffer[1080 * 1080 * DRV_PIXEL_BITS / 8] = {0};
+#ifdef USE_DC_PFB
 static uint8_t __attribute__((aligned(4))) disp_write_buff1_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
                                                                                * DRV_PIXEL_BITS / 8];
 static uint8_t __attribute__((aligned(4))) disp_write_buff2_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
                                                                                * DRV_PIXEL_BITS / 8];
-
+#endif
 static struct gui_dispdev dc =
 {
 #ifdef USE_DC_PFB
