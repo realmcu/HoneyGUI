@@ -368,6 +368,40 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             }
             break;
         }
+    case SCROLL_Y_REVERSE:
+        {
+            uint32_t line = 0;
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                if (i == 0)
+                {
+                    chr[i].x = rect->x1;
+                }
+                else
+                {
+                    chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
+                }
+                if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
+                {
+                    line++;
+                    chr[i].x = rect->x1;
+                }
+                chr[i].y = rect->y1 - line * chr[i].h - chr[i].char_h;
+                if (text->char_line_sum != 0)
+                {
+                    if (chr[i].y <= rect->yboundtop)
+                    {
+                        text->font_len = i;
+                        break;
+                    }
+                }
+            }
+            if (text->char_line_sum == 0)
+            {
+                text->char_line_sum = line;
+            }
+            break;
+        }
     case VERTICAL_LEFT:
         {
             uint32_t line = 0;

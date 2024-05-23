@@ -56,6 +56,7 @@ typedef enum
     MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
+    SCROLL_Y_REVERSE,
     VERTICAL_LEFT,
     VERTICAL_RIGHT,
 } TEXT_MODE;
