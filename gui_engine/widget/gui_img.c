@@ -337,7 +337,10 @@ static void gui_img_prepare(gui_obj_t *obj)
             {
                 obj->not_show = 1;
             }
-
+            if (ay > img_y + img_h * this->scale_y)
+            {
+                obj->not_show = 1;
+            }
         }
     }
 

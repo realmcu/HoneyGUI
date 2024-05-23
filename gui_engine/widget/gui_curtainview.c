@@ -536,10 +536,11 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
             {
                 this->release_y = 0;
                 this->middle_flag = 0;
-                this->cur_curtain = CURTAIN_DOWN;
+
 
                 if (c_down)
                 {
+                    this->cur_curtain = CURTAIN_DOWN;
                     GET_BASE(c_down)->not_show = false;
                 }
             }
@@ -567,10 +568,11 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
             {
                 this->release_y = 0;
                 this->middle_flag_up = 0;
-                this->cur_curtain = CURTAIN_UP;
+
 
                 if (c_up)
                 {
+                    this->cur_curtain = CURTAIN_UP;
                     GET_BASE(c_up)->not_show = false;
                 }
             }
@@ -659,10 +661,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
         {
             this->release_x = 0;
             this->middle_flag_left = 0;
-            this->cur_curtain = CURTAIN_LEFT;
 
             if (c_left)
             {
+                this->cur_curtain = CURTAIN_LEFT;
                 GET_BASE(c_left)->not_show = false;
             }
         }
