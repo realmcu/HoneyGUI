@@ -158,6 +158,10 @@ static void gui_win_prepare(gui_obj_t *obj)
 
     if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
+        if (tp->pressing)
+        {
+            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSING);
+        }
         switch (tp->type)
         {
         case TOUCH_SHORT:
@@ -192,8 +196,11 @@ static void gui_win_prepare(gui_obj_t *obj)
 
         case TOUCH_LONG:
             {
-                this->long_flag = true;
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                if (this->long_flag == false)
+                {
+                    this->long_flag = true;
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                }
             }
             break;
 
@@ -206,10 +213,6 @@ static void gui_win_prepare(gui_obj_t *obj)
             gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
             this->long_flag = false;
             this->press_flag = true;
-        }
-        if (tp->pressing)
-        {
-            gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSING);
         }
     }
 
