@@ -400,7 +400,8 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
         break;
     }
 
-    uint32_t size = buf_width * buf_height * font_img_pixel_bytes + sizeof(struct gui_rgb_data_head);
+    uint32_t size = buf_width * buf_height * (uint32_t)font_img_pixel_bytes + sizeof(
+                        struct gui_rgb_data_head);
     void *img_buf = FONT_MALLOC_PSRAM(size);
     memset(img_buf, 0x00, size);
 
