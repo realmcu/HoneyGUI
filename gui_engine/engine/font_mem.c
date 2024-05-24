@@ -76,6 +76,7 @@ void gui_font_get_dot_info(gui_text_t *text)
         break;
     }
     int32_t all_char_w = 0;
+    int32_t all_char_h = 0;
     uint32_t line_flag = 0;
     int32_t line_byte = 0;
 
@@ -115,6 +116,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[i].w = line_byte * 8 / rendor_mode;
                 }
                 all_char_w += chr[i].char_w;
+                all_char_h += chr[i].char_h;
             }
             break;
         case 1: //offset
@@ -164,6 +166,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
                 }
                 all_char_w += chr[i].char_w;
+                all_char_h += chr[i].char_h;
             }
             break;
         case 1: //offset
@@ -202,6 +205,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         }
                     }
                     all_char_w += chr[i].char_w;
+                    all_char_h += chr[i].char_h;
                 }
             }
             break;
@@ -210,6 +214,7 @@ void gui_font_get_dot_info(gui_text_t *text)
         }
     }
     text->char_width_sum = all_char_w;
+    text->char_height_sum = all_char_h;
     text->char_line_sum = line_flag;
     text->font_len = unicode_len;
     switch (text->charset)
@@ -376,17 +381,18 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 if (i == 0)
                 {
                     chr[i].x = rect->x1;
+                    chr[i].y = rect->y1 - chr[i].h;
                 }
                 else
                 {
                     chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
+                    chr[i].y = chr[i - 1].y - chr[i].char_h - 2;
                 }
                 if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
                 {
                     line++;
                     chr[i].x = rect->x1;
                 }
-                chr[i].y = rect->y1 - line * chr[i].h - chr[i].char_h;
                 if (text->char_line_sum != 0)
                 {
                     if (chr[i].y <= rect->yboundtop)

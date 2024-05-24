@@ -86,6 +86,7 @@ typedef struct gui_text
     uint16_t len;
     uint16_t font_len;
     int16_t char_width_sum;
+    int16_t char_height_sum;
     int16_t char_line_sum;
     TEXT_MODE mode;
     TEXT_CHARSET charset;

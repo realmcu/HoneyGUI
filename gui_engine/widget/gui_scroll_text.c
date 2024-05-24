@@ -338,7 +338,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     }
     else if (text->base.mode == SCROLL_Y_REVERSE)
     {
-        offset = text->base.char_line_sum * text->base.font_height;
+        offset = text->base.char_height_sum;
         if (offset > obj->h || offset == 0)
         {
             index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
