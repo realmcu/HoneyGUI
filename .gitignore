@@ -55,8 +55,9 @@ Mkfile.old
 dkms.conf
 *.pyc
 .gitignore
-lvgl_vs_sim/cconfig.h
-lvgl_vs_sim/gui.bin
+keil_sim/RTE/*
+keil_sim/build/*
+keil_sim/gui_engine.uvguix.*
 gui_engine/rtk_gui_sim/cconfig.h
 *.dblite
 
