@@ -14,9 +14,6 @@
 #include <gui_fb.h>
 #include <gui_server.h>
 #include <gui_obj.h>
-#include <tp_algo.h>
-#include <kb_algo.h>
-#include <wheel_algo.h>
 #include <string.h>
 #include <gui_app.h>
 

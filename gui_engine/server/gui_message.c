@@ -14,12 +14,8 @@
 #include <gui_fb.h>
 #include <gui_server.h>
 #include <gui_obj.h>
-#include <tp_algo.h>
-#include <kb_algo.h>
-#include <wheel_algo.h>
 #include <string.h>
 #include <gui_app.h>
-#include "gui_win.h"
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
 #include "js_extern_io.h"
 #endif

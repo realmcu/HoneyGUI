@@ -19,7 +19,6 @@
  *============================================================================*/
 #include <string.h>
 #include "guidef.h"
-#include "tp_algo.h"
 #include "gui_obj.h"
 #include "gui_server.h"
 #include "gui_img.h"

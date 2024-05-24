@@ -153,6 +153,7 @@ typedef struct gui_dispdev
     uint16_t screen_height;
     uint16_t fb_width;
     uint16_t fb_height;
+    uint16_t bit_depth;
     uint16_t driver_ic_fps;
     uint16_t driver_ic_hfp;
     uint16_t driver_ic_hbp;
@@ -168,7 +169,6 @@ typedef struct gui_dispdev
     float scale_y;
     gui_rect_t section;
     uint32_t section_count;
-    uint8_t bit_depth;
     void (*lcd_update)(struct gui_dispdev *dc);
     void (*virtual_lcd_update)(struct gui_dispdev *dc);
     int (*flash_seq_trans_enable)(void);

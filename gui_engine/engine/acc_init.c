@@ -38,8 +38,8 @@ static void gui_load_imgfile_align(draw_img_t *draw_img, uint8_t *data,
                                    uint8_t source_bytes_per_pixel)
 {
     const char *path = draw_img->data;
-    uint32_t gpu_width = ((draw_img->img_w + 15) >> 4) << 4;
-    uint32_t gpu_height = draw_img->img_h;
+    uint16_t gpu_width = ((draw_img->img_w + 15) >> 4) << 4;
+    uint16_t gpu_height = draw_img->img_h;
 
     int fd = gui_fs_open(path,  0);
     if (fd <= 0)
@@ -51,7 +51,7 @@ static void gui_load_imgfile_align(draw_img_t *draw_img, uint8_t *data,
 
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)data;
-    for (uint32_t i = 0; i < gpu_height; i++)
+    for (uint16_t i = 0; i < gpu_height; i++)
     {
         gui_fs_lseek(fd, sizeof(struct gui_rgb_data_head) + i * draw_img->img_w * source_bytes_per_pixel,
                      SEEK_SET);

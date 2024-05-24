@@ -25,6 +25,7 @@ static bool fb_change = false;
 
 static bool obj_is_active(gui_obj_t *obj)
 {
+    GUI_ASSERT(obj != NULL);
     float m00 = obj->matrix->m[0][0];
     float m01 = obj->matrix->m[0][1];
     float m02 = obj->matrix->m[0][2];
@@ -292,7 +293,7 @@ static void gui_fb_draw(gui_obj_t *root)
             }
             if (dc->frame_buf)
             {
-                memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
+                memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
             }
             dc->section_count = i;
 
@@ -318,7 +319,7 @@ static void gui_fb_draw(gui_obj_t *root)
     }
     else if (dc->type == DC_SINGLE)
     {
-        memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
+        memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
 
         obj_draw_scan(root);
         if (dc->lcd_draw_sync != NULL)
