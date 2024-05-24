@@ -115,6 +115,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
             source_bytes_per_pixel = 3;
             break;
         case RGBA8888:
+        case XRGB8888:
             source_bytes_per_pixel = 4;
             break;
         default:
