@@ -338,7 +338,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>ENABLE_RTK_GUI_FONT_RTK_MEM ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI GUI_KEIL_SIM ENABLE_RTK_GUI_DEMO</Define>
+              <Define>ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI ENABLE_RTK_GUI_FONT_RTK_MEM GUI_KEIL_SIM</Define>
               <Undefine></Undefine>
               <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;..\gui_engine;..\gui_engine\3rd\ezXML;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\3rd\tjpgd;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\example\demo;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget</IncludePath>
             </VariousControls>
@@ -768,6 +768,11 @@
               <FileName>gui_img_stb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_img_stb.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_keyboard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_keyboard.c</FilePath>
             </File>
             <File>
               <FileName>gui_map.c</FileName>

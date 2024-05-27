@@ -65,6 +65,22 @@ DECLARE_HANDLER(write)
     }
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(setInputable)
+{
+    if (args_cnt != 1 || !jerry_value_is_boolean(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_text_t *txtbox = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
+    if (txtbox)
+    {
+        bool enable = jerry_get_boolean_value(args[0]);
+        gui_text_input_set(txtbox, enable);
+        // jerry_release_value(enable);
+    }
+    return jerry_create_undefined();
+}
 DECLARE_HANDLER(setPosition)
 {
     if (args_cnt != 1 || !jerry_value_is_object(args[0]))
@@ -1525,8 +1541,8 @@ void js_gui_init()
     REGISTER_METHOD(document, setPosition);
     REGISTER_METHOD_NAME(document, "playAnimate", play_animate_text);
     REGISTER_METHOD_NAME(document, "setAnimate", setAnimate_text);
-
     REGISTER_METHOD_NAME(document, "pauseAnimate", pause_animate_text);
+    REGISTER_METHOD_NAME(document, "setInputable", setInputable);
 
     jerry_value_t app = jerry_create_object();
     js_set_property(global_obj, "app", app);

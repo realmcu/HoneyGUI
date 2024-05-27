@@ -57,7 +57,6 @@ struct gui_switch
     void *off_hl_pic_addr;
     void *long_touch_state_pic_addr;
     void *long_touch_state_hl_pic_addr;
-
     IMG_SOURCE_MODE_TYPE src_mode;
     uint32_t ifon : 1;
     uint32_t long_touch_state : 1;
@@ -174,14 +173,14 @@ gui_switch_t *gui_switch_create_from_fs(void    *parent,
                                         void    *on_pic);
 
 /**
- * @brief Turn on the switch
+ * @brief Turn on the switch, event will be triggered.
  *
  * @param this
  */
 void gui_switch_turn_on(gui_switch_t *this);
 
 /**
- * @brief Turn off the switch
+ * @brief Turn off the switch, event will be triggered.
  *
  * @param this
  */
@@ -201,7 +200,13 @@ void gui_switch_is_on(gui_switch_t *this);
  */
 void gui_switch_is_off(gui_switch_t *this);
 
-
+/**
+ * @brief set sw state and change ui, no event will be trigered.
+ *
+ * @param this
+ * @param ifon set sw state
+ */
+void gui_switch_change_state(gui_switch_t *this, bool ifon);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

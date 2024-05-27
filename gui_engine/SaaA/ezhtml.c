@@ -9,6 +9,7 @@
 #include <gui_seekbar.h>
 #include <gui_page.h>
 #include "gui_gallery.h"
+#include "gui_keyboard.h"
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
@@ -76,6 +77,7 @@ struct widget_create widget[] =
     {"movie", MOVIE},
     {"animateTransform", MACRO_ANIMATETRANSFORM},
     {"motorizedCurtain", MACRO_MOTORIZED_CURTAIN},
+    {"keyboard", KEYBOARD},
 };
 static void img_rotate_cb(gui_img_t *img)
 {
@@ -317,7 +319,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
     gui_log("%s: %s", name, p->txt);
-    for (size_t i = 0; i < WIDGETS_NUM; i++)
+    for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
     {
         if (!strcmp(widget[i].name, name))
         {
@@ -486,10 +488,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                 fontSize);
                             t = (void *)scroll_text;
                         }
-
-
-
-
                         parent = (void *)t;
                     }
                 }
@@ -798,8 +796,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 cap = NVG_SQUARE;
                             }
-
-
                         }
                         else if (!strcmp(p->attr[i], "fill"))
                         {
@@ -2452,6 +2448,240 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     gui_gallery_create(parent, ptxt, &config,
                                        x, y, w, h);
+                }
+                break;
+
+            case KEYBOARD:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 640;
+                    int16_t h = 360;
+
+                    gui_kb_config_t config = {0};
+                    char *picture = "app/system/resource/Progress bar_full.bin";
+                    // char *folder = NULL;
+
+                    // default image blend_mode
+                    uint8_t blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
+
+                    memset(&config, 0, sizeof(config));
+
+                    {
+#define PATH_PRE "app/box/resource/"
+                        char *floder_kb = PATH_PRE"keyboard";
+                        char *floder_letter = PATH_PRE"keyboard/0_letter/";
+                        char *floder_letter_upper = PATH_PRE"keyboard/1_letter_upper/";
+                        char *floder_num = PATH_PRE"keyboard/2_number/";
+                        char *floder_symbol = PATH_PRE"keyboard/3_symbol/";
+                        char *floder_func = PATH_PRE"keyboard/4_func/";
+                        char *floder_other = PATH_PRE"keyboard/5_other/";
+
+                        config.layout = KB_LAYOUT_BASIC;
+                        config.mode = KB_MODE_BASIC_ENG_LOWWER;
+
+                        uint16_t file_count = 0;
+                        DIR *dir = floder_letter;
+                        struct dirent *entry;
+                        char **folder_array[] = {floder_letter, floder_letter_upper, floder_num, floder_symbol, floder_func, floder_other};
+                        for (int i = 0; i < sizeof(folder_array) / sizeof(folder_array[0]); i++)
+                        {
+                            char *folder = folder_array[i];
+                            char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+                            // init image array
+                            sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+                            if ((dir = opendir(dir_path)) == NULL)
+                            {
+                                gui_free(dir_path);
+                                continue;
+                                //perror("opendir() failed"); return;
+                            }
+                            // gui_log("folder: %d %s\n", dir, folder);
+                            gui_free(dir_path);
+
+
+                            while ((entry = readdir(dir)) != NULL)
+                            {
+                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                {
+                                    char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                                    void *addr = NULL;
+                                    void *data = NULL;
+
+                                    file_count++;
+                                    sprintf(file_path, "%s/%s", folder, entry->d_name);
+                                    // gui_log("file_count %d, file: %s\n", file_count, entry->d_name);
+                                    addr = gui_get_file_address(file_path);
+                                    if (!config.img_array)
+                                    {
+                                        data = gui_malloc(sizeof(void *));
+                                    }
+                                    else
+                                    {
+                                        data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                                    }
+                                    config.img_array = data;
+                                    config.img_array[file_count - 1] = addr;
+
+                                    gui_free(file_path);
+                                }
+
+                            }
+                            closedir(dir);
+                            // gui_log("file_count %d, folder: %s\n", file_count, folder);
+                            if (0 == strcmp(folder, floder_symbol))
+                            {
+                                config.file_mark[0] = file_count;
+                            }
+                            else if (0 == strcmp(folder, floder_func))
+                            {
+                                config.file_mark[1] = file_count;
+                            }
+                        }
+                        config.num_pic = file_count;
+                    }
+
+                    gui_keyboard_create(parent, "test", &config,
+                                        0, 0, gui_get_screen_width(), gui_get_screen_height());
+                    // while (true)
+                    // {
+                    //     // #define IS_STR(str) (!strcmp(p->attr[i], str))
+                    //     if (!(p->attr[i]))
+                    //     {
+                    //         break;
+                    //     }
+                    //     if (!strcmp(p->attr[i], "x"))
+                    //     {
+                    //         x = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "y"))
+                    //     {
+                    //         y = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "w"))
+                    //     {
+                    //         w = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "h"))
+                    //     {
+                    //         h = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "folder"))
+                    //     {
+                    //         folder = gui_strdup(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "mainBg"))
+                    //     {
+                    //         config.data_main_bg = gui_strdup(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "centerBg"))
+                    //     {
+                    //         config.data_center_bg = gui_strdup(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "centerPercent"))
+                    //     {
+                    //         config.center_percent = atof(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "sideScale"))
+                    //     {
+                    //         config.side_scale = atof(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "sidePosPercent"))
+                    //     {
+                    //         config.side_pos_percent = atof(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "blendMode"))
+                    //     {
+                    //         i++;
+                    //         if (!strcmp(p->attr[i], "imgBypassMode"))
+                    //         {
+                    //             blendMode = IMG_BYPASS_MODE;
+                    //         }
+                    //         else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                    //         {
+                    //             blendMode = IMG_FILTER_BLACK;
+                    //         }
+                    //         else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                    //         {
+                    //             blendMode = IMG_SRC_OVER_MODE;
+                    //         }
+                    //         else if (!strcmp(p->attr[i], "imgCoverMode"))
+                    //         {
+                    //             blendMode = IMG_COVER_MODE;
+                    //         }
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "opacity"))
+                    //     {
+                    //         opacity = atof(p->attr[++i]);
+                    //     }
+                    //     i++;
+                    // }
+
+                    // char *ptxt = get_space_string_head(p->txt);
+                    // if (!folder)
+                    // {
+                    //     gui_log("gallery folder is not found!\n");
+                    // }
+                    // else if (folder)
+                    // {
+                    //     int file_count = 0;
+                    //     DIR *dir = 0;
+                    //     struct dirent *entry;
+                    //     char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+                    //     // init image array
+                    //     sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+                    //     if ((dir = opendir(dir_path)) == NULL)
+                    //     {
+                    //         gui_free(dir_path);
+                    //         //perror("opendir() failed"); return;
+                    //     }
+                    //     gui_free(dir_path);
+
+                    //     while ((entry = readdir(dir)) != NULL)
+                    //     {
+                    //         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                    //         {
+                    //             char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                    //             void *addr = NULL;
+                    //             void *data = NULL;
+
+                    //             file_count++;
+                    //             sprintf(file_path, "%s/%s", folder, entry->d_name);
+                    //             addr = gui_get_file_address(file_path);
+                    //             if (!config.img_array)
+                    //             {
+                    //                 data = gui_malloc(sizeof(void *));
+                    //             }
+                    //             else
+                    //             {
+                    //                 data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                    //             }
+                    //             config.img_array = data;
+                    //             config.img_array[file_count - 1] = addr;
+
+                    //             gui_free(file_path);
+                    //         }
+                    //     }
+                    //     closedir(dir);
+
+                    //     config.num_pic = file_count;
+                    // }
+
+                    // if (config.data_main_bg)
+                    // {
+                    //     config.data_main_bg = gui_get_file_address(config.data_main_bg);
+                    // }
+                    // if (config.data_center_bg)
+                    // {
+                    //     config.data_center_bg = gui_get_file_address(config.data_center_bg);
+                    // }
+
+                    // gui_gallery_create(parent, ptxt, &config,
+                    //    x, y, w, h);
                 }
                 break;
             // case MOVIE:

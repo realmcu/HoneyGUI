@@ -92,6 +92,7 @@ typedef struct gui_text
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
     uint8_t font_height;
+    uint8_t inputable;    // support user input or not
     uint8_t checksum;
     gui_animate_t *animate;
     void *content;
@@ -201,6 +202,8 @@ void gui_text_set_animate(void    *o,
  */
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode);
 
+
+void gui_text_input_set(gui_text_t *this, bool inputable);
 /**
  * @brief move the text widget
  *

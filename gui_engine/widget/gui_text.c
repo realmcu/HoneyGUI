@@ -23,6 +23,8 @@
 #include "font_stb.h"
 #include "font_mem_img.h"
 #include "font_mem_matrix.h"
+#include "gui_keyboard.h"
+#include "tp_algo.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -321,6 +323,7 @@ static void gui_text_update_att(gui_obj_t *obj)
 static void gui_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
+    touch_info_t *tp = tp_get_info();
     gui_point_t point = {0, 0, 1};
     uint8_t last;
     if (this->font_type == GUI_FONT_SRC_IMG)
@@ -338,6 +341,24 @@ static void gui_text_prepare(gui_obj_t *obj)
         this->mode == RIGHT)
     {
         this->base.h = this->font_height;
+    }
+
+    switch (tp->type)
+    {
+    case TOUCH_SHORT:
+        {
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                if (((gui_text_t *)obj)->inputable)
+                {
+                    gui_keyboard_launch(obj);
+                }
+            }
+        }
+        break;
+    default:
+        break;
     }
 
 
@@ -447,6 +468,7 @@ void gui_text_ctor(gui_text_t *this,
     root->has_destroy_cb = true;
     //for self
     this->mode = LEFT;
+    this->inputable = false;
 }
 
 /*============================================================================*
@@ -495,6 +517,11 @@ void gui_text_set_animate(void    *o,
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 {
     this->mode = mode;
+}
+
+void gui_text_input_set(gui_text_t *this, bool inputable)
+{
+    this->inputable = inputable;
 }
 
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)

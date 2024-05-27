@@ -273,6 +273,16 @@ void gui_button_set_animate(gui_button_t *this,
                             void         *callback,
                             void         *p);
 
+/**
+ * @brief change button img.
+ *
+ * @param this The button widget .
+ * @param background_pic The image shown when button was not pressed.
+ * @param highlight_pic The image shown when button was pressed.
+ */
+void gui_button_set_img(gui_button_t *this,
+                        void                 *background_pic,
+                        void                 *highlight_pic);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

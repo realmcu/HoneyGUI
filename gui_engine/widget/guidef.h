@@ -408,7 +408,8 @@ typedef enum t_obj_type
     QRCODE                   = 0x0027,
     GALLERY                  = 0x0028,
     TURN_TABLE               = 0x0029,
-    MACRO_MOTORIZED_CURTAIN  = 0x0030,
+    KEYBOARD                 = 0x002A,
+    MACRO_MOTORIZED_CURTAIN  = 0x002B,
 } T_OBJ_TYPE;
 
 typedef void (*gui_msg_cb)(void *);

@@ -342,6 +342,19 @@ void gui_button_set_animate(gui_button_t *this,
     animate->p = p;
     this->animate = animate;
 }
+void gui_button_set_img(gui_button_t *this,
+                        void                 *background_pic,
+                        void                 *highlight_pic)
+{
+    if (background_pic && background_pic)
+    {
+        this->off_pic_addr = background_pic;
+        this->on_pic_addr = highlight_pic;
+
+        this->img->data = this->off_pic_addr;
+    }
+}
+
 
 
 static gui_button_t *gui_button_create_core(void                 *parent,
