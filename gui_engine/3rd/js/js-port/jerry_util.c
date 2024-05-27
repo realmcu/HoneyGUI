@@ -6,7 +6,7 @@
 #include "jerry_util.h"
 
 #include "jerry_utf8.h"
-
+#include "gui_api.h"
 extern int js_console_init(void);
 extern int js_module_init(void);
 extern int js_buffer_init(void);

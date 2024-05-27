@@ -137,7 +137,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         continue;
                     }
 
-                    gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, 0, 0);
+                    gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, BUTTON_BG_ICON, 0);
                     gui_button_press(button, (gui_event_cb_t)button_cb, button);
                     gui_button_release(button, (gui_event_cb_t)button_release_cb, button);
 

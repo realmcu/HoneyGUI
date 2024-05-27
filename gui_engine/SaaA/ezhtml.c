@@ -341,7 +341,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 #endif
                     size_t color = 0xffffffff;
                     int fontSize = 32;
-                    int style = 0;
+                    TEXT_MODE style = 0;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -425,7 +425,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                             {
-                                FONT_SRC_TYPE font_type2;
+                                FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
                                 char *font_type = font;
                                 if (strstr(font_type, ".bin") != NULL)
                                 {
@@ -499,8 +499,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     size_t i = 0;
                     int16_t x = 0;
                     int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     char *file = NULL;
                     float scalex = 1;
                     float scaley = 1;
@@ -688,7 +688,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0;
                     int16_t h = 0;
-                    int style = 0;
+                    int style = 0; GUI_UNUSED(style);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -743,15 +743,15 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case ARC:
                 {
                     size_t i = 0;
-                    int16_t cx = 100;
-                    int16_t cy = 100;
-                    int16_t r = 100;
-                    int16_t stroke_width = 10;
-                    int cap = 0;
+                    int16_t cx = 100; GUI_UNUSED(cx);
+                    int16_t cy = 100; GUI_UNUSED(cy);
+                    int16_t r = 100; GUI_UNUSED(r);
+                    int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
+                    int cap = 0; GUI_UNUSED(cap);
                     uint32_t fill = 0xff0000ff;
                     uint32_t stroke = 0xff0000ff;
-                    float sd = 0;
-                    float ed = 100;
+                    float sd = 0; GUI_UNUSED(sd);
+                    float ed = 100; GUI_UNUSED(ed);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -833,8 +833,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     size_t i = 0;
                     int16_t x = 0;
                     int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     uint32_t color = 0xffffffaa;
                     uint32_t highlightColor = 0xffffffff;
                     bool vh = false;
@@ -952,8 +952,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     size_t i = 0;
                     int16_t x = 0;
                     int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     uint32_t color = 0xffffffaa;
                     uint32_t highlightColor = 0xffffffff;
                     bool canvas = false;
@@ -1533,8 +1533,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case SCREEN:
                 {
                     size_t i = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1623,7 +1623,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t h = 0;
                     float scope = 1.0f;
                     T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
-                    int style = 0;
+                    int style = 0; GUI_UNUSED(style);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1839,7 +1839,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     uint32_t font_size = 32;
                     int picture_x = 0;
                     int picture_y = 0;
-                    int transition = 0;
+                    int transition = 0; GUI_UNUSED(transition);
                     char *picture = NULL;
                     char *hl_picture = NULL;
                     int style = 0;
@@ -1967,7 +1967,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //font_size = 32;
-                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, 0, 0);
+                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, BUTTON_BG_ICON, 0);
                     GUI_TYPE(gui_button_t, parent)->style = style;
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
@@ -1985,7 +1985,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
 
                     {
-                        FONT_SRC_TYPE font_type2;
+                        FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
                         if (strstr(font_type, ".bin") != NULL)
                         {
                             font_type2 = GUI_FONT_SRC_BMP;
@@ -2068,22 +2068,23 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case RADIO:
                 {
                     size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    char *font_type = "rtk_font_fs32";
-                    char *text = NULL;
-                    int text_x = 0;
-                    int text_y = 0;
-                    uint32_t font_color = 0Xf0f0;
-                    uint32_t font_size = 40;
-                    int picture_x = 0;
-                    int picture_y = 0;
-                    int transition = 0;
-                    char *picture = NULL;
-                    char *hl_picture = NULL;
-                    int style = 0;
+                    int16_t x = 0; GUI_UNUSED(x);
+                    int16_t y = 0; GUI_UNUSED(y);
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
+                    char *font_type = "rtk_font_fs32"; GUI_UNUSED(font_type);
+                    char *text = NULL; GUI_UNUSED(text);
+                    int text_x = 0; GUI_UNUSED(text_x);
+                    int text_y = 0; GUI_UNUSED(text_y);
+                    uint32_t font_color = 0Xf0f0; GUI_UNUSED(font_color);
+                    uint32_t font_size = 40; GUI_UNUSED(font_size);
+                    int picture_x = 0; GUI_UNUSED(picture_x);
+                    int picture_y = 0; GUI_UNUSED(picture_y);
+                    int transition = 0; GUI_UNUSED(transition);
+                    char *picture = NULL; GUI_UNUSED(picture);
+                    char *hl_picture = NULL; GUI_UNUSED(hl_picture);
+                    int style = 0; GUI_UNUSED(style);
+
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -2118,8 +2119,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                         i++;
                     }
-                    void *img1;
-                    void *img2;
+                    void *img1; GUI_UNUSED(img1);
+                    void *img2; GUI_UNUSED(img2);
                     {
                         img1 = gui_get_file_address(picture);
                     }
@@ -2636,8 +2637,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     if (type && from && to && dur && repeatCount)
                     {
                         int dur_num = 0;
-                        int from_num[3];
-                        int to_num[3];
+                        int from_num[3]; GUI_UNUSED(from_num);
+                        int to_num[3]; GUI_UNUSED(to_num);
                         int repeat_num = 0;
                         if (!strcmp(type, "rotate"))
                         {
