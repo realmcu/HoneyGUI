@@ -116,11 +116,11 @@ static void switch_cb_for_mororized_curtain(gui_switch_t *sw, gui_event_t event_
     {
         if (event[i].filter == event_code)
         {
-            args = event[i].user_data;
+            args = (int)event[i].user_data;
         }
     }
     gui_seekbar_t *seekbar = 0;
-    gui_obj_tree_get_widget_by_type(GUI_BASE(sw)->parent, SEEKBAR, &seekbar);
+    gui_obj_tree_get_widget_by_type(GUI_BASE(sw)->parent, SEEKBAR, (gui_obj_t **)&seekbar);
     switch (args)
     {
     case 3:
@@ -143,7 +143,7 @@ static void switch_cb_for_mororized_curtain(gui_switch_t *sw, gui_event_t event_
         break;
     default:
         {
-            GUI_API(gui_seekbar_t).animate(seekbar, 10000, 0, seekbar_ani_cb, args);
+            GUI_API(gui_seekbar_t).animate(seekbar, 10000, 0, seekbar_ani_cb, (void *)args);
         }
         break;
     }
@@ -2043,19 +2043,22 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 gui_free(open_switch_name);
                                 open_switch_name = 0;
-                                GUI_API(gui_button_t).on_click(parent, switch_cb_for_mororized_curtain, 0);
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
                             }
                             else if (close_switch_name && !strcmp(parent->name, close_switch_name))
                             {
                                 gui_free(close_switch_name);
                                 close_switch_name = 0;
-                                GUI_API(gui_button_t).on_click(parent, switch_cb_for_mororized_curtain, 1);
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
                             }
                             else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
                             {
                                 gui_free(pause_switch_name);
                                 pause_switch_name = 0;
-                                GUI_API(gui_button_t).on_click(parent, switch_cb_for_mororized_curtain, 2);
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
                             }
                         }
                     }
@@ -2268,22 +2271,28 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             gui_free(open_switch_name);
                             open_switch_name = 0;
-                            GUI_API(gui_switch_t).on_turn_on(parent, switch_cb_for_mororized_curtain, 0);
-                            GUI_API(gui_switch_t).on_turn_off(parent, switch_cb_for_mororized_curtain, 0);
+                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
+                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
                         }
                         else if (close_switch_name && !strcmp(parent->name, close_switch_name))
                         {
                             gui_free(close_switch_name);
                             close_switch_name = 0;
-                            GUI_API(gui_switch_t).on_turn_on(parent, switch_cb_for_mororized_curtain, 1);
-                            GUI_API(gui_switch_t).on_turn_off(parent, switch_cb_for_mororized_curtain, 1);
+                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
+                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
                         }
                         else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
                         {
                             gui_free(pause_switch_name);
                             pause_switch_name = 0;
-                            GUI_API(gui_switch_t).on_turn_on(parent, switch_cb_for_mororized_curtain, 2);
-                            GUI_API(gui_switch_t).on_turn_off(parent, switch_cb_for_mororized_curtain, 3);
+                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
+                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)3);
                         }
                     }
 

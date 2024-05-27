@@ -903,7 +903,7 @@ static void gui_seekbar_set_animate(gui_seekbar_t *o, uint32_t dur, int repeat_c
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
+    animate->callback = (void (*)(void *, void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_seekbar_t *)o)->animate = animate;
