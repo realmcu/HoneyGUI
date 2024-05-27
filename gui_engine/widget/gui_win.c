@@ -107,7 +107,7 @@ static void gui_win_update_att(gui_obj_t *obj)
                 this->animate->progress_percent = 1;
                 this->animate->animate = 0;
             }
-            this->animate->callback(this->animate->p);
+            this->animate->callback(this->animate->p, this);
 
         }
         else if (this->animate->repeat_count == -1)
@@ -120,7 +120,7 @@ static void gui_win_update_att(gui_obj_t *obj)
             this->animate->last_round = round_count;
             this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
                                               (float)this->animate->dur;
-            this->animate->callback(this->animate->p);
+            this->animate->callback(this->animate->p, this);
         }
         else
         {
@@ -138,7 +138,7 @@ static void gui_win_update_att(gui_obj_t *obj)
             this->animate->last_round = round_count;
             this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
                                               (float)this->animate->dur;
-            this->animate->callback(this->animate->p);
+            this->animate->callback(this->animate->p, this);
         }
     }
 }
@@ -318,7 +318,7 @@ void gui_win_set_animate(gui_win_t *this,
     {
         animate->dur = 1;
     }
-    animate->callback = (void (*)(void *))callback;
+    animate->callback = (void (*)(void *, void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_win_t *)this)->animate = animate;

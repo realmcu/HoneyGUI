@@ -408,6 +408,7 @@ typedef enum t_obj_type
     QRCODE                   = 0x0027,
     GALLERY                  = 0x0028,
     TURN_TABLE               = 0x0029,
+    MACRO_MOTORIZED_CURTAIN  = 0x0030,
 } T_OBJ_TYPE;
 
 typedef void (*gui_msg_cb)(void *);
@@ -440,7 +441,7 @@ typedef struct gui_animate
     uint32_t current_frame;
     uint32_t last_round;
     float progress_percent;
-    void (* callback)(void *p);
+    void (* callback)(void *p, void *this_widget);
     void *p;
     bool animate;
     bool init;
@@ -625,6 +626,10 @@ extern char *defaultPath;
     GET_BASE(this)->create_done = true;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #define GUI_BASE(_p) ((gui_obj_t *)_p)
+#define _GUI_API_DEFINE(type) typedef struct __gui_api_##type{
+#define _GUI_API_DECLARE(type) } _gui_api_##type;extern _gui_api_##type gui_api_for_##type;
+#define _GUI_API_ASSIGN(type) _gui_api_##type gui_api_for_##type ={
+#define GUI_API(type)  gui_api_for_##type
 #if defined _WIN32
 #define GUI_FRAME_STEP 50
 #else

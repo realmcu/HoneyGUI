@@ -85,71 +85,62 @@ static void gui_button_update_att(gui_obj_t *obj)
 {
     gui_button_t *this = (void *)obj;
     uint32_t cur_time_gap;
-
     if (this->animate && this->animate->animate)
     {
-        cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
-        this->animate->cur_time_ms = gui_ms_get();
-
-        if (cur_time_gap >= 2 * this->animate->dur)
+        this->animate->Beginning_frame = 0;
+        this->animate->end_frame = 0;
+        if (this->animate->progress_percent == 0 && !this->animate->init)
         {
-            this->animate->init_time_ms += cur_time_gap;
+            this->animate->init = 1;
+            this->animate->init_time_ms = gui_ms_get();
+            this->animate->Beginning_frame = 1;
         }
+
+        this->animate->cur_time_ms = gui_ms_get();
+        cur_time_gap = this->animate->cur_time_ms - this->animate->init_time_ms;
 
         if (this->animate->repeat_count == 0)
         {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            if (cur_time_gap / this->animate->dur >= 1)
             {
-                this->animate->callback(this->animate->p);
-                this->animate->animate = false;
-                this->animate->progress_percent = 1.0f;
+                this->animate->end_frame = 1;
+                this->animate->progress_percent = 1;
+                this->animate->animate = 0;
             }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
-                                                          this->animate->init_time_ms) /
-                                                  (float)this->animate->dur;
-            }
+            this->animate->callback(this->animate->p, this);
+
         }
-        else if (this->animate->repeat_count < 0)
+        else if (this->animate->repeat_count == -1)
         {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
+            uint32_t  round_count = cur_time_gap / this->animate->dur;
+            if (round_count > this->animate->last_round)
             {
-                this->animate->callback(this->animate->p);
-                this->animate->init_time_ms += this->animate->dur;
-                this->animate->progress_percent = 1.0f;
+                this->animate->Beginning_frame = 1;
             }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
-                                                          this->animate->init_time_ms) /
-                                                  (float)this->animate->dur;
-            }
+            this->animate->last_round = round_count;
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            this->animate->callback(this->animate->p, this);
         }
-        else if (this->animate->repeat_count > 0)
+        else
         {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms -
-                 this->animate->current_repeat_count * this->animate->dur) >=
-                this->animate->dur)
+            uint32_t  round_count = cur_time_gap / this->animate->dur;
+            if (round_count > this->animate->repeat_count)
             {
-                if (this->animate->current_repeat_count < this->animate->repeat_count)
-                {
-                    this->animate->callback(this->animate->p);
-                    this->animate->current_repeat_count ++;
-                }
-                else
-                {
-                    this->animate->callback(this->animate->p);
-                    this->animate->animate = false;
-                }
-                this->animate->progress_percent = 1.0f;
+                this->animate->animate = 0;
+                return;
             }
-            else
+
+            if (round_count > this->animate->last_round)
             {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms - this->animate->init_time_ms -
-                                                          this->animate->current_repeat_count * this->animate->dur) /
-                                                  (float)this->animate->dur;
+                this->animate->Beginning_frame = 1;
             }
+            this->animate->last_round = round_count;
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            this->animate->callback(this->animate->p, this);
         }
     }
 }
@@ -346,7 +337,7 @@ void gui_button_set_animate(gui_button_t *this,
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
+    animate->callback = (void (*)(void *, void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     this->animate = animate;
@@ -468,7 +459,13 @@ gui_button_t *gui_button_create_from_fs(void             *parent,
     return gui_button_create_core(parent, x, y, w, h, background_pic, highlight_pic, text, image_type,
                                   count, IMG_SRC_FILESYS);
 }
+_GUI_API_ASSIGN(gui_button_t)
+.on_click = gui_button_click,
+ .on_long_press = gui_button_long,
+  .on_press = gui_button_press,
+   .on_release = gui_button_release,
 
+};
 /** End of WIDGET_Exported_Functions
   * @}
   */

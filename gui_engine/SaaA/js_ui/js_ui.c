@@ -736,7 +736,7 @@ DECLARE_HANDLER(switch_on)
             cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
-        GUI_TYPE(gui_switch_t, obj)->switch_on((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        GUI_API(gui_switch_t).on_turn_on((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -764,7 +764,7 @@ DECLARE_HANDLER(switch_off)
             cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
-        GUI_TYPE(gui_switch_t, obj)->switch_off((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        GUI_API(gui_switch_t).on_turn_off((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -1213,7 +1213,7 @@ DECLARE_HANDLER(sw_close)
     //gui_log("enter sw_close\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
-    sw->turn_off(sw);
+    GUI_API(gui_switch_t).turn_off(sw);
     return jerry_create_undefined();
 }
 
@@ -1222,7 +1222,7 @@ DECLARE_HANDLER(sw_open)
     //gui_log("enter sw_open\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
-    sw->turn_on(sw);
+    GUI_API(gui_switch_t).turn_on(sw);
     return jerry_create_undefined();
 }
 
@@ -1559,8 +1559,8 @@ void js_gui_init()
     jerry_value_t sw = jerry_create_object();
     js_set_property(global_obj, "sw", sw);
     REGISTER_METHOD(sw, getElementById);
-    REGISTER_METHOD(sw, switch_on);
-    REGISTER_METHOD(sw, switch_off);
+    REGISTER_METHOD_NAME(sw, "onOn", switch_on);
+    REGISTER_METHOD_NAME(sw, "onOff", switch_off);
     REGISTER_METHOD_NAME(sw, "turnOn", sw_open);
     REGISTER_METHOD_NAME(sw, "turnOff", sw_close);
     REGISTER_METHOD_NAME(sw, "onPress", onPress_switch);

@@ -48,7 +48,7 @@ struct widget_create
     T_OBJ_TYPE type;
 };
 
-#define WIDGETS_NUM 20
+#define WIDGETS_NUM 22
 
 struct widget_create widget[] =
 {
@@ -74,7 +74,8 @@ struct widget_create widget[] =
     {"appendTexts", RADIOSWITCH},
     {"arc", ARC},
     {"movie", MOVIE},
-    {"animateTransform", MACRO_ANIMATETRANSFORM}
+    {"animateTransform", MACRO_ANIMATETRANSFORM},
+    {"motorizedCurtain", MACRO_MOTORIZED_CURTAIN},
 };
 static void img_rotate_cb(gui_img_t *img)
 {
@@ -83,6 +84,69 @@ static void img_rotate_cb(gui_img_t *img)
 
     gui_img_rotation(img, 360 * img->animate->progress_percent, img->base.w / 2,
                      img->base.h);
+}
+static char *open_switch_name;
+static char *pause_switch_name;
+static char *close_switch_name;
+static void seekbar_ani_cb(int args, gui_seekbar_t *this)
+{
+    switch (args)
+    {
+    case 0:
+        {
+            GUI_API(gui_seekbar_t).set_progress(this, this->animate->progress_percent);
+        }
+        break;
+    case 1:
+        {
+            GUI_API(gui_seekbar_t).set_progress(this, 1.0f - this->animate->progress_percent);
+        }
+        break;
+    default:
+        break;
+    }
+}
+static void switch_cb_for_mororized_curtain(gui_switch_t *sw, gui_event_t event_code)
+{
+    int args = 0;
+    gui_event_dsc_t *event = GUI_BASE(sw)->event_dsc;
+
+    // same event only handle the first register one
+    for (size_t i = 0; i < GUI_BASE(sw)->event_dsc_cnt; i++)
+    {
+        if (event[i].filter == event_code)
+        {
+            args = event[i].user_data;
+        }
+    }
+    gui_seekbar_t *seekbar = 0;
+    gui_obj_tree_get_widget_by_type(GUI_BASE(sw)->parent, SEEKBAR, &seekbar);
+    switch (args)
+    {
+    case 3:
+        {
+            if (seekbar->animate)
+            {
+                seekbar->animate->animate = 1;
+            }
+        }
+        break;
+    case 2:
+        {
+            if (seekbar->animate)
+            {
+                seekbar->animate->animate = 0;
+            }
+
+
+        }
+        break;
+    default:
+        {
+            GUI_API(gui_seekbar_t).animate(seekbar, 10000, 0, seekbar_ani_cb, args);
+        }
+        break;
+    }
 }
 gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                        int16_t x,
@@ -188,7 +252,16 @@ static void sport_button_press_ani_cb(gui_button_t *button)
 
     //gui_log("o:%f\n", 25.0f * (from - scale));
 }
-
+static void reverse_array(void *arr[], int n)
+{
+    void *temp;
+    for (int i = 0; i < n / 2; i++)
+    {
+        temp = arr[i];
+        arr[i] = arr[n - i - 1];
+        arr[n - i - 1] = temp;
+    }
+}
 static void draw_arc(gui_canvas_t *c)
 {
 
@@ -896,6 +969,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     // default image blend_mode
                     BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
                     uint8_t opacity = 255;
+                    bool reverse = 0;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -990,6 +1064,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             ed = atof(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "reverse"))
+                        {
+                            reverse = 1;
+                        }
                         else if (!strcmp(p->attr[i], "blendMode"))
                         {
                             i++;
@@ -1067,7 +1145,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_free(path);
                             while ((entry = readdir(dir)) != NULL)
                             {
-                                file_count++;
+                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                {
+                                    file_count++;
+                                }
+
+
                             }
                             closedir(dir);
                         }
@@ -1096,27 +1179,53 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
                             gui_free(path);
                             closedir(dir);
+                            if (reverse)
+                            {
+                                reverse_array(image_array, count);
+                            }
+
+
                         }
-                        if (arc)
+                        bool if_widget = 0;
+                        if (p->parent)
                         {
-                            parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
-                                                                          cx, cy, 100, 100, sd, ed);
+                            if (!strcmp(widget[21].name, p->parent->name))
+                            {
+                                if_widget = 1;
+                            }
+                        }
+                        if (if_widget)
+                        {
+                            parent = (void *)gui_seekbar_create_movie_h_double(parent, image_array, file_count, x, y);
                             gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
                             gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                         }
                         else
                         {
-                            if (vh)
+                            if (arc)
                             {
-                                parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
+                                parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
+                                                                              cx, cy, 100, 100, sd, ed);
+                                gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                                gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                             }
                             else
                             {
-                                parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
+                                if (vh)
+                                {
+                                    parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
+                                }
+                                else
+                                {
+                                    parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
+                                }
+                                gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                                gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                             }
-                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
-                            gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                         }
+
+
+
 
 
                     }
@@ -1919,6 +2028,38 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 #endif
                         }
                     }
+                    {
+                        bool if_widget = 0;
+                        if (p->parent)
+                        {
+                            if (!strcmp(widget[21].name, p->parent->name))
+                            {
+                                if_widget = 1;
+                            }
+                        }
+                        if (if_widget)
+                        {
+                            if (open_switch_name && !strcmp(parent->name, open_switch_name))
+                            {
+                                gui_free(open_switch_name);
+                                open_switch_name = 0;
+                                GUI_API(gui_button_t).on_click(parent, switch_cb_for_mororized_curtain, 0);
+                            }
+                            else if (close_switch_name && !strcmp(parent->name, close_switch_name))
+                            {
+                                gui_free(close_switch_name);
+                                close_switch_name = 0;
+                                GUI_API(gui_button_t).on_click(parent, switch_cb_for_mororized_curtain, 1);
+                            }
+                            else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
+                            {
+                                gui_free(pause_switch_name);
+                                pause_switch_name = 0;
+                                GUI_API(gui_button_t).on_click(parent, switch_cb_for_mororized_curtain, 2);
+                            }
+                        }
+                    }
+
                     break;
                 }
             case RADIO:
@@ -2113,6 +2254,39 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
                     gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);
                     gui_img_set_opacity(GUI_TYPE(gui_switch_t, parent)->switch_picture, opacity);
+                    bool if_widget = 0;
+                    if (p->parent)
+                    {
+                        if (!strcmp(widget[21].name, p->parent->name))
+                        {
+                            if_widget = 1;
+                        }
+                    }
+                    if (if_widget)
+                    {
+                        if (open_switch_name && !strcmp(parent->name, open_switch_name))
+                        {
+                            gui_free(open_switch_name);
+                            open_switch_name = 0;
+                            GUI_API(gui_switch_t).on_turn_on(parent, switch_cb_for_mororized_curtain, 0);
+                            GUI_API(gui_switch_t).on_turn_off(parent, switch_cb_for_mororized_curtain, 0);
+                        }
+                        else if (close_switch_name && !strcmp(parent->name, close_switch_name))
+                        {
+                            gui_free(close_switch_name);
+                            close_switch_name = 0;
+                            GUI_API(gui_switch_t).on_turn_on(parent, switch_cb_for_mororized_curtain, 1);
+                            GUI_API(gui_switch_t).on_turn_off(parent, switch_cb_for_mororized_curtain, 1);
+                        }
+                        else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
+                        {
+                            gui_free(pause_switch_name);
+                            pause_switch_name = 0;
+                            GUI_API(gui_switch_t).on_turn_on(parent, switch_cb_for_mororized_curtain, 2);
+                            GUI_API(gui_switch_t).on_turn_off(parent, switch_cb_for_mororized_curtain, 3);
+                        }
+                    }
+
                 }
                 break;
             case GALLERY:
@@ -2546,6 +2720,55 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                     }
+                }
+                break;
+            case MACRO_MOTORIZED_CURTAIN:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        if (!strcmp(p->attr[i], "switchOpen"))
+                        {
+                            open_switch_name = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "switchClose"))
+                        {
+                            close_switch_name = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "switchPause"))
+                        {
+                            pause_switch_name = gui_strdup(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    char *ptxt = get_space_string_head(p->txt);
+                    //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+                    parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
                 }
                 break;
             default:

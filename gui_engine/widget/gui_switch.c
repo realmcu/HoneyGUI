@@ -416,10 +416,6 @@ void gui_switch_ctor(gui_switch_t *this,
     this->base.type = CLICKSWITCH;
     GET_BASE(this)->obj_cb = gui_switch_cb;
     GET_BASE(this)->has_prepare_cb = true;
-    this->turn_off = gui_switch_turn_off;
-    this->turn_on = gui_switch_turn_on;
-    this->switch_on = gui_switch_on;
-    this->switch_off = gui_switch_off;
     this->off_pic_addr = off_pic;
     this->on_pic_addr = on_pic;
     this->off_hl_pic_addr = this->off_pic_addr;
@@ -485,7 +481,13 @@ gui_switch_t *gui_switch_create_from_fs(void    *parent,
 {
     return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, IMG_SRC_FILESYS);
 }
-
+_GUI_API_ASSIGN(gui_switch_t)
+.ctor = gui_switch_ctor,
+ .on_turn_off = gui_switch_off,
+  .on_turn_on = gui_switch_on,
+   .turn_off = gui_switch_turn_off,
+    .turn_on = gui_switch_turn_on,
+};
 /** End of WIDGET_Exported_Functions
   * @}
   */

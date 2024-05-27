@@ -193,7 +193,7 @@ static void gui_scroll_text_update_att(gui_obj_t *obj)
         {
             if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms) >= this->base.animate->dur)
             {
-                this->base.animate->callback(this->base.animate->p);
+                this->base.animate->callback(this->base.animate->p, this);
                 this->base.animate->animate = false;
                 this->base.animate->progress_percent = 1.0f;
             }
@@ -208,7 +208,7 @@ static void gui_scroll_text_update_att(gui_obj_t *obj)
         {
             if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms) >= this->base.animate->dur)
             {
-                this->base.animate->callback(this->base.animate->p);
+                this->base.animate->callback(this->base.animate->p, this);
                 this->base.animate->init_time_ms += this->base.animate->dur;
                 this->base.animate->progress_percent = 1.0f;
             }
@@ -227,12 +227,12 @@ static void gui_scroll_text_update_att(gui_obj_t *obj)
             {
                 if (this->base.animate->current_repeat_count < this->base.animate->repeat_count)
                 {
-                    this->base.animate->callback(this->base.animate->p);
+                    this->base.animate->callback(this->base.animate->p, this);
                     this->base.animate->current_repeat_count ++;
                 }
                 else
                 {
-                    this->base.animate->callback(this->base.animate->p);
+                    this->base.animate->callback(this->base.animate->p, this);
                     this->base.animate->animate = false;
                 }
                 this->base.animate->progress_percent = 1.0f;
@@ -247,7 +247,6 @@ static void gui_scroll_text_update_att(gui_obj_t *obj)
         }
     }
 }
-
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;

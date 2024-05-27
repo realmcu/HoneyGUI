@@ -402,7 +402,15 @@ uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len);
  * @return uint8_t
  */
 void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
-
+/**
+ * @brief  get widget in tree by type
+ *
+ * @param obj tree
+ * @param type widget type
+ * @param output widget
+ * @return uint8_t
+ */
+void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

@@ -264,7 +264,7 @@ static void gui_text_update_att(gui_obj_t *obj)
         {
             if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
             {
-                this->animate->callback(this->animate->p);
+                this->animate->callback(this->animate->p, this);
                 this->animate->animate = false;
                 this->animate->progress_percent = 1.0f;
             }
@@ -279,7 +279,7 @@ static void gui_text_update_att(gui_obj_t *obj)
         {
             if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
             {
-                this->animate->callback(this->animate->p);
+                this->animate->callback(this->animate->p, this);
                 this->animate->init_time_ms += this->animate->dur;
                 this->animate->progress_percent = 1.0f;
             }
@@ -298,12 +298,12 @@ static void gui_text_update_att(gui_obj_t *obj)
             {
                 if (this->animate->current_repeat_count < this->animate->repeat_count)
                 {
-                    this->animate->callback(this->animate->p);
+                    this->animate->callback(this->animate->p, this);
                     this->animate->current_repeat_count ++;
                 }
                 else
                 {
-                    this->animate->callback(this->animate->p);
+                    this->animate->callback(this->animate->p, this);
                     this->animate->animate = false;
                 }
                 this->animate->progress_percent = 1.0f;
@@ -486,7 +486,7 @@ void gui_text_set_animate(void    *o,
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
+    animate->callback = (void (*)(void *, void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_text_t *)o)->animate = animate;

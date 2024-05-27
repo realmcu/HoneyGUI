@@ -57,12 +57,7 @@ struct gui_switch
     void *off_hl_pic_addr;
     void *long_touch_state_pic_addr;
     void *long_touch_state_hl_pic_addr;
-    void (*turn_off)(gui_switch_t *sw);
-    void (*turn_on)(gui_switch_t *sw);
-    void (*switch_on)(gui_switch_t *this, void *cb, void *p);
-    void (*switch_off)(gui_switch_t *this, void *cb, void *p);
-    void (*ctor)(gui_switch_t *this, gui_obj_t *parent, int16_t x,
-                 int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
+
     IMG_SOURCE_MODE_TYPE src_mode;
     uint32_t ifon : 1;
     uint32_t long_touch_state : 1;
@@ -74,6 +69,14 @@ struct gui_switch
     uint32_t checksum : 8;
 };
 
+_GUI_API_DEFINE(gui_switch_t)
+void (*turn_off)(gui_switch_t *sw);
+void (*turn_on)(gui_switch_t *sw);
+void (*on_turn_on)(gui_switch_t *this, void *cb, void *p);
+void (*on_turn_off)(gui_switch_t *this, void *cb, void *p);
+void (*ctor)(gui_switch_t *this, gui_obj_t *parent, int16_t x,
+             int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
+_GUI_API_DECLARE(gui_switch_t)
 
 /** End of WIDGET_Exported_Types
   * @}

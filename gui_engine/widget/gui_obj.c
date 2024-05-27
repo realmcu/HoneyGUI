@@ -556,7 +556,23 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_ob
         gui_obj_tree_get_widget_by_name(obj, name, output);
     }
 }
+void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output)
+{
+    gui_list_t *node = NULL;
 
+    gui_list_for_each(node, &root->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+
+        if (type == obj->type)
+        {
+            *output = obj;
+            return;
+        }
+
+        gui_obj_tree_get_widget_by_type(obj, type, output);
+    }
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

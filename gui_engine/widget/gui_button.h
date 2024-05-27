@@ -80,7 +80,12 @@ typedef struct gui_button
     IMG_SOURCE_MODE_TYPE src_mode;
     bool flag;
 } gui_button_t;
-
+_GUI_API_DEFINE(gui_swgui_button_titch_t)
+void (*on_click)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void (*on_press)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void (*on_long_press)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void (*on_release)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+_GUI_API_DECLARE(gui_button_t)
 /** End of WIDGET_Exported_Types
   * @}
   */
