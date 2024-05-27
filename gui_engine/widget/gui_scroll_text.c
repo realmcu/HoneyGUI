@@ -345,8 +345,8 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
                               / text->interval_time_ms;
             draw_rect.x1 = text->base.offset_x;
             draw_rect.x2 = draw_rect.x1 + obj->w;
-            draw_rect.y1 = text->base.offset_y + obj->h + text->cnt_value - text->start_value;
-            draw_rect.y2 = draw_rect.y1 - offset;
+            draw_rect.y2 = text->base.offset_y + obj->h + text->cnt_value;
+            draw_rect.y1 = draw_rect.y2 - offset;
         }
     }
 

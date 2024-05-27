@@ -116,7 +116,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[i].w = line_byte * 8 / rendor_mode;
                 }
                 all_char_w += chr[i].char_w;
-                all_char_h += chr[i].char_h;
             }
             break;
         case 1: //offset
@@ -166,7 +165,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
                 }
                 all_char_w += chr[i].char_w;
-                all_char_h += chr[i].char_h;
+                all_char_h = all_char_h + chr[i].char_h + 2;
             }
             break;
         case 1: //offset
@@ -205,7 +204,6 @@ void gui_font_get_dot_info(gui_text_t *text)
                         }
                     }
                     all_char_w += chr[i].char_w;
-                    all_char_h += chr[i].char_h;
                 }
             }
             break;
@@ -375,36 +373,17 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
         }
     case SCROLL_Y_REVERSE:
         {
-            uint32_t line = 0;
             for (uint16_t i = 0; i < text->font_len; i++)
             {
+                chr[i].x = rect->x1;
                 if (i == 0)
                 {
-                    chr[i].x = rect->x1;
-                    chr[i].y = rect->y1 - chr[i].h;
+                    chr[i].y = rect->y2 - chr[i].char_h;
                 }
                 else
                 {
-                    chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
                     chr[i].y = chr[i - 1].y - chr[i].char_h - 2;
                 }
-                if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
-                {
-                    line++;
-                    chr[i].x = rect->x1;
-                }
-                if (text->char_line_sum != 0)
-                {
-                    if (chr[i].y <= rect->yboundtop)
-                    {
-                        text->font_len = i;
-                        break;
-                    }
-                }
-            }
-            if (text->char_line_sum == 0)
-            {
-                text->char_line_sum = line;
             }
             break;
         }
