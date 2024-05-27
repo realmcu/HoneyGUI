@@ -84,20 +84,21 @@
 static void turn_table_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
+    gui_turn_table_t *this = (void *)obj;
     GUI_UNUSED(tp);
-    if (obj->skip_tp_up_hold)
+    if (this->skip_up_tp)
     {
         gui_obj_skip_other_up_hold(obj);
     }
-    if (obj->skip_tp_down_hold)
+    if (this->skip_down_tp)
     {
         gui_obj_skip_other_down_hold(obj);
     }
-    if (obj->skip_tp_left_hold)
+    if (this->skip_left_tp)
     {
         gui_obj_skip_other_left_hold(obj);
     }
-    if (obj->skip_tp_right_hold)
+    if (this->skip_right_tp)
     {
         gui_obj_skip_other_right_hold(obj);
     }
@@ -582,10 +583,10 @@ void gui_turn_table_set_tp(gui_turn_table_t *this,
                            bool left,
                            bool right)
 {
-    this->base.skip_tp_up_hold = !up;
-    this->base.skip_tp_down_hold = !down;
-    this->base.skip_tp_left_hold = !left;
-    this->base.skip_tp_right_hold = !right;
+    this->skip_up_tp = !up;
+    this->skip_down_tp = !down;
+    this->skip_left_tp = !left;
+    this->skip_right_tp = !right;
 }
 
 void gui_turn_table_generate_layout_by_array(gui_turn_table_t *this,

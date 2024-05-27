@@ -106,6 +106,10 @@ typedef struct gui_turn_table
 {
     gui_obj_t base;
     uint8_t checksum;
+    bool skip_up_tp;
+    bool skip_down_tp;
+    bool skip_left_tp;
+    bool skip_right_tp;
 //icon
     uint8_t current_icon_index;
     uint8_t icon_quantity;
