@@ -25,11 +25,6 @@
 #define DRV_LCD_HIGHT   454
 #endif
 
-#ifdef ENABLE_RTK_GUI_DEMO
-#define DRV_LCD_WIDTH   454
-#define DRV_LCD_HIGHT   454
-#endif
-
 #ifdef ENABLE_RTK_GUI_800_480_DEMO
 #define DRV_LCD_WIDTH   800
 #define DRV_LCD_HIGHT   480
@@ -45,6 +40,8 @@
 #undef DRV_PIXEL_BITS
 #define DRV_PIXEL_BITS  16
 #endif
+
+
 #ifndef DRV_LCD_WIDTH
 #define DRV_LCD_WIDTH   480
 #endif
@@ -195,7 +192,11 @@ void *rtk_gui_sdl(void *arg)
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s\n", SDL_GetError());
         return NULL;
     }
-    window = SDL_CreateWindow("RTKIOT GUI Simulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+
+    char str[50];
+    sprintf(str, "RTKIOT GUI Simulator %d x %d", DRV_LCD_WIDTH, DRV_LCD_HIGHT);
+
+    window = SDL_CreateWindow(str, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               sim_get_width(),
                               sim_get_hight(), 0);
     renderer = SDL_CreateRenderer(window, -1, 0);

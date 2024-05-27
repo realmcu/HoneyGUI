@@ -594,9 +594,9 @@
           <GroupName>realgui/demo</GroupName>
           <Files>
             <File>
-              <FileName>rtk_gui_demo.c</FileName>
+              <FileName>rtk_gui_base_demo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\gui_engine\example\demo\rtk_gui_demo.c</FilePath>
+              <FilePath>..\gui_engine\example\demo\rtk_gui_base_demo.c</FilePath>
             </File>
           </Files>
         </Group>

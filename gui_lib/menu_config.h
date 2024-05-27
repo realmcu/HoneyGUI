@@ -22,7 +22,7 @@
 #if (CONFIG_REALTEK_BUILD_GUI == 1)
 
 // <c> RTK GUI Demo
-//#define CONFIG_REALTEK_BUILD_GUI_DEMO
+//#define CONFIG_REALTEK_BUILD_GUI_BASE_DEMO
 // </c>
 
 // <c> RTK GUI Demo 368 448

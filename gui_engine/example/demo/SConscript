@@ -3,18 +3,18 @@
 from building import *
 
 cwd = GetCurrentDir()
+CPPPATH = [cwd]
 src = Split("""
 """)
 
-src += ['rtk_gui_demo.c']
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_BASE_DEMO'):
+    src += ['rtk_gui_base_demo.c']
+
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_PAINTENGINE_DEMO'):
+    src += ['rtk_gui_paintengine_demo.c']
 
 
-CPPPATH = [cwd]
 
-CPPDEFINES = []
-if GetDepend('CONFIG_REALTEK_BUILD_GUI_DEMO'):
-    CPPDEFINES += ['ENABLE_RTK_GUI_DEMO']
-
-group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH)
 
 Return('group')
