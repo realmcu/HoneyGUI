@@ -1235,8 +1235,8 @@ void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
     jerry_value_t js_cb = NULL;
     jerry_value_t res = 0;
 
-    memcpy(&(msg.payload), js_msg, sizeof(gui_msg_js_t));
-    js_cb = (jerry_value_t)msg.cb;
+    memcpy(&(msg.cb), js_msg, sizeof(gui_msg_js_t));
+    js_cb = (jerry_value_t)msg.payload;
     // gui_log("timer msg cb 0x%x\n", js_cb);
 
     res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
@@ -1296,7 +1296,7 @@ void arm_js_timercb(void *p_handle)
     js_cb = (void *)timer_id;
     // DBG_DIRECT("js_cb 0x%x\n", js_cb);
 
-    gui_msg_t msg = {.type = GUI_EVENT_EXTERN_IO_JS, .u.param = EXTERN_EVENT_TIMER, .cb = js_cb};
+    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS, .cb = (gui_msg_cb)EXTERN_EVENT_TIMER, .payload = js_cb};
     gui_send_msg_to_server(&msg);
 }
 #endif
@@ -1585,6 +1585,6 @@ void js_run_file_on_server(const char *file, gui_app_t *app)
         gui_msg_t msg;
         memset(&msg, 0, sizeof(gui_msg_t));
         msg.payload = (void *)file;
-        msg.cb = app;
+        msg.cb = (gui_msg_cb)app;
     }
 }

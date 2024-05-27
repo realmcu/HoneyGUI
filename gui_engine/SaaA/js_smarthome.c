@@ -104,6 +104,13 @@ void gui_sh_event_sw_handler(msg_sh_base_t *msg_sw)
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
+// typedef struct gui_msg
+// {
+//     uint16_t event;
+//     gui_msg_cb cb;  // typedef void (*gui_msg_cb)(void *);
+//     void *payload;
+// } gui_msg_t;
+
 typedef struct
 {
     /* user field of event */
@@ -116,8 +123,13 @@ typedef struct
             uint8_t sh_event_type;
             uint8_t data[2];
         };
+        gui_msg_cb cb;    // gui_msg
     };
-    uint8_t data_rsv[8];   // reserve
+    union
+    {
+        uint8_t data_rsv[4];   // reserve
+        void *payload;   // gui_msg
+    };
 } gui_msg_sh_t;
 
 

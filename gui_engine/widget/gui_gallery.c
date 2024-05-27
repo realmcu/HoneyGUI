@@ -107,9 +107,9 @@ static int16_t gui_gallery_get_position(gui_img_t *img)
 
 static void gui_gallery_reset_position(gui_gallery_t *this, gui_img_t *img, int16_t pos)
 {
-    int16_t w = this->base.w;
+    // int16_t w = this->base.w;
     int16_t h = this->base.h;
-    int16_t img_x = img->base.x;
+    // int16_t img_x = img->base.x;
     int16_t img_w = 0, img_h = 0;
     float scale = (pos == this->pos_c) ? 1.f : this->side_scale;
 
@@ -219,18 +219,18 @@ static void gui_gallery_prepare(gui_obj_t *obj)
     gui_gallery_t *this = (gui_gallery_t *)obj;
     gui_img_t *img_btm_l = this->img_bottom[GALLERY_IMG_IDX_BTM_LEFT];
     gui_img_t *img_btm_r = this->img_bottom[GALLERY_IMG_IDX_BTM_RIGHT];
-    int16_t x = this->base.x;
-    int16_t y = this->base.y;
-    int16_t w = this->base.w;
+//    int16_t x = this->base.x;
+//    int16_t y = this->base.y;
+//    int16_t w = this->base.w;
     int16_t h = this->base.h;
 
     uint8_t last;
 
 // calculate
-    int16_t center_line_pos_l = 0, center_line_pos_r = 0;
+//    int16_t center_line_pos_l = 0, center_line_pos_r = 0;
 
-    center_line_pos_l = x + w * (1 - this->center_percent) / 2;
-    center_line_pos_r = x + w * (1 + this->center_percent) / 2;
+//    center_line_pos_l = x + w * (1 - this->center_percent) / 2;
+//    center_line_pos_r = x + w * (1 + this->center_percent) / 2;
 
 
 // touch
@@ -257,9 +257,9 @@ static void gui_gallery_prepare(gui_obj_t *obj)
                 {
                     gui_img_t *img = this->img[i];
                     int16_t img_x = img->base.x;
-                    int16_t img_y = img->base.y;
+                    // int16_t img_y = img->base.y;
                     int16_t img_w = 0, img_h = 0;
-                    float scale_cur = img->scale_x;
+//                    float scale_cur = img->scale_x;
                     float scale_nxt = 0;
                     int16_t img_pos_cur = 0, img_pos_nxt = 0;
 
@@ -300,7 +300,7 @@ static void gui_gallery_prepare(gui_obj_t *obj)
                 // update bottom img
                 {
                     int16_t pos = 0;
-                    int16_t img_w = 0, img_h = 0;
+//                    int16_t img_w = 0, img_h = 0;
 
                     // bottom pop up
                     pos = gui_gallery_get_position(this->img[GALLERY_IMG_IDX_LEFT]);
@@ -381,7 +381,7 @@ static void gui_gallery_prepare(gui_obj_t *obj)
         break;
     case TOUCH_INVALIDE:
         {
-            int16_t pos = 0;
+//            int16_t pos = 0;
             this->release_x = 0;
 
             gui_gallery_reset_position(this, this->img[GALLERY_IMG_IDX_LEFT], this->pos_l);
@@ -408,16 +408,16 @@ static void gui_gallery_prepare(gui_obj_t *obj)
 
 static void gui_gallery_draw_cb(gui_obj_t *obj)
 {
-    gui_dispdev_t *dc = gui_get_dc();
-    gui_gallery_t *this = (gui_gallery_t *)obj;
-    draw_img_t *draw_img;
+//    gui_dispdev_t *dc = gui_get_dc();
+//    gui_gallery_t *this = (gui_gallery_t *)obj;
+//    draw_img_t *draw_img;
 
 }
 
 static void gui_gallery_end(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
-    gui_gallery_t *gallery = (gui_gallery_t *)obj;
+//    gui_gallery_t *gallery = (gui_gallery_t *)obj;
 
 }
 
@@ -497,16 +497,16 @@ static void gui_gallery_ctor(gui_gallery_t         *this,
                              int16_t                    h)
 {
     gui_obj_t *root = (gui_obj_t *)this;
-    void **array = config->img_array;
-    void *img_data = NULL;
-    char *path;
+//    void **array = config->img_array;
+//    void *img_data = NULL;
+//    char *path;
     gui_img_t *img = NULL;
     int16_t indx = 0;
 
-    int16_t x_c_bg, y_c_bg, w_c_bg, h_c_bg;
-    int16_t x_l, y_l, w_l, h_l;
-    int16_t x_c, y_c, w_c, h_c;
-    int16_t x_r, y_r, w_r, h_r;
+//    int16_t x_c_bg, y_c_bg, w_c_bg, h_c_bg;
+    int16_t x_l;//, y_l, w_l, h_l;
+    int16_t x_c;//, y_c, w_c, h_c;
+    int16_t x_r;//, y_r, w_r, h_r;
 
     int16_t img_w = 0, img_h = 0;
 

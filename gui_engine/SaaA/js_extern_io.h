@@ -38,20 +38,29 @@ typedef enum
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
+// typedef struct gui_msg
+// {
+//     uint16_t event;
+//     gui_msg_cb cb;  // typedef void (*gui_msg_cb)(void *);
+//     void *payload;
+// } gui_msg_t;
+
 typedef struct
 {
     /* the event type */
-    // uint16_t type;
+    // uint16_t event;
     /* user field of event */
     union
     {
         uint32_t  param;
         uint8_t extern_event_type;
+        gui_msg_cb cb;    // gui_msg
     };
     union
     {
-        void  *data[2];
+        void  *data;
         uint8_t *data_rsv;   // reserve
+        void *payload;   // gui_msg
     };
 } gui_msg_js_t;
 

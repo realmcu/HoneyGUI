@@ -1,14 +1,15 @@
 #include "js_user.h"
 
-
-#if (defined RTL87x2G)||(defined RTL8762D)
+#if defined ENABLE_MESH_SWITCH
 #include "app_msg.h"
+#if (defined RTL87x2G)||(defined RTL8762D)
 T_IO_MSG cmd_msg = {.type = IO_MSG_TYPE_UART, .subtype = 0x0d};
 #endif
-
+#endif
 
 static void send_mesh_cmd(char *cmd, uint32_t len)
 {
+#if defined ENABLE_MESH_SWITCH
 #if (defined RTL87x2G)||(defined RTL8762D)
     extern bool app_send_msg_to_apptask(T_IO_MSG * p_msg);
     uint32_t i = 0;
@@ -22,6 +23,7 @@ static void send_mesh_cmd(char *cmd, uint32_t len)
 
     cmd_msg.subtype = 0x0d;
     app_send_msg_to_apptask(&cmd_msg);
+#endif
 #endif
 }
 

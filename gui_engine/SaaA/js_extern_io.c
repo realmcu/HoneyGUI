@@ -7,7 +7,7 @@ extern void gui_extern_event_timer_handler(gui_msg_js_t *js_msg);
 
 void gui_extern_event_js_handler(gui_msg_t *msg)
 {
-    gui_msg_js_t *js_msg = (gui_msg_js_t *) & (msg->payload);
+    gui_msg_js_t *js_msg = (gui_msg_js_t *) & (msg->cb);
 
     switch (js_msg->extern_event_type)
     {

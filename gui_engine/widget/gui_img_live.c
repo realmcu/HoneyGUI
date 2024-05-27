@@ -96,11 +96,11 @@ static bool is_mjpeg(void *pdata)
 
 static uint8_t **mjpeg2jpeg_slicer(uint8_t *mjpeg, uint32_t size, uint32_t *slice_cnt)
 {
-    int ret = 0;
-    int input_skip = 0, output_size = 0;
+    // int ret = 0;
+    // int input_skip = 0, output_size = 0;
     uint8_t *pdata = mjpeg;
     uint8_t *ptmp = mjpeg;
-    uint8_t *output = NULL;
+    // uint8_t *output = NULL;
     uint8_t **array = NULL;
     *slice_cnt = 0;
     uint8_t scan_state = 0;  // 0: init, 1: soi, 2: eoi
@@ -470,7 +470,7 @@ static void gui_img_live_ctor(gui_img_live_t  *this,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     uint32_t frame_time_ms = 0;
-    uint32_t live_time = 0;
+    // uint32_t live_time = 0;
 
     gui_obj_ctor(root, parent, name, x, y, w, h);
     root->type = IMAGE_FROM_MEM;
@@ -484,7 +484,7 @@ static void gui_img_live_ctor(gui_img_live_t  *this,
     // this->fps = 24;
     this->data = addr;
     frame_time_ms = 1000.f / this->fps;
-    live_time = this->num_frame * frame_time_ms;
+    // live_time = this->num_frame * frame_time_ms;
 
     // get img data from file, and img type
     gui_img_live_file_init(this);
