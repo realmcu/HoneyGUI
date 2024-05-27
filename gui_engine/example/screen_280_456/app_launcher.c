@@ -282,7 +282,7 @@ static void curtain_center(gui_curtainview_t *curtainview)
                                                     20);
     gui_text_set(electric_quantity, "80", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 2, 32);
 }
-static void switch_to_wheel(void *obj, gui_event_t event)
+static void switch_to_wheel(void *obj, gui_event_t event, void *param)
 {
     gui_switch_app(get_launcher_app(), get_wheel_app());
 }
@@ -403,12 +403,12 @@ static void app_launcher_ui_design(gui_app_t *app)
 #endif
 }
 
-static void wheel_cb(void *obj, gui_event_t event)
+static void wheel_cb(void *obj, gui_event_t event, void *param)
 {
     gui_img_t *img = (gui_img_t *)obj;
     gui_log("img p %p, x %d, y %d \n", obj, img->base.x, img->base.y);
 }
-static void switch_to_launcher(void *obj, gui_event_t event)
+static void switch_to_launcher(void *obj, gui_event_t event, void *param)
 {
     gui_switch_app(get_wheel_app(), get_launcher_app());
 }
