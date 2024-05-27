@@ -18,6 +18,7 @@
 #define MAX_EVENT_CNT   10
 static gui_event_cb_t event_cb[MAX_EVENT_CNT];
 static gui_event_t event_code[MAX_EVENT_CNT];
+static void *event_cb_param[MAX_EVENT_CNT];
 static void *event_obj[MAX_EVENT_CNT];
 static uint8_t event_cnt = 0;
 static bool fb_change = false;
@@ -237,6 +238,7 @@ static void obj_draw_end(gui_obj_t *obj)
                 {
                     event_cb[event_cnt] = event_dsc->event_cb;
                     event_code[event_cnt] = event_dsc->event_code;
+                    event_cb_param[event_cnt] = event_dsc->user_data;
                     event_obj[event_cnt] = obj;
                     event_dsc->event_code = GUI_EVENT_INVALIDE;
                     event_cnt++;
@@ -401,7 +403,7 @@ void gui_fb_disp(gui_obj_t *root)
     obj_draw_end(root);
     for (uint8_t i = 0; i < event_cnt; i++)
     {
-        event_cb[i](event_obj[i], event_code[i]);
+        event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
     }
     event_cnt = 0;
     dc->frame_count++;

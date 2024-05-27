@@ -5,20 +5,12 @@
 sem_t sem_timer;
 #endif
 
-static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code)
+static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code, void *param)
 {
     //gui_log("enter js_cb_with_args\n");
-    cb_arg_t *args = NULL;
+    cb_arg_t *args = param;
     gui_event_dsc_t *event = obj->event_dsc;
 
-    // same event only handle the first register one
-    for (size_t i = 0; i < obj->event_dsc_cnt; i++)
-    {
-        if (event[i].filter == event_code)
-        {
-            args = event[i].user_data;
-        }
-    }
     if (args == NULL)
     {
         return;

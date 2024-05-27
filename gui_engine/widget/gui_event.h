@@ -86,7 +86,7 @@ typedef enum
     GUI_EVENT_USER_DEFINE             = 0x0100,
 } gui_event_t;
 
-typedef void (*gui_event_cb_t)(void *obj, gui_event_t e);
+typedef void (*gui_event_cb_t)(void *obj, gui_event_t e, void *param);
 
 typedef struct _gui_event_dsc_t
 {
