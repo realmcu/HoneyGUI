@@ -319,6 +319,21 @@ void nvgResetTransform(NVGcontext *ctx);
 //   [0 0 1]
 void nvgTransform(NVGcontext *ctx, float a, float b, float c, float d, float e, float f);
 
+// Premultiplies current coordinate system by specified matrix.
+// The parameters are interpreted as matrix as follows:
+//   [a c e]
+//   [b d f]
+//   [g h i]
+void nvgTransformxyz(NVGcontext *ctx, float a, float b, float c, float d, float e, float f, float g,
+                     float h, float i);
+
+// Premultiplies current coordinate system by specified matrix.
+// The parameters are interpreted as matrix as follows:
+//   [1 0 0]
+//   [0 1 0]
+//   [g h i]
+void nvgTransformz(NVGcontext *ctx, float g, float h, float i);
+
 // Translates current coordinate system.
 void nvgTranslate(NVGcontext *ctx, float x, float y);
 
