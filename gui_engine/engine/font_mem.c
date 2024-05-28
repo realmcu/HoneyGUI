@@ -94,7 +94,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                 if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
                 {
                     chr[i].char_w = text->font_height / 2;
-                    chr[i].char_h = 1;
+                    chr[i].char_h = text->font_height / 2;
                 }
                 else if (chr[i].unicode == 0x0A)
                 {
@@ -148,7 +148,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                 if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
                 {
                     chr[i].char_w = text->font_height / 2;
-                    chr[i].char_h = 1;
+                    chr[i].char_h = text->font_height / 2;
                 }
                 else if (chr[i].unicode == 0x0A)
                 {
@@ -188,7 +188,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     else if (chr[i].unicode == 0x20)
                     {
                         chr[i].char_w = text->font_height / 2;
-                        chr[i].char_h = 1;
+                        chr[i].char_h = text->font_height / 2;
                     }
                     else
                     {
