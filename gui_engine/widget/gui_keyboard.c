@@ -658,6 +658,7 @@ static void gui_kb_cursor_animate(void *p)
 
     i++;
     // printf(">%c\n", *(char*)cur);
+    // gui_log("gui_kb_cursor_animate\n");
 
     memset(pcontent, 0, KB_BUFF_DISPLAY_MAXLEN);
     if (len_bf)
@@ -666,7 +667,8 @@ static void gui_kb_cursor_animate(void *p)
     }
     pcontent[len_bf] = (i & 0x01) ? '_' : ' ';
     memcpy(pcontent + len_bf + 1, cur, len_display - len_bf);
-    this->txt_display->len = len_display + 1;
+
+    gui_text_content_set(this->txt_display, pcontent, len_display + 1);
 }
 
 static void gui_kb_update_display(void)
@@ -680,12 +682,12 @@ static void gui_kb_update_display(void)
 }
 static void gui_kb_input_proc(void *obj, gui_event_t event_code, void *param)
 {
-    gui_obj_t *this = (void *)obj;
-    T_OBJ_TYPE type = this->type;
+    // gui_obj_t *this = (void *)obj;
+    // T_OBJ_TYPE type = this->type;
     size_t key_val = (size_t)param;
 
-    gui_log("0x%x type: 0x%x, key: 0x%x %d %d\n", obj, type, key_val, KB_VALUE_AREA(key_val),
-            KB_VALUE_IDX(key_val));
+    // gui_log("0x%x type: 0x%x, key: 0x%x %d %d\n", obj, type, key_val, KB_VALUE_AREA(key_val),
+    //         KB_VALUE_IDX(key_val));
     // gui_log(">%s\n", buff_input);
 
     if (gui_kb_is_func(key_val))
@@ -937,6 +939,17 @@ static void gui_kb_mode_switch(gui_kb_t *this, uint8_t mode)
     gui_obj_show(this->win_func, true);
 
 }
+static void gui_kb_set_obj_scale(int16_t *obj_x, int16_t *obj_y, int16_t *obj_w, int16_t *obj_h)
+{
+    gui_kb_t *this = gui_get_kb();
+    uint16_t h = gui_get_screen_width();
+    float scale = this->scale;
+
+    *obj_x = *obj_x * scale;
+    *obj_y = h - (360 - *obj_y) * scale;
+    *obj_w = *obj_w * scale;
+    *obj_h = *obj_h * scale;
+}
 static void gui_kb_layout_basic_letter(gui_kb_t  *this)
 {
     int16_t x = this->base.x, y = this->base.y, w = this->base.w, h = this->base.h;
@@ -950,6 +963,7 @@ static void gui_kb_layout_basic_letter(gui_kb_t  *this)
     float y_step = 59;
     float x_letter_step = 61;
     float x_letter_start[3] = {19, 50, 111};
+    float scale = this->scale;
 
     this->win_letter = gui_win_create(this, "WIN_letter",
                                       x, y, w, h);
@@ -972,10 +986,12 @@ static void gui_kb_layout_basic_letter(gui_kb_t  *this)
         img_clk = get_key_img(this, key_val, KB_SRC_LOWWER_CLK);
         obj_w = ((gui_rgb_data_head_t *)img_default)->w;
         obj_h = ((gui_rgb_data_head_t *)img_default)->h;
+        gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
 
         btn = gui_button_create(this->win_letter, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                 BUTTON_BG_ICON, 0);
+        gui_img_scale(btn->img, scale, scale);
         gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
 
     }
@@ -993,6 +1009,7 @@ static void gui_kb_layout_basic_func(gui_kb_t  *this)
     int16_t y_start = 120;
     float y_step = 59;
     float x_pos[] = {19, 111, 203, 264, 384, 445, 537};
+    float scale = this->scale;
 
     this->win_func = gui_win_create(this, "WIN_func",
                                     x, y, w, h);
@@ -1015,16 +1032,19 @@ static void gui_kb_layout_basic_func(gui_kb_t  *this)
         img_clk = get_key_img(this, key_val, KB_SRC_CLK);
         obj_w = ((gui_rgb_data_head_t *)img_default)->w;
         obj_h = ((gui_rgb_data_head_t *)img_default)->h;
+        gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
         if (key_is_sw(key_val) == false)
         {
             btn = gui_button_create(this->win_func, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
                                     BUTTON_BG_ICON, 0);
+            gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
         }
         else
         {
             sw = gui_switch_create(this->win_func, obj_x, obj_y, obj_w, obj_h, img_default, img_clk);
+            gui_img_scale(sw->switch_picture, scale, scale);
             GUI_API(gui_switch_t).on_turn_on(sw, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
             GUI_API(gui_switch_t).on_turn_off(sw, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
         }
@@ -1042,7 +1062,7 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
     // location calculate
     // 3 row
     int16_t y_start = 120;
-
+    float scale = this->scale;
 
 
     this->win_num = gui_win_create(this, "WIN_num",
@@ -1070,9 +1090,11 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             img_clk = get_key_img(this, key_val, KB_SRC_CLK);
             obj_w = ((gui_rgb_data_head_t *)img_default)->w;
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
+            gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
             btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, " ",
                                     BUTTON_BG_ICON, 0);
+            gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
 
         }
@@ -1099,9 +1121,11 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             img_clk = get_key_img(this, key_val, KB_SRC_CLK);
             obj_w = ((gui_rgb_data_head_t *)img_default)->w;
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
+            gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
             btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, " ",
                                     BUTTON_BG_ICON, 0);
+            gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
 
         }
@@ -1154,18 +1178,21 @@ static void gui_kb_ctor(gui_kb_t                        *this,
     }
 
     // keyboard
+    global_kb = this;
     this->layout = config->layout;
     this->mode = config->mode;
     this->img_array = config->img_array;
     this->num_pic = config->num_pic;
     this->file_mark[0] = config->file_mark[0];
     this->file_mark[1] = config->file_mark[1];
+    this->scale = gui_get_screen_width() / 640.f;
 
     img_data = get_other_img(this, KB_IMG_IDX_BG);
     this->img_bg = gui_img_create_from_mem(this, "KB_BG",
                                            img_data,
                                            0, 0, w, h);
     gui_img_set_mode(this->img_bg, IMG_BYPASS_MODE);
+    gui_img_scale(this->img_bg, this->scale, gui_get_screen_height() / 360.f);
 
     //
     if (this->layout == KB_LAYOUT_BASIC)
@@ -1180,6 +1207,7 @@ static void gui_kb_ctor(gui_kb_t                        *this,
                                             img_data,
                                             19, 17, w, h);
     gui_img_set_mode(this->img_box, IMG_BYPASS_MODE);
+    gui_img_scale(this->img_box, this->scale, 1.f);
 
     char *text = buff_txt_display;
 
@@ -1271,7 +1299,6 @@ gui_kb_t *gui_keyboard_create(void                    *parent,
     gui_kb_ctor(this, (gui_obj_t *)parent, name, cofig, x, y, w, h);
 
     GET_BASE(this)->create_done = true;
-    global_kb = this;
     return this;
 }
 

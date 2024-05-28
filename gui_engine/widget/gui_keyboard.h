@@ -86,6 +86,7 @@ typedef struct
     gui_text_t *txt_input;   // call txtbox
     void **img_array;
     uint16_t file_mark[2];   // func, other start point
+    float scale;             // refer to 640*360, keep screen horizontal full
 
     uint8_t checksum;
 } gui_kb_t;
