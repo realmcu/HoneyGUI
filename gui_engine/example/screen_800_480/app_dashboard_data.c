@@ -28,7 +28,7 @@ bool communicate_navi_dlps_check(void)
 {
     return COMMUNICATE_ALLOW_DLPS;
 }
-extern void reset_daemon_time(uint32_t value);
+// extern void reset_daemon_time(uint32_t value);
 
 void app_dashboard_auto_refresh_data_demo(void)
 {
@@ -94,9 +94,6 @@ void *refresh_count_timer;
 static void refresh_count_timer_cb(void *p_handle)
 {
     app_dashboard_data_set_current_timer();
-#ifndef _WIN32
-    os_timer_start(&p_handle);
-#endif
 }
 
 void app_dashboard_initialize_data(void)
@@ -106,10 +103,7 @@ void app_dashboard_initialize_data(void)
     app_current_dashboard_data.refresh_timer_value = 36900;
     app_current_dashboard_data.tense_apm_display = T_TENSE_AM_DISPLAY;
     gui_log("app_dashboard_initialize_data exit\n");
-#ifndef _WIN32
-    os_timer_create(&refresh_count_timer, "gui-tick", 0, 1000, true, refresh_count_timer_cb);
-    os_timer_start(&refresh_count_timer);
-#endif
+
 }
 
 void app_dashboard_data_set_current_timer(void)
@@ -288,7 +282,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
 #ifndef _WIN32
     gui_indev_wakeup();
     COMMUNICATE_ALLOW_DLPS = false;
-    reset_daemon_time(gui_ms_get());
+    // reset_daemon_time(gui_ms_get());
     uint8_t navi_type = 0;
     navi_type = ((uint8_t *)pValue)[0];
     if (navi_type == TURN_LEFT || navi_type == LEFT_FRONT || navi_type == LEFT_BACK
