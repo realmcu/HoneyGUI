@@ -216,6 +216,15 @@ typedef enum
 void gui_keyboard_launch(gui_obj_t *obj);
 
 /**
+ * @brief launch keyboard input from widget event
+ * @note
+ * @param obj the widget call
+ * @param e   the event cb
+ * @param obj the widget call
+ */
+void gui_keyboard_launch_by_widget(void *obj, gui_event_t e, void *param);
+
+/**
  * @brief creat an image widget from memory address
  * @note creat an image widget and set attribute
  * @param parent the father widget it nested in.

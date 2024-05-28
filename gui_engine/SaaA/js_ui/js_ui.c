@@ -77,6 +77,10 @@ DECLARE_HANDLER(setInputable)
     {
         bool enable = jerry_get_boolean_value(args[0]);
         gui_text_input_set(txtbox, enable);
+        if (enable)
+        {
+            gui_text_click(txtbox, gui_keyboard_launch_by_widget, txtbox);
+        }
         // jerry_release_value(enable);
     }
     return jerry_create_undefined();

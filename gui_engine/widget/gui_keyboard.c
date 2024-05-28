@@ -1242,6 +1242,11 @@ void gui_keyboard_launch(gui_obj_t *obj)
     }
 }
 
+void gui_keyboard_launch_by_widget(void *obj, gui_event_t e, void *param)
+{
+    gui_keyboard_launch((gui_obj_t *)param);
+}
+
 
 gui_kb_t *gui_keyboard_create(void                    *parent,
                               const char                *name,

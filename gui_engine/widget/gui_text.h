@@ -162,6 +162,14 @@ typedef struct gui_text_line
   */
 
 /**
+ * @brief set textbox click event cb .
+ *
+ * @param this      text widget
+ * @param event_cb  cb function
+ * @param parameter cb parameter
+ */
+void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter);
+/**
 * @brief set the string in a text box widget.
 * @note The font size must match the font file!
 * @param this the text box widget pointer.

@@ -350,10 +350,6 @@ static void gui_text_prepare(gui_obj_t *obj)
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
-                if (((gui_text_t *)obj)->inputable)
-                {
-                    gui_keyboard_launch(obj);
-                }
             }
         }
         break;
@@ -474,6 +470,11 @@ void gui_text_ctor(gui_text_t *this,
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
+void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_CLICKED, parameter);
+}
 
 void gui_text_set(gui_text_t   *this,
                   void         *text,

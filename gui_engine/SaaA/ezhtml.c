@@ -110,7 +110,7 @@ static void seekbar_ani_cb(int args, gui_seekbar_t *this)
 }
 static void switch_cb_for_mororized_curtain(gui_switch_t *sw, gui_event_t event_code)
 {
-    int args = 0;
+    size_t args = 0;
     gui_event_dsc_t *event = GUI_BASE(sw)->event_dsc;
 
     // same event only handle the first register one
@@ -118,7 +118,7 @@ static void switch_cb_for_mororized_curtain(gui_switch_t *sw, gui_event_t event_
     {
         if (event[i].filter == event_code)
         {
-            args = (int)event[i].user_data;
+            args = (size_t)event[i].user_data;
         }
     }
     gui_seekbar_t *seekbar = 0;
@@ -344,6 +344,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     size_t color = 0xffffffff;
                     int fontSize = 32;
                     TEXT_MODE style = 0;
+                    uint8_t inputable = false;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -408,6 +409,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
 
                         }
+                        else if (!strcmp(p->attr[i], "inputable"))
+                        {
+                            inputable = atoi(p->attr[++i]);
+                        }
                         i++;
                     }
                     //gui_log("x:%d,y:%d,w:%dh:%d,font:%s,text:%s,color:%x\n", x, y, w, h, font, text, color);
@@ -423,7 +428,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_color_t color_temporary;
                             color_temporary.color.rgba_full = color;
                             gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
-
+                            if (inputable)
+                            {
+                                gui_text_input_set(t, inputable);
+                                gui_text_click(t, gui_keyboard_launch_by_widget, t);
+                            }
 
 
                             {
@@ -2483,9 +2492,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         config.mode = KB_MODE_BASIC_ENG_LOWWER;
 
                         uint16_t file_count = 0;
-                        DIR *dir = floder_letter;
+                        DIR *dir = NULL;
                         struct dirent *entry;
-                        char **folder_array[] = {floder_letter, floder_letter_upper, floder_num, floder_symbol, floder_func, floder_other};
+                        char *folder_array[] = {floder_letter, floder_letter_upper, floder_num, floder_symbol, floder_func, floder_other};
                         for (int i = 0; i < sizeof(folder_array) / sizeof(folder_array[0]); i++)
                         {
                             char *folder = folder_array[i];
