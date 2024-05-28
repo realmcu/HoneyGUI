@@ -28,7 +28,7 @@ extern "C" {
 /*********************
 *      DEFINES
 *********************/
-#define LX_INT_MEM_SIZE     (50 * 1024)//这部分SRAM用于提升帧率，默认值为32K，越大帧率优化的效果越好，客户可以根据实际情况修改大小
+#define LX_INT_MEM_SIZE     (2 * 1024)//这部分SRAM用于提升帧率，默认值为32K，越大帧率优化的效果越好，客户可以根据实际情况修改大小
 
 /**********************
 *      TYPEDEFS
@@ -48,9 +48,9 @@ void *lx_platform_realloc(void *ptr, size_t size);
 
 void lx_platform_free(void *ptr);
 
-void *lx_platform_int_malloc(size_t size);
+void *lx_platform_get_cache(void);
 
-void lx_platform_int_free(void *ptr);
+size_t lx_platform_get_cache_size(void);
 
 #if defined(__cplusplus)
 }

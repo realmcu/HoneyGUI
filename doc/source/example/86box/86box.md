@@ -40,8 +40,8 @@ This example demostrates how to develop a SmartUI 86BOX APP, from which you can 
 - On line 192 ~ 194 of the file ```gui_engine\example\screen_480_480\root\app\box\box.js```, it registers functions that will be triggered by the turning on and turning off gestures of a switch widget called ```living_switch```.
 ```javascript
 sw.getElementById('living_switch')
-sw.onOn(led1OnFunc)
-sw.onOff(led1OffFunc)
+sw.switch_on(led1OnFunc)
+sw.switch_off(led1OffFunc)
 ```
 - The function triggered by turning on gesture is ```led1OnFunc```. 
 - Define an instance of GPIO with an index value of 0 and a direction of output. 

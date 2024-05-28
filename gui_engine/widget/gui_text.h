@@ -56,6 +56,7 @@ typedef enum
     MULTI_RIGHT,
     SCROLL_X,
     SCROLL_Y,
+    SCROLL_Y_REVERSE,
     VERTICAL_LEFT,
     VERTICAL_RIGHT,
 } TEXT_MODE;
@@ -74,6 +75,7 @@ typedef enum
     GUI_FONT_SRC_BMP = 0,
     GUI_FONT_SRC_TTF = 1,
     GUI_FONT_SRC_IMG = 2,
+    GUI_FONT_SRC_MAT = 3,
 } FONT_SRC_TYPE;
 
 /** @brief  text widget structure */
@@ -84,11 +86,13 @@ typedef struct gui_text
     uint16_t len;
     uint16_t font_len;
     int16_t char_width_sum;
+    int16_t char_height_sum;
     int16_t char_line_sum;
     TEXT_MODE mode;
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
     uint8_t font_height;
+    uint8_t inputable;    // support user input or not
     uint8_t checksum;
     gui_animate_t *animate;
     void *content;
@@ -158,6 +162,14 @@ typedef struct gui_text_line
   */
 
 /**
+ * @brief set textbox click event cb .
+ *
+ * @param this      text widget
+ * @param event_cb  cb function
+ * @param parameter cb parameter
+ */
+void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter);
+/**
 * @brief set the string in a text box widget.
 * @note The font size must match the font file!
 * @param this the text box widget pointer.
@@ -198,6 +210,8 @@ void gui_text_set_animate(void    *o,
  */
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode);
 
+
+void gui_text_input_set(gui_text_t *this, bool inputable);
 /**
  * @brief move the text widget
  *

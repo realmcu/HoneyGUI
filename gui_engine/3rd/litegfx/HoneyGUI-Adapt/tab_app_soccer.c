@@ -40,7 +40,14 @@ static uintptr_t app_soccer_user_cb(uint16_t cmd, uintptr_t param, uintptr_t use
             gui_widget_litegfx_set_image(obj, index + 2, (void *)iconList[index]);
         }
     }
-    return;
+
+    if (cmd == LX_CMD_ID_CLICK)
+    {
+        gui_log("clicked item:%d", param);
+
+    }
+
+    return 0;
 }
 
 void design_tab_app_soccer(void *parent)

@@ -15,6 +15,6 @@ if GetDepend(['CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE']):
 
 CPPPATH = [cwd]
 
-group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
 
 Return('group')

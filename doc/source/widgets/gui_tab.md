@@ -23,14 +23,14 @@ For an introduction to idx and idy, please refer to:
 If you wish to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_create) setting. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
 
 ```c
-typedef enum gui_tab_style
+typedef enum t_slide_style
 {
     CLASSIC,
     REDUCTION,
     FADE,
     REDUCTION_FADE,
     STACKING,
-} SLIDE_STYLE;
+} T_SLIDE_STYLE;
 ```
 
 ## Example

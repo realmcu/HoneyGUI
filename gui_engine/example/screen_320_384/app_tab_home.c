@@ -77,7 +77,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     }
     else if (dynamic_island_count == 2)
     {
-        gui_tree_free((gui_obj_t *)dynamic_island_rect);
+        gui_obj_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_island_rect2",
                                                       DYNAMIC_ISLAND_PIC1_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
@@ -89,7 +89,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     }
     else if (dynamic_island_count == 3)
     {
-        gui_tree_free((gui_obj_t *)dynamic_island_rect);
+        gui_obj_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_island_rect3",
                                                       DYNAMIC_ISLAND_PIC2_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
@@ -101,7 +101,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     }
     else if (dynamic_island_count == 4)
     {
-        gui_tree_free((gui_obj_t *)dynamic_island_rect);
+        gui_obj_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_island_rect40",
                                                       DYNAMIC_ISLAND_PIC3_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
@@ -112,7 +112,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     }
     else if (dynamic_island_count == 5)
     {
-        gui_tree_free((gui_obj_t *)dynamic_island_rect);
+        gui_obj_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_island_rect5",
                                                       DYNAMIC_ISLAND_PIC4_BIN, -10, 25, 0, 0);
         // dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_islcand_pic0",
@@ -122,7 +122,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     }
     else if (dynamic_island_count == 6)
     {
-        gui_tree_free((gui_obj_t *)dynamic_island_rect);
+        gui_obj_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_rect = gui_img_create_from_mem(dynamic_island, "dynamic_island_rect6",
                                                       DYNAMIC_ISLAND_260_66_BIN, -10, 25, 0, 0);
         gui_img_t *dynamic_islcand_pic1 = gui_img_create_from_mem(dynamic_island_rect,
@@ -149,7 +149,7 @@ void switch_dynamic_island(void *obj, gui_event_t e)
     }
     else
     {
-        gui_tree_free((gui_obj_t *)dynamic_island_rect);
+        gui_obj_tree_free((gui_obj_t *)dynamic_island_rect);
         dynamic_island_count = 0;
     }
 }

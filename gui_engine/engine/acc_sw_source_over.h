@@ -20,34 +20,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void alpha_blend_blit_rtkargb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                            gui_rect_t *rect);
-void alpha_blend_blit_rtkargb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                             gui_rect_t *rect);
-void alpha_blend_blit_argb8565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          gui_rect_t *rect);
-void alpha_blend_blit_argb8888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                          gui_rect_t *rect);
-void alpha_blend_blit_rgb888_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect);
-void alpha_blend_blit_rgb565_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect);
-void alpha_blend_blit_rgb565_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect);
-void alpha_blend_blit_argb8565_to_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                         gui_rect_t *rect);
-void alpha_blend_blit_rgb888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect);
-void alpha_blend_blit_argb8888_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect);
-void alpha_blend_blit_rgb565_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect);
-void alpha_blend_blit_rgb888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                      gui_rect_t *rect);
-void alpha_blend_blit_rgba8888_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                                        gui_rect_t *rect);
-void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                     gui_rect_t *rect);
+
+void rect_2_argb8888(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+
+void rect_2_rgb565(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+
 #ifdef __cplusplus
 }
 #endif

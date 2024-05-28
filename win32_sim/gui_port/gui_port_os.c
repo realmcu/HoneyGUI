@@ -4,7 +4,9 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include <pthread.h>
+#include <time.h>
 #include "gui_queue.h"
+#include <unistd.h>
 
 static uint32_t gui_tick = 0;
 
@@ -12,20 +14,22 @@ static void *port_thread_create(const char *name, void (*entry)(void *param), vo
                                 uint32_t stack_size, uint8_t priority)
 {
     pthread_t *thread = malloc(sizeof(pthread_t));
-    pthread_create(thread, NULL, entry, param);
+    pthread_create(thread, NULL, (void *(*)(void *))entry, param);
     pthread_setname_np(*thread, name);
     return thread;
 }
 
 static bool port_thread_delete(void *handle)
 {
-    pthread_t *thread = handle;
+    pthread_t thread = *((pthread_t *)handle);
     void *ret = NULL;
+    int res = 0;
     //pthread_detach(*thread);
     //pthread_kill(*thread, 3);
-    pthread_cancel(*thread);
-    pthread_join(*thread, &ret);
-    return true;
+    res = pthread_cancel(thread);
+    pthread_join(thread, &ret);
+    free(handle);
+    return res;
 }
 static bool port_thread_mdelay(uint32_t ms)
 {
@@ -41,16 +45,21 @@ static Queue q;
 
 static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs)
 {
+    void **queue = handle;
     pthread_mutex_init(&port_mutex, NULL);
     pthread_cond_init(&port_cond, NULL);
 
     pthread_mutex_init(&queue_mutex, NULL);
     QueueInit(&q);
+    *queue = &q;
 }
 static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 {
+    QuDataType data = {0};
+
+    memcpy(&data, buffer, size);
     pthread_mutex_lock(&queue_mutex);
-    QueuePush(&q, 1);
+    QueuePush(&q, data);
     pthread_mutex_unlock(&queue_mutex);
 
     pthread_mutex_lock(&port_mutex);
@@ -64,12 +73,31 @@ static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t tim
     if (QueueEmpty(&q) == true)
     {
         pthread_mutex_lock(&port_mutex);
-        pthread_cond_timedwait(&port_cond, &port_mutex, &timeout);
+
+        struct timeval now;
+        struct timespec outtime;
+        mingw_gettimeofday(&now, NULL);
+        outtime.tv_sec = now.tv_sec + timeout;
+        outtime.tv_nsec = now.tv_usec * 1000;
+
+        pthread_cond_timedwait(&port_cond, &port_mutex, &outtime);
         pthread_mutex_unlock(&port_mutex);
+        return false;
     }
-    pthread_mutex_lock(&queue_mutex);
-    QueuePop(&q);
-    pthread_mutex_unlock(&queue_mutex);
+    else
+    {
+        QuDataType data;
+
+        pthread_mutex_lock(&queue_mutex);
+        data = QueueFront(&q);
+        QueuePop(&q);
+        pthread_mutex_unlock(&queue_mutex);
+
+        memcpy(buffer, &data, size);
+
+        return true;
+    }
+
 }
 
 
@@ -98,6 +126,9 @@ static void port_free(void *rmem)
 #define PORT_GUI_MEMHEAP_SIZE 1024*1024*10
 static uint8_t gui_memheap[PORT_GUI_MEMHEAP_SIZE] = {0};
 
+#define PORT_GUI_LOWER_MEMHEAP_SIZE 1024*1024*10
+static uint8_t gui_lower_memheap[PORT_GUI_LOWER_MEMHEAP_SIZE] = {0};
+
 
 static struct gui_os_api os_api =
 {
@@ -113,10 +144,14 @@ static struct gui_os_api os_api =
     .f_realloc = port_realloc,
     .f_free = port_free,
 
-    .mem_size = PORT_GUI_MEMHEAP_SIZE,
     .mem_addr = gui_memheap,
+    .mem_size = PORT_GUI_MEMHEAP_SIZE,
 
-    .log = printf,
+    .lower_mem_addr = gui_lower_memheap,
+    .lower_mem_size = PORT_GUI_LOWER_MEMHEAP_SIZE,
+    .mem_threshold_size = 10 * 1024,
+
+    .log = (void *)printf,
 };
 
 

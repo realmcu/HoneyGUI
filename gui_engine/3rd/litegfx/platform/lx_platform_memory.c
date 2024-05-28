@@ -41,9 +41,6 @@
 **********************/
 static char lx_int_mem_buffer[LX_INT_MEM_SIZE];
 
-static tlsf_t lx_int_mem_tlsf;
-static bool lx_int_mem_inited = false;
-
 /**********************
 *  GLOBAL VARIABLES
 **********************/
@@ -118,34 +115,14 @@ void lx_platform_free(void *ptr)
     gui_free(ptr);
 }
 
-void *lx_platform_int_malloc(size_t size)
+void *lx_platform_get_cache(void)
 {
-    void *ptr = NULL;
-
-    if (lx_int_mem_inited == false)
-    {
-        lx_int_mem_inited = true;
-
-        lx_int_mem_tlsf = tlsf_create_with_pool(&lx_int_mem_buffer[0], LX_INT_MEM_SIZE);
-    }
-
-    ptr = tlsf_malloc(lx_int_mem_tlsf, size);
-
-    if (ptr != NULL)
-    {
-        memset(ptr, 0, size);
-    }
-    else
-    {
-        LX_LOG_WARN("lx_platform_int_malloc failed!!!, size:%d", size);
-    }
-
-    return (void *)ptr;
+    return (void *)lx_int_mem_buffer;
 }
 
-void lx_platform_int_free(void *ptr)
+size_t lx_platform_get_cache_size(void)
 {
-    tlsf_free(lx_int_mem_tlsf, ptr);
+    return LX_INT_MEM_SIZE;
 }
 
 /**********************

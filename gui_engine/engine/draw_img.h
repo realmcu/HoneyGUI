@@ -29,7 +29,8 @@ typedef enum
     ARGB8565 = 1, //bit[4:0] for Blue, bit[10:5] for Green, bit[15:11] for Red, bit[23:16] for Alpha
     RGB888 = 3, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red
     RGBA8888 = 4, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for Alpha
-    BINARY = 5,
+    XRGB8888 = 5, //bit[7:0] for Blue, bit[15:8] for Green, bit[23:16] for Red, bit[21:24] for (255 - Alpha)
+    BINARY = 6,
     ALPHAMASK = 9,
     BMP = 11,
     JPEG = 12,
@@ -54,32 +55,17 @@ typedef enum
     IMG_SRC_FILESYS,
 } IMG_SOURCE_MODE_TYPE;
 
-typedef struct draw_img
-{
-    int16_t img_x;
-    int16_t img_y;
-    uint16_t img_w;
-    uint16_t img_h;
-    uint16_t target_w;
-    uint16_t target_h;
-    void *data;
-    struct gui_matrix *matrix;
-    struct gui_matrix *inverse;
-    uint8_t opacity_value;
-    uint32_t blend_mode : 3;
-    uint32_t checksum : 8;
-    uint32_t src_mode : 3;
-    uint32_t high_quality : 1;
-    //uint32_t color_mix; //todo for QuDai
-    float *line;
-} draw_img_t;
+
 
 void gui_image_load_scale(draw_img_t *img);
-bool gui_image_new_area(draw_img_t *img);
+bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect);
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end);
-struct gui_rgb_data_head rtgui_image_get_header(draw_img_t *img);
+gui_rgb_data_head_t gui_image_get_header(draw_img_t *img);
 uint32_t gui_image_get_pixel(draw_img_t *img);
+
+extern void (* gui_image_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect);
+extern void (* gui_image_acc_end_cb)(struct draw_img *image);
 
 #ifdef __cplusplus
 }

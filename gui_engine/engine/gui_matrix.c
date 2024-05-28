@@ -591,7 +591,7 @@ void matrix_rotate(float degrees, struct gui_matrix *matrix)
 
 void matrix_scale(float scale_x, float scale_y, struct gui_matrix *matrix)
 {
-    if ((scale_x == 1.0f) && (scale_x == 1.0f))
+    if ((scale_x == 1.0f) && (scale_y == 1.0f))
     {
         return;
     }

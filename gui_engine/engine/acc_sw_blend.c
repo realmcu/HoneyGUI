@@ -20,7 +20,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
 #include "acc_sw_blend.h"
 
 uint16_t do_blending_acc_2_rgb565_opacity(uint32_t fg, uint32_t bg, uint8_t alpha)

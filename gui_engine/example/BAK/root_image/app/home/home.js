@@ -75,25 +75,25 @@ function lampSwitchOffFunc(params) {
 }
 sw.getElementById('Kitchen')
 sw.onOn(led1OnFunc)
-sw.onOff(led1OffFunc)
+sw.switch_off(led1OffFunc)
 sw.getElementById('Parlor')
 sw.onOn(led2OnFunc)
-sw.onOff(led2OffFunc)
+sw.switch_off(led2OffFunc)
 sw.getElementById('bedroom')
 sw.onOn(led3OnFunc)
-sw.onOff(led3OffFunc)
+sw.switch_off(led3OffFunc)
 sw.getElementById('bedroom2')
 sw.onOn(led1OnFunc)
-sw.onOff(led1OffFunc)
+sw.switch_off(led1OffFunc)
 sw.getElementById('bedroom3')
 sw.onOn(led2OnFunc)
-sw.onOff(led2OffFunc)
+sw.switch_off(led2OffFunc)
 sw.getElementById('porch')
 sw.onOn(led3OnFunc)
-sw.onOff(led3OffFunc)
+sw.switch_off(led3OffFunc)
 sw.getElementById('lampSwitch')
 sw.onOn(lampSwitchOnFunc)
-sw.onOff(lampSwitchOffFunc)
+sw.switch_off(lampSwitchOffFunc)
 
 /**
  * ac
@@ -217,16 +217,16 @@ function acOffFunc1(params) {
 }
 sw.getElementById('coolingSwitch')
 sw.onOn(coolingFunc)
-sw.onOff(acOffFunc1)
+sw.switch_off(acOffFunc1)
 
 
 sw.getElementById('heatingSwitch')
 sw.onOn(heatingFunc)
-sw.onOff(acOffFunc1)
+sw.switch_off(acOffFunc1)
 
 sw.getElementById('acSwitch')
 sw.onOn(acOnFunc)
-sw.onOff(acOffFunc)
+sw.switch_off(acOffFunc)
 sw.turnOn()
 
 /**
@@ -267,13 +267,13 @@ seekbar.getElementById('curtain')
 seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
 sw.getElementById('curtainSwitch1')
 sw.onOn(swCurtain)
-sw.onOff(swCurtain)
+sw.switch_off(swCurtain)
 sw.getElementById('curtainSwitch2')
 sw.onOn(swCurtain)
-sw.onOff(swCurtain)
+sw.switch_off(swCurtain)
 sw.getElementById('curtainSwitch3')
 sw.onOn(swCurtain)
-sw.onOff(swCurtain)
+sw.switch_off(swCurtain)
 
 
 

@@ -15,31 +15,68 @@
 #include "gui_button.h"
 #include "gui_app.h"
 #include "gui_progressbar.h"
-#include "gui_rect.h"
 #include "tp_algo.h"
+#include "gui_canvas_rect.h"
 static void press_callback(gui_win_t *button);
 static void press_animate_cb(gui_win_t *button);
 static void release_callback(gui_win_t *button);
 static void release_animate_callback(gui_win_t *button);
-static void deal_win_in_page(gui_obj_t *object);
+static void deal_win_in_page(gui_obj_t *object, int page_y);
 static void page_callback(gui_page_t *page);
 static void heart_rate_cb(void);
 static void menu_cb(void);
 static void stopwatch_cb(void);
 static void map_cb(void);
+static void card_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
+static int window_index;
 #define MENU_GAP 74
 #define SCROLLBAR_SIZE 14
 const static void *scrollbar_array[SCROLLBAR_SIZE];
+
+static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                extern void gui_page_input_prepare(gui_obj_t *obj);
+                gui_page_input_prepare(obj);
+            }
+            break;
+
+        case OBJ_PREPARE:
+            {
+                extern void gui_page_update_rebound(gui_obj_t *obj);
+                gui_page_update_rebound(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            page_dtor(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void design_tab_menu(void *parent)
 {
-    gui_rect(parent, 0, 0, gui_get_screen_width(), gui_get_screen_height(), gui_rgba(UINT8_MAX,
-             UINT8_MAX, UINT8_MAX, 100));
+    gui_canvas_rect_create(parent, "canvas_rect", 0, 0, gui_get_screen_width(), gui_get_screen_height(),
+                           gui_rgba(UINT8_MAX,
+                                    UINT8_MAX, UINT8_MAX, 100));
     gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
-    gui_page_rebound(page, 1);
-    GET_BASE(page)->obj_destory = page_dtor;
+    //gui_page_rebound(page, 1);
+    GET_BASE(page)->obj_cb = gui_page_cb;
+    GET_BASE(page)->has_input_prepare_cb = true;
+    GET_BASE(page)->has_prepare_cb = true;
+    GET_BASE(page)->has_destroy_cb = true;
     GET_BASE(page)->y = page_y_recode;
     page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);
@@ -68,7 +105,7 @@ void design_tab_menu(void *parent)
         "Menu",
         "Stopwatch",
         "Map",
-        "Sport",
+        "CARD",
         "Heart Rate",
         "Clock",
         "Watch Face",
@@ -100,7 +137,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 4)
+        if (i < 5)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -115,7 +152,7 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[1], menu_cb, button_array[1]);
     gui_win_click(button_array[2], stopwatch_cb, button_array[2]);
     gui_win_click(button_array[3], map_cb, button_array[3]);
-    // gui_win_click(button_array[3], calculator_cb, button_array[3]);
+    gui_win_click(button_array[4], card_cb, button_array[4]);
     // gui_win_click(button_array[4], sport_cb, button_array[4]);
 
 }
@@ -179,7 +216,7 @@ static void release_animate_callback(gui_win_t *button)
 {
     gui_win_set_animate(button, 1000, 0, release_callback, button);
 }
-static void deal_win_in_page(gui_obj_t *object)
+static void deal_win_in_page(gui_obj_t *object, int page_y)
 {
     gui_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
@@ -187,10 +224,12 @@ static void deal_win_in_page(gui_obj_t *object)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->type == WINDOW)
         {
-            if (obj->matrix->m[1][2] >= (float)(0 - obj->h) &&
-                obj->matrix->m[1][2] < (float)gui_get_screen_height())
+            int ay = window_index * MENU_GAP + page_y;
+            window_index++;
+            if (ay >= (float)(0 - obj->h) &&
+                ay < (float)gui_get_screen_height())
             {
-                float scale = (1 - 0.5f * _UI_ABS(((float)(obj->matrix->m[1][2] + (float)(obj->h / 2)) -
+                float scale = (1 - 0.5f * _UI_ABS(((float)(ay + (float)(obj->h / 2)) -
                                                    (float)gui_get_screen_height() / 2) / (float)(gui_get_screen_height() / 2)));
                 GUI_TYPE(gui_win_t, obj)->scale = scale;
                 obj->not_show = false;
@@ -200,7 +239,7 @@ static void deal_win_in_page(gui_obj_t *object)
                 obj->not_show = true;
             }
         }
-        deal_win_in_page(obj);
+        deal_win_in_page(obj, page_y);
     }
 }
 const static void *scrollbar_array_top[] =
@@ -245,7 +284,8 @@ const static void *scrollbar_array[SCROLLBAR_SIZE] =
 };
 static void page_callback(gui_page_t *page)
 {
-    deal_win_in_page((void *)page);
+    window_index = 0;
+    deal_win_in_page((void *)page, GUI_BASE(page)->y);
 
 
 
@@ -258,7 +298,7 @@ static void page_callback(gui_page_t *page)
         if (progress >= 0 && progress <= 1)
         {
             {
-                pro->color_hl = (uint32_t)scrollbar_array;
+                pro->color_hl = (uint32_t)(uintptr_t)scrollbar_array;
                 pro->max = sizeof(scrollbar_array) / sizeof(void *);
             }
             gui_progressbar_set_percentage(pro, progress) ;
@@ -266,7 +306,7 @@ static void page_callback(gui_page_t *page)
         else if (progress < 0)
         {
             {
-                pro->color_hl = (uint32_t)scrollbar_array_top;
+                pro->color_hl = (uint32_t)(uintptr_t)scrollbar_array_top;
                 pro->max = sizeof(scrollbar_array_top) / sizeof(void *);
             }
             float progress_top = -progress;
@@ -275,7 +315,7 @@ static void page_callback(gui_page_t *page)
         else if (progress > 1)
         {
             {
-                pro->color_hl = (uint32_t)scrollbar_array_buttom;
+                pro->color_hl = (uint32_t)(uintptr_t)scrollbar_array_buttom;
                 pro->max = sizeof(scrollbar_array_buttom) / sizeof(void *);
             }
             float progress_buttom = progress - 1;
@@ -287,7 +327,9 @@ static void page_callback(gui_page_t *page)
 }
 static void heart_rate_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_HEART_RATE))
+    //GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_HEART_RATE))
+    GUI_APP_STARTUP(APP_HEART_RATE) // cppcheck-suppress unknownMacro
+    gui_app_layer_top();
 }
 static void menu_cb()
 {
@@ -300,6 +342,10 @@ static void stopwatch_cb()
 static void map_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MAP))
+}
+static void card_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CARDVIEW))
 }
 // static void clock_cb()
 // {

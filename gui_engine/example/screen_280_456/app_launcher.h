@@ -27,7 +27,6 @@ extern "C" {
 #include "root_image_8762g/ui_resource.h"
 #include <gui_app.h>
 #include <stdlib.h>
-#include "acc_engine.h"
 #include "gui_scroll_text.h"
 #include "draw_font.h"
 

@@ -27,8 +27,12 @@ static double acc_ppe_ceil(double _x)
 
 void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    if ((rect->x1 >= dc->section.x1 + dc->fb_width) || (rect->y1 >= dc->section.y2) ||
-        (rect->x2 < dc->section.x1) || (rect->y2 < dc->section.y1))
+    int32_t x_max = (image->img_target_w + image->img_target_x - 1);
+    int32_t y_max = (image->img_target_h + image->img_target_y - 1);
+    int32_t x_min = image->img_target_x;
+    int32_t y_min = image->img_target_y;
+    if (dc->section.y2 < y_min || dc->section.y1 > y_max || dc->section.x2 < x_min ||
+        dc->section.x1 > x_max)
     {
         return;
     }
@@ -102,50 +106,50 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     }
     if (1)
     {
-        if ((image->matrix->m[0][1] == 0) && (image->matrix->m[1][0] == 0))
+        if ((image->matrix.m[0][1] == 0) && (image->matrix.m[1][0] == 0))
         {
-            if ((image->matrix->m[0][0] != 1) || (image->matrix->m[1][1] != 1))
+            if ((image->matrix.m[0][0] != 1) || (image->matrix.m[1][1] != 1))
             {
-                float scale_x = image->matrix->m[0][0], scale_y = image->matrix->m[1][1];
-                if ((image->img_w == image->target_w) &&
-                    (image->img_h == image->target_h))
+                float scale_x = image->matrix.m[0][0], scale_y = image->matrix.m[1][1];
+                if ((image->img_w == image->img_target_w) &&
+                    (image->img_h == image->img_target_h))
                 {
-                    ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+                    ppe_translate_t trans = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1};
                     if (head->compress)
                     {
                         RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
                         uint32_t start_line = 0, end_line = 0;
-                        if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
+                        if ((dc->section.y1 <= y_min) && (dc->section.y2 > y_min))
                         {
                             start_line = 0;
-                            if ((rect->y1 + image->img_h) <= dc->section.y2)
+                            if ((y_min + image->img_h) <= dc->section.y2)
                             {
                                 end_line = image->img_h - 1;
                             }
                             else
                             {
-                                end_line = dc->section.y2 - rect->y1;
+                                end_line = dc->section.y2 - y_min;
                             }
                         }
-                        else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
+                        else if ((dc->section.y2 < (y_min + image->img_h)) && (dc->section.y1 > y_min))
                         {
                             trans.y = 0;
-                            start_line = dc->section.y1 - rect->y1;
-                            end_line = dc->section.y2 - rect->y1;
+                            start_line = dc->section.y1 - y_min;
+                            end_line = dc->section.y2 - y_min;
                         }
-                        else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
-                                 && (dc->section.y1 < (rect->y1 + image->img_h)))
+                        else if ((dc->section.y2 >= (y_min + image->img_h)) && (dc->section.y1 > y_min)
+                                 && (dc->section.y1 < (y_min + image->img_h)))
                         {
                             trans.y = 0;
-                            start_line = dc->section.y1 - rect->y1;
+                            start_line = dc->section.y1 - y_min;
                             end_line = image->img_h - 1;
                         }
                         source.height = end_line - start_line + 1;
                         const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                                                   struct gui_rgb_data_head));
                         hal_imdc_decompress_info info;
-                        info.start_column = rect->x1 < 0 ? -rect->x1 : 0;
-                        info.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                        info.start_column = x_min < 0 ? -x_min : 0;
+                        info.end_column = x_min + header->raw_pic_width > dc->screen_width ? dc->screen_width - x_min
                                           - info.start_column : header->raw_pic_width - 1;
                         info.start_line = start_line;
                         info.end_line = end_line;
@@ -154,7 +158,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                                                    * (header->algorithm_type.pixel_bytes + 2));
                         source.address = (uint32_t)source.memory;
                         source.width = info.end_column - info.start_column + 1;
-                        trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
+                        trans.x = x_min < 0 ? 0 : x_min - dc->section.x1;
                         bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
                         if (!ret)
                         {
@@ -176,25 +180,25 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                     scaled_img.color_key_value = 0x00000000;
                     mode = PPE_SRC_OVER_MODE;
                 }
-                trans.x = rect->x1 - dc->section.x1;
+                trans.x = x_min - dc->section.x1;
                 trans.y = 0;
-                if (rect->y1 < dc->section.y1)
+                if (y_min < dc->section.y1)
                 {
-                    scale_rect.top = (dc->section.y1 - rect->y1) / scale_y;
+                    scale_rect.top = (dc->section.y1 - y_min) / scale_y;
                 }
                 else
                 {
                     scale_rect.top = 0;
-                    trans.y = rect->y1 - dc->section.y1;
+                    trans.y = y_min - dc->section.y1;
                 }
-                if (rect->y2 > dc->section.y1 + dc->fb_height)
+                if (y_max > dc->section.y1 + dc->fb_height)
                 {
-                    scale_rect.bottom = ceil((dc->section.y1 + dc->fb_height - rect->y1 - 1) / scale_y) + ceil(
+                    scale_rect.bottom = ceil((dc->section.y1 + dc->fb_height - y_min - 1) / scale_y) + ceil(
                                             1 / scale_y);
                 }
                 else
                 {
-                    scale_rect.bottom = ceil((rect->y2 - rect->y1 + 1) / scale_y);
+                    scale_rect.bottom = ceil((y_max - y_min + 1) / scale_y);
                 }
                 if (scale_rect.bottom >= image->img_h)
                 {
@@ -292,42 +296,42 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             }
             else
             {
-                ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+                ppe_translate_t trans = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1};
                 if (head->compress)
                 {
                     RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
                     uint32_t start_line = 0, end_line = 0;
-                    if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
+                    if ((dc->section.y1 <= y_min) && (dc->section.y2 > y_min))
                     {
                         start_line = 0;
-                        if ((rect->y1 + image->img_h) <= dc->section.y2)
+                        if ((y_min + image->img_h) <= dc->section.y2)
                         {
                             end_line = image->img_h - 1;
                         }
                         else
                         {
-                            end_line = dc->section.y2 - rect->y1;
+                            end_line = dc->section.y2 - y_min;
                         }
                     }
-                    else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
+                    else if ((dc->section.y2 < (y_min + image->img_h)) && (dc->section.y1 > y_min))
                     {
                         trans.y = 0;
-                        start_line = dc->section.y1 - rect->y1;
-                        end_line = dc->section.y2 - rect->y1;
+                        start_line = dc->section.y1 - y_min;
+                        end_line = dc->section.y2 - y_min;
                     }
-                    else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
-                             && (dc->section.y1 < (rect->y1 + image->img_h)))
+                    else if ((dc->section.y2 >= (y_min + image->img_h)) && (dc->section.y1 > y_min)
+                             && (dc->section.y1 < (y_min + image->img_h)))
                     {
                         trans.y = 0;
-                        start_line = dc->section.y1 - rect->y1;
+                        start_line = dc->section.y1 - y_min;
                         end_line = image->img_h - 1;
                     }
                     source.height = end_line - start_line + 1;
                     const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                                               struct gui_rgb_data_head));
                     hal_imdc_decompress_info info;
-                    info.start_column = rect->x1 < 0 ? -rect->x1 : 0;
-                    info.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+                    info.start_column = x_min < 0 ? -x_min : 0;
+                    info.end_column = x_min + header->raw_pic_width > dc->screen_width ? dc->screen_width - x_min
                                       - info.start_column : header->raw_pic_width - 1;
                     info.start_line = start_line;
                     info.end_line = end_line;
@@ -336,7 +340,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                                                * (header->algorithm_type.pixel_bytes + 2));
                     source.address = (uint32_t)source.memory;
                     source.width = info.end_column - info.start_column + 1;
-                    trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
+                    trans.x = x_min < 0 ? 0 : x_min - dc->section.x1;
                     bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
                     if (!ret)
                     {
@@ -364,42 +368,42 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             source.color_key_value = 0x00000000;
         }
 
-        ppe_translate_t trans = {.x = rect->x1 - dc->section.x1, .y = rect->y1 - dc->section.y1};
+        ppe_translate_t trans = {.x = x_min - dc->section.x1, .y = y_min - dc->section.y1};
         if (head->compress)
         {
             RCC_PeriphClockCmd(APBPeriph_IMDC, APBPeriph_IMDC_CLOCK, ENABLE);
             uint32_t start_line = 0, end_line = 0;
-            if ((dc->section.y1 <= rect->y1) && (dc->section.y2 > rect->y1))
+            if ((dc->section.y1 <= y_min) && (dc->section.y2 > y_min))
             {
                 start_line = 0;
-                if ((rect->y1 + image->img_h) <= dc->section.y2)
+                if ((y_min + image->img_h) <= dc->section.y2)
                 {
                     end_line = image->img_h - 1;
                 }
                 else
                 {
-                    end_line = dc->section.y2 - rect->y1;
+                    end_line = dc->section.y2 - y_min;
                 }
             }
-            else if ((dc->section.y2 < (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1))
+            else if ((dc->section.y2 < (y_min + image->img_h)) && (dc->section.y1 > y_min))
             {
                 trans.y = 0;
-                start_line = dc->section.y1 - rect->y1;
-                end_line = dc->section.y2 - rect->y1;
+                start_line = dc->section.y1 - y_min;
+                end_line = dc->section.y2 - y_min;
             }
-            else if ((dc->section.y2 >= (rect->y1 + image->img_h)) && (dc->section.y1 > rect->y1)
-                     && (dc->section.y1 < (rect->y1 + image->img_h)))
+            else if ((dc->section.y2 >= (y_min + image->img_h)) && (dc->section.y1 > y_min)
+                     && (dc->section.y1 < (y_min + image->img_h)))
             {
                 trans.y = 0;
-                start_line = dc->section.y1 - rect->y1;
+                start_line = dc->section.y1 - y_min;
                 end_line = image->img_h - 1;
             }
             source.height = end_line - start_line + 1;
             const IMDC_file_header *header = (IMDC_file_header *)((uint32_t)image->data + sizeof(
                                                                       struct gui_rgb_data_head));
             hal_imdc_decompress_info info;
-            info.start_column = rect->x1 < 0 ? -rect->x1 : 0;
-            info.end_column = rect->x1 + header->raw_pic_width > dc->screen_width ? dc->screen_width - rect->x1
+            info.start_column = x_min < 0 ? -x_min : 0;
+            info.end_column = x_min + header->raw_pic_width > dc->screen_width ? dc->screen_width - x_min
                               - info.start_column : header->raw_pic_width - 1;
             info.start_line = start_line;
             info.end_line = end_line;
@@ -408,7 +412,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
                                        * (header->algorithm_type.pixel_bytes + 2));
             source.address = (uint32_t)source.memory;
             source.width = info.end_column - info.start_column + 1;
-            trans.x = rect->x1 < 0 ? 0 : rect->x1 - dc->section.x1;
+            trans.x = x_min < 0 ? 0 : x_min - dc->section.x1;
             bool ret = hal_imdc_decompress(&info, (uint8_t *)source.memory);
             if (!ret)
             {

@@ -23,8 +23,11 @@
 #include "gui_map.h"
 #include "gui_text.h"
 #include "gui_img_stb.h"
-#include "gui_rect.h"
 #include "tp_algo.h"
+#include "gui_button.h"
+#include "gui_canvas_rect.h"
+#include "gui_app.h"
+#include "gui_api.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -64,11 +67,21 @@
 #define SCREEN_H ((int)gui_get_screen_height())
 #define TILE_SIZE (256)
 #define EARTH_LONGITUDE_RANGE 360.0
-#define BEIJING_CITY_LONGITUDE 104.0668
-#define BEIJING_CITY_LATITUDE 30.5728
-#define TILE_ZOOM_LEVEL (8-2)
+#define GPS_LONGITUDE 120.58
+#define GPS_LATITUDE 31.3
+#define TILE_ZOOM_LEVEL (7)
 #define WIN_W (SCREEN_W*3/2)
 #define WIN_H (SCREEN_H*3/2)
+#define MAP_WIDGET_NAME "_MAP"
+#if _WIN32
+#define ROOT_PATH "./gui_engine/example/screen_454_454/root_image/SDCARD/"
+#elif defined RTL8772F
+#define ROOT_PATH "/sdcard/"
+#else
+#define ROOT_PATH "/"
+#endif
+#define PATH404 "map/icon/404.jpg"
+typedef long off_t;
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -91,31 +104,28 @@ static int tile_size = TILE_SIZE;
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-#// Convert longitude to tileX index at a certain zoom level
-int long2tilex(double lon, int z)
+static void free_for_rgb(void *p);
+// Convert longitude to tileX index at a certain zoom level
+static int long2tilex(double lon, int z)
 {
     return (int)(floor((lon + EARTH_LONGITUDE_RANGE / 2) / EARTH_LONGITUDE_RANGE * pow(2.0, z)));
 }
 // Convert latitude to tileY index at a certain zoom level
-int lat2tiley(double lat, int z)
+static int lat2tiley(double lat, int z)
 {
     // The formula includes taking tan of latitude then log's  the value . After that it's scaled to 2's pow of zoom level
     return (int)(floor((1.0 - log(tan(lat * M_PI / 180.0) + 1.0 / cos(lat * M_PI / 180.0)) / M_PI) / 2.0
                        * pow(2.0, z)));
 }
 
-double calculateScale(double latitude, int zoomLevel)
-{
-    double scale = 156543.03 * cos(latitude * (M_PI / 180)) / pow(2, zoomLevel);
-    return scale;
-}
 // function to generate tile URL path given the tile indices and zoom level
-void generateTileURL(int tileX, int tileY, int zoom)
+static void generateTileURL(int tileX, int tileY, int zoom)
 {
-    gui_log("http://mt0.google.com/vt/lyrs=m@221097413,traffic&x=%d&y=%d&z=%d\n", tileX, tileY, zoom);
+    //gui_log("http://mt0.google.com/vt/lyrs=m@221097413,traffic&x=%d&y=%d&z=%d\n", tileX, tileY, zoom);
 }
-void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat, double center_lon,
-                            int zoom, gui_map_t *parent)
+static void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat,
+                                   double center_lon,
+                                   int zoom, gui_map_t *parent)
 {
     // Calculate how many tiles are needed for each direction
     int tileCountX = ceil((double)windowWidth / TILE_SIZE);
@@ -124,7 +134,7 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
     // Calculate the position of the center tile
     int centerX = long2tilex(center_lon, zoom);
     int centerY = lat2tiley(center_lat, zoom);
-
+    //gui_log("centerX:%d,centerY:%d\n", centerX, centerY);
     // Calculate the range of x,y of the needed tiles
     int startX = centerX - tileCountX / 2;
     int startY = centerY - tileCountY / 2;
@@ -137,29 +147,43 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
         for (int y = startY; y < endY; y++)
         {
             generateTileURL(x, y, zoom);
-            gui_log("Relative coordinates: (%d, %d)\n", (x - startX)*tile_size, (y - startY)*tile_size);
-#if _WIN32
+            //gui_log("Relative coordinates: (%d, %d)\n", (x - startX)*tile_size, (y - startY)*tile_size);
+#if _WIN32 || RTL8772F
+            typedef long off_t;
             char path[100];
             memset(path, 0, 100);
-            sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg", zoom,
+            sprintf(path, "%s/map/%d/%d/%d/tile.jpg", ROOT_PATH, zoom,
                     x, y);
             int fd;
             fd = gui_fs_open(path, 0);
 
             char *jpg = 0;
             off_t filesize = 0;
+
             if (fd > 0)
             {
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
                 jpg = gui_malloc(filesize);
-                gui_log("open %s Successful!\n", path);
+                //gui_log("open %s Successful!\n", path);
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
             }
             else
             {
-                gui_log("open %s Fail!\n", path);
-                //return 0;
+                //gui_log("open %s Fail!\n", path);
+                memset(path, 0, 100);
+                sprintf(path, "%s/%s", ROOT_PATH, PATH404);
+                fd = gui_fs_open(path, 0);
+                if (fd <= 0)
+                {
+                    return;
+                }
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
             }
             if (parent->tile[y - startY][x - startX].img->data_buffer)
             {
@@ -167,34 +191,37 @@ void generateTilesForWindow(int windowWidth, int windowHeight, double center_lat
             }
             parent->tile[y - startY][x - startX].x = x;
             parent->tile[y - startY][x - startX].y = y;
-            parent->tile[y - startY][x - startX].zoom = zoom;
-            gui_stbimg_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
-                                     (x - startX)*tile_size, (y - startY)*tile_size);
+            gui_img_stb_set_attribute(parent->tile[y - startY][x - startX].img, jpg, filesize, JPEG,
+                                      (x - startX)*tile_size, (y - startY)*tile_size);
 
 #else
-            gui_rect((gui_obj_t *)parent, (x - startX)*tile_size, (y - startY)*tile_size, TILE_SIZE - 1,
-                     TILE_SIZE - 1,
-                     APP_COLOR_SILVER);
+            gui_canvas_rect_create((gui_obj_t *)parent, "canvas_rect", (x - startX)*tile_size,
+                                   (y - startY)*tile_size, TILE_SIZE - 1,
+                                   TILE_SIZE - 1,
+                                   APP_COLOR_SILVER);
 #endif
         }
     }
 }
+
 static void ctor(gui_map_t *this, gui_obj_t *parent)
 {
     extern void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
                              int16_t y, int16_t w, int16_t h);
-    gui_win_ctor((void *)this, parent, 0, -(WIN_W - SCREEN_W) / 2, -(WIN_H - SCREEN_H) / 2, WIN_W,
+    gui_win_ctor((void *)this, parent, MAP_WIDGET_NAME, -(WIN_W - SCREEN_W) / 2,
+                 -(WIN_H - SCREEN_H) / 2, WIN_W,
                  WIN_H);
     this->start_x = GET_BASE(this)->x;
     this->start_y = GET_BASE(this)->y;
 }
-static void load_new_tile(map_tile_t *tile)
+static void load_new_tile(map_tile_t *tile, int16_t zoom)
 {
-#if _WIN32
-    char path[100];
+#if _WIN32 || RTL8772F
+    typedef long off_t;
+    static char path[100];
     memset(path, 0, 100);
-    sprintf(path, "./gui_engine/example/screen_454_454/root_image/SDCARD/map/%d/%d/%d/tile.jpg",
-            tile->zoom, tile->x, tile->y);
+    sprintf(path, "%s/map/%d/%d/%d/tile.jpg", ROOT_PATH,
+            zoom, tile->x, tile->y);
     int fd;
     fd = gui_fs_open(path, 0);
 
@@ -204,24 +231,44 @@ static void load_new_tile(map_tile_t *tile)
     {
         filesize = gui_fs_lseek(fd, 0, SEEK_END);
         jpg = gui_malloc(filesize);
-        //gui_log("open %s Successful!\n", path);
+
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, jpg, filesize);
+        gui_fs_close(fd);
     }
     else
     {
         gui_log("open %s Fail!\n", path);
-        fd = gui_fs_open("./gui_engine/example/screen_454_454/root_image/SDCARD/map/Tiles not found.jpg",
+        memset(path, 0, 100);
+        sprintf(path, "%s/%s", ROOT_PATH, PATH404);
+        fd = gui_fs_open(path,
                          0);
+        if (fd <= 0)
+        {
+            return;
+        }
         filesize = gui_fs_lseek(fd, 0, SEEK_END);
         jpg = gui_malloc(filesize);
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, jpg, filesize);
+        gui_fs_close(fd);
     }
-    gui_stbimg_set_attribute(tile->img, jpg, filesize, JPEG, tile->img->base.x,
-                             tile->img->base.y);
+    gui_img_stb_set_attribute_static(tile->img, jpg, filesize, JPEG, tile->img->base.x,
+                                     tile->img->base.y);
 #else
 #endif
+}
+
+
+void pixel_to_latlon(double px_dx, double px_dy, double lat_prev, double lon_prev, int zoom,
+                     double *lat, double *lon)
+{
+    double tiles_at_this_zoom = pow(2.0, (double)zoom);
+    double lon_deg_per_px = 360.0 / (tiles_at_this_zoom * TILE_SIZE);
+    double lat_deg_per_px = 2 * atan(exp(M_PI)) / (tiles_at_this_zoom * TILE_SIZE) * 180.0 / M_PI;
+
+    *lon = lon_prev + px_dx * lon_deg_per_px;
+    *lat = lat_prev - px_dy * lat_deg_per_px;
 }
 /**
  * @brief Check if the screen is being pressed and released, and record these states
@@ -233,7 +280,7 @@ static void wincb(gui_map_t *this)
 {
     if (this->base.animate->progress_percent == 1)
     {
-        gui_log("wincb\n");
+        //gui_log("wincb\n");
     }
     touch_info_t *tp = tp_get_info();
     if (tp->pressed)
@@ -245,6 +292,12 @@ static void wincb(gui_map_t *this)
     {
         this->press = 0;
         this->release = 1;
+        double latitude;
+        double longitude;
+        pixel_to_latlon(-tp->deltaX, -tp->deltaY, this->latitude, this->longitude, this->zoom, &latitude,
+                        &longitude);
+        this->latitude = latitude;
+        this->longitude = longitude;
     }
     static bool deltaX_right_flag, deltaX_left_flag;
     if (this->press)
@@ -274,26 +327,31 @@ static void wincb(gui_map_t *this)
                     if (j == 2)
                     {
                         gui_free(this->tile[i][j].img->data_buffer);
+                        free_for_rgb(this->tile[i][j].img->img->data);
+                        this->tile[i][j].img->img->data = 0;
                     }
 
-                    gui_stbimg_set_attribute(
-                        this->tile[i][j].img,
-                        this->tile[i][j - 1].img->data_buffer,
-                        this->tile[i][j - 1].img->data_length,
-                        JPEG,
-                        this->tile[i][j].img->base.x,
-                        this->tile[i][j].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[i][j].img,
+                    //     this->tile[i][j - 1].img->data_buffer,
+                    //     this->tile[i][j - 1].img->data_length,
+                    //     JPEG,
+                    //     this->tile[i][j].img->base.x,
+                    //     this->tile[i][j].img->base.y
+                    // );
+                    this->tile[i][j].img->data_buffer = this->tile[i][j - 1].img->data_buffer;
+                    this->tile[i][j].img->data_length = this->tile[i][j - 1].img->data_length;
+                    this->tile[i][j].img->img->data = this->tile[i][j - 1].img->img->data;
                     this->tile[i][j].x--;
                 }
                 this->tile[i][0].x--;
-                load_new_tile(&this->tile[i][0]);
+                load_new_tile(&this->tile[i][0], this->zoom);
             }
 
 
             GUI_BASE(this)->x = -256 ;
             this->start_x = -256 - tp->deltaX;
+            GUI_BASE(this)->matrix->m[0][2] = GUI_BASE(this)->x;
         }
         if (GUI_BASE(this)->x <= -(GUI_BASE(this)->w - SCREEN_W)  && (tp->deltaX < 0 || deltaX_left_flag) &&
             !deltaX_right_flag)
@@ -305,27 +363,32 @@ static void wincb(gui_map_t *this)
                     if (j == 0)
                     {
                         gui_free(this->tile[i][j].img->data_buffer);
+                        free_for_rgb(this->tile[i][j].img->img->data);
+                        this->tile[i][j].img->img->data = 0;
                     }
 
-                    gui_stbimg_set_attribute(
-                        this->tile[i][j].img,
-                        this->tile[i][j + 1].img->data_buffer,
-                        this->tile[i][j + 1].img->data_length,
-                        JPEG,
-                        this->tile[i][j].img->base.x,
-                        this->tile[i][j].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[i][j].img,
+                    //     this->tile[i][j + 1].img->data_buffer,
+                    //     this->tile[i][j + 1].img->data_length,
+                    //     JPEG,
+                    //     this->tile[i][j].img->base.x,
+                    //     this->tile[i][j].img->base.y
+                    // );
+                    this->tile[i][j].img->data_buffer = this->tile[i][j + 1].img->data_buffer;
+                    this->tile[i][j].img->data_length = this->tile[i][j + 1].img->data_length;
+                    this->tile[i][j].img->img->data = this->tile[i][j + 1].img->img->data;
                     this->tile[i][j].x++;
                 }
 
                 // Load new image data to "tile[i][2]"
                 this->tile[i][2].x++;
-                load_new_tile(&this->tile[i][2]);
+                load_new_tile(&this->tile[i][2], this->zoom);
             }
 
             GUI_BASE(this)->x = 0;
             this->start_x = - tp->deltaX;
+            GUI_BASE(this)->matrix->m[0][2] = GUI_BASE(this)->x;
         }
 
         if (GUI_BASE(this)->y >= 0 && (tp->deltaY > 0))
@@ -337,26 +400,31 @@ static void wincb(gui_map_t *this)
                     if (j == 2)
                     {
                         gui_free(this->tile[j][i].img->data_buffer);
+                        free_for_rgb(this->tile[j][i].img->img->data);
+                        this->tile[j][i].img->img->data = 0;
                     }
 
-                    gui_stbimg_set_attribute(
-                        this->tile[j][i].img,
-                        this->tile[j - 1][i].img->data_buffer,
-                        this->tile[j - 1][i].img->data_length,
-                        JPEG,
-                        this->tile[j][i].img->base.x,
-                        this->tile[j][i].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[j][i].img,
+                    //     this->tile[j - 1][i].img->data_buffer,
+                    //     this->tile[j - 1][i].img->data_length,
+                    //     JPEG,
+                    //     this->tile[j][i].img->base.x,
+                    //     this->tile[j][i].img->base.y
+                    // );
+                    this->tile[j][i].img->data_buffer = this->tile[j - 1][i].img->data_buffer;
+                    this->tile[j][i].img->data_length = this->tile[j - 1][i].img->data_length;
+                    this->tile[j][i].img->img->data = this->tile[j - 1][i].img->img->data;
                     this->tile[j][i].y--;
                 }
                 this->tile[0][i].y--;
-                load_new_tile(&this->tile[0][i]);
+                load_new_tile(&this->tile[0][i], this->zoom);
             }
 
 
             GUI_BASE(this)->y = -256 ;
             this->start_y = -256 - tp->deltaY;
+            GUI_BASE(this)->matrix->m[1][2] = GUI_BASE(this)->y;
         }
 
         if (GUI_BASE(this)->y <= -(256 * 3 - SCREEN_H) && (tp->deltaY < 0))
@@ -368,26 +436,31 @@ static void wincb(gui_map_t *this)
                     if (j == 0)
                     {
                         gui_free(this->tile[j][i].img->data_buffer);
+                        free_for_rgb(this->tile[j][i].img->img->data);
+                        this->tile[j][i].img->img->data = 0;
                     }
 
-                    gui_stbimg_set_attribute(
-                        this->tile[j][i].img,
-                        this->tile[j + 1][i].img->data_buffer,
-                        this->tile[j + 1][i].img->data_length,
-                        JPEG,
-                        this->tile[j][i].img->base.x,
-                        this->tile[j][i].img->base.y
-                    );
-
+                    // gui_img_stb_set_attribute(
+                    //     this->tile[j][i].img,
+                    //     this->tile[j + 1][i].img->data_buffer,
+                    //     this->tile[j + 1][i].img->data_length,
+                    //     JPEG,
+                    //     this->tile[j][i].img->base.x,
+                    //     this->tile[j][i].img->base.y
+                    // );
+                    this->tile[j][i].img->data_buffer = this->tile[j + 1][i].img->data_buffer;
+                    this->tile[j][i].img->data_length = this->tile[j + 1][i].img->data_length;
+                    this->tile[j][i].img->img->data = this->tile[j + 1][i].img->img->data;
                     this->tile[j][i].y++;
                 }
                 this->tile[2][i].y++;
-                load_new_tile(&this->tile[2][i]);
+                load_new_tile(&this->tile[2][i], this->zoom);
             }
 
 
             GUI_BASE(this)->y = -(256 * 3 - SCREEN_H - 256) ;
             this->start_y = -(256 * 3 - SCREEN_H - 256) - tp->deltaY;
+            GUI_BASE(this)->matrix->m[1][2] = GUI_BASE(this)->y;
         }
 
 
@@ -407,10 +480,69 @@ static void wincb(gui_map_t *this)
 
 
 }
+static void free_for_rgb(void *p)
+{
+#ifdef _WIN32
+    gui_free(p);
+#elif defined RTL8772F
+    gui_lower_free(p);
+#else
+    gui_free(p);
+#endif
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+static void update_zoom(int zoom)
+{
+    gui_map_t *map = 0;
+    gui_obj_tree_get_widget_by_name(&gui_current_app()->screen, MAP_WIDGET_NAME, (void *)&map);
+    //float longitude;
+    //float latitude;
+    //tile_to_latlon(map->tile[1][1].x, map->tile[1][1].y, map->zoom, &latitude, &longitude);
+    if (zoom == 1)
+    {
+        map->zoom++;
+    }
+    else if (zoom == 0)
+    {
+        map->zoom--;
+    }
+    else if (zoom == -1)
+    {
+        map->latitude = GPS_LATITUDE;
+        map->longitude = GPS_LONGITUDE;
+        GUI_BASE(map)->x = -TILE_SIZE / 2;
+        GUI_BASE(map)->y = -TILE_SIZE / 2;
+    }
 
+    if (map->zoom < 0)
+    {
+        map->zoom = 0;
+    }
+    else if (map->zoom > 21)
+    {
+        map->zoom = 21;
+    }
+
+    //gui_log("%d,%d,%f,%f\n", map->tile[1][1].x, map->tile[1][1].y, latitude, longitude);
+    generateTilesForWindow(WIN_W, WIN_H, map->latitude, map->longitude, map->zoom, map);
+
+
+}
+
+static void zoom_cb()
+{
+    update_zoom(1);
+}
+static void zoom_minus_cb()
+{
+    update_zoom(0);
+}
+static void gps_cb()
+{
+    update_zoom(-1);
+}
 gui_map_t *gui_map_create(void *parent)
 {
 #define _GUI_NEW_GUI_MAP_PARAM this, parent
@@ -422,22 +554,107 @@ gui_map_t *gui_map_create(void *parent)
     int windowHeight = WIN_H;
 
     // The longitude and latitude to be displayed
-    double center_lat = BEIJING_CITY_LATITUDE;
-    double center_lon = BEIJING_CITY_LONGITUDE;
-
+    double center_lat = GPS_LATITUDE;
+    double center_lon = GPS_LONGITUDE;
+    this->longitude = GPS_LONGITUDE;
+    this->latitude = GPS_LATITUDE;
     // Zoom level
     int zoom = TILE_ZOOM_LEVEL;
+    this->zoom = zoom;
     for (size_t i = 0; i < 3; i++)
     {
         for (size_t j = 0; j < 3; j++)
         {
-            this->tile[i][j].img = gui_stbimg_create_from_mem(win, 0, 0, 0, JPEG, 0, 0);
+            this->tile[i][j].img = gui_img_stb_create_from_mem(win, 0, 0, 0, JPEG, 0, 0);
         }
     }
     generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);
+    {
+        gui_button_t *zoom = gui_button_create(parent, 50, 200 - 30, 80, 80, 0, 0, 0, BUTTON_BG_ICON, 0);
+        {
+            static char path[100];
+            memset(path, 0, 100);
+            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/plus.bin");
+            int fd;
+            fd = gui_fs_open(path, 0);
+
+            char *jpg = 0;
+            off_t filesize = 0;
+            if (fd > 0)
+            {
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
+                gui_img_t *img = gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            }
 
 
-    return 0;
+        }
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_cb, 0);
+    }
+    {
+        gui_button_t *zoom = gui_button_create(parent, 50, 300 - 30, 80, 80, 0, 0, 0, BUTTON_BG_ICON, 0);
+
+        {
+
+            static char path[100];
+            memset(path, 0, 100);
+            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/minus.bin");
+            int fd;
+            fd = gui_fs_open(path, 0);
+
+            char *jpg = 0;
+            off_t filesize = 0;
+            if (fd > 0)
+            {
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
+                gui_img_t *img = gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            }
+
+
+        }
+        gui_button_click((void *)zoom, (gui_event_cb_t)zoom_minus_cb, 0);
+    }
+    {
+        gui_button_t *zoom = gui_button_create(parent, 300, 300 - 30, 80, 80, 0, 0, 0, BUTTON_BG_ICON, 0);
+
+        {
+
+            static char path[100];
+            memset(path, 0, 100);
+            sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/GPS.bin");
+            int fd;
+            fd = gui_fs_open(path, 0);
+
+            char *jpg = 0;
+            off_t filesize = 0;
+            if (fd > 0)
+            {
+                filesize = gui_fs_lseek(fd, 0, SEEK_END);
+                jpg = gui_malloc(filesize);
+
+                gui_fs_lseek(fd, 0, SEEK_SET);
+                gui_fs_read(fd, jpg, filesize);
+                gui_fs_close(fd);
+                gui_img_t *img = gui_img_create_from_mem((void *)zoom, 0, jpg, 30, 30, 0, 0);
+                gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            }
+
+
+        }
+        gui_button_click((void *)zoom, (gui_event_cb_t)gps_cb, 0);
+    }
+    return this;
 }
 
 

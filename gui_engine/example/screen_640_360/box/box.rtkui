@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ui version="1.0">
+  <widget class="Screen" name="screen0" layer="0" isLocked="False">
+    <property name="geometry">
+      <width>640</width>
+      <height>360</height>
+      <x>0</x>
+      <y>0</y>
+    </property>
+    <widget class="TabView" name="tabview0" layer="1" isLocked="False">
+      <property name="geometry">
+        <width>640</width>
+        <height>360</height>
+        <x>0</x>
+        <y>0</y>
+      </property>
+      <widget class="Tab" name="tab0" layer="0" isLocked="False">
+        <property name="tabData">
+          <idX>0</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Text" name="text0" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>80</width>
+            <height>43</height>
+            <x>35</x>
+            <y>52</y>
+          </property>
+          <property name="text">
+            <string>Text</string>
+            <fontColor>#ffffffff</fontColor>
+            <font>fontSetting0</font>
+          </property>
+        </widget>
+      </widget>
+    </widget>
+  </widget>
+</ui>

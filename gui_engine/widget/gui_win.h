@@ -42,12 +42,14 @@ typedef struct gui_win
     gui_obj_t base;
     gui_animate_t *animate;
     float scale;
+    float scale_y;
     bool press_flag;
     bool long_flag;
     bool release_flag;
     bool enter_auto_scale;
     bool event5_flag;
     uint8_t checksum;
+    bool scope;
 } gui_win_t;
 
 /*============================================================================*

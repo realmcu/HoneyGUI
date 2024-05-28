@@ -60,7 +60,7 @@ var bluetooth = {
 var sw = {
     getElementById : function (win_name : string) {},
     onOn : function (func) {},
-    onOff : function (func) {},
+    switch_off : function (func) {},
     turnOn : function (func) {},
     turnOff : function (func) {},
 }

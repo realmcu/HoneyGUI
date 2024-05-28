@@ -24,7 +24,7 @@ function swOnOffFunc(params) {
     console.log('swOnOffFunc')
     LED1.writeSync(1)
 }
-sw.onOff(swOnOffFunc)
+sw.switch_off(swOnOffFunc)
 
 sw.getElementById('P2_5')
 function swOnOnFunc2(params) {
@@ -37,6 +37,6 @@ function swOnOffFunc2(params) {
     console.log('swOnOffFunc2')
     LED3.writeSync(0)
 }
-sw.onOff(swOnOffFunc2)
+sw.switch_off(swOnOffFunc2)
 
 

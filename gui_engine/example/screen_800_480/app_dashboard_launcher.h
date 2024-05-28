@@ -24,7 +24,6 @@ extern "C" {
 #include "root_image_800_480/ui_resource.h"
 #include <gui_app.h>
 #include <stdlib.h>
-#include "acc_engine.h"
 
 gui_app_t *get_app_dashboard_launcher(void);
 void app_dashboard_launcher_ui_design(gui_app_t *app);

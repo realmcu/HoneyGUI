@@ -1,265 +1,313 @@
+/**
+*****************************************************************************************
+*     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
+*****************************************************************************************
+  * @file  gui_barcode_gen.c
+  * @brief barcode widget
+  * @details barcode
+  * @author yuyin1_zhang@realsil.com.cn
+  * @date 2024/4/17
+  * @version 1.0
+  ***************************************************************************************
+    * @attention
+  * <h2><center>&copy; COPYRIGHT 2017 Realtek Semiconductor Corporation</center></h2>
+  ***************************************************************************************
+  */
 
+/*============================================================================*
+ *                        Header Files
+ *============================================================================*/
 #include <assert.h>
 #include <stdio.h>
-//#include "common.h"
 #include "gui_barcode_gen.h"
 #include "gui_api.h"
 
+/** @defgroup WIDGET WIDGET
+  * @{
+  */
+/*============================================================================*
+ *                           Types
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @{
+  */
 
-#define C128_MAX 160
 
-#define C128_LATCHA 'A'
-#define C128_LATCHB 'B'
-#define C128_LATCHC 'C'
-#define C128_SHIFTA 'a'
-#define C128_SHIFTB 'b'
-#define C128_ABORC '9'
-#define C128_AORB 'Z'
+/** End of WIDGET_Exported_Types
+  * @}
+  */
 
-#define BARCODE_CODE11 1           /* Code 11 */
-#define BARCODE_C25STANDARD 2      /* 2 of 5 Standard (Matrix) */
-#define BARCODE_C25MATRIX 2        /* Legacy */
-#define BARCODE_C25INTER 3         /* 2 of 5 Interleaved */
-#define BARCODE_C25IATA 4          /* 2 of 5 IATA */
-#define BARCODE_C25LOGIC 6         /* 2 of 5 Data Logic */
-#define BARCODE_C25IND 7           /* 2 of 5 Industrial */
-#define BARCODE_CODE39 8           /* Code 39 */
-#define BARCODE_EXCODE39 9         /* Extended Code 39 */
-#define BARCODE_EANX 13            /* EAN (European Article Number) */
-#define BARCODE_EANX_CHK 14        /* EAN + Check Digit */
-#define BARCODE_GS1_128 16         /* GS1-128 */
-#define BARCODE_EAN128 16          /* Legacy */
-#define BARCODE_CODABAR 18         /* Codabar */
-#define BARCODE_CODE128 20         /* Code 128 */
-#define BARCODE_DPLEIT 21          /* Deutsche Post Leitcode */
-#define BARCODE_DPIDENT 22         /* Deutsche Post Identcode */
-#define BARCODE_CODE16K 23         /* Code 16k */
-#define BARCODE_CODE49 24          /* Code 49 */
-#define BARCODE_CODE93 25          /* Code 93 */
-#define BARCODE_FLAT 28            /* Flattermarken */
-#define BARCODE_DBAR_OMN 29        /* GS1 DataBar Omnidirectional */
-#define BARCODE_RSS14 29           /* Legacy */
-#define BARCODE_DBAR_LTD 30        /* GS1 DataBar Limited */
-#define BARCODE_RSS_LTD 30         /* Legacy */
-#define BARCODE_DBAR_EXP 31        /* GS1 DataBar Expanded */
-#define BARCODE_RSS_EXP 31         /* Legacy */
-#define BARCODE_TELEPEN 32         /* Telepen Alpha */
-#define BARCODE_UPCA 34            /* UPC-A */
-#define BARCODE_UPCA_CHK 35        /* UPC-A + Check Digit */
-#define BARCODE_UPCE 37            /* UPC-E */
-#define BARCODE_UPCE_CHK 38        /* UPC-E + Check Digit */
-#define BARCODE_POSTNET 40         /* USPS (U.S. Postal Service) POSTNET */
-#define BARCODE_MSI_PLESSEY 47     /* MSI Plessey */
-#define BARCODE_FIM 49             /* Facing Identification Mark */
-#define BARCODE_LOGMARS 50         /* LOGMARS */
-#define BARCODE_PHARMA 51          /* Pharmacode One-Track */
-#define BARCODE_PZN 52             /* Pharmazentralnummer */
-#define BARCODE_PHARMA_TWO 53      /* Pharmacode Two-Track */
-#define BARCODE_CEPNET 54          /* Brazilian CEPNet Postal Code */
-#define BARCODE_PDF417 55          /* PDF417 */
-#define BARCODE_PDF417COMP 56      /* Compact PDF417 (Truncated PDF417) */
-#define BARCODE_PDF417TRUNC 56     /* Legacy */
-#define BARCODE_MAXICODE 57        /* MaxiCode */
-#define BARCODE_QRCODE 58          /* QR Code */
-#define BARCODE_CODE128AB 60       /* Code 128 (Suppress Code Set C) */
-#define BARCODE_CODE128B 60        /* Legacy */
-#define BARCODE_AUSPOST 63         /* Australia Post Standard Customer */
-#define BARCODE_AUSREPLY 66        /* Australia Post Reply Paid */
-#define BARCODE_AUSROUTE 67        /* Australia Post Routing */
-#define BARCODE_AUSREDIRECT 68     /* Australia Post Redirection */
-#define BARCODE_ISBNX 69           /* ISBN */
-#define BARCODE_RM4SCC 70          /* Royal Mail 4-State Customer Code */
-#define BARCODE_DATAMATRIX 71      /* Data Matrix (ECC200) */
-#define BARCODE_EAN14 72           /* EAN-14 */
-#define BARCODE_VIN 73             /* Vehicle Identification Number */
-#define BARCODE_CODABLOCKF 74      /* Codablock-F */
-#define BARCODE_NVE18 75           /* NVE-18 (SSCC-18) */
-#define BARCODE_JAPANPOST 76       /* Japanese Postal Code */
-#define BARCODE_KOREAPOST 77       /* Korea Post */
-#define BARCODE_DBAR_STK 79        /* GS1 DataBar Stacked */
-#define BARCODE_RSS14STACK 79      /* Legacy */
-#define BARCODE_DBAR_OMNSTK 80     /* GS1 DataBar Stacked Omnidirectional */
-#define BARCODE_RSS14STACK_OMNI 80 /* Legacy */
-#define BARCODE_DBAR_EXPSTK 81     /* GS1 DataBar Expanded Stacked */
-#define BARCODE_RSS_EXPSTACK 81    /* Legacy */
-#define BARCODE_PLANET 82          /* USPS PLANET */
-#define BARCODE_MICROPDF417 84     /* MicroPDF417 */
-#define BARCODE_USPS_IMAIL 85      /* USPS Intelligent Mail (OneCode) */
-#define BARCODE_ONECODE 85         /* Legacy */
-#define BARCODE_PLESSEY 86         /* UK Plessey */
+/*============================================================================*
+ *                           Constants
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @{
+  */
+
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
+
+/*============================================================================*
+ *                            Macros
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @{
+  */
+#define C128_MAX                        160
+
+#define C128_LATCHA                     'A'
+#define C128_LATCHB                     'B'
+#define C128_LATCHC                     'C'
+#define C128_SHIFTA                     'a'
+#define C128_SHIFTB                     'b'
+#define C128_ABORC                      '9'
+#define C128_AORB                       'Z'
+
+#define BARCODE_CODE11                   1           /* Code 11 */
+#define BARCODE_C25STANDARD              2           /* 2 of 5 Standard (Matrix) */
+#define BARCODE_C25MATRIX                2           /* Legacy */
+#define BARCODE_C25INTER                 3           /* 2 of 5 Interleaved */
+#define BARCODE_C25IATA                  4           /* 2 of 5 IATA */
+#define BARCODE_C25LOGIC                 6           /* 2 of 5 Data Logic */
+#define BARCODE_C25IND                   7           /* 2 of 5 Industrial */
+#define BARCODE_CODE39                   8           /* Code 39 */
+#define BARCODE_EXCODE39                 9           /* Extended Code 39 */
+#define BARCODE_EANX                     13          /* EAN (European Article Number) */
+#define BARCODE_EANX_CHK                 14          /* EAN + Check Digit */
+#define BARCODE_GS1_128                  16          /* GS1-128 */
+#define BARCODE_EAN128                   16          /* Legacy */
+#define BARCODE_CODABAR                  18          /* Codabar */
+#define BARCODE_CODE128                  20          /* Code 128 */
+#define BARCODE_DPLEIT                   21          /* Deutsche Post Leitcode */
+#define BARCODE_DPIDENT                  22          /* Deutsche Post Identcode */
+#define BARCODE_CODE16K                  23          /* Code 16k */
+#define BARCODE_CODE49                   24          /* Code 49 */
+#define BARCODE_CODE93                   25          /* Code 93 */
+#define BARCODE_FLAT                     28          /* Flattermarken */
+#define BARCODE_DBAR_OMN                 29          /* GS1 DataBar Omnidirectional */
+#define BARCODE_RSS14                    29          /* Legacy */
+#define BARCODE_DBAR_LTD                 30          /* GS1 DataBar Limited */
+#define BARCODE_RSS_LTD                  30          /* Legacy */
+#define BARCODE_DBAR_EXP                 31          /* GS1 DataBar Expanded */
+#define BARCODE_RSS_EXP                  31          /* Legacy */
+#define BARCODE_TELEPEN                  32          /* Telepen Alpha */
+#define BARCODE_UPCA                     34          /* UPC-A */
+#define BARCODE_UPCA_CHK                 35          /* UPC-A + Check Digit */
+#define BARCODE_UPCE                     37          /* UPC-E */
+#define BARCODE_UPCE_CHK                 38          /* UPC-E + Check Digit */
+#define BARCODE_POSTNET                  40          /* USPS (U.S. Postal Service) POSTNET */
+#define BARCODE_MSI_PLESSEY              47          /* MSI Plessey */
+#define BARCODE_FIM                      49          /* Facing Identification Mark */
+#define BARCODE_LOGMARS                  50          /* LOGMARS */
+#define BARCODE_PHARMA                   51          /* Pharmacode One-Track */
+#define BARCODE_PZN                      52          /* Pharmazentralnummer */
+#define BARCODE_PHARMA_TWO               53          /* Pharmacode Two-Track */
+#define BARCODE_CEPNET                   54          /* Brazilian CEPNet Postal Code */
+#define BARCODE_PDF417                   55          /* PDF417 */
+#define BARCODE_PDF417COMP               56          /* Compact PDF417 (Truncated PDF417) */
+#define BARCODE_PDF417TRUNC              56          /* Legacy */
+#define BARCODE_MAXICODE                 57          /* MaxiCode */
+#define BARCODE_QRCODE                   58          /* QR Code */
+#define BARCODE_CODE128AB                60          /* Code 128 (Suppress Code Set C) */
+#define BARCODE_CODE128B                 60          /* Legacy */
+#define BARCODE_AUSPOST                  63          /* Australia Post Standard Customer */
+#define BARCODE_AUSREPLY                 66          /* Australia Post Reply Paid */
+#define BARCODE_AUSROUTE                 67          /* Australia Post Routing */
+#define BARCODE_AUSREDIRECT              68          /* Australia Post Redirection */
+#define BARCODE_ISBNX                    69          /* ISBN */
+#define BARCODE_RM4SCC                   70          /* Royal Mail 4-State Customer Code */
+#define BARCODE_DATAMATRIX               71          /* Data Matrix (ECC200) */
+#define BARCODE_EAN14                    72          /* EAN-14 */
+#define BARCODE_VIN                      73          /* Vehicle Identification Number */
+#define BARCODE_CODABLOCKF               74          /* Codablock-F */
+#define BARCODE_NVE18                    75          /* NVE-18 (SSCC-18) */
+#define BARCODE_JAPANPOST                76          /* Japanese Postal Code */
+#define BARCODE_KOREAPOST                77          /* Korea Post */
+#define BARCODE_DBAR_STK                 79          /* GS1 DataBar Stacked */
+#define BARCODE_RSS14STACK               79          /* Legacy */
+#define BARCODE_DBAR_OMNSTK              80          /* GS1 DataBar Stacked Omnidirectional */
+#define BARCODE_RSS14STACK_OMNI          80          /* Legacy */
+#define BARCODE_DBAR_EXPSTK              81          /* GS1 DataBar Expanded Stacked */
+#define BARCODE_RSS_EXPSTACK             81          /* Legacy */
+#define BARCODE_PLANET                   82          /* USPS PLANET */
+#define BARCODE_MICROPDF417              84          /* MicroPDF417 */
+#define BARCODE_USPS_IMAIL               85          /* USPS Intelligent Mail (OneCode) */
+#define BARCODE_ONECODE                  85          /* Legacy */
+#define BARCODE_PLESSEY                  86          /* UK Plessey */
 /* Tbarcode 8 codes */
-#define BARCODE_TELEPEN_NUM 87 /* Telepen Numeric */
-#define BARCODE_ITF14 89       /* ITF-14 */
-#define BARCODE_KIX 90         /* Dutch Post KIX Code */
-#define BARCODE_AZTEC 92       /* Aztec Code */
-#define BARCODE_DAFT 93        /* DAFT Code */
-#define BARCODE_DPD 96         /* DPD Code */
-#define BARCODE_MICROQR 97     /* Micro QR Code */
+#define BARCODE_TELEPEN_NUM              87          /* Telepen Numeric */
+#define BARCODE_ITF14                    89          /* ITF-14 */
+#define BARCODE_KIX                      90          /* Dutch Post KIX Code */
+#define BARCODE_AZTEC                    92          /* Aztec Code */
+#define BARCODE_DAFT                     93          /* DAFT Code */
+#define BARCODE_DPD                      96          /* DPD Code */
+#define BARCODE_MICROQR                  97          /* Micro QR Code */
 
 /* Tbarcode 9 codes */
-#define BARCODE_HIBC_128 98     /* HIBC (Health Industry Barcode) Code 128 */
-#define BARCODE_HIBC_39 99      /* HIBC Code 39 */
-#define BARCODE_HIBC_DM 102     /* HIBC Data Matrix */
-#define BARCODE_HIBC_QR 104     /* HIBC QR Code */
-#define BARCODE_HIBC_PDF 106    /* HIBC PDF417 */
-#define BARCODE_HIBC_MICPDF 108 /* HIBC MicroPDF417 */
-#define BARCODE_HIBC_BLOCKF 110 /* HIBC Codablock-F */
-#define BARCODE_HIBC_AZTEC 112  /* HIBC Aztec Code */
+#define BARCODE_HIBC_128                 98          /* HIBC (Health Industry Barcode) Code 128 */
+#define BARCODE_HIBC_39                  99          /* HIBC Code 39 */
+#define BARCODE_HIBC_DM                  102         /* HIBC Data Matrix */
+#define BARCODE_HIBC_QR                  104         /* HIBC QR Code */
+#define BARCODE_HIBC_PDF                 106         /* HIBC PDF417 */
+#define BARCODE_HIBC_MICPDF              108         /* HIBC MicroPDF417 */
+#define BARCODE_HIBC_BLOCKF              110         /* HIBC Codablock-F */
+#define BARCODE_HIBC_AZTEC               112         /* HIBC Aztec Code */
 
 /* Tbarcode 10 codes */
-#define BARCODE_DOTCODE 115 /* DotCode */
-#define BARCODE_HANXIN 116  /* Han Xin (Chinese Sensible) Code */
+#define BARCODE_DOTCODE                  115         /* DotCode */
+#define BARCODE_HANXIN                   116         /* Han Xin (Chinese Sensible) Code */
 
 /* Tbarcode 11 codes */
-#define BARCODE_MAILMARK_2D 119 /* Royal Mail 2D Mailmark (CMDM) (Data Matrix) */
-#define BARCODE_UPU_S10 120     /* Universal Postal Union S10 */
-#define BARCODE_MAILMARK_4S 121 /* Royal Mail 4-State Mailmark */
-#define BARCODE_MAILMARK 121    /* Legacy */
+#define BARCODE_MAILMARK_2D              119         /* Royal Mail 2D Mailmark (CMDM) (Data Matrix) */
+#define BARCODE_UPU_S10                  120         /* Universal Postal Union S10 */
+#define BARCODE_MAILMARK_4S              121         /* Royal Mail 4-State Mailmark */
+#define BARCODE_MAILMARK                 121         /* Legacy */
 
 /* barcode specific */
-#define BARCODE_AZRUNE 128          /* Aztec Runes */
-#define BARCODE_CODE32 129          /* Code 32 */
-#define BARCODE_EANX_CC 130         /* EAN Composite */
-#define BARCODE_GS1_128_CC 131      /* GS1-128 Composite */
-#define BARCODE_EAN128_CC 131       /* Legacy */
-#define BARCODE_DBAR_OMN_CC 132     /* GS1 DataBar Omnidirectional Composite */
-#define BARCODE_RSS14_CC 132        /* Legacy */
-#define BARCODE_DBAR_LTD_CC 133     /* GS1 DataBar Limited Composite */
-#define BARCODE_RSS_LTD_CC 133      /* Legacy */
-#define BARCODE_DBAR_EXP_CC 134     /* GS1 DataBar Expanded Composite */
-#define BARCODE_RSS_EXP_CC 134      /* Legacy */
-#define BARCODE_UPCA_CC 135         /* UPC-A Composite */
-#define BARCODE_UPCE_CC 136         /* UPC-E Composite */
-#define BARCODE_DBAR_STK_CC 137     /* GS1 DataBar Stacked Composite */
-#define BARCODE_RSS14STACK_CC 137   /* Legacy */
-#define BARCODE_DBAR_OMNSTK_CC 138  /* GS1 DataBar Stacked Omnidirectional Composite */
-#define BARCODE_RSS14_OMNI_CC 138   /* Legacy */
-#define BARCODE_DBAR_EXPSTK_CC 139  /* GS1 DataBar Expanded Stacked Composite */
-#define BARCODE_RSS_EXPSTACK_CC 139 /* Legacy */
-#define BARCODE_CHANNEL 140         /* Channel Code */
-#define BARCODE_CODEONE 141         /* Code One */
-#define BARCODE_GRIDMATRIX 142      /* Grid Matrix */
-#define BARCODE_UPNQR 143           /* UPNQR (Univerzalnega Placilnega Naloga QR) */
-#define BARCODE_ULTRA 144           /* Ultracode */
-#define BARCODE_RMQR 145            /* Rectangular Micro QR Code (rMQR) */
-#define BARCODE_BC412 146           /* IBM BC412 (SEMI T1-95) */
-#define BARCODE_LAST 146            /* Max barcode number marker, not barcode */
+#define BARCODE_AZRUNE                   128         /* Aztec Runes */
+#define BARCODE_CODE32                   129         /* Code 32 */
+#define BARCODE_EANX_CC                  130         /* EAN Composite */
+#define BARCODE_GS1_128_CC               131         /* GS1-128 Composite */
+#define BARCODE_EAN128_CC                131         /* Legacy */
+#define BARCODE_DBAR_OMN_CC              132         /* GS1 DataBar Omnidirectional Composite */
+#define BARCODE_RSS14_CC                 132         /* Legacy */
+#define BARCODE_DBAR_LTD_CC              133         /* GS1 DataBar Limited Composite */
+#define BARCODE_RSS_LTD_CC               133         /* Legacy */
+#define BARCODE_DBAR_EXP_CC              134         /* GS1 DataBar Expanded Composite */
+#define BARCODE_RSS_EXP_CC               134         /* Legacy */
+#define BARCODE_UPCA_CC                  135         /* UPC-A Composite */
+#define BARCODE_UPCE_CC                  136         /* UPC-E Composite */
+#define BARCODE_DBAR_STK_CC              137         /* GS1 DataBar Stacked Composite */
+#define BARCODE_RSS14STACK_CC            137         /* Legacy */
+#define BARCODE_DBAR_OMNSTK_CC           138         /* GS1 DataBar Stacked Omnidirectional Composite */
+#define BARCODE_RSS14_OMNI_CC            138         /* Legacy */
+#define BARCODE_DBAR_EXPSTK_CC           139         /* GS1 DataBar Expanded Stacked Composite */
+#define BARCODE_RSS_EXPSTACK_CC          139         /* Legacy */
+#define BARCODE_CHANNEL                  140         /* Channel Code */
+#define BARCODE_CODEONE                  141         /* Code One */
+#define BARCODE_GRIDMATRIX               142         /* Grid Matrix */
+#define BARCODE_UPNQR                    143         /* UPNQR (Univerzalnega Placilnega Naloga QR) */
+#define BARCODE_ULTRA                    144         /* Ultracode */
+#define BARCODE_RMQR                     145         /* Rectangular Micro QR Code (rMQR) */
+#define BARCODE_BC412                    146         /* IBM BC412 (SEMI T1-95) */
+#define BARCODE_LAST                     146         /* Max barcode number marker, not barcode */
 
 /* Output options (`symbol->output_options`) */
-#define BARCODE_BIND_TOP 0x0001        /* Boundary bar above the symbol only (not below), does not affect stacking */
+#define BARCODE_BIND_TOP                 0x0001      /* Boundary bar above the symbol only (not below), does not affect stacking */
 /* Note: value was once used by the legacy (never-used) BARCODE_NO_ASCII */
-#define BARCODE_BIND 0x0002            /* Boundary bars above & below the symbol and between stacked symbols */
-#define BARCODE_BOX 0x0004             /* Box around symbol */
-#define BARCODE_STDOUT 0x0008          /* Output to stdout */
-#define READER_INIT 0x0010             /* Reader Initialisation (Programming) */
-#define SMALL_TEXT 0x0020              /* Use smaller font */
-#define BOLD_TEXT 0x0040               /* Use bold font */
-#define CMYK_COLOUR 0x0080             /* CMYK colour space (Encapsulated PostScript and TIF) */
-#define BARCODE_DOTTY_MODE 0x0100      /* Plot a matrix symbol using dots rather than squares */
-#define GS1_GS_SEPARATOR 0x0200        /* Use GS instead of FNC1 as GS1 separator (Data Matrix) */
-#define OUT_BUFFER_INTERMEDIATE 0x0400 /* Return ASCII values in bitmap buffer (OUT_BUFFER only) */
-#define BARCODE_QUIET_ZONES 0x0800     /* Add compliant quiet zones (additional to any specified whitespace) */
+#define BARCODE_BIND                     0x0002      /* Boundary bars above & below the symbol and between stacked symbols */
+#define BARCODE_BOX                      0x0004      /* Box around symbol */
+#define BARCODE_STDOUT                   0x0008      /* Output to stdout */
+#define READER_INIT                      0x0010      /* Reader Initialisation (Programming) */
+#define SMALL_TEXT                       0x0020      /* Use smaller font */
+#define BOLD_TEXT                        0x0040      /* Use bold font */
+#define CMYK_COLOUR                      0x0080      /* CMYK colour space (Encapsulated PostScript and TIF) */
+#define BARCODE_DOTTY_MODE               0x0100      /* Plot a matrix symbol using dots rather than squares */
+#define GS1_GS_SEPARATOR                 0x0200      /* Use GS instead of FNC1 as GS1 separator (Data Matrix) */
+#define OUT_BUFFER_INTERMEDIATE          0x0400      /* Return ASCII values in bitmap buffer (OUT_BUFFER only) */
+#define BARCODE_QUIET_ZONES              0x0800      /* Add compliant quiet zones (additional to any specified whitespace) */
 /* Note: CODE16K, CODE49, CODABLOCKF, ITF14, EAN/UPC have default quiet zones
  */
-#define BARCODE_NO_QUIET_ZONES 0x1000  /* Disable quiet zones, notably those with defaults as listed above */
-#define COMPLIANT_HEIGHT 0x2000        /* Warn if height not compliant, or use standard height (if any) as default */
-#define EANUPC_GUARD_WHITESPACE 0x4000 /* Add quiet zone indicators ("<"/">") to HRT whitespace (EAN/UPC) */
-#define EMBED_VECTOR_FONT 0x8000       /* Embed font in vector output - currently only for SVG output */
+#define BARCODE_NO_QUIET_ZONES           0x1000      /* Disable quiet zones, notably those with defaults as listed above */
+#define COMPLIANT_HEIGHT                 0x2000      /* Warn if height not compliant, or use standard height (if any) as default */
+#define EANUPC_GUARD_WHITESPACE          0x4000      /* Add quiet zone indicators ("<"/">") to HRT whitespace (EAN/UPC) */
+#define EMBED_VECTOR_FONT                0x8000      /* Embed font in vector output - currently only for SVG output */
 
 /* Input data types (`symbol->input_mode`) */
-#define DATA_MODE 0    /* Binary */
-#define UNICODE_MODE 1 /* UTF-8 */
-#define GS1_MODE 2     /* GS1 */
+#define DATA_MODE                        0           /* Binary */
+#define UNICODE_MODE                     1           /* UTF-8 */
+#define GS1_MODE                         2           /* GS1 */
 /* The following may be OR-ed with above */
-#define ESCAPE_MODE 0x0008       /* Process escape sequences */
-#define GS1PARENS_MODE 0x0010    /* Process parentheses as GS1 AI delimiters (instead of square brackets) */
-#define GS1NOCHECK_MODE 0x0020   /* Do not check validity of GS1 data (except that printable ASCII only) */
-#define HEIGHTPERROW_MODE 0x0040 /* Interpret `height` as per-row rather than as overall height */
-#define FAST_MODE 0x0080         /* Use faster if less optimal encodation or other shortcuts if available */
+#define ESCAPE_MODE                      0x0008      /* Process escape sequences */
+#define GS1PARENS_MODE                   0x0010      /* Process parentheses as GS1 AI delimiters (instead of square brackets) */
+#define GS1NOCHECK_MODE                  0x0020      /* Do not check validity of GS1 data (except that printable ASCII only) */
+#define HEIGHTPERROW_MODE                0x0040      /* Interpret `height` as per-row rather than as overall height */
+#define FAST_MODE                        0x0080      /* Use faster if less optimal encodation or other shortcuts if available */
 /* Note: affects DATAMATRIX, MICROPDF417, PDF417, QRCODE & UPNQR only */
-#define EXTRA_ESCAPE_MODE 0x0100 /* Process special symbology-specific escape sequences */
+#define EXTRA_ESCAPE_MODE                0x0100      /* Process special symbology-specific escape sequences */
 /* Note: currently Code 128 only */
 
 /* Data Matrix specific options (`symbol->option_3`) */
-#define DM_SQUARE 100 /* Only consider square versions on automatic symbol size selection */
-#define DM_DMRE 101   /* Consider DMRE versions on automatic symbol size selection */
+#define DM_SQUARE                        100         /* Only consider square versions on automatic symbol size selection */
+#define DM_DMRE                          101         /* Consider DMRE versions on automatic symbol size selection */
 
 /* QR, Han Xin, Grid Matrix specific options (`symbol->option_3`) */
-#define BARCODE_FULL_MULTIBYTE 200 /* Enable Kanji/Hanzi compression for Latin-1 & binary data */
+#define BARCODE_FULL_MULTIBYTE           200         /* Enable Kanji/Hanzi compression for Latin-1 & binary data */
 
 /* Ultracode specific option (`symbol->option_3`) */
-#define ULTRA_COMPRESSION 128 /* Enable Ultracode compression (experimental) */
+#define ULTRA_COMPRESSION                128         /* Enable Ultracode compression (experimental) */
 
 /* Warning and error conditions (API return values) */
-#define BARCODE_WARN_HRT_TRUNCATED 1     /* Human Readable Text was truncated (max 159 bytes) */
-#define BARCODE_WARN_INVALID_OPTION 2    /* Invalid option given but overridden by barcode */
-#define BARCODE_WARN_USES_ECI 3          /* Automatic ECI inserted by barcode */
-#define BARCODE_WARN_NONCOMPLIANT 4      /* Symbol created not compliant with standards */
-#define BARCODE_ERROR 5                  /* Warn/error marker, not returned */
-#define BARCODE_ERROR_TOO_LONG 5         /* Input data wrong length */
-#define BARCODE_ERROR_INVALID_DATA 6     /* Input data incorrect */
-#define BARCODE_ERROR_INVALID_CHECK 7    /* Input check digit incorrect */
-#define BARCODE_ERROR_INVALID_OPTION 8   /* Incorrect option given */
-#define BARCODE_ERROR_ENCODING_PROBLEM 9 /* Internal error (should not happen) */
-#define BARCODE_ERROR_FILE_ACCESS 10     /* Error opening output file */
-#define BARCODE_ERROR_MEMORY 11          /* Memory allocation (malloc) failure */
-#define BARCODE_ERROR_FILE_WRITE 12      /* Error writing to output file */
-#define BARCODE_ERROR_USES_ECI 13        /* Error counterpart of warning if WARN_FAIL_ALL set (see below) */
-#define BARCODE_ERROR_NONCOMPLIANT 14    /* Error counterpart of warning if WARN_FAIL_ALL set */
-#define BARCODE_ERROR_HRT_TRUNCATED 15   /* Error counterpart of warning if WARN_FAIL_ALL set */
+#define BARCODE_WARN_HRT_TRUNCATED       1           /* Human Readable Text was truncated (max 159 bytes) */
+#define BARCODE_WARN_INVALID_OPTION      2           /* Invalid option given but overridden by barcode */
+#define BARCODE_WARN_USES_ECI            3           /* Automatic ECI inserted by barcode */
+#define BARCODE_WARN_NONCOMPLIANT        4           /* Symbol created not compliant with standards */
+#define BARCODE_ERROR                    5           /* Warn/error marker, not returned */
+#define BARCODE_ERROR_TOO_LONG           5           /* Input data wrong length */
+#define BARCODE_ERROR_INVALID_DATA       6           /* Input data incorrect */
+#define BARCODE_ERROR_INVALID_CHECK      7           /* Input check digit incorrect */
+#define BARCODE_ERROR_INVALID_OPTION     8           /* Incorrect option given */
+#define BARCODE_ERROR_ENCODING_PROBLEM   9           /* Internal error (should not happen) */
+#define BARCODE_ERROR_FILE_ACCESS        10          /* Error opening output file */
+#define BARCODE_ERROR_MEMORY             11          /* Memory allocation (malloc) failure */
+#define BARCODE_ERROR_FILE_WRITE         12          /* Error writing to output file */
+#define BARCODE_ERROR_USES_ECI           13          /* Error counterpart of warning if WARN_FAIL_ALL set (see below) */
+#define BARCODE_ERROR_NONCOMPLIANT       14          /* Error counterpart of warning if WARN_FAIL_ALL set */
+#define BARCODE_ERROR_HRT_TRUNCATED      15          /* Error counterpart of warning if WARN_FAIL_ALL set */
 
 /* Warning level (`symbol->warn_level`) */
-#define WARN_DEFAULT 0  /* Default behaviour */
-#define WARN_FAIL_ALL 2 /* Treat warning as error */
+#define WARN_DEFAULT                     0           /* Default behaviour */
+#define WARN_FAIL_ALL                    2           /* Treat warning as error */
 
 /* Capability flags (ZBarcode_Cap() `cap_flag`) */
-#define BARCODE_CAP_HRT 0x0001              /* Prints Human Readable Text? */
-#define BARCODE_CAP_STACKABLE 0x0002        /* Is stackable? */
-#define BARCODE_CAP_EXTENDABLE 0x0004       /* Is extendable with add-on data? (Is EAN/UPC?) */
-#define BARCODE_CAP_COMPOSITE 0x0008        /* Can have composite data? */
-#define BARCODE_CAP_ECI 0x0010              /* Supports Extended Channel Interpretations? */
-#define BARCODE_CAP_GS1 0x0020              /* Supports GS1 data? */
-#define BARCODE_CAP_DOTTY 0x0040            /* Can be output as dots? */
-#define BARCODE_CAP_QUIET_ZONES 0x0080      /* Has default quiet zones? */
-#define BARCODE_CAP_FIXED_RATIO 0x0100      /* Has fixed width-to-height (aspect) ratio? */
-#define BARCODE_CAP_READER_INIT 0x0200      /* Supports Reader Initialisation? */
-#define BARCODE_CAP_FULL_MULTIBYTE 0x0400   /* Supports full-multibyte option? */
-#define BARCODE_CAP_MASK 0x0800             /* Is mask selectable? */
-#define BARCODE_CAP_STRUCTAPP 0x1000        /* Supports Structured Append? */
-#define BARCODE_CAP_COMPLIANT_HEIGHT 0x2000 /* Has compliant height? */
+#define BARCODE_CAP_HRT                  0x0001      /* Prints Human Readable Text? */
+#define BARCODE_CAP_STACKABLE            0x0002      /* Is stackable? */
+#define BARCODE_CAP_EXTENDABLE           0x0004      /* Is extendable with add-on data? (Is EAN/UPC?) */
+#define BARCODE_CAP_COMPOSITE            0x0008      /* Can have composite data? */
+#define BARCODE_CAP_ECI                  0x0010      /* Supports Extended Channel Interpretations? */
+#define BARCODE_CAP_GS1                  0x0020      /* Supports GS1 data? */
+#define BARCODE_CAP_DOTTY                0x0040      /* Can be output as dots? */
+#define BARCODE_CAP_QUIET_ZONES          0x0080      /* Has default quiet zones? */
+#define BARCODE_CAP_FIXED_RATIO          0x0100      /* Has fixed width-to-height (aspect) ratio? */
+#define BARCODE_CAP_READER_INIT          0x0200      /* Supports Reader Initialisation? */
+#define BARCODE_CAP_FULL_MULTIBYTE       0x0400      /* Supports full-multibyte option? */
+#define BARCODE_CAP_MASK                 0x0800      /* Is mask selectable? */
+#define BARCODE_CAP_STRUCTAPP            0x1000      /* Supports Structured Append? */
+#define BARCODE_CAP_COMPLIANT_HEIGHT     0x2000      /* Has compliant height? */
 
 /* The largest amount of data that can be encoded is 4350 4-byte UTF-8 chars in Han Xin Code */
-#define BARCODE_MAX_DATA_LEN 17400
+#define BARCODE_MAX_DATA_LEN             17400
 /* Maximum number of segments allowed for (`seg_count`) */
-#define BARCODE_MAX_SEG_COUNT 256
+#define BARCODE_MAX_SEG_COUNT            256
 
 /* Debug flags (`symbol->debug`) */
-#define BARCODE_DEBUG_PRINT 0x0000 /* Print debug info (if any) to stdout */ // 0x0001
-#define BARCODE_DEBUG_TEST 0x0000 /* For internal test use only */           // 0x0002
+#define BARCODE_DEBUG_PRINT              0x0000      /* Print debug info (if any) to stdout */ // 0x0001
+#define BARCODE_DEBUG_TEST               0x0000      /* For internal test use only */           // 0x0002
 
 #define BARCODE_EXTERN extern
-/////////
 
 /* `is_sane()` flags */
-#define IS_SPC_F 0x0001 /* Space */
-#define IS_HSH_F 0x0002 /* Hash sign # */
-#define IS_AST_F 0x0004 /* Asterisk sign * */
-#define IS_PLS_F 0x0008 /* Plus sign + */
-#define IS_MNS_F 0x0010 /* Minus sign - */
-#define IS_NUM_F 0x0020 /* Number 0-9 */
-#define IS_UPO_F 0x0040 /* Uppercase letter, apart from A-F and X */
-#define IS_UHX_F 0x0080 /* Uppercase hex A-F */
-#define IS_UX__F 0x0100 /* Uppercase X */
-#define IS_LWO_F 0x0200 /* Lowercase letter, apart from a-f and x */
-#define IS_LHX_F 0x0400 /* Lowercase hex a-f */
-#define IS_LX__F 0x0800 /* Lowercase x */
-#define IS_C82_F 0x1000 /* CSET82 punctuation (apart from *, + and -) */
-#define IS_SIL_F 0x2000 /* SILVER/TECHNETIUM punctuation .$/% (apart from space, + and -) */
-#define IS_CLI_F 0x4000 /* CALCIUM INNER punctuation $:/. (apart from + and -) (Codabar) */
-#define IS_ARS_F 0x8000 /* ARSENIC uppercase subset (VIN) */
+#define IS_SPC_F                         0x0001      /* Space */
+#define IS_HSH_F                         0x0002      /* Hash sign # */
+#define IS_AST_F                         0x0004      /* Asterisk sign * */
+#define IS_PLS_F                         0x0008      /* Plus sign + */
+#define IS_MNS_F                         0x0010      /* Minus sign - */
+#define IS_NUM_F                         0x0020      /* Number 0-9 */
+#define IS_UPO_F                         0x0040      /* Uppercase letter, apart from A-F and X */
+#define IS_UHX_F                         0x0080      /* Uppercase hex A-F */
+#define IS_UX__F                         0x0100      /* Uppercase X */
+#define IS_LWO_F                         0x0200      /* Lowercase letter, apart from a-f and x */
+#define IS_LHX_F                         0x0400      /* Lowercase hex a-f */
+#define IS_LX__F                         0x0800      /* Lowercase x */
+#define IS_C82_F                         0x1000      /* CSET82 punctuation (apart from *, + and -) */
+#define IS_SIL_F                         0x2000      /* SILVER/TECHNETIUM punctuation .$/% (apart from space, + and -) */
+#define IS_CLI_F                         0x4000      /* CALCIUM INNER punctuation $:/. (apart from + and -) (Codabar) */
+#define IS_ARS_F                         0x8000      /* ARSENIC uppercase subset (VIN) */
 
-#define IS_UPR_F (IS_UPO_F | IS_UHX_F | IS_UX__F) /* Uppercase letters */
-#define IS_LWR_F (IS_LWO_F | IS_LHX_F | IS_LX__F) /* Lowercase letters */
+#define IS_UPR_F (IS_UPO_F | IS_UHX_F | IS_UX__F)    /* Uppercase letters */
+#define IS_LWR_F (IS_LWO_F | IS_LHX_F | IS_LX__F)    /* Lowercase letters */
 
 /* The most commonly used set */
 #define NEON_F IS_NUM_F /* NEON "0123456789" */
@@ -269,9 +317,7 @@
 #define __isupper(c) ((c) >= 'A' && (c) <= 'Z')
 #define __islower(c) ((c) >= 'a' && (c) <= 'z')
 
-
 #define INTERNAL
-
 #define INTERNAL_DATA_EXTERN extern
 #define INTERNAL_DATA
 
@@ -282,17 +328,15 @@
         (s)->encoded_data[(y)][(x) >> 3] |= 1 << ((x)&0x07); \
     } while (0)
 
-/* Converts a character 0-9, A-F to its equivalent integer value */
-INTERNAL int ctoi(const char source);
-
-/* Expands from a width pattern to a bit pattern */
-INTERNAL void expand(struct barcode_symbol *symbol, const char data[], const int length);
-
-/* Treats source as ISO/IEC 8859-1 and copies into `symbol->text`, converting to UTF-8. Control chars (incl. DEL) and
-   non-ISO/IEC 8859-1 (0x80-9F) are replaced with spaces. Returns warning if truncated, else 0 */
-INTERNAL int hrt_cpy_iso8859_1(struct barcode_symbol *symbol, const unsigned char source[],
-                               const int length);
-
+/** End of WIDGET_Exported_Macros
+  * @}
+  */
+/*============================================================================*
+ *                            Variables
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @{
+  */
 INTERNAL_DATA const char C128Table[107][6] =  /* Used by CODABLOCKF and CODE16K also */
 {
     /* Code 128 character encodation - Table 1 (with final CODE16K-only character in place of Stop character) */
@@ -405,18 +449,43 @@ INTERNAL_DATA const char C128Table[107][6] =  /* Used by CODABLOCKF and CODE16K 
     {/* Only used by CODE16K */ '2', '1', '1', '1', '3', '3'}
 };
 
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
+
+/*============================================================================*
+ *                           Private Functions
+ *============================================================================*/
+/** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
+  * @{
+  */
 
 /* Converts a character 0-9, A-F to its equivalent integer value */
-INTERNAL int ctoi(const char source)
+INTERNAL int gui_barcode_gen_ctoi(const char source);
+
+/* Expands from a width pattern to a bit pattern */
+INTERNAL void gui_barcode_gen_expand(struct barcode_symbol *symbol, const char data[],
+                                     const int length);
+
+/* Treats source as ISO/IEC 8859-1 and copies into `symbol->text`, converting to UTF-8. Control chars (incl. DEL) and
+   non-ISO/IEC 8859-1 (0x80-9F) are replaced with spaces. Returns warning if truncated, else 0 */
+INTERNAL int gui_barcode_gen_hrt_cpy_iso8859_1(struct barcode_symbol *symbol,
+                                               const unsigned char source[],
+                                               const int length);
+
+/* Converts a character 0-9, A-F to its equivalent integer value */
+INTERNAL int gui_barcode_gen_ctoi(const char source)
 {
     if (__isdigit(source))
     {
         return (source - '0');
     }
+
     if ((source >= 'A') && (source <= 'F'))
     {
         return (source - 'A' + 10);
     }
+
     if ((source >= 'a') && (source <= 'f'))
     {
         return (source - 'a' + 10);
@@ -424,11 +493,10 @@ INTERNAL int ctoi(const char source)
     return -1;
 }
 
-
 /* Expands from a width pattern to a bit pattern */
-INTERNAL void expand(struct barcode_symbol *symbol, const char data[], const int length)
+INTERNAL void gui_barcode_gen_expand(struct barcode_symbol *symbol, const char data[],
+                                     const int length)
 {
-
     int reader;
     int writer, i;
     int latch, num;
@@ -443,7 +511,7 @@ INTERNAL void expand(struct barcode_symbol *symbol, const char data[], const int
 
     for (reader = 0; reader < length; reader++)
     {
-        num = ctoi(data[reader]);
+        num = gui_barcode_gen_ctoi(data[reader]);
         assert(num >= 0);
         for (i = 0; i < num; i++)
         {
@@ -463,8 +531,9 @@ INTERNAL void expand(struct barcode_symbol *symbol, const char data[], const int
     }
 }
 
-INTERNAL int hrt_cpy_iso8859_1(struct barcode_symbol *symbol, const unsigned char source[],
-                               const int length)
+INTERNAL int gui_barcode_gen_hrt_cpy_iso8859_1(struct barcode_symbol *symbol,
+                                               const unsigned char source[],
+                                               const int length)
 {
     int i, j;
     int warn_number = 0;
@@ -504,6 +573,7 @@ INTERNAL int hrt_cpy_iso8859_1(struct barcode_symbol *symbol, const unsigned cha
             symbol->text[j++] = source[i] - 0x40;
         }
     }
+
     if (j == sizeof(symbol->text))
     {
         warn_number = BARCODE_WARN_HRT_TRUNCATED;
@@ -515,12 +585,12 @@ INTERNAL int hrt_cpy_iso8859_1(struct barcode_symbol *symbol, const unsigned cha
     {
         strcpy(symbol->errtxt, "249: Human Readable Text truncated");
     }
+
     return warn_number;
 }
 
-
 /* Determine appropriate mode for a given character */
-INTERNAL int c128_parunmodd(const unsigned char llyth)
+INTERNAL int gui_barcode_gen_c128_parunmodd(const unsigned char llyth)
 {
     int modd;
 
@@ -559,9 +629,8 @@ INTERNAL int c128_parunmodd(const unsigned char llyth)
 /**
  * Bring together same type blocks
  */
-static void c128_grwp(int list[2][C128_MAX], int *p_indexliste)
+static void gui_barcode_gen_c128_grwp(int list[2][C128_MAX], int *p_indexliste)
 {
-
     /* bring together same type blocks */
     if (*p_indexliste > 1)
     {
@@ -593,7 +662,8 @@ static void c128_grwp(int list[2][C128_MAX], int *p_indexliste)
 /**
  * Implements rules from ISO 15417 Annex E
  */
-INTERNAL void c128_dxsmooth(int list[2][C128_MAX], int *p_indexliste, const char *manual_set)
+INTERNAL void gui_barcode_gen_c128_dxsmooth(int list[2][C128_MAX], int *p_indexliste,
+                                            const char *manual_set)
 {
     int i, last, next;
     const int indexliste = *p_indexliste;
@@ -602,6 +672,7 @@ INTERNAL void c128_dxsmooth(int list[2][C128_MAX], int *p_indexliste, const char
     {
         int current = list[1][i]; /* Either C128_ABORC, C128_AORB, C128_SHIFTA or C128_SHIFTB */
         int length = list[0][i];
+
         if (i != 0)
         {
             last = list[1][i - 1];
@@ -610,6 +681,7 @@ INTERNAL void c128_dxsmooth(int list[2][C128_MAX], int *p_indexliste, const char
         {
             last = 0;
         }
+
         if (i != indexliste - 1)
         {
             next = list[1][i + 1];
@@ -646,6 +718,7 @@ INTERNAL void c128_dxsmooth(int list[2][C128_MAX], int *p_indexliste, const char
                     current = C128_AORB; /* Determine below */
                 }
             }
+
             if (current == C128_AORB)
             {
                 if (manual_set && (manual_set[i] == 'A' || manual_set[i] == 'B'))
@@ -695,6 +768,7 @@ INTERNAL void c128_dxsmooth(int list[2][C128_MAX], int *p_indexliste, const char
                     current = C128_AORB; /* Determine below */
                 }
             }
+
             if (current == C128_AORB)
             {
                 if (manual_set && (manual_set[i] == 'A' || manual_set[i] == 'B'))
@@ -766,16 +840,15 @@ INTERNAL void c128_dxsmooth(int list[2][C128_MAX], int *p_indexliste, const char
         } /* Rule 2 is implemented elsewhere, Rule 6 is implied */
     }
 
-    c128_grwp(list, p_indexliste);
+    gui_barcode_gen_c128_grwp(list, p_indexliste);
 }
 
 /**
  * Translate Code 128 Set A characters into barcodes.
  * This set handles all control characters NUL to US.
  */
-INTERNAL void c128_set_a(const unsigned char source, int values[], int *bar_chars)
+INTERNAL void gui_barcode_gen_c128_set_a(const unsigned char source, int values[], int *bar_chars)
 {
-
     if (source > 127)
     {
         if (source < 160)
@@ -806,7 +879,7 @@ INTERNAL void c128_set_a(const unsigned char source, int values[], int *bar_char
  * This set handles all characters which are not part of long numbers and not
  * control characters.
  */
-INTERNAL int c128_set_b(const unsigned char source, int values[], int *bar_chars)
+INTERNAL int gui_barcode_gen_c128_set_b(const unsigned char source, int values[], int *bar_chars)
 {
     if (source >= 128 + 32)
     {
@@ -833,12 +906,13 @@ INTERNAL int c128_set_b(const unsigned char source, int values[], int *bar_chars
 /* Translate Code 128 Set C characters into barcodes
  * This set handles numbers in a compressed form
  */
-INTERNAL void c128_set_c(const unsigned char source_a, const unsigned char source_b, int values[],
-                         int *bar_chars)
+INTERNAL void gui_barcode_gen_c128_set_c(const unsigned char source_a, const unsigned char source_b,
+                                         int values[],
+                                         int *bar_chars)
 {
     int weight;
 
-    weight = (10 * ctoi(source_a)) + ctoi(source_b);
+    weight = (10 * gui_barcode_gen_ctoi(source_a)) + gui_barcode_gen_ctoi(source_b);
     values[(*bar_chars)] = weight;
     (*bar_chars)++;
 }
@@ -857,6 +931,7 @@ INTERNAL void c128_put_in_set(int list[2][C128_MAX], const int indexliste, char 
             set[read++] = list[1][i];
         }
     }
+
     if (source)
     {
         /* Watch out for odd-length Mode C blocks */
@@ -901,6 +976,7 @@ INTERNAL void c128_put_in_set(int list[2][C128_MAX], const int indexliste, char 
                 c_count = 0;
             }
         }
+
         if (c_count & 1)
         {
             if ((i - c_count) != 0)
@@ -912,6 +988,7 @@ INTERNAL void c128_put_in_set(int list[2][C128_MAX], const int indexliste, char 
                 set[i - 1] = 'B';
             }
         }
+
         for (i = 1; i < read - 1; i++)
         {
             if ((set[i] == 'C') && ((set[i - 1] == 'B') && (set[i + 1] == 'B')))
@@ -922,8 +999,12 @@ INTERNAL void c128_put_in_set(int list[2][C128_MAX], const int indexliste, char 
     }
 }
 
+/*============================================================================*
+ *                           Public Functions
+ *============================================================================*/
+
 /* Handle Code 128, 128B and HIBC 128 */
-barcode_symbol_t *barcode_encode(unsigned char source[], int length)
+barcode_symbol_t *gui_barcode_gen_barcode_encode(unsigned char source[], int length)
 {
     int i, j, k, values[C128_MAX] = {0}, bar_characters = 0, read, total_sum;
     //int error_number = 0;
@@ -984,6 +1065,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
                 src_buf[j++] = source[i];
             }
         }
+
         if (j != length)
         {
             length = j;
@@ -1042,6 +1124,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
             /* Detected a change from 8859-1 to 646 - count how long for */
             for (j = 0; ((i + j) < length) && (fset[i + j] == ' '); j++)
                 ;
+
             /* Count how many 8859-1 beyond */
             k = 0;
             if (i + j < length)
@@ -1049,6 +1132,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
                 for (k = 1; ((i + j + k) < length) && (fset[i + j + k] != ' '); k++)
                     ;
             }
+
             if (j < 3 || (j < 5 && k > 2))
             {
                 /* Change to shifting back rather than latching back */
@@ -1065,7 +1149,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
     indexliste = 0;
     indexchaine = 0;
 
-    mode = c128_parunmodd(src[indexchaine]);
+    mode = gui_barcode_gen_c128_parunmodd(src[indexchaine]);
     if (mode == C128_ABORC && (symbol->symbology == BARCODE_CODE128AB ||
                                (manual_set[indexchaine] == 'A' || manual_set[indexchaine] == 'B')))
     {
@@ -1083,12 +1167,14 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
             {
                 break;
             }
-            mode = c128_parunmodd(src[indexchaine]);
+
+            mode = gui_barcode_gen_c128_parunmodd(src[indexchaine]);
             if (mode == C128_ABORC && (symbol->symbology == BARCODE_CODE128AB ||
                                        (manual_set[indexchaine] == 'A' || manual_set[indexchaine] == 'B')))
             {
                 mode = C128_AORB;
             }
+
             if (manual_set[indexchaine] != manual_set[indexchaine - 1])
             {
                 break;
@@ -1100,7 +1186,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
 
     if (src == src_buf)
     {
-        /* Need to re-index `manual_set` to have sames indexes as `list` blocks for `c128_dxsmooth()` */
+        /* Need to re-index `manual_set` to have sames indexes as `list` blocks for `gui_barcode_gen_c128_dxsmooth()` */
         j = 0;
         for (i = 1; i < indexliste; i++)
         {
@@ -1108,7 +1194,8 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
             manual_set[i] = manual_set[j];
         }
     }
-    c128_dxsmooth(list, &indexliste, src == src_buf ? manual_set : NULL);
+
+    gui_barcode_gen_c128_dxsmooth(list, &indexliste, src == src_buf ? manual_set : NULL);
 
     /* Resolve odd length C128_LATCHC blocks */
     if ((list[1][0] == C128_LATCHC) && (list[0][0] & 1))
@@ -1123,6 +1210,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
             indexliste = 2;
         }
     }
+
     if (indexliste > 1)
     {
         for (i = 1; i < indexliste; i++)
@@ -1155,10 +1243,12 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
         {
             glyph_count += 2; /* 1 codeword */
         }
+
         if ((fset[i] == 'f') || (fset[i] == 'n'))
         {
             glyph_count += 2; /* May be overestimate if in latch */
         }
+
         if (((set[i] == 'A') || (set[i] == 'B')) || (set[i] == 'C'))
         {
             if (set[i] != last_set)
@@ -1167,6 +1257,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
                 glyph_count += 2;
             }
         }
+
         if (i == 0)
         {
             if (fset[i] == 'F')
@@ -1195,6 +1286,7 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
             glyph_count += 2;
         }
     }
+
     if (glyph_count > 120)
     {
         /* 60 * 2 */
@@ -1210,20 +1302,31 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
         switch (set[0])
         {
         case 'A': /* Start A */
-            values[bar_characters++] = 103;
-            current_set = 'A';
-            values[bar_characters++] = 96; /* FNC3 */
+            {
+                values[bar_characters++] = 103;
+                current_set = 'A';
+                values[bar_characters++] = 96; /* FNC3 */
+            }
             break;
+
         case 'B': /* Start B */
-            values[bar_characters++] = 104;
-            current_set = 'B';
-            values[bar_characters++] = 96; /* FNC3 */
+            {
+                values[bar_characters++] = 104;
+                current_set = 'B';
+                values[bar_characters++] = 96; /* FNC3 */
+            }
             break;
-        case 'C':                           /* Start C */
-            values[bar_characters++] = 104; /* Start B */
-            values[bar_characters++] = 96;  /* FNC3 */
-            values[bar_characters++] = 99;  /* Code C */
-            current_set = 'C';
+
+        case 'C': /* Start C */
+            {
+                values[bar_characters++] = 104; /* Start B */
+                values[bar_characters++] = 96;  /* FNC3 */
+                values[bar_characters++] = 99;  /* Code C */
+                current_set = 'C';
+            }
+            break;
+
+        default:
             break;
         }
     }
@@ -1233,16 +1336,27 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
         switch (set[0])
         {
         case 'A': /* Start A */
-            values[bar_characters++] = 103;
-            current_set = 'A';
+            {
+                values[bar_characters++] = 103;
+                current_set = 'A';
+            }
             break;
+
         case 'B': /* Start B */
-            values[bar_characters++] = 104;
-            current_set = 'B';
+            {
+                values[bar_characters++] = 104;
+                current_set = 'B';
+            }
             break;
+
         case 'C': /* Start C */
-            values[bar_characters++] = 105;
-            current_set = 'C';
+            {
+                values[bar_characters++] = 105;
+                current_set = 'C';
+            }
+            break;
+
+        default:
             break;
         }
     }
@@ -1252,14 +1366,22 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
         switch (current_set)
         {
         case 'A':
-            values[bar_characters++] = 101;
-            values[bar_characters++] = 101;
-            f_state = 1;
+            {
+                values[bar_characters++] = 101;
+                values[bar_characters++] = 101;
+                f_state = 1;
+            }
             break;
+
         case 'B':
-            values[bar_characters++] = 100;
-            values[bar_characters++] = 100;
-            f_state = 1;
+            {
+                values[bar_characters++] = 100;
+                values[bar_characters++] = 100;
+                f_state = 1;
+            }
+            break;
+
+        default:
             break;
         }
     }
@@ -1275,16 +1397,27 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
             switch (set[read])
             {
             case 'A':
-                values[bar_characters++] = 101;
-                current_set = 'A';
+                {
+                    values[bar_characters++] = 101;
+                    current_set = 'A';
+                }
                 break;
+
             case 'B':
-                values[bar_characters++] = 100;
-                current_set = 'B';
+                {
+                    values[bar_characters++] = 100;
+                    current_set = 'B';
+                }
                 break;
+
             case 'C':
-                values[bar_characters++] = 99;
-                current_set = 'C';
+                {
+                    values[bar_characters++] = 99;
+                    current_set = 'C';
+                }
+                break;
+
+            default:
                 break;
             }
         }
@@ -1297,31 +1430,48 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
                 switch (current_set)
                 {
                 case 'A':
-                    values[bar_characters++] = 101;
-                    values[bar_characters++] = 101;
-                    f_state = 1;
+                    {
+                        values[bar_characters++] = 101;
+                        values[bar_characters++] = 101;
+                        f_state = 1;
+                    }
                     break;
+
                 case 'B':
-                    values[bar_characters++] = 100;
-                    values[bar_characters++] = 100;
-                    f_state = 1;
+                    {
+                        values[bar_characters++] = 100;
+                        values[bar_characters++] = 100;
+                        f_state = 1;
+                    }
+                    break;
+
+                default:
                     break;
                 }
             }
+
             if ((fset[read] == ' ') && (f_state == 1))
             {
                 /* Latch end of extended mode */
                 switch (current_set)
                 {
                 case 'A':
-                    values[bar_characters++] = 101;
-                    values[bar_characters++] = 101;
-                    f_state = 0;
+                    {
+                        values[bar_characters++] = 101;
+                        values[bar_characters++] = 101;
+                        f_state = 0;
+                    }
                     break;
+
                 case 'B':
-                    values[bar_characters++] = 100;
-                    values[bar_characters++] = 100;
-                    f_state = 0;
+                    {
+                        values[bar_characters++] = 100;
+                        values[bar_characters++] = 100;
+                        f_state = 0;
+                    }
+                    break;
+
+                default:
                     break;
                 }
             }
@@ -1333,10 +1483,18 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
             switch (current_set)
             {
             case 'A':
-                values[bar_characters++] = 101; /* FNC 4 */
+                {
+                    values[bar_characters++] = 101; /* FNC 4 */
+                }
                 break;
+
             case 'B':
-                values[bar_characters++] = 100; /* FNC 4 */
+                {
+                    values[bar_characters++] = 100; /* FNC 4 */
+                }
+                break;
+
+            default:
                 break;
             }
         }
@@ -1352,20 +1510,30 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
         /* Encode data characters */
         case 'a':
         case 'A':
-            c128_set_a(src[read], values, &bar_characters);
-            read++;
+            {
+                gui_barcode_gen_c128_set_a(src[read], values, &bar_characters);
+                read++;
+            }
             break;
+
         case 'b':
         case 'B':
-            (void)c128_set_b(src[read], values, &bar_characters);
-            read++;
+            {
+                (void)gui_barcode_gen_c128_set_b(src[read], values, &bar_characters);
+                read++;
+            }
             break;
+
         case 'C':
-            c128_set_c(src[read], src[read + 1], values, &bar_characters);
-            read += 2;
+            {
+                gui_barcode_gen_c128_set_c(src[read], src[read + 1], values, &bar_characters);
+                read += 2;
+            }
+            break;
+
+        default:
             break;
         }
-
     }
     while (read < length);
 
@@ -1401,12 +1569,18 @@ barcode_symbol_t *barcode_encode(unsigned char source[], int length)
         printf("Checksum:  %d\n", total_sum);
     }
 
-    expand(symbol, dest, d - dest);
+    gui_barcode_gen_expand(symbol, dest, d - dest);
 
-    (void)hrt_cpy_iso8859_1(symbol, src, length); /* Truncation can't happen */
+    (void)gui_barcode_gen_hrt_cpy_iso8859_1(symbol, src, length); /* Truncation can't happen */
     // APP_PRINT_TRACE1("symbol->text %s", TRACE_STRING(symbol->text));
 
     return symbol;//error_number;
 }
 
+/** End of WIDGET_Exported_Functions
+  * @}
+  */
 
+/** End of WIDGET
+  * @}
+  */

@@ -18,6 +18,7 @@
 #define MAX_EVENT_CNT   10
 static gui_event_cb_t event_cb[MAX_EVENT_CNT];
 static gui_event_t event_code[MAX_EVENT_CNT];
+static void *event_cb_param[MAX_EVENT_CNT];
 static void *event_obj[MAX_EVENT_CNT];
 static uint8_t event_cnt = 0;
 static bool fb_change = false;
@@ -25,16 +26,27 @@ static bool fb_change = false;
 
 static bool obj_is_active(gui_obj_t *obj)
 {
-    if ((obj->matrix->m[0][1] == 0) && \
-        (obj->matrix->m[1][0] == 0) && \
-        (obj->matrix->m[2][0] == 0) && \
-        (obj->matrix->m[2][1] == 0) && \
-        (obj->matrix->m[2][2] == 1)) //scale and translate, no rotate
+    GUI_ASSERT(obj != NULL);
+    float m00 = obj->matrix->m[0][0];
+    float m01 = obj->matrix->m[0][1];
+    float m02 = obj->matrix->m[0][2];
+    float m10 = obj->matrix->m[1][0];
+    float m11 = obj->matrix->m[1][1];
+    float m12 = obj->matrix->m[1][2];
+    float m20 = obj->matrix->m[2][0];
+    float m21 = obj->matrix->m[2][1];
+    float m22 = obj->matrix->m[2][2];
+
+    if ((m01 == 0) && \
+        (m10 == 0) && \
+        (m20 == 0) && \
+        (m21 == 0) && \
+        (m22 == 1)) //scale and translate, no rotate
     {
-        float x_min = obj->matrix->m[0][2];
-        float x_max = obj->matrix->m[0][2] + obj->matrix->m[0][0] * obj->w;
-        float y_min = obj->matrix->m[1][2];
-        float y_max = obj->matrix->m[1][2] + obj->matrix->m[1][1] * obj->h;
+        float x_min = m02;
+        float x_max = m02 + m00 * obj->w;
+        float y_min = m12;
+        float y_max = m12 + m11 * obj->h;
         if ((x_min > (int)gui_get_screen_width()) || \
             (x_max < 0) || \
             (y_min > (int)gui_get_screen_height()) || \
@@ -121,14 +133,15 @@ static void obj_input_prepare(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->obj_input_prepare != NULL)
+        if (obj->has_input_prepare_cb)
         {
             if ((obj->matrix != NULL) && (obj->parent->matrix))
             {
                 memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
                 matrix_translate(obj->x, obj->y, obj->matrix);
             }
-            obj->obj_input_prepare(obj);
+
+            obj->obj_cb(obj, OBJ_INPUT_PREPARE);
             if (obj_is_active(obj) == false)
             {
                 continue;
@@ -160,11 +173,11 @@ static void obj_draw_prepare(gui_obj_t *object)
             matrix_translate(obj->x, obj->y, obj->matrix);
         }
 
-        if (obj->obj_prepare != NULL)
+        if (obj->has_prepare_cb)
         {
             if (!obj->gesture)
             {
-                obj->obj_prepare(obj);
+                obj->obj_cb(obj, OBJ_PREPARE);
             }
         }
         if (obj->not_show)
@@ -188,11 +201,13 @@ static void obj_draw_scan(gui_obj_t *obj)
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
         if (obj->active)
         {
-            if (obj->obj_draw != NULL)
+            if (obj->has_draw_cb)
             {
                 dc->section.y1 = dc->section_count * dc->fb_height;
                 dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
-                obj->obj_draw(obj);
+                dc->section.x1 = 0;
+                dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
+                obj->obj_cb(obj, OBJ_DRAW);
             }
         }
         else
@@ -210,9 +225,9 @@ static void obj_draw_end(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj->obj_end != NULL)
+        if (obj->has_end_cb)
         {
-            obj->obj_end(obj);
+            obj->obj_cb(obj, OBJ_END);
         }
         if (obj->active)
         {
@@ -223,6 +238,7 @@ static void obj_draw_end(gui_obj_t *obj)
                 {
                     event_cb[event_cnt] = event_dsc->event_cb;
                     event_code[event_cnt] = event_dsc->event_code;
+                    event_cb_param[event_cnt] = event_dsc->user_data;
                     event_obj[event_cnt] = obj;
                     event_dsc->event_code = GUI_EVENT_INVALIDE;
                     event_cnt++;
@@ -279,7 +295,7 @@ static void gui_fb_draw(gui_obj_t *root)
             }
             if (dc->frame_buf)
             {
-                memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
+                memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
             }
             dc->section_count = i;
 
@@ -305,7 +321,7 @@ static void gui_fb_draw(gui_obj_t *root)
     }
     else if (dc->type == DC_SINGLE)
     {
-        memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * dc->bit_depth >> 3);
+        memset(dc->frame_buf, 0x00, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
 
         obj_draw_scan(root);
         if (dc->lcd_draw_sync != NULL)
@@ -387,7 +403,7 @@ void gui_fb_disp(gui_obj_t *root)
     obj_draw_end(root);
     for (uint8_t i = 0; i < event_cnt; i++)
     {
-        event_cb[i](event_obj[i], event_code[i]);
+        event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
     }
     event_cnt = 0;
     dc->frame_count++;

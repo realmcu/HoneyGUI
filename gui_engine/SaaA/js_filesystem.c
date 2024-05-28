@@ -5,7 +5,7 @@ DECLARE_HANDLER(opendir)
     if (args_cnt >= 2 && jerry_value_is_string(args[0]) && jerry_value_is_function(args[1]))
     {
         char *pathname = js_value_to_string(args[0]);
-        gui_fs_DIR *dir = gui_fs_opendir(pathname);
+        gui_fs_dir *dir = gui_fs_opendir(pathname);
         jerry_value_t Dir = js_get_property(this_value, "Dir");
         jerry_set_object_native_pointer(Dir, dir, NULL);
         free(pathname);
@@ -24,7 +24,7 @@ DECLARE_HANDLER(opendir)
 DECLARE_HANDLER(readSync)
 {
     struct gui_fs_dirent *ptr  = NULL;
-    gui_fs_DIR *dir = NULL;
+    gui_fs_dir *dir = NULL;
     jerry_get_object_native_pointer(this_value, (void *)&dir, NULL);
     ptr = gui_fs_readdir(dir);
     if (ptr)
@@ -47,7 +47,7 @@ DECLARE_HANDLER(readSync)
 
 DECLARE_HANDLER(fs_close)
 {
-    gui_fs_DIR *dir = NULL;
+    gui_fs_dir *dir = NULL;
     jerry_get_object_native_pointer(this_value, (void *)&dir, NULL);
     gui_fs_closedir(dir);
     return jerry_create_undefined();

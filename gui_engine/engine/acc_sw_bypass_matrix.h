@@ -14,9 +14,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
-// #include "acc_sw_rle.h"
-// #include "acc_sw_blend.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,13 +1,13 @@
 
 #include "app_dashboard_data.h"
+#include <gui_api.h>
+#include "app_dashboard_main_display.h"
+#include "app_dashboard_connected_display.h"
 #ifndef _WIN32
 #include "trace.h"
-
 #include "communicate_parse_navigation.h"
 #include "communicate_parse_notify.h"
 #include "os_timer.h"
-#include "app_dashboard_main_display.h"
-#include "app_dashboard_connected_display.h"
 #include "os_sync.h"
 #include "communicate_protocol.h"
 #include "communicate_parse.h"
@@ -21,6 +21,14 @@ char str_def1[] = {0xe5, 0x85, 0xac, 0xe9, 0x87, 0x8c, '\0'};
 char str_def2[] = {0xe8, 0xbf, 0x9b, 0xe5, 0x85, 0xa5, '\0'};
 char str_def3[] = {0xe7, 0xb1, 0xb3, '\0'};
 char str_def4[] = {0x20, 0xe8, 0xbf, 0x9b, 0xe5, 0x85, 0xa5, '\0'};
+
+bool COMMUNICATE_ALLOW_DLPS = true;
+
+bool communicate_navi_dlps_check(void)
+{
+    return COMMUNICATE_ALLOW_DLPS;
+}
+// extern void reset_daemon_time(uint32_t value);
 
 void app_dashboard_auto_refresh_data_demo(void)
 {
@@ -86,7 +94,6 @@ void *refresh_count_timer;
 static void refresh_count_timer_cb(void *p_handle)
 {
     app_dashboard_data_set_current_timer();
-    os_timer_start(&p_handle);
 }
 
 void app_dashboard_initialize_data(void)
@@ -95,9 +102,8 @@ void app_dashboard_initialize_data(void)
     app_current_dashboard_data.show_main_display = true;
     app_current_dashboard_data.refresh_timer_value = 36900;
     app_current_dashboard_data.tense_apm_display = T_TENSE_AM_DISPLAY;
+    gui_log("app_dashboard_initialize_data exit\n");
 
-    os_timer_create(&refresh_count_timer, "gui-tick", 0, 1000, true, refresh_count_timer_cb);
-    os_timer_start(&refresh_count_timer);
 }
 
 void app_dashboard_data_set_current_timer(void)
@@ -215,21 +221,23 @@ void app_update_gui_widget(gui_img_t *target_image_obj,
                               target_image_obj->base.y);
     }
 }
-
+#ifndef _WIN32
 void app_dashboard_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
 {
+
     if (event == BP_UPDATE_VALUE_EVENT)
     {
-#ifndef _WIN32
+
         if (Value == NAVI_START)
         {
             app_current_dashboard_data.show_main_display = false;
         }
         else if (Value == NAVI_IDLE)
         {
+            COMMUNICATE_ALLOW_DLPS = true;
             app_current_dashboard_data.show_main_display = true;
         }
-#endif
+
     }
     else if (event == BP_LE_DISC_EVENT)
     {
@@ -245,8 +253,9 @@ void app_dashboard_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
         current_phone_status.phone_status = T_PHONE_STATUS_NONE;
         app_dashboard_data_set_phone_status(current_phone_status);
     }
-}
 
+}
+#endif
 uint8_t app_dashboard_data_get_show_main_display(void)
 {
     return app_current_dashboard_data.show_main_display;
@@ -268,9 +277,13 @@ void app_dashboard_data_get_navi_data_update(app_navi_data *rtn_phone_status)
 
 void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t length)
 {
-    int32_t distance = 0;
-    uint8_t navi_type = 0;
 
+    int32_t distance = 0;
+#ifndef _WIN32
+    gui_indev_wakeup();
+    COMMUNICATE_ALLOW_DLPS = false;
+    // reset_daemon_time(gui_ms_get());
+    uint8_t navi_type = 0;
     navi_type = ((uint8_t *)pValue)[0];
     if (navi_type == TURN_LEFT || navi_type == LEFT_FRONT || navi_type == LEFT_BACK
         || navi_type == LEFT_TURN_AROUND)
@@ -288,6 +301,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
         //stright_ahead();
         app_current_dashboard_data.current_navi_info = T_NAVI_INFO_1;
     }
+#endif
     app_navi_data current_navi_data;
     app_dashboard_data_get_navi_data_update(&current_navi_data);
 
@@ -328,6 +342,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
     }
 
     app_dashboard_data_set_navi_data_update(current_navi_data);
+
 }
 
 void app_dashboard_data_set_message_data_update(app_message_data current_message_status)
@@ -348,7 +363,7 @@ void app_dashboard_data_set_reject_end_call(void)
 {
     app_phone_data current_phone_status;
     app_dashboard_data_get_phone_status(&current_phone_status);
-
+#ifndef _WIN32
     if ((current_phone_status.phone_status == T_PHONE_STATUS_ACCEPT) ||
         (current_phone_status.phone_status == T_PHONE_STATUS_ONGOING))
     {
@@ -359,13 +374,14 @@ void app_dashboard_data_set_reject_end_call(void)
         p.l2_payload[0] = 0;
         package_prepare_send(&p);
     }
+#endif
 }
 
 void app_dashboard_data_set_accept_call(void)
 {
     app_phone_data current_phone_status;
     app_dashboard_data_get_phone_status(&current_phone_status);
-
+#ifndef _WIN32
     if (current_phone_status.phone_status == T_PHONE_STATUS_ONGOING)
     {
         struct protocol_pack p = {0};
@@ -375,12 +391,15 @@ void app_dashboard_data_set_accept_call(void)
         p.l2_payload[0] = 0;
         package_prepare_send(&p);
     }
+#endif
 }
 
 void app_dashboard_data_update_phone_status(uint8_t key, const uint8_t *pValue, uint16_t length)
 {
+#ifndef _WIN32
     if (length <= 11)
     {
+        gui_indev_wakeup();
         app_phone_data current_phone_status;
         app_dashboard_data_get_phone_status(&current_phone_status);
 
@@ -409,11 +428,13 @@ void app_dashboard_data_update_phone_status(uint8_t key, const uint8_t *pValue, 
     {
         APP_PRINT_INFO0("app_dashboard_data_update_phone_status over size");
     }
+#endif
 }
 
 void *dashboard_message_timer;
 static void dashboard_message_timer_cb(void *p_handle)
 {
+#ifndef _WIN32
     APP_PRINT_INFO0("dashboard_message_timer_cb");
     app_message_data current_message_status;
     app_dashboard_data_get_message_data_update(&current_message_status);
@@ -422,12 +443,14 @@ static void dashboard_message_timer_cb(void *p_handle)
     app_dashboard_data_set_message_data_update(current_message_status);
 
     os_timer_stop(&p_handle);
+#endif
 }
 
 void app_dashboard_data_update_message_status(const uint8_t *pValue, uint16_t length,
                                               uint8_t messaye_type)
 {
-
+#ifndef _WIN32
+    gui_indev_wakeup();
     app_message_data current_message_status;
     app_dashboard_data_get_message_data_update(&current_message_status);
 
@@ -440,5 +463,5 @@ void app_dashboard_data_update_message_status(const uint8_t *pValue, uint16_t le
 
     os_timer_create(&dashboard_message_timer, "gui-tick", 0, 3000, true, dashboard_message_timer_cb);
     os_timer_start(&dashboard_message_timer);
-
+#endif
 }

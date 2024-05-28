@@ -33,14 +33,6 @@ gui_app_t *gui_next_app(void)
 {
     return next_app;
 }
-void gui_app_exec(gui_app_t *app)
-{
-    gui_msg_t msg;
-    msg.app = app;
-    GUI_UNUSED(msg);
-}
-
-
 
 static void ctor(void *this)
 {
@@ -61,7 +53,6 @@ void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry)
     app->thread_entry = (void (*)(void *))gui_app_entry;
     app->ui_design = (void (*)(gui_app_t *))ui_design;
     ctor(app);
-
 }
 
 void gui_app_startup(gui_app_t *app)
@@ -74,7 +65,6 @@ void gui_app_startup(gui_app_t *app)
     {
         app->active_ms = 10000;
     }
-    gui_app_exec(app);
     if (app->thread_entry != NULL)
     {
         app->thread_id = gui_thread_create(app->screen.name,
@@ -96,32 +86,30 @@ void gui_app_startup(gui_app_t *app)
     app->screen.w = gui_get_screen_width();
     app->screen.h = gui_get_screen_height();
     app->screen.create_done = true;
-
-
+    app->start_ms = gui_ms_get();
 }
 
 void gui_app_shutdown(gui_app_t *app)
 {
+    if (app->dtor != NULL)
+    {
+        app->dtor(app);
+    }
     if (app->thread_entry != NULL)
     {
         gui_thread_delete(app->thread_id);
     }
-
     if (app->next)
     {
         app->close = true;
     }
     else
     {
-        gui_tree_free(&app->screen);
+        app->screen.parent = 0;
+        gui_obj_tree_free(&app->screen);
         gui_free(app->screen.matrix);
         app->close_sync = true;
     }
-}
-
-void gui_app_uninstall(gui_app_t *app)
-{
-    gui_tree_free(&app->screen);
 }
 
 gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_entry)
@@ -133,11 +121,6 @@ gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_e
     gui_app_install(app, ui_design, gui_app_entry);
 
     return app;
-}
-
-void gui_app_delete(gui_app_t *app)
-{
-    gui_app_uninstall(app);
 }
 
 void gui_switch_app(gui_app_t *from, gui_app_t *to)

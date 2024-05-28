@@ -6,57 +6,67 @@
 #include <string.h>
 #include <gui_api.h>
 #include <stdarg.h>
-#ifndef ENABLE_RTK_GUI_OS_HEAP
 #include "tlsf.h"
-#endif
 
-static struct gui_indev *indev;
-static struct gui_os_api *os_api;
+static struct gui_indev *indev = NULL;
+static struct gui_os_api *os_api = NULL;
 static struct gui_dispdev *dc = NULL;
 static struct gui_fs *fs = NULL;
+static struct acc_engine *acc = NULL;
 
 void gui_dc_info_register(struct gui_dispdev *info)
 {
     dc = info;
 }
-char gui_dc_get_gpu_type(void)
+void gui_acc_info_register(struct acc_engine *info)
 {
-    return dc->gpu_type;
-}
-unsigned char *gui_dc_get_fb(void)
-{
-    return dc->frame_buf;
-}
-void gui_dc_set_gpu_type(char type)
-{
-    dc->gpu_type = type;
+    acc = info;
 }
 
 void gui_fs_info_register(struct gui_fs *info)
 {
     fs = info;
 }
-
-
-#ifndef ENABLE_RTK_GUI_OS_HEAP
-static tlsf_t tlsf;
-#endif
-void gui_os_api_register(struct gui_os_api *info)
-{
-#ifndef ENABLE_RTK_GUI_OS_HEAP
-    tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
-#endif
-    os_api = info;
-}
-
 void gui_indev_info_register(struct gui_indev *info)
 {
     indev = info;
+}
+
+struct gui_dispdev *gui_get_dc(void)
+{
+    return dc;
+}
+
+struct acc_engine *gui_get_acc(void)
+{
+    return acc;
 }
 struct gui_indev *gui_get_indev(void)
 {
     return indev;
 }
+
+
+#ifndef ENABLE_RTK_GUI_OS_HEAP
+static tlsf_t tlsf = NULL;
+#endif
+static tlsf_t lower_tlsf = NULL;
+
+void gui_os_api_register(struct gui_os_api *info)
+{
+#ifndef ENABLE_RTK_GUI_OS_HEAP
+    tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
+#endif
+    if ((info->lower_mem_addr != NULL) && (info->lower_mem_size != 0))
+    {
+        lower_tlsf = tlsf_create_with_pool(info->lower_mem_addr, info->lower_mem_size);
+    }
+
+    os_api = info;
+}
+
+
+
 
 
 void ext_button_set_indicate(void (*callback)(void))
@@ -98,26 +108,6 @@ gui_wheel_port_data_t *wheel_get_data(void)
     return NULL;
 }
 
-gui_dispdev_t *gui_set_virtual_dc(uint8_t *frame_buf)
-{
-    //todo
-    return NULL;
-}
-
-struct gui_dispdev *gui_get_dc(void)
-{
-    return dc;
-}
-
-float gui_get_scale_x(void)
-{
-    return dc->scale_x;
-}
-
-float gui_get_scale_y(void)
-{
-    return dc->scale_y;
-}
 
 uint32_t gui_get_screen_width(void)
 {
@@ -235,86 +225,163 @@ bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 void *gui_malloc(uint32_t n)
 {
     void *ptr = NULL;
+    if ((n > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
+    {
+        ptr = gui_lower_malloc(n);
+        return ptr;
+    }
 #ifdef ENABLE_RTK_GUI_OS_HEAP
-    if (os_api->f_malloc)
-    {
-        ptr = os_api->f_malloc(n);
-        if (ptr == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-        }
-        return ptr;
-    }
-    else
-    {
-        GUI_ASSERT(NULL != NULL);
-        return ptr;
-    }
+    GUI_ASSERT(os_api->f_malloc != NULL);
+    ptr = os_api->f_malloc(n);
 #else
     ptr = tlsf_malloc(tlsf, n);
+#endif
     if (ptr == NULL)
     {
-        GUI_ASSERT(NULL != NULL);
+        ptr = gui_lower_malloc(n);
     }
-    // if (ptr == (void *)0x0000000000957578)
+    // if (ptr == (void *)0x0000000000749D30)
     // {
     //     GUI_ASSERT(NULL != NULL);
     // }
     return ptr;
-#endif
 }
 
 void *gui_realloc(void *ptr_old, uint32_t n)
 {
     void *ptr = NULL;
 #ifdef ENABLE_RTK_GUI_OS_HEAP
-    if (os_api->f_realloc)
+    GUI_ASSERT(os_api->f_realloc != NULL);
+    ptr = os_api->f_realloc(ptr_old, n);
+    if (ptr == NULL)
     {
-        ptr = os_api->f_realloc(ptr_old, n);
-        if (ptr == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-        }
+        return NULL;
+    }
+    return ptr;
+#else
+    if (
+        (os_api->lower_mem_size != 0) && \
+        ((uint32_t)(uintptr_t)ptr_old >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
+        ((uint32_t)(uintptr_t)ptr_old <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
+         (uint32_t)os_api->lower_mem_size)
+    )
+    {
+        ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
         return ptr;
     }
     else
     {
-        GUI_ASSERT(NULL != NULL);
+        ptr = tlsf_realloc(tlsf, ptr_old, n);
+        if (ptr == NULL)
+        {
+            ptr = tlsf_malloc(lower_tlsf, n);
+            memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
+            tlsf_free(tlsf, ptr_old);
+        }
+        // if (ptr == (void *)0x0000000000749D30)
+        // {
+        //     GUI_ASSERT(NULL != NULL);
+        // }
         return ptr;
     }
-#else
-    ptr = tlsf_realloc(tlsf, ptr_old, n);
-    if (ptr == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-    }
-    // if (ptr == (void *)0x00000000009196C8)
-    // {
-    //     GUI_ASSERT(NULL != NULL);
-    // }
-    return ptr;
 #endif
 }
 
 void gui_free(void *rmem)
 {
-#ifdef ENABLE_RTK_GUI_OS_HEAP
-    if (os_api->f_free)
+
+    if (
+        ((uint32_t)(uintptr_t)rmem >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
+        ((uint32_t)(uintptr_t)rmem <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
+         (uint32_t)os_api->lower_mem_size)
+    )
     {
-        os_api->f_free(rmem);
+        GUI_ASSERT(rmem != NULL);
+        GUI_ASSERT((uint32_t)(uintptr_t)os_api->lower_mem_addr != 0);
+        GUI_ASSERT((uint32_t)(uintptr_t)os_api->lower_mem_size != 0);
+        gui_lower_free(rmem);
+        return;
     }
+#ifdef ENABLE_RTK_GUI_OS_HEAP
+    GUI_ASSERT(os_api->f_free != NULL);
+    os_api->f_free(rmem);
 #else
     tlsf_free(tlsf, rmem);
 #endif
 }
 
+static uint32_t total_used_size = 0;
+static void gui_walker(void *ptr, size_t size, int used, void *user)
+{
+    if (used)
+    {
+        total_used_size = total_used_size + size;
+    }
+
+    gui_log("\t%p %s size: %x; total = %d\n", ptr, used ? "used" : "free", (unsigned int)size,
+            total_used_size);
+}
+
 void gui_mem_debug(void)
+{
+    total_used_size = 0;
+#ifdef ENABLE_RTK_GUI_OS_HEAP
+    gui_log("can't use thie func");
+#else
+    tlsf_walk_pool(tlsf_get_pool(tlsf), gui_walker, &total_used_size);
+#endif
+    total_used_size = 0;
+}
+
+
+void *gui_lower_malloc(uint32_t n)
+{
+    void *ptr = NULL;
+    GUI_ASSERT(lower_tlsf != NULL);
+    ptr = tlsf_malloc(lower_tlsf, n);
+    if (ptr == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
+    return ptr;
+}
+
+void *gui_lower_realloc(void *ptr_old, uint32_t n)
+{
+    void *ptr = NULL;
+    GUI_ASSERT(lower_tlsf != NULL);
+    ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
+    if (ptr == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
+    return ptr;
+}
+
+void gui_lower_free(void *rmem)
+{
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_free(lower_tlsf, rmem);
+}
+
+
+
+void gui_lower_mem_debug(void)
 {
 #ifdef ENABLE_RTK_GUI_OS_HEAP
     gui_log("can't use thie func");
 #else
-    tlsf_walk_pool(tlsf_get_pool(tlsf), NULL, NULL);
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(lower_tlsf), NULL, NULL);
 #endif
+}
+
+void gui_sleep_cb(void)
+{
+    if (os_api->gui_sleep_cb != NULL)
+    {
+        os_api->gui_sleep_cb();
+    }
 }
 
 void gui_log(const char *format, ...)
@@ -412,7 +479,7 @@ int gui_fs_ioctl(int fd, int cmd)
 
     return 0;
 }
-int gui_fs_closedir(gui_fs_DIR *d)
+int gui_fs_closedir(gui_fs_dir *d)
 {
     if (fs)
     {
@@ -424,7 +491,7 @@ int gui_fs_closedir(gui_fs_DIR *d)
 
     return 0;
 }
-gui_fs_DIR *gui_fs_opendir(const char *name)
+gui_fs_dir *gui_fs_opendir(const char *name)
 {
     if (fs)
     {
@@ -436,7 +503,7 @@ gui_fs_DIR *gui_fs_opendir(const char *name)
 
     return 0;
 }
-struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d)
+struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d)
 {
     if (fs)
     {
@@ -461,6 +528,24 @@ char *gui_strdup(const char *s)
     memcpy(tmp, s, len);
 
     return tmp;
+}
+
+char *gui_filepath_transforming(void *addr)
+{
+    // simulator on WIN32: address transforming and check existence
+    char *path = gui_malloc(strlen(addr) + strlen(GUI_ROOT_FOLDER) + 1);
+    GUI_ASSERT(path != NULL);
+    sprintf(path, "%s%s", GUI_ROOT_FOLDER, (char *)addr);
+    // check existence
+    FILE *fd = fopen(path, "r");
+    if (!fd)
+    {
+        gui_log("file not exist\n");
+        gui_free(path);
+        return NULL;
+    }
+    fclose(fd);
+    return path;
 }
 
 
@@ -619,6 +704,15 @@ void *gui_get_file_address(const char *file)
 #endif
 #if defined(_WIN32)
     {
+        // gui_log("get file: %s\n", file);
+        // check whether file has already been loaded
+        FIEL_LOAD_NODE *file_node = fileload_get_node(file);
+        if (file_node->mem_addr)
+        {
+            gui_log(">loaded before\n");
+            return file_node->mem_addr;
+        }
+
         char *path = gui_malloc(strlen(file) + strlen(root_folder) + 1);
         sprintf(path, "%s%s", root_folder, file);
 #ifndef O_BINARY
@@ -643,6 +737,7 @@ void *gui_get_file_address(const char *file)
         memset(imgbuf, 0, size);
         gui_fs_lseek(fd, 0, SEEK_SET);
         gui_fs_read(fd, imgbuf, size);
+        file_node->mem_addr = imgbuf;
         return imgbuf;
     }
 #else
@@ -664,4 +759,33 @@ void *gui_get_file_address(const char *file)
 
     }
 #endif
+}
+
+gui_color_t gui_rgba(unsigned char red,
+                     unsigned char green,
+                     unsigned char blue,
+                     unsigned char opacity)
+{
+    gui_color_t color;
+
+    // Use longer initialization to suppress warning.
+    color.color.rgba.r = red;
+    color.color.rgba.g = green;
+    color.color.rgba.b = blue;
+    color.color.rgba.a = opacity;
+
+    return color;
+}
+
+gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
+{
+    gui_color_t color;
+
+    // Use longer initialization to suppress warning.
+    color.color.rgba.r = red;
+    color.color.rgba.g = green;
+    color.color.rgba.b = blue;
+    color.color.rgba.a = UINT8_MAX;
+
+    return color;
 }

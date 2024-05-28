@@ -71,7 +71,7 @@ sw.onOn(swOnOnFunc)
 function swOnOffFunc(params) {
     console.log('swOnOffFunc')
 }
-sw.onOff(swOnOffFunc)
+sw.switch_off(swOnOffFunc)
 sw.turnOn();
 
 progressbar.getElementById('tab9Pro1')

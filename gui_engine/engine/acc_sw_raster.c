@@ -48,10 +48,10 @@ typedef struct _color_argb8565
 
 typedef struct _color_argb88888
 {
-    uint8_t b;
-    uint8_t g;
-    uint8_t r;
-    uint8_t a;
+    uint8_t b; ///< Blue color component, at the lowest address
+    uint8_t g; ///< Green color component
+    uint8_t r; ///< Red color component
+    uint8_t a; ///< Alpha channel for transparency, at the highest address
 } color_argb8888_t;
 #pragma pack()
 
@@ -71,7 +71,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
 
     if (input_type == RGB565)
     {
-        color_rgb565_t *pixel = (color_rgb565_t *)image_base + image_off;
+        color_rgb565_t *pixel = (color_rgb565_t *)(uintptr_t)image_base + image_off;
         source_alpha = 0xff;
         source_red = pixel->r << 3;
         source_green = pixel->g << 2;
@@ -79,7 +79,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
     }
     else if (input_type == RGB888)
     {
-        color_rgb888_t *pixel = (color_rgb888_t *)image_base + image_off;
+        color_rgb888_t *pixel = (color_rgb888_t *)(uintptr_t)image_base + image_off;
         source_alpha = 0xff;
         source_red = pixel->r;
         source_green = pixel->g;
@@ -87,7 +87,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
     }
     else if (input_type == ARGB8565)
     {
-        color_argb8565_t *pixel = (color_argb8565_t *)image_base + image_off;
+        color_argb8565_t *pixel = (color_argb8565_t *)(uintptr_t)image_base + image_off;
         source_alpha = pixel->a;
         source_red = pixel->r << 3;
         source_green = pixel->g << 2;
@@ -95,8 +95,16 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
     }
     else if (input_type == RGBA8888)
     {
-        color_argb8888_t *pixel = (color_argb8888_t *)image_base + image_off;
+        color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)image_base + image_off;
         source_alpha = pixel->a;
+        source_red = pixel->r;
+        source_green = pixel->g;
+        source_blue = pixel->b;
+    }
+    else if (input_type == XRGB8888)
+    {
+        color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)image_base + image_off;
+        source_alpha = (255 - pixel->a);
         source_red = pixel->r;
         source_green = pixel->g;
         source_blue = pixel->b;
@@ -105,7 +113,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
 
     if (dc_bytes_per_pixel == 2)
     {
-        color_rgb565_t *pixel = (color_rgb565_t *)writebuf + write_off;
+        color_rgb565_t *pixel = (color_rgb565_t *)(uintptr_t)writebuf + write_off;
         target_alpha = 0xff;
         target_red = pixel->r << 3;
         target_green = pixel->g << 2;
@@ -113,7 +121,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
     }
     else if (dc_bytes_per_pixel == 3)
     {
-        color_rgb888_t *pixel = (color_rgb888_t *)writebuf + write_off;
+        color_rgb888_t *pixel = (color_rgb888_t *)(uintptr_t)writebuf + write_off;
         target_alpha = 0xff;
         target_red = pixel->r;
         target_green = pixel->g;
@@ -121,7 +129,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
     }
     else if (dc_bytes_per_pixel == 4)
     {
-        color_argb8888_t *pixel = (color_argb8888_t *)writebuf + write_off;
+        color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)writebuf + write_off;
         target_alpha = pixel->a;
         target_red = pixel->r;
         target_green = pixel->g;
@@ -162,8 +170,15 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
         target_red   = ((255 - source_alpha) * target_red + source_alpha * source_red) / 255;
         target_green = ((255 - source_alpha) * target_green + source_alpha * source_green) / 255;
         target_blue  = ((255 - source_alpha) * target_blue + source_alpha * source_blue) / 255;
+    }
+    else if (blend_mode == IMG_RECT)
+    {
+        source_alpha = source_alpha * opacity_value / 255;
 
-
+        target_alpha = ((255 - source_alpha) * target_alpha + source_alpha * source_alpha) / 255;
+        target_red   = ((255 - source_alpha) * target_red + source_alpha * source_red) / 255;
+        target_green = ((255 - source_alpha) * target_green + source_alpha * source_green) / 255;
+        target_blue  = ((255 - source_alpha) * target_blue + source_alpha * source_blue) / 255;
     }
     else
     {
@@ -209,7 +224,7 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
         return;
     }
 
-    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(image->data);
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
     gui_rgb_data_head_t *head = image->data;
     char input_type = head->type;
     int16_t source_w = image->img_w;
@@ -221,7 +236,7 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
 
     uint8_t *writebuf = dc->frame_buf;
     uint32_t blend_mode = image->blend_mode;
-    gui_matrix_t *inverse = image->inverse;
+    gui_matrix_t *inverse = &image->inverse;
 
 
     for (uint32_t i = y_start; i <= y_end; i++)
@@ -238,12 +253,30 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
             {
                 continue;
             }
+            if (rect != NULL)
+            {
+                if ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))
+                {
+                    continue;
+                }
+            }
+
             int image_off = y * source_w + x;
             int write_off = (i - dc->section.y1) * dc->fb_width + j;
 
-            do_raster_pixel(writebuf, write_off, image_base, image_off, input_type, dc_bytes_per_pixel,
-                            opacity_value,
-                            blend_mode);
+
+            if (image->blend_mode == IMG_RECT)
+            {
+                do_raster_pixel(writebuf, write_off, image_base, 0, input_type, dc_bytes_per_pixel,
+                                opacity_value,
+                                blend_mode);
+            }
+            else
+            {
+                do_raster_pixel(writebuf, write_off, image_base, image_off, input_type, dc_bytes_per_pixel,
+                                opacity_value,
+                                blend_mode);
+            }
         }
     }
 
@@ -252,21 +285,64 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
 static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 {
     gui_img_file_t *file = (gui_img_file_t *)image->data;
+    gui_rgb_data_head_t *head = image->data;
+    char input_type = head->type;
     imdc_file_t *compressed = (imdc_file_t *)(&(file->data.idc_file));
-    uint32_t line = (uint32_t)compressed + compressed->compressed_addr[y];
+    uint32_t line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
     int location = 0;
-    imdc_rgb565_node_t *node = NULL;
-
-
-    do
+    if (input_type == RGB565)
     {
-        node = (imdc_rgb565_node_t *)line;
-        location += node->len;
-        line = line + sizeof(imdc_rgb565_node_t);
-    }
-    while (location < x);
+        imdc_rgb565_node_t *node = NULL;
+        do
+        {
+            node = (imdc_rgb565_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_rgb565_node_t);
+        }
+        while (location < x);
 
-    memcpy(pixel, &(node->pixel16), sizeof(node->pixel16));
+        memcpy(pixel, &(node->pixel16), sizeof(node->pixel16));
+    }
+    else if (input_type == ARGB8565)
+    {
+        imdc_argb8565_node_t *node = NULL;
+        do
+        {
+            node = (imdc_argb8565_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_argb8565_node_t);
+        }
+        while (location < x);
+
+        memcpy(pixel, &(node->pixel), sizeof(node->pixel));
+        pixel[2] = node->alpha;
+    }
+    else if (input_type == RGB888)
+    {
+        imdc_rgb888_node_t *node = NULL;
+        do
+        {
+            node = (imdc_rgb888_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_rgb888_node_t);
+        }
+        while (location < x);
+        pixel[2] = node->pixel_r;
+        pixel[1] = node->pixel_g;
+        pixel[0] = node->pixel_b;
+    }
+    else if (input_type == RGBA8888)
+    {
+        imdc_argb8888_node_t *node = NULL;
+        do
+        {
+            node = (imdc_argb8888_node_t *)(uintptr_t)line;
+            location += node->len;
+            line = line + sizeof(imdc_argb8888_node_t);
+        }
+        while (location < x);
+        memcpy(pixel, &(node->pixel32), sizeof(node->pixel32));
+    }
 
 }
 
@@ -294,7 +370,7 @@ void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *re
 
     uint8_t *writebuf = dc->frame_buf;
     uint32_t blend_mode = image->blend_mode;
-    gui_matrix_t *inverse = image->inverse;
+    gui_matrix_t *inverse = &image->inverse;
 
 
     for (uint32_t i = y_start; i <= y_end; i++)
@@ -311,12 +387,20 @@ void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *re
             {
                 continue;
             }
+            if (rect != NULL)
+            {
+                if ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))
+                {
+                    continue;
+                }
+            }
             int write_off = (i - dc->section.y1) * dc->fb_width + j;
 
             uint8_t rle_pixel[4];
+
             get_rle_pixel(image, x, y, rle_pixel);
 
-            do_raster_pixel(writebuf, write_off, (int)rle_pixel, 0, input_type, dc_bytes_per_pixel,
+            do_raster_pixel(writebuf, write_off, (int)(uintptr_t)rle_pixel, 0, input_type, dc_bytes_per_pixel,
                             opacity_value,
                             blend_mode);
         }

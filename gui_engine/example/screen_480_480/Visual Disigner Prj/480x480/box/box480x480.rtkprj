@@ -8,4 +8,7 @@
   <UIGroup>
     <UIItem>box480x480.rtkui</UIItem>
   </UIGroup>
+  <ExportSetting>
+    <UIItem>0x4600000</UIItem>
+  </ExportSetting>
 </GUIProject>

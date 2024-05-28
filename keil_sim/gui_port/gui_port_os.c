@@ -43,8 +43,9 @@ void port_free(void *rmem)
     free(rmem);
 }
 
-#define PORT_MEMHEAP_SIZE       (1024*1024*2)
+#define PORT_MEMHEAP_SIZE       (1024*1024)
 static uint8_t port_memheap[PORT_MEMHEAP_SIZE] = {0};
+static uint8_t port_lower_memheap[PORT_MEMHEAP_SIZE] = {0};
 static struct gui_os_api os_api =
 {
     .name = "win_keil",
@@ -57,6 +58,11 @@ static struct gui_os_api os_api =
     .f_free = port_free,
     .mem_addr = port_memheap,
     .mem_size = PORT_MEMHEAP_SIZE,
+
+    .lower_mem_addr = port_lower_memheap,
+    .lower_mem_size = PORT_MEMHEAP_SIZE,
+    .mem_threshold_size = 10 * 1024,
+
     .log = (log_func_t)printf,
 };
 void gui_port_os_init(void)

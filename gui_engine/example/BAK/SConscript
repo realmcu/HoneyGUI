@@ -16,6 +16,6 @@ if not GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
     src += ['app_launcher_tb_3d.c']
 CPPPATH = [cwd,cwd + '/root_image']
 
-group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_454_454_BAK'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_454_454_BAK'], CPPPATH = CPPPATH)
 
 Return('group')

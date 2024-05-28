@@ -12,6 +12,7 @@
 * Date:2021.12.05
 *******************************************************************************/
 
+#if 0//ndef _WIN32
 #include "lx_platform_memory.h"
 #include <gui_api.h>
 
@@ -102,3 +103,4 @@ void LxMemPrint()
         gui_log("Please enable LITEGFX_MEMORY_DEBUG");
     #endif
 }
+#endif

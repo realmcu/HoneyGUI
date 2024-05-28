@@ -28,18 +28,26 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <draw_img.h>
-#include <gui_img.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "draw_img.h"
+#include "gui_img.h"
+
+/** @defgroup WIDGET WIDGET
+  * @brief
+  * @{
+  */
 
 /*============================================================================*
  *                         Types
  *============================================================================*/
-
+/** @defgroup WIDGET_Exported_Types WIDGET Exported Types
+  * @brief
+  * @{
+  */
 
 /** @brief  stb img widget gif information structure */
-typedef struct gui_gif_info
+typedef struct gui_img_stb_gif_info
 {
     uint32_t init_time_ms;
     uint32_t *delay_ms;
@@ -50,7 +58,7 @@ typedef struct gui_gif_info
 } gui_gif_info_t;
 
 /** @brief  stb img widget information structure */
-typedef struct gui_stb_img
+typedef struct gui_img_stb
 {
     gui_obj_t base;
     gui_img_t *img;
@@ -59,26 +67,104 @@ typedef struct gui_stb_img
     void *data_buffer;
     uint32_t data_length;
     gui_gif_info_t *gif_info;
+    int16_t offset_x;
+    int16_t offset_y;
 } gui_stb_img_t;
+
+/* User defined session identifier */
+typedef struct
+{
+    uint8_t *data;     /* Pointer to the jpeg data */
+    uint32_t size;      /* Size of the jpeg data */
+    uint32_t index;     /* Current position in jpeg data */
+    uint8_t *fbuf;  /* Pointer to the work area */
+    uint8_t *image; /* JPG image read into this buffer */
+} IODEV;
+/** End of WIDGET_Exported_Types
+  * @}
+  */
 
 /*============================================================================*
  *                         Constants
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Constants WIDGET Exported Constants
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Constants
+  * @}
+  */
 
 /*============================================================================*
  *                         Macros
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
+  * @brief
+  * @{
+  */
+//Use tjpgd to replace jpeg decoding in stb
+// #define TJPG
+
+
+/** End of WIDGET_Exported_Macros
+ * @}
+ */
 
 /*============================================================================*
  *                         Variables
  *============================================================================*/
+/** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
+  * @brief
+  * @{
+  */
 
+
+/** End of WIDGET_Exported_Variables
+  * @}
+  */
 
 /*============================================================================*
  *                         Functions
  *============================================================================*/
+/** @defgroup WIDGET_Exported_GUI_Functions WIDGET Exported Functions
+  * @brief
+  * @{
+  */
 
+/**
+ * @brief set stb image widget attribute
+ *
+ * @param this stb image widget
+ * @param addr image address
+ * @param size image file size by Byte
+ * @param type image type
+ * @param x X-axis coordinate
+ * @param y Y-axis coordinate
+ */
+void gui_img_stb_set_attribute(gui_stb_img_t  *this,
+                               void           *addr,
+                               uint32_t        size,
+                               GUI_FormatType  type,
+                               int16_t         x,
+                               int16_t         y);
+/**
+ * @brief set stb image widget attribute without free rgb data
+ *
+ * @param this stb image widget
+ * @param addr image address
+ * @param size image file size by Byte
+ * @param type image type
+ * @param x X-axis coordinate
+ * @param y Y-axis coordinate
+ */
+void gui_img_stb_set_attribute_static(gui_stb_img_t  *this,
+                                      void           *addr,
+                                      uint32_t        size,
+                                      GUI_FormatType  type,
+                                      int16_t         x,
+                                      int16_t         y);
 /**
  * @brief Creat a image widget with buffer.
  * @note This widget is use to display image which needs to decode.
@@ -92,24 +178,25 @@ typedef struct gui_stb_img
  * @param x The Y-axis coordinate of the text box.
  * @return gui_stb_img_t*
  */
-gui_stb_img_t *gui_stbimg_create_from_mem(void *parent, const char *name, void *addr,
-                                          uint32_t size, GUI_FormatType type, int16_t x, int16_t y);
-/**
- * @brief set stb image widget attribute
- *
- * @param this stb image widget
- * @param addr image address
- * @param size image file size by Byte
- * @param type image type
- * @param x X-axis coordinate
- * @param y Y-axis coordinate
- */
-void gui_stbimg_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, GUI_FormatType type,
-                              int16_t x, int16_t y);
+gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
+                                           const char     *name,
+                                           void           *addr,
+                                           uint32_t        size,
+                                           GUI_FormatType  type,
+                                           int16_t         x,
+                                           int16_t         y);
+
+/** End of WIDGET_Exported_GUI_Functions
+  * @}
+  */
+
+/** End of WIDGET
+  * @}
+  */
+
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

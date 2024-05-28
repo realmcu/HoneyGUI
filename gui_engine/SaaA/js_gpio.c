@@ -116,7 +116,7 @@ DECLARE_HANDLER(writeSync)
 
 DECLARE_HANDLER(Gpio)
 {
-    gui_log("enter GPIO\n");
+    // gui_log("enter GPIO\n");
     REGISTER_METHOD(this_value, writeSync);
     char *mode_string = "in";
     int pin = -1;

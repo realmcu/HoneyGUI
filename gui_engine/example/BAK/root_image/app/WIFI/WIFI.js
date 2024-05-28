@@ -24,4 +24,4 @@ function stopSpeed(params) {
     }
 sw.getElementById('switch2')
 sw.onOn(startSpeed)
-sw.onOff(stopSpeed)
+sw.switch_off(stopSpeed)

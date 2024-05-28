@@ -19,7 +19,6 @@
  *============================================================================*/
 #include <string.h>
 #include "guidef.h"
-#include "gui_server.h"
 #include "tp_algo.h"
 #include "gui_obj.h"
 #include "gui_card.h"
@@ -89,6 +88,52 @@ static void gui_card_input_prepare(gui_obj_t *obj)
     matrix_translate(0, this->id * obj->h, obj->matrix);
 }
 
+#if 1
+static void gui_card_prepare(gui_obj_t *obj)
+{
+    gui_card_t *this = (gui_card_t *)obj;
+    gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
+    int32_t location = this->ay + parent->hold_y + parent->offset_y;
+    float h = gui_get_screen_height();
+
+
+    int32_t location_0 = h / 2;
+    int32_t location_1 = h / 2 + 40;
+
+    float scale_0 = 1.0f;
+    float scale_1 = 0.9f;
+
+    if (location < location_0)
+    {
+        matrix_translate(0, location, obj->matrix);
+        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
+        matrix_scale(scale_0, scale_0, obj->matrix);
+        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
+    }
+    else if (location < location_1)
+    {
+        float scale = (scale_0 - scale_1) * (location - location_0) / (location_1 - location_0);
+
+        matrix_translate(0, location, obj->matrix);
+        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
+        matrix_scale(1.0f - scale, 1.0f - scale, obj->matrix);
+        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
+    }
+    else if (location < h)
+    {
+        matrix_translate(0, location_1, obj->matrix);
+        matrix_translate(obj->w / 2, obj->h / 2, obj->matrix);
+        matrix_scale(scale_1, scale_1, obj->matrix);
+        matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
+    }
+    else
+    {
+        //out of rang
+        matrix_translate(1000, 1000, obj->matrix);
+    }
+
+}
+#else
 static void gui_card_prepare(gui_obj_t *obj)
 {
     gui_card_t *this = (gui_card_t *)obj;
@@ -131,6 +176,27 @@ static void gui_card_prepare(gui_obj_t *obj)
         matrix_translate(-obj->w / 2, -obj->h / 2, obj->matrix);
     }
 }
+#endif
+
+static void gui_card_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_card_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_card_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
 
 static void gui_card_ctor(gui_card_t *this,
                           gui_obj_t  *parent,
@@ -144,8 +210,9 @@ static void gui_card_ctor(gui_card_t *this,
     gui_cardview_t *cardview = (gui_cardview_t *)parent;
     gui_obj_t *obj = GET_BASE(this);
 
-    GET_BASE(this)->obj_input_prepare = gui_card_input_prepare;
-    GET_BASE(this)->obj_prepare = gui_card_prepare;
+    GET_BASE(this)->obj_cb = gui_card_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->type = CARD;
     if (parent->type != CARDVIEW)
     {
@@ -167,10 +234,10 @@ static void gui_card_ctor(gui_card_t *this,
  *============================================================================*/
 gui_card_t *gui_card_create(void       *parent,
                             const char *name,
-                            int16_t    x,
-                            int16_t    y,
-                            int16_t    w,
-                            int16_t    h)
+                            int16_t     x,
+                            int16_t     y,
+                            int16_t     w,
+                            int16_t     h)
 {
     if (w == 0)
     {

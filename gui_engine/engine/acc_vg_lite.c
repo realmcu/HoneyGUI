@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <gui_matrix.h>
 #include <vg_lite.h>
-#include <acc_engine.h>
 #include <stdlib.h>
 #include <math.h>
 

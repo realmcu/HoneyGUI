@@ -29,10 +29,10 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_img.h>
-#include <gui_switch.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "gui_img.h"
+#include "gui_switch.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -51,6 +51,7 @@ extern "C" {
 /** @brief  Pagelist widget structure */
 
 typedef void (*gui_pagelist_update_cb_t)(void *obj, void *list);
+
 typedef struct gui_pagelist
 {
     gui_obj_t base;
@@ -85,7 +86,6 @@ typedef struct gui_pagelist
   * @{
   */
 
-
 /** End of WIDGET_Exported_Constants
   * @}
   */
@@ -98,7 +98,6 @@ typedef struct gui_pagelist
   * @{
   */
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -110,7 +109,6 @@ typedef struct gui_pagelist
   * @brief
   * @{
   */
-
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -153,8 +151,10 @@ void gui_pagelist_decrease_real_list_max(gui_pagelist_t *this, int16_t real_list
  * @return
  */
 
-void gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb,
+void gui_pagelist_add_list_update_cb(gui_pagelist_t          *this,
+                                     gui_pagelist_update_cb_t list_first_cb,
                                      gui_pagelist_update_cb_t list_last_cb);
+
 /**
  * @brief set attribute for a pagelist widget
  *
@@ -166,9 +166,13 @@ void gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_c
  * @param list_last index of the bottom show list
  * @return
  */
+void gui_pagelist_set_att(gui_pagelist_t *this,
+                          int16_t         real_list_max,
+                          int16_t         show_list_max,
+                          int16_t         list_gap_y,
+                          gui_switch_t   *list_first,
+                          gui_switch_t   *list_last);
 
-void gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max,
-                          int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last);
 /**
  * @brief add a scroll bar picture for a pagelist widget, file source is memory address
  *
@@ -176,18 +180,8 @@ void gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t s
  * @param bar_pic bar picture
  * @return
  */
-
-void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic);
-
-/**
- * @brief add a scroll bar picture for a pagelist widget, file source is filesystem
- *
- * @param this pagelist widget
- * @param bar_pic bar picture filepath
- * @return
- */
-
-void gui_pagelist_add_scroll_bar_from_fs(gui_pagelist_t *this, void *bar_pic);
+void gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic,
+                                 IMG_SOURCE_MODE_TYPE src_mode);
 
 /**
  * @brief create a pagelist widget
@@ -200,13 +194,16 @@ void gui_pagelist_add_scroll_bar_from_fs(gui_pagelist_t *this, void *bar_pic);
  * @param h h of this widget
  * @return gui_pagelist_t*
  */
-gui_pagelist_t *gui_pagelist_create(void *parent,  const char *name,
-                                    int16_t x, int16_t y, int16_t w, int16_t h);
+gui_pagelist_t *gui_pagelist_create(void       *parent,
+                                    const char *name,
+                                    int16_t     x,
+                                    int16_t     y,
+                                    int16_t     w,
+                                    int16_t     h);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
-
 
 /** End of WIDGET
   * @}
@@ -217,4 +214,3 @@ gui_pagelist_t *gui_pagelist_create(void *parent,  const char *name,
 #endif
 
 #endif
-

@@ -1,21 +1,16 @@
 
 #include "js_user.h"
+#ifdef __WIN32
+#include <semaphore.h>
+sem_t sem_timer;
+#endif
 
-
-static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code)
+static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code, void *param)
 {
     //gui_log("enter js_cb_with_args\n");
-    cb_arg_t *args = NULL;
+    cb_arg_t *args = param;
     gui_event_dsc_t *event = obj->event_dsc;
 
-    // same event only handle the first register one
-    for (size_t i = 0; i < obj->event_dsc_cnt; i++)
-    {
-        if (event[i].filter == event_code)
-        {
-            args = event[i].user_data;
-        }
-    }
     if (args == NULL)
     {
         return;
@@ -70,6 +65,26 @@ DECLARE_HANDLER(write)
     }
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(setInputable)
+{
+    if (args_cnt != 1 || !jerry_value_is_boolean(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_text_t *txtbox = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
+    if (txtbox)
+    {
+        bool enable = jerry_get_boolean_value(args[0]);
+        gui_text_input_set(txtbox, enable);
+        if (enable)
+        {
+            gui_text_click(txtbox, gui_keyboard_launch_by_widget, txtbox);
+        }
+        // jerry_release_value(enable);
+    }
+    return jerry_create_undefined();
+}
 DECLARE_HANDLER(setPosition)
 {
     if (args_cnt != 1 || !jerry_value_is_object(args[0]))
@@ -118,7 +133,7 @@ DECLARE_HANDLER(getElementById)
     jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
     gui_obj_t *widget = NULL;
     char *a = js_value_to_string(args[0]);
-    gui_tree_get_widget_by_name(&app->screen, a, &widget);
+    gui_obj_tree_get_widget_by_name(&app->screen, a, &widget);
     gui_free(a);
     jerry_set_object_native_pointer(this_value, widget, NULL);
     jerry_release_value(global_obj);
@@ -237,6 +252,27 @@ DECLARE_HANDLER(notShow)
     return jerry_create_undefined();
 }
 
+DECLARE_HANDLER(setLocation)
+{
+    if (args_cnt != 2 || !jerry_value_is_number(args[0]) || !jerry_value_is_number(args[1]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_obj_t *obj = NULL;
+    float x = 0.f;
+    float y = 0.f;
+
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    x = jerry_get_number_value(args[0]);
+    y = jerry_get_number_value(args[1]);
+
+    if (obj)
+    {
+        obj->x = x;
+        obj->y = y;
+    }
+    return jerry_create_undefined();
+}
 
 DECLARE_HANDLER(rotation)
 {
@@ -246,11 +282,18 @@ DECLARE_HANDLER(rotation)
         return jerry_create_undefined();
     }
     gui_img_t *img = NULL;
-    jerry_get_object_native_pointer(this_value, (void *)img, NULL);
-    if (!img)
+    float degree = 0.f;
+    float c_x = 0.f;
+    float c_y = 0.f;
+
+    jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
+    degree = jerry_get_number_value(args[0]);
+    c_x = jerry_get_number_value(args[1]);
+    c_y = jerry_get_number_value(args[2]);
+
+    if (img)
     {
-        gui_img_rotation((void *)img, jerry_get_number_value(args[0]),
-                         jerry_get_number_value(args[1]), jerry_get_number_value(args[2]));
+        gui_img_rotation((void *)img, degree, c_x, c_y);
     }
     return jerry_create_undefined();
 }
@@ -262,7 +305,7 @@ DECLARE_HANDLER(scale)
     }
     gui_img_t *img = NULL;
     jerry_get_object_native_pointer(this_value, (void *)img, NULL);
-    if (!img)
+    if (img)
     {
         gui_img_scale((void *)img, jerry_get_number_value(args[0]),
                       jerry_get_number_value(args[1]));
@@ -277,7 +320,7 @@ DECLARE_HANDLER(setMode)
     }
     gui_img_t *img = NULL;
     jerry_get_object_native_pointer(this_value, (void *)img, NULL);
-    if (!img)
+    if (img)
     {
         gui_img_set_mode(img, jerry_get_number_value(args[0]));
     }
@@ -331,7 +374,7 @@ DECLARE_HANDLER(onClick)
         }
 
         cb_arg->func = args[0];
-        gui_button_api.onClick((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_click((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -359,7 +402,7 @@ DECLARE_HANDLER(onPress)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_api.onPress((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_press((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -387,7 +430,7 @@ DECLARE_HANDLER(onHold)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_api.onLong((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_long((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -676,13 +719,13 @@ DECLARE_HANDLER(onRelease)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_button_api.onRelease((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_button_release((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
 }
 
-DECLARE_HANDLER(onOn)
+DECLARE_HANDLER(switch_on)
 {
     ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
@@ -705,12 +748,12 @@ DECLARE_HANDLER(onOn)
             cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
-        GUI_TYPE(gui_switch_t, obj)->onOn((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        GUI_API(gui_switch_t).on_turn_on((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
 }
-DECLARE_HANDLER(onOff)
+DECLARE_HANDLER(switch_off)
 {
     ////gui_log("enter onPress\n");
     if (args_cnt >= 1 && jerry_value_is_function(args[0]))
@@ -733,7 +776,7 @@ DECLARE_HANDLER(onOff)
             cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
-        GUI_TYPE(gui_switch_t, obj)->onOff((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        GUI_API(gui_switch_t).on_turn_off((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -765,7 +808,6 @@ DECLARE_HANDLER(OnChange)
         }
         cb_arg->func = args[0];
         gui_tabview_tab_change((void *)obj, js_cb_with_args, (void *)(cb_arg));
-        // GUI_TYPE(gui_switch_t, obj)->onOn((void *)obj, js_cb_with_args, (void *)(cb_arg));
     }
     return jerry_create_undefined();
 }
@@ -881,7 +923,7 @@ static void gui_seekbar_set_animate(gui_seekbar_t *o, uint32_t dur, int repeat_c
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
+    animate->callback = (void (*)(void *, void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_seekbar_t *)o)->animate = animate;
@@ -994,6 +1036,58 @@ DECLARE_HANDLER(pause_animate_text)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(pause_animate_img)
+{
+    gui_img_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    obj->animate->animate = false;
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(play_animate_img)
+{
+    gui_img_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    obj->animate->animate = true;
+    obj->animate->current_frame = 0;
+    obj->animate->progress_percent = 0;
+    obj->animate->current_repeat_count = 0;
+
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(setAnimate_img)
+{
+    if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_object(args[1]))
+    {
+        gui_img_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        //gui_log("cb_arg:%x\n", cb_arg);
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
+        }
+        cb_arg->func = args[0];
+
+        float from = jerry_get_number_value(js_get_property(args[1], "from"));
+        float to = jerry_get_number_value(js_get_property(args[1], "to"));
+        int repeat = jerry_get_number_value(js_get_property(args[1], "iterations"));
+        int duration = jerry_get_number_value(js_get_property(args[1], "duration"));
+        gui_img_set_animate((void *)obj, duration, repeat, js_cb_with_args_animate,
+                            (void *)(cb_arg));
+        obj->animate->animate = false;
+    }
+
+    return jerry_create_undefined();
+}
+
 DECLARE_HANDLER(win_getAttribute)
 {
     //gui_log("enter onPress\n");
@@ -1131,7 +1225,7 @@ DECLARE_HANDLER(sw_close)
     //gui_log("enter sw_close\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
-    sw->turn_off(sw);
+    GUI_API(gui_switch_t).turn_off(sw);
     return jerry_create_undefined();
 }
 
@@ -1140,77 +1234,260 @@ DECLARE_HANDLER(sw_open)
     //gui_log("enter sw_open\n");
     gui_switch_t *sw = NULL;
     jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
-    sw->turn_on(sw);
+    GUI_API(gui_switch_t).turn_on(sw);
     return jerry_create_undefined();
 }
-struct timer_args
+
+
+
+#include "js_extern_io.h"
+void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
 {
-    jerry_value_t func;
-    uint32_t timeout;
-    bool one_short;
-};
+    gui_msg_t msg;
+    jerry_value_t js_cb = NULL;
+    jerry_value_t res = 0;
+
+    memcpy(&(msg.cb), js_msg, sizeof(gui_msg_js_t));
+    js_cb = (jerry_value_t)msg.payload;
+    // gui_log("timer msg cb 0x%x\n", js_cb);
+
+    res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
+    jerry_release_value(res);
+}
+
 #if _WIN32
-#include "stdio.h"
-#include "stdlib.h"
 #include <pthread.h>
-static void *rtk_gui_timer(struct timer_args *arg)
+
+typedef struct
 {
-    if (arg->one_short)
+    pthread_t *hdl;
+    uint32_t time_ms;
+    bool isPeriodic;
+    void *js_cb;
+} JS_TIMER_T;
+
+void js_ui_timerThread(void *param)
+{
+    JS_TIMER_T *js_timer = (JS_TIMER_T *)param;
+    const jerry_value_t js_cb = js_timer->js_cb;
+    uint32_t time_ms = js_timer->time_ms;
+    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS, .payload = EXTERN_EVENT_TIMER, .cb = js_cb};
+
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+    pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
+    do
     {
-        usleep((int)(arg->timeout) * 1000); //10ms
-        gui_free(arg);
-        jerry_value_t res = jerry_call_function(arg->func, jerry_create_undefined(), 0, 0);
+        usleep(time_ms * 1000); // us
+
+        pthread_testcancel();
+        // gui_send_msg_to_server(&msg);
+
+        int res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
         jerry_release_value(res);
+
+        pthread_testcancel();
     }
-    else
-    {
-        while (1)
-        {
-            usleep((int)(arg->timeout) * 1000); //10ms
-            jerry_value_t res = jerry_call_function(arg->func, jerry_create_undefined(), 0, 0);
-            jerry_release_value(res);
-        }
+    while (js_timer->isPeriodic);
 
-    }
+    pthread_exit(NULL);
+}
+#else
+#include "os_timer.h"
+#include "trace.h"
 
+#if defined (RTL87x2G)
+void arm_js_timercb(void *p_handle)
+{
+    // DBG_DIRECT("Timercb 0x%x 0x%x\n", &p_handle, p_handle);
+    uint32_t timer_id;
+    void *js_cb;
 
+    os_timer_id_get(&p_handle, &timer_id);
+    // DBG_DIRECT("timer_id 0x%x\n", timer_id);
 
+    js_cb = (void *)timer_id;
+    // DBG_DIRECT("js_cb 0x%x\n", js_cb);
+
+    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS, .cb = (gui_msg_cb)EXTERN_EVENT_TIMER, .payload = js_cb};
+    gui_send_msg_to_server(&msg);
 }
 #endif
+
+#endif
+
 
 DECLARE_HANDLER(setTimeout)
 {
+    // gui_log("setTimeout \n");
     if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_number(args[1]))
     {
-#ifdef _WIN32
-        pthread_t thread;
-        struct timer_args *arg = gui_malloc(sizeof(struct timer_args));
-        memset(arg, 0, sizeof(struct timer_args));
-        arg->func = args[0];
-        arg->timeout = (uint32_t)jerry_get_number_value(args[1]);
-        arg->one_short = 1;
-        pthread_create(&thread, NULL, rtk_gui_timer, arg);
+        uint32_t time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        jerry_value_t js_cb = args[0];
+        double js_timerID = 0;
+        gui_log("js_cb 0x%x\n", (uint32_t)js_cb);
 
+#ifdef _WIN32
+        pthread_t *thread_hdl;
+        JS_TIMER_T *js_timer = gui_malloc(sizeof(JS_TIMER_T));
+        memset(js_timer, 0, sizeof(JS_TIMER_T));
+        js_timer->js_cb = js_cb;
+        js_timer->time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        js_timer->isPeriodic = false;
+
+        thread_hdl = gui_thread_create("Timer", js_ui_timerThread, js_timer,
+                                       0, 0);
+        js_timer->hdl = thread_hdl;
+
+        // gui_log("hdl 0x%x, timerID 0x%x\n", thread_hdl, js_timer);
+
+        js_timerID = (uint32_t)js_timer;
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#else
+#if defined (RTL87x2G)
+        void *p_handle = NULL;
+
+        if (os_timer_create(&p_handle, "timer", (uint32_t)js_cb,
+                            time_ms, false, arm_js_timercb) == true)
+        {
+            // Timer created successfully, start the timer.
+            os_timer_start(&p_handle);
+            js_timerID = (uint32_t)p_handle;
+        }
+        else
+        {
+            // Timer failed to create.
+            js_timerID = 0;
+        }
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#endif
 #endif
     }
     return jerry_create_undefined();
 }
+
+DECLARE_HANDLER(clearTimeout)
+{
+    // gui_log("clearTimeout \n");
+    if (args_cnt == 1 && jerry_value_is_number(args[0]))
+    {
+        uint32_t js_timerID = (uint32_t)jerry_get_number_value(args[0]);
+        gui_log("js_timerID 0x%x\n", js_timerID);
+
+#ifdef _WIN32
+        JS_TIMER_T *js_timer = (JS_TIMER_T *)js_timerID;
+        int res = 0;
+
+        // gui_log("hdl 0x%x js_timer 0x%x\n", js_timer->hdl, js_timer);
+        res = gui_thread_delete(js_timer->hdl);
+        if (0 == res)
+        {
+            gui_free(js_timer);
+        }
+        else
+        {
+            gui_log("res %d %s\n", res, strerror(res));
+        }
+
+#else
+#if defined (RTL87x2G)
+        os_timer_delete((void **)&js_timerID);
+#endif
+#endif
+    }
+    return jerry_create_undefined();
+}
+
+
 DECLARE_HANDLER(setInterval)
 {
+    // gui_log("setInterval \n");
     if (args_cnt >= 2 && jerry_value_is_function(args[0]) && jerry_value_is_number(args[1]))
     {
-#ifdef _WIN32
-        pthread_t thread;
-        struct timer_args *arg = gui_malloc(sizeof(struct timer_args));
-        memset(arg, 0, sizeof(struct timer_args));
-        arg->func = args[0];
-        arg->timeout = (uint32_t)jerry_get_number_value(args[1]);
-        pthread_create(&thread, NULL, rtk_gui_timer, arg);
+        uint32_t time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        jerry_value_t js_cb = args[0];
+        double js_timerID = 0;
+        gui_log("js_cb 0x%x\n", (uint32_t)js_cb);
 
+#ifdef _WIN32
+        pthread_t *thread_hdl;
+        JS_TIMER_T *js_timer = gui_malloc(sizeof(JS_TIMER_T));
+        memset(js_timer, 0, sizeof(JS_TIMER_T));
+        js_timer->js_cb = args[0];
+        js_timer->time_ms = (uint32_t)jerry_get_number_value(args[1]);
+        js_timer->isPeriodic = true;
+
+        thread_hdl = gui_thread_create("Timer", js_ui_timerThread, js_timer,
+                                       0, 0);
+        js_timer->hdl = thread_hdl;
+
+        // gui_log("hdl 0x%x, timerID 0x%x\n", thread_hdl, js_timer);
+
+        js_timerID = (uint32_t)js_timer;
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#else
+#if defined (RTL87x2G)
+        void *p_handle = NULL;
+
+        if (os_timer_create(&p_handle, "timer", (uint32_t)js_cb,
+                            time_ms, true, arm_js_timercb) == true)
+        {
+            // Timer created successfully, start the timer.
+            os_timer_start(&p_handle);
+            js_timerID = (uint32_t)p_handle;
+        }
+        else
+        {
+            // Timer failed to create.
+            js_timerID = 0;
+        }
+        gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
+
+        return jerry_create_number(js_timerID);
+#endif
 #endif
     }
     return jerry_create_undefined();
 }
+
+
+DECLARE_HANDLER(clearInterval)
+{
+    // gui_log("clearInterval \n");
+    if (args_cnt == 1 && jerry_value_is_number(args[0]))
+    {
+        uint32_t js_timerID = (uint32_t)jerry_get_number_value(args[0]);
+        gui_log("js_timerID 0x%x\n", js_timerID);
+
+#ifdef _WIN32
+        JS_TIMER_T *js_timer = (JS_TIMER_T *)js_timerID;
+        int res = 0;
+
+        // gui_log("hdl 0x%x\n", js_timer->hdl);
+        res = gui_thread_delete(js_timer->hdl);
+        if (0 == res)
+        {
+            gui_free(js_timer);
+        }
+        else
+        {
+            gui_log("res %d %s\n", res, strerror(res));
+        }
+#else
+#if defined (RTL87x2G)
+        os_timer_delete((void **)&js_timerID);
+#endif
+#endif
+    }
+    return jerry_create_undefined();
+}
+
+
 void js_gui_init()
 {
     jerry_value_t global_obj = jerry_get_global_object();
@@ -1218,10 +1495,15 @@ void js_gui_init()
     jerry_value_t img = jerry_create_object();
     js_set_property(global_obj, "img", img);
     REGISTER_METHOD(img, getElementById);
+    REGISTER_METHOD(img, setLocation);
     REGISTER_METHOD(img, rotation);
     REGISTER_METHOD(img, scale);
     REGISTER_METHOD(img, setMode);
     REGISTER_METHOD(img, setAttribute);
+    REGISTER_METHOD_NAME(img,  "setAnimate", setAnimate_img);
+    REGISTER_METHOD_NAME(img,  "playAnimate", play_animate_img);
+    REGISTER_METHOD_NAME(img,  "pauseAnimate", pause_animate_img);
+
 
     jerry_value_t tab = jerry_create_object();
     js_set_property(global_obj, "tab", tab);
@@ -1254,17 +1536,17 @@ void js_gui_init()
     REGISTER_METHOD_NAME(seekbar, "setAnimate", setAnimate_seekbar);
     REGISTER_METHOD_NAME(seekbar, "setAttribute", seekbar_setAttribute);
     REGISTER_METHOD_NAME(seekbar, "getAttribute", seekbar_getAttribute);
-    REGISTER_METHOD_NAME(seekbar, "palyAnimate", play_animate_seekbar);
+    REGISTER_METHOD_NAME(seekbar, "playAnimate", play_animate_seekbar);
     REGISTER_METHOD_NAME(seekbar, "animateProgress", seekbar_getAnimateProgress);
     jerry_value_t document = jerry_create_object();
     js_set_property(global_obj, "textbox", document);
     REGISTER_METHOD(document, write);
     REGISTER_METHOD(document, getElementById);
     REGISTER_METHOD(document, setPosition);
-    REGISTER_METHOD_NAME(document, "palyAnimate", play_animate_text);
+    REGISTER_METHOD_NAME(document, "playAnimate", play_animate_text);
     REGISTER_METHOD_NAME(document, "setAnimate", setAnimate_text);
-
     REGISTER_METHOD_NAME(document, "pauseAnimate", pause_animate_text);
+    REGISTER_METHOD_NAME(document, "setInputable", setInputable);
 
     jerry_value_t app = jerry_create_object();
     js_set_property(global_obj, "app", app);
@@ -1289,14 +1571,22 @@ void js_gui_init()
     jerry_value_t sw = jerry_create_object();
     js_set_property(global_obj, "sw", sw);
     REGISTER_METHOD(sw, getElementById);
-    REGISTER_METHOD(sw, onOn);
-    REGISTER_METHOD(sw, onOff);
+    REGISTER_METHOD_NAME(sw, "onOn", switch_on);
+    REGISTER_METHOD_NAME(sw, "onOff", switch_off);
     REGISTER_METHOD_NAME(sw, "turnOn", sw_open);
     REGISTER_METHOD_NAME(sw, "turnOff", sw_close);
     REGISTER_METHOD_NAME(sw, "onPress", onPress_switch);
     REGISTER_METHOD(global_obj, setTimeout);
+    REGISTER_METHOD(global_obj, clearTimeout);
     REGISTER_METHOD(global_obj, setInterval);
+    REGISTER_METHOD(global_obj, clearInterval);
+
     jerry_release_value(global_obj);
+
+#ifdef __WIN32
+    sem_init(&sem_timer, 0, 1);
+#endif
+
 }
 
 
@@ -1306,7 +1596,7 @@ void js_run_file_on_server(const char *file, gui_app_t *app)
     {
         gui_msg_t msg;
         memset(&msg, 0, sizeof(gui_msg_t));
-        msg.u.payload = (void *)file;
-        msg.cb = app;
+        msg.payload = (void *)file;
+        msg.cb = (gui_msg_cb)app;
     }
 }

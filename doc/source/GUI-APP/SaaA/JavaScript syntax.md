@@ -168,11 +168,11 @@ sw.getElementById('tab8Switch')
 function swOnOnFunc(params) {
     console.log('swOnOnFunc')
 }
-sw.onOn(swOnOnFunc)
+sw.switch_on(swOnOnFunc)
 function swOnOffFunc(params) {
     console.log('swOnOffFunc')
 }
-sw.onOff(swOnOffFunc)
+sw.switch_off(swOnOffFunc)
 sw.turnOn();
 ```
 * turn on a led (P1_1)
@@ -226,8 +226,8 @@ DECLARE_HANDLER(writeSync)
 
 ```javascript
     getElementById : function (win_name : string) {},
-    onOn : function (func) {},
-    onOff : function (func) {},
+    switch_on : function (func) {},
+    switch_off : function (func) {},
     onPress : function (func) {},
     turnOn : function (func) {},//turn on the switch
     turnOff : function (func) {},//turn off the switch

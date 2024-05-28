@@ -14,9 +14,6 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
-// #include "acc_sw_rle.h"
-// #include "acc_sw_blend.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,10 +21,6 @@ extern "C" {
 
 void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                           gui_rect_t *rect);
-void filter_blit_2_rgb888(draw_img_t *image, struct gui_dispdev *dc,
-                          gui_rect_t *rect);
-void filter_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
-                            gui_rect_t *rect);
 
 #ifdef __cplusplus
 }

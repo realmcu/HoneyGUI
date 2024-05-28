@@ -25,7 +25,6 @@ extern "C" {
 #include "root_image_800_480/ui_resource.h"
 #include <gui_app.h>
 #include <stdlib.h>
-#include "acc_engine.h"
 #include "app_dashboard_data.h"
 
 static gui_img_t *dashboard_c_background = NULL;

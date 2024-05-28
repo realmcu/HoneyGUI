@@ -8,7 +8,7 @@
 #include <gui_app.h>
 #include "gui_tab.h"
 #include "gui_perspective.h"
-#include "draw_font.h"
+#include "font_mem.h"
 #include <gui_img.h>
 #include "gui_canvas.h"
 #include "app_gui_main.h"
@@ -28,7 +28,9 @@ gui_tab_t *tab_player = NULL;
 gui_tab_t *tab_call = NULL;
 gui_tab_t *tab_contacts = NULL;
 gui_tab_t *tab_record = NULL;
+gui_tab_t *tab_benchmark = NULL;
 gui_tab_t *tab_menu = NULL;
+gui_tab_t *tab_gfx_demo = NULL;
 static void design_app_watch_ui(gui_app_t *app);
 extern void gui_task_ext_execution_sethook(void (*hook)(void));
 
@@ -51,7 +53,7 @@ static gui_app_t app_watch_ui =
     },
     .ui_design = design_app_watch_ui,
     .thread_entry = NULL,
-    .active_ms = 60000,
+    .active_ms = 10000,
 };
 
 gui_app_t *get_app_watch_ui(void)
@@ -67,12 +69,13 @@ static void design_app_watch_ui(gui_app_t *app)
 
     gui_font_mem_init(FONT_BIN);
 
+
 #ifdef _ENABLE_RTK_SOC_WATCH_
 #include "mem_config.h"
     //memcpy((void *)SPIC2_ADDR, (void *)0x04400000, 0x100000 * 12);
 #endif
     tabview_main = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
-    gui_tabview_set_style(tabview_main, CLASSIC);
+    gui_tabview_set_style(tabview_main, TAB_CUBE);
     gui_tabview_enable_pre_load(tabview_main, true);
 
     tab_watchface = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 0, 0);
@@ -80,18 +83,24 @@ static void design_app_watch_ui(gui_app_t *app)
     tab_call = gui_tab_create(tabview_main, "tab_call",           0, 0, 0, 0, 2, 0);
     tab_contacts = gui_tab_create(tabview_main, "tab_contacts",        0, 0, 0, 0, 3, 0);
     tab_record = gui_tab_create(tabview_main, "tab_record",       0, 0, 0, 0, 4, 0);
+    tab_benchmark = gui_tab_create(tabview_main, "tab_benchmark",       0, 0, 0, 0, 5, 0);
     tab_menu = gui_tab_create(tabview_main, "tab_menu",       0, 0, 0, 0, -1, 0);
-    design_tab_watchface(gui_tab_get_rte_obj(tab_watchface));
-    design_tab_player(gui_tab_get_rte_obj(tab_player));
-    design_tab_call(gui_tab_get_rte_obj(tab_call));
-    design_tab_contacts(gui_tab_get_rte_obj(tab_contacts));
+    design_watchface_mgr(gui_tab_get_rte_obj(tab_watchface));
+    design_player_mgr(gui_tab_get_rte_obj(tab_player));
+    design_call_mgr(gui_tab_get_rte_obj(tab_call));
+    design_contacts_mgr(gui_tab_get_rte_obj(tab_contacts));
+    design_record_mgr(gui_tab_get_rte_obj(tab_record));
 #ifdef ENABLE_LITE_GFX
-    design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_record));
-#else
-    design_tab_record(gui_tab_get_rte_obj(tab_record));
+    extern void design_tab_app_soccer(void *parent);
+    tab_gfx_demo = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 6, 0);
+    // design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_gfx_demo));
+    design_tab_app_soccer(gui_tab_get_rte_obj(tab_gfx_demo));
+    // design_tab_watchface_flowerfall(gui_tab_get_rte_obj(tab_gfx_demo));
 #endif
 
+    extern void design_tab_menu(void *parent);
     design_tab_menu(gui_tab_get_rte_obj(tab_menu));
+    design_benchmark_mgr(gui_tab_get_rte_obj(tab_benchmark));
 
 }
 
@@ -102,10 +111,12 @@ static int watch_app_init(void)
 {
 #if defined _WIN32
     int fd;
+    extern int open(const char *file, int flags, ...);
     fd = open("./gui_engine/example/screen_454_454/root_image/root(0x4400000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
+        extern int read(int fd, void *buf, size_t len);
         read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
@@ -123,4 +134,3 @@ static int watch_app_init(void)
 }
 
 GUI_INIT_APP_EXPORT(watch_app_init);
-

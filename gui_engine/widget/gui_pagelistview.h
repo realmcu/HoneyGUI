@@ -29,9 +29,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <gui_img.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "gui_img.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -79,7 +79,6 @@ typedef struct gui_pagelistview
   * @{
   */
 
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -91,7 +90,6 @@ typedef struct gui_pagelistview
   * @brief
   * @{
   */
-
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -105,26 +103,6 @@ typedef struct gui_pagelistview
   * @{
   */
 
-
-/**
- * @brief
- *
- * @param this pagelistview
- * @param mask_bottom top mask pickture, should be created by app
- * @return gui_img_t*
- */
-
-void gui_pagelistview_add_top_mask(gui_pagelistview_t *this, gui_img_t *mask_top);
-
-/**
- * @brief
- *
- * @param this pagelistview
- * @param mask_bottom bottom mask pickture, should be created by app
- * @return
- */
-
-void gui_pagelistview_add_bottom_mask(gui_pagelistview_t *this, gui_img_t *mask_bottom);
 /**
  * @brief
  *
@@ -136,13 +114,34 @@ void gui_pagelistview_add_bottom_mask(gui_pagelistview_t *this, gui_img_t *mask_
  * @param h h of this widget
  * @return gui_pagelistview_t*
  */
-gui_pagelistview_t *gui_pagelistview_create(void *parent,  const char *name,
-                                            int16_t x, int16_t y, int16_t w, int16_t h);
+gui_pagelistview_t *gui_pagelistview_create(void       *parent,
+                                            const char *name,
+                                            int16_t     x,
+                                            int16_t     y,
+                                            int16_t     w,
+                                            int16_t     h);
+
+/**
+ * @brief
+ *
+ * @param this pagelistview
+ * @param mask_bottom top mask pickture, should be created by app
+ * @return gui_img_t*
+ */
+void gui_pagelistview_add_top_mask(gui_pagelistview_t *this, gui_img_t *mask_top);
+
+/**
+ * @brief
+ *
+ * @param this pagelistview
+ * @param mask_bottom bottom mask pickture, should be created by app
+ * @return
+ */
+void gui_pagelistview_add_bottom_mask(gui_pagelistview_t *this, gui_img_t *mask_bottom);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
-
 
 /** End of WIDGET
   * @}
@@ -153,4 +152,3 @@ gui_pagelistview_t *gui_pagelistview_create(void *parent,  const char *name,
 #endif
 
 #endif
-

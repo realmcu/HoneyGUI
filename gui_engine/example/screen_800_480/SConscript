@@ -7,16 +7,18 @@ src = Split("""
 """)
 
 src = Glob('*.c')
+CPPDEFINES = []
 if not GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
     SrcRemove(src,'app_lvgl.c')
-if  GetDepend('CONFIG_REALTEK_BUILD_GUI_800_480'):
-    SrcRemove(src,'app_dashboard_connected_display.c')
-    SrcRemove(src,'app_dashboard_data.c')
 SrcRemove(src,'app_dashboard_480_272.c')
 SrcRemove(src,'app_dashboard_800_400.c')
 CPPPATH = [cwd]
 CPPPATH += [cwd + '\\root_image_800_480']
 print(CPPPATH)
-group = DefineGroup('gui_demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'], CPPPATH = CPPPATH)
+
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'):
+    CPPDEFINES += ['ENABLE_RTK_GUI_800_480_DEMO']
+
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'], CPPPATH = CPPPATH)
 
 Return('group')

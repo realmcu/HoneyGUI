@@ -8,6 +8,8 @@
 #include "gui_button.h"
 #include <gui_seekbar.h>
 #include <gui_page.h>
+#include "gui_gallery.h"
+#include "gui_keyboard.h"
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
@@ -15,10 +17,10 @@
 #include <gui_img.h>
 #include <gui_app.h>
 #include <stdlib.h>
-#include "acc_engine.h"
 #include "gui_grid.h"
 #include "gui_scroll_text.h"
 #include "gui_switch.h"
+#include "gui_tab.h"
 #include "string.h"
 #include "stdio.h"
 #include <stdlib.h>
@@ -44,10 +46,10 @@
 struct widget_create
 {
     char *name;
-    obj_type_t type;
+    T_OBJ_TYPE type;
 };
 
-#define WIDGETS_NUM 20
+#define WIDGETS_NUM 22
 
 struct widget_create widget[] =
 {
@@ -68,11 +70,14 @@ struct widget_create widget[] =
     //{ "pagebar", PAGEBAR },
     { "screen", SCREEN },
     { "grid",  GRID},
+    {"gallery", GALLERY},
     {"radio", RADIO},
     {"appendTexts", RADIOSWITCH},
     {"arc", ARC},
     {"movie", MOVIE},
-    {"animateTransform", MACRO_ANIMATETRANSFORM}
+    {"animateTransform", MACRO_ANIMATETRANSFORM},
+    {"motorizedCurtain", MACRO_MOTORIZED_CURTAIN},
+    {"keyboard", KEYBOARD},
 };
 static void img_rotate_cb(gui_img_t *img)
 {
@@ -81,6 +86,69 @@ static void img_rotate_cb(gui_img_t *img)
 
     gui_img_rotation(img, 360 * img->animate->progress_percent, img->base.w / 2,
                      img->base.h);
+}
+static char *open_switch_name;
+static char *pause_switch_name;
+static char *close_switch_name;
+static void seekbar_ani_cb(int args, gui_seekbar_t *this)
+{
+    switch (args)
+    {
+    case 0:
+        {
+            GUI_API(gui_seekbar_t).set_progress(this, this->animate->progress_percent);
+        }
+        break;
+    case 1:
+        {
+            GUI_API(gui_seekbar_t).set_progress(this, 1.0f - this->animate->progress_percent);
+        }
+        break;
+    default:
+        break;
+    }
+}
+static void switch_cb_for_mororized_curtain(gui_switch_t *sw, gui_event_t event_code)
+{
+    size_t args = 0;
+    gui_event_dsc_t *event = GUI_BASE(sw)->event_dsc;
+
+    // same event only handle the first register one
+    for (size_t i = 0; i < GUI_BASE(sw)->event_dsc_cnt; i++)
+    {
+        if (event[i].filter == event_code)
+        {
+            args = (size_t)event[i].user_data;
+        }
+    }
+    gui_seekbar_t *seekbar = 0;
+    gui_obj_tree_get_widget_by_type(GUI_BASE(sw)->parent, SEEKBAR, (gui_obj_t **)&seekbar);
+    switch (args)
+    {
+    case 3:
+        {
+            if (seekbar->animate)
+            {
+                seekbar->animate->animate = 1;
+            }
+        }
+        break;
+    case 2:
+        {
+            if (seekbar->animate)
+            {
+                seekbar->animate->animate = 0;
+            }
+
+
+        }
+        break;
+    default:
+        {
+            GUI_API(gui_seekbar_t).animate(seekbar, 10000, 0, seekbar_ani_cb, (void *)args);
+        }
+        break;
+    }
 }
 gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *addr,
                                        int16_t x,
@@ -94,43 +162,6 @@ gui_img_t *xml_gui_img_create_from_mem(void *parent,  const char *name, void *ad
     return gui_img_create_from_mem(parent, name, addr,
                                    x,
                                    y, 0, 0);
-}
-
-gui_img_t *xml_gui_img_create(void *parent, const char *file, int16_t x, int16_t y)
-{
-    if (file == NULL)
-    {
-        file = gui_get_file_address("app/system/resource/icMenuBird.bin");
-    }
-
-    // check image size
-    char *path = gui_malloc(strlen(file) + strlen(GUI_ROOT_FOLDER) + 1);
-    sprintf(path, "%s%s", GUI_ROOT_FOLDER, file);
-    gui_log("xml imgfile>%s \n", path);
-
-    int fd = gui_fs_open(path,  0);
-    if (fd == -1)
-    {
-        gui_log("open file fail !\n");
-        return NULL;
-    }
-    int size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
-    gui_log("img size: %d \n", size);
-    gui_fs_close(fd);
-    // gui_free(path);
-
-    if (size < 100000)
-    {
-#ifdef __WIN32
-        path = file;
-#endif
-        return parent = (void *)gui_img_create_from_fs(parent, path, x, y);
-    }
-    else
-    {
-        void *imgbuf = gui_get_file_address(file);
-        return parent = (void *)gui_img_create_from_mem(parent, "image", imgbuf, x, y, 0, 0);
-    }
 }
 
 char *get_space_string_head(const char *string)
@@ -202,7 +233,7 @@ static void sport_button_press_ani_cb(gui_button_t *button)
     if (per == 0.0f)
     {
         from = ((gui_img_t *)(button->img))->scale_x;
-        alpha_from = button->img->draw_img.opacity_value;
+        alpha_from = button->img->draw_img->opacity_value;
     }
     from = 1.0f;
     float scale = (-0.5f * from) * per + from;
@@ -223,7 +254,16 @@ static void sport_button_press_ani_cb(gui_button_t *button)
 
     //gui_log("o:%f\n", 25.0f * (from - scale));
 }
-
+static void reverse_array(void *arr[], int n)
+{
+    void *temp;
+    for (int i = 0; i < n / 2; i++)
+    {
+        temp = arr[i];
+        arr[i] = arr[n - i - 1];
+        arr[n - i - 1] = temp;
+    }
+}
 static void draw_arc(gui_canvas_t *c)
 {
 
@@ -248,7 +288,7 @@ static void sport_button_release_ani_cb(gui_button_t *button)
     if (per == 0.0f)
     {
         from = ((gui_img_t *)(button->img))->scale_x;
-        alpha_from = button->img->draw_img.opacity_value;
+        alpha_from = button->img->draw_img->opacity_value;
     }
     //from = 1.25f;
     float scale = (1.0f - from) * per + from;
@@ -269,17 +309,17 @@ static void sport_button_release_ani_cb(gui_button_t *button)
 }
 static void sport_button_press(gui_button_t *b)
 {
-    gui_button_api.set_animate(b, 200, 0, sport_button_press_ani_cb, b);
+    gui_button_set_animate(b, 200, 0, sport_button_press_ani_cb, b);
 }
 static void sport_button_release(gui_button_t *b)
 {
-    gui_button_api.set_animate(b, 200, 0, sport_button_release_ani_cb, b);
+    gui_button_set_animate(b, 200, 0, sport_button_release_ani_cb, b);
 }
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
-    gui_log("%s\n", name);
-    for (size_t i = 0; i < WIDGETS_NUM; i++)
+    gui_log("%s: %s", name, p->txt);
+    for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
     {
         if (!strcmp(widget[i].name, name))
         {
@@ -303,7 +343,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 #endif
                     size_t color = 0xffffffff;
                     int fontSize = 32;
-                    int style = 0;
+                    TEXT_MODE style = 0;
+                    uint8_t inputable = false;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -368,6 +409,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
 
                         }
+                        else if (!strcmp(p->attr[i], "inputable"))
+                        {
+                            inputable = atoi(p->attr[++i]);
+                        }
                         i++;
                     }
                     //gui_log("x:%d,y:%d,w:%dh:%d,font:%s,text:%s,color:%x\n", x, y, w, h, font, text, color);
@@ -383,17 +428,21 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_color_t color_temporary;
                             color_temporary.color.rgba_full = color;
                             gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
-
+                            if (inputable)
+                            {
+                                gui_text_input_set(t, inputable);
+                                gui_text_click(t, gui_keyboard_launch_by_widget, t);
+                            }
 
 
                             {
-                                FONT_SRC_TYPE font_type2;
+                                FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
                                 char *font_type = font;
                                 if (strstr(font_type, ".bin") != NULL)
                                 {
                                     font_type2 = GUI_FONT_SRC_BMP;
                                     void *addr1 = gui_get_file_address(font_type);
-                                    gui_font_mem_init(addr1);
+                                    //gui_font_mem_init(addr1);
                                     t->font_height = fontSize;
                                     t->path = 0;
                                     t->font_type = GUI_FONT_SRC_BMP;
@@ -448,10 +497,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                 fontSize);
                             t = (void *)scroll_text;
                         }
-
-
-
-
                         parent = (void *)t;
                     }
                 }
@@ -461,8 +506,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     size_t i = 0;
                     int16_t x = 0;
                     int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     char *file = NULL;
                     float scalex = 1;
                     float scaley = 1;
@@ -548,7 +593,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     if (file)
                     {
                         void *imgbuf = gui_get_file_address(file);
-                        parent = (void *)xml_gui_img_create_from_mem(parent, gui_strdup(p->txt), imgbuf, x, y);
+                        parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
                         gui_img_set_mode((gui_img_t *)parent, IMG_SRC_OVER_MODE);
                         if (scalex != 1 || scaley != 1)
                         {
@@ -650,7 +695,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0;
                     int16_t h = 0;
-                    int style = 0;
+                    int style = 0; GUI_UNUSED(style);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -699,21 +744,21 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
-                    gui_tabview_loop((void *)parent, true);
+                    gui_tabview_loop_x((void *)parent, false);
                 }
                 break;
             case ARC:
                 {
                     size_t i = 0;
-                    int16_t cx = 100;
-                    int16_t cy = 100;
-                    int16_t r = 100;
-                    int16_t stroke_width = 10;
-                    int cap = 0;
+                    int16_t cx = 100; GUI_UNUSED(cx);
+                    int16_t cy = 100; GUI_UNUSED(cy);
+                    int16_t r = 100; GUI_UNUSED(r);
+                    int16_t stroke_width = 10; GUI_UNUSED(stroke_width);
+                    int cap = 0; GUI_UNUSED(cap);
                     uint32_t fill = 0xff0000ff;
                     uint32_t stroke = 0xff0000ff;
-                    float sd = 0;
-                    float ed = 100;
+                    float sd = 0; GUI_UNUSED(sd);
+                    float ed = 100; GUI_UNUSED(ed);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -750,18 +795,16 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             char *s = p->attr[++i];
                             if (!strcmp(p->attr[i], "butt"))
                             {
-                                cap = CAP_BUTT;
+                                cap = NVG_BUTT;
                             }
                             else if (!strcmp(p->attr[i], "round"))
                             {
-                                cap = CAP_ROUND;
+                                cap = NVG_ROUND;
                             }
                             else if (!strcmp(p->attr[i], "square"))
                             {
-                                cap = CAP_SQUARE;
+                                cap = NVG_SQUARE;
                             }
-
-
                         }
                         else if (!strcmp(p->attr[i], "fill"))
                         {
@@ -795,8 +838,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     size_t i = 0;
                     int16_t x = 0;
                     int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     uint32_t color = 0xffffffaa;
                     uint32_t highlightColor = 0xffffffff;
                     bool vh = false;
@@ -914,8 +957,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     size_t i = 0;
                     int16_t x = 0;
                     int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     uint32_t color = 0xffffffaa;
                     uint32_t highlightColor = 0xffffffff;
                     bool canvas = false;
@@ -931,6 +974,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     // default image blend_mode
                     BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
                     uint8_t opacity = 255;
+                    bool reverse = 0;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1025,6 +1069,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             ed = atof(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "reverse"))
+                        {
+                            reverse = 1;
+                        }
                         else if (!strcmp(p->attr[i], "blendMode"))
                         {
                             i++;
@@ -1102,7 +1150,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             gui_free(path);
                             while ((entry = readdir(dir)) != NULL)
                             {
-                                file_count++;
+                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                {
+                                    file_count++;
+                                }
+
+
                             }
                             closedir(dir);
                         }
@@ -1131,27 +1184,53 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             }
                             gui_free(path);
                             closedir(dir);
+                            if (reverse)
+                            {
+                                reverse_array(image_array, count);
+                            }
+
+
                         }
-                        if (arc)
+                        bool if_widget = 0;
+                        if (p->parent)
                         {
-                            parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
-                                                                          cx, cy, 100, 100, sd, ed);
+                            if (!strcmp(widget[21].name, p->parent->name))
+                            {
+                                if_widget = 1;
+                            }
+                        }
+                        if (if_widget)
+                        {
+                            parent = (void *)gui_seekbar_create_movie_h_double(parent, image_array, file_count, x, y);
                             gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
                             gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                         }
                         else
                         {
-                            if (vh)
+                            if (arc)
                             {
-                                parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
+                                parent = (void *)gui_seekbar_create_movie_arc(parent, image_array, file_count, x, y,
+                                                                              cx, cy, 100, 100, sd, ed);
+                                gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                                gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                             }
                             else
                             {
-                                parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
+                                if (vh)
+                                {
+                                    parent = (void *)gui_seekbar_create_movie_v(parent, image_array, file_count, x, y);
+                                }
+                                else
+                                {
+                                    parent = (void *)gui_seekbar_create_movie_h(parent, image_array, file_count, x, y);
+                                }
+                                gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
+                                gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                             }
-                            gui_img_set_mode(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), blendMode);
-                            gui_img_set_opacity(GUI_TYPE(gui_img_t, GUI_TYPE(gui_seekbar_t, parent)->base.c), opacity);
                         }
+
+
+
 
 
                     }
@@ -1279,6 +1358,36 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,idx:%d,idy:%d\n", x, y, w, h, idx, idy);
                     parent = (void *)gui_tab_create(parent, ptxt, x, y, w, h, idx, idy);
+                }
+
+
+                {
+                    // if(strcmp(parent->name, "home_tab") == 0)
+                    // {
+                    //     uint8_t num_pic = 6;
+                    //     void** img_arr = gui_malloc(num_pic * sizeof(void*));
+                    //     img_arr[0] = gui_get_file_address("app/box/resource/other/img_01.bin");
+                    //     img_arr[1] = gui_get_file_address("app/box/resource/other/img_02.bin");
+                    //     img_arr[2] = gui_get_file_address("app/box/resource/other/img_03.bin");
+                    //     img_arr[3] = gui_get_file_address("app/box/resource/other/img_04.bin");
+                    //     img_arr[4] = gui_get_file_address("app/box/resource/other/img_02.bin");
+                    //     img_arr[5] = gui_get_file_address("app/box/resource/other/img_03.bin");
+                    //     gui_gallery_config_t img_file = {
+                    //         .data_main_bg = gui_get_file_address("app/box/resource/other/main_bg.bin"),
+                    //         .data_center_bg = gui_get_file_address("app/box/resource/other/center_bg.bin"),
+                    //         .img_array = img_arr,
+                    //         .num_pic = num_pic
+                    //     };
+                    //     gui_gallery_create(parent,
+                    //                     "gallery_t",
+                    //                     &img_file,
+                    //                     0,
+                    //                     0,
+                    //                     480,
+                    //                     321);
+
+                    // }
+
                 }
                 break;
             case CURTAINVIEW:
@@ -1429,8 +1538,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
             case SCREEN:
                 {
                     size_t i = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1519,7 +1628,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t h = 0;
                     float scope = 1.0f;
                     T_GUI_CURTAIN_ENUM orientation = CURTAIN_MIDDLE;
-                    int style = 0;
+                    int style = 0; GUI_UNUSED(style);
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1735,7 +1844,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     uint32_t font_size = 32;
                     int picture_x = 0;
                     int picture_y = 0;
-                    int transition = 0;
+                    int transition = 0; GUI_UNUSED(transition);
                     char *picture = NULL;
                     char *hl_picture = NULL;
                     int style = 0;
@@ -1863,7 +1972,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //font_size = 32;
-                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, 0, 0);
+                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, text, BUTTON_BG_ICON, 0);
                     GUI_TYPE(gui_button_t, parent)->style = style;
                     parent->name = ptxt;
                     gui_button_img_move((void *)parent, picture_x, picture_y);
@@ -1876,17 +1985,17 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
-                        gui_button_api.onPress((void *)parent, sport_button_press, parent);
-                        gui_button_api.onRelease((void *)parent, sport_button_release, parent);
+                        gui_button_press((void *)parent, (gui_event_cb_t)sport_button_press, parent);
+                        gui_button_release((void *)parent, (gui_event_cb_t)sport_button_release, parent);
                     }
 
                     {
-                        FONT_SRC_TYPE font_type2;
+                        FONT_SRC_TYPE font_type2; GUI_UNUSED(font_type2);
                         if (strstr(font_type, ".bin") != NULL)
                         {
                             font_type2 = GUI_FONT_SRC_BMP;
                             void *addr1 = gui_get_file_address(font_type);
-                            gui_font_mem_init(addr1);
+                            //gui_font_mem_init(addr1);
                             GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
                             GUI_TYPE(gui_button_t, parent)->text->path = 0;
                             gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1);
@@ -1924,27 +2033,63 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 #endif
                         }
                     }
+                    {
+                        bool if_widget = 0;
+                        if (p->parent)
+                        {
+                            if (!strcmp(widget[21].name, p->parent->name))
+                            {
+                                if_widget = 1;
+                            }
+                        }
+                        if (if_widget)
+                        {
+                            if (open_switch_name && !strcmp(parent->name, open_switch_name))
+                            {
+                                gui_free(open_switch_name);
+                                open_switch_name = 0;
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
+                            }
+                            else if (close_switch_name && !strcmp(parent->name, close_switch_name))
+                            {
+                                gui_free(close_switch_name);
+                                close_switch_name = 0;
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
+                            }
+                            else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
+                            {
+                                gui_free(pause_switch_name);
+                                pause_switch_name = 0;
+                                GUI_API(gui_button_t).on_click((gui_button_t *)parent,
+                                                               (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
+                            }
+                        }
+                    }
+
                     break;
                 }
             case RADIO:
                 {
                     size_t i = 0;
-                    int16_t x = 0;
-                    int16_t y = 0;
-                    int16_t w = 0;
-                    int16_t h = 0;
-                    char *font_type = "rtk_font_fs32";
-                    char *text = NULL;
-                    int text_x = 0;
-                    int text_y = 0;
-                    uint32_t font_color = 0Xf0f0;
-                    uint32_t font_size = 40;
-                    int picture_x = 0;
-                    int picture_y = 0;
-                    int transition = 0;
-                    char *picture = NULL;
-                    char *hl_picture = NULL;
-                    int style = 0;
+                    int16_t x = 0; GUI_UNUSED(x);
+                    int16_t y = 0; GUI_UNUSED(y);
+                    int16_t w = 0; GUI_UNUSED(w);
+                    int16_t h = 0; GUI_UNUSED(h);
+                    char *font_type = "rtk_font_fs32"; GUI_UNUSED(font_type);
+                    char *text = NULL; GUI_UNUSED(text);
+                    int text_x = 0; GUI_UNUSED(text_x);
+                    int text_y = 0; GUI_UNUSED(text_y);
+                    uint32_t font_color = 0Xf0f0; GUI_UNUSED(font_color);
+                    uint32_t font_size = 40; GUI_UNUSED(font_size);
+                    int picture_x = 0; GUI_UNUSED(picture_x);
+                    int picture_y = 0; GUI_UNUSED(picture_y);
+                    int transition = 0; GUI_UNUSED(transition);
+                    char *picture = NULL; GUI_UNUSED(picture);
+                    char *hl_picture = NULL; GUI_UNUSED(hl_picture);
+                    int style = 0; GUI_UNUSED(style);
+
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -1979,8 +2124,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                         i++;
                     }
-                    void *img1;
-                    void *img2;
+                    void *img1; GUI_UNUSED(img1);
+                    void *img2; GUI_UNUSED(img2);
                     {
                         img1 = gui_get_file_address(picture);
                     }
@@ -2106,12 +2251,446 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     parent = (void *)gui_switch_create(parent, x, y, w, h, img1, img2);
                     parent->name = get_space_string_head(p->txt);
-                    GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = gui_get_file_address(hl_pictureHl);
-                    GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
+                    if (hl_pictureHl)
+                    {
+                        GUI_TYPE(gui_switch_t, parent)->on_hl_pic_addr = gui_get_file_address(hl_pictureHl);
+                    }
+                    if (pictureHl)
+                    {
+                        GUI_TYPE(gui_switch_t, parent)->off_hl_pic_addr = gui_get_file_address(pictureHl);
+                    }
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.x = picture_x;
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
                     gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);
                     gui_img_set_opacity(GUI_TYPE(gui_switch_t, parent)->switch_picture, opacity);
+                    bool if_widget = 0;
+                    if (p->parent)
+                    {
+                        if (!strcmp(widget[21].name, p->parent->name))
+                        {
+                            if_widget = 1;
+                        }
+                    }
+                    if (if_widget)
+                    {
+                        if (open_switch_name && !strcmp(parent->name, open_switch_name))
+                        {
+                            gui_free(open_switch_name);
+                            open_switch_name = 0;
+                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
+                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)0);
+                        }
+                        else if (close_switch_name && !strcmp(parent->name, close_switch_name))
+                        {
+                            gui_free(close_switch_name);
+                            close_switch_name = 0;
+                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
+                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)1);
+                        }
+                        else if (pause_switch_name && !strcmp(parent->name, pause_switch_name))
+                        {
+                            gui_free(pause_switch_name);
+                            pause_switch_name = 0;
+                            GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                             (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)2);
+                            GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                              (gui_event_cb_t)switch_cb_for_mororized_curtain, (void *)3);
+                        }
+                    }
+
+                }
+                break;
+            case GALLERY:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+
+                    gui_gallery_config_t config = {0};
+                    char *picture = "app/system/resource/Progress bar_full.bin";
+                    char *folder = NULL;
+
+                    // default image blend_mode
+                    uint8_t blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
+
+                    memset(&config, 0, sizeof(config));
+                    while (true)
+                    {
+                        // #define IS_STR(str) (!strcmp(p->attr[i], str))
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "folder"))
+                        {
+                            folder = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "mainBg"))
+                        {
+                            config.data_main_bg = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "centerBg"))
+                        {
+                            config.data_center_bg = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "centerPercent"))
+                        {
+                            config.center_percent = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sideScale"))
+                        {
+                            config.side_scale = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sidePosPercent"))
+                        {
+                            config.side_pos_percent = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "blendMode"))
+                        {
+                            i++;
+                            if (!strcmp(p->attr[i], "imgBypassMode"))
+                            {
+                                blendMode = IMG_BYPASS_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                            {
+                                blendMode = IMG_FILTER_BLACK;
+                            }
+                            else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                            {
+                                blendMode = IMG_SRC_OVER_MODE;
+                            }
+                            else if (!strcmp(p->attr[i], "imgCoverMode"))
+                            {
+                                blendMode = IMG_COVER_MODE;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "opacity"))
+                        {
+                            opacity = atof(p->attr[++i]);
+                        }
+                        i++;
+                    }
+
+                    char *ptxt = get_space_string_head(p->txt);
+                    if (!folder)
+                    {
+                        gui_log("gallery folder is not found!\n");
+                    }
+                    else if (folder)
+                    {
+                        int file_count = 0;
+                        DIR *dir = 0;
+                        struct dirent *entry;
+                        char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+                        // init image array
+                        sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+                        if ((dir = opendir(dir_path)) == NULL)
+                        {
+                            gui_free(dir_path);
+                            //perror("opendir() failed"); return;
+                        }
+                        gui_free(dir_path);
+
+                        while ((entry = readdir(dir)) != NULL)
+                        {
+                            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                            {
+                                char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                                void *addr = NULL;
+                                void *data = NULL;
+
+                                file_count++;
+                                sprintf(file_path, "%s/%s", folder, entry->d_name);
+                                addr = gui_get_file_address(file_path);
+                                if (!config.img_array)
+                                {
+                                    data = gui_malloc(sizeof(void *));
+                                }
+                                else
+                                {
+                                    data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                                }
+                                config.img_array = data;
+                                config.img_array[file_count - 1] = addr;
+
+                                gui_free(file_path);
+                            }
+                        }
+                        closedir(dir);
+
+                        config.num_pic = file_count;
+                    }
+
+                    if (config.data_main_bg)
+                    {
+                        config.data_main_bg = gui_get_file_address(config.data_main_bg);
+                    }
+                    if (config.data_center_bg)
+                    {
+                        config.data_center_bg = gui_get_file_address(config.data_center_bg);
+                    }
+
+                    gui_gallery_create(parent, ptxt, &config,
+                                       x, y, w, h);
+                }
+                break;
+
+            case KEYBOARD:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 640;
+                    int16_t h = 360;
+
+                    gui_kb_config_t config = {0};
+                    char *picture = "app/system/resource/Progress bar_full.bin";
+                    // char *folder = NULL;
+
+                    // default image blend_mode
+                    uint8_t blendMode = IMG_FILTER_BLACK;
+                    uint8_t opacity = 255;
+
+                    memset(&config, 0, sizeof(config));
+
+                    {
+#define PATH_PRE "app/box/resource/"
+                        char *floder_kb = PATH_PRE"keyboard";
+                        char *floder_letter = PATH_PRE"keyboard/0_letter/";
+                        char *floder_letter_upper = PATH_PRE"keyboard/1_letter_upper/";
+                        char *floder_num = PATH_PRE"keyboard/2_number/";
+                        char *floder_symbol = PATH_PRE"keyboard/3_symbol/";
+                        char *floder_func = PATH_PRE"keyboard/4_func/";
+                        char *floder_other = PATH_PRE"keyboard/5_other/";
+
+                        config.layout = KB_LAYOUT_BASIC;
+                        config.mode = KB_MODE_BASIC_ENG_LOWWER;
+
+                        uint16_t file_count = 0;
+                        DIR *dir = NULL;
+                        struct dirent *entry;
+                        char *folder_array[] = {floder_letter, floder_letter_upper, floder_num, floder_symbol, floder_func, floder_other};
+                        for (int i = 0; i < sizeof(folder_array) / sizeof(folder_array[0]); i++)
+                        {
+                            char *folder = folder_array[i];
+                            char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+                            // init image array
+                            sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+                            if ((dir = opendir(dir_path)) == NULL)
+                            {
+                                gui_free(dir_path);
+                                continue;
+                                //perror("opendir() failed"); return;
+                            }
+                            // gui_log("folder: %d %s\n", dir, folder);
+                            gui_free(dir_path);
+
+
+                            while ((entry = readdir(dir)) != NULL)
+                            {
+                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                {
+                                    char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                                    void *addr = NULL;
+                                    void *data = NULL;
+
+                                    file_count++;
+                                    sprintf(file_path, "%s/%s", folder, entry->d_name);
+                                    // gui_log("file_count %d, file: %s\n", file_count, entry->d_name);
+                                    addr = gui_get_file_address(file_path);
+                                    if (!config.img_array)
+                                    {
+                                        data = gui_malloc(sizeof(void *));
+                                    }
+                                    else
+                                    {
+                                        data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                                    }
+                                    config.img_array = data;
+                                    config.img_array[file_count - 1] = addr;
+
+                                    gui_free(file_path);
+                                }
+
+                            }
+                            closedir(dir);
+                            // gui_log("file_count %d, folder: %s\n", file_count, folder);
+                            if (0 == strcmp(folder, floder_symbol))
+                            {
+                                config.file_mark[0] = file_count;
+                            }
+                            else if (0 == strcmp(folder, floder_func))
+                            {
+                                config.file_mark[1] = file_count;
+                            }
+                        }
+                        config.num_pic = file_count;
+                    }
+
+                    gui_keyboard_create(parent, "test", &config,
+                                        0, 0, gui_get_screen_width(), gui_get_screen_height());
+                    // while (true)
+                    // {
+                    //     // #define IS_STR(str) (!strcmp(p->attr[i], str))
+                    //     if (!(p->attr[i]))
+                    //     {
+                    //         break;
+                    //     }
+                    //     if (!strcmp(p->attr[i], "x"))
+                    //     {
+                    //         x = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "y"))
+                    //     {
+                    //         y = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "w"))
+                    //     {
+                    //         w = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "h"))
+                    //     {
+                    //         h = atoi(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "folder"))
+                    //     {
+                    //         folder = gui_strdup(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "mainBg"))
+                    //     {
+                    //         config.data_main_bg = gui_strdup(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "centerBg"))
+                    //     {
+                    //         config.data_center_bg = gui_strdup(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "centerPercent"))
+                    //     {
+                    //         config.center_percent = atof(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "sideScale"))
+                    //     {
+                    //         config.side_scale = atof(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "sidePosPercent"))
+                    //     {
+                    //         config.side_pos_percent = atof(p->attr[++i]);
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "blendMode"))
+                    //     {
+                    //         i++;
+                    //         if (!strcmp(p->attr[i], "imgBypassMode"))
+                    //         {
+                    //             blendMode = IMG_BYPASS_MODE;
+                    //         }
+                    //         else if (!strcmp(p->attr[i], "imgFilterBlack"))
+                    //         {
+                    //             blendMode = IMG_FILTER_BLACK;
+                    //         }
+                    //         else if (!strcmp(p->attr[i], "imgSrcOverMode"))
+                    //         {
+                    //             blendMode = IMG_SRC_OVER_MODE;
+                    //         }
+                    //         else if (!strcmp(p->attr[i], "imgCoverMode"))
+                    //         {
+                    //             blendMode = IMG_COVER_MODE;
+                    //         }
+                    //     }
+                    //     else if (!strcmp(p->attr[i], "opacity"))
+                    //     {
+                    //         opacity = atof(p->attr[++i]);
+                    //     }
+                    //     i++;
+                    // }
+
+                    // char *ptxt = get_space_string_head(p->txt);
+                    // if (!folder)
+                    // {
+                    //     gui_log("gallery folder is not found!\n");
+                    // }
+                    // else if (folder)
+                    // {
+                    //     int file_count = 0;
+                    //     DIR *dir = 0;
+                    //     struct dirent *entry;
+                    //     char *dir_path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+
+                    //     // init image array
+                    //     sprintf(dir_path, "%s%s", GUI_ROOT_FOLDER, folder);
+                    //     if ((dir = opendir(dir_path)) == NULL)
+                    //     {
+                    //         gui_free(dir_path);
+                    //         //perror("opendir() failed"); return;
+                    //     }
+                    //     gui_free(dir_path);
+
+                    //     while ((entry = readdir(dir)) != NULL)
+                    //     {
+                    //         if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                    //         {
+                    //             char *file_path = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                    //             void *addr = NULL;
+                    //             void *data = NULL;
+
+                    //             file_count++;
+                    //             sprintf(file_path, "%s/%s", folder, entry->d_name);
+                    //             addr = gui_get_file_address(file_path);
+                    //             if (!config.img_array)
+                    //             {
+                    //                 data = gui_malloc(sizeof(void *));
+                    //             }
+                    //             else
+                    //             {
+                    //                 data = gui_realloc(config.img_array, file_count * (sizeof(void *)));
+                    //             }
+                    //             config.img_array = data;
+                    //             config.img_array[file_count - 1] = addr;
+
+                    //             gui_free(file_path);
+                    //         }
+                    //     }
+                    //     closedir(dir);
+
+                    //     config.num_pic = file_count;
+                    // }
+
+                    // if (config.data_main_bg)
+                    // {
+                    //     config.data_main_bg = gui_get_file_address(config.data_main_bg);
+                    // }
+                    // if (config.data_center_bg)
+                    // {
+                    //     config.data_center_bg = gui_get_file_address(config.data_center_bg);
+                    // }
+
+                    // gui_gallery_create(parent, ptxt, &config,
+                    //    x, y, w, h);
                 }
                 break;
             // case MOVIE:
@@ -2297,8 +2876,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     if (type && from && to && dur && repeatCount)
                     {
                         int dur_num = 0;
-                        int from_num[3];
-                        int to_num[3];
+                        int from_num[3]; GUI_UNUSED(from_num);
+                        int to_num[3]; GUI_UNUSED(to_num);
                         int repeat_num = 0;
                         if (!strcmp(type, "rotate"))
                         {
@@ -2390,6 +2969,55 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
 
                     }
+                }
+                break;
+            case MACRO_MOTORIZED_CURTAIN:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        if (!strcmp(p->attr[i], "switchOpen"))
+                        {
+                            open_switch_name = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "switchClose"))
+                        {
+                            close_switch_name = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "switchPause"))
+                        {
+                            pause_switch_name = gui_strdup(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    char *ptxt = get_space_string_head(p->txt);
+                    //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+                    parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
                 }
                 break;
             default:
@@ -2699,7 +3327,7 @@ static void screen_prepare(gui_obj_t *obj, struct gui_dispdev *dc, gui_rect_t *r
                 msg.type = GUI_SRV_CB;
                 msg.cb = obj->callback.link_cb;
                 msg.u.payload = obj->callback.param;
-                send_msg_to_gui_server(&msg);
+                gui_send_msg_to_server(&msg);
         }
 
     }

@@ -55,8 +55,9 @@ Mkfile.old
 dkms.conf
 *.pyc
 .gitignore
-lvgl_vs_sim/cconfig.h
-lvgl_vs_sim/gui.bin
+keil_sim/RTE/*
+keil_sim/build/*
+keil_sim/gui_engine.uvguix.*
 gui_engine/rtk_gui_sim/cconfig.h
 *.dblite
 
@@ -72,3 +73,9 @@ doc/_build
 # editor config
 .vscode/
 win32_sim/gui.bin
+
+# example
+gui_engine/example/screen_480_480/Visual Disigner Prj/480x480/Simulate/
+gui_engine/example/screen_480_480/Visual Disigner Prj/480x480/Export/
+gui_engine/example/screen_640_360/Simulate/
+gui_engine/example/screen_640_360/Export/

@@ -19,7 +19,6 @@
  *============================================================================*/
 #include <string.h>
 #include "guidef.h"
-#include "tp_algo.h"
 #include "gui_obj.h"
 #include "gui_server.h"
 #include "gui_img.h"
@@ -317,6 +316,26 @@ static void gui_curtain_prepare(gui_obj_t *obj)
     matrix_translate(dx, dy, obj->matrix);
 }
 
+static void gui_curtain_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_curtain_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_curtain_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_curtain_ctor(gui_curtain_t     *this,
                       gui_obj_t         *parent,
                       const char        *filename,
@@ -328,8 +347,9 @@ void gui_curtain_ctor(gui_curtain_t     *this,
                       float              scope)
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
-    ((gui_obj_t *)this)->obj_prepare = gui_curtain_prepare;
-    ((gui_obj_t *)this)->obj_input_prepare = gui_curtain_input_prepare;
+    ((gui_obj_t *)this)->obj_cb = gui_curtain_cb;
+    ((gui_obj_t *)this)->has_input_prepare_cb = true;
+    ((gui_obj_t *)this)->has_prepare_cb = true;
     ((gui_obj_t *)this)->type = CURTAIN;
 
     if (scope == 0)

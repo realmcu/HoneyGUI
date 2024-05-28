@@ -23,5 +23,5 @@ function stopSpeed(params) {
 	wifi.stopSpeed()
     }
 sw.getElementById('switch2')
-sw.onOn(startSpeed)
-sw.onOff(stopSpeed)
+sw.switch_on(startSpeed)
+sw.switch_off(stopSpeed)

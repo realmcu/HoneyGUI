@@ -2,6 +2,8 @@
 /*
  * File      : tp_algo.c
  */
+
+#ifndef RTK_TP_ALGO_V2
 //#include <string.h>
 #include <gui_server.h>
 #include <guidef.h>
@@ -76,7 +78,11 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
         {
             tp.type = TOUCH_INVALIDE;
         }
+#if _WIN32 || RTL8772F
+        if ((up_cnt == 1) && (down_cnt > 0))
+#else
         if ((up_cnt == 4) && (down_cnt > 0))
+#endif
         {
             tp_local_event = GUI_TOUCH_EVENT_UP;
             down_cnt = 0;
@@ -491,4 +497,4 @@ touch_info_t *tp_get_info(void)
 {
     return &tp;
 }
-
+#endif

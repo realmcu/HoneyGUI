@@ -19,16 +19,11 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
 #include "acc_sw_rle.h"
 #include <acc_sw_raster.h>
 #include "acc_sw_rle_bypass.h"
 #include "acc_sw_rle_cover.h"
-#include "acc_sw_rle_bypass_matrix.h"
 #include "acc_sw_rle_filter.h"
-#include "acc_sw_rle_filter_matrix.h"
-#include "acc_sw_rle_source_over.h"
-#include "acc_sw_rle_source_over_matrix.h"
 
 
 #if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E)
@@ -130,14 +125,14 @@ void uncompressed_rle_rect(imdc_file_t *file, int16_t x, int16_t y, int16_t w, i
 void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint16_t *linebuf = (uint16_t *)buf;
 
     // gui_log("file->compressed_addr[%d] %d\n", line, file->compressed_addr[line]);
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)addr;
+        imdc_rgb565_node_t *node = (imdc_rgb565_node_t *)(uintptr_t)addr;
         // gui_log("%d 0x%x\n", node->len, node->pixel16);
         gui_memset16(linebuf, node->pixel16, node->len);
 
@@ -148,13 +143,13 @@ void uncompressed_rle_rgb565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint8_t *linebuf = (uint8_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_argb8565_node_t *node = (imdc_argb8565_node_t *)addr;
+        imdc_argb8565_node_t *node = (imdc_argb8565_node_t *)(uintptr_t)addr;
         for (uint32_t i = 0; i < node->len; i++)
         {
             linebuf[i * 3 + 0] = node->pixel & 0xff;
@@ -168,13 +163,13 @@ void uncompressed_rle_argb8565(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint8_t *linebuf = (uint8_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_rgb888_node_t *node = (imdc_rgb888_node_t *)addr;
+        imdc_rgb888_node_t *node = (imdc_rgb888_node_t *)(uintptr_t)addr;
         for (uint32_t i = 0; i < node->len; i++)
         {
             linebuf[i * 3]     = node->pixel_b;
@@ -188,13 +183,13 @@ void uncompressed_rle_rgb888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 void uncompressed_rle_argb8888(imdc_file_t *file, uint32_t line,  uint8_t *buf)
 {
     //imdc_file_header_t *header = (imdc_file_header_t *)file;
-    uint32_t start = (uint32_t)file + file->compressed_addr[line];
-    uint32_t end = (uint32_t)file + file->compressed_addr[line + 1];
+    uint32_t start = (uint32_t)(uintptr_t)file + file->compressed_addr[line];
+    uint32_t end = (uint32_t)(uintptr_t)file + file->compressed_addr[line + 1];
     uint32_t *linebuf = (uint32_t *)buf;
 
     for (uint32_t addr = start; addr < end;)
     {
-        imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)addr;
+        imdc_argb8888_node_t *node = (imdc_argb8888_node_t *)(uintptr_t)addr;
         gui_memset32(linebuf, node->pixel32, node->len);
 
         addr = addr + sizeof(imdc_argb8888_node_t);
@@ -214,7 +209,7 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
 
     memcpy(buf, head, sizeof(struct gui_rgb_data_head));
     head = buf;
-    line_buf = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(buf));
+    line_buf = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(buf));
     if (head->type == RGB565)//rle_rgb565
     {
         uint8_t source_bytes_per_pixel = 2;
@@ -259,8 +254,9 @@ void rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
+    uint8_t opacity = image ->opacity_value;
     char img_type = head->type;
-    gui_matrix_t *matrix = image->matrix;
+    gui_matrix_t *matrix = &image->matrix;
     bool identity = true;
     if (
         (matrix->m[0][0] == 1) && \
@@ -279,7 +275,8 @@ void rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         identity = false;
     }
 
-    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565))
+    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565) && (opacity == 255) &&
+        (rect == NULL))
     {
         if (image->blend_mode == IMG_COVER_MODE)
         {

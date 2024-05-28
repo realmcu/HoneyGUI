@@ -25,6 +25,7 @@
 #include "gui_tabview.h"
 #include "gui_matrix.h"
 #include "gui_tab.h"
+#include "kb_algo.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -112,55 +113,26 @@ static void gui_tabview_input_prepare(gui_obj_t *obj)
     }
 }
 
-static void gui_tabview_loop_unpadding(gui_tabview_t *tabview)
-{
-    gui_obj_t *object = (gui_obj_t *)tabview;
-    gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &object->child_list)
-    {
-        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-
-        // left unpadding
-        if (GUI_TYPE(gui_tab_t, obj)->id.x == -tabview->tab_cnt_left - 1)
-        {
-            GUI_TYPE(gui_tab_t, obj)->id.x = tabview->tab_cnt_right;
-            tabview->loop_status = 0;
-            break;
-        }
-        // right unpadding
-        else if (GUI_TYPE(gui_tab_t, obj)->id.x == tabview->tab_cnt_right + 1)
-        {
-            GUI_TYPE(gui_tab_t, obj)->id.x = -tabview->tab_cnt_left;
-            tabview->loop_status2 = 0;
-            break;
-        }
-    }
-}
-
 static void gui_tabview_prepare(gui_obj_t *obj)
 {
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    kb_info_t *kb = kb_get_info();
     gui_tabview_t *tabview = (gui_tabview_t *)obj;
     gui_tabview_t *this = (gui_tabview_t *)obj;
     gui_tabview_tab_id_t last_cur_id = this->cur_id;
     uint8_t last = this->checksum;
 
+    if ((kb->type == KB_SHORT) && (obj->event_dsc_cnt > 0))
+    {
+        gui_obj_event_set(obj, GUI_EVENT_KB_SHORT_CLICKED);
+    }
     if (tabview->jump.jump_flag)
     {
         tabview->cur_id.y = tabview->jump.jump_id.y;
         tabview->cur_id.x = tabview->jump.jump_id.x;
         tabview->jump.jump_flag = false;
 
-        // handle jump from one edge(hold) to the other edge.
-        if ((tabview->cur_id.x == tabview->tab_cnt_left) || (tabview->cur_id.x == tabview->tab_cnt_right))
-        {
-            if ((tabview->loop) && (tabview->loop_status || tabview->loop_status2))
-            {
-                gui_tabview_loop_unpadding(tabview);
-            }
-        }
         return;
     }
 
@@ -189,7 +161,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     {
     case TOUCH_HOLD_X:
         {
-            if (!this->loop)
+            if (!this->loop_x)
             {
                 if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
                 {
@@ -234,44 +206,51 @@ static void gui_tabview_prepare(gui_obj_t *obj)
 
     case TOUCH_HOLD_Y:
         {
-            if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
+            if (!this->loop_y)
             {
-                break;
-            }
-
-            if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
-            {
-                break;
-            }
-
-            if ((obj->skip_tp_up_hold) && (obj->skip_tp_down_hold))
-            {
-                break;
-            }
-
-            if ((tabview->tab_cnt_down == 0) && (tabview->tab_cnt_up == 0))
-            {
-                break;
-            }
-
-            gui_obj_event_set(obj, GUI_EVENT_8);
-            this->release_y = tp->deltaY;
-
-            if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_down == 0))
-            {
-                if (this->release_y < 0)
+                if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
                 {
                     break;
                 }
-            }
 
-            if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_up == 0))
-            {
-                if (this->release_y > 0)
+                if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
                 {
-                    this->release_y = 0;
                     break;
                 }
+
+                if ((obj->skip_tp_up_hold) && (obj->skip_tp_down_hold))
+                {
+                    break;
+                }
+
+                if ((tabview->tab_cnt_down == 0) && (tabview->tab_cnt_up == 0))
+                {
+                    break;
+                }
+
+                gui_obj_event_set(obj, GUI_EVENT_8);
+                this->release_y = tp->deltaY;
+
+                if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_down == 0))
+                {
+                    if (this->release_y < 0)
+                    {
+                        break;
+                    }
+                }
+
+                if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_up == 0))
+                {
+                    if (this->release_y > 0)
+                    {
+                        this->release_y = 0;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                this->release_y = tp->deltaY;
             }
         }
         break;
@@ -280,7 +259,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         {
             gui_log("[TV]TOUCH_LEFT_SLIDE\n");
 
-            if (!this->loop)
+            if (!this->loop_x)
             {
                 if ((tabview->tab_cnt_right == 0) && (tabview->cur_id.x == 0))
                 {
@@ -296,7 +275,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
             //when current tab is the end,come back to current tab if sliding.
             if ((tabview->cur_id.x == tabview->tab_cnt_right))
             {
-                if (tabview->loop)
+                if (tabview->loop_x)
                 {
                     if (tabview->tab_cnt_left != 0)
                     {
@@ -321,12 +300,13 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         {
             gui_log("[TV]TOUCH_RIGHT_SLIDE\n");
 
-            if (!this->loop)
+            if (!this->loop_x)
             {
                 if ((tabview->tab_cnt_left == 0) && (tabview->cur_id.x == 0))
                 {
                     break;
                 }
+
                 if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
                 {
                     break;
@@ -336,7 +316,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
             //when current tab is the end,come back to current tab if sliding.
             if (tabview->cur_id.x == tabview->tab_cnt_left)
             {
-                if (tabview->loop)
+                if (tabview->loop_x)
                 {
                     if (tabview->tab_cnt_right != 0)
                     {
@@ -361,20 +341,40 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         {
             gui_log("[TV]TOUCH_DOWN_SLIDE\n");
 
-            if ((tabview->tab_cnt_up == 0) && (tabview->cur_id.y == 0))
+            if (!this->loop_y)
             {
-                break;
+                if ((tabview->tab_cnt_up == 0) && (tabview->cur_id.y == 0))
+                {
+                    break;
+                }
+
+                if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
+                {
+                    break;
+                }
             }
 
             //when current tab is the end,come back to current tab if sliding.
             if (tabview->cur_id.y == tabview->tab_cnt_up)
             {
-                return;
+                if (tabview->loop_y)
+                {
+                    if (tabview->tab_cnt_down != 0)
+                    {
+                        tabview->cur_id.y = tabview->tab_cnt_down;
+                    }
+                    else
+                    {
+                        tabview->cur_id.y = 0;
+                    }
+                    this->release_y = this->release_y - tabview->base.h;
+                }
             }
-
-            tabview->cur_id.y = tabview->cur_id.y - 1;
-            this->release_y = this->release_y - tabview->base.h;
-            gui_obj_event_set(obj, GUI_EVENT_1);
+            else
+            {
+                tabview->cur_id.y = tabview->cur_id.y - 1;
+                this->release_y = this->release_y - tabview->base.h;
+            }
         }
         break;
 
@@ -382,20 +382,40 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         {
             gui_log("[TV]TOUCH_UP_SLIDE\n");
 
-            if ((tabview->tab_cnt_down == 0) && (tabview->cur_id.y == 0))
+            if (!this->loop_y)
             {
-                break;
+                if ((tabview->tab_cnt_down == 0) && (tabview->cur_id.y == 0))
+                {
+                    break;
+                }
+
+                if ((obj->skip_tp_up_hold) && (tp->deltaY < 0))
+                {
+                    break;
+                }
             }
 
             //when current tab is the end,come back to current tab if sliding.
             if (tabview->cur_id.y == tabview->tab_cnt_down)
             {
-                return;
+                if (tabview->loop_y)
+                {
+                    if (tabview->tab_cnt_up != 0)
+                    {
+                        tabview->cur_id.y = tabview->tab_cnt_up;
+                    }
+                    else
+                    {
+                        tabview->cur_id.y = 0;
+                    }
+                    this->release_y = this->release_y + tabview->base.h;
+                }
             }
-
-            tabview->cur_id.y = tabview->cur_id.y + 1;
-            this->release_y = this->release_y + tabview->base.h;
-            gui_obj_event_set(obj, GUI_EVENT_2);
+            else
+            {
+                tabview->cur_id.y = tabview->cur_id.y + 1;
+                this->release_y = this->release_y + tabview->base.h;
+            }
         }
         break;
 
@@ -442,7 +462,7 @@ static void gui_tabview_prepare(gui_obj_t *obj)
     }
 
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));
 
     if (last != this->checksum)
     {
@@ -496,10 +516,40 @@ void gui_tabview_destory(gui_obj_t *obj)
     }
 }
 
+static void gui_tabview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_tabview_input_prepare(obj);
+            }
+            break;
+
+        case OBJ_PREPARE:
+            {
+                gui_tabview_prepare(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            {
+                gui_tabview_destory(obj);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
-void gui_tabview_set_style(gui_tabview_t *this, SLIDE_STYLE style)
+void gui_tabview_set_style(gui_tabview_t *this, T_SLIDE_STYLE style)
 {
     this->style = style;
 }
@@ -527,10 +577,10 @@ void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
 
 gui_tabview_t *gui_tabview_create(void       *parent,
                                   const char *filename,
-                                  int16_t    x,
-                                  int16_t    y,
-                                  int16_t    w,
-                                  int16_t    h)
+                                  int16_t     x,
+                                  int16_t     y,
+                                  int16_t     w,
+                                  int16_t     h)
 {
     gui_tabview_t *this = gui_malloc(sizeof(gui_tabview_t));
     gui_dispdev_t *dc = gui_get_dc();
@@ -548,10 +598,10 @@ gui_tabview_t *gui_tabview_create(void       *parent,
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_input_prepare = gui_tabview_input_prepare;
-    GET_BASE(this)->obj_prepare = gui_tabview_prepare;
-    GET_BASE(this)->obj_end = NULL;
-    GET_BASE(this)->obj_destory = gui_tabview_destory;
+    GET_BASE(this)->obj_cb = gui_tabview_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = TABVIEW;
     this->initial = true;
     gui_list_init(&(GET_BASE(this)->child_list));
@@ -572,9 +622,14 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
     parent_tabview->jump.jump_id.y = idy;
 }
 
-void gui_tabview_loop(gui_tabview_t *tabview, bool loop_or_not)
+void gui_tabview_loop_x(gui_tabview_t *tabview, bool loop)
 {
-    tabview->loop = loop_or_not;
+    tabview->loop_x = loop;
+}
+
+void gui_tabview_loop_y(gui_tabview_t *tabview, bool loop)
+{
+    tabview->loop_y = loop;
 }
 
 void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp)

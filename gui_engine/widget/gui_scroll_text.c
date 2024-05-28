@@ -20,6 +20,7 @@
 #include "gui_scroll_text.h"
 #include "font_mem.h"
 #include "font_stb.h"
+#include "font_mem_matrix.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -92,7 +93,7 @@ extern void gui_text_ctor(gui_text_t *this,
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_scroll_text_font_load(gui_text_t *text, gui_rect_t *rect)
+static void gui_scroll_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -108,12 +109,18 @@ static void gui_scroll_text_font_load(gui_text_t *text, gui_rect_t *rect)
         }
         break;
 
+    case GUI_FONT_SRC_MAT:
+        {
+            gui_font_mat_load(text, rect);
+        }
+        break;
+
     default:
         break;
     }
 }
 
-static void gui_scroll_text_font_draw(gui_text_t *text, gui_rect_t *rect)
+static void gui_scroll_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -126,6 +133,12 @@ static void gui_scroll_text_font_draw(gui_text_t *text, gui_rect_t *rect)
     case GUI_FONT_SRC_TTF:
         {
             gui_font_stb_draw(text, rect);
+        }
+        break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+            gui_font_mat_draw(text, rect);
         }
         break;
 
@@ -150,50 +163,90 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
         }
         break;
 
+    case GUI_FONT_SRC_MAT:
+        {
+            gui_font_mat_unload(text);
+        }
+        break;
+
     default:
         break;
     }
 }
 
-static void gui_scroll_text_update_att(struct _gui_obj_t *this)
+static void gui_scroll_text_update_att(gui_obj_t *obj)
 {
-    gui_scroll_text_t *obj = (void *)this;
-    size_t frame_count;
+    gui_scroll_text_t *this = (void *)obj;
+    uint32_t cur_time_gap;
 
-    if (obj->base.animate && obj->base.animate->animate)
+    if (this->base.animate && this->base.animate->animate)
     {
-        frame_count = obj->base.animate->dur * 30 / (1000);
-        obj->base.animate->callback(obj->base.animate->p);
-        obj->base.animate->current_frame++;
+        cur_time_gap = gui_ms_get() - this->base.animate->cur_time_ms;
+        this->base.animate->cur_time_ms = gui_ms_get();
 
-        if (obj->base.animate->current_frame > frame_count)
+        if (cur_time_gap >= 2 * this->base.animate->dur)
         {
-            if (obj->base.animate->repeat_count == 0)
+            this->base.animate->init_time_ms += cur_time_gap;
+        }
+
+        if (this->base.animate->repeat_count == 0)
+        {
+            if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms) >= this->base.animate->dur)
             {
-                obj->base.animate->animate = false;
+                this->base.animate->callback(this->base.animate->p, this);
+                this->base.animate->animate = false;
+                this->base.animate->progress_percent = 1.0f;
             }
-            else if (obj->base.animate->repeat_count < 0)
+            else
             {
-                obj->base.animate->current_frame = 0;
+                this->base.animate->progress_percent = (float)(this->base.animate->cur_time_ms -
+                                                               this->base.animate->init_time_ms) /
+                                                       (float)this->base.animate->dur;
             }
-            else if (obj->base.animate->repeat_count > 0)
+        }
+        else if (this->base.animate->repeat_count < 0)
+        {
+            if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms) >= this->base.animate->dur)
             {
-                obj->base.animate->current_repeat_count++;
-                if (obj->base.animate->current_repeat_count >= obj->base.animate->repeat_count)
+                this->base.animate->callback(this->base.animate->p, this);
+                this->base.animate->init_time_ms += this->base.animate->dur;
+                this->base.animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->base.animate->progress_percent = (float)(this->base.animate->cur_time_ms -
+                                                               this->base.animate->init_time_ms) /
+                                                       (float)this->base.animate->dur;
+            }
+        }
+        else if (this->base.animate->repeat_count > 0)
+        {
+            if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms -
+                 this->base.animate->current_repeat_count * this->base.animate->dur) >=
+                this->base.animate->dur)
+            {
+                if (this->base.animate->current_repeat_count < this->base.animate->repeat_count)
                 {
-                    obj->base.animate->animate = false;
+                    this->base.animate->callback(this->base.animate->p, this);
+                    this->base.animate->current_repeat_count ++;
                 }
                 else
                 {
-                    obj->base.animate->current_frame = 0;
+                    this->base.animate->callback(this->base.animate->p, this);
+                    this->base.animate->animate = false;
                 }
+                this->base.animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->base.animate->progress_percent = (float)(this->base.animate->cur_time_ms -
+                                                               this->base.animate->init_time_ms -
+                                                               this->base.animate->current_repeat_count * this->base.animate->dur) /
+                                                       (float)this->base.animate->dur;
             }
         }
-        obj->base.animate->progress_percent = ((float)(obj->base.animate->current_frame)) /
-                                              ((float)(frame_count));
     }
 }
-
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
@@ -236,7 +289,7 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     struct gui_dispdev *dc;
     int32_t offset;
     uint32_t index;
-    gui_rect_t draw_rect = {0};
+    gui_text_rect_t draw_rect = {0};
     uint32_t total_section_count;
 
     if (text->base.len == 0)
@@ -249,6 +302,10 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
     {
         cur_time_ms = gui_ms_get();
     }
+    draw_rect.x1 = text->base.offset_x;
+    draw_rect.y1 = text->base.offset_y;
+    draw_rect.x2 = draw_rect.x1 + obj->w;
+    draw_rect.y2 = draw_rect.y1 + obj->h;
 
     if (text->base.mode == SCROLL_X)
     {
@@ -278,12 +335,19 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             draw_rect.y2 = draw_rect.y1 + offset;
         }
     }
-    else
+    else if (text->base.mode == SCROLL_Y_REVERSE)
     {
-        draw_rect.x1 = text->base.offset_x;
-        draw_rect.y1 = text->base.offset_y;
-        draw_rect.x2 = draw_rect.x1 + obj->w;
-        draw_rect.y2 = draw_rect.y1 + obj->h;
+        offset = text->base.char_height_sum;
+        if (offset > obj->h || offset == 0)
+        {
+            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+            text->cnt_value = (text->end_value + text->start_value + offset) * index
+                              / text->interval_time_ms;
+            draw_rect.x1 = text->base.offset_x;
+            draw_rect.x2 = draw_rect.x1 + obj->w;
+            draw_rect.y2 = text->base.offset_y + obj->h + text->cnt_value;
+            draw_rect.y1 = draw_rect.y2 - offset;
+        }
     }
 
     draw_rect.xboundleft = text->base.offset_x;
@@ -327,6 +391,34 @@ static void gui_scroll_text_destory(gui_obj_t *obj)
     scroll_text_count = scroll_text_count > 0 ? scroll_text_count - 1 : 0;
 }
 
+static void gui_scroll_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_scroll_text_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_scroll_text_draw(obj);
+            break;
+
+        case OBJ_END:
+            gui_scroll_text_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_scroll_text_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_scroll_text_ctor(gui_scroll_text_t *this,
                                  gui_obj_t         *parent,
                                  const char        *name,
@@ -344,10 +436,11 @@ static void gui_scroll_text_ctor(gui_scroll_text_t *this,
 
     //for root class
     root->type = SCROLLTEXTBOX;
-    root->obj_prepare = gui_scroll_text_prepare;
-    root->obj_draw = gui_scroll_text_draw;
-    root->obj_end = gui_scroll_text_end;
-    root->obj_destory = gui_scroll_text_destory;
+    root->obj_cb = gui_scroll_text_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     this->init_time_ms = gui_ms_get();
 }

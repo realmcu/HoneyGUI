@@ -21,6 +21,10 @@
 #include "gui_matrix.h"
 #include "font_mem.h"
 #include "font_stb.h"
+#include "font_mem_img.h"
+#include "font_mem_matrix.h"
+#include "gui_keyboard.h"
+#include "tp_algo.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -78,7 +82,22 @@ static bool content_change = false;
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_text_font_load(gui_text_t *text, gui_rect_t *rect)
+static bool gui_text_matrix_is_identity(gui_matrix_t *matrix)
+{
+    if (matrix == NULL)
+    {
+        return false;
+    }
+    if (matrix->m[0][0] == 1.0f && matrix->m[1][1] == 1.0f)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+static void gui_text_font_load(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -100,12 +119,25 @@ static void gui_text_font_load(gui_text_t *text, gui_rect_t *rect)
         }
         break;
 
+    case GUI_FONT_SRC_MAT:
+        {
+            if (gui_text_matrix_is_identity(text->base.matrix))
+            {
+                gui_font_mem_load(text, rect);
+            }
+            else
+            {
+                gui_font_mat_load(text, rect);
+            }
+        }
+        break;
+
     default:
         break;
     }
 }
 
-static void gui_text_font_draw(gui_text_t *text, gui_rect_t *rect)
+static void gui_text_font_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     switch (text->font_type)
     {
@@ -124,6 +156,19 @@ static void gui_text_font_draw(gui_text_t *text, gui_rect_t *rect)
     case GUI_FONT_SRC_IMG:
         {
 
+        }
+        break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+            if (gui_text_matrix_is_identity(text->base.matrix))
+            {
+                gui_font_mem_draw(text, rect);
+            }
+            else
+            {
+                gui_font_mat_draw(text, rect);
+            }
         }
         break;
 
@@ -153,6 +198,13 @@ static void gui_text_font_unload(gui_text_t *text)
 
         }
         break;
+
+    case GUI_FONT_SRC_MAT:
+        {
+            gui_font_mat_unload(text);
+        }
+        break;
+
     default:
         break;
     }
@@ -185,57 +237,104 @@ static void gui_text_font_destory(gui_text_t *text)
         }
         break;
 
+    case GUI_FONT_SRC_MAT:
+        {
+
+        }
+        break;
+
     default:
         break;
     }
 }
-static void gui_text_update_att(struct _gui_obj_t *this)
+static void gui_text_update_att(gui_obj_t *obj)
 {
-    gui_text_t *obj = (void *)this;
-    size_t frame_count;
+    gui_text_t *this = (void *)obj;
+    uint32_t cur_time_gap;
 
-    if (obj->animate && obj->animate->animate)
+    if (this->animate && this->animate->animate)
     {
-        frame_count = obj->animate->dur * 30 / (1000);
-        obj->animate->callback(obj->animate->p);
-        obj->animate->current_frame++;
+        cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
+        this->animate->cur_time_ms = gui_ms_get();
 
-        if (obj->animate->current_frame > frame_count)
+        if (cur_time_gap >= 2 * this->animate->dur)
         {
-            if (obj->animate->repeat_count == 0)
+            this->animate->init_time_ms += cur_time_gap;
+        }
+
+        if (this->animate->repeat_count == 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
             {
-                obj->animate->animate = false;
+                this->animate->callback(this->animate->p, this);
+                this->animate->animate = false;
+                this->animate->progress_percent = 1.0f;
             }
-            else if (obj->animate->repeat_count < 0)
+            else
             {
-                obj->animate->current_frame = 0;
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
+                                                          this->animate->init_time_ms) /
+                                                  (float)this->animate->dur;
             }
-            else if (obj->animate->repeat_count > 0)
+        }
+        else if (this->animate->repeat_count < 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
             {
-                obj->animate->current_repeat_count++;
-                if (obj->animate->current_repeat_count >= obj->animate->repeat_count)
+                this->animate->callback(this->animate->p, this);
+                this->animate->init_time_ms += this->animate->dur;
+                this->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
+                                                          this->animate->init_time_ms) /
+                                                  (float)this->animate->dur;
+            }
+        }
+        else if (this->animate->repeat_count > 0)
+        {
+            if ((this->animate->cur_time_ms - this->animate->init_time_ms -
+                 this->animate->current_repeat_count * this->animate->dur) >=
+                this->animate->dur)
+            {
+                if (this->animate->current_repeat_count < this->animate->repeat_count)
                 {
-                    obj->animate->animate = false;
+                    this->animate->callback(this->animate->p, this);
+                    this->animate->current_repeat_count ++;
                 }
                 else
                 {
-                    obj->animate->current_frame = 0;
+                    this->animate->callback(this->animate->p, this);
+                    this->animate->animate = false;
                 }
+                this->animate->progress_percent = 1.0f;
+            }
+            else
+            {
+                this->animate->progress_percent = (float)(this->animate->cur_time_ms - this->animate->init_time_ms -
+                                                          this->animate->current_repeat_count * this->animate->dur) /
+                                                  (float)this->animate->dur;
             }
         }
-        obj->animate->progress_percent = ((float)(obj->animate->current_frame)) /
-                                         ((float)(frame_count));
     }
 }
 
 static void gui_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
+    touch_info_t *tp = tp_get_info();
     gui_point_t point = {0, 0, 1};
     uint8_t last;
+    if (this->font_type == GUI_FONT_SRC_IMG)
+    {
+        return;
+    }
+    matrix_multiply_point(obj->matrix, &point);
+    this->offset_x = point.p[0];
+    this->offset_y = point.p[1];
 
     gui_text_update_att(obj);
-    matrix_multiply_point(obj->matrix, &point);
 
     if (this->mode == LEFT ||
         this->mode == CENTER ||
@@ -243,12 +342,25 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         this->base.h = this->font_height;
     }
-    this->offset_x = point.p[0];
-    this->offset_y = point.p[1];
+
+    switch (tp->type)
+    {
+    case TOUCH_SHORT:
+        {
+            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
 
     last = this->checksum;
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
 
     if (last != this->checksum || content_change)
     {
@@ -261,7 +373,7 @@ static void gui_text_draw(gui_obj_t *obj)
 {
     gui_text_t *text = (gui_text_t *)obj;
     struct gui_dispdev *dc;
-    gui_rect_t draw_rect = {0};
+    gui_text_rect_t draw_rect = {0};
     uint32_t total_section_count;
 
     if (text->len == 0)
@@ -303,6 +415,34 @@ static void gui_text_destory(gui_obj_t *obj)
     gui_text_font_destory(text);
 }
 
+static void gui_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_text_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_text_draw(obj);
+            break;
+
+        case OBJ_END:
+            gui_text_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_text_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 void gui_text_ctor(gui_text_t *this,
                    gui_obj_t  *parent,
                    const char *name,
@@ -317,17 +457,24 @@ void gui_text_ctor(gui_text_t *this,
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
     root->type = TEXTBOX;
-    root->obj_prepare = gui_text_prepare;
-    root->obj_draw = gui_text_draw;
-    root->obj_end = gui_text_end;
-    root->obj_destory = gui_text_destory;
+    root->obj_cb = gui_text_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
     //for self
     this->mode = LEFT;
+    this->inputable = false;
 }
 
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+
+void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_CLICKED, parameter);
+}
 
 void gui_text_set(gui_text_t   *this,
                   void         *text,
@@ -362,7 +509,7 @@ void gui_text_set_animate(void    *o,
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
+    animate->callback = (void (*)(void *, void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     ((gui_text_t *)o)->animate = animate;
@@ -371,6 +518,11 @@ void gui_text_set_animate(void    *o,
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 {
     this->mode = mode;
+}
+
+void gui_text_input_set(gui_text_t *this, bool inputable)
+{
+    this->inputable = inputable;
 }
 
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
@@ -425,8 +577,8 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
     {
         text_img = this->scale_img;
         gui_img_set_attribute(text_img, "text_img", img, img_x, img_y);
-        text_img->base.w = gui_get_screen_width();
-        text_img->base.h = gui_get_screen_height();
+        text_img->base.w = gui_img_get_width(text_img);
+        text_img->base.h = gui_img_get_height(text_img);
     }
 
     switch (font_img_type)
@@ -434,14 +586,14 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
     case RGB565:
     case RGB888:
         {
-            text_img->draw_img.blend_mode = IMG_FILTER_BLACK;
+            text_img->blend_mode = IMG_FILTER_BLACK;
         }
         break;
 
     case ARGB8565:
     case RGBA8888:
         {
-            text_img->draw_img.blend_mode = IMG_SRC_OVER_MODE;
+            text_img->blend_mode = IMG_SRC_OVER_MODE;
         }
         break;
 

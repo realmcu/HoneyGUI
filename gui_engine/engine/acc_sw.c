@@ -20,15 +20,10 @@
 #include <draw_img.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "acc_engine.h"
 #include "acc_sw_rle.h"
 #include "acc_sw_bypass.h"
 #include "acc_sw_cover.h"
-#include "acc_sw_bypass_matrix.h"
 #include "acc_sw_filter.h"
-#include "acc_sw_filter_matrix.h"
-#include "acc_sw_source_over.h"
-#include "acc_sw_source_over_matrix.h"
 #include <acc_sw_raster.h>
 #include "acc_sw.h"
 
@@ -97,8 +92,9 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
     uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
     gui_rgb_data_head_t *head = image->data;
+    uint8_t opacity = image ->opacity_value;
     char img_type = head->type;
-    gui_matrix_t *matrix = image->matrix;
+    gui_matrix_t *matrix = &image->matrix;
     bool identity = false;
     if (
         (matrix->m[0][0] == 1) && \
@@ -113,7 +109,8 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         identity = true;
     }
 
-    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565))
+    if ((dc_bytes_per_pixel == 2) && (identity == true) && (img_type == RGB565) && (opacity == 255) &&
+        (rect == NULL))
     {
         if (image->blend_mode == IMG_COVER_MODE)
         {
@@ -130,11 +127,6 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
             filter_blit_2_rgb565(image, dc, rect);
             return;
         }
-    }
-    else if ((img_type == RGBA8888) && (image->blend_mode == IMG_RECT))
-    {
-        rect_2_argb8888(image, dc, rect);
-        return;
     }
 
     do_raster_no_rle(image, dc, rect);
@@ -155,6 +147,17 @@ void no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
  * @param rect scope
  */
 
+void sw_acc_prepare_cb(draw_img_t *image, gui_rect_t *rect)
+{
+    // GUI_LINE(1);
+    return;
+}
+void sw_acc_end_cb(draw_img_t *image)
+{
+    // GUI_LINE(1);
+    return;
+}
+
 
 void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
@@ -168,6 +171,13 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     {
         no_rle(image, dc, rect);
     }
+}
+void sw_acc_init(void)
+{
+    extern void (* gui_image_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
+    extern void (* gui_image_acc_end_cb)(struct draw_img * image);
+    gui_image_acc_prepare_cb = sw_acc_prepare_cb;
+    gui_image_acc_end_cb = sw_acc_end_cb;
 }
 /** End of ENGINE_Exported_Functions
   * @}

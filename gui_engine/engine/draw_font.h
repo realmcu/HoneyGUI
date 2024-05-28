@@ -4,11 +4,23 @@
 #include <guidef.h>
 #include <gui_api.h>
 #include <gui_text.h>
-#include "font_mem.h"
-#include "font_stb.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct gui_text_rect
+{
+    int16_t x1;
+    int16_t y1;
+    int16_t x2;
+    int16_t y2;
+    int16_t xboundleft;
+    int16_t xboundright;
+    int16_t yboundtop;
+    int16_t yboundbottom;
+} gui_text_rect_t;
+
+
 /**
  * @brief
  *

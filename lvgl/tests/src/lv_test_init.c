@@ -79,12 +79,12 @@ uint32_t custom_tick_get(void)
     static uint64_t start_ms = 0;
     if(start_ms == 0) {
         struct timeval tv_start;
-        gettimeofday(&tv_start, NULL);
+        mingw_gettimeofday(&tv_start, NULL);
         start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
     }
 
     struct timeval tv_now;
-    gettimeofday(&tv_now, NULL);
+    mingw_gettimeofday(&tv_now, NULL);
     uint64_t now_ms;
     now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
 

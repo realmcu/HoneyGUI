@@ -137,9 +137,9 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         continue;
                     }
 
-                    gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, 0, 0);
-                    gui_button_api.onPress(button, button_cb, button);
-                    gui_button_api.onRelease(button, button_release_cb, button);
+                    gui_button_t *button = gui_button_create(g, 0, 0, 100, 100, img1, img1, text, BUTTON_BG_ICON, 0);
+                    gui_button_press(button, (gui_event_cb_t)button_cb, button);
+                    gui_button_release(button, (gui_event_cb_t)button_release_cb, button);
 
 #ifdef RTL87x2G_DASHBOARD
                     gui_obj_event_set((void *)button, GUI_EVENT_TOUCH_RELEASED);
@@ -155,7 +155,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                         gui_text_set(button->text, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                                      strlen(text), font_size);
                         void *addr1 = gui_get_file_address("app/system/resource/font/arialbd_size16_bits4_font.bin");
-                        gui_font_mem_init(addr1);
+                        //gui_font_mem_init(addr1);
                         gui_text_type_set(button->text, addr1);
                     }
                 }

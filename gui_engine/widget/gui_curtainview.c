@@ -383,6 +383,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
                 if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * scope))
                 {
                     this->down_flag = 1;
+                    if (this->done_cb != NULL)
+                    {
+                        this->done_cb(this);
+                    }
                 }
             }
 
@@ -399,6 +403,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
                 if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * scope))
                 {
                     this->up_flag = 1;
+                    if (this->done_cb != NULL)
+                    {
+                        this->done_cb(this);
+                    }
                 }
             }
 
@@ -434,6 +442,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
                 if (_UI_ABS(tp->deltaY) > (int)((float)gui_get_screen_height() / 2.0f * scope))
                 {
                     this->middle_flag = 1;
+                    if (this->done_cb != NULL)
+                    {
+                        this->done_cb(this);
+                    }
                 }
                 else
                 {
@@ -524,10 +536,11 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
             {
                 this->release_y = 0;
                 this->middle_flag = 0;
-                this->cur_curtain = CURTAIN_DOWN;
+
 
                 if (c_down)
                 {
+                    this->cur_curtain = CURTAIN_DOWN;
                     GET_BASE(c_down)->not_show = false;
                 }
             }
@@ -555,10 +568,11 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
             {
                 this->release_y = 0;
                 this->middle_flag_up = 0;
-                this->cur_curtain = CURTAIN_UP;
+
 
                 if (c_up)
                 {
+                    this->cur_curtain = CURTAIN_UP;
                     GET_BASE(c_up)->not_show = false;
                 }
             }
@@ -647,10 +661,10 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
         {
             this->release_x = 0;
             this->middle_flag_left = 0;
-            this->cur_curtain = CURTAIN_LEFT;
 
             if (c_left)
             {
+                this->cur_curtain = CURTAIN_LEFT;
                 GET_BASE(c_left)->not_show = false;
             }
         }
@@ -748,11 +762,31 @@ static void gui_curtainview_prepare(gui_obj_t *obj)
 
     uint8_t last = this->checksum;
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_curtainview_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_curtainview_t));
 
     if (last != this->checksum)
     {
         gui_fb_change();
+    }
+}
+
+static void gui_curtainview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_curtainview_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_curtainview_prepare(obj);
+            break;
+
+        default:
+            break;
+        }
     }
 }
 
@@ -766,9 +800,10 @@ static void gui_curtainview_ctor(gui_curtainview_t *this,
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    ((gui_obj_t *)this)->obj_prepare = gui_curtainview_prepare;
     ((gui_obj_t *)this)->type = CURTAINVIEW;
-    ((gui_obj_t *)this)->obj_input_prepare = gui_curtainview_input_prepare;
+    ((gui_obj_t *)this)->obj_cb = gui_curtainview_cb;
+    ((gui_obj_t *)this)->has_input_prepare_cb = true;
+    ((gui_obj_t *)this)->has_prepare_cb = true;
     this->cur_curtain = CURTAIN_MIDDLE;
 }
 

@@ -53,7 +53,7 @@ typedef struct gui_cardview
     uint16_t card_height;
     uint16_t total_cnt;
     uint16_t cur_id;
-    SLIDE_STYLE style;
+    T_SLIDE_STYLE style;
     int16_t hold_y;
     int16_t target_y; //means stop at this location
     int16_t offset_y; //means stop at this location
@@ -61,6 +61,17 @@ typedef struct gui_cardview
     int16_t recode[5];
     void (*status_cb)(struct gui_cardview *this);
     uint8_t checksum;
+    int yold;
+    int target;
+    int start_x;
+    int start_y;
+    int align_hight;
+    int get_yend;
+    bool release;
+    bool press;
+    bool gesture_flag;
+    bool top_slide_only;
+    uint8_t status;
 } gui_cardview_t;
 
 /** End of WIDGET_Exported_Types
@@ -127,18 +138,18 @@ typedef struct gui_cardview
  */
 gui_cardview_t *gui_cardview_create(void       *parent,
                                     const char *name,
-                                    int16_t    x,
-                                    int16_t    y,
-                                    int16_t    w,
-                                    int16_t    h);
+                                    int16_t     x,
+                                    int16_t     y,
+                                    int16_t     w,
+                                    int16_t     h);
 
 /**
  * @brief set cardview style
  *
  * @param this widget pointer
- * @param style refer to SLIDE_STYLE
+ * @param style refer to T_SLIDE_STYLE
  */
-void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style);
+void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style);
 
 /**
  * @brief listen to cardview's event
@@ -147,7 +158,13 @@ void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style);
  * @param cb callback to be triggered
  */
 void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this));
-
+/**
+ * @brief automatic center alignment
+ *
+ * @param this widget pointer
+ * @param align_hight
+ */
+void gui_cardview_alignment(gui_cardview_t *this, int align_hight);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

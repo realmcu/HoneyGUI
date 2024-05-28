@@ -10,6 +10,11 @@
 #include "kb_algo.h"
 
 
+#ifdef ENABLE_RTK_GUI_280_456_DEMO
+#define DRV_LCD_WIDTH   280
+#define DRV_LCD_HIGHT   456
+#endif
+
 #ifdef ENABLE_RTK_GUI_448_368_DEMO
 #define DRV_LCD_WIDTH   368
 #define DRV_LCD_HIGHT   448
@@ -20,24 +25,52 @@
 #define DRV_LCD_HIGHT   454
 #endif
 
-#ifdef ENABLE_RTK_GUI_DEMO
-#define DRV_LCD_WIDTH   454
-#define DRV_LCD_HIGHT   454
+#ifdef ENABLE_RTK_GUI_800_480_DEMO
+#define DRV_LCD_WIDTH   800
+#define DRV_LCD_HIGHT   480
 #endif
 
 #define DRV_PIXEL_BITS  32
-#define LCD_SECTION_HEIGHT 10
+
+
 // #define USE_DC_PFB
+
 #ifdef USE_DC_PFB
+#define LCD_SECTION_HEIGHT 20
 #undef DRV_PIXEL_BITS
 #define DRV_PIXEL_BITS  16
 #endif
 
-// #define USE_DC_800_480
-#ifdef USE_DC_800_480
-#define DRV_LCD_WIDTH   800
+
+#if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
+// default demo 480_480
+#define ENABLE_RTK_GUI_SAAA_DEMO 1
+
+#if (ENABLE_RTK_GUI_SAAA_DEMO == 1)
+
+// ENABLE_RTK_GUI_480_480_DEMO
+#define DRV_LCD_WIDTH   480
 #define DRV_LCD_HIGHT   480
+
+#elif (ENABLE_RTK_GUI_SAAA_DEMO == 2)
+// ENABLE_RTK_GUI_480_320_DEMO
+#define DRV_LCD_WIDTH   480
+#define DRV_LCD_HIGHT   320
+
+#elif (ENABLE_RTK_GUI_SAAA_DEMO == 3)
+//  ENABLE_RTK_GUI_320_240_DEMO
+#define DRV_LCD_WIDTH   320
+#define DRV_LCD_HIGHT   240
+
+#elif (ENABLE_RTK_GUI_SAAA_DEMO == 4)
+//  ENABLE_RTK_GUI_640_360_DEMO
+#define DRV_LCD_WIDTH   640
+#define DRV_LCD_HIGHT   360
 #endif
+
+#endif
+
+
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -118,11 +151,12 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
 }
 
 static uint8_t sim_framebuffer[1080 * 1080 * DRV_PIXEL_BITS / 8] = {0};
+#ifdef USE_DC_PFB
 static uint8_t __attribute__((aligned(4))) disp_write_buff1_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
                                                                                * DRV_PIXEL_BITS / 8];
 static uint8_t __attribute__((aligned(4))) disp_write_buff2_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
                                                                                * DRV_PIXEL_BITS / 8];
-
+#endif
 static struct gui_dispdev dc =
 {
 #ifdef USE_DC_PFB
@@ -180,7 +214,11 @@ void *rtk_gui_sdl(void *arg)
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s\n", SDL_GetError());
         return NULL;
     }
-    window = SDL_CreateWindow("RTKIOT GUI Simulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+
+    char str[50];
+    sprintf(str, "RTKIOT GUI Simulator %d x %d", DRV_LCD_WIDTH, DRV_LCD_HIGHT);
+
+    window = SDL_CreateWindow(str, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               sim_get_width(),
                               sim_get_hight(), 0);
     renderer = SDL_CreateRenderer(window, -1, 0);
@@ -240,7 +278,7 @@ void *rtk_gui_sdl(void *arg)
                 tp_port_data.event = GUI_TOUCH_EVENT_UP;
                 tp_port_data.x_coordinate = event.button.x;
                 tp_port_data.y_coordinate = event.button.y;
-                //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
+                //gui_log("mouse up:(%d,%d)\n", event.button.x, event.button.y);
             }
             break;
         case SDL_MOUSEWHEEL:

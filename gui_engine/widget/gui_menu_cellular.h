@@ -28,9 +28,10 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 #include "gui_win.h"
+
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{
@@ -76,8 +77,6 @@ typedef struct gui_menu_cellular
   */
 
 
-
-
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -112,8 +111,10 @@ typedef struct gui_menu_cellular
  * @param array_size the array's size
  * @return gui_menu_cellular_t*
  */
-gui_menu_cellular_t *gui_menu_cellular_create(void *parent, int icon_size, uint32_t *icon_array[],
-                                              int array_size);
+gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
+                                              int       icon_size,
+                                              uint32_t *icon_array[],
+                                              int       array_size);
 /**
  * @brief config offset
  *
@@ -129,7 +130,6 @@ void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset
 /** End of WIDGET
   * @}
   */
-
 
 #ifdef __cplusplus
 }

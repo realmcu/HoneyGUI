@@ -186,6 +186,7 @@
             <RvdsVP>2</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -337,9 +338,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--diag_suppress=1</MiscControls>
-              <Define>ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI GUI_KEIL_SIM ENABLE_RTK_GUI_DEMO ENABLE_RTK_GUI_FONT_RTK_MEM</Define>
+              <Define>ENABLE_RTK_GUI_FONT_STB ENABLE_RTK_GUI ENABLE_RTK_GUI_FONT_RTK_MEM GUI_KEIL_SIM</Define>
               <Undefine></Undefine>
-              <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;..\gui_engine;..\gui_engine\3rd\ezXML;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget;..\gui_engine\example\demo</IncludePath>
+              <IncludePath>.;.;.;..\gui_engine\example\root_image;gui_port;..\gui_engine;..\gui_engine\3rd\ezXML;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\3rd\tjpgd;..\gui_engine\app;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\example\demo;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -404,6 +405,11 @@
           <GroupName>gui_port</GroupName>
           <Files>
             <File>
+              <FileName>gui_port_acc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>gui_port\gui_port_acc.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_port_dc.c</FileName>
               <FileType>1</FileType>
               <FilePath>gui_port\gui_port_dc.c</FilePath>
@@ -426,7 +432,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>rtk_gui</GroupName>
+          <GroupName>realgui/3rd</GroupName>
           <Files>
             <File>
               <FileName>nanovg.c</FileName>
@@ -464,15 +470,35 @@
               <FilePath>..\gui_engine\3rd\nanovg\agge\nanovg_vertex.cpp</FilePath>
             </File>
             <File>
+              <FileName>tjpgd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\3rd\tjpgd\tjpgd.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/app</GroupName>
+          <Files>
+            <File>
               <FileName>gui_app.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\app\gui_app.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/dc</GroupName>
+          <Files>
             <File>
               <FileName>gui_fb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\dc\gui_fb.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/engine</GroupName>
+          <Files>
             <File>
               <FileName>draw_img.c</FileName>
               <FileType>1</FileType>
@@ -492,6 +518,16 @@
               <FileName>font_mem.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\font_mem.c</FilePath>
+            </File>
+            <File>
+              <FileName>font_mem_img.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\font_mem_img.c</FilePath>
+            </File>
+            <File>
+              <FileName>font_mem_matrix.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\engine\font_mem_matrix.c</FilePath>
             </File>
             <File>
               <FileName>font_stb.c</FileName>
@@ -539,26 +575,6 @@
               <FilePath>..\gui_engine\engine\acc_sw_filter.c</FilePath>
             </File>
             <File>
-              <FileName>acc_sw_bypass_matrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_bypass_matrix.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_filter_matrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_filter_matrix.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_source_over.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_source_over.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_source_over_matrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_source_over_matrix.c</FilePath>
-            </File>
-            <File>
               <FileName>acc_sw_rle_bypass.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\acc_sw_rle_bypass.c</FilePath>
@@ -573,26 +589,21 @@
               <FileType>1</FileType>
               <FilePath>..\gui_engine\engine\acc_sw_rle_filter.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/demo</GroupName>
+          <Files>
             <File>
-              <FileName>acc_sw_rle_bypass_matrix.c</FileName>
+              <FileName>rtk_gui_base_demo.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_rle_bypass_matrix.c</FilePath>
+              <FilePath>..\gui_engine\example\demo\rtk_gui_base_demo.c</FilePath>
             </File>
-            <File>
-              <FileName>acc_sw_rle_filter_matrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_rle_filter_matrix.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_rle_source_over.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_rle_source_over.c</FilePath>
-            </File>
-            <File>
-              <FileName>acc_sw_rle_source_over_matrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\engine\acc_sw_rle_source_over_matrix.c</FilePath>
-            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/input</GroupName>
+          <Files>
             <File>
               <FileName>kb_algo.c</FileName>
               <FileType>1</FileType>
@@ -604,15 +615,30 @@
               <FilePath>..\gui_engine\input\tp_algo.c</FilePath>
             </File>
             <File>
+              <FileName>tp_algo_v2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\input\tp_algo_v2.c</FilePath>
+            </File>
+            <File>
               <FileName>wheel_algo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\input\wheel_algo.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/misc</GroupName>
+          <Files>
             <File>
               <FileName>tlsf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\misc\tlsf\tlsf.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/server</GroupName>
+          <Files>
             <File>
               <FileName>gui_api.c</FileName>
               <FileType>1</FileType>
@@ -624,9 +650,29 @@
               <FilePath>..\gui_engine\server\gui_components_init.c</FilePath>
             </File>
             <File>
+              <FileName>gui_message.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\server\gui_message.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_pm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\server\gui_pm.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_server.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\server\gui_server.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>realgui/widget</GroupName>
+          <Files>
+            <File>
+              <FileName>gui_barcode_gen.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_barcode_gen.c</FilePath>
             </File>
             <File>
               <FileName>gui_button.c</FileName>
@@ -637,6 +683,21 @@
               <FileName>gui_canvas.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_canvas.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_canvas_arc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_canvas_arc.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_canvas_rect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_canvas_rect.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_canvas_round_rect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_canvas_round_rect.c</FilePath>
             </File>
             <File>
               <FileName>gui_card.c</FileName>
@@ -679,6 +740,11 @@
               <FilePath>..\gui_engine\widget\gui_fps.c</FilePath>
             </File>
             <File>
+              <FileName>gui_gallery.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_gallery.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_grid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_grid.c</FilePath>
@@ -689,6 +755,11 @@
               <FilePath>..\gui_engine\widget\gui_img.c</FilePath>
             </File>
             <File>
+              <FileName>gui_img_live.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_img_live.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_img_scope.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_img_scope.c</FilePath>
@@ -697,6 +768,21 @@
               <FileName>gui_img_stb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_img_stb.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_keyboard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_keyboard.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_map.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_map.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_menu_cellular.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_menu_cellular.c</FilePath>
             </File>
             <File>
               <FileName>gui_obj.c</FileName>
@@ -729,9 +815,14 @@
               <FilePath>..\gui_engine\widget\gui_progressbar.c</FilePath>
             </File>
             <File>
-              <FileName>gui_rect.c</FileName>
+              <FileName>gui_qbcode.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\gui_engine\widget\gui_rect.c</FilePath>
+              <FilePath>..\gui_engine\widget\gui_qbcode.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_qrcode_gen.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_qrcode_gen.c</FilePath>
             </File>
             <File>
               <FileName>gui_return.c</FileName>
@@ -747,6 +838,11 @@
               <FileName>gui_seekbar.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_seekbar.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_simple_img.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_simple_img.c</FilePath>
             </File>
             <File>
               <FileName>gui_svg.c</FileName>
@@ -769,9 +865,19 @@
               <FilePath>..\gui_engine\widget\gui_tab_cube.c</FilePath>
             </File>
             <File>
+              <FileName>gui_tab_fade.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_tab_fade.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_tab_reduction.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_tab_reduction.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_tab_reduction_fade.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_tab_reduction_fade.c</FilePath>
             </File>
             <File>
               <FileName>gui_tab_rotate.c</FileName>
@@ -789,6 +895,11 @@
               <FilePath>..\gui_engine\widget\gui_text.c</FilePath>
             </File>
             <File>
+              <FileName>gui_turn_table.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_turn_table.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_watch_gradient_spot.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_watch_gradient_spot.c</FilePath>
@@ -804,6 +915,11 @@
               <FilePath>..\gui_engine\widget\gui_wave.c</FilePath>
             </File>
             <File>
+              <FileName>gui_wheel_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_wheel_list.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_widget_template.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_widget_template.c</FilePath>
@@ -812,26 +928,6 @@
               <FileName>gui_win.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_win.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_fade.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\widget\gui_tab_fade.c</FilePath>
-            </File>
-            <File>
-              <FileName>gui_tab_reduction_fade.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\widget\gui_tab_reduction_fade.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>gui_demo</GroupName>
-          <Files>
-            <File>
-              <FileName>rtk_gui_demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\gui_engine\example\demo\rtk_gui_demo.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -883,8 +979,8 @@
           <targetInfo name="gui_sim"/>
         </targetInfos>
       </component>
-      <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.15.0" condition="CMSISCORE">
-        <package name="CMSIS-DSP" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="ARM" version="1.15.0"/>
+      <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.14.1" condition="CMSISCORE">
+        <package name="CMSIS-DSP" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="ARM" version="1.14.1"/>
         <targetInfos>
           <targetInfo name="gui_sim"/>
         </targetInfos>

@@ -65,6 +65,15 @@ SECTIONS
      to include this between __data_start__ and __data_end__, but that
      breaks building the cygwin32 dll.  Instead, we name the section
      ".data_cygwin_nocopy" and explicitly include it after __data_end__. */
+  .rodata BLOCK(__section_alignment__) :
+  {
+    *(.rodata)
+    *(SORT(.rodata$*))
+    . = ALIGN(4);
+    _shell_command_start = ABSOLUTE(.); 
+    KEEP (*(shellCommand))
+    _shell_command_end = ABSOLUTE(.); 
+  }
   .data BLOCK(__section_alignment__) :
   {
     __data_start__ = . ;

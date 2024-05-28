@@ -34,65 +34,65 @@ static void reset_animate()
 static void callback_BT_on()
 {
     reset_animate();
-    img->draw_img.data = WURAOKAI_BIN;
+    img->draw_img->data = WURAOKAI_BIN;
 }
 static void callback_BT_off()
 {
     reset_animate();
-    img->draw_img.data = WURAOGUAN_BIN;
+    img->draw_img->data = WURAOGUAN_BIN;
 }
 static void callback_charge_on()
 {
     reset_animate();
-    img->draw_img.data = JINGYINKAI_BIN;
+    img->draw_img->data = JINGYINKAI_BIN;
 }
 static void callback_charge_off()
 {
     reset_animate();
-    img->draw_img.data = JINGYINGUAN_BIN;
+    img->draw_img->data = JINGYINGUAN_BIN;
 }
 
 static void callback_QR_on()
 {
     reset_animate();
-    img->draw_img.data = SHIZHONGKAI_BIN;
+    img->draw_img->data = SHIZHONGKAI_BIN;
 }
 static void callback_QR_off()
 {
     reset_animate();
-    img->draw_img.data = SHIZHONGGUAN_BIN;
+    img->draw_img->data = SHIZHONGGUAN_BIN;
 }
 
 #else
 static void callback_headset_on()
 {
     reset_animate();
-    img->draw_img.data = TEXT_HEADSET_CONNECT_BIN;
+    img->draw_img->data = TEXT_HEADSET_CONNECT_BIN;
 }
 static void callback_headset_off()
 {
     reset_animate();
-    img->draw_img.data = TEXT_HEADSET_DISCONNECT_BIN;
+    img->draw_img->data = TEXT_HEADSET_DISCONNECT_BIN;
 }
 static void callback_disturb_on()
 {
     reset_animate();
-    img->draw_img.data = TEXT_DISTURB_ON_BIN;
+    img->draw_img->data = TEXT_DISTURB_ON_BIN;
 }
 static void callback_disturb_off()
 {
     reset_animate();
-    img->draw_img.data = TEXT_DISTURB_OFF_BIN;
+    img->draw_img->data = TEXT_DISTURB_OFF_BIN;
 }
 static void callback_bright_on()
 {
     reset_animate();
-    img->draw_img.data = TEXT_BRIGHT_SCREEN_ON_BIN;
+    img->draw_img->data = TEXT_BRIGHT_SCREEN_ON_BIN;
 }
 static void callback_bright_off()
 {
     reset_animate();
-    img->draw_img.data = TEXT_BRIGHT_SCREEN_OFF_BIN;
+    img->draw_img->data = TEXT_BRIGHT_SCREEN_OFF_BIN;
 }
 #endif
 void page_tb_up_control0(void *parent)

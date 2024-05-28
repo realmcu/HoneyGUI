@@ -29,9 +29,9 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
-#include <draw_img.h>
+#include "guidef.h"
+#include "gui_api.h"
+#include "draw_img.h"
 #include "gui_img.h"
 
 /** @defgroup WIDGET WIDGET
@@ -48,8 +48,6 @@ extern "C" {
   */
 
 
-
-
 typedef struct gui_img_scope
 {
     gui_img_t base;
@@ -57,8 +55,8 @@ typedef struct gui_img_scope
     uint16_t scope_x2;
     uint16_t scope_y1;
     uint16_t scope_y2;
+    int16_t ax, ay;
 } gui_img_scope_t;
-
 
 
 /** End of WIDGET_Exported_Types
@@ -85,8 +83,6 @@ typedef struct gui_img_scope
   * @brief
   * @{
   */
-
-
 
 
 /** End of WIDGET_Exported_Macros
@@ -124,10 +120,22 @@ typedef struct gui_img_scope
  * @param y the y coordinate
  * @return gui_img_scope_t*
  */
-gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16_t y);
+gui_img_scope_t *gui_img_scope_create(void    *parent,
+                                      const char *name,
+                                      void    *addr,
+                                      int16_t  x,
+                                      int16_t  y);
 
-
-
+/**
+ * @brief
+ *
+ * @param this
+ * @param x1
+ * @param y1
+ * @param x2
+ * @param y2
+ */
+void gui_img_scope_set_range(gui_img_scope_t *this, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
@@ -142,4 +150,3 @@ gui_img_scope_t *gui_img_scope_create(void *parent, void *addr, int16_t x, int16
 #endif
 
 #endif
-

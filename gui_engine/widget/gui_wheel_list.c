@@ -108,13 +108,14 @@ static void wheel_list_prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = (touch_info_t *)tp_get_info();
     gui_wheel_list_t *this = (void *)obj;
-
+    int half_screen_w = (int)(gui_get_screen_width)() / 2;
+    int half_screen_h = (int)(gui_get_screen_height)() / 2;
     float cur_angle;
     uint8_t cur_layer = 0;
     if (tp->pressed || tp->pressing || tp->released)
     {
-        float x_length_start = (tp->x - dc->fb_width / 2);
-        float y_length_start = (tp->y - dc->fb_height / 2);
+        float x_length_start = (tp->x - half_screen_w);
+        float y_length_start = (tp->y - half_screen_h);
         float tp_angle_start = atan2(y_length_start, x_length_start);
 
 #if 1
@@ -131,8 +132,8 @@ static void wheel_list_prepare(gui_obj_t *obj)
             cur_layer++;
         }
 #endif
-        float x_length = (tp->x + tp->deltaX - dc->fb_width / 2);
-        float y_length = (tp->y + tp->deltaY - dc->fb_height / 2);
+        float x_length = (tp->x + tp->deltaX - half_screen_w);
+        float y_length = (tp->y + tp->deltaY - half_screen_h);
         float tp_angle_cur = atan2(y_length, x_length);
 
         cur_angle = this->rotation[cur_layer].angle + tp_angle_cur - tp_angle_start;
@@ -156,8 +157,7 @@ static void wheel_list_prepare(gui_obj_t *obj)
                         continue;
                     }
                     int x = dc->screen_width / 2 + this->distence * cur_layer * cos(RADIAN_60 * j / cur_layer +
-                                                                                    cur_angle)
-                            - this->radius;
+                                                                                    cur_angle)  - this->radius;
                     int y = dc->screen_height / 2 + this->distence * cur_layer * sin(RADIAN_60 * j / cur_layer +
                                                                                      cur_angle) - this->radius;
                     gui_img_set_location(this->icon_list[cur_layer][j], x, y);
@@ -205,6 +205,30 @@ static void wheel_list_destory(gui_obj_t *obj)
     gui_free(this->icon_list);
 }
 
+static void gui_wheel_list_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            wheel_list_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            wheel_list_prepare(obj);
+            break;
+
+        case OBJ_DESTORY:
+            wheel_list_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_wheel_list_ctor(gui_wheel_list_t *this,
                                 gui_obj_t *parent,
                                 uint8_t layer,
@@ -212,15 +236,14 @@ static void gui_wheel_list_ctor(gui_wheel_list_t *this,
                                 uint8_t distence)
 {
     //for base class
-    gui_obj_t *base = (gui_obj_t *)this;
     gui_obj_ctor(&this->base, parent, "wheel_list", 0, 0, 0, 0);
 
     //for root class
-    gui_obj_t *root = (gui_obj_t *)this;
-    root->type = WHEEL_LIST;
-    root->obj_input_prepare = wheel_list_input_prepare;
-    root->obj_prepare = wheel_list_prepare;
-    root->obj_destory = wheel_list_destory;
+    GET_BASE(this)->type = WHEEL_LIST;
+    GET_BASE(this)->obj_cb = gui_wheel_list_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
 
     this->layer = layer;
     this->distence = distence;
@@ -316,7 +339,7 @@ void gui_wheel_list_set_icon(gui_wheel_list_t *this,
     {
         if (this->icon_list[layer][index] != NULL)
         {
-            gui_tree_free(this->icon_list[layer][index]);
+            gui_obj_tree_free(this->icon_list[layer][index]);
         }
         if (layer == 0 && index == 0)
         {

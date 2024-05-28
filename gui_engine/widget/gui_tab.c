@@ -84,6 +84,69 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static bool gui_tab_loop_prepare(gui_tabview_t *parent, int16_t *tab_gap)
+{
+    touch_info_t *tp = tp_get_info();
+    int16_t tab_x_count, left_count, right_count;
+    int16_t tab_y_count, down_count, up_count;
+
+    if (parent->loop_x)
+    {
+        tab_x_count = -parent->tab_cnt_left + parent->tab_cnt_right + 1;
+        left_count = tab_x_count / 2 + tab_x_count % 2;
+        right_count = tab_x_count / 2;
+
+        if (tab_x_count == 1)
+        {
+            return false;
+        }
+        else
+        {
+            if (tab_gap[0] > right_count)
+            {
+                tab_gap[0] -= tab_x_count;
+            }
+            else if (tab_gap[0] <= -left_count)
+            {
+                tab_gap[0] += tab_x_count;
+            }
+        }
+
+        if ((tab_x_count == 2) && (tp->type == TOUCH_HOLD_X) && (tp->deltaX > 0))
+        {
+            tab_gap[0] = -tab_gap[0];
+        }
+    }
+    else if (parent->loop_y)
+    {
+        tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
+        up_count = tab_y_count / 2 + tab_y_count % 2;
+        down_count = tab_y_count / 2;
+
+        if (tab_y_count == 1)
+        {
+            return false;
+        }
+        else
+        {
+            if (tab_gap[1] > down_count)
+            {
+                tab_gap[1] -= tab_y_count;
+            }
+            else if (tab_gap[1] <= -up_count)
+            {
+                tab_gap[1] += tab_y_count;
+            }
+        }
+
+        if ((tab_y_count == 2) && (tp->type == TOUCH_HOLD_Y) && (tp->deltaY > 0))
+        {
+            tab_gap[1] = -tab_gap[1];
+        }
+    }
+
+    return true;
+}
 
 static void gui_tab_input_prepare(gui_obj_t *obj)
 {
@@ -91,35 +154,15 @@ static void gui_tab_input_prepare(gui_obj_t *obj)
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+    int16_t tab_gap[2] = {tab_x_gap, tab_y_gap};
 
-    if (parent->loop)
+    if (!(gui_tab_loop_prepare(parent, tab_gap)))
     {
-        int16_t tab_x_count = -parent->tab_cnt_left + parent->tab_cnt_right + 1;
-        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
-        int16_t right_count = tab_x_count / 2;
-
-        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
-        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
-        int16_t down_count = tab_y_count / 2;
-
-        if (tab_x_gap > right_count)
-        {
-            tab_x_gap -= tab_x_count;
-        }
-        else if (tab_x_gap < -left_count)
-        {
-            tab_x_gap += tab_x_count;
-        }
-
-        if (tab_y_gap > down_count)
-        {
-            tab_y_gap -= tab_y_count;
-        }
-        else if (tab_x_gap < -up_count)
-        {
-            tab_y_gap += tab_y_count;
-        }
+        return;
     }
+
+    tab_x_gap = tab_gap[0];
+    tab_y_gap = tab_gap[1];
 
     matrix_translate((tab_x_gap) * (int)this->base.w, \
                      (tab_y_gap) * (int)this->base.h, \
@@ -130,10 +173,20 @@ static void gui_tab_prepare(gui_obj_t *obj)
 {
     gui_tab_t *this = (gui_tab_t *)obj;
     kb_info_t *kb = kb_get_info();
+    touch_info_t *tp = tp_get_info();
     gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
 
     int16_t tab_x_gap = this->id.x - parent->cur_id.x;
     int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+    int16_t tab_gap[2] = {tab_x_gap, tab_y_gap};
+
+    if (!(gui_tab_loop_prepare(parent, tab_gap)))
+    {
+        return;
+    }
+
+    tab_x_gap = tab_gap[0];
+    tab_y_gap = tab_gap[1];
 
     if (parent->enable_pre_load)
     {
@@ -141,7 +194,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
         {
             if (tab_x_gap == 0)
             {
-                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
+                gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
 
                 if (this->shot_obj == NULL)
                 {
@@ -155,7 +208,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
             }
             else if (tab_x_gap == 1)
             {
-                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
+                gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
 
                 if (this->shot_obj == NULL)
                 {
@@ -169,7 +222,7 @@ static void gui_tab_prepare(gui_obj_t *obj)
             }
             else if (tab_x_gap == -1)
             {
-                gui_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
+                gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
 
                 if (this->shot_obj == NULL)
                 {
@@ -198,35 +251,6 @@ static void gui_tab_prepare(gui_obj_t *obj)
                 gui_obj_show(this->shot_obj, false);
                 gui_obj_show(this->rte_obj, true);
             }
-        }
-    }
-
-    if (parent->loop)
-    {
-        int16_t tab_x_count = - parent->tab_cnt_left + parent->tab_cnt_right + 1;
-        int16_t left_count = tab_x_count / 2 + tab_x_count % 2;
-        int16_t right_count = tab_x_count / 2;
-
-        int16_t tab_y_count = -parent->tab_cnt_up + parent->tab_cnt_down + 1;
-        int16_t up_count = tab_y_count / 2 + tab_y_count % 2;
-        int16_t down_count = tab_y_count / 2;
-
-        if (tab_x_gap > right_count)
-        {
-            tab_x_gap -= tab_x_count;
-        }
-        else if (tab_x_gap < -left_count)
-        {
-            tab_x_gap += tab_x_count;
-        }
-
-        if (tab_y_gap > down_count)
-        {
-            tab_y_gap -= tab_y_count;
-        }
-        else if (tab_x_gap < -up_count)
-        {
-            tab_y_gap += tab_y_count;
         }
     }
 
@@ -307,22 +331,53 @@ static void gui_tab_destroy(gui_obj_t *obj)
     }
 }
 
+static void gui_tab_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_tab_input_prepare(obj);
+            }
+            break;
+
+        case OBJ_PREPARE:
+            {
+                gui_tab_prepare(obj);
+            }
+            break;
+
+        case OBJ_DESTORY:
+            {
+                gui_tab_destroy(obj);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_tab_ctor(gui_tab_t  *this,
                          gui_obj_t  *parent,
                          const char *filename,
-                         int16_t    x,
-                         int16_t    y,
-                         int16_t    w,
-                         int16_t    h,
-                         int16_t    idx,
-                         int16_t    idy)
+                         int16_t     x,
+                         int16_t     y,
+                         int16_t     w,
+                         int16_t     h,
+                         int16_t     idx,
+                         int16_t     idy)
 {
 
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
 
-    GET_BASE(this)->obj_prepare = gui_tab_prepare;
-    GET_BASE(this)->obj_input_prepare = gui_tab_input_prepare;
-    GET_BASE(this)->obj_destory = gui_tab_destroy;
+    GET_BASE(this)->obj_cb = gui_tab_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = TAB;
 
     gui_tabview_t *parent_ext = (gui_tabview_t *)parent;
@@ -370,14 +425,73 @@ gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this)
     return this->rte_obj;
 }
 
+void gui_tab_update_preload(gui_obj_t *obj)
+{
+    gui_tabview_t *parent = (gui_tabview_t *)(obj->parent);
+    gui_tab_t *this = (gui_tab_t *)obj;
+    int16_t tab_x_gap = this->id.x - parent->cur_id.x;
+    int16_t tab_y_gap = this->id.y - parent->cur_id.y;
+    GUI_UNUSED(tab_y_gap);
+
+    if (parent->enable_pre_load)
+    {
+        if (tab_x_gap == 0)
+        {
+            gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->center_shot);
+
+            if (this->shot_obj == NULL)
+            {
+                this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->center_shot, 0,
+                                                                      0, 0, 0);
+            }
+            else
+            {
+                gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->center_shot, 0, 0);
+            }
+        }
+        else if (tab_x_gap == 1)
+        {
+            gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->right_shot);
+
+            if (this->shot_obj == NULL)
+            {
+                this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->right_shot, 0,
+                                                                      0, 0, 0);
+            }
+            else
+            {
+                gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->right_shot, 0, 0);
+            }
+        }
+        else if (tab_x_gap == -1)
+        {
+            gui_img_tree_convert_to_img((gui_obj_t *)this->rte_obj, NULL, parent->left_shot);
+
+            if (this->shot_obj == NULL)
+            {
+                this->shot_obj = (gui_obj_t *)gui_img_create_from_mem(obj,  "shot", (void *)parent->left_shot, 0, 0,
+                                                                      0, 0);
+            }
+            else
+            {
+                gui_img_set_attribute((gui_img_t *)(this->shot_obj), NULL, parent->left_shot, 0, 0);
+            }
+        }
+    }
+    else
+    {
+        // GUI_ASSERT(parent->enable_pre_load == true);
+    }
+}
+
 gui_tab_t *gui_tab_create(void       *parent,
                           const char *name,
-                          int16_t    x,
-                          int16_t    y,
-                          int16_t    w,
-                          int16_t    h,
-                          int16_t    idx,
-                          int16_t    idy)
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h,
+                          int16_t     idx,
+                          int16_t     idy)
 {
     if (w == 0)
     {
@@ -407,7 +521,7 @@ gui_tab_t *gui_tab_create(void       *parent,
     return this;
 }
 
-void gui_tab_set_style(gui_tab_t *this, SLIDE_STYLE style)
+void gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style)
 {
     this->style = style;
 }

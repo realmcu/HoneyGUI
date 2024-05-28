@@ -432,14 +432,42 @@ static void gui_watchface_gradient_widget_nanovg_destory(gui_obj_t *obj)
 
 }
 
+static void gui_watchface_gradient_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_watchface_gradient_prepare((gui_canvas_t *)obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_watchface_gradient_widget_nanovg_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_watchface_gradient_widget_nanovg_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_watchface_gradient_widget_nanovg_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 static void gui_watchface_gradient_widget_nanovg_ctor(gui_canvas_t *this,
                                                       gui_obj_t    *parent,
                                                       const char   *name,
                                                       void         *data,
-                                                      int16_t      x,
-                                                      int16_t      y,
-                                                      int16_t      w,
-                                                      int16_t      h)
+                                                      int16_t       x,
+                                                      int16_t       y,
+                                                      int16_t       w,
+                                                      int16_t       h)
 {
     //for base class
     gui_obj_t *base = (gui_obj_t *)this;
@@ -448,19 +476,20 @@ static void gui_watchface_gradient_widget_nanovg_ctor(gui_canvas_t *this,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = VG_LITE_CLOCK;
-    root->obj_prepare = (void (*)(struct _gui_obj_t *))gui_watchface_gradient_prepare;
-    root->obj_draw = gui_watchface_gradient_widget_nanovg_draw_cb;
-    root->obj_end = gui_watchface_gradient_widget_nanovg_end;
-    root->obj_destory = gui_watchface_gradient_widget_nanovg_destory;
+    root->obj_cb = gui_watchface_gradient_cb;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 }
 
 static void gui_watchface_gradient_ctor(gui_watchface_gradient_t *this,
                                         gui_obj_t                *parent,
                                         const char               *name,
-                                        int16_t                  x,
-                                        int16_t                  y,
-                                        int16_t                  w,
-                                        int16_t                  h)
+                                        int16_t                   x,
+                                        int16_t                   y,
+                                        int16_t                   w,
+                                        int16_t                   h)
 {
     gui_watchface_gradient_widget_nanovg_ctor((gui_canvas_t *)this, parent, name, NULL, x, y, w, h);
     gui_canvas_set_canvas_cb((gui_canvas_t *)this, gui_watchface_gradient_canvas_design);
@@ -472,10 +501,10 @@ static void gui_watchface_gradient_ctor(gui_watchface_gradient_t *this,
 
 gui_watchface_gradient_t *gui_watchface_gradient_create(void       *parent,
                                                         const char *name,
-                                                        int16_t    x,
-                                                        int16_t    y,
-                                                        int16_t    w,
-                                                        int16_t    h)
+                                                        int16_t     x,
+                                                        int16_t     y,
+                                                        int16_t     w,
+                                                        int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 

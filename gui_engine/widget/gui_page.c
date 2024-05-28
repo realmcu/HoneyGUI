@@ -122,7 +122,7 @@ void gui_page_add_scroll_bar(gui_page_t *this, void *bar_pic, IMG_SOURCE_MODE_TY
     else
     {
         this->src_mode = IMG_SRC_FILESYS;
-        this->scroll_bar = gui_img_create_from_fs(this->base.parent, bar_pic, 0, 0);
+        this->scroll_bar = gui_img_create_from_fs(this->base.parent, "scroll_bar", bar_pic, 0, 0, 0, 0);
     }
     gui_img_get_height(this->scroll_bar);
     this->scroll_bar->base.x = this->base.w - 3 - this->scroll_bar->base.w;
@@ -145,40 +145,64 @@ int gui_page_get_offset(gui_page_t *this)
 static void gui_page_update_att(gui_obj_t *obj)
 {
     gui_page_t *this = (void *)obj;
-    size_t frame_count;
-
+    uint32_t cur_time_gap;
     if (this->animate && this->animate->animate)
     {
-        frame_count = this->animate->dur * (1000 / 15) / (1000);
-        this->animate->callback(this->animate->p);
-        this->animate->current_frame++;
-
-        if (this->animate->current_frame > frame_count)
+        this->animate->Beginning_frame = 0;
+        this->animate->end_frame = 0;
+        if (this->animate->progress_percent == 0 && !this->animate->init)
         {
-            if (this->animate->repeat_count == 0)
-            {
-                this->animate->animate = false;
-            }
-            else if (this->animate->repeat_count < 0)
-            {
-                this->animate->current_frame = 0;
-            }
-            else if (this->animate->repeat_count > 0)
-            {
-                this->animate->current_repeat_count++;
-                if (this->animate->current_repeat_count >= this->animate->repeat_count)
-                {
-                    this->animate->animate = false;
-                }
-                else
-                {
-                    this->animate->current_frame = 0;
-                }
-            }
+            this->animate->init = 1;
+            this->animate->init_time_ms = gui_ms_get();
+            this->animate->Beginning_frame = 1;
         }
 
-        this->animate->progress_percent = ((float)(this->animate->current_frame)) / ((float)(
-                frame_count));
+        this->animate->cur_time_ms = gui_ms_get();
+        cur_time_gap = this->animate->cur_time_ms - this->animate->init_time_ms;
+
+        if (this->animate->repeat_count == 0)
+        {
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            if (cur_time_gap / this->animate->dur >= 1)
+            {
+                this->animate->end_frame = 1;
+                this->animate->progress_percent = 1;
+                this->animate->animate = 0;
+            }
+            this->animate->callback(this->animate->p, this);
+
+        }
+        else if (this->animate->repeat_count == -1)
+        {
+            uint32_t  round_count = cur_time_gap / this->animate->dur;
+            if (round_count > this->animate->last_round)
+            {
+                this->animate->Beginning_frame = 1;
+            }
+            this->animate->last_round = round_count;
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            this->animate->callback(this->animate->p, this);
+        }
+        else
+        {
+            uint32_t  round_count = cur_time_gap / this->animate->dur;
+            if (round_count > this->animate->repeat_count)
+            {
+                this->animate->animate = 0;
+                return;
+            }
+
+            if (round_count > this->animate->last_round)
+            {
+                this->animate->Beginning_frame = 1;
+            }
+            this->animate->last_round = round_count;
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            this->animate->callback(this->animate->p, this);
+        }
     }
 }
 
@@ -198,7 +222,7 @@ void gui_page_set_animate(gui_page_t *this,
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *))callback;
+    animate->callback = (void (*)(void *, void *))callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     this->animate = animate;
@@ -367,19 +391,6 @@ static void gui_page_update_boundary(gui_obj_t *obj)
     }
 }
 
-static void gui_page_update_layer(gui_obj_t *obj)
-{
-    gui_page_t *this = (gui_page_t *)obj;
-
-    if (obj->y == this->start_y)
-    {
-        obj->cover = false;
-    }
-    else
-    {
-        obj->cover = true;
-    }
-}
 
 static void gui_page_update_alien(gui_obj_t *obj)
 {
@@ -414,14 +425,19 @@ static void gui_page_update_alien(gui_obj_t *obj)
     }
 }
 
-static void gui_page_input_prepare(gui_obj_t *obj)
+void gui_page_input_prepare(gui_obj_t *obj)
 {
+    if (obj->gesture)
+    {
+        return;
+    }
+
     touch_info_t *tp = tp_get_info();
     gui_page_t *this = (gui_page_t *)obj;
 
     GUI_UNUSED(tp);
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == false)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false)
     {
         return;
     }
@@ -466,7 +482,7 @@ void gui_page_update(gui_obj_t *obj)
         return;
     }
 
-    if (gui_point_in_obj_rect(obj, tp->x, tp->y) == true)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
         if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
         {
@@ -529,11 +545,10 @@ void gui_page_update(gui_obj_t *obj)
                 }
             }
         }
-        gui_page_update_layer(obj);
     }
 }
 
-static void gui_page_update_rebound(gui_obj_t *obj)
+void gui_page_update_rebound(gui_obj_t *obj)
 {
     gui_page_update_att(obj);
 
@@ -548,7 +563,7 @@ static void gui_page_update_rebound(gui_obj_t *obj)
         return;
     }
 
-    if (tp->pressed && gui_point_in_obj_rect(obj, tp->x, tp->y))
+    if (tp->pressed && gui_obj_point_in_obj_rect(obj, tp->x, tp->y))
     {
         this->press = true;
     }
@@ -711,7 +726,6 @@ static void gui_page_update_rebound(gui_obj_t *obj)
             this->yold = obj->y;
         }
     }
-    gui_page_update_layer(obj);
 }
 
 void gui_page_destory(gui_obj_t *obj)
@@ -720,6 +734,55 @@ void gui_page_destory(gui_obj_t *obj)
     if (this->animate)
     {
         gui_free(this->animate);
+        this->animate = NULL;
+    }
+}
+
+static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_page_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_page_update(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_page_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+static void gui_page_rebound_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_page_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_page_update_rebound(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_page_destory(obj);
+            break;
+
+        default:
+            break;
+        }
     }
 }
 
@@ -733,9 +796,10 @@ void gui_page_ctor(gui_page_t *this,
 {
     gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
     GET_BASE(this)->type = PAGE;
-    GET_BASE(this)->obj_prepare = gui_page_update;
-    GET_BASE(this)->obj_input_prepare = gui_page_input_prepare;
-    GET_BASE(this)->obj_destory = gui_page_destory;
+    GET_BASE(this)->obj_cb = gui_page_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
+    GET_BASE(this)->has_prepare_cb = true;
+    GET_BASE(this)->has_destroy_cb = true;
     this->base.type = PAGE;
     this->start_x = x;
     this->start_y = y;
@@ -756,11 +820,17 @@ void gui_page_rebound(gui_page_t *this, bool rebound)
 {
     if (rebound)
     {
-        GET_BASE(this)->obj_prepare = gui_page_update_rebound;
+        GET_BASE(this)->obj_cb = gui_page_rebound_cb;
+        GET_BASE(this)->has_input_prepare_cb = true;
+        GET_BASE(this)->has_prepare_cb = true;
+        GET_BASE(this)->has_destroy_cb = true;
     }
     else
     {
-        GET_BASE(this)->obj_prepare = gui_page_update;
+        GET_BASE(this)->obj_cb = gui_page_cb;
+        GET_BASE(this)->has_input_prepare_cb = true;
+        GET_BASE(this)->has_prepare_cb = true;
+        GET_BASE(this)->has_destroy_cb = true;
     }
 }
 

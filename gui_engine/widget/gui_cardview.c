@@ -59,6 +59,7 @@
   * @{
   */
 
+#define CARDVIEW_SLIDE_SPEED 20
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -94,7 +95,7 @@ static void gui_cardview_input_prepare(gui_obj_t *obj)
         return;
     }
 
-    if (this->offset_y == 0)
+    if (this->hold_y == 0)
     {
         gui_obj_skip_other_up_hold(obj);
     }
@@ -105,144 +106,285 @@ static void gui_cardview_input_prepare(gui_obj_t *obj)
     }
 }
 
+static void gui_page_update_speed(gui_obj_t *obj)
+{
+    gui_cardview_t *this = (gui_cardview_t *)obj;
+    touch_info_t *tp = tp_get_info();
+    int recode_num = 4;
+
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        this->recode[i] = this->recode[i + 1];
+    }
+
+    this->recode[recode_num] = tp->deltaY;
+    this->speed = this->recode[recode_num] - this->recode[0];
+    int max_speed = 60;
+    int min_speed = 7;
+
+    if (this->speed > max_speed)
+    {
+        this->speed = max_speed;
+    }
+    else if (this->speed < -max_speed)
+    {
+        this->speed = -max_speed;
+    }
+
+    if ((this->speed > 0) && (this->speed < min_speed))
+    {
+        this->speed = min_speed;
+    }
+    else if ((this->speed < 0) && (this->speed > -min_speed))
+    {
+        this->speed = -min_speed;
+    }
+
+    this->target = (this->speed * this->speed + _UI_ABS(this->speed)) / 2;
+
+    int top_height = -this->hold_y;
+    int buttom_height = this->height + this->card_height + this->hold_y - (int)gui_get_screen_height();
+
+    if (this->speed > 0)
+    {
+        if (this->target > top_height)
+        {
+            this->target = top_height;
+        }
+        this->target = this->hold_y + this->target;
+    }
+    else if (this->speed < 0)
+    {
+        if (this->target > buttom_height)
+        {
+            this->target = buttom_height;
+        }
+        this->target = this->hold_y - this->target;
+    }
+    else
+    {
+        this->target = this->hold_y;
+    }
+
+    if (this->align_hight > 0)
+    {
+        int alien = _UI_ABS(this->target) % this->align_hight;
+        if (alien > this->align_hight / 2)
+        {
+            this->target = this->target - this->align_hight + alien;
+
+            if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
+            {
+                if (this->target > this->hold_y)
+                {
+                    this->speed = min_speed;
+                }
+                else
+                {
+                    this->speed = -min_speed;
+                }
+            }
+        }
+        else
+        {
+            this->target = this->target + alien;
+            if (_UI_ABS(this->speed) == min_speed || _UI_ABS(this->speed) == 0)
+            {
+                /* code */
+                if (this->target > this->hold_y)
+                {
+                    this->speed = min_speed;
+                }
+                else
+                {
+                    this->speed = -min_speed;
+                }
+            }
+        }
+    }
+}
+
+static void gui_page_hold_y(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_cardview_t *this = (gui_cardview_t *)obj;
+
+    this->hold_y = tp->deltaY + this->yold;
+
+    if (this->hold_y > this->start_y)/*@TOP*/
+    {
+        this->hold_y = this->start_y;
+    }
+    else if (this->hold_y < (this->start_y - (this->height + this->card_height -
+                                              (int)gui_get_screen_height()))
+             && this->hold_y != 0)/*@BOTTOM*/
+    {
+        gui_obj_event_set(obj, GUI_EVENT_7);
+        this->hold_y = this->start_y - (this->height + this->card_height - (int)gui_get_screen_height());
+    }
+
+    gui_page_update_speed(obj);
+}
+
+static void gui_page_update_inertial(gui_obj_t *obj)
+{
+    gui_cardview_t *this = (gui_cardview_t *)obj;
+
+    if (this->speed == 0)
+    {
+        this->release = false;
+    }
+
+    if (this->speed > 3)
+    {
+        this->hold_y += this->speed;
+        gui_obj_event_set(obj, GUI_EVENT_8);
+        this->speed -= 1;
+    }
+    else if (this->speed < -3)
+    {
+        this->hold_y += this->speed;
+        gui_obj_event_set(obj, GUI_EVENT_8);
+        this->speed += 1;
+    }
+}
+
+static void gui_page_update_boundary(gui_obj_t *obj)
+{
+    gui_cardview_t *this = (gui_cardview_t *)obj;
+
+    if (this->hold_y > this->start_y)/*@TOP*/
+    {
+        this->hold_y = this->start_y;
+        gui_obj_event_set(obj, GUI_EVENT_7);
+        this->release = false;
+    }
+    else if (this->hold_y < (this->start_y - (this->height + this->card_height -
+                                              (int)gui_get_screen_height()))
+             && this->hold_y != 0)/*@BOTTOM*/
+    {
+        this->release = false;
+        this->hold_y = this->start_y - (this->height + this->card_height - (int)gui_get_screen_height());
+        gui_obj_event_set(obj, GUI_EVENT_7);
+    }
+}
+
+
+static void gui_page_update_alien(gui_obj_t *obj)
+{
+    gui_cardview_t *this = (gui_cardview_t *)obj;
+
+    if ((this->speed <= 3) && (this->speed >= -3))
+    {
+        if (this->align_hight > 0)
+        {
+            if (((this->speed > 0) && (this->hold_y >= this->target))
+                || ((this->speed < 0) && (this->hold_y <= this->target)))
+            {
+                this->speed = 0;
+                this->release = false;
+                this->hold_y = this->target;
+
+            }
+
+            this->hold_y += this->speed;
+
+            if (this->speed != 0)
+            {
+
+            }
+        }
+        else
+        {
+            this->speed = 0;
+            this->release = false;
+
+        }
+    }
+}
 static void gui_cardview_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     gui_cardview_t *this = (gui_cardview_t *)obj;
     uint8_t last = this->checksum;
-    bool skip = false;
-
-    switch (tp->type)
+    this->align_hight = this->card_height;
+    if (this->gesture_flag)
     {
-    case TOUCH_HOLD_Y:
-        {
-            if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
-            {
-                break;
-            }
-
-            if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
-            {
-                break;
-            }
-            this->hold_y = tp->deltaY;
-
-            for (size_t i = 0; i < 4; i++)
-            {
-                this->recode[i] = this->recode[i + 1];
-            }
-
-            this->recode[4] = tp->deltaY ;
-            this->speed = this->recode[4] - this->recode[0];
-
-            if (this->speed > 60)
-            {
-                this->speed = 60;
-            }
-            else if (this->speed < -60)
-            {
-                this->speed = -60;
-            }
-
-            skip = true;
-        }
-        break;
-
-    case TOUCH_DOWN_SLIDE:
-    case TOUCH_UP_SLIDE:
-    case TOUCH_ORIGIN_FROM_Y:
-        {
-            int16_t tmp;
-
-            memset(this->recode, 0, sizeof(this->recode));
-
-            if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
-            {
-                break;
-            }
-
-            if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
-            {
-                break;
-            }
-
-            this->offset_y += this->target_y;
-            this->hold_y = this->hold_y - this->target_y;
-
-            if (this->offset_y > 0)
-            {
-                this->target_y = this->target_y - this->offset_y;
-                this->offset_y = 0;
-                this->hold_y = this->hold_y - this->target_y;
-            }
-
-            if (this->speed > 20)
-            {
-                tmp = this->hold_y + this->offset_y;
-                this->offset_y = 0;
-                this->hold_y = tmp;
-            }
-
-            if (this->speed < -20)
-            {
-                tmp = this->hold_y + this->offset_y;
-                this->offset_y = -(this->height - 2 * this->card_height);
-                this->hold_y = tmp - this->offset_y;
-            }
-        }
-        break;
-
-    default:
-        break;
+        return;
+    }
+    if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
+    {
+        return;
+    }
+    if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
+    {
+        return;
     }
 
-    if (skip == false)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
     {
-        if (this->hold_y >= GUI_FRAME_STEP)
+        if ((tp->x > this->start_x) && (tp->x < this->start_x + obj->w))
         {
-            this->hold_y -= GUI_FRAME_STEP;
-        }
-        else if (this->hold_y <= -GUI_FRAME_STEP)
-        {
-            this->hold_y += GUI_FRAME_STEP;
-        }
-        else
-        {
-            this->hold_y = 0;
+            if ((tp->y > this->start_y) && (tp->y < this->start_y + this->height + this->card_height))
+            {
+                if ((tp->type == TOUCH_HOLD_Y))
+                {
+                    gui_page_hold_y(obj);
+                }
+                else if (tp->released)
+                {
+                    int max_speed = CARDVIEW_SLIDE_SPEED;
+
+                    if (tp->type == TOUCH_UP_SLIDE)
+                    {
+                        gui_log("page TOUCH_UP_SLIDE\n");
+
+                        if (this->speed == 0)
+                        {
+                            this->speed = -max_speed;
+                        }
+                    }
+                    else if (tp->type == TOUCH_DOWN_SLIDE)
+                    {
+                        gui_log("page TOUCH_DOWN_SLIDE\n");
+
+                        if (this->speed == 0)
+                        {
+                            this->speed = max_speed;
+                        }
+                    }
+                    if (this->speed != 0)
+                    {
+                        this->release = true;
+                    }
+                }
+                else if (tp->pressed)
+                {
+                    this->release = false;
+                    this->speed = 0;
+                    memset(this->recode, 0, 10);
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+                }
+
+                if (tp->type != TOUCH_HOLD_Y)
+                {
+                    if (this->release)
+                    {
+                        gui_page_update_inertial(obj);
+                        gui_page_update_alien(obj);
+                    }
+                    gui_page_update_boundary(obj);
+                    this->yold = this->hold_y;
+                }
+            }
         }
     }
-    else
-    {
-        int tmp = abs(this->hold_y);
-        int v = abs(tmp) % 128;
-
-        if (v > 64)
-        {
-            tmp = ((tmp / 128) + 1) * 128;
-        }
-        else
-        {
-            tmp = ((tmp / 128)) * 128;
-        }
-
-        if (this->hold_y  < 0)
-        {
-            this->target_y = -tmp;
-        }
-        else
-        {
-            this->target_y = tmp;
-        }
-    }
-    skip = false;
-
     this->checksum = 0;
-    this->checksum = gui_checksum(0, (uint8_t *)this, sizeof(gui_cardview_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_cardview_t));
 
     if (last != this->checksum)
     {
         gui_fb_change();
-        gui_log("detal = %d \n", this->hold_y + this->offset_y);
     }
 
     if (this->status_cb != NULL)
@@ -269,6 +411,38 @@ static void gui_cardview_destory(gui_obj_t *obj)
 
 }
 
+static void gui_cardview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_INPUT_PREPARE:
+            gui_cardview_input_prepare(obj);
+            break;
+
+        case OBJ_PREPARE:
+            gui_cardview_prepare(obj);
+            break;
+
+        case OBJ_DRAW:
+            gui_cardview_draw_cb(obj);
+            break;
+
+        case OBJ_END:
+            gui_cardview_end(obj);
+            break;
+
+        case OBJ_DESTORY:
+            gui_cardview_destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -277,17 +451,17 @@ void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *thi
     this->status_cb = cb;
 }
 
-void gui_cardview_set_style(gui_cardview_t *this, SLIDE_STYLE style)
+void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style)
 {
     this->style = style;
 }
 
 gui_cardview_t *gui_cardview_create(void       *parent,
                                     const char *name,
-                                    int16_t    x,
-                                    int16_t    y,
-                                    int16_t    w,
-                                    int16_t    h)
+                                    int16_t     x,
+                                    int16_t     y,
+                                    int16_t     w,
+                                    int16_t     h)
 {
     GUI_ASSERT(parent != NULL);
 
@@ -307,11 +481,12 @@ gui_cardview_t *gui_cardview_create(void       *parent,
     //for root class
     gui_obj_t *root = (gui_obj_t *)this;
     root->type = CARDVIEW;
-    root->obj_input_prepare = gui_cardview_input_prepare;
-    root->obj_prepare = gui_cardview_prepare;
-    root->obj_draw = gui_cardview_draw_cb;
-    root->obj_end = gui_cardview_end;
-    root->obj_destory = gui_cardview_destory;
+    root->obj_cb = gui_cardview_cb;
+    root->has_input_prepare_cb = true;
+    root->has_prepare_cb = true;
+    root->has_draw_cb = true;
+    root->has_end_cb = true;
+    root->has_destroy_cb = true;
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
@@ -322,6 +497,10 @@ gui_cardview_t *gui_cardview_create(void       *parent,
 
     GET_BASE(this)->create_done = true;
     return this;
+}
+void gui_cardview_alignment(gui_cardview_t *this, int align_hight)
+{
+    this->align_hight = align_hight;
 }
 /** End of WIDGET_Exported_Functions
   * @}

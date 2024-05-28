@@ -261,8 +261,9 @@ enum tlsf_private
 /*
 ** Set assert macro, if it has not been provided by the user.
 */
+#include "gui_api.h"
 #if !defined (tlsf_assert)
-#define tlsf_assert assert
+#define tlsf_assert GUI_ASSERT
 #endif
 
 /*
@@ -1098,6 +1099,7 @@ tlsf_t tlsf_create(void *mem)
 
 tlsf_t tlsf_create_with_pool(void *mem, size_t bytes)
 {
+    tlsf_assert((bytes - tlsf_size()) > 1024 * 5);
     tlsf_t tlsf = tlsf_create(mem);
     tlsf_add_pool(tlsf, (char *)mem + tlsf_size(), bytes - tlsf_size());
     return tlsf;

@@ -17,9 +17,15 @@ static void *context_alloc(size_t size, void *cb_data_p)
     APP_PSRAM_SECTION static uint8_t js_buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
     return (void *)js_buffer;
 #elif defined RTL8762D
-    return (void *)(0x6900000);
+    static uint8_t *js_buffer = (void *)(0x6900000);
+
+#elif defined __WIN32
+    static uint8_t js_buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
+#else
+    js_buffer = malloc(size);
 #endif
-    return malloc(size);
+
+    return (void *)js_buffer;
 }
 
 // Only for js script loading !
@@ -104,6 +110,7 @@ void js_init(void)
     wifi_init();
     js_smarthome_init();
     js_matter_init();
+    js_mesh_init();
     extern gui_app_t *get_app_launcher_frontend(void);
     gui_app_startup(get_app_launcher_frontend());
 }

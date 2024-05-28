@@ -28,8 +28,8 @@ extern "C" {
 /*============================================================================*
  *                        Header Files
  *============================================================================*/
-#include <guidef.h>
-#include <gui_api.h>
+#include "guidef.h"
+#include "gui_api.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -55,7 +55,6 @@ typedef struct gui_eq
     float t;
 } gui_eq_t;
 
-
 /** End of WIDGET_Exported_Types
   * @}
   */
@@ -80,9 +79,6 @@ typedef struct gui_eq
   * @brief
   * @{
   */
-
-
-
 
 
 /** End of WIDGET_Exported_Macros
@@ -122,8 +118,12 @@ typedef struct gui_eq
  * @param h
  * @return gui_eq_t*
  */
-gui_eq_t *gui_eq_create(void *parent,  const char *name, int16_t x, int16_t y, int16_t w,
-                        int16_t h);
+gui_eq_t *gui_eq_create(void       *parent,
+                        const char *name,
+                        int16_t     x,
+                        int16_t     y,
+                        int16_t     w,
+                        int16_t     h);
 /**
  * @brief
  *
@@ -151,4 +151,3 @@ void gui_eq_set(gui_eq_t *this, float x, float y, float w, float h, float t);
 #endif
 
 #endif
-

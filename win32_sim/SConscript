@@ -13,6 +13,8 @@ CPPPATH = [cwd,
 
 #src = Glob('*.c')
 src = ['main.c']
+if GetDepend('CONFIG_REALTEK_BUILD_LETTER_SHELL'):
+    src += ['test_cmd.c']
 
 CPPDEFINES = ['GUI_WIN32_SIM']
 

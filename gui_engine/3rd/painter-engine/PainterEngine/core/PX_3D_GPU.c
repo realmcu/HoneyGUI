@@ -2,18 +2,19 @@
 #include "gui_api.h"
 #include <nanovg.h>
 
-extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format, uint8_t *data);
-extern void nvgDeleteAGGE(NVGcontext * ctx);
+extern NVGcontext *nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtexture format,
+                                 uint8_t *data);
+extern void nvgDeleteAGGE(NVGcontext *ctx);
 
 px_void PX_3D_GPU_RenderListRasterization(px_surface *psurface, PX_3D_RenderList *pList,
                                           PX_3D_Vertex p0, PX_3D_Vertex p1, PX_3D_Vertex p2)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    uint8_t *data = psurface->surfaceBuffer;
+    uint8_t *data = (uint8_t *)psurface->surfaceBuffer;
 
 
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
-                                    (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, data);
+                                   (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, data);
 
 
     nvgBeginFrame(vg, psurface->width, psurface->height, 1);

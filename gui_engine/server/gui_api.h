@@ -119,6 +119,23 @@ extern "C" {
     gui_log("%f  \n",(pox)->p[2]); \
     gui_log("-----------------------------------------------\n"); //!< print position
 
+/** @brief white color in gui_color_t structure */
+#define APP_COLOR_WHITE                     gui_rgba(UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX)
+/** @brief red color in gui_color_t structure */
+#define APP_COLOR_RED                       gui_rgba(UINT8_MAX, 0, 0, UINT8_MAX)
+/** @brief green color in gui_color_t structure */
+#define APP_COLOR_GREEN                     gui_rgba(0, UINT8_MAX, 0, UINT8_MAX)
+/** @brief blue color in gui_color_t structure */
+#define APP_COLOR_BLUE                      gui_rgba(0, 0, UINT8_MAX, UINT8_MAX)
+
+/**
+ * @link https://www.rapidtables.com/web/color/RGB_Color.html
+*/
+#define APP_COLOR_CRIMSON                   gui_rgb(220,20,60)
+#define APP_COLOR_FIREBRICK                 gui_rgb(178,34,34)
+#define APP_COLOR_WHITE_OPACITY             gui_rgba(255,255,255,150)
+#define APP_COLOR_SILVER                    gui_rgb(192,192,192)
+#define APP_COLOR_SILVER_OPACITY(opacity)   gui_rgba(192,192,192, opacity)
 /** End of SERVER_Exported_Macros
   * @}
   */
@@ -133,15 +150,13 @@ extern "C" {
   * @{
   */
 
-extern float gui_get_scale_x(void);
-extern float gui_get_scale_y(void);
 void gui_dc_info_register(struct gui_dispdev *info);
-char gui_dc_get_gpu_type(void);
-unsigned char *gui_dc_get_fb(void);
-void gui_dc_set_gpu_type(char type);
+void gui_acc_info_register(struct acc_engine *info);
 void gui_os_api_register(struct gui_os_api *info);
-
 void gui_indev_info_register(struct gui_indev *info);
+
+
+
 
 void ext_button_set_indicate(void (*callback)(void));
 
@@ -153,10 +168,8 @@ gui_wheel_port_data_t *wheel_get_data(void);
 
 struct gui_indev *gui_get_indev(void);
 struct gui_dispdev *gui_get_dc(void);
+struct acc_engine *gui_get_acc(void);
 
-float gui_get_scale_x(void);
-
-float gui_get_scale_y(void);
 
 uint32_t gui_get_screen_width(void);
 
@@ -186,10 +199,14 @@ bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 
 void *gui_malloc(uint32_t n);
 void *gui_realloc(void *ptr_old, uint32_t n);
+void gui_free(void *rmem);
 void gui_mem_debug(void);
 
-
-void gui_free(void *rmem);
+void *gui_lower_malloc(uint32_t n);
+void *gui_lower_realloc(void *ptr_old, uint32_t n);
+void gui_lower_free(void *rmem);
+void gui_lowr_mem_debug(void);
+void gui_sleep_cb(void);
 
 void gui_assert_handler(const char *ex_string, const char *func, uint32_t line);
 
@@ -198,13 +215,14 @@ int gui_fs_close(int d);
 int gui_fs_read(int fd, void *buf, size_t len);
 int gui_fs_write(int fd, const void *buf, size_t len);
 int gui_fs_lseek(int fd, int offset, int whence);
-int gui_fs_closedir(gui_fs_DIR *d);
+int gui_fs_closedir(gui_fs_dir *d);
 int gui_fs_ioctl(int fd, int cmd);
-gui_fs_DIR *gui_fs_opendir(const char *name);
-struct gui_fs_dirent *gui_fs_readdir(gui_fs_DIR *d);
+gui_fs_dir *gui_fs_opendir(const char *name);
+struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d);
 void *gui_get_file_address(const char *file);
-
 char *gui_strdup(const char *s);
+char *gui_filepath_transforming(void *addr);
+
 void gui_log(const char *format, ...);
 void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size);
 void gui_display_on(void);
@@ -213,6 +231,29 @@ uint32_t gui_ms_get(void);
 uint32_t gui_us_get(void);
 void gui_task_ext_execution_sethook(void (*hook)(void));
 
+/**
+ * @brief Get a color value from red, green, blue and opacity values.
+ *
+ * @param red  Range of unsigned char
+ * @param green Range of unsigned char
+ * @param blue Range of unsigned char
+ * @param opacity Range of unsigned char
+ * @return gui_color_t
+ */
+gui_color_t gui_rgba(unsigned char red,
+                     unsigned char green,
+                     unsigned char blue,
+                     unsigned char opacity);
+
+/**
+ * @brief Get a color value from red, green and blue.
+ *
+ * @param red  Range of unsigned char
+ * @param green Range of unsigned char
+ * @param blue Range of unsigned char
+ * @return gui_color_t
+ */
+gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
 /** End of SERVER_Exported_Functions
   * @}
   */

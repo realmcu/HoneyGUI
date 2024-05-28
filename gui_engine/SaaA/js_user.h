@@ -30,6 +30,7 @@
 #include "gui_server.h"
 #include "gui_switch.h"
 #include "gui_img.h"
+#include "gui_keyboard.h"
 #include "guidef.h"
 
 #ifdef RTL87x2G

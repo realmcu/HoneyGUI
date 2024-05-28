@@ -21,14 +21,14 @@ If developers need to construct a container to house tabs, they may utilize the 
 Developers can use [gui_tabview_set_style(this, style)](#gui_tabview_create) to set the desired style of tabview. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
 
 ```c
-typedef enum gui_tab_style
+typedef enum t_slide_style
 {
     CLASSIC,
     REDUCTION,
     FADE,
     REDUCTION_FADE,
     STACKING,
-} SLIDE_STYLE;
+} T_SLIDE_STYLE;
 ```
 
 ### Set tabview loop

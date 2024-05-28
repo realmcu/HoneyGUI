@@ -20,12 +20,13 @@ extern "C" {
 
 
 gui_app_t *get_app_watch_ui(void);
-extern void design_tab_watchface(void *parent);
-extern void design_tab_player(void *parent);
-extern void design_tab_call(void *parent);
-extern void design_tab_contacts(void *parent);
-extern void design_tab_record(void *parent);
-extern void design_tab_menu(void *parent);
+extern void design_watchface_mgr(void *parent);
+extern void design_player_mgr(void *parent);
+extern void design_call_mgr(void *parent);
+extern void design_contacts_mgr(void *parent);
+extern void design_record_mgr(void *parent);
+extern void design_benchmark_mgr(void *parent);
+
 extern gui_tabview_t *tabview_main;
 
 #ifdef __cplusplus

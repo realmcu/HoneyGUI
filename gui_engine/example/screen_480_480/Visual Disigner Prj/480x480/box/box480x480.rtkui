@@ -35,6 +35,36 @@
             <scaleY>1</scaleY>
           </property>
         </widget>
+        <widget class="Switch" name="sw_cd" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>30</width>
+            <height>32</height>
+            <x>160</x>
+            <y>286</y>
+          </property>
+          <property name="switchData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <picture>Resources/image/cutain/switch_off.jpg</picture>
+            <highlightPicture>Resources/image/cutain/switch_on.jpg</highlightPicture>
+          </property>
+        </widget>
+        <widget class="Image" name="img_cd" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>149</width>
+            <height>149</height>
+            <x>304</x>
+            <y>200</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgFilterBlack</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/other/cd.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
       </widget>
       <widget class="Tab" name="lamp_tab" layer="1" isLocked="False">
         <property name="tabData">
@@ -494,7 +524,7 @@
             <highlightPicture>Resources/image/wifi/speed_on.png</highlightPicture>
           </property>
         </widget>
-        <widget class="Text" name="txt_click" layer="4" isLocked="False">
+        <widget class="Text" name="txt_click" layer="6" isLocked="False">
           <property name="geometry">
             <width>108</width>
             <height>49</height>
@@ -507,7 +537,7 @@
             <font>fontSetting0</font>
           </property>
         </widget>
-        <widget class="Text" name="txt_unit" layer="4" isLocked="False">
+        <widget class="Text" name="txt_unit" layer="7" isLocked="False">
           <property name="geometry">
             <width>108</width>
             <height>49</height>
@@ -520,7 +550,7 @@
             <font>fontSetting0</font>
           </property>
         </widget>
-        <widget class="Text" name="txt_speed" layer="4" isLocked="False">
+        <widget class="Text" name="txt_speed" layer="8" isLocked="False">
           <property name="geometry">
             <width>108</width>
             <height>49</height>

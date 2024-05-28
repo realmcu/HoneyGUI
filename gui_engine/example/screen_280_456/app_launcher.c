@@ -15,7 +15,8 @@
 #include "tp_algo.h"
 #include <math.h>
 #include "gui_cube.h"
-#include "draw_font.h"
+#include "font_mem.h"
+#include "font_stb.h"
 #include "gui_scroll_text.h"
 #include "gui_page.h"
 #include "gui_components_init.h"
@@ -108,11 +109,11 @@ void change_size(gui_img_t *obj)
     gui_img_scale(obj, (float)xscale / 256, (float)yscale / 256);
     if (a <= 255 && a >= 0)
     {
-        obj->draw_img.opacity_value = a;
+        gui_img_set_opacity(obj, a);;
     }
     else
     {
-        obj->draw_img.opacity_value = 0;
+        gui_img_set_opacity(obj, 0);;
     }
 }
 static void tab_img(void *tab)
@@ -281,7 +282,7 @@ static void curtain_center(gui_curtainview_t *curtainview)
                                                     20);
     gui_text_set(electric_quantity, "80", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 2, 32);
 }
-static void switch_to_wheel(void *obj, gui_event_t event)
+static void switch_to_wheel(void *obj, gui_event_t event, void *param)
 {
     gui_switch_app(get_launcher_app(), get_wheel_app());
 }
@@ -300,6 +301,64 @@ static void curtain_up(gui_curtainview_t *curtainview)
     gui_img_t *app6 = gui_img_create_from_mem(curtain_up, "app6", APP_TWITTER_BIN, 74, 310, 0, 0);
     gui_img_t *app7 = gui_img_create_from_mem(curtain_up, "app7", APP_WHATSAPP_BIN, 142, 310, 0, 0);
     gui_img_t *app8 = gui_img_create_from_mem(curtain_up, "app8", APP_YOUTUBE_BIN, 211, 310, 0, 0);
+}
+#include "gui_turn_table.h"
+const gui_turn_table_coordinate_t point[12] =
+{
+    //left
+    {50, 250},
+    {50, 150},
+    //up
+    {100, 50},
+    {205, 50},
+    {310, 50},
+    //right
+    {360, 150},
+    {360, 250},
+    {360, 350},
+    //down
+    {310, 450},
+    {205, 450},
+    {100, 450},
+    //left
+    {50, 350}
+};
+
+static void tab_tt(void *tab)
+{
+    gui_turn_table_t *tt = gui_turn_table_create(tab, 24, 32, 3, 3);
+    gui_turn_table_set_icon_scale(tt, 1.0f, 2.0f);
+    gui_turn_table_set_highlight_index(tt, 9);
+    gui_turn_table_generate_layout_by_array(tt, (gui_turn_table_coordinate_t *)point, 12);
+
+    gui_turn_table_add_icon_default(tt, APP_FACEBOOK_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_FACEBOOK_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_FACEBOOK_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_INSTAGRAM_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_TWITTER_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_WHATSAPP_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_YOUTUBE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GMAIL_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GOOGLE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GOOGLE_BIN, NULL);
+    gui_turn_table_add_icon_default(tt, APP_GOOGLE_BIN, NULL);
+
+    gui_turn_table_add_icon_static(tt, ICMENUHEARTRATE_BIN);
 }
 static void tab_home(void *tab)
 {
@@ -332,24 +391,24 @@ static void app_launcher_ui_design(gui_app_t *app)
     gui_tab_t *tab4 = gui_tab_create(tv, "tab4", 0, 0, 0, 0, 4, 0);
     gui_tab_t *tab5 = gui_tab_create(tv, "tab5", 0, 0, 0, 0, 5, 0);
 
-    tab_two(tabn);
+    tab_tt(tabn);
     tab_home(tab0);
-    tab_lake(tab1);
+    tab_text(tab1);
     tab_tree(tab2);
     tab_img(tab3);
-    tab_text(tab5);
+    tab_lake(tab4);
     tab_iconlist(tab5);
 #ifndef _WIN32
     gui_log("after ui unused mem head is %d", heap = os_mem_peek(RAM_TYPE_DATA_ON));
 #endif
 }
 
-static void wheel_cb(void *obj, gui_event_t event)
+static void wheel_cb(void *obj, gui_event_t event, void *param)
 {
     gui_img_t *img = (gui_img_t *)obj;
     gui_log("img p %p, x %d, y %d \n", obj, img->base.x, img->base.y);
 }
-static void switch_to_launcher(void *obj, gui_event_t event)
+static void switch_to_launcher(void *obj, gui_event_t event, void *param)
 {
     gui_switch_app(get_wheel_app(), get_launcher_app());
 }

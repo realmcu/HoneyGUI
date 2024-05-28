@@ -72,7 +72,7 @@ typedef struct
 {
     gui_obj_t base;             //!< base structure
     gui_tab_id_t id;
-    SLIDE_STYLE style;
+    T_SLIDE_STYLE style;
     Normal_t normal;
     gui_obj_t *shot_obj; // shot
     gui_obj_t *rte_obj; //run time envriment
@@ -139,12 +139,12 @@ typedef struct
  */
 gui_tab_t *gui_tab_create(void       *parent,
                           const char *filename,
-                          int16_t    x,
-                          int16_t    y,
-                          int16_t    w,
-                          int16_t    h,
-                          int16_t    idx,
-                          int16_t    idy);
+                          int16_t     x,
+                          int16_t     y,
+                          int16_t     w,
+                          int16_t     h,
+                          int16_t     idx,
+                          int16_t     idy);
 
 /**
  * @brief get run time envriment obj
@@ -160,7 +160,14 @@ gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this);
  * @param this tab widget pointer
  * @param style slide style
  */
-void gui_tab_set_style(gui_tab_t *this, SLIDE_STYLE style);
+void gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style);
+
+/**
+ * @brief when enable preload, call this API can update preload buffer
+ *
+ * @param obj
+ */
+void gui_tab_update_preload(gui_obj_t *obj);
 
 /**
  * @brief

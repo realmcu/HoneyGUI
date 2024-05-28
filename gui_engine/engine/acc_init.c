@@ -1,59 +1,16 @@
 #include <draw_img.h>
 #include <stdio.h>
-#include "acc_engine.h"
 #include "acc_sw_rle.h"
 #include "acc_init.h"
 
 
+extern void sw_acc_init(void);
 extern void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
 
-extern void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
-extern void hw_acc_init(void);
 
-static struct acc_engine acc = {0};
 
-void gui_acc_init(void)
-{
-#ifdef RTK_MODULE_VG_LITE
-    acc.blit = hw_acc_blit;
-#elif defined RTK_MODULE_RTK_PPE
-    hw_acc_init();
-    acc.blit = hw_acc_blit;
-#elif defined RTK_MODULE_RTK_PPEV2
-    hw_acc_init();
-    acc.blit = hw_acc_blit;
-#else
-    acc.blit = sw_acc_blit;
-#endif
-}
 
-struct acc_engine *gui_get_acc(void)
-{
-    return &acc;
-}
 
-imdc_file_header_t rtgui_image_get_imdc_header(draw_img_t *img)
-{
-    imdc_file_header_t head = {0};
-
-    if (img->src_mode == IMG_SRC_FILESYS)
-    {
-        int fd = gui_fs_open(img->data,  0);
-        if (fd <= 0)
-        {
-            gui_log("open file fail:%s !\n", (char *)img->data);
-        }
-        gui_fs_lseek(fd, sizeof(struct gui_rgb_data_head), SEEK_SET);
-        gui_fs_read(fd, &head, sizeof(head));
-        gui_fs_close(fd);
-    }
-    else if (img->src_mode == IMG_SRC_MEMADDR)
-    {
-        memcpy(&head, (void *)((uint8_t *)(img->data) + sizeof(struct gui_rgb_data_head)), sizeof(head));
-    }
-
-    return head;
-}
 
 static void *gui_load_imgfile(draw_img_t *draw_img)
 {
@@ -81,8 +38,8 @@ static void gui_load_imgfile_align(draw_img_t *draw_img, uint8_t *data,
                                    uint8_t source_bytes_per_pixel)
 {
     const char *path = draw_img->data;
-    uint32_t gpu_width = ((draw_img->img_w + 15) >> 4) << 4;
-    uint32_t gpu_height = draw_img->img_h;
+    uint16_t gpu_width = ((draw_img->img_w + 15) >> 4) << 4;
+    uint16_t gpu_height = draw_img->img_h;
 
     int fd = gui_fs_open(path,  0);
     if (fd <= 0)
@@ -93,12 +50,12 @@ static void gui_load_imgfile_align(draw_img_t *draw_img, uint8_t *data,
     gui_fs_read(fd, data, sizeof(struct gui_rgb_data_head));
 
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)data;
-    for (uint32_t i = 0; i < gpu_height; i++)
+    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)data;
+    for (uint16_t i = 0; i < gpu_height; i++)
     {
         gui_fs_lseek(fd, sizeof(struct gui_rgb_data_head) + i * draw_img->img_w * source_bytes_per_pixel,
                      SEEK_SET);
-        gui_fs_read(fd, (void *)(image_off + i * gpu_width * source_bytes_per_pixel),
+        gui_fs_read(fd, (void *)(uintptr_t)(image_off + i * gpu_width * source_bytes_per_pixel),
                     draw_img->img_w * source_bytes_per_pixel);
     }
     gui_fs_close(fd);
@@ -111,7 +68,7 @@ static uint8_t *gui_malloc_align_img(uint8_t *offset, uint32_t size)
     uint8_t *img_buff = (uint8_t *)gui_malloc(size + 63);
     GUI_ASSERT(img_buff != NULL);
     // align data address by 64
-    uint8_t *data = (uint8_t *)(((((uint32_t)img_buff + 63) >> 6) << 6) - sizeof(
+    uint8_t *data = (uint8_t *)(((((uint32_t)(uintptr_t)img_buff + 63) >> 6) << 6) - sizeof(
                                     struct gui_rgb_data_head));
     if (data < img_buff)
     {
@@ -140,7 +97,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
     {
         uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
         uint32_t gpu_height = image->img_h;
-        gui_rgb_data_head_t head = rtgui_image_get_header(image);
+        gui_rgb_data_head_t head = gui_image_get_header(image);
         uint8_t source_bytes_per_pixel = 0;
 
         switch (head.type)
@@ -158,6 +115,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
             source_bytes_per_pixel = 3;
             break;
         case RGBA8888:
+        case XRGB8888:
             source_bytes_per_pixel = 4;
             break;
         default:
@@ -190,7 +148,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
         }
         else if (image->src_mode == IMG_SRC_MEMADDR)
         {
-            uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
+            uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data));
 #ifdef __WIN32
             // PC simulator: data alignment is unnecessary.
             if (head.compress)
@@ -228,7 +186,7 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
         }
     }
 
-    acc.blit(image, dc, rect);
+    gui_get_acc()->blit(image, dc, rect);
 
     if (flg_cache)
     {

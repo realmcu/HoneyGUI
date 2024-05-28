@@ -22,7 +22,7 @@
 #ifdef JMEM_STATS
 extern void jmem_heap_stats_print(void);
 #endif
-
+extern void gui_log(const char *format, ...);
 /**
  * Signal the port that jerry experienced a fatal failure from which it cannot
  * recover.

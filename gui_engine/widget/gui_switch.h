@@ -29,8 +29,8 @@ extern "C" {
  *                        Header Files
  *============================================================================*/
 
-#include <guidef.h>
-#include <gui_fb.h>
+#include "guidef.h"
+#include "gui_fb.h"
 #include "gui_img.h"
 
 /** @defgroup WIDGET WIDGET
@@ -57,23 +57,25 @@ struct gui_switch
     void *off_hl_pic_addr;
     void *long_touch_state_pic_addr;
     void *long_touch_state_hl_pic_addr;
-    bool ifon;
-    bool long_touch_state;
-    bool long_touch_enable;
-    bool press_flag;
-    bool long_flag;
-    bool release_flag;
-    bool touch_disable;
-    void (*turn_off)(gui_switch_t *sw);
-    void (*turn_on)(gui_switch_t *sw);
-    void (*onOn)(gui_switch_t *this, void *cb, void *p);
-    void (*onOff)(gui_switch_t *this, void *cb, void *p);
-    void (*ctor)(gui_switch_t *this, gui_obj_t *parent,
-                 int16_t x,
-                 int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
     IMG_SOURCE_MODE_TYPE src_mode;
-} ;
+    uint32_t ifon : 1;
+    uint32_t long_touch_state : 1;
+    uint32_t long_touch_enable : 1;
+    uint32_t press_flag : 1;
+    uint32_t long_flag : 1;
+    uint32_t release_flag : 1;
+    uint32_t touch_disable : 1;
+    uint32_t checksum : 8;
+};
 
+_GUI_API_DEFINE(gui_switch_t)
+void (*turn_off)(gui_switch_t *sw);
+void (*turn_on)(gui_switch_t *sw);
+void (*on_turn_on)(gui_switch_t *this, void *cb, void *p);
+void (*on_turn_off)(gui_switch_t *this, void *cb, void *p);
+void (*ctor)(gui_switch_t *this, gui_obj_t *parent, int16_t x,
+             int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
+_GUI_API_DECLARE(gui_switch_t)
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -142,8 +144,13 @@ struct gui_switch
  * @return return the widget object pointer.
  *
  */
-gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
-                                int16_t w, int16_t h, void *off_pic, void *on_pic);
+gui_switch_t *gui_switch_create(void    *parent,
+                                int16_t  x,
+                                int16_t  y,
+                                int16_t  w,
+                                int16_t  h,
+                                void    *off_pic,
+                                void    *on_pic);
 
 /**
  * @brief create a switch widget, file source is filesystem.
@@ -157,20 +164,28 @@ gui_switch_t *gui_switch_create(void *parent, int16_t x, int16_t y,
  * @return return the widget object pointer.
  *
  */
-gui_switch_t *gui_switch_create_from_fs(void *parent, int16_t x, int16_t y,
-                                        int16_t w, int16_t h, void *off_pic, void *on_pic);
+gui_switch_t *gui_switch_create_from_fs(void    *parent,
+                                        int16_t  x,
+                                        int16_t  y,
+                                        int16_t  w,
+                                        int16_t  h,
+                                        void    *off_pic,
+                                        void    *on_pic);
+
 /**
- * @brief Turn on the switch
+ * @brief Turn on the switch, event will be triggered.
  *
  * @param this
  */
 void gui_switch_turn_on(gui_switch_t *this);
+
 /**
- * @brief Turn off the switch
+ * @brief Turn off the switch, event will be triggered.
  *
  * @param this
  */
 void gui_switch_turn_off(gui_switch_t *this);
+
 /**
  * @brief If the switch has been turned on somehow, it can upadte the status to on status.
  *
@@ -185,7 +200,13 @@ void gui_switch_is_on(gui_switch_t *this);
  */
 void gui_switch_is_off(gui_switch_t *this);
 
-
+/**
+ * @brief set sw state and change ui, no event will be trigered.
+ *
+ * @param this
+ * @param ifon set sw state
+ */
+void gui_switch_change_state(gui_switch_t *this, bool ifon);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
@@ -200,6 +221,3 @@ void gui_switch_is_off(gui_switch_t *this);
 #endif
 
 #endif
-
-
-

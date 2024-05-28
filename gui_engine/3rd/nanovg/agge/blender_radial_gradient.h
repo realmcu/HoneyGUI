@@ -61,7 +61,7 @@ inline bool blender_radial_gradient<PixelT>::get_color(int x, int y, pixel32_rgb
 {
     float dx = x - _cx;
     float dy = y - _cy;
-    float r = sqrt(dx * dx + dy * dy);
+    float r = agge::sqrt(dx * dx + dy * dy);
 
     if (r <= _inr)
     {

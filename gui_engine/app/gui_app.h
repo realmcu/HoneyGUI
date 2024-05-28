@@ -50,6 +50,7 @@ struct gui_app
     gui_obj_t screen;               //!< widget tree root
     const char *xml;                //!< widget tree design file
     uint32_t active_ms;             //!< screen shut dowm delay
+    uint32_t start_ms;             //!< screen shut dowm delay
     void *thread_id;                //!< thread handle(optional)
     void (* thread_entry)(void *this); //!< thread entry
     void (* ctor)(void *this);      //!< constructor
@@ -104,8 +105,8 @@ struct gui_app
     }
 
 #define GUI_APP_HANDLE(APP_NAME) _get_app_##APP_NAME##_handle()
-#define GUI_APP_SHUTDOWM(APP_NAME) gui_app_shutdown(_get_app_##APP_NAME##_handle());
-#define GUI_APP_STARTUP(APP_NAME) gui_app_startup(_get_app_##APP_NAME##_handle());
+#define GUI_APP_SHUTDOWM(APP_NAME) extern gui_app_t *_get_app_##APP_NAME##_handle(void);gui_app_shutdown(_get_app_##APP_NAME##_handle());
+#define GUI_APP_STARTUP(APP_NAME) extern gui_app_t *_get_app_##APP_NAME##_handle(void);gui_app_startup(_get_app_##APP_NAME##_handle());
 #define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME##_handle(), _get_app_##APP_NAME_NEXT##_handle());
 #define GUI_APP_ROOT_SCREEN &(app->screen)
 #define GUI_APP_SWAP_HANDLE(HANDLE_FUNC, HANDLE_NEXT_FUNC)     extern gui_app_t *HANDLE_FUNC;\
@@ -155,7 +156,6 @@ struct gui_app
   */
 gui_app_t *gui_current_app(void);
 gui_app_t *gui_next_app(void);
-void gui_app_exec(gui_app_t *app);
 
 void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry);
 
@@ -163,11 +163,8 @@ void gui_app_startup(gui_app_t *app);
 
 void gui_app_shutdown(gui_app_t *app);
 
-void gui_app_uninstall(gui_app_t *app);
-
 gui_app_t *gui_app_create(const char *app_name, void *ui_design, void *gui_app_entry);
 
-void gui_app_delete(gui_app_t *app);
 /**
  * @brief switch app from A to B
  *

@@ -7,7 +7,8 @@ Widgets                              Brief
 `glossary`_                          Widgets glossary
 `obj`_                               The root widget of the widget tree
 `window`_                            A rectangular container widget
-`img`_                               display image on the screen
+`img`_                               Display image on the screen
+`simple img`_                        Simplified img
 `stbimage`_                          use stb lib to decode standard image format files and display
 `text`_                              To display text, which can be used to output text in different fonts, different colors, and different sizes
 `tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
@@ -28,12 +29,16 @@ Widgets                              Brief
 `menu_cellular`_                     Display icons set as a honeycomb shape menu
 `return`_                            The bubble-shaped curve that can be dragged out 
 `qbcode`_                            Display qrcode and barcode 
+`canvas_rect`_                       Display a rectangular
+`canvas_round_rect`_                 Display a round rectangular
+`canvas_arc`_                        Display a arc
 ==================                   ==================
 
 .. _glossary: widgets_glossary.html
 .. _obj: gui_obj.html
 .. _window: gui_window.html
 .. _img: gui_img.html
+.. _simple img: gui_simple_img.html 
 .. _stbimg: gui_img_stb.html
 .. _text: gui_text.html
 .. _tabview: gui_tabview.html
@@ -57,7 +62,7 @@ Widgets                              Brief
 .. _watchface gradient: gui_watchface_gradient.html
 .. _menu cellular: gui_menu_cellular.html
 .. _return: gui_return.html
-.. qbcode: qbcode.html
+.. _qbcode: qbcode.html
 .. toctree::
     :maxdepth: 2
 
@@ -65,6 +70,7 @@ Widgets                              Brief
     obj <gui_obj>
     window <gui_window>
     img <gui_img>
+    simple img <gui_simple_img>
     stbimg <gui_img_stb>
     text <gui_text>
     tabview <gui_tabview>

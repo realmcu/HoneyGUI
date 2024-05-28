@@ -45,6 +45,9 @@ int main(int argc, char **argv)
     // TODO: SASA auto get screen size
 
     gui_components_init();
+
+
+
     while (1)
     {
         time_t now;

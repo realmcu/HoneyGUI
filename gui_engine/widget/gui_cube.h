@@ -86,6 +86,22 @@ typedef struct
     };
 } gui_cube_imgfile_t;
 
+typedef struct
+{
+    float size;
+    gui_event_t event;
+} gui_cube_img_event_t;
+
+typedef struct
+{
+    gui_event_cb_t  click_cb_front;
+    gui_event_cb_t  click_cb_back;
+    gui_event_cb_t  click_cb_up;
+    gui_event_cb_t  click_cb_down;
+    gui_event_cb_t  click_cb_left;
+    gui_event_cb_t  click_cb_right;
+} gui_cube_cb_t;
+
 /** @brief  CUBE widget structure */
 typedef struct gui_cube
 {
@@ -270,6 +286,14 @@ void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
  * @param size scale size
  */
 void gui_cube_set_size(gui_cube_t *this, float size);
+
+/**
+ * @brief set click cb
+ *
+ * @param this widget pointer
+ * @param cb_list click cb list
+ */
+void gui_cube_add_click_cb(gui_cube_t *this, gui_cube_cb_t cb_list);
 
 /**
  * @brief
