@@ -332,7 +332,6 @@ static void gui_switch_prepare(gui_obj_t *obj)
                         {
                             this->ifon = !(this->ifon);
                             gui_switch_change_state(this, this->ifon);
-                            gui_log("sw:0x%x %d\n", this, this->ifon);
                             if (this->ifon)
                             {
                                 gui_obj_event_set(obj, GUI_EVENT_1);

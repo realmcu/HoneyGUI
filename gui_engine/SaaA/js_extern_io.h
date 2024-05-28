@@ -21,13 +21,19 @@ extern "C" {
 
 typedef enum
 {
-// js extern io event define
+// js extern io event define, 1 byte
     EXTERN_EVENT_NULL,
-    EXTERN_EVENT_SMARTHOME = 1,
-    EXTERN_EVENT_TIMER     = 2,
-// js smarthome event define
-    SH_EVENT_WIFI_SWITCH   = 1,
+    EXTERN_EVENT_SMARTHOME      = 0x01,
+    EXTERN_EVENT_TIMER          = 0x02,
+    EXTERN_EVENT_WIFI           = 0x03,
+// js smarthome event define,  1 byte
+    SH_EVENT_WIFI_SWITCH        = 1,
 
+// js wifi manage event define,  1 byte
+    WIFI_EVENT_MANAGE_ON            = 0x00,
+    WIFI_EVENT_MANAGE_OFF           = 0x01,
+    WIFI_EVENT_MANAGE_SCAN          = 0x02,
+    WIFI_EVENT_MANAGE_CONNECT       = 0x03,
 // js xxx event define
 
 

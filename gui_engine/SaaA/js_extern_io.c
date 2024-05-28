@@ -21,6 +21,11 @@ void gui_extern_event_js_handler(gui_msg_t *msg)
             gui_extern_event_timer_handler(js_msg);
             break;
         }
+    case EXTERN_EVENT_WIFI:
+        {
+            gui_extern_event_wifi_handler(js_msg);
+            break;
+        }
     // case EXTERN_EVENT_XXX:
 
 

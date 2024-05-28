@@ -1214,7 +1214,7 @@ void gui_keyboard_set_mode(gui_kb_t *this, uint8_t mode)
 void gui_keyboard_launch(gui_obj_t *obj)
 {
     gui_kb_t *this = global_kb;
-    if (this)
+    if (this && ((gui_text_t *)obj)->inputable)
     {
         this->txt_input = (gui_text_t *)obj;
 
