@@ -100,11 +100,11 @@
 // </c>
 
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
-#define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
+// #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 // <c> RTK GUI Enable LiteGFX
-#define CONFIG_REALTEK_BUILD_LITE_GFX
+// #define CONFIG_REALTEK_BUILD_LITE_GFX
 // </c>
 
 // <c> RTK GUI Enable LetterShell
@@ -112,7 +112,7 @@
 // </c>
 
 // <c> RTK GUI BOX2D
-#define CONFIG_REALTEK_BUILD_GUI_BOX2D
+// #define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
 
 #endif

@@ -70,6 +70,12 @@
 
 #endif
 
+#ifndef DRV_LCD_WIDTH
+#define DRV_LCD_WIDTH   480
+#endif
+#ifndef DRV_LCD_HIGHT
+#define DRV_LCD_HIGHT   480
+#endif
 
 
 static SDL_Window *window = NULL;

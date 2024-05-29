@@ -9,8 +9,6 @@ PLATFORM    = 'gcc'
 EXEC_PATH   = r'C:/mingw64/bin'
 BSP_LIBRARY_TYPE = None
 
-BUILD = 'debug'
-
 
 # toolchains
 PREFIX = ''
@@ -26,13 +24,11 @@ OBJCPY = PREFIX + 'objcopy'
 
 CPATH = ''
 LPATH = ''
-if BUILD == 'debug':
-    CFLAGS = ' -O0 -g -gdwarf-2 -static-libgcc'
-    LFLAGS = ' -T default.ld -pthread'
-else:
-    CFLAGS = ' '
-    LFLAGS = ' '
-CXXFLAGS = CFLAGS
+
+CFLAGS = ' -O0 -g -gdwarf-2 -static-libgcc'
+LFLAGS = ' -T default.ld -pthread'
+
+CXXFLAGS = CFLAGS + ' -std=c++11'
 POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n'
 POST_ACTION += SIZE + ' $TARGET \n'
 
