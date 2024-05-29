@@ -111,6 +111,10 @@
 #define CONFIG_REALTEK_BUILD_LETTER_SHELL
 // </c>
 
+// <c> RTK GUI BOX2D
+#define CONFIG_REALTEK_BUILD_GUI_BOX2D
+// </c>
+
 #endif
 
 // </e>

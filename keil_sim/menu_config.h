@@ -50,6 +50,10 @@
 #define CONFIG_REALTEK_BUILD_GUI_FONT_RTK_MEM
 // </c>
 
+// <c> RTK GUI BOX2D
+#define CONFIG_REALTEK_BUILD_GUI_BOX2D
+// </c>
+
 // <c> RTK GUI Font Enable TTF SVG
 //#define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
 // </c>

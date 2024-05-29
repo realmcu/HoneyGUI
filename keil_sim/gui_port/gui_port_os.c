@@ -3,22 +3,18 @@
 #include "gui_api.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "cmsis_os2.h"                  // ARM::CMSIS:RTOS2:Keil RTX5
 
 void *port_thread_create(const char *name, void (*entry)(void *param), void *param,
                          uint32_t stack_size, uint8_t priority)
 {
-    osThreadNew(entry, NULL, NULL);    // Create application main thread
     return NULL;
 }
 bool port_thread_delete(void *handle)
 {
-
     return true;
 }
 bool port_thread_mdelay(uint32_t ms)
 {
-    osDelay(ms);
     return true;
 }
 

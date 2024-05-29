@@ -6,7 +6,7 @@ cwd  = GetCurrentDir()
 objs = []
 list = os.listdir(cwd)
 
-if GetDepend('CONFIG_REALTEK_BUILD_BOX2D'):
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_BOX2D'):
     for d in list:
         path = os.path.join(cwd, d)
         if os.path.isfile(os.path.join(path, 'SConscript')):
