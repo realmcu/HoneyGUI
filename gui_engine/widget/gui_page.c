@@ -241,8 +241,8 @@ static void gui_page_update_speed(gui_obj_t *obj)
 
     this->recode[recode_num] = tp->deltaY;
     this->speed = this->recode[recode_num] - this->recode[0];
-    int max_speed = 60;
-    int min_speed = 7;
+    int max_speed = GUI_PAGE_MAX_SPEED;
+    int min_speed = GUI_PAGE_MIN_SPEED;
 
     if (this->speed > max_speed)
     {
@@ -521,9 +521,24 @@ void gui_page_update(gui_obj_t *obj)
                         gui_obj_event_set(obj, GUI_EVENT_8);
                     }
                     else
-                    {
-                        gui_obj_event_set(obj, GUI_EVENT_7);
-                    }
+
+                        if (this->align_hight > 0 && obj->y % this->align_hight != 0)
+                        {
+                            this->release = true;
+                            if (_UI_ABS(obj->y % this->align_hight) < this->align_hight / 2)
+                            {
+                                this->target = obj->y - (obj->y % this->align_hight);
+                                this->speed = GUI_PAGE_MIN_SPEED;
+                            }
+                            else
+                            {
+                                this->target = obj->y - this->align_hight + _UI_ABS(obj->y % this->align_hight);
+                                this->speed = -GUI_PAGE_MIN_SPEED;
+                            }
+                        }
+
+                    gui_obj_event_set(obj, GUI_EVENT_7);
+
                 }
                 else if (tp->pressed)
                 {
@@ -603,7 +618,7 @@ void gui_page_update_rebound(gui_obj_t *obj)
         }
         else if (tp->released)
         {
-            int max_speed = 60;
+            int max_speed = GUI_PAGE_MAX_SPEED;
             this->press = 0;
 
             if (tp->type == TOUCH_UP_SLIDE)
@@ -631,6 +646,20 @@ void gui_page_update_rebound(gui_obj_t *obj)
             }
             else
             {
+                if (this->align_hight > 0 && obj->y % this->align_hight != 0)
+                {
+                    this->release = true;
+                    if (_UI_ABS(obj->y % this->align_hight) < this->align_hight / 2)
+                    {
+                        this->target = obj->y - (obj->y % this->align_hight);
+                        this->speed = GUI_PAGE_MIN_SPEED;
+                    }
+                    else
+                    {
+                        this->target = obj->y - this->align_hight + _UI_ABS(obj->y % this->align_hight);
+                        this->speed = -GUI_PAGE_MIN_SPEED;
+                    }
+                }
                 gui_obj_event_set(obj, GUI_EVENT_7);
             }
         }

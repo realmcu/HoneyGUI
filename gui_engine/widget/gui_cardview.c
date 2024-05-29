@@ -105,7 +105,8 @@ static void gui_cardview_input_prepare(gui_obj_t *obj)
         gui_obj_skip_other_down_hold(obj);
     }
 }
-
+#define GUI_MAX_SPEED 60
+#define GUI_MIN_SPEED 7
 static void gui_page_update_speed(gui_obj_t *obj)
 {
     gui_cardview_t *this = (gui_cardview_t *)obj;
@@ -119,8 +120,8 @@ static void gui_page_update_speed(gui_obj_t *obj)
 
     this->recode[recode_num] = tp->deltaY;
     this->speed = this->recode[recode_num] - this->recode[0];
-    int max_speed = 60;
-    int min_speed = 7;
+    int max_speed = GUI_MAX_SPEED;
+    int min_speed = GUI_MIN_SPEED;
 
     if (this->speed > max_speed)
     {
@@ -273,7 +274,6 @@ static void gui_page_update_boundary(gui_obj_t *obj)
 static void gui_page_update_alien(gui_obj_t *obj)
 {
     gui_cardview_t *this = (gui_cardview_t *)obj;
-
     if ((this->speed <= 3) && (this->speed >= -3))
     {
         if (this->align_hight > 0)
@@ -356,6 +356,23 @@ static void gui_cardview_prepare(gui_obj_t *obj)
                     if (this->speed != 0)
                     {
                         this->release = true;
+                    }
+                    else
+                    {
+                        if (this->align_hight > 0 && this->hold_y % this->align_hight != 0)
+                        {
+                            this->release = true;
+                            if (_UI_ABS(this->hold_y % this->align_hight) < this->align_hight / 2)
+                            {
+                                this->target = this->hold_y - (this->hold_y % this->align_hight);
+                                this->speed = GUI_MIN_SPEED;
+                            }
+                            else
+                            {
+                                this->target = this->hold_y - this->align_hight + _UI_ABS(this->hold_y % this->align_hight);
+                                this->speed = -GUI_MIN_SPEED;
+                            }
+                        }
                     }
                 }
                 else if (tp->pressed)
