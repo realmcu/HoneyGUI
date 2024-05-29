@@ -247,6 +247,13 @@ static void gui_win_prepare(gui_obj_t *obj)
         matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
         this->scale = 0;
     }
+    if (this->hold_tp)
+    {
+        gui_obj_skip_other_up_hold(obj);
+        gui_obj_skip_other_down_hold(obj);
+        gui_obj_skip_other_left_hold(obj);
+        gui_obj_skip_other_right_hold(obj);
+    }
 }
 
 static void gui_win_destory(gui_obj_t *obj)
@@ -362,6 +369,11 @@ void gui_win_long(gui_win_t *this, void *callback, void *parameter)
 void gui_win_click(gui_win_t *this, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
+}
+
+void gui_win_hole_tp(gui_win_t *this, bool hold_tp)
+{
+    this->hold_tp = hold_tp;
 }
 
 gui_win_t *gui_win_create(void       *parent,

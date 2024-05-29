@@ -50,6 +50,7 @@ typedef struct gui_win
     bool event5_flag;
     uint8_t checksum;
     bool scope;
+    bool hold_tp;
 } gui_win_t;
 
 /*============================================================================*
@@ -172,6 +173,14 @@ void gui_win_long(gui_win_t *this, void *callback, void *parameter);
  * @param parameter
  */
 void gui_win_click(gui_win_t *this, void *callback, void *parameter);
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param hold_tp
+ */
+void gui_win_hole_tp(gui_win_t *this, bool hold_tp);
 
 #ifdef __cplusplus
 }

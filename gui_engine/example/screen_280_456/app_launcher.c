@@ -440,7 +440,9 @@ static void app_wheel_ui_design(gui_app_t *app)
     gui_wheel_list_add_icon_default(hc, ICMENUHEARTRATE_BIN, NULL);
 }
 
+#if defined _WIN32
 uint8_t resource_root[1024 * 1024 * 20];
+#endif
 static int app_init(void)
 {
 #if defined _WIN32
