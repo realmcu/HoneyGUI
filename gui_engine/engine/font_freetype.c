@@ -1,0 +1,270 @@
+#include "draw_font.h"
+#include "font_freetype.h"
+#include "gui_api.h"
+#include <math.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+static FT_FONT_LIB font_lib_tab[10];
+static uint8_t get_fontlib_name(uint8_t *font_file)
+{
+    uint8_t tab_size = sizeof(font_lib_tab) / sizeof(FT_FONT_LIB);
+    for (size_t i = 0; i < tab_size; i++)
+    {
+        if (font_lib_tab[i].font_ttf_file == font_file)
+        {
+            return i;
+        }
+    }
+    gui_log("Can not match font file, use default \n");
+    if (font_lib_tab[0].font_ttf_file == 0 ||
+        font_lib_tab[0].font_file_size == 0)
+    {
+        gui_log("There is no font file \n");
+        GUI_ASSERT(font_lib_tab[0].font_ttf_file != 0)
+    }
+    return 0;
+}
+
+void gui_font_ft_mem_init(void *font_ttf_addr, uint32_t font_file_size)
+{
+    if (font_ttf_addr == 0 || font_file_size == 0)
+    {
+        return;
+    }
+    int i = 0;
+    for (; i < sizeof(font_lib_tab) / sizeof(FT_FONT_LIB); i++)
+    {
+        if (font_lib_tab[i].font_ttf_file == NULL)
+        {
+            break;
+        }
+        if (font_lib_tab[i].font_ttf_file == font_ttf_addr)
+        {
+            break;
+        }
+    }
+    if (i >= sizeof(font_lib_tab) / sizeof(FT_FONT_LIB))
+    {
+        return;
+    }
+
+    font_lib_tab[i].font_ttf_file = font_ttf_addr;
+    font_lib_tab[i].font_file_size = font_file_size;
+}
+
+void gui_font_ft_load(gui_text_t *text, gui_text_rect_t *rect)
+{
+
+}
+
+void gui_font_ft_unload(gui_text_t *text)
+{
+
+}
+
+gui_inline uint32_t alphaBlendRGBA(gui_color_t fg, uint32_t bg, uint8_t alpha)
+{
+    uint32_t mix;
+    uint8_t back_a = 0xff - alpha;
+#if defined(_WIN32)
+    mix = 0xff000000;
+    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 16;
+    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff <<  8;
+    mix += ((bg >>  0 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  0;
+#else
+    mix = 0x000000ff;
+    mix += ((bg >> 24 & 0xff) * back_a + fg.color.rgba.r * alpha) / 0xff << 24;
+    mix += ((bg >> 16 & 0xff) * back_a + fg.color.rgba.g * alpha) / 0xff << 16;
+    mix += ((bg >>  8 & 0xff) * back_a + fg.color.rgba.b * alpha) / 0xff <<  8;
+#endif
+    return mix;
+}
+gui_inline uint16_t rgba2565(gui_color_t rgba)
+{
+    uint16_t red = rgba.color.rgba.r * 0x1f / 0xff << 11;
+    uint16_t gre = rgba.color.rgba.g * 0x3f / 0xff << 5;
+    uint16_t blu = rgba.color.rgba.b * 0x1f / 0xff;
+    return red + gre + blu;
+}
+gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
+{
+    alpha = (alpha + 4) >> 3;
+    bg = (bg | (bg << 16)) & 0x7e0f81f;
+    fg = (fg | (fg << 16)) & 0x7e0f81f;
+    uint32_t result = (fg - bg) * alpha; // parallel fixed-point multiply of all components
+    result >>= 5;
+    result += bg;
+    result &= 0x7e0f81f;
+    return (uint16_t)((result >> 16) | result); // contract result
+}
+
+static void font_ft_draw_bitmap(gui_text_t *text,
+                                FT_Bitmap *bitmap,
+                                gui_text_rect_t *rect,
+                                int x_start,
+                                int y_start)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    uint32_t width = bitmap->width;
+    uint32_t rows = bitmap->rows;
+    uint8_t *buffer = bitmap->buffer;
+    // gui_log("char: , width %d, rows %d, pitch %d, x_start %d, y_start %d \n", width, rows, bitmap->pitch, x_start, y_start);
+    uint8_t dc_bytes_per_pixel = dc->bit_depth >> 3;
+    if (dc_bytes_per_pixel == 4)
+    {
+        uint32_t *writebuf = (uint32_t *)dc->frame_buf;
+        uint32_t color_back;
+        for (int i = 0; i < rows; i++)
+        {
+            int write_off = (i + y_start - dc->section.y1) * dc->fb_width + x_start;
+            int read_off = i * bitmap->pitch;
+            for (int j = 0; j < width; j++)
+            {
+                if (buffer[read_off + j] != 0)
+                {
+                    color_back = writebuf[write_off + j];
+                    writebuf[write_off + j] = alphaBlendRGBA(text->color, color_back, buffer[read_off + j]);
+                }
+            }
+        }
+    }
+    else if (dc_bytes_per_pixel == 2)
+    {
+        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+        uint16_t color_back;
+        for (int i = 0; i < rows; i++)
+        {
+            int write_off = (i + y_start - dc->section.y1) * dc->fb_width + x_start;
+            int read_off = i * bitmap->pitch;
+            for (int j = 0; j < width; j++)
+            {
+                if (buffer[read_off + j] != 0)
+                {
+                    color_back = writebuf[write_off + j];
+                    writebuf[write_off + j] = alphaBlendRGB565(rgba2565(text->color), color_back, buffer[read_off + j]);
+                }
+            }
+        }
+    }
+}
+
+void gui_font_ft_draw(gui_text_t *text, gui_text_rect_t *rect)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+
+    if (dc->type == DC_RAMLESS)
+    {
+        return;
+    }
+
+    FT_Library    library;
+    FT_Face       face;
+
+    FT_GlyphSlot  slot;
+    FT_Matrix     matrix;                 /* transformation matrix */
+    FT_Vector     pen;                    /* untransformed origin  */
+    FT_Error      error;
+    FT_Bitmap     bitmap;
+    char         *text_list;
+    uint32_t      color;
+    double        angle;
+    uint32_t      font_file_length;
+
+    color = text->color.color.rgba_full;
+    text_list = (void *)(text->content);
+
+    angle = (0 / 360) * 3.14159 * 2;      /* use 0 degrees  pi    */
+    error = FT_Init_FreeType(&library);              /* initialize library */
+    GUI_ASSERT(error == 0)                          /* error handling omitted */
+
+    font_file_length = font_lib_tab[get_fontlib_name((uint8_t *)text->path)].font_file_size;
+    error = FT_New_Memory_Face(library, text->path, font_file_length, 0, &face);  //mem
+    GUI_ASSERT(error == 0)                          /* error handling omitted */
+    // error = FT_New_Face(library, text->path, 0, &face); //fs
+    // GUI_ASSERT(error == 0)                          /* error handling omitted */
+    error = FT_Set_Pixel_Sizes(face, text->font_height, text->font_height);
+    GUI_ASSERT(error == 0)                          /* error handling omitted */
+    // error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+    // GUI_ASSERT(error == 0)                          /* error handling omitted */
+
+    slot = face->glyph;
+
+    /* set up matrix */
+    matrix.xx = (FT_Fixed)(cos(angle) * 0x10000L);
+    matrix.xy = (FT_Fixed)(-sin(angle) * 0x10000L);
+    matrix.yx = (FT_Fixed)(sin(angle) * 0x10000L);
+    matrix.yy = (FT_Fixed)(cos(angle) * 0x10000L);
+
+    /* the pen position in 26.6 cartesian space coordinates; */
+    /* start at (40,0) relative to the upper left corner  */
+    pen.x = 0 * 64;
+    pen.y = 0 * 64;
+
+    uint16_t *p_buf = NULL;
+    uint16_t unicode_len = 0;
+    switch (text->charset)
+    {
+    case UTF_8_CHARSET:
+        p_buf = gui_malloc(text->len * sizeof(uint16_t));
+        if (p_buf == NULL)
+        {
+            GUI_ASSERT(NULL != NULL);
+            return;
+        }
+        else
+        {
+            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
+        }
+        text->len = unicode_len;
+        break;
+    case UTF_16_CHARSET:
+        unicode_len = text->len;
+        p_buf = (uint16_t *)text->content;
+        break;
+    default:
+        break;
+    }
+
+    uint32_t width = bitmap.width;
+    uint32_t rows = bitmap.rows;
+    uint8_t *buffer = bitmap.buffer;
+    int x_start = slot->bitmap_left;
+    int y_start = text->font_height - slot->bitmap_top;
+
+    for (int i = 0; i < text->len; i++)
+    {
+        /* set transformation */
+        FT_Set_Transform(face, &matrix, &pen);
+
+        /* load glyph image into the slot (erase previous one) */
+        // error = FT_Load_Char(face, text_list[i], FT_LOAD_RENDER);
+        // GUI_ASSERT(error == 0)                          /* error handling omitted */
+
+        error = FT_Load_Char(face, p_buf[i], FT_LOAD_NO_BITMAP);
+        GUI_ASSERT(error == 0)                          /* error handling omitted */
+        error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
+        GUI_ASSERT(error == 0)                          /* error handling omitted */
+
+        x_start = slot->bitmap_left + rect->x1;
+        x_start += bitmap.width;
+        y_start = text->font_height - slot->bitmap_top + rect->y1;
+
+        font_ft_draw_bitmap(text, &slot->bitmap, rect, x_start, y_start);
+        /* increment pen position */
+        pen.x += slot->advance.x;
+        pen.y += slot->advance.y;
+    }
+    switch (text->charset)
+    {
+    case UTF_8_CHARSET:
+        gui_free(p_buf);
+        break;
+    case UTF_16_CHARSET:
+        break;
+    default:
+        break;
+    }
+    FT_Done_Face(face);
+    FT_Done_FreeType(library);
+}

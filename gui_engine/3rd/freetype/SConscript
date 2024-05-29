@@ -1,0 +1,52 @@
+from building import *
+import os
+Import('PLATFORM')
+
+src = []
+inc = []
+group = []
+
+cwd = GetCurrentDir()
+
+CPPPATH = [cwd + '/include']
+
+src = [
+    cwd + "/src/autofit/autofit.c",
+    cwd + "/src/bdf/bdf.c",
+    cwd + "/src/cff/cff.c",
+    cwd + "/src/dlg/dlgwrap.c",
+    cwd + "/src/base/ftbase.c",
+    cwd + "/src/cache/ftcache.c",
+    cwd + "/src/base/ftdebug.c",
+    cwd + "/src/gzip/ftgzip.c",
+    cwd + "/src/base/ftinit.c",
+    cwd + "/src/lzw/ftlzw.c",
+    cwd + "/src/pcf/pcf.c",
+    cwd + "/src/pfr/pfr.c",
+    cwd + "/src/psaux/psaux.c",
+    cwd + "/src/pshinter/pshinter.c",
+    cwd + "/src/psnames/psmodule.c",
+    cwd + "/src/raster/raster.c",
+    cwd + "/src/sdf/sdf.c",
+    cwd + "/src/sfnt/sfnt.c",
+    cwd + "/src/smooth/smooth.c",
+    cwd + "/src/base/ftmm.c",
+    cwd + "/src/base/ftglyph.c",
+    cwd + "/src/base/ftbitmap.c",
+    cwd + "/src/base/ftsystem.c",
+    cwd + "/src/truetype/truetype.c",
+    cwd + "/src/type1/type1.c",
+    cwd + "/src/cid/type1cid.c",
+    cwd + "/src/type42/type42.c",
+    cwd + "/src/winfonts/winfnt.c",
+    cwd + "/src/svg/ftsvg.c",
+    # cwd + "/src/sdf/ftbsdf.c",
+    # cwd + "/src/sdf/ftsdf.c",
+    # cwd + "/src/sdf/ftsdfrend.c",
+]
+
+CPPDEFINES = ['ENABLE_FONT_FREETYPE']
+
+group = DefineGroup('realgui/3rd/freetype', src, depend = ['CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
+Return('group')

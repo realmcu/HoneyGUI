@@ -35,6 +35,9 @@ if GetDepend(['CONFIG_REALTEK_BUILD_PPE']):
 if GetDepend(['CONFIG_REALTEK_BUILD_PPEV2']):
     src += ['acc_rtk_ppev2.c']
 
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE']):
+    src += ['font_freetype.c']
+
 CPPPATH = [cwd]
 
 group = DefineGroup('realgui/engine', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
