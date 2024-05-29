@@ -442,6 +442,7 @@ typedef struct gui_animate
     uint32_t current_frame;
     uint32_t last_round;
     float progress_percent;
+    float last_per;
     void (* callback)(void *p, void *this_widget);
     void *p;
     bool animate;

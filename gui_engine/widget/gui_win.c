@@ -91,7 +91,6 @@ static void gui_win_update_att(gui_obj_t *obj)
         {
             this->animate->init = 1;
             this->animate->init_time_ms = gui_ms_get();
-            this->animate->Beginning_frame = 1;
         }
 
         this->animate->cur_time_ms = gui_ms_get();
@@ -113,13 +112,16 @@ static void gui_win_update_att(gui_obj_t *obj)
         else if (this->animate->repeat_count == -1)
         {
             uint32_t  round_count = cur_time_gap / this->animate->dur;
-            if (round_count > this->animate->last_round)
-            {
-                this->animate->Beginning_frame = 1;
-            }
-            this->animate->last_round = round_count;
+
+
             this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
                                               (float)this->animate->dur;
+            if (this->animate->progress_percent < this->animate->last_per)
+            {
+
+                this->animate->Beginning_frame = 1;
+            }
+            this->animate->last_per = this->animate->progress_percent;
             this->animate->callback(this->animate->p, this);
         }
         else
