@@ -63,6 +63,11 @@ typedef struct gui_img
     float t_x;                          //!< translate of screen x
     float t_y;                          //!< translate of screen y
     void *data;                         // this means address or filesystem path
+    union
+    {
+        void *file_path;                         // keep the filepath for partial draw
+        void *phy_addr;
+    };
     gui_animate_t *animate;
     uint16_t scope_x1;
     uint16_t scope_x2;

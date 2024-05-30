@@ -148,6 +148,19 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         matrix_identity(&this->img[i].matrix);
     }
 
+    for (int i = 0; i < 6; i++)
+    {
+        if (this->src_mode[i] == IMG_SRC_FILESYS)
+        {
+            this->data[i] = this->file_path[i];
+            this->img[i].data = this->data[i];
+        }
+        else if (this->src_mode[i] == IMG_SRC_MEMADDR)
+        {
+            this->img[i].data = this->data[i];
+        }
+    }
+
     gui_perspective_scale_3d(&v0, 1.0f);
     gui_perspective_scale_3d(&v1, 1.0f);
     gui_perspective_scale_3d(&v2, 1.0f);
@@ -214,7 +227,7 @@ static void gui_perspective_prepare(gui_obj_t *obj)
 
         memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(struct gui_matrix));
         matrix_inverse(&this->img[i].inverse);
-        gui_image_load_scale(&this->img[i]);
+        gui_image_load_scale(&this->img[i], (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
         gui_image_new_area(&this->img[i], NULL);
         if (gui_perspective_point_in_rect(&this->img[i], tp->x, tp->y) == true)
         {
@@ -254,7 +267,29 @@ static void gui_perspective_draw_cb(gui_obj_t *obj)
             if (this->temp[j] == this->ry[i])
             {
                 draw_img = &this->img[i];
+                // cache img to buffer
+                uint8_t *img_buff = NULL;
+
+                extern void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode);
+                img_buff = gui_draw_cache_img(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+                if (dc->type == DC_RAMLESS && this->src_mode[i] == IMG_SRC_FILESYS)
+                {
+                    if (dc->section_count == 0)
+                    {
+                        this->data[i] = img_buff;
+                    }
+                    else
+                    {
+                        img_buff = this->data[i];
+                    }
+                }
+
+                // blit
                 gui_acc_blit_to_dc(draw_img, dc, NULL);
+
+                // release img if cached
+                extern void gui_draw_free_img(draw_img_t *draw_img, void *img_buff, IMG_SOURCE_MODE_TYPE src_mode);
+                gui_draw_free_img(draw_img, img_buff, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
             }
         }
     }
@@ -276,18 +311,17 @@ static void gui_perspective_end(gui_obj_t *obj)
 
 static void gui_perspective_destory(gui_obj_t *obj)
 {
-    draw_img_t *draw_img;
+    gui_perspective_t *this = (gui_perspective_t *)obj;
 
     for (uint8_t i = 0; i < 6; i++)
     {
-        draw_img = &((gui_perspective_t *)obj)->img[i];
-
-        if (draw_img->src_mode == IMG_SRC_FILESYS)
+        if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
 #ifdef _WIN32
             // free path transforming memory on win
-            gui_free(draw_img->data);
+            gui_free(this->file_path[i]);
 #endif
+            this->file_path[i] = NULL;
         }
     }
 }
@@ -348,7 +382,7 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
     for (uint8_t i = 0; i < 6; i++)
     {
         draw_img = &this->img[i];
-        draw_img->src_mode = img_file->src_mode[i];
+        this->src_mode[i] = img_file->src_mode[i];
 
         if (img_file->src_mode[i] == IMG_SRC_FILESYS)
         {
@@ -356,11 +390,11 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
 #ifdef _WIN32
             path = gui_filepath_transforming(array[i]);
 #endif
-            draw_img->data = path;
+            this->file_path[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
-            draw_img->data = array[i];
+            this->data[i] = array[i];
         }
 
         draw_img->opacity_value = UINT8_MAX;
@@ -384,37 +418,35 @@ void gui_perspective_set_mode(gui_perspective_t *perspective,
 void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)
 {
     gui_perspective_t *this = perspective;
-    draw_img_t *draw_img;
     void *path;
 
     GUI_ASSERT(this != NULL);
 
     for (uint8_t i = 0; i < 6; i++)
     {
-        draw_img = &this->img[i];
-
         // reset file data
-        if (draw_img->src_mode == IMG_SRC_FILESYS)
+        if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
 #ifdef _WIN32
-            gui_free(draw_img->data);
+            gui_free(this->file_path[i]);
 #endif
-            draw_img->data = NULL;
+            this->file_path[i] = NULL;
+            this->data[i] = NULL;
         }
 
         // set new images
-        draw_img->src_mode = img_file->src_mode[i];
+        this->src_mode[i] = img_file->src_mode[i];
         if (img_file->src_mode[i] == IMG_SRC_FILESYS)
         {
             path = (void *)img_file->img_path[i];
 #ifdef _WIN32
             path = gui_filepath_transforming(path);
 #endif
-            draw_img->data = path;
+            this->file_path[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
-            draw_img->data = img_file->data_addr[i];
+            this->data[i] = img_file->data_addr[i];
         }
     }
 }

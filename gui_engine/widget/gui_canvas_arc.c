@@ -137,7 +137,7 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
 
 
     matrix_inverse(&img->inverse);
-    gui_image_load_scale(img);
+    gui_image_load_scale(img, IMG_SRC_MEMADDR);
     gui_image_new_area(img, NULL);
     *input_img = img;
 }

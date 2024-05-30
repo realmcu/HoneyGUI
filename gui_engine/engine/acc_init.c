@@ -78,52 +78,42 @@ static uint8_t *gui_malloc_align_img(uint8_t *offset, uint32_t size)
     return img_buff;
 }
 
-static void gui_release_imgfile_acc(draw_img_t *draw_img, const void *img_info, void *img_buff)
+void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
 {
-    gui_free(img_buff);
-    draw_img->data = (void *)img_info;
-}
-
-
-
-
-void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
-{
-    const void *img_info = image->data;
     uint8_t *img_buff = NULL;
-    bool flg_cache = false;
+    struct gui_dispdev *dc = gui_get_dc();
 
-    if (gui_get_dc()->type == DC_SINGLE)
+    do
+    {
+        if (dc->type == DC_RAMLESS)
+        {
+            if (src_mode == IMG_SRC_FILESYS)
+            {
+                // RAMLESS + MEM ADDRESS, cache img when section 0
+                if (dc->section_count != 0)
+                {
+                    // draw img is not released
+                    return img_buff;
+                }
+            }
+            else
+            {
+                // RAMLESS + MEM ADDRESS, not cache it
+                return img_buff;
+            }
+        }
+
+    }
+    while (0);
+
+    // start cache: SINGLE / RAMLESS + FILESYS(sect 0 only)
     {
         uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
         uint32_t gpu_height = image->img_h;
-        gui_rgb_data_head_t head = gui_image_get_header(image);
-        uint8_t source_bytes_per_pixel = 0;
+        gui_rgb_data_head_t head = gui_image_get_header(image, src_mode);
+        uint8_t source_bytes_per_pixel = gui_get_srcBpp(image, src_mode);
 
-        switch (head.type)
-        {
-        case RGB565:
-            source_bytes_per_pixel = 2;
-            break;
-        case RTKARGB8565:
-            source_bytes_per_pixel = 3;
-            break;
-        case ARGB8565:
-            source_bytes_per_pixel = 3;
-            break;
-        case RGB888:
-            source_bytes_per_pixel = 3;
-            break;
-        case RGBA8888:
-        case XRGB8888:
-            source_bytes_per_pixel = 4;
-            break;
-        default:
-            break;
-        }
-        GUI_ASSERT(source_bytes_per_pixel != 0);
-
-        if (image->src_mode == IMG_SRC_FILESYS)
+        if (src_mode == IMG_SRC_FILESYS)
         {
             uint32_t size = gpu_width * gpu_height * source_bytes_per_pixel;
             uint8_t *data = NULL;
@@ -144,9 +134,8 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
             {
                 gui_load_imgfile_align(image, data, source_bytes_per_pixel);
             }
-            flg_cache = true;
         }
-        else if (image->src_mode == IMG_SRC_MEMADDR)
+        else if (src_mode == IMG_SRC_MEMADDR)
         {
             uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data));
 #ifdef __WIN32
@@ -181,15 +170,46 @@ void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *r
                     }
                 }
 #endif
-                flg_cache = true;
             }
         }
     }
+    return img_buff;
+}
 
-    gui_get_acc()->blit(image, dc, rect);
+void gui_draw_free_img(draw_img_t *draw_img, void *img_buff, IMG_SOURCE_MODE_TYPE src_mode)
+{
+    struct gui_dispdev *dc = gui_get_dc();
 
-    if (flg_cache)
+    if (dc->type == DC_RAMLESS)
     {
-        gui_release_imgfile_acc(image, img_info, img_buff);
+        if (src_mode == IMG_SRC_FILESYS)
+        {
+            uint32_t section_count = dc->screen_height / dc->fb_height + ((dc->screen_height % dc->fb_height) ?
+                                                                          1 : 0);
+            // gui_log("%d: 0x%x 0x%x\n", dc->section_count, this->data, img_buff);
+            if (dc->section_count == (section_count - 1))
+            {
+                gui_free(img_buff);
+            }
+        }
+        else if (src_mode == IMG_SRC_MEMADDR)
+        {
+            // RAMLESS + MEM, not cached
+
+        }
+
     }
+    else if (dc->type == DC_SINGLE)
+    {
+        if (img_buff)
+        {
+            gui_free(img_buff);
+        }
+    }
+}
+
+
+void gui_acc_blit_to_dc(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+{
+    gui_get_acc()->blit(image, dc, rect);
 }

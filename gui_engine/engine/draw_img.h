@@ -57,12 +57,14 @@ typedef enum
 
 
 
-void gui_image_load_scale(draw_img_t *img);
+void gui_image_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
 bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect);
 bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
                            int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end);
-gui_rgb_data_head_t gui_image_get_header(draw_img_t *img);
-uint32_t gui_image_get_pixel(draw_img_t *img);
+gui_rgb_data_head_t gui_image_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
+uint32_t gui_image_get_pixel(draw_img_t *img); // analyze from img data
+uint8_t gui_get_srcBpp(draw_img_t *image,
+                       IMG_SOURCE_MODE_TYPE src_mode); // analyze from src (memory address, filesystem)
 
 extern void (* gui_image_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect);
 extern void (* gui_image_acc_end_cb)(struct draw_img *image);

@@ -68,6 +68,15 @@ typedef struct gui_perspective
     draw_img_t img[6];
     int ry[6];
     int temp[6];
+
+    union
+    {
+        void *file_path[6];                         // keep the filepath for partial draw
+        void *phy_addr[6];
+    };
+    void *data[6];
+    uint8_t src_mode[6];
+
     int16_t release_x;
     uint8_t checksum;
 } gui_perspective_t;

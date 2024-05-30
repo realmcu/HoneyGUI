@@ -55,7 +55,15 @@ typedef enum
     CUBE_SIDE_RIGHT,
     CUBE_SIDE_ALL
 } T_CUBE_SIDE_TYPE;
-
+typedef enum
+{
+    CUBE_NZ_0321 = 0,
+    CUBE_NZ_4567 = 1,
+    CUBE_NZ_5126 = 2,
+    CUBE_NZ_0473 = 3,
+    CUBE_NZ_7623 = 4,
+    CUBE_NZ_0154 = 5,
+} T_CUBE_NZ_TYPE;
 typedef struct
 {
     char *img_path_front;              //!< images file path
@@ -103,24 +111,29 @@ typedef struct
 } gui_cube_cb_t;
 
 /** @brief  CUBE widget structure */
+#ifdef  __CC_ARM
+#pragma anon_unions
+#endif
 typedef struct gui_cube
 {
     gui_obj_t base;                 //!< base structure
-    draw_img_t draw_img_front;
-    draw_img_t draw_img_back;
-    draw_img_t draw_img_up;
-    draw_img_t draw_img_down;
-    draw_img_t draw_img_left;
-    draw_img_t draw_img_right;
+    draw_img_t draw_img[6];         // draw_img_t draw_img_front;
+    // draw_img_t draw_img_back;
+    // draw_img_t draw_img_up;
+    // draw_img_t draw_img_down;
+    // draw_img_t draw_img_left;
+    // draw_img_t draw_img_right;
+
+
     float c_x;
     float c_y;
     float cbsize;
-    float nz0321;
-    float nz4567;
-    float nz5126;
-    float nz0473;
-    float nz7623;
-    float nz0154;
+    float nz[6];                    // float nz0321;
+    // float nz4567;
+    // float nz5126;
+    // float nz0473;
+    // float nz7623;
+    // float nz0154;
     //float scale_x;
     //float scale_y;
     //float t_x;
@@ -134,6 +147,14 @@ typedef struct gui_cube
     float xrot;
     float yrot;
     float zrot;
+
+    union
+    {
+        void *file_path[6];                         // keep the filepath for partial draw
+        void *phy_addr[6];
+    };
+    void *data[6];
+    uint8_t src_mode[6];
 } gui_cube_t;
 
 /** End of WIDGET_Exported_Types

@@ -130,6 +130,11 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
     this->draw_img = gui_malloc(sizeof(draw_img_t));
     memset(this->draw_img, 0x00, sizeof(draw_img_t));
+
+    if (this->src_mode == IMG_SRC_FILESYS)
+    {
+        this->data = this->file_path;
+    }
     this->draw_img->data = this->data;
     this->draw_img->blend_mode = this->blend_mode;
     this->draw_img->high_quality = this->high_quality;
@@ -172,7 +177,7 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&this->draw_img->inverse);
-    gui_image_load_scale(this->draw_img);
+    gui_image_load_scale(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
     gui_obj_t *o = obj;
     gui_win_t *win_scope = 0;
     GUI_TYPE(gui_img_scope_t, obj)->ax = obj->x;
@@ -268,8 +273,30 @@ static void gui_img_scope_draw_cb(gui_obj_t *obj)
         .y1 = GUI_TYPE(gui_img_scope_t, obj)->scope_y1,
         .y2 = GUI_TYPE(gui_img_scope_t, obj)->scope_y2,
     };
+
+    // cache img to buffer
+    uint8_t *img_buff = NULL;
+
+    extern void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode);
+    img_buff = gui_draw_cache_img(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+    if (dc->type == DC_RAMLESS && this->src_mode == IMG_SRC_FILESYS)
+    {
+        if (dc->section_count == 0)
+        {
+            this->data = img_buff;
+        }
+        else
+        {
+            img_buff = this->data;
+        }
+    }
+
+    // blit
     gui_acc_blit_to_dc(this->draw_img, dc, &rect);
 
+    // release img if cached
+    extern void gui_draw_free_img(draw_img_t *draw_img, void *img_buff, IMG_SOURCE_MODE_TYPE src_mode);
+    gui_draw_free_img(this->draw_img, img_buff, (IMG_SOURCE_MODE_TYPE)this->src_mode);
 }
 
 static void gui_img_scope_img_end(gui_obj_t *obj)
@@ -290,7 +317,17 @@ static void gui_img_scope_img_end(gui_obj_t *obj)
 static void gui_img_scope_img_destory(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);
+    gui_img_t *this = (gui_img_t *)obj;
+
     gui_log("do obj %s free\n", obj->name);
+    if (this->src_mode == IMG_SRC_FILESYS)
+    {
+#ifdef _WIN32
+        // free path transforming memory on win
+        gui_free(this->file_path);
+        this->file_path = NULL;
+#endif
+    }
 }
 
 static void gui_img_scope_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -324,6 +361,7 @@ static void gui_img_scope_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 void gui_img_scope_ctor(gui_img_t  *this,
                         gui_obj_t  *parent,
                         const char *name,
+                        IMG_SOURCE_MODE_TYPE  src_mode,
                         void       *addr,
                         int16_t     x,
                         int16_t     y,
@@ -342,12 +380,25 @@ void gui_img_scope_ctor(gui_img_t  *this,
     GET_BASE(this)->has_destroy_cb = true;
     //for self
 
-    this->data = addr;
     this->blend_mode = IMG_FILTER_BLACK;
     this->opacity_value = UINT8_MAX;
 
     this->scale_x = 1.0f;
     this->scale_y = 1.0f;
+
+    this->src_mode = src_mode;
+    if (this->src_mode == IMG_SRC_FILESYS)
+    {
+#ifdef _WIN32
+        addr = gui_filepath_transforming(addr);
+#endif
+        this->data = (void *)addr;
+        this->file_path = (void *)addr;
+    }
+    else if (this->src_mode == IMG_SRC_MEMADDR)
+    {
+        this->data = (void *)addr;
+    }
 }
 /*============================================================================*
  *                           Public Functions
@@ -371,7 +422,7 @@ gui_img_scope_t *gui_img_scope_create(void    *parent,
     GUI_ASSERT(img != NULL);
 
     memset(img, 0x00, sizeof(gui_img_scope_t));
-    gui_img_scope_ctor((void *)img, (gui_obj_t *)parent, name, addr, x, y, 0, 0);
+    gui_img_scope_ctor((void *)img, (gui_obj_t *)parent, name, IMG_SRC_MEMADDR, addr, x, y, 0, 0);
     img->scope_x1 = 0;
     img->scope_y1 = 0;
     img->scope_x2 = gui_img_get_width(&img->base);

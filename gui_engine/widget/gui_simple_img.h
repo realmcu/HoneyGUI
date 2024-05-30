@@ -48,7 +48,11 @@ typedef struct gui_simple_img
     draw_img_t *draw_img;
 
     void *data;                         // this means address or filesystem path
-
+    union
+    {
+        void *file_path;                  // keep the filepath for partial draw
+        void *phy_addr;
+    };
     uint32_t opacity_value : 8;
     uint32_t blend_mode    : 3;
     uint32_t src_mode      : 3;

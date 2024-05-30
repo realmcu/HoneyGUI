@@ -34,11 +34,13 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
     }
     return true;
 }
-void gui_image_load_scale(draw_img_t *img)
+
+
+gui_rgb_data_head_t gui_image_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
 {
     struct gui_rgb_data_head head = {0};
 
-    if (img->src_mode == IMG_SRC_FILESYS)
+    if (src_mode == IMG_SRC_FILESYS)
     {
         int fd = gui_fs_open(img->data,  0);
         if (fd <= 0)
@@ -48,35 +50,20 @@ void gui_image_load_scale(draw_img_t *img)
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
     }
-    else if (img->src_mode == IMG_SRC_MEMADDR)
-    {
-        memcpy(&head, img->data, sizeof(head));
-    }
-
-    img->img_w = head.w;
-    img->img_h = head.h;
-}
-
-gui_rgb_data_head_t gui_image_get_header(draw_img_t *img)
-{
-    struct gui_rgb_data_head head = {0};
-
-    if (img->src_mode == IMG_SRC_FILESYS)
-    {
-        int fd = gui_fs_open(img->data,  0);
-        if (fd <= 0)
-        {
-            gui_log("open file fail:%s !\n", (char *)img->data);
-        }
-        gui_fs_read(fd, &head, sizeof(head));
-        gui_fs_close(fd);
-    }
-    else if (img->src_mode == IMG_SRC_MEMADDR)
+    else if (src_mode == IMG_SRC_MEMADDR)
     {
         memcpy(&head, img->data, sizeof(head));
     }
 
     return head;
+}
+void gui_image_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
+{
+    struct gui_rgb_data_head head = {0};
+
+    head = gui_image_get_header(img, src_mode);
+    img->img_w = head.w;
+    img->img_h = head.h;
 }
 uint32_t gui_image_get_pixel(draw_img_t *img)
 {
@@ -98,6 +85,31 @@ uint32_t gui_image_get_pixel(draw_img_t *img)
         return 4;
     }
     return 0;
+}
+uint8_t gui_get_srcBpp(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
+{
+    struct gui_rgb_data_head head = gui_image_get_header(image, src_mode);
+    uint8_t source_bytes_per_pixel = 0;
+
+    switch (head.type)
+    {
+    case RGB565:
+        source_bytes_per_pixel = 2;
+        break;
+    case RTKARGB8565:
+    case ARGB8565:
+    case RGB888:
+        source_bytes_per_pixel = 3;
+        break;
+    case RGBA8888:
+    case XRGB8888:
+        source_bytes_per_pixel = 4;
+        break;
+    default:
+        break;
+    }
+    GUI_ASSERT(source_bytes_per_pixel != 0);
+    return source_bytes_per_pixel;
 }
 bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
 {
