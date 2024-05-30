@@ -113,7 +113,7 @@ void gui_server_msg_handler(gui_msg_t *msg)
         }
     case GUI_EVENT_USER_DEFINE:
         {
-            msg->cb(msg->payload);
+            msg->cb(msg);
             break;
         }
     case GUI_EVENT_RESET_ACTIVE_TIME:

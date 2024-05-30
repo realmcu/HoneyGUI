@@ -416,6 +416,7 @@ typedef void (*gui_msg_cb)(void *);
 typedef struct gui_msg
 {
     uint16_t event;
+    uint16_t sub_event;
     gui_msg_cb cb;
     void *payload;
 } gui_msg_t;
