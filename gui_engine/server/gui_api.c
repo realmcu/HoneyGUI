@@ -311,6 +311,7 @@ void gui_free(void *rmem)
 }
 
 static uint32_t total_used_size = 0;
+#ifndef ENABLE_RTK_GUI_OS_HEAP
 static void gui_walker(void *ptr, size_t size, int used, void *user)
 {
     if (used)
@@ -321,6 +322,7 @@ static void gui_walker(void *ptr, size_t size, int used, void *user)
     gui_log("\t%p %s size: %x; total = %d\n", ptr, used ? "used" : "free", (unsigned int)size,
             total_used_size);
 }
+#endif
 
 void gui_mem_debug(void)
 {
