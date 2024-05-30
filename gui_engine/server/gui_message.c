@@ -56,8 +56,14 @@ bool gui_send_msg_to_server(gui_msg_t *msg)
     if (gui_server_mq != NULL)
     {
         GUI_ASSERT(msg != NULL);
-        gui_mq_send(gui_server_mq, msg, sizeof(gui_msg_t), 0);
-        return true;
+        if (gui_mq_send(gui_server_mq, msg, sizeof(gui_msg_t), 0))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
@@ -82,6 +88,7 @@ void gui_server_msg_handler(gui_msg_t *msg)
     {
     case GUI_EVENT_DISPLAY_ON:
         {
+            app->start_ms = gui_ms_get();
             gui_display_on();
             gui_fb_change();
             break;
@@ -106,7 +113,6 @@ void gui_server_msg_handler(gui_msg_t *msg)
         }
     case GUI_EVENT_USER_DEFINE:
         {
-            app->start_ms = gui_ms_get();
             msg->cb(msg->payload);
             break;
         }
