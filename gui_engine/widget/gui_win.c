@@ -111,7 +111,7 @@ static void gui_win_update_att(gui_obj_t *obj)
         }
         else if (this->animate->repeat_count == -1)
         {
-            uint32_t  round_count = cur_time_gap / this->animate->dur;
+            // uint32_t  round_count = cur_time_gap / this->animate->dur;
 
 
             this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
