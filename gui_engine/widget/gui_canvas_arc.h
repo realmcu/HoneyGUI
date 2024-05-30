@@ -59,13 +59,11 @@ typedef struct gui_canvas_arc
 {
     gui_obj_t base;
     uint8_t *arc_data;
+    uint8_t *circle_data;
 
-    draw_img_t *arc_img_01;
-    draw_img_t *arc_img_02;
-    draw_img_t *arc_img_03;
-    draw_img_t *arc_img_04;
-    draw_img_t *arc_img_05;
-    draw_img_t *arc_img_06;
+    draw_img_t *arc_img[12];
+    draw_img_t *circle_img_01;
+    draw_img_t *circle_img_02;
     float  from;
     float  to;
     int  r;

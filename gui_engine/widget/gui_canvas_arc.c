@@ -109,7 +109,6 @@ static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
 }
 
 
-
 static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_img,
                         float rotate_degree, float image_angle, int img_w, int img_h)
 {
@@ -121,14 +120,11 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
     img->data = data;
     img->blend_mode = IMG_SRC_OVER_MODE;
     img->opacity_value = UINT8_MAX;
+    img->high_quality = 1;
     memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
-
-    matrix_translate(-(this->cx - this->r), -(this->cy - this->r), &img->matrix);
-
-
-    matrix_translate(this->cx, this->cy, &img->matrix);
-    matrix_rotate(rotate_degree, &img->matrix);
-    matrix_translate(-img_w / 2, -(this->r + this->stroke_width / 2), &img->matrix);
+    matrix_translate(this->r + this->stroke_width / 2, this->r + this->stroke_width / 2, &img->matrix);
+    matrix_rotate(rotate_degree + 90, &img->matrix);
+    matrix_translate(-(this->r + this->stroke_width / 2 + 1), -img_h / 2, &img->matrix);
 
 
 
@@ -142,62 +138,204 @@ static void set_arc_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_i
     *input_img = img;
 }
 
-static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
+static void set_circle_img(gui_canvas_arc_t *this, void *data, draw_img_t **input_img,
+                           bool start, int img_w, int img_h)
 {
+    gui_obj_t *obj = (gui_obj_t *)this;
+    draw_img_t *img = NULL;
+    img = gui_malloc(sizeof(draw_img_t));
+    memset(img, 0x00, sizeof(draw_img_t));
 
-    float degree = this->to - this->from;
-
-    if (degree >= 60)
+    img->data = data;
+    img->blend_mode = IMG_SRC_OVER_MODE;
+    img->opacity_value = UINT8_MAX;
+    img->high_quality = 1;
+    memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
+    if (start)
     {
-        degree = 60;
+        float start_x = this->cx + fix_sin((int)this->from) * this->r;
+        float start_y = this->cy - fix_cos((int)this->from) * this->r;
+        matrix_translate(-(this->cx - this->r - this->stroke_width / 2) + start_x - img_w / 2,
+                         -(this->cy - this->r - this->stroke_width / 2) + start_y - img_h / 2, &img->matrix);
+    }
+    else
+    {
+        float start_x = this->cx + fix_sin((int)this->to) * this->r;
+        float start_y = this->cy - fix_cos((int)this->to) * this->r;
+        matrix_translate(-(this->cx - this->r - this->stroke_width / 2) + start_x - img_w / 2,
+                         -(this->cy - this->r - this->stroke_width / 2) + start_y - img_h / 2, &img->matrix);
     }
 
-    float img_angle = (degree / 2) / 180.0f * 3.1415926f;
-    int img_w = this->stroke_width + 2 * this->r * sin(img_angle);
-    int img_h = this->stroke_width + this->r - this->r * cos(img_angle) + 1;
 
+
+    memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
+
+
+
+    matrix_inverse(&img->inverse);
+    gui_image_load_scale(img, IMG_SRC_MEMADDR);
+    gui_image_new_area(img, NULL);
+    *input_img = img;
+}
+
+
+
+static void gui_canvas_circle_prepare(gui_canvas_arc_t *this)
+{
+    int radius = this->stroke_width / 2;
+    int img_w = radius * 2;
+    int img_h = this->stroke_width + 2;
+    this->circle_data = gui_malloc(img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
+
+    memset(this->circle_data, 0x00, img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
+    uint32_t *data = (uint32_t *)(this->circle_data + sizeof(gui_rgb_data_head_t));
+    float boundary[img_h / 2];
+    for (int i = 1; i <= radius; i++)
+    {
+        float y = i - 0.5 - radius;
+        boundary[i - 1] = radius - sqrtf(radius * radius - y * y);
+    }
+    for (int i = 1; i <= radius; i++)
+    {
+        int k = i - 1;
+        uint16_t right = (int)boundary[k];
+        uint32_t offset = img_w * i;
+        if (right < img_w)
+        {
+            for (int j = right + 1; j < img_w - right - 1; j++)
+            {
+                data[offset + j] = this->color.color.rgba_full;
+            }
+        }
+        float portion = ceil(boundary[k]) - boundary[k];
+        gui_color_t color = this->color;
+        color.color.rgba.a = round(portion * color.color.rgba.a);
+        data[offset + right] = color.color.rgba_full;
+        data[offset + img_w - right - 1] = color.color.rgba_full;
+        if (k > radius / 2 - 1)
+        {
+            data[(right + 1) * img_w + k] = color.color.rgba_full;
+            data[(right + 2) * img_w - k - 1] = color.color.rgba_full;
+        }
+    }
+    for (int i = 1; i <= radius; i++)
+    {
+        uint32_t *src = data + i * img_w;
+        uint32_t *dst = data + (img_h - i - 1) * img_w;
+        memcpy(dst, src, img_w * sizeof(uint32_t));
+    }
+
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->circle_data;
+
+    set_arc_w_and_h(head, img_w, img_h);
+
+    set_circle_img(this, this->circle_data, &this->circle_img_01, true, img_w, img_h);
+    set_circle_img(this, this->circle_data, &this->circle_img_02, false, img_w, img_h);
+}
+
+
+static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
+{
+    float degree = this->to - this->from;
+
+    if (degree >= 30)
+    {
+        degree = 30;
+    }
+
+    float img_angle = ((degree + 2) / 2) / 180.0f * 3.1415926f;
+    int img_h = ceil(2 * (this->r + this->stroke_width / 2) * sin(img_angle)) + 2;
+    if (img_h % 2)
+    {
+        img_h += 1;
+    }
+    int img_w = ceil(this->stroke_width / 2.0f + this->r - (this->r - this->stroke_width / 2.0f) * cos(
+                         img_angle)) + 2;
+    degree = this->to - this->from;
     if (this->use_external_picture == false)
     {
         this->arc_data = gui_malloc(img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
-        degree = this->to - this->from;
 
-        memset(this->arc_data, 0x0, img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
-
-        NVGcontext *vg = nvgCreateAGGE(img_w, img_h, img_w * 4 /*ARGB 4 byte*/, NVG_TEXTURE_BGRA,
-                                       (uint8_t *)this->arc_data + sizeof(gui_rgb_data_head_t));
-        nvgBeginFrame(vg, img_w, img_h, 1);
-
-        // Draw 1/4 circle
-        nvgArc(vg, img_w / 2, this->r + this->stroke_width / 2, this->r, -NVG_PI / 2 - img_angle,
-               -NVG_PI / 2 + img_angle, NVG_CW);
-
-        nvgStrokeWidth(vg, this->stroke_width);
-
-        nvgLineCap(vg, this->cap);
-
-        nvgStrokeColor(vg, nvgRGBA(this->color.color.rgba.r, this->color.color.rgba.g,
-                                   this->color.color.rgba.b, this->color.color.rgba.a));
-
-        nvgStroke(vg);
-
-
-        nvgEndFrame(vg);
-        nvgDeleteAGGE(vg);
-
-        for (uint32_t i = 0; i < img_h; i++)
+        int32_t h_draw = img_h / 2;
+        int r2 = this->r + this->stroke_width / 2;
+        int r1 = this->r - this->stroke_width / 2;
+        float left_boundary[h_draw];
+        float right_boundary[h_draw];
+        float right_boundary_sub[h_draw];
+        float line_y = 1 / tanf(img_angle);
+        float line_c = r2 - line_y * h_draw;
+        memset(left_boundary, 0, h_draw * sizeof(float));
+        memset(right_boundary, 0, h_draw * sizeof(float));
+        memset(right_boundary_sub, 0, h_draw * sizeof(float));
+        bool exceed = false;
+        for (int i = 1; i <= h_draw; i++)
         {
-            for (uint32_t j = 0; j < img_w; j++)
+            int k = i - 1;
+            float y = k + 0.5 - h_draw;
+            left_boundary[k] = r2 - sqrtf(r2 * r2 - y * y);
+            float right = r2 - sqrtf(r1 * r1 - y * y);
+            if (!exceed)
             {
-                gui_color_t *pixel = (gui_color_t *)this->arc_data + i * img_w + j + 2;
-                if ((pixel->color.rgba.r != 0) || (pixel->color.rgba.g != 0) || (pixel->color.rgba.b != 0))
+                float line_right = line_y * (k + 0.5) + line_c;
+                if (line_right > right)
                 {
-                    pixel->color.rgba.a = this->color.color.rgba.a;
-                    pixel->color.rgba.r = this->color.color.rgba.r;
-                    pixel->color.rgba.g = this->color.color.rgba.g;
-                    pixel->color.rgba.b = this->color.color.rgba.b;
+                    exceed = true;
+                }
+                else
+                {
+                    right_boundary_sub[k] = line_y * (k + 1) + line_c;
+                    right = line_right;
+                }
+            }
+            right_boundary[k] = right;
+        }
+        memset(this->arc_data, 0x00, img_w * img_h * 4 + sizeof(gui_rgb_data_head_t));
+        uint32_t *data = (uint32_t *)(this->arc_data + sizeof(gui_rgb_data_head_t));
+        for (int i = 1; i <= h_draw; i++)
+        {
+            int k = i - 1;
+            int16_t left = (int)left_boundary[k];
+            int16_t right = (int)right_boundary[k];
+            uint32_t offset = img_w * i;
+            if (left < right - 1)
+            {
+                for (int j = left + 1; j < right; j++)
+                {
+                    data[offset + j + 1] = this->color.color.rgba_full;
+                }
+            }
+            float portion = ceil(left_boundary[k]) - left_boundary[k];
+            gui_color_t color = this->color;
+            color.color.rgba.a = round(portion * color.color.rgba.a);
+            data[offset + left + 1] = color.color.rgba_full;
+            portion = right_boundary[k] - (int)right_boundary[k];
+            color.color.rgba.a = round(portion * this->color.color.rgba.a);
+            uint8_t right_a = color.color.rgba.a;
+            data[offset + right + 1] = color.color.rgba_full;
+            if (right_boundary_sub[k] > right + 1 && right_boundary_sub[k] < img_w + 1)
+            {
+                int right_sub = (int)right_boundary_sub[k];
+                portion = (right_boundary_sub[k] - right_boundary[k]) / 4 * ((right_boundary_sub[k] - right_sub) /
+                                                                             (right_boundary_sub[k] - right_boundary[k]));
+                color.color.rgba.a = round(portion * this->color.color.rgba.a);
+                data[offset + right + 1] = color.color.rgba_full;
+                if (right_boundary_sub[k] > right + 2)
+                {
+                    color.color.rgba.a = (uint8_t)((uint16_t)right_a + (uint16_t)color.color.rgba.a) / 2;
+                    for (int j = right + 1; j < right_sub; j++)
+                    {
+                        data[offset + j + 1] = color.color.rgba_full;
+                    }
                 }
             }
         }
+        for (int i = 1; i <= h_draw; i++)
+        {
+            uint32_t *src = data + i * img_w;
+            uint32_t *dst = data + (img_h - i - 1) * img_w;
+            memcpy(dst, src, img_w * sizeof(uint32_t));
+        }
+
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->arc_data;
 
         set_arc_w_and_h(head, img_w, img_h);
@@ -231,64 +369,29 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
 
     }
 
-
-
-    if (degree <= 60)
+    int t = ceil(degree / 30);
+    if (degree > 30)
     {
-        set_arc_img(this, this->arc_data, &this->arc_img_01, this->from + degree / 2, img_angle, img_w,
-                    img_h);
-    }
-    else if (degree <= 120)
-    {
-
-        set_arc_img(this, this->arc_data, &this->arc_img_01, this->from + 30, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_02, this->from + 30 + (degree - 60), img_angle,
-                    img_w, img_h);
-    }
-    else if (degree <= 180)
-    {
-        set_arc_img(this, this->arc_data, &this->arc_img_01, this->from + 30, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_02, this->from + 30 + 60, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_03, this->from + 30 + 60 + (degree - 120),
-                    img_angle, img_w, img_h);
-    }
-    else if (degree <= 240)
-    {
-        set_arc_img(this, this->arc_data, &this->arc_img_01, this->from + 30, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_02, this->from + 30 + 60, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_03, this->from + 30 + 60 + 60, img_angle, img_w,
-                    img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_04, this->from + 30 + 60 + 60 + (degree - 180),
-                    img_angle, img_w, img_h);
-    }
-    else if (degree <= 300)
-    {
-        set_arc_img(this, this->arc_data, &this->arc_img_01, this->from + 30, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_02, this->from + 30 + 60, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_03, this->from + 30 + 60 + 60, img_angle, img_w,
-                    img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_04, this->from + 30 + 60 + 60 + 60, img_angle,
-                    img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_05,
-                    this->from + 30 + 60 + 60 + 60 + (degree - 240), img_angle, img_w, img_h);
-    }
-    else if (degree <= 360)
-    {
-        set_arc_img(this, this->arc_data, &this->arc_img_01, this->from + 30, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_02, this->from + 30 + 60, img_angle, img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_03, this->from + 30 + 60 + 60, img_angle, img_w,
-                    img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_04, this->from + 30 + 60 + 60 + 60, img_angle,
-                    img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_05, this->from + 30 + 60 + 60 + 60 + 60, img_angle,
-                    img_w, img_h);
-        set_arc_img(this, this->arc_data, &this->arc_img_06,
-                    this->from + 30 + 60 + 60 + 60 + 60 + (degree - 300), img_angle, img_w, img_h);
+        for (int i = 0; i < t; i++)
+        {
+            if (i == t - 1)
+            {
+                set_arc_img(this, this->arc_data, &this->arc_img[i], this->from + degree - 15, img_angle, img_w,
+                            img_h);
+            }
+            else
+            {
+                set_arc_img(this, this->arc_data, &this->arc_img[i], this->from + 15 + 30 * i, img_angle, img_w,
+                            img_h);
+            }
+        }
     }
     else
     {
-        GUI_ASSERT(NULL != NULL);
+        set_arc_img(this, this->arc_data, &this->arc_img[0], this->from + degree / 2, img_angle, img_w,
+                    img_h);
     }
+
 }
 
 static void gui_canvas_arc_draw(gui_canvas_arc_t *this)
@@ -296,48 +399,23 @@ static void gui_canvas_arc_draw(gui_canvas_arc_t *this)
     gui_dispdev_t *dc = gui_get_dc();
 
     float degree = this->to - this->from;
-    if (degree <= 60)
+    if (degree > 360)
     {
-        gui_acc_blit_to_dc(this->arc_img_01, dc, NULL);
+        degree = 360;
     }
-    else if (degree <= 120)
+    if (degree == 0)
     {
-        gui_acc_blit_to_dc(this->arc_img_01, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_02, dc, NULL);
+        return;
     }
-    else if (degree <= 180)
+    int num = ceil(degree / 30);
+    for (int i = 0; i < num; i++)
     {
-        gui_acc_blit_to_dc(this->arc_img_01, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_02, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_03, dc, NULL);
+        gui_acc_blit_to_dc(this->arc_img[i], dc, NULL);
     }
-    else if (degree <= 240)
+    if (this->cap == CANVAS_ARC_ROUND)
     {
-        gui_acc_blit_to_dc(this->arc_img_01, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_02, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_03, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_04, dc, NULL);
-    }
-    else if (degree <= 300)
-    {
-        gui_acc_blit_to_dc(this->arc_img_01, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_02, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_03, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_04, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_05, dc, NULL);
-    }
-    else if (degree <= 360)
-    {
-        gui_acc_blit_to_dc(this->arc_img_01, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_02, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_03, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_04, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_05, dc, NULL);
-        gui_acc_blit_to_dc(this->arc_img_06, dc, NULL);
-    }
-    else
-    {
-        GUI_ASSERT(NULL != NULL);
+        gui_acc_blit_to_dc(this->circle_img_01, dc, NULL);
+        gui_acc_blit_to_dc(this->circle_img_02, dc, NULL);
     }
 
 }
@@ -353,13 +431,14 @@ static void gui_canvas_arc_end(gui_canvas_arc_t *this)
     GUI_UNUSED(tp);
     GUI_UNUSED(dc);
     if (this->arc_data != NULL)    {gui_free(this->arc_data); this->arc_data = NULL;}
+    if (this->circle_data != NULL) {gui_free(this->circle_data); this->circle_data = NULL;}
 
-    if (this->arc_img_01 != NULL) {gui_free(this->arc_img_01); this->arc_img_01 = NULL;}
-    if (this->arc_img_01 != NULL) {gui_free(this->arc_img_02); this->arc_img_02 = NULL;}
-    if (this->arc_img_01 != NULL) {gui_free(this->arc_img_03); this->arc_img_03 = NULL;}
-    if (this->arc_img_01 != NULL) {gui_free(this->arc_img_04); this->arc_img_04 = NULL;}
-    if (this->arc_img_01 != NULL) {gui_free(this->arc_img_05); this->arc_img_05 = NULL;}
-    if (this->arc_img_01 != NULL) {gui_free(this->arc_img_06); this->arc_img_06 = NULL;}
+    for (int i = 0; i < 12; i++)
+    {
+        if (this->arc_img[i] != NULL) {gui_free(this->arc_img[i]); this->arc_img[i] = NULL;}
+    }
+    if (this->circle_img_01 != NULL) {gui_free(this->circle_img_01); this->circle_img_01 = NULL;}
+    if (this->circle_img_02 != NULL) {gui_free(this->circle_img_02); this->circle_img_02 = NULL;}
 }
 
 static void gui_canvas_arc_destory(gui_canvas_arc_t *this)
@@ -382,6 +461,7 @@ static void gui_canvas_arc_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         {
         case OBJ_PREPARE:
             gui_canvas_arc_prepare((gui_canvas_arc_t *)obj);
+            gui_canvas_circle_prepare((gui_canvas_arc_t *)obj);
             break;
 
         case OBJ_DRAW:
@@ -447,8 +527,9 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
     this->color = color;
     this->stroke_width = stroke_width;
 
-    gui_obj_ctor((gui_obj_t *)this, parent, name, cx - this->r, cy - this->r, cx + this->r,
-                 cy + this->r);
+    gui_obj_ctor((gui_obj_t *)this, parent, name, cx - this->r - this->stroke_width / 2,
+                 cy - this->r - this->stroke_width / 2, this->r * 2 + this->stroke_width,
+                 this->r * 2 + this->stroke_width);
 
     obj->obj_cb = gui_canvas_arc_cb;
     obj->has_prepare_cb = true;
