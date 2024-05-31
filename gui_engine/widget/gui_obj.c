@@ -260,6 +260,14 @@ void gui_obj_tree_free(void *obj)
     else
     {
         gui_log("obj %s parent equal NULL!\n", object->name);
+        if (object->matrix != NULL)
+        {
+            gui_free(object->matrix);
+        }
+        if (object->event_dsc != NULL)
+        {
+            gui_free(object->event_dsc);
+        }
         gui_list_init(&object->child_list);
     }
 }

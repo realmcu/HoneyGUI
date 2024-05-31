@@ -39,6 +39,17 @@ static void canvas_cb_black(gui_canvas_t *canvas)
 static void app_dialing_ui_design(gui_app_t *app)
 {
 
+    // gui_canvas_round_rect_create(&(app->screen), "t", 84, 100, 298, 78, 38, gui_rgba(100, 0, 0, 255));
+
+    // gui_canvas_arc_t *arc = gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 200, 0, 300, 20, gui_rgba(255, 0, 0, 255));
+    // gui_canvas_arc_set_cap(arc, CANVAS_ARC_ROUND);
+
+    // gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 150, 0, 360, 20, gui_rgba(0, 255, 0, 255));
+
+    // gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 100, 0, 270, 20, gui_rgba(0, 255, 0, 255));
+
+    // return;
+
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, TAB_CUBE);
 

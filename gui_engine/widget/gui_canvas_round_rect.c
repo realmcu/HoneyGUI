@@ -100,7 +100,7 @@ static void set_rect_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, 
     head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
     head->rsvd = 0;
-    head->type = XRGB8888;
+    head->type = ARGB8888;
     head->version = 0;
     head->rsvd2 = 0;
     head->w = w;

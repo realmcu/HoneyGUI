@@ -1,6 +1,6 @@
 
-#ifndef __TODO_DEF_H__
-#define __TODO_DEF_H__
+#ifndef __DEF_IMAGE_H__
+#define __DEF_IMAGE_H__
 
 
 

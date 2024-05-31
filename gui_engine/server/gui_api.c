@@ -330,7 +330,9 @@ void gui_mem_debug(void)
 #ifdef ENABLE_RTK_GUI_OS_HEAP
     gui_log("can't use thie func");
 #else
+    gui_log("\t\n");
     tlsf_walk_pool(tlsf_get_pool(tlsf), gui_walker, &total_used_size);
+    gui_log("\t\n");
 #endif
     total_used_size = 0;
 }
