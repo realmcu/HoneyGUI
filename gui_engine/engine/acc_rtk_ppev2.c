@@ -330,9 +330,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     }
 
     bool shape_transform = true;
-    if ((image->matrix.m[2][2] == 1 && image->matrix.m[0][1] == 0 && \
-         image->matrix.m[1][0] == 0 && image->matrix.m[2][0] == 0 && \
-         image->matrix.m[2][1] == 0) || image->blend_mode == IMG_COVER_MODE)
+    if (image->blend_mode == IMG_RECT)
+    {
+        mode = PPEV2_CONST_MASK_MODE;
+    }
+    else if ((image->matrix.m[2][2] == 1 && image->matrix.m[0][1] == 0 && \
+              image->matrix.m[1][0] == 0 && image->matrix.m[2][0] == 0 && \
+              image->matrix.m[2][1] == 0) || image->blend_mode == IMG_COVER_MODE)
     {
         shape_transform = false;
         if ((image->matrix.m[0][0] == 1 && image->matrix.m[1][1] == 1) || image->blend_mode == IMG_RECT)
@@ -461,10 +465,6 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     else if (image->blend_mode == IMG_COVER_MODE)
     {
         mode = PPEV2_BYPASS_MODE;
-    }
-    else if (image->blend_mode == IMG_RECT)
-    {
-        mode = PPEV2_CONST_MASK_MODE;
     }
     else if (image->blend_mode == IMG_SRC_OVER_MODE || image->blend_mode == IMG_FILTER_BLACK)
     {
@@ -739,6 +739,15 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         }
         else
         {
+            if (rect != NULL)
+            {
+                ppe_get_identity(&pre_trans);
+                pre_trans.m[0][2] = rect->x1 * -1.0f;
+                pre_trans.m[1][2] = rect->y1 * -1.0f;
+                ppe_mat_multiply(&pre_trans, &inverse);
+                source.width = rect->x2 - rect->x1 + 1;
+                source.height = rect->y2 - rect->y1 + 1;
+            }
             ppe_translate(0, dc->section.y1, &inverse);
             gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
             gui_color_t color = {.color.argb_full = rect_header->color.color.argb_full};
