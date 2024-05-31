@@ -101,7 +101,7 @@ static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h)
     head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
     head->rsvd = 0;
-    head->type = RGBA8888;
+    head->type = ARGB8888;
     head->version = 0;
     head->rsvd2 = 0;
     head->w = w;
@@ -204,18 +204,18 @@ static void gui_canvas_circle_prepare(gui_canvas_arc_t *this)
         {
             for (int j = right + 1; j < img_w - right - 1; j++)
             {
-                data[offset + j] = this->color.color.rgba_full;
+                data[offset + j] = this->color.color.argb_full;
             }
         }
         float portion = ceil(boundary[k]) - boundary[k];
         gui_color_t color = this->color;
         color.color.rgba.a = round(portion * color.color.rgba.a);
-        data[offset + right] = color.color.rgba_full;
-        data[offset + img_w - right - 1] = color.color.rgba_full;
+        data[offset + right] = color.color.argb_full;
+        data[offset + img_w - right - 1] = color.color.argb_full;
         if (k > radius / 2 - 1)
         {
-            data[(right + 1) * img_w + k] = color.color.rgba_full;
-            data[(right + 2) * img_w - k - 1] = color.color.rgba_full;
+            data[(right + 1) * img_w + k] = color.color.argb_full;
+            data[(right + 2) * img_w - k - 1] = color.color.argb_full;
         }
     }
     for (int i = 1; i <= radius; i++)
@@ -301,30 +301,30 @@ static void gui_canvas_arc_prepare(gui_canvas_arc_t *this)
             {
                 for (int j = left + 1; j < right; j++)
                 {
-                    data[offset + j + 1] = this->color.color.rgba_full;
+                    data[offset + j + 1] = this->color.color.argb_full;
                 }
             }
             float portion = ceil(left_boundary[k]) - left_boundary[k];
             gui_color_t color = this->color;
             color.color.rgba.a = round(portion * color.color.rgba.a);
-            data[offset + left + 1] = color.color.rgba_full;
+            data[offset + left + 1] = color.color.argb_full;
             portion = right_boundary[k] - (int)right_boundary[k];
             color.color.rgba.a = round(portion * this->color.color.rgba.a);
             uint8_t right_a = color.color.rgba.a;
-            data[offset + right + 1] = color.color.rgba_full;
+            data[offset + right + 1] = color.color.argb_full;
             if (right_boundary_sub[k] > right + 1 && right_boundary_sub[k] < img_w + 1)
             {
                 int right_sub = (int)right_boundary_sub[k];
                 portion = (right_boundary_sub[k] - right_boundary[k]) / 4 * ((right_boundary_sub[k] - right_sub) /
                                                                              (right_boundary_sub[k] - right_boundary[k]));
                 color.color.rgba.a = round(portion * this->color.color.rgba.a);
-                data[offset + right + 1] = color.color.rgba_full;
+                data[offset + right + 1] = color.color.argb_full;
                 if (right_boundary_sub[k] > right + 2)
                 {
                     color.color.rgba.a = (uint8_t)((uint16_t)right_a + (uint16_t)color.color.rgba.a) / 2;
                     for (int j = right + 1; j < right_sub; j++)
                     {
-                        data[offset + j + 1] = color.color.rgba_full;
+                        data[offset + j + 1] = color.color.argb_full;
                     }
                 }
             }

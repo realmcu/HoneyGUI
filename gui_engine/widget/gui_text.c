@@ -621,7 +621,7 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
         break;
 
     case ARGB8565:
-    case RGBA8888:
+    case ARGB8888:
         {
             text_img->blend_mode = IMG_SRC_OVER_MODE;
         }

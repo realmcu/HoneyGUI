@@ -443,7 +443,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         memset(font_shape, 0, sizeof(NSVGshape));
         font_shape->opacity = 1;
         font_shape->fill.type = 1;
-        font_shape->fill.d.color = text->color.color.rgba_full;
+        font_shape->fill.d.color = text->color.color.argb_full;
         font_shape->flags = 1;
         // font_shape->bounds[0] = 0;
         // font_shape->bounds[1] = 0;

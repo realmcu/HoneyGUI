@@ -274,7 +274,7 @@ static void curtain_center(gui_curtainview_t *curtainview)
     gui_text_set(date, "Sun 6/6/2023", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12, 32);
     gui_text_mode_set(date, LEFT);
     gui_text_type_set(date, HARMONYOS_SIZE32_BITS8_FONT_BIN);
-    gui_text_convert_to_img(date, RGBA8888);
+    gui_text_convert_to_img(date, ARGB8888);
 
     gui_img_t *bt = gui_img_create_from_mem(curtain_center, "bt", ICBLECONNECT24_BIN, 150, 3, 0, 0);
     gui_img_t *bat = gui_img_create_from_mem(curtain_center, "bat", ICBATTERYLVL4_BIN, 185, 6, 0, 0);

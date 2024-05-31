@@ -297,11 +297,34 @@ typedef struct draw_img
     void *acc_user;
 } draw_img_t;
 
+typedef struct _gui_color
+{
+    union
+    {
+        struct
+        {
+            uint8_t b; ///< Blue color component, at the lowest address
+            uint8_t g; ///< Green color component
+            uint8_t r; ///< Red color component
+            uint8_t a; ///< Alpha channel for transparency, at the highest address
+        } rgba;
+        uint32_t argb_full;
+    } color;
+} gui_color_t;
+typedef struct draw_circle
+{
+    int16_t x;
+    int16_t y;
+    int16_t Radius;
+    int16_t lineWidth;
+    gui_color_t color;
+} draw_circle_t;
+
 typedef struct acc_engine
 {
-    void (*blit)(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+    void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
     //todo
-    // void (*draw_circle)(canvas_circle_t *circle, struct gui_dispdev *dc);
+    void (*draw_circle)(draw_circle_t *circle, gui_dispdev_t *dc, gui_rect_t *rect);
     // void (*draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
     // void (*draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
     // void (*draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
@@ -499,21 +522,6 @@ typedef struct _gui_obj_t
     gui_matrix_t *matrix;
 
 } gui_obj_t;
-
-typedef struct _gui_color
-{
-    union
-    {
-        struct
-        {
-            uint8_t b; ///< Blue color component, at the lowest address
-            uint8_t g; ///< Green color component
-            uint8_t r; ///< Red color component
-            uint8_t a; ///< Alpha channel for transparency, at the highest address
-        } rgba;
-        uint32_t rgba_full;
-    } color;
-} gui_color_t;
 
 typedef struct gui_rgb_data_head
 {

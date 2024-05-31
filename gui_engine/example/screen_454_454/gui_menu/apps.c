@@ -308,7 +308,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
-        gui_text_convert_to_img(t, RGBA8888);
+        gui_text_convert_to_img(t, ARGB8888);
 
         gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
         gui_img_rotation(t->scale_img, 0, gui_img_get_width(t->scale_img) / 2, 0);
@@ -369,7 +369,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
         //puts(buffer_text);
 #endif
         gui_text_content_set(time_txt, buffer_text, strlen(buffer_text));
-        gui_text_convert_to_img(time_txt, RGBA8888);
+        gui_text_convert_to_img(time_txt, ARGB8888);
     }
     if (date_txt)
     {
@@ -618,7 +618,7 @@ GUI_APP_ENTRY(APP_STOPWATCH)
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
-        gui_text_convert_to_img(t, RGBA8888);
+        gui_text_convert_to_img(t, ARGB8888);
         gui_text_mode_set(t, CENTER);
 
     }
@@ -655,7 +655,7 @@ static void stop_watch_win_ani_cb()
     gui_text_t *time_txt = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
     gui_text_content_set(time_txt, buffer, strlen(buffer));
-    gui_text_convert_to_img(time_txt, RGBA8888);
+    gui_text_convert_to_img(time_txt, ARGB8888);
 }
 #include "gui_map.h"
 GUI_APP_ENTRY(APP_MAP)

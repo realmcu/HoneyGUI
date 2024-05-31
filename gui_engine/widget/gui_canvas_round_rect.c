@@ -116,7 +116,7 @@ static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
     head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
     head->rsvd = 0;
-    head->type = RGBA8888;
+    head->type = ARGB8888;
     head->version = 0;
     head->rsvd2 = 0;
     head->w = w;
@@ -168,16 +168,16 @@ static void prepare_arc_img(gui_canvas_round_rect_t *this)
         {
             for (int j = right + 1; j < this->r; j++)
             {
-                data[offset + j] = this->color.color.rgba_full;
+                data[offset + j] = this->color.color.argb_full;
             }
         }
         float portion = ceil(boundary[i]) - boundary[i];
         gui_color_t color = this->color;
         color.color.rgba.a = round(portion * color.color.rgba.a);
-        data[offset + right] = color.color.rgba_full;
+        data[offset + right] = color.color.argb_full;
         if (i > this->r / 2 - 1)
         {
-            data[right * this->r + i] = color.color.rgba_full;
+            data[right * this->r + i] = color.color.argb_full;
         }
     }
 }

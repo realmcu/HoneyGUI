@@ -129,7 +129,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                 for (int i = 0; i < 1 << rendor_mode; i++)
                 {
                     write_color.color.rgba.a = pre_alpha * i;
-                    color_output[i] = write_color.color.rgba_full;
+                    color_output[i] = write_color.color.argb_full;
                 }
                 for (uint32_t i = y_start; i < y_end; i++)
                 {
@@ -214,7 +214,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                         if (alpha != 0)
                         {
                             write_color.color.rgba.a = (alpha & 0x0f) * 17;
-                            writebuf[write_off + j - x_start] = write_color.color.rgba_full;
+                            writebuf[write_off + j - x_start] = write_color.color.argb_full;
                         }
                     }
                 }
@@ -265,7 +265,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                         if (alpha != 0)
                         {
                             write_color.color.rgba.a = alpha;
-                            writebuf[write_off + j - x_start] = write_color.color.rgba_full;
+                            writebuf[write_off + j - x_start] = write_color.color.argb_full;
                         }
                     }
                 }
@@ -312,7 +312,7 @@ static void gui_font_bmp2img_one_char(mem_char_t *chr, gui_color_t color, uint8_
                     {
                         if ((dots[dots_off + (j - font_x) / 8] >> ((j - font_x) % 8)) & 0x01)
                         {
-                            writebuf[write_off + j - x_start] = write_color.color.rgba_full;
+                            writebuf[write_off + j - x_start] = write_color.color.argb_full;
                         }
                     }
                 }
@@ -363,7 +363,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
         // case RGB888:
         font_img_pixel_bytes = 3;
         break;
-    case RGBA8888:
+    case ARGB8888:
         font_img_pixel_bytes = 4;
         break;
     default:

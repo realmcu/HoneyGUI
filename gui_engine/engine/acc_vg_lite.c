@@ -772,7 +772,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
         source.format = VG_LITE_BGR888;
         source_bytes_per_pixel = 3;
         break;
-    case RGBA8888:
+    case ARGB8888:
         source.format = VG_LITE_BGRA8888;
         source_bytes_per_pixel = 4;
         break;

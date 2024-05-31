@@ -171,7 +171,7 @@ void gui_font_ft_draw(gui_text_t *text, gui_text_rect_t *rect)
     double        angle;
     uint32_t      font_file_length;
 
-    color = text->color.color.rgba_full;
+    color = text->color.color.argb_full;
     text_list = (void *)(text->content);
 
     angle = (0 / 360) * 3.14159 * 2;      /* use 0 degrees  pi    */

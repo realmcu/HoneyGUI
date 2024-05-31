@@ -106,7 +106,7 @@ static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
     head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
     head->rsvd = 0;
-    head->type = RGBA8888;
+    head->type = ARGB8888;
     head->version = 0;
     head->rsvd2 = 0;
     head->w = this->base.w;

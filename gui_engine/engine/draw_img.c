@@ -80,7 +80,7 @@ uint32_t gui_image_get_pixel(draw_img_t *img)
     {
         return 3;
     }
-    else if (head->type == RGBA8888)
+    else if (head->type == ARGB8888)
     {
         return 4;
     }
@@ -101,7 +101,7 @@ uint8_t gui_get_srcBpp(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
     case RGB888:
         source_bytes_per_pixel = 3;
         break;
-    case RGBA8888:
+    case ARGB8888:
     case XRGB8888:
         source_bytes_per_pixel = 4;
         break;

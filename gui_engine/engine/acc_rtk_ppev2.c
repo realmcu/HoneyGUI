@@ -316,7 +316,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
     case RGB888:
         source.format = PPEV2_RGB888;
         break;
-    case RGBA8888:
+    case ARGB8888:
         source.format = PPEV2_ARGB8888;
         break;
     case ARGB8565:
@@ -419,13 +419,13 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
                 {
                     gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
                     gui_color_t color;
-                    color.color.rgba_full = rect_header->color.color.rgba_full;
+                    color.color.argb_full = rect_header->color.color.argb_full;
                     color.color.rgba.a = rect_header->color.color.rgba.a * (image->opacity_value * 1.0f / 255);
 
                     uint8_t tmp = color.color.rgba.b;
                     color.color.rgba.b = color.color.rgba.r;
                     color.color.rgba.r = tmp;
-                    PPEV2_Mask(&target, color.color.rgba_full, &dst_rect);
+                    PPEV2_Mask(&target, color.color.argb_full, &dst_rect);
                 }
                 return;
             }
@@ -741,14 +741,14 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, struct gui_rect *rec
         {
             ppe_translate(0, dc->section.y1, &inverse);
             gui_rect_file_head_t *rect_header = (gui_rect_file_head_t *)image->data;
-            gui_color_t color = {.color.rgba_full = rect_header->color.color.rgba_full};
+            gui_color_t color = {.color.argb_full = rect_header->color.color.argb_full};
 
             uint8_t tmp = color.color.rgba.b;
             color.color.rgba.b = color.color.rgba.r;
             color.color.rgba.r = tmp;
 
             color.color.rgba.a = rect_header->color.color.rgba.a * (image->opacity_value * 1.0f / 255);
-            source.const_color = color.color.rgba_full;
+            source.const_color = color.color.argb_full;
             ppe_rect.y -= dc->section.y1;
         }
         source.high_quality = image->high_quality;
@@ -790,7 +790,7 @@ bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
     case RGB888:
         output_header.type = PPEV2_RGB888;
         break;
-    case RGBA8888:
+    case ARGB8888:
         output_header.type = PPEV2_ARGB8888;
         break;
     case ARGB8565:

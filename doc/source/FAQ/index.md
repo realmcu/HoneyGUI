@@ -38,7 +38,7 @@ Specific scons version is required, please use the `pip install scons==4.4.0` co
 |---|---|---|---|---|---|
 | RGB565  |  Y | Y  | Y  | Y  | Y  |
 |  RGB888 | N  | Y  |  Y |  Y | N  |
-|  RGBA8888 |  N | Y  |  Y | Y  | N  |
+|  ARGB8888 |  N | Y  |  Y | Y  | N  |
 |  SVG | N  | Y   |  N |  Y  | N  |
 | TTF | N  | Y   |  N |  Y  | N  |
 | DOT font  |  Y | Y  | Y  | Y  |Y  |

@@ -93,7 +93,7 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
         source_green = pixel->g << 2;
         source_blue = pixel->b << 3;
     }
-    else if (input_type == RGBA8888)
+    else if (input_type == ARGB8888)
     {
         color_argb8888_t *pixel = (color_argb8888_t *)(uintptr_t)image_base + image_off;
         source_alpha = pixel->a;
@@ -331,7 +331,7 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
         pixel[1] = node->pixel_g;
         pixel[0] = node->pixel_b;
     }
-    else if (input_type == RGBA8888)
+    else if (input_type == ARGB8888)
     {
         imdc_argb8888_node_t *node = NULL;
         do

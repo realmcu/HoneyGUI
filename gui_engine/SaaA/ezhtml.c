@@ -426,7 +426,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             t = gui_text_create(parent, ptxt, x, y, gui_get_screen_width(), h);
                             gui_color_t color_temporary;
-                            color_temporary.color.rgba_full = color;
+                            color_temporary.color.argb_full = color;
                             gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
                             if (inputable)
                             {
@@ -491,7 +491,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                                                                     strlen(text) * (fontSize / 4), h);
                             gui_scroll_text_scroll_set(scroll_text, style, 100, 0, 3000, 1500000);
                             gui_color_t color_temporary;
-                            color_temporary.color.rgba_full = color;
+                            color_temporary.color.argb_full = color;
                             gui_scroll_text_set(scroll_text, gui_strdup(text), GUI_FONT_SRC_TTF, color_temporary,
                                                 strlen(text),
                                                 fontSize);
@@ -1981,7 +1981,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     gui_img_set_opacity(GUI_TYPE(gui_button_t, parent)->img, opacity);
 
                     gui_color_t color_temporary;
-                    color_temporary.color.rgba_full = font_color;
+                    color_temporary.color.argb_full = font_color;
                     GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
