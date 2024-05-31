@@ -1,0 +1,15 @@
+
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Glob('*.c')
+
+CPPPATH = [cwd]
+
+if GetDepend('CONFIG_REALTEK_BUILD_CJSON'):
+    CPPDEFINES = ['ENABLE_RTK_GUI_CJSON']
+
+group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_BUILD_CJSON'], CPPPATH = CPPPATH)
+
+Return('group')
