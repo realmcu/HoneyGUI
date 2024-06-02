@@ -411,6 +411,27 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t
  * @return uint8_t
  */
 void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
+/**
+ * @brief  update animate onn every frame
+ *
+ * @param animate
+ * @param obj widget
+ */
+void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj);
+/**
+ * @brief  set animate
+ *
+ * @param animate pointer
+ * @param dur animation time cost in ms
+ * @param repeat_count rounds to repeat
+ * @param callback every frame callback
+ * @param p callback's parameter
+ */
+gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
+                                   uint32_t      dur,
+                                   int           repeat_count,
+                                   void         *callback,
+                                   void         *p);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

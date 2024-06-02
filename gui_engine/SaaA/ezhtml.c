@@ -50,7 +50,7 @@ struct widget_create
 };
 
 #define WIDGETS_NUM 22
-
+#define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
 struct widget_create widget[] =
 {
     { "win", WINDOW }, //
@@ -279,6 +279,34 @@ static void draw_arc(gui_canvas_t *c)
     nvgStroke(c->vg);
 
 }
+static void button_press_ani_cb_array(int p, gui_button_t *button)
+{
+    float per = button->animate->progress_percent;
+    if (p == -1)
+    {
+        button->img->data = button->off_pic_addr;
+    }
+    else if (button->style == BUTTON_HIGHLIGHT_ARRAY)
+    {
+        float per = button->animate->progress_percent;
+        void **image_array = (void **)button->data;
+        button->img->data = image_array[(int)((p - 1) * per)];
+    }
+}
+static void switch_press_ani_cb_array(int p, gui_switch_t *button)
+{
+    float per = button->animate->progress_percent;
+    if (p == -1)
+    {
+        button->switch_picture->data = button->off_pic_addr;
+    }
+    else if (button->style == SWITCH_HIGHLIGHT_ARRAY)
+    {
+        float per = button->animate->progress_percent;
+        void **image_array = (void **)button->data;
+        button->switch_picture->data = image_array[(int)((p - 1) * per)];
+    }
+}
 static void sport_button_release_ani_cb(gui_button_t *button)
 {
     float per = (button->animate->progress_percent);
@@ -310,6 +338,23 @@ static void sport_button_release_ani_cb(gui_button_t *button)
 static void sport_button_press(gui_button_t *b)
 {
     gui_button_set_animate(b, 200, 0, sport_button_press_ani_cb, b);
+}
+static void button_press_array(gui_button_t *b, void *code, int p)
+{
+    GUI_API(gui_button_t).animate(b, 200, 0, button_press_ani_cb_array, p);
+}
+static void switch_press_array(gui_switch_t *b, void *code, int p)
+{
+    if (!b->ifon)
+    {
+        GUI_API(gui_switch_t).animate(b, b->animate->dur, 0, switch_press_ani_cb_array, p);
+    }
+
+
+}
+static void switch_release_array(gui_switch_t *b, void *code, int p)
+{
+    b->switch_picture->data = ((void **)(b->data))[p - 1];
 }
 static void sport_button_release(gui_button_t *b)
 {
@@ -1934,7 +1979,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             {
                                 style = WIDGET_SCALE_FADE;
                             }
-
+                            else if (!strcmp(p->attr[i], "array"))
+                            {
+                                style = BUTTON_HIGHLIGHT_ARRAY;
+                            }
                         }
                         else if (!strcmp(p->attr[i], "blendMode"))
                         {
@@ -1966,9 +2014,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     void *img2;
                     {
                         img1 = gui_get_file_address(picture);
+                        img2 = img1;
                     }
+                    if (style != BUTTON_HIGHLIGHT_ARRAY)
                     {
-                        img2 = gui_get_file_address(hl_picture);;
+                        img2 = gui_get_file_address(hl_picture);
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //font_size = 32;
@@ -1985,8 +2035,67 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_button_t, parent)->text->color = color_temporary;
                     if (style)
                     {
-                        gui_button_press((void *)parent, (gui_event_cb_t)sport_button_press, parent);
-                        gui_button_release((void *)parent, (gui_event_cb_t)sport_button_release, parent);
+                        if (style == BUTTON_HIGHLIGHT_ARRAY)
+                        {
+                            int file_count = 0;
+                            char *folder = hl_picture;
+                            {
+                                DIR *dir = 0;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    GUI_ASSERT(0);
+                                }
+                                gui_free(path);
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        file_count++;
+                                    }
+
+
+                                }
+                                closedir(dir);
+                            }
+                            void **image_array = gui_malloc(file_count * sizeof(void *));
+                            {
+                                DIR *dir = 0;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    //perror("opendir() failed"); return;
+                                }
+
+                                int count = 0;
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                                        sprintf(path2, "%s/%s", folder, entry->d_name);
+                                        image_array[count++] = gui_get_file_address(path2);
+                                    }
+
+                                }
+                                gui_free(path);
+                                closedir(dir);
+                                GUI_API(gui_button_t).on_press((void *)parent, (gui_event_cb_t)button_press_array, file_count);
+                                GUI_TYPE(gui_button_t, parent)->data = image_array;
+                                GUI_API(gui_button_t).on_release((void *)parent, (gui_event_cb_t)button_press_array, -1);
+                            }
+                        }
+                        else
+                        {
+                            gui_button_press((void *)parent, (gui_event_cb_t)sport_button_press, parent);
+                            gui_button_release((void *)parent, (gui_event_cb_t)sport_button_release, parent);
+                        }
+
                     }
 
                     {
@@ -2150,9 +2259,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *hl_pictureHl = NULL;
                     int picture_x = 0;
                     int picture_y = 0;
+                    int dur = 1000;
                     // default image blend_mode
                     BLEND_MODE_TYPE blendMode = IMG_FILTER_BLACK;
                     uint8_t opacity = 255;
+                    int style = 0;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -2224,13 +2335,27 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             opacity = atof(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "mode"))
+                        {
+                            char *s = p->attr[++i];
+                            if (!strcmp(p->attr[i], "array"))
+                            {
+                                style = SWITCH_HIGHLIGHT_ARRAY;
+                            }
+                        }
+                        else if (!strcmp(p->attr[i], "duration"))
+                        {
+                            dur = atoi(p->attr[++i]);
+                        }
                         i++;
                     }
                     void *img1;
                     void *img2;
                     {
                         img1 = gui_get_file_address(picture);
+                        img2 = img1;
                     }
+                    if (style != SWITCH_HIGHLIGHT_ARRAY)
                     {
                         img2 = gui_get_file_address(hl_picture);
                     }
@@ -2263,6 +2388,70 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     GUI_TYPE(gui_switch_t, parent)->switch_picture->base.y = picture_y;
                     gui_img_set_mode(GUI_TYPE(gui_switch_t, parent)->switch_picture, blendMode);
                     gui_img_set_opacity(GUI_TYPE(gui_switch_t, parent)->switch_picture, opacity);
+                    if (style)
+                    {
+                        if (style == SWITCH_HIGHLIGHT_ARRAY)
+                        {
+                            GUI_TYPE(gui_switch_t, parent)->style = style;
+                            int file_count = 0;
+                            char *folder = hl_picture;
+                            {
+                                DIR *dir = 0;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    GUI_ASSERT(0);
+                                }
+                                gui_free(path);
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        file_count++;
+                                    }
+
+
+                                }
+                                closedir(dir);
+                            }
+                            void **image_array = gui_malloc(file_count * sizeof(void *));
+                            {
+                                DIR *dir = 0;
+                                struct dirent *entry;
+                                char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                                sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                                if ((dir = opendir(path)) == NULL)
+                                {
+                                    gui_free(path);
+                                    //perror("opendir() failed"); return;
+                                }
+
+                                int count = 0;
+                                while ((entry = readdir(dir)) != NULL)
+                                {
+                                    if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                    {
+                                        char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                                        sprintf(path2, "%s/%s", folder, entry->d_name);
+                                        image_array[count++] = gui_get_file_address(path2);
+                                    }
+
+                                }
+                                gui_free(path);
+                                closedir(dir);
+                                GUI_API(gui_switch_t).on_press((void *)parent, (gui_event_cb_t)switch_press_array, file_count);
+                                GUI_API(gui_switch_t).animate((void *)parent, dur, 0, switch_press_ani_cb_array, 0);
+                                GUI_TYPE(gui_switch_t, parent)->animate->animate = 0;
+                                GUI_TYPE(gui_switch_t, parent)->data = image_array;
+                                GUI_TYPE(gui_switch_t, parent)->on_pic_addr = image_array[file_count - 1];
+
+                            }
+                        }
+
+
+                    }
                     bool if_widget = 0;
                     if (p->parent)
                     {

@@ -581,6 +581,89 @@ void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t
         gui_obj_tree_get_widget_by_type(obj, type, output);
     }
 }
+void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
+{
+    uint32_t cur_time_gap;
+    if (animate && animate->animate)
+    {
+        animate->Beginning_frame = 0;
+        animate->end_frame = 0;
+        if (animate->progress_percent == 0 && !animate->init)
+        {
+            animate->init = 1;
+            animate->init_time_ms = gui_ms_get();
+        }
+
+        animate->cur_time_ms = gui_ms_get();
+        cur_time_gap = animate->cur_time_ms - animate->init_time_ms;
+
+        if (animate->repeat_count == 0)
+        {
+            animate->progress_percent = (float)(cur_time_gap % animate->dur) /
+                                        (float)animate->dur;
+            if (cur_time_gap / animate->dur >= 1)
+            {
+                animate->end_frame = 1;
+                animate->progress_percent = 1;
+                animate->animate = 0;
+            }
+            animate->callback(animate->p, obj);
+
+        }
+        else if (animate->repeat_count == -1)
+        {
+            // uint32_t  round_count = cur_time_gap / animate->dur;
+
+
+            animate->progress_percent = (float)(cur_time_gap % animate->dur) /
+                                        (float)animate->dur;
+            if (animate->progress_percent < animate->last_per)
+            {
+
+                animate->Beginning_frame = 1;
+            }
+            animate->last_per = animate->progress_percent;
+            animate->callback(animate->p, obj);
+        }
+        else
+        {
+            uint32_t  round_count = cur_time_gap / animate->dur;
+            if (round_count > animate->repeat_count)
+            {
+                animate->animate = 0;
+                return;
+            }
+
+            if (round_count > animate->last_round)
+            {
+                animate->Beginning_frame = 1;
+            }
+            animate->last_round = round_count;
+            animate->progress_percent = (float)(cur_time_gap % animate->dur) /
+                                        (float)animate->dur;
+            animate->callback(animate->p, obj);
+        }
+    }
+}
+gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
+                                   uint32_t      dur,
+                                   int           repeat_count,
+                                   void         *callback,
+                                   void         *p)
+{
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *, void *))callback;
+    animate->repeat_count = repeat_count;
+    animate->p = p;
+    return animate;
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

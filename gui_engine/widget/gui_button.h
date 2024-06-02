@@ -85,6 +85,11 @@ void (*on_click)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
 void (*on_press)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
 void (*on_long_press)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
 void (*on_release)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void (*animate)(gui_button_t *this,
+                uint32_t      dur,
+                int           repeat_count,
+                void         *callback,
+                void         *p);
 _GUI_API_DECLARE(gui_button_t)
 /** End of WIDGET_Exported_Types
   * @}

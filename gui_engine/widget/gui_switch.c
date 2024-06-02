@@ -85,8 +85,13 @@ void gui_switch_change_state(gui_switch_t *this, bool ifon)
     this->ifon = ifon;
     if (this->ifon)
     {
-        gui_img_set_attribute(this->switch_picture, this->switch_picture->base.name, this->on_pic_addr, 0,
-                              0);
+        if (this->style != SWITCH_HIGHLIGHT_ARRAY)
+        {
+            gui_img_set_attribute(this->switch_picture, this->switch_picture->base.name, this->on_pic_addr, 0,
+                                  0);
+        }
+
+
     }
     else
     {
@@ -142,7 +147,14 @@ static void gui_switch_off(gui_switch_t *b, void *callback, void *parameter)
 {
     gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
 }
-
+static void on_press(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_PRESSED, parameter);
+}
+static void on_release(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_RELEASED, parameter);
+}
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -211,6 +223,27 @@ void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)
     }
 }
 
+static void animate(gui_switch_t *this,
+                    uint32_t      dur,
+                    int           repeat_count,
+                    void         *callback,
+                    void         *p)
+{
+    gui_animate_t *animate = this->animate;
+
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *, void *))callback;
+    animate->repeat_count = repeat_count;
+    animate->p = p;
+    this->animate = animate;
+}
 static void gui_switch_prepare(gui_obj_t *obj)
 {
     gui_switch_t *this = (gui_switch_t *)obj;
@@ -230,7 +263,7 @@ static void gui_switch_prepare(gui_obj_t *obj)
         }
         return;
     }
-
+    animate_frame_update(this->animate, GUI_BASE(this));
     if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
     {
         if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
@@ -351,6 +384,7 @@ static void gui_switch_prepare(gui_obj_t *obj)
             if (tp->released && this->press_flag)
             {
                 this->release_flag = true;
+                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
             }
             if (this->touch_disable)
             {
@@ -466,6 +500,9 @@ _GUI_API_ASSIGN(gui_switch_t)
   .on_turn_on = gui_switch_on,
    .turn_off = gui_switch_turn_off,
     .turn_on = gui_switch_turn_on,
+     .on_press = on_press,
+      .animate = animate,
+       .on_release = on_release,
 };
 /** End of WIDGET_Exported_Functions
   * @}
