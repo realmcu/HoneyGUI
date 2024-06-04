@@ -200,13 +200,13 @@ static void gui_card_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 static void gui_card_ctor(gui_card_t *this,
                           gui_obj_t  *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t    x,
                           int16_t    y,
                           int16_t    w,
                           int16_t    h)
 {
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+    gui_obj_ctor(&this->base, parent, name, x, y, w, h);
     gui_cardview_t *cardview = (gui_cardview_t *)parent;
     gui_obj_t *obj = GET_BASE(this);
 

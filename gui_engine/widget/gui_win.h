@@ -81,7 +81,7 @@ typedef struct gui_win
  *
  */
 gui_win_t *gui_win_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,

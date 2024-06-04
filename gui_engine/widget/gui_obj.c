@@ -131,7 +131,7 @@ static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
 *============================================================================*/
 void gui_obj_ctor(gui_obj_t  *this,
                   gui_obj_t  *parent,
-                  const char *filename,
+                  const char *name,
                   int16_t     x,
                   int16_t     y,
                   int16_t     w,
@@ -141,12 +141,12 @@ void gui_obj_ctor(gui_obj_t  *this,
 
     this->parent = parent;
 
-    if (!filename)
+    if (!name)
     {
-        filename = "_default_widget";
+        name = "_default_widget";
     }
 
-    this->name = filename;
+    this->name = name;
     this->x = x;
     this->y = y;
 
@@ -169,7 +169,7 @@ void gui_obj_ctor(gui_obj_t  *this,
 }
 
 gui_obj_t *gui_obj_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,
@@ -177,7 +177,7 @@ gui_obj_t *gui_obj_create(void       *parent,
 {
     gui_obj_t *this = gui_malloc(sizeof(gui_obj_t));
     memset(this, 0, sizeof(gui_obj_t));
-    gui_obj_ctor(this, parent, filename, x, y, w, h);
+    gui_obj_ctor(this, parent, name, x, y, w, h);
 
     gui_list_init(&(this->child_list));
     if ((this->parent) != ((void *)0))

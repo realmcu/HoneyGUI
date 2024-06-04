@@ -817,13 +817,13 @@ static void gui_page_rebound_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 void gui_page_ctor(gui_page_t *this,
                    gui_obj_t  *parent,
-                   const char *filename,
+                   const char *name,
                    int16_t     x,
                    int16_t     y,
                    int16_t     w,
                    int16_t     h)
 {
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+    gui_obj_ctor(&this->base, parent, name, x, y, w, h);
     GET_BASE(this)->type = PAGE;
     GET_BASE(this)->obj_cb = gui_page_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
@@ -835,13 +835,13 @@ void gui_page_ctor(gui_page_t *this,
 }
 
 gui_page_t *gui_page_create(void       *parent,
-                            const char *filename,
+                            const char *name,
                             int16_t     x,
                             int16_t     y,
                             int16_t     w,
                             int16_t     h)
 {
-#define _GUI_NEW_gui_page_create_param this, parent, filename, x, y, w, h
+#define _GUI_NEW_gui_page_create_param this, parent, name, x, y, w, h
     GUI_NEW(gui_page_t, gui_page_ctor, _GUI_NEW_gui_page_create_param)
 }
 

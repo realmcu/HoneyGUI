@@ -63,7 +63,7 @@ typedef struct gui_page
     gui_img_t *scroll_bar;
     int get_yend;
     gui_animate_t *animate;
-    void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *filename, int16_t x,
+    void (*ctor)(struct gui_page *this, gui_obj_t *parent, const char *name, int16_t x,
                  int16_t y, int16_t w, int16_t h);
     bool release;
     bool press;
@@ -161,7 +161,7 @@ void gui_page_destory(gui_obj_t *obj);
  */
 void gui_page_ctor(gui_page_t *this,
                    gui_obj_t  *parent,
-                   const char *filename,
+                   const char *name,
                    int16_t     x,
                    int16_t     y,
                    int16_t     w,
@@ -187,7 +187,7 @@ void gui_page_ctor(gui_page_t *this,
  * \endcode
  */
 gui_page_t *gui_page_create(void       *parent,
-                            const char *filename,
+                            const char *name,
                             int16_t     x,
                             int16_t     y,
                             int16_t     w,

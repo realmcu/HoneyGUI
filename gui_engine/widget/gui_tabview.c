@@ -576,7 +576,7 @@ void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable)
 }
 
 gui_tabview_t *gui_tabview_create(void       *parent,
-                                  const char *filename,
+                                  const char *name,
                                   int16_t     x,
                                   int16_t     y,
                                   int16_t     w,
@@ -596,7 +596,7 @@ gui_tabview_t *gui_tabview_create(void       *parent,
         h = (int)gui_get_screen_height();
     }
 
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+    gui_obj_ctor(&this->base, parent, name, x, y, w, h);
 
     GET_BASE(this)->obj_cb = gui_tabview_cb;
     GET_BASE(this)->has_input_prepare_cb = true;

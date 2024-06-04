@@ -187,7 +187,7 @@ void gui_img_set_mode(gui_img_t *this, BLEND_MODE_TYPE mode);
  * @param y Y-axis coordinate
  */
 void gui_img_set_attribute(gui_img_t  *this,
-                           const char *filename,
+                           const char *name,
                            void       *addr,
                            int16_t     x,
                            int16_t     y);

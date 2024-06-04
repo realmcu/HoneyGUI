@@ -290,13 +290,13 @@ static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 void gui_win_ctor(gui_win_t  *this,
                   gui_obj_t  *parent,
-                  const char *filename,
+                  const char *name,
                   int16_t     x,
                   int16_t     y,
                   int16_t     w,
                   int16_t     h)
 {
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+    gui_obj_ctor(&this->base, parent, name, x, y, w, h);
     GET_BASE(this)->obj_cb = gui_win_cb;
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_destroy_cb = true;
@@ -379,7 +379,7 @@ void gui_win_hole_tp(gui_win_t *this, bool hold_tp)
 }
 
 gui_win_t *gui_win_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,
@@ -388,7 +388,7 @@ gui_win_t *gui_win_create(void       *parent,
     gui_win_t *this = gui_malloc(sizeof(gui_win_t));
 
     memset(this, 0, sizeof(gui_win_t));
-    gui_win_ctor(this, parent, filename, x, y, w, h);
+    gui_win_ctor(this, parent, name, x, y, w, h);
 
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))

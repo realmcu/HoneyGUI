@@ -21,6 +21,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_cube.h"
+#include "gui_win.h"
 #include "gui_canvas_arc.h"
 #include "gui_canvas_round_rect.h"
 #include "tiger_blue_compressed.c"
@@ -48,6 +49,11 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     // gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 100, 0, 270, 20, gui_rgba(0, 255, 0, 255));
 
+    // return;
+
+    // gui_win_t *win = gui_win_create(&(app->screen), "win", 100, 100, 200, 200);
+
+    // gui_img_create_from_mem(win,  "img_1_test", (void *)_actiger_blue, -100, -100, 0, 0);
     // return;
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);

@@ -121,7 +121,7 @@ extern "C" {
   */
 void gui_obj_ctor(gui_obj_t  *this,
                   gui_obj_t  *parent,
-                  const char *filename,
+                  const char *name,
                   int16_t     x,
                   int16_t     y,
                   int16_t     w,
@@ -139,7 +139,7 @@ void gui_obj_ctor(gui_obj_t  *this,
  * @return gui_obj_t*
  */
 gui_obj_t *gui_obj_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,

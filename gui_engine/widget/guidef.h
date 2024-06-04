@@ -493,6 +493,12 @@ typedef struct _gui_obj_t
     int16_t y;
     int16_t w;
     int16_t h;
+#if 0
+    int16_t rang_x;
+    int16_t rang_y;
+    int16_t rang_w;
+    int16_t rang_h;
+#endif
     gui_list_t  child_list;
     gui_list_t  brother_list;
 

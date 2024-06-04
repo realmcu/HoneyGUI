@@ -140,7 +140,7 @@ _GUI_API_DECLARE(gui_seekbar_t)
   * \endcode
   */
 gui_seekbar_t *gui_seekbar_create_img_v(void       *parent,
-                                        const char *filename,
+                                        const char *name,
                                         int16_t     x,
                                         int16_t     y);
 /**
@@ -155,7 +155,7 @@ gui_seekbar_t *gui_seekbar_create_img_v(void       *parent,
   * \endcode
   */
 gui_seekbar_t *gui_seekbar_create_img_h(void       *parent,
-                                        const char *filename,
+                                        const char *name,
                                         int16_t     x,
                                         int16_t     y);
 /**

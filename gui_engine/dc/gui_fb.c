@@ -188,6 +188,13 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
+#if 0
+        //calculate range
+        obj->rang_x = _UI_MAX(obj->parent->x - obj->x, 0);
+        obj->rang_y = _UI_MAX(obj->parent->y - obj->y, 0);
+        obj->rang_w = _UI_MIN(obj->parent->w, obj->w - obj->rang_x);
+        obj->rang_h = _UI_MIN(obj->parent->h, obj->h - obj->rang_y);
+#endif
         obj_draw_prepare(obj);
     }
 }
