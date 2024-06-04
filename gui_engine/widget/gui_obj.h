@@ -213,7 +213,14 @@ void gui_obj_tree_free(void *obj);
   * \endcode
   */
 void gui_obj_tree_print(gui_obj_t *obj);
-
+/**
+  * @brief  get count of one type on tree
+  * @param  obj the root of the widget tree.
+  * @param  type widget type.
+  * @param  count count result.
+  * @return void
+  */
+void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count);
 /**
   * @brief   show or hide the widget
   * @param  obj the root of the widget tree.
@@ -432,6 +439,12 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
                                    int           repeat_count,
                                    void         *callback,
                                    void         *p);
+/**
+ * @brief  print name by bfs order
+ *
+ * @param root
+ */
+void gui_obj_tree_print_bfs(gui_obj_t *root);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

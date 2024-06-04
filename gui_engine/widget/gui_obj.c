@@ -238,7 +238,21 @@ void gui_obj_tree_print(gui_obj_t *obj)
         gui_obj_tree_print(obj);
     }
 }
+void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
+{
+    gui_list_t *node = NULL;
 
+    gui_list_for_each(node, &obj->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == type)
+        {
+            (*count)++;
+        }
+
+        gui_obj_tree_count_by_type(obj, type, count);
+    }
+}
 void gui_obj_tree_free(void *obj)
 {
     gui_obj_t *object = (gui_obj_t *)obj;
@@ -663,6 +677,31 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
     animate->repeat_count = repeat_count;
     animate->p = p;
     return animate;
+}
+void gui_obj_tree_print_bfs(gui_obj_t *root)
+{
+    if (root == NULL)
+    {
+        return;
+    }
+
+    gui_obj_t *queue[100];
+    int front = 0;
+    int rear = 0;
+
+    queue[rear++] = root;
+
+    while (front != rear)
+    {
+        gui_obj_t *current_obj = queue[front++];
+        gui_log(" %s \n", current_obj->name);
+        gui_list_t *node = NULL;
+        gui_list_for_each(node, &current_obj->child_list)
+        {
+            gui_obj_t *child_obj = gui_list_entry(node, gui_obj_t, brother_list);
+            queue[rear++] = child_obj;
+        }
+    }
 }
 /** End of WIDGET_Exported_Functions
   * @}

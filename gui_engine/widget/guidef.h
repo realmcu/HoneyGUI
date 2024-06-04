@@ -432,6 +432,7 @@ typedef enum t_obj_type
     TURN_TABLE               = 0x0029,
     KEYBOARD                 = 0x002A,
     MACRO_MOTORIZED_CURTAIN  = 0x002B,
+    MULTI_LEVEL              = 0x002C,
 } T_OBJ_TYPE;
 
 typedef void (*gui_msg_cb)(void *);
