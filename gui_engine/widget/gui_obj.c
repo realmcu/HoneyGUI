@@ -234,7 +234,7 @@ void gui_obj_tree_print(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        gui_log(" %s \n", obj->name);
+        gui_log(" %s-->%s \n", obj->name, obj->parent->name);
         gui_obj_tree_print(obj);
     }
 }
