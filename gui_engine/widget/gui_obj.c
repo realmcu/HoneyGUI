@@ -277,10 +277,12 @@ void gui_obj_tree_free(void *obj)
         if (object->matrix != NULL)
         {
             gui_free(object->matrix);
+            object->matrix = NULL;
         }
         if (object->event_dsc != NULL)
         {
             gui_free(object->event_dsc);
+            object->event_dsc = NULL;
         }
         gui_list_init(&object->child_list);
     }

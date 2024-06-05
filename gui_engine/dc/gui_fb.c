@@ -188,12 +188,24 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
-#if 0
-        //calculate range
-        obj->rang_x = _UI_MAX(obj->parent->x - obj->x, 0);
-        obj->rang_y = _UI_MAX(obj->parent->y - obj->y, 0);
-        obj->rang_w = _UI_MIN(obj->parent->w, obj->w - obj->rang_x);
-        obj->rang_h = _UI_MIN(obj->parent->h, obj->h - obj->rang_y);
+#ifdef ENABLE_GUI_CONTAIN_FUNCTION
+        int16_t x1 = _UI_MAX(obj->parent->range_x, obj->x);
+        int16_t y1 = _UI_MAX(obj->parent->range_y, obj->y);
+        int16_t x2 = _UI_MIN(obj->parent->range_x + obj->parent->range_w - 1, obj->x + obj->w - 1);
+        int16_t y2 = _UI_MIN(obj->parent->range_y + obj->parent->range_h - 1, obj->y + obj->h - 1);
+
+        if ((x2 > x1) && (y2 > y1))
+        {
+            obj->range_x = x1 - obj->x;
+            obj->range_y = y1 - obj->y;
+            obj->range_w = x2 - x1 + 1;
+            obj->range_h = y2 - y1 + 1;
+        }
+        else
+        {
+            GUI_ASSERT(NULL != NULL);
+        }
+
 #endif
         obj_draw_prepare(obj);
     }

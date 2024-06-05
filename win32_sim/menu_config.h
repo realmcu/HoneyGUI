@@ -119,6 +119,10 @@
 // #define CONFIG_REALTEK_BUILD_GUI_BOX2D
 // </c>
 
+// <c> RTK GUI ENABLE CONTAIN WIDGET
+// #define CONFIG_REALTEK_BUILD_GUI_CONTAIN
+// </c>
+
 #endif
 
 // </e>

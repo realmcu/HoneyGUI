@@ -51,9 +51,10 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     // return;
 
-    // gui_win_t *win = gui_win_create(&(app->screen), "win", 100, 100, 200, 200);
+    // gui_win_t *win0 = gui_win_create(&(app->screen), "win0", 100, 100, 200, 200);
+    // gui_win_t *win1 = gui_win_create(win0, "win1", 100, 100, 200, 200);
 
-    // gui_img_create_from_mem(win,  "img_1_test", (void *)_actiger_blue, -100, -100, 0, 0);
+    // gui_img_create_from_mem(win1,  "img_1_test", (void *)_actiger_blue, 50, 50, 0, 0);
     // return;
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
