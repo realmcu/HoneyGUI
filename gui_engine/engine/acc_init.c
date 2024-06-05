@@ -119,19 +119,16 @@ void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
             uint8_t *data = NULL;
             uint8_t offset = 0; // header address offset after image data address alignment
 
-            img_buff = gui_malloc_align_img(&offset, size);
-            data = img_buff + offset;
             if (head.compress)
             {
                 // gui_log("IMG_SRC_FILESYS IMDC_COMPRESS %s\n", img_info);
-                uint8_t *src_buff = (uint8_t *)gui_load_imgfile(image);
-                image->data = src_buff;
-                sw_acc_rle_uncompress(image, data);
-                gui_free(src_buff);
-                image->data = data;
+                uint8_t *img_buff = (uint8_t *)gui_load_imgfile(image);
+                image->data = img_buff;
             }
             else
             {
+                img_buff = gui_malloc_align_img(&offset, size);
+                data = img_buff + offset;
                 gui_load_imgfile_align(image, data, source_bytes_per_pixel);
             }
         }
@@ -140,9 +137,9 @@ void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
             uint8_t *data = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data));
 #ifdef __WIN32
             // PC simulator: data alignment is unnecessary.
-            if (head.compress)
+            if (0)
 #else
-            if (gpu_width != image->img_w || (int)data % 64 != 0 || head.compress)
+            if ((head.compress == false) && (gpu_width != image->img_w || (int)data % 64 != 0))
 #endif
             {
                 uint32_t size = gpu_width * gpu_height * source_bytes_per_pixel;
@@ -150,26 +147,16 @@ void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
 
                 img_buff = gui_malloc_align_img(&offset, size);
                 data = img_buff + offset;
-#ifndef __WIN32
-                if (head.compress)
-#endif
+
                 {
-                    // gui_log("IMG_SRC_MEMADDR IMDC_COMPRESS\n");
-                    sw_acc_rle_uncompress(image, data);
-                    image->data = data;
-                }
-#ifndef __WIN32
-                else
-                {
-                    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+                    uint8_t *image_off = sizeof(struct gui_rgb_data_head) + (uint8_t *)(image->data);
                     for (uint32_t i = 0; i < gpu_height; i++)
                     {
-                        memcpy((void *)((uint32_t)data + i * gpu_width * source_bytes_per_pixel),
+                        memcpy((void *)((uint8_t *)data + i * gpu_width * source_bytes_per_pixel),
                                (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
                                image->img_w * source_bytes_per_pixel);
                     }
                 }
-#endif
             }
         }
     }
