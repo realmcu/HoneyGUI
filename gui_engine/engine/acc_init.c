@@ -122,7 +122,7 @@ void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
             if (head.compress)
             {
                 // gui_log("IMG_SRC_FILESYS IMDC_COMPRESS %s\n", img_info);
-                uint8_t *img_buff = (uint8_t *)gui_load_imgfile(image);
+                img_buff = (uint8_t *)gui_load_imgfile(image);
                 image->data = img_buff;
             }
             else
