@@ -50,6 +50,7 @@ typedef struct gui_canvas_rect
     gui_obj_t base;
     draw_img_t *draw_img;
     gui_color_t color;
+    uint8_t opacity_value;
 } gui_canvas_rect_t;
 
 /** End of WIDGET_Exported_Types
@@ -119,7 +120,13 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
                                           int          h,
                                           gui_color_t  color);
 
-
+/**
+ * @brief
+ *
+ * @param this
+ * @param opacity_value
+ */
+void gui_canvas_rect_set_opacity(gui_canvas_rect_t *this, unsigned char opacity_value);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

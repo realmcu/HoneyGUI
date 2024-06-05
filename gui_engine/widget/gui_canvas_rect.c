@@ -97,7 +97,7 @@ static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
     this->draw_img = gui_malloc(sizeof(draw_img_t));
     memset(this->draw_img, 0x00, sizeof(draw_img_t));
     this->draw_img->blend_mode = IMG_RECT;
-    this->draw_img->opacity_value = UINT8_MAX;
+    this->draw_img->opacity_value = obj->parent->opacity_value * this->opacity_value / UINT8_MAX;
     gui_rgb_data_head_t *head = gui_malloc(sizeof(gui_rect_file_head_t));
     gui_rect_file_head_t *const_color = (gui_rect_file_head_t *)head;
     this->draw_img->data = head;
@@ -232,6 +232,17 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
     GET_BASE(canvas_rect)->create_done = true;
     canvas_rect->color = color;
     return canvas_rect;
+}
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param opacity_value
+ */
+void gui_canvas_rect_set_opacity(gui_canvas_rect_t *this, unsigned char opacity_value)
+{
+    this->opacity_value = opacity_value;
 }
 
 /** End of WIDGET_Exported_Functions
