@@ -201,7 +201,6 @@ static void jump(gui_multi_level_t  *this, int level, int index)
             root = o;
         }
     }
-    int id = 2;
     gui_multi_level_t *rst = 0;
     tree_child_free(root);
     rst = (gui_multi_level_t *)gui_obj_get_by_level_order_hide(root, level, index);

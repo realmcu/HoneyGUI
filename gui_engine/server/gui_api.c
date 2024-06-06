@@ -17,6 +17,23 @@ static struct acc_engine *acc = NULL;
 void gui_dc_info_register(struct gui_dispdev *info)
 {
     dc = info;
+
+    if (dc->fb_height == dc->screen_height)
+    {
+        dc->pfb_type = PFB_X_DIRECTION;
+        uint32_t last_section = (dc->screen_width % dc->fb_width) ? 1 : 0;
+        dc->section_total = dc->screen_width / dc->fb_width + last_section;
+    }
+    else if (dc->fb_width == dc->screen_width)
+    {
+        dc->pfb_type = PFB_Y_DIRECTION;
+        uint32_t last_section = (dc->screen_height % dc->fb_height) ? 1 : 0;
+        dc->section_total = dc->screen_height / dc->fb_height + last_section;
+    }
+    else
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
 }
 void gui_acc_info_register(struct acc_engine *info)
 {
@@ -405,7 +422,9 @@ void gui_log(const char *format, ...)
 void gui_assert_handler(const char *ex_string, const char *func, uint32_t line)
 {
     volatile char dummy = 0;
+    gui_log("\033[1;31m");
     gui_log("(%s) assertion failed at function:%s, line number:%d \n", ex_string, func, line);
+    gui_log("\033[0m");
     while (dummy == 0);
 }
 

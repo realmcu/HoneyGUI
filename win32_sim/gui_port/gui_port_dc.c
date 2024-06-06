@@ -33,7 +33,7 @@
 #define DRV_PIXEL_BITS  32
 
 
-// #define USE_DC_PFB
+#define USE_DC_PFB
 
 #ifdef USE_DC_PFB
 #define LCD_SECTION_HEIGHT 20
@@ -107,27 +107,37 @@ int32_t sim_get_hight()
 }
 
 
+static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, uint16_t yStart,
+                              uint16_t w, uint16_t h)
+{
+#if (DRV_PIXEL_BITS == 32)
+    uint32_t *read = (uint32_t *)input;
+    uint32_t *write = (uint32_t *)output;
+#else
+    uint16_t *read = (uint16_t *)input;
+    uint16_t *write = (uint16_t *)output;
+#endif
+    for (uint32_t i = yStart; i < (h + yStart); i++)
+    {
+        for (uint32_t j = xStart; j < (w + xStart); j++)
+        {
+            write[i * DRV_LCD_WIDTH + j] = *read;
+            read++;
+        }
+    }
+}
 
 void port_gui_lcd_update(struct gui_dispdev *dc)
 {
 #ifdef USE_DC_PFB
-    uint32_t total_section_cnt = (dc->screen_height / LCD_SECTION_HEIGHT + ((
-                                                                                dc->screen_height % LCD_SECTION_HEIGHT) ? 1 : 0));
 
-    if (dc->section_count == 0)
+    uint8_t *dst = surface->pixels;
+
+    if (dc->section_count == dc->section_total - 1)
     {
-        uint8_t *dst = surface->pixels;
-        dst = dst + dc->fb_height * dc->section_count * dc->fb_width * dc->bit_depth / 8;
-        memcpy(dst, dc->frame_buf, dc->fb_width * dc->fb_height * dc->bit_depth / 8);
+        lcd_update_window(dc->frame_buf, dst, dc->section.x1, dc->section.y1,
+                          dc->section.x2 - dc->section.x1 + 1, dc->section.y2 - dc->section.y1 + 1);
 
-    }
-    else if (dc->section_count == total_section_cnt - 1)
-    {
-        uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
-
-        uint8_t *dst = surface->pixels;
-        dst = dst + dc->fb_height * dc->section_count * dc->fb_width * dc->bit_depth / 8;
-        memcpy(dst, dc->frame_buf, dc->fb_width * last_height * dc->bit_depth / 8);
         SDL_Texture *texture;
         texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
@@ -137,9 +147,17 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
     }
     else
     {
-        uint8_t *dst = surface->pixels;
-        dst = dst + dc->fb_height * dc->section_count * dc->fb_width * dc->bit_depth / 8;
-        memcpy(dst, dc->frame_buf, dc->fb_width * dc->fb_height * dc->bit_depth / 8);
+        lcd_update_window(dc->frame_buf, dst, dc->section.x1, dc->section.y1,
+                          dc->section.x2 - dc->section.x1 + 1, dc->section.y2 - dc->section.y1 + 1);
+
+#if 0 //for debug
+        SDL_Texture *texture;
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+        SDL_RenderCopy(renderer, texture, NULL, &_rect);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(texture);
+#endif
     }
 #else
     SDL_Texture *texture;
@@ -167,6 +185,8 @@ static struct gui_dispdev dc =
 {
 #ifdef USE_DC_PFB
     .bit_depth = DRV_PIXEL_BITS,
+    // .fb_height = DRV_LCD_HIGHT,
+    // .fb_width = LCD_SECTION_HEIGHT,
     .fb_height = LCD_SECTION_HEIGHT,
     .fb_width = DRV_LCD_WIDTH,
     .screen_width =  DRV_LCD_WIDTH,
@@ -180,7 +200,6 @@ static struct gui_dispdev dc =
     .scale_y = 1,
     .disp_buf_1 = disp_write_buff1_port,
     .disp_buf_2 = disp_write_buff2_port,
-    .fb_height = LCD_SECTION_HEIGHT,
     .frame_buf = NULL,
     .type = DC_RAMLESS,
     .lcd_update = port_gui_lcd_update,

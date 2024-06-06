@@ -261,9 +261,8 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
                 }
             }
 
-            int image_off = y * source_w + x;
-            int write_off = (i - dc->section.y1) * dc->fb_width + j;
-
+            int read_off = y * source_w + x;
+            int write_off = (i - dc->section.y1) * dc->fb_width + j - dc->section.x1;
 
             if (image->blend_mode == IMG_RECT)
             {
@@ -273,7 +272,7 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
             }
             else
             {
-                do_raster_pixel(writebuf, write_off, image_base, image_off, input_type, dc_bytes_per_pixel,
+                do_raster_pixel(writebuf, write_off, image_base, read_off, input_type, dc_bytes_per_pixel,
                                 opacity_value,
                                 blend_mode);
             }

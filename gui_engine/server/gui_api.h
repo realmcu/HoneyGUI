@@ -83,7 +83,9 @@ extern "C" {
 #define GUI_LINE(EX)                                                         \
     if ((EX))                                                                    \
     {                                                                             \
+        gui_log("\033[1;31m");   \
         gui_log("[GUI] debug at function:%s, line number:%d \n", __FUNCTION__, __LINE__); \
+        gui_log("\033[0m");   \
     } //!< print line number
 #define __param_name(line) param_##line
 #define _param_name(line) __param_name(line)

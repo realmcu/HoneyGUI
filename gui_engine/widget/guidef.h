@@ -132,6 +132,11 @@ typedef enum t_gui_dc_type
     DC_DOUBLE,
 } T_GUI_DC_TYPE;
 
+typedef enum t_gui_pfb_type
+{
+    PFB_Y_DIRECTION,
+    PFB_X_DIRECTION,
+} T_GUI_PFB_TYPE;
 typedef struct _gui_frame_monitor_t
 {
     uint32_t start;
@@ -159,6 +164,7 @@ typedef struct gui_dispdev
     uint16_t driver_ic_hbp;
     uint16_t driver_ic_active_width;
     T_GUI_DC_TYPE type;
+    T_GUI_PFB_TYPE pfb_type;
     char gpu_type;
     /* pixel data */
     uint8_t *frame_buf;
@@ -169,6 +175,7 @@ typedef struct gui_dispdev
     float scale_y;
     gui_rect_t section;
     uint32_t section_count;
+    uint32_t section_total;
     void (*lcd_update)(struct gui_dispdev *dc);
     void (*virtual_lcd_update)(struct gui_dispdev *dc);
     int (*flash_seq_trans_enable)(void);

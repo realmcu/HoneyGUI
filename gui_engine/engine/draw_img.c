@@ -14,20 +14,12 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
     int16_t image_w = image->img_target_w ;
     int16_t image_h = image->img_target_h ;
 
-    *x_start = _UI_MAX(image_x, 0);
-    *x_end = _UI_MIN(image_x + image_w - 1, dc->fb_width - 1);
+    *x_start = _UI_MAX(image_x, dc->section.x1);
+    *x_end = _UI_MIN(image_x + image_w - 1, dc->section.x2);
 
-    *y_start = _UI_MAX(dc->section.y1, image_y);
-    *y_end = _UI_MIN(dc->section.y2, image_y + image_h - 1);
+    *y_start = _UI_MAX(image_y, dc->section.y1);
+    *y_end = _UI_MIN(image_y + image_h - 1, dc->section.y2);
 
-    // if (rect != NULL)
-    // {
-    //     GUI_ASSERT(rect == NULL);
-    //     *x_start = _UI_MAX(*x_start, rect->x1);
-    //     *x_end = _UI_MIN(*x_end, rect->x2);
-    //     *y_start = _UI_MAX(*y_start, rect->y1);
-    //     *y_end = _UI_MIN(*y_end, rect->y2);
-    // }
     if ((*x_start >= *x_end) || (*y_start >= *y_end))
     {
         return false;
