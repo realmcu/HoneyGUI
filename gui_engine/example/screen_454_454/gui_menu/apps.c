@@ -43,6 +43,7 @@ GUI_APP_DEFINE_NAME(APP_CARDVIEW)
 #define HEART_ANI_NAME "_HEART_ANI"
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
+#define HR_BK_RECT_NAME "_HR_BK_RECT_NAME"
 static void heart_ani_cb(gui_win_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
@@ -55,8 +56,8 @@ extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
-    gui_canvas_rect_create((void *)app_win, "canvas_rect", 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0,
-                           100));
+    gui_canvas_rect_create((void *)app_win, HR_BK_RECT_NAME, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0,
+                           255));
     gui_win_set_animate(app_win, 1000, 0, app_win_cb, app_win);
     gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
@@ -207,6 +208,13 @@ static void app_hr_ui_design(gui_app_t *app)
 static void app_win_cb(gui_win_t *win)
 {
     GUI_BASE(win)->x = (1.0f - win->animate->progress_percent) * SCREEN_W;
+    gui_canvas_rect_t *img = 0;
+    gui_obj_tree_get_widget_by_name((void *)win, HR_BK_RECT_NAME, (void *)&img);
+    if (img)
+    {
+        gui_canvas_rect_set_opacity(img, (255 - 100)*win->animate->progress_percent + 100);
+    }
+
     if (win->animate->progress_percent >= 1.0f)
     {
         gui_app_shutdown(get_app_watch_ui());

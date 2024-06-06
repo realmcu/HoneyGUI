@@ -269,19 +269,17 @@ static void gui_img_prepare(gui_obj_t *obj)
 
     matrix_inverse(&this->draw_img->inverse);
     gui_image_load_scale(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
-    if (!this->scope_flag)
+
     {
+        this->scope = 0;
+        gui_obj_t *o = obj;
+        while (o->parent != NULL)
         {
-            gui_obj_t *o = obj;
-            this->scope_flag = 1;
-            while (o->parent != NULL)
+            o = o->parent;
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
             {
-                o = o->parent;
-                if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
-                {
-                    this->scope = 1;
-                    break;
-                }
+                this->scope = 1;
+                break;
             }
         }
     }
