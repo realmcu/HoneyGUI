@@ -23,37 +23,6 @@
 #include <acc_sw_raster.h>
 #include <acc_sw_rle.h>
 
-#pragma pack(1)
-typedef struct _color_rgb888
-{
-    uint8_t b;
-    uint8_t g;
-    uint8_t r;
-} color_rgb888_t;
-
-typedef struct _color_rgb565
-{
-    uint16_t b : 5;
-    uint16_t g : 6;
-    uint16_t r : 5;
-} color_rgb565_t;
-
-typedef struct _color_argb8565
-{
-    uint16_t b : 5;
-    uint16_t g : 6;
-    uint16_t r : 5;
-    uint8_t a;
-} color_argb8565_t;
-
-typedef struct _color_argb88888
-{
-    uint8_t b; ///< Blue color component, at the lowest address
-    uint8_t g; ///< Green color component
-    uint8_t r; ///< Red color component
-    uint8_t a; ///< Alpha channel for transparency, at the highest address
-} color_argb8888_t;
-#pragma pack()
 
 static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, uint32_t image_off,
                             char input_type, uint8_t dc_bytes_per_pixel, uint8_t opacity_value, uint32_t blend_mode)
