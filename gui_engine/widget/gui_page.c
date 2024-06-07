@@ -82,6 +82,14 @@
 
 static void gui_page_set_height(gui_obj_t *object, gui_obj_t *page)
 {
+    if ((page->matrix != NULL))
+    {
+        if (page->matrix->m[0][0] != 1 || page->matrix->m[1][1] != 1)
+        {
+            page->h = INT16_MAX;
+            return;
+        }
+    }
     gui_list_t *node = NULL;
     gui_list_for_each(node, &object->child_list)
     {
@@ -98,7 +106,7 @@ static void gui_page_set_height(gui_obj_t *object, gui_obj_t *page)
             int ay = obj->matrix->m[1][2];
             int buttom = ay + obj->h - page->matrix->m[1][2];
 
-            //gui_log("buttom:%d\n",buttom);
+
 
             if (page->h < buttom)
             {
@@ -561,6 +569,11 @@ void gui_page_update(gui_obj_t *obj)
             }
         }
     }
+    // if ((obj->matrix != NULL) && (obj->parent->matrix))
+    // {
+    //     memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
+    //     matrix_translate(obj->x, obj->y, obj->matrix);
+    // }
 }
 
 void gui_page_update_rebound(gui_obj_t *obj)

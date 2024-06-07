@@ -307,11 +307,11 @@ static void gui_img_prepare(gui_obj_t *obj)
         }
         if (win_scope)
         {
-            int ax = o->matrix->m[0][2] ;
-            int ay = o->matrix->m[1][2];
+            int ax = win_scope->base.x ;
+            int ay = win_scope->base.y;
 
-            int w_w = o->w;
-            int w_h = o->h;
+            int w_w = win_scope->base.w;
+            int w_h = win_scope->base.h;
             int img_x = GUI_TYPE(gui_img_t, obj)->ax;
             int img_y = GUI_TYPE(gui_img_t, obj)->ay;
             int img_w = this->draw_img->img_w;
@@ -340,11 +340,13 @@ static void gui_img_prepare(gui_obj_t *obj)
             }
             if (ay + w_h < img_y)
             {
-                obj->not_show = 1;
+                //obj->not_show = 1;
+                GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
             }
             if (ay > img_y + img_h * this->scale_y)
             {
-                obj->not_show = 1;
+                //obj->not_show = 1;
+                GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
             }
         }
     }

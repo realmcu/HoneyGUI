@@ -220,10 +220,13 @@ void gui_obj_add_event_cb(void           *obj,
 
 void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code)
 {
-    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    if (!obj->gesture)
     {
-        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-        event_dsc->event_code = event_code;
+        for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+        {
+            gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+            event_dsc->event_code = event_code;
+        }
     }
 }
 
