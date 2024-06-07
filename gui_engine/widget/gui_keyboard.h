@@ -35,6 +35,7 @@ extern "C" {
 #include "gui_button.h"
 #include "gui_switch.h"
 #include "gui_win.h"
+#include "gui_pinyinIME.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -80,10 +81,12 @@ typedef struct
     gui_win_t *win_letter;
     gui_win_t *win_num;
     gui_win_t *win_func;
+    gui_win_t *win_ime;
     gui_img_t *img_bg;
     gui_img_t *img_box;
     gui_text_t *txt_display; // display buffer txt
     gui_text_t *txt_input;   // call txtbox
+    gui_ime_t *ime;
     void **img_array;
     uint16_t file_mark[2];   // func, other start point
     float scale;             // refer to 640*360, keep screen horizontal full
@@ -126,9 +129,10 @@ typedef enum
     KB_AREA_NUM       = 1,
     KB_AREA_FUNC      = 2,
     KB_AREA_SYMBOL    = 3,
-    KB_AREA_OTHER     = 3,
+    KB_AREA_OTHER     = 4,
 // input method
     KB_METHOD_NULL = 0,
+    KB_METHOD_PINYIN,
 
 // key size
     // LAYOUT basic
@@ -159,12 +163,12 @@ typedef enum
     KB_IMG_IDX_GRIDL,
     KB_IMG_IDX_GRIDR,
     KB_IMG_IDX_BG,
+    KB_IMG_IDX_CAND_LEFT,
+    KB_IMG_IDX_CAND_RIGHT,
 
     KB_IMG_OTHER_NUM,
 
 } KEYBOARD_CONST;
-
-
 
 
 

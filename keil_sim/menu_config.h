@@ -66,6 +66,9 @@
 //#define CONFIG_REALTEK_BUILD_PPE
 // </c>
 
+// <c> RTK GUI Enable cJSON
+#define CONFIG_REALTEK_BUILD_CJSON
+// </c>
 
 // <c> RTK GUI Enable SasA
 //#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP

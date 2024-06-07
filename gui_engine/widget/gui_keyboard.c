@@ -26,9 +26,7 @@
 #include <gui_app.h>
 #include "gui_button.h"
 #include "gui_keyboard.h"
-// #include "gui_img.h"
-// #include "gui_button.h"
-// #include "gui_switch.h"
+#include "gui_pinyinIME.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -63,6 +61,7 @@
   */
 #define KB_BUFF_INPUT_MAXLEN 128  //!<
 #define KB_BUFF_DISPLAY_MAXLEN 128 //!<
+#define KB_BUFF_PINYIN_MAXLEN 128
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -74,11 +73,12 @@
   */
 
 static gui_kb_t *global_kb;
-//static char buff_input[KB_BUFF_INPUT_MAXLEN];  // input debug
 static char buff_display[KB_BUFF_DISPLAY_MAXLEN];
 static char buff_txt_display[KB_BUFF_DISPLAY_MAXLEN + 4];
+static char buff_pinyin[KB_BUFF_PINYIN_MAXLEN];
 
 static uint16_t len_display = 0;
+static uint16_t len_pinyin = 0;
 static char *cursor; // point to buff_display
 
 
@@ -93,6 +93,11 @@ static char *gui_kb_get_cursor(void)
 {
     return cursor;
 }
+
+static bool gui_kb_is_ascii(uint8_t byte)
+{
+    return ((byte >> 7) == 0);
+}
 static bool gui_kb_cursor_is_head(void)
 {
     return (cursor == buff_display);
@@ -100,6 +105,10 @@ static bool gui_kb_cursor_is_head(void)
 static bool gui_kb_cursor_is_tail(void)
 {
     return ((cursor - buff_display) == len_display);
+}
+static uint8_t buff_kb_cursor_top_byte(void)
+{
+    return *(cursor - 1);
 }
 static void gui_kb_cursor_ls(void)
 {
@@ -109,22 +118,50 @@ static void gui_kb_cursor_ls(void)
     }
     else
     {
-        cursor --;
+        uint8_t len_shift = 1;
+        uint8_t byte = buff_kb_cursor_top_byte();
+        gui_kb_t *this = gui_get_kb();
+        gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+        uint8_t char_len = ime_api->get_char_len_byte(this->ime);
+
+        if (gui_kb_is_ascii(byte))
+        {
+            len_shift = 1;
+        }
+        else
+        {
+            len_shift = char_len;
+        }
+
+        cursor -= len_shift;
     }
 }
 static void gui_kb_cursor_rs(void)
 {
+    gui_kb_t *this = gui_get_kb();
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    uint8_t char_len = ime_api->get_char_len_byte(this->ime);
     if ((cursor - buff_display) >= len_display)
     {
         cursor = buff_display + len_display;
     }
     else
     {
-        cursor ++;
+        uint8_t len_shift = 1;
+        uint8_t byte = *cursor;
+
+        if (gui_kb_is_ascii(byte))
+        {
+            len_shift = 1;
+        }
+        else
+        {
+            len_shift = char_len;
+        }
+
+        cursor += len_shift;
     }
 }
-
-
 
 static bool buff_display_isempty(void)
 {
@@ -146,7 +183,7 @@ static uint8_t buff_display_push(char ch)
         buff_display[len] = ch;
         buff_display[len + 1] = '\0';
         len_display++;
-        gui_kb_cursor_rs();
+        cursor++;
         return 0;
     }
     return 1;
@@ -163,21 +200,51 @@ static void buff_display_pop(void)
 
     len_display--;
     buff_display[len - 1] = '\0';
-    gui_kb_cursor_ls();
+    cursor--;
 }
 
-//static uint8_t buff_display_top(void)
-//{
-//    uint16_t len = len_display;
+static bool buff_pinyin_isempty(void)
+{
+    if ((len_pinyin == 0))
+    {
+        return  true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
-//    return buff_display[len - 1];
-//}
+static uint8_t buff_pinyin_push(char ch)
+{
+    uint16_t len = len_pinyin;
+    if (len < (KB_BUFF_PINYIN_MAXLEN - 1))
+    {
+        buff_pinyin[len] = ch;
+        buff_pinyin[len + 1] = '\0';
+        len_pinyin++;
+        return 0;
+    }
+    return 1;
+}
 
-//static void buff_display_clean(void)
-//{
-//    buff_display[0] = '\0';
-//    len_display = 0;
-//}
+static void buff_pinyin_pop(void)
+{
+    uint16_t len = len_pinyin;
+
+    if (buff_pinyin_isempty())
+    {
+        return;
+    }
+
+    len_pinyin--;
+    buff_pinyin[len - 1] = '\0';
+}
+static void buff_pinyin_clean(void)
+{
+    buff_pinyin[0] = '\0';
+    len_pinyin = 0;
+}
 
 static uint16_t gui_kb_cursor_len(void)
 {
@@ -207,18 +274,36 @@ static void gui_kb_cursor_insert(char ch)
 }
 static void gui_kb_cursor_del()
 {
+    uint8_t len_del = 1;
+    uint8_t byte = buff_kb_cursor_top_byte();
+    gui_kb_t *this = gui_get_kb();
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    uint8_t char_len = ime_api->get_char_len_byte(this->ime);
+
+    if (gui_kb_is_ascii(byte))
+    {
+        len_del = 1;
+    }
+    else
+    {
+        len_del = char_len;
+    }
+
     if (gui_kb_cursor_is_tail())
     {
-        buff_display_pop();
+        for (uint8_t i = 0; i < len_del; i++)
+        {
+            buff_display_pop();
+        }
     }
     else
     {
         if (!gui_kb_cursor_is_head())
         {
             uint16_t len = gui_kb_cursor_len();
-            memmove(cursor - 1, cursor, len + 1);
-            len_display--;
-            cursor--;
+            memmove(cursor - len_del, cursor, len + 1);
+            len_display -= len_del;
+            cursor -= len_del;
         }
     }
 }
@@ -380,34 +465,112 @@ static bool gui_kb_is_func(uint32_t key_val)
 
     if (area == KB_AREA_FUNC)
     {
-        if ((idx != KB_BTN_IDX_SP) && (idx != KB_BTN_IDX_COMIC) && (idx != KB_BTN_IDX_ENTER))
+        if ((idx == KB_BTN_IDX_SP) && (gui_get_kb()->mode == KB_MODE_BASIC_PY))
+        {
+            return true;
+        }
+        else if ((idx != KB_BTN_IDX_SP) && (idx != KB_BTN_IDX_COMIC) && (idx != KB_BTN_IDX_ENTER))
         {
             return true;
         }
     }
     return false;
 }
+static bool gui_kb_is_other(uint32_t key_val)
+{
+    uint8_t area = KB_VALUE_AREA(key_val);
 
-// static gui_obj_t *gui_kb_get_subobj(gui_obj_t *win, uint16_t obj_idx)
-// {
-//     gui_obj_t *obj = NULL;
-//     uint16_t idx = 0;
-//     gui_list_t *node = NULL;
+    if (area == KB_AREA_OTHER)
+    {
+        return true;
+    }
+    return false;
+}
+static gui_obj_t *gui_kb_get_subobj(gui_obj_t *win, uint16_t obj_idx)
+{
+    gui_obj_t *obj = NULL;
+    uint16_t idx = 0;
+    gui_list_t *node = NULL;
 
-//     gui_list_for_each(node, &win->child_list)
-//     {
-//         gui_obj_t *obj_item = gui_list_entry(node, gui_obj_t, brother_list);
-//         // gui_log("%s type: 0x%x\n", obj_item->name, obj_item->type);
-//         if(idx == obj_idx)
-//         {
-//             obj = obj_item;
-//             break;
-//         }
-//         idx++;
-//     }
-//     return obj;
-// }
+    gui_list_for_each(node, &win->child_list)
+    {
+        gui_obj_t *obj_item = gui_list_entry(node, gui_obj_t, brother_list);
+        // gui_log("%s type: 0x%x\n", obj_item->name, obj_item->type);
+        if (idx == obj_idx)
+        {
+            obj = obj_item;
+            break;
+        }
+        idx++;
+    }
+    return obj;
+}
 
+// ********************************** IME ****************************** //
+static void gui_kb_refresh_cand(void)
+{
+    gui_kb_t *this = gui_get_kb();
+    gui_obj_t *win = (gui_obj_t *)this->win_ime;
+    gui_list_t *node = NULL;
+    uint8_t idx_cnt = 0;
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    uint8_t char_len = ime_api->get_char_len_byte(this->ime);
+
+    gui_list_for_each(node, &win->child_list)
+    {
+        gui_obj_t *obj_item = gui_list_entry(node, gui_obj_t, brother_list);
+        // gui_log("%s type: 0x%x\n", obj_item->name, obj_item->type);
+        if (TEXTBOX == obj_item->type && idx_cnt < ime_api->get_page_size(this->ime))
+        {
+            gui_text_t *text = (gui_text_t *)obj_item;
+            gui_text_content_set(text, text->content, char_len);
+        }
+        idx_cnt ++;
+    }
+}
+static void gui_kb_clear_cand(void)
+{
+    gui_kb_t *this = gui_get_kb();
+    gui_obj_t *win = (gui_obj_t *)this->win_ime;
+    gui_list_t *node = NULL;
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+
+    buff_pinyin_clean();
+    ime_api->clear_cand(this->ime);
+    gui_list_for_each(node, &win->child_list)
+    {
+        gui_obj_t *obj_item = gui_list_entry(node, gui_obj_t, brother_list);
+        // gui_log("%s type: 0x%x\n", obj_item->name, obj_item->type);
+        if (TEXTBOX == obj_item->type)
+        {
+            gui_text_t *text = (gui_text_t *)obj_item;
+            gui_text_content_set(text, text->content, 0);
+        }
+    }
+}
+static void gui_kb_select_cand(size_t idx)
+{
+    gui_kb_t *this = gui_get_kb();
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    uint8_t *cand_buff = ime_api->get_cand_buff(this->ime);
+
+    if (idx >= ime_api->get_cand_num(this->ime))
+    {
+        return ;
+    }
+
+    uint8_t char_len = ime_api->get_char_len_byte(this->ime);
+    char *ch = (char *)cand_buff + idx * char_len;
+    for (uint8_t i = 0; i < char_len; i++)
+    {
+        gui_kb_cursor_insert(ch[i]);
+    }
+
+    gui_kb_clear_cand();
+    ime_api->reset_page(this->ime);
+}
+
+// ********************************** KB input proc ****************************** //
 static void gui_basic_func_proc(uint32_t key_val)
 {
     gui_kb_t *this = gui_get_kb();
@@ -447,21 +610,35 @@ static void gui_basic_func_proc(uint32_t key_val)
         break;
     case KB_BTN_IDX_DEL:
         {
-            // buff_display_pop();
-            gui_kb_cursor_del();
+            if (this->mode == KB_MODE_BASIC_PY && len_pinyin)
+            {
+                buff_pinyin_pop();
+            }
+            else
+            {
+                gui_kb_cursor_del();
+            }
         }
         break;
     case KB_SW_IDX_SYMBOL:
         {
             if ((mode != KB_MODE_BASIC_SYMBOL_EN) && (mode != KB_MODE_BASIC_SYMBOL_CN))
             {
-                // symbol
-                this->symbol_Lk = false;
-                gui_keyboard_set_mode(this, KB_MODE_BASIC_SYMBOL_EN);
+                if (mode == KB_MODE_BASIC_PY)
+                {
+                    gui_kb_select_cand(0);
+                    gui_keyboard_set_mode(this, KB_MODE_BASIC_SYMBOL_CN);
+                }
+                else
+                {
+                    // jump to symbol
+                    this->symbol_Lk = false;
+                    gui_keyboard_set_mode(this, KB_MODE_BASIC_SYMBOL_EN);
+                }
             }
             else
             {
-                // abc
+                // jump to abc
                 gui_keyboard_set_mode(this, KB_MODE_BASIC_ENG_LOWWER);
             }
         }
@@ -470,6 +647,11 @@ static void gui_basic_func_proc(uint32_t key_val)
         {
             if ((mode != KB_MODE_BASIC_NUM))
             {
+                if (mode == KB_MODE_BASIC_PY)
+                {
+                    gui_kb_select_cand(0);
+                }
+
                 gui_keyboard_set_mode(this, KB_MODE_BASIC_NUM);
             }
             else
@@ -485,6 +667,14 @@ static void gui_basic_func_proc(uint32_t key_val)
     case KB_BTN_IDX_LS:
         {
             gui_kb_cursor_ls();
+        }
+        break;
+    case KB_BTN_IDX_SP:
+        {
+            if (mode == KB_MODE_BASIC_PY)
+            {
+                gui_kb_select_cand(0);
+            }
         }
         break;
     case KB_BTN_IDX_RS:
@@ -507,6 +697,7 @@ static void gui_basic_func_proc(uint32_t key_val)
             else if ((mode == KB_MODE_BASIC_PY))
             {
                 // pinyin to abc
+                gui_kb_clear_cand();
                 gui_keyboard_set_mode(this, KB_MODE_BASIC_ENG_LOWWER);
             }
             else if ((mode == KB_MODE_BASIC_ENG_LOWWER) || (mode == KB_MODE_BASIC_ENG_UPPER))
@@ -541,19 +732,56 @@ static void gui_basic_func_proc(uint32_t key_val)
 
 }
 
+
+static void gui_basic_other_proc(uint32_t key_val)
+{
+    gui_kb_t *this = gui_get_kb();
+    uint32_t kb_idx = KB_VALUE_IDX(key_val);
+    uint32_t idx = kb_idx;
+    uint8_t mode = this->mode;
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+
+    if (mode == KB_MODE_BASIC_PY)
+    {
+        switch (idx)
+        {
+        case KB_IMG_IDX_CAND_LEFT:
+            {
+                ime_api->page_flip(this->ime, IME_PAGE_BACKWARD);
+            }
+            break;
+        case KB_IMG_IDX_CAND_RIGHT:
+            {
+                ime_api->page_flip(this->ime, IME_PAGE_FORWARD);
+            }
+            break;
+        }
+    }
+
+}
+
+static uint8_t gui_kb_basic_symbol_cn[] =
+{
+    0xef, 0xbc, 0x8c, 0xe3, 0x80, 0x82, 0xef, 0xbc, 0x9f, 0xef, 0xbc, 0x81, 0xef, 0xbd, 0x9e, 0xef, 0xbc, 0x9a, 0xe2, 0x80, 0xa6, 0xe2, 0x80, 0xa6,
+    0xef, 0xbf, 0xa5, 0xe2, 0x80, 0xa6, 0xef, 0xbc, 0x9b, 0xe3, 0x80, 0x81, 0xe2, 0x80, 0xa6, 0xe2, 0x80, 0x9c, 0xe2, 0x80, 0x9d, 0xe3, 0x80, 0x8a,
+    0xe3, 0x80, 0x8b, 0xe3, 0x80, 0x90, 0xe3, 0x80, 0x91, 0xef, 0xbd, 0x9b, 0xef, 0xbd, 0x9d, 0xef, 0xbc, 0x9c, 0xef, 0xbc, 0x9e, 0xef, 0xbc, 0x88,
+    0xef, 0xbc, 0x89, 0xe2, 0x80, 0xa6
+};
 static char *gui_kb_basic_symbol[] = {",.-!~:%#+&/@*\"|\\_[]{}<>()?",
-                                      ",.?!",
+                                      (char *)gui_kb_basic_symbol_cn,
                                       ",:?~@.(!)-=+%#*"
                                      };
 
-static char gui_get_basic_char(uint32_t key_val)
+static uint32_t gui_get_basic_char(uint32_t key_val)
 {
     gui_kb_t *this = gui_get_kb();
     uint8_t  kb_area = KB_VALUE_AREA(key_val);
     uint32_t kb_idx = KB_VALUE_IDX(key_val);
     uint32_t idx = kb2letter_index(kb_idx);
-    char ch = '\0';
+    uint32_t ch = 0;
     uint8_t mode = this->mode;
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    uint8_t char_len = ime_api->get_char_len_byte(this->ime);
 
     if (kb_area == KB_AREA_FUNC)
     {
@@ -563,8 +791,11 @@ static char gui_get_basic_char(uint32_t key_val)
         }
         else if (kb_idx == KB_BTN_IDX_COMIC)
         {
-            // TODO: CN
-            ch = ',';
+            // ch = ',';
+            char *charset = gui_kb_basic_symbol[1];
+
+            gui_kb_select_cand(0);
+            memcpy(&ch, &charset[0 * char_len], char_len);
         }
         else if (kb_idx == KB_BTN_IDX_ENTER)
         {
@@ -589,19 +820,12 @@ static char gui_get_basic_char(uint32_t key_val)
         case KB_MODE_BASIC_SYMBOL_EN:
             {
                 ch = gui_kb_basic_symbol[0][kb_idx];
-                if (!this->symbol_Lk)
-                {
-                    gui_keyboard_set_mode(this, this->last_mode);
-                }
             }
             break;
         case KB_MODE_BASIC_SYMBOL_CN:
             {
-                ch = gui_kb_basic_symbol[1][kb_idx];
-                if (!this->symbol_Lk)
-                {
-                    gui_keyboard_set_mode(this, this->last_mode);
-                }
+                char *charset = gui_kb_basic_symbol[1];
+                memcpy(&ch, &charset[kb_idx * char_len], char_len);
             }
             break;
         case KB_MODE_BASIC_NUM:
@@ -633,18 +857,59 @@ static void gui_kb_input_func_proc(uint32_t key_val)
     }
 
 }
+static void gui_kb_input_other_proc(uint32_t key_val)
+{
+    gui_kb_t *this = gui_get_kb();
+
+    if (this->layout == KB_LAYOUT_BASIC)
+    {
+        gui_basic_other_proc(key_val);
+    }
+
+}
 static void gui_kb_input_char_proc(uint32_t key_val)
 {
     gui_kb_t *this = gui_get_kb();
-    char ch = '\0';
+    uint8_t  kb_area = KB_VALUE_AREA(key_val);
+    uint32_t kb_idx = KB_VALUE_IDX(key_val);
+    uint32_t ch = 0;
 
     if (this->layout == KB_LAYOUT_BASIC)
     {
         ch = gui_get_basic_char(key_val);
     }
 
-    // buff_display_push(ch);
-    gui_kb_cursor_insert(ch);
+    if (this->mode == KB_MODE_BASIC_PY && kb_area == KB_AREA_LETTER)
+    {
+        buff_pinyin_push(ch);
+    }
+    else
+    {
+        if (this->mode == KB_MODE_BASIC_SYMBOL_CN || ((kb_area == KB_AREA_FUNC) &&
+                                                      (kb_idx == KB_BTN_IDX_COMIC)))
+        {
+            uint8_t *byte = (uint8_t *)&ch;
+            gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+            uint8_t char_len = ime_api->get_char_len_byte(this->ime);
+
+            for (uint8_t i = 0; i < char_len; i++)
+            {
+                gui_kb_cursor_insert(byte[i]);
+            }
+        }
+        else
+        {
+            gui_kb_cursor_insert(ch);
+        }
+    }
+
+    if (this->mode == KB_MODE_BASIC_SYMBOL_EN || this->mode == KB_MODE_BASIC_SYMBOL_CN)
+    {
+        if (!this->symbol_Lk)
+        {
+            gui_keyboard_set_mode(this, this->last_mode);
+        }
+    }
 }
 
 
@@ -658,7 +923,7 @@ static void gui_kb_cursor_animate(void *p)
 
     i++;
     // printf(">%c\n", *(char*)cur);
-    // gui_log("gui_kb_cursor_animate\n");
+    // printf(">%d %s\n", len_display,(char*)buff_display);
 
     memset(pcontent, 0, KB_BUFF_DISPLAY_MAXLEN);
     if (len_bf)
@@ -671,32 +936,59 @@ static void gui_kb_cursor_animate(void *p)
     gui_text_content_set(this->txt_display, pcontent, len_display + 1);
 }
 
+static void gui_kb_update_pinyin(void)
+{
+    gui_kb_t *this = gui_get_kb();
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    uint8_t page_sz = ime_api->get_page_size(this->ime);
+    gui_text_t *txt = (gui_text_t *)gui_kb_get_subobj((gui_obj_t *)(this->win_ime), page_sz);
+
+    gui_text_content_set(txt, txt->content, len_pinyin);
+}
+static void gui_kb_update_cand(void)
+{
+    gui_kb_t *this = gui_get_kb();
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    if (buff_pinyin_isempty())
+    {
+        gui_kb_clear_cand();
+    }
+    ime_api->update_cand(this->ime, buff_pinyin, len_pinyin);
+    gui_kb_refresh_cand();
+}
 static void gui_kb_update_display(void)
 {
-    // gui_kb_t *this = gui_get_kb();
-
-    // memset(this->txt_display->content, 0, KB_BUFF_DISPLAY_MAXLEN);
-    // memcpy(this->txt_display->content, buff_display, len_display);
-    // this->txt_display->len = len_display;
     gui_kb_cursor_animate(NULL);
 }
 static void gui_kb_input_proc(void *obj, gui_event_t event_code, void *param)
 {
-    // gui_obj_t *this = (void *)obj;
-    // T_OBJ_TYPE type = this->type;
+    // gui_obj_t *object = (void *)obj;
+    // T_OBJ_TYPE type = object->type;
     size_t key_val = (size_t)param;
+    gui_kb_t *kb = gui_get_kb();
 
     // gui_log("0x%x type: 0x%x, key: 0x%x %d %d\n", obj, type, key_val, KB_VALUE_AREA(key_val),
-    //         KB_VALUE_IDX(key_val));
+    // KB_VALUE_IDX(key_val));
     // gui_log(">%s\n", buff_input);
 
     if (gui_kb_is_func(key_val))
     {
         gui_kb_input_func_proc(key_val);
     }
+    else if (gui_kb_is_other(key_val))
+    {
+        gui_kb_input_other_proc(key_val);
+    }
     else
     {
         gui_kb_input_char_proc(key_val);
+    }
+
+
+    if (kb->mode == KB_MODE_BASIC_PY)
+    {
+        gui_kb_update_pinyin();
+        gui_kb_update_cand();
     }
 
     // update display
@@ -705,7 +997,7 @@ static void gui_kb_input_proc(void *obj, gui_event_t event_code, void *param)
 }
 
 
-
+// ********************************** KB layout ****************************** //
 
 static void gui_kb_set_func_mode(gui_kb_t *this, uint8_t mode)
 {
@@ -902,7 +1194,7 @@ static void gui_kb_mode_switch(gui_kb_t *this, uint8_t mode)
     this->mode = mode;
     this->caps_Lk = false;
     this->is_cn = false;
-    gui_log("last: %d\n", this->last_mode);
+    // gui_log("last mode: %d\n", this->last_mode);
 
     if ((mode == KB_MODE_BASIC_SYMBOL_CN) || (mode == KB_MODE_BASIC_PY))
     {
@@ -913,11 +1205,17 @@ static void gui_kb_mode_switch(gui_kb_t *this, uint8_t mode)
         this->caps_Lk = true;
     }
 
+
+    gui_obj_show(this->win_ime, false);
+
     switch (mode)
     {
+    case KB_MODE_BASIC_PY:
+        {
+            gui_obj_show(this->win_ime, true);
+        }
     case KB_MODE_BASIC_ENG_LOWWER:
     case KB_MODE_BASIC_ENG_UPPER:
-    case KB_MODE_BASIC_PY:
     case KB_MODE_BASIC_SYMBOL_EN:
     case KB_MODE_BASIC_SYMBOL_CN:
         {
@@ -942,7 +1240,7 @@ static void gui_kb_mode_switch(gui_kb_t *this, uint8_t mode)
 static void gui_kb_set_obj_scale(int16_t *obj_x, int16_t *obj_y, int16_t *obj_w, int16_t *obj_h)
 {
     gui_kb_t *this = gui_get_kb();
-    uint16_t h = gui_get_screen_width();
+    uint16_t h = gui_get_screen_height();
     float scale = this->scale;
 
     *obj_x = *obj_x * scale;
@@ -1058,17 +1356,14 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
     uint16_t i = 0;
     gui_button_t *btn = NULL;
 
-
     // location calculate
     // 3 row
     int16_t y_start = 120;
     float scale = this->scale;
 
-
     this->win_num = gui_win_create(this, "WIN_num",
                                    x, y, w, h);
     // TODO: grid img
-
     {
         float y_step = 59;
         float x_pos[] = {203, 284, 365, 445};
@@ -1133,15 +1428,130 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
 
 }
 
+static void gui_kb_ime_cand_click(void *obj, gui_event_t e, void *param)
+{
+    // gui_log("click cand %d\n", param);
+    gui_kb_select_cand((size_t)param);
+    gui_kb_update_display();
+}
+
+static void gui_kb_layout_basic_ime(gui_kb_t  *this)
+{
+    int16_t x = this->base.x, y = this->base.y, w = this->base.w, h = this->base.h;
+    uint16_t i = 0;
+    gui_text_t *txt = NULL;
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
+    uint8_t page_sz = ime_api->get_page_size(this->ime);
+
+    // location calculate
+    uint8_t x_step = 57;   // fixed
+    float x_pos_cand_start = 34;
+    float scale = this->scale;
+    int16_t obj_x = 0, obj_y = 0;
+    int16_t obj_w = 0, obj_h = 0;
+    uint16_t screen_h = gui_get_screen_height();
+
+    int font_size_cn = 26;
+    void *addr_font_cn =
+        gui_get_file_address("app/system/resource/font/simsun_size26_bits4_font 3.bin");
+    int font_size_pinyin = 26;
+    void *addr_font_pinyin =
+        gui_get_file_address("app/system/resource/font/simsun_size26_bits1_font.bin");
+    char *text = (char *)ime_api->get_cand_buff(this->ime);
+    uint8_t char_len = ime_api->get_char_len_byte(this->ime);
+
+    this->win_ime = gui_win_create(this, "WIN_ime",
+                                   x, y, w, h);
+
+    // text: candi cn
+    obj_w = x_step; obj_h = font_size_cn;
+    int16_t x_pos_cand_start_scale = x_pos_cand_start * scale;
+    obj_y = 92;
+    obj_y = h - (360 - (obj_y + obj_h)) * scale - obj_h;
+    for (size_t i = 0; i < page_sz; i++)
+    {
+        obj_x = x_pos_cand_start_scale + i * x_step;
+
+        txt = gui_text_create(this->win_ime, "icon_text", obj_x, obj_y,
+                              obj_w, obj_h);
+        gui_text_mode_set(txt, CENTER);
+        // A Chinese character for each
+        gui_text_set(txt, text + i * char_len, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                     char_len, font_size_cn);
+        gui_font_mem_init(addr_font_cn);
+        gui_text_type_set(txt, addr_font_cn);
+
+        gui_text_click(txt, gui_kb_ime_cand_click, (void *)i);
+    }
+
+    // text: pinyin
+    obj_x = 34; obj_y = 64;
+    obj_w = 300; obj_h = font_size_pinyin;
+    obj_x = obj_x * scale;
+    obj_y = h - (360 - (obj_y + obj_h)) * scale - obj_h;
+
+    memset(buff_pinyin, 0, sizeof(buff_pinyin));
+    // len_pinyin = strlen("yong");
+    // memcpy(buff_pinyin, "yong", len_pinyin);
+
+    txt = gui_text_create(this->win_ime, "txt_pinyin", obj_x, obj_y,
+                          obj_w, obj_h);
+    gui_text_mode_set(txt, LEFT);
+    gui_text_set(txt, buff_pinyin, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
+                 len_pinyin, font_size_pinyin);
+    gui_font_mem_init(addr_font_pinyin);
+    gui_text_type_set(txt, addr_font_pinyin);
+
+
+
+    // button: left and right
+    {
+        gui_button_t *btn = NULL;
+        void *img_default = NULL, *img_clk = NULL;
+        size_t key_val = KB_VALUE_PACK(KB_AREA_OTHER, KB_IMG_IDX_CAND_LEFT);
+
+        obj_x = 19;
+        obj_y = 98;
+        img_default = get_other_img(this, KB_IMG_IDX_CAND_LEFT);
+        img_clk = img_default;
+        obj_w = ((gui_rgb_data_head_t *)img_default)->w;
+        obj_h = ((gui_rgb_data_head_t *)img_default)->h;
+        gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+
+        btn = gui_button_create(this->win_ime, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
+                                BUTTON_BG_ICON, 0);
+        gui_img_scale(btn->img, scale, scale);
+
+        gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
+
+        //
+        obj_x = 610;
+        obj_y = 98;
+        key_val = KB_VALUE_PACK(KB_AREA_OTHER, KB_IMG_IDX_CAND_RIGHT);
+        img_default = get_other_img(this, KB_IMG_IDX_CAND_RIGHT);
+        img_clk = img_default;
+        obj_w = ((gui_rgb_data_head_t *)img_default)->w;
+        obj_h = ((gui_rgb_data_head_t *)img_default)->h;
+        gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
+
+        btn = gui_button_create(this->win_ime, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
+                                BUTTON_BG_ICON, 0);
+        gui_img_scale(btn->img, scale, scale);
+
+        gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
+    }
+
+}
 static void gui_kb_layout_basic_ctor(gui_kb_t  *this, gui_kb_config_t  *config)
 {
-    // letters
+    // key
     gui_kb_layout_basic_letter(this);
     gui_kb_layout_basic_func(this);
     gui_kb_layout_basic_number(this);
+    gui_kb_layout_basic_ime(this);
 
     // default
-    gui_kb_mode_switch(this, KB_MODE_BASIC_SYMBOL_CN);
+    gui_kb_mode_switch(this, KB_MODE_BASIC_ENG_LOWWER);
 }
 
 static void gui_kb_ctor(gui_kb_t                        *this,
@@ -1197,7 +1607,12 @@ static void gui_kb_ctor(gui_kb_t                        *this,
     //
     if (this->layout == KB_LAYOUT_BASIC)
     {
+        this->ime = gui_pinyin_IME_create((uint16_t)(10 * this->scale));
+
         gui_kb_layout_basic_ctor(this, config);
+
+#define PATH_PRE "\\app/system/resource/ime/"
+        gui_IME_set_dict(this->ime,  PATH_PRE"\\dictionary_info.json", PATH_PRE"\\dict8105.txt");
     }
 
 
@@ -1213,14 +1628,12 @@ static void gui_kb_ctor(gui_kb_t                        *this,
 
     this->txt_display = gui_text_create(this, "icon_text", 24, 26,
                                         w, h - 60);
-    gui_text_set(this->txt_display, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
-                 strlen(text), 32);
     gui_text_mode_set(this->txt_display, LEFT);
     {
-        int font_size = 30;
+        int font_size = 26;
         gui_text_set(this->txt_display, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      strlen(text), font_size);
-        void *addr1 = gui_get_file_address("app/system/resource/font/calibri_size30_bits4_font.bin");
+        void *addr1 = gui_get_file_address("app/system/resource/font/simsun_size26_bits4_font 3.bin.bin");
         gui_font_mem_init(addr1);
         gui_text_type_set(this->txt_display, addr1);
     }

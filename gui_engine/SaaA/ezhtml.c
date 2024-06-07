@@ -789,7 +789,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     parent = (void *)gui_tabview_create(parent, ptxt, x, y, w, h);
-                    gui_tabview_loop_x((void *)parent, false);
+                    gui_tabview_loop_x((void *)parent, true);
                 }
                 break;
             case ARC:

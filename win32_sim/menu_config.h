@@ -96,11 +96,11 @@
 // </c>
 
 // <c> RTK GUI Enable SasA
-//#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
+// #define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>
 
 // <c> RTK GUI Enable cJSON
-// #define CONFIG_REALTEK_BUILD_CJSON
+#define CONFIG_REALTEK_BUILD_CJSON
 // </c>
 
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
