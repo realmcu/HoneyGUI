@@ -70,6 +70,10 @@
 #define CONFIG_REALTEK_BUILD_CJSON
 // </c>
 
+// <c> RTK GUI Enable KeyBoard And Pinyin
+//#define CONFIG_REALTEK_BUILD_PINYIN
+// </c>
+
 // <c> RTK GUI Enable SasA
 //#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
 // </c>

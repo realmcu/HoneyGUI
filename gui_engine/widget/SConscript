@@ -1,4 +1,4 @@
-# RT-Thread building script for GuiEngine demo
+#building script for HoneyGUI Widget
 
 from building import *
 
@@ -16,6 +16,10 @@ if not GetDepend(['CONFIG_REALTEK_BUILD_LVGL_GUI']):
 
 if not GetDepend(['CONFIG_REALTEK_BUILD_PAINTER_ENGINE']):
     SrcRemove(src,'gui_px.c')
+    
+if not GetDepend(['CONFIG_REALTEK_BUILD_PINYIN']):
+    SrcRemove(src,'gui_pinyinIME.c')
+    SrcRemove(src,'gui_keyboard.c')
 
 CPPPATH = [cwd]
 

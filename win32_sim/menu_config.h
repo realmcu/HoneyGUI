@@ -103,6 +103,10 @@
 #define CONFIG_REALTEK_BUILD_CJSON
 // </c>
 
+// <c> RTK GUI Enable KeyBoard And Pinyin
+#define CONFIG_REALTEK_BUILD_PINYIN
+// </c>
+
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
 // #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
