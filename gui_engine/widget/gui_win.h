@@ -96,7 +96,7 @@ gui_win_t *gui_win_create(void       *parent,
  * @param callback animate frame callback
  * @param p parameter
  */
-void gui_win_set_animate(gui_win_t *this,
+void gui_win_set_animate(gui_win_t *_this,
                          uint32_t   dur,
                          int        repeat_count,
                          void      *callback,
@@ -109,7 +109,7 @@ void gui_win_set_animate(gui_win_t *this,
  * @param callback
  * @param parameter
  */
-void gui_win_left(gui_win_t *this, void *callback, void *parameter);
+void gui_win_left(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
@@ -118,7 +118,7 @@ void gui_win_left(gui_win_t *this, void *callback, void *parameter);
  * @param callback
  * @param parameter
  */
-void gui_win_right(gui_win_t *this, void *callback, void *parameter);
+void gui_win_right(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
@@ -127,7 +127,7 @@ void gui_win_right(gui_win_t *this, void *callback, void *parameter);
  * @param callback
  * @param parameter
  */
-void gui_win_up(gui_win_t *this, void *callback, void *parameter);
+void gui_win_up(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
@@ -136,7 +136,7 @@ void gui_win_up(gui_win_t *this, void *callback, void *parameter);
  * @param callback
  * @param parameter
  */
-void gui_win_down(gui_win_t *this, void *callback, void *parameter);
+void gui_win_down(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
@@ -145,7 +145,7 @@ void gui_win_down(gui_win_t *this, void *callback, void *parameter);
  * @param callback
  * @param parameter
  */
-void gui_win_press(gui_win_t *this, void *callback, void *parameter);
+void gui_win_press(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
@@ -154,7 +154,7 @@ void gui_win_press(gui_win_t *this, void *callback, void *parameter);
  * @param callback
  * @param parameter
  */
-void gui_win_release(gui_win_t *this, void *callback, void *parameter);
+void gui_win_release(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
@@ -163,7 +163,7 @@ void gui_win_release(gui_win_t *this, void *callback, void *parameter);
  * @param callback
  * @param parameter
  */
-void gui_win_long(gui_win_t *this, void *callback, void *parameter);
+void gui_win_long(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
@@ -172,15 +172,15 @@ void gui_win_long(gui_win_t *this, void *callback, void *parameter);
  * @param callback
  * @param parameter
  */
-void gui_win_click(gui_win_t *this, void *callback, void *parameter);
+void gui_win_click(gui_win_t *_this, void *callback, void *parameter);
 
 /**
  * @brief
  *
- * @param this
+ * @param _this
  * @param hold_tp
  */
-void gui_win_hole_tp(gui_win_t *this, bool hold_tp);
+void gui_win_hole_tp(gui_win_t *_this, bool hold_tp);
 
 #ifdef __cplusplus
 }

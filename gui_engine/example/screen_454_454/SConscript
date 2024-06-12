@@ -5,7 +5,7 @@ from building import *
 cwd = GetCurrentDir()
 src = Split("""
 """)
-
+CPPDEFINES = []
 src = Glob('*.c')
 src += Glob('./gui_main/*.c')
 src += Glob('./gui_watchface/*.c')
@@ -15,6 +15,9 @@ src += Glob('./gui_common/*.c')
 src += Glob('./gui_call/*.c')
 src += Glob('./gui_record/*.c')
 src += Glob('./gui_menu/*.c') 
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_BOX2D'):
+    src += Glob('./gui_menu/*.cpp') 
+    CPPDEFINES += ['ENABLE_RTK_GUI_BOX2D']
 src += Glob('./gui_benchmark/*.c') 
 src += Glob('./gui_watchface_litegfx/*.c') 
 CPPPATH = [cwd]
@@ -27,7 +30,7 @@ CPPPATH += [cwd + '\\gui_record']
 CPPPATH += [cwd + '\\gui_watchface']
 print(CPPPATH)
 
-CPPDEFINES = []
+
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'):
     CPPDEFINES += ['ENABLE_RTK_GUI_454_454_DEMO']
 

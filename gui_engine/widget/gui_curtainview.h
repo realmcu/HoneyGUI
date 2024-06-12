@@ -94,7 +94,7 @@ typedef struct gui_curtainview
     bool init_flag;
     bool release_flag;
     int spring_value;
-    void (*done_cb)(struct gui_curtainview *this);
+    void (*done_cb)(struct gui_curtainview *_this);
 
     uint16_t has_center_curtain          : 1;
     uint16_t has_left_curtain            : 1;
@@ -183,7 +183,7 @@ gui_curtainview_t *gui_curtainview_create(void       *parent,
  * @param this widget pointer
  * @param cb event callback
  */
-void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtainview_t *this));
+void gui_curtainview_set_done_cb(gui_curtainview_t *_this, void (*cb)(gui_curtainview_t *_this));
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}
