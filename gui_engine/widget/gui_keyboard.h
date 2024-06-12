@@ -58,6 +58,7 @@ typedef struct
 {
     uint8_t layout;
     uint8_t mode;
+    uint8_t ime;
 
     void **img_array;
     uint16_t num_pic;

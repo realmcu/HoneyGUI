@@ -16,10 +16,11 @@ static void *context_alloc(size_t size, void *cb_data_p)
 #elif defined RTL87x2G
     js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
 #elif defined RTL8762D
-    static uint8_t *js_buffer = (void *)(0x6900000);
+    js_buffer = (void *)(0x6900000);
 
 #elif defined __WIN32
-    static uint8_t js_buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
+    static uint8_t buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
+    js_buffer = buffer;
 #else
     js_buffer = malloc(size);
 #endif
