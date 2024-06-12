@@ -17,7 +17,7 @@ If you need to update the location of image widget, use [gui_img_set_location(gu
 
 ### Set attribute
 
-You can use [gui_img_set_attribute(gui_img_t *this, const char *filename, void *addr, int16_t x, int16_t y)](#api) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
+You can use [gui_img_set_attribute(gui_img_t *this, const char *name, void *addr, int16_t x, int16_t y)](#api) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
 
 ### Get height/width
 

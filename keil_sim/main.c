@@ -22,7 +22,6 @@
 #ifdef RTE_Compiler_IO_STDOUT_EVR
 #include "EventRecorder.h"
 #endif
-#include "cmsis_os2.h"                  // ARM::CMSIS:RTOS2:Keil RTX5
 #include "Board_GLCD.h"
 #include "GLCD_Config.h"
 #include "gui_server.h"
@@ -54,7 +53,6 @@ void app_main(void *argument)
         time_t now;
         now = time(NULL);
         printf("World Time: %.*s\n", 25, ctime(&now));
-        osDelay(10000);
     }
 }
 /*----------------------------------------------------------------------------
@@ -66,13 +64,7 @@ int main(void)
     EventRecorderInitialize(0, 1);
 #endif
     printf("Realtek Bee GUI Welcome \r\n");
-    // ...
-    osKernelInitialize();                 // Initialize CMSIS-RTOS
-    osThreadNew(app_main, NULL, NULL);    // Create application main thread
-    if (osKernelGetState() == osKernelReady)
-    {
-        osKernelStart();                    // Start thread execution
-    }
+    app_main(NULL);
 
     while (1);
 

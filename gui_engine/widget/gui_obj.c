@@ -131,7 +131,7 @@ static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
 *============================================================================*/
 void gui_obj_ctor(gui_obj_t  *this,
                   gui_obj_t  *parent,
-                  const char *filename,
+                  const char *name,
                   int16_t     x,
                   int16_t     y,
                   int16_t     w,
@@ -141,12 +141,12 @@ void gui_obj_ctor(gui_obj_t  *this,
 
     this->parent = parent;
 
-    if (!filename)
+    if (!name)
     {
-        filename = "_default_widget";
+        name = "_default_widget";
     }
 
-    this->name = filename;
+    this->name = name;
     this->x = x;
     this->y = y;
 
@@ -169,7 +169,7 @@ void gui_obj_ctor(gui_obj_t  *this,
 }
 
 gui_obj_t *gui_obj_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,
@@ -177,7 +177,7 @@ gui_obj_t *gui_obj_create(void       *parent,
 {
     gui_obj_t *this = gui_malloc(sizeof(gui_obj_t));
     memset(this, 0, sizeof(gui_obj_t));
-    gui_obj_ctor(this, parent, filename, x, y, w, h);
+    gui_obj_ctor(this, parent, name, x, y, w, h);
 
     gui_list_init(&(this->child_list));
     if ((this->parent) != ((void *)0))
@@ -220,10 +220,13 @@ void gui_obj_add_event_cb(void           *obj,
 
 void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code)
 {
-    for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+    if (!obj->gesture)
     {
-        gui_event_dsc_t *event_dsc = obj->event_dsc + i;
-        event_dsc->event_code = event_code;
+        for (uint8_t i = 0; i < obj->event_dsc_cnt; i++)
+        {
+            gui_event_dsc_t *event_dsc = obj->event_dsc + i;
+            event_dsc->event_code = event_code;
+        }
     }
 }
 
@@ -234,11 +237,25 @@ void gui_obj_tree_print(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        gui_log(" %s \n", obj->name);
+        gui_log(" %s-->%s \n", obj->name, obj->parent->name);
         gui_obj_tree_print(obj);
     }
 }
+void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
+{
+    gui_list_t *node = NULL;
 
+    gui_list_for_each(node, &obj->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == type)
+        {
+            (*count)++;
+        }
+
+        gui_obj_tree_count_by_type(obj, type, count);
+    }
+}
 void gui_obj_tree_free(void *obj)
 {
     gui_obj_t *object = (gui_obj_t *)obj;
@@ -260,6 +277,16 @@ void gui_obj_tree_free(void *obj)
     else
     {
         gui_log("obj %s parent equal NULL!\n", object->name);
+        if (object->matrix != NULL)
+        {
+            gui_free(object->matrix);
+            object->matrix = NULL;
+        }
+        if (object->event_dsc != NULL)
+        {
+            gui_free(object->event_dsc);
+            object->event_dsc = NULL;
+        }
         gui_list_init(&object->child_list);
     }
 }
@@ -571,6 +598,114 @@ void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t
         }
 
         gui_obj_tree_get_widget_by_type(obj, type, output);
+    }
+}
+void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
+{
+    uint32_t cur_time_gap;
+    if (animate && animate->animate)
+    {
+        animate->Beginning_frame = 0;
+        animate->end_frame = 0;
+        if (animate->progress_percent == 0 && !animate->init)
+        {
+            animate->init = 1;
+            animate->init_time_ms = gui_ms_get();
+        }
+
+        animate->cur_time_ms = gui_ms_get();
+        cur_time_gap = animate->cur_time_ms - animate->init_time_ms;
+
+        if (animate->repeat_count == 0)
+        {
+            animate->progress_percent = (float)(cur_time_gap % animate->dur) /
+                                        (float)animate->dur;
+            if (cur_time_gap / animate->dur >= 1)
+            {
+                animate->end_frame = 1;
+                animate->progress_percent = 1;
+                animate->animate = 0;
+            }
+            animate->callback(animate->p, obj);
+
+        }
+        else if (animate->repeat_count == -1)
+        {
+            // uint32_t  round_count = cur_time_gap / animate->dur;
+
+
+            animate->progress_percent = (float)(cur_time_gap % animate->dur) /
+                                        (float)animate->dur;
+            if (animate->progress_percent < animate->last_per)
+            {
+
+                animate->Beginning_frame = 1;
+            }
+            animate->last_per = animate->progress_percent;
+            animate->callback(animate->p, obj);
+        }
+        else
+        {
+            uint32_t  round_count = cur_time_gap / animate->dur;
+            if (round_count > animate->repeat_count)
+            {
+                animate->animate = 0;
+                return;
+            }
+
+            if (round_count > animate->last_round)
+            {
+                animate->Beginning_frame = 1;
+            }
+            animate->last_round = round_count;
+            animate->progress_percent = (float)(cur_time_gap % animate->dur) /
+                                        (float)animate->dur;
+            animate->callback(animate->p, obj);
+        }
+    }
+}
+gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
+                                   uint32_t      dur,
+                                   int           repeat_count,
+                                   void         *callback,
+                                   void         *p)
+{
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    animate->callback = (void (*)(void *, void *))callback;
+    animate->repeat_count = repeat_count;
+    animate->p = p;
+    return animate;
+}
+void gui_obj_tree_print_bfs(gui_obj_t *root)
+{
+    if (root == NULL)
+    {
+        return;
+    }
+
+    gui_obj_t *queue[100];
+    int front = 0;
+    int rear = 0;
+
+    queue[rear++] = root;
+
+    while (front != rear)
+    {
+        gui_obj_t *current_obj = queue[front++];
+        gui_log(" %s \n", current_obj->name);
+        gui_list_t *node = NULL;
+        gui_list_for_each(node, &current_obj->child_list)
+        {
+            gui_obj_t *child_obj = gui_list_entry(node, gui_obj_t, brother_list);
+            queue[rear++] = child_obj;
+        }
     }
 }
 /** End of WIDGET_Exported_Functions

@@ -42,10 +42,7 @@ int main(int argc, char **argv)
     }
     printf("defaultPath path: %s\n", defaultPath);
 
-    // TODO: SASA auto get screen size
-
     gui_components_init();
-
 
 
     while (1)
@@ -53,9 +50,6 @@ int main(int argc, char **argv)
         time_t now;
         now = time(NULL);
         printf("World Time: %.*s\n", 25, ctime(&now));
-        // int age;
-        // scanf("%d", &age);
-        // printf("Your age is %d \n", age);
         sleep(1000);
     }
 

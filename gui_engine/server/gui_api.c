@@ -12,11 +12,29 @@ static struct gui_indev *indev = NULL;
 static struct gui_os_api *os_api = NULL;
 static struct gui_dispdev *dc = NULL;
 static struct gui_fs *fs = NULL;
+static struct gui_ftl *ftl = NULL;
 static struct acc_engine *acc = NULL;
 
 void gui_dc_info_register(struct gui_dispdev *info)
 {
     dc = info;
+
+    if (dc->fb_height == dc->screen_height)
+    {
+        dc->pfb_type = PFB_X_DIRECTION;
+        uint32_t last_section = (dc->screen_width % dc->fb_width) ? 1 : 0;
+        dc->section_total = dc->screen_width / dc->fb_width + last_section;
+    }
+    else if (dc->fb_width == dc->screen_width)
+    {
+        dc->pfb_type = PFB_Y_DIRECTION;
+        uint32_t last_section = (dc->screen_height % dc->fb_height) ? 1 : 0;
+        dc->section_total = dc->screen_height / dc->fb_height + last_section;
+    }
+    else
+    {
+        GUI_ASSERT(NULL != NULL);
+    }
 }
 void gui_acc_info_register(struct acc_engine *info)
 {
@@ -27,6 +45,12 @@ void gui_fs_info_register(struct gui_fs *info)
 {
     fs = info;
 }
+
+void gui_ftl_info_register(struct gui_ftl *info)
+{
+    ftl = info;
+}
+
 void gui_indev_info_register(struct gui_indev *info)
 {
     indev = info;
@@ -222,7 +246,7 @@ bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 }
 
 
-void *gui_malloc(uint32_t n)
+void *gui_malloc(size_t n)
 {
     void *ptr = NULL;
     if ((n > os_api->mem_threshold_size) && (os_api->mem_threshold_size != 0))
@@ -247,7 +271,7 @@ void *gui_malloc(uint32_t n)
     return ptr;
 }
 
-void *gui_realloc(void *ptr_old, uint32_t n)
+void *gui_realloc(void *ptr_old, size_t n)
 {
     void *ptr = NULL;
 #ifdef ENABLE_RTK_GUI_OS_HEAP
@@ -311,6 +335,7 @@ void gui_free(void *rmem)
 }
 
 static uint32_t total_used_size = 0;
+#ifndef ENABLE_RTK_GUI_OS_HEAP
 static void gui_walker(void *ptr, size_t size, int used, void *user)
 {
     if (used)
@@ -321,6 +346,7 @@ static void gui_walker(void *ptr, size_t size, int used, void *user)
     gui_log("\t%p %s size: %x; total = %d\n", ptr, used ? "used" : "free", (unsigned int)size,
             total_used_size);
 }
+#endif
 
 void gui_mem_debug(void)
 {
@@ -328,13 +354,15 @@ void gui_mem_debug(void)
 #ifdef ENABLE_RTK_GUI_OS_HEAP
     gui_log("can't use thie func");
 #else
+    gui_log("\t\n");
     tlsf_walk_pool(tlsf_get_pool(tlsf), gui_walker, &total_used_size);
+    gui_log("\t\n");
 #endif
     total_used_size = 0;
 }
 
 
-void *gui_lower_malloc(uint32_t n)
+void *gui_lower_malloc(size_t n)
 {
     void *ptr = NULL;
     GUI_ASSERT(lower_tlsf != NULL);
@@ -346,7 +374,7 @@ void *gui_lower_malloc(uint32_t n)
     return ptr;
 }
 
-void *gui_lower_realloc(void *ptr_old, uint32_t n)
+void *gui_lower_realloc(void *ptr_old, size_t n)
 {
     void *ptr = NULL;
     GUI_ASSERT(lower_tlsf != NULL);
@@ -401,7 +429,9 @@ void gui_log(const char *format, ...)
 void gui_assert_handler(const char *ex_string, const char *func, uint32_t line)
 {
     volatile char dummy = 0;
+    gui_log("\033[1;31m");
     gui_log("(%s) assertion failed at function:%s, line number:%d \n", ex_string, func, line);
+    gui_log("\033[0m");
     while (dummy == 0);
 }
 
@@ -546,6 +576,39 @@ char *gui_filepath_transforming(void *addr)
     }
     fclose(fd);
     return path;
+}
+
+int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)
+{
+    if (ftl->read)
+    {
+        ftl->read(addr, buf, len);
+        return len;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len)
+{
+    if (ftl->write)
+    {
+        ftl->write(addr, buf, len);
+        return len;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int gui_ftl_erase(uint32_t addr, uint32_t len)
+{
+    if (ftl->erase)
+    {
+        ftl->erase(addr, len);
+    }
+    return 0;
 }
 
 

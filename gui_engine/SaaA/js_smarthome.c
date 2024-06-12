@@ -116,7 +116,6 @@ typedef struct
     /* user field of event */
     union
     {
-        uint32_t  param;
         struct
         {
             uint8_t extern_event_type;

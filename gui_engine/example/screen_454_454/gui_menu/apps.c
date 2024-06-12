@@ -43,6 +43,7 @@ GUI_APP_DEFINE_NAME(APP_CARDVIEW)
 #define HEART_ANI_NAME "_HEART_ANI"
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
+#define HR_BK_RECT_NAME "_HR_BK_RECT_NAME"
 static void heart_ani_cb(gui_win_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
@@ -55,8 +56,8 @@ extern const uint32_t *gui_app_return_array[RETURN_ARRAY_SIZE];
 static void app_hr_ui_design(gui_app_t *app)
 {
     gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
-    gui_canvas_rect_create((void *)app_win, "canvas_rect", 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0,
-                           100));
+    gui_canvas_rect_create((void *)app_win, HR_BK_RECT_NAME, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0,
+                           255));
     gui_win_set_animate(app_win, 1000, 0, app_win_cb, app_win);
     gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
@@ -207,6 +208,13 @@ static void app_hr_ui_design(gui_app_t *app)
 static void app_win_cb(gui_win_t *win)
 {
     GUI_BASE(win)->x = (1.0f - win->animate->progress_percent) * SCREEN_W;
+    gui_canvas_rect_t *img = 0;
+    gui_obj_tree_get_widget_by_name((void *)win, HR_BK_RECT_NAME, (void *)&img);
+    if (img)
+    {
+        gui_canvas_rect_set_opacity(img, (255 - 100)*win->animate->progress_percent + 100);
+    }
+
     if (win->animate->progress_percent >= 1.0f)
     {
         gui_app_shutdown(get_app_watch_ui());
@@ -297,7 +305,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
     rect = gui_canvas_rect_create((void *)status_bar, "canvas_rect", 0, 0, SCREEN_W, SCREEN_H,
                                   COLOR_SILVER_OPACITY(230));
     GET_BASE(rect)->not_show = 1;
-    // gui_img_set_opacity((gui_img_t *)rect, 0);
+    gui_canvas_rect_set_opacity(rect, 0);
     gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
     {
         char *text = "07:55";
@@ -308,7 +316,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
-        gui_text_convert_to_img(t, RGBA8888);
+        gui_text_convert_to_img(t, ARGB8888);
 
         gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
         gui_img_rotation(t->scale_img, 0, gui_img_get_width(t->scale_img) / 2, 0);
@@ -369,7 +377,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
         //puts(buffer_text);
 #endif
         gui_text_content_set(time_txt, buffer_text, strlen(buffer_text));
-        gui_text_convert_to_img(time_txt, RGBA8888);
+        gui_text_convert_to_img(time_txt, ARGB8888);
     }
     if (date_txt)
     {
@@ -416,7 +424,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             {
                 opacity = 255;
             }
-            // gui_img_set_opacity((gui_img_t *)rect, opacity);
+            gui_canvas_rect_set_opacity(rect, opacity);
             float scale = deltaY * deltaY * ((1.0f - TIME_SCALE_RATE) / 10000.0f) + TIME_SCALE_RATE;
             if (scale > 1)
             {
@@ -433,7 +441,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
             if (deltaY >= 100)
             {
                 expand = 1;
-                // gui_img_set_opacity((gui_img_t *)rect, 255);
+                gui_canvas_rect_set_opacity(rect, 255);
             }
             else
             {
@@ -446,7 +454,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
     }
     if (shrink)
     {
-        // gui_img_set_opacity((gui_img_t *)rect, 0);
+        gui_canvas_rect_set_opacity(rect, 0);
         GET_BASE(rect)->not_show = 1;
         gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
         shrink = 0;
@@ -474,7 +482,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
                     deltaY = -100;
                 }
                 int opacity = (100 - (-deltaY)) * 255 / 100;
-                // gui_img_set_opacity((gui_img_t *)rect, opacity);
+                gui_canvas_rect_set_opacity(rect, opacity);
                 float scale = (100 - (-deltaY)) * ((1.0f - TIME_SCALE_RATE) / 100.0f) + TIME_SCALE_RATE;
                 gui_img_scale(time_txt->scale_img, scale, scale);
                 //GET_BASE(win)->not_show = 1;
@@ -487,7 +495,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
                 if (deltaY < 0)
                 {
                     expand = 0;
-                    // gui_img_set_opacity((gui_img_t *)rect, 0);
+                    gui_canvas_rect_set_opacity(rect, 0);
                     GET_BASE(rect)->not_show = 1;
                     gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
                     if (ignore_gesture)
@@ -618,7 +626,7 @@ GUI_APP_ENTRY(APP_STOPWATCH)
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1);
-        gui_text_convert_to_img(t, RGBA8888);
+        gui_text_convert_to_img(t, ARGB8888);
         gui_text_mode_set(t, CENTER);
 
     }
@@ -655,7 +663,7 @@ static void stop_watch_win_ani_cb()
     gui_text_t *time_txt = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
     gui_text_content_set(time_txt, buffer, strlen(buffer));
-    gui_text_convert_to_img(time_txt, RGBA8888);
+    gui_text_convert_to_img(time_txt, ARGB8888);
 }
 #include "gui_map.h"
 GUI_APP_ENTRY(APP_MAP)

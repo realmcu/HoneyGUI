@@ -11,8 +11,8 @@ extern int js_console_init(void);
 extern int js_module_init(void);
 extern int js_buffer_init(void);
 extern int js_buffer_cleanup(void);
-extern void *gui_malloc(uint32_t n);
-extern void *gui_realloc(void *ptr_old, uint32_t n);
+extern void *gui_malloc(size_t n);
+extern void *gui_realloc(void *ptr_old, size_t n);
 extern void gui_free(void *rmem);
 static void _js_value_dump(jerry_value_t value);
 

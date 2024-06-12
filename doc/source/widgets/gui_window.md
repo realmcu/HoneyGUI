@@ -28,7 +28,7 @@ And the following widgets will take the Window's widget left-top corner as the i
 
 ### Create widget
 
-You can create a win widget by this api [`gui_win_create(void *parent, const char *filename, int16_t x, int16_t y, int16_t w, int16_t h)`](#api).
+You can create a win widget by this api [`gui_win_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)`](#api).
 This `w/h` are the width and height of the win widget.
 
 ### Add event

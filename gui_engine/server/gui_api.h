@@ -83,7 +83,9 @@ extern "C" {
 #define GUI_LINE(EX)                                                         \
     if ((EX))                                                                    \
     {                                                                             \
+        gui_log("\033[1;31m");   \
         gui_log("[GUI] debug at function:%s, line number:%d \n", __FUNCTION__, __LINE__); \
+        gui_log("\033[0m");   \
     } //!< print line number
 #define __param_name(line) param_##line
 #define _param_name(line) __param_name(line)
@@ -197,13 +199,13 @@ bool gui_mq_send_urgent(void *handle, void *buffer, uint32_t size, uint32_t time
 
 bool gui_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t timeout);
 
-void *gui_malloc(uint32_t n);
-void *gui_realloc(void *ptr_old, uint32_t n);
+void *gui_malloc(size_t n);
+void *gui_realloc(void *ptr_old, size_t n);
 void gui_free(void *rmem);
 void gui_mem_debug(void);
 
-void *gui_lower_malloc(uint32_t n);
-void *gui_lower_realloc(void *ptr_old, uint32_t n);
+void *gui_lower_malloc(size_t n);
+void *gui_lower_realloc(void *ptr_old, size_t n);
 void gui_lower_free(void *rmem);
 void gui_lowr_mem_debug(void);
 void gui_sleep_cb(void);
@@ -222,6 +224,10 @@ struct gui_fs_dirent *gui_fs_readdir(gui_fs_dir *d);
 void *gui_get_file_address(const char *file);
 char *gui_strdup(const char *s);
 char *gui_filepath_transforming(void *addr);
+
+int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len);
+int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len);
+int gui_ftl_erase(uint32_t addr, uint32_t len);
 
 void gui_log(const char *format, ...);
 void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size);

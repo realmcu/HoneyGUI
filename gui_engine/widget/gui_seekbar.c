@@ -69,9 +69,9 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-extern void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
+extern void gui_progressbar_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *name,
                                  int16_t x, int16_t y, int16_t w, int16_t h);
-extern void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *filename,
+extern void gui_progressbar_v_ctor(gui_progressbar_t *this, gui_obj_t *parent, const char *name,
                                    int16_t x, int16_t y, int16_t w, int16_t h);
 extern void gui_progressbar_v_img_ctor(gui_progressbar_t *this, gui_obj_t *parent, void *picture,
                                        int16_t x, int16_t y);
@@ -827,26 +827,26 @@ _GUI_API_ASSIGN(gui_seekbar_t)
  *                           Public Functions
  *============================================================================*/
 gui_seekbar_t *gui_seekbar_create_img_v(void       *parent,
-                                        const char *filename,
+                                        const char *name,
                                         int16_t     x,
                                         int16_t     y)
 {
     gui_seekbar_t *this = gui_malloc(sizeof(gui_seekbar_t));
     memset(this, 0, sizeof(gui_seekbar_t));
-    gui_seekbar_ctor_img_v(this, parent, (void *)filename, x, y);
+    gui_seekbar_ctor_img_v(this, parent, (void *)name, x, y);
     ((gui_obj_t *)this)->create_done = 1;
 
     return this;
 }
 
 gui_seekbar_t *gui_seekbar_create_img_h(void       *parent,
-                                        const char *filename,
+                                        const char *name,
                                         int16_t     x,
                                         int16_t     y)
 {
     gui_seekbar_t *this = gui_malloc(sizeof(gui_seekbar_t));
     memset(this, 0, sizeof(gui_seekbar_t));
-    gui_seekbar_ctor_img_h(this, parent, (void *)filename, x, y);
+    gui_seekbar_ctor_img_h(this, parent, (void *)name, x, y);
     ((gui_obj_t *)this)->create_done = 1;
 
     return this;

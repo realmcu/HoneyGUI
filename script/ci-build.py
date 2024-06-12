@@ -51,11 +51,12 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
         print("./win32_sim > scons.exe\r\n{}".format(result_lines))
         if 'warning:' in result_lines:
             os.chdir('./..')
+            print(result_lines)
             print("win32_sim: 'scons' fail: has warning")
             return False
     except Exception as e:
         os.chdir('./..')
-        print("win32_sim: 'scons' fail: {}".format(e))
+        print("win32_sim: 'scons' fail: {}".format(e.output))
         return False
     os.chdir('./..')
     #reset
@@ -69,11 +70,12 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
         print("./keil_sim > scons.exe\r\n{}".format(result_lines))
         if 'warning:' in result_lines:
             os.chdir('./..')
+            print(result_lines)
             print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: has warning")
             return False
     except Exception as e:
         os.chdir('./..')
-        print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: {}".format(e))
+        print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: {}".format(e.output))
         return False
     os.chdir('./..')
 

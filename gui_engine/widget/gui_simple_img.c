@@ -122,6 +122,11 @@ static void gui_simple_img_prepare(gui_obj_t *obj)
     this->draw_img = gui_malloc(sizeof(draw_img_t));
     memset(this->draw_img, 0x00, sizeof(draw_img_t));
 
+    if (this->src_mode == IMG_SRC_FILESYS)
+    {
+        this->data = this->filename;
+    }
+
     this->draw_img->data = this->data;
     this->draw_img->blend_mode = this->blend_mode;
     this->draw_img->high_quality = this->high_quality;
@@ -153,13 +158,13 @@ static void gui_simple_img_prepare(gui_obj_t *obj)
         }
     }
 
-    gui_image_load_scale(this->draw_img);
+    draw_img_load_scale(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
 
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&this->draw_img->inverse);
-    gui_image_new_area(this->draw_img, NULL);
+    draw_img_new_area(this->draw_img, NULL);
 
     //caculate by obj matrix
     gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
@@ -192,7 +197,15 @@ static void gui_simple_img_draw_cb(gui_obj_t *obj)
     gui_simple_img_t *this = (gui_simple_img_t *)obj;
     struct gui_dispdev *dc = gui_get_dc();
 
+    // cache img to buffer
+
+    draw_img_cache(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
+
+    // blit
     gui_acc_blit_to_dc(this->draw_img, dc, NULL);
+
+    // release img if cached
+    draw_img_free(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
 
 }
 
@@ -204,9 +217,9 @@ static void gui_simple_img_end(gui_obj_t *obj)
 
     if (this->draw_img != NULL)
     {
-        if (gui_image_acc_end_cb != NULL)
+        if (draw_img_acc_end_cb != NULL)
         {
-            gui_image_acc_end_cb(this->draw_img);
+            draw_img_acc_end_cb(this->draw_img);
         }
 
         gui_free(this->draw_img);
@@ -222,7 +235,8 @@ static void gui_simple_img_destory(gui_obj_t *obj)
     {
 #ifdef _WIN32
         // free path transforming memory on win
-        gui_free(this->data);
+        gui_free(this->filename);
+        this->filename = NULL;
 #endif
     }
 }
@@ -288,14 +302,15 @@ static void gui_simple_img_ctor(gui_simple_img_t     *this,
     obj->has_destroy_cb = true;
     obj->type = IMAGE_FROM_MEM;
 
-    if (src_mode == IMG_SRC_FILESYS)
+    if (this->src_mode == IMG_SRC_FILESYS)
     {
 #ifdef _WIN32
         path = gui_filepath_transforming(path);
 #endif
         this->data = (void *)path;
+        this->filename = (void *)path;
     }
-    else if (src_mode == IMG_SRC_MEMADDR)
+    else if (this->src_mode == IMG_SRC_MEMADDR)
     {
         this->data = (void *)path;
     }

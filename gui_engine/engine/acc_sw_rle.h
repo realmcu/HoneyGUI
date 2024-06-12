@@ -21,72 +21,7 @@
 extern "C" {
 #endif
 
-typedef enum
-{
-    IMDC_SRC_RGB565 = 0x04, // 4,
-    IMDC_SRC_RGB888 = 0x44, // 68,
-    IMDC_SRC_ARGB8888 = 0x84, // 132,
 
-} imdc_src_type;
-
-typedef struct imdc_file_header
-{
-    struct
-    {
-        uint8_t algorithm: 2;
-        uint8_t feature_1: 2;
-        uint8_t feature_2: 2;
-        uint8_t pixel_bytes: 2;
-    } algorithm_type;
-    uint8_t reserved[3];
-    uint32_t raw_pic_width;
-    uint32_t raw_pic_height;
-} imdc_file_header_t;
-
-typedef struct imdc_file
-{
-    imdc_file_header_t header;
-    uint32_t compressed_addr[1024];
-
-} imdc_file_t;
-
-typedef struct gui_img_file
-{
-    gui_rgb_data_head_t img_header;
-    union
-    {
-        imdc_file_t idc_file;
-        uint32_t unzip_data[1024];
-    } data;
-
-} gui_img_file_t;
-
-#pragma pack(1)
-
-typedef struct imdc_rgb565_node
-{
-    uint8_t len;
-    uint16_t pixel16;  //rgb565
-} imdc_rgb565_node_t;
-typedef struct imdc_argb8565_node
-{
-    uint8_t len;
-    uint16_t pixel;  //argb8565
-    uint8_t alpha;
-} imdc_argb8565_node_t;
-typedef struct imdc_rgb888_node
-{
-    uint8_t len;
-    uint8_t pixel_b;  //rgb888
-    uint8_t pixel_g;
-    uint8_t pixel_r;
-} imdc_rgb888_node_t;
-typedef struct imdc_argb8888_node
-{
-    uint8_t len;
-    uint32_t pixel32;    //argb8888
-} imdc_argb8888_node_t;
-#pragma pack()
 
 void rle_alpha_blend_blit_2_argb8888(draw_img_t *image, struct gui_dispdev *dc,
                                      gui_rect_t *rect);

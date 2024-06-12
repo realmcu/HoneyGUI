@@ -132,6 +132,11 @@ typedef enum t_gui_dc_type
     DC_DOUBLE,
 } T_GUI_DC_TYPE;
 
+typedef enum t_gui_pfb_type
+{
+    PFB_Y_DIRECTION,
+    PFB_X_DIRECTION,
+} T_GUI_PFB_TYPE;
 typedef struct _gui_frame_monitor_t
 {
     uint32_t start;
@@ -159,6 +164,7 @@ typedef struct gui_dispdev
     uint16_t driver_ic_hbp;
     uint16_t driver_ic_active_width;
     T_GUI_DC_TYPE type;
+    T_GUI_PFB_TYPE pfb_type;
     char gpu_type;
     /* pixel data */
     uint8_t *frame_buf;
@@ -169,6 +175,7 @@ typedef struct gui_dispdev
     float scale_y;
     gui_rect_t section;
     uint32_t section_count;
+    uint32_t section_total;
     void (*lcd_update)(struct gui_dispdev *dc);
     void (*virtual_lcd_update)(struct gui_dispdev *dc);
     int (*flash_seq_trans_enable)(void);
@@ -211,6 +218,13 @@ struct gui_fs
     struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
     int (*closedir)(gui_fs_dir *d);
     int (*ioctl)(int fildes, int cmd, ...);
+};
+
+struct gui_ftl
+{
+    int (*read)(uint32_t addr, uint8_t *buf, uint32_t len);
+    int (*write)(uint32_t addr, const uint8_t *buf, uint32_t len);
+    int (*erase)(uint32_t addr, uint32_t len);
 };
 
 struct gui_indev
@@ -292,17 +306,72 @@ typedef struct draw_img
     uint8_t opacity_value;
     uint32_t blend_mode : 3;
     uint32_t checksum : 8;
-    uint32_t src_mode : 3;
     uint32_t high_quality : 1;
     //uint32_t color_mix; //todo for QuDai
     void *acc_user;
 } draw_img_t;
 
+typedef struct _gui_color
+{
+    union
+    {
+        struct
+        {
+            uint8_t b; ///< Blue color component, at the lowest address
+            uint8_t g; ///< Green color component
+            uint8_t r; ///< Red color component
+            uint8_t a; ///< Alpha channel for transparency, at the highest address
+        } rgba;
+        uint32_t argb_full;
+    } color;
+} gui_color_t;
+
+#pragma pack(1)
+typedef struct _color_rgb888
+{
+    uint8_t b;
+    uint8_t g;
+    uint8_t r;
+} color_rgb888_t;
+
+typedef struct _color_rgb565
+{
+    uint16_t b : 5;
+    uint16_t g : 6;
+    uint16_t r : 5;
+} color_rgb565_t;
+
+typedef struct _color_argb8565
+{
+    uint16_t b : 5;
+    uint16_t g : 6;
+    uint16_t r : 5;
+    uint8_t a;
+} color_argb8565_t;
+
+typedef struct _color_argb88888
+{
+    uint8_t b; ///< Blue color component, at the lowest address
+    uint8_t g; ///< Green color component
+    uint8_t r; ///< Red color component
+    uint8_t a; ///< Alpha channel for transparency, at the highest address
+} color_argb8888_t;
+#pragma pack()
+
+typedef struct draw_circle
+{
+    int16_t x;
+    int16_t y;
+    int16_t Radius;
+    int16_t lineWidth;
+    gui_color_t color;
+} draw_circle_t;
+
 typedef struct acc_engine
 {
-    void (*blit)(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect);
+    void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
     //todo
-    // void (*draw_circle)(canvas_circle_t *circle, struct gui_dispdev *dc);
+    void (*draw_circle)(draw_circle_t *circle, gui_dispdev_t *dc, gui_rect_t *rect);
     // void (*draw_rectangle)(canvas_rectangle_t *r, struct gui_dispdev *dc);
     // void (*draw_arc)(canvas_arc_t *a, struct gui_dispdev *dc);
     // void (*draw_line)(canvas_line_t *l, struct gui_dispdev *dc);
@@ -410,12 +479,14 @@ typedef enum t_obj_type
     TURN_TABLE               = 0x0029,
     KEYBOARD                 = 0x002A,
     MACRO_MOTORIZED_CURTAIN  = 0x002B,
+    MULTI_LEVEL              = 0x002C,
 } T_OBJ_TYPE;
 
 typedef void (*gui_msg_cb)(void *);
 typedef struct gui_msg
 {
     uint16_t event;
+    uint16_t sub_event;
     gui_msg_cb cb;
     void *payload;
 } gui_msg_t;
@@ -442,6 +513,7 @@ typedef struct gui_animate
     uint32_t current_frame;
     uint32_t last_round;
     float progress_percent;
+    float last_per;
     void (* callback)(void *p, void *this_widget);
     void *p;
     bool animate;
@@ -468,6 +540,12 @@ typedef struct _gui_obj_t
     int16_t y;
     int16_t w;
     int16_t h;
+#ifdef ENABLE_GUI_CONTAIN_FUNCTION //means range of this object
+    int16_t range_x;
+    int16_t range_y;
+    int16_t range_w;
+    int16_t range_h;
+#endif
     gui_list_t  child_list;
     gui_list_t  brother_list;
 
@@ -499,21 +577,6 @@ typedef struct _gui_obj_t
 
 } gui_obj_t;
 
-typedef struct _gui_color
-{
-    union
-    {
-        struct
-        {
-            uint8_t b; ///< Blue color component, at the lowest address
-            uint8_t g; ///< Green color component
-            uint8_t r; ///< Red color component
-            uint8_t a; ///< Alpha channel for transparency, at the highest address
-        } rgba;
-        uint32_t rgba_full;
-    } color;
-} gui_color_t;
-
 typedef struct gui_rgb_data_head
 {
     unsigned char scan : 1;
@@ -527,6 +590,72 @@ typedef struct gui_rgb_data_head
     char version;
     char rsvd2;
 } gui_rgb_data_head_t;
+
+typedef enum
+{
+    IMDC_SRC_RGB565 = 0x04, // 4,
+    IMDC_SRC_RGB888 = 0x44, // 68,
+    IMDC_SRC_ARGB8888 = 0x84, // 132,
+} imdc_src_type;
+
+typedef struct imdc_file_header
+{
+    struct
+    {
+        uint8_t algorithm: 2;
+        uint8_t feature_1: 2;
+        uint8_t feature_2: 2;
+        uint8_t pixel_bytes: 2;
+    } algorithm_type;
+    uint8_t reserved[3];
+    uint32_t raw_pic_width;
+    uint32_t raw_pic_height;
+} imdc_file_header_t;
+
+typedef struct imdc_file
+{
+    imdc_file_header_t header;
+    uint32_t compressed_addr[1024];
+
+} imdc_file_t;
+
+typedef struct gui_img_file
+{
+    gui_rgb_data_head_t img_header;
+    union
+    {
+        imdc_file_t idc_file;
+        uint32_t unzip_data[1024];
+    } data;
+
+} gui_img_file_t;
+
+#pragma pack(1)
+
+typedef struct imdc_rgb565_node
+{
+    uint8_t len;
+    uint16_t pixel16;  //rgb565
+} imdc_rgb565_node_t;
+typedef struct imdc_argb8565_node
+{
+    uint8_t len;
+    uint16_t pixel;  //argb8565
+    uint8_t alpha;
+} imdc_argb8565_node_t;
+typedef struct imdc_rgb888_node
+{
+    uint8_t len;
+    uint8_t pixel_b;  //rgb888
+    uint8_t pixel_g;
+    uint8_t pixel_r;
+} imdc_rgb888_node_t;
+typedef struct imdc_argb8888_node
+{
+    uint8_t len;
+    uint32_t pixel32;    //argb8888
+} imdc_argb8888_node_t;
+#pragma pack()
 
 typedef struct _gui_rect_file_head
 {

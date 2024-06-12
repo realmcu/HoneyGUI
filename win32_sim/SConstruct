@@ -26,6 +26,7 @@ TARGET = 'gui.' + 'exe'
 
 env = Environment(tools = ['mingw'],
                   CC=menu_config.CC, CCFLAGS = menu_config.CFLAGS,
+                  CXX = menu_config.CXX, CXXFLAGS = menu_config.CXXFLAGS,
                   LINKFLAGS = menu_config.LFLAGS)
 
 #env.PrependENVPath('PATH', menu_config.EXEC_PATH)

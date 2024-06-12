@@ -817,13 +817,13 @@ void gui_curtainview_set_done_cb(gui_curtainview_t *this, void (*cb)(gui_curtain
 }
 
 gui_curtainview_t *gui_curtainview_create(void       *parent,
-                                          const char *filename,
+                                          const char *name,
                                           int16_t     x,
                                           int16_t     y,
                                           int16_t     w,
                                           int16_t     h)
 {
-#define _paramgui_curtainview_create_ this, parent, filename, x, y, w, h
+#define _paramgui_curtainview_create_ this, parent, name, x, y, w, h
     GUI_NEW(gui_curtainview_t, gui_curtainview_ctor, _paramgui_curtainview_create_)
 }
 

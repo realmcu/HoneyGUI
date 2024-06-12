@@ -21,6 +21,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_cube.h"
+#include "gui_win.h"
 #include "gui_canvas_arc.h"
 #include "gui_canvas_round_rect.h"
 #include "tiger_blue_compressed.c"
@@ -38,6 +39,27 @@ static void canvas_cb_black(gui_canvas_t *canvas)
 
 static void app_dialing_ui_design(gui_app_t *app)
 {
+
+    // gui_canvas_round_rect_create(&(app->screen), "t", 84, 100, 298, 78, 38, gui_rgba(100, 0, 0, 255));
+
+    // gui_canvas_arc_t *arc = gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 200, 0, 300, 20, gui_rgba(255, 0, 0, 255));
+    // gui_canvas_arc_set_cap(arc, CANVAS_ARC_ROUND);
+
+    // gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 150, 0, 360, 20, gui_rgba(0, 255, 0, 255));
+
+    // gui_canvas_arc_create(&(app->screen), "t", 454 / 2, 454 / 2, 100, 0, 270, 20, gui_rgba(0, 255, 0, 255));
+
+    // return;
+
+    // gui_win_t *win0 = gui_win_create(&(app->screen), "win0", 100, 100, 200, 200);
+    // gui_win_t *win1 = gui_win_create(win0, "win1", 100, 100, 200, 200);
+
+    // gui_img_create_from_mem(win1,  "img_1_test", (void *)_actiger_blue, 50, 50, 0, 0);
+    // return;
+
+    gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue_compressed, 0, 0, 0,
+                            0);
+    return;
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, TAB_CUBE);

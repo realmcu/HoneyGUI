@@ -182,7 +182,7 @@ static void gui_grid_ctor(gui_grid_t *this,
                           uint16_t    gap_col,
                           uint16_t    gap_row)
 {
-    gui_obj_ctor(&this->base, parent, "grid", x, y, gap_col * col, 700);
+    gui_obj_ctor(&this->base, parent, "grid", x, y, gap_col * col, gap_row * row);
 
     //GET_BASE(this)->obj_update_att = obj_update_att;
     GET_BASE(this)->obj_cb = gui_grid_cb;

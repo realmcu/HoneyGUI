@@ -57,7 +57,10 @@ struct gui_switch
     void *off_hl_pic_addr;
     void *long_touch_state_pic_addr;
     void *long_touch_state_hl_pic_addr;
+    void *data;
+    gui_animate_t *animate;             //!< can set animation
     IMG_SOURCE_MODE_TYPE src_mode;
+    char style;
     uint32_t ifon : 1;
     uint32_t long_touch_state : 1;
     uint32_t long_touch_enable : 1;
@@ -73,8 +76,15 @@ void (*turn_off)(gui_switch_t *sw);
 void (*turn_on)(gui_switch_t *sw);
 void (*on_turn_on)(gui_switch_t *this, void *cb, void *p);
 void (*on_turn_off)(gui_switch_t *this, void *cb, void *p);
+void (*on_press)(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter);
+void (*on_release)(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter);
 void (*ctor)(gui_switch_t *this, gui_obj_t *parent, int16_t x,
              int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
+void (*animate)(gui_switch_t *this,
+                uint32_t      dur,
+                int           repeat_count,
+                void         *callback,
+                void         *p);
 _GUI_API_DECLARE(gui_switch_t)
 
 /** End of WIDGET_Exported_Types
@@ -101,7 +111,7 @@ _GUI_API_DECLARE(gui_switch_t)
   * @brief
   * @{
   */
-
+#define SWITCH_HIGHLIGHT_ARRAY INT8_MAX
 
 
 

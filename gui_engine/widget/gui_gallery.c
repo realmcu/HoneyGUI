@@ -423,20 +423,7 @@ static void gui_gallery_end(gui_obj_t *obj)
 
 static void gui_gallery_destory(gui_obj_t *obj)
 {
-    draw_img_t *draw_img;
 
-    for (uint8_t i = 0; i < 6; i++)
-    {
-        draw_img = (draw_img_t *) & ((gui_gallery_t *)obj)->img[i];
-
-        if (draw_img->src_mode == IMG_SRC_FILESYS)
-        {
-#ifdef _WIN32
-            // free path transforming memory on win
-            gui_free(draw_img->data);
-#endif
-        }
-    }
 }
 
 static void gui_gallery_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)

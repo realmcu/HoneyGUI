@@ -237,14 +237,14 @@ void sw_acc_rle_uncompress(draw_img_t *image, void *buf)
         }
         head->type = RGB888;
     }
-    else if (head->type == RGBA8888)//rle_rgba8888
+    else if (head->type == ARGB8888)//rle_rgba8888
     {
         uint8_t source_bytes_per_pixel = 4;
         for (int k = 0; k < source_h; k++)
         {
             uncompressed_rle_argb8888(file, k, (uint8_t *)(line_buf + k * source_w * source_bytes_per_pixel));
         }
-        head->type = RGBA8888;
+        head->type = ARGB8888;
     }
     head->compress = 0;
     return;

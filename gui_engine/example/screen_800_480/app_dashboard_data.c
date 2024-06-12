@@ -28,8 +28,6 @@ bool communicate_navi_dlps_check(void)
 {
     return COMMUNICATE_ALLOW_DLPS;
 }
-// extern void reset_daemon_time(uint32_t value);
-
 void app_dashboard_auto_refresh_data_demo(void)
 {
     uint8_t current_battery_level_temp = 0x0;
@@ -241,6 +239,7 @@ void app_dashboard_data_set_show_main_display(uint8_t Value, T_LE_EVENT event)
     }
     else if (event == BP_LE_DISC_EVENT)
     {
+        COMMUNICATE_ALLOW_DLPS = true;
         app_current_dashboard_data.show_main_display = true;
         //message off
         app_message_data current_message_status;
@@ -282,7 +281,8 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
 #ifndef _WIN32
     gui_indev_wakeup();
     COMMUNICATE_ALLOW_DLPS = false;
-    // reset_daemon_time(gui_ms_get());
+    gui_msg_t msg;
+    msg.event = GUI_EVENT_RESET_ACTIVE_TIME;
     uint8_t navi_type = 0;
     navi_type = ((uint8_t *)pValue)[0];
     if (navi_type == TURN_LEFT || navi_type == LEFT_FRONT || navi_type == LEFT_BACK

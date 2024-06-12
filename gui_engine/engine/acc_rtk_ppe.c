@@ -66,7 +66,7 @@ void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
     case RGB888:
         source.format = PPE_RGB888;
         break;
-    case RGBA8888:
+    case ARGB8888:
         source.format = PPE_ARGB8888;
         break;
     case ARGB8565:

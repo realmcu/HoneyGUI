@@ -220,12 +220,12 @@ void design_curtain_menu(void *parent)
 
     gui_page_t *page = gui_page_create(win, PAGE_NAME, 0, 0, 454, 454);
     gui_win_set_animate(win, 1000, -1, page_cb, win);
-    gui_img_scope_t *img1 = gui_img_scope_create(page, 0, A1_BIN, 0, 0);
-    gui_img_scope_create(page, 0, A2_BIN, 0, 130 * 1);
-    gui_img_scope_create(page, 0, A3_BIN, 0, 130 * 2);
-    gui_img_scope_create(page, 0, A4_BIN, 0, 130 * 3);
-    gui_img_scope_create(page, 0, A5_BIN, 0, 130 * 4);
-    gui_img_scope_create(page, 0, A6_BIN, 0, 130 * 5);
+    gui_img_create_from_mem(page, 0, A1_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(page, 0, A2_BIN, 0, 130 * 1, 0, 0);
+    gui_img_create_from_mem(page, 0, A3_BIN, 0, 130 * 2, 0, 0);
+    gui_img_create_from_mem(page, 0, A4_BIN, 0, 130 * 3, 0, 0);
+    gui_img_create_from_mem(page, 0, A5_BIN, 0, 130 * 4, 0, 0);
+    gui_img_create_from_mem(page, 0, A6_BIN, 0, 130 * 5, 0, 0);
 
 }
 static void page_cb(gui_win_t *win)
@@ -259,6 +259,7 @@ static void page_cb(gui_win_t *win)
             {
                 GUI_BASE(c_up)->gesture = 0;
             }
+            win->scope = 1;
             gui_log(">\n");
         }
         else
@@ -279,6 +280,7 @@ static void page_cb(gui_win_t *win)
                 GUI_BASE(c_up)->gesture = 1;
             }
             gui_log("<\n");
+            win->scope = 0;
         }
 
 

@@ -73,9 +73,11 @@ typedef enum
 typedef enum
 {
     GUI_FONT_SRC_BMP = 0,
+    GUI_FONT_SRC_STB = 1,
     GUI_FONT_SRC_TTF = 1,
     GUI_FONT_SRC_IMG = 2,
     GUI_FONT_SRC_MAT = 3,
+    GUI_FONT_SRC_FT = 4,
 } FONT_SRC_TYPE;
 
 /** @brief  text widget structure */

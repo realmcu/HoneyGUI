@@ -223,7 +223,7 @@ static uint32_t get_image_size(void *data)
     case RGB888:
         source_bytes_per_pixel = 3;
         break;
-    case RGBA8888:
+    case ARGB8888:
         source_bytes_per_pixel = 4;
         break;
     default:
@@ -300,7 +300,7 @@ void gui_widget_litegfx_set_image(gui_obj_t *obj, uint16_t index, void *data)
         format = LX_IMG_CF_RGB888;
         break;
 
-    case RGBA8888:
+    case ARGB8888:
         format = LX_IMG_CF_RGBA8888;
         break;
 

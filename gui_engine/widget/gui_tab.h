@@ -138,7 +138,7 @@ typedef struct
  *
  */
 gui_tab_t *gui_tab_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,

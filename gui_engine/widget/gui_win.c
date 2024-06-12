@@ -91,7 +91,6 @@ static void gui_win_update_att(gui_obj_t *obj)
         {
             this->animate->init = 1;
             this->animate->init_time_ms = gui_ms_get();
-            this->animate->Beginning_frame = 1;
         }
 
         this->animate->cur_time_ms = gui_ms_get();
@@ -112,14 +111,17 @@ static void gui_win_update_att(gui_obj_t *obj)
         }
         else if (this->animate->repeat_count == -1)
         {
-            uint32_t  round_count = cur_time_gap / this->animate->dur;
-            if (round_count > this->animate->last_round)
-            {
-                this->animate->Beginning_frame = 1;
-            }
-            this->animate->last_round = round_count;
+            // uint32_t  round_count = cur_time_gap / this->animate->dur;
+
+
             this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
                                               (float)this->animate->dur;
+            if (this->animate->progress_percent < this->animate->last_per)
+            {
+
+                this->animate->Beginning_frame = 1;
+            }
+            this->animate->last_per = this->animate->progress_percent;
             this->animate->callback(this->animate->p, this);
         }
         else
@@ -247,6 +249,13 @@ static void gui_win_prepare(gui_obj_t *obj)
         matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
         this->scale = 0;
     }
+    if (this->hold_tp)
+    {
+        gui_obj_skip_other_up_hold(obj);
+        gui_obj_skip_other_down_hold(obj);
+        gui_obj_skip_other_left_hold(obj);
+        gui_obj_skip_other_right_hold(obj);
+    }
 }
 
 static void gui_win_destory(gui_obj_t *obj)
@@ -281,13 +290,13 @@ static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 void gui_win_ctor(gui_win_t  *this,
                   gui_obj_t  *parent,
-                  const char *filename,
+                  const char *name,
                   int16_t     x,
                   int16_t     y,
                   int16_t     w,
                   int16_t     h)
 {
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+    gui_obj_ctor(&this->base, parent, name, x, y, w, h);
     GET_BASE(this)->obj_cb = gui_win_cb;
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_destroy_cb = true;
@@ -364,8 +373,13 @@ void gui_win_click(gui_win_t *this, void *callback, void *parameter)
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
 
+void gui_win_hole_tp(gui_win_t *this, bool hold_tp)
+{
+    this->hold_tp = hold_tp;
+}
+
 gui_win_t *gui_win_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,
@@ -374,7 +388,7 @@ gui_win_t *gui_win_create(void       *parent,
     gui_win_t *this = gui_malloc(sizeof(gui_win_t));
 
     memset(this, 0, sizeof(gui_win_t));
-    gui_win_ctor(this, parent, filename, x, y, w, h);
+    gui_win_ctor(this, parent, name, x, y, w, h);
 
     gui_list_init(&(((gui_obj_t *)this)->child_list));
     if ((((gui_obj_t *)this)->parent) != ((void *)0))

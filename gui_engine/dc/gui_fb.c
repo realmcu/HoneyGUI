@@ -188,6 +188,25 @@ static void obj_draw_prepare(gui_obj_t *object)
         {
             continue;
         }
+#ifdef ENABLE_GUI_CONTAIN_FUNCTION
+        int16_t x1 = _UI_MAX(obj->parent->range_x, obj->x);
+        int16_t y1 = _UI_MAX(obj->parent->range_y, obj->y);
+        int16_t x2 = _UI_MIN(obj->parent->range_x + obj->parent->range_w - 1, obj->x + obj->w - 1);
+        int16_t y2 = _UI_MIN(obj->parent->range_y + obj->parent->range_h - 1, obj->y + obj->h - 1);
+
+        if ((x2 > x1) && (y2 > y1))
+        {
+            obj->range_x = x1 - obj->x;
+            obj->range_y = y1 - obj->y;
+            obj->range_w = x2 - x1 + 1;
+            obj->range_h = y2 - y1 + 1;
+        }
+        else
+        {
+            GUI_ASSERT(NULL != NULL);
+        }
+
+#endif
         obj_draw_prepare(obj);
     }
 }
@@ -203,10 +222,21 @@ static void obj_draw_scan(gui_obj_t *obj)
         {
             if (obj->has_draw_cb)
             {
-                dc->section.y1 = dc->section_count * dc->fb_height;
-                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
-                dc->section.x1 = 0;
+
+                if (dc->pfb_type == PFB_Y_DIRECTION)
+                {
+                    dc->section.x1 = 0;
+                    dc->section.y1 = dc->section_count * dc->fb_height;
+                }
+                else
+                {
+                    dc->section.x1 = dc->section_count * dc->fb_width;
+                    dc->section.y1 = 0;
+                }
+
                 dc->section.x2 = _UI_MIN(dc->section.x1 + dc->fb_width - 1, dc->screen_width - 1);
+                dc->section.y2 = _UI_MIN(dc->section.y1 + dc->fb_height - 1, dc->screen_height - 1);
+
                 obj->obj_cb(obj, OBJ_DRAW);
             }
         }
@@ -280,10 +310,8 @@ static void gui_fb_draw(gui_obj_t *root)
 
     if (dc->type == DC_RAMLESS)
     {
-        uint32_t section_count = dc->screen_height / dc->fb_height + ((dc->screen_height % dc->fb_height) ?
-                                                                      1 : 0);
         gui_flash_boost();
-        for (uint32_t i = 0; i < section_count; i++)
+        for (uint32_t i = 0; i < dc->section_total; i++)
         {
             if (i % 2 == 0)
             {
@@ -308,7 +336,6 @@ static void gui_fb_draw(gui_obj_t *root)
                 {
                     write_time = dc->get_lcd_us();
                 }
-                //gui_log("read = %dus, write = %d us\n", read_time, write_time);
             }
             if (dc->lcd_draw_sync != NULL)
             {

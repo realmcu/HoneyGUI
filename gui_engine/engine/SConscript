@@ -1,4 +1,4 @@
-# RT-Thread building script for GuiEngine demo
+# building script for HoneyGUI
 
 from building import *
 
@@ -34,6 +34,9 @@ if GetDepend(['CONFIG_REALTEK_BUILD_PPE']):
 
 if GetDepend(['CONFIG_REALTEK_BUILD_PPEV2']):
     src += ['acc_rtk_ppev2.c']
+
+if GetDepend(['CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE']):
+    src += ['font_freetype.c']
 
 CPPPATH = [cwd]
 

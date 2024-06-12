@@ -50,6 +50,10 @@
 #define CONFIG_REALTEK_BUILD_GUI_FONT_RTK_MEM
 // </c>
 
+// <c> RTK GUI BOX2D
+#define CONFIG_REALTEK_BUILD_GUI_BOX2D
+// </c>
+
 // <c> RTK GUI Font Enable TTF SVG
 //#define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
 // </c>
@@ -62,6 +66,13 @@
 //#define CONFIG_REALTEK_BUILD_PPE
 // </c>
 
+// <c> RTK GUI Enable cJSON
+#define CONFIG_REALTEK_BUILD_CJSON
+// </c>
+
+// <c> RTK GUI Enable KeyBoard And Pinyin
+//#define CONFIG_REALTEK_BUILD_PINYIN
+// </c>
 
 // <c> RTK GUI Enable SasA
 //#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP

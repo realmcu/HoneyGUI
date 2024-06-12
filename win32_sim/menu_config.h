@@ -96,19 +96,35 @@
 // </c>
 
 // <c> RTK GUI Enable SasA
-//#define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
+// #define CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP
+// </c>
+
+// <c> RTK GUI Enable cJSON
+#define CONFIG_REALTEK_BUILD_CJSON
+// </c>
+
+// <c> RTK GUI Enable KeyBoard And Pinyin
+#define CONFIG_REALTEK_BUILD_PINYIN
 // </c>
 
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
-#define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
+// #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>
 
 // <c> RTK GUI Enable LiteGFX
-#define CONFIG_REALTEK_BUILD_LITE_GFX
+// #define CONFIG_REALTEK_BUILD_LITE_GFX
 // </c>
 
 // <c> RTK GUI Enable LetterShell
 #define CONFIG_REALTEK_BUILD_LETTER_SHELL
+// </c>
+
+// <c> RTK GUI BOX2D
+// #define CONFIG_REALTEK_BUILD_GUI_BOX2D
+// </c>
+
+// <c> RTK GUI ENABLE CONTAIN WIDGET
+// #define CONFIG_REALTEK_BUILD_GUI_CONTAIN
 // </c>
 
 #endif

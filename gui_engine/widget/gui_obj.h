@@ -121,7 +121,7 @@ extern "C" {
   */
 void gui_obj_ctor(gui_obj_t  *this,
                   gui_obj_t  *parent,
-                  const char *filename,
+                  const char *name,
                   int16_t     x,
                   int16_t     y,
                   int16_t     w,
@@ -139,7 +139,7 @@ void gui_obj_ctor(gui_obj_t  *this,
  * @return gui_obj_t*
  */
 gui_obj_t *gui_obj_create(void       *parent,
-                          const char *filename,
+                          const char *name,
                           int16_t     x,
                           int16_t     y,
                           int16_t     w,
@@ -213,7 +213,14 @@ void gui_obj_tree_free(void *obj);
   * \endcode
   */
 void gui_obj_tree_print(gui_obj_t *obj);
-
+/**
+  * @brief  get count of one type on tree
+  * @param  obj the root of the widget tree.
+  * @param  type widget type.
+  * @param  count count result.
+  * @return void
+  */
+void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count);
 /**
   * @brief   show or hide the widget
   * @param  obj the root of the widget tree.
@@ -411,6 +418,33 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t
  * @return uint8_t
  */
 void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
+/**
+ * @brief  update animate onn every frame
+ *
+ * @param animate
+ * @param obj widget
+ */
+void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj);
+/**
+ * @brief  set animate
+ *
+ * @param animate pointer
+ * @param dur animation time cost in ms
+ * @param repeat_count rounds to repeat
+ * @param callback every frame callback
+ * @param p callback's parameter
+ */
+gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
+                                   uint32_t      dur,
+                                   int           repeat_count,
+                                   void         *callback,
+                                   void         *p);
+/**
+ * @brief  print name by bfs order
+ *
+ * @param root
+ */
+void gui_obj_tree_print_bfs(gui_obj_t *root);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

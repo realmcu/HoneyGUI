@@ -33,11 +33,16 @@ void cmd_free_all(void)
 }
 GUI_EXPORT_CMD(free_all, cmd_free_all);
 
-void cmd_calculate(void)
+
+void do_calculate(void *msg)
 {
     gui_app_t *app = gui_current_app();
     gui_mem_debug();
+}
 
+void cmd_calculate(void)
+{
+    gui_server_exec_cb(do_calculate);
 }
 GUI_EXPORT_CMD(calculate, cmd_calculate);
 

@@ -1,4 +1,4 @@
-# RT-Thread building script for GuiEngine demo
+# building script for HoneyGUI
 
 from building import *
 

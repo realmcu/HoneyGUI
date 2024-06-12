@@ -363,7 +363,7 @@ static void gui_tab_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
 static void gui_tab_ctor(gui_tab_t  *this,
                          gui_obj_t  *parent,
-                         const char *filename,
+                         const char *name,
                          int16_t     x,
                          int16_t     y,
                          int16_t     w,
@@ -372,7 +372,7 @@ static void gui_tab_ctor(gui_tab_t  *this,
                          int16_t     idy)
 {
 
-    gui_obj_ctor(&this->base, parent, filename, x, y, w, h);
+    gui_obj_ctor(&this->base, parent, name, x, y, w, h);
 
     GET_BASE(this)->obj_cb = gui_tab_cb;
     GET_BASE(this)->has_input_prepare_cb = true;
