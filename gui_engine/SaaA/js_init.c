@@ -10,12 +10,11 @@ jerry_value_t ret_value;
 
 static void *context_alloc(size_t size, void *cb_data_p)
 {
+    void *js_buffer = NULL;
 #ifdef RTL8763EP
     return malloc(size);
 #elif defined RTL87x2G
-#include "app_section.h"
-    APP_PSRAM_SECTION static uint8_t js_buffer[(PKG_JMEM_HEAP_SIZE + 100) * 1024] = {0};
-    return (void *)js_buffer;
+    js_buffer = gui_lower_malloc((PKG_JMEM_HEAP_SIZE + 100) * 1024);
 #elif defined RTL8762D
     static uint8_t *js_buffer = (void *)(0x6900000);
 
@@ -37,9 +36,7 @@ static void *script_malloc(void)
 #ifdef RTL8763EP
     scipt_buff =  malloc(JS_SCRIPT_BUFF_SIZE);
 #elif defined RTL87x2G
-#include "app_section.h"
-    APP_PSRAM_SECTION static uint8_t js_script_buffer[JS_SCRIPT_BUFF_SIZE] = {0};
-    scipt_buff = (void *)js_script_buffer;
+    scipt_buff = gui_lower_malloc(JS_SCRIPT_BUFF_SIZE);
 #elif defined RTL8762D
     scipt_buff = (void *)(0x6900000 + PKG_JMEM_HEAP_SIZE * 1024);
 #else
@@ -57,6 +54,7 @@ static void script_free(void *scipt_buff)
     free(scipt_buff);
 #elif defined RTL87x2G
     // static
+    gui_lower_free(scipt_buff);
 #elif defined RTL8762D
     // static
 #else

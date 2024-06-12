@@ -111,7 +111,7 @@ CJSON_PUBLIC(double) cJSON_GetNumberValue(const cJSON *const item)
 {
     if (!cJSON_IsNumber(item))
     {
-        return (double) NAN;
+        return (double) 0.0 / 0.0;
     }
 
     return item->valuedouble;
@@ -177,9 +177,17 @@ static void *CJSON_CDECL internal_realloc(void *pointer, size_t size)
 }
 #else
 #include "gui_api.h"
+
+#if defined RTL87x2G
+#define internal_malloc gui_lower_malloc
+#define internal_free gui_lower_free
+#define internal_realloc gui_lower_realloc
+#else
 #define internal_malloc gui_malloc
 #define internal_free gui_free
 #define internal_realloc gui_realloc
+#endif
+
 #endif
 
 /* strlen of character literals resolved at compile time */
@@ -784,6 +792,10 @@ fail:
 /* Parse the input text into an unescaped cinput, and populate item. */
 static cJSON_bool parse_string(cJSON *const item, parse_buffer *const input_buffer)
 {
+    if (!input_buffer)
+    {
+        goto fail;
+    }
     const unsigned char *input_pointer = buffer_at_offset(input_buffer) + 1;
     const unsigned char *input_end = buffer_at_offset(input_buffer) + 1;
     unsigned char *output_pointer = NULL;
@@ -1471,6 +1483,10 @@ static cJSON_bool parse_array(cJSON *const item, parse_buffer *const input_buffe
     cJSON *head = NULL; /* head of the linked list */
     cJSON *current_item = NULL;
 
+    if (!input_buffer)
+    {
+        return false; /* to deeply nested */
+    }
     if (input_buffer->depth >= CJSON_NESTING_LIMIT)
     {
         return false; /* to deeply nested */
@@ -1483,7 +1499,10 @@ static cJSON_bool parse_array(cJSON *const item, parse_buffer *const input_buffe
         goto fail;
     }
 
-    input_buffer->offset++;
+    if (input_buffer)
+    {
+        input_buffer->offset++;
+    }
     buffer_skip_whitespace(input_buffer);
     if (can_access_at_index(input_buffer, 0) && (buffer_at_offset(input_buffer)[0] == ']'))
     {
@@ -1494,7 +1513,10 @@ static cJSON_bool parse_array(cJSON *const item, parse_buffer *const input_buffe
     /* check if we skipped to the end of the buffer */
     if (cannot_access_at_index(input_buffer, 0))
     {
-        input_buffer->offset--;
+        if (input_buffer)
+        {
+            input_buffer->offset--;
+        }
         goto fail;
     }
 
@@ -1632,6 +1654,10 @@ static cJSON_bool parse_object(cJSON *const item, parse_buffer *const input_buff
     cJSON *head = NULL; /* linked list head */
     cJSON *current_item = NULL;
 
+    if (!input_buffer)
+    {
+        return false; /* to deeply nested */
+    }
     if (input_buffer->depth >= CJSON_NESTING_LIMIT)
     {
         return false; /* to deeply nested */
@@ -1643,7 +1669,10 @@ static cJSON_bool parse_object(cJSON *const item, parse_buffer *const input_buff
         goto fail; /* not an object */
     }
 
-    input_buffer->offset++;
+    if (input_buffer)
+    {
+        input_buffer->offset++;
+    }
     buffer_skip_whitespace(input_buffer);
     if (can_access_at_index(input_buffer, 0) && (buffer_at_offset(input_buffer)[0] == '}'))
     {
@@ -1653,12 +1682,18 @@ static cJSON_bool parse_object(cJSON *const item, parse_buffer *const input_buff
     /* check if we skipped to the end of the buffer */
     if (cannot_access_at_index(input_buffer, 0))
     {
-        input_buffer->offset--;
+        if (input_buffer)
+        {
+            input_buffer->offset--;
+        }
         goto fail;
     }
 
     /* step back to character in front of the first element */
-    input_buffer->offset--;
+    if (input_buffer)
+    {
+        input_buffer->offset--;
+    }
     /* loop through the comma separated array elements */
     do
     {
@@ -1689,7 +1724,10 @@ static cJSON_bool parse_object(cJSON *const item, parse_buffer *const input_buff
         }
 
         /* parse the name of the child */
-        input_buffer->offset++;
+        if (input_buffer)
+        {
+            input_buffer->offset++;
+        }
         buffer_skip_whitespace(input_buffer);
         if (!parse_string(current_item, input_buffer))
         {
@@ -3195,5 +3233,4 @@ CJSON_PUBLIC(void *) cJSON_malloc(size_t size)
 CJSON_PUBLIC(void) cJSON_free(void *object)
 {
     global_hooks.deallocate(object);
-    object = NULL;
 }

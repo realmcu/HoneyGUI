@@ -462,10 +462,13 @@ static bool gui_kb_is_func(uint32_t key_val)
 {
     uint8_t area = KB_VALUE_AREA(key_val);
     uint32_t idx = KB_VALUE_IDX(key_val);
+    gui_kb_t *this = gui_get_kb();
+    gui_ime_api_t *ime_api = (gui_ime_api_t *)(this->ime->api);
 
     if (area == KB_AREA_FUNC)
     {
-        if ((idx == KB_BTN_IDX_SP) && (gui_get_kb()->mode == KB_MODE_BASIC_PY))
+        if ((idx == KB_BTN_IDX_SP) && (this->mode == KB_MODE_BASIC_PY) &&
+            (ime_api->get_cand_num(this->ime) != 0))
         {
             return true;
         }
@@ -1453,7 +1456,7 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
 
     int font_size_cn = 26;
     void *addr_font_cn =
-        gui_get_file_address("app/system/resource/font/simsun_size26_bits4_font 3.bin");
+        gui_get_file_address("app/system/resource/font/simsun_size26_bits1_font.bin");
     int font_size_pinyin = 26;
     void *addr_font_pinyin =
         gui_get_file_address("app/system/resource/font/simsun_size26_bits1_font.bin");
@@ -1611,8 +1614,8 @@ static void gui_kb_ctor(gui_kb_t                        *this,
 
         gui_kb_layout_basic_ctor(this, config);
 
-#define PATH_PRE "\\app/system/resource/ime/"
-        gui_IME_set_dict(this->ime,  PATH_PRE"\\dictionary_info.json", PATH_PRE"\\dict8105.txt");
+#define PATH_PRE "app/system/resource/ime/"
+        gui_IME_set_dict(this->ime,  PATH_PRE"dictionary_info.json", PATH_PRE"dict8105.txt");
     }
 
 
@@ -1633,7 +1636,7 @@ static void gui_kb_ctor(gui_kb_t                        *this,
         int font_size = 26;
         gui_text_set(this->txt_display, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      strlen(text), font_size);
-        void *addr1 = gui_get_file_address("app/system/resource/font/simsun_size26_bits4_font 3.bin.bin");
+        void *addr1 = gui_get_file_address("app/system/resource/font/simsun_size26_bits1_font.bin.bin");
         gui_font_mem_init(addr1);
         gui_text_type_set(this->txt_display, addr1);
     }

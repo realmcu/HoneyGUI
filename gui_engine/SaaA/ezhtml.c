@@ -341,13 +341,13 @@ static void sport_button_press(gui_button_t *b)
 }
 static void button_press_array(gui_button_t *b, void *code, int p)
 {
-    GUI_API(gui_button_t).animate(b, 200, 0, button_press_ani_cb_array, p);
+    GUI_API(gui_button_t).animate(b, 200, 0, button_press_ani_cb_array, (void *)p);
 }
 static void switch_press_array(gui_switch_t *b, void *code, int p)
 {
     if (!b->ifon)
     {
-        GUI_API(gui_switch_t).animate(b, b->animate->dur, 0, switch_press_ani_cb_array, p);
+        GUI_API(gui_switch_t).animate(b, b->animate->dur, 0, switch_press_ani_cb_array, (void *)p);
     }
 
 
@@ -2085,9 +2085,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
                                 gui_free(path);
                                 closedir(dir);
-                                GUI_API(gui_button_t).on_press((void *)parent, (gui_event_cb_t)button_press_array, file_count);
+                                GUI_API(gui_button_t).on_press((void *)parent, (gui_event_cb_t)button_press_array,
+                                                               (void *)file_count);
                                 GUI_TYPE(gui_button_t, parent)->data = image_array;
-                                GUI_API(gui_button_t).on_release((void *)parent, (gui_event_cb_t)button_press_array, -1);
+                                GUI_API(gui_button_t).on_release((void *)parent, (gui_event_cb_t)button_press_array, (void *) - 1);
                             }
                         }
                         else
@@ -2441,7 +2442,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
                                 gui_free(path);
                                 closedir(dir);
-                                GUI_API(gui_switch_t).on_press((void *)parent, (gui_event_cb_t)switch_press_array, file_count);
+                                GUI_API(gui_switch_t).on_press((void *)parent, (gui_event_cb_t)switch_press_array,
+                                                               (void *)file_count);
                                 GUI_API(gui_switch_t).animate((void *)parent, dur, 0, switch_press_ani_cb_array, 0);
                                 GUI_TYPE(gui_switch_t, parent)->animate->animate = 0;
                                 GUI_TYPE(gui_switch_t, parent)->data = image_array;
