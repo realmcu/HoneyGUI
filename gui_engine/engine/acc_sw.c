@@ -174,10 +174,10 @@ void sw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 }
 void sw_acc_init(void)
 {
-    extern void (* gui_image_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
-    extern void (* gui_image_acc_end_cb)(struct draw_img * image);
-    gui_image_acc_prepare_cb = sw_acc_prepare_cb;
-    gui_image_acc_end_cb = sw_acc_end_cb;
+    extern void (* draw_img_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
+    extern void (* draw_img_acc_end_cb)(struct draw_img * image);
+    draw_img_acc_prepare_cb = sw_acc_prepare_cb;
+    draw_img_acc_end_cb = sw_acc_end_cb;
 }
 /** End of ENGINE_Exported_Functions
   * @}

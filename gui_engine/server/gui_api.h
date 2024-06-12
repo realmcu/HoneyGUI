@@ -225,6 +225,10 @@ void *gui_get_file_address(const char *file);
 char *gui_strdup(const char *s);
 char *gui_filepath_transforming(void *addr);
 
+int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len);
+int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len);
+int gui_ftl_erase(uint32_t addr, uint32_t len);
+
 void gui_log(const char *format, ...);
 void gui_log_hexdump(const char *name, uint8_t *buf, uint16_t size);
 void gui_display_on(void);

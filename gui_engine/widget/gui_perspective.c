@@ -227,8 +227,8 @@ static void gui_perspective_prepare(gui_obj_t *obj)
 
         memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(struct gui_matrix));
         matrix_inverse(&this->img[i].inverse);
-        gui_image_load_scale(&this->img[i], (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
-        gui_image_new_area(&this->img[i], NULL);
+        draw_img_load_scale(&this->img[i], (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+        draw_img_new_area(&this->img[i], NULL);
         if (gui_perspective_point_in_rect(&this->img[i], tp->x, tp->y) == true)
         {
             switch (tp->type)
@@ -268,28 +268,13 @@ static void gui_perspective_draw_cb(gui_obj_t *obj)
             {
                 draw_img = &this->img[i];
                 // cache img to buffer
-                uint8_t *img_buff = NULL;
-
-                extern void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode);
-                img_buff = gui_draw_cache_img(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
-                if (dc->type == DC_RAMLESS && this->src_mode[i] == IMG_SRC_FILESYS)
-                {
-                    if (dc->section_count == 0)
-                    {
-                        this->data[i] = img_buff;
-                    }
-                    else
-                    {
-                        img_buff = this->data[i];
-                    }
-                }
+                draw_img_cache(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
 
                 // blit
                 gui_acc_blit_to_dc(draw_img, dc, NULL);
 
                 // release img if cached
-                extern void gui_draw_free_img(draw_img_t *draw_img, void *img_buff, IMG_SOURCE_MODE_TYPE src_mode);
-                gui_draw_free_img(draw_img, img_buff, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+                draw_img_free(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
             }
         }
     }
@@ -302,9 +287,9 @@ static void gui_perspective_end(gui_obj_t *obj)
 
     for (uint8_t i = 0; i < 6; i++)
     {
-        if (gui_image_acc_end_cb != NULL)
+        if (draw_img_acc_end_cb != NULL)
         {
-            gui_image_acc_end_cb(&perspective->img[i]);
+            draw_img_acc_end_cb(&perspective->img[i]);
         }
     }
 }

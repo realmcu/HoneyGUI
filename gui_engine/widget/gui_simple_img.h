@@ -50,8 +50,8 @@ typedef struct gui_simple_img
     void *data;                         // this means address or filesystem path
     union
     {
-        void *file_path;                  // keep the filepath for partial draw
-        void *phy_addr;
+        void *filename;                  // keep the filepath for partial draw
+        void *ftl;
     };
     uint32_t opacity_value : 8;
     uint32_t blend_mode    : 3;

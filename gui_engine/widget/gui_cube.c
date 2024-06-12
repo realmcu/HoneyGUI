@@ -248,7 +248,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
     {
         if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
-            this->data[i] = this->file_path[i];
+            this->data[i] = this->filename[i];
             this->draw_img[i].data = this->data[i];
         }
         else if (this->src_mode[i] == IMG_SRC_MEMADDR)
@@ -312,8 +312,8 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&front->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&front->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&front->inverse);
-        gui_image_load_scale(front, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_FRONT]);
-        gui_image_new_area(front, NULL);
+        draw_img_load_scale(front, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_FRONT]);
+        draw_img_new_area(front, NULL);
         if (gui_cube_point_in_rect(front, tp->x, tp->y) == true)
         {
             if (this->nz[CUBE_NZ_0321] > cube_event.size)
@@ -333,8 +333,8 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&back->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&back->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&back->inverse);
-        gui_image_load_scale(back, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_BACK]);
-        gui_image_new_area(back, NULL);
+        draw_img_load_scale(back, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_BACK]);
+        draw_img_new_area(back, NULL);
         if (gui_cube_point_in_rect(back, tp->x, tp->y) == true)
         {
             if (this->nz[CUBE_NZ_4567] > cube_event.size)
@@ -354,8 +354,8 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&up->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&up->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&up->inverse);
-        gui_image_load_scale(up, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_UP]);
-        gui_image_new_area(up, NULL);
+        draw_img_load_scale(up, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_UP]);
+        draw_img_new_area(up, NULL);
         if (gui_cube_point_in_rect(up, tp->x, tp->y) == true)
         {
             if (this->nz[CUBE_NZ_5126] > cube_event.size)
@@ -375,8 +375,8 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&down->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&down->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&down->inverse);
-        gui_image_load_scale(down, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_DOWN]);
-        gui_image_new_area(down, NULL);
+        draw_img_load_scale(down, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_DOWN]);
+        draw_img_new_area(down, NULL);
         if (gui_cube_point_in_rect(down, tp->x, tp->y) == true)
         {
             if (this->nz[CUBE_NZ_0473] > cube_event.size)
@@ -396,8 +396,8 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&left->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&left->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&left->inverse);
-        gui_image_load_scale(left, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_LEFT]);
-        gui_image_new_area(left, NULL);
+        draw_img_load_scale(left, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_LEFT]);
+        draw_img_new_area(left, NULL);
         if (gui_cube_point_in_rect(left, tp->x, tp->y) == true)
         {
             if (this->nz[CUBE_NZ_7623] > cube_event.size)
@@ -417,8 +417,8 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&right->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&right->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&right->inverse);
-        gui_image_load_scale(right, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_RIGHT]);
-        gui_image_new_area(right, NULL);
+        draw_img_load_scale(right, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_RIGHT]);
+        draw_img_new_area(right, NULL);
         if (gui_cube_point_in_rect(right, tp->x, tp->y) == true)
         {
             if (this->nz[CUBE_NZ_0154] > cube_event.size)
@@ -447,31 +447,12 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         if (this->nz[i] > 0.0f)
         {
             CUBE_JUDEG_FULL_RANK(&draw_img)
-            {
-                // cache img to buffer
-                uint8_t *img_buff = NULL;
 
-                extern void *gui_draw_cache_img(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode);
-                img_buff = gui_draw_cache_img(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
-                if (dc->type == DC_RAMLESS && this->src_mode[i] == IMG_SRC_FILESYS)
-                {
-                    if (dc->section_count == 0)
-                    {
-                        this->data[i] = img_buff;
-                    }
-                    else
-                    {
-                        img_buff = this->data[i];
-                    }
-                }
-
-                // blit
-                gui_acc_blit_to_dc(draw_img, dc, NULL);
-
-                // release img if cached
-                extern void gui_draw_free_img(draw_img_t *draw_img, void *img_buff, IMG_SOURCE_MODE_TYPE src_mode);
-                gui_draw_free_img(draw_img, img_buff, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
-            }
+            draw_img_cache(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+            // blit
+            gui_acc_blit_to_dc(draw_img, dc, NULL);
+            // release img if cached
+            draw_img_free(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
         }
     }
 }
@@ -483,9 +464,9 @@ static void gui_cube_end(gui_obj_t *obj)
 
     for (int i = 0; i < 6; i++)
     {
-        if (gui_image_acc_end_cb != NULL)
+        if (draw_img_acc_end_cb != NULL)
         {
-            gui_image_acc_end_cb(&this->draw_img[i]);
+            draw_img_acc_end_cb(&this->draw_img[i]);
         }
     }
 }
@@ -501,9 +482,9 @@ static void gui_cube_destory(gui_obj_t *obj)
         {
 #ifdef _WIN32
             // free path transforming memory on win
-            gui_free(this->file_path[i]);
+            gui_free(this->filename[i]);
 #endif
-            this->file_path[i] = NULL;
+            this->filename[i] = NULL;
         }
     }
 }
@@ -576,7 +557,7 @@ static void gui_cube_ctor(gui_cube_t         *this,
 #ifdef _WIN32
             path = gui_filepath_transforming(path);
 #endif
-            this->file_path[i] = path;
+            this->filename[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
@@ -714,9 +695,9 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
         if (this->src_mode[i] == IMG_SRC_FILESYS)
         {
 #ifdef _WIN32
-            gui_free(this->file_path[i]);
+            gui_free(this->filename[i]);
 #endif
-            this->file_path[i] = NULL;
+            this->filename[i] = NULL;
             this->data[i] = NULL;
         }
 
@@ -728,7 +709,7 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
 #ifdef _WIN32
             path = gui_filepath_transforming(path);
 #endif
-            this->file_path[i] = path;
+            this->filename[i] = path;
         }
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {

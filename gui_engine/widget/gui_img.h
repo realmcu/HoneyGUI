@@ -65,8 +65,8 @@ typedef struct gui_img
     void *data;                         // this means address or filesystem path
     union
     {
-        void *file_path;                         // keep the filepath for partial draw
-        void *phy_addr;
+        void *filename;                         // keep the filepath for partial draw
+        void *ftl;
     };
     gui_animate_t *animate;
     uint16_t scope_x1;
@@ -267,6 +267,25 @@ gui_img_t *gui_img_create_from_mem(void       *parent,
                                    int16_t     w,
                                    int16_t     h);
 
+/**
+ * @brief creat an image widget from memory address
+ * @note creat an image widget and set attribute
+ * @param parent the father widget it nested in.
+ * @param name widget name.
+ * @param ftl not xip address, use ftl address
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @param w the width of the widget.
+ * @param h the hight of the widget.
+ * @return return the widget object pointer.
+ */
+gui_img_t *gui_img_create_from_ftl(void       *parent,
+                                   const char *name,
+                                   void       *ftl,
+                                   int16_t     x,
+                                   int16_t     y,
+                                   int16_t     w,
+                                   int16_t     h);
 /**
  * @brief creat an image widget from filesystem
  *

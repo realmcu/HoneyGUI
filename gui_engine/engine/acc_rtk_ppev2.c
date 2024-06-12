@@ -980,8 +980,8 @@ void hw_acc_init(void)
     PPEV2_CLK_ENABLE(ENABLE);
     uint8_t dma_channel_1, dma_channel_2;
     hal_dma_channel_init(&dma_channel_1, &dma_channel_2);
-    extern void (* gui_image_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
-    extern void (* gui_image_acc_end_cb)(struct draw_img * image);
-    gui_image_acc_prepare_cb = hw_acc_prepare_cb;
-    gui_image_acc_end_cb = hw_acc_end_cb;
+    extern void (* draw_img_acc_prepare_cb)(struct draw_img * image, gui_rect_t *rect);
+    extern void (* draw_img_acc_end_cb)(struct draw_img * image);
+    draw_img_acc_prepare_cb = hw_acc_prepare_cb;
+    draw_img_acc_end_cb = hw_acc_end_cb;
 }

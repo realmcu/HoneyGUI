@@ -143,8 +143,8 @@ static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, 
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&img->inverse);
-    gui_image_load_scale(img, IMG_SRC_MEMADDR);
-    gui_image_new_area(img, NULL);
+    draw_img_load_scale(img, IMG_SRC_MEMADDR);
+    draw_img_new_area(img, NULL);
     *input_img = img;
 
 }
@@ -202,8 +202,8 @@ static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, u
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&img->inverse);
-    gui_image_load_scale(img, IMG_SRC_MEMADDR);
-    gui_image_new_area(img, NULL);
+    draw_img_load_scale(img, IMG_SRC_MEMADDR);
+    draw_img_new_area(img, NULL);
     *input_img = img;
 }
 

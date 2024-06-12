@@ -341,6 +341,10 @@ static gui_button_t *gui_button_create_core(void                 *parent,
                 {
                     button->img = (void *)gui_img_create_from_mem(button, "icon_img", background_pic, 0, 0, 0, 0);
                 }
+                else if (src_mode == IMG_SRC_FTL)
+                {
+                    button->img = (void *)gui_img_create_from_ftl(button, "icon_img", background_pic, 0, 0, 0, 0);
+                }
             }
             break;
 
@@ -354,6 +358,11 @@ static gui_button_t *gui_button_create_core(void                 *parent,
                 else if (src_mode == IMG_SRC_MEMADDR)
                 {
                     button->img = (void *)gui_img_create_from_mem((void *)button, "g", ((void **)background_pic)[0], 0,
+                                                                  0, 0, 0);
+                }
+                else if (src_mode == IMG_SRC_FTL)
+                {
+                    button->img = (void *)gui_img_create_from_ftl((void *)button, "g", ((void **)background_pic)[0], 0,
                                                                   0, 0, 0);
                 }
             }
@@ -414,6 +423,22 @@ gui_button_t *gui_button_create_from_fs(void             *parent,
     return gui_button_create_core(parent, x, y, w, h, background_pic, highlight_pic, text, image_type,
                                   count, IMG_SRC_FILESYS);
 }
+
+gui_button_t *gui_button_create_ftl(void             *parent,
+                                    int16_t           x,
+                                    int16_t           y,
+                                    int16_t           w,
+                                    int16_t           h,
+                                    void             *background_pic,
+                                    void             *highlight_pic,
+                                    char             *text,
+                                    T_BUTTON_BG_TYPE  image_type,
+                                    int               count)
+{
+    return gui_button_create_core(parent, x, y, w, h, background_pic, highlight_pic, text, image_type,
+                                  count, IMG_SRC_FTL);
+}
+
 _GUI_API_ASSIGN(gui_button_t)
 .on_click = gui_button_click,
  .on_long_press = gui_button_long,

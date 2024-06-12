@@ -12,6 +12,7 @@ static struct gui_indev *indev = NULL;
 static struct gui_os_api *os_api = NULL;
 static struct gui_dispdev *dc = NULL;
 static struct gui_fs *fs = NULL;
+static struct gui_ftl *ftl = NULL;
 static struct acc_engine *acc = NULL;
 
 void gui_dc_info_register(struct gui_dispdev *info)
@@ -44,6 +45,12 @@ void gui_fs_info_register(struct gui_fs *info)
 {
     fs = info;
 }
+
+void gui_ftl_info_register(struct gui_ftl *info)
+{
+    ftl = info;
+}
+
 void gui_indev_info_register(struct gui_indev *info)
 {
     indev = info;
@@ -569,6 +576,39 @@ char *gui_filepath_transforming(void *addr)
     }
     fclose(fd);
     return path;
+}
+
+int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len)
+{
+    if (ftl->read)
+    {
+        ftl->read(addr, buf, len);
+        return len;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len)
+{
+    if (ftl->write)
+    {
+        ftl->write(addr, buf, len);
+        return len;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int gui_ftl_erase(uint32_t addr, uint32_t len)
+{
+    if (ftl->erase)
+    {
+        ftl->erase(addr, len);
+    }
+    return 0;
 }
 
 

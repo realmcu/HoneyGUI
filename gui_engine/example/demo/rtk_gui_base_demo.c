@@ -57,8 +57,9 @@ static void app_dialing_ui_design(gui_app_t *app)
     // gui_img_create_from_mem(win1,  "img_1_test", (void *)_actiger_blue, 50, 50, 0, 0);
     // return;
 
-    // gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue, 0, 0, 0, 0);
-    // return;
+    gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue_compressed, 0, 0, 0,
+                            0);
+    return;
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_tabview_set_style(tv, TAB_CUBE);

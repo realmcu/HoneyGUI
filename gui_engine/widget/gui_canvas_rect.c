@@ -118,8 +118,8 @@ static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&this->draw_img->inverse);
-    gui_image_load_scale(this->draw_img, IMG_SRC_MEMADDR);
-    gui_image_new_area(this->draw_img, NULL);
+    draw_img_load_scale(this->draw_img, IMG_SRC_MEMADDR);
+    draw_img_new_area(this->draw_img, NULL);
 
 }
 

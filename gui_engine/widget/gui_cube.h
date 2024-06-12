@@ -150,8 +150,8 @@ typedef struct gui_cube
 
     union
     {
-        void *file_path[6];                         // keep the filepath for partial draw
-        void *phy_addr[6];
+        void *filename[6];                         // keep the filepath for partial draw
+        void *ftl[6];
     };
     void *data[6];
     uint8_t src_mode[6];

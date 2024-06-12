@@ -72,7 +72,7 @@ typedef struct gui_perspective
     union
     {
         void *file_path[6];                         // keep the filepath for partial draw
-        void *phy_addr[6];
+        void *ftl[6];
     };
     void *data[6];
     uint8_t src_mode[6];

@@ -2,11 +2,11 @@
 #include <string.h>
 #include <math.h>
 
-void (* gui_image_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
-void (* gui_image_acc_end_cb)(struct draw_img *image) = NULL;
+void (* draw_img_acc_prepare_cb)(struct draw_img *image, gui_rect_t *rect) = NULL;
+void (* draw_img_acc_end_cb)(struct draw_img *image) = NULL;
 
-bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
-                           int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end)
+bool draw_img_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect,
+                          int16_t *x_start, int16_t *x_end, int16_t *y_start, int16_t *y_end)
 {
     int16_t image_x = image->img_target_x;
     int16_t image_y = image->img_target_y;
@@ -28,7 +28,7 @@ bool gui_image_target_area(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t
 }
 
 
-gui_rgb_data_head_t gui_image_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
+gui_rgb_data_head_t draw_img_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
 {
     struct gui_rgb_data_head head = {0};
 
@@ -42,6 +42,11 @@ gui_rgb_data_head_t gui_image_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE s
         gui_fs_read(fd, &head, sizeof(head));
         gui_fs_close(fd);
     }
+    else if (src_mode == IMG_SRC_FTL)
+    {
+        uint32_t base = (uint32_t)(uintptr_t)img->data;
+        gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
+    }
     else if (src_mode == IMG_SRC_MEMADDR)
     {
         memcpy(&head, img->data, sizeof(head));
@@ -49,61 +54,38 @@ gui_rgb_data_head_t gui_image_get_header(draw_img_t *img, IMG_SOURCE_MODE_TYPE s
 
     return head;
 }
-void gui_image_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
+void draw_img_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
 {
     struct gui_rgb_data_head head = {0};
 
-    head = gui_image_get_header(img, src_mode);
+    head = draw_img_get_header(img, src_mode);
     img->img_w = head.w;
     img->img_h = head.h;
 }
-uint32_t gui_image_get_pixel(draw_img_t *img)
+uint32_t draw_img_get_pixel_byte(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
 {
-    struct gui_rgb_data_head *head = img->data;
-    if (head->type == RGB565)
+    struct gui_rgb_data_head head = {0};
+    head = draw_img_get_header(img, src_mode);
+    if (head.type == RGB565)
     {
         return 2;
     }
-    else if (head->type == RGB888)
+    else if (head.type == RGB888)
     {
         return 3;
     }
-    else if (head->type == ARGB8565)
+    else if (head.type == ARGB8565)
     {
         return 3;
     }
-    else if (head->type == ARGB8888)
+    else if (head.type == ARGB8888)
     {
         return 4;
     }
     return 0;
 }
-uint8_t gui_get_srcBpp(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
-{
-    struct gui_rgb_data_head head = gui_image_get_header(image, src_mode);
-    uint8_t source_bytes_per_pixel = 0;
 
-    switch (head.type)
-    {
-    case RGB565:
-        source_bytes_per_pixel = 2;
-        break;
-    case RTKARGB8565:
-    case ARGB8565:
-    case RGB888:
-        source_bytes_per_pixel = 3;
-        break;
-    case ARGB8888:
-    case XRGB8888:
-        source_bytes_per_pixel = 4;
-        break;
-    default:
-        break;
-    }
-    GUI_ASSERT(source_bytes_per_pixel != 0);
-    return source_bytes_per_pixel;
-}
-bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
+bool draw_img_new_area(draw_img_t *img, gui_rect_t *rect)
 {
     gui_point_t pox = {0.0f};
     float x_min = 0.0f;
@@ -203,9 +185,9 @@ bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
         y_max = pox.p[1];
     }
 
-    if (gui_image_acc_prepare_cb != NULL)
+    if (draw_img_acc_prepare_cb != NULL)
     {
-        gui_image_acc_prepare_cb(img, rect);
+        draw_img_acc_prepare_cb(img, rect);
     }
 
     img->img_target_x = (int16_t)x_min;
@@ -213,5 +195,77 @@ bool gui_image_new_area(draw_img_t *img, gui_rect_t *rect)
     img->img_target_w = ceil(x_max) - (int16_t)x_min + 1;
     img->img_target_h = ceil(y_max) - (int16_t)y_min + 1;
     return true;
+}
+
+
+void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    if (dc->section_count != 0)
+    {
+        return;
+    }
+    if (src_mode == IMG_SRC_FILESYS)
+    {
+        int fd = gui_fs_open((const char *)image->data,  0);
+        uint32_t size = gui_fs_lseek(fd, 0, SEEK_END) - gui_fs_lseek(fd, 0, SEEK_SET);
+        uint8_t *data = (uint8_t *)gui_malloc(size);
+        GUI_ASSERT(data != NULL);
+        gui_fs_read(fd, data, size);
+        gui_fs_close(fd);
+        image->data = data;
+
+        return;
+    }
+    else if (src_mode == IMG_SRC_FTL)
+    {
+        gui_rgb_data_head_t head;
+        uint32_t base = (uint32_t)(uintptr_t)image->data;
+        gui_ftl_read(base, (uint8_t *)&head, sizeof(gui_rgb_data_head_t));
+        uint8_t *data = NULL;
+        if (head.compress == true)
+        {
+            uint32_t start = 0;
+            gui_ftl_read(base + sizeof(gui_rgb_data_head_t) + sizeof(imdc_file_header_t),
+                         (uint8_t *)(uintptr_t)start, 4);
+            uint32_t end = 0;
+            gui_ftl_read(base + sizeof(gui_rgb_data_head_t) + sizeof(imdc_file_header_t) + 4 * head.h,
+                         (uint8_t *)(uintptr_t)end, 4);
+            uint32_t size = end - start;
+            data = (uint8_t *)gui_malloc(size);
+            GUI_ASSERT(data != NULL);
+            gui_ftl_read(base, data, size);
+        }
+        else
+        {
+            draw_img_get_header(image, src_mode);
+            uint8_t pixel_byte = draw_img_get_pixel_byte(image, src_mode);
+            uint32_t size = head.w * head.h * pixel_byte;
+            data = (uint8_t *)gui_malloc(size);
+            GUI_ASSERT(data != NULL);
+            gui_ftl_read(base, (uint8_t *)&head, head.w * head.h * pixel_byte);
+        }
+        image->data = data;
+
+        return;
+    }
+    else if (src_mode == IMG_SRC_MEMADDR)
+    {
+        return;
+    }
+
+}
+
+void draw_img_free(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    if (dc->section_count != dc->section_total - 1)
+    {
+        return;
+    }
+    if ((src_mode == IMG_SRC_FILESYS) || (src_mode == IMG_SRC_FTL))
+    {
+        gui_free(img->data);
+    }
 }
 
