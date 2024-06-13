@@ -556,7 +556,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
             uint16_t color_output = rgba2565(color);
             uint8_t ppb = 4;//pixel_per_byte = 8 / rendor_mode
-            int write_off = (y_start - dc->section.y1) * dc->fb_width;
+            int write_off = (y_start - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
             int dots_off = (y_start - font_y) * (font_w / ppb);
             int left_offset = 0, right_offset = 0, byte = 0;
             uint16_t color_back;
@@ -681,7 +681,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                         writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
                     }
                 }
-                write_off += dc->fb_width;
+                write_off += dc->section.x2 - dc->section.x1 + 1;
                 dots_off += (font_w / ppb);
             }
 #else
@@ -954,7 +954,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint16_t *writebuf = (uint16_t *)dc->frame_buf;
             uint16_t color_output = rgba2565(color);
             uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
-            int write_off = (y_start - dc->section.y1) * dc->fb_width;
+            int write_off = (y_start - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
             int dots_off = (y_start - font_y) * (font_w / ppb);
             int left_offset = 0, right_offset = 0, byte = 0;
             uint32_t x_start_right = x_start;
@@ -1042,7 +1042,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                         writebuf[write_off + j - dc->section.x1] = color_output;
                     }
                 }
-                write_off += dc->fb_width;
+                write_off += dc->section.x2 - dc->section.x1 + 1;
                 dots_off += (font_w / ppb);
             }
 #else
