@@ -38,29 +38,35 @@ void cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
     int16_t source_w = image->img_w;
     int16_t source_h = image->img_h;
+    gui_matrix_t *inverse = &image->inverse;
 
     for (uint32_t i = y_start; i <= y_end; i++)
     {
-        for (uint32_t j = x_start; j <= x_end; j++)
-        {
-            if ((j >= source_w) || (j < 0) || (i < 0) || (i >= source_h))
-            {
-                continue;
-            }
-            if (rect != NULL)
-            {
-                if ((j >= rect->x2) || (j < rect->x1) || (i < rect->y1) || (i >= rect->y2))
-                {
-                    continue;
-                }
-            }
+        // for (uint32_t j = x_start; j <= x_end; j++)
+        // {
+        //     if ((j >= source_w) || (j < 0) || (i < 0) || (i >= source_h))
+        //     {
+        //         continue;
+        //     }
+        //     if (rect != NULL)
+        //     {
+        //         if ((j >= rect->x2) || (j < rect->x1) || (i < rect->y1) || (i >= rect->y2))
+        //         {
+        //             continue;
+        //         }
+        //     }
 
-            int read_off = i * source_w + j;
-            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
+        //     int read_off = i * source_w + j;
+        //     int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
 
-            uint16_t pixel = *((uint16_t *)(uintptr_t)image_base + read_off);
-            writebuf[write_off] = pixel;
-        }
+        //     uint16_t pixel = *((uint16_t *)(uintptr_t)image_base + read_off);
+        //     writebuf[write_off] = pixel;
+        // }
+        uint32_t len = x_end - x_start + 1;
+        uint32_t source_off = (i + inverse->m[1][2]) * source_w + x_start + inverse->m[0][2];
+        uint32_t des_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
+                           dc->section.x1;
+        memcpy(writebuf + des_off, (uint16_t *)(uintptr_t)image_base + source_off, 2 * len);
     }
 }
 

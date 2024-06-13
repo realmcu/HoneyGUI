@@ -43,28 +43,32 @@ void bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
 
     for (uint32_t i = y_start; i <= y_end; i++)
     {
-        for (uint32_t j = x_start; j <= x_end; j++)
-        {
-            int x = j + inverse->m[0][2];
-            int y = i + inverse->m[1][2];
+        // for (uint32_t j = x_start; j <= x_end; j++)
+        // {
+        //     int x = j + inverse->m[0][2];
+        //     int y = i + inverse->m[1][2];
+        //     if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
+        //     {
+        //         continue;
+        //     }
+        //     if (rect != NULL)
+        //     {
+        //         if ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))
+        //         {
+        //             continue;
+        //         }
+        //     }
+        //     int read_off = y * source_w + x;
+        //     int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
 
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
-            {
-                continue;
-            }
-            if (rect != NULL)
-            {
-                if ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))
-                {
-                    continue;
-                }
-            }
+        //     uint16_t pixel = *((uint16_t *)(uintptr_t)image_base + read_off);
+        //     writebuf[write_off] = pixel;
+        // }
 
-            int read_off = y * source_w + x;
-            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
-
-            uint16_t pixel = *((uint16_t *)(uintptr_t)image_base + read_off);
-            writebuf[write_off] = pixel;
-        }
+        uint32_t len = x_end - x_start + 1;
+        uint32_t source_off = (i + inverse->m[1][2]) * source_w + x_start + inverse->m[0][2];
+        uint32_t des_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
+                           dc->section.x1;
+        memcpy(writebuf + des_off, (uint16_t *)(uintptr_t)image_base + source_off, 2 * len);
     }
 }
