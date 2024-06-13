@@ -78,7 +78,7 @@ void rle_bypass_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     for (uint32_t i = y_start; i <= y_end; i++)
     {
         int line = i - image_y;
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
+        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
         // memset line
         rle_bypass_rgb565_draw(file, line,  &(writebuf[write_off + x_start]), image_x, (x_end - x_start));

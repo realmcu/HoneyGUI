@@ -697,7 +697,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
@@ -727,7 +727,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
@@ -763,7 +763,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
@@ -795,7 +795,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
@@ -824,7 +824,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = (dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
@@ -860,7 +860,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
                     uint8_t alpha = (dots[(i - font_y) * (font_w / ppb) + (j - font_x) / ppb] >>
@@ -885,7 +885,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint16_t color_output = rgba2565(color);
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
                 int dots_off = (i - font_y) * font_w - font_x;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
@@ -905,7 +905,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint8_t color_back[3];
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 int dots_off = (i - font_y) * font_w - font_x;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
@@ -932,7 +932,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint32_t color_back;
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 int dots_off = (i - font_y) * font_w - font_x;
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
@@ -1051,7 +1051,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
                 int dots_off = (i - font_y) * (font_w / ppb);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
@@ -1071,7 +1071,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 int dots_off = (i - font_y) * (font_w / ppb);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {
@@ -1097,7 +1097,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             uint8_t ppb = 8;//pixel_per_byte = 8 / rendor_mode
             for (uint32_t i = y_start; i < y_end; i++)
             {
-                int write_off = (i - dc->section.y1) * dc->fb_width ;
+                int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
                 int dots_off = (i - font_y) * (font_w / ppb);
                 for (uint32_t j = x_start; j < x_end; j++)
                 {

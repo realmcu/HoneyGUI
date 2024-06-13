@@ -135,7 +135,7 @@ static void gui_qrcode_draw(gui_qbcode_t *qbcode, gui_rect_t *rect)
     {
         int16_t findey = (i - qbcode_y) * (qbcode_size + (qbcode_border_size + qbcode_border_size)) /
                          qbcode_h - qbcode_border_size;
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
+        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
         if ((findey < 0) || (findey >= qbcode_size))
         {
             memset(&writebuf[write_off + x_start], 0xff, line_width);
@@ -206,7 +206,7 @@ static void gui_barcode_draw(gui_qbcode_t *barcode, gui_rect_t *rect)
     for (uint32_t i = y_start; i < y_end; i++)
     {
         int16_t findy = (i - qbcode_y);
-        int write_off = (i - dc->section.y1) * dc->fb_width;
+        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1);
 
         if ((findy < qbcode_border_size) || (findy >= (qbcode_h - qbcode_border_size)))
         {

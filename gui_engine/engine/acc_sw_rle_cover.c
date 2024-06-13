@@ -43,7 +43,7 @@ void rle_cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     uint8_t line_buf[BYTE_PIXEL_RGB565 * source_w];
     for (uint32_t i = y_start; i <= y_end; i++)
     {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
+        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
         int line = i - image_y;
         uncompressed_rle_rgb565(file, line, line_buf);
         int read_off = (int)(uintptr_t)line_buf - BYTE_PIXEL_RGB565 * image_x;

@@ -230,7 +230,7 @@ void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rec
             }
 
             int read_off = y * source_w + x;
-            int write_off = (i - dc->section.y1) * dc->fb_width + j - dc->section.x1;
+            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
 
             if (image->blend_mode == IMG_RECT)
             {
@@ -360,7 +360,7 @@ void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *re
                     continue;
                 }
             }
-            int write_off = (i - dc->section.y1) * dc->fb_width + j;
+            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
 
             uint8_t rle_pixel[4];
 

@@ -56,7 +56,7 @@ void cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
             }
 
             int read_off = i * source_w + j;
-            int write_off = (i - dc->section.y1) * dc->fb_width + j - dc->section.x1;
+            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
 
             uint16_t pixel = *((uint16_t *)(uintptr_t)image_base + read_off);
             writebuf[write_off] = pixel;

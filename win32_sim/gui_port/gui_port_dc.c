@@ -180,12 +180,7 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
 }
 
 static uint8_t sim_framebuffer[1080 * 1080 * DRV_PIXEL_BITS / 8] = {0};
-#ifdef USE_DC_PFB
-static uint8_t __attribute__((aligned(4))) disp_write_buff1_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
-                                                                               * DRV_PIXEL_BITS / 8];
-static uint8_t __attribute__((aligned(4))) disp_write_buff2_port[DRV_LCD_WIDTH * LCD_SECTION_HEIGHT
-                                                                               * DRV_PIXEL_BITS / 8];
-#endif
+
 static struct gui_dispdev dc =
 {
 #ifdef USE_DC_PFB
@@ -203,8 +198,8 @@ static struct gui_dispdev dc =
     .section_count = 0,
     .scale_x = 1,
     .scale_y = 1,
-    .disp_buf_1 = disp_write_buff1_port,
-    .disp_buf_2 = disp_write_buff2_port,
+    .disp_buf_1 = NULL,
+    .disp_buf_2 = NULL,
     .frame_buf = NULL,
     .type = DC_RAMLESS,
     .lcd_update = port_gui_lcd_update,
@@ -380,14 +375,11 @@ void gui_port_dc_init(void)
     pthread_cond_destroy(&sdl_ok_event);
 
     gui_dc_info_register(&dc);
-#ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
-    struct gui_dispdev *dc =  gui_get_dc();
-    dc->fb_height = sim_screen_hight;
-    dc->fb_width = sim_screen_width;
-    dc->screen_width = sim_screen_width;
-    dc->screen_height = sim_screen_hight;
-    dc->driver_ic_active_width = sim_screen_width;
+#ifdef USE_DC_PFB
+    dc.disp_buf_1 =  malloc(dc.fb_height * dc.fb_width * DRV_PIXEL_BITS / 8);
+    dc.disp_buf_2 =  malloc(dc.fb_height * dc.fb_width * DRV_PIXEL_BITS / 8);
 #endif
+
 }
 
 

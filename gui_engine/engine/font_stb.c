@@ -246,7 +246,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
         uint32_t color_back;
         for (uint32_t i = y_start; i < y_end; i++)
         {
-            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
             for (uint32_t j = x_start; j < x_end; j++)
             {
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
@@ -265,7 +265,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
         uint8_t color_back[3];
         for (uint32_t i = y_start; i < y_end; i++)
         {
-            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
             for (uint32_t j = x_start; j < x_end; j++)
             {
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
@@ -291,7 +291,7 @@ static void font_stb_draw_bitmap(gui_text_t *text, FONT_STB_SCREEN *stb_screen,
         uint16_t color_back;
         for (uint32_t i = y_start; i < y_end; i++)
         {
-            int write_off = (i - dc->section.y1) * dc->fb_width ;
+            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
             for (uint32_t j = x_start; j < x_end; j++)
             {
                 uint8_t alpha = dots[(i - font_y) * font_w + (j - font_x)];
