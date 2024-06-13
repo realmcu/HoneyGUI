@@ -24,31 +24,42 @@
 void cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                          gui_rect_t *rect)
 {
-    int16_t image_x = image->img_target_x;
-    int16_t image_y = image->img_target_y;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
     int16_t y_end = 0;
-    int16_t source_w = image->img_w;
 
     if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
     }
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
+    uint32_t image_base = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
+    uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
-    int read_x_off = -_UI_MIN(image_x, 0) * BYTE_PIXEL_RGB565  + image_off;
+    int16_t source_w = image->img_w;
+    int16_t source_h = image->img_h;
+
     for (uint32_t i = y_start; i <= y_end; i++)
     {
-        int write_off = (i - dc->section.y1) * dc->fb_width ;
-        int read_off = ((i - image_y) * source_w) * BYTE_PIXEL_RGB565 + read_x_off -
-                       BYTE_PIXEL_RGB565 * x_start;
-        uint16_t *writebuf = (uint16_t *)dc->frame_buf;
         for (uint32_t j = x_start; j <= x_end; j++)
         {
-            uint16_t pixel = (*((uint16_t *)(uintptr_t)read_off + j));
-            writebuf[write_off + j] = pixel;
+            if ((j >= source_w) || (j < 0) || (i < 0) || (i >= source_h))
+            {
+                continue;
+            }
+            if (rect != NULL)
+            {
+                if ((j >= rect->x2) || (j < rect->x1) || (i < rect->y1) || (i >= rect->y2))
+                {
+                    continue;
+                }
+            }
+
+            int read_off = i * source_w + j;
+            int write_off = (i - dc->section.y1) * dc->fb_width + j - dc->section.x1;
+
+            uint16_t pixel = *((uint16_t *)(uintptr_t)image_base + read_off);
+            writebuf[write_off] = pixel;
         }
     }
 }
