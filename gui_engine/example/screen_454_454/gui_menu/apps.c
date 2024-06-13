@@ -10,6 +10,7 @@
 #include "gui_canvas_rect.h"
 #include<stdio.h>
 #include<time.h>
+//Please search app name macro for entry
 #define APP_HEART_RATE
 #define APP_CLOCK
 #define APP_WATCH_FACE
@@ -20,6 +21,8 @@
 #define APP_MAP
 #define APP_CARDVIEW
 #define APP_BOX2D
+#define APP_COMPASS
+#define APP_SETTING
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
@@ -29,7 +32,8 @@ GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
 GUI_APP_DEFINE_NAME(APP_MAP)
 GUI_APP_DEFINE_NAME(APP_CARDVIEW)
-
+GUI_APP_DEFINE_NAME(APP_COMPASS)
+GUI_APP_DEFINE_NAME(APP_SETTING)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -758,9 +762,221 @@ GUI_APP_ENTRY(APP_BOX2D)
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
+#include "gui_multi_level.h"
+static void ui_design_0(gui_obj_t *parent)
+{
+
+}
+static void ui_design_1_0(gui_obj_t *parent)
+{
+
+}
+static void ui_design_1_1(gui_obj_t *parent)
+{
+
+}
+static void ui_design_1_2(gui_obj_t *parent)
+{
+
+}
+GUI_APP_ENTRY(APP_SETTING)
+{
+    gui_multi_level_t *m0 = gui_multi_level_create(GUI_APP_ROOT_SCREEN, 0, ui_design_0);
+    gui_multi_level_t *m1_0 = gui_multi_level_create(m0, 0, ui_design_1_0);
+    gui_multi_level_t *m1_1 = gui_multi_level_create(m0, 0, ui_design_1_1);
+    gui_multi_level_t *m1_2 = gui_multi_level_create(m0, 0, ui_design_1_2);
+}
+#include "math.h"
+#include <stdio.h>
+
+// Function to convert degrees to direction
+const char *getDirection(double deg)
+{
+    const char *directions[] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+
+    // Ensure that the degree is between 0 (inclusive) to 360 (exclusive)
+    while (deg < 0) { deg += 360; }
+    while (deg >= 360) { deg -= 360; }
+
+    // Divide the circle into 8 parts and return corresponding direction
+    int index = (int)((deg + 22.5) / 45) % 8;
+    return directions[index];
+}
 
 
 
+static void compass_win_cb(gui_img_t *img_array[])
+{
+    touch_info_t *tp = tp_get_info();
+    static bool hold = 1;
+    static int img_x1, img_x2;
+    static bool edge_flag;
+    static bool change_flag;
+    static int offset;
+    int img_w = gui_img_get_width(img_array[0]);
+    int screen_w = gui_get_screen_width();
+    // if (tp->pressed)
+    // {
+    //     hold = 1;
+    //     img_x1 = GUI_BASE(img_array[0])->x;
+    //     img_x2 = GUI_BASE(img_array[1])->x;
+    // }else if (tp->released)
+    // {
+    //     hold = 0;
+    //     img_x1 = GUI_BASE(img_array[0int])->x;
+    //     img_x2 = GUI_BASE(img_array[1])->x;
+    // }
+    if (hold)
+    {
+        static float time;
+        float displacement = sinf(time++ * 0.01f) * 200.0 * M_PI;
+        offset = (int)displacement;
+        int degree = offset / 7 % 360;
+        if (degree < 0)
+        {
+            degree += 360;
+        }
+
+        gui_log("degree:%d\n", degree);
+        {
+            static char degree_text[4];
+            sprintf(degree_text, "%d", degree);
+            degree_text[3] = 0;
+            gui_text_set((void *)img_array[2], degree_text,  GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(degree_text),
+                         16);
+        }
+        {
+            const char *degree_text = getDirection((double)degree);
+
+            gui_text_set((void *)img_array[3], (char *)degree_text,  GUI_FONT_SRC_BMP, gui_rgba(0xff, 0x66,
+                         0x00, 0xff), strlen(degree_text), 16);
+        }
+        gui_img_set_location(img_array[0], offset + img_x1, img_array[0]->base.y);
+        gui_img_set_location(img_array[1], offset + img_x2, img_array[1]->base.y);
+        {
+            if (GUI_BASE(img_array[0])->x < 10 && GUI_BASE(img_array[0])->x >= -10)
+            {
+                edge_flag = 1;
+            }
+            else
+            {
+                edge_flag = 0;
+                change_flag = 0;
+            }
+            if (edge_flag && !change_flag)
+            {
+                GUI_BASE(img_array[1])->x = GUI_BASE(img_array[0])->x - img_w - 4;
+                change_flag = 1;
+                img_x2 = GUI_BASE(img_array[1])->x - offset;
+            }
+        }
+        {
+            static bool edge_flag2;
+            static bool change_flag2;
+            if (GUI_BASE(img_array[1])->x < 10 && GUI_BASE(img_array[1])->x >= -10)
+            {
+                edge_flag2 = 1;
+            }
+            else
+            {
+                edge_flag2 = 0;
+                change_flag2 = 0;
+            }
+            if (edge_flag2 && !change_flag2)
+            {
+                GUI_BASE(img_array[0])->x = GUI_BASE(img_array[1])->x - img_w - 4;
+                change_flag2 = 1;
+                img_x1 = GUI_BASE(img_array[0])->x - offset;
+            }
+        }
+
+        {
+            static bool edge_flag3;
+            static bool change_flag3;
+            if (GUI_BASE(img_array[1])->x + img_w < 10 + screen_w &&
+                GUI_BASE(img_array[1])->x + img_w >= -10 + screen_w)
+            {
+                edge_flag3 = 1;
+            }
+            else
+            {
+                edge_flag3 = 0;
+                change_flag3 = 0;
+            }
+            if (edge_flag3 && !change_flag3)
+            {
+                GUI_BASE(img_array[0])->x = GUI_BASE(img_array[1])->x + img_w + 4;
+                change_flag3 = 1;
+                img_x1 = GUI_BASE(img_array[0])->x - offset;
+            }
+        }
+        {
+            static bool edge_flag4;
+            static bool change_flag4;
+            if (GUI_BASE(img_array[0])->x + img_w < 10 + screen_w &&
+                GUI_BASE(img_array[0])->x + img_w >= -10 + screen_w)
+            {
+                edge_flag4 = 1;
+            }
+            else
+            {
+                edge_flag4 = 0;
+                change_flag4 = 0;
+            }
+            if (edge_flag4 && !change_flag4)
+            {
+                GUI_BASE(img_array[1])->x = GUI_BASE(img_array[0])->x + img_w + 4;
+                change_flag4 = 1;
+                img_x2 = GUI_BASE(img_array[1])->x - offset;
+            }
+        }
+        gui_log("%d,%d\n", GUI_BASE(img_array[0])->x, GUI_BASE(img_array[1])->x);
+    }
+
+
+
+
+}
+GUI_APP_ENTRY(APP_COMPASS)
+{
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
+
+    gui_img_t *img = gui_img_create_from_mem(win, 0, TICKMARK_BIN, 200, 200, 0, 0);
+    int img_w = gui_img_get_width(img);
+    gui_img_t *img2 = gui_img_create_from_mem(win, 0, TICKMARK_BIN, -img_w + 200 - 4, 200, 0, 0);
+    gui_img_t *img3 = gui_img_create_from_mem(win, 0, HAND_BIN, gui_get_screen_width() / 2 - 39 / 2,
+                                              260, 0, 0);
+    gui_img_set_mode(img3, IMG_SRC_OVER_MODE);
+    static gui_img_t *img_array[4];
+    img_array[0] = img;
+    img_array[1] = img2;
+    gui_win_set_animate(win, 1000, -1, compass_win_cb, img_array);
+    {
+        char *text = "0";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, "compass text", 0, 180, gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1);
+        gui_text_mode_set(t, CENTER);
+        img_array[2] = (void *)t;
+
+    }
+    {
+        char *text = "N";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, "direction text", 0, 160,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgba(0xff, 0x66, 0x00, 0xff), strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1);
+        gui_text_mode_set(t, CENTER);
+        img_array[3] = (void *)t;
+
+    }
+}
 
 
 
