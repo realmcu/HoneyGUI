@@ -467,6 +467,11 @@ static gui_switch_t *gui_switch_create_core(void                 *parent,
     {
         this->switch_picture = (void *)gui_img_create_from_mem(this, "switch_picture", off_pic, 0, 0, 0, 0);
     }
+    else if (src_mode == IMG_SRC_FTL)
+    {
+        this->switch_picture = (void *)gui_img_create_from_ftl(this, "switch_picture", off_pic, 0, 0, 0, 0);
+    }
+
 
     ((gui_obj_t *)this)->create_done = 1;
 
@@ -493,6 +498,17 @@ gui_switch_t *gui_switch_create_from_fs(void    *parent,
                                         void    *on_pic)
 {
     return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, IMG_SRC_FILESYS);
+}
+
+gui_switch_t *gui_switch_create_from_ftl(void    *parent,
+                                         int16_t  x,
+                                         int16_t  y,
+                                         int16_t  w,
+                                         int16_t  h,
+                                         void    *off_pic,
+                                         void    *on_pic)
+{
+    return gui_switch_create_core(parent, x, y, w, h, off_pic, on_pic, IMG_SRC_FTL);
 }
 _GUI_API_ASSIGN(gui_switch_t)
 .ctor = gui_switch_ctor,
