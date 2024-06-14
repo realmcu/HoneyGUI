@@ -274,6 +274,10 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 #define   BARS1_BIN                               (void *)(resource_root + 0x00bda438)
 #define   BARS2_BIN                               (void *)(resource_root + 0x00bdc3b8)
 #define   BARS3_BIN                               (void *)(resource_root + 0x00bde338)
+#define   VOLUME_BIN                              (void *)(resource_root + 0x00be02f8)
+#define   VOLUME2_BIN                             (void *)(resource_root + 0x00be2c38)
+#define   VOLUMEBACK_BIN                          (void *)(resource_root + 0x00be3278)
+#define   VOLUMEBACK2_BIN                         (void *)(resource_root + 0x00be5ab8)
 
 #else
 #define   A1_BIN                                  (void *)(0x04400ab8)
@@ -549,5 +553,9 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 #define   BARS1_BIN                               (void *)(0x04fda438)
 #define   BARS2_BIN                               (void *)(0x04fdc3b8)
 #define   BARS3_BIN                               (void *)(0x04fde338)
+#define   VOLUME_BIN                              (void *)(0x04fe02f8)
+#define   VOLUME2_BIN                             (void *)(0x04fe2c38)
+#define   VOLUMEBACK_BIN                          (void *)(0x04fe3278)
+#define   VOLUMEBACK2_BIN                         (void *)(0x04fe5ab8)
 
 #endif

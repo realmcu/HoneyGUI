@@ -30,6 +30,7 @@ static void map_cb(void);
 static void card_cb(void);
 static void box2d_cb(void);
 static void compass_cb(void);
+static void volume_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -110,7 +111,7 @@ void design_tab_menu(void *parent)
         "CARD",
         "box2d",
         "Compass",
-        "Watch Face",
+        "Volume",
         "Calculator",
         "Sport",
         "Watch Face",
@@ -139,7 +140,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 7)
+        if (i < 8)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -156,7 +157,8 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[3], map_cb,          button_array[3]);
     gui_win_click(button_array[4], card_cb,         button_array[4]);
     gui_win_click(button_array[5], box2d_cb,        button_array[5]);
-    gui_win_click(button_array[6], compass_cb,        button_array[5]);
+    gui_win_click(button_array[6], compass_cb,      button_array[6]);
+    gui_win_click(button_array[7], volume_cb,       button_array[7]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -356,6 +358,10 @@ static void box2d_cb()
 static void compass_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_COMPASS))
+}
+static void volume_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_VOLUME))
 }
 // static void calculator_cb()
 // {

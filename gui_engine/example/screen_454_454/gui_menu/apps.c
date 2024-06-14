@@ -23,6 +23,7 @@
 #define APP_BOX2D
 #define APP_COMPASS
 #define APP_SETTING
+#define APP_VOLUME
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
@@ -34,6 +35,7 @@ GUI_APP_DEFINE_NAME(APP_MAP)
 GUI_APP_DEFINE_NAME(APP_CARDVIEW)
 GUI_APP_DEFINE_NAME(APP_COMPASS)
 GUI_APP_DEFINE_NAME(APP_SETTING)
+GUI_APP_DEFINE_NAME(APP_VOLUME)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -977,7 +979,132 @@ GUI_APP_ENTRY(APP_COMPASS)
 
     }
 }
+static void volume_cb(gui_img_t *volume, gui_win_t *win)
+{
+    GUI_TOUCHPAD_IMPORT_AS_TP
+    static bool hold;
+    int img_w = gui_img_get_width(volume);
+    int img_h = gui_img_get_height(volume);
+    int win_x = GUI_BASE(win)->x;
+    int win_y = GUI_BASE(win)->y;
+    static int scope_top;
+    static float per;
+    if (tp->pressed && (tp->x >= win_x && tp->x <= win_x + img_w) && (tp->y > win_y &&
+                                                                      tp->y < win_y + img_h))
+    {
+        hold = 1;
+        scope_top = volume->scope_y1;
+    }
+    else if (tp->released)
+    {
+        hold = 0;
 
+    }
+    if (hold)
+    {
+        int scope_x2 = scope_top + tp->deltaY;
+        if (scope_x2 < 0)
+        {
+            scope_x2 = 0;
+        }
+        if (scope_x2 > img_h)
+        {
+            scope_x2 = img_h;
+        }
+        volume->scope_y1 = scope_x2;
+        gui_log("percentage:%f\n", per);
+    }
+    per = ((float)(img_h - volume->scope_y1)) / ((float)img_h);
+}
+static void volume2_cb(gui_img_t *volume, gui_win_t *win)
+{
+    GUI_TOUCHPAD_IMPORT_AS_TP
+    static bool hold;
+    int img_w = gui_img_get_width(volume);
+    int img_h = gui_img_get_height(volume);
+    int win_x = GUI_BASE(win)->x;
+    int win_y = GUI_BASE(win)->y;
+    static int scope_top;
+    static float per;
+    if (tp->pressed && (tp->x >= win_x && tp->x <= win_x + img_w) && (tp->y > win_y &&
+                                                                      tp->y < win_y + img_h))
+    {
+        hold = 1;
+        scope_top = volume->scope_x2;
+    }
+    else if (tp->released)
+    {
+        hold = 0;
+    }
+    if (hold)
+    {
+        int scope_x2 = scope_top + tp->deltaX;
+        if (scope_x2 < 0)
+        {
+            scope_x2 = 0;
+        }
+        if (scope_x2 > img_w)
+        {
+            scope_x2 = img_w;
+        }
+        volume->scope_x2 = scope_x2;
+        gui_log("percentage:%f\n", per);
+    }
+    per = ((float)(volume->scope_x2)) / ((float)img_w);
+    gui_text_t *t = 0;
+    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "volume text", (void *)&t);
+    if (t)
+    {
+        static char text[sizeof("VOLUME:100.00%")];
+        sprintf(text, "VOLUME:%.2f%", per);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, t->color, strlen(text), t->font_height);
+    }
+
+}
+GUI_APP_ENTRY(APP_VOLUME)
+{
+    {
+        //bar 1
+        gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 100, 20, SCREEN_W, SCREEN_H);
+        gui_img_t *back = gui_img_create_from_mem(win, 0, VOLUMEBACK_BIN, 0, 0, 0, 0);
+        gui_img_t *volume = gui_img_create_from_mem(win, 0, VOLUME_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(back, IMG_SRC_OVER_MODE);
+        gui_img_set_mode(volume, IMG_SRC_OVER_MODE);
+        gui_win_set_animate(win, 1000, -1, volume_cb, volume);
+        volume->scope_flag = 1;
+        volume->scope_y1 = 200;
+    }
+    {
+        //bar 2
+        gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 240, 200, SCREEN_W, SCREEN_H);
+        gui_img_t *back = gui_img_create_from_mem(win, 0, VOLUMEBACK2_BIN, 0, 0, 0, 0);
+        gui_img_t *volume = gui_img_create_from_mem(win, 0, VOLUME2_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(back, IMG_SRC_OVER_MODE);
+        gui_img_set_mode(volume, IMG_SRC_OVER_MODE);
+        gui_win_set_animate(win, 1000, -1, volume2_cb, volume);
+        volume->scope_flag = 1;
+        volume->scope_x2 = 100;
+        {
+            //percentage text
+            char *text = "VOLUME:100%";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, "volume text", 0, -20,
+                                            gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1);
+            gui_text_mode_set(t, LEFT);
+        }
+    }
+
+    {
+        //status_bar&return handle
+        status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
+        gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                          sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+    }
+}
 
 
 

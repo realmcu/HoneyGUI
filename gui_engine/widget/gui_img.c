@@ -376,7 +376,7 @@ static void gui_img_draw_cb(gui_obj_t *obj)
 
     draw_img_cache(this->draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode);
 
-    if (this->scope)
+    if (this->scope || this->scope_flag)
     {
         gui_rect_t rect =
         {
