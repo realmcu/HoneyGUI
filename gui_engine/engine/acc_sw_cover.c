@@ -37,7 +37,6 @@ void cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
     int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
     gui_matrix_t *inverse = &image->inverse;
 
     for (uint32_t i = y_start; i <= y_end; i++)
