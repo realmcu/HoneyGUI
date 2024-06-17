@@ -25,6 +25,7 @@
 #include "acc_init.h"
 #include "gui_matrix.h"
 #include "gui_perspective.h"
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -94,7 +95,7 @@
   * @retval ...
   */
 
-static void gui_perspective_scale_3d(Vertex_t *vertex, float scale)
+static void gui_perspective_scale_3d(gui_vertex_t *vertex, float scale)
 {
     vertex->x *= scale;
     vertex->y *= scale;
@@ -125,8 +126,8 @@ static bool gui_perspective_point_in_rect(draw_img_t *img, int16_t x, int16_t y)
 static void gui_perspective_prepare(gui_obj_t *obj)
 {
     struct gui_matrix rotate_3D;
-    Vertex_t rv0, rv1, rv2, rv3;
-    Vertex_t tv0, tv1, tv2, tv3;
+    gui_vertex_t rv0, rv1, rv2, rv3;
+    gui_vertex_t tv0, tv1, tv2, tv3;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
 
@@ -135,10 +136,10 @@ static void gui_perspective_prepare(gui_obj_t *obj)
     float h = 300;
     float d = w * fix_sin(60);
 
-    Vertex_t v0 = {-w / 2 + 10, -h / 2, d};
-    Vertex_t v1 = {w  / 2 - 10, -h / 2, d};
-    Vertex_t v2 = {w  / 2 - 10, h  / 2, d};
-    Vertex_t v3 = {-w / 2 + 10, h  / 2, d};
+    gui_vertex_t v0 = {-w / 2 + 10, -h / 2, d};
+    gui_vertex_t v1 = {w  / 2 - 10, -h / 2, d};
+    gui_vertex_t v2 = {w  / 2 - 10, h  / 2, d};
+    gui_vertex_t v3 = {-w / 2 + 10, h  / 2, d};
 
     float xoff, yoff, zoff, t;
     uint8_t last;
@@ -221,7 +222,7 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         matrix_transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
         matrix_transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
 
-        Vertex_t p = {(float)(dc->screen_width) / 2, 0, 2 * d};
+        gui_vertex_t p = {(float)(dc->screen_width) / 2, 0, 2 * d};
         matrix_transfrom_blit(this->img[i].img_w, this->img[i].img_h, &p, &rv0, &rv1, &rv2, &rv3,
                               &this->img[i].matrix);
 

@@ -281,7 +281,7 @@ int output_func(JDEC *jd, void *bitmap, JRECT *rect, gui_obj_t *obj)
 static void gui_img_tjpgd_image_prepare(gui_obj_t *obj)
 {
     gui_stb_img_t *this = (gui_stb_img_t *)obj;
-    gui_point_t point = {0, 0, 1};
+    gui_point3f_t point = {0, 0, 1};
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];

@@ -29,7 +29,7 @@ extern "C" {
  *============================================================================*/
 #include <guidef.h>
 #include <gui_fb.h>
-
+#include "gui_obj.h"
 /** @defgroup APP APP
   * @brief
   * @{

@@ -1,0 +1,13 @@
+# RT-Thread building script for GuiEngine demo
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Split("""
+""")
+
+CPPPATH = [cwd]
+
+group = DefineGroup('', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+
+Return('group')

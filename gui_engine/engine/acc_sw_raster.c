@@ -254,7 +254,7 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
     gui_img_file_t *file = (gui_img_file_t *)image->data;
     gui_rgb_data_head_t *head = image->data;
     char input_type = head->type;
-    imdc_file_t *compressed = (imdc_file_t *)(&(file->data.idc_file));
+    imdc_file_t *compressed = (imdc_file_t *)(&(file->data.imdc_file));
     uint32_t line = (uint32_t)(uintptr_t)compressed + compressed->compressed_addr[y];
     int location = 0;
     if (input_type == RGB565)

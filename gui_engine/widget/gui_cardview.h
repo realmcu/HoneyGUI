@@ -31,6 +31,8 @@ extern "C" {
  *============================================================================*/
 #include "guidef.h"
 #include "gui_api.h"
+#include "gui_tabview.h"
+
 
 /** @defgroup WIDGET WIDGET
   * @brief

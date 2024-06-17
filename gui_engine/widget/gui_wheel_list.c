@@ -18,7 +18,7 @@
  *                        Header Files
  *============================================================================*/
 #include <gui_wheel_list.h>
-#include "gui_list.h"
+#include "def_list.h"
 #include "tp_algo.h"
 #include "gui_img.h"
 #include "gui_canvas.h"

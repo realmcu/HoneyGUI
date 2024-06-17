@@ -354,7 +354,7 @@ static void gui_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
     touch_info_t *tp = tp_get_info();
-    gui_point_t point = {0, 0, 1};
+    gui_point3f_t point = {0, 0, 1};
     uint8_t last;
     if (this->font_type == GUI_FONT_SRC_IMG)
     {

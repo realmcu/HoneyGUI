@@ -346,7 +346,7 @@ void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *w,
                       int16_t   *h)
 {
-    gui_point_t p[4] =
+    gui_point3f_t p[4] =
     {
         {0, 0, 1},
         {obj->w - 1, 0, 1},
@@ -367,7 +367,7 @@ void gui_obj_get_area(gui_obj_t *obj,
 
     for (uint8_t i = 1; i < 3; i++)
     {
-        gui_point_t *point = p + i;
+        gui_point3f_t *point = p + i;
 
         if (point->p[0] < x_min)
         {

@@ -32,6 +32,7 @@ extern "C" {
 #include <gui_api.h>
 #include <draw_img.h>
 #include <gui_matrix.h>
+#include "gui_obj.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief

@@ -29,7 +29,6 @@ extern "C" {
  *                        Header Files
  *============================================================================*/
 #include "guidef.h"
-#include "gui_fb.h"
 #include "gui_tabview.h"
 #include "gui_matrix.h"
 
@@ -73,7 +72,7 @@ typedef struct
     gui_obj_t base;             //!< base structure
     gui_tab_id_t id;
     T_SLIDE_STYLE style;
-    Normal_t normal;
+    gui_vertex_t normal;
     gui_obj_t *shot_obj; // shot
     gui_obj_t *rte_obj; //run time envriment
 } gui_tab_t;

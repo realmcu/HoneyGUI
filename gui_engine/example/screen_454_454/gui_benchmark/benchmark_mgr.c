@@ -1,6 +1,6 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
-#include "gui_event.h"
+#include "def_event.h"
 #include "benchmark_mgr.h"
 
 gui_tabview_t *tabview_benchmark_mgr = NULL;

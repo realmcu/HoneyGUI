@@ -144,7 +144,7 @@ static bool Gauss(float A[][9], int equ, int var, float *answer)   //epu:A's row
     return true;
 }
 
-static bool getPerspectiveTransform(Point2f_t *src, Point2f_t *dst, float *ret)
+static bool getPerspectiveTransform(gui_point2f_t *src, gui_point2f_t *dst, float *ret)
 {
     float x0 = src[0].x, x1 = src[1].x, x2 = src[3].x, x3 = src[2].x;
     float y0 = src[0].y, y1 = src[1].y, y2 = src[3].y, y3 = src[2].y;
@@ -174,8 +174,9 @@ static bool getPerspectiveTransform(Point2f_t *src, Point2f_t *dst, float *ret)
 // h means image height, use w and h can get four point in XY plane
 
 // p means the perspective point,  use this parameter can get four point in XY plane
-void matrix_transfrom_blit(float w, float h, Vertex_t *p, Vertex_t *v0, Vertex_t *v1, Vertex_t *v2,
-                           Vertex_t *v3, struct gui_matrix *matrix)
+void matrix_transfrom_blit(float w, float h, gui_vertex_t *p, gui_vertex_t *v0, gui_vertex_t *v1,
+                           gui_vertex_t *v2,
+                           gui_vertex_t *v3, struct gui_matrix *matrix)
 {
     // Compute 3x3 image transform matrix to map a rectangle image (w,h) to
     // a parallelogram (x0,y0), (x1,y1), (x2,y2), (x3,y3) counterclock wise.
@@ -190,8 +191,8 @@ void matrix_transfrom_blit(float w, float h, Vertex_t *p, Vertex_t *v0, Vertex_t
     float y3 = p->y - (p->y - v3->y) * p->z / (p->z - v3->z);
 
 
-    Point2f_t src[4] = {{0, 0}, {w, 0}, {w, h}, {0, h}};
-    Point2f_t dst[4] = {{x0, y0}, {x1, y1}, {x2, y2}, {x3, y3}};
+    gui_point2f_t src[4] = {{0, 0}, {w, 0}, {w, h}, {0, h}};
+    gui_point2f_t dst[4] = {{x0, y0}, {x1, y1}, {x2, y2}, {x3, y3}};
     v0->x = x0;
     v1->x = x1;
     v2->x = x2;
@@ -248,9 +249,10 @@ void matrix_identity(struct gui_matrix *matrix)
     matrix->m[2][2] = 1.0f;
 }
 #if 0
-void matrix_multiply_normal(struct gui_matrix *matrix, Normal_t *normal)
+void matrix_multiply_normal(struct gui_matrix *matrix,
+                            gui_vertex_t *normal)
 {
-    Normal_t temp;
+    gui_vertex_t temp;
 
     /* Process all rows. */
 
@@ -286,9 +288,9 @@ void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
 
 }
 
-void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point *pox)
+void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point3f_t *pox)
 {
-    struct gui_point temp;
+    struct gui_point3f_t temp;
     int row;
 
     /* Process all rows. */
@@ -365,9 +367,9 @@ void matrix_compute_rotate(float rx, float ry, float rz, struct gui_matrix *rota
 #endif
 }
 #else
-void matrix_multiply_normal(struct gui_matrix *matrix, Normal_t *normal)
+void matrix_multiply_normal(struct gui_matrix *matrix, gui_vertex_t *normal)
 {
-    //Normal_t temp;
+    //gui_vertex_t temp;
 
     float m00, m01, m02, m10, m11, m12, m20, m21, m22, x, y, z;
     m00 = matrix->m[0][0];
@@ -435,9 +437,9 @@ void matrix_multiply(struct gui_matrix *matrix, struct gui_matrix *mult)
     matrix->m[2][1] = (m20 * t01) + (m21 * t11) + (m22 * t21);
     matrix->m[2][2] = (m20 * t02) + (m21 * t12) + (m22 * t22);
 }
-void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point *pox)
+void matrix_multiply_point(struct gui_matrix *matrix, struct gui_point3f *pox)
 {
-    //struct gui_point temp;
+    //struct gui_point3f_t temp;
     //int row;
     float m_row0, m_row1, m_row2;
 
@@ -619,7 +621,8 @@ void matrix_perspective(float px, float py, struct gui_matrix *matrix)
 }
 
 
-void matrix_transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc, float tx,
+void matrix_transfrom_rotate(struct gui_matrix *rotate, gui_vertex_t *vertex, gui_vertex_t *rc,
+                             float tx,
                              float ty, float tz)
 {
     // Compute the new cube vertex coordinates transformed by the rotation matrix.
@@ -804,7 +807,7 @@ void matrix_func_test(void)
     }
     gui_free(matrix);
 #elif 0//matrix_multiply_normal test
-    Normal_t *normal_matrix = gui_malloc(sizeof(Normal_t));
+    gui_vertex_t *normal_matrix = gui_malloc(sizeof(gui_vertex_t));
     {
         matrix.m[0][0] = 1.0f;
         matrix.m[0][1] = 2.0f;
@@ -841,7 +844,7 @@ void matrix_func_test(void)
         DBG_DIRECT("<====");
     }
     {
-        void matrix_multiply_normal_new(struct gui_matrix * matrix, Normal_t *normal);
+        void matrix_multiply_normal_new(struct gui_matrix * matrix, gui_vertex_t *normal);
         matrix.m[0][0] = 1.0f;
         matrix.m[0][1] = 2.0f;
         matrix.m[0][2] = 3.0f;
@@ -944,7 +947,7 @@ void matrix_func_test(void)
     //gui_free(matrix);
 #elif 1 // matrix_multiply_point test
     struct gui_matrix *matrix = gui_malloc(sizeof(struct gui_matrix));
-    struct gui_point *pox = gui_malloc(sizeof(struct gui_point));
+    struct gui_point3f_t *pox = gui_malloc(sizeof(struct gui_point3f_t));
     {
 
         matrix->m[0][0] = 1.0f;

@@ -23,6 +23,7 @@
 #include "acc_init.h"
 #include "tp_algo.h"
 #include "gui_simple_img.h"
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @{

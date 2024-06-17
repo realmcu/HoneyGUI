@@ -83,7 +83,7 @@
 
 static void gui_qbcode_prepare(gui_obj_t *obj)
 {
-    gui_point_t point = {0, 0, 1};
+    gui_point3f_t point = {0, 0, 1};
     gui_qbcode_t *this = (void *)obj;
 
     matrix_multiply_point(obj->matrix, &point);

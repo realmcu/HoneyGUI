@@ -26,6 +26,7 @@
 #include "gui_cube.h"
 #include "tp_algo.h"
 #include <math.h>
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -80,7 +81,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
-static void gui_cube_scale(Vertex_t *vertex, float scale)
+static void gui_cube_scale(gui_vertex_t *vertex, float scale)
 {
     // Scale cube vertex coordinates to proper size.
     vertex->x *= scale;
@@ -103,7 +104,8 @@ static void gui_cube_compute_rotate(float rx, float ry, float rz, struct gui_mat
     rotate->m[2][2] = cos(RAD(ry)) * cos(RAD(rx));
 }
 
-static void gui_cube_transfrom_rotate(struct gui_matrix *rotate, Vertex_t *vertex, Vertex_t *rc,
+static void gui_cube_transfrom_rotate(struct gui_matrix *rotate, gui_vertex_t *vertex,
+                                      gui_vertex_t *rc,
                                       float tx,
                                       float ty)
 {
@@ -117,7 +119,7 @@ static void gui_cube_transfrom_rotate(struct gui_matrix *rotate, Vertex_t *verte
     rc->y += ty;
 }
 
-static void gui_cube_transfrom_normalZ(struct gui_matrix *rotate, Normal_t *nVec, float *nZ)
+static void gui_cube_transfrom_normalZ(struct gui_matrix *rotate, gui_vertex_t *nVec, float *nZ)
 {
     // Compute the new normal Z coordinate transformed by the rotation matrix.
     *nZ = rotate->m[2][0] * nVec->x + rotate->m[2][1] * nVec->y + rotate->m[2][2] * nVec->z;
@@ -139,10 +141,10 @@ static void gui_cube_transfrom_normalZ(struct gui_matrix *rotate, Normal_t *nVec
 //
 static void gui_cube_transfrom_blit(float              w,
                                     float              h,
-                                    Vertex_t          *v0,
-                                    Vertex_t          *v1,
-                                    Vertex_t          *v2,
-                                    Vertex_t          *v3,
+                                    gui_vertex_t          *v0,
+                                    gui_vertex_t          *v1,
+                                    gui_vertex_t          *v2,
+                                    gui_vertex_t          *v3,
                                     struct gui_matrix *matrix)
 {
     float sx, sy, shx, shy, tx, ty;
@@ -212,21 +214,21 @@ static void gui_cube_prepare(gui_obj_t *obj)
 {
     struct gui_matrix rotate_3D;
     struct gui_matrix matrix;
-    Vertex_t rv0, rv1, rv2, rv3, rv4, rv5, rv6, rv7;
-    Vertex_t cube_v0 = {-1.0, -1.0, -1.0};
-    Vertex_t cube_v1 = {1.0, -1.0, -1.0};
-    Vertex_t cube_v2 = {1.0, 1.0, -1.0};
-    Vertex_t cube_v3 = {-1.0, 1.0, -1.0};
-    Vertex_t cube_v4 = {-1.0, -1.0, 1.0};
-    Vertex_t cube_v5 = {1.0, -1.0, 1.0};
-    Vertex_t cube_v6 = {1.0, 1.0, 1.0};
-    Vertex_t cube_v7 = {-1.0, 1.0, 1.0};
-    Normal_t normal0321 = {0.0, 0.0, -1.0};
-    Normal_t normal4567 = {0.0, 0.0, 1.0};
-    Normal_t normal1265 = {1.0, 0.0, 0.0};
-    Normal_t normal0473 = {-1.0, 0.0, 0.0};
-    Normal_t normal2376 = {0.0, 1.0, 0.0};
-    Normal_t normal0154 = {0.0, -1.0, 0.0};
+    gui_vertex_t rv0, rv1, rv2, rv3, rv4, rv5, rv6, rv7;
+    gui_vertex_t cube_v0 = {-1.0, -1.0, -1.0};
+    gui_vertex_t cube_v1 = {1.0, -1.0, -1.0};
+    gui_vertex_t cube_v2 = {1.0, 1.0, -1.0};
+    gui_vertex_t cube_v3 = {-1.0, 1.0, -1.0};
+    gui_vertex_t cube_v4 = {-1.0, -1.0, 1.0};
+    gui_vertex_t cube_v5 = {1.0, -1.0, 1.0};
+    gui_vertex_t cube_v6 = {1.0, 1.0, 1.0};
+    gui_vertex_t cube_v7 = {-1.0, 1.0, 1.0};
+    gui_vertex_t normal0321 = {0.0, 0.0, -1.0};
+    gui_vertex_t normal4567 = {0.0, 0.0, 1.0};
+    gui_vertex_t normal1265 = {1.0, 0.0, 0.0};
+    gui_vertex_t normal0473 = {-1.0, 0.0, 0.0};
+    gui_vertex_t normal2376 = {0.0, 1.0, 0.0};
+    gui_vertex_t normal0154 = {0.0, -1.0, 0.0};
 
     gui_cube_t *this = (gui_cube_t *)obj;
     gui_dispdev_t *dc = gui_get_dc();
