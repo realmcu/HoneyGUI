@@ -1,0 +1,34 @@
+# for module compiling
+import os
+Import('PLATFORM')
+from building import *
+
+objs = []
+cwd  = GetCurrentDir()
+list = os.listdir(cwd)
+
+
+if GetDepend(['CONFIG_REALTEK_BUILD_ARM_2D']):
+    CPPDEFINES = ['ENABLE_AMR_2D']
+    src = Split("""""")
+    src += Glob(cwd + '/Arm-2D/Library/Source/*.c')
+    src += Glob(cwd + '/Arm-2D/Helper/Source/*.c')
+    if PLATFORM == 'gcc':
+        src += Glob(cwd + '/Arm-2D/examples/[template][pc][vscode]/platform/*.c')
+        src += Glob(cwd + '/Arm-2D/examples/[template][pc][vscode]/platform/math/*.c')
+    path = [cwd + '/Arm-2D']
+    path += [cwd + '/Arm-2D/Library/Include']
+    path += [cwd + '/Arm-2D/Helper/Include']
+    if PLATFORM == 'gcc':
+        path += [cwd + '/Arm-2D/examples/[template][pc][vscode]/platform']
+        path += [cwd + '/Arm-2D/examples/[template][pc][vscode]/platform/math']
+        path += [cwd + '/Arm-2D/examples/[template][pc][vscode]/platform/math/dsp']
+    objs = DefineGroup('realgui/3rd/Arm2d', src, depend = ['CONFIG_REALTEK_BUILD_ARM_2D'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+
+
+for d in list:
+    path = os.path.join(cwd, d)
+    if os.path.isfile(os.path.join(path, 'SConscript')):
+        objs = objs + SConscript(os.path.join(d, 'SConscript'))
+
+Return('objs')

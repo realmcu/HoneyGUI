@@ -131,6 +131,10 @@
 // #define CONFIG_REALTEK_BUILD_GUI_CONTAIN
 // </c>
 
+// <c> RTK GUI Enable SasA
+//#define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
+// </c>
+
 #endif
 
 // </e>
@@ -149,9 +153,15 @@
 // </c>
 
 #endif
-// <c> RTK GUI Enable SasA
-//#define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
-// </c>
+
+// </e>
+
+// <e> HoneyGUI Enable Arm-2D
+#define CONFIG_REALTEK_BUILD_ARM_2D     0
+
+#if (CONFIG_REALTEK_BUILD_ARM_2D == 1)
+#endif
+
 // </e>
 
 
