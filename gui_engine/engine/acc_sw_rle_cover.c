@@ -24,8 +24,6 @@
 void rle_cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                              struct gui_rect *rect)
 {
-    int16_t image_x = image->img_target_x;
-    int16_t image_y = image->img_target_y;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -37,21 +35,26 @@ void rle_cover_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
         return;
     }
 
-    uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
+    uint32_t image_off = sizeof(gui_rgb_data_head_t) + (uint32_t)(uintptr_t)(image->data);
 
     imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
     uint8_t line_buf[BYTE_PIXEL_RGB565 * source_w];
+    gui_matrix_t *inverse = &image->inverse;
+
     for (uint32_t i = y_start; i <= y_end; i++)
     {
-        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
-        int line = i - image_y;
-        uncompressed_rle_rgb565(file, line, line_buf);
-        int read_off = (int)(uintptr_t)line_buf - BYTE_PIXEL_RGB565 * image_x;
+        int y = i + inverse->m[1][2];
+        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
+                        dc->section.x1;
+        uncompressed_rle_rgb565(file, y, line_buf);
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
+
         for (uint32_t j = x_start; j <= x_end; j++)
         {
-            uint16_t pixel = *((uint16_t *)(uintptr_t)read_off + j);
-            writebuf[write_off + j] = pixel;
+            int x = j + inverse->m[0][2];
+            uint16_t pixel = *((uint16_t *)(uintptr_t)line_buf + x);
+            writebuf[write_off] = pixel;
+            write_off++;
         }
     }
 

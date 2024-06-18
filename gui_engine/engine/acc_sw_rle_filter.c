@@ -72,8 +72,6 @@ static void rle_filter_rgb565_draw(imdc_file_t *file, uint32_t line,  uint16_t *
 void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                               struct gui_rect *rect)
 {
-    int16_t image_x = image->img_target_x;
-    int16_t image_y = image->img_target_y;
     int16_t x_start = 0;
     int16_t x_end = 0;
     int16_t y_start = 0;
@@ -84,14 +82,19 @@ void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     }
 
     uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(uintptr_t)(image->data);
-
     imdc_file_t *file = (imdc_file_t *)(uintptr_t)image_off;
+
+    gui_matrix_t *inverse = &image->inverse;
+    int x = x_start + inverse->m[0][2];
+
     for (uint32_t i = y_start; i <= y_end; i++)
     {
-        int line = i - image_y;
-        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) ;
+        int y = i + inverse->m[1][2];
+        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
+                        dc->section.x1;
         uint16_t *writebuf = (uint16_t *)dc->frame_buf;
-        rle_filter_rgb565_draw(file, line,  &(writebuf[write_off + x_start]), image_x, (x_end - x_start));
+        rle_filter_rgb565_draw(file, y,  &(writebuf[write_off]), -x, (x_end - x_start + 1));
+        write_off++;
     }
 
 }

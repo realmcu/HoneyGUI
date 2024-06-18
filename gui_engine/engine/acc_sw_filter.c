@@ -37,40 +37,24 @@ void filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
     uint16_t *writebuf = (uint16_t *)dc->frame_buf;
 
     int16_t source_w = image->img_w;
-    int16_t source_h = image->img_h;
     gui_matrix_t *inverse = &image->inverse;
-
-
 
     for (uint32_t i = y_start; i <= y_end; i++)
     {
+        int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + x_start -
+                        dc->section.x1;
+
+        uint16_t *image_ptr = (uint16_t *)(uintptr_t)image_base + (uint32_t)((
+                                                                                 i + inverse->m[1][2]) * source_w + x_start + inverse->m[0][2]);
+
         for (uint32_t j = x_start; j <= x_end; j++)
         {
-            int x = j + inverse->m[0][2];
-            int y = i + inverse->m[1][2];
-
-
-            if ((x >= source_w) || (x < 0) || (y < 0) || (y >= source_h))
-            {
-                continue;
-            }
-            if (rect != NULL)
-            {
-                if ((x >= rect->x2) || (x < rect->x1) || (y < rect->y1) || (y >= rect->y2))
-                {
-                    continue;
-                }
-            }
-
-            int read_off = y * source_w + x;
-            int write_off = (i - dc->section.y1) * (dc->section.x2 - dc->section.x1 + 1) + j - dc->section.x1;
-
-            uint16_t pixel = *((uint16_t *)(uintptr_t)image_base + read_off);
+            uint16_t pixel = *image_ptr++;
             if (pixel != 0)
             {
                 writebuf[write_off] = pixel;
             }
-
+            write_off++;
         }
     }
 
