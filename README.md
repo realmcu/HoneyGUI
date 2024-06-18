@@ -45,14 +45,14 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
 
 ### Startup by GUI
 
-1. Install VSCODE
+#### Install VSCODE
    - [```Install VSCODE```](https://code.visualstudio.com/)
    - [```Install C/C++```](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 
-2. Open project
+#### Open project
    - Click ```HoneyGUI.code-workspace``` file
 
-3. Run project
+#### Run project
 You can select the Run and Debug options after entering the vscode interface, and then click the `Run button`.
 
 
