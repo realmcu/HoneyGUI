@@ -6,8 +6,9 @@ Convert pictures in various formats into RGB raw pictures
 * The operation steps and detailed instructions are as follows:
 
 <br/>
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1706602071562881120/e9191194_13671125.png "></div>
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718765954611644598/e761d204_13408154.png"></div>
 <br/>
+
 
 ### Configuration
 - Color head : BeeGUI wants this head to display.
@@ -61,15 +62,14 @@ Convert pictures in various formats into RGB raw pictures
 ## Output Files
 The following files will be generated.
 <br/>
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1707029841066421625/08de60b3_13671125.png "></div>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718776957325643948/803a9ab3_13408154.png"></div>
 <br/>
 
 By using the image conversion tool, we can convert the three `JPG files a, b, and c` into three `binary files a, b, and c`.
 
 Place the `binary file` into the `root` folder of the packaging directory. For the packaging process, please refer to the "**How to packing resource**" section.
 
-<br/>
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1707029849505947540/c20a1748_13671125.png "></div>
+<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png"></div>
 <br/>
 
 

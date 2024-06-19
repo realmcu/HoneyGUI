@@ -41,11 +41,6 @@ div,p{
     text-align: justify;
     text-justify:inter-ideograph;
 }
-div:after{
-    content: "";
-    display: inline-block;
-    width: 100%;
-}
 p i{
     display: inline-block;
     /*padding-left: 100%;*/

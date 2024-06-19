@@ -32,16 +32,16 @@ typedef enum t_slide_style
 ```
 
 ### Set tabview loop
-The tabview loop function is a nifty feature that allows you to effortlessly traverse through all tabs that have been created. By enabling this function using [gui_tabview_loop(tabview, loop_or_not)](#gui_tabview_create), as indicated in Figure 3, you'll notice a blue outer box indicating the visible range of the screen. The arrow's direction signifies the direction of tab switching. When sliding left, once all tabs have shifted to the left side of the visible range, another leftward swipe will initiate cycling from the leftmost tab that was created. Conversely, Figure 4 demonstrates that when sliding right again, the display will begin cycling from the rightmost tab.
+The tabview loop function is a nifty feature that allows you to effortlessly traverse through all tabs that have been created. By enabling this function using [gui_tabview_loop(tabview, loop_or_not)](#gui_tabview_create), as indicated in Figure-2, you'll notice a blue outer box indicating the visible range of the screen. The arrow's direction signifies the direction of tab switching. When sliding left, once all tabs have shifted to the left side of the visible range, another leftward swipe will initiate cycling from the leftmost tab that was created. Conversely, Figure-3 demonstrates that when sliding right again, the display will begin cycling from the rightmost tab.
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118586546869079/2d4816ec_10641540.png" /></center>
-<center>Figure-3</center>
+<center>Figure-2</center>
 <br>
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118609354334424/c6a664b2_10641540.png" /></center>
-<center>Figure-4</center>
+<center>Figure-3</center>
 <br>
 
 ## Example

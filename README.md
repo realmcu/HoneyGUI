@@ -11,7 +11,7 @@ The GUI framework has good portability, which can run on a variety of chips and 
 ## Software Architecture
 
 
-<div align=center><img width= "600" src ="https://foruda.gitee.com/images/1698215110757026070/a3648515_10088396.png"/></div><br/>
+<div align=center><img width= "600" src ="https://foruda.gitee.com/images/1718703720072592459/5bc6a013_13408154.png"/></div><br/>
 
 
 ## Installation
@@ -40,7 +40,7 @@ Open a CMD window in the `HoneyGUI` folder, and then run the following command t
 The `scons` command to perform the build process and then execute `gui.exe` to run it.
 
 
-<div align=center><img width= "600"  src ="https://foruda.gitee.com/images/1699429582680903862/9a73ac31_13671125.png"/></div><br/>
+<div align=center><img width= "600"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
 
 
 ### Startup by GUI
