@@ -24,7 +24,7 @@ The qbcode widget is the widget used to create or display qrcode and barcode. Yo
 
 ### qrcode encode notes
 
-The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15; You can modify the version according to the document: https://www.qrcode.com/zh/about/version.html;
+The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15; You can modify the version according to the document: [https://www.qrcode.com/zh/about/version.html](https://www.qrcode.com/zh/about/version.html);
 
 ## Example
 

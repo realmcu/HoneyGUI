@@ -139,54 +139,54 @@ typedef struct gui_img
 /**
  * @brief load the image to read it's width
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @return uint16_t image's width
  */
-uint16_t gui_img_get_width(gui_img_t *this);
+uint16_t gui_img_get_width(gui_img_t *_this);
 
 /**
  * @brief load the image to read it's hight
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @return uint16_t image's height
  */
-uint16_t gui_img_get_height(gui_img_t *this);
+uint16_t gui_img_get_height(gui_img_t *_this);
 
 /**
  * @brief refresh the image size from src
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  */
-void gui_img_refresh_size(gui_img_t *this);
+void gui_img_refresh_size(gui_img_t *_this);
 
 /**
  * @brief set the image's location
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param x the x coordinate
  * @param y the y coordinate
  */
-void gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y);
+void gui_img_set_location(gui_img_t *_this, uint16_t x, uint16_t y);
 
 /**
  * @brief set the image's blend mode.
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param mode the enumeration value of the mode is BLEND_MODE_TYPE.
  *
  */
-void gui_img_set_mode(gui_img_t *this, BLEND_MODE_TYPE mode);
+void gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode);
 
 /**
  * @brief set x,y and file path
  *
- * @param this image widget
+ * @param _this image widget
  * @param name change widget name
  * @param addr change picture address
  * @param x X-axis coordinate
  * @param y Y-axis coordinate
  */
-void gui_img_set_attribute(gui_img_t  *this,
+void gui_img_set_attribute(gui_img_t  *_this,
                            const char *name,
                            void       *addr,
                            int16_t     x,
@@ -195,12 +195,12 @@ void gui_img_set_attribute(gui_img_t  *this,
 /**
  * @brief Rotate the image around the center of the circle
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param degrees clockwise rotation absolute angle
  * @param c_x The X-axis coordinates of the center of the circle
  * @param c_y The Y-axis coordinates of the center of the circle
  */
-void gui_img_rotation(gui_img_t *this,
+void gui_img_rotation(gui_img_t *_this,
                       float      degrees,
                       float      c_x,
                       float      c_y);
@@ -208,44 +208,44 @@ void gui_img_rotation(gui_img_t *this,
 /**
  * @brief Change the size of the image, take (0, 0) as the zoom center
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param scale_x Scale in the x direction
  * @param scale_y Scale in the y direction
  */
-void gui_img_scale(gui_img_t *this, float scale_x, float scale_y);
+void gui_img_scale(gui_img_t *_this, float scale_x, float scale_y);
 
 /**
  * @brief move image
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param t_x New X-axis coordinate
  * @param t_y New Y-axis coordinate
  */
-void gui_img_translate(gui_img_t *this, float t_x, float t_y);
+void gui_img_translate(gui_img_t *_this, float t_x, float t_y);
 
 /**
  * @brief skew image on X-axis
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param degrees skew angle
  */
-void gui_img_skew_x(gui_img_t *this, float degrees);
+void gui_img_skew_x(gui_img_t *_this, float degrees);
 
 /**
  * @brief skew image on Y-axis
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param degrees skew angle
  */
-void gui_img_skew_y(gui_img_t *this, float degrees);
+void gui_img_skew_y(gui_img_t *_this, float degrees);
 
 /**
  * @brief Add opacity value to the image
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param opacity_value The opacity value ranges from 0 to 255, default 255.
  */
-void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value);
+void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value);
 
 /**
  * @brief creat an image widget from memory address
@@ -309,13 +309,13 @@ gui_img_t *gui_img_create_from_fs(void       *parent,
 /**
  * @brief
  *
- * @param this
+ * @param _this
  * @param dur
  * @param repeat_count
  * @param callback
  * @param p
  */
-void gui_img_set_animate(gui_img_t *this,
+void gui_img_set_animate(gui_img_t *_this,
                          uint32_t   dur,
                          int        repeat_count,
                          void      *callback,
@@ -324,11 +324,11 @@ void gui_img_set_animate(gui_img_t *this,
 /**
  * @brief set the image's quality.
  *
- * @param this the image widget pointer.
+ * @param _this the image widget pointer.
  * @param high_quality image drawn in high quality or not.
  *
  */
-void gui_img_set_quality(gui_img_t *this, bool high_quality);
+void gui_img_set_quality(gui_img_t *_this, bool high_quality);
 
 /**
  * @brief

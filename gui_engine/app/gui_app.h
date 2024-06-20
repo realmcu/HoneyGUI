@@ -52,9 +52,9 @@ struct gui_app
     uint32_t active_ms;             //!< screen shut dowm delay
     uint32_t start_ms;             //!< screen shut dowm delay
     void *thread_id;                //!< thread handle(optional)
-    void (* thread_entry)(void *this); //!< thread entry
-    void (* ctor)(void *this);      //!< constructor
-    void (* dtor)(void *this);      //!< destructor
+    void (* thread_entry)(void *_this); //!< thread entry
+    void (* ctor)(void *_this);      //!< constructor
+    void (* dtor)(void *_this);      //!< destructor
     void (* ui_design)(gui_app_t *); //!< ui create entry
     bool lvgl;
     bool close;
@@ -114,14 +114,14 @@ struct gui_app
     gui_switch_app(HANDLE_FUNC, HANDLE_NEXT_FUNC);
 #define GUI_APP_DEFINE_NAME(APP_NAME)\
     \
-    static void APP_NAME##_ui_design(gui_app_t*);\
+    static void _##APP_NAME##_ui_design(gui_app_t*);\
     static gui_app_t _app_##APP_NAME =\
                                       {\
                                        .screen =\
                                                 {\
                                                  .name = #APP_NAME,\
                                                 },\
-                                       .ui_design = APP_NAME##_ui_design,\
+                                       .ui_design = _##APP_NAME##_ui_design,\
                                        .active_ms = 1000000,\
                                       };\
     \
@@ -129,7 +129,7 @@ struct gui_app
     {\
         return &_app_##APP_NAME;\
     }
-#define GUI_APP_ENTRY(APP_NAME) static void APP_NAME##_ui_design(gui_app_t* app)
+#define GUI_APP_ENTRY(APP_NAME) static void _##APP_NAME##_ui_design(gui_app_t* app)
 /** End of APP_Exported_Macros
   * @}
   */

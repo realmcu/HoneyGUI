@@ -123,8 +123,8 @@ static void set_arc_w_and_h(gui_rgb_data_head_t *head, uint16_t w, uint16_t h, g
     head->h = h;
 }
 
-static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, uint16_t x,
-                         uint16_t y, uint16_t w, uint16_t h)
+static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, int16_t x,
+                         int16_t y, uint16_t w, uint16_t h)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = NULL;
@@ -152,38 +152,39 @@ static void set_rect_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, 
 static void prepare_arc_img(gui_canvas_round_rect_t *this)
 {
     uint32_t *data = (uint32_t *)(this->circle_data + sizeof(gui_rgb_data_head_t));
+    uint16_t img_w = this->r + 1;
     float boundary[this->r];
     memset(boundary, 0, this->r * sizeof(float));
-    for (int i = 0; i < this->r; i++)
+    for (int i = 1; i <= this->r; i++)
     {
-        float y = i + 0.5 - this->r;
-        boundary[i] = this->r - sqrtf(this->r * this->r - y * y);
-
+        float y = i - 0.5 - this->r;
+        boundary[i - 1] = this->r - sqrtf(this->r * this->r - y * y);
     }
-    for (int i = 0; i < this->r; i++)
+    for (int i = 1; i <= this->r; i++)
     {
-        uint16_t right = (int)boundary[i];
-        uint32_t offset = this->r * i;
-        if (right < this->r - 1)
+        int k = i - 1;
+        uint16_t right = (int)boundary[k];
+        uint32_t offset = img_w * i;
+        if (right < img_w)
         {
-            for (int j = right + 1; j < this->r; j++)
+            for (int j = right + 2; j < img_w; j++)
             {
                 data[offset + j] = this->color.color.argb_full;
             }
         }
-        float portion = ceil(boundary[i]) - boundary[i];
+        float portion = ceil(boundary[k]) - boundary[k];
         gui_color_t color = this->color;
         color.color.rgba.a = round(portion * color.color.rgba.a);
-        data[offset + right] = color.color.argb_full;
-        if (i > this->r / 2 - 1)
+        data[offset + right + 1] = color.color.argb_full;
+        if (k > this->r / 2 - 1)
         {
-            data[right * this->r + i] = color.color.argb_full;
+            data[(right + 1) * img_w + k] = color.color.argb_full;
         }
     }
 }
 
-static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, uint16_t x,
-                        uint16_t y, float degree)
+static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, int16_t x,
+                        int16_t y, float degree)
 {
     gui_obj_t *obj = (gui_obj_t *)this;
     draw_img_t *img = NULL;
@@ -191,14 +192,15 @@ static void set_arc_img(gui_canvas_round_rect_t *this, draw_img_t **input_img, u
     memset(img, 0x00, sizeof(draw_img_t));
 
     img->data = this->circle_data;
+    img->high_quality = 1;
     img->blend_mode = IMG_SRC_OVER_MODE;
     img->opacity_value = UINT8_MAX;
     memcpy(&img->matrix, obj->matrix, sizeof(struct gui_matrix));
     matrix_translate(x, y, &img->matrix);
 
-    matrix_translate(this->r, this->r, &img->matrix);
+    matrix_translate(this->r + 1, this->r + 1, &img->matrix);
     matrix_rotate(degree, &img->matrix);
-    matrix_translate(-this->r, -this->r, &img->matrix);
+    matrix_translate(-this->r - 1, -this->r - 1, &img->matrix);
     memcpy(&img->inverse, &img->matrix, sizeof(struct gui_matrix));
 
     matrix_inverse(&img->inverse);
@@ -243,23 +245,24 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
                  this->base.h - this->r - 1,
                  this->base.w - 2 * this->r + 2, \
                  this->r + 1);
-
     if (this->use_external_picture == false)
     {
-        this->circle_data = gui_malloc(this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
-        memset(this->circle_data, 0x00, this->r * this->r * 4 + sizeof(gui_rgb_data_head_t));
+        this->circle_data = gui_malloc((this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
+        memset(this->circle_data, 0x00, (this->r + 1) * (this->r + 1) * 4 + sizeof(gui_rgb_data_head_t));
 
         prepare_arc_img(this);
         gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)this->circle_data;
 
-        set_arc_w_and_h(head, this->r, this->r, this->color);
+        set_arc_w_and_h(head, this->r + 1, this->r + 1, this->color);
 
     }
-    set_arc_img(this, &this->circle_00, 0, 0, 0);
-    set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 1, 0, 90);
-    set_arc_img(this, &this->circle_10, 0, this->base.h - 2 * this->r - 1, 270);
-    set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 1, this->base.h - 2 * this->r - 1,
+    set_arc_img(this, &this->circle_00, -1, -1, 0);
+    set_arc_img(this, &this->circle_01, this->base.w - 2 * this->r - 2, -1, 90);
+    set_arc_img(this, &this->circle_10, -1, this->base.h - 2 * this->r - 2, 270);
+    set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 2, this->base.h - 2 * this->r - 2,
                 180);
+
+
 }
 
 static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)

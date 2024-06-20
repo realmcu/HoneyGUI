@@ -371,10 +371,16 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             gui_scroll_text_font_draw(&text->base, &draw_rect);
         }
     }
-
-    total_section_count = dc->screen_height / dc->fb_height -
-                          ((dc->screen_height % dc->fb_height) ? 0 : 1);
-
+    if (dc->pfb_type == PFB_X_DIRECTION)
+    {
+        total_section_count = dc->screen_width / dc->fb_width -
+                              ((dc->screen_width % dc->fb_width) ? 0 : 1);
+    }
+    else
+    {
+        total_section_count = dc->screen_height / dc->fb_height -
+                              ((dc->screen_height % dc->fb_height) ? 0 : 1);
+    }
     if (dc->section_count == total_section_count)
     {
         gui_scroll_text_font_unload(&text->base);

@@ -103,6 +103,13 @@
 
 // </e>
 
+// <e> HoneyGUI Enable Arm-2D
+#define CONFIG_REALTEK_BUILD_ARM_2D     1
+
+#if (CONFIG_REALTEK_BUILD_ARM_2D == 1)
+#endif
+
+// </e>
 
 // </h>
 

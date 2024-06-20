@@ -2,21 +2,21 @@
 
 Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table.txt file, custom.cST file), and find the vector font data corresponding characters according to the Unicode code from the font file (such as.ttf). Convert to a bitmap, and the output is a.bin file.
 
-<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1708226065411340283/b7deeeff_13674272.png  " ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1708226065411340283/b7deeeff_13674272.png" ></div>
 
 ## Font bin generation
 Please refer to the following steps for how to generate files:
 * Copy the Font library file to the directory (`\Font Convert Tool\font`).
 
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1708422430971385686/cf46cfc0_13674272.png " ></div>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
 
 * You can refer to the documentation under the directory (`\Font Convert Tool\doc`) for the specific meanings of each parameter to config font parameters by edit FontConfig.json.
 
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1708422408570201826/3a92b27d_13674272.png " ></div>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779327750693194/d2cd240c_13408154.png" ></div>
 
 * Double-click fontDirctionary.exe and then font bin will be Generated.
 
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1708422452689814303/44ce06d7_13674272.png " ></div>
+<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
 
 ## FontConfig.json Parameter description
 

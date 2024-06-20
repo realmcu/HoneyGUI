@@ -351,6 +351,7 @@ static void gui_walker(void *ptr, size_t size, int used, void *user)
 void gui_mem_debug(void)
 {
     total_used_size = 0;
+    GUI_UNUSED(total_used_size);
 #ifdef ENABLE_RTK_GUI_OS_HEAP
     gui_log("can't use thie func");
 #else

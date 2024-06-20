@@ -404,7 +404,7 @@ static void gui_text_draw(gui_obj_t *obj)
     gui_text_t *text = (gui_text_t *)obj;
     struct gui_dispdev *dc;
     gui_text_rect_t draw_rect = {0};
-    uint32_t total_section_count;
+    uint32_t total_section_count = UINT32_MAX;
 
     if (text->len == 0)
     {
@@ -416,17 +416,34 @@ static void gui_text_draw(gui_obj_t *obj)
     draw_rect.y1 = text->offset_y;
     draw_rect.x2 = draw_rect.x1 + obj->w;
     draw_rect.y2 = draw_rect.y1 + obj->h;
-    total_section_count = dc->screen_height / dc->fb_height -
-                          ((dc->screen_height % dc->fb_height) ? 0 : 1);
+
+
     if (dc->section_count == 0)
     {
         gui_text_font_load(text, &draw_rect);
     }
-    if (!(draw_rect.y1 >= (int)(dc->section_count + 1)*dc->fb_height || \
-          draw_rect.y2 < (int)(dc->section_count)*dc->fb_height))
+
+    if (dc->pfb_type == PFB_X_DIRECTION)
     {
-        gui_text_font_draw(text, &draw_rect);
+        total_section_count = dc->screen_width / dc->fb_width -
+                              ((dc->screen_width % dc->fb_width) ? 0 : 1);
+        if (!(draw_rect.x1 >= (int)(dc->section_count + 1)*dc->fb_width || \
+              draw_rect.x2 < (int)(dc->section_count)*dc->fb_width))
+        {
+            gui_text_font_draw(text, &draw_rect);
+        }
     }
+    else if (dc->pfb_type == PFB_Y_DIRECTION)
+    {
+        total_section_count = dc->screen_height / dc->fb_height -
+                              ((dc->screen_height % dc->fb_height) ? 0 : 1);
+        if (!(draw_rect.y1 >= (int)(dc->section_count + 1)*dc->fb_height || \
+              draw_rect.y2 < (int)(dc->section_count)*dc->fb_height))
+        {
+            gui_text_font_draw(text, &draw_rect);
+        }
+    }
+
     if (dc->section_count == total_section_count)
     {
         gui_text_font_unload(text);

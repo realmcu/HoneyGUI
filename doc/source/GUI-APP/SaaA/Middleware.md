@@ -1,6 +1,7 @@
 # Middleware
 RVD exports the SaaA package. The firmware needs to parse and play it.
-![](https://foruda.gitee.com/images/1715938743160813708/833fbdab_10088396.png "saaa.png")
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715938743160813708/833fbdab_10088396.png" alt ="saaa.png"></div><br/>
+
 ## PACKAGE 
 |resource|XML|JavaScript|
 |---|---|---|
@@ -12,26 +13,29 @@ RVD exports the SaaA package. The firmware needs to parse and play it.
 * The implementation of the launcher is in this file ```gui_engine\SaaA\frontend_launcher.c```. 
 *  It uses a grid widget to layout the apps' button. Then it iterates the ```app``` folder, to find all XML files, which represent apps. 
 * The launcher gets the title and icon of the APP, and use a button widget to display them. The click event of the registration button is to start the app.
-![](https://foruda.gitee.com/images/1715938973907688018/ce054910_10088396.png "launcher.png")
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715938973907688018/ce054910_10088396.png" alt ="launcher.png"></div><br/>
+
 ## XML
 * The xml file in the APP package describes the initial nested tree structure and specific parameters of the widget.
-* Using ```gui_engine\3rd\ezXML``` to convert xml to C language data format. Please refer to ```https://ezxml.sourceforge.net/```for details.
+* Using ```gui_engine\3rd\ezXML``` to convert xml to C language data format. Please refer to <https://ezxml.sourceforge.net/> for details.
 * The implementation of the xml parser is in this file ```gui_engine\SaaA\ezhtml.c```. You can read the syntax 
 description on the ```XML syntax``` page.
 * According to the syntax protocol, this function ```foreach_create``` uses a recursive strategy to traverse each tag of xml and map the tag to the widget, configure the tag's attributes to the widget.
 * After the xml traversal is completed, a C-APP has actually been created in the firmware, which is no different from the result of directly using the C-APP api.
 * Then the JavaScript file mentioned in xml will be executed.
-![](https://foruda.gitee.com/images/1715939055906559343/0b59a527_10088396.png "xml.png")
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939055906559343/0b59a527_10088396.png" alt ="xml.png"></div><br/>
+
 ## JavaScript
 * JavaScript describes Customized behaviors, such as triggering behaviors of widget gesture events, peripheral operations, printing logs, etc.
-* Based on JerryScript engine on ```gui_engine\3rd\js``` for common syntax. Please refer to ```https://jerryscript.net/```for details.
+* Based on JerryScript engine on ```gui_engine\3rd\js``` for common syntax. Please refer to <https://jerryscript.net/> for details.
 * The implementation of the JavaScript parser is Files starting with js in this folder ```gui_engine\SaaA```. You can read the syntax 
 description on the ```JavaScript syntax``` page.
 * ```DECLARE_HANDLER``` is used to define a function as a C language implementation of a JavaScript function.
 * ```REGISTER_METHOD``` and ```REGISTER_METHOD_NAME``` are used to add a function to a javascript object, so you can call it in script.
 * In a javascript file, there are some variable definitions, function definitions, and function calls. When the app starts, as mentioned above, the JavaScript file will be executed at the end of the XML parsing, and the function calls in it will be executed, mainly some initialization behaviors and the registration of event listeners. 
 * The callback functions of those events will not be executed until the event occurs.
-![](https://foruda.gitee.com/images/1715939260331113428/b473228b_10088396.png "js.png")
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939260331113428/b473228b_10088396.png" alt ="js.png"></div><br/>
+
 ## EXAMPLE
 ### Progressbar API
 ```javascript
@@ -69,7 +73,7 @@ DECLARE_HANDLER(progress)
 }
 ```
 
-* The ```getElementById``` is used to get the tag handle, refer to ```https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById``` for more usgae.
+* The ```getElementById``` is used to get the tag handle, refer to <https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById> for more usgae.
 * Input formal parameter is the tag's specified name. Using ```js_value_to_string``` to convert JS form name to C form char array, and get the pointer handle, and assign value to tag. It is a little different from standard function definitions, which is return the new instantiate tag.
 ```c
 DECLARE_HANDLER(getElementById)
@@ -224,11 +228,12 @@ DECLARE_HANDLER(writeSync)
                 }
 #endif								
 									
-        }
+            }
 
-        gui_free(direction);
+            gui_free(direction);
+        }
+        return jerry_create_undefined();
     }
-    return jerry_create_undefined();
 }
 ```
 

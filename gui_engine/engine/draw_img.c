@@ -225,13 +225,11 @@ void draw_img_cache(draw_img_t *image, IMG_SOURCE_MODE_TYPE src_mode)
         uint8_t *data = NULL;
         if (head.compress == true)
         {
-            uint32_t start = 0;
-            gui_ftl_read(base + sizeof(gui_rgb_data_head_t) + sizeof(imdc_file_header_t),
-                         (uint8_t *)(uintptr_t)start, 4);
             uint32_t end = 0;
-            gui_ftl_read(base + sizeof(gui_rgb_data_head_t) + sizeof(imdc_file_header_t) + 4 * head.h,
-                         (uint8_t *)(uintptr_t)end, 4);
-            uint32_t size = end - start;
+            gui_ftl_read(base + sizeof(gui_rgb_data_head_t) + sizeof(imdc_file_header_t) + 4 * (head.h),
+                         (uint8_t *)&end, 4);
+
+            uint32_t size = end  + sizeof(gui_rgb_data_head_t);
             data = (uint8_t *)gui_malloc(size);
             GUI_ASSERT(data != NULL);
             gui_ftl_read(base, data, size);

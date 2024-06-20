@@ -765,7 +765,7 @@ extern char *defaultPath;
 #else
 #define GUI_FRAME_STEP 50
 #endif
-
+#define GUI_TOUCHPAD_IMPORT_AS_TP touch_info_t *tp = tp_get_info();
 
 /** End of SUBMOUDLE_Exported_Macros
   * @}
