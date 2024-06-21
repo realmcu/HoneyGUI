@@ -561,15 +561,6 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             int left_offset = 0, right_offset = 0, byte = 0;
             uint16_t color_back;
             uint8_t alpha_2bit;
-            if (font_x < x_start)
-            {
-                byte = 0;
-                while (font_x + ppb * byte < x_start)
-                {
-                    byte++;
-                }
-                left_offset = font_x + ppb * byte - x_start;
-            }
             if (font_x + chr->char_w > x_end)
             {
                 while (font_x + ppb * byte < x_end)
@@ -578,6 +569,15 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                 }
                 right_offset = x_end - font_x - ppb * byte + ppb;
                 byte = 0;
+            }
+            if (font_x < x_start)
+            {
+                byte = 0;
+                while (font_x + ppb * byte < x_start)
+                {
+                    byte++;
+                }
+                left_offset = font_x + ppb * byte - x_start;
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
@@ -707,8 +707,8 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                         alpha = alpha & 0x03;
                         alpha = alpha_list[alpha];
                         alpha = color.color.rgba.a * alpha / 0xff;
-                        color_back = writebuf[write_off + j];
-                        writebuf[write_off + j] = alphaBlendRGB565(color_output, color_back, alpha);
+                        color_back = writebuf[write_off + j - dc->section.x1];
+                        writebuf[write_off + j - dc->section.x1] = alphaBlendRGB565(color_output, color_back, alpha);
                     }
                 }
             }
@@ -958,15 +958,6 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
             int dots_off = (y_start - font_y) * (font_w / ppb);
             int left_offset = 0, right_offset = 0, byte = 0;
             uint32_t x_start_right = x_start;
-            if (font_x < x_start)
-            {
-                while (font_x + ppb * byte < x_start)
-                {
-                    byte++;
-                }
-                left_offset = font_x + ppb * byte - x_start;
-                x_start_right = _UI_MIN((x_start + left_offset), x_end);
-            }
             if (font_x + chr->char_w > x_end)
             {
                 while (font_x + ppb * byte < x_end)
@@ -975,6 +966,15 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                 }
                 right_offset = x_end - font_x - ppb * byte + ppb;
                 byte = 0;
+            }
+            if (font_x < x_start)
+            {
+                while (font_x + ppb * byte < x_start)
+                {
+                    byte++;
+                }
+                left_offset = font_x + ppb * byte - x_start;
+                x_start_right = _UI_MIN((x_start + left_offset), x_end);
             }
             for (uint32_t i = y_start; i < y_end; i++)
             {
@@ -1057,7 +1057,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                 {
                     if ((dots[dots_off + (j - font_x) / ppb] >> ((j - font_x) % ppb)) & 0x01)
                     {
-                        writebuf[write_off + j] = color_output;
+                        writebuf[write_off + j - dc->section.x1] = color_output;
                     }
                 }
             }

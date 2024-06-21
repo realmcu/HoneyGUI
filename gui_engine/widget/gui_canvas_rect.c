@@ -223,6 +223,7 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
     GET_BASE(canvas_rect)->has_draw_cb = true;
     GET_BASE(canvas_rect)->has_end_cb = true;
     GET_BASE(canvas_rect)->has_destroy_cb = true;
+    canvas_rect->opacity_value = UINT8_MAX;
     gui_list_init(&(GET_BASE(canvas_rect)->child_list));
     if ((GET_BASE(canvas_rect)->parent) != NULL)
     {
