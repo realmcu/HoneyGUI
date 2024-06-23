@@ -24,6 +24,7 @@
 #define APP_COMPASS
 #define APP_SETTING
 #define APP_VOLUME
+#define APP_CYCLE_TRACKING
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
@@ -36,6 +37,7 @@ GUI_APP_DEFINE_NAME(APP_CARDVIEW)
 GUI_APP_DEFINE_NAME(APP_COMPASS)
 GUI_APP_DEFINE_NAME(APP_SETTING)
 GUI_APP_DEFINE_NAME(APP_VOLUME)
+GUI_APP_DEFINE_NAME(APP_CYCLE_TRACKING)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -1105,10 +1107,510 @@ GUI_APP_ENTRY(APP_VOLUME)
                           sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     }
 }
+#include <math.h>
+
+double F(double x, double a, double b, double c)
+{
+    return cos((a + x) / b) * c;
+}
+
+double Solve(double guess, double a, double b, double c)
+{
+    const double EPSILON = 0.1;
+    double x = guess;
+    while (fabs(x - F(x, a, b, c)) > EPSILON)
+    {
+        x = F(x, a, b, c);
+    }
+    return x;
+}
+
+static void cycle_tracking_win_cb(gui_win_t *win)
+{
+    GUI_TOUCHPAD_IMPORT_AS_TP
+    static bool hold;
+    int img_w = GUI_BASE(win)->w;
+    int img_h = GUI_BASE(win)->h;
+    int win_x = GUI_BASE(win)->x;
+    int win_y = GUI_BASE(win)->y;
+    static int scope_top;
+    static float per;
+    static bool swap, swap_flag;
+    if (tp->pressed && (tp->x >= win_x && tp->x <= win_x + img_w) && (tp->y > win_y &&
+                                                                      tp->y < win_y + img_h))
+    {
+        hold = 1;
+    }
+    else if (tp->released)
+    {
+        hold = 0;
+        swap = 0;
+        swap_flag = 0;
+    }
+    if (hold)
+    {
+        if (swap == 0)
+        {
+
+
+
+            gui_list_t *node = NULL;
+            gui_obj_t *obj = GUI_BASE(win);
+            gui_img_t *img_array[7];
+            memset(img_array, 0, sizeof(img_array));
+            int count = 0;
+            gui_list_for_each(node, &obj->child_list)
+            {
+                gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                if (obj->type == IMAGE_FROM_MEM)
+                {
+                    img_array[count++] = (void *)obj;
+                }
+            }
+            {
+                float offset = tp->deltaX;
+                float half_screen_w = 370 / 2;
+                float img_w = 120;
+                float gap = 5;
+                float scale = cosf((float)offset / (float)half_screen_w * M_PI / 2);
+                float half_w_3 =  img_w * scale / 2;
+                img_array[3]->base.x = offset + half_screen_w - img_w / 2;
+                img_array[3]->base.y = 180 * (1.0f - scale) / 2;
+                gui_log("中间%f\n", scale);
+                gui_img_translate(img_array[3], img_w / 2 * (1.0f - (half_w_3 / (img_w / 2))), 0);
+                gui_img_scale(img_array[3], half_w_3 / (img_w / 2), half_w_3 / (img_w / 2));
+                //gui_img_translate(img_array[3], 0, 0);
+                float half_w_4 = 0;
+                float half_w_5 = 0;
+                float half_w_6 = 0;
+                //x=cos((a+x)/b)*c
+                //half_w_4 = cosf((offset+half_w_3+gap+half_w_4)/half_screen_w*M_PI/2)*img_w/2
+                offset += half_w_3 + gap;
+                int b = (half_screen_w / M_PI * 2);
+                {
+                    double solution = Solve(60, offset, b, (img_w / 2));
+                    printf("Solution: %lf\n", solution);
+                    half_w_4 = (solution);
+                }
+                img_array[4]->base.x = offset + half_screen_w;
+                img_array[4]->base.y = 180 * (1.0f - half_w_4 / (img_w / 2)) / 2;
+                //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                gui_img_scale(img_array[4], half_w_4 / (img_w / 2), half_w_4 / (img_w / 2));
+                //gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,offset+half_screen_w+half_w_4, 0, 2, 448, COLOR_RED);
+                offset += 2 * half_w_4 + gap;
+                {
+                    double solution = Solve(60, offset, b, (img_w / 2));
+                    printf("Solution: %lf\n", solution);
+                    half_w_5 = (solution);
+                }
+                img_array[5]->base.x = offset + half_screen_w;
+                img_array[5]->base.y = 180 * (1.0f - half_w_5 / (img_w / 2)) / 2;
+                //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                gui_img_scale(img_array[5], half_w_5 / (img_w / 2), half_w_5 / (img_w / 2));
+                //gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,offset+half_screen_w+half_w_5, 0, 2, 448, COLOR_RED);
+
+                offset += 2 * half_w_5 + gap;
+                {
+                    double solution = Solve(60, offset, b, (img_w / 2));
+                    printf("Solution: %lf\n", solution);
+                    half_w_6 = (solution);
+                }
+                img_array[6]->base.x = offset + half_screen_w;
+                img_array[6]->base.y = 180 * (1.0f - half_w_6 / (img_w / 2)) / 2;
+                //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                gui_img_scale(img_array[6], half_w_6 / (img_w / 2), half_w_6 / (img_w / 2));
+                //gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,offset+half_screen_w+half_w_6, 0, 2, 448, COLOR_RED);
+
+                gui_log(" ");
+
+                {
+                    float half_w_0 = 0;
+                    float half_w_1 = 0;
+                    float half_w_2 = 0;
+                    offset = tp->deltaX;
+                    //x=cos((a+x)/b)*c
+                    //half_w_4 = cosf((offset+half_w_3+gap+half_w_4)/half_screen_w*M_PI/2)*img_w/2
+                    offset -= half_w_3 + gap;
+                    int b = (half_screen_w / M_PI * 2);
+                    {
+                        double solution = Solve(60, -offset, b, (img_w / 2));
+                        printf("Solution: %lf\n", solution);
+                        half_w_2 = (solution);
+                    }
+                    img_array[2]->base.x = offset + half_screen_w - half_w_2 * 2;
+                    img_array[2]->base.y = 180 * (1.0f - half_w_2 / (img_w / 2)) / 2;
+                    //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                    gui_img_scale(img_array[2], half_w_2 / (img_w / 2), half_w_2 / (img_w / 2));
+                    if (half_w_2 / (img_w / 2) >= 0.98f)
+                    {
+                        swap = 1;
+                    }
+                    //gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,img_array[2]->base.x+half_w_2, 0, 2, 448, COLOR_RED);
+                    {
+                        offset -= half_w_2 * 2 + gap;
+                        int b = (half_screen_w / M_PI * 2);
+                        {
+                            double solution = Solve(60, -offset, b, (img_w / 2));
+                            printf("Solution: %lf\n", solution);
+                            half_w_1 = (solution);
+                        }
+                        img_array[1]->base.x = offset + half_screen_w - half_w_1 * 2;
+                        img_array[1]->base.y = 180 * (1.0f - half_w_1 / (img_w / 2)) / 2;
+                        //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                        gui_img_scale(img_array[1], half_w_1 / (img_w / 2), half_w_1 / (img_w / 2));
+                        //gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,img_array[1]->base.x+half_w_1, 0, 2, 448, COLOR_RED);
+                    }
+                    {
+                        offset -= half_w_1 * 2 + gap;
+                        int b = (half_screen_w / M_PI * 2);
+                        {
+                            double solution = Solve(60, -offset, b, (img_w / 2));
+                            printf("Solution: %lf\n", solution);
+                            half_w_0 = (solution);
+                        }
+                        img_array[0]->base.x = offset + half_screen_w - half_w_0 * 2;
+                        img_array[0]->base.y = 180 * (1.0f - half_w_0 / (img_w / 2)) / 2;
+                        //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                        gui_img_scale(img_array[0], half_w_0 / (img_w / 2), half_w_0 / (img_w / 2));
+                        //gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,img_array[0]->base.x+half_w_0, 0, 2, 448, COLOR_RED);
+                    }
+
+
+                }
+
+                if (half_w_4 / (img_w / 2) >= 0.98f)
+                {
+                    swap = 1;
+                }
+            }
 
 
 
 
+
+
+
+        }
+        else if (!swap_flag)
+        {
+            gui_log(" swap%d\n", tp->deltaX);
+            {
+                swap_flag = 1;
+                static int swap_count;
+                swap_count++;
+                gui_list_t *node = NULL;
+                gui_obj_t *obj = GUI_BASE(win);
+                int w_old = 0; int x_start = 15;
+
+                float scale2 = 0;
+
+                void *image_array[] = {KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                       KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                       KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                       KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                       KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                       KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                      };            gui_list_for_each(node, &obj->child_list)
+
+                {
+                    gui_list_t *node = NULL;
+                    gui_obj_t *obj = GUI_BASE(win);
+                    gui_img_t *img_array[7];
+                    memset(img_array, 0, sizeof(img_array));
+                    int count = 0;
+                    gui_list_for_each(node, &obj->child_list)
+                    {
+                        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+                        if (obj->type == IMAGE_FROM_MEM)
+                        {
+                            img_array[count] = (void *)obj;
+                            gui_img_t *img = GUI_TYPE(gui_img_t, obj);
+                            img->data = image_array[count + swap_count];
+
+                            count++;
+                        }
+                    }
+                    {
+                        float offset = 0;
+                        float half_screen_w = 370 / 2;
+                        float img_w = 120;
+                        float gap = 5;
+                        float scale = cosf((float)offset / (float)half_screen_w * M_PI / 2);
+                        float half_w_3 =  img_w * scale / 2;
+                        img_array[3]->base.x = offset + half_screen_w - img_w / 2;
+                        img_array[3]->base.y = 0;
+                        gui_img_translate(img_array[3], img_w / 2 * (1.0f - (half_w_3 / (img_w / 2))), 0);
+                        gui_img_scale(img_array[3], half_w_3 / (img_w / 2), half_w_3 / (img_w / 2));
+                        //gui_img_translate(img_array[3], 0, 0);
+                        float half_w_4 = 0;
+                        float half_w_5 = 0;
+                        float half_w_6 = 0;
+                        //x=cos((a+x)/b)*c
+                        //half_w_4 = cosf((offset+half_w_3+gap+half_w_4)/half_screen_w*M_PI/2)*img_w/2
+                        offset += half_w_3 + gap;
+                        int b = (half_screen_w / M_PI * 2);
+                        {
+                            double solution = Solve(60, offset, b, (img_w / 2));
+                            printf("Solution: %lf\n", solution);
+                            half_w_4 = (solution);
+                        }
+                        img_array[4]->base.x = offset + half_screen_w;
+                        img_array[4]->base.y = 180 * (1.0f - half_w_4 / (img_w / 2)) / 2;
+                        //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                        gui_img_scale(img_array[4], half_w_4 / (img_w / 2), half_w_4 / (img_w / 2));
+//gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,offset+half_screen_w+half_w_4, 0, 2, 448, COLOR_RED);
+                        offset += 2 * half_w_4 + gap;
+                        {
+                            double solution = Solve(60, offset, b, (img_w / 2));
+                            printf("Solution: %lf\n", solution);
+                            half_w_5 = (solution);
+                        }
+                        img_array[5]->base.x = offset + half_screen_w;
+                        img_array[5]->base.y = 180 * (1.0f - half_w_5 / (img_w / 2)) / 2;
+                        //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                        gui_img_scale(img_array[5], half_w_5 / (img_w / 2), half_w_5 / (img_w / 2));
+//gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,offset+half_screen_w+half_w_5, 0, 2, 448, COLOR_RED);
+
+                        offset += 2 * half_w_5 + gap;
+                        {
+                            double solution = Solve(60, offset, b, (img_w / 2));
+                            printf("Solution: %lf\n", solution);
+                            half_w_6 = (solution);
+                        }
+                        img_array[6]->base.x = offset + half_screen_w;
+                        img_array[6]->base.y = 180 * (1.0f - half_w_6 / (img_w / 2)) / 2;
+                        //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                        gui_img_scale(img_array[6], half_w_6 / (img_w / 2), half_w_6 / (img_w / 2));
+//gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,offset+half_screen_w+half_w_6, 0, 2, 448, COLOR_RED);
+
+                        gui_log(" ");
+
+                        {
+                            float half_w_0 = 0;
+                            float half_w_1 = 0;
+                            float half_w_2 = 0;
+                            offset = 0;
+                            //x=cos((a+x)/b)*c
+                            //half_w_4 = cosf((offset+half_w_3+gap+half_w_4)/half_screen_w*M_PI/2)*img_w/2
+                            offset -= half_w_3 + gap;
+                            int b = (half_screen_w / M_PI * 2);
+                            {
+                                double solution = Solve(60, -offset, b, (img_w / 2));
+                                printf("Solution: %lf\n", solution);
+                                half_w_2 = (solution);
+                            }
+                            img_array[2]->base.x = offset + half_screen_w - half_w_2 * 2;
+                            img_array[2]->base.y = 180 * (1.0f - half_w_2 / (img_w / 2)) / 2;
+                            //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                            gui_img_scale(img_array[2], half_w_2 / (img_w / 2), half_w_2 / (img_w / 2));
+//gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,img_array[2]->base.x+half_w_2, 0, 2, 448, COLOR_RED);
+                            {
+                                offset -= half_w_2 * 2 + gap;
+                                int b = (half_screen_w / M_PI * 2);
+                                {
+                                    double solution = Solve(60, -offset, b, (img_w / 2));
+                                    printf("Solution: %lf\n", solution);
+                                    half_w_1 = (solution);
+                                }
+                                img_array[1]->base.x = offset + half_screen_w - half_w_1 * 2;
+                                img_array[1]->base.y = 180 * (1.0f - half_w_1 / (img_w / 2)) / 2;
+                                //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                                gui_img_scale(img_array[1], half_w_1 / (img_w / 2), half_w_1 / (img_w / 2));
+//gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,img_array[1]->base.x+half_w_1, 0, 2, 448, COLOR_RED);
+                            }
+                            {
+                                offset -= half_w_1 * 2 + gap;
+                                int b = (half_screen_w / M_PI * 2);
+                                {
+                                    double solution = Solve(60, -offset, b, (img_w / 2));
+                                    printf("Solution: %lf\n", solution);
+                                    half_w_0 = (solution);
+                                }
+                                img_array[0]->base.x = offset + half_screen_w - half_w_0 * 2;
+                                img_array[0]->base.y = 180 * (1.0f - half_w_0 / (img_w / 2)) / 2;
+                                //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                                gui_img_scale(img_array[0], half_w_0 / (img_w / 2), half_w_0 / (img_w / 2));
+//gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0,img_array[0]->base.x+half_w_0, 0, 2, 448, COLOR_RED);
+                            }
+
+
+                        }
+
+
+                    }
+                }
+
+
+
+
+            }
+        }
+    }
+}
+
+GUI_APP_ENTRY(APP_CYCLE_TRACKING)
+{
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "WIN", 0, 200, 0, 0);
+    gui_win_set_animate(win, 1000, -1, cycle_tracking_win_cb, win);
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, 368 / 2 - 1, 0, 2, 448, COLOR_RED);
+    {
+        gui_list_t *node = NULL;
+        gui_obj_t *obj = GUI_BASE(win);
+        gui_img_t *img_array[7];
+        memset(img_array, 0, sizeof(img_array));
+        int count = 0;
+        gui_list_for_each(node, &obj->child_list)
+        {
+            gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+            if (obj->type == IMAGE_FROM_MEM)
+            {
+                img_array[count++] = (void *)obj;
+            }
+        }
+        {
+            float offset = 0;
+            float half_screen_w = 370 / 2;
+            float img_w = 120;
+            float gap = 5;
+            float scale = cosf((float)offset / (float)half_screen_w * M_PI / 2);
+            float half_w_3 =  img_w * scale / 2;
+            img_array[3]->base.x = offset + half_screen_w - img_w / 2;
+            gui_img_translate(img_array[3], img_w / 2 * (1.0f - (half_w_3 / (img_w / 2))), 0);
+            gui_img_scale(img_array[3], half_w_3 / (img_w / 2), half_w_3 / (img_w / 2));
+            //gui_img_translate(img_array[3], 0, 0);
+            float half_w_4 = 0;
+            float half_w_5 = 0;
+            float half_w_6 = 0;
+            //x=cos((a+x)/b)*c
+            //half_w_4 = cosf((offset+half_w_3+gap+half_w_4)/half_screen_w*M_PI/2)*img_w/2
+            offset += half_w_3 + gap;
+            int b = (half_screen_w / M_PI * 2);
+            {
+                double solution = Solve(60, offset, b, (img_w / 2));
+                printf("Solution: %lf\n", solution);
+                half_w_4 = (solution);
+            }
+            img_array[4]->base.x = offset + half_screen_w;
+            img_array[4]->base.y = 180 * (1.0f - half_w_4 / (img_w / 2)) / 2;
+            //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+            gui_img_scale(img_array[4], half_w_4 / (img_w / 2), half_w_4 / (img_w / 2));
+            gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, offset + half_screen_w + half_w_4, 0, 2, 448,
+                                   COLOR_RED);
+            offset += 2 * half_w_4 + gap;
+            {
+                double solution = Solve(60, offset, b, (img_w / 2));
+                printf("Solution: %lf\n", solution);
+                half_w_5 = (solution);
+            }
+            img_array[5]->base.x = offset + half_screen_w;
+            img_array[5]->base.y = 180 * (1.0f - half_w_5 / (img_w / 2)) / 2;
+            //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+            gui_img_scale(img_array[5], half_w_5 / (img_w / 2), half_w_5 / (img_w / 2));
+            gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, offset + half_screen_w + half_w_5, 0, 2, 448,
+                                   COLOR_RED);
+
+            offset += 2 * half_w_5 + gap;
+            {
+                double solution = Solve(60, offset, b, (img_w / 2));
+                printf("Solution: %lf\n", solution);
+                half_w_6 = (solution);
+            }
+            img_array[6]->base.x = offset + half_screen_w;
+            img_array[6]->base.y = 180 * (1.0f - half_w_6 / (img_w / 2)) / 2;
+            //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+            gui_img_scale(img_array[6], half_w_6 / (img_w / 2), half_w_6 / (img_w / 2));
+            gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, offset + half_screen_w + half_w_6, 0, 2, 448,
+                                   COLOR_RED);
+
+            gui_log(" ");
+
+            {
+                float half_w_0 = 0;
+                float half_w_1 = 0;
+                float half_w_2 = 0;
+                offset = 0;
+                //x=cos((a+x)/b)*c
+                //half_w_4 = cosf((offset+half_w_3+gap+half_w_4)/half_screen_w*M_PI/2)*img_w/2
+                offset -= half_w_3 + gap;
+                int b = (half_screen_w / M_PI * 2);
+                {
+                    double solution = Solve(60, -offset, b, (img_w / 2));
+                    printf("Solution: %lf\n", solution);
+                    half_w_2 = (solution);
+                }
+                img_array[2]->base.x = offset + half_screen_w - half_w_2 * 2;
+                img_array[2]->base.y = 180 * (1.0f - half_w_2 / (img_w / 2)) / 2;
+                //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                gui_img_scale(img_array[2], half_w_2 / (img_w / 2), half_w_2 / (img_w / 2));
+                gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, img_array[2]->base.x + half_w_2, 0, 2, 448,
+                                       COLOR_RED);
+                {
+                    offset -= half_w_2 * 2 + gap;
+                    int b = (half_screen_w / M_PI * 2);
+                    {
+                        double solution = Solve(60, -offset, b, (img_w / 2));
+                        printf("Solution: %lf\n", solution);
+                        half_w_1 = (solution);
+                    }
+                    img_array[1]->base.x = offset + half_screen_w - half_w_1 * 2;
+                    img_array[1]->base.y = 180 * (1.0f - half_w_1 / (img_w / 2)) / 2;
+                    //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                    gui_img_scale(img_array[1], half_w_1 / (img_w / 2), half_w_1 / (img_w / 2));
+                    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, img_array[1]->base.x + half_w_1, 0, 2, 448,
+                                           COLOR_RED);
+                }
+                {
+                    offset -= half_w_1 * 2 + gap;
+                    int b = (half_screen_w / M_PI * 2);
+                    {
+                        double solution = Solve(60, -offset, b, (img_w / 2));
+                        printf("Solution: %lf\n", solution);
+                        half_w_0 = (solution);
+                    }
+                    img_array[0]->base.x = offset + half_screen_w - half_w_0 * 2;
+                    img_array[0]->base.y = 180 * (1.0f - half_w_0 / (img_w / 2)) / 2;
+                    //gui_img_translate(img_array[4], img_w/2*(1.0f-(half_w_4/(img_w/2))), 0);
+                    gui_img_scale(img_array[0], half_w_0 / (img_w / 2), half_w_0 / (img_w / 2));
+                    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, img_array[0]->base.x + half_w_0, 0, 2, 448,
+                                           COLOR_RED);
+                }
+
+
+            }
+
+
+        }
+    }
+
+}
 
 
 
