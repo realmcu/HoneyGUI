@@ -459,6 +459,14 @@ void gui_font_mat_unload(gui_text_t *text)
 {
     if (text->data)
     {
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            mem_char_t *chr = text->data;
+            for (int i = 0; i < text->font_len; i++)
+            {
+                gui_free(chr[i].dot_addr);
+            }
+        }
         gui_free(text->data);
         text->data = NULL;
     }
@@ -467,10 +475,12 @@ void gui_font_mat_unload(gui_text_t *text)
 
 void gui_font_mat_load(gui_text_t *text, gui_text_rect_t *rect)
 {
+    text->refresh = true;
     gui_font_get_dot_info(text);
     gui_font_char_mat(text);
     gui_font_matrix_adapt_rect(text, rect);
     gui_font_mem_layout(text, rect);
+    text->refresh = true;
 }
 
 void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)

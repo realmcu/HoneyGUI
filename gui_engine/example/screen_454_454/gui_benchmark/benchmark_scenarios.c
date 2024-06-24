@@ -387,7 +387,7 @@ void benchmark_single_text(void *parent)
         text[i] = gui_text_create(parent, "text_test", 0, y_offset * i, 454, 32);
         gui_text_set(text[i], benchmark_text_display, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(benchmark_text_display), 32);
-        gui_text_type_set(text[i], SIMKAI_SIZE32_BITS1_FONT_BIN);
+        gui_text_type_set(text[i], SIMKAI_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     }
 }
 

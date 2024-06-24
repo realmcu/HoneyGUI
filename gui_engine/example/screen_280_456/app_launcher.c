@@ -63,26 +63,6 @@ gui_app_t *get_wheel_app(void)
     return &app_wheel;
 }
 
-static void *addr_list[] =
-{
-    LIGHT_DYNAMIC_00_BIN, LIGHT_DYNAMIC_01_BIN, LIGHT_DYNAMIC_02_BIN,
-    LIGHT_DYNAMIC_03_BIN, LIGHT_DYNAMIC_04_BIN, LIGHT_DYNAMIC_05_BIN,
-    LIGHT_DYNAMIC_06_BIN, LIGHT_DYNAMIC_07_BIN, LIGHT_DYNAMIC_08_BIN,
-    LIGHT_DYNAMIC_09_BIN, LIGHT_DYNAMIC_10_BIN, LIGHT_DYNAMIC_11_BIN,
-    LIGHT_DYNAMIC_12_BIN, LIGHT_DYNAMIC_13_BIN, LIGHT_DYNAMIC_14_BIN,
-    LIGHT_DYNAMIC_15_BIN, LIGHT_DYNAMIC_16_BIN, LIGHT_DYNAMIC_17_BIN,
-    LIGHT_DYNAMIC_18_BIN, LIGHT_DYNAMIC_19_BIN, LIGHT_DYNAMIC_20_BIN,
-    LIGHT_DYNAMIC_21_BIN, LIGHT_DYNAMIC_22_BIN, LIGHT_DYNAMIC_23_BIN,
-    LIGHT_DYNAMIC_24_BIN, LIGHT_DYNAMIC_25_BIN, LIGHT_DYNAMIC_26_BIN,
-    LIGHT_DYNAMIC_27_BIN, LIGHT_DYNAMIC_28_BIN, LIGHT_DYNAMIC_29_BIN,
-    LIGHT_DYNAMIC_30_BIN, LIGHT_DYNAMIC_31_BIN, LIGHT_DYNAMIC_32_BIN,
-    LIGHT_DYNAMIC_33_BIN, LIGHT_DYNAMIC_34_BIN, LIGHT_DYNAMIC_35_BIN,
-    LIGHT_DYNAMIC_36_BIN, LIGHT_DYNAMIC_37_BIN, LIGHT_DYNAMIC_38_BIN,
-    LIGHT_DYNAMIC_39_BIN, LIGHT_DYNAMIC_40_BIN, LIGHT_DYNAMIC_41_BIN,
-    LIGHT_DYNAMIC_42_BIN, LIGHT_DYNAMIC_43_BIN, LIGHT_DYNAMIC_44_BIN,
-};
-
-
 int xscale = 64;
 int yscale = 64;
 #define CHANGE_VALUE 8
@@ -176,32 +156,32 @@ static void tab_text(void *tab)
     {
         text1[i] = gui_text_create(tab, "text1", 32 * i, 32 * i, 280, 32);
         gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_TTF, color[i], strlen(text_string[i]), 32);
-        gui_text_type_set(text1[i], QUICKSAND_MEDIUM_TTF);
+        gui_text_type_set(text1[i], QUICKSAND_MEDIUM_TTF, FONT_SRC_MEMADDR);
     }
 #else
     for (int i = 0; i < FONT_NUM; i++)
     {
         text1[i] = gui_text_create(tab, "text1", 0, 32 * i + 32 * FONT_NUM * 0, 300, 32);
         gui_text_set(text1[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
-        gui_text_type_set(text1[i], HARMONYOS_SIZE32_BITS1_FONT_BIN);
+        gui_text_type_set(text1[i], HARMONYOS_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     }
     for (int i = 0; i < FONT_NUM; i++)
     {
         text2[i] = gui_text_create(tab, "text2", 0, 32 * i + 32 * FONT_NUM * 1, 300, 32);
         gui_text_set(text2[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
-        gui_text_type_set(text2[i], HARMONYOS_SIZE32_BITS1_FONT_BIN);
+        gui_text_type_set(text2[i], HARMONYOS_SIZE32_BITS1_FONT_BIN, FONT_SRC_MEMADDR);
     }
     for (int i = 0; i < FONT_NUM; i++)
     {
         text4[i] = gui_text_create(tab, "text4", 0, 32 * i + 32 * FONT_NUM * 2, 300, 32);
         gui_text_set(text4[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
-        gui_text_type_set(text4[i], HARMONYOS_SIZE32_BITS4_FONT_BIN);
+        gui_text_type_set(text4[i], HARMONYOS_SIZE32_BITS4_FONT_BIN, FONT_SRC_MEMADDR);
     }
     for (int i = 0; i < FONT_NUM; i++)
     {
         text8[i] = gui_text_create(tab, "text8", 0, 32 * i + 32 * FONT_NUM * 3, 300, 32);
         gui_text_set(text8[i], text_string[i], GUI_FONT_SRC_BMP, color[i], strlen(text_string[i]), 32);
-        gui_text_type_set(text8[i], HARMONYOS_SIZE32_BITS8_FONT_BIN);
+        gui_text_type_set(text8[i], HARMONYOS_SIZE32_BITS8_FONT_BIN, FONT_SRC_MEMADDR);
     }
 #endif
 #endif
@@ -266,14 +246,14 @@ static void curtain_center(gui_curtainview_t *curtainview)
 
     gui_text_t *time = gui_text_create(curtain_center, "time",  0, 80, 280, 128);
     gui_text_set(time, "15:30", GUI_FONT_SRC_TTF, APP_COLOR_WHITE, 5, 128);
-    gui_text_type_set(time, QUICKSAND_MEDIUM_TTF);
+    gui_text_type_set(time, QUICKSAND_MEDIUM_TTF, FONT_SRC_MEMADDR);
     gui_text_mode_set(time, CENTER);
 
     int w_offset = gui_get_mem_utf8_char_width("Sun 6/6/2023", HARMONYOS_SIZE32_BITS4_FONT_BIN);
     gui_text_t *date = gui_text_create(curtain_center, "date", (280 - w_offset) / 2, 180, 280, 100);
     gui_text_set(date, "Sun 6/6/2023", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 12, 32);
     gui_text_mode_set(date, LEFT);
-    gui_text_type_set(date, HARMONYOS_SIZE32_BITS8_FONT_BIN);
+    gui_text_type_set(date, HARMONYOS_SIZE32_BITS8_FONT_BIN, FONT_SRC_MEMADDR);
     gui_text_convert_to_img(date, ARGB8888);
 
     gui_img_t *bt = gui_img_create_from_mem(curtain_center, "bt", ICBLECONNECT24_BIN, 150, 3, 0, 0);

@@ -3,7 +3,6 @@
 
 #include <guidef.h>
 #include <gui_api.h>
-#include <gui_text.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

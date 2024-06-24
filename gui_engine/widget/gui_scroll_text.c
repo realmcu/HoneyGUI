@@ -473,9 +473,9 @@ void gui_scroll_text_set(gui_scroll_text_t *this,
     gui_scroll_text_restart(this);
 }
 
-void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source)
+void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source, FONT_SRC_MODE font_mode)
 {
-    this->base.path = font_source;
+    gui_text_type_set(&this->base, font_source, font_mode);
 }
 
 void gui_scroll_text_content_set(gui_scroll_text_t *this, void *text, uint16_t length)

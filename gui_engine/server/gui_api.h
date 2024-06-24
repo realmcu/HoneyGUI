@@ -225,8 +225,33 @@ void *gui_get_file_address(const char *file);
 char *gui_strdup(const char *s);
 char *gui_filepath_transforming(void *addr);
 
+/**
+ * @brief Read from flash translation layer
+ *
+ * @param addr The starting address to read from.
+ * @param buf Buffer to store the read data.
+ * @param len Number of bytes to read.
+ * @return int
+ */
 int gui_ftl_read(uint32_t addr, uint8_t *buf, uint32_t len);
+
+/**
+ * @brief Write to the flash translation layer
+ *
+ * @param addr The starting address to write to.
+ * @param buf The buffer containing the data to write.
+ * @param len The number of bytes to write.
+ * @return int
+ */
 int gui_ftl_write(uint32_t addr, const uint8_t *buf, uint32_t len);
+
+/**
+ * @brief Erase a section of the flash translation layer
+ *
+ * @param addr The starting address of the section to erase.
+ * @param len The number of bytes to erase.
+ * @return int
+ */
 int gui_ftl_erase(uint32_t addr, uint32_t len);
 
 void gui_log(const char *format, ...);

@@ -15,6 +15,7 @@ extern "C" {
 #define FONT_MALLOC_PSRAM(x)  gui_malloc(x)
 #define FONT_FREE_PSRAM(x)  gui_free(x)
 
+#define FONT_FILE_FLAG 0x01
 
 typedef struct
 {
@@ -41,13 +42,15 @@ typedef struct
 {
     uint8_t *font_file;
     uint8_t font_size;
+    FONT_SRC_MODE type;
+    uint8_t *data;
 } MEM_FONT_LIB;
 
 #pragma pack(1)
 typedef struct
 {
     uint8_t head_length;               /*font file head length*/
-    uint8_t file_type;                 /*0x1 is font file*/
+    uint8_t file_type;                 /*0x1-FONT_FILE_FLAG is font file*/
     uint8_t version[4];                /*version*/
     uint8_t font_size;                 /*font size*/
     uint8_t rendor_mode;               /*support 1/2/4/8*/
@@ -76,7 +79,42 @@ typedef struct
  *
  * @param font_bin_addr the binary file address of this font type
  */
-void gui_font_mem_init(uint8_t *font_bin_addr);
+uint8_t gui_font_mem_init(uint8_t *font_bin_addr);
+
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list
+ *
+ * @param font_bin_addr font file address
+ * @return uint8_t
+ */
+uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr);
+
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list
+ *
+ * @param font_bin_addr font file address
+ * @return uint8_t
+ */
+uint8_t gui_font_mem_init_fs(uint8_t *font_bin_addr);
+
+/**
+ * @brief Initialize the character binary file and store the font and
+ * corresponding information in the font list
+ *
+ * @param font_bin_addr font file address
+ * @return uint8_t
+ */
+uint8_t gui_font_mem_init_mem(uint8_t *font_bin_addr);
+
+/**
+ * @brief Destroy this flot type in font list
+ *
+ * @param font_bin_addr font file address
+ * @return uint8_t
+ */
+uint8_t gui_font_mem_destroy(uint8_t *font_bin_addr);
 
 /**
  * @brief Preprocessing of bitmap fonts using internal engines

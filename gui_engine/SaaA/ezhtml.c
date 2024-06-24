@@ -491,7 +491,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     t->font_height = fontSize;
                                     t->path = 0;
                                     t->font_type = GUI_FONT_SRC_BMP;
-                                    gui_text_type_set(t, addr1);
+                                    gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
                                     gui_text_mode_set(t, LEFT);
                                     // t->font_height = fontSize;
                                     //t->path = 0;
@@ -2108,7 +2108,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             //gui_font_mem_init(addr1);
                             GUI_TYPE(gui_button_t, parent)->text->font_height = font_size;
                             GUI_TYPE(gui_button_t, parent)->text->path = 0;
-                            gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1);
+                            gui_text_type_set(GUI_TYPE(gui_button_t, parent)->text, addr1, FONT_SRC_MEMADDR);
                             gui_text_mode_set(GUI_TYPE(gui_button_t, parent)->text, LEFT);
                             // t->font_height = fontSize;
                             //t->path = 0;

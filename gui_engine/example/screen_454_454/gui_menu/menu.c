@@ -150,7 +150,7 @@ void design_tab_menu(void *parent)
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(200, 200, 200), strlen(text), font_size);
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     gui_win_click(button_array[0], heart_rate_cb,     button_array[0]);
     gui_win_click(button_array[1], menu_cb,           button_array[1]);

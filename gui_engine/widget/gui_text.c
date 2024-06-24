@@ -23,7 +23,6 @@
 #include "font_stb.h"
 #include "font_mem_img.h"
 #include "font_mem_matrix.h"
-#include "gui_keyboard.h"
 #include "tp_algo.h"
 
 /** @defgroup WIDGET WIDGET
@@ -70,7 +69,6 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-static bool content_change = false;
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -199,7 +197,7 @@ static void gui_text_font_unload(gui_text_t *text)
     {
     case GUI_FONT_SRC_BMP:
         {
-            gui_font_mem_unload(text);
+            // gui_font_mem_unload(text);
         }
         break;
 
@@ -217,7 +215,7 @@ static void gui_text_font_unload(gui_text_t *text)
 
     case GUI_FONT_SRC_MAT:
         {
-            gui_font_mat_unload(text);
+            // gui_font_mat_unload(text);
         }
         break;
 
@@ -245,7 +243,7 @@ static void gui_text_font_destory(gui_text_t *text)
     {
     case GUI_FONT_SRC_BMP:
         {
-
+            gui_font_mem_unload(text);
         }
         break;
 
@@ -263,7 +261,7 @@ static void gui_text_font_destory(gui_text_t *text)
 
     case GUI_FONT_SRC_MAT:
         {
-
+            gui_font_mat_unload(text);
         }
         break;
 
@@ -392,10 +390,9 @@ static void gui_text_prepare(gui_obj_t *obj)
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
 
-    if (last != this->checksum || content_change)
+    if (last != this->checksum || this->refresh)
     {
         gui_fb_change();
-        content_change = false;
     }
 }
 
@@ -512,6 +509,8 @@ void gui_text_ctor(gui_text_t *this,
     //for self
     this->mode = LEFT;
     this->inputable = false;
+    this->font_mode = FONT_SRC_MEMADDR;
+    this->refresh = true;
 }
 
 /*============================================================================*
@@ -537,8 +536,7 @@ void gui_text_set(gui_text_t   *this,
     this->font_height = font_size;
     this->char_width_sum = 0;
     this->char_line_sum = 0;
-    gui_fb_change();
-    content_change = true;
+    this->refresh = true;
 }
 
 void gui_text_set_animate(void    *o,
@@ -565,6 +563,7 @@ void gui_text_set_animate(void    *o,
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 {
     this->mode = mode;
+    this->refresh = true;
 }
 
 void gui_text_input_set(gui_text_t *this, bool inputable)
@@ -574,18 +573,25 @@ void gui_text_input_set(gui_text_t *this, bool inputable)
 
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
 {
-    this->base.x = x ;
-    this->base.y = y ;
+    this->base.x = x;
+    this->base.y = y;
+    this->refresh = true;
 }
 
 void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
 {
     this->font_height = height;
+    this->refresh = true;
 }
 
-void gui_text_type_set(gui_text_t *this, void *font_source)
+void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_mode)
 {
+    if (font_mode == FONT_SRC_FTL)
+    {
+        gui_font_mem_init_ftl(font_source);
+    }
     this->path = font_source;
+    this->font_mode = font_mode;
 }
 
 void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
@@ -599,8 +605,7 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->len = length;
     this->char_width_sum = 0;
     this->char_line_sum = 0;
-    gui_fb_change();
-    content_change = true;
+    this->refresh = true;
 }
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
