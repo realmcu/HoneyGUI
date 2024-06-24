@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <gui_tabview.h>
 #include "gui_card.h"
 #include <gui_obj.h>
@@ -11,9 +12,11 @@
 #include "gui_server.h"
 #include "draw_font.h"
 #include "gui_components_init.h"
-#include <stdio.h>
 #include "font_mem.h"
 #include "gui_button.h"
+#ifndef _WIN32
+#include "app_task.h"
+#endif
 
 #define GIF_LOAD_NAME "arrow_load"
 
@@ -29,7 +32,7 @@ gui_text_t *left_battery_text;
 gui_text_t *right_battery_text;
 gui_text_t *case_battery_text;
 
-static uint8_t arrow_x = 50;
+static uint32_t arrow_x = 20;
 uint8_t wallpaper_idx = 0;
 uint32_t *wallpaper_list[WALLPAPER_NUM] = {WALLPAPER1_BIN, WALLPAPER2_BIN, WALLPAPER3_BIN};
 
@@ -44,7 +47,7 @@ static gui_app_t app_chargebox =
     },
     .ui_design = app_chargebox_ui_design,
     .thread_entry = NULL,
-    .active_ms = 1000000,
+    .active_ms = 1000 * 60,
 };
 
 void *get_app_chargebox(void)
@@ -55,10 +58,9 @@ void *get_app_chargebox(void)
 void app_gui_ble_action_cb(void *obj, gui_event_t e, void *param)
 {
 #ifndef _WIN32
-#include "app_task.h"
     T_IO_MSG io_gui_msg_send;
     io_gui_msg_send.type = IO_MSG_TYPE_GUI;
-    T_APP_GUI_SUBEVENT_TYPE subtype = (T_APP_GUI_SUBEVENT_TYPE)param;
+    T_APP_GUI_SUBEVENT_TYPE subtype = (T_APP_GUI_SUBEVENT_TYPE)(uintptr_t)param;
     gui_log("subtype: %d", subtype);
     io_gui_msg_send.subtype = subtype;
     app_send_msg_to_apptask(&io_gui_msg_send);
@@ -76,15 +78,13 @@ static void img_loading_animate_callback(gui_win_t *win)
 {
     gui_img_t *img;
     gui_obj_tree_get_widget_by_name((void *)win, GIF_LOAD_NAME, (void *)&img);
-    if (win->animate->Beginning_frame)
+
+    arrow_x = arrow_x + 20;
+    if (arrow_x > 250)
     {
-        arrow_x = arrow_x + 20;
-        gui_img_set_attribute(img, GIF_LOAD_NAME, ARROW_BIN, arrow_x, GET_BASE(img)->y);
-        if (arrow_x == 330)
-        {
-            arrow_x = 0;
-        }
+        arrow_x = 20;
     }
+    gui_img_set_attribute(img, GIF_LOAD_NAME, ARROW_BIN, arrow_x, GET_BASE(img)->y);
 }
 
 static void app_chargebox_ui_design(gui_app_t *app)
@@ -102,8 +102,8 @@ static void app_chargebox_ui_design(gui_app_t *app)
     screen_wallpaper = gui_img_create_from_mem(win, "screen lock", wallpaper_list[wallpaper_idx], 0, 0,
                                                0, 0);
     gui_img_set_mode(screen_wallpaper, IMG_BYPASS_MODE);
-    gui_img_create_from_mem(win, GIF_LOAD_NAME, ARROW_BIN, 50, 120, 0, 0);
-    gui_win_set_animate(win, 4, -1, img_loading_animate_callback, win);
+    gui_img_create_from_mem(win, GIF_LOAD_NAME, ARROW_BIN, 20, 120, 0, 0);
+    gui_win_set_animate(win, 1000, -1, img_loading_animate_callback, win);
     gui_obj_add_event_cb(win, (gui_event_cb_t)screen_unlock_cb, GUI_EVENT_2, NULL);
 
     bat_left = gui_img_create_from_mem(tabview_info, "BAT_L", BAT_L_BIN, 10, 10, 0, 0);
@@ -112,24 +112,13 @@ static void app_chargebox_ui_design(gui_app_t *app)
     gui_img_set_mode(bat_right, IMG_BYPASS_MODE);
     bat_case = gui_img_create_from_mem(tabview_info, "BAT_CASE", BAT_CASE_BIN, 210, 10, 0, 0);
     gui_img_set_mode(bat_case, IMG_BYPASS_MODE);
-    bluetooth = gui_img_create_from_mem(tabview_info, "BLUETOOTH_OFF", BLUETOOTH_OFF_BIN, 340, 10, 0,
+    bluetooth = gui_img_create_from_mem(tabview_info, "bluetooth_status", BLUETOOTH_OFF_BIN, 340, 10, 0,
                                         0);
     gui_img_set_mode(bluetooth, IMG_BYPASS_MODE);
 
-    char *left_battery = "100%";
     left_battery_text = gui_text_create(tabview_info, "battery level txt", 50, 15, 100, 24);
-    gui_text_set(left_battery_text, left_battery, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
-                                                                            UINT8_MAX), strlen(left_battery), 24);
-
-    char *right_battery = "100%";
     right_battery_text = gui_text_create(tabview_info, "battery level txt", 150, 15, 100, 24);
-    gui_text_set(right_battery_text, right_battery, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
-                                                                              UINT8_MAX), strlen(right_battery), 24);
-
-    char *case_battery = "100%";
     case_battery_text = gui_text_create(tabview_info, "battery level txt", 250, 15, 100, 24);
-    gui_text_set(case_battery_text, case_battery, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
-                                                                            UINT8_MAX), strlen(case_battery), 24);
 
     gui_tab_t *tb_music = gui_tab_create(tabview_main, "tb_music",           0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_volume = gui_tab_create(tabview_main, "tb_volume",         0, 0, 0, 0, 1, 0);

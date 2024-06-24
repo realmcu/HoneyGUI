@@ -8,10 +8,6 @@
 #include "gui_tabview.h"
 #include "gui_scroll_text.h"
 
-#define MUSIC_TITLE_MAX_LENGTH      (512)
-#define MUSIC_ARTIST_MAX_LENGTH     (128)
-#define MUSIC_ALBUM_MAX_LENGTH      (32)
-#define MUSIC_SCROLL_TEXT_DURATION  (3*1000)
 
 gui_text_t *text_volume;
 gui_text_t *text_music_title_prefix;

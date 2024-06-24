@@ -4,10 +4,44 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #include <gui_app.h>
+#include "gui_img.h"
+#include "gui_text.h"
 #include "root_image_chargebox/ui_resource.h"
 
 #define WALLPAPER_NUM 3
+#define MUSIC_TITLE_MAX_LENGTH            512
+#define MUSIC_ARTIST_MAX_LENGTH           128
+#define MUSIC_ALBUM_MAX_LENGTH            32
+#define MUSIC_SCROLL_TEXT_DURATION        3*1000
+#define APP_GUI_DEVICE_NAME_MAX_LENGTH    40
+#define BATTERY_INVALID_VALUE             0x7F
+
+typedef enum
+{
+    GUI_LISTENING_OFF,
+    GUI_LISTENING_NORMAL_APT,
+    GUI_LISTENING_ANC,
+    GUI_LISTENING_LLAPT,
+} T_APP_GUI_LISTENING_MODE;
+
+typedef enum
+{
+    BLE_LINK_DISCONNECT,
+    BLE_LINK_CONNECT,
+} T_APP_GUI_LE_LINK_STATUS;
+
+typedef enum
+{
+    AVRCP_TITLE = 1,
+    AVRCP_NAME_OF_ARTIST,
+    AVRCP_NAME_OF_ALBUM,
+    AVRCP_NUMBER_OF_MEDIA,
+    AVRCP_TOTAL_NUMBER_OF_MEDIA,
+    AVRCP_GENRE,
+    AVRCP_PLAYING_TIME_IN_MILLISECOND,
+} APP_AVRCP_ATTRIBUTE_TYPE;
 
 typedef enum
 {
@@ -64,6 +98,15 @@ extern gui_img_t *bluetooth;
 extern gui_text_t *left_battery_text;
 extern gui_text_t *right_battery_text;
 extern gui_text_t *case_battery_text;
+
+void app_gui_show_title(uint8_t *title, uint16_t length);
+void app_gui_show_artist(uint8_t *artist, uint16_t length);
+void app_gui_show_album(uint8_t *album, uint16_t length);
+void app_gui_show_volume(uint8_t current_phone_volume);
+void app_gui_show_device_name(uint8_t *data, uint8_t length);
+void app_gui_show_battery(uint8_t case_battery, uint8_t left_battery, uint8_t right_battery);
+void app_gui_show_bt_link_status(T_APP_GUI_LE_LINK_STATUS link_status);
+
 
 #ifdef __cplusplus
 }
