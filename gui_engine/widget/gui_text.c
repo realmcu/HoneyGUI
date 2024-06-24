@@ -24,7 +24,7 @@
 #include "font_mem_img.h"
 #include "font_mem_matrix.h"
 #include "tp_algo.h"
-
+#include "gui_fb.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
