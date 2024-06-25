@@ -72,10 +72,10 @@ static void rle_filter_rgb565_draw(imdc_file_t *file, uint32_t line,  uint16_t *
 void rle_filter_blit_2_rgb565(draw_img_t *image, struct gui_dispdev *dc,
                               struct gui_rect *rect)
 {
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
     if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
     {
         return;
