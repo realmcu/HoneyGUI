@@ -33,14 +33,55 @@ gui_app_t *get_launcher_app(void)
 {
     return &app_launcher;
 }
+static void *addr_list[] =
+{
+    FIRE_00000_BIN, //nozip
+    FIRE_00001_BIN, //zip...
+    FIRE_00002_BIN,
+    FIRE_00003_BIN,
+    FIRE_00004_BIN,
+    FIRE_00005_BIN,
+    FIRE_00006_BIN,
+    FIRE_00007_BIN,
+    FIRE_00008_BIN,
+    FIRE_00009_BIN,
+    FIRE_00010_BIN,
+    FIRE_00011_BIN,
+    FIRE_00012_BIN,
+    FIRE_00013_BIN,
+    FIRE_00014_BIN,
+    FIRE_00015_BIN,
+    FIRE_00016_BIN,
+    FIRE_00017_BIN,
+    FIRE_00018_BIN,
+    FIRE_00019_BIN,
+};
+uint8_t fire_index;
+#define FIRE_S 0
+#define FIRE_E 19
+void fire_live(void *p, void *obj)
+{
+    if (fire_index < FIRE_E)
+    {
+        fire_index ++;
+        gui_img_set_attribute((gui_img_t *)obj, "fire", addr_list[fire_index], 0, 0);
+    }
+    else
+    {
+        fire_index = FIRE_S;
+        gui_img_set_attribute((gui_img_t *)obj, "fire", addr_list[fire_index], 0, 0);
+    }
+}
 
 static void app_launcher_ui_design(gui_app_t *app)
 {
     gui_log("app_launcher_ui_design\n");
 
-    gui_img_t *falsh_img = gui_img_create_from_mem(&(app->screen), "lake", LAKE_240_240_BIN, 0, 0, 0,
-                                                   0);
-    gui_img_set_mode(falsh_img, IMG_BYPASS_MODE);
+    fire_index = FIRE_S;
+    gui_img_t *fire = gui_img_create_from_mem(&(app->screen), "lake", addr_list[fire_index], 0, 0, 0,
+                                              0);
+    gui_img_set_animate(fire, 50, INT32_MAX, fire_live, fire);
+    gui_img_set_mode(fire, IMG_BYPASS_MODE);
     return;
 }
 
@@ -51,7 +92,7 @@ static int app_init(void)
 {
 #if defined _WIN32
     int fd;
-    fd = open("./gui_engine/example/screen_240_240/root_image/root(0x858000).bin", 0);
+    fd = open("./gui_engine/example/screen_240_240/root_image/roots(0x859000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
