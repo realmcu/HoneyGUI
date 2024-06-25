@@ -99,13 +99,13 @@ void gui_tab_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     float h = this->base.h;
     float rotate_degree;
 
-    Vertex_t v0 = {-w, -h, 0};
-    Vertex_t v1 = {w,  -h, 0};
-    Vertex_t v2 = {w,  h,  0};
-    Vertex_t v3 = {-w, h,  0};
+    gui_vertex_t v0 = {-w, -h, 0};
+    gui_vertex_t v1 = {w,  -h, 0};
+    gui_vertex_t v2 = {w,  h,  0};
+    gui_vertex_t v3 = {-w, h,  0};
 
-    Vertex_t tv0, tv1, tv2, tv3;
-    Vertex_t rv0, rv1, rv2, rv3;
+    gui_vertex_t tv0, tv1, tv2, tv3;
+    gui_vertex_t rv0, rv1, rv2, rv3;
 
     release_x = parent->release_x;
 
@@ -140,7 +140,7 @@ void gui_tab_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap)
     matrix_transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
     matrix_transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
 
-    Vertex_t p = {(float)(dc->screen_width) / 2, (float)(dc->screen_height) / 2, -zoff};
+    gui_vertex_t p = {(float)(dc->screen_width) / 2, (float)(dc->screen_height) / 2, -zoff};
 
     matrix_transfrom_blit(this->base.w, this->base.h, &p, &rv0, &rv1, &rv2, &rv3,
                           &temp);

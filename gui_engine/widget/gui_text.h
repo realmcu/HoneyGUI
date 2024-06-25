@@ -80,6 +80,13 @@ typedef enum
     GUI_FONT_SRC_FT = 4,
 } FONT_SRC_TYPE;
 
+typedef enum
+{
+    FONT_SRC_MEMADDR = 0,
+    FONT_SRC_FILESYS = 1,
+    FONT_SRC_FTL     = 2,
+} FONT_SRC_MODE;
+
 /** @brief  text widget structure */
 typedef struct gui_text
 {
@@ -93,9 +100,11 @@ typedef struct gui_text
     TEXT_MODE mode;
     TEXT_CHARSET charset;
     FONT_SRC_TYPE font_type;
+    FONT_SRC_MODE font_mode;
     uint8_t font_height;
     uint8_t inputable;    // support user input or not
     uint8_t checksum;
+    bool refresh;
     gui_animate_t *animate;
     void *content;
     void *data;
@@ -171,6 +180,7 @@ typedef struct gui_text_line
  * @param parameter cb parameter
  */
 void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter);
+
 /**
 * @brief set the string in a text box widget.
 * @note The font size must match the font file!
@@ -212,8 +222,14 @@ void gui_text_set_animate(void    *o,
  */
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode);
 
-
+/**
+ * @brief set inputable
+ *
+ * @param this he text box widget pointer.
+ * @param inputable inputable
+ */
 void gui_text_input_set(gui_text_t *this, bool inputable);
+
 /**
  * @brief move the text widget
  *
@@ -237,8 +253,9 @@ void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width);
  * @note The type must match the font size!
  * @param this the text widget pointer
  * @param font_source the addr of .ttf or .bin
+ * @param font_mode font source mode
  */
-void gui_text_type_set(gui_text_t *this, void *font_source);
+void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_mode);
 
 /**
  * @brief set font encoding

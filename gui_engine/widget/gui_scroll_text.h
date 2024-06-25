@@ -180,8 +180,9 @@ void gui_scroll_text_encoding_set(gui_scroll_text_t *this, TEXT_CHARSET charset)
  * @note The type must match the font size!
  * @param this the scroll text widget pointer
  * @param font_source the addr of .ttf or .bin
+ * @param font_mode font source mode
  */
-void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source);
+void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source, FONT_SRC_MODE font_mode);
 
 /**
  * @brief set content of text widget

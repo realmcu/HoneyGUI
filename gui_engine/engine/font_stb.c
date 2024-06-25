@@ -342,6 +342,10 @@ static void stb_add_path(NSVGshape *shape, stbtt_vertex *stbVertex, int line_cou
 #endif
 void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
+    if (text->font_mode != FONT_SRC_MEMADDR)
+    {
+        return;
+    }
     int ascent = 0, descent = 0, lineGap = 0, ch = 0, line_num = 0;
     float scale = 0, xpos = 0, ypos = 0, baseline = 0;
     scale = stbtt_ScaleForPixelHeight(&font, text->font_height * text->base.matrix->m[0][0]);

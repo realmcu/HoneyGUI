@@ -21,6 +21,8 @@
 #include "font_mem.h"
 #include "font_stb.h"
 #include "font_mem_matrix.h"
+#include "gui_fb.h"
+
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -250,7 +252,7 @@ static void gui_scroll_text_update_att(gui_obj_t *obj)
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
-    gui_point_t point = {0, 0, 1};
+    gui_point3f_t point = {0, 0, 1};
 
     if (!this->base.not_show)
     {
@@ -471,9 +473,9 @@ void gui_scroll_text_set(gui_scroll_text_t *this,
     gui_scroll_text_restart(this);
 }
 
-void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source)
+void gui_scroll_text_type_set(gui_scroll_text_t *this, void *font_source, FONT_SRC_MODE font_mode)
 {
-    this->base.path = font_source;
+    gui_text_type_set(&this->base, font_source, font_mode);
 }
 
 void gui_scroll_text_content_set(gui_scroll_text_t *this, void *text, uint16_t length)

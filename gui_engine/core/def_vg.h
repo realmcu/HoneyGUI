@@ -1,3 +1,13 @@
+/**
+ * @file def_vg.h
+ * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
+ * @brief
+ * @version 0.1
+ * @date 2024-06-14
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 
 #ifndef __DEF_VG_H__
 #define __DEF_VG_H__

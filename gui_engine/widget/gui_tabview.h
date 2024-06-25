@@ -30,6 +30,7 @@ extern "C" {
  *============================================================================*/
 #include "guidef.h"
 #include "gui_fb.h"
+#include "gui_obj.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief
@@ -49,7 +50,28 @@ typedef struct
     int32_t x;
     int32_t y;
 } gui_tabview_tab_id_t;
+typedef struct gui_index
+{
+    int8_t x;
+    int8_t y;
+} gui_index_t;
+typedef struct gui_jump
+{
+    bool jump_flag;
+    gui_index_t jump_id;
+} gui_jump_t;
+typedef enum t_slide_style
+{
+    CLASSIC          = 0x0000,
+    REDUCTION        = 0x0001,
+    FADE             = 0x0002,
+    REDUCTION_FADE   = 0x0003,
+    STACKING         = 0x0004,
 
+    TAB_ROTATE       = 0x0005,
+    TAB_CUBE         = 0x0006,
+    TAB_PAGE         = 0x0007,
+} T_SLIDE_STYLE;
 /** @brief  tabview structure */
 typedef struct gui_tabview
 {

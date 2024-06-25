@@ -834,7 +834,7 @@ void hw_acc_prepare_cb(draw_img_t *img, gui_rect_t *rect)
         img->matrix.m[1][0] != 0 || img->matrix.m[2][0] != 0 || \
         img->matrix.m[2][1] != 0)
     {
-        gui_point_t pox = {0.0f};
+        gui_point3f_t pox = {0.0f};
         float point[4][2];
         float *line = gui_malloc(12 * sizeof(float));
         float x1 = 0;

@@ -270,7 +270,7 @@ static void gui_img_prepare(gui_obj_t *obj)
         while (o->parent != NULL)
         {
             o = o->parent;
-            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope && !this->scope_flag)
             {
                 this->scope = 1;
                 break;

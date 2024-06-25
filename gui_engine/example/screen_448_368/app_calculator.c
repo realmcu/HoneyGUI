@@ -729,9 +729,9 @@ static void calculator_draw_button(void *parent)
                                       font_size);
     gui_text_set(text_display_dn, text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                  strlen(text), font_size);
-    gui_text_type_set(text_display_up, addr_font);
+    gui_text_type_set(text_display_up, addr_font, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_display_up, RIGHT);
-    gui_text_type_set(text_display_dn, addr_font);
+    gui_text_type_set(text_display_dn, addr_font, FONT_SRC_MEMADDR);
     gui_text_mode_set(text_display_dn, RIGHT);
 
     for (i = 0; i < 21; i++)
@@ -741,7 +741,7 @@ static void calculator_draw_button(void *parent)
         // btn text config
         GUI_TYPE(gui_button_t, button[i])->text->font_height = 24;
         GUI_TYPE(gui_button_t, button[i])->text->path = 0;
-        gui_text_type_set(GUI_TYPE(gui_button_t, button[i])->text, addr_font);
+        gui_text_type_set(GUI_TYPE(gui_button_t, button[i])->text, addr_font, FONT_SRC_MEMADDR);
         gui_text_mode_set(GUI_TYPE(gui_button_t, button[i])->text, LEFT);
         GET_BASE(GUI_TYPE(gui_button_t, button[i])->text)->x = 36;
         GET_BASE(GUI_TYPE(gui_button_t, button[i])->text)->y = 18;

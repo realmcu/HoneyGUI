@@ -32,6 +32,7 @@ extern "C" {
 #include "gui_api.h"
 #include "draw_img.h"
 #include "gui_img.h"
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @brief

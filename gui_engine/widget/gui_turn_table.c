@@ -18,7 +18,7 @@
  *                        Header Files
  *============================================================================*/
 #include <gui_turn_table.h>
-#include "gui_list.h"
+#include "def_list.h"
 #include "tp_algo.h"
 #include "gui_img.h"
 

@@ -30,6 +30,7 @@ extern "C" {
  *============================================================================*/
 #include <guidef.h>
 #include <gui_api.h>
+#include <gui_obj.h>
 
 
 /** @defgroup DC DC
@@ -105,7 +106,7 @@ extern "C" {
  *
  * @param parent the widget tree
  */
-void gui_fb_disp(struct _gui_obj_t *parent);
+void gui_fb_disp(gui_obj_t *root);
 
 
 /**

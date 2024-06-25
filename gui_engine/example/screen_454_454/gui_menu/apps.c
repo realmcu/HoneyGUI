@@ -24,6 +24,7 @@
 #define APP_COMPASS
 #define APP_SETTING
 #define APP_VOLUME
+#define APP_CYCLE_TRACKING
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
@@ -36,6 +37,7 @@ GUI_APP_DEFINE_NAME(APP_CARDVIEW)
 GUI_APP_DEFINE_NAME(APP_COMPASS)
 GUI_APP_DEFINE_NAME(APP_SETTING)
 GUI_APP_DEFINE_NAME(APP_VOLUME)
+GUI_APP_DEFINE_NAME(APP_CYCLE_TRACKING)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -102,7 +104,7 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         }
         {
             char *text = "132";
@@ -111,7 +113,7 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         }
         {
             char *text = "66";
@@ -120,7 +122,7 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         }
         {
             char *text = "12AM";
@@ -128,7 +130,7 @@ static void app_hr_ui_design(gui_app_t *app)
             gui_text_t *t = gui_text_create(rect, "txt", 10, 400 - 18, gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         }
         {
             char *text = " 6AM";
@@ -137,7 +139,7 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         }
         {
             char *text = "12PM";
@@ -146,7 +148,7 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         }
         {
             char *text = " 6PM";
@@ -155,7 +157,7 @@ static void app_hr_ui_design(gui_app_t *app)
                                             gui_get_screen_width(), font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER_OPACITY(100), strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         }
         gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + 10, 300, 5, 400 - 300, COLOR_SILVER);
         gui_canvas_rect_create((void *)rect, "canvas_rect", 10 + 10 + 100, 160, 5, 400 - 160, COLOR_SILVER);
@@ -183,7 +185,7 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 100, 300, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         char *text = "68";
@@ -191,7 +193,7 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 100, 320, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         char *text = "BPM";
@@ -199,7 +201,7 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 157, 347, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_RED, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         char *text = "75 BPM, 2m ago";
@@ -207,7 +209,7 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_t *t = gui_text_create(page, "txt", 100, 370, gui_get_screen_width(), font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
@@ -323,7 +325,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_convert_to_img(t, ARGB8888);
 
         gui_img_scale(t->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
@@ -341,7 +343,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
                                             font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, CENTER);
 
         }
@@ -352,7 +354,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
                                             font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, CENTER);
 
         }
@@ -633,7 +635,7 @@ GUI_APP_ENTRY(APP_STOPWATCH)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_convert_to_img(t, ARGB8888);
         gui_text_mode_set(t, CENTER);
 
@@ -684,7 +686,7 @@ GUI_APP_ENTRY(APP_MAP)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, CENTER);
 
     }
@@ -746,7 +748,7 @@ GUI_APP_ENTRY(APP_BOX2D)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MULTI_LEFT);
     }
     {
@@ -757,7 +759,7 @@ GUI_APP_ENTRY(APP_BOX2D)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, MULTI_LEFT);
     }
 #endif
@@ -960,7 +962,7 @@ GUI_APP_ENTRY(APP_COMPASS)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, CENTER);
         img_array[2] = (void *)t;
 
@@ -973,7 +975,7 @@ GUI_APP_ENTRY(APP_COMPASS)
                                         font_size);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgba(0xff, 0x66, 0x00, 0xff), strlen(text), font_size);
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, CENTER);
         img_array[3] = (void *)t;
 
@@ -1093,7 +1095,7 @@ GUI_APP_ENTRY(APP_VOLUME)
                                             font_size);
             gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
             void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1);
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
             gui_text_mode_set(t, LEFT);
         }
     }
@@ -1105,10 +1107,210 @@ GUI_APP_ENTRY(APP_VOLUME)
                           sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     }
 }
+#include <math.h>
 
+double F(double x, double a, double b, double c)
+{
+    return cos((a + x) / b) * c;
+}
 
+double Solve(double guess, double a, double b, double c)
+{
+    const double EPSILON = 0.1;
+    double x = guess;
+    while (fabs(x - F(x, a, b, c)) > EPSILON)
+    {
+        x = F(x, a, b, c);
+    }
+    return x;
+}
+static void get_img_array(gui_img_t **img_array, gui_win_t *root, int img_array_count)
+{
+    gui_list_t *node = NULL;
+    gui_obj_t *obj = GUI_BASE(root);
+    int count = 0;
+    memset(img_array, 0, sizeof(img_array)*img_array_count);
+    gui_list_for_each(node, &obj->child_list)
+    {
+        if (count >= img_array_count)
+        {
+            return;
+        }
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->type == IMAGE_FROM_MEM)
+        {
+            img_array[count++] = (void *)obj;
+        }
+    }
 
+}
+static void cycle_image_process(int delta_x, gui_img_t **img_array)
+{
+    float offset = delta_x;
+    float half_screen_w = 370 / 2;
+    float img_w = 120;
+    float gap = 5;
+    float scale = cosf((float)offset / (float)half_screen_w * M_PI / 2);
+    float half_w_3 =  img_w * scale / 2;
+    img_array[3]->base.x = offset + half_screen_w - img_w / 2;
+    img_array[3]->base.y = 180 * (1.0f - scale) / 2;
+    gui_log("medium%f\n", scale);
+    gui_img_translate(img_array[3], img_w / 2 * (1.0f - (half_w_3 / (img_w / 2))), 0);
+    gui_img_scale(img_array[3], half_w_3 / (img_w / 2), half_w_3 / (img_w / 2));
+    offset += half_w_3 + gap;
+    for (size_t i = 0; i < 3; i++)
+    {
+        float solution = Solve(60, offset, half_screen_w / M_PI * 2, (img_w / 2));
+        float scale = solution / (img_w / 2);
+        gui_log("Solution: %lf\n", solution);
+        img_array[4 + i]->base.x = offset + half_screen_w;
+        img_array[4 + i]->base.y = 180 * (1.0f - scale) / 2;
+        gui_img_scale(img_array[4 + i], scale, scale);
+        offset += 2 * solution + gap;
+    }
+    offset = delta_x - (half_w_3 + gap);
+    for (size_t i = 0; i < 3; i++)
+    {
+        double solution = Solve(60, -offset, half_screen_w / M_PI * 2, (img_w / 2));
+        printf("Solution: %lf\n", solution);
+        float scale = solution / (img_w / 2);
+        img_array[2 - i]->base.x = offset + half_screen_w - solution * 2;
+        img_array[2 - i]->base.y = 180 * (1.0f - scale) / 2;
+        gui_img_scale(img_array[2 - i], scale, scale);
+        offset -= 2 * solution + gap;
+    }
+}
 
+static void cycle_tracking_win_cb(gui_win_t *win)
+{
+    GUI_TOUCHPAD_IMPORT_AS_TP
+    static bool hold;
+    int img_w = GUI_BASE(win)->w;
+    int img_h = GUI_BASE(win)->h;
+    int win_x = GUI_BASE(win)->x;
+    int win_y = GUI_BASE(win)->y;
+    static int scope_top;
+    static float per;
+    static bool swap, swap_flag, alien_flag;
+    gui_img_t *img_array[7];
+    get_img_array(img_array, win, sizeof(img_array) / sizeof(img_array[0]));
+    const void *data_array[] = {KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                                KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
+                               };
+    static int swap_count = sizeof(data_array) / sizeof(data_array[0]) / 2;
+    int max_swap_count = sizeof(data_array) / sizeof(data_array[0]) - sizeof(img_array) / sizeof(
+                             img_array[0]);
+    if (tp->pressed && (tp->x >= win_x && tp->x <= win_x + img_w) && (tp->y > win_y &&
+                                                                      tp->y < win_y + img_h))
+    {
+        hold = 1;
+    }
+    else if (tp->released)
+    {
+        if (!swap)
+        {
+            alien_flag = 1;
+        }
+        hold = 0;
+        swap = 0;
+        swap_flag = 0;
+    }
+    if (hold)
+    {
+
+        if (swap == 0)
+        {
+            cycle_image_process(tp->deltaX, img_array);
+            if (img_array[2]->scale_x >= 0.98f || img_array[4]->scale_x >= 0.98f)
+            {
+                swap = 1;
+            }
+        }
+        else if (!swap_flag)
+        {
+            swap_flag = 1;
+            float scale2 = 0;
+            swap_count += (tp->deltaX > 0) ? -1 : 1;
+            swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
+            for (size_t i = 0; i < sizeof(img_array) / sizeof(img_array[0]); i++)
+            {
+                img_array[i]->data = (void *)data_array[swap_count + i];
+            }
+            cycle_image_process(0, img_array);
+        }
+    }
+    else
+    {
+        if (alien_flag)
+        {
+            if (img_array[2]->scale_x > img_array[3]->scale_x)
+            {
+                swap_count += -1;
+                swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
+                for (size_t i = 0; i < sizeof(img_array) / sizeof(img_array[0]); i++)
+                {
+                    img_array[i]->data = (void *)data_array[swap_count + i];
+                }
+
+            }
+            else if (img_array[4]->scale_x > img_array[3]->scale_x)
+            {
+                swap_count += 1;
+                swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
+                for (size_t i = 0; i < sizeof(img_array) / sizeof(img_array[0]); i++)
+                {
+                    img_array[i]->data = (void *)data_array[swap_count + i];
+                }
+            }
+            cycle_image_process(0, img_array);
+            alien_flag = 0;
+        }
+
+    }
+
+}
+
+GUI_APP_ENTRY(APP_CYCLE_TRACKING)
+{
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "WIN", 0, 200, 0, 0);
+    gui_win_set_animate(win, 1000, -1, cycle_tracking_win_cb, win);
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    {
+        gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
+        gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    }
+    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, 368 / 2 - 1, 0, 2, 448, COLOR_RED);
+    gui_img_t *img_array[7];
+    get_img_array(img_array, win, sizeof(img_array) / sizeof(img_array[0]));
+    cycle_image_process(0, img_array);
+}
 
 
 

@@ -21,7 +21,6 @@
 #include "gui_canvas_arc.h"
 #include <string.h>
 #include <gui_obj.h>
-#include <draw_img.h>
 #include "acc_init.h"
 #include <tp_algo.h>
 #include "nanovg.h"

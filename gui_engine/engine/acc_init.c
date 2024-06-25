@@ -1,4 +1,13 @@
-#include <draw_img.h>
+/**
+ * @file acc_init.c
+ * @author wenjing_jiang(wenjing_jiang@realsil.com.cn)
+ * @brief
+ * @version 0.1
+ * @date 2024-06-21
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include <stdio.h>
 #include "acc_sw_rle.h"
 #include "acc_init.h"

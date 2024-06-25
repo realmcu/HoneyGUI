@@ -18,7 +18,7 @@
  *                        Header Files
  *============================================================================*/
 #include <string.h>
-#include"guidef.h"
+#include "guidef.h"
 #include "gui_obj.h"
 #include "gui_widget_template.h"
 #include "tp_algo.h"

@@ -12,7 +12,6 @@
 #include <guidef.h>
 #include <gui_matrix.h>
 #include <gui_fb.h>
-#include <gui_obj.h>
 #include "gui_server.h"
 
 #define MAX_EVENT_CNT   10
@@ -57,7 +56,7 @@ static bool obj_is_active(gui_obj_t *obj)
         }
     }
 
-    gui_point_t p[4] =
+    gui_point3f_t p[4] =
     {
         {0, 0, 1},
         {obj->w, 0, 1},
@@ -82,7 +81,7 @@ static bool obj_is_active(gui_obj_t *obj)
 
     for (uint32_t i = 1; i < 3; i++)
     {
-        gui_point_t *point = p + i;
+        gui_point3f_t *point = p + i;
         if (point->p[0] < x_min)
         {
             x_min = point->p[0];
@@ -91,7 +90,7 @@ static bool obj_is_active(gui_obj_t *obj)
 
     for (uint32_t i = 1; i < 3; i++)
     {
-        gui_point_t *point = p + i;
+        gui_point3f_t *point = p + i;
         if (point->p[0] > x_max)
         {
             x_max = point->p[0];
@@ -100,7 +99,7 @@ static bool obj_is_active(gui_obj_t *obj)
 
     for (uint32_t i = 1; i < 3; i++)
     {
-        gui_point_t *point = p + i;
+        gui_point3f_t *point = p + i;
         if (point->p[1] < y_min)
         {
             y_min = point->p[1];
@@ -109,7 +108,7 @@ static bool obj_is_active(gui_obj_t *obj)
 
     for (uint32_t i = 1; i < 3; i++)
     {
-        gui_point_t *point = p + i;
+        gui_point3f_t *point = p + i;
         if (point->p[1] > y_max)
         {
             y_max = point->p[1];

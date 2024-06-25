@@ -12,7 +12,6 @@
 #define __DEF_COLOR_H__
 
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,7 +52,6 @@ typedef struct _color_argb88888
     uint8_t a; ///< Alpha channel for transparency, at the highest address
 } color_argb8888_t;
 #pragma pack()
-
 
 typedef struct _gui_color
 {

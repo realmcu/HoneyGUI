@@ -1548,7 +1548,7 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
         gui_text_set(txt, text + i * char_len, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                      char_len, font_size_cn);
         gui_font_mem_init(addr_font_cn);
-        gui_text_type_set(txt, addr_font_cn);
+        gui_text_type_set(txt, addr_font_cn, FONT_SRC_MEMADDR);
 
         gui_text_click(txt, gui_kb_ime_cand_click, (void *)i);
     }
@@ -1569,7 +1569,7 @@ static void gui_kb_layout_basic_ime(gui_kb_t  *this)
     gui_text_set(txt, buff_key, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX),
                  len_key, font_size_key);
     gui_font_mem_init(addr_font_key);
-    gui_text_type_set(txt, addr_font_key);
+    gui_text_type_set(txt, addr_font_key, FONT_SRC_MEMADDR);
 
 
 
@@ -1706,7 +1706,7 @@ static void gui_kb_ctor(gui_kb_t                        *this,
                      strlen(text), font_size);
         void *addr1 = gui_get_file_address("app/system/resource/font/simsun_size26_bits1_font.bin");
         gui_font_mem_init(addr1);
-        gui_text_type_set(this->txt_display, addr1);
+        gui_text_type_set(this->txt_display, addr1, FONT_SRC_MEMADDR);
     }
     gui_obj_show(this, false);
 }

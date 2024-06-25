@@ -33,7 +33,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, IMAGE565_BIN, 0, 16, 0, 0);
@@ -46,7 +46,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, COMPRESS_565_BIN, 0, 16 + 100, 0,
@@ -60,7 +60,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, MIX565_BIN, 0, 16 + 100 * 2, 0, 0);
@@ -73,7 +73,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, COMPRESS_MIX_565_BIN, 0,
@@ -87,7 +87,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, IMAGE888_BIN, 100, 16 + 100 * 0, 0,
@@ -101,7 +101,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, COMPRESS888_BIN, 100, 16 + 100 * 1,
@@ -115,7 +115,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, IMAGE8565_BIN, 100, 16 + 100 * 2,
@@ -129,7 +129,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         gui_img_t *img = gui_img_create_from_mem(GUI_APP_ROOT_SCREEN, 0, COMPRESS8565_BIN, 100,
@@ -143,7 +143,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     {
         char *text = "RECT; RECT ROUND";
@@ -155,7 +155,7 @@ static void test(gui_app_t *app)
         }
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_font_mem_init(addr1);
-        gui_text_type_set(t, addr1);
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_canvas_rect_t *rect = gui_canvas_rect_create(GUI_APP_ROOT_SCREEN,
                                                          "canvas_rect", 200 + 10, 16, 200, 120, COLOR_FIREBRICK);
         gui_canvas_round_rect_create(rect, "r_r", 100, 10, 6, 100, 3, gui_rgba(163, 163, 163,

@@ -7,7 +7,7 @@ extern "C" {
 
 #include "gui_obj.h"
 #include "gui_win.h"
-#include "gui_list.h"
+#include "def_list.h"
 #include "gui_tab.h"
 #include "gui_interface.h"
 #ifndef _WIN32
