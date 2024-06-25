@@ -32,8 +32,17 @@ extern "C" {
 #define LX_VGWIDGET_INS_BUTTERFLY lx_vglite_load_butterfly_widget()/*蝴蝶翩翩(数字时钟)特效*/
 #define LX_VGWIDGET_INS_SOCCER lx_vglite_load_soccer_widget()/*球型+粒子特效*/
 #define LX_VGWIDGET_INS_FLOWER_FALL lx_vglite_load_flower_fall_widget()/*落花纷飞(数字时钟)特效*/
+#define LX_VGWIDGET_INS_ENERGY_BOX lx_vglite_load_energy_box_widget()/*充电特效*/
+#define LX_VGWIDGET_INS_PRISM lx_vglite_load_prism_widget()/*面板带厚底的多面柱体，支持3~12面*/
+#define LX_VGWIDGET_INS_PRISM_REFL lx_vglite_load_prism_refl_widget()/*面板带倒影的多面柱体，支持3~12面*/
+#define LX_VGWIDGET_INS_DIGIT_CLOCK_00 lx_vglite_load_digit_clock00_widget()/*数字时钟特效*/
+#define LX_VGWIDGET_INS_WINDMILL lx_vglite_load_windmill_widget()/*吹风车(数字时钟)特效*/
+#define LX_VGWIDGET_INS_NOTIFICATIONS lx_vglite_load_notifications_widget()/*通知中心*/
 
 #define LX_VGTRANS_INS_DEMO  lx_vglite_load_demo_transition()/*仅供调试*/
+#define LX_VGTRANS_INS_FLIP  lx_vglite_load_flip_transition()/*玻璃翻板转场特效*/
+#define LX_VGTRANS_INS_CUBE    lx_vglite_load_cube_transition()/*玻璃方块转场特效*/
+#define LX_VGTRANS_INS_SHIFT    lx_vglite_load_shift_transition()/*漂移转场特效*/
 
 /**********************
 *      TYPEDEFS
@@ -43,6 +52,7 @@ extern "C" {
 enum LX_CMD_ID
 {
     LX_CMD_ID_INIT = 0,
+    LX_CMD_ID_UPDATE,
     LX_CMD_ID_GET_IMAGE,
     LX_CMD_ID_FREE_IMAGE,
     LX_CMD_ID_SET_SELECTED,
@@ -153,6 +163,16 @@ uintptr_t lx_vglite_load_demo_widget(void);
 uintptr_t lx_vglite_load_butterfly_widget(void);
 uintptr_t lx_vglite_load_soccer_widget(void);
 uintptr_t lx_vglite_load_flower_fall_widget(void);
+uintptr_t lx_vglite_load_energy_box_widget(void);
+uintptr_t lx_vglite_load_prism_widget(void);
+uintptr_t lx_vglite_load_prism_refl_widget(void);
+uintptr_t lx_vglite_load_digit_clock00_widget(void);
+uintptr_t lx_vglite_load_windmill_widget(void);
+uintptr_t lx_vglite_load_notifications_widget(void);
+
+uintptr_t  lx_vglite_load_flip_transition();
+uintptr_t  lx_vglite_load_cube_transition();
+uintptr_t  lx_vglite_load_shift_transition();
 
 /*
     功能：特效实例初始化
@@ -286,6 +306,13 @@ void lx_vglite_trans_render(uintptr_t handler, int16_t x1, int16_t y1, int16_t x
 */
 void lx_vglite_trans_set_src(uintptr_t handler, uint16_t index, void *data, lx_img_cf_t format,
                              int16_t w, int16_t h);
+
+/*
+    功能：过场特效构建
+    参数 1：uintptr_t handler，该特效实例对应的 handler
+    参数 2: bool return_back，false时为入场特效，true时为出场特效
+*/
+void lx_vglite_trans_set_return_back(uintptr_t handler, bool return_back);
 
 /**********************
 * INTERNAL PROTOTYPES

@@ -91,10 +91,10 @@ static void design_app_watch_ui(gui_app_t *app)
     design_contacts_mgr(gui_tab_get_rte_obj(tab_contacts));
     design_record_mgr(gui_tab_get_rte_obj(tab_record));
 #ifdef ENABLE_LITE_GFX
-    extern void design_tab_app_soccer(void *parent);
+    extern void design_tab_watchface_butterfly(void *parent);
     tab_gfx_demo = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 6, 0);
     // design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_gfx_demo));
-    design_tab_app_soccer(gui_tab_get_rte_obj(tab_gfx_demo));
+    design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_gfx_demo));
     // design_tab_watchface_flowerfall(gui_tab_get_rte_obj(tab_gfx_demo));
 #endif
 

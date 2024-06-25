@@ -2,7 +2,7 @@
 #include "root_image/ui_resource.h"
 #if 1
 
-static uintptr_t watchface_flowerfall_user_cb(uint16_t cmd, uintptr_t param, uintptr_t user_data)
+uintptr_t watchface_flowerfall_user_cb(uint16_t cmd, uintptr_t param, uintptr_t user_data)
 {
     if (cmd == LX_CMD_ID_INIT)
     {
@@ -19,17 +19,7 @@ static uintptr_t watchface_flowerfall_user_cb(uint16_t cmd, uintptr_t param, uin
         gui_widget_litegfx_set_image(obj, 8, FLOWERFALL_BACKGROUND_BIN);
         gui_widget_litegfx_set_image(obj, 9, FLOWERFALL_BRANCH01_BIN);
         gui_widget_litegfx_set_image(obj, 10, FLOWERFALL_BRANCH02_BIN);
-        gui_widget_litegfx_set_image(obj, 11, (void *)COMMON_FONT32_BIN);
-        gui_widget_litegfx_set_image(obj, 12, (void *)COMMON_FONT96_BIN);
-        gui_widget_litegfx_set_image(obj, 13, (void *)COMMON_UNFIXED_BIN);
-        gui_widget_litegfx_set_image(obj, 14, (void *)COMMON_FIXED_BIN);
 
-        gui_widget_litegfx_set_param(obj, LX_CMD_ID_SHOW_TIME,
-                                     (uint32_t)false);//时间显示开关，默认开
-        gui_widget_litegfx_set_param(obj, LX_CMD_ID_TIME_FORMAT,
-                                     1);//时间制式开关，0：24小时制，1：12小时制，默认0
-        gui_widget_litegfx_set_param(obj, LX_CMD_ID_FIXED_BUTTON,
-                                     (uint32_t)false);//表盘固定按钮开关，默认关
     }
     return 0;
 }
