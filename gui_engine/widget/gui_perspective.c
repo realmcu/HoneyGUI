@@ -21,6 +21,7 @@
 #include <string.h>
 #include "gui_obj.h"
 #include "tp_algo.h"
+#include "wheel_algo.h"
 #include "draw_img.h"
 #include "acc_init.h"
 #include "gui_matrix.h"
@@ -130,6 +131,7 @@ static void gui_perspective_prepare(gui_obj_t *obj)
     gui_vertex_t tv0, tv1, tv2, tv3;
     gui_dispdev_t *dc = gui_get_dc();
     touch_info_t *tp = tp_get_info();
+    wheel_info_t *wheel = wheel_get_info();
 
     gui_perspective_t *this = (gui_perspective_t *)obj;
     float w = 300;
@@ -178,6 +180,19 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         {
             this->release_x = tp->deltaX;
         }
+        break;
+    default:
+        break;
+    }
+
+    switch (wheel->type)
+    {
+    case WHEEL_ING:
+        {
+            this->release_x = wheel->delta * 10;
+        }
+        break;
+    case WHEEL_FINISHED:
         break;
     default:
         break;
