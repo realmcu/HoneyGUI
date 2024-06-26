@@ -3,10 +3,14 @@
 #include "gui_api.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "stdarg.h"
 #include <pthread.h>
 #include <time.h>
 #include "gui_queue.h"
 #include <unistd.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 static uint32_t gui_tick = 0;
 
@@ -112,6 +116,24 @@ static void *port_malloc(uint32_t n)
     return malloc(n);
 }
 
+
+int (*write_to_file)(const void *buf, size_t len) = NULL;
+static void port_log(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    char buf[2048];
+    vsnprintf(buf, sizeof(buf), format, args);
+
+    printf("[GUI MODULE]%s", buf);
+    if (write_to_file != NULL)
+    {
+        write_to_file(buf, strlen(buf));
+    }
+
+    va_end(args);
+}
+
 static void *port_realloc(void *ptr, uint32_t n)
 {
     return realloc(ptr, n);
@@ -151,7 +173,7 @@ static struct gui_os_api os_api =
     .lower_mem_size = PORT_GUI_LOWER_MEMHEAP_SIZE,
     .mem_threshold_size = 10 * 1024,
 
-    .log = (void *)printf,
+    .log = (void *)port_log,
 };
 
 

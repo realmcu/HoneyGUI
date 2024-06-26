@@ -36,6 +36,7 @@ void cmd_print_pass(void)
     gui_server_exec_cb(print_pass);
 }
 GUI_EXPORT_CMD(pass, cmd_print_pass);
+GUI_INIT_APP_EXPORT(cmd_print_pass);
 
 
 void print_fail(void *msg)
@@ -47,5 +48,6 @@ void cmd_print_fail(void)
     gui_server_exec_cb(print_fail);
 }
 GUI_EXPORT_CMD(fail, cmd_print_fail);
+GUI_INIT_APP_EXPORT(cmd_print_fail);
 
 
