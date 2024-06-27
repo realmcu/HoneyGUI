@@ -159,13 +159,12 @@ def get_prj_info_by_group_name(all_project, proj_group_name){
 
 
 
-def publish_html(){
-    try{
-        archiveArtifacts artifacts: "doc/output/html_out/"
-        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: "doc/output/html_out", reportFiles: 'index.html', reportName: 'Test Report', reportTitles: ''])
+def is_gui_module(){
+    def subject = params.GERRIT_CHANGE_SUBJECT
+    def module = subject.split(":")[0].split('-')[0]
+    if(module == "GUI"){
         return true
-    }catch(error){
-        echo "${error}"
+    }else{
         return false
     }
 }
@@ -179,10 +178,11 @@ def do_ci_build(current_project_detail, all_project, manifest_len, HoneyRepo_Hom
             withEnv(["HoneyRepo=${HoneyRepo_Home}", "manifest=${Manifest_Path}", "subGitPath=${HoneyRepo_Home}\\${current_project_detail['path']}", "subGitGroup=${current_project_detail['groups'][0]}"]){
                 dir("${HoneyRepo_Home}\\${get_prj_info_by_group_name(all_project, 'sdk')['path']}"){
                     bat "python script/ci-build.py --chipType ${chip_type}"
-                    res = publish_html()
-                    if(res == true){
-                        doc_url = BUILD_URL + "artifact/doc/output/html_out/index.html"
-                        cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"Doc html: $doc_url\" "
+                    if(is_gui_module() == true){
+                        archiveArtifacts artifacts: "doc/output/html_out/"
+                        en_doc_url = BUILD_URL + "artifact/doc/output/html_out/en/index.html"
+                        cn_doc_url = BUILD_URL + "artifact/doc/output/html_out/cn/index.html"
+                        cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"EN Doc html: $en_doc_url CN Doc html: $cn_doc_url\" "
                         exe_cmd(cmd_message)
                     }
                 }

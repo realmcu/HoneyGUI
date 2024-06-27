@@ -85,7 +85,7 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
 def DOC_handler(module, submodule, manifest_path, repo_home, chip_type):
     print("build sphinx document\n")
     try:
-        cmd = ["python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "../doc/source/build.py")]
+        cmd = ["python", os.path.join(os.path.dirname(os.path.abspath(__file__)), "../doc/build.py")]
         print(" ".join(cmd), flush=True)
         subprocess.check_call(cmd, universal_newlines=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
