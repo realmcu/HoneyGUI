@@ -1146,6 +1146,7 @@ static void get_img_array(gui_img_t **img_array, gui_win_t *root, int img_array_
 }
 static void cycle_image_process(int delta_x, gui_img_t **img_array)
 {
+    //gui_log("dx:%d\n",delta_x);
     float offset = delta_x;
     float half_screen_w = 370 / 2;
     float img_w = 120;
@@ -1162,7 +1163,7 @@ static void cycle_image_process(int delta_x, gui_img_t **img_array)
     {
         float solution = Solve(60, offset, half_screen_w / M_PI * 2, (img_w / 2));
         float scale = solution / (img_w / 2);
-        gui_log("Solution: %lf\n", solution);
+        //gui_log("Solution: %lf\n", solution);
         img_array[4 + i]->base.x = offset + half_screen_w;
         img_array[4 + i]->base.y = 180 * (1.0f - scale) / 2;
         gui_img_scale(img_array[4 + i], scale, scale);
@@ -1172,7 +1173,7 @@ static void cycle_image_process(int delta_x, gui_img_t **img_array)
     for (size_t i = 0; i < 3; i++)
     {
         double solution = Solve(60, -offset, half_screen_w / M_PI * 2, (img_w / 2));
-        printf("Solution: %lf\n", solution);
+        //printf("Solution: %lf\n", solution);
         float scale = solution / (img_w / 2);
         img_array[2 - i]->base.x = offset + half_screen_w - solution * 2;
         img_array[2 - i]->base.y = 180 * (1.0f - scale) / 2;
@@ -1193,6 +1194,9 @@ static void cycle_tracking_win_cb(gui_win_t *win)
     static float per;
     static bool swap, swap_flag, alien_flag;
     gui_img_t *img_array[7];
+    static int id ;
+    static bool exception = 0;
+    static int dx_old;
     get_img_array(img_array, win, sizeof(img_array) / sizeof(img_array[0]));
     const void *data_array[] = {KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
                                 KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN, KEHUZHOUQI_BIN,
@@ -1211,37 +1215,127 @@ static void cycle_tracking_win_cb(gui_win_t *win)
     }
     else if (tp->released)
     {
-        if (!swap)
+        //if (!swap)
         {
             alien_flag = 1;
         }
         hold = 0;
         swap = 0;
         swap_flag = 0;
+        id = 0;
+        exception = 0;
     }
     if (hold)
     {
-
+//180,160,103 +-
+        gui_log("tp:%d %d\n", tp->deltaX, swap);
         if (swap == 0)
         {
-            cycle_image_process(tp->deltaX, img_array);
+
+            int dx[] = {0, 87, 190, 274};
+            int dx_right[] = {0, -87, -190, -274};
+
+            //dx = tp->deltaX;
+            //cycle_image_process(tp->deltaX+dx, img_array);
             if (img_array[2]->scale_x >= 0.98f || img_array[4]->scale_x >= 0.98f)
             {
-                swap = 1;
+                swap_flag = 1;
+                swap_count += (tp->deltaX > 0) ? -1 : 1;
+                swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
+                for (size_t i = 0; i < sizeof(img_array) / sizeof(img_array[0]); i++)
+                {
+                    img_array[i]->data = (void *)data_array[swap_count + i];
+                }
+                gui_log("img_array[2]\n");
+                id++;
+                if (id >= 4)
+                {
+                    id = 3;
+                };
             }
-        }
-        else if (!swap_flag)
-        {
-            swap_flag = 1;
-            float scale2 = 0;
-            swap_count += (tp->deltaX > 0) ? -1 : 1;
-            swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
-            for (size_t i = 0; i < sizeof(img_array) / sizeof(img_array[0]); i++)
+            else if (img_array[1]->scale_x >= 0.98f || img_array[5]->scale_x >= 0.98f)
             {
-                img_array[i]->data = (void *)data_array[swap_count + i];
+                swap_flag = 1;
+                swap_count += (tp->deltaX > 0) ? -1 : 1;
+                swap_count += (tp->deltaX > 0) ? -1 : 1;
+                swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
+                for (size_t i = 0; i < sizeof(img_array) / sizeof(img_array[0]); i++)
+                {
+                    img_array[i]->data = (void *)data_array[swap_count + i];
+                } gui_log("img_array[1]\n");
+                //gui_log("tp:%d\n",tp->deltaX);
+                id++;
+                id++;
+                if (id >= 4)
+                {
+                    id = 3;
+                };
             }
-            cycle_image_process(0, img_array);
+            else if (img_array[0]->scale_x >= 0.98f || img_array[6]->scale_x >= 0.98f)
+            {
+                swap_flag = 1;
+                swap_count += (tp->deltaX > 0) ? -1 : 1;
+                swap_count += (tp->deltaX > 0) ? -1 : 1;
+                swap_count += (tp->deltaX > 0) ? -1 : 1;
+                swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
+                for (size_t i = 0; i < sizeof(img_array) / sizeof(img_array[0]); i++)
+                {
+                    img_array[i]->data = (void *)data_array[swap_count + i];
+                } gui_log("img_array[0]\n");
+                //gui_log("tp:%d\n",tp->deltaX);
+                id++;
+                id++;
+                id++;
+                if (id >= 4)
+                {
+                    id = 3;
+                };
+            }
+            else
+            {
+                gui_log("else[0]:%f\n", img_array[3]->scale_x);
+
+
+            }
+            if (!exception)
+            {
+                if (dx_old >= 0 && tp->deltaX <= 0)
+                {
+                    id = 0;
+                }
+                if (dx_old <= 0 && tp->deltaX >= 0)
+                {
+                    id = 0;
+                }
+                if (tp->deltaX > 0)
+                {
+                    cycle_image_process(tp->deltaX - dx[id], img_array);
+                    gui_log("1308\n");
+                }
+                else
+                {
+                    cycle_image_process(tp->deltaX - dx_right[id], img_array);
+                    gui_log("1313:%d\n", id);
+                }
+                if (img_array[3]->base.y > 90)
+                {
+                    cycle_image_process(0, img_array); gui_log("1317\n");
+                }
+
+
+            }
+            else
+            {
+                cycle_image_process(0, img_array);
+            }
+            if (swap == 1)
+            {
+                cycle_image_process(0, img_array);
+            }
+
+
         }
+        dx_old = tp->deltaX;
     }
     else
     {
