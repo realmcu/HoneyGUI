@@ -9,6 +9,8 @@ cwd  = GetCurrentDir()
 math_cwd = cwd + '/math'
 list = os.listdir(cwd)
 
+LOCAL_CFLAGS = ''
+LOCAL_CFLAGS += ' -Ofast -flto'
 
 if GetDepend(['CONFIG_REALTEK_BUILD_ARM_2D']):
     CPPDEFINES = ['ENABLE_AMR_2D']
@@ -40,7 +42,7 @@ if GetDepend(['CONFIG_REALTEK_BUILD_ARM_2D']):
         CPPDEFINES += ['__va_list=va_list']
         CPPDEFINES += ['_RTE_=1']
         # CPPDEFINES += [' ARM_SECTION\(x\)=']
-    objs = DefineGroup('realgui/3rd/Arm2d', src, depend = ['CONFIG_REALTEK_BUILD_ARM_2D'], CPPPATH = path, CPPDEFINES = CPPDEFINES)
+    objs = DefineGroup('realgui/3rd/Arm2d', src, depend = ['CONFIG_REALTEK_BUILD_ARM_2D'], CPPPATH = path, CPPDEFINES = CPPDEFINES, LOCAL_CCFLAGS = LOCAL_CFLAGS)
 
 
 for d in list:

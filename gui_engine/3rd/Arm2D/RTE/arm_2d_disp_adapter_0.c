@@ -19,21 +19,33 @@
 /*============================ INCLUDES ======================================*/
 
 #include "arm_2d.h"
+#include "gui_api.h"
+#include <time.h>
 
 uint32_t arm_2d_helper_get_reference_clock_frequency(void)
 {
-    return 1000000;
+    return 1000000ul;
 }
 int64_t arm_2d_helper_get_system_timestamp(void)
 {
-    return 0;
+    struct timespec timestamp;
+    clock_gettime(CLOCK_MONOTONIC, &timestamp);
+
+    return 1000000ul * timestamp.tv_sec + timestamp.tv_nsec / 1000ul;
 }
+
+
 int32_t Disp0_DrawBitmap(int16_t x,
                          int16_t y,
                          int16_t width,
                          int16_t height,
                          const uint8_t *bitmap)
 {
+    gui_dispdev_t *dc = gui_get_dc();
+    for(uint32_t i = y; i < (y + height); i++)
+    {
+        memcpy(dc->frame_buf + i * dc->fb_width * 2 + x*2, bitmap + (i - y) * width * 2, 2 * width);
+    }
     return 0;
 }
 

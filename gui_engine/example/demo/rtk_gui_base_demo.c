@@ -26,6 +26,16 @@
 #include "gui_canvas_round_rect.h"
 #include "tiger_blue_compressed.c"
 #include "acc_sw_rle.h"
+#ifdef ENABLE_AMR_2D
+#include "gui_arm2d.h"
+#include "arm_2d.h"
+#include "arm_2d_disp_adapters.h"
+#include "arm_2d_helper.h"
+static void arm2d_cb(gui_arm2d_t *canvas)
+{
+    GUI_LINE(1);
+}
+#endif
 
 
 static void canvas_cb_black(gui_canvas_t *canvas)
@@ -34,6 +44,7 @@ static void canvas_cb_black(gui_canvas_t *canvas)
     nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 200));
     nvgFill(canvas->vg);
 }
+
 
 
 
@@ -56,6 +67,11 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     // gui_img_create_from_mem(win1,  "img_1_test", (void *)_actiger_blue, 50, 50, 0, 0);
     // return;
+
+#ifdef ENABLE_AMR_2D
+    gui_arm2d_t *arm2d = gui_arm2d_create(&(app->screen), "arm2d_test", arm2d_cb, 0, 0, 0, 0);
+
+#endif
 
     gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue_compressed, 0, 0, 0,
                             0);

@@ -1,0 +1,12 @@
+# building script for HoneyGUI
+
+from building import *
+
+cwd = GetCurrentDir()
+src = Glob("*.c")
+
+
+CPPPATH = [cwd]
+group = DefineGroup('realgui/3rd/Arm2d/widget', src, depend = ['CONFIG_REALTEK_BUILD_ARM_2D'], CPPPATH = CPPPATH)
+
+Return('group')
