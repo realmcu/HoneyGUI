@@ -25,10 +25,16 @@ OBJCPY = PREFIX + 'objcopy'
 CPATH = ''
 LPATH = ''
 
-CFLAGS = ' -O0 -g -gdwarf-2 -static-libgcc'
-LFLAGS = ' -T default.ld -pthread'
+# CFLAGS_BASE = ' -Ofast -g -gdwarf-2 -static-libgcc -flto' #for arm2d
+CFLAGS_BASE = ' -O0 -g -gdwarf-2 -static-libgcc'
 
-CXXFLAGS = CFLAGS + ' -std=c++11'
+CFLAGS = CFLAGS_BASE + ' -std=gnu11'
+CXXFLAGS = CFLAGS_BASE + ' -std=c++11'
+
+LFLAGS = ' -T default.ld'
+# LFLAGS += ' -flto' #for arm2d
+LFLAGS += ' -pthread'
+
 POST_ACTION = OBJCPY + ' -O binary $TARGET gui.bin\n'
 POST_ACTION += SIZE + ' $TARGET \n'
 

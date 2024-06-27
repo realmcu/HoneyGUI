@@ -25,7 +25,7 @@ TARGET = 'gui.' + 'exe'
 #    LINK = menu_config.LINK, LINKFLAGS = menu_config.LFLAGS)
 
 env = Environment(tools = ['mingw'],
-                  CC=menu_config.CC, CCFLAGS = menu_config.CFLAGS,
+                  CC=menu_config.CC, CFLAGS = menu_config.CFLAGS,
                   CXX = menu_config.CXX, CXXFLAGS = menu_config.CXXFLAGS,
                   LINKFLAGS = menu_config.LFLAGS)
 
@@ -44,6 +44,11 @@ Export('TOOL_ROOT')
 Export('RTK_GUI_ENGINE')
 Export('LVGL_ROOT')
 
+
+print("CC: ", env['CC'])
+print("CCFLAGS: ", env['CCFLAGS'])
+print("CXXFLAGS: ", env['CXXFLAGS'])
+print("LINKFLAGS: ", env['LINKFLAGS'])
 
 print('TOOL ROOT = ' + TOOL_ROOT)
 print('RTK GUI ENGINE ROOT = ' + RTK_GUI_ENGINE)
