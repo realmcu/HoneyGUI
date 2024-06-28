@@ -196,7 +196,7 @@ The following flow describes the `cover mode` process for `RLE` compressed image
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714376646404378867/18b85d40_13671125.png"/></div><br/>
 
 ### RLE Cover No Matrix
-The following flow describes the `cover mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
+The following flowchart describes the process of writing `compressed images` to a frame buffer in `cover mode`. Taking the target device image type as RGB565 as an example.
 
 <div style="text-align: center"><img width="650" src ="https://foruda.gitee.com/images/1714455786263653108/4f957293_13671125.png"/></div><br/>
 

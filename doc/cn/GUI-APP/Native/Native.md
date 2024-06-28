@@ -1,16 +1,16 @@
-##  Develop a APP use native C/C++
-### Introduction
+##  使用原生C/C++开发一个应用程序
+### 简介
 
 
-### Source File
+### 源文件
 
 
 
-### Two Steps 
-__Step 1:  Declare the app structure__
+### 两个步骤 
+__步骤1：声明应用程序结构__
 
 
-__Step 2:  Declare the app ui design function__
+__步骤2：声明应用程序UI设计函数__
 
 
 

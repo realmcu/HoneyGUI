@@ -1,7 +1,7 @@
-LCD Chips
+LCD芯片
 *************
 
-The following table lists the LCD-related interfaces supported by mainstream  chips.If you want to know more information, please click on the specific chip name.
+以下表格列出了主流芯片支持的与LCD相关的接口。如果您想了解更多信息，请点击特定芯片的名称。
 
 ===============  =======  ========  =======  =======  =======
 SOC              I8080    QSPI      RGB      MIPI     SPI      
@@ -14,7 +14,7 @@ SOC              I8080    QSPI      RGB      MIPI     SPI
 `RTL8772F`_      Y        Y         Y        Y        Y         
 ===============  =======  ========  =======  =======  =======
 
-The following table lists the LCD-related driver IC supported by mainstream chips.If you want to know more information, please click on the specific chip name.
+以下表格列出了主流芯片支持的与LCD相关的驱动IC。如果您想了解更多信息，请点击特定芯片的名称。
 
 ===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
 SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903     ST7796      OTM8009A    SH8601A   SH8601Z   RM69330   ST7789    NV3041A
@@ -26,8 +26,8 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 `RTL8772F`_      NA         Y           Y          NA         Y          NA          NA          Y           Y         Y         NA        NA        NA
 ===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
 
-'Y' means the driver already included in the library.
-'NA' means the driver not yet included in the library. 
+'Y' 表示驱动程序已包含在库中。
+'NA' 表示驱动程序尚未包含在库中。
 
 .. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
 .. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca

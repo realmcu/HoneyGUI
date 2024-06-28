@@ -87,7 +87,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 
 ```
-- Source code of the second app
+#### Source code of the second app
 ```c
 #include <tp_algo.h>
 static void app2_ani_cb(gui_win_t *win)

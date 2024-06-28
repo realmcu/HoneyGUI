@@ -7,6 +7,6 @@ Script as a APP
     :maxdepth: 2
 
     RVisualDesigner <RVisualDesigner>
-    JavaScript syntax <JavaScript syntax>
-    XML syntax <XML syntax>
-    Middleware <Middleware>
+    JavaScript语法 <JavaScript syntax>
+    XML语法 <XML syntax>
+    中间件 <Middleware>

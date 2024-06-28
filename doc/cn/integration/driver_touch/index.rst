@@ -1,7 +1,7 @@
-Touch Chips
+触摸芯片
 *************
 
-The following table lists the Touch-related IC supported by all chips. If you want to know more information, please click on the specific chip name.
+以下表格列出了所有芯片支持的与触摸相关的IC。如果您想了解更多信息，请点击特定芯片的名称。
 
 ==================  =========  ==========  ========  =======  ========  ========  =========                  
 SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147                 
@@ -13,8 +13,8 @@ SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T 
 `RTL8772F`_         Y          Y           Y         Y        NA        NA         NA 
 ==================  =========  ==========  ========  =======  ========  ========  =========
 
-'Y' means the driver already included in the library.
-'NA' means the driver not yet included in the library.              
+'Y' 表示驱动程序已包含在库中。
+'NA' 表示驱动程序尚未包含在库中。   
 
 
 .. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca

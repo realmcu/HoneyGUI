@@ -1,13 +1,13 @@
-# XML syntax
-## Element
-- Element corresponding widget
-- Element's attributes corresponding widget's attributes (0 value can be ignored)
-- text content is the widget instance's name
+# XML 语法
+## 元素
+- 元素对应控件
+- 元素的属性对应控件的属性（0 值可以忽略）
+- 文本内容对应控件实例的名称
 ```xml
 <type a1="xx" a2="xx" a3="xx" a4="xx">name</type> 
 ```
-## Nesting
-The nesting structure of elements is consistent with the nesting structure of actual widgets
+## 嵌套
+元素的嵌套结构与实际控件的嵌套结构一致
 ```xml
 <fatherType a1="xx" a2="xx" a3="xx" a4="xx">fatherName 
 

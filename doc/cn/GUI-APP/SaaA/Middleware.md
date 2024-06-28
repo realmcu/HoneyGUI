@@ -1,63 +1,61 @@
-# Middleware
-RVD exports the SaaA package. The firmware needs to parse and play it.
+# 中间件
+RVD导出了SaaA包。固件需要解析和播放它。
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715938743160813708/833fbdab_10088396.png" alt ="saaa.png"></div><br/>
 
-## PACKAGE 
-|resource|XML|JavaScript|
+## 包
+|资源|XML|JavaScript|
 |---|---|---|
-|Pictures and font files, etc.|Describes the initial nested tree structure and specific parameters of the widget|Customized behaviors, such as triggering behaviors of widget gesture events, peripheral operations, printing logs, etc.|
+|图片和字体文件等|描述控件的初始嵌套树结构和特定参数|自定义行为，如触发控件手势事件的行为、外围操作、打印日志等|
 
-* Packages are in the ```root/app``` folder of File system image, and a launcher in firmware will iterate through these packages and set a start button on the screen for each package .Click the button to start the corresponding package.
-## launcher
+* 包位于文件系统映像的 ```root/app``` 文件夹中，固件中的启动程序将遍历这些包并为每个包在屏幕上设置一个启动按钮。单击按钮启动相应的包。
+## 启动器
 
-* The implementation of the launcher is in this file ```gui_engine\SaaA\frontend_launcher.c```. 
-*  It uses a grid widget to layout the apps' button. Then it iterates the ```app``` folder, to find all XML files, which represent apps. 
-* The launcher gets the title and icon of the APP, and use a button widget to display them. The click event of the registration button is to start the app.
+* 启动器的实现在 ```gui_engine\SaaA\frontend_launcher.c``` 文件中。
+* 它使用网格控件来布局应用程序的按钮。然后它迭代 ```app``` 文件夹，查找所有表示应用程序的XML文件。
+* 启动器获取APP的标题和图标，并使用按钮控件来显示它们。注册按钮的点击事件是为了启动应用程序。
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715938973907688018/ce054910_10088396.png" alt ="launcher.png"></div><br/>
 
 ## XML
-* The xml file in the APP package describes the initial nested tree structure and specific parameters of the widget.
-* Using ```gui_engine\3rd\ezXML``` to convert xml to C language data format. Please refer to <https://ezxml.sourceforge.net/> for details.
-* The implementation of the xml parser is in this file ```gui_engine\SaaA\ezhtml.c```. You can read the syntax 
-description on the ```XML syntax``` page.
-* According to the syntax protocol, this function ```foreach_create``` uses a recursive strategy to traverse each tag of xml and map the tag to the widget, configure the tag's attributes to the widget.
-* After the xml traversal is completed, a C-APP has actually been created in the firmware, which is no different from the result of directly using the C-APP api.
-* Then the JavaScript file mentioned in xml will be executed.
+* APP包中的XML文件描述了控件的初始嵌套树结构和特定参数。
+* 使用 ```gui_engine\3rd\ezXML``` 将XML转换为C语言数据格式。详细信息请参考 <https://ezxml.sourceforge.net/>。
+* XML解析器的实现在该文件 ```gui_engine\SaaA\ezhtml.c```中。您可以在 ```XML syntax``` 页面上阅读语法说明。
+* 根据语法规定，函数 ```foreach_create``` 使用递归策略遍历XML的每个标签，并将标签映射到控件，将标签的属性配置给控件。
+* XML遍历完成后，在固件中实际上创建了一个C-APP，与直接使用C-APP API的结果没有区别。
+* 然后将执行XML中提到的JavaScript文件。
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939055906559343/0b59a527_10088396.png" alt ="xml.png"></div><br/>
 
 ## JavaScript
-* JavaScript describes Customized behaviors, such as triggering behaviors of widget gesture events, peripheral operations, printing logs, etc.
-* Based on JerryScript engine on ```gui_engine\3rd\js``` for common syntax. Please refer to <https://jerryscript.net/> for details.
-* The implementation of the JavaScript parser is Files starting with js in this folder ```gui_engine\SaaA```. You can read the syntax 
-description on the ```JavaScript syntax``` page.
-* ```DECLARE_HANDLER``` is used to define a function as a C language implementation of a JavaScript function.
-* ```REGISTER_METHOD``` and ```REGISTER_METHOD_NAME``` are used to add a function to a javascript object, so you can call it in script.
-* In a javascript file, there are some variable definitions, function definitions, and function calls. When the app starts, as mentioned above, the JavaScript file will be executed at the end of the XML parsing, and the function calls in it will be executed, mainly some initialization behaviors and the registration of event listeners. 
-* The callback functions of those events will not be executed until the event occurs.
+* JavaScript描述了自定义行为，例如触发控件手势事件、外围操作、打印日志等。
+* 基于 ```gui_engine\3rd\js``` 上的JerryScript引擎，支持常见语法。详细信息请参考 <https://jerryscript.net/>。
+* JavaScript解析器的实现在该文件夹 ```gui_engine\SaaA``` 中以.js开头的文件中。您可以在 ```JavaScript syntax``` 页面上阅读语法说明。
+* 使用 ```DECLARE_HANDLER``` 将函数定义为JavaScript函数的C语言实现。
+* 使用 ```REGISTER_METHOD``` 和 ```REGISTER_METHOD_NAME``` 将函数添加到JavaScript对象中，以便在脚本中使用它。
+* 在JavaScript文件中，有一些变量定义、函数定义和函数调用。当应用程序启动时，如上所述，JavaScript文件将在XML解析结束时执行，其中的函数调用将被执行，主要是一些初始化行为和事件监听器的注册。
+* 直到事件发生，那些事件的回调函数才会被执行。
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939260331113428/b473228b_10088396.png" alt ="js.png"></div><br/>
 
-## EXAMPLE
-### Progressbar API
+## 示例
+### 进度条 API
 ```javascript
-//Read and write the progress value of a progressbar tag called 'tag name'
+//读取和设置进度条标签'tag name'的进度值
 progressbar.getElementById('tag name')
-var proress = progressbar.progress(0.7)
+var progress = progressbar.progress(0.7)
 ```
-#### Define a progressbar object
-In fact, this object is added to the global object. Using property of the global object does not require explicitly calling the global object.
+#### 定义一个进度条对象
+实际上，该对象是添加到全局对象中的。使用全局对象的属性不需要显式调用全局对象。
 ```c
 jerry_value_t progress = jerry_create_object();
 js_set_property(global_obj, "progressbar", progress);
 ```
-#### Add 2 functions to the progressbar object
+#### 向进度条对象添加两个函数
 ```c
 REGISTER_METHOD(progress, progress);
 REGISTER_METHOD(progress, getElementById);
 ```
-#### Define 2 functions
-* The ```progress``` is used to write and read the progressbar's progress.
-* Input formal parameters are in the array ```args```. The first in it is the progress number. If this parameter exists, which means that the progress needs to be set. Using ```jerry_get_number_value()``` to convert javascript parameter to c language variable.
-* The return value is the progress you want to get, using ```jerry_create_number``` to convert c language variable to javascript variable. By the way, the form of these javascript variables in C language is an index of an unsigned integer.
+#### 定义两个函数
+* ```progress``` 函数用于设置和读取进度条的进度。
+* 输入形式参数在数组 ```args```中，其中第一个是进度数值。如果该参数存在，则表示需要设置进度。使用 ```jerry_get_number_value()``` 将 Javascript 参数转换为 C 语言变量。
+* 返回值是要获取的进度，使用 ```jerry_create_number``` 将 C 语言变量转换为 Javascript变量。需要注意的是，这些 JavaScript 变量在 C 语言中的形式是无符号整数的索引。
 
 ```c
 DECLARE_HANDLER(progress)
@@ -73,8 +71,8 @@ DECLARE_HANDLER(progress)
 }
 ```
 
-* The ```getElementById``` is used to get the tag handle, refer to <https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById> for more usgae.
-* Input formal parameter is the tag's specified name. Using ```js_value_to_string``` to convert JS form name to C form char array, and get the pointer handle, and assign value to tag. It is a little different from standard function definitions, which is return the new instantiate tag.
+* ```getElementById``` 函数用于获取标签的句柄。更多用法请参考 <https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById>。
+* 输入形式参数是标签的指定名称。使用 ```js_value_to_string``` 函数将 JS 形式的名称转换为 C 形式的 char 数组，并获取指针句柄，并将值赋给标签。与标准函数定义略有不同，此函数返回新实例化的标签。
 ```c
 DECLARE_HANDLER(getElementById)
 {
@@ -96,37 +94,37 @@ DECLARE_HANDLER(getElementById)
     return jerry_create_undefined();
 }
 ```
- ### Light control
-This page shows how the  UI switch corresponds to the peripheral switch.
+ ### 灯控制
+本页展示了UI开关与外设开关之间的对应关系。
 ```javascript
-//IO P1_1 is set to low level
+//将IO P1_1设置为低电平
 var P1_1 = 9
 var LED1 = new Gpio(P1_1, 'out');
 LED1.writeSync(0)
 ```
-#### Light swtich data
+#### 灯开关数据
 
-|data|value type|brief|
+|数据|值类型|简介|
 |---|---|---|
-|gpio|number|index of light|
-|direction|out / in|direction of signal|
-|write value|number|0 for turning off / 1 for turning on |
+|gpio|数字|灯的索引|
+|方向|输出/输入|信号方向|
+|写入的值|数字|0 表示关闭 / 1 表示打开 |
 
-- Refer to [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage) for more information.
-#### GPIO light Switch
-- Get gpio index , direction, and write value;
-- Use gpio driver ```drv_pin_mode()``` & ```drv_pin_write()``` to operate it;
-#### MATTER light Switch
-- Get gpio index, and write value;
-- Tramsform data to matter protocol;
-- Use ```matter_send_msg_to_app()``` to operate lights;
-#### MESH light Switch
-- Get gpio index, and write value;
-- Tramsform data to mesh protocol;
-- Use ```matter_send_msg_to_app()``` to operate lights;
+- 更多信息请参考 [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage)。
+#### GPIO 灯开关
+- 获取 gpio 索引、方向和写入值；
+- 使用 gpio 驱动的 ```drv_pin_mode()``` 和 ```drv_pin_write()``` 来操作灯。
+#### MATTER 灯开关
+- 获取 gpio 索引、方向和写入值；
+- 将数据转换为 MATTER 协议；
+- 使用 ```matter_send_msg_to_app()``` 来操作灯。
+#### MESH 灯开关
+- 获取 gpio 索引、方向和写入值；
+- 将数据转换为 MESH 协议；
+- 使用 ```matter_send_msg_to_app()``` 来操作灯。
 
 
-The following code example is the ```writeSync``` 's control light implementation for RTL87X2G. First get gpio value and direction value, then use specify driver api to operate light.
+下面的代码示例是基于 RTL87X2G 的 ```writeSync```  控制灯的实现。先获取 gpio 值和方向值，然后使用特定的驱动 API 来操作灯。
 ```c
 #ifdef RTL87x2G
 #define ENABLE_MATTER_SWITCH

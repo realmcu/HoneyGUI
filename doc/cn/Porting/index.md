@@ -1,32 +1,32 @@
-# Porting
+# 移植
 
-The porting files are in the gui_port folder.
-    There are four files that need to be modified, corresponding to the input device, display device, OS, and file system.
-    At present, it has been transplanted in FreeRTOS, RT-Thread, and Windows, you can refer to it.
-## Input device
+移植文件位于gui_port文件夹中。
+需要修改四个文件，分别对应输入设备、显示设备、操作系统和文件系统。
+目前已在FreeRTOS、RT-Thread和Windows上进行了移植，可供参考。
+## 输入设备
 
-- Refer to ``guidef.h`` and ``gui_port_indev.c``
-- The input information is abstracted as touch screen contacts, and the input information structure is as follows
+- 参考 ``guidef.h`` 和 ``gui_port_indev.c``
+- 输入信息被抽象为触摸屏接触，输入信息的结构体如下：
 
 ```C
 typedef struct gui_touch_port_data
 {
-    uint8_t          event;                 /* The touch event of the data */
-    uint8_t          track_id;              /* Track id of point */
-    uint16_t         width;                 /* Point of width */
-    uint16_t         x_coordinate;          /* Point of x coordinate */
-    uint16_t         y_coordinate;          /* Point of y coordinate */
-    uint32_t         timestamp;             /* The timestamp when the data was received */
+    uint8_t          event;                 /* 数据的触摸事件 */
+    uint8_t          track_id;              /* 点的跟踪id */
+    uint16_t         width;                 /* 点的宽度 */
+    uint16_t         x_coordinate;          /* 点的x坐标 */
+    uint16_t         y_coordinate;          /* 点的y坐标 */
+    uint32_t         timestamp;             /* 收到数据时的时间戳 */
     void            *data;
 } gui_touch_port_data_t;
 ```
 
-## Display device
+## 显示设备
 
-- Refer to ``guidef.h`` and ``gui_port_dc.c``
-- It is necessary to define the screen width and height, frame buffer address and mode, whether the resolution is scaled, and realize the refresh function. The structure is as follows.
-- The framebuffer's size is ```fb_width*fb_height*bit_depth/8```.
-- In ```DC_RAMLESS``` mode, two framebuffers are used, and the fb_height is section height.
+- 参考 ``guidef.h`` 和 ``gui_port_dc.c``
+- 需要定义屏幕的宽度和高度、帧缓冲区地址和模式、分辨率是否缩放，并实现刷新函数。结构如下。
+- 帧缓冲区的大小为 ```fb_width*fb_height*bit_depth/8```.
+- 在 ```DC_RAMLESS``` 模式下，使用了两个帧缓冲区，fb_height 是分段高度。
 
 ```C
 static struct gui_dispdev dc =
@@ -54,10 +54,10 @@ static struct gui_dispdev dc =
 };
 ```
 
-## File system
+## 文件系统
 
-- Refer to ``guidef.h`` and ``gui_port_filesystem.c``
-- Need to define several posix-style interface operation files and folders, as follows.
+- 参考 ``guidef.h`` 和 ``gui_port_filesystem.c``
+- 需要定义几个类似 posix 风格的接口操作文件和文件夹，如下：
 
 ```C
 struct gui_fs
@@ -74,10 +74,10 @@ struct gui_fs
 };
 ```
 
-## OS
+## 操作系统
 
-- Refer to ``guidef.h`` and ``gui_port_os.c``
-- Need to define interfaces for threads, timers, message queues, and memory management, as follows
+- 参考 ``guidef.h`` 和 ``gui_port_os.c``
+- 需要定义线程、定时器、消息队列和内存管理的接口，如下：
 
 ```C
 struct gui_os_api
@@ -107,29 +107,29 @@ struct gui_os_api
 };
 ```
 
-## Sleep management
+## 休眠管理
 
-In order to reduce power consumption and increase device usage time, the sleep(low-power) mode is supported.
+为了降低功耗和增加设备的使用时间，支持睡眠（低功耗）模式。
 
-- Refer to ``gui_app.h``
+- 参考 ``gui_app.h``
 
 ```C
 typedef struct gui_app gui_app_t;
 struct gui_app
 {
-    gui_obj_t screen;               //!< widget tree root
-    const char *xml;                //!< widget tree design file
-    uint32_t active_ms;             //!< screen shut dowm delay
-    void *thread_id;                //!< thread handle(optional)
-    void (* thread_entry)(void *this); //!< thread entry
-    void (* ctor)(void *this);      //!< constructor
-    void (* dtor)(void *this);      //!< destructor
-    void (* ui_design)(gui_app_t *); //!< ui create entry
+    gui_obj_t screen;               //!< 控件树的根节点
+    const char *xml;                //!< 控件树的设计文件
+    uint32_t active_ms;             //!< 屏幕关闭延时
+    void *thread_id;                //!< 线程句柄（可选）
+    void (* thread_entry)(void *this); //!< 线程入口函数
+    void (* ctor)(void *this);      //!< 构造函数
+    void (* dtor)(void *this);      //!< 析构函数
+    void (* ui_design)(gui_app_t *); //!< UI创建入口函数
     bool lvgl;
 };
 ```
 
-``active_ms`` is the standby time of the gui app, which can be defined as different values in different apps.
-Same as other types of electronic devices, when the screen continues to display an interface for longer than the standby time, it will enter sleep mode.
-During sleep, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
-In chip manual, this low-power state where peripherals can be turned off is called deep low power state(DLPS). More information about DLPS can be found in the relevant guidance documentation in the SDK.
+``active_ms`` 是 gui 应用程序的待机时间，可以在不同的应用程序中定义为不同的值。
+与其他类型的电子设备一样，当屏幕持续显示一个界面的时间超过待机时间时，设备将进入睡眠模式。
+在睡眠状态下，通过触摸触摸板、按键或发送消息可以唤醒设备。
+在芯片手册中，这种外设可以关闭的低功耗状态被称为深度低功耗状态（DLPS）。关于DLPS的更多信息，可以在SDK的相关指导文档中找到。

@@ -1,18 +1,18 @@
 
-##  App switching
-### App switching animation sample
-- The first app has a gray interface, and the second app has a blue interface. 
-- Clicking on the first app's interface will switch to the second app. 
-- The first app will gradually become transparent until it disappears when switching, and the second app will enlarge to fill the screen. 
-- Swipe on the second app interface to switch back to the first app.
-- The second app will gradually shrink and become transparent as you drag it until it disappears. The first app will shrink from very large to the screen size and gradually become opaque.
+##  应用程序切换
+### 应用程序切换动画示例
+- 第一个应用程序具有灰色界面，第二个应用程序具有蓝色界面。
+- 点击第一个应用程序的界面将切换到第二个应用程序。
+- 切换时，第一个应用程序将逐渐变为透明，直到消失，而第二个应用程序将放大以填充屏幕。
+- 在第二个应用程序界面上滑动可切换回第一个应用程序。
+- 第二个应用程序将随着拖动逐渐缩小并变为透明，直至消失。第一个应用程序将从非常大的尺寸缩小到屏幕尺寸，并逐渐变为不透明。
 <br>
 
 <center><img width= "300" src="https://foruda.gitee.com/images/1707364376277366786/f2c74bf6_13671147.gif" /></center>
 <br>
 
-#### Source code of the first app
-- In the animation frame callback, execute app switching and implement the animation effect of app switching
+#### 第一个应用程序的源代码
+- 在动画帧回调中，执行应用程序切换，并实现应用程序切换的动画效果。
 
 ```c
 #include <tp_algo.h>
@@ -87,7 +87,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 
 ```
-- Source code of the second app
+#### 第二个应用程序的源代码
 ```c
 #include <tp_algo.h>
 static void app2_ani_cb(gui_win_t *win)

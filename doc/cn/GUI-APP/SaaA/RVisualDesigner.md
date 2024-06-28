@@ -1,13 +1,13 @@
-## Overview
-RTKIOT Visual Designer is a tool to make graphical interface design for Realtek series ICs, its currently supported ICs are shown in [Table 1-1](#table_1_1). 
+## 概述
+RTKIOT可视化设计工具是一个用于为Realtek系列IC制作图形界面设计的工具，目前支持的IC列表如 [表 1-1](#table_1_1) 所示。
 
-RTKIOT Visual Designer supports:
-+ Drag and widgets from the toolbox and drop them in the Design View.
-+ Drag and drop the widget to change its position in the Design View, or modify the position and appearance of the widget via the Property View.
-+ Export the user designed GUI project to .bin, and the .bin can be programmed into the IC to display graphical interface.
-+ Simulate the GUI project on PC.
+RTKIOT 可视化设计工具支持以下功能：
++ 从工具箱中拖拽控件并将其放置在设计视图中。
++ 拖放控件以在设计视图中更改其位置，或通过属性视图修改控件的位置和外观。
++ 导出用户设计的GUI项目为.bin文件，将.bin文件烧录到IC上以显示图形界面。
++ 在PC上模拟GUI项目。
 
-<div id = "table_1_1" style="text-align:center;"><b>Table 1-1 Supported ICs</b></div>
+<div id = "table_1_1" style="text-align:center;"><b>表 1-1 支持的IC列表</b></div>
 
 <!-- <div class="center">
 
@@ -22,8 +22,8 @@ RTKIOT Visual Designer supports:
 
 <table align="center">
 	<tr>
-		<th width="100">No.</th>
-		<th width="200">Supported ICs</th>
+		<th width="100">序号</th>
+		<th width="200">支持的IC</th>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px; text-align: center;">
 		<td>1</td>
@@ -47,114 +47,114 @@ RTKIOT Visual Designer supports:
 	</tr>
 </table>
 
-This document mainly consists of:
-+ Indroduction to Function Panels
-+ Indroduction to Resource Management
-+ Indroduction to the Menu Bar
-+ Quick start to tutorials
-+ GUI demo project
+本文档主要包括以下内容：
++ 功能面板介绍
++ 资源管理介绍
++ 菜单栏介绍
++ 快速入门教程
++ GUI演示项目
 
-To simplify the document, "Tool" is used below to refer to "RTKIOT Visual Designer".
+为了简化文档，下文中使用“工具”来指代“RTKIOT可视化设计工具”。
 
 
 <div STYLE="page-break-after: always;"></div> 
 
 
-## Function Panels
-### Toolkit/Widgets
-+ Non-containerized widget
-    + Can be used as the parent of other widget.
-    + There is coordinate following relationship between parent and child widgets.
-    + Visible when child widget is out of range of parent widget.
-+ Container widget
-    + Can be used as the parent of other widget.
-    + There is coordinate following relationship between parent and child widgets.
-    + Visible when child widget is out of range of parent widget.
-    + Can drag and drop a widget from the toolbox into the container widget.
+## 功能面板
+### 工具箱/控件
++ 非容器化控件
+    + 可作为其他控件的父控件。
+    + 父控件与子控件之间存在坐标跟随关系。
+    + 当子控件超出父控件范围时仍可显示。
++ 容器化控件
+    + 可作为其他控件的父控件。
+    + 父控件与子控件之间存在坐标跟随关系。
+    + 当子控件超出父控件范围时仍可显示。
+    + 可从工具箱中将控件拖放到容器控件中。
 
-This section lists the properties supported by the widget in tables and mark with "Y" or "N" to indicate whether the IC supports them or not. 
+本节列出了小部件支持的属性，并用"Y"或"N"标记是否IC支持该属性。
 </br>
 
-#### Non-containerized Widget
-##### Text
-Used only for text display and does not support user input. The properties are shown in [Table 2-1](#table_2_1).
+#### 非容器化控件
+##### 文本 (Text)
+仅用于文本显示，不支持用户输入。属性如 [表 2-1](#table_2_1) 所示。
 
-<div id = "table_2_1" style="text-align:center;"><b>Table 2-1 Text widget properties</b></div>
+<div id = "table_2_1" style="text-align:center;"><b>表 2-1 文本控件属性</b></div>
 
 <table align="center">
     <tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+		<th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+		<td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+		<td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+		<td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-		<td><b><I>Text</I></b></td>
-		<td>Displayed text.</td>
+		<td><b><I>文本</I></b></td>
+		<td>显示文本</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Display Mode</I></b></td>
-		<td>Long text (text content beyond the widget's range) </br>
-        display mode with the following supported types.</br>
-        truncate: Truncated display mode</br>
-        verticalscroll: Vertical scrolling display mode</br>
-        horizontalscroll: Horizontal scrolling display mode.
+		<td><b><I>显示文本</I></b></td>
+		<td>长文本（超出控件范围的文本内容）</br>
+        的显示模式可使用以下支持的类型：</br>
+        截断显示模式（truncate）：截断文本显示模式</br>
+        垂直滚动显示模式（verticalscroll）：垂直滚动文本显示模式</br>
+        水平滚动显示模式（horizontalscroll）：水平滚动文本显示模式。
         </td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-        <td><b><I>Font</I></b></td>
-		<td>Font setting, please refer to
-        <a href="#font_setting_anchor">Font Setting</a>.
+        <td><b><I>字体</I></b></td>
+		<td>字体设置请参考
+        <a href="#font_setting_anchor">字体设置</a>.
         </td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Font Color (RGBA)</I></b></td>
-		<td>Font color setting, use RGBA./td>
+		<td><b><I>字体颜色 (RGBA)</I></b></td>
+		<td>字体颜色设置，使用RGBA</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
@@ -162,132 +162,131 @@ Used only for text display and does not support user input. The properties are s
 </table>
 </br>
 
-##### Button
-Clickable widget with text and background image. The properties are shown in [Table 2-2](#table_2_2).
+##### 按钮 (Button)
+可点击的控件，具有文本和背景图片。属性如 [表 2-2](#table_2_2) 所示。
 
-<div id = "table_2_2" style="text-align:center;"><b>Table 2-2 Button properties</b></div>
+<div id = "table_2_2" style="text-align:center;"><b>表 2-2 按钮属性</b></div>
 
 <table align="center">
     <tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+		<th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+		<td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+		<td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+		<td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-		<td><b><I>Text</I></b></td>
-		<td>Displayed text</td>
+		<td><b><I>文本</I></b></td>
+		<td>显示文本</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Text X</I></b></td>
-		<td>Horizontal coordinate relative to the Button widget.</td>
+		<td><b><I>文本 X</I></b></td>
+		<td>相对于按钮控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-        <td><b><I>Text Y</I></b></td>
-		<td>Vertical coordinate relative to the Button widget.</a>
+        <td><b><I>文本 Y</I></b></td>
+		<td>相对于按钮控件的垂直坐标</a>
         </td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Display Mode</I></b></td>
-		<td>Horizontal or Vertical display.</td>
+		<td><b><I>显示模式</I></b></td>
+		<td>水平或垂直显示</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-        <td><b><I>Font</I></b></td>
-		<td>Font setting, please refer to
-        <a href="#font_setting_anchor">Font Setting</a>.
+        <td><b><I>字体</I></b></td>
+		<td>字体设置请参考
+        <a href="#font_setting_anchor">字体设置</a>
         </td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Text Color (RGB)</I></b></td>
-		<td>Text color setting, use RGB.</td>
+		<td><b><I>文本颜色 (RGB)</I></b></td>
+		<td>文本颜色设置，使用RGB</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-        <td><b><I>Transition</I></b></td>
-		<td>Image transition mode with the following options.
-        normal: No effect</br>
-        fade: Fade-in/out</br>
-        scale: Scalling</br>
-        fadeScale: Fade-in/out and scaling</br>
-        Note: Set the transition mode is effective only if set
-        the default and highlight background image, otherwise all normal.
+        <td><b><I>转换</I></b></td>
+		<td>图像转换模式有以下选项：</br>
+        normal: 无效果</br>
+        fade: 淡入/淡出</br>
+        scale: 缩放</br>
+        fadeScale: 淡入/淡出和缩放</br>
+        注意：只有在设置了默认和高亮背景图片时，变换模式才会生效，否则默认为normal。
         </td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-        <td><b><I>BG Image (Default)</b></I></td>
-        <td>Default background image.</td>
+        <td><b><I>BG 图像 (默认)</b></I></td>
+        <td>默认的背景图像</td>
         <td style="text-align: center">Y</td>
         <td style="text-align: center">Y</td>
         <td style="text-align: center">Y</td>
     </tr>
     <tr style="font-size: 14px;">
-        <td><b><I>BG Image</br>
-        (Highlight)</b></I></td>
-        <td>Selected/Highlight background image.</td>
+        <td><b><I>BG 图像</br>
+        (高亮)</b></I></td>
+        <td>选定/高亮显示的背景图像</td>
         <td style="text-align: center">Y</td>
         <td style="text-align: center">Y</td>
         <td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-        <td><b><I>BG Image</br>
-        Rotation Angle</b></I></td>
-        <td>Background image rotation angle, range: 0~360 degree.</td>
+        <td><b><I>BG 图像</br>
+        旋转角度</b></I></td>
+        <td>背景图像旋转角度，范围：0~360度</td>
         <td style="text-align: center">Y</td>
         <td style="text-align: center">Y</td>
         <td style="text-align: center">Y</td>
@@ -295,167 +294,167 @@ Clickable widget with text and background image. The properties are shown in [Ta
 </table>
 </br>
 
-##### Image
-Widget that can set image. The properties are shown in [Table 2-3](#table_2_3).
+##### 图像 (Image)
+能够设置图像的控件，其属性如 [表 2-3](#table_2_3) 所示。
 
-<div id = "table_2_3" style="text-align:center;"><b>Table 2-3 Image properties</b></div>
+<div id = "table_2_3" style="text-align:center;"><b>表 2-3 图像属性</b></div>
 
 <table align="center">
     <tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+		<th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+		<td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+		<td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+		<td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-	    <td><b><I>Image</b></I></td>
-	    <td>Image Path</br>
-        Note: The image must be pre-imported into the project. Please refer to
-        <a href="#img_res_m_anchor">Image Resource Management</a> for details.
+	    <td><b><I>图像</b></I></td>
+	    <td>图像路径</br>
+        注意：图像必须预先导入到项目中。详细请参考
+        <a href="#img_res_m_anchor">图像资源管理</a>。
         </td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="font-size: 14px;">
-	    <td><b><I>Image Rotation Angle</b></I></td>
-	    <td>Image rotation angle.</td>
+	    <td><b><I>图像旋转角度</b></I></td>
+	    <td>图像旋转角度</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-	    <td><b><I>Image Scale X</b></I></td>
-	    <td>Image horizontal scaling degree, is a multiplier/percentage.</br>
-        For example, set scale x 0.5 means that the actual display width of the image is half of the original image width.
+	    <td><b><I>图像比例 X</b></I></td>
+	    <td>图像水平缩放程度，是一个倍数/百分比。</br>
+        例如，设置比例x 为0.5表示图像的实际显示宽度是原始图像宽度的一半。
         </td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="font-size: 14px;">
-	    <td><b><I>Image Scale Y</b></I></td>
-	    <td>Image vertical scaling degree, is a multiplier/percentage.</td>
+	    <td><b><I>图像比例 Y</b></I></td>
+	    <td>图像垂直缩放程度，是一个倍数/百分比</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
 </table>
 
-**Note:**
-1.	When exporting, tool will convert the imported images. And the image conversion parameters can be set in "Menu Bar -> Setting -> Image Convert Setting", please refer to <a href="#img_conv_setting_anchor">Image Convert Setting</a> for details.
-2.	If the size of the imported image does not match the size of the widget, tool doesn't scale or crop the image.
+**注意:**
+1.	在导出时，工具将转换导入的图像。可以在“菜单栏 -> 设置 -> 图像转换设置”中设置图像转换参数，详细请参考 <a href="#img_conv_setting_anchor">图像转换设置</a>。
+2.	如果导入的图像大小与控件的大小不匹配，工具不会对图像进行缩放或裁剪。
 
 </br>
 
-##### SeekBar
-Sliding widget that can respond to user swipe gesture with the widget and change the progress value. The properties are shown in [Table 2-4](#table_2_4).
+##### 滑动条 (SeekBar)
+滑动控件，可以响应用户滑动手势，并改变进度值。其属性如 [表 2-4](#table_2_4) 所示。
 
-<div id = "table_2_4" style="text-align:center;"><b>Table 2-4 Text widget properties</b></div>
+<div id = "table_2_4" style="text-align:center;"><b>表 2-4 滑动条属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+		<th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+		<td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+		<td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+		<td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-	    <td><b><I>Color(Highlight) (RGBA)</b></I></td>
-	    <td>Background color of partially completed part of progress bar, please refer to
-        <a href="#figure_2_1">Figure 2-1</a>.
+	    <td><b><I>颜色 (高亮) (RGBA)</b></I></td>
+	    <td>进度条完成部分的背景色，请参考
+        <a href="#figure_2_1">图 2-1</a>.
         </td>
 	    <td style="text-align: center">N</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">N</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-	    <td><b><I>Color (RGBA)</b></I></td>
-	    <td>Background color of the whole progress bar, please refer to
-        <a href="#figure_2_1">Figure 2-1</a>.
+	    <td><b><I>颜色 (RGBA)</b></I></td>
+	    <td>整个进度条的背景色，请参考
+        <a href="#figure_2_1">图 2-1</a>.
         </td>
 	    <td style="text-align: center">N</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">N</td>
     </tr>
     <tr style="font-size: 14px;">
-	    <td><b><I>Orientation</b></I></td>
-	    <td>Widget display orientation and gesture response orientation with the following types:</br>
-        vertical/V: Vertical orientation</br>
-        arc: Direction of a curve</br>
-        horizontal/H: Horizontal orientation</td>
+	    <td><b><I>方向</b></I></td>
+	    <td>控件显示方向和手势响应方向的类型如下：</br>
+        vertical/V: 垂直方向</br>
+        arc: 曲线的方向</br>
+        horizontal/H: 水平方向</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
@@ -463,103 +462,102 @@ Sliding widget that can respond to user swipe gesture with the widget and change
 </table>
 
 <div id="figure_2_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817870508689816/f43215ff_12407535.png" style="width: 400px"></div>
-<div style="text-align:center;"><b>Figure 2-1 Seekbar</b></div>
+<div style="text-align:center;"><b>图 2-1 Seekbar</b></div>
 </br>
 
-##### Image SeekBar
-Sliding widget with multi-images as background, and switch to different images as user swipes. The properties are shown in Table 2-5.
+##### 图像滑动条 (Image SeekBar)
+具有多个图像作为背景的滑动控件，用户滑动时可以切换到不同的图像，其属性如表 [表 2-5](#table_2_5) 所示。
 
-<div id = "table_2_5" style="text-align:center;"><b>Table 2-5 Image Seekbar properties</b></div>
+<div id = "table_2_5" style="text-align:center;"><b>表 2-5 图像滑动条属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+		<th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+		<td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+		<td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+		<td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-	    <td><b><I>Degree(Start)</b></I></td>
-	    <td>Start degree (Invalid if orientation is arc).</td>
+	    <td><b><I>角度 (起始)</b></I></td>
+	    <td>起始角度（如果方向是曲线则无效）</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-	    <td><b><I>Degree(End)</b></I></td>
-	    <td>End degree (Invalid if orientation is arc).</td>
+	    <td><b><I>角度 (结束)</b></I></td>
+	    <td>结束角度（如果方向是曲线则无效）</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="font-size: 14px;">
-	    <td><b><I>Image Directory</b></I></td>
-	    <td>Folder that contains only the images to be displayed on this widget.</br>
-        Notes: </br>
-        1.	Please sort the images by name;</br>
-        2.	When the user swipes on the widget, the widget will switch the background image according to the current progress.
+	    <td><b><I>图像目录</b></I></td>
+	    <td>包含要在此控件上显示的图像的文件夹</br>
+        注意： </br>
+        1.	请按名称对图像进行排序；</br>
+        2.	当用户在控件上滑动时，控件将根据当前进度切换背景图像。
         </td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-	    <td><b><I>Central X</b></I></td>
-	    <td>Horizontal coordinate of the center of the arc relative to the parent widget.</td>
+	    <td><b><I>中心 X</b></I></td>
+	    <td>弧的中心相对于父控件的水平坐标</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="font-size: 14px;">
-	    <td><b>Central Y<I></b></I></td>
-	    <td>Vertical coordinate of the center of the arc relative to the parent widget.</td>
+	    <td><b>中心 Y<I></b></I></td>
+	    <td>弧的中心相对于父控件的垂直坐标</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-	    <td><b><I>Orientation</b></I></td>
-	    <td>Widget display orientation and gesture response orientation with the following types:</br>
-        vertical/V: Vertical orientation</br>
-        arc: Direction of a curve</br>
-        horizontal/H: Horizontal orientation
-        </td>
+	    <td><b><I>方向</b></I></td>
+	    <td>控件显示方向和手势响应方向的类型如下：</br>
+        vertical/V: 垂直方向</br>
+        arc: 曲线的方向</br>
+        horizontal/H: 水平方向</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
@@ -567,64 +565,64 @@ Sliding widget with multi-images as background, and switch to different images a
 </table>
 </br>
 
-##### Switch
-Switch widget with "Checked" and "Unchecked" states. The properties are shown in [Table 2-6](#table_2_6).
+##### 开关 (Switch)
+具有“已选中”和“未选中”状态的开关控件，其属性如 [表 2-6](#table_2_6) 所示。
 
-<div id = "table_2_6" style="text-align:center;"><b>Table 2-6 Switch properties</b></div>
+<div id = "table_2_6" style="text-align:center;"><b>表 2-6 开关属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+		<th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+        <td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+        <td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+        <td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="font-size: 14px;">
-		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
-		<td style="text-align: center">Y</td>
-		<td style="text-align: center">Y</td>
-		<td style="text-align: center">Y</td>
-	</tr>
+        <td><b><I>X</I></b></td>
+        <td>相对于父控件的水平坐标</td>
+        <td style="text-align: center">Y</td>
+        <td style="text-align: center">Y</td>
+        <td style="text-align: center">Y</td>
+    </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
-		<td style="text-align: center">Y</td>
-		<td style="text-align: center">Y</td>
-		<td style="text-align: center">Y</td>
-	</tr>
+        <td><b><I>Y</I></b></td>
+        <td>相对于父控件的垂直坐标</td>
+        <td style="text-align: center">Y</td>
+        <td style="text-align: center">Y</td>
+        <td style="text-align: center">Y</td>
+    </tr>
     <tr style="font-size: 14px;">
-	    <td><b><I>BG Image(Checked)</b></I></td>
-	    <td>Checked state background image.</td>
+	    <td><b><I>BG 图像 (已选中)</b></I></td>
+	    <td>已选中状态的背景图像</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
     </tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-	    <td><b><I>BG Image(Default)</b></I></td>
-	    <td>Unchecked state background image.</td>
+	    <td><b><I>BG 图像 (未选中)</b></I></td>
+	    <td>未选中状态的背景图像</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
 	    <td style="text-align: center">Y</td>
@@ -632,109 +630,109 @@ Switch widget with "Checked" and "Unchecked" states. The properties are shown in
 </table>
 </br>
 
-##### Arc
-Arc widget, no gesture support yet. The properties are shown in [Table 2-7](#table_2_7).
+##### 弧形 (Arc)
+弧形控件，暂时不支持手势，其属性如 [表 2-7](#table_2_7) 所示。
 
-<div id = "table_2_7" style="text-align:center;"><b>Table 2-7 Arc properties</b></div>
+<div id = "table_2_7" style="text-align:center;"><b>表 2-7 弧形属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+        <th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
 		<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+        <td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+        <td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+        <td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Central X</I></b></td>
-		<td>Horizontal coordinate of the center of the arc relative to the parent widget.</td>
+		<td><b><I>中心 X</b></I></td>
+	    <td>弧的中心相对于父控件的水平坐标</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Central Y</I></b></td>
-		<td>Vertical coordinate of the center of the arc relative to the parent widget.</td>
+		<td><b>中心 Y<I></b></I></td>
+	    <td>弧的中心相对于父控件的垂直坐标</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="font-size: 14px;">
-        <td><b><I>BG Color</I></b></td>
-		<td>Arc background color</td>
+        <td><b><I>BG 颜色</I></b></td>
+		<td>弧形背景颜色</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
     </tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Cap Mode</I></b></td>
-		<td>Arc cap mode, the following options are supported:</br>
-        round/butt/square, please refer to
-        <a href="#figure_2_2">Figure 2-2</a>
+		<td><b><I>末端样式</I></b></td>
+		<td>弧度末端样式，支持以下选项：</br>
+        圆形/平头/方形，请参考
+        <a href="#figure_2_2">图 2-2</a>
         </td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Degree(End)</b></I></td>
-		<td>End degree of arc.</td>
+		<td><b><I>度数 (结束)</b></I></td>
+		<td>弧形的结束度数</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
     </tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Degree(Start)</b></I></td>
-		<td>Start degree of arc.</td>
+		<td><b><I>度数 (开始)</b></I></td>
+		<td>弧形的开始度数</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Radius</b></I></td>
-		<td>Radius of arc.</td>
+		<td><b><I>半径</b></I></td>
+		<td>弧形的半径</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
     </tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Stroke Width</b></I></td>
-		<td>Width of arc stroke.</td>
+		<td><b><I>描边宽度</b></I></td>
+		<td>弧形的描边宽度</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">N</td>
@@ -742,58 +740,58 @@ Arc widget, no gesture support yet. The properties are shown in [Table 2-7](#tab
 </table>
 
 <div id = "figure_2_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817869829442326/90524d4c_12407535.png"/></div>
-<div style="text-align:center;"><b>Figure 2-2 Cap mode</b></div>
+<div style="text-align:center;"><b>图 2-2 末端样式</b></div>
 </br>
 
 
-#### Container widget
-##### Screen
-Screen widget, corresponds to the physical screen, is the root widget of a GUI project. The properties are shown in [Table 2-8](#table_2_8).
+#### 容器控件
+##### 屏幕 (Screen)
+屏幕控件，对应于物理屏幕，是GUI项目的根控件，其属性显示在 [表 2-8](#table_2_8) 中。
 
-**Note:**
-Only "Name" property can be modified.
+**注意：**
+只能修改“名称”属性。
 
-<div id = "table_2_8" style="text-align:center;"><b>Table 2-8 Screen properties</b></div>
+<div id = "table_2_8" style="text-align:center;"><b>表 2-8 屏幕属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+        <th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+        <td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+        <td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+        <td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate, always 0.</td>
+		<td>水平坐标，始终为0</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate, always 0.</td>
+		<td>垂直坐标，始终为0</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
@@ -801,62 +799,61 @@ Only "Name" property can be modified.
 </table>
 </br>
 
-##### TabView and Tab
-With Tab widget as child widget, it supports up/down/left/right swiping to switch among Tabs. 
-The properties of TabView are shown in [Table 2-9](#table_2_9), and the properties of Tab are shown in [Table 2-10](#table_2_10).
+##### 选项卡视图 (TabView) 和选项卡 (Tab)
+选项卡视图控件作为父控件，支持上下左右滑动来在选项卡之间切换。选项卡视图控件具有以下属性，如 [表 2-9](#table_2_9) 所示，选项卡控件具有以下属性，如 [表 2-10](#table_2_10) 所示。
 
-<div id = "table_2_9" style="text-align:center;"><b>Table 2-9 TabView properties</b></div>
+<div id = "table_2_9" style="text-align:center;"><b>表 2-9 选项卡视图属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+        <th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+        <td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+        <td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+        <td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget, always 0.</td>
+		<td>相对于父控件的水平坐标，始终为0</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent widget, always 0.</td>
+		<td>相对于父控件的垂直坐标，始终为0</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>Transition</b></I></td>
-		<td>Tab transition mode with the following supported types:</br>
-        normal: No effect</br>
-        fade: Fade-in/out</br>
-        scale: Scalling</br>
-        fadeScale: Fade-in/out and scaling
+		<td>选项卡切换模式支持以下类型：</br>
+        normal: 无特效</br>
+        fade: 淡入/淡出</br>
+        scale:  缩放</br>
+        fadeScale: 淡入/淡出和缩放
 		</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
@@ -864,63 +861,63 @@ The properties of TabView are shown in [Table 2-9](#table_2_9), and the properti
 	</tr>
 </table>
 
-<div id = "table_2_10" style="text-align:center;"><b>Table 2-10 Tab properties</b></div>
+<div id = "table_2_10" style="text-align:center;"><b>表 2-10 选项卡属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+        <th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+        <td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+        <td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+        <td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to TabView widget, always 0.</td>
+		<td>相对于父控件的水平坐标，始终为0</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to TabView widget, always 0.</td>
+		<td>相对于父控件的垂直坐标，始终为0</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Index(X-Axis)</b></I></td>
-		<td>Horizontal index of Tabs in TabView, please refer to
-		<a href="#figure_2_3">Figure 2-3</a>.</td>
+		<td><b><I>索引 (X轴)</b></I></td>
+		<td>选项卡视图中选项卡的水平索引，请参见
+		<a href="#figure_2_3">图 2-3</a>.</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Index(Y-Axis)</b></I></td>
-		<td>Vertical index of Tabs in TabView, please refer to
-		<a href="#figure_2_3">Figure 2-3</a>.</td>
+		<td><b><I>索引 (Y轴)</b></I></td>
+		<td>选项卡视图中选项卡的垂直索引，请参见
+		<a href="#figure_2_3">如 2-3</a>.</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
@@ -929,66 +926,66 @@ The properties of TabView are shown in [Table 2-9](#table_2_9), and the properti
 	
 <div id = "figure_2_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817871000642675/ca6cda22_12407535.png" width="300"/></div>
 	
-<center><div><b>Figure 2-3 Image Seekbar properties</b></div></center>
+<center><div><b>图 2-3 选项卡索引</b></div></center>
 
-**Notes:**
-1.	TabView width and height could not be modified, defaulting to Screen's width and height. 
-2.	TabView horizontal and vertical coordinate could not be modified, is always 0.
-3.	TabView can only be used as a child of Screen widget.
-4.	TabView's child widgets can only be Tabs.
-5.	Tab's width and height could not be modified, defaulting to TabView's width and height.
-6.	Tab's horizontal and vertical coordinate could not be modified and is always 0.
+**注意：**
+1.	选项卡视图的宽度和高度不能被修改，会默认设置为屏幕的宽度和高度。
+2.	选项卡视图的水平和垂直坐标不能被修改，始终为0。
+3.	选项卡视图只能作为屏幕控件的子控件使用。
+4.	选项卡视图的子控件只能是选项卡。
+5.	选项卡的宽度和高度不能被修改，会默认设置为选项卡视图的宽度和高度。
+6.	选项卡的水平和垂直坐标不能被修改，始终为0。
 
 </br>
 
-##### Page
-Container widget with scrollable content.
+##### 页面 (Page)
+具有可滚动内容的容器控件。
 
-**Notes:**
-1.	Page only supports vertical scrolling.
-2.	The width and height of the Page widget only defines the area of the interface that can response to a swipe gesture. Whether scrolling is allowed depends on whether or not the child widget added to it are outside the scope of the screen.
+**注意：**
+1.	页面只支持垂直滚动。
+2.	页面控件的宽度和高度只定义了对滑动手势响应的界面区域，是否允许滚动取决于是否将其添加到超出屏幕范围的子控件中。
 
-<div id = "table_2_11" style="text-align:center;"><b>Table 2-11 Page  properties</b></div>
+<div id = "table_2_11" style="text-align:center;"><b>表 2-11 页面属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+        <th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G</th>
 		<th width="60">TBD</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+        <td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+        <td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
     <tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+        <td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
@@ -997,57 +994,57 @@ Container widget with scrollable content.
 </br>
 
 
-##### Win
-Within the area defined by Win width and height, it can response to variable gestures, including click, long click, press, press release and swipe. The properties are shown in [Table 2-12](#table_2_12).
+##### 窗口 (Win)
+在窗口的宽度和高度定义的区域内，可以响应各种手势，包括点击、长按、按下、释放和滑动，其属性如 [表 2-12](#table_2_12) 所示。
 
-<div id = "table_2_12" style="text-align:center;"><b>Table 2-12 Win  properties</b></div>
+<div id = "table_2_12" style="text-align:center;"><b>表 2-12 窗口属性</b></div>
 
 <table align="center">
 	<tr>
-		<th width="130">Property</th>
-		<th width="350" style="text-align: center;">Description</th>
+		<th width="130">属性</th>
+        <th width="350" style="text-align: center;">描述</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Name</I></b></td>
-		<td>Widget name.</td>
+		<td><b><I>名称</I></b></td>
+        <td>控件名称</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Size (Height)</I></b></td>
-		<td>Widget height.</td>
+		<td><b><I>大小 (高度)</I></b></td>
+        <td>控件高度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Size (Width)</I></b></td>
-		<td>Widget width.</td>
+		<td><b><I>大小 (宽度)</I></b></td>
+        <td>控件宽度</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>X</I></b></td>
-		<td>Horizontal coordinate relative to the parent widget.</td>
+		<td>相对于父控件的水平坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Y</I></b></td>
-		<td>Vertical coordinate relative to the parent control.</td>
+		<td>相对于父控件的垂直坐标</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Hidden</b></I></td>
-		<td>Indicate whether Win and its child widget need to be hidden.</td>
+		<td><b><I>隐藏</b></I></td>
+		<td>表示是否隐藏窗口及其子控件</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
@@ -1056,659 +1053,650 @@ Within the area defined by Win width and height, it can response to variable ges
 </br>
 
 
-### Design View/Canvas
-Users can drag and drop widgets from the Toolbox panel into the Design View, adjust the widgets layout and set properterties to design a graphical interface that can be rendered in the Realtek ICs.
+### 设计视图/画布
+用户可以从工具箱面板中拖放控件到设计视图中，调整控件的布局并设置属性，以设计一个可以在瑞昱 IC中渲染的图形界面。
 
 <img src="https://foruda.gitee.com/images/1710817870929335945/6991cdc9_12407535.png">
-<div id = "figure_2_4" style="text-align:center;"><b>Figure 2-4 Design View</b></div>
+<div id = "figure_2_4" style="text-align:center;"><b>图 2-4 设计视图</b></div>
 </br>
 
-#### TabView - Create/Delete/Insert Tab
-Drag and drop TabView widget from the Toolbox into the Design View, then a TabView that contains only a home tab (coordinates (0,0)) is created, as shown in [Figure 2-5](#figure_2_5).
+#### 选项卡视图 - 创建/删除/插入选项卡
+从工具箱中拖放选项卡视图控件到设计视图中，创建出一个只包含一个主页选项卡（坐标（0,0））的选项卡视图，如 [图 2-5](#figure_2_5) 所示。
 
 
 <img src="https://foruda.gitee.com/images/1710817870419593506/9ab927b9_12407535.png">
-<div id = "figure_2_5" style="text-align:center;"><b>Figure 2-5 Create TabView</b></div>
+<div id = "figure_2_5" style="text-align:center;"><b>图 2-5 创建选项卡视图</b></div>
 </br>
 
 
-##### Create Tab
-New Tabs can be created by clicking the buttons around the Design View.
+##### 创建选项卡
+可以通过点击设计视图周围的按钮来创建新的选项卡。
 
-**Notes:**
-1.	If idx is 0, up and down button is enabled.
-2.	If idy is 0, left and right button is enabled.
+**注意：**
+1.	如果idx为0，则上下按钮可用。
+2.	如果idy为0，则左右按钮可用。
 
 
-###### Delete Tab
-Select the Tab to be deleted, click "Edit -> Delete" on the menu bar or press the Delete key on the keyboard. Then double-check if you want to delete it.
+###### 删除选项卡
+选择要删除的选项卡，在菜单栏上单击“编辑->删除”或按键盘上的Delete键，然后再次确认是否要删除它。
 
 <div id = "figure_2_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817870328087578/e0915700_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 2-6 Delete tab double-check</b></div>
+<div style="text-align:center;"><b>图 2-6  删除选项卡再次确认</b></div>
 </br>
 
-##### Insert Tab
-Currently, Tab insertion is only supported by modifying the coordinates of an existing Tab and creating a new one.
+##### 插入选项卡
+目前，选项卡的插入只支持通过修改现有选项卡的坐标并创建新选项卡来实现。
 
-For example, Tab need to be inserted between Tabs with coordinates (1, 0) and (2, 0), the steps are as follow.
-1.	Increase the idx of Tab (2,0) and the Tabs to its right by 1, as shown in [Figure 2-7 (b)](#figure_2_7_b).
-2.	Switch to Tab (1,0) and click  to create new Tab (2, 0).
+例如，需要在坐标（1,0）和（2,0）的选项卡之间插入一个选项卡，步骤如下。
+1.	将选项卡（2,0）及其右侧的选项卡的idx加一，如 [图 2-7 (b)](#figure_2_7_b) 所示。
+2.	切换到选项卡（1,0），点击 创建新的选项卡（2,0）。
 
 <div id="figure_2_7_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817875276200848/d238bf5a_12407535.png"></div>
-<div style="text-align:center;">a. Tab insertion position</div>
+<div style="text-align:center;">a. 选项卡插入位置</div>
 <div id="figure_2_7_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817875726752431/e704d18a_12407535.png"></div>
-<div style="text-align:center;">b. Modify existing Tab coordinates</div>
+<div style="text-align:center;">b. 修改已存在的选项卡坐标</div>
 <div id="figure_2_7_c"><img src="https://foruda.gitee.com/images/1710818987429423477/280e6384_12407535.png"></div>
-<div style="text-align:center;">c. Create Tab</div>
-<div style="text-align:center;"><b>Figure 2-7 Insert Tab</b></div>
+<div style="text-align:center;">c. 创建选项卡</div>
+<div style="text-align:center;"><b>图 2-7 插入选项卡</b></div>
 </br>
 
 
-#### Tabview Overview Chart
-Please click ![icon](https://foruda.gitee.com/images/1710818993805990437/796af0dc_12407535.png)  to show TabView Overview Chart.
+#### 选项卡视图概览图
+请点击 ![icon](https://foruda.gitee.com/images/1710818993805990437/796af0dc_12407535.png)  查看选项卡视图概览图。
 
-**Notes:**
-1.	The highlight Tab in the Overview Chart indicates the Tab that is currently being edited in Design View.
-2.	The Overview Chart label each Tab with its coordinates. When simulate or rendered in ICs, the Tab with coordinates (0,0) is displayed on the Home page, and users can swipe up/down/left/right to display other Tabs.
+**注意：**
+1.	在概览图中，高亮显示的选项卡表示当前在设计视图中正在编辑的选项卡。
+2.	概览图使用选项卡的坐标进行标注。当在IC中进行模拟或渲染时，坐标为（0, 0）的选项卡显示在主页上，用户可以上下左右滑动以显示其他选项卡。
 
 <div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710818988334796749/309f47b2_12407535.png"></div>
 <div id="figure_2_8_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710818988855366691/0a431fa4_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 2-8 TabView Overview Chart</b></div>
+<div style="text-align:center;"><b>图 2-8 选项卡视图概览图</b></div>
 </br>
 
 
-#### Zoom of Design View
-There are 3 ways to zoom the Design View.
-1.	Press Ctrl key and wheel mouse.
-2.	Click "-" and "+" button.
-3.	Drag the slider bar.
+#### 设计视图的缩放
+有三种方式可以对设计视图进行缩放。
+1.	按住Ctrl键，并滚动鼠标滚轮。
+2.	点击“-”和“+”按钮。
+3.	拖动滑动条。
 
 <div id="figure_2_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710818993215663271/c0d56791_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 2-9 Zoom of Design View</b></div>
+<div style="text-align:center;"><b>图 2-9 设计视图的缩放</b></div>
 </br>
 
 
-### Property View
-Selecting a widget in the Widget Tree or Design View exposes all of the widget's property values, which the users can modify as needed, as shown in [Figure 2-10](#figure_2_10).
+### 属性视图
+在控件树或设计视图中选择一个控件，可以显示出所有控件的属性值，用户可以根据需要进行修改，如 [图 2-10](#figure_2_10) 所示。
 
 <div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710818988161964594/40fa2436_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 2-10 Property View</b></div>
+<div style="text-align:center;"><b>图 2-10 属性视图</b></div>
 </br>
 
 
-### Widget Tree
-The Widget Tree is used to present to the users the parent/child/sibling relationship of the currently laid out widgets. And we have the following convention here.
-1.	The child widget layer is on top of the parent widget layer, i.e., when the parent and child widget overlap, the child widget will cover the parent widget.
-2.	The layer of sibling widgets is related to the order in which the widgets are added, with widgets add first at bottom and widgets added later at the top.
+### 控件树
+控件树用于向用户展示当前布局中控件之间的父子关系和兄弟关系。我们遵循以下约定：
+1.	子控件位于父控件的上方，即当父控件和子控件重叠时，子控件会覆盖父控件。
+2.	兄弟控件的图层顺序与添加顺序相关，先添加的控件在底部，后添加的控件在顶部。
 
-[Figure 2-11](#figure_2_11) shows all the child widgets of the Home tab and Lamp tab, where the Home tab has only one Image child widget for setting the background, and the Lamp tab contains an Image widget and a number of Switch widgets.
+[图 2-11](#figure_2_11) 展示了主页选项卡和灯选项卡中的所有子控件，其中主页选项卡只有一个背景图片控件，而灯选项卡包含一个图片控件和多个开关控件。
 
 <div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710818987846178523/1b27419f_12407535.png"></div>
-<div style="text-align:center;">a. Home Tab</div>
+<div style="text-align:center;">a. 主页选项卡</div>
 <div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710818987413289439/46a6c801_12407535.png"></div>
-<div style="text-align:center;">b. Lamp Tab</div>
-<div style="text-align:center;"><b>Figure 2-11 Property View</b></div>
+<div style="text-align:center;">b. 灯选项卡</div>
+<div style="text-align:center;"><b>图 2-11 控件树视图</b></div>
 </br>
 
-Widget Tree supports the following operations.
-1.	Select widget
-If you select a widget on the Widget Tree, the corresponding widget in the Design View focuses and its properties are shown on Property View.
-2.	Modify the parent-child relationship 
-Select a widget on the Widget Tree (except Tab/TabView/Screen) and drag-and-drop it on the target widget item. Then the widget will be a child widget of the target widget.
-3.	Modify widget layers
-Select a widget on the Widget Tree (except Tab/TabView/Screen) and drag-and-drop it to the upper or lower edge of the target widget item. Then on the Design View, the widget will be placed over or under the target widget.
-4.	Lock widgets
-Click the button and lock the widget/widgets, as shown in [Figure 2-12](#figure_2_12).
-    + If click the lock button of screen, all the screen's child widgets will be locked, then user could not drag or resize the widgets on Design View.
-    + If clik the lock button of Tab, all the tab's child widgets will be locked, then user could not drag or resize the widgets on Design View.
+控件树支持以下操作：
+1.	选择控件：如果在控件树中选择一个控件，设计视图中对应的控件会聚焦，并在属性视图中显示其属性。
+2.	修改父子关系：在控件树中选择一个控件（除了选项卡/选项卡视图/屏幕），并将其拖放到目标控件项上，该控件将成为目标控件的子控件。
+3.	修改控件图层：在控件树中选择一个控件（除了选项卡/选项卡视图/屏幕），将其拖放到目标控件项的上方或下方，在设计视图中，该控件将在目标控件的上方或下方。
+4.	锁定控件：点击锁定按钮，锁定一个或多个控件，如 [图 2-12](#figure_2_12) 所示。
+    + 如果点击屏幕的锁定按钮，所有屏幕的子控件将被锁定，用户将无法在设计视图中拖动或调整控件大小。
+    + 如果点击选项卡的锁定按钮，所有选项卡的子控件将被锁定，用户将无法在设计视图中拖动或调整控件大小。
 
 <div id="figure_2_12" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824254850042256/002159e9_12407535.png"></div>
-<div style="text-align:center;">a. Un-Locked</div>
+<div style="text-align:center;">a. 未锁定</div>
 <div id="figure_2_12_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824254887179488/09fabec5_12407535.png"></div>
-<div style="text-align:center;">b. Locked</div>
-<div style="text-align:center;"><b>Figure 2-12 Lock widget/widgets</b></div>
+<div style="text-align:center;">b. 已锁定</div>
+<div style="text-align:center;"><b>图 2-12 锁定控件</b></div>
 </br>
 
 
 <div STYLE="page-break-after: always;"></div> 
 
 
-## Resource Mangement
-Only pre-imported image and font files can be referenced by the GUI project. This chapter focus on how to manage image and font resource.
-The image and font explorer is located directly below the design view, as shown in [Figure 3-1](#figure_3_1).
+## 资源管理
+只有预导入的图像和字体文件可以被GUI项目引用。本章重点介绍如何管理图像和字体资源。
+图像和字体资源管理器位于设计视图正下方，如 [图 3-1](#figure_3_1) 所示。
 
 <div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824260408871745/edfdf9bd_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 3-1 Image and font resource management</b></div>
+<div style="text-align:center;"><b>图 3-1 图像和字体资源管理</b></div>
 </br>
 
 
-### <div id="img_res_m_anchor">Image Resource Management</div>
-Click ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png)  to bring up the Image Management view as shown in [Figure 3-2](#figure_3_2).
+### <div id="img_res_m_anchor">图像资源管理</div>
+点击 ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png)  打开图像管理器，如 [图 3-2](#figure_3_2) 所示。
 
 <div id="figure_3_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824254901030282/9705cea5_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 3-2 Image resource management window</b></div>
+<div style="text-align:center;"><b>图 3-2 图像资源管理窗口</b></div>
 </br>
 
 
-##### Add Images
-Images can be added to the GUI project by following the process below.
-1.	Click   to create a new image folder and enter the folder name.
-The created folder is located in the Resouce\image folder under the GUI project directory.
+##### 添加图像
+通过以下步骤可以将图像添加到GUI项目中。
+1.	点击 ，创建一个新的图像文件夹并输入文件夹名称。创建的文件夹位于GUI项目目录下的Resouce\image文件夹中。
 
 <div id="figure_3_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824260010283421/eb1636f0_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 3-3 Create image folder</b></div>
+<div style="text-align:center;"><b>图 3-3 创建图像文件夹</b></div>
 
-2.	Select the created image folder and click ![icon](https://foruda.gitee.com/images/1710824254769021374/55b6c303_12407535.png) to select images (multiple selection is possible) to add them to the folder.
-As shown in [Figure 3-4](#figure_3_4), the images are copied to the Resource\image\home folder after the addition is completed.
+2.	选择创建的图像文件夹，然后点击 ![icon](https://foruda.gitee.com/images/1710824254769021374/55b6c303_12407535.png) 选择图像（支持多选），将它们添加到文件夹中。添加完成后，如 [图 3-4](#figure_3_4)所示，图像会被复制到Resource\image\home文件夹中。
 
 <div id="figure_3_4_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824488209842923/05efbb41_12407535.png" width="300"></div>
-<div style="text-align:center;">a. Select image folder</div>
+<div style="text-align:center;">a. 选择图像文件夹</div>
 <div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483196685183/7e19707a_12407535.png" width="500"></div>
-<div style="text-align:center;">b. Select the images to be added</div>
+<div style="text-align:center;">b. 选择需要添加的图像</div>
 <div id="figure_3_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824488369529087/4940a684_12407535.png" width="300"></div>
-<div style="text-align:center;">c. Add images</div>
-<div style="text-align:center;"><b>Figure 3-4 Add Image(s)</b></div>
+<div style="text-align:center;">c. 添加图像</div>
+<div style="text-align:center;"><b>图 3-4 添加图像</b></div>
 </br>
 
 
-##### Remove Images/Image Folder
-Select the image or image folder to be removed, and click ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png).
+##### 移除图像/图像文件夹
+选择要移除的图像或图像文件夹，然后点击 ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png)。
 </br>
 
 
-##### Rename Image Folder
-Select the image folder, double click and enter a new name.
+##### 重命名图像文件夹
+选择图像文件夹，双击并输入一个新名称。
 </br>
 
 
-#### Preview Images
-Select the image folder and all images in this folder will be displayed in the right area.
+#### 预览图像
+选择图像文件夹，右侧区域将显示该文件夹中的所有图像。
 
 <div id="figure_3_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483098291044/697fd630_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 3-5 Preview images</b></div>
+<div style="text-align:center;"><b>图 3-5 预览图像</b></div>
 </br>
 
 
-#### Refresh
-If the user locally operates the image resources, not via Tool, you can click   to refresh.
+#### 刷新
+如果用户在本地操作图像资源而不是通过工具进行操作，可以点击   刷新。
 
-**Note:**
-Not recommended.
+**注意：**
+不推荐的做法。
 </br>
 
 
-### Font Resource Management
-Please refer to [Figure 3-6](#figure_3_6).
+### 字体资源管理
+请参考 [图 3-6](#figure_3_6)。
 </br>
 
 
-#### Add Third-Party Font
-If need use a third-party font (.ttf), please click ![icon](https://foruda.gitee.com/images/1710824482944711702/8b73005d_12407535.png) to import the resource first, otherwise the locally installed font will be used.
+#### 添加第三方字体
+如果需要使用第三方字体（.ttf），请先点击 ![icon](https://foruda.gitee.com/images/1710824482944711702/8b73005d_12407535.png) 导入资源，否则将使用本地安装的字体。
 
 <div id="figure_3_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483191984010/283b1f70_12407535.png" width="500"></div>
-<div style="text-align:center;"><b>Figure 3-6 Fonts management</b></div>
+<div style="text-align:center;"><b>图 3-6 字体管理</b></div>
 </br>
 
 
-#### Remove Third-Party Font
-Select the font to be removed and click ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png).
+#### 移除第三方字体
+选择要移除的字体，然后点击  ![icon](https://foruda.gitee.com/images/1710824483012674071/c0c62b91_12407535.png)。
 </br>
 
 
 <div STYLE="page-break-after: always;"></div> 
 
 
-## Menu Bar
-### File
-#### Start Page
-If you want to close the current project and open an existed project or create a new project, you can open the Start Page by click "File -> Start Page".
-Click "Open Project" or select a .rtkprj and double click to open the existed project, or click "Create Project" to create a new project, please refer to [How to Create Project](#how_to_create_anchor) and [How to Open Project](#how_to_open_anchor).
+## 菜单栏
+### 文件
+#### 起始页
+如果要关闭当前项目并打开一个已存在的项目或新建一个项目，可以通过点击“文件 -> 起始页”来打开起始页。
+点击“打开项目”或选择一个.rtkprj文件并双击打开已存在的项目，或者点击“创建项目”来创建新项目，请参考 [如何创建项目](#how_to_create_anchor) 和 [如何打开项目](#how_to_open_anchor)。
 
 
 <div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824561456305634/8d4384a4_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 4-1 File - Start Page</b></div>
+<div style="text-align:center;"><b>图 4-1 文件 - 起始页</b></div>
 </br>
 
 
-#### Save
-Save all the UI changes of the project, the shortcut is Ctrl + S.
+#### 保存
+保存项目的所有UI更改，快捷键是Ctrl + S。
 </br>
 
 
-##### Exit Save
-Prompt window will pop-up when you close the project, as shown below. Please click "OK" to save, or the changes will be abandoned.
+##### 退出保存
+当关闭项目时会弹出提示窗口，如下所示。请点击“确定”进行保存，否则更改将会丢失。
 
 <div id="figure_4_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555938151074/9cb2be23_12407535.png" width="260"></div>
-<div style="text-align:center;"><b>Figure 4-2 Close and save the project</b></div>
+<div style="text-align:center;"><b>图 4-2 关闭并保存项目</b></div>
 </br>
 
 
-### Edit
-#### Copy/Paste
-1.	Click "Edit -> Copy" to copy the selected widget, the shortcut is Ctrl + C.
-2.	Click "Edit -> Paste" to create a copy of the selected widget on the Design View, the shortcut is Ctrl + V.
+### 编辑
+#### 复制/粘贴
+1.	点击“编辑 -> 复制”以复制所选控件，快捷键是Ctrl + C。
+2.	点击“编辑 -> 粘贴”以在设计视图中创建所选控件的副本，快捷键是Ctrl + V。
 </br>
 
 
-#### Delete
-Click "Edit -> Delete" to delete the selected widget, or press "Delete" key on the keyboard.
+#### 删除
+点击“编辑 -> 删除”以删除所选控件，或按下键盘上的“Delete”键。
 </br>
 
 
-#### Undo/Redo
-Undo: Undo the change made to the widget, the shortcut is Ctrl + Z.
-Redo: Do the change to the widget again, the shortcut is Ctrl + Y.
+#### 撤销/重做
+撤销：撤销对控件所做的更改，快捷键是Ctrl + Z。
+重做：重新对控件进行更改，快捷键是Ctrl + Y。
 </br>
 
 
-#### Convert Project
-The Convert Project window is used to convert the IC type and screen size/resolution for current project.
+#### 转换项目
+转换项目窗口用于转换当前项目的IC类型和屏幕尺寸/分辨率。
 
 <div id="figure_4_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555929917469/fcbb0ff3_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 4-3 Convert Project window</b></div>
+<div style="text-align:center;"><b>图 4-3 转换项目窗口</b></div>
 </br>
 
 
-#### Project Name Modification
-The Project Name window is used to modify current project name. Please enter the new name in the input box.
+#### 修改项目名称
+修改项目名称窗口用于修改当前项目的名称。请在输入框中输入新名称。
  
 <div id="figure_4_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555934977455/0a13f4fd_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 4-4 Project Name window</b></div>
+<div style="text-align:center;"><b>图 4-4 修改项目名称窗口</b></div>
 </br>
 
 
-### Setting
+### 设置
 
-#### <div id="img_conv_setting_anchor">Image Convert Setting</div>
-The images must be converted to be displayed correctly on the IC, so users need to set the correct convert parameters. All the optional parameters are shown in [Figure 4-5](#figure_4_5).
+#### <div id="img_conv_setting_anchor">图像转换设置</div>
+图像必须转换才能在IC上正确显示，因此用户需要设置正确的转换参数。所有可选参数如 [图 4-5](#figure_4_5) 所示。
 
 <div id="figure_4_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555965501168/ec76c1b1_12407535.png" width="260"></div>
-<div style="text-align:center;"><b>Figure 4-5 Image convert window</b></div>
+<div style="text-align:center;"><b>图 4-5 图像转换窗口</b></div>
 
-The parameters are described as follows.
+参数描述如下。
 </br>
 
 
-##### Scan Mode
-The available options are shown in [Table 4-1](#table_4_1).
+##### 扫描模式
+可用的选项如 [表 4-1](#table_4_1) 所示。
 
-<div id="table_4_1" style="text-align:center;"><b>Table 4-1 Scan mode options</b></div>
+<div id="table_4_1" style="text-align:center;"><b>表 4-1 扫描模式选项</b></div>
 <table align="center">
 	<tr>
-		<th width="130">Scan Mode</th>
-		<th width="600" style="text-align: center;">Description</th>
+		<th width="130">扫描模式</th>
+		<th width="600" style="text-align: center;">描述</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Horizental</I></b></td>
-		<td>Horizontal scan.</td>
+		<td><b><I>水平</I></b></td>
+		<td>水平扫描</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Vertical</I></b></td>
-		<td>Vertical scan.</td>
+		<td><b><I>垂直</I></b></td>
+		<td>垂直扫描</td>
 	</tr>
 </table>
 </br>
 
-##### Color Space
-Color space of Image, the available options are shown in [Table 4-2](#table_4_2).
+##### 颜色空间
+图像的颜色空间，可用的选项如 [表 4-2](#table_4_2) 所示。
 
-<div id="table_4_2" style="text-align:center;"><b>Table 4-2 Color space options</b></div>
+<div id="table_4_2" style="text-align:center;"><b>表 4-2 颜色空间选项</b></div>
 <table align="center">
 	<tr>
-		<th width="130">Color Space</th>
-		<th width="600" style="text-align: center;">Description</th>
+		<th width="130">颜色空间</th>
+		<th width="600" style="text-align: center;">描述</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>RGB565</I></b></td>
-		<td>16 bit RGB mode</br>
-        Bit 4:0 represent blue; Bit 10:5 represent green; Bit 15:11 represent red.
+		<td>16位RGB模式</br>
+        位 4:0 表示蓝色；位 10:5 表示绿色；位 15:11 表示红色。
         </td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>RTKARGB</I></b></td>
-		<td>16 bit ARGB mode</br>
-        Bit 4:0 represent blue; Bit 9:5 represent green; Bit 14:10 represent red; Bit 15 represent alpha.
+		<td>16位ARGB模式</br>
+        位 4:0 表示蓝色；位 9:5 表示绿色；位 14:10 表示红色; 位 15 表示透明度。
 		</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>RTKRGAB</I></b></td>
-		<td>16 bit RGAB mode</br>
-        Bit 4:0 represent blue; Bit 5 represent alpha; Bit 10:6 represent green; Bit 15:11 represent red.
+		<td>16位RGAB模式</br>
+        位 4:0 表示蓝色；位 5 表示透明度；位 10:6 表示绿色；位 15:11 表示红色。
 		</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>RGB</I></b></td>
-		<td>24 bit RGB mode</br>
-        Bit 7:0 represent blue; Bit 15:8 represent green; Bit 23:16 represent red.
+		<td>24 位 RGB mode</br>
+        位 7:0 表示蓝色；位 15:8 表示绿色；位 23:16 表示红色。
 		</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>RGBA</I></b></td>
-		<td>32 bit RGBA mode</br>
-        Bit 7:0 represent blue; Bit 15:8 represent green; Bit 23:16 represent red; Bit 31:24 represent alpha.
+		<td>32 位 RGBA mode</br>
+        位 7:0 表示蓝色；位 15:8 表示绿色；位 23:16 表示红色; 位 31:24 表示透明度。
         </td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>BINARY</I></b></td>
-		<td>2-value (0 or 1) image.</td>
+		<td><b><I>二进制</I></b></td>
+		<td>2-值 (0 或 1) 图像</td>
 	</tr>
 </table>
 </br>
 
 
-##### Compress
-If check "Compress", please set the compression parameter as needed.
-The optional Compress Mode is as follows:
-1.	RLE: Run-Length Encoding, a lossless compression algorithm.
-If you select RLE as the Compress Mode, RLE Level and RLE Run Length parameter are mandatory to set.
+##### 压缩
+如果勾选“压缩”，请根据需要设置压缩参数。
+可选的压缩模式如下：
+1.	行程长度编码（Run-Length Encoding），一种无损压缩算法。 如果选择RLE作为压缩模式，则需要设置RLE级别和RLE行程长度参数。
 
 <div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555889664193/c33b99ad_12407535.png" width="260"></div>
-<div style="text-align:center;">a. RLE Level - Level1</div>
+<div style="text-align:center;">a. RLE 级别 - Level1</div>
 <div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824561230699040/f2dbfb4a_12407535.png" width="260"></div>
-<div style="text-align:center;">b.	RLE Level - Level2</div>
-<div style="text-align:center;"><b>Figure 4-6 RLE parameters</b></div>
+<div style="text-align:center;">b.	RLE 级别 - Level2</div>
+<div style="text-align:center;"><b>图 4-6 RLE 参数</b></div>
 </br>
 
-<div id="table_4_3" style="text-align:center;"><b>Table 4-3 RLE Level</b></div>
+<div id="table_4_3" style="text-align:center;"><b>表 4-3 RLE 级别</b></div>
 <table class="center">
 	<tr>
-		<th width="150">RLE Level</th>
-		<th width="600" style="text-align: center;">Description</th>
+		<th width="150">RLE 级别</th>
+		<th width="600" style="text-align: center;">描述</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Level1</I></b></td>
-		<td>1-level compress.</td>
+		<td>1级压缩</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>Level2</I></b></td>
-		<td>2-level compress, secondary compress based on the 1-level compress.</td>
+		<td>2级压缩，基于1级压缩的次级压缩</td>
 	</tr>
 </table>
 
-<div id="table_4_4" style="text-align:center;"><b>Table 4-4 RLE Run Length</b></div>
+<div id="table_4_4" style="text-align:center;"><b>表 4-4 RLE 行程长度</b></div>
 <table align="center">
 	<tr>
-		<th width="150">RLE Run Length</th>
-		<th width="580" style="text-align: center;">Description</th>
+		<th width="150">RLE 行程长度</th>
+		<th width="580" style="text-align: center;">描述</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>Byte_1</I></b></td>
-		<td>1byte, Maximum 255.</td>
+		<td>1个字节，最大为255</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>Byte_2</I></b></td>
-		<td>2byte, Maximum 255.</td>
+		<td>2个字节，最大为255</td>
 	</tr>
 </table>
 
-Maximum length of duplicate characters allowed per stroke (Run) during compression.
+每个行程（Run）在压缩过程中允许的最大重复字符长度。
 
 2.	FastLz: 
-A dictionary-and-sliding-window based lossless compression algorithm for compressing data with a large number of repetitive values.
+一种基于字典和滑动窗口的无损压缩算法，用于压缩具有大量重复值的数据。
 3.	YUV_Sample_Blur: 
-A lossy compression algorithm combining YUV sampling and blurring.
-YUV Sample: Keep the luminance information of the image and only sample the chrominance information.
-Blur: Discard the lower bit of each byte after YUV sampling to achieve the purpose of data compression.
+一种结合YUV采样和模糊处理的有损压缩算法。
+YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
+模糊处理：在YUV采样后丢弃每个字节的低位，以达到数据压缩的目的。
 
 
-<div id="table_4_5" style="text-align:center;"><b>Table 4-5 YUV Sample Mode</b></div>
+<div id="table_4_5" style="text-align:center;"><b>表 4-5 YUV 采样模式</b></div>
 <table align="center">
 	<tr>
-		<th width="160">YUV Sample Mode</th>
-		<th width="570" style="text-align: center;">Description</th>
+		<th width="160">YUV 采样模式</th>
+		<th width="570" style="text-align: center;">描述</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>YUV444</I></b></td>
-		<td>4 pixel data are sampled to 4 Y, 4 U and 4, i.e., each Y corresponds to a set of UV components, fully preserving the YUV data.</td>
+		<td>采样4个像素数据到4个Y、4个U和4个V，即每个Y对应一组UV分量，完全保留YUV数据。</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>YUV422</I></b></td>
-		<td>Every 4 pixel data are sampled to 4 Y, 2 U and 2 V, i.e., every 2 Y corresponds to a set of UV components, data size is 75% of the original.</td>
+		<td>每4个像素数据采样为4个Y、2个U和2个V，即每2个Y对应一组UV分量，数据大小为原始数据的75%。</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
 		<td><b><I>YUV411</I></b></td>
-		<td>Every 4 pixel data are sampled to 4 Y, 1 U and 1 U, i.e., every 4 Y corresponds to a set of UV components, data size if 50% of the original.</td>
+		<td>每4个像素数据采样为4个Y、1个U和1个V，即每4个Y对应一组UV分量，数据大小为原始数据的50%。</td>
 	</tr>
 	<tr style="font-size: 14px;">
 		<td><b><I>YUV422</I></b></td>
-		<td>Y - luminance; V - chrominance.</td>
+		<td>Y - 亮度； V - 色度</td>
 	</tr>
 </table>
 
-<div id="table_4_6" style="text-align:center;"><b>Table 4-6 Blur Mode</b></div>
+<div id="table_4_6" style="text-align:center;"><b>表 4-6 模糊处理模式</b></div>
 <table align="center">
 	<tr>
-		<th width="150">YUV Sample Mode</th>
-		<th width="580" style="text-align: center;">Description</th>
+		<th width="150">模糊处理模式</th>
+		<th width="580" style="text-align: center;">描述</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Bit0</I></b></td>
-		<td>Saving without discarding lower bit.</td>
+		<td><b><I>位0</I></b></td>
+		<td>不丢弃低位的保存方式</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Bit1</I></b></td>
-		<td>Each byte discards bit0 (preserve [bit7:bit1]).</td>
+		<td><b><I>位1</I></b></td>
+		<td>每个字节丢弃位0 (保留 [位7:位1]).</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Bit2</I></b></td>
-		<td>Each byte discards [bit1:bit0] (preserve [bit7:bit2]).</td>
+		<td><b><I>位2</I></b></td>
+		<td>每个字节丢弃 [位1:位0] (保留 [位7:位2]).</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Bit4</I></b></td>
-		<td>Each byte discards [bit3:bit0] (preserve [bit7:bit4]).</td>
+		<td><b><I>位4</I></b></td>
+		<td>每个字节丢弃 [位3:位0] (保留 [位7:位4]).</td>
 	</tr>
 </table>
 
-4.	YUV_Sample_Blur+FastLz: Algorithm combines YUV_Sample_Blur and FastLz.
+4.	YUV_Sample_Blur+FastLz: 该算法结合了YUV_Sample_Blur和FastLz算法。
 
 
-#### <div id="font_setting_anchor">Font Convert Setting</div>
-Include Bitmap Fonts and Vector Fonts. Fonts supported by Realtek series ICs are shown in [Table 4-7](#table_4_7).
+#### <div id="font_setting_anchor">字体转换设置</div>
+包括位图字体和矢量字体。支持Realtek系列IC的字体在 [表 4-7](#table_4_7) 中显示。
 
-<u><b>Attention: You should create at least one Font Convert Setting, otherwise you could not select font for the text-type widget in the Property View.</b></u>
+<u><b>注意：您至少需要创建一个字体转换设置，否则无法在属性视图中为文本类型控件选择字体。</b></u>
 
-<div id="table_4_7" style="text-align:center;"><b>Table 4-7 Fonts supported by Realtek</b></div>
+<div id="table_4_7" style="text-align:center;"><b>表 4-7 Realtek支持的字体</b></div>
 <table align="center">
 	<tr>
-		<th width="130">Font</th>
+		<th width="130">字体</th>
 		<th width="60">8762D/8763E</th>
 		<th width="60">8762G/8772G</th>
 		<th width="60">TBD</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Vector</I></b></td>
+		<td><b><I>矢量</I></b></td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">N</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Bitmap</I></b></td>
+		<td><b><I>位图</I></b></td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 		<td style="text-align: center">Y</td>
 	</tr>
 </table>
 
-To use Bitmap Fonts, you need to set the following parameters.
+要使用位图字体，您需要设置以下参数。
 
 <div id="figure_4_7" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555984723993/d86cef5d_12407535.png" width="260"></div>
-<div style="text-align:center;"><b>Figure 4-7 Convert settings of Bitmap Fonts</b></div>
+<div style="text-align:center;"><b>图 4-7 位图字体的转换设置</b></div>
 
-[Table 4-8](#table_4_8) lists the description of each parameter.
+[表 4-8](#table_4_8) 列出了每个参数的描述。
 
-<div id="table_4_8" style="text-align:center;"><b>Table 4-8 Font convert parameters</b></div>
+<div id="table_4_8" style="text-align:center;"><b>表 4-8 字体转换参数</b></div>
 <table align="center">
 	<tr>
-		<th width="150">Parameters</th>
-		<th width="580" style="text-align: center;">Description</th>
+		<th width="150">参数</th>
+		<th width="580" style="text-align: center;">描述</th>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Font Setting Name</I></b></td>
-		<td>User-defined font setting name.</br>
-        Please make sure that you create a different font setting name each time.
+		<td><b><I>字体设置名称</I></b></td>
+		<td>用户定义的字体设置名称，</br>
+        请确保每次创建不同的字体设置名称。
 		</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Font Size</I></b></td>
-		<td>Font size.</td>
+		<td><b><I>字体大小</I></b></td>
+		<td>字体大小</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Bold</I></b></td>
-		<td>Bold or not.</td>
+		<td><b><I>粗体</I></b></td>
+		<td>是否为粗体</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Italic</I></b></td>
-		<td>Italic or not.</td>
+		<td><b><I>斜体</I></b></td>
+		<td>是否为斜体</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Render Mode</I></b></td>
-		<td>Bit number used to represent a pixel in the converted .bin file.</td>
+		<td><b><I>渲染模式</I></b></td>
+		<td>用于表示在转换的.bin文件中像素的位数</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Scan Mode</I></b></td>
-		<td>There are two ways to scan when saving .bin.</br>
-        H: Horizontal scanning</br>
-        V: Vertical scanning
+		<td><b><I>扫描模式</I></b></td>
+		<td>保存.bin时有两种扫描方式</br>
+        H: 水平扫描</br>
+        V: 垂直扫描
 		</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Index Method</I></b></td>
-		<td>Index method of the converted .bin's re-indexing area.</td>
+		<td><b><I>索引方法</I></b></td>
+		<td>转换的.bin文件重新索引区域的索引方法</td>
 	</tr>
 	<tr style="font-size: 14px;">
-		<td><b><I>Code Page</I></b></td>
-		<td>Support multiple code page.</td>
+		<td><b><I>代码页</I></b></td>
+		<td>支持多个代码页</td>
 	</tr>
 	<tr style="background-color: #D9E2F3; font-size: 14px;">
-		<td><b><I>Text Type</I></b></td>
-		<td>The types are as following.</br>
-        Range: If the text's Unicode range can be pre-determined, please select this type and entered the range in the Range TextBox. Multiple ranges are supported, please set each range in a separate line.</br>
-        Note: Only the characters within the ranges will be converted and save to .bin file, which can save storage space.</br>
-        Random: If the text's Unicode range cannot be pre-determined, please select this type.</br>
-        Note: All characters of the Font will be converted and save to .bin file.
+		<td><b><I>文本类型</I></b></td>
+		<td>有以下几种类型。</br>
+        范围：如果文本的Unicode范围可以预先确定，请选择此类型，并在范围文本框中输入范围。支持多个范围，请将每个范围单独设置在一行中。</br>
+        注意：只有范围内的字符将被转换并保存到.bin文件中，可以节省存储空间。</br>
+        随机：如果文本的Unicode范围无法预先确定，请选择此类型。</br>
+        注意：字体的所有字符都将被转换并保存到.bin文件中。
 		</td>
 	</tr>
 </table>
 
-Vector Font parameters are shown in [Figure 4-8](#figure_4_8).
+有关矢量字体的参数，请参考 [图 4-8](#figure_4_8)。
 
 <div id="figure_4_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824633144604007/ae5d772b_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 4-8 Vector font parameters</b></div>
+<div style="text-align:center;"><b>图 4-8 矢量字体参数</b></div>
 
 
-### Export
-If you have finished designing the GUI project and want to program it to the IC, please click "Export", then the Tool performs the following actions:
-1.	Image convert
-2.	Font convert
-3.	Pack the .xml, .js, images and fonts into the output .bin.
+### 导出
+如果您已经完成了GUI项目的设计，并且想将其烧录到IC中，请点击“导出”，然后工具将执行以下操作：
+1.	图像转换
+2.	字体转换
+3.	将.xml、.js、图像和字体打包到输出的.bin文件中。
 
-When the above actions are done, a message box pops up.
+当上述操作完成后，会弹出一个消息框。
 
 <div id="figure_4_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824633121026710/337d046a_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 4-9 Vector font parameters</b></div>
+<div style="text-align:center;"><b>图 4-9 导出成功</b></div>
 
-The .bin can be programmed into your IC.
+.bin文件可以烧录进您的IC中。
 
 
-### Simulate
-Simulate the project on UI.
-Attention: When you simulate the project at the first time, please click "Export" before clicking "Simulate". And then, there is no need to click "Export" again if you didn't modify any image or font setting.
-[Figure 4-10](#figure_4_10) hows the running simulator.
+### 模拟
+在UI上模拟项目。
+注意：当您第一次模拟项目时，请先点击“导出”，然后再点击“模拟”。如果您没有修改任何图像或字体设置，则无需再次点击“导出”。
+[图 4-10](#figure_4_10) 显示了运行中的模拟器。
 
 <div id="figure_4_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png" width="260"></div>
-<div style="text-align:center;"><b>Figure 4-10 Running simulator</b></div>
+<div style="text-align:center;"><b>图 4-10 运行模拟器</b></div>
 
 
 <div STYLE="page-break-after: always;"></div> 
 
 
-## Quick Start To Tutorials
-### <div id="how_to_create_anchor">How to Create Project</div>
+## 快速开始教程
+### <div id="how_to_create_anchor">如何创建项目</div>
 <div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824633374956290/299fb9f5_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 5-1 Start Page</b></div>
+<div style="text-align:center;"><b>图 5-1 开始页面</b></div>
 
-Double click and run "RVisualDesigner.exe", and then configure the project step by step (1~4) and click "Create Project" (5), as shown in [Figure 5-1](#figure_5_1).
-After creation, the GUI design window pops up as shown in [Figure 5-2](#figure_5_2). The left side is the component area, the center is the design area, and the right side is the widget property setting area. 
+双击运行"RVisualDesigner.exe"，然后按照步骤（1~4）配置项目，点击"创建项目"（5），如 [图 5-1](#figure_5_1) 所示。
+创建项目后，GUI设计窗口将弹出，如 [图 5-2](#figure_5_2) 所示。左侧是组件区域，中间是设计区域，右侧是部件属性设置区域。
 
 <div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824633484403086/7932a505_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 5-2 GUI design window</b></div>
+<div style="text-align:center;"><b>图 5-2 GUI设计窗口</b></div>
 
-Note: The newly created project file is located in the project folder under the Solution Folder (3 in [Figure 5-1](#figure_5_1)). There is an example in [Figure 5-3](#figure_5_3).
+注意：新创建的项目文件位于解决方案文件夹下的项目文件夹中 ([图 5-1](#figure_5_1) 中的3)。 [图 5-3](#figure_5_3) 中展示了一个示例。
 
 <div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824633124706596/fe5653b6_12407535.png" width="400"></div>
-<div style="text-align:center;"><b>Figure 5-3 Project folder</b></div>
+<div style="text-align:center;"><b>图 5-3 项目文件夹</b></div>
 
-After you drag and drop a widget on Design View, and click "File - Save" or press Ctrl + S, the .rtkui file will be created, as shown in [Figure 5-4](#figure_5_4).
+当在设计视图上拖放一个控件，并点击"文件 - 保存"或按下Ctrl + S时，将创建一个.rtkui文件，如 [Figure 5-4](#figure_5_4).
 
 <div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828526032663800/81e3057a_12407535.png" width="400"></div>
-<div style="text-align:center;"><b>Figure 5-4 The .rtkui file</b></div>
+<div style="text-align:center;"><b>图 5-4 .rtkui文件</b></div>
 
 
-### How to Write Javascript Code
-After the project is created, the xxx.js file is created, as shown in [Figure 5-4](#figure_5_4). The xxx.js file is empty, please code here to implement the widgets' event callback.
+### 如何编写 JavaScript 代码
+项目创建完成后，会生成一个 xxx.js 文件，如 [图 5-4](#figure_5_4) 所示。打开该文件，在其中编写 JavaScript 代码以实现控件的事件回调函数。
 
 
-### <div id="how_to_open_anchor">How to Open Project</div>
+### <div id="how_to_open_anchor">如何打开项目</div>
 <div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824633354019948/7c6804dc_12407535.png" width="400"></div>
-<div style="text-align:center;"><b>Figure 5-5 Open Project</b></div>
+<div style="text-align:center;"><b>图 5-5 打开项目</b></div>
 
-There are two ways to open project.
-1.	Click "Open Project" and select a .rtkprj file.
+有两种打开项目的方式：
+1.	点击 "打开项目"，选择一个 .rtkprj 文件进行打开。
 
 <div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828552787091298/4e1ccc92_12407535.png" width="400"></div>
-<div style="text-align:center;"><b>Figure 5-6 Open project by selecting .rtkprj</b></div>
+<div style="text-align:center;"><b>图 5-6 选择 .rtkprj 文件打开项目</b></div>
 
-2.	Select a .rtkprj in Recent Project area.
-If the project listed on Recent Project area, a message window pops up.
+2.	在 "最近项目" 区域选择一个 .rtkprj 文件进行打开。 如果最近项目中有所需的项目，则会弹出一个消息窗口。
 
 <div id="figure_5_7" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828557068088923/e418bb99_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 5-7 Message window</b></div>
+<div style="text-align:center;"><b>图 5-7 消息窗口</b></div>
 
 
-### How to Open/Close Project
-Click "File -> Start Page" on Menu Bar.
+### 如何打开/关闭项目
+点击菜单栏上的 "文件 -> 起始页"。
 
 
-### How to Export/Pack Project
+### 如何导出/打包项目
 <div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828565511074049/27af6150_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 5-8 Export</b></div>
+<div style="text-align:center;"><b>图 5-8 导出</b></div>
 <div id="figure_5_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828593609008235/ca49b9cd_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 5-9 Export OK</b></div>
+<div style="text-align:center;"><b>图 5-9 导出成功</b></div>
 
-Click "Export" on Menu Bar, the output are shown in [Figure 5-9](#figure_5_9).
+点击菜单栏中的 "导出"，导出结果会显示在 [图 5-9](#figure_5_9)中。
 
 
-### How to Simulate
+### 如何进行模拟
 <div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828603947574032/f90b802b_12407535.png"></div>
-<div style="text-align:center;"><b>Figure 5-10 Simulate</b></div>
+<div style="text-align:center;"><b>图 5-10 模拟</b></div>
 
-Click on the "Simulate" button in the menu bar.
+点击菜单栏上的 "模拟" 按钮。
 
 
 <div STYLE="page-break-after: always;"></div> 
 
 
-## GUI Demo Project
-There is a Demo in RVisualDesigner-vx.x.x.x.zip, as shown in [Figure 6-1](#figure_6_1). 
+## GUI Demo 项目
+RVisualDesigner-vx.x.x.x.zip 中包含一个 Demo 项目，如 [图 6-1](#figure_6_1) 所示。
 
-The folder - 454x454 contains project with resolution 454*454. 
+文件夹 454x454 包含分辨率为 454*454 的项目。
 
-The folder - 480x480 contains project with resolution 480*480.
+文件夹 480x480 包含分辨率为 480*480 的项目。
 
 <div id="figure_6_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828619648299243/6ddfa28a_12407535.png" width="400"></div>
-<div style="text-align:center;"><b>Figure 6-1 Demo</b></div>
+<div style="text-align:center;"><b>图 6-1 Demo</b></div>
 
-Please follow the steps to demo the project.
-1.	Open the project according to the screen size/resolution of your IC.
-2.	Check the IC type by clicking "Edit - Convert Project" on Menu Bar, please refer to "Convert Project" for details. 
-If current IC type of the project does not match your IC, please select target IC type, enter the target resolution and click "Convert".
+请按以下步骤运行项目：
+1.	根据您的 IC 的屏幕尺寸/分辨率打开相应的项目。
+2.	点击菜单栏中的 "编辑 -> 转换项目"，检查 IC 类型。有关详细信息，请参考 "转换项目"。 如果当前项目的 IC 类型与您的 IC 不匹配，请选择目标 IC 类型，输入目标分辨率，然后点击 "转换"。
 
 <div id="figure_6_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828634079822366/790c6381_12407535.png" width="300"></div>
-<div style="text-align:center;"><b>Figure 6-2 Convert Project</b></div>
+<div style="text-align:center;"><b>图 6-2 转换项目</b></div>
 
-3.	Click "Export" on Menu Bar and wait until the export ok/fail message box pops up.
+3.	点击菜单栏中的 "导出"，等待导出结果弹出框的出现。
 
 <div id="figure_6_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828658401238872/d2f38d9e_12407535.jpeg" width="300"></div>
-<div style="text-align:center;"><b>Figure 6-3 Output .bin</b></div>
+<div style="text-align:center;"><b>图 6-3 输出 .bin 文件</b></div>
 
-Program the output .bin into your IC.
+将导出的 .bin 文件烧录到您的 IC 中。

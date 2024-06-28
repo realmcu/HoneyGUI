@@ -67,12 +67,12 @@ Flash速度模式应设置为4位模式；根据芯片的能力，Flash时钟应
 |开关 (switch)|384|
 |文本 (text)|128|
 |页面 (page)|128|
-|标签视图 (tabview)|120|
-|标签 (tab)|104|
+|选项卡视图 (tabview)|120|
+|选项卡 (tab)|104|
 |幕布视图 (curtainview)|152|
 |幕布 (curtain)|104|
 |按钮 (button)|408|
-|拖动条 (seekbar)|416|
+|滑动条 (seekbar)|416|
 
 ## 如何提高帧率常见问题
 

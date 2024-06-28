@@ -41,7 +41,7 @@ description on the ```JavaScript syntax``` page.
 ```javascript
 //Read and write the progress value of a progressbar tag called 'tag name'
 progressbar.getElementById('tag name')
-var proress = progressbar.progress(0.7)
+var progress = progressbar.progress(0.7)
 ```
 #### Define a progressbar object
 In fact, this object is added to the global object. Using property of the global object does not require explicitly calling the global object.

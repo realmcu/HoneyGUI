@@ -11,8 +11,8 @@
 `简单图像 (simple img)`_             简化的图像控件
 `stb图像 (stbimage)`_                使用stb库解码标准图像格式文件并显示
 `文本 (text)`_                       显示文本，以不同的字体、颜色和大小输出文本
-`标签视图 (tabview)`_                屏幕从屏幕中的交叉方向扩展，通过滑动切换当前显示的卡片
-`标签 (tab)`_                        屏幕从屏幕中的交叉方向扩展，通过滑动切换当前显示的卡片
+`选项卡视图 (tabview)`_              屏幕从屏幕中的交叉方向扩展，通过滑动切换当前显示的卡片
+`选项卡 (tab)`_                      屏幕从屏幕中的交叉方向扩展，通过滑动切换当前显示的卡片
 `幕布视图 (curtainview)`_            滑动扩展和收缩窗帘
 `幕布 (curtain)`_                    滑动扩展和收缩窗帘
 `卡片视图 (cardview)`_               显示一个3D卡片集合
@@ -41,8 +41,8 @@
 .. _简单图像 (simple img): gui_simple_img.html 
 .. _stb图像 (stbimage): gui_img_stb.html
 .. _文本 (text): gui_text.html
-.. _标签视图 (tabview): gui_tabview.html
-.. _标签 (tab): gui_tab.html
+.. _选项卡视图 (tabview): gui_tabview.html
+.. _选项卡 (tab): gui_tab.html
 .. _幕布视图 (curtainview): gui_curtainview.html
 .. _幕布 (curtain): gui_curtain.html
 .. _卡片视图 (cardview): gui_cardview.html
@@ -72,8 +72,8 @@
     简单图像 (simple img) <gui_simple_img>
     stb图像 (stbimage) <gui_img_stb>
     文本 (text) <gui_text>
-    标签视图 (tabview) <gui_tabview>
-    标签 (tab) <gui_tab>
+    选项卡视图 (tabview) <gui_tabview>
+    选项卡 (tab) <gui_tab>
     幕布视图 (curtainview) <gui_curtainview>
     幕布 (curtain) <gui_curtain>
     卡片视图 (cardview) <gui_cardview>

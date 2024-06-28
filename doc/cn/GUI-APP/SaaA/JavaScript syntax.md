@@ -1,11 +1,11 @@
-# JavaScript syntax
+# JavaScript 语法
 
 
 
 
-## Win
+## 窗口 (Win)
 
-* Hide a window
+* 隐藏窗口
 
 ``` javascript
 win.getElementById('heat_win')
@@ -15,7 +15,7 @@ if (!hid) {
     win.setAttribute("hidden", "hidden");
 }
 ```
-* Listen to gestures
+* 监听手势
 
 ```javascript
 win.getElementById('tab7Win')
@@ -30,7 +30,7 @@ function winNromalOnReleaseFunc(params) {
 win.onRelease(winNromalOnReleaseFunc)
 ```
 
-* click to swap windows between ```'cool_win'``` and ```'heat_win'```
+* 点击交换 ```'cool_win'``` 和 ```'heat_win'``` 之间的窗口
 ```javascript
 win.getElementById('cool_win')
 function hideCool(params) {
@@ -70,8 +70,8 @@ win.onClick(hideHeat)
 ```
 
 
-## Button
-* Listen to press gesture, the function ```iconNromalOnPressFunc``` will trigger when finger touchs screen.
+## 按钮 (Button)
+* 监听按下手势，当手指触摸屏幕时，触发函数```iconNromalOnPressFunc```。
 
 ```javascript
 icon.getElementById('iconNormal')
@@ -95,9 +95,9 @@ icon.onPress(iconNromalOnPressFunc)
 
 
 
-## Text
+## 文本 (Text)
 
-* Change text content
+* 修改文本内容
 
 ```javascript
     textbox.getElementById('tab10text1')
@@ -110,9 +110,9 @@ icon.onPress(iconNromalOnPressFunc)
     write : function (text : string) {},
     setPosition : function (position : object) {}, //var position={x:0,y:0}
 ```
-## ImageSeekbar
+## 图像滑动条 (ImageSeekbar)
 
-* Drag the progress bar and then the text shows the current progress.
+* 拖动进度条，文本显示当前进度。
 ```javascript
 seekbar.getElementById('tab10Seek1')
 function seekbarOnPress(params) {
@@ -130,7 +130,7 @@ function seekbarOnPressing(params) {
 }
 seekbar.onPressing(seekbarOnPressing)
 ```
-* Animation based on imageSeekbar
+* 基于图像滑动条的动画
 ```javascript
 var curtainAnimateTiming = {
     duration: 2000,
@@ -150,18 +150,18 @@ seekbar.palyAnimate()
 
 ```javascript
     getElementById : function (win_name : string) {},
-    progress : function (progressToSet : number):{},//get or set progress//return progress
-    onPress : function (callback_func) {}, //gesture press
-    onPressing : function (callback_func) {},//gesture pressing
-    onRelease : function (click_callback_func) {},//gesture release
-    setAnimate : function (frameCallback : function, config : object) {},// frameCallback function will be executed once every frame // var curtainAnimateTiming = {duration: 2000,iterations:1,}
-    setAttribute :function(attributeName : string, value : any) {},  //support "hidden"
-    getAttribute : function(attributeName : string) {},   //return attribute value //support "hidden"
-    palyAnimate : function () {}, //Start animation
+    progress : function (progressToSet : number):{},//获取或设置进度//返回进度
+    onPress : function (callback_func) {}, //手势按下
+    onPressing : function (callback_func) {},//手势按下时
+    onRelease : function (click_callback_func) {},//手势释放
+    setAnimate : function (frameCallback : function, config : object) {},// 每帧执行frameCallback函数 // var curtainAnimateTiming = {duration: 2000,iterations:1,}
+    setAttribute :function(attributeName : string, value : any) {},  //支持 "hidden"
+    getAttribute : function(attributeName : string) {},   //返回属性值 //支持 "hidden"
+    palyAnimate : function () {}, //开始动画
 ```
-## Switch
+## 开关 (Switch)
 
-* Listen to 2 gestures
+* 监听两种手势
 ```javascript
 
 sw.getElementById('tab8Switch')
@@ -186,8 +186,7 @@ function led1OnFunc(params) {
 sw.getElementById('living_switch')
 sw.turnOn()
 ```
-This is the ```writeSync``` 's control gpio led implementation for RTL87X2G. First get gpio value and direction value, then use specify driver api to operate led.
-Refer to [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage) for more information.
+这是针对RTL87X2G的GPIO LED的 ```writeSync``` 控制的实现。首先获取GPIO值和方向值，然后使用特定的驱动程序API操作LED。详细信息请参考[https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage)。
 ```c
 DECLARE_HANDLER(writeSync)
 {
@@ -229,13 +228,13 @@ DECLARE_HANDLER(writeSync)
     switch_on : function (func) {},
     switch_off : function (func) {},
     onPress : function (func) {},
-    turnOn : function (func) {},//turn on the switch
-    turnOff : function (func) {},//turn off the switch
+    turnOn : function (func) {},//打开开关
+    turnOff : function (func) {},//关闭开关
 
 ```
 
 
-## IMAGE
+## 图像 (IMAGE)
 
 * API
 ```javascript
@@ -244,26 +243,26 @@ DECLARE_HANDLER(writeSync)
     scale : function (scaleRateX:number, scaleRateY:number) {},
     setMode : function (modeIndex:number) {},
 ```
-## APP
+## 应用程序 (APP)
 
 * API
 ```javascript
     open : function (appXML : string) {},
     close : function () {},
 ```
-## PROGRESSBAR
+## 进度条 (PROGRESSBAR)
 
 * API
 ```javascript
     getElementById : function (widget_name : string) {},
-    progress : function (progressToSet : number):{},//get or set progress//return progress
+    progress : function (progressToSet : number):{},//获取或设置进度//返回进度
 ```
-## TAB
+## 选项卡 (TAB)
 
 * API
 ```javascript
     getElementById : function (widget_name : string) {},
-    jump : function (tabIndex : number) {}, //jump to horizontal tab 
-    OnChange : function (func) {},//Listen for events where the index value changes
-    getCurTab : function () {},//return x,y,z property
+    jump : function (tabIndex : number) {}, //跳转到指定水平选项卡 
+    OnChange : function (func) {},//监听索引值变化的事件
+    getCurTab : function () {},//返回当前选项卡的属性（x、y、z等）
 ```
