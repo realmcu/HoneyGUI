@@ -3,7 +3,7 @@
 #include "font_mem.h"
 
 MEM_FONT_LIB font_lib_tab[10];
-uint8_t get_fontlib_name(uint8_t font_size)
+uint8_t get_fontlib_by_size(uint8_t font_size)
 {
     uint8_t tab_size = sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB);
     for (size_t i = 0; i < tab_size; i++)
@@ -22,6 +22,25 @@ uint8_t get_fontlib_name(uint8_t font_size)
     return 0;
 }
 
+uint8_t get_fontlib_by_name(uint8_t *font_file)
+{
+    uint8_t tab_size = sizeof(font_lib_tab) / sizeof(MEM_FONT_LIB);
+    for (size_t i = 0; i < tab_size; i++)
+    {
+        if (font_lib_tab[i].font_file == font_file)
+        {
+            return i;
+        }
+    }
+    gui_log("Can not match font file, use default \n");
+    if (font_lib_tab[0].font_file == NULL)
+    {
+        gui_log("There is no font file \n");
+        GUI_ASSERT(font_lib_tab[0].font_file != 0)
+    }
+    return 0;
+}
+
 void gui_font_get_dot_info(gui_text_t *text)
 {
     GUI_FONT_HEAD *font;
@@ -30,7 +49,7 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint32_t dot_offset;
     if (text->path == NULL)
     {
-        font_index = get_fontlib_name(text->font_height);
+        font_index = get_fontlib_by_size(text->font_height);
         if (font_lib_tab[font_index].type == FONT_SRC_MEMADDR)
         {
             text->font_mode = FONT_SRC_MEMADDR;
@@ -51,11 +70,12 @@ void gui_font_get_dot_info(gui_text_t *text)
     }
     else if (text->font_mode == FONT_SRC_FTL)
     {
+        font_index = get_fontlib_by_name(text->path);
         font = (GUI_FONT_HEAD *)font_lib_tab[font_index].data;
         table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
     }
-
+    GUI_ASSERT(font != 0)
 
     uint8_t rendor_mode = font->rendor_mode;
     if (rendor_mode == 0)
@@ -164,7 +184,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                         line_byte = (chr[i].char_w * rendor_mode + 8 - 1) / 8;
                         chr[i].w = line_byte * 8 / rendor_mode;
 
-                        uint8_t dot_size = chr[i].w * chr[i].char_h;
+                        uint32_t dot_size = chr[i].w * chr[i].char_h;
                         uint8_t *dot_buf = gui_malloc(dot_size);
                         gui_ftl_read((uintptr_t)chr[i].dot_addr, dot_buf, dot_size);
                         chr[i].dot_addr = dot_buf;
@@ -1249,6 +1269,7 @@ uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
 
     uint32_t head_index_len = font->head_length + font->index_area_size;
     data = gui_realloc(data, head_index_len);
+    font = (GUI_FONT_HEAD *)data;
     gui_ftl_read((uintptr_t)font_bin_addr, data, head_index_len);
 
     font_lib_tab[i].font_file = font_bin_addr;

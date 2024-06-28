@@ -161,10 +161,18 @@ uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr);
 /**
  * @brief Get the fontlib name object
  *
- * @param font_size font szie
+ * @param font_size font size
  * @return uint8_t font lib index
  */
-uint8_t get_fontlib_name(uint8_t font_size);
+uint8_t get_fontlib_by_size(uint8_t font_size);
+
+/**
+ * @brief Get the fontlib name object
+ *
+ * @param font_file font file
+ * @return uint8_t font lib index
+ */
+uint8_t get_fontlib_by_name(uint8_t *font_file);
 
 /**
  * @brief text layout by mode
