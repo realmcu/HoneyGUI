@@ -78,10 +78,10 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
         {
             tp.type = TOUCH_INVALIDE;
         }
-#if _WIN32 || RTL8772F
-        if ((up_cnt == 1) && (down_cnt > 0))
-#else
+#if RTL8762G_86BOX
         if ((up_cnt == 4) && (down_cnt > 0))
+#else
+        if ((up_cnt == 1) && (down_cnt > 0))
 #endif
         {
             tp_local_event = GUI_TOUCH_EVENT_UP;
