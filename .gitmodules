@@ -1,3 +1,0 @@
-[submodule "gui_engine/3rd/Arm2D/Arm-2D"]
-	path = gui_engine/3rd/Arm2D/Arm-2D
-	url = https://github.com/ARM-software/Arm-2D.git
