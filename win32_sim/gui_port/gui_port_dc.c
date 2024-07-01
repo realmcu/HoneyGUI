@@ -132,6 +132,20 @@ static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, 
     }
 }
 
+void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t height,
+                                    const uint8_t *bitmap)
+{
+    uint8_t *dst = surface->pixels;
+    lcd_update_window((uint8_t *)bitmap, dst, x, y, width, height);
+    //todo
+    SDL_Texture *texture;
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+    SDL_RenderCopy(renderer, texture, NULL, &_rect);
+    SDL_RenderPresent(renderer);
+    SDL_DestroyTexture(texture);
+}
+
 void port_gui_lcd_update(struct gui_dispdev *dc)
 {
 #ifdef USE_DC_PFB
@@ -222,6 +236,7 @@ static struct gui_dispdev dc =
     .type = DC_SINGLE,
     .lcd_update = port_gui_lcd_update,
 #endif
+    .direct_draw_bitmap_to_lcd = port_direct_draw_bitmap_to_lcd,
 
 };
 
