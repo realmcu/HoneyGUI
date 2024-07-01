@@ -42,10 +42,15 @@ int32_t Disp0_DrawBitmap(int16_t x,
                          const uint8_t *bitmap)
 {
     gui_dispdev_t *dc = gui_get_dc();
-    for(uint32_t i = y; i < (y + height); i++)
-    {
-        memcpy(dc->frame_buf + i * dc->fb_width * 2 + x*2, bitmap + (i - y) * width * 2, 2 * width);
-    }
+
+    // for(uint32_t i = y; i < (y + height); i++)
+    // {
+    //     memcpy(dc->frame_buf + i * dc->fb_width * 2 + x*2, bitmap + (i - y) * width * 2, 2 * width);
+    // }
+    // return 0;
+
+    dc->direct_draw_bitmap_to_lcd(x, y, width, height, bitmap);
+
     return 0;
 }
 
