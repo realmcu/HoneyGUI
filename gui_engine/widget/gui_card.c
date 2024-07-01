@@ -89,7 +89,7 @@ static void gui_card_input_prepare(gui_obj_t *obj)
 }
 
 #if 1
-static void gui_card_prepare(gui_obj_t *obj)
+static void gui_card_prepare_reduction(gui_obj_t *obj)
 {
     gui_card_t *this = (gui_card_t *)obj;
     gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
@@ -134,7 +134,7 @@ static void gui_card_prepare(gui_obj_t *obj)
 
 }
 #else
-static void gui_card_prepare(gui_obj_t *obj)
+static void gui_card_prepare_reduction(gui_obj_t *obj)
 {
     gui_card_t *this = (gui_card_t *)obj;
     gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
@@ -177,6 +177,39 @@ static void gui_card_prepare(gui_obj_t *obj)
     }
 }
 #endif
+
+static void gui_card_prepare_classic(gui_obj_t *obj)
+{
+    gui_card_t *this = (gui_card_t *)obj;
+    gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
+
+    int32_t location = this->ay + parent->hold_y + parent->offset_y;
+    matrix_translate(0, location, obj->matrix);
+}
+
+static void gui_card_prepare(gui_obj_t *obj)
+{
+    gui_card_t *this = (gui_card_t *)obj;
+    gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
+
+    switch (parent->style)
+    {
+    case CLASSIC:
+        {
+            gui_card_prepare_classic(obj);
+        }
+        break;
+
+    case REDUCTION:
+        {
+            gui_card_prepare_reduction(obj);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
 
 static void gui_card_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
