@@ -24,7 +24,7 @@
 #include "gui_win.h"
 #include "gui_canvas_arc.h"
 #include "gui_canvas_round_rect.h"
-#include "tiger_blue_compressed.c"
+#include "tiger_blue_compressed.txt"
 #include "acc_sw_rle.h"
 #ifdef ENABLE_AMR_2D
 #include "gui_arm2d.h"

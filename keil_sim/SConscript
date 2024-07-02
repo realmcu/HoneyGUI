@@ -23,7 +23,7 @@ if GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
 
 path = [cwd]
 
-config = ['./menu_config.h']
+config = [RTK_GUI_ENGINE + './../win32_sim/menu_config.h']
 
 DefineGroup('menuconfig', config, depend = [''], CPPPATH = path, CPPDEFINES = CPPDEFINES)
 

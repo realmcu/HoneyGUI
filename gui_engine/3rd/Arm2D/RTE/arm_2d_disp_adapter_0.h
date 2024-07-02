@@ -50,21 +50,21 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your screen
 #ifndef __DISP0_CFG_COLOUR_DEPTH__
-#   define __DISP0_CFG_COLOUR_DEPTH__                              16
+#   define __DISP0_CFG_COLOUR_DEPTH__                              DRV_PIXEL_BITS
 #endif
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
 // <i> Default: 320
 #ifndef __DISP0_CFG_SCEEN_WIDTH__
-#   define __DISP0_CFG_SCEEN_WIDTH__                               480
+#   define __DISP0_CFG_SCEEN_WIDTH__                               DRV_LCD_WIDTH
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              480
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              DRV_LCD_HIGHT
 #endif
 
 /*
@@ -88,7 +88,7 @@ extern "C" {
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           480
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           DRV_LCD_WIDTH
 #endif
 
 // <o>Height of the PFB block
@@ -170,7 +170,7 @@ extern "C" {
 #endif
 
 // <q>Enable the helper service for Asynchronous Flushing
-// <i> Please select this option when using asynchronous flushing, e.g. DMA + ISR 
+// <i> Please select this option when using asynchronous flushing, e.g. DMA + ISR
 #ifndef __DISP0_CFG_ENABLE_ASYNC_FLUSHING__
 #   define __DISP0_CFG_ENABLE_ASYNC_FLUSHING__                     0
 #endif
@@ -191,7 +191,7 @@ extern "C" {
 //     <0=>     Disable Navigation Layer
 //     <1=>     Normal Mode (Bottom)
 //     <2=>     Tiny Mode (Bottom Centre)
-// <i> Configure the default navigation layer of this display adapter. 
+// <i> Configure the default navigation layer of this display adapter.
 // <i> NOTE: Disable the navigation layer will also remove the real-time FPS display.
 #ifndef __DISP0_CFG_NAVIGATION_LAYER_MODE__
 #   define __DISP0_CFG_NAVIGATION_LAYER_MODE__                              1
@@ -228,7 +228,7 @@ extern "C" {
 #endif
 
 // <q>Use heap to allocate buffer in the virtual resource helper service
-// <i> Use malloc and free in the virtual resource helper service. When disabled, a static buffer in the size of current display adapter PFB will be used. 
+// <i> Use malloc and free in the virtual resource helper service. When disabled, a static buffer in the size of current display adapter PFB will be used.
 // <i> This feature is disabled by default.
 #ifndef __DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
 #   define __DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__      0
@@ -249,31 +249,31 @@ extern "C" {
 
 #if __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
 #define disp_adapter0_impl_vres(__COLOUR_FORMAT, __WIDTH, __HEIGHT,...)         \
-{                                                                               \
-    .tTile = {                                                                  \
-        .tRegion = {                                                            \
-            .tSize = {                                                          \
-                .iWidth = (__WIDTH),                                            \
-                .iHeight =(__HEIGHT),                                           \
-            },                                                                  \
-        },                                                                      \
-        .tInfo = {                                                              \
-            .bIsRoot = true,                                                    \
-            .bHasEnforcedColour = true,                                         \
-            .bVirtualResource = true,                                           \
-            .tColourInfo = {                                                    \
-                .chScheme = (__COLOUR_FORMAT),                                  \
-            },                                                                  \
-        },                                                                      \
-    },                                                                          \
-    .Load       = &__disp_adapter0_vres_asset_loader,                           \
-    .Depose     = &__disp_adapter0_vres_buffer_deposer,                         \
-    __VA_ARGS__                                                                 \
-}
+    {                                                                               \
+        .tTile = {                                                                  \
+                                                                                    .tRegion = {                                                            \
+                                                                                                                                                            .tSize = {                                                          \
+                                                                                                                                                                                                                                .iWidth = (__WIDTH),                                            \
+                                                                                                                                                                                                                                .iHeight =(__HEIGHT),                                           \
+                                                                                                                                                                     },                                                                  \
+                                                                                               },                                                                      \
+                                                                                    .tInfo = {                                                              \
+                                                                                                                                                            .bIsRoot = true,                                                    \
+                                                                                                                                                            .bHasEnforcedColour = true,                                         \
+                                                                                                                                                            .bVirtualResource = true,                                           \
+                                                                                                                                                            .tColourInfo = {                                                    \
+                                                                                                                                                                                                                                .chScheme = (__COLOUR_FORMAT),                                  \
+                                                                                                                                                                           },                                                                  \
+                                                                                             },                                                                      \
+                 },                                                                          \
+                 .Load       = &__disp_adapter0_vres_asset_loader,                           \
+                               .Depose     = &__disp_adapter0_vres_buffer_deposer,                         \
+                                             __VA_ARGS__                                                                 \
+    }
 #endif
 
 #define disp_adapter0_task(...)                                                 \
-        ({                                                                      \
+    ({                                                                      \
         static bool ARM_2D_SAFE_NAME(s_bRefreshLCD) = false;                    \
         arm_fsm_rt_t ARM_2D_SAFE_NAME(ret) = arm_fsm_rt_on_going;               \
         if (!__ARM_VA_NUM_ARGS(__VA_ARGS__)) {                                  \
@@ -313,64 +313,64 @@ arm_fsm_rt_t __disp_adapter0_task(void);
  *  \brief a method to load a specific part of an image
  *  \note It is NOT an API for users to call, plese leave it alone
  *
- *  \param[in] pTarget a reference of an user object 
+ *  \param[in] pTarget a reference of an user object
  *  \param[in] ptVRES a reference of this virtual resource
  *  \param[in] ptRegion the target region of the image
  *  \return intptr_t the address of a resource buffer which holds the content
  */
-intptr_t __disp_adapter0_vres_asset_loader   (
-                                                uintptr_t pTarget, 
-                                                arm_2d_vres_t *ptVRES, 
-                                                arm_2d_region_t *ptRegion);
-    
+intptr_t __disp_adapter0_vres_asset_loader(
+    uintptr_t pTarget,
+    arm_2d_vres_t *ptVRES,
+    arm_2d_region_t *ptRegion);
+
 /*!
  *  \brief a method to despose the buffer
  *  \note It is NOT an API for users to call, plese leave it alone
  *
- *  \param[in] pTarget a reference of an user object 
+ *  \param[in] pTarget a reference of an user object
  *  \param[in] ptVRES a reference of this virtual resource
  *  \param[in] pBuffer the target buffer
  */
-void __disp_adapter0_vres_buffer_deposer (  uintptr_t pTarget, 
-                                                arm_2d_vres_t *ptVRES, 
-                                                intptr_t pBuffer );
+void __disp_adapter0_vres_buffer_deposer(uintptr_t pTarget,
+                                         arm_2d_vres_t *ptVRES,
+                                         intptr_t pBuffer);
 
 /*!
  * \brief A user implemented function to return the address for specific asset
  *        stored in external memory, e.g. SPI Flash
- * \note You MUST provide an implementation when 
+ * \note You MUST provide an implementation when
  *       __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__ is enabled(1)
  *
  * \param[in] pObj an pointer of user defined object, it is used for OOC
- * \note You can ignore pObj if you don't care/don't use OOC 
+ * \note You can ignore pObj if you don't care/don't use OOC
  *
  * \param[in] ptVRES the target virtual resource object
  * \return uintptr_t the address of the target asset in external memory
  */
 extern
 uintptr_t __disp_adapter0_vres_get_asset_address(
-                                                        uintptr_t pObj,
-                                                        arm_2d_vres_t *ptVRES);
+    uintptr_t pObj,
+    arm_2d_vres_t *ptVRES);
 
 /*!
  * \brief A user implemented function to copy content from external memory
  *        (e.g. SPI Flash) to a local buffer with specified address and size.
  *
- * \note You MUST provide an implementation when 
+ * \note You MUST provide an implementation when
  *       __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__ is enabled(1)
  *
  * \param[in] pObj an pointer of user defined object, it is used for OOC
- * \note You can ignore pObj if you don't care/don't use OOC 
+ * \note You can ignore pObj if you don't care/don't use OOC
  *
  * \param[in] pBuffer the address of the local buffer
  * \param[in] pAddress the address in the external memory
  * \param[in] nSizeInByte number of bytes to read
  */
 extern
-void __disp_adapter0_vres_read_memory( intptr_t pObj, 
-                                                void *pBuffer,
-                                                uintptr_t pAddress,
-                                                size_t nSizeInByte);
+void __disp_adapter0_vres_read_memory(intptr_t pObj,
+                                      void *pBuffer,
+                                      uintptr_t pAddress,
+                                      size_t nSizeInByte);
 
 #endif
 
@@ -382,23 +382,23 @@ void __disp_adapter0_vres_read_memory( intptr_t pObj,
  * \brief An user implemented interface for DMA memory-to-memory copy.
  *        You should implement an ISR for copy-complete event and call
  *        disp_adapter0_insert_dma_copy_complete_event_handler() or
- *        arm_2d_helper_3fb_report_dma_copy_complete() to notify the 
+ *        arm_2d_helper_3fb_report_dma_copy_complete() to notify the
  *        3FB (direct mode) helper service.
- * 
+ *
  * \param[in] ptThis the helper service control block
  * \param[in] pObj the address of the user object
  * \param[in] pnSource the source address of the memory block
  * \param[in] pnTarget the target address
  * \param[in] nDataItemCount the number of date items
- * \param[in] chDataItemSize the size of each data item 
+ * \param[in] chDataItemSize the size of each data item
  */
 extern
-void __disp_adapter0_request_dma_copy(  arm_2d_helper_3fb_t *ptThis,
-                                        void *pObj,
-                                        uintptr_t pnSource,
-                                        uintptr_t pnTarget,
-                                        uint32_t nDataItemCount,
-                                        uint_fast8_t chDataItemSize);
+void __disp_adapter0_request_dma_copy(arm_2d_helper_3fb_t *ptThis,
+                                      void *pObj,
+                                      uintptr_t pnSource,
+                                      uintptr_t pnTarget,
+                                      uint32_t nDataItemCount,
+                                      uint_fast8_t chDataItemSize);
 
 /*!
  * \brief An user implemented interface for 2D-Copy.
@@ -411,27 +411,27 @@ void __disp_adapter0_request_dma_copy(  arm_2d_helper_3fb_t *ptThis,
  * \retval true the 2D copy is complete when leaving this function
  * \retval false An async 2D copy request is sent to the DMA
  *
- * \note if false is replied, you have to call 
+ * \note if false is replied, you have to call
  *       disp_adapter0_insert_2d_copy_complete_event_handler() to report
- *       the completion of the 2d-copy. 
+ *       the completion of the 2d-copy.
  */
-bool __disp_adapter0_request_2d_copy(   arm_2d_helper_3fb_t *ptThis,
-                                        void *pObj,
-                                        uintptr_t pnSource,
-                                        uint32_t wSourceStride,
-                                        uintptr_t pnTarget,
-                                        uint32_t wTargetStride,
-                                        int16_t iWidth,
-                                        int16_t iHeight,
-                                        uint_fast8_t chBytePerPixel );
+bool __disp_adapter0_request_2d_copy(arm_2d_helper_3fb_t *ptThis,
+                                     void *pObj,
+                                     uintptr_t pnSource,
+                                     uint32_t wSourceStride,
+                                     uintptr_t pnTarget,
+                                     uint32_t wTargetStride,
+                                     int16_t iWidth,
+                                     int16_t iHeight,
+                                     uint_fast8_t chBytePerPixel);
 
 /*!
  * \brief the handler for the 2d copy complete event.
- * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and 
- *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user 
+ * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and
+ *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user
  *       MUST call this function to notify the PFB helper that the previous
- *       asynchronouse 2d copy is complete. 
- * \note When people using DMA+ISR to offload CPU, this fucntion is called in 
+ *       asynchronouse 2d copy is complete.
+ * \note When people using DMA+ISR to offload CPU, this fucntion is called in
  *       the DMA transfer complete ISR.
  */
 extern
@@ -439,11 +439,11 @@ void disp_adapter0_insert_2d_copy_complete_event_handler(void);
 
 /*!
  * \brief the handler for the dma copy complete event.
- * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and 
- *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user 
+ * \note When both __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ and
+ *       __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__ is set to '1', user
  *       MUST call this function to notify the PFB helper that the previous
- *       dma copy is complete. 
- * \note When people using DMA+ISR to offload CPU, this fucntion is called in 
+ *       dma copy is complete.
+ * \note When people using DMA+ISR to offload CPU, this fucntion is called in
  *       the DMA transfer complete ISR.
  */
 extern
@@ -452,13 +452,13 @@ void disp_adapter0_insert_dma_copy_complete_event_handler(void);
 #   else
 
 /*!
- * \brief It is an user implemented function that request an LCD flushing in 
- *        asynchronous manner. 
- * \note User MUST implement this function when 
+ * \brief It is an user implemented function that request an LCD flushing in
+ *        asynchronous manner.
+ * \note User MUST implement this function when
  *       __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ is set to '1'
  *
  * \param[in] pTarget an user specified object address
- * \param[in] bIsNewFrame whether this flushing request is the first iteration 
+ * \param[in] bIsNewFrame whether this flushing request is the first iteration
  *            of a new frame.
  * \param[in] iX the x coordinate of a flushing window in the target screen
  * \param[in] iY the y coordinate of a flushing window in the target screen
@@ -466,22 +466,22 @@ void disp_adapter0_insert_dma_copy_complete_event_handler(void);
  * \param[in] iHeight the height of a flushing window
  * \param[in] pBuffer the frame buffer address
  */
-extern void __disp_adapter0_request_async_flushing( 
-                                                    void *pTarget,
-                                                    bool bIsNewFrame,
-                                                    int16_t iX, 
-                                                    int16_t iY,
-                                                    int16_t iWidth,
-                                                    int16_t iHeight,
-                                                    const COLOUR_INT *pBuffer);
+extern void __disp_adapter0_request_async_flushing(
+    void *pTarget,
+    bool bIsNewFrame,
+    int16_t iX,
+    int16_t iY,
+    int16_t iWidth,
+    int16_t iHeight,
+    const COLOUR_INT *pBuffer);
 
 
 /*!
  * \brief the handler for the asynchronous flushing complete event.
- * \note When __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ is set to '1', user 
+ * \note When __DISP0_CFG_ENABLE_ASYNC_FLUSHING__ is set to '1', user
  *       MUST call this function to notify the PFB helper that the previous
- *       asynchronous flushing is complete. 
- * \note When people using DMA+ISR to offload CPU, this fucntion is called in 
+ *       asynchronous flushing is complete.
+ * \note When people using DMA+ISR to offload CPU, this fucntion is called in
  *       the DMA transfer complete ISR.
  */
 extern
@@ -495,7 +495,7 @@ void disp_adapter0_insert_async_flushing_complete_event_handler(void);
 /*!
  * \brief get a pointer for flushing
  * \return void * the address of a framebuffer
- * 
+ *
  * \note please only call this function when on vsync event.
  */
 extern

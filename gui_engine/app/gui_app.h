@@ -57,6 +57,7 @@ struct gui_app
     void (* dtor)(void *_this);      //!< destructor
     void (* ui_design)(gui_app_t *); //!< ui create entry
     bool lvgl;
+    bool arm2d;
     bool close;
     bool next;
     bool close_sync;

@@ -7,8 +7,9 @@
  *      INCLUDES
  *********************/
 
-#include "rtl_rcc.h"
+
 #if LV_USE_GPU_RTK_PPE
+#include "rtl_rcc.h"
 #include "lv_draw_rtk_ppe_buffer.h"
 #include "rtl_gdma.h"
 

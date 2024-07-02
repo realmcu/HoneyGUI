@@ -5,9 +5,15 @@
 #include "tp_algo.h"
 #include "Board_GLCD.h"
 
+
+#if defined(__ARMCC_VERSION)
+#undef DRV_LCD_WIDTH
+#undef DRV_LCD_HIGHT
+#undef DRV_PIXEL_BITS
 #define DRV_LCD_WIDTH   320
 #define DRV_LCD_HIGHT   240
 #define DRV_PIXEL_BITS  16
+#endif
 
 uint8_t resource_root[1024] = {0};
 

@@ -10,41 +10,6 @@
 #include "kb_algo.h"
 
 
-#ifdef ENABLE_RTK_GUI_240_240_DEMO
-#define DRV_LCD_WIDTH   240
-#define DRV_LCD_HIGHT   240
-#endif
-
-#ifdef ENABLE_RTK_GUI_280_456_DEMO
-#define DRV_LCD_WIDTH   280
-#define DRV_LCD_HIGHT   456
-#endif
-
-#ifdef ENABLE_RTK_GUI_448_368_DEMO
-#define DRV_LCD_WIDTH   368
-#define DRV_LCD_HIGHT   448
-#endif
-
-#ifdef ENABLE_RTK_GUI_454_454_DEMO
-#define DRV_LCD_WIDTH   454
-#define DRV_LCD_HIGHT   454
-#endif
-
-#ifdef ENABLE_RTK_GUI_800_480_DEMO
-#define DRV_LCD_WIDTH   800
-#define DRV_LCD_HIGHT   480
-#endif
-
-#define DRV_PIXEL_BITS  32
-
-
-#define USE_DC_PFB
-
-#ifdef USE_DC_PFB
-#define LCD_SECTION_HEIGHT 20
-#undef DRV_PIXEL_BITS
-#define DRV_PIXEL_BITS  16
-#endif
 
 
 #if defined ENABLE_RTK_GUI_SCRIPT_AS_A_APP
@@ -81,7 +46,15 @@
 #ifndef DRV_LCD_HIGHT
 #define DRV_LCD_HIGHT   480
 #endif
+#ifndef DRV_PIXEL_BITS
+#define DRV_PIXEL_BITS   16
+#endif
 
+#define USE_DC_PFB
+
+#ifdef USE_DC_PFB
+#define LCD_SECTION_HEIGHT 20
+#endif
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
@@ -137,13 +110,6 @@ void port_direct_draw_bitmap_to_lcd(int16_t x, int16_t y, int16_t width, int16_t
 {
     uint8_t *dst = surface->pixels;
     lcd_update_window((uint8_t *)bitmap, dst, x, y, width, height);
-    //todo
-    SDL_Texture *texture;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
-    SDL_RenderCopy(renderer, texture, NULL, &_rect);
-    SDL_RenderPresent(renderer);
-    SDL_DestroyTexture(texture);
 }
 
 void port_gui_lcd_update(struct gui_dispdev *dc)
@@ -156,13 +122,6 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
     {
         lcd_update_window(dc->frame_buf, dst, dc->section.x1, dc->section.y1,
                           dc->section.x2 - dc->section.x1 + 1, dc->section.y2 - dc->section.y1 + 1);
-
-        SDL_Texture *texture;
-        texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
-        SDL_RenderCopy(renderer, texture, NULL, &_rect);
-        SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(texture);
     }
     else
     {
@@ -179,15 +138,7 @@ void port_gui_lcd_update(struct gui_dispdev *dc)
 #endif
     }
 #else
-    SDL_Texture *texture;
-
     memcpy(surface->pixels, dc->frame_buf, sim_get_width() * sim_get_hight() * DRV_PIXEL_BITS / 8);
-
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
-    SDL_RenderCopy(renderer, texture, NULL, &_rect);
-    SDL_RenderPresent(renderer);
-    SDL_DestroyTexture(texture);
 #endif
 
     return;
@@ -240,7 +191,20 @@ static struct gui_dispdev dc =
 
 };
 
-
+static void *sdl_flush(void *arg)
+{
+    while (true)
+    {
+        usleep((1000 / 60) * 1000);
+        //todo
+        SDL_Texture *texture;
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+        SDL_RenderCopy(renderer, texture, NULL, &_rect);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(texture);
+    }
+}
 
 void *rtk_gui_sdl(void *arg)
 {
@@ -283,6 +247,9 @@ void *rtk_gui_sdl(void *arg)
 
     pthread_cond_signal(&sdl_ok_event);
     pthread_mutex_unlock(&sdl_ok_mutex);
+
+    pthread_t thread;
+    pthread_create(&thread, NULL, sdl_flush, NULL);
 
     SDL_Event event;
     while (true)

@@ -85,7 +85,7 @@ static void gui_server_entry(void *parameter)
             gui_send_msg_to_server(&msg);
         }
 
-        if (app->lvgl == true)
+        if ((app->lvgl == true) || (app->arm2d == true))
         {
             continue;
         }
