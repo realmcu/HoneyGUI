@@ -36,9 +36,15 @@
 // <c> RTK GUI Demo 454 454
 #define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
+
 // <c> RTK GUI TEST
 //#define CONFIG_REALTEK_BUILD_TEST
 // </c>
+
+// <c> RTK GUI AUTO TEST
+// #define CONFIG_REALTEK_BUILD_AUTO_TEST
+// </c>
+
 // <c> RTK GUI Demo 280 456
 // #define CONFIG_REALTEK_BUILD_GUI_280_456_DEMO
 // </c>

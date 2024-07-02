@@ -20,6 +20,7 @@
 #include <guidef.h>
 #include <string.h>
 #include <gui_obj.h>
+#include <gui_fb.h>
 #include "gui_widget_litegfx.h"
 #include <tp_algo.h>
 #include <draw_img.h>

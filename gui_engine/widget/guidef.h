@@ -186,6 +186,8 @@ typedef struct gui_dispdev
     uint32_t section_count;
     uint32_t section_total;
     void (*lcd_update)(struct gui_dispdev *dc);
+    void (*direct_draw_bitmap_to_lcd)(int16_t x, int16_t y, int16_t width, int16_t height,
+                                      const uint8_t *bitmap);
     void (*virtual_lcd_update)(struct gui_dispdev *dc);
     int (*flash_seq_trans_enable)(void);
     int (*flash_seq_trans_disable)(void);

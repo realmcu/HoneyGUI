@@ -131,7 +131,7 @@ static int gui_port_console_init(void)
 
 #ifdef ENABLE_RTK_GUI_CONSOLE
 #include "gui_components_init.h"
-GUI_INIT_APP_EXPORT(gui_port_console_init);
+GUI_INIT_COMPONENT_EXPORT(gui_port_console_init);
 
 void func(int i, char ch, char *str)
 {

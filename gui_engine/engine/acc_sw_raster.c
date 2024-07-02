@@ -182,10 +182,10 @@ static void do_raster_pixel(uint8_t *writebuf, int write_off, int image_base, ui
 
 void do_raster_no_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
 
 
     if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)
@@ -315,10 +315,10 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
 
 void do_raster_use_rle(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
 {
-    int16_t x_start = 0;
-    int16_t x_end = 0;
-    int16_t y_start = 0;
-    int16_t y_end = 0;
+    int32_t x_start = 0;
+    int32_t x_end = 0;
+    int32_t y_start = 0;
+    int32_t y_end = 0;
 
 
     if (draw_img_target_area(image, dc, rect, &x_start, &x_end, &y_start, &y_end) == false)

@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<package schemaVersion="1.7.28" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.28/schema/PACK.xsd">
+  <vendor>ARM</vendor>
+  <name>Arm-2D</name>
+  <description>A 2D graphic library optimized for Cortex-M processors.</description>
+  <!-- web download link -->
+  <url>https://www.keil.com/pack/</url>
+  <supportContact>https://github.com/ARM-software/Arm-2D/issues</supportContact>
+  <license>LICENSE</license>
+  <licenseSets>
+    <licenseSet id="all" default="true" gating="true">
+      <license name="LICENSE" title="Apache 2.0 open-source license" spdx="Apache-2.0"/>
+    </licenseSet>
+  </licenseSets>
+  <repository type="git">https://github.com/ARM-software/Arm-2D.git</repository>
+  
+  <releases>
+    <release version="9.9.99" tag="v9.9.99">
+      Active development ...
+    </release>
+  </releases>
+
+  <keywords>
+    <!-- keywords for indexing -->
+    <keyword>Cortex-M</keyword>
+    <keyword>Arm-2D</keyword>
+    <keyword>Image Processing</keyword>
+  </keywords>
+  
+    <conditions> 
+        <!--
+        <condition id="Arm Compiler">
+            <description>Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang).</description>
+            <accept Tcompiler="ARMCC" Toptions="AC6"/>
+            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+            <accept Tcompiler="ARMCC" Toptions="AC5"/>
+        </condition>
+        <condition id="Arm GCC">
+            <description>GNU Tools for Arm Embedded Processors.</description>
+            <accept Tcompiler="GCC"/>
+        </condition>
+        
+        <condition id="Cortex-M Processors">
+            <description>Support All Cortex-M based processors</description>
+            <accept  Dcore="Cortex-M0"/>
+            <accept  Dcore="Cortex-M0+"/>
+            <accept  Dcore="Cortex-M1"/>
+            <accept  Dcore="Cortex-M3"/>
+            <accept  Dcore="Cortex-M4"/>
+            <accept  Dcore="Cortex-M7"/>
+            <accept  Dcore="Cortex-M23"/>
+            <accept  Dcore="Cortex-M33"/>
+            <accept  Dcore="Cortex-M35P"/>
+            <accept  Dcore="Cortex-M52"/>
+            <accept  Dcore="Cortex-M55"/>
+            <accept  Dcore="Cortex-M85"/>
+            <accept  Dcore="Star-MC1"/>
+            <accept  Dcore="SC000"/>
+            <accept  Dcore="SC300"/>
+            <accept  Dcore="ARMV8MBL"/>
+            <accept  Dcore="ARMV8MML"/>
+            <accept  Dcore="ARMV81MML"/>
+        </condition>
+        -->
+
+        <condition id="Helium">
+            <description>Support All processors with Helium</description>
+            <accept  Dmve="MVE"/>
+            <accept  Dmve="FP_MVE"/>
+        </condition>
+        
+        <condition id="CMSIS-CORE">
+            <description>Require CMSIS-CORE Support</description>
+            <require Cclass="CMSIS" Cgroup="CORE"/>
+        </condition>
+        
+        <condition id="CMSIS-DSP">
+            <description>Require CMSIS-DSP Support</description>
+            <require condition="CMSIS-CORE"/>
+            <require Cclass="CMSIS" Cgroup="DSP" Cversion="1.8.0"/>
+        </condition>
+        
+        <condition id="Arm-2D-CORE">
+            <description>Require Arm-2D Core Service</description>
+            <require Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core"/>
+        </condition>
+        
+        <condition id="Arm-2D-EXTRA">
+            <description>Require Arm-2D Core Service</description>
+            <require condition="Arm-2D-CORE"/>
+            <require Cclass="Acceleration" Cgroup="Arm-2D" Csub="Alpha-Blending"/>
+            <require Cclass="Acceleration" Cgroup="Arm-2D" Csub="Transform"/>
+        </condition>
+        
+        <condition id="Arm-2D-PFB">
+            <description>Require Arm-2D Core Service</description>
+            <require condition="Arm-2D-CORE"/>
+            <require Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB"/>
+        </condition>
+        
+        <condition id="CMSIS-RTOS2">
+            <description>Require CMSIS-RTOS2</description>
+            <require Cclass="CMSIS" Cgroup="RTOS2"/>
+        </condition>
+        
+        <condition id="PFB CMSIS-RTOS2">
+            <description>Require CMSIS-RTOS2</description>
+            <require condition="CMSIS-RTOS2"/>
+            <require condition="Arm-2D-PFB"/>
+        </condition>
+        
+        <!--
+        <condition id="Arm-2D-DSP">
+            <description>Require Arm-2D Core Service</description>
+            <require condition="Arm-2D-CORE"/>
+            <require condition="CMSIS-DSP"/>
+        </condition>
+        -->
+        <condition id="Arm-2D-Helper">
+            <description>Require Arm-2D Helper Services</description>
+            <require condition="Arm-2D-CORE"/>
+            <require Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB" Cversion="1.4.16" />
+            <require Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf"/>
+            <require Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Controls"/>
+        </condition>
+        
+        <condition id="Arm-2D-Benchmark-Generic">
+            <description>The Dependency Requirement for running arm-2d generic bemchmark</description>
+            <require condition="Arm-2D-Helper"/>
+            <deny Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Benchmark-WatchPanel" />
+        </condition>
+        
+        <condition id="Arm-2D-Benchmark-WatchPanel">
+            <description>The Dependency Requirement for running arm-2d watch-panel bemchmark</description>
+            <require condition="Arm-2D-Helper"/>
+            <deny Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Benchmark-Generic" />
+        </condition>
+
+        <condition id="IO">
+          <description>Deny selection of Compiler class when using CMSIS-Compiler</description>
+          <deny Cclass="Compiler" Cgroup="I/O"/>
+        </condition>
+
+        <condition id="CORE">
+          <description>CMSIS-Compiler CORE component</description>
+          <require condition="IO"/>
+          <require Cclass="CMSIS-Compiler" Cgroup="CORE"/>
+        </condition>
+
+        <condition id="STDOUT LCD Console">
+          <description>Dependency for retarget printf to an LCD console</description>
+          <require condition="CORE"/>
+          <require condition="Arm-2D-Helper"/>
+          <accept Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="RTOS Helper" Cvariant="CMSIS-RTOS2"/>
+          <accept Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="RTOS Helper" Cvariant="RT-Thread"/>
+          <accept Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="RTOS Helper" Cvariant="User Custom"/>
+          <require Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter"/>
+        </condition>
+
+        <condition id="STDOUT Disp Adapter0">
+          <description>Dependency for retarget printf to the display adapter 0</description>
+          <require condition="CORE"/>
+          <require Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter"/>
+        </condition>
+
+        
+        <!--
+        <condition id="Cortex-M CMSIS-CORE">
+            <description>Compile Cortex-M Processors CMSIS-CORE.</description>
+            <require condition="Cortex-M Processors"/>
+            <require condition="CMSIS-CORE"/>
+        </condition>
+        
+        <condition id="Cortex-M CMSIS-DSP">
+            <description>Compile Cortex-M Processors with CMSIS-DSP</description>
+            <require condition="Cortex-M Processors"/>
+            <require condition="CMSIS-DSP"/>
+        </condition>
+        -->
+    </conditions>
+  <!-- apis section (optional - for Application Programming Interface descriptions) -->
+  <!-- 
+  <apis>
+  </apis>
+  -->
+
+  <!-- boards section (mandatory for Board Support Packs) -->
+  <!-- 
+  <boards>
+  </boards>
+  -->
+
+  <!-- devices section (mandatory for Device Family Packs) -->
+  <!--
+  <devices>
+  </devices>
+  -->
+
+  <!-- examples section (optional for all Software Packs)-->
+  <!--
+  <examples>
+  </examples>
+  -->
+  
+  <!-- conditions section (optional for all Software Packs)-->
+  <!--
+  <conditions>
+  </conditions>
+  -->
+
+    <components>
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cversion="1.1.7" condition="CMSIS-DSP">
+          <description>A 2D image processing library for Cortex-M processors</description>
+          <files>
+            <file category="include"     name="Library/Include/" />
+            <file category="sourceC"     name="Library/Source/arm_2d.c"                         attr="config" version="1.4.0" />
+            <file category="sourceC"     name="Library/Source/arm_2d_async.c" />
+            <file category="sourceC"     name="Library/Source/arm_2d_draw.c" />
+            <file category="sourceC"     name="Library/Source/arm_2d_conversion.c" />
+            <file category="sourceC"     name="Library/Source/arm_2d_helium.c"                  condition="Helium" />
+            <file category="doc"         name="documentation/index.html"/>
+            <file category="preIncludeGlobal"    name="Library/Include/template/arm_2d_cfg.h"   attr="config" version="1.3.6" />
+            <file category="utility"     name="tools/img2c.py"                                  attr="config" version="1.2.2"/>
+            <file category="utility"     name="tools/ttf2c.py"                                  attr="config" version="1.2.0"/>
+            <file category="other"       name="tools/README.md" />
+            <file category="other"       name="ReleaseNote.md" />
+            
+            <!-- the template for user controls -->
+            <file category="header"      name="examples/common/controls/template/user_control_template.h"   attr="template"  select="User Control Template" version="1.2.0"/>
+            <file category="sourceC"     name="examples/common/controls/template/user_control_template.c"   attr="template"  select="User Control Template" version="1.2.0"/>
+            
+            <!-- the template for scenes -->
+            <file category="sourceC"     name="Helper/template/arm_2d_scene_template.c" attr="template"  select="User Scene Template"   version="1.2.10" />
+            <file category="header"      name="Helper/template/arm_2d_scene_template.h" attr="template"  select="User Scene Template"   version="1.2.10" />
+
+            <!-- the template for user defined OPCODEs -->
+            <file category="sourceC"     name="Library/template/arm_2d_user_opcode_template_i_cp_src.c" attr="template"  select="OPCODE Template for Copy-Like Operations"   version="1.0.0" />
+            <file category="header"      name="Library/template/arm_2d_user_opcode_template_i_cp_src.h" attr="template"  select="OPCODE Template for Copy-Like Operations"   version="1.0.0" />
+
+          </files>
+
+          <RTE_Components_h>
+
+#define RTE_Acceleration_Arm_2D
+#define __RTE_ACCELERATION_ARM_2D__     /* this macro is deprecated, please use the macro above in your code */
+          </RTE_Components_h>
+          
+          <Pre_Include_Global_h>
+#define ___ARM_2D_CFG_SKIP_HEADER___
+          </Pre_Include_Global_h>
+          
+        </component>
+        
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Alpha-Blending" Cversion="1.1.7" condition="Arm-2D-CORE">
+          <description>Alpha-blending related APIs for Arm-2D</description>
+          <files>
+            <file category="sourceC"     name="Library/Source/arm_2d_alpha_blending.c" />
+            <file category="doc"         name="documentation/html/group__gAlpha.html"/>
+          </files>
+          <RTE_Components_h>
+
+    #define RTE_Acceleration_Arm_2D_Alpha_Blending
+          </RTE_Components_h>
+        </component>
+        
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Transform" Cversion="1.1.7" condition="Arm-2D-CORE">
+          <description>Transform (rotation and zooming)</description>
+          <files>
+            <file category="sourceC"     name="Library/Source/arm_2d_transform.c"           condition="CMSIS-DSP"/>
+            <file category="doc"         name="documentation/html/group__gTransform.html"/>
+          </files>
+          <RTE_Components_h>
+
+    #define RTE_Acceleration_Arm_2D_Transform
+          </RTE_Components_h>
+        </component>
+        
+        <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Filter" Cversion="1.1.7" condition="Arm-2D-CORE">
+          <description>Filters (Blur etc)</description>
+          <files>
+            <file category="sourceC"     name="Library/Source/arm_2d_filter.c"/>
+            <file category="doc"         name="documentation/html/group__gFilter.html"/>
+          </files>
+          <RTE_Components_h>
+
+    #define RTE_Acceleration_Arm_2D_Filter
+          </RTE_Components_h>
+        </component>
+
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB" Cversion="1.12.1" condition="Arm-2D-CORE">
+          <description>Helper services for LCD adaptor(s), e.g. Generic Partial Framebuffer, Scene Player etc.</description>
+          <files>
+            <file category="include"     name="Helper/Include/" />
+            <file category="include"     name="examples/demos/" />
+            <file category="sourceC"     name="Helper/Source/arm_2d_helper.c" />
+            <file category="sourceC"     name="Helper/Source/arm_2d_helper_pfb.c" />
+            <file category="sourceC"     name="Helper/Source/arm_2d_helper_scene.c" />
+            <file category="sourceC"     name="Helper/Source/arm_2d_helper_list.c" />
+            <file category="doc"         name="documentation/html/group__gHelper.html"/>
+            
+            <file category="sourceC"     name="Helper/template/arm_2d_helper_rtos_user.c"  attr="template"  select="User RTOS Support Template"   version="1.0.1" />
+            
+            <!-- scene template -->
+            <file category="sourceC"     name="examples/common/scenes/meter/arm_2d_scene_meter.c"   attr="template"  select="Scene Template: Meter"   version="1.2.9" />
+            <file category="sourceC"     name="examples/common/asset/MeterPanel.c"                  attr="template"  select="Scene Template: Meter"   version="1.2.9" />
+            <file category="header"      name="examples/common/scenes/meter/arm_2d_scene_meter.h"   attr="template"  select="Scene Template: Meter"   version="1.2.9" />
+            
+            <file category="sourceC"     name="examples/common/scenes/watch/arm_2d_scene_watch.c"   attr="template"  select="Scene Template: Watch"   version="1.1.1" />
+            <file category="header"      name="examples/common/scenes/watch/arm_2d_scene_watch.h"   attr="template"  select="Scene Template: Watch"   version="1.1.1" />
+
+            <file category="sourceC"     name="examples/common/scenes/fitness/arm_2d_scene_fitness.c" attr="template"  select="Scene Template: Fitness"   version="1.2.3" />
+            <file category="header"      name="examples/common/scenes/fitness/arm_2d_scene_fitness.h" attr="template"  select="Scene Template: Fitness"   version="1.2.3" />
+
+            <file category="sourceC"     name="examples/common/scenes/alarm_clock/arm_2d_scene_alarm_clock.c" attr="template"  select="Scene Template: Alarm Clock"   version="1.0.2" />
+            <file category="header"      name="examples/common/scenes/alarm_clock/arm_2d_scene_alarm_clock.h" attr="template"  select="Scene Template: Alarm Clock"   version="1.0.2" />
+
+            <file category="sourceC"     name="examples/common/scenes/histogram/arm_2d_scene_histogram.c" attr="template"  select="Scene Template: Histogram"   version="1.1.1" />
+            <file category="header"      name="examples/common/scenes/histogram/arm_2d_scene_histogram.h" attr="template"  select="Scene Template: Histogram"   version="1.1.1" />
+
+            <file category="sourceC"     name="examples/common/scenes/fan/arm_2d_scene_fan.c"   attr="template"  select="Scene Template: Fan"   version="1.0.1" />
+            <file category="header"      name="examples/common/scenes/fan/arm_2d_scene_fan.h"   attr="template"  select="Scene Template: Fan"   version="1.0.1" />
+
+            <file category="sourceC"     name="examples/common/scenes/bubble_charging/arm_2d_scene_bubble_charging.c"   attr="template"  select="Scene Template: Bubble Charging"   version="1.0.1" />
+            <file category="header"      name="examples/common/scenes/bubble_charging/arm_2d_scene_bubble_charging.h"   attr="template"  select="Scene Template: Bubble Charging"   version="1.0.1" />
+
+            <file category="sourceC"     name="examples/common/scenes/animate_background/arm_2d_scene_animate_background.c"   attr="template"  select="Scene Template: Animate Background"   version="1.0.0" />
+            <file category="header"      name="examples/common/scenes/animate_background/arm_2d_scene_animate_background.h"   attr="template"  select="Scene Template: Animate Background"   version="1.0.0" />
+          </files>
+          <RTE_Components_h>
+    #define RTE_Acceleration_Arm_2D_Helper_PFB
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="RTOS Helper" Cvariant="CMSIS-RTOS2" Cversion="1.1.0" condition="PFB CMSIS-RTOS2">
+          <description>A helper service enables the asynchronose mode on CMSIS-RTOS2.</description>
+          <files>
+            <file category="sourceC"     name="Helper/template/arm_2d_helper_rtos_cmsis_rtos2.c" attr="config" version="1.1.0" />
+          </files>
+          <RTE_Components_h>
+    #define RTE_Acceleration_Arm_2D_Helper_RTOS_CMSIS_RTOS2
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="RTOS Helper" Cvariant="RT-Thread" Cversion="1.1.0" condition="Arm-2D-PFB">
+          <description>A helper service enables the asynchronose mode on RT-Thread.</description>
+          <files>
+            <file category="sourceC"     name="Helper/template/arm_2d_helper_rtos_rt_thread.c" attr="config" version="1.1.0" />
+          </files>
+          <RTE_Components_h>
+    #define RTE_Acceleration_Arm_2D_Helper_RTOS_RT_Thread
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="RTOS Helper" Cvariant="User Custom" Cversion="1.1.0" condition="Arm-2D-PFB">
+          <description>A template for user to custom a RTOS wrapper</description>
+          <files>
+            <file category="sourceC"     name="Helper/template/arm_2d_helper_rtos_user.c" attr="config" version="1.1.0" />
+          </files>
+          <RTE_Components_h>
+    #define RTE_Acceleration_Arm_2D_Helper_RTOS_USER
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cversion="3.1.0" condition="Arm-2D-Helper" maxInstances="8">
+          <description>The Display Adapter.</description>
+          <files>
+            <file category="sourceC"     name="Helper/template/arm_2d_disp_adapter.c" attr="config" version="3.1.0" />
+            <file category="header"      name="Helper/template/arm_2d_disp_adapter.h" attr="config" version="3.1.0" />
+          </files>
+          <RTE_Components_h>
+    #define RTE_Acceleration_Arm_2D_Helper_Disp_Adapter%Instance%
+    #define __RTE_ACCELERATION_ARM_2D_HELPER_DISP_ADAPTER%Instance%__  /* this macro is deprecated, please use the macro above in your code */
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Scene" Cversion="1.2.10" condition="Arm-2D-Helper" maxInstances="1000">
+          <description>A template for scene</description>
+          <files>
+            <file category="sourceC"     name="Helper/template/arm_2d_scene.c" attr="config" version="1.2.10" />
+            <file category="header"      name="Helper/template/arm_2d_scene.h" attr="config" version="1.2.10" />
+          </files>
+          <RTE_Components_h>
+    #define RTE_Acceleration_Arm_2D_Scene%Instance%
+    #define __RTE_ACCELERATION_ARM_2D_SCENE%Instance%__    /* this macro is deprecated, please use the macro above in your code */
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" Cversion="2.3.1" condition="Arm-2D-CORE">
+          <description>An example module to print ASCII strings to target string.</description>
+          <files>
+            <file category="include"     name="examples/common/controls/" />
+            <file category="sourceC"     name="examples/common/controls/lcd_printf.c" />
+            <file category="sourceC"     name="examples/common/controls/GLCD_Fonts.c"      />
+            <file category="sourceC"     name="examples/common/asset/DigitsFont.c"         />
+            <file category="sourceC"     name="examples/common/asset/alarm_clock_font32.c" />
+            <file category="sourceC"     name="examples/common/asset/alarm_clock_font64.c" />
+          </files>
+          <RTE_Components_h>
+
+    #define RTE_Acceleration_Arm_2D_Extra_LCD_printf__
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Controls" Cversion="1.7.7" condition="Arm-2D-EXTRA">
+          <description>A set of example controls, e.g. round-corner-box, spinning-wheels etc</description>
+          <files>
+            <!-- example control source files -->
+            <file category="include"     name="examples/common/controls/" />
+            <file category="sourceC"     name="examples/common/controls/controls.c" />
+            <file category="sourceC"     name="examples/common/controls/busy_wheel.c" />
+            <file category="sourceC"     name="examples/common/controls/shape_round_corner_box.c" />
+            <file category="sourceC"     name="examples/common/controls/spinning_wheel.c" />
+            <file category="sourceC"     name="examples/common/controls/progress_bar_drill.c" />
+            <file category="sourceC"     name="examples/common/controls/progress_bar_flowing.c" />
+            <file category="sourceC"     name="examples/common/controls/progress_bar_simple.c" />
+            <file category="sourceC"     name="examples/common/controls/number_list.c" />
+            <file category="sourceC"     name="examples/common/controls/progress_wheel.c" />
+            <file category="sourceC"     name="examples/common/controls/list_view.c" />
+            <file category="sourceC"     name="examples/common/controls/battery_gasgauge.c" />
+            <file category="sourceC"     name="examples/common/controls/dynamic_nebula.c" />
+            <file category="sourceC"     name="examples/common/controls/console_box.c" />
+            <file category="sourceC"     name="examples/common/controls/histogram.c" />
+
+            <!-- assets -->
+            <file category="sourceC"     name="examples/common/asset/WhiteDotSmall.c" />
+            <file category="sourceC"     name="examples/common/asset/WhiteDotMiddle.c" />
+            <file category="sourceC"     name="examples/common/asset/WhiteDotBig.c" />
+            <file category="sourceC"     name="examples/common/asset/SpinWheel.c" />
+            <file category="sourceC"     name="examples/common/asset/blue_slashes.c" />
+            <file category="sourceC"     name="examples/common/asset/wave.c" />
+            <file category="sourceC"     name="examples/common/asset/cmsis_logo.c" />
+            <file category="sourceC"     name="examples/common/asset/GreenCircle.c" />
+            <file category="sourceC"     name="examples/common/asset/QuaterArcSmall.c" />
+            <file category="sourceC"     name="examples/common/asset/QuaterArcMiddle.c" />
+            <file category="sourceC"     name="examples/common/asset/QuaterArcBig.c" />
+            <file category="sourceC"     name="examples/common/asset/ListCover.c" />
+            <file category="sourceC"     name="examples/common/asset/battery_boarder_1.c" />
+            <file category="sourceC"     name="examples/common/asset/battery_gasgauge_block.c" />
+            <file category="sourceC"     name="examples/common/asset/battery_gasgauge_grade_boarder.c" />
+            <file category="sourceC"     name="examples/common/asset/SinWave.c" />
+            <file category="sourceC"     name="examples/common/asset/glass_reflection_wide.c" />
+            <file category="sourceC"     name="examples/common/asset/glass_reflection_narrow.c" />
+            <file category="sourceC"     name="examples/common/asset/Lighting.c" />
+            <file category="sourceC"     name="examples/common/asset/Pointer.c" />
+            <file category="sourceC"     name="examples/common/asset/watch_panel.c" />
+            <file category="sourceC"     name="examples/common/asset/pointer_sec.c" />
+            <file category="sourceC"     name="examples/common/asset/gear_01.c" />
+            <file category="sourceC"     name="examples/common/asset/gear_02.c" />
+            <file category="sourceC"     name="examples/common/asset/star.c" />
+            <file category="sourceC"     name="examples/common/asset/small_icon_sun.c" />
+            <file category="sourceC"     name="examples/common/asset/software.c" />
+            <file category="sourceC"     name="examples/common/asset/circle_mask.c" />
+            <file category="sourceC"     name="examples/common/asset/circle_small.c" />
+            <file category="sourceC"     name="examples/common/asset/wifi_signal.c" />
+            <file category="sourceC"     name="examples/common/asset/helium.c" />
+            <file category="sourceC"     name="examples/common/asset/background.c" />
+            <file category="sourceC"     name="examples/common/asset/BackgroundSmall.c" />
+            <file category="sourceC"     name="examples/common/asset/WatchCoverRound.c" />
+            <file category="sourceC"     name="examples/common/asset/GlassHalo.c" />
+            <file category="sourceC"     name="examples/common/asset/ECG.c" />
+            <file category="sourceC"     name="examples/common/asset/ECGScan.c" />
+            <file category="sourceC"     name="examples/common/asset/Cuisine.c" />
+            <file category="sourceC"     name="examples/common/asset/fan_blade.c" />
+            <file category="sourceC"     name="examples/common/asset/RadialGradient.c" />
+            <file category="sourceC"     name="examples/common/asset/GlassBall.c" />
+            <file category="sourceC"     name="examples/common/asset/HallowOutCircleMask.c" />
+            <file category="sourceC"     name="examples/common/asset/Fire8x4.c" />
+          </files>
+          <RTE_Components_h>
+
+    #define RTE_Acceleration_Arm_2D_Extra_Controls
+          </RTE_Components_h>
+        </component>
+        
+        <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Benchmark-Generic" Cversion="1.4.3" condition="Arm-2D-Benchmark-Generic">
+          <description>An all-in-one generic benchmark for arm-2d.</description>
+          <files>
+            <file category="include"     name="examples/common/benchmark/" />
+            <file category="sourceC"     name="examples/common/benchmark/benchmark_generic.c" />
+            <file category="sourceC"     name="examples/common/benchmark/arm_2d_scene_benchmark_generic.c" />
+			      <file category="sourceC"     name="examples/common/benchmark/arm_2d_scene_benchmark_generic_cover.c" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Extra_Benchmark
+    #define RTE_Acceleration_Arm_2D_Extra_Benchmark_Generic
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Benchmark-WatchPanel" Cversion="1.4.3" condition="Arm-2D-Benchmark-WatchPanel">
+          <description>A watch-panel benchmark for arm-2d.</description>
+          <files>
+            <file category="include"     name="examples/common/benchmark/" />
+            <file category="sourceC"     name="examples/common/benchmark/benchmark_watch_panel.c" />
+            <file category="sourceC"     name="examples/common/benchmark/arm_2d_scene_benchmark_watch_panel.c" />
+			      <file category="sourceC"     name="examples/common/benchmark/arm_2d_scene_benchmark_watch_panel_cover.c" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Extra_Benchmark
+    #define RTE_Acceleration_Arm_2D_Extra_Benchmark_Watch_Panel
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Basics" Cversion="1.0.1" condition="Arm-2D-EXTRA">
+          <description>A demo for some basic operations.</description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_basics.c" attr="config" version="1.0.1" />
+            <file category="header"      name="examples/demos/arm_2d_scene_basics.h" attr="config" version="1.0.1" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Basics
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Atom" Cversion="1.0.2" condition="Arm-2D-EXTRA">
+          <description>A demo for how to use the dirty region helper service.</description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_atom.c" attr="config" version="1.0.2" />
+            <file category="header"      name="examples/demos/arm_2d_scene_atom.h" attr="config" version="1.0.2" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Atom
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="AudioMark" Cversion="1.0.2" condition="Arm-2D-EXTRA">
+          <description>A complex demo for evaluating the system performance under the heavy load.</description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_audiomark.c" attr="config" version="1.0.2" />
+            <file category="header"      name="examples/demos/arm_2d_scene_audiomark.h" attr="config" version="1.0.2" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_AudioMark
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="ConsoleWindow" Cversion="1.0.1" condition="Arm-2D-EXTRA">
+          <description>A demo for how to create a floating window of a text console.</description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_console_window.c" attr="config" version="1.0.1" />
+            <file category="header"      name="examples/demos/arm_2d_scene_console_window.h" attr="config" version="1.0.1" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Console_Window
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Gas Gauge" Cversion="1.0.1" condition="Arm-2D-EXTRA">
+          <description>A demo for the battery gas gauge.</description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_gas_gauge.c" attr="config" version="1.0.1" />
+            <file category="header"      name="examples/demos/arm_2d_scene_gas_gauge.h" attr="config" version="1.0.1" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Gas_Gauge
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Listview" Cversion="1.0.1" condition="Arm-2D-EXTRA">
+          <description>A demo for the listview </description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_listview.c" attr="config" version="1.0.1" />
+            <file category="header"      name="examples/demos/arm_2d_scene_listview.h" attr="config" version="1.0.1" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Listview
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Panel" Cversion="1.0.2" condition="Arm-2D-EXTRA">
+          <description>A demo for typical controls on a panel </description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_panel.c" attr="config" version="1.0.2" />
+            <file category="header"      name="examples/demos/arm_2d_scene_panel.h" attr="config" version="1.0.2" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Panel
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Progress and Status" Cversion="1.0.1" condition="Arm-2D-EXTRA">
+          <description>A demo for progress indication and gif </description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_progress_status.c" attr="config" version="1.0.1" />
+            <file category="header"      name="examples/demos/arm_2d_scene_progress_status.h" attr="config" version="1.0.1" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Progress_Status
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Virtual Resources" Cversion="1.0.0" condition="Arm-2D-EXTRA">
+          <description>A demo for how to use virtual resources </description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_virtual_resource.c" attr="config" version="1.0.0" />
+            <file category="header"      name="examples/demos/arm_2d_scene_virtual_resource.h" attr="config" version="1.0.0" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Virtual_Resources
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Menu" Cversion="1.0.1" condition="Arm-2D-EXTRA">
+          <description>A demo for menu </description>
+          <files>
+            <file category="sourceC"     name="examples/demos/arm_2d_scene_menu.c" attr="config" version="1.0.1" />
+            <file category="header"      name="examples/demos/arm_2d_scene_menu.h" attr="config" version="1.0.1" />
+          </files>
+          <RTE_Components_h>
+#define RTE_Acceleration_Arm_2D_Demos_Menu
+          </RTE_Components_h>
+        </component>
+
+        <component Cclass="CMSIS-Compiler" Cgroup="STDOUT" Csub="LCD Console" Cversion="1.0.2" condition="STDOUT LCD Console">
+          <description>Retarget STDOUT to an Arm-2D LCD Console. </description>
+          <RTE_Components_h>
+            #define RTE_CMSIS_Compiler_STDOUT                /* CMSIS-Compiler STDOUT */
+            #define RTE_CMSIS_Compiler_STDOUT_Custom         /* CMSIS-Compiler STDOUT: Custom */
+            #define RTE_CMSIS_Compiler_STDOUT_LCD_Console   /* CMSIS-Compiler STDOUT: Arm-2D LCD Console */
+
+            #undef __DISP0_CFG_USE_CONSOLE__
+            #define __DISP0_CFG_USE_CONSOLE__               0 /* disable the console in DISP0_ADAPTER */
+
+            #undef __DISP0_CFG_DISABLE_NAVIGATION_LAYER__
+            #define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__  1 /* disable the navigation layer */
+
+            #undef __DISP0_CFG_DISABLE_DEFAULT_SCENE__
+            #define __DISP0_CFG_DISABLE_DEFAULT_SCENE__     1 /* disable the default scene */
+
+          </RTE_Components_h>
+          <files>
+            <file category="sourceC"  name="Helper/template/arm_2d_helper_lcd_console.c"/>
+            <file category="sourceC"  name="examples/demos/arm_2d_scene_console.c"/>
+            <file category="header"   name="Helper/template/arm_2d_helper_lcd_console.h"/>
+            <file category="header"   name="examples/demos/arm_2d_scene_console.h"/>
+          </files>
+        </component>
+
+        <component Cclass="CMSIS-Compiler" Cgroup="STDOUT" Csub="Display Adapter 0" Cversion="1.0.1" condition="STDOUT Disp Adapter0">
+          <description>Retarget STDOUT to the Arm-2D Display Adapter 0</description>
+          <RTE_Components_h>
+            #define RTE_CMSIS_Compiler_STDOUT                   /* CMSIS-Compiler STDOUT */
+            #define RTE_CMSIS_Compiler_STDOUT_Custom            /* CMSIS-Compiler STDOUT: Custom */
+            #define RTE_CMSIS_Compiler_STDOUT_Display_Adapter_0 /* CMSIS-Compiler STDOUT: Arm-2D Display Adapter 0 */
+          </RTE_Components_h>
+
+          <files>
+            <file category="sourceC"  name="Helper/template/arm_2d_helper_disp_adapter0_console.c"/>
+          </files>
+        </component>
+
+    </components>
+
+  <!-- optional taxonomy section for defining new component Class and Group names -->
+
+  <taxonomy>
+      <description Cclass="Acceleration" Cgroup="Arm-2D" doc="documentation/index.html">A 2D Image Processing Library for Cortex-M Processors</description>
+  </taxonomy>
+
+  
+</package>

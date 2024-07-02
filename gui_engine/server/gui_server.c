@@ -79,7 +79,7 @@ static void gui_server_entry(void *parameter)
         wheel_info_t *wheel = wheel_algo_process(wheel_get_data());
         GUI_UNUSED(wheel);
 
-        if ((tp->pressing == true) || (kb->pressing == true))
+        if ((tp->pressing == true) || (kb->pressing == true) || wheel->type == WHEEL_ING)
         {
             gui_msg_t msg = {.event = GUI_EVENT_RESET_ACTIVE_TIME};
             gui_send_msg_to_server(&msg);

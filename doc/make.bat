@@ -7,8 +7,12 @@ REM Command file for Sphinx documentation
 if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
-set SOURCEDIR=source
-set BUILDDIR=build
+set EN_SOURCEDIR=./en
+set EN_BUILDDIR=_build/en
+set EN_CONFDIR=./en
+set CN_SOURCEDIR=./cn
+set CN_BUILDDIR=_build/cn
+set CN_CONFDIR=./cn
 
 %SPHINXBUILD% >NUL 2>NUL
 if errorlevel 9009 (
@@ -25,7 +29,10 @@ if errorlevel 9009 (
 
 if "%1" == "" goto help
 
-%SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+REM sphinx-build -b html -c ./en ../ ./_build/en -D language=en
+%SPHINXBUILD% -M %1 %EN_SOURCEDIR% %EN_BUILDDIR% -D language=en -c %EN_CONFDIR% %SPHINXOPTS% %O%
+REM sphinx-build -b html -c ./cn ../ ./_build/cn -D language=zh_CN
+%SPHINXBUILD% -M %1 %CN_SOURCEDIR% %CN_BUILDDIR% -D language=zh_CN -c %CN_CONFDIR% %SPHINXOPTS% %O%
 goto end
 
 :help

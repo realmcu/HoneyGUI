@@ -173,7 +173,8 @@ static size_t in_func(     /* Returns number of bytes read (zero on error) */
     size_t nbyte    /* Number of bytes to read/remove */
 )
 {
-    IODEV *dev = (IODEV *)jd->device;  /* Session identifier (5th argument of jd_prepare function) */
+    LIVE_IODEV *dev = (LIVE_IODEV *)
+                      jd->device;  /* Session identifier (5th argument of jd_prepare function) */
     static uint32_t offset = 0;
     uint8_t *pstart = dev->mem_addr;
 
@@ -202,7 +203,8 @@ static int out_func(       /* Returns 1 to continue, 0 to abort */
     gui_obj_t *obj
 )
 {
-    IODEV *dev = (IODEV *)jd->device;  /* Session identifier (5th argument of jd_prepare function) */
+    LIVE_IODEV *dev = (LIVE_IODEV *)
+                      jd->device;  /* Session identifier (5th argument of jd_prepare function) */
     uint8_t *src, *dst;
     uint16_t y, bws;
     unsigned int bwd;
@@ -234,7 +236,7 @@ static void *gui_img_live_decode_jpeg(void *jepg)
     JDEC jdec;        /* Decompression object */
     void *work = NULL;       /* Pointer to the work area */
     size_t sz_work = 3500; /* Size of work area */
-    IODEV devid;      /* Session identifier */
+    LIVE_IODEV devid;      /* Session identifier */
     void *data = NULL;
     uint8_t N_BPP = (3 - JD_FORMAT);
 

@@ -1,0 +1,57 @@
+/* div[role="search"] style */
+.wy-side-nav-search > div[role="search"] {
+    text-align: center;
+}
+
+/*Let `code` wrap*/
+.rst-content code, .rst-content tt, code {
+    white-space: normal;
+}
+
+.highlight {
+    background:#eeffcc;
+}
+
+dl.cpp.unexpanded dd {
+    display: none;
+}
+
+dl.c.unexpanded dd {
+    display: none;
+}
+
+.rtk-api-expansion-button {
+    padding: 4px;
+}
+.rtk-api-expansion-button::before {
+    font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+    display: inline-block;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+.unexpanded .rtk-api-expansion-button::before {
+    content: "\f0da \00a0";
+}
+.expanded .rtk-api-expansion-button::before {
+    content: "\f0d7 \00a0";
+}
+
+/*text align justify */
+div,p{
+    text-align: justify;
+    text-justify:inter-ideograph;
+}
+p i{
+    display: inline-block;
+    /*padding-left: 100%;*/
+    width: 100%;
+}
+
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+    content: none !important;
+}

@@ -62,7 +62,9 @@ typedef struct gui_cardview
     int16_t speed;
     int16_t recode[5];
     void (*status_cb)(struct gui_cardview *this);
+    gui_animate_t *animate;
     uint8_t checksum;
+    uint8_t bottom_space_count;
     int yold;
     int target;
     int start_x;
@@ -146,6 +148,21 @@ gui_cardview_t *gui_cardview_create(void       *parent,
                                     int16_t     h);
 
 /**
+ * @brief set animate to cardview widget
+ *
+ * @param o widget object pointer
+ * @param dur Animation duration
+ * @param repeat_count Repeat play times, -1 means play on repeat forever
+ * @param callback animate frame callback
+ * @param p parameter
+ */
+void gui_cardview_set_animate(gui_cardview_t *_this,
+                              uint32_t   dur,
+                              int        repeat_count,
+                              void      *callback,
+                              void      *p);
+
+/**
  * @brief set cardview style
  *
  * @param this widget pointer
@@ -167,6 +184,32 @@ void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *thi
  * @param align_hight
  */
 void gui_cardview_alignment(gui_cardview_t *this, int align_hight);
+/**
+ * @brief set bottom_space
+ *
+ * @param this widget pointer
+ * @param bottom_space bottom_space_count
+ */
+void gui_cardview_set_bottom_space(gui_cardview_t *this, uint8_t bottom_space);
+
+/**
+ * @brief Add a callback function to the event of sliding the cardview upwards in the Y-axis direction
+ *
+ * @param this widget pointer
+ * @param callback
+ * @param parameter
+ */
+void gui_cardview_up(gui_cardview_t *this, void *callback, void *parameter);
+
+/**
+ * @brief Add a callback function to the event of sliding the cardview downwards in the Y-axis direction
+ *
+ * @param this widget pointer
+ * @param callback
+ * @param parameter
+ */
+void gui_cardview_down(gui_cardview_t *this, void *callback, void *parameter);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

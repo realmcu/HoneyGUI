@@ -30,6 +30,7 @@ extern "C" {
  *============================================================================*/
 #include <guidef.h>
 #include <gui_api.h>
+#include <gui_obj.h>
 #include <lx_vglite_api.h>
 
 /** @defgroup WIDGET WIDGET

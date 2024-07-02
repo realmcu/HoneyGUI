@@ -84,6 +84,73 @@
   * @{
   */
 
+static void gui_cardview_update_att(gui_obj_t *obj)
+{
+    gui_cardview_t *this = (void *)obj;
+    //size_t frame_count;
+    uint32_t cur_time_gap;
+    if (this->animate && this->animate->animate)
+    {
+        this->animate->Beginning_frame = 0;
+        this->animate->end_frame = 0;
+        if (this->animate->progress_percent == 0 && !this->animate->init)
+        {
+            this->animate->init = 1;
+            this->animate->init_time_ms = gui_ms_get();
+        }
+
+        this->animate->cur_time_ms = gui_ms_get();
+        cur_time_gap = this->animate->cur_time_ms - this->animate->init_time_ms;
+
+        if (this->animate->repeat_count == 0)
+        {
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            if (cur_time_gap / this->animate->dur >= 1)
+            {
+                this->animate->end_frame = 1;
+                this->animate->progress_percent = 1;
+                this->animate->animate = 0;
+            }
+            this->animate->callback(this->animate->p, this);
+
+        }
+        else if (this->animate->repeat_count == -1)
+        {
+            // uint32_t  round_count = cur_time_gap / this->animate->dur;
+
+
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            if (this->animate->progress_percent < this->animate->last_per)
+            {
+
+                this->animate->Beginning_frame = 1;
+            }
+            this->animate->last_per = this->animate->progress_percent;
+            this->animate->callback(this->animate->p, this);
+        }
+        else
+        {
+            uint32_t  round_count = cur_time_gap / this->animate->dur;
+            if (round_count > this->animate->repeat_count)
+            {
+                this->animate->animate = 0;
+                return;
+            }
+
+            if (round_count > this->animate->last_round)
+            {
+                this->animate->Beginning_frame = 1;
+            }
+            this->animate->last_round = round_count;
+            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
+                                              (float)this->animate->dur;
+            this->animate->callback(this->animate->p, this);
+        }
+    }
+}
+
 static void gui_cardview_input_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
@@ -144,8 +211,8 @@ static void gui_page_update_speed(gui_obj_t *obj)
     this->target = (this->speed * this->speed + _UI_ABS(this->speed)) / 2;
 
     int top_height = -this->hold_y;
-    int buttom_height = this->height + this->card_height + this->hold_y - (int)gui_get_screen_height();
-
+    int buttom_height = this->height + this->card_height * this->bottom_space_count + this->hold_y -
+                        (int)gui_get_screen_height();
     if (this->speed > 0)
     {
         if (this->target > top_height)
@@ -216,12 +283,13 @@ static void gui_page_hold_y(gui_obj_t *obj)
     {
         this->hold_y = this->start_y;
     }
-    else if (this->hold_y < (this->start_y - (this->height + this->card_height -
-                                              (int)gui_get_screen_height()))
+    else if (this->hold_y < (this->start_y - (this->height + this->card_height *
+                                              this->bottom_space_count - (int)gui_get_screen_height()))
              && this->hold_y != 0)/*@BOTTOM*/
     {
         gui_obj_event_set(obj, GUI_EVENT_7);
-        this->hold_y = this->start_y - (this->height + this->card_height - (int)gui_get_screen_height());
+        this->hold_y = this->start_y - (this->height + this->card_height * this->bottom_space_count -
+                                        (int)gui_get_screen_height());
     }
 
     gui_page_update_speed(obj);
@@ -260,12 +328,13 @@ static void gui_page_update_boundary(gui_obj_t *obj)
         gui_obj_event_set(obj, GUI_EVENT_7);
         this->release = false;
     }
-    else if (this->hold_y < (this->start_y - (this->height + this->card_height -
-                                              (int)gui_get_screen_height()))
+    else if (this->hold_y < (this->start_y - (this->height + this->card_height *
+                                              this->bottom_space_count - (int)gui_get_screen_height()))
              && this->hold_y != 0)/*@BOTTOM*/
     {
         this->release = false;
-        this->hold_y = this->start_y - (this->height + this->card_height - (int)gui_get_screen_height());
+        this->hold_y = this->start_y - (this->height + this->card_height * this->bottom_space_count -
+                                        (int)gui_get_screen_height());
         gui_obj_event_set(obj, GUI_EVENT_7);
     }
 }
@@ -307,6 +376,7 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_cardview_t *this = (gui_cardview_t *)obj;
     uint8_t last = this->checksum;
+    gui_cardview_update_att(obj);
     this->align_hight = this->card_height;
     if (this->gesture_flag)
     {
@@ -399,6 +469,18 @@ static void gui_cardview_prepare(gui_obj_t *obj)
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_cardview_t));
 
+    if (tp->type == TOUCH_ORIGIN_FROM_Y)
+    {
+        if (tp->deltaY <= -10)
+        {
+            gui_obj_event_set(obj, GUI_EVENT_1);
+        }
+        else if (tp->deltaY > 10)
+        {
+            gui_obj_event_set(obj, GUI_EVENT_2);
+        }
+    }
+
     if (last != this->checksum)
     {
         gui_fb_change();
@@ -425,7 +507,12 @@ static void gui_cardview_end(gui_obj_t *obj)
 
 static void gui_cardview_destory(gui_obj_t *obj)
 {
-
+    gui_cardview_t *this = (void *)obj;
+    if (this->animate)
+    {
+        gui_free(this->animate);
+        this->animate = NULL;
+    }
 }
 
 static void gui_cardview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -463,6 +550,32 @@ static void gui_cardview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
+void gui_cardview_set_animate(gui_cardview_t *this,
+                              uint32_t   dur,
+                              int        repeat_count,
+                              void      *callback,
+                              void      *p)
+{
+    gui_animate_t *animate = ((gui_cardview_t *)this)->animate;
+
+    if (!(animate))
+    {
+        animate = gui_malloc(sizeof(gui_animate_t));
+    }
+
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    if (dur == 0)
+    {
+        animate->dur = 1;
+    }
+    animate->callback = (void (*)(void *, void *))callback;
+    animate->repeat_count = repeat_count;
+    animate->p = p;
+    ((gui_cardview_t *)this)->animate = animate;
+}
+
 void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this))
 {
     this->status_cb = cb;
@@ -471,6 +584,21 @@ void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *thi
 void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style)
 {
     this->style = style;
+}
+
+void gui_cardview_set_bottom_space(gui_cardview_t *this, uint8_t bottom_space)
+{
+    this->bottom_space_count = bottom_space;
+}
+
+void gui_cardview_up(gui_cardview_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+}
+
+void gui_cardview_down(gui_cardview_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
 }
 
 gui_cardview_t *gui_cardview_create(void       *parent,
@@ -504,6 +632,9 @@ gui_cardview_t *gui_cardview_create(void       *parent,
     root->has_draw_cb = true;
     root->has_end_cb = true;
     root->has_destroy_cb = true;
+
+    this->style = REDUCTION;
+    this->bottom_space_count = 1;
 
     gui_list_init(&(GET_BASE(this)->child_list));
     if ((GET_BASE(this)->parent) != NULL)
