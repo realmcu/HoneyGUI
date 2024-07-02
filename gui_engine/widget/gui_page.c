@@ -102,7 +102,11 @@ static void gui_page_set_height(gui_obj_t *object, gui_obj_t *page)
                 memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
                 matrix_translate(obj->x, obj->y, obj->matrix);
             }
-
+            if (obj->matrix == NULL || page->matrix == NULL)
+            {
+                gui_log("Error: obj->matrix is NULL\n");
+                return;
+            }
             int ay = obj->matrix->m[1][2];
             int buttom = ay + obj->h - page->matrix->m[1][2];
 

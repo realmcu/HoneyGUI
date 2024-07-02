@@ -346,6 +346,12 @@ void gui_wheel_list_set_icon(gui_wheel_list_t *this,
             x = dc->screen_width / 2 - this->radius;
             y = dc->screen_height / 2 - this->radius;
         }
+        else if (layer == 0)
+        {
+            /* code */
+            gui_log("Warning: Layer is zero, using default value 1.0f instead.\n");
+            layer = 1;
+        }
         else
         {
             x = dc->screen_width / 2 + this->distence * layer * cos(RADIAN_60 * index / layer) - this->radius;

@@ -1192,7 +1192,7 @@ static void gui_qrcode_gen_apply_mask(const uint8_t      function_modules[],
 {
     //assert(0 <= (int)mask && (int)mask <= 7);  // Disallows QRCODEGEN_MASK_AUTO
     int qrsize = gui_qrcode_gen_get_size(qrcode);
-    bool invert;
+    bool invert = 0;
     bool val;
 
     for (int y = 0; y < qrsize; y++)
@@ -1203,7 +1203,6 @@ static void gui_qrcode_gen_apply_mask(const uint8_t      function_modules[],
             {
                 continue;
             }
-
             switch ((int)mask)
             {
             case 0:

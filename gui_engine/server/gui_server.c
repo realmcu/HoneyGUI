@@ -122,6 +122,11 @@ static void gui_server_entry(void *parameter)
                 {
                     extern gui_app_t *next_app;
                     extern gui_app_t *current_app;
+                    if (current_app == NULL)
+                    {
+                        gui_log("Error: current_app is NULL\n");
+                        return;
+                    }
                     current_app->close = false;
                     gui_list_remove(&(app->screen.brother_list));
                     app->screen.parent = 0;

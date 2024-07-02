@@ -20,7 +20,6 @@
 #include <string.h>
 #include "gui_img.h"
 #include "gui_obj.h"
-#include "tp_algo.h"
 #include "gui_img_live.h"
 
 #ifdef IMG_LIVE_TJPGDEC
@@ -407,10 +406,24 @@ static void gui_img_live_file_init(gui_img_live_t  *this)
         if (!fp)
         {
             gui_log("Error: open mjpeg failed\n");
+            return;
         }
         fseek(fp, 0, SEEK_END);
         sz_mjpeg = ftell(fp);
         fseek(fp, 0, SEEK_SET);
+
+        if (sz_mjpeg < 0)
+        {
+            gui_log("Error: sz_mjpeg cannot be negative.\n");
+            fclose(fp);
+            return;
+        }
+        if (!mjpeg_buff)
+        {
+            gui_log("Error: Memory allocation failed\n");
+            fclose(fp);
+            return;
+        }
         mjpeg_buff = gui_malloc(sz_mjpeg);
         memset(mjpeg_buff, 0, sz_mjpeg);
         fread(mjpeg_buff, 1, sz_mjpeg, fp);
@@ -420,7 +433,11 @@ static void gui_img_live_file_init(gui_img_live_t  *this)
     {
         mjpeg_buff = this->data;
     }
-
+    if (!mjpeg_buff)
+    {
+        gui_log("Error: mjpeg_buff is NULL\n");
+        return;
+    }
     if (is_mjpeg(mjpeg_buff))
     {
         this->img_type = IMG_LIVE_MJPEG;

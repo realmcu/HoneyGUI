@@ -526,7 +526,7 @@ static void gui_turn_table_ctor(gui_turn_table_t *this,
     this->highlight_index = this->active_icon_quantity / 2;
     this->sector_angle = M_PI / this->active_icon_quantity * 2;
 
-    this->static_list = gui_malloc(sizeof(gui_turn_table_coordinate_t *) *
+    this->static_list = gui_malloc(sizeof(gui_turn_table_coordinate_t) *
                                    (this->active_icon_quantity + 1));
 
     gui_turn_table_refresh_icon_list(this);

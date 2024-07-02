@@ -304,7 +304,7 @@ DECLARE_HANDLER(scale)
         return jerry_create_undefined();
     }
     gui_img_t *img = NULL;
-    jerry_get_object_native_pointer(this_value, (void *)img, NULL);
+    jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
     if (img)
     {
         gui_img_scale((void *)img, jerry_get_number_value(args[0]),
@@ -319,7 +319,8 @@ DECLARE_HANDLER(setMode)
         return jerry_create_undefined();
     }
     gui_img_t *img = NULL;
-    jerry_get_object_native_pointer(this_value, (void *)img, NULL);
+    jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
+
     if (img)
     {
         gui_img_set_mode(img, jerry_get_number_value(args[0]));
@@ -1247,6 +1248,7 @@ void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
     jerry_value_t js_cb = NULL;
     jerry_value_t res = 0;
 
+    memset(&msg, 0, sizeof(gui_msg_t));
     memcpy(&(msg.cb), js_msg, sizeof(gui_msg_js_t));
     js_cb = (jerry_value_t)msg.payload;
     // gui_log("timer msg cb 0x%x\n", js_cb);

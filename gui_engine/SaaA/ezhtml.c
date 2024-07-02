@@ -1576,7 +1576,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
-                    parent = (void *)gui_grid_create(parent, x, y, colNumber, rowNumber, colGap, rowGap);
+                    parent = (void *)gui_grid_create(parent, x, y, rowNumber, colNumber, colGap, rowGap);
                     parent->name = ptxt;
                 }
                 break;
@@ -2965,7 +2965,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
 
                                 }
-                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                                gui_log("p->attr[i]:%x\n", (unsigned int)(unsigned char)p->attr[i]);
                             }
                             {
                                 //to
@@ -2988,7 +2988,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
 
                                 }
-                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                                gui_log("p->attr[i]:%x\n", (unsigned int)(unsigned char)p->attr[i]);
                             }
                             {
                                 //dur
@@ -3009,7 +3009,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     dur_num = dur_num * 1000;
                                 }
 
-                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                                gui_log("p->attr[i]:%x\n", (unsigned int)(unsigned char)p->attr[i]);
                             }
                             {
                                 //repeatCount
