@@ -81,7 +81,7 @@ typedef struct
     uint8_t *fbuf;          /* Output frame buffer */
     unsigned int wfbuf;     /* Width of the frame buffer [pix] */
     uint8_t state;          /* input state: 0 init, 1 inputing */
-} IODEV;
+} LIVE_IODEV;
 
 /** End of WIDGET_Exported_Types
   * @}
