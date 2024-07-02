@@ -189,7 +189,6 @@ static void gui_card_prepare_classic(gui_obj_t *obj)
 
 static void gui_card_prepare(gui_obj_t *obj)
 {
-    gui_card_t *this = (gui_card_t *)obj;
     gui_cardview_t *parent = (gui_cardview_t *)(obj->parent);
 
     switch (parent->style)
