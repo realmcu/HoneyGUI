@@ -8,6 +8,13 @@
 
 import os
 
+from datetime import datetime
+ 
+html_context = {
+    'current_year': datetime.now().year, # Set the Copyright year of footer
+    "show_sphinx": False, # remove 'Powered by Sphinx' at the bottom
+}
+
 project = 'RTKIOT GUI'
 author = 'RTKIOT GUI'
 release = 'v0.0.0.1'

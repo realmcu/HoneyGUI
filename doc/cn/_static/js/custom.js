@@ -16,3 +16,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
         dt.insertBefore(button, dt.firstChild);
     });
 })
+
+/* ============= Toggle Languages ============= */
+function change_language(lang)
+{
+    var url = window.location.pathname;
+    var newUrl = "";
+    if(lang.toLowerCase() == 'en')
+    {
+        newUrl = url.replace(/\/en\//gi, '/cn/');
+    }
+    else {
+        newUrl = url.replace(/\/cn\//gi, '/en/');
+    }  
+    window.location.href = newUrl;
+}

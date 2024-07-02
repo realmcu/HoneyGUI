@@ -1,0 +1,9 @@
+{% extends "!breadcrumbs.html" %}
+
+{% block breadcrumbs_aside %}
+<li class="wy-breadcrumbs-aside">
+   <a a href="javascript:void(0);" onclick="change_language('cn')">EN</a>/<a a href="javascript:void(0);" onclick="change_language('en')">中文</a>
+</li>
+
+ {{ super() }}
+{% endblock %}
