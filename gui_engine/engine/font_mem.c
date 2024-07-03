@@ -1114,7 +1114,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                     uint8_t temp = *temp_p;
                     if (temp)
                     {
-                        uint16_t offset = write_off - dc->section.x1 + font_x + (j - font_x) / ppb * ppb;
+                        uint32_t offset = write_off - dc->section.x1 + font_x + (j - font_x) / ppb * ppb;
                         if (temp & 0x0F)
                         {
                             if (temp & 0x01)
