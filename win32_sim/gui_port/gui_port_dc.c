@@ -220,7 +220,7 @@ void *rtk_gui_sdl(void *arg)
     }
 
     char str[50];
-    sprintf(str, "RTKIOT GUI Simulator %d x %d", DRV_LCD_WIDTH, DRV_LCD_HIGHT);
+    sprintf(str, "RTKIOT GUI Simulator %d x %d", sim_get_width(), sim_get_hight());
 
     window = SDL_CreateWindow(str, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               sim_get_width(),

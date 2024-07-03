@@ -402,6 +402,7 @@ static void gui_img_live_file_init(gui_img_live_t  *this)
         // char *file = "D:/Browser/ffmpeg-2024-05-08-git-e8e84dc325-full_build/bin/output.mjpeg";
         char *file = this->data;
         FILE *fp = fopen(file, "rb");
+        int rdlen = 0;
 
         if (!fp)
         {
@@ -425,8 +426,9 @@ static void gui_img_live_file_init(gui_img_live_t  *this)
             return;
         }
         mjpeg_buff = gui_malloc(sz_mjpeg);
+        GUI_ASSERT(mjpeg_buff != NULL);
         memset(mjpeg_buff, 0, sz_mjpeg);
-        fread(mjpeg_buff, 1, sz_mjpeg, fp);
+        rdlen = fread(mjpeg_buff, 1, sz_mjpeg, fp);
         fclose(fp);
     }
     else if (this->src_mode == IMG_SRC_MEMADDR)

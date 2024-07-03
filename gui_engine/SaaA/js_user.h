@@ -32,6 +32,7 @@
 #include "gui_img.h"
 #include "gui_keyboard.h"
 #include "guidef.h"
+#include "gui_page.h"
 
 #ifdef RTL87x2G
 #include "wdt.h"

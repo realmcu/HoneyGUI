@@ -320,7 +320,6 @@ DECLARE_HANDLER(setMode)
     }
     gui_img_t *img = NULL;
     jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
-
     if (img)
     {
         gui_img_set_mode(img, jerry_get_number_value(args[0]));
@@ -329,8 +328,9 @@ DECLARE_HANDLER(setMode)
 }
 DECLARE_HANDLER(setAttribute)
 {
-    if (args_cnt != 3 || !jerry_value_is_string(args[0]) || !jerry_value_is_number(args[1]) ||
-        !jerry_value_is_number(args[2]))
+    if (args_cnt != 4 || !jerry_value_is_string(args[0]) || !jerry_value_is_string(args[1]) ||
+        !jerry_value_is_number(args[2]) ||
+        !jerry_value_is_number(args[3]))
     {
         return jerry_create_undefined();
     }
@@ -339,18 +339,44 @@ DECLARE_HANDLER(setAttribute)
     ////gui_log("jerry_get_object_native_pointer = %s",img->base.name);
     if (img)
     {
-        jerry_value_t s = jerry_value_to_string(args[0]);////gui_log("jerryenter1\n");
-        jerry_length_t length = jerry_get_utf8_string_length(s); ////gui_log("jerryenter2\n");
-        jerry_char_t *strbuf1 = gui_malloc(length + 1); ////gui_log("jerryenter3\n");
-        jerry_string_to_utf8_char_buffer(s, strbuf1, length + 1); ////gui_log("jerryenter4\n");
-        strbuf1[length] = '\0';
-        gui_img_set_attribute(img, (void *)strbuf1, NULL, jerry_get_number_value(args[1]),
-                              jerry_get_number_value(args[2]));////gui_log("jerryenter5\n");
+        jerry_value_t s = jerry_value_to_string(args[0]);
+        jerry_length_t length = jerry_get_utf8_string_length(s);
+        jerry_char_t *name_buf = gui_malloc(length + 1);
+        jerry_string_to_utf8_char_buffer(s, name_buf, length + 1);
+        name_buf[length] = '\0';
+
+        s = jerry_value_to_string(args[1]);
+        length = jerry_get_utf8_string_length(s);
+        jerry_char_t *path_buf = gui_malloc(length + 1);
+        jerry_string_to_utf8_char_buffer(s, path_buf, length + 1);
+        path_buf[length] = '\0';
+        void *img_addr = gui_get_file_address(path_buf);
+        gui_free(path_buf);
+
+        if (img_addr)
+        {
+            gui_img_set_attribute(img, (void *)name_buf, img_addr, jerry_get_number_value(args[2]),
+                                  jerry_get_number_value(args[3]));
+        }
         jerry_release_value(s);
     }
     return jerry_create_undefined();
 }
 
+DECLARE_HANDLER(setRebound)
+{
+    if (args_cnt != 1 || !jerry_value_is_boolean(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_page_t *page = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&page, NULL);
+    if (page)
+    {
+        gui_page_rebound(page, jerry_get_boolean_value(args[0]));
+    }
+    return jerry_create_undefined();
+}
 
 DECLARE_HANDLER(onClick)
 {
@@ -432,6 +458,36 @@ DECLARE_HANDLER(onHold)
         }
         cb_arg->func = args[0];
         gui_button_long((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
+    }
+
+    return jerry_create_undefined();
+}
+
+
+DECLARE_HANDLER(onClick_text)
+{
+    //////gui_log("enter onclick\n");
+    if (args_cnt >= 1 && jerry_value_is_function(args[0]))
+    {
+        //js_add_event_listener(this_value, "onclick", args[0]);
+        gui_obj_t *obj = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+        //////gui_log("enter onclick %s\n",obj->name);
+
+        cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+        memset(cb_arg, 0, sizeof(cb_arg_t));
+        cb_arg->args_count = args_cnt - 1;
+        if (cb_arg->args_count)
+        {
+            cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+        }
+        for (size_t i = 0; i < cb_arg->args_count; i++)
+        {
+            cb_arg->args_p[i] = args[i + 1];
+        }
+
+        cb_arg->func = args[0];
+        gui_text_click((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -1183,8 +1239,11 @@ DECLARE_HANDLER(win_setAttribute)
         {
             gui_obj_t *obj = NULL;
             jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-            (obj->not_show) = true;
-            gui_fb_change();
+            if (obj)
+            {
+                (obj->not_show) = true;
+                gui_fb_change();
+            }
         }
         gui_free(a);
     }
@@ -1201,15 +1260,17 @@ DECLARE_HANDLER(win_removeAttribute)
         {
             gui_obj_t *obj = NULL;
             jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-            obj->not_show = false;
-
+            if (obj)
+            {
+                obj->not_show = false;
+                gui_fb_change();
+            }
         }
         gui_free(a);
     }
 
     return jerry_create_undefined();
 }
-
 DECLARE_HANDLER(progress)
 {
     gui_obj_t *obj = NULL;
@@ -1549,6 +1610,8 @@ void js_gui_init()
     REGISTER_METHOD_NAME(document, "setAnimate", setAnimate_text);
     REGISTER_METHOD_NAME(document, "pauseAnimate", pause_animate_text);
     REGISTER_METHOD_NAME(document, "setInputable", setInputable);
+    REGISTER_METHOD_NAME(document, "onClick", onClick_text);
+
 
     jerry_value_t app = jerry_create_object();
     js_set_property(global_obj, "app", app);
@@ -1570,6 +1633,12 @@ void js_gui_init()
     REGISTER_METHOD_NAME(win, "getAttribute", win_getAttribute);
     REGISTER_METHOD_NAME(win, "removeAttribute", win_removeAttribute);
     REGISTER_METHOD_NAME(win, "setAttribute", win_setAttribute);
+
+    jerry_value_t page = jerry_create_object();
+    js_set_property(global_obj, "page", page);
+    REGISTER_METHOD(page, getElementById);
+    REGISTER_METHOD_NAME(page, "setRebound", setRebound);
+
     jerry_value_t sw = jerry_create_object();
     js_set_property(global_obj, "sw", sw);
     REGISTER_METHOD(sw, getElementById);

@@ -2965,7 +2965,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
 
                                 }
-                                gui_log("p->attr[i]:%x\n", (unsigned int)(unsigned char)p->attr[i]);
+                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                             {
                                 //to
@@ -2988,7 +2988,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
 
                                 }
-                                gui_log("p->attr[i]:%x\n", (unsigned int)(unsigned char)p->attr[i]);
+                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                             {
                                 //dur
@@ -3009,7 +3009,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     dur_num = dur_num * 1000;
                                 }
 
-                                gui_log("p->attr[i]:%x\n", (unsigned int)(unsigned char)p->attr[i]);
+                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                             {
                                 //repeatCount
@@ -3024,7 +3024,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 }
                                 repeat_num = repeatCount_num;
 
-                                gui_log("p->attr[i]:%x\n", p->attr[i]);
+                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                         }
                         {
