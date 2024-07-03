@@ -29,11 +29,18 @@ list(APPEND gui_headers
 			${gui_misc_headers}
             ${gui_3rd_common_headers}
             ${gui_3rd_headers}
-			${gui_misc_tlsf_headers})
+			${gui_misc_tlsf_headers}
+			${gui_engine_core})
 set(gui_headers ${gui_headers} CACHE INTERNAL  "gui headers ")
 
-if(gui_debug_enable)
+#if(gui_debug_enable)
+message([GUI] sources lists:)
 foreach(ITEM ${gui_sources})
    message(${ITEM})
 endforeach()
-endif()
+
+message([GUI] headers lists:)
+foreach([GUI] ${gui_headers})
+   message(${ITEM})
+endforeach()
+#endif()
