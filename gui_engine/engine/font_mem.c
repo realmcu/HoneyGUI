@@ -1239,14 +1239,21 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
 void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
-    GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
+    GUI_FONT_HEAD *font;
+    if (text->font_mode == FONT_SRC_FTL)
+    {
+        font = (GUI_FONT_HEAD *)font_lib_tab[get_fontlib_by_name(text->path)].data;
+    }
+    else
+    {
+        font = (GUI_FONT_HEAD *)text->path;
+    }
     uint8_t rendor_mode = font->rendor_mode;
     for (uint16_t i = 0; i < text->font_len; i++)
     {
         rtk_draw_unicode(chr + i, text->color, rendor_mode, rect, font->font_mode_detail.detail.crop);
     }
 }
-
 
 uint8_t gui_font_mem_init_ftl(uint8_t *font_bin_addr)
 {

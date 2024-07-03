@@ -584,6 +584,11 @@ void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
     this->refresh = true;
 }
 
+void gui_text_font_mode_set(gui_text_t *this, FONT_SRC_MODE font_mode)
+{
+    this->font_mode = font_mode;
+}
+
 void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_mode)
 {
     if (font_mode == FONT_SRC_FTL)
