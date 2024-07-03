@@ -63,7 +63,6 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
     #keil_sim scons --target=mdk5
-    change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
     try:
         result_lines = subprocess.check_output(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
@@ -71,11 +70,11 @@ def SDK_handler(module, submodule, manifest_path, repo_home, chip_type):
         if 'warning:' in result_lines:
             os.chdir('./..')
             print(result_lines)
-            print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: has warning")
+            print("keil_sim: 'scons --target=mdk5' fail: has warning")
             return False
     except Exception as e:
         os.chdir('./..')
-        print("scons after enable BUILD_USING_SCRIPT_AS_A_APP fail: {}".format(e.output))
+        print("keil_sim: 'scons --target=mdk5' fail: {}".format(e.output))
         return False
     os.chdir('./..')
 

@@ -77,14 +77,13 @@ if __name__ == '__main__':
     repo.git.checkout('--', '.')
     repo.git.clean('-dfx')
     #keil_sim scons --target=mdk5
-    change_or_revert_macros(repo, "./keil_sim/menu_config.h", "change", [("BUILD_USING_SCRIPT_AS_A_APP", "", "BUILD_USING_SCRIPT_AS_A_APP")], True)
     os.chdir('./keil_sim')
     try:
         subprocess.check_call(["scons.exe", "--target=mdk5"], universal_newlines=True, stderr=subprocess.STDOUT)
     except Exception as e:
         os.chdir('./..')
-        send_mail("keil_sim: 'scons --target=mdk5' after enable BUILD_USING_SCRIPT_AS_A_APP fail.", None)
-        sys.exit("keil_sim: 'scons --target=mdk5' after enable BUILD_USING_SCRIPT_AS_A_APP fail, {}".format(e))
+        send_mail("keil_sim: 'keil_sim: 'scons --target=mdk5' fail.", None)
+        sys.exit("keil_sim: 'keil_sim: 'scons --target=mdk5' fail, {}".format(e))
     os.chdir('./..')
     #reset
     repo.git.checkout('--', '.')
