@@ -23,6 +23,7 @@
 gui_tabview_t *tabview_main;
 gui_tabview_t *tabview_info;
 gui_win_t *win;
+gui_win_t *win_call;
 gui_img_t *screen_wallpaper;
 gui_img_t *bat_left;
 gui_img_t *bat_right;
@@ -55,6 +56,20 @@ void *get_app_chargebox(void)
     return &app_chargebox;
 }
 
+
+void port_gui_sleep_cb(void)
+{
+    extern gui_win_t *win;
+    GET_BASE(win)->not_show = false;
+    extern gui_tabview_t *tabview_main;
+    gui_tabview_tp_disable(tabview_main, true);
+#ifndef _WIN32
+    extern bool TOUCH_ALLOW_DLPS;
+    TOUCH_ALLOW_DLPS = true;
+#endif
+    gui_display_off();
+}
+
 void app_gui_ble_action_cb(void *obj, gui_event_t e, void *param)
 {
 #ifndef _WIN32
@@ -72,6 +87,7 @@ static void screen_unlock_cb(void *obj, gui_event_t e)
     GET_BASE(win)->not_show = true;
     GET_BASE(tabview_info)->not_show = false;
     GET_BASE(tabview_main)->not_show = false;
+    gui_tabview_tp_disable(tabview_main, false);
 }
 
 static void img_loading_animate_callback(gui_win_t *win)
@@ -95,10 +111,13 @@ static void app_chargebox_ui_design(gui_app_t *app)
 
     tabview_info = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     GET_BASE(tabview_info)->not_show = true;
+    gui_tabview_tp_disable(tabview_info, true);
     tabview_main = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     GET_BASE(tabview_main)->not_show = true;
+    gui_tabview_tp_disable(tabview_main, true);
 
     win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
+    win_call = gui_win_create(&(app->screen), "tabview call manager", 0, 0, 0, 0);
     screen_wallpaper = gui_img_create_from_mem(win, "screen lock", wallpaper_list[wallpaper_idx], 0, 0,
                                                0, 0);
     gui_img_set_mode(screen_wallpaper, IMG_BYPASS_MODE);
@@ -106,23 +125,23 @@ static void app_chargebox_ui_design(gui_app_t *app)
     gui_win_set_animate(win, 1000, -1, img_loading_animate_callback, win);
     gui_obj_add_event_cb(win, (gui_event_cb_t)screen_unlock_cb, GUI_EVENT_2, NULL);
 
-    bat_left = gui_img_create_from_mem(tabview_info, "BAT_L", BAT_L_BIN, 10, 10, 0, 0);
+    bat_left = gui_img_create_from_mem(tabview_info, "BAT_L", BAT_L_BIN, 20, 10, 0, 0);
     gui_img_set_mode(bat_left, IMG_BYPASS_MODE);
-    bat_right = gui_img_create_from_mem(tabview_info, "BAT_R", BAT_R_BIN, 110, 10, 0, 0);
+    bat_right = gui_img_create_from_mem(tabview_info, "BAT_R", BAT_R_BIN, 120, 10, 0, 0);
     gui_img_set_mode(bat_right, IMG_BYPASS_MODE);
-    bat_case = gui_img_create_from_mem(tabview_info, "BAT_CASE", BAT_CASE_BIN, 210, 10, 0, 0);
+    bat_case = gui_img_create_from_mem(tabview_info, "BAT_CASE", BAT_CASE_BIN, 220, 10, 0, 0);
     gui_img_set_mode(bat_case, IMG_BYPASS_MODE);
-    bluetooth = gui_img_create_from_mem(tabview_info, "bluetooth_status", BLUETOOTH_OFF_BIN, 340, 10, 0,
+    bluetooth = gui_img_create_from_mem(tabview_info, "bluetooth_status", BLUETOOTH_OFF_BIN, 320, 10, 0,
                                         0);
     gui_img_set_mode(bluetooth, IMG_BYPASS_MODE);
 
-    left_battery_text = gui_text_create(tabview_info, "battery level txt", 50, 15, 100, 24);
-    right_battery_text = gui_text_create(tabview_info, "battery level txt", 150, 15, 100, 24);
-    case_battery_text = gui_text_create(tabview_info, "battery level txt", 250, 15, 100, 24);
+    left_battery_text = gui_text_create(tabview_info, "battery level txt", 60, 15, 100, 24);
+    right_battery_text = gui_text_create(tabview_info, "battery level txt", 160, 15, 100, 24);
+    case_battery_text = gui_text_create(tabview_info, "battery level txt", 260, 15, 100, 24);
 
-    gui_tab_t *tb_music = gui_tab_create(tabview_main, "tb_music",           0, 0, 0, 0, 0, 0);
-    gui_tab_t *tb_volume = gui_tab_create(tabview_main, "tb_volume",         0, 0, 0, 0, 1, 0);
-    gui_tab_t *tb_call = gui_tab_create(tabview_main, "tb_call",             0, 0, 0, 0, 2, 0);
+    gui_tab_t *tb_conn = gui_tab_create(tabview_main, "tb_conn",             0, 0, 0, 0, 0, 0);
+    gui_tab_t *tb_music = gui_tab_create(tabview_main, "tb_music",           0, 0, 0, 0, 1, 0);
+    gui_tab_t *tb_volume = gui_tab_create(tabview_main, "tb_volume",         0, 0, 0, 0, 2, 0);
     gui_tab_t *tb_anc = gui_tab_create(tabview_main, "tb_anc",               0, 0, 0, 0, 3, 0);
     gui_tab_t *tb_equalizer = gui_tab_create(tabview_main, "tb_equalizer",   0, 0, 0, 0, 4, 0);
     gui_tab_t *tb_clock = gui_tab_create(tabview_main, "tb_clock",           0, 0, 0, 0, 5, 0);
@@ -132,9 +151,9 @@ static void app_chargebox_ui_design(gui_app_t *app)
     gui_tab_t *tb_findtws = gui_tab_create(tabview_main, "tb_find",          0, 0, 0, 0, 9, 0);
     gui_tab_t *tb_flashlight = gui_tab_create(tabview_main, "tb_flashlight", 0, 0, 0, 0, 10, 0);
 
+    page_tb_conn(tb_conn);
     page_tb_music(tb_music);
     page_tb_volume(tb_volume);
-    page_tb_call(tb_call);
     page_tb_anc(tb_anc);
     page_tb_equalizer(tb_equalizer);
     page_tb_clock(tb_clock);

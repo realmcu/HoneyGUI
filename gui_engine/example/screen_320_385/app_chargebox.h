@@ -28,6 +28,13 @@ typedef enum
 
 typedef enum
 {
+    MUSIC_STOP,
+    MUSIC_PLAYING,
+    MUSIC_PAUSED,
+} T_APP_GUI_PLAYER_STATUS;
+
+typedef enum
+{
     BLE_LINK_DISCONNECT,
     BLE_LINK_CONNECT,
 } T_APP_GUI_LE_LINK_STATUS;
@@ -79,6 +86,7 @@ static void app_chargebox_ui_design(gui_app_t *app);
 void app_gui_ble_action_cb(void *obj, gui_event_t e, void *param);
 
 extern void *get_app_chargebox(void);
+extern void page_tb_conn(void *parent);
 extern void page_tb_music(void *parent);
 extern void page_tb_volume(void *parent);
 extern void page_tb_call(void *parent);
@@ -99,6 +107,7 @@ extern gui_text_t *left_battery_text;
 extern gui_text_t *right_battery_text;
 extern gui_text_t *case_battery_text;
 
+void app_gui_show_link_device(void);
 void app_gui_show_title(uint8_t *title, uint16_t length);
 void app_gui_show_artist(uint8_t *artist, uint16_t length);
 void app_gui_show_album(uint8_t *album, uint16_t length);
@@ -106,6 +115,7 @@ void app_gui_show_volume(uint8_t current_phone_volume);
 void app_gui_show_device_name(uint8_t *data, uint8_t length);
 void app_gui_show_battery(uint8_t case_battery, uint8_t left_battery, uint8_t right_battery);
 void app_gui_show_bt_link_status(T_APP_GUI_LE_LINK_STATUS link_status);
+void app_gui_show_player_status(T_APP_GUI_PLAYER_STATUS player_status);
 
 
 #ifdef __cplusplus
