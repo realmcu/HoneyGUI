@@ -350,7 +350,7 @@ DECLARE_HANDLER(setAttribute)
         jerry_char_t *path_buf = gui_malloc(length + 1);
         jerry_string_to_utf8_char_buffer(s, path_buf, length + 1);
         path_buf[length] = '\0';
-        void *img_addr = gui_get_file_address(path_buf);
+        void *img_addr = gui_get_file_address((const char *)path_buf);
         gui_free(path_buf);
 
         if (img_addr)
