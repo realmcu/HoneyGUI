@@ -63,7 +63,7 @@ extern "C" {
 #   define __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__             1
 #endif
 
-// <q>Enable ccca8888(ARGB8888) implicit conversion 
+// <q>Enable ccca8888(ARGB8888) implicit conversion
 // <i> This feature is disabled by default to save code size
 #ifndef __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__
 #   define __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__      0
@@ -102,19 +102,19 @@ extern "C" {
  */
 #ifndef __ARM_2D_LOG_CHANNEL_MASK_FILTER__
 #   define __ARM_2D_LOG_CHANNEL_MASK_FILTER__                                   \
-            (   ARM_2D_LOG_CHN_TYPE_USER                                        \
-            |   ARM_2D_LOG_CHN_TYPE_INFO                                        \
-            |   ARM_2D_LOG_CHN_TYPE_WARNING                                     \
-            |   ARM_2D_LOG_CHN_TYPE_ERROR                                       \
-            |   ARM_2D_LOG_CHN_PIPELINE                                         \
-            |   ARM_2D_LOG_CHN_OPCODE                                           \
-            |   ARM_2D_LOG_CHN_HELPER                                           \
-            |   ARM_2D_LOG_CHN_HELPER_PFB                                       \
-            |   ARM_2D_LOG_CHN_SCENE_PLAYER                                     \
-            |   ARM_2D_LOG_CHN_DIRTY_REGION_OPTIMISATION                        \
-            |   ARM_2D_LOG_CHN_STATISTICS                                       \
-            |   ARM_2D_LOG_CHN_CONTROLS                                         \
-            |   ARM_2D_LOG_CHN_APP)
+    (   ARM_2D_LOG_CHN_TYPE_USER                                        \
+        |   ARM_2D_LOG_CHN_TYPE_INFO                                        \
+        |   ARM_2D_LOG_CHN_TYPE_WARNING                                     \
+        |   ARM_2D_LOG_CHN_TYPE_ERROR                                       \
+        |   ARM_2D_LOG_CHN_PIPELINE                                         \
+        |   ARM_2D_LOG_CHN_OPCODE                                           \
+        |   ARM_2D_LOG_CHN_HELPER                                           \
+        |   ARM_2D_LOG_CHN_HELPER_PFB                                       \
+        |   ARM_2D_LOG_CHN_SCENE_PLAYER                                     \
+        |   ARM_2D_LOG_CHN_DIRTY_REGION_OPTIMISATION                        \
+        |   ARM_2D_LOG_CHN_STATISTICS                                       \
+        |   ARM_2D_LOG_CHN_CONTROLS                                         \
+        |   ARM_2D_LOG_CHN_APP)
 #endif
 
 // <q>Enable The Layout Debug Mode
@@ -127,20 +127,20 @@ extern "C" {
 
 // <h>Patches for improving performance
 // =======================
-// 
+//
 // <c1> Do NOT treat alpha value 255 as completely opaque in mask related operations
 // <i> When define this macro, alpha value 0xFF will not be treated as opaque in mask related operations and you can barely see the background. Defining this macro improves performance.
-//#define __ARM_2D_CFG_UNSAFE_IGNORE_ALPHA_255_COMPENSATION__  
+//#define __ARM_2D_CFG_UNSAFE_IGNORE_ALPHA_255_COMPENSATION__
 // </c>
 
 // <c1> Ignore calibrartion for small angles in transform operations
 // <i> This option is used to speed up M-cores without DSP support. It skips saturation in the QADD/QDADD/QDSUB involved in the rotation. The chances of overflow remain low as elements involved are using non-accumulating Q15.16 format and integer parts are in the range of the screen size providing enough margin.
-//#define __ARM_2D_CFG_UNSAFE_IGNORE_CALIB_IN_TRANSFORM__ 
+//#define __ARM_2D_CFG_UNSAFE_IGNORE_CALIB_IN_TRANSFORM__
 // </c>
 
 // <c1> Ignore satuation protection in fixed-point operations
 // <i> This option is used to remove calibration in angle computations to gain a better performance, small error might be noticible for angles like 90, 180, 270 etc.
-//#define __ARM_2D_CFG_UNSAFE_NO_SATURATION_IN_FIXED_POINT__ 
+//#define __ARM_2D_CFG_UNSAFE_NO_SATURATION_IN_FIXED_POINT__
 // </c>
 
 
@@ -171,7 +171,7 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your LCD
 // <i> Default: 16
-#   define __GLCD_CFG_COLOUR_DEPTH__                                    16
+#   define __GLCD_CFG_COLOUR_DEPTH__                                    DRV_PIXEL_BITS
 #endif
 
 // <o> The size of the LCD printf text buffer <16-65535>
@@ -186,14 +186,14 @@ extern "C" {
 // <i> The width of your screen for running benchmark
 // <i> Default: 320
 #ifndef __GLCD_CFG_SCEEN_WIDTH__
-#   define __GLCD_CFG_SCEEN_WIDTH__                                     480
+#   define __GLCD_CFG_SCEEN_WIDTH__                                     DRV_LCD_WIDTH
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen for running benchmark
 // <i> Default: 240
 #ifndef __GLCD_CFG_SCEEN_HEIGHT__
-#   define __GLCD_CFG_SCEEN_HEIGHT__                                    480
+#   define __GLCD_CFG_SCEEN_HEIGHT__                                    DRV_LCD_HIGHT
 #endif
 
 // <o>Number of iterations <1-2000>

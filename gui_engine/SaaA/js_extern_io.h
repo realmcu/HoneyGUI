@@ -26,6 +26,7 @@ typedef enum
     EXTERN_EVENT_SMARTHOME      = 0x01,
     EXTERN_EVENT_TIMER          = 0x02,
     EXTERN_EVENT_WIFI           = 0x03,
+    EXTERN_EVENT_KEY            = 0x04,
 // js smarthome event define,  1 byte
     SH_EVENT_WIFI_SWITCH        = 1,
 
@@ -34,6 +35,12 @@ typedef enum
     WIFI_EVENT_MANAGE_OFF           = 0x01,
     WIFI_EVENT_MANAGE_SCAN          = 0x02,
     WIFI_EVENT_MANAGE_CONNECT       = 0x03,
+// js key manage event define,  1 byte
+    KEY_EVENT_PRESS                 = 0x00,
+    KEY_EVENT_CLICK                 = 0x01,
+    KEY_EVENT_LONG_PRESS            = 0x02,
+    KEY_EVENT_RELEASE               = 0x03,
+
 // js xxx event define
 
 

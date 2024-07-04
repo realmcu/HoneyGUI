@@ -107,6 +107,7 @@ void js_init(void)
     js_gpio_init();
     //js_fs_init();
     wifi_init();
+    js_key_init();
     js_smarthome_init();
     js_matter_init();
     js_mesh_init();

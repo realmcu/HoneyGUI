@@ -211,15 +211,15 @@ typedef struct
 
 static void gui_wifi_manage_on_handler(gui_msg_wifi_t *msg)
 {
-    gui_log("wifi on param: 0x%x\n", msg->param);
+    gui_log("wifi on param: 0x%x\n", *((int *)msg->param));
 }
 static void gui_wifi_manage_off_handler(gui_msg_wifi_t *msg)
 {
-    gui_log("wifi off param: 0x%x\n", msg->param);
+    gui_log("wifi off param: 0x%x\n", *((int *)msg->param));
 }
 static void gui_wifi_manage_scan_handler(gui_msg_wifi_t *msg)
 {
-    gui_log("wifi scan param: 0x%x\n", msg->param);
+    gui_log("wifi scan param: 0x%x\n", *((int *)msg->param));
 #if defined ENABLE_WIFI_NIC
 #if (defined RTL87x2G)
     ap_array_t *array = (ap_array_t *)msg->param;
@@ -240,7 +240,7 @@ static void gui_wifi_manage_scan_handler(gui_msg_wifi_t *msg)
 }
 static void gui_wifi_manage_connect_handler(gui_msg_wifi_t *msg)
 {
-    gui_log("wifi connect param: 0x%x\n", msg->param);
+    gui_log("wifi connect param: 0x%x\n",  *((int *)msg->param));
 }
 
 // wifi event

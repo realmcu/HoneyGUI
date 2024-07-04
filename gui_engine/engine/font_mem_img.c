@@ -1,6 +1,7 @@
 #include <string.h>
 #include "font_mem_img.h"
 
+extern MEM_FONT_LIB font_lib_tab[10];
 gui_inline uint16_t alphaBlendRGB565(uint32_t fg, uint32_t bg, uint8_t alpha)
 {
     alpha = (alpha + 4) >> 3;
@@ -413,7 +414,15 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     memcpy(img_buf, &head, sizeof(head));
 
     mem_char_t *chr = text->data;
-    GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
+    GUI_FONT_HEAD *font;
+    if (text->font_mode == FONT_SRC_FTL)
+    {
+        font = (GUI_FONT_HEAD *)font_lib_tab[get_fontlib_by_name(text->path)].data;
+    }
+    else
+    {
+        font = (GUI_FONT_HEAD *)text->path;
+    }
     uint8_t rendor_mode = font->rendor_mode;
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
     rect.x2 = rect.x1 + buf_width;

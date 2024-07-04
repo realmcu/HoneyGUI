@@ -7,14 +7,26 @@ CPPPATH = [cwd]
 src = Split("""
 """)
 
-if GetDepend('CONFIG_REALTEK_BUILD_GUI_BASE_DEMO'):
-    src += ['rtk_gui_base_demo.c']
+group = []
+CPPDEFINES = ['DRV_LCD_WIDTH=480']
+CPPDEFINES += ['DRV_LCD_HIGHT=480']
+CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
-if GetDepend('CONFIG_REALTEK_BUILD_GUI_PAINTENGINE_DEMO'):
-    src += ['rtk_gui_paintengine_demo.c']
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_BASE'):
+    src += ['app_ui_realgui_base.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_PAINTENGINE'):
+    src += ['app_ui_paintengine.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
+if GetDepend('CONFIG_REALTEK_BUILD_LVGL_DEMO_APP'):
+    src += ['app_ui_lvgl.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
-group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH)
+if GetDepend('CONFIG_REALTEK_BUILD_ARM2D_DEMO_APP'):
+    src += ['app_ui_arm2d.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')
+

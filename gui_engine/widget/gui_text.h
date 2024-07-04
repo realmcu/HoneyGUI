@@ -249,6 +249,14 @@ void gui_text_move(gui_text_t *this, int16_t x, int16_t y);
 void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width);
 
 /**
+ * @brief set text font mode
+ *
+ * @param this the text widget pointer
+ * @param font_mode font source mode
+ */
+void gui_text_font_mode_set(gui_text_t *this, FONT_SRC_MODE font_mode);
+
+/**
  * @brief set font type
  * @note The type must match the font size!
  * @param this the text widget pointer

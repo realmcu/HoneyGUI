@@ -151,54 +151,17 @@ void disp_disable_update(void)
  *You can use DMA or any hardware acceleration to do this operation in the background but
  *'lv_disp_flush_ready()' has to be called when finished.*/
 #include "gui_api.h"
-static void dc_update(lv_disp_drv_t *disp_drv, uint8_t *framebuffer, uint16_t xStart,
-                      uint16_t yStart, uint16_t w,
-                      uint16_t h)
-{
-    gui_dispdev_t *dc = gui_get_dc();
-    //printf("xStart = %d, yStart = %d, w = %d, h = %d \n", xStart, yStart, w, h);
-    uint16_t xEnd = xStart + w - 1;
-    uint16_t yEnd = yStart + h - 1;
-    if (dc->bit_depth == 16)
-    {
-        uint16_t *pixel = (uint16_t *)framebuffer;
-        uint16_t *write = dc->frame_buf;
-        for (uint32_t i = yStart; i <= yEnd; i++)
-        {
-            for (uint32_t j = xStart; j <= xEnd; j++)
-            {
-                *(write + i * dc->fb_width + j) = *pixel;
-                pixel++;
-            }
-        }
-    }
-    else if (dc->bit_depth == 32)
-    {
-        uint32_t *pixel = (uint32_t *)framebuffer;
-        uint32_t *write = dc->frame_buf;
-        for (uint32_t i = yStart; i <= yEnd; i++)
-        {
-            for (uint32_t j = xStart; j <= xEnd; j++)
-            {
-                *(write + i * dc->fb_width + j) = *pixel;
-                pixel++;
-            }
-        }
-    }
-    if (lv_disp_flush_is_last(disp_drv) == true)
-    {
-        dc->lcd_update(dc);
-    }
 
-}
 static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
 {
 
+    gui_dispdev_t *dc = gui_get_dc();
     if (disp_flush_enabled)
     {
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
-        dc_update(disp_drv, (uint8_t *)color_p, area->x1, area->y1, area->x2 - area->x1 + 1,
-                  area->y2 - area->y1 + 1);
+
+        dc->direct_draw_bitmap_to_lcd(area->x1, area->y1, area->x2 - area->x1 + 1, area->y2 - area->y1 + 1,
+                                      (const uint8_t *)color_p);
     }
 
     /*IMPORTANT!!!

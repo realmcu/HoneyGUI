@@ -20,8 +20,9 @@ static double acc_ppe_ceil(double _x)
 {
 #if defined (__GNUC__)
     return (_x + 1.0); //todo, only fix gcc compile issue
-#endif
+#else
     return ceil(_x);
+#endif
 }
 
 
