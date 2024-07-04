@@ -16,7 +16,10 @@ if not GetDepend(['CONFIG_REALTEK_BUILD_LVGL_GUI']):
 
 if not GetDepend(['CONFIG_REALTEK_BUILD_PAINTER_ENGINE']):
     SrcRemove(src,'gui_px.c')
-    
+
+if not GetDepend(['CONFIG_REALTEK_BUILD_U8G2']):
+    SrcRemove(src,'gui_u8g2.c')
+
 if not GetDepend(['CONFIG_REALTEK_BUILD_PINYIN']):
     SrcRemove(src,'gui_pinyinIME.c')
     SrcRemove(src,'gui_keyboard.c')
