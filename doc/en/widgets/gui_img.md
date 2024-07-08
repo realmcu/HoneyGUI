@@ -1,17 +1,18 @@
 # Image
+<br>
 
-The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.Image widgets support moving, zooming, rotating, etc.
+The image widget is the basic widget used to display image. Image widgets support moving, zooming, rotating, etc.
 
 ## Usage
 
 ### Create widget
 
-You can use [gui_img_create_from_mem(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#api) to create an image widget from memory, or use [gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)](#api) to create an image widget from file. If the width or height of the image widget is set to `0`, the widget's size will be set according to the size of the image source automatically.
+You can use [gui_img_create_from_mem(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#api) to create an image widget from memory, or use [gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)](#api) to create an image widget from file. Alternatively, you can use [gui_img_create_from_ftl(void *parent, const char *name, void *ftl, int16_t x, int16_t y, int16_t w, int16_t h)](#api) to create an image widget from ftl.
+If the width or height of the image widget is set to `0`, the widget's size will be set according to the size of the image source automatically.
 
-### Set location
+### Update location
 
 If you need to update the location of image widget, use [gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y)](#api) to relocate.
-`x, y` is the new coordinate.
 
 ### Set attribute
 
@@ -21,19 +22,39 @@ You can use [gui_img_set_attribute(gui_img_t *this, const char *name, void *addr
 
 If you want to get the height/width of image widget, you can do so with [gui_img_get_height(gui_img_t *this)](#api) or [gui_img_get_width(gui_img_t *this)](#api).
 
-### Translate
+### Refresh
+
+You can refresh the image size using [gui_img_refresh_size(gui_img_t *_this)](#api).
+
+### Blend mode
+
+You can set the image's blend mode using [gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)](#api).
+
+### Translation
 
 Using [gui_img_translate(gui_img_t *this, float t_x, float t_y)](#api) to move the image widget.
 It can move an image widget to a new coordinate without changing the original coordinate in the widget's attribute.
 
-### Rotate
+### Rotation
 
 You can rotate the image widget around the center of the circle by this api [gui_img_rotation(gui_img_t *this, float degrees, float c_x, float c_y)](#api).
-The `c_x, c_y` is the relative to origin of the image widget, not the origin of screen.
 
 ### Zoom
 
 You can adjust the size of the image widget to fit your requirements by this api [gui_img_scale(gui_img_t *this, float scale_x, float scale_y)](#api).
+
+### Opacity
+The opacity value of the image is adjustable, and you can set it using [gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)](#api).
+
+### Animation
+You can use the [gui_img_set_animate(gui_img_t *_this, uint32_t dur, int repeat_count, void *callback, void *p)](#api) to set the animation effects for the image widget.
+
+### Quality
+You can set the image's quality using [gui_img_set_quality(gui_img_t *_this, bool high_quality)](#api).
+
+### Screenshot
+
+You can use [gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#api) to save a fullscreen screenshot. Additionally, you can use [gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#api) to save a screenshot of the current widget's size. The saved image will be in RGB format.
 
 ## Example
 
