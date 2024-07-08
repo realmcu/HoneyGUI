@@ -1,89 +1,89 @@
-# Text widget
+# 文本控件
 
-The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen. In order to draw text, the font file can be standard .ttf file or customized .bin file.
+文本控件是用于显示文本的基本小控件，可用于将不同字体、不同颜色和不同大小的文本输出到屏幕上。为了绘制文本，字体文件可以是标准的.ttf文件或自定义的.bin文件。
 
-## Features
+## 特性
 
-Text widgets can support the following features.
+文本控件能支持下面的特性。
 
-+ **UTF-8 support**
-+ **Multi language support**
-+ **Text typesetting support**
-+ **Word wrap and texts scrolling**
-+ **Anti-aliasing**
-+ **Multi fonts support**
-+ **Multi font sizes support**
-+ **Thirty-two bit true color support**
-+ **Custom animation effects support**
-+ **Standrads TTF file support[^1]**
-+ **Self-developed font files support**
++ **支持UTF-8**
++ **支持多语言**
++ **支持文本排版**
++ **自动换行和文本滚动**
++ **抗锯齿**
++ **支持多种字体**
++ **支持多种字体大小**
++ **支持32位真彩色**
++ **支持自定义动画效果**
++ **支持自定义动画效果[^1]**
++ **支持自行开发的字体文件**
 
-[^1]: Only part of the chip support this feature
+[^1]: 只有部分芯片支持此功能
 
-## Usage
+## 用法
 
-Using functions to load font files and display text
+调用对应的函数加载字体文件并显示文本。
 
-### Initialize the font file
+### 初始化字体文件
 
-In order to draw text, font files containing glyph information need to be loaded into the system.
+为了绘制文本，包含字体信息的字体文件需要加载到系统中。
 
-The font file can be standard .ttf file or customized .bin file. The font file can be initialized ahead of time to avoid having to set the font type for each text widget.
+字体文件可以是标准的.ttf文件或自定义的.bin文件。字体文件需要提前初始化，且必须为文本控件设置字体类型。
 
-+ To initialize the new version customized bin font file, you need to use [gui_font_mem_init(font_bin_addr)](#api) .
++ 初始化自定义bin字体文件，需要调用 [gui_font_mem_init(font_bin_addr)](#api)。
 
-+ To initialize the standrad TTF file to draw text, you need to use [gui_font_stb_init(font_ttf_addr)](#api) .
++ 初始化标准TTF文件来绘制文本，需要调用 [gui_font_stb_init(font_ttf_addr)](#api)。
 
-All customized bin font files are available from RTK technicians.
+所有自定义bin字体文件都可以从RTK FAE那里获得。
 
-`FONT_BIN`,`FONT_TTF` are all address of the files stored in flash.
+`FONT_BIN`,`FONT_TTF` 这两个文件储存了flash中的文件地址。
 
-If you want to know more about file storage, please read userdata.md.
+### 创建文本控件
 
-### Create text widget
+开发者可以调用 [gui_text_create(parent, filename, x, y, w, h)](#api)来创建文本控件。创建后，控件的坐标和文本框的大小已经确定。这些属性也可以随时修改。
 
-To create a text widget, you can use [gui_text_create(parent, filename, x, y, w, h)](#api)
+注意：文本控件的大小应大于要显示的字符串，超出范围的文本将被隐藏。
 
-The coordinates on the screen and text box size have been identified after create.
+### 设置文本属性
 
-These attributes also can be modified whenever you want.
+#### 设置文本
 
-Note that text box size should be larger than the string to be shown, out-of-range text will be hidden.
+开发者可以调用[gui_text_set(this, text, text_type, color, length, font_size)](#api)来设置文本控件文本、文本类型、颜色、长度和文本字体大小。
 
-### Set text attributes
+注意： 文本长度必须与设置的字符长度相同，文本字体大小必须与加载的字体文件的大小相同。
 
-#### Set text
+#### 字体类型
 
-To add some texts or characters to a text widget and set text attributes with: [gui_text_set(this, text, text_type, color, length, font_size)](#api)
+文本控件支持类型设置。开发者可以调用[gui_text_type_set(this, type)](#api)来设置类型。类型为bin/ttf文件的地址。
 
-Note that text length must be the same as the set character length, text frontsize should must be the same as the type size
 
-#### Font type
+#### 文本内容
 
-Text widget support the type setting. You can use this function to set type.Type is bin/ttf file address.
-[gui_text_type_set(this, type)](#api).
+开发者可以调用[gui_text_content_set(this, text, length)](#api)来设置文本控件需要显示的内容。
 
-#### Text content
+#### 文本编码
 
-This interface can be used to set the content that needs to be displayed by the text widget.
-[gui_text_content_set(this, text, length)](#api).
+文本控件同时支持UTF-8编码和UTF-16编码输入格式，开发者可以使用[gui_text_encoding_set(this, charset)](#api)更改编码方式。
 
-#### Text encoding
+#### 文本转换为图片
 
-The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, and this interface can be used to change the decoding method.
-[gui_text_encoding_set(this, charset)](#api).
+使用[gui_text_convert_to_img(this, font_img_type)](#api)可以将文本控件中的文本将被转换为图像，存储在内存中，并使用该图像进行呈现。它还支持图像转换，如缩放和旋转。这只适用于位图字体。
 
-#### Convert to img
+注意：因为需要文本控件的内容和字体大小信息，所以应该在set text之后调用它。如果修改了文本的内容、字体大小、位置和其他属性，则需要重用此接口进行转换。
 
-By using this interface, the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
-[gui_text_convert_to_img(this, font_img_type)](#api).
-Because the content and font size information of the text widget is needed, it should be called after set text.If the content, font size, position and other attributes of the text have been modified, you need to reuse this interface for conversion.
+### 文本输入设置
 
-#### Text mode
+开发者可以使用函数 [gui_text_input_set(this, inputable)](#api) 设置文本的输入。
 
-Text widget support seven typesetting modes, to set text typesetting mode with: [gui_text_mode_set(this, mode)](#api).
+### 设置文本点击事件
 
-All typesetting modes are as follows.
+开发者可以调用函数 [gui_text_click(this, event_cb, parameter)](#api) 添加文本点击事件。
+
+#### 文本模式
+
+文本控件支持七种排版模式，通过[gui_text_mode_set(this, mode)](#api)来设置文本排版模式。
+
+排版模式如下：
 
 | 类型                | 行类型         | X 方向             | Y 方向             | 控件                     |
 |---------------------|----------------|-------------------|--------------------|-------------------------|
@@ -109,23 +109,21 @@ All typesetting modes are as follows.
    :end-before: /** @brief  text mode enum end */
 ```
 
-### Text move
+### 文本移动
 
-You can use this function [gui_text_move(this, x, y)](#api) to move text to a specified location, but x and y cannot be larger than w and h of the text
+开发者可以调用函数 [gui_text_move(this, x, y)](#api) 将文本移动到指定位置，但是x和y不能大于文本控件的w和h。
 
-### Set animate
+### 设置动画
 
-Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#api) to set the animation and implement the animation effect in the corresponding callback function
+开发者可以调用函数 [gui_text_set_animate(o, dur, repeat_count, callback, p)](#api) 来设置动画并在相应的回调函数中实现动画效果。
 
-To use scroll text, you can read scrolltext.md.
+## 示例
 
-## Example
+### 多文本控件示例
 
-### Example Multiple text widget
+下面展示了一个多文本控件的示例。
 
-An example of the multiple text widget is shown below.
-
-<details> <summary>Example code</summary>
+<details> <summary>示例代码</summary>
 
 ```C
 #include "string.h"
@@ -178,11 +176,11 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 <center><img  width="300" src= "https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "/></center></br>
 
-### Example Animate text widget
+### 动画文本控件示例
 
-An example of the animate text widget is shown below.
+动画文本控件的示例如下所示。
 
-<details> <summary>Example code</summary>
+<details> <summary>示例代码</summary>
 
 ```C
 #include "root_image_hongkong/ui_resource.h"
@@ -227,7 +225,7 @@ void page_tb_activity(void *parent)
 
 </details></br>
 
-<center><img width="300" src= "(https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
+<center><img width="300" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
 
 <br>
 

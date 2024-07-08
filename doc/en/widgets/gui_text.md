@@ -38,15 +38,9 @@ All customized bin font files are available from RTK technicians.
 
 `FONT_BIN`,`FONT_TTF` are all address of the files stored in flash.
 
-If you want to know more about file storage, please read userdata.md.
-
 ### Create text widget
 
-To create a text widget, you can use [gui_text_create(parent, filename, x, y, w, h)](#api)
-
-The coordinates on the screen and text box size have been identified after create.
-
-These attributes also can be modified whenever you want.
+To create a text widget, you can use [gui_text_create(parent, filename, x, y, w, h)](#api), The coordinates on the screen and text box size have been identified after create. These attributes also can be modified whenever you want.
 
 Note that text box size should be larger than the string to be shown, out-of-range text will be hidden.
 
@@ -78,6 +72,14 @@ The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, 
 By using this interface, the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
 [gui_text_convert_to_img(this, font_img_type)](#api).
 Because the content and font size information of the text widget is needed, it should be called after set text.If the content, font size, position and other attributes of the text have been modified, you need to reuse this interface for conversion.
+
+### Text input
+
+Text widget support the input setting. You can use this function to set input [gui_text_input_set(this, inputable)](#api).
+
+### Text click
+
+Text widget support click. You can use this function to add the click event for text [gui_text_click(this, event_cb, parameter)](#api).
 
 #### Text mode
 
@@ -116,8 +118,6 @@ You can use this function [gui_text_move(this, x, y)](#api) to move text to a sp
 ### Set animate
 
 Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#api) to set the animation and implement the animation effect in the corresponding callback function
-
-To use scroll text, you can read scrolltext.md.
 
 ## Example
 
@@ -227,7 +227,7 @@ void page_tb_activity(void *parent)
 
 </details></br>
 
-<center><img width="300" src= "(https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
+<center><img width="300" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
 
 <br>
 
