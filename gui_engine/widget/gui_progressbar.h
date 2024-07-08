@@ -48,6 +48,7 @@ extern "C" {
   */
 
 /** @brief  ... */
+/* gui_progressbar_t start*/
 typedef struct gui_progressbar
 {
     gui_obj_t base;
@@ -61,6 +62,7 @@ typedef struct gui_progressbar
                  int16_t w, int16_t h);
     IMG_SOURCE_MODE_TYPE src_mode;   // scroll_bar
 } gui_progressbar_t;
+/* gui_progressbar_t end*/
 
 /** End of WIDGET_Exported_Types
   * @}

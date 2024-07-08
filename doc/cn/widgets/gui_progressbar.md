@@ -1,41 +1,38 @@
-# Progressbar
+# 进度条控件
+<br>
 
-The progressbar widget allows you to create widgets with three different effects.
-After created a progressbar widget, you can set the percentage of the widget to display.
+进度条控件允许创建具备三种不同效果的控件。开发者创建进度条控件后，可以设置控件显示的百分比。
 
-## Usage
+## 用法
 
-### Create vertical widget
+### 创建水平方向控件
 
-You can create a vertical style progressbar based on picture by this api [gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y)](#api).
-It's a normal single picture progressbar.
+开发者可以使用API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#api)创建基于单张图片的水平方向进度条控件。 这是一个普通的单张图片进度条控件。
 
-### Create horizontal widget
+### 创建垂直方向控件
 
-Similar to `Create vertical widget` above, you can use [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#api) to create a horizontal style progressbar based on picture.
+类似于上面提到的`创建水平方向控件`，开发者可以使用 [gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y)](#api) 创建基于单张图片的垂直方向进度条控件。
 
-### Create movie widget
+### 创建电影风格控件
 
-Unlike the above two normal single picture progressbar, a movie style progressbar consists of a series of pictures.
-You can create a movie style progressbar from memory address by using [gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api), and [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api) from filesystem. `picture_array` is the array used to store the pictures and `array_length` is the number of pictures.
-The first picture is shown at 0% progress and the last picture is shown at 100% progress.
+与上述两种单张图片的进度条控件不同，电影风格的进度条控件由一系列的图片组成。开发者可以调用[gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api)从内存地址创建电影风格的进度条控件，或者调用 [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api) 从文件系统创建电影风格的进度条控件。
+在 0% 进度时显示第一张图片，在 100% 进度时显示最后一张图片。
 
-### Percentage
+### 进度
 
-For example, if you want to use a progressbar to show the progress of a song, you can use [gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)](#api) to set the current progress after the progressbar has been created.
-In addition, you can use [gui_progressbar_get_percentage(gui_progressbar_t *this)](#api) to get the current progress.
+例如，开发者想创建一个电影风格的进度条控件，可以通过 [gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)](#api) 和 [gui_progressbar_get_progress(gui_progressbar_t *this)](#api) 来设置和获取进度。
 
-### Progress
+### 百分比
 
-The above usage (`Percentage`) is for a normal single picture progressbar. For a movie style progressbar, you need to use [gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)](#api) and [gui_progressbar_get_progress(gui_progressbar_t *this)](#api) to set and get the progress.
+上述用法(`进度`)适用于电影风格的进度条控件。对于普通的单张图片进度条控件，如果开发者想使用一个进度条控件来显示歌曲播放的进度，可以在创建进度条控件后使用 [gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)](#api) 来设置当前的百分比进度。此外，还可以使用 [gui_progressbar_get_percentage(gui_progressbar_t *this)](#api) 来获取当前的百分比进度。
 
-### Get max
+### 获取最大值
 
-This api [gui_progressbar_get_max(gui_progressbar_t *this)](#api) is used to get the number of pictures in a movie style progressbar, so you can know how many pictures will be displayed in total.
+此 API [gui_progressbar_get_max(gui_progressbar_t *this)](#api) 用于获取电影风格进度条控件中的图片数量，这样就可以知道总共会显示多少张图片。
 
-## Example
+## 示例
 
-<details> <summary>code</summary>
+<details> <summary>示例代码</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -102,10 +99,7 @@ void page_tb_three(void *parent)
 }
 ```
 
-
-</details>
-
-<br>
+</details><br>
 
 <center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/progressbar.gif" /></center>
 
