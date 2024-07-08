@@ -15,6 +15,7 @@ list(APPEND gui_sources
 			${gui_server_sources} 
 			${gui_widget_sources}
 			${gui_misc_tlsf_sources}
+			${gui_engine_core_sources}
 			)
 set(gui_sources ${gui_sources} CACHE INTERNAL  "gui sources ")
 
@@ -26,21 +27,16 @@ list(APPEND gui_headers
 			${gui_server_headers} 
 			${gui_widget_headers}
 			${gui_3rd_nanovg_headers}
+			${gui_3rd_nanosvg_headers}
 			${gui_misc_headers}
             ${gui_3rd_common_headers}
             ${gui_3rd_headers}
 			${gui_misc_tlsf_headers}
-			${gui_engine_core})
+			${gui_engine_core_headers})
 set(gui_headers ${gui_headers} CACHE INTERNAL  "gui headers ")
 
-#if(gui_debug_enable)
-message([GUI] sources lists:)
+if(gui_debug_enable)
 foreach(ITEM ${gui_sources})
    message(${ITEM})
 endforeach()
-
-message([GUI] headers lists:)
-foreach([GUI] ${gui_headers})
-   message(${ITEM})
-endforeach()
-#endif()
+endif()
