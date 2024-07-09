@@ -284,6 +284,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
     gui_msg_t msg;
     msg.event = GUI_EVENT_RESET_ACTIVE_TIME;
     uint8_t navi_type = 0;
+    gui_send_msg_to_server(&msg);
     navi_type = ((uint8_t *)pValue)[0];
     if (navi_type == TURN_LEFT || navi_type == LEFT_FRONT || navi_type == LEFT_BACK
         || navi_type == LEFT_TURN_AROUND)
