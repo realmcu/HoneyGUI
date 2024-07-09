@@ -1,0 +1,16 @@
+// Copyright (c) 2024 Arm Limited. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
+
+// <<< Use Configuration Wizard in Context Menu >>>
+
+// <e> Fixed Debug Authentication
+// <i> Use a fixed value for Debug Authentication. Only secure debug authentication configurable.
+DAuthFixed  = 0x1;
+
+//   <q.2> Secure Invasive Debug
+//   <q.3> Secure Non-Invasive Debug
+DAuthConfig = 0xF;
+
+// </e>
+
+// <<< end of configuration section >>>

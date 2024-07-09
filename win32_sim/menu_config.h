@@ -23,7 +23,7 @@
 
 // <h> HoneyGUI Demo Select
 // <c> RTK GUI Base Demo
-#define CONFIG_REALTEK_BUILD_REAL_BASE
+//#define CONFIG_REALTEK_BUILD_REAL_BASE
 // </c>
 
 // <c> HoneyGUI Enalbe LVGL APP
@@ -38,12 +38,16 @@
 // #define CONFIG_REALTEK_BUILD_REAL_PAINTENGINE
 // </c>
 
+// <c> RTK GUI NanoVG Demo
+// #define CONFIG_REALTEK_BUILD_REAL_NANOVG
+// </c>
+
 // <c> RTK GUI Demo 368 448
 // #define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
 // </c>
 
 // <c> RTK GUI Demo 454 454
-// #define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
+#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO
 // </c>
 
 // <c> RTK GUI TEST
