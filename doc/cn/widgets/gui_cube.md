@@ -1,28 +1,28 @@
-# Cube
+# 立方体
 
-The cube is a 3D display widget that show a rotating cube with six faces, each capable of displaying distinct images.
+立方体是一个3D显示控件，它可以展示六个面的旋转立方体，每个面都能够显示不同的图像。
 
-## Usage
-### Create a cube
-[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y)](#api) creates a cube widget. The `img_file` is an struct including image sources for the six faces of a cube. Both memory address and file path are supported, whether you choose to utilize memory or access the filesystem, simply set `IMG_SOURCE_MODE_TYPE src_mode[6]` to either `IMG_SRC_MEMADDR` or `IMG_SRC_FILESYS`.
+## 用法
+### 创建控件
+[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y)](#api)创建一个cube控件。其中，`img_file`是一个包含了每个面图像源的结构体，支持内存地址或者文件系统路径。通过将`IMG_SOURCE_MODE_TYPE src_mode[6]`设置成`IMG_SRC_MEMADDR`或`IMG_SRC_FILESYS`来选择内存地址还是文件系统路径访问图像。
 
-### Set size
-By default, the cube's size is `dc->fb_height / 8.0`. If you want to change the size set [void gui_cube_set_size(cube, size)](#api). Note this `size` is the 1/2 length of cube edge.
+### 设置大小
+立方体控件的默认大小是`dc->fb_height / 8.0`，可以通过[void gui_cube_set_size(cube, size)](#api)改变大小。注意`size`是立方体的1/2边长。
 
-### Set center
-By default, the center is `((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`. You can use [void gui_cube_set_center(cube, c_x, c_y)](#api) to set the center coordinates of the cube.
+### 设置中心
+立方体控件的默认中心是`((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`。使用[void gui_cube_set_center(cube, c_x, c_y)](#api)改变立方体的中心坐标。
 
-### Set image mode
-By default, the cube's image blend mode is `IMG_FILTER_BLACK`, you can change the blend mode of image by calling [void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api).
+### 设置图像模式
+立方体控件默认图像混合模式是`IMG_FILTER_BLACK`（*滤黑，即图像中像素值为0的像素不写入屏幕刷新帧缓冲区*），可以通过[void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api)来改变图像混合模式。
 
-### Set cube image
-The images of cube can be configured by calling [void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#api).
+### 设置立方体图像
+可以通过[void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#api)来设置立方体展示的图像。
 
-### Set rotation direction
-The rotation direction of this cube can be achieved by calling [void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree)](#api), [void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree)](#api) and [void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree)](#api).
+### 设置旋转角度
+立方体的旋转角度可以通过以下API设置，[void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree)](#api)，[void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree)](#api)以及[void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree)](#api)。
 
 
-## Example
+## 示例
 ```c
 #include <gui_obj.h>
 #include "gui_cube.h"
