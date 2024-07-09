@@ -1,27 +1,27 @@
-# SVG
+# 可缩放矢量图形
 
-- The SVG widget allows you to display an image in SVG format.
-- SVG images are vector graphics based on XML language implementation, which can be used to describe 2D vector graphics.
-- SVG images **do not need to be converted into** `bin` format files using ImageConverter tools, but can be directly packaged in the `root` directory.
+可缩放矢量图形（SVG）可以展示SVG格式的图像。
+- SVG是一种用于描述二维图形的 XML 标记语言，与位图图像不同，SVG图像以文本形式存储，并且可以缩放到任意大小而不会失真，因为它们基于数学描述而不是像素。
+- SVG图像可以直接打包到`root`文件夹。
 
-## Usage
-### Creat a svg widget
-You can use [gui_svg_create_from_mem(parent, name, addr, size, x, y, w, h)](#api) to create an SVG widget from memory, or use [gui_svg_create_from_file(parent, name, filename, x, y, w, h)](#api) to create from file.
-This `w/h` are the width and height of the SVG widget, not SVG image. This `size` is the data size of the SVG image that must be filled in.
+## 用法
+### 创建控件
+使用[gui_svg_create_from_mem(parent, name, addr, size, x, y, w, h)](#api)以从内存地址加载图像的方式创建一个SVG控件, 或者使用[gui_svg_create_from_file(parent, name, filename, x, y, w, h)](#api)以从文件系统路径加载图像的方式创建一个SVG控件。
+其中，`w/h`是SVG控件的宽度和高度，而不是要绘制的SVG图像的宽高，`size`是必须填写的SVG图像的绘制数据大小。
 
-### SVG rotation
-Using the [gui_svg_rotation(svg, degrees, c_x, c_y)](#api) the image will be rotated by an angle of `degree`. The `(c_x, c_y)` is relative to the origin of the SVG widget, not the origin of the screen.
+### 设置旋转
+使用[gui_svg_rotation(svg, degrees, c_x, c_y)](#api)将SVG图像旋转`degree`角度。其中，`(c_x, c_y)`是旋转中心。
 
-### SVG scale
-If you need the object size to be updated to transformed size set [gui_svg_scale(svg, scale_x, scale_y)](#api).
+### 设置缩放
+如果需要更新SVG图像的大小，可以使用[gui_svg_scale(svg, scale_x, scale_y)](#api)。
 
-### SVG translate
-The image will be translated by using the [gui_svg_translate(svg, t_x, t_y)](#api).
+### 设置平移
+使用[gui_svg_translate(svg, t_x, t_y)](#api)平移SVG图像。
 
-### Opacity
-If you want the image to fade or opacity set [gui_svg_set_opacity(svg, opacity_value)](#api).
+### 设置透明度
+使用[gui_svg_set_opacity(svg, opacity_value)](#api)设置SVG图像透明度。
 
-## Example
+## 示例
 
 ### Creat a simple SVG
 ```cpp
