@@ -174,12 +174,7 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
     }
     else if (GET_BASE(this->c)->type == IMAGE_FROM_MEM)
     {
-        size_t p = percentage * this->max;
-
-        if (p > this->max - 2)
-        {
-            p = this->max - 2;
-        }
+        size_t p = percentage * (this->max - 1);
 
         GUI_TYPE(gui_img_t, this->c)->data = ((void **)(uintptr_t)(this->color_hl))[p];
     }

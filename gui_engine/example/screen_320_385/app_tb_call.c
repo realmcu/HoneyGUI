@@ -8,19 +8,25 @@
 #include "gui_tabview.h"
 
 extern gui_tabview_t *tabview_main;
+extern gui_win_t *win_call;
 gui_tabview_t *tabview_call_mgr;
 gui_button_t *button_call_answer;
 gui_button_t *button_call_reject;
+gui_button_t *button_call_end;
 gui_switch_t *switch_mic_unmute;
 gui_switch_t *switch_mic_mute;
 
-static void call_reject_cb(void)
+
+void app_gui_exit_call(void *obj, gui_event_t e, void *param)
 {
+    gui_log("app_gui_exit_call \n");
     if (tabview_call_mgr != NULL)
     {
         gui_obj_tree_free(tabview_call_mgr);
     }
-    gui_tabview_jump_tab(tabview_main, tabview_main->cur_id.x, 0);
+
+    GET_BASE(tabview_main)->not_show = false;
+    gui_tabview_tp_disable(tabview_main, false);
 }
 
 static void switch_mic_unmute_on_cb(void)
@@ -38,10 +44,10 @@ static void call_answer_cb(void)
     button_call_answer->base.not_show = true;
     button_call_reject->base.not_show = true;
 
-    gui_button_t *button_call_end = gui_button_create(tabview_call_mgr, 80, 150, 80, 80,
-                                                      CALL_REJECT_BIN,
-                                                      CALL_REJECT_HIGHLIGHT_BIN, NULL, BUTTON_BG_ICON, 0);
-    gui_button_click(button_call_end, (gui_event_cb_t)call_reject_cb, NULL);
+    button_call_end = gui_button_create(tabview_call_mgr, 80, 150, 80, 80,
+                                        CALL_REJECT_BIN,
+                                        CALL_REJECT_HIGHLIGHT_BIN, NULL, BUTTON_BG_ICON, 0);
+    gui_button_click(button_call_end, (gui_event_cb_t)app_gui_exit_call, NULL);
     gui_button_click(button_call_end, (gui_event_cb_t)app_gui_ble_action_cb,
                      (void *)GUI_BLE_SUBEVENT_CALL_REJECT);
 
@@ -59,9 +65,15 @@ static void call_answer_cb(void)
 
 }
 
-void page_tb_call(void *parent)
+
+void app_gui_enter_call(void *obj, gui_event_t e, void *param)
 {
-    tabview_call_mgr = gui_tabview_create(parent, "tabview call manager", 0, 0, 0, 0);
+    gui_log("app_gui_enter_call \n");
+
+    GET_BASE(tabview_main)->not_show = true;
+    gui_tabview_tp_disable(tabview_main, true);
+
+    tabview_call_mgr = gui_tabview_create(win_call, "tabview call manager", 0, 0, 0, 0);
     button_call_answer = gui_button_create(tabview_call_mgr, 60, 150, 80, 80, CALL_ANSWER_BIN,
                                            CALL_ANSWER_HIGHLIGHT_BIN, NULL, BUTTON_BG_ICON, 0);
     gui_button_click(button_call_answer, (gui_event_cb_t)call_answer_cb, NULL);
@@ -70,7 +82,7 @@ void page_tb_call(void *parent)
 
     button_call_reject = gui_button_create(tabview_call_mgr, 240, 150, 80, 80, CALL_REJECT_BIN,
                                            CALL_REJECT_HIGHLIGHT_BIN, NULL, BUTTON_BG_ICON, 0);
-    gui_button_click(button_call_reject, (gui_event_cb_t)call_reject_cb, NULL);
+    gui_button_click(button_call_reject, (gui_event_cb_t)app_gui_exit_call, NULL);
     gui_button_click(button_call_reject, (gui_event_cb_t)app_gui_ble_action_cb,
                      (void *)GUI_BLE_SUBEVENT_CALL_REJECT);
 }

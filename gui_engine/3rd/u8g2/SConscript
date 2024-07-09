@@ -1,0 +1,15 @@
+
+from building import *
+
+cwd = GetCurrentDir()
+
+src = Glob('csrc/*.c')
+
+path   = [cwd + '/csrc']
+
+if GetDepend('CONFIG_REALTEK_BUILD_U8G2'):
+    CPPDEFINES = ['ENABLE_RTK_GUI_U8G2']
+
+group = DefineGroup('realgui/3rd/u8g2', src, depend = ['CONFIG_REALTEK_BUILD_U8G2'], CPPPATH = path)
+
+Return('group')

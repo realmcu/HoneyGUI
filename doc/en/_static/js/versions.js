@@ -18,14 +18,14 @@ function add_version_selector()
 
 function change_version()
 {
-    var cur_ver = window.location.pathname.split('/')[2];
+    var cur_ver = window.location.pathname.split('/')[3];
     var next_ver = document.getElementById("versions").value;
     window.location.href = location.href.replace(cur_ver, next_ver);
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
     add_version_selector().then(() => {
-        var cur_ver = window.location.pathname.split('/')[2];
+        var cur_ver = window.location.pathname.split('/')[3];
         document.getElementById("versions").value = cur_ver;
     });
 })

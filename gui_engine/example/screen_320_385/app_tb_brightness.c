@@ -10,7 +10,7 @@
 #define BAR_SIZE 5
 gui_progressbar_t *progressbar_brightness;
 gui_text_t *text_brightness;
-static char brightness[30];
+static char brightness[20];
 
 const static void *scrollbar_array[BAR_SIZE] =
 {
@@ -31,12 +31,8 @@ void brightness_dec_cb(void)
                  strlen(brightness), 28);
 
     float progress = (float)current_brightness / (BAR_SIZE - 1);
-    gui_log("progress: %f\n", progress);
     if (progress >= 0 && progress <= 1)
     {
-        progressbar_brightness->color_hl = (uint32_t)(uintptr_t)scrollbar_array;
-        progressbar_brightness->max = sizeof(scrollbar_array) / sizeof(void *);
-
         gui_progressbar_set_percentage(progressbar_brightness, progress) ;
     }
 
@@ -44,11 +40,9 @@ void brightness_dec_cb(void)
 
 void brightness_inc_cb(void)
 {
-    gui_log("current_brightness: %d\n", current_brightness);
     if (current_brightness < 4)
     {
         current_brightness++;
-        gui_log("current_brightness++: %d\n", current_brightness);
     }
 
     snprintf(brightness, sizeof(brightness), "屏幕亮度: %d", current_brightness);
@@ -57,12 +51,8 @@ void brightness_inc_cb(void)
                  strlen(brightness), 28);
 
     float progress = (float)current_brightness / (BAR_SIZE - 1);
-    gui_log("progress: %f\n", progress);
     if (progress >= 0 && progress <= 1)
     {
-        progressbar_brightness->color_hl = (uint32_t)(uintptr_t)scrollbar_array;
-        progressbar_brightness->max = sizeof(scrollbar_array) / sizeof(void *);
-
         gui_progressbar_set_percentage(progressbar_brightness, progress) ;
     }
 
@@ -82,7 +72,7 @@ void page_tb_brightness(void *parent)
 
     progressbar_brightness = gui_progressbar_movie_create(parent, (void *)scrollbar_array, BAR_SIZE, 94,
                                                           150);
-
+    progressbar_brightness->max = sizeof(scrollbar_array) / sizeof(void *);
     gui_progressbar_set_percentage(progressbar_brightness, (float)current_brightness / (BAR_SIZE - 1));
 
     gui_button_t *button_brightness_inc = gui_button_create(parent, 240, 200, 80, 80, OPTION_RIGHT_BIN,

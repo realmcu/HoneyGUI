@@ -130,6 +130,10 @@
 #define CONFIG_REALTEK_BUILD_PINYIN
 // </c>
 
+// <c> RTK GUI Enable u8g2
+// #define CONFIG_REALTEK_BUILD_U8G2
+// </c>
+
 // <c> RTK GUI Enable Painter Engine only enable for Bee3Pro and simulation
 // #define CONFIG_REALTEK_BUILD_PAINTER_ENGINE
 // </c>

@@ -75,7 +75,7 @@ void page_tb_volume(void *parent)
                                                                                   UINT8_MAX),
                  strlen(title_prefix), 28);
 
-    text_music_title = gui_scroll_text_create(parent, "title txt", 120, 65, 200, 28);
+    text_music_title = gui_scroll_text_create(parent, "title txt", 120, 60, 200, 28);
     gui_scroll_text_set(text_music_title, music_title, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
                                                                                  UINT8_MAX),
                         strlen(music_title), 28);
@@ -106,4 +106,6 @@ void page_tb_volume(void *parent)
                                                        VOLUME_UP_HIGHLIGHT_BIN, NULL, BUTTON_BG_ICON, 0);
     gui_button_click(button_volume_up, (gui_event_cb_t)app_gui_ble_action_cb,
                      (void *)GUI_BLE_SUBEVENT_VOLUME_UP);
+    // extern void app_gui_enter_call(void *obj, gui_event_t e, void *param);
+    // gui_obj_add_event_cb(button_volume_up, app_gui_enter_call, GUI_EVENT_TOUCH_LONG, NULL);
 }

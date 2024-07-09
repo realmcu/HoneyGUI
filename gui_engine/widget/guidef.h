@@ -172,6 +172,8 @@ typedef struct gui_dispdev
     uint16_t driver_ic_hfp;
     uint16_t driver_ic_hbp;
     uint16_t driver_ic_active_width;
+    uint16_t target_w;
+    uint16_t target_h;
     T_GUI_DC_TYPE type;
     T_GUI_PFB_TYPE pfb_type;
     char gpu_type;
