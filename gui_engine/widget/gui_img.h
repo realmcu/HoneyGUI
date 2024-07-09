@@ -339,7 +339,14 @@ void gui_img_set_quality(gui_img_t *_this, bool high_quality);
  * @return gui_img_t*
  */
 void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
-
+/**
+ * @brief convert a tree to a image data in root widget's size (RGB format)
+ *
+ * @param obj tree root
+ * @param matrix null if no need to transform
+ * @param shot_buf image data buffer
+ */
+void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

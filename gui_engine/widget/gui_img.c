@@ -629,6 +629,51 @@ static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
     }
 }
 
+static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
+{
+    if (dc->virtual_lcd_update != NULL)
+    {
+        dc->virtual_lcd_update(dc);
+        return;
+    }
+
+    float scale = 0.7f;
+    uint16_t w = dc->target_w * scale;
+    uint16_t h = dc->target_h * scale;
+    uint16_t byte = dc->bit_depth / 8;
+    uint32_t total_section_cnt = (dc->target_h / dc->fb_height + ((
+                                                                      dc->target_h % dc->fb_height) ? 1 : 0));
+
+    if (dc->type == DC_SINGLE)
+    {
+        for (uint16_t y = 0; y < h; y++)
+        {
+            memcpy(dc->shot_buf + 8 + y * w * byte, dc->frame_buf + y * dc->fb_width * byte, w * byte);
+        }
+        // gui_log("[GUI warning] please use user method for improve! \n");
+    }
+    else if (dc->type == DC_RAMLESS)
+    {
+        if (dc->section_count == 0)
+        {
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
+        }
+        else if (dc->section_count >= total_section_cnt - 1)
+        {
+            uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            //gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
+            // gui_log("[GUI warning] please use user method for improve! \n");
+        }
+        else
+        {
+            uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
+            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
+        }
+    }
+}
+
 /*============================================================================*
  *                           Public Functions
  *============================================================================*/
@@ -911,7 +956,41 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
     gui_free(dc_bak);
     gui_free(matrix_bak);
 }
+void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)
+{
+    gui_dispdev_t *dc = gui_get_dc();
+    gui_dispdev_t *dc_bak = gui_malloc(sizeof(gui_dispdev_t));
+    gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
+    memcpy(dc_bak, dc, sizeof(gui_dispdev_t));
+    memcpy(matrix_bak, obj->matrix, sizeof(gui_matrix_t));
+    matrix_scale(0.7f, 0.7f, obj->matrix);
 
+    dc->bit_depth = 16;
+
+    dc->lcd_update = gui_img_virtual_dc_update_root_size;
+    dc->shot_buf = shot_buf;
+    dc->target_h = obj->h;
+    dc->target_w = obj->w;
+    gui_fb_change();
+    gui_fb_disp(obj);
+    gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
+
+    head->scan = 0;
+    head->align = 0;
+    head->resize = 2;//0-no resize;1-50%(x&y);2-70%;3-80%
+    head->compress = 0;
+    head->rsvd = 0;
+    head->type = 0;
+    head->version = 0;
+    head->rsvd2 = 0;
+    head->w = obj->w * 0.7f;
+    head->h = obj->h * 0.7f;
+
+    memcpy(dc, dc_bak, sizeof(gui_dispdev_t));
+    memcpy(obj->matrix, matrix_bak, sizeof(gui_matrix_t));
+    gui_free(dc_bak);
+    gui_free(matrix_bak);
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

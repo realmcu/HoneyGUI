@@ -1107,14 +1107,19 @@ GUI_APP_ENTRY(APP_VOLUME)
                           sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
     }
 }
+
+
+/**
+ * @brief APP cycle tracking
+*/
 #include <math.h>
 
-double F(double x, double a, double b, double c)
+static double F(double x, double a, double b, double c)
 {
     return cos((a + x) / b) * c;
 }
 
-double Solve(double guess, double a, double b, double c)
+static double Solve(double guess, double a, double b, double c)
 {
     const double EPSILON = 0.1;
     double x = guess;
@@ -1404,6 +1409,9 @@ GUI_APP_ENTRY(APP_CYCLE_TRACKING)
     gui_img_t *img_array[7];
     get_img_array(img_array, win, sizeof(img_array) / sizeof(img_array[0]));
     cycle_image_process(0, img_array);
+
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)win);
 }
 
 
