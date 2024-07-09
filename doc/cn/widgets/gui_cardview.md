@@ -1,35 +1,41 @@
-# Cardview
+# 卡片容器控件
 
-Card effect container widget, which can nest card. You can switch cards by swiping.
+卡片效果容器控件，可以嵌套卡片，可以通过滑动来切换卡片。
 
 <br>
 <center><img width="500" src= "https://foruda.gitee.com/images/1700123394899348792/914aadf9_10641540.png "></center>
 <br>
 
-## Usage
+## 用法
 
-### Create widget
-Using [gui_cardview_create(parent,  name, x, y, w, h)](#api) to create cardview widget
+### 创建控件
+开发者可以调用 [gui_cardview_create(parent,  name, x, y, w, h)](#api) 来创建卡片容器控件。
 
-### Callback
-When the state of the cardview changes, it triggers a callback, and you can use the callback function [gui_cardview_status_cb(this, cb)](#api) to do what you want.
+### 回调
+当卡片容器的状态改变时，它会触发一个回调，开发者可以在回调函数[gui_cardview_status_cb(this, cb)](#api)来做想做的事情。
 
-### Set style
-There are five style in cardview widget [gui_cardview_set_style(this, style)](#api)
+### 设置风格
+卡片容器控件有5种风格，开发者可以使用 [gui_cardview_set_style(this, style)](#api)来设置风格。
 
-```
-typedef enum t_slide_style
-{
-    CLASSIC,
-    REDUCTION,
-    FADE,
-    REDUCTION_FADE,
-    STACKING,
-} T_SLIDE_STYLE;
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/gui_tabview.h
+   :language: c
+   :start-after: /* T_SLIDE_STYLE enum start*/
+   :end-before: /* T_SLIDE_STYLE enum end*/
+   
 ```
 
-## Example
-Please refer to the page below:
+### 设置中心对齐
+开发者可以调用函数[gui_cardview_alignment(this, align_hight)](#api)来设置卡片自动中心对齐。
+
+### 设置底部间隔
+开发者可以调用函数[gui_cardview_set_bottom_space(this, bottom_space)](#api)来设置卡片的底部间隔。
+
+### y轴方向滑动回调
+卡片容器在y轴方向滑动的事件可以添加相应的回调函数[gui_cardview_up(this, callback, parameter)](#api)、[gui_cardview_down(this, callback, parameter)](#api)。
+
+## 示例
+请参考这一章节的实现:
 ```eval_rst
 `card`_    
 
