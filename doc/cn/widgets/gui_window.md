@@ -1,40 +1,35 @@
-# Window
+# 窗口 (window)
 <br>
 
-## Overview
+## 概述
 
-The widget provides a virtual area for the developer to place application-required widgets. The developer can depend on the requirement to create the space relative to the screen.
-For example, Figure-1 creates an area the same as the screen dimension, and the developer can create a space with different sizes, as in Figure-2.
+此控件为开发者提供了一个虚拟区域，用于放置应用程序所需的控件。开发者可以根据需求创建相对于屏幕的空间。
+例如，图-1 创建了一个与屏幕尺寸相同的区域，而开发者也可以创建不同尺寸的空间，如图-2 所示。
 
 <center><img src="https://foruda.gitee.com/images/1701081169144847122/2f0a8469_13671147.png" /></center>
 <br>
-<center>Figure-1</center>
+<center>图-1</center>
 <br>
 
 <center><img src="https://foruda.gitee.com/images/1701081183476854396/dec93062_13671147.png" /></center>
 <br>
-<center>Figure-2</center>
+<center>图-2</center>
 <br>
 
-And the following widgets will take the Window's widget left-top corner as the initial coordinates in Figure-3.
+如图-3 所示的小部件将以窗口小部件的左上角作为初始坐标。
 <br>
 
 <center><img src="https://foruda.gitee.com/images/1701081206134160709/80ae8874_13671147.png" /></center>
 <br>
-<center>Figure-3</center>
+<center>图-3</center>
 <br>
 
-## Usage
+## 使用方法
 
-### Create widget
+### 创建窗口部件
 
-You can create a win widget by this api [`gui_win_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)`](#api).
-This `w/h` are the width and height of the win widget.
-
-### Add event
-
-To add an event of widget by this api [gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter, void *user_data)](#api).
-`obj` is the selected widget, `event_cb` is the switching events, `filter` is the way how to trigger event, and `user_data` is the data to transmit.
+你可以通过这个 API [`gui_win_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)`](#api)创建一个窗口控件。
+其中 `w/h` 是窗口控件的宽度和高度。
 <br>
 
 <span id="api">
