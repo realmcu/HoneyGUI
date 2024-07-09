@@ -13,30 +13,28 @@
 
 void print_pass(void *msg)
 {
-    AUTO_TEST_LOG("Pass!");
+    AUTO_TEST_LOG("PASS!");
 }
 void cmd_print_pass(void)
 {
     gui_server_exec_cb(print_pass);
 }
 GUI_EXPORT_CMD(pass, cmd_print_pass);
-GUI_INIT_APP_EXPORT(cmd_print_pass);
 
 
 void print_fail(void *msg)
 {
-    AUTO_TEST_LOG("Fail!");
+    AUTO_TEST_LOG("FAIL!");
 }
 void cmd_print_fail(void)
 {
     gui_server_exec_cb(print_fail);
 }
 GUI_EXPORT_CMD(fail, cmd_print_fail);
-GUI_INIT_APP_EXPORT(cmd_print_fail);
 
 void print_all_widget_size(void *msg)
 {
-    AUTO_TEST_LOG("gui_test_case_obj_000 Start !");
+    AUTO_TEST_LOG("gui_test_case_obj_000 START!");
     LOG_SIZEOF(obj);
     LOG_SIZEOF(img);
     LOG_SIZEOF(win);
@@ -79,23 +77,40 @@ void print_all_widget_size(void *msg)
     LOG_SIZEOF(watch_gradient_spot);
     LOG_SIZEOF(wave);
     LOG_SIZEOF(wheel_list);
-    AUTO_TEST_LOG("gui_test_case_obj_000 Pass!");
+    AUTO_TEST_LOG("gui_test_case_obj_000 PASS!");
 }
 void gui_test_case_obj_000(void)
 {
     gui_server_exec_cb(print_all_widget_size);
 }
 GUI_EXPORT_CMD(gui_test_case_obj_000, gui_test_case_obj_000);
-GUI_INIT_APP_EXPORT(gui_test_case_obj_000);
+
+void compare_img_szie(void *msg)
+{
+    AUTO_TEST_LOG("gui_test_case_img_000 START!");
+    LOG_SIZEOF(img);
+    if (sizeof(gui_img_t) > GUI_IMG_T_SIZE)
+    {
+        AUTO_TEST_LOG("gui_test_case_img_000 PASS!");
+    }
+    else
+    {
+        AUTO_TEST_LOG("gui_test_case_img_000 FAIL!");
+    }
+}
+void gui_test_case_img_000(void)
+{
+    gui_server_exec_cb(compare_img_szie);
+}
 
 void auto_test(void *msg)
 {
     gui_test_case_obj_000();
+    gui_test_case_img_000();
 }
 void cmd_auto_test_start(void)
 {
     gui_server_exec_cb(auto_test);
 }
 GUI_EXPORT_CMD(auto_test_start, cmd_auto_test_start);
-GUI_INIT_APP_EXPORT(cmd_auto_test_start);
 
