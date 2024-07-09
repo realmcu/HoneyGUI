@@ -1,17 +1,17 @@
-# Card
+# 卡片控件
 
-Users can create various controls on the card. Before creating the card widget, you must select create cardview widget.
+用户可以在卡片上创建各种控件。在创建卡片控件之前，必须先创建卡片视图控件。
 
-## Usage
+## 用法
 
-### Create card widget
-Using [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#api) to create card widget
+### 创建卡片控件
+可以调用 [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#api) 来创建卡片控件。
 
-## Example
+## 示例
 
-There are  six cards created
+创建6个卡片控件：
 
-<details> <summary>Example code</summary>
+<details> <summary>示例代码</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
