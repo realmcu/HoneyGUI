@@ -2,7 +2,7 @@
 
 ## Image format conversion
 Convert pictures in various formats into RGB raw pictures
-* Open the converter. Please download from [```ImageConvert\ImageConverter.exe```](https://wiki.realtek.com/display/BTMKT/BLE+Soc+Image+Convert+Tool)
+* Open the converter. Please refer to the Tool section for the download link of the image conversion tool:[Image Convert Tool](../index.md) 
 * The operation steps and detailed instructions are as follows:
 
 <br/>
