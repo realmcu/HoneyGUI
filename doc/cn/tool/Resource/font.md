@@ -1,41 +1,41 @@
 # 字体转换工具
 
-Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table.txt file, custom.cST file), and find the vector font data corresponding characters according to the Unicode code from the font file (such as.ttf). Convert to a bitmap, and the output is a.bin file.
+字体转换工具功能：从标准内部码表(codepage文件)、自定义Unicode码表(或补充码表.txt文件，cST文件)中获取所有待转换字符对应的Unicode码。并根据字体文件(如.ttf)中的Unicode代码查找向量字体数据对应的字符。转换为位图，输出为.bin文件。
 
 <div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1721186859304603819/25785a2f_13408154.png" ></div>
 
-## Font bin generation
-Please refer to the following steps for how to generate files:
-* Copy the Font library file to the directory (`\Font Convert Tool\font`).
+## 生成字体bin文件
+如何生成对应的文件，请参考以下步骤:
+* 将字体库文件复制到该目录 (`\Font Convert Tool\font`)。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
 
-* You can refer to the documentation under the directory (`\Font Convert Tool\doc`) for the specific meanings of each parameter to config font parameters by edit FontConfig.json.
+* 可以参考(`\Font Convert Tool\doc`)目录下的文档，了解每个参数的具体含义，通过编辑FontConfig.json配置字体参数。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779327750693194/d2cd240c_13408154.png" ></div>
 
-* Double-click fontDirctionary.exe and then font bin will be Generated.
+* 双击fontDirctionary.exe生成font.bin。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
 
-## FontConfig.json Parameter description
+## FontConfig.json参数说明
 
-| field name | Field meaning|
+| 字段名 | 字段含义|
 | ----- | ---- |
-| codePages | A list of selected characters arranged in a specific order for the text of a language. Can be set multiple |
-| cstPaths | Binary Unicode code table cst file path. Can be set multiple |
-| mappingPaths|User - defined unicode character set file path. Multiple groups can be set|
-|customerVals|User-defined continuous unicode characters. Multiple groups can be set|
-|firstVal|The starting value of a custom continuous unicode character|
-|range|A custom number of consecutive unicode character|
-|fontSet|Used to specify font-related Settings to be converted|
-|bold|Specifies whether converted characters are bolded|
-|italic|Specifies whether the converted character is slanted|
-|scanMode|Specifies how the converted character data is saved. If the value is "H", the fonts are saved by row, and if the value is "V", the fonts are saved by column|
-|fontSize|Specifies the converted character size|
-|font|Specifies the font file to use for the conversion|
-|renderMode|Specifies how many bits are used to represent a pixel in the converted character bitmap|
-|indexMethod|Specify the index mode of the re-index area of the output bin file after conversion, and fill the address index with 0; offset index 1|
+| codePages | 按一种语言文本的特定顺序排列的选定字符的列表。可设置多个|
+| cstPaths | 二进制Unicode码表.cst文件路径。可设置多个|
+| mappingPaths|用户定义的unicode字符集文件路径。可以设置多个分组|
+|customerVals|用户定义的连续unicode字符。可以设置多个分组|
+|firstVal|自定义连续unicode字符的起始值|
+|range|自定义的连续unicode字符数|
+|fontSet|用于指定要转换的与字体相关的设置|
+|bold|指定是否保留转换后的字符|
+|italic|指定转换后的字符是否倾斜|
+|scanMode|指定如何保存转换后的字符数据。如果该值为“H”，则字体按行保存；如果该值为“V”，则字体按列保存|
+|fontSize|指定转换后的字符大小|
+|font|指定要用于转换的字体文件|
+|renderMode|指定在转换后的字符位图中使用多少位来表示像素|
+|indexMethod|指定转换后输出bin文件的重索引区域的索引方式，地址：0；偏移：1|
 
 
 
