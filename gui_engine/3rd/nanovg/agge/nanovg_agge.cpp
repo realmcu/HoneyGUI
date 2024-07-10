@@ -19,16 +19,11 @@
 #include <agge/nanovg_image_blender.h>
 #include <agge/blender_linear_gradient.h>
 #include <agge/blender_radial_gradient.h>
-#ifdef ENABLE_RTK_GUI
 #include "gui_api.h"
 #define NANOVG_MALLOC gui_malloc
 #define NANOVG_REALLOC gui_realloc
 #define NANOVG_FREE gui_free
-#else
-#define NANOVG_MALLOC malloc
-#define NANOVG_REALLOC realloc
-#define NANOVG_FREE free
-#endif
+
 template <typename T>
 agge::rect<T> mkrect(T x1, T y1, T x2, T y2) {
   agge::rect<T> r = {x1, y1, x2, y2};
