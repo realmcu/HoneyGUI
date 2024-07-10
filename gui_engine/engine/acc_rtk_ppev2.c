@@ -794,16 +794,16 @@ bool hw_acc_imdc_decode(uint8_t *image, gui_rect_t *rect, uint8_t *output)
     switch (head->type)
     {
     case RGB565:
-        output_header.type = PPEV2_RGB565;
+        output_header.type = RGB565;
         break;
     case RGB888:
-        output_header.type = PPEV2_RGB888;
+        output_header.type = RGB888;
         break;
     case ARGB8888:
-        output_header.type = PPEV2_ARGB8888;
+        output_header.type = ARGB8888;
         break;
     case ARGB8565:
-        output_header.type = PPEV2_ARGB8565;
+        output_header.type = ARGB8565;
         break;
     default:
         return false;
