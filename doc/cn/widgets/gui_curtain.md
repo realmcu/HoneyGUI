@@ -1,22 +1,23 @@
-# Curtain
+# 幕布
+<br>
 
-The curtain widget enables you to create curtains in five directions: up, down, left, right, and middle. (refer to [T_GUI_CURTAIN_ENUM](#T_GUI_CURTAIN_ENUM)). Before creating the curtain widget, you must first create a curtainview widget to accommodate the curtain.
+幕布控件可以创建5个不同方向的幕布，分别是上、下、左、右、中间 (参考[T_GUI_CURTAIN_ENUM](#T_GUI_CURTAIN_ENUM))，创建幕布控件之前，必须先创建幕布视图控件(`curtainview`)来容纳幕布。
 
-## Usage
+## 使用方法
 
-### Create curtain widget
+### 创建幕布控件
 
-If you wish to create a curtain widget with a defined direction, you may opt to utilize the [gui_curtain_create(parent, filename, x, y, w, h, orientation, scope)](#gui_curtain_create) function.
-`Orientation` field offers various directions for the curtain, allowing for the creation of a middle or right curtain widget.
-`Scope` refers to the curtain range that can be extended, which falls between 0 and 1
+如果想要创建带有方向的幕布控件，可以使用[gui_curtain_create(parent, filename, x, y, w, h, orientation, scope)](#gui_curtain_create) 函数来创建。
+`Orientation` 表示方向，可以创建上、下、左、右、中间等五个不同方向的幕布控件。
+`Scope` 表示幕布的扩展范围，范围为0到1。
 
 <span id = "T_GUI_CURTAIN_ENUM">
 
-### Orientation
+### 幕布控件方向
 
 </span>
 
-There are five orientations in curtain widget.
+幕布控件有5个方向，分别是上、下、左、右、中间。
 
 ```c
 typedef enum CURTAIN_ORIENTATION
@@ -30,9 +31,7 @@ typedef enum CURTAIN_ORIENTATION
 } T_GUI_CURTAIN_ENUM;
 ```
 
-
-
-## Example
+## 示例
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
