@@ -411,8 +411,8 @@ static void gui_text_draw(gui_obj_t *obj)
     dc = gui_get_dc();
     draw_rect.x1 = text->offset_x;
     draw_rect.y1 = text->offset_y;
-    draw_rect.x2 = draw_rect.x1 + obj->w;
-    draw_rect.y2 = draw_rect.y1 + obj->h;
+    draw_rect.x2 = draw_rect.x1 + obj->w - 1;
+    draw_rect.y2 = draw_rect.y1 + obj->h - 1;
 
 
     if (dc->section_count == 0)
