@@ -68,6 +68,18 @@ typedef struct _gui_color
     } color;
 } gui_color_t;
 
+typedef struct _gui_surface
+{
+    gui_color_t *surfaceBuffer;
+    int width;
+    int height;
+
+    int limit_left;
+    int limit_top;
+    int limit_right;
+    int limit_bottom;
+} gui_surface_t;
+
 #ifdef __cplusplus
 }
 #endif

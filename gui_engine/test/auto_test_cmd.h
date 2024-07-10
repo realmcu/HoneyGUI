@@ -82,6 +82,8 @@ extern "C" {
 
 #define LOG_SIZEOF(prefix) AUTO_TEST_LOG("name: " #prefix " size: %lu", sizeof(MAKE_TYPE_NAME(prefix)))
 
+#define GUI_IMG_T_SIZE 176 //2024/7/9 luke
+
 #ifdef __cplusplus
 }
 #endif

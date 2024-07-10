@@ -20,6 +20,10 @@ if GetDepend('CONFIG_REALTEK_BUILD_REAL_PAINTENGINE'):
     src += ['app_ui_paintengine.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
+if GetDepend('CONFIG_REALTEK_BUILD_REAL_NANOVG'):
+    src += ['app_ui_nanovg.c']
+    group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
+
 if GetDepend('CONFIG_REALTEK_BUILD_LVGL_DEMO_APP'):
     src += ['app_ui_lvgl.c']
     group = DefineGroup('realgui/demo', src, depend = [''], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)

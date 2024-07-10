@@ -27,6 +27,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "time.h"
+#include "cmsis_os2.h"                  // ARM::CMSIS:RTOS2:Keil RTX5
 
 
 
@@ -37,22 +38,23 @@ void app_main(void *argument)
 {
 
 
-    GLCD_Initialize();                          /* Initialize the GLCD            */
+//    GLCD_Initialize();                          /* Initialize the GLCD            */
 
-    /* display initial screen */
-    GLCD_SetBackgroundColor(GLCD_COLOR_RED);
-    GLCD_ClearScreen();
-    //GLCD_SetBackgroundColor(GLCD_COLOR_BLUE);
-    GLCD_SetForegroundColor(GLCD_COLOR_GREEN);
+//    /* display initial screen */
+//    GLCD_SetBackgroundColor(GLCD_COLOR_RED);
+//    GLCD_ClearScreen();
+//    //GLCD_SetBackgroundColor(GLCD_COLOR_BLUE);
+//    GLCD_SetForegroundColor(GLCD_COLOR_GREEN);
 
     gui_components_init();
 
 
     while (1)
     {
-        time_t now;
-        now = time(NULL);
-        printf("World Time: %.*s\n", 25, ctime(&now));
+        //time_t now;
+        //now = time(NULL);
+        //printf("World Time: %.*s\n", 25, ctime(&now));
+        osDelay(10000);
     }
 }
 /*----------------------------------------------------------------------------
@@ -64,7 +66,13 @@ int main(void)
     EventRecorderInitialize(0, 1);
 #endif
     printf("Realtek Bee GUI Welcome \r\n");
-    app_main(NULL);
+    // ...
+    osKernelInitialize();                 // Initialize CMSIS-RTOS
+    osThreadNew(app_main, NULL, NULL);    // Create application main thread
+    if (osKernelGetState() == osKernelReady)
+    {
+        osKernelStart();                    // Start thread execution
+    }
 
     while (1);
 
