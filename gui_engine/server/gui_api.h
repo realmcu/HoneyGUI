@@ -132,12 +132,15 @@ extern "C" {
 
 /**
  * @link https://www.rapidtables.com/web/color/RGB_Color.html
+ * @brief APP_COLOR_##HTML / CSS Name       Decimal Code(R,G,B)
 */
 #define APP_COLOR_CRIMSON                   gui_rgb(220,20,60)
 #define APP_COLOR_FIREBRICK                 gui_rgb(178,34,34)
 #define APP_COLOR_WHITE_OPACITY             gui_rgba(255,255,255,150)
 #define APP_COLOR_SILVER                    gui_rgb(192,192,192)
 #define APP_COLOR_SILVER_OPACITY(opacity)   gui_rgba(192,192,192, opacity)
+#define APP_COLOR_BLACK                     gui_rgb(0,0,0)
+#define APP_COLOR_GRAY                      gui_rgb(128,128,128)
 /** End of SERVER_Exported_Macros
   * @}
   */

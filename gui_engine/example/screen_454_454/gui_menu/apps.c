@@ -25,6 +25,7 @@
 #define APP_SETTING
 #define APP_VOLUME
 #define APP_CYCLE_TRACKING
+#define APP_MUSIC
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
 GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
@@ -38,6 +39,7 @@ GUI_APP_DEFINE_NAME(APP_COMPASS)
 GUI_APP_DEFINE_NAME(APP_SETTING)
 GUI_APP_DEFINE_NAME(APP_VOLUME)
 GUI_APP_DEFINE_NAME(APP_CYCLE_TRACKING)
+GUI_APP_DEFINE_NAME(APP_MUSIC)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -766,29 +768,346 @@ GUI_APP_ENTRY(APP_BOX2D)
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
+/**
+ * @brief setting app (multi level)
+*/
 #include "gui_multi_level.h"
+#include "gui_button.h"
+#define HIGHLIGHT_BLUE gui_rgb(0, 100, 255)
+struct button_args
+{
+    gui_multi_level_t *parent;
+    unsigned char index;
+    unsigned char level;
+};
+
+static void multi_levle_button_cb(gui_obj_t *this, void *event, struct button_args *args)
+{
+    GUI_API(gui_multi_level_t).jump(args->parent, args->level, args->index);
+}
 static void ui_design_0(gui_obj_t *parent)
 {
-
+    {
+        gui_button_t *button = gui_button_create(parent, 0, 0, 454, 100, MYDEVICE_BIN, MYDEVICEHL_BIN, 0, 0,
+                                                 0);
+        static struct button_args args;
+        args.parent = (void *)parent;
+        args.level = 1;
+        args.index = 0;
+        GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)multi_levle_button_cb, &args);
+    }
+    {
+        gui_button_t *button = gui_button_create(parent, 0, 102 * 1, 454, 100, BATTERY_BIN, BATTERYHL_BIN,
+                                                 0, 0, 0);
+        static struct button_args args;
+        args.parent = (void *)parent;
+        args.level = 1;
+        args.index = 1;
+        GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)multi_levle_button_cb, &args);
+    }
+    {
+        gui_button_t *button = gui_button_create(parent, 0, 102 * 2, 454, 100, BLUETOOTH_BIN,
+                                                 BLUETOOTHHL_BIN, 0, 0, 0);
+        static struct button_args args;
+        args.parent = (void *)parent;
+        args.level = 1;
+        args.index = 2;
+        GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)multi_levle_button_cb, &args);
+    }
+    gui_return_create(parent, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
+static void mydevice_button_press_cb(gui_win_t *this, void *event, gui_canvas_rect_t *rect)
+{
+    rect->color = HIGHLIGHT_BLUE;
+}
+static void mydevice_button_release_cb(gui_win_t *this, void *event, gui_canvas_rect_t *rect)
+{
+    rect->color = APP_COLOR_WHITE;
+}
+static void setting_return_cb(gui_obj_t *this)
+{
+    if (this->parent && this->parent->type == MULTI_LEVEL)
+    {
+        if (this->parent->parent && this->parent->parent->type == MULTI_LEVEL)
+        {
+            uint8_t index = GUI_TYPE(gui_multi_level_t, this->parent->parent)->index;
+            uint8_t level = GUI_TYPE(gui_multi_level_t, this->parent->parent)->level;
+            GUI_API(gui_multi_level_t).jump((void *)this->parent, level, index);
+        }
+    }
+}
+
+#include "gui_grid.h"
+static char *device_name = "Triton's watch";
+static char *storage = "123.9 GB/256GB";
 static void ui_design_1_0(gui_obj_t *parent)
 {
-
+    {
+        gui_win_t *win = gui_win_create(parent, 0, 0, 0, 454, 100);
+        static struct button_args args;
+        args.parent = (void *)parent;
+        args.level = 2;
+        args.index = 0;
+        GUI_API(gui_win_t).on_click(win, multi_levle_button_cb, &args);
+        gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
+                                                         GUI_BASE(win)->h,
+                                                         APP_COLOR_WHITE);
+        GUI_API(gui_win_t).on_press(win, mydevice_button_press_cb, rect);
+        GUI_API(gui_win_t).on_release(win, mydevice_button_release_cb, rect);
+        {
+            char *text = "Device name";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0,  0, 42,
+                                            gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, MULTI_LEFT);
+        }
+        {
+            char *text = device_name;
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0,  300, 42,
+                                            gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_GRAY, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, MULTI_LEFT);
+        }
+        {
+            char *text = ">";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0,  454 - 20, 42,
+                                            gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_GRAY, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, MULTI_LEFT);
+        }
+    }
+    {
+        gui_win_t *win = gui_win_create(parent, 0, 0, 102, 454, 100);
+        static struct button_args args;
+        args.parent = (void *)parent;
+        args.level = 2;
+        args.index = 1;
+        GUI_API(gui_win_t).on_click(win, multi_levle_button_cb, &args);
+        gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
+                                                         GUI_BASE(win)->h,
+                                                         APP_COLOR_WHITE);
+        GUI_API(gui_win_t).on_press(win, mydevice_button_press_cb, rect);
+        GUI_API(gui_win_t).on_release(win, mydevice_button_release_cb, rect);
+        {
+            char *text = "Storage";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0,  0, 42,
+                                            gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, MULTI_LEFT);
+        }
+        {
+            char *text = storage;
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0,  300, 42,
+                                            gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_GRAY, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, MULTI_LEFT);
+        }
+        {
+            char *text = ">";
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, 0,  454 - 20, 42,
+                                            gui_get_screen_width(),
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_GRAY, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, MULTI_LEFT);
+        }
+    }
+    gui_grid_t *grid = gui_grid_create(parent, 10, 204, 10, 1, 50, 50);
+    {
+        char *text = "1.0.21.0";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(grid, 0, 0, 0,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+        {
+            char *text = "OS version";
+            int font_size = 16;
+            gui_text_t *t2 = gui_text_create(t, 0, 0, 20,
+                                             gui_get_screen_width(),
+                                             font_size);
+            gui_text_set(t2, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t2, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t2, MULTI_LEFT);
+        }
+    }
+    {
+        char *text = "XXXXXXXX";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(grid, 0, 100, 0,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+        {
+            char *text = "CPU";
+            int font_size = 16;
+            gui_text_t *t2 = gui_text_create(t, 0, 0, 20,
+                                             gui_get_screen_width(),
+                                             font_size);
+            gui_text_set(t2, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t2, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t2, MULTI_LEFT);
+        }
+    }
+    {
+        char *text = "16GB";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(grid, 0, 0, 0,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+        {
+            char *text = "RAM";
+            int font_size = 16;
+            gui_text_t *t2 = gui_text_create(t, 0, 0, 20,
+                                             gui_get_screen_width(),
+                                             font_size);
+            gui_text_set(t2, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t2, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t2, MULTI_LEFT);
+        }
+    }
+    {
+        char *text = "5000 mAh(typ)";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(grid, 0, 0, 0,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+        {
+            char *text = "Battery capacity";
+            int font_size = 16;
+            gui_text_t *t2 = gui_text_create(t, 0, 0, 20,
+                                             gui_get_screen_width(),
+                                             font_size);
+            gui_text_set(t2, text, GUI_FONT_SRC_BMP, COLOR_SILVER, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t2, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t2, MULTI_LEFT);
+        }
+    }
+    gui_return_create(parent, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), setting_return_cb, (void *)0);
 }
 static void ui_design_1_1(gui_obj_t *parent)
 {
-
+    gui_button_t *button = gui_button_create(parent, 0, 102 * 1, 454, 100, BATTERY_BIN, BATTERYHL_BIN,
+                                             0, 0, 0);
+    gui_return_create(parent, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), setting_return_cb, (void *)0);
 }
 static void ui_design_1_2(gui_obj_t *parent)
 {
-
+    gui_button_t *button = gui_button_create(parent, 0, 102 * 2, 454, 100, BLUETOOTH_BIN,
+                                             BLUETOOTHHL_BIN, 0, 0, 0);
+    gui_return_create(parent, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), setting_return_cb, (void *)0);
+}
+static void ui_design_2_0(gui_obj_t *parent)
+{
+    gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE);
+    {
+        char *text = "Rename device";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  10, 10,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+    gui_win_t *win = gui_win_create(parent, 0, 10, 30, 400, 100);
+    gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w, GUI_BASE(win)->h, COLOR_SILVER);
+    gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w, 2, HIGHLIGHT_BLUE);
+    gui_canvas_rect_create((void *)win, 0, 0, GUI_BASE(win)->h, GUI_BASE(win)->w, 2, HIGHLIGHT_BLUE);
+    gui_canvas_rect_create((void *)win, 0, 0, 0, 2, GUI_BASE(win)->h, HIGHLIGHT_BLUE);
+    gui_canvas_rect_create((void *)win, 0, GUI_BASE(win)->w, 0, 2, GUI_BASE(win)->h + 1,
+                           HIGHLIGHT_BLUE);
+    {
+        char *text = device_name;
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(win, 0,  10, 42,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+    gui_return_create(parent, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), setting_return_cb, (void *)0);
+}
+static void ui_design_2_1(gui_obj_t *parent)
+{
+    gui_canvas_rect_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_WHITE);
+    {
+        char *text = "Storage space";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  10, 10,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+    gui_win_t *win = gui_win_create(parent, 0, 40, 40, 0, 0);
+    gui_canvas_rect_create((void *)win, 0, 0, 0, 60, 10, COLOR_SILVER);
+    gui_canvas_rect_create((void *)win, 0, 0, 10, 60, 20, COLOR_RED);
+    gui_canvas_rect_create((void *)win, 0, 0, 10 + 20, 60, 30, APP_COLOR_GREEN);
+    gui_canvas_rect_create((void *)win, 0, 0, 10 + 20 + 30, 60, 40, APP_COLOR_BLUE);
+    gui_canvas_rect_create((void *)win, 0, 0, 10 + 20 + 30 + 40, 60, 50, APP_COLOR_GRAY);
+    gui_return_create(parent, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), setting_return_cb, (void *)0);
 }
 GUI_APP_ENTRY(APP_SETTING)
 {
-    gui_multi_level_t *m0 = gui_multi_level_create(GUI_APP_ROOT_SCREEN, 0, ui_design_0);
-    gui_multi_level_t *m1_0 = gui_multi_level_create(m0, 0, ui_design_1_0);
-    gui_multi_level_t *m1_1 = gui_multi_level_create(m0, 0, ui_design_1_1);
-    gui_multi_level_t *m1_2 = gui_multi_level_create(m0, 0, ui_design_1_2);
+    gui_multi_level_t *m0 = gui_multi_level_create(GUI_APP_ROOT_SCREEN, 0, ui_design_0);//main
+    gui_multi_level_t *m1_0 = gui_multi_level_create(m0, 0, ui_design_1_0);//mydevice
+    gui_multi_level_t *m1_1 = gui_multi_level_create(m0, 0, ui_design_1_1);//battery
+    gui_multi_level_t *m1_2 = gui_multi_level_create(m0, 0, ui_design_1_2);//bluetooth
+    gui_multi_level_t *m2_0 = gui_multi_level_create(m1_0, 0, ui_design_2_0);//rename
+    gui_multi_level_t *m2_1 = gui_multi_level_create(m1_0, 0, ui_design_2_1);//storage
+
 }
 #include "math.h"
 #include <stdio.h>
@@ -1414,6 +1733,13 @@ GUI_APP_ENTRY(APP_CYCLE_TRACKING)
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)win);
 }
 
+GUI_APP_ENTRY(APP_MUSIC)
+{
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "WIN", 0, 200, 0, 0);
+    //gui_win_set_animate(win, 1000, -1, music_win_cb, win);
 
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)win);
+}
 
 

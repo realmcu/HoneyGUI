@@ -40,8 +40,17 @@ typedef struct gui_multi_level
     gui_obj_t base;
     void (*ui_design)(gui_obj_t *);
     bool hidden;
+    uint8_t level;
+    uint8_t index;
 } gui_multi_level_t;
 _GUI_API_DEFINE(gui_multi_level_t)
+/**
+ * @brief jump to a specitf multi_level widget.
+ * @param this one of the multi_level widgets in app.
+ * @param level specitf level. 0,1,2...
+ * @param index index in this level. 0,1,2...
+ *
+ */
 void (*jump)(gui_multi_level_t *this, int levle, int index);
 
 _GUI_API_DECLARE(gui_multi_level_t)
@@ -76,9 +85,8 @@ gui_multi_level_t *gui_multi_level_create(void *parent, const char *widget_name,
 /**
  * @brief jump to a specitf multi_level widget.
  * @param this one of the multi_level widgets in app.
- * @param level specitf level.
- * @param index index in this level.
- * @return return the widget object pointer
+ * @param level specitf level. 0,1,2...
+ * @param index index in this level. 0,1,2...
  *
  */
 void gui_multi_level_jump(gui_multi_level_t  *this, int level, int index);
