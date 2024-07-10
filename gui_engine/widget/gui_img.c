@@ -637,7 +637,7 @@ static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
         return;
     }
 
-    float scale = 0.7f;
+    float scale = 1;
     uint16_t w = dc->target_w * scale;
     uint16_t h = dc->target_h * scale;
     uint16_t byte = dc->bit_depth / 8;
@@ -659,12 +659,16 @@ static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
             uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
             gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, dc->fb_height, dc);
         }
-        else if (dc->section_count >= total_section_cnt - 1)
+        else if (dc->section_count == total_section_cnt - 1)
         {
-            uint32_t last_height = dc->screen_height - dc->section_count * dc->fb_height;
+            uint32_t last_height = dc->target_h - dc->section_count * dc->fb_height;
             uint8_t *dst = 8 + dc->shot_buf + w *  dc->fb_height * dc->section_count * byte;
-            //gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
+            gui_img_rect_copy(dst, dc->frame_buf, 0, 0, w, last_height, dc);
             // gui_log("[GUI warning] please use user method for improve! \n");
+        }
+        else if (dc->section_count > total_section_cnt - 1)
+        {
+
         }
         else
         {
@@ -963,7 +967,7 @@ void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix,
     gui_matrix_t *matrix_bak = gui_malloc(sizeof(gui_matrix_t));
     memcpy(dc_bak, dc, sizeof(gui_dispdev_t));
     memcpy(matrix_bak, obj->matrix, sizeof(gui_matrix_t));
-    matrix_scale(0.7f, 0.7f, obj->matrix);
+    //matrix_scale(0.7f, 0.7f, obj->matrix);
 
     dc->bit_depth = 16;
 
@@ -977,14 +981,14 @@ void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix,
 
     head->scan = 0;
     head->align = 0;
-    head->resize = 2;//0-no resize;1-50%(x&y);2-70%;3-80%
+    head->resize = 0;//0-no resize;1-50%(x&y);2-70%;3-80%
     head->compress = 0;
     head->rsvd = 0;
     head->type = 0;
     head->version = 0;
     head->rsvd2 = 0;
-    head->w = obj->w * 0.7f;
-    head->h = obj->h * 0.7f;
+    head->w = obj->w ;
+    head->h = obj->h ;
 
     memcpy(dc, dc_bak, sizeof(gui_dispdev_t));
     memcpy(obj->matrix, matrix_bak, sizeof(gui_matrix_t));
