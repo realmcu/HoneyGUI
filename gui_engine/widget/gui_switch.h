@@ -47,6 +47,7 @@ extern "C" {
   */
 
 typedef struct gui_switch gui_switch_t;
+/* gui_switch_t start*/
 struct gui_switch
 {
     gui_obj_t base;
@@ -70,6 +71,7 @@ struct gui_switch
     uint32_t touch_disable : 1;
     uint32_t checksum : 8;
 };
+/* gui_switch_t end*/
 
 _GUI_API_DEFINE(gui_switch_t)
 void (*turn_off)(gui_switch_t *sw);
