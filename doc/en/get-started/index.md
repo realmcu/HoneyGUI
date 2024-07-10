@@ -7,10 +7,16 @@
 
 ## Description
 
-There are two ways to develop an application, SaaA(Script as a APP) and Native C-APP.
-- SaaA(Script as a APP) consists of JavaScript and XML. Recommended ```RVisualDesigner``` as a  PC designer to do low-code development.
-- Native C-APP development using C/C++ language, directly call the API of GUI engine.
-- Also can directly call the API of [LVGL](https://lvgl.io/).
+HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (GUI) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
+
+As a comprehensive display framework, HoneyGUI not only includes Realtek's self-developed display engine development tools but also supports direct calls to external APIs such as LVGL and ARM2D for application development. Additionally, HoneyGUI provides a PC-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, RVD, to achieve visual programming.
+
+Here are several common methods for APP development:
+
+- Develop applications using the RealGUI display engine by calling C/C++ APIs.
+- Directly call LVGL APIs to develop applications.
+- Directly call ARM-2D APIs to develop applications.
+- Front-end development using JavaScript and XML. It is recommended to use RVisualDesigner as a PC-based design tool for low-code development.
 
 The GUI framework has good portability, which can run on a variety of chips and OS. PC Windows version is provided.
 
