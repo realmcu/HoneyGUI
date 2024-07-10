@@ -1,25 +1,158 @@
+/* =========== Define common variables =========== */
+body {
+    --md-left-sider-width: 280px;
+    --md-right-contents-width: 250px;
+}
+/* =========== Define common variables =========== */
+
+/* =========== Render Common Style =========== */
+html,body {
+	width: 100%;
+    height: 100%;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 28px;
+}
+
+/* =========== Render Common Style =========== */
+
+.rst-content div, 
+.rst-content p {
+    text-align: justify;
+}
+
+figcaption, figcaption p{
+    text-align: center !important;
+}
+
+/*.wy-nav-side {
+     overflow:auto; 
+}*/
+/* =========== Render sm-screen Style =========== */
+@media screen and (min-width: 768px) {
+    /* ----- left sider ----- */
+    .wy-nav-side {
+        width: var(--md-left-sider-width);
+    }
+    .wy-side-scroll,
+    .wy-side-nav-search,
+    .wy-menu-vertical {
+        width: 100%;
+    }
+
+    /* ----- main content ----- */
+    .wy-nav-content-wrap {
+        margin-left: var(--md-left-sider-width);
+        overflow-x: auto;
+        background:rgba(0,0,0,.05);
+    }
+    .wy-nav-content {
+        width: calc(100% - var(--md-right-contents-width));
+        max-width: 1200px;
+        min-width: 500px;
+        margin:0;
+        padding: 1.618em 3.2%;
+        background:#fff;
+    }
+    /* ----- right contents ----- */
+    .contents {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: var(--md-right-contents-width);
+        height: 100%;
+        overflow: auto;
+        padding-left: 30px;
+        background-color: #f3f3f3; 
+        z-index: 999;
+        /* 可以添加更多样式来改变目录栏的外观，例如背景色、宽度、间距等 */
+    }
+
+    /* 添加导航拖拽组件 */
+    .resize-handle-left,
+    .resize-handle-right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 100%;
+        margin-right: -1px;
+        position: absolute;
+        top: 0px;
+        cursor: col-resize;
+        color: #333;
+        background-color: #d0d0d0;
+    }
+    /* 左侧导航拖拽组件 */
+    .resize-handle-left {
+        right: 1px;
+    }
+    /* 右侧导航拖拽组件 */
+    .resize-handle-right {
+        left: 0;
+    }
+}
+/* =========== Render sm-screen Style =========== */
+
+/* =========== Render xs-screen Style =========== */
+@media screen and (max-width: 767px) {
+    .resize-handle-left, 
+    .resize-handle-right {
+        display: none;
+    }
+}
+/* =========== Render xs-screen Style =========== */
+
+/* ======= Render List Style ======== */
+
+.rst-content ol ol li {
+    list-style-type: lower-latin !important;
+}
+.rst-content ol ol ol li {
+    list-style-type: lower-roman !important;
+}
+
+/* ======= Render List Style ======== */
+
+
+/* =========== Render Sider Style ============ */
 /* div[role="search"] style */
+/*
 .wy-side-nav-search > div[role="search"] {
     text-align: center;
 }
 
-/*Let `code` wrap*/
+div.wy-menu,
+div.wy-menu-vertical {
+    text-align: left !important;
+}
+*/
+li[class*="toctree-"] * {
+    font-size: 14px !important;
+}
+
+/* =========== Render Sider Style ============ */
+
+
+/* ======== Render Main Content Style ========= */
+
+/* ======== Render Main Content Style ========= */
+
+
+/* ========= Render Code Block Style ========= */
 .rst-content code, .rst-content tt, code {
     white-space: normal;
 }
 
 .highlight {
-    background:#eeffcc;
+    background:rgba(223, 233, 243,0.4);
 }
 
-dl.cpp.unexpanded dd {
+dl.c.unexpanded dd, dl.cpp.unexpanded dd {
     display: none;
 }
-
-dl.c.unexpanded dd {
-    display: none;
-}
-
 .rtk-api-expansion-button {
     padding: 4px;
 }
@@ -29,24 +162,69 @@ dl.c.unexpanded dd {
     font-size: 1.1em;
     cursor: pointer;
 }
-.unexpanded .rtk-api-expansion-button::before {
-    content: "\f0da \00a0";
-}
 .expanded .rtk-api-expansion-button::before {
     content: "\f0d7 \00a0";
 }
-
-/*text align justify */
-div,p{
-    text-align: justify;
-    text-justify:inter-ideograph;
+.unexpanded .rtk-api-expansion-button::before {
+    content: "\f0da \00a0";
 }
-p i{
-    display: inline-block;
-    /*padding-left: 100%;*/
-    width: 100%;
+/*
+.rst-content code {
+    border:1px solid #e1e4e5;
+    background-color: rgba(223, 233, 243,0.4);
+    font-size: 14px;
 }
 
+.rst-content code {
+    color: #e74c3c;
+}
+.rst-content div[class^=highlight], .rst-content pre.literal-block {
+    margin: 1px 0 12px;
+}
+*/
+/* ========= Render Code Block Style ========= */
+
+
+/* ============ Render Table Style ============ */
+.wy-table-responsive {
+    /* width: 100%;
+  	overflow: auto; */
+}
+table {
+    border-collapse:collapse;
+	margin: 0 auto;
+	max-width: 100%;
+	word-break: normal;
+	margin-top: 4px;
+    margin-bottom: 10px;
+}
+.wy-table-responsive table td, 
+.wy-table-responsive table th {
+    /* 设置单元格中的文字自动换行 */
+    white-space: normal;
+}
+table th {
+    background-color: #ecf7f8;
+}
+.rst-content table ul {
+    margin-bottom: 0;
+}
+/* ============ Render Table Style ============ */
+
+
+/* ============ Render Title Style ============ */
+h1, h2, h3, h4, h5, h6 {
+	-webkit-transition: text-shadow 0.5s linear;
+	-moz-transition: text-shadow 0.5s linear;
+	-ms-transition: text-shadow 0.5s linear;
+	-o-transition: text-shadow 0.5s linear;
+	transition: text-shadow 0.5s linear;
+	margin-right: 15px;
+	font-family: Arial,sans-serif;
+    margin: 24px 0;
+}
+
+/* 禁止标题自动编号 */
 h1::before,
 h2::before,
 h3::before,
@@ -55,3 +233,138 @@ h5::before,
 h6::before {
     content: none !important;
 }
+/* ============ Render Title Style ============ */
+.rst-content h1 {
+    font-size: 38px;
+    font-weight: 400;
+    margin-bottom: 48px;
+}
+.rst-content h2 {
+    font-size: 32px;
+	font-weight: 400;
+	margin-top: 48px;
+	margin-bottom: 32px;
+}
+.rst-content h3 {
+    font-size: 28px;
+	font-weight: 400;
+	margin-top: 42px;
+	margin-bottom: 28px;
+}
+.rst-content h4 {
+    font-size: 24px;
+	font-weight: 400;
+	margin-top: 36px;
+	margin-bottom: 24px;
+}
+.rst-content h5 {
+    font-size: 20px;
+	font-weight: 400;
+	margin-top: 30px;
+	margin-bottom: 20px;
+}
+.rst-content h6 {
+    font-size: 18px;
+	font-weight: 400;
+	margin-top: 24px;
+	margin-bottom: 18px;
+}
+
+/* ========= Render Quote Block Style ========= */
+/*
+blockquote {
+    background-color: #F7F8FB;
+    border-left: 2px solid #9CAFD4;
+    margin: 0 24px 0 4px;
+    padding: 0 12px 0 16px;
+}
+blockquote p {
+    margin-bottom: 4px;
+}
+*/
+/* ========= Render Quote Block Style ========= */
+
+
+/* ========= Render Note Style ========= */
+html.writer-html5 .rst-content dl.field-list {
+    /* grid-template-columns: auto auto; */
+}
+/* ========= Render Note Style ========= */
+
+
+/* ========= Render added-api & deprecared-api Style ========= */
+/*
+section[id*="added-api"] dd dl,
+section[id*="deprecated-api"] dd dl {
+    background-color: rgba(223, 233, 243,0.3);
+    padding: 8px 8px 0px;
+    border: 1px solid #b4c2de;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+.rst-content dl dt {
+    margin-bottom: 0px;
+}
+*/
+/* ========= Render added-api & deprecared-api Style ========= */
+
+/* ========= Render Image Style ========= */
+.rst-content img{
+    height: auto !important;
+}
+.img-border {
+    border: 1px solid #000;
+}
+/* ========= Render Image Style ========= */
+
+/* ========= Render text color ========= */
+.red-text {
+    color: red;
+}
+/* ========= Render text color ========= */
+
+/* ========= Render text style ========= */
+.bolditalic {
+    font-style: italic;
+    font-weight: bold;
+}
+/* ========= Render text style ========= */
+
+/* ==== Render back-to-top icon style ==== */
+#back-to-top {
+    position: fixed;
+    bottom: 40px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    font-size: 24px;
+    background-color: #0068B6;
+    color: #fff;
+    border-color: transparent;
+    border-radius: 50%;
+    box-shadow: 0 0 5px 0 rgba(0,0,0,.27);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all .3s ease-out;
+}
+ 
+#back-to-top:hover {
+    background-color: #064778;
+}
+/* ==== Render back-to-top icon style ==== */
+
+
+.sphinx-tabs::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height:1px;
+    border: none;
+    border-top: 1px solid #e1e4e5;
+    margin: 8px 0 12px;
+    padding: 0;
+}
+
+
