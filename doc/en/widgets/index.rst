@@ -66,7 +66,7 @@ Widgets                              Brief
 .. toctree::
     :maxdepth: 2
 
-    glossary <widgets_glossary>
+    widget_template <widget_template>
     obj <gui_obj>
     window <gui_window>
     img <gui_img>

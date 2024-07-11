@@ -49,7 +49,7 @@ RTKIOT GUI
   控件 <widgets/index>
   移植 <Porting/index>
   集成和驱动 <integration/index>
-  示例 <example/index>
+  示例 <sample/index>
   工具 <tool/index>
   设计说明 <Design/index>
   常见问题 <FAQ/index>

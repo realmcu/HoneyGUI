@@ -42,10 +42,10 @@ RTKIOT GUI
 
   Get Started <get-started/index>
   Application <GUI-APP/index>
-  widgets <widgets/index>
+  Widgets <widgets/index>
   Porting <Porting/index>
   Integration and Drivers <integration/index>
-  Example <example/index>
+  Samples <sample/index>
   Tool <tool/index>
   Design Spec<Design/index>
   FAQ <FAQ/index>

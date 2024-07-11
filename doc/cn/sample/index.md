@@ -1,4 +1,4 @@
-# **示例**
+# 示例
 
 为了帮助用户熟悉使用该环境，我们提供了一些示例应用程序。这些示例程序会不断增加，您可以从以下配置中选择适合您的配置，配置文件为：menu_config.h。
 
@@ -14,9 +14,9 @@ GUI_INIT_APP_EXPORT(app_init);
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
-    示例计算器应用程序 <Calculator/Demo>
-    示例86box应用程序 <86box/86box>
+    计算器 <Calculator/Demo>
+    86box <86box/86box>
     状态栏 <Status bar>
 ```

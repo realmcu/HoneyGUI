@@ -1,7 +1,6 @@
-# **Tool**
+# Tool
 
-In UI design, two main tools are used: image conversion tool and font conversion tool. Next, we provide the usage methods of these two tools.
-
+In UI design, it is necessary to use Image Convert Tool or Font Convert Tool to convert images or fonts into binary files. Then, Pack Tool is used to package all the UI resource files, and finally, MP Tool is used for burning. The following text will introduce the usage of these four tools.
 
 <!-- Add tool downlod link here -->
 
@@ -10,8 +9,8 @@ In UI design, two main tools are used: image conversion tool and font conversion
 .. toctree::
     :hidden:
 
-    How to prepare image resource <Resource/image>
-    How to prepare font resource <Resource/font>
-    How to packing resource <Resource/packing>
-    How to download resource <Resource/download>
+    Image Convert Tool <Resource/image>
+    Font Convert Tool <Resource/font>
+    Pack Tool <Resource/packing>
+    MP Tool <Resource/download>
 ```
