@@ -631,12 +631,6 @@ static void gui_img_virtual_dc_update(struct gui_dispdev *dc)
 
 static void gui_img_virtual_dc_update_root_size(struct gui_dispdev *dc)
 {
-    if (dc->virtual_lcd_update != NULL)
-    {
-        dc->virtual_lcd_update(dc);
-        return;
-    }
-
     float scale = 1;
     uint16_t w = dc->target_w * scale;
     uint16_t h = dc->target_h * scale;
