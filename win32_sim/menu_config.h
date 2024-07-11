@@ -66,6 +66,10 @@
 // #define CONFIG_REALTEK_BUILD_GUI_240_240_DEMO
 // </c>
 
+// <c> RTK GUI Demo 240 320
+// #define CONFIG_REALTEK_BUILD_GUI_240_320_DEMO
+// </c>
+
 // <c> RTK GUI Demo 368 448 FileSystem
 // #define CONFIG_REALTEK_BUILD_GUI_448_368_FILESYSTEM_DEMO
 // </c>
