@@ -1,8 +1,9 @@
 # Tab
+<br>
 
-The tab widget enables you to create an unlimited number of tabs in both the x and y axes of the screen.Before integrating the tab widget, you must first establish a tabview widget to house the tabs.The direction of the generated tabs is denoted by idx and idy.
+选项卡控件`(tab)`是一种创建在x轴或者y轴上的控件，理论上来说可以创建无数个选项卡控件。选项卡控件的生成方向由idx和idy来表示，idx表示x轴方向，idy表示y轴方向，在建立选项卡控件之前必须要建立一个选项卡视图控件`(tabview)`来容纳这些选项卡。
 
-For an introduction to idx and idy, please refer to:
+关于idx和idy的介绍，请参阅：
 
 ```eval_rst
 `tabview`_
@@ -11,13 +12,15 @@ For an introduction to idx and idy, please refer to:
 
 ```
 
-## Usage
+## 用法
 
-### Create tab widget
-[gui_tab_create(parent, x, y, w, h, idx, idy)](#gui_tab_create) is used to create a tab widget, where idx and idy represent the direction of the created tab.
+### 创建选项卡控件
 
-### Set tab style
-If you wish to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_create) setting. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
+使用 [gui_tab_create(parent, x, y, w, h, idx, idy)](#gui_tab_create) 函数创建选项卡控件，其中idx和idy表示创建选项卡控件的方向。
+
+### 设置选项卡切换风格
+
+如果想要在切换不同的选项卡控件时，展现不同的切换效果，可以使用 [gui_tab_set_style(this, style)](#gui_tab_create) 函数来设置。在默认情况下使用经典风格，切换效果有以下几种：
 
 ```c
 typedef enum t_slide_style
@@ -30,11 +33,11 @@ typedef enum t_slide_style
 } T_SLIDE_STYLE;
 ```
 
-## Example
+## 示例
 
-### Example for tab
+### 选项卡控件示例
 
-The style of tab switching can be personalized, allowing developers to utilize the function [gui_tabview_set_style(this, style)](#gui_tabview_set_style) to set the tab style to either REDUCTION, CLASSIC,FADE, or REDUCTION_FADE. The FADE style adjusts the transparency of the tab during the switching process, whereas the REDUCTION_FADE style alters both the image size and transparency during the tab switching process. For this example, we have designated the first three tabs as CALSSIC style, and the last three tabs as REDUCTION_FADE style.
+选项卡切换的样式可以自定义，开发者可以使用 [gui_tabview_set_style(this, style)](#gui_tabview_set_style) 这个函数设置选项卡的切换风格。如 REDUCTION、CLASSIC、FADE 或 REDUCTION_FADE。FADE 样式表示在切换过程中调整选项卡的透明度，而 REDUCTION_FADE 样式则可以在选项卡切换过程中同时改变图像大小和透明度。在这个例子中，我们将前三个选项卡指定为 CLASSIC 样式，后三个选项卡指定为 REDUCTION_FADE 样式。
 
 ```c
 #include <gui_tabview.h>
@@ -87,9 +90,9 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 <br>
 
-### Example for tabview
+### 选项卡视图控件(tabview)示例
 
-In tabview, [gui_tabview_set_style(this, style)](#gui_tabview_set_style) can be utilized to standardize all tab switching styles. For instance, you can set all tab styles to either CLASSIC, FADE, REDUCTION or REDUCTION_FADE. The example below demonstrates the switch to REDUCTION style, which is defaulted to CLASSIC style.
+不同于单个选项卡的风格切换，在选项卡视图控件`(tabview)`中可以使用 [gui_tabview_set_style(this, style)](#gui_tabview_set_style)  来统一所有选项卡的切换样式。例如，可以将所有选项卡的样式设置为 CLASSIC、FADE、REDUCTION 或 REDUCTION_FADE。下面的例子展示了如何切换到 REDUCTION 样式，默认情况下是 CLASSIC 样式。
 
 ```c
 #include <gui_tabview.h>
@@ -136,8 +139,9 @@ static void app_hongkong_ui_design(gui_app_t *app)
 <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tabview.gif" width = "300" /></div>
 <br>
 
-### Example for tabview loop
-Within the tab view, the function [gui_tabview_loop(tabview, loop_or_not)](#gui_tabview_create) (please reference tabview) can be utilized to determine whether the tabs should cycle through continuously. The ` loop_or_not ` parameter, which is of the bool type, specifies whether you wish to enable the looping display feature.
+### 选项卡循环显示示例
+
+在选项卡视图中，可以使用函数 [gui_tabview_loop(tabview, loop_or_not)](#gui_tabview_create) (请参考 tabview) 来决定选项卡是否连续循环切换和显示。loop_or_not 参数是布尔类型，用于指定是否希望启用循环显示功能，如果是true，则选项卡将会循环显示，如果是false，则选项卡将不会循环显示。
 
 ```c
 #include <gui_tabview.h>
@@ -187,7 +191,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 <span id="gui_tab_create">
 
-## API
+## 接口函数
 
 </span>
 
