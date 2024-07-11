@@ -16,8 +16,8 @@ GUI_INIT_APP_EXPORT(app_init);
 .. toctree::
     :maxdepth: 2
 
-    示例计算器应用程序 <Calculator/Demo>
-    示例86box应用程序 <86box/86box>
-	示例LiteGFX应用程序 <LiteGFX/Demo>
+    计算器应用程序 <Calculator/Demo>
+    86box应用程序 <86box/86box>
+    LiteGFX应用程序 <LiteGFX/Demo>
     状态栏 <Status bar>
 ```

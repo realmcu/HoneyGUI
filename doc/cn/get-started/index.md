@@ -23,7 +23,7 @@ GUI框架具有很强的可移植性，可以在多种芯片和操作系统上�
 ## 软件架构
 
 
-<div style="text-align: center"><img width= "600" src ="HoneyGUI.png"/></div><br/>
+<div style="text-align: center"><img width= "600" src ="https://foruda.gitee.com/images/1720700131929539160/ec0dbbb9_1860080.png"/></div><br/>
 
 
 ## 安装
