@@ -15,17 +15,15 @@ static void canvas_cb_black(gui_canvas_t *canvas)
 {
     NVGcontext *vg = canvas->vg;
 
-    NVGpaint fillPaint = nvgLinearGradient(vg, 20, 256, 20 + 200, 256 + 180, nvgRGB(255, 0, 0),
-                                           nvgRGB(0, 0, 255));
 
-    nvgRect(vg, 20, 256, 200, 180);
+    nvgRect(vg, 20, 20, 200, 180);
 
     nvgStrokeWidth(vg, 8.0f);
     nvgStrokeColor(vg, nvgRGB(255, 0, 0));
     nvgStroke(vg);
 
     nvgFillColor(vg, nvgRGBA(0, 255, 0, 200));
-    // nvgFillPaint(vg, fillPaint);
+
     nvgFill(vg);
 
 }
