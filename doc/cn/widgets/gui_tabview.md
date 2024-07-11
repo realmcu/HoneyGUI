@@ -1,51 +1,52 @@
-# Tabview
+# 选项卡视图
+<br>
 
-The gui_tabview widget is the container to store and depends on user selection to change the tab for different functions. As in Figure-1, the "Green Area" represents the actual display region, and there're five rectangles with the red dashed line as the whole gui_tabview area. And each rectangle is the gui_tab widget. The "idx" stands for the index on the X-axis, and the "idy" stands for the index on Y-axis.
+选项卡视图控件`(tabview)`小部件是一个用于存储选项卡的容器，并根据用户选择切换并显示不同的选项卡。如图 1 所示，“绿色区域”代表实际显示区域，五个带有红色虚线的矩形是整个选项卡视图控件 `(tabview)` 区域。每个矩形是选项卡控件 `(tab)` 。"idx" 表示 X 轴上的索引，"idy" 表示 Y 轴上的索引。
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1700117108278339023/652a6a38_10641540.png" /></center>
-<center>Figure-1</center>
-<br>
+<center>图-1</center>
 
-## Usage
+## 用法
 
-### Create tabview widget
-If developers need to construct a container to house tabs, they may utilize the [gui_tabview_create(parent, filename, x, y, w, h)](#gui_tabview_create) function to establish a tabview.
+### 创建选项卡视图
 
-### Switch the gui_tab
+开发者在创建选项卡控件`(tab)`时，需要先构建一个容器来容纳选项卡页，也就是选项卡视图 `(tabview)` 控件, 需要使用 [gui_tabview_create(parent, filename, x, y, w, h)](#gui_tabview_create) 这个函数来创建一个选项卡视图容器。
 
-[gui_tabview_jump_tab(parent_tabview, idx, idy)](#gui_tabview_create ) is used to set up a jump to a specified tab, and through this function, users can quickly locate the desired tab.
+### 选项卡切换
 
-### Set tabview style
-Developers can use [gui_tabview_set_style(this, style)](#gui_tabview_create) to set the desired style of tabview. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
+在使用过程中，默认情况下选项卡页的切换一般是通过左右或者上下滑动进行，如果用户希望快速切换到某一个指定的选项卡页时，就需要使用 [gui_tabview_jump_tab(parent_tabview, idx, idy)](#gui_tabview_create ) 这个函数来实现。该函数可以实现跳转到指定选项卡页的功能，并通过 idx 和 idy 来指定选项卡页的位置。
 
-```c
-typedef enum t_slide_style
-{
-    CLASSIC,
-    REDUCTION,
-    FADE,
-    REDUCTION_FADE,
-    STACKING,
-} T_SLIDE_STYLE;
+### 设置选项卡切换风格
+
+开发者可以使用 [gui_tabview_set_style(this, style)](#gui_tabview_create) 来设置所需的选项卡视图样式。默认情况下，使用的是经典样式`(CLASSIC)`。具体的切换风格请参考下列枚举：
+
+```eval_rst
+
+.. literalinclude:: ../../../gui_engine/widget/gui_tabview.h
+   :language: c
+   :start-after: /* T_SLIDE_STYLE enum start*/
+   :end-before: /* T_SLIDE_STYLE enum end*/
+
 ```
 
-### Set tabview loop
-The tabview loop function is a nifty feature that allows you to effortlessly traverse through all tabs that have been created. By enabling this function using [gui_tabview_loop(tabview, loop_or_not)](#gui_tabview_create), as indicated in Figure-2, you'll notice a blue outer box indicating the visible range of the screen. The arrow's direction signifies the direction of tab switching. When sliding left, once all tabs have shifted to the left side of the visible range, another leftward swipe will initiate cycling from the leftmost tab that was created. Conversely, Figure-3 demonstrates that when sliding right again, the display will begin cycling from the rightmost tab.
+### 设置选项卡循环显示
+
+选项卡视图循环功能是一项巧妙的特性，可以让用户轻松地遍历所有已创建的选项卡页。通过使用 [gui_tabview_loop_x(tabview, loop)](#gui_tabview_create) 启用x反向的循环显示功能，[gui_tabview_loop_y(tabview, loop)](#gui_tabview_create) 启用y反向的循环显示功能，如图2所示，可以看到蓝色的外框表示当前屏幕的可使选项卡控件。箭头的方向表示选项卡切换的方向。当向左滑动时，一旦所有选项卡都移至可见范围的左侧，再次左滑将从最左侧已创建的选项卡开始循环。相反，如图3所示，当再次向右滑动时，显示将从最右侧的选项卡开始循环。
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118586546869079/2d4816ec_10641540.png" /></center>
-<center>Figure-2</center>
+<center>图-2</center>
 <br>
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118609354334424/c6a664b2_10641540.png" /></center>
-<center>Figure-3</center>
+<center>图-3</center>
 <br>
 
-## Example
+## 示例
 
-Please refer to the page below:
+请参考以下示例代码：
 
 ```eval_rst
 `tab`_
