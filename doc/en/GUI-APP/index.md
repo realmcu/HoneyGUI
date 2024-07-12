@@ -3,11 +3,13 @@
   +  The GUI framework diagram is shown in the figure below:
   
   
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1703071724612530370/974a550f_10088396.png" alt="app fw.png"></div><br/>
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1720764399046158372/8fde9e89_1860080.png" alt="app fw.png"></div><br/>
 
-  +  Each APP consists of a thread, a control tree, and event trigger callbacks (optional).
-  +  The GUI_SERVER traverses the widgets according to the refresh instruction, renders the frame buffer, executes the trigger callback, schedules the app and other operations.
-  +  APP can be installed, opened, closed, uninstalled and switched.
+  +  In each project, multiple applications (APPs) can exist simultaneously, but only one application can be in a running state at any given time, while the other applications will be in a suspended state.
+  +  When using different rendering engines, the upper-layer implementation of the application (APP) will vary.
+  +  Each app can create its own dedicated thread, or it may choose not to.
+  +  The app can be installed, opened, closed, uninstalled, and switched.
+  +  The GUI_SERVER performs operations such as traversing controls according to refresh instructions, rendering the frame buffer, executing trigger callbacks, and scheduling apps.
 
 
 ```eval_rst
