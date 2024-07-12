@@ -2,6 +2,8 @@
 
 The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.STB image widgets support bmp, jpg, png, gif, etc.
 
+In the STB image library, STB is not an acronym; it is actually a naming convention used to identify a series of single-file libraries developed by Sean T. Barrett. The STB image library `(stb_image.h)` is one of these libraries and is used to load and store various common image formats.
+
 ## Usage
 
 ### Create widget

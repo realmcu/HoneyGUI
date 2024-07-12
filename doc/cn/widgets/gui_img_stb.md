@@ -1,18 +1,21 @@
-# STB Image
+# STB 图像
+<br>
 
-The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.STB image widgets support bmp, jpg, png, gif, etc.
+STB图像控件是用于显示图像的基本控件。可以设置左、中、右三种图像，中间的图像将会重复以匹配对象的宽度，STB图像控件支持 bmp、jpg、png、gif 等格式。
 
-## Usage
+在 STB 图像库中，STB 并不是一个缩写，而是一个命名惯例，用于标识由 Sean T. Barrett 开发的一系列单文件库。STB 图像库`（stb_image.h）` 是其中之一，用于加载和存储多种常见的图像格式。
 
-### Create widget
+## 用法
 
-You can use [gui_img_stb_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) to create an STB image widget from memory.Please confirm that the type and size are correct.
+### 创建控件
 
-### Set attribute
+使用[gui_img_stb_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) 从内存中创建一个STB图像控件，注意需要确保类型和大小是正确的。
 
-You can use [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) to set the attribute of an STB image widget, replace it with a new file and set a new coordinate.
+### 设置属性
 
-## Example
+使用 [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) 来设置STB图像控件的属性，可以设置新的文件和新的坐标。
+
+## 示例
 
 <details> <summary>code</summary>
 
