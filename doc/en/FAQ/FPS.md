@@ -10,7 +10,7 @@ Use hardware acceleration to render images instead of software acceleration when
 
 ## Data transmission speed
 
-The speed of data transfer will also affect the drawing speed of the HoneyGUI, so ensure the bandwidth and frequency of the memory.
+HoneyGUI supports image compression, and some chips have built-in hardware decompression modules. Using hardware decompression modules is very fast, but software decompression requires a certain amount of time. Compressed images can reduce the size of the original image resources, allowing more resources to be stored in user data, and will also reduce the time needed to read from flash.
 
 ## UI design
 

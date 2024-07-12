@@ -2,7 +2,6 @@
 
 使用GUI过程中产生的一些常见问题，可参考本章节。
 
-
 ```eval_rst
 .. toctree::
     :hidden:
