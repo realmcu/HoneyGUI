@@ -385,6 +385,10 @@ static void gui_text_prepare(gui_obj_t *obj)
         break;
     }
 
+    if (obj->not_show)
+    {
+        this->refresh = false;
+    }
 
     last = this->checksum;
     this->checksum = 0;
