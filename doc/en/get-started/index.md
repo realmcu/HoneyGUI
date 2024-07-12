@@ -57,7 +57,7 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
 <div style="text-align: center"><img width= "600"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
 
 
-### Startup by GUI
+### Startup by VSCode
 
 #### Install VSCode
    - [Download VSCode](https://code.visualstudio.com/)

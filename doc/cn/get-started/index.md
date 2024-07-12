@@ -57,7 +57,7 @@ GUI框架具有很强的可移植性，可以在多种芯片和操作系统上�
 <div style="text-align: center"><img width= "600"  src ="https://foruda.gitee.com/images/1718704649306452668/282ac763_13408154.png"/></div><br/>
 
 
-### 通过GUI启动
+### 通过VSCode启动
 
 #### 安装VSCode
    - [下载VSCode](https://code.visualstudio.com/)
