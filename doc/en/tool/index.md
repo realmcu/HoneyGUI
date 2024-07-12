@@ -7,7 +7,7 @@ In UI design, it is necessary to use Image Convert Tool or Font Convert Tool to 
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     Image Convert Tool <Resource/image>
     Font Convert Tool <Resource/font>

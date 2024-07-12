@@ -13,9 +13,9 @@ GUI_INIT_APP_EXPORT(app_init);
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
-    Calculator <Calculator/Demo>
-    86box <86box/86box>
+    Calculator Application <Calculator/Demo>
+    86box Application <86box/86box>
     Status bar <Status bar>
 ```

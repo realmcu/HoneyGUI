@@ -4,7 +4,6 @@ widgets
 ==================                   ==================
 Widgets                              Brief
 ------------------                   ------------------
-`glossary`_                          Widgets glossary
 `obj`_                               The root widget of the widget tree
 `window`_                            A rectangular container widget
 `img`_                               Display image on the screen
@@ -34,7 +33,6 @@ Widgets                              Brief
 `canvas_arc`_                        Display a arc
 ==================                   ==================
 
-.. _glossary: widgets_glossary.html
 .. _obj: gui_obj.html
 .. _window: gui_window.html
 .. _img: gui_img.html
@@ -63,6 +61,7 @@ Widgets                              Brief
 .. _menu cellular: gui_menu_cellular.html
 .. _return: gui_return.html
 .. _qbcode: qbcode.html
+
 .. toctree::
     :maxdepth: 2
 

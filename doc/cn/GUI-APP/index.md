@@ -14,7 +14,7 @@
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     使用C/C++设计应用程序 <Native/Native>
     使用LVGL设计应用程序 <LVGL/fwk_app_lvgl>

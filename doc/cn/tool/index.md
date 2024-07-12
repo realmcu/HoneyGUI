@@ -8,7 +8,7 @@
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     图像转换工具 <Resource/image>
     字体转换工具 <Resource/font>

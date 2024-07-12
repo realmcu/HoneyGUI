@@ -14,7 +14,7 @@
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     Use C/C++ Design An Application <Native/Native>
     Use LVGL Design An Application <LVGL/fwk_app_lvgl>

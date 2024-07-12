@@ -4,7 +4,7 @@ Some common problems that arise during the use of GUI can be referred to in this
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     Development environment FAQ <environment>
     Porting FAQ <porting>

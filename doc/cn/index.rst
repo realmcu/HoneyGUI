@@ -1,5 +1,3 @@
-PDF版本: :download:`RTKIOT GUI.pdf <RTKIOT GUI.pdf>`
-
 RTKIOT GUI
 ==========================================
 .. include_开始标签
@@ -43,16 +41,18 @@ RTKIOT GUI
 
 
 .. toctree::
+   :maxdepth: 2
 
-  入门指南 <get-started/index>
-  应用程序 <GUI-APP/index>
-  控件 <widgets/index>
-  移植 <Porting/index>
-  集成和驱动 <integration/index>
-  示例 <sample/index>
-  工具 <tool/index>
-  设计说明 <Design/index>
-  常见问题 <FAQ/index>
+   入门指南 <get-started/index>
+   应用程序 <GUI-APP/index>
+   控件 <widgets/index>
+   移植 <Porting/index>
+   示例 <sample/index>
+   工具 <tool/index>
+   设计说明 <Design/index>
+   常见问题 <FAQ/index>
+   获取PDF <get-pdf/index>
+   专业术语 <Glossary>
 
 
 

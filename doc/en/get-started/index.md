@@ -18,7 +18,7 @@ Here are several common methods for APP development:
 - Directly call ARM-2D APIs to develop applications.
 - Front-end development using JavaScript and XML. It is recommended to use RVisualDesigner as a PC-based design tool for low-code development.
 
-The GUI framework has good portability, which can run on a variety of chips and OS. PC Windows version is provided.
+The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run on a variety of chips and OS. PC Windows version is provided.
 
 ## Software Architecture
 

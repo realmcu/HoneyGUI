@@ -6,7 +6,7 @@
 
 
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     概览 <overview>
     输入 <input>

@@ -4,7 +4,7 @@
 
 ```eval_rst
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     开发环境常见问题 <environment>
     移植常见问题 <porting>

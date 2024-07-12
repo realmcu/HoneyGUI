@@ -6,7 +6,7 @@ This section describes the workflow of the Smart UI system, which involves the p
 
 
 .. toctree::
-    :hidden:
+    :maxdepth: 2
 
     overview <overview>
     input <input>
