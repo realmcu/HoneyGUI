@@ -28,6 +28,11 @@
 #include "gui_canvas_rect.h"
 #include "gui_app.h"
 #include "gui_api.h"
+#if TARGET_RTL8773E
+#include "wchar.h"
+#include "ff.h"
+#endif
+
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -82,6 +87,13 @@
 #endif
 #define PATH404 "map/icon/404.jpg"
 typedef long off_t;
+
+#if TARGET_RTL8773E
+static const TCHAR    *plus_fil_pth             = (const TCHAR *)_T("map/icon/plus.bin");
+static const TCHAR    *minus_fil_pth            = (const TCHAR *)_T("map/icon/minus.bin");
+static const TCHAR    *gps_fil_pth              = (const TCHAR *)_T("map/icon/GPS.bin");
+static const TCHAR    *path404_fil_pth          = (const TCHAR *)_T("map/icon/404.jpg");
+#endif
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -148,15 +160,26 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
         {
             generateTileURL(x, y, zoom);
             //gui_log("Relative coordinates: (%d, %d)\n", (x - startX)*tile_size, (y - startY)*tile_size);
-#if _WIN32 || RTL8772F
+#if _WIN32 || RTL8772F || TARGET_RTL8773E
             typedef long off_t;
+
+#if TARGET_RTL8773E
+            char path_temp[100];
+            TCHAR path[100];
+            uint16_t path_len = 0;
+            memset(path, 0, 100);
+            memset(path_temp, 0, 100);
+            sprintf(path_temp, "map/%d/%d/%d/tile.jpg", zoom, x, y);
+            path_len = (strlen(path_temp) + 1) * 2;
+            mbstowcs(path, path_temp, path_len);
+#else
             char path[100];
             memset(path, 0, 100);
             sprintf(path, "%s/map/%d/%d/%d/tile.jpg", ROOT_PATH, zoom,
                     x, y);
+#endif
             int fd;
-            fd = gui_fs_open(path, 0);
-
+            fd = gui_fs_open((const char *)path, 0);
             char *jpg = 0;
             off_t filesize = 0;
 
@@ -173,8 +196,13 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
             {
                 //gui_log("open %s Fail!\n", path);
                 memset(path, 0, 100);
+#if TARGET_RTL8773E
+                uint16_t path404_path_len = wcslen(path404_fil_pth);
+                memcpy((uint8_t *)path, path404_fil_pth, path404_path_len * 2);
+#else
                 sprintf(path, "%s/%s", ROOT_PATH, PATH404);
-                fd = gui_fs_open(path, 0);
+#endif
+                fd = gui_fs_open((const char *)path, 0);
                 if (fd <= 0)
                 {
                     return;
@@ -255,15 +283,26 @@ static void ctor(gui_map_t *this, gui_obj_t *parent)
 }
 static void load_new_tile(map_tile_t *tile, int16_t zoom)
 {
-#if _WIN32 || RTL8772F
+#if _WIN32 || RTL8772F || TARGET_RTL8773E
     typedef long off_t;
+#if TARGET_RTL8773E
+    char path_temp[100];
+    TCHAR path[100];
+    uint16_t path_len = 0;
+    memset(path, 0, 100);
+    memset(path_temp, 0, 100);
+    sprintf(path_temp, "map/%d/%d/%d/tile.jpg",
+            zoom, tile->x, tile->y);
+    path_len = (strlen(path_temp) + 1) * 2;
+    mbstowcs(path, path_temp, path_len);
+#else
     static char path[100];
     memset(path, 0, 100);
     sprintf(path, "%s/map/%d/%d/%d/tile.jpg", ROOT_PATH,
             zoom, tile->x, tile->y);
+#endif
     int fd;
-    fd = gui_fs_open(path, 0);
-
+    fd = gui_fs_open((const char *)path, 0);
     char *jpg = 0;
     off_t filesize = 0;
     if (fd > 0)
@@ -279,9 +318,13 @@ static void load_new_tile(map_tile_t *tile, int16_t zoom)
     {
         gui_log("open %s Fail!\n", path);
         memset(path, 0, 100);
+#if TARGET_RTL8773E
+        uint16_t path404_path_len = wcslen(path404_fil_pth);
+        memcpy((uint8_t *)path, path404_fil_pth, path404_path_len * 2);
+#else
         sprintf(path, "%s/%s", ROOT_PATH, PATH404);
-        fd = gui_fs_open(path,
-                         0);
+#endif
+        fd = gui_fs_open((const char *)path, 0);
         if (fd <= 0)
         {
             return;
@@ -523,7 +566,7 @@ static void free_for_rgb(void *p)
 {
 #ifdef _WIN32
     gui_free(p);
-#elif defined RTL8772F
+#elif defined RTL8772F || TARGET_RTL8773E
     gui_lower_free(p);
 #else
     gui_free(p);
@@ -604,7 +647,11 @@ gui_map_t *gui_map_create(void *parent)
     {
         for (size_t j = 0; j < 3; j++)
         {
+#if TARGET_RTL8773E
+            this->tile[i][j].img = gui_img_stb_create_from_mem(win, 0, 0, 0, JPEG, RGB565, 0, 0);
+#else
             this->tile[i][j].img = gui_img_stb_create_from_mem(win, 0, 0, 0, JPEG, RGB888, 0, 0);
+#endif
         }
     }
     generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);
@@ -613,7 +660,12 @@ gui_map_t *gui_map_create(void *parent)
         {
             static char path[100];
             memset(path, 0, 100);
+#if TARGET_RTL8773E
+            uint16_t plus_path_len = wcslen(plus_fil_pth);
+            memcpy((uint8_t *)path, plus_fil_pth, plus_path_len * 2);
+#else
             sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/plus.bin");
+#endif
             int fd;
             fd = gui_fs_open(path, 0);
 
@@ -642,7 +694,12 @@ gui_map_t *gui_map_create(void *parent)
 
             static char path[100];
             memset(path, 0, 100);
+#if TARGET_RTL8773E
+            uint16_t minus_path_len = wcslen(minus_fil_pth);
+            memcpy((uint8_t *)path, minus_fil_pth, minus_path_len * 2);
+#else
             sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/minus.bin");
+#endif
             int fd;
             fd = gui_fs_open(path, 0);
 
@@ -671,7 +728,12 @@ gui_map_t *gui_map_create(void *parent)
 
             static char path[100];
             memset(path, 0, 100);
+#if TARGET_RTL8773E
+            uint16_t gps_path_len = wcslen(gps_fil_pth);
+            memcpy((uint8_t *)path, gps_fil_pth, gps_path_len * 2);
+#else
             sprintf(path, "%s/%s", ROOT_PATH, "/map/icon/GPS.bin");
+#endif
             int fd;
             fd = gui_fs_open(path, 0);
 
