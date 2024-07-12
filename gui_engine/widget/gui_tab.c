@@ -389,25 +389,29 @@ static void gui_tab_ctor(gui_tab_t  *this,
     this->normal.x = 0;
     this->normal.y = 0;
     this->normal.z = -1.0f;
+    if (!(idx != 0 && idy != 0))
+    {
+        parent_ext->tab_cnt++;
+        if (idx > 0)
+        {
+            parent_ext->tab_cnt_right++;
+        }
+        else if (idx < 0)
+        {
+            parent_ext->tab_cnt_left--;
+        }
 
-    parent_ext->tab_cnt++;
-    if (idx > 0)
-    {
-        parent_ext->tab_cnt_right++;
-    }
-    else if (idx < 0)
-    {
-        parent_ext->tab_cnt_left--;
+        if (idy > 0)
+        {
+            parent_ext->tab_cnt_down++;
+        }
+        else if (idy < 0)
+        {
+            parent_ext->tab_cnt_up--;
+        }
     }
 
-    if (idy > 0)
-    {
-        parent_ext->tab_cnt_down++;
-    }
-    else if (idy < 0)
-    {
-        parent_ext->tab_cnt_up--;
-    }
+
 }
 
 /*============================================================================*
