@@ -1,46 +1,41 @@
-# Watchface_gradient
+# 表盘渐变
+<br>
 
-The watchface_gradient widget allows you to create a pointer watchface with a scanning effect for each pointer.
+表盘渐变是指具有指针扫描效果的指针表盘控件。
 
-## Usage
+## 用法
 
-### Create watchface_gradient widget
+### 创建控件
 
-If you want to create a new watchface_gradient widget, please call the function [gui_watchface_gradient_create(parent, name, x, y, w, h)](#gui_watchface_gradient_create) to achieve it.
+使用 [gui_watchface_gradient_create(parent, name, x, y, w, h)](#gui_watchface_gradient_create) 函数创建具有扫描效果的指针表盘控件。
 
-## Example
+## 示例
 
-```c
-#include "gui_img.h"
-#include "root_image_hongkong/ui_resource.h"
-#include "gui_win.h"
-#include "gui_watch_gradient_spot.h"
-#include "gui_text.h"
-#include "gui_watchface_gradient.h"
-#include "gui_cardview.h"
-#include "gui_card.h"
-#include "gui_tab.h"
-#include "gui_app.h"
-gui_win_t *win_watch;
-gui_img_t *img;
-gui_watch_gradient_spot_t *watch;
-gui_text_t *rate;
-static gui_watchface_gradient_t *canvas;
-gui_tabview_t *tablist_tab;
+<details> <summary>code</summary>
 
-void page_ct_clock(void *parent)
-{
-    win_watch = gui_win_create(parent, "win", 0, 0, 368, 448);
-    gui_obj_add_event_cb(win_watch, (gui_event_cb_t)callback_touch_long, GUI_EVENT_TOUCH_LONG, NULL);
-    img = gui_img_create_from_mem(parent, "page0", CLOCKN_BIN, 0, 0, 0, 0);
-    watch = gui_watch_gradient_spot_create(win_watch, "watchface", 0, 0, 0, 0);
-    gui_watch_gradient_spot_set_center(watch, 368 / 2, 448 / 2);
-    canvas = gui_watchface_gradient_create(parent, "watchface_gradient", (368 - 368) / 2,
-                                           (448 - 448) / 2, 368, 448);
-    GET_BASE(watch)->not_show = true;
-    GET_BASE(canvas)->not_show = true;
-}
+```eval_rst
+.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_ct_clock.c
+   :language: c
+   :start-after: /* watchface_watch_gradient_spot demo start*/
+   :end-before: /* watchface_watch_gradient_spot demo end*/
+
+.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_tablist.c
+   :language: c
+   :start-after: /* watchface start*/
+   :end-before: /* watchface end*/
+
+.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_ct_clock.c
+   :language: c
+   :start-after: /* callback_touch_long start*/
+   :end-before: /* callback_touch_long end*/
+
+.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_ct_clock.c
+   :language: c
+   :start-after: /* page_ct_clock start*/
+   :end-before: /* page_ct_clock end*/
 ```
+
+</details>
 
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931787525761928/f8a2202f_10641540.png" width = "300" /></div>
