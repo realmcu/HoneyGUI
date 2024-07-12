@@ -536,13 +536,30 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
 
 
 }
+/* app swap animation callback of the next app*/
 #include "gui_menu_cellular.h"
-
+#include "math.h"
+static void menu_win_ani_cb(void *args, gui_win_t *win)
+{
+    float pro = win->animate->progress_percent;
+    win->scale = sinf(pro * (M_PI / 2 - 0.2f) + 0.2f);
+    win->scale_y = sinf(pro * (M_PI / 2 - 0.2f) + 0.2f);
+    GUI_BASE(win)->opacity_value = (pro) * UINT8_MAX;
+    if (win->animate->end_frame)
+    {
+        win->scale = 0;
+        win->scale_y = 0;
+    }
+}
 static void app_menu(gui_app_t *app)
 {
     /**
      * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
     */
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
+    GUI_API(gui_win_t).animate(win, 2000, 0, menu_win_ani_cb,
+                               0);//aniamtion start to play at app startup
+    /* app swap animation configration of the next app*/
     uint32_t *array[] =
     {
         I4500009_BIN,
@@ -593,11 +610,11 @@ static void app_menu(gui_app_t *app)
         I4500020_BIN,
 
     };
-    gui_menu_cellular_t *cell = gui_menu_cellular_create(GUI_APP_ROOT_SCREEN, 100, array,
+    gui_menu_cellular_t *cell = gui_menu_cellular_create(win, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
-    status_bar(GUI_APP_ROOT_SCREEN, (void *)cell);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+    status_bar(win, (void *)cell);
+    gui_return_create(win, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)cell);
 }
 #include "gui_seekbar.h"

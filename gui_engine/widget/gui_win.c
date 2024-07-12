@@ -247,7 +247,6 @@ static void gui_win_prepare(gui_obj_t *obj)
             matrix_scale(this->scale, this->scale_y, GET_BASE(obj)->matrix);
         }
         matrix_translate(GET_BASE(obj)->w / -2, GET_BASE(obj)->h / -2, GET_BASE(obj)->matrix);
-        this->scale = 0;
     }
     if (this->hold_tp)
     {
@@ -405,6 +404,7 @@ _GUI_API_ASSIGN(gui_win_t)
 .on_click = gui_win_click,
  .on_press = gui_win_press,
   .on_release = gui_win_release,
+   .animate = gui_win_set_animate,
 };
 /** End of WIDGET_Exported_Functions
   * @}

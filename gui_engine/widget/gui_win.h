@@ -185,6 +185,11 @@ _GUI_API_DEFINE(gui_win_t)
 void (*on_click)(gui_win_t *this, void *event_cb, void *parameter);
 void (*on_press)(gui_win_t *this, void *event_cb, void *parameter);
 void (*on_release)(gui_win_t *this, void *event_cb, void *parameter);
+void (*animate)(gui_win_t     *this,
+                uint32_t      dur,
+                int           repeat_count,
+                void          *callback,
+                void          *p);
 _GUI_API_DECLARE(gui_win_t)
 #ifdef __cplusplus
 }

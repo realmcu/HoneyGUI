@@ -50,6 +50,7 @@ static gui_app_t app_watch_ui =
         .y    = 0,
         .parent = NULL,
         .matrix = NULL,
+        .type = SCREEN,
     },
     .ui_design = design_app_watch_ui,
     .thread_entry = NULL,

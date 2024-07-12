@@ -565,7 +565,21 @@ void gui_obj_skip_other_right_hold(gui_obj_t *obj)
     gui_obj_skip_all_child_right_hold(o);
     obj->skip_tp_right_hold = false;
 }
+gui_obj_t *gui_get_root(gui_obj_t *object)
+{
+    gui_obj_t *o = object;
 
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+    if (o->type == SCREEN)
+    {
+        return o;
+    }
+    return 0;
+
+}
 void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
 {
     gui_list_t *node = NULL;
