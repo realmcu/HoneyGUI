@@ -52,6 +52,7 @@ extern "C" {
 #pragma anon_unions
 #endif
 
+/* perspective imgfile structure start*/
 typedef struct
 {
     IMG_SOURCE_MODE_TYPE src_mode[6];                    //!< flag: indicate file src
@@ -61,6 +62,7 @@ typedef struct
         void *data_addr[6];              //!< images memory address
     };
 } gui_perspective_imgfile_t;
+/* perspective imgfile structure end*/
 
 typedef struct gui_perspective
 {

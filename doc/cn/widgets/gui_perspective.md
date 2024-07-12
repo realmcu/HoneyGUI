@@ -1,97 +1,49 @@
-# Perspective
+# 透视
+<br>
 
-The perspective is a hexagonal prism-like widget that uses six tabs as column faces. The prism will automatically rotate to show all tabs. A single click allows the user to quick jump to the current tab.
+透视控件是一个六面体形状的控件，由六个标签页作为六个面。当创建好透视控件后，该控件会自动旋转来显示不同的标签页，在旋转的同时也可以点击不同的标签页实现快速跳转到当前标签页。
 
-## Usage
+## 用法
 
-### Create perspective widget
-[gui_perspective_t *gui_perspective_create(void *parent,  const char *name, gui_perspective_imgfile_t *img_file, int16_t x, int16_t y)](#gui_perspective_create) is used to create a perspective widget. The `img_file` is an struct including image sources for the six pages. Both memory address and file path are supported, `uint8_t flg_fs` should be set `true` when using filesystem.
+### 创建透视控件
 
-### Set image mode
-By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, you can change the blend mode of image by calling [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#api).
+使用 [gui_perspective_t *gui_perspective_create(void *parent,  const char *name, gui_perspective_imgfile_t *img_file, int16_t x, int16_t y)](#gui_perspective_create) 函数创建透视控件。`img_file`是一个包含六个标签页的图像资源的结构体。创建透视控件时，六个标签页的图片资源可以使用内存地址或文件路径，`gui_perspective_imgfile_t` (参考如下结构体) 中的字段 src_mode 表明了图片资源是来自内存地址还是文件路径，如示例中展示，`src_mode` 为 `IMG_SRC_MEMADDR` 时表示图片资源来自内存地址。
 
-### Set cube image
-The images of cube can be configured by calling [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#api).
+```eval_rst
 
-## Example
+.. literalinclude:: ../../../gui_engine/widget/gui_perspective.h
+   :language: c
+   :start-after: /* perspective imgfile structure start*/
+   :end-before: /* perspective imgfile structure end*/
 
-```c
-#include "root_image_hongkong/ui_resource.h"
-#include "gui_perspective.h"
-#include "gui_canvas.h"
-#include "gui_win.h"
-#include "gui_obj.h"
-#include "gui_app.h"
-#include <gui_tabview.h>
-#include "app_hongkong.h"
+```
 
-extern gui_tabview_t *tv;
-gui_perspective_t *img_test;
+### 设置透视控件的图片
 
-static void canvas_cb_black(gui_canvas_t *canvas)
-{
-    nvgRect(canvas->vg, 0, 0, 368, 448);
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 255));
-    nvgFill(canvas->vg);
-}
+使用 [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#api) 函数设置透视控件的图片。
 
-static void callback_prism_touch_clicked()
-{
-    gui_app_t *app = get_app_hongkong();
-    gui_obj_t *screen = &(app->screen);
-    int angle = img_test->release_x;
-    if (img_test->release_x < 0)
-    {
-        angle = img_test->release_x + 360;
-    }
-    angle = (angle % 360) / (360 / 6);
-    if (angle < 0 || angle > 5)
-    {
-        angle = 0;
-    }
+### 设置图片混合模式
 
-    gui_obj_tree_free(screen);
-    app->ui_design(get_app_hongkong());
+默认情况下，透视控件的图像混合模式为`IMG_SRC_OVER_MODE`，调用 [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#api) 函数可以设置图像的混合模式。混合模式`BLEND_MODE_TYPE`枚举类型如下：
 
+```eval_rst
 
-    gui_tabview_jump_tab(tv, angle, 0);
-}
+.. literalinclude:: ../../../gui_engine/engine/draw_img.h
+   :language: c
+   :start-after: /* BLEND_MODE_TYPE structure start*/
+   :end-before: /* BLEND_MODE_TYPE structure end*/
 
-void callback_prism(void *obj, gui_event_t e)
-{
-    gui_app_t *app = get_app_hongkong();
-    gui_obj_t *screen = &(app->screen);
+```
 
-    gui_obj_tree_free(screen);
+## 示例
 
-    gui_win_t *win = gui_win_create(screen, "win", 0, 0, 368, 448);
-    gui_canvas_t *canvas = gui_canvas_create(win, "canvas", 0, 0, 0, 368, 448);
-    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
-    gui_perspective_imgfile_t imgfile =
-    {
-        .flg_fs = true,
-        .img_path[0] = "Clockn.bin",
-        .img_path[1] = "Weather.bin",
-        .img_path[2] = "Music.bin",
-        .img_path[3] = "QuickCard.bin",
-        .img_path[4] = "HeartRate.bin",
-        .img_path[5] = "Activity.bin"
-    };
-    //// using memory address
-    // gui_perspective_imgfile_t imgfile =
-    // {
-    //     .flg_fs = false,
-    //     .data_addr[0] = CLOCKN_BIN,
-    //     .data_addr[1] = WEATHER_BIN,
-    //     .data_addr[2] = MUSIC_BIN,
-    //     .data_addr[3] = QUICKCARD_BIN,
-    //     .data_addr[4] = HEARTRATE_BIN,
-    //     .data_addr[5] = ACTIVITY_BIN
-    // };
-    img_test = gui_perspective_create(canvas, "test", &imgfile, 0, 0);
+```eval_rst
 
-    gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,NULL);
-}
+.. literalinclude:: ../../../gui_engine/example/screen_448_368/app_prism.c
+   :language: c
+   :start-after: /* perspective example start*/
+   :end-before: /* perspective example end*/
+
 ```
 
 <br>

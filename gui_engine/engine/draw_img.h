@@ -39,7 +39,7 @@ typedef enum
     RTKARGB8565 = 15,
 } GUI_FormatType;
 
-
+/* BLEND_MODE_TYPE structure start*/
 typedef enum
 {
     IMG_BYPASS_MODE = 0,
@@ -48,6 +48,7 @@ typedef enum
     IMG_COVER_MODE,
     IMG_RECT,
 } BLEND_MODE_TYPE;
+/* BLEND_MODE_TYPE structure end*/
 
 typedef enum
 {
