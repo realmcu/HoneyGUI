@@ -18,6 +18,7 @@ sub_git_group_env = 'subGitGroup'
 sub_git_path_env = 'subGitPath'
 
 
+
 honeyRepo_uitl_dir = os.path.join(os.environ.get(honeyRepo_env), "build", "utils")
 
 print("repo home: ", os.environ[honeyRepo_env])
