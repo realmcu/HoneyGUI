@@ -1,20 +1,20 @@
-##  Demo: Develop a "Calculator APP"
-### Introduction
-This example demostrates how to develop a simple "Calculator APP", from which you can learn and understand the basic methods and processes of developing a ui application.
-The "Calculator" works just like a traditional calculator, using button widget for user input and text widget for display. Watch the demo video below to see its full functionality.
+##  示例：开发一个 “计算器 APP”
+### 简介
+本示例通过演示如何开发一个简单的 “计算器 APP”，来介绍设计开发 UI APP的基本方法和流程。示例中的 “计算器 APP” 其功能和传统的计算器功能一致，应用使用 "button" 控件来获取用户输入，用 "text" 控件来显示输入内容和计算结果。请观看以下演示视频来了解完整功能。
 
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1706089242549970186/448f9137_10641540.gif " width = "300" /></div>
 <br>
 
-### Source File
-To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
+### 源文件
+为了帮助学习和熟悉基本的开发流程，开发者可以在路径 `gui\gui_engine\example\` 下获取该示例的源文件 `app_calculator.c`。
 
 
-### Two Steps 
-__Step 1:  Declare the app structure__
+### 只需两步
+__步骤 1:  声明 APP 的结构体__
 
-The app structure saves all the information of ui. Developers should initialize the app structure with the app name and ui design function.
+
+APP 结构体保存了 UI 的所有信息，开发者应该使用 APP 名称和 UI 设计函数完成初始化。
 
 ```c
 #include <gui_app.h>
@@ -37,9 +37,9 @@ gui_app_t *get_app_calculator(void)
     return &calculator;
 }
 ```
-__Step 2:  Declare the app ui design function__
+__步骤 2:  定义 APP ui_design 函数__
 
-The app ui design function adds all the widgets required to form a complex ui. In this example, we add a window widgets and draw the calculator ui. 
+APP ui_design 函数包含了复杂 UI 的所有控件创建及其配置。在本示例 APP 中，我们加入一个 "window" 控件，并将所有的 "button" 控件和 "text" 控件都其作为子控件完成整个 APP UI 设计。
 
 ```c
 static void app_calculator_ui_design(gui_app_t *app)
@@ -47,7 +47,7 @@ static void app_calculator_ui_design(gui_app_t *app)
     gui_win_t *win = gui_win_create(&app->screen, "back_win", 0, 0, gui_get_screen_width(),
                                     gui_get_screen_height());
 
-    gui_calculator_create(&app->screen, "calculator", 0, 0, 454, 454);
+    gui_calculator_create(win, "calculator", 0, 0, 454, 454);
 }
 ```
 

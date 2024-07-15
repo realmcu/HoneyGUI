@@ -47,7 +47,7 @@ static void app_calculator_ui_design(gui_app_t *app)
     gui_win_t *win = gui_win_create(&app->screen, "back_win", 0, 0, gui_get_screen_width(),
                                     gui_get_screen_height());
 
-    gui_calculator_create(&app->screen, "calculator", 0, 0, 454, 454);
+    gui_calculator_create(win, "calculator", 0, 0, 454, 454);
 }
 ```
 
