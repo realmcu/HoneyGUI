@@ -1,14 +1,15 @@
-# Page
+# 页面
+<br>
 
-The page widget enables developers to establish a column of additional controls along the y-axis. These controls are permitted to extend beyond the screen's display boundary. Users can access these controls by swiping up or down.
+页面控件是一个容器控件，可以让开发人员能够沿着 y 轴建立一个额外控制的列，创建页面控件后，可以在该控件上添加其他的控件，如按钮控件，图片控件等等，页面控件可以超出屏幕显示边界，用户可以通过向上或向下滑动来访问添加到页面控件上的其他控件。
 
-## Usage
+## 使用方法
 
-### Create page widget
+### 创建控件
 
-Developers can utilize the [gui_page_create(parent, filename, x, y, w, h)](#gui_page_create) function to establish a page widget. The page widget is a container oriented vertically, allowing the addition of other widgets to it. The height of the page widget is determined by the number of widgets added to it.
+开发者可以使用 [gui_page_create(parent, filename, x, y, w, h)](#gui_page_create) 函数来创建一个页面控件。页面控件是一个垂直排列的容器，允许向其中添加其他控件，页面控件的高度由添加的控件数量决定，当添加的其他控件越多时，其高度也就越高。
 
-## Example
+## 示例
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
