@@ -33,16 +33,46 @@ The memory consumption statistics of this demo are as follows
 
 ### Widget memory usage
 
-| Widget | Memory(Byte)  |
-|---|---|
-|win |104|
-|img |248|
-|switch |384|
-|text |128|
-|page  |128|
-|tabview |120|
-|tab |104|
-|curtainview |152|
-|curtain |104|
-|button |408|
-|seekbar |416|
+| Widget | Memory(Byte) on ARM SoC | Memory(Byte) on Win_32 SIM |
+|---|---|---|
+|obj | 52| 88|
+|img | 112|178|
+|win | 72|112|
+|page | 124|184|
+|tab | 88|136|
+|tabview | 100|160|
+|button | 88|160|
+|text | 100|176|
+|scroll_text | 120|200|
+|app | 92|152|
+|canvas_arc | 156|264|
+|canvas_rect | 64|104|
+|canvas | 60|104|
+|card | 72|112|
+|cardview | 124|176|
+|colorwheel | 72|112|
+|cube | 748|928|
+|curtain | 60|96|
+|curtainview | 120|168|
+|gallery | 112|184|
+|grid | 100|144|
+|img_live | 84|144|
+|img_scope | 124|192|
+|stb_img | 76|144|
+|kb | 108|192|
+|map | 196|272|
+|menu_cellular | 76|120|
+|multi_level | 60|104|
+|pagelist | 96|160|
+|pagelistview | 64|112|
+|perspective | 736|920|
+|progressbar | 80|136|
+|qbcode | 84|136|
+|scroll_wheel | 388|696|
+|seekbar | 128|216|
+|simple_img | 68|120|
+|svg | 96|144|
+|turn_table | 128|192|
+|watch_gradient_spot | 60|96|
+|wave | 72|112|
+|wheel_list | 64|112|

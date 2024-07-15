@@ -12,10 +12,6 @@ JS(javascript)包含在GUI模块中，JS使用的堆空间可能会受到资源�
 
 GUI任务不支持喂狗功能，因此应用程序应在APP注册的hook函数中进行喂狗操作，并由GUI使用。注册函数为 `void gui_task_ext_execution_sethook(void (*hook)(void))`.
 
-## 创建Magic image
-
-如果SoC不支持GPU，在创建Magic Image时，应该改用普通的图像创建api，具体信息请参考 `gui_magic_img_t *xml_gui_img_creat_from_mem(void *parent,  const char *name, void *addr,int16_t x, int16_t y)`.
-
 ## 不支持FPU
 
 如果SoC不支持FPU，一些头文件和代码不应该包含在内，例如RTL8763EP。
