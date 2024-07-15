@@ -565,7 +565,7 @@ gui_map_t *gui_map_create(void *parent)
     {
         for (size_t j = 0; j < 3; j++)
         {
-            this->tile[i][j].img = gui_img_stb_create_from_mem(win, 0, 0, 0, JPEG, 0, 0);
+            this->tile[i][j].img = gui_img_stb_create_from_mem(win, 0, 0, 0, JPEG, RGB888, 0, 0);
         }
     }
     generateTilesForWindow(windowWidth, windowHeight, center_lat, center_lon, zoom, this);

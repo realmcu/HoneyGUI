@@ -26,7 +26,7 @@
 #include "acc_sw_rle_filter.h"
 
 
-#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H)
+#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H)  && !defined(RTL8762E)
 #define __FPU_PRESENT                  1            /* FPU present                                                             */
 #include "arm_math.h"
 #else
@@ -35,7 +35,7 @@
 
 void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 {
-#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H)
+#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H) && !defined(RTL8762E)
     arm_fill_q15(pixel, (int16_t *)addr, len);
 #endif
 #if defined(_MSC_VER) || (defined(__GNUC__))
@@ -47,7 +47,7 @@ void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 }
 void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
 {
-#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H)
+#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H) && !defined(RTL8762E)
     arm_fill_q31(pixel, (int32_t *)addr, len);
 #endif
 #if defined(_MSC_VER) || (defined(__GNUC__))

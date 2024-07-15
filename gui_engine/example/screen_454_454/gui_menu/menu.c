@@ -24,7 +24,7 @@ static void release_animate_callback(gui_win_t *button);
 static void deal_win_in_page(gui_obj_t *object, int page_y);
 static void page_callback(gui_page_t *page);
 static void heart_rate_cb(void);
-static void menu_cb(void);
+static void menu_cb(gui_obj_t *obj);
 static void stopwatch_cb(void);
 static void map_cb(void);
 static void card_cb(void);
@@ -32,6 +32,7 @@ static void box2d_cb(void);
 static void compass_cb(void);
 static void volume_cb(void);
 static void cycle_tracking_cb(void);
+static void setting_cb();
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -69,13 +70,46 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
         }
     }
 }
+#include "math.h"
+/* app swap animation callback of the first app*/
+static void win_ani_cb(void *args, gui_win_t *win)
+{
+    // Calculate the progress percentage of the animation
+    float pro = win->animate->progress_percent;
 
+    // Adjust the scale of the window based on sine function of the progress percentage
+    // This will create a smooth scaling effect as the progress advances
+    win->scale = 1 + sinf(pro * M_PI / 2);
+    win->scale_y = 1 + sinf(pro * M_PI / 2);
+
+    // Ensure the scope property is set to 1 (used to indicate visibility)
+    win->scope = 1;
+
+    // Set the opacity of the window's base GUI element, gradually decreasing as the animation progresses
+    // This creates a fading effect by setting opacity inversely proportional to the progress percentage
+    GUI_BASE(win)->opacity_value = (1.0f - pro) * UINT8_MAX;
+
+    // Check if the animation has reached its last frame
+    if (win->animate->end_frame)
+    {
+        // Shutdown the GUI application
+        gui_app_shutdown(get_app_watch_ui());
+    }
+}
+
+#define MENU_WIN_NAME "menu win name"
 void design_tab_menu(void *parent)
 {
-    gui_canvas_rect_create(parent, "canvas_rect", 0, 0, gui_get_screen_width(), gui_get_screen_height(),
+    gui_win_t *win = gui_win_create(parent, MENU_WIN_NAME, 0, 0, 0, 0);
+    GUI_API(gui_win_t).animate(win, 2000, 0, win_ani_cb, 0);
+    win->animate->animate =
+        0;//aniamtion start to play until win->animate->animate == 1 (on button click event)
+    /* app swap animation configration of the first app*/
+    gui_canvas_rect_create((void *)win, "canvas_rect", 0, 0, gui_get_screen_width(),
+                           gui_get_screen_height(),
                            gui_rgba(UINT8_MAX,
                                     UINT8_MAX, UINT8_MAX, 100));
-    gui_page_t *page = gui_page_create(parent, 0, 0, 0, 0, 0);
+    gui_page_t *page = gui_page_create(win, 0, 0, 0, 0, 0);
     //gui_page_rebound(page, 1);
     GET_BASE(page)->obj_cb = gui_page_cb;
     GET_BASE(page)->has_input_prepare_cb = true;
@@ -84,7 +118,7 @@ void design_tab_menu(void *parent)
     GET_BASE(page)->y = page_y_recode;
     page_y_recode = 0;
     gui_page_set_animate(page, 1000, -1, page_callback, page);
-    pro = gui_progressbar_movie_create(parent, (void *)scrollbar_array, SCROLLBAR_SIZE, 435, 200);
+    pro = gui_progressbar_movie_create(win, (void *)scrollbar_array, SCROLLBAR_SIZE, 435, 200);
     gui_img_set_mode((void *)pro->c, IMG_SRC_OVER_MODE);
     //gui_page_rebound(page, true);
     gui_page_center_alignment(page, MENU_GAP);
@@ -114,7 +148,7 @@ void design_tab_menu(void *parent)
         "Compass",
         "Volume",
         "Cycle tracking",
-        "Sport",
+        "Setting",
         "Watch Face",
         "Calculator",
         "Sport",
@@ -141,7 +175,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 9)
+        if (i < 10)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -161,6 +195,7 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[6], compass_cb,        button_array[6]);
     gui_win_click(button_array[7], volume_cb,         button_array[7]);
     gui_win_click(button_array[8], cycle_tracking_cb, button_array[8]);
+    gui_win_click(button_array[9], setting_cb,        button_array[9]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -337,10 +372,24 @@ static void heart_rate_cb()
     GUI_APP_STARTUP(APP_HEART_RATE) // cppcheck-suppress unknownMacro
     gui_app_layer_top();
 }
-static void menu_cb()
+/* The first app's nimation starts playing on click event*/
+static void menu_cb(gui_obj_t *obj)
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MENU))
+    // Retrieve the window object with the name specified by MENU_WIN_NAME from the root of the GUI tree
+    gui_win_t *win = 0;
+    gui_obj_tree_get_widget_by_name(gui_get_root(obj), MENU_WIN_NAME, (void *)&win);
+
+    // If the window object is found, enable its animation by setting the animate flag to 1
+    if (win)
+    {
+        win->animate->animate = 1;
+    }
+    GUI_APP_STARTUP(APP_MENU);  // Start up the menu application(NEXT APP)
+
+    // Bring the next application layer to the top, ensuring it's displayed above the first app layer
+    gui_app_layer_top();
 }
+/* In the button click callback, execute the next app startup.*/
 static void stopwatch_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_STOPWATCH))
@@ -368,6 +417,10 @@ static void volume_cb()
 static void cycle_tracking_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CYCLE_TRACKING))
+}
+static void setting_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_SETTING))
 }
 // static void calculator_cb()
 // {

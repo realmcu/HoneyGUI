@@ -89,7 +89,7 @@ void compare_img_szie(void *msg)
 {
     AUTO_TEST_LOG("gui_test_case_img_000 START!");
     LOG_SIZEOF(img);
-    if (sizeof(gui_img_t) > GUI_IMG_T_SIZE)
+    if (sizeof(gui_img_t) <= GUI_IMG_T_SIZE)
     {
         AUTO_TEST_LOG("gui_test_case_img_000 PASS!");
     }
@@ -103,10 +103,20 @@ void gui_test_case_img_000(void)
     gui_server_exec_cb(compare_img_szie);
 }
 
+void auto_test_finish(void *msg)
+{
+    AUTO_TEST_LOG("auto_test_finish!");
+}
+void gui_auto_test_finish(void)
+{
+    gui_server_exec_cb(auto_test_finish);
+}
+
 void auto_test(void *msg)
 {
     gui_test_case_obj_000();
     gui_test_case_img_000();
+    gui_auto_test_finish();
 }
 void cmd_auto_test_start(void)
 {

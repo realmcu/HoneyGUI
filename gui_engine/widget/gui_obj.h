@@ -546,6 +546,13 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
  * @param root
  */
 void gui_obj_tree_print_bfs(gui_obj_t *root);
+/**
+ * @brief  print name by bfs order
+ *
+ * @param object widget pointer
+ * @return gui_obj_t * root
+ */
+gui_obj_t *gui_get_root(gui_obj_t *object);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

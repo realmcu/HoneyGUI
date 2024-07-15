@@ -1,3 +1,3 @@
-# **Product example**
+# Product example
 
 

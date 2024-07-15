@@ -9,6 +9,8 @@
 import os
 
 from datetime import datetime
+
+ROOT_BASE = os.path.abspath(os.path.dirname(__file__))
  
 html_context = {
     'current_year': datetime.now().year, # Set the Copyright year of footer
@@ -26,8 +28,32 @@ release = 'v0.0.0.1'
 extensions = ["breathe", 
               "myst_parser", 
               "sphinx_rtd_theme",
+              "sphinx.ext.intersphinx",
               "sphinxcontrib.mermaid",
               "sphinx_copybutton"]
+
+myst_enable_extensions = [
+    # "amsmath",
+    "attrs_block",
+    "attrs_inline",
+    "colon_fence",
+    # "deflist",
+    # "dollarmath",
+    # "fieldlist",
+    # "html_admonition",
+    # "html_image",
+    "linkify",
+    # "replacements",
+    # "smartquotes",
+    # "strikethrough",
+    # "substitution",
+    # "tasklist",
+]
+
+intersphinx_mapping = {
+    'api_en': ('', (os.path.join(ROOT_BASE, '_build', 'en', 'html', 'objects.inv'), None)),
+    'api_cn': ('', (os.path.join(ROOT_BASE, '_build', 'cn', 'html', 'objects.inv'), None)),
+}
 
 exclude_patterns = []
 
@@ -63,7 +89,7 @@ html_js_files = [
     'js/versions.js'
 ]
 
-html_logo = './_static/image/bbpro-h55px.jpg'
+html_logo = './_static/image/logo.png'
 html_favicon = "./_static/image/favicon.ico"
 
 html_theme = 'sphinx_rtd_theme'

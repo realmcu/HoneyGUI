@@ -352,7 +352,7 @@ void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
-    int rect_w = rect->x2 - rect->x1;
+    int rect_w = rect->x2 - rect->x1 + 1;
     switch (text->mode)
     {
     case LEFT:
@@ -372,7 +372,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 {
                     chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
                 }
-                if ((chr[i].x + chr[i].char_w) >= rect->x2)
+                if ((chr[i].x + chr[i].char_w - 1) > rect->x2)
                 {
                     text->font_len = i;
                     break;
@@ -400,7 +400,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 {
                     chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
                 }
-                if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
+                if ((chr[i].x + chr[i].char_w - 1) > rect->x2 || chr[i - 1].unicode == 0x0A)
                 {
                     line_buf[line].line_char = i - 1;
                     line_buf[line].line_dx = (rect_w - chr[i].x + rect->x1) / 2 * (text->mode - 3);
@@ -466,7 +466,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 {
                     chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
                 }
-                if ((chr[i].x + chr[i].char_w) > rect->x2 || chr[i - 1].unicode == 0x0A)
+                if ((chr[i].x + chr[i].char_w - 1) > rect->x2 || chr[i - 1].unicode == 0x0A)
                 {
                     line++;
                     chr[i].x = rect->x1;

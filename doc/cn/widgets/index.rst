@@ -4,7 +4,6 @@
 ==================                   ==================
 控件                                 简介
 ------------------                   ------------------
-`专业术语`_                          控件专业术语
 `对象 (obj)`_                        控件树的根控件
 `窗口 (window)`_                     矩形容器控件
 `图像 (img)`_                        屏幕上显示图像
@@ -34,7 +33,6 @@
 `画布弧形 (canvas_arc)`_             显示一个弧形
 ==================                   ==================
 
-.. _专业术语: widgets_glossary.html
 .. _对象 (obj): gui_obj.html
 .. _窗口 (window): gui_window.html
 .. _图像 (img): gui_img.html
@@ -62,10 +60,10 @@
 .. _菜单单元格 (menu_celllar): gui_menu_cellular.html
 .. _返回 (return): gui_return.html
 .. _二维码和条形码 (qbcode): qbcode.html
+
 .. toctree::
     :maxdepth: 2
 
-    专业术语 <widgets_glossary>
     对象 (obj) <gui_obj>
     窗口 (window) <gui_window>
     图像 (img) <gui_img>

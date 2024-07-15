@@ -176,6 +176,9 @@ static gui_obj_t *gui_obj_get_by_level_order_hide(gui_obj_t *root, int target_le
                 int child_order = ++level_order[child_level];
                 queue[rear].level = child_level;
                 queue[rear].order = child_order;
+                gui_log("child_level:%d, child_order:%d\n", child_level, child_order);
+                GUI_TYPE(gui_multi_level_t, child_obj)->index = child_order - 1;
+                GUI_TYPE(gui_multi_level_t, child_obj)->level = child_level - 1;
                 ++rear;
                 if (GUI_TYPE(gui_multi_level_t, child_obj)->hidden == 0)
                 {
@@ -203,7 +206,7 @@ static void jump(gui_multi_level_t  *this, int level, int index)
     }
     gui_multi_level_t *rst = 0;
     tree_child_free(root);
-    rst = (gui_multi_level_t *)gui_obj_get_by_level_order_hide(root, level, index);
+    rst = (gui_multi_level_t *)gui_obj_get_by_level_order_hide(root, ++level, ++index);
     rst->ui_design((void *)rst);
 }
 /*============================================================================*

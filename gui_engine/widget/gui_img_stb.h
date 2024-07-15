@@ -63,7 +63,8 @@ typedef struct gui_img_stb
     gui_obj_t base;
     gui_img_t *img;
     bool src_changed;
-    GUI_FormatType image_format;
+    GUI_FormatType input_format;
+    GUI_FormatType output_format;
     void *data_buffer;
     uint32_t data_length;
     gui_gif_info_t *gif_info;
@@ -173,7 +174,8 @@ void gui_img_stb_set_attribute_static(gui_stb_img_t  *this,
  * @param name The widget's name.
  * @param addr The data address of image.
  * @param size The data size of image.The unit is bytes.
- * @param type The type of image. bmp 11, jpeg 12, png 13,
+ * @param input_type The input type of image. bmp 11, jpeg 12, png 13,
+ * @param output_type The output type of image. RGB565 RGB888,
  * @param x The X-axis coordinate of the text box.
  * @param x The Y-axis coordinate of the text box.
  * @return gui_stb_img_t*
@@ -182,9 +184,18 @@ gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
                                            const char     *name,
                                            void           *addr,
                                            uint32_t        size,
-                                           GUI_FormatType  type,
+                                           GUI_FormatType  input_type,
+                                           GUI_FormatType  output_type,
                                            int16_t         x,
                                            int16_t         y);
+
+/**
+ * @brief set output_format
+ * @note RGB565 or RGB888
+ * @param this stb image widget
+ * @param output output format
+ */
+void gui_img_stb_set_output_format(gui_stb_img_t  *this, GUI_FormatType output);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

@@ -95,6 +95,7 @@ struct gui_app
                                        .screen =\
                                                 {\
                                                  .name = #APP_NAME,\
+                                                 .type = SCREEN,\
                                                 },\
                                        .ui_design = UI_DESIGN,\
                                        .active_ms = 1000000,\

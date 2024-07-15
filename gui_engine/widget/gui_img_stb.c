@@ -87,21 +87,67 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static void rgb888_to_rgb565(const uint8_t *src, uint8_t *dst, size_t source_w, size_t source_h)
+{
+    const uint8_t *rgb888_data = src;
+    uint16_t *rgb565_data = (uint16_t *)(dst);
+
+    for (size_t i = 0; i < source_w * source_h; i++)
+    {
+        uint8_t r = rgb888_data[3 * i + 2];
+        uint8_t g = rgb888_data[3 * i + 1];
+        uint8_t b = rgb888_data[3 * i + 0];
+
+        uint16_t r5 = (r >> 3) & 0x1F;
+        uint16_t g6 = (g >> 2) & 0x3F;
+        uint16_t b5 = (b >> 3) & 0x1F;
+
+        rgb565_data[i] = (r5 << 11) | (g6 << 5) | b5;
+    }
+}
+
 static uint8_t *gui_img_stb_decode_image(gui_stb_img_t *img)
 {
+    if (img == NULL || img->data_buffer == NULL || img->data_length <= 0)
+    {
+        return NULL; // Argument check
+    }
     uint8_t *output;
     int source_w = 0, source_h = 0, num_components = 0;
     gui_rgb_data_head_t head;
+    int head_len = sizeof(gui_rgb_data_head_t);
+    if (img->output_format == RGB888)
+    {
+        output = stbi_load_from_memory(img->data_buffer, img->data_length, &source_w, &source_h,
+                                       &num_components, 0);
+        GUI_ASSERT(output != NULL);
+        memset(&head, 0x0, sizeof(head));
+        head.w = source_w;
+        head.h = source_h;
+        head.type = RGB888;
+        memcpy(output, &head, sizeof(head));
 
-    output = stbi_load_from_memory(img->data_buffer, img->data_length, &source_w, &source_h,
-                                   &num_components, 0);
-    memset(&head, 0x0, sizeof(head));
-    head.w = source_w;
-    head.h = source_h;
-    head.type = RGB888;
-    memcpy(output, &head, sizeof(head));
+        return output;
+    }
+    else if (img->output_format == RGB565)
+    {
+        output = stbi_load_from_memory(img->data_buffer, img->data_length, &source_w, &source_h,
+                                       &num_components, 0);
+        GUI_ASSERT(output != NULL);
+        uint8_t *rgb565_buf = gui_malloc(source_w * source_h * 2 + head_len);
+        GUI_ASSERT(rgb565_buf != NULL);
+        rgb888_to_rgb565(output + head_len, rgb565_buf + head_len, source_w, source_h);
 
-    return output;
+        memset(&head, 0x0, sizeof(head));
+        head.w = source_w;
+        head.h = source_h;
+        head.type = RGB565;
+        memcpy(rgb565_buf, &head, sizeof(head));
+
+        gui_free(output);
+        return rgb565_buf;
+    }
+    return NULL;
 }
 
 static void gui_img_stb_modify_img(gui_obj_t *obj)
@@ -115,14 +161,14 @@ static void gui_img_stb_modify_img(gui_obj_t *obj)
         return;
     }
 #ifdef TJPG
-    if (img->image_format == JPEG)
+    if (img->input_format == JPEG)
     {
         return;
     }
 #endif
-    if ((img->image_format != JPEG)
-        && (img->image_format != BMP)
-        && (img->image_format != PNG))
+    if ((img->input_format != JPEG)
+        && (img->input_format != BMP)
+        && (img->input_format != PNG))
     {
         return;
     }
@@ -160,14 +206,14 @@ static void gui_img_stb_modify_img_static(gui_obj_t *obj)
         return;
     }
 #ifdef TJPG
-    if (img->image_format == JPEG)
+    if (img->input_format == JPEG)
     {
         return;
     }
 #endif
-    if ((img->image_format != JPEG)
-        && (img->image_format != BMP)
-        && (img->image_format != PNG))
+    if ((img->input_format != JPEG)
+        && (img->input_format != BMP)
+        && (img->input_format != PNG))
     {
         return;
     }
@@ -290,7 +336,7 @@ static void gui_img_tjpgd_image_prepare(gui_obj_t *obj)
 static void gui_img_tjpgd_image_draw(gui_obj_t *obj)
 {
     gui_stb_img_t *img = (gui_stb_img_t *)obj;
-    if (img->image_format != JPEG)
+    if (img->input_format != JPEG)
     {
         return;
     }
@@ -342,7 +388,8 @@ static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
                                       const char     *name,
                                       void           *addr,
                                       uint32_t        size,
-                                      GUI_FormatType  type,
+                                      GUI_FormatType  input_type,
+                                      GUI_FormatType  output_type,
                                       int16_t         x,
                                       int16_t         y)
 {
@@ -361,7 +408,8 @@ static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
     this->src_changed = true;
     this->data_buffer = addr;
     this->data_length = size;
-    this->image_format = type;
+    this->input_format = input_type;
+    this->output_format = output_type;
 }
 
 /*============================================================================*
@@ -370,14 +418,14 @@ static void gui_img_stb_from_mem_ctor(gui_stb_img_t  *this,
 void gui_img_stb_set_attribute(gui_stb_img_t  *this,
                                void           *addr,
                                uint32_t        size,
-                               GUI_FormatType  type,
+                               GUI_FormatType  input_type,
                                int16_t         x,
                                int16_t         y)
 {
     this->src_changed = true;
     this->data_buffer = addr;
     this->data_length = size;
-    this->image_format = type;
+    this->input_format = input_type;
     this->base.x = x;
     this->base.y = y;
     gui_img_stb_modify_img((gui_obj_t *)this);
@@ -385,23 +433,30 @@ void gui_img_stb_set_attribute(gui_stb_img_t  *this,
 void gui_img_stb_set_attribute_static(gui_stb_img_t  *this,
                                       void           *addr,
                                       uint32_t        size,
-                                      GUI_FormatType  type,
+                                      GUI_FormatType  input_type,
                                       int16_t         x,
                                       int16_t         y)
 {
     this->src_changed = true;
     this->data_buffer = addr;
     this->data_length = size;
-    this->image_format = type;
+    this->input_format = input_type;
     this->base.x = x;
     this->base.y = y;
     gui_img_stb_modify_img_static((gui_obj_t *)this);
 }
+
+void gui_img_stb_set_output_format(gui_stb_img_t  *this, GUI_FormatType output_type)
+{
+    this->output_format = output_type;
+}
+
 gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
                                            const char     *name,
                                            void           *addr,
                                            uint32_t        size,
-                                           GUI_FormatType  type,
+                                           GUI_FormatType  input_type,
+                                           GUI_FormatType  output_type,
                                            int16_t         x,
                                            int16_t         y)
 {
@@ -416,7 +471,8 @@ gui_stb_img_t *gui_img_stb_create_from_mem(void           *parent,
     GUI_ASSERT(img != NULL);
 
     memset(img, 0x00, sizeof(gui_stb_img_t));
-    gui_img_stb_from_mem_ctor(img, (gui_obj_t *)parent, name, addr, size, type, x, y);
+    gui_img_stb_from_mem_ctor(img, (gui_obj_t *)parent, name, addr, size, input_type, output_type, x,
+                              y);
 
     gui_list_init(&(GET_BASE(img)->child_list));
     if ((GET_BASE(img)->parent) != NULL)
