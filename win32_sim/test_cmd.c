@@ -9,22 +9,7 @@
  *
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include "gui_server.h"
-#include "unistd.h"
-#include "time.h"
-#include "gui_components_init.h"
-#include "gui_img.h"
-#include "shell.h"
-
-#define GUI_EXPORT_CMD(cmd, func_name) \
-    SHELL_EXPORT_CMD( \
-                      SHELL_CMD_PERMISSION(0) | SHELL_CMD_TYPE(SHELL_TYPE_CMD_FUNC) | SHELL_CMD_DISABLE_RETURN, \
-                      cmd, func_name, no_use);
-
-
+#include "test_cmd.h"
 
 void cmd_free_all(void)
 {

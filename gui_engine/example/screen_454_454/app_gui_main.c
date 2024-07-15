@@ -111,13 +111,15 @@ uint8_t resource_root[1024 * 1024 * 20];
 static int watch_app_init(void)
 {
 #if defined _WIN32
+#ifndef ENABLE_MONKEY_TEST
+    extern int read(int fd, void *buf, size_t len);
+#endif
     int fd;
     extern int open(const char *file, int flags, ...);
     fd = open("./gui_engine/example/screen_454_454/root_image/root(0x4400000).bin", 0);
     if (fd > 0)
     {
         printf("open root(0x4400000).bin Successful!\n");
-        extern int read(int fd, void *buf, size_t len);
         read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
@@ -135,3 +137,21 @@ static int watch_app_init(void)
 }
 
 GUI_INIT_APP_EXPORT(watch_app_init);
+
+#if defined _WIN32
+#ifdef ENABLE_MONKEY_TEST
+#include "test_cmd.h"
+void return_home(void *msg)
+{
+    tabview_main->cur_id.x = 0;
+    tabview_main->cur_id.y = 0;
+    gui_log("return_home done \n");
+}
+void cmd_return_home(void)
+{
+    gui_server_exec_cb(return_home);
+}
+GUI_EXPORT_CMD(return_home, cmd_return_home);
+#endif
+#endif
+
