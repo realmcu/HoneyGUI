@@ -109,6 +109,7 @@ typedef enum t_obj_type
     MACRO_MOTORIZED_CURTAIN  = 0x002B,
     MULTI_LEVEL              = 0x002C,
     U8G2                     = 0x002D,
+    MACRO_ONCLICK            = 0x002E,
 } T_OBJ_TYPE;
 typedef enum
 {
