@@ -1,8 +1,8 @@
-##  示例效果: 集成趣戴效果
+##  Sample: Integrate LiteGFX
 
-### 趣戴介绍
+### LiteGFX
 
-趣戴科技是一家依托自研LiteGfx框架，充分发挥各类芯片性能，为客户提供跨平台、一站式GUI解决方案及丰富绚丽特效产品的软件服务企业。通过自研2.5D特效框架，模拟实现3D技术并融合了粒子系统物理引擎技术，所有2.5D特效都内嵌于LiteGfx Designer，客户可轻松使用并进行个性化开发，为客户打造与众不同的视觉形象。趣戴科技将不断丰富公司在2.5D技术上的产品储备，助力客户在激烈的市场竞争中脱颖而出。其坚信优秀的视觉设计是提升企业品牌价值和市场竞争力的关键。
+QuDai Technology is a software service company that leverages its self-developed LiteGfx framework to fully harness the performance of various chips, providing customers with cross-platform, one-stop GUI solutions and a plethora of dazzling visual effects products. By utilizing our proprietary 2.5D effects framework, we simulate 3D technology and integrate particle system physics engine technology. All 2.5D effects are embedded within LiteGfx Designer, allowing customers to easily use and personalize them to create unique visual identities. QuDai Technology will continuously enrich its product portfolio in 2.5D technology, helping clients stand out in the fiercely competitive market. We firmly believe that excellent visual design is the key to enhancing a company's brand value and market competitiveness.
 
 
 
@@ -21,10 +21,10 @@
 
 
 
-### 源文件
-趣戴组件作为第三方库的形式集成到HoneyGUI中，并作为RealGUI 引擎的一个控件使用，包含核心lib，控件适配，平台支持三个部分:
+### Source Code
+QuDai components are integrated into HoneyGUI as a third-party library and used as a Widget in the RealGUI engine. This integration includes three main parts: core library, control adaptation, and platform support.
 
-相关代码路径：`HoneyGUI\gui_engine\3rd\litegfx`
+Source code path:`HoneyGUI\gui_engine\3rd\litegfx`
 
 
 ```eval_rst
@@ -62,18 +62,18 @@
                     lx_vglite_api.h
 
 ```
-#### 控件适配层
+#### Widget adaptation layer
 
-此目录下的代码是趣戴为了适配HoneyGUI 提供的wrapper 层代码。其中`gui_widget_litegfx.c/h` 为控件，`tab_` 开头的文件是示例代码，直接使用user可以
-参考示例代码实现自己的上层效果。注意，使用此方法本质仍然是通过RealGUI 调用引擎显示相关效果，此控件支持FrameBuffer 的分块方式。
+The code in this directory is a wrapper layer provided by QuDai to adapt to HoneyGUI. The files `gui_widget_litegfx.c/h` are for the widgets, while files starting with `tab_` are sample code. 
+Users can refer to these sample codes to implement their own upper-layer effects. Note that essentially, using this method still involves calling the RealGUI engine to display related effects. This widget supports the tiled approach for FrameBuffer.
 
-#### 平台适配层
+#### Platform adaptation layer
 
-此目录依据不同的平台重构了适配平台方便的一些接口，包括调试日志输出， 包括内存管理，包括重构一些C++ 函数，如new等，包括系统时间相关。
+This directory restructures some interfaces to accommodate different platforms for convenience. This includes debugging log output, memory management, the restructuring of some C++ functions like new, and system time-related functionalities.
 
-#### 核心lib
+#### Core lib
 
-提供window gcc 版本的liblx_vglite_gcc.a, 提供嵌入式环境版本lx_vglite.lib, 请注意编译器版本。
+It provides the Windows GCC version of `liblx_vglite_gcc.a` and the embedded environment version of `lx_vglite.lib`. Please pay attention to the compiler version.
 
 
 
