@@ -11,11 +11,11 @@
 
 #### Source code
 - In the animation frame callback, implement the animation effect of app switching(scaling and fading).
-- In the animation frame callback, when the animation is finished, shut down the app.
+- When the animation is finished, shut down the app.
 
 ```eval_rst
 
-.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/menu.c
+.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/menu_in_tab.c
    :language: c
    :start-after: /* app swap animation callback of the first app*/
    :end-before: /* app swap animation configration of the first app*/
@@ -26,7 +26,7 @@
 ```eval_rst
 
 
-.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/apps.c
+.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
    :language: c
    :start-after: /* app swap animation callback of the next app*/
    :end-before: /* app swap animation configration of the next app*/
@@ -37,7 +37,7 @@
 ```eval_rst
 
 
-.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/menu.c
+.. literalinclude:: ../../../../gui_engine/example/screen_454_454/gui_menu/menu_in_tab.c
    :language: c
    :start-after: /* The first app's nimation starts playing on click event*/
    :end-before: /* In the button click callback, execute the next app startup.*/

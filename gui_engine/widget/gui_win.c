@@ -400,12 +400,7 @@ gui_win_t *gui_win_create(void       *parent,
 
     return this;
 }
-_GUI_API_ASSIGN(gui_win_t)
-.on_click = gui_win_click,
- .on_press = gui_win_press,
-  .on_release = gui_win_release,
-   .animate = gui_win_set_animate,
-};
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

@@ -101,7 +101,7 @@ static void win_ani_cb(void *args, gui_win_t *win)
 void design_tab_menu(void *parent)
 {
     gui_win_t *win = gui_win_create(parent, MENU_WIN_NAME, 0, 0, 0, 0);
-    GUI_API(gui_win_t).animate(win, 2000, 0, win_ani_cb, 0);
+    gui_win_set_animate(win, 2000, 0, win_ani_cb, 0);
     win->animate->animate =
         0;//aniamtion start to play until win->animate->animate == 1 (on button click event)
     /* app swap animation configration of the first app*/

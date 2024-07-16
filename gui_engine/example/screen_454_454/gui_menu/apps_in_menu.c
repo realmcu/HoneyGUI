@@ -557,8 +557,8 @@ static void app_menu(gui_app_t *app)
      * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
     */
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
-    GUI_API(gui_win_t).animate(win, 2000, 0, menu_win_ani_cb,
-                               0);//aniamtion start to play at app startup
+    gui_win_set_animate(win, 2000, 0, menu_win_ani_cb,
+                        0);//aniamtion start to play at app startup
     /* app swap animation configration of the next app*/
     uint32_t *array[] =
     {
@@ -866,12 +866,12 @@ static void ui_design_1_0(gui_obj_t *parent)
         args.parent = (void *)parent;
         args.level = 2;
         args.index = 0;
-        GUI_API(gui_win_t).on_click(win, multi_levle_button_cb, &args);
+        gui_win_click(win, multi_levle_button_cb, &args);
         gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
                                                          GUI_BASE(win)->h,
                                                          APP_COLOR_WHITE);
-        GUI_API(gui_win_t).on_press(win, mydevice_button_press_cb, rect);
-        GUI_API(gui_win_t).on_release(win, mydevice_button_release_cb, rect);
+        gui_win_press(win, mydevice_button_press_cb, rect);
+        gui_win_release(win, mydevice_button_release_cb, rect);
         {
             char *text = "Device name";
             int font_size = 16;
@@ -912,12 +912,12 @@ static void ui_design_1_0(gui_obj_t *parent)
         args.parent = (void *)parent;
         args.level = 2;
         args.index = 1;
-        GUI_API(gui_win_t).on_click(win, multi_levle_button_cb, &args);
+        gui_win_click(win, multi_levle_button_cb, &args);
         gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
                                                          GUI_BASE(win)->h,
                                                          APP_COLOR_WHITE);
-        GUI_API(gui_win_t).on_press(win, mydevice_button_press_cb, rect);
-        GUI_API(gui_win_t).on_release(win, mydevice_button_release_cb, rect);
+        gui_win_press(win, mydevice_button_press_cb, rect);
+        gui_win_release(win, mydevice_button_release_cb, rect);
         {
             char *text = "Storage";
             int font_size = 16;
