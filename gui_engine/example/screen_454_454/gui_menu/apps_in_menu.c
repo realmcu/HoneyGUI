@@ -787,6 +787,7 @@ GUI_APP_ENTRY(APP_BOX2D)
 /**
  * @brief setting app (multi level)
 */
+/* define of ui_design_0 of (0,0)*/
 #include "gui_multi_level.h"
 #include "gui_button.h"
 #define HIGHLIGHT_BLUE gui_rgb(0, 100, 255)
@@ -833,6 +834,7 @@ static void ui_design_0(gui_obj_t *parent)
     gui_return_create(parent, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
+/* define of ui_design_1_0 of (1,0)*/
 static void mydevice_button_press_cb(gui_win_t *this, void *event, gui_canvas_rect_t *rect)
 {
     rect->color = HIGHLIGHT_BLUE;
@@ -1115,6 +1117,7 @@ static void ui_design_2_1(gui_obj_t *parent)
     gui_return_create(parent, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), setting_return_cb, (void *)0);
 }
+/* Create multi levels in 0~2 level*/
 GUI_APP_ENTRY(APP_SETTING)
 {
     gui_multi_level_t *m0 = gui_multi_level_create(GUI_APP_ROOT_SCREEN, 0, ui_design_0);//main
@@ -1123,8 +1126,8 @@ GUI_APP_ENTRY(APP_SETTING)
     gui_multi_level_t *m1_2 = gui_multi_level_create(m0, 0, ui_design_1_2);//bluetooth
     gui_multi_level_t *m2_0 = gui_multi_level_create(m1_0, 0, ui_design_2_0);//rename
     gui_multi_level_t *m2_1 = gui_multi_level_create(m1_0, 0, ui_design_2_1);//storage
-
 }
+/* GUI_APP_ENTRY(APP_SETTING) end */
 #include "math.h"
 #include <stdio.h>
 
