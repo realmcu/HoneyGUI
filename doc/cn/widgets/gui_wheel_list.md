@@ -1,42 +1,42 @@
-# Wheel list
+# 旋转列表
 
 <br/>
 
-## Overview
+## 概览
 
-The wheellist widget is an application list interface, mainly composed of application icons arranged in multiple circular layers. Each layer can rotate independently, and each icon can have an associated callback.
+旋转列表组件是一个应用程序列表界面，主要由多个圆形层排列的应用程序图标组成。每层可以独立旋转，每个图标都可以有一个关联的回调。
 
-## Usage
+## 使用方法
 
-### Create a wheel list
+### 创建一个旋转列表
 
-[gui_wheel_list_t *gui_wheel_list_create(void *parent, uint8_t layer, uint8_t radius, uint8_t distence)](#api) creates a wheel list widget.
+[gui_wheel_list_t *gui_wheel_list_create(void *parent, uint8_t layer, uint8_t radius, uint8_t distence)](#api) 用于创建一个旋转列表组件。
 
-`layer` is the number of layers of the round wheel, 1 means there is one circle of outer icons in addition to the center icon.
+`layer` 是圆轮的层数，1表示除了中心图标外还有1圈外部图标。
 
-`radius` is the radius of the icon. If the icon is square, it is half of the side length of the icon image. This value needs to be accurate, otherwise errors will occur in the icon arrangement calculation and position calculation.
+`radius` 是图标的半径。如果图标是正方形的话，它是图标图像边长的一半。这个值需要精确，否则在图标排列计算和位置计算中会出现错误。
 
-`distance` is the distance between the centers of the icons of two adjacent layers, which needs to be greater than the diameter or side length of the icon.
+`distance` 是相邻两层图标中心之间的距离，需要大于图标的直径或边长。
 
-In Layer 0, there is a central icon, whose center is at the center of the screen. This point serves as the reference for calculating the positions of other icons.
-The number of icons in each layer is 6*n, where n represents the number of icon layers. Therefore, the closer to the outer layer, the more icons there are, and the smaller the angle between the centers of adjacent icons and the center of the screen on the same layer.
+在第0层，有一个中心图标，其中心位于屏幕中心。这个点作为计算其他图标位置的参考点。
+每层的图标数量为6*n，其中n代表图标层数。因此，越靠近外层，图标越多，同层相邻图标中心与屏幕中心的夹角越小。
 
-### Add icon
+### 添加图标
 
-#### Default
+#### 默认方式
 
-After creating the wheel list widget, you can use the default interface for adding icons. In the wheel, corresponding icons can be added from the inside out in a layer-by-layer fashion.
+创建旋转列表组件后，可以使用默认接口添加图标。在轮子中，可以从内向外一层层添加相应的图标。
 [void gui_wheel_list_add_icon_default(gui_wheel_list_t *this, void *icon_addr,gui_event_cb_t event_cb)](#api)
 
-`this` is the pointer to the widget.
+`this` 是组件的指针。
 
-`icon_addr` is the pointer to the address of the image.
+`icon_addr` 是图像地址的指针。
 
-`event_cb` is the callback function of this image, triggered by clicking.
+`event_cb` 是此图像的回调函数，由点击触发。
 
-##### Default example
+##### 默认方式示例
 
-<details> <summary>Example code</summary>
+<details> <summary>示例代码</summary>
 
 ```c
 #include "gui_wheel_list.h"
@@ -125,22 +125,22 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 <br/>
 
-#### Customized
+#### 自定义方式
 
-After creating the wheel list widget, you can use the default interface for adding icons. In the wheel, corresponding icons can be added from the inside out in a layer-by-layer fashion.
+创建旋转列表组件后，可以使用自定义接口添加图标。在轮子中，可以从内向外一层层添加相应的图标。
 [gui_wheel_list_set_icon(gui_wheel_list_t *this, void *icon_addr, gui_event_cb_t event_cb, uint8_t layer, uint8_t index)](#api)
 
-`this` is the pointer to the widget.
+`this` 是组件的指针。
 
-`icon_addr` is the pointer to the address of the image.
+`icon_addr` 是图像地址的指针。
 
-`event_cb` is the callback function of this image, triggered by clicking.
+`event_cb` 是此图像的回调函数，由点击触发。
 
-`layer` is the level or layer where the icon is located.
+`layer` 是图标所在的层数。
 
-##### Customized example
+##### 自定义示例
 
-<details> <summary>Example code</summary>
+<details> <summary>示例代码</summary>
 
 ```c
 #include "gui_wheel_list.h"
