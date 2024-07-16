@@ -1,7 +1,6 @@
-SaaA
+使用脚本设计应用程序
 *************
 
-Script as a APP
 
 .. toctree::
     :maxdepth: 2

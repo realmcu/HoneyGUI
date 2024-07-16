@@ -1,7 +1,5 @@
 # canvas
-<br/>
 
-## Overview
 The canvas widget is the basic widget used to drawing graphics in nanovg.***Limitations: Sufficient memory is needed to open a framebuffer.***
 
 ## Usage

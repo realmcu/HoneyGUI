@@ -1,7 +1,5 @@
 # Progressbar
-<br>
 
-## Overview
 The progressbar widget allows you to create widgets with three different effects.
 After created a progressbar widget, you can set the percentage of the widget to display.
 

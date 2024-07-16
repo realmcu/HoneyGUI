@@ -1,6 +1,6 @@
-# **GUI APP FrameWork**
+# GUI Application
 
-  +  The GUI framework diagram is shown in the figure below:
+The GUI framework diagram is shown in the figure below:
   
   
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1720764399046158372/8fde9e89_1860080.png" alt="app fw.png"></div><br/>
@@ -19,5 +19,5 @@
     Use C/C++ Design An Application <Native/Native>
     Use LVGL Design An Application <LVGL/fwk_app_lvgl>
     Use Script Design An Application <SaaA/index>
-    Switch Application <Switch_APP/index>
+    Application switching <Switch_APP/index>
 ```

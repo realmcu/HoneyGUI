@@ -1,7 +1,4 @@
 # Return
-<br>
-
-## Overview
 
 The bubble-shaped curve that can be dragged out on the left side of the screen is used to perform a return operation.
 

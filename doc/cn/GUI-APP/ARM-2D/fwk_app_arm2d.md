@@ -1,4 +1,4 @@
-# GUI-APP: 使用ARM-2D
+# 使用ARM-2D设计应用程序
 
 Arm-2D 是一个在 Cortex-M 处理器上进行 2.5D 图像处理的开源项目。
 

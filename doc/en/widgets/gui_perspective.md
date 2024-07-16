@@ -1,7 +1,4 @@
 # Perspective
-<br>
-
-## Overview
 
 The perspective is a hexagonal prism-like widget that uses six tabs as column faces. The prism will automatically rotate to show all tabs. A single click allows the user to quick jump to the current tab.
 

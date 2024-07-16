@@ -1,6 +1,5 @@
-
-##  App switching
-### App switching animation sample
+#  Application switching
+## Application switching animation sample
 - The first app has a list, and the second app has a grid. 
 - Clicking on the first app's button will switch to the second app. 
 - The first app will gradually become transparent until it disappears when switching, and the second app will enlarge to fill the screen. 
@@ -9,7 +8,7 @@
 <center><img width= "300" src="https://foruda.gitee.com/images/1720769983624603433/05c8f87b_10088396.gif" /></center>
 <br>
 
-#### Source code
+### Source code
 - In the animation frame callback, implement the animation effect of app switching(scaling and fading).
 - When the animation is finished, shut down the app.
 

@@ -1,9 +1,5 @@
 # Text widget
 
-<br>
-
-## Overview
-
 The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen. In order to draw text, the font file can be standard .ttf file or customized .bin file.
 
 ## Features

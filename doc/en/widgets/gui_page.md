@@ -1,7 +1,4 @@
 # Page
-<br>
-
-## Overview
 
 The page widget enables developers to establish a column of additional controls along the y-axis. These controls are permitted to extend beyond the screen's display boundary. Users can access these controls by swiping up or down.
 

@@ -1,6 +1,6 @@
-# **GUI应用程序框架**
+# GUI应用程序
 
-  +  HoneyGUI框架的结构图如下所示：
+HoneyGUI框架的结构图如下所示：
   
   
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1720764399046158372/8fde9e89_1860080.png" alt="app fw.png"></div><br/>
@@ -20,5 +20,5 @@
     使用LVGL设计应用程序 <LVGL/fwk_app_lvgl>
     使用ARM-2D设计应用程序 <ARM-2D/fwk_app_arm2d>
     使用脚本设计应用程序 <SaaA/index>
-    切换应用程序 <Switch_APP/index>
+    应用程序切换 <Switch_APP/index>
 ```

@@ -1,7 +1,4 @@
 # Menu cellular
-<br>
-
-## Overview
 
 The menu cellular widget display a icons set as a honeycomb shape menu.
 

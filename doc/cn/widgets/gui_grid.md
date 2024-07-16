@@ -1,7 +1,5 @@
 # Grid
-<br>
 
-## Overview
 The Grid Widget allows you to display widget set in a grid view.
 
 ## Usage

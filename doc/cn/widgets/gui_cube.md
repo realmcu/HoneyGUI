@@ -1,7 +1,5 @@
 # Cube
-<br/>
 
-## Overview
 The cube is a 3D display widget that show a rotating cube with six faces, each capable of displaying distinct images.
 
 ## Usage

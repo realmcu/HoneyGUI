@@ -1,4 +1,4 @@
-# GUI-APP: 使用LVGL
+# 使用LVGL设计应用程序
 
 LVGL是最受欢迎的免费开源嵌入式图形库，可为任何MCU、MPU和显示类型创建漂亮的用户界面。LVGL（Light and Versatile Graphics Library）是一个免费开源的图形库，提供了一切你需要创建嵌入式GUI所需的功能，包括易于使用的图形元素、美观的视觉效果和低内存占用。
 

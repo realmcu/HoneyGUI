@@ -1,5 +1,5 @@
-#  Demo: Develop a "86Box APP"
-## Introduction
+#  86box Application
+
 This example demostrates how to develop a SmartUI 86BOX APP, from which you can learn and understand the basic methods and processes of developing a ui application.
 
 ## Source File

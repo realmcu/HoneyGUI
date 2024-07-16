@@ -1,4 +1,4 @@
-# GUI-APP: UI resource font
+# 字体转换工具
 
 Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table.txt file, custom.cST file), and find the vector font data corresponding characters according to the Unicode code from the font file (such as.ttf). Convert to a bitmap, and the output is a.bin file.
 

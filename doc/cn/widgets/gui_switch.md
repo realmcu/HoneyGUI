@@ -1,7 +1,5 @@
 # Switch
-<br>
 
-## Overview
 Switch is a custom switch button control, often used to enable or disable certain features or options, allowing the user to control the behavior of an application by toggling the state of the button.
 
 ## Usage

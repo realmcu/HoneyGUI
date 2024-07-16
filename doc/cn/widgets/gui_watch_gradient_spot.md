@@ -1,7 +1,4 @@
 # Watch_gradient_spot
-<br>
-
-## Overview
 
 The watch_gradient_spot widget allows you to create a pointer watchface with dynamic water drops in the center.
 

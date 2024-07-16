@@ -1,7 +1,4 @@
 # Tab
-<br>
-
-## Overview
 
 The tab widget enables you to create an unlimited number of tabs in both the x and y axes of the screen.Before integrating the tab widget, you must first establish a tabview widget to house the tabs.The direction of the generated tabs is denoted by idx and idy.
 

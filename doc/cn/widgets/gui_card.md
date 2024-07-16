@@ -1,7 +1,5 @@
 # Card
-<br>
 
-## Overview
 Users can create various controls on the card. Before creating the card widget, you must select create cardview widget.
 
 ## Usage

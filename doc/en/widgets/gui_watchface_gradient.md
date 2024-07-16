@@ -1,7 +1,4 @@
 # Watchface_gradient
-<br>
-
-## Overview
 
 The watchface_gradient widget allows you to create a pointer watchface with a scanning effect for each pointer.
 

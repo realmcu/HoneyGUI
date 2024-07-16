@@ -1,7 +1,5 @@
 # Cardview
-<br>
 
-## Overview
 Card effect container widget, which can nest card. You can switch cards by swiping.
 
 <br>

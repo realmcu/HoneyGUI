@@ -1,6 +1,4 @@
-# GUI-APP: UI resource 
-
-
+# MP Tool
 
 ##  Download to the EVB
 Open the MPTool tool to download UI resources, and download the generated image file to the specified address (such as the file system mount address).

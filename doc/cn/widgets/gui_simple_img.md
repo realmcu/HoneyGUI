@@ -1,7 +1,5 @@
 # Simple image
-<br>
 
-## Overview
 The simple img widget is a simplified version of the img control, lacking transformation operations such as rotation, translation, and scaling.
 
 ## Usage
