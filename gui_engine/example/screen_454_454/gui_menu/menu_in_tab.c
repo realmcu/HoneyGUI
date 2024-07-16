@@ -75,22 +75,18 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 static void win_ani_cb(void *args, gui_win_t *win)
 {
     // Calculate the progress percentage of the animation
-    float pro = win->animate->progress_percent;
+    float pro = gui_win_get_aniamtion_progress_percent(win);
 
     // Adjust the scale of the window based on sine function of the progress percentage
     // This will create a smooth scaling effect as the progress advances
-    win->scale = 1 + sinf(pro * M_PI / 2);
-    win->scale_y = 1 + sinf(pro * M_PI / 2);
-
+    gui_win_set_scale_rate(win, 1 + sinf(pro * M_PI / 2), 1 + sinf(pro * M_PI / 2));
     // Ensure the scope property is set to 1 (used to indicate visibility)
-    win->scope = 1;
-
+    gui_win_set_scope(win, 1);
     // Set the opacity of the window's base GUI element, gradually decreasing as the animation progresses
     // This creates a fading effect by setting opacity inversely proportional to the progress percentage
-    GUI_BASE(win)->opacity_value = (1.0f - pro) * UINT8_MAX;
-
+    gui_win_set_opacity(win, (1.0f - pro) * UINT8_MAX);
     // Check if the animation has reached its last frame
-    if (win->animate->end_frame)
+    if (gui_win_is_animation_end_frame(win))
     {
         // Shutdown the GUI application
         gui_app_shutdown(get_app_watch_ui());
@@ -102,8 +98,7 @@ void design_tab_menu(void *parent)
 {
     gui_win_t *win = gui_win_create(parent, MENU_WIN_NAME, 0, 0, 0, 0);
     gui_win_set_animate(win, 2000, 0, win_ani_cb, 0);
-    win->animate->animate =
-        0;//aniamtion start to play until win->animate->animate == 1 (on button click event)
+    gui_win_stop_animation(win);//aniamtion start to play until button click event
     /* app swap animation configration of the first app*/
     gui_canvas_rect_create((void *)win, "canvas_rect", 0, 0, gui_get_screen_width(),
                            gui_get_screen_height(),

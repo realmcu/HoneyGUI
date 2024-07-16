@@ -181,6 +181,62 @@ void gui_win_click(gui_win_t *_this, void *callback, void *parameter);
  * @param hold_tp
  */
 void gui_win_hole_tp(gui_win_t *_this, bool hold_tp);
+/**
+ * @brief Get the animation progress percentage.
+ *
+ * @param win Pointer to the window structure that contains the animation.
+ * @return The current animation progress percentage.
+ */
+float gui_win_get_aniamtion_progress_percent(gui_win_t *win);
+
+/**
+ * @brief Set the scale rate for the window both horizontally and vertically.
+ *
+ * @param win Pointer to the window structure.
+ * @param scale_rate_horizontal The horizontal scale rate.
+ * @param scale_rate_vertical The vertical scale rate.
+ */
+void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical);
+
+/**
+ * @brief Enable or disable the scope for the window.
+ *
+ * @param win Pointer to the window structure.
+ * @param enable A boolean value to enable or disable the scope.
+ */
+void gui_win_set_scope(gui_win_t *win, bool enable);
+
+/**
+ * @brief Set the opacity value for the window.
+ *
+ * @param win Pointer to the window structure.
+ * @param opacity_value The desired opacity value to set.
+ */
+void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value);
+
+/**
+ * @brief Check if the animation is at its end frame.
+ *
+ * @param win Pointer to the window structure that contains the animation.
+ * @return true if the end_frame is not 0, false otherwise.
+ */
+bool gui_win_is_animation_end_frame(gui_win_t *win);
+
+/**
+ * @brief Start the animation by setting the animate field to 1.
+ *
+ * @param win Pointer to the window structure that contains the animation.
+ * If win or win->animate is NULL, the function will log an error message.
+ */
+void gui_win_start_animation(gui_win_t *win);
+
+/**
+ * @brief Stop the animation by setting the animate field to 0.
+ *
+ * @param win Pointer to the window structure that contains the animation.
+ * If win or win->animate is NULL, the function will log an error message.
+ */
+void gui_win_stop_animation(gui_win_t *win);
 
 #ifdef __cplusplus
 }

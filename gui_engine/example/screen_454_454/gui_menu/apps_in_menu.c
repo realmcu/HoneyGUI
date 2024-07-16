@@ -541,14 +541,13 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
 #include "math.h"
 static void menu_win_ani_cb(void *args, gui_win_t *win)
 {
-    float pro = win->animate->progress_percent;
-    win->scale = sinf(pro * (M_PI / 2 - 0.2f) + 0.2f);
-    win->scale_y = sinf(pro * (M_PI / 2 - 0.2f) + 0.2f);
-    GUI_BASE(win)->opacity_value = (pro) * UINT8_MAX;
-    if (win->animate->end_frame)
+    float pro = gui_win_get_aniamtion_progress_percent(win);
+    gui_win_set_scale_rate(win, sinf(pro * (M_PI / 2 - 0.2f) + 0.2f),
+                           sinf(pro * (M_PI / 2 - 0.2f) + 0.2f));
+    gui_win_set_opacity(win, (pro) * UINT8_MAX);
+    if (gui_win_is_animation_end_frame)
     {
-        win->scale = 0;
-        win->scale_y = 0;
+        gui_win_set_scale_rate(win, 0, 0);//reset scale
     }
 }
 static void app_menu(gui_app_t *app)
