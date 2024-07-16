@@ -474,7 +474,10 @@ void gui_win_stop_animation(gui_win_t *win)
     }
     win->animate->animate = 0;
 }
-
+void gui_win_prepare_globle(gui_obj_t *obj)
+{
+    gui_win_prepare(obj);
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

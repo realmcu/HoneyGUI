@@ -203,7 +203,45 @@ static void generateTilesForWindow(int windowWidth, int windowHeight, double cen
         }
     }
 }
+static void destory(gui_obj_t *obj)
+{
+    gui_win_t *this = (void *)obj;
+    if (this->animate)
+    {
+        gui_free(this->animate);
+        this->animate = NULL;
+    }
+    gui_map_t *parent = GUI_TYPE(gui_map_t, obj);
+    for (size_t i = 0; i < 3; i++)
+    {
+        for (size_t j = 0; j < 3; j++)
+        {
+            gui_free(parent->tile[i][j].img->data_buffer);
+        }
+        gui_free(parent->button_data[i]);
+    }
 
+}
+extern void gui_win_prepare_globle(gui_obj_t *obj);
+static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
+{
+    if (obj != NULL)
+    {
+        switch (cb_type)
+        {
+        case OBJ_PREPARE:
+            gui_win_prepare_globle(obj);
+            break;
+
+        case OBJ_DESTORY:
+            destory(obj);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
 static void ctor(gui_map_t *this, gui_obj_t *parent)
 {
     extern void gui_win_ctor(gui_win_t *this, gui_obj_t *parent, const char *filename, int16_t x,
@@ -213,6 +251,7 @@ static void ctor(gui_map_t *this, gui_obj_t *parent)
                  WIN_H);
     this->start_x = GET_BASE(this)->x;
     this->start_y = GET_BASE(this)->y;
+    GET_BASE(this)->obj_cb = gui_win_cb;
 }
 static void load_new_tile(map_tile_t *tile, int16_t zoom)
 {
@@ -584,7 +623,7 @@ gui_map_t *gui_map_create(void *parent)
             {
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
                 jpg = gui_malloc(filesize);
-
+                this->button_data[0] = jpg;
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
                 gui_fs_close(fd);
@@ -613,7 +652,7 @@ gui_map_t *gui_map_create(void *parent)
             {
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
                 jpg = gui_malloc(filesize);
-
+                this->button_data[1] = jpg;
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
                 gui_fs_close(fd);
@@ -642,7 +681,7 @@ gui_map_t *gui_map_create(void *parent)
             {
                 filesize = gui_fs_lseek(fd, 0, SEEK_END);
                 jpg = gui_malloc(filesize);
-
+                this->button_data[2] = jpg;
                 gui_fs_lseek(fd, 0, SEEK_SET);
                 gui_fs_read(fd, jpg, filesize);
                 gui_fs_close(fd);
