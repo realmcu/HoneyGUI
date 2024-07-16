@@ -71,18 +71,18 @@ Currently, porting has been done on FreeRTOS, RT-Thread, and Windows for referen
 The following table lists the LCD-related interfaces supported by mainstream  chips.If you want to know more information, please click on the specific chip name.
 
 ===============  =======  ========  =======  =======  =======
-SOC              I8080    QSPI      RGB      MIPI     SPI      
----------------  -------  --------  -------  -------  ------- 
-`RTL8762C`_      Y        NA        NA       NA       Y         
-`RTL8762D`_      Y        Y         NA       NA       Y         
-`RTL8763E`_      Y        Y         NA       NA       Y         
-`RTL8772G`_      Y        Y         Y        NA       Y        
-`RTL8773E`_      Y        Y         Y        NA       Y        
-`RTL8772F`_      Y        Y         Y        Y        Y         
+SOC              I8080    QSPI      RGB      MIPI     SPI
+---------------  -------  --------  -------  -------  -------
+`RTL8762C`_      Y        NA        NA       NA       Y
+`RTL8762D`_      Y        Y         NA       NA       Y
+`RTL8763E`_      Y        Y         NA       NA       Y
+`RTL8772G`_      Y        Y         Y        NA       Y
+`RTL8773E`_      Y        Y         Y        NA       Y
+`RTL8772F`_      Y        Y         Y        Y        Y
 ===============  =======  ========  =======  =======  =======
 
 'Y' means the driver already included in the library.
-'NA' means the driver not yet included in the library. 
+'NA' means the driver not yet included in the library.
 
 .. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
 .. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
@@ -102,14 +102,14 @@ The following table lists the LCD-related driver IC supported by mainstream chip
 SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903     ST7796      OTM8009A    SH8601A   SH8601Z   RM69330   ST7789    NV3041A
 ---------------  ---------  ----------  ---------  ---------  ---------  ----------  ----------  ----------  --------  --------  --------  --------  --------
 `RTL8762D`_      NA         NA          NA         NA         NA         NA          Y           NA          NA        NA        Y         Y         Y
-`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA           
+`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA
 `RTL8772G`_      Y          Y           Y          Y          Y          Y           Y           NA          NA        NA        NA        NA        NA
 `RTL8773E`_      NA         NA          NA         NA         NA         NA          NA          NA          Y         NA        NA        NA        NA
 `RTL8772F`_      NA         Y           Y          NA         Y          NA          NA          Y           Y         Y         NA        NA        NA
 ===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
 
 'Y' means the driver already included in the library.
-'NA' means the driver not yet included in the library. 
+'NA' means the driver not yet included in the library.
 
 .. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
 .. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
@@ -126,21 +126,12 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 - If not using a filesystem, you can fill in null pointers.
 - The structure definition is as follows:
 
-    ```C
-    struct gui_fs
-    {
-        int (*open)(const char *file, int flags, ...);
-        int (*close)(int d);
-        int (*read)(int fd, void *buf, size_t len);
-        int (*write)(int fd, const void *buf, size_t len);
-        int (*lseek)(int fd, int offset, int whence);
-        /* directory api */
-        gui_fs_dir *(*opendir)(const char *name);
-        struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
-        int (*closedir)(gui_fs_dir *d);
-        int (*ioctl)(int fildes, int cmd, ...);
-    };
-    ```
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_fs struct define start */
+   :end-before: /* gui_fs struct define end */
+```
 
 ## Flash Translation Layer
 
@@ -149,41 +140,24 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 - If not using a Flash Translation Layer, you can fill in null pointers.
 - The structure definition is as follows:
 
-    ```C
-    static struct gui_ftl ftl_port =
-    {
-        .read      = (int (*)(uint32_t addr, uint8_t *buf, uint32_t len))port_ftl_read,
-        .write     = (int (*)(uint32_t addr, const uint8_t *buf, uint32_t len))port_ftl_write,
-        .erase     = (int (*)(uint32_t addr, uint32_t len))port_ftl_erase,
-    };
-    ```
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_ftl struct define start */
+   :end-before: /* gui_ftl struct define end */
+```
 
 ## Input Device
 
 - Refer to `guidef.h` and `gui_port_indev.c`
 - Input devices include touchpads, keyboards, and wheels. The structure for input information is as follows:
 
-    ```C
-    struct gui_indev
-    {
-        uint16_t tp_width;
-        uint16_t tp_height;
-        uint32_t touch_timeout_ms;
-        uint16_t long_button_time_ms;
-        uint16_t short_button_time_ms;
-        uint16_t kb_long_button_time_ms;
-        uint16_t kb_short_button_time_ms;
-        uint16_t quick_slide_time_ms;
-
-        void (*ext_button_indicate)(void (*callback)(void));
-
-        gui_touch_port_data_t *(*tp_get_data)(void);
-
-        gui_kb_port_data_t *(*kb_get_port_data)(void);
-
-        gui_wheel_port_data_t *(*wheel_get_port_data)(void);
-    };
-    ```
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_indev struct define start */
+   :end-before: /* gui_indev struct define end */
+```
 
 - If a specific input device is needed, the corresponding data acquisition function needs to be implemented in `gui_indev`, and the required time thresholds need to be filled in.
 
@@ -193,18 +167,18 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 
 The following table lists the Touch-related IC supported by all chips. If you want to know more information, please click on the specific chip name.
 
-==================  =========  ==========  ========  =======  ========  ========  =========                  
-SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147                 
-------------------  ---------  ----------  --------  -------  --------  --------  ---------         
+==================  =========  ==========  ========  =======  ========  ========  =========
+SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147
+------------------  ---------  ----------  --------  -------  --------  --------  ---------
 `RTL8762D`_         Y          NA          NA        NA       NA        NA         NA
 `RTL8763E`_         NA         NA          NA        NA       NA        Y          Y
 `RTL8772G`_         NA         NA          NA        Y        Y         NA         NA
 `RTL8773E`_         Y          NA          NA        Y        NA        NA         NA
-`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA 
+`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA
 ==================  =========  ==========  ========  =======  ========  ========  =========
 
 'Y' means the driver already included in the library.
-'NA' means the driver not yet included in the library.              
+'NA' means the driver not yet included in the library.
 
 
 .. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
@@ -219,40 +193,12 @@ SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T 
 - Refer to `guidef.h` and `gui_port_os.c`
 - Define the interfaces for thread, timer, message queue, and memory management. The structure definition is as follows:
 
-    ```C
-    struct gui_os_api
-    {
-        char *name;
-        void *(*thread_create)(const char *name, void (*entry)(void *param), void *param,
-                               uint32_t stack_size, uint8_t priority);
-        bool (*thread_delete)(void *handle);
-        bool (*thread_suspend)(void *handle);
-        bool (*thread_resume)(void *handle);
-        bool (*thread_mdelay)(uint32_t ms);
-        uint32_t (*thread_ms_get)(void);
-        uint32_t (*thread_us_get)(void);
-        bool (*mq_create)(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs);
-        bool (*mq_send)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-        bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-        bool (*mq_recv)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-
-        void *(*f_malloc)(uint32_t);
-        void *(*f_realloc)(void *ptr, uint32_t);
-        void (*f_free)(void *rmem);
-
-        void (*gui_sleep_cb)(void);
-
-        void *mem_addr;
-        uint32_t mem_size;
-
-        uint32_t mem_threshold_size;
-        void *lower_mem_addr;
-        uint32_t lower_mem_size;
-
-        log_func_t log;
-        void (*gui_tick_hook)(void);
-    };
-    ```
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_os_api struct define start */
+   :end-before: /* gui_os_api struct define end */
+```
 
 ## Sleep Management
 

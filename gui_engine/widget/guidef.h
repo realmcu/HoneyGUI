@@ -236,6 +236,7 @@ struct gui_fs_dirent
     char d_name[256];         /* The null-terminated file name */
 };
 
+/* gui_fs struct define start */
 struct gui_fs
 {
     int (*open)(const char *file, int flags, ...);
@@ -249,14 +250,18 @@ struct gui_fs
     int (*closedir)(gui_fs_dir *d);
     int (*ioctl)(int fildes, int cmd, ...);
 };
+/* gui_fs struct define end */
 
+/* gui_ftl struct define start */
 struct gui_ftl
 {
     int (*read)(uint32_t addr, uint8_t *buf, uint32_t len);
     int (*write)(uint32_t addr, const uint8_t *buf, uint32_t len);
     int (*erase)(uint32_t addr, uint32_t len);
 };
+/* gui_ftl struct define end */
 
+/* gui_indev struct define start */
 struct gui_indev
 {
     uint16_t tp_witdh;
@@ -276,9 +281,11 @@ struct gui_indev
 
     gui_wheel_port_data_t *(*wheel_get_port_data)(void);
 };
+/* gui_indev struct define end */
 
 typedef void (* log_func_t)(const char *fmt, ...);
 
+/* gui_os_api struct define start */
 struct gui_os_api
 {
     char *name;
@@ -311,6 +318,7 @@ struct gui_os_api
     log_func_t log;
     void (*gui_tick_hook)(void);
 };
+/* gui_os_api struct define end */
 
 typedef struct draw_circle
 {
@@ -392,6 +400,8 @@ typedef struct _gui_rect_file_head
     struct gui_rgb_data_head head;
     gui_color_t color;
 } gui_rect_file_head_t;
+
+/* acc_engine_t struct define start */
 typedef struct acc_engine
 {
     void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
@@ -414,6 +424,8 @@ typedef struct acc_engine
     // void (*LineTo)(canvas_path_t *data, float x, float y);
 
 } acc_engine_t;
+/* acc_engine_t struct define end */
+
 /** End of SUBMOUDLE_Exported_Types
   * @}
   */

@@ -64,7 +64,6 @@ static struct gui_dispdev dc =
 - 在 `DC_SINGLE` 模式下，帧缓冲区的大小为 `fb_width*fb_height*bit_depth/8`。
 - 在 `DC_RAMLESS` 模式下，使用了两个部分帧缓冲区，大小为`fb_width*fb_height*bit_depth/8`，此时的`fb_height`是分段高度。
 
-
 ### 支持接口类型
 
 ```eval_rst
@@ -72,14 +71,14 @@ static struct gui_dispdev dc =
 以下表格列出了主流芯片支持的与LCD相关的接口。如果您想了解更多信息，请点击特定芯片的名称。
 
 ===============  =======  ========  =======  =======  =======
-SOC              I8080    QSPI      RGB      MIPI     SPI      
----------------  -------  --------  -------  -------  ------- 
-`RTL8762C`_      Y        NA        NA       NA       Y         
-`RTL8762D`_      Y        Y         NA       NA       Y         
-`RTL8763E`_      Y        Y         NA       NA       Y         
-`RTL8772G`_      Y        Y         Y        NA       Y        
-`RTL8773E`_      Y        Y         Y        NA       Y        
-`RTL8772F`_      Y        Y         Y        Y        Y         
+SOC              I8080    QSPI      RGB      MIPI     SPI
+---------------  -------  --------  -------  -------  -------
+`RTL8762C`_      Y        NA        NA       NA       Y
+`RTL8762D`_      Y        Y         NA       NA       Y
+`RTL8763E`_      Y        Y         NA       NA       Y
+`RTL8772G`_      Y        Y         Y        NA       Y
+`RTL8773E`_      Y        Y         Y        NA       Y
+`RTL8772F`_      Y        Y         Y        Y        Y
 ===============  =======  ========  =======  =======  =======
 
 'Y' 表示驱动程序已包含在库中。
@@ -94,7 +93,7 @@ SOC              I8080    QSPI      RGB      MIPI     SPI
 ```
 
 ### 已验证屏幕驱动
-
+****
 ```eval_rst
 
 以下表格列出了主流芯片支持的与LCD相关的驱动IC。如果您想了解更多信息，请点击特定芯片的名称。
@@ -103,7 +102,7 @@ SOC              I8080    QSPI      RGB      MIPI     SPI
 SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903     ST7796      OTM8009A    SH8601A   SH8601Z   RM69330   ST7789    NV3041A
 ---------------  ---------  ----------  ---------  ---------  ---------  ----------  ----------  ----------  --------  --------  --------  --------  --------
 `RTL8762D`_      NA         NA          NA         NA         NA         NA          Y           NA          NA        NA        Y         Y         Y
-`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA           
+`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA
 `RTL8772G`_      Y          Y           Y          Y          Y          Y           Y           NA          NA        NA        NA        NA        NA
 `RTL8773E`_      NA         NA          NA         NA         NA         NA          NA          NA          Y         NA        NA        NA        NA
 `RTL8772F`_      NA         Y           Y          NA         Y          NA          NA          Y           Y         Y         NA        NA        NA
@@ -127,20 +126,11 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 - 不使用文件系统时可以填入空指针。
 - 结构体定义如下：
 
-```C
-struct gui_fs
-{
-    int (*open)(const char *file, int flags, ...);
-    int (*close)(int d);
-    int (*read)(int fd, void *buf, size_t len);
-    int (*write)(int fd, const void *buf, size_t len);
-    int (*lseek)(int fd, int offset, int whence);
-    /* directory api*/
-    gui_fs_dir *(*opendir)(const char *name);
-    struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
-    int (*closedir)(gui_fs_dir *d);
-    int (*ioctl)(int fildes, int cmd, ...);
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_fs struct define start */
+   :end-before: /* gui_fs struct define end */
 ```
 
 ## 闪存转换层
@@ -150,13 +140,11 @@ struct gui_fs
 - 不使用闪存转换层时可以填入空指针。
 - 结构体定义如下:
 
-```C
-static struct gui_ftl ftl_port =
-{
-    .read      = (int (*)(uint32_t addr, uint8_t *buf, uint32_t len))port_ftl_read,
-    .write     = (int (*)(uint32_t addr, const uint8_t *buf, uint32_t len))port_ftl_write,
-    .erase     = (int (*)(uint32_t addr, uint32_t len))port_ftl_erase,
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_ftl struct define start */
+   :end-before: /* gui_ftl struct define end */
 ```
 
 ## 输入设备
@@ -164,26 +152,11 @@ static struct gui_ftl ftl_port =
 - 参考 `guidef.h` 和 `gui_port_indev.c`
 - 输入设备包括触摸板、键盘和滚轮，输入信息的结构体如下：
 
-```C
-struct gui_indev
-{
-    uint16_t tp_witdh;
-    uint16_t tp_height;
-    uint32_t touch_timeout_ms;
-    uint16_t long_button_time_ms;
-    uint16_t short_button_time_ms;
-    uint16_t kb_long_button_time_ms;
-    uint16_t kb_short_button_time_ms;
-    uint16_t quick_slide_time_ms;
-
-    void (*ext_button_indicate)(void (*callback)(void));
-
-    gui_touch_port_data_t *(*tp_get_data)(void);
-
-    gui_kb_port_data_t *(*kb_get_port_data)(void);
-
-    gui_wheel_port_data_t *(*wheel_get_port_data)(void);
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_indev struct define start */
+   :end-before: /* gui_indev struct define end */
 ```
 
 - 如果需要某一种输入设备，需要在`gui_indev`中实现对应的数度获取函数，并填写所需的时间阈值。
@@ -194,18 +167,18 @@ struct gui_indev
 
 以下表格列出了所有芯片支持的与触摸相关的IC。如果您想了解更多信息，请点击特定芯片的名称。
 
-==================  =========  ==========  ========  =======  ========  ========  =========                  
-SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147                 
-------------------  ---------  ----------  --------  -------  --------  --------  ---------         
+==================  =========  ==========  ========  =======  ========  ========  =========
+SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147
+------------------  ---------  ----------  --------  -------  --------  --------  ---------
 `RTL8762D`_         Y          NA          NA        NA       NA        NA         NA
 `RTL8763E`_         NA         NA          NA        NA       NA        Y          Y
 `RTL8772G`_         NA         NA          NA        Y        Y         NA         NA
 `RTL8773E`_         Y          NA          NA        Y        NA        NA         NA
-`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA 
+`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA
 ==================  =========  ==========  ========  =======  ========  ========  =========
 
 'Y' 表示驱动程序已包含在库中。
-'NA' 表示驱动程序尚未包含在库中。   
+'NA' 表示驱动程序尚未包含在库中。
 
 
 .. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
@@ -224,39 +197,11 @@ SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T 
 - 参考 `guidef.h` 和 `gui_port_os.c`
 - 需要定义线程、定时器、消息队列和内存管理的接口，结构体定义如下：
 
-```C
-struct gui_os_api
-{
-    char *name;
-    void *(*thread_create)(const char *name, void (*entry)(void *param), void *param,
-                           uint32_t stack_size, uint8_t priority);
-    bool (*thread_delete)(void *handle);
-    bool (*thread_suspend)(void *handle);
-    bool (*thread_resume)(void *handle);
-    bool (*thread_mdelay)(uint32_t ms);
-    uint32_t (*thread_ms_get)(void);
-    uint32_t (*thread_us_get)(void);
-    bool (*mq_create)(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs);
-    bool (*mq_send)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-    bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-    bool (*mq_recv)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-
-    void *(*f_malloc)(uint32_t);
-    void *(*f_realloc)(void *ptr, uint32_t);
-    void (*f_free)(void *rmem);
-
-    void (*gui_sleep_cb)(void);
-
-    void *mem_addr;
-    uint32_t mem_size;
-
-    uint32_t mem_threshold_size;
-    void *lower_mem_addr;
-    uint32_t lower_mem_size;
-
-    log_func_t log;
-    void (*gui_tick_hook)(void);
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_os_api struct define start */
+   :end-before: /* gui_os_api struct define end */
 ```
 
 ## 休眠管理
