@@ -77,4 +77,4 @@ GUI框架具有很强的可移植性，可以在多种芯片和操作系统上�
 您可以通过滑动和长按与其进行交互。
 
 
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1698286583110259632/b48ad0af_10088396.png"/></div><br/>
+<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>

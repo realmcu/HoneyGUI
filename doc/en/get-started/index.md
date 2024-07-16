@@ -23,7 +23,7 @@ The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run 
 ## Software Architecture
 
 
-<div style="text-align: center"><img width= "600" src ="https://foruda.gitee.com/images/1718703720072592459/5bc6a013_13408154.png"/></div><br/>
+<div style="text-align: center"><img width= "600" src ="https://foruda.gitee.com/images/1721096451950004714/f8a0724c_1860080.png"/></div><br/>
 
 
 ## Installation
@@ -77,4 +77,4 @@ You can select the `Run and Debug` options after entering the vscode interface, 
 You can interact with it by swiping and long pressing.
 
 
-<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1698286583110259632/b48ad0af_10088396.png"/></div><br/>
+<div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1721095451242922178/f43e885b_1860080.png"/></div><br/>
