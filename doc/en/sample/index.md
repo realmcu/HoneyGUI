@@ -17,6 +17,6 @@ GUI_INIT_APP_EXPORT(app_init);
 
     Calculator Application <Calculator/Demo>
     86box Application <86box/86box>
-	LiteGFX Application <LiteGFX/Demo>
+    LiteGFX Application <LiteGFX/Demo>
     Status bar <Status-bar/Status bar>
 ```
