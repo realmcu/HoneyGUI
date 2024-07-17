@@ -23,7 +23,7 @@ The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run 
 ## Software Architecture
 
 
-<div style="text-align: center"><img width= "600" src ="https://foruda.gitee.com/images/1721097560507751759/d40dd1c3_1860080.png"/></div><br/>
+<div style="text-align: center"><img width= "600" src ="https://foruda.gitee.com/images/1721196540166827807/b601c3a5_13408154.png"/></div><br/>
 
 
 ## Installation

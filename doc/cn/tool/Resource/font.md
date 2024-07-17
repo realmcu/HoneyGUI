@@ -2,7 +2,7 @@
 
 Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table.txt file, custom.cST file), and find the vector font data corresponding characters according to the Unicode code from the font file (such as.ttf). Convert to a bitmap, and the output is a.bin file.
 
-<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1708226065411340283/b7deeeff_13674272.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1721186859304603819/25785a2f_13408154.png" ></div>
 
 ## Font bin generation
 Please refer to the following steps for how to generate files:
