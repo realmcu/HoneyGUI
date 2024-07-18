@@ -26,11 +26,8 @@
 #define APP_VOLUME
 #define APP_CYCLE_TRACKING
 #define APP_MUSIC
+#define APP_WEB
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
-GUI_APP_DEFINE(APP_CLOCK,      app_hr_ui_design)
-GUI_APP_DEFINE(APP_WATCH_FACE, app_hr_ui_design)
-GUI_APP_DEFINE(APP_CALCULATOR, app_hr_ui_design)
-GUI_APP_DEFINE(APP_SPORT,      app_hr_ui_design)
 GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
 GUI_APP_DEFINE_NAME(APP_MAP)
@@ -40,6 +37,7 @@ GUI_APP_DEFINE_NAME(APP_SETTING)
 GUI_APP_DEFINE_NAME(APP_VOLUME)
 GUI_APP_DEFINE_NAME(APP_CYCLE_TRACKING)
 GUI_APP_DEFINE_NAME(APP_MUSIC)
+GUI_APP_DEFINE_NAME(APP_WEB)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -1761,4 +1759,36 @@ GUI_APP_ENTRY(APP_MUSIC)
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)win);
 }
 
+GUI_APP_ENTRY(APP_WEB)
+{
+#ifdef ENABLE_RTK_GUI_WEB
+    extern int gui_web_open_html(const char *html_file);
+    gui_web_open_html("gui_engine\\example\\web\\mechanical-clock-canvas\\index.html");
 
+#else
+    {
+        char *text = "Please uncomment CONFIG_REALTEK_BUILD_WEB";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, 0,  0, 200,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+    {
+        char *text = "in win32_sim/menu_config.h";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, 0,  0, 220,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+#endif
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}

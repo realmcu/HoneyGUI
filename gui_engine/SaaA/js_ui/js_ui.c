@@ -5,6 +5,23 @@
 sem_t sem_timer;
 #endif
 
+jerry_value_t jerry_call_func_sem(const jerry_value_t func_obj_val,  /**< function object to call */
+                                  const jerry_value_t this_val, /**< object for 'this' binding */
+                                  const jerry_value_t args_p[], /**< function's call arguments */
+                                  jerry_size_t args_count) /**< number of the arguments */
+{
+#ifdef __WIN32
+    sem_wait(&sem_timer);
+#endif
+
+    jerry_value_t res = jerry_call_func_sem(func_obj_val, this_val, args_p, args_count);
+
+#ifdef __WIN32
+    sem_post(&sem_timer);
+#endif
+    return res;
+}
+
 static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code, void *param)
 {
     //gui_log("enter js_cb_with_args\n");
@@ -15,7 +32,7 @@ static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code, void *param)
     {
         return;
     }
-    jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
+    jerry_value_t res = jerry_call_func_sem(args->func, jerry_create_undefined(), args->args_p,
                                             args->args_count);
     jerry_release_value(res);
 }
@@ -27,7 +44,7 @@ static void js_cb_with_args_animate(cb_arg_t *args)
     {
         return;
     }
-    jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
+    jerry_value_t res = jerry_call_func_sem(args->func, jerry_create_undefined(), args->args_p,
                                             args->args_count);
     jerry_release_value(res);
 
@@ -1314,7 +1331,7 @@ void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
     js_cb = (jerry_value_t)msg.payload;
     // gui_log("timer msg cb 0x%x\n", js_cb);
 
-    res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
+    res = jerry_call_func_sem(js_cb, jerry_create_undefined(), 0, 0);
     jerry_release_value(res);
 }
 
@@ -1345,7 +1362,7 @@ void js_ui_timerThread(void *param)
         pthread_testcancel();
         // gui_send_msg_to_server(&msg);
 
-        int res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
+        int res = jerry_call_func_sem(js_cb, jerry_create_undefined(), 0, 0);
         jerry_release_value(res);
 
         pthread_testcancel();

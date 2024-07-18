@@ -142,7 +142,7 @@ typedef struct _gui_obj_t
     void (* obj_cb)(struct _gui_obj_t *obj, T_OBJ_CB_TYPE cb_type);
     //end of run time
     T_OBJ_TYPE type; //no need this , only use name
-    uint32_t active               : 1;    // this flag means obj location in screen
+    uint32_t active               : 1;    // this_widget flag means obj location in screen
     uint32_t not_show             : 1;
 
     uint32_t skip_tp_left_hold    : 1;
@@ -202,7 +202,7 @@ typedef struct _gui_obj_t
   * @{
   */
 /**
-  * @param  this
+  * @param  this_widget
   * @param  parent switching events
   * @param  filename how to trigger events
   * @param  x left
@@ -215,13 +215,13 @@ typedef struct _gui_obj_t
   * static void app_main_task(void *parent, const char *name, int16_t x,
                                int16_t y, int16_t w, int16_t h)
   * {
-  *    gui_obj_t *base = (gui_obj_t *)this;
+  *    gui_obj_t *base = (gui_obj_t *)this_widget;
   *    gui_obj_ctor(base, parent, name, x, y, w, h);
   *
   * }
   * \endcode
   */
-void gui_obj_ctor(gui_obj_t  *this,
+void gui_obj_ctor(gui_obj_t  *this_widget,
                   gui_obj_t  *parent,
                   const char *name,
                   int16_t     x,
@@ -269,7 +269,7 @@ void gui_obj_add_event_cb(void           *obj,
                           void           *user_data);
 
 /**
-  * @brief    this API only for Widget, not for Application
+  * @brief    this_widget API only for Widget, not for Application
   * @param  obj
   * @param  event_code
   * @return void
@@ -351,7 +351,7 @@ void gui_obj_tree_show(gui_obj_t *obj, bool enable);
 void gui_obj_show(void *obj, bool enable);
 
 /**
-  * @brief   show the root of this tree
+  * @brief   show the root of this_widget tree
   * @param  obj the root of the widget tree.
   * @return gui_obj_t*
   */
@@ -366,7 +366,7 @@ gui_obj_t *gui_obj_tree_get_root(gui_obj_t *obj);
 gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 
 /**
- * @brief judge the obj if in range of this rect
+ * @brief judge the obj if in range of this_widget rect
  *
  * @param obj
  * @param x
@@ -467,7 +467,7 @@ void gui_obj_skip_all_child_up_hold(gui_obj_t *obj);
 void gui_obj_skip_other_up_hold(gui_obj_t *obj);
 
 /**
- * @brief get the area of this obj
+ * @brief get the area of this_widget obj
  *
  * @param obj
  * @param x
@@ -482,7 +482,7 @@ void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *h);
 
 /**
- * @brief judge the point if in range of this obj rect
+ * @brief judge the point if in range of this_widget obj rect
  *
  * @param obj
  * @param x

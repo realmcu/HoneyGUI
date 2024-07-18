@@ -7,9 +7,9 @@ src = Glob('*.c')
 
 CPPPATH = [cwd]
 
-if GetDepend('CONFIG_REALTEK_BUILD_WEB'):
-    CPPDEFINES = ['ENABLE_RTK_GUI_WEB']
 
-group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_BUILD_WEB'], CPPPATH = CPPPATH)
+CPPDEFINES = ['ENABLE_RTK_GUI_WEB']
+
+group = DefineGroup('realgui/3rd', src, depend = ['CONFIG_REALTEK_BUILD_WEB'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

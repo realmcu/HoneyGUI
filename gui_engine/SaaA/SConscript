@@ -6,14 +6,17 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-
+CPPPATH = [cwd]
 if GetDepend(['CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP']):
     src += Glob('./*.c')
     src += Glob('./js_ui/*.c')
 if GetDepend(['CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE']):
     src += ['ezhtml.c']
     #src += ['frontend_launcher.c']
-CPPPATH = [cwd]
+if GetDepend(['CONFIG_REALTEK_BUILD_WEB']):
+    src += ['web/HtmlParser.cpp']+['web/JsExecutor.cpp']+['web/Renderer.cpp']+['web/web.cpp']
+    CPPPATH += [cwd+'/web']
+
 
 group = DefineGroup('realgui/SaaA', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
 
