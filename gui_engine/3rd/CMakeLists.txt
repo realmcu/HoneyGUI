@@ -28,7 +28,12 @@ list(APPEND gui_3rd_headers
 			${gui_widget_cJSIN_headers})
 set(gui_3rd_headers ${gui_3rd_headers} CACHE INTERNAL  "gui 3rd headers ")
 
-
-foreach(ITEM ${gui_3rd_sources})
-   message(${ITEM})
-endforeach()
+if(gui_debug_enable)  
+	foreach(ITEM ${gui_3rd_sources})
+		message([GUI][3rd srcs] ${ITEM})
+	endforeach()
+	
+	foreach(ITEM ${gui_3rd_headers})
+		message([GUI][3rd srcs] ${ITEM})
+	endforeach()
+endif()

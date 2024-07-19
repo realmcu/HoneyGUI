@@ -37,6 +37,10 @@ set(gui_headers ${gui_headers} CACHE INTERNAL  "gui headers ")
 
 if(gui_debug_enable)
 foreach(ITEM ${gui_sources})
-   message(${ITEM})
+   message(STATUS [GUI][srcs]${ITEM})
+endforeach()
+
+foreach(ITEM ${gui_headers})
+   message(STATUS [GUI][headers]${ITEM})
 endforeach()
 endif()
