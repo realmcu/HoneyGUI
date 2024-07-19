@@ -65,7 +65,7 @@ sw.switch_off(led1OffFunc)
 #### Tab 跳转 switch
 
 <br/>
-<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1706611480770133203/abb7d074_13671125.gif "/></div>
+<div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/sample/86box/86box.gif"/></div>
 <br/>
 
 1. 为 tabview 控件注册 tab 切换回调，当 tab 滑动切换时，更新当前 tab 索引值并同步 UI 显示状态。

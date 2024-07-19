@@ -3,7 +3,7 @@
 This is a new style status bar. In the non-pull-down state, only the real-time time in small fonts is displayed at the top of the screen. Click on the top to pull down the status bar. When pulling down, the mask color gradually becomes opaque and the time text becomes larger. After pulling down to a certain extent, the status bar becomes fully expanded, and the date and message notification will be displayed.
 
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1713320564618549955/a14b17aa_10088396.gif"  /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/sample/Status-bar/status_bar.gif"  /></div>
 <br>
 
 ##  Implementation

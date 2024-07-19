@@ -157,7 +157,7 @@ void page_tb_control0(void *parent)
 
 <br>
 
-<center><img width="300" src= "https://foruda.gitee.com/images/1702982214228261259/c0f279a1_13674272.gif "/></center>
+<center><img width="300" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/switch.gif"/></center>
 
 <br>
 

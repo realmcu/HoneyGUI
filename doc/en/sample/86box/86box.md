@@ -67,7 +67,7 @@ sw.switch_off(led1OffFunc)
 #### Tab jumping switch
 
 <br/>
-<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1706611480770133203/abb7d074_13671125.gif "/></div>
+<div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/sample/86box/86box.gif"/></div>
 <br/>
 
 

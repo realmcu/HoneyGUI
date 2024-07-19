@@ -67,7 +67,7 @@ static void app_ui_design(gui_app_t *app)
 }
 ```
 <br/>
-<div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1700192672716244989/94347ec7_13671125.gif "></div>
+<div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/canvas_arc.gif"></div>
 <br/>
 
 ## API

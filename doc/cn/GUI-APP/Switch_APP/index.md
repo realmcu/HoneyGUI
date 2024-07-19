@@ -6,7 +6,7 @@
 - 在切换时，第一个APP会逐渐变透明直至消失, 第二个APP会逐渐增大直至充满屏幕. 
 <br>
 
-<center><img width= "300" src="https://foruda.gitee.com/images/1721358446853094062/035b495a_10088396.gif" /></center>
+<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/GUI-APP/Switch_APP/switch_app.gif" /></center>
 <br>
 
 ### 对应的代码

@@ -83,7 +83,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 ```
 <br>
 
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1707123074599166359/1f62b9c5_10641540.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tab.gif" width = "300" /></div>
 
 <br>
 
@@ -133,7 +133,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 <br>
 
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1701255113760758795/64efc30d_10641540.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tabview.gif" width = "300" /></div>
 <br>
 
 ### Example for tabview loop
@@ -181,7 +181,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 ```
 
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1707190747113723176/25bf8257_10641540.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tabview_loop.gif" width = "300" /></div>
 <br>
 
 

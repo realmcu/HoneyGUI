@@ -232,7 +232,7 @@ void page_tb_activity(void *parent)
 
 </details></br>
 
-<center><img width="300" src= "https://foruda.gitee.com/images/1701077306172011299/b0206172_13674272.gif "/></center>
+<center><img width="300" src= "(https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
 
 <br>
 

@@ -113,7 +113,7 @@ void curtain_down_design(void *parent_widget)
 
 <br>
 
-<center><img width="300" src= "https://foruda.gitee.com/images/1699872126165535256/1a26f029_13674272.gif "/></center>
+<center><img width="300" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/card.gif"/></center>
 
 <br>
 

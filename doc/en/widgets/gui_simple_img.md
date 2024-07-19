@@ -87,7 +87,7 @@ void page_tb3(void *parent)
 
 <br>
 
-<center><img width= "300" src="https://foruda.gitee.com/images/1715074028338417840/9bb1c0dc_13671125.gif" /></center>
+<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/simple_img.gif" /></center>
 <br>
 
 <span id="api">

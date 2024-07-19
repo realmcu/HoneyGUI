@@ -3,7 +3,7 @@
 本示例通过演示如何开发一个简单的 “计算器 APP”，来介绍设计开发 UI APP的基本方法和流程。示例中的 “计算器 APP” 其功能和传统的计算器功能一致，应用使用 "button" 控件来获取用户输入，用 "text" 控件来显示输入内容和计算结果。请观看以下演示视频来了解完整功能。
 
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1706089242549970186/448f9137_10641540.gif " width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/sample/Calculator/calculator.gif" width = "300" /></div>
 <br>
 
 ## 源文件
