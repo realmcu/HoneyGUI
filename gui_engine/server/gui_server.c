@@ -99,8 +99,8 @@ static void gui_server_entry(void *parameter)
                     extern gui_app_t *next_app;
                     extern gui_app_t *current_app;
                     current_app->close = false;
-                    gui_list_remove(&(app->screen.brother_list));
-                    app->screen.parent = 0;
+                    gui_list_remove(&(next_app->screen.brother_list));
+                    next_app->screen.parent = 0;
                     gui_obj_tree_free(&((gui_app_t *)app)->screen);
                     current_app = next_app;
                     next_app = 0;

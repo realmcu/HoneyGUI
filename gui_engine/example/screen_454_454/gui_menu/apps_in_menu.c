@@ -54,6 +54,7 @@ GUI_APP_DEFINE_NAME(APP_WEB)
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
 #define HR_BK_RECT_NAME "_HR_BK_RECT_NAME"
+#define APP_SWAP_ANIMATION_DUR 2000
 static void heart_ani_cb(gui_win_t *img);
 static void page_cb(gui_page_t *page);
 static void win_cb(gui_win_t *win);
@@ -543,18 +544,74 @@ static void menu_win_ani_cb(void *args, gui_win_t *win)
     gui_win_set_scale_rate(win, sinf(pro * (M_PI / 2 - 0.2f) + 0.2f),
                            sinf(pro * (M_PI / 2 - 0.2f) + 0.2f));
     gui_win_set_opacity(win, (pro) * UINT8_MAX);
-    if (gui_win_is_animation_end_frame)
+    if (gui_win_is_animation_end_frame(win))
     {
         gui_win_set_scale_rate(win, 0, 0);//reset scale
     }
 }
+#define APP_WATCH_WIN_NAME "menu win name"
+static void menu_win_ani_cb_return(void *args, gui_win_t *win)
+{
+    float pro = gui_win_get_aniamtion_progress_percent(win);
+    gui_win_set_opacity(win, (1.0f - pro) * UINT8_MAX);
+    gui_win_set_scale_rate(win, cosf(pro * M_PI / 2), cosf(pro * M_PI / 2));
+    if (gui_win_is_animation_end_frame(win))
+    {
+        GUI_APP_SHUTDOWM(APP_MENU)
+    }
+}
+static void app_wathc_win_ani_cb_return(void *args, gui_win_t *win)
+{
+    float pro = gui_win_get_aniamtion_progress_percent(win);
+    gui_win_set_opacity(win, (pro) * UINT8_MAX);
+    gui_win_set_scale_rate(win, 1 + cosf(pro * M_PI / 2), 1 + cosf(pro * M_PI / 2));
+    if (gui_win_is_animation_end_frame(win))
+    {
+        /*Overwrite app watch's aniamtion as the shut down animation*/
+        extern void app_watch_mune_win_ani_cb(void *args, gui_win_t *win);
+        gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, app_watch_mune_win_ani_cb,
+                            0);
+        gui_win_stop_animation(win);
+    }
+}
+#define APP_MENU_WIN_NAME "APP_MENU_WIN_NAME"
+static void app_menu_win_cb(gui_obj_t *this)//this widget, event code, parameter
+{
+    gui_app_layer_buttom();
+    gui_app_startup(get_app_watch_ui());
+    gui_tabview_t *tabview = 0;
+    gui_obj_tree_get_widget_by_name(&(get_app_watch_ui()->screen), "tabview", (void *)&tabview);
+    if (tabview)
+    {
+        gui_tabview_jump_tab(tabview, -1, 0);
+    }
+    {
+        gui_win_t *win = 0;
+        gui_obj_tree_get_widget_by_name(&(get_app_watch_ui()->screen), APP_WATCH_WIN_NAME, (void *)&win);
+        if (win)
+        {
+            /*Overwrite app watch's aniamtion as the start animation*/
+            gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, app_wathc_win_ani_cb_return,
+                                0);
+        }
+    }
+    gui_win_t *win = 0;
+    gui_obj_tree_get_widget_by_name(&(GUI_APP_HANDLE(APP_MENU)->screen), APP_MENU_WIN_NAME,
+                                    (void *)&win);
+    if (win)
+    {
+        gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, menu_win_ani_cb_return,
+                            0);
+    }
+}
+
 static void app_menu(gui_app_t *app)
 {
     /**
      * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
     */
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
-    gui_win_set_animate(win, 2000, 0, menu_win_ani_cb,
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, APP_MENU_WIN_NAME, 0, 0, 0, 0);
+    gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, menu_win_ani_cb,
                         0);//aniamtion start to play at app startup
     /* app swap animation configration of the next app*/
     uint32_t *array[] =
@@ -610,9 +667,10 @@ static void app_menu(gui_app_t *app)
     gui_menu_cellular_t *cell = gui_menu_cellular_create(win, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
-    status_bar(win, (void *)cell);
+    //status_bar(win, (void *)cell);
     gui_return_create(win, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)cell);
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), app_menu_win_cb, (void *)cell);
+    gui_win_click(win, app_menu_win_cb, win);
 }
 #include "gui_seekbar.h"
 #include "gui_img.h"

@@ -5,7 +5,7 @@
 - The first app will gradually become transparent until it disappears when switching, and the second app will enlarge to fill the screen. 
 <br>
 
-<center><img width= "300" src="https://foruda.gitee.com/images/1720769983624603433/05c8f87b_10088396.gif" /></center>
+<center><img width= "300" src="https://foruda.gitee.com/images/1721358446853094062/035b495a_10088396.gif" /></center>
 <br>
 
 ### Source code
