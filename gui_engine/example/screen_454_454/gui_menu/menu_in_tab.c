@@ -98,7 +98,7 @@ void app_watch_mune_win_ani_cb(void *args, gui_win_t *win)
 void design_tab_menu(void *parent)
 {
     gui_win_t *win = gui_win_create(parent, MENU_WIN_NAME, 0, 0, 0, 0);
-    gui_win_set_animate(win, 5000, 0, app_watch_mune_win_ani_cb, 0);
+    gui_win_set_animate(win, 2000, 0, app_watch_mune_win_ani_cb, 0);
     gui_win_stop_animation(win);//aniamtion start to play until button click event
     /* app swap animation configration of the first app*/
     gui_canvas_rect_create((void *)win, "canvas_rect", 0, 0, gui_get_screen_width(),

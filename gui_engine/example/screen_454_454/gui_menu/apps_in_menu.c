@@ -1820,8 +1820,9 @@ GUI_APP_ENTRY(APP_MUSIC)
 GUI_APP_ENTRY(APP_WEB)
 {
 #ifdef ENABLE_RTK_GUI_WEB
-    extern int gui_web_open_html(const char *html_file);
-    gui_web_open_html("gui_engine\\example\\web\\mechanical-clock-canvas\\index.html");
+    extern int gui_web_open_html(const char *html_file, gui_obj_t *parent);
+    gui_web_open_html("gui_engine\\example\\web\\mechanical-clock-canvas\\index.html",
+                      GUI_APP_ROOT_SCREEN);
 
 #else
     {

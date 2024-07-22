@@ -175,16 +175,16 @@ typedef struct gui_text_line
 /**
  * @brief set textbox click event cb .
  *
- * @param this      text widget
+ * @param this_widget      text widget
  * @param event_cb  cb function
  * @param parameter cb parameter
  */
-void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter);
+void gui_text_click(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter);
 
 /**
 * @brief set the string in a text box widget.
 * @note The font size must match the font file!
-* @param this the text box widget pointer.
+* @param this_widget the text box widget pointer.
 * @param text the text string.
 * @param text_type text type.
 * @param color the text's color.
@@ -192,7 +192,7 @@ void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter);
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t   *this,
+void gui_text_set(gui_text_t   *this_widget,
                   void         *text,
                   FONT_SRC_TYPE text_type,
                   gui_color_t   color,
@@ -215,80 +215,80 @@ void gui_text_set_animate(void    *o,
                           void    *p);
 
 /**
- * @brief set text mode of this text widget
+ * @brief set text mode of this_widget text widget
  * @note if text line count was more than one, it will display on the left even if it was set lft or right
- * @param this the text widget pointer.
+ * @param this_widget the text widget pointer.
  * @param mode there was three mode: LEFT, CENTER and RIGHT.
  */
-void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode);
+void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
 
 /**
  * @brief set inputable
  *
- * @param this he text box widget pointer.
+ * @param this_widget he text box widget pointer.
  * @param inputable inputable
  */
-void gui_text_input_set(gui_text_t *this, bool inputable);
+void gui_text_input_set(gui_text_t *this_widget, bool inputable);
 
 /**
  * @brief move the text widget
  *
- * @param this the text box widget pointer.
+ * @param this_widget the text box widget pointer.
  * @param x the X-axis coordinate of the text box.
  * @param y the Y-axis coordinate of the text box.
  */
-void gui_text_move(gui_text_t *this, int16_t x, int16_t y);
+void gui_text_move(gui_text_t *this_widget, int16_t x, int16_t y);
 
 /**
  * @brief set font size or width and height
  * @note if use freetype, width and height is effective, else height will be applied as font size
- * @param this the text widget pointer.
+ * @param this_widget the text widget pointer.
  * @param height font height or font size.
  * @param width font width(only be effective when freetype was used).
  */
-void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width);
+void gui_text_size_set(gui_text_t *this_widget, uint8_t height, uint8_t width);
 
 /**
  * @brief set text font mode
  *
- * @param this the text widget pointer
+ * @param this_widget the text widget pointer
  * @param font_mode font source mode
  */
-void gui_text_font_mode_set(gui_text_t *this, FONT_SRC_MODE font_mode);
+void gui_text_font_mode_set(gui_text_t *this_widget, FONT_SRC_MODE font_mode);
 
 /**
  * @brief set font type
  * @note The type must match the font size!
- * @param this the text widget pointer
+ * @param this_widget the text widget pointer
  * @param font_source the addr of .ttf or .bin
  * @param font_mode font source mode
  */
-void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_mode);
+void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE font_mode);
 
 /**
  * @brief set font encoding
  * @note utf-8 or unicode
- * @param this the text widget pointer
+ * @param this_widget the text widget pointer
  * @param encoding_type encoding_type
  */
-void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset);
+void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
 
 /**
  * @brief set text content
  *
- * @param this the text widget pointer
+ * @param this_widget the text widget pointer
  * @param text the text string.
  * @param length the text string's length
  */
-void gui_text_content_set(gui_text_t *this, void *text, uint16_t length);
+void gui_text_content_set(gui_text_t *this_widget, void *text, uint16_t length);
 
 /**
  * @brief to draw text by img, so that text can be scaled
  *
- * @param this the text widget pointer
+ * @param this_widget the text widget pointer
  * @param font_img_type color format
  */
-void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type);
+void gui_text_convert_to_img(gui_text_t *this_widget, GUI_FormatType font_img_type);
 
 /**
  * @brief create a text box widget.

@@ -7,6 +7,7 @@ function drawClock() {
     drawFace(ctx, radius);
     drawTime(ctx, radius);
     drawNumbers(ctx, radius);
+    updateDigitalClock();
 }
 
 function drawFace(ctx, radius) {
@@ -73,7 +74,14 @@ function drawHand(ctx, pos, length, width) {
     ctx.stroke();
     ctx.rotate(-pos);
 }
-
+const digitalClock = document.getElementById('digital-clock');
+function updateDigitalClock() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    digitalClock.textContent = `${hours}:${minutes}:${seconds}`;
+}
 function updateClock() {
     ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
     drawClock();

@@ -2,7 +2,6 @@
 #include <string>
 #include "HtmlParser.h"
 #include "JsExecutor.h"
-#include "Renderer.h"
 
 namespace WebParser
 {
@@ -16,7 +15,6 @@ public:
 private:
     HtmlParser htmlParser_;
     JsExecutor jsExecutor_;
-    Renderer renderer_;
 };
 
 } // namespace WebParser

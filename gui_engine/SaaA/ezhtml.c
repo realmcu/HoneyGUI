@@ -28,6 +28,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
+#include "gui_return.h"
 #ifdef __arm__
 #include "romfs.h"
 #else
@@ -94,6 +95,9 @@ static char *open_switch_name;
 static char *pause_switch_name;
 static char *close_switch_name;
 static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent);
+static void setting_return_cb(gui_obj_t *this);
+static void **image_array;
+static int file_count;
 static void seekbar_ani_cb(int args, gui_seekbar_t *this)
 {
     switch (args)
@@ -368,6 +372,9 @@ static void multi_level_ui_design(gui_multi_level_t *obj)
 {
     extern void *get_app_xml(void);
     create_tree_in_multi_level(get_app_xml(), obj);
+    gui_return_create(obj, image_array,
+                      file_count, setting_return_cb, (void *)0);
+    gui_obj_tree_print(obj);
 }
 struct on_click_jump_cb_param
 {
@@ -382,7 +389,7 @@ static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_p
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
-    gui_log("%s: %s", name, p->txt);
+    gui_log("widget_create_handle:%s: %s", name, p->txt);
     for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
     {
         if (!strcmp(widget[i].name, name))
@@ -2795,6 +2802,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
                     parent = gui_multi_level_create(parent, ptxt, multi_level_ui_design);
+
                 }
                 break;
             case MACRO_ONCLICK:
@@ -2850,7 +2858,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
                                     else if (parent->type == WINDOW)
                                     {
-                                        GUI_API(gui_win_t).on_click(parent, on_click_jump_cb, param);
+                                        gui_win_click(parent, on_click_jump_cb, param);
                                     }
 
 
@@ -3014,8 +3022,67 @@ void foreach_count(ezxml_t p, size_t *widget_count)
     }
 }*/
 static ezxml_t f1;
+
+static void system_load()
+{
+    const char *folder = "app/system/resource/return_array";
+    {
+        DIR *dir = 0;
+        struct dirent *entry;
+
+        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+        if ((dir = opendir(path)) == NULL)
+        {
+            gui_free(path);
+            //perror("opendir() failed"); return;
+        }
+        gui_free(path);
+        while ((entry = readdir(dir)) != NULL)
+        {
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                file_count++;
+            }
+
+
+        }
+        closedir(dir);
+    }
+    image_array = gui_malloc(file_count * sizeof(void *));
+    {
+        DIR *dir = 0;
+        struct dirent *entry;
+        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+        if ((dir = opendir(path)) == NULL)
+        {
+            gui_free(path);
+            //perror("opendir() failed"); return;
+        }
+
+        int count = 0;
+        while ((entry = readdir(dir)) != NULL)
+        {
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                sprintf(path2, "%s/%s", folder, entry->d_name);
+                image_array[count++] = gui_get_file_address(path2);
+            }
+
+        }
+        gui_free(path);
+        closedir(dir);
+
+
+    }
+
+
+}
 void create_tree(gui_app_t *app)
 {
+    system_load();
     f1 = ezxml_parse_file(app->xml);
     js = NULL;
     foreach_create(f1, &app->screen);
@@ -3036,6 +3103,7 @@ void create_tree(gui_app_t *app)
 }
 static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent)
 {
+    gui_obj_tree_print(parent);
     ezxml_t title = 0;
     ezxml_t f = 0;
     if (f1 != 0)
@@ -3052,7 +3120,7 @@ static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent
     {
         ezxml_free(f);
     }
-
+    gui_obj_tree_print(parent);
 
 
 
@@ -3209,6 +3277,18 @@ void create_tree_nest(char *xml, void *obj)
 {
     ezxml_t f1 = ezxml_parse_file(xml);
     foreach_create(f1, obj);
+}
+static void setting_return_cb(gui_obj_t *this)
+{
+    if (this->parent && this->parent->type == MULTI_LEVEL)
+    {
+        if (this->parent->parent && this->parent->parent->type == MULTI_LEVEL)
+        {
+            uint8_t index = GUI_TYPE(gui_multi_level_t, this->parent->parent)->index;
+            uint8_t level = GUI_TYPE(gui_multi_level_t, this->parent->parent)->level;
+            GUI_API(gui_multi_level_t).jump((void *)this->parent, level, index);
+        }
+    }
 }
 /*static gui_list_t app_list;
 static void screen_backfunc(gui_app_t *app)

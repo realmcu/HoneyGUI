@@ -4,8 +4,7 @@ namespace WebParser
 {
 
 Web::Web(const std::string &html, int width, int height)
-    : htmlParser_(html),
-      renderer_(width, height) {}
+    : htmlParser_(html) {}
 
 void Web::parseAndRender(const std::string &output_filename)
 {
@@ -24,12 +23,6 @@ void Web::parseAndRender(const std::string &output_filename)
             }
         }
     }
-
-    // Example: Draw a simple watch face
-    renderer_.drawWeb();
-
-    // Save the rendered image
-    renderer_.saveToFile(output_filename);
 }
 void Web::parseAndRender()
 {
@@ -48,16 +41,14 @@ void Web::parseAndRender()
             }
         }
     }
-
-    // Example: Draw a simple watch face
-    renderer_.drawWeb();
 }
 } // namespace WebParser
 
+#include "HtmlParser.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
+#include "gui_obj.h"
 std::string readFile(const std::string &filename)
 {
     std::ifstream file(filename);
@@ -65,16 +56,26 @@ std::string readFile(const std::string &filename)
     buffer << file.rdbuf();
     return buffer.str();
 }
+
+
+
 extern "C" {
-    int gui_web_open_html(const char *html_file_path)
+    int gui_web_open_html(const char *html_file_path, gui_obj_t *parent)
     {
 
         const std::string html_file = html_file_path;
-
         std::string html_content = readFile(html_file);
 
-        WebParser::Web Web(html_content, 200, 200);
-        Web.parseAndRender();
+        WebParser::HtmlParser htmlParser(html_content);
+
+        // Assuming the root parent is nullptr
+        ControlHandle rootParent = parent;
+
+        std::cout << "Creating controls from <body> tag:" << std::endl;
+        htmlParser.traverseBodyWithParent(rootParent);
+
+        WebParser::Web watchFace(html_content, 200, 200);
+        watchFace.parseAndRender();
 
         return EXIT_SUCCESS;
     }
