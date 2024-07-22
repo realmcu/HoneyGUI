@@ -686,6 +686,7 @@ gui_text_t *gui_text_create(void       *parent,
     memset(text, 0, sizeof(gui_text_t));
 
     gui_text_ctor(text, parent, name, x, y, w, h);
+    text->refresh = false;
     gui_list_init(&(GET_BASE(text)->child_list));
     if ((GET_BASE(text)->parent) != NULL)
     {
