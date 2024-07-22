@@ -96,59 +96,59 @@ icon.onClick(icon_gpio_turnAllOff, 11)
 
 // switch light
 sw.getElementById('sw_1_0')
-sw.switch_on(sw_gpio_turnOn, 0)
-sw.switch_off(sw_gpio_turnOff, 0)
+sw.onOn(sw_gpio_turnOn, 0)
+sw.onOff(sw_gpio_turnOff, 0)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_1_1')
-sw.switch_on(sw_gpio_turnOn, 1)
-sw.switch_off(sw_gpio_turnOff, 1)
+sw.onOn(sw_gpio_turnOn, 1)
+sw.onOff(sw_gpio_turnOff, 1)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_1_2')
-sw.switch_on(sw_gpio_turnOn, 2)
-sw.switch_off(sw_gpio_turnOff, 2)
+sw.onOn(sw_gpio_turnOn, 2)
+sw.onOff(sw_gpio_turnOff, 2)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_1_3')
-sw.switch_on(sw_gpio_turnOn, 3)
-sw.switch_off(sw_gpio_turnOff, 3)
+sw.onOn(sw_gpio_turnOn, 3)
+sw.onOff(sw_gpio_turnOff, 3)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_1_4')
-sw.switch_on(sw_gpio_turnOn, 4)
-sw.switch_off(sw_gpio_turnOff, 4)
+sw.onOn(sw_gpio_turnOn, 4)
+sw.onOff(sw_gpio_turnOff, 4)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_1_5')
-sw.switch_on(sw_gpio_turnOn, 5)
-sw.switch_off(sw_gpio_turnOff, 5)
+sw.onOn(sw_gpio_turnOn, 5)
+sw.onOff(sw_gpio_turnOff, 5)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_2_0')
-sw.switch_on(sw_gpio_turnOn, 6)
-sw.switch_off(sw_gpio_turnOff, 6)
+sw.onOn(sw_gpio_turnOn, 6)
+sw.onOff(sw_gpio_turnOff, 6)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_2_1')
-sw.switch_on(sw_gpio_turnOn, 7)
-sw.switch_off(sw_gpio_turnOff, 7)
+sw.onOn(sw_gpio_turnOn, 7)
+sw.onOff(sw_gpio_turnOff, 7)
 sw.onPress(sw_gpio_en)
 
 // switch plug
 sw.getElementById('sw_2_2')
-sw.switch_on(sw_gpio_turnOn, 8)
-sw.switch_off(sw_gpio_turnOff, 8)
+sw.onOn(sw_gpio_turnOn, 8)
+sw.onOff(sw_gpio_turnOff, 8)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_2_3')
-sw.switch_on(sw_gpio_turnOn, 9)
-sw.switch_off(sw_gpio_turnOff, 9)
+sw.onOn(sw_gpio_turnOn, 9)
+sw.onOff(sw_gpio_turnOff, 9)
 sw.onPress(sw_gpio_en)
 
 sw.getElementById('sw_2_4')
-sw.switch_on(sw_gpio_turnOn, 10)
-sw.switch_off(sw_gpio_turnOff, 10)
+sw.onOn(sw_gpio_turnOn, 10)
+sw.onOff(sw_gpio_turnOff, 10)
 sw.onPress(sw_gpio_en)
 // console.log('[JS] end switch')
 //-------------------------------------------
@@ -240,22 +240,22 @@ function sw_ac_Offcb(params) {
 }
 
 sw.getElementById('sw_heat')
-sw.switch_on(sw_ac_Oncb, 0)
-sw.switch_off(sw_ac_Offcb, 0)
+sw.onOn(sw_ac_Oncb, 0)
+sw.onOff(sw_ac_Offcb, 0)
 
 sw.getElementById('sw_cold')
-sw.switch_on(sw_ac_Oncb, 1)
-sw.switch_off(sw_ac_Offcb, 1)
+sw.onOn(sw_ac_Oncb, 1)
+sw.onOff(sw_ac_Offcb, 1)
 // turn on cold mode
 sw.turnOn()
 
 sw.getElementById('sw_fan')
-sw.switch_on(sw_ac_Oncb, 2)
-sw.switch_off(sw_ac_Offcb, 2)
+sw.onOn(sw_ac_Oncb, 2)
+sw.onOff(sw_ac_Offcb, 2)
 
 sw.getElementById('sw_dry')
-sw.switch_on(sw_ac_Oncb, 3)
-sw.switch_off(sw_ac_Offcb, 3)
+sw.onOn(sw_ac_Oncb, 3)
+sw.onOff(sw_ac_Offcb, 3)
 // console.log('[JS] end ac')
 
 //-------------------------------------------
@@ -284,8 +284,8 @@ function swCurtain(params) {
 seekbar.getElementById('skbr_curtain')
 seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
 sw.getElementById('sw_curtain')
-sw.switch_on(swCurtain)
-sw.switch_off(swCurtain)
+sw.onOn(swCurtain)
+sw.onOff(swCurtain)
 // console.log('[JS] curtain end')
 
 //-------------------------------------------
@@ -356,33 +356,33 @@ tab.onChange(tab_slide)
 // console.log('[JS] jump')
 // jump tab0
 sw.getElementById('sw_tab0')
-sw.switch_on(sw_jump_tab, 0)
-sw.switch_off(sw_jump_keep_on, 0)
+sw.onOn(sw_jump_tab, 0)
+sw.onOff(sw_jump_keep_on, 0)
 
 // jump tab1
 sw.getElementById('sw_tab1')
-sw.switch_on(sw_jump_tab, 1)
-sw.switch_off(sw_jump_keep_on, 1)
+sw.onOn(sw_jump_tab, 1)
+sw.onOff(sw_jump_keep_on, 1)
 
 // jump tab2
 sw.getElementById('sw_tab2')
-sw.switch_on(sw_jump_tab, 2)
-sw.switch_off(sw_jump_keep_on, 2)
+sw.onOn(sw_jump_tab, 2)
+sw.onOff(sw_jump_keep_on, 2)
 
 // jump tab3
 sw.getElementById('sw_tab3')
-sw.switch_on(sw_jump_tab, 3)
-sw.switch_off(sw_jump_keep_on, 3)
+sw.onOn(sw_jump_tab, 3)
+sw.onOff(sw_jump_keep_on, 3)
 
 // jump tab4
 sw.getElementById('sw_tab4')
-sw.switch_on(sw_jump_tab, 4)
-sw.switch_off(sw_jump_keep_on, 4)
+sw.onOn(sw_jump_tab, 4)
+sw.onOff(sw_jump_keep_on, 4)
 
 // jump tab5
 sw.getElementById('sw_tab5')
-sw.switch_on(sw_jump_tab, 5)
-sw.switch_off(sw_jump_keep_on, 5)
+sw.onOn(sw_jump_tab, 5)
+sw.onOff(sw_jump_keep_on, 5)
 
 // console.log('[JS] end jump')
 
@@ -439,6 +439,6 @@ function stopSpeed(params) {
 }
 sw.getElementById('sw_wifi')
 sw.onOn(startSpeed)
-sw.switch_off(stopSpeed)
+sw.onOff(stopSpeed)
 
 console.log('[JS] end')

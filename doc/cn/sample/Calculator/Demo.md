@@ -7,7 +7,7 @@
 <br>
 
 ## 源文件
-为了帮助学习和熟悉基本的开发流程，开发者可以在路径 `gui\gui_engine\example\` 下获取该示例的源文件 `app_calculator.c`。
+为了帮助学习和熟悉基本的开发流程，开发者可以在路径 `gui_engine\example\screen_448_368` 下获取该示例的源文件 `app_calculator.c`。
 
 
 ## 只需两步
