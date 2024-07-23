@@ -9,7 +9,7 @@ The 'Base Object' implements the basic properties of widgets on a screen. The sc
 
 ### Add event
 
-You can add an event of widget by this api [gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter, void *user_data)](#api).
+You can add an event of widget by this [api](/Glossary.rst#term-api) [gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter, void *user_data)](#api).
 `obj` is the selected widget, `event_cb` is the switching events, `filter` is the way how to trigger event, and `user_data` is the data to transmit.
 
 ### Set event
@@ -17,7 +17,7 @@ You can set an event of widget by this api [gui_obj_event_set(gui_obj_t *obj, gu
 
 ### Free widget
 
-Using [gui_obj_tree_free(void *obj)](#api) to free the widget tree recursively from the root to the leaves(Preorder traversal).
+Using [gui_obj_tree_free(void *obj)](#api) to free the widget tree recursively from the root to the leaves (Preorder traversal).
 
 ### Print widget
 

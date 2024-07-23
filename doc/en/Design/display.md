@@ -28,7 +28,7 @@ Here, the image widget loads the image data and reads the image information, whi
 
 Such as image movement, image reduction and enlargement, image rotation and so on.
 
-In addition, some of the hardware supports powerful GPU that can draw widgets with complex transformation effects, such as cube widget, color wheel widget, and so on.
+In addition, some of the hardware supports powerful [GPU](/Glossary.rst#term-GPU) that can draw widgets with complex transformation effects, such as cube widget, color wheel widget, and so on.
 
 ### Acceleration
 
@@ -40,9 +40,9 @@ The accelerator receives the drawing task assigned by the UI widget and transfer
 
 ### Buffer
 
-In most embedded systems where RAM is limited, RealUI uses a chunked rendering mechanism that requires a display buffer.
+In most embedded systems where [RAM](/Glossary.rst#term-RAM) is limited, RealUI uses a chunked rendering mechanism that requires a display buffer.
 
-The display buffer stores the image drawing results of the accelerator and the drawing results of other non-accelerating controls, and the data is transferred to the frame buffer through DMA.
+The display buffer stores the image drawing results of the accelerator and the drawing results of other non-accelerating controls, and the data is transferred to the frame buffer through [DMA](/Glossary.rst#term-DMA).
 
 Single frame draw mode can be used when the available RAM can accommodate a full frame, in which case a full frame buffer is used instead of a display buffer.
 

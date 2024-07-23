@@ -12,7 +12,7 @@ The workflow of the smart UI system is mainly divided into four steps.
 
 ### System
 
-System initialization mainly includes the initialization of the system clock, the initialization of peripherals and the initialization of other modules of the project, such as PSRAM, LCD, TP, and Bluetooth.
+System initialization mainly includes the initialization of the system clock, the initialization of peripherals and the initialization of other modules of the project, such as [PSRAM](/Glossary.rst#term-PSRAM), [LCD](/Glossary.rst#term-LCD), [TP](/Glossary.rst#term-TP), and Bluetooth.
 
 ### GUI Server
 
@@ -29,8 +29,8 @@ GUI server is the running function of GUI task, and its specific running process
 1. GUI APP EXIST: First, the currently running GUI APP needs to be obtained. When the GUI detects that there is a running GUI APP, it will proceed to the next step;
 2. GET LCD DATA: Get real-time information about the screen;
 3. GET TP DATA: Get real-time information about the touchpad and run the touch algorithm;
-4. GET KB DATA: Get real-time information about the keyboard and run the keyboard algorithm;
+4. GET [KB](/Glossary.rst#term-KB) DATA: Get real-time information about the keyboard and run the keyboard algorithm;
 5. OBJ DRAW: Drawing widgets in the APP, including functional operations and image processing.
-6. UPDATE FB: Delivers the drawn results to the screen.
+6. UPDATE [FB](/Glossary.rst#term-FB): Delivers the drawn results to the screen.
 
 More detailed operation of the GUI APP can be found in the online documentation.

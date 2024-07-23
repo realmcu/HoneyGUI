@@ -12,7 +12,7 @@ The touchpad is one of the most commonly used input devices, and most of the tim
 
 ### Touchpad hardware and driver
 
-Although different touchpad chips have different message data structures, the message always contains the touch status and the coordinates of the touch point. In order to transmit coordinate information, a data bus is needed, and I2C is the most commonly used data bus between touch chips and microprocessors.
+Although different touchpad chips have different message data structures, the message always contains the touch status and the coordinates of the touch point. In order to transmit coordinate information, a data bus is needed, and [I2C](/Glossary.rst#term-I2C) is the most commonly used data bus between touch chips and microprocessors.
 
 In addition, different touch chips need to use different drivers according to their specifications, which needs to be ported.
 

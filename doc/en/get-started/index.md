@@ -9,16 +9,16 @@
 
 HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (GUI) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
 
-As a comprehensive display framework, HoneyGUI not only includes Realtek's self-developed display engine development tools but also supports direct calls to external APIs such as LVGL and ARM2D for application development. Additionally, HoneyGUI provides a PC-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, RVD, to achieve visual programming.
+As a comprehensive display framework, HoneyGUI not only includes Realtek's self-developed display engine development tools but also supports direct calls to external APIs such as LVGL and ARM2D for application development. Additionally, HoneyGUI provides a PC-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, [RVD](/Glossary.rst#RVD), to achieve visual programming.
 
 Here are several common methods for APP development:
 
 - Develop applications using the RealGUI display engine by calling C/C++ APIs.
-- Directly call LVGL APIs to develop applications.
-- Directly call ARM-2D APIs to develop applications.
-- Front-end development using JavaScript and XML. It is recommended to use RVisualDesigner as a PC-based design tool for low-code development.
+- Directly call [LVGL](https://lvgl.io/) APIs to develop applications.
+- Directly call [ARM-2D](https://github.com/ARM-software/Arm-2D) APIs to develop applications.
+- Front-end development using JavaScript and XML. It is recommended to use ```RVisualDesigner``` as a [PC](/Glossary.rst#term-PC)-based design tool for low-code development.
 
-The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run on a variety of chips and OS. PC Windows version is provided.
+The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run on a variety of chips and [OS](/Glossary.rst#term-OS). PC Windows version is provided.
 
 ## Software Architecture
 
@@ -67,7 +67,7 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
    - Click `HoneyGUI.code-workspace` file
 
 #### Run project
-You can select the `Run and Debug` options after entering the vscode interface, and then click the `Run button`.
+You can select the `Run and Debug` options after entering the vscode interface, and then click the `Run` button.
 
 
 <div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699582639386992543/b2078d27_13671125.png"/></div><br/>

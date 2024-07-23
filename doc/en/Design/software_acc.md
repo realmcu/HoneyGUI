@@ -89,7 +89,7 @@ The following flow describes the `cover mode` process for `No RLE` compressed im
 
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714375761122113396/e0e01095_13671125.png"/></div><br/>
 
-- If the matrix is an identity matrix, a blit process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
+- If the matrix is an identity matrix, a [blit](/Glossary.rst#term-blit) process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
 - The `dc_bytes_per_pixel` is pixel bytes of  display device, calculated as `dc->bit_depth >> 3`, where `bit_depth` is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
 
 ### No RLE Cover

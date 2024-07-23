@@ -89,7 +89,7 @@ typedef enum
 
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714375761122113396/e0e01095_13671125.png"/></div><br/>
 
-- 如果矩阵是单位矩阵，则执行没有矩阵操作的渲染过程；否则，执行具有矩阵操作的渲染过程。
+- 如果矩阵是单位矩阵，则执行没有矩阵操作的[blit](/Glossary.rst#term-blit)过程；否则，执行具有矩阵操作的blit过程。
 - `dc_bytes_per_pixel` 表示显示设备的像素字节数，计算方式为 `dc->bit_depth >> 3`，其中 `bit_depth` 为显示设备的位深度。以位深度为24的显示设备为例，其像素字节数为3。
 
 ### 无RLE覆盖模式（不带矩阵变换）
@@ -108,7 +108,7 @@ typedef enum
 
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327745470292085/b2ffb40d_13671125.png"/></div><br/>
 
-- 如果矩阵是单位矩阵，则执行没有矩阵操作的渲染过程；否则，执行具有矩阵操作的渲染过程。
+- 如果矩阵是单位矩阵，则执行没有矩阵操作的blit过程；否则，执行具有矩阵操作的blit过程。
 - `dc_bytes_per_pixel` 表示显示设备的像素字节数，计算方式为 `dc->bit_depth >> 3`，其中 `bit_depth` 为显示设备的位深度。以位深度为24的显示设备为例，其像素字节数为3。
   
 ### 无RLE旁路模式（不带矩阵变换）

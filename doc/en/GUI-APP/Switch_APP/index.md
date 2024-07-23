@@ -9,7 +9,7 @@
 <br>
 
 ### Source code
-- In the animation frame callback, implement the animation effect of app switching(scaling and fading).
+- In the animation frame callback, implement the animation effect of app switching (scaling and fading).
 - When the animation is finished, shut down the app.
 
 ```eval_rst
