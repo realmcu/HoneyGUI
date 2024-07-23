@@ -14,7 +14,7 @@ jerry_value_t jerry_call_func_sem(const jerry_value_t func_obj_val,  /**< functi
     sem_wait(&sem_timer);
 #endif
 
-    jerry_value_t res = jerry_call_func_sem(func_obj_val, this_val, args_p, args_count);
+    jerry_value_t res = jerry_call_function(func_obj_val, this_val, args_p, args_count);
 
 #ifdef __WIN32
     sem_post(&sem_timer);
