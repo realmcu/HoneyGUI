@@ -97,6 +97,8 @@ static char *close_switch_name;
 static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent);
 static void setting_return_cb(gui_obj_t *this);
 static void **image_array;
+static void *return_image;
+static void *return_image_hl;
 static int file_count;
 static void seekbar_ani_cb(int args, gui_seekbar_t *this)
 {
@@ -372,9 +374,11 @@ static void multi_level_ui_design(gui_multi_level_t *obj)
 {
     extern void *get_app_xml(void);
     create_tree_in_multi_level(get_app_xml(), obj);
-    gui_return_create(obj, image_array,
-                      file_count, setting_return_cb, (void *)0);
-    gui_obj_tree_print(obj);
+    // gui_return_create(obj, image_array,
+    //                   file_count, setting_return_cb, (void *)0);
+    gui_button_t *button = gui_button_create(obj, 0, 0, 45, 45, return_image, return_image_hl, 0, 0, 0);
+    button->img->blend_mode = IMG_SRC_OVER_MODE;
+    GUI_API(gui_button_t).on_click(button, setting_return_cb, 0);
 }
 struct on_click_jump_cb_param
 {
@@ -384,7 +388,16 @@ struct on_click_jump_cb_param
 
 static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
 {
-    GUI_API(gui_multi_level_t).jump(obj, param->id1, param->id2);
+    if (param->id1 < 0)
+    {
+        setting_return_cb(obj);
+    }
+    else
+    {
+        GUI_API(gui_multi_level_t).jump(obj, param->id1, param->id2);
+    }
+
+
 }
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
@@ -3022,8 +3035,7 @@ void foreach_count(ezxml_t p, size_t *widget_count)
     }
 }*/
 static ezxml_t f1;
-
-static void system_load()
+static void load_return_array()
 {
     const char *folder = "app/system/resource/return_array";
     {
@@ -3035,7 +3047,8 @@ static void system_load()
         if ((dir = opendir(path)) == NULL)
         {
             gui_free(path);
-            //perror("opendir() failed"); return;
+            //perror("opendir() failed");
+            return;
         }
         gui_free(path);
         while ((entry = readdir(dir)) != NULL)
@@ -3058,7 +3071,8 @@ static void system_load()
         if ((dir = opendir(path)) == NULL)
         {
             gui_free(path);
-            //perror("opendir() failed"); return;
+            //perror("opendir() failed");
+            return;
         }
 
         int count = 0;
@@ -3077,6 +3091,17 @@ static void system_load()
 
 
     }
+
+}
+static void load_return_image()
+{
+    return_image = gui_get_file_address("app/system/resource/return.bin");
+    return_image_hl = gui_get_file_address("app/system/resource/returnhl.bin");
+}
+static void system_load()
+{
+    load_return_array();
+    load_return_image();
 
 
 }
