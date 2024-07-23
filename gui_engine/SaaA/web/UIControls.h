@@ -8,7 +8,7 @@
 #include "gui_win.h"
 using ControlHandle = void*;  // Assuming generic control handle type; replace with actual type
 ControlHandle createButton(ControlHandle parent,
-                           const std::map<std::string, std::string> &attributes)
+                           const std::map<std::string, std::string> &attributes, const std::string &folder)
 {
     std::cout << "Creating Button with parent " << parent << " and attributes:" << std::endl;
     for (const auto &attr : attributes)
@@ -22,7 +22,7 @@ ControlHandle createButton(ControlHandle parent,
 }
 
 ControlHandle createLabel(ControlHandle parent,
-                          const std::map<std::string, std::string> &attributes)
+                          const std::map<std::string, std::string> &attributes, const std::string &folder)
 {
     std::cout << "Creating Label with parent " << parent << " and attributes:" << std::endl;
     for (const auto &attr : attributes)
@@ -33,7 +33,8 @@ ControlHandle createLabel(ControlHandle parent,
     ControlHandle newButton = reinterpret_cast<void *>(2) ;
     return newButton;
 }
-ControlHandle createDiv(ControlHandle parent, const std::map<std::string, std::string> &attributes)
+ControlHandle createDiv(ControlHandle parent, const std::map<std::string, std::string> &attributes,
+                        const std::string &folder)
 {
     std::string name = attributes.at("id");
     int16_t x = std::stoi(attributes.at("x"));
@@ -70,11 +71,12 @@ ControlHandle createDiv(ControlHandle parent, const std::map<std::string, std::s
 
     return static_cast<ControlHandle>(newDiv);
 }
-ControlHandle createImg(ControlHandle parent, const std::map<std::string, std::string> &attributes)
+ControlHandle createImg(ControlHandle parent, const std::map<std::string, std::string> &attributes,
+                        const std::string &folder)
 {
 
     std::string name = attributes.at("id");
-    std::string filePath = attributes.at("src");
+    std::string filePath = folder + "/" + attributes.at("src");
     int16_t x = std::stoi(attributes.at("x"));
     int16_t y = std::stoi(attributes.at("y"));
     int16_t w = std::stoi(attributes.at("width"));
@@ -93,7 +95,7 @@ ControlHandle createImg(ControlHandle parent, const std::map<std::string, std::s
 }
 
 ControlHandle createCanvas(ControlHandle parent,
-                           const std::map<std::string, std::string> &attributes)
+                           const std::map<std::string, std::string> &attributes, const std::string &folder)
 {
     std::cout << "Creating Canvas with parent " << parent << " and attributes:" << std::endl;
     for (const auto &attr : attributes)

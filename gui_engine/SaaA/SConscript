@@ -14,7 +14,7 @@ if GetDepend(['CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE']):
     src += ['ezhtml.c']
     #src += ['frontend_launcher.c']
 if GetDepend(['CONFIG_REALTEK_BUILD_WEB']):
-    src += ['web/HtmlParser.cpp']+['web/JsExecutor.cpp']+['web/web.cpp']+['web/font.c']
+    src += ['web/JsExecutor.cpp']+['web/web.cpp']+['web/font.c']
     CPPPATH += [cwd+'/web']
 
 

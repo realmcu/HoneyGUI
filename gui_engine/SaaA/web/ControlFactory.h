@@ -8,7 +8,7 @@ class ControlFactory
 {
 public:
     using ControlCreator =
-        std::function<ControlHandle(ControlHandle, const std::map<std::string, std::string>&)>;
+        std::function<ControlHandle(ControlHandle, const std::map<std::string, std::string>&, const std::string &)>;
 
     static ControlFactory &getInstance()
     {
@@ -23,12 +23,12 @@ public:
 
 
     ControlHandle createControl(ControlHandle parent, const std::string &tag,
-                                const std::map<std::string, std::string> &attributes) const
+                                const std::map<std::string, std::string> &attributes, const std::string &folder) const
     {
         auto it = controlMap_.find(tag);
         if (it != controlMap_.end())
         {
-            return it->second(parent, attributes);
+            return it->second(parent, attributes, folder);
         }
         else
         {

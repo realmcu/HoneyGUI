@@ -3,59 +3,49 @@
 namespace WebParser
 {
 
-Web::Web(const std::string &html, int width, int height)
-    : htmlParser_(html) {}
+Web::Web(const std::string &html, int width, int height, gui_obj_t *parent)
+    : index(html), parent(parent)
+{
+    GUI_ROOT_FOLDER = (char *)"";
+    readFile(index);
+    output_ = gumbo_parse(html_content.c_str());
+    if (!output_)
+    {
+        throw std::runtime_error("Failed to parse HTML.");
+    }
+    extractCSSFromHTML();
 
-void Web::parseAndRender(const std::string &output_filename)
-{
-    // Example: Find all <script> tags and execute their content
-    std::vector<GumboNode *> script_nodes = htmlParser_.findElementsByTag("script");
-    for (GumboNode *node : script_nodes)
-    {
-        GumboElement *element = &node->v.element;
-        for (unsigned int i = 0; i < element->children.length; ++i)
-        {
-            GumboNode *child = static_cast<GumboNode *>(element->children.data[i]);
-            if (child->type == GUMBO_NODE_TEXT)
-            {
-                std::string script_content(child->v.text.text);
-                jsExecutor_.executeScript(script_content);
-            }
-        }
-    }
+    cssParser(cssString);
+    traverseBodyWithParent(parent);
 }
-void Web::parseAndRender()
-{
-    // Example: Find all <script> tags and execute their content
-    std::vector<GumboNode *> script_nodes = htmlParser_.findElementsByTag("script");
-    for (GumboNode *node : script_nodes)
-    {
-        GumboElement *element = &node->v.element;
-        for (unsigned int i = 0; i < element->children.length; ++i)
-        {
-            GumboNode *child = static_cast<GumboNode *>(element->children.data[i]);
-            if (child->type == GUMBO_NODE_TEXT)
-            {
-                std::string script_content(child->v.text.text);
-                jsExecutor_.executeScript(script_content);
-            }
-        }
-    }
-}
+
+
+// void Web::parseAndRender()
+// {
+//     // Example: Find all <script> tags and execute their content
+//     std::vector<GumboNode *> script_nodes = htmlParser_.findElementsByTag("script");
+//     for (GumboNode *node : script_nodes)
+//     {
+//         GumboElement *element = &node->v.element;
+//         for (unsigned int i = 0; i < element->children.length; ++i)
+//         {
+//             GumboNode *child = static_cast<GumboNode *>(element->children.data[i]);
+//             if (child->type == GUMBO_NODE_TEXT)
+//             {
+//                 std::string script_content(child->v.text.text);
+//                 jsExecutor_.executeScript(script_content);
+//             }
+//         }
+//     }
+// }
 } // namespace WebParser
 
-#include "HtmlParser.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include "gui_obj.h"
-std::string readFile(const std::string &filename)
-{
-    std::ifstream file(filename);
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
+
 
 
 
@@ -64,18 +54,10 @@ extern "C" {
     {
 
         const std::string html_file = html_file_path;
-        std::string html_content = readFile(html_file);
+        WebParser::Web web(html_file, 454, 454, parent);
 
-        WebParser::HtmlParser htmlParser(html_content);
 
-        // Assuming the root parent is nullptr
-        ControlHandle rootParent = parent;
 
-        std::cout << "Creating controls from <body> tag:" << std::endl;
-        htmlParser.traverseBodyWithParent(rootParent);
-
-        WebParser::Web watchFace(html_content, 200, 200);
-        watchFace.parseAndRender();
 
         return EXIT_SUCCESS;
     }
