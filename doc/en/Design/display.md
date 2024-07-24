@@ -6,7 +6,7 @@ The workflow of the display system is very complex, and there are different proc
 
 As the most commonly used UI input source, the image is used here as an example to illustrate the complete workflow from the raw image to the screen, as shown in the figure below.
 
-Because the hardware configuration of different types of IC is different, the RTL8772G chip platform is chosen, and RealUI is used as the UI system to explain the image display workflow.
+Because the hardware configuration of different types of [IC](/Glossary.rst#term-IC) is different, the RTL8772G chip platform is chosen, and RealUI is used as the UI system to explain the image display workflow.
 
 </details></br><center>
 <img src="https://foruda.gitee.com/images/1703054151955593791/7444de3c_9325830.png",alt="Image Display Work Flow"/>
@@ -18,15 +18,13 @@ The original image is converted into a file in a special format and then downloa
 
 After the simple migration of the file system is complete, the standard file system can be used.
 
-Read the GUI online documentation for more information about image conversion tools.
+Read the [GUI](/Glossary.rst#term-GUI) online documentation for more information about image conversion tools.
 
 ### UI Widget
 
 The image widget is the most basic UI widget used to display images. There are many widgets in the UI system that draw special images based on image widgets.
 
-Here, the image widget loads the image data and reads the image information, which, combined with the UI design and the behavior of the widget layer, provides the image rendering requirements for the acceleration layer.
-
-Such as image movement, image reduction and enlargement, image rotation and so on.
+Here, the image widget loads the image data and reads the image information, which, combined with the UI design and the behavior of the widget layer, provides the image rendering requirements for the acceleration layer. Such as image movement, image reduction and enlargement, image rotation and so on.
 
 In addition, some of the hardware supports powerful [GPU](/Glossary.rst#term-GPU) that can draw widgets with complex transformation effects, such as cube widget, color wheel widget, and so on.
 
