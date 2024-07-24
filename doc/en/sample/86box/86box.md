@@ -1,6 +1,6 @@
 #  86box Application
 
-This example demostrates how to develop a SmartUI 86BOX APP, from which you can learn and understand the basic methods and processes of developing a ui application.
+This example demostrates how to develop a RealUI 86BOX APP, from which you can learn and understand the basic methods and processes of developing a ui application.
 
 ## Source File
 - APP package `gui_engine\example\screen_480_480\root\app\box`
@@ -8,7 +8,7 @@ This example demostrates how to develop a SmartUI 86BOX APP, from which you can 
 
 ## UI design
 ### RVisualDesigner
-- SmartUI 86box utilizes `RVisualDesigner` to complete UI design. For the first-time usage of `RVisualDesigner`, please refer to `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` to obtain a detailed development guide.
+- RealUI 86box utilizes `RVisualDesigner` to complete UI design. For the first-time usage of `RVisualDesigner`, please refer to `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` to obtain a detailed development guide.
 
 - Find and open the example UI design project in the specified path.
 <br/>

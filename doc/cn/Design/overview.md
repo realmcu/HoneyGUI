@@ -1,12 +1,10 @@
-# 智能UI系统概述
+# RealUI系统概述
 
-智能UI系统是基于HoneyGUI的高效嵌入式显示项目解决方案。
-
-HoneyGUI是一个包括RealUI和LVGL的显示软件框架。
+RealUI系统是基于HoneyGUI的高效嵌入式显示项目解决方案。
 
 ## RealUI工作流程
 
-智能UI系统的工作流程主要分为四个步骤：
+RealUI系统的工作流程主要分为四个步骤：
 
 <center><img src="https://foruda.gitee.com/images/1703054193639447830/2052fd20_9325830.png",alt="GUI flow.png"/></center>
 

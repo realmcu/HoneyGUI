@@ -1,12 +1,10 @@
-# Smart UI system overview
+# RealUI system overview
 
-Smart UI system is an efficient embedded solution for display projects based on HoneyGUI.
-
-HoneyGUI is a display software framework that includes RealUI and LVGL.
+RealUI system is an efficient embedded solution for display projects based on HoneyGUI.
 
 ## RealUI workflow
 
-The workflow of the smart UI system is mainly divided into four steps.
+The workflow of the RealUI system is mainly divided into four steps.
 
 <center><img src="https://foruda.gitee.com/images/1703054193639447830/2052fd20_9325830.png",alt="GUI flow.png"/></center>
 
