@@ -1,331 +1,145 @@
-console.log('enter box3')
+console.log('enter 86box')
 
-/**
- * lamp
- */
-
-var P1_1 = 9
-var P1_0 = 8
-var P2_5 = 21
-var lamp1 = P1_1
-var lamp2 = P1_0
-var lamp3 = P2_5
-var lamp4 = P1_1
-var lamp5 = P1_0
-var lamp6 = P2_5
-//0x6c
-var LED1 = new Gpio(0, 'out');
-var LED2 = new Gpio(1, 'out');
-var LED3 = new Gpio(2, 'out');
-var LED4 = new Gpio(3, 'out');
-var LED5 = new Gpio(4, 'out');
-var LED6 = new Gpio(5, 'out');
-var LED7 = new Gpio(6, 'out');
-var LED8 = new Gpio(7, 'out');
-var LED9 = new Gpio(49052, 'out');
-var plug1 = new Gpio(8, 'out');
-var plug2 = new Gpio(9, 'out');
-var plug3 = new Gpio(10, 'out');
-//console.log(LED1.gpio+';'+LED1.direction)
-
-var sleep_flag = true;
-function sleepflagTrue(params) {
-    
-    sleep_flag = true;
-    //console.log('sleep_flag;'+sleep_flag)
-}
-// var sh_test = new SMTHM;
-
-function led1OnFunc(params) {
-    //console.log('led1OnFunc')
-    //console.log('sleep_flag;'+sleep_flag)
-    if (sleep_flag) {
-        LED1.writeSync(0)
-    }
-    // sh_test.test();
-}
-function led1OffFunc(params) {
-    //console.log('led1OffFunc')
-    
-    if (sleep_flag) {
-        LED1.writeSync(1)
-    }
-}
-function led2OnFunc(params) {
-    //console.log('led2OnFunc')
-    
-    if (sleep_flag) {
-        LED2.writeSync(0)
-    }
-}
-function led2OffFunc(params) {
-    //console.log('led2OffFunc')
-    
-    if (sleep_flag) {
-        LED2.writeSync(1)
-    }    
-}
-function led3OnFunc(params) {
-    //console.log('led3OnFunc')
-    
-    if (sleep_flag) {
-        LED3.writeSync(0)
-    }
-}
-function led3OffFunc(params) {
-    //console.log('led3OffFunc')
-    
-    if (sleep_flag) {
-        LED3.writeSync(1)
-    }
-}
-function led4OnFunc(params) {
-    //console.log('led1OnFunc')
-    
-    if (sleep_flag) {
-        LED4.writeSync(0)
-    }
-}
-function led4OffFunc(params) {
-    //console.log('led1OffFunc')
-    
-    if (sleep_flag) {
-        LED4.writeSync(1)
-    }
-}
-function led5OnFunc(params) {
-    //console.log('led2OnFunc')
-    
-    if (sleep_flag) {
-        LED5.writeSync(0)
-    }
-}
-function led5OffFunc(params) {
-    //console.log('led2OffFunc')
-    
-    if (sleep_flag) {
-        LED5.writeSync(1)
-    }
-}
-function led6OnFunc(params) {
-    //console.log('led3OnFunc')
-    
-    if (sleep_flag) {
-        LED6.writeSync(0)
-    }
-}
-function led6OffFunc(params) {
-    //console.log('led3OffFunc')
-    
-    if (sleep_flag) {
-        LED6.writeSync(1)
-    }
-}
-function led7OnFunc(params) {
-    //console.log('led2OnFunc')
-    
-    if (sleep_flag) {
-        LED7.writeSync(0)
-    }
-}
-function led7OffFunc(params) {
-    //console.log('led2OffFunc')
-    
-    if (sleep_flag) {
-        LED7.writeSync(1)
-    }
-}
-function led8OnFunc(params) {
-    //console.log('led3OnFunc')
-    
-    if (sleep_flag) {
-        LED8.writeSync(0)
-    }
-}
-function led8OffFunc(params) {
-    //console.log('led3OffFunc')
-    
-    if (sleep_flag) {
-        LED8.writeSync(1)
-    }
-}
-//plug
-function plug1OnFunc(params) {
-    //console.log('led3OnFunc')
-    
-    if (sleep_flag) {
-        plug1.writeSync(0)
-    }
-}
-function plug1OffFunc(params) {
-    //console.log('led3OffFunc')
-    
-    if (sleep_flag) {
-        plug1.writeSync(1)
-    }
-}
-function plug2OnFunc(params) {
-    //console.log('led3OnFunc')
-    
-    if (sleep_flag) {
-        plug2.writeSync(0)
-    }
-}
-function plug2OffFunc(params) {
-    //console.log('led3OffFunc')
-    
-    if (sleep_flag) {
-        plug2.writeSync(1)
-    }
-}
-function plug3OnFunc(params) {
-    //console.log('led3OnFunc')
-    
-    if (sleep_flag) {
-        plug3.writeSync(0)
-    }
-}
-function plug3OffFunc(params) {
-    //console.log('led3OffFunc')
-    
-    if (sleep_flag) {
-        plug3.writeSync(1)
-    }
-}
-function lampSwitchOnFunc(params) {
-    sleep_flag = false;
-    //console.log('lampSwitchOnFunc')
-    sw.getElementById('kitchen_switch')
-    sw.turnOn()
-    sw.getElementById('parlor_switch')
-    sw.turnOn()
-    sw.getElementById('bedroom_switch') 
-    sw.turnOn()   
-	sw.getElementById('bedroom_switch1')
-    sw.turnOn()
-    sw.getElementById('bedroom_switch2')
-    sw.turnOn()
-    sw.getElementById('porch_switch')
-    sw.turnOn() 
-    sw.getElementById('bedroom_off')
-    sw.turnOn()
-    sw.getElementById('children')
-    sw.turnOn()
-    sw.getElementById('socket1')
-    sw.turnOn()
-    sw.getElementById('socket3')
-    sw.turnOn()
-    sw.getElementById('switch0')
-    sw.turnOn()
+// var sh = new SMTHM;
 
 
-    // LED1.writeSync(0)
-	// LED2.writeSync(0)
-	// LED3.writeSync(0)
-	// LED4.writeSync(0)
-	// LED5.writeSync(0)
-	// LED6.writeSync(0)	
-	// LED7.writeSync(0)
-	// LED8.writeSync(0)	
-	// plug1.writeSync(0)	
-	// plug2.writeSync(0)	
-	// plug3.writeSync(0)	
+//-------------------------------------------
+// device switch io
 
-    LED9.writeSync(0) 
+var Pin_sw = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 49052];
+var swArray = [
+	new Gpio(Pin_sw[0], 'out'),
+	new Gpio(Pin_sw[1], 'out'),
+	new Gpio(Pin_sw[2], 'out'),
+	new Gpio(Pin_sw[3], 'out'),
+	new Gpio(Pin_sw[4], 'out'),
+	new Gpio(Pin_sw[5], 'out'),
+	new Gpio(Pin_sw[6], 'out'),
+	new Gpio(Pin_sw[7], 'out'),
+	new Gpio(Pin_sw[8], 'out'),
+	new Gpio(Pin_sw[9], 'out'),
+	new Gpio(Pin_sw[10], 'out'),
+	new Gpio(Pin_sw[11], 'out'),
+  ];
+
+var all_sw_id =[
+	'sw_living',
+	'sw_dining',
+	'sw_study',
+	'sw_wash',
+    'sw_kitchen',
+    'sw_bath',
+	'sw_bed',
+	'sw_child',
+	'sw_skt_0',
+    'sw_skt_1',
+    'sw_skt_2'
+];
+
+var Id_prefix_sw_sub = 'sw_sub_';
+var Id_prefix_sw_img = 'sw_img_';
+var gpio_val_on = 0;
+var gpio_val_off = 1;
+
+function sw_device_online(params) {
+    sw.getElementById(all_sw_id[params])
+    sw.setShow(1)
+    
+    img.getElementById(Id_prefix_sw_img + params.toString())
+    img.setShow(0)
 }
-function lampSwitchOffFunc(params) {
-    sleep_flag = false;
-    //console.log('lampSwitchOffFunc')
-    sw.getElementById('kitchen_switch')
-    sw.turnOff()
-    sw.getElementById('parlor_switch')
-    sw.turnOff()
-    sw.getElementById('bedroom_switch')
-    sw.turnOff()
-	sw.getElementById('bedroom_switch1')
-    sw.turnOff()
-    sw.getElementById('bedroom_switch2')
-    sw.turnOff()
-    sw.getElementById('porch_switch')
-    sw.turnOff()
-    sw.getElementById('bedroom_off')
-    sw.turnOff()
-    sw.getElementById('children')
-    sw.turnOff()
-    sw.getElementById('socket1')
-    sw.turnOff()
-    sw.getElementById('socket3')
-    sw.turnOff()
-    sw.getElementById('switch0')
-    sw.turnOff()
-
-    // LED1.writeSync(1)
-	// LED2.writeSync(1)
-	// LED3.writeSync(1)
-	// LED4.writeSync(1)
-	// LED5.writeSync(1)
-	// LED6.writeSync(1)	
-	// LED7.writeSync(1)
-	// LED8.writeSync(1)	
-	// plug1.writeSync(1)	
-	// plug2.writeSync(1)	
-	// plug3.writeSync(1)	
-
-    LED9.writeSync(1) 
+function sw_device_offline(params) {
+    img.getElementById(Id_prefix_sw_img + params.toString())
+    img.setShow(1)
+    
+    sw.getElementById(all_sw_id[params])
+    sw.setShow(0)
 }
-sw.getElementById('kitchen_switch')
-sw.onOn(led1OnFunc)
-sw.onOff(led1OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('parlor_switch')
-sw.onOn(led2OnFunc)
-sw.onOff(led2OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('bedroom_switch')
-sw.onOn(led3OnFunc)
-sw.onOff(led3OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('bedroom_switch1')
-sw.onOn(led4OnFunc)
-sw.onOff(led4OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('bedroom_switch2')
-sw.onOn(led5OnFunc)
-sw.onOff(led5OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('porch_switch')
-sw.onOn(led6OnFunc)
-sw.onOff(led6OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('bedroom_off')
-sw.onOn(led7OnFunc)
-sw.onOff(led7OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('children')
-sw.onOn(led8OnFunc)
-sw.onOff(led8OffFunc)
-sw.onPress(sleepflagTrue)
+function sw_device_turnOn(params) {
+	// console.log('sw_gpio_turnOn ', params)
+    swArray[params].writeSync(gpio_val_on) 
+    // swArray[params].state = 1;
+}
+
+function sw_device_turnOff(params) {
+	// console.log('sw_gpio_turnOff ', params)
+    swArray[params].writeSync(gpio_val_off) 
+    // swArray[params].state = 0;
+}
+
+// switch light & socket init
+for (var i = 0; i < 11; i++){
+    sw.getElementById(all_sw_id[i]);
+    // console.log(all_sw_id[i])
+
+    sw_device_online(i)
+    sw.onOn(sw_device_turnOn, i)
+    sw.onOff(sw_device_turnOff, i)
+}
 
 
-sw.getElementById('socket1')
-sw.onOn(plug1OnFunc)
-sw.onOff(plug1OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('switch0')
-sw.onOn(plug2OnFunc)
-sw.onOff(plug2OffFunc)
-sw.onPress(sleepflagTrue)
-sw.getElementById('socket3')
-sw.onOn(plug3OnFunc)
-sw.onOff(plug3OffFunc)
-sw.onPress(sleepflagTrue)
-icon.getElementById('allturnon')
-icon.onClick(lampSwitchOnFunc)
-icon.getElementById('sleep')
-icon.onClick(lampSwitchOffFunc)
-/**
- * ac
- */
+// button all on/off
+var gpio_val_group_on = 0x10;  
+var gpio_val_group_off = 0x11; 
+function icon_gpio_turnAllOn(params) {
+	// console.log('icon_gpio_turnAllOn ', params)
+	swArray[params].writeSync(gpio_val_group_on)
+
+	for (var i = 0; i < 11; i++){
+		sw.getElementById(all_sw_id[i])
+		// sw.turnOn();
+        sw.setState(1);
+        // swArray[params].state = 1;
+	}
+}
+
+function icon_gpio_turnAllOff(params) {
+	// console.log('icon_gpio_turnAllOn ', params)
+	swArray[params].writeSync(gpio_val_group_off) 
+
+	for (var i = 0; i < 11; i++){
+		sw.getElementById(all_sw_id[i])
+		// sw.turnOff();
+        sw.setState(0);
+        // swArray[params].state = 0;
+	}
+
+}
+
+icon.getElementById('btn_allon')
+icon.onClick(icon_gpio_turnAllOn, 11)
+icon.getElementById('btn_alloff')
+icon.onClick(icon_gpio_turnAllOff, 11)
+
+
+// sw subscribe manage
+var gpio_val_sub = 0x20;   
+var gpio_val_unsub = 0x30; 
+function sw_sub_turnOn(params) {
+	// console.log('sw_gpio_turnOn ', params)
+    swArray[params].writeSync(gpio_val_sub) 
+}
+
+function sw_sub_turnOff(params) {
+	// console.log('sw_gpio_turnOff ', params)
+    swArray[params].writeSync(gpio_val_unsub) 
+}
+
+for (var i = 0; i < 11; i++){
+    var id_str = Id_prefix_sw_sub + i.toString();
+    sw.getElementById(id_str);
+    console.log(id_str)
+
+    // default state is ON 
+    sw.onOn(sw_sub_turnOff, i)
+    sw.onOff(sw_sub_turnOn, i)
+}
+
+
+console.log('[JS] end switch')
+//-------------------------------------------
+// ac control
+
 console.log('ac start')
 var acStatus = 1
 var acOnOffStatus = 0;
@@ -460,20 +274,33 @@ function acOnFunc(params) {
 }
 function acOffFunc1(params) {
     //console.log('heatingFunc')
-
+    if(params == acStatus)
+    {
+        if(params == 1)
+        {
+            sw.getElementById('cool_switch')
+        }
+        else
+        {
+            sw.getElementById('heat_switch')
+        }
+        sw.setState(1)
+    }
 }
 sw.getElementById('cool_switch')
 sw.onOn(coolingFunc)
-sw.onOff(acOffFunc1)
+sw.onOff(acOffFunc1, 1)
+sw.setState(1)
 
 
 sw.getElementById('heat_switch')
 sw.onOn(heatingFunc)
-sw.onOff(acOffFunc1)
+sw.onOff(acOffFunc1, 2)
 
 sw.getElementById('ac_on_off_switch')
 sw.onOn(acOnFunc)
 sw.onOff(acOffFunc)
+sw.setState(1)
 //sw.turnOn()
 
 /**
@@ -481,37 +308,33 @@ sw.onOff(acOffFunc)
  */
 var curtainAnimateTiming = {
     duration: 2000,
-    iterations:1,
+    iterations:0,
     from: 1,
     to: 0
 }
-var testAnimateTiming = {
-    duration: 1000,
-    iterations:-1,
-    from: 1,
-    to: 0
-}
-var curtain_open = 0;
+var cur_actOpen = 0;
 seekbar.getElementById('curtain_bar')
 function curtainFrame(params) {
    // console.log('curtainFrame')
-     animate= seekbar.animateProgress()
-    if (curtain_open==1) {
-        seekbar.setAttribute("progress", animate)
-    } else {
-        seekbar.setAttribute("progress", 1.0-animate)
-    }
+    seekbar.getElementById('curtain_bar')
+    var animate = seekbar.animateProgress()
+    seekbar.setAttribute("progress", cur_actOpen ?  (1.0 - animate) : animate)
 }
 
 function swCurtain(params) {
    // console.log('swCurtain')
-    seekbar.palyAnimate()
-    if (curtain_open==1) {
-        curtain_open = 0;
-    } else {
-        curtain_open = 1;
-    }
+    seekbar.getElementById('curtain_bar')
+    cur_actOpen = cur_actOpen ? 0 : 1;
+    seekbar.playAnimate()
+
+    sw.getElementById('open_switch')
+    sw.setState(cur_actOpen)
+    sw.getElementById('close_switch')
+    sw.setState(cur_actOpen)
+    sw.getElementById('curtain_on_off_switch')
+    sw.setState(cur_actOpen)
 }
+seekbar.setAttribute("progress", 1) // closed
 seekbar.setAnimate(curtainFrame, curtainAnimateTiming)
 sw.getElementById('open_switch')
 sw.onOn(swCurtain)
@@ -531,8 +354,6 @@ function resetPressFunc(params) {
     matter.dataRst();
 }
 icon.onHold(resetPressFunc)
-
-
 
 //-------------------------------------------
 //// tab  control
@@ -652,7 +473,7 @@ textbox.write(' ')
 textbox.getElementById('txt_unit')
 textbox.write(' ')
 var textAnimateConfig = {
-    duration: 2000,
+    duration:  40,
     iterations:-1,
     from: 1,
     to: 0
@@ -660,7 +481,7 @@ var textAnimateConfig = {
 var speed = 888;
 function textAnimateCallback(params) {
     textbox.getElementById('txt_speed')
-    speed=wifi.readSpeed()
+    speed = wifi.readSpeed()
     // textbox.write(wifi.readSpeed())
 	textbox.write(speed.toString())
 }
@@ -673,7 +494,7 @@ function startSpeed(params) {
 
     textbox.getElementById('txt_speed')
     textbox.setAnimate(textAnimateCallback, textAnimateConfig)
-    textbox.palyAnimate()
+    textbox.playAnimate()
     wifi.startSpeed()
 }
 function stopSpeed(params) {
@@ -698,23 +519,9 @@ console.log('end wifi speed')
 //-------------------------------------------
 // wifi sync switch
 
-var sh_wifi = new SMTHM;
+var sh = new SMTHM;
 
-var all_sw_id =[
-	'kitchen_switch',
-	'parlor_switch',
-	'bedroom_switch',
-	'bedroom_switch1',
-    'bedroom_switch2',
-    'porch_switch',
-	'bedroom_off',
-	'children',
-	'socket1',
-    'switch0',
-    'socket3'
-];
-
-function Wifi_sw(params) {
+function IOT_sw(params) {
     // console.log('enter  Wifi_sw')
 
     var idx = params.idx;
@@ -723,16 +530,21 @@ function Wifi_sw(params) {
     // console.log(idx, '  ', val, ' ', all_sw_id[idx])
 
     sw.getElementById(all_sw_id[idx]);
-    if(val)
+    if(val == 0 || val == 1) // on/off
     {
-        sw.turnOn()
+        sw.setState(val);
+        sw_device_online(idx);
     }
-    else
+    else if(val == 2) // offline
     {
-        sw.turnOff()
+        sw_device_offline(idx);
+    }
+    else if(val == 3) // online
+    {
+        sw_device_online(idx);
     }
 
 }
-sh_wifi.OnSyncSW(Wifi_sw);
+sh.OnSyncSW(IOT_sw);
 
 console.log('end js')

@@ -3115,6 +3115,7 @@ void create_tree(gui_app_t *app)
     f1 = 0;
 #ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_run_file(const char *file, gui_app_t  *app);
+    extern void js_isReady(void);
     if (js)
     {
         char *path = gui_malloc(strlen(js) + strlen(GUI_ROOT_FOLDER) + 1);
@@ -3123,6 +3124,7 @@ void create_tree(gui_app_t *app)
         js_run_file(path, app);
 
         gui_free(path);
+        js_isReady();
     }
 #endif
 }

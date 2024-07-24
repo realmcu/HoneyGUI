@@ -33,7 +33,73 @@
         idy="0"
         x="0"
         y="0">lamp_tab
-<switch
+<img
+          x="43"
+          y="48"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp/Living_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_0
+</img><img
+          x="254"
+          y="48"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp/Dining_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_1
+</img><img
+          x="43"
+          y="175"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp/Study_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_2
+</img><img
+          x="254"
+          y="175"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp/Wash_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_3
+</img><img
+          x="43"
+          y="302"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp/Kitchen_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_4
+</img><img
+          x="254"
+          y="302"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp/Bathroom_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_5
+</img><switch
           x="42"
           y="48"
           picture="app/box/resource/lamp/Living_off.bin"
@@ -41,7 +107,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">kitchen_switch
+          h="97">sw_living
 </switch><switch
           x="254"
           y="48"
@@ -50,7 +116,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">parlor_switch
+          h="97">sw_dining
 </switch><switch
           x="43"
           y="175"
@@ -59,7 +125,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">bedroom_switch
+          h="97">sw_study
 </switch><switch
           x="254"
           y="175"
@@ -68,7 +134,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">bedroom_switch1
+          h="97">sw_wash
 </switch><switch
           x="42"
           y="302"
@@ -77,7 +143,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">bedroom_switch2
+          h="97">sw_kitchen
 </switch><switch
           x="254"
           y="302"
@@ -86,13 +152,122 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">porch_switch
+          h="97">sw_bath
+</switch><switch
+          x="201"
+          y="121"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_0
+</switch><switch
+          x="413"
+          y="121"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_1
+</switch><switch
+          x="201"
+          y="247"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_2
+</switch><switch
+          x="413"
+          y="247"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_3
+</switch><switch
+          x="201"
+          y="375"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_4
+</switch><switch
+          x="413"
+          y="375"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_5
 </switch></tab><tab
         idx="2"
         idy="0"
         x="0"
         y="0">lamp_tab2
-<switch
+<img
+          x="42"
+          y="48"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp2/Bedroom_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_6
+</img><img
+          x="254"
+          y="48"
+          w="184"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp2/Children_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_7
+</img><img
+          x="42"
+          y="302"
+          w="124"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp2/socket1_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_8
+</img><img
+          x="178"
+          y="302"
+          w="124"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp2/socket2_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_9
+</img><img
+          x="313"
+          y="302"
+          w="124"
+          h="97"
+          opacity="255"
+          file="app/box/resource/lamp2/socket3_offline.bin"
+          blendMode="imgBypassMode"
+          rotationAngle="0"
+          scaleX="1"
+          scaleY="1">sw_img_10
+</img><switch
           x="42"
           y="48"
           picture="app/box/resource/lamp2/Bedroom_off.bin"
@@ -100,7 +275,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">bedroom_off
+          h="97">sw_bed
 </switch><switch
           x="254"
           y="48"
@@ -109,7 +284,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="184"
-          h="97">children
+          h="97">sw_child
 </switch><icon
           picture="app/box/resource/lamp2/AllTurnon_off.bin"
           highlightPicture="app/box/resource/lamp2/AllTurnon_on.bin"
@@ -126,7 +301,7 @@
           w="184"
           h="97"
           x="42"
-          y="175">allturnon
+          y="175">btn_allon
 </icon><icon
           picture="app/box/resource/lamp2/sleep_off-1.bin"
           highlightPicture="app/box/resource/lamp2/sleep_on.bin"
@@ -143,7 +318,7 @@
           w="184"
           h="97"
           x="254"
-          y="175">sleep
+          y="175">btn_alloff
 </icon><switch
           x="42"
           y="302"
@@ -152,16 +327,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="124"
-          h="97">socket1
-</switch><switch
-          x="313"
-          y="302"
-          picture="app/box/resource/lamp2/socket3_off.bin"
-          highlightPicture="app/box/resource/lamp2/socket3_on.bin"
-          blendMode="imgBypassMode"
-          opacity="255"
-          w="124"
-          h="97">socket3
+          h="97">sw_skt_0
 </switch><switch
           x="178"
           y="302"
@@ -170,17 +336,71 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="124"
-          h="97">switch0
+          h="97">sw_skt_1
+</switch><switch
+          x="313"
+          y="302"
+          picture="app/box/resource/lamp2/socket3_off.bin"
+          highlightPicture="app/box/resource/lamp2/socket3_on.bin"
+          blendMode="imgBypassMode"
+          opacity="255"
+          w="124"
+          h="97">sw_skt_2
+</switch><switch
+          x="198"
+          y="120"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_6
+</switch><switch
+          x="411"
+          y="121"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_7
+</switch><switch
+          x="140"
+          y="375"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="33"
+          h="36">sw_sub_8
+</switch><switch
+          x="278"
+          y="374"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="29"
+          h="36">sw_sub_9
+</switch><switch
+          x="410"
+          y="374"
+          picture="app/box/resource/lamp/sub_on.bin"
+          highlightPicture="app/box/resource/lamp/sub_off.bin"
+          blendMode="imgFilterBlack"
+          opacity="255"
+          w="36"
+          h="36">sw_sub_10
 </switch></tab><tab
         idx="3"
         idy="0"
         x="0"
         y="0">ac_tab
 <win
-          w="480"
-          h="480"
           x="0"
-          y="0">cool_win
+          y="0"
+          w="480"
+          h="480">cool_win
 <img
             x="78"
             y="68"
@@ -193,24 +413,24 @@
             scaleX="1"
             scaleY="1">image2
 </img><seekbar
+            x="83"
+            y="30"
+            w="312"
+            h="164"
+            opacity="255"
+            folder="app/box/resource/cooling"
+            blendMode="imgFilterBlack"
             orientation="arc"
             centralX="156"
             centralY="164"
-            folder="app/box/resource/cooling"
             startDegree="270"
-            endDegree="90"
-            blendMode="imgFilterBlack"
-            opacity="255"
-            w="312"
-            h="164"
-            x="83"
-            y="30">cool_bar
+            endDegree="90">cool_bar
 </seekbar></win><win
-          hidden="hidden"
+          x="0"
+          y="0"
           w="480"
           h="480"
-          x="0"
-          y="0">heat_win
+          hidden="hidden">heat_win
 <img
             x="80"
             y="70"
@@ -223,18 +443,18 @@
             scaleX="1"
             scaleY="1">image3
 </img><seekbar
+            x="83"
+            y="30"
+            w="312"
+            h="164"
+            opacity="255"
+            folder="app/box/resource/heating"
+            blendMode="imgFilterBlack"
             orientation="arc"
             centralX="156"
             centralY="164"
-            folder="app/box/resource/heating"
             startDegree="270"
-            endDegree="90"
-            blendMode="imgFilterBlack"
-            opacity="255"
-            w="312"
-            h="164"
-            x="83"
-            y="30">heat_bar
+            endDegree="90">heat_bar
 </seekbar></win><switch
           x="118"
           y="341"
@@ -268,18 +488,18 @@
         x="0"
         y="0">curain_tab
 <seekbar
+          x="85"
+          y="74"
+          w="314"
+          h="229"
+          opacity="255"
+          folder="app/box/resource/curtain_list"
+          blendMode="imgBypassMode"
           orientation="vertical"
           centralX="0"
           centralY="0"
-          folder="app/box/resource/curtain_list"
           startDegree="0"
-          endDegree="0"
-          blendMode="imgBypassMode"
-          opacity="255"
-          w="314"
-          h="229"
-          x="85"
-          y="74">curtain_bar
+          endDegree="0">curtain_bar
 </seekbar><switch
           x="117"
           y="354"
@@ -292,8 +512,8 @@
 </switch><switch
           x="335"
           y="354"
-          picture="app/box/resource/cutain/close.bin"
-          highlightPicture="app/box/resource/cutain/open.bin"
+          picture="app/box/resource/cutain/open.bin"
+          highlightPicture="app/box/resource/cutain/close.bin"
           blendMode="imgBypassMode"
           opacity="255"
           w="27"
@@ -306,7 +526,7 @@
           blendMode="imgBypassMode"
           opacity="255"
           w="30"
-          h="32">curtain_on_off_switch
+          h="34">curtain_on_off_switch
 </switch><icon
           picture="app/box/resource/other/default.bin"
           highlightPicture="app/box/resource/other/high.bin"
@@ -339,35 +559,35 @@
           w="480"
           h="415">sw_wifi
 </switch><textbox
+          x="185"
+          y="72"
           color="#ffffffff"
-          mode="truncate"
+          w="108"
+          h="49"
           text=" Click"
           fontSize="40"
           font="app/box/resource/font/times_size40_bits8_font.bin"
+          mode="truncate">txt_click
+</textbox><textbox
+          x="262"
+          y="71"
+          color="#ffffffff"
           w="108"
           h="49"
-          x="185"
-          y="72">txt_click
-</textbox><textbox
-          color="#ffffffff"
-          mode="truncate"
-          text="bit/s"
+          text="Kbit/s"
           fontSize="40"
           font="app/box/resource/font/times_size40_bits8_font.bin"
+          mode="truncate">txt_unit
+</textbox><textbox
+          x="156"
+          y="72"
+          color="#ffffffff"
           w="108"
           h="49"
-          x="279"
-          y="71">txt_unit
-</textbox><textbox
-          color="#ffffffff"
-          mode="truncate"
           text="12345"
           fontSize="40"
           font="app/box/resource/font/times_size40_bits8_font.bin"
-          w="108"
-          h="49"
-          x="147"
-          y="72">txt_speed
+          mode="truncate">txt_speed
 </textbox></tab></tabview><switch
       x="82"
       y="432"

@@ -106,11 +106,11 @@ void gui_switch_turn_on(gui_switch_t *this)
 
     if (this->ifon)
     {
-        gui_obj_event_set((void *)this, GUI_EVENT_1);
+        gui_obj_event_set((void *)this, (gui_event_t)SWITCH_EVENT_TURN_ON);
     }
     else if (!this->ifon)
     {
-        gui_obj_event_set((void *)this, GUI_EVENT_2);
+        gui_obj_event_set((void *)this, (gui_event_t)SWITCH_EVENT_TURN_OFF);
     }
 }
 
@@ -120,11 +120,11 @@ void gui_switch_turn_off(gui_switch_t *this)
 
     if (this->ifon)
     {
-        gui_obj_event_set((void *)this, GUI_EVENT_1);
+        gui_obj_event_set((void *)this, (gui_event_t)SWITCH_EVENT_TURN_ON);
     }
     else if (!this->ifon)
     {
-        gui_obj_event_set((void *)this, GUI_EVENT_2);
+        gui_obj_event_set((void *)this, (gui_event_t)SWITCH_EVENT_TURN_OFF);
     }
 }
 
@@ -140,20 +140,20 @@ void gui_switch_is_off(gui_switch_t *this)
 
 static void gui_switch_on(gui_switch_t *b, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_ON, parameter);
 }
 
 static void gui_switch_off(gui_switch_t *b, void *callback, void *parameter)
 {
-    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, GUI_EVENT_2, parameter);
+    gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_OFF, parameter);
 }
 static void on_press(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_PRESSED, parameter);
+    gui_obj_add_event_cb(this, event_cb, (gui_event_t)SWITCH_EVENT_PRESSED, parameter);
 }
 static void on_release(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_RELEASED, parameter);
+    gui_obj_add_event_cb(this, event_cb, (gui_event_t)SWITCH_EVENT_RELEASED, parameter);
 }
 /*============================================================================*
  *                           Public Functions
@@ -244,6 +244,20 @@ static void animate(gui_switch_t *this,
     animate->p = p;
     this->animate = animate;
 }
+
+static void gui_switch_input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_switch_t *this = (gui_switch_t *)obj;
+    GUI_UNUSED(tp);
+
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false)
+    {
+        return;
+    }
+    gui_obj_skip_other_short(obj);
+
+}
 static void gui_switch_prepare(gui_obj_t *obj)
 {
     gui_switch_t *this = (gui_switch_t *)obj;
@@ -272,6 +286,25 @@ static void gui_switch_prepare(gui_obj_t *obj)
             {
             case TOUCH_SHORT:
                 {
+                    if ((obj->skip_tp_short))
+                    {
+                        break;
+                    }
+                    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                    {
+                        this->ifon = !(this->ifon);
+                        gui_switch_change_state(this, this->ifon);
+                        if (this->ifon)
+                        {
+                            gui_obj_event_set(obj, (gui_event_t)SWITCH_EVENT_TURN_ON);
+                        }
+                        else if (!this->ifon)
+                        {
+                            gui_obj_event_set(obj, (gui_event_t)SWITCH_EVENT_TURN_OFF);
+                        }
+                        gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
+                        this->press_flag = false;
+                    }
                 }
                 break;
             case TOUCH_UP_SLIDE:
@@ -326,7 +359,7 @@ static void gui_switch_prepare(gui_obj_t *obj)
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
                     //gui_log("pressed type 0x%x\n", tp->type);
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_PRESSED);
+                    gui_obj_event_set(obj, (gui_event_t)SWITCH_EVENT_PRESSED);
 
                     this->long_flag = false;
                     this->press_flag = true;
@@ -358,24 +391,6 @@ static void gui_switch_prepare(gui_obj_t *obj)
                     {
                         gui_switch_long_touch(this);
                     }
-                    else if ((!this->long_touch_state && !this->long_flag) || (!this->long_touch_enable))
-                    {
-                        if (((tp->deltaX == 0) && (tp->deltaY == 0)) &&
-                            (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true))
-                        {
-                            this->ifon = !(this->ifon);
-                            gui_switch_change_state(this, this->ifon);
-                            if (this->ifon)
-                            {
-                                gui_obj_event_set(obj, GUI_EVENT_1);
-                            }
-                            else if (!this->ifon)
-                            {
-                                gui_obj_event_set(obj, GUI_EVENT_2);
-                            }
-                            gui_tree_disable_widget_gesture_by_type(&(gui_current_app()->screen), WINDOW);
-                        }
-                    }
                 }
                 this->press_flag = false;
                 this->release_flag = false;
@@ -384,7 +399,7 @@ static void gui_switch_prepare(gui_obj_t *obj)
             if (tp->released && this->press_flag)
             {
                 this->release_flag = true;
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_RELEASED);
+                gui_obj_event_set(obj, (gui_event_t)SWITCH_EVENT_RELEASED);
             }
             if (this->touch_disable)
             {
@@ -405,6 +420,9 @@ static void gui_switch_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_switch_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_switch_prepare(obj);
             break;
@@ -428,6 +446,7 @@ void gui_switch_ctor(gui_switch_t *this,
 
     this->base.type = CLICKSWITCH;
     GET_BASE(this)->obj_cb = gui_switch_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
     this->off_pic_addr = off_pic;
     this->on_pic_addr = on_pic;

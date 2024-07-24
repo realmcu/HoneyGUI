@@ -87,6 +87,16 @@ void (*animate)(gui_switch_t *this,
                 void         *p);
 _GUI_API_DECLARE(gui_switch_t)
 
+
+typedef enum
+{
+    SWITCH_EVENT_TURN_ON     = GUI_EVENT_1,
+    SWITCH_EVENT_TURN_OFF    = GUI_EVENT_2,
+    SWITCH_EVENT_PRESSED     = GUI_EVENT_TOUCH_PRESSED,
+    SWITCH_EVENT_RELEASED     = GUI_EVENT_TOUCH_RELEASED,
+
+} T_GUI_SWITCH_EVENT;
+
 /** End of WIDGET_Exported_Types
   * @}
   */
@@ -230,7 +240,7 @@ void gui_switch_is_on(gui_switch_t *this);
 void gui_switch_is_off(gui_switch_t *this);
 
 /**
- * @brief set sw state and change ui, no event will be trigered.
+ * @brief set sw state and change ui, NO event will be trigered.
  *
  * @param this
  * @param ifon set sw state

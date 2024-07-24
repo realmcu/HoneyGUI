@@ -565,6 +565,33 @@ void gui_obj_skip_other_right_hold(gui_obj_t *obj)
     gui_obj_skip_all_child_right_hold(o);
     obj->skip_tp_right_hold = false;
 }
+
+
+void gui_obj_skip_all_child_short(gui_obj_t *obj)
+{
+    gui_list_t *node = NULL;
+
+    gui_list_for_each(node, &obj->child_list)
+    {
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        o->skip_tp_short = true;
+        gui_obj_skip_all_child_short(o);
+    }
+}
+
+void gui_obj_skip_other_short(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+
+    gui_obj_skip_all_child_short(o);
+    obj->skip_tp_short = false;
+}
+
 gui_obj_t *gui_get_root(gui_obj_t *object)
 {
     gui_obj_t *o = object;

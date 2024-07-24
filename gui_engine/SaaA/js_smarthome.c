@@ -17,13 +17,32 @@ static js_sh_sw_cb_t js_sh_switch_cb;
 // test event handle process
 DECLARE_HANDLER(test)
 {
-    gui_log("enter test \n");
+    double val = jerry_get_number_value(args[0]);
+    gui_log("enter test arg: %d\n", val);
+
+    // gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS};
+    // uint8_t data[] = {0x01, 0x01, 0x05, 0x01};
+
+    // memcpy(&(msg.payload), data, sizeof(data));
+    // gui_extern_event_js_handler(&msg);
+
+
 
     gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS};
-    uint8_t data[] = {0x01, 0x01, 0x05, 0x01};
+    uint8_t extern_event_type = EXTERN_EVENT_SMARTHOME;  // 0x01
+    uint8_t sub_event_type = SH_EVENT_IOT_SWITCH;       // 0x01
+    uint8_t id = 5;     // device ID (count from 0)
+    uint8_t state = val;  // device Status (0:off, 1:on, 2:offline, 3:online)
+    uint8_t data[] = {0x00, 0x00, 0x00, 0x00};
 
-    memcpy(&(msg.payload), data, sizeof(data));
-    gui_extern_event_js_handler(&msg);
+    data[0] = extern_event_type;
+    data[1] = sub_event_type;
+    data[2] = id;
+    data[3] = state;
+
+    memcpy(&(msg.cb), data, sizeof(data));
+    // gui_extern_event_js_handler(&msg);
+    gui_send_msg_to_server(&msg);
 
     return jerry_create_undefined();
 }
@@ -140,7 +159,7 @@ void gui_extern_event_sh_handler(gui_msg_js_t *js_msg)
     gui_log("sh_event_type: %d", sh_msg->sh_event_type);
     switch (sh_msg->sh_event_type)
     {
-    case SH_EVENT_WIFI_SWITCH:
+    case SH_EVENT_IOT_SWITCH:
         {
             gui_sh_event_sw_handler((msg_sh_base_t *)(sh_msg->data));
             break;

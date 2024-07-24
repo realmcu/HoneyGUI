@@ -149,6 +149,7 @@ typedef struct _gui_obj_t
     uint32_t skip_tp_right_hold   : 1;
     uint32_t skip_tp_up_hold      : 1;
     uint32_t skip_tp_down_hold    : 1;
+    uint32_t skip_tp_short        : 1;
     uint32_t create_done          : 1;
     uint32_t flag_3d              : 1;
     uint32_t gesture              : 1;
@@ -465,6 +466,21 @@ void gui_obj_skip_all_child_up_hold(gui_obj_t *obj);
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_up_hold(gui_obj_t *obj);
+
+
+/**
+ * @brief skip all short click actions of the child object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_all_child_short(gui_obj_t *obj);
+
+/**
+ * @brief skip all short click actions of the other object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_other_short(gui_obj_t *obj);
 
 /**
  * @brief get the area of this_widget obj

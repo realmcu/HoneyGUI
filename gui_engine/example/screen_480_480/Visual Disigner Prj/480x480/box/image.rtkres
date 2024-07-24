@@ -112,37 +112,87 @@
   <ImageConvertSettingInfo ImagePath="heating\heating_00024.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="home\home_1.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Bathroom_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\Bathroom_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Bathroom_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Dining_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\Dining_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Dining_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Kitchen_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\Kitchen_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Kitchen_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Living_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\Living_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Living_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Study_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\Study_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Study_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\sub_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\sub_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Wash_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp\Wash_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp\Wash_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\AllTurnon_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\AllTurnon_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\Bedroom_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp2\Bedroom_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\Bedroom_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\Children_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp2\Children_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\Children_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\sleep_off-1.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\sleep_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\socket1_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp2\socket1_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\socket1_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\socket2_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp2\socket2_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\socket2_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\socket3_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="lamp2\socket3_offline.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="lamp2\socket3_on.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="new_folder\aa2.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="new_folder\aa3.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="other\cd.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="other\center_bg.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="other\default.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="other\high.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="other\img_01.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="other\img_02.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="other\img_03.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="other\img_04.jpg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="other\main_bg.jpg" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="other\unlock.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="wifi\speed_off.png" ImageSettingName="GlobalSetting" />
   <ImageConvertSettingInfo ImagePath="wifi\speed_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\all_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\all_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain_bg.jpeg" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\cutain_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_pause.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_pause_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_start.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\c_start_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\g_curtain_off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\g_curtain_on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\off.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\off_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\on.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\on_pressed.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00000.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00001.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00002.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00003.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00004.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00005.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00006.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00007.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00008.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00009.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00010.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00011.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00012.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00013.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00014.png" ImageSettingName="GlobalSetting" />
+  <ImageConvertSettingInfo ImagePath="g:curtain\curtain MG\curtain_00015.png" ImageSettingName="GlobalSetting" />
 </ImageConvertXmlData>
