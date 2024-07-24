@@ -358,6 +358,11 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         return;
     }
+    if (this->base.not_show)
+    {
+        return;
+    }
+
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
@@ -409,6 +414,7 @@ static void gui_text_draw(gui_obj_t *obj)
 
     if (text->len == 0)
     {
+        text->refresh = false;
         return;
     }
 
