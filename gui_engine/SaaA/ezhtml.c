@@ -378,7 +378,7 @@ static void multi_level_ui_design(gui_multi_level_t *obj)
     //                   file_count, setting_return_cb, (void *)0);
     gui_button_t *button = gui_button_create(obj, 0, 0, 45, 45, return_image, return_image_hl, 0, 0, 0);
     button->img->blend_mode = IMG_SRC_OVER_MODE;
-    GUI_API(gui_button_t).on_click(button, setting_return_cb, 0);
+    GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
 }
 struct on_click_jump_cb_param
 {
@@ -2814,7 +2814,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                 {
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
-                    parent = gui_multi_level_create(parent, ptxt, multi_level_ui_design);
+                    parent = (void *)gui_multi_level_create(parent, ptxt, (void(*)(gui_obj_t *))multi_level_ui_design);
 
                 }
                 break;
@@ -2867,11 +2867,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     param->id2 = y;
                                     if (parent->type == BUTTON)
                                     {
-                                        GUI_API(gui_button_t).on_click(parent, on_click_jump_cb, param);
+                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
                                     }
                                     else if (parent->type == WINDOW)
                                     {
-                                        gui_win_click(parent, on_click_jump_cb, param);
+                                        gui_win_click((gui_win_t *)parent, on_click_jump_cb, param);
                                     }
 
 
@@ -3130,7 +3130,7 @@ void create_tree(gui_app_t *app)
 }
 static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent)
 {
-    gui_obj_tree_print(parent);
+    gui_obj_tree_print((gui_obj_t *)parent);
     ezxml_t title = 0;
     ezxml_t f = 0;
     if (f1 != 0)
@@ -3141,13 +3141,13 @@ static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent
     {
         f = ezxml_parse_file(app->xml);
     }
-    foreach_create_for_multilevel(f, parent);
+    foreach_create_for_multilevel(f, (gui_obj_t *)parent);
     gui_log(" ");
     if (f1 == 0)
     {
         ezxml_free(f);
     }
-    gui_obj_tree_print(parent);
+    gui_obj_tree_print((gui_obj_t *)parent);
 
 
 
