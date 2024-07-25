@@ -315,8 +315,8 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
         if (offset > obj->w)
         {
             index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
-            text->cnt_value = (text->end_value + text->start_value + offset) * index
-                              / text->interval_time_ms;
+            text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
+                              text->interval_time_ms;
             draw_rect.x1 = text->base.offset_x - text->cnt_value + text->start_value;
             draw_rect.x2 = draw_rect.x1 + offset - 1;
             draw_rect.y1 = text->base.offset_y;
