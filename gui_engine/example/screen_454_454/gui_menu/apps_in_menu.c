@@ -1998,7 +1998,7 @@ void ui_1_0(gui_obj_t *parent)
 struct app_block block_array[] =
 {
     {0, 0, ui_0_0}, {0, 1, ui_0_1}, {1, 1, ui_1_1}, {0, -1, ui_0_m1}, {-1, 0, ui_m1_0}, {-1, -1, ui_m1_m1},
-    {-1, 1, ui_m1_1}, {1, -1, ui_1_m1}, {1, 0, ui_1_0},
+    {-1, 1, ui_m1_1}, {1, -1, ui_1_m1}, {1, 0, ui_1_0}, {-2, 0, ui_1_1},
 };
 static gui_win_t *win_index;
 static gui_win_t *win_next;
@@ -2056,12 +2056,16 @@ static void block_cb(gui_win_t *win)
 {
     GUI_TOUCHPAD_IMPORT_AS_TP
     static bool hold;
-    static bool horizontal;
+    static int horizontal = -1;
     static bool load;
     static int idx, idy;
     static bool jump;
+    static bool release_animation;
+    static int direction;
     int deltaX = tp->deltaX;
     int deltaY = tp->deltaY;
+    static int offset;
+    static bool release_animation_end;
     if (tp->x + tp->deltaX > SCREEN_W)
     {
         deltaX = SCREEN_W - tp->x;
@@ -2070,23 +2074,75 @@ static void block_cb(gui_win_t *win)
     {
         deltaX = 0 - tp->x;
     }
+    if (tp->y + tp->deltaY > SCREEN_H)
+    {
+        deltaY = SCREEN_H - tp->y;
+    }
+    else if (tp->y + tp->deltaY < 0)
+    {
+        deltaY = 0 - tp->y;
+    }
 
 
     if (tp->pressed)
     {
         hold = 1;
+        horizontal = -1;
+        if (release_animation)
+        {
+            if (jump)
+            {
+                gui_obj_tree_free(win_index);
+                block_transform(win_next, 0, 0, 0, 0);
+                release_animation_end = 0;
+                if (direction == 1)
+                {
+                    idx--;
+                }
+                else if (direction == 2)
+                {
+                    idx++;
+                }
+                else if (direction == 3)
+                {
+                    idy--;
+                }
+                else if (direction == 4)
+                {
+                    idy++;
+                }
+            }
+            else
+            {
+                gui_obj_tree_free(win_next);
+                block_transform(win_index, 0, 0, 0, 0);
+                release_animation_end = 0;
+            }
+        }
+
+        release_animation = 0;
+        load = 0;
+        if (jump)
+        {
+            win_index = win_next;
+            win_next = 0;
+            jump = 0;
+
+            horizontal = -1;
+            block_transform(win_index, 0, 0, 0, 0);
+        }
     }
     else if (tp->released)
     {
         hold = 0;
-        if (jump)
+        if (load)
         {
-            gui_obj_tree_free(win_index);
-            block_transform(win_next, 0, 0, 0, 0);
-
+            release_animation = 1;
         }
 
+        offset = deltaX;
     }
+
     if (hold)
     {
         if (tp->type == TOUCH_HOLD_X)
@@ -2097,25 +2153,29 @@ static void block_cb(gui_win_t *win)
         {
             horizontal = 0;
         }
-        if (horizontal)
+        if (horizontal == 1)
         {
             if (tp->deltaX > 0) //->
             {
                 if (!load)
                 {
                     win_next = block_render((gui_obj_t *)win, idx - 1, idy);
+                    gui_log("block_render :%d\n", idx);
                     if (win_next)
                     {
                         load = 1;
+
                     }
                 }
                 if (load)
                 {
+                    gui_log("block_transform :%d\n", deltaX);
                     block_transform(win_next, -1, 0, deltaX, 0);
                     block_transform(win_index, 0, 0, deltaX, 0);
                     if (deltaX > SCREEN_W / 3)
                     {
                         jump = 1;
+
                     }
                     else
                     {
@@ -2129,14 +2189,286 @@ static void block_cb(gui_win_t *win)
             }
             else if (tp->deltaX < 0) //<-
             {
-                /* code */
+                if (!load)
+                {
+                    win_next = block_render((gui_obj_t *)win, idx + 1, idy);
+                    gui_log("block_render :%d\n", idx);
+                    if (win_next)
+                    {
+                        load = 1;
+
+                    }
+                }
+                if (load)
+                {
+                    //gui_log("block_transform :%d\n",deltaX );
+                    block_transform(win_next, 1, 0, deltaX, 0);
+                    block_transform(win_index, 0, 0, deltaX, 0);
+                    if (_UI_ABS(deltaX) > SCREEN_W / 3)
+                    {
+                        jump = 1;
+                    }
+                    else
+                    {
+                        jump = 0;
+                    }
+
+
+                }
+            }
+
+
+        }
+        else if (horizontal == 0)
+        {
+            if (tp->deltaY > 0) //.
+            {
+                if (!load)
+                {
+                    win_next = block_render((gui_obj_t *)win, idx, idy - 1);
+                    gui_log("block_render :%d\n", idx);
+                    if (win_next)
+                    {
+                        load = 1;
+
+                    }
+                }
+                if (load)
+                {
+                    gui_log("block_transform :%d\n", deltaX);
+                    block_transform(win_next, 0, -1, 0, deltaY);
+                    block_transform(win_index, 0, 0, 0, deltaY);
+                    if (deltaY > SCREEN_H / 3)
+                    {
+                        jump = 1;
+
+                    }
+                    else
+                    {
+                        jump = 0;
+                    }
+
+
+                }
+
+
+            }
+            else if (tp->deltaY < 0) //^
+            {
+                if (!load)
+                {
+                    win_next = block_render((gui_obj_t *)win, idx, idy + 1);
+                    gui_log("block_render :%d\n", idx);
+                    if (win_next)
+                    {
+                        load = 1;
+
+                    }
+                }
+                if (load)
+                {
+                    //gui_log("block_transform :%d\n",deltaX );
+                    block_transform(win_next, 0, 1, 0, deltaY);
+                    block_transform(win_index, 0, 0, 0, deltaY);
+                    if (_UI_ABS(deltaY) > SCREEN_H / 3)
+                    {
+                        jump = 1;
+                    }
+                    else
+                    {
+                        jump = 0;
+                    }
+
+
+                }
+            }
+        }
+
+
+    }
+    else if (release_animation)
+    {
+
+        static float count = 3;
+        if (horizontal == 1)
+        {
+            if (jump)
+            {
+                if (deltaX > 0)
+                {
+#define STEP 8
+                    offset = sinf(count * M_PI / 2 / (SCREEN_W - deltaX)) * (SCREEN_W - deltaX) * 2 + deltaX;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_W - deltaX)));
+                    if (offset > SCREEN_W)
+                    {
+                        offset = SCREEN_W;
+                        release_animation_end = 1;
+                        count = 3;
+                        idx--;
+                    }
+                    count += STEP;
+                    block_transform(win_next, -1, 0, offset, 0);
+                    block_transform(win_index, 0, 0, offset, 0);
+                    direction = 1;
+                }
+                else if (deltaX < 0)
+                {
+                    offset = -sinf(count * M_PI / 2 / (SCREEN_W - _UI_ABS(deltaX))) * (SCREEN_W - _UI_ABS(
+                                                                                           deltaX)) * 2 + deltaX;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_W - deltaX)));
+                    if (_UI_ABS(offset) > SCREEN_W)
+                    {
+                        offset = -SCREEN_W;
+                        release_animation_end = 1;
+                        count = 3;
+                        idx++;
+                    }
+                    count += STEP;
+                    block_transform(win_next, 1, 0, offset, 0);
+                    block_transform(win_index, 0, 0, offset, 0);
+                    direction = 2;
+                }
+
+
+            }
+            else
+            {
+                if (deltaX > 0)
+                {
+
+                    offset = deltaX - sinf(count * M_PI / 2 / (deltaX)) * (deltaX) * 2;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_W - deltaX)));
+                    if (offset < 0)
+                    {
+                        offset = 0;
+                        release_animation_end = 1;
+                        count = 3;
+                    }
+                    count += STEP;
+                    block_transform(win_next, -1, 0, offset, 0);
+                    block_transform(win_index, 0, 0, offset, 0);
+                }
+                else if (deltaX < 0)
+                {
+
+                    offset = deltaX + sinf(count * M_PI / 2 / (_UI_ABS(deltaX))) * (_UI_ABS(deltaX)) * 2;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_W - deltaX)));
+                    if (offset > 0)
+                    {
+                        offset = 0;
+                        release_animation_end = 1;
+                        count = 3;
+                    }
+                    count += STEP;
+                    block_transform(win_next, -1, 0, offset, 0);
+                    block_transform(win_index, 0, 0, offset, 0);
+                }
+            }
+
+
+        }
+        else if (horizontal == 0)
+        {
+            if (jump)
+            {
+                if (deltaY > 0)
+                {
+
+                    offset = sinf(count * M_PI / 2 / (SCREEN_H - deltaY)) * (SCREEN_H - deltaY) * 2 + deltaY;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_W - deltaX)));
+                    if (offset > SCREEN_H)
+                    {
+                        offset = SCREEN_H;
+                        release_animation_end = 1;
+                        count = 3;
+                        idy--;
+                    }
+                    count += STEP;
+                    block_transform(win_next, 0, -1, 0, offset);
+                    block_transform(win_index, 0, 0, 0, offset);
+                    direction = 3;
+                }
+                else if (deltaY < 0)
+                {
+                    offset = -sinf(count * M_PI / 2 / (SCREEN_H - _UI_ABS(deltaY))) * (SCREEN_H - _UI_ABS(
+                                                                                           deltaY)) * 2 + deltaY;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_H - deltaY)));
+                    if (_UI_ABS(offset) > SCREEN_H)
+                    {
+                        offset = -SCREEN_H;
+                        release_animation_end = 1;
+                        count = 3;
+                        idy++;
+                    }
+                    count += STEP;
+                    block_transform(win_next,  0, 1, 0, offset);
+                    block_transform(win_index, 0, 0, 0, offset);
+                    direction = 4;
+                }
+
+
+            }
+            else
+            {
+                if (deltaY > 0)
+                {
+
+                    offset = deltaY - sinf(count * M_PI / 2 / (deltaY)) * (deltaY) * 2;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_W - deltaX)));
+                    if (offset < 0)
+                    {
+                        offset = 0;
+                        release_animation_end = 1;
+                        count = 3;
+                    }
+                    count += STEP;
+                    block_transform(win_next, 0, -1, 0, offset);
+                    block_transform(win_index, 0, 0, 0, offset);
+                }
+                else if (deltaY < 0)
+                {
+
+                    offset = deltaY + sinf(count * M_PI / 2 / (_UI_ABS(deltaY))) * (_UI_ABS(deltaY)) * 2;
+                    gui_log("%f\n", sinf(count * M_PI / 2 / (SCREEN_W - deltaY)));
+                    if (offset > 0)
+                    {
+                        offset = 0;
+                        release_animation_end = 1;
+                        count = 3;
+                    }
+                    count += STEP;
+                    block_transform(win_next,  0, -1, 0, offset);
+                    block_transform(win_index, 0, 0, 0, offset);
+                }
+            }
+
+
+        }
+
+        if (release_animation_end)
+        {
+            if (jump)
+            {
+                gui_obj_tree_free(win_index);
+                block_transform(win_next, 0, 0, 0, 0);
+                release_animation = 0;
+                release_animation_end = 0;
+            }
+            else
+            {
+                gui_obj_tree_free(win_next);
+                block_transform(win_index, 0, 0, 0, 0);
+                release_animation = 0;
+                release_animation_end = 0;
             }
 
 
         }
 
 
+
     }
+
 }
 
 GUI_APP_ENTRY(APP_BLOCK)
