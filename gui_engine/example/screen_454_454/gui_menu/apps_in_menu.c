@@ -28,6 +28,7 @@
 #define APP_MUSIC
 #define APP_WEB
 #define APP_BLOCK
+#define APP_FRUIT_NINJA
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
@@ -40,6 +41,7 @@ GUI_APP_DEFINE_NAME(APP_CYCLE_TRACKING)
 GUI_APP_DEFINE_NAME(APP_MUSIC)
 GUI_APP_DEFINE_NAME(APP_WEB)
 GUI_APP_DEFINE_NAME(APP_BLOCK)
+GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -2023,11 +2025,11 @@ static void block_win_cb(gui_win_t *win)
 }
 static void block_transform(gui_win_t *block, int offset_x_, int offset_y_, int tp_x_, int tp_y_)
 {
-    if (offset_x_ == 0 && offset_y_ == 0)
+    if (block == win_index)
     {
         offset_x_index = offset_x_;  offset_y_index = offset_y_;  tp_x_index = tp_x_;  tp_y_index = tp_y_;
     }
-    else
+    else if (block == win_next)
     {
         offset_x = offset_x_;  offset_y = offset_y_;  tp_x = tp_x_;  tp_y = tp_y_;
     }
@@ -2077,6 +2079,13 @@ static void block_cb(gui_win_t *win)
     else if (tp->released)
     {
         hold = 0;
+        if (jump)
+        {
+            gui_obj_tree_free(win_index);
+            block_transform(win_next, 0, 0, 0, 0);
+
+        }
+
     }
     if (hold)
     {
@@ -2135,4 +2144,12 @@ GUI_APP_ENTRY(APP_BLOCK)
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
     gui_win_set_animate(win, 1000, -1, block_cb, win);
     win_index = block_render((gui_obj_t *)win, 0, 0);
+}
+/**
+ * @brief APP_FRUIT_NINJA
+ * Please code here @shel_deng@realsil.com.cn
+ */
+GUI_APP_ENTRY(APP_FRUIT_NINJA)
+{
+
 }

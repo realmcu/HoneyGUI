@@ -35,6 +35,7 @@ static void cycle_tracking_cb(void);
 static void setting_cb(void);
 static void web_cb(void);
 static void block_cb(void);
+static void fruit_ninja_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -133,6 +134,10 @@ void design_tab_menu(void *parent)
         ICON_MENU_BIN,
         ICON_MENU_BIN,
         ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
+        ICON_MENU_BIN,
     };
     static char *text_array[] =
     {
@@ -148,6 +153,9 @@ void design_tab_menu(void *parent)
         "Setting",
         "Web",
         "Block",
+        "Fruit Ninja",
+        "Calculator",
+        "Music",
         "Sport",
     };
     int array_size = sizeof(array) / sizeof(array[0]);
@@ -194,7 +202,8 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[8],  cycle_tracking_cb, button_array[8]);
     gui_win_click(button_array[9],  setting_cb,        button_array[9]);
     gui_win_click(button_array[10], web_cb,            button_array[10]);
-    gui_win_click(button_array[11], block_cb,            button_array[11]);
+    gui_win_click(button_array[11], block_cb,          button_array[11]);
+    gui_win_click(button_array[12], fruit_ninja_cb,    button_array[12]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -434,4 +443,8 @@ static void page_dtor(gui_obj_t *obj)
     extern void gui_page_destory(gui_obj_t *obj);
     gui_page_destory(obj);
     page_y_recode = obj->y;
+}
+static void fruit_ninja_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_FRUIT_NINJA))
 }
