@@ -60,6 +60,7 @@ typedef struct gui_jump
     bool jump_flag;
     gui_index_t jump_id;
 } gui_jump_t;
+/* T_SLIDE_STYLE enum start*/
 typedef enum t_slide_style
 {
     CLASSIC          = 0x0000,
@@ -72,6 +73,7 @@ typedef enum t_slide_style
     TAB_CUBE         = 0x0006,
     TAB_PAGE         = 0x0007,
 } T_SLIDE_STYLE;
+/* T_SLIDE_STYLE enum end*/
 /** @brief  tabview structure */
 typedef struct gui_tabview
 {
