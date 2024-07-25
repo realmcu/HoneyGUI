@@ -102,6 +102,13 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return;
+        }
+
         gui_obj_tree_child_free(obj);
         gui_obj_destory_cb(obj);
 
@@ -117,10 +124,17 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
 static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return;
+        }
         obj->not_show = !enable;
         gui_obj_tree_child_show(obj, enable);
     }
@@ -233,10 +247,17 @@ void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code)
 void gui_obj_tree_print(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return;
+        }
         gui_log(" %s-->%s \n", obj->name, obj->parent->name);
         gui_obj_tree_print(obj);
     }
@@ -244,10 +265,17 @@ void gui_obj_tree_print(gui_obj_t *obj)
 void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return;
+        }
         if (obj->type == type)
         {
             (*count)++;
@@ -326,11 +354,17 @@ void gui_obj_show(void *obj, bool enable)
 gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_obj_t *object = obj;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-
+        if (obj == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return 0;
+        }
         if (obj->type == child_type)
         {
             return obj;
@@ -445,10 +479,16 @@ void gui_obj_skip_all_parent_left_hold(gui_obj_t *obj)
 void gui_obj_skip_all_child_left_hold(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        if (o == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
+            return;
+        }
         o->skip_tp_left_hold = true;
         gui_obj_skip_all_child_left_hold(o);
     }
@@ -465,10 +505,16 @@ void gui_obj_skip_all_parent_right_hold(gui_obj_t *obj)
 void gui_obj_skip_all_child_right_hold(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        if (o == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
+            return;
+        }
         o->skip_tp_right_hold = true;
         gui_obj_skip_all_child_right_hold(o);
     }
@@ -485,10 +531,16 @@ void gui_obj_skip_all_parent_up_hold(gui_obj_t *obj)
 void gui_obj_skip_all_child_up_hold(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        if (o == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
+            return;
+        }
         o->skip_tp_up_hold = true;
         gui_obj_skip_all_child_up_hold(o);
     }
@@ -505,10 +557,16 @@ void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj)
 void gui_obj_skip_all_child_down_hold(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        if (o == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
+            return;
+        }
         o->skip_tp_down_hold = true;
         gui_obj_skip_all_child_down_hold(o);
     }
@@ -570,10 +628,16 @@ void gui_obj_skip_other_right_hold(gui_obj_t *obj)
 void gui_obj_skip_all_child_short(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &obj->child_list)
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        if (o == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
+            return;
+        }
         o->skip_tp_short = true;
         gui_obj_skip_all_child_short(o);
     }
@@ -610,11 +674,16 @@ gui_obj_t *gui_get_root(gui_obj_t *object)
 void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_obj_t **output)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &object->child_list)
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-
+        if (obj == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("@name:%s, @type:%d\n", object->name, object->type);
+            return;
+        }
         if ((strlen(name) == strlen(obj->name)) && (strcmp(name, obj->name) == 0))
         {
             *output = obj;
@@ -627,11 +696,16 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_ob
 void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output)
 {
     gui_list_t *node = NULL;
-
-    gui_list_for_each(node, &root->child_list)
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &root->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-
+        if (obj == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, root);
+            gui_log("@name:%s, @type:%d\n", root->name, root->type);
+            return;
+        }
         if (type == obj->type)
         {
             *output = obj;
@@ -742,9 +816,16 @@ void gui_obj_tree_print_bfs(gui_obj_t *root)
         gui_obj_t *current_obj = queue[front++];
         gui_log(" %s \n", current_obj->name);
         gui_list_t *node = NULL;
-        gui_list_for_each(node, &current_obj->child_list)
+        gui_list_t *tmp = NULL;
+        gui_list_for_each_safe(node, tmp, &current_obj->child_list)
         {
             gui_obj_t *child_obj = gui_list_entry(node, gui_obj_t, brother_list);
+            if (child_obj == 0)
+            {
+                gui_log("list NULL @line:%d, @%x", __LINE__, root);
+                gui_log("@name:%s, @type:%d\n", root->name, root->type);
+                return;
+            }
             queue[rear++] = child_obj;
         }
     }

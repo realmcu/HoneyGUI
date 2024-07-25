@@ -27,6 +27,7 @@
 #define APP_CYCLE_TRACKING
 #define APP_MUSIC
 #define APP_WEB
+#define APP_BLOCK
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 GUI_APP_DEFINE_NAME(APP_STOPWATCH)
 GUI_APP_DEFINE(APP_MENU,       app_menu)
@@ -38,6 +39,7 @@ GUI_APP_DEFINE_NAME(APP_VOLUME)
 GUI_APP_DEFINE_NAME(APP_CYCLE_TRACKING)
 GUI_APP_DEFINE_NAME(APP_MUSIC)
 GUI_APP_DEFINE_NAME(APP_WEB)
+GUI_APP_DEFINE_NAME(APP_BLOCK)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -1850,4 +1852,287 @@ GUI_APP_ENTRY(APP_WEB)
 #endif
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}
+struct app_block
+{
+    int x, y;
+    void *render;
+};
+void ui_0_0(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "0,0";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_0_1(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "0,1";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_1_1(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "1,1";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_0_m1(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "0,-1";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_m1_0(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "-1, 0";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_m1_m1(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "-1, -1";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_m1_1(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "-1, 1";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_1_m1(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "1, -1";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+void ui_1_0(gui_obj_t *parent)
+{
+    gui_img_create_from_mem(parent, 0, CLOCK_BASE_BIN, 0, 0, 0, 0);
+    {
+        char *text = "1, 0";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(parent, 0,  454 / 2, 454 / 2,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+}
+struct app_block block_array[] =
+{
+    {0, 0, ui_0_0}, {0, 1, ui_0_1}, {1, 1, ui_1_1}, {0, -1, ui_0_m1}, {-1, 0, ui_m1_0}, {-1, -1, ui_m1_m1},
+    {-1, 1, ui_m1_1}, {1, -1, ui_1_m1}, {1, 0, ui_1_0},
+};
+static gui_win_t *win_index;
+static gui_win_t *win_next;
+static int offset_x,  offset_y,  tp_x,  tp_y;
+static int offset_x_index,  offset_y_index,  tp_x_index,  tp_y_index;
+static void block_transform_sync(gui_win_t *block, int offset_x, int offset_y, int tp_x, int tp_y)
+{
+    matrix_translate(offset_x * (int)block->base.w + tp_x, \
+                     offset_y * (int)block->base.h + tp_y, \
+                     block->base.matrix);
+}
+static void block_win_cb(gui_win_t *win)
+{
+    if (win == win_index)
+    {
+        block_transform_sync(win, offset_x_index,  offset_y_index,  tp_x_index,  tp_y_index);
+    }
+    else if (win == win_next)
+    {
+        block_transform_sync(win, offset_x,  offset_y,  tp_x,  tp_y);
+    }
+
+
+}
+static void block_transform(gui_win_t *block, int offset_x_, int offset_y_, int tp_x_, int tp_y_)
+{
+    if (offset_x_ == 0 && offset_y_ == 0)
+    {
+        offset_x_index = offset_x_;  offset_y_index = offset_y_;  tp_x_index = tp_x_;  tp_y_index = tp_y_;
+    }
+    else
+    {
+        offset_x = offset_x_;  offset_y = offset_y_;  tp_x = tp_x_;  tp_y = tp_y_;
+    }
+
+
+}
+static gui_win_t *block_render(gui_obj_t *parent, int idx, int idy)
+{
+    win_next = 0;
+    for (size_t i = 0; i < sizeof(block_array) / sizeof(struct app_block); i++)
+    {
+        if (block_array[i].x == idx && block_array[i].y == idy)
+        {
+            gui_win_t *win = gui_win_create(parent, 0, 0, 0, 0, 0);
+            gui_win_set_animate(win, 1000, -1, block_win_cb, win);
+            ((void (*)(gui_obj_t *parent))(block_array[i].render))((gui_obj_t *)win);
+            return win;
+        }
+    }
+    return 0;
+}
+
+static void block_cb(gui_win_t *win)
+{
+    GUI_TOUCHPAD_IMPORT_AS_TP
+    static bool hold;
+    static bool horizontal;
+    static bool load;
+    static int idx, idy;
+    static bool jump;
+    int deltaX = tp->deltaX;
+    int deltaY = tp->deltaY;
+    if (tp->x + tp->deltaX > SCREEN_W)
+    {
+        deltaX = SCREEN_W - tp->x;
+    }
+    else if (tp->x + tp->deltaX < 0)
+    {
+        deltaX = 0 - tp->x;
+    }
+
+
+    if (tp->pressed)
+    {
+        hold = 1;
+    }
+    else if (tp->released)
+    {
+        hold = 0;
+    }
+    if (hold)
+    {
+        if (tp->type == TOUCH_HOLD_X)
+        {
+            horizontal = 1;
+        }
+        else if (tp->type == TOUCH_HOLD_Y)
+        {
+            horizontal = 0;
+        }
+        if (horizontal)
+        {
+            if (tp->deltaX > 0) //->
+            {
+                if (!load)
+                {
+                    win_next = block_render((gui_obj_t *)win, idx - 1, idy);
+                    if (win_next)
+                    {
+                        load = 1;
+                    }
+                }
+                if (load)
+                {
+                    block_transform(win_next, -1, 0, deltaX, 0);
+                    block_transform(win_index, 0, 0, deltaX, 0);
+                    if (deltaX > SCREEN_W / 3)
+                    {
+                        jump = 1;
+                    }
+                    else
+                    {
+                        jump = 0;
+                    }
+
+
+                }
+
+
+            }
+            else if (tp->deltaX < 0) //<-
+            {
+                /* code */
+            }
+
+
+        }
+
+
+    }
+}
+
+GUI_APP_ENTRY(APP_BLOCK)
+{
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
+    gui_win_set_animate(win, 1000, -1, block_cb, win);
+    win_index = block_render((gui_obj_t *)win, 0, 0);
 }

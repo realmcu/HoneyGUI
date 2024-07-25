@@ -34,6 +34,7 @@ static void volume_cb(void);
 static void cycle_tracking_cb(void);
 static void setting_cb(void);
 static void web_cb(void);
+static void block_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -146,7 +147,7 @@ void design_tab_menu(void *parent)
         "Cycle tracking",
         "Setting",
         "Web",
-        "Calculator",
+        "Block",
         "Sport",
     };
     int array_size = sizeof(array) / sizeof(array[0]);
@@ -171,7 +172,7 @@ void design_tab_menu(void *parent)
         char *text = text_array[i];
         int font_size = 16;
         gui_text_t *t = gui_text_create(button, "txt", 70, 27, gui_get_screen_width(), font_size);
-        if (i < 11)
+        if (i < 12)
         {
             gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(42, 5, 79), strlen(text), font_size);
         }
@@ -193,6 +194,7 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[8],  cycle_tracking_cb, button_array[8]);
     gui_win_click(button_array[9],  setting_cb,        button_array[9]);
     gui_win_click(button_array[10], web_cb,            button_array[10]);
+    gui_win_click(button_array[11], block_cb,            button_array[11]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -423,7 +425,10 @@ static void web_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_WEB))
 }
-
+static void block_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_BLOCK))
+}
 static void page_dtor(gui_obj_t *obj)
 {
     extern void gui_page_destory(gui_obj_t *obj);
