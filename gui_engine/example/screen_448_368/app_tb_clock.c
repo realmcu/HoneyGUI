@@ -1,3 +1,4 @@
+/* curtain example start*/
 #include "root_image_hongkong/ui_resource.h"
 #include <gui_img.h>
 #include "gui_curtainview.h"
@@ -21,3 +22,4 @@ void page_tb_clock(void *parent)
     tabview_up_design(ct_control0);
     curtain_down_design(ct_card);
 }
+/* curtain example end*/
