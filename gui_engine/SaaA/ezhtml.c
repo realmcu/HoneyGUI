@@ -51,7 +51,7 @@ struct widget_create
     T_OBJ_TYPE type;
 };
 
-#define WIDGETS_NUM 25
+#define WIDGETS_NUM 26
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
 struct widget_create widget[] =
 {
@@ -82,6 +82,7 @@ struct widget_create widget[] =
     {"keyboard", KEYBOARD},
     {"multiLevel", MULTI_LEVEL},
     {"onClick", MACRO_ONCLICK},
+    {"backIcon", MACRO_BACKICON},
 };
 static void img_rotate_cb(gui_img_t *img)
 {
@@ -374,11 +375,6 @@ static void multi_level_ui_design(gui_multi_level_t *obj)
 {
     extern void *get_app_xml(void);
     create_tree_in_multi_level(get_app_xml(), obj);
-    // gui_return_create(obj, image_array,
-    //                   file_count, setting_return_cb, (void *)0);
-    gui_button_t *button = gui_button_create(obj, 0, 0, 45, 45, return_image, return_image_hl, 0, 0, 0);
-    button->img->blend_mode = IMG_SRC_OVER_MODE;
-    GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
 }
 struct on_click_jump_cb_param
 {
@@ -2886,6 +2882,70 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                 }
                 break;
+            case MACRO_BACKICON:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    char *picture = NULL;
+                    char *hl_picture = NULL;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "picture"))
+                        {
+                            picture = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "highlightPicture"))
+                        {
+                            hl_picture = gui_strdup(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    void *img1 = return_image;
+                    void *img2 = return_image_hl;
+                    if (picture)
+                    {
+                        img1 = gui_get_file_address(picture);
+                        img2 = img1;
+                    }
+                    if (hl_picture)
+                    {
+                        img2 = gui_get_file_address(hl_picture);
+                    }
+                    char *ptxt = get_space_string_head(p->txt);
+                    //font_size = 32;
+                    parent = (void *)gui_button_create(parent, x, y, w, h, img1, img2, 0, 0, 0);
+                    parent->name = ptxt;
+                    gui_button_t *button = (void *)parent;
+                    button->img->blend_mode = IMG_SRC_OVER_MODE;
+                    GUI_API(gui_button_t).on_click(button, setting_return_cb, 0);
+
+
+                    break;
+                }
             default:
                 break;
             }
