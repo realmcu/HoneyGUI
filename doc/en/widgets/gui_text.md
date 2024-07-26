@@ -1,9 +1,5 @@
 # Text widget
 
-<br>
-
-## Overview
-
 The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen. In order to draw text, the font file can be standard .ttf file or customized .bin file.
 
 ## Features
@@ -236,7 +232,7 @@ void page_tb_activity(void *parent)
 
 </details></br>
 
-<center><img width="300" src= "https://foruda.gitee.com/images/1701077306172011299/b0206172_13674272.gif "/></center>
+<center><img width="300" src= "(https://docs.realmcu.com/HoneyGUI/image/widgets/text.gif"/></center>
 
 <br>
 

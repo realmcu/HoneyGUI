@@ -1,7 +1,5 @@
 # Progressbar
-<br>
 
-## Overview
 The progressbar widget allows you to create widgets with three different effects.
 After created a progressbar widget, you can set the percentage of the widget to display.
 
@@ -109,7 +107,7 @@ void page_tb_three(void *parent)
 
 <br>
 
-<center><img width= "300" src="https://foruda.gitee.com/images/1700102166174264891/96e1cada_13671147.gif" /></center>
+<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/progressbar.gif" /></center>
 
 <span id="api">
 

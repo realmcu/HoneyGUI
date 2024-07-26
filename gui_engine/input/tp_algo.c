@@ -12,8 +12,11 @@
 #include <tp_algo.h>
 
 
-
+#ifdef ENABLE_MONKEY_TEST
+#define RTK_TP_DEBUG
+#else
 //#define RTK_TP_DEBUG
+#endif
 
 #ifdef RTK_TP_DEBUG
 

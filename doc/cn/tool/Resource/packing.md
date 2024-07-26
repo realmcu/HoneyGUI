@@ -1,4 +1,4 @@
-# GUI-APP: UI resource 
+# 打包工具
 
 ## RTL87x2G
 RTL87x2G is the abbreviation of a series IC type.

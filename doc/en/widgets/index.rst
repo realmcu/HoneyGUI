@@ -31,6 +31,7 @@ Widgets                              Brief
 `canvas_rect`_                       Display a rectangular
 `canvas_round_rect`_                 Display a round rectangular
 `canvas_arc`_                        Display a arc
+`multi_level`_                       Manage and manipulate multi-level subwindows
 ==================                   ==================
 
 .. _obj: gui_obj.html
@@ -61,7 +62,7 @@ Widgets                              Brief
 .. _menu cellular: gui_menu_cellular.html
 .. _return: gui_return.html
 .. _qbcode: qbcode.html
-
+.. _multi_level: gui_multi_level.html
 .. toctree::
     :maxdepth: 2
 
@@ -93,3 +94,4 @@ Widgets                              Brief
     menu cellular <gui_menu_cellular>
     return <gui_return> 
 	qbcode <gui_qbcode> 
+    multi_level <gui_multi_level>

@@ -1,17 +1,17 @@
-##  Demo: Develop a "Calculator APP"
-### Introduction
+#  Calculator Application
+
 This example demostrates how to develop a simple "Calculator APP", from which you can learn and understand the basic methods and processes of developing a ui application.
 The "Calculator" works just like a traditional calculator, using button widget for user input and text widget for display. Watch the demo video below to see its full functionality.
 
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1706089242549970186/448f9137_10641540.gif " width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/sample/Calculator/calculator.gif" width = "300" /></div>
 <br>
 
-### Source File
-To help learn and be familiar with the development, you can find all source files you may need in path `sdk\src\app\gui\gui_engine\example\`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
+## Source File
+To help learn and be familiar with the development, you can find all source files you may need in path `gui_engine\example\screen_448_368`. The source file for this demostration is `app_calculator.c`, you can find it in the path mentioned for more details.
 
 
-### Two Steps 
+## Two Steps 
 __Step 1:  Declare the app structure__
 
 The app structure saves all the information of ui. Developers should initialize the app structure with the app name and ui design function.
@@ -47,7 +47,7 @@ static void app_calculator_ui_design(gui_app_t *app)
     gui_win_t *win = gui_win_create(&app->screen, "back_win", 0, 0, gui_get_screen_width(),
                                     gui_get_screen_height());
 
-    gui_calculator_create(&app->screen, "calculator", 0, 0, 454, 454);
+    gui_calculator_create(win, "calculator", 0, 0, 454, 454);
 }
 ```
 

@@ -15,9 +15,9 @@ RTKIOT GUI
 ==================  ==================  ==================
 
 ==================  ==================  ==================
-|移植|_             |集成|_              |常见问题|_
+|移植|_             |示例|_              |常见问题|_
 ------------------  ------------------  ------------------
-`移植`_             `集成`_              `常见问题`_
+`移植`_             `示例`_              `常见问题`_
 ==================  ==================  ==================
 
 .. |入门指南| image:: ./_static/image/get_started.png
@@ -32,8 +32,8 @@ RTKIOT GUI
 .. |移植| image:: ./_static/image/porting.png
 .. _移植: get-started/index.html
 
-.. |集成| image:: ./_static/image/integration.png
-.. _集成: integration/index.html
+.. |示例| image:: ./_static/image/integration.png
+.. _示例: sample/index.html
 
 .. |常见问题| image:: ./_static/image/FAQ.png
 .. _常见问题: FAQ/index.html
@@ -44,7 +44,7 @@ RTKIOT GUI
    :maxdepth: 2
 
    入门指南 <get-started/index>
-   应用程序 <GUI-APP/index>
+   GUI应用程序 <GUI-APP/index>
    控件 <widgets/index>
    移植 <Porting/index>
    示例 <sample/index>

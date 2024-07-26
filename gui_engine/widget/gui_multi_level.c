@@ -137,9 +137,9 @@ static gui_obj_t *gui_obj_get_by_level_order_hide(gui_obj_t *root, int target_le
     }
     int count = 0;
     gui_obj_tree_count_by_type(root, MULTI_LEVEL, &count);
-    queue_node_t queue[count];
-    int front = 0, rear = 0, level_order[count];
-    memset(level_order, 0, count * sizeof(int));
+    queue_node_t queue[count + 3];
+    int front = 0, rear = 0, level_order[count + 3];
+    memset(level_order, 0, count + 3 * sizeof(int));
     if (root->type == MULTI_LEVEL)
     {
         queue[rear].gui_obj = root;
@@ -207,7 +207,12 @@ static void jump(gui_multi_level_t  *this, int level, int index)
     gui_multi_level_t *rst = 0;
     tree_child_free(root);
     rst = (gui_multi_level_t *)gui_obj_get_by_level_order_hide(root, ++level, ++index);
-    rst->ui_design((void *)rst);
+    if (rst)
+    {
+        rst->ui_design((void *)rst);
+    }
+
+
 }
 /*============================================================================*
  *                           Public Functions

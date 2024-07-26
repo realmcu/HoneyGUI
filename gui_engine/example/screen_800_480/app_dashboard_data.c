@@ -283,6 +283,7 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
     COMMUNICATE_ALLOW_DLPS = false;
     gui_msg_t msg;
     msg.event = GUI_EVENT_RESET_ACTIVE_TIME;
+    gui_server_msg_handler(&msg);
     uint8_t navi_type = 0;
     gui_send_msg_to_server(&msg);
     navi_type = ((uint8_t *)pValue)[0];

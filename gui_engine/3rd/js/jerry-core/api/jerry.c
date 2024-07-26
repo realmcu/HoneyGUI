@@ -2247,19 +2247,12 @@ jerry_invoke_function(bool is_invoke_as_constructor, /**< true - invoke function
  *
  * @return returned jerry value of the called function
  */
-#ifdef __WIN32
-#include <semaphore.h>
-extern sem_t sem_timer;
-#endif
 jerry_value_t
 jerry_call_function(const jerry_value_t func_obj_val,  /**< function object to call */
                     const jerry_value_t this_val, /**< object for 'this' binding */
                     const jerry_value_t args_p[], /**< function's call arguments */
                     jerry_size_t args_count) /**< number of the arguments */
 {
-#ifdef __WIN32
-    sem_wait(&sem_timer);
-#endif
     // gui_log("\nstar call 0x%x\n", func_obj_val);
     jerry_assert_api_available();
 
@@ -2268,9 +2261,6 @@ jerry_call_function(const jerry_value_t func_obj_val,  /**< function object to c
         jerry_value_t res = jerry_invoke_function(false, func_obj_val, this_val, args_p, args_count);
         // gui_log("end call 0x%x\n\n", func_obj_val);
 
-#ifdef __WIN32
-        sem_post(&sem_timer);
-#endif
         return res;
     }
 

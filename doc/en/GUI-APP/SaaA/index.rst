@@ -1,7 +1,6 @@
-SaaA
+Use Script Design An Application
 *************
 
-Script as a APP
 
 .. toctree::
     :maxdepth: 2

@@ -41,11 +41,14 @@ DECLARE_HANDLER(writeSync)
         char *direction = js_value_to_string(v2);
         jerry_release_value(v2);
         int mode = 0;
+        uint8_t wr_mode = (write_value >> 4) & 0x0F;
+        uint8_t wr_val = write_value & 0x0F;
 
 
         if (gpio >= 0)
         {
-            gui_log("gpio %d, mode %d, write_value %d\n", gpio, mode, write_value);
+            gui_log("gpio %d, IOmode %d, value 0x%x, wr_mode %d, wr_val %d\n", gpio, mode, write_value, wr_mode,
+                    wr_val);
             /**
              * GPIO
             */
@@ -60,7 +63,7 @@ DECLARE_HANDLER(writeSync)
                 mode = PIN_MODE_INPUT;
             }
             drv_pin_mode(gpio, mode);
-            drv_pin_write(gpio, write_value);
+            drv_pin_write(gpio, wr_val);
 #endif
 #endif
             /**
@@ -71,7 +74,7 @@ DECLARE_HANDLER(writeSync)
             extern bool app_send_msg_to_apptask(T_IO_MSG * p_msg);
 
             led_msg.u.param = 0x64 + gpio;
-            if (write_value == 0)
+            if (wr_val == 0)
             {
                 led_msg.subtype = IO_MSG_MESH_LIGHT_ON_GUI;
             }
@@ -87,23 +90,15 @@ DECLARE_HANDLER(writeSync)
             */
 #ifdef ENABLE_MATTER_SWITCH
 #ifdef RTL87x2G
+            // wr_mode: 0 (signal),  1 (group), 2 (subscribe), 3 (shutdown subscribe), 4 (gui ready)
             if (gpio >= 0)
             {
                 extern bool matter_send_msg_to_app(uint16_t sub_type, uint32_t param);
 
-                uint32_t param = gpio << 8 | write_value;
-                if (gpio != 49052)
-                {
-                    //single
-                    matter_send_msg_to_app(0, param);
-                }
-                else
-                {
-                    //group
-                    matter_send_msg_to_app(1, param);
-                }
+                uint32_t param = (gpio << 8) | wr_val;
+                matter_send_msg_to_app(wr_mode, param);
 
-                gui_log("gpio%d, %d, %d param %d\n", gpio, mode, write_value, param);
+                gui_log("->Matter: gpio %d, wr_mode %d, wr_val %d param 0x%x\n", gpio, wr_mode, wr_val, param);
             }
 #endif
 #endif
@@ -138,6 +133,7 @@ DECLARE_HANDLER(Gpio)
     jerry_value_t pin_js = jerry_create_number(pin);
     js_set_property(this_value, "gpio", pin_js);
     js_set_string_property(this_value, "direction", mode_string);
+    // js_set_string_property(this_value, "state", jerry_create_number(0));
 
     return jerry_create_undefined();
 }

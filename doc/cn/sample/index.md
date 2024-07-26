@@ -19,5 +19,5 @@ GUI_INIT_APP_EXPORT(app_init);
     计算器应用程序 <Calculator/Demo>
     86box应用程序 <86box/86box>
     LiteGFX应用程序 <LiteGFX/Demo>
-    状态栏 <Status bar>
+    状态栏 <Status-bar/Status bar>
 ```

@@ -1,7 +1,4 @@
 # Qrcode
-<br>
-
-## Overview
 
 The qbcode widget is the widget used to create or display qrcode and barcode. You can set a border, location and size attribute for qbcode widget. Qbcode widget support text and binary data  for qrcode encode, and support support text for barcode encode. The qrcode widget the QR Code Model 2 specification, supporting all versions (sizes) from 1 to 40, all 4 error correction levels, and 4 character encoding modes. The widget support fout error correction level in a QR Code symbol, and the high level is set by default. Barcode support code128 format.
 

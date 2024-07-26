@@ -1,4 +1,4 @@
-# GUI-APP: UI resource image
+# 图像转换工具
 
 ## Image format conversion
 Convert pictures in various formats into RGB raw pictures

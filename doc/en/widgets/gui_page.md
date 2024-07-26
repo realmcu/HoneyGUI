@@ -1,7 +1,4 @@
 # Page
-<br>
-
-## Overview
 
 The page widget enables developers to establish a column of additional controls along the y-axis. These controls are permitted to extend beyond the screen's display boundary. Users can access these controls by swiping up or down.
 
@@ -40,7 +37,7 @@ void page_tb_activity(void *parent)
 }
 ```
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1702980322226942161/b6425e49_10641540.gif " width = "300" /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/page.gif" width = "300" /></div>
 <br>
 
 <span id = "gui_page_create">

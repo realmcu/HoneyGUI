@@ -60,7 +60,8 @@ int js_util_lock(void);
 int js_util_unlock(void);
 void js_util_user_init(js_util_user func);
 void js_util_user_cleanup(js_util_user func);
-
+void
+jerry_port_set_default_context(jerry_context_t *context);
 #ifdef __cplusplus
 }
 #endif

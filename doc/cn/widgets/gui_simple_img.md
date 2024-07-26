@@ -1,7 +1,5 @@
 # Simple image
-<br>
 
-## Overview
 The simple img widget is a simplified version of the img control, lacking transformation operations such as rotation, translation, and scaling.
 
 ## Usage
@@ -89,7 +87,7 @@ void page_tb3(void *parent)
 
 <br>
 
-<center><img width= "300" src="https://foruda.gitee.com/images/1715074028338417840/9bb1c0dc_13671125.gif" /></center>
+<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/simple_img.gif" /></center>
 <br>
 
 <span id="api">

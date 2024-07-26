@@ -711,7 +711,7 @@ typedef unsigned char validate_uint32[sizeof(stbi__uint32) == 4 ? 1 : -1];
 #define STBI_MALLOC(sz)           gui_malloc(sz)
 #define STBI_REALLOC(p,newsz)     gui_realloc(p, newsz)
 #define STBI_FREE(p)              gui_free(p)
-#elif defined RTL8772F
+#elif defined RTL8772F || TARGET_RTL8773E
 #define STBI_MALLOC(sz)           gui_lower_malloc(sz)
 #define STBI_REALLOC(p,newsz)     gui_lower_realloc(p, newsz )
 #define STBI_FREE(p)              gui_lower_free(p)

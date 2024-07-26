@@ -1,7 +1,5 @@
 # Image
-<br>
 
-## Overview
 The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.Image widgets support moving, zooming, rotating, etc.
 
 ## Usage
@@ -141,7 +139,7 @@ void page_tb6(void *parent)
 
 <br>
 
-<center><img width= "300" src="https://foruda.gitee.com/images/1700028291499940369/2d8b2d83_13671147.gif" /></center>
+<center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/img.gif" /></center>
 <br>
 
 <span id="api">

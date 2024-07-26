@@ -1,7 +1,4 @@
 # Window
-<br>
-
-## Overview
 
 The widget provides a virtual area for the developer to place application-required widgets. The developer can depend on the requirement to create the space relative to the screen.
 For example, Figure-1 creates an area the same as the screen dimension, and the developer can create a space with different sizes, as in Figure-2.

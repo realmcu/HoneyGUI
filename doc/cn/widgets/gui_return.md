@@ -1,7 +1,4 @@
 # Return
-<br>
-
-## Overview
 
 The bubble-shaped curve that can be dragged out on the left side of the screen is used to perform a return operation.
 
@@ -13,7 +10,7 @@ Creating function is [gui_return_create](#gui_return_create). Users need to ente
 
 ## Example
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1713248172846272975/fd33e8c2_10088396.gif"  /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/return.gif"  /></div>
 <br>
 
 

@@ -5,6 +5,23 @@
 sem_t sem_timer;
 #endif
 
+jerry_value_t jerry_call_func_sem(const jerry_value_t func_obj_val,  /**< function object to call */
+                                  const jerry_value_t this_val, /**< object for 'this' binding */
+                                  const jerry_value_t args_p[], /**< function's call arguments */
+                                  jerry_size_t args_count) /**< number of the arguments */
+{
+#ifdef __WIN32
+    sem_wait(&sem_timer);
+#endif
+
+    jerry_value_t res = jerry_call_function(func_obj_val, this_val, args_p, args_count);
+
+#ifdef __WIN32
+    sem_post(&sem_timer);
+#endif
+    return res;
+}
+
 static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code, void *param)
 {
     //gui_log("enter js_cb_with_args\n");
@@ -15,7 +32,7 @@ static void js_cb_with_args(gui_obj_t *obj, gui_event_t event_code, void *param)
     {
         return;
     }
-    jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
+    jerry_value_t res = jerry_call_func_sem(args->func, jerry_create_undefined(), args->args_p,
                                             args->args_count);
     jerry_release_value(res);
 }
@@ -27,7 +44,7 @@ static void js_cb_with_args_animate(cb_arg_t *args)
     {
         return;
     }
-    jerry_value_t res = jerry_call_function(args->func, jerry_create_undefined(), args->args_p,
+    jerry_value_t res = jerry_call_func_sem(args->func, jerry_create_undefined(), args->args_p,
                                             args->args_count);
     jerry_release_value(res);
 
@@ -323,6 +340,21 @@ DECLARE_HANDLER(setMode)
     if (img)
     {
         gui_img_set_mode(img, jerry_get_number_value(args[0]));
+    }
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(setShow)
+{
+    if (args_cnt != 1 || !jerry_value_is_number(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_obj_t *obj = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
+    if (obj)
+    {
+        bool show = (bool)jerry_get_number_value(args[0]);
+        gui_obj_show(obj, show);
     }
     return jerry_create_undefined();
 }
@@ -997,6 +1029,7 @@ DECLARE_HANDLER(play_animate_seekbar)
         GUI_TYPE(gui_seekbar_t, obj)->animate->current_frame = 0;
         GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent = 0;
         GUI_TYPE(gui_seekbar_t, obj)->animate->current_repeat_count = 0;
+        GUI_TYPE(gui_seekbar_t, obj)->animate->init = false;
     }
 
     return jerry_create_undefined();
@@ -1195,19 +1228,13 @@ DECLARE_HANDLER(seekbar_getAttribute)
 }
 DECLARE_HANDLER(seekbar_getAnimateProgress)
 {
-    //gui_log("enter seekbar_getAttribute1\n");
-    {
-        {
-            gui_obj_t *obj = NULL;
-            jerry_get_object_native_pointer(this_value, (void *)&obj,
-                                            NULL);//gui_log("enter seekbar_getAttribute4\n");
-
-            return jerry_create_number(GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent);
-
-        }
-        ;//gui_log("enter seekbar_getAttribute7\n");
-    }
-
+    gui_obj_t *obj = NULL;
+    float percent = 0;
+    jerry_get_object_native_pointer(this_value, (void *)&obj,
+                                    NULL);
+    percent = GUI_TYPE(gui_seekbar_t, obj)->animate->progress_percent;
+    // gui_log("seekbar_getAnimateProgress %f\n", percent);
+    return jerry_create_number(percent);
 
 }
 DECLARE_HANDLER(seekbar_setAttribute)
@@ -1220,7 +1247,7 @@ DECLARE_HANDLER(seekbar_setAttribute)
         {
             gui_obj_t *obj = NULL;
             jerry_get_object_native_pointer(this_value, (void *)&obj, NULL);
-            //gui_log("seekbar_setAttribute:%f\n", jerry_get_number_value(args[1]));
+            // gui_log("seekbar_setAttribute:%f\n", jerry_get_number_value(args[1]));
             gui_progressbar_set_percentage((void *)obj, jerry_get_number_value(args[1]));
 
         }
@@ -1300,6 +1327,22 @@ DECLARE_HANDLER(sw_open)
     return jerry_create_undefined();
 }
 
+DECLARE_HANDLER(sw_setState)
+{
+    if (args_cnt >= 1 && jerry_value_is_number(args[0]))
+    {
+        gui_switch_t *sw = NULL;
+        double val = jerry_get_number_value(args[0]);
+
+        jerry_get_object_native_pointer(this_value, (void *)(&sw), NULL);
+        if (sw)
+        {
+            gui_switch_change_state(sw, (bool)val);
+        }
+    }
+
+    return jerry_create_undefined();
+}
 
 
 #include "js_extern_io.h"
@@ -1314,7 +1357,7 @@ void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
     js_cb = (jerry_value_t)msg.payload;
     // gui_log("timer msg cb 0x%x\n", js_cb);
 
-    res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
+    res = jerry_call_func_sem(js_cb, jerry_create_undefined(), 0, 0);
     jerry_release_value(res);
 }
 
@@ -1345,7 +1388,7 @@ void js_ui_timerThread(void *param)
         pthread_testcancel();
         // gui_send_msg_to_server(&msg);
 
-        int res = jerry_call_function(js_cb, jerry_create_undefined(), 0, 0);
+        int res = jerry_call_func_sem(js_cb, jerry_create_undefined(), 0, 0);
         jerry_release_value(res);
 
         pthread_testcancel();
@@ -1563,6 +1606,7 @@ void js_gui_init()
     REGISTER_METHOD(img, scale);
     REGISTER_METHOD(img, setMode);
     REGISTER_METHOD(img, setAttribute);
+    REGISTER_METHOD(img, setShow);
     REGISTER_METHOD_NAME(img,  "setAnimate", setAnimate_img);
     REGISTER_METHOD_NAME(img,  "playAnimate", play_animate_img);
     REGISTER_METHOD_NAME(img,  "pauseAnimate", pause_animate_img);
@@ -1583,6 +1627,7 @@ void js_gui_init()
     REGISTER_METHOD(icon, onRelease);
     REGISTER_METHOD(icon, onHold);
     REGISTER_METHOD(icon, getChildElementByTag);
+    REGISTER_METHOD(icon, setShow);
     REGISTER_METHOD_NAME(icon, "write", icon_write);
     jerry_value_t progress = jerry_create_object();
     js_set_property(global_obj, "progressbar", progress);
@@ -1601,11 +1646,14 @@ void js_gui_init()
     REGISTER_METHOD_NAME(seekbar, "getAttribute", seekbar_getAttribute);
     REGISTER_METHOD_NAME(seekbar, "playAnimate", play_animate_seekbar);
     REGISTER_METHOD_NAME(seekbar, "animateProgress", seekbar_getAnimateProgress);
+
+
     jerry_value_t document = jerry_create_object();
     js_set_property(global_obj, "textbox", document);
     REGISTER_METHOD(document, write);
     REGISTER_METHOD(document, getElementById);
     REGISTER_METHOD(document, setPosition);
+    REGISTER_METHOD(document, setShow);
     REGISTER_METHOD_NAME(document, "playAnimate", play_animate_text);
     REGISTER_METHOD_NAME(document, "setAnimate", setAnimate_text);
     REGISTER_METHOD_NAME(document, "pauseAnimate", pause_animate_text);
@@ -1622,6 +1670,7 @@ void js_gui_init()
     jerry_value_t win = jerry_create_object();
     js_set_property(global_obj, "win", win);
     REGISTER_METHOD(win, getElementById);
+    REGISTER_METHOD(win, setShow);
     REGISTER_METHOD_NAME(win, "onRelease", onRelease_win);
     REGISTER_METHOD_NAME(win, "onClick", onClick_win);
     REGISTER_METHOD_NAME(win, "onPress", onPress_win);
@@ -1642,11 +1691,15 @@ void js_gui_init()
     jerry_value_t sw = jerry_create_object();
     js_set_property(global_obj, "sw", sw);
     REGISTER_METHOD(sw, getElementById);
+    REGISTER_METHOD(sw, setShow);
     REGISTER_METHOD_NAME(sw, "onOn", switch_on);
     REGISTER_METHOD_NAME(sw, "onOff", switch_off);
     REGISTER_METHOD_NAME(sw, "turnOn", sw_open);
     REGISTER_METHOD_NAME(sw, "turnOff", sw_close);
     REGISTER_METHOD_NAME(sw, "onPress", onPress_switch);
+    REGISTER_METHOD_NAME(sw, "setState", sw_setState);
+
+    // timer
     REGISTER_METHOD(global_obj, setTimeout);
     REGISTER_METHOD(global_obj, clearTimeout);
     REGISTER_METHOD(global_obj, setInterval);

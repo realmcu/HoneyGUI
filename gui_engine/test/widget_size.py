@@ -23,7 +23,7 @@ if not matching_files:
 
 # Select the first matching file
 log_file_path = matching_files[0]
-output_excel_path = os.path.join(directory_path, 'widget_size.xlsx')
+output_excel_path = os.path.join(os.getcwd(), 'gui_engine', 'test', 'widget_size.xlsx')
 
 print(f"Using log file: {log_file_path}")
 print(f"Output will be saved to: {output_excel_path}")
@@ -40,7 +40,7 @@ process_data = False
 # Read the log file and extract required information
 with open(log_file_path, 'r', encoding='utf-8') as file:
     for line in file:
-        if "gui_test_case_obj_000 Start" in line:
+        if "gui_test_case_obj_000 START" in line:
             process_data = True
             print(f"Started processing at line: {line.strip()}")
 
@@ -51,7 +51,7 @@ with open(log_file_path, 'r', encoding='utf-8') as file:
                 size = int(match.group(2))
                 data.append({'name': name, 'size': size})
 
-        if "gui_test_case_obj_000 Pass" in line:
+        if "gui_test_case_obj_000 PASS" in line:
             process_data = False
             print(f"Stopped processing at line: {line.strip()}")
             break

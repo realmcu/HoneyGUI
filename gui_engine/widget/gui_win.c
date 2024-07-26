@@ -400,12 +400,84 @@ gui_win_t *gui_win_create(void       *parent,
 
     return this;
 }
-_GUI_API_ASSIGN(gui_win_t)
-.on_click = gui_win_click,
- .on_press = gui_win_press,
-  .on_release = gui_win_release,
-   .animate = gui_win_set_animate,
-};
+float gui_win_get_aniamtion_progress_percent(gui_win_t *win)
+{
+    if (win == NULL || win->animate == NULL)
+    {
+        // Handle error: window or animate structure is NULL
+        gui_log("Cannot get_aniamtion_progress_percent: win or win->animate is NULL\n");
+        return 0;
+    }
+    return win->animate->progress_percent;
+}
+void gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical)
+{
+    if (win == NULL)
+    {
+        // Handle error: window structure is NULL
+        gui_log("Cannot set_scale_rate: win is NULL\n");
+        return;
+    }
+    win->scale = scale_rate_horizontal;
+    win->scale_y = scale_rate_vertical;
+}
+void gui_win_set_scope(gui_win_t *win, bool enable)
+{
+    if (win == NULL)
+    {
+        // Handle error: window structure is NULL
+        gui_log("Cannot set scope: win is NULL\n");
+        return;
+    }
+    win->scope = enable;
+}
+void gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)
+{
+    if (win == NULL)
+    {
+        // Handle error: window structure is NULL
+        gui_log("Cannot set opacity: win is NULL\n");
+        return;
+    }
+    GUI_BASE(win)->opacity_value = opacity_value;
+}
+// Function to retrieve the end_frame value from the window's animation structure
+bool gui_win_is_animation_end_frame(gui_win_t *win)
+{
+    if (win == NULL || win->animate == NULL)
+    {
+        // Handle error: window or animate structure is NULL
+        gui_log("Cannot judge animation_end_frame: win or win->animate is NULL\n");
+        return 0;
+    }
+    return win->animate->end_frame != 0;
+}
+// Function to start the animation, sets animate to 1
+void gui_win_start_animation(gui_win_t *win)
+{
+    if (win == NULL || win->animate == NULL)
+    {
+        // Handle error: window or animate structure is NULL
+        gui_log("Cannot start animation: win or win->animate is NULL\n");
+        return;
+    }
+    win->animate->animate = 1;
+}
+// Function to stop the animation, sets animate to 0
+void gui_win_stop_animation(gui_win_t *win)
+{
+    if (win == NULL || win->animate == NULL)
+    {
+        // Handle error: window or animate structure is NULL
+        gui_log("Cannot stop animation: win or win->animate is NULL\n");
+        return;
+    }
+    win->animate->animate = 0;
+}
+void gui_win_prepare_globle(gui_obj_t *obj)
+{
+    gui_win_prepare(obj);
+}
 /** End of WIDGET_Exported_Functions
   * @}
   */

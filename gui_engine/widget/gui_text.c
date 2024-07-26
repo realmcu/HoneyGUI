@@ -358,6 +358,11 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
         return;
     }
+    if (this->base.not_show)
+    {
+        return;
+    }
+
     matrix_multiply_point(obj->matrix, &point);
     this->offset_x = point.p[0];
     this->offset_y = point.p[1];
@@ -409,6 +414,7 @@ static void gui_text_draw(gui_obj_t *obj)
 
     if (text->len == 0)
     {
+        text->refresh = false;
         return;
     }
 
@@ -686,6 +692,7 @@ gui_text_t *gui_text_create(void       *parent,
     memset(text, 0, sizeof(gui_text_t));
 
     gui_text_ctor(text, parent, name, x, y, w, h);
+    text->refresh = false;
     gui_list_init(&(GET_BASE(text)->child_list));
     if ((GET_BASE(text)->parent) != NULL)
     {

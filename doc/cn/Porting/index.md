@@ -1,32 +1,36 @@
 # 移植
 
 移植文件位于gui_port文件夹中。
-需要修改四个文件，分别对应输入设备、显示设备、操作系统和文件系统。
-目前已在FreeRTOS、RT-Thread和Windows上进行了移植，可供参考。
-## 输入设备
+需要修改六个文件，其文件名与功能如下。
+|文件名|功能|
+|---|---|
+|gui_port_acc.c|加速|
+|gui_port_dc.c|显示设备|
+|gui_port_filesystem.c|文件系统|
+|gui_port_ftl.c|闪存转换层|
+|gui_port_indev.c|输入设备|
+|gui_port_os.c|操作系统|
 
-- 参考 ``guidef.h`` 和 ``gui_port_indev.c``
-- 输入信息被抽象为触摸屏接触，输入信息的结构体如下：
+目前已在FreeRTOS、RT-Thread和Windows上进行了移植，可供参考。
+
+## 加速
+
+- 参考 `guidef.h` 和 `gui_port_acc.c`
+- 需要根据平台型号，定义加速绘制接口，一般是`hw_acc_blit`或者`sw_acc_blit`。
+- 结构体定义如下:
 
 ```C
-typedef struct gui_touch_port_data
+typedef struct acc_engine
 {
-    uint8_t          event;                 /* 数据的触摸事件 */
-    uint8_t          track_id;              /* 点的跟踪id */
-    uint16_t         width;                 /* 点的宽度 */
-    uint16_t         x_coordinate;          /* 点的x坐标 */
-    uint16_t         y_coordinate;          /* 点的y坐标 */
-    uint32_t         timestamp;             /* 收到数据时的时间戳 */
-    void            *data;
-} gui_touch_port_data_t;
+    void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
+} acc_engine_t;
 ```
 
 ## 显示设备
 
-- 参考 ``guidef.h`` 和 ``gui_port_dc.c``
-- 需要定义屏幕的宽度和高度、帧缓冲区地址和模式、分辨率是否缩放，并实现刷新函数。结构如下。
-- 帧缓冲区的大小为 ```fb_width*fb_height*bit_depth/8```.
-- 在 ```DC_RAMLESS``` 模式下，使用了两个帧缓冲区，fb_height 是分段高度。
+- 参考 `guidef.h` 和 `gui_port_dc.c`
+- 需要定义屏幕的宽度和高度、帧缓冲区地址和模式、分辨率是否缩放等等，并实现刷新函数，结构体定义参考 `guidef.h`。
+- 一个典型的`gui_dispdev`结构体初始化声明如下：
 
 ```C
 static struct gui_dispdev dc =
@@ -36,10 +40,12 @@ static struct gui_dispdev dc =
     .fb_height = FB_HEIGHT,
     .screen_width =  DRV_LCD_WIDTH,
     .screen_height = DRV_LCD_HIGHT,
+    .dc.disp_buf_1 = disp_write_buff1_port,
+    .dc.disp_buf_2 = disp_write_buff2_port,
     .driver_ic_fps = 60,
     .driver_ic_hfp = 10,
     .driver_ic_hbp = 10,
-    .driver_ic_active_width = 320,
+    .driver_ic_active_width = DRV_LCD_WIDTH,
     .type = DC_RAMLESS,
     .adaption = false,
     .section = {0, 0, 0, 0},
@@ -50,68 +56,159 @@ static struct gui_dispdev dc =
     .reset_lcd_timer = reset_vendor_counter,
     .get_lcd_us = read_vendor_counter_no_display,
     .lcd_te_wait = port_lcd_te_wait,
-    .gpu_type = GPU_SW,
+    .dc.scale_x = 1,
+    .dc.scale_y = 1,
 };
+```
+
+- 在 `DC_SINGLE` 模式下，帧缓冲区的大小为 `fb_width*fb_height*bit_depth/8`。
+- 在 `DC_RAMLESS` 模式下，使用了两个部分帧缓冲区，大小为`fb_width*fb_height*bit_depth/8`，此时的`fb_height`是分段高度。
+
+### 支持接口类型
+
+```eval_rst
+
+以下表格列出了主流芯片支持的与LCD相关的接口。如果您想了解更多信息，请点击特定芯片的名称。
+
+===============  =======  ========  =======  =======  =======
+SOC              I8080    QSPI      RGB      MIPI     SPI
+---------------  -------  --------  -------  -------  -------
+`RTL8762C`_      Y        NA        NA       NA       Y
+`RTL8762D`_      Y        Y         NA       NA       Y
+`RTL8763E`_      Y        Y         NA       NA       Y
+`RTL8772G`_      Y        Y         Y        NA       Y
+`RTL8773E`_      Y        Y         Y        NA       Y
+`RTL8772F`_      Y        Y         Y        Y        Y
+===============  =======  ========  =======  =======  =======
+
+'Y' 表示驱动程序已包含在库中。
+'NA' 表示驱动程序尚未包含在库中。
+
+.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
+.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+```
+
+### 已验证屏幕驱动
+****
+```eval_rst
+
+以下表格列出了主流芯片支持的与LCD相关的驱动IC。如果您想了解更多信息，请点击特定芯片的名称。
+
+===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
+SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903     ST7796      OTM8009A    SH8601A   SH8601Z   RM69330   ST7789    NV3041A
+---------------  ---------  ----------  ---------  ---------  ---------  ----------  ----------  ----------  --------  --------  --------  --------  --------
+`RTL8762D`_      NA         NA          NA         NA         NA         NA          Y           NA          NA        NA        Y         Y         Y
+`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA
+`RTL8772G`_      Y          Y           Y          Y          Y          Y           Y           NA          NA        NA        NA        NA        NA
+`RTL8773E`_      NA         NA          NA         NA         NA         NA          NA          NA          Y         NA        NA        NA        NA
+`RTL8772F`_      NA         Y           Y          NA         Y          NA          NA          Y           Y         Y         NA        NA        NA
+===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
+
+'Y' 表示驱动程序已包含在库中。
+'NA' 表示驱动程序尚未包含在库中。
+
+.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
+.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
 ## 文件系统
 
-- 参考 ``guidef.h`` 和 ``gui_port_filesystem.c``
-- 需要定义几个类似 posix 风格的接口操作文件和文件夹，如下：
+- 参考 `guidef.h` 和 `gui_port_filesystem.c`
+- 需要定义几个类似 posix 风格的接口操作文件和文件夹。
+- 不使用文件系统时可以填入空指针。
+- 结构体定义如下：
 
-```C
-struct gui_fs
-{
-    int (*open)(const char *file, int flags, ...);
-    int (*close)(int d);
-    int (*read)(int fd, void *buf, size_t len);
-    int (*write)(int fd, const void *buf, size_t len);
-    int (*lseek)(int fd, int offset, int whence);
-    /* directory api*/
-    gui_fs_dir *(*opendir)(const char *name);
-    struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
-    int (*closedir)(gui_fs_dir *d);
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_fs struct define start */
+   :end-before: /* gui_fs struct define end */
 ```
+
+## 闪存转换层
+
+- 参考 `guidef.h` 和 `gui_port_ftl.c`
+- 需要定义闪存转换层的三个接口：`read`，`write`，`erase`。
+- 不使用闪存转换层时可以填入空指针。
+- 结构体定义如下:
+
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_ftl struct define start */
+   :end-before: /* gui_ftl struct define end */
+```
+
+## 输入设备
+
+- 参考 `guidef.h` 和 `gui_port_indev.c`
+- 输入设备包括触摸板、键盘和滚轮，输入信息的结构体如下：
+
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_indev struct define start */
+   :end-before: /* gui_indev struct define end */
+```
+
+- 如果需要某一种输入设备，需要在`gui_indev`中实现对应的数度获取函数，并填写所需的时间阈值。
+
+### 触摸芯片
+
+```eval_rst
+
+以下表格列出了所有芯片支持的与触摸相关的IC。如果您想了解更多信息，请点击特定芯片的名称。
+
+==================  =========  ==========  ========  =======  ========  ========  =========
+SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147
+------------------  ---------  ----------  --------  -------  --------  --------  ---------
+`RTL8762D`_         Y          NA          NA        NA       NA        NA         NA
+`RTL8763E`_         NA         NA          NA        NA       NA        Y          Y
+`RTL8772G`_         NA         NA          NA        Y        Y         NA         NA
+`RTL8773E`_         Y          NA          NA        Y        NA        NA         NA
+`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA
+==================  =========  ==========  ========  =======  ========  ========  =========
+
+'Y' 表示驱动程序已包含在库中。
+'NA' 表示驱动程序尚未包含在库中。
+
+
+.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+```
+
+### 物理按键
+
+### 编码器滚轮
 
 ## 操作系统
 
-- 参考 ``guidef.h`` 和 ``gui_port_os.c``
-- 需要定义线程、定时器、消息队列和内存管理的接口，如下：
+- 参考 `guidef.h` 和 `gui_port_os.c`
+- 需要定义线程、定时器、消息队列和内存管理的接口，结构体定义如下：
 
-```C
-struct gui_os_api
-{
-    char *name;
-    void *(*thread_create)(const char *name, void (*entry)(void *param), void *param,
-                           uint32_t stack_size, uint8_t priority);
-    bool (*thread_delete)(void *handle);
-    bool (*thread_mdelay)(uint32_t ms);
-    char *(*thread_get_name)(void);
-    void *(*timer_create)(char *name, void (*timeout)(void *param), void *param, uint32_t time,
-                          bool reload);
-    bool (*timer_start)(void *handle);
-    bool (*timer_stop)(void *handle);
-    bool (*timer_delete)(void *handle);
-    void *(*mq_create)(const char *name, uint32_t msg_size, uint32_t max_msgs);
-    bool (*mq_send)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-    bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-    bool (*mq_recv)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-
-    void *(*f_malloc)(uint32_t);
-    void (*f_free)(void *rmem);
-    void (*assert_handler)(const char *ex_string, const char *func, uint32_t line);
-    uint32_t (*tick_get)(void);
-    //void (*log)(const char *fmt, ...);
-
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_os_api struct define start */
+   :end-before: /* gui_os_api struct define end */
 ```
 
 ## 休眠管理
 
 为了降低功耗和增加设备的使用时间，支持睡眠（低功耗）模式。
 
-- 参考 ``gui_app.h``
+- 参考 `gui_app.h`
 
 ```C
 typedef struct gui_app gui_app_t;
@@ -126,10 +223,14 @@ struct gui_app
     void (* dtor)(void *this);      //!< 析构函数
     void (* ui_design)(gui_app_t *); //!< UI创建入口函数
     bool lvgl;
+    bool arm2d;
+    bool close;
+    bool next;
+    bool close_sync;
 };
 ```
 
-``active_ms`` 是 gui 应用程序的待机时间，可以在不同的应用程序中定义为不同的值。
+`active_ms` 是 gui 应用程序的待机时间，可以在不同的应用程序中定义为不同的值。
 与其他类型的电子设备一样，当屏幕持续显示一个界面的时间超过待机时间时，设备将进入睡眠模式。
 在睡眠状态下，通过触摸触摸板、按键或发送消息可以唤醒设备。
 在芯片手册中，这种外设可以关闭的低功耗状态被称为深度低功耗状态（DLPS）。关于DLPS的更多信息，可以在SDK的相关指导文档中找到。

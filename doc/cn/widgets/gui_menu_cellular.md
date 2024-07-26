@@ -1,7 +1,4 @@
 # Menu cellular
-<br>
-
-## Overview
 
 The menu cellular widget display a icons set as a honeycomb shape menu.
 
@@ -16,7 +13,7 @@ Function is [void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_
 
 ## Example
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1713248192190019543/a2d10c29_10088396.gif"  /></div>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/menu_cellular.gif"  /></div>
 <br>
 
 ```c

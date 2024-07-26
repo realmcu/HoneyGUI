@@ -1,6 +1,5 @@
 # Tabview
 
-## Overview
 The gui_tabview widget is the container to store and depends on user selection to change the tab for different functions. As in Figure-1, the "Green Area" represents the actual display region, and there're five rectangles with the red dashed line as the whole gui_tabview area. And each rectangle is the gui_tab widget. The "idx" stands for the index on the X-axis, and the "idy" stands for the index on Y-axis.
 
 <br>

@@ -1,7 +1,4 @@
 # Curtain
-<br>
-
-## Overview
 
 The curtain widget enables you to create curtains in five directions: up, down, left, right, and middle. (refer to [T_GUI_CURTAIN_ENUM](#T_GUI_CURTAIN_ENUM)). Before creating the curtain widget, you must first create a curtainview widget to accommodate the curtain.
 

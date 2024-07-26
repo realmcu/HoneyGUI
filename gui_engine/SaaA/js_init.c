@@ -64,6 +64,20 @@ static void script_free(void *scipt_buff)
 #endif
 }
 
+
+void js_isReady(void)
+{
+    // inform other tasks
+#ifdef ENABLE_MATTER_SWITCH
+#ifdef RTL87x2G
+    // wr_mode: 0 (signal),  1 (group), 2 (subscribe), 3 (shutdown subscribe), 4 (gui ready)
+    extern bool matter_send_msg_to_app(uint16_t sub_type, uint32_t param);
+    matter_send_msg_to_app(4, 0);
+    gui_log("->Matter: js_isReady\n");
+#endif
+#endif
+}
+
 void js_run_file(const char *file, gui_app_t  *app)
 {
     jerry_value_t global_obj = jerry_get_global_object();

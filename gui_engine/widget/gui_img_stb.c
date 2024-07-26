@@ -179,7 +179,7 @@ static void gui_img_stb_modify_img(gui_obj_t *obj)
         {
 #if _WIN32
             gui_free(img->img->data);
-#elif defined RTL8772F
+#elif defined RTL8772F || TARGET_RTL8773E
             gui_lower_free(img->img->data);
 #else
             gui_free(img->img->data);

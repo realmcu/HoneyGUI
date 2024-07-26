@@ -28,6 +28,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "ezxml.h"
+#include "gui_return.h"
 #ifdef __arm__
 #include "romfs.h"
 #else
@@ -42,6 +43,7 @@
 #endif
 
 #include "gui_api.h"
+#include "gui_multi_level.h"
 //char *GUI_ROOT_FOLDER = GUI_ROOT_FOLDER;
 struct widget_create
 {
@@ -49,7 +51,7 @@ struct widget_create
     T_OBJ_TYPE type;
 };
 
-#define WIDGETS_NUM 22
+#define WIDGETS_NUM 25
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
 struct widget_create widget[] =
 {
@@ -78,6 +80,8 @@ struct widget_create widget[] =
     {"animateTransform", MACRO_ANIMATETRANSFORM},
     {"motorizedCurtain", MACRO_MOTORIZED_CURTAIN},
     {"keyboard", KEYBOARD},
+    {"multiLevel", MULTI_LEVEL},
+    {"onClick", MACRO_ONCLICK},
 };
 static void img_rotate_cb(gui_img_t *img)
 {
@@ -90,6 +94,12 @@ static void img_rotate_cb(gui_img_t *img)
 static char *open_switch_name;
 static char *pause_switch_name;
 static char *close_switch_name;
+static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent);
+static void setting_return_cb(gui_obj_t *this);
+static void **image_array;
+static void *return_image;
+static void *return_image_hl;
+static int file_count;
 static void seekbar_ani_cb(int args, gui_seekbar_t *this)
 {
     switch (args)
@@ -360,10 +370,39 @@ static void sport_button_release(gui_button_t *b)
 {
     gui_button_set_animate(b, 200, 0, sport_button_release_ani_cb, b);
 }
+static void multi_level_ui_design(gui_multi_level_t *obj)
+{
+    extern void *get_app_xml(void);
+    create_tree_in_multi_level(get_app_xml(), obj);
+    // gui_return_create(obj, image_array,
+    //                   file_count, setting_return_cb, (void *)0);
+    gui_button_t *button = gui_button_create(obj, 0, 0, 45, 45, return_image, return_image_hl, 0, 0, 0);
+    button->img->blend_mode = IMG_SRC_OVER_MODE;
+    GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
+}
+struct on_click_jump_cb_param
+{
+    int id1;
+    int id2;
+};
+
+static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_param *param)
+{
+    if (param->id1 < 0)
+    {
+        setting_return_cb(obj);
+    }
+    else
+    {
+        GUI_API(gui_multi_level_t).jump(obj, param->id1, param->id2);
+    }
+
+
+}
 gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 {
     char *name = p->name;
-    gui_log("%s: %s", name, p->txt);
+    gui_log("widget_create_handle:%s: %s", name, p->txt);
     for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
     {
         if (!strcmp(widget[i].name, name))
@@ -704,35 +743,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                 }
                 break;
-            /*case CLICKSWITCH:
-            {
-                size_t i = 0;
-                int16_t x = 0;
-                int16_t y = 0;
-                while (true)
-                {
-                    if (!(p->attr[i]))
-                    {
-                        break;
-                    }
-                    //gui_log("p->attr[i]:%s\n", p->attr[i]);
-                    if (!strcmp(p->attr[i], "x"))
-                    {
-                        x = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "y"))
-                    {
-                        y = atoi(p->attr[++i]);
-                    }
-                    i++;
-                }
-                char *ptxt = get_space_string_head(p->txt);
-                //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
-                {
-                    parent = gui_switch_create(parent, ptxt, x, y,0,0);
-                }
-            }
-            break;*/
             case TABVIEW:
                 {
                     size_t i = 0;
@@ -1286,78 +1296,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                 }
                 break;
-            /*case PROGRESSBAR:
-            {
-                size_t i = 0;
-                int16_t x = 0;
-                int16_t y = 0;
-                int16_t w = 0;
-                int16_t h = 0;
-                while (true)
-                {
-                    if (!(p->attr[i]))
-                    {
-                        break;
-                    }
-                    //gui_log("p->attr[i]:%s\n", p->attr[i]);
-                    if (!strcmp(p->attr[i], "x"))
-                    {
-                        x = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "y"))
-                    {
-                        y = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "w"))
-                    {
-                        w = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "h"))
-                    {
-                        h = atoi(p->attr[++i]);
-                    }
-                    i++;
-                }
-                char *ptxt = get_space_string_head(p->txt);
-                parent = gui_progressbar_create(parent, ptxt, x, y, w, h);
-            }
-            break;
-            case SEEKBAR:
-            {
-                size_t i = 0;
-                int16_t x = 0;
-                int16_t y = 0;
-                int16_t w = 0;
-                int16_t h = 0;
-                while (true)
-                {
-                    if (!(p->attr[i]))
-                    {
-                        break;
-                    }
-                    //gui_log("p->attr[i]:%s\n", p->attr[i]);
-                    if (!strcmp(p->attr[i], "x"))
-                    {
-                        x = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "y"))
-                    {
-                        y = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "w"))
-                    {
-                        w = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "h"))
-                    {
-                        h = atoi(p->attr[++i]);
-                    }
-                    i++;
-                }
-                char *ptxt = get_space_string_head(p->txt);
-                parent = gui_seekbar_create(parent, ptxt, x, y, w, h);
-            }
-            break;*/
             case TAB:
                 {
                     size_t i = 0;
@@ -1403,36 +1341,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,idx:%d,idy:%d\n", x, y, w, h, idx, idy);
                     parent = (void *)gui_tab_create(parent, ptxt, x, y, w, h, idx, idy);
-                }
-
-
-                {
-                    // if(strcmp(parent->name, "home_tab") == 0)
-                    // {
-                    //     uint8_t num_pic = 6;
-                    //     void** img_arr = gui_malloc(num_pic * sizeof(void*));
-                    //     img_arr[0] = gui_get_file_address("app/box/resource/other/img_01.bin");
-                    //     img_arr[1] = gui_get_file_address("app/box/resource/other/img_02.bin");
-                    //     img_arr[2] = gui_get_file_address("app/box/resource/other/img_03.bin");
-                    //     img_arr[3] = gui_get_file_address("app/box/resource/other/img_04.bin");
-                    //     img_arr[4] = gui_get_file_address("app/box/resource/other/img_02.bin");
-                    //     img_arr[5] = gui_get_file_address("app/box/resource/other/img_03.bin");
-                    //     gui_gallery_config_t img_file = {
-                    //         .data_main_bg = gui_get_file_address("app/box/resource/other/main_bg.bin"),
-                    //         .data_center_bg = gui_get_file_address("app/box/resource/other/center_bg.bin"),
-                    //         .img_array = img_arr,
-                    //         .num_pic = num_pic
-                    //     };
-                    //     gui_gallery_create(parent,
-                    //                     "gallery_t",
-                    //                     &img_file,
-                    //                     0,
-                    //                     0,
-                    //                     480,
-                    //                     321);
-
-                    // }
-
                 }
                 break;
             case CURTAINVIEW:
@@ -1604,66 +1512,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
                 }
                 break;
-            /*case PAGEBAR:
-            {
-                size_t i = 0;
-                int16_t x = 0;
-                int16_t y = 0;
-                int16_t w = 0;
-                int16_t h = 0;
-                BAR_LAYOUT_T bar_layout = UP;
-                while (true)
-                {
-                    if (!(p->attr[i]))
-                    {
-                        break;
-                    }
-                    //gui_log("p->attr[i]:%s\n", p->attr[i]);
-                    if (!strcmp(p->attr[i], "x"))
-                    {
-                        x = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "y"))
-                    {
-                        y = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "w"))
-                    {
-                        w = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "h"))
-                    {
-                        h = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "orientation"))
-                    {
-                        const char *o = p->attr[++i];
-                        if (!strcmp(o, "MIDDLE"))
-                            bar_layout = MIDDLE;
-                        else if (!strcmp(o, "UP"))
-                        {
-                            bar_layout = UP;
-                        }
-                        else if (!strcmp(o, "DOWN"))
-                        {
-                            bar_layout = DOWN;
-                        }
-                        else if (!strcmp(o, "LEFT"))
-                        {
-                            bar_layout = LEFT;
-                        }
-                        else if (!strcmp(o, "RIGHT"))
-                        {
-                            bar_layout = RIGHT;
-                        }
-                    }
-                    i++;
-                }
-                char *ptxt = get_space_string_head(p->txt);
-                //gui_log("x:%d,y:%d,w:%dh:%d,scope:%f\n", x, y, w, h);
-                //parent = gui_pagebar_create(parent, ptxt, x, y, w, h, bar_layout);
-            }
-            break;*/
             case CURTAIN:
                 {
                     size_t i = 0;
@@ -1753,127 +1601,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent = (void *)gui_curtain_create(parent, ptxt, x, y, w, h, orientation, scope);
                 }
                 break;
-            /*case ICONLIST:
-            {
-                size_t i = 0;
-                int16_t x = 0;
-                int16_t y = 0;
-                int16_t w = 320;
-                int16_t h = gui_get_screen_height();
-                uint32_t space_between_icons = 10;
-                uint32_t space_in_icon = 2;
-                void *back_img_src = NULL;
-                void *back_img_highlight_src = NULL;
-                char *font_type = "rtk_font_fs32";
-                uint32_t font_color = 0XFFFF;
-                uint32_t font_size = 40;
-                ICON_LAYOUT_T icon_layout = RIGHT;
-                while (true)
-                {
-                    if (!(p->attr[i]))
-                    {
-                        break;
-                    }
-                    //gui_log("p->attr[i]:%s\n", p->attr[i]);
-                    if (!strcmp(p->attr[i], "x"))
-                    {
-                        x = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "y"))
-                    {
-                        y = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "w"))
-                    {
-                        uint32_t w_temp = atoi(p->attr[++i]);
-                        if (w_temp)
-                        {
-                            w = w_temp;
-                        }
-
-                    }
-                    else if (!strcmp(p->attr[i], "h"))
-                    {
-                        uint32_t w_temp = atoi(p->attr[++i]);
-                        if (w_temp)
-                        {
-                            h = w_temp;
-                        }
-                    }
-                    else if (!strcmp(p->attr[i], "font"))
-                    {
-                        font_type = gui_strdup(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "fontColor"))
-                    {
-                        font_color = string_rgb888_to_rgb565(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "fontSize"))
-                    {
-                        font_size = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "spaceBetweenIcons"))
-                    {
-                        space_between_icons = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "spaceInIcon"))
-                    {
-                        space_in_icon = atoi(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "backImg"))
-                    {
-                        back_img_src = gui_strdup(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "backImgHighlight"))
-                    {
-                        back_img_highlight_src = gui_strdup(p->attr[++i]);
-                    }
-                    else if (!strcmp(p->attr[i], "orientation"))
-                    {
-                        const char *o = p->attr[++i];
-                        if (!strcmp(o, "MIDDLE"))
-                            icon_layout = CURTAIN_MIDDLE;
-                        else if (!strcmp(o, "UP"))
-                        {
-                            icon_layout = CURTAIN_UP;
-                        }
-                        else if (!strcmp(o, "DOWN"))
-                        {
-                            icon_layout = CURTAIN_DOWN;
-                        }
-                        else if (!strcmp(o, "LEFT"))
-                        {
-                            icon_layout = CURTAIN_LEFT;
-                        }
-                        else if (!strcmp(o, "RIGHT"))
-                        {
-                            icon_layout = CURTAIN_RIGHT;
-                        }
-                    }
-                    i++;
-                }
-                //gui_log("x:%d,y:%d,w:%dh:%d\n", x, y, w, h);
-                char *ptxt = get_space_string_head(p->txt);
-                parent = gui_iconlist_create_theme1(parent, ptxt, x, y, w, h, NULL, 0);
-                gui_iconlist_theme_1_t *il = (gui_iconlist_theme_1_t *)parent;
-                il->font_color = font_color;
-                il->font_size = font_size;
-                il->font_type = font_type;
-                il->icon_gap = space_between_icons;
-                il->icon_layout = icon_layout;
-                il->gap_in_icon = space_in_icon;
-                if (back_img_src)
-                {
-                    il->back_img_src = back_img_src;
-                }
-                if (back_img_highlight_src)
-                {
-                    il->back_img_highlight_src = back_img_highlight_src;
-                }
-
-
-            }
-            break;*/
             case ICON:
                 {
                     size_t i = 0;
@@ -2650,7 +2377,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                        x, y, w, h);
                 }
                 break;
-
             case KEYBOARD:
                 {
                     size_t i = 0;
@@ -3084,6 +2810,82 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent = (void *)gui_win_create(parent, ptxt, x, y, w, h);
                 }
                 break;
+            case MULTI_LEVEL:
+                {
+                    char *ptxt = get_space_string_head(p->txt);
+                    //gui_log("x:%d,y:%d,w:%dh:%d,orientation:%d\n", x, y, w, h, orientation);
+                    parent = (void *)gui_multi_level_create(parent, ptxt, (void(*)(gui_obj_t *))multi_level_ui_design);
+
+                }
+                break;
+            case MACRO_ONCLICK:
+                {
+                    char *type = 0;
+                    char *to = 0;
+                    int x = 0;
+                    int y = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        //gui_log("p->attr[i]:%x\n",p->attr[i]);
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id1"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id2"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    int to_widget = 0;
+                    if (type && to)
+                    {
+                        if (!strcmp(type, "jump"))
+                        {
+                            {
+                                //to
+                                if (!strcmp(to, "multiLevel"))
+                                {
+                                    //GUI_API(gui_multi_level_t).jump(parent, x, y);
+                                    struct on_click_jump_cb_param *param;
+                                    param = gui_malloc(sizeof(struct on_click_jump_cb_param));
+                                    param->id1 = x;
+                                    param->id2 = y;
+                                    if (parent->type == BUTTON)
+                                    {
+                                        GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
+                                    }
+                                    else if (parent->type == WINDOW)
+                                    {
+                                        gui_win_click((gui_win_t *)parent, on_click_jump_cb, param);
+                                    }
+
+
+
+                                }
+
+                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                            }
+
+                        }
+
+                    }
+                }
+                break;
             default:
                 break;
             }
@@ -3098,8 +2900,18 @@ void foreach_create(ezxml_t p, gui_obj_t *parent)
     ezxml_t i;
     for (i = p; i != NULL; i = i->ordered)
     {
-        foreach_create(i->child, widget_create_handle(i, parent));
+        if (parent->type == MULTI_LEVEL && strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0)
+        {
+            gui_log("%s,%s\n", i->name, i->txt);
+            foreach_create(i->child, parent);
+        }
+        else
+        {
+            foreach_create(i->child, widget_create_handle(i, parent));
+        }
     }
+
+
 }
 void foreach_scan(ezxml_t p, const char *element, ezxml_t *target)
 {
@@ -3128,6 +2940,37 @@ void foreach_scan_with_content(ezxml_t p, const char *element, ezxml_t *target, 
             return;
         }
         foreach_scan_with_content(i->child, element, target, content);
+    }
+}
+static int level, order;
+void foreach_create_in_multilevel(ezxml_t p, gui_obj_t *parent)
+{
+    ezxml_t i;
+    for (i = p; i != NULL; i = i->ordered)
+    {
+        if (strncmp(i->name, "multiLevel", strlen("multiLevel")) != 0)
+        {
+            gui_log("%s,%s\n", i->name, i->txt);
+            foreach_create_in_multilevel(i->child, widget_create_handle(i, parent));
+        }
+
+
+    }
+}
+static void foreach_create_for_multilevel(ezxml_t p, gui_obj_t *parent)
+{
+    ezxml_t i;
+    for (i = p; i != NULL; i = i->ordered)
+    {
+
+        if (strncmp(i->name, "multiLevel", strlen("multiLevel")) == 0 &&
+            strncmp(i->txt, parent->name, strlen(parent->name)) == 0)
+        {
+            foreach_create_in_multilevel(i->child, parent);
+            return;
+        }
+
+        foreach_create_for_multilevel(i->child, parent);
     }
 }
 void level_scan(ezxml_t p, char **pic, char **text)
@@ -3191,14 +3034,88 @@ void foreach_count(ezxml_t p, size_t *widget_count)
         //handle_launcher_msg();
     }
 }*/
+static ezxml_t f1;
+static void load_return_array()
+{
+    const char *folder = "app/system/resource/return_array";
+    {
+        DIR *dir = 0;
+        struct dirent *entry;
 
+        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+        if ((dir = opendir(path)) == NULL)
+        {
+            gui_free(path);
+            //perror("opendir() failed");
+            return;
+        }
+        gui_free(path);
+        while ((entry = readdir(dir)) != NULL)
+        {
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                file_count++;
+            }
+
+
+        }
+        closedir(dir);
+    }
+    image_array = gui_malloc(file_count * sizeof(void *));
+    {
+        DIR *dir = 0;
+        struct dirent *entry;
+        char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+        sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+        if ((dir = opendir(path)) == NULL)
+        {
+            gui_free(path);
+            //perror("opendir() failed");
+            return;
+        }
+
+        int count = 0;
+        while ((entry = readdir(dir)) != NULL)
+        {
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                sprintf(path2, "%s/%s", folder, entry->d_name);
+                image_array[count++] = gui_get_file_address(path2);
+            }
+
+        }
+        gui_free(path);
+        closedir(dir);
+
+
+    }
+
+}
+static void load_return_image()
+{
+    return_image = gui_get_file_address("app/system/resource/return.bin");
+    return_image_hl = gui_get_file_address("app/system/resource/returnhl.bin");
+}
+static void system_load()
+{
+    load_return_array();
+    load_return_image();
+
+
+}
 void create_tree(gui_app_t *app)
 {
-    ezxml_t f1 = ezxml_parse_file(app->xml);
+    system_load();
+    f1 = ezxml_parse_file(app->xml);
     js = NULL;
     foreach_create(f1, &app->screen);
+    ezxml_free(f1);
+    f1 = 0;
 #ifdef ENABLE_RTK_GUI_SCRIPT_AS_A_APP
     extern void js_run_file(const char *file, gui_app_t  *app);
+    extern void js_isReady(void);
     if (js)
     {
         char *path = gui_malloc(strlen(js) + strlen(GUI_ROOT_FOLDER) + 1);
@@ -3207,10 +3124,35 @@ void create_tree(gui_app_t *app)
         js_run_file(path, app);
 
         gui_free(path);
+        js_isReady();
     }
 #endif
 }
+static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent)
+{
+    gui_obj_tree_print((gui_obj_t *)parent);
+    ezxml_t title = 0;
+    ezxml_t f = 0;
+    if (f1 != 0)
+    {
+        f = f1;
+    }
+    else
+    {
+        f = ezxml_parse_file(app->xml);
+    }
+    foreach_create_for_multilevel(f, (gui_obj_t *)parent);
+    gui_log(" ");
+    if (f1 == 0)
+    {
+        ezxml_free(f);
+    }
+    gui_obj_tree_print((gui_obj_t *)parent);
 
+
+
+
+}
 const char *get_child_ele_attr(char *xml, char *ele, char *txt, char *chile_ele, char *attr)
 {
     ezxml_t f1 = ezxml_parse_file(xml);
@@ -3362,6 +3304,18 @@ void create_tree_nest(char *xml, void *obj)
 {
     ezxml_t f1 = ezxml_parse_file(xml);
     foreach_create(f1, obj);
+}
+static void setting_return_cb(gui_obj_t *this)
+{
+    if (this->parent && this->parent->type == MULTI_LEVEL)
+    {
+        if (this->parent->parent && this->parent->parent->type == MULTI_LEVEL)
+        {
+            uint8_t index = GUI_TYPE(gui_multi_level_t, this->parent->parent)->index;
+            uint8_t level = GUI_TYPE(gui_multi_level_t, this->parent->parent)->level;
+            GUI_API(gui_multi_level_t).jump((void *)this->parent, level, index);
+        }
+    }
 }
 /*static gui_list_t app_list;
 static void screen_backfunc(gui_app_t *app)

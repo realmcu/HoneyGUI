@@ -83,7 +83,7 @@ _GUI_API_DECLARE(gui_multi_level_t)
 gui_multi_level_t *gui_multi_level_create(void *parent, const char *widget_name,
                                           void (*ui_design)(gui_obj_t *));
 /**
- * @brief jump to a specitf multi_level widget.
+ * @brief jump to a specific multi_level widget.
  * @param this one of the multi_level widgets in app.
  * @param level specitf level. 0,1,2...
  * @param index index in this level. 0,1,2...

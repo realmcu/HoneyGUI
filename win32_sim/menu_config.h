@@ -133,7 +133,9 @@
 // <c> RTK GUI Enable cJSON
 #define CONFIG_REALTEK_BUILD_CJSON
 // </c>
-
+// <c> RTK GUI Enable web
+//#define CONFIG_REALTEK_BUILD_WEB
+// </c>
 // <c> RTK GUI Enable KeyBoard And Pinyin
 #define CONFIG_REALTEK_BUILD_PINYIN
 // </c>
@@ -152,6 +154,10 @@
 
 // <c> RTK GUI Enable LetterShell
 #define CONFIG_REALTEK_BUILD_LETTER_SHELL
+// </c>
+
+// <c> RTK GUI Enable Monkey Test Log
+// #define CONFIG_REALTEK_BUILD_MONKEY_TEST
 // </c>
 
 // <c> RTK GUI BOX2D

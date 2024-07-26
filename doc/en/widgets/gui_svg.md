@@ -1,7 +1,4 @@
 # SVG
-<br/>
-
-## Overview
 
 - The SVG widget allows you to display an image in SVG format.
 - SVG images are vector graphics based on XML language implementation, which can be used to describe 2D vector graphics.

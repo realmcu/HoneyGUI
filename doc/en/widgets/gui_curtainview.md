@@ -1,7 +1,4 @@
 # Curtainview
-<br>
-
-## Overview
 
 The gui_curtainview widget provides an extended area for the developer to place application-related information, such as the application menu or the information for the application.
 As illustrated in Figure, the gui_curtainview can comprise of four curtains that can be positioned from the up/down/right/left orientation, or they can be situated in the central area.

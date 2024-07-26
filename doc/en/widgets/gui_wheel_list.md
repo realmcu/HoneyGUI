@@ -1,9 +1,5 @@
 # Wheel list
 
-<br/>
-
-## Overview
-
 The wheellist widget is an application list interface, mainly composed of application icons arranged in multiple circular layers. Each layer can rotate independently, and each icon can have an associated callback.
 
 ## Usage
@@ -121,7 +117,7 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 </details></br>
 
-<center><img width="456" src= "https://foruda.gitee.com/images/1712042390527485103/b8f53fb0_9325830.gif"/></center>
+<center><img width="456" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/wheel_list1.gif"/></center>
 
 <br/>
 
@@ -219,7 +215,7 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 </details></br>
 
-<center><img width="456" src= "https://foruda.gitee.com/images/1712044916842211542/c5085ac7_9325830.gif"/></center>
+<center><img width="456" src= "https://docs.realmcu.com/HoneyGUI/image/widgets/wheel_list2.gif"/></center>
 
 <br/>
 

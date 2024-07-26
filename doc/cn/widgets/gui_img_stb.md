@@ -1,9 +1,5 @@
 # STB Image
 
-<br>
-
-## Overview
-
 The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.STB image widgets support bmp, jpg, png, gif, etc.
 
 ## Usage

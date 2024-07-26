@@ -5,22 +5,22 @@ RTKIOT GUI
 
 
 ==================  ==================  ==================
-|Get Started|_      |GUI-APP|_          |Widgets|_
+|Get Started|_      |GUI Application|_  |Widgets|_
 ------------------  ------------------  ------------------
-`Get Started`_      `GUI-APP`_          `Widgets`_
+`Get Started`_      `GUI Application`_  `Widgets`_
 ==================  ==================  ==================
 
 ==================  ==================  ==================
-|Porting|_          |Integration|_              |FAQ|_
+|Porting|_          |Samples|_              |FAQ|_
 ------------------  ------------------  ------------------
-`Porting`_          `Integration`_              `FAQ`_
+`Porting`_          `Samples`_              `FAQ`_
 ==================  ==================  ==================
 
 .. |Get Started| image:: ./_static/image/get_started.png
 .. _Get Started: get-started/index.html
 
-.. |GUI-APP| image:: ./_static/image/app.png
-.. _GUI-APP: GUI-APP/index.html
+.. |GUI Application| image:: ./_static/image/app.png
+.. _GUI Application: GUI-APP/index.html
 
 .. |Widgets| image:: ./_static/image/widgets.png
 .. _Widgets: widgets/index.html
@@ -28,8 +28,8 @@ RTKIOT GUI
 .. |Porting| image:: ./_static/image/porting.png
 .. _Porting: get-started/index.html
 
-.. |Integration| image:: ./_static/image/integration.png
-.. _Integration: integration/index.html
+.. |Samples| image:: ./_static/image/integration.png
+.. _Samples: sample/index.html
 
 .. |FAQ| image:: ./_static/image/FAQ.png
 .. _FAQ: FAQ/index.html
@@ -40,7 +40,7 @@ RTKIOT GUI
   :maxdepth: 2
 
   Get Started <get-started/index>
-  Application <GUI-APP/index>
+  GUI Application <GUI-APP/index>
   Widgets <widgets/index>
   Porting <Porting/index>
   Samples <sample/index>

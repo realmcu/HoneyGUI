@@ -8,7 +8,11 @@ src = Split("""
 
 src = Glob('*.c')
 CPPPATH = [cwd]
+CPPDEFINES = []
 
-group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH)
+if GetDepend('CONFIG_REALTEK_BUILD_MONKEY_TEST'):
+    CPPDEFINES += ['ENABLE_MONKEY_TEST']
+
+group = DefineGroup('rtk_gui', src, depend = ['CONFIG_REALTEK_BUILD_GUI'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

@@ -5,63 +5,45 @@ jenkins_test_build_name = ""
 jenkins_test_script_name = ""
 
 
-LOWERSTACK_PATCH = "lowerstack-patch"
-LOWERSTACK_PATCH_PATH_RELATIVE_TO_REPO_HOME = ''
-LOWERSTACK_PATCH_PATH_RELATIVE_TO_WORKSPACE = ""
-LOWERSTACK_PATCH_BRANCH = ''
-
-LOWERSTACK_ROM = "lowerstack-rom"
-LOWERSTACK_ROM_PATH_RELATIVE_TO_REPO_HOME = ''
-LOWERSTACK_ROM_PATH_RELATIVE_TO_WORKSPACE = ""
-LOWERSTACK_ROM_BRANCH = ''
-
 SDK = 'sdk'
 SDK_PATH_RELATIVE_TO_REPO_HOME = ''
 SDK_PATH_RELATIVE_TO_WORKSPACE = ''
 SDK_BRANCH = ''
 
-ROM = 'rom'
-ROM_PATH_RELATIVE_TO_REPO_HOME = ''
-ROM_PATH_RELATIVE_TO_WORKSPACE = ''
-ROM_BRANCH = ''
-
-
-
-ROM_BRANCH_CUT_MAP = [
-    "_bblite2-dev":[
-        "cutThrottle" : "BBLite2FPGATest",
-        "slave_label_prefix": "bb2-fpga",
-        "branchMapping": ""
+HONEYGUI_BRANCH_CUT_MAP = [
+    "master":[
+        "cutThrottle" : "BB2CCutTest",
     ]
-]// branches here will be tested
+]
+
+test_module_map = [
+    "HoneyGUI_CMD": [
+        "label": "HoneyGUI",
+        "Test": 1,
+        "displayNmae": "HoneyGUI_CMD",
+        "testResult": true
+    ],
+    "HoneyGUI_Simulator": [
+        "label": "HoneyGUI",
+        "Test": 0,
+        "displayNmae": "HoneyGUI_Simulator",
+        "testResult": true
+    ]
+]
+
 
 Need_Test = true
 temp_label_prefix = ""
-test_module_map = []
 retryCount = 3
 
 def set_submodule_info(all_project, repo_home){
-    def lowerstack_patch_info = get_prj_info_by_group_name(all_project, LOWERSTACK_PATCH)
-    LOWERSTACK_PATCH_BRANCH = lowerstack_patch_info['branch']
-    LOWERSTACK_PATCH_PATH_RELATIVE_TO_REPO_HOME = lowerstack_patch_info['path']
-    LOWERSTACK_PATCH_PATH_RELATIVE_TO_WORKSPACE = "${repo_home}\\${LOWERSTACK_PATCH_PATH_RELATIVE_TO_REPO_HOME}"
+    def sdk_info = get_prj_info_by_group_name(all_project, SDK)
+    SDK_BRANCH = sdk_info['branch']
+    SDK_PATH_RELATIVE_TO_REPO_HOME = sdk_info['path']
+    SDK_PATH_RELATIVE_TO_WORKSPACE = "${repo_home}\\${SDK_PATH_RELATIVE_TO_REPO_HOME}"
 
-    def lowerstack_rom_info = get_prj_info_by_group_name(all_project, LOWERSTACK_ROM)
-    LOWERSTACK_ROM_BRANCH = lowerstack_rom_info['branch']
-    LOWERSTACK_ROM_PATH_RELATIVE_TO_REPO_HOME = lowerstack_rom_info['path']
-    LOWERSTACK_ROM_PATH_RELATIVE_TO_WORKSPACE = "${repo_home}\\${LOWERSTACK_ROM_PATH_RELATIVE_TO_REPO_HOME}"
-
-    def rom_info = get_prj_info_by_group_name(all_project, ROM)
-    ROM_BRANCH = rom_info['branch']
-    ROM_PATH_RELATIVE_TO_REPO_HOME = rom_info['path']
-    ROM_PATH_RELATIVE_TO_WORKSPACE = "${repo_home}\\${ROM_PATH_RELATIVE_TO_REPO_HOME}"
-
-
-    echo "set_submodule_info"
-    echo "${LOWERSTACK_PATCH_BRANCH} ${LOWERSTACK_PATCH_PATH_RELATIVE_TO_REPO_HOME} ${LOWERSTACK_PATCH_PATH_RELATIVE_TO_WORKSPACE}"
-    echo "${LOWERSTACK_ROM_BRANCH} ${LOWERSTACK_ROM_PATH_RELATIVE_TO_REPO_HOME} ${LOWERSTACK_ROM_PATH_RELATIVE_TO_WORKSPACE}"
-    echo "${ROM_BRANCH} ${ROM_PATH_RELATIVE_TO_REPO_HOME} ${ROM_PATH_RELATIVE_TO_WORKSPACE}"
-
+    echo "submodule info"
+    echo "${SDK_BRANCH} ${SDK_PATH_RELATIVE_TO_REPO_HOME} ${SDK_PATH_RELATIVE_TO_WORKSPACE}"
 }
 
 def get_submodule_info(all_project, submodule_group_name){
@@ -74,9 +56,9 @@ def get_submodule_info(all_project, submodule_group_name){
 }
 
 
-def set_test_script_name(chip_type){
-    jenkins_test_build_name = "jenkins-test-build_${chip_type}.py"
-    jenkins_test_script_name = "jenkins-test_${chip_type}.py"
+def set_test_script_name(){
+    jenkins_test_build_name = "jenkins-test-build.py"
+    jenkins_test_script_name = "jenkins-test.py"
 }
 
 
@@ -129,12 +111,12 @@ def check_test_necessary_by_commit_msg()
 
 
 
-def set_test_nessary(rom_branch, manifest_len, chip_type){
+def set_test_nessary(sdk_branch, manifest_len, chip_type){
     def cmd_message = ""
-    if(!ROM_BRANCH_CUT_MAP.containsKey(rom_branch.toString())){
-        echo "Test for ${rom_branch} is not supported"
+    if(!HONEYGUI_BRANCH_CUT_MAP.containsKey(sdk_branch.toString())){
+        echo "Test for ${sdk_branch} is not supported"
         Need_Test = false
-        cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"Test for ${rom_branch} ${chip_type} is not supported\" "
+        cmd_message = "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"Test for ${sdk_branch} ${chip_type} is not supported\" "
     }
 
     if(!check_test_necessary_by_commit_msg()){
@@ -194,30 +176,185 @@ def do_ci_build(current_project_detail, all_project, manifest_len, HoneyRepo_Hom
 
 def do_test_build(current_project_detail, all_project, manifest_len, HoneyRepo_Home, Manifest_Path, chip_type){
     timestamps{
-        set_test_nessary(get_prj_info_by_group_name(all_project, ROM)['branch'], manifest_len, chip_type)
+        set_test_nessary(get_prj_info_by_group_name(all_project, SDK)['branch'], manifest_len, chip_type)
         if(!Need_Test){
             echo "No need to do test, return"
             return
+        }
+
+        stage("CITestBuild"){
+            set_submodule_info(all_project, HoneyRepo_Home)
+            set_test_script_name()
+            build_cmd = "python ${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script/${jenkins_test_build_name} CI"
+            for(module in test_module_map.keySet()){
+                if(test_module_map[module]["Test"] > 0){
+                    build_cmd += " --${module}"
+                }
+            }
+            try{
+                emptyFolder('SRC/Dict')
+                build_cmd += ' --binDir SRC/Dict'
+                withEnv(["HONEYGUI_ROOT=${WORKSPACE}\\${SDK_PATH_RELATIVE_TO_WORKSPACE}"])
+                {
+                    exe_cmd(build_cmd)
+                }
+            }catch(err){
+                bat "python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --label_name Test-Verified --label_value -1 --gerrit_refspec USE_ENV --message \"Test Build Error\" "
+                error err.message
+            }
+
+            // to check
+            withEnv(["HoneyRepo_ROOT=${WORKSPACE}\\${HoneyRepo_Home}", "HONEYGUI_ROOT=${WORKSPACE}\\${SDK_PATH_RELATIVE_TO_WORKSPACE}"]){
+                copy_script_cmd = "python ${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script/ftp/copy_script.py --testType CI --zipFolder script --localFolder test_script --workDir ${WORKSPACE}/SRC/Dict"
+                exe_cmd(copy_script_cmd)
+            }
+
+
+            dir("${SDK_PATH_RELATIVE_TO_WORKSPACE}/script"){
+                stash includes: "ftp/download_test_files.py, ftp/ftp_helper.py", name: "Test-Script"
+            }
+
+            dir("${WORKSPACE}/${SDK_PATH_RELATIVE_TO_WORKSPACE}/script"){
+                stash includes: "base/parse_json.py, \
+                                 ftp/ftp_helper.py, ftp/copy_script.py, \
+                                report/generate_test_report.py, report/__init__.py, \
+                                ", name: "Dump-Files", allowEmpty: true
+            }
         }
     }
 }
 
 
 def do_ci_test(current_project_detail, all_project, manifest_len, HoneyRepo_Home, chip_type){
+    echo "0"
     if(!Need_Test)
     {
         return
     }
-}
+    echo "1"
+    set_test_script_name()
+    def builders = [:]
+    for(module in test_module_map.keySet()){
+        def test_module = module
+        if(test_module_map[test_module]["Test"] == 0){
+            continue
+        }
+        def build_name = test_module_map[test_module]["displayNmae"]
+        echo "2"
+        builders["${build_name}"] = {
+            throttle([HONEYGUI_BRANCH_CUT_MAP[SDK_BRANCH]["cutThrottle"]]){
+                try{
+                    echo "3"
+                    def is_env_error = true
+                    def test_result = false
+                    retry(retryCount){
+                        if(is_env_error == false){
+                            error "Not env error, no need to retry"
+                        }
+                        def test_node = test_module_map[test_module]["label"]
+                        node(test_node){
+                            def test_cmd = ""
+                            timestamps{
+                                stage("${build_name}"){
+                                    timeout(120){
+                                        echo "execute ${build_name} test on node ${NODE_NAME}"
+                                        emptyFolder("SRC")
+                                        emptyFolder("script")
+                                        emptyFolder("log")
+                                        dir("script"){
+                                            unstash "Test-Script"
+                                        }
+                                        try{
+                                            exe_cmd("python script/ftp/download_test_files.py --module ${test_module}")
+                                        }catch(download_err){
+                                            is_env_error = false
+                                            error "${download_err}"
+                                        }
+                                        try{
+                                            // to do ,call test
+                                            test_cmd = "python ${WORKSPACE}/script/${jenkins_test_script_name} CI 0"
+                                            test_cmd += " --module ${test_module}"
+                                            exe_cmd(test_cmd)
+                                            echo "${test_module} test pass"
+                                            test_result = true
+                                        }catch(err){
+                                            echo "${test_module} test fail ${err.message}"
+                                            is_env_error = false
+                                            error "execute  ${test_module} dryrun test on ${NODE_NAME} failure"
+                                        }finally{
+                                            try{
+                                                dumplog_cmd = "python ${WORKSPACE}/script/${jenkins_test_script_name} CI 0 --module ${test_module} --step DUMPLOG"
+                                                try{
+                                                    withEnv(["Test_Result=${test_result}"]){
+                                                        exe_cmd(dumplog_cmd + " --dryrun")
+                                                    }
+                                                }catch(dump_err){
+                                                    echo "${dump_err}"
+                                                }
+                                                stash includes: "SRC/report/jira_info~*.json", name: "Jira-Info-${test_module}", allowEmpty: true
+                                            }catch(err){
+                                                echo "${err.message}"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-
-@NonCPS
-def List extractLines(final String content) {
-    List myKeys = []
-    content.eachLine { line -> 
-        myKeys << line
+                }catch(err){
+                    test_module_map[test_module]["testResult"] = false
+                    error "run ${test_module} failed, ${err}"
+                }
+            }
+        }
     }
-    return myKeys
+    builders["failFast"] = false
+
+    catchError{
+        stage("CI Test"){
+            parallel builders
+        }
+    }
+
+    node("keilBuildServerPushJira"){
+        stage("generate report"){
+            emptyFolder("script")
+            emptyFolder("SRC/report")
+            dir("script"){
+                unstash "Dump-Files"
+            }
+            for(module in test_module_map.keySet()){
+                if(test_module_map[module]["Test"] > 0){
+                    unstash "Jira-Info-${module}"
+                }
+            }
+
+            catchError{
+                try{
+                    withEnv(["Test_Result=${currentBuild.currentResult}"]){
+                        bat "python ${WORKSPACE}/script/report/generate_test_report.py"
+                    }
+                    archiveArtifacts allowEmptyArchive: true, artifacts: "SRC/report/index.html"
+                    if(currentBuild.currentResult == "FAILURE"){
+                        exe_cmd("python \"D:\\admin\\DependTools\\Python Lib\\GerritCommentAdd\\gerrit_comment_add.py\" --label_name Test-Verified --label_value -1 --gerrit_refspec ${params.GERRIT_REFSPEC} --message \"HoneyGUI test error\"")
+                    }else{
+                        echo "test is pass"
+                    }
+                }catch(error){
+                    echo "${error}"
+                }
+            }
+
+            try{
+                remove_script_cmd = "python ${WORKSPACE}/script/ftp/copy_script.py --step removeZip"
+                exe_cmd(remove_script_cmd)
+            }catch(error){
+                echo "${error}"
+            }
+        }
+    }
 }
+
 
 return this

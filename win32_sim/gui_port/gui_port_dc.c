@@ -369,6 +369,9 @@ void gui_port_dc_init(void)
 struct gui_touch_port_data *port_touchpad_get_data()
 {
     tp_port_data.timestamp_ms = gui_ms_get();//todo
+#ifdef ENABLE_MONKEY_TEST
+    gui_log("win_32 sim get tp data, GUI live \n");
+#endif
     return &tp_port_data;
 }
 

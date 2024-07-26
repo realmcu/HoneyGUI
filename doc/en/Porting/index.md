@@ -1,135 +1,232 @@
 # Porting
 
-The porting files are in the gui_port folder.
-    There are four files that need to be modified, corresponding to the input device, display device, OS, and file system.
-    At present, it has been transplanted in FreeRTOS, RT-Thread, and Windows, you can refer to it.
-## Input device
+The porting files are located in the `gui_port` folder.
+Six files need to be modified, with their filenames and functions as follows.
+| Filename                   | Function             |
+|---                         |---                   |
+| gui_port_acc.c             | Acceleration         |
+| gui_port_dc.c              | Display Device       |
+| gui_port_filesystem.c      | Filesystem           |
+| gui_port_ftl.c             | Flash Translation Layer |
+| gui_port_indev.c           | Input Device         |
+| gui_port_os.c              | Operating System     |
 
-- Refer to ``guidef.h`` and ``gui_port_indev.c``
-- The input information is abstracted as touch screen contacts, and the input information structure is as follows
+Currently, porting has been done on FreeRTOS, RT-Thread, and Windows for reference.
 
-```C
-typedef struct gui_touch_port_data
-{
-    uint8_t          event;                 /* The touch event of the data */
-    uint8_t          track_id;              /* Track id of point */
-    uint16_t         width;                 /* Point of width */
-    uint16_t         x_coordinate;          /* Point of x coordinate */
-    uint16_t         y_coordinate;          /* Point of y coordinate */
-    uint32_t         timestamp;             /* The timestamp when the data was received */
-    void            *data;
-} gui_touch_port_data_t;
+## Acceleration
+
+- Refer to `guidef.h` and `gui_port_acc.c`
+- Define the accelerated drawing interface depending on the platform model, generally `hw_acc_blit` or `sw_acc_blit`.
+- The structure definition is as follows:
+
+    ```C
+    typedef struct acc_engine
+    {
+        void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
+    } acc_engine_t;
+    ```
+
+## Display Device
+
+- Refer to `guidef.h` and `gui_port_dc.c`
+- Define the screen width and height, framebuffer address and mode, whether the resolution is scaled, and implement the refresh function. Refer to `guidef.h` for the structure definition.
+- A typical `gui_dispdev` structure initialization declaration is as follows:
+
+    ```C
+    static struct gui_dispdev dc =
+    {
+        .bit_depth = DRV_PIXEL_BITS,
+        .fb_width = DRV_LCD_WIDTH,
+        .fb_height = FB_HEIGHT,
+        .screen_width =  DRV_LCD_WIDTH,
+        .screen_height = DRV_LCD_HIGHT,
+        .dc.disp_buf_1 = disp_write_buff1_port,
+        .dc.disp_buf_2 = disp_write_buff2_port,
+        .driver_ic_fps = 60,
+        .driver_ic_hfp = 10,
+        .driver_ic_hbp = 10,
+        .driver_ic_active_width = DRV_LCD_WIDTH,
+        .type = DC_RAMLESS,
+        .adaption = false,
+        .section = {0, 0, 0, 0},
+        .section_count = 0,
+        .lcd_update = port_gui_lcd_update,
+        .flash_seq_trans_disable = flash_boost_disable,
+        .flash_seq_trans_enable = flash_boost_enable,
+        .reset_lcd_timer = reset_vendor_counter,
+        .get_lcd_us = read_vendor_counter_no_display,
+        .lcd_te_wait = port_lcd_te_wait,
+        .dc.scale_x = 1,
+        .dc.scale_y = 1,
+    };
+    ```
+
+- In `DC_SINGLE` mode, the framebuffer size is `fb_width * fb_height * bit_depth / 8`.
+- In `DC_RAMLESS` mode, two partial framebuffers are used, with size `fb_width * fb_height * bit_depth / 8`, where `fb_height` is the segmented height.
+
+### Interface
+
+```eval_rst
+
+The following table lists the LCD-related interfaces supported by mainstream  chips.If you want to know more information, please click on the specific chip name.
+
+===============  =======  ========  =======  =======  =======
+SOC              I8080    QSPI      RGB      MIPI     SPI
+---------------  -------  --------  -------  -------  -------
+`RTL8762C`_      Y        NA        NA       NA       Y
+`RTL8762D`_      Y        Y         NA       NA       Y
+`RTL8763E`_      Y        Y         NA       NA       Y
+`RTL8772G`_      Y        Y         Y        NA       Y
+`RTL8773E`_      Y        Y         Y        NA       Y
+`RTL8772F`_      Y        Y         Y        Y        Y
+===============  =======  ========  =======  =======  =======
+
+'Y' means the driver already included in the library.
+'NA' means the driver not yet included in the library.
+
+.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
+.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
-## Display device
+### Driver IC
 
-- Refer to ``guidef.h`` and ``gui_port_dc.c``
-- It is necessary to define the screen width and height, frame buffer address and mode, whether the resolution is scaled, and realize the refresh function. The structure is as follows.
-- The framebuffer's size is ```fb_width*fb_height*bit_depth/8```.
-- In ```DC_RAMLESS``` mode, two framebuffers are used, and the fb_height is section height.
+```eval_rst
 
-```C
-static struct gui_dispdev dc =
-{
-    .bit_depth = DRV_PIXEL_BITS,
-    .fb_width = DRV_LCD_WIDTH,
-    .fb_height = FB_HEIGHT,
-    .screen_width =  DRV_LCD_WIDTH,
-    .screen_height = DRV_LCD_HIGHT,
-    .driver_ic_fps = 60,
-    .driver_ic_hfp = 10,
-    .driver_ic_hbp = 10,
-    .driver_ic_active_width = 320,
-    .type = DC_RAMLESS,
-    .adaption = false,
-    .section = {0, 0, 0, 0},
-    .section_count = 0,
-    .lcd_update = port_gui_lcd_update,
-    .flash_seq_trans_disable = flash_boost_disable,
-    .flash_seq_trans_enable = flash_boost_enable,
-    .reset_lcd_timer = reset_vendor_counter,
-    .get_lcd_us = read_vendor_counter_no_display,
-    .lcd_te_wait = port_lcd_te_wait,
-    .gpu_type = GPU_SW,
-};
+The following table lists the LCD-related driver IC supported by mainstream chips.If you want to know more information, please click on the specific chip name.
+
+===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
+SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903     ST7796      OTM8009A    SH8601A   SH8601Z   RM69330   ST7789    NV3041A
+---------------  ---------  ----------  ---------  ---------  ---------  ----------  ----------  ----------  --------  --------  --------  --------  --------
+`RTL8762D`_      NA         NA          NA         NA         NA         NA          Y           NA          NA        NA        Y         Y         Y
+`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA
+`RTL8772G`_      Y          Y           Y          Y          Y          Y           Y           NA          NA        NA        NA        NA        NA
+`RTL8773E`_      NA         NA          NA         NA         NA         NA          NA          NA          Y         NA        NA        NA        NA
+`RTL8772F`_      NA         Y           Y          NA         Y          NA          NA          Y           Y         Y         NA        NA        NA
+===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
+
+'Y' means the driver already included in the library.
+'NA' means the driver not yet included in the library.
+
+.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
+.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
-## File system
+## Filesystem
 
-- Refer to ``guidef.h`` and ``gui_port_filesystem.c``
-- Need to define several posix-style interface operation files and folders, as follows.
+- Refer to `guidef.h` and `gui_port_filesystem.c`
+- Define several posix-like interfaces to operate files and directories.
+- If not using a filesystem, you can fill in null pointers.
+- The structure definition is as follows:
 
-```C
-struct gui_fs
-{
-    int (*open)(const char *file, int flags, ...);
-    int (*close)(int d);
-    int (*read)(int fd, void *buf, size_t len);
-    int (*write)(int fd, const void *buf, size_t len);
-    int (*lseek)(int fd, int offset, int whence);
-    /* directory api*/
-    gui_fs_dir *(*opendir)(const char *name);
-    struct gui_fs_dirent *(*readdir)(gui_fs_dir *d);
-    int (*closedir)(gui_fs_dir *d);
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_fs struct define start */
+   :end-before: /* gui_fs struct define end */
 ```
 
-## OS
+## Flash Translation Layer
 
-- Refer to ``guidef.h`` and ``gui_port_os.c``
-- Need to define interfaces for threads, timers, message queues, and memory management, as follows
+- Refer to `guidef.h` and `gui_port_ftl.c`
+- Define three interfaces for the Flash Translation Layer: `read`, `write`, `erase`.
+- If not using a Flash Translation Layer, you can fill in null pointers.
+- The structure definition is as follows:
 
-```C
-struct gui_os_api
-{
-    char *name;
-    void *(*thread_create)(const char *name, void (*entry)(void *param), void *param,
-                           uint32_t stack_size, uint8_t priority);
-    bool (*thread_delete)(void *handle);
-    bool (*thread_mdelay)(uint32_t ms);
-    char *(*thread_get_name)(void);
-    void *(*timer_create)(char *name, void (*timeout)(void *param), void *param, uint32_t time,
-                          bool reload);
-    bool (*timer_start)(void *handle);
-    bool (*timer_stop)(void *handle);
-    bool (*timer_delete)(void *handle);
-    void *(*mq_create)(const char *name, uint32_t msg_size, uint32_t max_msgs);
-    bool (*mq_send)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-    bool (*mq_send_urgent)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-    bool (*mq_recv)(void *handle, void *buffer, uint32_t size, uint32_t timeout);
-
-    void *(*f_malloc)(uint32_t);
-    void (*f_free)(void *rmem);
-    void (*assert_handler)(const char *ex_string, const char *func, uint32_t line);
-    uint32_t (*tick_get)(void);
-    //void (*log)(const char *fmt, ...);
-
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_ftl struct define start */
+   :end-before: /* gui_ftl struct define end */
 ```
 
-## Sleep management
+## Input Device
 
-In order to reduce power consumption and increase device usage time, the sleep(low-power) mode is supported.
+- Refer to `guidef.h` and `gui_port_indev.c`
+- Input devices include touchpads, keyboards, and wheels. The structure for input information is as follows:
 
-- Refer to ``gui_app.h``
-
-```C
-typedef struct gui_app gui_app_t;
-struct gui_app
-{
-    gui_obj_t screen;               //!< widget tree root
-    const char *xml;                //!< widget tree design file
-    uint32_t active_ms;             //!< screen shut dowm delay
-    void *thread_id;                //!< thread handle(optional)
-    void (* thread_entry)(void *this); //!< thread entry
-    void (* ctor)(void *this);      //!< constructor
-    void (* dtor)(void *this);      //!< destructor
-    void (* ui_design)(gui_app_t *); //!< ui create entry
-    bool lvgl;
-};
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_indev struct define start */
+   :end-before: /* gui_indev struct define end */
 ```
 
-``active_ms`` is the standby time of the gui app, which can be defined as different values in different apps.
-Same as other types of electronic devices, when the screen continues to display an interface for longer than the standby time, it will enter sleep mode.
-During sleep, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
-In chip manual, this low-power state where peripherals can be turned off is called deep low power state(DLPS). More information about DLPS can be found in the relevant guidance documentation in the SDK.
+- If a specific input device is needed, the corresponding data acquisition function needs to be implemented in `gui_indev`, and the required time thresholds need to be filled in.
+
+### Touch IC
+
+```eval_rst
+
+The following table lists the Touch-related IC supported by all chips. If you want to know more information, please click on the specific chip name.
+
+==================  =========  ==========  ========  =======  ========  ========  =========
+SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147
+------------------  ---------  ----------  --------  -------  --------  --------  ---------
+`RTL8762D`_         Y          NA          NA        NA       NA        NA         NA
+`RTL8763E`_         NA         NA          NA        NA       NA        Y          Y
+`RTL8772G`_         NA         NA          NA        Y        Y         NA         NA
+`RTL8773E`_         Y          NA          NA        Y        NA        NA         NA
+`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA
+==================  =========  ==========  ========  =======  ========  ========  =========
+
+'Y' means the driver already included in the library.
+'NA' means the driver not yet included in the library.
+
+
+.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+```
+
+## Operating System
+
+- Refer to `guidef.h` and `gui_port_os.c`
+- Define the interfaces for thread, timer, message queue, and memory management. The structure definition is as follows:
+
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* gui_os_api struct define start */
+   :end-before: /* gui_os_api struct define end */
+```
+
+## Sleep Management
+
+To reduce power consumption and increase the device's usage time, sleep (low power) mode is supported.
+
+- Refer to `gui_app.h`
+
+    ```C
+    typedef struct gui_app gui_app_t;
+    struct gui_app
+    {
+        gui_obj_t screen;               //!< Root node of the control tree
+        const char *xml;                //!< Control tree design file
+        uint32_t active_ms;             //!< Screen off delay
+        void *thread_id;                //!< Thread handle (optional)
+        void (* thread_entry)(void *this); //!< Thread entry function
+        void (* ctor)(void *this);      //!< Constructor
+        void (* dtor)(void *this);      //!< Destructor
+        void (* ui_design)(gui_app_t *); //!< UI creation entry function
+        bool lvgl;
+        bool arm2d;
+        bool close;
+        bool next;
+        bool close_sync;
+    };
+    ```
+
+`active_ms` is the standby time of the GUI application, which can be defined as different values in different applications.
+Like other types of electronic devices, when the screen continuously displays an interface for the standby time, the device will enter sleep mode.
+In sleep mode, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
+In the chip manual, this low power state where peripherals can be turned off is called Deep Low Power State (DLPS). More information about DLPS can be found in the relevant SDK documentation.

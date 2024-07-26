@@ -14,10 +14,6 @@ infomation could see api `void *context_alloc(size_t size, void *cb_data_p)`.
 
 GUI task not support feed watch dog, so app should do this in hook function registered by APP and used by GUI. The registered function is `void gui_task_ext_execution_sethook(void (*hook)(void))`.
 
-## Magic image create
-
-If SoC not support GPU, while creating magic image, create api should change to normal image create api, the specific info could see `gui_magic_img_t *xml_gui_img_creat_from_mem(void *parent,  const char *name, void *addr,int16_t x, int16_t y)`.
-
 ## Not support FPU
 
 If SoC not support FPU, some header and code should not include by macro, example as RTL8763EP.
