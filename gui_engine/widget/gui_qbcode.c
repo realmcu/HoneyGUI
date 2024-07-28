@@ -408,7 +408,7 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
             {
                 int16_t findex = (j) * (qbcode_size + border_size + border_size) / image_wsize - border_size;
                 write_buf[write_off + j] = gui_qrcode_gen_get_module((uint8_t *)qbcode->data, findex,
-                                                                     findey) ? 0 : 0xffff;
+                                                                     findey) ? 1 : 0xffff;
             }
         }
 
@@ -454,7 +454,7 @@ void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, u
 
                 int16_t findex = (j) * (p_barcode->width + border_size + border_size) / image_wsize - border_size;
                 write_buf[write_off + j] = ((p_barcode->encoded_data[0][findex / 8]) & (0x01 <<
-                                                                                        (findex) % 8)) ? 0 : 0xffff;
+                                                                                        (findex) % 8)) ? 1 : 0xffff;
             }
         }
 
