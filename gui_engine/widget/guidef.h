@@ -330,7 +330,7 @@ typedef struct draw_circle
 } draw_circle_t;
 
 
-
+/* T_GUI_INPUT_TYPE enum start*/
 typedef enum
 {
     TOUCH_INIT                  = 0x100,
@@ -360,7 +360,7 @@ typedef enum
     WHEEL_FINISHED              = 0x302,
     WHEEL_INVALIDE              = 0x303,
 } T_GUI_INPUT_TYPE;
-
+/* T_GUI_INPUT_TYPE enum end*/
 
 
 

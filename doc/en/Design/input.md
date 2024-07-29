@@ -68,31 +68,11 @@ The input types obtained after the algorithm processing are as follows.
 
 <details> <summary>T_GUI_INPUT_TYPE</summary>
 
-```C
-typedef enum
-{
-    TOUCH_INIT      = 0x100,
-    TOUCH_HOLD_X,
-    TOUCH_HOLD_Y,
-    TOUCH_SHORT,
-    TOUCH_LONG,
-    TOUCH_ORIGIN_FROM_X,
-    TOUCH_ORIGIN_FROM_Y,
-    TOUCH_LEFT_SLIDE,
-    TOUCH_RIGHT_SLIDE,
-    TOUCH_UP_SLIDE,
-    TOUCH_DOWN_SLIDE,
-    TOUCH_SHORT_BUTTON,
-    TOUCH_LONG_BUTTON,
-    TOUCH_UP_SLIDE_TWO_PAGE,
-    TOUCH_DOWN_SLIDE_TWO_PAGE,
-    TOUCH_INVALIDE,
-
-    KB_INIT      = 0x200,
-    KB_SHORT,
-    KB_LONG,
-    KB_INVALIDE,
-} T_GUI_INPUT_TYPE;
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* T_GUI_INPUT_TYPE enum start*/
+   :end-before: /* T_GUI_INPUT_TYPE enum end*/
 ```
 
 </details>
@@ -157,7 +137,7 @@ The workflow for keyboard information is shown in the figure below.
 
 #### Hardware and driver
 
-The hardware design and driver of the keyboard are relatively simple, and this chapter will explain it through a single GPIO. For instructions on how to use GPIO, you can refer to the instructions in the SDK to use the generic API in rtl87x2g_gpio.c or use the wrapped API in drv_gpio.c. They can do the same thing.
+The hardware design and driver of the keyboard are relatively simple, and this chapter will explain it through a single [GPIO](/Glossary.rst#term-GPIO). For instructions on how to use GPIO, you can refer to the instructions in the SDK to use the generic [API](/Glossary.rst#term-api) in rtl87x2g_gpio.c or use the wrapped API in drv_gpio.c. They can do the same thing.
 
 ### Get Keyboar Data
 
@@ -176,5 +156,19 @@ The algorithm processor fills in the `kb_info_t` structure, which is available t
 There are two ways to respond to the keyboard, one is to respond to the processed key information in the widget such as window, and the other is to respond directly to the press action when the key is received.
 
 The first way is as follow.
+
+```c
+static void win_prepare(gui_obj_t *obj)  
+{  
+    gui_dispdev_t *dc = gui_get_dc();  
+    touch_info_t *tp = tp_get_info();  
+    kb_info_t *kb = kb_get_info();  
+    if (kb->pressed == true)  
+    {  
+        gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);  
+    }  
+    ......
+}  
+```
 
 For the second type, please refer to the GPIO user manual.

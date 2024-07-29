@@ -12,7 +12,7 @@ UI系统可以接收设备中其他外设的输入，典型的输入设备有触
 
 ### 触摸板硬件和驱动程序
 
-尽管不同的触摸板芯片具有不同的消息数据结构，但消息始终包含触摸状态和触摸点的坐标。为了传输坐标信息，需要一个数据总线，而[I2C](/Glossary.rst#term-I2C)是触摸芯片和微处理器之间最常用的数据总线。
+尽管不同的触摸板芯片具有不同的消息数据结构，但消息始终包含触摸状态和触摸点的坐标。为了传输坐标信息，需要一个数据总线，而 [I2C](/Glossary.rst#term-I2C) 是触摸芯片和微处理器之间最常用的数据总线。
 
 此外，根据规格要求，不同的触摸芯片需要使用不同的驱动程序，需要进行移植。
 
@@ -68,31 +68,11 @@ struct gui_touch_port_data *port_touchpad_get_data()
 
 <details> <summary>T_GUI_INPUT_TYPE</summary>
 
-```C
-typedef enum
-{
-    TOUCH_INIT      = 0x100,
-    TOUCH_HOLD_X,
-    TOUCH_HOLD_Y,
-    TOUCH_SHORT,
-    TOUCH_LONG,
-    TOUCH_ORIGIN_FROM_X,
-    TOUCH_ORIGIN_FROM_Y,
-    TOUCH_LEFT_SLIDE,
-    TOUCH_RIGHT_SLIDE,
-    TOUCH_UP_SLIDE,
-    TOUCH_DOWN_SLIDE,
-    TOUCH_SHORT_BUTTON,
-    TOUCH_LONG_BUTTON,
-    TOUCH_UP_SLIDE_TWO_PAGE,
-    TOUCH_DOWN_SLIDE_TWO_PAGE,
-    TOUCH_INVALIDE,
-
-    KB_INIT      = 0x200,
-    KB_SHORT,
-    KB_LONG,
-    KB_INVALIDE,
-} T_GUI_INPUT_TYPE;
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/guidef.h
+   :language: c
+   :start-after: /* T_GUI_INPUT_TYPE enum start*/
+   :end-before: /* T_GUI_INPUT_TYPE enum end*/
 ```
 
 </details>
@@ -157,7 +137,7 @@ void design_tab_home(void *parent)
 
 #### 硬件和驱动程序
 
-键盘的硬件设计和驱动程序比较简单，本章将通过一个单独的 GPIO 来说明。有关如何使用 GPIO 的说明，请参考 SDK 中的说明。您可以使用 rtl87x2g_gpio.c 中的通用 API 或 drv_gpio.c 中的封装 API 来完成相同的操作。
+键盘的硬件设计和驱动程序比较简单，本章将通过一个单独的 [GPIO](/Glossary.rst#term-GPIO) 来说明。有关如何使用 GPIO 的说明，请参考 SDK 中的说明。您可以使用 rtl87x2g_gpio.c 中的通用 [API](/Glossary.rst#term-api) 或 drv_gpio.c 中的封装 API 来完成相同的操作。
 
 ### 获取键盘数据
 
@@ -167,7 +147,7 @@ void design_tab_home(void *parent)
 
 键盘算法的代码实现在 `kb_algo_process` 函数中。
 
-通过长时间按压来确定输入的类型是短按还是长按。
+通过按压时间的长短来确定输入的类型是短按还是长按。
 
 算法处理器将填充 `kb_info_t` 结构体，该结构体对所有控件都可用。
 
@@ -176,5 +156,19 @@ void design_tab_home(void *parent)
 对键盘的响应有两种方式，一种是在控件（如窗口）中响应经过处理的按键信息，另一种是在接收到按键时直接响应按下动作。
 
 第一种方式示例如下所示。
+
+```c
+static void win_prepare(gui_obj_t *obj)  
+{  
+    gui_dispdev_t *dc = gui_get_dc();  
+    touch_info_t *tp = tp_get_info();  
+    kb_info_t *kb = kb_get_info();  
+    if (kb->pressed == true)  
+    {  
+        gui_obj_event_set(obj, GUI_EVENT_KB_DOWN_PRESSED);  
+    }  
+   ......
+}  
+```
 
 对于第二种方式，请参考 GPIO 用户手册。

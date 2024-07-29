@@ -76,9 +76,12 @@ Glossary
 
     GPU
         Graphics Processing Unit
-        
+
     GUI
         Graphical User Interface
+
+    GPIO
+        General Purpose Input Output
 
     hw
         Hardware
