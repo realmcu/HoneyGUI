@@ -11,13 +11,11 @@
 #include<stdio.h>
 #include<time.h>
 //Please search app name macro for entry
-#define APP_HEART_RATE
+
 #define APP_CLOCK
 #define APP_WATCH_FACE
 #define APP_CALCULATOR
 #define APP_SPORT
-#define APP_MENU
-#define APP_STOPWATCH
 #define APP_MAP
 #define APP_CARDVIEW
 #define APP_BOX2D
@@ -29,9 +27,16 @@
 #define APP_WEB
 #define APP_BLOCK
 #define APP_FRUIT_NINJA
+#define APP_HEART_RATE
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
+/*Define a app with name APP_STOPWATCH*/
+#define APP_STOPWATCH
 GUI_APP_DEFINE_NAME(APP_STOPWATCH)
+/*Define a app with name APP_STOPWATCH end*/
+/*Define a app with name APP_MENU and entry func app_menu*/
+#define APP_MENU
 GUI_APP_DEFINE(APP_MENU,       app_menu)
+/*Define a app with name APP_MENU and entry func app_menu end*/
 GUI_APP_DEFINE_NAME(APP_MAP)
 GUI_APP_DEFINE_NAME(APP_CARDVIEW)
 GUI_APP_DEFINE_NAME(APP_COMPASS)
@@ -608,7 +613,7 @@ static void app_menu_win_cb(gui_obj_t *this)//this widget, event code, parameter
                             0);
     }
 }
-
+/*Define APP_MENU's entry func */
 static void app_menu(gui_app_t *app)
 {
     /**
@@ -701,6 +706,7 @@ const uint32_t *gui_app_return_array[] =
 };
 static void stop_watch_win_ani_cb(void);
 #define STOPWATCHTEXT "STOPWATCHTEXT"
+/*define the app's ui design*/
 GUI_APP_ENTRY(APP_STOPWATCH)
 {
     gui_win_t *stop = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -722,6 +728,7 @@ GUI_APP_ENTRY(APP_STOPWATCH)
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
+/*define the app's ui design end*/
 static void get_stopwatch_string(char *buffer)
 {
 #if _WIN32
