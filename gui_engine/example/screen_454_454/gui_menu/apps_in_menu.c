@@ -566,7 +566,7 @@ static void menu_win_ani_cb_return(void *args, gui_win_t *win)
     gui_win_set_scale_rate(win, cosf(pro * M_PI / 2), cosf(pro * M_PI / 2));
     if (gui_win_is_animation_end_frame(win))
     {
-        GUI_APP_SHUTDOWM(APP_MENU)
+        GUI_APP_SHUTDOWN(APP_MENU)
     }
 }
 static void app_wathc_win_ani_cb_return(void *args, gui_win_t *win)
