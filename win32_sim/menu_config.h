@@ -23,7 +23,7 @@
 
 // <h> HoneyGUI Demo Select
 // <c> RTK GUI Base Demo
-//#define CONFIG_REALTEK_BUILD_REAL_BASE
+// #define CONFIG_REALTEK_BUILD_REAL_BASE
 // </c>
 
 // <c> HoneyGUI Enalbe LVGL APP
@@ -51,7 +51,7 @@
 // </c>
 
 // <c> RTK GUI TEST
-//#define CONFIG_REALTEK_BUILD_TEST
+// #define CONFIG_REALTEK_BUILD_TEST
 // </c>
 
 // <c> RTK GUI AUTO TEST
@@ -99,7 +99,7 @@
 // </c>
 
 // <c> RTK GUI Font Enable FREETYPE
-//#define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
+// #define CONFIG_REALTEK_BUILD_GUI_FONT_FREETYPE
 // </c>
 
 // <c> RTK GUI Font Enable RTK MEM
@@ -107,15 +107,15 @@
 // </c>
 
 // <c> RTK GUI Font Enable TTF SVG
-//#define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
+// #define CONFIG_REALTEK_BUILD_GUI_FONT_TTF_SVG
 // </c>
 
 // <c> RTK GUI Enable VGLITE GPU
-//#define CONFIG_REALTEK_BUILD_VG_LITE
+// #define CONFIG_REALTEK_BUILD_VG_LITE
 // </c>
 
 // <c> RTK GUI Enable PPE1.0
-//#define CONFIG_REALTEK_BUILD_PPE
+// #define CONFIG_REALTEK_BUILD_PPE
 // </c>
 
 // <c> RTK GUI Enable PPE2.0
@@ -134,7 +134,7 @@
 #define CONFIG_REALTEK_BUILD_CJSON
 // </c>
 // <c> RTK GUI Enable web
-//#define CONFIG_REALTEK_BUILD_WEB
+// #define CONFIG_REALTEK_BUILD_WEB
 // </c>
 // <c> RTK GUI Enable KeyBoard And Pinyin
 #define CONFIG_REALTEK_BUILD_PINYIN
@@ -173,7 +173,7 @@
 // </c>
 
 // <c> RTK GUI Enable SasA
-//#define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
+// #define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
 // </c>
 // </h>
 #endif
@@ -185,13 +185,16 @@
 
 #if (CONFIG_REALTEK_BUILD_LVGL_GUI == 1)
 
+// <h>
 // <c> HoneyGUI Enable LVGL EXAMPLES
 #define CONFIG_REALTEK_BUILD_LVGL_EXAMPLES
 // </c>
 
 // <c> HoneyGUI Enable LVGL RLOTTIE
-//#define BUILD_USING_LVGL_RLOTTIE
+// #define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
 // </c>
+
+// </h>
 
 #endif
 
