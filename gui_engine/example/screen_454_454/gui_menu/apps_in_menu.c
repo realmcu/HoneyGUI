@@ -2011,11 +2011,106 @@ static gui_win_t *win_index;
 static gui_win_t *win_next;
 static int offset_x,  offset_y,  tp_x,  tp_y;
 static int offset_x_index,  offset_y_index,  tp_x_index,  tp_y_index;
+
+gui_vertex_t normal, normal_index;
+#define SLIDE 0
+#define CUBE 1
+static int style = CUBE;
+static void block_transform_cube(gui_win_t *block, int offset_x, int offset_y, int tp_x, int tp_y);
 static void block_transform_sync(gui_win_t *block, int offset_x, int offset_y, int tp_x, int tp_y)
 {
-    matrix_translate(offset_x * (int)block->base.w + tp_x, \
-                     offset_y * (int)block->base.h + tp_y, \
-                     block->base.matrix);
+    switch (style)
+    {
+    case SLIDE:
+        {
+            matrix_translate(offset_x * (int)block->base.w + tp_x, \
+                             offset_y * (int)block->base.h + tp_y, \
+                             block->base.matrix);
+        }
+        break;
+    case CUBE:
+        {
+            block_transform_cube(block, offset_x,  offset_y,  tp_x, tp_y);
+        }
+        break;
+    default:
+        break;
+    }
+
+}
+
+static void block_transform_cube(gui_win_t *block, int offset_x, int offset_y, int tp_x, int tp_y)
+{
+    gui_matrix_t temp;
+    gui_matrix_t rotate_3D;
+    int16_t release_x = tp_x;
+    gui_obj_t *obj = (void *)block;
+    float w = SCREEN_W;
+    float h = SCREEN_H;
+    float d = (w + h) / 2;
+    float rotate_degree;
+    float xoff;
+    float yoff;
+    float zoff;
+
+    gui_vertex_t v0 = {-w, -h, d};
+    gui_vertex_t v1 = {w,  -h, d};
+    gui_vertex_t v2 = {w,  h,  d};
+    gui_vertex_t v3 = {-w, h,  d};
+
+    gui_vertex_t tv0, tv1, tv2, tv3;
+    gui_vertex_t rv0, rv1, rv2, rv3;
+
+    rotate_degree = 90 * release_x / (w) + 90.0 * (offset_x);
+
+    matrix_compute_rotate(0, rotate_degree, 0, &rotate_3D);
+
+    //matrix_multiply_normal(&rotate_3D, &this->normal);
+
+    matrix_transfrom_rotate(&rotate_3D, &v0, &tv0, 0, 0, 0);
+    matrix_transfrom_rotate(&rotate_3D, &v1, &tv1, 0, 0, 0);
+    matrix_transfrom_rotate(&rotate_3D, &v2, &tv2, 0, 0, 0);
+    matrix_transfrom_rotate(&rotate_3D, &v3, &tv3, 0, 0, 0);
+
+    matrix_compute_rotate(0, 0, 0, &rotate_3D);
+    xoff = (float)w / 2;
+    yoff = (float)h / 2 ;
+    zoff = -(xoff + yoff) * 2;
+
+    matrix_transfrom_rotate(&rotate_3D, &tv0, &rv0, xoff, yoff, zoff);
+    matrix_transfrom_rotate(&rotate_3D, &tv1, &rv1, xoff, yoff, zoff);
+    matrix_transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
+    matrix_transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
+
+    gui_vertex_t p = {(float)(w) / 2, (float)(h) / 2, xoff + yoff};
+
+    matrix_transfrom_blit(w,  h, &p, &rv0, &rv1, &rv2, &rv3,
+                          &temp);
+
+    if (rv0.x > rv1.x)
+    {
+        obj->not_show = true;
+    }
+    else
+    {
+        obj->not_show = false;
+    }
+
+    if (rotate_degree > 90)
+    {
+        matrix_translate((offset_x) * (int)w, \
+                         (offset_y) * (int)h, \
+                         obj->matrix);
+    }
+
+    if (rotate_degree < -90)
+    {
+        matrix_translate((offset_x) * (int)w, \
+                         (offset_y) * (int)h, \
+                         obj->matrix);
+    }
+
+    matrix_multiply(obj->matrix, &temp);
 }
 static void block_win_cb(gui_win_t *win)
 {
