@@ -92,6 +92,28 @@ static void img_rotate_cb(gui_img_t *img)
     gui_img_rotation(img, 360 * img->animate->progress_percent, img->base.w / 2,
                      img->base.h);
 }
+
+typedef struct
+{
+    void **image_arr;
+    int image_count;
+    char *img_name;
+    gui_img_t *img;
+} image_animate_params_t;
+static void image_animate_callback(void *params)
+{
+    static int current_image_index = 0;
+    image_animate_params_t *animate_params = (image_animate_params_t *)params;
+
+    if (animate_params->image_count > 0)
+    {
+        gui_img_set_attribute(animate_params->img, animate_params->img_name,
+                              animate_params->image_arr[current_image_index], GET_BASE(animate_params->img)->x,
+                              GET_BASE(animate_params->img)->y);
+        current_image_index = (current_image_index + 1) % animate_params->image_count;
+    }
+
+}
 static char *open_switch_name;
 static char *pause_switch_name;
 static char *close_switch_name;
@@ -589,6 +611,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t w = 0; GUI_UNUSED(w);
                     int16_t h = 0; GUI_UNUSED(h);
                     char *file = NULL;
+                    char *folder = NULL;
+                    int count = 0;
+                    uint32_t ani_duration = 20;
                     float scalex = 1;
                     float scaley = 1;
                     float angle = 0;
@@ -666,11 +691,74 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 file = gui_strdup(filetemp);
                             }
                         }
+                        else if (!strcmp(p->attr[i], "folder"))
+                        {
+                            folder = gui_strdup(p->attr[++i]);
+                        }
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
                     //gui_log("x:%d,y:%d,w:%dh:%d,file:%s\n", x, y, w, h, file);
-                    if (file)
+                    if (folder)
+                    {
+                        int file_count = 0;
+                        {
+                            DIR *dir = NULL;
+                            struct dirent *entry;
+                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                            if ((dir = opendir(path)) == NULL)
+                            {
+                                gui_free(path);
+                            }
+                            gui_free(path);
+                            while ((entry = readdir(dir)) != NULL)
+                            {
+                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                {
+                                    file_count++;
+                                }
+                            }
+                            closedir(dir);
+                        }
+
+                        void **image_array = gui_malloc(file_count * sizeof(void *));
+                        {
+                            DIR *dir = NULL;
+                            struct dirent *entry;
+                            char *path = gui_malloc(strlen(folder) + strlen(GUI_ROOT_FOLDER) + 1);
+                            sprintf(path, "%s%s", GUI_ROOT_FOLDER, folder);
+                            if ((dir = opendir(path)) == NULL)
+                            {
+                                gui_free(path);
+                            }
+
+
+                            while ((entry = readdir(dir)) != NULL)
+                            {
+                                if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+                                {
+                                    char *path2 = gui_malloc(strlen(entry->d_name) + strlen(folder) + 2);
+                                    sprintf(path2, "%s/%s", folder, entry->d_name);
+                                    image_array[count++] = gui_get_file_address(path2);
+                                }
+                            }
+                            gui_free(path);
+                            closedir(dir);
+                        }
+                        parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, image_array[0], x, y);
+
+                        image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
+                        params->image_arr = image_array;
+                        params->image_count = count;
+                        params->img = (gui_img_t *)parent;
+                        params->img_name = ptxt;
+
+                        gui_img_set_animate((gui_img_t *)parent, ani_duration, -1, image_animate_callback, params);
+                        gui_img_set_mode((gui_img_t *)parent, blendMode);
+                        gui_img_set_opacity((gui_img_t *)parent, opacity);
+                    }
+                    else if (file)
                     {
                         void *imgbuf = gui_get_file_address(file);
                         parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
