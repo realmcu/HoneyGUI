@@ -2583,7 +2583,232 @@ GUI_APP_ENTRY(APP_BLOCK)
  * @brief APP_FRUIT_NINJA
  * Please code here @shel_deng@realsil.com.cn
  */
-GUI_APP_ENTRY(APP_FRUIT_NINJA)
+const int16_t SCREEN_WIDTH = 454;
+const int16_t SCREEN_HEIGHT = 454;
+const float SCREEN_STOP_PERCENT = 0.5;
+int16_t ORIGINAL_POSITION_X = 200;
+int16_t ORIGINAL_POSITION_Y = 454;
+gui_img_t *img, *img_gameover, *img_bg;
+gui_text_t *score_board;
+int16_t fruit_score;
+void *img_set[] =
 {
+    FRUIT_NINJA_STRAWBERRY_BIN,
+    FRUIT_NINJA_STRAWBERRY_HALF_1_BIN,
+    FRUIT_NINJA_STRAWBERRY_HALF_2_BIN,
+    FRUIT_NINJA_BANANA_BIN,
+    FRUIT_NINJA_BANANA_HALF_1_BIN,
+    FRUIT_NINJA_BANANA_HALF_2_BIN,
+    FRUIT_NINJA_PEACH_BIN,
+    FRUIT_NINJA_PEACH_HALF_1_BIN,
+    FRUIT_NINJA_PEACH_HALF_2_BIN,
+    FRUIT_NINJA_WATERMELON_BIN,
+    FRUIT_NINJA_WATERMELON_HALF_1_BIN,
+    FRUIT_NINJA_WATERMELON_HALF_2_BIN
+};
+int16_t img_set_cnt = 0;
+
+/* This part is used to calculate whether the rectangular image is crossed over or not */
+#include <math.h>
+
+/* Define a point structure */
+typedef struct
+{
+    float x, y;
+} Point;
+
+/* Compute the cross product */
+float cross_product(Point p1, Point p2, Point p3)
+{
+    return (p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y);
+}
+
+/* Determine whether the point q is on the line pr */
+int on_segment(Point p, Point q, Point r)
+{
+    if (q.x <= fmax(p.x, r.x) && q.x >= fmin(p.x, r.x) &&
+        q.y <= fmax(p.y, r.y) && q.y >= fmin(p.y, r.y))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+/* Determine whether two line segments intersect */
+int segments_intersect(Point p1, Point p2, Point p3, Point p4)
+{
+    float d1 = cross_product(p1, p3, p4);
+    float d2 = cross_product(p2, p3, p4);
+    float d3 = cross_product(p3, p1, p2);
+    float d4 = cross_product(p4, p1, p2);
+
+    if (((d1 * d2 < 0) && (d3 * d4 < 0)) ||
+        (d1 == 0 && on_segment(p3, p1, p4)) ||
+        (d2 == 0 && on_segment(p3, p2, p4)) ||
+        (d3 == 0 && on_segment(p1, p3, p2)) ||
+        (d4 == 0 && on_segment(p1, p4, p2)))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+/* Calculate the point of intersection of line segments */
+int intersection_point(Point p1, Point p2, Point p3, Point p4, Point *intersect)
+{
+    float A1 = p2.y - p1.y;
+    float B1 = p1.x - p2.x;
+    float C1 = A1 * p1.x + B1 * p1.y;
+
+    float A2 = p4.y - p3.y;
+    float B2 = p3.x - p4.x;
+    float C2 = A2 * p3.x + B2 * p3.y;
+
+    float det = A1 * B2 - A2 * B1;
+    if (det == 0)
+    {
+        return 0; // Parallel or co-linear
+    }
+    else
+    {
+        intersect->x = (B2 * C1 - B1 * C2) / det;
+        intersect->y = (A1 * C2 - A2 * C1) / det;
+
+        if (on_segment(p1, *intersect, p2) && on_segment(p3, *intersect, p4))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+}
+
+/* Determine if a line segment has two points of intersection with a rectangle */
+int line_has_two_intersections_with_rectangle(Point rect_min, float width, float height,
+                                              Point line_start, Point line_end)
+{
+    /* The four vertices of the rectangle */
+    Point rect_max = {rect_min.x + width, rect_min.y + height};
+    Point rect_p2 = {rect_min.x, rect_min.y + height}; // left-down
+    Point rect_p3 = {rect_min.x + width, rect_min.y}; // right-top
+
+    /* four sides of a rectangle */
+    Point rect_edges[4][2] =
+    {
+        {rect_min, rect_p3},  // top
+        {rect_p3, rect_max},  // right
+        {rect_max, rect_p2},  // bottom
+        {rect_p2, rect_min}   // left
+    };
+
+    int intersection_count = 0;
+    Point intersect;
+
+    /* Check if the line segment intersects any of the sides and count the number of intersections */
+    for (int i = 0; i < 4; i++)
+    {
+        if (segments_intersect(line_start, line_end, rect_edges[i][0], rect_edges[i][1]))
+        {
+            if (intersection_point(line_start, line_end, rect_edges[i][0], rect_edges[i][1], &intersect))
+            {
+                intersection_count++;
+                if (intersection_count == 2)
+                {
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+void APP_FRUIT_NINJA_cb(gui_win_t *win)
+{
+    /*show img*/
+    float progress_percent = (SCREEN_STOP_PERCENT < win->animate->progress_percent) ? 1.0 -
+                             win->animate->progress_percent : win->animate->progress_percent; //进程数 or 0.5
+
+    //log
+    // printf("enter APP_FRUIT_NINJA_cb success!\r\n");
+    // printf("img->animate->progress_percent = %f\r\n", win->animate->progress_percent);
+
+    /* pic move part. Set the image location and rotate it on the GUI */
+    gui_img_set_location(img, ORIGINAL_POSITION_X, SCREEN_HEIGHT * (1 - progress_percent * 2));
+    gui_img_rotation(img, 360 * win->animate->progress_percent, gui_img_get_width(img) / 2,
+                     gui_img_get_height(img) / 2);
+
+    /*get touchpoint*/
+    GUI_TOUCHPAD_IMPORT_AS_TP
+    int img_w = GUI_BASE(img)->w;
+    int img_h = GUI_BASE(img)->h;
+    int img_x = GUI_BASE(img)->x;
+    int img_y = GUI_BASE(img)->y;
+
+    if (tp->released)
+    {
+        if (tp->x >= img_x &&
+            tp->x <= img_x + img_w &&
+            tp->y >= img_y &&
+            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
+        {
+            fruit_score -= 10;
+        }
+        else
+        {
+            Point img_coordinate = {img_x, img_y};
+            Point tp_start = {tp->x, tp->y};
+            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
+            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end))
+            {
+                gui_img_set_attribute(img, "img", img_set[img_set_cnt++], img_x, img_y);
+                img_set_cnt %= sizeof(img_set) / sizeof(void *);
+                fruit_score += 10;
+            }
+            else
+            {
+                fruit_score -= 10;
+            }
+        }
+        static char text_content[16];
+        sprintf(text_content, "SCORE: %d", fruit_score);
+        gui_text_content_set(score_board, text_content, strlen(text_content));
+
+        if (fruit_score <= -50)
+        {
+            gui_log("game over!\r\n");
+            img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 75, 150, 0,
+                                                   0);
+            gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
+            gui_win_stop_animation(win);
+        }
+    }
 
 }
+
+GUI_APP_ENTRY(APP_FRUIT_NINJA)
+{
+    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0); //create window
+
+    gui_win_set_animate(win, 5000, -1, APP_FRUIT_NINJA_cb, win);  //dur=1 why bounce twice？
+    /* Create an image for displaying on the window */
+    img_bg = gui_img_create_from_mem(win, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0,
+                                     0); // background decrease FPS
+    img = gui_img_create_from_mem(win, "img", FRUIT_NINJA_STRAWBERRY_BIN, ORIGINAL_POSITION_X,
+                                  ORIGINAL_POSITION_Y, 0, 0);
+    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+    score_board = gui_text_create(win, "score_board",  0, 10, 100, 50);
+    gui_text_set(score_board, "SCORE: 0", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen("SCORE: 0"), 16);
+    void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+    gui_text_type_set(score_board, addr1, FONT_SRC_MEMADDR);
+    gui_text_mode_set(score_board, LEFT);
+
+    /* return button */
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}
+
+
