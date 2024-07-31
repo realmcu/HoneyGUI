@@ -259,6 +259,7 @@ static void gui_IME_parse_dict_json(gui_ime_t *this, char *buff_json)
     if (cjson_dict_info_array && this->dict_len != 0)
     {
         cJSON *cjson_dict_item = NULL;
+        GUI_UNUSED(cjson_dict_item);
         cJSON *cjson_len = NULL;
         cJSON *cjson_key = NULL;
         cJSON *cjson_os = NULL;

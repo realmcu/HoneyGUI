@@ -111,7 +111,11 @@ CJSON_PUBLIC(double) cJSON_GetNumberValue(const cJSON *const item)
 {
     if (!cJSON_IsNumber(item))
     {
+        #if defined(__clang__)
         return (double) 0.0 / 0.0;
+        #else
+        return (double) NAN;
+        #endif
     }
 
     return item->valuedouble;
@@ -792,14 +796,16 @@ fail:
 /* Parse the input text into an unescaped cinput, and populate item. */
 static cJSON_bool parse_string(cJSON *const item, parse_buffer *const input_buffer)
 {
-    if (!input_buffer)
-    {
-        goto fail;
-    }
+
     const unsigned char *input_pointer = buffer_at_offset(input_buffer) + 1;
     const unsigned char *input_end = buffer_at_offset(input_buffer) + 1;
     unsigned char *output_pointer = NULL;
     unsigned char *output = NULL;
+
+    if (!input_buffer)
+    {
+        goto fail;
+    }
 
     /* not a string */
     if (buffer_at_offset(input_buffer)[0] != '\"')
