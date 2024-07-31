@@ -2583,30 +2583,10 @@ GUI_APP_ENTRY(APP_BLOCK)
  * @brief APP_FRUIT_NINJA
  * Please code here @shel_deng@realsil.com.cn
  */
-const int16_t SCREEN_WIDTH = 454;
-const int16_t SCREEN_HEIGHT = 454;
-const float SCREEN_STOP_PERCENT = 0.5;
-int16_t ORIGINAL_POSITION_X = 200;
-int16_t ORIGINAL_POSITION_Y = 454;
-gui_img_t *img, *img_gameover, *img_bg;
-gui_text_t *score_board;
-int16_t fruit_score;
-void *img_set[] =
-{
-    FRUIT_NINJA_STRAWBERRY_BIN,
-    FRUIT_NINJA_STRAWBERRY_HALF_1_BIN,
-    FRUIT_NINJA_STRAWBERRY_HALF_2_BIN,
-    FRUIT_NINJA_BANANA_BIN,
-    FRUIT_NINJA_BANANA_HALF_1_BIN,
-    FRUIT_NINJA_BANANA_HALF_2_BIN,
-    FRUIT_NINJA_PEACH_BIN,
-    FRUIT_NINJA_PEACH_HALF_1_BIN,
-    FRUIT_NINJA_PEACH_HALF_2_BIN,
-    FRUIT_NINJA_WATERMELON_BIN,
-    FRUIT_NINJA_WATERMELON_HALF_1_BIN,
-    FRUIT_NINJA_WATERMELON_HALF_2_BIN
-};
-int16_t img_set_cnt = 0;
+
+static gui_img_t *img_strawberry, *img_banana, *img_peach, *img_watermelon, *img_gameover, *img_bg;
+static gui_text_t *score_board;
+static int16_t fruit_score = 0;
 
 /* This part is used to calculate whether the rectangular image is crossed over or not */
 #include <math.h>
@@ -2617,14 +2597,35 @@ typedef struct
     float x, y;
 } Point;
 
+/* rotate to get rectangular's four points */
+static Point rotate_point(Point p, Point center, double angle)
+{
+    // 将角度转换为弧度
+    double radians = angle * 2 * 3.14 / 360.0;
+    double cos_theta = cos(radians);
+    double sin_theta = sin(radians);
+
+    // 平移点使中心点为原点
+    double translated_x = p.x - center.x;
+    double translated_y = p.y - center.y;
+
+    // 进行旋转
+    double rotated_x = translated_x * cos_theta - translated_y * sin_theta;
+    double rotated_y = translated_x * sin_theta + translated_y * cos_theta;
+
+    // 平移点回原来的位置
+    Point rotated_point = {rotated_x + center.x, rotated_y + center.y};
+    return rotated_point;
+}
+
 /* Compute the cross product */
-float cross_product(Point p1, Point p2, Point p3)
+static float cross_product(Point p1, Point p2, Point p3)
 {
     return (p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y);
 }
 
 /* Determine whether the point q is on the line pr */
-int on_segment(Point p, Point q, Point r)
+static int on_segment(Point p, Point q, Point r)
 {
     if (q.x <= fmax(p.x, r.x) && q.x >= fmin(p.x, r.x) &&
         q.y <= fmax(p.y, r.y) && q.y >= fmin(p.y, r.y))
@@ -2635,7 +2636,7 @@ int on_segment(Point p, Point q, Point r)
 }
 
 /* Determine whether two line segments intersect */
-int segments_intersect(Point p1, Point p2, Point p3, Point p4)
+static int segments_intersect(Point p1, Point p2, Point p3, Point p4)
 {
     float d1 = cross_product(p1, p3, p4);
     float d2 = cross_product(p2, p3, p4);
@@ -2654,7 +2655,7 @@ int segments_intersect(Point p1, Point p2, Point p3, Point p4)
 }
 
 /* Calculate the point of intersection of line segments */
-int intersection_point(Point p1, Point p2, Point p3, Point p4, Point *intersect)
+static int intersection_point(Point p1, Point p2, Point p3, Point p4, Point *intersect)
 {
     float A1 = p2.y - p1.y;
     float B1 = p1.x - p2.x;
@@ -2685,22 +2686,69 @@ int intersection_point(Point p1, Point p2, Point p3, Point p4, Point *intersect)
     }
 }
 
+/* Calculate the shortest distance from the point to the line and determine if this pendant is on the line segment */
+static float point_to_line_segment_distance(Point p, Point a, Point b)
+{
+    /* vector AB */
+    float ABx = b.x - a.x;
+    float ABy = b.y - a.y;
+
+    /* vector AP */
+    float APx = p.x - a.x;
+    float APy = p.y - a.y;
+
+    /* Calculate the square length of the vector AB */
+    float AB_square_length = ABx * ABx + ABy * ABy;
+
+    /* Calculate t, the length of the projection of AP on AB */
+    float t = (APx * ABx + APy * ABy) / AB_square_length;
+
+    // Ensure that t is between [0, 1], indicating that the vertical foot is on the AB line.
+    if (t < 0) { t = 0; }
+    if (t > 1) { t = 1; }
+
+    /* Coordinates of the pendant point */
+    Point projection;
+    projection.x = a.x + t * ABx;
+    projection.y = a.y + t * ABy;
+
+    /* Calculate the distance from point P to the pendant */
+    float distance = sqrt((p.x - projection.x) * (p.x - projection.x) + (p.y - projection.y) *
+                          (p.y - projection.y));
+
+    return distance;
+}
+
 /* Determine if a line segment has two points of intersection with a rectangle */
-int line_has_two_intersections_with_rectangle(Point rect_min, float width, float height,
-                                              Point line_start, Point line_end)
+static bool line_has_two_intersections_with_rectangle(Point rect_min, float width, float height,
+                                                      Point line_start, Point line_end, float angle)
 {
     /* The four vertices of the rectangle */
     Point rect_max = {rect_min.x + width, rect_min.y + height};
     Point rect_p2 = {rect_min.x, rect_min.y + height}; // left-down
     Point rect_p3 = {rect_min.x + width, rect_min.y}; // right-top
 
+
+    Point center = {rect_min.x + width / 2.0, rect_min.y + height / 2.0}; // calculate center point
+
+    /* calculate rectangular's four rotated points */
+
+    Point rotated_rect_min = rotate_point(rect_min, center, angle); // left-up
+    Point rotated_rect_max = rotate_point(rect_max, center, angle); // right-down
+    Point rotated_rect_p2 = rotate_point(rect_p2, center, angle); // left-down
+    Point rotated_rect_p3 = rotate_point(rect_p3, center, angle); // right-top
+
+    // gui_log("angle: %.2f  center: %.2f %.2f\r\n", angle, center.x, center.y);
+    // gui_log("rect_min: %.2f %.2f\r\n", rect_min.x, rect_min.y);
+    // gui_log("rotated_rect_min: %.2f %.2f\r\n\n", rotated_rect_min.x, rotated_rect_min.y);
+
     /* four sides of a rectangle */
     Point rect_edges[4][2] =
     {
-        {rect_min, rect_p3},  // top
-        {rect_p3, rect_max},  // right
-        {rect_max, rect_p2},  // bottom
-        {rect_p2, rect_min}   // left
+        {rotated_rect_min, rotated_rect_p3},  // top
+        {rotated_rect_p3, rotated_rect_max},  // right
+        {rotated_rect_max, rotated_rect_p2},  // bottom
+        {rotated_rect_p2, rotated_rect_min}   // left
     };
 
     int intersection_count = 0;
@@ -2717,62 +2765,214 @@ int line_has_two_intersections_with_rectangle(Point rect_min, float width, float
                 if (intersection_count == 2)
                 {
                     return 1;
+                    /* Judge again based on the distance between the center point and the line segment */
+                    // float distance = point_to_line_segment_distance(center , line_start, line_end);
+                    // gui_log("distance: %.2f\r\n", distance);
+                    // if (distance < 40)
+                    // {
+                    //     return 1;
+                    // }
                 }
             }
         }
     }
     return 0;
 }
-
-
-
-void APP_FRUIT_NINJA_cb(gui_win_t *win)
+/* Scoring, changing pictures */
+static int16_t cutting_judgment(gui_img_t *ST, gui_img_t *BA, gui_img_t *PE, gui_img_t *WM,
+                                touch_info_t *tp)
 {
-    /*show img*/
-    float progress_percent = (SCREEN_STOP_PERCENT < win->animate->progress_percent) ? 1.0 -
-                             win->animate->progress_percent : win->animate->progress_percent; //进程数 or 0.5
-
-    //log
-    // printf("enter APP_FRUIT_NINJA_cb success!\r\n");
-    // printf("img->animate->progress_percent = %f\r\n", win->animate->progress_percent);
-
-    /* pic move part. Set the image location and rotate it on the GUI */
-    gui_img_set_location(img, ORIGINAL_POSITION_X, SCREEN_HEIGHT * (1 - progress_percent * 2));
-    gui_img_rotation(img, 360 * win->animate->progress_percent, gui_img_get_width(img) / 2,
-                     gui_img_get_height(img) / 2);
-
-    /*get touchpoint*/
-    GUI_TOUCHPAD_IMPORT_AS_TP
-    int img_w = GUI_BASE(img)->w;
-    int img_h = GUI_BASE(img)->h;
-    int img_x = GUI_BASE(img)->x;
-    int img_y = GUI_BASE(img)->y;
-
-    if (tp->released)
+    bool score_increase_flag = false; // = 0, score decrease 10
+    /* strawberry */
     {
+        int img_w = GUI_BASE(ST)->w;
+        int img_h = GUI_BASE(ST)->h;
+        int img_x = GUI_BASE(ST)->x;
+        int img_y = GUI_BASE(ST)->y;
+        float img_rotate_angle = ST->degrees;
+
         if (tp->x >= img_x &&
             tp->x <= img_x + img_w &&
             tp->y >= img_y &&
             tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
         {
-            fruit_score -= 10;
+            ;
         }
         else
         {
             Point img_coordinate = {img_x, img_y};
             Point tp_start = {tp->x, tp->y};
             Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
-            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end))
+            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
+                                                          img_rotate_angle))
             {
-                gui_img_set_attribute(img, "img", img_set[img_set_cnt++], img_x, img_y);
-                img_set_cnt %= sizeof(img_set) / sizeof(void *);
-                fruit_score += 10;
-            }
-            else
-            {
-                fruit_score -= 10;
+                if (!strcmp(ST->base.name, "img_strawberry"))
+                {
+                    gui_img_set_attribute(ST, "img_strawberry_cut", FRUIT_NINJA_STRAWBERRY_HALF_1_BIN, img_x, img_y);
+                    fruit_score += 10;
+                    score_increase_flag = true;
+                }
             }
         }
+    }
+    /* banana */
+    {
+        int img_w = GUI_BASE(BA)->w;
+        int img_h = GUI_BASE(BA)->h;
+        int img_x = GUI_BASE(BA)->x;
+        int img_y = GUI_BASE(BA)->y;
+        float img_rotate_angle = BA->degrees;
+        if (tp->x >= img_x &&
+            tp->x <= img_x + img_w &&
+            tp->y >= img_y &&
+            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
+        {
+            ;
+        }
+        else
+        {
+            Point img_coordinate = {img_x, img_y};
+            Point tp_start = {tp->x, tp->y};
+            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
+            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
+                                                          img_rotate_angle))
+            {
+                if (!strcmp(BA->base.name, "img_banana"))
+                {
+                    gui_img_set_attribute(BA, "img_banana_cut", FRUIT_NINJA_BANANA_HALF_1_BIN, img_x, img_y);
+                    fruit_score += 10;
+                    score_increase_flag = true;
+                }
+            }
+        }
+    }
+    /* peach */
+    {
+        int img_w = GUI_BASE(PE)->w;
+        int img_h = GUI_BASE(PE)->h;
+        int img_x = GUI_BASE(PE)->x;
+        int img_y = GUI_BASE(PE)->y;
+        float img_rotate_angle = PE->degrees;
+        if (tp->x >= img_x &&
+            tp->x <= img_x + img_w &&
+            tp->y >= img_y &&
+            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
+        {
+            ;
+        }
+        else
+        {
+            Point img_coordinate = {img_x, img_y};
+            Point tp_start = {tp->x, tp->y};
+            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
+            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
+                                                          img_rotate_angle))
+            {
+                if (!strcmp(PE->base.name, "img_peach"))
+                {
+                    gui_img_set_attribute(PE, "img_peach_cut", FRUIT_NINJA_PEACH_HALF_1_BIN, img_x, img_y);
+                    fruit_score += 10;
+                    score_increase_flag = true;
+                }
+            }
+        }
+    }
+    /* watermelon */
+    {
+        int img_w = GUI_BASE(WM)->w;
+        int img_h = GUI_BASE(WM)->h;
+        int img_x = GUI_BASE(WM)->x;
+        int img_y = GUI_BASE(WM)->y;
+        float img_rotate_angle = WM->degrees;
+        if (tp->x >= img_x &&
+            tp->x <= img_x + img_w &&
+            tp->y >= img_y &&
+            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
+        {
+            ;
+        }
+        else
+        {
+            Point img_coordinate = {img_x, img_y};
+            Point tp_start = {tp->x, tp->y};
+            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
+            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
+                                                          img_rotate_angle))
+            {
+                if (!strcmp(WM->base.name, "img_watermelon"))
+                {
+                    gui_img_set_attribute(WM, "img_watermelon_cut", FRUIT_NINJA_WATERMELON_HALF_1_BIN, img_x, img_y);
+                    fruit_score += 10;
+                    score_increase_flag = true;
+                }
+            }
+        }
+    }
+    if (!score_increase_flag)
+    {
+        fruit_score -= 10;
+    }
+    gui_log("fruit_score: %d\r\n", fruit_score);
+}
+
+static void APP_FRUIT_NINJA_cb(gui_win_t *win)
+{
+    const int16_t SCREEN_HEIGHT = 550; //454, height increases, fruit refreshes out of sight
+    const float SCREEN_STOP_PERCENT = 0.5;
+    const int16_t ORIGINAL_POSITION_X_SB = 50;
+    const int16_t ORIGINAL_POSITION_X_BA = 160;
+    const int16_t ORIGINAL_POSITION_X_PE = 380;
+    const int16_t ORIGINAL_POSITION_X_WM = 270;
+    int16_t ORIGINAL_POSITION_Y = 550; //454
+
+    /*show img*/
+    float progress_percent = (SCREEN_STOP_PERCENT < win->animate->progress_percent) ? 1.0 -
+                             win->animate->progress_percent : win->animate->progress_percent; //progress_percent or 0.5
+
+    //log
+    // printf("enter APP_FRUIT_NINJA_cb success!\r\n");
+    // printf("img->animate->progress_percent = %f\r\n", win->animate->progress_percent);
+
+    /* bounce-back fruit recover */
+    uint16_t new_position_y = SCREEN_HEIGHT * (1 - progress_percent * 2) +
+                              20; //height increases, fruit refreshes out of sight
+    if (454 * (1 - progress_percent * 2) >= 450)
+    {
+        gui_img_set_attribute(img_strawberry, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN,
+                              ORIGINAL_POSITION_X_SB, new_position_y);
+        gui_img_set_attribute(img_banana, "img_banana", FRUIT_NINJA_BANANA_BIN, ORIGINAL_POSITION_X_BA,
+                              new_position_y);
+        gui_img_set_attribute(img_peach, "img_peach", FRUIT_NINJA_PEACH_BIN, ORIGINAL_POSITION_X_PE,
+                              new_position_y);
+        gui_img_set_attribute(img_watermelon, "img_watermelon", FRUIT_NINJA_WATERMELON_BIN,
+                              ORIGINAL_POSITION_X_WM, new_position_y);
+        return ;
+    }
+
+    /* pic move part. Set the image location and rotate it on the GUI */
+    gui_img_set_location(img_strawberry, ORIGINAL_POSITION_X_SB, new_position_y);
+    gui_img_rotation(img_strawberry, 360 * win->animate->progress_percent,
+                     gui_img_get_width(img_strawberry) / 2,
+                     gui_img_get_height(img_strawberry) / 2);
+    gui_img_set_location(img_banana, ORIGINAL_POSITION_X_BA, new_position_y);
+    gui_img_rotation(img_banana, 360 * win->animate->progress_percent,
+                     gui_img_get_width(img_banana) / 2,
+                     gui_img_get_height(img_banana) / 2);
+    gui_img_set_location(img_peach, ORIGINAL_POSITION_X_PE, new_position_y);
+    gui_img_rotation(img_peach, 360 * win->animate->progress_percent, gui_img_get_width(img_peach) / 2,
+                     gui_img_get_height(img_peach) / 2);
+    gui_img_set_location(img_watermelon, ORIGINAL_POSITION_X_WM, new_position_y);
+    gui_img_rotation(img_watermelon, 360 * win->animate->progress_percent,
+                     gui_img_get_width(img_watermelon) / 2,
+                     gui_img_get_height(img_watermelon) / 2);
+
+    /*get touchpoint*/
+    GUI_TOUCHPAD_IMPORT_AS_TP
+
+    if (tp->released)
+    {
+        cutting_judgment(img_strawberry, img_banana, img_peach, img_watermelon, tp);
+
         static char text_content[16];
         sprintf(text_content, "SCORE: %d", fruit_score);
         gui_text_content_set(score_board, text_content, strlen(text_content));
@@ -2784,6 +2984,7 @@ void APP_FRUIT_NINJA_cb(gui_win_t *win)
                                                    0);
             gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
             gui_win_stop_animation(win);
+            fruit_score = 0;
         }
     }
 
@@ -2791,15 +2992,38 @@ void APP_FRUIT_NINJA_cb(gui_win_t *win)
 
 GUI_APP_ENTRY(APP_FRUIT_NINJA)
 {
+    const int16_t ORIGINAL_POSITION_X_SB = 50;
+    const int16_t ORIGINAL_POSITION_X_BA = 160;
+    const int16_t ORIGINAL_POSITION_X_PE = 380;
+    const int16_t ORIGINAL_POSITION_X_WM = 270;
+    int16_t ORIGINAL_POSITION_Y = 550; //height increases, fruit refreshes out of sight
+
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0); //create window
 
     gui_win_set_animate(win, 5000, -1, APP_FRUIT_NINJA_cb, win);  //dur=1 why bounce twice？
+
     /* Create an image for displaying on the window */
     img_bg = gui_img_create_from_mem(win, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0,
-                                     0); // background decrease FPS
-    img = gui_img_create_from_mem(win, "img", FRUIT_NINJA_STRAWBERRY_BIN, ORIGINAL_POSITION_X,
-                                  ORIGINAL_POSITION_Y, 0, 0);
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+                                     0); // if data of background is too big, decrease FPS
+    img_strawberry = gui_img_create_from_mem(win, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN,
+                                             ORIGINAL_POSITION_X_SB,
+                                             ORIGINAL_POSITION_Y, 0, 0);
+    gui_img_set_mode(img_strawberry, IMG_SRC_OVER_MODE);
+
+    img_banana = gui_img_create_from_mem(win, "img_banana", FRUIT_NINJA_BANANA_BIN,
+                                         ORIGINAL_POSITION_X_BA,
+                                         ORIGINAL_POSITION_Y, 0, 0);
+    gui_img_set_mode(img_banana, IMG_SRC_OVER_MODE);
+
+    img_peach = gui_img_create_from_mem(win, "img_peach", FRUIT_NINJA_PEACH_BIN, ORIGINAL_POSITION_X_PE,
+                                        ORIGINAL_POSITION_Y, 0, 0);
+    gui_img_set_mode(img_peach, IMG_SRC_OVER_MODE);
+
+    img_watermelon = gui_img_create_from_mem(win, "img_watermelon", FRUIT_NINJA_WATERMELON_BIN,
+                                             ORIGINAL_POSITION_X_WM,
+                                             ORIGINAL_POSITION_Y, 0, 0);
+    gui_img_set_mode(img_watermelon, IMG_SRC_OVER_MODE);
+
     score_board = gui_text_create(win, "score_board",  0, 10, 100, 50);
     gui_text_set(score_board, "SCORE: 0", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen("SCORE: 0"), 16);
     void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
