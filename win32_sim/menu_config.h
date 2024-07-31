@@ -175,8 +175,9 @@
 // <c> RTK GUI Enable SasA
 // #define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
 // </c>
-// </h>
+
 #endif
+// </h>
 
 // </e>
 
@@ -185,7 +186,6 @@
 
 #if (CONFIG_REALTEK_BUILD_LVGL_GUI == 1)
 
-// <h>
 // <c> HoneyGUI Enable LVGL EXAMPLES
 #define CONFIG_REALTEK_BUILD_LVGL_EXAMPLES
 // </c>
@@ -193,8 +193,6 @@
 // <c> HoneyGUI Enable LVGL RLOTTIE
 // #define CONFIG_REALTEK_BUILD_LVGL_RLOTTIE
 // </c>
-
-// </h>
 
 #endif
 
