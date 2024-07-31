@@ -10,12 +10,11 @@ You can use [gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#api) t
 ### Set grid style
 There are two style in grid widget [gui_grid_style(grid, style)](#api)
 
-```
-typedef enum
-{
-    GRID_CLASSIC,         //!< Evenly layout vertically and horizontally
-    GRID_SCALE,           //!< scale by slide
-} T_GUI_GRID_STYLE;
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/gui_grid.h
+   :language: c
+   :start-after: /* T_GUI_GRID_STYLE enum start*/
+   :end-before: /* T_GUI_GRID_STYLE enum end*/
 ```
 
 ## Example

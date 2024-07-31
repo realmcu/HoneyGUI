@@ -2,7 +2,7 @@
 
 网格组件可以在网格视图中显示组件集。
 
-## 使用方法
+## 用法
 
 ### 创建网格组件
 你可以通过这个 API [gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#api) 创建网格组件, 按照创建的顺序用控件填充网格。
@@ -10,12 +10,11 @@
 ### 设置网格样式
 你可以通过这个 API [gui_grid_style(grid, style)](#api) 进行设置，总共有以下两种样式。
 
-```
-typedef enum
-{
-    GRID_CLASSIC,         //!< Evenly layout vertically and horizontally
-    GRID_SCALE,           //!< scale by slide
-} T_GUI_GRID_STYLE;
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/gui_grid.h
+   :language: c
+   :start-after: /* T_GUI_GRID_STYLE enum start*/
+   :end-before: /* T_GUI_GRID_STYLE enum end*/
 ```
 
 ## 示例
