@@ -28,7 +28,9 @@ for root, dirs, files in os.walk(cwd):
 
 src += [cwd + '/HoneyGUI.lib']
 
-group = DefineGroup('gui', src, depend = ['CONFIG_REALTEK_BUILD_HONEYGUI_LIB'], CPPPATH = inc)
+CPPDEFINES = ['ENABLE_HONEYGUI']
+
+group = DefineGroup('gui', src, depend = ['CONFIG_REALTEK_BUILD_HONEYGUI_LIB'], CPPPATH = inc, CPPDEFINES = CPPDEFINES)
 
 
 
