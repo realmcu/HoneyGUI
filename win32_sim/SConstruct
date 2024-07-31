@@ -37,6 +37,7 @@ env.Append(LIBS = ['mingw32'])
 
 RTK_GUI_ENGINE = os.path.abspath('./../gui_engine/')
 LVGL_ROOT = os.path.abspath('./../lvgl/')
+ARM2D_ROOT = os.path.abspath('./../Arm2D/')
 PLATFORM = menu_config.PLATFORM
 
 Export('PLATFORM')
@@ -91,6 +92,7 @@ if platform.system() == 'Windows':
 # include app
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
 objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
+objs.extend(SConscript(os.path.join(ARM2D_ROOT, 'SConscript')))
 
 # bsp_vdir = 'build'
 
