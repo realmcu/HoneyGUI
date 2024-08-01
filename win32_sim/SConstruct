@@ -44,6 +44,7 @@ Export('PLATFORM')
 Export('TOOL_ROOT')
 Export('RTK_GUI_ENGINE')
 Export('LVGL_ROOT')
+LEGACY_UI = os.path.abspath('./../rtkv0/')
 
 
 print("CC: ", env['CC'])
@@ -93,6 +94,7 @@ if platform.system() == 'Windows':
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
 objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
 objs.extend(SConscript(os.path.join(ARM2D_ROOT, 'SConscript')))
+objs.extend(SConscript(os.path.join(LEGACY_UI, 'SConscript')))
 
 # bsp_vdir = 'build'
 

@@ -59,6 +59,13 @@ SECTIONS
     __rt_init_start = .;
     KEEP(*(SORT(.uii_fn*)))
     __rt_init_end = .;
+
+    /* section information for rtk legacy gui. */
+    __UI_MenuTypeDef_size = DEFINED(UI_MenuTypeDef_size) ? UI_MenuTypeDef_size : 1;
+    GUIStrartMenu = .;
+    KEEP(*(SORT(.app.flash.gui_menu*)))
+    . = ALIGN(__UI_MenuTypeDef_size);
+    GUIEndMenu = .;
   }
   /* The Cygwin32 library uses a section to avoid copying certain data
      on fork.  This used to be named ".data".  The linker used

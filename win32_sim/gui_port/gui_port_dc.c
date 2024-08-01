@@ -361,6 +361,7 @@ void gui_port_dc_init(void)
     dc.disp_buf_1 =  malloc(dc.fb_height * dc.fb_width * DRV_PIXEL_BITS / 8);
     dc.disp_buf_2 =  malloc(dc.fb_height * dc.fb_width * DRV_PIXEL_BITS / 8);
 #endif
+    dc.lcd_gram = surface->pixels;
 
 }
 

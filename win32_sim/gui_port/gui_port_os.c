@@ -60,6 +60,7 @@ static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, ui
 static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 {
     QuDataType data = {0};
+    GUI_ASSERT(handle != NULL);
 
     memcpy(&data, buffer, size);
     pthread_mutex_lock(&queue_mutex);
@@ -69,6 +70,14 @@ static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t tim
     pthread_mutex_lock(&port_mutex);
     pthread_cond_signal(&port_cond);
     pthread_mutex_unlock(&port_mutex);
+    if (handle != NULL)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 
 }
 

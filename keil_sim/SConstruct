@@ -26,6 +26,7 @@ env = Environment(tools = ['mingw'],
 
 RTK_GUI_ENGINE = os.path.abspath('./../gui_engine/')
 LVGL_ROOT = os.path.abspath('./../lvgl/')
+LEGACY_UI = os.path.abspath('./../rtkv0/')
 PLATFORM = menu_config.PLATFORM
 
 Export('PLATFORM')
@@ -44,6 +45,7 @@ objs = PrepareBuilding(env, TOOL_ROOT, has_libcpu=False)
 # include app
 objs.extend(SConscript(os.path.join(RTK_GUI_ENGINE, 'SConscript')))
 objs.extend(SConscript(os.path.join(LVGL_ROOT, 'SConscript')))
+objs.extend(SConscript(os.path.join(LEGACY_UI, 'SConscript')))
 
 # bsp_vdir = 'build'
 
