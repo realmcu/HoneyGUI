@@ -114,6 +114,111 @@ static void image_animate_callback(void *params)
     }
 
 }
+
+#define LIGHTS_NUM 20
+typedef struct
+{
+    int id;
+    bool state;
+} light_param_t;
+light_param_t lights[LIGHTS_NUM];
+
+char *read_file(const char *path)
+{
+    FILE *file = fopen(path, "r");
+    if (!file)
+    {
+        perror("fopen");
+        return NULL;
+    }
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *content = (char *)malloc(length + 1);
+    if (content)
+    {
+        fread(content, 1, length, file);
+        content[length] = '\0';
+    }
+    fclose(file);
+    return content;
+}
+
+void parse_json(const char *json_str)
+{
+    const char *ptr = json_str;
+    int index = 0;
+
+    while ((ptr = strstr(ptr, "\"id\"")) != NULL && index < LIGHTS_NUM)
+    {
+        char state_buffer[10];
+
+        sscanf(ptr, "\"id\": %d", &lights[index].id);
+        ptr = strstr(ptr, "\"state\"");
+        sscanf(ptr, "\"state\": \"%9[^\"]\"", state_buffer);
+
+        if (strcmp(state_buffer, "on") == 0)
+        {
+            lights[index].state = true;
+        }
+        else if (strcmp(state_buffer, "off") == 0)
+        {
+            lights[index].state = false;
+        }
+
+        index++;
+    }
+}
+
+void write_file(const char *filename, const char *content)
+{
+    FILE *file = fopen(filename, "w");
+    if (file != NULL)
+    {
+        fwrite(content, 1, strlen(content), file);
+        fclose(file);
+    }
+}
+
+void update_light_config(int index, bool state)
+{
+    char *config_file_path = "./gui_engine/example/web/peripheral_simulation/light_config.json";
+    char *json_str = read_file(config_file_path);
+    if (json_str)
+    {
+        parse_json(json_str);
+        free(json_str);
+    }
+
+    for (int i = 0; i < LIGHTS_NUM; i++)
+    {
+        if (lights[i].id == index)
+        {
+            lights[i].state = state;
+            break;
+        }
+    }
+
+    char config_str[2048] = "{\n    \"lights\": [\n";
+    for (int i = 0; i < LIGHTS_NUM; i++)
+    {
+        char light_str[64];
+        snprintf(light_str, sizeof(light_str), "        {\"id\": %d, \"state\": \"%s\"}%s\n",
+                 lights[i].id, lights[i].state ? "on" : "off",
+                 (i < LIGHTS_NUM - 1) ? "," : "");
+        strcat(config_str, light_str);
+    }
+    strcat(config_str, "    ]\n}");
+
+    write_file(config_file_path, config_str);
+}
+
+static void light_control_cb(void *obj, gui_event_t e, light_param_t *light)
+{
+    gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
+    update_light_config(light->id, light->state);
+}
+
 static char *open_switch_name;
 static char *pause_switch_name;
 static char *close_switch_name;
@@ -710,7 +815,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
-                                return;
+                                return 0;
                             }
                             gui_free(path);
                             while ((entry = readdir(dir)) != NULL)
@@ -732,7 +837,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
-                                return;
+                                return 0;
                             }
 
 
@@ -1286,7 +1391,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
-                                return;
+                                return 0;
                             }
                             gui_free(path);
                             while ((entry = readdir(dir)) != NULL)
@@ -1309,7 +1414,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
-                                return;
+                                return 0;
                             }
 
                             int count = 0;
@@ -1882,7 +1987,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 if ((dir = opendir(path)) == NULL)
                                 {
                                     gui_free(path);
-                                    return;
+                                    return 0;
                                 }
 
                                 int count = 0;
@@ -2239,7 +2344,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 if ((dir = opendir(path)) == NULL)
                                 {
                                     gui_free(path);
-                                    return;
+                                    return 0;
                                 }
 
                                 int count = 0;
@@ -2416,7 +2521,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         if ((dir = opendir(dir_path)) == NULL)
                         {
                             gui_free(dir_path);
-                            //perror("opendir() failed"); return;
+                            return 0;
                         }
                         gui_free(dir_path);
 
@@ -2959,16 +3064,26 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     {
                                         gui_win_click((gui_win_t *)parent, on_click_jump_cb, param);
                                     }
-
-
-
                                 }
 
                                 gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
 
                         }
+                        else if (!strcmp(type, "control"))
+                        {
+                            if (!strcmp(to, "light"))
+                            {
+                                light_param_t *light;
+                                light = gui_malloc(sizeof(light_param_t));
+                                light->id = x;
+                                light->state = (bool)y;
+                                gui_win_click((gui_win_t *)parent, light_control_cb, light);
+                            }
 
+                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
+                        }
                     }
                 }
                 break;

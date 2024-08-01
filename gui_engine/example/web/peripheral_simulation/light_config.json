@@ -1,0 +1,24 @@
+{
+    "lights": [
+        {"id": 0, "state": "off"},
+        {"id": 1, "state": "off"},
+        {"id": 2, "state": "on"},
+        {"id": 3, "state": "off"},
+        {"id": 4, "state": "on"},
+        {"id": 5, "state": "off"},
+        {"id": 6, "state": "on"},
+        {"id": 7, "state": "off"},
+        {"id": 8, "state": "on"},
+        {"id": 9, "state": "on"},
+        {"id": 10, "state": "off"},
+        {"id": 11, "state": "off"},
+        {"id": 12, "state": "off"},
+        {"id": 13, "state": "on"},
+        {"id": 14, "state": "off"},
+        {"id": 15, "state": "on"},
+        {"id": 16, "state": "on"},
+        {"id": 17, "state": "on"},
+        {"id": 18, "state": "off"},
+        {"id": 19, "state": "off"}
+    ]
+}
