@@ -59,8 +59,8 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 
         case OBJ_PREPARE:
             {
-                extern void gui_page_update_rebound(gui_obj_t *obj);
-                gui_page_update_rebound(obj);
+                extern void gui_page_prepare_rebound(gui_obj_t *obj);
+                gui_page_prepare_rebound(obj);
             }
             break;
 

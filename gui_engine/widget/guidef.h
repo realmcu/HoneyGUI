@@ -74,10 +74,15 @@ typedef struct touch_info
     int16_t deltaY;
     int16_t x;
     int16_t y;
+    int16_t history_x;
+    int16_t history_y;
     uint32_t type;
     uint8_t pressed  : 1;
     uint8_t released : 1;
     uint8_t pressing : 1;
+    uint8_t button_down  : 1;
+    uint8_t button_up  : 1;
+    uint8_t button_hold  : 1;
 } touch_info_t;
 
 
@@ -153,11 +158,14 @@ typedef struct gui_kb_port_data
     uint32_t timestamp_ms_release;          /* The timestamp when when release, update once*/
     uint32_t timestamp_ms_pressing;         /* The timestamp when pressing, update periodically*/
 } gui_kb_port_data_t;
-
+#define GUI_WHEEL_NO_EVENT 0
+#define GUI_WHEEL_BUTTON_DOWN 1
+#define GUI_WHEEL_BUTTON_UP 2
+#define GUI_WHEEL_SCROLL 3
 typedef struct gui_wheel_port_data
 {
-    uint8_t  event;
-    int16_t  delta;
+    uint8_t  event;//0:no event//1:button down//2:button up//3:scroll
+    int16_t  delta;//positive away from the user and negative toward the user
     uint32_t timestamp_ms;             /* The timestamp when the data was received */
 } gui_wheel_port_data_t;
 typedef struct gui_dispdev

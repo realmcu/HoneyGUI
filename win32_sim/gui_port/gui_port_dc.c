@@ -275,6 +275,11 @@ void *rtk_gui_sdl(void *arg)
                 tp_port_data.x_coordinate = event.button.x;
                 tp_port_data.y_coordinate = event.button.y;
                 //gui_log("mouse down:(%d,%d)\n", event.button.x, event.button.y);
+                if (event.button.button == SDL_BUTTON_MIDDLE)
+                {
+                    wheel_port_data.event = GUI_WHEEL_BUTTON_DOWN;
+                    wheel_port_data.timestamp_ms = gui_ms_get();
+                }
             }
             break;
 
@@ -286,12 +291,19 @@ void *rtk_gui_sdl(void *arg)
                 tp_port_data.x_coordinate = event.button.x;
                 tp_port_data.y_coordinate = event.button.y;
                 //gui_log("mouse up:(%d,%d)\n", event.button.x, event.button.y);
+                if (event.button.button == SDL_BUTTON_MIDDLE)
+                {
+                    wheel_port_data.event = GUI_WHEEL_BUTTON_UP;
+                    wheel_port_data.timestamp_ms = gui_ms_get();
+                }
             }
             break;
         case SDL_MOUSEWHEEL:
             {
-                gui_log("[SDL_MOUSEWHEEL]:(%d,%d)\n", event.button.x, event.button.y);
-                wheel_port_data.delta = event.button.x;
+
+                wheel_port_data.delta = event.wheel.y;
+                wheel_port_data.timestamp_ms = gui_ms_get();
+                wheel_port_data.event = GUI_WHEEL_SCROLL;
             }
             break;
         case SDL_KEYDOWN:
@@ -383,7 +395,6 @@ gui_kb_port_data_t *port_kb_get_data(void)
 
 gui_wheel_port_data_t *port_wheel_get_data(void)
 {
-    wheel_port_data.timestamp_ms = gui_ms_get();
     return &wheel_port_data;
 }
 

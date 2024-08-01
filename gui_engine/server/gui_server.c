@@ -76,7 +76,7 @@ static void gui_server_entry(void *parameter)
         kb_info_t *kb = kb_algo_process(kb_get_data());
         GUI_UNUSED(kb);
 
-        wheel_info_t *wheel = wheel_algo_process(wheel_get_data());
+        touch_info_t *wheel = wheel_algo_process(wheel_get_data());
         GUI_UNUSED(wheel);
 
         if ((tp->pressing == true) || (kb->pressing == true) || wheel->type == WHEEL_ING)
