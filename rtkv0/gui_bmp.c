@@ -13,6 +13,8 @@
 #include "string.h"
 #include <string.h>
 #include "gui_bmp.h"
+#include "acc_init.h"
+#include "def_list.h"
 
 
 uint8_t rtl_gui_show_bmp_sector(UI_WidgetTypeDef *widget, int16_t detal_x, int16_t detal_y, int Zs,
@@ -537,11 +539,44 @@ uint8_t rtl_gui_show_bmp_sector_legacy(int xs, int ys, int width, int height,
 }
 
 
-uint8_t rtl_gui_show_background(UI_WidgetTypeDef *widget, int16_t detal_x, int16_t detal_y, int Zs,
+
+uint8_t rtl_gui_show_background(UI_MenuTypeDef *menu, UI_WidgetTypeDef *widget, int Zs,
                                 int Ze, uint8_t *buf)
 {
-    int xs = widget->x + detal_x;
-    int ys = widget->y + detal_y;
+
+#if 1
+    gui_log("name = %s \n", menu->name);
+
+    draw_img_t image;
+    gui_dispdev_t dc;
+    image.img_w = widget->width;
+    image.img_h = widget->hight;
+    image.data = widget->addr - 8;
+
+    memcpy(&image.matrix, &menu->matrix, sizeof(gui_matrix_t));
+    matrix_translate(widget->x, widget->y, &image.matrix);
+
+
+    memcpy(&image.inverse, &image.matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&image.inverse);
+    image.opacity_value = 255;
+    image.blend_mode = IMG_FILTER_BLACK;
+    draw_img_new_area(&image, NULL);
+
+    memcpy(&dc, gui_get_dc(), sizeof(gui_dispdev_t));
+    dc.frame_buf = buf;
+    dc.section_count = Zs / LCD_SECTION_HEIGHT;
+    dc.section.x1 = 0;
+    dc.section.x2 = LCD_WIDTH - 1;
+    dc.section.y1 = Zs;
+    dc.section.y2 = Ze - 1;
+
+    gui_acc_blit_to_dc(&image, &dc, NULL);
+
+    return 0;
+#endif
+    int xs = widget->x + menu->detal_x;
+    int ys = widget->y + menu->detal_y;
     int width = widget->width;
     int height = widget->hight;
     unsigned char *BMP = (unsigned char *)widget->addr;

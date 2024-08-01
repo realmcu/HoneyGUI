@@ -100,7 +100,19 @@ void gui_set_te_function(bool flag)
 
 void rtl_gui_refresh_by_dma_internal(uint8_t *readbuf, uint32_t count_for_section)
 {
+    // GUI_ASSERT(NULL != NULL);
+    gui_dispdev_t *dc = gui_get_dc();
 
+    if (count_for_section == TOTAL_SECTION_COUNT - 1)
+    {
+        uint32_t length = ((LCD_HIGHT - count_for_section * LCD_SECTION_HEIGHT) % LCD_SECTION_HEIGHT) *
+                          LCD_WIDTH * PIXEL_BYTES;
+        memcpy(dc->lcd_gram + count_for_section * LCD_SECTION_BYTE_LEN, readbuf, length);
+    }
+    else
+    {
+        memcpy(dc->lcd_gram + count_for_section * LCD_SECTION_BYTE_LEN, readbuf, LCD_SECTION_BYTE_LEN);
+    }
 
 }
 
@@ -155,8 +167,8 @@ static void rtl_gui_lcd_real_update_x(UI_MenuTypeDef *p_show_menu)
             }
             else if ((local_cur_widget_list + j)->widget_id_type == ICON_BACKGROUND)
             {
-                rtl_gui_show_background(local_cur_widget_list + j, \
-                                        local_cur_menu->detal_x, 0, \
+                rtl_gui_show_background(local_cur_menu, \
+                                        local_cur_widget_list + j, \
                                         i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                         pWriteBuf);
             }
@@ -194,8 +206,8 @@ static void rtl_gui_lcd_real_update_x(UI_MenuTypeDef *p_show_menu)
                 }
                 else if ((local_sub_widget_list + j)->widget_id_type == ICON_BACKGROUND)
                 {
-                    rtl_gui_show_background(local_sub_widget_list + j, \
-                                            local_sub_menu->detal_x, 0, \
+                    rtl_gui_show_background(local_sub_menu, \
+                                            local_sub_widget_list + j, \
                                             i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                             pWriteBuf);
                 }
@@ -232,8 +244,8 @@ static void rtl_gui_lcd_real_update_x(UI_MenuTypeDef *p_show_menu)
                 }
                 else if ((local_par_widget_list + j)->widget_id_type == ICON_BACKGROUND)
                 {
-                    rtl_gui_show_background(local_par_widget_list + j, \
-                                            local_par_menu->detal_x, 0, \
+                    rtl_gui_show_background(local_par_menu, \
+                                            local_par_widget_list + j, \
                                             i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                             pWriteBuf);
                 }
@@ -306,8 +318,8 @@ static void rtl_gui_lcd_real_update_y(UI_MenuTypeDef *p_show_menu)
             }
             else if ((local_cur_widget_list + j)->widget_id_type == ICON_BACKGROUND)
             {
-                rtl_gui_show_background(local_cur_widget_list + j, \
-                                        0, local_cur_menu->detal_y, \
+                rtl_gui_show_background(local_cur_menu, \
+                                        local_cur_widget_list + j, \
                                         i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                         pWriteBuf);
             }
@@ -346,8 +358,8 @@ static void rtl_gui_lcd_real_update_y(UI_MenuTypeDef *p_show_menu)
                 }
                 else if ((local_sub_widget_list + j)->widget_id_type == ICON_BACKGROUND)
                 {
-                    rtl_gui_show_background(local_sub_widget_list + j, \
-                                            0, local_sub_menu->detal_y, \
+                    rtl_gui_show_background(local_sub_menu, \
+                                            local_sub_widget_list + j, \
                                             i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                             pWriteBuf);
                 }
@@ -387,8 +399,8 @@ static void rtl_gui_lcd_real_update_y(UI_MenuTypeDef *p_show_menu)
                 }
                 else if ((local_par_widget_list + j)->widget_id_type == ICON_BACKGROUND)
                 {
-                    rtl_gui_show_background(local_par_widget_list + j, \
-                                            0, local_par_menu->detal_y, \
+                    rtl_gui_show_background(local_par_menu, \
+                                            local_par_widget_list + j, \
                                             i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                             pWriteBuf);
                 }
@@ -467,7 +479,7 @@ void rtl_gui_menu_update(UI_MenuTypeDef *ui_cur, void *p_ui_cur_argv, \
                ui_cur->current_max_widget * sizeof(UI_WidgetTypeDef));
         memcpy(g_cur_menu.pBMPList, ui_cur->pBMPList,
                ui_cur->current_max_bmp * sizeof(UI_BMPTypeDef));
-
+        g_cur_menu.name = ui_cur->name;
         ui_cur->cur_display_info(ui_cur, &g_cur_menu, p_ui_cur_argv);
 
     }

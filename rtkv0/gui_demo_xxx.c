@@ -14,6 +14,7 @@
 #include "gui_common_menu.h"
 #include "gui_task.h"
 #include "gui_psram.h"
+#include <gui_matrix.h>
 #include "tiger_blue.txt"
 
 #if FEATURE_PSRAM
@@ -71,25 +72,29 @@ static void menu_display_info_cb(UI_MenuTypeDef *cur_menu, UI_MenuTypeDef *retur
     {
         return;
     }
-
+    matrix_identity(&return_menu->matrix);
+    matrix_rotate(45, &return_menu->matrix);
     return_menu->pWidgetList[0].addr = (uint32_t)(_actiger_blue + 8);
 }
 
-static void menu_constructor_cb(UI_MenuTypeDef *cur_menu, UI_MenuTypeDef *return_menu, void *argv)
+static void menu_constructor_cb(UI_MenuTypeDef *cur_menu, void *argv)
 {
     gui_log("file = %s, line = %d \n", __FILE__, __LINE__);
 
+
 #if USING_PSRAM
     rtl_gui_prepare_frame_buffer(cur_menu, cur_menu, NULL, &FrameBufferOrigin);
-    rtl_gui_update_detal(0, 0);
+    rtl_gui_prepare_frame_buffer(cur_menu, cur_menu, NULL, &FrameBufferLeft);
+    rtl_gui_prepare_frame_buffer(cur_menu, cur_menu, NULL, &FrameBufferRight);
+    rtl_gui_update_detal(-100, 0);
 #else
-    rtl_gui_menu_update(cur_menu, NULL, cur_menu->MenuSub, NULL, cur_menu->MenuParent, NULL, 0, 0);
+    rtl_gui_menu_update(cur_menu, NULL, cur_menu, NULL, cur_menu, NULL, 0, 0);
 #endif
     /* add user code here */
     /* add user code here */
 }
 
-static void menu_destructor_cb(UI_MenuTypeDef *cur_menu, UI_MenuTypeDef *return_menu, void *argv)
+static void menu_destructor_cb(UI_MenuTypeDef *cur_menu, void *argv)
 {
     gui_log("file = %s, line = %d \n", __FILE__, __LINE__);
 }
