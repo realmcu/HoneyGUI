@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 #ifdef LV_CONF_KCONFIG_EXTERNAL_INCLUDE
+//cppcheck-suppress [preprocessorErrorDirective]
 #  include LV_CONF_KCONFIG_EXTERNAL_INCLUDE
 #else
 
