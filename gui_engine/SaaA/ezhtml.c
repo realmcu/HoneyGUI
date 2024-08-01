@@ -710,6 +710,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
+                                return;
                             }
                             gui_free(path);
                             while ((entry = readdir(dir)) != NULL)
@@ -731,6 +732,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
+                                return;
                             }
 
 
@@ -1284,7 +1286,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
-                                //perror("opendir() failed"); return;
+                                return;
                             }
                             gui_free(path);
                             while ((entry = readdir(dir)) != NULL)
@@ -1307,7 +1309,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             if ((dir = opendir(path)) == NULL)
                             {
                                 gui_free(path);
-                                //perror("opendir() failed"); return;
+                                return;
                             }
 
                             int count = 0;
@@ -1880,7 +1882,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 if ((dir = opendir(path)) == NULL)
                                 {
                                     gui_free(path);
-                                    //perror("opendir() failed"); return;
+                                    return;
                                 }
 
                                 int count = 0;
@@ -2237,7 +2239,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 if ((dir = opendir(path)) == NULL)
                                 {
                                     gui_free(path);
-                                    //perror("opendir() failed"); return;
+                                    return;
                                 }
 
                                 int count = 0;
