@@ -181,8 +181,8 @@ void rtl_gui_update_to_psram_framebuffer(UI_MenuTypeDef *p_show_menu,
             }
             else if ((local_cur_widget_list + j)->widget_id_type == ICON_BACKGROUND)
             {
-                rtl_gui_show_background(local_cur_widget_list + j, \
-                                        0, 0, \
+                rtl_gui_show_background(local_cur_menu, \
+                                        local_cur_widget_list + j, \
                                         i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                         pWriteBuf);
             }

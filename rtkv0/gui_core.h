@@ -6,6 +6,7 @@ extern "C" {
 #endif
 #include "stdint.h"
 #include "stdbool.h"
+#include "def_matrix.h"
 
 typedef enum
 {
@@ -150,10 +151,8 @@ typedef struct _UI_MenuTypeDef
                         void *argv);
     void (* display_cb)(struct _UI_MenuTypeDef *cur_menu, struct _UI_MenuTypeDef *return_menu,
                         void *argv);
-    void (* constructor_cb)(struct _UI_MenuTypeDef *cur_menu, struct _UI_MenuTypeDef *return_menu,
-                            void *argv);
-    void (* destructor_cb)(struct _UI_MenuTypeDef *cur_menu, struct _UI_MenuTypeDef *return_menu,
-                           void *argv);
+    void (* constructor_cb)(struct _UI_MenuTypeDef *cur_menu, void *argv);
+    void (* destructor_cb)(struct _UI_MenuTypeDef *cur_menu, void *argv);
 
     UI_WidgetTypeDef *pWidgetList;
     UI_BMPTypeDef *pBMPList;
@@ -169,6 +168,8 @@ typedef struct _UI_MenuTypeDef
     uint16_t psram_has_center_cache : 1;
 
     uint16_t dynamicFlag : 1;
+    gui_matrix_t matrix;
+    gui_matrix_t inverse;
 
 } __attribute__((aligned(128))) UI_MenuTypeDef;
 

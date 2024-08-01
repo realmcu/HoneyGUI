@@ -61,7 +61,7 @@ void gui_event_new_view_handler(T_RTK_GUI_EVENT *msg)
         pTaskCurrentView->psram_has_left_cache = false;
         pTaskCurrentView->psram_has_right_cache = false;
         pTaskCurrentView->psram_has_center_cache = false;
-        pTaskCurrentView->constructor_cb(pTaskCurrentView, NULL, NULL);
+        pTaskCurrentView->constructor_cb(pTaskCurrentView, NULL);
     }
 
 }
