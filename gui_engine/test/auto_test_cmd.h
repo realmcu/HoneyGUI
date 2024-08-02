@@ -2,8 +2,8 @@
  * @file auto_test_cmd.h
  * @author howie_wang (howie_wang@realtek.com.cn)
  * @brief
- * @version 0.1
- * @date 2024-06-26
+ * @version 1.0
+ * @date 2024-08-01
  *
  * @copyright Copyright (c) 2024
  *

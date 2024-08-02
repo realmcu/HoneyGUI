@@ -48,7 +48,7 @@
 // </c>
 
 // <c> RTK GUI AUTO TEST
-// #define CONFIG_REALTEK_BUILD_AUTO_TEST
+// #define CONFIG_REALTEK_BUILD_HONEYGUI_AUTO_TEST
 // </c>
 
 // <c> RTK GUI Demo 280 456
