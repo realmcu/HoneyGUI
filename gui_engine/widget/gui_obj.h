@@ -111,6 +111,7 @@ typedef enum t_obj_type
     U8G2                     = 0x002D,
     MACRO_ONCLICK            = 0x002E,
     MACRO_BACKICON           = 0x002F,
+    CANVAS_IMG               = 0x0030,
 } T_OBJ_TYPE;
 typedef enum
 {
