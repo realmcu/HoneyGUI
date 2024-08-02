@@ -203,6 +203,7 @@ typedef struct gui_dispdev
     int (*flash_seq_trans_disable)(void);
     uint32_t (*get_lcd_us)(void);
     void (*reset_lcd_timer)(void);
+    void (*lcd_section_hook)(struct gui_dispdev *dc);
     void (*lcd_te_wait)(void);
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
