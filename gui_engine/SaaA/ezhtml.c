@@ -718,7 +718,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *file = NULL;
                     char *folder = NULL;
                     int count = 0;
-                    uint32_t ani_duration = 20;
+                    uint32_t duration;
                     float scalex = 1;
                     float scaley = 1;
                     float angle = 0;
@@ -800,6 +800,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             folder = gui_strdup(p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "duration"))
+                        {
+                            duration = atoi(p->attr[++i]);
+                        }
                         i++;
                     }
                     char *ptxt = get_space_string_head(p->txt);
@@ -861,7 +865,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         params->img = (gui_img_t *)parent;
                         params->img_name = ptxt;
 
-                        gui_img_set_animate((gui_img_t *)parent, ani_duration, -1, image_animate_callback, params);
+                        gui_img_set_animate((gui_img_t *)parent, duration, -1, image_animate_callback, params);
                         gui_img_set_mode((gui_img_t *)parent, blendMode);
                         gui_img_set_opacity((gui_img_t *)parent, opacity);
                     }

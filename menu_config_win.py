@@ -140,9 +140,7 @@ class ConfigEditorApp:
                         if primary_option['name'] == option:
                             if primary_option['variable'].get():
                                 should_enable = True
-                                print(should_enable)
                             
-
                     # Check for secondary options
                     for section in self.config_sections:
                         for sec in section['secondary_single']:
@@ -291,14 +289,6 @@ class ConfigEditorApp:
         row_index = 0
 
         for primary_option in self.primary_options:
-            # # Create a radiobutton for each primary option
-            # primary_radio = tk.Radiobutton(
-            #     scrollable_frame, text=primary_option['name'],
-            #     variable=self.primary_group, value=primary_option['name']
-            # )
-            # primary_radio.grid(row=row_index, column=0, sticky='w')
-            # row_index += 1
-
             var = tk.BooleanVar(value=primary_option['value'])
             primary_option['variable'] = var
             self.primary_groups[primary_option['name']] = var
