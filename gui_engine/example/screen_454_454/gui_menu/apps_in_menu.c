@@ -8,10 +8,11 @@
 #include "gui_tabview.h"
 #include "gui_return.h"
 #include "gui_canvas_rect.h"
+#include "gui_multi_level.h"
+#include "gui_button.h"
 #include<stdio.h>
 #include<time.h>
 //Please search app name macro for entry
-
 #define APP_CLOCK
 #define APP_WATCH_FACE
 #define APP_CALCULATOR
@@ -706,10 +707,109 @@ const uint32_t *gui_app_return_array[] =
 };
 static void stop_watch_win_ani_cb(void);
 #define STOPWATCHTEXT "STOPWATCHTEXT"
-/*define the app's ui design*/
-GUI_APP_ENTRY(APP_STOPWATCH)
+
+const static int gap = 50;
+#define COUNT 7
+static char text_array[COUNT][3];
+static gui_text_t *text_widget_array[COUNT];
+const static unsigned char time_array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+// static void stop_watch_win_overwrite(gui_obj_t *win)
+// {
+//     IMPORT_GUI_TOUCHPAD
+//     IMPORT_GUI_WHEEL
+//     static bool wheel_take_over;
+//     static char time_array_offset;
+//     int time_array_size = sizeof(time_array)/sizeof(time_array[0]);
+//     static bool update;
+//     if (!wheel_take_over)
+//     {
+//         if (touch->pressing&& !update)
+//         {
+//             GUI_BASE(win)->y = touch->deltaY;
+//             if (GUI_BASE(win)->y<-gap )
+//             {
+//                 GUI_BASE(win)->y = 0;
+//                 update = 1;
+//                 time_array_offset++;
+//                 if (time_array_offset>time_array_size-COUNT)
+//                 {
+//                     time_array_offset = 0;
+//                 }
+
+//                 for (size_t i = 0; i < COUNT; i++)
+//                 {
+//                     char *text = text_array[i];
+//                     memset(text, 0, sizeof(text_array[i]));
+//                     sprintf(text, "%d", time_array[time_array_offset+i]);
+//                     gui_log("t:%s,%d,%d\n", text,time_array[time_array_offset+i], time_array_offset);
+//                     gui_text_content_set(text_widget_array[i], text, strlen(text));
+//                 }
+
+
+//             }
+//             else if (GUI_BASE(win)->y>gap)
+//             {
+//                 GUI_BASE(win)->y = 0;
+//             }
+
+//         }
+//         if (touch->released)
+//         {
+//             update = 0;
+//         }
+
+
+//     }
+
+
+// }
+static void stop_watch_win_overwrite(gui_obj_t *win)
 {
-    gui_win_t *stop = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H);
+    IMPORT_GUI_TOUCHPAD
+    IMPORT_GUI_WHEEL
+    static bool wheel_take_over;
+    static char time_array_offset;
+    int time_array_size = sizeof(time_array) / sizeof(time_array[0]) - 6;
+    static int history_y;
+    if (!wheel_take_over)
+    {
+        if (touch->pressing)
+        {
+            touch->history_y = history_y + touch->deltaY;
+            /**
+             * Index = offset/gap
+               WidgetOffset = offset%gap
+            */
+            time_array_offset = _UI_ABS(touch->history_y / gap % time_array_size);
+            int widget_offset = touch->history_y % gap;
+            gui_log("%d,%d\n", time_array_offset, widget_offset);
+            GUI_BASE(win)->y = widget_offset;
+            for (size_t i = 0; i < COUNT; i++)
+            {
+                char *text = text_array[i];
+                memset(text, 0, sizeof(text_array[i]));
+                sprintf(text, "%d", time_array[time_array_offset + i]);
+                gui_log("t:%s,%d,%d\n", text, time_array[time_array_offset + i], time_array_offset);
+                gui_text_content_set(text_widget_array[i], text, strlen(text));
+            }
+        }
+        else
+        {
+            history_y = touch->history_y;
+        }
+
+    }
+
+
+}
+static void stop_watch_ml0(gui_obj_t *parent)
+{
+
+}
+static void stop_watch_ml1_0(gui_obj_t *parent)
+{
+
+    gui_win_t *stop = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_set_animate(stop, 1000, -1, stop_watch_win_ani_cb, 0);
     {
         char *text = "07:55";
@@ -717,10 +817,103 @@ GUI_APP_ENTRY(APP_STOPWATCH)
         gui_text_t *t = gui_text_create(stop, STOPWATCHTEXT,  0, 200,
                                         gui_get_screen_width(),
                                         font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_convert_to_img(t, ARGB8888);
+        gui_text_mode_set(t, CENTER);
+
+    }
+}
+
+static void stop_watch_ml1_1(gui_obj_t *parent)
+{
+
+
+    const int width = 100;
+
+    static gui_win_t *win_array[COUNT];
+
+    gui_win_t *win = gui_win_create(parent, 0, 0, 70, width, gap * (COUNT - 1));
+
+    gui_win_set_scope(win, 1);
+    gui_canvas_rect_create((void *)win, 0, 0, 0, width, gap * (COUNT - 1), COLOR_RED);
+    gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, width, gap * (COUNT - 1));
+    gui_win_set_animate(win, 1000, -1, stop_watch_win_overwrite, timer1);
+
+
+    for (size_t i = 0; i < COUNT; i++)
+    {
+        gui_win_t *win = gui_win_create(timer1, 0, 0, gap * i, width, gap);
+        win_array[i] = win;
+        {
+            char *text = text_array[i];
+            memset(text, 0, sizeof(text_array[i]));
+            sprintf(text, "%d", i);
+
+
+            int font_size = 16;
+            gui_text_t *t = gui_text_create(win, text, 0, 0, width,
+                                            font_size);
+            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+            gui_text_mode_set(t, CENTER);
+            text_widget_array[i] = t;
+        }
+
+    }
+
+
+    gui_img_t *img = gui_img_create_from_mem(parent, 0, STOPWATCH_BIN, 0, 0, 0, 0);
+    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+}
+static void win_stop_watch_cb(void *null1, void *null2, void *param)
+{
+    gui_multi_level_t *ml = param;
+    GUI_API(gui_multi_level_t).jump(ml, 1, 0);
+
+}
+static void win_timer_cb(void *null1, void *null2, void *param)
+{
+    gui_multi_level_t *ml = param;
+    GUI_API(gui_multi_level_t).jump(ml, 1, 1);
+
+}
+/*define the app's ui design*/
+GUI_APP_ENTRY(APP_STOPWATCH)
+{
+    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER);
+    gui_multi_level_t *ml0 = gui_multi_level_create(GUI_APP_ROOT_SCREEN, 0, stop_watch_ml0);
+    gui_multi_level_create(ml0, 0, stop_watch_ml1_0);
+    gui_multi_level_create(ml0, 0, stop_watch_ml1_1);
+    GUI_API(gui_multi_level_t).jump(ml0, 1, 0);
+    const int win_height = 100;
+    gui_win_t *win_stop_watch = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_H - win_height,
+                                               SCREEN_W / 2, win_height);
+    gui_win_press(win_stop_watch, win_stop_watch_cb, ml0);
+    {
+        char *text = "Stop watch";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(win_stop_watch, text, 0, 52, gui_get_screen_width() / 2,
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, CENTER);
+
+    }
+    gui_win_t *win_timer = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W / 2 + 1,
+                                          SCREEN_H - win_height, SCREEN_W / 2, win_height);
+    gui_win_press(win_timer, win_timer_cb, ml0);
+    {
+        char *text = "timer";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(win_timer, text, 0, 52, gui_get_screen_width() / 2,
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, CENTER);
 
     }
@@ -855,8 +1048,7 @@ GUI_APP_ENTRY(APP_BOX2D)
  * @brief setting app (multi level)
 */
 /* define of ui_design_0 of (0,0)*/
-#include "gui_multi_level.h"
-#include "gui_button.h"
+
 #define HIGHLIGHT_BLUE gui_rgb(0, 100, 255)
 struct button_args
 {

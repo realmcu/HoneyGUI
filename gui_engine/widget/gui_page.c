@@ -998,11 +998,12 @@ static void prepare_rebound_wheel(gui_obj_t *obj, touch_info_t *tp)
     }
     if (tp->pressed)
     {
-        tp->history_y = obj->y + tp->deltaY;
+        this->speed = 0;
         this->release = 1;
     }
     if (!this->release)
     {
+        tp->history_y = obj->y;
         return;
     }
 

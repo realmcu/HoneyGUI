@@ -373,10 +373,11 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 #define   BLUETOOTHHL_BIN                         (void *)(resource_root + 0x00f9ee78)
 #define   MYDEVICE_BIN                            (void *)(resource_root + 0x00fa13f8)
 #define   MYDEVICEHL_BIN                          (void *)(resource_root + 0x00fa3338)
-#define   VOLUME_BIN                              (void *)(resource_root + 0x00fa52f8)
-#define   VOLUME2_BIN                             (void *)(resource_root + 0x00fa7c38)
-#define   VOLUMEBACK_BIN                          (void *)(resource_root + 0x00fa8278)
-#define   VOLUMEBACK2_BIN                         (void *)(resource_root + 0x00faaab8)
+#define   STOPWATCH_BIN                           (void *)(resource_root + 0x00fa52b8)
+#define   VOLUME_BIN                              (void *)(resource_root + 0x01018278)
+#define   VOLUME2_BIN                             (void *)(resource_root + 0x0101abb8)
+#define   VOLUMEBACK_BIN                          (void *)(resource_root + 0x0101b1f8)
+#define   VOLUMEBACK2_BIN                         (void *)(resource_root + 0x0101da38)
 
 #else
 #define   A1_BIN                                  (void *)(0x04400af8)
@@ -751,9 +752,10 @@ extern unsigned char resource_root[1024 * 1024 * 20];
 #define   BLUETOOTHHL_BIN                         (void *)(0x0539ee78)
 #define   MYDEVICE_BIN                            (void *)(0x053a13f8)
 #define   MYDEVICEHL_BIN                          (void *)(0x053a3338)
-#define   VOLUME_BIN                              (void *)(0x053a52f8)
-#define   VOLUME2_BIN                             (void *)(0x053a7c38)
-#define   VOLUMEBACK_BIN                          (void *)(0x053a8278)
-#define   VOLUMEBACK2_BIN                         (void *)(0x053aaab8)
+#define   STOPWATCH_BIN                           (void *)(0x053a52b8)
+#define   VOLUME_BIN                              (void *)(0x05418278)
+#define   VOLUME2_BIN                             (void *)(0x0541abb8)
+#define   VOLUMEBACK_BIN                          (void *)(0x0541b1f8)
+#define   VOLUMEBACK2_BIN                         (void *)(0x0541da38)
 
 #endif

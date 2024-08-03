@@ -539,6 +539,8 @@ extern char *defaultPath;
 #define GUI_FRAME_STEP 50
 #endif
 #define GUI_TOUCHPAD_IMPORT_AS_TP touch_info_t *tp = tp_get_info();
+#define IMPORT_GUI_TOUCHPAD touch_info_t *touch = tp_get_info();
+#define IMPORT_GUI_WHEEL touch_info_t *wheel = tp_get_info();
 #define GUI_ERROR (gui_error_t)1
 #define GUI_ERROR_NULL (gui_error_t)2
 #define GUI_ERROR_FORMAT (gui_error_t)3
