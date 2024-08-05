@@ -71,7 +71,8 @@
 static uint32_t cur_time_ms;
 /**
  * @brief The number of frames that need to be skipped.
- * If the value is 2, then scrolling text will skip two frames and scroll one frame.
+ * If the value of scroll_skip_frame is 10, the scrolling text
+ * will pause for one frame after every 10 frames of scrolling.
  */
 static uint8_t scroll_text_count = 0;
 static uint8_t scroll_skip_frame = 10;

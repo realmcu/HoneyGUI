@@ -83,35 +83,30 @@ Because the content and font size information of the text widget is needed, it s
 
 Text widget support seven typesetting modes, to set text typesetting mode with: [gui_text_mode_set(this, mode)](#api).
 
-All nine typesetting modes are as follows.
+All typesetting modes are as follows.
 
-|Type|Description|Widget|
-|--|--|--|
-|`LEFT`|Single-line text. Left align. |Text widget. Default.|
-|`CENTER`|Single-line text.Center align.|Text widget.|
-|`RIGHT`|Single-line text. Right align.|Text widget.|
-|`MULTI_LEFT`|Multiline text. Left align.|Text widget.|
-|`MULTI_CENTER`|Multiline text. Center align.|Text widget.|
-|`MULTI_RIGHT`|Multiline text. Right align.|Text widget.|
-|`SCROLL_X`|Horizontal scroll single-line text. Right to left.|Only on scroll text widget.|
-|`SCROLL_Y`|Vertical scroll multiline text. Bottom-up.|Only on scroll text widget.|
-|`VERTICAL_LEFT`|Vertical multiline text. To left.|Text widget.|
-|`VERTICAL_RIGHT`|Vertical multiline text. To right.|Text widget.|
+| Type               | Line Type     | X Direction      | Y Direction      | Widget                    |
+|--------------------|---------------|------------------|------------------|---------------------------|
+| `LEFT`             | Single-line   | Left             | Top              | Text widget. Default.     |
+| `CENTER`           | Single-line   | Center           | Top              | Text widget.              |
+| `RIGHT`            | Single-line   | Right            | Top              | Text widget.              |
+| `MULTI_LEFT`       | Multi-line    | Left             | Top              | Text widget.              |
+| `MULTI_CENTER`     | Multi-line    | Center           | Top              | Text widget.              |
+| `MULTI_RIGHT`      | Multi-line    | Right            | Top              | Text widget.              |
+| `MID_LEFT`         | Multi-line    | Left             | Mid              | Text widget.              |
+| `MID_CENTER`       | Multi-line    | Center           | Mid              | Text widget.              |
+| `MID_RIGHT`        | Multi-line    | Right            | Mid              | Text widget.              |
+| `SCROLL_X`         | Single-line   | Right to Left    | Top              | Scroll text widget.       |
+| `SCROLL_Y`         | Multi-line    | Left             | Bottom to Top    | Scroll text widget.       |
+| `SCROLL_Y_REVERSE` | Multi-line    | Right            | Top to Bottom    | Scroll text widget.       |
+| `VERTICAL_LEFT`    | Multi-line    | Left             | Top to Bottom    | Text widget.              |
+| `VERTICAL_RIGHT`   | Multi-line    | Right            | Bottom to Top    | Text widget.              |
 
-```C
-typedef enum
-{
-    LEFT = 0,
-    CENTER,
-    RIGHT,
-    MULTI_LEFT,
-    MULTI_CENTER,
-    MULTI_RIGHT,
-    SCROLL_X,
-    SCROLL_Y,
-    VERTICAL_LEFT,
-    VERTICAL_RIGHT,
-} TEXT_MODE;
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/gui_text.h
+   :language: c
+   :start-after: /** @brief  text mode enum start */
+   :end-before: /** @brief  text mode enum end */
 ```
 
 ### Text move

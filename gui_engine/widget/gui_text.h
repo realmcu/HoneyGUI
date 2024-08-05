@@ -45,21 +45,29 @@ extern "C" {
   * @{
   */
 
-/** @brief  text mode enum */
+/** @brief  text mode enum start */
 typedef enum
 {
-    LEFT = 0,
-    CENTER,
-    RIGHT,
-    MULTI_LEFT,
-    MULTI_CENTER,
-    MULTI_RIGHT,
-    SCROLL_X,
-    SCROLL_Y,
-    SCROLL_Y_REVERSE,
-    VERTICAL_LEFT,
-    VERTICAL_RIGHT,
+    /* TOP */
+    LEFT               = 0x00,
+    CENTER             = 0x01,
+    RIGHT              = 0x02,
+    MULTI_LEFT         = 0x03,
+    MULTI_CENTER       = 0x04,
+    MULTI_RIGHT        = 0x05,
+    /* MID */
+    MID_LEFT           = 0x10,
+    MID_CENTER         = 0x11,
+    MID_RIGHT          = 0x12,
+    /* SCROLL */
+    SCROLL_X           = 0x30,
+    SCROLL_Y           = 0x31,
+    SCROLL_Y_REVERSE   = 0x32,
+    /* VERTICAL */
+    VERTICAL_LEFT      = 0x40,
+    VERTICAL_RIGHT     = 0x41,
 } TEXT_MODE;
+/** @brief  text mode enum end */
 
 /** @brief  text encoding format enum */
 typedef enum
@@ -77,7 +85,7 @@ typedef enum
     GUI_FONT_SRC_TTF = 1,
     GUI_FONT_SRC_IMG = 2,
     GUI_FONT_SRC_MAT = 3,
-    GUI_FONT_SRC_FT = 4,
+    GUI_FONT_SRC_FT  = 4,
 } FONT_SRC_TYPE;
 
 typedef enum
