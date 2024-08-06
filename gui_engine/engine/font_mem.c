@@ -353,6 +353,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
     int rect_w = rect->x2 - rect->x1 + 1;
+    int rect_h = rect->y2 - rect->y1 + 1;
     switch (text->mode)
     {
     case LEFT:
@@ -415,8 +416,8 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             line_buf[line].line_char = text->font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
-                                                                                          1].char_w) / 2 * (text->mode - MULTI_LEFT);
+            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1
+                                      - chr[text->font_len - 1].char_w) / 2 * (text->mode - MULTI_LEFT);
             line = 0;
             for (uint16_t i = 0; i < text->font_len; i++)
             {
@@ -428,7 +429,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             text->char_line_sum = line;
-            text->char_height_sum = line * text->font_height;
+            text->char_height_sum = line * chr[0].h;
             gui_free(line_buf);
             break;
         }
@@ -467,10 +468,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             line_buf[line].line_char = text->font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
-                                                                                          1].char_w) / 2 * (text->mode - MID_LEFT);
-            text->char_height_sum = (line + 1) * text->font_height;
-            offset_y = rect->y1 + ((rect->y2 - rect->y1 + 1) - text->char_height_sum) / 2;
+            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1
+                                      - chr[text->font_len - 1].char_w) / 2 * (text->mode - MID_LEFT);
+            text->char_height_sum = (line + 1) * chr[0].h;
+            offset_y = (rect_h - text->char_height_sum) / 2;
             line = 0;
             for (uint16_t i = 0; i < text->font_len; i++)
             {
