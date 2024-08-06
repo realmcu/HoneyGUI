@@ -10,6 +10,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_multi_level.h"
 #include "gui_button.h"
+#include "gui_image_array.h"
 #include<stdio.h>
 #include<time.h>
 //Please search app name macro for entry
@@ -711,65 +712,152 @@ static void stop_watch_win_ani_cb(void);
 const static int gap = 50;
 #define COUNT 7
 static char text_array[COUNT][3];
-static gui_text_t *text_widget_array[COUNT];
+static gui_obj_t *text_widget_array[COUNT];
 const static unsigned char time_array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-// static void stop_watch_win_overwrite(gui_obj_t *win)
-// {
-//     IMPORT_GUI_TOUCHPAD
-//     IMPORT_GUI_WHEEL
-//     static bool wheel_take_over;
-//     static char time_array_offset;
-//     int time_array_size = sizeof(time_array)/sizeof(time_array[0]);
-//     static bool update;
-//     if (!wheel_take_over)
-//     {
-//         if (touch->pressing&& !update)
-//         {
-//             GUI_BASE(win)->y = touch->deltaY;
-//             if (GUI_BASE(win)->y<-gap )
-//             {
-//                 GUI_BASE(win)->y = 0;
-//                 update = 1;
-//                 time_array_offset++;
-//                 if (time_array_offset>time_array_size-COUNT)
-//                 {
-//                     time_array_offset = 0;
-//                 }
+struct gui_text_image_map
+{
+    const char *text;
+    void *image_data;
+};
+const static struct gui_text_image_map app_text_image_map[] =
+{
+    {"0", TEXT0_BIN},
+    {"1", TEXT1_BIN},
+    {"2", TEXT2_BIN},
+    {"3", TEXT3_BIN},
+    {"4", TEXT4_BIN},
+    {"5", TEXT5_BIN},
+    {"6", TEXT6_BIN},
+    {"7", TEXT7_BIN},
+    {"8", TEXT8_BIN},
+    {"9", TEXT9_BIN},
+    {"PM", TEXTPM_BIN},
+    {"AM", TEXTAM_BIN},
+    {".", TEXTDIAN_BIN},
+    {":", TEXTMAOHAO_BIN},
+    {"/", TEXTXIEGANG_BIN},
+};
+// Function to retrieve image data based on text input
+void *get_image_data(const char *text)
+{
+    for (size_t i = 0; i < sizeof(app_text_image_map) / sizeof(app_text_image_map[0]); ++i)
+    {
+        if (strcmp(app_text_image_map[i].text, text) == 0)
+        {
+            return app_text_image_map[i].image_data;
+        }
+    }
+    return NULL; // Return NULL if no match is found
+}
 
-//                 for (size_t i = 0; i < COUNT; i++)
-//                 {
-//                     char *text = text_array[i];
-//                     memset(text, 0, sizeof(text_array[i]));
-//                     sprintf(text, "%d", time_array[time_array_offset+i]);
-//                     gui_log("t:%s,%d,%d\n", text,time_array[time_array_offset+i], time_array_offset);
-//                     gui_text_content_set(text_widget_array[i], text, strlen(text));
-//                 }
+// Function to process the input string and return image pointers
+void **get_image_pointers(const char *input, size_t *num_pointers)
+{
+    size_t capacity = 16; // Start with a reasonable initial capacity
+    /*Why Start with a Capacity of 16?
+    Balance Between Space and Performance:
+    Memory Efficiency: Starting with some preallocated space avoids constant reallocations and copying when adding elements to the array. A small initial allocation (like 16) means you don't waste much memory upfront.
+    Performance: Frequent reallocations can be costly, both in terms of time (because data has to be copied to a new location) and CPU usage. Starting with a moderate size helps balance these factors.*/
+
+    *num_pointers = 0;
+    void **image_pointers = gui_malloc(capacity * sizeof(void *));
+    if (image_pointers == NULL)
+    {
+        gui_log("Failed to allocate memory");
+    }
+
+    const char *ptr = input;
+    while (*ptr != '\0')
+    {
+        const char *next = ptr + 1;
+
+        // Handle multi-character tokens (e.g., "AM" and "PM")
+        if (strncmp(ptr, "PM", 2) == 0 || strncmp(ptr, "AM", 2) == 0)
+        {
+            char token[3] = {ptr[0], ptr[1], '\0'};
+            void *img = get_image_data(token);
+            if (img != NULL)
+            {
+                if (*num_pointers == capacity)
+                {
+                    capacity *= 2;
+                    image_pointers = gui_realloc(image_pointers, capacity * sizeof(void *));
+                    if (image_pointers == NULL)
+                    {
+                        gui_log("Failed to reallocate memory");
+                    }
+                }
+                image_pointers[(*num_pointers)++] = img;
+            }
+            next = ptr + 2; // Skip the next character as it's part of "AM" or "PM"
+        }
+        else
+        {
+            char token[2] = {ptr[0], '\0'};
+            void *img = get_image_data(token);
+            if (img != NULL)
+            {
+                if (*num_pointers == capacity)
+                {
+                    capacity *= 2;
+                    image_pointers = gui_realloc(image_pointers, capacity * sizeof(void *));
+                    if (image_pointers == NULL)
+                    {
+                        gui_log("Failed to reallocate memory");
+                    }
+                }
+                image_pointers[(*num_pointers)++] = img;
+            }
+        }
+
+        ptr = next;
+    }
+
+    return image_pointers;
+}
 
 
-//             }
-//             else if (GUI_BASE(win)->y>gap)
-//             {
-//                 GUI_BASE(win)->y = 0;
-//             }
+#define NUMBER_TEXT 0
+#define NUMBER_IMAGE 1
+#define NUMBER_RENDER NUMBER_IMAGE
+static void render_number(const char *text, gui_obj_t *obj)
+{
+    switch (NUMBER_RENDER)
+    {
+    case NUMBER_TEXT:
+        {
+            gui_text_content_set((void *)obj, (void *)text, strlen(text));
+        }
+        break;
+    case NUMBER_IMAGE:
+        {
+            const char *input = text;
+            size_t num_pointers;
+            void **image_pointers = get_image_pointers(input, &num_pointers);
 
-//         }
-//         if (touch->released)
-//         {
-//             update = 0;
-//         }
+            // Print results
+            gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
+            for (size_t i = 0; i < num_pointers; ++i)
+            {
+                gui_log("Image pointer %zu: %p\n", i + 1, image_pointers[i]);
+            }
+            gui_image_array_write((void *)obj, image_pointers, num_pointers);
+            // Free allocated memory
+            gui_free(image_pointers);
 
-
-//     }
-
-
-// }
+        }
+        break;
+    default:
+        break;
+    }
+}
 static void stop_watch_win_overwrite(gui_obj_t *win)
 {
     IMPORT_GUI_TOUCHPAD
     IMPORT_GUI_WHEEL
     static bool wheel_take_over;
     static char time_array_offset;
-    int time_array_size = sizeof(time_array) / sizeof(time_array[0]) - 6;
+    int time_array_size = sizeof(time_array) / sizeof(time_array[0]);
     static int history_y;
     if (!wheel_take_over)
     {
@@ -777,20 +865,27 @@ static void stop_watch_win_overwrite(gui_obj_t *win)
         {
             touch->history_y = history_y + touch->deltaY;
             /**
-             * Index = offset/gap
-               WidgetOffset = offset%gap
+             * Index = offset / gap % array length
+               WidgetOffset = offset % gap
             */
-            time_array_offset = _UI_ABS(touch->history_y / gap % time_array_size);
+            time_array_offset = -(touch->history_y / gap % time_array_size);
             int widget_offset = touch->history_y % gap;
-            gui_log("%d,%d\n", time_array_offset, widget_offset);
             GUI_BASE(win)->y = widget_offset;
             for (size_t i = 0; i < COUNT; i++)
             {
                 char *text = text_array[i];
                 memset(text, 0, sizeof(text_array[i]));
-                sprintf(text, "%d", time_array[time_array_offset + i]);
-                gui_log("t:%s,%d,%d\n", text, time_array[time_array_offset + i], time_array_offset);
-                gui_text_content_set(text_widget_array[i], text, strlen(text));
+                int index = time_array_offset + i;
+                if (index >= time_array_size)
+                {
+                    index -= time_array_size;
+                }
+                if (index < 0)
+                {
+                    index += time_array_size;
+                }
+                sprintf(text, "%d", time_array[index]);
+                render_number(text, (void *)text_widget_array[i]);
             }
         }
         else
@@ -850,16 +945,44 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
             char *text = text_array[i];
             memset(text, 0, sizeof(text_array[i]));
             sprintf(text, "%d", i);
+            switch (NUMBER_RENDER)
+            {
+            case NUMBER_TEXT:
+                {
+                    int font_size = 16;
+                    gui_text_t *t = gui_text_create(win, text, 0, 0, width,
+                                                    font_size);
+                    gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+                    void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+                    gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+                    gui_text_mode_set(t, CENTER);
+                    text_widget_array[i] = GUI_BASE(t);
+                }
+                break;
+            case NUMBER_IMAGE:
+                {
+                    const char *input = text;
+                    size_t num_pointers;
+                    void **image_pointers = get_image_pointers(input, &num_pointers);
+
+                    // Print results
+                    gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
+                    for (size_t i = 0; i < num_pointers; ++i)
+                    {
+                        gui_log("Image pointer %zu: %p\n", i + 1, image_pointers[i]);
+                    }
+                    text_widget_array[i] = GUI_BASE(gui_image_array_create(win, 0, 0, image_pointers, num_pointers,
+                                                                           "num"));
+                    // Free allocated memory
+                    gui_free(image_pointers);
+
+                }
+                break;
+            default:
+                break;
+            }
 
 
-            int font_size = 16;
-            gui_text_t *t = gui_text_create(win, text, 0, 0, width,
-                                            font_size);
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-            gui_text_mode_set(t, CENTER);
-            text_widget_array[i] = t;
         }
 
     }
