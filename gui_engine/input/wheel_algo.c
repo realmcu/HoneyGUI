@@ -16,59 +16,95 @@
 #include <wheel_algo.h>
 
 
-//#define RTK_WHEEL_DEBUG
-
-#ifdef RTK_WHEEL_DEBUG
-
-#define WHEEL_LOG(format, ...) gui_log(format, ##__VA_ARGS__)
-
-#else
-
-#define WHEEL_LOG(format, ...)
-
-#endif
 
 
-static wheel_info_t wheel =
-{
-    .delta = 0,
-    .type = WHEEL_INIT,
-};
-static uint32_t reset_ms = 0;
 
 
-static bool wheel_judge_ing(gui_wheel_port_data_t *wheel_raw)
-{
-    if (wheel_raw->delta != 0)
-    {
-        return true;
-    }
-    return false;
-}
 
-wheel_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
+#define STEP 40
+#define RELEASE_THRESHOLD_MS 300
+static touch_info_t wheel = {.type = TOUCH_INVALIDE, .x = 454 / 2, .y = 454 / 2};
+touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw)
 {
     GUI_ASSERT(wheel_raw != NULL);
 
-    if (wheel_judge_ing(wheel_raw) == true)
+
+    static uint32_t timestamp;
+    wheel.button_down = 0;
+    wheel.button_up = 0;
+    wheel.released = 0;
+    wheel.pressed = 0;
+
+    if (wheel.type == TOUCH_DOWN_SLIDE || wheel.type == TOUCH_UP_SLIDE)
     {
-        wheel.type = WHEEL_ING;
-        wheel.delta += wheel_raw->delta;
-        wheel_raw->delta = 0;
-        //do reset
-        reset_ms = wheel_raw->timestamp_ms;
+        wheel.type = TOUCH_INVALIDE;
     }
 
-    if (((wheel_raw->timestamp_ms - reset_ms) > 300) && (wheel.type == WHEEL_ING))
+    switch (wheel_raw->event)
     {
-        wheel.type = WHEEL_FINISHED;
-        WHEEL_LOG("Wheel finished wheel.delta = %d!! \n", wheel.delta);
+    case GUI_WHEEL_NO_EVENT:
+        if (gui_ms_get() - timestamp > RELEASE_THRESHOLD_MS / 2)
+        {
+            if (wheel.pressing)
+            {
+                wheel.released = 1;
+                wheel.pressing = 0;
+
+                if (wheel.deltaY > 0)
+                {
+                    wheel.type = TOUCH_DOWN_SLIDE;
+                }
+                else
+                {
+                    wheel.type = TOUCH_UP_SLIDE;
+                }
+
+                wheel.deltaY = 0;
+            }
+
+        }
+
+        break;
+    case GUI_WHEEL_BUTTON_DOWN:
+        {
+            wheel.button_down = 1;
+            wheel.button_hold = 1;
+        }
+        break;
+    case GUI_WHEEL_BUTTON_UP:
+        {
+            wheel.button_down = 0;
+            wheel.button_hold = 0;
+            wheel.button_up  = 1;
+        }
+        break;
+    case GUI_WHEEL_SCROLL:
+        {
+
+            if (wheel.type == TOUCH_INVALIDE)
+            {
+                wheel.pressed = 1;
+                wheel.pressing = 1;
+            }
+            if (wheel.pressing)
+            {
+                wheel.deltaY = wheel.deltaY + wheel_raw->delta * STEP;
+                wheel.type = TOUCH_HOLD_Y;
+            }
+
+
+            wheel.history_y = wheel.history_y + wheel_raw->delta * STEP;
+            timestamp = wheel_raw->timestamp_ms;
+        }
+        break;
+    default:
+        break;
     }
+    wheel_raw->event = GUI_WHEEL_NO_EVENT;
     return &wheel;
 }
 
-wheel_info_t *wheel_get_info(void)
+touch_info_t *wheel_get_info(void)
 {
     return &wheel;
 }
-

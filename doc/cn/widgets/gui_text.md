@@ -83,35 +83,30 @@ Because the content and font size information of the text widget is needed, it s
 
 Text widget support seven typesetting modes, to set text typesetting mode with: [gui_text_mode_set(this, mode)](#api).
 
-All nine typesetting modes are as follows.
+All typesetting modes are as follows.
 
-|Type|Description|Widget|
-|--|--|--|
-|`LEFT`|Single-line text. Left align. |Text widget. Default.|
-|`CENTER`|Single-line text.Center align.|Text widget.|
-|`RIGHT`|Single-line text. Right align.|Text widget.|
-|`MULTI_LEFT`|Multiline text. Left align.|Text widget.|
-|`MULTI_CENTER`|Multiline text. Center align.|Text widget.|
-|`MULTI_RIGHT`|Multiline text. Right align.|Text widget.|
-|`SCROLL_X`|Horizontal scroll single-line text. Right to left.|Only on scroll text widget.|
-|`SCROLL_Y`|Vertical scroll multiline text. Bottom-up.|Only on scroll text widget.|
-|`VERTICAL_LEFT`|Vertical multiline text. To left.|Text widget.|
-|`VERTICAL_RIGHT`|Vertical multiline text. To right.|Text widget.|
+| 类型                | 行类型         | X 方向             | Y 方向             | 控件                     |
+|---------------------|----------------|-------------------|--------------------|-------------------------|
+| `LEFT`              | 单行           | 左对齐             | 顶部               | 文本控件。默认。         |
+| `CENTER`            | 单行           | 居中               | 顶部               | 文本控件。               |
+| `RIGHT`             | 单行           | 右对齐             | 顶部               | 文本控件。               |
+| `MULTI_LEFT`        | 多行           | 左对齐             | 顶部               | 文本控件。               |
+| `MULTI_CENTER`      | 多行           | 居中               | 顶部               | 文本控件。               |
+| `MULTI_RIGHT`       | 多行           | 右对齐             | 顶部               | 文本控件。               |
+| `MID_LEFT`          | 多行           | 左对齐             | 中部               | 文本控件。               |
+| `MID_CENTER`        | 多行           | 居中               | 中部               | 文本控件。               |
+| `MID_RIGHT`         | 多行           | 右对齐             | 中部               | 文本控件。               |
+| `SCROLL_X`          | 单行           | 由右向左滚动       | 顶部               | 滚动文本控件。           |
+| `SCROLL_Y`          | 多行           | 左对齐             | 由下向上滚动       | 滚动文本控件。           |
+| `SCROLL_Y_REVERSE`  | 多行           | 右对齐             | 由上向下滚动       | 滚动文本控件。           |
+| `VERTICAL_LEFT`     | 多行           | 左对齐             | 由上向下           | 文本控件。               |
+| `VERTICAL_RIGHT`    | 多行           | 右对齐             | 由下向上           | 文本控件。               |
 
-```C
-typedef enum
-{
-    LEFT = 0,
-    CENTER,
-    RIGHT,
-    MULTI_LEFT,
-    MULTI_CENTER,
-    MULTI_RIGHT,
-    SCROLL_X,
-    SCROLL_Y,
-    VERTICAL_LEFT,
-    VERTICAL_RIGHT,
-} TEXT_MODE;
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/gui_text.h
+   :language: c
+   :start-after: /** @brief  text mode enum start */
+   :end-before: /** @brief  text mode enum end */
 ```
 
 ### Text move

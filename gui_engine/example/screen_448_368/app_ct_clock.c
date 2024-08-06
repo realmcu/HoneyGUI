@@ -1,3 +1,4 @@
+/* watchface_watch_gradient_spot demo start*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_img.h"
 #include "gui_win.h"
@@ -15,6 +16,7 @@ gui_watch_gradient_spot_t *watch;
 gui_text_t *rate;
 static gui_watchface_gradient_t *canvas;
 gui_tabview_t *tablist_tab;
+/* watchface_watch_gradient_spot demo end*/
 
 // static void canvas_cb(gui_canvas_t *canvas)
 // {
@@ -60,6 +62,7 @@ static void callback_time()
 
 }
 
+/* callback_touch_long start*/
 static void callback_touch_long(void *obj, gui_event_t e)
 {
     gui_log("win widget long touch enter cb\n");
@@ -104,6 +107,7 @@ static void callback_touch_long(void *obj, gui_event_t e)
     tablist_watchface(tb_watchface);
 
 }
+/* callback_touch_long end*/
 
 static void callback_watchface()
 {
@@ -132,7 +136,7 @@ static void callback_watchface()
 }
 
 
-
+/* page_ct_clock start*/
 void page_ct_clock(void *parent)
 {
     win_watch = gui_win_create(parent, "win", 0, 0, 368, 448);
@@ -149,4 +153,4 @@ void page_ct_clock(void *parent)
     GET_BASE(canvas)->not_show = true;
 
 }
-
+/* page_ct_clock end*/

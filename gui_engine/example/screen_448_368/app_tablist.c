@@ -12,6 +12,8 @@ void tablist_clock(void *parent)
     gui_img_t *rect = gui_img_create_from_mem(parent, "rect", RECT_221_269_BIN, 0, 0, 0, 0);
     gui_img_set_mode(rect, IMG_SRC_OVER_MODE);
 }
+
+/* watch_gradient_spot start*/
 void tablist_watch(void *parent)
 {
     gui_watch_gradient_spot_t *watch = gui_watch_gradient_spot_create(parent, "watchface", 0, 0, 221,
@@ -20,6 +22,9 @@ void tablist_watch(void *parent)
     gui_img_t *rect = gui_img_create_from_mem(parent, "rect", RECT_221_269_BIN, 0, 0, 0, 0);
     gui_img_set_mode(rect, IMG_SRC_OVER_MODE);
 }
+/* watch_gradient_spot end*/
+
+/* watchface start*/
 void tablist_watchface(void *parent)
 {
     gui_watchface_gradient_t *canvas = gui_watchface_gradient_create(parent, "watchface_gradient",
@@ -28,6 +33,8 @@ void tablist_watchface(void *parent)
     gui_img_t *rect = gui_img_create_from_mem(parent, "rect", RECT_221_269_BIN, 0, 0, 0, 0);
     gui_img_set_mode(rect, IMG_SRC_OVER_MODE);
 }
+/* watchface end*/
+
 void tablist_blood(void *parent)
 {
     gui_img_t *tablist_img = gui_img_create_from_mem(parent, "page3", WEATHER_BIN, 0, 0,

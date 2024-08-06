@@ -1,26 +1,25 @@
-# Grid
+# 网格
 
-The Grid Widget allows you to display widget set in a grid view.
+网格组件可以在网格视图中显示组件集。
 
-## Usage
+## 用法
 
-### Create grid widget
-You can use [gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#api) to create a grid widget, Populate the grid with controls in the order they were created
+### 创建网格组件
+你可以通过这个 API [gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#api) 创建网格组件, 按照创建的顺序用控件填充网格。
 
-### Set grid style
-There are two style in grid widget [gui_grid_style(grid, style)](#api)
+### 设置网格样式
+你可以通过这个 API [gui_grid_style(grid, style)](#api) 进行设置，总共有以下两种样式。
 
+```eval_rst
+.. literalinclude:: ../../../gui_engine/widget/gui_grid.h
+   :language: c
+   :start-after: /* T_GUI_GRID_STYLE enum start*/
+   :end-before: /* T_GUI_GRID_STYLE enum end*/
 ```
-typedef enum
-{
-    GRID_CLASSIC,         //!< Evenly layout vertically and horizontally
-    GRID_SCALE,           //!< scale by slide
-} T_GUI_GRID_STYLE;
-```
 
-## Example
+## 示例
 
-### classic style
+### 经典样式
 
 
 ```cpp

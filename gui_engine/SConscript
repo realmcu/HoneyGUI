@@ -8,7 +8,7 @@ list = os.listdir(cwd)
 src = Split("""""")
 CPPPATH = [cwd]
 
-CPPDEFINES = ['ENABLE_RTK_GUI']
+CPPDEFINES = ['ENABLE_HONEYGUI']
 
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_OS_HEAP'):
     CPPDEFINES += ['ENABLE_RTK_GUI_OS_HEAP']

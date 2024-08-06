@@ -15,8 +15,8 @@
 #include "guidef.h"
 
 
-wheel_info_t *wheel_get_info(void);
-wheel_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw);
+touch_info_t *wheel_get_info(void);
+touch_info_t *wheel_algo_process(gui_wheel_port_data_t *wheel_raw);
 
 
 #endif

@@ -16,7 +16,7 @@ The GUI framework diagram is shown in the figure below:
 .. toctree::
     :maxdepth: 2
 
-    Use C/C++ Design An Application <Native/Native>
+    C-APP <Native/Native>
     Use LVGL Design An Application <LVGL/fwk_app_lvgl>
     Use Script Design An Application <SaaA/index>
     Application switching <Switch_APP/index>

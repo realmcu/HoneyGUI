@@ -26,7 +26,7 @@ def HoneyGUI_CMD_preBuild():
     with open(os.path.join(HONEYGUI_ROOT, menu_config_path), mode='r', newline='', errors='surrogateescape') as fd:
         stream = fd.read()
     stream = re.sub(r'(#define CONFIG_REALTEK_BUILD_GUI_454_454_DEMO)', lambda objs: "//" + objs.group(1), stream, count=1, flags=re.M)
-    stream = re.sub(r'//\s*(#define CONFIG_REALTEK_BUILD_AUTO_TEST)', lambda objs: objs.group(1), stream, count=1, flags=re.M)
+    stream = re.sub(r'//\s*(#define CONFIG_REALTEK_BUILD_HONEYGUI_AUTO_TEST)', lambda objs: objs.group(1), stream, count=1, flags=re.M)
     with open(os.path.join(HONEYGUI_ROOT, menu_config_path), mode='w+', newline='', errors='surrogateescape') as fd:
         fd.write(stream)
     print(f"git diff {menu_config_path}")

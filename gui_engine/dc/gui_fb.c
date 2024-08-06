@@ -327,7 +327,14 @@ static void gui_fb_draw(gui_obj_t *root)
             }
             if (dc->frame_buf)
             {
-                memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
+                if (dc->lcd_section_hook)
+                {
+                    dc->lcd_section_hook(dc);
+                }
+                else
+                {
+                    memset(dc->frame_buf, 0x0, dc->fb_height * dc->fb_width * (dc->bit_depth >> 3));
+                }
             }
             dc->section_count = i;
 

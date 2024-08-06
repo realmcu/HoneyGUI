@@ -1,3 +1,4 @@
+/* perspective example start*/
 #include "root_image_hongkong/ui_resource.h"
 #include "gui_perspective.h"
 #include "gui_canvas.h"
@@ -67,3 +68,4 @@ void callback_prism(void *obj, gui_event_t e)
     gui_obj_add_event_cb(win, (gui_event_cb_t)callback_prism_touch_clicked, GUI_EVENT_TOUCH_CLICKED,
                          NULL);
 }
+/* perspective example end*/

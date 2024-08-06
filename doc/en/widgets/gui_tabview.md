@@ -19,19 +19,18 @@ If developers need to construct a container to house tabs, they may utilize the 
 ### Set tabview style
 Developers can use [gui_tabview_set_style(this, style)](#gui_tabview_create) to set the desired style of tabview. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
 
-```c
-typedef enum t_slide_style
-{
-    CLASSIC,
-    REDUCTION,
-    FADE,
-    REDUCTION_FADE,
-    STACKING,
-} T_SLIDE_STYLE;
+```eval_rst
+
+.. literalinclude:: ../../../gui_engine/widget/gui_tabview.h
+   :language: c
+   :start-after: /* T_SLIDE_STYLE enum start*/
+   :end-before: /* T_SLIDE_STYLE enum end*/
+
 ```
 
 ### Set tabview loop
-The tabview loop function is a nifty feature that allows you to effortlessly traverse through all tabs that have been created. By enabling this function using [gui_tabview_loop(tabview, loop_or_not)](#gui_tabview_create), as indicated in Figure-2, you'll notice a blue outer box indicating the visible range of the screen. The arrow's direction signifies the direction of tab switching. When sliding left, once all tabs have shifted to the left side of the visible range, another leftward swipe will initiate cycling from the leftmost tab that was created. Conversely, Figure-3 demonstrates that when sliding right again, the display will begin cycling from the rightmost tab.
+
+The Tabview loop function is a clever feature that allows users to easily navigate through all the tabs that have been created. By enabling the reverse loop display function using [gui_tabview_loop_x(tabview, loop)](#gui_tabview_create) for the x-axis and [gui_tabview_loop_y(tabview, loop)](#gui_tabview_create) for the y-axis, as shown in Figure-2, you will see a blue outer box indicating the visible area of the screen for the tab control. The direction of the arrow represents the direction of tab switching. When swiping left, once all tabs have moved to the left side of the visible area, another left swipe will cycle back to the leftmost tab that was created. Conversely, as shown in Figure-3, when swiping right again, the display will cycle from the rightmost tab.
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118586546869079/2d4816ec_10641540.png" /></center>

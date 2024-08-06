@@ -250,6 +250,7 @@ static void gui_switch_input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_switch_t *this = (gui_switch_t *)obj;
     GUI_UNUSED(tp);
+    GUI_UNUSED(this);
 
     if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false)
     {

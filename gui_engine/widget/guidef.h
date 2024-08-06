@@ -74,10 +74,15 @@ typedef struct touch_info
     int16_t deltaY;
     int16_t x;
     int16_t y;
+    int16_t history_x;
+    int16_t history_y;
     uint32_t type;
     uint8_t pressed  : 1;
     uint8_t released : 1;
     uint8_t pressing : 1;
+    uint8_t button_down  : 1;
+    uint8_t button_up  : 1;
+    uint8_t button_hold  : 1;
 } touch_info_t;
 
 
@@ -153,11 +158,14 @@ typedef struct gui_kb_port_data
     uint32_t timestamp_ms_release;          /* The timestamp when when release, update once*/
     uint32_t timestamp_ms_pressing;         /* The timestamp when pressing, update periodically*/
 } gui_kb_port_data_t;
-
+#define GUI_WHEEL_NO_EVENT 0
+#define GUI_WHEEL_BUTTON_DOWN 1
+#define GUI_WHEEL_BUTTON_UP 2
+#define GUI_WHEEL_SCROLL 3
 typedef struct gui_wheel_port_data
 {
-    uint8_t  event;
-    int16_t  delta;
+    uint8_t  event;//0:no event//1:button down//2:button up//3:scroll
+    int16_t  delta;//positive away from the user and negative toward the user
     uint32_t timestamp_ms;             /* The timestamp when the data was received */
 } gui_wheel_port_data_t;
 typedef struct gui_dispdev
@@ -195,10 +203,12 @@ typedef struct gui_dispdev
     int (*flash_seq_trans_disable)(void);
     uint32_t (*get_lcd_us)(void);
     void (*reset_lcd_timer)(void);
+    void (*lcd_section_hook)(struct gui_dispdev *dc);
     void (*lcd_te_wait)(void);
     void (*lcd_power_on)(void);
     void (*lcd_power_off)(void);
     void (*lcd_draw_sync)(void);
+    uint8_t *lcd_gram;
     uint32_t frame_count;
     gui_frame_monitor_t (*lcd_frame_monitor);
 } gui_dispdev_t;
@@ -330,7 +340,7 @@ typedef struct draw_circle
 } draw_circle_t;
 
 
-
+/* T_GUI_INPUT_TYPE enum start*/
 typedef enum
 {
     TOUCH_INIT                  = 0x100,
@@ -360,7 +370,7 @@ typedef enum
     WHEEL_FINISHED              = 0x302,
     WHEEL_INVALIDE              = 0x303,
 } T_GUI_INPUT_TYPE;
-
+/* T_GUI_INPUT_TYPE enum end*/
 
 
 
@@ -529,6 +539,8 @@ extern char *defaultPath;
 #define GUI_FRAME_STEP 50
 #endif
 #define GUI_TOUCHPAD_IMPORT_AS_TP touch_info_t *tp = tp_get_info();
+#define IMPORT_GUI_TOUCHPAD touch_info_t *touch = tp_get_info();
+#define IMPORT_GUI_WHEEL touch_info_t *wheel = tp_get_info();
 #define GUI_ERROR (gui_error_t)1
 #define GUI_ERROR_NULL (gui_error_t)2
 #define GUI_ERROR_FORMAT (gui_error_t)3

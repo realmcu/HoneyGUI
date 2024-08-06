@@ -66,6 +66,7 @@ typedef struct
     float right;
 } gui_curtain_float_t;
 
+/* T_GUI_CURTAIN_ENUM start*/
 typedef enum
 {
     CURTAIN_UNDEFINED,
@@ -75,6 +76,7 @@ typedef enum
     CURTAIN_RIGHT,
     CURTAIN_MIDDLE,
 } T_GUI_CURTAIN_ENUM;
+/* T_GUI_CURTAIN_ENUM end*/
 
 /** @brief  curtainview structure */
 typedef struct gui_curtainview

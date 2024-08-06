@@ -76,9 +76,12 @@
 
     GPU
         图形处理器 (Graphics Processing Unit)
-        
+
     GUI
         图形用户界面 (Graphical User Interface)
+
+    GPIO
+        通用输入输出口 (General Purpose Input Output)
 
     hw
         硬件 (Hardware)

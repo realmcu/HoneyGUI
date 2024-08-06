@@ -19,22 +19,20 @@ For an introduction to idx and idy, please refer to:
 ### Set tab style
 If you wish to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_create) setting. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
 
-```c
-typedef enum t_slide_style
-{
-    CLASSIC,
-    REDUCTION,
-    FADE,
-    REDUCTION_FADE,
-    STACKING,
-} T_SLIDE_STYLE;
+```eval_rst
+
+.. literalinclude:: ../../../gui_engine/widget/gui_tabview.h
+   :language: c
+   :start-after: /* T_SLIDE_STYLE enum start*/
+   :end-before: /* T_SLIDE_STYLE enum end*/
+
 ```
 
 ## Example
 
 ### Example for tab
 
-The style of tab switching can be personalized, allowing developers to utilize the function [gui_tabview_set_style(this, style)](#gui_tabview_set_style) to set the tab style to either REDUCTION, CLASSIC,FADE, or REDUCTION_FADE. The FADE style adjusts the transparency of the tab during the switching process, whereas the REDUCTION_FADE style alters both the image size and transparency during the tab switching process. For this example, we have designated the first three tabs as CALSSIC style, and the last three tabs as REDUCTION_FADE style.
+The tab switching style can be customized, and developers can set the tab switching style using the function [gui_tabview_set_style(this, style)](#gui_tab_create). Available styles include `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, and `TAB_PAGE`. The `FADE` style adjusts the tab's opacity during the switch, while the `REDUCTION_FADE` style changes both the size and opacity of the tab during the transition. In this example, the first three tabs are set to the `TAB_CUBE` style, and the last three tabs are set to the `REDUCTION` style, as shown in the animation below. Developers can modify the tab switching style by calling [gui_tab_set_style(this, style)](#gui_tab_create) for different tabs.
 
 ```c
 #include <gui_tabview.h>
@@ -58,24 +56,26 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_win_t *win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
+    gui_tabview_enable_pre_load(tv, true);
 
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",             0, 0, 0, 0, 3, 0);
+    gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",           0, 0, 0, 0, 3, 0);
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
-    gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",               0, 0, 0, 0, 6, 0);
-    page_tb_clock(tb_clock);
-    page_tb_activity(tb_activity);
-    page_tb_heart(tb_heart);
-    page_tb_cube(tb_cube);
-    page_tb_weather(tb_weather);
-    page_tb_music(tb_music);
+    gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
+    page_tb_clock(gui_tab_get_rte_obj(tb_clock));
+    page_tb_activity(gui_tab_get_rte_obj(tb_activity));
+    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
+    page_tb_cube(gui_tab_get_rte_obj(tb_cube));
+    page_tb_weather(gui_tab_get_rte_obj(tb_weather));
+    page_tb_music(gui_tab_get_rte_obj(tb_music));
 
-    gui_tab_set_style(tb_clock, CLASSIC);
-    gui_tab_set_style(tb_activity, CLASSIC);
-    gui_tab_set_style(tb_heart, CLASSIC);
+    gui_tab_set_style(tb_clock, TAB_CUBE);
+    gui_tab_set_style(tb_activity, TAB_CUBE);
+    gui_tab_set_style(tb_heart, TAB_CUBE);
     gui_tab_set_style(tb_cube, REDUCTION);
     gui_tab_set_style(tb_weather, REDUCTION);
     gui_tab_set_style(tb_music, REDUCTION);
@@ -83,13 +83,13 @@ static void app_hongkong_ui_design(gui_app_t *app)
 ```
 <br>
 
-<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tab.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1721901439083426379/8f8f9db8_10641540.gif" width = "300" /></div>
 
 <br>
 
-### Example for tabview
+### Example for tabview rotate
 
-In tabview, [gui_tabview_set_style(this, style)](#gui_tabview_set_style) can be utilized to standardize all tab switching styles. For instance, you can set all tab styles to either CLASSIC, FADE, REDUCTION or REDUCTION_FADE. The example below demonstrates the switch to REDUCTION style, which is defaulted to CLASSIC style.
+Unlike individual tab style changes, the tabview control allows you to set a uniform switching style for all tabs using the function [gui_tabview_set_style(this, style)](#gui_tab_create). For example, you can set all tabs to styles such as `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, or `TAB_PAGE`. The following example demonstrates how to switch to the `TAB_ROTATE` style, with `CLASSIC` being the default style. Developers can use the [gui_tabview_set_style(this, style)](#gui_tab_create) function to set the desired switching style for all tabs.
 
 ```c
 #include <gui_tabview.h>
@@ -113,31 +113,34 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_win_t *win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, REDUCTION);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
+    gui_tabview_set_style(tv, TAB_ROTATE);
+    gui_tabview_enable_pre_load(tv, true);
 
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",             0, 0, 0, 0, 3, 0);
+    gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",           0, 0, 0, 0, 3, 0);
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
-    gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",               0, 0, 0, 0, 6, 0);
-    page_tb_clock(tb_clock);
-    page_tb_activity(tb_activity);
-    page_tb_heart(tb_heart);
-    page_tb_cube(tb_cube);
-    page_tb_weather(tb_weather);
-    page_tb_music(tb_music);
+    gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
+    page_tb_clock(gui_tab_get_rte_obj(tb_clock));
+    page_tb_activity(gui_tab_get_rte_obj(tb_activity));
+    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
+    page_tb_cube(gui_tab_get_rte_obj(tb_cube));
+    page_tb_weather(gui_tab_get_rte_obj(tb_weather));
+    page_tb_music(gui_tab_get_rte_obj(tb_music));
 }
 ```
 
 <br>
 
-<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tabview.gif" width = "300" /></div>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1721902043698157443/1cb14773_10641540.gif" width = "300" /></div>
 <br>
 
 ### Example for tabview loop
-Within the tab view, the function [gui_tabview_loop(tabview, loop_or_not)](#gui_tabview_create) (please reference tabview) can be utilized to determine whether the tabs should cycle through continuously. The ` loop_or_not ` parameter, which is of the bool type, specifies whether you wish to enable the looping display feature.
+
+In a tabview, you can use the function [gui_tabview_loop_x(tabview, loop)](#gui_tab_create) (refer to tabview) to determine whether the tabs should loop continuously in the x-direction. Similarly, [gui_tabview_loop_y(tabview, loop)](#gui_tab_create) determines whether the tabs should loop continuously in the y-direction. The loop parameter is a boolean that specifies whether to enable the looping feature. If set to true, the tabs will loop continuously; if set to false, they will not.
 
 ```c
 #include <gui_tabview.h>
@@ -161,22 +164,24 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
     gui_win_t *win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
-    gui_tabview_set_style(tv, REDUCTION);
-    gui_tabview_loop(tv, true);
+    gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
+    gui_tabview_set_style(tv, TAB_CUBE);
+    gui_tabview_enable_pre_load(tv, true);
+    gui_tabview_loop_x(tv, true);
 
     gui_tab_t *tb_clock = gui_tab_create(tv, "tb_clock",           0, 0, 0, 0, 0, 0);
     gui_tab_t *tb_activity = gui_tab_create(tv, "tb_activity",     0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_heart = gui_tab_create(tv, "tb_heart",           0, 0, 0, 0, 2, 0);
-    gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",             0, 0, 0, 0, 3, 0);
+    gui_tab_t *tb_cube = gui_tab_create(tv, "tb_cube",           0, 0, 0, 0, 3, 0);
     gui_tab_t *tb_weather = gui_tab_create(tv, "tb_weather",       0, 0, 0, 0, 5, 0);
     gui_tab_t *tb_music = gui_tab_create(tv, "tb_music",           0, 0, 0, 0, 4, 0);
-    gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",               0, 0, 0, 0, 6, 0);
-    page_tb_clock(tb_clock);
-    page_tb_activity(tb_activity);
-    page_tb_heart(tb_heart);
-    page_tb_cube(tb_cube);
-    page_tb_weather(tb_weather);
-    page_tb_music(tb_music);
+    gui_tab_t *tb_ani = gui_tab_create(tv, "tb_ani",          0, 0, 0, 0, 6, 0);
+    page_tb_clock(gui_tab_get_rte_obj(tb_clock));
+    page_tb_activity(gui_tab_get_rte_obj(tb_activity));
+    page_tb_heart(gui_tab_get_rte_obj(tb_heart));
+    page_tb_cube(gui_tab_get_rte_obj(tb_cube));
+    page_tb_weather(gui_tab_get_rte_obj(tb_weather));
+    page_tb_music(gui_tab_get_rte_obj(tb_music));
 }
 ```
 

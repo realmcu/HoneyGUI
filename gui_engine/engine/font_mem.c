@@ -366,7 +366,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].y = rect->y1;
                 if (i == 0)
                 {
-                    chr[i].x = rect->x1 + offset * text->mode;
+                    chr[i].x = rect->x1 + offset * (text->mode - LEFT);
                 }
                 else
                 {
@@ -403,7 +403,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 if ((chr[i].x + chr[i].char_w - 1) > rect->x2 || chr[i - 1].unicode == 0x0A)
                 {
                     line_buf[line].line_char = i - 1;
-                    line_buf[line].line_dx = (rect_w - chr[i].x + rect->x1) / 2 * (text->mode - 3);
+                    line_buf[line].line_dx = (rect_w - chr[i].x + rect->x1) / 2 * (text->mode - MULTI_LEFT);
                     line++;
                     chr[i].x = rect->x1;
                 }
@@ -415,12 +415,67 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             line_buf[line].line_char = text->font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1 -
-                                      chr[text->font_len - 1].char_w) / 2 * (text->mode - 3);
+            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
+                                                                                          1].char_w) / 2 * (text->mode - MULTI_LEFT);
             line = 0;
             for (uint16_t i = 0; i < text->font_len; i++)
             {
                 chr[i].x += line_buf[line].line_dx;
+
+                if (i >= line_buf[line].line_char)
+                {
+                    line++;
+                }
+            }
+            text->char_line_sum = line;
+            text->char_height_sum = line * text->font_height;
+            gui_free(line_buf);
+            break;
+        }
+    case MID_LEFT:
+    case MID_CENTER:
+    case MID_RIGHT:
+        {
+            gui_text_line_t *line_buf;
+            int line = 0;
+            int offset_y = 0;
+            text->char_line_sum = text->char_width_sum / rect_w + 1 + text->char_line_sum;
+            line_buf = gui_malloc((text->char_line_sum + 1) * sizeof(gui_text_line_t));
+            memset(line_buf, 0, (text->char_line_sum + 1) * sizeof(gui_text_line_t));
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                if (i == 0)
+                {
+                    chr[i].x = rect->x1;
+                }
+                else
+                {
+                    chr[i].x = chr[i - 1].x + chr[i - 1].char_w;
+                }
+                if ((chr[i].x + chr[i].char_w - 1) > rect->x2 || chr[i - 1].unicode == 0x0A)
+                {
+                    line_buf[line].line_char = i - 1;
+                    line_buf[line].line_dx = (rect_w - chr[i].x + rect->x1) / 2 * (text->mode - MID_LEFT);
+                    line++;
+                    chr[i].x = rect->x1;
+                }
+                chr[i].y = rect->y1 + line * chr[i].h;
+                if (chr[i].y >= rect->y2)
+                {
+                    text->font_len = i;
+                    break;
+                }
+            }
+            line_buf[line].line_char = text->font_len - 1;
+            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
+                                                                                          1].char_w) / 2 * (text->mode - MID_LEFT);
+            text->char_height_sum = (line + 1) * text->font_height;
+            offset_y = rect->y1 + ((rect->y2 - rect->y1 + 1) - text->char_height_sum) / 2;
+            line = 0;
+            for (uint16_t i = 0; i < text->font_len; i++)
+            {
+                chr[i].x += line_buf[line].line_dx;
+                chr[i].y += offset_y;
                 if (i >= line_buf[line].line_char)
                 {
                     line++;

@@ -49,8 +49,8 @@ struct gui_app
 {
     gui_obj_t screen;               //!< widget tree root
     const char *xml;                //!< widget tree design file
-    uint32_t active_ms;             //!< screen shut dowm delay
-    uint32_t start_ms;             //!< screen shut dowm delay
+    uint32_t active_ms;             //!< screen shut down delay
+    uint32_t start_ms;             //!< screen shut down delay
     void *thread_id;                //!< thread handle(optional)
     void (* thread_entry)(void *_this); //!< thread entry
     void (* ctor)(void *_this);      //!< constructor
@@ -87,51 +87,135 @@ struct gui_app
   * @brief
   * @{
   */
-#define GUI_APP_DEFINE(APP_NAME,UI_DESIGN)\
-    \
-    static void UI_DESIGN(gui_app_t*);\
-    static gui_app_t _app_##APP_NAME =\
-                                      {\
-                                       .screen =\
-                                                {\
-                                                 .name = #APP_NAME,\
-                                                 .type = SCREEN,\
-                                                },\
-                                       .ui_design = UI_DESIGN,\
-                                       .active_ms = 1000000,\
-                                      };\
-    \
-    gui_app_t *_get_app_##APP_NAME##_handle(void)\
-    {\
-        return &_app_##APP_NAME;\
+
+
+/**
+ * @brief Macro to define a GUI application.
+ *
+ * This macro creates a new GUI application by defining a static function pointer to the UI design function,
+ * initializing the GUI application structure, and providing a way to retrieve a handle to this application.
+ *
+ * @param APP_NAME The name of the application.
+ * @param UI_DESIGN The function to design the UI of the application.
+ */
+#define GUI_APP_DEFINE(APP_NAME, UI_DESIGN) \
+    static void UI_DESIGN(gui_app_t*); \
+    static gui_app_t _app_##APP_NAME = \
+                                       { \
+                                         .screen = \
+                                                   { \
+                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
+                                                     .type = SCREEN,    /**< The screen type is initialized to SCREEN. */ \
+                                                   }, \
+                                         .ui_design = UI_DESIGN,   /**< The UI design function is assigned. */ \
+                                         .active_ms = 1000000,     /**< The active duration is set to 1,000,000 milliseconds. */ \
+                                       }; \
+    /**
+     * @brief Function to get the handle of the application.
+     *
+     * @return A pointer to the application instance.
+     */ \
+    gui_app_t *_get_app_##APP_NAME##_handle(void) \
+    { \
+        return &_app_##APP_NAME; \
     }
 
+/**
+ * @brief Macro to get the handle of a GUI application by its name.
+ *
+ * @param APP_NAME The name of the application.
+ * @return A pointer to the application instance.
+ */
 #define GUI_APP_HANDLE(APP_NAME) _get_app_##APP_NAME##_handle()
-#define GUI_APP_SHUTDOWM(APP_NAME) extern gui_app_t *_get_app_##APP_NAME##_handle(void);gui_app_shutdown(_get_app_##APP_NAME##_handle());
-#define GUI_APP_STARTUP(APP_NAME) extern gui_app_t *_get_app_##APP_NAME##_handle(void);gui_app_startup(_get_app_##APP_NAME##_handle());
-#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME##_handle(), _get_app_##APP_NAME_NEXT##_handle());
+
+/**
+ * @brief Macro to shut down a GUI application.
+ *
+ * This macro shuts down the application by calling the external function gui_app_shutdown
+ * with the application's handle.
+ *
+ * @param APP_NAME The name of the application.
+ */
+#define GUI_APP_SHUTDOWN(APP_NAME) extern gui_app_t *_get_app_##APP_NAME##_handle(void); gui_app_shutdown(_get_app_##APP_NAME##_handle());
+
+/**
+ * @brief Macro to start up a GUI application.
+ *
+ * This macro starts up the application by calling the external function gui_app_startup
+ * with the application's handle.
+ *
+ * @param APP_NAME The name of the application.
+ */
+#define GUI_APP_STARTUP(APP_NAME) extern gui_app_t *_get_app_##APP_NAME##_handle(void); gui_app_startup(_get_app_##APP_NAME##_handle());
+
+/**
+ * @brief Macro to swap between two GUI applications.
+ *
+ * This macro allows switching from one application to another by calling gui_switch_app
+ * and passing the handles of the current and next application.
+ *
+ * @param APP_NAME The name of the current application.
+ * @param APP_NAME_NEXT The name of the next application.
+ */
+#define GUI_APP_SWAP(APP_NAME, APP_NAME_NEXT) gui_switch_app(_get_app_##APP_NAME##_handle(), _get_app_##APP_NAME##_handle_next());
+
+/**
+ * @brief Macro to get a pointer to the root screen of the current application.
+ *
+ * @return A pointer to the root screen of the current application.
+ */
 #define GUI_APP_ROOT_SCREEN &(app->screen)
-#define GUI_APP_SWAP_HANDLE(HANDLE_FUNC, HANDLE_NEXT_FUNC)     extern gui_app_t *HANDLE_FUNC;\
-    extern gui_app_t *HANDLE_NEXT_FUNC;\
+
+/**
+ * @brief Macro to swap between two GUI applications using their handle functions.
+ *
+ * This macro swaps between two applications using their external handle functions.
+ *
+ * @param HANDLE_FUNC The handle function of the current application.
+ * @param HANDLE_NEXT_FUNC The handle function of the next application.
+ */
+#define GUI_APP_SWAP_HANDLE(HANDLE_FUNC, HANDLE_NEXT_FUNC) \
+    extern gui_app_t *HANDLE_FUNC; \
+    extern gui_app_t *HANDLE_NEXT_FUNC; \
     gui_switch_app(HANDLE_FUNC, HANDLE_NEXT_FUNC);
-#define GUI_APP_DEFINE_NAME(APP_NAME)\
-    \
-    static void _##APP_NAME##_ui_design(gui_app_t*);\
-    static gui_app_t _app_##APP_NAME =\
-                                      {\
-                                       .screen =\
-                                                {\
-                                                 .name = #APP_NAME,\
-                                                },\
-                                       .ui_design = _##APP_NAME##_ui_design,\
-                                       .active_ms = 1000000,\
-                                      };\
-    \
-    gui_app_t *_get_app_##APP_NAME##_handle(void)\
-    {\
-        return &_app_##APP_NAME;\
+
+/**
+ * @brief Macro to define a GUI application with a specific name.
+ *
+ * This macro works similarly to GUI_APP_DEFINE but with a naming convention for the UI design function.
+ *
+ * @param APP_NAME The name of the application.
+ */
+#define GUI_APP_DEFINE_NAME(APP_NAME) \
+    static void _##APP_NAME##_ui_design(gui_app_t*); \
+    static gui_app_t _app_##APP_NAME = \
+                                       { \
+                                         .screen = \
+                                                   { \
+                                                     .name = #APP_NAME, /**< The screen name is set to the application name. */ \
+                                                   }, \
+                                         .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
+                                         .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
+                                       }; \
+    /**
+     * @brief Function to get the handle of the application.
+     *
+     * @return A pointer to the application instance.
+     */ \
+    gui_app_t *_get_app_##APP_NAME##_handle(void) \
+    { \
+        return &_app_##APP_NAME; \
     }
+
+/**
+ * @brief Macro to declare the entry point of a GUI application's UI design function.
+ *
+ * This macro declares the UI design function for the application.
+ *
+ * @param APP_NAME The name of the application.
+ */
 #define GUI_APP_ENTRY(APP_NAME) static void _##APP_NAME##_ui_design(gui_app_t* app)
+
 /** End of APP_Exported_Macros
   * @}
   */
@@ -156,7 +240,14 @@ struct gui_app
   * @brief
   * @{
   */
+
+/**
+ * @brief get current app pointer
+*/
 gui_app_t *gui_current_app(void);
+/**
+ * @brief get nect app pointer if there are two apps exist.
+*/
 gui_app_t *gui_next_app(void);
 
 void gui_app_install(gui_app_t *app, void *ui_design, void *gui_app_entry);
