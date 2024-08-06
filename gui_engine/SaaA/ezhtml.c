@@ -223,7 +223,7 @@ static char *open_switch_name;
 static char *pause_switch_name;
 static char *close_switch_name;
 static void create_tree_in_multi_level(gui_app_t *app, gui_multi_level_t *parent);
-static void setting_return_cb(gui_obj_t *this);
+static void setting_return_cb(void *obj, gui_event_t e, void *param);
 static void **image_array;
 static void *return_image;
 static void *return_image_hl;
@@ -513,7 +513,7 @@ static void on_click_jump_cb(void *obj, gui_event_t e, struct on_click_jump_cb_p
 {
     if (param->id1 < 0)
     {
-        setting_return_cb(obj);
+        setting_return_cb(obj, e, (void *)param);
     }
     else
     {
@@ -3150,7 +3150,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     parent->name = ptxt;
                     gui_button_t *button = (void *)parent;
                     button->img->blend_mode = IMG_SRC_OVER_MODE;
-                    GUI_API(gui_button_t).on_click(button, setting_return_cb, 0);
+                    GUI_API(gui_button_t).on_click(button, (gui_event_cb_t)setting_return_cb, 0);
 
 
                     break;
@@ -3574,8 +3574,9 @@ void create_tree_nest(char *xml, void *obj)
     ezxml_t f1 = ezxml_parse_file(xml);
     foreach_create(f1, obj);
 }
-static void setting_return_cb(gui_obj_t *this)
+static void setting_return_cb(void *obj, gui_event_t e, void *param)
 {
+    gui_obj_t *this = (gui_obj_t *)obj;
     if (this->parent && this->parent->type == MULTI_LEVEL)
     {
         if (this->parent->parent && this->parent->parent->type == MULTI_LEVEL)

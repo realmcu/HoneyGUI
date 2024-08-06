@@ -22,7 +22,7 @@
 #include "gui_obj.h"
 #include "tp_algo.h"
 #include "gui_img.h"
-#include "acc_init.h"
+// #include "acc_init.h"
 #include "gui_matrix.h"
 #include "gui_gallery.h"
 #include "gui_fb.h"
