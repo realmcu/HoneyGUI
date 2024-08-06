@@ -19,7 +19,9 @@
  *============================================================================*/
 #ifndef __TP_ALGO_H__
 #define __TP_ALGO_H__
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================================================================*
  *                        Header Files
@@ -123,7 +125,9 @@ struct touch_info *tp_get_info(void);
   * @}
   */
 
-
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif
