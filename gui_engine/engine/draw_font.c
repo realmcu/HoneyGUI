@@ -108,3 +108,13 @@ uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
     return k;
 }
 
+// Function to convert UTF-16 Big-Endian (BE) to Little-Endian (LE)
+void utf16_be_to_le(const uint8_t *input, uint8_t *output, size_t length)
+{
+    for (size_t i = 0; i < length; i += 2)
+    {
+        // Swap the positions of the two bytes
+        output[i] = input[i + 1];
+        output[i + 1] = input[i];
+    }
+}
