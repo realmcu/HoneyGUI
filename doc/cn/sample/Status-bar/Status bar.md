@@ -1,15 +1,15 @@
 #  状态栏
 
-This is a new style status bar. In the non-pull-down state, only the real-time time in small fonts is displayed at the top of the screen. Click on the top to pull down the status bar. When pulling down, the mask color gradually becomes opaque and the time text becomes larger. After pulling down to a certain extent, the status bar becomes fully expanded, and the date and message notification will be displayed.
+这是一种新样式的状态栏。在非下拉状态时，仅在屏幕顶部用小字体显示实时时间。点击顶部可以下拉状态栏，随着下拉，遮罩颜色逐渐变为不透明，时间文字变大。下拉到一定程度后，状态栏完全展开，显示日期和消息通知。
 
 <br>
 <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/sample/Status-bar/status_bar.gif"  /></div>
 <br>
 
-##  Implementation
-###  File
- Function ```static void status_bar(void *parent, gui_obj_t *ignore_gesture)``` is on the line 255 of ```gui_engine\example\screen_454_454\gui_menu\apps.c```
-###  Design
+##  实现
+###  文件
+ 函数 ```static void status_bar(void *parent, gui_obj_t *ignore_gesture)``` 位于 ```gui_engine\example\screen_454_454\gui_menu\apps.c``` 的第255行
+###  设计
 
 ```eval_rst
 .. mermaid::
@@ -22,9 +22,9 @@ This is a new style status bar. In the non-pull-down state, only the real-time t
         H --> F[Text Data]
         H --> G[Text NOTIFS]
 ```
-* In this status bar, the window widget is the root node. A white semi-transparent background of the status bar is drawn using the rectangle drawing function. Three text boxes are nested, representing time, date, and notification messages, respectively. Among them, the time text box uses a function to cache into an image, because the time display needs to be scaled.The rectangular background and the text of the date and notification messages are initially hidden. Touch screen interactive effects are implemented in the animation callback function of the root node window widget.
-* In the animation callback function of the window, first update the contents of the text box for time and date to real-time time and date, in the formats of "07:55" and "Tue, Apr 16" respectively. Then, read touchpad data, determining the display effect of the status bar based on current touch screen information such as gestures, for instance, whether to hide the background, whether to hide the date and notifications, change background transparency, time text box reduction scale, and so on.
-* The 'status_bar' function has a parameter 'ignore_gesture', which takes the pointer to a widget. This parameter is used to resolve conflicts between gestures on the widget and the status bar. When such a conflict is encountered, the gesture interaction of the respective widget is deactivated through this piece of code: ```if (ignore_gesture) { ignore_gesture->gesture = 1; }```. Here, setting the 'gesture' attribute to '1' turns off the gesture response of the widget in question.
+* 在此状态栏中，以窗口控件为根节点。使用矩形绘制函数绘制状态栏的白色半透明背景。嵌套了三个文本框，分别表示时间、日期和通知消息。其中，时间文本框使用函数缓存成图像，因为时间显示需要缩放。矩形背景和日期、通知消息的文本初始时被隐藏。触摸屏交互效果在根节点窗口控件的动画回调函数中实现。
+* 在窗口的动画回调函数中，首先将时间和日期文本框的内容更新为实时的时间和日期，格式分别为"07:55"和"Tue, Apr 16"。然后，读取触摸板数据，根据当前触屏信息如手势判断状态栏的显示效果，例如是否隐藏背景、是否隐藏日期和通知、更改背景透明度、时间文本框的缩放比例等。
+* 'status_bar'函数有一个参数'ignore_gesture'，它接收一个指向控件的指针。此参数用于解决控件上的手势与状态栏之间的冲突。遇到这种冲突时，通过这段代码 ```if (ignore_gesture) { ignore_gesture->gesture = 1; }``` 来停用相应控件的手势交互。这里，将'gesture'属性设置为'1'关闭了该控件的手势响应。
 
 
 

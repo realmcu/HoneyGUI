@@ -87,7 +87,7 @@ typedef enum
 ## 无RLE覆盖模式概述
 以下流程描述了 `No RLE` 压缩图像的 `cover mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714375761122113396/e0e01095_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1714375761122113396/e0e01095_13671125.png"/></div><br/>
 
 - 如果矩阵是单位矩阵，则执行没有矩阵操作的[blit](/Glossary.rst#term-blit)过程；否则，执行具有矩阵操作的blit过程。
 - `dc_bytes_per_pixel` 表示显示设备的像素字节数，计算方式为 `dc->bit_depth >> 3`，其中 `bit_depth` 为显示设备的位深度。以位深度为24的显示设备为例，其像素字节数为3。
@@ -106,7 +106,7 @@ typedef enum
 
 以下流程描述了 `No RLE` 压缩图像的 `bypass mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327745470292085/b2ffb40d_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327745470292085/b2ffb40d_13671125.png"/></div><br/>
 
 - 如果矩阵是单位矩阵，则执行没有矩阵操作的blit过程；否则，执行具有矩阵操作的blit过程。
 - `dc_bytes_per_pixel` 表示显示设备的像素字节数，计算方式为 `dc->bit_depth >> 3`，其中 `bit_depth` 为显示设备的位深度。以位深度为24的显示设备为例，其像素字节数为3。
@@ -137,7 +137,7 @@ typedef enum
 ## 无RLE滤黑模式概述
 以下流程描述了 `No RLE` 压缩图像的 `filter mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327755412119622/87231a49_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327755412119622/87231a49_13671125.png"/></div><br/>
 
 ### 无RLE滤黑模式（不带矩阵变换）
 下面的流程图描述了将 `uncompressed images` 写入帧缓冲区的 `filter mode`处理过程，以RGB565为目标设备图像类型为例。
@@ -172,7 +172,7 @@ typedef enum
 ### 无RLE源覆盖模式（不带矩阵变换）
 下面的流程图描述了将 `uncompressed images` 写入帧缓冲区的 `source_over mode`处理过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1710318794490000646/1da4e0a2_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="500" src ="https://foruda.gitee.com/images/1710318794490000646/1da4e0a2_13671125.png"/></div><br/>
 
 基于 `opacity_value` 执行相应的操作将图像像素写入帧缓冲区。
   - 如果 `opacity_value` 为 `0`，表示图像不显示，直接跳出处理流程。
@@ -182,7 +182,7 @@ typedef enum
 ### 无RLE源覆盖模式（带矩阵变换）
 下面的流程图描述了使用 `source_over mode with matrix operations` 将 `uncompressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1710318799964556869/22c5cdfb_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="500" src ="https://foruda.gitee.com/images/1710318799964556869/22c5cdfb_13671125.png"/></div><br/>
 
 1. 执行矩阵计算，将目标区域的写入点映射到图像像素，并获取图像像素的像素值。
 2. 基于 `opacity_value` 执行相应的操作将图像像素写入帧缓冲区。
@@ -193,12 +193,12 @@ typedef enum
 ## RLE覆盖模式概述
 以下流程描述了 `RLE` 压缩图像的 `cover mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714376646404378867/18b85d40_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1714376646404378867/18b85d40_13671125.png"/></div><br/>
 
 ### RLE覆盖模式（不带矩阵变换）
 下面的流程图描述了将 `compressed images` 写入帧缓冲区的 `cover mode`处理过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img width="650" src ="https://foruda.gitee.com/images/1714455786263653108/4f957293_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="700" src ="https://foruda.gitee.com/images/1714455786263653108/4f957293_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -207,7 +207,7 @@ typedef enum
 ### RLE覆盖模式（带矩阵变换）
 下面的流程图描述了使用 `cover mode with matrix operations` 将 `compressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img width="650" src ="https://foruda.gitee.com/images/1714455799554861994/cbe7fe2e_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="700" src ="https://foruda.gitee.com/images/1714455799554861994/cbe7fe2e_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -217,7 +217,7 @@ typedef enum
 ## RLE通路模式概述
 以下流程描述了 `RLE` 压缩图像的 `bypass mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327763804701147/539b16fd_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327763804701147/539b16fd_13671125.png"/></div><br/>
 
 ### RLE通路模式（不带矩阵变换）
 下面的流程图描述了将 `bypass images` 写入帧缓冲区的 `cover mode`处理过程，以RGB565为目标设备图像类型为例。
@@ -247,7 +247,7 @@ typedef enum
 ## RLE滤黑模式概述
 以下流程描述了 `RLE` 压缩图像的 `filter mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327772848839544/88fe64aa_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327772848839544/88fe64aa_13671125.png"/></div><br/>
 
 ### RLE滤黑模式（不带矩阵变换）
 下面的流程图描述了将 `compressed images` 写入帧缓冲区的 `filter mode`处理过程，以RGB565为目标设备图像类型为例。
@@ -279,7 +279,7 @@ typedef enum
 ## RLE源覆盖模式概述
 以下流程描述了 `RLE` 压缩图像的 `source_over mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327781855932915/3ce7e711_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327781855932915/3ce7e711_13671125.png"/></div><br/>
 
 ### RLE源覆盖模式（不带矩阵变换）
 下面的流程图描述了将 `compressed images` 写入帧缓冲区的 `source_over mode`处理过程，以RGB565为目标设备图像类型为例。
@@ -320,12 +320,10 @@ typedef enum
 
 ## 支持的输入类型和输出类型
 
-|  |  |  |  |
-| --- | --- | --- | --- |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+|输入 / 输出类型|
+|---|
+|RGB565|
+|RGB888|
+|ARGB8565|
+|ARGB8888|
+

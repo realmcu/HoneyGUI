@@ -87,7 +87,7 @@ typedef enum
 ## Overview No RLE Cover Mode
 The following flow describes the `cover mode` process for `No RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714375761122113396/e0e01095_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1714375761122113396/e0e01095_13671125.png"/></div><br/>
 
 - If the matrix is an identity matrix, a [blit](/Glossary.rst#term-blit) process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
 - The `dc_bytes_per_pixel` is pixel bytes of  display device, calculated as `dc->bit_depth >> 3`, where `bit_depth` is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
@@ -106,7 +106,7 @@ The following flowchart describes the process of writing `uncompressed images` t
 
 The following flow describes the `bypass mode` process for `No RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327745470292085/b2ffb40d_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327745470292085/b2ffb40d_13671125.png"/></div><br/>
 
 - If the matrix is an identity matrix, a blit process without matrix operations is performed; otherwise, a blit process with matrix operations is carried out.
 - The `dc_bytes_per_pixel` is pixel bytes of  display device, calculated as `dc->bit_depth >> 3`, where `bit_depth` is the bit depth of the display device. Taking a display device with a bit depth of 24 as an example, its pixel bytes are 3.
@@ -137,7 +137,7 @@ The following flowchart describes the process of writing `uncompressed images` t
 ## Overview No RLE Filter
 The following flow describes the `filter mode` process for `No RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327755412119622/87231a49_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327755412119622/87231a49_13671125.png"/></div><br/>
 
 ### No RLE Filter
 The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `filter mode`. Taking the target device image type as RGB565 as an example.
@@ -172,7 +172,7 @@ The following flow describes the `source_over mode` process for `No RLE` compres
 ### No RLE Alpha No Matrix
 The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `source_over mode`. Taking the target device image type as RGB565 and the source image type as RGB565 as an example.
 
-<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1710318794490000646/1da4e0a2_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="500" src ="https://foruda.gitee.com/images/1710318794490000646/1da4e0a2_13671125.png"/></div><br/>
 
 Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
   - If the `opacity_value` is `0`, the image is not displayed and the process is break.
@@ -182,7 +182,7 @@ Based on the `opacity_value`, execute the corresponding operation to write image
 ### No RLE Alpha Matrix
 The following flowchart describes the process of writing `uncompressed images` to a frame buffer using `source_over mode with matrix operations`. Taking the target device image type as RGB565 and the source image type as RGB565 as an example.
 
-<div style="text-align: center"><img width="400" src ="https://foruda.gitee.com/images/1710318799964556869/22c5cdfb_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="500" src ="https://foruda.gitee.com/images/1710318799964556869/22c5cdfb_13671125.png"/></div><br/>
 
 1. Perform matrix calculation to map the target area write-in points to image pixels, and obtain the pixel value of the image pixels.
 2. Based on the `opacity_value`, execute the corresponding operation to write image pixels into the framebuffer.
@@ -193,12 +193,12 @@ The following flowchart describes the process of writing `uncompressed images` t
 ## Overview RLE Cover Mode
 The following flow describes the `cover mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1714376646404378867/18b85d40_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1714376646404378867/18b85d40_13671125.png"/></div><br/>
 
 ### RLE Cover No Matrix
 The following flowchart describes the process of writing `compressed images` to a frame buffer in `cover mode`. Taking the target device image type as RGB565 as an example.
 
-<div style="text-align: center"><img width="650" src ="https://foruda.gitee.com/images/1714455786263653108/4f957293_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="700" src ="https://foruda.gitee.com/images/1714455786263653108/4f957293_13671125.png"/></div><br/>
 
 1. Perform different processing steps based on the `img_type` from the head of compression data.
 2. Decompress the compressed image data.
@@ -207,7 +207,7 @@ The following flowchart describes the process of writing `compressed images` to 
 ### RLE Cover Matrix
 The following flowchart describes the process of writing `compressed images` to a frame buffer in `cover mode with matrix operations`. Taking the target device image type as RGB565 as an example.
 
-<div style="text-align: center"><img width="650" src ="https://foruda.gitee.com/images/1714455799554861994/cbe7fe2e_13671125.png"/></div><br/>
+<div style="text-align: center"><img width="700" src ="https://foruda.gitee.com/images/1714455799554861994/cbe7fe2e_13671125.png"/></div><br/>
 
 1. Perform different processing steps based on the `img_type` from the head of compression data.
 2. Decompress the compressed image data.
@@ -217,7 +217,7 @@ The following flowchart describes the process of writing `compressed images` to 
 ## Overview RLE Bypass Mode
 The following flow describes the `bypass mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327763804701147/539b16fd_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327763804701147/539b16fd_13671125.png"/></div><br/>
 
 ### RLE Bypass No Matrix
 The following flowchart describes the process of writing `compressed images` to a frame buffer in `bypass mode`. Taking the target device image type as RGB565 as an example.
@@ -247,7 +247,7 @@ The following flowchart describes the process of writing `compressed images` to 
 ## Overview RLE Filter
 The following flow describes the `filter mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327772848839544/88fe64aa_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327772848839544/88fe64aa_13671125.png"/></div><br/>
 
 ### RLE Filter
 The following flowchart describes the process of writing `compressed images` to a frame buffer in `filter mode`. Taking the target device image type as RGB565 as an example.
@@ -279,7 +279,7 @@ The following flowchart describes the process of writing `compressed images` to 
 ## Overview RLE Source_over
 The following flow describes the `source_over mode` process for `RLE` compressed image. Select a processing method based on the image matrix and the pixel byte of the display device, and write it to the frame buffer.
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327781855932915/3ce7e711_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327781855932915/3ce7e711_13671125.png"/></div><br/>
 
 ### RLE Source_over No Matrix
 The following flowchart describes the process of writing `compressed images` to a frame buffer in `source_over mode`. Taking the target device image type as RGB565 as an example.
@@ -320,12 +320,9 @@ If you need to modify the vision file of the flowchart, please download it from 
 
 ## Support Input type and Output type
 
-|  |  |  |  |
-| --- | --- | --- | --- |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+|Input / Output type|
+|---|
+|RGB565|
+|RGB888|
+|ARGB8565|
+|ARGB8888|

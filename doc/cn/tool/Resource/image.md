@@ -2,7 +2,7 @@
 
 ## 图像格式转换
 将各种格式的图片转换为RGB原始图片。
-* 打开转换器。图片转换工具下载链接请参考Tool章节：[工具](../index.md) 
+* 打开转换器。图片转换工具下载链接请参考该章节：[工具](../index.md) 
 
 * 操作步骤及详细说明如下：
 
@@ -67,7 +67,7 @@
 
 通过使用图像转换工具（ImageConvert Tool），开发者可以将三个JPG文件（a、b和c）转换为二进制文件（a、b和c）。
 
-接下来，开发者需要将这些二进制文件放置在打包目录的根文件夹（root）中。关于打包资源的过程，请参考"**How to packing resource**"部分。
+接下来，开发者需要将这些二进制文件放置在打包目录的根文件夹（root）中。关于打包资源的过程，请参考[打包工具](./packing.md)章节。
 
 <div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1718786296198222012/e213af1a_13408154.png"></div>
 <br/>

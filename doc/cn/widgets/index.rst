@@ -25,7 +25,7 @@
 `立方体 (cube)`_                     显示一个立方体
 `轮形列表 (wheellist)`_              轮形的应用程序列表
 `透视 (perspective)`_                滑动扩展和收缩窗帘
-`菜单单元格 (menu_celllar)`_         显示成蜂窝形状菜单设置的图标
+`蜂窝菜单 (menu_celllar)`_           显示成蜂窝形状菜单设置的图标
 `返回 (return)`_                     可以拖出的泡泡形状曲线
 `二维码和条形码 (qbcode)`_           显示二维码和条形码
 `画布矩形 (canvas_rect)`_            显示一个矩形
@@ -57,7 +57,7 @@
 .. _可缩放矢量图形 (svg): gui_svg.html
 .. _监视渐变点 (watch gradient spot): gui_watch_gradient_spot.html
 .. _表盘渐变 (watchface gradient): gui_watchface_gradient.html
-.. _菜单单元格 (menu_celllar): gui_menu_cellular.html
+.. _蜂窝菜单 (menu_celllar): gui_menu_cellular.html
 .. _返回 (return): gui_return.html
 .. _二维码和条形码 (qbcode): qbcode.html
 
@@ -88,6 +88,6 @@
     可缩放矢量图形 (svg) <gui_svg>
     监视渐变点 (watch gradient spot) <gui_watch_gradient_spot>
     表盘渐变 (watchface gradient) <gui_watchface_gradient>
-    菜单单元格 (menu_celllar) <gui_menu_cellular>
+    蜂窝菜单 (menu_celllar) <gui_menu_cellular>
     返回 (return) <gui_return> 
 	二维码和条形码 (qbcode) <gui_qbcode> 
