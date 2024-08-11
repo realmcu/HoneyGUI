@@ -243,6 +243,37 @@ void gui_progressbar_h_img_ctor(gui_progressbar_t *this,
     GUI_TYPE(gui_img_scope_t, this->c)->scope_y2 = GET_BASE(this)->h;
 }
 
+void gui_progressbar_h_img_ctor_from_ftl(gui_progressbar_t *this,
+                                         gui_obj_t         *parent,
+                                         void              *picture,
+                                         int16_t            x,
+                                         int16_t            y)
+{
+
+    gui_obj_ctor(&(this->base), parent, "h_img_pro", x, y, 0, 0);
+    this->per = 0.3f;
+    this->base.type = PROGRESSBAR;
+    this->max = 0;
+    this->color = 1;
+
+    gui_list_init(&(((gui_obj_t *)this)->child_list));
+    if ((((gui_obj_t *)this)->parent) != ((void *)0))
+    {
+        gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
+                               &(((gui_obj_t *)this)->brother_list));
+    }
+    this->c = (void *)gui_img_scope_create_from_ftl(this, "progressbar_h", picture, 0, 0);
+
+    int w = gui_img_get_width((void *)this->c);
+    this->max = w;
+    GET_BASE(this)->w = w;
+    GET_BASE(this)->h = gui_img_get_height((void *)this->c);
+    GUI_TYPE(gui_img_scope_t, this->c)->scope_x2 = this->max * this->per;
+    GUI_TYPE(gui_img_scope_t, this->c)->scope_y2 = GET_BASE(this)->h;
+}
+
+
+
 void gui_progressbar_v_img_ctor(gui_progressbar_t *this,
                                 gui_obj_t         *parent,
                                 void              *picture,
@@ -269,6 +300,34 @@ void gui_progressbar_v_img_ctor(gui_progressbar_t *this,
     GUI_TYPE(gui_img_scope_t, this->c)->scope_y1 = this->max * (1.0f - this->per);
 }
 
+void gui_progressbar_v_img_ctor_from_ftl(gui_progressbar_t *this,
+                                         gui_obj_t         *parent,
+                                         void              *picture,
+                                         int16_t            x,
+                                         int16_t            y)
+{
+    gui_obj_ctor(&(this->base), parent, "h_img_pro", x, y, 0, 0);
+    this->per = 0.3f;
+    this->base.type = PROGRESSBAR;
+    this->max = 0;
+
+    gui_list_init(&(((gui_obj_t *)this)->child_list));
+    if ((((gui_obj_t *)this)->parent) != ((void *)0))
+    {
+        gui_list_insert_before(&((((gui_obj_t *)this)->parent)->child_list),
+                               &(((gui_obj_t *)this)->brother_list));
+    }
+    this->c = (void *)gui_img_scope_create_from_ftl(this, "progressbar_v", picture, 0, 0);
+
+    int w = gui_img_get_height((void *)this->c);
+    this->max = w;
+    GET_BASE(this)->w = gui_img_get_width((void *)this->c);
+    GET_BASE(this)->h = w;
+    GUI_TYPE(gui_img_scope_t, this->c)->scope_y1 = this->max * (1.0f - this->per);
+}
+
+
+
 gui_progressbar_t *gui_progressbar_img_h_create(void    *parent,
                                                 void    *picture,
                                                 int16_t  x,
@@ -282,11 +341,35 @@ gui_progressbar_t *gui_progressbar_img_h_create(void    *parent,
     return this;
 }
 
+gui_progressbar_t *gui_progressbar_img_h_create_from_ftl(void    *parent,
+                                                         void    *picture,
+                                                         int16_t  x,
+                                                         int16_t  y)
+{
+    gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
+    memset(this, 0, sizeof(gui_progressbar_t));
+    gui_progressbar_h_img_ctor_from_ftl(this, parent, picture, x, y);
+    ((gui_obj_t *)this)->create_done = 1;
+
+    return this;
+}
+
 gui_progressbar_t *gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y)
 {
     gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
     memset(this, 0, sizeof(gui_progressbar_t));
     gui_progressbar_v_img_ctor(this, parent, picture, x, y);
+    ((gui_obj_t *)this)->create_done = 1;
+
+    return this;
+}
+
+gui_progressbar_t *gui_progressbar_img_v_create_from_ftl(void *parent, void *picture, int16_t x,
+                                                         int16_t y)
+{
+    gui_progressbar_t *this = gui_malloc(sizeof(gui_progressbar_t));
+    memset(this, 0, sizeof(gui_progressbar_t));
+    gui_progressbar_v_img_ctor_from_ftl(this, parent, picture, x, y);
     ((gui_obj_t *)this)->create_done = 1;
 
     return this;

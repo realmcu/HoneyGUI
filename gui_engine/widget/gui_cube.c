@@ -257,6 +257,10 @@ static void gui_cube_prepare(gui_obj_t *obj)
         {
             this->draw_img[i].data = this->data[i];
         }
+        else if (this->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->draw_img[i].data = this->ftl[i];
+        }
     }
 
     gui_cube_scale(&cube_v0, cbsize);
@@ -449,12 +453,13 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         if (this->nz[i] > 0.0f)
         {
             CUBE_JUDEG_FULL_RANK(&draw_img)
-
-            draw_img_cache(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
-            // blit
-            gui_acc_blit_to_dc(draw_img, dc, NULL);
-            // release img if cached
-            draw_img_free(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+            {
+                draw_img_cache(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+                // blit
+                gui_acc_blit_to_dc(draw_img, dc, NULL);
+                // release img if cached
+                draw_img_free(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+            }
         }
     }
 }
@@ -564,6 +569,11 @@ static void gui_cube_ctor(gui_cube_t         *this,
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
             this->data[i] = img_path[i];
+        }
+        else if (img_file->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->data[i] = img_path[i];
+            this->ftl[i] = img_path[i];
         }
 
         this->src_mode[i] = img_file->src_mode[i];
@@ -716,6 +726,11 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
             this->data[i] = img_path[i];
+        }
+        else if (img_file->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->data[i] = img_path[i];
+            this->ftl[i] = img_path[i];
         }
     }
 }

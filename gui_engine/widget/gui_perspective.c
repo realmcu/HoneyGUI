@@ -162,6 +162,10 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         {
             this->img[i].data = this->data[i];
         }
+        else if (this->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->img[i].data = this->ftl[i];
+        }
     }
 
     gui_perspective_scale_3d(&v0, 1.0f);
@@ -237,13 +241,14 @@ static void gui_perspective_prepare(gui_obj_t *obj)
         matrix_transfrom_rotate(&rotate_3D, &tv2, &rv2, xoff, yoff, zoff);
         matrix_transfrom_rotate(&rotate_3D, &tv3, &rv3, xoff, yoff, zoff);
 
+        draw_img_load_scale(&this->img[i], (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+
         gui_vertex_t p = {(float)(dc->screen_width) / 2, 0, 2 * d};
         matrix_transfrom_blit(this->img[i].img_w, this->img[i].img_h, &p, &rv0, &rv1, &rv2, &rv3,
                               &this->img[i].matrix);
-
         memcpy(&this->img[i].inverse, &this->img[i].matrix, sizeof(struct gui_matrix));
         matrix_inverse(&this->img[i].inverse);
-        draw_img_load_scale(&this->img[i], (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+
         draw_img_new_area(&this->img[i], NULL);
         if (gui_perspective_point_in_rect(&this->img[i], tp->x, tp->y) == true)
         {
@@ -397,6 +402,11 @@ static void gui_perspective_ctor(gui_perspective_t         *this,
         {
             this->data[i] = array[i];
         }
+        else if (img_file->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->data[i] = array[i];
+            this->ftl[i] =  array[i];
+        }
 
         draw_img->opacity_value = UINT8_MAX;
         draw_img->blend_mode = IMG_SRC_OVER_MODE;
@@ -448,6 +458,11 @@ void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_img
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
             this->data[i] = img_file->data_addr[i];
+        }
+        else if (img_file->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->data[i] = img_file->data_addr[i];
+            this->ftl[i] =  img_file->data_addr[i];
         }
     }
 }

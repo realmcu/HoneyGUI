@@ -115,7 +115,7 @@ typedef struct gui_img_scope
  * @brief create a picture with scope,only display pixels in scope
  *
  * @param parent parent widget
- * @param addr picture address
+ * @param addr ftl or xip address, use xip address
  * @param x the x coordinate
  * @param y the y coordinate
  * @return gui_img_scope_t*
@@ -125,6 +125,20 @@ gui_img_scope_t *gui_img_scope_create(void    *parent,
                                       void    *addr,
                                       int16_t  x,
                                       int16_t  y);
+/**
+ * @brief create a picture from with scope,only display pixels in scope
+ *
+ * @param parent parent widget
+ * @param ftl not xip address, use ftl address
+ * @param x the x coordinate
+ * @param y the y coordinate
+ * @return gui_img_scope_t*
+ */
+gui_img_scope_t *gui_img_scope_create_from_ftl(void    *parent,
+                                               const char *name,
+                                               void    *ftl,
+                                               int16_t  x,
+                                               int16_t  y);
 
 /**
  * @brief

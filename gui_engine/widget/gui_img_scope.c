@@ -385,6 +385,11 @@ void gui_img_scope_ctor(gui_img_t  *this,
     {
         this->data = (void *)addr;
     }
+    else if (src_mode == IMG_SRC_FTL)
+    {
+        this->data = (void *)addr;
+        this->ftl = (void *)addr;
+    }
 }
 /*============================================================================*
  *                           Public Functions
@@ -409,6 +414,35 @@ gui_img_scope_t *gui_img_scope_create(void    *parent,
 
     memset(img, 0x00, sizeof(gui_img_scope_t));
     gui_img_scope_ctor((void *)img, (gui_obj_t *)parent, name, IMG_SRC_MEMADDR, addr, x, y, 0, 0);
+    img->scope_x1 = 0;
+    img->scope_y1 = 0;
+    img->scope_x2 = gui_img_get_width(&img->base);
+    img->scope_y2 = gui_img_get_height(&img->base);
+
+    gui_list_init(&(GET_BASE(img)->child_list));
+    if ((GET_BASE(img)->parent) != NULL)
+    {
+        gui_list_insert_before(&((GET_BASE(img)->parent)->child_list), &(GET_BASE(img)->brother_list));
+    }
+
+    GET_BASE(img)->create_done = true;
+
+    return img;
+}
+
+gui_img_scope_t *gui_img_scope_create_from_ftl(void    *parent,
+                                               const char *name,
+                                               void    *addr,
+                                               int16_t  x,
+                                               int16_t  y)
+{
+    GUI_ASSERT(parent != NULL);
+
+    gui_img_scope_t *img = gui_malloc(sizeof(gui_img_scope_t));
+    GUI_ASSERT(img != NULL);
+
+    memset(img, 0x00, sizeof(gui_img_scope_t));
+    gui_img_scope_ctor((void *)img, (gui_obj_t *)parent, name, IMG_SRC_FTL, addr, x, y, 0, 0);
     img->scope_x1 = 0;
     img->scope_y1 = 0;
     img->scope_x2 = gui_img_get_width(&img->base);
