@@ -1,6 +1,6 @@
 # Pagelist
 
-The pagelist widget has the similar function as page widget, and it is expected to use less ram size. The pagelist widget bahaves like a scroll at y-axis. When it moves at y-axis, the child nodes will also move with pagelist widget. you can set two switch widget which indicate the first and the ast, and two border line which indicate top and bottom. The first one will move from top to bottom when it reaches top. The last one will move from bottom to top when it reaches bottom. This characteristic makes the child widgets look like more than that they are really created.
+The pagelist widget has the similar function as page widget, and it is expected to use less ram size. The pagelist widget bahaves like a scroll at y-axis. When it moves at y-axis, the child nodes will also move with pagelist widget. you can set two switch widget which indicate the first and the last, and two border line which indicate top and bottom. The first one will move from top to bottom when it reaches top. The last one will move from bottom to top when it reaches bottom. This characteristic makes the child widgets look like more than that they are really created.
 
 ## Usage
 
