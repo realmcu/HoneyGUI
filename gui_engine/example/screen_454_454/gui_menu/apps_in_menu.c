@@ -861,7 +861,7 @@ static void stop_watch_win_overwrite(gui_obj_t *win)
     static int history_y;
     if (!wheel_take_over)
     {
-        if (touch->pressing)
+        if (touch->pressing && touch->x > win->x && touch->x < win->x + win->w)
         {
             touch->history_y = history_y + touch->deltaY;
             /**
