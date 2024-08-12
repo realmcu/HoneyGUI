@@ -76,6 +76,17 @@ typedef struct _UI_BMPTypeDef
     uint32_t addr;
 } UI_BMPTypeDef;
 
+typedef struct _UI_3DTypeDef
+{
+    int16_t x;
+    int16_t y;
+    int16_t width;
+    int16_t hight;
+    uint32_t addr;
+    gui_matrix_t matrix;
+    gui_matrix_t inverse;
+} UI_3DTypeDef;
+
 typedef struct _UI_PSRAMBufferTypeDef
 {
     const char *name;
@@ -156,8 +167,10 @@ typedef struct _UI_MenuTypeDef
 
     UI_WidgetTypeDef *pWidgetList;
     UI_BMPTypeDef *pBMPList;
+    UI_3DTypeDef *p3DList;
     uint8_t current_max_widget;//this means widget
     uint8_t current_max_bmp;//this means bmp
+    uint8_t current_max_3d;//this means 3d
     int16_t detal_x;
     int16_t detal_y;
 
@@ -223,6 +236,27 @@ void rtl_gui_prepare_frame_buffer(UI_MenuTypeDef *pCurMenu, \
                                   UI_PSRAMBufferTypeDef *pPSRAM);
 void rtl_gui_update_detal(int16_t x, int16_t y);
 
+void gui_v0_cube(float cbsize, \
+                 float c_x, \
+                 float c_y, \
+                 float xrot, \
+                 float yrot, \
+                 float zrot, \
+                 uint16_t img_w, uint16_t img_h, \
+                 gui_matrix_t *m0, \
+                 gui_matrix_t *m1, \
+                 gui_matrix_t *m2, \
+                 gui_matrix_t *m3, \
+                 gui_matrix_t *m4, \
+                 gui_matrix_t *m5);
+void gui_v0_perspective(float release_x, \
+                        uint16_t img_w, uint16_t img_h, \
+                        gui_matrix_t *m0, \
+                        gui_matrix_t *m1, \
+                        gui_matrix_t *m2, \
+                        gui_matrix_t *m3, \
+                        gui_matrix_t *m4, \
+                        gui_matrix_t *m5);
 extern uint8_t *disp_write_buff1;
 extern uint8_t *disp_write_buff2;
 extern uint8_t *disp_read_buff;

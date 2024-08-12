@@ -16,7 +16,7 @@ extern "C" {
 #define LCD_HIGHT                           480
 #define PAGE_SWITCH_TIMER_INTERVAL          40
 #define LCD_SECTION_HEIGHT                  20
-#define FEATURE_PSRAM                       0
+#define RTK_LEGCAY_GUI_USING_PSRAM          1
 
 #define RGB16BIT_565                        16
 #define RGB24BIT_888                        24
