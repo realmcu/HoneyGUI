@@ -26,18 +26,19 @@ Widgets                              Brief
 `wheellist`_                         Wheel-shaped application list
 `perspective`_                       Slide to extend and retract curtains
 `menu_cellular`_                     Display icons set as a honeycomb shape menu
-`return`_                            The bubble-shaped curve that can be dragged out 
-`qbcode`_                            Display qrcode and barcode 
+`return`_                            The bubble-shaped curve that can be dragged out
+`qbcode`_                            Display qrcode and barcode
 `canvas_rect`_                       Display a rectangular
 `canvas_round_rect`_                 Display a round rectangular
 `canvas_arc`_                        Display a arc
 `multi_level`_                       Manage and manipulate multi-level subwindows
+`litegfx`_                           Third-Party Collaboration Special Effects
 ==================                   ==================
 
 .. _obj: gui_obj.html
 .. _window: gui_window.html
 .. _img: gui_img.html
-.. _simple img: gui_simple_img.html 
+.. _simple img: gui_simple_img.html
 .. _stbimg: gui_img_stb.html
 .. _text: gui_text.html
 .. _tabview: gui_tabview.html
@@ -63,6 +64,7 @@ Widgets                              Brief
 .. _return: gui_return.html
 .. _qbcode: qbcode.html
 .. _multi_level: gui_multi_level.html
+.. _litegfx: gui_widget_litegfx.html
 .. toctree::
     :maxdepth: 2
 
@@ -92,6 +94,7 @@ Widgets                              Brief
     watch gradient spot <gui_watch_gradient_spot>
     watchface gradient <gui_watchface_gradient>
     menu cellular <gui_menu_cellular>
-    return <gui_return> 
-	qbcode <gui_qbcode> 
+    return <gui_return>
+	qbcode <gui_qbcode>
     multi_level <gui_multi_level>
+    litegfx <gui_widget_litegfx>

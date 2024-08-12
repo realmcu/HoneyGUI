@@ -16,7 +16,7 @@ uintptr_t app_energy_box_user_cb(uint16_t cmd, uintptr_t param, uintptr_t user_d
     return 0;
 }
 
-void design_tab_app_energbox(void *parent)
+void design_tab_app_energybox(void *parent)
 {
     gui_widget_litegfx_t *widget = gui_widget_litegfx_create(parent, "lx vglite energbox",
                                                              LX_VGWIDGET_INS_ENERGY_BOX, app_energy_box_user_cb, 0, 0, 454, 454);
