@@ -96,7 +96,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
     struct dirent *entry;
     if ((dir = opendir(dirPath)) == NULL)
     {
-        perror("opendir() failed"); return;
+        gui_log("opendir(%s) failed", dirPath); return;
     }
     while ((entry = readdir(dir)) != NULL)
     {
@@ -110,7 +110,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
             DIR *dirr = 0;
             if ((dirr = opendir(path2)) == NULL)
             {
-                perror("opendir() failed"); return;
+                gui_log("opendir(%s) failed", path2); return;
             }
             struct dirent *entryy;
             while ((entryy = readdir(dirr)) != NULL)

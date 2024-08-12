@@ -5,6 +5,8 @@ import subprocess
 import os
 import sys
 import atexit
+import threading
+import queue
 
 def get_script_dir():
     if getattr(sys, 'frozen', False):
@@ -111,34 +113,40 @@ class ConfigEditorApp:
 
         try:
             self.scons_process = subprocess.Popen(["scons"], cwd=win32_sim_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            self.read_process_output(self.scons_process)
+
+            self.output_queue = queue.Queue()
+            threading.Thread(target=self.read_process_output, args=(self.scons_process.stdout, "stdout", self.output_queue)).start()
+            threading.Thread(target=self.read_process_output, args=(self.scons_process.stderr, "stderr", self.output_queue)).start()
+
+            self.check_process()
         except Exception as e:
             messagebox.showerror("错误", f"构建失败:\n{str(e)}")
-            
-    def read_process_output(self, process):
-        def read_line():
-            line = process.stdout.readline()
-            if line:
+
+    def read_process_output(self, stream, stream_type, output_queue):
+        for line in iter(stream.readline, ''):
+            output_queue.put((stream_type, line))
+        stream.close()
+
+    def check_process(self):
+        try:
+            while not self.output_queue.empty():
+                stream_type, line = self.output_queue.get_nowait()
                 self.text_box.config(state="normal")
                 self.text_box.insert("end", line)
                 self.text_box.config(state="disabled")
                 self.text_box.yview("end")
-                self.text_box.update_idletasks()
-                self.master.after(10, read_line)
+        except queue.Empty:
+            pass
+
+        return_code = self.scons_process.poll()
+        if return_code is None:
+            self.master.after(100, self.check_process)
+        else:
+            if return_code == 0:
+                self.run_gui_exe()
             else:
-                return_code = process.poll()
-                if return_code is None:
-                    self.master.after(100, read_line)
-                else:
-                    process.stdout.close()
-                    stderr_output = process.stderr.read()
-                    process.stderr.close()
-                    if return_code == 0:
-                        self.run_gui_exe()
-                    else:
-                        self.show_error_window(return_code, stderr_output)
-              
-        read_line()
+                stderr_output = self.scons_process.stderr.read()
+                self.show_error_window(return_code, stderr_output)
 
     def show_error_window(self, return_code, error_message):
         messagebox.showerror("错误", f"SCons 构建失败，退出代码: {return_code}\n{error_message}")
@@ -152,13 +160,27 @@ class ConfigEditorApp:
                 raise FileNotFoundError(f"gui.exe 未找到在 '{gui_exe_path}'")
             self.gui_process = subprocess.Popen([gui_exe_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+            threading.Thread(target=self.read_process_output, args=(self.gui_process.stdout, "stdout", self.output_queue), daemon=True).start()
+            threading.Thread(target=self.read_process_output, args=(self.gui_process.stderr, "stderr", self.output_queue), daemon=True).start()
+
             if self.gui_process.poll() is None:
                 print(f"gui.exe started successfully with PID: {self.gui_process.pid}")
             else:
                 print("Failed to start gui.exe.")
-
+            # self.check_gui_process()
         except Exception as e:
             messagebox.showerror("错误", f"GUI 启动失败:\n{str(e)}")  
+
+    def check_gui_process(self):
+        self.update_text_box()
+
+        return_code = self.gui_process.poll()
+        if return_code is None:
+            self.master.after(100, self.check_gui_process)
+        else:
+            if return_code != 0:
+                stderr_output = self.gui_process.stderr.read()
+                self.show_error_window(return_code, stderr_output)
 
     def create_widgets(self):
         self.master.grid_rowconfigure(0, weight=0)
@@ -185,6 +207,8 @@ class ConfigEditorApp:
 
         self.canvas.grid(row=1, column=0, sticky='nsew', padx=(50, 0))
         scrollbar.grid(row=1, column=1, sticky='ns')
+
+        self.canvas.bind_all("<MouseWheel>", self.on_mouse_wheel)
 
         self.buttons = []
 
@@ -231,7 +255,8 @@ class ConfigEditorApp:
         self.select_option(option_name)
         self.run_command()
 
-    
+    def on_mouse_wheel(self, event):
+        self.canvas.yview_scroll(-1 * (event.delta // 120), "units")
 
     def cleanup(self):
         if self.scons_process is not None and self.scons_process.poll() is None:
