@@ -18,14 +18,14 @@ namespace agge
 
 
 	float sqrt(float x)
-	{	return ::sqrtf(x);	}
+	{	return nvg__sqrtf(x);	}
 
 	double sqrt(double x)
-	{	return ::sqrt(x);	}
+	{	return nvg__sqrtf(x);	}
 
 	float sin(float a)
-	{	return ::sinf(a);	}
+	{	return nvg__sinf(a);	}
 
 	float cos(float a)
-	{	return ::cosf(a);}
+	{	return nvg__cosf(a);    }
 }

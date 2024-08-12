@@ -61,5 +61,8 @@ namespace agge
 	extern "C"
 	{
 		float nvg__sqrtf(float a);
-	};
+		float nvg__modf(float a, float b);
+		float nvg__sinf(float a);
+		float nvg__cosf(float a);
+    };
 }
