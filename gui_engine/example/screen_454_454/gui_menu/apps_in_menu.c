@@ -49,6 +49,7 @@ GUI_APP_DEFINE_NAME(APP_MUSIC)
 GUI_APP_DEFINE_NAME(APP_WEB)
 GUI_APP_DEFINE_NAME(APP_BLOCK)
 GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
+GUI_APP_DEFINE_NAME(APP_CALCULATOR)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -2908,4 +2909,17 @@ GUI_APP_ENTRY(APP_FRUIT_NINJA)
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
 
+/**
+ * @brief APP_CALCULATOR
+ *
+ */
+#include "app_calculator.h"
 
+GUI_APP_ENTRY(APP_CALCULATOR)
+{
+    gui_app_t *calculator = get_app_calculator();
+    calculator->ui_design((gui_app_t *)GUI_APP_ROOT_SCREEN);
+
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}
