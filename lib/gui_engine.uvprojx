@@ -11,19 +11,19 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6220000::V6.22::.\ArmCompilerforEmbedded6.22</pCCUsed>
-      <uAC6>1</uAC6>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
-          <Device>ARMCM4_FP</Device>
+          <Device>ARMCM3</Device>
           <Vendor>ARM</Vendor>
           <PackID>ARM.CMSIS.5.9.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ESEL ELITTLE</Cpu>
+          <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M3") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
           <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000)</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:ARMCM4_FP$Device\ARM\ARMCM4\Include\ARMCM4_FP.h</RegisterFile>
+          <RegisterFile>$$Device:ARMCM3$Device\ARM\ARMCM3\Include\ARMCM3.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -54,11 +54,11 @@
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
-          <BrowseInformation>0</BrowseInformation>
+          <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\build\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
-          <CreateBatchFile>0</CreateBatchFile>
+          <CreateBatchFile>1</CreateBatchFile>
           <BeforeCompile>
             <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
@@ -112,11 +112,11 @@
           <SimDllName>SARMCM3.DLL</SimDllName>
           <SimDllArguments>  -MPU</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
-          <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
+          <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
           <TargetDllArguments> -MPU</TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
-          <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
+          <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
         </DllOption>
         <DebugOption>
           <OPTHX>
@@ -174,7 +174,7 @@
             <AdsLsxf>1</AdsLsxf>
             <RvctClst>0</RvctClst>
             <GenPPlst>0</GenPPlst>
-            <AdsCpuType>"Cortex-M4"</AdsCpuType>
+            <AdsCpuType>"Cortex-M3"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
             <mOS>0</mOS>
             <uocRom>0</uocRom>
@@ -183,7 +183,7 @@
             <hadIRAM>1</hadIRAM>
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
-            <RvdsVP>2</RvdsVP>
+            <RvdsVP>0</RvdsVP>
             <RvdsMve>2</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>5</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
@@ -322,7 +322,7 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>3</wLevel>
+            <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
@@ -336,8 +336,8 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
-              <Define>ENABLE_RTK_GUI_FONT_STB TARGET_RTL8773E ENABLE_RTK_GUI ENABLE_RTK_GUI_FONT_RTK_MEM</Define>
+              <MiscControls>--fpu=FPv5-SP --gnu  --bss_threshold=0 --library_interface=aeabi_clib --no-multibyte-chars</MiscControls>
+              <Define>ENABLE_RTK_GUI_FONT_RTK_MEM ENABLE_HONEYGUI ENABLE_RTK_GUI_FONT_STB TARGET_RTL8773E</Define>
               <Undefine></Undefine>
               <IncludePath>.;.;..\gui_engine;..\gui_engine\3rd\cJSON;..\gui_engine\3rd\ezXML;..\gui_engine\3rd\nanosvg\src;..\gui_engine\3rd\nanovg;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\base;..\gui_engine\3rd\nanovg\agge;..\gui_engine\3rd\nanovg\vglite;..\gui_engine\3rd\stb;..\gui_engine\3rd\tjpgd;..\gui_engine\app;..\gui_engine\core;..\gui_engine\dc;..\gui_engine\engine;..\gui_engine\input;..\gui_engine\misc;..\gui_engine\misc\tlsf;..\gui_engine\SaaA;..\gui_engine\server;..\gui_engine\widget</IncludePath>
             </VariousControls>
@@ -644,6 +644,11 @@
               <FilePath>..\gui_engine\widget\gui_canvas_arc.c</FilePath>
             </File>
             <File>
+              <FileName>gui_canvas_img.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_canvas_img.c</FilePath>
+            </File>
+            <File>
               <FileName>gui_canvas_rect.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_canvas_rect.c</FilePath>
@@ -702,6 +707,11 @@
               <FileName>gui_grid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\gui_engine\widget\gui_grid.c</FilePath>
+            </File>
+            <File>
+              <FileName>gui_image_array.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\gui_engine\widget\gui_image_array.c</FilePath>
             </File>
             <File>
               <FileName>gui_img.c</FileName>
