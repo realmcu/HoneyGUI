@@ -7,9 +7,21 @@
 <type a1="xx" a2="xx" a3="xx" a4="xx">name</type> 
 ```
 ## Nesting
-The nesting structure of elements is consistent with the nesting structure of actual widgets
+The nesting structure of elements is consistent with the nesting structure of actual widgets.
 
 ```eval_rst
+.. raw:: html
+
+    <style>
+    .center {
+        display: flex;
+        justify-content: center;
+    }
+    </style>
+
+.. raw:: html
+
+    <div class="center">
 
 .. mermaid::
  
@@ -18,6 +30,9 @@ The nesting structure of elements is consistent with the nesting structure of ac
       fatherName --> childName2;
       childName2 --> childName3;
       childName2 --> childName4;
+
+.. raw:: html
+    </div>
 ```
 ```xml
 <fatherType a1="xx" a2="xx" a3="xx" a4="xx">fatherName 
