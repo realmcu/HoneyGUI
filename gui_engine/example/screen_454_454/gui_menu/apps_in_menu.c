@@ -711,6 +711,12 @@ static void stop_watch_win_ani_cb(void);
 #define STOPWATCHTEXT "STOPWATCHTEXT"
 
 const static int gap = 50;
+static int touch_y;
+static bool alien = true;
+static int16_t recode[5];
+static const int end_speed = 3;
+static const int array_length = 24;
+static int speed, target;
 #define COUNT 7
 static char text_array[COUNT][3];
 static gui_obj_t *text_widget_array[COUNT];
@@ -835,13 +841,6 @@ static void render_number(const char *text, gui_obj_t *obj)
             const char *input = text;
             size_t num_pointers;
             void **image_pointers = get_image_pointers(input, &num_pointers);
-
-            // Print results
-            gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
-            for (size_t i = 0; i < num_pointers; ++i)
-            {
-                gui_log("Image pointer %zu: %p\n", i + 1, image_pointers[i]);
-            }
             gui_image_array_write((void *)obj, image_pointers, num_pointers);
             // Free allocated memory
             gui_free(image_pointers);
@@ -852,6 +851,50 @@ static void render_number(const char *text, gui_obj_t *obj)
         break;
     }
 }
+static void update_speed(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    int recode_num = 4;
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        recode[i] = recode[i + 1];
+    }
+    recode[recode_num] = tp->deltaY;
+    speed = recode[recode_num] - recode[0];
+    int max_speed = GUI_PAGE_MAX_SPEED;
+    int min_speed = GUI_PAGE_MIN_SPEED;
+    if (speed > max_speed)
+    {
+        speed = max_speed;
+    }
+    else if (speed < -max_speed)
+    {
+        speed = -max_speed;
+    }
+    if ((speed > 0) && (speed < min_speed))
+    {
+        speed = min_speed;
+    }
+    else if ((speed < 0) && (speed > -min_speed))
+    {
+        speed = -min_speed;
+    }
+}
+static bool render;
+static void gui_page_update_inertial(gui_obj_t *obj)
+{
+    IMPORT_GUI_TOUCHPAD
+    if (speed > end_speed)
+    {
+        touch_y += speed;
+        speed -= 1;
+    }
+    else if (speed < -end_speed)
+    {
+        touch_y += speed;
+        speed += 1;
+    }
+}
 static void stop_watch_win_overwrite(gui_obj_t *win)
 {
     IMPORT_GUI_TOUCHPAD
@@ -860,18 +903,108 @@ static void stop_watch_win_overwrite(gui_obj_t *win)
     static char time_array_offset;
     int time_array_size = sizeof(time_array) / sizeof(time_array[0]);
     static int history_y;
+    if (wheel->pressed)
+    {
+        wheel_take_over = 1;
+        wheel->history_x = touch_y;
+    }
+    if (wheel->released)
+    {
+        wheel_take_over = 0;
+    }
+
     if (!wheel_take_over)
     {
+        if (touch->pressed && touch->x > win->x && touch->x < win->x + win->w)
+        {
+            history_y = touch_y;
+            speed = 0;
+            memset(recode, 0, sizeof(recode));
+        }
         if (touch->pressing && touch->x > win->x && touch->x < win->x + win->w)
         {
-            touch->history_y = history_y + touch->deltaY;
+            touch_y = history_y + touch->deltaY;
             /**
              * Index = offset / gap % array length
                WidgetOffset = offset % gap
             */
-            time_array_offset = -(touch->history_y / gap % time_array_size);
-            int widget_offset = touch->history_y % gap;
+            update_speed(win);
+            render = 1;
+
+
+        }
+        else
+        {
+            gui_page_update_inertial(win);
+        }
+        if (render)
+        {
+            time_array_offset = -(touch_y / gap % array_length);
+            int widget_offset = touch_y % gap;
             GUI_BASE(win)->y = widget_offset;
+            if (alien && widget_offset == 0 && speed <= end_speed && speed >= -end_speed)
+            {
+                render = 0;
+            }
+            if (alien && widget_offset != 0)
+            {
+                if (speed > 0 && speed <= end_speed)
+                {
+
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y += end_speed;
+                    }
+
+
+                }
+                else if (speed < 0 && speed >= -end_speed)
+                {
+
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y -= end_speed;
+                    }
+
+                }
+                else if (speed == 0)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    if (widget_offset > 0)
+                    {
+                        if (widget_offset > gap / 2)
+                        {
+                            touch_y += end_speed;
+                        }
+                        else
+                        {
+                            touch_y -= end_speed;
+                        }
+                    }
+                    else if (widget_offset < 0)
+                    {
+                        if (-widget_offset > gap / 2)
+                        {
+                            touch_y -= end_speed;
+                        }
+                        else
+                        {
+                            touch_y += end_speed;
+                        }
+                    }
+                }
+            }
             for (size_t i = 0; i < COUNT; i++)
             {
                 char *text = text_array[i];
@@ -891,12 +1024,92 @@ static void stop_watch_win_overwrite(gui_obj_t *win)
         }
         else
         {
-            history_y = touch->history_y;
+            history_y = touch_y;
         }
-
     }
-
-
+    else
+    {
+        touch_y = wheel->history_y;
+        {
+            time_array_offset = -(touch_y / gap % array_length);
+            int widget_offset = touch_y % gap;
+            GUI_BASE(win)->y = widget_offset;
+            if (alien && widget_offset == 0 && speed <= end_speed && speed >= -end_speed)
+            {
+                render = 0;
+            }
+            if (alien && widget_offset != 0)
+            {
+                if (speed > 0 && speed <= end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y += end_speed;
+                    }
+                }
+                else if (speed < 0 && speed >= -end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y -= end_speed;
+                    }
+                }
+                else if (speed == 0)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    if (widget_offset > 0)
+                    {
+                        if (widget_offset > gap / 2)
+                        {
+                            touch_y += end_speed;
+                        }
+                        else
+                        {
+                            touch_y -= end_speed;
+                        }
+                    }
+                    else if (widget_offset < 0)
+                    {
+                        if (-widget_offset > gap / 2)
+                        {
+                            touch_y -= end_speed;
+                        }
+                        else
+                        {
+                            touch_y += end_speed;
+                        }
+                    }
+                }
+            }
+            for (size_t i = 0; i < COUNT; i++)
+            {
+                char *text = text_array[i];
+                memset(text, 0, sizeof(text_array[i]));
+                int index = time_array_offset + i;
+                if (index >= time_array_size)
+                {
+                    index -= time_array_size;
+                }
+                if (index < 0)
+                {
+                    index += time_array_size;
+                }
+                sprintf(text, "%d", time_array[index]);
+                render_number(text, (void *)text_widget_array[i]);
+            }
+        }
+    }
 }
 static void stop_watch_ml0(gui_obj_t *parent)
 {
@@ -933,8 +1146,8 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
     gui_win_t *win = gui_win_create(parent, 0, 0, 70, width, gap * (COUNT - 1));
 
     gui_win_set_scope(win, 1);
-    gui_canvas_rect_create((void *)win, 0, 0, 0, width, gap * (COUNT - 1), COLOR_RED);
-    gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, width, gap * (COUNT - 1));
+    gui_canvas_rect_create((void *)win, 0, 0, 50, width, gap * (COUNT - 2), COLOR_RED);
+    gui_win_t *timer1 = gui_win_create(win, 0, width / 2 - gap / 2, 0, width, gap * (COUNT - 1));
     gui_win_set_animate(win, 1000, -1, stop_watch_win_overwrite, timer1);
 
 
