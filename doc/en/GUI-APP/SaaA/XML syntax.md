@@ -32,8 +32,10 @@ The nesting structure of elements is consistent with the nesting structure of ac
       childName2 --> childName4;
 
 .. raw:: html
+
     </div>
 ```
+
 ```xml
 <fatherType a1="xx" a2="xx" a3="xx" a4="xx">fatherName 
 

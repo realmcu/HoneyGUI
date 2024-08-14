@@ -31,3 +31,20 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .catch(error => console.error('Error loading configuration file:', error));
 });
+
+function update() {
+    fetch('light_config.json')
+        .then(response => response.json())
+        .then(config => {
+
+            const lightsConfig = config.lights;
+            lightsConfig.forEach(lightConfig => {
+                lightDiv = document.getElementById(`light-${lightConfig.id}`);
+
+                lightDiv.style.backgroundImage = lightConfig.state === 'on' ? 
+                    "url('resources/light_on.png')" : "url('resources/light_off.png')";      
+            });
+        })
+        .catch(error => console.error('Error loading configuration file:', error));
+}
+setInterval(update, 1000);

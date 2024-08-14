@@ -19,5 +19,5 @@ GUI_INIT_APP_EXPORT(app_init);
     86box Application <86box/86box>
     LiteGFX Application <LiteGFX/Demo>
     Status bar <Status-bar/Status bar>
-    Fruit_Ninja Application <Fruit_Ninja/Demo>
+    Fruit Ninja Application <Fruit_Ninja/Demo>
 ```
