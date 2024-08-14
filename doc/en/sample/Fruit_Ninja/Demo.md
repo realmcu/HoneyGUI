@@ -2,11 +2,9 @@
 
 This example demostrates how to develop a simple "Fruit Ninja APP", from which you can learn and understand the basic methods and processes of developing a ui application. Cut the fruits to gain points until you get to the bomb game over. Watch the demo video below to see its full functionality.
 
-```eval_rst
-.. raw:: html
-
-    <iframe src="https://drive.google.com/file/d/16fp68gP_a70eIvRbJNd6TNg6f0_htSWX/preview" width="500" height="500" allow="autoplay"></iframe>
-```
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723621216978994553/76b62adc_10737458.gif" width = "450" /></div>
+<br>
 
 ## Source File
 To help learn and be familiar with the development, you can find all source files you may need in path sdk\src\app\gui\gui_engine\example\. The source file for this demostration is app_fruit_ninja_box2d.cpp, you can find it in the path mentioned for more details.

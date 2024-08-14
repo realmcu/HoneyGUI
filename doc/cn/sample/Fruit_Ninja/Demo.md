@@ -2,11 +2,9 @@
 
 本示例演示了如何开发一个简单的"水果忍者"APP，您可以从中学习和了解开发ui 应用程序的基本方法和流程。切割水果获得分数，直到切到炸弹游戏结束，观看下面的演示视频，了解其全部功能。
 
-```eval_rst
-.. raw:: html
-
-    <iframe src="https://drive.google.com/file/d/16fp68gP_a70eIvRbJNd6TNg6f0_htSWX/preview" width="500" height="500" allow="autoplay"></iframe>
-```
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723621216978994553/76b62adc_10737458.gif" width = "450" /></div>
+<br>
 
 ## 源文件
 为了帮助您学习和熟悉开发，您可以在 sdk\src\app\gui\gui_engine\example 路径下找到您可能需要的所有源文件。本演示的源文件是 app_fruit_ninja_box2d.cpp，您可以在上述路径中找到它，了解更多详情。
