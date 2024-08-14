@@ -117,23 +117,13 @@ typedef struct
 typedef struct gui_cube
 {
     gui_obj_t base;                 //!< base structure
-    draw_img_t draw_img[6];         // draw_img_t draw_img_front;
-    // draw_img_t draw_img_back;
-    // draw_img_t draw_img_up;
-    // draw_img_t draw_img_down;
-    // draw_img_t draw_img_left;
-    // draw_img_t draw_img_right;
-
+    draw_img_t draw_img[6];         // please refer to enum T_CUBE_SIDE_TYPE.
 
     float c_x;
     float c_y;
     float cbsize;
-    float nz[6];                    // float nz0321;
-    // float nz4567;
-    // float nz5126;
-    // float nz0473;
-    // float nz7623;
-    // float nz0154;
+    float nz[6];                    // please refer to enum T_CUBE_NZ_TYPE.
+
     //float scale_x;
     //float scale_y;
     //float t_x;
