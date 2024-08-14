@@ -26,6 +26,7 @@ class ConfigEditorApp:
     def __init__(self, master, file_path):
         self.master = master
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.master.geometry("500x600")
         self.info_window = None
         self.scons_process = None
         self.gui_process = None
@@ -50,8 +51,10 @@ class ConfigEditorApp:
             for option in self.primary_options:
                 for line in config_lines:
                     if re.match(rf"^#define\s+{option['macro']}\b", line.strip()):
-                        
-                        return option['name']
+                        parts = line.strip().split()
+                        if len(parts) > 2 and parts[2] == '0':
+                            continue
+                        return option['macro']
 
         except Exception as e:
             print(f"Error reading config file: {e}")
@@ -70,10 +73,16 @@ class ConfigEditorApp:
 
                 for option in self.primary_options:
                     if re.search(rf"^//\s*#define\s+{option['macro']}\b|^#define\s+{option['macro']}\b", line.strip()):
-                        if option['name'] == selected_option:
-                            new_line = f"#define {option['macro']}\n"
+                        if option['macro'] == selected_option:
+                            if option['macro'] == "CONFIG_REALTEK_BUILD_LVGL_GUI" or option['macro'] == "CONFIG_REALTEK_BUILD_ARM_2D":
+                                new_line = f"#define {option['macro']}     1\n"
+                            else:
+                                new_line = f"#define {option['macro']}\n"
                         else:
-                            new_line = f"// #define {option['macro']}\n"
+                            if option['macro'] == "CONFIG_REALTEK_BUILD_LVGL_GUI" or option['macro'] == "CONFIG_REALTEK_BUILD_ARM_2D":
+                                new_line = f"#define {option['macro']}     0\n"
+                            else:
+                                new_line = f"// #define {option['macro']}\n"
                         break
 
                 file.write(new_line)
@@ -189,7 +198,7 @@ class ConfigEditorApp:
         self.master.grid_columnconfigure(1, weight=0)
 
         title = tk.Label(self.master, text="GUI Demo", font=('Helvetica', 16))
-        title.grid(row=0, column=0, columnspan=2, pady=(20, 10))
+        title.grid(row=0, column=0, columnspan=2, pady=(20, 10), sticky='ew')
 
         self.canvas = tk.Canvas(self.master)
         scrollbar = tk.Scrollbar(self.master, orient="vertical", command=self.canvas.yview)
@@ -215,9 +224,9 @@ class ConfigEditorApp:
         row_index = 0
         for option in self.primary_options:
             button_frame = tk.Frame(self.scrollable_frame, borderwidth=2, relief='flat', padx=10, pady=5, highlightbackground="black", highlightthickness=1)
-            button_frame.grid(row=row_index, column=0, padx=10, pady=10, sticky='ew')
+            button_frame.grid(row=row_index, column=0, padx=40, pady=10, sticky='ew')
             button_frame.grid_columnconfigure(0, weight=1)
-            button_frame.option_name = option['name']
+            button_frame.option_macro = option['macro']
 
             name_label = tk.Label(button_frame, text=option.get('name'), font=('Helvetica', 14, 'bold'), anchor='center')
             name_label.pack(fill='x', pady=(5, 0))
@@ -231,16 +240,16 @@ class ConfigEditorApp:
 
             # Ensure all child components propagate the click event to handle_button_click
             for widget in (button_frame, name_label, spacer, details_label):
-                widget.bind("<Button-1>", lambda e, opt=option['name']: self.handle_button_click(opt))
+                widget.bind("<Button-1>", lambda e, opt=option['macro']: self.handle_button_click(opt))
 
             self.buttons.append(button_frame)
             row_index += 1
         self.select_option(self.primary_var.get())
 
-    def select_option(self, option_name):
-        self.primary_var.set(option_name)
+    def select_option(self, option_macro):
+        self.primary_var.set(option_macro)
         for button_frame in self.buttons:
-            if button_frame.option_name == option_name:
+            if button_frame.option_macro == option_macro:
                 button_frame.config(bg="lightblue", relief="solid", bd=2)
                 for child in button_frame.winfo_children():
                     if isinstance(child, tk.Label):
@@ -251,8 +260,8 @@ class ConfigEditorApp:
                     if isinstance(child, tk.Label):
                         child.config(bg="SystemButtonFace")
 
-    def handle_button_click(self, option_name):
-        self.select_option(option_name)
+    def handle_button_click(self, option_macro):
+        self.select_option(option_macro)
         self.run_command()
 
     def on_mouse_wheel(self, event):
@@ -270,23 +279,77 @@ class ConfigEditorApp:
 if __name__ == "__main__":
     
     products_info = {
+        "CONFIG_REALTEK_BUILD_REAL_BASE": {
+            "name": "Base",
+            "resolution": "480 x 480",
+            "description": "GUI base application",
+            "macro": "CONFIG_REALTEK_BUILD_REAL_BASE"
+        },
+        "CONFIG_REALTEK_BUILD_REAL_NANOVG": {
+            "name": "NANOVG",
+            "resolution": "480 x 480",
+            "description": "NANOVG application",
+            "macro": "CONFIG_REALTEK_BUILD_REAL_NANOVG"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_448_368_DEMO": {
+            "name": "Watch",
+            "resolution": "368 x 448",
+            "description": "Watch application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_448_368_DEMO"
+        },
         "CONFIG_REALTEK_BUILD_GUI_454_454_DEMO": {
             "name": "Watch",
-            "resolution": "454x454",
+            "resolution": "454 x 454",
             "description": "Watch application using native C",
             "macro": "CONFIG_REALTEK_BUILD_GUI_454_454_DEMO"
         },
         "CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP": {
             "name": "86box",
-            "resolution": "480x480",
+            "resolution": "480 x 480",
             "description": "86box application using SaaA",
             "macro": "CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP"
         },
         "CONFIG_REALTEK_BUILD_TEST": {
             "name": "Test",
-            "resolution": "480x480",
+            "resolution": "480 x 480",
             "description": "Test application",
             "macro": "CONFIG_REALTEK_BUILD_TEST"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_280_456_DEMO": {
+            "name": "Watch",
+            "resolution": "280 x 456",
+            "description": "Watch application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_280_456_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_240_240_DEMO": {
+            "name": "Electronic Cigarette",
+            "resolution": "240 x 240",
+            "description": "Electronic cigarette application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_240_240_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_320_385_DEMO": {
+            "name": "Charge Box",
+            "resolution": "386 x 320",
+            "description": "Charge Box application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_320_385_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_800_480_DEMO": {
+            "name": "Dashboard",
+            "resolution": "800 x 480",
+            "description": "Dashboard application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_800_480_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_LVGL_GUI":{
+            "name": "LVGL",
+            "resolution": "480 x 480",
+            "description": "LVGL application",
+            "macro": "CONFIG_REALTEK_BUILD_LVGL_GUI"
+        },
+        "CONFIG_REALTEK_BUILD_ARM_2D":{
+            "name": "ARM2D",
+            "resolution": "480 x 480",
+            "description": "ARM2D application",
+            "macro": "CONFIG_REALTEK_BUILD_ARM_2D"
         }
     }
 
