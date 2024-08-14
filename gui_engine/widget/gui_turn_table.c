@@ -106,6 +106,8 @@ static void turn_table_input_prepare(gui_obj_t *obj)
 static void gui_turn_table_update_resetting_angle(gui_turn_table_t *this)
 {
     float temp = M_PI / this->active_icon_quantity / TURN_TABLE_ROTATE_STEP;
+    // gui_log("enter last_angle[0] %f, [1] %f , [2] %f \n",
+    //          this->last_angle[0],this->last_angle[1],this->last_angle[2]);
     if (this->last_angle[0] > 0)
     {
         if (this->last_angle[2] > this->last_angle[1] &&
@@ -122,7 +124,7 @@ static void gui_turn_table_update_resetting_angle(gui_turn_table_t *this)
         this->last_angle[1] -= temp;
         this->last_angle[0] = this->resetting_angle;
     }
-    if (this->last_angle[0] < 0)
+    else if (this->last_angle[0] < 0)
     {
         if (this->last_angle[2] < this->last_angle[1] &&
             this->last_angle[1] < this->last_angle[0])
@@ -139,7 +141,22 @@ static void gui_turn_table_update_resetting_angle(gui_turn_table_t *this)
         this->last_angle[1] += temp;
         this->last_angle[0] = this->resetting_angle;
     }
-
+    if (this->last_angle[0] == 0)
+    {
+        if (this->last_angle[2] == 0 &&
+            this->last_angle[1] == 0)
+        {
+            return;
+        }
+        else if (fabs(this->last_angle[2]) < temp ||
+                 fabs(this->last_angle[1]) < temp)
+        {
+            this->last_angle[1] = 0;
+            this->last_angle[2] = 0;
+        }
+    }
+    // gui_log("exit last_angle[0] %f, [1] %f , [2] %f \n",
+    //         this->last_angle[0],this->last_angle[1],this->last_angle[2]);
 }
 static void gui_turn_table_refresh_angle_list_release(gui_turn_table_t *this, float angle)
 {
@@ -154,7 +171,8 @@ static void gui_turn_table_refresh_angle_list(gui_turn_table_t *this, float angl
     this->last_angle[2] = this->last_angle[1];
     this->last_angle[1] = this->last_angle[0];
     this->last_angle[0] = angle;
-    // gui_log("last_angle[2] %f , last_angle[1] %f , last_angle[0] %f \n",this->last_angle[2],this->last_angle[1],this->last_angle[0]);
+    // gui_log("last_angle[2] %f , last_angle[1] %f , last_angle[0] %f \n",
+    //          this->last_angle[2],this->last_angle[1],this->last_angle[0]);
 
     if (this->last_angle[2] < this->last_angle[1] &&
         this->last_angle[1] < this->last_angle[0])
@@ -196,6 +214,10 @@ static gui_turn_table_coordinate_t gui_turn_table_get_image_coordinate(gui_turn_
                                                                        int index, float ratio)
 {
     gui_turn_table_coordinate_t input1, input2, output;
+    memset(&input1, 0, sizeof(input1));
+    memset(&input2, 0, sizeof(input2));
+    memset(&output, 0, sizeof(output));
+
     input1 = this->static_list[index];
     switch (this->state)
     {
@@ -209,7 +231,7 @@ static gui_turn_table_coordinate_t gui_turn_table_get_image_coordinate(gui_turn_
             {
                 input2 = this->static_list[index + 1];
             }
-            else if (index + 1 == this->active_icon_quantity)
+            else if (index + 1 >= this->active_icon_quantity)
             {
                 input2 = this->static_list[0];
             }
@@ -287,7 +309,7 @@ static void gui_turn_table_update_position(gui_turn_table_t *this, float angle)
     float offset_ratio = ((int)(angle / this->sector_angle) * this->sector_angle - angle) /
                          this->sector_angle;
 
-    while (index + this->active_icon_quantity < 0)
+    while (index + this->active_icon_quantity <= 0)
     {
         index += this->icon_quantity;
     }
@@ -403,12 +425,12 @@ static void turn_table_prepare(gui_obj_t *obj)
     int half_screen_w = (int)(gui_get_screen_width)() / 2;
     int half_screen_h = (int)(gui_get_screen_height)() / 2;
     float rotationg_angle = 0;
-
     if (tp->pressed || tp->pressing || tp->released)
     {
         if (tp->pressed)
         {
             this->turn_count = 0;
+            this->need_update = true;
             memset(this->last_angle, 0, sizeof(float) * 3);
         }
 
@@ -432,15 +454,27 @@ static void turn_table_prepare(gui_obj_t *obj)
             this->resetting_angle = ((int)(rotationg_angle / this->sector_angle) * this->sector_angle -
                                      rotationg_angle);
             this->turn_count = 0;
+            // gui_log("this->resetting_angle %f ,rotationg_angle %f ,this->sector_angle %f \n",
+            //          this->resetting_angle,    rotationg_angle,    this->sector_angle);
             gui_turn_table_refresh_angle_list_release(this, this->resetting_angle);
         }
     }
     else
     {
         gui_turn_table_update_resetting_angle(this);
-        if (this->resetting_angle != 0)
+        if (this->last_angle[0] != 0)
         {
             gui_turn_table_update_position(this, this->resetting_angle);
+        }
+        else
+        {
+            if (this->last_angle[1] == 0 &&
+                this->last_angle[2] == 0 &&
+                this->need_update == true)
+            {
+                gui_turn_table_update_position(this, this->resetting_angle);
+                this->need_update = false;
+            }
         }
     }
 
@@ -456,6 +490,7 @@ static void turn_table_destory(gui_obj_t *obj)
     gui_turn_table_t *this = (void *)obj;
     gui_free(this->static_list);
     gui_free(this->icon_list);
+    gui_free(this->name_list);
 }
 
 static void gui_turn_table_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
@@ -493,6 +528,15 @@ static void gui_turn_table_refresh_icon_list(gui_turn_table_t *this)
     {
         this->icon_list = gui_realloc(this->icon_list, sizeof(gui_img_t *) * this->icon_quantity);
     }
+    if (this->name_list == NULL)
+    {
+        this->name_list = gui_malloc(TT_IMG_NAME_LENGTH * this->icon_quantity);
+        memset(this->name_list, 0, TT_IMG_NAME_LENGTH * this->icon_quantity);
+    }
+    else
+    {
+        this->name_list = gui_realloc(this->name_list, TT_IMG_NAME_LENGTH * this->icon_quantity);
+    }
 }
 
 static void gui_turn_table_ctor(gui_turn_table_t *this,
@@ -525,7 +569,7 @@ static void gui_turn_table_ctor(gui_turn_table_t *this,
     this->icon_highlight_scale = 2.0f;
     this->highlight_index = this->active_icon_quantity / 2;
     this->sector_angle = M_PI / this->active_icon_quantity * 2;
-
+    this->need_update = true;
     this->static_list = gui_malloc(sizeof(gui_turn_table_coordinate_t) *
                                    (this->active_icon_quantity + 1));
 
@@ -632,8 +676,12 @@ void gui_turn_table_add_icon_default(gui_turn_table_t *this,
             x = this->static_list[0].x;
             y = this->static_list[0].y;
         }
-        this->icon_list[i] = gui_img_create_from_mem(this, "tt_img", icon_addr, x, y, 0, 0);
+        sprintf((char *)&this->name_list[i * TT_IMG_NAME_LENGTH], "tt_img_%d", i);
+        this->icon_list[i] = gui_img_create_from_mem(this,
+                                                     (const char *)&this->name_list[i * TT_IMG_NAME_LENGTH],
+                                                     icon_addr, x, y, 0, 0);
         gui_img_scale(this->icon_list[i], this->icon_scale, this->icon_scale);
+        gui_img_set_quality(this->icon_list[i], true);
         if (i == this->highlight_index)
         {
             if (this->highlight_icon == NULL)
@@ -642,6 +690,7 @@ void gui_turn_table_add_icon_default(gui_turn_table_t *this,
                 y = gui_get_screen_height() / 2 - this->icon_radius * this->icon_highlight_scale;
                 this->highlight_icon = gui_img_create_from_mem(this, "tth_img", icon_addr, x, y, 0, 0);
                 gui_img_scale(this->highlight_icon, this->icon_highlight_scale, this->icon_highlight_scale);
+                gui_img_set_quality(this->highlight_icon, true);
             }
         }
 
@@ -691,6 +740,7 @@ void gui_turn_table_add_icon_static(gui_turn_table_t *this,
     int y = this->static_list[0].y;
     this->static_icon = gui_img_create_from_mem(this, "tts_img", icon_addr, x, y, 0, 0);
     gui_img_scale(this->static_icon, this->icon_scale, this->icon_scale);
+    gui_img_set_quality(this->static_icon, true);
 }
 /** End of WIDGET_Exported_Functions
   * @}
