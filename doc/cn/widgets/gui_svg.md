@@ -23,12 +23,12 @@
 
 ## 示例
 
-### Creat a simple SVG
+### 创建一个简单的 SVG
 ```cpp
 #include "gui_svg.h"
 #include "root_image_hongkong/ui_resource.h"
 void page_tb_svg(void *parent)
-{ 
+{
     gui_svg_t* svg1=gui_svg_create_from_mem(parent,"svg1",ACTIVITY_SVG,5184,0,0,100,100);
 }
 ```
@@ -36,13 +36,13 @@ void page_tb_svg(void *parent)
 <div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598969684310669/2e2a68e7_13671125.png"/></div>
 <br/>
 
-### SVG rotation
+### SVG 旋转
 
 ```c
 #include "gui_svg.h"
 #include "root_image_hongkong/ui_resource.h"
 void page_tb_svg(void *parent)
-{ 
+{
     gui_svg_t* svg1=gui_svg_create_from_mem(parent,"svg1",ACTIVITY_SVG,5184,0,0,100,100);
     gui_svg_rotation(svg1,90,50,50);
 }
@@ -51,13 +51,13 @@ void page_tb_svg(void *parent)
 <div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598974541085137/fcc74440_13671125.png"/></div>
 <br/>
 
-### SVG scale
+### SVG 缩放
 
 ```c
 #include "gui_svg.h"
 #include "root_image_hongkong/ui_resource.h"
 void page_tb_svg(void *parent)
-{ 
+{
     gui_svg_t* svg1=gui_svg_create_from_mem(parent,"svg1",ACTIVITY_SVG,5184,0,0,100,100);
     gui_svg_scale(svg1,2,1);
 }
@@ -66,13 +66,13 @@ void page_tb_svg(void *parent)
 <div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598982107316449/af526d67_13671125.png"/></div>
 <br/>
 
-### SVG translate
+### SVG 平移
 
 ```c
 #include "gui_svg.h"
 #include "root_image_hongkong/ui_resource.h"
 void page_tb_svg(void *parent)
-{ 
+{
     gui_svg_t* svg1=gui_svg_create_from_mem(parent,"svg1",ACTIVITY_SVG,5184,0,0,100,100);
     gui_svg_translate(svg1,100,100);
 }

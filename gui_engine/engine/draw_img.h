@@ -50,13 +50,14 @@ typedef enum
 } BLEND_MODE_TYPE;
 /* BLEND_MODE_TYPE structure end*/
 
+/* IMG_SOURCE_MODE_TYPE enum start*/
 typedef enum
 {
     IMG_SRC_MEMADDR = 0,
     IMG_SRC_FILESYS,
     IMG_SRC_FTL,
 } IMG_SOURCE_MODE_TYPE;
-
+/* IMG_SOURCE_MODE_TYPE enum end*/
 
 
 void draw_img_load_scale(draw_img_t *img, IMG_SOURCE_MODE_TYPE src_mode);
