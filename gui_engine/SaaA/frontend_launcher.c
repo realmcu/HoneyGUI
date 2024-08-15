@@ -121,9 +121,9 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     char path[512];
                     sprintf(path, "%s/%s", path2, entryy->d_name);
                     extern void get_app(gui_app_t *app, char **pic, char **text);
-                    char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";
-                    uint32_t temp = (uint32_t)path;
-                    app->xml = (char *)temp;
+                    char *pic = "app/system/resource/icMenuBird.bin";
+                    char *text = "bird";
+                    app->xml = path;
 
 
                     get_app(app, &pic, &text);

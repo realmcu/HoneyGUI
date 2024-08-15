@@ -1,5 +1,6 @@
 
 #include "js_user.h"
+#include "unistd.h"
 #ifdef __WIN32
 #include <semaphore.h>
 sem_t sem_timer;
@@ -244,7 +245,8 @@ DECLARE_HANDLER(open)
         jerry_get_object_native_pointer(this_value, (void *)&app, NULL);
 
         char *new_xml = js_value_to_string(args[0]);
-        gui_app_t *app2 = (void *)get_app_xml();
+        extern void *get_app_xml(void);
+        gui_app_t *app2 = (gui_app_t *)get_app_xml();
         app2->xml = new_xml;
         gui_switch_app(app, app2);
     }
@@ -1349,12 +1351,12 @@ DECLARE_HANDLER(sw_setState)
 void gui_extern_event_timer_handler(gui_msg_js_t *js_msg)
 {
     gui_msg_t msg;
-    jerry_value_t js_cb = NULL;
+    jerry_value_t js_cb = 0;
     jerry_value_t res = 0;
 
     memset(&msg, 0, sizeof(gui_msg_t));
     memcpy(&(msg.cb), js_msg, sizeof(gui_msg_js_t));
-    js_cb = (jerry_value_t)msg.payload;
+    js_cb = (jerry_value_t)(uintptr_t)msg.payload;
     // gui_log("timer msg cb 0x%x\n", js_cb);
 
     res = jerry_call_func_sem(js_cb, jerry_create_undefined(), 0, 0);
@@ -1375,9 +1377,9 @@ typedef struct
 void js_ui_timerThread(void *param)
 {
     JS_TIMER_T *js_timer = (JS_TIMER_T *)param;
-    const jerry_value_t js_cb = js_timer->js_cb;
+    const jerry_value_t js_cb = (jerry_value_t)(uintptr_t)js_timer->js_cb;
     uint32_t time_ms = js_timer->time_ms;
-    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS, .payload = EXTERN_EVENT_TIMER, .cb = js_cb};
+    gui_msg_t msg = {.event = GUI_EVENT_EXTERN_IO_JS, .payload = (void *)(uintptr_t)EXTERN_EVENT_TIMER, .cb = (gui_msg_cb)(uintptr_t)js_cb};
 
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
@@ -1436,7 +1438,7 @@ DECLARE_HANDLER(setTimeout)
         pthread_t *thread_hdl;
         JS_TIMER_T *js_timer = gui_malloc(sizeof(JS_TIMER_T));
         memset(js_timer, 0, sizeof(JS_TIMER_T));
-        js_timer->js_cb = js_cb;
+        js_timer->js_cb = (void *)(uintptr_t)js_cb;
         js_timer->time_ms = (uint32_t)jerry_get_number_value(args[1]);
         js_timer->isPeriodic = false;
 
@@ -1446,7 +1448,7 @@ DECLARE_HANDLER(setTimeout)
 
         // gui_log("hdl 0x%x, timerID 0x%x\n", thread_hdl, js_timer);
 
-        js_timerID = (uint32_t)js_timer;
+        js_timerID = (uint32_t)(uintptr_t)js_timer;
         gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
 
         return jerry_create_number(js_timerID);
@@ -1484,7 +1486,7 @@ DECLARE_HANDLER(clearTimeout)
         gui_log("js_timerID 0x%x\n", js_timerID);
 
 #ifdef _WIN32
-        JS_TIMER_T *js_timer = (JS_TIMER_T *)js_timerID;
+        JS_TIMER_T *js_timer = (JS_TIMER_T *)(uintptr_t)js_timerID;
         int res = 0;
 
         // gui_log("hdl 0x%x js_timer 0x%x\n", js_timer->hdl, js_timer);
@@ -1522,7 +1524,7 @@ DECLARE_HANDLER(setInterval)
         pthread_t *thread_hdl;
         JS_TIMER_T *js_timer = gui_malloc(sizeof(JS_TIMER_T));
         memset(js_timer, 0, sizeof(JS_TIMER_T));
-        js_timer->js_cb = args[0];
+        js_timer->js_cb = (void *)(uintptr_t)args[0];
         js_timer->time_ms = (uint32_t)jerry_get_number_value(args[1]);
         js_timer->isPeriodic = true;
 
@@ -1532,7 +1534,7 @@ DECLARE_HANDLER(setInterval)
 
         // gui_log("hdl 0x%x, timerID 0x%x\n", thread_hdl, js_timer);
 
-        js_timerID = (uint32_t)js_timer;
+        js_timerID = (uint32_t)(uintptr_t)js_timer;
         gui_log("timerID 0x%x\n", (uint32_t)js_timerID);
 
         return jerry_create_number(js_timerID);
@@ -1571,7 +1573,7 @@ DECLARE_HANDLER(clearInterval)
         gui_log("js_timerID 0x%x\n", js_timerID);
 
 #ifdef _WIN32
-        JS_TIMER_T *js_timer = (JS_TIMER_T *)js_timerID;
+        JS_TIMER_T *js_timer = (JS_TIMER_T *)(uintptr_t)js_timerID;
         int res = 0;
 
         // gui_log("hdl 0x%x\n", js_timer->hdl);
