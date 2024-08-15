@@ -8,8 +8,8 @@ This section describes the workflow of the RealUI system, which involves the pro
 .. toctree::
     :maxdepth: 2
 
-    overview <overview>
-    input <input>
-    display <display>
-    software_acc <software_acc>
+    RealUI system overview <overview>
+    Input sub-system <input>
+    Display sub-system <display>
+    Software Accelerate <software_acc>
    

@@ -320,9 +320,9 @@ If you need to modify the vision file of the flowchart, please download it from 
 
 ## Support Input type and Output type
 
-|Input / Output type|
-|---|
-|RGB565|
-|RGB888|
-|ARGB8565|
-|ARGB8888|
+|Input type|Output type|
+|---|---|
+|RGB565|RGB565|
+|RGB888|RGB888|
+|-|ARGB8565|
+|ARGB8888|ARGB8888|

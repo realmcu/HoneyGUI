@@ -214,12 +214,12 @@ typedef enum
 3. 进行矩阵计算，将目标区域的写入点映射到图像像素，并获得图像像素的像素值。
 4. 将像素结果写入帧缓冲区。
 
-## RLE通路模式概述
+## RLE旁路模式概述
 以下流程描述了 `RLE` 压缩图像的 `bypass mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
 <div style="text-align: center"><img width= "800" img src ="https://foruda.gitee.com/images/1710327763804701147/539b16fd_13671125.png"/></div><br/>
 
-### RLE通路模式（不带矩阵变换）
+### RLE旁路模式（不带矩阵变换）
 下面的流程图描述了将 `bypass images` 写入帧缓冲区的 `cover mode`处理过程，以RGB565为目标设备图像类型为例。
 
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318858967603728/74fc9285_13671125.png"/></div><br/>
@@ -231,7 +231,7 @@ typedef enum
     - 如果 `opacity_value` 为 `255`，将源图像像素转换为RGB565格式，并写入帧缓冲区。
     - 如果 `opacity_value` 介于 `0` 和 `255` 之间，执行Alpha混合操作将源图像像素与对应的帧缓冲区像素进行混合。混合公式为 `((255 - Sa) * D + Sa * S) / 255)`，将混合结果写入帧缓冲区。
 
-### RLE通路模式（带矩阵变换）
+### RLE旁路模式（带矩阵变换）
 下面的流程图描述了使用 `bypass mode with matrix operations` 将 `compressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318868326988985/8e089811_13671125.png"/></div><br/>
@@ -320,10 +320,10 @@ typedef enum
 
 ## 支持的输入类型和输出类型
 
-|输入 / 输出类型|
-|---|
-|RGB565|
-|RGB888|
-|ARGB8565|
-|ARGB8888|
+|输入类型|输出类型|
+|---|---|
+|RGB565|RGB565|
+|RGB888|RGB888|
+|-|ARGB8565|
+|ARGB8888|ARGB8888|
 
