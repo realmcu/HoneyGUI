@@ -81,6 +81,7 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y);
 void gui_img_set_animate(gui_img_t *this,
                          uint32_t   dur,
                          int        repeat_count,
@@ -354,7 +355,13 @@ static void gui_img_prepare(gui_obj_t *obj)
             gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
         }
     }
-
+    if (point_in_obj_circle(obj, tp->x, tp->y) == true)
+    {
+        if ((tp->type == TOUCH_SHORT) && (obj->event_dsc_cnt > 0))
+        {
+            gui_obj_event_set(obj, GUI_EVENT_1);
+        }
+    }
     last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
@@ -364,7 +371,28 @@ static void gui_img_prepare(gui_obj_t *obj)
         gui_fb_change();
     }
 }
+static bool point_in_obj_circle(gui_obj_t *obj, int16_t x, int16_t y)
+{
+    int16_t m_x, m_y, m_w, m_h;//caculate by obj matrix
 
+    gui_obj_get_area(obj, &m_x, &m_y, &m_w, &m_h);
+    int circle_w = (float)m_w / 1.41421356f;
+    int circle_h = (float)m_h / 1.41421356f;
+    //gui_log("%d,%d,%d,%d\n",m_x, m_y, m_w, circle_w);
+    m_x += (m_w - circle_w) / 2;
+    m_y += (m_h - circle_h) / 2;
+    m_w = circle_w;
+    m_h = circle_h;
+    if ((m_x < x)
+        && ((m_x + m_w) > x)
+        && (m_y < y)
+        && ((m_y + m_h) > y))
+    {
+        return true;
+    }
+
+    return false;
+}
 static void gui_img_draw_cb(gui_obj_t *obj)
 {
     GUI_ASSERT(obj != NULL);

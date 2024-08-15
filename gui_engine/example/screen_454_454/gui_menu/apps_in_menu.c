@@ -616,6 +616,11 @@ static void app_menu_win_cb(gui_obj_t *this)//this widget, event code, parameter
                             0);
     }
 }
+
+static void app_menu_cb(void *obj, gui_event_t e, void *param)
+{
+    gui_log("%d,%x\n", GUI_TYPE(gui_obj_t, obj)->type, param);
+}
 /*Define APP_MENU's entry func */
 static void app_menu(gui_app_t *app)
 {
@@ -676,13 +681,31 @@ static void app_menu(gui_app_t *app)
         I4500020_BIN,
 
     };
+
     gui_menu_cellular_t *cell = gui_menu_cellular_create(win, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
+    {
+        struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
+        {
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1},
+        };
+        gui_menu_cellular_on_click(cell, gesture_parameter_array,
+                                   sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));
+
+    }
     //status_bar(win, (void *)cell);
     gui_return_create(win, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), app_menu_win_cb, (void *)cell);
-    gui_win_click(win, app_menu_win_cb, win);
 }
 #include "gui_seekbar.h"
 #include "gui_img.h"
