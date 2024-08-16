@@ -1,7 +1,7 @@
 
 #include "js_user.h"
-#include "unistd.h"
 #ifdef __WIN32
+#include "unistd.h"
 #include <semaphore.h>
 sem_t sem_timer;
 #endif
