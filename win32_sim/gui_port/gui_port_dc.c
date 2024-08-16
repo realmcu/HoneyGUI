@@ -383,7 +383,12 @@ struct gui_touch_port_data *port_touchpad_get_data()
 {
     tp_port_data.timestamp_ms = gui_ms_get();//todo
 #ifdef ENABLE_MONKEY_TEST
-    gui_log("win_32 sim get tp data, GUI live \n");
+    static uint32_t live_time = 0;
+    if (gui_ms_get() >= live_time + 5000)
+    {
+        live_time += 5000;
+        gui_log("win_32 sim get tp data, GUI live \n");
+    }
 #endif
     return &tp_port_data;
 }
