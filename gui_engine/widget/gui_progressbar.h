@@ -48,6 +48,7 @@ extern "C" {
   */
 
 /** @brief  ... */
+/* gui_progressbar_t start*/
 typedef struct gui_progressbar
 {
     gui_obj_t base;
@@ -61,6 +62,7 @@ typedef struct gui_progressbar
                  int16_t w, int16_t h);
     IMG_SOURCE_MODE_TYPE src_mode;   // scroll_bar
 } gui_progressbar_t;
+/* gui_progressbar_t end*/
 
 /** End of WIDGET_Exported_Types
   * @}
@@ -126,6 +128,19 @@ gui_progressbar_t *gui_progressbar_img_h_create(void    *parent,
                                                 void    *picture,
                                                 int16_t  x,
                                                 int16_t  y);
+/**
+ * @brief create a horizontal progressbar based on picture
+ *
+ * @param parent parent widget
+ * @param picture the picture background, should be ftl addr
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @return gui_progressbar_t*
+ */
+gui_progressbar_t *gui_progressbar_img_h_create_from_ftl(void    *parent,
+                                                         void    *picture,
+                                                         int16_t  x,
+                                                         int16_t  y);
 
 /**
  * @brief create a vertical progressbar based on picture
@@ -140,6 +155,20 @@ gui_progressbar_t *gui_progressbar_img_v_create(void    *parent,
                                                 void    *picture,
                                                 int16_t  x,
                                                 int16_t  y);
+
+/**
+ * @brief create a vertical progressbar based on picture
+ *
+ * @param parent parent widget
+ * @param picture the picture background, should be ftl addr
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @return gui_progressbar_t*
+ */
+gui_progressbar_t *gui_progressbar_img_v_create_from_ftl(void    *parent,
+                                                         void    *picture,
+                                                         int16_t  x,
+                                                         int16_t  y);
 
 /**
  * @brief create a frame progressbar based on pictures, file source is memory address.

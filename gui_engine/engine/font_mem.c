@@ -98,23 +98,12 @@ void gui_font_get_dot_info(gui_text_t *text)
             return;
         }
     }
-    mem_char_t *chr = gui_malloc(sizeof(mem_char_t) * text->len);
-    if (chr == NULL)
-    {
-        GUI_ASSERT(NULL != NULL);
-        return;
-    }
-    if (chr)
-    {
-        memset(chr, 0, sizeof(mem_char_t) * text->len);
-    }
-    text->data = chr;
-    text->refresh = false;
+
     uint16_t *p_buf = NULL;
     uint16_t unicode_len = 0;
     switch (text->charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         p_buf = gui_malloc(text->len * sizeof(uint16_t));
         if (p_buf == NULL)
         {
@@ -126,13 +115,43 @@ void gui_font_get_dot_info(gui_text_t *text)
             unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
         }
         break;
-    case UTF_16_CHARSET:
+
+    case UTF_16:
         unicode_len = text->len / 2;
         p_buf = (uint16_t *)text->content;
         break;
+
+    case UTF_16BE:
+        unicode_len = text->len / 2;
+        p_buf = gui_malloc((unicode_len + 1) * sizeof(uint16_t));
+        if (p_buf == NULL)
+        {
+            GUI_ASSERT(NULL != NULL);
+            return;
+        }
+        else
+        {
+            utf16_be_to_le(text->content, (uint8_t *)p_buf, unicode_len * 2);
+        }
+        break;
+
     default:
         break;
     }
+
+    mem_char_t *chr = gui_malloc(sizeof(mem_char_t) * unicode_len);
+    if (chr == NULL)
+    {
+        GUI_ASSERT(NULL != NULL);
+        return;
+    }
+    if (chr)
+    {
+        memset(chr, 0, sizeof(mem_char_t) * unicode_len);
+    }
+    text->data = chr;
+    text->refresh = false;
+
     int32_t all_char_w = 0;
     int32_t all_char_h = 0;
     uint32_t line_flag = 0;
@@ -333,10 +352,13 @@ void gui_font_get_dot_info(gui_text_t *text)
     text->font_len = unicode_len;
     switch (text->charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         gui_free(p_buf);
         break;
-    case UTF_16_CHARSET:
+    case UTF_16:
+        break;
+    case UTF_16BE:
+        gui_free(p_buf);
         break;
     default:
         break;
@@ -353,6 +375,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
     int rect_w = rect->x2 - rect->x1 + 1;
+    int rect_h = rect->y2 - rect->y1 + 1;
     switch (text->mode)
     {
     case LEFT:
@@ -415,8 +438,8 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             line_buf[line].line_char = text->font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
-                                                                                          1].char_w) / 2 * (text->mode - MULTI_LEFT);
+            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1
+                                      - chr[text->font_len - 1].char_w) / 2 * (text->mode - MULTI_LEFT);
             line = 0;
             for (uint16_t i = 0; i < text->font_len; i++)
             {
@@ -428,7 +451,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             text->char_line_sum = line;
-            text->char_height_sum = line * text->font_height;
+            text->char_height_sum = line * chr[0].h;
             gui_free(line_buf);
             break;
         }
@@ -467,10 +490,10 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
             }
             line_buf[line].line_char = text->font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1 - chr[text->font_len -
-                                                                                          1].char_w) / 2 * (text->mode - MID_LEFT);
-            text->char_height_sum = (line + 1) * text->font_height;
-            offset_y = rect->y1 + ((rect->y2 - rect->y1 + 1) - text->char_height_sum) / 2;
+            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1
+                                      - chr[text->font_len - 1].char_w) / 2 * (text->mode - MID_LEFT);
+            text->char_height_sum = (line + 1) * chr[0].h;
+            offset_y = (rect_h - text->char_height_sum) / 2;
             line = 0;
             for (uint16_t i = 0; i < text->font_len; i++)
             {
@@ -1433,7 +1456,7 @@ uint8_t gui_font_mem_destroy(uint8_t *font_bin_addr)
 
 uint32_t gui_get_mem_utf8_char_width(void *content, void *font_bin_addr)
 {
-    return gui_get_mem_char_width(content, font_bin_addr, UTF_8_CHARSET);
+    return gui_get_mem_char_width(content, font_bin_addr, UTF_8);
 }
 
 uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET charset)
@@ -1454,7 +1477,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
     uint16_t unicode_len = 0;
     switch (charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         unicode_buffer = gui_malloc(string_len * sizeof(uint16_t));
         if (unicode_buffer == NULL)
         {
@@ -1466,7 +1489,7 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
             unicode_len = utf8_to_unicode(content, string_len, unicode_buffer, string_len);
         }
         break;
-    case UTF_16_CHARSET:
+    case UTF_16:
         unicode_len = string_len / 2;
         unicode_buffer = (uint16_t *)content;
         break;
@@ -1578,10 +1601,10 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
     }
     switch (charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         gui_free(unicode_buffer);
         break;
-    case UTF_16_CHARSET:
+    case UTF_16:
         break;
     default:
         break;

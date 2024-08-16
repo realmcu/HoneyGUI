@@ -1,22 +1,22 @@
-# canvas
+# 画布
 
-The canvas widget is the basic widget used to drawing graphics in nanovg.***Limitations: Sufficient memory is needed to open a framebuffer.***
+画布（canvas）是一个使用nanovg绘制几何图形的控件。***限制：打开帧缓冲区需要足够的内存。***
 
-## Usage
-### Creat a canvas
-[gui_canvas_create(parent, name, addr, x, y, w, h)](#api) creates a canvas. This `addr` can be a null pointer.
+## 用法
+### 创建控件
+使用[gui_canvas_create(parent, name, addr, x, y, w, h)](#api)创建一个画布。其中，`addr`可以是一个空指针（NULL）。
 
-### Add callback function
-[gui_canvas_set_canvas_cb(canvas, cb)](#api) sets the callback function for drawing specific shapes.
+### 添加回调函数
+使用[gui_canvas_set_canvas_cb(canvas, cb)](#api)设置绘制具体图形的回调函数。
 
-## Example
-### Rounded Rectangle
+## 示例
+### 圆角矩形
 
-A simple example of drawing three rounded rectangles of different colors.
-- three color refer to [Colors' RGB Data](https://www.rapidtables.com/web/color/RGB_Color.html)
+以下是一个绘制三个不同颜色的圆角矩形的简单例子。
+- 其中，三种颜色参考[Colors' RGB Data](https://www.rapidtables.com/web/color/RGB_Color.html)
 - ```firebrick```
 - ```olive drab```
-- ```dodger blue``` with 100 value opacity
+- ```dodger blue``` 设置透明度为100。
 
 ```c
 #include "gui_canvas.h"
@@ -44,9 +44,9 @@ static void app_ui_design(gui_app_t *app)
 <div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1698649650262539854/8b1a974f_10088396.png"></div>
 <br/>
 
-### Arc animation
+### 圆弧动画
 
-An example of drawing an arc animation. ```arc_cb``` will be triggered every frame.
+以下是一个绘制圆弧动画的例子，其中，屏幕刷新的每一帧都会触发```arc_cb```函数。
 
 ```c
 #include "math.h"
@@ -71,12 +71,12 @@ static void app_ui_design(gui_app_t *app)
 <br/>
 
 ## API
-### Vector graphics api
-Please refer to
+### Nanovg API
+请参考以下地址：
 - [nanovg-introduction](https://openplanet.dev/docs/tutorials/nanovg-introduction) 
 - [nanovg github](https://github.com/memononen/nanovg)
 
-### GUI widget api
+### RealGUI API
 
 ```eval_rst
 

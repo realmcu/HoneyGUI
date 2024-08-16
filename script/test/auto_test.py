@@ -22,7 +22,7 @@ class AutoTest():
     def run_test(self):
         log_path = log.get_log_dir(module = self.module)
 
-        cmd = ['python', f"{os.getcwd()}\\script\\IntegrationTester", "Test"]
+        cmd = ['python', f"{os.getcwd()}\\script\\IntegrationTester"]
         cmd.extend(["--testType", self.test_type])
         if self.module in ["HoneyGUI_CMD"]:
             cmd.extend(["--module", "HoneyGUI"])

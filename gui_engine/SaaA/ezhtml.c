@@ -219,6 +219,20 @@ static void light_control_cb(void *obj, gui_event_t e, light_param_t *light)
     update_light_config(light->id, light->state);
 }
 
+static void light_switch_on_cb(void *obj, gui_event_t e, light_param_t *light)
+{
+    light->state = true;
+    gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
+    update_light_config(light->id, light->state);
+}
+
+static void light_switch_off_cb(void *obj, gui_event_t e, light_param_t *light)
+{
+    light->state = false;
+    gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
+    update_light_config(light->id, light->state);
+}
+
 static char *open_switch_name;
 static char *pause_switch_name;
 static char *close_switch_name;
@@ -479,13 +493,14 @@ static void sport_button_press(gui_button_t *b)
 }
 static void button_press_array(gui_button_t *b, void *code, int p)
 {
-    GUI_API(gui_button_t).animate(b, 200, 0, button_press_ani_cb_array, (void *)p);
+    GUI_API(gui_button_t).animate(b, 200, 0, button_press_ani_cb_array, (void *)(uintptr_t)p);
 }
 static void switch_press_array(gui_switch_t *b, void *code, int p)
 {
     if (!b->ifon)
     {
-        GUI_API(gui_switch_t).animate(b, b->animate->dur, 0, switch_press_ani_cb_array, (void *)p);
+        GUI_API(gui_switch_t).animate(b, b->animate->dur, 0, switch_press_ani_cb_array,
+                                      (void *)(uintptr_t)p);
     }
 
 
@@ -2008,7 +2023,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 gui_free(path);
                                 closedir(dir);
                                 GUI_API(gui_button_t).on_press((void *)parent, (gui_event_cb_t)button_press_array,
-                                                               (void *)file_count);
+                                                               (void *)(uintptr_t)file_count);
                                 GUI_TYPE(gui_button_t, parent)->data = image_array;
                                 GUI_API(gui_button_t).on_release((void *)parent, (gui_event_cb_t)button_press_array, (void *) - 1);
                             }
@@ -2365,7 +2380,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 gui_free(path);
                                 closedir(dir);
                                 GUI_API(gui_switch_t).on_press((void *)parent, (gui_event_cb_t)switch_press_array,
-                                                               (void *)file_count);
+                                                               (void *)(uintptr_t)file_count);
                                 GUI_API(gui_switch_t).animate((void *)parent, dur, 0, switch_press_ani_cb_array, 0);
                                 GUI_TYPE(gui_switch_t, parent)->animate->animate = 0;
                                 GUI_TYPE(gui_switch_t, parent)->data = image_array;
@@ -3066,7 +3081,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                     }
                                     else if (parent->type == WINDOW)
                                     {
-                                        gui_win_click((gui_win_t *)parent, on_click_jump_cb, param);
+                                        gui_win_click((gui_win_t *)parent, (gui_event_cb_t)on_click_jump_cb, param);
                                     }
                                 }
 
@@ -3082,7 +3097,21 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                 light = gui_malloc(sizeof(light_param_t));
                                 light->id = x;
                                 light->state = (bool)y;
-                                gui_win_click((gui_win_t *)parent, light_control_cb, light);
+                                if (parent->type == BUTTON)
+                                {
+                                    GUI_API(gui_button_t).on_click((gui_button_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                                }
+                                else if (parent->type == WINDOW)
+                                {
+                                    gui_win_click((gui_win_t *)parent, (gui_event_cb_t)light_control_cb, light);
+                                }
+                                else if (parent->type == CLICKSWITCH)
+                                {
+                                    GUI_API(gui_switch_t).on_turn_on((gui_switch_t *)parent,
+                                                                     (gui_event_cb_t)light_switch_on_cb, light);
+                                    GUI_API(gui_switch_t).on_turn_off((gui_switch_t *)parent,
+                                                                      (gui_event_cb_t)light_switch_off_cb, light);
+                                }
                             }
 
                             gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));

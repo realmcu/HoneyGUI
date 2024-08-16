@@ -1,11 +1,39 @@
 # Switch
 
-Switch is a custom switch button control, often used to enable or disable certain features or options, allowing the user to control the behavior of an application by toggling the state of the button.
+Switch is a custom switch button control, often used to enable or disable certain features or options, allowing the developer to control the behavior of an application by toggling the state of the button.
 
 ## Usage
 
-### Create switch widget
-Using [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#api) to create switch widget from memory address, and [gui_switch_t * gui_switch_create_frome_fs(parent, x, y, w, h, off_pic, on_pic)](#api) to create from filesystem.
+### Create widget
+Using [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#api) or [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#api) to create switch widget from memory address, and [gui_switch_t * gui_switch_create_frome_fs(parent, x, y, w, h, off_pic, on_pic)](#api) to create switch widget from filesystem.
+You can refer to the specific parameters of gui_switch_t, such as base, switch_picture, on_pic_addr, off_pic_addr, etc, in [gui_switch_t](#gui_switch_t).
+
+<span id = "gui_switch_t">
+
+### Parameters of switch widget
+
+</span>
+
+```eval_rst
+
+.. literalinclude:: ../../../gui_engine/widget/gui_switch.h
+   :language: h
+   :start-after: /* gui_switch_t start*/
+   :end-before: /* gui_switch_t end*/
+
+
+```
+
+### Turn on/off
+By using the following APIs, you can turn on or off the switch, and the event (created by gui_obj_add_event_cb) will be triggered.<br/>
+[gui_switch_turn_on(gui_switch_t *this)](#api) and [gui_switch_turn_off(gui_switch_t *this)](#api).
+
+### Update on/off state
+If the switch widget has been turned on somehow, you can use the following APIs to update the status to on or off.<br/>
+[gui_switch_is_on(gui_switch_t *this)](#api) and [gui_switch_is_off(gui_switch_t *this)](#api).
+
+### Change switch state
+You can use [gui_switch_change_state(gui_switch_t *this, bool ifon)](#api) to set the switch widget's state and change the UI and there won't be any event (created by gui_obj_add_event_cb) triggered.
 
 ## Example
 

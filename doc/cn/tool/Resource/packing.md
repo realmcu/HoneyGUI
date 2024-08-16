@@ -1,75 +1,84 @@
 # 打包工具
 
 ## RTL87x2G
-RTL87x2G is the abbreviation of a series IC type.
-Take RTL8762G as an example as follows.
+RTL87x2G 是一系列IC类型的缩写。
+以下以 RTL8762G 为例进行说明。
 
-Before starting, select the appropriate demo under the sdk directory (`\subsys\gui\gui_engine\example\screen_800_480\root_image_800_480`), or create a new packaging directory based on the example. 
-Then copy the `bat and py scripts` to that directory, ensuring that the `root folder` and the `bat and py scripts` exist under the directory.
+在开始之前，请在SDK目录下的（`\subsys\gui\gui_engine\example\screen_800_480\root_image_800_480`）选择一个合适的示例，或者基于示例创建一个新的打包目录。
+然后，将bat和py脚本复制到该目录中，确保root文件夹以及bat和py脚本都处于该目录下。
+
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718779885964281659/e73b5078_13408154.png"></div>
 <br/>
 
-1. Copy `resource` all the generated bin files to the `root` folder.
-2. Double-click the batch file (`.bat`) to run it, which will execute the packaging process and generate `.bin` file and `.h` file.
-3. The `.h` is the address offset of each file in the file system, which can be accessed directly without using the file system. Before developing gui code, please add the folder containing `.h` to the include directory.
-4. Use the MPTool tool to burn the `.bin `file into Flash memory.
+1. 将所有生成的`bin`文件从resource文件夹复制到`root`文件夹中。
+2. 双击批处理文件（`.bat`）以运行它，这将执行打包过程并生成root `bin`文件和`.h`文件
+3. `.h`文件包含了文件系统中每个文件的地址偏移量，可以在不使用文件系统的情况下直接访问。在开发GUI代码之前，请将包含`.h`的文件夹添加到包含目录中。
+4. 使用MPTool工具将`root_xx.bin`文件烧录到Flash存储中。
+
 
 ##  RTL8762D
-Take RTL8762D as an example as follows:
-1. Copy all the generated bin files to the folder ```\src\app\dashboard\application\root_image\root```.
-2. Double-click ```mkromfs_0xa00000.bat``` in the ```\src\app\dashboard\application\root_image``` directory to execute the script and generate an image of the root folder. A new `.bin` file and `.h` file will appear in the directory.
-3. Between them, `.bin` is the image file, and `.h` is the address offset of each file in the file system, which can be accessed directly without using the file system.
+以下以RTL8762D为例进行说明：
+1. 将所有生成的`bin`文件复制到文件夹```\src\app\dashboard\application\root_image\root```中。
+2. 在```\src\app\dashboard\application\root_image```目录下，双击`mkromfs_0xa00000.bat`脚本文件以执行它，并生成`root`文件夹的镜像。执行后，该目录下将出现一个新的`.bin`文件和`.h`文件。
+3. 其中，`.bin`文件是根文件夹的镜像文件，而`.h`文件则包含了文件系统中每个文件的地址偏移量。这样，开发者可以在不使用文件系统的情况下直接访问这些文件。
+
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718786488596930495/a813d294_13408154.png"></div>
 <br/>
 
 ##  RTL8763E and RTL8773DO
-RTL8763E is the name of a series IC type, including RTL8763EWE-VP/RTL8763EW-VC. RTL8763E and RTL877DO have different packaging processes as follows.
+RTL8763E是一个IC系列的名称，包含RTL8763EWE-VP和RTL8763EW-VC。RTL8763E和RTL877DO有不同的打包流程。
 
-### Unzip userdata.zip
-Unzip userdata.zip and move files in userdata.zip to sdk/src/sample/bt_audio_trx/panel/userdata.
+### 解压 userdata.zip
+解压 userdata.zip 文件，并将 userdata.zip 中的文件移动到 `sdk/src/sample/bt_audio_trx/panel/userdata` 目录下。
+
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718780909907949565/4ca96246_13408154.png" ></div>
 <br/>
 
-### Set configuration
-Bat file has some distinctive due to IC type.
-If IC is RTL8763EWE-VP or RTL8763EW-VC.
+### 配置设定
+由于IC类型不同，批处理文件（bat）也会不一样。
+
+如果IC类型是RTL8763EWE-VP或RTL8763EW-VC。
+
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718781307571552882/d7f3f5ee_13408154.png " ></div>
 <br/>
 
-If IC is RTL8773DO.
+如果IC类型是RTL8773DO。
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718781327901813150/409bf9a6_13408154.png " ></div>
 <br/>
 
-Please set bat configuration due to own IC type.
+请根据自己的IC类型设置批处理（bat）配置。
 
-### Generate userdata bin
-Generate process as follows:
-1. Copy all the generated bin files to the folder ```\src\sample\bt_audio_trx\panel\user_data\root```.
-2. Double-click ```gen_root_image.bat``` in the ```\src\sample\bt_audio_trx\panel\user_data``` directory to execute the script and generate an image of the root folder. A new .bin file and .h file will appear in the directory.
-3. Between them, `.bin` is the image file, and `.h` is the address offset of each file in the file system, which can be accessed directly without using the file system.
+### 生成用户数据（userdata bin）
+生成过程如下：
+1. 将所有生成的bin文件复制到文件夹`\src\sample\bt_audio_trx\panel\user_data\root`中。
+2. 双击`\src\sample\bt_audio_trx\panel\user_data`目录中的`gen_root_image.bat`文件以执行脚本并生成root文件夹的镜像。一个新的`.bin`文件和`.h`文件将出现在目录中。
+3. 在这两个文件中，`.bin`文件是镜像文件，而`.h`文件是文件系统中每个文件的地址偏移量，可以直接访问而无需使用文件系统。
+
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718781540264130584/8ab9bacc_13408154.png" ></div>
 <br/>
 
 
 ##  RTL8773E
-RTL8773E is the name of a series IC type, including RTL8773EWE/RTL8773EWE-VP, The packaging process is as follows
+RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用户数据（userdata）打包处理过程如下
 
-### Generate root bin
-1. Copy generated images bin to this folder ```\src\app\watch\gui_application\root_image\root\8773e_watch``` and Copy generated font bin to this folder ```\src\app\watch\gui_application\root_image\root\font```.
-2. Modify build address: You need to adjust the address to ```0x238b400``` by modifying this file ```mkromfs_0x4400000.bat``` (python_bin_mkromfs_0x4400000.py --binary `--addr 0x238b400` root root(0x4400000).bin). The --addr corresponds to the flash map userdata address +0x400 (image header size)
-3. Double-click ```mkromfs_0x4400000.bat``` in the ```\src\app\watch\gui_application\root_image``` directory to execute the script and generate an image of the root folder. A new bin `root(0x4400000).bin` file and h file `ui_resource.h` will appear in the directory.
-4. Between them, `.bin` is the image file, and `.h` is the address offset of each file in the file system, which can be accessed directly without using the file system.
+### 生成用户数据（userdata）
+
+1. 将生成的图像`bin`文件复制到 `\src\app\watch\gui_application\root_image\root\8773e_watch`目录，并将生成的字体`bin`文件复制到 `\src\app\watch\gui_application\root_image\root\font`目录。
+2. 修改构建地址（`build address`）：开发者需要通过修改 `mkromfs_0x4400000.bat` 文件（python_bin_mkromfs_0x4400000.py --binary `--addr 0x238b400` root root(0x4400000).bin）。这里的 `--addr` 参数对应于闪存映射中的 userdata 地址加上 0x400（图像头部大小）。
+3. 在 `\src\app\watch\gui_application\root_image`目录中双击`mkromfs_0x4400000.bat`文件来执行脚本，并生成root文件夹的镜像。一个新的`bin`文件 root(0x4400000).bin 和头文件 ui_resource.h 将出现在目录中。
+4. 在这两个文件中，`.bin` 文件是包含root目录内容的镜像文件，而 `.h` 文件则包含了文件系统中每个文件的地址偏移量，这些偏移量允许开发者在不使用文件系统的情况下直接访问这些文件。
+
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718785235574270822/e3a612e2_13408154.png"></div>
 <br/>
 
-Note: The generated ui_resource.h requires the following code to be added manually
+注意：生成的 ui_resource.h 文件需要手动添加以下代码。
 
 ```C
 #if defined _WIN32
@@ -83,9 +92,9 @@ Note: The generated ui_resource.h requires the following code to be added manual
 #endif
 ```
 
-### Generate userdata bin
-It needs to use MPPGTOOL to generate user data Generate process as follows:
+### 生成用户数据（userdata bin）
+使用MPPGTOOL来生成用户数据，生成过程如下：
 <br/>
 <div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1718782467179312695/69433669_13408154.png"></div>
 <br/>   
-Note: The Max size must be larger than the Actual size; otherwise, the user data size in the flash_map needs to be changed
+注意：最大size必须大于实际size，否则，需要更改 flash_map 中的用户数据大小。

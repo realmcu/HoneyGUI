@@ -1,11 +1,11 @@
 # 卡片控件
 
-用户可以在卡片上创建各种控件。在创建卡片控件之前，必须先创建卡片视图控件。
+用户可以在卡片上创建各种控件。在创建卡片控件之前，必须先创建卡片容器控件。
 
 ## 用法
 
 ### 创建卡片控件
-可以调用 [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#api) 来创建卡片控件。
+开发者可以调用 [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#api) 来创建卡片控件。
 
 ## 示例
 

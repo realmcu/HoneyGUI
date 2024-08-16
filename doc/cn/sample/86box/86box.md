@@ -6,7 +6,7 @@
 - APP package `gui_engine\example\screen_480_480\root\app\box`
 - UI 设计工程 `RVisualDesigner-v1.0.5.0\Demo\480x480\box\box480x480.rtkprj`
 
-## UI design
+## UI设计
 ### RVisualDesigner
 - RealUI 86box 使用 RVisualDesigner 来完成 UI 设计， 首次使用 RVisualDesigner 请参阅 `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` 获取详尽的使开发指南。
 

@@ -79,7 +79,7 @@ void page_tb_volume(void *parent)
     gui_scroll_text_set(text_music_title, music_title, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX,
                                                                                  UINT8_MAX),
                         strlen(music_title), 28);
-    gui_scroll_text_encoding_set(text_music_title, UTF_8_CHARSET);
+    gui_scroll_text_encoding_set(text_music_title, UTF_8);
 
     snprintf(music_artist, sizeof(music_artist), "%s", artist_prefix);
     text_music_artist = gui_text_create(parent, "artist txt", 20, 105, 200, 360);

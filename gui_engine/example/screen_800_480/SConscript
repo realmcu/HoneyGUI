@@ -22,6 +22,6 @@ if GetDepend('CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'):
     CPPDEFINES += ['DRV_LCD_HIGHT=480']
     CPPDEFINES += ['DRV_PIXEL_BITS=16']
 
-group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'], CPPPATH = CPPPATH)
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_800_480_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

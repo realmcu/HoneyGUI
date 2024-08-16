@@ -139,12 +139,12 @@ struct NVGcontext
 };
 
 float nvg__sqrtf(float a) { return sqrtf(a); }
-static float nvg__modf(float a, float b) { return fmodf(a, b); }
-static float nvg__sinf(float a) { return sinf(a); }
-static float nvg__cosf(float a) { return cosf(a); }
-static float nvg__tanf(float a) { return tanf(a); }
-static float nvg__atan2f(float a, float b) { return atan2f(a, b); }
-static float nvg__acosf(float a) { return acosf(a); }
+float nvg__modf(float a, float b) { return fmodf(a, b); }
+float nvg__sinf(float a) { return sinf(a); }
+float nvg__cosf(float a) { return cosf(a); }
+float nvg__tanf(float a) { return tanf(a); }
+float nvg__atan2f(float a, float b) { return atan2f(a, b); }
+float nvg__acosf(float a) { return acosf(a); }
 
 static int nvg__mini(int a, int b) { return a < b ? a : b; }
 static int nvg__maxi(int a, int b) { return a > b ? a : b; }

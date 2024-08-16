@@ -61,7 +61,7 @@
 |stb图像(stb_img) | 76|144|
 |键盘(kb) | 108|192|
 |地图(map) | 196|272|
-|细胞菜单(menu_cellular) | 76|120|
+|蜂窝菜单(menu_cellular) | 76|120|
 |多级菜单(multi_level) | 60|104|
 |页面列表(pagelist) | 96|160|
 |页面列表视图(pagelistview) | 64|112|

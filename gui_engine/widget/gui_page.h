@@ -71,6 +71,7 @@ typedef struct gui_page
     bool top_slide_only;
     uint8_t status;
     IMG_SOURCE_MODE_TYPE src_mode; // scroll_bar
+    uint8_t checksum;
 } gui_page_t;
 
 typedef enum

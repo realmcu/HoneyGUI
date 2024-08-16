@@ -318,6 +318,7 @@ void gui_obj_tree_free(void *obj);
   * \endcode
   */
 void gui_obj_tree_print(gui_obj_t *obj);
+
 /**
   * @brief  get count of one type on tree
   * @param  obj the root of the widget tree.
@@ -326,6 +327,7 @@ void gui_obj_tree_print(gui_obj_t *obj);
   * @return void
   */
 void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count);
+
 /**
   * @brief   show or hide the widget
   * @param  obj the root of the widget tree.
@@ -435,7 +437,7 @@ void gui_obj_skip_other_right_hold(gui_obj_t *obj);
 void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj);
 
 /**
- * @briefskip all down slide hold actions of the child object
+ * @brief skip all down slide hold actions of the child object
  *
  * @param obj the root of the widget tree.
  */
@@ -539,7 +541,7 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t
  */
 void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
 /**
- * @brief  update animate onn every frame
+ * @brief  update animate on every frame
  *
  * @param animate
  * @param obj widget

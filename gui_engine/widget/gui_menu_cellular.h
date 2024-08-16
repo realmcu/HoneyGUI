@@ -50,7 +50,18 @@ typedef struct gui_menu_cellular
 {
     gui_win_t base; //!< base structure
     void *overwrite;
+    int x, y ;
+    int16_t speed[2];
+    int16_t left, right, top, bottom;
+    int16_t left_offset, right_offset, top_offset, bottom_offset;
+    int16_t touch_y;
+    bool render;
 } gui_menu_cellular_t;
+struct gui_menu_cellular_gesture_parameter
+{
+    gui_event_cb_t callback_function;
+    void *parameter;
+};
 /** End of WIDGET_Exported_Types
   * @}
   */
@@ -123,6 +134,13 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
  * @param offset_y  offset_y
  */
 void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y);
+
+/**
+ *
+*/
+void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
+                                struct gui_menu_cellular_gesture_parameter *para_array, int array_length);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

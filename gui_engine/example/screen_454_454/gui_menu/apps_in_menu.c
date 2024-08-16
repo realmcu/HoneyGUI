@@ -10,6 +10,7 @@
 #include "gui_canvas_rect.h"
 #include "gui_multi_level.h"
 #include "gui_button.h"
+#include "gui_image_array.h"
 #include<stdio.h>
 #include<time.h>
 //Please search app name macro for entry
@@ -48,6 +49,7 @@ GUI_APP_DEFINE_NAME(APP_MUSIC)
 GUI_APP_DEFINE_NAME(APP_WEB)
 GUI_APP_DEFINE_NAME(APP_BLOCK)
 GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
+GUI_APP_DEFINE_NAME(APP_CALCULATOR)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -614,6 +616,11 @@ static void app_menu_win_cb(gui_obj_t *this)//this widget, event code, parameter
                             0);
     }
 }
+
+static void app_menu_cb(void *obj, gui_event_t e, void *param)
+{
+    gui_log("%d,%x\n", GUI_TYPE(gui_obj_t, obj)->type, param);
+}
 /*Define APP_MENU's entry func */
 static void app_menu(gui_app_t *app)
 {
@@ -674,13 +681,31 @@ static void app_menu(gui_app_t *app)
         I4500020_BIN,
 
     };
+
     gui_menu_cellular_t *cell = gui_menu_cellular_create(win, 100, array,
                                                          sizeof(array) / sizeof(uint32_t *));
     gui_menu_cellular_offset((void *)cell, -36, -216);
+    {
+        struct gui_menu_cellular_gesture_parameter gesture_parameter_array[] =
+        {
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1}, {app_menu_cb, (void *)1},
+            {app_menu_cb, (void *)1},
+        };
+        gui_menu_cellular_on_click(cell, gesture_parameter_array,
+                                   sizeof(gesture_parameter_array) / sizeof(gesture_parameter_array[0]));
+
+    }
     //status_bar(win, (void *)cell);
     gui_return_create(win, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), app_menu_win_cb, (void *)cell);
-    gui_win_click(win, app_menu_win_cb, win);
 }
 #include "gui_seekbar.h"
 #include "gui_img.h"
@@ -709,98 +734,405 @@ static void stop_watch_win_ani_cb(void);
 #define STOPWATCHTEXT "STOPWATCHTEXT"
 
 const static int gap = 50;
+static int touch_y;
+static bool alien = true;
+static int16_t recode[5];
+static const int end_speed = 3;
+static const int array_length = 24;
+static int speed, target;
 #define COUNT 7
 static char text_array[COUNT][3];
-static gui_text_t *text_widget_array[COUNT];
+static gui_obj_t *text_widget_array[COUNT];
 const static unsigned char time_array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-// static void stop_watch_win_overwrite(gui_obj_t *win)
-// {
-//     IMPORT_GUI_TOUCHPAD
-//     IMPORT_GUI_WHEEL
-//     static bool wheel_take_over;
-//     static char time_array_offset;
-//     int time_array_size = sizeof(time_array)/sizeof(time_array[0]);
-//     static bool update;
-//     if (!wheel_take_over)
-//     {
-//         if (touch->pressing&& !update)
-//         {
-//             GUI_BASE(win)->y = touch->deltaY;
-//             if (GUI_BASE(win)->y<-gap )
-//             {
-//                 GUI_BASE(win)->y = 0;
-//                 update = 1;
-//                 time_array_offset++;
-//                 if (time_array_offset>time_array_size-COUNT)
-//                 {
-//                     time_array_offset = 0;
-//                 }
+struct gui_text_image_map
+{
+    const char *text;
+    void *image_data;
+};
+const static struct gui_text_image_map app_text_image_map[] =
+{
+    {"0", TEXT0_BIN},
+    {"1", TEXT1_BIN},
+    {"2", TEXT2_BIN},
+    {"3", TEXT3_BIN},
+    {"4", TEXT4_BIN},
+    {"5", TEXT5_BIN},
+    {"6", TEXT6_BIN},
+    {"7", TEXT7_BIN},
+    {"8", TEXT8_BIN},
+    {"9", TEXT9_BIN},
+    {"PM", TEXTPM_BIN},
+    {"AM", TEXTAM_BIN},
+    {".", TEXTDIAN_BIN},
+    {":", TEXTMAOHAO_BIN},
+    {"/", TEXTXIEGANG_BIN},
+};
+// Function to retrieve image data based on text input
+void *get_image_data(const char *text)
+{
+    for (size_t i = 0; i < sizeof(app_text_image_map) / sizeof(app_text_image_map[0]); ++i)
+    {
+        if (strcmp(app_text_image_map[i].text, text) == 0)
+        {
+            return app_text_image_map[i].image_data;
+        }
+    }
+    return NULL; // Return NULL if no match is found
+}
 
-//                 for (size_t i = 0; i < COUNT; i++)
-//                 {
-//                     char *text = text_array[i];
-//                     memset(text, 0, sizeof(text_array[i]));
-//                     sprintf(text, "%d", time_array[time_array_offset+i]);
-//                     gui_log("t:%s,%d,%d\n", text,time_array[time_array_offset+i], time_array_offset);
-//                     gui_text_content_set(text_widget_array[i], text, strlen(text));
-//                 }
+// Function to process the input string and return image pointers
+void **get_image_pointers(const char *input, size_t *num_pointers)
+{
+    size_t capacity = 16; // Start with a reasonable initial capacity
+    /*Why Start with a Capacity of 16?
+    Balance Between Space and Performance:
+    Memory Efficiency: Starting with some preallocated space avoids constant reallocations and copying when adding elements to the array. A small initial allocation (like 16) means you don't waste much memory upfront.
+    Performance: Frequent reallocations can be costly, both in terms of time (because data has to be copied to a new location) and CPU usage. Starting with a moderate size helps balance these factors.*/
+
+    *num_pointers = 0;
+    void **image_pointers = gui_malloc(capacity * sizeof(void *));
+    if (image_pointers == NULL)
+    {
+        gui_log("Failed to allocate memory");
+    }
+
+    const char *ptr = input;
+    while (*ptr != '\0')
+    {
+        const char *next = ptr + 1;
+
+        // Handle multi-character tokens (e.g., "AM" and "PM")
+        if (strncmp(ptr, "PM", 2) == 0 || strncmp(ptr, "AM", 2) == 0)
+        {
+            char token[3] = {ptr[0], ptr[1], '\0'};
+            void *img = get_image_data(token);
+            if (img != NULL)
+            {
+                if (*num_pointers == capacity)
+                {
+                    capacity *= 2;
+                    image_pointers = gui_realloc(image_pointers, capacity * sizeof(void *));
+                    if (image_pointers == NULL)
+                    {
+                        gui_log("Failed to reallocate memory");
+                    }
+                }
+                image_pointers[(*num_pointers)++] = img;
+            }
+            next = ptr + 2; // Skip the next character as it's part of "AM" or "PM"
+        }
+        else
+        {
+            char token[2] = {ptr[0], '\0'};
+            void *img = get_image_data(token);
+            if (img != NULL)
+            {
+                if (*num_pointers == capacity)
+                {
+                    capacity *= 2;
+                    image_pointers = gui_realloc(image_pointers, capacity * sizeof(void *));
+                    if (image_pointers == NULL)
+                    {
+                        gui_log("Failed to reallocate memory");
+                    }
+                }
+                image_pointers[(*num_pointers)++] = img;
+            }
+        }
+
+        ptr = next;
+    }
+
+    return image_pointers;
+}
 
 
-//             }
-//             else if (GUI_BASE(win)->y>gap)
-//             {
-//                 GUI_BASE(win)->y = 0;
-//             }
+#define NUMBER_TEXT 0
+#define NUMBER_IMAGE 1
+#define NUMBER_RENDER NUMBER_IMAGE
+static void render_number(const char *text, gui_obj_t *obj)
+{
+    switch (NUMBER_RENDER)
+    {
+    case NUMBER_TEXT:
+        {
+            gui_text_content_set((void *)obj, (void *)text, strlen(text));
+        }
+        break;
+    case NUMBER_IMAGE:
+        {
+            const char *input = text;
+            size_t num_pointers;
+            void **image_pointers = get_image_pointers(input, &num_pointers);
+            gui_image_array_write((void *)obj, image_pointers, num_pointers);
+            // Free allocated memory
+            gui_free(image_pointers);
 
-//         }
-//         if (touch->released)
-//         {
-//             update = 0;
-//         }
-
-
-//     }
-
-
-// }
+        }
+        break;
+    default:
+        break;
+    }
+}
+static void update_speed(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    int recode_num = 4;
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        recode[i] = recode[i + 1];
+    }
+    recode[recode_num] = tp->deltaY;
+    speed = recode[recode_num] - recode[0];
+    int max_speed = GUI_PAGE_MAX_SPEED;
+    int min_speed = GUI_PAGE_MIN_SPEED;
+    if (speed > max_speed)
+    {
+        speed = max_speed;
+    }
+    else if (speed < -max_speed)
+    {
+        speed = -max_speed;
+    }
+    if ((speed > 0) && (speed < min_speed))
+    {
+        speed = min_speed;
+    }
+    else if ((speed < 0) && (speed > -min_speed))
+    {
+        speed = -min_speed;
+    }
+}
+static bool render;
+static void gui_page_update_inertial(gui_obj_t *obj)
+{
+    IMPORT_GUI_TOUCHPAD
+    if (speed > end_speed)
+    {
+        touch_y += speed;
+        speed -= 1;
+    }
+    else if (speed < -end_speed)
+    {
+        touch_y += speed;
+        speed += 1;
+    }
+}
 static void stop_watch_win_overwrite(gui_obj_t *win)
 {
     IMPORT_GUI_TOUCHPAD
     IMPORT_GUI_WHEEL
     static bool wheel_take_over;
     static char time_array_offset;
-    int time_array_size = sizeof(time_array) / sizeof(time_array[0]) - 6;
+    int time_array_size = sizeof(time_array) / sizeof(time_array[0]);
     static int history_y;
+    if (wheel->pressed)
+    {
+        wheel_take_over = 1;
+        wheel->history_x = touch_y;
+    }
+    if (wheel->released)
+    {
+        wheel_take_over = 0;
+    }
+
     if (!wheel_take_over)
     {
-        if (touch->pressing)
+        if (touch->pressed && touch->x > win->x && touch->x < win->x + win->w)
         {
-            touch->history_y = history_y + touch->deltaY;
+            history_y = touch_y;
+            speed = 0;
+            memset(recode, 0, sizeof(recode));
+        }
+        if (touch->pressing && touch->x > win->x && touch->x < win->x + win->w)
+        {
+            touch_y = history_y + touch->deltaY;
             /**
-             * Index = offset/gap
-               WidgetOffset = offset%gap
+             * Index = offset / gap % array length
+               WidgetOffset = offset % gap
             */
-            time_array_offset = _UI_ABS(touch->history_y / gap % time_array_size);
-            int widget_offset = touch->history_y % gap;
-            gui_log("%d,%d\n", time_array_offset, widget_offset);
+            update_speed(win);
+            render = 1;
+
+
+        }
+        else
+        {
+            gui_page_update_inertial(win);
+        }
+        if (render)
+        {
+            time_array_offset = -(touch_y / gap % array_length);
+            int widget_offset = touch_y % gap;
             GUI_BASE(win)->y = widget_offset;
+            if (alien && widget_offset == 0 && speed <= end_speed && speed >= -end_speed)
+            {
+                render = 0;
+            }
+            if (alien && widget_offset != 0)
+            {
+                if (speed > 0 && speed <= end_speed)
+                {
+
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y += end_speed;
+                    }
+
+
+                }
+                else if (speed < 0 && speed >= -end_speed)
+                {
+
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y -= end_speed;
+                    }
+
+                }
+                else if (speed == 0)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    if (widget_offset > 0)
+                    {
+                        if (widget_offset > gap / 2)
+                        {
+                            touch_y += end_speed;
+                        }
+                        else
+                        {
+                            touch_y -= end_speed;
+                        }
+                    }
+                    else if (widget_offset < 0)
+                    {
+                        if (-widget_offset > gap / 2)
+                        {
+                            touch_y -= end_speed;
+                        }
+                        else
+                        {
+                            touch_y += end_speed;
+                        }
+                    }
+                }
+            }
             for (size_t i = 0; i < COUNT; i++)
             {
                 char *text = text_array[i];
                 memset(text, 0, sizeof(text_array[i]));
-                sprintf(text, "%d", time_array[time_array_offset + i]);
-                gui_log("t:%s,%d,%d\n", text, time_array[time_array_offset + i], time_array_offset);
-                gui_text_content_set(text_widget_array[i], text, strlen(text));
+                int index = time_array_offset + i;
+                if (index >= time_array_size)
+                {
+                    index -= time_array_size;
+                }
+                if (index < 0)
+                {
+                    index += time_array_size;
+                }
+                sprintf(text, "%d", time_array[index]);
+                render_number(text, (void *)text_widget_array[i]);
             }
         }
         else
         {
-            history_y = touch->history_y;
+            history_y = touch_y;
         }
-
     }
-
-
+    else
+    {
+        touch_y = wheel->history_y;
+        {
+            time_array_offset = -(touch_y / gap % array_length);
+            int widget_offset = touch_y % gap;
+            GUI_BASE(win)->y = widget_offset;
+            if (alien && widget_offset == 0 && speed <= end_speed && speed >= -end_speed)
+            {
+                render = 0;
+            }
+            if (alien && widget_offset != 0)
+            {
+                if (speed > 0 && speed <= end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y += end_speed;
+                    }
+                }
+                else if (speed < 0 && speed >= -end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y -= end_speed;
+                    }
+                }
+                else if (speed == 0)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    if (widget_offset > 0)
+                    {
+                        if (widget_offset > gap / 2)
+                        {
+                            touch_y += end_speed;
+                        }
+                        else
+                        {
+                            touch_y -= end_speed;
+                        }
+                    }
+                    else if (widget_offset < 0)
+                    {
+                        if (-widget_offset > gap / 2)
+                        {
+                            touch_y -= end_speed;
+                        }
+                        else
+                        {
+                            touch_y += end_speed;
+                        }
+                    }
+                }
+            }
+            for (size_t i = 0; i < COUNT; i++)
+            {
+                char *text = text_array[i];
+                memset(text, 0, sizeof(text_array[i]));
+                int index = time_array_offset + i;
+                if (index >= time_array_size)
+                {
+                    index -= time_array_size;
+                }
+                if (index < 0)
+                {
+                    index += time_array_size;
+                }
+                sprintf(text, "%d", time_array[index]);
+                render_number(text, (void *)text_widget_array[i]);
+            }
+        }
+    }
 }
 static void stop_watch_ml0(gui_obj_t *parent)
 {
@@ -837,8 +1169,8 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
     gui_win_t *win = gui_win_create(parent, 0, 0, 70, width, gap * (COUNT - 1));
 
     gui_win_set_scope(win, 1);
-    gui_canvas_rect_create((void *)win, 0, 0, 0, width, gap * (COUNT - 1), COLOR_RED);
-    gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, width, gap * (COUNT - 1));
+    gui_canvas_rect_create((void *)win, 0, 0, 50, width, gap * (COUNT - 2), COLOR_RED);
+    gui_win_t *timer1 = gui_win_create(win, 0, width / 2 - gap / 2, 0, width, gap * (COUNT - 1));
     gui_win_set_animate(win, 1000, -1, stop_watch_win_overwrite, timer1);
 
 
@@ -850,16 +1182,44 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
             char *text = text_array[i];
             memset(text, 0, sizeof(text_array[i]));
             sprintf(text, "%d", i);
+            switch (NUMBER_RENDER)
+            {
+            case NUMBER_TEXT:
+                {
+                    int font_size = 16;
+                    gui_text_t *t = gui_text_create(win, text, 0, 0, width,
+                                                    font_size);
+                    gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+                    void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+                    gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+                    gui_text_mode_set(t, CENTER);
+                    text_widget_array[i] = GUI_BASE(t);
+                }
+                break;
+            case NUMBER_IMAGE:
+                {
+                    const char *input = text;
+                    size_t num_pointers;
+                    void **image_pointers = get_image_pointers(input, &num_pointers);
+
+                    // Print results
+                    gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
+                    for (size_t i = 0; i < num_pointers; ++i)
+                    {
+                        gui_log("Image pointer %zu: %p\n", i + 1, image_pointers[i]);
+                    }
+                    text_widget_array[i] = GUI_BASE(gui_image_array_create(win, 0, 0, image_pointers, num_pointers,
+                                                                           "num"));
+                    // Free allocated memory
+                    gui_free(image_pointers);
+
+                }
+                break;
+            default:
+                break;
+            }
 
 
-            int font_size = 16;
-            gui_text_t *t = gui_text_create(win, text, 0, 0, width,
-                                            font_size);
-            gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-            gui_text_mode_set(t, CENTER);
-            text_widget_array[i] = t;
         }
 
     }
@@ -2776,455 +3136,26 @@ GUI_APP_ENTRY(APP_BLOCK)
  * Please code here @shel_deng@realsil.com.cn
  */
 
-static gui_img_t *img_strawberry, *img_banana, *img_peach, *img_watermelon, *img_gameover, *img_bg;
-static gui_text_t *score_board;
-static int16_t fruit_score = 0;
-
-/* This part is used to calculate whether the rectangular image is crossed over or not */
-#include <math.h>
-
-/* Define a point structure */
-typedef struct
-{
-    float x, y;
-} Point;
-
-/* rotate to get rectangular's four points */
-static Point rotate_point(Point p, Point center, double angle)
-{
-    // 将角度转换为弧度
-    double radians = angle * 2 * 3.14 / 360.0;
-    double cos_theta = cos(radians);
-    double sin_theta = sin(radians);
-
-    // 平移点使中心点为原点
-    double translated_x = p.x - center.x;
-    double translated_y = p.y - center.y;
-
-    // 进行旋转
-    double rotated_x = translated_x * cos_theta - translated_y * sin_theta;
-    double rotated_y = translated_x * sin_theta + translated_y * cos_theta;
-
-    // 平移点回原来的位置
-    Point rotated_point = {rotated_x + center.x, rotated_y + center.y};
-    return rotated_point;
-}
-
-/* Compute the cross product */
-static float cross_product(Point p1, Point p2, Point p3)
-{
-    return (p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y);
-}
-
-/* Determine whether the point q is on the line pr */
-static int on_segment(Point p, Point q, Point r)
-{
-    if (q.x <= fmax(p.x, r.x) && q.x >= fmin(p.x, r.x) &&
-        q.y <= fmax(p.y, r.y) && q.y >= fmin(p.y, r.y))
-    {
-        return 1;
-    }
-    return 0;
-}
-
-/* Determine whether two line segments intersect */
-static int segments_intersect(Point p1, Point p2, Point p3, Point p4)
-{
-    float d1 = cross_product(p1, p3, p4);
-    float d2 = cross_product(p2, p3, p4);
-    float d3 = cross_product(p3, p1, p2);
-    float d4 = cross_product(p4, p1, p2);
-
-    if (((d1 * d2 < 0) && (d3 * d4 < 0)) ||
-        (d1 == 0 && on_segment(p3, p1, p4)) ||
-        (d2 == 0 && on_segment(p3, p2, p4)) ||
-        (d3 == 0 && on_segment(p1, p3, p2)) ||
-        (d4 == 0 && on_segment(p1, p4, p2)))
-    {
-        return 1;
-    }
-    return 0;
-}
-
-/* Calculate the point of intersection of line segments */
-static int intersection_point(Point p1, Point p2, Point p3, Point p4, Point *intersect)
-{
-    float A1 = p2.y - p1.y;
-    float B1 = p1.x - p2.x;
-    float C1 = A1 * p1.x + B1 * p1.y;
-
-    float A2 = p4.y - p3.y;
-    float B2 = p3.x - p4.x;
-    float C2 = A2 * p3.x + B2 * p3.y;
-
-    float det = A1 * B2 - A2 * B1;
-    if (det == 0)
-    {
-        return 0; // Parallel or co-linear
-    }
-    else
-    {
-        intersect->x = (B2 * C1 - B1 * C2) / det;
-        intersect->y = (A1 * C2 - A2 * C1) / det;
-
-        if (on_segment(p1, *intersect, p2) && on_segment(p3, *intersect, p4))
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-}
-
-/* Calculate the shortest distance from the point to the line and determine if this pendant is on the line segment */
-static float point_to_line_segment_distance(Point p, Point a, Point b)
-{
-    /* vector AB */
-    float ABx = b.x - a.x;
-    float ABy = b.y - a.y;
-
-    /* vector AP */
-    float APx = p.x - a.x;
-    float APy = p.y - a.y;
-
-    /* Calculate the square length of the vector AB */
-    float AB_square_length = ABx * ABx + ABy * ABy;
-
-    /* Calculate t, the length of the projection of AP on AB */
-    float t = (APx * ABx + APy * ABy) / AB_square_length;
-
-    // Ensure that t is between [0, 1], indicating that the vertical foot is on the AB line.
-    if (t < 0) { t = 0; }
-    if (t > 1) { t = 1; }
-
-    /* Coordinates of the pendant point */
-    Point projection;
-    projection.x = a.x + t * ABx;
-    projection.y = a.y + t * ABy;
-
-    /* Calculate the distance from point P to the pendant */
-    float distance = sqrt((p.x - projection.x) * (p.x - projection.x) + (p.y - projection.y) *
-                          (p.y - projection.y));
-
-    return distance;
-}
-
-/* Determine if a line segment has two points of intersection with a rectangle */
-static bool line_has_two_intersections_with_rectangle(Point rect_min, float width, float height,
-                                                      Point line_start, Point line_end, float angle)
-{
-    /* The four vertices of the rectangle */
-    Point rect_max = {rect_min.x + width, rect_min.y + height};
-    Point rect_p2 = {rect_min.x, rect_min.y + height}; // left-down
-    Point rect_p3 = {rect_min.x + width, rect_min.y}; // right-top
-
-
-    Point center = {rect_min.x + width / 2.0, rect_min.y + height / 2.0}; // calculate center point
-
-    /* calculate rectangular's four rotated points */
-
-    Point rotated_rect_min = rotate_point(rect_min, center, angle); // left-up
-    Point rotated_rect_max = rotate_point(rect_max, center, angle); // right-down
-    Point rotated_rect_p2 = rotate_point(rect_p2, center, angle); // left-down
-    Point rotated_rect_p3 = rotate_point(rect_p3, center, angle); // right-top
-
-    // gui_log("angle: %.2f  center: %.2f %.2f\r\n", angle, center.x, center.y);
-    // gui_log("rect_min: %.2f %.2f\r\n", rect_min.x, rect_min.y);
-    // gui_log("rotated_rect_min: %.2f %.2f\r\n\n", rotated_rect_min.x, rotated_rect_min.y);
-
-    /* four sides of a rectangle */
-    Point rect_edges[4][2] =
-    {
-        {rotated_rect_min, rotated_rect_p3},  // top
-        {rotated_rect_p3, rotated_rect_max},  // right
-        {rotated_rect_max, rotated_rect_p2},  // bottom
-        {rotated_rect_p2, rotated_rect_min}   // left
-    };
-
-    int intersection_count = 0;
-    Point intersect;
-
-    /* Check if the line segment intersects any of the sides and count the number of intersections */
-    for (int i = 0; i < 4; i++)
-    {
-        if (segments_intersect(line_start, line_end, rect_edges[i][0], rect_edges[i][1]))
-        {
-            if (intersection_point(line_start, line_end, rect_edges[i][0], rect_edges[i][1], &intersect))
-            {
-                intersection_count++;
-                if (intersection_count == 2)
-                {
-                    return 1;
-                    /* Judge again based on the distance between the center point and the line segment */
-                    // float distance = point_to_line_segment_distance(center , line_start, line_end);
-                    // gui_log("distance: %.2f\r\n", distance);
-                    // if (distance < 40)
-                    // {
-                    //     return 1;
-                    // }
-                }
-            }
-        }
-    }
-    return 0;
-}
-/* Scoring, changing pictures */
-static int16_t cutting_judgment(gui_img_t *ST, gui_img_t *BA, gui_img_t *PE, gui_img_t *WM,
-                                touch_info_t *tp)
-{
-    bool score_increase_flag = false; // = 0, score decrease 10
-    /* strawberry */
-    {
-        int img_w = GUI_BASE(ST)->w;
-        int img_h = GUI_BASE(ST)->h;
-        int img_x = GUI_BASE(ST)->x;
-        int img_y = GUI_BASE(ST)->y;
-        float img_rotate_angle = ST->degrees;
-
-        if (tp->x >= img_x &&
-            tp->x <= img_x + img_w &&
-            tp->y >= img_y &&
-            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
-        {
-            ;
-        }
-        else
-        {
-            Point img_coordinate = {img_x, img_y};
-            Point tp_start = {tp->x, tp->y};
-            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
-            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
-                                                          img_rotate_angle))
-            {
-                if (!strcmp(ST->base.name, "img_strawberry"))
-                {
-                    gui_img_set_attribute(ST, "img_strawberry_cut", FRUIT_NINJA_STRAWBERRY_HALF_1_BIN, img_x, img_y);
-                    fruit_score += 10;
-                    score_increase_flag = true;
-                }
-            }
-        }
-    }
-    /* banana */
-    {
-        int img_w = GUI_BASE(BA)->w;
-        int img_h = GUI_BASE(BA)->h;
-        int img_x = GUI_BASE(BA)->x;
-        int img_y = GUI_BASE(BA)->y;
-        float img_rotate_angle = BA->degrees;
-        if (tp->x >= img_x &&
-            tp->x <= img_x + img_w &&
-            tp->y >= img_y &&
-            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
-        {
-            ;
-        }
-        else
-        {
-            Point img_coordinate = {img_x, img_y};
-            Point tp_start = {tp->x, tp->y};
-            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
-            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
-                                                          img_rotate_angle))
-            {
-                if (!strcmp(BA->base.name, "img_banana"))
-                {
-                    gui_img_set_attribute(BA, "img_banana_cut", FRUIT_NINJA_BANANA_HALF_1_BIN, img_x, img_y);
-                    fruit_score += 10;
-                    score_increase_flag = true;
-                }
-            }
-        }
-    }
-    /* peach */
-    {
-        int img_w = GUI_BASE(PE)->w;
-        int img_h = GUI_BASE(PE)->h;
-        int img_x = GUI_BASE(PE)->x;
-        int img_y = GUI_BASE(PE)->y;
-        float img_rotate_angle = PE->degrees;
-        if (tp->x >= img_x &&
-            tp->x <= img_x + img_w &&
-            tp->y >= img_y &&
-            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
-        {
-            ;
-        }
-        else
-        {
-            Point img_coordinate = {img_x, img_y};
-            Point tp_start = {tp->x, tp->y};
-            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
-            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
-                                                          img_rotate_angle))
-            {
-                if (!strcmp(PE->base.name, "img_peach"))
-                {
-                    gui_img_set_attribute(PE, "img_peach_cut", FRUIT_NINJA_PEACH_HALF_1_BIN, img_x, img_y);
-                    fruit_score += 10;
-                    score_increase_flag = true;
-                }
-            }
-        }
-    }
-    /* watermelon */
-    {
-        int img_w = GUI_BASE(WM)->w;
-        int img_h = GUI_BASE(WM)->h;
-        int img_x = GUI_BASE(WM)->x;
-        int img_y = GUI_BASE(WM)->y;
-        float img_rotate_angle = WM->degrees;
-        if (tp->x >= img_x &&
-            tp->x <= img_x + img_w &&
-            tp->y >= img_y &&
-            tp->y <= img_y + img_h) //tp is inside or on the edges of the picture
-        {
-            ;
-        }
-        else
-        {
-            Point img_coordinate = {img_x, img_y};
-            Point tp_start = {tp->x, tp->y};
-            Point tp_end = {tp->x + tp->deltaX, tp->y + tp->deltaY};
-            if (line_has_two_intersections_with_rectangle(img_coordinate, img_w, img_h, tp_start, tp_end,
-                                                          img_rotate_angle))
-            {
-                if (!strcmp(WM->base.name, "img_watermelon"))
-                {
-                    gui_img_set_attribute(WM, "img_watermelon_cut", FRUIT_NINJA_WATERMELON_HALF_1_BIN, img_x, img_y);
-                    fruit_score += 10;
-                    score_increase_flag = true;
-                }
-            }
-        }
-    }
-    if (!score_increase_flag)
-    {
-        fruit_score -= 10;
-    }
-    gui_log("fruit_score: %d\r\n", fruit_score);
-}
-
-static void APP_FRUIT_NINJA_cb(gui_win_t *win)
-{
-    const int16_t SCREEN_HEIGHT = 550; //454, height increases, fruit refreshes out of sight
-    const float SCREEN_STOP_PERCENT = 0.5;
-    const int16_t ORIGINAL_POSITION_X_SB = 50;
-    const int16_t ORIGINAL_POSITION_X_BA = 160;
-    const int16_t ORIGINAL_POSITION_X_PE = 380;
-    const int16_t ORIGINAL_POSITION_X_WM = 270;
-    int16_t ORIGINAL_POSITION_Y = 550; //454
-
-    /*show img*/
-    float progress_percent = (SCREEN_STOP_PERCENT < win->animate->progress_percent) ? 1.0 -
-                             win->animate->progress_percent : win->animate->progress_percent; //progress_percent or 0.5
-
-    //log
-    // printf("enter APP_FRUIT_NINJA_cb success!\r\n");
-    // printf("img->animate->progress_percent = %f\r\n", win->animate->progress_percent);
-
-    /* bounce-back fruit recover */
-    uint16_t new_position_y = SCREEN_HEIGHT * (1 - progress_percent * 2) +
-                              20; //height increases, fruit refreshes out of sight
-    if (454 * (1 - progress_percent * 2) >= 450)
-    {
-        gui_img_set_attribute(img_strawberry, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN,
-                              ORIGINAL_POSITION_X_SB, new_position_y);
-        gui_img_set_attribute(img_banana, "img_banana", FRUIT_NINJA_BANANA_BIN, ORIGINAL_POSITION_X_BA,
-                              new_position_y);
-        gui_img_set_attribute(img_peach, "img_peach", FRUIT_NINJA_PEACH_BIN, ORIGINAL_POSITION_X_PE,
-                              new_position_y);
-        gui_img_set_attribute(img_watermelon, "img_watermelon", FRUIT_NINJA_WATERMELON_BIN,
-                              ORIGINAL_POSITION_X_WM, new_position_y);
-        return ;
-    }
-
-    /* pic move part. Set the image location and rotate it on the GUI */
-    gui_img_set_location(img_strawberry, ORIGINAL_POSITION_X_SB, new_position_y);
-    gui_img_rotation(img_strawberry, 360 * win->animate->progress_percent,
-                     gui_img_get_width(img_strawberry) / 2,
-                     gui_img_get_height(img_strawberry) / 2);
-    gui_img_set_location(img_banana, ORIGINAL_POSITION_X_BA, new_position_y);
-    gui_img_rotation(img_banana, 360 * win->animate->progress_percent,
-                     gui_img_get_width(img_banana) / 2,
-                     gui_img_get_height(img_banana) / 2);
-    gui_img_set_location(img_peach, ORIGINAL_POSITION_X_PE, new_position_y);
-    gui_img_rotation(img_peach, 360 * win->animate->progress_percent, gui_img_get_width(img_peach) / 2,
-                     gui_img_get_height(img_peach) / 2);
-    gui_img_set_location(img_watermelon, ORIGINAL_POSITION_X_WM, new_position_y);
-    gui_img_rotation(img_watermelon, 360 * win->animate->progress_percent,
-                     gui_img_get_width(img_watermelon) / 2,
-                     gui_img_get_height(img_watermelon) / 2);
-
-    /*get touchpoint*/
-    GUI_TOUCHPAD_IMPORT_AS_TP
-
-    if (tp->released)
-    {
-        cutting_judgment(img_strawberry, img_banana, img_peach, img_watermelon, tp);
-
-        static char text_content[16];
-        sprintf(text_content, "SCORE: %d", fruit_score);
-        gui_text_content_set(score_board, text_content, strlen(text_content));
-
-        if (fruit_score <= -50)
-        {
-            gui_log("game over!\r\n");
-            img_gameover = gui_img_create_from_mem(win, "img_gameover", FRUIT_NINJA_GAMEOVER_BIN, 75, 150, 0,
-                                                   0);
-            gui_img_set_mode(img_gameover, IMG_SRC_OVER_MODE); // pic needs to be changed
-            gui_win_stop_animation(win);
-            fruit_score = 0;
-        }
-    }
-
-}
-
 GUI_APP_ENTRY(APP_FRUIT_NINJA)
 {
-    const int16_t ORIGINAL_POSITION_X_SB = 50;
-    const int16_t ORIGINAL_POSITION_X_BA = 160;
-    const int16_t ORIGINAL_POSITION_X_PE = 380;
-    const int16_t ORIGINAL_POSITION_X_WM = 270;
-    int16_t ORIGINAL_POSITION_Y = 550; //height increases, fruit refreshes out of sight
+    extern void app_fruit_ninja_design(gui_obj_t *obj);
+    app_fruit_ninja_design(GUI_APP_ROOT_SCREEN);
 
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0); //create window
-
-    gui_win_set_animate(win, 5000, -1, APP_FRUIT_NINJA_cb, win);  //dur=1 why bounce twice？
-
-    /* Create an image for displaying on the window */
-    img_bg = gui_img_create_from_mem(win, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0,
-                                     0); // if data of background is too big, decrease FPS
-    img_strawberry = gui_img_create_from_mem(win, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN,
-                                             ORIGINAL_POSITION_X_SB,
-                                             ORIGINAL_POSITION_Y, 0, 0);
-    gui_img_set_mode(img_strawberry, IMG_SRC_OVER_MODE);
-
-    img_banana = gui_img_create_from_mem(win, "img_banana", FRUIT_NINJA_BANANA_BIN,
-                                         ORIGINAL_POSITION_X_BA,
-                                         ORIGINAL_POSITION_Y, 0, 0);
-    gui_img_set_mode(img_banana, IMG_SRC_OVER_MODE);
-
-    img_peach = gui_img_create_from_mem(win, "img_peach", FRUIT_NINJA_PEACH_BIN, ORIGINAL_POSITION_X_PE,
-                                        ORIGINAL_POSITION_Y, 0, 0);
-    gui_img_set_mode(img_peach, IMG_SRC_OVER_MODE);
-
-    img_watermelon = gui_img_create_from_mem(win, "img_watermelon", FRUIT_NINJA_WATERMELON_BIN,
-                                             ORIGINAL_POSITION_X_WM,
-                                             ORIGINAL_POSITION_Y, 0, 0);
-    gui_img_set_mode(img_watermelon, IMG_SRC_OVER_MODE);
-
-    score_board = gui_text_create(win, "score_board",  0, 10, 100, 50);
-    gui_text_set(score_board, "SCORE: 0", GUI_FONT_SRC_BMP, APP_COLOR_WHITE, strlen("SCORE: 0"), 16);
-    void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-    gui_text_type_set(score_board, addr1, FONT_SRC_MEMADDR);
-    gui_text_mode_set(score_board, LEFT);
-
-    /* return button */
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
 
+/**
+ * @brief APP_CALCULATOR
+ *
+ */
+#include "app_calculator.h"
 
+GUI_APP_ENTRY(APP_CALCULATOR)
+{
+    gui_app_t *calculator = get_app_calculator();
+    calculator->ui_design((gui_app_t *)GUI_APP_ROOT_SCREEN);
+
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}

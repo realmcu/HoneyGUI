@@ -2,7 +2,7 @@
 *****************************************************************************************
 *     Copyright(c) 2017, Realtek Semiconductor Corporation. All rights reserved.
 *****************************************************************************************
-  * @file gui_app.h
+  * @file gui_components_init.h
   * @brief app api
   * @details application startup and close
   * @author howie_wang@realsil.com.cn

@@ -113,6 +113,7 @@ char *text_string[FONT_NUM] =
     "!@#$%^&",
     "QWERTYU",
 };
+static uint16_t uutf_16[] = {0x30, 0x31, 0x32, 0x33, 0X34};
 static void tab_text(void *tab)
 {
     gui_img_t *tree = gui_img_create_from_mem(tab, "tree", TREE_BIN, 0, 0, 0, 0);
@@ -122,8 +123,9 @@ static void tab_text(void *tab)
     gui_text_mode_set(text2, LEFT);
 
     gui_text_t *text3 = gui_text_create(tab,  "text3",  0, 85, 280, 50);
-    gui_text_set(text3, "1234567", GUI_FONT_SRC_BMP, APP_COLOR_BLUE, 7, 48);
+    gui_text_set(text3, uutf_16, GUI_FONT_SRC_BMP, APP_COLOR_BLUE, 10, 48);
     gui_text_mode_set(text3, CENTER);
+    gui_text_encoding_set(text3, UTF_16);
 
     gui_text_t *text4 = gui_text_create(tab,  "text4",  0, 145, 280, 50);
     gui_text_set(text4, "!@#$", GUI_FONT_SRC_BMP, APP_COLOR_RED, 4, 64);

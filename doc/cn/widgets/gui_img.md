@@ -1,43 +1,67 @@
-# Image
+# 图像控件
+<br>
 
-The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.Image widgets support moving, zooming, rotating, etc.
+图像控件是用于显示图像的基本控件，支持移动、缩放、旋转等功能。
 
-## Usage
+## 用法
 
-### Create widget
+### 创建控件
 
-You can use [gui_img_create_from_mem(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#api) to create an image widget from memory, or use [gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)](#api) to create an image widget from file. If the width or height of the image widget is set to `0`, the widget's size will be set according to the size of the image source automatically.
+开发者可以使用 [gui_img_create_from_mem(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#api)从内存中创建一个图像控件，或者使用  [gui_img_create_from_fs(void *parent, const char *file, int16_t x, int16_t y)](#api)从文件系统中创建一个图像控件。同样，也可以使用 [gui_img_create_from_ftl(void *parent, const char *name, void *ftl, int16_t x, int16_t y, int16_t w, int16_t h)](#api)从闪存中创建一个图像控件。
+如果图像控件的宽度或高度设置为 0，那么控件的大小将根据图像源的大小自动设置。
 
-### Set location
+### 更新位置
 
-If you need to update the location of image widget, use [gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y)](#api) to relocate.
-`x, y` is the new coordinate.
+如果想要更新图像控件的位置，开发者可以使用[gui_img_set_location(gui_img_t *this, uint16_t x, uint16_t y)](#api)去更新位置。
 
-### Set attribute
+### 设定属性
 
-You can use [gui_img_set_attribute(gui_img_t *this, const char *name, void *addr, int16_t x, int16_t y)](#api) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
+开发者可以通过 [gui_img_set_attribute(gui_img_t *this, const char *name, void *addr, int16_t x, int16_t y)](#api) 来设置图像控件的属性，替换为新图像并设置新坐标。
 
-### Get height/width
+### 获取高度/宽度
 
-If you want to get the height/width of image widget, you can do so with [gui_img_get_height(gui_img_t *this)](#api) or [gui_img_get_width(gui_img_t *this)](#api).
+如果想要获取图像控件的高度/宽度，开发者可以使用 [gui_img_get_height(gui_img_t *this)](#api) 或 [gui_img_get_width(gui_img_t *this)](#api)。
 
-### Translate
+### 刷新大小
 
-Using [gui_img_translate(gui_img_t *this, float t_x, float t_y)](#api) to move the image widget.
-It can move an image widget to a new coordinate without changing the original coordinate in the widget's attribute.
+开发者可以调用 [gui_img_refresh_size(gui_img_t *_this)](#api)来刷新图像控件大小。
 
-### Rotate
+### 混合模式
 
-You can rotate the image widget around the center of the circle by this api [gui_img_rotation(gui_img_t *this, float degrees, float c_x, float c_y)](#api).
-The `c_x, c_y` is the relative to origin of the image widget, not the origin of screen.
+开发者可以使用 [gui_img_set_mode(gui_img_t *_this, BLEND_MODE_TYPE mode)](#api)来设定图像控件的混合模式。
 
-### Zoom
+### 移动
 
-You can adjust the size of the image widget to fit your requirements by this api [gui_img_scale(gui_img_t *this, float scale_x, float scale_y)](#api).
+通过 [gui_img_translate(gui_img_t *this, float t_x, float t_y)](#api) 来移动图像控件。
+开发者可以将图像控件移动到新坐标，而不改变控件属性中的原始坐标。
 
-## Example
+### 旋转
 
-<details> <summary>code</summary>
+开发者可以通过 [gui_img_rotation(gui_img_t *this, float degrees, float c_x, float c_y)](#api)来围绕圆心旋转图像控件。
+
+### 缩放
+
+开发者可以使用 [gui_img_scale(gui_img_t *this, float scale_x, float scale_y)](#api)调整图像控件的大小以满足需求。
+
+### 不透明度
+
+图像控件的不透明度值是可调整的，开发者可以调用 [gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)](#api)来调整。
+
+### 动画效果
+
+开发者可以通过 [gui_img_set_animate(gui_img_t *_this, uint32_t dur, int repeat_count, void *callback, void *p)](#api)来设定图像控件的动画效果。
+
+### 质量
+
+开发者可以调用 [gui_img_set_quality(gui_img_t *_this, bool high_quality)](#api)来设定图像控件的显示质量。
+
+### 截屏
+
+开发者可以使用[gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#api)来保存全屏截图。另外，可以使用[gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf)](#api)来保存当前控件大小的截图。保存的图像会是RGB格式。
+
+## 示例
+
+<details> <summary>示例代码</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"

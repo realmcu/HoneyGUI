@@ -9,6 +9,14 @@ src = Split("""
 src = Glob('*.c')
 CPPPATH = [cwd]
 print(CPPPATH)
-group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_320_385_DEMO'], CPPPATH = CPPPATH)
+
+CPPDEFINES = []
+if GetDepend('CONFIG_REALTEK_BUILD_GUI_320_385_DEMO'):
+    CPPDEFINES += ['ENABLE_RTK_GUI_320_385_DEMO']
+    CPPDEFINES += ['DRV_LCD_WIDTH=386']
+    CPPDEFINES += ['DRV_LCD_HIGHT=320']
+    CPPDEFINES += ['DRV_PIXEL_BITS=16']
+
+group = DefineGroup('realgui/demo', src, depend = ['CONFIG_REALTEK_BUILD_GUI_320_385_DEMO'], CPPPATH = CPPPATH, CPPDEFINES = CPPDEFINES)
 
 Return('group')

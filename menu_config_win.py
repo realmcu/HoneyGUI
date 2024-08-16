@@ -5,6 +5,8 @@ import subprocess
 import os
 import sys
 import atexit
+import threading
+import queue
 
 def get_script_dir():
     if getattr(sys, 'frozen', False):
@@ -24,6 +26,7 @@ class ConfigEditorApp:
     def __init__(self, master, file_path):
         self.master = master
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.master.geometry("500x600")
         self.info_window = None
         self.scons_process = None
         self.gui_process = None
@@ -48,8 +51,10 @@ class ConfigEditorApp:
             for option in self.primary_options:
                 for line in config_lines:
                     if re.match(rf"^#define\s+{option['macro']}\b", line.strip()):
-                        
-                        return option['name']
+                        parts = line.strip().split()
+                        if len(parts) > 2 and parts[2] == '0':
+                            continue
+                        return option['macro']
 
         except Exception as e:
             print(f"Error reading config file: {e}")
@@ -68,10 +73,16 @@ class ConfigEditorApp:
 
                 for option in self.primary_options:
                     if re.search(rf"^//\s*#define\s+{option['macro']}\b|^#define\s+{option['macro']}\b", line.strip()):
-                        if option['name'] == selected_option:
-                            new_line = f"#define {option['macro']}\n"
+                        if option['macro'] == selected_option:
+                            if option['macro'] == "CONFIG_REALTEK_BUILD_LVGL_GUI" or option['macro'] == "CONFIG_REALTEK_BUILD_ARM_2D":
+                                new_line = f"#define {option['macro']}     1\n"
+                            else:
+                                new_line = f"#define {option['macro']}\n"
                         else:
-                            new_line = f"// #define {option['macro']}\n"
+                            if option['macro'] == "CONFIG_REALTEK_BUILD_LVGL_GUI" or option['macro'] == "CONFIG_REALTEK_BUILD_ARM_2D":
+                                new_line = f"#define {option['macro']}     0\n"
+                            else:
+                                new_line = f"// #define {option['macro']}\n"
                         break
 
                 file.write(new_line)
@@ -111,34 +122,40 @@ class ConfigEditorApp:
 
         try:
             self.scons_process = subprocess.Popen(["scons"], cwd=win32_sim_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            self.read_process_output(self.scons_process)
+
+            self.output_queue = queue.Queue()
+            threading.Thread(target=self.read_process_output, args=(self.scons_process.stdout, "stdout", self.output_queue)).start()
+            threading.Thread(target=self.read_process_output, args=(self.scons_process.stderr, "stderr", self.output_queue)).start()
+
+            self.check_process()
         except Exception as e:
             messagebox.showerror("错误", f"构建失败:\n{str(e)}")
-            
-    def read_process_output(self, process):
-        def read_line():
-            line = process.stdout.readline()
-            if line:
+
+    def read_process_output(self, stream, stream_type, output_queue):
+        for line in iter(stream.readline, ''):
+            output_queue.put((stream_type, line))
+        stream.close()
+
+    def check_process(self):
+        try:
+            while not self.output_queue.empty():
+                stream_type, line = self.output_queue.get_nowait()
                 self.text_box.config(state="normal")
                 self.text_box.insert("end", line)
                 self.text_box.config(state="disabled")
                 self.text_box.yview("end")
-                self.text_box.update_idletasks()
-                self.master.after(10, read_line)
+        except queue.Empty:
+            pass
+
+        return_code = self.scons_process.poll()
+        if return_code is None:
+            self.master.after(100, self.check_process)
+        else:
+            if return_code == 0:
+                self.run_gui_exe()
             else:
-                return_code = process.poll()
-                if return_code is None:
-                    self.master.after(100, read_line)
-                else:
-                    process.stdout.close()
-                    stderr_output = process.stderr.read()
-                    process.stderr.close()
-                    if return_code == 0:
-                        self.run_gui_exe()
-                    else:
-                        self.show_error_window(return_code, stderr_output)
-              
-        read_line()
+                stderr_output = self.scons_process.stderr.read()
+                self.show_error_window(return_code, stderr_output)
 
     def show_error_window(self, return_code, error_message):
         messagebox.showerror("错误", f"SCons 构建失败，退出代码: {return_code}\n{error_message}")
@@ -152,13 +169,27 @@ class ConfigEditorApp:
                 raise FileNotFoundError(f"gui.exe 未找到在 '{gui_exe_path}'")
             self.gui_process = subprocess.Popen([gui_exe_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
+            threading.Thread(target=self.read_process_output, args=(self.gui_process.stdout, "stdout", self.output_queue), daemon=True).start()
+            threading.Thread(target=self.read_process_output, args=(self.gui_process.stderr, "stderr", self.output_queue), daemon=True).start()
+
             if self.gui_process.poll() is None:
                 print(f"gui.exe started successfully with PID: {self.gui_process.pid}")
             else:
                 print("Failed to start gui.exe.")
-
+            # self.check_gui_process()
         except Exception as e:
             messagebox.showerror("错误", f"GUI 启动失败:\n{str(e)}")  
+
+    def check_gui_process(self):
+        self.update_text_box()
+
+        return_code = self.gui_process.poll()
+        if return_code is None:
+            self.master.after(100, self.check_gui_process)
+        else:
+            if return_code != 0:
+                stderr_output = self.gui_process.stderr.read()
+                self.show_error_window(return_code, stderr_output)
 
     def create_widgets(self):
         self.master.grid_rowconfigure(0, weight=0)
@@ -167,7 +198,7 @@ class ConfigEditorApp:
         self.master.grid_columnconfigure(1, weight=0)
 
         title = tk.Label(self.master, text="GUI Demo", font=('Helvetica', 16))
-        title.grid(row=0, column=0, columnspan=2, pady=(20, 10))
+        title.grid(row=0, column=0, columnspan=2, pady=(20, 10), sticky='ew')
 
         self.canvas = tk.Canvas(self.master)
         scrollbar = tk.Scrollbar(self.master, orient="vertical", command=self.canvas.yview)
@@ -186,14 +217,16 @@ class ConfigEditorApp:
         self.canvas.grid(row=1, column=0, sticky='nsew', padx=(50, 0))
         scrollbar.grid(row=1, column=1, sticky='ns')
 
+        self.canvas.bind_all("<MouseWheel>", self.on_mouse_wheel)
+
         self.buttons = []
 
         row_index = 0
         for option in self.primary_options:
             button_frame = tk.Frame(self.scrollable_frame, borderwidth=2, relief='flat', padx=10, pady=5, highlightbackground="black", highlightthickness=1)
-            button_frame.grid(row=row_index, column=0, padx=10, pady=10, sticky='ew')
+            button_frame.grid(row=row_index, column=0, padx=40, pady=10, sticky='ew')
             button_frame.grid_columnconfigure(0, weight=1)
-            button_frame.option_name = option['name']
+            button_frame.option_macro = option['macro']
 
             name_label = tk.Label(button_frame, text=option.get('name'), font=('Helvetica', 14, 'bold'), anchor='center')
             name_label.pack(fill='x', pady=(5, 0))
@@ -207,16 +240,16 @@ class ConfigEditorApp:
 
             # Ensure all child components propagate the click event to handle_button_click
             for widget in (button_frame, name_label, spacer, details_label):
-                widget.bind("<Button-1>", lambda e, opt=option['name']: self.handle_button_click(opt))
+                widget.bind("<Button-1>", lambda e, opt=option['macro']: self.handle_button_click(opt))
 
             self.buttons.append(button_frame)
             row_index += 1
         self.select_option(self.primary_var.get())
 
-    def select_option(self, option_name):
-        self.primary_var.set(option_name)
+    def select_option(self, option_macro):
+        self.primary_var.set(option_macro)
         for button_frame in self.buttons:
-            if button_frame.option_name == option_name:
+            if button_frame.option_macro == option_macro:
                 button_frame.config(bg="lightblue", relief="solid", bd=2)
                 for child in button_frame.winfo_children():
                     if isinstance(child, tk.Label):
@@ -227,11 +260,12 @@ class ConfigEditorApp:
                     if isinstance(child, tk.Label):
                         child.config(bg="SystemButtonFace")
 
-    def handle_button_click(self, option_name):
-        self.select_option(option_name)
+    def handle_button_click(self, option_macro):
+        self.select_option(option_macro)
         self.run_command()
 
-    
+    def on_mouse_wheel(self, event):
+        self.canvas.yview_scroll(-1 * (event.delta // 120), "units")
 
     def cleanup(self):
         if self.scons_process is not None and self.scons_process.poll() is None:
@@ -245,23 +279,77 @@ class ConfigEditorApp:
 if __name__ == "__main__":
     
     products_info = {
+        "CONFIG_REALTEK_BUILD_REAL_BASE": {
+            "name": "Base",
+            "resolution": "480 x 480",
+            "description": "GUI base application",
+            "macro": "CONFIG_REALTEK_BUILD_REAL_BASE"
+        },
+        "CONFIG_REALTEK_BUILD_REAL_NANOVG": {
+            "name": "NANOVG",
+            "resolution": "480 x 480",
+            "description": "NANOVG application",
+            "macro": "CONFIG_REALTEK_BUILD_REAL_NANOVG"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_448_368_DEMO": {
+            "name": "Watch",
+            "resolution": "368 x 448",
+            "description": "Watch application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_448_368_DEMO"
+        },
         "CONFIG_REALTEK_BUILD_GUI_454_454_DEMO": {
             "name": "Watch",
-            "resolution": "454x454",
+            "resolution": "454 x 454",
             "description": "Watch application using native C",
             "macro": "CONFIG_REALTEK_BUILD_GUI_454_454_DEMO"
         },
         "CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP": {
             "name": "86box",
-            "resolution": "480x480",
+            "resolution": "480 x 480",
             "description": "86box application using SaaA",
             "macro": "CONFIG_REALTEK_BUILD_SCRIPT_AS_A_APP"
         },
         "CONFIG_REALTEK_BUILD_TEST": {
             "name": "Test",
-            "resolution": "480x480",
+            "resolution": "480 x 480",
             "description": "Test application",
             "macro": "CONFIG_REALTEK_BUILD_TEST"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_280_456_DEMO": {
+            "name": "Watch",
+            "resolution": "280 x 456",
+            "description": "Watch application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_280_456_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_240_240_DEMO": {
+            "name": "Electronic Cigarette",
+            "resolution": "240 x 240",
+            "description": "Electronic cigarette application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_240_240_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_320_385_DEMO": {
+            "name": "Charge Box",
+            "resolution": "386 x 320",
+            "description": "Charge Box application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_320_385_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_GUI_800_480_DEMO": {
+            "name": "Dashboard",
+            "resolution": "800 x 480",
+            "description": "Dashboard application",
+            "macro": "CONFIG_REALTEK_BUILD_GUI_800_480_DEMO"
+        },
+        "CONFIG_REALTEK_BUILD_LVGL_GUI":{
+            "name": "LVGL",
+            "resolution": "480 x 480",
+            "description": "LVGL application",
+            "macro": "CONFIG_REALTEK_BUILD_LVGL_GUI"
+        },
+        "CONFIG_REALTEK_BUILD_ARM_2D":{
+            "name": "ARM2D",
+            "resolution": "480 x 480",
+            "description": "ARM2D application",
+            "macro": "CONFIG_REALTEK_BUILD_ARM_2D"
         }
     }
 

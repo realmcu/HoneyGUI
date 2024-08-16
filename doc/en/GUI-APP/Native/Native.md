@@ -1,5 +1,5 @@
 # C-APP
-## Introduction
+
 Write C language code with GUI API, and then compile it together with GUI code to implement the expected display as C-APP.
 
 ## Syntax

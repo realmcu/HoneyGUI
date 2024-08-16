@@ -6,7 +6,10 @@
 	],
 	"settings": {
 		"files.associations": {
-
+			"gui_card.h": "c",
+			"gui_obj.h": "c",
+			"gui_page.h": "c",
+			"gui_img.h": "c"
 		}
 	}
 }

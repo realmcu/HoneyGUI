@@ -17,7 +17,7 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
     uint16_t unicode_len = 0;
     switch (text->charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         p_buf = gui_malloc(text->len * sizeof(uint16_t));
         if (p_buf == NULL)
         {
@@ -29,7 +29,7 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
             unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
         }
         break;
-    case UTF_16_CHARSET:
+    case UTF_16:
         unicode_len = text->len;
         p_buf = (uint16_t *)text->content;
         break;
@@ -76,10 +76,10 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
     }
     switch (text->charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         gui_free(p_buf);
         break;
-    case UTF_16_CHARSET:
+    case UTF_16:
         break;
     default:
         break;
@@ -357,7 +357,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     uint16_t unicode_len = 0;
     switch (text->charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         p_buf = gui_malloc(text->len * sizeof(uint16_t));
         if (p_buf == NULL)
         {
@@ -369,7 +369,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
             unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
         }
         break;
-    case UTF_16_CHARSET:
+    case UTF_16:
         unicode_len = text->len;
         p_buf = (uint16_t *)text->content;
         break;
@@ -622,10 +622,10 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
 #endif
     switch (text->charset)
     {
-    case UTF_8_CHARSET:
+    case UTF_8:
         gui_free(p_buf);
         break;
-    case UTF_16_CHARSET:
+    case UTF_16:
         break;
     default:
         break;

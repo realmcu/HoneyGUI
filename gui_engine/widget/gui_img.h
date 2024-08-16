@@ -82,7 +82,7 @@ typedef struct gui_img
     uint32_t press_flag    : 1;         //!< press to change picture to the highlighted
     uint32_t release_flag  : 1;
     uint32_t scope         : 1;
-    uint32_t scope_flag         : 1;
+    uint32_t scope_flag    : 1;
     uint8_t checksum;
 } gui_img_t;
 
@@ -287,6 +287,7 @@ gui_img_t *gui_img_create_from_ftl(void       *parent,
                                    int16_t     y,
                                    int16_t     w,
                                    int16_t     h);
+
 /**
  * @brief creat an image widget from filesystem
  *
@@ -339,6 +340,7 @@ void gui_img_set_quality(gui_img_t *_this, bool high_quality);
  * @return gui_img_t*
  */
 void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
+
 /**
  * @brief convert a tree to a image data in root widget's size (RGB format)
  *
@@ -347,6 +349,7 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
  * @param shot_buf image data buffer
  */
 void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

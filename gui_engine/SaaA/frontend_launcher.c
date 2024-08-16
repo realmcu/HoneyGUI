@@ -96,7 +96,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
     struct dirent *entry;
     if ((dir = opendir(dirPath)) == NULL)
     {
-        perror("opendir() failed"); return;
+        gui_log("opendir(%s) failed", dirPath); return;
     }
     while ((entry = readdir(dir)) != NULL)
     {
@@ -110,7 +110,7 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
             DIR *dirr = 0;
             if ((dirr = opendir(path2)) == NULL)
             {
-                perror("opendir() failed"); return;
+                gui_log("opendir(%s) failed", path2); return;
             }
             struct dirent *entryy;
             while ((entryy = readdir(dirr)) != NULL)
@@ -121,9 +121,9 @@ void searchXmlFiles(char *dirPath, gui_app_t *app)
                     char path[512];
                     sprintf(path, "%s/%s", path2, entryy->d_name);
                     extern void get_app(gui_app_t *app, char **pic, char **text);
-                    char *pic = "app/system/resource/icMenuBird.bin"; char *text = "bird";
-                    uint32_t temp = (uint32_t)path;
-                    app->xml = (char *)temp;
+                    char *pic = "app/system/resource/icMenuBird.bin";
+                    char *text = "bird";
+                    app->xml = path;
 
 
                     get_app(app, &pic, &text);

@@ -72,9 +72,13 @@ typedef enum
 /** @brief  text encoding format enum */
 typedef enum
 {
-    UTF_8_CHARSET    = 0,
-    UTF_16_CHARSET   = 1,
-    UNICODE_ENCODING = 1,
+    UTF_8                = 0,       //UTF: Unicode Transformation Format
+
+    UTF_16               = 1,       //default LE, does not support surrogate pairs
+    UTF_16LE             = 1,
+    UNICODE_ENCODING     = 1,       //utf-16 equal to unicode on BMP
+
+    UTF_16BE             = 2,
 } TEXT_CHARSET;
 
 /** @brief  font type enum */

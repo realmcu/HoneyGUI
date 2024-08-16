@@ -77,6 +77,7 @@ extern "C" {
   * @{
   */
 
+#define TT_IMG_NAME_LENGTH  10 //strlen(tt_img_xxx)
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -123,6 +124,7 @@ typedef struct gui_turn_table
     gui_turn_table_coordinate_t *static_list;
     gui_img_t * *icon_list;
     float icon_scale;
+    uint8_t *name_list;
 //static
     gui_img_t *static_icon;
 //highlight
@@ -136,6 +138,7 @@ typedef struct gui_turn_table
     float sector_angle;
     TURN_TABLE_STATE_T state;
     int turn_count;
+    bool need_update;
 } gui_turn_table_t;
 
 /** End of WIDGET_Exported_Variables

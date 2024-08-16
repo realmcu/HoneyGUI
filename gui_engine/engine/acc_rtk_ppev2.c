@@ -42,7 +42,7 @@ static void change_cache_buf(uint32_t cache_size)
 #if F_APP_GUI_USE_PSRAM
     else if ((uint32_t)cache_buf > PSRAM_GUI_HEAP_ADDR)
     {
-        gui_free(cache_buf);
+        gui_lower_free(cache_buf);
         cache_buf = cache_buf1;
     }
 #endif
@@ -56,7 +56,7 @@ static void restore_cache_buf(void)
 #if F_APP_GUI_USE_PSRAM
     if ((uint32_t)cache_buf > PSRAM_GUI_HEAP_ADDR)
     {
-        gui_free(cache_buf);
+        gui_lower_free(cache_buf);
     }
 #endif
     cache_buf = cache_buf1;
@@ -67,9 +67,9 @@ static void cache_on_psram(uint32_t size)
 {
     if ((uint32_t)cache_buf > PSRAM_GUI_HEAP_ADDR)
     {
-        gui_free(cache_buf);
+        gui_lower_free(cache_buf);
     }
-    cache_buf = gui_malloc(size);
+    cache_buf = gui_lower_malloc(size);
 }
 #endif
 

@@ -257,6 +257,10 @@ static void gui_cube_prepare(gui_obj_t *obj)
         {
             this->draw_img[i].data = this->data[i];
         }
+        else if (this->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->draw_img[i].data = this->ftl[i];
+        }
     }
 
     gui_cube_scale(&cube_v0, cbsize);
@@ -305,6 +309,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
 
     if (this->nz[CUBE_NZ_0321] > 0.0f)
     {
+        draw_img_load_scale(front, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_FRONT]);
         gui_cube_transfrom_blit(front->img_w, front->img_h, &rv0, &rv3, &rv2, &rv1, &matrix);
 
         gui_matrix_t tmp;
@@ -314,7 +319,6 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&front->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&front->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&front->inverse);
-        draw_img_load_scale(front, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_FRONT]);
         draw_img_new_area(front, NULL);
         if (gui_cube_point_in_rect(front, tp->x, tp->y) == true)
         {
@@ -328,6 +332,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
 
     if (this->nz[CUBE_NZ_4567] > 0.0f)
     {
+        draw_img_load_scale(back, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_BACK]);
         gui_cube_transfrom_blit(back->img_w, back->img_h, &rv4, &rv5, &rv6, &rv7, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
@@ -335,7 +340,6 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&back->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&back->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&back->inverse);
-        draw_img_load_scale(back, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_BACK]);
         draw_img_new_area(back, NULL);
         if (gui_cube_point_in_rect(back, tp->x, tp->y) == true)
         {
@@ -349,6 +353,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
 
     if (this->nz[CUBE_NZ_5126] > 0.0f)
     {
+        draw_img_load_scale(up, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_UP]);
         gui_cube_transfrom_blit(up->img_w, up->img_h, &rv5, &rv1, &rv2, &rv6, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
@@ -356,7 +361,6 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&up->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&up->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&up->inverse);
-        draw_img_load_scale(up, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_UP]);
         draw_img_new_area(up, NULL);
         if (gui_cube_point_in_rect(up, tp->x, tp->y) == true)
         {
@@ -370,6 +374,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
 
     if (this->nz[CUBE_NZ_0473] > 0.0f)
     {
+        draw_img_load_scale(down, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_DOWN]);
         gui_cube_transfrom_blit(down->img_w, down->img_h, &rv0, &rv4, &rv7, &rv3, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
@@ -377,7 +382,6 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&down->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&down->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&down->inverse);
-        draw_img_load_scale(down, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_DOWN]);
         draw_img_new_area(down, NULL);
         if (gui_cube_point_in_rect(down, tp->x, tp->y) == true)
         {
@@ -391,6 +395,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
 
     if (this->nz[CUBE_NZ_7623] > 0.0f)
     {
+        draw_img_load_scale(left, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_LEFT]);
         gui_cube_transfrom_blit(left->img_w, left->img_h, &rv7, &rv6, &rv2, &rv3, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
@@ -398,7 +403,6 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&left->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&left->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&left->inverse);
-        draw_img_load_scale(left, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_LEFT]);
         draw_img_new_area(left, NULL);
         if (gui_cube_point_in_rect(left, tp->x, tp->y) == true)
         {
@@ -412,6 +416,7 @@ static void gui_cube_prepare(gui_obj_t *obj)
 
     if (this->nz[CUBE_NZ_0154] > 0.0f)
     {
+        draw_img_load_scale(right, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_RIGHT]);
         gui_cube_transfrom_blit(right->img_w, right->img_h, &rv0, &rv1, &rv5, &rv4, &matrix);
         gui_matrix_t tmp;
         memcpy(&tmp, obj->matrix, sizeof(struct gui_matrix));
@@ -419,7 +424,6 @@ static void gui_cube_prepare(gui_obj_t *obj)
         memcpy(&right->matrix, &tmp, sizeof(struct gui_matrix));
         memcpy(&right->inverse, &tmp, sizeof(struct gui_matrix));
         matrix_inverse(&right->inverse);
-        draw_img_load_scale(right, (IMG_SOURCE_MODE_TYPE)this->src_mode[CUBE_SIDE_RIGHT]);
         draw_img_new_area(right, NULL);
         if (gui_cube_point_in_rect(right, tp->x, tp->y) == true)
         {
@@ -449,12 +453,13 @@ static void gui_cube_draw_cb(gui_obj_t *obj)
         if (this->nz[i] > 0.0f)
         {
             CUBE_JUDEG_FULL_RANK(&draw_img)
-
-            draw_img_cache(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
-            // blit
-            gui_acc_blit_to_dc(draw_img, dc, NULL);
-            // release img if cached
-            draw_img_free(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+            {
+                draw_img_cache(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+                // blit
+                gui_acc_blit_to_dc(draw_img, dc, NULL);
+                // release img if cached
+                draw_img_free(draw_img, (IMG_SOURCE_MODE_TYPE)this->src_mode[i]);
+            }
         }
     }
 }
@@ -564,6 +569,11 @@ static void gui_cube_ctor(gui_cube_t         *this,
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
             this->data[i] = img_path[i];
+        }
+        else if (img_file->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->data[i] = img_path[i];
+            this->ftl[i] = img_path[i];
         }
 
         this->src_mode[i] = img_file->src_mode[i];
@@ -716,6 +726,11 @@ void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)
         else if (img_file->src_mode[i] == IMG_SRC_MEMADDR)
         {
             this->data[i] = img_path[i];
+        }
+        else if (img_file->src_mode[i] == IMG_SRC_FTL)
+        {
+            this->data[i] = img_path[i];
+            this->ftl[i] = img_path[i];
         }
     }
 }

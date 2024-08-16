@@ -1,29 +1,35 @@
-# Simple image
+# 简单图像
 
-The simple img widget is a simplified version of the img control, lacking transformation operations such as rotation, translation, and scaling.
+简单图像（simple img）是图像（img）控件的一个简化版本，去掉了旋转、平移和缩放等几何变换操作。
 
-## Usage
+## 用法
 
-### Create widget
+### 创建控件
 
-You can use [gui_simple_img_create(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h, IMG_SOURCE_MODE_TYPE src_mode_type)](#api) to create an simple  image widget. If src_mode_type is IMG_SRC_MEMADDR, the image is created from memory. If src_mode_type is IMG_SRC_FILESYS, the image is created from the file system using the the image path as `addr`.
+使用[gui_simple_img_create(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h, IMG_SOURCE_MODE_TYPE src_mode_type)](#api)创建一个简单图像（simple img）控件。 其中，如果`src_mode_type`是`IMG_SRC_MEMADDR`，图像将从内存地址加载；如果`src_mode_type`是`IMG_SRC_FILESYS`，图像将从文件系统加载，`addr`的值应该是图片路径。加载方式请参考下列枚举：
 
-### Set location
+```eval_rst
+.. literalinclude:: ../../../gui_engine/engine/draw_img.h
+   :language: c
+   :start-after: /* IMG_SOURCE_MODE_TYPE enum start*/
+   :end-before: /* IMG_SOURCE_MODE_TYPE enum end*/
+```
 
-If you need to update the location of image widget, use [gui_simple_img_set_location(gui_img_t *img, uint16_t x, uint16_t y)](#api) to relocate.
-`x, y` is the new coordinate.
+### 设置位置
 
-### Set attribute
+如果需要改变简单图像（simple img）控件的位置，使用 [gui_simple_img_set_location(gui_img_t *img, uint16_t x, uint16_t y)](#api)重设起点坐标。其中，`x, y` 是新的起点坐标。
 
-You can use [void gui_simple_img_set_attribute(gui_simple_img_t *img, const char *name, void *addr,int16_t x,int16_t y)](#api) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
+### 设置属性
 
-### Get height/width
+使用[void gui_simple_img_set_attribute(gui_simple_img_t *img, const char *name, void *addr,int16_t x,int16_t y)](#api)设置简单图像（simple img）控件的属性，改变图像来源并设置新的起点坐标。
 
-If you want to get the height/width of image widget, you can do so with [gui_simple_img_get_height(gui_simple_img_t *this)](#api) or [gui_simple_img_get_width(gui_simple_img_t *this)](#api).
+### 获取高度/宽度
 
-## Example
+如果想获取简单图像（simple img）控件的高度或宽度，可以使用[gui_simple_img_get_height(gui_simple_img_t *this)](#api)或[gui_simple_img_get_width(gui_simple_img_t *this)](#api)。
 
-<details> <summary>code</summary>
+## 示例
+
+<details> <summary>代码片段</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"

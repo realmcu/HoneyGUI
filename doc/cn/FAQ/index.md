@@ -10,4 +10,5 @@
     移植常见问题 <porting>
     规格常见问题 <specification>
     如何提高帧率常见问题 <FPS>
+    显示常见问题 <display>
 ```

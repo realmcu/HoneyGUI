@@ -1,14 +1,14 @@
-# Return
+# 返回
 
-The bubble-shaped curve that can be dragged out on the left side of the screen is used to perform a return operation.
+可以从屏幕左侧拖出的泡泡形状曲线用于执行返回操作。
 
-## Usage
+## 用法
 
-### Create a return widget
+### 创建返回控件
 
-Creating function is [gui_return_create](#gui_return_create). Users need to enter curve animation frame images file array ,and the return operation function.
+创建函数是 [gui_return_create](#gui_return_create)。用户需要提供曲线动画帧图像文件数组，以及返回操作函数。
 
-## Example
+## 示例
 <br>
 <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/return.gif"  /></div>
 <br>
@@ -17,7 +17,7 @@ Creating function is [gui_return_create](#gui_return_create). Users need to ente
 ```eval_rst
 
 .. note::
-  Please refer to ```gui_engine\example\screen_454_454\gui_menu\apps.c``` for details.
+  详细信息请参阅 ```gui_engine\example\screen_454_454\gui_menu\apps.c```。
 
 ```
 
