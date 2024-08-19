@@ -2418,6 +2418,7 @@ struct app_block
 {
     int x, y;
     void *render;
+    bool curtain;
 };
 void ui_0_0(gui_obj_t *parent)
 {
@@ -2556,8 +2557,8 @@ void ui_1_0(gui_obj_t *parent)
 }
 struct app_block block_array[] =
 {
-    {0, 0, ui_0_0}, {0, 1, ui_0_1}, {1, 1, ui_1_1}, {0, -1, ui_0_m1}, {-1, 0, ui_m1_0}, {-1, -1, ui_m1_m1},
-    {-1, 1, ui_m1_1}, {1, -1, ui_1_m1}, {1, 0, ui_1_0}, {-2, 0, ui_1_1},
+    {0, 0, ui_0_0}, {0, 1, ui_0_1, 1}, {1, 1, ui_1_1}, {0, -1, ui_0_m1}, {-1, 0, ui_m1_0, 1}, {-1, -1, ui_m1_m1},
+    {-1, 1, ui_m1_1}, {1, -1, ui_1_m1}, {1, 0, ui_1_0, 1}, {-2, 0, ui_1_1},
 };
 static gui_win_t *win_index;
 static gui_win_t *win_next;
@@ -2582,7 +2583,19 @@ static void block_transform_sync(gui_win_t *block, int offset_x, int offset_y, i
         break;
     case CUBE:
         {
-            block_transform_cube(block, offset_x,  offset_y,  tp_x, tp_y);
+            //gui_log("%d,%d,%d,%d\n",offset_x,  offset_y,  tp_x, tp_y);
+            if (offset_y != 0 || tp_y != 0) //vertical
+            {
+                matrix_translate(offset_x * (int)block->base.w + tp_x, \
+                                 offset_y * (int)block->base.h + tp_y, \
+                                 block->base.matrix);
+            }
+            else
+            {
+                block_transform_cube(block, offset_x,  offset_y,  tp_x, tp_y);
+            }
+
+
         }
         break;
     default:
@@ -2664,7 +2677,7 @@ static void block_transform_cube(gui_win_t *block, int offset_x, int offset_y, i
 
     matrix_multiply(obj->matrix, &temp);
 }
-static void block_win_cb(gui_win_t *win)
+static void block_win_cb(struct app_block *config, gui_win_t *win)
 {
     if (win == win_index)
     {
@@ -2677,20 +2690,39 @@ static void block_win_cb(gui_win_t *win)
 
 
 }
+static bool next_curtain;
+static bool win_curtain;
+static bool curtain_left;
+static bool curtain_right;
+static bool curtain_up;
+static bool curtain_down;
+static bool touch_left;
+static bool touch_right;
+static bool touch_up;
+static bool touch_down;
 static void block_transform(gui_win_t *block, int offset_x_, int offset_y_, int tp_x_, int tp_y_)
 {
+    gui_log("next_curtain:%d,win_curtain:%d,%x,%x,%x\n", next_curtain, win_curtain, win_index, win_next,
+            block);
     if (block == win_index)
     {
-        offset_x_index = offset_x_;  offset_y_index = offset_y_;  tp_x_index = tp_x_;  tp_y_index = tp_y_;
+        if (!next_curtain)
+        {
+            offset_x_index = offset_x_;  offset_y_index = offset_y_;  tp_x_index = tp_x_;  tp_y_index = tp_y_;
+        }
     }
     else if (block == win_next)
     {
-        offset_x = offset_x_;  offset_y = offset_y_;  tp_x = tp_x_;  tp_y = tp_y_;
+        if (!win_curtain)
+        {
+            offset_x = offset_x_;  offset_y = offset_y_;  tp_x = tp_x_;  tp_y = tp_y_;
+        }
+
     }
 
 
 }
-static gui_win_t *block_render(gui_obj_t *parent, int idx, int idy)
+static gui_win_t *block_render(gui_obj_t *parent, int idx, int idy, bool next)
 {
     win_next = 0;
     for (size_t i = 0; i < sizeof(block_array) / sizeof(struct app_block); i++)
@@ -2698,8 +2730,17 @@ static gui_win_t *block_render(gui_obj_t *parent, int idx, int idy)
         if (block_array[i].x == idx && block_array[i].y == idy)
         {
             gui_win_t *win = gui_win_create(parent, 0, 0, 0, 0, 0);
-            gui_win_set_animate(win, 1000, -1, block_win_cb, win);
+            gui_win_set_animate(win, 1000, -1, block_win_cb, &block_array[i]);
             ((void (*)(gui_obj_t *parent))(block_array[i].render))((gui_obj_t *)win);
+            if (next)
+            {
+                next_curtain = block_array[i].curtain;
+            }
+            else
+            {
+                win_curtain = block_array[i].curtain;
+            }
+
             return win;
         }
     }
@@ -2742,11 +2783,18 @@ static void block_cb(gui_win_t *win)
     {
         hold = 1;
         horizontal = -1;
+
+
         if (release_animation)
         {
             if (jump)
             {
-                gui_obj_tree_free(win_index);
+                if (!next_curtain)
+                {
+                    gui_obj_tree_free(win_index);
+                }
+
+
                 block_transform(win_next, 0, 0, 0, 0);
                 release_animation_end = 0;
                 if (direction == 1)
@@ -2778,13 +2826,66 @@ static void block_cb(gui_win_t *win)
         load = 0;
         if (jump)
         {
+            gui_log("jump\n");
+            touch_left = 0;
+            touch_right = 0;
+            touch_up = 0;
+            touch_down = 0;
+            gui_win_t *temp = win_index;
             win_index = win_next;
-            win_next = 0;
+
+            if (!next_curtain)
+            {
+                win_next = 0;
+            }
+            else
+            {
+                win_next = temp;
+                if (curtain_down)
+                {
+                    touch_left = 1;
+                    touch_right = 1;
+                    touch_down = 1;
+                    curtain_down = 0;
+                }
+                if (curtain_left)
+                {
+                    touch_down = 1;
+                    touch_left = 1;
+                    touch_up = 1;
+                    curtain_left = 0;
+                }
+                if (curtain_right)
+                {
+                    touch_right = 1;
+                    touch_down = 1;
+                    touch_up = 1;
+                    curtain_right = 0;
+                }
+                if (curtain_up)
+                {
+                    touch_left = 1;
+                    touch_right = 1;
+                    touch_up = 1;
+                    curtain_up = 0;
+                }
+
+            }
+
+            if (win_curtain)
+            {
+                win_curtain = 0;
+            }
+            win_curtain = next_curtain;
+
+
+            next_curtain = 0;
             jump = 0;
 
             horizontal = -1;
             block_transform(win_index, 0, 0, 0, 0);
         }
+
     }
     else if (tp->released)
     {
@@ -2809,21 +2910,30 @@ static void block_cb(gui_win_t *win)
         }
         if (horizontal == 1)
         {
-            if (tp->deltaX > 0) //->
+            if (tp->deltaX > 0 && !touch_right) //->
             {
                 if (!load)
                 {
-                    win_next = block_render((gui_obj_t *)win, idx - 1, idy);
-                    gui_log("block_render :%d\n", idx);
+                    if (!win_curtain)
+                    {
+                        win_next = block_render((gui_obj_t *)win, idx - 1, idy, 1);
+
+                    }
                     if (win_next)
                     {
                         load = 1;
+                        if (next_curtain)
+                        {
+                            curtain_right = 1;
+                        }
+
 
                     }
+
                 }
                 if (load)
                 {
-                    gui_log("block_transform :%d\n", deltaX);
+                    gui_log("block_transform\n");
                     block_transform(win_next, -1, 0, deltaX, 0);
                     block_transform(win_index, 0, 0, deltaX, 0);
                     if (deltaX > SCREEN_W / 3)
@@ -2841,21 +2951,26 @@ static void block_cb(gui_win_t *win)
 
 
             }
-            else if (tp->deltaX < 0) //<-
+            else if (tp->deltaX < 0 && !touch_left) //<-
             {
                 if (!load)
                 {
-                    win_next = block_render((gui_obj_t *)win, idx + 1, idy);
-                    gui_log("block_render :%d\n", idx);
+                    if (!win_curtain)
+                    {
+                        win_next = block_render((gui_obj_t *)win, idx + 1, idy, 1);
+
+                    }
                     if (win_next)
                     {
                         load = 1;
-
+                        if (next_curtain)
+                        {
+                            curtain_left = 1;
+                        }
                     }
                 }
                 if (load)
                 {
-                    //gui_log("block_transform :%d\n",deltaX );
                     block_transform(win_next, 1, 0, deltaX, 0);
                     block_transform(win_index, 0, 0, deltaX, 0);
                     if (_UI_ABS(deltaX) > SCREEN_W / 3)
@@ -2875,16 +2990,23 @@ static void block_cb(gui_win_t *win)
         }
         else if (horizontal == 0)
         {
-            if (tp->deltaY > 0) //.
+            if (tp->deltaY > 0 && !touch_down) //v
             {
                 if (!load)
                 {
-                    win_next = block_render((gui_obj_t *)win, idx, idy - 1);
-                    gui_log("block_render :%d\n", idx);
+                    if (!win_curtain)
+                    {
+                        win_next = block_render((gui_obj_t *)win, idx, idy - 1, 1);
+                        gui_log("block_render :%d\n", idx);
+
+                    }
                     if (win_next)
                     {
                         load = 1;
-
+                        if (next_curtain)
+                        {
+                            curtain_down = 1;
+                        }
                     }
                 }
                 if (load)
@@ -2907,16 +3029,23 @@ static void block_cb(gui_win_t *win)
 
 
             }
-            else if (tp->deltaY < 0) //^
+            else if (tp->deltaY < 0 && !touch_up) //^
             {
                 if (!load)
                 {
-                    win_next = block_render((gui_obj_t *)win, idx, idy + 1);
-                    gui_log("block_render :%d\n", idx);
+                    if (!win_curtain)
+                    {
+                        win_next = block_render((gui_obj_t *)win, idx, idy + 1, 1);
+                        gui_log("block_render :%d\n", idx);
+
+                    }
                     if (win_next)
                     {
                         load = 1;
-
+                        if (next_curtain)
+                        {
+                            curtain_up = 1;
+                        }
                     }
                 }
                 if (load)
@@ -3103,7 +3232,10 @@ static void block_cb(gui_win_t *win)
         {
             if (jump)
             {
-                gui_obj_tree_free(win_index);
+                if (!next_curtain)
+                {
+                    gui_obj_tree_free(win_index);
+                }
                 block_transform(win_next, 0, 0, 0, 0);
                 release_animation = 0;
                 release_animation_end = 0;
@@ -3129,7 +3261,7 @@ GUI_APP_ENTRY(APP_BLOCK)
 {
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
     gui_win_set_animate(win, 1000, -1, block_cb, win);
-    win_index = block_render((gui_obj_t *)win, 0, 0);
+    win_index = block_render((gui_obj_t *)win, 0, 0, 0);
 }
 /**
  * @brief APP_FRUIT_NINJA
