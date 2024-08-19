@@ -1,8 +1,8 @@
 # 字体转换工具
 
-字体转换工具功能：从标准内部码表(codepage文件)、自定义Unicode码表(或补充码表.txt文件，cST文件)中获取所有待转换字符对应的Unicode码。并根据字体文件(如.ttf)中的Unicode代码查找向量字体数据对应的字符。转换为位图，输出为.bin文件。
+字体转换工具功能：从标准内部码表(代码页文件)、自定义Unicode码表(或补充码表.txt文件，自定义.cst文件)中获取所有待转换字符对应的Unicode码。根据Unicode编码从字体文件（如.ttf）中找到相应字符的矢量字体数据。将其转换为位图，并输出为.bin文件。
 
-<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1721186859304603819/25785a2f_13408154.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724051635820787454/a69d7ac6_13408154.png" ></div>
 
 ## 生成字体bin文件
 如何生成对应的文件，请参考以下步骤:

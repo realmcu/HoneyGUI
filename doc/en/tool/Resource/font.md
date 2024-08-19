@@ -1,8 +1,8 @@
 # Font Convert Tool
 
-Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table.txt file, custom.cST file), and find the vector font data corresponding characters according to the Unicode code from the font file (such as.ttf). Convert to a bitmap, and the output is a.bin file.
+Font conversion tool features: Obtain the Unicode code corresponding to all characters to be converted from the standard internal code table (codepage file), custom Unicode code table (or supplementary code table .txt file, custom .cst file), and find the vector font data corresponding characters according to the Unicode code from the font file (such as .ttf). Convert to a bitmap, and the output is a .bin file.
 
-<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1721186859304603819/25785a2f_13408154.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724051635820787454/a69d7ac6_13408154.png" ></div>
 
 ## Font bin generation
 Please refer to the following steps for how to generate files:
@@ -10,7 +10,7 @@ Please refer to the following steps for how to generate files:
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
 
-* You can refer to the documentation under the directory (`\Font Convert Tool\doc`) for the specific meanings of each parameter to config font parameters by edit `FontConfig.json`.
+* You can refer to the documentation under the directory (`\Font Convert Tool\doc`) for the specific meanings of each parameter to config font parameters by editing `FontConfig.json`.
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png" ></div>
 
@@ -18,7 +18,7 @@ Please refer to the following steps for how to generate files:
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724035284336578868/8affdd56_9325830.png" ></div>
 
-* Double-click `fontDirctionary.exe` and then font bin will be Generated.
+* Double-click `fontDirctionary.exe` and then font bin will be generated.
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
 
@@ -34,7 +34,7 @@ Please refer to the following steps for how to generate files:
 | mappingPaths | User-defined unicode character set file path. Multiple groups can be set                                      |
 | fontSet      | Used to specify font-related settings to be converted                                                         |
 | bold         | Specifies whether converted characters are bolded                                                             |
-| italic       | Specifies whether the converted character is slanted                                                          |
+| italic       | Specifies whether the converted characters are slanted                                                          |
 | scanMode     | Specifies how the converted character data is saved. If the value is "H", the fonts are saved by row; if the value is "V", the fonts are saved by column. |
 | fontSize     | Specifies the converted character size                                                                        |
 | font         | Specifies the font file to use for the conversion                                                             |
