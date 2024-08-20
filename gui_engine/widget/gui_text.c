@@ -354,6 +354,22 @@ static void gui_text_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_point3f_t point = {0, 0, 1};
     uint8_t last;
+
+#if 0 // font mat scale min scale function
+    if (this->base.matrix->m[0][0] < this->min_scale)
+    {
+        this->base.matrix->m[0][0] = this->min_scale;
+        this->scale_img->base.matrix->m[0][0] = this->min_scale;
+    }
+    if (this->base.matrix->m[1][1] < this->min_scale)
+    {
+        this->base.matrix->m[1][1] = this->min_scale;
+        this->scale_img->base.matrix->m[1][1] = this->min_scale;
+    }
+    // gui_log("text scale x %f, y %f ; img scale x %f, y %f",
+    //         this->base.matrix->m[0][0],this->base.matrix->m[1][1],
+    //         this->scale_img->base.matrix->m[0][0],this->scale_img->base.matrix->m[1][1]);
+#endif
     if (this->font_type == GUI_FONT_SRC_IMG)
     {
         return;
@@ -579,6 +595,11 @@ void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 void gui_text_input_set(gui_text_t *this, bool inputable)
 {
     this->inputable = inputable;
+}
+
+void gui_text_set_min_scale(gui_text_t *this, float min_scale)
+{
+    this->min_scale = min_scale;
 }
 
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)

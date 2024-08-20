@@ -123,6 +123,7 @@ typedef struct gui_text
     void *path;//!<  address or path
     int16_t offset_x;
     int16_t offset_y;
+    float min_scale;
     gui_img_t *scale_img;
 } gui_text_t;
 
@@ -241,6 +242,14 @@ void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
  * @param inputable inputable
  */
 void gui_text_input_set(gui_text_t *this_widget, bool inputable);
+
+/**
+ * @brief set text min scale
+ *
+ * @param this the text box widget pointer.
+ * @param min_scale minimum scale
+ */
+void gui_text_set_min_scale(gui_text_t *this_widget, float min_scale);
 
 /**
  * @brief move the text widget
