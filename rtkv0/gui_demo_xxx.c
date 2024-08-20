@@ -86,11 +86,11 @@ static void menu_display_info_cb(UI_MenuTypeDef *cur_menu, UI_MenuTypeDef *retur
     return_menu->pWidgetList[0].addr = (uint32_t)(_actiger_blue + 8);
 
     return_menu->p3DList[0].addr = (uint32_t)(_actiger_blue + 8);
-    return_menu->p3DList[1].addr = (uint32_t)(_actiger_grey + 8);
-    return_menu->p3DList[2].addr = (uint32_t)(_actiger_yellow + 8);
-    return_menu->p3DList[3].addr = (uint32_t)(_actiger_white + 8);
-    return_menu->p3DList[4].addr = (uint32_t)(_actiger_turk + 8);
-    return_menu->p3DList[5].addr = (uint32_t)(_actiger_laven + 8);
+    return_menu->p3DList[1].addr = (uint32_t)(_actiger_blue + 8);
+    return_menu->p3DList[2].addr = (uint32_t)(_actiger_blue + 8);
+    return_menu->p3DList[3].addr = (uint32_t)(_actiger_blue + 8);
+    return_menu->p3DList[4].addr = (uint32_t)(_actiger_blue + 8);
+    return_menu->p3DList[5].addr = (uint32_t)(_actiger_blue + 8);
 
     matrix_identity(&return_menu->p3DList[0].matrix);
     matrix_identity(&return_menu->p3DList[1].matrix);
@@ -126,11 +126,13 @@ static void menu_constructor_cb(UI_MenuTypeDef *cur_menu, void *argv)
 
 
 #if RTK_LEGCAY_GUI_USING_PSRAM
-    UI_MenuTypeDef *ui_local_left = (UI_MenuTypeDef *)gui_get_menu_addr_by_name("GUIDemoMenuLeft");
+
     rtl_gui_prepare_frame_buffer(cur_menu, cur_menu, NULL, &FrameBufferOrigin);
-    rtl_gui_prepare_frame_buffer(cur_menu, ui_local_left, NULL, &FrameBufferLeft);
-    rtl_gui_prepare_frame_buffer(cur_menu, ui_local_left, NULL, &FrameBufferRight);
-    rtl_gui_update_detal(-300, 0);
+    rtl_gui_prepare_frame_buffer(cur_menu,
+                                 (UI_MenuTypeDef *)gui_get_menu_addr_by_name("GUIDemoMenuLeft"), NULL, &FrameBufferLeft);
+    rtl_gui_prepare_frame_buffer(cur_menu,
+                                 (UI_MenuTypeDef *)gui_get_menu_addr_by_name("GUIDemoMenuRight"), NULL, &FrameBufferRight);
+    rtl_gui_update_detal(-200, 0);
 #else
     rtl_gui_menu_update(cur_menu, NULL, cur_menu, NULL, cur_menu, NULL, 0, 0);
 #endif

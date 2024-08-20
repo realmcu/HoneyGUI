@@ -29,7 +29,7 @@
 const static UI_WidgetTypeDef  icon[] =
 {
     [0]     = {
-        .x = 0,   .y = 100,    .width = 256, .hight = 236,     .addr = 0,   .widget_id_type = ICON_BACKGROUND,
+        .x = 200,   .y = 200,    .width = 256, .hight = 236,     .addr = 0,   .widget_id_type = ICON_BACKGROUND,
     },
 
 };
