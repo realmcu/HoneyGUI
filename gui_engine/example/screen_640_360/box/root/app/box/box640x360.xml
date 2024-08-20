@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<app>box640x360
+<script
+    file="app/box/box640x360.js"></script><screen
+    w="640"
+    h="360"
+    x="0"
+    y="0">screen0
+    <img
+        x="248"
+        y="-20"
+        w="144"
+        h="157"
+        opacity="255"
+        file="app/box/resource/lamp/ctlamp.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">img_ctlamp
+    </img>
+    <slider
+        x="202"
+        y="180"
+        w="236"
+        h="64"
+        deltax="0"
+        deltay="0"
+        bgPicture="app/box/resource/lamp/color_temperature.bin"
+        sliderPicture="app/box/resource/lamp/circle.bin"
+        minTemp="3700"
+        maxTemp="6500"
+        sliderSize="23"
+        textSize="16"
+        font="app/box/resource/font/arialbd_size16_bits4_font.bin">slider_ct
+    </slider>
+    <seekbar
+        x="202"
+        y="280"
+        w="236"
+        h="37"
+        opacity="255"
+        folder="app/box/resource/brightness"
+        blendMode="imgBypassMode"
+        orientation="H"
+        centralX="0"
+        centralY="0"
+        startDegree="0"
+        endDegree="0">bar_brightness
+    </seekbar>
+    <textbox
+        x="280"
+        y="320"
+        color="#ffffffff"
+        w="108"
+        h="49"
+        text="brightness"
+        fontSize="16"
+        font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+        mode="truncate">txt_brightness
+    </textbox>
+      
+</screen></app>

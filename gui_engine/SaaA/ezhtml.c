@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include "ezxml.h"
 #include "gui_return.h"
+#include "gui_slider.h"
 #ifdef __arm__
 #include "romfs.h"
 #else
@@ -83,6 +84,7 @@ struct widget_create widget[] =
     {"multiLevel", MULTI_LEVEL},
     {"onClick", MACRO_ONCLICK},
     {"backIcon", MACRO_BACKICON},
+    {"slider", SLIDER},
 };
 static void img_rotate_cb(gui_img_t *img)
 {
@@ -3184,6 +3186,101 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     break;
                 }
+            case SLIDER:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    int16_t deltax = 0;
+                    int16_t deltay = 0;
+                    char *slider_picture = NULL;
+                    char *bg_picture = NULL;
+                    int16_t minTemp = 0;
+                    int16_t maxTemp = 0;
+                    int16_t slider_size = 0;
+                    int16_t text_size = 0;
+                    char *font = NULL;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "deltax"))
+                        {
+                            deltax = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "deltay"))
+                        {
+                            deltay = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "bgPicture"))
+                        {
+                            bg_picture = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sliderPicture"))
+                        {
+                            slider_picture = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "minTemp"))
+                        {
+                            minTemp = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "maxTemp"))
+                        {
+                            maxTemp = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sliderSize"))
+                        {
+                            slider_size = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "textSize"))
+                        {
+                            text_size = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "font"))
+                        {
+                            font = p->attr[++i];
+                        }
+                        i++;
+                    }
+                    void *bg_buf;
+                    void *slider_buf;
+                    if (bg_picture)
+                    {
+                        bg_buf = gui_get_file_address(bg_picture);
+                    }
+                    if (slider_picture)
+                    {
+                        slider_buf = gui_get_file_address(slider_picture);
+                    }
+
+                    gui_slider_t *slider = gui_slider_create(parent, bg_buf, x, y, w, h, minTemp, maxTemp, slider_buf,
+                                                             deltax, deltay, slider_size, text_size);
+                    void *addr = gui_get_file_address(font);
+                    gui_text_type_set(slider->currentValue_text, addr, FONT_SRC_MEMADDR);
+
+                }
+                break;
             default:
                 break;
             }

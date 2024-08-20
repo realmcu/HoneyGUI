@@ -422,12 +422,12 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                int pro = tp->x + tp->deltaX - 0;
+                int pro = tp->x + tp->deltaX - obj->x;
                 if (pro <= 0) { pro = 1; }
                 if (pro >= obj->w) { pro = obj->w; }
                 if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
                 {
-                    pro = pro * (circle->base.max - 2) / obj->w;
+                    pro = pro * circle->base.max / obj->w;
                     gui_log("pro:%d\n", pro);
                 }
                 gui_progressbar_set_progress((void *)circle, pro);
