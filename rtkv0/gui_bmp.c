@@ -544,7 +544,7 @@ uint8_t rtl_gui_show_background(UI_MenuTypeDef *menu, UI_WidgetTypeDef *widget, 
                                 int Ze, uint8_t *buf)
 {
 
-#if 1
+#if 0
     gui_log("name = %s \n", menu->name);
 
     draw_img_t image;
@@ -692,5 +692,45 @@ uint8_t rtl_gui_show_background(UI_MenuTypeDef *menu, UI_WidgetTypeDef *widget, 
     }
 
     return xs + width;
+}
+
+uint8_t rtl_gui_show_3d(UI_MenuTypeDef *menu, UI_3DTypeDef *widget, int Zs, int Ze, uint8_t *buf)
+{
+#if 1
+    gui_log("fun = %s, name = %s \n", __func__, menu->name);
+
+    draw_img_t image;
+    gui_dispdev_t dc;
+    image.img_w = widget->width;
+    image.img_h = widget->hight;
+    image.data = widget->addr - 8;
+
+    // memcpy(&image.matrix, &menu->matrix, sizeof(gui_matrix_t));
+
+    memcpy(&image.matrix, &widget->matrix, sizeof(gui_matrix_t));
+
+
+
+    // matrix_translate(widget->x, widget->y, &image.matrix);
+
+
+    memcpy(&image.inverse, &image.matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&image.inverse);
+    image.opacity_value = 255;
+    image.blend_mode = IMG_FILTER_BLACK;
+    draw_img_new_area(&image, NULL);
+
+    memcpy(&dc, gui_get_dc(), sizeof(gui_dispdev_t));
+    dc.frame_buf = buf;
+    dc.section_count = Zs / LCD_SECTION_HEIGHT;
+    dc.section.x1 = 0;
+    dc.section.x2 = LCD_WIDTH - 1;
+    dc.section.y1 = Zs;
+    dc.section.y2 = Ze - 1;
+
+    gui_acc_blit_to_dc(&image, &dc, NULL);
+
+    return 0;
+#endif
 }
 

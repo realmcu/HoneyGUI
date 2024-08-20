@@ -388,7 +388,7 @@ lv_res_t lv_ppe_blit_recolor(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *d
         uint32_t recolor_line_num = buffer_size / (source.width * LV_COLOR_DEPTH / 8);
         for (uint16_t y = 0; y < source.height; y += recolor_line_num)
         {
-            ppe_rect_t rect = {.left = 0, .right = source.width - 1, .top = y, .bottom = y + recolor_line_num};
+            ppe_rect_t rect = {.left = 0, .right = source.width - 1, .top = y, .bottom = y + recolor_line_num - 1};
             if (y + recolor_line_num >= source.height)
             {
                 rect.bottom = source.height - 1;

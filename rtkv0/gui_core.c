@@ -42,6 +42,8 @@ static UI_BMPTypeDef  g_cur_bmp[GUI_GLOBAL_BMP_MAX];
 static UI_BMPTypeDef  g_sub_bmp[GUI_GLOBAL_BMP_MAX];
 static UI_BMPTypeDef  g_par_bmp[GUI_GLOBAL_BMP_MAX];
 
+static UI_3DTypeDef  g_cur_3d[GUI_GLOBAL_BMP_MAX];
+
 UI_MenuTypeDef g_cur_menu =
 {
     /* change Here for UI */
@@ -52,6 +54,7 @@ UI_MenuTypeDef g_cur_menu =
     .touch_func = NULL,
     .pWidgetList = g_cur_widget,
     .pBMPList = g_cur_bmp,
+    .p3DList = g_cur_3d,
     .current_max_widget = 0,
 };
 UI_MenuTypeDef g_sub_menu =
@@ -86,7 +89,7 @@ void gui_core_init(void)
     disp_write_buff1 = rtl_gui_core_buff;
     disp_write_buff2 = disp_write_buff1 + LCD_WIDTH * LCD_SECTION_HEIGHT * PIXEL_BYTES;
     disp_read_buff = disp_write_buff1 + LCD_WIDTH * LCD_SECTION_HEIGHT * PIXEL_BYTES * 2;
-#if FEATURE_PSRAM
+#if RTK_LEGCAY_GUI_USING_PSRAM
     psram_frame_buffer_init();
 #endif
 }
@@ -103,16 +106,7 @@ void rtl_gui_refresh_by_dma_internal(uint8_t *readbuf, uint32_t count_for_sectio
     // GUI_ASSERT(NULL != NULL);
     gui_dispdev_t *dc = gui_get_dc();
 
-    if (count_for_section == TOTAL_SECTION_COUNT - 1)
-    {
-        uint32_t length = ((LCD_HIGHT - count_for_section * LCD_SECTION_HEIGHT) % LCD_SECTION_HEIGHT) *
-                          LCD_WIDTH * PIXEL_BYTES;
-        memcpy(dc->lcd_gram + count_for_section * LCD_SECTION_BYTE_LEN, readbuf, length);
-    }
-    else
-    {
-        memcpy(dc->lcd_gram + count_for_section * LCD_SECTION_BYTE_LEN, readbuf, LCD_SECTION_BYTE_LEN);
-    }
+    memcpy(dc->lcd_gram + count_for_section * LCD_SECTION_BYTE_LEN, readbuf, LCD_SECTION_BYTE_LEN);
 
 }
 
@@ -137,6 +131,15 @@ static void rtl_gui_lcd_real_update_x(UI_MenuTypeDef *p_show_menu)
     UI_WidgetTypeDef *local_par_widget_list = p_show_menu->MenuParent->pWidgetList;
     UI_BMPTypeDef *local_par_bmp_list = p_show_menu->MenuParent->pBMPList;
 
+    UI_WidgetTypeDef *widget_list[3] = {local_cur_widget_list, local_sub_widget_list, local_par_widget_list};
+    UI_3DTypeDef *ui_3d_list[3] = { \
+                                    p_show_menu->p3DList, \
+                                    p_show_menu->MenuSub->p3DList, \
+                                    p_show_menu->MenuParent->p3DList
+                                  };
+
+    UI_MenuTypeDef *menu[3] = {local_cur_menu, local_sub_menu, local_par_menu};
+
     for (uint8_t i = 0; i < TOTAL_SECTION_COUNT; i++)
     {
         if (i % 2)
@@ -150,119 +153,38 @@ static void rtl_gui_lcd_real_update_x(UI_MenuTypeDef *p_show_menu)
 
         memset(pWriteBuf, 0x00, LCD_SECTION_HEIGHT * LCD_WIDTH * PIXEL_BYTES);
 
-        for (uint8_t j = 0; j < local_cur_menu->current_max_widget; j++)
-        {
-            if (((local_cur_widget_list + j)->y >= (i + 1)*LCD_SECTION_HEIGHT) ||
-                (((local_cur_widget_list + j)->y + (local_cur_widget_list + j)->hight) <= i * LCD_SECTION_HEIGHT))
-            {
-                continue;
-            }
 
-            if ((local_cur_widget_list + j)->widget_id_type == ICON_WIDGET)
-            {
-                rtl_gui_show_bmp_sector(local_cur_widget_list + j, \
-                                        local_cur_menu->detal_x, 0, \
-                                        i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
-                                        pWriteBuf);
-            }
-            else if ((local_cur_widget_list + j)->widget_id_type == ICON_BACKGROUND)
-            {
-                rtl_gui_show_background(local_cur_menu, \
-                                        local_cur_widget_list + j, \
-                                        i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
-                                        pWriteBuf);
-            }
-
-        }
-        for (uint8_t j = 0; j < local_cur_menu->current_max_bmp; j++)
+        for (uint8_t cnt = 0; cnt < 3; cnt++)
         {
-            if (((local_cur_bmp_list + j)->y >= (i + 1)*LCD_SECTION_HEIGHT) ||
-                (((local_cur_bmp_list + j)->y + (local_cur_bmp_list + j)->hight) <= i * LCD_SECTION_HEIGHT))
+            for (uint8_t j = 0; j < menu[cnt]->current_max_widget; j++)
             {
-                continue;
-            }
-            rtl_gui_show_bmp_simple(local_cur_bmp_list + j, \
-                                    local_cur_menu->detal_x, 0, \
-                                    i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
-                                    pWriteBuf);
-        }
 
-        if (local_sub_menu->detal_x < LCD_WIDTH)
-        {
-            for (uint8_t j = 0; j < local_sub_menu->current_max_widget; j++)
-            {
-                if (((local_sub_widget_list + j)->y >= (i + 1)*LCD_SECTION_HEIGHT) ||
-                    (((local_sub_widget_list + j)->y + (local_sub_widget_list + j)->hight) <= i * LCD_SECTION_HEIGHT))
+                if ((widget_list[cnt] + j)->widget_id_type == ICON_WIDGET)
                 {
-                    continue;
-                }
-
-                if ((local_sub_widget_list + j)->widget_id_type == ICON_WIDGET)
-                {
-                    rtl_gui_show_bmp_sector(local_sub_widget_list + j, \
-                                            local_sub_menu->detal_x, 0, \
+                    rtl_gui_show_bmp_sector(widget_list[cnt] + j, \
+                                            menu[cnt]->detal_x, 0, \
                                             i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                             pWriteBuf);
                 }
-                else if ((local_sub_widget_list + j)->widget_id_type == ICON_BACKGROUND)
+                else if ((widget_list[cnt] + j)->widget_id_type == ICON_BACKGROUND)
                 {
-                    rtl_gui_show_background(local_sub_menu, \
-                                            local_sub_widget_list + j, \
+                    rtl_gui_show_background(menu[cnt], \
+                                            widget_list[cnt] + j, \
                                             i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
                                             pWriteBuf);
                 }
+
             }
-            for (uint8_t j = 0; j < local_sub_menu->current_max_bmp; j++)
+            for (uint8_t j = 0; j < menu[cnt]->current_max_3d; j++)
             {
-                if (((local_sub_bmp_list + j)->y >= (i + 1)*LCD_SECTION_HEIGHT) ||
-                    (((local_sub_bmp_list + j)->y + (local_sub_bmp_list + j)->hight) <= i * LCD_SECTION_HEIGHT))
-                {
-                    continue;
-                }
-                rtl_gui_show_bmp_simple(local_sub_bmp_list + j, \
-                                        local_sub_menu->detal_x, 0, \
-                                        i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
-                                        pWriteBuf);
+                rtl_gui_show_3d(menu[cnt], \
+                                widget_list[cnt] + j, \
+                                i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
+                                pWriteBuf);
             }
         }
 
-        if (local_par_menu->detal_x > -LCD_WIDTH)
-        {
-            for (uint8_t j = 0; j < local_par_menu->current_max_widget; j++)
-            {
-                if (((local_par_widget_list + j)->y >= (i + 1)*LCD_SECTION_HEIGHT) ||
-                    (((local_par_widget_list + j)->y + (local_par_widget_list + j)->hight) <= i * LCD_SECTION_HEIGHT))
-                {
-                    continue;
-                }
-                if ((local_par_widget_list + j)->widget_id_type == ICON_WIDGET)
-                {
-                    rtl_gui_show_bmp_sector(local_par_widget_list + j, \
-                                            local_par_menu->detal_x, 0, \
-                                            i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
-                                            pWriteBuf);
-                }
-                else if ((local_par_widget_list + j)->widget_id_type == ICON_BACKGROUND)
-                {
-                    rtl_gui_show_background(local_par_menu, \
-                                            local_par_widget_list + j, \
-                                            i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
-                                            pWriteBuf);
-                }
-            }
-            for (uint8_t j = 0; j < local_par_menu->current_max_bmp; j++)
-            {
-                if (((local_par_bmp_list + j)->y >= (i + 1)*LCD_SECTION_HEIGHT) ||
-                    (((local_par_bmp_list + j)->y + (local_par_bmp_list + j)->hight) <= i * LCD_SECTION_HEIGHT))
-                {
-                    continue;
-                }
-                rtl_gui_show_bmp_simple(local_par_bmp_list + j, \
-                                        local_par_menu->detal_x, 0, \
-                                        i * LCD_SECTION_HEIGHT, (i + 1)*LCD_SECTION_HEIGHT, \
-                                        pWriteBuf);
-            }
-        }
+
         rtl_gui_refresh_by_dma_internal(pWriteBuf, i);
     }
 }
@@ -453,7 +375,7 @@ void rtl_gui_lcd_update_internal(void)
     {
         rtl_gui_lcd_real_update_from_internal_ram(&g_cur_menu);
     }
-#if FEATURE_PSRAM
+#if RTK_LEGCAY_GUI_USING_PSRAM
     else
     {
         rtl_gui_lcd_update_from_psram();
@@ -471,15 +393,20 @@ void rtl_gui_menu_update(UI_MenuTypeDef *ui_cur, void *p_ui_cur_argv, \
                          int16_t detal_x, int16_t detal_y)
 {
     FrameBufferMode = FRAMEBUFFER_MODE_NONE_PSRAM;
+    // detal_x = 0;
+    // detal_y = 0;
     if (ui_cur != NULL)
     {
         g_cur_menu.current_max_widget = ui_cur->current_max_widget;
         g_cur_menu.current_max_bmp = ui_cur->current_max_bmp;
+        g_cur_menu.current_max_3d = ui_cur->current_max_3d;
         memcpy(g_cur_menu.pWidgetList, ui_cur->pWidgetList,
                ui_cur->current_max_widget * sizeof(UI_WidgetTypeDef));
         memcpy(g_cur_menu.pBMPList, ui_cur->pBMPList,
                ui_cur->current_max_bmp * sizeof(UI_BMPTypeDef));
-        g_cur_menu.name = ui_cur->name;
+        memcpy(g_cur_menu.p3DList, ui_cur->p3DList,
+               ui_cur->current_max_3d * sizeof(UI_3DTypeDef));
+        //g_cur_menu.name = ui_cur->name;
         ui_cur->cur_display_info(ui_cur, &g_cur_menu, p_ui_cur_argv);
 
     }
@@ -553,10 +480,13 @@ void rtl_gui_prepare_frame_buffer(UI_MenuTypeDef *pCurMenu, \
         {
             g_cur_menu.current_max_widget = pLoadMenu->current_max_widget;
             g_cur_menu.current_max_bmp = pLoadMenu->current_max_bmp;
+            g_cur_menu.current_max_3d = pLoadMenu->current_max_3d;
             memcpy(g_cur_menu.pWidgetList, pLoadMenu->pWidgetList,
                    pLoadMenu->current_max_widget * sizeof(UI_WidgetTypeDef));
             memcpy(g_cur_menu.pBMPList, pLoadMenu->pBMPList,
                    pLoadMenu->current_max_bmp * sizeof(UI_BMPTypeDef));
+            memcpy(g_cur_menu.p3DList, pLoadMenu->p3DList,
+                   pLoadMenu->current_max_3d * sizeof(UI_3DTypeDef));
             pLoadMenu->cur_display_info(pLoadMenu, &g_cur_menu, p_ui_cur_argv);
             rtl_gui_update_to_psram_framebuffer(&g_cur_menu, pPSRAM);
             pCurMenu->psram_has_center_cache = true;
@@ -568,10 +498,13 @@ void rtl_gui_prepare_frame_buffer(UI_MenuTypeDef *pCurMenu, \
         {
             g_cur_menu.current_max_widget = pLoadMenu->current_max_widget;
             g_cur_menu.current_max_bmp = pLoadMenu->current_max_bmp;
+            g_cur_menu.current_max_3d = pLoadMenu->current_max_3d;
             memcpy(g_cur_menu.pWidgetList, pLoadMenu->pWidgetList,
                    pLoadMenu->current_max_widget * sizeof(UI_WidgetTypeDef));
             memcpy(g_cur_menu.pBMPList, pLoadMenu->pBMPList,
                    pLoadMenu->current_max_bmp * sizeof(UI_BMPTypeDef));
+            memcpy(g_cur_menu.p3DList, pLoadMenu->p3DList,
+                   pLoadMenu->current_max_3d * sizeof(UI_3DTypeDef));
             pLoadMenu->cur_display_info(pLoadMenu, &g_cur_menu, p_ui_cur_argv);
             rtl_gui_update_to_psram_framebuffer(&g_cur_menu, pPSRAM);
             pCurMenu->psram_has_left_cache = true;
@@ -583,10 +516,13 @@ void rtl_gui_prepare_frame_buffer(UI_MenuTypeDef *pCurMenu, \
         {
             g_cur_menu.current_max_widget = pLoadMenu->current_max_widget;
             g_cur_menu.current_max_bmp = pLoadMenu->current_max_bmp;
+            g_cur_menu.current_max_3d = pLoadMenu->current_max_3d;
             memcpy(g_cur_menu.pWidgetList, pLoadMenu->pWidgetList,
                    pLoadMenu->current_max_widget * sizeof(UI_WidgetTypeDef));
             memcpy(g_cur_menu.pBMPList, pLoadMenu->pBMPList,
                    pLoadMenu->current_max_bmp * sizeof(UI_BMPTypeDef));
+            memcpy(g_cur_menu.p3DList, pLoadMenu->p3DList,
+                   pLoadMenu->current_max_3d * sizeof(UI_3DTypeDef));
             pLoadMenu->cur_display_info(pLoadMenu, &g_cur_menu, p_ui_cur_argv);
             rtl_gui_update_to_psram_framebuffer(&g_cur_menu, pPSRAM);
             pCurMenu->psram_has_right_cache = true;
@@ -598,10 +534,13 @@ void rtl_gui_prepare_frame_buffer(UI_MenuTypeDef *pCurMenu, \
         {
             g_cur_menu.current_max_widget = pLoadMenu->current_max_widget;
             g_cur_menu.current_max_bmp = pLoadMenu->current_max_bmp;
+            g_cur_menu.current_max_3d = pLoadMenu->current_max_3d;
             memcpy(g_cur_menu.pWidgetList, pLoadMenu->pWidgetList,
                    pLoadMenu->current_max_widget * sizeof(UI_WidgetTypeDef));
             memcpy(g_cur_menu.pBMPList, pLoadMenu->pBMPList,
                    pLoadMenu->current_max_bmp * sizeof(UI_BMPTypeDef));
+            memcpy(g_cur_menu.p3DList, pLoadMenu->p3DList,
+                   pLoadMenu->current_max_3d * sizeof(UI_3DTypeDef));
             pLoadMenu->cur_display_info(pLoadMenu, &g_cur_menu, p_ui_cur_argv);
             rtl_gui_update_to_psram_framebuffer(&g_cur_menu, pPSRAM);
             pCurMenu->psram_has_down_cache = true;
@@ -613,10 +552,13 @@ void rtl_gui_prepare_frame_buffer(UI_MenuTypeDef *pCurMenu, \
         {
             g_cur_menu.current_max_widget = pLoadMenu->current_max_widget;
             g_cur_menu.current_max_bmp = pLoadMenu->current_max_bmp;
+            g_cur_menu.current_max_3d = pLoadMenu->current_max_3d;
             memcpy(g_cur_menu.pWidgetList, pLoadMenu->pWidgetList,
                    pLoadMenu->current_max_widget * sizeof(UI_WidgetTypeDef));
             memcpy(g_cur_menu.pBMPList, pLoadMenu->pBMPList,
                    pLoadMenu->current_max_bmp * sizeof(UI_BMPTypeDef));
+            memcpy(g_cur_menu.p3DList, pLoadMenu->p3DList,
+                   pLoadMenu->current_max_3d * sizeof(UI_3DTypeDef));
             pLoadMenu->cur_display_info(pLoadMenu, &g_cur_menu, p_ui_cur_argv);
             rtl_gui_update_to_psram_framebuffer(&g_cur_menu, pPSRAM);
             pCurMenu->psram_has_up_cache = true;

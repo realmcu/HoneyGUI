@@ -18,6 +18,7 @@ uint8_t rtl_gui_show_bmp_simple(UI_BMPTypeDef *widget, int16_t detal_x, int16_t 
                                 int Ze, uint8_t *buf);
 uint8_t rtl_gui_show_background(UI_MenuTypeDef *menu, UI_WidgetTypeDef *widget, int Zs,
                                 int Ze, uint8_t *buf);
+uint8_t rtl_gui_show_3d(UI_MenuTypeDef *menu, UI_3DTypeDef *widget, int Zs, int Ze, uint8_t *buf);
 #ifdef __cplusplus
 }
 #endif

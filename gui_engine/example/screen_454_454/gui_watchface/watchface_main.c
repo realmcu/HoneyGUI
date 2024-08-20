@@ -92,7 +92,7 @@ static void win_switch_to_perspective_app_touch_cb(void *obj, uint16_t event)
 
         if (second_click - first_click < DOUBLE_CLICK_INTERVAL && second_click != 0)
         {
-            app_watchface_switch_tabs(WATCHFACE_PERSPECTIVE);
+            // app_watchface_switch_tabs(WATCHFACE_PERSPECTIVE);  //double click bug
             is_first_click = 1;
             first_click = 0;
             second_click = 0;
