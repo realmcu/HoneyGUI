@@ -454,3 +454,13 @@ static void calculator_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CALCULATOR))
 }
+
+void menu_loop_ui(gui_obj_t *parent)
+{
+
+}
+
+
+
+
+

@@ -99,7 +99,7 @@ static void lcd_update_window(uint8_t *input, uint8_t *output, uint16_t xStart, 
     {
         for (uint32_t j = xStart; j < (w + xStart); j++)
         {
-            write[i * DRV_LCD_WIDTH + j] = *read;
+            write[i * sim_get_width() + j] = *read;
             read++;
         }
     }
@@ -353,6 +353,9 @@ void gui_port_dc_init(void)
     xml_get_screen(path, 0, &sim_screen_width, &sim_screen_hight);
     _rect.w = sim_screen_width;
     _rect.h = sim_screen_hight;
+    dc.fb_width = sim_screen_width;
+    dc.screen_width = sim_screen_width;
+    dc.screen_height = sim_screen_hight;
 #endif
     pthread_mutex_init(&sdl_ok_mutex, NULL);
     pthread_cond_init(&sdl_ok_event, NULL);
