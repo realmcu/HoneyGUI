@@ -3,7 +3,7 @@
 ##  Download to the EVB
 Select the chip type and language in the MP Tool startup interface, taking RTL8762D as an example.
 <br/>
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1721812755008370232/a9e4ff39_13408154.png" alt="IMAGE"></div>
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1724143547149951697/bc248044_13408154.png" alt="IMAGE"></div>
 <br/>
 
 * Load the necessary files for burning, including flash map, System Config File, APP Image, etc.

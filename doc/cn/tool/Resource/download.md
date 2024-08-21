@@ -3,7 +3,7 @@
 ##  下载到 EVB 中
 在MP Tool启动界面选择芯片类型和语言，以RTL8762D为例。
 <br/>
-<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1721812755008370232/a9e4ff39_13408154.png" alt="IMAGE"></div>
+<div style="text-align: center"><img width= "600" src="https://foruda.gitee.com/images/1724143547149951697/bc248044_13408154.png" alt="IMAGE"></div>
 <br/>
 
 * 加载烧录所需的文件，包含flash map、System Config File、APP Image等。 

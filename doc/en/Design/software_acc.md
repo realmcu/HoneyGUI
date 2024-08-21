@@ -324,5 +324,9 @@ If you need to modify the vision file of the flowchart, please download it from 
 |---|---|
 |RGB565|RGB565|
 |RGB888|RGB888|
-|-|ARGB8565|
 |ARGB8888|ARGB8888|
+|ARGB8565|ARGB8565|
+|RLE_RGB565|RLE_RGB565|
+|RLE_RGB888|RLE_RGB888|
+|RLE_ARGB8888|RLE_ARGB8888|
+|RLE_ARGB8565|RLE_ARGB8565|
