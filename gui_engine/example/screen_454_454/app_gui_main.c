@@ -102,7 +102,9 @@ static void design_app_watch_ui(gui_app_t *app)
     extern void design_tab_menu(void *parent);
     design_tab_menu(gui_tab_get_rte_obj(tab_menu));
     design_benchmark_mgr(gui_tab_get_rte_obj(tab_benchmark));
-
+    gui_tab_t *tab_menu_loop = gui_tab_create(tabview_main, "tab_menu", 0, 0, 0, 0, -2, 0);
+    extern void menu_loop_ui(gui_obj_t *parent);
+    menu_loop_ui(GUI_BASE(tab_menu_loop));
 }
 
 #if defined _WIN32

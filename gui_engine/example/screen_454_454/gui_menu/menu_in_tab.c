@@ -454,9 +454,350 @@ static void calculator_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CALCULATOR))
 }
+// Define an array for window list, containing 15 windows
+static gui_win_t *win_list_array[15];
+
+// Define the gap between windows
+static const int win_list_gap = 100;
+
+// Define the length of the array
+static const int array_length = 15;
+
+// Define the speed threshold to stop
+static const int end_speed = 3;
+
+// Define an array to record the Y-axis delta from the last touch event
+static int16_t recode[5];
+
+// Define current speed and target speed
+static int speed, target;
+
+// Define a boolean to control alignment
+static bool alien = true;
+static int touch_y;
+
+// Function to update touch speed
+static void update_speed(gui_obj_t *obj)
+{
+    // Get touch information
+    touch_info_t *tp = tp_get_info();
+    int recode_num = 4;
+
+    // Update recorded values
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        recode[i] = recode[i + 1];
+    }
+
+    // Record the current touch Y-axis delta
+    recode[recode_num] = tp->deltaY;
+
+    // Calculate speed
+    speed = recode[recode_num] - recode[0];
+    //gui_log("tp->deltaY:%d,speed:%d\n", tp->deltaY, speed);
+
+    // Define maximum and minimum speed
+    int max_speed = GUI_PAGE_MAX_SPEED;
+    int min_speed = GUI_PAGE_MIN_SPEED;
+
+    // Check if speed exceeds the maximum speed and limit it
+    if (speed > max_speed)
+    {
+        speed = max_speed;
+    }
+    else if (speed < -max_speed)
+    {
+        speed = -max_speed;
+    }
+
+    // Check if speed is below the minimum speed and limit it
+    if ((speed > 0) && (speed < min_speed))
+    {
+        speed = min_speed;
+    }
+    else if ((speed < 0) && (speed > -min_speed))
+    {
+        speed = -min_speed;
+    }
+}
+
+// Define a flag for rendering
+static bool render;
+
+// Function to update inertial scrolling
+static void gui_page_update_inertial(gui_obj_t *obj)
+{
+    // Import touchpad module
+    IMPORT_GUI_TOUCHPAD
+    //gui_log("speed:%d\n", speed);
+
+    // If the speed is greater than the stop threshold
+    if (speed > end_speed)
+    {
+        // Increase historical Y coordinate and decrease speed
+        touch_y += speed;
+        speed -= 1;
+    }
+    // If the speed is less than the negative stop threshold
+    else if (speed < -end_speed)
+    {
+        // Increase historical Y coordinate and increase speed (towards 0)
+        touch_y += speed;
+        speed += 1;
+    }
+}
+
+static void win_list_overwrite(void **param, gui_obj_t *win_aniamte)
+{
+    // Import touchpad and wheel modules
+    IMPORT_GUI_TOUCHPAD
+    IMPORT_GUI_WHEEL
+
+    // Define static variables to record whether the wheel takes over, the offset for time array, and the historical Y coordinate
+    static bool wheel_take_over;
+    static char time_array_offset;
+    static int history_y;
+
+    // Get the window list object
+    gui_obj_t *win_list = param[0];
+
+    // If the window list is null, return immediately
+    if (!win_list)
+    {
+        return;
+    }
+
+    // If the wheel has not taken over touch input
+    if (!wheel_take_over)
+    {
+        // Check if the touch is pressed within the bounds of the animated window
+        if (touch->pressed && touch->x > win_aniamte->x && touch->x < win_aniamte->x + win_aniamte->w)
+        {
+            // Record the initial historical Y coordinate, reset speed, and clear records
+            history_y = touch_y;
+            speed = 0;
+            memset(recode, 0, sizeof(recode));
+            static int i;
+
+        }
+
+        // Check if the touch is pressing within the bounds of the animated window
+        if (touch->pressing &&
+            touch->x > win_aniamte->x &&
+            touch->x < win_aniamte->x + win_aniamte->w &&
+            touch->type != TOUCH_HOLD_X &&
+            touch->type != TOUCH_RIGHT_SLIDE &&
+            touch->type != TOUCH_LEFT_SLIDE)
+        {
+            // Update historical Y coordinate
+            touch_y = history_y + touch->deltaY;
+            /**
+             * Calculate offset index and window offset
+             * Index = offset / gap % array_length
+             * WidgetOffset = offset % gap
+            */
+            // Update scrolling speed
+            update_speed(win_list);
+
+            // Set render flag
+            render = 1;
+        }
+        else
+        {
+            // If the touch is not within the window bounds, execute inertial scrolling update
+            gui_page_update_inertial(win_list);
+        }
+
+        // If rendering is needed
+        if (render)
+        {
+            // Calculate the offset for the time array and the widget offset
+            time_array_offset = -(touch_y / win_list_gap % array_length);
+            int widget_offset = touch_y % win_list_gap;
+
+            // Set the Y coordinate of the window list
+            GUI_BASE(win_list)->y = widget_offset;
+
+            // Check if the condition for the animation stop is met
+            if (alien && widget_offset == 0 && speed <= end_speed && speed >= -end_speed)
+            {
+                render = 0;
+            }
+
+            // If still needing animation adjustment
+            if (alien && widget_offset != 0)
+            {
+                if (speed > 0 && speed <= end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y += end_speed;
+                    }
+                }
+                else if (speed < 0 && speed >= -end_speed)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    else
+                    {
+                        touch_y -= end_speed;
+                    }
+                }
+                else if (speed == 0)
+                {
+                    if (_UI_ABS(widget_offset) <= end_speed)
+                    {
+                        widget_offset = 0;
+                    }
+                    if (widget_offset > 0)
+                    {
+                        if (widget_offset > win_list_gap / 2)
+                        {
+                            touch_y += end_speed;
+                        }
+                        else
+                        {
+                            touch_y -= end_speed;
+                        }
+                    }
+                    else if (widget_offset < 0)
+                    {
+                        if (-widget_offset > win_list_gap / 2)
+                        {
+                            touch_y -= end_speed;
+                        }
+                        else
+                        {
+                            touch_y += end_speed;
+                        }
+                    }
+                }
+            }
+
+            // Hide all items in the window list
+            for (size_t i = 0; i < array_length; i++)
+            {
+                GUI_BASE(win_list_array[i])->not_show = 1;
+            }
+
+            // Calculate and display the currently visible window items
+            for (size_t i = 0; i < gui_get_screen_height() / win_list_gap + 3; i++)
+            {
+                int index = time_array_offset + i;
+                if (index >= array_length)
+                {
+                    index -= array_length;
+                }
+                if (index < 0)
+                {
+                    index += array_length;
+                }
+
+                GUI_BASE(win_list_array[index])->y = i * win_list_gap;
+                GUI_BASE(win_list_array[index])->not_show = 0;
+            }
+        }
+        else
+        {
+            // Record the current historical Y coordinate
+            history_y = touch_y;
+        }
+    }
+    static uint8_t checksum;
+    uint8_t last = checksum;
+    checksum = 0;
+    checksum = gui_obj_checksum(0, (uint8_t *)win_list, sizeof(gui_win_t));
+
+    if (last != checksum)
+    {
+        gui_fb_change();
+    }
+}
+
+static void page_scroll(gui_obj_t *parent)
+{
+    // Define an array of icons containing pointers to different icons
+    void *icon_array[] =
+    {
+        ICON_MIC_MUTE_OFF_BIN, ICON_MIC_MUTE_OFF_TOUCH_BIN, ICON_MIC_MUTE_ON_BIN, ICON_MIC_MUTE_ON_TOUCH_BIN,
+        ICON_BLUETOOTH_OFF_BIN, ICON_BLUETOOTH_ON_BIN, ICON_BLUETOOTH_TOUCH_BIN, ICON_BUDS_OFF_BIN,
+        ICON_BUDS_ON_BIN, ICON_BUDS_TOUCH_BIN, ICON_BUTTON_OFF_BIN, ICON_BUTTON_ON_BIN,
+        ICON_PHONE_TOUCH_BIN, ICON_PHONE_ON_BIN, ICON_PHONE_OFF_BIN
+    };
+
+    // Define an array of texts corresponding to each window label
+    char *win_list_text_array[] =
+    {
+        "ICON_MIC_MUTE_OFF_BIN", "ICON_MIC_MUTE_OFF_TOUCH_BIN", "ICON_MIC_MUTE_ON_BIN",
+        "ICON_MIC_MUTE_ON_TOUCH_BIN", "ICON_BLUETOOTH_OFF_BIN", "ICON_BLUETOOTH_ON_BIN",
+        "ICON_BLUETOOTH_TOUCH_BIN", "ICON_BUDS_OFF_BIN", "ICON_BUDS_ON_BIN", "ICON_BUDS_TOUCH_BIN",
+        "ICON_BUTTON_OFF_BIN", "ICON_BUTTON_ON_BIN", "ICON_PHONE_TOUCH_BIN", "ICON_PHONE_ON_BIN",
+        "ICON_PHONE_OFF_BIN"
+    };
+
+    // Get the length of the array
+    const int array_length = sizeof(win_list_text_array) / sizeof(win_list_text_array[0]);
+
+    // Create an animated window at the initial position (0, 100), without a specified size
+    gui_win_t *win_animate = gui_win_create(parent, 0, 100, -100, 0, 0);
+
+    // Create a window list inside the animated window
+    gui_win_t *win_list = gui_win_create(win_animate, 0, 0, 0, 0, 0);
+
+    // Static parameter array to pass the window list and window list array
+    static void *param[2];
+    param[0] = win_list;
+    param[1] = win_list_array;
+
+    // Set properties for the animated window: duration is 1000 ms, loop count is -1 (infinite loop), callback function is win_list_overwrite, with param as argument
+    gui_win_set_animate(win_animate, 1000, -1, win_list_overwrite, param);
+
+    // Define the gap between windows
+    int gap = win_list_gap;
+
+    // Iterate over each item in the text array, create corresponding windows and icons, and set texts
+    for (size_t i = 0; i < array_length; i++)
+    {
+        // Create a window, location is calculated based on the iterator index and the gap
+        gui_win_t *win = gui_win_create(win_list, 0, 0, i * gap, 200, gap);
+        win_list_array[i] = win;
+
+        // Create an icon inside the window, icon is loaded from memory, the initial position is set to 0
+        gui_img_t *icon = gui_img_create_from_mem(win, 0, icon_array[i], 0, 0, 0, 0);
+
+        {
+            // Create text inside the window
+            gui_text_t *t = gui_text_create(win, win_list_text_array[i], 100, 0, 100, 16);
+
+            // Set text content, font, color, and length
+            gui_text_set(t, win_list_text_array[i], GUI_FONT_SRC_BMP, APP_COLOR_BLACK,
+                         strlen(win_list_text_array[i]), 16);
+
+            // Define the font address
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+
+            // Set text type to the font resource from memory address
+            gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+
+            // Set text mode to center
+            gui_text_mode_set(t, CENTER);
+        }
+    }
+}
+
 
 void menu_loop_ui(gui_obj_t *parent)
 {
+    gui_canvas_rect_create(parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height(),
+                           APP_COLOR_SILVER);
+    page_scroll(parent);
+
 
 }
 
