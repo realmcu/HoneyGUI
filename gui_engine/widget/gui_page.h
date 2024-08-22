@@ -246,9 +246,9 @@ void gui_page_rebound(gui_page_t *this, bool rebound);
  * @brief automatic center alignment
  *
  * @param page widget pointer
- * @param align_hight
+ * @param align_height page center aligned height
  */
-void gui_page_center_alignment(gui_page_t *page, int align_hight);
+void gui_page_center_alignment(gui_page_t *page, int align_height);
 
 /**
  * @brief set only top slide flag

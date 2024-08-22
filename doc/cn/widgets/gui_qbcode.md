@@ -1,4 +1,4 @@
-# 二维码和条形码
+# 二维码或条形码
 <br>
 
 二维码条形码控件可以用来生成或展示二维码和条形码，开发者可以设置二维码控件或者条形码控件的边框、位置和大小属性。生成二维码时，qbcode控件能处理文本和二进制数据；生成条形码时，则只能处理文本数据。二维码遵循QR Code Model 2标准，支持从1到40的各种规格，支持4种纠错等级和4种字符编码模式。默认情况下，二维码的纠错等级设置为最高级。对于条形码，它支持code128格式。
@@ -7,7 +7,7 @@
 
 ### 创建控件
 
-使用 [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w,int16_t h,T_QBCODE_DISPLAY_TYPE  type,T_QBCODE_ENCODE_TYPE   encodeType)](#api) 函数创建一个二维码或者条形码控件，具体创建的是二维码控件还是条形码控件，由参数`encodeType`决定。`encodeType` 枚举类型如下：
+使用 [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, T_QBCODE_DISPLAY_TYPE type, T_QBCODE_ENCODE_TYPE encodeType)](#api) 函数创建一个二维码或者条形码控件，具体创建的是二维码控件还是条形码控件，由参数`encodeType`决定。`encodeType` 枚举类型如下：
 
 ```eval_rst
 
@@ -67,7 +67,7 @@ gui_qbcode_config(qrcode, str, strlen(str), 3);
 
 char* str = "1234567890";
 
-gui_qbcode_t * qrcode = gui_qbcode_create(parent,
+gui_qbcode_t * barcode = gui_qbcode_create(parent,
                                           "qrcode",
                                           454/2 - BARCODE_WIDTH/2,
                                           454/2 - BARCODE_HEIGHT/2,
