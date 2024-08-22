@@ -85,6 +85,7 @@ struct widget_create widget[] =
     {"onClick", MACRO_ONCLICK},
     {"backIcon", MACRO_BACKICON},
     {"slider", SLIDER},
+    {"onChange", MACRO_ONCHANGE},
 };
 static void img_rotate_cb(gui_img_t *img)
 {
@@ -118,11 +119,17 @@ static void image_animate_callback(void *params)
 }
 
 #define LIGHTS_NUM 20
+
 typedef struct
 {
     int id;
     bool state;
+    bool has_brightness;
+    bool has_colorTemperature;
+    int brightness;
+    int colorTemperature;
 } light_param_t;
+
 light_param_t lights[LIGHTS_NUM];
 
 char *read_file(const char *path)
@@ -154,19 +161,30 @@ void parse_json(const char *json_str)
     while ((ptr = strstr(ptr, "\"id\"")) != NULL && index < LIGHTS_NUM)
     {
         char state_buffer[10];
+        bool has_brightness = false;
+        bool has_colorTemperature = false;
 
         sscanf(ptr, "\"id\": %d", &lights[index].id);
+
         ptr = strstr(ptr, "\"state\"");
         sscanf(ptr, "\"state\": \"%9[^\"]\"", state_buffer);
+        lights[index].state = (strcmp(state_buffer, "on") == 0);
 
-        if (strcmp(state_buffer, "on") == 0)
+        const char *br_ptr = strstr(ptr, "\"brightness\"");
+        if (br_ptr != NULL && (br_ptr - ptr) < (strchr(ptr, '}') - ptr))
         {
-            lights[index].state = true;
+            sscanf(br_ptr, "\"brightness\": %d", &lights[index].brightness);
+            has_brightness = true;
         }
-        else if (strcmp(state_buffer, "off") == 0)
+        lights[index].has_brightness = has_brightness;
+
+        const char *ct_ptr = strstr(ptr, "\"colorTemperature\"");
+        if (ct_ptr != NULL && (ct_ptr - ptr) < (strchr(ptr, '}') - ptr))
         {
-            lights[index].state = false;
+            sscanf(ct_ptr, "\"colorTemperature\": %d", &lights[index].colorTemperature);
+            has_colorTemperature = true;
         }
+        lights[index].has_colorTemperature = has_colorTemperature;
 
         index++;
     }
@@ -182,7 +200,7 @@ void write_file(const char *filename, const char *content)
     }
 }
 
-void update_light_config(int index, bool state)
+void update_light_config(int index, const char *attribute, int value)
 {
     char *config_file_path = "./gui_engine/example/web/peripheral_simulation/light_config.json";
     char *json_str = read_file(config_file_path);
@@ -196,7 +214,18 @@ void update_light_config(int index, bool state)
     {
         if (lights[i].id == index)
         {
-            lights[i].state = state;
+            if (strcmp(attribute, "state") == 0)
+            {
+                lights[i].state = value;
+            }
+            else if (strcmp(attribute, "brightness") == 0)
+            {
+                lights[i].brightness = value;
+            }
+            else if (strcmp(attribute, "colorTemperature") == 0)
+            {
+                lights[i].colorTemperature = value;
+            }
             break;
         }
     }
@@ -204,11 +233,27 @@ void update_light_config(int index, bool state)
     char config_str[2048] = "{\n    \"lights\": [\n";
     for (int i = 0; i < LIGHTS_NUM; i++)
     {
-        char light_str[64];
-        snprintf(light_str, sizeof(light_str), "        {\"id\": %d, \"state\": \"%s\"}%s\n",
-                 lights[i].id, lights[i].state ? "on" : "off",
-                 (i < LIGHTS_NUM - 1) ? "," : "");
+        char light_str[256];
+        snprintf(light_str, sizeof(light_str),
+                 "        {\"id\": %d, \"state\": \"%s\"",
+                 lights[i].id, lights[i].state ? "on" : "off");
         strcat(config_str, light_str);
+
+        if (lights[i].has_brightness)
+        {
+            char brightness_str[50];
+            snprintf(brightness_str, sizeof(brightness_str), ", \"brightness\": %d", lights[i].brightness);
+            strcat(config_str, brightness_str);
+        }
+
+        if (lights[i].has_colorTemperature)
+        {
+            char color_temp_str[50];
+            snprintf(color_temp_str, sizeof(color_temp_str), ", \"colorTemperature\": %d",
+                     lights[i].colorTemperature);
+            strcat(config_str, color_temp_str);
+        }
+        strcat(config_str, (i < LIGHTS_NUM - 1) ? "},\n" : "}\n");
     }
     strcat(config_str, "    ]\n}");
 
@@ -218,21 +263,37 @@ void update_light_config(int index, bool state)
 static void light_control_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
-    update_light_config(light->id, light->state);
+    update_light_config(light->id, "state", light->state);
 }
 
 static void light_switch_on_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     light->state = true;
     gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
-    update_light_config(light->id, light->state);
+    update_light_config(light->id, "state", light->state);
 }
 
 static void light_switch_off_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     light->state = false;
     gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
-    update_light_config(light->id, light->state);
+    update_light_config(light->id, "state", light->state);
+}
+
+static void light_brightness_cb(void *obj, gui_event_t e, light_param_t *light)
+{
+    gui_seekbar_t *this = (gui_seekbar_t *)obj;
+    light->brightness = 100 * GUI_API(gui_seekbar_t).get_progress(this);
+    gui_log("light->id: %d  light->brightness: %d\n", light->id, light->brightness);
+    update_light_config(light->id, "brightness", light->brightness);
+}
+
+static void light_colorTemp_cb(void *obj, gui_event_t e, light_param_t *light)
+{
+    gui_slider_t *this = (gui_slider_t *)obj;
+    light->colorTemperature = GUI_API(gui_slider_t).get_currentValue(this);
+    gui_log("light->id: %d  light->colorTemperature: %d\n", light->id, light->colorTemperature);
+    update_light_config(light->id,  "colorTemperature", light->colorTemperature);
 }
 
 static char *open_switch_name;
@@ -3241,11 +3302,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             slider_picture = gui_strdup(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "minTemp"))
+                        else if (!strcmp(p->attr[i], "minValue"))
                         {
                             minTemp = atoi(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "maxTemp"))
+                        else if (!strcmp(p->attr[i], "maxValue"))
                         {
                             maxTemp = atoi(p->attr[++i]);
                         }
@@ -3274,11 +3335,69 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         slider_buf = gui_get_file_address(slider_picture);
                     }
 
-                    gui_slider_t *slider = gui_slider_create(parent, bg_buf, x, y, w, h, minTemp, maxTemp, slider_buf,
-                                                             deltax, deltay, slider_size, text_size);
+                    parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minTemp, maxTemp, slider_buf,
+                                                       deltax, deltay, slider_size, text_size);
                     void *addr = gui_get_file_address(font);
+                    gui_slider_t *slider = (gui_slider_t *)parent;
                     gui_text_type_set(slider->currentValue_text, addr, FONT_SRC_MEMADDR);
 
+                }
+                break;
+
+            case MACRO_ONCHANGE:
+                {
+                    char *type = 0;
+                    char *to = 0;
+                    int id = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+
+                    if (type && to)
+                    {
+                        if (!strcmp(type, "control"))
+                        {
+                            light_param_t *light;
+                            light = gui_malloc(sizeof(light_param_t));
+                            light->id = id;
+
+                            if (!strcmp(to, "lightBrightness"))
+                            {
+                                if (parent->type == SEEKBAR)
+                                {
+                                    GUI_API(gui_seekbar_t).on_change((gui_seekbar_t *)parent, (gui_event_cb_t)light_brightness_cb,
+                                                                     light);
+                                }
+
+                            }
+                            else if (!strcmp(to, "lightColorTemp"))
+                            {
+                                if (parent->type == SLIDER)
+                                {
+                                    GUI_API(gui_slider_t).on_change((gui_slider_t *)parent, (gui_event_cb_t)light_colorTemp_cb, light);
+                                }
+                            }
+
+                        }
+                    }
                 }
                 break;
             default:

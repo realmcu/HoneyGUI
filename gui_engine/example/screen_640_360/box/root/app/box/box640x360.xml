@@ -27,11 +27,16 @@
         deltay="0"
         bgPicture="app/box/resource/lamp/color_temperature.bin"
         sliderPicture="app/box/resource/lamp/circle.bin"
-        minTemp="3700"
-        maxTemp="6500"
+        minValue="3700"
+        maxValue="6500"
         sliderSize="23"
         textSize="16"
         font="app/box/resource/font/arialbd_size16_bits4_font.bin">slider_ct
+        <onChange
+            type="control"
+            to="lightColorTemp"
+            id="15">changeValue_ct
+        </onChange>          
     </slider>
     <seekbar
         x="202"
@@ -46,6 +51,11 @@
         centralY="0"
         startDegree="0"
         endDegree="0">bar_brightness
+        <onChange
+            type="control"
+            to="lightBrightness"
+            id="15">changeValue_bt
+        </onChange>
     </seekbar>
     <textbox
         x="280"
@@ -57,6 +67,5 @@
         fontSize="16"
         font="app/box/resource/font/arialbd_size16_bits4_font.bin"
         mode="truncate">txt_brightness
-    </textbox>
-      
+    </textbox>   
 </screen></app>

@@ -114,6 +114,7 @@ typedef enum t_obj_type
     CANVAS_IMG               = 0x0030,
     VG_LITE_SOCCER           = 0x0031,
     SLIDER                   = 0x0032,
+    MACRO_ONCHANGE           = 0x0033,
 } T_OBJ_TYPE;
 typedef enum
 {
