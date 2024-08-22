@@ -136,8 +136,14 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
 void gui_menu_cellular_offset(gui_obj_t *menu_cellular, int offset_x, int offset_y);
 
 /**
+ * @brief Listen to click events on the cellular menu.
  *
-*/
+ * It processes the click event based on the given gesture parameters.
+ *
+ * @param menu_cellular Pointer to the cellular menu structure.
+ * @param para_array Array of gesture parameters corresponding to the click event.
+ * @param array_length Length of the gesture parameters array.
+ */
 void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
                                 struct gui_menu_cellular_gesture_parameter *para_array, int array_length);
 

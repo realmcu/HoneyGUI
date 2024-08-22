@@ -225,8 +225,11 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
+
+    /*gui_return_create*/
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)page);
+    /*gui_return_create end*/
 }
 static void app_win_cb(gui_win_t *win)
 {
@@ -707,9 +710,11 @@ static void app_menu(gui_app_t *app)
     gui_return_create(win, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), app_menu_win_cb, (void *)cell);
 }
+/*Define APP_MENU's entry func end*/
 #include "gui_seekbar.h"
 #include "gui_img.h"
 #define RETURN_HEIGHT 100
+/*Define gui_app_return_array*/
 const uint32_t *gui_app_return_array[] =
 {
     PATH04_BIN,
@@ -730,6 +735,7 @@ const uint32_t *gui_app_return_array[] =
     PATH24_BIN,
     PATH25_BIN,
 };
+/*Define gui_app_return_array end*/
 static void stop_watch_win_ani_cb(void);
 #define STOPWATCHTEXT "STOPWATCHTEXT"
 
