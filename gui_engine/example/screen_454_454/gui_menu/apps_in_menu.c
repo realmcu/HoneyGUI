@@ -1169,7 +1169,7 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
     gui_win_t *win = gui_win_create(parent, 0, 0, 70, width, gap * (COUNT - 1));
 
     gui_win_set_scope(win, 1);
-    gui_canvas_rect_create((void *)win, 0, 0, 50, width, gap * (COUNT - 2), COLOR_RED);
+    gui_canvas_rect_create((void *)win, 0, width + 2, 50, 2, gap * (COUNT - 2), APP_COLOR_BLACK);
     gui_win_t *timer1 = gui_win_create(win, 0, width / 2 - gap / 2, 0, width, gap * (COUNT - 1));
     gui_win_set_animate(win, 1000, -1, stop_watch_win_overwrite, timer1);
 

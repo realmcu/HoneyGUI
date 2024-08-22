@@ -124,6 +124,11 @@ static void gui_progressbar_movie_ctor_core(gui_progressbar_t     *this,
 void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
 {
     this->per = ((float)progress) / ((float)this->max);
+    if (this->per != this->per_history)
+    {
+        this->per_history = this->per;
+        gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
+    }
 
     if (GET_BASE(this->c)->type == IMAGE_SCOPE)
     {
@@ -145,6 +150,7 @@ void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
         GET_BASE(this->c)->h = gui_img_get_height((void *)(this->c));
 
     }
+
 }
 
 size_t gui_progressbar_get_progress(gui_progressbar_t *this)
@@ -155,6 +161,11 @@ size_t gui_progressbar_get_progress(gui_progressbar_t *this)
 void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
 {
     this->per = percentage;
+    if (this->per != this->per_history)
+    {
+        this->per_history = this->per;
+        gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
+    }
 
     if (GET_BASE(this->c)->type == IMAGE_SCOPE)
     {
