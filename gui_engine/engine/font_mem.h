@@ -27,7 +27,7 @@ typedef struct
 
 typedef struct
 {
-    uint16_t unicode;
+    uint32_t unicode;
     int16_t x;
     int16_t y;
     int16_t w;
@@ -36,6 +36,7 @@ typedef struct
     uint8_t char_w;
     uint8_t char_h;
     uint8_t *dot_addr;
+    gui_img_t *emoji_img;
 } mem_char_t;
 
 typedef struct
@@ -138,6 +139,13 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect);
  * @param text Widget pointer
  */
 void gui_font_mem_unload(gui_text_t *text);
+
+/**
+ * @brief GUI_FONT_SRC_BMP text widget destroy function.
+ *
+ * @param text Widget pointer
+ */
+void gui_font_mem_obj_destroy(gui_text_t *text);
 
 /**
  * @brief Get the pixel width of the text in the current font file.

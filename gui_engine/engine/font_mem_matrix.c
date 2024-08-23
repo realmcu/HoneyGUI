@@ -475,12 +475,20 @@ void gui_font_mat_unload(gui_text_t *text)
 
 void gui_font_mat_load(gui_text_t *text, gui_text_rect_t *rect)
 {
-    text->refresh = true;
-    gui_font_get_dot_info(text);
+    if (text->data == NULL)
+    {
+        gui_font_get_dot_info(text);
+    }
+    else
+    {
+        gui_font_mem_unload(text);
+        gui_font_get_dot_info(text);
+    }
     gui_font_char_mat(text);
     gui_font_matrix_adapt_rect(text, rect);
     gui_font_mem_layout(text, rect);
-    text->refresh = true;
+    text->layout_refresh = true;
+    text->content_refresh = true;
 }
 
 void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)

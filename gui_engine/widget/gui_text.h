@@ -32,6 +32,8 @@ extern "C" {
 #include "guidef.h"
 #include "gui_obj.h"
 #include "gui_img.h"
+#include "draw_font.h"
+
 /** @defgroup WIDGET WIDGET
   * @brief
   * @{
@@ -69,18 +71,6 @@ typedef enum
 } TEXT_MODE;
 /** @brief  text mode enum end */
 
-/** @brief  text encoding format enum */
-typedef enum
-{
-    UTF_8                = 0,       //UTF: Unicode Transformation Format
-
-    UTF_16               = 1,       //default LE, does not support surrogate pairs
-    UTF_16LE             = 1,
-    UNICODE_ENCODING     = 1,       //utf-16 equal to unicode on BMP
-
-    UTF_16BE             = 2,
-} TEXT_CHARSET;
-
 /** @brief  font type enum */
 typedef enum
 {
@@ -116,7 +106,8 @@ typedef struct gui_text
     uint8_t font_height;
     uint8_t inputable;    // support user input or not
     uint8_t checksum;
-    bool refresh;
+    bool layout_refresh;
+    bool content_refresh;
     gui_animate_t *animate;
     void *content;
     void *data;
@@ -125,6 +116,8 @@ typedef struct gui_text
     int16_t offset_y;
     float min_scale;
     gui_img_t *scale_img;
+    uint8_t *emoji_path;
+    uint8_t emoji_size;
 } gui_text_t;
 
 /** @brief  text line structure */
@@ -285,6 +278,18 @@ void gui_text_font_mode_set(gui_text_t *this_widget, FONT_SRC_MODE font_mode);
  * @param font_mode font source mode
  */
 void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE font_mode);
+
+/**
+ * @brief Set emoji file path and emoji size
+ * @note Need romfs.
+ * @note Example of a full emoji image file path: "font/emoji/emoji_u1f30d.bin".
+ * @param this The text widget pointer.
+ * @param path Path contain folder path and file name prefix. Path eg:"font/emoji/emoji_u".
+ * Folder path is emoji image file folder path, eg:"font/emoji/".
+ * File name prefix is prefix before the filename for Unicode sorting, eg:"emoji_u".
+ * @param size Emoji image file size. eg 32.
+ */
+void gui_text_emoji_set(gui_text_t *this_widget, uint8_t *path, uint8_t size);
 
 /**
  * @brief set font encoding

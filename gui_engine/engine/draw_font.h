@@ -19,18 +19,33 @@ typedef struct gui_text_rect
     int16_t yboundbottom;
 } gui_text_rect_t;
 
+/** @brief  text encoding format enum */
+typedef enum
+{
+    UTF_8                = 0,       //UTF: Unicode Transformation Format
+
+    UTF_16               = 1,       //default LE, does not support surrogate pairs
+    UTF_16LE             = 1,
+    UNICODE_ENCODING     = 1,       //utf-16 equal to unicode on BMP
+
+    UTF_16BE             = 2,
+
+    UTF_32LE             = 3,
+
+    UTF_32BE             = 4,
+} TEXT_CHARSET;
 
 /**
- * @brief
+ * @brief Converts content from a specified charset to Unicode code points.
  *
- * @param utf8
- * @param len
- * @param unicode_array
- * @param unicode_buf_len
- * @return uint16_t
+ * @param charset_type The charset type of the content.
+ * @param content Input content to be converted.
+ * @param len Length of the input content in bytes.
+ * @param p_buf_ptr Pointer to the buffer that will hold the Unicode code points.
+ * @return The length of the Unicode code points array.
  */
-uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
-                         uint16_t unicode_buf_len);
+uint16_t process_content_by_charset(TEXT_CHARSET charset_type, uint8_t *content, uint16_t len,
+                                    uint32_t **p_buf_ptr);
 
 /**
  * @brief Get the len by char num object
@@ -42,18 +57,15 @@ uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint16_t *unicode_array,
 uint32_t get_len_by_char_num(uint8_t *utf8, uint32_t char_num);
 
 /**
- * @brief Converts a UTF-16 encoded array from Big-Endian (BE) format to Little-Endian (LE) format.
+ * @brief Function to generate file path based on a given Unicode sequence
  *
- * This function takes an array of UTF-16 encoded data in Big-Endian format and converts it to Little-Endian format.
- * It ensures that the length of the input array is an even number since each UTF-16 character consists of 2 bytes.
- * The output array must be pre-allocated and of the same length as the input array.
- *
- * @param input Pointer to the input array containing UTF-16 BE encoded data.
- * @param output Pointer to the output array where UTF-16 LE encoded data will be stored.
- * @param length Length of the input and output arrays in bytes. Must be an even number.
+ * @param unicode_buf
+ * @param len
+ * @param file_path
+ * @return int
  */
-void utf16_be_to_le(const uint8_t *input, uint8_t *output, size_t length);
-
+uint32_t generate_emoji_file_path_from_unicode(const uint32_t *unicode_buf, uint32_t len,
+                                               char *file_path);
 
 #ifdef __cplusplus
 }

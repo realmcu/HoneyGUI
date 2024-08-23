@@ -105,6 +105,103 @@ static void tab_img(void *tab)
     gui_img_scale(ppe_test, (float)xscale / 256, (float)yscale / 256);
     // gui_img_set_animate(ppe_test, 1000, -1, change_size, ppe_test);
 }
+
+//charset test
+//The string "Hello  shi jie" in UTF-8 encoding. Strlen is 15
+static uint8_t utf8_data[] =
+{
+    0x48, 0x65, 0x6C, 0x6C, 0x6F,
+    0xF0, 0x9F, 0x8C, 0x8D,
+    0xE4, 0xB8, 0x96,
+    0xE7, 0x95, 0x8C
+};
+//The string "Hello  shi jie" in UTF-16 LE encoding. Strlen is 18
+static uint8_t utf16le_data[] =
+{
+    0x48, 0x00, 0x65, 0x00, 0x6C, 0x00, 0x6C, 0x00, 0x6F, 0x00,
+    0x3C, 0xD8, 0x0D, 0xDF,
+    0x16, 0x4E, 0x4C, 0x75
+};
+//The string "Hello  shi jie" in UTF-16 BE encoding. Strlen is 18
+static uint8_t utf16be_data[] =
+{
+    0x00, 0x48, 0x00, 0x65, 0x00, 0x6C, 0x00, 0x6C, 0x00, 0x6F,
+    0xD8, 0x3C, 0xDF, 0x0D,
+    0x4E, 0x16, 0x75, 0x4C
+};
+//The string "Hello  shi jie" in UTF-32 LE encoding. Strlen is 32
+static uint8_t utf32le_data[] =
+{
+    0x48, 0x00, 0x00, 0x00, 0x65, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x6F, 0x00, 0x00, 0x00,
+    0x0D, 0xF3, 0x01, 0x00,
+    0x16, 0x4E, 0x00, 0x00, 0x4C, 0x75, 0x00, 0x00
+};
+//The string "Hello  shi jie" in UTF-32 BE encoding. Strlen is 32
+static uint8_t utf32be_data[] =
+{
+    0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x65, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x6F,
+    0x00, 0x01, 0xF3, 0x0D,
+    0x00, 0x00, 0x4E, 0x16, 0x00, 0x00, 0x75, 0x4C
+};
+static void tab_text_charset(void *tab)
+{
+    gui_text_t *utf8 = gui_text_create(tab,  "utf8",  0, 0, 280, 32);
+    gui_text_set(utf8, utf8_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 15, 32);
+    // gui_text_encoding_set(utf16le, UTF_8);
+    gui_text_emoji_set(utf8, "font/emoji/emoji_u", 32);
+
+    gui_text_t *utf16le = gui_text_create(tab, "utf16le",  0, 50, 280, 32);
+    gui_text_set(utf16le, utf16le_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 18, 32);
+    gui_text_encoding_set(utf16le, UTF_16LE);
+    gui_text_emoji_set(utf16le, "font/emoji/emoji_u", 32);
+
+    gui_text_t *utf16be = gui_text_create(tab, "utf16be",  0, 100, 280, 32);
+    gui_text_set(utf16be, utf16be_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 18, 32);
+    gui_text_encoding_set(utf16be, UTF_16BE);
+    gui_text_emoji_set(utf16be, "font/emoji/emoji_u", 32);
+
+    gui_text_t *utf32le = gui_text_create(tab, "utf32le",  0, 150, 280, 32);
+    gui_text_set(utf32le, utf32le_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 32, 32);
+    gui_text_encoding_set(utf32le, UTF_32LE);
+    gui_text_emoji_set(utf32le, "font/emoji/emoji_u", 32);
+
+    gui_text_t *utf32be = gui_text_create(tab, "utf32be",  0, 200, 280, 32);
+    gui_text_set(utf32be, utf32be_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 32, 32);
+    gui_text_encoding_set(utf32be, UTF_32BE);
+    gui_text_emoji_set(utf32be, "font/emoji/emoji_u", 32);
+}
+
+//emoji test
+static uint32_t emoji_sequence[] =
+{
+    0x1F44B, 0x1F3FB, //  Waving Hand: Light Skin Tone
+    0x1F64B, //  Person Raising Hand
+    0x1F646, 0x200D, 0x2642, 0xFE0F,//  Man Gesturing OK
+    0x1F466, //  Boy
+    0x1F469, //  Woman
+    0x1F469, 0x200D, 0x1F467, // Woman and Girl
+    0x1F474, //  Older Man
+    0x1F475, //  Older Woman
+    0x1F469, 0x200D, 0x1F469, 0x200D, 0x1F466, //  Two Women and Boy
+    0x1F468, //  Man
+    0x1F385, //  Santa Claus
+    0x1F468, 0x200D, 0x1F467, 0x200D, 0x1F466, //  Man, Girl, Boy
+    0x1F468, 0x200D, 0x2764, 0xFE0F, 0x200D, 0x1F468, //  Two Men Holding Hands
+    0x1F469, 0x200D, 0x2764, 0xFE0F, 0x200D, 0x1F48B, 0x200D, 0x1F469, //  Two Women Kissing with Heart
+    0x1F46A, //  Family
+    0x1F9D1, 0x200D, 0x1F91D, 0x200D, 0x1F9D1, //  Two People Holding Hands
+    0x1F469, 0x200D, 0x1F4BB, //  Woman Technologist
+    0x1F3C3, 0x200D, 0x2640, 0xFE0F //  Woman Running
+};
+static void tab_text_emoji(void *tab)
+{
+    gui_text_t *text2 = gui_text_create(tab,  "text2",  0, 35, 280, 100);
+    gui_text_set(text2, emoji_sequence, GUI_FONT_SRC_BMP, APP_COLOR_GREEN, 53 * 4, 32);
+    gui_text_mode_set(text2, MULTI_LEFT);
+    gui_text_encoding_set(text2, UTF_32LE);
+    gui_text_emoji_set(text2, "font/emoji/emoji_u", 32);
+}
+
 #define FONT_NUM 4
 char *text_string[FONT_NUM] =
 {
@@ -113,7 +210,7 @@ char *text_string[FONT_NUM] =
     "!@#$%^&",
     "QWERTYU",
 };
-static uint16_t uutf_16[] = {0x30, 0x31, 0x32, 0x33, 0X34};
+
 static void tab_text(void *tab)
 {
     gui_img_t *tree = gui_img_create_from_mem(tab, "tree", TREE_BIN, 0, 0, 0, 0);
@@ -123,9 +220,8 @@ static void tab_text(void *tab)
     gui_text_mode_set(text2, LEFT);
 
     gui_text_t *text3 = gui_text_create(tab,  "text3",  0, 85, 280, 50);
-    gui_text_set(text3, uutf_16, GUI_FONT_SRC_BMP, APP_COLOR_BLUE, 10, 48);
+    gui_text_set(text3, "QWERTYUIOP", GUI_FONT_SRC_BMP, APP_COLOR_BLUE, 10, 48);
     gui_text_mode_set(text3, CENTER);
-    gui_text_encoding_set(text3, UTF_16);
 
     gui_text_t *text4 = gui_text_create(tab,  "text4",  0, 145, 280, 50);
     gui_text_set(text4, "!@#$", GUI_FONT_SRC_BMP, APP_COLOR_RED, 4, 64);
@@ -377,10 +473,15 @@ static void app_launcher_ui_design(gui_app_t *app)
     tab_tt(tabn);
     tab_home(tab0);
     tab_text(tab1);
-    tab_tree(tab2);
-    tab_img(tab3);
-    tab_lake(tab4);
-    tab_iconlist(tab5);
+    tab_img(tab2);
+    tab_iconlist(tab3);
+#ifdef _WIN32
+    tab_text_charset(tab4);
+    tab_text_emoji(tab5);
+#else
+    tab_tree(tab4);
+    tab_lake(tab5);
+#endif
 #ifndef _WIN32
     gui_log("after ui unused mem head is %d", heap = os_mem_peek(RAM_TYPE_DATA_ON));
 #endif

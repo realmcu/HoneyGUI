@@ -87,57 +87,9 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint8_t index_unit_length = 4; //now set to 4 , todo
     bool crop = font->font_mode_detail.detail.crop;
 
-    if (text->data != NULL)
-    {
-        if (text->refresh)
-        {
-            gui_font_mem_unload(text);
-        }
-        else
-        {
-            return;
-        }
-    }
-
-    uint16_t *p_buf = NULL;
+    uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
-    switch (text->charset)
-    {
-    case UTF_8:
-        p_buf = gui_malloc(text->len * sizeof(uint16_t));
-        if (p_buf == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-            return;
-        }
-        else
-        {
-            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
-        }
-        break;
-
-    case UTF_16:
-        unicode_len = text->len / 2;
-        p_buf = (uint16_t *)text->content;
-        break;
-
-    case UTF_16BE:
-        unicode_len = text->len / 2;
-        p_buf = gui_malloc((unicode_len + 1) * sizeof(uint16_t));
-        if (p_buf == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-            return;
-        }
-        else
-        {
-            utf16_be_to_le(text->content, (uint8_t *)p_buf, unicode_len * 2);
-        }
-        break;
-
-    default:
-        break;
-    }
+    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
 
     mem_char_t *chr = gui_malloc(sizeof(mem_char_t) * unicode_len);
     if (chr == NULL)
@@ -150,49 +102,83 @@ void gui_font_get_dot_info(gui_text_t *text)
         memset(chr, 0, sizeof(mem_char_t) * unicode_len);
     }
     text->data = chr;
-    text->refresh = false;
+    text->content_refresh = false;
 
     int32_t all_char_w = 0;
     int32_t all_char_h = 0;
     uint32_t line_flag = 0;
     int32_t line_byte = 0;
 
+    uint32_t uni_i = 0;
+    uint32_t chr_i = 0;
+
     if (crop)
     {
         switch (index_method)
         {
         case 0: //address
-            for (uint32_t i = 0; i < unicode_len; i++)
+            for (uni_i = 0; uni_i < unicode_len; uni_i++)
             {
-                chr[i].unicode = p_buf[i];
-                chr[i].w = 0;
-                chr[i].h = text->font_height;
+                chr[chr_i].unicode = unicode_buf[uni_i];
+                chr[chr_i].w = 0;
+                chr[chr_i].h = text->font_height;
                 uint32_t offset = 0;
-                if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
+                if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
                 {
-                    chr[i].char_w = text->font_height / 2;
-                    chr[i].char_h = text->font_height / 2;
+                    chr[chr_i].char_w = text->font_height / 2;
+                    chr[chr_i].char_h = text->font_height / 2;
                 }
-                else if (chr[i].unicode == 0x0A)
+                else if (chr[chr_i].unicode == 0x0A)
                 {
                     line_flag ++;
-                    chr[i].char_w = 0;
-                    chr[i].char_h = 0;
+                    chr[chr_i].char_w = 0;
+                    chr[chr_i].char_h = 0;
+                }
+                else if (chr[chr_i].unicode >= 0x10000)
+                {
+                    if (text->emoji_path)
+                    {
+                        char file_path[100];
+                        memset(file_path, 0, 100);
+                        memcpy(file_path, text->emoji_path, strlen((const char *)text->emoji_path));
+                        uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
+                                                                                           unicode_len - uni_i, file_path);
+                        // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
+                        if (multi_unicode_len != 0)
+                        {
+                            chr[chr_i].dot_addr = gui_get_file_address(file_path);
+                            if (chr[chr_i].dot_addr != NULL)
+                            {
+                                chr[chr_i].char_w = text->font_height;
+                                chr[chr_i].char_h = text->font_height;
+                            }
+                            else
+                            {
+                                chr[chr_i].char_w = 0;
+                                chr[chr_i].char_h = 0;
+                            }
+                            uni_i += multi_unicode_len - 1;
+                        }
+                        else
+                        {
+                            gui_log("No valid emoji\n");
+                        }
+                    }
                 }
                 else
                 {
-                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + chr[i].unicode *
+                    uint32_t *offset_addr = (uint32_t *)((uint8_t *)(uintptr_t)table_offset + chr[chr_i].unicode *
                                                          index_unit_length);
                     offset = *offset_addr;
                     if (offset == 0xFFFFFFFF) { continue; }
-                    chr[i].dot_addr = (uint8_t *)text->path + offset + 4;
+                    chr[chr_i].dot_addr = (uint8_t *)text->path + offset + 4;
                     if (text->font_mode == FONT_SRC_MEMADDR)
                     {
-                        chr[i].char_w = (uint8_t)(*(chr[i].dot_addr - 2));
-                        chr[i].char_y = (uint8_t)(*(chr[i].dot_addr - 4));
-                        chr[i].char_h = (uint8_t)(*(chr[i].dot_addr - 1)) - chr[i].char_y;
-                        line_byte = (chr[i].char_w * rendor_mode + 8 - 1) / 8;
-                        chr[i].w = line_byte * 8 / rendor_mode;
+                        chr[chr_i].char_w = (uint8_t)(*(chr[chr_i].dot_addr - 2));
+                        chr[chr_i].char_y = (uint8_t)(*(chr[chr_i].dot_addr - 4));
+                        chr[chr_i].char_h = (uint8_t)(*(chr[chr_i].dot_addr - 1)) - chr[chr_i].char_y;
+                        line_byte = (chr[chr_i].char_w * rendor_mode + 8 - 1) / 8;
+                        chr[chr_i].w = line_byte * 8 / rendor_mode;
                     }
                     else if (text->font_mode == FONT_SRC_FTL)
                     {
@@ -204,17 +190,17 @@ void gui_font_get_dot_info(gui_text_t *text)
                             return;
                         }
 
-                        gui_ftl_read((uintptr_t)chr[i].dot_addr - 4, dot_buf_max, read_size_max);
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 4, dot_buf_max, read_size_max);
 
-                        chr[i].char_y = *dot_buf_max;
-                        chr[i].char_w = *(dot_buf_max + 2);
-                        chr[i].char_h = *(dot_buf_max + 3);
+                        chr[chr_i].char_y = *dot_buf_max;
+                        chr[chr_i].char_w = *(dot_buf_max + 2);
+                        chr[chr_i].char_h = *(dot_buf_max + 3);
 
-                        chr[i].char_h = chr[i].char_h - chr[i].char_y;
-                        line_byte = (chr[i].char_w * rendor_mode + 8 - 1) / 8;
-                        chr[i].w = line_byte * 8 / rendor_mode;
+                        chr[chr_i].char_h = chr[chr_i].char_h - chr[chr_i].char_y;
+                        line_byte = (chr[chr_i].char_w * rendor_mode + 8 - 1) / 8;
+                        chr[chr_i].w = line_byte * 8 / rendor_mode;
 
-                        uint32_t dot_size = line_byte * chr[i].char_h;
+                        uint32_t dot_size = line_byte * chr[chr_i].char_h;
                         uint8_t *dot_buf = gui_malloc(dot_size);
                         if (dot_buf == NULL)
                         {
@@ -224,10 +210,11 @@ void gui_font_get_dot_info(gui_text_t *text)
                         memcpy(dot_buf, dot_buf_max + 4, dot_size);
                         gui_free(dot_buf_max);
 
-                        chr[i].dot_addr = dot_buf;
+                        chr[chr_i].dot_addr = dot_buf;
                     }
                 }
-                all_char_w += chr[i].char_w;
+                all_char_w += chr[chr_i].char_w;
+                chr_i ++;
             }
             break;
         case 1: //offset
@@ -251,94 +238,158 @@ void gui_font_get_dot_info(gui_text_t *text)
         switch (index_method)
         {
         case 0: //address
-            for (uint32_t i = 0; i < unicode_len; i++)
+            for (uni_i = 0; uni_i < unicode_len; uni_i++)
             {
-                chr[i].unicode = p_buf[i];
-                chr[i].w = aliened_font_size;
-                chr[i].h = text->font_height;
+                chr[chr_i].unicode = unicode_buf[uni_i];
+                chr[chr_i].w = aliened_font_size;
+                chr[chr_i].h = text->font_height;
                 uint16_t offset = 0;
-                if (chr[i].unicode == 0x20 || chr[i].unicode == 0x0D)
+                if (chr[chr_i].unicode == 0x20 || chr[chr_i].unicode == 0x0D)
                 {
-                    chr[i].char_w = text->font_height / 2;
-                    chr[i].char_h = text->font_height / 2;
+                    chr[chr_i].char_w = text->font_height / 2;
+                    chr[chr_i].char_h = text->font_height / 2;
                 }
-                else if (chr[i].unicode == 0x0A)
+                else if (chr[chr_i].unicode == 0x0A)
                 {
                     line_flag ++;
-                    chr[i].char_w = 0;
-                    chr[i].char_h = 0;
+                    chr[chr_i].char_w = 0;
+                    chr[chr_i].char_h = 0;
+                }
+                else if (chr[chr_i].unicode >= 0x10000)
+                {
+                    if (text->emoji_path)
+                    {
+                        char file_path[100];
+                        memset(file_path, 0, 100);
+                        memcpy(file_path, text->emoji_path, strlen((const char *)text->emoji_path));
+                        uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
+                                                                                           unicode_len - uni_i, file_path);
+                        // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
+                        if (multi_unicode_len != 0)
+                        {
+                            chr[chr_i].dot_addr = gui_get_file_address(file_path);
+                            if (chr[chr_i].dot_addr != NULL)
+                            {
+                                chr[chr_i].char_w = text->font_height;
+                                chr[chr_i].char_h = text->font_height;
+                            }
+                            else
+                            {
+                                chr[chr_i].char_w = 0;
+                                chr[chr_i].char_h = 0;
+                            }
+                            uni_i += multi_unicode_len - 1;
+                        }
+                        else
+                        {
+                            gui_log("No valid emoji\n");
+                        }
+                    }
                 }
                 else
                 {
-                    offset = *(uint16_t *)(uintptr_t)(chr[i].unicode * 2 + table_offset);
+                    offset = *(uint16_t *)(uintptr_t)(chr[chr_i].unicode * 2 + table_offset);
                     if (offset == 0xFFFF) { continue; }
-                    chr[i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
+                    chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)offset * font_area + dot_offset + 4);
                     if (text->font_mode == FONT_SRC_MEMADDR)
                     {
-                        chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
-                        chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
+                        chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
+                        chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
                     }
                     else if (text->font_mode == FONT_SRC_FTL)
                     {
-                        gui_ftl_read((uintptr_t)chr[i].dot_addr - 2, &chr[i].char_w, 1);
-                        gui_ftl_read((uintptr_t)chr[i].dot_addr - 1, &chr[i].char_h, 1);
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, &chr[chr_i].char_w, 1);
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 1, &chr[chr_i].char_h, 1);
                         uint8_t *dot_buf = gui_malloc(text->font_height * text->font_height);
-                        gui_ftl_read((uintptr_t)chr[i].dot_addr, dot_buf, text->font_height * text->font_height);
-                        chr[i].dot_addr = dot_buf;
+                        gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, text->font_height * text->font_height);
+                        chr[chr_i].dot_addr = dot_buf;
                     }
                 }
-                all_char_w += chr[i].char_w;
-                all_char_h = all_char_h + chr[i].char_h + 2;
+                all_char_w += chr[chr_i].char_w;
+                all_char_h = all_char_h + chr[chr_i].char_h + 2;
+                chr_i ++;
             }
             break;
         case 1: //offset
             {
                 uint32_t index_area_size = font->index_area_size;
-                for (uint32_t i = 0; i < unicode_len; i++)
+                for (uni_i = 0; uni_i < unicode_len; uni_i++)
                 {
-                    chr[i].unicode = p_buf[i];
-                    chr[i].w = aliened_font_size;
-                    chr[i].h = text->font_height;
-                    chr[i].char_w = text->font_height / 2;
-                    chr[i].char_h = text->font_height;
+                    chr[chr_i].unicode = unicode_buf[uni_i];
+                    chr[chr_i].w = aliened_font_size;
+                    chr[chr_i].h = text->font_height;
+                    chr[chr_i].char_w = text->font_height / 2;
+                    chr[chr_i].char_h = text->font_height;
                     uint32_t index = 0;
-                    if (chr[i].unicode == 0x0A)
+                    if (chr[chr_i].unicode == 0x0A)
                     {
                         line_flag ++;
-                        chr[i].char_w = 0;
-                        chr[i].char_h = 0;
+                        chr[chr_i].char_w = 0;
+                        chr[chr_i].char_h = 0;
                     }
-                    else if (chr[i].unicode == 0x20)
+                    else if (chr[chr_i].unicode == 0x20)
                     {
-                        chr[i].char_w = text->font_height / 2;
-                        chr[i].char_h = text->font_height / 2;
+                        chr[chr_i].char_w = text->font_height / 2;
+                        chr[chr_i].char_h = text->font_height / 2;
+                    }
+                    else if (chr[chr_i].unicode >= 0x10000)
+                    {
+                        if (text->emoji_path)
+                        {
+                            char file_path[100];
+                            memset(file_path, 0, 100);
+                            memcpy(file_path, text->emoji_path, strlen((const char *)text->emoji_path));
+                            uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
+                                                                                               unicode_len - uni_i, file_path);
+                            // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
+                            if (multi_unicode_len != 0)
+                            {
+                                chr[chr_i].dot_addr = gui_get_file_address(file_path);
+                                if (chr[chr_i].dot_addr != NULL)
+                                {
+                                    chr[chr_i].char_w = text->font_height;
+                                    chr[chr_i].char_h = text->font_height;
+                                }
+                                else
+                                {
+                                    chr[chr_i].char_w = 0;
+                                    chr[chr_i].char_h = 0;
+                                }
+                                uni_i += multi_unicode_len - 1;
+                            }
+                            else
+                            {
+                                gui_log("No valid emoji\n");
+                            }
+                        }
                     }
                     else
                     {
                         for (; index < index_area_size / 2; index ++)
                         {
-                            if (chr[i].unicode == *(uint16_t *)(uintptr_t)(table_offset + index * 2))
+                            if (chr[chr_i].unicode == *(uint16_t *)(uintptr_t)(table_offset + index * 2))
                             {
-                                chr[i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
+                                chr[chr_i].dot_addr = (uint8_t *)(uintptr_t)((uintptr_t)index * font_area + dot_offset + 4);
                                 if (text->font_mode == FONT_SRC_MEMADDR)
                                 {
-                                    chr[i].char_w = (int16_t)(*(chr[i].dot_addr - 2));
-                                    chr[i].char_h = (int16_t)(*(chr[i].dot_addr - 1));
+                                    chr[chr_i].char_w = (int16_t)(*(chr[chr_i].dot_addr - 2));
+                                    chr[chr_i].char_h = (int16_t)(*(chr[chr_i].dot_addr - 1));
                                     break;
                                 }
                                 else if (text->font_mode == FONT_SRC_FTL)
                                 {
-                                    gui_ftl_read((uintptr_t)chr[i].dot_addr - 2, &chr[i].char_w, 1);
-                                    gui_ftl_read((uintptr_t)chr[i].dot_addr - 1, &chr[i].char_h, 1);
+                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 2, &chr[chr_i].char_w, 1);
+                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr - 1, &chr[chr_i].char_h, 1);
                                     uint8_t *dot_buf = gui_malloc(text->font_height * text->font_height);
-                                    gui_ftl_read((uintptr_t)chr[i].dot_addr, dot_buf, text->font_height * text->font_height);
-                                    chr[i].dot_addr = dot_buf;
+                                    gui_ftl_read((uintptr_t)chr[chr_i].dot_addr, dot_buf, text->font_height * text->font_height);
+                                    chr[chr_i].dot_addr = dot_buf;
                                     break;
                                 }
                             }
                         }
                     }
-                    all_char_w += chr[i].char_w;
+                    all_char_w += chr[chr_i].char_w;
+                    chr_i ++;
                 }
             }
             break;
@@ -349,26 +400,29 @@ void gui_font_get_dot_info(gui_text_t *text)
     text->char_width_sum = all_char_w;
     text->char_height_sum = all_char_h;
     text->char_line_sum = line_flag;
-    text->font_len = unicode_len;
-    switch (text->charset)
-    {
-    case UTF_8:
-        gui_free(p_buf);
-        break;
-    case UTF_16:
-        break;
-    case UTF_16BE:
-        gui_free(p_buf);
-        break;
-    default:
-        break;
-    }
+    text->font_len = chr_i;
+
+    gui_free(unicode_buf);
 }
 
 void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
 {
-    gui_font_get_dot_info(text);
-    gui_font_mem_layout(text, rect);
+    if (text->data == NULL)
+    {
+        gui_font_get_dot_info(text);
+    }
+    else
+    {
+        if (text->content_refresh)
+        {
+            gui_font_mem_unload(text);
+            gui_font_get_dot_info(text);
+        }
+    }
+    // if (text->layout_refresh)
+    {
+        gui_font_mem_layout(text, rect);
+    }
 }
 
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
@@ -638,9 +692,36 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
     default:
         break;
     }
+    text->layout_refresh = false;
 }
 
 void gui_font_mem_unload(gui_text_t *text)
+{
+    if (text->data)
+    {
+        if (text->font_mode == FONT_SRC_FTL)
+        {
+            mem_char_t *chr = text->data;
+            for (int i = 0; i < text->font_len; i++)
+            {
+                gui_free(chr[i].dot_addr);
+            }
+        }
+        for (int i = 0; i < text->font_len; i++)
+        {
+            mem_char_t *chr = text->data;
+            if (chr[i].emoji_img != NULL)
+            {
+                gui_obj_tree_free(chr[i].emoji_img);
+            }
+        }
+        gui_free(text->data);
+        text->data = NULL;
+    }
+    return;
+}
+
+void gui_font_mem_obj_destroy(gui_text_t *text)
 {
     if (text->data)
     {
@@ -1314,6 +1395,19 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
         break;
     }
 }
+void gui_font_draw_emoji(gui_text_t *text, mem_char_t *chr, void *data, int16_t x, int16_t y)
+{
+    if (data)
+    {
+        if (chr->emoji_img == NULL)
+        {
+            chr->emoji_img = gui_img_create_from_mem(text, "emoji", data, x, y, 0, 0);
+            float x_sccle = (float)(chr->char_w) / (float)(text->emoji_size);
+            float y_scale = (float)(chr->char_h) / (float)(text->emoji_size);
+            gui_img_scale(chr->emoji_img, x_sccle, y_scale);
+        }
+    }
+}
 void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
 {
     mem_char_t *chr = text->data;
@@ -1329,7 +1423,14 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
     uint8_t rendor_mode = font->rendor_mode;
     for (uint16_t i = 0; i < text->font_len; i++)
     {
-        rtk_draw_unicode(chr + i, text->color, rendor_mode, rect, font->font_mode_detail.detail.crop);
+        if (chr[i].unicode >= 0x10000)
+        {
+            gui_font_draw_emoji(text, chr + i, chr[i].dot_addr, chr[i].x - rect->x1, chr[i].y - rect->y1);
+        }
+        else
+        {
+            rtk_draw_unicode(chr + i, text->color, rendor_mode, rect, font->font_mode_detail.detail.crop);
+        }
     }
 }
 
@@ -1473,29 +1574,10 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
     }
     uint32_t font_area = aliened_font_size * font->font_size / 8 * font->rendor_mode + 4;
     uint8_t index_unit_length = 4; //now set to 4 , todo
-    uint16_t *unicode_buffer = NULL;
+    uint32_t *unicode_buffer = NULL;
     uint16_t unicode_len = 0;
-    switch (charset)
-    {
-    case UTF_8:
-        unicode_buffer = gui_malloc(string_len * sizeof(uint16_t));
-        if (unicode_buffer == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-            return 0;
-        }
-        else
-        {
-            unicode_len = utf8_to_unicode(content, string_len, unicode_buffer, string_len);
-        }
-        break;
-    case UTF_16:
-        unicode_len = string_len / 2;
-        unicode_buffer = (uint16_t *)content;
-        break;
-    default:
-        break;
-    }
+    unicode_len = process_content_by_charset(charset, content, string_len, &unicode_buffer);
+
     uint32_t all_char_w = 0;
     uint32_t line_flag = 0;
 
@@ -1599,15 +1681,6 @@ uint32_t gui_get_mem_char_width(void *content, void *font_bin_addr, TEXT_CHARSET
             break;
         }
     }
-    switch (charset)
-    {
-    case UTF_8:
-        gui_free(unicode_buffer);
-        break;
-    case UTF_16:
-        break;
-    default:
-        break;
-    }
+    gui_free(unicode_buffer);
     return all_char_w;
 }
