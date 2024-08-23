@@ -21,10 +21,10 @@
 ```eval_rst
 .. raw:: html
 
-    <iframe src="https://drive.google.com/file/d/1qpLBVJRt2gnRR_cpuXc9L06VjqwvpzS0/preview" width="640" height="480" allow="autoplay"></iframe>
+    <div style="text-align: center"><iframe src="https://docs.realmcu.com/HoneyGUI/image/FAQ/8772F_demo.mp4" width="640" height="480" allow="autoplay"></iframe></div><br>
 ```
 
-The memory consumption statistics of this demo are as follows
+The memory consumption statistics of this demo are as follows.
 | Module | Cost  |
 |---|---|
 | Widget  |  14.56KB |
