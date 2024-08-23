@@ -141,8 +141,7 @@ _GUI_API_DECLARE(gui_slider_t)
  * @param minValue minimum value of slider range.
  * @param maxValue maximum value of slider range.
  * @param slider_img the slider image of the slider widget.
- * @param deltax the initial X-axis coordinate of the slider, relative to the entire slider widget.
- * @param deltay the initial Y-axis coordinate of the slider, relative to the entire slider widget.
+ * @param currentValue the current value selected by the slider.
  * @param slider_size the size of slider.
  * @param text_size the size of text.
  * @return gui_slider_t*
@@ -156,8 +155,7 @@ gui_slider_t *gui_slider_create(void          *parent,
                                 uint16_t       minValue,
                                 uint16_t       maxValue,
                                 void          *slider_img,
-                                int16_t        deltax,
-                                int16_t        deltay,
+                                uint16_t       currentValue,
                                 int16_t        slider_size,
                                 int16_t        text_size);
 

@@ -104,8 +104,8 @@ static void gui_slider_prepare(gui_obj_t *obj)
 
     if (this->dragging)
     {
-        int newSliderX = tp->x + tp->deltaX - this->x - this->deltax - this->slider_size / 2;
-        int newSliderY = tp->y + tp->deltaY - this->y - this->deltay - this->slider_size / 2;
+        int newSliderX = tp->x + tp->deltaX - this->x - this->slider_size / 2;
+        int newSliderY = tp->y + tp->deltaY - this->y - this->slider_size / 2;
 
         newSliderX = newSliderX > (this->w - this->slider_size) ? (this->w - this->slider_size) :
                      newSliderX;
@@ -163,8 +163,7 @@ static void gui_slider_ctor(gui_slider_t  *this,
                             uint16_t       minValue,
                             uint16_t       maxValue,
                             void          *slider_img,
-                            int16_t        deltax,
-                            int16_t        deltay,
+                            uint16_t       currentValue,
                             int16_t        slider_size,
                             int16_t        text_size)
 {
@@ -184,13 +183,14 @@ static void gui_slider_ctor(gui_slider_t  *this,
     this->h = h;
     this->minValue = minValue;
     this->maxValue = maxValue;
-    this->sliderX = deltax;
-    this->sliderY = deltay;
-    this->slider_size = slider_size;
-
-    this->currentValue = minValue;
+    this->currentValue = currentValue;
     this->preValue = this->currentValue;
+    this->slider_size = slider_size;
     this->text_size = text_size;
+
+    this->deltax = ((this->currentValue - this->minValue) * (this->w - this->slider_size)) /
+                   (this->maxValue - this->minValue);
+    this->deltay = this->h / 2 - this->slider_size / 2;
 
 }
 /*============================================================================*
@@ -207,8 +207,7 @@ gui_slider_t *gui_slider_create(void          *parent,
                                 uint16_t       minValue,
                                 uint16_t       maxValue,
                                 void          *slider_img,
-                                int16_t        deltax,
-                                int16_t        deltay,
+                                uint16_t       currentValue,
                                 int16_t        slider_size,
                                 int16_t        text_size)
 {
@@ -218,7 +217,7 @@ gui_slider_t *gui_slider_create(void          *parent,
     memset(slider, 0x00, sizeof(gui_slider_t));
 
     gui_slider_ctor(slider, (gui_obj_t *)parent, bg_img, x, y, w, h, minValue, maxValue, slider_img,
-                    deltax, deltay, slider_size, text_size);
+                    currentValue, slider_size, text_size);
 
     gui_list_init(&(GET_BASE(slider)->child_list));
     if ((GET_BASE(slider)->parent) != NULL)

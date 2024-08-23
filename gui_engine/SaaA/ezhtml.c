@@ -3254,12 +3254,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t y = 0;
                     int16_t w = 0;
                     int16_t h = 0;
-                    int16_t deltax = 0;
-                    int16_t deltay = 0;
                     char *slider_picture = NULL;
                     char *bg_picture = NULL;
-                    int16_t minTemp = 0;
-                    int16_t maxTemp = 0;
+                    int16_t minValue = 0;
+                    int16_t maxValue = 0;
+                    int16_t currentValue = 0;
                     int16_t slider_size = 0;
                     int16_t text_size = 0;
                     char *font = NULL;
@@ -3286,14 +3285,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             h = atoi(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "deltax"))
-                        {
-                            deltax = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "deltay"))
-                        {
-                            deltay = atoi(p->attr[++i]);
-                        }
                         else if (!strcmp(p->attr[i], "bgPicture"))
                         {
                             bg_picture = gui_strdup(p->attr[++i]);
@@ -3304,11 +3295,15 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         }
                         else if (!strcmp(p->attr[i], "minValue"))
                         {
-                            minTemp = atoi(p->attr[++i]);
+                            minValue = atoi(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "maxValue"))
                         {
-                            maxTemp = atoi(p->attr[++i]);
+                            maxValue = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "currentValue"))
+                        {
+                            currentValue = atoi(p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "sliderSize"))
                         {
@@ -3335,8 +3330,8 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         slider_buf = gui_get_file_address(slider_picture);
                     }
 
-                    parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minTemp, maxTemp, slider_buf,
-                                                       deltax, deltay, slider_size, text_size);
+                    parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minValue, maxValue, slider_buf,
+                                                       currentValue, slider_size, text_size);
                     void *addr = gui_get_file_address(font);
                     gui_slider_t *slider = (gui_slider_t *)parent;
                     gui_text_type_set(slider->currentValue_text, addr, FONT_SRC_MEMADDR);

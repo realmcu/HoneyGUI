@@ -23,12 +23,11 @@
         y="180"
         w="236"
         h="64"
-        deltax="0"
-        deltay="0"
         bgPicture="app/box/resource/lamp/color_temperature.bin"
         sliderPicture="app/box/resource/lamp/circle.bin"
         minValue="3700"
         maxValue="6500"
+        currentValue="5000"
         sliderSize="23"
         textSize="16"
         font="app/box/resource/font/arialbd_size16_bits4_font.bin">slider_ct
