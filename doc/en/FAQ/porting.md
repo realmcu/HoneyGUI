@@ -22,10 +22,6 @@ If SoC not support FPU, some header and code should not include by macro, exampl
 
 SoC need to read image and font resource from flash by file system which should set a start address that is consistent with address in User Data generation script, GUI has supplied the related file which is 'romfs.c' where the start address is `ROMFS_ADDR`.
 
-## Realloc function
-
-GUI need this function, but it would bring hardfault if using C library api. APP could use malloc api instead of realloc.
-
 ## Flash setting
 
 Flash speed mode should set to 4 bit mode; flash clock should set to a higher value based on chip capabilities.
