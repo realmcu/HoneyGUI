@@ -525,7 +525,7 @@ void app_benchmark_start(void)
     rtk_lcd_hal_set_TE_type(LCDC_TE_TYPE_NO_TE);
 #endif
     /*free all tabs before switch gui app*/
-    benchmark_free_all_other_mgrs();
+    app_gui_main_free();
     //to do
     gui_switch_app(get_app_watch_ui(), get_app_benchmark());
 }

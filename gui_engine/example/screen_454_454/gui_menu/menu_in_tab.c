@@ -45,6 +45,10 @@ static int window_index;
 #define SCROLLBAR_SIZE 14
 const static void *scrollbar_array[SCROLLBAR_SIZE];
 
+#define GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(HANDLE_FUNC, HANDLE_NEXT_FUNC)\
+    app_gui_main_free();\
+    GUI_APP_SWAP_HANDLE(HANDLE_FUNC, HANDLE_NEXT_FUNC)\
+
 static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 {
     if (obj != NULL)
@@ -402,43 +406,43 @@ static void menu_cb(gui_obj_t *obj)
 /* In the button click callback, execute the next app startup.*/
 static void stopwatch_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_STOPWATCH))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_STOPWATCH))
 }
 static void map_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MAP))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_MAP))
 }
 static void card_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CARDVIEW))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CARDVIEW))
 }
 static void box2d_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_BOX2D))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_BOX2D))
 }
 static void compass_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_COMPASS))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_COMPASS))
 }
 static void volume_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_VOLUME))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_VOLUME))
 }
 static void cycle_tracking_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CYCLE_TRACKING))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CYCLE_TRACKING))
 }
 static void setting_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_SETTING))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_SETTING))
 }
 static void web_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_WEB))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_WEB))
 }
 static void block_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_BLOCK))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_BLOCK))
 }
 static void page_dtor(gui_obj_t *obj)
 {
@@ -448,11 +452,11 @@ static void page_dtor(gui_obj_t *obj)
 }
 static void fruit_ninja_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_FRUIT_NINJA))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_FRUIT_NINJA))
 }
 static void calculator_cb()
 {
-    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CALCULATOR))
+    GUI_APP_SWAP_HANDLE_WITH_APP_GUI_MAIN_FREE(get_app_watch_ui(), GUI_APP_HANDLE(APP_CALCULATOR))
 }
 // Define an array for window list, containing 15 windows
 static gui_win_t *win_list_array[15];

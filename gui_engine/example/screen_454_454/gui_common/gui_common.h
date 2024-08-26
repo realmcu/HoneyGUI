@@ -60,6 +60,7 @@ uint8_t *gui_get_create_connect_by_user_addr(void);
 int app_tab_manager_ctor(void *parent, app_tab_t *tab);
 int app_tab_manager_free(app_tab_t *tab);
 int app_tab_manager_switch(app_tab_t *tab);
+void app_gui_main_free(void);
 
 
 #ifdef __cplusplus
