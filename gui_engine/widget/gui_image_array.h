@@ -51,13 +51,24 @@ extern "C" {
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
+struct gui_image_array_scope
+{
+    uint16_t scope_x1;
+    uint16_t scope_x2;
+    uint16_t scope_y1;
+    uint16_t scope_y2;
+    int16_t ax, ay, w;
+};
+
 typedef struct gui_image_array
 {
     gui_obj_t base;
     draw_img_t **draw_img;
+    struct gui_image_array_scope **scope;
     void **image_data;
     int array_count;
     uint8_t checksum;
+    bool parent_scope, scope_flag;
 } gui_image_array_t;
 
 /** End of WIDGET_Exported_Types

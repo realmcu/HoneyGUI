@@ -1047,7 +1047,10 @@ static void stop_watch_win_overwrite(gui_obj_t *win)
                 {
                     index += time_array_size;
                 }
-                sprintf(text, "%d", time_array[index]);
+
+                sprintf(text, "%02ld", time_array[index]);
+
+
                 render_number(text, (void *)text_widget_array[i]);
             }
         }
@@ -1134,7 +1137,8 @@ static void stop_watch_win_overwrite(gui_obj_t *win)
                 {
                     index += time_array_size;
                 }
-                sprintf(text, "%d", time_array[index]);
+                sprintf(text, "%02ld", time_array[index]);
+
                 render_number(text, (void *)text_widget_array[i]);
             }
         }
@@ -1163,7 +1167,7 @@ static void stop_watch_ml1_0(gui_obj_t *parent)
 
     }
 }
-
+#include "gui_switch.h"
 static void stop_watch_ml1_1(gui_obj_t *parent)
 {
 
@@ -1171,14 +1175,12 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
     const int width = 100;
 
     static gui_win_t *win_array[COUNT];
-
-    gui_win_t *win = gui_win_create(parent, 0, 0, 70, width, gap * (COUNT - 1));
-
-    gui_win_set_scope(win, 1);
-    gui_canvas_rect_create((void *)win, 0, width + 2, 50, 2, gap * (COUNT - 2), APP_COLOR_BLACK);
-    gui_win_t *timer1 = gui_win_create(win, 0, width / 2 - gap / 2, 0, width, gap * (COUNT - 1));
+    gui_win_t *scope = gui_win_create(parent, 0, 0, 40, width, gap * (COUNT - 2) - 25);
+    gui_win_set_scope(scope, 1);
+    gui_win_t *win = gui_win_create(scope, 0, 0, -50, width, gap * (COUNT - 1));
+    gui_canvas_rect_create((void *)win, 0, width + 2, 50, 2, gap * (COUNT - 2) - 25, APP_COLOR_BLACK);
+    gui_win_t *timer1 = gui_win_create(win, 0, width / 2 - gap / 2 + 10, 0, width, gap * (COUNT - 1));
     gui_win_set_animate(win, 1000, -1, stop_watch_win_overwrite, timer1);
-
 
     for (size_t i = 0; i < COUNT; i++)
     {
@@ -1187,7 +1189,10 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
         {
             char *text = text_array[i];
             memset(text, 0, sizeof(text_array[i]));
-            sprintf(text, "%d", i);
+
+            sprintf(text, "%02ld", i);
+
+
             switch (NUMBER_RENDER)
             {
             case NUMBER_TEXT:
@@ -1198,7 +1203,7 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
                     gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
                     void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
                     gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-                    gui_text_mode_set(t, CENTER);
+                    gui_text_mode_set(t, LEFT);
                     text_widget_array[i] = GUI_BASE(t);
                 }
                 break;
@@ -1231,8 +1236,13 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
     }
 
 
-    gui_img_t *img = gui_img_create_from_mem(parent, 0, STOPWATCH_BIN, 0, 0, 0, 0);
+    gui_img_t *img = gui_img_create_from_mem(scope, 0, STOPWATCHMASK_BIN, 0, 0, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+    gui_switch_t *sw = gui_switch_create(parent, 454 / 2 - 150 / 2, 300, 150, 100, STARTBUTTON_BIN,
+                                         STOPBUTTON_BIN);
+    gui_img_set_mode(sw->switch_picture, IMG_SRC_OVER_MODE);
+
 }
 static void win_stop_watch_cb(void *null1, void *null2, void *param)
 {

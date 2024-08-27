@@ -570,6 +570,15 @@ static void win_list_overwrite(void **param, gui_obj_t *win_aniamte)
     {
         return;
     }
+    if (wheel->pressed)
+    {
+        wheel_take_over = 1;
+    }
+    if (wheel->released)
+    {
+        wheel_take_over = 0;
+        history_y = touch_y;
+    }
 
     // If the wheel has not taken over touch input
     if (!wheel_take_over)
@@ -713,6 +722,40 @@ static void win_list_overwrite(void **param, gui_obj_t *win_aniamte)
             history_y = touch_y;
         }
     }
+    else
+    {
+        touch_y = history_y + wheel->deltaY;
+        // Calculate the offset for the time array and the widget offset
+        time_array_offset = -(touch_y / win_list_gap % array_length);
+        int widget_offset = touch_y % win_list_gap;
+
+        // Set the Y coordinate of the window list
+        GUI_BASE(win_list)->y = widget_offset;
+        // Hide all items in the window list
+        for (size_t i = 0; i < array_length; i++)
+        {
+            GUI_BASE(win_list_array[i])->not_show = 1;
+        }
+
+        // Calculate and display the currently visible window items
+        for (size_t i = 0; i < gui_get_screen_height() / win_list_gap + 3; i++)
+        {
+            int index = time_array_offset + i;
+            if (index >= array_length)
+            {
+                index -= array_length;
+            }
+            if (index < 0)
+            {
+                index += array_length;
+            }
+
+            GUI_BASE(win_list_array[index])->y = i * win_list_gap;
+            GUI_BASE(win_list_array[index])->not_show = 0;
+        }
+    }
+
+
     static uint8_t checksum;
     uint8_t last = checksum;
     checksum = 0;
