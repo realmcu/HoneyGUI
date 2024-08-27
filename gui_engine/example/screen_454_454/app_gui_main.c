@@ -17,6 +17,7 @@
 #include "gui_win.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
+#include "gui_common.h"
 #include <stdio.h>
 #ifdef _ENABLE_RTK_SOC_WATCH_
 #include "wdg.h"
@@ -61,11 +62,14 @@ gui_app_t *get_app_watch_ui(void)
 {
     return &app_watch_ui;
 }
-
+static void dtor()
+{
+    app_gui_main_free();
+}
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_log("design_app_watch_ui\n");
-
+    app->dtor = dtor;
     gui_task_ext_execution_sethook(gui_task_kick_wdg);
 
     gui_font_mem_init(FONT_BIN);
