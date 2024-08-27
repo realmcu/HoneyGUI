@@ -87,22 +87,139 @@ struct widget_create widget[] =
     {"slider", SLIDER},
     {"onChange", MACRO_ONCHANGE},
 };
-static void img_rotate_cb(gui_img_t *img)
-{
-    gui_img_translate(img, img->base.w / 2,
-                      img->base.h);
-
-    gui_img_rotation(img, 360 * img->animate->progress_percent, img->base.w / 2,
-                     img->base.h);
-}
 
 typedef struct
 {
+    int x;
+    int y;
+    float scale_x;
+    float scale_y;
+    float scale_x_from;
+    float scale_y_from;
+    uint8_t opacity;
+    uint8_t opacity_from;
     void **image_arr;
     int image_count;
     char *img_name;
+    char *animate_type;
     gui_img_t *img;
 } image_animate_params_t;
+
+static void img_rotate_cb(image_animate_params_t *animate_params)
+{
+    gui_img_translate(animate_params->img, animate_params->img->base.w / 2,
+                      animate_params->img->base.h / 2);
+
+    gui_img_rotation(animate_params->img, 360 * animate_params->img->animate->progress_percent,
+                     animate_params->img->base.w / 2,
+                     animate_params->img->base.h / 2);
+}
+
+static void img_translate_cb(image_animate_params_t *animate_params)
+{
+    float t_x = animate_params->img->animate->progress_percent * (animate_params->x -
+                                                                  animate_params->img->base.x);
+    float t_y = animate_params->img->animate->progress_percent * (animate_params->y -
+                                                                  animate_params->img->base.y);
+
+    gui_img_translate(animate_params->img, t_x, t_y);
+}
+
+static void img_scale_cb(image_animate_params_t *animate_params)
+{
+    float scale_x = animate_params->scale_x_from - animate_params->img->animate->progress_percent *
+                    (animate_params->scale_x_from - animate_params->scale_x);
+    float scale_y = animate_params->scale_y_from - animate_params->img->animate->progress_percent *
+                    (animate_params->scale_y_from - animate_params->scale_y);
+
+    gui_img_scale(animate_params->img, scale_x, scale_y);
+}
+
+static void img_opacity_cb(image_animate_params_t *animate_params)
+{
+    uint8_t opacity = animate_params->opacity_from - animate_params->img->animate->progress_percent *
+                      (animate_params->opacity_from - animate_params->opacity);
+
+    gui_img_set_opacity(animate_params->img, opacity);
+}
+
+static void multi_animate_callback(void *params)
+{
+    image_animate_params_t *animate_params = (image_animate_params_t *)params;
+
+    if (!strcmp(animate_params->animate_type, "rotate"))
+    {
+        img_rotate_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate"))
+    {
+        img_translate_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "scale"))
+    {
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "opacity"))
+    {
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_scale"))
+    {
+        img_rotate_cb(params);
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_opacity"))
+    {
+        img_rotate_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate_scale"))
+    {
+        img_translate_cb(params);
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate_opacity"))
+    {
+        img_translate_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "scale_opacity"))
+    {
+        img_scale_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate_scale"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate_opacity"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate_scale_opacity"))
+    {
+        img_translate_cb(params);
+        img_scale_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate_scale_opacity"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+        img_scale_cb(params);
+        img_opacity_cb(params);
+    }
+}
+
 static void image_animate_callback(void *params)
 {
     static int current_image_index = 0;
@@ -2905,6 +3022,9 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *to = 0;
                     char *dur = 0;
                     char *repeatCount = 0;
+                    float scale_x = 1;
+                    float scale_y = 1;
+                    uint8_t opacity = 255;
                     size_t i = 0;
                     while (true)
                     {
@@ -2934,6 +3054,18 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             repeatCount = (p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "scaleX"))
+                        {
+                            scale_x = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "scaleY"))
+                        {
+                            scale_y = atof(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "opacity"))
+                        {
+                            opacity = atoi(p->attr[++i]);
+                        }
                         i++;
                     }
                     if (type && from && to && dur && repeatCount)
@@ -2942,94 +3074,105 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         int from_num[3]; GUI_UNUSED(from_num);
                         int to_num[3]; GUI_UNUSED(to_num);
                         int repeat_num = 0;
-                        if (!strcmp(type, "rotate"))
+
                         {
+                            //from
+                            int from_length = strlen(from);
+                            int index[4];
+                            index[0] = 0;
+                            int idcount = 1;
+                            for (size_t i = 0; i < from_length + 1; i++)
                             {
-                                //from
-                                int from_length = strlen(from);
-                                int index[4];
-                                index[0] = 0;
-                                int idcount = 1;
-                                for (size_t i = 0; i < from_length + 1; i++)
+                                if (from[i] == ' ' || from[i] == '\0')
                                 {
-                                    if (from[i] == ' ' || from[i] == '\0')
-                                    {
-                                        index[idcount] = i;
-                                        int num_length = index[idcount] - index[idcount - 1] + 1;
-                                        char num_char[num_length + 1];
-                                        num_char[num_length] = '\0';
-                                        memcpy(num_char, from + index[idcount - 1], num_length);
-                                        from_num[idcount - 1] = atoi(num_char);
-                                        idcount++;
-                                    }
-
+                                    index[idcount] = i;
+                                    int num_length = index[idcount] - index[idcount - 1] + 1;
+                                    char num_char[num_length + 1];
+                                    num_char[num_length] = '\0';
+                                    memcpy(num_char, from + index[idcount - 1], num_length);
+                                    from_num[idcount - 1] = atoi(num_char);
+                                    idcount++;
                                 }
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+
                             }
-                            {
-                                //to
-                                int from_length = strlen(to);
-                                int index[4];
-                                index[0] = 0;
-
-                                int idcount = 1;
-                                for (size_t i = 0; i < from_length + 1; i++)
-                                {
-                                    if (to[i] == ' ' || to[i] == '\0')
-                                    {
-                                        index[idcount] = i;
-                                        int num_length = index[idcount] - index[idcount - 1] + 1;
-                                        char num_char[num_length + 1];
-                                        num_char[num_length] = '\0';
-                                        memcpy(num_char, to + index[idcount - 1], num_length);
-                                        to_num[idcount - 1] = atoi(num_char);
-                                        idcount++;
-                                    }
-
-                                }
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
-                            }
-                            {
-                                //dur
-                                int from_length = strlen(dur);
-                                int ms = 0;
-                                for (size_t i = 0; i < from_length + 1; i++)
-                                {
-                                    if (dur[i] == 'm')
-                                    {
-                                        ms = 1;
-                                        break;
-                                    }
-
-                                }
-                                dur_num = atoi(dur);
-                                if (!ms)
-                                {
-                                    dur_num = dur_num * 1000;
-                                }
-
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
-                            }
-                            {
-                                //repeatCount
-                                int repeatCount_num = 0;
-                                if (!strcmp(repeatCount, "indefinite"))
-                                {
-                                    repeatCount_num = -1;
-                                }
-                                else
-                                {
-                                    repeatCount_num = atoi(repeatCount);
-                                }
-                                repeat_num = repeatCount_num;
-
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
-                            }
+                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                         }
                         {
-                            gui_img_set_animate((gui_img_t *)parent, dur_num, repeat_num, img_rotate_cb, parent);
+                            //to
+                            int from_length = strlen(to);
+                            int index[4];
+                            index[0] = 0;
+
+                            int idcount = 1;
+                            for (size_t i = 0; i < from_length + 1; i++)
+                            {
+                                if (to[i] == ' ' || to[i] == '\0')
+                                {
+                                    index[idcount] = i;
+                                    int num_length = index[idcount] - index[idcount - 1] + 1;
+                                    char num_char[num_length + 1];
+                                    num_char[num_length] = '\0';
+                                    memcpy(num_char, to + index[idcount - 1], num_length);
+                                    to_num[idcount - 1] = atoi(num_char);
+                                    idcount++;
+                                }
+
+                            }
+                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                        }
+                        {
+                            //dur
+                            int from_length = strlen(dur);
+                            int ms = 0;
+                            for (size_t i = 0; i < from_length + 1; i++)
+                            {
+                                if (dur[i] == 'm')
+                                {
+                                    ms = 1;
+                                    break;
+                                }
+
+                            }
+                            dur_num = atoi(dur);
+                            if (!ms)
+                            {
+                                dur_num = dur_num * 1000;
+                            }
+
+                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                        }
+                        {
+                            //repeatCount
+                            int repeatCount_num = 0;
+                            if (!strcmp(repeatCount, "indefinite"))
+                            {
+                                repeatCount_num = -1;
+                            }
+                            else
+                            {
+                                repeatCount_num = atoi(repeatCount);
+                            }
+                            repeat_num = repeatCount_num;
+
+                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                         }
 
+                        image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
+                        params->img = (gui_img_t *)parent;
+                        params->animate_type = type;
+
+                        params->x = to_num[1];
+                        params->y = to_num[2];
+
+                        params->scale_x = scale_x;
+                        params->scale_y = scale_y;
+                        params->opacity = opacity;
+
+                        params->scale_x_from = params->img->scale_x;
+                        params->scale_y_from = params->img->scale_y;
+                        params->opacity_from = params->img->opacity_value;
+
+                        gui_img_set_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params);
 
                     }
                 }
