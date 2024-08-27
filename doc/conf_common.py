@@ -97,6 +97,8 @@ html_theme_path = ["_themes"]
 html_theme_options = {
     'collapse_navigation' : False,
     'logo_only': True,
+    # 在侧边栏显示版本
+    'display_version': True,
 }
 
 
