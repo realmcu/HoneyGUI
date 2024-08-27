@@ -5,7 +5,7 @@ Users can create various controls on the card. Before creating the card widget, 
 ## Usage
 
 ### Create card widget
-Using [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#api) to create card widget
+Using [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#gui_card_create) to create card widget
 
 ## Example
 

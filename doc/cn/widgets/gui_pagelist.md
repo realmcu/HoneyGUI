@@ -8,26 +8,26 @@
 
 ### 增加页面控件
 
-开发者可以通过 [gui_pagelist_increase_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#api)来增加真实列表的数量。
+开发者可以通过 [gui_pagelist_increase_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_increase_real_list_max)来增加真实列表的数量。
 
 ### 减少页面控件
-开发者可以使用[gui_pagelist_decrease_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#api)来减少真实列表的数量。
+开发者可以使用[gui_pagelist_decrease_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_decrease_real_list_max)来减少真实列表的数量。
 
 ### 添加回调函数
 
-此API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#api) 用于在页列表上下滑动时添加更新回调，通常用于更新文本。
+此API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#gui_pagelist_add_list_update_cb) 用于在页列表上下滑动时添加更新回调，通常用于更新文本。
 
 ### 设定属性
 
-开发者可以调用 [gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max, int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last)](#api)来设定页面列表控件的属性。
+开发者可以调用 [gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max, int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last)](#gui_pagelist_set_att)来设定页面列表控件的属性。
 
 ### 增加图片
 
-通过此API [gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode)](#api), 可以为pagelist控件添加滚动条图像，文件来源可以是内存地址。
+通过此API [gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode)](#gui_pagelist_add_scroll_bar), 可以为pagelist控件添加滚动条图像，文件来源可以是内存地址。
 
 ### 创建控件
 
-开发者可以利用 [gui_pagelist_create(parent, filename, x, y, w, h)](#api) 函数来创建一个页面列表控件。它的高度将根据子控件的总高度进行设置。
+开发者可以利用 [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pagelist_create) 函数来创建一个页面列表控件。它的高度将根据子控件的总高度进行设置。
 
 ## 示例
 

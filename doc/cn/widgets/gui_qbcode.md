@@ -7,7 +7,7 @@
 
 ### 创建控件
 
-使用 [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, T_QBCODE_DISPLAY_TYPE type, T_QBCODE_ENCODE_TYPE encodeType)](#api) 函数创建一个二维码或者条形码控件，具体创建的是二维码控件还是条形码控件，由参数`encodeType`决定。`encodeType` 枚举类型如下：
+使用 [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, T_QBCODE_DISPLAY_TYPE type, T_QBCODE_ENCODE_TYPE encodeType)](#gui_qbcode_create) 函数创建一个二维码或者条形码控件，具体创建的是二维码控件还是条形码控件，由参数`encodeType`决定。`encodeType` 枚举类型如下：
 
 ```eval_rst
 
@@ -20,7 +20,7 @@
 
 ### 设置控件的尺寸和边框
 
-使用 [void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, uint8_t border_size)](#api) 函数来设置控件的尺寸和边框。
+使用 [void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, uint8_t border_size)](#gui_qbcode_config) 函数来设置控件的尺寸和边框。
 
 ### 二维码编码注释
 

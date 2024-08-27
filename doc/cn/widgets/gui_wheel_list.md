@@ -6,7 +6,7 @@
 
 ### 创建一个旋转列表
 
-[gui_wheel_list_t *gui_wheel_list_create(void *parent, uint8_t layer, uint8_t radius, uint8_t distence)](#api) 用于创建一个旋转列表组件。
+[gui_wheel_list_t *gui_wheel_list_create(void *parent, uint8_t layer, uint8_t radius, uint8_t distence)](#gui_wheel_list_create) 用于创建一个旋转列表组件。
 
 `layer` 是圆轮的层数，1表示除了中心图标外还有1圈外部图标。
 
@@ -22,7 +22,7 @@
 #### 默认方式
 
 创建旋转列表组件后，可以使用默认接口添加图标。在轮子中，可以从内向外一层层添加相应的图标。
-[void gui_wheel_list_add_icon_default(gui_wheel_list_t *this, void *icon_addr,gui_event_cb_t event_cb)](#api)
+[void gui_wheel_list_add_icon_default(gui_wheel_list_t *this, void *icon_addr,gui_event_cb_t event_cb)](#gui_wheel_list_add_icon_default)
 
 `this` 是组件的指针。
 
@@ -124,7 +124,7 @@ static void app_launcher_ui_design(gui_app_t *app)
 #### 自定义方式
 
 创建旋转列表组件后，可以使用自定义接口添加图标。在轮子中，可以从内向外一层层添加相应的图标。
-[gui_wheel_list_set_icon(gui_wheel_list_t *this, void *icon_addr, gui_event_cb_t event_cb, uint8_t layer, uint8_t index)](#api)
+[gui_wheel_list_set_icon(gui_wheel_list_t *this, void *icon_addr, gui_event_cb_t event_cb, uint8_t layer, uint8_t index)](#gui_wheel_list_set_icon)
 
 `this` 是组件的指针。
 

@@ -6,20 +6,20 @@ The simple img widget is a simplified version of the img control, lacking transf
 
 ### Create widget
 
-You can use [gui_simple_img_create(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h, IMG_SOURCE_MODE_TYPE src_mode_type)](#api) to create an simple  image widget. If src_mode_type is IMG_SRC_MEMADDR, the image is created from memory. If src_mode_type is IMG_SRC_FILESYS, the image is created from the file system using the the image path as `addr`.
+You can use [gui_simple_img_create(void *parent,  const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h, IMG_SOURCE_MODE_TYPE src_mode_type)](#gui_simple_img_create) to create an simple  image widget. If src_mode_type is IMG_SRC_MEMADDR, the image is created from memory. If src_mode_type is IMG_SRC_FILESYS, the image is created from the file system using the the image path as `addr`.
 
 ### Set location
 
-If you need to update the location of image widget, use [gui_simple_img_set_location(gui_img_t *img, uint16_t x, uint16_t y)](#api) to relocate.
+If you need to update the location of image widget, use [gui_simple_img_set_location(gui_img_t *img, uint16_t x, uint16_t y)](#gui_simple_img_set_location) to relocate.
 `x, y` is the new coordinate.
 
 ### Set attribute
 
-You can use [void gui_simple_img_set_attribute(gui_simple_img_t *img, const char *name, void *addr,int16_t x,int16_t y)](#api) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
+You can use [void gui_simple_img_set_attribute(gui_simple_img_t *img, const char *name, void *addr,int16_t x,int16_t y)](#gui_simple_img_set_attribute) to set the attribute of an image widget, replace it with a new image and set a new coordinate.
 
 ### Get height/width
 
-If you want to get the height/width of image widget, you can do so with [gui_simple_img_get_height(gui_simple_img_t *this)](#api) or [gui_simple_img_get_width(gui_simple_img_t *this)](#api).
+If you want to get the height/width of image widget, you can do so with [gui_simple_img_get_height(gui_simple_img_t *this)](#gui_simple_img_get_height) or [gui_simple_img_get_width(gui_simple_img_t *this)](#gui_simple_img_get_width).
 
 ## Example
 

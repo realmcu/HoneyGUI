@@ -4,10 +4,10 @@
 
 ## 用法
 ### 创建控件
-使用[gui_canvas_create(parent, name, addr, x, y, w, h)](#api)创建一个画布。其中，`addr`可以是一个空指针（NULL）。
+使用[gui_canvas_create(parent, name, addr, x, y, w, h)](#gui_canvas_create)创建一个画布。其中，`addr`可以是一个空指针（NULL）。
 
 ### 添加回调函数
-使用[gui_canvas_set_canvas_cb(canvas, cb)](#api)设置绘制具体图形的回调函数。
+使用[gui_canvas_set_canvas_cb(canvas, cb)](#gui_canvas_set_canvas_cb)设置绘制具体图形的回调函数。
 
 ## 示例
 ### 圆角矩形

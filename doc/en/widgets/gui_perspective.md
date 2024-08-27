@@ -17,10 +17,10 @@ The perspective is a hexagonal prism-like widget that uses six tabs as column fa
 ```
 
 ### Set image
-The images of cube can be configured by calling [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#api).
+The images of cube can be configured by calling [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#gui_perspective_set_img).
 
 ### Set image mode
-By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, you can change the blend mode of image by calling [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#api).
+By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, you can change the blend mode of image by calling [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#gui_perspective_set_mode).
 
 ```eval_rst
 

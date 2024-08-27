@@ -6,7 +6,7 @@
 ## 用法
 
 ### 创建控件
-开发者可以调用 [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#api) 或者 [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#api)从内存地址创建开关控件，使用[gui_switch_t * gui_switch_create_frome_fs(parent, x, y, w, h, off_pic, on_pic)](#api) 从文件系统创建开关控件。
+开发者可以调用 [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create) 或者 [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_ftl)从内存地址创建开关控件，使用[gui_switch_t * gui_switch_create_frome_fs(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create_frome_fs) 从文件系统创建开关控件。
 可以参考[gui_switch_t](#gui_switch_t)中的具体参数，例如base、switch_picture、on_pic_addr、off_pic_addr等。
 
 <span id = "gui_switch_t">
@@ -28,16 +28,16 @@
 ### 开/关
 
 开发者可以使用以下API来打开或关闭开关控件，并触发事件(由gui_obj_add_event_cb创建)。<br/>
-[gui_switch_turn_on(gui_switch_t *this)](#api) 或者 [gui_switch_turn_off(gui_switch_t *this)](#api)。
+[gui_switch_turn_on(gui_switch_t *this)](#gui_switch_turn_on) 或者 [gui_switch_turn_off(gui_switch_t *this)](#gui_switch_turn_off)。
 
 ### 更新开关状态
 
 如果已经打开/关闭了开关控件，开发者可以通过以下API将状态更新为打开或关闭。<br/>
-[gui_switch_is_on(gui_switch_t *this)](#api) 或者 [gui_switch_is_off(gui_switch_t *this)](#api)。
+[gui_switch_is_on(gui_switch_t *this)](#gui_switch_is_on) 或者 [gui_switch_is_off(gui_switch_t *this)](#gui_switch_is_off)。
 
 ### 改变开关控件状态
 
-开发者可以调用 [gui_switch_change_state(gui_switch_t *this, bool ifon)](#api)来设置开关控件的状态并改变UI，但不会触发任何事件(由gui_obj_add_event_cb创建)。
+开发者可以调用 [gui_switch_change_state(gui_switch_t *this, bool ifon)](#gui_switch_change_state)来设置开关控件的状态并改变UI，但不会触发任何事件(由gui_obj_add_event_cb创建)。
 
 ## 示例
 

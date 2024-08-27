@@ -6,7 +6,7 @@ The qbcode widget is the widget used to create or display qrcode and barcode. Yo
 
 ### create qbcode widget
 
-To create a qbcode widget, you can use the function [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, T_QBCODE_DISPLAY_TYPE type, T_QBCODE_ENCODE_TYPE encodeType)](#api). Whether a qrcode or barcode is created depends on the ```encodeType``` parameter. The ```encodeType``` enumeration types are as follows:
+To create a qbcode widget, you can use the function [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, T_QBCODE_DISPLAY_TYPE type, T_QBCODE_ENCODE_TYPE encodeType)](#gui_qbcode_create). Whether a qrcode or barcode is created depends on the ```encodeType``` parameter. The ```encodeType``` enumeration types are as follows:
 
 ```eval_rst
 
@@ -19,7 +19,7 @@ To create a qbcode widget, you can use the function [gui_qbcode_t *gui_qbcode_cr
 
 ### config qbcode size and border
 
-Use the function [void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, uint8_t border_size)](#api) to set the size and border of qbcode.
+Use the function [void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, uint8_t border_size)](#gui_qbcode_config) to set the size and border of qbcode.
 
 ### qrcode encode notes
 

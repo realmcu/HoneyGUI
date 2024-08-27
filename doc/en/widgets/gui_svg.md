@@ -6,20 +6,20 @@
 
 ## Usage
 ### Creat a svg widget
-You can use [gui_svg_create_from_mem(parent, name, addr, size, x, y, w, h)](#api) to create an SVG widget from memory, or use [gui_svg_create_from_file(parent, name, filename, x, y, w, h)](#api) to create from file.
+You can use [gui_svg_create_from_mem(parent, name, addr, size, x, y, w, h)](#gui_svg_create_from_mem) to create an SVG widget from memory, or use [gui_svg_create_from_file(parent, name, filename, x, y, w, h)](#gui_svg_create_from_file) to create from file.
 This `w/h` are the width and height of the SVG widget, not SVG image. This `size` is the data size of the SVG image that must be filled in.
 
 ### SVG rotation
-Using the [gui_svg_rotation(svg, degrees, c_x, c_y)](#api) the image will be rotated by an angle of `degree`. The `(c_x, c_y)` is relative to the origin of the SVG widget, not the origin of the screen.
+Using the [gui_svg_rotation(svg, degrees, c_x, c_y)](#gui_svg_rotation) the image will be rotated by an angle of `degree`. The `(c_x, c_y)` is relative to the origin of the SVG widget, not the origin of the screen.
 
 ### SVG scale
-If you need the object size to be updated to transformed size set [gui_svg_scale(svg, scale_x, scale_y)](#api).
+If you need the object size to be updated to transformed size set [gui_svg_scale(svg, scale_x, scale_y)](#gui_svg_scale).
 
 ### SVG translate
-The image will be translated by using the [gui_svg_translate(svg, t_x, t_y)](#api).
+The image will be translated by using the [gui_svg_translate(svg, t_x, t_y)](#gui_svg_translate).
 
 ### Opacity
-If you want the image to fade or opacity set [gui_svg_set_opacity(svg, opacity_value)](#api).
+If you want the image to fade or opacity set [gui_svg_set_opacity(svg, opacity_value)](#gui_svg_set_opacity).
 
 ## Example
 

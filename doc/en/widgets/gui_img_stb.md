@@ -8,11 +8,11 @@ In the STB image library, STB is not an acronym; it is actually a naming convent
 
 ### Create widget
 
-You can use [gui_img_stb_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) to create an STB image widget from memory.Please confirm that the type and size are correct.
+You can use [gui_img_stb_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#gui_img_stb_create_from_mem) to create an STB image widget from memory.Please confirm that the type and size are correct.
 
 ### Set attribute
 
-You can use [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) to set the attribute of an STB image widget, replace it with a new file and set a new coordinate.
+You can use [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#gui_img_stb_set_attribute) to set the attribute of an STB image widget, replace it with a new file and set a new coordinate.
 
 ## Example
 

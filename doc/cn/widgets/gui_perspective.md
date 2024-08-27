@@ -20,11 +20,11 @@
 
 ### 设置透视控件的图片
 
-使用 [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#api) 函数设置透视控件的图片。
+使用 [void gui_perspective_set_img(gui_perspective_t *perspective, gui_perspective_imgfile_t *img_file)](#gui_perspective_set_img) 函数设置透视控件的图片。
 
 ### 设置图片混合模式
 
-默认情况下，透视控件的图像混合模式为`IMG_SRC_OVER_MODE`，调用 [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#api) 函数可以设置图像的混合模式。混合模式`BLEND_MODE_TYPE`枚举类型如下：
+默认情况下，透视控件的图像混合模式为`IMG_SRC_OVER_MODE`，调用 [void gui_perspective_set_mode(gui_perspective_t *perspective, uint8_t img_index, BLEND_MODE_TYPE mode)](#gui_perspective_set_mode) 函数可以设置图像的混合模式。混合模式`BLEND_MODE_TYPE`枚举类型如下：
 
 ```eval_rst
 

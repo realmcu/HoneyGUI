@@ -4,10 +4,10 @@ The canvas widget is the basic widget used to drawing graphics in nanovg.***Limi
 
 ## Usage
 ### Creat a canvas
-[gui_canvas_create(parent, name, addr, x, y, w, h)](#api) creates a canvas. This `addr` can be a null pointer.
+[gui_canvas_create(parent, name, addr, x, y, w, h)](#gui_canvas_create) creates a canvas. This `addr` can be a null pointer.
 
 ### Add callback function
-[gui_canvas_set_canvas_cb(canvas, cb)](#api) sets the callback function for drawing specific shapes.
+[gui_canvas_set_canvas_cb(canvas, cb)](#gui_canvas_set_canvas_cb) sets the callback function for drawing specific shapes.
 
 ## Example
 ### Rounded Rectangle

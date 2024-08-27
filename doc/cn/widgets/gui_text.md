@@ -30,9 +30,9 @@
 
 字体文件可以是标准的.ttf文件或自定义的.bin文件。字体文件需要提前初始化，且必须为文本控件设置字体类型。
 
-+ 初始化自定义bin字体文件，需要调用 [gui_font_mem_init(font_bin_addr)](#api)。
++ 初始化自定义bin字体文件，需要调用 [gui_font_mem_init(font_bin_addr)](#gui_font_mem_init)。
 
-+ 初始化标准TTF文件来绘制文本，需要调用 [gui_font_stb_init(font_ttf_addr)](#api)。
++ 初始化标准TTF文件来绘制文本，需要调用 [gui_font_stb_init(font_ttf_addr)](#gui_font_stb_init)。
 
 所有自定义bin字体文件都可以从RTK FAE那里获得。
 
@@ -40,7 +40,7 @@
 
 ### 创建文本控件
 
-开发者可以调用 [gui_text_create(parent, filename, x, y, w, h)](#api)来创建文本控件。创建后，控件的坐标和文本框的大小已经确定。这些属性也可以随时修改。
+开发者可以调用 [gui_text_create(parent, filename, x, y, w, h)](#gui_text_create)来创建文本控件。创建后，控件的坐标和文本框的大小已经确定。这些属性也可以随时修改。
 
 注意：文本控件的大小应大于要显示的字符串，超出范围的文本将被隐藏。
 
@@ -48,40 +48,40 @@
 
 #### 设置文本
 
-开发者可以调用[gui_text_set(this, text, text_type, color, length, font_size)](#api)来设置文本控件文本、文本类型、颜色、长度和文本字体大小。
+开发者可以调用[gui_text_set(this, text, text_type, color, length, font_size)](#gui_text_set)来设置文本控件文本、文本类型、颜色、长度和文本字体大小。
 
 注意： 文本长度必须与设置的字符长度相同，文本字体大小必须与加载的字体文件的大小相同。
 
 #### 字体类型
 
-文本控件支持类型设置。开发者可以调用[gui_text_type_set(this, type)](#api)来设置类型。类型为bin/ttf文件的地址。
+文本控件支持类型设置。开发者可以调用[gui_text_type_set(this, type)](#gui_text_type_set)来设置类型。类型为bin/ttf文件的地址。
 
 
 #### 文本内容
 
-开发者可以调用[gui_text_content_set(this, text, length)](#api)来设置文本控件需要显示的内容。
+开发者可以调用[gui_text_content_set(this, text, length)](#gui_text_content_set)来设置文本控件需要显示的内容。
 
 #### 文本编码
 
-文本控件同时支持UTF-8编码和UTF-16编码输入格式，开发者可以使用[gui_text_encoding_set(this, charset)](#api)更改编码方式。
+文本控件同时支持UTF-8编码和UTF-16编码输入格式，开发者可以使用[gui_text_encoding_set(this, charset)](#gui_text_encoding_set)更改编码方式。
 
 #### 文本转换为图片
 
-使用[gui_text_convert_to_img(this, font_img_type)](#api)可以将文本控件中的文本将被转换为图像，存储在内存中，并使用该图像进行呈现。它还支持图像转换，如缩放和旋转。这只适用于位图字体。
+使用[gui_text_convert_to_img(this, font_img_type)](#gui_text_convert_to_img)可以将文本控件中的文本将被转换为图像，存储在内存中，并使用该图像进行呈现。它还支持图像转换，如缩放和旋转。这只适用于位图字体。
 
 注意：因为需要文本控件的内容和字体大小信息，所以应该在set text之后调用它。如果修改了文本的内容、字体大小、位置和其他属性，则需要重用此接口进行转换。
 
 ### 文本输入设置
 
-开发者可以使用函数 [gui_text_input_set(this, inputable)](#api) 设置文本的输入。
+开发者可以使用函数 [gui_text_input_set(this, inputable)](#gui_text_input_set) 设置文本的输入。
 
 ### 设置文本点击事件
 
-开发者可以调用函数 [gui_text_click(this, event_cb, parameter)](#api) 添加文本点击事件。
+开发者可以调用函数 [gui_text_click(this, event_cb, parameter)](#gui_text_click) 添加文本点击事件。
 
 #### 文本模式
 
-文本控件支持七种排版模式，通过[gui_text_mode_set(this, mode)](#api)来设置文本排版模式。
+文本控件支持七种排版模式，通过[gui_text_mode_set(this, mode)](#gui_text_mode_set)来设置文本排版模式。
 
 排版模式如下：
 
@@ -111,11 +111,11 @@
 
 ### 文本移动
 
-开发者可以调用函数 [gui_text_move(this, x, y)](#api) 将文本移动到指定位置，但是x和y不能大于文本控件的w和h。
+开发者可以调用函数 [gui_text_move(this, x, y)](#gui_text_move) 将文本移动到指定位置，但是x和y不能大于文本控件的w和h。
 
 ### 设置动画
 
-开发者可以调用函数 [gui_text_set_animate(o, dur, repeat_count, callback, p)](#api) 来设置动画并在相应的回调函数中实现动画效果。
+开发者可以调用函数 [gui_text_set_animate(o, dur, repeat_count, callback, p)](#gui_text_set_animate) 来设置动画并在相应的回调函数中实现动画效果。
 
 ## 示例
 
