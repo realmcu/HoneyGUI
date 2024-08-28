@@ -90,7 +90,7 @@ gui_win_t *gui_win_create(void       *parent,
 /**
  * @brief
  *
- * @param o widget object pointer
+ * @param _this widget object pointer
  * @param dur Animation duration
  * @param repeat_count Repeat play times, -1 means play on repeat forever
  * @param callback animate frame callback
@@ -103,84 +103,84 @@ void gui_win_set_animate(gui_win_t *_this,
                          void      *p);
 
 /**
- * @brief
+ * @brief Register a callback function for the left slide event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_left(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Register a callback function for the right slide event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_right(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Register a callback function for the up slide event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_up(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Register a callback function for the down slide event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_down(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Register a callback function for the press event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_press(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Register a callback function for the release event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_release(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Register a callback function for a long press event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_long(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Register a callback function for a click event of the win widget
  *
- * @param b
- * @param callback
- * @param parameter
+ * @param _this win pointer
+ * @param callback callback func
+ * @param parameter callback parameter
  */
 void gui_win_click(gui_win_t *_this, void *callback, void *parameter);
 
 /**
- * @brief
+ * @brief Set the hold_tp state
  *
- * @param _this
- * @param hold_tp
+ * @param _this win pointer
+ * @param hold_tp a boolean value to set the state to true or false
  */
-void gui_win_hole_tp(gui_win_t *_this, bool hold_tp);
+void gui_win_hold_tp(gui_win_t *_this, bool hold_tp);
 /**
  * @brief Get the animation progress percentage.
  *
