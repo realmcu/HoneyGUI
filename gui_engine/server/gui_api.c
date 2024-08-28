@@ -71,16 +71,18 @@ struct gui_indev *gui_get_indev(void)
 }
 
 
-#ifndef ENABLE_RTK_GUI_OS_HEAP
 static tlsf_t tlsf = NULL;
-#endif
 static tlsf_t lower_tlsf = NULL;
 
-void gui_os_api_register(struct gui_os_api *info)
+void gui_os_api_register(gui_os_api_t *info)
 {
-#ifndef ENABLE_RTK_GUI_OS_HEAP
-    tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
-#endif
+
+    if ((info->mem_addr != NULL) && (info->mem_size != 0))
+    {
+        tlsf = tlsf_create_with_pool(info->mem_addr, info->mem_size);
+    }
+
+
     if ((info->lower_mem_addr != NULL) && (info->lower_mem_size != 0))
     {
         lower_tlsf = tlsf_create_with_pool(info->lower_mem_addr, info->lower_mem_size);
@@ -254,12 +256,15 @@ void *gui_malloc(size_t n)
         ptr = gui_lower_malloc(n);
         return ptr;
     }
-#ifdef ENABLE_RTK_GUI_OS_HEAP
-    GUI_ASSERT(os_api->f_malloc != NULL);
-    ptr = os_api->f_malloc(n);
-#else
-    ptr = tlsf_malloc(tlsf, n);
-#endif
+    if (tlsf != NULL)
+    {
+        ptr = tlsf_malloc(tlsf, n);
+    }
+    else
+    {
+        GUI_ASSERT(os_api->f_malloc != NULL);
+        ptr = os_api->f_malloc(n);
+    }
     if (ptr == NULL)
     {
         ptr = gui_lower_malloc(n);
@@ -274,41 +279,46 @@ void *gui_malloc(size_t n)
 void *gui_realloc(void *ptr_old, size_t n)
 {
     void *ptr = NULL;
-#ifdef ENABLE_RTK_GUI_OS_HEAP
-    GUI_ASSERT(os_api->f_realloc != NULL);
-    ptr = os_api->f_realloc(ptr_old, n);
-    if (ptr == NULL)
+
+    if (tlsf == NULL)
     {
-        return NULL;
-    }
-    return ptr;
-#else
-    if (
-        (os_api->lower_mem_size != 0) && \
-        ((uint32_t)(uintptr_t)ptr_old >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
-        ((uint32_t)(uintptr_t)ptr_old <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
-         (uint32_t)os_api->lower_mem_size)
-    )
-    {
-        ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
+        GUI_ASSERT(os_api->f_realloc != NULL);
+        ptr = os_api->f_realloc(ptr_old, n);
+        if (ptr == NULL)
+        {
+            return NULL;
+        }
         return ptr;
     }
     else
     {
-        ptr = tlsf_realloc(tlsf, ptr_old, n);
-        if (ptr == NULL)
+        if (
+            (os_api->lower_mem_size != 0) && \
+            ((uint32_t)(uintptr_t)ptr_old >= (uint32_t)(uintptr_t)os_api->lower_mem_addr) && \
+            ((uint32_t)(uintptr_t)ptr_old <= (uint32_t)(uintptr_t)os_api->lower_mem_addr +
+             (uint32_t)os_api->lower_mem_size)
+        )
         {
-            ptr = tlsf_malloc(lower_tlsf, n);
-            memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
-            tlsf_free(tlsf, ptr_old);
+            ptr = tlsf_realloc(lower_tlsf, ptr_old, n);
+            return ptr;
         }
-        // if (ptr == (void *)0x0000000000749D30)
-        // {
-        //     GUI_ASSERT(NULL != NULL);
-        // }
-        return ptr;
+        else
+        {
+            ptr = tlsf_realloc(tlsf, ptr_old, n);
+            if (ptr == NULL)
+            {
+                ptr = tlsf_malloc(lower_tlsf, n);
+                memcpy(ptr, ptr_old, tlsf_block_size(ptr_old));
+                tlsf_free(tlsf, ptr_old);
+            }
+            // if (ptr == (void *)0x0000000000749D30)
+            // {
+            //     GUI_ASSERT(NULL != NULL);
+            // }
+            return ptr;
+        }
     }
-#endif
+
 }
 
 void gui_free(void *rmem)
@@ -325,16 +335,18 @@ void gui_free(void *rmem)
         gui_lower_free(rmem);
         return;
     }
-#ifdef ENABLE_RTK_GUI_OS_HEAP
-    GUI_ASSERT(os_api->f_free != NULL);
-    os_api->f_free(rmem);
-#else
-    tlsf_free(tlsf, rmem);
-#endif
+    if (tlsf != NULL)
+    {
+        tlsf_free(tlsf, rmem);
+    }
+    else
+    {
+        GUI_ASSERT(os_api->f_free != NULL);
+        os_api->f_free(rmem);
+    }
 }
 
 static uint32_t total_used_size = 0;
-#ifndef ENABLE_RTK_GUI_OS_HEAP
 static void gui_walker(void *ptr, size_t size, int used, void *user)
 {
     if (used)
@@ -345,19 +357,15 @@ static void gui_walker(void *ptr, size_t size, int used, void *user)
     gui_log("\t%p %s size: %x; total = %d\n", ptr, used ? "used" : "free", (unsigned int)size,
             total_used_size);
 }
-#endif
 
 void gui_mem_debug(void)
 {
     total_used_size = 0;
     GUI_UNUSED(total_used_size);
-#ifdef ENABLE_RTK_GUI_OS_HEAP
-    gui_log("can't use thie func");
-#else
+    GUI_ASSERT(tlsf != NULL);
     gui_log("\t\n");
     tlsf_walk_pool(tlsf_get_pool(tlsf), gui_walker, &total_used_size);
     gui_log("\t\n");
-#endif
     total_used_size = 0;
 }
 
@@ -396,12 +404,8 @@ void gui_lower_free(void *rmem)
 
 void gui_lower_mem_debug(void)
 {
-#ifdef ENABLE_RTK_GUI_OS_HEAP
-    gui_log("can't use thie func");
-#else
     GUI_ASSERT(lower_tlsf != NULL);
     tlsf_walk_pool(tlsf_get_pool(lower_tlsf), NULL, NULL);
-#endif
 }
 
 void gui_sleep_cb(void)

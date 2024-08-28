@@ -296,7 +296,7 @@ struct gui_indev
 typedef void (* log_func_t)(const char *fmt, ...);
 
 /* gui_os_api struct define start */
-struct gui_os_api
+typedef struct gui_os_api
 {
     char *name;
     void *(*thread_create)(const char *name, void (*entry)(void *param), void *param,
@@ -327,7 +327,7 @@ struct gui_os_api
 
     log_func_t log;
     void (*gui_tick_hook)(void);
-};
+} gui_os_api_t;
 /* gui_os_api struct define end */
 
 typedef struct draw_circle
