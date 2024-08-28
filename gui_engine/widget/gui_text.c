@@ -679,6 +679,7 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
         gui_img_set_attribute(text_img, "text_img", img, img_x, img_y);
         text_img->base.w = gui_img_get_width(text_img);
         text_img->base.h = gui_img_get_height(text_img);
+        gui_fb_change();
     }
 
     switch (font_img_type)
