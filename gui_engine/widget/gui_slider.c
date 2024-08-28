@@ -57,7 +57,6 @@
 /** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @{
   */
-#define TEXT_LENGTH 50
 
 /** End of WIDGET_Exported_Macros
   * @}
@@ -68,7 +67,6 @@
 /** @defgroup WIDGET_Exported_Variables WIDGET Exported Variables
   * @{
   */
-char show_text[TEXT_LENGTH];
 
 /** End of WIDGET_Exported_Variables
   * @}
@@ -122,11 +120,6 @@ static void gui_slider_prepare(gui_obj_t *obj)
 
         gui_img_set_location(this->slider_image, this->sliderX, this->sliderY);
 
-        snprintf(show_text, TEXT_LENGTH, "current value: %d", this->currentValue);
-        gui_text_set(this->currentValue_text, show_text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
-                                                                                   UINT8_MAX,
-                                                                                   UINT8_MAX), strlen(show_text), this->text_size);
-
         if (this->preValue != this->currentValue)
         {
             gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
@@ -164,8 +157,7 @@ static void gui_slider_ctor(gui_slider_t  *this,
                             uint16_t       maxValue,
                             void          *slider_img,
                             uint16_t       currentValue,
-                            int16_t        slider_size,
-                            int16_t        text_size)
+                            int16_t        slider_size)
 {
     //for base class
     gui_obj_ctor(&this->base, parent, "slider", x, y, w, h);
@@ -186,7 +178,6 @@ static void gui_slider_ctor(gui_slider_t  *this,
     this->currentValue = currentValue;
     this->preValue = this->currentValue;
     this->slider_size = slider_size;
-    this->text_size = text_size;
 
     this->deltax = ((this->currentValue - this->minValue) * (this->w - this->slider_size)) /
                    (this->maxValue - this->minValue);
@@ -208,8 +199,7 @@ gui_slider_t *gui_slider_create(void          *parent,
                                 uint16_t       maxValue,
                                 void          *slider_img,
                                 uint16_t       currentValue,
-                                int16_t        slider_size,
-                                int16_t        text_size)
+                                int16_t        slider_size)
 {
     GUI_ASSERT(parent != NULL);
     gui_slider_t *slider = gui_malloc(sizeof(gui_slider_t));
@@ -217,7 +207,7 @@ gui_slider_t *gui_slider_create(void          *parent,
     memset(slider, 0x00, sizeof(gui_slider_t));
 
     gui_slider_ctor(slider, (gui_obj_t *)parent, bg_img, x, y, w, h, minValue, maxValue, slider_img,
-                    currentValue, slider_size, text_size);
+                    currentValue, slider_size);
 
     gui_list_init(&(GET_BASE(slider)->child_list));
     if ((GET_BASE(slider)->parent) != NULL)
@@ -234,11 +224,6 @@ gui_slider_t *gui_slider_create(void          *parent,
                                                    slider->deltax, slider->deltay, slider->slider_size, slider->slider_size);
     gui_img_set_mode(slider->slider_image, IMG_SRC_OVER_MODE);
 
-    slider->currentValue_text = gui_text_create(slider, "currentValue", 0, slider->h, slider->w, 28);
-    snprintf(show_text, TEXT_LENGTH, "current value: %d", slider->currentValue);
-    gui_text_set(slider->currentValue_text, show_text, GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX,
-                                                                                 UINT8_MAX,
-                                                                                 UINT8_MAX), strlen(show_text), slider->text_size);
     GET_BASE(slider)->create_done = true;
     return slider;
 }

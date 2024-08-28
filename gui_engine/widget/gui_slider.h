@@ -63,7 +63,6 @@ typedef struct gui_slider
     uint16_t maxValue;
     uint16_t preValue;
     uint16_t currentValue;
-    gui_text_t *currentValue_text;
     bool dragging;
     int16_t sliderX;
     int16_t sliderY;
@@ -143,7 +142,6 @@ _GUI_API_DECLARE(gui_slider_t)
  * @param slider_img the slider image of the slider widget.
  * @param currentValue the current value selected by the slider.
  * @param slider_size the size of slider.
- * @param text_size the size of text.
  * @return gui_slider_t*
  */
 gui_slider_t *gui_slider_create(void          *parent,
@@ -156,8 +154,7 @@ gui_slider_t *gui_slider_create(void          *parent,
                                 uint16_t       maxValue,
                                 void          *slider_img,
                                 uint16_t       currentValue,
-                                int16_t        slider_size,
-                                int16_t        text_size);
+                                int16_t        slider_size);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

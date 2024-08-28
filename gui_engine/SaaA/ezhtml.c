@@ -236,7 +236,7 @@ static void image_animate_callback(void *params)
 }
 
 #define LIGHTS_NUM 20
-
+char light_value_text[30];
 typedef struct
 {
     int id;
@@ -245,6 +245,9 @@ typedef struct
     bool has_colorTemperature;
     int brightness;
     int colorTemperature;
+    char *prefix;
+    char *postfix;
+    gui_text_t *text;
 } light_param_t;
 
 light_param_t lights[LIGHTS_NUM];
@@ -409,6 +412,9 @@ static void light_colorTemp_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     gui_slider_t *this = (gui_slider_t *)obj;
     light->colorTemperature = GUI_API(gui_slider_t).get_currentValue(this);
+    snprintf(light_value_text, sizeof(light_value_text), "%s%d%s", light->prefix,
+             light->colorTemperature, light->postfix);
+    gui_text_content_set(light->text, light_value_text, strlen(light_value_text));
     gui_log("light->id: %d  light->colorTemperature: %d\n", light->id, light->colorTemperature);
     update_light_config(light->id,  "colorTemperature", light->colorTemperature);
 }
@@ -3403,8 +3409,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     int16_t maxValue = 0;
                     int16_t currentValue = 0;
                     int16_t slider_size = 0;
-                    int16_t text_size = 0;
-                    char *font = NULL;
                     while (true)
                     {
                         if (!(p->attr[i]))
@@ -3452,14 +3456,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             slider_size = atoi(p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "textSize"))
-                        {
-                            text_size = atoi(p->attr[++i]);
-                        }
-                        else if (!strcmp(p->attr[i], "font"))
-                        {
-                            font = p->attr[++i];
-                        }
                         i++;
                     }
                     void *bg_buf;
@@ -3474,18 +3470,15 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     }
 
                     parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minValue, maxValue, slider_buf,
-                                                       currentValue, slider_size, text_size);
-                    void *addr = gui_get_file_address(font);
-                    gui_slider_t *slider = (gui_slider_t *)parent;
-                    gui_text_type_set(slider->currentValue_text, addr, FONT_SRC_MEMADDR);
-
+                                                       currentValue, slider_size);
                 }
                 break;
 
             case MACRO_ONCHANGE:
                 {
                     char *type = 0;
-                    char *to = 0;
+                    char *prefix = 0;
+                    char *postfix = 0;
                     int id = 0;
                     size_t i = 0;
                     while (true)
@@ -3498,9 +3491,13 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             type = (p->attr[++i]);
                         }
-                        else if (!strcmp(p->attr[i], "to"))
+                        else if (!strcmp(p->attr[i], "prefix"))
                         {
-                            to = (p->attr[++i]);
+                            prefix = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "postfix"))
+                        {
+                            postfix = (p->attr[++i]);
                         }
                         else if (!strcmp(p->attr[i], "id"))
                         {
@@ -3509,29 +3506,39 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         i++;
                     }
 
-                    if (type && to)
+                    if (type)
                     {
-                        if (!strcmp(type, "control"))
+                        light_param_t *light;
+                        light = gui_malloc(sizeof(light_param_t));
+                        light->id = id;
+                        if (!strcmp(type, "controlLightBT"))
                         {
-                            light_param_t *light;
-                            light = gui_malloc(sizeof(light_param_t));
-                            light->id = id;
-
-                            if (!strcmp(to, "lightBrightness"))
+                            if (parent->type == SEEKBAR)
                             {
-                                if (parent->type == SEEKBAR)
-                                {
-                                    GUI_API(gui_seekbar_t).on_change((gui_seekbar_t *)parent, (gui_event_cb_t)light_brightness_cb,
-                                                                     light);
-                                }
-
+                                GUI_API(gui_seekbar_t).on_change((gui_seekbar_t *)parent, (gui_event_cb_t)light_brightness_cb,
+                                                                 light);
                             }
-                            else if (!strcmp(to, "lightColorTemp"))
+                        }
+                        else if (!strcmp(type, "controlLightCT"))
+                        {
+                            light->text = gui_malloc(sizeof(gui_text_t));
+                            light->prefix = prefix;
+                            light->postfix = postfix;
+
+                            gui_text_t *text = 0;
+                            gui_obj_tree_get_widget_by_type(GUI_BASE(parent)->parent, TEXTBOX, (gui_obj_t **)&text);
+
+                            if (parent->type == SLIDER)
                             {
-                                if (parent->type == SLIDER)
+                                gui_slider_t *slider = (gui_slider_t *)parent;
+                                snprintf(light_value_text, sizeof(light_value_text), "%s%d%s", prefix, slider->currentValue,
+                                         postfix);
+                                if (text)
                                 {
-                                    GUI_API(gui_slider_t).on_change((gui_slider_t *)parent, (gui_event_cb_t)light_colorTemp_cb, light);
+                                    gui_text_content_set(text, light_value_text, strlen(light_value_text));
+                                    light->text = text;
                                 }
+                                GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)light_colorTemp_cb, light);
                             }
 
                         }

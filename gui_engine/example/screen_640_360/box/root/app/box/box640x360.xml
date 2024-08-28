@@ -28,14 +28,24 @@
         minValue="3700"
         maxValue="6500"
         currentValue="5000"
-        sliderSize="23"
-        textSize="16"
-        font="app/box/resource/font/arialbd_size16_bits4_font.bin">slider_ct
+        sliderSize="23">slider_ct
+        <textbox
+            x="0"
+            y="70"
+            color="#ffffffff"
+            w="108"
+            h="49"
+            text=""
+            fontSize="16"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+            mode="truncate">txt_currentValue
+        </textbox>
         <onChange
-            type="control"
-            to="lightColorTemp"
+            type="controlLightCT"
+            prefix="lightColorTemp "
+            postfix="K"
             id="15">changeValue_ct
-        </onChange>          
+        </onChange>
     </slider>
     <seekbar
         x="202"
@@ -51,8 +61,7 @@
         startDegree="0"
         endDegree="0">bar_brightness
         <onChange
-            type="control"
-            to="lightBrightness"
+            type="controlLightBT"
             id="15">changeValue_bt
         </onChange>
     </seekbar>
@@ -66,5 +75,5 @@
         fontSize="16"
         font="app/box/resource/font/arialbd_size16_bits4_font.bin"
         mode="truncate">txt_brightness
-    </textbox>   
+    </textbox>
 </screen></app>
