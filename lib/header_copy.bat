@@ -33,9 +33,18 @@ xcopy "%LIB_DIR%\*.lib" "%TARGET_DIR%\"
 
 xcopy "%CURRENT_DIR%\script\SConscript" "%TARGET_DIR%\"
 
-xcopy "%REAL_GUI_SOURCE_DIR%\*.h" "%REAL_GUI_TARGET_DIR%\" /S /E /Y /I
+rem xcopy "%REAL_GUI_SOURCE_DIR%\*.h" "%REAL_GUI_TARGET_DIR%\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\app\*.h" "%REAL_GUI_TARGET_DIR%\app\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\core\*.h" "%REAL_GUI_TARGET_DIR%\core\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\dc\*.h" "%REAL_GUI_TARGET_DIR%\dc\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\server\*.h" "%REAL_GUI_TARGET_DIR%\server\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\widget\*.h" "%REAL_GUI_TARGET_DIR%\widget\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\engine\*.h" "%REAL_GUI_TARGET_DIR%\engine\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\input\*.h" "%REAL_GUI_TARGET_DIR%\input\" /S /E /Y /I
+xcopy "%REAL_GUI_SOURCE_DIR%\3rd\nanovg\*.h" "%REAL_GUI_TARGET_DIR%\3rd\nanovg\" /S /E /Y /I
+
 xcopy "%LVGL_SOURCE_DIR%\*.h" "%LVGL_TARGET_DIR%\" /S /E /Y /I
-xcopy "%CURRENT_DIR%\lv_conf.h" "%LVGL_TARGET_DIR%\"
+
 
 
 
