@@ -22,13 +22,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
 })
 
 
-
-
-
-
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
     // 获取页面上所有的锚点链接
     var rstcontent = document.querySelector(".rst-content");
@@ -66,32 +59,55 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ========= Add left-sider and right-sider draggable component ========= */
-$( function() {
+$(function() {
     var leftResizing = false,
         leftDownX = 0;
 
-    $( '.wy-nav-side' )
-        // .wrapInner('<div class="in-nav-side"></div>')
-        .append( '<span class="resize-handle-left"> || </span>' )
-        .on( 'mousedown', 'span.resize-handle-left', function( e ) {
+    // Checks if stored width exists in localStorage
+    var leftSiderBarWidth = localStorage.getItem('docs.realmcu.siderbar.width');
+    if (window.matchMedia('(min-width: 768px)').matches && leftSiderBarWidth) {
+        $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
+        $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
+    }
+
+    $('.wy-nav-side')
+        .append('<span class="resize-handle-left"> || </span>')
+        .on('mousedown', 'span.resize-handle-left', function(e) {
             leftResizing = true;
             leftDownX = e.clientX;
         });
 
-    $( document ).on( 'mousemove', function( e ) {
+    $(document).on('mousemove', function(e) {
         if (!leftResizing)
             return;
 
         var offsetNew = e.clientX - document.body.offsetLeft;
-
-        //限制导航栏宽度
-        if (offsetNew > 200 && offsetNew < 800) { 
-            $( '.wy-nav-side' ).css( 'width', offsetNew + 'px' );
-            // $( '.in-nav-side' ).css( 'width', offsetNew + 'px' );
-            $( '.wy-nav-content-wrap' ).css( 'margin-left', offsetNew + 'px' );
+        // 限制导航栏宽度
+        if (offsetNew > 200 && offsetNew < 800) {
+            $('.wy-nav-side').css('width', offsetNew + 'px');
+            $('.wy-nav-content-wrap').css('margin-left', offsetNew + 'px');
         }
-    }).on( 'mouseup', function(e) {
-        leftResizing = false;
+    }).on('mouseup', function(e) {
+        if (leftResizing) {
+            leftResizing = false;
+            // Store width in localStorage
+            var newWidth = $('.wy-nav-side').width();
+            localStorage.setItem('docs.realmcu.siderbar.width', newWidth);
+        }
+    });
+
+    // Also adjust width on window resize
+    $(window).resize(function() {
+        if (window.matchMedia('(min-width: 768px)').matches) {
+            var leftSiderBarWidth = localStorage.getItem('docs.realmcu.siderbar.width');
+            if (leftSiderBarWidth) {
+                $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
+                $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
+            }
+        } else {
+            $('.wy-nav-side').css('width', '');
+            $('.wy-nav-content-wrap').css('margin-left', '');
+        }
     });
 });
 
