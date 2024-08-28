@@ -577,6 +577,20 @@ void gui_obj_tree_print_bfs(gui_obj_t *root);
  * @return gui_obj_t * root
  */
 gui_obj_t *gui_get_root(gui_obj_t *object);
+/**
+ * @brief Calculate the absolute coordinates of a GUI object.
+ *
+ * This function calculates the absolute (global) X and Y coordinates
+ * of a given GUI object based on its local position within the parent hierarchy.
+ *
+ * @param[in]  obj          Pointer to the GUI object for which to calculate absolute coordinates.
+ * @param[out] absolute_x   Pointer to an integer where the absolute X coordinate will be stored.
+ * @param[out] absolute_y   Pointer to an integer where the absolute Y coordinate will be stored.
+ *
+ * @note This function assumes that @p obj is a valid pointer and
+ *       that @p absolute_x and @p absolute_y are valid pointers to integers.
+ */
+void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

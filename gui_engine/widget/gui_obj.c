@@ -467,7 +467,18 @@ bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y)
 
     return false;
 }
-
+void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y)
+{
+    gui_obj_t *o = obj;
+    *absolute_x = o->x;
+    *absolute_y = o->y;
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+        *absolute_x += o->x;
+        *absolute_y += o->y;
+    }
+}
 void gui_obj_skip_all_parent_left_hold(gui_obj_t *obj)
 {
     for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
