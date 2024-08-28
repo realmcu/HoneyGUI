@@ -64,7 +64,7 @@ $(function() {
         leftDownX = 0;
 
     // Checks if stored width exists in localStorage
-    var leftSiderBarWidth = localStorage.getItem('docs.realmcu.siderbar.width');
+    var leftSiderBarWidth = localStorage.getItem('docs.honeygui.siderbar.width');
     if (window.matchMedia('(min-width: 768px)').matches && leftSiderBarWidth) {
         $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
         $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
@@ -92,14 +92,14 @@ $(function() {
             leftResizing = false;
             // Store width in localStorage
             var newWidth = $('.wy-nav-side').width();
-            localStorage.setItem('docs.realmcu.siderbar.width', newWidth);
+            localStorage.setItem('docs.honeygui.siderbar.width', newWidth);
         }
     });
 
     // Also adjust width on window resize
     $(window).resize(function() {
         if (window.matchMedia('(min-width: 768px)').matches) {
-            var leftSiderBarWidth = localStorage.getItem('docs.realmcu.siderbar.width');
+            var leftSiderBarWidth = localStorage.getItem('docs.honeygui.siderbar.width');
             if (leftSiderBarWidth) {
                 $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
                 $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
