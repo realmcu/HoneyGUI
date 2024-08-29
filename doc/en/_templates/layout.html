@@ -1,5 +1,12 @@
 {% extends "!layout.html" %}
+{{ super() }}
 
+{%- block extrabody %}
+    <div id="imgModal" class="img-modal">
+        <span class="img-modal-close">&times;</span>
+        <img class="img-in-modal" id="imgInModal">
+    </div>
+{% endblock %}
 
 {% block sidebartitle %}
     {%- set _logo_url = logo_url|default(pathto('_static/' + (logo or ""), 1)) %}
@@ -14,7 +21,7 @@
     {# Rewrite versions selector #}
     {% if theme_display_version %}
     <div class="version-container">
-        <select name="version-selector" id="version-selector" onchange="change_version()" style="width: 126px; margin: -6px auto 16px; border-radius:2px;">
+        <select name="version-selector" id="version-selector" onchange="change_version()">
         </select>
     </div>
     {%- endif %}

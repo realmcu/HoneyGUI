@@ -86,7 +86,8 @@ html_show_copyright = False
 html_static_path = ['_static']
 html_js_files = [
     'js/custom.js',
-    'js/versions.js'
+    'js/versions.js',
+    'js/imgmodal.js'
 ]
 
 html_logo = './_static/image/logo.png'
