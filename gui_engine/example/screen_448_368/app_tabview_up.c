@@ -53,6 +53,15 @@ static char *tabview_array[] =
     "tv_os_information"
 };
 
+typedef struct
+{
+    uint8_t R;
+    uint8_t G;
+    uint8_t B;
+} view_more_RGB;
+view_more_RGB rgb_1 = {39, 43, 44};
+view_more_RGB rgb_2 = {39, 43, 44};
+view_more_RGB rgb_3 = {39, 43, 44};
 static void canvas_cb_clear(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 0, 0, 305, 80, 50); // the X/Y-axis coordinate relative to parent widget
@@ -80,7 +89,7 @@ static void canvas_cb_option(gui_canvas_t *canvas)
 static void canvas_cb_os_information(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 0, 0, 350, 220, 35); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(39, 43, 44, 255));
+    nvgFillColor(canvas->vg, nvgRGBA(39, 43, 44, 255)); //
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
@@ -215,10 +224,25 @@ static void canvas_cb_message_bg(gui_canvas_t *canvas)
     nvgBeginPath(canvas->vg);
 }
 
-static void canvas_cb_view_more(gui_canvas_t *canvas)
+
+static void canvas_cb_view_more_1(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 9, 0, 350, 80, 15); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(39, 43, 44, 255));
+    nvgFillColor(canvas->vg, nvgRGBA(rgb_1.R, rgb_1.G, rgb_1.B, 255)); //R G B
+    nvgFill(canvas->vg);
+    nvgBeginPath(canvas->vg);
+}
+static void canvas_cb_view_more_2(gui_canvas_t *canvas)
+{
+    nvgRoundedRect(canvas->vg, 9, 0, 350, 80, 15); // the X/Y-axis coordinate relative to parent widget
+    nvgFillColor(canvas->vg, nvgRGBA(rgb_2.R, rgb_2.G, rgb_2.B, 255)); //R G B
+    nvgFill(canvas->vg);
+    nvgBeginPath(canvas->vg);
+}
+static void canvas_cb_view_more_3(gui_canvas_t *canvas)
+{
+    nvgRoundedRect(canvas->vg, 9, 0, 350, 80, 15); // the X/Y-axis coordinate relative to parent widget
+    nvgFillColor(canvas->vg, nvgRGBA(rgb_3.R, rgb_3.G, rgb_3.B, 255)); //R G B
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
@@ -248,7 +272,6 @@ static void message_more_cb(gui_obj_t *win)
         win->x = 0;
     }
 
-
     touch_info_t *tp = tp_get_info();
     if (tp->released)
     {
@@ -265,31 +288,41 @@ static void message_more_cb(gui_obj_t *win)
             if (tp->x > 9 && tp->x < 359)
             {
                 uint16_t y = base_y;
+                view_more_RGB temp = {255, 255, 255};
                 if ((tp->y > y && tp->y < y + h))
                 {
                     gui_log("click canvas1\r\n");
+                    rgb_1 = temp;
                     return;
                 }
                 y = y + h + interval;
                 if ((tp->y > y && tp->y < y + h))
                 {
                     gui_log("click canvas2\r\n");
+                    rgb_2 = temp;
                     return;
                 }
                 y = y + h + interval;
                 if ((tp->y > y && tp->y < y + h))
                 {
                     gui_log("click canvas3\r\n");
+                    rgb_3 = temp;
+                    return;
                 }
             }
         }
     }
+    rgb_1.R = 39;
+    rgb_1.G = 43;
+    rgb_1.B = 44;
+    rgb_2 = rgb_1;
+    rgb_3 = rgb_1;
 }
 // ... content
 static void view_more(gui_obj_t *obj)
 {
     gui_win_stop_animation(win_design);
-    GUI_BASE(pg)->gesture = 1; // stop page slide
+    GUI_BASE(pg)->gesture = 1; // stop page slide, win_design animation will restore it
 
     gui_obj_t *parent = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "2", (void *)&parent);
@@ -341,8 +374,8 @@ static void view_more(gui_obj_t *obj)
         }
 
         gui_canvas_t *canvas = gui_canvas_create(win, "canvas_1", 0, 0, 140, SCREEN_WIDTH, 80);
-        gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more);
-        content = "No reminders for an hour";
+        gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_1);
+        content = "Don't remind for an hour";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content),
@@ -351,8 +384,8 @@ static void view_more(gui_obj_t *obj)
         gui_text_mode_set(text, CENTER);
 
         canvas = gui_canvas_create(win, "canvas_2", 0, 0, 230, SCREEN_WIDTH, 80);
-        gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more);
-        content = "No reminders today";
+        gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_2);
+        content = "Don't remind today";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content),
@@ -361,8 +394,8 @@ static void view_more(gui_obj_t *obj)
         gui_text_mode_set(text, CENTER);
 
         canvas = gui_canvas_create(win, "canvas_3", 0, 0, 320, SCREEN_WIDTH, 80);
-        gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more);
-        content = "Add to Summary";
+        gui_canvas_set_canvas_cb(canvas, canvas_cb_view_more_3);
+        content = "Add this to Summary";
         text = gui_text_create(canvas, "text1",  0, 24, 0, 0);
         gui_text_set(text, (void *)content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                      strlen(content),
@@ -532,14 +565,6 @@ static void os_information(void *parent)
     gui_obj_add_event_cb(tv, (gui_event_cb_t)tv_os_information_more, GUI_EVENT_2, tv);
 }
 
-static void line(void *page, void *win)
-{
-    gui_canvas_t *canvas = gui_canvas_create(win, "line", 0, 160, 425, SCREEN_WIDTH, 10);
-    gui_canvas_set_canvas_cb(canvas, canvas_cb_draw_line);
-    win_clear = gui_win_create(page, "spare", 0, SCREEN_HEIGHT, SCREEN_WIDTH,
-                               40); // bottom space to slide when tv all clear
-}
-
 static void canvas_cb_draw_bg(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -606,6 +631,7 @@ static void win_design_cb(void)
                             if (tp->x > 9 && tp->x < 179)
                             {
                                 gui_obj_event_set(GUI_BASE(tv), GUI_EVENT_2);
+                                // gui_log("click left\r\n");
                             }
                             else if (tp->x > 189 && tp->x < 359)
                             {
@@ -665,11 +691,18 @@ void tabview_up_design(void *parent_widget)
 
     pg = gui_page_create(win_design, PAGE_NAME, 0, 0, 0, 0);
 
+    // draw bottom line
+    canvas = gui_canvas_create(win_design, "line", 0, 160, 425, SCREEN_WIDTH, 10);
+    gui_canvas_set_canvas_cb(canvas, canvas_cb_draw_line);
+
     // draw table content
     pagelist_clear(pg);
     pagelist_message(pg);
     os_information(pg);
-    line(pg, win_design);
+
+    // bottom space to slide when tv all clear
+    win_clear = gui_win_create(pg, "spare", 0, SCREEN_HEIGHT, SCREEN_WIDTH,
+                               40);
 
     gui_win_set_animate(win_design, 1000, -1, win_design_cb, NULL);
 }

@@ -171,6 +171,10 @@ static void cv_cb(gui_cardview_t *cv)
     {
         obj->y = 81 + offset + 500;
     }
+    else if (offset < -581)
+    {
+        obj->y = 0;
+    }
 }
 
 void curtain_down_design(void *parent_widget)
