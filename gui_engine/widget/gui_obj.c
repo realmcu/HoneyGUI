@@ -789,6 +789,10 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
             animate->callback(animate->p, obj);
         }
     }
+    if (animate && !animate->animate)
+    {
+        animate->init_time_ms = gui_ms_get();
+    }
 }
 gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
                                    uint32_t      dur,

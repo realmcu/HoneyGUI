@@ -35,9 +35,15 @@ static void img_animate_watchface_callback(void *obj)
     uint16_t minute = RtkWristbandSys.Global_Time.minutes;
     uint16_t hour = RtkWristbandSys.Global_Time.hour;
 #else
-    uint16_t seconds = 0;
-    uint16_t minute = 0;
-    uint16_t hour = 0;
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    uint16_t seconds = timeinfo->tm_sec;
+    uint16_t minute = timeinfo->tm_min;
+    uint16_t hour = timeinfo->tm_hour;
+
 #endif
     angle_hour = (hour % 12) * MY_PI / 6 + minute * MY_PI / 360;
     angle_min  = minute * MY_PI / 30 + seconds * MY_PI / 1800;
