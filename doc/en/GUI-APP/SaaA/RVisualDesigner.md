@@ -16,11 +16,11 @@ RTKIOT Visual Designer supports:
 + Simulate the GUI project on PC.
 
 This document mainly consists of:
-+ Indroduction to Function Panels
-+ Indroduction to Resource Management
-+ Indroduction to the Menu Bar
-+ Quick start to tutorials
-+ GUI demo project
++ [Function Panels](#function_panel_anchor)
++ [Resource Management](#resource_manage_anchor)
++ [Menu Bar](#menu_anchor)
++ [Quick start to tutorials](#quick_start_anchor)
++ [GUI demo project](#gui_demo_anchor)
 
 To simplify the document, "Tool" is used below to refer to "RTKIOT Visual Designer".
 
@@ -29,6 +29,7 @@ To simplify the document, "Tool" is used below to refer to "RTKIOT Visual Design
 
 
 ## Function Panels
+<a id="function_panel_anchor"></a>
 ### Toolkit/Widgets
 + Non-containerized widget
     + Can be used as the parent of other widget.
@@ -47,7 +48,7 @@ This section lists the properties supported by the widget in tables and mark wit
 ##### Text
 Used only for text display and does not support user input. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name          | Widget name.   | Y	    | Y			  | Y	|
 | Size (Height) | Widget height. | Y		| Y			  | Y	|
@@ -63,7 +64,7 @@ Used only for text display and does not support user input. The properties are s
 ##### Button
 Clickable widget with text and background image. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -85,7 +86,7 @@ Clickable widget with text and background image. The properties are shown in the
 ##### Image
 Widget that can set image. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -97,14 +98,15 @@ Widget that can set image. The properties are shown in the table below.
 | Image Scale X | Image horizontal scaling degree, is a multiplier/percentage.<br/>For example, set scale x 0.5 means that the actual display width of the image is half of the original image width. | Y | Y | Y |
 | Image Scale Y | Image vertical scaling degree, is a multiplier/percentage. | Y | Y | Y |
 
-**Note:**
-1.	When exporting, tool will convert the imported images. And the image conversion parameters can be set in "Menu Bar -> Setting -> Image Convert Setting", please refer to <a href="#img_conv_setting_anchor">Image Convert Setting</a> for details.
+```{note}
+1.	When exporting, tool will convert the imported images. And the image conversion parameters can be set in "Menu Bar -> Setting -> Image Convert Setting", please refer to [Image Convert Setting](#img_conv_setting_anchor) for details.
 2.	If the size of the imported image does not match the size of the widget, tool doesn't scale or crop the image.
+```
 
 ##### SeekBar
 Sliding widget that can respond to user swipe gesture with the widget and change the progress value. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -120,7 +122,7 @@ Sliding widget that can respond to user swipe gesture with the widget and change
 ##### Image SeekBar
 Sliding widget with multi-images as background, and switch to different images as user swipes. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -137,7 +139,7 @@ Sliding widget with multi-images as background, and switch to different images a
 ##### Switch
 Switch widget with "Checked" and "Unchecked" states. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -150,7 +152,7 @@ Switch widget with "Checked" and "Unchecked" states. The properties are shown in
 ##### Arc
 Arc widget, no gesture support yet. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | N |
 | Size (Height) | Widget height. | Y | Y | N |
@@ -172,7 +174,7 @@ Arc widget, no gesture support yet. The properties are shown in the table below.
 ##### Screen
 Screen widget, corresponds to the physical screen, is the root widget of a GUI project. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -180,14 +182,15 @@ Screen widget, corresponds to the physical screen, is the root widget of a GUI p
 | X | Horizontal coordinate, always 0. | Y | Y | Y |
 | Y | Vertical coordinate, always 0. | Y | Y | Y |
 
-**Note:**
+```{note}
 Only "Name" property can be modified.
+```
 
 ##### TabView and Tab
 With Tab widget as child widget, it supports up/down/left/right swiping to switch among Tabs. 
 The properties of Tabview and Tab are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -197,7 +200,7 @@ The properties of Tabview and Tab are shown in the table below.
 | Transition | Tab transition mode with the following supported types:<br/>- normal: No effect<br/>- fade: Fade-in/out<br/>- scale: Scaling<br/>- fadeScale: Fade-in/out and scaling | N | Y | Y |
 <br/>
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -209,22 +212,24 @@ The properties of Tabview and Tab are shown in the table below.
 
 <div id = "figure_2_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817871000642675/ca6cda22_12407535.png" width="300"/></div>
 
-**Notes:**
+```{note}
 1.	TabView width and height could not be modified, defaulting to Screen's width and height. 
 2.	TabView horizontal and vertical coordinate could not be modified, is always 0.
 3.	TabView can only be used as a child of Screen widget.
 4.	TabView's child widgets can only be Tabs.
 5.	Tab's width and height could not be modified, defaulting to TabView's width and height.
 6.	Tab's horizontal and vertical coordinate could not be modified and is always 0.
+```
 
 ##### Page
 Container widget with scrollable content.
 
-**Notes:**
+```{note}
 1.	Page only supports vertical scrolling.
 2.	The width and height of the Page widget only defines the area of the interface that can response to a swipe gesture. Whether scrolling is allowed depends on whether or not the child widget added to it are outside the scope of the screen.
+```
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -235,7 +240,7 @@ Container widget with scrollable content.
 ##### Win
 Within the area defined by Win width and height, it can response to variable gestures, including click, long click, press, press release and swipe. The properties are shown in the table below.
 
-| Property | Description | 8762D/8763E | 8762G/8772G | TBD |
+| Property | Description | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |----------|-------------|:-----------:|:-----------:|:---:|
 | Name | Widget name. | Y | Y | Y |
 | Size (Height) | Widget height. | Y | Y | Y |
@@ -247,19 +252,20 @@ Within the area defined by Win width and height, it can response to variable ges
 ### Design View/Canvas
 Users can drag and drop widgets from the Toolbox panel into the Design View, adjust the widgets layout and set properterties to design a graphical interface that can be rendered in the Realtek ICs.
 
-<img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png">
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png" width="650"></div>
 
 #### TabView - Create/Delete/Insert Tab
 Drag and drop TabView widget from the Toolbox into the Design View, then a TabView that contains only a home tab (coordinates (0,0)) is created, as shown in the figure below.
 
-<img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png">
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png" width="650"></div>
 
 ##### Create Tab
 New Tabs can be created by clicking the buttons around the Design View.
 
-**Notes:**
+```{note}
 1.	If idx is 0, up and down button is enabled.
 2.	If idy is 0, left and right button is enabled.
+```
 
 ###### Delete Tab
 Select the Tab to be deleted, click "Edit -> Delete" on the menu bar or press the Delete key on the keyboard. Then double-check if you want to delete it.
@@ -282,9 +288,10 @@ For example, Tab need to be inserted between Tabs with coordinates (1, 0) and (2
 #### Tabview Overview Chart
 Please click ![icon](https://foruda.gitee.com/images/1710818993805990437/796af0dc_12407535.png)  to show TabView Overview Chart.
 
-**Notes:**
+```{note}
 1.	The highlight Tab in the Overview Chart indicates the Tab that is currently being edited in Design View.
 2.	The Overview Chart label each Tab with its coordinates. When simulate or rendered in ICs, the Tab with coordinates (0,0) is displayed on the Home page, and users can swipe up/down/left/right to display other Tabs.
+```
 
 <div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628617214746327/0711439d_12407535.png"></div>
 <br/>
@@ -302,7 +309,7 @@ There are 3 ways to zoom the Design View.
 ### Property View
 Selecting a widget in the Widget Tree or Design View exposes all of the widget's property values, which the users can modify as needed.
 
-<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628761244768808/a468a545_12407535.png"></div>
+<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628761244768808/a468a545_12407535.png" width="650"></div>
 
 ### Widget Tree
 The Widget Tree is used to present to the users the parent/child/sibling relationship of the currently laid out widgets. And we have the following convention here.
@@ -311,9 +318,9 @@ The Widget Tree is used to present to the users the parent/child/sibling relatio
 
 The figure shows all the child widgets of the Home tab and Lamp tab, where the Home tab has only one Image child widget for setting the background, and the Lamp tab contains an Image widget and a number of Switch widgets.
 
-<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png"></div>
+<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png" width="650"></div>
 <br/>
-<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png"></div>
+<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png" width="650"></div>
 
 Widget Tree supports the following operations.
 1.	Select widget:
@@ -334,12 +341,14 @@ Click the button and lock the widget/widgets.
 <div STYLE="page-break-after: always;"></div> 
 
 ## Resource Mangement
+<a id="resource_manage_anchor"></a>
 Only pre-imported image and font files can be referenced by the GUI project. This chapter focus on how to manage image and font resource.
 The image and font explorer is located directly below the design view, as shown in the figure below.
 
-<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png"></div>
+<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="650"></div>
 
-### <div id="img_res_m_anchor">Image Resource Management</div>
+### Image Resource Management
+<a id="img_res_m_anchor"></a>
 
 Click ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png) to bring up the Image Management view.
 
@@ -357,7 +366,7 @@ As shown in the figure below, the images are copied to the Resource\image\home f
 
 <div id="figure_3_4_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629572036008240/98958d66_12407535.png" width="400"></div>
 <br/>
-<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1719883790483193796/1c74af21_12407535.png" width="500"></div>
+<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725412988097005313/b591b7ca_12407535.png" width="500"></div>
 <br/>
 <div id="figure_3_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629616915297638/de3a62a7_12407535.png" width="400"></div>
 
@@ -376,8 +385,9 @@ Select the image folder and all images in this folder will be displayed in the r
 #### Refresh
 If the user locally operates the image resources, not via Tool, you can click ![icon](https://foruda.gitee.com/images/1710824483020058086/3ecd6f6d_12407535.png)  to refresh.
 
-**Note:**
+```{note}
 Not recommended.
+```
 
 ### Font Resource Management
 
@@ -392,13 +402,14 @@ Select the font to be removed and click ![icon](https://foruda.gitee.com/images/
 <div STYLE="page-break-after: always;"></div> 
 
 ## Menu Bar
+<a id="menu_anchor"></a>
 ### File
 #### Start Page
 If you want to close the current project and open an existed project or create a new project, you can open the Start Page by click "File -> Start Page".
 Click "Open Project" or select a .rtkprj and double click to open the existed project, or click "Create Project" to create a new project, please refer to [How to Create Project](#how_to_create_anchor) and [How to Open Project](#how_to_open_anchor).
 
 
-<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png"></div>
+<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png" width="650"></div>
 
 #### Save
 Save all the UI changes of the project, the shortcut is Ctrl + S.
@@ -432,7 +443,8 @@ The Project Name window is used to modify current project name. Please enter the
 
 ### Setting
 
-#### <div id="img_conv_setting_anchor">Image Convert Setting</div>
+{#img_conv_setting_anchor}
+#### Image Convert Setting
 
 The images must be converted to be displayed correctly on the IC, so users need to set the correct convert parameters. All the optional parameters are shown in the figure below.
 
@@ -466,9 +478,9 @@ The optional Compress Mode is as follows:
 1.	RLE: Run-Length Encoding, a lossless compression algorithm.
 If you select RLE as the Compress Mode, RLE Level and RLE Run Length parameter are mandatory to set.
 
-<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555889664193/c33b99ad_12407535.png" width="260"></div>
+<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555889664193/c33b99ad_12407535.png" width="350"></div>
 <br/>
-<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824561230699040/f2dbfb4a_12407535.png" width="260"></div>
+<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824561230699040/f2dbfb4a_12407535.png" width="350"></div>
 
 | RLE Level | Description |
 |-----------|-------------|
@@ -480,14 +492,23 @@ If you select RLE as the Compress Mode, RLE Level and RLE Run Length parameter a
 | Byte_1 | 1 byte, Maximum 255. |
 | Byte_2 | 2 bytes, Maximum 255. |
 
-Maximum length of duplicate characters allowed per stroke (Run) during compression.
+<div style="margin-left: 24px;">
+RLE Run Length: Maximum length of duplicate characters allowed per stroke (Run) during compression.
+</div>
 
 2.	FastLz: 
+<div style="margin-left: 24px;">
 A dictionary-and-sliding-window based lossless compression algorithm for compressing data with a large number of repetitive values.
-3.	YUV_Sample_Blur: 
+</div>
+3.	YUV_Sample_Blur:
+<div style="margin-left: 24px;"> 
+
 A lossy compression algorithm combining YUV sampling and blurring.
+
 YUV Sample: Keep the luminance information of the image and only sample the chrominance information.
+
 Blur: Discard the lower bit of each byte after YUV sampling to achieve the purpose of data compression.
+</div>
 
 | YUV Sample Mode | Description |
 |-----------------|-------------|
@@ -505,11 +526,14 @@ Blur: Discard the lower bit of each byte after YUV sampling to achieve the purpo
 
 4.	YUV_Sample_Blur+FastLz: Algorithm combines YUV_Sample_Blur and FastLz.
 
-#### <div id="font_setting_anchor">Font Convert Setting</div>
+{#font_setting_anchor}
+#### Font Convert Setting
 Include Bitmap Fonts and Vector Fonts. Fonts supported by Realtek series ICs are shown in the table below.
-<u><b>Attention: You should create at least one Font Convert Setting, otherwise you could not select font for the text-type widget in the Property View.</b></u>
+```{note}
+You should create at least one Font Convert Setting, otherwise you could not select font for the text-type widget in the Property View.
+```
 
-| Font   | 8762D/8763E | 8762G/8772G | TBD |
+| Font   | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |--------|:-----------:|:-----------:|:---:|
 | Vector | N           | N           | Y   |
 | Bitmap | Y           | Y           | Y   |
@@ -550,40 +574,48 @@ The .bin can be programmed into your IC.
 
 ### Simulate
 Simulate the project on UI.
-Attention: When you simulate the project at the first time, please click "Export" before clicking "Simulate". And then, there is no need to click "Export" again if you didn't modify any image or font setting.
+
+```{note}
+When you simulate the project at the first time, please click "Export" before clicking "Simulate". And then, there is no need to click "Export" again if you didn't modify any image or font setting.
+```
 
 <div id="figure_4_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png" width="350"></div>
 
 <div STYLE="page-break-after: always;"></div> 
 
 ## Quick Start To Tutorials
-### <div id="how_to_create_anchor">How to Create Project</div>
+<a id="quick_start_anchor"></a>
+### How to Create Project
+<a id="how_to_create_anchor"></a>
 
-<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png"></div>
+<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="650"></div>
 
 Double click and run "RVisualDesigner.exe", and then configure the project step by step (1~4) and click "Create Project" (5).
 After creation, the GUI design window pops up. The left side is the component area, the center is the design area, and the right side is the widget property setting area. 
 
-<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630514220062774/eea79572_12407535.png"></div>
+<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630514220062774/eea79572_12407535.png" width="650"></div>
 
-Note: The newly created project file is located in the project folder under the Solution Folder. There is an example as shown in the figure below.
+```{note}
+The newly created project file is located in the project folder under the Solution Folder. There is an example as shown in the figure below.
+```
 
-<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636140310566494/4830f874_12407535.png" width="500"></div>
+<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505762180091944/39be3e5a_12407535.png" width="300"></div>
 
 After you drag and drop a widget on Design View, and click "File - Save" or press Ctrl + S, the .rtkui file will be created.
 
-<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636158959132154/772d60f3_12407535.png" width="500"></div>
+<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505619255178068/e89d3b76_12407535.png" width="300"></div>
 
 ### How to Write Javascript Code
 After the project is created, the xxx.js file is created. The xxx.js file is empty, please code here to implement the widgets' event callback.
 
-### <div id="how_to_open_anchor">How to Open Project</div>
-<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png"></div>
+### How to Open Project
+<a id="how_to_open_anchor"></a>
+<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="650"></div>
 
 There are two ways to open project.
 1.	Click "Open Project" and select a .rtkprj file.
 
-<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636446597639065/93e8c58b_12407535.png" width="500"></div>
+<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1724911708175163337/8513c36b_12407535.png" width="500"></div>
 
 2.	Select a .rtkprj in Recent Project area.
 If the project listed on Recent Project area, a message window pops up.
@@ -596,7 +628,7 @@ Click "File -> Start Page" on Menu Bar.
 
 
 ### How to Export/Pack Project
-<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png"></div>
+<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png" width="650"></div>
 <br/>
 
 Click "Export" on Menu Bar, the output are shown in the figure below.
@@ -604,13 +636,14 @@ Click "Export" on Menu Bar, the output are shown in the figure below.
 
 
 ### How to Simulate
-<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png"></div>
+<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png" width="650"></div>
 
 Click on the "Simulate" button in the menu bar.
 
 <div STYLE="page-break-after: always;"></div> 
 
 ## GUI Demo Project
+<a id="gui_demo_anchor"></a>
 There is a Demo in RVisualDesigner-vx.x.x.x.zip. 
 
 The folder - 454x454 contains project with resolution 454*454. 
@@ -624,7 +657,7 @@ Please follow the steps to demo the project.
 2.	Check the IC type by clicking "Edit - Convert Project" on Menu Bar, please refer to "Convert Project" for details. 
 If current IC type of the project does not match your IC, please select target IC type, enter the target resolution and click "Convert".
 
-<div id="figure_6_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636942634993243/11b1e212_12407535.png" width="500"></div>
+<div id="figure_6_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636942634993243/11b1e212_12407535.png" width="400"></div>
 
 3.	Click "Export" on Menu Bar and wait until the export ok/fail message box pops up.
 
