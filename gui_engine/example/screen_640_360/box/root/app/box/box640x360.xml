@@ -29,24 +29,38 @@
         maxValue="6500"
         currentValue="5000"
         sliderSize="23">slider_ct
-        <textbox
-            x="0"
-            y="70"
+        <onChange
+            type="write"
+            to="txt_currentValue">
+        </onChange><!-- use slider to write slider value to textbox called txt_currentValue,  -->
+        <onChange
+            type="control" 
+            to="controlLightCT" 
+            id="16">
+        </onChange> <!-- use slider to control colorTemp lamp called controlLightCT, index 16 -->
+    </slider>
+    <textbox
+            x="202"
+            y="250"
             color="#ffffffff"
             w="108"
             h="49"
-            text=""
+            text="5000"
             fontSize="16"
             font="app/box/resource/font/arialbd_size16_bits4_font.bin"
             mode="truncate">txt_currentValue
         </textbox>
-        <onChange
-            type="controlLightCT"
-            prefix="lightColorTemp "
-            postfix="K"
-            id="15">changeValue_ct
-        </onChange>
-    </slider>
+        <textbox
+            x="240"
+            y="250"
+            color="#ffffffff"
+            w="108"
+            h="49"
+            text="°"
+            fontSize="16"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+            mode="truncate">txt_currentValuemark
+        </textbox>
     <seekbar
         x="202"
         y="280"
@@ -61,7 +75,8 @@
         startDegree="0"
         endDegree="0">bar_brightness
         <onChange
-            type="controlLightBT"
+            to="controlLightBT"
+            type="control" 
             id="15">changeValue_bt
         </onChange>
     </seekbar>

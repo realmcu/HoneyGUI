@@ -798,7 +798,7 @@ void *gui_get_file_address(const char *file)
         {
             static uint32_t used = 0;
             used += size;
-            gui_log(">malloc: %d -- used: %d\n", size, used);
+            //gui_log(">malloc: %d -- used: %d\n", size, used);
         }
         void *imgbuf = gui_malloc(size);
         memset(imgbuf, 0, size);
