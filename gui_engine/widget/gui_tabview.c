@@ -91,6 +91,7 @@ static void gui_tabview_input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_tabview_t *this = (gui_tabview_t *)obj;
     GUI_UNUSED(tp);
+    GUI_UNUSED(this);
     // if (this->tab_cnt_left < this->cur_id.x)
     // {
     //     gui_obj_skip_other_right_hold(obj);
