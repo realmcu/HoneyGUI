@@ -1,16 +1,16 @@
 # 字体转换工具
 
-字体转换工具功能：从标准内部码表(代码页文件)、自定义Unicode码表(或补充码表.txt文件，自定义.cst文件)中获取所有待转换字符对应的Unicode码。根据Unicode编码从字体文件（如.ttf）中找到相应字符的矢量字体数据。将其转换为位图，并输出为.bin文件。
+字体转换工具功能：从标准内部码表（代码页文件）、自定义Unicode码表（或补充码表.txt文件，自定义.cst文件）中获取所有待转换字符对应的Unicode码。根据Unicode编码从字体文件（如.ttf）中找到相应字符的矢量字体数据。将其转换为位图，并输出为.bin文件。
 
-<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724051635820787454/a69d7ac6_13408154.png" ></div>
+<div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1724915636901040677/99c83b9b_13674272.png" ></div>
 
 ## 生成字体bin文件
 如何生成对应的文件，请参考以下步骤:
-* 将字体库文件复制到该目录 (`\Font Convert Tool\font`)。
+* 将字体库文件复制到该目录（`\Font Convert Tool\font`）。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
 
-* 可以参考(`\Font Convert Tool\doc`)目录下的文档，了解每个参数的具体含义，通过编辑`FontConfig.json`配置字体参数。
+* 可以参考（`\Font Convert Tool\doc`）目录下的文档，了解每个参数的具体含义，通过编辑`FontConfig.json`配置字体参数。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png" ></div>
 
