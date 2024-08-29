@@ -111,7 +111,7 @@ static uint16_t utf8_to_unicode(uint8_t *utf8, uint16_t len, uint32_t *unicode_a
 
     return k;
 }
-
+#if 0
 static void utf16_be_to_le(const uint8_t *input, uint8_t *output, size_t length)
 {
     for (size_t i = 0; i < length; i += 2)
@@ -155,6 +155,7 @@ static uint16_t utf16_to_unicode_length(uint16_t *utf16, uint32_t len)
 
     return unicode_length;
 }
+#endif
 static uint16_t utf16le_to_unicode(uint8_t *utf16le, uint16_t len, uint32_t *unicode_array,
                                    uint16_t unicode_buf_len)
 {
@@ -444,7 +445,6 @@ static int find_first_emoji(const uint32_t *unicode_buf, uint32_t len)
         return 0;
     }
     uint32_t i = 0;
-    int emoji_len = 1;
 
     for (i = 1; i < len; i++)
     {
