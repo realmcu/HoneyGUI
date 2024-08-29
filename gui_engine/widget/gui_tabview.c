@@ -91,26 +91,26 @@ static void gui_tabview_input_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_tabview_t *this = (gui_tabview_t *)obj;
     GUI_UNUSED(tp);
+    // if (this->tab_cnt_left < this->cur_id.x)
+    // {
+    //     gui_obj_skip_other_right_hold(obj);
+    // }
+    // if (this->tab_cnt_right > this->cur_id.x)
+    // {
+    //     gui_obj_skip_other_left_hold(obj);
+    // }
 
-    if (this->tab_cnt_left < this->cur_id.x)
-    {
-        gui_obj_skip_other_right_hold(obj);
-    }
+    // if (this->tab_cnt_up < this->cur_id.y)
+    // {
+    //     gui_obj_skip_other_down_hold(obj);
+    // }
 
-    if (this->tab_cnt_right > this->cur_id.x)
-    {
-        gui_obj_skip_other_left_hold(obj);
-    }
-
-    if (this->tab_cnt_up < this->cur_id.y)
-    {
-        gui_obj_skip_other_down_hold(obj);
-    }
-
-    if (this->tab_cnt_down > this->cur_id.y)
-    {
-        gui_obj_skip_other_up_hold(obj);
-    }
+    // if (this->tab_cnt_down > this->cur_id.y)
+    // {
+    //     gui_obj_skip_other_up_hold(obj);
+    // }
+    obj->skip_tp_left_hold = false;
+    obj->skip_tp_right_hold = false;
 }
 
 static void gui_tabview_prepare(gui_obj_t *obj)
@@ -157,284 +157,286 @@ static void gui_tabview_prepare(gui_obj_t *obj)
         }
     }
 
-    switch (tp->type)
+    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y))
     {
-    case TOUCH_HOLD_X:
+        switch (tp->type)
         {
-            if (!this->loop_x)
+        case TOUCH_HOLD_X:
             {
-                if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
+                if (!this->loop_x)
                 {
-                    break;
+                    if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
+                    {
+                        break;
+                    }
+
+                    if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
+                    {
+                        break;
+                    }
+
+                    if ((tabview->tab_cnt_left == 0) && (tabview->tab_cnt_right == 0))
+                    {
+                        break;
+                    }
+
+                    this->release_x = tp->deltaX;
+
+                    if ((tabview->cur_id.x == 0) && (tabview->tab_cnt_right == 0))
+                    {
+                        if (this->release_x < 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    if ((tabview->cur_id.x == 0) && (tabview->tab_cnt_left == 0))
+                    {
+                        if (this->release_x > 0)
+                        {
+                            this->release_x = 0;
+                            break;
+                        }
+                    }
                 }
-
-                if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
+                else
                 {
-                    break;
+                    this->release_x = tp->deltaX;
                 }
+            }
+            break;
 
-                if ((tabview->tab_cnt_left == 0) && (tabview->tab_cnt_right == 0))
+        case TOUCH_HOLD_Y:
+            {
+                if (!this->loop_y)
                 {
-                    break;
+                    if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
+                    {
+                        break;
+                    }
+
+                    if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
+                    {
+                        break;
+                    }
+
+                    if ((obj->skip_tp_up_hold) && (obj->skip_tp_down_hold))
+                    {
+                        break;
+                    }
+
+                    if ((tabview->tab_cnt_down == 0) && (tabview->tab_cnt_up == 0))
+                    {
+                        break;
+                    }
+
+                    gui_obj_event_set(obj, GUI_EVENT_8);
+                    this->release_y = tp->deltaY;
+
+                    if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_down == 0))
+                    {
+                        if (this->release_y < 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_up == 0))
+                    {
+                        if (this->release_y > 0)
+                        {
+                            this->release_y = 0;
+                            break;
+                        }
+                    }
                 }
-
-                this->release_x = tp->deltaX;
-
-                if ((tabview->cur_id.x == 0) && (tabview->tab_cnt_right == 0))
+                else
                 {
-                    if (this->release_x < 0)
+                    this->release_y = tp->deltaY;
+                }
+            }
+            break;
+
+        case TOUCH_LEFT_SLIDE:
+            {
+                gui_log("[TV]TOUCH_LEFT_SLIDE\n");
+
+                if (!this->loop_x)
+                {
+                    if ((tabview->tab_cnt_right == 0) && (tabview->cur_id.x == 0))
+                    {
+                        break;
+                    }
+
+                    if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
                     {
                         break;
                     }
                 }
 
-                if ((tabview->cur_id.x == 0) && (tabview->tab_cnt_left == 0))
+                //when current tab is the end,come back to current tab if sliding.
+                if ((tabview->cur_id.x == tabview->tab_cnt_right))
                 {
-                    if (this->release_x > 0)
+                    if (tabview->loop_x)
                     {
-                        this->release_x = 0;
-                        break;
+                        if (tabview->tab_cnt_left != 0)
+                        {
+                            tabview->cur_id.x = tabview->tab_cnt_left;
+                        }
+                        else
+                        {
+                            tabview->cur_id.x = 0;
+                        }
+                        this->release_x = this->release_x + tabview->base.w;
                     }
                 }
-            }
-            else
-            {
-                this->release_x = tp->deltaX;
-            }
-        }
-        break;
-
-    case TOUCH_HOLD_Y:
-        {
-            if (!this->loop_y)
-            {
-                if ((obj->skip_tp_up_hold) && (tp->deltaY  < 0))
+                else
                 {
-                    break;
-                }
-
-                if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
-                {
-                    break;
-                }
-
-                if ((obj->skip_tp_up_hold) && (obj->skip_tp_down_hold))
-                {
-                    break;
-                }
-
-                if ((tabview->tab_cnt_down == 0) && (tabview->tab_cnt_up == 0))
-                {
-                    break;
-                }
-
-                gui_obj_event_set(obj, GUI_EVENT_8);
-                this->release_y = tp->deltaY;
-
-                if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_down == 0))
-                {
-                    if (this->release_y < 0)
-                    {
-                        break;
-                    }
-                }
-
-                if ((tabview->cur_id.y == 0) && (tabview->tab_cnt_up == 0))
-                {
-                    if (this->release_y > 0)
-                    {
-                        this->release_y = 0;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                this->release_y = tp->deltaY;
-            }
-        }
-        break;
-
-    case TOUCH_LEFT_SLIDE:
-        {
-            gui_log("[TV]TOUCH_LEFT_SLIDE\n");
-
-            if (!this->loop_x)
-            {
-                if ((tabview->tab_cnt_right == 0) && (tabview->cur_id.x == 0))
-                {
-                    break;
-                }
-
-                if ((obj->skip_tp_left_hold) && (tp->deltaX  < 0))
-                {
-                    break;
-                }
-            }
-
-            //when current tab is the end,come back to current tab if sliding.
-            if ((tabview->cur_id.x == tabview->tab_cnt_right))
-            {
-                if (tabview->loop_x)
-                {
-                    if (tabview->tab_cnt_left != 0)
-                    {
-                        tabview->cur_id.x = tabview->tab_cnt_left;
-                    }
-                    else
-                    {
-                        tabview->cur_id.x = 0;
-                    }
+                    tabview->cur_id.x = tabview->cur_id.x + 1;
                     this->release_x = this->release_x + tabview->base.w;
                 }
             }
-            else
-            {
-                tabview->cur_id.x = tabview->cur_id.x + 1;
-                this->release_x = this->release_x + tabview->base.w;
-            }
-        }
-        break;
+            break;
 
-    case TOUCH_RIGHT_SLIDE:
-        {
-            gui_log("[TV]TOUCH_RIGHT_SLIDE\n");
-
-            if (!this->loop_x)
+        case TOUCH_RIGHT_SLIDE:
             {
-                if ((tabview->tab_cnt_left == 0) && (tabview->cur_id.x == 0))
+                gui_log("[TV]TOUCH_RIGHT_SLIDE\n");
+
+                if (!this->loop_x)
                 {
-                    break;
+                    if ((tabview->tab_cnt_left == 0) && (tabview->cur_id.x == 0))
+                    {
+                        break;
+                    }
+
+                    if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
+                    {
+                        break;
+                    }
                 }
 
-                if ((obj->skip_tp_right_hold) && (tp->deltaX  > 0))
+                //when current tab is the end,come back to current tab if sliding.
+                if (tabview->cur_id.x == tabview->tab_cnt_left)
                 {
-                    break;
+                    if (tabview->loop_x)
+                    {
+                        if (tabview->tab_cnt_right != 0)
+                        {
+                            tabview->cur_id.x = tabview->tab_cnt_right;
+                        }
+                        else
+                        {
+                            tabview->cur_id.x = 0;
+                        }
+                        this->release_x = this->release_x - tabview->base.w;
+                    }
                 }
-            }
-
-            //when current tab is the end,come back to current tab if sliding.
-            if (tabview->cur_id.x == tabview->tab_cnt_left)
-            {
-                if (tabview->loop_x)
+                else
                 {
-                    if (tabview->tab_cnt_right != 0)
-                    {
-                        tabview->cur_id.x = tabview->tab_cnt_right;
-                    }
-                    else
-                    {
-                        tabview->cur_id.x = 0;
-                    }
+                    tabview->cur_id.x = tabview->cur_id.x - 1;
                     this->release_x = this->release_x - tabview->base.w;
                 }
             }
-            else
-            {
-                tabview->cur_id.x = tabview->cur_id.x - 1;
-                this->release_x = this->release_x - tabview->base.w;
-            }
-        }
-        break;
+            break;
 
-    case TOUCH_DOWN_SLIDE:
-        {
-            gui_log("[TV]TOUCH_DOWN_SLIDE\n");
-
-            if (!this->loop_y)
+        case TOUCH_DOWN_SLIDE:
             {
-                if ((tabview->tab_cnt_up == 0) && (tabview->cur_id.y == 0))
+                gui_log("[TV]TOUCH_DOWN_SLIDE\n");
+
+                if (!this->loop_y)
                 {
-                    break;
+                    if ((tabview->tab_cnt_up == 0) && (tabview->cur_id.y == 0))
+                    {
+                        break;
+                    }
+
+                    if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
+                    {
+                        break;
+                    }
                 }
 
-                if ((obj->skip_tp_down_hold) && (tp->deltaY  > 0))
+                //when current tab is the end,come back to current tab if sliding.
+                if (tabview->cur_id.y == tabview->tab_cnt_up)
                 {
-                    break;
+                    if (tabview->loop_y)
+                    {
+                        if (tabview->tab_cnt_down != 0)
+                        {
+                            tabview->cur_id.y = tabview->tab_cnt_down;
+                        }
+                        else
+                        {
+                            tabview->cur_id.y = 0;
+                        }
+                        this->release_y = this->release_y - tabview->base.h;
+                    }
                 }
-            }
-
-            //when current tab is the end,come back to current tab if sliding.
-            if (tabview->cur_id.y == tabview->tab_cnt_up)
-            {
-                if (tabview->loop_y)
+                else
                 {
-                    if (tabview->tab_cnt_down != 0)
-                    {
-                        tabview->cur_id.y = tabview->tab_cnt_down;
-                    }
-                    else
-                    {
-                        tabview->cur_id.y = 0;
-                    }
+                    tabview->cur_id.y = tabview->cur_id.y - 1;
                     this->release_y = this->release_y - tabview->base.h;
                 }
             }
-            else
-            {
-                tabview->cur_id.y = tabview->cur_id.y - 1;
-                this->release_y = this->release_y - tabview->base.h;
-            }
-        }
-        break;
+            break;
 
-    case TOUCH_UP_SLIDE:
-        {
-            gui_log("[TV]TOUCH_UP_SLIDE\n");
-
-            if (!this->loop_y)
+        case TOUCH_UP_SLIDE:
             {
-                if ((tabview->tab_cnt_down == 0) && (tabview->cur_id.y == 0))
+                gui_log("[TV]TOUCH_UP_SLIDE\n");
+
+                if (!this->loop_y)
                 {
-                    break;
+                    if ((tabview->tab_cnt_down == 0) && (tabview->cur_id.y == 0))
+                    {
+                        break;
+                    }
+
+                    if ((obj->skip_tp_up_hold) && (tp->deltaY < 0))
+                    {
+                        break;
+                    }
                 }
 
-                if ((obj->skip_tp_up_hold) && (tp->deltaY < 0))
+                //when current tab is the end,come back to current tab if sliding.
+                if (tabview->cur_id.y == tabview->tab_cnt_down)
                 {
-                    break;
+                    if (tabview->loop_y)
+                    {
+                        if (tabview->tab_cnt_up != 0)
+                        {
+                            tabview->cur_id.y = tabview->tab_cnt_up;
+                        }
+                        else
+                        {
+                            tabview->cur_id.y = 0;
+                        }
+                        this->release_y = this->release_y + tabview->base.h;
+                    }
                 }
-            }
-
-            //when current tab is the end,come back to current tab if sliding.
-            if (tabview->cur_id.y == tabview->tab_cnt_down)
-            {
-                if (tabview->loop_y)
+                else
                 {
-                    if (tabview->tab_cnt_up != 0)
-                    {
-                        tabview->cur_id.y = tabview->tab_cnt_up;
-                    }
-                    else
-                    {
-                        tabview->cur_id.y = 0;
-                    }
+                    tabview->cur_id.y = tabview->cur_id.y + 1;
                     this->release_y = this->release_y + tabview->base.h;
                 }
             }
-            else
+            break;
+
+        case TOUCH_ORIGIN_FROM_X:
             {
-                tabview->cur_id.y = tabview->cur_id.y + 1;
-                this->release_y = this->release_y + tabview->base.h;
+
             }
+            break;
+
+        case TOUCH_ORIGIN_FROM_Y:
+            {
+
+            }
+            break;
+
+        default:
+            break;
         }
-        break;
-
-    case TOUCH_ORIGIN_FROM_X:
-        {
-
-        }
-        break;
-
-    case TOUCH_ORIGIN_FROM_Y:
-        {
-
-        }
-        break;
-
-    default:
-        break;
     }
-
     if (this->release_x >= GUI_FRAME_STEP)
     {
         this->release_x -= GUI_FRAME_STEP;

@@ -145,14 +145,14 @@ static void draw_timecard(void *parent_widget)
     GUI_BASE(canvas_timecard)->not_show = 0;
 }
 
-static void cv_cb(gui_cardview_t *page)
+static void cv_cb(gui_cardview_t *cv)
 {
     gui_canvas_t *canvas = 0;
     gui_img_t *img = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __CANVAS_NAME, (void *)&canvas);
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __IMG_NAME, (void *)&img);
-    int offset = page->hold_y;
-    // gui_log("offset-->%d\r\n", offset);
+    int offset = cv->hold_y;
+    gui_log("offset-->%d\r\n", offset);
     if (offset + CARD_HEIGHT + 50 < 0)
     {
         GUI_BASE(canvas)->not_show = 0;
@@ -165,7 +165,12 @@ static void cv_cb(gui_cardview_t *page)
         GUI_BASE(canvas)->not_show = 1;
         GUI_BASE(img)->not_show = 0;
     }
-
+    gui_obj_t *obj = 0;
+    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "appview", (void *)&obj);
+    if (offset <= -500 && offset >= -581)
+    {
+        obj->y = 81 + offset + 500;
+    }
 }
 
 void curtain_down_design(void *parent_widget)
@@ -203,6 +208,6 @@ void curtain_down_design(void *parent_widget)
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
     img = gui_img_create_from_mem(cv_app, "app", UI_CARD_APP_BIN, 8, 0, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-    img = gui_img_create_from_mem(cv_appview, "appview", UI_CARD_APPVIEW_BIN, 38, 0, 0, 0);
+    img = gui_img_create_from_mem(cv_appview, "appview", UI_CARD_APPVIEW_BIN, 38, 81, 0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 }
