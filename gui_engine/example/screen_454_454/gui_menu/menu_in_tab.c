@@ -17,6 +17,7 @@
 #include "gui_progressbar.h"
 #include "tp_algo.h"
 #include "gui_canvas_rect.h"
+#include "gui_scroll_text.h"
 static void press_callback(gui_win_t *button);
 static void press_animate_cb(gui_win_t *button);
 static void release_callback(gui_win_t *button);
@@ -813,6 +814,7 @@ static void page_scroll(gui_obj_t *parent)
         // Create an icon inside the window, icon is loaded from memory, the initial position is set to 0
         gui_img_t *icon = gui_img_create_from_mem(win, 0, icon_array[i], 0, 0, 0, 0);
 
+#if 0
         {
             // Create text inside the window
             gui_text_t *t = gui_text_create(win, win_list_text_array[i], 100, 0, 100, 16);
@@ -830,6 +832,26 @@ static void page_scroll(gui_obj_t *parent)
             // Set text mode to center
             gui_text_mode_set(t, CENTER);
         }
+#else
+        {
+            // Create scroll text inside the window
+            gui_scroll_text_t *scrool_text1 = gui_scroll_text_create(win, win_list_text_array[i], 100, 50, 100,
+                                                                     16);
+
+            // Set text content, font, color, and length
+            gui_scroll_text_set(scrool_text1, win_list_text_array[i], GUI_FONT_SRC_BMP, APP_COLOR_BLACK,
+                                strlen(win_list_text_array[i]), 16);
+
+            // Set text scroll property
+            gui_scroll_text_scroll_set(scrool_text1, SCROLL_X, 50, 50, 5 * 1000, 0);
+
+            // Define the font address
+            void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+
+            // Set text type to the font resource from memory address
+            gui_scroll_text_type_set(scrool_text1, addr1, FONT_SRC_MEMADDR);
+        }
+#endif
     }
 }
 
