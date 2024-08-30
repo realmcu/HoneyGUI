@@ -132,6 +132,14 @@ div.wy-menu-vertical {
 li[class*="toctree-"] * {
     font-size: 14px !important;
 }
+.wy-menu-vertical li[class*="toctree-"].current,
+.wy-menu-vertical li[class*="toctree-"].current > a,
+.wy-menu-vertical li[class*="toctree-"].current li[class*="toctree-"]>a {
+    background: white;
+}
+.wy-menu-vertical li.current>a, .wy-menu-vertical li.on a {
+    color: #004d88;
+}
 
 /* =========== Render Sider Style ============ */
 
