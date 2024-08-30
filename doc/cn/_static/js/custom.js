@@ -50,9 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 修改location.hash来实现页面的跳转
                 location.hash = href;
             }, 0);
-            $('html, body').animate({
-                scrollTop: targetElement.offsetTop
-            }, 1000); // 动画滚动时间，这里设置为1000ms，可以根据需要调整
+            targetElement.scrollIntoView({ behavior: 'smooth' });
         });
     }
 
