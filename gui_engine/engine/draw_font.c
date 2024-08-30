@@ -161,7 +161,7 @@ static uint16_t utf16le_to_unicode(uint8_t *utf16le, uint16_t len, uint32_t *uni
 {
     if (len % 2 != 0)
     {
-        // UTF-16LE string length should be even
+        gui_log("Error! UTF-16LE string length should be even!\n");
         return 0;
     }
 
@@ -211,7 +211,7 @@ static uint16_t utf16be_to_unicode(uint8_t *utf16be, uint16_t len, uint32_t *uni
 {
     if (len % 2 != 0)
     {
-        // UTF-16BE string length should be even
+        gui_log("Error! UTF-16BE string length should be even!\n");
         return 0;
     }
 
@@ -262,7 +262,7 @@ static uint16_t utf32le_to_unicode(uint8_t *utf32le, uint16_t len, uint32_t *uni
 {
     if (len % 4 != 0)
     {
-        // UTF-32LE string length should be divisible by 4
+        gui_log("Error! UTF-32LE string length should be divisible by 4!\n");
         return 0;
     }
 
@@ -281,7 +281,7 @@ static uint16_t utf32be_to_unicode(uint8_t *utf32be, uint16_t len, uint32_t *uni
 {
     if (len % 4 != 0)
     {
-        // UTF-32BE string length should be divisible by 4
+        gui_log("Error! UTF-32BE string length should be divisible by 4!\n");
         return 0;
     }
 

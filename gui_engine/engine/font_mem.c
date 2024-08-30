@@ -90,7 +90,12 @@ void gui_font_get_dot_info(gui_text_t *text)
     uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
     unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
-
+    if (unicode_len == 0)
+    {
+        gui_log("Warning! After process, unicode len of text: %s is 0!\n", text->base.name);
+        text->font_len = 0;
+        return;
+    }
     mem_char_t *chr = gui_malloc(sizeof(mem_char_t) * unicode_len);
     if (chr == NULL)
     {
