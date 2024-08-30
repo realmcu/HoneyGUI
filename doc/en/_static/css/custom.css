@@ -157,7 +157,9 @@ li[class*="toctree-"] * {
 
 
 /* ======== Render Main Content Style ========= */
-
+.wy-nav-content a:visited {
+    color: #2980b9;
+}
 /* ======== Render Main Content Style ========= */
 
 
