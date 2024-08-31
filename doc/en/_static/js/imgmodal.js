@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var closeImgModal = document.getElementsByClassName("img-modal-close")[0];
     var currentScale = 1;
 
-    document.querySelectorAll('img').forEach(function(imgItem) {
+    document.querySelectorAll('.rst-content img').forEach(function(imgItem) {
         imgItem.addEventListener('click', function () {
             imgModal.style.display = "flex";
             imgInModal.src = this.src;

@@ -27,6 +27,10 @@ figcaption, figcaption p{
     text-align: center !important;
 }
 
+.wy-breadcrumbs {
+    text-align: left;
+}
+
 /*.wy-nav-side {
      overflow:auto; 
 }*/
@@ -97,10 +101,25 @@ figcaption, figcaption p{
 /* =========== Render sm-screen Style =========== */
 
 /* =========== Render xs-screen Style =========== */
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
     .resize-handle-left, 
     .resize-handle-right {
         display: none;
+    }
+
+    .wy-nav-top {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .wy-breadcrumbs li.wy-breadcrumbs-aside {
+        display: block;
     }
 }
 /* =========== Render xs-screen Style =========== */
@@ -355,7 +374,7 @@ section[id*="deprecated-api"] dd dl {
 /* ==== Render back-to-top icon style ==== */
 #back-to-top {
     position: fixed;
-    bottom: 40px;
+    bottom: 80px;
     right: 20px;
     width: 40px;
     height: 40px;
