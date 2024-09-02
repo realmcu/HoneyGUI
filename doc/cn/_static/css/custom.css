@@ -21,6 +21,8 @@ p {
 .rst-content div, 
 .rst-content p {
     text-align: justify;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 figcaption, figcaption p{
