@@ -5,7 +5,15 @@ document.addEventListener("DOMContentLoaded", function () {
     var currentScale = 1;
 
     document.querySelectorAll('.rst-content img').forEach(function(imgItem) {
-        imgItem.addEventListener('click', function () {
+        imgItem.addEventListener('click', function (event) {
+            var parentElement = imgItem.parentElement;
+            if (parentElement && parentElement.tagName.toLowerCase() === 'a') {
+                // 阻止父a标签的点击事件
+                parentElement.addEventListener('click', function(aEvent) {
+                    aEvent.preventDefault();
+                });
+            }
+
             imgModal.style.display = "flex";
             imgInModal.src = this.src;
             imgInModal.style.transform = 'scale(1)'; // Reset scale on each open
@@ -19,12 +27,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.documentElement.style.overflow = "auto"; // Enable scrolling
     }
 
-    // window.onclick = function(event) {
-    //     if (event.target === imgModal) {
-    //         imgModal.style.display = "none";
-    //         document.documentElement.style.overflow = "auto"; // Enable scrolling
-    //     }
-    // }
+    window.onclick = function(event) {
+        if (event.target === imgModal) {
+            imgModal.style.display = "none";
+            document.documentElement.style.overflow = "auto"; // Enable scrolling
+        }
+    }
 
     // Zoom in/out
     imgInModal.addEventListener("wheel", function(event) {

@@ -413,9 +413,9 @@ section[id*="deprecated-api"] dd dl {
 
 /* ====== Render image modal style ====== */
 /* 禁用点击图片跳转到图片地址的效果 */
-a.image-reference {
+/* a.image-reference {
     pointer-events: none;
-}
+} */
 
 .img-modal {
     display: none;
