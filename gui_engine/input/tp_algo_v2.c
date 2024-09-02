@@ -64,6 +64,9 @@ static uint8_t tp_judge_relese_or_press(struct gui_touch_port_data *raw_data)
             long_button_flag = false;
             tp.pressed = true;
             tp.pressing = true;
+            raw_data->timestamp_ms_start = raw_data->timestamp_ms;
+            raw_data->x_coordinate_start = raw_data->x_coordinate;
+            raw_data->y_coordinate_start = raw_data->y_coordinate;
             TP_LOG("=====START DOWN====== tick = %d\n", raw_data->timestamp_ms);
         }
     }
