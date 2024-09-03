@@ -10,7 +10,7 @@ This example demostrates how to develop a RealUI 86BOX APP, from which you can l
 ### RVisualDesigner
 - RealUI 86box utilizes `RVisualDesigner` to complete UI design. For the first-time usage of `RVisualDesigner`, please refer to `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` to obtain a detailed development guide.
 
-- Find and open the example UI design project in the specified path.
+- Find and open the example UI design project in the specified path:
 <br/>
 <div style="text-align: center"><img width="600" src="https://foruda.gitee.com/images/1701067827418608218/7c54ffbf_10088396.png "></div>
 <br/>

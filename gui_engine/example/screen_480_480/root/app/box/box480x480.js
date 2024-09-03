@@ -57,13 +57,27 @@ function sw_device_offline(params) {
 }
 function sw_device_turnOn(params) {
 	// console.log('sw_gpio_turnOn ', params)
-    swArray[params].writeSync(gpio_val_on) 
+    if(params >= 8 && params <= 10)
+    {
+       swArray[params].writeSync(gpio_val_group_on)
+    }
+    else
+    {
+        swArray[params].writeSync(gpio_val_on) 
+    }
     // swArray[params].state = 1;
 }
 
 function sw_device_turnOff(params) {
 	// console.log('sw_gpio_turnOff ', params)
-    swArray[params].writeSync(gpio_val_off) 
+    if(params >= 8 && params <= 10)
+    {
+        swArray[params].writeSync(gpio_val_group_off)
+    }
+    else
+    {
+        swArray[params].writeSync(gpio_val_off) 
+    }
     // swArray[params].state = 0;
 }
 
@@ -85,7 +99,7 @@ function icon_gpio_turnAllOn(params) {
 	// console.log('icon_gpio_turnAllOn ', params)
 	swArray[params].writeSync(gpio_val_group_on)
 
-	for (var i = 0; i < 11; i++){
+	for (var i = 0; i < 8; i++){
 		sw.getElementById(all_sw_id[i])
 		// sw.turnOn();
         sw.setState(1);
@@ -97,7 +111,7 @@ function icon_gpio_turnAllOff(params) {
 	// console.log('icon_gpio_turnAllOn ', params)
 	swArray[params].writeSync(gpio_val_group_off) 
 
-	for (var i = 0; i < 11; i++){
+	for (var i = 0; i < 8; i++){
 		sw.getElementById(all_sw_id[i])
 		// sw.turnOff();
         sw.setState(0);
@@ -130,7 +144,8 @@ for (var i = 0; i < 11; i++){
     sw.getElementById(id_str);
     console.log(id_str)
 
-    // default state is ON 
+    // default state is ON(0), OFF(1) 
+   // sw.setState(1)
     sw.onOn(sw_sub_turnOff, i)
     sw.onOff(sw_sub_turnOn, i)
 }

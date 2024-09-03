@@ -10,7 +10,7 @@
 ### RVisualDesigner
 - RealUI 86box 使用 RVisualDesigner 来完成 UI 设计， 首次使用 RVisualDesigner 请参阅 `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` 获取详尽的使开发指南。
 
-- 在图示路径中找到并打开示例的 UI 设计工程
+- 在图示路径中找到并打开示例的 UI 设计工程：
 <br/>
 <div style="text-align: center"><img width="600" src="https://foruda.gitee.com/images/1701067827418608218/7c54ffbf_10088396.png "></div>
 <br/>
