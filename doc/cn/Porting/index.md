@@ -15,108 +15,88 @@
 
 ## 加速
 
-- 参考 `guidef.h` 和 `gui_port_acc.c`
+- 参考 `guidef.h` 和 `gui_port_acc.c`。
 - 需要根据平台型号，定义加速绘制接口，一般是`hw_acc_blit`或者`sw_acc_blit`。
 - 结构体定义如下:
 
-```C
-typedef struct acc_engine
-{
-    void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
-} acc_engine_t;
-```
+    ```C
+    typedef struct acc_engine
+    {
+        void (*blit)(draw_img_t *image, gui_dispdev_t *dc, gui_rect_t *rect);
+    } acc_engine_t;
+    ```
 
 ## 显示设备
 
-- 参考 `guidef.h` 和 `gui_port_dc.c`
+- 参考 `guidef.h` 和 `gui_port_dc.c`。
 - 需要定义屏幕的宽度和高度、帧缓冲区地址和模式、分辨率是否缩放等等，并实现刷新函数，结构体定义参考 `guidef.h`。
 - 一个典型的`gui_dispdev`结构体初始化声明如下：
 
-```C
-static struct gui_dispdev dc =
-{
-    .bit_depth = DRV_PIXEL_BITS,
-    .fb_width = DRV_LCD_WIDTH,
-    .fb_height = FB_HEIGHT,
-    .screen_width =  DRV_LCD_WIDTH,
-    .screen_height = DRV_LCD_HIGHT,
-    .dc.disp_buf_1 = disp_write_buff1_port,
-    .dc.disp_buf_2 = disp_write_buff2_port,
-    .driver_ic_fps = 60,
-    .driver_ic_hfp = 10,
-    .driver_ic_hbp = 10,
-    .driver_ic_active_width = DRV_LCD_WIDTH,
-    .type = DC_RAMLESS,
-    .adaption = false,
-    .section = {0, 0, 0, 0},
-    .section_count = 0,
-    .lcd_update = port_gui_lcd_update,
-    .flash_seq_trans_disable = flash_boost_disable,
-    .flash_seq_trans_enable = flash_boost_enable,
-    .reset_lcd_timer = reset_vendor_counter,
-    .get_lcd_us = read_vendor_counter_no_display,
-    .lcd_te_wait = port_lcd_te_wait,
-    .dc.scale_x = 1,
-    .dc.scale_y = 1,
-};
-```
+    ```C
+    static struct gui_dispdev dc =
+    {
+        .bit_depth = DRV_PIXEL_BITS,
+        .fb_width = DRV_LCD_WIDTH,
+        .fb_height = FB_HEIGHT,
+        .screen_width =  DRV_LCD_WIDTH,
+        .screen_height = DRV_LCD_HIGHT,
+        .dc.disp_buf_1 = disp_write_buff1_port,
+        .dc.disp_buf_2 = disp_write_buff2_port,
+        .driver_ic_fps = 60,
+        .driver_ic_hfp = 10,
+        .driver_ic_hbp = 10,
+        .driver_ic_active_width = DRV_LCD_WIDTH,
+        .type = DC_RAMLESS,
+        .adaption = false,
+        .section = {0, 0, 0, 0},
+        .section_count = 0,
+        .lcd_update = port_gui_lcd_update,
+        .flash_seq_trans_disable = flash_boost_disable,
+        .flash_seq_trans_enable = flash_boost_enable,
+        .reset_lcd_timer = reset_vendor_counter,
+        .get_lcd_us = read_vendor_counter_no_display,
+        .lcd_te_wait = port_lcd_te_wait,
+        .dc.scale_x = 1,
+        .dc.scale_y = 1,
+    };
+    ```
 
 - 在 `DC_SINGLE` 模式下，帧缓冲区的大小为 `fb_width*fb_height*bit_depth/8`。
 - 在 `DC_RAMLESS` 模式下，使用了两个部分帧缓冲区，大小为`fb_width*fb_height*bit_depth/8`，此时的`fb_height`是分段高度。
 
 ### 支持接口类型
 
-```eval_rst
-
 以下表格列出了主流芯片支持的与LCD相关的接口。如果您想了解更多信息，请点击特定芯片的名称。
 
-===============  =======  ========  =======  =======  =======
-SOC              I8080    QSPI      RGB      MIPI     SPI
----------------  -------  --------  -------  -------  -------
-`RTL8762C`_      Y        NA        NA       NA       Y
-`RTL8762D`_      Y        Y         NA       NA       Y
-`RTL8763E`_      Y        Y         NA       NA       Y
-`RTL8772G`_      Y        Y         Y        NA       Y
-`RTL8773E`_      Y        Y         Y        NA       Y
-`RTL8772F`_      Y        Y         Y        Y        Y
-===============  =======  ========  =======  =======  =======
+| SOC                                                              | I8080 | QSPI | RGB | MIPI | SPI |
+|:----------------------------------------------------------------:|:-----:|:----:|:---:|:----:|:---:|
+| <span style="display:inline-block;width:70px">[RTL8762C]</span>  |   Y   |  NA  |  NA |  NA  |  Y  |
+| [RTL8762D]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
+| [RTL8763E]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
+| [RTL8772G]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
+| [RTL8773E]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
+| [RTL8772F]                                                       |   Y   |  Y   |  Y  |  Y   |  Y  |
 
+```{note}
 'Y' 表示驱动程序已包含在库中。
 'NA' 表示驱动程序尚未包含在库中。
-
-.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
-.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
-.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
-.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
 ### 已验证屏幕驱动
-****
-```eval_rst
 
 以下表格列出了主流芯片支持的与LCD相关的驱动IC。如果您想了解更多信息，请点击特定芯片的名称。
 
-===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
-SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903     ST7796      OTM8009A    SH8601A   SH8601Z   RM69330   ST7789    NV3041A
----------------  ---------  ----------  ---------  ---------  ---------  ----------  ----------  ----------  --------  --------  --------  --------  --------
-`RTL8762D`_      NA         NA          NA         NA         NA         NA          Y           NA          NA        NA        Y         Y         Y
-`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA
-`RTL8772G`_      Y          Y           Y          Y          Y          Y           Y           NA          NA        NA        NA        NA        NA
-`RTL8773E`_      NA         NA          NA         NA         NA         NA          NA          NA          Y         NA        NA        NA        NA
-`RTL8772F`_      NA         Y           Y          NA         Y          NA          NA          Y           Y         Y         NA        NA        NA
-===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
+| SOC                                                             | EK9716 | ICNA3311 | NT35510 | NV3047 | ST7701S | ST77903 | ST7796 | OTM8009A | SH8601A | SH8601Z | RM69330 | ST7789 | NV3041A |
+|:---------------------------------------------------------------:|:------:|:--------:|:-------:|:------:|:-------:|:-------:|:------:|:--------:|:-------:|:-------:|:-------:|:------:|:-------:|
+| <span style="display:inline-block;width:70px">[RTL8762D]</span> |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   Y    |    NA    |    NA   |    NA   |    Y    |   Y    |    Y    |
+| [RTL8763E]                                                      |   NA   |    NA    |    Y    |   NA   |    NA   |    NA   |   NA   |    NA    |    NA   |    Y    |    NA   |   NA   |    NA   |
+| [RTL8772G]                                                      |   Y    |    Y     |    Y    |   Y    |    Y    |    Y    |   Y    |    NA    |    NA   |    NA   |    NA   |   NA   |    NA   |
+| [RTL8773E]                                                      |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   NA   |    NA    |    Y    |    NA   |    NA   |   NA   |    NA   |
+| [RTL8772F]                                                      |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
 
+```{note}
 'Y' 表示驱动程序已包含在库中。
 'NA' 表示驱动程序尚未包含在库中。
-
-.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
-.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
-.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
-.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
 ## 文件系统
@@ -126,12 +106,12 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 - 不使用文件系统时可以填入空指针。
 - 结构体定义如下：
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_fs struct define start */
-   :end-before: /* gui_fs struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_fs struct define start */
+        :end-before: /* gui_fs struct define end */
+    ```
 
 ## 闪存转换层
 
@@ -140,52 +120,42 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 - 不使用闪存转换层时可以填入空指针。
 - 结构体定义如下:
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_ftl struct define start */
-   :end-before: /* gui_ftl struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_ftl struct define start */
+        :end-before: /* gui_ftl struct define end */
+    ```
 
 ## 输入设备
 
 - 参考 `guidef.h` 和 `gui_port_indev.c`
 - 输入设备包括触摸板、键盘和滚轮，输入信息的结构体如下：
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_indev struct define start */
-   :end-before: /* gui_indev struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_indev struct define start */
+        :end-before: /* gui_indev struct define end */
+    ```
 
 - 如果需要某一种输入设备，需要在`gui_indev`中实现对应的数度获取函数，并填写所需的时间阈值。
 
 ### 触摸芯片
 
-```eval_rst
-
 以下表格列出了所有芯片支持的与触摸相关的IC。如果您想了解更多信息，请点击特定芯片的名称。
 
-==================  =========  ==========  ========  =======  ========  ========  =========
-SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147
-------------------  ---------  ----------  --------  -------  --------  --------  ---------
-`RTL8762D`_         Y          NA          NA        NA       NA        NA         NA
-`RTL8763E`_         NA         NA          NA        NA       NA        Y          Y
-`RTL8772G`_         NA         NA          NA        Y        Y         NA         NA
-`RTL8773E`_         Y          NA          NA        Y        NA        NA         NA
-`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA
-==================  =========  ==========  ========  =======  ========  ========  =========
+| SOC                                                              | CST816S | CHSC6417 | FT3169 | GT911 | ZT2717 | CST816T | GT9147 |
+|:----------------------------------------------------------------:|:-------:|:--------:|:------:|:-----:|:------:|:-------:|:------:|
+| <span style="display:inline-block;width:70px">[RTL8762D]</span>  |    Y    |    NA    |   NA   |   NA  |   NA   |    NA   |    NA  |
+| [RTL8763E]                                                       |    NA   |    NA    |   NA   |   NA  |   NA   |     Y   |     Y  |
+| [RTL8772G]                                                       |    NA   |    NA    |   NA   |    Y  |    Y   |    NA   |    NA  |
+| [RTL8773E]                                                       |    Y    |    NA    |   NA   |    Y  |   NA   |    NA   |    NA  |
+| [RTL8772F]                                                       |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
 
+```{note}
 'Y' 表示驱动程序已包含在库中。
 'NA' 表示驱动程序尚未包含在库中。
-
-
-.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
-.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
-.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
 ### 物理按键
@@ -197,12 +167,12 @@ SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T 
 - 参考 `guidef.h` 和 `gui_port_os.c`
 - 需要定义线程、定时器、消息队列和内存管理的接口，结构体定义如下：
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_os_api struct define start */
-   :end-before: /* gui_os_api struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_os_api struct define start */
+        :end-before: /* gui_os_api struct define end */
+    ```
 
 ## 休眠管理
 
@@ -210,27 +180,34 @@ SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T 
 
 - 参考 `gui_app.h`
 
-```C
-typedef struct gui_app gui_app_t;
-struct gui_app
-{
-    gui_obj_t screen;               //!< 控件树的根节点
-    const char *xml;                //!< 控件树的设计文件
-    uint32_t active_ms;             //!< 屏幕关闭延时
-    void *thread_id;                //!< 线程句柄（可选）
-    void (* thread_entry)(void *this); //!< 线程入口函数
-    void (* ctor)(void *this);      //!< 构造函数
-    void (* dtor)(void *this);      //!< 析构函数
-    void (* ui_design)(gui_app_t *); //!< UI创建入口函数
-    bool lvgl;
-    bool arm2d;
-    bool close;
-    bool next;
-    bool close_sync;
-};
-```
+    ```C
+    typedef struct gui_app gui_app_t;
+    struct gui_app
+    {
+        gui_obj_t screen;               //!< 控件树的根节点
+        const char *xml;                //!< 控件树的设计文件
+        uint32_t active_ms;             //!< 屏幕关闭延时
+        void *thread_id;                //!< 线程句柄（可选）
+        void (* thread_entry)(void *this); //!< 线程入口函数
+        void (* ctor)(void *this);      //!< 构造函数
+        void (* dtor)(void *this);      //!< 析构函数
+        void (* ui_design)(gui_app_t *); //!< UI创建入口函数
+        bool lvgl;
+        bool arm2d;
+        bool close;
+        bool next;
+        bool close_sync;
+    };
+    ```
 
 `active_ms` 是 gui 应用程序的待机时间，可以在不同的应用程序中定义为不同的值。
 与其他类型的电子设备一样，当屏幕持续显示一个界面的时间超过待机时间时，设备将进入睡眠模式。
 在睡眠状态下，通过触摸触摸板、按键或发送消息可以唤醒设备。
 在芯片手册中，这种外设可以关闭的低功耗状态被称为深度低功耗状态（DLPS）。关于DLPS的更多信息，可以在SDK的相关指导文档中找到。
+
+[RTL8762C]: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
+[RTL8762D]: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+[RTL8763E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+[RTL8772G]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+[RTL8773E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+[RTL8772F]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3

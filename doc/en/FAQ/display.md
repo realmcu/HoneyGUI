@@ -1,4 +1,4 @@
-# Display FAQ
+# Display
 
 ## Font Anti-Aliasing
 

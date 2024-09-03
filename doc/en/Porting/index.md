@@ -15,7 +15,7 @@ Currently, porting has been done on FreeRTOS, RT-Thread, and Windows for referen
 
 ## Acceleration
 
-- Refer to `guidef.h` and `gui_port_acc.c`
+- Refer to `guidef.h` and `gui_port_acc.c`.
 - Define the accelerated drawing interface depending on the platform model, generally `hw_acc_blit` or `sw_acc_blit`.
 - The structure definition is as follows:
 
@@ -28,7 +28,7 @@ Currently, porting has been done on FreeRTOS, RT-Thread, and Windows for referen
 
 ## Display Device
 
-- Refer to `guidef.h` and `gui_port_dc.c`
+- Refer to `guidef.h` and `gui_port_dc.c`.
 - Define the screen width and height, framebuffer address and mode, whether the resolution is scaled, and implement the refresh function. Refer to `guidef.h` for the structure definition.
 - A typical `gui_dispdev` structure initialization declaration is as follows:
 
@@ -66,57 +66,37 @@ Currently, porting has been done on FreeRTOS, RT-Thread, and Windows for referen
 
 ### Interface
 
-```eval_rst
-
 The following table lists the LCD-related interfaces supported by mainstream  chips.If you want to know more information, please click on the specific chip name.
 
-===============  =======  ========  =======  =======  =======
-SOC              I8080    QSPI      RGB      MIPI     SPI
----------------  -------  --------  -------  -------  -------
-`RTL8762C`_      Y        NA        NA       NA       Y
-`RTL8762D`_      Y        Y         NA       NA       Y
-`RTL8763E`_      Y        Y         NA       NA       Y
-`RTL8772G`_      Y        Y         Y        NA       Y
-`RTL8773E`_      Y        Y         Y        NA       Y
-`RTL8772F`_      Y        Y         Y        Y        Y
-===============  =======  ========  =======  =======  =======
+| SOC                                                              | I8080 | QSPI | RGB | MIPI | SPI |
+|:----------------------------------------------------------------:|:-----:|:----:|:---:|:----:|:---:|
+| <span style="display:inline-block;width:70px">[RTL8762C]</span>  |   Y   |  NA  |  NA |  NA  |  Y  |
+| [RTL8762D]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
+| [RTL8763E]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
+| [RTL8772G]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
+| [RTL8773E]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
+| [RTL8772F]                                                       |   Y   |  Y   |  Y  |  Y   |  Y  |
 
+```{note}
 'Y' means the driver already included in the library.
 'NA' means the driver not yet included in the library.
-
-.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
-.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
-.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
-.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
 ### Driver IC
 
-```eval_rst
-
 The following table lists the LCD-related driver IC supported by mainstream chips.If you want to know more information, please click on the specific chip name.
 
-===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
-SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903     ST7796      OTM8009A    SH8601A   SH8601Z   RM69330   ST7789    NV3041A
----------------  ---------  ----------  ---------  ---------  ---------  ----------  ----------  ----------  --------  --------  --------  --------  --------
-`RTL8762D`_      NA         NA          NA         NA         NA         NA          Y           NA          NA        NA        Y         Y         Y
-`RTL8763E`_      NA         NA          Y          NA         NA         NA          NA          NA          NA        Y         NA        NA        NA
-`RTL8772G`_      Y          Y           Y          Y          Y          Y           Y           NA          NA        NA        NA        NA        NA
-`RTL8773E`_      NA         NA          NA         NA         NA         NA          NA          NA          Y         NA        NA        NA        NA
-`RTL8772F`_      NA         Y           Y          NA         Y          NA          NA          Y           Y         Y         NA        NA        NA
-===============  =========  ==========  =========  =========  =========  ==========  ==========  ==========  ========  ========  ========  ========  ========
+| SOC                                                             | EK9716 | ICNA3311 | NT35510 | NV3047 | ST7701S | ST77903 | ST7796 | OTM8009A | SH8601A | SH8601Z | RM69330 | ST7789 | NV3041A |
+|:---------------------------------------------------------------:|:------:|:--------:|:-------:|:------:|:-------:|:-------:|:------:|:--------:|:-------:|:-------:|:-------:|:------:|:-------:|
+| <span style="display:inline-block;width:70px">[RTL8762D]</span> |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   Y    |    NA    |    NA   |    NA   |    Y    |   Y    |    Y    |
+| [RTL8763E]                                                      |   NA   |    NA    |    Y    |   NA   |    NA   |    NA   |   NA   |    NA    |    NA   |    Y    |    NA   |   NA   |    NA   |
+| [RTL8772G]                                                      |   Y    |    Y     |    Y    |   Y    |    Y    |    Y    |   Y    |    NA    |    NA   |    NA   |    NA   |   NA   |    NA   |
+| [RTL8773E]                                                      |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   NA   |    NA    |    Y    |    NA   |    NA   |   NA   |    NA   |
+| [RTL8772F]                                                      |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
 
+```{note}
 'Y' means the driver already included in the library.
 'NA' means the driver not yet included in the library.
-
-.. _RTL8762C: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
-.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
-.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
-.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
 ## Filesystem
@@ -126,12 +106,12 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 - If not using a filesystem, you can fill in null pointers.
 - The structure definition is as follows:
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_fs struct define start */
-   :end-before: /* gui_fs struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_fs struct define start */
+        :end-before: /* gui_fs struct define end */
+    ```
 
 ## Flash Translation Layer
 
@@ -140,52 +120,42 @@ SOC              EK9716     ICNA3311    NT35510    NV3047     ST7701S    ST77903
 - If not using a Flash Translation Layer, you can fill in null pointers.
 - The structure definition is as follows:
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_ftl struct define start */
-   :end-before: /* gui_ftl struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_ftl struct define start */
+        :end-before: /* gui_ftl struct define end */
+    ```
 
 ## Input Device
 
 - Refer to `guidef.h` and `gui_port_indev.c`
 - Input devices include touchpads, keyboards, and wheels. The structure for input information is as follows:
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_indev struct define start */
-   :end-before: /* gui_indev struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_indev struct define start */
+        :end-before: /* gui_indev struct define end */
+    ```
 
 - If a specific input device is needed, the corresponding data acquisition function needs to be implemented in `gui_indev`, and the required time thresholds need to be filled in.
 
 ### Touch IC
 
-```eval_rst
-
 The following table lists the Touch-related IC supported by all chips. If you want to know more information, please click on the specific chip name.
 
-==================  =========  ==========  ========  =======  ========  ========  =========
-SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T    GT9147
-------------------  ---------  ----------  --------  -------  --------  --------  ---------
-`RTL8762D`_         Y          NA          NA        NA       NA        NA         NA
-`RTL8763E`_         NA         NA          NA        NA       NA        Y          Y
-`RTL8772G`_         NA         NA          NA        Y        Y         NA         NA
-`RTL8773E`_         Y          NA          NA        Y        NA        NA         NA
-`RTL8772F`_         Y          Y           Y         Y        NA        NA         NA
-==================  =========  ==========  ========  =======  ========  ========  =========
+| SOC                                                              | CST816S | CHSC6417 | FT3169 | GT911 | ZT2717 | CST816T | GT9147 |
+|:----------------------------------------------------------------:|:-------:|:--------:|:------:|:-----:|:------:|:-------:|:------:|
+| <span style="display:inline-block;width:70px">[RTL8762D]</span>  |    Y    |    NA    |   NA   |   NA  |   NA   |    NA   |    NA  |
+| [RTL8763E]                                                       |    NA   |    NA    |   NA   |   NA  |   NA   |     Y   |     Y  |
+| [RTL8772G]                                                       |    NA   |    NA    |   NA   |    Y  |    Y   |    NA   |    NA  |
+| [RTL8773E]                                                       |    Y    |    NA    |   NA   |    Y  |   NA   |    NA   |    NA  |
+| [RTL8772F]                                                       |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
 
+```{note}
 'Y' means the driver already included in the library.
 'NA' means the driver not yet included in the library.
-
-
-.. _RTL8762D: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
-.. _RTL8763E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772G: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
-.. _RTL8773E: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-.. _RTL8772F: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 ```
 
 ## Operating System
@@ -193,12 +163,12 @@ SOC                 CST816S    CHSC6417    FT3169    GT911    ZT2717    CST816T 
 - Refer to `guidef.h` and `gui_port_os.c`
 - Define the interfaces for thread, timer, message queue, and memory management. The structure definition is as follows:
 
-```eval_rst
-.. literalinclude:: ../../../gui_engine/widget/guidef.h
-   :language: c
-   :start-after: /* gui_os_api struct define start */
-   :end-before: /* gui_os_api struct define end */
-```
+    ```eval_rst
+    .. literalinclude:: ../../../gui_engine/widget/guidef.h
+        :language: c
+        :start-after: /* gui_os_api struct define start */
+        :end-before: /* gui_os_api struct define end */
+    ```
 
 ## Sleep Management
 
@@ -230,3 +200,10 @@ To reduce power consumption and increase the device's usage time, sleep (low pow
 Like other types of electronic devices, when the screen continuously displays an interface for the standby time, the device will enter sleep mode.
 In sleep mode, the device can be awakened by touching the touchpad, pressing a key, or sending a message.
 In the chip manual, this low power state where peripherals can be turned off is called Deep Low Power State (DLPS). More information about DLPS can be found in the relevant SDK documentation.
+
+[RTL8762C]: https://www.realmcu.com/en/Home/Product/93cc0582-3a3f-4ea8-82ea-76c6504e478a
+[RTL8762D]: https://www.realmcu.com/en/Home/Product/52feef61-22d0-483e-926f-06eb10e804ca
+[RTL8763E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+[RTL8772G]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
+[RTL8773E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
+[RTL8772F]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3

@@ -28,6 +28,7 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 
 ## 安装
 
+{#Install_compiler_cn}
 ### 安装编译器
 下载 MinGW-w64 工具链，解压到 C 盘，并将其添加到系统环境变量 `Path`中。
 1.  [MinGW-w64 下载](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z)
