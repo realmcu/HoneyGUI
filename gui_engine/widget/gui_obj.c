@@ -180,6 +180,7 @@ void gui_obj_ctor(gui_obj_t  *this,
     this->matrix = gui_malloc(sizeof(struct gui_matrix));
 
     matrix_identity(this->matrix);
+    this->magic = GUI_MAGIC_NUMBER;
 }
 
 gui_obj_t *gui_obj_create(void       *parent,
@@ -286,6 +287,7 @@ void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
 }
 void gui_obj_tree_free(void *obj)
 {
+    //GUI_WIDGET_TRY_EXCEPT(obj)
     gui_obj_t *object = (gui_obj_t *)obj;
 
     gui_obj_tree_child_free(object);
@@ -844,6 +846,45 @@ void gui_obj_tree_print_bfs(gui_obj_t *root)
             queue[rear++] = child_obj;
         }
     }
+}
+void gui_obj_hidden(gui_obj_t *obj, bool hidden)
+{
+    GUI_WIDGET_TRY_EXCEPT(obj)
+    obj->not_show = hidden;
+}
+static size_t safe_strlen(const char *str, size_t max_len)
+{
+    if (str == NULL) { return 0; }
+
+    size_t len = 0;
+    while (len < max_len && str[len] != '\0')
+    {
+        len++;
+    }
+
+    return len;
+}
+
+static bool is_string(const char *str, size_t max_len)
+{
+    if (str == NULL) { return 0; }
+    size_t len = safe_strlen(str, max_len);
+    if (len < max_len)
+    {
+        return 1;
+    }
+    return 0;
+}
+#define MAX_WIDGET_NAME_LENGTH 128
+const char *gui_widget_name(gui_obj_t *widget, const char *name)
+{
+    GUI_WIDGET_TRY_EXCEPT(widget)
+    if (is_string(name, MAX_WIDGET_NAME_LENGTH + 1))
+    {
+        widget->name = name;
+    }
+    return widget->name;
+
 }
 /** End of WIDGET_Exported_Functions
   * @}

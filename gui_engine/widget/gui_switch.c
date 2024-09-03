@@ -87,16 +87,16 @@ void gui_switch_change_state(gui_switch_t *this, bool ifon)
     {
         if (this->style != SWITCH_HIGHLIGHT_ARRAY)
         {
-            gui_img_set_attribute(this->switch_picture, this->switch_picture->base.name, this->on_pic_addr, 0,
-                                  0);
+            gui_img_set_attribute(this->switch_picture, this->switch_picture->base.name, this->on_pic_addr,
+                                  this->switch_picture->base.x, this->switch_picture->base.y);
         }
 
 
     }
     else
     {
-        gui_img_set_attribute(this->switch_picture, this->switch_picture->base.name, this->off_pic_addr, 0,
-                              0);
+        gui_img_set_attribute(this->switch_picture, this->switch_picture->base.name, this->off_pic_addr,
+                              this->switch_picture->base.x, this->switch_picture->base.y);
     }
 }
 
@@ -162,11 +162,13 @@ static void gui_switch_hl(gui_switch_t *sw)
 {
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_hl_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_hl_pic_addr,
+                              sw->switch_picture->base.x, sw->switch_picture->base.y);
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_hl_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_hl_pic_addr,
+                              sw->switch_picture->base.x, sw->switch_picture->base.y);
     }
 }
 
@@ -174,11 +176,13 @@ static void gui_switch_hl_back(gui_switch_t *sw)
 {
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr,
+                              sw->switch_picture->base.x, sw->switch_picture->base.y);
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr,
+                              sw->switch_picture->base.x, sw->switch_picture->base.y);
     }
 }
 
@@ -192,18 +196,20 @@ static void gui_switch_long_touch_back(gui_switch_t *sw)
 {
     if (sw->ifon)
     {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->on_pic_addr,
+                              sw->switch_picture->base.x, sw->switch_picture->base.y);
     }
     else
     {
-        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr, 0, 0);
+        gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name, sw->off_pic_addr,
+                              sw->switch_picture->base.x, sw->switch_picture->base.y);
     }
 }
 
 static void gui_switch_hl_long_touch(gui_switch_t *sw)
 {
     gui_img_set_attribute(sw->switch_picture, sw->switch_picture->base.name,
-                          sw->long_touch_state_hl_pic_addr, 0, 0);
+                          sw->long_touch_state_hl_pic_addr, sw->switch_picture->base.x, sw->switch_picture->base.y);
 }
 
 void gui_tree_disable_widget_gesture_by_type(gui_obj_t *obj, int type)

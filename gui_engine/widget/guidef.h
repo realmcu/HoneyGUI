@@ -547,6 +547,17 @@ extern char *defaultPath;
 #define GUI_ERROR_FORMAT (gui_error_t)3
 #define GUI_SUCCESS (gui_error_t)0
 typedef int gui_error_t;
+#define GUI_MAGIC_NUMBER 0B1011
+#define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT((obj&&GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
+#define GUI_WIDHET_POINTER(pointer, name) gui_obj_t *pointer = 0;\
+    gui_obj_tree_get_widget_by_name((void *)gui_current_app(), name, &pointer);\
+    GUI_WIDGET_TRY_EXCEPT(pointer)
+#define GUI_ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
+#define GUI_WIDGET_TYPE_TRY_EXCEPT(obj,widget_type) {GUI_WIDGET_TRY_EXCEPT(obj)if ((GUI_BASE(obj)->type != widget_type))\
+        {\
+            gui_log("GUI_WIDGET_TYPE_TRY_EXCEPT: type is %d ;",GUI_BASE(obj)->type);\
+        }\
+        {GUI_ASSERT((GUI_BASE(obj)->type == widget_type))}}
 /** End of SUBMOUDLE_Exported_Macros
   * @}
   */

@@ -66,14 +66,43 @@ typedef struct gui_scroll_wheel_new
     int16_t string_array_size;
     int16_t gap;
     int16_t count;
-    int16_t touch_y, speed, text_image_map_length;
+    int16_t touch_y, speed, text_image_map_length, col_offset, index_offset;
     gui_win_t *win;
     int16_t recode[5];
     const struct gui_text_image_map *text_image_map;
-
+    bool wheel_take_over;
+    char time_array_offset;
+    int history_y;
 } gui_scroll_wheel_new_t;
 
+_GUI_API_DEFINE(gui_scroll_wheel_new_t)
+/**
+ * @brief Get the current index of the scroll wheel widget.
+ *
+ * This function pointer should point to a function that returns the current index
+ * of the scroll wheel widget. The index typically represents the currently
+ * selected item in the scroll wheel.
+ *
+ * @param widget Pointer to the scroll wheel widget.
+ *
+ * @return The current index of the scroll wheel widget.
+ */
+int (*get_index)(gui_scroll_wheel_new_t *widget);
 
+/**
+ * @brief Set the current index for the scroll wheel widget.
+ *
+ * This function pointer should point to a function that sets the current index
+ * of the scroll wheel widget. The index typically represents the item to be
+ * selected in the scroll wheel.
+ *
+ * @param this Pointer to the scroll wheel widget.
+ * @param index Index to be set as the current index.
+ *
+ * @return Status code indicating success or failure.
+ */
+int (*set_index)(gui_scroll_wheel_new_t *this, int index);
+_GUI_API_DECLARE(gui_scroll_wheel_new_t)
 /** End of WIDGET_Exported_Types
   * @}
   */
@@ -162,6 +191,50 @@ void gui_scroll_wheel_new_render_text(gui_scroll_wheel_new_t *widget, const void
  */
 void gui_scroll_wheel_new_render_image_array(gui_scroll_wheel_new_t *widget,
                                              const struct gui_text_image_map *map, int map_length);
+/**
+ * @brief Set the column offset for a scroll wheel widget.
+ *
+ * This function sets the column offset for the specified scroll wheel widget.
+ * The offset determines the starting column position for rendering the widget.
+ *
+ * @param widget Pointer to the scroll wheel widget.
+ * @param offset Column offset to be set.
+ */
+void gui_scroll_wheel_new_set_col_offset(gui_scroll_wheel_new_t *widget, int offset);
+
+/**
+ * @brief Get image pointers based on the input text and a mapping.
+ *
+ * This function parses the input text and retrieves image pointers according to
+ * the specified text-image map. It returns an array of pointers to images that
+ * correspond to the characters in the input text.
+ *
+ * @param input Pointer to the input text string.
+ * @param num_pointers Pointer to a variable to receive the number of image pointers.
+ * @param text_image_map_length Length of the text-image map.
+ * @param text_image_map Pointer to the text-image map structure.
+ *
+ * @return Pointer to an array of image pointers. The array and its content
+ *         should be freed by the caller when no longer needed.
+ */
+void **gui_scroll_wheel_new_get_image_pointers(const char *input, size_t *num_pointers,
+                                               int16_t text_image_map_length, const struct gui_text_image_map *text_image_map);
+
+/**
+ * @brief Render the scroll wheel based on the input text and mapping.
+ *
+ * This function renders the scroll wheel using the specified input text and
+ * a text-image map. The rendering mode determines how the wheel is displayed.
+ *
+ * @param text Pointer to the input text string.
+ * @param obj Pointer to the text object.
+ * @param render_mode Rendering mode to be applied.
+ * @param text_image_map_length Length of the text-image map.
+ * @param text_image_map Pointer to the text-image map structure.
+ */
+void gui_scroll_wheel_new_render(const char *text, gui_obj_t *obj, unsigned char render_mode,
+                                 int16_t text_image_map_length, const struct gui_text_image_map *text_image_map);
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

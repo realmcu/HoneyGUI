@@ -54,8 +54,7 @@ struct widget_create
 
 #define WIDGETS_NUM 26
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
-#define MACRO_ONON 9001
-#define MACRO_ONOFF 9002
+
 static struct widget_create widget[] =
 {
     { "win", WINDOW }, //

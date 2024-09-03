@@ -145,7 +145,7 @@ static void gui_win_update_att(gui_obj_t *obj)
     }
 }
 
-static void gui_win_prepare(gui_obj_t *obj)
+static void prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
     kb_info_t *kb = kb_get_info();
@@ -476,7 +476,11 @@ void gui_win_stop_animation(gui_win_t *win)
 }
 void gui_win_prepare_globle(gui_obj_t *obj)
 {
-    gui_win_prepare(obj);
+    prepare(obj);
+}
+void gui_win_prepare(gui_obj_t *obj)
+{
+    prepare(obj);
 }
 /** End of WIDGET_Exported_Functions
   * @}

@@ -34,6 +34,7 @@ static void img_animate_watchface_callback(void *obj)
     uint16_t seconds = get_system_clock_second();
     uint16_t minute = RtkWristbandSys.Global_Time.minutes;
     uint16_t hour = RtkWristbandSys.Global_Time.hour;
+    int millisecond = 0;
 #else
     time_t rawtime;
     struct tm *timeinfo;
@@ -43,11 +44,15 @@ static void img_animate_watchface_callback(void *obj)
     uint16_t seconds = timeinfo->tm_sec;
     uint16_t minute = timeinfo->tm_min;
     uint16_t hour = timeinfo->tm_hour;
-
+    int millisecond = 0;
+    struct timespec spec;
+    const float angle_per_second = 360.0f / 60.0f;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    millisecond = spec.tv_nsec / 1000000;
 #endif
     angle_hour = (hour % 12) * MY_PI / 6 + minute * MY_PI / 360;
     angle_min  = minute * MY_PI / 30 + seconds * MY_PI / 1800;
-    angle_sec  = seconds * MY_PI / 30;
+    angle_sec = (seconds + millisecond / 1000.0f) * angle_per_second;
     gui_img_translate(watchface_hour, watchface_hour->base.w / 2, watchface_hour->base.h);
     gui_img_translate(watchface_minute, watchface_minute->base.w / 2, watchface_minute->base.h);
     gui_img_translate(watchface_second, watchface_second->base.w / 2, watchface_second->base.h);

@@ -115,6 +115,9 @@ typedef enum t_obj_type
     VG_LITE_SOCCER           = 0x0031,
     SLIDER                   = 0x0032,
     MACRO_ONCHANGE           = 0x0033,
+    TYPE_SCROLL_WHEEL_NEW    = 0x0034,
+    MACRO_ONON               = 0x0035,
+    MACRO_ONOFF              = 0x0036,
 } T_OBJ_TYPE;
 typedef enum
 {
@@ -165,7 +168,7 @@ typedef struct _gui_obj_t
     uint32_t has_draw_cb          : 1;
     uint32_t has_end_cb           : 1;
     uint32_t has_destroy_cb       : 1;
-
+    uint32_t magic                : 4;
     gui_event_dsc_t *event_dsc;
 
     gui_matrix_t *matrix;
@@ -591,6 +594,8 @@ gui_obj_t *gui_get_root(gui_obj_t *object);
  *       that @p absolute_x and @p absolute_y are valid pointers to integers.
  */
 void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y);
+void gui_obj_hidden(gui_obj_t *obj, bool hidden);
+const char *gui_widget_name(gui_obj_t *widget, const char *name);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

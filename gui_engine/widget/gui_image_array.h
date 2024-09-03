@@ -69,6 +69,7 @@ typedef struct gui_image_array
     int array_count;
     uint8_t checksum;
     bool parent_scope, scope_flag;
+    const char *text;
 } gui_image_array_t;
 
 /** End of WIDGET_Exported_Types

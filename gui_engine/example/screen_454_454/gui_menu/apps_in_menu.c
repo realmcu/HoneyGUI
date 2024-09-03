@@ -66,6 +66,7 @@ GUI_APP_DEFINE_NAME(APP_CALCULATOR)
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
 #define HR_BK_RECT_NAME "_HR_BK_RECT_NAME"
+#define STOPWATCHTEXT "STOPWATCHTEXT"
 #define APP_SWAP_ANIMATION_DUR 2000
 static void heart_ani_cb(gui_win_t *img);
 static void page_cb(gui_page_t *page);
@@ -318,13 +319,20 @@ static void win_cb(gui_win_t *win)
 
 
 }
-
+void gui_return_cb(gui_win_t *win)
+{
+    win_cb(win);
+}
 #define TIME_SCALE_RATE (0.35F)
 #define STATUS_BAR_HEIGHT 20
 #define STATUS_BAR_TIME_TEXT "STATUS_BAR_TIME_TEXT"
 #define STATUS_BAR_DATE_TEXT "STATUS_BAR_DATE_TEXT"
 #define STATUS_BAR_WINDOW "STATUS_BAR_WINDOW"
 static gui_canvas_rect_t *rect;
+void gui_app_create_status_bar(void *parent, gui_obj_t *ignore_gesture)
+{
+    status_bar(parent, ignore_gesture);
+}
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -736,163 +744,15 @@ const uint32_t *gui_app_return_array[] =
     PATH25_BIN,
 };
 /*Define gui_app_return_array end*/
-static void stop_watch_win_ani_cb(void);
-#define STOPWATCHTEXT "STOPWATCHTEXT"
 
-const static int gap = 50;
-#include "gui_scroll_wheel_new.h"
-const static struct gui_text_image_map app_text_image_map[] =
-{
-    {"0", TEXT0_BIN},
-    {"1", TEXT1_BIN},
-    {"2", TEXT2_BIN},
-    {"3", TEXT3_BIN},
-    {"4", TEXT4_BIN},
-    {"5", TEXT5_BIN},
-    {"6", TEXT6_BIN},
-    {"7", TEXT7_BIN},
-    {"8", TEXT8_BIN},
-    {"9", TEXT9_BIN},
-    {"PM", TEXTPM_BIN},
-    {"AM", TEXTAM_BIN},
-    {".", TEXTDIAN_BIN},
-    {":", TEXTMAOHAO_BIN},
-    {"/", TEXTXIEGANG_BIN},
-};
-static void stop_watch_ml0(gui_obj_t *parent)
-{
-
-}
-
-const char *string_array[] = {"01", "02", "03",
-                              "04",
-                              "05",
-                              "06",
-                              "07",
-                              "08",
-                              "09",
-                             };
-static void stop_watch_ml1_0(gui_obj_t *parent)
-{
-
-    gui_win_t *stop = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_set_animate(stop, 1000, -1, stop_watch_win_ani_cb, 0);
-    {
-        char *text = "07:55";
-        int font_size = 48;
-        gui_text_t *t = gui_text_create(stop, STOPWATCHTEXT,  0, 200,
-                                        gui_get_screen_width(),
-                                        font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-        void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_convert_to_img(t, ARGB8888);
-        gui_text_mode_set(t, CENTER);
-
-    }
-}
-#include "gui_switch.h"
-static void stop_watch_ml1_1(gui_obj_t *parent)
-{
-    const int width = 100;
-    gui_scroll_wheel_new_t *wheel = gui_scroll_wheel_new_create(parent, 100, 100, width, 50, 5,
-                                                                string_array, 9);
-    //gui_scroll_wheel_new_render_text(wheel, ARIALBD_SIZE16_BITS4_FONT_BIN, 16);
-    gui_scroll_wheel_new_render_image_array(wheel, app_text_image_map, 15);
-    gui_canvas_rect_create((void *)wheel, 0, width + 2, 0, 2, gap * 5 - 25, APP_COLOR_BLACK);
-    gui_img_t *img = gui_img_create_from_mem(wheel, 0, STOPWATCHMASK_BIN, 0, 0, 0, 0);
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-
-    gui_switch_t *sw = gui_switch_create(parent, 454 / 2 - 150 / 2, 300, 150, 100, STARTBUTTON_BIN,
-                                         STOPBUTTON_BIN);
-    gui_img_set_mode(sw->switch_picture, IMG_SRC_OVER_MODE);
-
-}
-static void win_stop_watch_cb(void *null1, void *null2, void *param)
-{
-    gui_multi_level_t *ml = param;
-    GUI_API(gui_multi_level_t).jump(ml, 1, 0);
-
-}
-static void win_timer_cb(void *null1, void *null2, void *param)
-{
-    gui_multi_level_t *ml = param;
-    GUI_API(gui_multi_level_t).jump(ml, 1, 1);
-
-}
 /*define the app's ui design*/
 GUI_APP_ENTRY(APP_STOPWATCH)
 {
-    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER);
-    gui_multi_level_t *ml0 = gui_multi_level_create(GUI_APP_ROOT_SCREEN, 0, stop_watch_ml0);
-    gui_multi_level_create(ml0, 0, stop_watch_ml1_0);
-    gui_multi_level_create(ml0, 0, stop_watch_ml1_1);
-    GUI_API(gui_multi_level_t).jump(ml0, 1, 0);
-    const int win_height = 100;
-    gui_win_t *win_stop_watch = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_H - win_height,
-                                               SCREEN_W / 2, win_height);
-    gui_win_press(win_stop_watch, win_stop_watch_cb, ml0);
-    {
-        char *text = "Stop watch";
-        int font_size = 16;
-        gui_text_t *t = gui_text_create(win_stop_watch, text, 0, 52, gui_get_screen_width() / 2,
-                                        font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_mode_set(t, CENTER);
-
-    }
-    gui_win_t *win_timer = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W / 2 + 1,
-                                          SCREEN_H - win_height, SCREEN_W / 2, win_height);
-    gui_win_press(win_timer, win_timer_cb, ml0);
-    {
-        char *text = "timer";
-        int font_size = 16;
-        gui_text_t *t = gui_text_create(win_timer, text, 0, 52, gui_get_screen_width() / 2,
-                                        font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_mode_set(t, CENTER);
-
-    }
-    status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+    extern void app_clock_ui_design(gui_obj_t *parent);
+    app_clock_ui_design(GUI_APP_ROOT_SCREEN);
 }
 /*define the app's ui design end*/
-static void get_stopwatch_string(char *buffer)
-{
-#if _WIN32
-    static bool enter;
-    static struct timeval start;
-    if (!enter)
-    {
-        enter = 1;
-        mingw_gettimeofday(&start, NULL);
-    }
-    struct timeval end;
-    long mtime, secs, usecs;
-    {
-        mingw_gettimeofday(&end, NULL);
-        secs  = end.tv_sec  - start.tv_sec;
-        usecs = end.tv_usec - start.tv_usec;
-        mtime = ((secs) * 1000 + usecs / 1000.0) + 0.5;
-        sprintf(buffer, "\r%02ld:%02ld:%02ld", secs / 60, secs % 60, (mtime % 1000) / 10);
-    }
-#endif
-}
-static void stop_watch_win_ani_cb()
-{
 
-    static char buffer[9];
-    get_stopwatch_string(buffer);
-    gui_text_t *time_txt = 0;
-    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
-    gui_text_content_set(time_txt, buffer, strlen(buffer));
-    gui_text_convert_to_img(time_txt, ARGB8888);
-}
 #include "gui_map.h"
 GUI_APP_ENTRY(APP_MAP)
 {
