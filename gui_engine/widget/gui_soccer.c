@@ -193,11 +193,91 @@ static gui_vertex_t computeNormal(gui_vertex_t a, gui_vertex_t b, gui_vertex_t c
     return normal;
 }
 
+gui_quaternion_t quat_identity()
+{
+    return (gui_quaternion_t) {1.0f, 0.0f, 0.0f, 0.0f};
+}
+
+gui_quaternion_t quaternion_multiply(gui_quaternion_t q1, gui_quaternion_t q2)
+{
+    gui_quaternion_t result;
+    result.x = q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y;
+    result.y = q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x;
+    result.z = q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w;
+    result.w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z;
+    return result;
+}
+
+gui_quaternion_t quaternion_from_angle_axis(float angle, float axisX, float axisY, float axisZ)
+{
+    gui_quaternion_t result;
+    float halfAngleRadian = angle * 0.5f;
+    float sinHalfAngle = sinf(halfAngleRadian);
+    result.x = axisX * sinHalfAngle;
+    result.y = axisY * sinHalfAngle;
+    result.z = axisZ * sinHalfAngle;
+    result.w = cosf(halfAngleRadian);
+    return result;
+}
+
+void quaternion_to_matrix(gui_quaternion_t *quaternion, gui_matrix_t *matrix)
+{
+    float x = quaternion->x;
+    float y = quaternion->y;
+    float z = quaternion->z;
+    float w = quaternion->w;
+
+    float xx = x * x;
+    float yy = y * y;
+    float zz = z * z;
+    float xy = x * y;
+    float xz = x * z;
+    float yz = y * z;
+    float wx = w * x;
+    float wy = w * y;
+    float wz = w * z;
+
+    matrix->m[0][0] = 1 - 2 * (yy + zz);
+    matrix->m[0][1] = 2 * (xy - wz);
+    matrix->m[0][2] = 2 * (xz + wy);
+
+    matrix->m[1][0] = 2 * (xy + wz);
+    matrix->m[1][1] = 1 - 2 * (xx + zz);
+    matrix->m[1][2] = 2 * (yz - wx);
+
+    matrix->m[2][0] = 2 * (xz - wy);
+    matrix->m[2][1] = 2 * (yz + wx);
+    matrix->m[2][2] = 1 - 2 * (xx + yy);
+}
+
 static void gui_soccer_prepare(gui_obj_t *obj)
 {
     gui_soccer_t *this = (gui_soccer_t *)obj;
+    gui_dispdev_t *dc = gui_get_dc();
+    touch_info_t *tp = (touch_info_t *)tp_get_info();
 
-    this->yrot = this->yrot + 1;
+    this->yrot = 1;
+    this->rotation = quaternion_multiply(quaternion_from_angle_axis(this->yrot / 180.0f * PHI, 0, 1, 0),
+                                         this->rotation);
+    float scsize = this->scsize;
+    float xoff = (this->c_x - dc->screen_width / 2) + dc->screen_width / 2;
+    float yoff = (this->c_y - dc->screen_height / 2) + dc->screen_height / 2;
+
+    switch (tp->type)
+    {
+    case TOUCH_HOLD_X:
+        this->rotation = quaternion_multiply(quaternion_from_angle_axis(tp->deltaX / 360.0f, 0, 1, 0),
+                                             this->rotation);
+        break;
+
+    case TOUCH_HOLD_Y:
+        this->rotation = quaternion_multiply(quaternion_from_angle_axis(-tp->deltaY / 360.0f, 1, 0, 0),
+                                             this->rotation);
+        break;
+
+    default:
+        break;
+    }
 
     for (int i = 0; i < 20; i++)
     {
@@ -248,21 +328,21 @@ static void gui_soccer_prepare(gui_obj_t *obj)
         gui_vertex_t qrv2;
         gui_vertex_t qrv3;
 
-        gui_soccer_scale(&qv0, 100);
-        gui_soccer_scale(&qv1, 100);
-        gui_soccer_scale(&qv2, 100);
-        gui_soccer_scale(&qv3, 100);
+        gui_soccer_scale(&qv0, scsize);
+        gui_soccer_scale(&qv1, scsize);
+        gui_soccer_scale(&qv2, scsize);
+        gui_soccer_scale(&qv3, scsize);
 
         gui_matrix_t matrix;
         gui_matrix_t rotate_3D;
 
-        matrix_compute_rotate(this->yrot, this->yrot, this->yrot, &rotate_3D);
+        quaternion_to_matrix(&this->rotation, &rotate_3D);
         matrix_multiply_normal(&rotate_3D, &this->normal[i]);
 
-        matrix_transfrom_rotate(&rotate_3D, &qv0, &qrv0, 200, 200, 0);
-        matrix_transfrom_rotate(&rotate_3D, &qv1, &qrv1, 200, 200, 0);
-        matrix_transfrom_rotate(&rotate_3D, &qv2, &qrv2, 200, 200, 0);
-        matrix_transfrom_rotate(&rotate_3D, &qv3, &qrv3, 200, 200, 0);
+        matrix_transfrom_rotate(&rotate_3D, &qv0, &qrv0, xoff, yoff, 0);
+        matrix_transfrom_rotate(&rotate_3D, &qv1, &qrv1, xoff, yoff, 0);
+        matrix_transfrom_rotate(&rotate_3D, &qv2, &qrv2, xoff, yoff, 0);
+        matrix_transfrom_rotate(&rotate_3D, &qv3, &qrv3, xoff, yoff, 0);
         gui_soccer_transfrom_blit(100, 100, &qrv1, &qrv0, &qrv3, &qrv2, &matrix);
 
 
@@ -343,10 +423,10 @@ static void gui_soccer_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     }
 }
 
-static void gui_soccer_ctor(gui_soccer_t         *this,
+static void gui_soccer_ctor(gui_soccer_t       *this,
                             gui_obj_t          *parent,
                             const char         *name,
-                            void *addr,
+                            void               *addr,
                             int16_t             x,
                             int16_t             y,
                             int16_t             w,
@@ -378,7 +458,11 @@ static void gui_soccer_ctor(gui_soccer_t         *this,
     }
 
     gui_dispdev_t *dc = gui_get_dc();
+    this->scsize = 100;
+    this->c_x = (dc->fb_width - this->scsize) / 2.0f;
+    this->c_y = (dc->fb_width - this->scsize) / 2.0f;
 
+    this->rotation = quat_identity();
 }
 
 /*============================================================================*
@@ -389,7 +473,7 @@ static void gui_soccer_ctor(gui_soccer_t         *this,
 
 gui_soccer_t *gui_soccer_create(void               *parent,
                                 const char         *name,
-                                void                *addr,
+                                void               *addr,
                                 int16_t             x,
                                 int16_t             y)
 {
@@ -414,6 +498,60 @@ gui_soccer_t *gui_soccer_create(void               *parent,
     GET_BASE(soccer)->create_done = true;
     return soccer;
 }
+
+BLEND_MODE_TYPE gui_soccer_get_mode(gui_soccer_t *soccer)
+{
+    GUI_ASSERT(soccer != NULL);
+    return (BLEND_MODE_TYPE)soccer->draw_img[0].blend_mode;
+}
+
+void gui_soccer_set_mode(gui_soccer_t *soccer, BLEND_MODE_TYPE mode)
+{
+    GUI_ASSERT(soccer != NULL);
+
+    for (int i = 0; i < 20; i++)
+    {
+        soccer->draw_img[i].blend_mode = mode;
+    }
+}
+
+uint8_t gui_soccer_get_opacity(gui_soccer_t *soccer)
+{
+    GUI_ASSERT(soccer != NULL);
+    return (BLEND_MODE_TYPE)soccer->draw_img[0].opacity_value;
+}
+
+void gui_soccer_set_opacity(gui_soccer_t *soccer, uint8_t opacity)
+{
+    GUI_ASSERT(soccer != NULL);
+
+    for (int i = 0; i < 20; i++)
+    {
+        soccer->draw_img[i].opacity_value = opacity;
+    }
+}
+
+void gui_soccer_set_img(gui_soccer_t *soccer, void *addr)
+{
+    GUI_ASSERT(soccer != NULL);
+
+    for (int i = 0; i < 20; i++)
+    {
+        soccer->draw_img[i].data = addr;
+    }
+}
+
+void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y)
+{
+    this->c_x = c_x;
+    this->c_y = c_y;
+}
+
+void gui_soccer_set_size(gui_soccer_t *this, float size)
+{
+    this->scsize = size;
+}
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

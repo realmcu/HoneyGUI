@@ -46,7 +46,13 @@ extern "C" {
   * @{
   */
 
-
+typedef struct
+{
+    float w;
+    float x;
+    float y;
+    float z;
+} gui_quaternion_t;
 
 /** @brief  SOCCER widget structure */
 #ifdef  __CC_ARM
@@ -59,7 +65,11 @@ typedef struct gui_soccer
     float xrot;
     float yrot;
     float zrot;
+    float c_x;
+    float c_y;
+    float scsize;
     gui_vertex_t normal[20];
+    gui_quaternion_t rotation;
     // float nz[20];
 
 } gui_soccer_t;
@@ -122,7 +132,7 @@ typedef struct gui_soccer
  *
  * @param parent parent widget
  * @param name  widget name
- * @param img_file the image file data, set flg_fs true when using filesystem
+ * @param addr the image file data
  * @param x  left
  * @param y top
  * @return gui_soccer_t* widget pointer
@@ -148,9 +158,71 @@ typedef struct gui_soccer
  */
 gui_soccer_t *gui_soccer_create(void               *parent,
                                 const char         *name,
-                                void *addr,
+                                void               *addr,
                                 int16_t             x,
                                 int16_t             y);
+
+
+/**
+ * @brief get the soccer image's blend mode
+ *
+ * @param soccer the soccer widget pointer
+ * @return the soccer image's blend mode
+ *
+ */
+BLEND_MODE_TYPE gui_soccer_get_mode(gui_soccer_t *soccer);
+
+/**
+ * @brief set the soccer image's blend mode
+ *
+ * @param soccer the soccer widget pointer
+ * @param mode the enumeration value of the mode is BLEND_MODE_TYPE
+ *
+ */
+void gui_soccer_set_mode(gui_soccer_t *soccer, BLEND_MODE_TYPE mode);
+
+/**
+ * @brief get the soccer image's opacity
+ *
+ * @param soccer the cube widget pointer
+ * @return the soccer image's opacity
+ *
+ */
+uint8_t gui_soccer_get_opacity(gui_soccer_t *soccer);
+
+/**
+ * @brief set the soccer image's opacity
+ *
+ * @param soccer the soccer widget pointer
+ * @param opacity the soccer image's opacity
+ *
+ */
+void gui_soccer_set_opacity(gui_soccer_t *soccer, uint8_t opacity);
+
+/**
+ * @brief set soccer image
+ *
+ * @param cube the soccer widget pointer
+ * @param addr the image file data
+ */
+void gui_soccer_set_img(gui_soccer_t *soccer, void *addr);
+
+/**
+ * @brief set center
+ *
+ * @param this widget pointer
+ * @param c_x center x
+ * @param c_y center y
+ */
+void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y);
+
+/**
+ * @brief set size
+ *
+ * @param this widget pointer
+ * @param size scale size
+ */
+void gui_soccer_set_size(gui_soccer_t *this, float size);
 
 
 /** End of WIDGET_Exported_GUI_Functions
