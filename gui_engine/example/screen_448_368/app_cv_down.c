@@ -95,14 +95,75 @@
 #include "gui_text.h"
 #include "gui_page.h"
 #include "gui_app.h"
+#include "time.h"
+#include "gui_curtainview.h"
+#include "gui_win.h"
 #define __CANVAS_NAME "canvas_timecard"
 #define __IMG_NAME    "timecard"
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 #define CARD_HEIGHT 157 + 10
 
+static char *month[12] =
+{
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+};
+char *day[7] =
+{
+    "Sun",
+    "Mon",
+    "Tues",
+    "Wed",
+    "Thur",
+    "Fri",
+    "Sat"
+};
+
+extern struct tm *timeinfo;
+static char date_timecard_content[10] = "Thur 15", time_content[10] = "00:00",
+                                                                      date_content[20] = "October15\nThur";
+static gui_text_t *timecard_date_text, *timecard_time_text, *date_text, *time_text;
+
+static void *font_size_96_bin_addr = SOURCEHANSANSSC_SIZE96_BITS4_FONT_BIN;
+static void *font_size_64_bin_addr = SOURCEHANSANSSC_SIZE64_BITS4_FONT_BIN;
+static void *font_size_48_bin_addr = SOURCEHANSANSSC_SIZE48_BITS4_FONT_BIN;
+static void *font_size_40_bin_addr = SOURCEHANSANSSC_SIZE40_BITS4_FONT_BIN;
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS4_FONT_BIN;
 static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS4_FONT_BIN;
+
+static void display_date()
+{
+    char temp_1[10];
+    sprintf(temp_1, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
+    strcpy(date_timecard_content, temp_1);
+    gui_text_content_set(timecard_date_text, date_timecard_content, strlen(date_timecard_content));
+
+    char temp_2[20];
+    sprintf(temp_2, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday, day[timeinfo->tm_wday]);
+    strcpy(date_content, temp_2);
+    gui_text_content_set(date_text, date_content, strlen(date_content));
+}
+
+static void display_time()
+{
+    char temp[10];
+    sprintf(temp, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+
+    strcpy(time_content, temp);
+    gui_text_content_set(timecard_time_text, time_content, strlen(time_content));
+    gui_text_content_set(time_text, time_content, strlen(time_content));
+}
 
 static void canvas_cb_draw_bg(gui_canvas_t *canvas)
 {
@@ -119,7 +180,6 @@ static void canvas_cb_draw_timecard(gui_canvas_t *canvas)
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
-
 // draw timecard and not display
 static void draw_timecard(void *parent_widget)
 {
@@ -127,32 +187,32 @@ static void draw_timecard(void *parent_widget)
     gui_canvas_set_canvas_cb(canvas_timecard, canvas_cb_draw_timecard);
 
     // text
-    char *date_content = "15 Thurs";
-    gui_text_t *date_text = gui_text_create(canvas_timecard, "date_text",  15, 20, 0, 0);
-    gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                 strlen(date_content),
+    timecard_date_text = gui_text_create(canvas_timecard, "",  15, 20, 0, 0);
+    gui_text_set(timecard_date_text, (void *)date_timecard_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                 strlen(date_timecard_content),
                  32);
-    gui_text_type_set(date_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(date_text, LEFT);
+    gui_text_type_set(timecard_date_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(timecard_date_text, LEFT);
 
-    char *time_content = "23:00";
-    gui_text_t *time_text = gui_text_create(canvas_timecard, "time_text",  -50, 20, 0, 0);
-    gui_text_set(time_text, (void *)time_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+    timecard_time_text = gui_text_create(canvas_timecard, "",  -50, 20, 0, 0);
+    gui_text_set(timecard_time_text, (void *)time_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(time_content),
                  32);
-    gui_text_type_set(time_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(time_text, RIGHT);
+    gui_text_type_set(timecard_time_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(timecard_time_text, RIGHT);
     GUI_BASE(canvas_timecard)->not_show = 0;
 }
 
 static void cv_cb(gui_cardview_t *cv)
 {
+    display_time();
+    display_date();
+
     gui_canvas_t *canvas = 0;
     gui_img_t *img = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __CANVAS_NAME, (void *)&canvas);
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __IMG_NAME, (void *)&img);
     int offset = cv->hold_y;
-    gui_log("offset-->%d\r\n", offset);
     if (offset + CARD_HEIGHT + 50 < 0)
     {
         GUI_BASE(canvas)->not_show = 0;
@@ -183,10 +243,26 @@ void curtain_down_design(void *parent_widget)
     gui_canvas_t *canvas_bg = gui_canvas_create(parent_widget, "background", 0, 0, 0, 368, 448);
     gui_canvas_set_canvas_cb(canvas_bg, canvas_cb_draw_bg);
 
-
-    gui_img_t *img = gui_img_create_from_mem(parent_widget, __IMG_NAME, UI_CARD_TIMEVIEW_BIN, 17, 30, 0,
+    //clock circle
+    gui_img_t *img = gui_img_create_from_mem(parent_widget, __IMG_NAME, UI_CARD_CLOCKCIRCLE_BIN, 17, 30,
+                                             0,
                                              0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+
+    // text
+    date_text = gui_text_create(img, "date_text",  0, 42, 0, 0);
+    gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                 strlen(date_content),
+                 40);
+    gui_text_type_set(date_text, font_size_40_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(date_text, MULTI_LEFT);
+
+    time_text = gui_text_create(img, "time_text",  -40, 50, 0, 0);
+    gui_text_set(time_text, (void *)time_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                 strlen(time_content),
+                 64);
+    gui_text_type_set(time_text, font_size_64_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(time_text, RIGHT);
 
 
     gui_cardview_t *cv = gui_cardview_create(parent_widget, "cardview", 0, 0, 0, 448);
