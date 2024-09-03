@@ -429,6 +429,8 @@ section[id*="deprecated-api"] dd dl {
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    overflow-x: auto;
+    overflow-y: auto;
 }
 @keyframes imgzoom {
     from {transform: scale(0)}
@@ -448,6 +450,7 @@ section[id*="deprecated-api"] dd dl {
     font-size: 46px;
     font-weight: bold;
     transition: 0.3s;
+    z-index: 1001;
 }
 .img-modal-close:hover,
 .img-modal-close:focus {
