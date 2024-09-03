@@ -620,6 +620,7 @@ gui_scroll_wheel_new_t *gui_scroll_wheel_new_create(void    *parent,
         this->win = timer1;
 
     }
+    return this;
 }
 void **gui_scroll_wheel_new_get_image_pointers(const char *input, size_t *num_pointers,
                                                int16_t text_image_map_length, const struct gui_text_image_map *text_image_map)
