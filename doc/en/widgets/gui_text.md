@@ -18,11 +18,11 @@ Text widgets can support the following features.
 + **Standrads TTF file support[^1]**
 + **Self-developed font files support**
 
-[^1]: Only part of the chip support this feature
+[^1]: Only part of the chip support this feature.
 
 ## Usage
 
-Using functions to load font files and display text
+Using functions to load font files and display text.
 
 ### Initialize the font file
 
@@ -50,7 +50,7 @@ The size of text box should be larger than the string to be shown, out-of-range 
 
 #### Set text
 
-To add some texts or characters to a text widget and set text attributes with: [gui_text_set(this, text, text_type, color, length, font_size)](#gui_text_set)
+To add some texts or characters to a text widget and set text attributes with [gui_text_set(this, text, text_type, color, length, font_size)](#gui_text_set).
 
 ```{Note}
 The text length must be the same as the set character length, and the font size of the text must be the same as the size of the loaded font file.
@@ -58,7 +58,7 @@ The text length must be the same as the set character length, and the font size 
 
 #### Font type
 
-Text widget support the type setting. You can use this function to set type.Type is bin/ttf file address.
+Text widget support the type setting. You can use this function to set type. Type is bin/ttf file address.
 [gui_text_type_set(this, type)](#gui_text_type_set).
 
 #### Text content
@@ -119,11 +119,11 @@ All typesetting modes are as follows.
 
 ### Text move
 
-You can use this function [gui_text_move(this, x, y)](#gui_text_move) to move text to a specified location, but x and y cannot be larger than w and h of the text
+You can use this function [gui_text_move(this, x, y)](#gui_text_move) to move text to a specified location, but x and y cannot be larger than w and h of the text.
 
 ### Set animate
 
-Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#gui_text_set_animate) to set the animation and implement the animation effect in the corresponding callback function
+Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#gui_text_set_animate) to set the animation and implement the animation effect in the corresponding callback function.
 
 ## Example
 
