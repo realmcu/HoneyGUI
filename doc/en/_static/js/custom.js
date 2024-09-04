@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetElement = document.getElementById(targetHref.slice(1));
 
             if(targetElement){
-                event.preventDefault(); // 阻止默认行为
+                // event.preventDefault(); // 阻止默认行为
 
                 // 使用 window.getComputedStyle 获取实际 display 属性
                 if(window.getComputedStyle(targetElement).display !== 'block'){
