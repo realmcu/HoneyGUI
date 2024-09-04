@@ -116,7 +116,6 @@ The nesting structure of elements is consistent with the nesting structure of ac
 | colNumber |Number of columns|number|
 | rowGap |Gap between rows|number|
 | colGap |Gap between columns|number|
-|mainBg|centerBg|centerPercent|sideScale|sidePosPercent|
 | mainBg |Main background image file path|string| 
 | centerBg |background image of the center main image file path|string| 
 | centerPercent |Proportion of the center area|number|
@@ -127,12 +126,10 @@ The nesting structure of elements is consistent with the nesting structure of ac
 | to(animateTransform) |Animation target value|number|
 | dur |Animation duration|number|
 | repeatCount |Animation repeat count|number|
-| switchOpen|switchClose|switchPause|
 | switchOpen |Motorized curtain's opening button's tag name|string|
 | switchClose |Motorized curtain's closeing button's tag name|string|
 | switchOpen |Motorized curtain's pausing button's tag name|string|
 | ime|input method editor|null/pinyin|
-|type(onClick)| to | id1 | id2 | 
 | type(onClick)|action triggered by the click event|jump|control|
 | type(onClick)|action triggered by the click event|jump|control|
 | to(onClick) |target|light|multiLevel|

@@ -55,13 +55,13 @@ win.onClick(hideHeat)
 * API
 ```javascript
     getElementById : function (win_name : string) {}
-    onClick : function (click_callback_func) {}
-    onRight : function (click_callback_func) {}
-    onLeft : function (click_callback_func) {}
-    onUp : function (click_callback_func) {}
-    onDown : function (click_callback_func) {}
+    onClick : function (callback_func) {}
+    onRight : function (callback_func) {}
+    onLeft : function (callback_func) {}
+    onUp : function (callback_func) {}
+    onDown : function (callback_func) {}
     onPress : function (callback_func) {}
-    onRelease : function (click_callback_func) {}
+    onRelease : function (callback_func) {}
     onHold : function (callback_func) {}
     getAttribute : function(attributeName : string) {},   //return attribute value //support "hidden"
     removeAttribute : function (attribute : string) {} //support "hidden"
@@ -85,9 +85,9 @@ icon.onPress(iconNromalOnPressFunc)
 * API
 ```javascript
     getElementById : function (win_name : string) {},
-    onClick : function (click_callback_func) {},
+    onClick : function (callback_func) {},
     onPress : function (callback_func) {},
-    onRelease : function (click_callback_func) {},
+    onRelease : function (callback_func) {},
     onHold : function (callback_func) {},
     getChildElementByTag : function (tag : string) {},
     write : function (text : string) {},
@@ -150,10 +150,10 @@ seekbar.palyAnimate()
 
 ```javascript
     getElementById : function (win_name : string) {},
-    progress : function (progressToSet : number):{},//获取或设置进度//返回进度
+    progress : function (progressToSet : number){},//获取或设置进度//返回进度
     onPress : function (callback_func) {}, //手势按下
     onPressing : function (callback_func) {},//手势按下时
-    onRelease : function (click_callback_func) {},//手势释放
+    onRelease : function (callback_func) {},//手势释放
     setAnimate : function (frameCallback : function, config : object) {},// 每帧执行frameCallback函数 // var curtainAnimateTiming = {duration: 2000,iterations:1,}
     setAttribute :function(attributeName : string, value : any) {},  //支持 "hidden"
     getAttribute : function(attributeName : string) {},   //返回属性值 //支持 "hidden"
@@ -175,7 +175,7 @@ function swOnOffFunc(params) {
 sw.switch_off(swOnOffFunc)
 sw.turnOn();
 ```
-* turn on a led (P1_1)
+* 打开LED灯 (P1_1)
 ```javascript
 var P1_1 = 9
 var LED1 = new Gpio(P1_1, 'out');
