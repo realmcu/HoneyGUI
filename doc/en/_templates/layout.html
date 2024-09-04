@@ -2,13 +2,6 @@
 {{ super() }}
 
 
-{% block extrahead %}
-{{ super() }}
-
-<script type="text/javascript" src="{{ pathto('_static/js/auth.js', 1) }}"></script>
-{% endblock %}
-
-
 {%- block extrabody %}
     <div id="imgModal" class="img-modal">
         <span class="img-modal-close">&times;</span>
