@@ -148,27 +148,27 @@ static void tab_text_charset(void *tab)
     gui_text_t *utf8 = gui_text_create(tab,  "utf8",  0, 0, 280, 32);
     gui_text_set(utf8, utf8_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 15, 32);
     // gui_text_encoding_set(utf16le, UTF_8);
-    gui_text_emoji_set(utf8, "font/emoji/emoji_u", 32);
+    gui_text_emoji_set(utf8, (uint8_t *)"font/emoji/emoji_u", 32);
 
     gui_text_t *utf16le = gui_text_create(tab, "utf16le",  0, 50, 280, 32);
     gui_text_set(utf16le, utf16le_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 18, 32);
     gui_text_encoding_set(utf16le, UTF_16LE);
-    gui_text_emoji_set(utf16le, "font/emoji/emoji_u", 32);
+    gui_text_emoji_set(utf16le, (uint8_t *)"font/emoji/emoji_u", 32);
 
     gui_text_t *utf16be = gui_text_create(tab, "utf16be",  0, 100, 280, 32);
     gui_text_set(utf16be, utf16be_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 18, 32);
     gui_text_encoding_set(utf16be, UTF_16BE);
-    gui_text_emoji_set(utf16be, "font/emoji/emoji_u", 32);
+    gui_text_emoji_set(utf16be, (uint8_t *)"font/emoji/emoji_u", 32);
 
     gui_text_t *utf32le = gui_text_create(tab, "utf32le",  0, 150, 280, 32);
     gui_text_set(utf32le, utf32le_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 32, 32);
     gui_text_encoding_set(utf32le, UTF_32LE);
-    gui_text_emoji_set(utf32le, "font/emoji/emoji_u", 32);
+    gui_text_emoji_set(utf32le, (uint8_t *)"font/emoji/emoji_u", 32);
 
     gui_text_t *utf32be = gui_text_create(tab, "utf32be",  0, 200, 280, 32);
     gui_text_set(utf32be, utf32be_data, GUI_FONT_SRC_BMP, APP_COLOR_WHITE, 32, 32);
     gui_text_encoding_set(utf32be, UTF_32BE);
-    gui_text_emoji_set(utf32be, "font/emoji/emoji_u", 32);
+    gui_text_emoji_set(utf32be, (uint8_t *)"font/emoji/emoji_u", 32);
 }
 
 //emoji test
