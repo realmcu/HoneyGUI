@@ -35,13 +35,8 @@
 卡片容器在y轴方向滑动的事件可以添加相应的回调函数[gui_cardview_up(this, callback, parameter)](#gui_cardview_up)、[gui_cardview_down(this, callback, parameter)](#gui_cardview_down)。
 
 ## 示例
-请参考这一章节的实现:
-```eval_rst
-`card`_    
+请参考该章节：[卡片](./gui_card.md)
 
-.. _card: gui_card.html
-
-```
 
 ## API
 

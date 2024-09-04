@@ -27,7 +27,7 @@ The encoded data for qrcode can exceeded the max bytes by default, which can mod
 
 ## Example
 
-<details> <summary>sample code</summary>
+<details> <summary>qrcode</summary>
 
 ```c
 #include "gui_qbcode.h"
@@ -56,7 +56,7 @@ gui_qbcode_config(qrcode, str, strlen(str), 3);
 <center><img width= "300" src="https://foruda.gitee.com/images/1713239098192542999/e635ea60_10641540.jpeg" /></center>
 <br>
 
-<details> <summary>sample code</summary>
+<details> <summary>barcode</summary>
 
 ```c
 #define BARCODE_WIDTH     (143 * 3)

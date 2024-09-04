@@ -101,6 +101,7 @@ html_theme_options = {
     'logo_only': True,
     # 在侧边栏显示版本
     'display_version': True,
+    'navigation_depth': 10,
 }
 
 

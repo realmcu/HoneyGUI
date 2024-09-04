@@ -30,9 +30,8 @@ After creating the wheel list widget, you can use the default interface for addi
 
 `event_cb` is the callback function of this image, triggered by clicking.
 
-##### Default example
 
-<details> <summary>Example code</summary>
+<details> <summary>code</summary>
 
 ```c
 #include "gui_wheel_list.h"
@@ -134,9 +133,8 @@ After creating the wheel list widget, you can use the default interface for addi
 
 `layer` is the level or layer where the icon is located.
 
-##### Customized example
 
-<details> <summary>Example code</summary>
+<details> <summary>code</summary>
 
 ```c
 #include "gui_wheel_list.h"

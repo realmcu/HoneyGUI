@@ -1,11 +1,10 @@
 # 选项卡容器
 <br>
 
-选项卡容器控件`(tabview)`是一个用于存储选项卡的容器，并根据用户选择切换并显示不同的选项卡。如图 1 所示，“绿色区域”代表实际显示区域，五个带有红色虚线的矩形是整个选项卡容器控件 `(tabview)` 区域。每个矩形是选项卡控件 `(tab)` 。"idx" 表示 X 轴上的索引，"idy" 表示 Y 轴上的索引。
+选项卡容器控件`(tabview)`是一个用于存储选项卡的容器，并根据用户选择切换并显示不同的选项卡。如下图所示，“绿色区域”代表实际显示区域，五个带有红色虚线的矩形是整个选项卡容器控件 `(tabview)` 区域。每个矩形是选项卡控件 `(tab)` 。"idx" 表示 X 轴上的索引，"idy" 表示 Y 轴上的索引。
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1700117108278339023/652a6a38_10641540.png" /></center>
-<center>图-1</center>
 
 ## 用法
 
@@ -32,34 +31,25 @@
 
 ### 设置选项卡循环显示
 
-选项卡容器循环功能是一项巧妙的特性，可以让用户轻松地遍历所有已创建的选项卡页。通过使用 [gui_tabview_loop_x(tabview, loop)](#gui_tabview_create) 启用x反向的循环显示功能，[gui_tabview_loop_y(tabview, loop)](#gui_tabview_create) 启用y反向的循环显示功能，如图2所示，可以看到蓝色的外框表示当前屏幕的可使选项卡控件。箭头的方向表示选项卡切换的方向。当向左滑动时，一旦所有选项卡都移至可见范围的左侧，再次左滑将从最左侧已创建的选项卡开始循环。相反，如图3所示，当再次向右滑动时，显示将从最右侧的选项卡开始循环。
+选项卡容器循环功能是一项巧妙的特性，可以让用户轻松地遍历所有已创建的选项卡页。通过使用 [gui_tabview_loop_x(tabview, loop)](#gui_tabview_create) 启用x反向的循环显示功能，[gui_tabview_loop_y(tabview, loop)](#gui_tabview_create) 启用y反向的循环显示功能，如图a所示，可以看到蓝色的外框表示当前屏幕的可使选项卡控件。箭头的方向表示选项卡切换的方向。当向左滑动时，一旦所有选项卡都移至可见范围的左侧，再次左滑将从最左侧已创建的选项卡开始循环。相反，如图b所示，当再次向右滑动时，显示将从最右侧的选项卡开始循环。
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118586546869079/2d4816ec_10641540.png" /></center>
-<center>图-2</center>
+<center>图a</center>
 <br>
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118609354334424/c6a664b2_10641540.png" /></center>
-<center>图-3</center>
+<center>图b</center>
 <br>
 
 ## 示例
 
-请参考以下示例代码：
+请参考该章节：[选项卡](./gui_tab.md)
 
-```eval_rst
-`tab`_
-
-.. _tab: gui_tab.html
-
-```
-
-<span id="gui_tabview_create">
 
 ## API
 
-</span>
 
 ```eval_rst
 

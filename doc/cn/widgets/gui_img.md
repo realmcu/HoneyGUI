@@ -61,7 +61,7 @@
 
 ## 示例
 
-<details> <summary>示例代码</summary>
+<details> <summary>代码</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -166,11 +166,9 @@ void page_tb6(void *parent)
 <center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/img.gif" /></center>
 <br>
 
-<span id="api">
 
 ## API
 
-</span>
 
 ```eval_rst
 

@@ -1,4 +1,4 @@
-#  86box Application
+#  86box
 
 This example demostrates how to develop a RealUI 86BOX APP, from which you can learn and understand the basic methods and processes of developing a ui application.
 

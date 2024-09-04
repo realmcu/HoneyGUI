@@ -28,7 +28,7 @@
 
 ## 示例
 
-<details> <summary>二维码示例</summary>
+<details> <summary>二维码</summary>
 
 ```c
 #include "gui_qbcode.h"
@@ -57,7 +57,7 @@ gui_qbcode_config(qrcode, str, strlen(str), 3);
 <center><img width= "300" src="https://foruda.gitee.com/images/1713239098192542999/e635ea60_10641540.jpeg" /></center>
 <br>
 
-<details> <summary>条形码示例</summary>
+<details> <summary>条形码</summary>
 
 ```c
 #define BARCODE_WIDTH     (143 * 3)

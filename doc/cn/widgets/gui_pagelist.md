@@ -31,7 +31,7 @@
 
 ## 示例
 
-<details> <summary>示例代码</summary>
+<details> <summary>代码</summary>
 
 ```c
 #include "root_image/ui_resource.h"

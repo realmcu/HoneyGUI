@@ -30,9 +30,8 @@
 
 `event_cb` 是此图像的回调函数，由点击触发。
 
-##### 默认方式示例
 
-<details> <summary>示例代码</summary>
+<details> <summary>代码</summary>
 
 ```c
 #include "gui_wheel_list.h"
@@ -134,9 +133,8 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 `layer` 是图标所在的层数。
 
-##### 自定义示例
 
-<details> <summary>示例代码</summary>
+<details> <summary>代码</summary>
 
 ```c
 #include "gui_wheel_list.h"

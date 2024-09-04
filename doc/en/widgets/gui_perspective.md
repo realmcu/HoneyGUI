@@ -33,6 +33,8 @@ By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, you can change t
 
 ## Example
 
+<details> <summary>code</summary>
+
 ```eval_rst
 
 .. literalinclude:: ../../../gui_engine/example/screen_448_368/app_prism.c
@@ -41,7 +43,7 @@ By default, the cube's image blend mode is `IMG_SRC_OVER_MODE`, you can change t
    :end-before: /* perspective example end*/
 
 ```
-
+</details>
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png" width = "300" /></div>
 <br>

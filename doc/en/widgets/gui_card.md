@@ -9,9 +9,9 @@ Using [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#gui_card_create
 
 ## Example
 
-There are  six cards created
+There are six cards created:
 
-<details> <summary>Example code</summary>
+<details> <summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"

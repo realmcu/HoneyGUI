@@ -1,4 +1,4 @@
-# Fruit Ninja Application
+# Fruit Ninja
 
 This example demostrates how to develop a simple "Fruit Ninja APP", from which you can learn and understand the basic methods and processes of developing a ui application. Cut the fruits to gain points until you get to the bomb game over. Watch the demo video below to see its full functionality.
 

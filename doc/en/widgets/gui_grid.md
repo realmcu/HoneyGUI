@@ -21,6 +21,7 @@ There are two style in grid widget [gui_grid_style(grid, style)](#gui_grid_style
 
 ### classic style
 
+<details> <summary>code</summary>
 
 ```cpp
 #include <gui_obj.h>
@@ -39,6 +40,7 @@ void page_tb_grid(void *parent)
     }
 }
 ```
+</details>
 <br>
 <center><img width = "300" src= "https://foruda.gitee.com/images/1693896763454036220/6c0a498b_10088396.png"/></center>
 <br>

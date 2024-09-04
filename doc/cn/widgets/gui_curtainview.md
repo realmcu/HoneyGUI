@@ -19,20 +19,10 @@
 
 ## 示例
 
-请参考以下示例代码:
-
-```eval_rst
-`curtain`_
-
-.. _curtain: gui_curtain.html
-
-```
-
-<span id = "gui_curtainview_create">
+请参考该章节：[幕布](./gui_curtain.md)
 
 ## API
 
-</span>
 
 ```eval_rst
 

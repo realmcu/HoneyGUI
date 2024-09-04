@@ -1,10 +1,9 @@
 # Tabview
 
-The gui_tabview widget is the container to store and depends on user selection to change the tab for different functions. As in Figure-1, the "Green Area" represents the actual display region, and there're five rectangles with the red dashed line as the whole gui_tabview area. And each rectangle is the gui_tab widget. The "idx" stands for the index on the X-axis, and the "idy" stands for the index on Y-axis.
+The gui_tabview widget is the container to store and depends on user selection to change the tab for different functions. As shown in the following figure, the "Green Area" represents the actual display region, and there're five rectangles with the red dashed line as the whole gui_tabview area. And each rectangle is the gui_tab widget. The "idx" stands for the index on the X-axis, and the "idy" stands for the index on Y-axis.
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1700117108278339023/652a6a38_10641540.png" /></center>
-<center>Figure-1</center>
 <br>
 
 ## Usage
@@ -30,34 +29,25 @@ Developers can use [gui_tabview_set_style(this, style)](#gui_tabview_create) to 
 
 ### Set tabview loop
 
-The Tabview loop function is a clever feature that allows users to easily navigate through all the tabs that have been created. By enabling the reverse loop display function using [gui_tabview_loop_x(tabview, loop)](#gui_tabview_create) for the x-axis and [gui_tabview_loop_y(tabview, loop)](#gui_tabview_create) for the y-axis, as shown in Figure-2, you will see a blue outer box indicating the visible area of the screen for the tab control. The direction of the arrow represents the direction of tab switching. When swiping left, once all tabs have moved to the left side of the visible area, another left swipe will cycle back to the leftmost tab that was created. Conversely, as shown in Figure-3, when swiping right again, the display will cycle from the rightmost tab.
+The Tabview loop function is a clever feature that allows users to easily navigate through all the tabs that have been created. By enabling the reverse loop display function using [gui_tabview_loop_x(tabview, loop)](#gui_tabview_create) for the x-axis and [gui_tabview_loop_y(tabview, loop)](#gui_tabview_create) for the y-axis, as shown in Figure-a, you will see a blue outer box indicating the visible area of the screen for the tab control. The direction of the arrow represents the direction of tab switching. When swiping left, once all tabs have moved to the left side of the visible area, another left swipe will cycle back to the leftmost tab that was created. Conversely, as shown in Figure-b, when swiping right again, the display will cycle from the rightmost tab.
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118586546869079/2d4816ec_10641540.png" /></center>
-<center>Figure-2</center>
+<center>Figure-a</center>
 <br>
 
 <br>
 <center><img src="https://foruda.gitee.com/images/1707118609354334424/c6a664b2_10641540.png" /></center>
-<center>Figure-3</center>
+<center>Figure-b</center>
 <br>
 
 ## Example
 
-Please refer to the page below:
+Please refer to the section: [tab](./gui_tab.md)
 
-```eval_rst
-`tab`_
-
-.. _tab: gui_tab.html
-
-```
-
-<span id="gui_tabview_create">
 
 ## API
 
-</span>
 
 ```eval_rst
 

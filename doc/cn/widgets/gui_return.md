@@ -9,20 +9,7 @@
 创建函数是 [gui_return_create](#gui_return_create)。用户需要提供曲线动画帧图像文件数组，以及返回操作函数。
 
 ## 示例
-<br>
-<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/return.gif"  /></div>
-<br>
-
-
-```eval_rst
-
-.. note::
-  详细信息请参阅 ```gui_engine\example\screen_454_454\gui_menu\apps.c```。
-
-```
-
-
-
+<details> <summary>代码</summary>
 
 ```c
 const uint32_t *gui_app_return_array[] =
@@ -48,6 +35,19 @@ const uint32_t *gui_app_return_array[] =
 gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)cell);
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/return.gif"  /></div>
+<br>
+
+
+```eval_rst
+
+.. note::
+  详细信息请参阅 ```gui_engine\example\screen_454_454\gui_menu\apps.c```。
+
+```
+
 
 
 <span id = "gui_return_create">

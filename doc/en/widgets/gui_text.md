@@ -42,7 +42,9 @@ All customized bin font files are available from RTK technicians.
 
 To create a text widget, you can use [gui_text_create(parent, filename, x, y, w, h)](#gui_text_create), The coordinates on the screen and text box size have been identified after create. These attributes also can be modified whenever you want.
 
-Note that text box size should be larger than the string to be shown, out-of-range text will be hidden.
+```{Note}
+The size of text box should be larger than the string to be shown, out-of-range text will be hidden.
+```
 
 ### Set text attributes
 
@@ -50,7 +52,9 @@ Note that text box size should be larger than the string to be shown, out-of-ran
 
 To add some texts or characters to a text widget and set text attributes with: [gui_text_set(this, text, text_type, color, length, font_size)](#gui_text_set)
 
-Note that text length must be the same as the set character length, text frontsize should must be the same as the type size
+```{Note}
+The text length must be the same as the set character length, and the font size of the text must be the same as the size of the loaded font file.
+```
 
 #### Font type
 
@@ -69,9 +73,11 @@ The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, 
 
 #### Convert to img
 
-By using this interface, the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
-[gui_text_convert_to_img(this, font_img_type)](#gui_text_convert_to_img).
+By using this function [gui_text_convert_to_img(this, font_img_type)](#gui_text_convert_to_img), the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
+
+```{Note}
 Because the content and font size information of the text widget is needed, it should be called after set text.If the content, font size, position and other attributes of the text have been modified, you need to reuse this interface for conversion.
+```
 
 ### Text input
 
@@ -87,22 +93,22 @@ Text widget support seven typesetting modes, to set text typesetting mode with: 
 
 All typesetting modes are as follows.
 
-| Type               | Line Type     | X Direction      | Y Direction      | Widget                    |
-|--------------------|---------------|------------------|------------------|---------------------------|
-| `LEFT`             | Single-line   | Left             | Top              | Text widget. Default.     |
-| `CENTER`           | Single-line   | Center           | Top              | Text widget.              |
-| `RIGHT`            | Single-line   | Right            | Top              | Text widget.              |
-| `MULTI_LEFT`       | Multi-line    | Left             | Top              | Text widget.              |
-| `MULTI_CENTER`     | Multi-line    | Center           | Top              | Text widget.              |
-| `MULTI_RIGHT`      | Multi-line    | Right            | Top              | Text widget.              |
-| `MID_LEFT`         | Multi-line    | Left             | Mid              | Text widget.              |
-| `MID_CENTER`       | Multi-line    | Center           | Mid              | Text widget.              |
-| `MID_RIGHT`        | Multi-line    | Right            | Mid              | Text widget.              |
-| `SCROLL_X`         | Single-line   | Right to Left    | Top              | Scroll text widget.       |
-| `SCROLL_Y`         | Multi-line    | Left             | Bottom to Top    | Scroll text widget.       |
-| `SCROLL_Y_REVERSE` | Multi-line    | Right            | Top to Bottom    | Scroll text widget.       |
-| `VERTICAL_LEFT`    | Multi-line    | Left             | Top to Bottom    | Text widget.              |
-| `VERTICAL_RIGHT`   | Multi-line    | Right            | Bottom to Top    | Text widget.              |
+| Type               | Line Type     | X Direction      | Y Direction      | Widget                   |
+|--------------------|---------------|------------------|------------------|--------------------------|
+| `LEFT`             | Single-line   | Left             | Top              | Text widget (Default)    |
+| `CENTER`           | Single-line   | Center           | Top              | Text widget              |
+| `RIGHT`            | Single-line   | Right            | Top              | Text widget              |
+| `MULTI_LEFT`       | Multi-line    | Left             | Top              | Text widget              |
+| `MULTI_CENTER`     | Multi-line    | Center           | Top              | Text widget              |
+| `MULTI_RIGHT`      | Multi-line    | Right            | Top              | Text widget              |
+| `MID_LEFT`         | Multi-line    | Left             | Mid              | Text widget              |
+| `MID_CENTER`       | Multi-line    | Center           | Mid              | Text widget              |
+| `MID_RIGHT`        | Multi-line    | Right            | Mid              | Text widget              |
+| `SCROLL_X`         | Single-line   | Right to Left    | Top              | Scroll text widget       |
+| `SCROLL_Y`         | Multi-line    | Left             | Bottom to Top    | Scroll text widget       |
+| `SCROLL_Y_REVERSE` | Multi-line    | Right            | Top to Bottom    | Scroll text widget       |
+| `VERTICAL_LEFT`    | Multi-line    | Left             | Top to Bottom    | Text widget              |
+| `VERTICAL_RIGHT`   | Multi-line    | Right            | Bottom to Top    | Text widget              |
 
 ```eval_rst
 .. literalinclude:: ../../../gui_engine/widget/gui_text.h
@@ -121,11 +127,10 @@ Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#g
 
 ## Example
 
-### Example Multiple text widget
+### Multiple text widget
 
-An example of the multiple text widget is shown below.
 
-<details> <summary>Example code</summary>
+<details> <summary>code</summary>
 
 ```C
 #include "string.h"
@@ -178,11 +183,10 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 <center><img  width="300" src= "https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "/></center></br>
 
-### Example Animate text widget
+### Animate text widget
 
-An example of the animate text widget is shown below.
 
-<details> <summary>Example code</summary>
+<details> <summary>code</summary>
 
 ```C
 #include "root_image_hongkong/ui_resource.h"

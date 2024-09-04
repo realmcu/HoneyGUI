@@ -28,6 +28,8 @@ You can utilize the [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pag
 
 ## Example
 
+<details> <summary>code</summary>
+
 ```c
 #include "root_image/ui_resource.h"
 #include "gui_img.h"
@@ -71,6 +73,7 @@ void design_pagelist_test(void *parent)
                                     (gui_pagelist_update_cb_t)pagelist_test_update_list_last_cb);
 }
 ```
+</details>
 <br>
 
 <br>
