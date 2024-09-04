@@ -199,7 +199,7 @@ static void tab_text_emoji(void *tab)
     gui_text_set(text2, emoji_sequence, GUI_FONT_SRC_BMP, APP_COLOR_GREEN, 53 * 4, 32);
     gui_text_mode_set(text2, MULTI_LEFT);
     gui_text_encoding_set(text2, UTF_32LE);
-    gui_text_emoji_set(text2, "font/emoji/emoji_u", 32);
+    gui_text_emoji_set(text2, (uint8_t *)"font/emoji/emoji_u", 32);
 }
 
 #define FONT_NUM 4
