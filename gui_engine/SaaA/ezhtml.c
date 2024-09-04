@@ -441,7 +441,7 @@ static void slider_write_text_cb(void *obj, gui_event_t e, char *text_name)
 {
     gui_slider_t *this = (gui_slider_t *)obj;
     gui_text_t *text = 0;
-    gui_obj_tree_get_widget_by_type(gui_current_app(), TEXTBOX, (gui_obj_t **)&text);
+    gui_obj_tree_get_widget_by_type((gui_obj_t *)gui_current_app(), TEXTBOX, (gui_obj_t **)&text);
 
     snprintf(light_value_text, sizeof(light_value_text), "%d",
              GUI_API(gui_slider_t).get_currentValue(this));

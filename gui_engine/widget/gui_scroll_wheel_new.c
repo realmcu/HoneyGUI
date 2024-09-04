@@ -89,6 +89,7 @@ static int set_index(gui_scroll_wheel_new_t *this, int index)
 {
     GUI_WIDGET_TYPE_TRY_EXCEPT(this, WINDOW)
     this->index_offset = index;
+    return this->index_offset;
 }
 static void ctor(struct gui_scroll_wheel_new *this,
                  gui_obj_t               *parent,
@@ -625,7 +626,7 @@ gui_scroll_wheel_new_t *gui_scroll_wheel_new_create(void    *parent,
 void **gui_scroll_wheel_new_get_image_pointers(const char *input, size_t *num_pointers,
                                                int16_t text_image_map_length, const struct gui_text_image_map *text_image_map)
 {
-    get_image_pointers(input, num_pointers, text_image_map_length, text_image_map);
+    return get_image_pointers(input, num_pointers, text_image_map_length, text_image_map);
 }
 void gui_scroll_wheel_new_render(const char *text, gui_obj_t *obj, unsigned char render_mode,
                                  int16_t text_image_map_length, const struct gui_text_image_map *text_image_map)
