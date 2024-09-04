@@ -22,7 +22,12 @@ static void canvas_cb_black(gui_canvas_t *canvas)
     nvgStrokeColor(vg, nvgRGB(255, 0, 0));
     nvgStroke(vg);
 
-    nvgFillColor(vg, nvgRGBA(0, 255, 0, 200));
+
+    NVGpaint gradient = nvgLinearGradient(vg, 20, 20, 220, 200, nvgRGB(255, 0, 0), nvgRGBA(0, 255, 0,
+                                          255));
+    nvgFillPaint(vg, gradient);
+
+    // nvgFillColor(vg, nvgRGBA(0, 255, 0, 200));
 
     nvgFill(vg);
 

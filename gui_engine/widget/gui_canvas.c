@@ -115,7 +115,8 @@ static void gui_canvas_widget_nanovg_draw_cb(gui_obj_t *obj)
         nvgScissor(vg, 0, 0, dc->fb_width, dc->fb_height);
         nvgResetTransform(vg);
         nvgTranslate(vg, 0, - (float)dc->fb_height * (float)dc->section_count);
-        nvgTransformxyz(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
+        nvgTransformxyz(vg, \
+                        obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
                         obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2],
                         obj->matrix->m[2][0], obj->matrix->m[2][1], obj->matrix->m[2][2]);
 

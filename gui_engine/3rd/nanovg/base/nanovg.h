@@ -51,7 +51,7 @@ typedef struct NVGcolor NVGcolor;
 
 struct NVGpaint
 {
-    float xform[6];
+    float xform[9];
     float extent[2];
     float radius;
     float feather;
@@ -326,13 +326,6 @@ void nvgTransform(NVGcontext *ctx, float a, float b, float c, float d, float e, 
 //   [g h i]
 void nvgTransformxyz(NVGcontext *ctx, float a, float b, float c, float d, float e, float f, float g,
                      float h, float i);
-
-// Premultiplies current coordinate system by specified matrix.
-// The parameters are interpreted as matrix as follows:
-//   [1 0 0]
-//   [0 1 0]
-//   [g h i]
-void nvgTransformz(NVGcontext *ctx, float g, float h, float i);
 
 // Translates current coordinate system.
 void nvgTranslate(NVGcontext *ctx, float x, float y);
@@ -670,7 +663,7 @@ enum NVGtexture
 
 struct NVGscissor
 {
-    float xform[6];
+    float xform[9];
     float extent[2];
 };
 typedef struct NVGscissor NVGscissor;
