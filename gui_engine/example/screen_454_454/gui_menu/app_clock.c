@@ -136,6 +136,7 @@ const static char *minutes_string_array[] =
     "50", "51", "52", "53", "54", "55", "56", "57", "58", "59",
 };
 static int hour_index, minute_index, second_index;
+static bool stopwatch_enter;
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -163,15 +164,27 @@ static void stop_watch_ml0(gui_obj_t *parent)
 
 }
 
-
-
+static void stopwatch_switch_on_cb(void *null1, void *null2, gui_win_t *stop)
+{
+    gui_win_start_animation(stop);
+    stopwatch_enter = 0;
+}
+static void stopwatch_switch_off_cb(void *null1, void *null2, gui_win_t *stop)
+{
+    gui_win_stop_animation(stop);
+    char *buffer = "00:00:00";
+    GUI_WIDGET_POINTER_BY_NAME(time_txt, STOPWATCHTEXT)
+    gui_text_content_set(GUI_TYPE(gui_text_t, time_txt), buffer, strlen(buffer));
+    gui_text_convert_to_img(GUI_TYPE(gui_text_t, time_txt), ARGB8888);
+}
 static void stop_watch_ml1_0(gui_obj_t *parent)
 {
 
     gui_win_t *stop = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_win_set_animate(stop, 1000, -1, stop_watch_win_ani_cb, 0);
+    gui_win_stop_animation(stop);
     {
-        char *text = "07:55";
+        char *text = "00:00:00";
         int font_size = 48;
         gui_text_t *t = gui_text_create(stop, STOPWATCHTEXT,  0, 200,
                                         gui_get_screen_width(),
@@ -179,10 +192,18 @@ static void stop_watch_ml1_0(gui_obj_t *parent)
         gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
         void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_convert_to_img(t, ARGB8888);
         gui_text_mode_set(t, CENTER);
+        gui_text_convert_to_img(t, ARGB8888);
+
 
     }
+    gui_switch_t *sw = gui_switch_create(parent, 454 / 2 - 150 / 2 + 30, 300, 100, 50, STARTBUTTON_BIN,
+                                         STOPBUTTON_BIN);
+    gui_img_set_mode(sw->switch_picture, IMG_SRC_OVER_MODE);
+    GUI_BASE(sw->switch_picture)->y = -27;
+    GUI_BASE(sw->switch_picture)->x = -30;
+    GUI_API(gui_switch_t).on_turn_on(sw, stopwatch_switch_on_cb, stop);
+    GUI_API(gui_switch_t).on_turn_off(sw, stopwatch_switch_off_cb, stop);
 }
 static void hour_destory_overwrite(gui_obj_t *obj)
 {
@@ -504,30 +525,31 @@ static void win_stop_watch_cb(void *null1, void *null2, void *param)
 {
     gui_multi_level_t *ml = param;
     GUI_API(gui_multi_level_t).jump(ml, 1, 0);
-    GUI_WIDHET_POINTER(rect, STOPWATCH_RECT_NAME);
+    GUI_WIDGET_POINTER_BY_NAME(rect, STOPWATCH_RECT_NAME);
     GUI_TYPE(gui_canvas_rect_t, rect)->color = COLOR_PURPLE;
 
 }
 static void win_release_cb(void *null1, void *null2, const char *param)
 {
-    GUI_WIDHET_POINTER(rect, param);
+    GUI_WIDGET_POINTER_BY_NAME(rect, param);
     GUI_TYPE(gui_canvas_rect_t, rect)->color = APP_COLOR_SILVER;
 }
 static void win_timer_cb(void *null1, void *null2, void *param)
 {
     gui_multi_level_t *ml = param;
     GUI_API(gui_multi_level_t).jump(ml, 1, 1);
-    GUI_WIDHET_POINTER(rect, TIMER_RECT_NAME);
+    GUI_WIDGET_POINTER_BY_NAME(rect, TIMER_RECT_NAME);
     GUI_TYPE(gui_canvas_rect_t, rect)->color = COLOR_PURPLE;
 }
+
 static void get_stopwatch_string(char *buffer)
 {
 #if _WIN32
-    static bool enter;
+
     static struct timeval start;
-    if (!enter)
+    if (!stopwatch_enter)
     {
-        enter = 1;
+        stopwatch_enter = 1;
         mingw_gettimeofday(&start, NULL);
     }
     struct timeval end;
@@ -553,41 +575,11 @@ static void stop_watch_win_ani_cb()
 }
 void parse_time_string(const char *time_string, int *hours, int *minutes, int *seconds)
 {
-    // 将时间字符串解析为小时、分钟、秒的整数
     sscanf(time_string, "%d:%d:%d", hours, minutes, seconds);
 }
 void format_time_string(int hours, int minutes, int seconds, char *buffer)
 {
-    // 格式化时间为HH:MM:SS的字符串
     sprintf(buffer, "%02d:%02d:%02d", hours, minutes, seconds);
-}
-void countdown(const char *time_string)
-{
-
-
-    // while (total_seconds > 0) {
-    //     // 获取当前时间
-    //     time_t current_time = time(NULL);
-
-    //     // 计算剩余时间
-    //     total_seconds = difftime(end_time, current_time);
-
-    //     if (total_seconds < 0) break;
-
-    //     // 计算剩余的小时、分钟和秒
-    //     hours = total_seconds / 3600;
-    //     minutes = (total_seconds % 3600) / 60;
-    //     seconds = total_seconds % 60;
-
-    //     char formatted_time[9];
-    //     format_time_string(hours, minutes, seconds, formatted_time);
-
-    //     // 输出剩余时间
-    //     printf("\r%s", formatted_time);
-
-
-    // }
-
 }
 const char *get_text_from_widget(gui_obj_t *widget)
 {
@@ -605,9 +597,9 @@ const char *get_text_from_widget(gui_obj_t *widget)
 static bool enter;
 static void timer_start_window_callback(gui_win_t *win)
 {
-    GUI_WIDHET_POINTER(text1, TIMER_TEXT_NAME1);
-    GUI_WIDHET_POINTER(text2, TIMER_TEXT_NAME2);
-    GUI_WIDHET_POINTER(text3, TIMER_TEXT_NAME3);
+    GUI_WIDGET_POINTER_BY_NAME(text1, TIMER_TEXT_NAME1);
+    GUI_WIDGET_POINTER_BY_NAME(text2, TIMER_TEXT_NAME2);
+    GUI_WIDGET_POINTER_BY_NAME(text3, TIMER_TEXT_NAME3);
 
     static int total_seconds;
     static int hours, minutes, seconds;
@@ -655,16 +647,16 @@ static void timer_start_window_callback(gui_win_t *win)
 static void timer_show_window_callback(gui_win_t *win)
 {
     gui_log("per:%f\n", win->animate->progress_percent);
-    GUI_WIDHET_POINTER(text1, TIMER_TEXT_NAME1);
+    GUI_WIDGET_POINTER_BY_NAME(text1, TIMER_TEXT_NAME1);
     GUI_BASE(text1)->x = TEXT1_X + win->animate->progress_percent * TEXT_GAP;
-    GUI_WIDHET_POINTER(text3, TIMER_TEXT_NAME3);
+    GUI_WIDGET_POINTER_BY_NAME(text3, TIMER_TEXT_NAME3);
     GUI_BASE(text3)->x = TEXT3_X - win->animate->progress_percent * TEXT_GAP;
     if (gui_win_is_animation_end_frame(win))
     {
         /* show : */
-        GUI_WIDHET_POINTER(text4, TIMER_TEXT_NAME4);
+        GUI_WIDGET_POINTER_BY_NAME(text4, TIMER_TEXT_NAME4);
         gui_obj_hidden(text4, 0);
-        GUI_WIDHET_POINTER(text5, TIMER_TEXT_NAME5);
+        GUI_WIDGET_POINTER_BY_NAME(text5, TIMER_TEXT_NAME5);
         gui_obj_hidden(text5, 0);
         gui_win_set_animate(win, 1000, -1, timer_start_window_callback, win);
         enter = 0;
@@ -672,42 +664,42 @@ static void timer_show_window_callback(gui_win_t *win)
 }
 static void switch_off_cb()
 {
-    GUI_WIDHET_POINTER(win_setting, SETTING_WIN_NAME);
+    GUI_WIDGET_POINTER_BY_NAME(win_setting, SETTING_WIN_NAME);
     gui_obj_hidden(win_setting, 0);
-    GUI_WIDHET_POINTER(win_timer, TIMER_WIN_NAME);
+    GUI_WIDGET_POINTER_BY_NAME(win_timer, TIMER_WIN_NAME);
     gui_obj_hidden(win_timer, 1);
     gui_win_stop_animation(GUI_TYPE(gui_win_t, win_setting));
     enter = 0;
 }
 static void switch_on_cb(void *null1, void *null2, void *param)
 {
-    GUI_WIDHET_POINTER(win, SETTING_WIN_NAME);
+    GUI_WIDGET_POINTER_BY_NAME(win, SETTING_WIN_NAME);
     gui_win_set_animate(GUI_TYPE(gui_win_t, win), 1000, 0, timer_show_window_callback, win);
     gui_obj_hidden(win, 1);
-    GUI_WIDHET_POINTER(win_timer, TIMER_WIN_NAME);
+    GUI_WIDGET_POINTER_BY_NAME(win_timer, TIMER_WIN_NAME);
     gui_obj_hidden(win_timer, 0);
-    GUI_WIDHET_POINTER(text4, TIMER_TEXT_NAME4);
+    GUI_WIDGET_POINTER_BY_NAME(text4, TIMER_TEXT_NAME4);
     gui_obj_hidden(text4, 1);
-    GUI_WIDHET_POINTER(text5, TIMER_TEXT_NAME5);
+    GUI_WIDGET_POINTER_BY_NAME(text5, TIMER_TEXT_NAME5);
     gui_obj_hidden(text5, 1);
     {
-        GUI_WIDHET_POINTER(wheel, WHEEL_NAME);
+        GUI_WIDGET_POINTER_BY_NAME(wheel, WHEEL_NAME);
         int index = GUI_API(gui_scroll_wheel_new_t).get_index((void *)wheel);
-        GUI_WIDHET_POINTER(text1, TIMER_TEXT_NAME1);
+        GUI_WIDGET_POINTER_BY_NAME(text1, TIMER_TEXT_NAME1);
         gui_scroll_wheel_new_render(string_array[index], text1, render_mode, IMAGE_ARRAY_MAP_LENGTH,
                                     IMAGE_ARRAY_MAP);
     }
     {
-        GUI_WIDHET_POINTER(wheel, WHEEL_NAME2);
+        GUI_WIDGET_POINTER_BY_NAME(wheel, WHEEL_NAME2);
         int index = GUI_API(gui_scroll_wheel_new_t).get_index((void *)wheel);
-        GUI_WIDHET_POINTER(text1, TIMER_TEXT_NAME2);
+        GUI_WIDGET_POINTER_BY_NAME(text1, TIMER_TEXT_NAME2);
         gui_scroll_wheel_new_render(minutes_string_array[index], text1, render_mode, IMAGE_ARRAY_MAP_LENGTH,
                                     IMAGE_ARRAY_MAP);
     }
     {
-        GUI_WIDHET_POINTER(wheel, WHEEL_NAME3);
+        GUI_WIDGET_POINTER_BY_NAME(wheel, WHEEL_NAME3);
         int index = GUI_API(gui_scroll_wheel_new_t).get_index((void *)wheel);
-        GUI_WIDHET_POINTER(text1, TIMER_TEXT_NAME3);
+        GUI_WIDGET_POINTER_BY_NAME(text1, TIMER_TEXT_NAME3);
         gui_scroll_wheel_new_render(minutes_string_array[index], text1, render_mode, IMAGE_ARRAY_MAP_LENGTH,
                                     IMAGE_ARRAY_MAP);
     }

@@ -549,7 +549,7 @@ extern char *defaultPath;
 typedef int gui_error_t;
 #define GUI_MAGIC_NUMBER 0B1011
 #define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT((obj&&GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
-#define GUI_WIDHET_POINTER(pointer, name) gui_obj_t *pointer = 0;\
+#define GUI_WIDGET_POINTER_BY_NAME(pointer, name) gui_obj_t *pointer = 0;\
     gui_obj_tree_get_widget_by_name((void *)gui_current_app(), name, &pointer);\
     GUI_WIDGET_TRY_EXCEPT(pointer)
 #define GUI_ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
