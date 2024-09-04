@@ -13,29 +13,10 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
     {
         gui_font_stb_init(text->path);
     }
-    uint16_t *p_buf = NULL;
+    uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
-    switch (text->charset)
-    {
-    case UTF_8:
-        p_buf = gui_malloc(text->len * sizeof(uint16_t));
-        if (p_buf == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-            return;
-        }
-        else
-        {
-            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
-        }
-        break;
-    case UTF_16:
-        unicode_len = text->len;
-        p_buf = (uint16_t *)text->content;
-        break;
-    default:
-        break;
-    }
+    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
+
     text->font_len = unicode_len;
     float all_char_w = 0;
     float scale = 0;
@@ -44,7 +25,7 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
     scale = stbtt_ScaleForPixelHeight(&font, text->font_height * text->base.matrix->m[0][0]);
     while (ch < unicode_len)
     {
-        stbtt_GetCodepointHMetrics(&font, p_buf[ch++], &advance, &lsb);
+        stbtt_GetCodepointHMetrics(&font, unicode_buf[ch++], &advance, &lsb);
         all_char_w += advance * scale;
     }
     if (text->char_width_sum == 0)
@@ -74,16 +55,7 @@ void gui_font_stb_load(gui_text_t *text, gui_text_rect_t *rect)
             break;
         }
     }
-    switch (text->charset)
-    {
-    case UTF_8:
-        gui_free(p_buf);
-        break;
-    case UTF_16:
-        break;
-    default:
-        break;
-    }
+    gui_free(unicode_buf);
 }
 
 void gui_font_stb_unload(gui_text_t *text)
@@ -352,38 +324,19 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
     stbtt_GetFontVMetrics(&font, &ascent, &descent, &lineGap);
     baseline = ascent * scale;
     // baseline = 900 * scale;
+
     gui_dispdev_t *dc = gui_get_dc();
-    uint16_t *p_buf = NULL;
+    uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
-    switch (text->charset)
-    {
-    case UTF_8:
-        p_buf = gui_malloc(text->len * sizeof(uint16_t));
-        if (p_buf == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-            return;
-        }
-        else
-        {
-            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
-        }
-        break;
-    case UTF_16:
-        unicode_len = text->len;
-        p_buf = (uint16_t *)text->content;
-        break;
-    default:
-        break;
-    }
+    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
 
 #ifdef RTK_GUI_FONT_ENABLE_TTF_SVG
     while (ch < unicode_len)
     {
-        int glyph_index = stbtt_FindGlyphIndex(&font, p_buf[ch]);
+        int glyph_index = stbtt_FindGlyphIndex(&font, unicode_buf[ch]);
         int advance, lsb, x0, y0, x1, y1;
         stbtt_GetGlyphHMetrics(&font, glyph_index, &advance, &lsb);
-        // gui_log("unicode : %c\n", p_buf[ch]);
+        // gui_log("unicode : %c\n", unicode_buf[ch]);
         if (text->mode == LEFT || text->mode == CENTER || text->mode == RIGHT)
         {
             if (xpos + advance * scale > text->base.w)
@@ -548,7 +501,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         default:
             break;
         }
-        // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",p_buf[ch],ch,xpos,ypos);
+        // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",unicode_buf[ch],ch,xpos,ypos);
         gui_get_acc()->draw_svg(font_svg, 1, dc, rect->x1 + xpos + offset, rect->y1 + ypos, 1, 0, 0, 0);
         extern void nsvgDelete(NSVGimage * image);
         nsvgDelete(font_svg);
@@ -569,7 +522,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
         }
         while (ch < unicode_len)
         {
-            int glyph_index = stbtt_FindGlyphIndex(&font, p_buf[ch]);
+            int glyph_index = stbtt_FindGlyphIndex(&font, unicode_buf[ch]);
             int advance, lsb, x0, y0, x1, y1;
             float x_shift = xpos - (float) floor(xpos);
             stbtt_GetGlyphHMetrics(&font, glyph_index, &advance, &lsb);
@@ -583,7 +536,7 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
             }
             else if (text->mode == MULTI_LEFT || text->mode == MULTI_CENTER || text->mode == MULTI_RIGHT)
             {
-                if ((xpos + advance * scale > stb_screen->width) || p_buf[ch] == 0x0A)
+                if ((xpos + advance * scale > stb_screen->width) || unicode_buf[ch] == 0x0A)
                 {
                     line_num ++;
                     xpos = 0;
@@ -607,29 +560,20 @@ void gui_font_stb_draw(gui_text_t *text, gui_text_rect_t *rect)
                     xpos = 0;
                 }
             }
-            // gui_log("unicode %x \n",p_buf[ch]);
+            // gui_log("unicode %x \n",unicode_buf[ch]);
             ypos = line_num * scale * (ascent - descent + lineGap);
             /*If a non-standard ttf font is used, the header information of the stb_screen memory may be lost because the drawing is out of bounds, triggering a free problem.*/
             stbtt_MakeCodepointBitmapSubpixel(&font,
                                               &stb_screen->buf[((int)baseline + y0 + (int)ypos)*stb_screen->width + (int) xpos + x0],
-                                              x1 - x0, y1 - y0, stb_screen->width, scale, scale, x_shift, 0, p_buf[ch]);
-            // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",p_buf[ch],ch,xpos,ypos);
+                                              x1 - x0, y1 - y0, stb_screen->width, scale, scale, x_shift, 0, unicode_buf[ch]);
+            // gui_log("draw %c , ch : %d , xpos : %f , y pos : %f \n",unicode_buf[ch],ch,xpos,ypos);
             ++ch;
             xpos += (advance * scale);
         }
     }
     font_stb_draw_bitmap(text, text->data, rect);
 #endif
-    switch (text->charset)
-    {
-    case UTF_8:
-        gui_free(p_buf);
-        break;
-    case UTF_16:
-        break;
-    default:
-        break;
-    }
+    gui_free(unicode_buf);
 }
 
 void gui_font_stb_init(void *font_ttf_addr)

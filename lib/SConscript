@@ -11,8 +11,7 @@ cwd = GetCurrentDir()
 src = Split("""
 """)
 
-
-CPPDEFINES = ['TARGET_RTL8773E']
+CPPDEFINES = []
 
 if GetDepend('CONFIG_REALTEK_BUILD_LVGL_GUI'):
     CPPDEFINES += ['LV_LVGL_H_INCLUDE_SIMPLE']

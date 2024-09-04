@@ -124,7 +124,7 @@ static void gui_return_prepare(gui_obj_t *obj)
             if (return_flag)
             {
                 return_flag = 0;
-                gui_obj_event_set(obj, GUI_EVENT_1);
+                gui_obj_event_set(obj, GUI_EVENT_8);
             }
         }
 
@@ -200,7 +200,7 @@ static void gui_return_ctor(gui_return_t   *this,
     this->ignore_gesture_widget = ignore_gesture_widget;
     GET_BASE(this)->obj_cb = gui_return_cb;
     GET_BASE(this)->has_prepare_cb = true;
-    gui_obj_add_event_cb(this, (gui_event_cb_t)return_cb, GUI_EVENT_1, this);
+    gui_obj_add_event_cb(this, (gui_event_cb_t)return_cb, GUI_EVENT_8, this);
 
     GET_BASE(this)->w = RETURN_HEIGHT;
     GET_BASE(this)->h = (int)gui_get_screen_height() * 2 / 3;

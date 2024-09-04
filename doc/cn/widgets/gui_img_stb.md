@@ -9,11 +9,11 @@ STB图像控件是用于显示图像的基本控件。可以设置左、中、�
 
 ### 创建控件
 
-使用[gui_img_stb_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) 从内存中创建一个STB图像控件，注意需要确保类型和大小是正确的。
+使用[gui_img_stb_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#gui_img_stb_create_from_mem) 从内存中创建一个STB图像控件，注意需要确保类型和大小是正确的。
 
 ### 设置属性
 
-使用 [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#api) 来设置STB图像控件的属性，可以设置新的文件和新的坐标。
+使用 [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#gui_img_stb_set_attribute) 来设置STB图像控件的属性，可以设置新的文件和新的坐标。
 
 ## 示例
 

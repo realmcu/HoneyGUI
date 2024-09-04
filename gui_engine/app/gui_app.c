@@ -95,20 +95,21 @@ void gui_app_startup(gui_app_t *app)
 
 void gui_app_shutdown(gui_app_t *app)
 {
-    if (app->dtor != NULL)
-    {
-        app->dtor(app);
-    }
-    if (app->thread_entry != NULL)
-    {
-        gui_thread_delete(app->thread_id);
-    }
+
     if (app->next)
     {
         app->close = true;
     }
     else
     {
+        if (app->dtor != NULL)
+        {
+            app->dtor(app);
+        }
+        if (app->thread_entry != NULL)
+        {
+            gui_thread_delete(app->thread_id);
+        }
         app->screen.parent = 0;
         gui_obj_tree_free(&app->screen);
         if (app->screen.matrix != NULL)

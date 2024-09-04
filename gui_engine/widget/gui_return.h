@@ -77,9 +77,9 @@ typedef struct gui_return
   * @brief
   * @{
   */
-#define RETURN_HEIGHT           100
-#define RETURN_ENABLE_THREHOLD  10
-#define RETURN_THREHOLD         80
+#define RETURN_HEIGHT           100 //widget hight
+#define RETURN_ENABLE_THREHOLD  10 //threhold to drag
+#define RETURN_THREHOLD         80 //threhold to return
 
 /** End of WIDGET_Exported_Macros
   * @}

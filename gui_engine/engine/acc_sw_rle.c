@@ -24,39 +24,35 @@
 #include "acc_sw_rle_bypass.h"
 #include "acc_sw_rle_cover.h"
 #include "acc_sw_rle_filter.h"
-
-
-#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H)  && !defined(RTL8762E)
-#define __FPU_PRESENT                  1            /* FPU present                                                             */
-#include "arm_math.h"
-#else
 #include "math.h"
-#endif
 
+
+#ifdef  GUI_USE_ARM_MATH
+#include "arm_math.h"
 void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
 {
-#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H) && !defined(RTL8762E)
     arm_fill_q15(pixel, (int16_t *)addr, len);
-#endif
-#if defined(_MSC_VER) || (defined(__GNUC__))
-    for (uint32_t i = 0; i < len; i++)
-    {
-        addr[i] = pixel;
-    }
-#endif
 }
 void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
 {
-#if defined ( __CC_ARM ) && !defined(TARGET_RTL8773E) && !defined(RTL8752H) && !defined(RTL8762E)
     arm_fill_q31(pixel, (int32_t *)addr, len);
-#endif
-#if defined(_MSC_VER) || (defined(__GNUC__))
+}
+#else
+void gui_memset16(uint16_t *addr, uint16_t pixel, uint32_t len) //rgb565
+{
     for (uint32_t i = 0; i < len; i++)
     {
         addr[i] = pixel;
     }
-#endif
 }
+void gui_memset32(uint32_t *addr, uint32_t pixel, uint32_t len)  //argb8888
+{
+    for (uint32_t i = 0; i < len; i++)
+    {
+        addr[i] = pixel;
+    }
+}
+#endif
 
 void uncompressed_rle_line(imdc_file_t *file, uint32_t line, int16_t x, int16_t w, uint8_t *buf)
 {

@@ -117,7 +117,7 @@ typedef struct
  * @param parent the father widget it nested in.
  * @param filename this tab widget's name.
  * @param x the X-axis coordinate of the widget.
- * @param x the Y-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
  * @param w the width of the widget.
  * @param h the hight of the widget.
  * @return return the widget object pointer.

@@ -81,13 +81,18 @@ void psram_frame_buffer_init(void)
     set_w_and_h(PSRAM_LCD_FRAME_BUFFER_UP, 480, 480);
 }
 
+extern void gui_v0_rotate(gui_matrix_t *matrix, int32_t x);
+extern void gui_v0_cut_cube(gui_matrix_t *matrix, int32_t x);
 
-
-static void rtl_gui_cutscene_to_lcd(uint8_t *left, uint8_t *right, float depend_touch,
+static void rtl_gui_cutscene_to_lcd(uint8_t *left, \
+                                    uint8_t *main, \
+                                    uint8_t *right, \
+                                    float depend_touch,
                                     uint8_t style)
 {
 
     draw_img_t image_left;
+    draw_img_t image_main;
     draw_img_t image_right;
     gui_dispdev_t dc;
 
@@ -99,28 +104,36 @@ static void rtl_gui_cutscene_to_lcd(uint8_t *left, uint8_t *right, float depend_
     image_left.opacity_value = 255;
     image_left.blend_mode = IMG_FILTER_BLACK;
 
+    image_main.img_w = dc.screen_width;
+    image_main.img_h = dc.screen_height;
+    image_main.data = main - 8 ;
+    image_main.opacity_value = 255;
+    image_main.blend_mode = IMG_FILTER_BLACK;
+
     image_right.img_w = dc.screen_width;
     image_right.img_h = dc.screen_height;
     image_right.data = right - 8;
     image_right.opacity_value = 255;
     image_right.blend_mode = IMG_FILTER_BLACK;
 
-#if 0
-    matrix_identity(&image_left.matrix);
-    matrix_translate(depend_touch, 0, &image_left.matrix);
 
-    matrix_identity(&image_right.matrix);
-    matrix_translate(depend_touch + dc.screen_width, 0, &image_right.matrix);
-#else
-    extern void gui_v0_rotate(gui_matrix_t *matrix, int32_t x);
-    gui_v0_rotate(&image_left.matrix, depend_touch);
-    gui_v0_rotate(&image_right.matrix, depend_touch + dc.screen_width);
 
-#endif
+
+    // gui_v0_rotate(&image_left.matrix, depend_touch - dc.screen_width);
+    // gui_v0_rotate(&image_main.matrix, depend_touch);
+    // gui_v0_rotate(&image_right.matrix, depend_touch + dc.screen_width);
+
+    gui_v0_cut_cube(&image_left.matrix, depend_touch  - dc.screen_width);
+    gui_v0_cut_cube(&image_main.matrix, depend_touch);
+    gui_v0_cut_cube(&image_right.matrix, depend_touch + dc.screen_width);
 
     memcpy(&image_left.inverse, &image_left.matrix, sizeof(gui_matrix_t));
     matrix_inverse(&image_left.inverse);
     draw_img_new_area(&image_left, NULL);
+
+    memcpy(&image_main.inverse, &image_main.matrix, sizeof(gui_matrix_t));
+    matrix_inverse(&image_main.inverse);
+    draw_img_new_area(&image_main, NULL);
 
     memcpy(&image_right.inverse, &image_right.matrix, sizeof(gui_matrix_t));
     matrix_inverse(&image_right.inverse);
@@ -144,6 +157,7 @@ static void rtl_gui_cutscene_to_lcd(uint8_t *left, uint8_t *right, float depend_
         dc.section.y1 = dc.section_count * dc.fb_height;
         dc.section.y2 = (dc.section_count + 1) * dc.fb_height;
         gui_acc_blit_to_dc(&image_left, &dc, NULL);
+        gui_acc_blit_to_dc(&image_main, &dc, NULL);
         gui_acc_blit_to_dc(&image_right, &dc, NULL);
         extern void rtl_gui_refresh_by_dma_internal(uint8_t *readbuf, uint32_t count_for_section);
         rtl_gui_refresh_by_dma_internal(dc.frame_buf, i);
@@ -166,17 +180,10 @@ void rtl_gui_lcd_update_from_psram(void)
 
     if (psram_detal_y == 0)
     {
-        if (psram_detal_x > 0)
-        {
-            // rtl_gui_copy_psram_to_lcd_x(FrameBufferLeft, FrameBufferOrigin, LCD_WIDTH - psram_detal_x);
-            rtl_gui_cutscene_to_lcd(FrameBufferLeft.pLCDBuffer, FrameBufferOrigin.pLCDBuffer, psram_detal_x, 0);
-        }
-        else
-        {
-            // rtl_gui_copy_psram_to_lcd_x(FrameBufferOrigin, FrameBufferRight, -psram_detal_x);
-            rtl_gui_cutscene_to_lcd(FrameBufferOrigin.pLCDBuffer, FrameBufferRight.pLCDBuffer, psram_detal_x,
-                                    0);
-        }
+        rtl_gui_cutscene_to_lcd(FrameBufferLeft.pLCDBuffer, \
+                                FrameBufferOrigin.pLCDBuffer, \
+                                FrameBufferRight.pLCDBuffer, \
+                                psram_detal_x, 0);
     }
     else
     {

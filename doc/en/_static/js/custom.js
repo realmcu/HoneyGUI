@@ -22,76 +22,97 @@ document.addEventListener('DOMContentLoaded', (event) => {
 })
 
 
-
-
-
-
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
-    // 获取页面上所有的锚点链接
-    var rstcontent = document.querySelector(".rst-content");
-    var anchors = rstcontent.querySelectorAll('a[href^="#"]');
+    // 获取页面上所有的锚点链接,添加点击事件
+    document.querySelectorAll('a[href^="#"]').forEach(anchorItem => {
+        anchorItem.addEventListener('click', function(event) {
+            const targetHref = anchorItem.getAttribute('href');
+            const targetElement = document.getElementById(targetHref.slice(1));
 
-    for (var i = 0; i < anchors.length; i++) {
-        anchors[i].addEventListener('click', function(event) {
-            var href = this.getAttribute('href'); // 获取href值，形如"#target"
-            var targetId = href.slice(1); // 切掉"#"，得到"target id"
-            var targetElement = document.getElementById(targetId);
+            if(targetElement){
+                event.preventDefault(); // 阻止默认行为
 
-            // 阻止默认行为
-            event.preventDefault();
+                // 使用 window.getComputedStyle 获取实际 display 属性
+                if(window.getComputedStyle(targetElement).display !== 'block'){
+                    // 修改目标元素的display属性
+                    const parents = $(targetHref).parents('dl.unexpanded'); // jQuery
+                    parents.each(function(index, parent) {
+                        parent.classList.remove('unexpanded');
+                        parent.classList.add('expanded');
+                    });
+                }
 
-            if(targetElement.style.display != "block"){
-                // 修改目标元素的display属性
-                const parents = $(`#${targetId}`).parents("dl.unexpanded");
-                parents.each(function(index, parent) {
-                    parent.classList.remove("unexpanded");
-                    parent.classList.add("expanded");
-                });
+                setTimeout(() => {
+                    history.pushState(null, null, ' ');
+                    history.pushState(null, null, targetHref);
+
+                    const eleNavTop = document.querySelector(".wy-nav-top");
+                    const eleDisplay = window.getComputedStyle(eleNavTop).display;
+                    const stickyOffset = eleDisplay === "block" ? -60 : 0;
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY + stickyOffset;
+
+                    // 使用平滑滚动，并考虑 sticky 元素的高度
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'auto'
+                    });
+                }, 0);
             }
-
-
-            setTimeout(function() {
-                // 修改location.hash来实现页面的跳转
-                location.hash = href;
-            }, 0);
-            $('html, body').animate({
-                scrollTop: targetElement.offsetTop
-            }, 1000); // 动画滚动时间，这里设置为1000ms，可以根据需要调整
-        });
-    }
-
+        })
+    });
 });
 
+
 /* ========= Add left-sider and right-sider draggable component ========= */
-$( function() {
+$(function() {
     var leftResizing = false,
         leftDownX = 0;
 
-    $( '.wy-nav-side' )
-        // .wrapInner('<div class="in-nav-side"></div>')
-        .append( '<span class="resize-handle-left"> || </span>' )
-        .on( 'mousedown', 'span.resize-handle-left', function( e ) {
+    // Checks if stored width exists in localStorage
+    var leftSiderBarWidth = localStorage.getItem('docs.honeygui.siderbar.width');
+    if (window.matchMedia('(min-width: 768px)').matches && leftSiderBarWidth) {
+        $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
+        $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
+    }
+
+    $('.wy-nav-side')
+        .append('<span class="resize-handle-left"> || </span>')
+        .on('mousedown', 'span.resize-handle-left', function(e) {
             leftResizing = true;
             leftDownX = e.clientX;
         });
 
-    $( document ).on( 'mousemove', function( e ) {
+    $(document).on('mousemove', function(e) {
         if (!leftResizing)
             return;
 
         var offsetNew = e.clientX - document.body.offsetLeft;
-
-        //限制导航栏宽度
-        if (offsetNew > 200 && offsetNew < 800) { 
-            $( '.wy-nav-side' ).css( 'width', offsetNew + 'px' );
-            // $( '.in-nav-side' ).css( 'width', offsetNew + 'px' );
-            $( '.wy-nav-content-wrap' ).css( 'margin-left', offsetNew + 'px' );
+        // 限制导航栏宽度
+        if (offsetNew > 200 && offsetNew < 800) {
+            $('.wy-nav-side').css('width', offsetNew + 'px');
+            $('.wy-nav-content-wrap').css('margin-left', offsetNew + 'px');
         }
-    }).on( 'mouseup', function(e) {
-        leftResizing = false;
+    }).on('mouseup', function(e) {
+        if (leftResizing) {
+            leftResizing = false;
+            // Store width in localStorage
+            var newWidth = $('.wy-nav-side').width();
+            localStorage.setItem('docs.honeygui.siderbar.width', newWidth);
+        }
+    });
+
+    // Also adjust width on window resize
+    $(window).resize(function() {
+        if (window.matchMedia('(min-width: 768px)').matches) {
+            var leftSiderBarWidth = localStorage.getItem('docs.honeygui.siderbar.width');
+            if (leftSiderBarWidth) {
+                $('.wy-nav-side').css('width', leftSiderBarWidth + 'px');
+                $('.wy-nav-content-wrap').css('margin-left', leftSiderBarWidth + 'px');
+            }
+        } else {
+            $('.wy-nav-side').css('width', '');
+            $('.wy-nav-content-wrap').css('margin-left', '');
+        }
     });
 });
 
@@ -122,16 +143,13 @@ $( function() {
     });
 });
 
-/* ================ Add back-to-top component ================ */
-document.addEventListener("DOMContentLoaded", function() {
-    var backToTopButton = document.createElement("div");
-    backToTopButton.id = "back-to-top";
-    backToTopButton.innerHTML = "↑";
-    backToTopButton.onclick = function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-    document.body.appendChild(backToTopButton);
-});
+/* ============= back-to-top func ============= */
+function backToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // $('html,body').animate({
+    //     scrollTop: 0
+    // }, 300);
+}
 
 /* ============= Toggle Languages ============= */
 function change_language(lang)

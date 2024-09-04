@@ -1,0 +1,192 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<app>box640x360
+<script
+    file="app/box/box640x360.js"></script><screen
+    w="640"
+    h="360"
+    x="0"
+    y="0">screen0
+
+    <slider
+        x="202"
+        y="180"
+        w="236"
+        h="64"
+        bgPicture="app/box/resource/lamp/color_temperature.bin"
+        sliderPicture="app/box/resource/lamp/circle.bin"
+        minValue="3700"
+        maxValue="6500"
+        currentValue="5000"
+        sliderSize="23">slider_ct
+        <onChange
+            type="write"
+            to="txt_currentValue">
+        </onChange><!-- use slider to write slider value to textbox called txt_currentValue,  -->
+        <onChange
+            type="control" 
+            to="controlLightCT" 
+            id="16">
+        </onChange> <!-- use slider to control colorTemp lamp called controlLightCT, index 16 -->
+    </slider>
+    <textbox
+            x="202"
+            y="250"
+            color="#ffffffff"
+            w="108"
+            h="49"
+            text="5000"
+            fontSize="16"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+            mode="truncate">txt_currentValue
+        </textbox>
+        <textbox
+            x="240"
+            y="250"
+            color="#ffffffff"
+            w="108"
+            h="49"
+            text="°"
+            fontSize="16"
+            font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+            mode="truncate">txt_currentValuemark
+        </textbox>
+    <seekbar
+        x="202"
+        y="280"
+        w="236"
+        h="37"
+        opacity="255"
+        folder="app/box/resource/brightness"
+        blendMode="imgBypassMode"
+        orientation="H"
+        centralX="0"
+        centralY="0"
+        startDegree="0"
+        endDegree="0">bar_brightness
+        <onChange
+            to="controlLightBT"
+            type="control" 
+            id="15">changeValue_bt
+        </onChange>
+    </seekbar>
+    <textbox
+        x="280"
+        y="320"
+        color="#ffffffff"
+        w="108"
+        h="49"
+        text="brightness"
+        fontSize="16"
+        font="app/box/resource/font/arialbd_size16_bits4_font.bin"
+        mode="truncate">txt_brightness
+    </textbox>
+    <!-- Animation test -->
+    <img
+        x="0"
+        y="0"
+        w="144"
+        h="157"
+        opacity="255"
+        file="app/box/resource/lamp/ctlamp.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">imgAnimate1
+        <!-- Rotate fast from: degree, x center, y center-->
+        <animateTransform
+        type="rotate"
+        from="0 72 79"
+        to="360 72 79"
+        dur="1s"
+        repeatCount="indefinite"> </animateTransform>
+    </img>
+    <img
+        x="500"
+        y="0"
+        w="144"
+        h="157"
+        opacity="255"
+        file="app/box/resource/lamp/ctlamp.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">imgAnimate2
+        <!-- Rotate slow from: degree, x center, y center-->
+        <animateTransform
+        type="rotate"
+        from="-45 72 79"
+        to="45 72 79"
+        dur="10s"
+        repeatCount="indefinite"> </animateTransform>
+    </img>
+    <img
+        x="0"
+        y="200"
+        w="144"
+        h="157"
+        opacity="255"
+        file="app/box/resource/lamp/ctlamp.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">imgAnimate3
+        <!-- Opacity from: opacity(0~255) -->
+        <animateTransform
+        type="opacity"
+        from="255"
+        to="100"
+        dur="2s"
+        repeatCount="indefinite"> </animateTransform>
+    </img>
+    <img
+        x="500"
+        y="180"
+        w="144"
+        h="157"
+        opacity="255"
+        file="app/box/resource/lamp/ctlamp.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">imgAnimate4
+        <!-- Scale  from: x rate, y rate, x center, y center-->
+        <animateTransform
+        type="scale"
+        from="0.2 0.8 72 79"
+        to="0.9 1.2 72 79"
+        dur="4s"
+        repeatCount="indefinite"> </animateTransform>
+    </img>
+    <img
+        x="248"
+        y="-20"
+        w="144"
+        h="157"
+        opacity="255"
+        file="app/box/resource/lamp/ctlamp.bin"
+        blendMode="imgBypassMode"
+        rotationAngle="0"
+        scaleX="1"
+        scaleY="1">img_ctlamp
+         <!-- translate  from: x, y-->
+        <animateTransform
+        type="translate"
+        from="-40 0"
+        to="40 0"
+        dur="3s"
+        pause = "pause"
+        repeatCount="indefinite"> </animateTransform>
+    </img>
+    <switch
+            x="260"
+            y="0">sw_living
+            <onOff
+                to="img_ctlamp"
+                type="pause" >
+            </onOff>
+            <onOn
+                to="img_ctlamp"
+                type="start" >
+            </onOn>
+    </switch>
+</screen></app>

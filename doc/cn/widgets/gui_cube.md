@@ -4,22 +4,22 @@
 
 ## 用法
 ### 创建控件
-[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y)](#api)创建一个cube控件。其中，`img_file`是一个包含了每个面图像源的结构体，支持内存地址或者文件系统路径。通过将`IMG_SOURCE_MODE_TYPE src_mode[6]`设置成`IMG_SRC_MEMADDR`或`IMG_SRC_FILESYS`来选择内存地址还是文件系统路径访问图像。
+[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y)](#gui_cube_create)创建一个cube控件。其中，`img_file`是一个包含了每个面图像源的结构体，支持内存地址或者文件系统路径。通过将`IMG_SOURCE_MODE_TYPE src_mode[6]`设置成`IMG_SRC_MEMADDR`或`IMG_SRC_FILESYS`来选择内存地址还是文件系统路径访问图像。
 
 ### 设置大小
-立方体控件的默认大小是`dc->fb_height / 8.0`，可以通过[void gui_cube_set_size(cube, size)](#api)改变大小。注意`size`是立方体的1/2边长。
+立方体控件的默认大小是`dc->fb_height / 8.0`，可以通过[void gui_cube_set_size(cube, size)](#gui_cube_set_size)改变大小。注意`size`是立方体的1/2边长。
 
 ### 设置中心
-立方体控件的默认中心是`((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`。使用[void gui_cube_set_center(cube, c_x, c_y)](#api)改变立方体的中心坐标。
+立方体控件的默认中心是`((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`。使用[void gui_cube_set_center(cube, c_x, c_y)](#gui_cube_set_center)改变立方体的中心坐标。
 
 ### 设置图像模式
-立方体控件默认图像混合模式是`IMG_FILTER_BLACK`（*滤黑，即图像中像素值为0的像素不写入屏幕刷新帧缓冲区*），可以通过[void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api)来改变图像混合模式。
+立方体控件默认图像混合模式是`IMG_FILTER_BLACK`（*滤黑，即图像中像素值为0的像素不写入屏幕刷新帧缓冲区*），可以通过[void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#gui_cube_set_mode)来改变图像混合模式。
 
 ### 设置立方体图像
-可以通过[void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#api)来设置立方体展示的图像。
+可以通过[void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#gui_cube_set_img)来设置立方体展示的图像。
 
 ### 设置旋转角度
-立方体的旋转角度可以通过以下API设置，[void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree)](#api)，[void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree)](#api)以及[void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree)](#api)。
+立方体的旋转角度可以通过以下API设置，[void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree)](#gui_cube_auto_rotation_by_x)，[void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree)](#gui_cube_auto_rotation_by_y)以及[void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree)](#gui_cube_auto_rotation_by_z)。
 
 
 ## 示例

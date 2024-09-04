@@ -17,37 +17,26 @@ Creating function is [gui_return_create](#gui_return_create). Users need to ente
 ```eval_rst
 
 .. note::
-  Please refer to ```gui_engine\example\screen_454_454\gui_menu\apps.c``` for details.
+  Please refer to ``gui_engine\example\screen_454_454\gui_menu\apps_in_menu.c`` for details.
 
 ```
 
 
 
+```eval_rst
 
-```c
-const uint32_t *gui_app_return_array[] =
-{
-    PATH04_BIN,
-    PATH05_BIN,
-    PATH07_BIN,
-    PATH08_BIN,
-    PATH09_BIN,
-    PATH11_BIN,
-    PATH12_BIN,
-    PATH14_BIN,
-    PATH15_BIN,
-    PATH16_BIN,
-    PATH18_BIN,
-    PATH19_BIN,
-    PATH20_BIN,
-    PATH22_BIN,
-    PATH23_BIN,
-    PATH24_BIN,
-    PATH25_BIN,
-};
-gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)cell);
+.. literalinclude:: ../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+   :language: c
+   :start-after: /*Define gui_app_return_array*/
+   :end-before: /*Define gui_app_return_array end*/
+
+.. literalinclude:: ../../../gui_engine/example/screen_454_454/gui_menu/apps_in_menu.c
+   :language: c
+   :start-after: /*gui_return_create*/
+   :end-before: /*gui_return_create end*/
+
 ```
+
 
 
 <span id = "gui_return_create">

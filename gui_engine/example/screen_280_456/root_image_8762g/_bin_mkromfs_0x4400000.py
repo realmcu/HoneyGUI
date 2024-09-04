@@ -208,13 +208,13 @@ class Folder(object):
                 if (data_addr + 8) % pad_len != 0:
                     add_data = b'\0' * (pad_len - (data_addr + 8) % pad_len)
                 data_addr = data_addr + len(add_data)
-                # H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
+                # H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) +
                 #                '(void *)(resource_root + ' + '0x%08x' % data_addr + ' - ' + '0x%08x' % BASE_ADDR + ')' + '\n')
-                
-                H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
+
+                H_FILE_IF = (H_FILE_IF + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) +
                                '(void *)(resource_root + ' + '0x%08x' % (data_addr - BASE_ADDR) + ')' + '\n')
 
-                H_FILE_ELSE = (H_FILE_ELSE + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) + 
+                H_FILE_ELSE = (H_FILE_ELSE + '#define   ' + '%-40s' % (str(c._name).replace('.', '_').upper()) +
                                '(void *)(' + '0x%08x' % data_addr + ')' + '\n')
             # pad the data to 4 bytes boundary
 

@@ -172,14 +172,3 @@ static void scenario_benchmark_manager_frame_end_cb(void)
             draw_time / 1000, draw_time % 1000,
             total_time / 1000, total_time % 1000);
 }
-
-void benchmark_free_all_other_mgrs(void)
-{
-    free_watchface_mgr();
-    free_call_mgr();
-    free_player_mgr();
-    free_record_mgr();
-    free_contacts_mgr();
-    free_benchmark_mgr();
-}
-

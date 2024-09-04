@@ -27,7 +27,7 @@
 `透视 (perspective)`_                滑动扩展和收缩窗帘
 `蜂窝菜单 (menu_celllar)`_           显示成蜂窝形状菜单设置的图标
 `返回 (return)`_                     可以拖出的泡泡形状曲线
-`二维码和条形码 (qbcode)`_           显示二维码和条形码
+`二维码或条形码 (qbcode)`_           显示二维码或条形码
 `画布矩形 (canvas_rect)`_            显示一个矩形
 `画布圆角矩形 (canvas_round_rect)`_  显示一个圆角矩形
 `画布弧形 (canvas_arc)`_             显示一个弧形
@@ -60,7 +60,7 @@
 .. _表盘渐变 (watchface gradient): gui_watchface_gradient.html
 .. _蜂窝菜单 (menu_celllar): gui_menu_cellular.html
 .. _返回 (return): gui_return.html
-.. _二维码和条形码 (qbcode): qbcode.html
+.. _二维码或条形码 (qbcode): qbcode.html
 .. _趣带特效 (litegfx): gui_widget_litegfx.html
 .. toctree::
     :maxdepth: 2
@@ -91,5 +91,5 @@
     表盘渐变 (watchface gradient) <gui_watchface_gradient>
     蜂窝菜单 (menu_celllar) <gui_menu_cellular>
     返回 (return) <gui_return>
-	二维码和条形码 (qbcode) <gui_qbcode>
+	二维码或条形码 (qbcode) <gui_qbcode>
     趣带特效 (litegfx) <gui_widget_litegfx>

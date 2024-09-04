@@ -237,19 +237,19 @@ static void gui_seekbar_prepare(gui_obj_t *obj)
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
-                gui_obj_event_set(obj, GUI_EVENT_1);
+                //gui_obj_event_set(obj, GUI_EVENT_1);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            gui_obj_event_set(obj, GUI_EVENT_2);
+            //gui_obj_event_set(obj, GUI_EVENT_2);
         }
 
         if (b->press_flag)
         {
-            gui_obj_event_set(obj, GUI_EVENT_3);
+            //gui_obj_event_set(obj, GUI_EVENT_3);
         }
     }
 }
@@ -422,12 +422,12 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
         {
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                int pro = tp->x + tp->deltaX - 0;
+                int pro = tp->x + tp->deltaX - obj->x;
                 if (pro <= 0) { pro = 1; }
                 if (pro >= obj->w) { pro = obj->w; }
                 if (GET_BASE(circle->base.c)->type == IMAGE_FROM_MEM)
                 {
-                    pro = pro * (circle->base.max - 2) / obj->w;
+                    pro = pro * circle->base.max / obj->w;
                     gui_log("pro:%d\n", pro);
                 }
                 gui_progressbar_set_progress((void *)circle, pro);
@@ -459,7 +459,7 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
 
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                    //gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
             }
             break;
@@ -479,18 +479,18 @@ static void gui_seekbar_h_prepare(gui_obj_t *obj)
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
                 b->press_flag = true;
-                gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
+                //gui_obj_event_set(obj, GUI_EVENT_1);  ////gui_log("%d\n", __LINE__);
             }
         }
 
         if ((tp->released) && (b->press_flag))
         {
             b->press_flag = false;
-            gui_obj_event_set(obj, GUI_EVENT_2);
+            //gui_obj_event_set(obj, GUI_EVENT_2);
         }
         if (b->press_flag)
         {
-            gui_obj_event_set(obj, GUI_EVENT_3);
+            //gui_obj_event_set(obj, GUI_EVENT_3);
         }
     }
 }
@@ -818,10 +818,15 @@ static void gui_seekbar_set_animate(gui_seekbar_t *o, uint32_t dur, int repeat_c
     animate->p = p;
     ((gui_seekbar_t *)o)->animate = animate;
 }
+static void on_change(gui_seekbar_t *this, gui_event_cb_t function, void *param)
+{
+    gui_obj_add_event_cb(this, function, GUI_EVENT_1, param);
+}
 _GUI_API_ASSIGN(gui_seekbar_t)
 .animate = gui_seekbar_set_animate,
  .get_progress = (float(*)(gui_seekbar_t *))gui_progressbar_get_percentage,
   .set_progress = (void (*)(gui_seekbar_t *, float))gui_progressbar_set_percentage,
+   .on_change = on_change,
 };
 /*============================================================================*
  *                           Public Functions

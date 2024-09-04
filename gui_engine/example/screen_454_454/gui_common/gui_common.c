@@ -1,5 +1,11 @@
 #include "gui_common.h"
 #include "app_gui_main.h"
+#include "watchface_mgr.h"
+#include "player_mgr.h"
+#include "call_mgr.h"
+#include "contacts_mgr.h"
+#include "record_mgr.h"
+#include "benchmark_mgr.h"
 #ifndef _WIN32
 #include "gui_interface.h"
 #include "app_gap.h"
@@ -110,4 +116,15 @@ int app_tab_manager_switch(app_tab_t *tab)
 
     return 0;
 }
+
+void app_gui_main_free(void)
+{
+    free_watchface_mgr();
+    free_call_mgr();
+    free_player_mgr();
+    free_record_mgr();
+    free_contacts_mgr();
+    free_benchmark_mgr();
+}
+
 

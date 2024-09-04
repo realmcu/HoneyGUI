@@ -243,7 +243,7 @@ static void gui_text_font_destory(gui_text_t *text)
     {
     case GUI_FONT_SRC_BMP:
         {
-            gui_font_mem_unload(text);
+            gui_font_mem_obj_destroy(text);
         }
         break;
 
@@ -354,6 +354,22 @@ static void gui_text_prepare(gui_obj_t *obj)
     touch_info_t *tp = tp_get_info();
     gui_point3f_t point = {0, 0, 1};
     uint8_t last;
+
+#if 0 // font mat scale min scale function
+    if (this->base.matrix->m[0][0] < this->min_scale)
+    {
+        this->base.matrix->m[0][0] = this->min_scale;
+        this->scale_img->base.matrix->m[0][0] = this->min_scale;
+    }
+    if (this->base.matrix->m[1][1] < this->min_scale)
+    {
+        this->base.matrix->m[1][1] = this->min_scale;
+        this->scale_img->base.matrix->m[1][1] = this->min_scale;
+    }
+    // gui_log("text scale x %f, y %f ; img scale x %f, y %f",
+    //         this->base.matrix->m[0][0],this->base.matrix->m[1][1],
+    //         this->scale_img->base.matrix->m[0][0],this->scale_img->base.matrix->m[1][1]);
+#endif
     if (this->font_type == GUI_FONT_SRC_IMG)
     {
         return;
@@ -392,14 +408,15 @@ static void gui_text_prepare(gui_obj_t *obj)
 
     if (obj->not_show)
     {
-        this->refresh = false;
+        this->layout_refresh = false;
+        this->content_refresh = false;
     }
 
     last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_text_t));
 
-    if (last != this->checksum || this->refresh)
+    if (last != this->checksum || this->content_refresh)
     {
         gui_fb_change();
     }
@@ -414,7 +431,8 @@ static void gui_text_draw(gui_obj_t *obj)
 
     if (text->len == 0)
     {
-        text->refresh = false;
+        text->content_refresh = false;
+        text->layout_refresh = false;
         return;
     }
 
@@ -520,7 +538,8 @@ void gui_text_ctor(gui_text_t *this,
     this->mode = LEFT;
     this->inputable = false;
     this->font_mode = FONT_SRC_MEMADDR;
-    this->refresh = true;
+    this->content_refresh = false;
+    this->layout_refresh = false;
 }
 
 /*============================================================================*
@@ -546,7 +565,8 @@ void gui_text_set(gui_text_t   *this,
     this->font_height = font_size;
     this->char_width_sum = 0;
     this->char_line_sum = 0;
-    this->refresh = true;
+    this->content_refresh = true;
+    this->layout_refresh = true;
 }
 
 void gui_text_set_animate(void    *o,
@@ -573,7 +593,7 @@ void gui_text_set_animate(void    *o,
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)
 {
     this->mode = mode;
-    this->refresh = true;
+    this->layout_refresh = true;
 }
 
 void gui_text_input_set(gui_text_t *this, bool inputable)
@@ -581,17 +601,23 @@ void gui_text_input_set(gui_text_t *this, bool inputable)
     this->inputable = inputable;
 }
 
+void gui_text_set_min_scale(gui_text_t *this, float min_scale)
+{
+    this->min_scale = min_scale;
+}
+
 void gui_text_move(gui_text_t *this, int16_t x, int16_t y)
 {
     this->base.x = x;
     this->base.y = y;
-    this->refresh = true;
+    this->layout_refresh = true;
 }
 
 void gui_text_size_set(gui_text_t *this, uint8_t height, uint8_t width)
 {
     this->font_height = height;
-    this->refresh = true;
+    this->content_refresh = true;
+    this->layout_refresh = true;
 }
 
 void gui_text_font_mode_set(gui_text_t *this, FONT_SRC_MODE font_mode)
@@ -609,6 +635,12 @@ void gui_text_type_set(gui_text_t *this, void *font_source, FONT_SRC_MODE font_m
     this->font_mode = font_mode;
 }
 
+void gui_text_emoji_set(gui_text_t *this, uint8_t *path, uint8_t size)
+{
+    this->emoji_path = path;
+    this->emoji_size = size;
+}
+
 void gui_text_encoding_set(gui_text_t *this, TEXT_CHARSET charset)
 {
     this->charset = charset;
@@ -620,7 +652,8 @@ void gui_text_content_set(gui_text_t *this, void *text, uint16_t length)
     this->len = length;
     this->char_width_sum = 0;
     this->char_line_sum = 0;
-    this->refresh = true;
+    this->content_refresh = true;
+    this->layout_refresh = true;
 }
 
 void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
@@ -646,6 +679,7 @@ void gui_text_convert_to_img(gui_text_t *this, GUI_FormatType font_img_type)
         gui_img_set_attribute(text_img, "text_img", img, img_x, img_y);
         text_img->base.w = gui_img_get_width(text_img);
         text_img->base.h = gui_img_get_height(text_img);
+        gui_fb_change();
     }
 
     switch (font_img_type)
@@ -692,7 +726,6 @@ gui_text_t *gui_text_create(void       *parent,
     memset(text, 0, sizeof(gui_text_t));
 
     gui_text_ctor(text, parent, name, x, y, w, h);
-    text->refresh = false;
     gui_list_init(&(GET_BASE(text)->child_list));
     if ((GET_BASE(text)->parent) != NULL)
     {

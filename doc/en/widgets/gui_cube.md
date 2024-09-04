@@ -4,22 +4,22 @@ The cube is a 3D display widget that show a rotating cube with six faces, each c
 
 ## Usage
 ### Create a cube
-[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y)](#api) creates a cube widget. The `img_file` is an struct including image sources for the six faces of a cube. Both memory address and file path are supported, whether you choose to utilize memory or access the filesystem, simply set `IMG_SOURCE_MODE_TYPE src_mode[6]` to either `IMG_SRC_MEMADDR` or `IMG_SRC_FILESYS`.
+[gui_cube_t *gui_cube_create(void *parent,  const char *name, gui_cube_imgfile_t *img_file, int16_t x, int16_t y)](#gui_cube_create) creates a cube widget. The `img_file` is an struct including image sources for the six faces of a cube. Both memory address and file path are supported, whether you choose to utilize memory or access the filesystem, simply set `IMG_SOURCE_MODE_TYPE src_mode[6]` to either `IMG_SRC_MEMADDR` or `IMG_SRC_FILESYS`.
 
 ### Set size
-By default, the cube's size is `dc->fb_height / 8.0`. If you want to change the size set [void gui_cube_set_size(cube, size)](#api). Note this `size` is the 1/2 length of cube edge.
+By default, the cube's size is `dc->fb_height / 8.0`. If you want to change the size set [void gui_cube_set_size(cube, size)](#gui_cube_set_size). Note this `size` is the 1/2 length of cube edge.
 
 ### Set center
-By default, the center is `((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`. You can use [void gui_cube_set_center(cube, c_x, c_y)](#api) to set the center coordinates of the cube.
+By default, the center is `((dc->fb_width - size) / 2.0f,dc->fb_width - size) / 2.0f)`. You can use [void gui_cube_set_center(cube, c_x, c_y)](#gui_cube_set_center) to set the center coordinates of the cube.
 
 ### Set image mode
-By default, the cube's image blend mode is `IMG_FILTER_BLACK`, you can change the blend mode of image by calling [void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#api).
+By default, the cube's image blend mode is `IMG_FILTER_BLACK`, you can change the blend mode of image by calling [void gui_cube_set_mode(gui_cube_t *cube, T_CUBE_SIDE_TYPE cube_side, BLEND_MODE_TYPE mode)](#gui_cube_set_mode).
 
 ### Set cube image
-The images of cube can be configured by calling [void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#api).
+The images of cube can be configured by calling [void gui_cube_set_img(gui_cube_t *cube, gui_cube_imgfile_t *img_file)](#gui_cube_set_img).
 
 ### Set rotation direction
-The rotation direction of this cube can be achieved by calling [void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree)](#api), [void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree)](#api) and [void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree)](#api).
+The rotation direction of this cube can be achieved by calling [void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree)](#gui_cube_auto_rotation_by_x), [void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree)](#gui_cube_auto_rotation_by_y) and [void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree)](#gui_cube_auto_rotation_by_z).
 
 
 ## Example

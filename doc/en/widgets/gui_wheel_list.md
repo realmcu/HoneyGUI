@@ -6,7 +6,7 @@ The wheellist widget is an application list interface, mainly composed of applic
 
 ### Create a wheel list
 
-[gui_wheel_list_t *gui_wheel_list_create(void *parent, uint8_t layer, uint8_t radius, uint8_t distence)](#api) creates a wheel list widget.
+[gui_wheel_list_t *gui_wheel_list_create(void *parent, uint8_t layer, uint8_t radius, uint8_t distence)](#gui_wheel_list_create) creates a wheel list widget.
 
 `layer` is the number of layers of the round wheel, 1 means there is one circle of outer icons in addition to the center icon.
 
@@ -22,7 +22,7 @@ The number of icons in each layer is 6*n, where n represents the number of icon 
 #### Default
 
 After creating the wheel list widget, you can use the default interface for adding icons. In the wheel, corresponding icons can be added from the inside out in a layer-by-layer fashion.
-[void gui_wheel_list_add_icon_default(gui_wheel_list_t *this, void *icon_addr,gui_event_cb_t event_cb)](#api)
+[void gui_wheel_list_add_icon_default(gui_wheel_list_t *this, void *icon_addr,gui_event_cb_t event_cb)](#gui_wheel_list_add_icon_default)
 
 `this` is the pointer to the widget.
 
@@ -124,7 +124,7 @@ static void app_launcher_ui_design(gui_app_t *app)
 #### Customized
 
 After creating the wheel list widget, you can use the default interface for adding icons. In the wheel, corresponding icons can be added from the inside out in a layer-by-layer fashion.
-[gui_wheel_list_set_icon(gui_wheel_list_t *this, void *icon_addr, gui_event_cb_t event_cb, uint8_t layer, uint8_t index)](#api)
+[gui_wheel_list_set_icon(gui_wheel_list_t *this, void *icon_addr, gui_event_cb_t event_cb, uint8_t layer, uint8_t index)](#gui_wheel_list_set_icon)
 
 `this` is the pointer to the widget.
 

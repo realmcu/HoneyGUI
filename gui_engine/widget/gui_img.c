@@ -107,74 +107,7 @@ void gui_img_set_animate(gui_img_t *this,
 static void gui_img_update_att(gui_obj_t *o)
 {
     gui_img_t *this = (void *)o;
-    uint32_t cur_time_gap;
-
-    if (this->animate && this->animate->animate)
-    {
-        cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
-        this->animate->cur_time_ms = gui_ms_get();
-
-        if (cur_time_gap >= 2 * this->animate->dur)
-        {
-            this->animate->init_time_ms += cur_time_gap;
-        }
-
-        if (this->animate->repeat_count == 0)
-        {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
-            {
-                this->animate->callback(this->animate->p, this);
-                this->animate->animate = false;
-                this->animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
-                                                          this->animate->init_time_ms) /
-                                                  (float)this->animate->dur;
-            }
-        }
-        else if (this->animate->repeat_count < 0)
-        {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
-            {
-                this->animate->callback(this->animate->p, this);
-                this->animate->init_time_ms += this->animate->dur;
-                this->animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
-                                                          this->animate->init_time_ms) /
-                                                  (float)this->animate->dur;
-            }
-        }
-        else if (this->animate->repeat_count > 0)
-        {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms -
-                 this->animate->current_repeat_count * this->animate->dur) >=
-                this->animate->dur)
-            {
-                if (this->animate->current_repeat_count < this->animate->repeat_count)
-                {
-                    this->animate->callback(this->animate->p, this);
-                    this->animate->current_repeat_count ++;
-                }
-                else
-                {
-                    this->animate->callback(this->animate->p, this);
-                    this->animate->animate = false;
-                }
-                this->animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms - this->animate->init_time_ms -
-                                                          this->animate->current_repeat_count * this->animate->dur) /
-                                                  (float)this->animate->dur;
-            }
-        }
-    }
+    animate_frame_update(this->animate, o);
 }
 
 static void gui_img_prepare(gui_obj_t *obj)
@@ -304,7 +237,13 @@ static void gui_img_prepare(gui_obj_t *obj)
         {
             int ax = win_scope->base.x ;
             int ay = win_scope->base.y;
-
+            o = GUI_BASE(win_scope);
+            while (o->parent != NULL)
+            {
+                o = o->parent;
+                ax += o->x;
+                ay += o->y;
+            }
             int w_w = win_scope->base.w;
             int w_h = win_scope->base.h;
             int img_x = GUI_TYPE(gui_img_t, obj)->ax;

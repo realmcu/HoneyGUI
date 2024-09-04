@@ -5,7 +5,7 @@
 ## 用法
 
 ### 创建卡片控件
-开发者可以调用 [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#api) 来创建卡片控件。
+开发者可以调用 [gui_card_create(parent, filename, x, y, w, h, idx, idy)](#gui_card_create) 来创建卡片控件。
 
 ## 示例
 

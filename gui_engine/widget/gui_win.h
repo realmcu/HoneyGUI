@@ -237,6 +237,12 @@ void gui_win_start_animation(gui_win_t *win);
  * If win or win->animate is NULL, the function will log an error message.
  */
 void gui_win_stop_animation(gui_win_t *win);
+/**
+ * @brief window widget prepare
+ *
+ * @param obj pointer
+ */
+void gui_win_prepare(gui_obj_t *obj);
 
 #ifdef __cplusplus
 }

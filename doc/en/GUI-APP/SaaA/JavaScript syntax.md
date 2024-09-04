@@ -73,13 +73,13 @@ win.onClick(hideHeat)
 * API
 ```javascript
     getElementById : function (win_name : string) {}
-    onClick : function (click_callback_func) {}
-    onRight : function (click_callback_func) {}
-    onLeft : function (click_callback_func) {}
-    onUp : function (click_callback_func) {}
-    onDown : function (click_callback_func) {}
+    onClick : function (callback_func) {}
+    onRight : function (callback_func) {}
+    onLeft : function (callback_func) {}
+    onUp : function (callback_func) {}
+    onDown : function (callback_func) {}
     onPress : function (callback_func) {}
-    onRelease : function (click_callback_func) {}
+    onRelease : function (callback_func) {}
     onHold : function (callback_func) {}
     getAttribute : function(attributeName : string) {},   //return attribute value //support "hidden"
     removeAttribute : function (attribute : string) {} //support "hidden"
@@ -105,9 +105,9 @@ icon.onPress(iconNromalOnPressFunc)
 * API
 ```javascript
     getElementById : function (win_name : string) {},
-    onClick : function (click_callback_func) {},
+    onClick : function (callback_func) {},
     onPress : function (callback_func) {},
-    onRelease : function (click_callback_func) {},
+    onRelease : function (callback_func) {},
     onHold : function (callback_func) {},
     getChildElementByTag : function (tag : string) {},
     write : function (text : string) {},
@@ -177,10 +177,10 @@ seekbar.palyAnimate()
 
 ```javascript
     getElementById : function (win_name : string) {},
-    progress : function (progressToSet : number):{},//get or set progress//return progress
+    progress : function (progressToSet : number){},//get or set progress//return progress
     onPress : function (callback_func) {}, //gesture press
     onPressing : function (callback_func) {},//gesture pressing
-    onRelease : function (click_callback_func) {},//gesture release
+    onRelease : function (callback_func) {},//gesture release
     setAnimate : function (frameCallback : function, config : object) {},// frameCallback function will be executed once every frame // var curtainAnimateTiming = {duration: 2000,iterations:1,}
     setAttribute :function(attributeName : string, value : any) {},  //support "hidden"
     getAttribute : function(attributeName : string) {},   //return attribute value //support "hidden"

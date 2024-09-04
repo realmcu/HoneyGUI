@@ -66,6 +66,7 @@ GUI_APP_DEFINE_NAME(APP_CALCULATOR)
 #define HEART_ANI_W 180
 #define PAGE_NAME "_heart_rate_page"
 #define HR_BK_RECT_NAME "_HR_BK_RECT_NAME"
+#define STOPWATCHTEXT "STOPWATCHTEXT"
 #define APP_SWAP_ANIMATION_DUR 2000
 static void heart_ani_cb(gui_win_t *img);
 static void page_cb(gui_page_t *page);
@@ -225,8 +226,11 @@ static void app_hr_ui_design(gui_app_t *app)
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
     status_bar(GUI_APP_ROOT_SCREEN, (void *)page);
+
+    /*gui_return_create*/
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)page);
+    /*gui_return_create end*/
 }
 static void app_win_cb(gui_win_t *win)
 {
@@ -315,13 +319,20 @@ static void win_cb(gui_win_t *win)
 
 
 }
-
+void gui_return_cb(gui_win_t *win)
+{
+    win_cb(win);
+}
 #define TIME_SCALE_RATE (0.35F)
 #define STATUS_BAR_HEIGHT 20
 #define STATUS_BAR_TIME_TEXT "STATUS_BAR_TIME_TEXT"
 #define STATUS_BAR_DATE_TEXT "STATUS_BAR_DATE_TEXT"
 #define STATUS_BAR_WINDOW "STATUS_BAR_WINDOW"
 static gui_canvas_rect_t *rect;
+void gui_app_create_status_bar(void *parent, gui_obj_t *ignore_gesture)
+{
+    status_bar(parent, ignore_gesture);
+}
 static void status_bar(void *parent, gui_obj_t *ignore_gesture)
 {
     gui_win_t *status_bar = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -707,9 +718,11 @@ static void app_menu(gui_app_t *app)
     gui_return_create(win, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), app_menu_win_cb, (void *)cell);
 }
+/*Define APP_MENU's entry func end*/
 #include "gui_seekbar.h"
 #include "gui_img.h"
 #define RETURN_HEIGHT 100
+/*Define gui_app_return_array*/
 const uint32_t *gui_app_return_array[] =
 {
     PATH04_BIN,
@@ -730,589 +743,16 @@ const uint32_t *gui_app_return_array[] =
     PATH24_BIN,
     PATH25_BIN,
 };
-static void stop_watch_win_ani_cb(void);
-#define STOPWATCHTEXT "STOPWATCHTEXT"
+/*Define gui_app_return_array end*/
 
-const static int gap = 50;
-static int touch_y;
-static bool alien = true;
-static int16_t recode[5];
-static const int end_speed = 3;
-static const int array_length = 24;
-static int speed, target;
-#define COUNT 7
-static char text_array[COUNT][3];
-static gui_obj_t *text_widget_array[COUNT];
-const static unsigned char time_array[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-struct gui_text_image_map
-{
-    const char *text;
-    void *image_data;
-};
-const static struct gui_text_image_map app_text_image_map[] =
-{
-    {"0", TEXT0_BIN},
-    {"1", TEXT1_BIN},
-    {"2", TEXT2_BIN},
-    {"3", TEXT3_BIN},
-    {"4", TEXT4_BIN},
-    {"5", TEXT5_BIN},
-    {"6", TEXT6_BIN},
-    {"7", TEXT7_BIN},
-    {"8", TEXT8_BIN},
-    {"9", TEXT9_BIN},
-    {"PM", TEXTPM_BIN},
-    {"AM", TEXTAM_BIN},
-    {".", TEXTDIAN_BIN},
-    {":", TEXTMAOHAO_BIN},
-    {"/", TEXTXIEGANG_BIN},
-};
-// Function to retrieve image data based on text input
-void *get_image_data(const char *text)
-{
-    for (size_t i = 0; i < sizeof(app_text_image_map) / sizeof(app_text_image_map[0]); ++i)
-    {
-        if (strcmp(app_text_image_map[i].text, text) == 0)
-        {
-            return app_text_image_map[i].image_data;
-        }
-    }
-    return NULL; // Return NULL if no match is found
-}
-
-// Function to process the input string and return image pointers
-void **get_image_pointers(const char *input, size_t *num_pointers)
-{
-    size_t capacity = 16; // Start with a reasonable initial capacity
-    /*Why Start with a Capacity of 16?
-    Balance Between Space and Performance:
-    Memory Efficiency: Starting with some preallocated space avoids constant reallocations and copying when adding elements to the array. A small initial allocation (like 16) means you don't waste much memory upfront.
-    Performance: Frequent reallocations can be costly, both in terms of time (because data has to be copied to a new location) and CPU usage. Starting with a moderate size helps balance these factors.*/
-
-    *num_pointers = 0;
-    void **image_pointers = gui_malloc(capacity * sizeof(void *));
-    if (image_pointers == NULL)
-    {
-        gui_log("Failed to allocate memory");
-    }
-
-    const char *ptr = input;
-    while (*ptr != '\0')
-    {
-        const char *next = ptr + 1;
-
-        // Handle multi-character tokens (e.g., "AM" and "PM")
-        if (strncmp(ptr, "PM", 2) == 0 || strncmp(ptr, "AM", 2) == 0)
-        {
-            char token[3] = {ptr[0], ptr[1], '\0'};
-            void *img = get_image_data(token);
-            if (img != NULL)
-            {
-                if (*num_pointers == capacity)
-                {
-                    capacity *= 2;
-                    image_pointers = gui_realloc(image_pointers, capacity * sizeof(void *));
-                    if (image_pointers == NULL)
-                    {
-                        gui_log("Failed to reallocate memory");
-                    }
-                }
-                image_pointers[(*num_pointers)++] = img;
-            }
-            next = ptr + 2; // Skip the next character as it's part of "AM" or "PM"
-        }
-        else
-        {
-            char token[2] = {ptr[0], '\0'};
-            void *img = get_image_data(token);
-            if (img != NULL)
-            {
-                if (*num_pointers == capacity)
-                {
-                    capacity *= 2;
-                    image_pointers = gui_realloc(image_pointers, capacity * sizeof(void *));
-                    if (image_pointers == NULL)
-                    {
-                        gui_log("Failed to reallocate memory");
-                    }
-                }
-                image_pointers[(*num_pointers)++] = img;
-            }
-        }
-
-        ptr = next;
-    }
-
-    return image_pointers;
-}
-
-
-#define NUMBER_TEXT 0
-#define NUMBER_IMAGE 1
-#define NUMBER_RENDER NUMBER_IMAGE
-static void render_number(const char *text, gui_obj_t *obj)
-{
-    switch (NUMBER_RENDER)
-    {
-    case NUMBER_TEXT:
-        {
-            gui_text_content_set((void *)obj, (void *)text, strlen(text));
-        }
-        break;
-    case NUMBER_IMAGE:
-        {
-            const char *input = text;
-            size_t num_pointers;
-            void **image_pointers = get_image_pointers(input, &num_pointers);
-            gui_image_array_write((void *)obj, image_pointers, num_pointers);
-            // Free allocated memory
-            gui_free(image_pointers);
-
-        }
-        break;
-    default:
-        break;
-    }
-}
-static void update_speed(gui_obj_t *obj)
-{
-    touch_info_t *tp = tp_get_info();
-    int recode_num = 4;
-    for (size_t i = 0; i < recode_num; i++)
-    {
-        recode[i] = recode[i + 1];
-    }
-    recode[recode_num] = tp->deltaY;
-    speed = recode[recode_num] - recode[0];
-    int max_speed = GUI_PAGE_MAX_SPEED;
-    int min_speed = GUI_PAGE_MIN_SPEED;
-    if (speed > max_speed)
-    {
-        speed = max_speed;
-    }
-    else if (speed < -max_speed)
-    {
-        speed = -max_speed;
-    }
-    if ((speed > 0) && (speed < min_speed))
-    {
-        speed = min_speed;
-    }
-    else if ((speed < 0) && (speed > -min_speed))
-    {
-        speed = -min_speed;
-    }
-}
-static bool render;
-static void gui_page_update_inertial(gui_obj_t *obj)
-{
-    IMPORT_GUI_TOUCHPAD
-    if (speed > end_speed)
-    {
-        touch_y += speed;
-        speed -= 1;
-    }
-    else if (speed < -end_speed)
-    {
-        touch_y += speed;
-        speed += 1;
-    }
-}
-static void stop_watch_win_overwrite(gui_obj_t *win)
-{
-    IMPORT_GUI_TOUCHPAD
-    IMPORT_GUI_WHEEL
-    static bool wheel_take_over;
-    static char time_array_offset;
-    int time_array_size = sizeof(time_array) / sizeof(time_array[0]);
-    static int history_y;
-    if (wheel->pressed)
-    {
-        wheel_take_over = 1;
-        wheel->history_x = touch_y;
-    }
-    if (wheel->released)
-    {
-        wheel_take_over = 0;
-    }
-
-    if (!wheel_take_over)
-    {
-        if (touch->pressed && touch->x > win->x && touch->x < win->x + win->w)
-        {
-            history_y = touch_y;
-            speed = 0;
-            memset(recode, 0, sizeof(recode));
-        }
-        if (touch->pressing && touch->x > win->x && touch->x < win->x + win->w)
-        {
-            touch_y = history_y + touch->deltaY;
-            /**
-             * Index = offset / gap % array length
-               WidgetOffset = offset % gap
-            */
-            update_speed(win);
-            render = 1;
-
-
-        }
-        else
-        {
-            gui_page_update_inertial(win);
-        }
-        if (render)
-        {
-            time_array_offset = -(touch_y / gap % array_length);
-            int widget_offset = touch_y % gap;
-            GUI_BASE(win)->y = widget_offset;
-            if (alien && widget_offset == 0 && speed <= end_speed && speed >= -end_speed)
-            {
-                render = 0;
-            }
-            if (alien && widget_offset != 0)
-            {
-                if (speed > 0 && speed <= end_speed)
-                {
-
-                    if (_UI_ABS(widget_offset) <= end_speed)
-                    {
-                        widget_offset = 0;
-                    }
-                    else
-                    {
-                        touch_y += end_speed;
-                    }
-
-
-                }
-                else if (speed < 0 && speed >= -end_speed)
-                {
-
-                    if (_UI_ABS(widget_offset) <= end_speed)
-                    {
-                        widget_offset = 0;
-                    }
-                    else
-                    {
-                        touch_y -= end_speed;
-                    }
-
-                }
-                else if (speed == 0)
-                {
-                    if (_UI_ABS(widget_offset) <= end_speed)
-                    {
-                        widget_offset = 0;
-                    }
-                    if (widget_offset > 0)
-                    {
-                        if (widget_offset > gap / 2)
-                        {
-                            touch_y += end_speed;
-                        }
-                        else
-                        {
-                            touch_y -= end_speed;
-                        }
-                    }
-                    else if (widget_offset < 0)
-                    {
-                        if (-widget_offset > gap / 2)
-                        {
-                            touch_y -= end_speed;
-                        }
-                        else
-                        {
-                            touch_y += end_speed;
-                        }
-                    }
-                }
-            }
-            for (size_t i = 0; i < COUNT; i++)
-            {
-                char *text = text_array[i];
-                memset(text, 0, sizeof(text_array[i]));
-                int index = time_array_offset + i;
-                if (index >= time_array_size)
-                {
-                    index -= time_array_size;
-                }
-                if (index < 0)
-                {
-                    index += time_array_size;
-                }
-                sprintf(text, "%d", time_array[index]);
-                render_number(text, (void *)text_widget_array[i]);
-            }
-        }
-        else
-        {
-            history_y = touch_y;
-        }
-    }
-    else
-    {
-        touch_y = wheel->history_y;
-        {
-            time_array_offset = -(touch_y / gap % array_length);
-            int widget_offset = touch_y % gap;
-            GUI_BASE(win)->y = widget_offset;
-            if (alien && widget_offset == 0 && speed <= end_speed && speed >= -end_speed)
-            {
-                render = 0;
-            }
-            if (alien && widget_offset != 0)
-            {
-                if (speed > 0 && speed <= end_speed)
-                {
-                    if (_UI_ABS(widget_offset) <= end_speed)
-                    {
-                        widget_offset = 0;
-                    }
-                    else
-                    {
-                        touch_y += end_speed;
-                    }
-                }
-                else if (speed < 0 && speed >= -end_speed)
-                {
-                    if (_UI_ABS(widget_offset) <= end_speed)
-                    {
-                        widget_offset = 0;
-                    }
-                    else
-                    {
-                        touch_y -= end_speed;
-                    }
-                }
-                else if (speed == 0)
-                {
-                    if (_UI_ABS(widget_offset) <= end_speed)
-                    {
-                        widget_offset = 0;
-                    }
-                    if (widget_offset > 0)
-                    {
-                        if (widget_offset > gap / 2)
-                        {
-                            touch_y += end_speed;
-                        }
-                        else
-                        {
-                            touch_y -= end_speed;
-                        }
-                    }
-                    else if (widget_offset < 0)
-                    {
-                        if (-widget_offset > gap / 2)
-                        {
-                            touch_y -= end_speed;
-                        }
-                        else
-                        {
-                            touch_y += end_speed;
-                        }
-                    }
-                }
-            }
-            for (size_t i = 0; i < COUNT; i++)
-            {
-                char *text = text_array[i];
-                memset(text, 0, sizeof(text_array[i]));
-                int index = time_array_offset + i;
-                if (index >= time_array_size)
-                {
-                    index -= time_array_size;
-                }
-                if (index < 0)
-                {
-                    index += time_array_size;
-                }
-                sprintf(text, "%d", time_array[index]);
-                render_number(text, (void *)text_widget_array[i]);
-            }
-        }
-    }
-}
-static void stop_watch_ml0(gui_obj_t *parent)
-{
-
-}
-static void stop_watch_ml1_0(gui_obj_t *parent)
-{
-
-    gui_win_t *stop = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_set_animate(stop, 1000, -1, stop_watch_win_ani_cb, 0);
-    {
-        char *text = "07:55";
-        int font_size = 48;
-        gui_text_t *t = gui_text_create(stop, STOPWATCHTEXT,  0, 200,
-                                        gui_get_screen_width(),
-                                        font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-        void *addr1 = ARIAL_SIZE48_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_convert_to_img(t, ARGB8888);
-        gui_text_mode_set(t, CENTER);
-
-    }
-}
-
-static void stop_watch_ml1_1(gui_obj_t *parent)
-{
-
-
-    const int width = 100;
-
-    static gui_win_t *win_array[COUNT];
-
-    gui_win_t *win = gui_win_create(parent, 0, 0, 70, width, gap * (COUNT - 1));
-
-    gui_win_set_scope(win, 1);
-    gui_canvas_rect_create((void *)win, 0, 0, 50, width, gap * (COUNT - 2), COLOR_RED);
-    gui_win_t *timer1 = gui_win_create(win, 0, width / 2 - gap / 2, 0, width, gap * (COUNT - 1));
-    gui_win_set_animate(win, 1000, -1, stop_watch_win_overwrite, timer1);
-
-
-    for (size_t i = 0; i < COUNT; i++)
-    {
-        gui_win_t *win = gui_win_create(timer1, 0, 0, gap * i, width, gap);
-        win_array[i] = win;
-        {
-            char *text = text_array[i];
-            memset(text, 0, sizeof(text_array[i]));
-            sprintf(text, "%d", i);
-            switch (NUMBER_RENDER)
-            {
-            case NUMBER_TEXT:
-                {
-                    int font_size = 16;
-                    gui_text_t *t = gui_text_create(win, text, 0, 0, width,
-                                                    font_size);
-                    gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-                    void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-                    gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-                    gui_text_mode_set(t, CENTER);
-                    text_widget_array[i] = GUI_BASE(t);
-                }
-                break;
-            case NUMBER_IMAGE:
-                {
-                    const char *input = text;
-                    size_t num_pointers;
-                    void **image_pointers = get_image_pointers(input, &num_pointers);
-
-                    // Print results
-                    gui_log("Found %zu image pointers for input \"%s\"\n", num_pointers, input);
-                    for (size_t i = 0; i < num_pointers; ++i)
-                    {
-                        gui_log("Image pointer %zu: %p\n", i + 1, image_pointers[i]);
-                    }
-                    text_widget_array[i] = GUI_BASE(gui_image_array_create(win, 0, 0, image_pointers, num_pointers,
-                                                                           "num"));
-                    // Free allocated memory
-                    gui_free(image_pointers);
-
-                }
-                break;
-            default:
-                break;
-            }
-
-
-        }
-
-    }
-
-
-    gui_img_t *img = gui_img_create_from_mem(parent, 0, STOPWATCH_BIN, 0, 0, 0, 0);
-    gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-}
-static void win_stop_watch_cb(void *null1, void *null2, void *param)
-{
-    gui_multi_level_t *ml = param;
-    GUI_API(gui_multi_level_t).jump(ml, 1, 0);
-
-}
-static void win_timer_cb(void *null1, void *null2, void *param)
-{
-    gui_multi_level_t *ml = param;
-    GUI_API(gui_multi_level_t).jump(ml, 1, 1);
-
-}
 /*define the app's ui design*/
 GUI_APP_ENTRY(APP_STOPWATCH)
 {
-    gui_canvas_rect_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, SCREEN_W, SCREEN_H, COLOR_SILVER);
-    gui_multi_level_t *ml0 = gui_multi_level_create(GUI_APP_ROOT_SCREEN, 0, stop_watch_ml0);
-    gui_multi_level_create(ml0, 0, stop_watch_ml1_0);
-    gui_multi_level_create(ml0, 0, stop_watch_ml1_1);
-    GUI_API(gui_multi_level_t).jump(ml0, 1, 0);
-    const int win_height = 100;
-    gui_win_t *win_stop_watch = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, SCREEN_H - win_height,
-                                               SCREEN_W / 2, win_height);
-    gui_win_press(win_stop_watch, win_stop_watch_cb, ml0);
-    {
-        char *text = "Stop watch";
-        int font_size = 16;
-        gui_text_t *t = gui_text_create(win_stop_watch, text, 0, 52, gui_get_screen_width() / 2,
-                                        font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_mode_set(t, CENTER);
-
-    }
-    gui_win_t *win_timer = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W / 2 + 1,
-                                          SCREEN_H - win_height, SCREEN_W / 2, win_height);
-    gui_win_press(win_timer, win_timer_cb, ml0);
-    {
-        char *text = "timer";
-        int font_size = 16;
-        gui_text_t *t = gui_text_create(win_timer, text, 0, 52, gui_get_screen_width() / 2,
-                                        font_size);
-        gui_text_set(t, text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
-        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
-        gui_text_mode_set(t, CENTER);
-
-    }
-    status_bar(GUI_APP_ROOT_SCREEN, (void *)0);
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+    extern void app_clock_ui_design(gui_obj_t *parent);
+    app_clock_ui_design(GUI_APP_ROOT_SCREEN);
 }
 /*define the app's ui design end*/
-static void get_stopwatch_string(char *buffer)
-{
-#if _WIN32
-    static bool enter;
-    static struct timeval start;
-    if (!enter)
-    {
-        enter = 1;
-        mingw_gettimeofday(&start, NULL);
-    }
-    struct timeval end;
-    long mtime, secs, usecs;
-    {
-        mingw_gettimeofday(&end, NULL);
-        secs  = end.tv_sec  - start.tv_sec;
-        usecs = end.tv_usec - start.tv_usec;
-        mtime = ((secs) * 1000 + usecs / 1000.0) + 0.5;
-        sprintf(buffer, "\r%02ld:%02ld:%02ld", secs / 60, secs % 60, (mtime % 1000) / 10);
-    }
-#endif
-}
-static void stop_watch_win_ani_cb()
-{
 
-    static char buffer[9];
-    get_stopwatch_string(buffer);
-    gui_text_t *time_txt = 0;
-    gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), STOPWATCHTEXT, (void *)&time_txt);
-    gui_text_content_set(time_txt, buffer, strlen(buffer));
-    gui_text_convert_to_img(time_txt, ARGB8888);
-}
 #include "gui_map.h"
 GUI_APP_ENTRY(APP_MAP)
 {

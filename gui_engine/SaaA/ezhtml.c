@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include "ezxml.h"
 #include "gui_return.h"
+#include "gui_slider.h"
 #ifdef __arm__
 #include "romfs.h"
 #else
@@ -53,7 +54,8 @@ struct widget_create
 
 #define WIDGETS_NUM 26
 #define BUTTON_HIGHLIGHT_ARRAY INT8_MAX
-struct widget_create widget[] =
+
+static struct widget_create widget[] =
 {
     { "win", WINDOW }, //
     { "textbox", TEXTBOX },//
@@ -83,23 +85,164 @@ struct widget_create widget[] =
     {"multiLevel", MULTI_LEVEL},
     {"onClick", MACRO_ONCLICK},
     {"backIcon", MACRO_BACKICON},
+    {"slider", SLIDER},
+    {"onChange", MACRO_ONCHANGE},
+    {"onOn", MACRO_ONON},
+    {"onOff", MACRO_ONOFF},
 };
-static void img_rotate_cb(gui_img_t *img)
-{
-    gui_img_translate(img, img->base.w / 2,
-                      img->base.h);
-
-    gui_img_rotation(img, 360 * img->animate->progress_percent, img->base.w / 2,
-                     img->base.h);
-}
 
 typedef struct
 {
+    int x;
+    int y;
+    int translate_from_x;
+    int translate_from_y;
+    int translate_to_x;
+    int translate_to_y;
+    int rotate_x;
+    int rotate_y;
+    int rotate_from;
+    int rotate_to;
+    float scale_x;
+    float scale_y;
+    float scale_x_from;
+    float scale_y_from;
+    int scale_x_center;
+    int scale_y_center;
+    uint8_t opacity;
+    uint8_t opacity_from;
     void **image_arr;
     int image_count;
     char *img_name;
+    char *animate_type;
     gui_img_t *img;
 } image_animate_params_t;
+static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name);
+static void start_animation_cb(gui_obj_t *this, void *null, char *to_name);
+static void img_rotate_cb(image_animate_params_t *animate_params)
+{
+    gui_img_translate(animate_params->img, animate_params->rotate_x,
+                      animate_params->rotate_y);
+
+    gui_img_rotation(animate_params->img,
+                     animate_params->rotate_from + (animate_params->rotate_to - animate_params->rotate_from)*
+                     animate_params->img->animate->progress_percent,
+                     animate_params->rotate_x,
+                     animate_params->rotate_y);
+}
+
+static void img_translate_cb(image_animate_params_t *animate_params)
+{
+    float t_x = animate_params->translate_from_x + animate_params->img->animate->progress_percent *
+                (animate_params->translate_to_x -
+                 animate_params->translate_from_x);
+    float t_y = animate_params->translate_from_y + animate_params->img->animate->progress_percent *
+                (animate_params->translate_to_y -
+                 animate_params->translate_from_y);
+
+    gui_img_translate(animate_params->img, t_x, t_y);
+}
+
+static void img_scale_cb(image_animate_params_t *animate_params)
+{
+    float scale_x = animate_params->scale_x_from - animate_params->img->animate->progress_percent *
+                    (animate_params->scale_x_from - animate_params->scale_x);
+    float scale_y = animate_params->scale_y_from - animate_params->img->animate->progress_percent *
+                    (animate_params->scale_y_from - animate_params->scale_y);
+
+    gui_img_scale(animate_params->img, scale_x, scale_y);
+    gui_img_translate(animate_params->img, animate_params->scale_x_center,
+                      animate_params->scale_y_center);
+
+    gui_img_rotation(animate_params->img, 0, animate_params->scale_x_center,
+                     animate_params->scale_y_center);
+}
+
+static void img_opacity_cb(image_animate_params_t *animate_params)
+{
+    uint8_t opacity = animate_params->opacity_from - animate_params->img->animate->progress_percent *
+                      (animate_params->opacity_from - animate_params->opacity);
+
+    gui_img_set_opacity(animate_params->img, opacity);
+}
+
+static void multi_animate_callback(void *params)
+{
+    image_animate_params_t *animate_params = (image_animate_params_t *)params;
+
+    if (!strcmp(animate_params->animate_type, "rotate"))
+    {
+        img_rotate_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate"))
+    {
+        img_translate_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "scale"))
+    {
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "opacity"))
+    {
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_scale"))
+    {
+        img_rotate_cb(params);
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_opacity"))
+    {
+        img_rotate_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate_scale"))
+    {
+        img_translate_cb(params);
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate_opacity"))
+    {
+        img_translate_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "scale_opacity"))
+    {
+        img_scale_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate_scale"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+        img_scale_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate_opacity"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "translate_scale_opacity"))
+    {
+        img_translate_cb(params);
+        img_scale_cb(params);
+        img_opacity_cb(params);
+    }
+    else if (!strcmp(animate_params->animate_type, "rotate_translate_scale_opacity"))
+    {
+        img_rotate_cb(params);
+        img_translate_cb(params);
+        img_scale_cb(params);
+        img_opacity_cb(params);
+    }
+}
+
 static void image_animate_callback(void *params)
 {
     static int current_image_index = 0;
@@ -116,11 +259,20 @@ static void image_animate_callback(void *params)
 }
 
 #define LIGHTS_NUM 20
+char light_value_text[30];
 typedef struct
 {
     int id;
     bool state;
+    bool has_brightness;
+    bool has_colorTemperature;
+    int brightness;
+    int colorTemperature;
+    char *prefix;
+    char *postfix;
+    gui_text_t *text;
 } light_param_t;
+
 light_param_t lights[LIGHTS_NUM];
 
 char *read_file(const char *path)
@@ -152,19 +304,30 @@ void parse_json(const char *json_str)
     while ((ptr = strstr(ptr, "\"id\"")) != NULL && index < LIGHTS_NUM)
     {
         char state_buffer[10];
+        bool has_brightness = false;
+        bool has_colorTemperature = false;
 
         sscanf(ptr, "\"id\": %d", &lights[index].id);
+
         ptr = strstr(ptr, "\"state\"");
         sscanf(ptr, "\"state\": \"%9[^\"]\"", state_buffer);
+        lights[index].state = (strcmp(state_buffer, "on") == 0);
 
-        if (strcmp(state_buffer, "on") == 0)
+        const char *br_ptr = strstr(ptr, "\"brightness\"");
+        if (br_ptr != NULL && (br_ptr - ptr) < (strchr(ptr, '}') - ptr))
         {
-            lights[index].state = true;
+            sscanf(br_ptr, "\"brightness\": %d", &lights[index].brightness);
+            has_brightness = true;
         }
-        else if (strcmp(state_buffer, "off") == 0)
+        lights[index].has_brightness = has_brightness;
+
+        const char *ct_ptr = strstr(ptr, "\"colorTemperature\"");
+        if (ct_ptr != NULL && (ct_ptr - ptr) < (strchr(ptr, '}') - ptr))
         {
-            lights[index].state = false;
+            sscanf(ct_ptr, "\"colorTemperature\": %d", &lights[index].colorTemperature);
+            has_colorTemperature = true;
         }
+        lights[index].has_colorTemperature = has_colorTemperature;
 
         index++;
     }
@@ -180,7 +343,7 @@ void write_file(const char *filename, const char *content)
     }
 }
 
-void update_light_config(int index, bool state)
+void update_light_config(int index, const char *attribute, int value)
 {
     char *config_file_path = "./gui_engine/example/web/peripheral_simulation/light_config.json";
     char *json_str = read_file(config_file_path);
@@ -194,7 +357,18 @@ void update_light_config(int index, bool state)
     {
         if (lights[i].id == index)
         {
-            lights[i].state = state;
+            if (strcmp(attribute, "state") == 0)
+            {
+                lights[i].state = value;
+            }
+            else if (strcmp(attribute, "brightness") == 0)
+            {
+                lights[i].brightness = value;
+            }
+            else if (strcmp(attribute, "colorTemperature") == 0)
+            {
+                lights[i].colorTemperature = value;
+            }
             break;
         }
     }
@@ -202,11 +376,27 @@ void update_light_config(int index, bool state)
     char config_str[2048] = "{\n    \"lights\": [\n";
     for (int i = 0; i < LIGHTS_NUM; i++)
     {
-        char light_str[64];
-        snprintf(light_str, sizeof(light_str), "        {\"id\": %d, \"state\": \"%s\"}%s\n",
-                 lights[i].id, lights[i].state ? "on" : "off",
-                 (i < LIGHTS_NUM - 1) ? "," : "");
+        char light_str[256];
+        snprintf(light_str, sizeof(light_str),
+                 "        {\"id\": %d, \"state\": \"%s\"",
+                 lights[i].id, lights[i].state ? "on" : "off");
         strcat(config_str, light_str);
+
+        if (lights[i].has_brightness)
+        {
+            char brightness_str[50];
+            snprintf(brightness_str, sizeof(brightness_str), ", \"brightness\": %d", lights[i].brightness);
+            strcat(config_str, brightness_str);
+        }
+
+        if (lights[i].has_colorTemperature)
+        {
+            char color_temp_str[50];
+            snprintf(color_temp_str, sizeof(color_temp_str), ", \"colorTemperature\": %d",
+                     lights[i].colorTemperature);
+            strcat(config_str, color_temp_str);
+        }
+        strcat(config_str, (i < LIGHTS_NUM - 1) ? "},\n" : "}\n");
     }
     strcat(config_str, "    ]\n}");
 
@@ -216,23 +406,47 @@ void update_light_config(int index, bool state)
 static void light_control_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
-    update_light_config(light->id, light->state);
+    update_light_config(light->id, "state", light->state);
 }
 
 static void light_switch_on_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     light->state = true;
     gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
-    update_light_config(light->id, light->state);
+    update_light_config(light->id, "state", light->state);
 }
 
 static void light_switch_off_cb(void *obj, gui_event_t e, light_param_t *light)
 {
     light->state = false;
     gui_log("light->id: %d, light->state: %d\n", light->id, light->state);
-    update_light_config(light->id, light->state);
+    update_light_config(light->id, "state", light->state);
 }
 
+static void light_brightness_cb(void *obj, gui_event_t e, light_param_t *light)
+{
+    gui_seekbar_t *this = (gui_seekbar_t *)obj;
+    light->brightness = 100 * GUI_API(gui_seekbar_t).get_progress(this);
+    gui_log("light->id: %d  light->brightness: %d\n", light->id, light->brightness);
+    update_light_config(light->id, "brightness", light->brightness);
+}
+
+static void light_colorTemp_cb(void *obj, gui_event_t e, light_param_t *light)
+{
+    gui_slider_t *this = (gui_slider_t *)obj;
+    light->colorTemperature = GUI_API(gui_slider_t).get_currentValue(this);
+    update_light_config(light->id,  "colorTemperature", light->colorTemperature);
+}
+static void slider_write_text_cb(void *obj, gui_event_t e, char *text_name)
+{
+    gui_slider_t *this = (gui_slider_t *)obj;
+    gui_text_t *text = 0;
+    gui_obj_tree_get_widget_by_type((gui_obj_t *)gui_current_app(), TEXTBOX, (gui_obj_t **)&text);
+
+    snprintf(light_value_text, sizeof(light_value_text), "%d",
+             GUI_API(gui_slider_t).get_currentValue(this));
+    gui_text_content_set(text, light_value_text, strlen(light_value_text));
+}
 static char *open_switch_name;
 static char *pause_switch_name;
 static char *close_switch_name;
@@ -2309,6 +2523,11 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         img1 = gui_get_file_address("app/system/resource/switchOff.bin");
                         img2 = gui_get_file_address("app/system/resource/switchOn.bin");
+                        int16_t *scale = img1;
+                        scale++;
+                        w = *scale;
+                        scale++;
+                        h = *scale;
                     }
 
 
@@ -2842,6 +3061,10 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     char *to = 0;
                     char *dur = 0;
                     char *repeatCount = 0;
+                    char *pause = 0;
+                    float scale_x = 1;
+                    float scale_y = 1;
+                    uint8_t opacity = 255;
                     size_t i = 0;
                     while (true)
                     {
@@ -2871,20 +3094,27 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         {
                             repeatCount = (p->attr[++i]);
                         }
+                        else if (!strcmp(p->attr[i], "pause"))
+                        {
+                            pause = (p->attr[++i]);
+                        }
                         i++;
                     }
+                    float from_num_f[4];
+                    float to_num_f[4];
+                    memset(from_num_f, 0, sizeof(from_num_f));
+                    memset(to_num_f, 0, sizeof(to_num_f));
                     if (type && from && to && dur && repeatCount)
                     {
-                        int dur_num = 0;
-                        int from_num[3]; GUI_UNUSED(from_num);
-                        int to_num[3]; GUI_UNUSED(to_num);
-                        int repeat_num = 0;
-                        if (!strcmp(type, "rotate"))
+                        if (!strcmp(type, "rotate") || !strcmp(type, "scale") || !strcmp(type, "opacity") ||
+                            !strcmp(type, "translate"))
                         {
+                            int dur_num = 0;
+                            int repeat_num = 0;
                             {
                                 //from
                                 int from_length = strlen(from);
-                                int index[4];
+                                int index[4 + 1];
                                 index[0] = 0;
                                 int idcount = 1;
                                 for (size_t i = 0; i < from_length + 1; i++)
@@ -2896,17 +3126,16 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         char num_char[num_length + 1];
                                         num_char[num_length] = '\0';
                                         memcpy(num_char, from + index[idcount - 1], num_length);
-                                        from_num[idcount - 1] = atoi(num_char);
+                                        from_num_f[idcount - 1] = (float)atof(num_char);
                                         idcount++;
                                     }
-
                                 }
                                 gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
                             {
                                 //to
                                 int from_length = strlen(to);
-                                int index[4];
+                                int index[5];
                                 index[0] = 0;
 
                                 int idcount = 1;
@@ -2919,54 +3148,87 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                                         char num_char[num_length + 1];
                                         num_char[num_length] = '\0';
                                         memcpy(num_char, to + index[idcount - 1], num_length);
-                                        to_num[idcount - 1] = atoi(num_char);
+                                        to_num_f[idcount - 1] = (float)atof(num_char);
                                         idcount++;
                                     }
-
                                 }
                                 gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
+                        }
+
+
+
+                        int dur_num = 0;
+
+                        int repeat_num = 0;
+
+
+                        {
+                            //dur
+                            int from_length = strlen(dur);
+                            int ms = 0;
+                            for (size_t i = 0; i < from_length + 1; i++)
                             {
-                                //dur
-                                int from_length = strlen(dur);
-                                int ms = 0;
-                                for (size_t i = 0; i < from_length + 1; i++)
+                                if (dur[i] == 'm')
                                 {
-                                    if (dur[i] == 'm')
-                                    {
-                                        ms = 1;
-                                        break;
-                                    }
-
-                                }
-                                dur_num = atoi(dur);
-                                if (!ms)
-                                {
-                                    dur_num = dur_num * 1000;
+                                    ms = 1;
+                                    break;
                                 }
 
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                             }
+                            dur_num = atoi(dur);
+                            if (!ms)
                             {
-                                //repeatCount
-                                int repeatCount_num = 0;
-                                if (!strcmp(repeatCount, "indefinite"))
-                                {
-                                    repeatCount_num = -1;
-                                }
-                                else
-                                {
-                                    repeatCount_num = atoi(repeatCount);
-                                }
-                                repeat_num = repeatCount_num;
-
-                                gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
+                                dur_num = dur_num * 1000;
                             }
+
+                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                         }
                         {
-                            gui_img_set_animate((gui_img_t *)parent, dur_num, repeat_num, img_rotate_cb, parent);
+                            //repeatCount
+                            int repeatCount_num = 0;
+                            if (!strcmp(repeatCount, "indefinite"))
+                            {
+                                repeatCount_num = -1;
+                            }
+                            else
+                            {
+                                repeatCount_num = atoi(repeatCount);
+                            }
+                            repeat_num = repeatCount_num;
+
+                            gui_log("p->attr[i]:%x\n", (size_t)(p->attr[i]));
                         }
 
+                        image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
+                        params->img = (gui_img_t *)parent;
+                        params->animate_type = type;
+
+                        params->x = (int)to_num_f[1];
+                        params->y = (int)to_num_f[2];
+
+                        params->scale_x = to_num_f[0];
+                        params->scale_y = to_num_f[1];
+                        params->opacity = (int)to_num_f[0];
+
+                        params->scale_x_from = from_num_f[0];
+                        params->scale_y_from = from_num_f[1];
+                        params->scale_x_center = from_num_f[2];
+                        params->scale_y_center = from_num_f[3];
+                        params->opacity_from = (int)from_num_f[0];
+                        params->rotate_from = (int)from_num_f[0];
+                        params->rotate_to = (int)to_num_f[0];
+                        params->rotate_x = (int)from_num_f[1];
+                        params->rotate_y = (int)from_num_f[2];
+                        params->translate_from_x = from_num_f[0];
+                        params->translate_from_y = from_num_f[1];
+                        params->translate_to_x = to_num_f[0];
+                        params->translate_to_y = to_num_f[1];
+                        gui_img_set_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params);
+                        if (pause && !strcmp(pause, "pause"))
+                        {
+                            GUI_TYPE(gui_img_t, parent)->animate->animate = 0;
+                        }
 
                     }
                 }
@@ -3184,6 +3446,232 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
 
                     break;
                 }
+            case SLIDER:
+                {
+                    size_t i = 0;
+                    int16_t x = 0;
+                    int16_t y = 0;
+                    int16_t w = 0;
+                    int16_t h = 0;
+                    char *slider_picture = NULL;
+                    char *bg_picture = NULL;
+                    int16_t minValue = 0;
+                    int16_t maxValue = 0;
+                    int16_t currentValue = 0;
+                    int16_t slider_size = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        //gui_log("p->attr[i]:%s,\n", p->attr[i]);
+                        if (!strcmp(p->attr[i], "x"))
+                        {
+                            x = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "y"))
+                        {
+                            y = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "w"))
+                        {
+                            w = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "h"))
+                        {
+                            h = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "bgPicture"))
+                        {
+                            bg_picture = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sliderPicture"))
+                        {
+                            slider_picture = gui_strdup(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "minValue"))
+                        {
+                            minValue = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "maxValue"))
+                        {
+                            maxValue = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "currentValue"))
+                        {
+                            currentValue = atoi(p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "sliderSize"))
+                        {
+                            slider_size = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    void *bg_buf;
+                    void *slider_buf;
+                    if (bg_picture)
+                    {
+                        bg_buf = gui_get_file_address(bg_picture);
+                    }
+                    if (slider_picture)
+                    {
+                        slider_buf = gui_get_file_address(slider_picture);
+                    }
+
+                    parent = (void *)gui_slider_create(parent, bg_buf, x, y, w, h, minValue, maxValue, slider_buf,
+                                                       currentValue, slider_size);
+                }
+                break;
+
+            case MACRO_ONCHANGE:
+                {
+                    char *type = 0;
+                    char *to = 0;
+                    int id = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    if (type)
+                    {
+
+                        if (!strcmp(type, "control"))
+                        {
+                            light_param_t *light;
+                            light = gui_malloc(sizeof(light_param_t));
+                            light->id = (id);
+                            if (!strcmp(to, "controlLightBT"))
+                            {
+                                if (parent->type == SEEKBAR)
+                                {
+                                    GUI_API(gui_seekbar_t).on_change((gui_seekbar_t *)parent, (gui_event_cb_t)light_brightness_cb,
+                                                                     light);
+                                }
+                            }
+                            else if (!strcmp(to, "controlLightCT"))
+                            {
+                                light->text = gui_malloc(sizeof(gui_text_t));
+                                if (parent->type == SLIDER)
+                                {
+                                    gui_slider_t *slider = (gui_slider_t *)parent;
+                                    GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)light_colorTemp_cb, light);
+                                }
+
+                            }
+                        }
+                        else if (!strcmp(type, "write"))
+                        {
+                            if (parent->type == SLIDER)
+                            {
+                                gui_slider_t *slider = (gui_slider_t *)parent;
+                                GUI_API(gui_slider_t).on_change(slider, (gui_event_cb_t)slider_write_text_cb, gui_strdup(to));
+                            }
+                        }
+                    }
+                }
+                break;
+            case MACRO_ONON:
+                {
+                    char *type = 0;
+                    char *to = 0;
+                    int id = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    if (type)
+                    {
+
+                        if (!strcmp(type, "pause"))
+                        {
+                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), pause_animation_cb,
+                                                             gui_strdup(to));
+                        }
+                        else if (!strcmp(type, "start"))
+                        {
+                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), start_animation_cb,
+                                                             gui_strdup(to));
+                        }
+                    }
+                }
+                break;
+            case MACRO_ONOFF:
+                {
+                    char *type = 0;
+                    char *to = 0;
+                    int id = 0;
+                    size_t i = 0;
+                    while (true)
+                    {
+                        if (!(p->attr[i]))
+                        {
+                            break;
+                        }
+                        if (!strcmp(p->attr[i], "type"))
+                        {
+                            type = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "to"))
+                        {
+                            to = (p->attr[++i]);
+                        }
+                        else if (!strcmp(p->attr[i], "id"))
+                        {
+                            id = atoi(p->attr[++i]);
+                        }
+                        i++;
+                    }
+                    if (type)
+                    {
+
+                        if (!strcmp(type, "pause"))
+                        {
+                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), pause_animation_cb,
+                                                              gui_strdup(to));
+                        }
+                        else if (!strcmp(type, "start"))
+                        {
+                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), start_animation_cb,
+                                                              gui_strdup(to));
+                        }
+                    }
+                }
+                break;
             default:
                 break;
             }
@@ -3616,82 +4104,35 @@ static void setting_return_cb(void *obj, gui_event_t e, void *param)
         }
     }
 }
-/*static gui_list_t app_list;
-static void screen_backfunc(gui_app_t *app)
+static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name)
 {
-    if (app->installed)
+    if (to_name)
     {
-        gui_app_close_base(app);
-        memset(app, 0, sizeof(gui_app_t));
-        gui_free(app);
-    }
-    open_xml_app("app/system/launcher.xml");
-}
-static void set_sreeen_back_function(gui_app_t *app, void *backfunc)
-{
-    app->screen->w = gui_get_screen_width();
-    app->screen->h = gui_get_screen_height();
-    gui_cb_set_with_param(app->screen, backfunc, RIGHT_SLIDE_CB, app);
-}
-static void screen_prepare(gui_obj_t *obj, struct gui_dispdev *dc, gui_rect_t *rect,
-                             touch_info_t *tp)
-{
-    if (obj->callback.link_cb)
-    {
-        if ((tp->type == TOUCH_RIGHT_SLIDE && (tp->x>0&&tp->x<20))|| (tp->type == TOUCH_LEFT_SLIDE&& (tp->x>(gui_get_screen_width()-20)&&tp->x<gui_get_screen_width())))
+        gui_obj_t *to = 0;
+        gui_obj_tree_get_widget_by_name((void *)gui_current_app(), to_name, &to);
+        if (to)
         {
-                gui_msg_t msg;
-                msg.type = GUI_SRV_CB;
-                msg.cb = obj->callback.link_cb;
-                msg.u.payload = obj->callback.param;
-                gui_send_msg_to_server(&msg);
+            /* pause */
+            if (to->type == IMAGE_FROM_MEM)
+            {
+                GUI_TYPE(gui_img_t, to)->animate->animate = 0;
+            }
         }
-
     }
-
 }
-void open_xml_app(const char *xml)
+static void start_animation_cb(gui_obj_t *this, void *null, char *to_name)
 {
-    gui_app_t *app = gui_malloc(sizeof(gui_app_t));
-
-    memset(app, 0, sizeof(gui_app_t));
-    char *app_name = NULL;
-    bool startup = false;
-    gui_log("ezxml_parse_file:%s\n",xml);
-    ezxml_t f1 = ezxml_parse_file(xml);
-    GUI_ASSERT(f1);
-    if (!strcmp("app", f1->name))
+    if (to_name)
     {
-        app_name = get_space_string_head(f1->txt);
-        size_t i = 0;
-        while (true)
+        gui_obj_t *to = 0;
+        gui_obj_tree_get_widget_by_name((void *)gui_current_app(), to_name, &to);
+        if (to)
         {
-            if (!(f1->attr[i]))
+            /* pause */
+            if (to->type == IMAGE_FROM_MEM)
             {
-                break;
+                GUI_TYPE(gui_img_t, to)->animate->animate = 1;
             }
-            //gui_log("p->attr[i]:%s\n", f1->attr[i]);
-            //gui_log("p->attr[i+1]:%s\n", f1->attr[i + 1]);
-            if (!strcmp(f1->attr[i], "startup"))
-            {
-                if (!strcmp(f1->attr[++i], "true"))
-                {
-                    startup = true;
-                    break;
-                }
-            }
-            i++;
         }
-        ezxml_free(f1);
     }
-    //gui_log("startup:%d\n", startup);
-    gui_app_ctor_base(app, app_name, app_init, gui_app_startup_base, gui_app_close_base);
-    //gui_list_append(&app_list, &(app->list_node));
-    app->xml = xml;
-    //if (startup)
-    {
-        gui_app_startup_base(app);
-    }
-
 }
-*/

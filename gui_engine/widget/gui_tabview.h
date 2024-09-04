@@ -217,8 +217,8 @@ void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp);
 /**
  * @brief enable tab widget cache
  *
- * @param this
- * @param cache
+ * @param this tabview pointer.
+ * @param enable true: enable tab widget cache,  false: disable tab widget cache.
  */
 void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable);
 

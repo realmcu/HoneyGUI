@@ -46,7 +46,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 {
     gui_log("app_hongkong_ui_design\n");
 
-    tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
+    tv = gui_tabview_create(&(app->screen), "hongkong_tabview", 0, 0, 0, 0);
     gui_win_t *win = gui_win_create(&(app->screen), "window", 0, 0, 0, 0);
     gui_obj_add_event_cb(win, (gui_event_cb_t)kb_button_cb, GUI_EVENT_KB_UP_PRESSED, NULL);
     gui_tabview_set_style(tv, TAB_CUBE);

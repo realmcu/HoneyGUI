@@ -152,6 +152,7 @@ static void widget_nanovg_canvas_img_draw_cb(gui_obj_t *obj)
         nvgEndFrame(vg);
         nvgDeleteAGGE(vg);
         if ((mpCanvasImg->cBlue) || (mpCanvasImg->cGreen) || (mpCanvasImg->cRed))
+        {
             if (dc->bit_depth >> 3 == 4)
             {
                 uint32_t *mpBuff = (uint32_t *)(mpCanvasImg->bpImageBuff + sizeof(struct gui_rgb_data_head));
@@ -185,6 +186,7 @@ static void widget_nanovg_canvas_img_draw_cb(gui_obj_t *obj)
                     ulCount++;
                 }
             }
+        }
 
         mpCanvasImg->bpImageCtr->base.not_show = false;
         mpCanvasImg->bImageActive = true;

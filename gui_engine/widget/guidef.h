@@ -296,7 +296,7 @@ struct gui_indev
 typedef void (* log_func_t)(const char *fmt, ...);
 
 /* gui_os_api struct define start */
-struct gui_os_api
+typedef struct gui_os_api
 {
     char *name;
     void *(*thread_create)(const char *name, void (*entry)(void *param), void *param,
@@ -327,7 +327,7 @@ struct gui_os_api
 
     log_func_t log;
     void (*gui_tick_hook)(void);
-};
+} gui_os_api_t;
 /* gui_os_api struct define end */
 
 typedef struct draw_circle
@@ -539,7 +539,7 @@ extern char *defaultPath;
 #define GUI_FRAME_STEP 50
 #endif
 #define GUI_TOUCHPAD_IMPORT_AS_TP touch_info_t *tp = tp_get_info();
-#define IMPORT_GUI_TOUCHPAD touch_info_t *touch = tp_get_info();
+#define IMPORT_GUI_TOUCHPAD  extern touch_info_t *tp_get_info(void); touch_info_t *touch = tp_get_info();
 #define IMPORT_GUI_WHEEL extern touch_info_t *wheel_get_info(void);\
     touch_info_t *wheel = wheel_get_info();
 #define GUI_ERROR (gui_error_t)1
@@ -547,6 +547,17 @@ extern char *defaultPath;
 #define GUI_ERROR_FORMAT (gui_error_t)3
 #define GUI_SUCCESS (gui_error_t)0
 typedef int gui_error_t;
+#define GUI_MAGIC_NUMBER 0B1011
+#define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT((obj&&GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
+#define GUI_WIDHET_POINTER(pointer, name) gui_obj_t *pointer = 0;\
+    gui_obj_tree_get_widget_by_name((void *)gui_current_app(), name, &pointer);\
+    GUI_WIDGET_TRY_EXCEPT(pointer)
+#define GUI_ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
+#define GUI_WIDGET_TYPE_TRY_EXCEPT(obj,widget_type) {GUI_WIDGET_TRY_EXCEPT(obj)if ((GUI_BASE(obj)->type != widget_type))\
+        {\
+            gui_log("GUI_WIDGET_TYPE_TRY_EXCEPT: type is %d ;",GUI_BASE(obj)->type);\
+        }\
+        {GUI_ASSERT((GUI_BASE(obj)->type == widget_type))}}
 /** End of SUBMOUDLE_Exported_Macros
   * @}
   */

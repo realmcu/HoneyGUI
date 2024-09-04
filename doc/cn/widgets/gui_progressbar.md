@@ -7,28 +7,28 @@
 
 ### 创建水平方向控件
 
-开发者可以使用API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#api)创建基于单张图片的水平方向进度条控件。 这是一个普通的单张图片进度条控件。
+开发者可以使用API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_h_create)创建基于单张图片的水平方向进度条控件。 这是一个普通的单张图片进度条控件。
 
 ### 创建垂直方向控件
 
-类似于上面提到的`创建水平方向控件`，开发者可以使用 [gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y)](#api) 创建基于单张图片的垂直方向进度条控件。
+类似于上面提到的`创建水平方向控件`，开发者可以使用 [gui_progressbar_img_v_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_v_create) 创建基于单张图片的垂直方向进度条控件。
 
 ### 创建电影风格控件
 
-与上述两种单张图片的进度条控件不同，电影风格的进度条控件由一系列的图片组成。开发者可以调用[gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api)从内存地址创建电影风格的进度条控件，或者调用 [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#api) 从文件系统创建电影风格的进度条控件。
+与上述两种单张图片的进度条控件不同，电影风格的进度条控件由一系列的图片组成。开发者可以调用[gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create)从内存地址创建电影风格的进度条控件，或者调用 [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create_from_fs) 从文件系统创建电影风格的进度条控件。
 在 0% 进度时显示第一张图片，在 100% 进度时显示最后一张图片。
 
 ### 进度
 
-例如，开发者想创建一个电影风格的进度条控件，可以通过 [gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)](#api) 和 [gui_progressbar_get_progress(gui_progressbar_t *this)](#api) 来设置和获取进度。
+例如，开发者想创建一个电影风格的进度条控件，可以通过 [gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)](#gui_progressbar_set_progress) 和 [gui_progressbar_get_progress(gui_progressbar_t *this)](#gui_progressbar_get_progress) 来设置和获取进度。
 
 ### 百分比
 
-上述用法(`进度`)适用于电影风格的进度条控件。对于普通的单张图片进度条控件，如果开发者想使用一个进度条控件来显示歌曲播放的进度，可以在创建进度条控件后使用 [gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)](#api) 来设置当前的百分比进度。此外，还可以使用 [gui_progressbar_get_percentage(gui_progressbar_t *this)](#api) 来获取当前的百分比进度。
+上述用法(`进度`)适用于电影风格的进度条控件。对于普通的单张图片进度条控件，如果开发者想使用一个进度条控件来显示歌曲播放的进度，可以在创建进度条控件后使用 [gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)](#gui_progressbar_set_percentage) 来设置当前的百分比进度。此外，还可以使用 [gui_progressbar_get_percentage(gui_progressbar_t *this)](#gui_progressbar_get_percentage) 来获取当前的百分比进度。
 
 ### 获取最大值
 
-此 API [gui_progressbar_get_max(gui_progressbar_t *this)](#api) 用于获取电影风格进度条控件中的图片数量，这样就可以知道总共会显示多少张图片。
+此 API [gui_progressbar_get_max(gui_progressbar_t *this)](#gui_progressbar_get_max) 用于获取电影风格进度条控件中的图片数量，这样就可以知道总共会显示多少张图片。
 
 ## 示例
 

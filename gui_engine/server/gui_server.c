@@ -98,6 +98,14 @@ static void gui_server_entry(void *parameter)
                 {
                     extern gui_app_t *next_app;
                     extern gui_app_t *current_app;
+                    if (current_app->dtor != NULL)
+                    {
+                        current_app->dtor(current_app);
+                    }
+                    if (current_app->thread_entry != NULL)
+                    {
+                        gui_thread_delete(current_app->thread_id);
+                    }
                     current_app->close = false;
                     gui_list_remove(&(next_app->screen.brother_list));
                     next_app->screen.parent = 0;
@@ -126,6 +134,14 @@ static void gui_server_entry(void *parameter)
                     {
                         gui_log("Error: current_app is NULL\n");
                         return;
+                    }
+                    if (current_app->dtor != NULL)
+                    {
+                        current_app->dtor(current_app);
+                    }
+                    if (current_app->thread_entry != NULL)
+                    {
+                        gui_thread_delete(current_app->thread_id);
                     }
                     current_app->close = false;
                     gui_list_remove(&(app->screen.brother_list));

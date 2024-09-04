@@ -9,7 +9,7 @@
  *
  */
 #include <stdio.h>
-#include "acc_sw_rle.h"
+//#include "acc_sw_rle.h"
 #include "acc_init.h"
 
 

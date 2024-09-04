@@ -181,9 +181,9 @@ void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *thi
  * @brief automatic center alignment
  *
  * @param this widget pointer
- * @param align_hight
+ * @param align_height align height
  */
-void gui_cardview_alignment(gui_cardview_t *this, int align_hight);
+void gui_cardview_alignment(gui_cardview_t *this, int align_height);
 /**
  * @brief set bottom_space
  *
@@ -196,8 +196,8 @@ void gui_cardview_set_bottom_space(gui_cardview_t *this, uint8_t bottom_space);
  * @brief Add a callback function to the event of sliding the cardview upwards in the Y-axis direction
  *
  * @param this widget pointer
- * @param callback
- * @param parameter
+ * @param callback callback to be triggered
+ * @param parameter parameter of callback function
  */
 void gui_cardview_up(gui_cardview_t *this, void *callback, void *parameter);
 
@@ -205,8 +205,8 @@ void gui_cardview_up(gui_cardview_t *this, void *callback, void *parameter);
  * @brief Add a callback function to the event of sliding the cardview downwards in the Y-axis direction
  *
  * @param this widget pointer
- * @param callback
- * @param parameter
+ * @param callback callback to be triggered
+ * @param parameter parameter of callback function
  */
 void gui_cardview_down(gui_cardview_t *this, void *callback, void *parameter);
 

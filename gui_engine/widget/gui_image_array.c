@@ -27,7 +27,7 @@
 #include "tp_algo.h"
 #include <math.h>
 #include "gui_fb.h"
-
+#include "gui_win.h"
 /** @defgroup WIDGET WIDGET
   * @{
   */
@@ -91,7 +91,31 @@ static void prepare(gui_obj_t *obj)
     gui_dispdev_t *dc = gui_get_dc();
     this->draw_img = gui_malloc(this->array_count * sizeof(draw_img_t *));
     memset(this->draw_img, 0, this->array_count * sizeof(draw_img_t *));
+
     int w = 0;
+    if (!this->scope_flag)
+    {
+        this->scope = gui_malloc(this->array_count * sizeof(struct gui_image_array_scope *));
+        memset(this->scope, 0, this->array_count * sizeof(struct gui_image_array_scope *));
+        this->scope_flag = 1;
+        gui_obj_t *o = obj;
+        while (o->parent != NULL)
+        {
+            o = o->parent;
+            if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+            {
+                this->parent_scope = 1;
+                break;
+            }
+        }
+        for (int i = 0; i < this->array_count; i++)
+        {
+            this->scope[i] = gui_malloc(sizeof(struct gui_image_array_scope));
+            memset(this->scope[i], 0, sizeof(struct gui_image_array_scope));
+        }
+
+    }
+
     for (int i = 0; i < this->array_count; i++)
     {
         this->draw_img[i] = gui_malloc(sizeof(draw_img_t));
@@ -105,13 +129,89 @@ static void prepare(gui_obj_t *obj)
 
         matrix_inverse(&this->draw_img[i]->inverse);
         draw_img_load_scale(this->draw_img[i], IMG_SRC_MEMADDR);
+        if (this->parent_scope)
+        {
+
+            gui_obj_t *o = obj;
+            gui_win_t *win_scope = 0;
+            this->scope[i]->ax = obj->x + w;
+            this->scope[i]->ay = obj->y;
+            while (o->parent != NULL)
+            {
+                o = o->parent;
+                if (o->type == WINDOW && GUI_TYPE(gui_win_t, o)->scope)
+                {
+                    win_scope = (void *)o;
+                    break;
+                }
+            }
+            o = obj;
+            while (o->parent != NULL)
+            {
+                o = o->parent;
+                this->scope[i]->ax += o->x;
+                this->scope[i]->ay += o->y;
+            }
+            if (win_scope)
+            {
+                int ax = win_scope->base.x ;
+                int ay = win_scope->base.y;
+                o = GUI_BASE(win_scope);
+                while (o->parent != NULL)
+                {
+                    o = o->parent;
+                    ax += o->x;
+                    ay += o->y;
+                }
+                int w_w = win_scope->base.w;
+                int w_h = win_scope->base.h;
+                int img_x = this->scope[i]->ax;
+                int img_y = this->scope[i]->ay;
+                int img_w = this->draw_img[i]->img_w;
+                int img_h = this->draw_img[i]->img_h;
+                //gui_log("ax,ay:%d,%d,%d,%d,%d,%d,%d,%d\n",ax,ay,img_x,img_y,img_w ,img_h, w_w, w_h);
+                this->scope[i]->scope_x1 = 0;
+                this->scope[i]->scope_x2 = img_w;
+                this->scope[i]->scope_y1 = 0;
+                this->scope[i]->scope_y2 = img_h;
+                obj->not_show = 0;
+                if (ax > img_x)
+                {
+                    this->scope[i]->scope_x1 = ax - img_x;
+                }
+                if (ay > img_y)
+                {
+                    this->scope[i]->scope_y1 = ay - img_y;
+                }
+                if (ax + w_w < img_x + img_w)
+                {
+                    this->scope[i]->scope_x2 = -(img_x - (ax + w_w));
+                }
+                if (ay + w_h < img_y + img_h)
+                {
+                    this->scope[i]->scope_y2 = -(img_y - (ay + w_h));
+                }
+                if (ay + w_h < img_y)
+                {
+                    //obj->not_show = 1;
+                    this->scope[i]->scope_y2 = this->scope[i]->scope_y1 - 1;
+                }
+                if (ay > img_y + img_h * this->scope[i]->scope_y2)
+                {
+                    //obj->not_show = 1;
+                    this->scope[i]->scope_y2 = this->scope[i]->scope_y1 - 1;
+                }
+            }
+        }
+
+
         draw_img_new_area(this->draw_img[i], NULL);
         w += this->draw_img[i]->img_w + 1;
 
     }
     uint8_t last = this->checksum;
     this->checksum = 0;
-    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_image_array_t));
 
     if (last != this->checksum)
     {
@@ -126,7 +226,23 @@ static void draw(gui_obj_t *obj)
     gui_image_array_t *this = (gui_image_array_t *)obj;
     for (int i = 0; i < this->array_count; i++)
     {
-        gui_acc_blit_to_dc(this->draw_img[i], dc, NULL);
+
+        if (this->parent_scope)
+        {
+            gui_rect_t rect =
+            {
+                .x1 = this->scope[i]->scope_x1,
+                .x2 = this->scope[i]->scope_x2,
+                .y1 = this->scope[i]->scope_y1,
+                .y2 = this->scope[i]->scope_y2,
+            };
+            gui_acc_blit_to_dc(this->draw_img[i], dc, &rect);
+        }
+        else
+        {
+            gui_acc_blit_to_dc(this->draw_img[i], dc, NULL);
+
+        }
     }
 }
 
@@ -145,6 +261,7 @@ static void end(gui_obj_t *obj)
         gui_free(this->draw_img);
         this->draw_img = NULL;
     }
+
 }
 
 static void destory(gui_obj_t *obj)
@@ -154,6 +271,15 @@ static void destory(gui_obj_t *obj)
     {
         gui_free(this->image_data);
         this->image_data = 0;
+    }
+    if (this->scope != NULL)
+    {
+        for (int i = 0; i < this->array_count; i++)
+        {
+            gui_free(this->scope[i]);
+        }
+        gui_free(this->scope);
+        this->scope = NULL;
     }
 
 }

@@ -752,7 +752,7 @@ static void calculator_draw_button(void *parent)
         GUI_TYPE(gui_button_t, button[i])->text->len = 1;
 
         // setup btn callback
-        gui_button_click(button[i], (gui_event_cb_t)cb_btn[i], "0"); // revised
+        gui_button_click(button[i], (gui_event_cb_t)cb_btn[i], NULL); // revised
     }
 
     // reset as ac

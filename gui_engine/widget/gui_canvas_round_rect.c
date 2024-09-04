@@ -285,11 +285,23 @@ static void gui_canvas_round_rect_draw(gui_canvas_round_rect_t *this)
     gui_acc_blit_to_dc(this->circle_11, dc, NULL);
 }
 
+#define IMG_DATA_FREE(draw_img ) \
+    if(draw_img!=NULL)  \
+        draw_img_acc_end_cb(draw_img)
 
 static void gui_canvas_round_rect_end(gui_canvas_round_rect_t *this)
 {
     if (this->rect_data != NULL) {gui_free(this->rect_data); this->rect_data = NULL;}
     if (this->use_external_picture == false) {if (this->circle_data != NULL) {gui_free(this->circle_data); this->circle_data = NULL;}}
+    if (draw_img_acc_end_cb != NULL)
+    {
+        IMG_DATA_FREE(this->rect_1);
+        IMG_DATA_FREE(this->rect_2);
+        IMG_DATA_FREE(this->circle_00);
+        IMG_DATA_FREE(this->circle_01);
+        IMG_DATA_FREE(this->circle_10);
+        IMG_DATA_FREE(this->circle_11);
+    }
     if (this->rect_0 != NULL) {gui_free(this->rect_0); this->rect_0 = NULL;}
     if (this->rect_1 != NULL) {gui_free(this->rect_1); this->rect_1 = NULL;}
     if (this->rect_2 != NULL) {gui_free(this->rect_2); this->rect_2 = NULL;}

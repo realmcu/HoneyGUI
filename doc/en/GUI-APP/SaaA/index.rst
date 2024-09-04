@@ -1,4 +1,4 @@
-Use Script Design An Application
+Script as an Application
 *************
 
 

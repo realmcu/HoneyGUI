@@ -21,10 +21,16 @@ p {
 .rst-content div, 
 .rst-content p {
     text-align: justify;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 figcaption, figcaption p{
     text-align: center !important;
+}
+
+.wy-breadcrumbs {
+    text-align: left;
 }
 
 /*.wy-nav-side {
@@ -76,9 +82,9 @@ figcaption, figcaption p{
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 16px;
+        width: 18px;
         height: 100%;
-        margin-right: -1px;
+        margin-right: -2px;
         position: absolute;
         top: 0px;
         cursor: col-resize;
@@ -97,10 +103,25 @@ figcaption, figcaption p{
 /* =========== Render sm-screen Style =========== */
 
 /* =========== Render xs-screen Style =========== */
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
     .resize-handle-left, 
     .resize-handle-right {
         display: none;
+    }
+
+    .wy-nav-top {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .wy-breadcrumbs li.wy-breadcrumbs-aside {
+        display: block;
     }
 }
 /* =========== Render xs-screen Style =========== */
@@ -132,12 +153,34 @@ div.wy-menu-vertical {
 li[class*="toctree-"] * {
     font-size: 14px !important;
 }
+.wy-menu-vertical li[class*="toctree-"].current,
+.wy-menu-vertical li[class*="toctree-"].current > a,
+.wy-menu-vertical li[class*="toctree-"].current li[class*="toctree-"]>a {
+    background: white;
+}
+.wy-menu-vertical li.current>a, .wy-menu-vertical li.on a {
+    color: #004d88;
+}
 
 /* =========== Render Sider Style ============ */
 
 
-/* ======== Render Main Content Style ========= */
+/* ====== Render version selector style ====== */
+.version-container {
+    text-align: center;
+}
+#version-selector {
+    width: 126px;
+    margin: -6px auto 16px;
+    border-radius:2px;
+}
+/* ====== Render version selector style ====== */
 
+
+/* ======== Render Main Content Style ========= */
+.wy-nav-content a:visited {
+    color: #2980b9;
+}
 /* ======== Render Main Content Style ========= */
 
 
@@ -333,7 +376,7 @@ section[id*="deprecated-api"] dd dl {
 /* ==== Render back-to-top icon style ==== */
 #back-to-top {
     position: fixed;
-    bottom: 40px;
+    bottom: 80px;
     right: 20px;
     width: 40px;
     height: 40px;
@@ -368,3 +411,52 @@ section[id*="deprecated-api"] dd dl {
 }
 
 
+/* ====== Render image modal style ====== */
+/* 禁用点击图片跳转到图片地址的效果 */
+/* a.image-reference {
+    pointer-events: none;
+} */
+
+.img-modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+@keyframes imgzoom {
+    from {transform: scale(0)}
+    to {transform: scale(1)}
+}
+.img-in-modal {
+    max-height: 80%;
+    transition: transform 0.4s ease;
+    animation-name: imgzoom;
+    animation-duration: 0.6s;
+}
+.img-modal-close {
+    position: absolute;
+    top: 2%;
+    right: 4%;
+    color: #fff;
+    font-size: 46px;
+    font-weight: bold;
+    transition: 0.3s;
+    z-index: 1001;
+}
+.img-modal-close:hover,
+.img-modal-close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* ====== Render image modal style ====== */

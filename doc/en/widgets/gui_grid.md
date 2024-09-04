@@ -5,10 +5,10 @@ The Grid Widget allows you to display widget set in a grid view.
 ## Usage
 
 ### Create grid widget
-You can use [gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#api) to create a grid widget, Populate the grid with controls in the order they were created
+You can use [gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#gui_grid_create) to create a grid widget, Populate the grid with controls in the order they were created
 
 ### Set grid style
-There are two style in grid widget [gui_grid_style(grid, style)](#api)
+There are two style in grid widget [gui_grid_style(grid, style)](#gui_grid_style)
 
 ```eval_rst
 .. literalinclude:: ../../../gui_engine/widget/gui_grid.h

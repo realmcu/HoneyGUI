@@ -76,6 +76,10 @@
 /** @defgroup WIDGET_Exported_Functions WIDGET Exported Functions
   * @{
   */
+static void gui_pagelistview_input_prepare(gui_pagelistview_t *this)
+{
+
+}
 
 static void gui_pagelistview_prepare(gui_pagelistview_t *this)
 {
@@ -103,6 +107,10 @@ static void gui_pagelistview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_pagelistview_input_prepare((gui_pagelistview_t *)obj);
+            break;
+
         case OBJ_PREPARE:
             gui_pagelistview_prepare((gui_pagelistview_t *)obj);
             break;
@@ -138,6 +146,7 @@ static void gui_pagelistview_ctor(gui_pagelistview_t *this,
     gui_obj_ctor(root, parent, name, x, y, w, h);
 
     root->obj_cb = gui_pagelistview_cb;
+    root->has_input_prepare_cb = true;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;

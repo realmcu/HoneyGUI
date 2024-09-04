@@ -69,6 +69,7 @@ _GUI_API_DEFINE(gui_seekbar_t)
 void (*animate)(gui_seekbar_t *o, uint32_t dur, int repeat_count, void *callback, void *p);
 float (*get_progress)(gui_seekbar_t *this);
 void (*set_progress)(gui_seekbar_t *this, float progress);
+void (*on_change)(gui_seekbar_t *this, gui_event_cb_t function, void *param);
 _GUI_API_DECLARE(gui_seekbar_t)
 
 /** End of WIDGET_Exported_Types

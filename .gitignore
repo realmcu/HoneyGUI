@@ -58,6 +58,9 @@ dkms.conf
 keil_sim/RTE/*
 keil_sim/build/*
 keil_sim/gui_engine.uvguix.*
+lib/RTE/*
+lib/build/*
+lib/gui_engine.uvguix.*
 gui_engine/rtk_gui_sim/cconfig.h
 *.dblite
 

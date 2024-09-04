@@ -148,8 +148,7 @@ gui_tab_t *gui_tab_create(void       *parent,
 /**
  * @brief get run time envriment obj
  *
- * @param this
- * @return gui_obj_t*
+ * @param this tab widget pointer
  */
 gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this);
 
@@ -164,46 +163,52 @@ void gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style);
 /**
  * @brief when enable preload, call this API can update preload buffer
  *
- * @param obj
+ * @param obj tab widget pointer
  */
 void gui_tab_update_preload(gui_obj_t *obj);
 
 /**
  * @brief
  *
- * @param obj
+ * @param obj tab widget pointer
+ * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
+ * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
  */
 void gui_tab_rotate(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
  * @brief
  *
- * @param obj
+ * @param obj tab widget pointer
+ * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
+ * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
  */
 void gui_tab_reduction(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
  * @brief
  *
- * @param obj
- * @param tab_x_gap
- * @param tab_y_gap
+ * @param obj tab widget pointer
+ * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
+ * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
  */
 void gui_tab_reduction_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
  * @brief
  *
- * @param obj
- * @param tab_x_gap
- * @param tab_y_gap
+ * @param obj tab widget pointer
+ * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
+ * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
  */
 void gui_tab_fade(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 
 /**
  * @brief
  *
- * @param obj
+ * @param obj tab widget pointer
+ * @param tab_x_gap the relative position difference between the current tab and the parent tabview in the x direction
+ * @param tab_y_gap the relative position difference between the current tab and the parent tabview in the y direction
  */
 void gui_tab_cube(gui_obj_t *obj, int16_t tab_x_gap, int16_t tab_y_gap);
 

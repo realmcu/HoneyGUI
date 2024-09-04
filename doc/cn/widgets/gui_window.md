@@ -21,7 +21,7 @@
 
 ### 创建窗口控件
 
-可以通过 [`gui_win_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)`](#api) 该API创建一个窗口控件，
+可以通过 [`gui_win_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)`](#gui_win_create) 该API创建一个窗口控件，
 其中 `w/h` 是窗口控件的宽度和高度。
 <br>
 

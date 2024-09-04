@@ -201,30 +201,9 @@ void gui_font_ft_draw(gui_text_t *text, gui_text_rect_t *rect)
     pen.x = 0 * 64;
     pen.y = 0 * 64;
 
-    uint16_t *p_buf = NULL;
+    uint32_t *unicode_buf = NULL;
     uint16_t unicode_len = 0;
-    switch (text->charset)
-    {
-    case UTF_8:
-        p_buf = gui_malloc(text->len * sizeof(uint16_t));
-        if (p_buf == NULL)
-        {
-            GUI_ASSERT(NULL != NULL);
-            return;
-        }
-        else
-        {
-            unicode_len = utf8_to_unicode(text->content, text->len, p_buf, text->len);
-        }
-        text->len = unicode_len;
-        break;
-    case UTF_16:
-        unicode_len = text->len;
-        p_buf = (uint16_t *)text->content;
-        break;
-    default:
-        break;
-    }
+    unicode_len = process_content_by_charset(text->charset, text->content, text->len, &unicode_buf);
 
     uint32_t width = bitmap.width;
     uint32_t rows = bitmap.rows;
@@ -241,7 +220,7 @@ void gui_font_ft_draw(gui_text_t *text, gui_text_rect_t *rect)
         // error = FT_Load_Char(face, text_list[i], FT_LOAD_RENDER);
         // GUI_ASSERT(error == 0)                          /* error handling omitted */
 
-        error = FT_Load_Char(face, p_buf[i], FT_LOAD_NO_BITMAP);
+        error = FT_Load_Char(face, unicode_buf[i], FT_LOAD_NO_BITMAP);
         GUI_ASSERT(error == 0)                          /* error handling omitted */
         error = FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL);
         GUI_ASSERT(error == 0)                          /* error handling omitted */
@@ -255,16 +234,8 @@ void gui_font_ft_draw(gui_text_t *text, gui_text_rect_t *rect)
         pen.x += slot->advance.x;
         pen.y += slot->advance.y;
     }
-    switch (text->charset)
-    {
-    case UTF_8:
-        gui_free(p_buf);
-        break;
-    case UTF_16:
-        break;
-    default:
-        break;
-    }
+
+    gui_free(unicode_buf);
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 }
