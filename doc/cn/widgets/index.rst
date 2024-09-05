@@ -32,7 +32,8 @@
 `画布圆角矩形 (canvas_round_rect)`_  显示一个圆角矩形
 `画布弧形 (canvas_arc)`_             显示一个弧形
 `趣带特效 (litegfx)`_                第三方合作特效
-`多级菜单 (multi_level)`_             管理和操作多层子窗口
+`多级菜单 (multi_level)`_            管理和操作多层子窗口
+`2.5D足球 (2.5D soccer)`_            2.5D足球特效
 ==================                   ==================
 
 .. _对象 (obj): gui_obj.html
@@ -62,8 +63,9 @@
 .. _蜂窝菜单 (menu_celllar): gui_menu_cellular.html
 .. _返回 (return): gui_return.html
 .. _二维码或条形码 (qbcode): qbcode.html
-.. _趣带特效 (litegfx): gui_widget_litegfx.html
 .. _多级菜单: gui_multi_level.html
+.. _趣带特效 (litegfx): gui_widget_litegfx.html
+.. _2.5D足球 (2.5D soccer): gui_soccer.html
 .. toctree::
     :maxdepth: 2
 
@@ -91,8 +93,9 @@
     可缩放矢量图形 (svg) <gui_svg>
     监视渐变点 (watch gradient spot) <gui_watch_gradient_spot>
     表盘渐变 (watchface gradient) <gui_watchface_gradient>
-    蜂窝菜单 (menu_celllar) <gui_menu_cellular>
+    蜂窝菜单 (menu celllar) <gui_menu_cellular>
     返回 (return) <gui_return>
 	二维码或条形码 (qbcode) <gui_qbcode>
+    多级菜单 (multi level) <gui_multi_level>
     趣带特效 (litegfx) <gui_widget_litegfx>
-    多级菜单 (multi_level) <gui_multi_level>
+    2.5D足球 (2.5D soccer) <gui_soccer>

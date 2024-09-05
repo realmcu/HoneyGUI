@@ -4,22 +4,19 @@ The widget provides a virtual area for the developer to place application-requir
 For example, Figure-1 creates an area the same as the screen dimension, and the developer can create a space with different sizes, as in Figure-2.
 
 <center><img src="https://foruda.gitee.com/images/1701081169144847122/2f0a8469_13671147.png" /></center>
-<br>
 <center>Figure-1</center>
 <br>
 
 <center><img src="https://foruda.gitee.com/images/1701081183476854396/dec93062_13671147.png" /></center>
-<br>
 <center>Figure-2</center>
 <br>
 
-And the following widgets will take the Window's widget left-top corner as the initial coordinates in Figure-3.
+And the following widgets will take the Window's widget left-top corner as the initial coordinates in the following figure.
 <br>
 
 <center><img src="https://foruda.gitee.com/images/1701081206134160709/80ae8874_13671147.png" /></center>
 <br>
-<center>Figure-3</center>
-<br>
+
 
 ## Usage
 

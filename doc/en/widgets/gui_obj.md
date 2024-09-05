@@ -3,7 +3,7 @@
 The 'Base Object' implements the basic properties of widgets on a screen. The screen widget is the root node of a control tree. The screen coordinate system is set as follows. The origin of the polar coordinates is the negative direction of the Y axis, and the positive direction of the polar coordinates is clockwise:
 <br>
 
-<center><img src="https://foruda.gitee.com/images/1718762967150637512/872c46fa_13408154.png" /></center>
+<center><img width="200" img src="https://foruda.gitee.com/images/1718762967150637512/872c46fa_13408154.png" /></center>
 
 ## Usage
 
