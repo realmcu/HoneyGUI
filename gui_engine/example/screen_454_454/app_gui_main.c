@@ -109,6 +109,9 @@ static void design_app_watch_ui(gui_app_t *app)
     gui_tab_t *tab_menu_loop = gui_tab_create(tabview_main, "tab_menu", 0, 0, 0, 0, -2, 0);
     extern void menu_loop_ui(gui_obj_t *parent);
     menu_loop_ui(GUI_BASE(tab_menu_loop));
+    gui_tab_t *tab_alipay = gui_tab_create(tabview_main, "alipay",       0, 0, 0, 0, 6, 0);
+    extern void alipay_menu_ui(gui_obj_t *parent);
+    alipay_menu_ui(GUI_BASE(tab_alipay));
 }
 
 #if defined _WIN32

@@ -530,9 +530,9 @@ extern char *defaultPath;
 #define GET_BASE(_p) ((gui_obj_t *)_p)
 #define GUI_BASE(_p) ((gui_obj_t *)_p)
 #define _GUI_API_DEFINE(type) typedef struct __gui_api_##type{
-#define _GUI_API_DECLARE(type) } _gui_api_##type;extern _gui_api_##type gui_api_for_##type;
-#define _GUI_API_ASSIGN(type) _gui_api_##type gui_api_for_##type ={
-#define GUI_API(type)  gui_api_for_##type
+#define _GUI_API_DECLARE(type) } _gui_api_##type;extern _gui_api_##type _gui_api_for_##type;
+#define _GUI_API_ASSIGN(type) _gui_api_##type _gui_api_for_##type ={
+#define GUI_API(type)  _gui_api_for_##type
 #if defined _WIN32
 #define GUI_FRAME_STEP 50
 #else
@@ -549,15 +549,75 @@ extern char *defaultPath;
 typedef int gui_error_t;
 #define GUI_MAGIC_NUMBER 0B1011
 #define GUI_WIDGET_TRY_EXCEPT(obj) {GUI_ASSERT((obj&&GUI_BASE(obj)->magic == GUI_MAGIC_NUMBER))}
+/**
+ * @brief Macro to retrieve a GUI widget pointer by its name.
+ *
+ * This macro initializes a `gui_obj_t` pointer to `NULL`, retrieves the specified named widget
+ * from the GUI object tree starting from the current application root, assigns the retrieved
+ * widget to the pointer, and performs an exception check on the pointer.
+ *
+ * @param[in] pointer The name of the pointer variable that will hold the retrieved widget.
+ * @param[in] name The name of the widget to retrieve.
+ *
+ * @note This macro assumes the existence of the function `gui_obj_tree_get_widget_by_name`,
+ *       the function `gui_current_app()`, and the macro `GUI_WIDGET_TRY_EXCEPT`.
+ *       The `gui_obj_tree_get_widget_by_name` function is declared as `extern` within the macro.
+ */
 #define GUI_WIDGET_POINTER_BY_NAME(pointer, name) gui_obj_t *pointer = 0;\
+    extern void gui_obj_tree_get_widget_by_name(gui_obj_t *, const char *, gui_obj_t **);\
+    extern gui_app_t *gui_current_app(void);\
     gui_obj_tree_get_widget_by_name((void *)gui_current_app(), name, &pointer);\
     GUI_WIDGET_TRY_EXCEPT(pointer)
+/**
+ * @brief Macro to retrieve a GUI widget pointer by its type.
+ *
+ * This macro initializes a `gui_obj_t` pointer to `NULL`, retrieves the specified type of widget
+ * from the GUI object tree starting from a given root, assigns the retrieved widget to the
+ * pointer, and performs an exception check on the pointer.
+ *
+ * @param[in] pointer The name of the pointer variable that will hold the retrieved widget.
+ * @param[in] type The type of widget to retrieve.
+ * @param[in] root The root of the GUI object tree where the search begins.
+ *
+ */
+#define GUI_WIDGET_POINTER_BY_TYPE(pointer, type, root) \
+    GUI_WIDGET_TRY_EXCEPT(root)\
+    gui_obj_t *pointer = 0;\
+    extern void gui_obj_tree_get_widget_by_type(gui_obj_t *, T_OBJ_TYPE , gui_obj_t **);\
+    gui_obj_tree_get_widget_by_type(root, type, &pointer);\
+    GUI_WIDGET_TRY_EXCEPT(pointer)
+/**
+ * @brief Macro to calculate the size of an array.
+ *
+ * This macro calculates the number of elements in an array by dividing the total size of the
+ * array by the size of its first element.
+ *
+ * @param[in] array The array whose size is to be determined.
+ *
+ * @return The number of elements in the array.
+ */
 #define GUI_ARRAY_SIZE(array) (sizeof(array)/sizeof(array[0]))
+/**
+ * @brief Macro to check the type of a GUI widget and log an error if it doesn't match the expected type.
+ *
+ * This macro first performs an exception check on the given object. Then, it compares the type of the
+ * GUI widget with the expected type. If the types do not match, it logs an error message. Finally,
+ * it asserts that the widget type matches the expected type.
+ *
+ * @param[in] obj The GUI object whose type is to be checked.
+ * @param[in] widget_type The expected type of the GUI widget.
+ *
+ */
 #define GUI_WIDGET_TYPE_TRY_EXCEPT(obj,widget_type) {GUI_WIDGET_TRY_EXCEPT(obj)if ((GUI_BASE(obj)->type != widget_type))\
         {\
+            extern void gui_log(const char *format, ...);\
             gui_log("GUI_WIDGET_TYPE_TRY_EXCEPT: type is %d ;",GUI_BASE(obj)->type);\
         }\
         {GUI_ASSERT((GUI_BASE(obj)->type == widget_type))}}
+#define GUI_SPEED_RECODE_LENGTH 5
+#define GUI_SPEED_RECODE_DEFINE int speed_recode[GUI_SPEED_RECODE_LENGTH];
+#define GUI_SPEED_MAX 60
+#define GUI_SPEED_MIN 7
 /** End of SUBMOUDLE_Exported_Macros
   * @}
   */
