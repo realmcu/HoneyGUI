@@ -12,21 +12,21 @@
 
 - 在图示路径中找到并打开示例的 UI 设计工程：
 <br/>
-<div style="text-align: center"><img width="600" src="https://foruda.gitee.com/images/1701067827418608218/7c54ffbf_10088396.png "></div>
+<div style="text-align: center"><img width="600" src="https://foruda.gitee.com/images/1725515761517919126/033a0990_9218678.png"></div>
 <br/>
 
 - 依次点击 `Export` 和 `Simulate` 来完成导出和启动模拟，模拟器窗口启动后将显示 86box APP 图标，鼠标点击后进入对应的 APP。
 <br/>
-<div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1701068361132692754/85acb896_10088396.png "></div>
+<div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1725515804906725239/f2b55fe1_9218678.png"></div>
 <br/>
 <br/>
-<div style="text-align: center"><img img width="300" src="https://foruda.gitee.com/images/1701068989928620648/71684794_10088396.png "></div>
+<div style="text-align: center"><img img width="300" src="https://foruda.gitee.com/images/1725515818032367801/cd5c125c_9218678.png"></div>
 <br/>
 
 - 进入 APP，在模拟器窗口中将看到与 RVisualDesigner 设计工程中一致的 UI 内容，因而该设计模式具有 “所见即所得” 特点。开发者从 ```ToolBox``` 中拖拽控件到画布中来创建控件到当前页面，添加图片资源到工程后，控件可以配置并链接到自定义的图片。控件间的层级关系将通过 ```Widget tree``` 来展示。
 
 <br/>
-<div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1701069129985417739/5558648f_10088396.png "></div>
+<div style="text-align: center"><img img width="600" src="https://foruda.gitee.com/images/1725515836928906868/bf7c4fa0_9218678.png"></div>
 <br/>
 
 
@@ -41,7 +41,7 @@
 #### 灯光控制 switch
 
 <br/>
-<div style="text-align: center"><img img width="300" src="https://foruda.gitee.com/images/1701075114325492203/ca9769d1_10088396.png "></div>
+<div style="text-align: center"><img img width="300" src="https://foruda.gitee.com/images/1725515850170490894/67696ea2_9218678.png"></div>
 <br/>
 
 - 为名为 "kitchen_switch" 的 switch 控件依次注册了打开和关闭 switch 时的回调函数。当 switch 控件  "kitchen_switch" 被打开时，其回调函数 `led1OnFunc` 将会被触发调用。
