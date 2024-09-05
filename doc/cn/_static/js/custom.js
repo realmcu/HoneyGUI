@@ -22,44 +22,43 @@ document.addEventListener('DOMContentLoaded', (event) => {
 })
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 获取页面上所有的锚点链接,添加点击事件
-    document.querySelectorAll('a[href^="#"]').forEach(anchorItem => {
-        anchorItem.addEventListener('click', function(event) {
-            const targetHref = anchorItem.getAttribute('href');
-            const targetElement = document.getElementById(targetHref.slice(1));
+document.addEventListener("DOMContentLoaded", function () {
+    function showHiddenElement(element) {
+        const isHidden = getComputedStyle(element).display !== 'block';
+        if (isHidden) {
+            // 修改目标元素的display属性
+            const parentDls = $(window.location.hash).parents('dl.unexpanded'); // jQuery
+            parentDls.each(function(index, pitem) {
+                pitem.classList.remove('unexpanded');
+                pitem.classList.add('expanded');
+            });
+        }     
+    }
 
-            if(targetElement){
-                // event.preventDefault(); // 阻止默认行为
+    function adjustScroll() {
+        const eleFixedNav = document.querySelector(".wy-nav-top");
+        const fixedNavDisplay = window.getComputedStyle(eleFixedNav).display;
+        const fixedNavHeight = fixedNavDisplay === "block" ? 65 : 0;
+        const hash = window.location.hash.substring(1);
+        const eleTarget = document.getElementById(hash);
+        if (eleTarget) {
+            showHiddenElement(eleTarget);
+            const offsetTop = eleTarget.getBoundingClientRect().top + window.pageYOffset - fixedNavHeight;
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'instant' /* Optional: for smooth scrolling */
+            });
+        }
+    }
 
-                // 使用 window.getComputedStyle 获取实际 display 属性
-                if(window.getComputedStyle(targetElement).display !== 'block'){
-                    // 修改目标元素的display属性
-                    const parents = $(targetHref).parents('dl.unexpanded'); // jQuery
-                    parents.each(function(index, parent) {
-                        parent.classList.remove('unexpanded');
-                        parent.classList.add('expanded');
-                    });
-                }
-
-                setTimeout(() => {
-                    history.pushState(null, null, ' ');
-                    history.pushState(null, null, targetHref);
-
-                    const eleNavTop = document.querySelector(".wy-nav-top");
-                    const eleDisplay = window.getComputedStyle(eleNavTop).display;
-                    const stickyOffset = eleDisplay === "block" ? -60 : 0;
-                    const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY + stickyOffset;
-
-                    // 使用平滑滚动，并考虑 sticky 元素的高度
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: 'auto'
-                    });
-                }, 0);
-            }
-        })
+    document.addEventListener('click', function(event) {
+        if (event.target.tagName === 'A' && event.target.hash) {
+            setTimeout(adjustScroll, 0);  // Delay adjustment to allow default behavior to complete
+        }
     });
+
+    window.addEventListener("load", adjustScroll); // Adjust on page load if there's a hash in the URL
+    window.addEventListener("hashchange", adjustScroll); // When URL hash changes
 });
 
 
