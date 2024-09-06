@@ -7,10 +7,22 @@
 #include "gui_text.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
-static const int gap = 50;
+#include "gui_app.h"
+
+
 #define ROW_COUNT 10
+#define TICKET_COUNT 24
+#define ROW_GAP 50
+#define UPDATE_TEXT_NAME "update text"
+#define CLICK_FUNCTION_ARRAY func_array
+#define TICKET_NAME_ARRAY string_array
+#define BACKGROUND_IMAGE ICON_PROCESS_BAR_BIN
+#define FONT ARIALBD_SIZE16_BITS4_FONT_BIN
+#define FONT_SIZE 16
+
+static const int gap = ROW_GAP;
 static const int count = ROW_COUNT;
-static const int font_size = 16;
+static const int font_size = FONT_SIZE;
 static int time_array_size;
 static const void *func_array[];
 static const char *string_array[];
@@ -26,9 +38,9 @@ static void qrcode_ui(gui_obj_t *parent)
 static void render(int index, gui_obj_t *obj)
 {
     GUI_WIDGET_POINTER_BY_TYPE(t, TEXTBOX, obj)
-    gui_text_content_set((void *)t, (void *)string_array[index], strlen(string_array[index]));
+    gui_text_content_set((void *)t, (void *)TICKET_NAME_ARRAY[index], strlen(TICKET_NAME_ARRAY[index]));
     //change obj callback
-    obj->event_dsc->event_cb = func_array[index];
+    obj->event_dsc->event_cb = CLICK_FUNCTION_ARRAY[index];
     obj->event_dsc->user_data = (void *)(size_t)index;
 
 }
@@ -46,6 +58,7 @@ static void override(gui_win_t *timer1, gui_win_t *win)
     static int history_y;
     static bool event5_flag;
     end_speed = 3;
+    alien = 1;
     if (wheel->pressed)
     {
         wheel_take_over = 1;
@@ -74,6 +87,8 @@ static void override(gui_win_t *timer1, gui_win_t *win)
             render_flag = 0;
             history_y = 0;
             touch_y = 0;
+            GUI_WIDGET_POINTER_BY_NAME(text, UPDATE_TEXT_NAME)
+            gui_obj_hidden(text, 1);
         }
         if (touch->pressing && touch->x > ax && touch->x < ax + GUI_BASE(win)->w)
         {
@@ -201,7 +216,7 @@ static void override(gui_win_t *timer1, gui_win_t *win)
                     {
                         index += time_array_size;
                     }
-                    const char *text = string_array[index];
+                    const char *text = TICKET_NAME_ARRAY[index];
                     if (i == (count) / 2)
                     {
                         index_offset = index;
@@ -295,7 +310,7 @@ static void override(gui_win_t *timer1, gui_win_t *win)
                     {
                         index += time_array_size;
                     }
-                    const char *text = string_array[index];
+                    const char *text = TICKET_NAME_ARRAY[index];
                     if (i == (count) / 2)
                     {
                         index_offset = index;
@@ -309,14 +324,14 @@ static void override(gui_win_t *timer1, gui_win_t *win)
 }
 static void ticket(void *obj, gui_event_t e, void *param)
 {
-    gui_log(string_array[(size_t)param]); gui_log("\r");
+    gui_log(TICKET_NAME_ARRAY[(size_t)param]); gui_log("\r");
 }
-static const void *func_array[] =
+static const void *func_array[TICKET_COUNT] =
 {
     ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
     ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket, ticket,
 };
-static const char *string_array[] =
+static const char *string_array[TICKET_COUNT] =
 {
     "TICKET 1",
     "TICKET 2",
@@ -346,10 +361,21 @@ static const char *string_array[] =
 static void update_callback(void *obj, gui_event_t e, void *param)
 {
     gui_log(param);
+    GUI_WIDGET_POINTER_BY_NAME(text, UPDATE_TEXT_NAME)
+    gui_obj_hidden(text, 0);
 }
 static void menu_ui(gui_obj_t *parent)
 {
-    time_array_size = GUI_ARRAY_SIZE(string_array);
+    {
+        const char *text = "update";
+        gui_text_t *t = gui_text_create(parent, UPDATE_TEXT_NAME, 0, 20, gui_get_screen_width(), font_size);
+        gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
+        const void *addr1 = FONT;
+        gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, LEFT);
+        gui_obj_hidden(GUI_BASE(t), 1);
+    }
+    time_array_size = TICKET_COUNT;
     gui_win_t *win = gui_win_create(parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height());
     gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, 0, 0);
     gui_win_set_animate(win, 1000, -1, override, timer1);
@@ -357,17 +383,18 @@ static void menu_ui(gui_obj_t *parent)
     {
         gui_win_t *win = gui_win_create(timer1, 0, 0, i * gap, gui_get_screen_width(), gap);
         widget_array[i] = GUI_BASE(win);
-        gui_img_t *img = gui_img_create_from_mem(win, 0, ICON_PROCESS_BAR_BIN, 0, 0, 0, 0);
-        const char *text = string_array[i];
+        gui_img_t *img = gui_img_create_from_mem(win, 0, BACKGROUND_IMAGE, 0, 0, 0, 0);
+        const char *text = TICKET_NAME_ARRAY[i];
         gui_text_t *t = gui_text_create(win, 0, 0, 20, GUI_BASE(win)->w, font_size);
         gui_text_set(t, (void *)text, GUI_FONT_SRC_BMP, APP_COLOR_BLACK, strlen(text), font_size);
-        const void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        const void *addr1 = FONT;
         gui_text_type_set(t, (void *)addr1, FONT_SRC_MEMADDR);
         gui_text_mode_set(t, LEFT);
 
-        gui_win_click(win, (void *)func_array[i], (void *)i);
+        gui_win_click(win, (void *)CLICK_FUNCTION_ARRAY[i], (void *)i);
     }
     gui_obj_add_event_cb(win, update_callback, GUI_EVENT_5, "update\n");
+
 
 }
 static void jump(void *obj, gui_event_t e, gui_multi_level_t *param)
