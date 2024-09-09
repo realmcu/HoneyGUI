@@ -109,9 +109,12 @@ figcaption, figcaption p{
         display: none;
     }
 
+    /* fixed top nav setting */
+    .wy-grid-for-nav {
+        top: 60px;
+    }
     .wy-nav-top {
-        position: -webkit-sticky;
-        position: sticky;
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
