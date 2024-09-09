@@ -17,7 +17,9 @@ p {
 }
 
 /* =========== Render Common Style =========== */
-
+.wy-nav-content-wrap {
+    overflow-x: auto;
+}
 .rst-content div, 
 .rst-content p {
     text-align: justify;
@@ -51,7 +53,6 @@ figcaption, figcaption p{
     /* ----- main content ----- */
     .wy-nav-content-wrap {
         margin-left: var(--md-left-sider-width);
-        overflow-x: auto;
         background:rgba(0,0,0,.05);
     }
     .wy-nav-content {
