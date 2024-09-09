@@ -36,6 +36,7 @@
 ```
 
 ## 示例
+<details> <summary>代码</summary>
 
 ```eval_rst
 
@@ -45,7 +46,7 @@
    :end-before: /* perspective example end*/
 
 ```
-
+</details>
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699931105543257223/ccac3ca0_10641540.png" width = "300" /></div>
 <br>

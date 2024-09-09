@@ -18,20 +18,11 @@ Once the curtain extension is finished, you can configure certain callback event
 
 ## Example
 
-Please refer to the page below:
+Please refer to the section: [curtain](./gui_curtain.md)
 
-```eval_rst
-`curtain`_
-
-.. _curtain: gui_curtain.html
-
-```
-
-<span id = "gui_curtainview_create">
 
 ## API
 
-</span>
 
 ```eval_rst
 

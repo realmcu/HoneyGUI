@@ -29,16 +29,15 @@
 ```
 
 ## 示例
+<details> <summary>代码</summary>
 
 ```eval_rst
-
 .. literalinclude:: ../../../gui_engine/example/screen_448_368/app_tb_clock.c
    :language: c
    :start-after: /* curtain example start*/
    :end-before: /* curtain example end*/
-
 ```
-
+</details>
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png" width = "300" /></div>
 <br>

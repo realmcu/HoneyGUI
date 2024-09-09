@@ -471,6 +471,9 @@ bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y)
 }
 void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y)
 {
+    GUI_WIDGET_TRY_EXCEPT(obj)
+    GUI_ASSERT(absolute_x) // cppcheck-suppress unknownMacro
+    GUI_ASSERT(absolute_y)
     gui_obj_t *o = obj;
     *absolute_x = o->x;
     *absolute_y = o->y;
@@ -886,6 +889,49 @@ const char *gui_widget_name(gui_obj_t *widget, const char *name)
     return widget->name;
 
 }
+void gui_update_speed(int *speed, int speed_recode[])
+{
+    IMPORT_GUI_TOUCHPAD
+    int recode_num = 4;
+    for (size_t i = 0; i < recode_num; i++)
+    {
+        speed_recode[i] = speed_recode[i + 1];
+    }
+    speed_recode[recode_num] = touch->deltaY;
+    *speed = speed_recode[recode_num] - speed_recode[0];
+    int max_speed = GUI_SPEED_MAX;
+    int min_speed = GUI_SPEED_MIN;
+    if (*speed > max_speed)
+    {
+        *speed = max_speed;
+    }
+    else if (*speed < -max_speed)
+    {
+        *speed = -max_speed;
+    }
+    if ((*speed > 0) && (*speed < min_speed))
+    {
+        *speed = min_speed;
+    }
+    else if ((*speed < 0) && (*speed > -min_speed))
+    {
+        *speed = -min_speed;
+    }
+}
+void gui_inertial(int *speed, int end_speed, int *offset)
+{
+    if (*speed > end_speed)
+    {
+        *offset += *speed;
+        *speed -= 1;
+    }
+    else if (*speed < -end_speed)
+    {
+        *offset += *speed;
+        *speed += 1;
+    }
+}
+
 /** End of WIDGET_Exported_Functions
   * @}
   */

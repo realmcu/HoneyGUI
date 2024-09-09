@@ -594,8 +594,46 @@ gui_obj_t *gui_get_root(gui_obj_t *object);
  *       that @p absolute_x and @p absolute_y are valid pointers to integers.
  */
 void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y);
+/**
+ * @brief Set the visibility of a GUI object.
+ *
+ * This function sets the visibility of a given GUI object by adjusting its hidden state.
+ *
+ * @param[in,out] obj Pointer to the GUI object that will be updated.
+ * @param[in] hidden Boolean flag indicating whether the object should be hidden (true) or shown (false).
+ */
 void gui_obj_hidden(gui_obj_t *obj, bool hidden);
+/**
+ * @brief Set or retrieve the name of a GUI widget.
+ *
+ * This function sets the name of a given GUI widget if the provided name is valid.
+ * It returns the current name of the widget.
+ *
+ * @param[in,out] widget Pointer to the GUI widget whose name will be set or retrieved.
+ * @param[in] name Pointer to a string containing the new name for the widget. If the name is valid, it will be set as the widget's name.
+ *
+ * @return The current name of the widget.
+ */
 const char *gui_widget_name(gui_obj_t *widget, const char *name);
+/**
+ * @brief Update speed
+ *
+ * This function updates the current speed and records the speed change history.
+ *
+ * @param[in,out] speed Pointer to the current speed, which will be updated by the function.
+ * @param[out] speed_recode Array to record speed changes, which will be updated by the function.
+ */
+void gui_update_speed(int *speed, int speed_recode[]);
+/**
+ * @brief Inertial calculation
+ *
+ * This function performs inertial calculations based on the current speed, end speed, and offset.
+ *
+ * @param[in,out] speed Pointer to the current speed, which will be updated by the function.
+ * @param[in] end_speed Target end speed.
+ * @param[in,out] offset Pointer to the offset, which will be updated by the function.
+ */
+void gui_inertial(int *speed, int end_speed, int *offset);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

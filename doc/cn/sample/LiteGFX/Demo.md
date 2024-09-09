@@ -1,4 +1,4 @@
-#  LiteGFX应用程序
+#  LiteGFX
 
 ## 趣戴介绍
 

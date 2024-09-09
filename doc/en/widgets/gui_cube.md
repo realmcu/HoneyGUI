@@ -23,6 +23,9 @@ The rotation direction of this cube can be achieved by calling [void gui_cube_au
 
 
 ## Example
+
+<details> <summary>code</summary>
+
 ```c
 #include <gui_obj.h>
 #include "gui_cube.h"
@@ -59,6 +62,7 @@ void page_tb_cube(void *parent)
     gui_cube_set_center(cube4, 200, 200);
 }
 ```
+</details>
 <br/>
 <div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube.gif"></div>
 <br/>

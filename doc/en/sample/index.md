@@ -15,9 +15,9 @@ GUI_INIT_APP_EXPORT(app_init);
 .. toctree::
     :maxdepth: 2
 
-    Calculator Application <Calculator/Demo>
-    86box Application <86box/86box>
-    LiteGFX Application <LiteGFX/Demo>
+    Calculator <Calculator/Demo>
+    86box <86box/86box>
+    LiteGFX <LiteGFX/Demo>
     Status bar <Status-bar/Status bar>
-    Fruit Ninja Application <Fruit_Ninja/Demo>
+    Fruit Ninja <Fruit_Ninja/Demo>
 ```

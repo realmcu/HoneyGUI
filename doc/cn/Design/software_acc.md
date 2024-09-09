@@ -114,7 +114,7 @@ typedef enum
 ### 无RLE旁路模式（不带矩阵变换）
 下面的流程图描述了将 `uncompressed images` 写入帧缓冲区的 `bypass mode`处理过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318765186128026/16894745_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318765186128026/16894745_13671125.png"/></div><br/>
 
 1. 根据 `img_type` 执行不同的处理步骤。
 2. 基于 `opacity_value` 执行相应的操作将图像像素写入帧缓冲区。
@@ -125,7 +125,7 @@ typedef enum
 ### 无RLE旁路模式（带矩阵变换）
 下面的流程图描述了使用 `blend mode with matrix operations` 将 `uncompressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318778978528410/26fe6091_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318778978528410/26fe6091_13671125.png"/></div><br/>
 
 1. 根据 `img_type` 执行不同的处理步骤。
 2. 执行矩阵计算，将目标区域的写入点映射到图像像素，并获取图像像素的像素值。
@@ -142,7 +142,7 @@ typedef enum
 ### 无RLE滤黑模式（不带矩阵变换）
 下面的流程图描述了将 `uncompressed images` 写入帧缓冲区的 `filter mode`处理过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318784445569859/c4bf1075_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318784445569859/c4bf1075_13671125.png"/></div><br/>
 
 1. 根据 `img_type` 执行不同的处理步骤。
 2. 如果像素值为0，则跳过处理；否则，执行后续写入操作。
@@ -154,7 +154,7 @@ typedef enum
 ### 无RLE旁路模式（带矩阵变换）
 下面的流程图描述了使用 `filter mode with matrix operations` 将 `uncompressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318788829157429/3ca92cb9_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318788829157429/3ca92cb9_13671125.png"/></div><br/>
 
 1. 根据 `img_type` 执行不同的处理步骤。
 2. 执行矩阵计算，将目标区域的写入点映射到图像像素，并获取图像像素的像素值。
@@ -167,7 +167,7 @@ typedef enum
 ## 无RLE源覆盖模式概述
 以下流程描述了 `No RLE` 压缩图像的 `source_over mode` 处理过程。根据图像矩阵和显示设备的像素字节数选择处理方法，并将其写入帧缓冲区。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710327760371625897/982f575e_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "1000" img src ="https://foruda.gitee.com/images/1710327760371625897/982f575e_13671125.png"/></div><br/>
 
 ### 无RLE源覆盖模式（不带矩阵变换）
 下面的流程图描述了将 `uncompressed images` 写入帧缓冲区的 `source_over mode`处理过程，以RGB565为目标设备图像类型为例。
@@ -222,7 +222,7 @@ typedef enum
 ### RLE旁路模式（不带矩阵变换）
 下面的流程图描述了将 `bypass images` 写入帧缓冲区的 `cover mode`处理过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318858967603728/74fc9285_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318858967603728/74fc9285_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -234,7 +234,7 @@ typedef enum
 ### RLE旁路模式（带矩阵变换）
 下面的流程图描述了使用 `bypass mode with matrix operations` 将 `compressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318868326988985/8e089811_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318868326988985/8e089811_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -252,7 +252,7 @@ typedef enum
 ### RLE滤黑模式（不带矩阵变换）
 下面的流程图描述了将 `compressed images` 写入帧缓冲区的 `filter mode`处理过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318872306891932/9145c589_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318872306891932/9145c589_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -265,7 +265,7 @@ typedef enum
 ### RLE滤黑模式（带矩阵变换）
 下面的流程图描述了使用 `filter mode with matrix operations` 将 `compressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318876464804105/64471b6b_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318876464804105/64471b6b_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -284,7 +284,7 @@ typedef enum
 ### RLE源覆盖模式（不带矩阵变换）
 下面的流程图描述了将 `compressed images` 写入帧缓冲区的 `source_over mode`处理过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318880764265303/dee05307_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318880764265303/dee05307_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -296,7 +296,7 @@ typedef enum
 ### RLE源覆盖模式（带矩阵变换）
 下面的流程图描述了使用 `source_over mode with matrix operations` 将 `compressed images` 写入帧缓冲区的过程，以RGB565为目标设备图像类型为例。
 
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1710318886248980211/a668df5f_13671125.png"/></div><br/>
+<div style="text-align: center"><img width= "900" img src ="https://foruda.gitee.com/images/1710318886248980211/a668df5f_13671125.png"/></div><br/>
 
 1. 根据压缩数据头部的 `img_type` 执行不同的处理步骤。
 2. 对压缩图像数据进行解压。
@@ -313,8 +313,7 @@ typedef enum
 [no rle](https://gitee.com/langhao-luo/gui_images/blob/master/visio/design/no_rle.vsdx)
 
 
-```{eval-rst}
-.. 注意::
+```{note}
    在压缩的source_over矩阵模式下，rle_rgb888和rle_rgba8888相当于输出rle_rgb565。
 ```
 

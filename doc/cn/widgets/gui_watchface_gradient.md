@@ -11,7 +11,7 @@
 
 ## 示例
 
-<details> <summary>code</summary>
+<details> <summary>代码</summary>
 
 ```eval_rst
 .. literalinclude:: ../../../gui_engine/example/screen_448_368/app_ct_clock.c

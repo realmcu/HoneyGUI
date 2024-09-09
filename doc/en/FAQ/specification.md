@@ -1,22 +1,22 @@
-# Specification FAQ
+# Specification
 
 ## Graphics
 
-| Platform  | 8762D  |8772F   |87X2D |PC   |8763E|
-|---|---|---|---|---|---|
-| RGB565  |  Y | Y  | Y  | Y  | Y  |
-|  RGB888 | N  | Y  |  Y |  Y | N  |
-|  ARGB8888 |  N | Y  |  Y | Y  | N  |
-|  SVG | N  | Y   |  N |  Y  | N  |
-| TTF | N  | Y   |  N |  Y  | N  |
-| DOT font  |  Y | Y  | Y  | Y  |Y  |
-|  Vector Graphics | N  | Y   |  N |  Y  |N |
-|  Linear gradient | N  | Y   |  N |  Y  |N |
-|  Radial gradient | N  | N   |  N |  Y  |N |
+| Platform          | RTL8762D | RTL8772F | RTL87X2G | RTL8763E | PC  |
+|-------------------|----------|----------|----------|----------|-----|
+| RGB565            | Y        | Y        | Y        | Y        | Y   |
+| RGB888            | N        | Y        | Y        | N        | Y   |
+| ARGB8888          | N        | Y        | Y        | N        | Y   |
+| SVG               | N        | Y        | N        | N        | Y   |
+| TTF               | N        | Y        | N        | N        | Y   |
+| DOT font          | Y        | Y        | Y        | Y        | Y   |
+| Vector Graphics   | N        | Y        | N        | N        | Y   |
+| Linear gradient   | N        | Y        | N        | N        | Y   |
+| Radial gradient   | N        | N        | N        | N        | Y   |
 
 ## Memory usage
 
-### 8772F demo
+### RTL8772F demo
 
 ```eval_rst
 .. raw:: html

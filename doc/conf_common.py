@@ -85,10 +85,10 @@ html_show_copyright = False
 
 html_static_path = ['_static']
 html_js_files = [
+    'js/auth.js',
     'js/custom.js',
     'js/versions.js',
     'js/imgmodal.js',
-    'js/auth.js'
 ]
 
 html_logo = './_static/image/logo.png'
@@ -101,6 +101,7 @@ html_theme_options = {
     'logo_only': True,
     # 在侧边栏显示版本
     'display_version': True,
+    'navigation_depth': 10,
 }
 
 

@@ -1,5 +1,10 @@
 # MP Tool
 
+MP Tool supports debugging mode and batch production mode, integrating packaging and flash map generation functions.
+
+* Debug Mode: Offers developers a platform for debugging and feature development.
+* MP Mode: Provides an array of capabilities, including the ability to program up to 8 devices concurrently and modify the device's Bluetooth address.
+
 ##  Download to the EVB
 Select the chip type and language in the MP Tool startup interface, taking RTL8762D as an example.
 <br/>

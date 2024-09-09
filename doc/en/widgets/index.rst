@@ -33,6 +33,7 @@ Widgets                              Brief
 `canvas_arc`_                        Display a arc
 `multi_level`_                       Manage and manipulate multi-level subwindows
 `litegfx`_                           Third-Party Collaboration Special Effects
+`2.5D soccer`_                       2.5D Soccer Special Effects
 ==================                   ==================
 
 .. _obj: gui_obj.html
@@ -65,6 +66,7 @@ Widgets                              Brief
 .. _qbcode: qbcode.html
 .. _multi_level: gui_multi_level.html
 .. _litegfx: gui_widget_litegfx.html
+.. _2.5D soccer: gui_soccer.html
 .. toctree::
     :maxdepth: 2
 
@@ -96,5 +98,6 @@ Widgets                              Brief
     menu cellular <gui_menu_cellular>
     return <gui_return>
 	qbcode <gui_qbcode>
-    multi_level <gui_multi_level>
+    multi level <gui_multi_level>
     litegfx <gui_widget_litegfx>
+    2.5D soccer <gui_soccer>

@@ -6,9 +6,9 @@
 .. toctree::
     :maxdepth: 2
 
-    开发环境常见问题 <environment>
-    移植常见问题 <porting>
-    规格常见问题 <specification>
-    如何提高帧率常见问题 <FPS>
-    显示常见问题 <display>
+    开发环境 <environment>
+    移植 <porting>
+    规格 <specification>
+    如何提高帧率 <FPS>
+    显示 <display>
 ```

@@ -2,7 +2,7 @@ var ReturnUrl = window.location.href;
 $.ajax({
     url: 'https://www.realmcu.com/Docs/CheckDocsPermission',
     type: 'GET',
-    dataType: "JSON",
+    dataType: "json",
     xhrFields: {
         withCredentials: true // 发送请求时需携带cookie
     },

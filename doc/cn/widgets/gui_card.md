@@ -11,7 +11,7 @@
 
 创建6个卡片控件：
 
-<details> <summary>示例代码</summary>
+<details> <summary>代码</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"

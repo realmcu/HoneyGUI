@@ -1,4 +1,4 @@
-# How To Increase FPS FAQ
+# How To Increase FPS
 
 ## Pixel format
 

@@ -37,7 +37,7 @@ You can use [gui_switch_change_state(gui_switch_t *this, bool ifon)](#gui_switch
 
 ## Example
 
-<details> <summary>Example code</summary>
+<details> <summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"

@@ -1,6 +1,6 @@
 # Pagelist
 
-The pagelist widget has the similar function as page widget, and it is expected to use less ram size. The pagelist widget bahaves like a scroll at y-axis. When it moves at y-axis, the child nodes will also move with pagelist widget. you can set two switch widget which indicate the first and the ast, and two border line which indicate top and bottom. The first one will move from top to bottom when it reaches top. The last one will move from bottom to top when it reaches bottom. This characteristic makes the child widgets look like more than that they are really created.
+The pagelist widget has the similar function as page widget, and it is expected to use less ram size. The pagelist widget bahaves like a scroll at y-axis. When it moves at y-axis, the child nodes will also move with pagelist widget. you can set two switch widget which indicate the first and the last, and two border line which indicate top and bottom. The first one will move from top to bottom when it reaches top. The last one will move from bottom to top when it reaches bottom. This characteristic makes the child widgets look like more than that they are really created.
 
 ## Usage
 
@@ -27,6 +27,8 @@ By using this API [gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_p
 You can utilize the [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pagelist_create) function to establish a pagelist widget. It's height will be set according to the total height of child widgets.
 
 ## Example
+
+<details> <summary>code</summary>
 
 ```c
 #include "root_image/ui_resource.h"
@@ -71,6 +73,7 @@ void design_pagelist_test(void *parent)
                                     (gui_pagelist_update_cb_t)pagelist_test_update_list_last_cb);
 }
 ```
+</details>
 <br>
 
 <br>

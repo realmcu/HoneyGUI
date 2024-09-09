@@ -28,6 +28,7 @@ The [GUI](/Glossary.rst#term-GUI) framework has good portability, which can run 
 
 ## Installation
 
+{#Install_compiler_en}
 ### Install compiler
 Download the MinGW-w64 toolchain, unzip it to drive C, and add it to the system environment variable `Path`.
 1.  [MinGW-w64 Download](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/sjlj/x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0.7z)

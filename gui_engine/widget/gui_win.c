@@ -255,6 +255,12 @@ static void prepare(gui_obj_t *obj)
         gui_obj_skip_other_left_hold(obj);
         gui_obj_skip_other_right_hold(obj);
     }
+    if (this->event5_flag)
+    {
+        gui_obj_event_set(obj, GUI_EVENT_5);
+    }
+
+
 }
 
 static void gui_win_destory(gui_obj_t *obj)
@@ -372,7 +378,7 @@ void gui_win_click(gui_win_t *this, void *callback, void *parameter)
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }
 
-void gui_win_hole_tp(gui_win_t *this, bool hold_tp)
+void gui_win_hold_tp(gui_win_t *this, bool hold_tp)
 {
     this->hold_tp = hold_tp;
 }

@@ -1,6 +1,6 @@
 # 趣带
 
-与趣带（LiteGFX）合作，基于 HoneyGUI 推出了各种酷炫的小部件和智能手表表盘。
+与趣带（LiteGFX）合作，基于 HoneyGUI 推出了各种酷炫的控件和智能手表表盘。
 
 ## 使用方法
 
@@ -9,10 +9,7 @@ HoneyGUI 已经做好了趣带特效控件层的封装，因此不需要单独�
 ## 示例
 
 ### 通知
-
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723430546161167009/198f4430_9325830.gif"/></div>
-<br>
+<details> <summary>代码</summary>
 
 ```c
 
@@ -22,12 +19,13 @@ static void design_app_watch_ui(gui_app_t *app)
     design_tab_app_notifications(&(app->screen));
 }
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723430546161167009/198f4430_9325830.gif"/></div>
+<br>
 
 ### 能量盒
-
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723444521333503824/5a699e73_9325830.gif"/></div>
-<br>
+<details> <summary>代码</summary>
 
 ```c
 
@@ -37,12 +35,14 @@ static void design_app_watch_ui(gui_app_t *app)
     design_tab_app_energybox(&(app->screen));
 }
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723444521333503824/5a699e73_9325830.gif"/></div>
+<br>
+
 
 ### 棱镜
-
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723446841825807274/e17dcd08_9325830.gif"/></div>
-<br>
+<details> <summary>代码</summary>
 
 ```c
 
@@ -52,12 +52,15 @@ static void design_app_watch_ui(gui_app_t *app)
     design_tab_app_prsim_refl(&(app->screen));
 }
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723446841825807274/e17dcd08_9325830.gif"/></div>
+<br>
+
+
 
 ### 数字时钟
-
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723448952426583702/594b5c97_9325830.gif"/></div>
-<br>
+<details> <summary>代码</summary>
 
 ```c
 
@@ -70,12 +73,15 @@ static void design_app_watch_ui(gui_app_t *app)
     design_tab_watchface_digit_clock(tab0);
 }
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723448952426583702/594b5c97_9325830.gif"/></div>
+<br>
+
+
 
 ### 蝴蝶
-
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723449031267718568/527bf443_9325830.gif"/></div>
-<br>
+<details> <summary>代码</summary>
 
 ```c
 
@@ -90,12 +96,15 @@ static void design_app_watch_ui(gui_app_t *app)
 
 }
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723449031267718568/527bf443_9325830.gif"/></div>
+<br>
+
+
 
 ### 落樱
-
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723449064680099900/269758fb_9325830.gif"/></div>
-<br>
+<details> <summary>代码</summary>
 
 ```c
 
@@ -108,12 +117,13 @@ static void design_app_watch_ui(gui_app_t *app)
     design_tab_watchface_flowerfall(tab0);
 }
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723449064680099900/269758fb_9325830.gif"/></div>
+<br>
 
 ### 风车
-
-<br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723449195666990344/7ec4093f_9325830.gif"/></div>
-<br>
+<details> <summary>代码</summary>
 
 ```c
 
@@ -126,6 +136,12 @@ static void design_app_watch_ui(gui_app_t *app)
     design_tab_watchface_windmill(tab0);
 }
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://foruda.gitee.com/images/1723449195666990344/7ec4093f_9325830.gif"/></div>
+<br>
+
+
 
 ## API
 

@@ -1,4 +1,4 @@
-# 移植常见问题
+# 移植
 
 ## 用户数据
 
@@ -10,7 +10,7 @@ JS(javascript)包含在GUI模块中，JS使用的堆空间可能会受到资源�
 
 ## 喂狗
 
-GUI任务不支持喂狗功能，因此应用程序应在APP注册的hook函数中进行喂狗操作，并由GUI使用。注册函数为 `void gui_task_ext_execution_sethook(void (*hook)(void))`.
+GUI任务不支持喂狗功能，因此应用程序应在APP注册的hook函数中进行喂狗操作，并由GUI使用。注册函数为 `void gui_task_ext_execution_sethook(void (*hook)(void))`。
 
 ## 不支持FPU
 
@@ -18,7 +18,7 @@ GUI任务不支持喂狗功能，因此应用程序应在APP注册的hook函数�
 
 ## 文件系统
 
-SoC需要通过文件系统从flash中读取图像和字体资源，文件系统中的起始地址应与用户数据生成脚本中的地址一致。GUI已经提供了相关文件，其中起始地址为 `ROMFS_ADDR`.
+SoC需要通过文件系统从flash中读取图像和字体资源，文件系统中的起始地址应与用户数据生成脚本中的地址一致。GUI已经提供了相关文件，其中起始地址为 `ROMFS_ADDR`。
 
 ## Flash设置
 

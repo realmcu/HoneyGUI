@@ -35,13 +35,7 @@ You can use this function [gui_cardview_set_bottom_space(this, bottom_space)](#g
 The event of the card container sliding in the Y-axis can add the corresponding callback function[gui_cardview_up(this, callback, parameter)](#gui_cardview_up) and [gui_cardview_down(this, callback, parameter)](#gui_cardview_down).
 
 ## Example
-Please refer to the page below:
-```eval_rst
-`card`_    
-
-.. _card: gui_card.html
-
-```
+Please refer to the section: [card](./gui_card.md)
 
 ## API
 

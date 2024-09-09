@@ -28,6 +28,7 @@ There are five orientations in curtain widget.
 ```
 
 ## Example
+<details> <summary>code</summary>
 
 ```eval_rst
 
@@ -37,7 +38,7 @@ There are five orientations in curtain widget.
    :end-before: /* curtain example end*/
 
 ```
-
+</details>
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png" width = "300" /></div>
 <br>

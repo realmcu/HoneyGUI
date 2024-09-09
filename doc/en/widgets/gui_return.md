@@ -9,19 +9,7 @@ The bubble-shaped curve that can be dragged out on the left side of the screen i
 Creating function is [gui_return_create](#gui_return_create). Users need to enter curve animation frame images file array ,and the return operation function.
 
 ## Example
-<br>
-<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/return.gif"  /></div>
-<br>
-
-
-```eval_rst
-
-.. note::
-  Please refer to ``gui_engine\example\screen_454_454\gui_menu\apps_in_menu.c`` for details.
-
-```
-
-
+<details> <summary>code</summary>
 
 ```eval_rst
 
@@ -36,7 +24,18 @@ Creating function is [gui_return_create](#gui_return_create). Users need to ente
    :end-before: /*gui_return_create end*/
 
 ```
+</details>
+<br>
+<div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/return.gif"  /></div>
+<br>
 
+
+```eval_rst
+
+.. note::
+  Please refer to ``gui_engine\example\screen_454_454\gui_menu\apps_in_menu.c`` for details.
+
+```
 
 
 <span id = "gui_return_create">

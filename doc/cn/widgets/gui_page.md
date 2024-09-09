@@ -11,6 +11,8 @@
 
 ## 示例
 
+<details> <summary>代码</summary>
+
 ```c
 #include "root_image_hongkong/ui_resource.h"
 #include <gui_img.h>
@@ -37,6 +39,7 @@ void page_tb_activity(void *parent)
     gui_img_t *img5 = gui_img_create_from_mem(pg1, "img5", PLAYER_MUSIC_WIND_ICON_BIN, 0, 460, 0, 0);
 }
 ```
+</details>
 <br>
 <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/page.gif" width = "300" /></div>
 <br>
