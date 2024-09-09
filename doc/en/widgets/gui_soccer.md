@@ -34,13 +34,13 @@ You can set the image for the soccer ball faces by using [void gui_soccer_set_im
 static void app_dialing_ui_design(gui_app_t *app)
 {
     gui_soccer_t *soccer = gui_soccer_create(&(app->screen), "soccer", (void *)_acgreen_hexagon, 0, 0);
-    gui_soccer_set_size(soccer, 80);
+    // gui_soccer_set_size(soccer, 80);
     gui_soccer_set_center(soccer, 240, 240);
 }
 ```
 </details>
 <br/>
-<div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1725505731435871157/0cb0e4bc_13408154.gif"></div>
+<div style="text-align: center"><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/soccer.gif"></div>
 <br/>
 
 ## API
