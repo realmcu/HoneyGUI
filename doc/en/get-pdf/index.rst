@@ -2,4 +2,4 @@
 Get PDF
 ========
 
-PDF version: :download:`RTKIOT GUI.pdf <RTKIOT GUI.pdf>`
+PDF version: :download:`RTKIOT GUI.pdf <../RTKIOT GUI.pdf>`
