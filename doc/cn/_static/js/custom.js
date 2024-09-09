@@ -78,12 +78,19 @@ $(function() {
         .append('<span class="resize-handle-left"> || </span>')
         .on('mousedown', 'span.resize-handle-left', function(e) {
             leftResizing = true;
+            e.preventDefault(); // 阻止默认的文本选中行为
+
+            // 给body添加类，避免选中内容
+            // $('body').css('user-select', 'none');
+
             leftDownX = e.clientX;
         });
 
     $(document).on('mousemove', function(e) {
         if (!leftResizing)
             return;
+
+        e.preventDefault(); // 阻止默认的文本选中行为
 
         var offsetNew = e.clientX - document.body.offsetLeft;
         // 限制导航栏宽度
@@ -94,6 +101,9 @@ $(function() {
     }).on('mouseup', function(e) {
         if (leftResizing) {
             leftResizing = false;
+            // 解除body的类，允许选中内容
+            // $('body').css('user-select', '');
+
             // Store width in localStorage
             var newWidth = $('.wy-nav-side').width();
             localStorage.setItem('docs.honeygui.siderbar.width', newWidth);
