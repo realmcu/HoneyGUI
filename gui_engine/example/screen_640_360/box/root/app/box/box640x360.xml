@@ -136,7 +136,7 @@
         scaleY="1">imgAnimate1
         <onLoad
             to="imgAnimate1"
-            type="aniamte" 
+            type="animate" 
             id="animateRotate2">
         </onLoad>
     </img>
@@ -153,7 +153,7 @@
         scaleY="1">imgAnimate2
         <onLoad
             to="imgAnimate2"
-            type="aniamte" 
+            type="animate" 
             id="animateRotate1">
         </onLoad>
     </img>
@@ -170,8 +170,13 @@
         scaleY="1">imgAnimate3
         <onLoad
             to="imgAnimate3"
-            type="aniamte" 
+            type="animate" 
             id="animateOpacity1">
+        </onLoad>
+        <onLoad
+            to="imgAnimate3"
+            type="animate" 
+            id="animateRotate1">
         </onLoad>
     </img>
     <img
@@ -203,22 +208,22 @@
             y="0">sw_living
             <onOff
                 to="img_ctlamp"
-                type="aniamtePause" 
+                type="animatePause" 
                 id="animateTranslate1">
             </onOff>
             <onOn
                 to="img_ctlamp"
-                type="aniamte" 
+                type="animate" 
                 id="animateTranslate1">
             </onOn>
             <onOff
                 to="imgAnimate4"
-                type="aniamte" 
+                type="animate" 
                 id="animateScale1">
             </onOff>
             <onOn
                 to="imgAnimate4"
-                type="aniamtePause" 
+                type="animatePause" 
                 id="animateScale1">
             </onOn>
     </switch>

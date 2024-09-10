@@ -223,10 +223,13 @@ static void gui_colorwheel_draw_cb(gui_obj_t *obj)
     NVGcontext *vg = nvgCreateAGGE(dc->fb_width, dc->fb_height, dc->fb_width * (dc->bit_depth >> 3),
                                    (dc->bit_depth >> 3) == 2 ? NVG_TEXTURE_BGR565 : NVG_TEXTURE_BGRA, dc->frame_buf);
     nvgBeginFrame(vg, dc->fb_width, dc->fb_height, 1);
-
+    nvgScissor(vg, 0, 0, dc->fb_width, dc->fb_height);
     nvgResetTransform(vg);
-    nvgTransform(vg, obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
-                 obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2]);
+    nvgTranslate(vg, 0, - (float)dc->fb_height * (float)dc->section_count);
+    nvgTransformxyz(vg, \
+                    obj->matrix->m[0][0], obj->matrix->m[1][0], obj->matrix->m[0][1],
+                    obj->matrix->m[1][1], obj->matrix->m[0][2], obj->matrix->m[1][2],
+                    obj->matrix->m[2][0], obj->matrix->m[2][1], obj->matrix->m[2][2]);
 
     gui_colorwheel_draw(vg, x, y, w, h, t);
 

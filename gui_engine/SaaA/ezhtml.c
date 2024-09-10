@@ -3443,13 +3443,13 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         char **param = gui_malloc(sizeof(char *) * 2);
                         param[0] = gui_strdup(to);
                         param[1] = gui_strdup(id);
-                        if (!strcmp(type, "aniamtePause"))
+                        if (!strcmp(type, "animatePause"))
                         {
 
                             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), pause_animation_cb,
                                                              (param));
                         }
-                        else if (!strcmp(type, "aniamte"))
+                        else if (!strcmp(type, "animate"))
                         {
                             GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), start_animation_cb,
                                                              param);
@@ -3494,7 +3494,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), pause_animation_cb,
                                                               (param));
                         }
-                        else if (!strcmp(type, "aniamte"))
+                        else if (!strcmp(type, "animate"))
                         {
                             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), start_animation_cb,
                                                               param);
@@ -3531,7 +3531,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     if (type)
                     {
 
-                        if (!strcmp(type, "aniamte"))
+                        if (!strcmp(type, "animate"))
                         {
                             ezxml_t f = 0;
                             if (f1 != 0)
