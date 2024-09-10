@@ -863,7 +863,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         gui_text_t *t = 0;
                         if (style == 0)
                         {
-                            t = gui_text_create(parent, ptxt, x, y, gui_get_screen_width(), h);
+                            t = gui_text_create(parent, ptxt, x, y, w, h);
                             gui_color_t color_temporary;
                             color_temporary.color.argb_full = color;
                             gui_text_set(t, gui_strdup(text), GUI_FONT_SRC_BMP, color_temporary, strlen(text), 32);
@@ -1105,7 +1105,6 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                     {
                         void *imgbuf = gui_get_file_address(file);
                         parent = (void *)xml_gui_img_create_from_mem(parent, ptxt, imgbuf, x, y);
-                        gui_img_set_mode((gui_img_t *)parent, IMG_SRC_OVER_MODE);
                         if (scalex != 1 || scaley != 1)
                         {
                             gui_img_scale((void *)parent, scalex, scaley);

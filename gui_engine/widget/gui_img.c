@@ -110,6 +110,48 @@ static void gui_img_update_att(gui_obj_t *o)
     animate_frame_update(this->animate, o);
 }
 
+static void gui_img_input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_img_t *this = (gui_img_t *)obj;
+    GUI_UNUSED(tp);
+    GUI_UNUSED(this);
+
+    matrix_translate(this->t_x, this->t_y, obj->matrix);
+    matrix_rotate(this->degrees, obj->matrix);
+    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
+    matrix_translate(-this->c_x, -this->c_y, obj->matrix);
+
+    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
+        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
+    {
+        return;
+    }
+
+    if (this->tp_block)
+    {
+
+        if (tp->pressed)
+        {
+            gui_obj_skip_other_parent_pressed(obj);
+        }
+
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
+            {
+                gui_obj_skip_other_parent_short(obj);
+            }
+            break;
+        case TOUCH_LONG:
+            {
+                gui_obj_skip_other_parent_long(obj);
+            }
+            break;
+        }
+    }
+}
+
 static void gui_img_prepare(gui_obj_t *obj)
 {
     uint8_t last;
@@ -428,6 +470,11 @@ static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_img_input_prepare(obj);
+            }
+            break;
         case OBJ_PREPARE:
             {
                 gui_img_prepare(obj);
@@ -475,6 +522,7 @@ static void gui_img_ctor(gui_img_t            *this,
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
     obj->obj_cb = gui_img_cb;
+    obj->has_input_prepare_cb = true;
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
@@ -844,6 +892,11 @@ void gui_img_set_attribute(gui_img_t  *this,
 void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
 {
     this->opacity_value = opacity_value;
+}
+
+void gui_img_set_tp_block(gui_img_t *this, bool block)
+{
+    this->tp_block = block;
 }
 
 void gui_img_rotation(gui_img_t *this,

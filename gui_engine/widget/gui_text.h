@@ -89,6 +89,13 @@ typedef enum
     FONT_SRC_FTL     = 2,
 } FONT_SRC_MODE;
 
+typedef enum
+{
+    TXT_EVENT_CLICK         = GUI_EVENT_1,
+    TXT_EVENT_PSWD_DONE     = GUI_EVENT_2,
+
+} T_GUI_TEXT_EVENT;
+
 /** @brief  text widget structure */
 typedef struct gui_text
 {
@@ -104,7 +111,8 @@ typedef struct gui_text
     FONT_SRC_TYPE font_type;
     FONT_SRC_MODE font_mode;
     uint8_t font_height;
-    uint8_t inputable;    // support user input or not
+    uint8_t inputable : 1;    // support user input or not
+    uint8_t ispasswd  : 1;    // is a passwd text, to inform kb
     uint8_t checksum;
     bool layout_refresh;
     bool content_refresh;
@@ -186,6 +194,15 @@ typedef struct gui_text_line
  * @param parameter cb parameter
  */
 void gui_text_click(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter);
+
+/**
+ * @brief set textbox password done event cb, to handle password.
+ *
+ * @param this_widget      text widget
+ * @param event_cb  cb function
+ * @param parameter cb parameter
+ */
+void gui_text_pswd_done(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter);
 
 /**
 * @brief set the string in a text box widget.

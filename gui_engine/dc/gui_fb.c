@@ -129,9 +129,14 @@ static bool obj_is_active(gui_obj_t *obj)
 static void obj_input_prepare(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
+
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->not_show)
+        {
+            continue;
+        }
         if (obj->has_input_prepare_cb)
         {
             if ((obj->matrix != NULL) && (obj->parent->matrix))
@@ -139,8 +144,8 @@ static void obj_input_prepare(gui_obj_t *obj)
                 memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
                 matrix_translate(obj->x, obj->y, obj->matrix);
             }
-
             obj->obj_cb(obj, OBJ_INPUT_PREPARE);
+
             if (obj_is_active(obj) == false)
             {
                 continue;
@@ -179,6 +184,7 @@ static void obj_draw_prepare(gui_obj_t *object)
 
         if (obj->has_prepare_cb)
         {
+            // gui_log("obj_draw_prepare act %d %s\n", obj->active, obj->name);
             if (!obj->gesture)
             {
                 obj->obj_cb(obj, OBJ_PREPARE);
@@ -217,6 +223,7 @@ static void obj_draw_prepare(gui_obj_t *object)
 
 static void obj_draw_scan(gui_obj_t *obj)
 {
+
     gui_list_t *node = NULL;
     struct gui_dispdev *dc = gui_get_dc();
     gui_list_for_each(node, &obj->child_list)
@@ -226,7 +233,6 @@ static void obj_draw_scan(gui_obj_t *obj)
         {
             if (obj->has_draw_cb)
             {
-
                 if (dc->pfb_type == PFB_Y_DIRECTION)
                 {
                     dc->section.x1 = 0;

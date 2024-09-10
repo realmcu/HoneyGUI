@@ -348,6 +348,28 @@ static void gui_text_update_att(gui_obj_t *obj)
     }
 }
 
+static void gui_text_input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_text_t *this = (gui_text_t *)obj;
+    GUI_UNUSED(tp);
+    GUI_UNUSED(this);
+
+    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
+        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
+    {
+        return;
+    }
+
+    switch (tp->type)
+    {
+    case TOUCH_SHORT:
+        {
+            gui_obj_skip_other_short(obj);
+        }
+        break;
+    }
+}
 static void gui_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
@@ -396,9 +418,14 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
     case TOUCH_SHORT:
         {
+            if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) ||
+                (obj->skip_tp_short))
+            {
+                break;
+            }
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                gui_obj_event_set(obj, (gui_event_t)TXT_EVENT_CLICK);
             }
         }
         break;
@@ -493,6 +520,9 @@ static void gui_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_text_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_text_prepare(obj);
             break;
@@ -530,6 +560,7 @@ void gui_text_ctor(gui_text_t *this,
 
     root->type = TEXTBOX;
     root->obj_cb = gui_text_cb;
+    root->has_input_prepare_cb = true;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
@@ -548,7 +579,11 @@ void gui_text_ctor(gui_text_t *this,
 
 void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_CLICKED, parameter);
+    gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_CLICK, parameter);
+}
+void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_PSWD_DONE, parameter);
 }
 
 void gui_text_set(gui_text_t   *this,

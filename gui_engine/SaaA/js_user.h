@@ -33,6 +33,7 @@
 #include "gui_keyboard.h"
 #include "guidef.h"
 #include "gui_page.h"
+#include "gui_server.h"
 
 #ifdef RTL87x2G
 #include "wdt.h"
@@ -55,10 +56,12 @@ typedef struct cb_arg
     jerry_size_t args_count;
 } cb_arg_t;
 
-void js_gui_init();
-void js_gpio_init();
-void wifi_init();
-void js_key_init();
+
+void js_gpio_init(void);
+void js_matter_init(void);
+void js_mesh_init(void);
+void js_wifi_init(void);
+void js_key_init(void);
 void js_smarthome_init(void);
 void js_matter_init();
 void js_mesh_init();

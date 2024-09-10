@@ -45,7 +45,7 @@ DECLARE_HANDLER(Mesh)
 }
 
 
-void js_mesh_init()
+void js_mesh_init(void)
 {
     jerry_value_t global_obj = jerry_get_global_object();
     REGISTER_METHOD(global_obj, Mesh);

@@ -203,25 +203,99 @@ DECLARE_HANDLER(icon_write)
     {
         return jerry_create_undefined();
     }
-    gui_button_t *txtbox = NULL;
-    jerry_get_object_native_pointer(this_value, (void *) &txtbox, NULL);
-    if (txtbox)
+    gui_button_t *btn = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &btn, NULL);
+    if (btn)
     {
-        char *strbuf1 = js_value_to_string(args[0]);
-        gui_text_set(txtbox->text, strbuf1, GUI_FONT_SRC_TTF, txtbox->text->color, strlen(strbuf1),
-                     txtbox->text->font_height);
-        //jerry_release_value(s);
-        jerry_value_t global_obj = jerry_get_global_object();
-        jerry_value_t app_property = js_get_property(global_obj, "app");
-        gui_app_t *app = NULL;
-        jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
-        jerry_release_value(global_obj);
-        jerry_release_value(app_property);
+        // char *strbuf1 = js_value_to_string(args[0]);
+        // gui_text_set(btn->text, strbuf1, GUI_FONT_SRC_TTF, btn->text->color, strlen(strbuf1),
+        //              btn->text->font_height);
+        // //jerry_release_value(s);
+        // jerry_value_t global_obj = jerry_get_global_object();
+        // jerry_value_t app_property = js_get_property(global_obj, "app");
+        // gui_app_t *app = NULL;
+        // jerry_get_object_native_pointer(app_property, (void *)&app, NULL);
+        // jerry_release_value(global_obj);
+        // jerry_release_value(app_property);
         //gui_exec(app->screen);
+
+        jerry_value_t s = jerry_value_to_string(args[0]);////gui_log("jerryenter1\n");
+        jerry_length_t char_length = jerry_get_utf8_string_length(s); ////gui_log("jerryenter2\n");
+        jerry_size_t byte_size = jerry_get_utf8_string_size(s);
+        jerry_char_t *strbuf1 = gui_malloc(byte_size + 1); ////gui_log("jerryenter3\n");
+        jerry_string_to_utf8_char_buffer(s, strbuf1, byte_size + 1); ////gui_log("jerryenter4\n");
+        strbuf1[byte_size] = '\0';
+        gui_free(btn->text->content);
+        gui_text_content_set(btn->text, (void *)strbuf1, byte_size);
+        jerry_release_value(s);
+    }
+    return jerry_create_undefined();
+}
+DECLARE_HANDLER(icon_txtPos)
+{
+    if (args_cnt != 1 || !jerry_value_is_object(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_button_t *btn = NULL;
+    jerry_get_object_native_pointer(this_value, (void *) &btn, NULL);
+    if (btn)
+    {
+        int x = jerry_get_number_value(js_get_property(args[0], "x"));
+        int y = jerry_get_number_value(js_get_property(args[0], "y"));
+        // gui_log("setPosition %d %d\n", x, y);
+        gui_button_text_move(btn, x, y);
     }
     return jerry_create_undefined();
 }
 
+DECLARE_HANDLER(icon_setEnable)
+{
+    if (args_cnt == 1 || jerry_value_is_number(args[0]))
+    {
+        gui_button_t *btn = NULL;
+        jerry_get_object_native_pointer(this_value, (void *) &btn, NULL);
+        if (btn)
+        {
+            bool enable = (bool)jerry_get_number_value(args[0]);
+
+            gui_button_set_enable(btn, enable);
+        }
+    }
+    return jerry_create_undefined();
+}
+
+DECLARE_HANDLER(icon_setImg)
+{
+#if 0
+    if (args_cnt != 2 || !jerry_value_is_string(args[0]))
+    {
+        return jerry_create_undefined();
+    }
+    gui_img_t *img = NULL;
+    jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
+    ////gui_log("jerry_get_object_native_pointer = %s",img->base.name);
+    if (img)
+    {
+        jerry_value_t s = jerry_value_to_string(args[0]);
+        jerry_length_t length = jerry_get_utf8_string_length(s);
+
+        jerry_char_t *path_buf = gui_malloc(length + 1);
+        jerry_string_to_utf8_char_buffer(s, path_buf, length + 1);
+        path_buf[length] = '\0';
+        void *img_addr = gui_get_file_address((const char *)path_buf);
+        gui_free(path_buf);
+
+        if (img_addr)
+        {
+            gui_img_set_attribute(img, img->base.name, img_addr, img->base.x, img->base.y);
+        }
+        jerry_release_value(s);
+        gui_fb_change();
+    }
+#endif
+    return jerry_create_undefined();
+}
 DECLARE_HANDLER(reload)
 {
     gui_app_t *app = NULL;
@@ -357,14 +431,13 @@ DECLARE_HANDLER(setShow)
     {
         bool show = (bool)jerry_get_number_value(args[0]);
         gui_obj_show(obj, show);
+        gui_fb_change();
     }
     return jerry_create_undefined();
 }
-DECLARE_HANDLER(setAttribute)
+DECLARE_HANDLER(setImg)
 {
-    if (args_cnt != 4 || !jerry_value_is_string(args[0]) || !jerry_value_is_string(args[1]) ||
-        !jerry_value_is_number(args[2]) ||
-        !jerry_value_is_number(args[3]))
+    if (args_cnt != 1 || !jerry_value_is_string(args[0]))
     {
         return jerry_create_undefined();
     }
@@ -375,12 +448,7 @@ DECLARE_HANDLER(setAttribute)
     {
         jerry_value_t s = jerry_value_to_string(args[0]);
         jerry_length_t length = jerry_get_utf8_string_length(s);
-        jerry_char_t *name_buf = gui_malloc(length + 1);
-        jerry_string_to_utf8_char_buffer(s, name_buf, length + 1);
-        name_buf[length] = '\0';
 
-        s = jerry_value_to_string(args[1]);
-        length = jerry_get_utf8_string_length(s);
         jerry_char_t *path_buf = gui_malloc(length + 1);
         jerry_string_to_utf8_char_buffer(s, path_buf, length + 1);
         path_buf[length] = '\0';
@@ -389,10 +457,10 @@ DECLARE_HANDLER(setAttribute)
 
         if (img_addr)
         {
-            gui_img_set_attribute(img, (void *)name_buf, img_addr, jerry_get_number_value(args[2]),
-                                  jerry_get_number_value(args[3]));
+            gui_img_set_attribute(img, img->base.name, img_addr, img->base.x, img->base.y);
         }
         jerry_release_value(s);
+        gui_fb_change();
     }
     return jerry_create_undefined();
 }
@@ -526,7 +594,36 @@ DECLARE_HANDLER(onClick_text)
 
     return jerry_create_undefined();
 }
+// get passwd from kb
+DECLARE_HANDLER(setPasswd)
+{
+    if (args_cnt >= 1 && jerry_value_is_function(args[0]))
+    {
+        gui_text_t *txt = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&txt, NULL);
 
+        if (txt)
+        {
+            txt->ispasswd = true;
+            cb_arg_t *cb_arg = gui_malloc(sizeof(cb_arg_t));
+            memset(cb_arg, 0, sizeof(cb_arg_t));
+            cb_arg->args_count = args_cnt - 1;
+            if (cb_arg->args_count)
+            {
+                cb_arg->args_p = gui_malloc(sizeof(jerry_value_t) * cb_arg->args_count);
+            }
+            for (size_t i = 0; i < cb_arg->args_count; i++)
+            {
+                cb_arg->args_p[i] = args[i + 1];
+            }
+
+            cb_arg->func = args[0];
+            gui_text_pswd_done((void *)txt, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
+        }
+    }
+
+    return jerry_create_undefined();
+}
 
 
 DECLARE_HANDLER(onRelease_win)
@@ -1179,7 +1276,20 @@ DECLARE_HANDLER(setAnimate_img)
 
     return jerry_create_undefined();
 }
+DECLARE_HANDLER(setBlock)
+{
+    if (args_cnt == 1 && jerry_value_is_number(args[0]))
+    {
+        gui_img_t *img = NULL;
+        jerry_get_object_native_pointer(this_value, (void *)&img, NULL);
 
+        if (img)
+        {
+            bool block = (bool)jerry_get_number_value(args[0]);
+            gui_img_set_tp_block(img, block);
+        }
+    }
+}
 DECLARE_HANDLER(win_getAttribute)
 {
     //gui_log("enter onPress\n");
@@ -1607,11 +1717,12 @@ void js_gui_init()
     REGISTER_METHOD(img, rotation);
     REGISTER_METHOD(img, scale);
     REGISTER_METHOD(img, setMode);
-    REGISTER_METHOD(img, setAttribute);
+    REGISTER_METHOD(img, setImg);
     REGISTER_METHOD(img, setShow);
     REGISTER_METHOD_NAME(img,  "setAnimate", setAnimate_img);
     REGISTER_METHOD_NAME(img,  "playAnimate", play_animate_img);
     REGISTER_METHOD_NAME(img,  "pauseAnimate", pause_animate_img);
+    REGISTER_METHOD_NAME(img,  "setBlock", setBlock);
 
 
     jerry_value_t tab = jerry_create_object();
@@ -1631,6 +1742,11 @@ void js_gui_init()
     REGISTER_METHOD(icon, getChildElementByTag);
     REGISTER_METHOD(icon, setShow);
     REGISTER_METHOD_NAME(icon, "write", icon_write);
+    REGISTER_METHOD_NAME(icon, "setTxtPos", icon_txtPos);
+    REGISTER_METHOD_NAME(icon, "setEnable", icon_setEnable);
+    REGISTER_METHOD_NAME(icon, "setImg", icon_setImg);
+
+
     jerry_value_t progress = jerry_create_object();
     js_set_property(global_obj, "progressbar", progress);
     REGISTER_METHOD(progress, progress);
@@ -1640,6 +1756,7 @@ void js_gui_init()
     js_set_property(global_obj, "seekbar", seekbar);
     REGISTER_METHOD(seekbar, progress);
     REGISTER_METHOD(seekbar, getElementById);
+    REGISTER_METHOD(seekbar, setShow);
     REGISTER_METHOD_NAME(seekbar, "onRelease", onrelease_seekbar);
     REGISTER_METHOD_NAME(seekbar, "onPress", onpress_seekbar);
     REGISTER_METHOD_NAME(seekbar, "onPressing", onpressing_seekbar);
@@ -1661,6 +1778,7 @@ void js_gui_init()
     REGISTER_METHOD_NAME(document, "pauseAnimate", pause_animate_text);
     REGISTER_METHOD_NAME(document, "setInputable", setInputable);
     REGISTER_METHOD_NAME(document, "onClick", onClick_text);
+    REGISTER_METHOD_NAME(document, "setPasswd", setPasswd);
 
 
     jerry_value_t app = jerry_create_object();

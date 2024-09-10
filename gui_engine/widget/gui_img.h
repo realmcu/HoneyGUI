@@ -83,6 +83,7 @@ typedef struct gui_img
     uint32_t release_flag  : 1;
     uint32_t scope         : 1;
     uint32_t scope_flag    : 1;
+    uint32_t tp_block      : 1;
     uint8_t checksum;
 } gui_img_t;
 
@@ -247,6 +248,14 @@ void gui_img_skew_y(gui_img_t *_this, float degrees);
  * @param opacity_value The opacity value ranges from 0 to 255, default 255.
  */
 void gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value);
+
+/**
+ * @brief set image as tp blocker, tp will not be recived by widget under image.
+ *
+ * @param _this the image widget pointer.
+ * @param block block or not.
+ */
+void gui_img_set_tp_block(gui_img_t *_this, bool block);
 
 /**
  * @brief creat an image widget from memory address

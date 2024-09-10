@@ -144,6 +144,9 @@ static void gui_win_update_att(gui_obj_t *obj)
         }
     }
 }
+static void gui_win_input_prepare(gui_obj_t *obj)
+{
+}
 
 static void prepare(gui_obj_t *obj)
 {
@@ -279,6 +282,9 @@ static void gui_win_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_win_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_win_prepare(obj);
             break;
@@ -303,6 +309,7 @@ void gui_win_ctor(gui_win_t  *this,
 {
     gui_obj_ctor(&this->base, parent, name, x, y, w, h);
     GET_BASE(this)->obj_cb = gui_win_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_destroy_cb = true;
     GET_BASE(this)->type = WINDOW;

@@ -62,6 +62,7 @@
 #define KB_BUFF_INPUT_MAXLEN 128  //!<
 #define KB_BUFF_DISPLAY_MAXLEN 128 //!<
 #define KB_BUFF_KEY_MAXLEN 128
+#define KB_PSWD_KEY_MAXLEN 128
 /** End of WIDGET_Exported_Macros
   * @}
   */
@@ -76,6 +77,7 @@ static gui_kb_t *global_kb;
 static char buff_display[KB_BUFF_DISPLAY_MAXLEN];
 static char buff_txt_display[KB_BUFF_DISPLAY_MAXLEN + 4];
 static char buff_key[KB_BUFF_KEY_MAXLEN];
+static char buff_pswd[KB_PSWD_KEY_MAXLEN];
 
 static uint16_t len_display = 0;
 static uint16_t len_key = 0;
@@ -325,6 +327,8 @@ static void gui_kb_cursor_del()
         }
     }
 }
+static void gui_kb_input_prepare(gui_obj_t *obj)
+{}
 static void gui_kb_prepare(gui_obj_t *obj)
 {}
 static void gui_kb_draw_cb(gui_obj_t *obj)
@@ -754,9 +758,24 @@ static void gui_basic_func_proc(uint32_t key_val)
             uint8_t *str = gui_malloc(size + 1);
             if (str)
             {
-                memcpy(str, buff_display, size);
-                str[size] = '\0';
-                gui_text_content_set(txt, (void *)str, size);
+                if (this->ispasswd)
+                {
+                    uint16_t len = (size < (KB_PSWD_KEY_MAXLEN - 1)) ? size : (KB_PSWD_KEY_MAXLEN - 1);
+                    this->ispasswd = false;
+                    memcpy(buff_pswd, buff_display, len);
+                    memset(str, '*', len);
+                    buff_pswd[len] = '\0';
+                    str[len] = '\0';
+                    gui_text_content_set(txt, (void *)str, len);
+
+                    gui_obj_event_set((gui_obj_t *)txt, (gui_event_t)TXT_EVENT_PSWD_DONE);
+                }
+                else
+                {
+                    memcpy(str, buff_display, size);
+                    str[size] = '\0';
+                    gui_text_content_set(txt, (void *)str, size);
+                }
             }
             gui_obj_show(this, false);
 
@@ -1357,7 +1376,7 @@ static void gui_kb_layout_basic_letter(gui_kb_t  *this)
         gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
 
-        btn = gui_button_create(this->win_letter, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
+        btn = gui_button_create(this->win_letter, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_l",
                                 BUTTON_BG_ICON, 0);
         gui_img_scale(btn->img, scale, scale);
         gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
@@ -1404,7 +1423,7 @@ static void gui_kb_layout_basic_func(gui_kb_t  *this)
 
         if (key_is_sw(key_val) == false)
         {
-            btn = gui_button_create(this->win_func, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "",
+            btn = gui_button_create(this->win_func, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_f",
                                     BUTTON_BG_ICON, 0);
             gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
@@ -1457,7 +1476,7 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
             gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
-            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, " ",
+            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_n",
                                     BUTTON_BG_ICON, 0);
             gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
@@ -1488,7 +1507,7 @@ static void gui_kb_layout_basic_number(gui_kb_t  *this)
             obj_h = ((gui_rgb_data_head_t *)img_default)->h;
             gui_kb_set_obj_scale(&obj_x, &obj_y, &obj_w, &obj_h);
 
-            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, " ",
+            btn = gui_button_create(this->win_num, obj_x, obj_y, obj_w, obj_h, img_default, img_clk, "kb_s",
                                     BUTTON_BG_ICON, 0);
             gui_img_scale(btn->img, scale, scale);
             gui_button_click(btn, (gui_event_cb_t)gui_kb_input_proc, (void *)key_val);
@@ -1642,6 +1661,7 @@ static void gui_kb_ctor(gui_kb_t                        *this,
 
     root->type = KEYBOARD;
     root->obj_cb = gui_kb_cb;
+    root->has_input_prepare_cb = true;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
@@ -1671,7 +1691,8 @@ static void gui_kb_ctor(gui_kb_t                        *this,
                                            img_data,
                                            0, 0, w, h);
     gui_img_set_mode(this->img_bg, IMG_BYPASS_MODE);
-    gui_img_scale(this->img_bg, this->scale, gui_get_screen_height() / 360.f);
+    gui_img_scale(this->img_bg, this->scale, gui_get_screen_height() / 320.f);
+    gui_img_set_tp_block(this->img_bg, true);
 
     //
     if (this->layout == KB_LAYOUT_BASIC)
@@ -1723,17 +1744,41 @@ void gui_keyboard_set_mode(gui_kb_t *this, uint8_t mode)
     }
 }
 
+char *gui_kb_get_pswd(void)
+{
+    return buff_pswd;
+}
+void gui_kb_set_pswd(char *pswd, uint8_t pswd_len)
+{
+    if (pswd)
+    {
+        uint8_t len = (pswd_len < (KB_PSWD_KEY_MAXLEN - 1)) ? pswd_len : (KB_PSWD_KEY_MAXLEN - 1);
+        memset(buff_pswd, 0, KB_PSWD_KEY_MAXLEN);
+        memcpy(buff_pswd, pswd, len);
+    }
+}
+
 void gui_keyboard_launch(gui_obj_t *obj)
 {
     gui_kb_t *this = global_kb;
     if (this && ((gui_text_t *)obj)->inputable)
     {
         this->txt_input = (gui_text_t *)obj;
+        this->ispasswd = this->txt_input->ispasswd;
 
         memset(buff_display, 0, KB_BUFF_DISPLAY_MAXLEN);
         len_display = 0;
-        memcpy(buff_display, this->txt_input->content, this->txt_input->len);
-        len_display = this->txt_input->len;
+        if (this->ispasswd)
+        {
+            len_display = strlen(buff_pswd);
+            memcpy(buff_display, buff_pswd, len_display);
+        }
+        else
+        {
+            len_display = this->txt_input->len;
+            memcpy(buff_display, this->txt_input->content, len_display);
+        }
+
         gui_kb_cursor_set_tail();
         gui_kb_update_display();
 
@@ -1743,10 +1788,8 @@ void gui_keyboard_launch(gui_obj_t *obj)
                              gui_kb_cursor_animate,
                              gui_kb_get_cursor());
 
-
         gui_keyboard_set_mode(this, KB_MODE_BASIC_ENG_LOWWER);
         gui_obj_show(this, true);
-
     }
     else
     {

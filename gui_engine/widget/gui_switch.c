@@ -262,7 +262,13 @@ static void gui_switch_input_prepare(gui_obj_t *obj)
     {
         return;
     }
-    gui_obj_skip_other_short(obj);
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
+    {
+        if (tp->type == TOUCH_SHORT)
+        {
+            gui_obj_skip_other_short(obj);
+        }
+    }
 
 }
 static void gui_switch_prepare(gui_obj_t *obj)

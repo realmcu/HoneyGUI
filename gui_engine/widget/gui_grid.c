@@ -138,7 +138,9 @@ static void gui_grid_deal_img_in_root(gui_obj_t *object, float x, float y)
         gui_grid_deal_img_in_root(obj, x, y);
     }
 }
-
+static void gui_grid_input_prepare(gui_obj_t *obj)
+{
+}
 static void gui_grid_prepare(gui_obj_t *obj)
 {
     gui_grid_t *this = (void *)obj;
@@ -163,6 +165,9 @@ static void gui_grid_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_grid_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_grid_prepare(obj);
             break;
@@ -186,6 +191,7 @@ static void gui_grid_ctor(gui_grid_t *this,
 
     //GET_BASE(this)->obj_update_att = obj_update_att;
     GET_BASE(this)->obj_cb = gui_grid_cb;
+    GET_BASE(this)->has_input_prepare_cb = true;
     GET_BASE(this)->has_prepare_cb = true;
     this->row = row;
     this->col = col;

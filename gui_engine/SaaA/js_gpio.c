@@ -90,7 +90,7 @@ DECLARE_HANDLER(writeSync)
             */
 #ifdef ENABLE_MATTER_SWITCH
 #ifdef RTL87x2G
-            // wr_mode: 0 (signal),  1 (group), 2 (subscribe), 3 (shutdown subscribe), 4 (gui ready)
+            // wr_mode: 0 (singal),  1 (group), 2 (subscribe), 3 (shutdown subscribe), 4 (gui ready)
             if (gpio >= 0)
             {
                 extern bool matter_send_msg_to_app(uint16_t sub_type, uint32_t param);

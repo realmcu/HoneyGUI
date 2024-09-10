@@ -1,5 +1,7 @@
 
 #include "js_user.h"
+#include "jcontext.h"
+
 extern int js_console_init(void);
 extern void jerry_port_set_default_context(jerry_context_t *context);
 extern void *gui_malloc(size_t n);
@@ -103,13 +105,11 @@ void js_run_file(const char *file, gui_app_t  *app)
         script_free(script);
     }
 }
-
 void js_init(void)
 {
     /* JERRY_ENABLE_EXTERNAL_CONTEXT */
     jerry_port_set_default_context(jerry_create_context(PKG_JMEM_HEAP_SIZE * 1024, context_alloc,
                                                         NULL));
-
     /* Initialize engine */
     jerry_init(JERRY_INIT_EMPTY);
 
@@ -120,7 +120,7 @@ void js_init(void)
     js_gui_init();
     js_gpio_init();
     //js_fs_init();
-    wifi_init();
+    js_wifi_init();
     js_key_init();
     js_smarthome_init();
     js_matter_init();

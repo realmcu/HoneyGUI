@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<GUIProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ToolsVersion="1.0.6.0" CopyRight="Realtek" PartNumber="4">
+  <IsNoXmlMode>false</IsNoXmlMode>
+  <ResourceGroup>
+    <FontSetting>font.rtkres</FontSetting>
+    <ImageSetting>image.rtkres</ImageSetting>
+  </ResourceGroup>
+  <UIGroup>
+    <UIItem>wifi.rtkui</UIItem>
+  </UIGroup>
+  <ExportSetting>
+    <UIItem>0x4600000</UIItem>
+  </ExportSetting>
+</GUIProject>

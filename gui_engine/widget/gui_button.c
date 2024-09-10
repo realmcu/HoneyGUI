@@ -86,7 +86,40 @@ static void gui_button_update_att(gui_obj_t *obj)
     gui_button_t *this = (void *)obj;
     animate_frame_update(this->animate, GUI_BASE(this));
 }
+static void gui_button_input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_button_t *this = (gui_button_t *)obj;
+    GUI_UNUSED(tp);
+    GUI_UNUSED(this);
 
+    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
+        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
+    {
+        return;
+    }
+
+    if (tp->pressed)
+    {
+        gui_obj_skip_other_pressed(obj);
+    }
+
+    switch (tp->type)
+    {
+    case TOUCH_SHORT:
+        {
+            gui_obj_skip_other_short(obj);
+        }
+        break;
+    case TOUCH_LONG:
+        {
+            gui_obj_skip_other_long(obj);
+        }
+        break;
+    }
+
+
+}
 static void gui_button_prepare(gui_obj_t *obj)
 {
     touch_info_t *tp = tp_get_info();
@@ -104,36 +137,49 @@ static void gui_button_prepare(gui_obj_t *obj)
         return;
     }
 
-    switch (tp->type)
-    {
-    case TOUCH_SHORT:
+    if (TOUCH_INVALIDE != tp->type)
+        switch (tp->type)
         {
-            if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+        case TOUCH_SHORT:
             {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
-            }
-        }
-        break;
-
-    case TOUCH_LONG:
-        {
-            if (this->long_flag == false)
-            {
+                if (obj->skip_tp_short || !this->enable)
+                {
+                    break;
+                }
                 if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                 {
-                    this->long_flag = true;
-                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                    gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
                 }
             }
-        }
-        break;
+            break;
 
-    default:
-        break;
-    }
+        case TOUCH_LONG:
+            {
+                if (obj->skip_tp_long || !this->enable)
+                {
+                    break;
+                }
+                if (this->long_flag == false)
+                {
+                    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                    {
+                        this->long_flag = true;
+                        gui_obj_event_set(obj, GUI_EVENT_TOUCH_LONG);
+                    }
+                }
+            }
+            break;
+
+        default:
+            break;
+        }
 
     if (tp->pressed)
     {
+        if (obj->skip_tp_pressed || !this->enable)
+        {
+            return;
+        }
         if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
         {
             if (this->on_pic_addr && this->style == 0)
@@ -177,6 +223,9 @@ static void gui_button_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_button_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_button_prepare(obj);
             break;
@@ -207,10 +256,12 @@ static void gui_button_ctor(gui_button_t *this,
     root->type = BUTTON;
     root->obj_cb = gui_button_cb;
     root->has_prepare_cb = true;
+    root->has_input_prepare_cb = true;
 
     // for self
     this->off_pic_addr = background_pic;
     this->on_pic_addr = highlight_pic;
+    this->enable = true;
 }
 
 /*============================================================================*
@@ -297,6 +348,10 @@ void gui_button_set_img(gui_button_t *this,
     }
 }
 
+void gui_button_set_enable(gui_button_t *this, bool enable)
+{
+    this->enable = enable;
+}
 
 
 static gui_button_t *gui_button_create_core(void                 *parent,

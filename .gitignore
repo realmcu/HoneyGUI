@@ -78,7 +78,9 @@ doc/_build
 win32_sim/gui.bin
 
 # example
-gui_engine/example/screen_480_480/Visual Disigner Prj/480x480/Simulate/
-gui_engine/example/screen_480_480/Visual Disigner Prj/480x480/Export/
+gui_engine/example/screen_480_480/Visual_Disigner_Prj/480x480/Simulate/
+gui_engine/example/screen_480_480/Visual_Disigner_Prj/480x480/Export/root/
 gui_engine/example/screen_640_360/Simulate/
-gui_engine/example/screen_640_360/Export/
+gui_engine/example/screen_640_360/Export/root/
+gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Export/root/
+gui_engine/example/screen_480_480/Visual_Disigner_Prj/demo_wifi/Simulate/

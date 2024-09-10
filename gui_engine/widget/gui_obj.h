@@ -159,6 +159,8 @@ typedef struct _gui_obj_t
     uint32_t skip_tp_up_hold      : 1;
     uint32_t skip_tp_down_hold    : 1;
     uint32_t skip_tp_short        : 1;
+    uint32_t skip_tp_long         : 1;
+    uint32_t skip_tp_pressed      : 1;
     uint32_t create_done          : 1;
     uint32_t flag_3d              : 1;
     uint32_t gesture              : 1;
@@ -343,8 +345,10 @@ void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count);
   */
 void gui_obj_tree_show(gui_obj_t *obj, bool enable);
 
+
+
 /**
-  * @brief  object show or not
+  * @brief  set object show or not
   * @param  obj
   * @param  enable
   * @return void
@@ -493,6 +497,76 @@ void gui_obj_skip_all_child_short(gui_obj_t *obj);
  */
 void gui_obj_skip_other_short(gui_obj_t *obj);
 
+
+/**
+ * @brief enable all short click actions from parent object to the root object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_enable_this_parent_short(gui_obj_t *obj);
+
+/**
+ * @brief skip click actions of other objects of parent object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_other_parent_short(gui_obj_t *obj);
+
+/**
+ * @brief skip all long click actions of the child object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_all_child_long(gui_obj_t *obj);
+
+/**
+ * @brief skip all long click actions of the other object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_other_long(gui_obj_t *obj);
+
+/**
+ * @brief enable all long press actions from parent object to the root object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_enable_this_parent_short(gui_obj_t *obj);
+
+/**
+ * @brief skip long press actions of other objects of parent object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_other_parent_short(gui_obj_t *obj);
+
+/**
+ * @brief skip all pressed actions of the child object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_all_child_pressed(gui_obj_t *obj);
+
+/**
+ * @brief skip all pressed actions of the other object
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_other_pressed(gui_obj_t *obj);
+
+/**
+ * @brief skip long press actions of the other parent, only keep top layer widget serial parent
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_other_parent_long(gui_obj_t *obj);
+
+/**
+ * @brief skip pressed actions of the other parent, only keep top layer widget serial parent
+ *
+ * @param obj the root of the widget tree.
+ */
+void gui_obj_skip_other_parent_pressed(gui_obj_t *obj);
 /**
  * @brief get the area of this_widget obj
  *
