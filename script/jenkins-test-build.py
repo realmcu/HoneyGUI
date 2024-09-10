@@ -22,6 +22,7 @@ def get_file_single(pathname):
     return file_matches[0]
 
 menu_config_path = r'win32_sim/menu_config.h'
+
 def HoneyGUI_CMD_preBuild():
     with open(os.path.join(HONEYGUI_ROOT, menu_config_path), mode='r', newline='', errors='surrogateescape') as fd:
         stream = fd.read()
@@ -39,10 +40,40 @@ def HoneyGUI_CMD_afterBuild():
     subprocess.check_call(["git", "diff", menu_config_path], cwd=HONEYGUI_ROOT)
 
 
+def HoneyGUI_Monkey_Test_preBuild():
+    with open(os.path.join(HONEYGUI_ROOT, menu_config_path), mode='r', newline='', errors='surrogateescape') as fd:
+        stream = fd.read()
+    stream = re.sub(r'//\s*(#define CONFIG_REALTEK_BUILD_MONKEY_TEST)', lambda objs: objs.group(1), stream, count=1, flags=re.M)
+    with open(os.path.join(HONEYGUI_ROOT, menu_config_path), mode='w+', newline='', errors='surrogateescape') as fd:
+        fd.write(stream)
+    print(f"git diff {menu_config_path}")
+    subprocess.check_call(["git", "diff", menu_config_path], cwd=HONEYGUI_ROOT)
+
+
+def HoneyGUI_Monkey_Test_afterBuild():
+    subprocess.check_call(["git", "checkout", "--",menu_config_path], cwd=HONEYGUI_ROOT)
+    print(f"after checkout {menu_config_path}")
+    subprocess.check_call(["git", "diff", menu_config_path], cwd=HONEYGUI_ROOT)
+
+
+def HoneyGUI_Monkey_Test_CopyRoot(dst):
+    root_file = r'gui_engine\example\screen_454_454\root_image\root(0x4400000).bin'
+    root_dir = os.path.dirname(root_file)
+    dst = os.path.join(dst, root_dir)
+
+    os.makedirs(dst, exist_ok=True)
+    shutil.copy2(os.path.join(HONEYGUI_ROOT, root_file), dst)
+
+
 HoneyGUI_build_hook = {
     "HoneyGUI_CMD": {
         "PreBuild": HoneyGUI_CMD_preBuild,
         "AfterBuild": HoneyGUI_CMD_afterBuild
+    },
+    "HoneyGUI_Monkey_Test": {
+        "PreBuild": HoneyGUI_Monkey_Test_preBuild,
+        "AfterBuild": HoneyGUI_Monkey_Test_afterBuild,
+        "CopyRoot": HoneyGUI_Monkey_Test_CopyRoot
     }
 }
 
@@ -66,6 +97,13 @@ def build_honeyGUI(build_type, module_paratmeters):
         bin_relative_dir = f"{module_name}/bin"
         bin_dir = os.path.join(build_dict_dir, bin_relative_dir)
         os.makedirs(bin_dir, exist_ok=True)
+
+        if HoneyGUI_build_hook.get(module_name, {}).get("CopyRoot"):
+            HoneyGUI_build_hook.get(module_name, {}).get("CopyRoot")(bin_dir)
+
+        if module_name in ["HoneyGUI_Monkey_Test"]:
+            bin_dir = os.path.join(bin_dir, "win32_sim")
+            os.makedirs(bin_dir, exist_ok=True)
         shutil.copy2(gui_exe, bin_dir)
         shutil.copy2(gui_bin, bin_dir)
         shutil.copy2(os.path.join(HONEYGUI_ROOT, "win32_sim", "SDL2.dll"), bin_dir)
@@ -110,6 +148,7 @@ if __name__ == '__main__':
     parser.add_argument('--binDir', help='build output dir')
     parser.add_argument('--HoneyGUI_CMD', action = 'store_true', help = 'is need to test HoneyGUI_CMD')
     parser.add_argument('--HoneyGUI_Simulator', action = 'store_true', help='is need to test HoneyGUI_Simulator')
+    parser.add_argument('--HoneyGUI_Monkey_Test', action = 'store_true', help='is need to test HoneyGUI_Simulator')
 
 
     arg_dict = parser.parse_args()
@@ -121,7 +160,7 @@ if __name__ == '__main__':
     HONEYGUI_ROOT = os.environ['HONEYGUI_ROOT']
 
     module_input_parameters = {}
-    for m in ["HoneyGUI_CMD", "HoneyGUI_Simulator"]:
+    for m in ["HoneyGUI_CMD", "HoneyGUI_Simulator", "HoneyGUI_Monkey_Test"]:
         module_input_parameters[m] = getattr(arg_dict, m)
 
     build_dict_dir = os.path.join(os.environ.get("WORKSPACE"), arg_dict.binDir)

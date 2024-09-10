@@ -44,7 +44,10 @@ if __name__ == '__main__':
         sys.path.append(os.path.join(os.path.dirname(__file__), "test"))
         test_class_module_name = importlib.import_module(MODULE_APP_MAP[module]['test_class_module'])
         test_class_name = "".join(list(map(lambda x: x.capitalize(), MODULE_APP_MAP[module]['test_class_module'].split("_"))))
-        test_class = getattr(test_class_module_name, test_class_name)(sequence_index = sequence_index,
+        test_class = getattr(test_class_module_name, test_class_name)(
+                                                                    project = 'HoneyGUI',
+                                                                    branch = "release/v1.0",chip_type = "",
+                                                                    sequence_index = sequence_index,
                                                                     test_type = test_type, 
                                                                     module = module, is_dryrun = is_dryrun,
                                                                     triggered_by = triggered_by, triggered_date = triggered_date)

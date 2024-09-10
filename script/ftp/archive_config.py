@@ -5,6 +5,7 @@ ARCHIVE_MAP = {
                 (r"script/log", "sdk"),
                 (r"script/ftp", "sdk"),
                 (r"script/test", "sdk"),
+                (r"script/tool", "sdk"),
                 (r"script/report", "sdk"),
                 (r"script/base", "sdk"),
                 (r"script/SDKPlatformConfig", "sdk"),

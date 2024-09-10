@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import platform
 import glob
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from ftp.ftp_helper import *
@@ -65,4 +66,14 @@ def copy_log_to_ftp(work_dir, src_path, module_name):
 
     except Exception as e:
         print("Copy test log to ftp folder {} failed: {}".format(unpack_path, e))
+
+
+def get_pip_name(project, module):
+    pip_name = None
+    win_version = platform.platform()
+    print("This is {}".format(win_version), flush = True)
+    if 'Windows-7' in win_version:
+        pip_name = project + '_' + module + '_' + os.environ['BUILD_ID']
+    
+    return pip_name
 
