@@ -267,7 +267,6 @@ static void lv_draw_ppe_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_d
     }
 //    DBG_DIRECT("blend area %d->%d, %d->%d", blend_area.x1, blend_area.x2, blend_area.y1, blend_area.y2);
     /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
     bool has_mask = lv_draw_mask_is_any(&blend_area);
     bool done = false;
@@ -280,17 +279,6 @@ static void lv_draw_ppe_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_d
     else if (!has_mask && !has_recolor &&
              lv_area_get_size(&blend_area) >= LV_PPE_SIZE_LIMIT)
     {
-//        lv_color_t *dest_buf = draw_ctx->buf;
-//
-//        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
-//        //TODO: handle chroma key in if condition: !lv_img_cf_is_chroma_keyed(cf)
-//        lv_area_t src_area;
-//        src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
-//        src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
-//        src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
-//        src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
-//        lv_coord_t src_stride = lv_area_get_width(coords);
         done = (lv_ppe_blit_transform(draw_ctx, dsc, coords, map_p, cf) == LV_RES_OK);
     }
 
