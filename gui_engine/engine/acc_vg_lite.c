@@ -104,6 +104,147 @@ static BGRA_struct HSLA(float h, float s, float l, unsigned char a)
     return col;
 }
 
+void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
+{
+    if (image->opacity_value == 0)
+    {
+        return;
+    }
+
+    vg_lite_matrix_t matrix;
+
+    vg_lite_buffer_t target;
+    memset(&target, 0x00, sizeof(vg_lite_buffer_t));
+
+    vg_lite_blend_t blend_mode = VG_LITE_BLEND_NONE;
+    target.width  = dc->fb_width;
+    target.height = dc->fb_height;
+    if (dc->bit_depth == 16)
+    {
+        target.format = VG_LITE_BGR565;
+        target.stride = target.width * 2;
+    }
+    else
+    {
+        target.format = VG_LITE_BGRA8888;
+        target.stride = target.width * 4;
+    }
+    target.memory = (void *)dc->frame_buf;
+    target.address = (uint32_t)dc->frame_buf;
+    target.tiled = VG_LITE_LINEAR;
+
+    vg_lite_buffer_t source;
+    memset(&source, 0x00, sizeof(vg_lite_buffer_t));
+
+    struct gui_rgb_data_head *head = image->data;
+    uint8_t source_bytes_per_pixel = 0;
+    switch (head->type)
+    {
+    case RGB565:
+        source.format = VG_LITE_BGR565;
+        source_bytes_per_pixel = 2;
+        break;
+    case RGB888:
+        source.format = VG_LITE_BGR888;
+        source_bytes_per_pixel = 3;
+        break;
+    case ARGB8888:
+        source.format = VG_LITE_BGRA8888;
+        source_bytes_per_pixel = 4;
+        break;
+    default:
+        break;
+    }
+
+    uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
+    bool image_alien = true;
+    gpu_width = ((image->img_w + 15) >> 4) << 4;
+    uint32_t gpu_height = image->img_h;
+    source.stride = gpu_width * source_bytes_per_pixel;
+    uint8_t *source_buffer = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
+    uint8_t *tmp = source_buffer;
+    //source_buffer = tmp + 64 - (int)tmp % 64;
+    //gui_log("tmp, (int)tmp % 64:%x, tmp:%x\n",tmp, (int)tmp % 64);
+    if (gpu_width != image->img_w || (int)tmp % 64 != 0)
+    {
+        image_alien = false;
+    }
+    if (!image_alien)
+    {
+        tmp = gui_malloc(gpu_width * gpu_height * source_bytes_per_pixel + 63);
+        source_buffer = tmp + 64 - (int)tmp % 64;
+
+
+        GUI_ASSERT(source_buffer != NULL);
+
+
+        uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
+        for (uint32_t i = 0; i < gpu_height; i++)
+        {
+            memcpy(source_buffer + i * gpu_width * source_bytes_per_pixel,
+                   (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
+                   image->img_w * source_bytes_per_pixel);
+        }
+    }
+
+    source.width = gpu_width;
+    source.height = image->img_h;
+    source.memory = (void *)source_buffer;
+    source.address = (uint32_t)source_buffer;
+    source.tiled = VG_LITE_LINEAR;
+
+    uint32_t opa_input = image->opacity_value;
+    uint32_t opa = 0;
+    if (opa_input < 255)
+    {
+        source.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        opa = (opa_input << 24) | (opa_input << 16) | (opa_input << 8) | opa_input;
+    }
+    switch (image->blend_mode)
+    {
+    case IMG_BYPASS_MODE:
+        blend_mode = VG_LITE_BLEND_NONE;
+        vg_lite_identity(&matrix);
+        vg_lite_translate(rect->x1 * 1.0f, rect->y1 * 1.0f, &matrix);
+        break;
+    case IMG_FILTER_BLACK:
+        {
+//TODO: add this part in MP version
+//            vg_lite_color_key4_t color_key;
+//            color_key[0].alpha = 0x00;
+//            color_key[0].enable = 1;
+//            color_key[0].hign_r = 0x00;
+//            color_key[0].low_r = 0x00;
+//            color_key[0].hign_b = 0x00;
+//            color_key[0].low_b = 0x00;
+//            color_key[0].hign_g = 0x00;
+//            color_key[0].low_g = 0x00;
+//            vg_lite_set_color_key(color_key);
+//            source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+            blend_mode = VG_LITE_BLEND_SRC_OVER;
+            source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+            memcpy(&matrix, &image->matrix, sizeof(vg_lite_matrix_t));
+        }
+        break;
+    case IMG_SRC_OVER_MODE:
+        blend_mode = VG_LITE_BLEND_SRC_OVER;
+        source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+        memcpy(&matrix, &image->matrix, sizeof(vg_lite_matrix_t));
+    default:
+        break;
+    }
+    vg_lite_rectangle_t imgae_rect = {.x = 0, .y = 0, .width = image->img_w, .height = image->img_h};
+    vg_lite_error_t error_code = vg_lite_blit_rect(&target, &source, &imgae_rect, &matrix,
+                                                   blend_mode, opa, VG_LITE_FILTER_POINT);
+    GUI_ASSERT(error_code == VG_LITE_SUCCESS);
+    vg_lite_finish();
+    if (!image_alien)
+    {
+        gui_free(tmp);
+    }
+}
+
+#if 0
 void hw_draw_arc(canvas_arc_t *a, struct gui_dispdev *dc)
 {
     if (a->start_angle == a->end_angle)
@@ -465,6 +606,7 @@ void hw_draw_line(canvas_line_t *l, struct gui_dispdev *dc)
     vg_lite_clear_path(&line_path);
 }
 
+
 void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
 {
     vg_lite_buffer_t target;
@@ -728,145 +870,7 @@ void hw_draw_rectangle(canvas_rectangle_t *r, struct gui_dispdev *dc)
     gui_free(rect_data);
 }
 
-void hw_acc_blit(draw_img_t *image, struct gui_dispdev *dc, gui_rect_t *rect)
-{
-    if (image->opacity_value == 0)
-    {
-        return;
-    }
 
-    vg_lite_matrix_t matrix;
-
-    vg_lite_buffer_t target;
-    memset(&target, 0x00, sizeof(vg_lite_buffer_t));
-
-    vg_lite_blend_t blend_mode = VG_LITE_BLEND_NONE;
-    target.width  = dc->fb_width;
-    target.height = dc->fb_height;
-    if (dc->bit_depth == 16)
-    {
-        target.format = VG_LITE_BGR565;
-        target.stride = target.width * 2;
-    }
-    else
-    {
-        target.format = VG_LITE_BGRA8888;
-        target.stride = target.width * 4;
-    }
-    target.memory = (void *)dc->frame_buf;
-    target.address = (uint32_t)dc->frame_buf;
-    target.tiled = VG_LITE_LINEAR;
-
-    vg_lite_buffer_t source;
-    memset(&source, 0x00, sizeof(vg_lite_buffer_t));
-
-    struct gui_rgb_data_head *head = image->data;
-    uint8_t source_bytes_per_pixel = 0;
-    switch (head->type)
-    {
-    case RGB565:
-        source.format = VG_LITE_BGR565;
-        source_bytes_per_pixel = 2;
-        break;
-    case RGB888:
-        source.format = VG_LITE_BGR888;
-        source_bytes_per_pixel = 3;
-        break;
-    case ARGB8888:
-        source.format = VG_LITE_BGRA8888;
-        source_bytes_per_pixel = 4;
-        break;
-    default:
-        break;
-    }
-
-    uint32_t gpu_width = ((image->img_w + 15) >> 4) << 4;
-    bool image_alien = true;
-    gpu_width = ((image->img_w + 15) >> 4) << 4;
-    uint32_t gpu_height = image->img_h;
-    source.stride = gpu_width * source_bytes_per_pixel;
-    uint8_t *source_buffer = (uint8_t *)(sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data));
-    uint8_t *tmp = source_buffer;
-    //source_buffer = tmp + 64 - (int)tmp % 64;
-    //gui_log("tmp, (int)tmp % 64:%x, tmp:%x\n",tmp, (int)tmp % 64);
-    if (gpu_width != image->img_w || (int)tmp % 64 != 0)
-    {
-        image_alien = false;
-    }
-    if (!image_alien)
-    {
-        tmp = gui_malloc(gpu_width * gpu_height * source_bytes_per_pixel + 63);
-        source_buffer = tmp + 64 - (int)tmp % 64;
-
-
-        GUI_ASSERT(source_buffer != NULL);
-
-
-        uint32_t image_off = sizeof(struct gui_rgb_data_head) + (uint32_t)(image->data);
-        for (uint32_t i = 0; i < gpu_height; i++)
-        {
-            memcpy(source_buffer + i * gpu_width * source_bytes_per_pixel,
-                   (void *)(image_off + i * image->img_w * source_bytes_per_pixel),
-                   image->img_w * source_bytes_per_pixel);
-        }
-    }
-
-    source.width = gpu_width;
-    source.height = image->img_h;
-    source.memory = (void *)source_buffer;
-    source.address = (uint32_t)source_buffer;
-    source.tiled = VG_LITE_LINEAR;
-
-    uint32_t opa_input = image->opacity_value;
-    uint32_t opa = 0;
-    if (opa_input < 255)
-    {
-        source.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-        opa = (opa_input << 24) | (opa_input << 16) | (opa_input << 8) | opa_input;
-    }
-    switch (image->blend_mode)
-    {
-    case IMG_BYPASS_MODE:
-        blend_mode = VG_LITE_BLEND_NONE;
-        vg_lite_identity(&matrix);
-        vg_lite_translate(rect->x1 * 1.0f, rect->y1 * 1.0f, &matrix);
-        break;
-    case IMG_FILTER_BLACK:
-        {
-//TODO: add this part in MP version
-//            vg_lite_color_key4_t color_key;
-//            color_key[0].alpha = 0x00;
-//            color_key[0].enable = 1;
-//            color_key[0].hign_r = 0x00;
-//            color_key[0].low_r = 0x00;
-//            color_key[0].hign_b = 0x00;
-//            color_key[0].low_b = 0x00;
-//            color_key[0].hign_g = 0x00;
-//            color_key[0].low_g = 0x00;
-//            vg_lite_set_color_key(color_key);
-//            source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
-            blend_mode = VG_LITE_BLEND_SRC_OVER;
-            source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
-            memcpy(&matrix, image->matrix, sizeof(vg_lite_matrix_t));
-        }
-        break;
-    case IMG_SRC_OVER_MODE:
-        blend_mode = VG_LITE_BLEND_SRC_OVER;
-        source.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
-        memcpy(&matrix, image->matrix, sizeof(vg_lite_matrix_t));
-    default:
-        break;
-    }
-    vg_lite_rectangle_t imgae_rect = {.x = 0, .y = 0, .width = image->img_w, .height = image->img_h};
-    vg_lite_error_t error_code = vg_lite_blit_rect(&target, &source, &imgae_rect, &matrix,
-                                                   blend_mode, opa, VG_LITE_FILTER_POINT);
-    GUI_ASSERT(error_code == VG_LITE_SUCCESS);
-    vg_lite_finish();
-    if (!image_alien)
-    {
-        gui_free(tmp);
-    }
-}
 
 #include "nanosvg.h"
 extern void list_memheap(void);
@@ -1648,3 +1652,4 @@ void hw_acc_draw_palette_wheel(canvas_palette_wheel_t *pw, struct gui_dispdev *d
     vg_lite_clear_path(&circle_big_path);
     vg_lite_clear_path(&circle_small_path);
 }
+#endif
