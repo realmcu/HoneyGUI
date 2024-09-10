@@ -118,6 +118,7 @@ typedef enum t_obj_type
     TYPE_SCROLL_WHEEL_NEW    = 0x0034,
     MACRO_ONON               = 0x0035,
     MACRO_ONOFF              = 0x0036,
+    MACRO_ONLOAD,
 } T_OBJ_TYPE;
 typedef enum
 {

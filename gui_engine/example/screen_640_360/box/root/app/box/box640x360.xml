@@ -1,12 +1,54 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<app>box640x360
-<script
-    file="app/box/box640x360.js"></script><screen
+<app iconPicture = "app/box/resource/lamp/circle.bin">box640x360
+    <script
+    file="app/box/box640x360.js">
+    </script>
+    <!-- Rotate fast from: degree, x center, y center-->
+    <animateTransform
+            type="rotate"
+            from="0 72 79"
+            to="360 72 79"
+            dur="1s"
+            repeatCount="indefinite">animateRotate1
+    </animateTransform>
+    <!-- Rotate slow from: degree, x center, y center-->
+    <animateTransform
+        type="rotate"
+        from="-45 72 79"
+        to="45 72 79"
+        dur="10s"
+        repeatCount="indefinite">animateRotate2
+    </animateTransform>
+    <!-- Opacity from: opacity(0~255) -->
+    <animateTransform
+        type="opacity"
+        from="255"
+        to="100"
+        dur="2s"
+        repeatCount="indefinite">animateOpacity1
+    </animateTransform>
+    <!-- Scale  from: x rate, y rate, x center, y center-->
+    <animateTransform
+        type="scale"
+        from="0.2 0.8 72 79"
+        to="0.9 1.2 72 79"
+        dur="4s"
+        repeatCount="indefinite">animateScale1
+    </animateTransform>
+    <!-- translate  from: x, y-->
+    <animateTransform
+        type="translate"
+        from="-40 0"
+        to="40 0"
+        dur="3s"
+        pause = "pause"
+        repeatCount="indefinite">animateTranslate1
+    </animateTransform>
+    <screen
     w="640"
     h="360"
     x="0"
     y="0">screen0
-
     <slider
         x="202"
         y="180"
@@ -92,13 +134,11 @@
         rotationAngle="0"
         scaleX="1"
         scaleY="1">imgAnimate1
-        <!-- Rotate fast from: degree, x center, y center-->
-        <animateTransform
-        type="rotate"
-        from="0 72 79"
-        to="360 72 79"
-        dur="1s"
-        repeatCount="indefinite"> </animateTransform>
+        <onLoad
+            to="imgAnimate1"
+            type="aniamte" 
+            id="animateRotate2">
+        </onLoad>
     </img>
     <img
         x="500"
@@ -111,13 +151,11 @@
         rotationAngle="0"
         scaleX="1"
         scaleY="1">imgAnimate2
-        <!-- Rotate slow from: degree, x center, y center-->
-        <animateTransform
-        type="rotate"
-        from="-45 72 79"
-        to="45 72 79"
-        dur="10s"
-        repeatCount="indefinite"> </animateTransform>
+        <onLoad
+            to="imgAnimate2"
+            type="aniamte" 
+            id="animateRotate1">
+        </onLoad>
     </img>
     <img
         x="0"
@@ -130,13 +168,11 @@
         rotationAngle="0"
         scaleX="1"
         scaleY="1">imgAnimate3
-        <!-- Opacity from: opacity(0~255) -->
-        <animateTransform
-        type="opacity"
-        from="255"
-        to="100"
-        dur="2s"
-        repeatCount="indefinite"> </animateTransform>
+        <onLoad
+            to="imgAnimate3"
+            type="aniamte" 
+            id="animateOpacity1">
+        </onLoad>
     </img>
     <img
         x="500"
@@ -149,13 +185,6 @@
         rotationAngle="0"
         scaleX="1"
         scaleY="1">imgAnimate4
-        <!-- Scale  from: x rate, y rate, x center, y center-->
-        <animateTransform
-        type="scale"
-        from="0.2 0.8 72 79"
-        to="0.9 1.2 72 79"
-        dur="4s"
-        repeatCount="indefinite"> </animateTransform>
     </img>
     <img
         x="248"
@@ -168,25 +197,29 @@
         rotationAngle="0"
         scaleX="1"
         scaleY="1">img_ctlamp
-         <!-- translate  from: x, y-->
-        <animateTransform
-        type="translate"
-        from="-40 0"
-        to="40 0"
-        dur="3s"
-        pause = "pause"
-        repeatCount="indefinite"> </animateTransform>
     </img>
     <switch
             x="260"
             y="0">sw_living
             <onOff
                 to="img_ctlamp"
-                type="pause" >
+                type="aniamtePause" 
+                id="animateTranslate1">
             </onOff>
             <onOn
                 to="img_ctlamp"
-                type="start" >
+                type="aniamte" 
+                id="animateTranslate1">
+            </onOn>
+            <onOff
+                to="imgAnimate4"
+                type="aniamte" 
+                id="animateScale1">
+            </onOff>
+            <onOn
+                to="imgAnimate4"
+                type="aniamtePause" 
+                id="animateScale1">
             </onOn>
     </switch>
 </screen></app>
