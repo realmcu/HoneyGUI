@@ -149,8 +149,3 @@ static void design_app_watch_ui(gui_app_t *app)
 
 </span>
 
-```eval_rst
-
-.. doxygenfile:: gui_widget_litegfx.h
-
-```

@@ -152,9 +152,3 @@ static void design_app_watch_ui(gui_app_t *app)
 
 Following the examples above, it is recommended that users directly use the effects API provided by the upper layer rather than the widget layer API.
 
-
-```eval_rst
-
-.. doxygenfile:: gui_widget_litegfx.h
-
-```
