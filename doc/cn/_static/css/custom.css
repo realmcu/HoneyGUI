@@ -121,6 +121,9 @@ figcaption, figcaption p{
         right: 0;
         z-index: 999;
     }
+    .wy-nav-top i {
+        float: right;
+    }
 }
 
 @media screen and (max-width: 480px) {
@@ -197,6 +200,12 @@ li[class*="toctree-"] * {
     background:rgba(223, 233, 243,0.4);
 }
 
+.rst-content dl dd {
+    margin-right: 12px;
+}
+.rst-content div[itemprop="articleBody"] section > dl > dd {
+    margin-left: 0;
+}
 dl.c.unexpanded dd, dl.cpp.unexpanded dd {
     display: none;
 }
