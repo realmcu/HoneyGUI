@@ -106,7 +106,7 @@ extern "C" {
  *
  * @param parent the widget tree
  */
-void gui_fb_disp(gui_obj_t *root);
+void gui_fb_disp(gui_obj_t *root, bool enable_event);
 
 
 /**

@@ -162,7 +162,7 @@ static void gui_server_entry(void *parameter)
 
         }
 
-        gui_fb_disp(screen);
+        gui_fb_disp(screen, true);
         app_next = gui_next_app();
         if (layer)
         {

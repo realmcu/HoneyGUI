@@ -955,7 +955,7 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
     dc->shot_buf = shot_buf;
 
     gui_fb_change();
-    gui_fb_disp(obj);
+    gui_fb_disp(obj, false);
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
 
     head->scan = 0;
@@ -990,7 +990,7 @@ void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix,
     dc->target_h = obj->h;
     dc->target_w = obj->w;
     gui_fb_change();
-    gui_fb_disp(obj);
+    gui_fb_disp(obj, false);
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
 
     head->scan = 0;

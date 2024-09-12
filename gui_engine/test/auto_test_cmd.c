@@ -119,7 +119,7 @@ void test_img_RGB565_filter(void *msg)
     gui_obj_tree_free(screen);
     gui_img_t *img = gui_img_create_from_mem(screen, "img", _acimage565, 0, 0, 0, 0);
     gui_fb_change();
-    gui_fb_disp(screen);
+    gui_fb_disp(screen, false);
     save_dc(0);
     compare_dc(0);
     AUTO_TEST_LOG("%s PASS!", test_case_name);

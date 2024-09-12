@@ -387,7 +387,7 @@ uint32_t gui_spf()
 {
     return spf;
 }
-void gui_fb_disp(gui_obj_t *root)
+void gui_fb_disp(gui_obj_t *root, bool enable_event)
 {
     if (root == NULL)
     {
@@ -445,9 +445,12 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     obj_draw_end(root);
-    for (uint8_t i = 0; i < event_cnt; i++)
+    if (enable_event == true)
     {
-        event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
+        for (uint8_t i = 0; i < event_cnt; i++)
+        {
+            event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
+        }
     }
     event_cnt = 0;
     dc->frame_count++;
