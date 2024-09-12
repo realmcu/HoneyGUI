@@ -1,8 +1,24 @@
 document.addEventListener("DOMContentLoaded", function () {
     var imgModal = document.getElementById("imgModal");
     var imgInModal= document.getElementById("imgInModal");
+    var imgContainer = imgInModal.parentElement;
     var closeImgModal = document.getElementsByClassName("img-modal-close")[0];
     var currentScale = 1;
+
+    // 初始化图片大小，使其适应容器
+    function initModalImageSize() {
+        const containerWidth = imgContainer.clientWidth;
+        const containerHeight = imgContainer.clientHeight;
+        const imgNaturalWidth = imgInModal.naturalWidth;
+        const imgNaturalHeight = imgInModal.naturalHeight;
+
+        const widthRatio = containerWidth / imgNaturalWidth;
+        const heightRatio = containerHeight / imgNaturalHeight;
+        const initScale = Math.min(widthRatio, heightRatio);
+
+        imgInModal.style.width = `${imgNaturalWidth * initScale}px`;
+        imgInModal.style.height = `${imgNaturalHeight * initScale}px`;
+    }
 
     document.querySelectorAll('.rst-content img').forEach(function(imgItem) {
         imgItem.addEventListener('click', function (event) {
@@ -16,8 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             imgModal.style.display = "flex";
             imgInModal.src = this.src;
-            imgInModal.style.transform = 'scale(1)'; // Reset scale on each open
-            currentScale = 1; // Reset scale value
+            initModalImageSize();
             document.documentElement.style.overflow = "hidden"; // Disable scrolling
         });
     });
@@ -42,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
             currentScale += 0.1;
         } else {
             // Scroll down (zoom out)
-            currentScale = Math.max(0.5, currentScale - 0.1); // Avoid scaling below the half original size
+            currentScale = Math.max(1, currentScale - 0.1); // Avoid scaling below the original size
         }
         imgInModal.style.transform = `scale(${currentScale})`;
     });

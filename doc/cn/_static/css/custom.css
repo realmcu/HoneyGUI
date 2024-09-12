@@ -437,20 +437,27 @@ section[id*="deprecated-api"] dd dl {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
     background-color: rgba(0,0,0,0.6);
     z-index: 1000;
     justify-content: center;
     align-items: center;
-    overflow-x: auto;
-    overflow-y: auto;
+    overflow: hidden;
+}
+.modal-img-box {
+    max-width: 80%;
+    max-height: 80%;
+    margin: auto;
+    overflow: auto;
 }
 @keyframes imgzoom {
     from {transform: scale(0)}
     to {transform: scale(1)}
 }
 .img-in-modal {
-    max-height: 80%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* 使图片适应容器的大小，同时保持图片的长宽比 */
+    transform-origin: top left; /* 设置缩放原点为左上角 */
     transition: transform 0.4s ease;
     animation-name: imgzoom;
     animation-duration: 0.6s;
