@@ -1639,7 +1639,8 @@ static void cycle_tracking_win_cb(gui_win_t *win)
 
             //dx = tp->deltaX;
             //cycle_image_process(tp->deltaX+dx, img_array);
-            if (img_array[2]->scale_x >= 0.98f || img_array[4]->scale_x >= 0.98f)
+            if (gui_img_get_transform_scale_x(img_array[2]) >= 0.98f ||
+                gui_img_get_transform_scale_x(img_array[4]) >= 0.98f)
             {
                 swap_flag = 1;
                 swap_count += (tp->deltaX > 0) ? -1 : 1;
@@ -1655,7 +1656,8 @@ static void cycle_tracking_win_cb(gui_win_t *win)
                     id = 3;
                 };
             }
-            else if (img_array[1]->scale_x >= 0.98f || img_array[5]->scale_x >= 0.98f)
+            else if (gui_img_get_transform_scale_x(img_array[1]) >= 0.98f ||
+                     gui_img_get_transform_scale_x(img_array[5]) >= 0.98f)
             {
                 swap_flag = 1;
                 swap_count += (tp->deltaX > 0) ? -1 : 1;
@@ -1673,7 +1675,8 @@ static void cycle_tracking_win_cb(gui_win_t *win)
                     id = 3;
                 };
             }
-            else if (img_array[0]->scale_x >= 0.98f || img_array[6]->scale_x >= 0.98f)
+            else if (gui_img_get_transform_scale_x(img_array[0]) ||
+                     gui_img_get_transform_scale_x(img_array[6]) >= 0.98f)
             {
                 swap_flag = 1;
                 swap_count += (tp->deltaX > 0) ? -1 : 1;
@@ -1695,7 +1698,7 @@ static void cycle_tracking_win_cb(gui_win_t *win)
             }
             else
             {
-                gui_log("else[0]:%f\n", img_array[3]->scale_x);
+                gui_log("else[0]:%f\n", gui_img_get_transform_scale_x(img_array[3]));
 
 
             }
@@ -1743,7 +1746,7 @@ static void cycle_tracking_win_cb(gui_win_t *win)
     {
         if (alien_flag)
         {
-            if (img_array[2]->scale_x > img_array[3]->scale_x)
+            if (gui_img_get_transform_scale_x(img_array[2]) > gui_img_get_transform_scale_x(img_array[3]))
             {
                 swap_count += -1;
                 swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);
@@ -1753,7 +1756,7 @@ static void cycle_tracking_win_cb(gui_win_t *win)
                 }
 
             }
-            else if (img_array[4]->scale_x > img_array[3]->scale_x)
+            else if (gui_img_get_transform_scale_x(img_array[4]) > gui_img_get_transform_scale_x(img_array[3]))
             {
                 swap_count += 1;
                 swap_count = (swap_count < 0) ? 0 : ((swap_count > max_swap_count) ? max_swap_count : swap_count);

@@ -235,20 +235,7 @@ static void animate(gui_switch_t *this,
                     void         *callback,
                     void         *p)
 {
-    gui_animate_t *animate = this->animate;
-
-    if (!(animate))
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-    }
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (void (*)(void *, void *))callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    this->animate = animate;
+    GUI_SET_ANIMATE_HELPER
 }
 
 static void gui_switch_input_prepare(gui_obj_t *obj)

@@ -41,6 +41,7 @@ typedef struct gui_win
 {
     gui_obj_t base;
     gui_animate_t *animate;
+    gui_animate_t **animate_array;
     float scale;
     float scale_y;
     bool press_flag;
@@ -51,6 +52,7 @@ typedef struct gui_win
     uint8_t checksum;
     bool scope;
     bool hold_tp;
+    uint8_t animate_array_length;
 } gui_win_t;
 
 /*============================================================================*
@@ -243,7 +245,30 @@ void gui_win_stop_animation(gui_win_t *win);
  * @param obj pointer
  */
 void gui_win_prepare(gui_obj_t *obj);
-
+/**
+ * @brief Append an animation to a GUI window.
+ *
+ * This function appends an animation to the specified GUI window. The animation
+ * will run for the specified duration, repeat the specified number of times, and
+ * call the provided callback function at each frame.
+ *
+ * @param[in,out] win Pointer to the GUI window object.
+ * @param[in]     dur Duration of the animation in milliseconds.
+ * @param[in]     repeat_count Number of times the animation should repeat.
+ * @param[in]     callback Function to be called at each frame.
+ * @param[in]     p User data to be passed to the callback function.
+ * @param[in]     name aniamte name.
+ *
+ * @note The `callback` function should match the expected signature for animation
+ *       callbacks in the GUI library being used. The `p` parameter allows the
+ *       passing of additional data to the callback function.
+ */
+void gui_win_append_animate(gui_win_t *,
+                            uint32_t   dur,
+                            int        repeat_count,
+                            void      *callback,
+                            void      *p,
+                            const char *name);
 #ifdef __cplusplus
 }
 #endif

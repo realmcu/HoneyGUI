@@ -214,6 +214,11 @@
             <onOn
                 to="img_ctlamp"
                 type="animate" 
+                id="animateOpacity1">
+            </onOn>
+            <onOn
+                to="img_ctlamp"
+                type="animate" 
                 id="animateTranslate1">
             </onOn>
             <onOff

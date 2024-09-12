@@ -50,19 +50,23 @@ extern "C" {
 #ifdef  __CC_ARM
 #pragma anon_unions
 #endif
+struct gui_img_transform
+{
+
+    float degrees;                      //!< float gui_img_get_transform_degrees(gui_img_t *img);
+    float c_x;                          //!< center of image x; float gui_img_get_transform_c_x(gui_img_t *img);
+    float c_y;                          //!< center of image y;  float gui_img_get_transform_c_y(gui_img_t *img);
+    float scale_x;                      //!< float gui_img_get_transform_scale_x(gui_img_t *img);
+    float scale_y;                      //!< float gui_img_get_transform_scale_y(gui_img_t *img);
+    float t_x;                          //!< translate of screen x;  float gui_img_get_transform_t_x(gui_img_t *img);
+    float t_y;                          //!< translate of screen y;  float gui_img_get_transform_t_y(gui_img_t *img);
+};
 
 typedef struct gui_img
 {
     gui_obj_t base;
     draw_img_t *draw_img;
-
-    float degrees;
-    float c_x;                          //!< center of image x
-    float c_y;                          //!< center of image y
-    float scale_x;
-    float scale_y;
-    float t_x;                          //!< translate of screen x
-    float t_y;                          //!< translate of screen y
+    struct gui_img_transform *transform;
     void *data;                         // this means address or filesystem path
     union
     {
@@ -85,6 +89,7 @@ typedef struct gui_img
     uint32_t scope_flag    : 1;
     uint32_t tp_block      : 1;
     uint8_t checksum;
+    uint8_t animate_array_length;
 } gui_img_t;
 
 /** End of WIDGET_Exported_Types
@@ -358,6 +363,85 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
  * @param shot_buf image data buffer
  */
 void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *shot_buf);
+/**
+ * @brief Get the transform scale in the X direction for a GUI image.
+ *
+ * @param[in] img Pointer to the GUI image object.
+ *
+ * @return The scale in the X direction.
+ */
+float gui_img_get_transform_scale_x(gui_img_t *img);
+
+/**
+ * @brief Get the transform scale in the Y direction for a GUI image.
+ *
+ * @param[in] img Pointer to the GUI image object.
+ *
+ * @return The scale in the Y direction.
+ */
+float gui_img_get_transform_scale_y(gui_img_t *img);
+
+/**
+ * @brief Get the rotation angle in degrees for a GUI image.
+ *
+ * @param[in] img Pointer to the GUI image object.
+ *
+ * @return The rotation angle in degrees.
+ */
+float gui_img_get_transform_degrees(gui_img_t *img);
+
+/**
+ * @brief Get the center X coordinate for rotate of a GUI image.
+ *
+ * @param[in] img Pointer to the GUI image object.
+ *
+ * @return The center X coordinate for transformations.
+ */
+float gui_img_get_transform_c_x(gui_img_t *img);
+
+/**
+ * @brief Get the center Y coordinate for rotate of a GUI image.
+ *
+ * @param[in] img Pointer to the GUI image object.
+ *
+ * @return The center Y coordinate for transformations.
+ */
+float gui_img_get_transform_c_y(gui_img_t *img);
+
+/**
+ * @brief Get the translation in the X direction for a GUI image.
+ *
+ * @param[in] img Pointer to the GUI image object.
+ *
+ * @return The translation in the X direction.
+ */
+float gui_img_get_transform_t_x(gui_img_t *img);
+
+/**
+ * @brief Get the translation in the Y direction for a GUI image.
+ *
+ * @param[in] img Pointer to the GUI image object.
+ *
+ * @return The translation in the Y direction.
+ */
+float gui_img_get_transform_t_y(gui_img_t *img);
+
+/**
+ * @brief Append an animation to a GUI image.
+ *
+ * @param[in,out] img Pointer to the GUI image object.
+ * @param[in]     dur Duration of the animation in milliseconds.
+ * @param[in]     repeat_count Number of times the animation should repeat.
+ * @param[in]     callback (void *p, void *this_widget, gui_animate_t *animate)Function to be called at each the animation frame.
+ * @param[in]     p User data to be passed to the callback function.
+ * @param[in]     name aniamte name.
+ */
+void gui_img_append_animate(gui_img_t *,
+                            uint32_t   dur,
+                            int        repeat_count,
+                            gui_animate_callback_t callback,
+                            void      *p,
+                            const char *name);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

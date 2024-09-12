@@ -640,6 +640,7 @@ void gui_obj_skip_other_right_hold(gui_obj_t *obj)
     obj->skip_tp_right_hold = false;
 }
 
+
 void gui_obj_skip_all_child_short(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
@@ -876,7 +877,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
                 animate->progress_percent = 1;
                 animate->animate = 0;
             }
-            animate->callback(animate->p, obj);
+            animate->callback(animate->p, obj, animate);
 
         }
         else if (animate->repeat_count == -1)
@@ -892,7 +893,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
                 animate->Beginning_frame = 1;
             }
             animate->last_per = animate->progress_percent;
-            animate->callback(animate->p, obj);
+            animate->callback(animate->p, obj, animate);
         }
         else
         {
@@ -910,7 +911,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
             animate->last_round = round_count;
             animate->progress_percent = (float)(cur_time_gap % animate->dur) /
                                         (float)animate->dur;
-            animate->callback(animate->p, obj);
+            animate->callback(animate->p, obj, animate);
         }
     }
     if (animate && !animate->animate)
@@ -932,7 +933,7 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *, void *))callback;
+    animate->callback = (gui_animate_callback_t)callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     return animate;

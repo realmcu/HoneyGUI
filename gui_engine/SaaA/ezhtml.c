@@ -122,35 +122,41 @@ static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[]);
 static void foreach_create_animate(ezxml_t p, gui_obj_t *parent, const char *animate_name);
 static ezxml_t f1;
-static void img_rotate_cb(image_animate_params_t *animate_params)
+static void img_rotate_cb(image_animate_params_t *animate_params, void *null,
+                          gui_animate_t *animate)
 {
+    static  int i;
+
     gui_img_translate(animate_params->img, animate_params->rotate_x,
                       animate_params->rotate_y);
-
+    gui_log("img_rotate_cb%f\n", animate_params->rotate_from + (animate_params->rotate_to -
+                                                                animate_params->rotate_from)*
+            animate->progress_percent);
     gui_img_rotation(animate_params->img,
                      animate_params->rotate_from + (animate_params->rotate_to - animate_params->rotate_from)*
-                     animate_params->img->animate->progress_percent,
+                     animate->progress_percent,
                      animate_params->rotate_x,
                      animate_params->rotate_y);
 }
 
-static void img_translate_cb(image_animate_params_t *animate_params)
+static void img_translate_cb(image_animate_params_t *animate_params, void *null,
+                             gui_animate_t *animate)
 {
-    float t_x = animate_params->translate_from_x + animate_params->img->animate->progress_percent *
+    float t_x = animate_params->translate_from_x + animate->progress_percent *
                 (animate_params->translate_to_x -
                  animate_params->translate_from_x);
-    float t_y = animate_params->translate_from_y + animate_params->img->animate->progress_percent *
+    float t_y = animate_params->translate_from_y + animate->progress_percent *
                 (animate_params->translate_to_y -
                  animate_params->translate_from_y);
 
     gui_img_translate(animate_params->img, t_x, t_y);
 }
 
-static void img_scale_cb(image_animate_params_t *animate_params)
+static void img_scale_cb(image_animate_params_t *animate_params, void *null, gui_animate_t *animate)
 {
-    float scale_x = animate_params->scale_x_from - animate_params->img->animate->progress_percent *
+    float scale_x = animate_params->scale_x_from - animate->progress_percent *
                     (animate_params->scale_x_from - animate_params->scale_x);
-    float scale_y = animate_params->scale_y_from - animate_params->img->animate->progress_percent *
+    float scale_y = animate_params->scale_y_from - animate->progress_percent *
                     (animate_params->scale_y_from - animate_params->scale_y);
 
     gui_img_scale(animate_params->img, scale_x, scale_y);
@@ -161,88 +167,89 @@ static void img_scale_cb(image_animate_params_t *animate_params)
                      animate_params->scale_y_center);
 }
 
-static void img_opacity_cb(image_animate_params_t *animate_params)
+static void img_opacity_cb(image_animate_params_t *animate_params, void *null,
+                           gui_animate_t *animate)
 {
-    uint8_t opacity = animate_params->opacity_from - animate_params->img->animate->progress_percent *
+    uint8_t opacity = animate_params->opacity_from - animate->progress_percent *
                       (animate_params->opacity_from - animate_params->opacity);
-
+    gui_log("img_opacity_cb%d\n", opacity);
     gui_img_set_opacity(animate_params->img, opacity);
 }
 
-static void multi_animate_callback(void *params)
+static void multi_animate_callback(void *params, void *null, gui_animate_t *animate)
 {
     image_animate_params_t *animate_params = (image_animate_params_t *)params;
-
+    gui_log("multi_animate_callback:%x,%s\n", animate_params, animate_params->animate_type);
     if (!strcmp(animate_params->animate_type, "rotate"))
     {
-        img_rotate_cb(params);
+        img_rotate_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "translate"))
     {
-        img_translate_cb(params);
+        img_translate_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "scale"))
     {
-        img_scale_cb(params);
+        img_scale_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "opacity"))
     {
-        img_opacity_cb(params);
+        img_opacity_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "rotate_translate"))
     {
-        img_rotate_cb(params);
-        img_translate_cb(params);
+        img_rotate_cb(params, null, animate);
+        img_translate_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "rotate_scale"))
     {
-        img_rotate_cb(params);
-        img_scale_cb(params);
+        img_rotate_cb(params, null, animate);
+        img_scale_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "rotate_opacity"))
     {
-        img_rotate_cb(params);
-        img_opacity_cb(params);
+        img_rotate_cb(params, null, animate);
+        img_opacity_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "translate_scale"))
     {
-        img_translate_cb(params);
-        img_scale_cb(params);
+        img_translate_cb(params, null, animate);
+        img_scale_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "translate_opacity"))
     {
-        img_translate_cb(params);
-        img_opacity_cb(params);
+        img_translate_cb(params, null, animate);
+        img_opacity_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "scale_opacity"))
     {
-        img_scale_cb(params);
-        img_opacity_cb(params);
+        img_scale_cb(params, null, animate);
+        img_opacity_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "rotate_translate_scale"))
     {
-        img_rotate_cb(params);
-        img_translate_cb(params);
-        img_scale_cb(params);
+        img_rotate_cb(params, null, animate);
+        img_translate_cb(params, null, animate);
+        img_scale_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "rotate_translate_opacity"))
     {
-        img_rotate_cb(params);
-        img_translate_cb(params);
-        img_opacity_cb(params);
+        img_rotate_cb(params, null, animate);
+        img_translate_cb(params, null, animate);
+        img_opacity_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "translate_scale_opacity"))
     {
-        img_translate_cb(params);
-        img_scale_cb(params);
-        img_opacity_cb(params);
+        img_translate_cb(params, null, animate);
+        img_scale_cb(params, null, animate);
+        img_opacity_cb(params, null, animate);
     }
     else if (!strcmp(animate_params->animate_type, "rotate_translate_scale_opacity"))
     {
-        img_rotate_cb(params);
-        img_translate_cb(params);
-        img_scale_cb(params);
-        img_opacity_cb(params);
+        img_rotate_cb(params, null, animate);
+        img_translate_cb(params, null, animate);
+        img_scale_cb(params, null, animate);
+        img_opacity_cb(params, null, animate);
     }
 }
 
@@ -601,7 +608,7 @@ static void sport_button_press_ani_cb(gui_button_t *button)
     static float from = 0;
     if (per == 0.0f)
     {
-        from = ((gui_img_t *)(button->img))->scale_x;
+        from = gui_img_get_transform_scale_x((gui_img_t *)(button->img));
         alpha_from = button->img->draw_img->opacity_value;
     }
     from = 1.0f;
@@ -684,7 +691,7 @@ static void sport_button_release_ani_cb(gui_button_t *button)
     static float from = 0;
     if (per == 0.0f)
     {
-        from = ((gui_img_t *)(button->img))->scale_x;
+        from = gui_img_get_transform_scale_x((gui_img_t *)(button->img));
         alpha_from = button->img->draw_img->opacity_value;
     }
     //from = 1.25f;
@@ -3487,7 +3494,7 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         char **param = gui_malloc(sizeof(char *) * 2);
                         param[0] = gui_strdup(to);
                         param[1] = gui_strdup(id);
-                        if (!strcmp(type, "aniamtePause"))
+                        if (!strcmp(type, "animatePause"))
                         {
 
                             GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), pause_animation_cb,
@@ -3569,7 +3576,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
         return 0;
     }
     char *name = p->name;
-    gui_log("animate_create_handle:%s: %s", name, p->txt);
+
     for (size_t i = 0; i < sizeof(widget) / sizeof(widget[0]); i++)
     {
         if (!strcmp(widget[i].name, name))
@@ -3583,7 +3590,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                     {
                         continue;
                     }
-
+                    gui_log("animate_create_handle:%s: %s", name, p->txt);
                     char *type = 0;
                     char *from = 0;
                     char *to = 0;
@@ -3730,7 +3737,7 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
 
                         image_animate_params_t *params = gui_malloc(sizeof(image_animate_params_t));
                         params->img = (gui_img_t *)parent;
-                        params->animate_type = type;
+                        params->animate_type = gui_strdup(type);
 
                         params->x = (int)to_num_f[1];
                         params->y = (int)to_num_f[2];
@@ -3752,11 +3759,9 @@ gui_obj_t *animate_create_handle(ezxml_t p, gui_obj_t *parent, const char *aniam
                         params->translate_from_y = from_num_f[1];
                         params->translate_to_x = to_num_f[0];
                         params->translate_to_y = to_num_f[1];
-                        gui_img_set_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params);
-                        if (pause && !strcmp(pause, "pause"))
-                        {
-                            GUI_TYPE(gui_img_t, parent)->animate->animate = 0;
-                        }
+                        gui_img_append_animate((gui_img_t *)parent, dur_num, repeat_num, multi_animate_callback, params,
+                                               gui_strdup(aniamte_name));
+
 
                     }
                     return 0;
@@ -4214,7 +4219,12 @@ static void pause_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             {
                 if (GUI_TYPE(gui_img_t, to)->animate)
                 {
-                    GUI_TYPE(gui_img_t, to)->animate->animate = 0;
+                    //GUI_TYPE(gui_img_t, to)->animate->animate = 0;
+                    for (size_t i = 0; i < GUI_TYPE(gui_img_t, to)->animate_array_length; i++)
+                    {
+                        ((gui_animate_t **)(GUI_TYPE(gui_img_t, to)->animate))[i]->animate = 0;
+                    }
+
                 }
 
 
@@ -4233,7 +4243,18 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
             /* pause */
             if (to->type == IMAGE_FROM_MEM)
             {
-                if (!GUI_TYPE(gui_img_t, to)->animate)
+                gui_img_t *img = GUI_TYPE(gui_img_t, to);
+                bool create = 1;
+                {
+                    for (size_t i = 0; i < img->animate_array_length; i++)
+                    {
+                        if (GUI_STRINGS_EQUAL(((gui_animate_t **)(img->animate))[i]->name, to_name[1]))
+                        {
+                            create = 0;
+                        }
+                    }
+                }
+                if (create)
                 {
                     ezxml_t f = 0;
                     if (f1 != 0)
@@ -4252,7 +4273,13 @@ static void start_animation_cb(gui_obj_t *this, void *null, char *to_name[])
                         ezxml_free(f);
                     }
                 }
-                GUI_TYPE(gui_img_t, to)->animate->animate = 1;
+                else
+                {
+                    for (size_t i = 0; i < GUI_TYPE(gui_img_t, to)->animate_array_length; i++)
+                    {
+                        ((gui_animate_t **)(img->animate))[i]->animate = 1;
+                    }
+                }
             }
         }
     }

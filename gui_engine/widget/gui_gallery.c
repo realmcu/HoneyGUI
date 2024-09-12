@@ -101,7 +101,7 @@ static int16_t gui_gallery_get_position(gui_img_t *img)
     int16_t img_x = img->base.x;
     int16_t img_w = 0;
 
-    img_w = img->base.w * img->scale_x;
+    img_w = img->base.w * gui_img_get_transform_scale_x(img);
     pos = img_x + (img_w >> 1);
     return pos;
 }
@@ -267,7 +267,7 @@ static void gui_gallery_prepare(gui_obj_t *obj)
                     // gui_log("x %d, scale_cur %f\n", img_x, scale_cur);
 
                     // scale
-                    img_w = img->base.w * img->scale_x;
+                    img_w = img->base.w * gui_img_get_transform_scale_x(img);
                     img_pos_cur = img_x + (img_w >> 1);
                     img_pos_nxt = img_pos_cur + delta_pos;
                     if (img_pos_nxt <= this->pos_l) { img_pos_nxt = this->pos_l; }
@@ -276,8 +276,8 @@ static void gui_gallery_prepare(gui_obj_t *obj)
                     gui_img_scale(img, scale_nxt,  scale_nxt);
 
                     // location
-                    img_w = img->base.w * img->scale_x;
-                    img_h = img->base.h * img->scale_y;
+                    img_w = img->base.w * gui_img_get_transform_scale_x(img);
+                    img_h = img->base.h * gui_img_get_transform_scale_y(img);
                     gui_img_set_location(img, img_pos_nxt - (img_w >> 1), (h - img_h) >> 1);
                 }
 
@@ -469,8 +469,8 @@ static gui_img_t *gui_gallery_create_img(gui_gallery_t  *this, char *name, int16
                                   this->base.x, this->base.y, this->base.w, this->base.h);
     gui_img_set_mode(img, IMG_BYPASS_MODE);
     gui_img_scale(img, scale, scale);
-    img_w = img->base.w * img->scale_x;
-    img_h = img->base.h * img->scale_y;
+    img_w = img->base.w * gui_img_get_transform_scale_x(img);
+    img_h = img->base.h * gui_img_get_transform_scale_y(img);
     gui_img_set_location(img, pos - (img_w >> 1), (this->base.h - img_h) >> 1);
     return img;
 }
