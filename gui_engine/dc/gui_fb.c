@@ -22,6 +22,16 @@ static void *event_obj[MAX_EVENT_CNT];
 static uint8_t event_cnt = 0;
 static bool fb_change = false;
 
+static void obj_reset_active(gui_obj_t *obj)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &obj->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        obj->active = false;
+        obj_reset_active(obj);
+    }
+}
 
 static bool obj_is_active(gui_obj_t *obj)
 {
@@ -408,6 +418,7 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     }
 
     obj_input_prepare(root);
+    obj_reset_active(root);
     if (dc->lcd_frame_monitor)
     {
         dc->lcd_frame_monitor->input_prepare_cb();
