@@ -1,29 +1,5 @@
 /**
- * @file lv_draw_vglite_blend.h
- *
- */
-
-/**
- * MIT License
- *
- * Copyright 2020-2023 NXP
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice (including the next paragraph)
- * shall be included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * @file lv_draw_ppe_blend.h
  *
  */
 
@@ -57,17 +33,30 @@ extern "C" {
  **********************/
 
 /**
- * Fill area, with optional opacity.
+ * Fill area.
  *
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] color Color
- * @param[in] opa Opacity (255 = full, 128 = 50% background/50% color, 0 = no fill)
+ * @param[in] dsc Description of content
  *
  * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ * @retval LV_RES_INV Error occurred
  */
 lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
                      const lv_draw_sw_blend_dsc_t *dsc);
+
+/**
+ * Map area.
+ *
+ * @param[in] dest_area Area with relative coordinates of destination buffer
+ * @param[in] draw_ctx Context for rendering
+ * @param[in] dsc Description of content
+ *
+ * @retval LV_RES_OK Map completed
+ * @retval LV_RES_INV Error occurred
+ */
+lv_res_t lv_ppe_map(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
+                    const lv_draw_sw_blend_dsc_t *dsc);
 
 /**
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
@@ -82,7 +71,7 @@ lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
  * @param[in] opa Opacity
  *
  * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ * @retval LV_RES_INV Error occurred
  */
 lv_res_t lv_ppe_blit(lv_color_t *dest_buf, lv_area_t *dest_area, lv_coord_t dest_stride,
                      const lv_color_t *src_buf, lv_area_t *src_area, lv_coord_t src_stride,
@@ -101,7 +90,7 @@ lv_res_t lv_ppe_blit(lv_color_t *dest_buf, lv_area_t *dest_area, lv_coord_t dest
  * @param[in] dsc Image descriptor
  *
  * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ * @retval LV_RES_INV Error occurred
  */
 lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
                                const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf);

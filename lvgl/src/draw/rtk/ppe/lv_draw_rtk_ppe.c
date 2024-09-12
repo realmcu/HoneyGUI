@@ -48,7 +48,6 @@ static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_ds
  *      MACROS
  **********************/
 #include "lv_img.h"
-extern lv_img_dsc_t img_benchmark_cogwheel_rgb;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -154,11 +153,9 @@ static lv_res_t lv_draw_ppe_bg(lv_draw_ctx_t *draw_ctx, const lv_draw_rect_dsc_t
         lv_res_t res = lv_ppe_draw_bg(draw_ctx, &rel_coords, &rel_clip_area, dsc);
         if (res != LV_RES_OK)
         {
-            //DBG_DIRECT("bg return %d ", __LINE__);
         }
         return res;
     }
-    //DBG_DIRECT("bg return %d ", __LINE__);
     return LV_RES_INV;
 }
 
@@ -193,6 +190,11 @@ static lv_res_t lv_draw_ppe_img(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t
 
 static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
 {
+    lv_opa_t *mask;
+    if (dsc->mask_buf == NULL) { mask = NULL; }
+    if (dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) { return; }
+    else if (dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) { mask = NULL; }
+    else { mask = dsc->mask_buf; }
     if (dsc->opa <= (lv_opa_t)LV_OPA_MIN)
     {
         return;
@@ -210,13 +212,16 @@ static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_ds
 
     bool done = false;
     /*Fill/Blend only non masked, normal blended*/
-    if (dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL &&
-        lv_area_get_size(&blend_area) >= LV_PPE_SIZE_LIMIT)
+    if (dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL)
     {
         const lv_color_t *src_buf = dsc->src_buf;
         if (src_buf == NULL)
         {
             done = (lv_ppe_fill(&blend_area, draw_ctx, dsc) == LV_RES_OK);
+        }
+        else
+        {
+            done = (lv_ppe_map(&blend_area, draw_ctx, dsc) == LV_RES_OK);
         }
     }
     //TODO: should be added in MP version
@@ -228,7 +233,7 @@ static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_ds
 #endif
             )
     {
-        //done = (lv_ppe_mask(draw_ctx, dsc) == LV_RES_OK);
+        done = (lv_ppe_mask(draw_ctx, dsc) == LV_RES_OK);
     }
 
     if (!done)
@@ -241,8 +246,6 @@ static void lv_draw_ppe_blend(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_ds
 static void lv_draw_ppe_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
                                     const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf)
 {
-//    DBG_DIRECT("buf area %d->%d, %d->%d", draw_ctx->buf_area->x1, draw_ctx->buf_area->x2, draw_ctx->buf_area->y1, draw_ctx->buf_area->y2);
-//    DBG_DIRECT("coords %d->%d, %d->%d", coords->x1, coords->x2, coords->y1, coords->y2);
     if (dsc->opa <= (lv_opa_t)LV_OPA_MIN)
     {
         return;
@@ -260,18 +263,17 @@ static void lv_draw_ppe_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_d
         return;
     }
     lv_area_t blend_area;
+    lv_area_copy(&blend_area, draw_ctx->clip_area);
     /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
-    if (!_lv_area_intersect(&blend_area, coords, draw_ctx->buf_area))
-    {
-        return;    /*Fully clipped, nothing to do*/
-    }
-//    DBG_DIRECT("blend area %d->%d, %d->%d", blend_area.x1, blend_area.x2, blend_area.y1, blend_area.y2);
+//    if (!_lv_area_intersect(&blend_area, coords, draw_ctx->buf_area))
+//    {
+//        return;    /*Fully clipped, nothing to do*/
+//    }
     /*Make the blend area relative to the buffer*/
 
     bool has_mask = lv_draw_mask_is_any(&blend_area);
     bool done = false;
     bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
-
     if (!has_mask && has_recolor && cf == LV_IMG_CF_TRUE_COLOR)
     {
         done = (lv_ppe_blit_recolor(draw_ctx, dsc, coords, map_p, cf) == LV_RES_OK);

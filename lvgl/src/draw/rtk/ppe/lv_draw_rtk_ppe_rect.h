@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_rect.h
+ * @file lv_draw_rtk_ppe_rect.h
  *
  */
 
@@ -39,7 +39,7 @@ extern "C" {
  * @param[in] dsc Description of the rectangle background
  *
  * @retval LV_RES_OK Draw completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ * @retval LV_RES_INV Error occurred
  *
  */
 lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
@@ -51,10 +51,10 @@ lv_res_t lv_ppe_draw_bg(lv_draw_ctx_t *draw_ctx, const lv_area_t *coords,
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_VG_LITE*/
+#endif /*LV_USE_GPU_RTK_PPE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_VGLITE_RECT_H*/
+#endif /*LV_DRAW_PPE_RECT_H*/
