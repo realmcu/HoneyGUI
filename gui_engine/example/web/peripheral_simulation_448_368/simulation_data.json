@@ -1,0 +1,21 @@
+{
+    "temperature": [
+        {
+            "low": 18,
+            "high": 37,
+            "cur": 23
+        }
+    ],
+    "compass": [
+        {
+            "degree": 255
+        }
+    ],
+    "activity": [
+        {
+            "move": 3518,
+            "ex": 20,
+            "stand": 9
+        }
+    ]
+}
