@@ -427,7 +427,7 @@ void *gui_text_bmp2img(gui_text_t *text, GUI_FormatType font_img_type, int16_t *
     uint8_t *buffer_addr = (uint8_t *)img_buf + sizeof(struct gui_rgb_data_head);
     rect.x2 = rect.x1 + buf_width;
     rect.y2 = rect.y1 + buf_height;
-    for (uint16_t i = 0; i < text->font_len; i++)
+    for (uint16_t i = 0; i < text->active_font_len; i++)
     {
         gui_font_bmp2img_one_char(chr + i, text->color, rendor_mode, &rect, buffer_addr, buf_width,
                                   font_img_pixel_bytes, font->font_mode_detail.detail.crop);

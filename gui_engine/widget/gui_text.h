@@ -103,6 +103,7 @@ typedef struct gui_text
     gui_color_t color;
     uint16_t len;
     uint16_t font_len;
+    uint16_t active_font_len;
     int16_t char_width_sum;
     int16_t char_height_sum;
     int16_t char_line_sum;

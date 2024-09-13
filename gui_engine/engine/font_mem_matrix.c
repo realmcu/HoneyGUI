@@ -444,7 +444,7 @@ static void gui_font_char_mat(gui_text_t *text)
     float scale_x = text->base.matrix->m[0][0];
     float scale_y = text->base.matrix->m[1][1];
 
-    for (int i = 0; i < text->font_len; i++)
+    for (int i = 0; i < text->active_font_len; i++)
     {
         chr[i].char_w = chr[i].char_w * scale_x;
 
@@ -496,7 +496,7 @@ void gui_font_mat_draw(gui_text_t *text, gui_text_rect_t *rect)
     mem_char_t *chr = text->data;
     GUI_FONT_HEAD *font = (GUI_FONT_HEAD *)text->path;
     uint8_t rendor_mode = font->rendor_mode;
-    for (uint16_t i = 0; i < text->font_len; i++)
+    for (uint16_t i = 0; i < text->active_font_len; i++)
     {
         rtk_draw_unicode_matrix(chr + i, text->color, rendor_mode, rect, font->font_mode_detail.detail.crop,
                                 text->base.matrix->m[0][0]);

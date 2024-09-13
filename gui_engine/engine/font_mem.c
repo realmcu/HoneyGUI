@@ -207,6 +207,7 @@ void gui_font_get_dot_info(gui_text_t *text)
 
                         uint32_t dot_size = line_byte * chr[chr_i].char_h;
                         uint8_t *dot_buf = gui_malloc(dot_size);
+                        // gui_log("FTL malloc %d, p: %p\n",dot_size,dot_buf);
                         if (dot_buf == NULL)
                         {
                             GUI_ASSERT(NULL != NULL);
@@ -406,7 +407,7 @@ void gui_font_get_dot_info(gui_text_t *text)
     text->char_height_sum = all_char_h;
     text->char_line_sum = line_flag;
     text->font_len = chr_i;
-
+    gui_log("FTL unicode text->font_len %d\n", text->font_len);
     gui_free(unicode_buf);
 }
 
@@ -456,7 +457,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 if ((chr[i].x + chr[i].char_w - 1) > rect->x2)
                 {
-                    text->font_len = i;
+                    text->active_font_len = i;
                     break;
                 }
             }
@@ -492,15 +493,15 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].y = rect->y1 + line * chr[i].h;
                 if (chr[i].y >= rect->y2)
                 {
-                    text->font_len = i;
+                    text->active_font_len = i;
                     break;
                 }
             }
-            line_buf[line].line_char = text->font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1
-                                      - chr[text->font_len - 1].char_w) / 2 * (text->mode - MULTI_LEFT);
+            line_buf[line].line_char = text->active_font_len - 1;
+            line_buf[line].line_dx = (rect_w - chr[text->active_font_len - 1].x + rect->x1 -
+                                      chr[text->active_font_len - 1].char_w) / 2 * (text->mode - MULTI_LEFT);
             line = 0;
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < text->active_font_len; i++)
             {
                 chr[i].x += line_buf[line].line_dx;
 
@@ -544,17 +545,17 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].y = rect->y1 + line * chr[i].h;
                 if (chr[i].y >= rect->y2)
                 {
-                    text->font_len = i;
+                    text->active_font_len = i;
                     break;
                 }
             }
-            line_buf[line].line_char = text->font_len - 1;
-            line_buf[line].line_dx = (rect_w - chr[text->font_len - 1].x + rect->x1
-                                      - chr[text->font_len - 1].char_w) / 2 * (text->mode - MID_LEFT);
+            line_buf[line].line_char = text->active_font_len - 1;
+            line_buf[line].line_dx = (rect_w - chr[text->active_font_len - 1].x + rect->x1 -
+                                      chr[text->active_font_len - 1].char_w) / 2 * (text->mode - MID_LEFT);
             text->char_height_sum = (line + 1) * chr[0].h;
             offset_y = (rect_h - text->char_height_sum) / 2;
             line = 0;
-            for (uint16_t i = 0; i < text->font_len; i++)
+            for (uint16_t i = 0; i < text->active_font_len; i++)
             {
                 chr[i].x += line_buf[line].line_dx;
                 chr[i].y += offset_y;
@@ -583,7 +584,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 }
                 if (chr[i].x > rect->xboundright)
                 {
-                    text->font_len = i;
+                    text->active_font_len = i;
                     break;
                 }
             }
@@ -613,7 +614,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 {
                     if (chr[i].y >= rect->yboundbottom)
                     {
-                        text->font_len = i;
+                        text->active_font_len = i;
                         break;
                     }
                 }
@@ -661,7 +662,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].x = rect->x1 - line * chr[i].w;
                 if (chr[i].x < 0)
                 {
-                    text->font_len = i;
+                    text->active_font_len = i;
                     break;
                 }
             }
@@ -688,7 +689,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
                 chr[i].x = rect->x1 + line * chr[i].w;
                 if (chr[i].x >= rect->x2)
                 {
-                    text->font_len = i;
+                    text->active_font_len = i;
                     break;
                 }
             }
@@ -710,8 +711,10 @@ void gui_font_mem_unload(gui_text_t *text)
             for (int i = 0; i < text->font_len; i++)
             {
                 gui_free(chr[i].dot_addr);
+                // gui_log("FTL free %p\n",chr[i].dot_addr);
             }
         }
+        gui_log("FTL text->font_len IS %d\n", text->font_len);
         for (int i = 0; i < text->font_len; i++)
         {
             mem_char_t *chr = text->data;
@@ -1266,7 +1269,7 @@ static void rtk_draw_unicode(mem_char_t *chr, gui_color_t color, uint8_t rendor_
                         writebuf[write_off + j - dc->section.x1] = color_output;
                     }
                 }
-                for (uint32_t j = x_start + left_offset; j < x_end - right_offset;)
+                for (int j = x_start + left_offset; j < x_end - right_offset;)
                 {
                     uint8_t temp = *temp_p;
                     if (temp)
@@ -1419,7 +1422,7 @@ void gui_font_mem_draw(gui_text_t *text, gui_text_rect_t *rect)
         font = (GUI_FONT_HEAD *)text->path;
     }
     uint8_t rendor_mode = font->rendor_mode;
-    for (uint16_t i = 0; i < text->font_len; i++)
+    for (uint16_t i = 0; i < text->active_font_len; i++)
     {
         if (chr[i].unicode >= 0x10000)
         {
