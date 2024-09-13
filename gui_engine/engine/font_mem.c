@@ -207,7 +207,6 @@ void gui_font_get_dot_info(gui_text_t *text)
 
                         uint32_t dot_size = line_byte * chr[chr_i].char_h;
                         uint8_t *dot_buf = gui_malloc(dot_size);
-                        // gui_log("FTL malloc %d, p: %p\n",dot_size,dot_buf);
                         if (dot_buf == NULL)
                         {
                             GUI_ASSERT(NULL != NULL);
@@ -407,7 +406,7 @@ void gui_font_get_dot_info(gui_text_t *text)
     text->char_height_sum = all_char_h;
     text->char_line_sum = line_flag;
     text->font_len = chr_i;
-    gui_log("FTL unicode text->font_len %d\n", text->font_len);
+    text->active_font_len = chr_i;
     gui_free(unicode_buf);
 }
 
@@ -711,10 +710,8 @@ void gui_font_mem_unload(gui_text_t *text)
             for (int i = 0; i < text->font_len; i++)
             {
                 gui_free(chr[i].dot_addr);
-                // gui_log("FTL free %p\n",chr[i].dot_addr);
             }
         }
-        gui_log("FTL text->font_len IS %d\n", text->font_len);
         for (int i = 0; i < text->font_len; i++)
         {
             mem_char_t *chr = text->data;
