@@ -452,6 +452,11 @@ static void gui_img_destory(gui_obj_t *obj)
 
 
     }
+    if (this->transform)
+    {
+        gui_free(this->transform);
+        this->transform = NULL;
+    }
 
 }
 
