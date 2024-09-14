@@ -3,19 +3,19 @@
         {
             "low": 18,
             "high": 37,
-            "cur": 23
+            "cur": 28
         }
     ],
     "compass": [
         {
-            "degree": 255
+            "degree": 106
         }
     ],
     "activity": [
         {
-            "move": 3518,
-            "ex": 20,
-            "stand": 9
+            "move": 3014,
+            "ex": 24,
+            "stand": 1
         }
     ]
 }

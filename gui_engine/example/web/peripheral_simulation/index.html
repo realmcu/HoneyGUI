@@ -3,12 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>20 Lights Simulator</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <style>
+        input[type=range] {
+            width: 300px;
+        }
+    </style>
 </head>
 <body>
-    <div id="lights-container"></div>
+    <main>
+        <section id="lights-section">
+            <h1>Lights Interface</h1>
+            <div id="lights-container"></div>
+        </section>
+        <section id="simulator-interface-section">
+            <h2>Simulator Interface</h2>
+            <div>
+                <h3>Temperature:</h3>
+                Low: <input type="range" id="tempLow" min="18" max="37" value="18" oninput="updateValue('tempLow')"><span id="tempLowVal">18</span><br>
+                High: <input type="range" id="tempHigh" min="18" max="37" value="37" oninput="updateValue('tempHigh')"><span id="tempHighVal">37</span><br>
+                Current: <input type="range" id="tempCur" min="18" max="37" value="22" oninput="updateValue('tempCur')"><span id="tempCurVal">22</span><br>
+            </div>
+            <div>
+                <h3>Compass:</h3>
+                Degree: <input type="range" id="compDegree" min="0" max="359" value="90" oninput="updateValue('compDegree')"><span id="compDegreeVal">90</span><br>
+            </div>
+            <div>
+                <h3>Activity:</h3>
+                Move: <input type="range" id="activityMove" min="1" max="10000" value="1" oninput="updateValue('activityMove')"><span id="activityMoveVal">1</span><br>
+                Exercise: <input type="range" id="activityEx" min="1" max="60" value="1" oninput="updateValue('activityEx')"><span id="activityExVal">1</span><br>
+                Stand: <input type="range" id="activityStand" min="1" max="24" value="1" oninput="updateValue('activityStand')"><span id="activityStandVal">1</span><br>
+            </div>
+            <pre id="output"></pre>
+        </section>
+    </main>
     <script src="scripts/script.js"></script>
+    <script src="scripts/clock_config.js"></script>
 </body>
 </html>
-

@@ -184,8 +184,7 @@ static char degree_content[5] = "0°", *orien_content = "N";
 
 #if defined __WIN32
 const char *filename =
-    "./gui_engine/example/web/peripheral_simulation_448_368/simulation_data.json";
-// "./gui_engine/example/screen_448_368/watch_icon_content.json";
+    "./gui_engine/example/web/peripheral_simulation/json/simulation_data.json"; //gui_engine\example\web\peripheral_simulation\json\simulation_data.json
 char *json_content;
 bool jason_mutex = 0;
 #endif

@@ -355,7 +355,7 @@ void write_file(const char *filename, const char *content)
 
 void update_light_config(int index, const char *attribute, int value)
 {
-    char *config_file_path = "./gui_engine/example/web/peripheral_simulation/light_config.json";
+    char *config_file_path = "./gui_engine/example/web/peripheral_simulation/json/light_config.json";
     char *json_str = read_file(config_file_path);
     if (json_str)
     {
