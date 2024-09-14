@@ -73,6 +73,8 @@ doc/output
 doc/build
 doc/_build
 gui_engine/example/web/tree/diagram.mmd
+doc/**/word_dict.txt
+
 # editor config
 .vscode/
 win32_sim/gui.bin

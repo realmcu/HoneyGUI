@@ -16,6 +16,7 @@ sphinx-copybutton = "*"
 sphinx-mermaid = "*"
 sphinxcontrib-mermaid = "*"
 linkify-it-py = "*"
+jieba = "*"
 
 [dev-packages]
 

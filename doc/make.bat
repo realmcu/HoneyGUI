@@ -29,6 +29,12 @@ if errorlevel 9009 (
 
 if "%1" == "" goto help
 
+if "%1" == "html" (
+    REM Run Python script to generate dictionary using CN_SOURCEDIR
+    python generate_jieba_dict.py %CN_SOURCEDIR% %CN_SOURCEDIR%/word_dict.txt
+    if errorlevel 1 exit /b 1
+)
+
 REM sphinx-build -b html -c ./en ../ ./_build/en -D language=en
 %SPHINXBUILD% -M %1 %EN_SOURCEDIR% %EN_BUILDDIR% -D language=en -c %EN_CONFDIR% %SPHINXOPTS% %O%
 REM sphinx-build -b html -c ./cn ../ ./_build/cn -D language=zh_CN

@@ -93,6 +93,9 @@ if not skip_doxygen:
   cmd("doxygen Doxyfile")
 
 
+# Generate jeba dict
+os.chdir(doc_path)
+cmd("python generate_jieba_dict.py ./cn ./cn/word_dict.txt")
 
 # BUILD HTML
 os.chdir(doc_path)
