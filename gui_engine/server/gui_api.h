@@ -141,6 +141,8 @@ extern "C" {
 #define APP_COLOR_SILVER_OPACITY(opacity)   gui_rgba(192,192,192, opacity)
 #define APP_COLOR_BLACK                     gui_rgb(0,0,0)
 #define APP_COLOR_GRAY                      gui_rgb(128,128,128)
+#define APP_COLOR_BLACK_OPACITY(opacity)    gui_rgba(0,0,0, opacity)
+#define APP_COLOR_GRAY_OPACITY(opacity)     gui_rgba(128,128,128, opacity)
 /** End of SERVER_Exported_Macros
   * @}
   */
@@ -288,6 +290,12 @@ gui_color_t gui_rgba(unsigned char red,
  * @return gui_color_t
  */
 gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
+/**
+ * @brief Get fps.
+ *
+ * @return fps
+ */
+uint32_t gui_fps(void);
 /** End of SERVER_Exported_Functions
   * @}
   */

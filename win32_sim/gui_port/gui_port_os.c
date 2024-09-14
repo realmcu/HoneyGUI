@@ -12,7 +12,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-static uint32_t gui_tick = 0;
+static volatile uint32_t gui_tick;
 
 static void *port_thread_create(const char *name, void (*entry)(void *param), void *param,
                                 uint32_t stack_size, uint8_t priority)
@@ -116,7 +116,7 @@ static bool port_mq_recv(void *handle, void *buffer, uint32_t size, uint32_t tim
 
 static uint32_t port_thread_ms_get(void)
 {
-    return 10 * gui_tick;
+    return gui_tick;
 }
 
 
@@ -191,17 +191,45 @@ static void *rtk_gui_timer(void *arg)
     while (true)
     {
         usleep(10 * 1000); //10ms
-        gui_tick++;
         if (os_api.gui_tick_hook != NULL)
         {
             os_api.gui_tick_hook();
         }
     }
 }
+#include <stdio.h>
+#include <sys/time.h>
+#include <inttypes.h>
+static void *rtk_gui_tick(void *arg)
+{
+    struct timeval currentTime;
+
+
+    gettimeofday(&currentTime, NULL);
+
+    int64_t start_milliseconds = currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000;
+    while (1)
+    {
+        struct timeval currentTime;
+
+        gettimeofday(&currentTime, NULL);
+        gui_tick = currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000 - start_milliseconds;
+    }
+}
+
 void gui_port_os_init(void)
 {
     pthread_t thread;
     pthread_create(&thread, NULL, rtk_gui_timer, NULL);
+    {
+        pthread_t thread_id;
+        if (pthread_create(&thread_id, NULL, rtk_gui_tick, NULL) != 0)
+        {
+            fprintf(stderr, "Error creating thread\n");
+            return;
+        }
+    }
+
     gui_os_api_register(&os_api);
 
 }

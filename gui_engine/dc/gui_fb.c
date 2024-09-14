@@ -386,8 +386,11 @@ static void gui_fb_draw(gui_obj_t *root)
 
     }
 }
-
-
+static int frame_count_per_second;
+uint32_t gui_fps()
+{
+    return frame_count_per_second;
+}
 void gui_fb_change(void)
 {
     fb_change = true;
@@ -430,20 +433,21 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     }
 
     static int last_ms;
+    static int one_second;
+    int tick = gui_ms_get();
+    static int frame_count;
+    if (tick - one_second >= 1000)
+    {
+        one_second = tick;
+        frame_count_per_second = frame_count;
+        frame_count = 0;
+        gui_log("fps:%d\r", frame_count_per_second);
+    }
     if (fb_change == true)
     {
+        frame_count++;
         gui_fb_draw(root);
         fb_change = false;
-        {
-            int ms = gui_ms_get();
-            if (last_ms)
-            {
-                spf = ms - last_ms;
-                //gui_log("spf:%d ms", spf);
-            }
-            else { spf = 0; }
-            last_ms = ms;
-        }
     }
     else
     {

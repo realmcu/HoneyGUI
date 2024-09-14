@@ -18,6 +18,7 @@
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_common.h"
+#include "gui_fps.h"
 #include <stdio.h>
 #ifdef _ENABLE_RTK_SOC_WATCH_
 #include "wdg.h"
@@ -112,6 +113,7 @@ static void design_app_watch_ui(gui_app_t *app)
     gui_tab_t *tab_alipay = gui_tab_create(tabview_main, "alipay",       0, 0, 0, 0, 6, 0);
     extern void alipay_menu_ui(gui_obj_t *parent);
     alipay_menu_ui(GUI_BASE(tab_alipay));
+    gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
 #if defined _WIN32
