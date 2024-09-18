@@ -39,6 +39,7 @@ static void block_cb(void);
 static void fruit_ninja_cb(void);
 static void calculator_cb(void);
 static void soccer_cb(void);
+static void box2d_ring_cb(void);
 static int page_y_recode;
 static void page_dtor(gui_obj_t *obj);
 static gui_progressbar_t *pro;
@@ -159,7 +160,7 @@ void design_tab_menu(void *parent)
         "Fruit Ninja",
         "Calculator",
         "Soccer",
-        "Music",
+        "box2d ring",
         "Sport",
     };
     int array_size = sizeof(array) / sizeof(array[0]);
@@ -210,6 +211,7 @@ void design_tab_menu(void *parent)
     gui_win_click(button_array[12], fruit_ninja_cb,    button_array[12]);
     gui_win_click(button_array[13], calculator_cb,     button_array[13]);
     gui_win_click(button_array[14], soccer_cb,         button_array[14]);
+    gui_win_click(button_array[15], box2d_ring_cb,     button_array[15]);
 }
 
 static void press_callback(gui_win_t *button)
@@ -461,6 +463,10 @@ static void calculator_cb()
 static void soccer_cb()
 {
     GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_SOCCER))
+}
+static void box2d_ring_cb()
+{
+    GUI_APP_SWAP_HANDLE(get_app_watch_ui(), GUI_APP_HANDLE(APP_BOX2D_RING))
 }
 // Define an array for window list, containing 15 windows
 static gui_win_t *win_list_array[15];

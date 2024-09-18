@@ -32,6 +32,7 @@
 #define APP_FRUIT_NINJA
 #define APP_HEART_RATE
 #define APP_SOCCER
+#define APP_BOX2D_RING
 GUI_APP_DEFINE(APP_HEART_RATE, app_hr_ui_design) // cppcheck-suppress syntaxError
 /*Define a app with name APP_STOPWATCH*/
 #define APP_STOPWATCH
@@ -53,6 +54,7 @@ GUI_APP_DEFINE_NAME(APP_BLOCK)
 GUI_APP_DEFINE_NAME(APP_FRUIT_NINJA)
 GUI_APP_DEFINE_NAME(APP_CALCULATOR)
 GUI_APP_DEFINE_NAME(APP_SOCCER)
+GUI_APP_DEFINE_NAME(APP_BOX2D_RING)
 #define SCREEN_W ((int)gui_get_screen_width())
 #define SCREEN_H ((int)gui_get_screen_height())
 /**
@@ -2805,6 +2807,39 @@ GUI_APP_ENTRY(APP_SOCCER)
     gui_soccer_set_center(soccer, 227, 227);
     gui_soccer_on_click(soccer, app_soccer_cb, NULL);
 
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}
+
+GUI_APP_ENTRY(APP_BOX2D_RING)
+{
+#ifdef ENABLE_RTK_GUI_BOX2D
+    extern void app_box2d_ring_ui_design(gui_obj_t *obj);
+    app_box2d_ring_ui_design(GUI_APP_ROOT_SCREEN);
+#else
+    {
+        char *text = "Please uncomment CONFIG_REALTEK_BUILD_GUI_BOX2D";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, 0,  0, 200,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+    {
+        char *text = "in win32_sim/menu_config.h";
+        int font_size = 16;
+        gui_text_t *t = gui_text_create(GUI_APP_ROOT_SCREEN, 0,  0, 220,
+                                        gui_get_screen_width(),
+                                        font_size);
+        gui_text_set(t, text, GUI_FONT_SRC_BMP, COLOR_WHITE, strlen(text), font_size);
+        void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
+        gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+        gui_text_mode_set(t, MULTI_LEFT);
+    }
+#endif
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
 }
