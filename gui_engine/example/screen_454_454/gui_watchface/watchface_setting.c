@@ -13,7 +13,7 @@
 char *txet_sw_reset = "确认重启？";
 char *txet_factory_data_reset = "确认恢复出厂？";
 
-static void switch_back_menu_setting_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_back_menu_setting_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_back_menu_setting_touch_cb, event = %d\n", event);
     app_watchface_switch_tabs(WATCHFACE_MAIN);
@@ -21,18 +21,18 @@ static void switch_back_menu_setting_touch_cb(void *obj, gui_event_cb_t event)
 
 static void switch_sw_reset_yes_action(void *obj)
 {
-    gui_log("switch_sw_reset_yes_action, obj = 0x%x\n", obj);
+    gui_log("switch_sw_reset_yes_action\n");
 #ifndef _WIN32
     chip_reset(RESET_ALL);
 #endif
 }
 static void switch_sw_reset_no_action(void *obj)
 {
-    gui_log("switch_sw_reset_no_action, obj = 0x%x\n", obj);
+    gui_log("switch_sw_reset_no_action\n");
     app_watchface_switch_tabs(WATCHFACE_SETTING);
 }
 
-static void switch_text_base_sw_reset_touch_cb(void *obj, gui_event_cb_t event)//base?
+static void switch_text_base_sw_reset_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_text_base_sw_reset_touch_cb, event = %d\n", event);
 
@@ -45,7 +45,7 @@ static void switch_text_base_sw_reset_touch_cb(void *obj, gui_event_cb_t event)/
 
 static void switch_factory_data_reset_yes_action(void *obj)
 {
-    gui_log("switch_factory_data_reset_yes_action, obj = 0x%x\n", obj);
+    gui_log("switch_factory_data_reset_yes_action\n");
 
 #ifndef _WIN32
     T_IO_MSG factory_reset_msg;
@@ -57,11 +57,12 @@ static void switch_factory_data_reset_yes_action(void *obj)
 }
 static void switch_factory_data_reset_no_action(void *obj)
 {
-    gui_log("switch_factory_data_reset_no_action, obj = 0x%x\n", obj);
+    gui_log("switch_factory_data_reset_no_action\n");
     app_watchface_switch_tabs(WATCHFACE_SETTING);
 }
 
-static void switch_text_base_factory_data_reset_touch_cb(void *obj, gui_event_cb_t event)//base?
+static void switch_text_base_factory_data_reset_touch_cb(void *obj, uint16_t event,
+                                                         void *param)
 {
     gui_log("switch_text_base_factory_data_reset_touch_cb, event = %d\n", event);
 

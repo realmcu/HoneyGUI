@@ -1,20 +1,14 @@
 #include <gui_tabview.h>
 #include "gui_card.h"
 #include <gui_obj.h>
-#include <gui_win.h>
 #include <gui_text.h>
 #include <gui_curtain.h>
 #include "root_image/ui_resource.h"
 #include <gui_app.h>
 #include "gui_tab.h"
-#include "gui_perspective.h"
 #include "font_mem.h"
 #include <gui_img.h>
-#include "gui_canvas.h"
 #include "app_gui_main.h"
-#include "gui_perspective.h"
-#include "gui_cube.h"
-#include "gui_win.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_common.h"
@@ -126,19 +120,27 @@ static int watch_app_init(void)
 #endif
     int fd;
     extern int open(const char *file, int flags, ...);
+    extern int close(int fd);
     fd = open("./gui_engine/example/screen_454_454/root_image/root(0x4400000).bin", 0);
     if (fd > 0)
     {
+        if (read(fd, resource_root, 1024 * 1024 * 20) == -1)
+        {
+            printf("open root(0x4400000).bin read fail!");
+            close(fd);
+            return 0;
+        }
         printf("open root(0x4400000).bin Successful!\n");
-        read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
     {
+        close(fd);
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
         return 0;
     }
+    close(fd);
 #endif
     extern int gui_server_init(void);
     gui_server_init();

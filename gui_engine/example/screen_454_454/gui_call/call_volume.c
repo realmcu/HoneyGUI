@@ -2,7 +2,6 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_text.h"
-#include "gui_scroll_text.h"
 #include "gui_switch.h"
 #include "gui_app.h"
 #include "gui_win.h"
@@ -22,7 +21,7 @@ gui_progressbar_t *progressbar_calling_volume = NULL;
 float volume_percentage;
 uint8_t gui_curr_volume = 0;
 
-static void switch_call_vol_update_cb(void *obj, uint16_t event)
+static void switch_call_vol_update_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_call_vol_update_cb\n");
 
@@ -42,7 +41,7 @@ static void switch_call_vol_update_cb(void *obj, uint16_t event)
 #endif
 }
 
-static void switch_calling_volume_up_touch_cb(void *parent, uint16_t event)
+static void switch_calling_volume_up_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_call_vol_up_touch_cb\n");
 
@@ -66,7 +65,7 @@ static void switch_calling_volume_up_touch_cb(void *parent, uint16_t event)
     }
 }
 
-static void switch_calling_volume_down_touch_cb(void *parent, uint16_t event)
+static void switch_calling_volume_down_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_call_vol_down_touch_cb\n");
 

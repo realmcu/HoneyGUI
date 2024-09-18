@@ -13,7 +13,6 @@
 #include "app_task.h"
 #endif
 #include "gui_page.h"
-#include "gui_img_scope.h"
 #include "tp_algo.h"
 #define MODE_SOURCE true
 #define MODE_SINK false

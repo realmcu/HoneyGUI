@@ -5,13 +5,12 @@
 #include "gui_win.h"
 #include "gui_obj.h"
 #include "gui_common.h"
-#include "gui_grid.h"
 #include "gui_tab.h"
 #include "contacts_mgr.h"
 
-static void switch_contacts_touch_cb(void *obj, uint16_t event)
+static void switch_contacts_touch_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("switch_contacts_touch_cb, obj = 0x%x\n", obj);
+    gui_log("switch_contacts_touch_cb\n");
     switch (event)
     {
     case GUI_EVENT_1:

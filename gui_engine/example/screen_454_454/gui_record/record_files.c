@@ -4,29 +4,25 @@
 #include "gui_curtainview.h"
 #include "gui_curtain.h"
 #include "gui_img.h"
-#include "gui_page.h"
-#include "gui_grid.h"
 #include "gui_text.h"
 #include "gui_switch.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
-#include "gui_img_scope.h"
-#include "gui_scroll_text.h"
 #include "record_mgr.h"
 #ifndef _WIN32
 #include "app_task.h"
 #include "app_mmi.h"
 #endif
 
-static void record_files_back_touch_cb(void *obj, uint16_t event)
+static void record_files_back_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("record_files_back_touch_cb\n");
     app_record_switch_tabs(RECORD_MAIN);
 }
 
-static void switch_record_files_touch_cb(void *obj, uint16_t event)
+static void switch_record_files_touch_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("switch_record_files_touch_cb, obj = 0x%x\n", obj);
+    gui_log("switch_record_files_touch_cb\n");
     switch (event)
     {
     case GUI_EVENT_1:

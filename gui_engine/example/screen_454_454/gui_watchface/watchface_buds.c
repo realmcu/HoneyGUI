@@ -23,7 +23,7 @@ static uint8_t app_bond_earphone_index = 0xff;
 char *txet_disconnect = "确认断开连接？";
 char bond_bd_addr[20];
 //todo:
-static void tab_buds_update_cb(void *obj, uint16_t event)
+static void tab_buds_update_cb(void *obj, uint16_t event, void *param)
 {
 #ifndef _WIN32
     //todo:
@@ -77,13 +77,13 @@ static void tab_buds_update_cb(void *obj, uint16_t event)
 #endif
 }
 
-static void switch_back_menu_buds_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_back_menu_buds_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_back_menu_buds_touch_cb, event = %d\n", event);
     app_watchface_switch_tabs(WATCHFACE_MAIN);
 }
 
-static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_text_base_buds_device_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_text_base_buds_device_touch_cb, event = %d\n", event);
 #ifndef _WIN32
@@ -91,7 +91,7 @@ static void switch_text_base_buds_device_touch_cb(void *obj, gui_event_cb_t even
 #endif
 }
 
-static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_text_base_search_buds_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_text_base_search_buds_touch_cb, event = %d\n", event);
 #ifndef _WIN32
@@ -113,7 +113,7 @@ static void switch_text_base_search_buds_touch_cb(void *obj, gui_event_cb_t even
 
 static void switch_disconnect_yes_action(void *obj)
 {
-    gui_log("switch_disconnect_yes_action, obj = 0x%x\n", obj);
+    gui_log("switch_disconnect_yes_action\n");
 #ifndef _WIN32
     //disconnect buds
     app_bond_earphone_index = app_bt_bond_get_active_num_by_type(T_DEVICE_TYPE_EARPHONE);
@@ -131,16 +131,16 @@ static void switch_disconnect_yes_action(void *obj)
 
 static void switch_disconnect_no_action(void *obj)
 {
-    gui_log("switch_disconnect_no_action, obj = 0x%x\n", obj);
+    gui_log("switch_disconnect_no_action\n");
     app_watchface_switch_tabs(WATCHFACE_BUDS);
 #ifndef _WIN32
     gui_update_by_event(GUI_EVENT_BUDS, NULL, false);
 #endif
 }
 
-static void switch_disconnect_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_disconnect_touch_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("switch_disconnect_touch_cb, event = %d\n", event);
+    gui_log("switch_disconnect_touch_cb\n");
 
     set_confirm_yes(switch_disconnect_yes_action, obj);
     set_confirm_no(switch_disconnect_no_action, obj);

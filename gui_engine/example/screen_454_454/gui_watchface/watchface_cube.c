@@ -6,7 +6,6 @@
 #include "gui_canvas.h"
 #include "app_gui_main.h"
 #include "gui_cube.h"
-#include "gui_server.h"
 #include <stdio.h>
 #include "watchface_mgr.h"
 #ifndef _WIN32

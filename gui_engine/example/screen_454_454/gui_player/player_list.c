@@ -116,7 +116,7 @@ void play_select_music(uint16_t index)
 #endif
 }
 
-static void switch_song_back_cb(void *obj, uint16_t event)
+static void switch_song_back_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_song_back_cb event = %d\n", event);
     switch (event)
@@ -130,7 +130,7 @@ static void switch_song_back_cb(void *obj, uint16_t event)
     }
 }
 
-static void switch_song_cb(void *obj, uint16_t event)
+static void switch_song_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_song_1_cb event = %d\n", event);
     gui_switch_t *this = (gui_switch_t *)obj;
@@ -171,7 +171,7 @@ static void switch_song_cb(void *obj, uint16_t event)
 
 static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_t *list_first)
 {
-    gui_log("pagelist_test_update_list_first_cb, list_first = 0x%x\n", list_first);
+    gui_log("pagelist_test_update_list_first_cb, list_first = 0x%x\n", (uint32_t *)list_first);
 
 #ifndef _WIN32
     slide_index++;
@@ -194,7 +194,7 @@ static void pagelist_test_update_list_first_cb(gui_pagelist_t *this, gui_switch_
 
 static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t *list_last)
 {
-    gui_log("pagelist_test_update_list_last_cb, list_first = 0x%x\n", list_last);
+    gui_log("pagelist_test_update_list_last_cb, list_first = 0x%x\n", (uint32_t *)list_last);
 
 #ifndef _WIN32
     slide_index--;
@@ -212,7 +212,7 @@ static void pagelist_test_update_list_last_cb(gui_pagelist_t *obj, gui_switch_t 
 #endif
 }
 
-static void tab_player_list_update_cb(void *obj, uint16_t event)
+static void tab_player_list_update_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("tab_player_list_update_cb  event = 0x%x\n", event);
     app_player_switch_tabs(PLAYER_MAIN);
