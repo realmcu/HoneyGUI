@@ -5,13 +5,11 @@
 
 ## Win widget
 
-```{note}
-This is a container widget. 
-Operations on the window widget will affect the widgets nested in the container. 
-Hiding the window will hide the nested widgets. 
-When the window makes graphic transformations, such as panning and scaling, the nested widgets will make consistent transformations. 
-This widget can monitor multiple gestures.
-```
+- This is a container widget. 
+- Operations on the window widget will affect the widgets nested in the container. 
+- Hiding the window will hide the nested widgets. 
+- When the window makes graphic transformations, such as panning and scaling, the nested widgets will make consistent transformations. 
+- This widget can monitor multiple gestures.
 
 ### Hide a window
 - This ```win``` variable is assigned the  ```win``` tag ```'heat_win'```'s handle
@@ -216,8 +214,9 @@ function led1OnFunc(params) {
 sw.getElementById('living_switch')
 sw.turnOn()
 ```
-This is the ```writeSync``` 's control gpio led implementation for RTL87X2G. First get gpio value and direction value, then use specify driver api to operate led.
-Refer to [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage) for more information.
+- This is the ```writeSync``` 's control gpio led implementation for RTL87X2G. 
+- First get gpio value and direction value, then use specify driver api to operate led.
+- Refer to [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage) for more information.
 ```c
 DECLARE_HANDLER(writeSync)
 {
@@ -265,7 +264,7 @@ DECLARE_HANDLER(writeSync)
 ```
 
 
-## IMAGE
+## Image
 
 ### API
 ```javascript
@@ -274,21 +273,21 @@ DECLARE_HANDLER(writeSync)
     scale : function (scaleRateX:number, scaleRateY:number) {},
     setMode : function (modeIndex:number) {},
 ```
-## APP
+## App
 
 ### API
 ```javascript
     open : function (appXML : string) {},
     close : function () {},
 ```
-## PROGRESSBAR
+## Progressbar
 
 ### API
 ```javascript
     getElementById : function (widget_name : string) {},
     progress : function (progressToSet : number):{},//get or set progress//return progress
 ```
-## TAB
+## Tab
 
 ### API
 ```javascript
