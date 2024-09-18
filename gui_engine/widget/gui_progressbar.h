@@ -61,6 +61,7 @@ typedef struct gui_progressbar
                  int16_t y,
                  int16_t w, int16_t h);
     IMG_SOURCE_MODE_TYPE src_mode;   // scroll_bar
+    uint8_t image_type;
 } gui_progressbar_t;
 /* gui_progressbar_t end*/
 

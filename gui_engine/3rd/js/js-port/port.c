@@ -73,7 +73,11 @@ void jerry_port_log(jerry_log_level_t level, const char *format, ...)
  */
 void jerryx_port_handler_print_char(char c)  /**< the character to print */
 {
+#ifdef __WIN32
+    printf("%c", c);
+#else
     gui_log("%c", c);
+#endif
 } /* jerryx_port_handler_print_char */
 
 /*

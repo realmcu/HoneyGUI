@@ -278,76 +278,31 @@ static void gui_text_font_destory(gui_text_t *text)
 static void gui_text_update_att(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
-    uint32_t cur_time_gap;
-
-    if (this->animate && this->animate->animate)
-    {
-        cur_time_gap = gui_ms_get() - this->animate->cur_time_ms;
-        this->animate->cur_time_ms = gui_ms_get();
-
-        if (cur_time_gap >= 2 * this->animate->dur)
-        {
-            this->animate->init_time_ms += cur_time_gap;
-        }
-
-        if (this->animate->repeat_count == 0)
-        {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
-            {
-                this->animate->callback(this->animate->p, this);
-                this->animate->animate = false;
-                this->animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
-                                                          this->animate->init_time_ms) /
-                                                  (float)this->animate->dur;
-            }
-        }
-        else if (this->animate->repeat_count < 0)
-        {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms) >= this->animate->dur)
-            {
-                this->animate->callback(this->animate->p, this);
-                this->animate->init_time_ms += this->animate->dur;
-                this->animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms -
-                                                          this->animate->init_time_ms) /
-                                                  (float)this->animate->dur;
-            }
-        }
-        else if (this->animate->repeat_count > 0)
-        {
-            if ((this->animate->cur_time_ms - this->animate->init_time_ms -
-                 this->animate->current_repeat_count * this->animate->dur) >=
-                this->animate->dur)
-            {
-                if (this->animate->current_repeat_count < this->animate->repeat_count)
-                {
-                    this->animate->callback(this->animate->p, this);
-                    this->animate->current_repeat_count ++;
-                }
-                else
-                {
-                    this->animate->callback(this->animate->p, this);
-                    this->animate->animate = false;
-                }
-                this->animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->animate->progress_percent = (float)(this->animate->cur_time_ms - this->animate->init_time_ms -
-                                                          this->animate->current_repeat_count * this->animate->dur) /
-                                                  (float)this->animate->dur;
-            }
-        }
-    }
+    animate_frame_update(this->animate, obj);
 }
 
+static void gui_text_input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_text_t *this = (gui_text_t *)obj;
+    GUI_UNUSED(tp);
+    GUI_UNUSED(this);
+
+    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
+        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
+    {
+        return;
+    }
+
+    switch (tp->type)
+    {
+    case TOUCH_SHORT:
+        {
+            gui_obj_skip_other_short(obj);
+        }
+        break;
+    }
+}
 static void gui_text_prepare(gui_obj_t *obj)
 {
     gui_text_t *this = (void *)obj;
@@ -396,9 +351,14 @@ static void gui_text_prepare(gui_obj_t *obj)
     {
     case TOUCH_SHORT:
         {
+            if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) ||
+                (obj->skip_tp_short))
+            {
+                break;
+            }
             if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
             {
-                gui_obj_event_set(obj, GUI_EVENT_TOUCH_CLICKED);
+                gui_obj_event_set(obj, (gui_event_t)TXT_EVENT_CLICK);
             }
         }
         break;
@@ -493,6 +453,9 @@ static void gui_text_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_text_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_text_prepare(obj);
             break;
@@ -530,6 +493,7 @@ void gui_text_ctor(gui_text_t *this,
 
     root->type = TEXTBOX;
     root->obj_cb = gui_text_cb;
+    root->has_input_prepare_cb = true;
     root->has_prepare_cb = true;
     root->has_draw_cb = true;
     root->has_end_cb = true;
@@ -548,7 +512,11 @@ void gui_text_ctor(gui_text_t *this,
 
 void gui_text_click(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
 {
-    gui_obj_add_event_cb(this, event_cb, GUI_EVENT_TOUCH_CLICKED, parameter);
+    gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_CLICK, parameter);
+}
+void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *parameter)
+{
+    gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_PSWD_DONE, parameter);
 }
 
 void gui_text_set(gui_text_t   *this,
@@ -575,19 +543,8 @@ void gui_text_set_animate(void    *o,
                           void    *callback,
                           void    *p)
 {
-    gui_animate_t *animate = ((gui_text_t *)o)->animate;
-    if (!(animate))
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-    }
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (void (*)(void *, void *))callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    ((gui_text_t *)o)->animate = animate;
+    gui_text_t *this = o;
+    GUI_SET_ANIMATE_HELPER
 }
 
 void gui_text_mode_set(gui_text_t *this, TEXT_MODE mode)

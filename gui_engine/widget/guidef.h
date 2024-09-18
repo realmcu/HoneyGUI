@@ -384,7 +384,6 @@ typedef struct gui_msg
     void *payload;
 } gui_msg_t;
 
-
 typedef struct gui_animate
 {
     uint32_t dur;
@@ -396,14 +395,15 @@ typedef struct gui_animate
     uint32_t last_round;
     float progress_percent;
     float last_per;
-    void (* callback)(void *p, void *this_widget);
+    void (* callback)(void *p, void *this_widget, struct gui_animate *animate);
     void *p;
+    const char *name;
     bool animate;
     bool init;
     bool Beginning_frame;
     bool end_frame;
 } gui_animate_t;
-
+typedef void (* gui_animate_callback_t)(void *p, void *this_widget, gui_animate_t *animate);
 
 typedef struct _gui_rect_file_head
 {
@@ -618,6 +618,22 @@ typedef int gui_error_t;
 #define GUI_SPEED_RECODE_DEFINE int speed_recode[GUI_SPEED_RECODE_LENGTH];
 #define GUI_SPEED_MAX 60
 #define GUI_SPEED_MIN 7
+#define GUI_SET_ANIMATE_HELPER \
+    gui_animate_t *animate = this->animate;\
+    \
+    if (!(animate))\
+    {\
+        animate = gui_malloc(sizeof(gui_animate_t));\
+    }\
+    \
+    memset((animate), 0, sizeof(gui_animate_t));\
+    animate->animate = true;\
+    animate->dur = dur;\
+    animate->callback = (gui_animate_callback_t)callback;\
+    animate->repeat_count = repeat_count;\
+    animate->p = p;\
+    this->animate = animate;
+#define GUI_STRINGS_EQUAL(string1, string2) (!strcmp(string1, string2))
 /** End of SUBMOUDLE_Exported_Macros
   * @}
   */

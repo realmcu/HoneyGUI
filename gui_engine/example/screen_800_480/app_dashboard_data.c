@@ -290,17 +290,14 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
     if (navi_type == TURN_LEFT || navi_type == LEFT_FRONT || navi_type == LEFT_BACK
         || navi_type == LEFT_TURN_AROUND)
     {
-        //turn_left();
         app_current_dashboard_data.current_navi_info = T_NAVI_INFO_2;
     }
     else if (navi_type == TURN_RIGHT || navi_type == RIGHT_FRONT || navi_type == RIGHT_BACK)
     {
-        //turn_right();
         app_current_dashboard_data.current_navi_info = T_NAVI_INFO_3;
     }
     else
     {
-        //stright_ahead();
         app_current_dashboard_data.current_navi_info = T_NAVI_INFO_1;
     }
 #endif
@@ -319,28 +316,50 @@ void app_dashboard_data_update_navi_status(const uint8_t *pValue, uint16_t lengt
                 (distance % 1000 / 100));
         current_navi_data.navigation_num_len = strlen((char *)current_navi_data.navigation_msg);
 
-        memcpy(current_navi_data.navigation_unit, str_def1, strlen(str_def1));
-        current_navi_data.navigation_unit_len = strlen(str_def1);
+        size_t len = strlen(str_def1);
+        if (len < sizeof(current_navi_data.navigation_unit))
+        {
+            memcpy(current_navi_data.navigation_unit, str_def1, len);
+            current_navi_data.navigation_unit_len = len;
+        }
 
-        memcpy(current_navi_data.road_names, str_def2, strlen(str_def2));
-        current_navi_data.road_num_len = strlen(str_def2);
-        memcpy(current_navi_data.road_names + current_navi_data.road_num_len, (uint8_t *)pValue + 3,
-               length - 3);
-        current_navi_data.road_num_len = length - 3 + strlen(str_def2);
+        len = strlen(str_def2);
+        if (len < sizeof(current_navi_data.road_names))
+        {
+            memcpy(current_navi_data.road_names, str_def2, len);
+            current_navi_data.road_num_len = len;
+            size_t remaining_len = sizeof(current_navi_data.road_names) - len;
+            if (length - 3 <= remaining_len)
+            {
+                memcpy(current_navi_data.road_names + len, (uint8_t *)pValue + 3, length - 3);
+                current_navi_data.road_num_len += length - 3;
+            }
+        }
     }
     else
     {
         sprintf((char *)current_navi_data.navigation_msg, "%d", distance);
         current_navi_data.navigation_num_len = strlen((char *)current_navi_data.navigation_msg);
 
-        memcpy(current_navi_data.navigation_unit, str_def3, strlen(str_def3));
-        current_navi_data.navigation_unit_len = strlen(str_def3);
+        size_t len = strlen(str_def3);
+        if (len < sizeof(current_navi_data.navigation_unit))
+        {
+            memcpy(current_navi_data.navigation_unit, str_def3, len);
+            current_navi_data.navigation_unit_len = len;
+        }
 
-        memcpy(current_navi_data.road_names, str_def4, strlen(str_def4));
-        current_navi_data.road_num_len = strlen(str_def4);
-        memcpy(current_navi_data.road_names + current_navi_data.road_num_len, (uint8_t *)pValue + 3,
-               length - 3);
-        current_navi_data.road_num_len = length - 3 + strlen(str_def4);
+        len = strlen(str_def4);
+        if (len < sizeof(current_navi_data.road_names))
+        {
+            memcpy(current_navi_data.road_names, str_def4, len);
+            current_navi_data.road_num_len = len;
+            size_t remaining_len = sizeof(current_navi_data.road_names) - len;
+            if (length - 3 <= remaining_len)
+            {
+                memcpy(current_navi_data.road_names + len, (uint8_t *)pValue + 3, length - 3);
+                current_navi_data.road_num_len += length - 3;
+            }
+        }
     }
 
     app_dashboard_data_set_navi_data_update(current_navi_data);
@@ -457,6 +476,10 @@ void app_dashboard_data_update_message_status(const uint8_t *pValue, uint16_t le
     app_dashboard_data_get_message_data_update(&current_message_status);
 
     memset(current_message_status.wechat_msg, 0x0, sizeof(current_message_status.wechat_msg));
+    if (length > sizeof(current_message_status.wechat_msg))
+    {
+        length = sizeof(current_message_status.wechat_msg);
+    }
 
     current_message_status.wechat_msg_len = length;
     memcpy(&current_message_status.wechat_msg[0], &pValue[0], length);

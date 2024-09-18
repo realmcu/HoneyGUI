@@ -244,7 +244,51 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
  */
 void gui_canvas_rect_set_opacity(gui_canvas_rect_t *this, unsigned char opacity_value)
 {
+    GUI_ASSERT(this != NULL);
     this->opacity_value = opacity_value;
+}
+
+/**
+  * @brief set canvas rect color
+ *
+ * @param this
+ * @param color
+ */
+void gui_canvas_rect_set_color(gui_canvas_rect_t *this, gui_color_t  color)
+{
+    GUI_ASSERT(this != NULL);
+    this->color = color;
+}
+
+/**
+ * @brief set canvas rect location, start X and Y
+ *
+ * @param this
+ * @param start x
+ * @param start y
+ */
+void gui_canvas_rect_set_location(gui_canvas_rect_t *this, int x, int y)
+{
+    GUI_ASSERT(this != NULL);
+    gui_obj_t *root = (gui_obj_t *)this;
+    root->x = x;
+    root->y = y;
+}
+
+
+/**
+ * @brief set canvas rect size, width and heigh
+ *
+ * @param this
+ * @param width
+ * @param heigh
+ */
+void gui_canvas_rect_set_size(gui_canvas_rect_t *this, int w, int h)
+{
+    GUI_ASSERT(this != NULL);
+    gui_obj_t *root = (gui_obj_t *)this;
+    root->w = w;
+    root->h = h;
 }
 
 /** End of WIDGET_Exported_Functions

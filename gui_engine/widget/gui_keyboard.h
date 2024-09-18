@@ -70,14 +70,15 @@ typedef struct
     gui_obj_t base;
 
     // config
-    uint32_t layout: 3;  // layout type
-    uint32_t input_Method: 3; // input method type
-    uint32_t mode  : 3;  // input mode   EN/CN/NUM/CHAR...
-    uint32_t last_mode  : 3;  // input mode   EN/CN/NUM/CHAR...
-    uint32_t is_cn: 1; // en:0, cn:1
-    uint32_t caps_Lk: 1; // caps
-    uint32_t symbol_Lk: 1; // symbol lock
-    uint32_t num_pic: 16;
+    uint32_t layout       : 3; // layout type
+    uint32_t input_Method : 3; // input method type
+    uint32_t mode         : 3; // input mode   EN/CN/NUM/CHAR...
+    uint32_t last_mode    : 3; // input mode   EN/CN/NUM/CHAR...
+    uint32_t is_cn        : 1; // en:0, cn:1
+    uint32_t caps_Lk      : 1; // caps
+    uint32_t symbol_Lk    : 1; // symbol lock
+    uint32_t ispasswd     : 1;
+    uint32_t num_pic      : 16;
 
     gui_win_t *win_letter;
     gui_win_t *win_num;
@@ -169,9 +170,12 @@ typedef enum
 
     KB_IMG_OTHER_NUM,
 
+
+// event
+    KB_EVENT_PSWD_DONE     = GUI_EVENT_1,
+
+
 } KEYBOARD_CONST;
-
-
 
 /** End of WIDGET_Exported_Constants
   * @}
@@ -213,6 +217,20 @@ typedef enum
   * @{
   */
 
+/**
+ * @brief get input password
+ * @note
+ * @return password buffer
+ */
+char *gui_kb_get_pswd(void);
+
+/**
+ * @brief set history password
+ * @note
+ * @param pswd  history password string
+ * @param pswd_len  history password string length
+ */
+void gui_kb_set_pswd(char *pswd, uint8_t pswd_len);
 
 /**
  * @brief launch keyboard input

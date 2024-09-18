@@ -180,75 +180,7 @@ static void gui_scroll_text_font_unload(gui_text_t *text)
 static void gui_scroll_text_update_att(gui_obj_t *obj)
 {
     gui_scroll_text_t *this = (void *)obj;
-    uint32_t cur_time_gap;
-
-    if (this->base.animate && this->base.animate->animate)
-    {
-        cur_time_gap = gui_ms_get() - this->base.animate->cur_time_ms;
-        this->base.animate->cur_time_ms = gui_ms_get();
-
-        if (cur_time_gap >= 2 * this->base.animate->dur)
-        {
-            this->base.animate->init_time_ms += cur_time_gap;
-        }
-
-        if (this->base.animate->repeat_count == 0)
-        {
-            if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms) >= this->base.animate->dur)
-            {
-                this->base.animate->callback(this->base.animate->p, this);
-                this->base.animate->animate = false;
-                this->base.animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->base.animate->progress_percent = (float)(this->base.animate->cur_time_ms -
-                                                               this->base.animate->init_time_ms) /
-                                                       (float)this->base.animate->dur;
-            }
-        }
-        else if (this->base.animate->repeat_count < 0)
-        {
-            if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms) >= this->base.animate->dur)
-            {
-                this->base.animate->callback(this->base.animate->p, this);
-                this->base.animate->init_time_ms += this->base.animate->dur;
-                this->base.animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->base.animate->progress_percent = (float)(this->base.animate->cur_time_ms -
-                                                               this->base.animate->init_time_ms) /
-                                                       (float)this->base.animate->dur;
-            }
-        }
-        else if (this->base.animate->repeat_count > 0)
-        {
-            if ((this->base.animate->cur_time_ms - this->base.animate->init_time_ms -
-                 this->base.animate->current_repeat_count * this->base.animate->dur) >=
-                this->base.animate->dur)
-            {
-                if (this->base.animate->current_repeat_count < this->base.animate->repeat_count)
-                {
-                    this->base.animate->callback(this->base.animate->p, this);
-                    this->base.animate->current_repeat_count ++;
-                }
-                else
-                {
-                    this->base.animate->callback(this->base.animate->p, this);
-                    this->base.animate->animate = false;
-                }
-                this->base.animate->progress_percent = 1.0f;
-            }
-            else
-            {
-                this->base.animate->progress_percent = (float)(this->base.animate->cur_time_ms -
-                                                               this->base.animate->init_time_ms -
-                                                               this->base.animate->current_repeat_count * this->base.animate->dur) /
-                                                       (float)this->base.animate->dur;
-            }
-        }
-    }
+    animate_frame_update(this->base.animate, obj);
 }
 static void gui_scroll_text_prepare(gui_obj_t *obj)
 {

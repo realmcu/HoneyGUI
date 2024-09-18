@@ -1,0 +1,910 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ui version="1.0">
+  <widget class="Screen" name="screen0" layer="0" isLocked="False">
+    <property name="geometry">
+      <width>480</width>
+      <height>480</height>
+      <x>0</x>
+      <y>0</y>
+    </property>
+    <widget class="TabView" name="tabview0" layer="0" isLocked="False">
+      <property name="geometry">
+        <width>480</width>
+        <height>480</height>
+        <x>0</x>
+        <y>0</y>
+      </property>
+      <widget class="Tab" name="tab0" layer="-1" isLocked="False">
+        <property name="tabData">
+          <idX>0</idX>
+          <idY>0</idY>
+        </property>
+        <widget class="Page" name="page_wifi" layer="-1" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>480</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <widget class="Text" name="text0" layer="-1" isLocked="False">
+            <property name="geometry">
+              <width>105</width>
+              <height>31</height>
+              <x>32</x>
+              <y>28</y>
+            </property>
+            <property name="text">
+              <string>WLAN 设置</string>
+              <fontColor>#ffffffff</fontColor>
+              <font>fontSetting0</font>
+              <inputable>False</inputable>
+            </property>
+          </widget>
+          <widget class="Switch" name="sw_wifi" layer="0" isLocked="False">
+            <property name="geometry">
+              <width>56</width>
+              <height>26</height>
+              <x>392</x>
+              <y>30</y>
+            </property>
+            <property name="switchData">
+              <opacity>255</opacity>
+              <picture>Resources/image/wifi/sw_off.png</picture>
+              <highlightPicture>Resources/image/wifi/sw_on.png</highlightPicture>
+              <blendMode>imgBypassMode</blendMode>
+              <mode>normal</mode>
+              <folder />
+              <duration>1000</duration>
+            </property>
+          </widget>
+          <widget class="Win" name="win_save" layer="1" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>79</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_save" layer="1" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/blue.png</picture>
+                <highlightPicture>Resources/image/wifi/blue.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi" layer="7" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win8" layer="3" isLocked="False">
+            <property name="geometry">
+              <width>425</width>
+              <height>31</height>
+              <x>32</x>
+              <y>157</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Text" name="text1" layer="3" isLocked="False">
+              <property name="geometry">
+                <width>159</width>
+                <height>31</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>选取附近的 WLAN</string>
+                <fontColor>#ffffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+            </widget>
+            <widget class="Button" name="btn_scan" layer="3" isLocked="False">
+              <property name="geometry">
+                <width>30</width>
+                <height>30</height>
+                <x>389</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string />
+                <fontColor>#ffffff</fontColor>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/refresh_1.png</picture>
+                <highlightPicture>Resources/image/wifi/refresh_4.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win0" layer="4" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>197</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_00" layer="4" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture>Resources/image/wifi/grey_hl.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_00" layer="5" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_00" layer="6" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win1" layer="5" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>273</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_01" layer="5" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture>Resources/image/wifi/grey_hl.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_01" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_01" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win2" layer="6" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>349</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_02" layer="6" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture>Resources/image/wifi/grey_hl.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_02" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_02" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win3" layer="7" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>425</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_03" layer="7" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture />
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_03" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_03" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win4" layer="8" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>501</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_04" layer="8" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture>Resources/image/wifi/grey_hl.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_04" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_04" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win5" layer="9" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>577</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_05" layer="9" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture>Resources/image/wifi/grey_hl.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_05" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_05" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win6" layer="10" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>653</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_06" layer="10" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture>Resources/image/wifi/grey_hl.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_06" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_06" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+          <widget class="Win" name="win7" layer="11" isLocked="False">
+            <property name="geometry">
+              <width>416</width>
+              <height>60</height>
+              <x>32</x>
+              <y>729</y>
+            </property>
+            <property name="winData">
+              <hidden>False</hidden>
+              <bindMenu />
+            </property>
+            <widget class="Button" name="btn_07" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>416</width>
+                <height>60</height>
+                <x>0</x>
+                <y>0</y>
+              </property>
+              <property name="text">
+                <string>ssid</string>
+                <fontColor>#ffffff</fontColor>
+                <font>fontSetting0</font>
+                <inputable>False</inputable>
+              </property>
+              <property name="buttonData">
+                <blendMode>imgBypassMode</blendMode>
+                <opacity>255</opacity>
+                <picture>Resources/image/wifi/grey.png</picture>
+                <highlightPicture>Resources/image/wifi/grey_hl.png</highlightPicture>
+                <pictureX>0</pictureX>
+                <pictureY>0</pictureY>
+                <rotationAngle>0</rotationAngle>
+                <textX>0</textX>
+                <textY>0</textY>
+                <bindMenu />
+              </property>
+            </widget>
+            <widget class="Image" name="img_lk_07" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>16</width>
+                <height>19</height>
+                <x>376</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/Lock.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+            <widget class="Image" name="img_rssi_07" layer="11" isLocked="False">
+              <property name="geometry">
+                <width>18</width>
+                <height>18</height>
+                <x>24</x>
+                <y>21</y>
+              </property>
+              <property name="imageData">
+                <blendMode>imgFilterBlack</blendMode>
+                <opacity>255</opacity>
+                <image>Resources/image/wifi/rssi_4.png</image>
+                <rotationAngle>0</rotationAngle>
+                <scaleX>1</scaleX>
+                <scaleY>1</scaleY>
+              </property>
+            </widget>
+          </widget>
+        </widget>
+        <widget class="Image" name="img_bg" layer="0" isLocked="False">
+          <property name="geometry">
+            <width>480</width>
+            <height>480</height>
+            <x>0</x>
+            <y>0</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>150</opacity>
+            <image>Resources/image/wifi/BG.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+        <widget class="Win" name="win_con" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>336</width>
+            <height>234</height>
+            <x>72</x>
+            <y>131</y>
+          </property>
+          <property name="winData">
+            <hidden>False</hidden>
+            <bindMenu />
+          </property>
+          <widget class="Image" name="img_con" layer="1" isLocked="False">
+            <property name="geometry">
+              <width>336</width>
+              <height>234</height>
+              <x>0</x>
+              <y>0</y>
+            </property>
+            <property name="imageData">
+              <blendMode>imgFilterBlack</blendMode>
+              <opacity>255</opacity>
+              <image>Resources/image/wifi/win_1.png</image>
+              <rotationAngle>0</rotationAngle>
+              <scaleX>1</scaleX>
+              <scaleY>1</scaleY>
+            </property>
+          </widget>
+          <widget class="Text" name="txt_ssid" layer="2" isLocked="False">
+            <property name="geometry">
+              <width>247</width>
+              <height>32</height>
+              <x>30</x>
+              <y>21</y>
+            </property>
+            <property name="text">
+              <string>SSID</string>
+              <fontColor>#ff000000</fontColor>
+              <font>fontSetting0</font>
+              <inputable>False</inputable>
+            </property>
+          </widget>
+          <widget class="Text" name="txt_pw" layer="3" isLocked="False">
+            <property name="geometry">
+              <width>230</width>
+              <height>35</height>
+              <x>30</x>
+              <y>105</y>
+            </property>
+            <property name="text">
+              <string>pass word</string>
+              <fontColor>#ff000000</fontColor>
+              <font>fontSetting0</font>
+              <inputable>True</inputable>
+            </property>
+          </widget>
+          <widget class="Text" name="txt_err" layer="4" isLocked="False">
+            <property name="geometry">
+              <width>195</width>
+              <height>32</height>
+              <x>98</x>
+              <y>51</y>
+            </property>
+            <property name="text">
+              <string>连接失败，请重试！</string>
+              <fontColor>#ff0000ff</fontColor>
+              <font>fontSetting0</font>
+              <inputable>False</inputable>
+            </property>
+          </widget>
+          <widget class="Button" name="btn_can" layer="6" isLocked="False">
+            <property name="geometry">
+              <width>137</width>
+              <height>53</height>
+              <x>29</x>
+              <y>164</y>
+            </property>
+            <property name="text">
+              <string />
+              <fontColor>#ffffff</fontColor>
+              <inputable>False</inputable>
+            </property>
+            <property name="buttonData">
+              <blendMode>imgFilterBlack</blendMode>
+              <opacity>255</opacity>
+              <picture>Resources/image/wifi/cancel_0.png</picture>
+              <highlightPicture>Resources/image/wifi/cancel_1.png</highlightPicture>
+              <pictureX>0</pictureX>
+              <pictureY>0</pictureY>
+              <rotationAngle>0</rotationAngle>
+              <textX>0</textX>
+              <textY>0</textY>
+              <bindMenu />
+            </property>
+          </widget>
+          <widget class="Button" name="btn_con" layer="7" isLocked="False">
+            <property name="geometry">
+              <width>137</width>
+              <height>53</height>
+              <x>178</x>
+              <y>164</y>
+            </property>
+            <property name="text">
+              <string />
+              <fontColor>#ffffff</fontColor>
+              <inputable>False</inputable>
+            </property>
+            <property name="buttonData">
+              <blendMode>imgFilterBlack</blendMode>
+              <opacity>255</opacity>
+              <picture>Resources/image/wifi/connect_1.png</picture>
+              <highlightPicture>Resources/image/wifi/connect_0.png</highlightPicture>
+              <pictureX>0</pictureX>
+              <pictureY>0</pictureY>
+              <rotationAngle>0</rotationAngle>
+              <textX>0</textX>
+              <textY>0</textY>
+              <bindMenu />
+            </property>
+          </widget>
+          <widget class="Switch" name="sw_visib" layer="7" isLocked="False">
+            <property name="geometry">
+              <width>49</width>
+              <height>32</height>
+              <x>275</x>
+              <y>109</y>
+            </property>
+            <property name="switchData">
+              <opacity>255</opacity>
+              <picture>Resources/image/wifi/visible_0.png</picture>
+              <highlightPicture>Resources/image/wifi/visible_1.png</highlightPicture>
+              <blendMode>imgFilterBlack</blendMode>
+              <mode>normal</mode>
+              <folder />
+              <duration>1000</duration>
+            </property>
+          </widget>
+        </widget>
+        <widget class="Image" name="img_loading" layer="1" isLocked="False">
+          <property name="geometry">
+            <width>83</width>
+            <height>83</height>
+            <x>202</x>
+            <y>202</y>
+          </property>
+          <property name="imageData">
+            <blendMode>imgBypassMode</blendMode>
+            <opacity>255</opacity>
+            <image>Resources/image/loading/loading_00000.png</image>
+            <rotationAngle>0</rotationAngle>
+            <scaleX>1</scaleX>
+            <scaleY>1</scaleY>
+          </property>
+        </widget>
+      </widget>
+    </widget>
+    <widget class="Keybord" name="keybord0" layer="2" isLocked="False">
+      <property name="geometry">
+        <width>480</width>
+        <height>190</height>
+        <x>0</x>
+        <y>305</y>
+      </property>
+      <property name="keyboardData">
+        <isHide>true</isHide>
+        <ime>None</ime>
+      </property>
+    </widget>
+  </widget>
+</ui>

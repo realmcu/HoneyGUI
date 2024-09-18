@@ -59,7 +59,8 @@
 /** @defgroup WIDGET_Exported_Macros WIDGET Exported Macros
   * @{
   */
-
+#define IMAGE_ARRAY 1
+#define IMAGE_SCOPE 2
 
 
 /** End of WIDGET_Exported_Macros
@@ -114,7 +115,7 @@ static void gui_progressbar_movie_ctor_core(gui_progressbar_t     *this,
     {
         this->c = (void *)gui_img_create_from_mem(this, "pro", picture_array[0], 0, 0, 0, 0);
     }
-
+    this->image_type = IMAGE_ARRAY;
     this->color_hl = (uint32_t)(uintptr_t)picture_array;
 }
 
@@ -130,7 +131,7 @@ void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
         gui_obj_event_set(GUI_BASE(this), GUI_EVENT_1);
     }
 
-    if (GET_BASE(this->c)->type == IMAGE_SCOPE)
+    if (this->image_type == IMAGE_SCOPE)
     {
         if (this->color == 1)
         {
@@ -141,7 +142,7 @@ void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress)
             GUI_TYPE(gui_img_scope_t, this->c)->scope_y1 = (1.0f - this->per) * this->max;
         }
     }
-    else if (GET_BASE(this->c)->type == IMAGE_FROM_MEM)
+    else if (this->image_type == IMAGE_ARRAY)
     {
         size_t p = progress;
 
@@ -178,7 +179,7 @@ void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage)
             GUI_TYPE(gui_img_scope_t, this->c)->scope_y1 = (1.0f - percentage) * this->max;
         }
     }
-    else if (GET_BASE(this->c)->type == IMAGE_FROM_MEM)
+    else if (GET_BASE(this->c)->type == IMAGE_ARRAY)
     {
         size_t p = percentage * (this->max - 1);
 
@@ -240,7 +241,7 @@ void gui_progressbar_h_img_ctor(gui_progressbar_t *this,
                                &(((gui_obj_t *)this)->brother_list));
     }
     this->c = (void *)gui_img_scope_create(this, "progressbar_h", picture, 0, 0);
-
+    this->image_type = IMAGE_SCOPE;
     int w = gui_img_get_width((void *)this->c);
     this->max = w;
     GET_BASE(this)->w = w;
@@ -269,7 +270,7 @@ void gui_progressbar_h_img_ctor_from_ftl(gui_progressbar_t *this,
                                &(((gui_obj_t *)this)->brother_list));
     }
     this->c = (void *)gui_img_scope_create_from_ftl(this, "progressbar_h", picture, 0, 0);
-
+    this->image_type = IMAGE_SCOPE;
     int w = gui_img_get_width((void *)this->c);
     this->max = w;
     GET_BASE(this)->w = w;
@@ -298,7 +299,7 @@ void gui_progressbar_v_img_ctor(gui_progressbar_t *this,
                                &(((gui_obj_t *)this)->brother_list));
     }
     this->c = (void *)gui_img_scope_create(this, "progressbar_v", picture, 0, 0);
-
+    this->image_type = IMAGE_SCOPE;
     int w = gui_img_get_height((void *)this->c);
     this->max = w;
     GET_BASE(this)->w = gui_img_get_width((void *)this->c);
@@ -324,7 +325,7 @@ void gui_progressbar_v_img_ctor_from_ftl(gui_progressbar_t *this,
                                &(((gui_obj_t *)this)->brother_list));
     }
     this->c = (void *)gui_img_scope_create_from_ftl(this, "progressbar_v", picture, 0, 0);
-
+    this->image_type = IMAGE_SCOPE;
     int w = gui_img_get_height((void *)this->c);
     this->max = w;
     GET_BASE(this)->w = gui_img_get_width((void *)this->c);

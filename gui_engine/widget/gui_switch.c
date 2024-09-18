@@ -235,20 +235,7 @@ static void animate(gui_switch_t *this,
                     void         *callback,
                     void         *p)
 {
-    gui_animate_t *animate = this->animate;
-
-    if (!(animate))
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-    }
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (void (*)(void *, void *))callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    this->animate = animate;
+    GUI_SET_ANIMATE_HELPER
 }
 
 static void gui_switch_input_prepare(gui_obj_t *obj)
@@ -262,7 +249,13 @@ static void gui_switch_input_prepare(gui_obj_t *obj)
     {
         return;
     }
-    gui_obj_skip_other_short(obj);
+    if (gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == true)
+    {
+        if (tp->type == TOUCH_SHORT)
+        {
+            gui_obj_skip_other_short(obj);
+        }
+    }
 
 }
 static void gui_switch_prepare(gui_obj_t *obj)

@@ -17,11 +17,11 @@ RTKIOT 可视化设计工具支持以下功能：
 + 在PC上模拟GUI项目。
 
 本文档主要包括以下内容：
-+ 功能面板介绍
-+ 资源管理介绍
-+ 菜单栏介绍
-+ 快速入门教程
-+ GUI演示项目
++ [功能面板](#function_panel_anchor)
++ [资源管理](#resource_manage_anchor)
++ [菜单栏](#menu_anchor)
++ [快速入门教程](#quick_start_anchor)
++ [GUI演示项目](#gui_demo_anchor)
 
 为了简化文档，下文中使用“工具”来指代“RTKIOT可视化设计工具”。
 
@@ -30,6 +30,7 @@ RTKIOT 可视化设计工具支持以下功能：
 
 
 ## 功能面板
+<a id="function_panel_anchor"></a>
 ### 工具箱/控件
 + 非容器化控件
     + 可作为其他控件的父控件。
@@ -47,7 +48,7 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 文本 (Text)
 仅用于文本显示，不支持用户输入。属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称 | Y | Y | Y |
 | Size (Height)  | 控件高度 | Y | Y | Y |
@@ -62,7 +63,7 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 按钮 (Button)
 可点击的控件，具有文本和背景图片。属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称    | Y | Y | Y |
 | Size (Height)  | 控件高度    | Y | Y | Y |
@@ -83,7 +84,7 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 图像 (Image)
 能够设置图像的控件，其属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称     | Y | Y | Y |
 | Size (Height)  | 控件高度     | Y | Y | Y |
@@ -95,14 +96,17 @@ RTKIOT 可视化设计工具支持以下功能：
 | Image Scale X  | 图像水平缩放程度，是一个倍数/百分比。<br/> 例如，设置比例x 为0.5表示图像的实际显示宽度是原始图像宽度的一半  | Y | Y | Y |
 | Image Scale Y  | 图像垂直缩放程度，是一个倍数/百分比 | Y | Y | Y |
 
-**注意:**
-1.	在导出时，工具将转换导入的图像。可以在“菜单栏 -> 设置 -> 图像转换设置”中设置图像转换参数，详细请参考 <a href="#img_conv_setting_anchor">图像转换设置</a>。
+
+```{note}
+1.	在导出时，工具将转换导入的图像。可以在“菜单栏 -> 设置 -> 图像转换设置”中设置图像转换参数，详细请参考 [图像转换设置](#img_conv_setting_anchor)。
 2.	如果导入的图像大小与控件的大小不匹配，工具不会对图像进行缩放或裁剪。
+```
+
 
 ##### 滑动条 (SeekBar)
 滑动控件，可以响应用户滑动手势，并改变进度值。其属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名      | Y | Y | Y |
 | Size (Height)  | 控件高度    | Y | Y | Y |
@@ -118,7 +122,7 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 图像滑动条 (Image SeekBar)
 具有多个图像作为背景的滑动控件，用户滑动时可以切换到不同的图像，其属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名      | Y | Y | Y |
 | Size (Height)  | 控件高度    | Y | Y | Y |
@@ -135,7 +139,7 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 开关 (Switch)
 具有“已选中”和“未选中”状态的开关控件，其属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称    | Y | Y | Y |
 | Size (Height)  | 控件高度    | Y | Y | Y |
@@ -148,7 +152,7 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 圆弧 (Arc)
 弧形控件，暂时不支持手势，其属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称     | Y | Y | N |
 | Size (Height)  | 控件高度     | Y | Y | N |
@@ -170,10 +174,12 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 屏幕 (Screen)
 屏幕控件，对应于物理屏幕，是GUI项目的根控件，其属性如下表所示。
 
-**注意：**
-只能修改Name属性。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+```{note}
+只能修改Name属性。
+```
+
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称     | Y | Y | Y |
 | Size (Height)  | 控件高度     | Y | Y | Y |
@@ -185,7 +191,7 @@ RTKIOT 可视化设计工具支持以下功能：
 选项卡视图控件作为父控件，支持上下左右滑动来在选项卡之间切换。选项卡视图控件具有以下属性，如下表所示。
 
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称     | Y | Y | Y |
 | Size (Height)  | 控件高度     | Y | Y | Y |
@@ -195,7 +201,7 @@ RTKIOT 可视化设计工具支持以下功能：
 | Transition     | 选项卡切换模式支持以下类型：<br/>normal: 无特效<br/>fade: 淡入/淡出<br/>scale: 缩放<br/>fadeScale: 淡入/淡出和缩放 | N | Y | Y |
 <br/>
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称     | Y | Y | Y |
 | Size (Height)  | 控件高度     | Y | Y | Y |
@@ -207,24 +213,30 @@ RTKIOT 可视化设计工具支持以下功能：
 	
 <div id = "figure_2_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817871000642675/ca6cda22_12407535.png" width="300"/></div>
 
-**注意：**
+
+```{note}
 1.	选项卡视图的宽度和高度不能被修改，会默认设置为屏幕的宽度和高度。
 2.	选项卡视图的水平和垂直坐标不能被修改，始终为0。
 3.	选项卡视图只能作为屏幕控件的子控件使用。
 4.	选项卡视图的子控件只能是选项卡。
 5.	选项卡的宽度和高度不能被修改，会默认设置为选项卡视图的宽度和高度。
 6.	选项卡的水平和垂直坐标不能被修改，始终为0。
+```
+
 
 </br>
 
 ##### 页面 (Page)
 具有可滚动内容的容器控件。
 
-**注意：**
+
+```{note}
 1.	页面只支持垂直滚动。
 2.	页面控件的宽度和高度只定义了对滑动手势响应的界面区域，是否允许滚动取决于是否将其添加到超出屏幕范围的子控件中。
+```
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称     | Y | Y | Y |
 | Size (Height)  | 控件高度     | Y | Y | Y |
@@ -235,7 +247,7 @@ RTKIOT 可视化设计工具支持以下功能：
 ##### 窗口 (Win)
 在窗口的宽度和高度定义的区域内，可以响应各种手势，包括点击、长按、按下、释放和滑动，其属性如下表所示。
 
-| 属性 | 描述 | 8762D/8763E | 8762G/8772G | TBD |
+| 属性 | 描述 | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |------|-----|:-----------:|:-----------:|:---:|
 | Name           | 控件名称     | Y | Y | Y |
 | Size (Height)  | 控件高度     | Y | Y | Y |
@@ -247,19 +259,22 @@ RTKIOT 可视化设计工具支持以下功能：
 ### 设计视图/画布
 用户可以从工具箱面板中拖放控件到设计视图中，调整控件的布局并设置属性，以设计一个可以在瑞昱 IC中渲染的图形界面。
 
-<img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png">
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627839639298235/033d3a5b_12407535.png" width="650"></div>
+
 
 #### 选项卡视图 - 创建/删除/插入选项卡
 从工具箱中拖放选项卡视图控件到设计视图中，创建出一个只包含一个主页选项卡（坐标（0,0））的选项卡视图，如下图所示。
 
-<img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png">
+<div style="text-align:center;"><img src="https://foruda.gitee.com/images/1721627964036015694/3b5ee0d4_12407535.png" width="650"></div>
 
 ##### 创建选项卡
 可以通过点击设计视图周围的按钮来创建新的选项卡。
 
-**注意：**
+
+```{note}
 1.	如果idx为0，则上下按钮可用。
 2.	如果idy为0，则左右按钮可用。
+```
 
 
 ###### 删除选项卡
@@ -274,22 +289,25 @@ RTKIOT 可视化设计工具支持以下功能：
 1.	将选项卡（2,0）及其右侧的选项卡的idx加一，如下图所示；
 2.	切换到选项卡（1,0），点击 创建新的选项卡（2,0）。
 
-<div id="figure_2_7_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628407464342474/00daa1b6_12407535.png"></div>
+<div id="figure_2_7_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628407464342474/00daa1b6_12407535.png" width="650"></div>
 <br/>
-<div id="figure_2_7_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628378862688215/3aefc151_12407535.png"></div>
+<div id="figure_2_7_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628378862688215/3aefc151_12407535.png" width="650"></div>
 <br/>
-<div id="figure_2_7_c"><img src="https://foruda.gitee.com/images/1721628460504196478/3446e06e_12407535.png"></div>
+<div id="figure_2_7_c" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628460504196478/3446e06e_12407535.png" width="650"></div>
 
 #### 选项卡视图概览图
 请点击 ![icon](https://foruda.gitee.com/images/1710818993805990437/796af0dc_12407535.png)  查看选项卡视图概览图。
 
-**注意：**
+
+```{note}
 1.	在概览图中，高亮显示的选项卡表示当前在设计视图中正在编辑的选项卡。
 2.	概览图使用选项卡的坐标进行标注。当在IC中进行模拟或渲染时，坐标为（0, 0）的选项卡显示在主页上，用户可以上下左右滑动以显示其他选项卡。
+```
 
-<div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628617214746327/0711439d_12407535.png"></div>
+
+<div id="figure_2_8_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628617214746327/0711439d_12407535.png" width="650"></div>
 <br/>
-<div id="figure_2_8_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628633709549622/a41c6011_12407535.png"></div>
+<div id="figure_2_8_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628633709549622/a41c6011_12407535.png" width="650"></div>
 
 #### 设计视图的缩放
 有三种方式可以对设计视图进行缩放。
@@ -297,12 +315,12 @@ RTKIOT 可视化设计工具支持以下功能：
 2.	点击“-”和“+”按钮。
 3.	拖动滑动条。
 
-<div id="figure_2_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628744851323697/d56f9725_12407535.png"></div>
+<div id="figure_2_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628744851323697/d56f9725_12407535.png" width="650"></div>
 
 ### 属性视图
 在控件树或设计视图中选择一个控件，可以显示出所有控件的属性值，用户可以根据需要进行修改。
 
-<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628761244768808/a468a545_12407535.png"></div>
+<div id="figure_2_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628761244768808/a468a545_12407535.png" width="650"></div>
 
 ### 控件树
 控件树用于向用户展示当前布局中控件之间的父子关系和兄弟关系。我们遵循以下约定：
@@ -311,9 +329,9 @@ RTKIOT 可视化设计工具支持以下功能：
 
 下图展示了主页选项卡和灯选项卡中的所有子控件，其中主页选项卡只有一个背景图片控件，而灯选项卡包含一个图片控件和多个开关控件。
 
-<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png"></div>
+<div id="figure_2_11" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628970571915820/15772594_12407535.png" width="650"></div>
 <br/>
-<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png"></div>
+<div id="figure_2_11_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721628988181629026/d9ff763a_12407535.png" width="650"></div>
 
 控件树支持以下操作：
 1.	选择控件：如果在控件树中选择一个控件，设计视图中对应的控件会聚焦，并在属性视图中显示其属性。
@@ -331,12 +349,14 @@ RTKIOT 可视化设计工具支持以下功能：
 
 
 ## 资源管理
+<a id="resource_manage_anchor"></a>
 只有预导入的图像和字体文件可以被GUI项目引用。本章重点介绍如何管理图像和字体资源。
 图像和字体资源管理器位于设计视图正下方，如下图所示。
 
-<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png"></div>
+<div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="650"></div>
 
-### <div id="img_res_m_anchor">图像资源管理</div>
+### 图像资源管理
+<a id="img_res_m_anchor"></a>
 点击 ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png)  打开图像管理器，如下图所示。
 
 <div id="figure_3_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629385728298056/d385e592_12407535.png" width="400"></div>
@@ -346,13 +366,13 @@ RTKIOT 可视化设计工具支持以下功能：
 1.	点击![icon](https://foruda.gitee.com/images/1710824254786867861/174e524d_12407535.png) ，创建一个新的图像文件夹并输入文件夹名称。创建的文件夹位于GUI项目目录下的Resouce\image文件夹中。
 
 <div id="figure_3_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629445428238950/c3e216ca_12407535.png" width="400"></div>
-<div style="text-align:center;"><b>图 3-3 创建图像文件夹</b></div>
+
 
 2.	选择创建的图像文件夹，然后点击 ![icon](https://foruda.gitee.com/images/1710824254769021374/55b6c303_12407535.png) 选择图像（支持多选），将它们添加到文件夹中。添加完成后，图像会被复制到Resource\image\home文件夹中。
 
 <div id="figure_3_4_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629572036008240/98958d66_12407535.png" width="400"></div>
 <br/>
-<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1719883790483193796/1c74af21_12407535.png" width="500"></div>
+<div id="figure_3_4_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725412988097005313/b591b7ca_12407535.png" width="500"></div>
 <br/>
 <div id="figure_3_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629616915297638/de3a62a7_12407535.png" width="400"></div>
 
@@ -370,8 +390,11 @@ RTKIOT 可视化设计工具支持以下功能：
 #### 刷新
 如果用户在本地操作图像资源而不是通过工具进行操作，可以点击   刷新。
 
-**注意：**
+
+```{note}
 不推荐的做法。
+```
+
 
 ### 字体资源管理
 
@@ -386,13 +409,14 @@ RTKIOT 可视化设计工具支持以下功能：
 <div STYLE="page-break-after: always;"></div> 
 
 ## 菜单栏
+<a id="menu_anchor"></a>
 ### 文件
 #### 起始页
 如果要关闭当前项目并打开一个已存在的项目或新建一个项目，可以通过点击“文件 -> 起始页”来打开起始页。
 点击“打开项目”或选择一个.rtkprj文件并双击打开已存在的项目，或者点击“创建项目”来创建新项目，请参考 [如何创建项目](#how_to_create_anchor) 和 [如何打开项目](#how_to_open_anchor)。
 
 
-<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png"></div>
+<div id="figure_4_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629731453730155/b3e315a3_12407535.png" width="650"></div>
 
 #### 保存
 保存项目的所有UI更改，快捷键是Ctrl + S。
@@ -427,7 +451,8 @@ RTKIOT 可视化设计工具支持以下功能：
 
 ### 设置
 
-#### <div id="img_conv_setting_anchor">图像转换设置</div>
+{#img_conv_setting_anchor}
+#### 图像转换设置
 图像必须转换才能在IC上正确显示，因此用户需要设置正确的转换参数。所有可选参数如下图所示。
 
 <div id="figure_4_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630165031575995/1be72944_12407535.png" width="400"></div>
@@ -459,9 +484,9 @@ RTKIOT 可视化设计工具支持以下功能：
 可选的压缩模式如下：
 1.	行程长度编码（Run-Length Encoding），一种无损压缩算法。 如果选择RLE作为压缩模式，则需要设置RLE级别和RLE行程长度参数。
 
-<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555889664193/c33b99ad_12407535.png" width="260"></div>
+<div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824555889664193/c33b99ad_12407535.png" width="350"></div>
 <br/>
-<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824561230699040/f2dbfb4a_12407535.png" width="260"></div>
+<div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824561230699040/f2dbfb4a_12407535.png" width="350"></div>
 
 | RLE 级别 |                      描述                      |
 |---------|-----------------------------------------------|
@@ -473,14 +498,27 @@ RTKIOT 可视化设计工具支持以下功能：
 | Byte_1     | 1个字节，最大为255     |
 | Byte_2     | 2个字节，最大为255     |
 
-每个行程（Run）在压缩过程中允许的最大重复字符长度。
+<div style="margin-left: 24px;">
+
+RLE行程长度：每个行程（Run）在压缩过程中允许的最大重复字符长度。
+</div>
 
 2.	FastLz: 
+
+<div style="margin-left: 24px;">
+
 一种基于字典和滑动窗口的无损压缩算法，用于压缩具有大量重复值的数据。
+</div>
+
 3.	YUV_Sample_Blur: 
+<div style="margin-left: 24px;">
+
 一种结合YUV采样和模糊处理的有损压缩算法。
+
 YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
+
 模糊处理：在YUV采样后丢弃每个字节的低位，以达到数据压缩的目的。
+</div>
 
 | YUV 采样模式 | 描述           |
 |-------------|----------------|
@@ -498,12 +536,17 @@ YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
 
 4.	YUV_Sample_Blur+FastLz: 该算法结合了YUV_Sample_Blur和FastLz算法。
 
-#### <div id="font_setting_anchor">字体转换设置</div>
+{#font_setting_anchor}
+#### 字体转换设置
 包括位图字体和矢量字体。支持Realtek系列IC的字体在下表中显示。
 
-<u><b>注意：您至少需要创建一个字体转换设置，否则无法在属性视图中为文本类型控件选择字体。</b></u>
 
-| 字体    | 8762D/8763E | 8762G/8772G | TBD |
+```{note}
+您至少需要创建一个字体转换设置，否则无法在属性视图中为文本类型控件选择字体。
+```
+
+
+| 字体    | RTL8762D/RTL8763E | RTL8762G/RTL8772G | TBD |
 |---------|--------------|-------------|-----|
 | Vector（矢量）  |      N       |      N      |  Y  |
 | Bitmap（位图）  |      Y       |      Y      |  Y  |
@@ -544,41 +587,54 @@ YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
 
 ### 模拟
 在UI上模拟项目。
-注意：当您第一次模拟项目时，请先点击“导出”，然后再点击“模拟”。如果您没有修改任何图像或字体设置，则无需再次点击“导出”。
+
+
+```{note}
+当您第一次模拟项目时，请先点击“导出”，然后再点击“模拟”。如果您没有修改任何图像或字体设置，则无需再次点击“导出”。
+```
+
+
 下图显示为模拟器运行效果。
 
 <div id="figure_4_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710828505193590425/a8c6e2c0_12407535.png" width="350"></div>
 
 <div STYLE="page-break-after: always;"></div> 
 
-## 快速开始教程
-### <div id="how_to_create_anchor">如何创建项目</div>
-<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png"></div>
+## 快速入门教程
+<a id="quick_start_anchor"></a>
+### 如何创建项目
+<a id="how_to_create_anchor"></a>
+<div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="650"></div>
 
 双击运行"RVisualDesigner.exe"，然后按照步骤（1~4）配置项目，点击"创建项目"（5）。
 创建项目后，GUI设计窗口将弹出。左侧是组件区域，中间是设计区域，右侧是部件属性设置区域。
 
-<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630514220062774/eea79572_12407535.png"></div>
+<div id="figure_5_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630514220062774/eea79572_12407535.png" width="650"></div>
 
-注意：新创建的项目文件位于解决方案文件夹下的项目文件夹中。下图展示了一个示例。
+<br>
 
-<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636140310566494/4830f874_12407535.png" width="500"></div>
+```{note}
+新创建的项目文件位于解决方案文件夹下的项目文件夹中。下图展示了一个示例。
+```
+
+<div id="figure_5_3" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505762180091944/39be3e5a_12407535.png" width="300"></div>
 
 当在设计视图上拖放一个控件，并点击"文件 - 保存"或按下Ctrl + S时，将创建一个.rtkui文件。
 
-<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636158959132154/772d60f3_12407535.png" width="500"></div>
+<div id="figure_5_4" style="text-align:center;"><img src="https://foruda.gitee.com/images/1725505619255178068/e89d3b76_12407535.png" width="300"></div>
 
 
 ### 如何编写 JavaScript 代码
 项目创建完成后，会生成一个 xxx.js 文件，打开该文件，在其中编写 JavaScript 代码以实现控件的事件回调函数。
 
-### <div id="how_to_open_anchor">如何打开项目</div>
-<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png"></div>
+### 如何打开项目
+<a id="how_to_open_anchor"></a>
+<div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="650"></div>
 
 有两种打开项目的方式：
 1.	点击 "打开项目"，选择一个 .rtkprj 文件进行打开。
 
-<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636446597639065/93e8c58b_12407535.png" width="500"></div>
+<div id="figure_5_6" style="text-align:center;"><img src="https://foruda.gitee.com/images/1724911708175163337/8513c36b_12407535.png" width="500"></div>
 
 2.	在 "最近项目" 区域选择一个 .rtkprj 文件进行打开。 如果最近项目中有所需的项目，则会弹出一个消息窗口。
 
@@ -589,20 +645,21 @@ YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
 
 
 ### 如何导出/打包项目
-<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png"></div>
+<div id="figure_5_8" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636632023023311/9f459245_12407535.png" width="650"></div>
 <br/>
 
 点击菜单栏中的 "导出"，导出结果会显示在下图中。
 <div id="figure_5_9" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636703955653703/deacfb05_12407535.png" width="400"></div>
 
 ### 如何进行模拟
-<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png"></div>
+<div id="figure_5_10" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636770252167619/8cfcafa3_12407535.png" width="650"></div>
 
 点击菜单栏上的 "模拟" 按钮。
 
 <div STYLE="page-break-after: always;"></div> 
 
-## GUI Demo 项目
+## GUI演示项目
+<a id="gui_demo_anchor"></a>
 RVisualDesigner-vx.x.x.x.zip 中包含一个 Demo 项目。
 
 文件夹 454x454 包含分辨率为 454*454 的项目。
@@ -615,7 +672,7 @@ RVisualDesigner-vx.x.x.x.zip 中包含一个 Demo 项目。
 1.	根据您的 IC 的屏幕尺寸/分辨率打开相应的项目；
 2.	点击菜单栏中的 "编辑 -> 转换项目"，检查 IC 类型。有关详细信息，请参考 "转换项目"。 如果当前项目的 IC 类型与您的 IC 不匹配，请选择目标 IC 类型，输入目标分辨率，然后点击 "转换"。
 
-<div id="figure_6_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636942634993243/11b1e212_12407535.png" width="500"></div>
+<div id="figure_6_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636942634993243/11b1e212_12407535.png" width="400"></div>
 
 3.	点击菜单栏中的 "导出"，等待导出结果弹出框的出现。
 

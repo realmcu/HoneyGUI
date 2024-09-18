@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <math.h>
-
+#include <stdint.h>
 
 namespace app_fruit_ninja
 {
@@ -35,6 +35,10 @@ typedef struct
     float x, y;
 } Point;
 
+static bool get_init_flag(void)
+{
+    return init_flag;
+}
 /* rotate to get rectangular's four points */
 static Point rotate_point(Point p, Point center, float angle)
 {
@@ -172,22 +176,34 @@ static bool line_has_two_intersections_with_rectangle(Point rect_min, float widt
     }
     return 0;
 }
+
+static uint16_t seed = 12345;
+
+static uint16_t xorshift32()
+{
+    seed ^= seed << 6;
+    seed ^= seed >> 9;
+    seed ^= seed << 2;
+    return seed;
+}
+
 // Image refresh
-bool position_refresh(int x, int y, gui_img_t *img, b2Body *body)
+static bool position_refresh(int x, int y, gui_img_t *img, b2Body *body)
 {
     if (y < -70 || y > 550 || x < -70 || x > SCREEN_WIDTH + 70)
     {
-        b2Vec2 position((100 + rand() % (354 - 100 + 1)) * P2M, 550 * P2M);
+        b2Vec2 position((100 + xorshift32() % (354 - 100 + 1)) * P2M, 550 * P2M);
+        // gui_log("x=%f,y=%f\r\n", position.x, position.y);
         b2Vec2 lv; //speed
-        body->SetTransform(position, rand() % (360 + 1));
+        body->SetTransform(position, xorshift32() % (360 + 1));
         if (position.x * M2P > 227) // if position left, velocity right
         {
-            lv.Set(-(10 + rand() % (15 - 10 + 1)),
-                   -(22 + rand() % (22 - 20 + 1))); // velocity x:10~15; y: 18~20
+            lv.Set(-(10 + xorshift32() % (15 - 10 + 1)),
+                   -(22 + xorshift32() % (22 - 20 + 1))); // velocity x:10~15; y: 18~20
         }
         else
         {
-            lv.Set((10 + rand() % (15 - 10 + 1)), -(22 + rand() % (22 - 20 + 1)));
+            lv.Set((10 + xorshift32() % (15 - 10 + 1)), -(22 + xorshift32() % (22 - 20 + 1)));
         }
         body->SetLinearVelocity(lv);
         body->SetAngularVelocity(-314);
@@ -208,8 +224,9 @@ bool position_refresh(int x, int y, gui_img_t *img, b2Body *body)
 }
 
 // scoring, cutting pictures. if cut bomb, gameover
-bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *PE, gui_img_t *WM,
-                      gui_img_t *BB, touch_info_t *tp, gui_img_t *img_cut_arry[], bool *fruit_cut_flag)
+static bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *PE,
+                             gui_img_t *WM,
+                             gui_img_t *BB, touch_info_t *tp, gui_img_t *img_cut_arry[], bool *fruit_cut_flag)
 {
     /* strawberry */
     {
@@ -217,7 +234,7 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
         int img_h = GUI_BASE(ST)->h;
         int img_x = GUI_BASE(ST)->x;
         int img_y = GUI_BASE(ST)->y;
-        float img_rotate_angle = ST->degrees;
+        float img_rotate_angle = gui_img_get_transform_degrees(ST);
 
         if (!fruit_cut_flag[0])
         {
@@ -242,7 +259,8 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
 
                     /* display other half fruit */ // smooth display at the first time
                     gui_img_set_location(img_cut_arry[0], img_x + 10, img_y + 10);
-                    gui_img_rotation(img_cut_arry[0], ST->degrees, gui_img_get_width(img_cut_arry[0]) / 2,
+                    gui_img_rotation(img_cut_arry[0], gui_img_get_transform_degrees(ST),
+                                     gui_img_get_width(img_cut_arry[0]) / 2,
                                      gui_img_get_height(img_cut_arry[0]) / 2);
                     fruit_cut_flag[0] = true;
 
@@ -259,7 +277,7 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
         int img_h = GUI_BASE(BA)->h;
         int img_x = GUI_BASE(BA)->x;
         int img_y = GUI_BASE(BA)->y;
-        float img_rotate_angle = BA->degrees;
+        float img_rotate_angle = gui_img_get_transform_degrees(BA);
 
         if (!fruit_cut_flag[1])
         {
@@ -283,7 +301,8 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
                         gui_img_set_attribute(BA, "img_banana_cut", FRUIT_NINJA_BANANA_HALF_1_BIN, img_x, img_y);
                         /* display other half fruit */
                         gui_img_set_location(img_cut_arry[1], img_x + 10, img_y + 10);
-                        gui_img_rotation(img_cut_arry[1], BA->degrees, gui_img_get_width(img_cut_arry[1]) / 2,
+                        gui_img_rotation(img_cut_arry[1], gui_img_get_transform_degrees(BA),
+                                         gui_img_get_width(img_cut_arry[1]) / 2,
                                          gui_img_get_height(img_cut_arry[1]) / 2);
                         fruit_cut_flag[1] = true;
 
@@ -299,7 +318,7 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
         int img_h = GUI_BASE(PE)->h;
         int img_x = GUI_BASE(PE)->x;
         int img_y = GUI_BASE(PE)->y;
-        float img_rotate_angle = PE->degrees;
+        float img_rotate_angle = gui_img_get_transform_degrees(PE);
 
         if (!fruit_cut_flag[2])
         {
@@ -323,7 +342,8 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
                         gui_img_set_attribute(PE, "img_peach_cut", FRUIT_NINJA_PEACH_HALF_1_BIN, img_x, img_y);
                         /* display other half fruit */
                         gui_img_set_location(img_cut_arry[2], img_x + 10, img_y + 10);
-                        gui_img_rotation(img_cut_arry[2], PE->degrees, gui_img_get_width(img_cut_arry[2]) / 2,
+                        gui_img_rotation(img_cut_arry[2], gui_img_get_transform_degrees(PE),
+                                         gui_img_get_width(img_cut_arry[2]) / 2,
                                          gui_img_get_height(img_cut_arry[2]) / 2);
                         fruit_cut_flag[2] = true;
 
@@ -339,7 +359,7 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
         int img_h = GUI_BASE(WM)->h;
         int img_x = GUI_BASE(WM)->x;
         int img_y = GUI_BASE(WM)->y;
-        float img_rotate_angle = WM->degrees;
+        float img_rotate_angle = gui_img_get_transform_degrees(WM);
         if (!fruit_cut_flag[3])
         {
             if (tp->x >= img_x &&
@@ -362,7 +382,8 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
                         gui_img_set_attribute(WM, "img_watermelon_cut", FRUIT_NINJA_WATERMELON_HALF_1_BIN, img_x, img_y);
                         /* display other half fruit */
                         gui_img_set_location(img_cut_arry[3], img_x + 10, img_y + 10);
-                        gui_img_rotation(img_cut_arry[3], WM->degrees, gui_img_get_width(img_cut_arry[3]) / 2,
+                        gui_img_rotation(img_cut_arry[3], gui_img_get_transform_degrees(WM),
+                                         gui_img_get_width(img_cut_arry[3]) / 2,
                                          gui_img_get_height(img_cut_arry[3]) / 2);
                         fruit_cut_flag[3] = true;
 
@@ -378,7 +399,7 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
         int img_h = GUI_BASE(BB)->h;
         int img_x = GUI_BASE(BB)->x;
         int img_y = GUI_BASE(BB)->y;
-        float img_rotate_angle = BB->degrees;
+        float img_rotate_angle = gui_img_get_transform_degrees(BB);
         if (tp->x >= img_x &&
             tp->x <= img_x + img_w &&
             tp->y >= img_y &&
@@ -402,7 +423,7 @@ bool cutting_judgment(gui_win_t *win, gui_img_t *ST, gui_img_t *BA, gui_img_t *P
 }
 
 // App callback function
-void fruit_ninja_cb(gui_win_t *win)
+static void fruit_ninja_cb(gui_win_t *win)
 {
     static b2World world(b2Vec2(0.0f, 9.8f)); // Create a Box2D world with gravity
     static b2Body *body_st, *body_ba, *body_pe, *body_wm,
@@ -415,7 +436,7 @@ void fruit_ninja_cb(gui_win_t *win)
     *img_cut_arry[4]; // img_strawberry_cut, *img_banana_cut, *img_peach_cut, *img_watermelon_cut;
 
 
-    if (init_flag)
+    if (get_init_flag())
     {
         // Add dynamic bodys
         b2BodyDef ballBodyDef;
@@ -558,26 +579,30 @@ void fruit_ninja_cb(gui_win_t *win)
         {
             gui_img_set_location(img_cut_arry[0],  GUI_BASE(img_strawberry)->x + 10,
                                  GUI_BASE(img_strawberry)->y + 10);
-            gui_img_rotation(img_cut_arry[0], img_strawberry->degrees, gui_img_get_width(img_cut_arry[0]) / 2,
+            gui_img_rotation(img_cut_arry[0], gui_img_get_transform_degrees(img_strawberry),
+                             gui_img_get_width(img_cut_arry[0]) / 2,
                              gui_img_get_height(img_cut_arry[0]) / 2);
         }
         if (fruit_cut_flag[1])
         {
             gui_img_set_location(img_cut_arry[1],  GUI_BASE(img_banana)->x + 10, GUI_BASE(img_banana)->y + 10);
-            gui_img_rotation(img_cut_arry[1], img_banana->degrees, gui_img_get_width(img_cut_arry[1]) / 2,
+            gui_img_rotation(img_cut_arry[1], gui_img_get_transform_degrees(img_banana),
+                             gui_img_get_width(img_cut_arry[1]) / 2,
                              gui_img_get_height(img_cut_arry[1]) / 2);
         }
         if (fruit_cut_flag[2])
         {
             gui_img_set_location(img_cut_arry[2],  GUI_BASE(img_peach)->x + 10, GUI_BASE(img_peach)->y + 10);
-            gui_img_rotation(img_cut_arry[2], img_peach->degrees, gui_img_get_width(img_cut_arry[2]) / 2,
+            gui_img_rotation(img_cut_arry[2], gui_img_get_transform_degrees(img_peach),
+                             gui_img_get_width(img_cut_arry[2]) / 2,
                              gui_img_get_height(img_cut_arry[2]) / 2);
         }
         if (fruit_cut_flag[3])
         {
             gui_img_set_location(img_cut_arry[3],  GUI_BASE(img_watermelon)->x + 10,
                                  GUI_BASE(img_watermelon)->y + 10);
-            gui_img_rotation(img_cut_arry[3], img_watermelon->degrees, gui_img_get_width(img_cut_arry[3]) / 2,
+            gui_img_rotation(img_cut_arry[3], gui_img_get_transform_degrees(img_watermelon),
+                             gui_img_get_width(img_cut_arry[3]) / 2,
                              gui_img_get_height(img_cut_arry[3]) / 2);
         }
     }
@@ -603,7 +628,7 @@ void fruit_ninja_cb(gui_win_t *win)
 }
 
 // GUI design function
-void fruit_ninja_design(gui_obj_t *obj)
+static void fruit_ninja_design(gui_obj_t *obj)
 {
     gui_win_t *win = gui_win_create(obj,
                                     "FRUIT_NINJA_BOX2D", 0, 0, 0, 0);

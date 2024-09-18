@@ -23,6 +23,7 @@
 #include "gui_obj.h"
 #include "nanovg.h"
 #include "gui_canvas.h"
+#include "gui_fb.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -89,6 +90,13 @@ static void gui_canvas_prepare(gui_canvas_t *this)
     GUI_UNUSED(root);
     GUI_UNUSED(cx);
     GUI_UNUSED(cy);
+    int last = this->checksum;
+    this->checksum = 0;
+    this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_canvas_t));
+    if (last != this->checksum || this->render)
+    {
+        gui_fb_change();
+    }
 }
 
 static void gui_canvas_widget_nanovg_draw_cb(gui_obj_t *obj)

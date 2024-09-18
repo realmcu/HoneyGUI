@@ -11,9 +11,6 @@ SrcRemove(src,'gui_scroll_wheel.c')
 SrcRemove(src,'gui_bitmap.c')
 SrcRemove(src,'gui_stb_img.c')
 
-if not GetDepend(['CONFIG_REALTEK_BUILD_MAP']):
-    SrcRemove(src,'gui_map.c')
-
 if not GetDepend(['CONFIG_REALTEK_BUILD_LVGL_GUI']):
     SrcRemove(src,'gui_lvgl.c')
 

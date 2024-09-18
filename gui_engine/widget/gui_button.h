@@ -78,7 +78,8 @@ typedef struct gui_button
     char style;
     gui_animate_t *animate;             //!< can set animation
     IMG_SOURCE_MODE_TYPE src_mode;
-    bool flag;
+    uint8_t flag   : 1;
+    uint8_t enable : 1;                 //!< enable function
 } gui_button_t;
 _GUI_API_DEFINE(gui_button_t)
 void (*on_click)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
@@ -288,6 +289,14 @@ void gui_button_set_animate(gui_button_t *this,
 void gui_button_set_img(gui_button_t *this,
                         void                 *background_pic,
                         void                 *highlight_pic);
+
+/**
+ * @brief Set button function enable.
+ *
+ * @param this The pointer of this button widget.
+ * @param enable enable.
+ */
+void gui_button_set_enable(gui_button_t *this, bool enable);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

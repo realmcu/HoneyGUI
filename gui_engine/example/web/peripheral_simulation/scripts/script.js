@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function loadConfiguration() {
-        fetch('light_config.json')
+        fetch('json/light_config.json')
             .then(response => response.json())
             .then(config => {
                 const lightsConfig = config.lights;

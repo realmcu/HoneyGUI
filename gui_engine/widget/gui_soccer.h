@@ -68,6 +68,7 @@ typedef struct gui_soccer
     float c_x;
     float c_y;
     float scsize;
+    int press_face;
     gui_vertex_t normal[20];
     gui_quaternion_t rotation;
     // float nz[20];
@@ -158,7 +159,7 @@ typedef struct gui_soccer
  */
 gui_soccer_t *gui_soccer_create(void               *parent,
                                 const char         *name,
-                                void               *addr,
+                                uint32_t           *frame_array[],
                                 int16_t             x,
                                 int16_t             y);
 
@@ -205,7 +206,7 @@ void gui_soccer_set_opacity(gui_soccer_t *soccer, uint8_t opacity);
  * @param cube the soccer widget pointer
  * @param addr the image file data
  */
-void gui_soccer_set_img(gui_soccer_t *soccer, void *addr);
+void gui_soccer_set_img(gui_soccer_t *soccer, uint32_t *frame_array[]);
 
 /**
  * @brief set center
@@ -223,6 +224,15 @@ void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y);
  * @param size scale size
  */
 void gui_soccer_set_size(gui_soccer_t *this, float size);
+
+/**
+ * @brief set on_click event
+ *
+ * @param this widget pointer
+ * @param callback callback function
+ * @param parameter callback function parameter
+ */
+void gui_soccer_on_click(gui_soccer_t *this, void *callback, void *parameter);
 
 
 /** End of WIDGET_Exported_GUI_Functions

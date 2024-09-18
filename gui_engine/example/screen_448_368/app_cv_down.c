@@ -130,7 +130,7 @@ char *day[7] =
     "Sat"
 };
 
-extern struct tm *timeinfo;
+static struct tm *timeinfo;
 static char date_timecard_content[10] = "Thur 15", time_content[10] = "00:00",
                                                                       date_content[20] = "October15\nThur";
 static gui_text_t *timecard_date_text, *timecard_time_text, *date_text, *time_text;
@@ -157,6 +157,9 @@ static void display_date()
 
 static void display_time()
 {
+    time_t rawtime;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
     char temp[10];
     sprintf(temp, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
 
@@ -168,7 +171,7 @@ static void display_time()
 static void canvas_cb_draw_bg(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 0, 0, 368, 448, 50); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255 * 0.8)); //(255, 255, 255, 255 * 0.34)
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255 * 0.6)); //(255, 255, 255, 255 * 0.34)
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }
@@ -205,9 +208,10 @@ static void draw_timecard(void *parent_widget)
 
 static void cv_cb(gui_cardview_t *cv)
 {
+#if defined _WIN32
     display_time();
     display_date();
-
+#endif
     gui_canvas_t *canvas = 0;
     gui_img_t *img = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __CANVAS_NAME, (void *)&canvas);
@@ -245,8 +249,7 @@ void curtain_down_design(void *parent_widget)
 
     //clock circle
     gui_img_t *img = gui_img_create_from_mem(parent_widget, __IMG_NAME, UI_CARD_CLOCKCIRCLE_BIN, 17, 30,
-                                             0,
-                                             0);
+                                             0, 0);
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
     // text

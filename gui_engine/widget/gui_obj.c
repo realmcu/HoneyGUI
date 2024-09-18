@@ -671,6 +671,126 @@ void gui_obj_skip_other_short(gui_obj_t *obj)
     gui_obj_skip_all_child_short(o);
     obj->skip_tp_short = false;
 }
+void gui_obj_enable_this_parent_short(gui_obj_t *obj)
+{
+    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
+    {
+        o->skip_tp_short = false;
+    }
+}
+void gui_obj_skip_other_parent_short(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+
+    gui_obj_skip_all_child_short(o);
+    gui_obj_enable_this_parent_short(obj);
+}
+
+void gui_obj_skip_all_child_long(gui_obj_t *obj)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        if (o == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
+            return;
+        }
+        o->skip_tp_long = true;
+        gui_obj_skip_all_child_long(o);
+    }
+}
+
+void gui_obj_skip_other_long(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+
+    gui_obj_skip_all_child_long(o);
+    obj->skip_tp_long = false;
+}
+
+void gui_obj_enable_this_parent_long(gui_obj_t *obj)
+{
+    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
+    {
+        o->skip_tp_long = false;
+    }
+}
+void gui_obj_skip_other_parent_long(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+
+    gui_obj_skip_all_child_long(o);
+    gui_obj_enable_this_parent_long(obj);
+}
+
+void gui_obj_skip_all_child_pressed(gui_obj_t *obj)
+{
+    gui_list_t *node = NULL;
+    gui_list_t *tmp = NULL;
+    gui_list_for_each_safe(node, tmp, &obj->child_list)
+    {
+        gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
+        if (o == 0)
+        {
+            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
+            return;
+        }
+        o->skip_tp_pressed = true;
+        gui_obj_skip_all_child_pressed(o);
+    }
+}
+
+void gui_obj_skip_other_pressed(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+
+    gui_obj_skip_all_child_pressed(o);
+    obj->skip_tp_pressed = false;
+}
+void gui_obj_enable_this_parent_pressed(gui_obj_t *obj)
+{
+    for (gui_obj_t *o = obj; o->parent != NULL; o = o->parent)
+    {
+        o->skip_tp_pressed = false;
+    }
+}
+void gui_obj_skip_other_parent_pressed(gui_obj_t *obj)
+{
+    gui_obj_t *o = obj;
+
+    while (o->parent != NULL)
+    {
+        o = o->parent;
+    }
+
+    gui_obj_skip_all_child_pressed(o);
+    gui_obj_enable_this_parent_pressed(obj);
+}
 
 gui_obj_t *gui_get_root(gui_obj_t *object)
 {
@@ -757,7 +877,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
                 animate->progress_percent = 1;
                 animate->animate = 0;
             }
-            animate->callback(animate->p, obj);
+            animate->callback(animate->p, obj, animate);
 
         }
         else if (animate->repeat_count == -1)
@@ -773,7 +893,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
                 animate->Beginning_frame = 1;
             }
             animate->last_per = animate->progress_percent;
-            animate->callback(animate->p, obj);
+            animate->callback(animate->p, obj, animate);
         }
         else
         {
@@ -791,7 +911,7 @@ void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj)
             animate->last_round = round_count;
             animate->progress_percent = (float)(cur_time_gap % animate->dur) /
                                         (float)animate->dur;
-            animate->callback(animate->p, obj);
+            animate->callback(animate->p, obj, animate);
         }
     }
     if (animate && !animate->animate)
@@ -813,7 +933,7 @@ gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
     animate->dur = dur;
-    animate->callback = (void (*)(void *, void *))callback;
+    animate->callback = (gui_animate_callback_t)callback;
     animate->repeat_count = repeat_count;
     animate->p = p;
     return animate;

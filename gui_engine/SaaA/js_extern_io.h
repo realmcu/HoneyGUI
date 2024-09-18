@@ -35,6 +35,7 @@ typedef enum
     WIFI_EVENT_MANAGE_OFF           = 0x01,
     WIFI_EVENT_MANAGE_SCAN          = 0x02,
     WIFI_EVENT_MANAGE_CONNECT       = 0x03,
+    WIFI_EVENT_MANAGE_DISCONNECT    = 0x04,
 // js key manage: subevent define,  1 byte
     KEY_EVENT_PRESS                 = 0x00,
     KEY_EVENT_CLICK                 = 0x01,

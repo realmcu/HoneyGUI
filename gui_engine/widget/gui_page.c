@@ -157,64 +157,9 @@ int gui_page_get_offset(gui_page_t *this)
 static void gui_page_update_att(gui_obj_t *obj)
 {
     gui_page_t *this = (void *)obj;
-    uint32_t cur_time_gap;
-    if (this->animate && this->animate->animate)
+    if (this->animate)
     {
-        this->animate->Beginning_frame = 0;
-        this->animate->end_frame = 0;
-        if (this->animate->progress_percent == 0 && !this->animate->init)
-        {
-            this->animate->init = 1;
-            this->animate->init_time_ms = gui_ms_get();
-            this->animate->Beginning_frame = 1;
-        }
-
-        this->animate->cur_time_ms = gui_ms_get();
-        cur_time_gap = this->animate->cur_time_ms - this->animate->init_time_ms;
-
-        if (this->animate->repeat_count == 0)
-        {
-            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
-                                              (float)this->animate->dur;
-            if (cur_time_gap / this->animate->dur >= 1)
-            {
-                this->animate->end_frame = 1;
-                this->animate->progress_percent = 1;
-                this->animate->animate = 0;
-            }
-            this->animate->callback(this->animate->p, this);
-
-        }
-        else if (this->animate->repeat_count == -1)
-        {
-            uint32_t  round_count = cur_time_gap / this->animate->dur;
-            if (round_count > this->animate->last_round)
-            {
-                this->animate->Beginning_frame = 1;
-            }
-            this->animate->last_round = round_count;
-            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
-                                              (float)this->animate->dur;
-            this->animate->callback(this->animate->p, this);
-        }
-        else
-        {
-            uint32_t  round_count = cur_time_gap / this->animate->dur;
-            if (round_count > this->animate->repeat_count)
-            {
-                this->animate->animate = 0;
-                return;
-            }
-
-            if (round_count > this->animate->last_round)
-            {
-                this->animate->Beginning_frame = 1;
-            }
-            this->animate->last_round = round_count;
-            this->animate->progress_percent = (float)(cur_time_gap % this->animate->dur) /
-                                              (float)this->animate->dur;
-            this->animate->callback(this->animate->p, this);
-        }
+        animate_frame_update(this->animate, obj);
     }
 }
 
@@ -224,20 +169,7 @@ void gui_page_set_animate(gui_page_t *this,
                           void       *callback,
                           void       *p)
 {
-    gui_animate_t *animate = this->animate;
-
-    if (!(animate))
-    {
-        animate = gui_malloc(sizeof(gui_animate_t));
-    }
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (void (*)(void *, void *))callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    this->animate = animate;
+    GUI_SET_ANIMATE_HELPER
 }
 
 static void gui_page_update_speed(gui_obj_t *obj)

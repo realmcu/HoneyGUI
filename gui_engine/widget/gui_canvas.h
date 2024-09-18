@@ -51,6 +51,8 @@ typedef struct gui_canvas
     gui_obj_t base;
     NVGcontext *vg;
     void (*nanovg_canvas_cb)(struct gui_canvas *this_widget);
+    uint8_t checksum;
+    uint8_t render;
 } gui_canvas_t;
 
 /** End of WIDGET_Exported_Types

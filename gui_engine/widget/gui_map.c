@@ -76,8 +76,6 @@
 #define MAP_WIDGET_NAME "_MAP"
 #if _WIN32
 #define ROOT_PATH "./gui_engine/example/screen_454_454/root_image/SDCARD/"
-#elif defined RTL8772F
-#define ROOT_PATH "/sdcard/"
 #else
 #define ROOT_PATH "/"
 #endif
@@ -520,13 +518,7 @@ static void wincb(gui_map_t *this)
 }
 static void free_for_rgb(void *p)
 {
-#ifdef _WIN32
     gui_free(p);
-#elif defined RTL8772F
-    gui_lower_free(p);
-#else
-    gui_free(p);
-#endif
 }
 /*============================================================================*
  *                           Public Functions

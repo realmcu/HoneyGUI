@@ -93,10 +93,11 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
     this = (gui_img_t *)obj;
     tp = tp_get_info();
 
-    matrix_translate(this->t_x, this->t_y, obj->matrix);
-    matrix_rotate(this->degrees, obj->matrix);
-    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-    matrix_translate(-this->c_x, -this->c_y, obj->matrix);
+    matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
+    matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
+    matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
+    matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
+
 
     float m00 = obj->matrix->m[0][0];
     float m01 = obj->matrix->m[0][1];
@@ -168,10 +169,11 @@ static void gui_img_scope_prepare(gui_obj_t *obj)
 
 
 
-    matrix_translate(this->t_x, this->t_y, obj->matrix);
-    matrix_rotate(this->degrees, obj->matrix);
-    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-    matrix_translate(-this->c_x, -this->c_y, obj->matrix);
+    matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
+    matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
+    matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
+    matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
+
 
     memcpy(&this->draw_img->matrix, obj->matrix, sizeof(struct gui_matrix));
     memcpy(&this->draw_img->inverse, obj->matrix, sizeof(struct gui_matrix));
@@ -358,7 +360,7 @@ void gui_img_scope_ctor(gui_img_t  *this,
     gui_obj_ctor(GET_BASE(this), parent, name, x, y, w, h);
 
     //for root class
-    GET_BASE(this)->type = IMAGE_SCOPE;
+    GET_BASE(this)->type = IMAGE_FROM_MEM;
     GET_BASE(this)->obj_cb = gui_img_scope_cb;
     GET_BASE(this)->has_prepare_cb = true;
     GET_BASE(this)->has_draw_cb = true;
@@ -368,10 +370,6 @@ void gui_img_scope_ctor(gui_img_t  *this,
 
     this->blend_mode = IMG_FILTER_BLACK;
     this->opacity_value = UINT8_MAX;
-
-    this->scale_x = 1.0f;
-    this->scale_y = 1.0f;
-
     this->src_mode = src_mode;
     if (this->src_mode == IMG_SRC_FILESYS)
     {

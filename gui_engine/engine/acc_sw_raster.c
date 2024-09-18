@@ -266,7 +266,7 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
             location += node->len;
             line = line + sizeof(imdc_rgb565_node_t);
         }
-        while (location < x);
+        while (location  < (x + 1));
 
         memcpy(pixel, &(node->pixel16), sizeof(node->pixel16));
     }
@@ -279,7 +279,7 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
             location += node->len;
             line = line + sizeof(imdc_argb8565_node_t);
         }
-        while (location < x);
+        while (location  < (x + 1));
 
         memcpy(pixel, &(node->pixel), sizeof(node->pixel));
         pixel[2] = node->alpha;
@@ -293,7 +293,7 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
             location += node->len;
             line = line + sizeof(imdc_rgb888_node_t);
         }
-        while (location < x);
+        while (location  < (x + 1));
         pixel[2] = node->pixel_r;
         pixel[1] = node->pixel_g;
         pixel[0] = node->pixel_b;
@@ -307,7 +307,7 @@ static void get_rle_pixel(draw_img_t *image, int x, int y, uint8_t *pixel)
             location += node->len;
             line = line + sizeof(imdc_argb8888_node_t);
         }
-        while (location < x);
+        while (location  < (x + 1));
         memcpy(pixel, &(node->pixel32), sizeof(node->pixel32));
     }
 

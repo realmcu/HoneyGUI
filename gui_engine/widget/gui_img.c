@@ -88,28 +88,72 @@ void gui_img_set_animate(gui_img_t *this,
                          void      *callback,
                          void      *p)
 {
-    gui_animate_t *animate = this->animate;
-
-    if (!(animate))
+    if (this->animate_array_length != 0)
     {
-        animate = gui_malloc(sizeof(gui_animate_t));
+        return;
     }
-
-    memset((animate), 0, sizeof(gui_animate_t));
-    animate->animate = true;
-    animate->dur = dur;
-    animate->callback = (void (*)(void *, void *))callback;
-    animate->repeat_count = repeat_count;
-    animate->p = p;
-    this->animate = animate;
+    GUI_SET_ANIMATE_HELPER
 }
 
 static void gui_img_update_att(gui_obj_t *o)
 {
     gui_img_t *this = (void *)o;
-    animate_frame_update(this->animate, o);
+    if (this->animate_array_length == 0)
+    {
+        if (this->animate)
+        {
+            animate_frame_update(this->animate, o);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < this->animate_array_length; i++)
+        {
+            animate_frame_update(((gui_animate_t **)(this->animate))[i], o);
+        }
+    }
 }
+static void gui_img_input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_img_t *this = (gui_img_t *)obj;
+    GUI_UNUSED(tp);
+    GUI_UNUSED(this);
 
+    matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
+    matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
+    matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
+    matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
+
+    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
+        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
+    {
+        return;
+    }
+
+    if (this->tp_block)
+    {
+
+        if (tp->pressed)
+        {
+            gui_obj_skip_other_parent_pressed(obj);
+        }
+
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
+            {
+                gui_obj_skip_other_parent_short(obj);
+            }
+            break;
+        case TOUCH_LONG:
+            {
+                gui_obj_skip_other_parent_long(obj);
+            }
+            break;
+        }
+    }
+}
 static void gui_img_prepare(gui_obj_t *obj)
 {
     uint8_t last;
@@ -121,10 +165,10 @@ static void gui_img_prepare(gui_obj_t *obj)
     this = (gui_img_t *)obj;
     tp = tp_get_info();
 
-    matrix_translate(this->t_x, this->t_y, obj->matrix);
-    matrix_rotate(this->degrees, obj->matrix);
-    matrix_scale(this->scale_x, this->scale_y, obj->matrix);
-    matrix_translate(-this->c_x, -this->c_y, obj->matrix);
+    matrix_translate(gui_img_get_transform_t_x(this), gui_img_get_transform_t_y(this), obj->matrix);
+    matrix_rotate(gui_img_get_transform_degrees(this), obj->matrix);
+    matrix_scale(gui_img_get_transform_scale_x(this), gui_img_get_transform_scale_y(this), obj->matrix);
+    matrix_translate(-gui_img_get_transform_c_x(this), -gui_img_get_transform_c_y(this), obj->matrix);
 
     float m00 = obj->matrix->m[0][0];
     float m01 = obj->matrix->m[0][1];
@@ -277,7 +321,7 @@ static void gui_img_prepare(gui_obj_t *obj)
                 //obj->not_show = 1;
                 GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
             }
-            if (ay > img_y + img_h * this->scale_y)
+            if (ay > img_y + img_h * gui_img_get_transform_scale_y(this))
             {
                 //obj->not_show = 1;
                 GUI_TYPE(gui_img_t, obj)->scope_y2 = GUI_TYPE(gui_img_t, obj)->scope_y1 - 1;
@@ -304,7 +348,10 @@ static void gui_img_prepare(gui_obj_t *obj)
     last = this->checksum;
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_img_t));
-
+    if (this->transform)
+    {
+        this->checksum += gui_obj_checksum(0, (uint8_t *)this->transform, sizeof(*this->transform));
+    }
     if (last != this->checksum)
     {
         gui_fb_change();
@@ -387,8 +434,28 @@ static void gui_img_destory(gui_obj_t *obj)
 
     if (this->animate)
     {
-        gui_free(this->animate);
-        this->animate = NULL;
+        if (this->animate_array_length == 0)
+        {
+            gui_free(this->animate);
+            this->animate = NULL;
+        }
+        else
+        {
+            for (size_t i = 0; i < this->animate_array_length; i++)
+            {
+                gui_free(((gui_animate_t **)(this->animate))[i]);
+                ((gui_animate_t **)(this->animate))[i] = NULL;
+            }
+            this->animate = 0;
+            this->animate_array_length = 0;
+        }
+
+
+    }
+    if (this->transform)
+    {
+        gui_free(this->transform);
+        this->transform = NULL;
     }
 
 }
@@ -428,6 +495,11 @@ static void gui_img_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            {
+                gui_img_input_prepare(obj);
+            }
+            break;
         case OBJ_PREPARE:
             {
                 gui_img_prepare(obj);
@@ -475,6 +547,7 @@ static void gui_img_ctor(gui_img_t            *this,
     gui_obj_ctor(obj, parent, name, x, y, w, h);
 
     obj->obj_cb = gui_img_cb;
+    obj->has_input_prepare_cb = true;
     obj->has_prepare_cb = true;
     obj->has_draw_cb = true;
     obj->has_end_cb = true;
@@ -503,8 +576,6 @@ static void gui_img_ctor(gui_img_t            *this,
     this->blend_mode = IMG_FILTER_BLACK;
     this->opacity_value = UINT8_MAX;
 
-    this->scale_x = 1.0f;
-    this->scale_y = 1.0f;
 
     obj->w = gui_img_get_width(this);
     obj->h = gui_img_get_height(this);
@@ -846,37 +917,130 @@ void gui_img_set_opacity(gui_img_t *this, unsigned char opacity_value)
     this->opacity_value = opacity_value;
 }
 
+void gui_img_set_tp_block(gui_img_t *this, bool block)
+{
+    this->tp_block = block;
+}
+
+#define DEFAULT_TRANSFORM_SCALE_X 1.0F
+#define DEFAULT_TRANSFORM_SCALE_Y 1.0F
+#define DEFAULT_TRANSFORM_DEGREE 0
+#define DEFAULT_TRANSFORM_C_X 0
+#define DEFAULT_TRANSFORM_C_Y 0
+#define DEFAULT_TRANSFORM_T_X 0
+#define DEFAULT_TRANSFORM_T_Y 0
+static struct gui_img_transform *get_transform(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform == 0)
+    {
+        gui_log("this->transform == 0\n");
+        this->transform = gui_malloc(sizeof(*this->transform));
+        if (this->transform)
+        {
+            memset(this->transform, 0, sizeof(*this->transform));
+            this->transform->degrees = DEFAULT_TRANSFORM_DEGREE;
+            this->transform->c_x     = DEFAULT_TRANSFORM_C_X;
+            this->transform->c_y     = DEFAULT_TRANSFORM_C_Y;
+            this->transform->scale_x = DEFAULT_TRANSFORM_SCALE_X;
+            this->transform->scale_y = DEFAULT_TRANSFORM_SCALE_Y;
+            this->transform->t_x     = DEFAULT_TRANSFORM_T_X;
+            this->transform->t_y     = DEFAULT_TRANSFORM_T_Y;
+        }
+    }
+    GUI_ASSERT(this->transform)
+    return this->transform;
+}
 void gui_img_rotation(gui_img_t *this,
                       float      degrees,
                       float      c_x,
                       float      c_y)
 {
-    GUI_ASSERT(this != NULL);
-
-    this->degrees = degrees;
-    this->c_x = c_x;
-    this->c_y = c_y;
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    get_transform(this)->degrees = degrees;
+    get_transform(this)->c_x = c_x;
+    get_transform(this)->c_y = c_y;
 }
 
 void gui_img_scale(gui_img_t *this, float scale_x, float scale_y)
 {
-    GUI_ASSERT(this != NULL);
-
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
     if ((scale_x > 0) && (scale_y > 0))
     {
-        this->scale_x = scale_x;
-        this->scale_y = scale_y;
+        get_transform(this)->scale_x = scale_x;
+        get_transform(this)->scale_y = scale_y;
     }
 }
 
 void gui_img_translate(gui_img_t *this, float t_x, float t_y)
 {
-    GUI_ASSERT(this != NULL);
-
-    this->t_x = t_x;
-    this->t_y = t_y;
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    get_transform(this)->t_x = t_x;
+    get_transform(this)->t_y = t_y;
 }
-
+float gui_img_get_transform_scale_x(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->scale_x;
+    }
+    return DEFAULT_TRANSFORM_SCALE_X;
+}
+float gui_img_get_transform_scale_y(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->scale_y;
+    }
+    return DEFAULT_TRANSFORM_SCALE_Y;
+}
+float gui_img_get_transform_degrees(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->degrees;
+    }
+    return DEFAULT_TRANSFORM_DEGREE;
+}
+float gui_img_get_transform_c_x(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->c_x;
+    }
+    return DEFAULT_TRANSFORM_C_X;
+}
+float gui_img_get_transform_c_y(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->c_y;
+    }
+    return DEFAULT_TRANSFORM_C_Y;
+}
+float gui_img_get_transform_t_x(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->t_x;
+    }
+    return DEFAULT_TRANSFORM_T_X;
+}
+float gui_img_get_transform_t_y(gui_img_t *this)
+{
+    GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
+    if (this->transform)
+    {
+        return this->transform->t_y;
+    }
+    return DEFAULT_TRANSFORM_T_Y;
+}
 void gui_img_skew_x(gui_img_t *this, float degrees)
 {
 
@@ -902,7 +1066,7 @@ void gui_img_tree_convert_to_img(gui_obj_t *obj, gui_matrix_t *matrix, uint8_t *
     dc->shot_buf = shot_buf;
 
     gui_fb_change();
-    gui_fb_disp(obj);
+    gui_fb_disp(obj, false);
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
 
     head->scan = 0;
@@ -937,7 +1101,7 @@ void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix,
     dc->target_h = obj->h;
     dc->target_w = obj->w;
     gui_fb_change();
-    gui_fb_disp(obj);
+    gui_fb_disp(obj, false);
     gui_rgb_data_head_t *head = (gui_rgb_data_head_t *)(dc->shot_buf);
 
     head->scan = 0;
@@ -955,6 +1119,37 @@ void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix,
     memcpy(obj->matrix, matrix_bak, sizeof(gui_matrix_t));
     gui_free(dc_bak);
     gui_free(matrix_bak);
+}
+void gui_img_append_animate(gui_img_t *this,
+                            uint32_t   dur,
+                            int        repeat_count,
+                            gui_animate_callback_t callback,
+                            void      *p,
+                            const char *name)
+{
+    if (this->animate_array_length == 0 && this->animate)
+    {
+        memset(this->animate, 0, sizeof(*this->animate));
+        gui_free(this->animate);
+        this->animate = 0;
+    }
+    this->animate_array_length++;
+    this->animate = gui_realloc(this->animate, sizeof(gui_animate_t) * this->animate_array_length);
+    ((gui_animate_t **)(this->animate))[this->animate_array_length - 1] = gui_malloc(sizeof(
+                                                                              gui_animate_t));
+    gui_animate_t *animate = ((gui_animate_t **)(this->animate))[this->animate_array_length - 1];
+
+    memset((animate), 0, sizeof(gui_animate_t));
+    animate->animate = true;
+    animate->dur = dur;
+    if (dur == 0)
+    {
+        animate->dur = 1000;
+    }
+    animate->callback = callback;
+    animate->repeat_count = repeat_count;
+    animate->p = p;
+    animate->name = name;
 }
 /** End of WIDGET_Exported_Functions
   * @}

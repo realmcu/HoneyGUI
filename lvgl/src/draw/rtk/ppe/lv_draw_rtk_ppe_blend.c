@@ -62,15 +62,9 @@ lv_res_t lv_ppe_fill(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
     target.height = lv_area_get_height(draw_ctx->buf_area);
     target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
     lv_color32_t bg_color = lv_ppe_toABGR8888(dsc->color);
-
-    if (dsc->opa == 0xFF)
+    if (dsc->opa != 0xFF)
     {
-        target.global_alpha_en = DISABLE;
-    }
-    else
-    {
-        target.global_alpha_en = ENABLE;
-        target.global_alpha = dsc->opa;
+        bg_color.ch.alpha = dsc->opa * bg_color.ch.alpha / 255;
     }
     ppe_rect_t rect = {.left = dest_area->x1, .right = dest_area->x2, .top = dest_area->y1, .bottom = dest_area->y2};
     PPE_ERR err = PPE_Clear_Rect(&target, &rect, bg_color.full);
@@ -115,7 +109,6 @@ lv_res_t lv_ppe_alpha_only(const lv_img_dsc_t *img, lv_draw_ctx_t *draw_ctx,
 }
 
 #include "os_mem.h"
-#include "trace.h"
 lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
                                const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t cf)
 {
@@ -176,8 +169,22 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
     {
         return LV_RES_INV;
     }
-    ppe_translate_t trans = {.x = coords->x1, .y = coords->y1};
+    ppe_translate_t trans = {.x = coords->x1 - draw_ctx->buf_area->x1, .y = coords->y1 - draw_ctx->buf_area->y1};
 
+    lv_area_t constraint_area;
+    ppe_rect_t blend_rect;
+    if (_lv_area_intersect(&constraint_area, draw_ctx->buf_area, draw_ctx->clip_area))
+    {
+        lv_area_move(&constraint_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+        blend_rect.x1 = constraint_area.x1;
+        blend_rect.y1 = constraint_area.y1;
+        blend_rect.x2 = constraint_area.x2;
+        blend_rect.y2 = constraint_area.y2;
+    }
+    else
+    {
+        return LV_RES_OK;
+    }
     if (dsc->zoom != LV_IMG_ZOOM_NONE)
     {
         memset(&zoom, 0, sizeof(ppe_buffer_t));
@@ -195,6 +202,11 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         float zoom_ratio = dsc->zoom * 1.0f / LV_IMG_ZOOM_NONE;
         uint32_t new_width = (uint32_t)(source_width * zoom_ratio);
         uint32_t new_height = (uint32_t)(source_height * zoom_ratio);
+        lv_point_t new_start_point;
+        lv_ppe_get_scale_point((const lv_point_t *)&dsc->pivot, (const lv_area_t *)coords, zoom_ratio,
+                               &new_start_point);
+        trans.x = new_start_point.x - draw_ctx->buf_area->x1;
+        trans.y = new_start_point.y - draw_ctx->buf_area->y1;
         uint32_t buffer_size = 0;
         uint8_t *internal_buf = lv_draw_rtk_ppe_get_buffer(&buffer_size);
         zoom.memory = (uint32_t *)internal_buf;
@@ -212,7 +224,8 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 return LV_RES_INV;
             }
 
-            err = PPE_blend(&zoom, &target, &trans, mode);
+            //err = PPE_blend(&zoom, &target, &trans, mode);
+            err = PPE_blend_rect(&zoom, &target, &trans, &blend_rect, mode);
             if (err == PPE_SUCCESS)
             {
                 return LV_RES_OK;
@@ -240,8 +253,8 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 {
                     return LV_RES_INV;
                 }
-                trans.y = coords->y1 + y;
-                err = PPE_blend(&zoom, &target, &trans, mode);
+                trans.y = new_start_point.y + y;
+                err = PPE_blend_rect(&zoom, &target, &trans, &blend_rect, mode);
                 if (err != PPE_SUCCESS)
                 {
                     return LV_RES_INV;
@@ -302,7 +315,7 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         else
 #endif
         {
-            PPE_ERR err = PPE_blend(&source, &target, &trans, mode);
+            PPE_ERR err = PPE_blend_rect(&source, &target, &trans, &blend_rect, mode);
             if (err == PPE_SUCCESS)
             {
                 return LV_RES_OK;
@@ -443,5 +456,46 @@ lv_res_t lv_ppe_mask(lv_draw_ctx_t *draw_ctx, const lv_draw_sw_blend_dsc_t *dsc)
     }
 }
 
+lv_res_t lv_ppe_map(const lv_area_t *dest_area, lv_draw_ctx_t *draw_ctx,
+                    const lv_draw_sw_blend_dsc_t *dsc)
+{
+    PPE_BLEND_MODE mode = PPE_BYPASS_MODE;
 
-#endif /*LV_USE_GPU_RTK_VG_LITE*/
+    ppe_buffer_t target, source;
+    memset(&target, 0, sizeof(ppe_buffer_t));
+    memset(&source, 0, sizeof(ppe_buffer_t));
+    target.address = (uint32_t)draw_ctx->buf;
+    target.memory = (uint32_t *)target.address;
+    target.width = lv_area_get_width(draw_ctx->buf_area);
+    target.height = lv_area_get_height(draw_ctx->buf_area);
+    target.format = sizeof(lv_color_t) == 2 ? PPE_RGB565 : PPE_ARGB8888;
+
+    source.address = (uint32_t)dsc->src_buf;
+    source.memory = (uint32_t *)source.address;
+    source.width = dsc->blend_area->x2 - dsc->blend_area->x1 + 1;
+    source.height = dsc->blend_area->y2 - dsc->blend_area->y1 + 1;
+    source.format = target.format;
+    if (dsc->opa < LV_OPA_MIN)
+    {
+        source.global_alpha_en = true;
+        source.global_alpha = dsc->opa;
+        mode = PPE_SRC_OVER_MODE;
+    }
+
+    ppe_rect_t clip_rect = {.x1 = dsc->blend_area->x1, .x2 = dsc->blend_area->x2,
+                            .y1 = dsc->blend_area->y1, .y2 = dsc->blend_area->y2
+                           };
+
+    ppe_translate_t trans = {.x = dest_area->x1 - dsc->blend_area->x1, .y = dest_area->y1 - dsc->blend_area->y1};
+    PPE_ERR err = PPE_blend_rect(&source, &target, &trans, &clip_rect, mode);
+    if (err == PPE_SUCCESS)
+    {
+        return LV_RES_OK;
+    }
+    else
+    {
+        return LV_RES_INV;
+    }
+}
+
+#endif /*LV_USE_PPE*/

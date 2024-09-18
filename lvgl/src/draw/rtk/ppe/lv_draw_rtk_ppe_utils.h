@@ -1,5 +1,5 @@
 /**
- * @file lv_vglite_utils.h
+ * @file lv_draw_rtk_ppe_utils.h
  *
  */
 
@@ -54,6 +54,9 @@ extern "C" {
 lv_color32_t lv_ppe_toABGR8888(lv_color_t color);
 
 PPE_ERR lv_ppe_recolor(ppe_buffer_t *image, ppe_buffer_t *buffer, ppe_rect_t *rect, uint32_t color);
+
+void lv_ppe_get_scale_point(const lv_point_t *pivot, const lv_area_t *coords, float scale_ratio,
+                            lv_point_t *result);
 /**********************
  *      MACROS
  **********************/

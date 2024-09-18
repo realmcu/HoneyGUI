@@ -22,6 +22,16 @@ static void *event_obj[MAX_EVENT_CNT];
 static uint8_t event_cnt = 0;
 static bool fb_change = false;
 
+static void obj_reset_active(gui_obj_t *obj)
+{
+    gui_list_t *node = NULL;
+    gui_list_for_each(node, &obj->child_list)
+    {
+        gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        obj->active = false;
+        obj_reset_active(obj);
+    }
+}
 
 static bool obj_is_active(gui_obj_t *obj)
 {
@@ -129,9 +139,14 @@ static bool obj_is_active(gui_obj_t *obj)
 static void obj_input_prepare(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
+
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        if (obj->not_show)
+        {
+            continue;
+        }
         if (obj->has_input_prepare_cb)
         {
             if ((obj->matrix != NULL) && (obj->parent->matrix))
@@ -139,8 +154,8 @@ static void obj_input_prepare(gui_obj_t *obj)
                 memcpy(obj->matrix, obj->parent->matrix, sizeof(gui_matrix_t));
                 matrix_translate(obj->x, obj->y, obj->matrix);
             }
-
             obj->obj_cb(obj, OBJ_INPUT_PREPARE);
+
             if (obj_is_active(obj) == false)
             {
                 continue;
@@ -179,6 +194,7 @@ static void obj_draw_prepare(gui_obj_t *object)
 
         if (obj->has_prepare_cb)
         {
+            // gui_log("obj_draw_prepare act %d %s\n", obj->active, obj->name);
             if (!obj->gesture)
             {
                 obj->obj_cb(obj, OBJ_PREPARE);
@@ -217,6 +233,7 @@ static void obj_draw_prepare(gui_obj_t *object)
 
 static void obj_draw_scan(gui_obj_t *obj)
 {
+
     gui_list_t *node = NULL;
     struct gui_dispdev *dc = gui_get_dc();
     gui_list_for_each(node, &obj->child_list)
@@ -226,7 +243,6 @@ static void obj_draw_scan(gui_obj_t *obj)
         {
             if (obj->has_draw_cb)
             {
-
                 if (dc->pfb_type == PFB_Y_DIRECTION)
                 {
                     dc->section.x1 = 0;
@@ -370,8 +386,11 @@ static void gui_fb_draw(gui_obj_t *root)
 
     }
 }
-
-
+static int frame_count_per_second;
+uint32_t gui_fps()
+{
+    return frame_count_per_second;
+}
 void gui_fb_change(void)
 {
     fb_change = true;
@@ -381,7 +400,7 @@ uint32_t gui_spf()
 {
     return spf;
 }
-void gui_fb_disp(gui_obj_t *root)
+void gui_fb_disp(gui_obj_t *root, bool enable_event)
 {
     if (root == NULL)
     {
@@ -402,6 +421,7 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     obj_input_prepare(root);
+    obj_reset_active(root);
     if (dc->lcd_frame_monitor)
     {
         dc->lcd_frame_monitor->input_prepare_cb();
@@ -413,20 +433,21 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     static int last_ms;
+    static int one_second;
+    int tick = gui_ms_get();
+    static int frame_count;
+    if (tick - one_second >= 1000)
+    {
+        one_second = tick;
+        frame_count_per_second = frame_count;
+        frame_count = 0;
+        gui_log("fps:%d\r", frame_count_per_second);
+    }
     if (fb_change == true)
     {
+        frame_count++;
         gui_fb_draw(root);
         fb_change = false;
-        {
-            int ms = gui_ms_get();
-            if (last_ms)
-            {
-                spf = ms - last_ms;
-                //gui_log("spf:%d ms", spf);
-            }
-            else { spf = 0; }
-            last_ms = ms;
-        }
     }
     else
     {
@@ -439,9 +460,12 @@ void gui_fb_disp(gui_obj_t *root)
     }
 
     obj_draw_end(root);
-    for (uint8_t i = 0; i < event_cnt; i++)
+    if (enable_event == true)
     {
-        event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
+        for (uint8_t i = 0; i < event_cnt; i++)
+        {
+            event_cb[i](event_obj[i], event_code[i], event_cb_param[i]);
+        }
     }
     event_cnt = 0;
     dc->frame_count++;

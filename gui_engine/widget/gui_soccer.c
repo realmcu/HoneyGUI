@@ -510,6 +510,23 @@ static void gui_soccer_prepare(gui_obj_t *obj)
         matrix_inverse(&this->draw_img[i].inverse);
         draw_img_new_area(&this->draw_img[i], NULL);
     }
+
+    if (tp->type == TOUCH_SHORT)
+    {
+        for (int i = 0; i < 20; i++)
+        {
+            if (tp->x >= this->draw_img[i].img_target_x &&
+                tp->x <= (this->draw_img[i].img_target_x + this->draw_img[i].img_target_w) &&
+                tp->y >= this->draw_img[i].img_target_y &&
+                tp->y <= (this->draw_img[i].img_target_y + this->draw_img[i].img_target_h) && this->normal[i].z > 0)
+            {
+                gui_obj_event_set(obj, GUI_EVENT_1);
+                this->press_face = i;
+                gui_log("this->press_face: %d\n", this->press_face);
+                break;
+            }
+        }
+    }
     gui_fb_change();
 }
 
@@ -582,7 +599,7 @@ static void gui_soccer_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 static void gui_soccer_ctor(gui_soccer_t       *this,
                             gui_obj_t          *parent,
                             const char         *name,
-                            void               *addr,
+                            uint32_t           *frame_array[],
                             int16_t             x,
                             int16_t             y,
                             int16_t             w,
@@ -608,7 +625,7 @@ static void gui_soccer_ctor(gui_soccer_t       *this,
     {
         this->draw_img[i].opacity_value = UINT8_MAX;
         this->draw_img[i].blend_mode = IMG_SRC_OVER_MODE;
-        this->draw_img[i].data = addr;
+        this->draw_img[i].data = frame_array[i];
         this->draw_img[i].img_w = 100;
         this->draw_img[i].img_h = 100;
     }
@@ -619,6 +636,7 @@ static void gui_soccer_ctor(gui_soccer_t       *this,
     this->c_y = (dc->fb_width - this->scsize) / 2.0f;
 
     this->rotation = quat_identity();
+    this->press_face = -1;
 }
 
 /*============================================================================*
@@ -629,7 +647,7 @@ static void gui_soccer_ctor(gui_soccer_t       *this,
 
 gui_soccer_t *gui_soccer_create(void               *parent,
                                 const char         *name,
-                                void               *addr,
+                                uint32_t           *frame_array[],
                                 int16_t             x,
                                 int16_t             y)
 {
@@ -644,7 +662,7 @@ gui_soccer_t *gui_soccer_create(void               *parent,
     GUI_ASSERT(soccer != NULL);
     memset(soccer, 0x00, sizeof(gui_soccer_t));
 
-    gui_soccer_ctor(soccer, (gui_obj_t *)parent, name, addr, x, y, 0, 0);
+    gui_soccer_ctor(soccer, (gui_obj_t *)parent, name, frame_array, x, y, 0, 0);
     gui_list_init(&(GET_BASE(soccer)->child_list));
     if ((GET_BASE(soccer)->parent) != NULL)
     {
@@ -687,13 +705,13 @@ void gui_soccer_set_opacity(gui_soccer_t *soccer, uint8_t opacity)
     }
 }
 
-void gui_soccer_set_img(gui_soccer_t *soccer, void *addr)
+void gui_soccer_set_img(gui_soccer_t *soccer, uint32_t *frame_array[])
 {
     GUI_ASSERT(soccer != NULL);
 
     for (int i = 0; i < 20; i++)
     {
-        soccer->draw_img[i].data = addr;
+        soccer->draw_img[i].data = frame_array[i];
     }
 }
 
@@ -706,6 +724,11 @@ void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y)
 void gui_soccer_set_size(gui_soccer_t *this, float size)
 {
     this->scsize = size;
+}
+
+void gui_soccer_on_click(gui_soccer_t *this, void *callback, void *parameter)
+{
+    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_1, parameter);
 }
 
 /** End of WIDGET_Exported_Functions

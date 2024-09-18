@@ -161,10 +161,6 @@
 // #define CONFIG_REALTEK_BUILD_GUI_CONTAIN
 // </c>
 
-// <c> RTK GUI ENABLE MAP
-#define CONFIG_REALTEK_BUILD_MAP
-// </c>
-
 // <c> RTK GUI Enable SasA
 // #define CONFIG_REALTEK_BUILD_WATCHFACE_UPDATE
 // </c>
