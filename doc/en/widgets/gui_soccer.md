@@ -24,7 +24,6 @@ You can set the image for the soccer ball faces by using [void gui_soccer_set_im
 
 ## Example
 
-<details> <summary>code</summary>
 
 ```c
 #include "gui_app.h"
@@ -38,7 +37,6 @@ static void app_dialing_ui_design(gui_app_t *app)
     gui_soccer_set_center(soccer, 240, 240);
 }
 ```
-</details>
 <br/>
 <div style="text-align: center"><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/soccer.gif"></div>
 <br/>

@@ -3,7 +3,7 @@
 
 
 
-## Win widget
+## Win
 
 - This is a container widget. 
 - Operations on the window widget will affect the widgets nested in the container. 
@@ -40,7 +40,7 @@ function winNromalOnReleaseFunc(params) {
 }
 win.onRelease(winNromalOnReleaseFunc)
 ```
-### Swap windows demo
+### Swap windows
 * The implementation logic is that clicking the current window will hide the current window and display another window.
 * click to swap windows between ```'cool_win'``` and ```'heat_win'```
 * The ```win.onClick``` function enables the win widget to monitor the event of the finger clicking the screen.
@@ -87,7 +87,7 @@ win.onClick(hideHeat)
 
 
 ## Button
-### Example of listening for the button pressed event
+### Monitor button press event
 * Can be used to develop button press highlight effects or buttons that require quick response.
 * Listen to press gesture, the function ```iconNromalOnPressFunc``` will trigger when finger touchs screen within the area of the button.
 
@@ -129,10 +129,10 @@ icon.onPress(iconNromalOnPressFunc)
     write : function (text : string) {},
     setPosition : function (position : object) {}, //var position={x:0,y:0}
 ```
-## ImageSeekbar
-### Example showing current progress
+## Seekbar
+### Display current progress
 * Drag the progress bar and then the text shows the current progress.
-* ```seekbar.progress()``` function can read and write the progress.
+* ```seekbar.progress``` function can read and write the progress.
 * ```seekbar.onPressing``` function will listen for events where your finger is kept pressed on the screen. This parameter function will be executed in each frame, while the finger is in contact with the screen.
 ```javascript
 seekbar.getElementById('tab10Seek1')

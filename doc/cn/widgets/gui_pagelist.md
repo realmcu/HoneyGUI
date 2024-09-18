@@ -1,4 +1,4 @@
-# 页面列表控件
+# 页面列表 (Page list)
 
 <br>
 
@@ -31,7 +31,6 @@
 
 ## 示例
 
-<details> <summary>代码</summary>
 
 ```c
 #include "root_image/ui_resource.h"
@@ -77,7 +76,7 @@ void design_pagelist_test(void *parent)
 }
 ```
 
-</details><br>
+<br>
 
 <span id = "api">
 

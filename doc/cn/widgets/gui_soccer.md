@@ -1,4 +1,4 @@
-# 2.5D足球
+# 2.5D足球 (2.5D soccer)
 
 2.5D足球由12个顶点和20个面组成，这些顶点和面可以构成一个近似3D效果的球形。其中，顶点定义了球体的形状和位置，面是由多个顶点连接而成的平面，用于填充球的表面。
 
@@ -24,8 +24,6 @@
 
 ## 示例
 
-<details> <summary>代码</summary>
-
 ```c
 #include "gui_app.h"
 #include "gui_soccer.h"
@@ -38,7 +36,6 @@ static void app_dialing_ui_design(gui_app_t *app)
     gui_soccer_set_center(soccer, 240, 240);
 }
 ```
-</details>
 <br/>
 <div style="text-align: center"><img width= "400" src="https://docs.realmcu.com/HoneyGUI/image/widgets/soccer.gif"></div>
 <br/>

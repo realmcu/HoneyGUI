@@ -10,7 +10,6 @@ Developers can utilize the [gui_page_create(parent, filename, x, y, w, h)](#gui_
 
 ## Example
 
-<details> <summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -38,7 +37,6 @@ void page_tb_activity(void *parent)
     gui_img_t *img5 = gui_img_create_from_mem(pg1, "img5", PLAYER_MUSIC_WIND_ICON_BIN, 0, 460, 0, 0);
 }
 ```
-</details>
 <br>
 <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/page.gif" width = "300" /></div>
 <br>

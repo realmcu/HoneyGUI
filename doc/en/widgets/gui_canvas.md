@@ -1,4 +1,4 @@
-# canvas
+# Canvas
 
 The canvas widget is the basic widget used to drawing graphics in nanovg.
 ```{Limitations}

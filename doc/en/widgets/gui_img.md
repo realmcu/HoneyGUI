@@ -1,4 +1,4 @@
-# Image
+# Img
 <br>
 
 The image widget is the basic widget used to display image. Image widgets support moving, zooming, rotating, etc.
@@ -37,11 +37,11 @@ It can move an image widget to a new coordinate without changing the original co
 
 ### Rotation
 
-You can rotate the image widget around the center of the circle by this api [gui_img_rotation(gui_img_t *this, float degrees, float c_x, float c_y)](#gui_img_rotation).
+You can rotate the image widget around the center of the circle by this API [gui_img_rotation(gui_img_t *this, float degrees, float c_x, float c_y)](#gui_img_rotation).
 
 ### Zoom
 
-You can adjust the size of the image widget to fit your requirements by this api [gui_img_scale(gui_img_t *this, float scale_x, float scale_y)](#gui_img_scale).
+You can adjust the size of the image widget to fit your requirements by this API [gui_img_scale(gui_img_t *this, float scale_x, float scale_y)](#gui_img_scale).
 
 ### Opacity
 The opacity value of the image is adjustable, and you can set it using [gui_img_set_opacity(gui_img_t *_this, unsigned char opacity_value)](#gui_img_set_opacity).

@@ -1,4 +1,4 @@
-# 页面
+# 页面 (Page)
 <br>
 
 页面控件是一个容器控件，可以让开发人员能够沿着 y 轴建立一个额外控制的列，创建页面控件后，可以在该控件上添加其他的控件，如按钮控件，图片控件等等，页面控件可以超出屏幕显示边界，用户可以通过向上或向下滑动来访问添加到页面控件上的其他控件。
@@ -11,7 +11,6 @@
 
 ## 示例
 
-<details> <summary>代码</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -39,7 +38,6 @@ void page_tb_activity(void *parent)
     gui_img_t *img5 = gui_img_create_from_mem(pg1, "img5", PLAYER_MUSIC_WIND_ICON_BIN, 0, 460, 0, 0);
 }
 ```
-</details>
 <br>
 <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/page.gif" width = "300" /></div>
 <br>

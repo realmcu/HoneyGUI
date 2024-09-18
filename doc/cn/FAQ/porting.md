@@ -6,7 +6,7 @@
 
 ## JS分配堆内存
 
-JS(javascript)包含在GUI模块中，JS使用的堆空间可能会受到资源限制，导致malloc失败。如果SoC支持psram特性，可以将此堆空间重定位到psram。具体信息请参考api `void *context_alloc(size_t size, void *cb_data_p)`。
+JS(javascript)包含在GUI模块中，JS使用的堆空间可能会受到资源限制，导致malloc失败。如果SoC支持psram特性，可以将此堆空间重定位到psram。具体信息请参考API `void *context_alloc(size_t size, void *cb_data_p)`。
 
 ## 喂狗
 

@@ -1,4 +1,4 @@
-# 开关控件
+# 开关 (Switch)
 <br>
 
 开关控件是一个自定义的开关按钮控件，常用于启用或禁用某些功能或选项，允许开发者通过切换按钮的状态来控制应用程序的行为。
@@ -6,24 +6,9 @@
 ## 用法
 
 ### 创建控件
-开发者可以调用 [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create) 或者 [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_ftl)从内存地址创建开关控件，使用[gui_switch_t * gui_switch_create_frome_fs(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create_frome_fs) 从文件系统创建开关控件。
-可以参考[gui_switch_t](#gui_switch_t)中的具体参数，例如base、switch_picture、on_pic_addr、off_pic_addr等。
+开发者可以调用 [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create) 或者 [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_ftl)从内存地址创建开关控件，使用[gui_switch_t * gui_switch_create_from_fs(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create_from_fs) 从文件系统创建开关控件。
+可以参考`gui_switch_t`中的具体参数，例如base、switch_picture、on_pic_addr、off_pic_addr等。
 
-<span id = "gui_switch_t">
-
-### 开关控件的参数
-
-</span>
-
-```eval_rst
-
-.. literalinclude:: ../../../gui_engine/widget/gui_switch.h
-   :language: h
-   :start-after: /* gui_switch_t start*/
-   :end-before: /* gui_switch_t end*/
-
-
-```
 
 ### 开/关
 

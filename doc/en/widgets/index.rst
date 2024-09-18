@@ -1,103 +1,146 @@
-widgets
+Widgets
 *************
 
 ==================                   ==================
 Widgets                              Brief
 ------------------                   ------------------
-`obj`_                               The root widget of the widget tree
-`window`_                            A rectangular container widget
-`img`_                               Display image on the screen
-`simple img`_                        Simplified img
-`stbimage`_                          use stb lib to decode standard image format files and display
-`text`_                              To display text, which can be used to output text in different fonts, different colors, and different sizes
-`tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
-`tab`_                               The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
-`curtainview`_                       Slide to extend and retract curtains
-`curtain`_                           Slide to extend and retract curtains
-`cardview`_                          Display a 3d card set
-`card`_                              Display a 3d card set
-`page`_                              Swipe up and down to display the creation of controls in different vertical directions
-`pagelist`_                          Slide like page widget, could use less ram to display child widget
-`switch`_                            Listen to on and off gesture
-`grid`_                              Display widgets set in a grid view(Evenly layout vertically and horizontally)
-`progressbar`_                       Show progress by showing part of picture, or one frame of pictures, or drawing bar of specified length
-`canvas`_                            using nanovg lib to draw 2d graphics
-`cube`_                              Display a cube
-`wheellist`_                         Wheel-shaped application list
-`perspective`_                       Slide to extend and retract curtains
-`menu_cellular`_                     Display icons set as a honeycomb shape menu
-`return`_                            The bubble-shaped curve that can be dragged out
-`qbcode`_                            Display qrcode and barcode
-`canvas_rect`_                       Display a rectangular
-`canvas_round_rect`_                 Display a round rectangular
-`canvas_arc`_                        Display a arc
-`multi_level`_                       Manage and manipulate multi-level subwindows
-`litegfx`_                           Third-Party Collaboration Special Effects
+`Obj`_                               The root widget of the widget tree
+`Window`_                            A rectangular container widget
+`Img`_                               Display image on the screen
+`Simple img`_                        Simplified img
+`STB img`_                          use stb lib to decode standard image format files and display
+`Text`_                              To display text, which can be used to output text in different fonts, different colors, and different sizes
+`Tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
+`Tab`_                               The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
+`Curtainview`_                       Slide to extend and retract curtains
+`Curtain`_                           Slide to extend and retract curtains
+`Cardview`_                          Display a 3d card set
+`Card`_                              Display a 3d card set
+`Page`_                              Swipe up and down to display the creation of controls in different vertical directions
+`Pagelist`_                          Slide like page widget, could use less ram to display child widget
+`Switch`_                            Listen to on and off gesture
+`Grid`_                              Display widgets set in a grid view(Evenly layout vertically and horizontally)
+`Progressbar`_                       Show progress by showing part of picture, or one frame of pictures, or drawing bar of specified length
+`Canvas`_                            using nanovg lib to draw 2d graphics
+`Cube`_                              Display a cube
+`Wheellist`_                         Wheel-shaped application list
+`Perspective`_                       Slide to extend and retract curtains
+`SVG`_
+`Menu_cellular`_                     Display icons set as a honeycomb shape menu
+`Return`_                            The bubble-shaped curve that can be dragged out
+`Qbcode`_                            Display qrcode and barcode
+`Canvas_rect`_                       Display a rectangular
+`Canvas_round_rect`_                 Display a round rectangular
+`Canvas_arc`_                        Display a arc
+`Multi_level`_                       Manage and manipulate multi-level subwindows
+`LiteGFX`_                           Third-Party Collaboration Special Effects
 `2.5D soccer`_                       2.5D Soccer Special Effects
 ==================                   ==================
 
-.. _obj: gui_obj.html
-.. _window: gui_window.html
-.. _img: gui_img.html
-.. _simple img: gui_simple_img.html
-.. _stbimg: gui_img_stb.html
-.. _text: gui_text.html
-.. _tabview: gui_tabview.html
-.. _tab: gui_tab.html
-.. _curtainview: gui_curtainview.html
-.. _curtain: gui_curtain.html
-.. _cardview: gui_cardview.html
-.. _card: gui_card.html
-.. _page: gui_page.html
-.. _pagelist: gui_pagelist.html
-.. _switch: gui_switch.html
-.. _grid: gui_grid.html
-.. _progressbar: gui_progressbar.html
-.. _canvas: gui_canvas.html
-.. _cube: gui_cube.html
-.. _wheel list: gui_wheel_list.html
-.. _perspective: gui_perspective.html
-.. _svg: gui_svg.html
-.. _stbimage: gui_img_stb.html
-.. _watch gradient spot: gui_watch_gradient_spot.html
-.. _watchface gradient: gui_watchface_gradient.html
-.. _menu cellular: gui_menu_cellular.html
-.. _return: gui_return.html
-.. _qbcode: qbcode.html
-.. _multi_level: gui_multi_level.html
-.. _litegfx: gui_widget_litegfx.html
+.. _Obj: gui_obj.html
+.. _Window: gui_window.html
+.. _Img: gui_img.html
+.. _Simple img: gui_simple_img.html
+.. _STB img: gui_img_stb.html
+.. _Text: gui_text.html
+.. _Tabview: gui_tabview.html
+.. _Tab: gui_tab.html
+.. _Curtainview: gui_curtainview.html
+.. _Curtain: gui_curtain.html
+.. _Cardview: gui_cardview.html
+.. _Card: gui_card.html
+.. _Page: gui_page.html
+.. _Pagelist: gui_pagelist.html
+.. _Switch: gui_switch.html
+.. _Grid: gui_grid.html
+.. _Progressbar: gui_progressbar.html
+.. _Canvas: gui_canvas.html
+.. _Cube: gui_cube.html
+.. _Wheel list: gui_wheel_list.html
+.. _Perspective: gui_perspective.html
+.. _SVG: gui_svg.html
+.. _Watch gradient spot: gui_watch_gradient_spot.html
+.. _Watchface gradient: gui_watchface_gradient.html
+.. _Menu cellular: gui_menu_cellular.html
+.. _Return: gui_return.html
+.. _Qbcode: qbcode.html
+.. _Multi_level: gui_multi_level.html
+.. _LiteGFX: gui_widget_litegfx.html
 .. _2.5D soccer: gui_soccer.html
+
+.. csv-table:: Abbreviation
+   :header: Words,Definition
+   :widths: 50 100
+   :name: Abbreviation
+
+   acc,Accelerate
+   addr,Address
+   att,Attribute
+   ax,Absolute coordinates on the x-axis
+   blit,Bit-Block Image Transfer
+   buff,Buffer
+   cb,Callback
+   cbsize,Cubesize
+   ctor,Constructor
+   cur_idx,Current index in x direction
+   cur_idy,Current index in y direction
+   cx,Center coordinates on the x-axis
+   dc,Display Canvas
+   dur,Duration
+   dx,The difference along the x-axis for touchpad
+   fd,File Descriptor
+   fg,Foreground
+   fs,File System
+   hw,Hardware
+   id,Index
+   img,Image
+   info,Information
+   init,Initialize
+   mem,Memory
+   mq,Message queue
+   nz,Normal vector in Z direction of plane
+   obj,Object
+   off,Offset
+   pic,Picture
+   pos,Position
+   prev,Previous
+   rst,Result
+   src,Source
+   sx,Scale in x direction
+   tmp,Temporary
+   tx,Translation in x direction
+
+
 .. toctree::
     :maxdepth: 2
 
-    widget_template <widget_template>
-    obj <gui_obj>
-    window <gui_window>
-    img <gui_img>
-    simple img <gui_simple_img>
-    stbimg <gui_img_stb>
-    text <gui_text>
-    tabview <gui_tabview>
-    tab <gui_tab>
-    curtainview <gui_curtainview>
-    curtain <gui_curtain>
-    cardview <gui_cardview>
-    card <gui_card>
-    page <gui_page>
-    pagelist <gui_pagelist>
-    switch <gui_switch>
-    grid <gui_grid>
-    progressbar <gui_progressbar>
-    canvas <gui_canvas>
-    cube <gui_cube>
-    wheel list <gui_wheel_list>
-    perspective <gui_perspective>
-    svg <gui_svg>
-    watch gradient spot <gui_watch_gradient_spot>
-    watchface gradient <gui_watchface_gradient>
-    menu cellular <gui_menu_cellular>
-    return <gui_return>
-	qbcode <gui_qbcode>
-    multi level <gui_multi_level>
-    litegfx <gui_widget_litegfx>
+    Obj <gui_obj>
+    Window <gui_window>
+    Img <gui_img>
+    Simple img <gui_simple_img>
+    STB img <gui_img_stb>
+    Text <gui_text>
+    Tabview <gui_tabview>
+    Tab <gui_tab>
+    Curtainview <gui_curtainview>
+    Curtain <gui_curtain>
+    Cardview <gui_cardview>
+    Card <gui_card>
+    Page <gui_page>
+    Pagelist <gui_pagelist>
+    Switch <gui_switch>
+    Grid <gui_grid>
+    Progressbar <gui_progressbar>
+    Canvas <gui_canvas>
+    Cube <gui_cube>
+    Wheel list <gui_wheel_list>
+    Perspective <gui_perspective>
+    SVG <gui_svg>
+    Watch gradient spot <gui_watch_gradient_spot>
+    Watchface gradient <gui_watchface_gradient>
+    Menu cellular <gui_menu_cellular>
+    Return <gui_return>
+	Qbcode <gui_qbcode>
+    Multi level <gui_multi_level>
+    LiteGFX <gui_widget_litegfx>
     2.5D soccer <gui_soccer>

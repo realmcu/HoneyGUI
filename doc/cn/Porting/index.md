@@ -75,7 +75,7 @@
 | [RTL8763E]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
 | [RTL8772G]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
 | [RTL8773E]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
-| [RTL8772F]                                                       |   Y   |  Y   |  Y  |  Y   |  Y  |
+| RTL8772F                                                         |   Y   |  Y   |  Y  |  Y   |  Y  |
 
 ```{note}
 'Y' 表示驱动程序已包含在库中。
@@ -92,7 +92,7 @@
 | [RTL8763E]                                                      |   NA   |    NA    |    Y    |   NA   |    NA   |    NA   |   NA   |    NA    |    NA   |    Y    |    NA   |   NA   |    NA   |
 | [RTL8772G]                                                      |   Y    |    Y     |    Y    |   Y    |    Y    |    Y    |   Y    |    NA    |    NA   |    NA   |    NA   |   NA   |    NA   |
 | [RTL8773E]                                                      |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   NA   |    NA    |    Y    |    NA   |    NA   |   NA   |    NA   |
-| [RTL8772F]                                                      |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
+| RTL8772F                                                       |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
 
 ```{note}
 'Y' 表示驱动程序已包含在库中。
@@ -151,7 +151,7 @@
 | [RTL8763E]                                                       |    NA   |    NA    |   NA   |   NA  |   NA   |     Y   |     Y  |
 | [RTL8772G]                                                       |    NA   |    NA    |   NA   |    Y  |    Y   |    NA   |    NA  |
 | [RTL8773E]                                                       |    Y    |    NA    |   NA   |    Y  |   NA   |    NA   |    NA  |
-| [RTL8772F]                                                       |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
+| RTL8772F                                                         |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
 
 ```{note}
 'Y' 表示驱动程序已包含在库中。
@@ -210,4 +210,3 @@
 [RTL8763E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
 [RTL8772G]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 [RTL8773E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-[RTL8772F]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3

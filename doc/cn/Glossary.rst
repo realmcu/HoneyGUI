@@ -5,167 +5,60 @@
 .. glossary::
     :sorted:
 
-    acc
-        加速 (Accelerate)
 
-    addr
-        地址 (Address)
-
-    att
-        属性 (Attribute)
-
-    api
-        应用程序编程接口 (Application Programming Interface)
+    API
+        Application Programming Interface
 
     APP
-        应用程序 (Application)
-
-    ax
-        x轴上的绝对坐标 (Absolute coordinates on the x-axis)
-
-    blit
-        位块图像传输 (Bit-Block Image Transfer)
-
-    buff
-        缓冲区 (Buffer)
+        Application
 
     BG
-        背景 (Background)
-
-    cb
-        回调函数 (Callback)
-
-    cbsize
-        立方体大小 (Cubesize)
-
-    ctor
-        构造函数 (Constructor)
-
-    cur_idx
-        x方向上的当前索引 (Current index in x direction)
-    
-    cur_idy
-        y方向上的当前索引 (Current index in y direction)
-
-    cx
-        x轴上的中心坐标 (Center coordinates on the x-axis)
-
-    dc
-        显示画布 (Display Canvas)
+        Background
 
     DMA
-        直接内存访问 (Direct Memory Access)
-
-    dur
-        持续时间 (Duration)
-
-    dx
-        触摸板沿x轴的偏移 (The difference along the x-axis for touchpad)
+        Direct Memory Access
 
     FB
-        帧缓冲区 (Frame Buffer)
-
-    fd
-        文件描述符 (File Descriptor)
-
-    fg
-        前景 (Foreground)
-
-    fs
-        文件系统 (File System)
+        Frame Buffer
 
     GPU
-        图形处理器 (Graphics Processing Unit)
+        Graphics Processing Unit
 
     GUI
-        图形用户界面 (Graphical User Interface)
+        Graphical User Interface
 
     GPIO
-        通用输入输出口 (General Purpose Input Output)
-
-    hw
-        硬件 (Hardware)
+        General Purpose Input Output
 
     I2C
-        内部集成电路 (Inter-Integrated Circuit)
+        Inter-Integrated Circuit
 
     IC
-        集成电路 (Integrated Circuit)
-
-    id
-        索引 (Index)
-
-    img
-        图像 (Image)
-
-    info
-        信息 (Information)
-
-    init
-        初始化 (Initialize)
+        Integrated Circuit
 
     KB
-        键盘 (Key Board)
+        Key Board
 
     LCD
-        液晶显示器 (Liquid Crystal Display)
-
-    mem
-        内存 (Memory)
-
-    mq
-        消息队列 (Message Queue)
-
-    nz
-        平面Z方向的法向量 (Normal vector in Z direction of plane)
-
-    obj
-        对象 (Object)
-
-    off
-        偏移 (Offset)
+        Liquid Crystal Display
 
     OS
-        操作系统 (Operating System)
+        Operating System
 
     PC
-        个人计算机 (Personal Computer)
-
-    pic
-        图片 (Picture)
-
-    pos
-        位置 (Position)
-
-    prev
-        先前的 (Previous)
-
+        Personal Computer
+    
     PSRAM
-        伪静态随机存储器 (Pseudo Static Random Access Memory)
+        Pseudo Static Random Access Memory
 
     RAM
-        随机存取存储器 (Random Access Memory)
+        Random Access Memory
 
     RLE
-        行程长度编码 (Run-Length Encoding)
-
-    rst
-        结果 (Result)
-
-    src
-        源 (Source)
-
-    sx
-        x方向缩放 (Scale in x direction)
+        Run-Length Encoding
 
     RVD
-        RTKIOT可视化设计器(RTKIOT Visual Designer)
-
-    tmp
-        临时的 (Temporary)
+        RTKIOT Visual Designer
 
     TP
-        触摸板 (Touch Pad)
-
-    tx
-        x方向的平移 (Translation in x direction)
+        Touch Pad

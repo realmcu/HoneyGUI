@@ -28,9 +28,10 @@ RTKIOT 可视化设计工具支持以下功能：
 
 <div STYLE="page-break-after: always;"></div> 
 
+<a id="function_panel_anchor"></a>
 
 ## 功能面板
-<a id="function_panel_anchor"></a>
+
 ### 工具箱/控件
 + 非容器化控件
     + 可作为其他控件的父控件。
@@ -347,16 +348,19 @@ RTKIOT 可视化设计工具支持以下功能：
 
 <div STYLE="page-break-after: always;"></div> 
 
+<a id="resource_manage_anchor"></a>
 
 ## 资源管理
-<a id="resource_manage_anchor"></a>
+
 只有预导入的图像和字体文件可以被GUI项目引用。本章重点介绍如何管理图像和字体资源。
 图像和字体资源管理器位于设计视图正下方，如下图所示。
 
 <div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="650"></div>
 
-### 图像资源管理
 <a id="img_res_m_anchor"></a>
+
+### 图像资源管理
+
 点击 ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png)  打开图像管理器，如下图所示。
 
 <div id="figure_3_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629385728298056/d385e592_12407535.png" width="400"></div>
@@ -408,8 +412,10 @@ RTKIOT 可视化设计工具支持以下功能：
 
 <div STYLE="page-break-after: always;"></div> 
 
-## 菜单栏
 <a id="menu_anchor"></a>
+
+## 菜单栏
+
 ### 文件
 #### 起始页
 如果要关闭当前项目并打开一个已存在的项目或新建一个项目，可以通过点击“文件 -> 起始页”来打开起始页。
@@ -600,10 +606,14 @@ YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
 
 <div STYLE="page-break-after: always;"></div> 
 
-## 快速入门教程
 <a id="quick_start_anchor"></a>
-### 如何创建项目
+
+## 快速入门教程
+
 <a id="how_to_create_anchor"></a>
+
+### 如何创建项目
+
 <div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="650"></div>
 
 双击运行"RVisualDesigner.exe"，然后按照步骤（1~4）配置项目，点击"创建项目"（5）。
@@ -627,8 +637,10 @@ YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
 ### 如何编写 JavaScript 代码
 项目创建完成后，会生成一个 xxx.js 文件，打开该文件，在其中编写 JavaScript 代码以实现控件的事件回调函数。
 
-### 如何打开项目
 <a id="how_to_open_anchor"></a>
+
+### 如何打开项目
+
 <div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="650"></div>
 
 有两种打开项目的方式：
@@ -658,8 +670,10 @@ YUV 采样：保留图像的亮度信息，并只对色度信息进行采样。
 
 <div STYLE="page-break-after: always;"></div> 
 
-## GUI演示项目
 <a id="gui_demo_anchor"></a>
+
+## GUI演示项目
+
 RVisualDesigner-vx.x.x.x.zip 中包含一个 Demo 项目。
 
 文件夹 454x454 包含分辨率为 454*454 的项目。
