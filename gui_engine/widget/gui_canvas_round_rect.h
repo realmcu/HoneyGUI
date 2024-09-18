@@ -60,6 +60,7 @@ typedef struct gui_canvas_round_rect
     uint8_t *rect_data;
     int  r;
     gui_color_t color;
+    uint8_t opacity_value;
     bool use_external_picture;
 } gui_canvas_round_rect_t;
 
@@ -132,12 +133,48 @@ gui_canvas_round_rect_t *gui_canvas_round_rect_create(gui_obj_t   *parent,
                                                       gui_color_t  color);
 
 /**
+ * @brief Set the opacity of the canvas round rectangle.
+ *
+ * This function sets the opacity level for a given round rectangle on the canvas.
+ * The opacity value ranges from `0` (fully transparent) to `255` (fully opaque).
+ *
+ * @param _this           Pointer to the gui_canvas_round_rect_t structure.
+ * @param opacity_value   The opacity value to be set (0-255).
+ */
+void gui_canvas_round_rect_set_opacity(gui_canvas_round_rect_t *_this, unsigned char opacity_value);
+
+
+/**
+ * @brief Set the color of the canvas round rectangle.
+ *
+ * This function assigns a specific color to the round rectangle on the canvas.
+ *
+ * @param _this  Pointer to the gui_canvas_round_rect_t structure.
+ * @param color  The color value to be set, represented as gui_color_t.
+ */
+void gui_canvas_round_rect_set_color(gui_canvas_round_rect_t *_this, gui_color_t color);
+
+
+/**
+ * @brief Set the location of the canvas round rectangle.
+ *
+ * This function specifies the starting coordinates (X and Y) for the round rectangle
+ * on the canvas.
+ *
+ * @param _this  Pointer to the gui_canvas_round_rect_t structure.
+ * @param x      The start X-coordinate.
+ * @param y      The start Y-coordinate.
+ */
+void gui_canvas_round_rect_set_location(gui_canvas_round_rect_t *_this, int x, int y);
+
+
+/**
  * @brief
  *
- * @param this
+ * @param _this
  * @param data
  */
-void gui_canvas_round_rect_set_external_picture(gui_canvas_round_rect_t *this, void *data);
+void gui_canvas_round_rect_set_external_picture(gui_canvas_round_rect_t *_this, void *data);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

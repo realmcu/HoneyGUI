@@ -284,51 +284,51 @@ gui_cube_t *gui_cube_create(void               *parent,
 /**
  * @brief set center
  *
- * @param this widget pointer
+ * @param _this widget pointer
  * @param c_x center x
  * @param c_y center y
  */
-void gui_cube_set_center(gui_cube_t *this, float c_x, float c_y);
+void gui_cube_set_center(gui_cube_t *_this, float c_x, float c_y);
 
 /**
  * @brief set size
  *
- * @param this widget pointer
+ * @param _this widget pointer
  * @param size scale size
  */
-void gui_cube_set_size(gui_cube_t *this, float size);
+void gui_cube_set_size(gui_cube_t *_this, float size);
 
 /**
  * @brief set click cb
  *
- * @param this widget pointer
+ * @param _this widget pointer
  * @param cb_list click cb list
  */
-void gui_cube_add_click_cb(gui_cube_t *this, gui_cube_cb_t cb_list);
+void gui_cube_add_click_cb(gui_cube_t *_this, gui_cube_cb_t cb_list);
 
 /**
  * @brief
  *
- * @param this
+ * @param _this
  * @param interval
  */
-void gui_cube_auto_rotation_by_x(gui_cube_t *this, uint32_t internal_ms, float degree);
+void gui_cube_auto_rotation_by_x(gui_cube_t *_this, uint32_t internal_ms, float degree);
 
 /**
  * @brief
  *
- * @param this
+ * @param _this
  * @param interval
  */
-void gui_cube_auto_rotation_by_y(gui_cube_t *this, uint32_t internal_ms, float degree);
+void gui_cube_auto_rotation_by_y(gui_cube_t *_this, uint32_t internal_ms, float degree);
 
 /**
  * @brief
  *
- * @param this
+ * @param _this
  * @param interval
  */
-void gui_cube_auto_rotation_by_z(gui_cube_t *this, uint32_t internal_ms, float degree);
+void gui_cube_auto_rotation_by_z(gui_cube_t *_this, uint32_t internal_ms, float degree);
 
 /** End of WIDGET_Exported_GUI_Functions
   * @}

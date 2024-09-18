@@ -3,10 +3,7 @@
 #include "gui_tabview.h"
 #include "gui_tab.h"
 #include "gui_img.h"
-#include "gui_img_scope.h"
 #include "gui_obj.h"
-#include "gui_canvas.h"
-
 #include "string.h"
 #include "stdio.h"
 #include "stdlib.h"
@@ -26,29 +23,12 @@
 #include "gui_canvas_round_rect.h"
 #include "tiger_blue_compressed.txt"
 #include "acc_sw_rle.h"
-#ifdef ENABLE_AMR_2D
-#include "gui_arm2d.h"
-#include "arm_2d.h"
-#include "arm_2d_disp_adapters.h"
-#include "arm_2d_helper.h"
-static void arm2d_cb(gui_arm2d_t *canvas)
-{
-    GUI_LINE(1);
-}
-#endif
-
-
-static void canvas_cb_black(gui_canvas_t *canvas)
-{
-    nvgRect(canvas->vg, 20, 256, 200, 180);
-    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 128, 200));
-    nvgFill(canvas->vg);
-}
 
 
 
 
-static void app_dialing_ui_design(gui_app_t *app)
+
+static void app_ui_design(gui_app_t *app)
 {
 
     // gui_canvas_round_rect_create(&(app->screen), "t", 84, 100, 298, 78, 38, gui_rgba(100, 0, 0, 255));
@@ -67,11 +47,6 @@ static void app_dialing_ui_design(gui_app_t *app)
 
     // gui_img_create_from_mem(win1,  "img_1_test", (void *)_actiger_blue, 50, 50, 0, 0);
     // return;
-
-#ifdef ENABLE_AMR_2D
-    gui_arm2d_t *arm2d = gui_arm2d_create(&(app->screen), "arm2d_test", arm2d_cb, 0, 0, 0, 0);
-
-#endif
 
     gui_img_create_from_mem(&(app->screen),  "img_1_test", (void *)_actiger_blue_compressed, 0, 0, 0,
                             0);
@@ -99,9 +74,6 @@ static void app_dialing_ui_design(gui_app_t *app)
     gui_img_t *img_2 = gui_img_create_from_mem(gui_tab_get_rte_obj(tab_2),  "img_2",
                                                (void *)_actiger_turk, 100, 100, 0, 0);
 
-    gui_canvas_t *canvas = gui_canvas_create(tab_1, "canvas", 0, 0, 0, 454, 454);
-    gui_canvas_set_canvas_cb(canvas, canvas_cb_black);
-
 }
 
 
@@ -113,7 +85,7 @@ static gui_app_t rtk_gui_demo =
         .x    = 0,
         .y    = 0,
     },
-    .ui_design = app_dialing_ui_design,
+    .ui_design = app_ui_design,
     .active_ms = 1000 * 60 * 60,
 };
 

@@ -870,7 +870,7 @@ static void page_scroll(gui_obj_t *parent)
 }
 
 
-void menu_loop_ui(gui_obj_t *parent)
+void design_menu_loop_ui(gui_obj_t *parent)
 {
     gui_canvas_rect_create(parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height(),
                            APP_COLOR_SILVER);

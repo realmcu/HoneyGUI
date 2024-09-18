@@ -158,7 +158,7 @@ typedef enum
 /**
  * @brief create a tabview widget, which can nest tabs.
  * @param parent the father widget it nested in.
- * @param filename this tabview widget's name.
+ * @param filename _this tabview widget's name.
  * @param x the X-axis coordinate relative to parent widget
  * @param y the Y-axis coordinate relative to parent widget
  * @param w width
@@ -185,10 +185,10 @@ void gui_tabview_jump_tab(gui_tabview_t *parent_tabview, int8_t idx, int8_t idy)
 /**
  * @brief config slide effect
  *
- * @param this tabview pointer
+ * @param _this tabview pointer
  * @param style refer to T_SLIDE_STYLE
  */
-void gui_tabview_set_style(gui_tabview_t *this, T_SLIDE_STYLE style);
+void gui_tabview_set_style(gui_tabview_t *_this, T_SLIDE_STYLE style);
 
 /**
  * @brief Config tabview loop_x sliding feature. The default setting is no looping.
@@ -207,7 +207,7 @@ void gui_tabview_loop_x(gui_tabview_t *tabview, bool loop);
 void gui_tabview_loop_y(gui_tabview_t *tabview, bool loop);
 
 /**
- * @brief disable tp action for this tabview.
+ * @brief disable tp action for _this tabview.
  *
  * @param tabview tabview pointer.
  * @param disable_tp true: disable tp action,  false: enable tp action.
@@ -217,10 +217,10 @@ void gui_tabview_tp_disable(gui_tabview_t *tabview, bool disable_tp);
 /**
  * @brief enable tab widget cache
  *
- * @param this tabview pointer.
+ * @param _this tabview pointer.
  * @param enable true: enable tab widget cache,  false: disable tab widget cache.
  */
-void gui_tabview_enable_pre_load(gui_tabview_t *this, bool enable);
+void gui_tabview_enable_pre_load(gui_tabview_t *_this, bool enable);
 
 /**
  * @brief Register callback for tab change.

@@ -143,13 +143,14 @@ gui_img_scope_t *gui_img_scope_create_from_ftl(void    *parent,
 /**
  * @brief
  *
- * @param this
+ * @param _this
  * @param x1
  * @param y1
  * @param x2
  * @param y2
  */
-void gui_img_scope_set_range(gui_img_scope_t *this, int16_t x1, int16_t y1, int16_t x2, int16_t y2);
+void gui_img_scope_set_range(gui_img_scope_t *_this, int16_t x1, int16_t y1, int16_t x2,
+                             int16_t y2);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

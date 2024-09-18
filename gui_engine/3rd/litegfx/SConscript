@@ -15,8 +15,11 @@ src += Glob("vglite/source/interface/*.cpp")
 src += Glob("vglite/source/lib/*.cpp")
 src += Glob("vglite/source/widgets/*.cpp")
 src += Glob("vglite/source/transitions/*.cpp")
+src += Glob("HoneyGUI-Adapt/gui_widget_litegfx.c")
 if GetDepend('CONFIG_REALTEK_BUILD_GUI_454_454_DEMO'):
-    src += Glob("HoneyGUI-Adapt/*.c")
+    src += Glob("HoneyGUI-Adapt/tab_*.c")
+    
+
 
 CPPPATH = [cwd, os.path.join(cwd, 'platform'),
            os.path.join(cwd, 'HoneyGUI-Adapt'),
