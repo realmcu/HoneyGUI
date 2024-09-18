@@ -26,6 +26,7 @@
 
 char *defaultPath = "gui_engine\\example\\screen_480_480\\root\\";
 // char *defaultPath = "gui_engine\\example\\screen_480_480\\Visual Disigner Prj\\480x480\\Export\\root\\";
+// char *defaultPath = "gui_engine\\example\\screen_280_456\\root_image_8762g\\root\\";
 int main(int argc, char **argv)
 {
     printf("\n\n\t************** %s **************\t\n   \t <%s> \t Build Time: %s\n\n", COMPANY_NAME,

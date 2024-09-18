@@ -75,8 +75,10 @@ void gui_font_get_dot_info(gui_text_t *text)
         table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
     }
-    GUI_ASSERT(font != 0)
-
+    if (font == NULL)
+    {
+        gui_assert_handler("font == NULL", __FUNCTION__, __LINE__);
+    }
     uint8_t rendor_mode = font->rendor_mode;
     if (rendor_mode == 0)
     {
@@ -145,7 +147,7 @@ void gui_font_get_dot_info(gui_text_t *text)
                     {
                         char file_path[100];
                         memset(file_path, 0, 100);
-                        memcpy(file_path, text->emoji_path, strlen((const char *)text->emoji_path));
+                        snprintf(file_path, sizeof(file_path), "%s", text->emoji_path);
                         uint32_t multi_unicode_len = generate_emoji_file_path_from_unicode(&unicode_buf[uni_i],
                                                                                            unicode_len - uni_i, file_path);
                         // gui_log("emoji len %d, path %s\n", multi_unicode_len,file_path);
@@ -412,6 +414,10 @@ void gui_font_get_dot_info(gui_text_t *text)
 
 void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
 {
+    if (text == NULL)
+    {
+        return;
+    }
     if (text->data == NULL)
     {
         gui_font_get_dot_info(text);
