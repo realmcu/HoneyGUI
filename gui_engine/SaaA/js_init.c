@@ -117,6 +117,7 @@ void js_init(void)
     jerryx_handler_register_global((const jerry_char_t *) "print",
                                    jerryx_handler_print);
     js_console_init();
+    extern void js_gui_init(void);
     js_gui_init();
     js_gpio_init();
     //js_fs_init();

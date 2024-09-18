@@ -1289,6 +1289,7 @@ DECLARE_HANDLER(setBlock)
             gui_img_set_tp_block(img, block);
         }
     }
+    return jerry_create_undefined();
 }
 DECLARE_HANDLER(win_getAttribute)
 {

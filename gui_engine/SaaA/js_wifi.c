@@ -53,8 +53,9 @@ typedef struct
 
     uint8_t state;
     uint8_t ap_count;
+#if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
     ssid_info_t ssid_info;
-
+#endif
 } js_wifi_data_t;
 
 js_wifi_data_t js_wifi_data;
@@ -171,7 +172,9 @@ DECLARE_HANDLER(connect)
     // gui_log("wifi connect, %d %s\n", ssid_info.ssid_index, ssid_info.password);
     gui_log("wifi connect\n");
 
+#if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
     ssid_info = js_wifi_data.ssid_info;
+#endif
     gui_send_msg_to_app_task(WIFI_CMD_CONNECT);
     return jerry_create_undefined();
 }
@@ -186,6 +189,7 @@ DECLARE_HANDLER(setConIndex)
 {
     gui_log("wifi setConIndex\n");
 
+#if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
     if (args_cnt == 1 && jerry_value_is_number(args[0]))
     {
         int i = jerry_get_number_value(args[0]);
@@ -195,14 +199,17 @@ DECLARE_HANDLER(setConIndex)
             js_wifi_data.ssid_info.password[0] = '\0';
         }
     }
+#endif
     return jerry_create_undefined();
 }
 
 DECLARE_HANDLER(initPasswd)
 {
     gui_log("wifi initPasswd\n");
+#if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
     js_wifi_data.ssid_info.password[0] = '\0';
     gui_kb_set_pswd(js_wifi_data.ssid_info.password, 0);
+#endif
     return jerry_create_undefined();
 }
 
@@ -210,14 +217,18 @@ DECLARE_HANDLER(setConPasswd)
 {
     char *pswd = gui_kb_get_pswd();
     gui_log("wifi setConPasswd %s\n", pswd);
-    memcpy(js_wifi_data.ssid_info.password, pswd, strlen(pswd) + 1);
 
+#if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
+    memcpy(js_wifi_data.ssid_info.password, pswd, strlen(pswd) + 1);
+#endif
     return jerry_create_undefined();
 }
 
 DECLARE_HANDLER(setPasswdVisible)
 {
     gui_log("wifi setPasswdVisible\n");
+
+#if (defined ENABLE_WIFI_NIC) || (defined __WIN32)
     if (args_cnt == 2 && jerry_value_is_string(args[0]) && jerry_value_is_number(args[1]))
     {
         jerry_value_t global_obj = jerry_get_global_object();
@@ -248,6 +259,7 @@ DECLARE_HANDLER(setPasswdVisible)
             gui_text_content_set(txtbox, txtbox->content, txtbox->len);
         }
     }
+#endif
 
     return jerry_create_undefined();
 }
