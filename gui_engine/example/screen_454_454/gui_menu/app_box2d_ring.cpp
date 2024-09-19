@@ -13,22 +13,25 @@
 #include <ctime>   // For using time
 #include <nanovg.h>
 #include "gui_canvas.h"
-
+#include "tp_algo.h"
 namespace app_box2d_ring
 {
 
 const float TIMESTEP = 1.0f / 60.0f; // Timestep
 const int VELOCITY_ITERATIONS = 8; // Velocity iterations
 const int POSITION_ITERATIONS = 3; // Position iterations
-
 const int RING_SEGMENTS = 100; // Number of ring segments
-const int BALL_COUNT = 30; // Number of balls
+const int BALL_COUNT = 40; // Number of balls
 const float BALL_RADIUS = 10.0f; // Ball radius
 const float PIXELS_PER_METER = 30.0f; // Pixels per meter
-const float INITIAL_SPEED = 100.0f; // Initial speed
+const float INITIAL_SPEED = 20.0f; // Initial speed
 const float RING_GAP = 70.0f; // RING_GAP
 const float BALL_DENSITY = 0.1f; // BALL_DENSITY
 const float BALL_RESTITUTION = 0.3f; // BALL_RESTITUTION
+const NVGcolor BACKGROUND_COLOR = nvgRGB(255, 255, 255);
+const float EFFECT_RADIUS = 20.0f; // Effect radius of the finger
+constexpr float MINIMUM_LINEAR_VELOCITY = 5.0f; // Minimum linear velocity to avoid stopping
+constexpr float MAX_ANGULAR_VELOCITY = 15.0f; // Maximum angular velocity for balls
 gui_obj_t *parent;
 gui_canvas *this_widget;
 NVGcontext *vg = nullptr; // NanoVG context
@@ -44,40 +47,114 @@ struct Ball
 };
 
 std::vector<Ball> balls; // Vector to store balls and their colors
-
+std::vector<b2Body *> temporaryBodies; // Vector to store temporary bodies
 bool init();
 void close();
 void createRing(b2World *world, float radius, float restitution);
 void createBalls(b2World *world);
 void applyCentripetalForce(b2Body *ball);
 void render(gui_canvas *this_widget);
-
+void maintainMinimumVelocity(b2Body *ball);
+void limitMaxAngularVelocity(b2Body *ball);
 // App callback function
 void app_box2d_cb(gui_win_t *win)
 {
     for (const Ball &ball : balls)
     {
         applyCentripetalForce(ball.body); // Apply centripetal force
+        limitMaxAngularVelocity(ball.body); // Limit the maximum angular velocity
+        maintainMinimumVelocity(ball.body); // Ensure minimum motion
     }
 
     world->Step(TIMESTEP, VELOCITY_ITERATIONS, POSITION_ITERATIONS); // Update the physics world
 }
+void win_press_callback(void *obj, gui_event_t e, void *param)
+{
+    touch_info_t *touch = tp_get_info();
+    int mouseX = touch->x;
+    int mouseY = touch->y;
 
+    // Convert mouse coordinates to Box2D world coordinates
+    b2Vec2 clickPoint(mouseX / PIXELS_PER_METER, mouseY / PIXELS_PER_METER);
+
+    // Create a temporary large invisible ball to create the effect
+    b2BodyDef ballBodyDef;
+    ballBodyDef.type = b2_dynamicBody; // Set as dynamic body
+    ballBodyDef.position.Set(clickPoint.x, clickPoint.y);
+    b2Body *ballBody = world->CreateBody(&ballBodyDef);
+
+    b2CircleShape circleShape;
+    circleShape.m_radius = EFFECT_RADIUS / PIXELS_PER_METER;
+
+    b2FixtureDef fixtureDef;
+    fixtureDef.shape = &circleShape;
+    fixtureDef.density = BALL_DENSITY * 10; // Set density
+    fixtureDef.restitution = BALL_RESTITUTION * 10; // Set restitution
+    fixtureDef.friction = 0.0f; // Set friction to zero to minimize stopping
+    ballBody->CreateFixture(&fixtureDef);
+// Apply initial tangential velocity to the ball
+    float vx = INITIAL_SPEED ;  // Tangential velocity x component
+    float vy = INITIAL_SPEED ;   // Tangential velocity y component
+    ballBody->SetLinearVelocity(b2Vec2(vx, vy));
+    temporaryBodies.push_back(ballBody); // Store the temporary body
+}
+void win_release_callback()
+{
+    // Destroy temporary bodies after a short period
+    for (b2Body *body : temporaryBodies)
+    {
+        world->DestroyBody(body);
+    }
+    temporaryBodies.clear();
+}
+// Maintain minimum linear velocity to avoid stopping
+void maintainMinimumVelocity(b2Body *ball)
+{
+    if (ball->GetLinearVelocity().Length() < MINIMUM_LINEAR_VELOCITY)
+    {
+        // Apply a small random impulse to keep the ball moving
+        float angle = rand() % 360;
+        float impulseMagnitude = ball->GetMass() * MINIMUM_LINEAR_VELOCITY;
+        b2Vec2 impulse(impulseMagnitude * cos(angle), impulseMagnitude * sin(angle));
+        ball->ApplyLinearImpulseToCenter(impulse, true);
+    }
+}
+// Limit the maximum angular velocity to prevent unrealistic speeds
+void limitMaxAngularVelocity(b2Body *ball)
+{
+    float currentSpeed = ball->GetLinearVelocity().Length();
+    if (currentSpeed > MAX_ANGULAR_VELOCITY)
+    {
+        b2Vec2 scaledVelocity = ball->GetLinearVelocity();
+        scaledVelocity *= (MAX_ANGULAR_VELOCITY / currentSpeed);
+        ball->SetLinearVelocity(scaledVelocity);
+    }
+}
 bool init()
 {
-    //GUI_WIDGET_TRY_EXCEPT(parent)
+    GUI_WIDGET_TRY_EXCEPT(parent)
     SCREEN_WIDTH = gui_get_screen_width(); // Screen width
     SCREEN_HEIGHT = gui_get_screen_height(); // Screen height
     OUTER_RING_RADIUS = SCREEN_WIDTH / 2.0f; // Outer ring radius
     INNER_RING_RADIUS = SCREEN_HEIGHT / 2.0f - RING_GAP; // Inner ring radius
-    gui_win_t *win = gui_win_create(parent, "APP_BOX2D ring", 0, 0, 0, 0);
+    gui_win_t *win = gui_win_create(parent, "APP_BOX2D ring", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    if (!win)
+    {
+        return false; // Handle window creation failure
+    }
 
     // Set the animation function of the window
     gui_win_set_animate(win, 1000, -1, (void *)app_box2d_cb, win);
-
+    gui_win_press(win, (void *)win_press_callback, win);
+    gui_win_release(win, (void *)win_release_callback, win);
     this_widget = gui_canvas_create(parent, "canvas", 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    gui_canvas_set_canvas_cb(this_widget, render);
+    if (!this_widget)
+    {
+        return false; // Handle canvas creation failure
+    }
 
+    gui_canvas_set_canvas_cb(this_widget, render);
     return true;
 }
 
@@ -108,7 +185,7 @@ void createRing(b2World *world, float radius, float restitution)
         b2FixtureDef fixtureDef;
         fixtureDef.shape = &edgeShape;
         fixtureDef.restitution = restitution; // Set restitution
-
+        fixtureDef.friction = 0.0f; // Set friction to zero to minimize stopping
         ringBody->CreateFixture(&fixtureDef); // Create fixture
     }
 }
@@ -134,7 +211,7 @@ void createBalls(b2World *world)
         fixtureDef.shape = &circleShape;
         fixtureDef.density = BALL_DENSITY; // Set density
         fixtureDef.restitution = BALL_RESTITUTION; // Set restitution
-
+        fixtureDef.friction = 0.0f; // Set friction to zero to minimize stopping
         ballBody->CreateFixture(&fixtureDef);
 
         // Apply initial tangential velocity to the ball
@@ -161,12 +238,25 @@ void applyCentripetalForce(b2Body *ball)
     b2Vec2 force = forceMagnitude * toCenter; // Centripetal force vector
     ball->ApplyForceToCenter(force, true); // Apply force to ball center
 }
+// Define custom comparison operator for NVGcolor
+bool operator!=(const NVGcolor &c1, const NVGcolor &c2)
+{
+    return !(c1.r == c2.r && c1.g == c2.g && c1.b == c2.b && c1.a == c2.a);
+}
 
 // Render function
 void render(gui_canvas *this_widget)
 {
     // Clear background color
     vg = this_widget->vg;
+    if (BACKGROUND_COLOR != nvgRGB(0, 0, 0))
+    {
+        nvgBeginPath(vg);
+        nvgRect(vg, 0, 0, 454, 454);
+        nvgFillColor(vg, BACKGROUND_COLOR);
+        nvgFill(vg);
+    }
+
 
     // Draw balls
     for (const Ball &ball : balls)
@@ -176,7 +266,8 @@ void render(gui_canvas *this_widget)
 
         // Draw ball
         NVGpaint ballPaint = nvgRadialGradient(vg, ballX, ballY, 1, BALL_RADIUS,
-                                               ball.color, nvgRGBA(0, 0, 0, 0));
+                                               ball.color, nvgRGBA(ball.color.r * UINT8_MAX, ball.color.g * UINT8_MAX, ball.color.b * UINT8_MAX,
+                                                                   0));
         nvgBeginPath(vg);
         nvgCircle(vg, ballX, ballY, BALL_RADIUS);
         nvgFillPaint(vg, ballPaint); // Set gradient color
