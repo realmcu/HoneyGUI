@@ -591,8 +591,7 @@ const char *get_text_from_widget(gui_obj_t *widget)
     {
         return GUI_TYPE(gui_text_t, widget)->content;
     }
-
-
+    return 0;
 }
 static bool enter;
 static void timer_start_window_callback(gui_win_t *win)

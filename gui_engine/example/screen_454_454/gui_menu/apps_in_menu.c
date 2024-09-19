@@ -10,7 +10,6 @@
 #include "gui_canvas_rect.h"
 #include "gui_multi_level.h"
 #include "gui_button.h"
-#include "gui_image_array.h"
 #include "gui_soccer.h"
 #include<stdio.h>
 #include<time.h>
@@ -459,10 +458,6 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
 
 
             int opacity = deltaY * 255 / 100;
-            if (opacity > 255)
-            {
-                opacity = 255;
-            }
             gui_canvas_rect_set_opacity(rect, opacity);
             float scale = deltaY * deltaY * ((1.0f - TIME_SCALE_RATE) / 10000.0f) + TIME_SCALE_RATE;
             if (scale > 1)
@@ -495,7 +490,11 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
     {
         gui_canvas_rect_set_opacity(rect, 0);
         GET_BASE(rect)->not_show = 1;
-        gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+        if (time_txt)
+        {
+            gui_img_scale(time_txt->scale_img, TIME_SCALE_RATE, TIME_SCALE_RATE);
+        }
+
         shrink = 0;
         if (ignore_gesture)
         {
@@ -635,7 +634,7 @@ static void app_menu_win_cb(gui_obj_t *this)//this widget, event code, parameter
 
 static void app_menu_cb(void *obj, gui_event_t e, void *param)
 {
-    gui_log("%d,%x\n", GUI_TYPE(gui_obj_t, obj)->type, param);
+    gui_log("%d,%p\n", GUI_TYPE(gui_obj_t, obj)->type, param);
 }
 /*Define APP_MENU's entry func */
 static void app_menu(gui_app_t *app)
@@ -1418,6 +1417,10 @@ static void volume_cb(gui_img_t *volume, gui_win_t *win)
         volume->scope_y1 = scope_x2;
         gui_log("percentage:%f\n", per);
     }
+    if (img_h == 0)
+    {
+        img_h = 454;
+    }
     per = ((float)(img_h - volume->scope_y1)) / ((float)img_h);
 }
 static void volume2_cb(gui_img_t *volume, gui_win_t *win)
@@ -1454,13 +1457,17 @@ static void volume2_cb(gui_img_t *volume, gui_win_t *win)
         volume->scope_x2 = scope_x2;
         gui_log("percentage:%f\n", per);
     }
+    if (img_w == 0)
+    {
+        img_w = 454;
+    }
     per = ((float)(volume->scope_x2)) / ((float)img_w);
     gui_text_t *t = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "volume text", (void *)&t);
     if (t)
     {
-        static char text[sizeof("VOLUME:100.00%")];
-        sprintf(text, "VOLUME:%.2f%", per);
+        static char text[sizeof("VOLUME:100.00%%")];
+        sprintf(text, "VOLUME:%.2f%%", per);
         gui_text_set(t, text, GUI_FONT_SRC_BMP, t->color, strlen(text), t->font_height);
     }
 
@@ -1536,7 +1543,7 @@ static void get_img_array(gui_img_t **img_array, gui_win_t *root, int img_array_
     gui_list_t *node = NULL;
     gui_obj_t *obj = GUI_BASE(root);
     int count = 0;
-    memset(img_array, 0, sizeof(img_array)*img_array_count);
+    memset(img_array, 0, sizeof(*img_array)*img_array_count);
     gui_list_for_each(node, &obj->child_list)
     {
         if (count >= img_array_count)
@@ -1636,7 +1643,6 @@ static void cycle_tracking_win_cb(gui_win_t *win)
     {
 //180,160,103 +-
         gui_log("tp:%d %d\n", tp->deltaX, swap);
-        if (swap == 0)
         {
 
             int dx[] = {0, 87, 190, 274};
@@ -2150,7 +2156,7 @@ static bool touch_up;
 static bool touch_down;
 static void block_transform(gui_win_t *block, int offset_x_, int offset_y_, int tp_x_, int tp_y_)
 {
-    gui_log("next_curtain:%d,win_curtain:%d,%x,%x,%x\n", next_curtain, win_curtain, win_index, win_next,
+    gui_log("next_curtain:%d,win_curtain:%d,%p,%p,%p\n", next_curtain, win_curtain, win_index, win_next,
             block);
     if (block == win_index)
     {
