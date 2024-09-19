@@ -9,8 +9,8 @@ In UI design, it is necessary to use Image Convert Tool or Font Convert Tool to 
 .. toctree::
     :maxdepth: 2
 
-    Image Convert Tool <Resource/image>
-    Font Convert Tool <Resource/font>
-    Pack Tool <Resource/packing>
-    MP Tool <Resource/download>
+    Image Convert Tool <image>
+    Font Convert Tool <font>
+    Pack Tool <packing>
+    MP Tool <download>
 ```

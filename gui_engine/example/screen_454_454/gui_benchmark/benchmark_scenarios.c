@@ -8,7 +8,6 @@
 #include "gui_text.h"
 #include "gui_scroll_text.h"
 #include "gui_page.h"
-#include "gui_grid.h"
 #include "font_mem.h"
 #include "app_gui_main.h"
 #include "benchmark_common.h"
@@ -45,7 +44,7 @@ void *get_app_benchmark(void)
     return &app_benchmark;
 }
 
-static void win_count_frame_cb(void *p)
+static void win_count_frame_cb(void *p, void *obj)
 {
     /*send msg to update frame cost*/
     if (benchmark_frame_count < BENCHMARK_MAX_FRAME)
@@ -61,7 +60,7 @@ static void win_count_frame_cb(void *p)
     gui_fb_change();
 }
 
-static void win_count_frame_switch_scenario_cb(void *obj, gui_event_t event)
+static void win_count_frame_switch_scenario_cb(void *obj, uint16_t event, void *param)
 {
     gui_win_t *this = (gui_win_t *)obj;
     gui_app_t *app = get_app_benchmark();
@@ -204,7 +203,7 @@ void benchmark_single_img_design(void *parent)
 
 /*benchmark scenario 1*/
 static float img_rotate_angle = 0.0f;
-static void single_img_rotation_ani_cb(void *p)
+static void single_img_rotation_ani_cb(void *p, void *obj)
 {
     //gui_log("img_rotate_angle %f", img_rotate_angle);
     gui_img_t *this = (gui_img_t *)p;
@@ -229,7 +228,7 @@ void benchmark_single_img_rotation_design(void *parent)
 
 /*benchmark scenario 2*/
 static int16_t img_cube_slide = 0;
-static void single_img_tab_cube_ani_cb(void *p)
+static void single_img_tab_cube_ani_cb(void *p, void *obj)
 {
     //gui_log("img_cube_slide %d", img_cube_slide);
     gui_img_t *this = (gui_img_t *)p;
@@ -264,7 +263,7 @@ void benchmark_single_img_cube_design(void *parent)
 
 /*benchmark scenario 3*/
 static int16_t img_reduction_slide = 0;
-static void single_img_tab_reduction_ani_cb(void *p)
+static void single_img_tab_reduction_ani_cb(void *p, void *obj)
 {
     //gui_log("img_reduction_slide %d", img_reduction_slide);
     gui_img_t *this = (gui_img_t *)p;
@@ -315,6 +314,8 @@ void benchmark_double_img_design(void *parent)
 void benchmark_cube(void *parent)
 {
     gui_cube_imgfile_t image_file;
+    float degree = 360.f / (float)BENCHMARK_MAX_FRAME;
+
     memset(&image_file, 0, sizeof(gui_cube_imgfile_t));
     for (int i = 0; i < 6; i++)
     {
@@ -329,12 +330,12 @@ void benchmark_cube(void *parent)
     gui_cube_t *ccc = gui_cube_create(parent, "ccc", &image_file, 0, 0);
     gui_cube_set_center(ccc, 227, 227);
     gui_cube_set_size(ccc, 75);
-    gui_cube_auto_rotation_by_y(ccc, 100, 360 / BENCHMARK_MAX_FRAME);
+    gui_cube_auto_rotation_by_y(ccc, 100, degree);
 }
 
 /*benchmark scenario 6*/
 static int16_t perspective_rotation = 0;
-static void win_perspective_animate_cb(void *p)
+static void win_perspective_animate_cb(void *p, void *obj)
 {
     //gui_log("perspective_rotation %d", perspective_rotation);
     gui_win_t *this = (gui_win_t *)p;

@@ -5,24 +5,9 @@ Switch is a custom switch button control, often used to enable or disable certai
 ## Usage
 
 ### Create widget
-Using [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create) or [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_ftl) to create switch widget from memory address, and [gui_switch_t * gui_switch_create_frome_fs(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create_frome_fs) to create switch widget from filesystem.
-You can refer to the specific parameters of gui_switch_t, such as base, switch_picture, on_pic_addr, off_pic_addr, etc, in [gui_switch_t](#gui_switch_t).
+Using [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create) or [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_ftl) to create switch widget from memory address, and [gui_switch_t * gui_switch_create_from_fs(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create_from_fs) to create switch widget from filesystem.
+You can refer to the specific parameters of `gui_switch_t`, such as base, switch_picture, on_pic_addr, off_pic_addr, etc.
 
-<span id = "gui_switch_t">
-
-### Parameters of switch widget
-
-</span>
-
-```eval_rst
-
-.. literalinclude:: ../../../gui_engine/widget/gui_switch.h
-   :language: h
-   :start-after: /* gui_switch_t start*/
-   :end-before: /* gui_switch_t end*/
-
-
-```
 
 ### Turn on/off
 By using the following APIs, you can turn on or off the switch, and the event (created by gui_obj_add_event_cb) will be triggered.<br/>

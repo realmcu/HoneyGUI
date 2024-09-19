@@ -1,4 +1,4 @@
-# STB Image
+# STB img
 
 The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.STB image widgets support bmp, jpg, png, gif, etc.
 
@@ -16,7 +16,6 @@ You can use [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t 
 
 ## Example
 
-<details> <summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -31,8 +30,6 @@ static void app_home_ui_design(gui_app_t *app)
     gui_stb_img_t *png = gui_img_stb_create_from_mem(&app->screen, "png", TEST_PNG, 0x2B00, PNG, 170, 170);
 }
 ```
-
-</details>
 
 <br>
 

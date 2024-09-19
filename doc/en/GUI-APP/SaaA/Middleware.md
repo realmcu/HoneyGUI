@@ -2,13 +2,13 @@
 RVD exports the SaaA package. The firmware needs to parse and play it.
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715938743160813708/833fbdab_10088396.png" alt ="saaa.png"></div><br/>
 
-## PACKAGE 
+## Package
 |resource|XML|JavaScript|
 |---|---|---|
 |Pictures and font files, etc.|Describes the initial nested tree structure and specific parameters of the widget|Customized behaviors, such as triggering behaviors of widget gesture events, peripheral operations, printing logs, etc.|
 
 * Packages are in the ```root/app``` folder of File system image, and a launcher in firmware will iterate through these packages and set a start button on the screen for each package .Click the button to start the corresponding package.
-## launcher
+## Launcher
 
 * The implementation of the launcher is in this file ```gui_engine\SaaA\frontend_launcher.c```. 
 *  It uses a grid widget to layout the apps' button. Then it iterates the ```app``` folder, to find all XML files, which represent apps. 
@@ -36,7 +36,7 @@ description on the ```JavaScript syntax``` page.
 * The callback functions of those events will not be executed until the event occurs.
 <div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939260331113428/b473228b_10088396.png" alt ="js.png"></div><br/>
 
-## EXAMPLE
+## Example
 ### Progressbar API
 ```javascript
 //Read and write the progress value of a progressbar tag called 'tag name'
@@ -126,7 +126,7 @@ LED1.writeSync(0)
 - Use ```matter_send_msg_to_app()``` to operate lights;
 
 
-The following code example is the ```writeSync``` 's control light implementation for RTL87X2G. First get gpio value and direction value, then use specify driver api to operate light.
+The following code example is the ```writeSync``` 's control light implementation for RTL87X2G. First get gpio value and direction value, then use specify driver API to operate light.
 ```c
 #ifdef RTL87x2G
 #define ENABLE_MATTER_SWITCH

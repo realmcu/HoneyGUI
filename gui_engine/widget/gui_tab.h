@@ -126,7 +126,7 @@ typedef struct
 /**
  * @brief create a tab widget, which should be nested in a tabview.
  * @param parent the father widget it nested in.
- * @param filename this tab widget's name.
+ * @param filename _this tab widget's name.
  * @param x the X-axis coordinate of the widget.
  * @param x the Y-axis coordinate of the widget.
  * @param w the width of the widget.
@@ -148,20 +148,20 @@ gui_tab_t *gui_tab_create(void       *parent,
 /**
  * @brief get run time envriment obj
  *
- * @param this tab widget pointer
+ * @param _this tab widget pointer
  */
-gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *this);
+gui_obj_t *gui_tab_get_rte_obj(gui_tab_t *_this);
 
 /**
- * @brief set style of this tab
+ * @brief set style of _this tab
  *
- * @param this tab widget pointer
+ * @param _this tab widget pointer
  * @param style slide style
  */
-void gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style);
+void gui_tab_set_style(gui_tab_t *_this, T_SLIDE_STYLE style);
 
 /**
- * @brief when enable preload, call this API can update preload buffer
+ * @brief when enable preload, call _this API can update preload buffer
  *
  * @param obj tab widget pointer
  */

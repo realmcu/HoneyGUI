@@ -1,4 +1,4 @@
-# C-APP
+# Use C Design An Application
 
 Write C language code with GUI API, and then compile it together with GUI code to implement the expected display as C-APP.
 

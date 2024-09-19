@@ -1,4 +1,4 @@
-# 幕布
+# 幕布 (Curtain)
 <br>
 
 幕布控件可以创建5个不同方向的幕布，分别是上、下、左、右、中间 (参考[T_GUI_CURTAIN_ENUM](#T_GUI_CURTAIN_ENUM))，创建幕布控件之前，必须先创建幕布视图控件(`curtainview`)来容纳幕布。
@@ -29,7 +29,6 @@
 ```
 
 ## 示例
-<details> <summary>代码</summary>
 
 ```eval_rst
 .. literalinclude:: ../../../gui_engine/example/screen_448_368/app_tb_clock.c
@@ -37,7 +36,6 @@
    :start-after: /* curtain example start*/
    :end-before: /* curtain example end*/
 ```
-</details>
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1699869962427925475/4a382788_10641540.png" width = "300" /></div>
 <br>

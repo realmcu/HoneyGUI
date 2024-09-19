@@ -137,9 +137,9 @@ The workflow for keyboard information is shown in the figure below.
 
 #### Hardware and driver
 
-The hardware design and driver of the keyboard are relatively simple, and this chapter will explain it through a single [GPIO](/Glossary.rst#term-GPIO). For instructions on how to use GPIO, you can refer to the instructions in the SDK to use the generic [API](/Glossary.rst#term-api) in rtl87x2g_gpio.c or use the wrapped API in drv_gpio.c. They can do the same thing.
+The hardware design and driver of the keyboard are relatively simple, and this chapter will explain it through a single [GPIO](/Glossary.rst#term-GPIO). For instructions on how to use GPIO, you can refer to the instructions in the SDK to use the generic [API](/Glossary.rst#term-API) in rtl87x2g_gpio.c or use the wrapped API in drv_gpio.c. They can do the same thing.
 
-### Get Keyboar Data
+### Get Keyboard Data
 
 In the `port_kb_get_data` function, the touch information will be fetched. Users need to fill `port_kb_get_data` according to their functional requirements and fill the structure with keyboard input information.
 

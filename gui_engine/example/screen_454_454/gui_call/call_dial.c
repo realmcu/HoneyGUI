@@ -3,7 +3,6 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_text.h"
-#include "gui_scroll_text.h"
 #include "gui_switch.h"
 #include "gui_app.h"
 #include "call_mgr.h"
@@ -27,9 +26,9 @@ char buffer_dial_num[BUFFER_DIAL_NUM_MAX];
 char *p_display_dial_num = buffer_dial_num;
 int8_t dial_num_index = 0;
 
-static void gui_call_status_update_cb(void *obj, uint16_t event)
+static void gui_call_status_update_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("gui_call_status_update_cb\n", event);
+    gui_log("gui_call_status_update_cb %d\n", event);
     switch (event)
     {
     case GUI_EVENT_CALL_INCOMING:
@@ -56,7 +55,7 @@ static void reset_dial_num(void)
                  strlen(p_display_dial_num), FONT_H_32);
 }
 
-static void switch_dial_back_touch_cb(void *obj, uint16_t event)
+static void switch_dial_back_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_dial_back_touch_cb event = %d\n", event);
     switch (event)
@@ -70,7 +69,7 @@ static void switch_dial_back_touch_cb(void *obj, uint16_t event)
     }
     reset_dial_num();
 }
-static void switch_dial_num_touch_cb(void *obj, uint16_t event)
+static void switch_dial_num_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_dial_num_touch_cb\n");
     gui_switch_t *this = (gui_switch_t *)obj;
@@ -132,7 +131,7 @@ static void switch_dial_num_touch_cb(void *obj, uint16_t event)
     gui_text_set(text_dial_num, p_display_dial_num, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
 }
-static void switch_dial_delete_touch_cb(void *obj, uint16_t event)
+static void switch_dial_delete_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_dial_delete_touch_cb\n");
     if (dial_num_index > GUI_DIAL_NUM_MAX)
@@ -148,7 +147,7 @@ static void switch_dial_delete_touch_cb(void *obj, uint16_t event)
     gui_text_set(text_dial_num, p_display_dial_num, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(p_display_dial_num), FONT_H_32);
 }
-static void switch_dial_outgoing_call_touch_cb(void *obj, uint16_t event)
+static void switch_dial_outgoing_call_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_dial_outgoing_call_touch_cb\n");
     //app_call_switch_tabs(CALL_OUTGOING);

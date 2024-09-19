@@ -10,8 +10,8 @@
 .. toctree::
     :maxdepth: 2
 
-    图像转换工具 <Resource/image>
-    字体转换工具 <Resource/font>
-    打包工具 <Resource/packing>
-    烧录工具 <Resource/download>
+    图像转换工具 <image>
+    字体转换工具 <font>
+    打包工具 <packing>
+    烧录工具 <download>
 ```

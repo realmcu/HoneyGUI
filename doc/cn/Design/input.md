@@ -137,7 +137,7 @@ void design_tab_home(void *parent)
 
 #### 硬件和驱动程序
 
-键盘的硬件设计和驱动程序比较简单，本章将通过一个单独的 [GPIO](/Glossary.rst#term-GPIO) 来说明。有关如何使用 GPIO 的说明，请参考 SDK 中的说明。您可以使用 rtl87x2g_gpio.c 中的通用 [API](/Glossary.rst#term-api) 或 drv_gpio.c 中的封装 API 来完成相同的操作。
+键盘的硬件设计和驱动程序比较简单，本章将通过一个单独的 [GPIO](/Glossary.rst#term-GPIO) 来说明。有关如何使用 GPIO 的说明，请参考 SDK 中的说明。您可以使用 rtl87x2g_gpio.c 中的通用 [API](/Glossary.rst#term-API) 或 drv_gpio.c 中的封装 API 来完成相同的操作。
 
 ### 获取键盘数据
 

@@ -159,16 +159,16 @@ gui_canvas_arc_t *gui_canvas_arc_create(void       *parent,
 /**
  * @brief
  *
- * @param this
+ * @param _this
  * @param cap
  */
-void gui_canvas_arc_set_cap(gui_canvas_arc_t *this, T_CANVAS_ARC_CAP cap);
+void gui_canvas_arc_set_cap(gui_canvas_arc_t *_this, T_CANVAS_ARC_CAP cap);
 
 /**
  * @brief
  *
  */
-void gui_canvas_arc_set_external_picture(gui_canvas_arc_t *this, \
+void gui_canvas_arc_set_external_picture(gui_canvas_arc_t *_this, \
                                          void *data[]
                                         );
 

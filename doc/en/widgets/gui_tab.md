@@ -11,7 +11,7 @@ For an introduction to idx and idy, please refer to: [tabview](./gui_tabview.md)
 [gui_tab_create(parent, x, y, w, h, idx, idy)](#gui_tab_create) is used to create a tab widget, where idx and idy represent the direction of the created tab.
 
 ### Set tab style
-If you wish to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_create) setting. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
+If you wish to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_set_style) setting. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
 
 ```eval_rst
 
@@ -26,7 +26,7 @@ If you wish to exhibit various switching effects when switching tabs, you can ut
 
 ### Tab
 
-The tab switching style can be customized, and developers can set the tab switching style using the function [gui_tabview_set_style(this, style)](#gui_tab_create). Available styles include `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, and `TAB_PAGE`. The `FADE` style adjusts the tab's opacity during the switch, while the `REDUCTION_FADE` style changes both the size and opacity of the tab during the transition. In this example, the first three tabs are set to the `TAB_CUBE` style, and the last three tabs are set to the `REDUCTION` style, as shown in the animation below. Developers can modify the tab switching style by calling [gui_tab_set_style(this, style)](#gui_tab_create) for different tabs.
+The tab switching style can be customized, and developers can set the tab switching style using the function [gui_tab_set_style(this, style)](#gui_tab_create). Available styles include `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, and `TAB_PAGE`. The `FADE` style adjusts the tab's opacity during the switch, while the `REDUCTION_FADE` style changes both the size and opacity of the tab during the transition. In this example, the first three tabs are set to the `TAB_CUBE` style, and the last three tabs are set to the `REDUCTION` style, as shown in the animation below.
 
 ```c
 #include <gui_tabview.h>
@@ -83,9 +83,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 ### Tabview Rotate
 
-Unlike individual tab style changes, the tabview control allows you to set a uniform switching style for all tabs using the function [gui_tabview_set_style(this, style)](#gui_tab_create). For example, you can set all tabs to styles such as `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, or `TAB_PAGE`. The following example demonstrates how to switch to the `TAB_ROTATE` style, with `CLASSIC` being the default style. Developers can use the [gui_tabview_set_style(this, style)](#gui_tab_create) function to set the desired switching style for all tabs.
+Unlike individual tab style changes, the tabview control allows you to set a uniform switching style for all tabs using the function `gui_tabview_set_style(this, style)`. For example, you can set all tabs to styles such as `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, or `TAB_PAGE`. The following example demonstrates how to switch to the `TAB_ROTATE` style, with `CLASSIC` being the default style.
 
-<details> <summary>code</summary>
 
 ```c
 #include <gui_tabview.h>
@@ -128,7 +127,6 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_music(gui_tab_get_rte_obj(tb_music));
 }
 ```
-</details>
 <br>
 
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1721902043698157443/1cb14773_10641540.gif" width = "300" /></div>
@@ -136,9 +134,8 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 ### Tabview Loop
 
-In a tabview, you can use the function [gui_tabview_loop_x(tabview, loop)](#gui_tab_create) (refer to tabview) to determine whether the tabs should loop continuously in the x-direction. Similarly, [gui_tabview_loop_y(tabview, loop)](#gui_tab_create) determines whether the tabs should loop continuously in the y-direction. The loop parameter is a boolean that specifies whether to enable the looping feature. If set to true, the tabs will loop continuously; if set to false, they will not.
+In a tabview, you can use the function `gui_tabview_loop_x(tabview, loop)` (refer to tabview) to determine whether the tabs should loop continuously in the x-direction. Similarly, `gui_tabview_loop_y(tabview, loop)` determines whether the tabs should loop continuously in the y-direction. The loop parameter is a boolean that specifies whether to enable the looping feature. If set to true, the tabs will loop continuously; if set to false, they will not.
 
-<details> <summary>code</summary>
 
 ```c
 #include <gui_tabview.h>
@@ -182,7 +179,6 @@ static void app_hongkong_ui_design(gui_app_t *app)
     page_tb_music(gui_tab_get_rte_obj(tb_music));
 }
 ```
-<details>
 <br>
 <div style="text-align: center"><img src="https://docs.realmcu.com/HoneyGUI/image/widgets/tabview_loop.gif" width = "300" /></div>
 <br>

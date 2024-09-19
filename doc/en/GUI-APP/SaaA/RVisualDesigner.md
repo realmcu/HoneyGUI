@@ -27,9 +27,10 @@ To simplify the document, "Tool" is used below to refer to "RTKIOT Visual Design
 
 <div STYLE="page-break-after: always;"></div> 
 
+<a id="function_panel_anchor"></a>
 
 ## Function Panels
-<a id="function_panel_anchor"></a>
+
 ### Toolkit/Widgets
 + Non-containerized widget
     + Can be used as the parent of other widget.
@@ -340,15 +341,19 @@ Click the button and lock the widget/widgets.
 
 <div STYLE="page-break-after: always;"></div> 
 
-## Resource Mangement
 <a id="resource_manage_anchor"></a>
+
+## Resource Mangement
+
 Only pre-imported image and font files can be referenced by the GUI project. This chapter focus on how to manage image and font resource.
 The image and font explorer is located directly below the design view, as shown in the figure below.
 
 <div id="figure_3_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721629333990020010/27b6b02c_12407535.png" width="650"></div>
 
-### Image Resource Management
 <a id="img_res_m_anchor"></a>
+
+### Image Resource Management
+
 
 Click ![icon](https://foruda.gitee.com/images/1710824254768634573/d752fbd6_12407535.png) to bring up the Image Management view.
 
@@ -401,8 +406,10 @@ Select the font to be removed and click ![icon](https://foruda.gitee.com/images/
 
 <div STYLE="page-break-after: always;"></div> 
 
-## Menu Bar
 <a id="menu_anchor"></a>
+
+## Menu Bar
+
 ### File
 #### Start Page
 If you want to close the current project and open an existed project or create a new project, you can open the Start Page by click "File -> Start Page".
@@ -583,10 +590,14 @@ When you simulate the project at the first time, please click "Export" before cl
 
 <div STYLE="page-break-after: always;"></div> 
 
-## Quick Start To Tutorials
 <a id="quick_start_anchor"></a>
-### How to Create Project
+
+## Quick Start To Tutorials
+
 <a id="how_to_create_anchor"></a>
+
+### How to Create Project
+
 
 <div id="figure_5_1" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721630502223709854/341d9828_12407535.png" width="650"></div>
 
@@ -608,8 +619,10 @@ After you drag and drop a widget on Design View, and click "File - Save" or pres
 ### How to Write Javascript Code
 After the project is created, the xxx.js file is created. The xxx.js file is empty, please code here to implement the widgets' event callback.
 
-### How to Open Project
 <a id="how_to_open_anchor"></a>
+
+### How to Open Project
+
 <div id="figure_5_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1721636293745281159/b5fbf3b0_12407535.png" width="650"></div>
 
 There are two ways to open project.
@@ -642,8 +655,10 @@ Click on the "Simulate" button in the menu bar.
 
 <div STYLE="page-break-after: always;"></div> 
 
-## GUI Demo Project
 <a id="gui_demo_anchor"></a>
+
+## GUI Demo Project
+
 There is a Demo in RVisualDesigner-vx.x.x.x.zip. 
 
 The folder - 454x454 contains project with resolution 454*454. 

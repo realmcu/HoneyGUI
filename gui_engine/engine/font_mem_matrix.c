@@ -475,6 +475,7 @@ void gui_font_mat_unload(gui_text_t *text)
 
 void gui_font_mat_load(gui_text_t *text, gui_text_rect_t *rect)
 {
+    GUI_ASSERT(text != NULL)
     if (text->data == NULL)
     {
         gui_font_get_dot_info(text);

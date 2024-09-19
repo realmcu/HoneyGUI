@@ -7,7 +7,6 @@
 #include "gui_win.h"
 #include "gui_tabview.h"
 #include "gui_switch.h"
-#include "gui_scroll_text.h"
 #include "record_mgr.h"
 #ifndef _WIN32
 #include "app_mic_record.h"

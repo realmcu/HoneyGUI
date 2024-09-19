@@ -22,6 +22,7 @@
 #include <string.h>
 #include <gui_obj.h>
 #include <draw_img.h>
+#include "gui_fb.h"
 #include "acc_init.h"
 #include <tp_algo.h>
 #include "nanovg.h"
@@ -261,7 +262,7 @@ static void gui_canvas_round_rect_prepare(gui_canvas_round_rect_t *this)
     set_arc_img(this, &this->circle_10, -1, this->base.h - 2 * this->r - 2, 270);
     set_arc_img(this, &this->circle_11, this->base.w - 2 * this->r - 2, this->base.h - 2 * this->r - 2,
                 180);
-
+    gui_fb_change();
 
 }
 
@@ -392,6 +393,56 @@ void gui_canvas_round_rect_set_external_picture(gui_canvas_round_rect_t *this, v
     this->use_external_picture = true;
     this->circle_data = data;
 }
+
+/**
+ * @brief Set the opacity of the canvas round rectangle.
+ *
+ * This function sets the opacity level for a given round rectangle on the canvas.
+ * The opacity value ranges from `0` (fully transparent) to `255` (fully opaque).
+ *
+ * @param _this           Pointer to the gui_canvas_round_rect_t structure.
+ * @param opacity_value   The opacity value to be set (0-255).
+ */
+void gui_canvas_round_rect_set_opacity(gui_canvas_round_rect_t *this, unsigned char opacity_value)
+{
+    GUI_ASSERT(NULL != NULL);
+    this->opacity_value = opacity_value;
+}
+
+
+/**
+ * @brief Set the color of the canvas round rectangle.
+ *
+ * This function assigns a specific color to the round rectangle on the canvas.
+ *
+ * @param _this  Pointer to the gui_canvas_round_rect_t structure.
+ * @param color  The color value to be set, represented as gui_color_t.
+ */
+void gui_canvas_round_rect_set_color(gui_canvas_round_rect_t *this, gui_color_t color)
+{
+    GUI_ASSERT(this != NULL);
+    this->color = color;
+}
+
+
+/**
+ * @brief Set the location of the canvas round rectangle.
+ *
+ * This function specifies the starting coordinates (X and Y) for the round rectangle
+ * on the canvas.
+ *
+ * @param _this  Pointer to the gui_canvas_round_rect_t structure.
+ * @param x      The start X-coordinate.
+ * @param y      The start Y-coordinate.
+ */
+void gui_canvas_round_rect_set_location(gui_canvas_round_rect_t *this, int x, int y)
+{
+    GUI_ASSERT(this != NULL);
+    gui_obj_t *root = (gui_obj_t *)this;
+    root->x = x;
+    root->y = y;
+}
+
 
 /** End of WIDGET_Exported_Functions
   * @}

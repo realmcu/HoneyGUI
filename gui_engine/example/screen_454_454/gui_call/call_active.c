@@ -2,11 +2,9 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_text.h"
-#include "gui_scroll_text.h"
 #include "gui_switch.h"
 #include "gui_app.h"
 #include "gui_win.h"
-#include "gui_progressbar.h"
 #include "gui_interface.h"
 #include "call_mgr.h"
 #ifndef _WIN32
@@ -73,9 +71,9 @@ static void update_talk_time(void)
     talk_time[10] = '\0';
 }
 
-static void gui_call_status_update_cb(void *obj, uint16_t event)
+static void gui_call_status_update_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("gui_call_status_update_cb\n", event);
+    gui_log("gui_call_status_update_cb %d\n", event);
     switch (event)
     {
     case GUI_EVENT_CALL_END:
@@ -128,7 +126,7 @@ static void curtainview_set_done_cb_call_vol(gui_curtainview_t *this)
     }
 }
 
-static void switch_calling_hangup_touch_cb(void *obj, uint16_t event)
+static void switch_calling_hangup_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_calling_hangup_touch_cb\n");
     reset_talk_time();
@@ -143,7 +141,7 @@ static void switch_calling_hangup_touch_cb(void *obj, uint16_t event)
 #endif
 }
 
-static void switch_calling_mute_touch_cb(void *obj, uint16_t event)
+static void switch_calling_mute_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_calling_mute_touch_cb\n");
 #ifndef _WIN32

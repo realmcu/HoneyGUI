@@ -1,4 +1,4 @@
-# **Welcome to the RTKIOT GUI wiki!**
+# Get Started
 
 ## Source project download
 

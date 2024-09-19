@@ -2,12 +2,6 @@
 #include "gui_api.h"
 #include "gui_win.h"
 #include "benchmark_common.h"
-#include "watchface_mgr.h"
-#include "player_mgr.h"
-#include "call_mgr.h"
-#include "record_mgr.h"
-#include "contacts_mgr.h"
-#include "benchmark_mgr.h"
 
 static uint32_t scenario_count = 0;
 static void scenario_benchmark_manager_frame_start_cb(void);

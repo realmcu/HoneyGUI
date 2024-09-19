@@ -1,6 +1,6 @@
 # Wheel list
 
-The wheellist widget is an application list interface, mainly composed of application icons arranged in multiple circular layers. Each layer can rotate independently, and each icon can have an associated callback.
+The wheel list widget is an application list interface, mainly composed of application icons arranged in multiple circular layers. Each layer can rotate independently, and each icon can have an associated callback.
 
 ## Usage
 

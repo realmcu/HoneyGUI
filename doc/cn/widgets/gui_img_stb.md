@@ -1,4 +1,4 @@
-# STB 图像
+# STB 图像 (STB img)
 <br>
 
 STB图像控件是用于显示图像的基本控件。可以设置左、中、右三种图像，中间的图像将会重复以匹配对象的宽度，STB图像控件支持 bmp、jpg、png、gif 等格式。
@@ -17,7 +17,6 @@ STB图像控件是用于显示图像的基本控件。可以设置左、中、�
 
 ## 示例
 
-<details> <summary>code</summary>
 
 ```c
 #include "root_image_hongkong/ui_resource.h"
@@ -33,7 +32,6 @@ static void app_home_ui_design(gui_app_t *app)
 }
 ```
 
-</details>
 
 <br>
 

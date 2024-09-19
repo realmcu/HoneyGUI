@@ -23,7 +23,7 @@ static gui_text_t *text_phone_media_audio = NULL;
 char *txet_disconnect_phone = "确认断开连接？";
 static uint8_t app_bond_phone_index = 0xff;
 
-static void tab_phone_update_cb(void *obj, uint16_t event)
+static void tab_phone_update_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("tab_phone_update_cb\n %d", event);
 #ifndef _WIN32
@@ -86,7 +86,7 @@ static void tab_phone_update_cb(void *obj, uint16_t event)
 #endif
 }
 
-static void switch_back_menu_phone_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_back_menu_phone_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_back_menu_phone_touch_cb, event = %d\n", event);
     app_watchface_switch_tabs(WATCHFACE_MAIN);
@@ -94,7 +94,7 @@ static void switch_back_menu_phone_touch_cb(void *obj, gui_event_cb_t event)
 
 static void switch_disconnect_yes_action(void *obj)
 {
-    gui_log("switch_disconnect_yes_action, obj = 0x%x\n", obj);
+    gui_log("switch_disconnect_yes_action\n");
     app_watchface_switch_tabs(WATCHFACE_PHONE);
 
 #ifndef _WIN32
@@ -114,7 +114,7 @@ static void switch_disconnect_no_action(void *obj)
     app_watchface_switch_tabs(WATCHFACE_PHONE);
 }
 
-static void switch_text_base_phone_touch_cb(void *obj, uint16_t event)
+static void switch_text_base_phone_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_text_base_phone_touch_cb, event = %d\n", event);
 #ifndef _WIN32
@@ -149,7 +149,7 @@ static void switch_text_base_phone_touch_cb(void *obj, uint16_t event)
 #endif
 }
 
-static void switch_text_base_connect_new_phone_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_text_base_connect_new_phone_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_text_base_connect_new_phone_touch_cb, event = %d\n", event);
 
@@ -165,7 +165,7 @@ static void switch_text_base_connect_new_phone_touch_cb(void *obj, gui_event_cb_
 #endif
 }
 
-static void switch_switch_media_audio_off_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_switch_media_audio_off_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_switch_media_audio_off_touch_cb, event = %d\n", event);
     gui_switch_is_off(switch_media_audio);
@@ -190,7 +190,7 @@ static void switch_switch_media_audio_off_touch_cb(void *obj, gui_event_cb_t eve
 #endif
 }
 
-static void switch_switch_media_audio_on_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_switch_media_audio_on_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_switch_media_audio_on_touch_cb, event = %d\n", event);
     gui_switch_is_on(switch_media_audio);
@@ -215,7 +215,7 @@ static void switch_switch_media_audio_on_touch_cb(void *obj, gui_event_cb_t even
 #endif
 }
 
-static void switch_disconnect_touch_cb(void *obj, gui_event_cb_t event)
+static void switch_disconnect_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_disconnect_touch_cb, event = %d\n", event);
 

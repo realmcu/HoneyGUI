@@ -89,7 +89,7 @@ void lv_draw_rtk_ppe_read_buffer(lv_draw_ctx_t *draw_ctx, const lv_area_t *area,
             {
                 LVGL_GDMA_LLIStruct[i].LLP = (uint32_t)&LVGL_GDMA_LLIStruct[i + 1];
                 /* configure low 32 bit of CTL register */
-                LVGL_GDMA_LLIStruct[i].CTL_LOW = GDMA_Channel0->GDMA_CTL_LOWx;
+                LVGL_GDMA_LLIStruct[i].CTL_LOW = GDMA_Channel0->GDMA_CTLx_L;
             }
         }
     }
@@ -166,7 +166,7 @@ void lv_draw_rtk_ppe_write_buffer(uint8_t *src, const lv_area_t *area, lv_draw_c
             {
                 LVGL_GDMA_LLIStruct[i].LLP = (uint32_t)&LVGL_GDMA_LLIStruct[i + 1];
                 /* configure low 32 bit of CTL register */
-                LVGL_GDMA_LLIStruct[i].CTL_LOW = GDMA_Channel0->GDMA_CTL_LOWx;
+                LVGL_GDMA_LLIStruct[i].CTL_LOW = GDMA_Channel0->GDMA_CTLx_L;
             }
         }
     }

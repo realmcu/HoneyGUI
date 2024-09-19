@@ -7,7 +7,7 @@ After created a progressbar widget, you can set the percentage of the widget to 
 
 ### Create horizontal widget
 
-You can create a horizontal style progressbar based on picture by this api  [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_h_create).
+You can create a horizontal style progressbar based on picture by this API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_h_create).
 It's a normal single-picture progressbar.
 
 ### Create vertical widget
@@ -30,7 +30,7 @@ The above usage of (`Progress`) applies to movie-style progressbar. For a normal
 
 ### Get max number
 
-This api [gui_progressbar_get_max(gui_progressbar_t *this)](#gui_progressbar_get_max) is used to get the number of pictures in a movie style progressbar, so you can know how many pictures will be displayed in total.
+This API [gui_progressbar_get_max(gui_progressbar_t *this)](#gui_progressbar_get_max) is used to get the number of pictures in a movie style progressbar, so you can know how many pictures will be displayed in total.
 
 ## Example
 

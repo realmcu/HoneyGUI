@@ -1,7 +1,6 @@
 #include "root_image/ui_resource.h"
 #include "gui_common.h"
 #include "gui_curtainview.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
 #include "gui_text.h"
 #include "gui_switch.h"

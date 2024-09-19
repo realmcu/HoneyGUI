@@ -1,20 +1,14 @@
 #include <gui_tabview.h>
 #include "gui_card.h"
 #include <gui_obj.h>
-#include <gui_win.h>
 #include <gui_text.h>
 #include <gui_curtain.h>
 #include "root_image/ui_resource.h"
 #include <gui_app.h>
 #include "gui_tab.h"
-#include "gui_perspective.h"
 #include "font_mem.h"
 #include <gui_img.h>
-#include "gui_canvas.h"
 #include "app_gui_main.h"
-#include "gui_perspective.h"
-#include "gui_cube.h"
-#include "gui_win.h"
 #include "gui_server.h"
 #include "gui_components_init.h"
 #include "gui_common.h"
@@ -84,35 +78,34 @@ static void design_app_watch_ui(gui_app_t *app)
     gui_tabview_set_style(tabview_main, TAB_CUBE);
     gui_tabview_enable_pre_load(tabview_main, true);
 
+    gui_tab_t *tab_menu_loop = gui_tab_create(tabview_main, "tab_menu", 0, 0, 0, 0, -2, 0);
+    tab_menu = gui_tab_create(tabview_main, "tab_menu",       0, 0, 0, 0, -1, 0);
     tab_watchface = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 0, 0);
     tab_player = gui_tab_create(tabview_main, "tab_player",      0, 0, 0, 0, 1, 0);
     tab_call = gui_tab_create(tabview_main, "tab_call",           0, 0, 0, 0, 2, 0);
     tab_contacts = gui_tab_create(tabview_main, "tab_contacts",        0, 0, 0, 0, 3, 0);
     tab_record = gui_tab_create(tabview_main, "tab_record",       0, 0, 0, 0, 4, 0);
     tab_benchmark = gui_tab_create(tabview_main, "tab_benchmark",       0, 0, 0, 0, 5, 0);
-    tab_menu = gui_tab_create(tabview_main, "tab_menu",       0, 0, 0, 0, -1, 0);
+
+    design_menu_loop_ui(GUI_BASE(tab_menu_loop));
+    design_tab_menu(gui_tab_get_rte_obj(tab_menu));
     design_watchface_mgr(gui_tab_get_rte_obj(tab_watchface));
     design_player_mgr(gui_tab_get_rte_obj(tab_player));
     design_call_mgr(gui_tab_get_rte_obj(tab_call));
     design_contacts_mgr(gui_tab_get_rte_obj(tab_contacts));
     design_record_mgr(gui_tab_get_rte_obj(tab_record));
+    design_benchmark_mgr(gui_tab_get_rte_obj(tab_benchmark));
 #ifdef ENABLE_LITE_GFX
     extern void design_tab_watchface_butterfly(void *parent);
     tab_gfx_demo = gui_tab_create(tabview_main, "tb_watchface",  0, 0, 0, 0, 6, 0);
     // design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_gfx_demo));
     design_tab_watchface_butterfly(gui_tab_get_rte_obj(tab_gfx_demo));
     // design_tab_watchface_flowerfall(gui_tab_get_rte_obj(tab_gfx_demo));
-#endif
-
-    extern void design_tab_menu(void *parent);
-    design_tab_menu(gui_tab_get_rte_obj(tab_menu));
-    design_benchmark_mgr(gui_tab_get_rte_obj(tab_benchmark));
-    gui_tab_t *tab_menu_loop = gui_tab_create(tabview_main, "tab_menu", 0, 0, 0, 0, -2, 0);
-    extern void menu_loop_ui(gui_obj_t *parent);
-    menu_loop_ui(GUI_BASE(tab_menu_loop));
+#else
     gui_tab_t *tab_alipay = gui_tab_create(tabview_main, "alipay",       0, 0, 0, 0, 6, 0);
     extern void alipay_menu_ui(gui_obj_t *parent);
     alipay_menu_ui(GUI_BASE(tab_alipay));
+#endif
     gui_fps_create(GUI_APP_ROOT_SCREEN);
 }
 
@@ -127,19 +120,27 @@ static int watch_app_init(void)
 #endif
     int fd;
     extern int open(const char *file, int flags, ...);
+    extern int close(int fd);
     fd = open("./gui_engine/example/screen_454_454/root_image/root(0x4400000).bin", 0);
     if (fd > 0)
     {
+        if (read(fd, resource_root, 1024 * 1024 * 20) == -1)
+        {
+            printf("open root(0x4400000).bin read fail!");
+            close(fd);
+            return 0;
+        }
         printf("open root(0x4400000).bin Successful!\n");
-        read(fd, resource_root, 1024 * 1024 * 20);
     }
     else
     {
+        close(fd);
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
         printf("open root(0x4400000).bin Fail!\n");
         return 0;
     }
+    close(fd);
 #endif
     extern int gui_server_init(void);
     gui_server_init();

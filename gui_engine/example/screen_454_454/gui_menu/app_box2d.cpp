@@ -4,7 +4,7 @@
 #include "../root_image/ui_resource.h"
 #include "box2d/box2d.h"
 #include <iostream>
-#include<stdio.h>
+#include <stdio.h>
 #include <cmath>
 namespace app_box2d
 {

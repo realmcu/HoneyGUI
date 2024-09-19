@@ -1,12 +1,12 @@
-# Watchface_gradient
+# Watchface gradient
 
-The watchface_gradient widget allows you to create a pointer watchface with a scanning effect for each pointer.
+The watchface gradient widget allows you to create a pointer watchface with a scanning effect for each pointer.
 
 ## Usage
 
-### Create watchface_gradient widget
+### Create watchface gradient widget
 
-If you want to create a new watchface_gradient widget, please call the function [gui_watchface_gradient_create(parent, name, x, y, w, h)](#gui_watchface_gradient_create) to achieve it.
+If you want to create a new watchface gradient widget, please call the function [gui_watchface_gradient_create(parent, name, x, y, w, h)](#gui_watchface_gradient_create) to achieve it.
 
 ## Example
 

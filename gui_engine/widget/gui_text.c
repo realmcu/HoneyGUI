@@ -298,7 +298,10 @@ static void gui_text_input_prepare(gui_obj_t *obj)
     {
     case TOUCH_SHORT:
         {
-            gui_obj_skip_other_short(obj);
+            if (this->inputable)
+            {
+                gui_obj_skip_other_short(obj);
+            }
         }
         break;
     }

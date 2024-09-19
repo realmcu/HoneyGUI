@@ -3,7 +3,7 @@
 
 
 
-## 窗口控件
+## 窗口 (Win)
 
 - 这是一个容器控件。
 - 对窗口控件的操作将影响嵌套在容器中的控件。
@@ -43,7 +43,7 @@ win.onRelease(winNromalOnReleaseFunc)
 ```
 
 
-### 切换窗口示例
+### 切换窗口
 - 实现逻辑是点击当前窗口将隐藏当前窗口并显示另一个窗口。
 - 点击在 ```'cool_win'``` 和 ```'heat_win'``` 窗口之间进行切换。
 - ```win.onClick``` 函数使 ```win``` 控件能够监控手指点击屏幕的事件。
@@ -90,8 +90,8 @@ win.onClick(hideHeat)
 ```
 
 
-## 按钮
-### 监听按下事件的示例
+## 按钮 (Button)
+### 监听按钮按下事件
 - 可以用于开发按键按下高亮效果或者需要快速响应的按钮。
 - 监听按压手势，当手指在按钮区域内触摸屏幕时，将触发 ```iconNromalOnPressFunc``` 函数。
 
@@ -117,7 +117,7 @@ icon.onPress(iconNromalOnPressFunc)
 
 
 
-## 文本
+## 文本 (Text)
 
 ### 编辑文本 
 * Using ```textbox.write``` function.
@@ -133,10 +133,10 @@ icon.onPress(iconNromalOnPressFunc)
     write : function (text : string) {},
     setPosition : function (position : object) {}, //var position={x:0,y:0}
 ```
-## 拖动条
-### 显示当前进度的示例
+## 拖动条 (Seekbar)
+### 显示当前进度
 * 拖动进度条，文本将显示当前进度。
-* ```seekbar.progress()``` 函数可以读取和写入进度。
+* ```seekbar.progress``` 函数可以读取和写入进度。
 * ```seekbar.onPressing``` 函数将监听手指在屏幕上保持按压的事件。当手指与屏幕接触时，此参数函数将在每一帧中执行。
 ```javascript
 seekbar.getElementById('tab10Seek1')
@@ -188,7 +188,7 @@ seekbar.palyAnimate()
     getAttribute : function(attributeName : string) {},   //return attribute value //support "hidden"
     palyAnimate : function () {}, //Start animation
 ```
-## 开关
+## 开关 (Switch)
 
 ### 监听两个事件
 - 开关控件有两个事件，即被打开触发和被关闭触发。
@@ -268,7 +268,7 @@ DECLARE_HANDLER(writeSync)
 ```
 
 
-## 图片
+## 图片 (Image)
 
 ### API
 ```javascript
@@ -277,21 +277,21 @@ DECLARE_HANDLER(writeSync)
     scale : function (scaleRateX:number, scaleRateY:number) {},
     setMode : function (modeIndex:number) {},
 ```
-## APP
+## 应用程序 (App)
 
 ### API
 ```javascript
     open : function (appXML : string) {},
     close : function () {},
 ```
-## 进度条
+## 进度条 (Progressbar)
 
 ### API
 ```javascript
     getElementById : function (widget_name : string) {},
     progress : function (progressToSet : number):{},//get or set progress//return progress
 ```
-## 切屏页面（TAB）
+## 选项卡 (Tab)
 
 ### API
 ```javascript

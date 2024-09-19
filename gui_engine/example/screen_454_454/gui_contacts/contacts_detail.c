@@ -2,16 +2,11 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_curtainview.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
-#include "gui_page.h"
-#include "gui_grid.h"
 #include "gui_text.h"
 #include "gui_switch.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
-#include "gui_img_scope.h"
-#include "gui_scroll_text.h"
 #include "contacts_mgr.h"
 
 gui_text_t *text_contacts_details_name = NULL;
@@ -19,20 +14,20 @@ gui_text_t *text_contacts_details_phone = NULL;
 
 char *test_dail_num = "12345678910";
 
-static void contacts_details_back_touch_cb(void *obj, uint16_t event)
+static void contacts_details_back_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("contacts_details_back_touch_cb\n");
     app_contacts_switch_tabs(CONTACTS_LIST);
 }
 
-static void switch_contacts_details_call_touch_cb(void *obj, uint16_t event)
+static void switch_contacts_details_call_touch_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("switch_contacts_details_call_touch_cb, obj = 0x%x\n", obj);
+    gui_log("switch_contacts_details_call_touch_cb\n");
     switch (event)
     {
     case GUI_EVENT_1:
     case GUI_EVENT_2:
-        gui_log("GUI_EVENT_1 GUI_EVENT_2 obj = 0x%x\n", obj);
+        gui_log("GUI_EVENT_1 GUI_EVENT_2\n");
 //Add the call gui jump
         break;
 

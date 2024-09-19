@@ -2,7 +2,6 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_text.h"
-#include "gui_scroll_text.h"
 #include "gui_switch.h"
 #include "gui_app.h"
 #include "gui_win.h"
@@ -12,9 +11,9 @@
 #include "app_mmi.h"
 #endif
 
-static void gui_call_status_update_cb(void *obj, uint16_t event)
+static void gui_call_status_update_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("gui_call_status_update_cb\n", event);
+    gui_log("gui_call_status_update_cb %d\n", event);
 #ifndef _WIN32
     switch (event)
     {
@@ -35,7 +34,7 @@ static void gui_call_status_update_cb(void *obj, uint16_t event)
 #endif
 }
 
-static void switch_incoming_call_answer_touch_cb(void *obj, uint16_t event)
+static void switch_incoming_call_answer_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_incoming_call_answer_touch_cb\n");
 
@@ -49,7 +48,7 @@ static void switch_incoming_call_answer_touch_cb(void *obj, uint16_t event)
 #endif
 }
 
-static void switch_incoming_call_hangup_touch_cb(void *obj, uint16_t event)
+static void switch_incoming_call_hangup_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("switch_incoming_call_hangup_touch_cb\n");
 #ifndef _WIN32

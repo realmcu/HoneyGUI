@@ -35,6 +35,14 @@
 // #define CONFIG_REALTEK_BUILD_REAL_NANOVG
 // </c>
 
+// <c> RTK GUI Box2D Demo
+// #define CONFIG_REALTEK_BUILD_REAL_BOX2D
+// </c>
+
+// <c> RTK GUI LiteGFX Demo
+// #define CONFIG_REALTEK_BUILD_REAL_LITEGFX_DEMO
+// </c>
+
 // <c> RTK GUI Demo 368 448
 // #define CONFIG_REALTEK_BUILD_GUI_448_368_DEMO
 // </c>

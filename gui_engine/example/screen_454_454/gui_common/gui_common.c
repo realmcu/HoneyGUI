@@ -1,5 +1,4 @@
 #include "gui_common.h"
-#include "app_gui_main.h"
 #include "watchface_mgr.h"
 #include "player_mgr.h"
 #include "call_mgr.h"

@@ -75,7 +75,7 @@ The following table lists the LCD-related interfaces supported by mainstream  ch
 | [RTL8763E]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
 | [RTL8772G]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
 | [RTL8773E]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
-| [RTL8772F]                                                       |   Y   |  Y   |  Y  |  Y   |  Y  |
+| RTL8772F                                                         |   Y   |  Y   |  Y  |  Y   |  Y  |
 
 ```{note}
 'Y' means the driver already included in the library.
@@ -92,7 +92,7 @@ The following table lists the LCD-related driver IC supported by mainstream chip
 | [RTL8763E]                                                      |   NA   |    NA    |    Y    |   NA   |    NA   |    NA   |   NA   |    NA    |    NA   |    Y    |    NA   |   NA   |    NA   |
 | [RTL8772G]                                                      |   Y    |    Y     |    Y    |   Y    |    Y    |    Y    |   Y    |    NA    |    NA   |    NA   |    NA   |   NA   |    NA   |
 | [RTL8773E]                                                      |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   NA   |    NA    |    Y    |    NA   |    NA   |   NA   |    NA   |
-| [RTL8772F]                                                      |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
+| RTL8772F                                                        |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
 
 ```{note}
 'Y' means the driver already included in the library.
@@ -151,7 +151,7 @@ The following table lists the Touch-related IC supported by all chips. If you wa
 | [RTL8763E]                                                       |    NA   |    NA    |   NA   |   NA  |   NA   |     Y   |     Y  |
 | [RTL8772G]                                                       |    NA   |    NA    |   NA   |    Y  |    Y   |    NA   |    NA  |
 | [RTL8773E]                                                       |    Y    |    NA    |   NA   |    Y  |   NA   |    NA   |    NA  |
-| [RTL8772F]                                                       |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
+| RTL8772F                                                         |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
 
 ```{note}
 'Y' means the driver already included in the library.
@@ -206,4 +206,3 @@ In the chip manual, this low power state where peripherals can be turned off is 
 [RTL8763E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
 [RTL8772G]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3
 [RTL8773E]: https://www.realmcu.com/en/Home/Product/eed7a243-66bf-4b5c-b811-a60d2d4e95cf
-[RTL8772F]: https://www.realmcu.com/en/Home/Product/c175760b-088e-43d9-86da-1fc9b3f07ec3

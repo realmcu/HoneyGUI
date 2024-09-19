@@ -1,4 +1,4 @@
-# 立方体
+# 立方体 (Cube)
 
 立方体是一个3D显示控件，它可以展示六个面的旋转立方体，每个面都能够显示不同的图像。
 
@@ -24,7 +24,6 @@
 
 ## 示例
 
-<details> <summary>代码</summary>
 
 ```c
 #include <gui_obj.h>
@@ -44,17 +43,6 @@ void page_tb_cube(void *parent)
         .data_addr.data_addr_left = MUSIC_BIN,
         .data_addr.data_addr_right = QUICKCARD_BIN
     };
-    // gui_cube_imgfile_t imgfile =
-    // {
-    //     .src_mode[0] = IMG_SRC_FILESYS, .src_mode[1] = IMG_SRC_FILESYS, .src_mode[2] = IMG_SRC_FILESYS,
-    //     .src_mode[3] = IMG_SRC_FILESYS, .src_mode[4] = IMG_SRC_FILESYS, .src_mode[5] = IMG_SRC_FILESYS,
-    //     .img_path.img_path_front = "Activity.bin",
-    //     .img_path.img_path_back = "Weather.bin",
-    //     .img_path.img_path_up = "HeartRate.bin",
-    //     .img_path.img_path_down = "Clockn.bin",
-    //     .img_path.img_path_left = "Music.bin",
-    //     .img_path.img_path_right = "QuickCard.bin"
-    // };
     gui_cube_t *cube4 = gui_cube_create(parent, "cube", &imgfile, 0, 0);
     gui_cube_auto_rotation_by_y(cube4, 100, 5.5f);
     gui_cube_set_mode(cube4, CUBE_SIDE_DOWN, IMG_SRC_OVER_MODE);
@@ -62,7 +50,6 @@ void page_tb_cube(void *parent)
     gui_cube_set_center(cube4, 200, 200);
 }
 ```
-</details>
 <br/>
 <div style="text-align: center"><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/cube.gif"></div>
 <br/>

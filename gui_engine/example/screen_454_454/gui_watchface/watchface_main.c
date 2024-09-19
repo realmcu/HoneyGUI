@@ -1,4 +1,3 @@
-#include "app_gui_main.h"
 #include "root_image/ui_resource.h"
 #include "gui_img.h"
 #include "gui_curtainview.h"
@@ -9,7 +8,6 @@
 #include "gui_obj.h"
 #include "watchface_mgr.h"
 #include "gui_interface.h"
-#include "app_gui_main.h"
 #ifndef _WIN32
 #include "hub_clock.h"
 #include "module_global_data.h"

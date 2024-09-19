@@ -2,16 +2,11 @@
 #include "app_gui_main.h"
 #include "gui_common.h"
 #include "gui_curtainview.h"
-#include "gui_curtain.h"
 #include "gui_img.h"
-#include "gui_page.h"
-#include "gui_grid.h"
 #include "gui_text.h"
 #include "gui_switch.h"
 #include "gui_win.h"
 #include "gui_tabview.h"
-#include "gui_img_scope.h"
-#include "gui_scroll_text.h"
 #include "contacts_mgr.h"
 
 #define MAX_CINTACTS_NUM        3
@@ -20,15 +15,15 @@ gui_switch_t *switch_designated_contact[MAX_CINTACTS_NUM] = {NULL};
 gui_text_t *text_designated_contact[MAX_CINTACTS_NUM] = {NULL};
 char *contacts_list_name[MAX_CINTACTS_NUM] = {"联系人1", "联系人2", "联系人3"};
 
-static void contacts_list_back_touch_cb(void *obj, uint16_t event)
+static void contacts_list_back_touch_cb(void *obj, uint16_t event, void *param)
 {
     gui_log("contacts_list_back_touch_cb\n");
     app_contacts_switch_tabs(CONTACTS_MAIN);
 }
 
-static void switch_designated_contact_touch_cb(void *obj, uint16_t event)
+static void switch_designated_contact_touch_cb(void *obj, uint16_t event, void *param)
 {
-    gui_log("switch_designated_contact_touch_cb, obj = 0x%x\n", obj);
+    gui_log("switch_designated_contact_touch_cb\n");
     switch (event)
     {
 

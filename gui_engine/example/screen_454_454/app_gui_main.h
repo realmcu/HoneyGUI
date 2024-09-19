@@ -20,6 +20,8 @@ extern "C" {
 
 
 gui_app_t *get_app_watch_ui(void);
+extern void design_menu_loop_ui(gui_obj_t *parent);
+extern void design_tab_menu(void *parent);
 extern void design_watchface_mgr(void *parent);
 extern void design_player_mgr(void *parent);
 extern void design_call_mgr(void *parent);

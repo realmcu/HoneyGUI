@@ -1,4 +1,4 @@
-# 文本控件
+# 文本控件 (Text)
 
 文本控件是用于显示文本的基本小控件，可用于将不同字体、不同颜色和不同大小的文本输出到屏幕上。为了绘制文本，字体文件可以是标准的.ttf文件或自定义的.bin文件。
 
@@ -30,9 +30,9 @@
 
 字体文件可以是标准的.ttf文件或自定义的.bin文件。字体文件需要提前初始化，且必须为文本控件设置字体类型。
 
-+ 初始化自定义bin字体文件，需要调用 [gui_font_mem_init(font_bin_addr)](#gui_font_mem_init)。
++ 初始化自定义bin字体文件，需要调用 `gui_font_mem_init(font_bin_addr)`。
 
-+ 初始化标准TTF文件来绘制文本，需要调用 [gui_font_stb_init(font_ttf_addr)](#gui_font_stb_init)。
++ 初始化标准TTF文件来绘制文本，需要调用 `gui_font_stb_init(font_ttf_addr)`。
 
 所有自定义bin字体文件都可以从RTK FAE那里获得。
 
