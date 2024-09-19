@@ -432,7 +432,6 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
         dc->lcd_frame_monitor->draw_prepare_cb();
     }
 
-    static int last_ms;
     static int one_second;
     int tick = gui_ms_get();
     static int frame_count;
@@ -452,7 +451,6 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     else
     {
         gui_thread_mdelay(17);
-        last_ms = gui_ms_get();
     }
     if (dc->lcd_frame_monitor)
     {

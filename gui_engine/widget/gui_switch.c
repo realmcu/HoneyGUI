@@ -356,21 +356,24 @@ static void gui_switch_prepare(gui_obj_t *obj)
             }
             if (tp->pressed)
             {
-                if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
+                if (!obj->skip_tp_pressed)
                 {
-                    //gui_log("pressed type 0x%x\n", tp->type);
-                    gui_obj_event_set(obj, (gui_event_t)SWITCH_EVENT_PRESSED);
-
-                    this->long_flag = false;
-                    this->press_flag = true;
-
-                    if (!this->long_touch_state)
+                    if (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == true)
                     {
-                        gui_switch_hl(this);
-                    }
-                    else
-                    {
-                        gui_switch_hl_long_touch(this);
+                        //gui_log("pressed type 0x%x\n", tp->type);
+                        gui_obj_event_set(obj, (gui_event_t)SWITCH_EVENT_PRESSED);
+
+                        this->long_flag = false;
+                        this->press_flag = true;
+
+                        if (!this->long_touch_state)
+                        {
+                            gui_switch_hl(this);
+                        }
+                        else
+                        {
+                            gui_switch_hl_long_touch(this);
+                        }
                     }
                 }
             }
