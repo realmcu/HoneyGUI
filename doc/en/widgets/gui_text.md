@@ -1,6 +1,6 @@
-# Text widget
+# Text
 
-The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen. In order to draw text, the font file can be standard .ttf file or customized .bin file.
+The text widget is the basic widget used to display text, which can be used to output text in different fonts, different colors, and different sizes to the screen. In order to draw text, the font file can be a standard .ttf file or a customized .bin file.
 
 ## Features
 
@@ -15,7 +15,7 @@ Text widgets can support the following features.
 + **Multi font sizes support**
 + **Thirty-two bit true color support**
 + **Custom animation effects support**
-+ **Standrads TTF file support[^1]**
++ **Standards TTF file support[^1]**
 + **Self-developed font files support**
 
 [^1]: Only part of the chip support this feature.
@@ -24,31 +24,31 @@ Text widgets can support the following features.
 
 Using functions to load font files and display text.
 
-### Initialize the font file
+### Initialize The Font File
 
 In order to draw text, font files containing glyph information need to be loaded into the system.
 
-The font file can be standard .ttf file or customized .bin file. The font file can be initialized ahead of time to avoid having to set the font type for each text widget.
+The font file can be a standard .ttf file or a customized .bin file. The font file can be initialized ahead of time to avoid having to set the font type for each text widget.
 
-+ To initialize the new version customized bin font file, you need to use [gui_font_mem_init(font_bin_addr)](#gui_font_mem_init) .
++ To initialize the new version customized bin font file, use [gui_font_mem_init(font_bin_addr)](#gui_font_mem_init).
 
-+ To initialize the standrad TTF file to draw text, you need to use [gui_font_stb_init(font_ttf_addr)](#gui_font_stb_init) .
++ To initialize the standard TTF file to draw text, use [gui_font_stb_init(font_ttf_addr)](#gui_font_stb_init).
 
 All customized bin font files are available from RTK technicians.
 
-`FONT_BIN`,`FONT_TTF` are all address of the files stored in flash.
+`FONT_BIN`, `FONT_TTF` are all addresses of the files stored in flash.
 
-### Create text widget
+### Create Text Widget
 
 To create a text widget, you can use [gui_text_create(parent, filename, x, y, w, h)](#gui_text_create), The coordinates on the screen and text box size have been identified after create. These attributes also can be modified whenever you want.
 
 ```{Note}
-The size of text box should be larger than the string to be shown, out-of-range text will be hidden.
+The size of the text box should be larger than the string to be shown; out-of-range text will be hidden.
 ```
 
-### Set text attributes
+### Set Text Attributes
 
-#### Set text
+#### Set Text
 
 To add some texts or characters to a text widget and set text attributes with [gui_text_set(this, text, text_type, color, length, font_size)](#gui_text_set).
 
@@ -56,40 +56,40 @@ To add some texts or characters to a text widget and set text attributes with [g
 The text length must be the same as the set character length, and the font size of the text must be the same as the size of the loaded font file.
 ```
 
-#### Font type
+#### Font Type
 
-Text widget support the type setting. You can use this function to set type. Type is bin/ttf file address.
+The text widget support type setting. This function can be used to set the type. The type is a bin/ttf file address 
 [gui_text_type_set(this, type)](#gui_text_type_set).
 
-#### Text content
+#### Text Content
 
-This interface can be used to set the content that needs to be displayed by the text widget.
+This interface can be used to set the content that needs to be displayed by the text widget 
 [gui_text_content_set(this, text, length)](#gui_text_content_set).
 
-#### Text encoding
+#### Text Encoding
 
-The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, and this interface can be used to change the decoding method.
+The text widget supports both UTF-8 encoding and UTF-16 encoding input formats, and this interface can be used to change the decoding method 
 [gui_text_encoding_set(this, charset)](#gui_text_encoding_set).
 
-#### Convert to img
+#### Convert to Img
 
 By using this function [gui_text_convert_to_img(this, font_img_type)](#gui_text_convert_to_img), the text in the text widget will be converted into an image, stored in memory, and rendered using the image. It also supports image transformations such as scaling and rotation. This only applies to bitmap fonts.
 
 ```{Note}
-Because the content and font size information of the text widget is needed, it should be called after set text.If the content, font size, position and other attributes of the text have been modified, you need to reuse this interface for conversion.
+Because the content and font size information of the text widget is needed, it should be called after set text. If the content, font size, position, and other attributes of the text have been modified, you need to reuse this interface for conversion.
 ```
 
-### Text input
+#### Text Input
 
-Text widget support the input setting. You can use this function to set input [gui_text_input_set(this, inputable)](#gui_text_input_set).
+Text widget supports the input setting. You can use this function to set input [gui_text_input_set(this, inputable)](#gui_text_input_set).
 
-### Text click
+#### Text Click
 
-Text widget support click. You can use this function to add the click event for text [gui_text_click(this, event_cb, parameter)](#gui_text_click).
+Text widget supports click. You can use this function to add the click event for text [gui_text_click(this, event_cb, parameter)](#gui_text_click).
 
-#### Text mode
+#### Text Mode
 
-Text widget support seven typesetting modes, to set text typesetting mode with: [gui_text_mode_set(this, mode)](#gui_text_mode_set).
+Text widget supports seven typesetting modes. To set text typesetting mode, use: [gui_text_mode_set(this, mode)](#gui_text_mode_set).
 
 All typesetting modes are as follows.
 
@@ -117,17 +117,17 @@ All typesetting modes are as follows.
    :end-before: /** @brief  text mode enum end */
 ```
 
-### Text move
+#### Text Move
 
-You can use this function [gui_text_move(this, x, y)](#gui_text_move) to move text to a specified location, but x and y cannot be larger than w and h of the text.
+It is possible to use this function [gui_text_move(this, x, y)](#gui_text_move) to move text to a specified location, but x and y cannot be larger than w and h of the text.
 
-### Set animate
+#### Set Animate
 
 Using this function [gui_text_set_animate(o, dur, repeat_count, callback, p)](#gui_text_set_animate) to set the animation and implement the animation effect in the corresponding callback function.
 
 ## Example
 
-### Multiple text widget
+### Multiple Text Widget
 
 
 <details> <summary>code</summary>
@@ -183,7 +183,7 @@ static void app_launcher_ui_design(gui_app_t *app)
 
 <center><img  width="300" src= "https://foruda.gitee.com/images/1694429576419596614/3cc7bc43_9325830.png "/></center></br>
 
-### Animate text widget
+### Animate Text Widget
 
 
 <details> <summary>code</summary>
