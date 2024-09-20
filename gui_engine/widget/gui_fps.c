@@ -22,7 +22,6 @@
 #include "gui_obj.h"
 #include "gui_server.h"
 #include "gui_canvas_rect.h"
-#include "tp_algo.h"
 #include "gui_text.h"
 #include "font_mem.h"
 #include "gui_win.h"

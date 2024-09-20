@@ -9,11 +9,11 @@
 #include <box2d/box2d.h>
 #include <SDL.h>
 #include <vector>
-#include <cstdlib>  // For using srand and rand
-#include <ctime>   // For using time
+
 #include <nanovg.h>
 #include "gui_canvas.h"
 #include "tp_algo.h"
+#include <random>  // For secure random numbers
 namespace app_box2d_ring
 {
 
@@ -48,6 +48,9 @@ struct Ball
 
 std::vector<Ball> balls; // Vector to store balls and their colors
 std::vector<b2Body *> temporaryBodies; // Vector to store temporary bodies
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_int_distribution<> dis(0, 255);
 bool init();
 void close();
 void createRing(b2World *world, float radius, float restitution);
@@ -108,12 +111,13 @@ void win_release_callback()
     temporaryBodies.clear();
 }
 // Maintain minimum linear velocity to avoid stopping
+// Maintain minimum linear velocity to avoid stopping
 void maintainMinimumVelocity(b2Body *ball)
 {
     if (ball->GetLinearVelocity().Length() < MINIMUM_LINEAR_VELOCITY)
     {
         // Apply a small random impulse to keep the ball moving
-        float angle = rand() % 360;
+        float angle = dis(gen) % 360;
         float impulseMagnitude = ball->GetMass() * MINIMUM_LINEAR_VELOCITY;
         b2Vec2 impulse(impulseMagnitude * cos(angle), impulseMagnitude * sin(angle));
         ball->ApplyLinearImpulseToCenter(impulse, true);
@@ -220,7 +224,7 @@ void createBalls(b2World *world)
         ballBody->SetLinearVelocity(b2Vec2(vx, vy));
 
         // Assign random color to the ball
-        NVGcolor color = nvgRGB(rand() % 256, rand() % 256, rand() % 256);
+        NVGcolor color = nvgRGB(dis(gen), dis(gen), dis(gen));
         balls.push_back({ballBody, color}); // Add ball and color to vector
     }
 }

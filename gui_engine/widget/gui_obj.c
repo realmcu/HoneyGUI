@@ -102,9 +102,9 @@ static void gui_obj_tree_child_free(gui_obj_t *object)
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
+        if (obj->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
             gui_log("@name:%s, @type:%d\n", object->name, object->type);
             return;
         }
@@ -129,9 +129,9 @@ static void gui_obj_tree_child_show(gui_obj_t *obj, bool enable)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
+        if (obj->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
             gui_log("@name:%s, @type:%d\n", object->name, object->type);
             return;
         }
@@ -253,9 +253,9 @@ void gui_obj_tree_print(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
+        if (obj->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
             gui_log("@name:%s, @type:%d\n", object->name, object->type);
             return;
         }
@@ -271,9 +271,9 @@ void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
+        if (obj->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
             gui_log("@name:%s, @type:%d\n", object->name, object->type);
             return;
         }
@@ -361,13 +361,7 @@ gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
-        {
-            gui_log("list NULL @line:%d, @%x", __LINE__, object);
-            gui_log("@name:%s, @type:%d\n", object->name, object->type);
-            return 0;
-        }
-        if (obj->type == child_type)
+        if (obj->magic == GUI_MAGIC_NUMBER && obj->type == child_type)
         {
             return obj;
         }
@@ -814,9 +808,9 @@ void gui_obj_tree_get_widget_by_name(gui_obj_t *object, const char *name, gui_ob
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
+        if (obj->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, object);
+            gui_log("list NULL @line:%d, @%p", __LINE__, object);
             gui_log("@name:%s, @type:%d\n", object->name, object->type);
             return;
         }
@@ -837,9 +831,9 @@ void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t
     gui_list_for_each_safe(node, tmp, &root->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
+        if (obj->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, root);
+            gui_log("list NULL @line:%d, @%p", __LINE__, root);
             gui_log("@name:%s, @type:%d\n", root->name, root->type);
             return;
         }
@@ -961,9 +955,9 @@ void gui_obj_tree_print_bfs(gui_obj_t *root)
         gui_list_for_each_safe(node, tmp, &current_obj->child_list)
         {
             gui_obj_t *child_obj = gui_list_entry(node, gui_obj_t, brother_list);
-            if (child_obj == 0)
+            if (child_obj->magic != GUI_MAGIC_NUMBER)
             {
-                gui_log("list NULL @line:%d, @%x", __LINE__, root);
+                gui_log("list NULL @line:%d, @%p", __LINE__, root);
                 gui_log("@name:%s, @type:%d\n", root->name, root->type);
                 return;
             }

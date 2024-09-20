@@ -23,7 +23,6 @@
 #include "gui_obj.h"
 #include "gui_server.h"
 #include "gui_tabview.h"
-#include "gui_tab.h"
 #include "gui_curtain.h"
 
 /** @defgroup WIDGET WIDGET
