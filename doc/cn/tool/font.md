@@ -6,19 +6,19 @@
 
 ## 生成字体bin文件
 如何生成对应的文件，请参考以下步骤:
-* 将字体库文件复制到该目录（`\Font Convert Tool\font`）。
+1. 将字体库文件复制到该目录（`\Font Convert Tool\font`）。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779202121064741/2e5506f6_13408154.png" ></div>
 
-* 可以参考（`\Font Convert Tool\doc`）目录下的文档，了解每个参数的具体含义，通过编辑`FontConfig.json`配置字体参数。
+2. 可以参考（`\Font Convert Tool\doc`）目录下的文档，了解每个参数的具体含义，通过编辑`FontConfig.json`配置字体参数。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724034571057169577/1a91aa47_9325830.png" ></div>
 
-* 打开`setting.ini`，修改可选配置项。
+3. 打开`setting.ini`，修改可选配置项。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1724035284336578868/8affdd56_9325830.png" ></div>
 
-* 双击`fontDirctionary.exe`生成font.bin。
+4. 双击`fontDirctionary.exe`生成font.bin。
 
 <div style="text-align: center"><img width= "400" src="https://foruda.gitee.com/images/1718779549743952722/46c77609_13408154.png" ></div>
 
@@ -28,10 +28,10 @@
 | ----------------------- | --------------------------------------------------------------------------------- |
 | 代码页 (codePages)      | 一组按特定顺序排列的选定字符，用于某种语言的文本。可以设置多个。                        |
 | cst路径 (cstPaths)      | 二进制 Unicode 代码表 cst 文件路径。可以设置多个。                                   |
-| 自定义值 (customerVals) | 用户定义的连续 unicode 字符。可以设置多组。                                          |
-| 起始值 (firstVal)       | 自定义连续 unicode 字符的起始值。                                                   |
-| 范围 (range)           | 自定义的连续 unicode 字符数量。                                                      |
-| 映射路径 (mappingPaths) | 用户定义的 unicode 字符集文件路径。可以设置多组。                                     |
+| 自定义值 (customerVals) | 用户定义的连续 Unicode 字符。可以设置多组。                                          |
+| 起始值 (firstVal)       | 自定义连续 Unicode 字符的起始值。                                                   |
+| 范围 (range)           | 自定义的连续 Unicode 字符数量。                                                      |
+| 映射路径 (mappingPaths) | 用户定义的 Unicode 字符集文件路径。可以设置多组。                                     |
 | 字体设置 (fontSet)      | 用于指定要转换的字体相关设置。                                                       |
 | 加粗 (bold)            | 指定转换后的字符是否加粗。                                                           |
 | 斜体 (italic)          | 指定转换后的字符是否倾斜。                                                           |
