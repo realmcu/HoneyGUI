@@ -709,6 +709,12 @@ void gui_update_speed(int *speed, int speed_recode[]);
  * @param[in,out] offset Pointer to the offset, which will be updated by the function.
  */
 void gui_inertial(int *speed, int end_speed, int *offset);
+/**
+ * @brief tree print mermaid.
+ *
+ * @param[in] obj Pointer to the GUI object root.
+ */
+void gui_obj_tree_print_mmd(gui_obj_t *obj);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

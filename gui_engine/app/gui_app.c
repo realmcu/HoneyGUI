@@ -61,6 +61,7 @@ void gui_app_startup(gui_app_t *app)
     gui_list_init(&app->screen.brother_list);
     app->screen.opacity_value = UINT8_MAX;
     app->ui_design(app);
+    gui_obj_tree_print_mmd(&(app->screen));
     if (app->active_ms == 0)
     {
         app->active_ms = 10000;
