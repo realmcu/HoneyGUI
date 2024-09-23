@@ -1,14 +1,14 @@
 # Curtain
 
-The curtain widget enables you to create curtains in five directions: up, down, left, right, and middle. (refer to [T_GUI_CURTAIN_ENUM](#T_GUI_CURTAIN_ENUM)). Before creating the curtain widget, you must first create a curtainview widget to accommodate the curtain.
+The curtain widget enables you to create curtains in five directions: up, down, left, right, and middle (refer to [T_GUI_CURTAIN_ENUM](#T_GUI_CURTAIN_ENUM)). Before creating the curtain widget, you must first create a curtainview widget to accommodate the curtain.
 
 ## Usage
 
-### Create curtain widget
+### Create Curtain Widget
 
-If you wish to create a curtain widget with a defined direction, you may opt to utilize the [gui_curtain_create(parent, filename, x, y, w, h, orientation, scope)](#gui_curtain_create) function.
-`Orientation` field offers various directions for the curtain, allowing for the creation of a middle or right curtain widget.
-`Scope` refers to the curtain range that can be extended, which falls between 0 and 1
+If you want to create a curtain widget with a defined direction, you may opt to utilize the [gui_curtain_create(parent, filename, x, y, w, h, orientation, scope)](#gui_curtain_create) function.
+`orientation` represents direction and can create curtain controls in five different directions: up, down, left, right, and center.
+`Scope` refers to the curtain range that can be extended, which falls between 0 and 1.
 
 <span id = "T_GUI_CURTAIN_ENUM">
 

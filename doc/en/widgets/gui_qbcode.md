@@ -1,12 +1,12 @@
 # Qbcode
 
-The qbcode widget is the widget used to create or display qrcode and barcode. You can set a border, location and size attribute for qbcode widget. Qbcode widget support text and binary data  for qrcode encode, and support support text for barcode encode. The qrcode widget the QR Code Model 2 specification, supporting all versions (sizes) from 1 to 40, all 4 error correction levels, and 4 character encoding modes. The widget support fout error correction level in a QR Code symbol, and the high level is set by default. Barcode support code128 format.
+The qbcode widget can be used to create or display qrcode and barcode. You can set the border, location and size attribute for qbcode widget. Qbcode widget support text and binary data for qrcode encode, and support text for barcode encode. The qrcode widget follows the QR Code Model 2 standard, upports various specifications from 1 to 40, and supports 4 error correction levels and 4 character encoding modes. By default, the error correction level of QR codes is set to the highest level. For barcode, it supports the code128 format.
 
 ## Usage
 
-### create qbcode widget
+### Create Widget
 
-To create a qbcode widget, you can use the function [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, T_QBCODE_DISPLAY_TYPE type, T_QBCODE_ENCODE_TYPE encodeType)](#gui_qbcode_create). Whether a qrcode or barcode is created depends on the ```encodeType``` parameter. The ```encodeType``` enumeration types are as follows:
+To create a qbcode widget, you can use the function [gui_qbcode_t *gui_qbcode_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, T_QBCODE_DISPLAY_TYPE type, T_QBCODE_ENCODE_TYPE encodeType)](#gui_qbcode_create). Whether a qrcode or barcode is created depends on the `encodeType` parameter. The `encodeType` enumeration types are as follows:
 
 ```eval_rst
 
@@ -17,13 +17,13 @@ To create a qbcode widget, you can use the function [gui_qbcode_t *gui_qbcode_cr
 
 ```
 
-### config qbcode size and border
+### Set Size and Border
 
 Use the function [void gui_qbcode_config(gui_qbcode_t *qbcode, uint8_t *data, uint32_t data_len, uint8_t border_size)](#gui_qbcode_config) to set the size and border of qbcode.
 
-### qrcode encode notes
+### Qrcode Encode Notes
 
-The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15; You can modify the version according to the document: [https://www.qrcode.com/zh/about/version.html](https://www.qrcode.com/zh/about/version.html);
+The encoded data for qrcode can exceeded the max bytes by default, which can modify the max version is 15. You can modify the version according to the document: https://www.qrcode.com/zh/about/version.html.
 
 ## Example
 

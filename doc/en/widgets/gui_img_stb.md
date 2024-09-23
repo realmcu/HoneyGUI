@@ -1,18 +1,18 @@
-# STB img
+# STB Img
 
 The image widget is the basic widget used to display image. You can set a left, right and center image, and the center image will be repeated to match the width of the object.STB image widgets support bmp, jpg, png, gif, etc.
 
-In the STB image library, STB is not an acronym; it is actually a naming convention used to identify a series of single-file libraries developed by Sean T. Barrett. The STB image library `(stb_image.h)` is one of these libraries and is used to load and store various common image formats.
+In the STB image library, STB is not an acronym. It is actually a naming convention used to identify a series of single-file libraries developed by Sean T. Barrett. The STB image library `stb_image.h` is one of these libraries and is used to load and store various common image formats.
 
 ## Usage
 
-### Create widget
+### Create Widget
 
-You can use [gui_img_stb_create_from_mem(void *parent,  const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#gui_img_stb_create_from_mem) to create an STB image widget from memory.Please confirm that the type and size are correct.
+You can use [gui_img_stb_create_from_mem(void *parent, const char *name, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y)](#gui_img_stb_create_from_mem) to create an STB image widget from memory. Please confirm that the type and size are correct.
 
-### Set attribute
+### Set Attribute
 
-You can use [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y);](#gui_img_stb_set_attribute) to set the attribute of an STB image widget, replace it with a new file and set a new coordinate.
+You can use [gui_img_stb_set_attribute(gui_stb_img_t *img, void *addr, uint32_t size, uint8_t type, int16_t x, int16_t y)](#gui_img_stb_set_attribute) to set the attribute of an STB image widget, replace it with a new file and set a new coordinate.
 
 ## Example
 

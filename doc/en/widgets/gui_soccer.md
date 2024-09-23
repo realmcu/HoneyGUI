@@ -1,24 +1,24 @@
-# 2.5D soccer
+# 2.5D Soccer
 
 2.5D soccer consists of 12 vertices and 20 faces, which can form an approximately 3D spherical shape. Among them, the vertices define the shape and position of the sphere, and the face is a plane formed by connecting multiple vertices, used to fill the surface of the sphere.
 
 ## Usage
-### Create widget
+### Create Widget
 Use [gui_soccer_t *gui_soccer_create(void *parent, const char  *name, void *addr, int16_t x, int16_t y)](#gui_soccer_create) to create a 2.5D soccer. The `addr` parameter is the image used to fill the white faces of the soccer ball.
 
-### Set size
+### Set Size
 The default distance between the vertices of the soccer is 100. You can change the size of the soccer by using [void gui_soccer_set_size(gui_soccer_t *this, float size)](#gui_soccer_set_size) to modify the distance between the vertices.
 
-### Set center
+### Set Center
 The default center of the soccer is `((dc->fb_width - this->scsize) / 2.0f)`, where `this->scsize` is the distance between the vertices of the soccer. You can change the center coordinates of the soccer by using [void gui_soccer_set_center(gui_soccer_t *this, float c_x, float c_y)](#gui_soccer_set_center).
 
-### Set image mode
+### Set Image Mode
 The default image blending mode for the soccer is  `IMG_SRC_OVER_MODE`. You can change the image blending mode by using [void gui_soccer_set_mode(gui_soccer_t *soccer, BLEND_MODE_TYPE mode)](#gui_soccer_set_mode).
 
-### Set image opacity
+### Set Image Opacity
 You can change the opacity of the image by using [void gui_soccer_set_opacity(gui_soccer_t *soccer, uint8_t opacity)](#gui_soccer_set_opacity).
 
-### Set image for soccer faces
+### Set Image for Soccer Faces
 You can set the image for the soccer ball faces by using [void gui_soccer_set_img(gui_soccer_t *soccer, void *addr)](#gui_soccer_set_img).
 
 

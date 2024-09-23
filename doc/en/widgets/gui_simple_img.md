@@ -1,4 +1,4 @@
-# Simple image
+# Simple Image
 
 The simple img widget is a simplified version of the img control, lacking transformation operations such as rotation, translation, and scaling.
 

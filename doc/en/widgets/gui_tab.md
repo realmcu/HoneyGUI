@@ -1,17 +1,17 @@
 # Tab
 
-The tab widget enables you to create an unlimited number of tabs in both the x and y axes of the screen.Before integrating the tab widget, you must first establish a tabview widget to house the tabs.The direction of the generated tabs is denoted by idx and idy.
+The tab widget enables you to create an unlimited number of tabs in both the x and y axes of the screen. Before integrating the tab widget, you must first establish a tabview widget to house the tabs. The direction of the generated tabs is denoted by idx and idy.
 
 For an introduction to idx and idy, please refer to: [tabview](./gui_tabview.md)
 
 
 ## Usage
 
-### Create tab widget
-[gui_tab_create(parent, x, y, w, h, idx, idy)](#gui_tab_create) is used to create a tab widget, where idx and idy represent the direction of the created tab.
+### Create Tab Widget
+[gui_tab_create(parent, x, y, w, h, idx, idy)](#gui_tab_create) is used to create a tab widget, where `idx` and `idy` represent the direction of the created tab.
 
-### Set tab style
-If you wish to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_set_style) setting. By default, the classic style is employed. The styles are illustrated in the subsequent enumeration.
+### Set Tab Style
+If you want to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_set_style) to set it. By default, the classic style is employed. The available switching effects include the following:
 
 ```eval_rst
 

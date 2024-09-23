@@ -1,12 +1,12 @@
 # Page
 
-The page widget enables developers to establish a column of additional controls along the y-axis. These controls are permitted to extend beyond the screen's display boundary. Users can access these controls by swiping up or down.
+The page widget is a container widget that allow developers to create a page containing other widgets along the y-axis. After creating a page, various other widgets can be added to it, such as button, image, and more. The page widget can extend beyond the screen display boundaries, and users can access additional controls added to the page by swiping up or down. 
 
 ## Usage
 
-### Create page widget
+### Create Page Widget
 
-Developers can utilize the [gui_page_create(parent, filename, x, y, w, h)](#gui_page_create) function to establish a page widget. The page widget is a container oriented vertically, allowing the addition of other widgets to it. The height of the page widget is determined by the number of widgets added to it.
+Developers can utilize the [gui_page_create(parent, filename, x, y, w, h)](#gui_page_create) function to establish a page widget. The page widget is a container oriented vertically, allowing the addition of other widgets to it. The height of the page widget is determined by the number of widgets added to it. As more widgets are added, its height increases.
 
 ## Example
 

@@ -1,28 +1,28 @@
-# Pagelist
+# Page List
 
 The pagelist widget has the similar function as page widget, and it is expected to use less ram size. The pagelist widget bahaves like a scroll at y-axis. When it moves at y-axis, the child nodes will also move with pagelist widget. you can set two switch widget which indicate the first and the last, and two border line which indicate top and bottom. The first one will move from top to bottom when it reaches top. The last one will move from bottom to top when it reaches bottom. This characteristic makes the child widgets look like more than that they are really created.
 
 ## Usage
 
-### Increase
+### Increase Page List
 
 You can increase the number of real lists using [gui_pagelist_increase_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_increase_real_list_max)[gui_pagelist_t](#gui_pagelist_t).
 
-### Decrease
+### Decrease Page List
 You can decrease the number of real lists using [gui_pagelist_decrease_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_decrease_real_list_max).
 
-### Add callback
+### Add Callback
 
 The API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#gui_pagelist_add_list_update_cb) is used to add an update callback when the pagelist slides up and down, typically for updating text.
 
-### Set attribute
+### Set Attribute
 You can set attributes for a pagelist widget using [gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max, int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last)](#gui_pagelist_set_att).
 
-### Add picture
+### Add Picture
 
 By using this API [gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_pic, IMG_SOURCE_MODE_TYPE src_mode)](#gui_pagelist_add_scroll_bar), you can add a scroll bar image for a pagelist widget, with the file source being a memory address.
 
-### Create widget
+### Create Widget
 
 You can utilize the [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pagelist_create) function to establish a pagelist widget. It's height will be set according to the total height of child widgets.
 

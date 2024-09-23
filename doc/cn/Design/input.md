@@ -18,9 +18,7 @@ UI系统可以接收设备中其他外设的输入，典型的输入设备有触
 
 ### 获取触摸板数据
 
-在 `port_touchpad_get_data` 函数中，触摸信息将在 `drv_touch_read`中获取，经过简单处理后，作为原始数据供触摸算法处理程序使用。
-
-<details> <summary>port_touchpad_get_data</summary>
+在 `port_touchpad_get_data` 函数中，触摸信息将在 `drv_touch_read` 中获取，经过简单处理后，作为原始数据供触摸算法处理程序使用。
 
 ```C
 struct gui_touch_port_data *port_touchpad_get_data()
@@ -54,19 +52,12 @@ struct gui_touch_port_data *port_touchpad_get_data()
 }
 ```
 
-</details>
-
 原始数据的数据结构是 `gui_touch_port_data_t`。
 
 ### 触摸板算法处理器
 
-触摸板算法处理的代码实现在 `tp_algo_process` 函数中。
+触摸板算法处理的代码实现在 `tp_algo_process` 函数中。通过判断X轴和Y轴坐标数据的变化以及触摸时间，进行手势识别。经过算法处理后得到的输入类型如下：
 
-通过判断X轴和Y轴坐标数据的变化以及触摸时间，进行手势识别。
-
-经过算法处理后得到的输入类型如下：
-
-<details> <summary>T_GUI_INPUT_TYPE</summary>
 
 ```eval_rst
 .. literalinclude:: ../../../gui_engine/widget/guidef.h
@@ -75,7 +66,6 @@ struct gui_touch_port_data *port_touchpad_get_data()
    :end-before: /* T_GUI_INPUT_TYPE enum end*/
 ```
 
-</details>
 
 算法处理器将填充 `touch_info_t` 结构体，该结构体对所有控件可用。
 
@@ -86,7 +76,6 @@ struct gui_touch_port_data *port_touchpad_get_data()
 大多数控件在相应的准备函数中处理触摸信息，比如 `win_prepare`。使用 `tp_get_info` 函数获取触摸信息。
 
 在应用程序层面，可以根据不同类型的事件绑定不同的回调函数，示例如下：
-<details> <summary>示例</summary>
 
 ```C
 gui_img_t *hour;
@@ -125,8 +114,6 @@ void design_tab_home(void *parent)
 }
 ```
 
-</details>
-
 在这个例子中，首先创建了一个名为clock的窗口，在点击时执行 `show_clock` 函数，在长按时执行 `enter_homelist` 函数。
 
 ## 键盘
@@ -135,21 +122,17 @@ void design_tab_home(void *parent)
 
 <center><img src="https://foruda.gitee.com/images/1703054218572846675/2cd18af7_9325830.png",alt="Keyboard Information Flow"/></center>
 
-#### 硬件和驱动程序
+### 硬件和驱动程序
 
-键盘的硬件设计和驱动程序比较简单，本章将通过一个单独的 [GPIO](/Glossary.rst#term-GPIO) 来说明。有关如何使用 GPIO 的说明，请参考 SDK 中的说明。您可以使用 rtl87x2g_gpio.c 中的通用 [API](/Glossary.rst#term-API) 或 drv_gpio.c 中的封装 API 来完成相同的操作。
+键盘的硬件设计和驱动程序比较简单，本章将通过一个单独的 [GPIO](/Glossary.rst#term-GPIO) 来说明。有关如何使用GPIO，请参考SDK中的说明。您可以使用 `rtl87x2g_gpio.c` 中的通用 [API](/Glossary.rst#term-API) 或 `drv_gpio.c` 中的封装API来完成相同的操作。
 
 ### 获取键盘数据
 
-在 `port_kb_get_data` 函数中，会获取键盘信息。 用户根据自己的功能需求填写 `port_kb_get_data`，并将结构体填充为键盘输入信息。
+在 `port_kb_get_data` 函数中，可以获取到键盘信息。用户根据自己的功能需求填写 `port_kb_get_data`，并将结构体填充为键盘输入信息。
 
 ### 键盘算法处理器
 
-键盘算法的代码实现在 `kb_algo_process` 函数中。
-
-通过按压时间的长短来确定输入的类型是短按还是长按。
-
-算法处理器将填充 `kb_info_t` 结构体，该结构体对所有控件都可用。
+键盘算法的代码实现在 `kb_algo_process` 函数中。通过按压时间的长短来确定输入的类型是短按还是长按。算法处理器将填充 `kb_info_t` 结构体，该结构体对所有控件都可用。
 
 ### 响应
 

@@ -1,20 +1,20 @@
 # Curtainview
 
-The gui_curtainview widget provides an extended area for the developer to place application-related information, such as the application menu or the information for the application.
-As illustrated in Figure, the gui_curtainview can comprise of four curtains that can be positioned from the up/down/right/left orientation, or they can be situated in the central area.
+The curtainview widget can accommodate multiple curtain widgets. On the created curtain widgets, you can place application-related information such as application menus or other pertinent content. This widget can be extended as needed and customized according to requirements.
+As illustrated in figure, the curtainview is composed of five curtains, arranged in the following five directions: top, bottom, right, left, and center.
 <br>
 <div style="text-align: center"><img src="https://foruda.gitee.com/images/1700114998989746788/e5140991_10641540.png" /></div>
 <br>
 
 ## Usage
 
-### Create curtainview widget
+### Create Curtainview Widget
 
 The function [gui_curtainview_create(parent, filename, x, y, w, h)](#gui_curtainview_create) is utilized to create a container that is capable of housing the curtain widget.
 
 ### Callback
 
-Once the curtain extension is finished, you can configure certain callback events through the use of  [gui_curtainview_set_done_cb (this, cb)](#gui_curtainview_create).
+Once the curtain extension is finished, you can configure certain callback events through the use of  [gui_curtainview_set_done_cb (this, cb)](#gui_curtainview_set_done_cb).
 
 ## Example
 
