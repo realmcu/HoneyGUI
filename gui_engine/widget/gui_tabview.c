@@ -26,6 +26,7 @@
 #include "gui_matrix.h"
 #include "gui_tab.h"
 #include "kb_algo.h"
+#include "gui_tabview_internal.h"
 
 /** @defgroup WIDGET WIDGET
   * @{
@@ -438,31 +439,35 @@ static void gui_tabview_prepare(gui_obj_t *obj)
             break;
         }
     }
-    if (this->release_x >= GUI_FRAME_STEP)
+    if (tp->pressing == false)
     {
-        this->release_x -= GUI_FRAME_STEP;
-    }
-    else if (this->release_x <= -GUI_FRAME_STEP)
-    {
-        this->release_x += GUI_FRAME_STEP;
-    }
-    else
-    {
-        this->release_x = 0;
+        if (this->release_x >= GUI_FRAME_STEP)
+        {
+            this->release_x -= GUI_FRAME_STEP;
+        }
+        else if (this->release_x <= -GUI_FRAME_STEP)
+        {
+            this->release_x += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_x = 0;
+        }
+
+        if (this->release_y >= GUI_FRAME_STEP)
+        {
+            this->release_y -= GUI_FRAME_STEP;
+        }
+        else if (this->release_y <= -GUI_FRAME_STEP)
+        {
+            this->release_y += GUI_FRAME_STEP;
+        }
+        else
+        {
+            this->release_y = 0;
+        }
     }
 
-    if (this->release_y >= GUI_FRAME_STEP)
-    {
-        this->release_y -= GUI_FRAME_STEP;
-    }
-    else if (this->release_y <= -GUI_FRAME_STEP)
-    {
-        this->release_y += GUI_FRAME_STEP;
-    }
-    else
-    {
-        this->release_y = 0;
-    }
 
     this->checksum = 0;
     this->checksum = gui_obj_checksum(0, (uint8_t *)this, sizeof(gui_tabview_t));

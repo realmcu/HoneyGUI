@@ -503,6 +503,11 @@
               <FileType>1</FileType>
               <FilePath>..\gui_engine\3rd\tjpgd\tjpgd.c</FilePath>
             </File>
+            <File>
+              <FileName>stb_image.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\gui_engine\3rd\stb\stb_image.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
