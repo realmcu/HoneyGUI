@@ -1,6 +1,6 @@
 # Page List
 
-The pagelist widget has the similar function as page widget, and it is expected to use less ram size. The pagelist widget bahaves like a scroll at y-axis. When it moves at y-axis, the child nodes will also move with pagelist widget. you can set two switch widget which indicate the first and the last, and two border line which indicate top and bottom. The first one will move from top to bottom when it reaches top. The last one will move from bottom to top when it reaches bottom. This characteristic makes the child widgets look like more than that they are really created.
+The pagelist widget has a similar function as the page widget, and it is expected to use less RAM size. The pagelist widget behaves like a scroll on the y-axis. When it moves on the y-axis, the child nodes will also move with the pagelist widget. Two switch widgets can be set to indicate the first and the last, and two border lines to indicate the top and bottom. The first one will move from top to bottom when it reaches the top. The last one will move from bottom to top when it reaches the bottom. This characteristic makes the child widgets look like more than what is really created.
 
 ## Usage
 
@@ -16,7 +16,7 @@ You can decrease the number of real lists using [gui_pagelist_decrease_real_list
 The API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#gui_pagelist_add_list_update_cb) is used to add an update callback when the pagelist slides up and down, typically for updating text.
 
 ### Set Attribute
-You can set attributes for a pagelist widget using [gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max, int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last)](#gui_pagelist_set_att).
+Attributes for a pagelist widget can be set using [gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max, int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last)](#gui_pagelist_set_att).
 
 ### Add Picture
 
@@ -24,7 +24,7 @@ By using this API [gui_pagelist_add_scroll_bar(gui_pagelist_t *this, void *bar_p
 
 ### Create Widget
 
-You can utilize the [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pagelist_create) function to establish a pagelist widget. It's height will be set according to the total height of child widgets.
+One can utilize the [gui_pagelist_create(parent, filename, x, y, w, h)](#gui_pagelist_create) function to establish a pagelist widget. Its height will be set according to the total height of child widgets.
 
 ## Example
 
@@ -58,9 +58,9 @@ void design_pagelist_test(void *parent)
                             GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]),
                             FONT_H_32);
         gui_scroll_text_scroll_set(scroll_text_pagelist_test[i], SCROLL_X, 0, 0, 5000, 0);
-        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_1,
+        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)switch_pagelist_touch_cb, GUI_EVENT_1,
                              NULL);
-        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_2,
+        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)switch_pagelist_touch_cb, GUI_EVENT_2,
                              NULL);
     }
     index_first = 0;

@@ -13,7 +13,7 @@
 
 ### 添加回调函数
 
-此API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#gui_pagelist_add_list_update_cb) 用于在页列表上下滑动时添加更新回调，通常用于更新文本。
+此API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#gui_pagelist_add_list_update_cb) 用于在页面列表上下滑动时添加更新回调，通常用于更新文本。
 
 ### 设定属性
 
@@ -59,9 +59,9 @@ void design_pagelist_test(void *parent)
                             GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]),
                             FONT_H_32);
         gui_scroll_text_scroll_set(scroll_text_pagelist_test[i], SCROLL_X, 0, 0, 5000, 0);
-        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_1,
+        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)switch_pagelist_touch_cb, GUI_EVENT_1,
                              NULL);
-        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_2,
+        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)switch_pagelist_touch_cb, GUI_EVENT_2,
                              NULL);
     }
     index_first = 0;
