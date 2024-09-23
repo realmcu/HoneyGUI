@@ -3,7 +3,7 @@
 The curtainview widget can accommodate multiple curtain widgets. On the created curtain widgets, you can place application-related information such as application menus or other pertinent content. This widget can be extended as needed and customized according to requirements.
 As illustrated in figure, the curtainview is composed of five curtains, arranged in the following five directions: top, bottom, right, left, and center.
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1700114998989746788/e5140991_10641540.png" /></div>
+<div style="text-align: center"><img width="400" img src="https://foruda.gitee.com/images/1727088694333469506/7c243250_13408154.png" /></div>
 <br>
 
 ## Usage

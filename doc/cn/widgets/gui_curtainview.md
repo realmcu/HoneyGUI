@@ -4,7 +4,7 @@
 幕布容器控件 (Curtainvew) 可容纳多个幕布控件。在创建的幕布控件上可以放置应用程序相关的信息，例如应用程序菜单或应用程序等信息。该控件可以根据需要进行扩展，并可以根据需要进行自定义。如下图所示，幕布容器控件由五个幕布组成，分别在上/下/右/左/中五个方向进行排列。
 
 <br>
-<div style="text-align: center"><img src="https://foruda.gitee.com/images/1700114998989746788/e5140991_10641540.png" /></div>
+<div style="text-align: center"><img width="400" img src="https://foruda.gitee.com/images/1727088694333469506/7c243250_13408154.png" /></div>
 <br>
 
 ## 用法
