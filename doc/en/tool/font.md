@@ -40,7 +40,7 @@ Please refer to the following steps for how to generate files:
 
 ## Setting.ini Parameter Description
 
-| Field name   | Default value | Field meaning                                                                                                 |
+| <span style="display:inline-block;width:100px">Field name</span> | <span style="display:inline-block;width:100px">Default value</span> | <span style="display:inline-block;width:600px">Field meaning</span>                                                                                                 |
 | ------------ | ------------- | ------------------------------------------------------------------------------------------------------------- |
 | gamma        | 1             | The gamma value is a parameter used to describe the nonlinear relationship between input pixel values and output brightness. The higher the value, the higher the text brightness.|
 | rotate       | 0             | Font Rotation Angle. 0: No rotation. 1: Rotate 90° clockwise. 2: Rotate 90° counterclockwise.                 |
