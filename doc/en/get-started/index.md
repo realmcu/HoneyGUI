@@ -9,7 +9,7 @@
 
 HoneyGUI is a graphics display framework independently developed by Realtek. It is an open-source embedded graphical user interface (GUI) library specifically designed for resource-constrained microcontrollers and embedded systems. HoneyGUI is lightweight, feature-rich, and highly customizable, making it widely used in consumer electronics, home appliances, medical devices, and smartwatches.
 
-As a comprehensive display framework, HoneyGUI not only includes Realtek's self-developed display engine development tools but also supports direct calls to external APIs such as LVGL and ARM2D for application development. Additionally, HoneyGUI provides a PC-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, [RVD](/Glossary.rst#RVD), to achieve visual programming.
+As a comprehensive display framework, HoneyGUI not only includes Realtek's self-developed display engine but also supports direct calls to external APIs such as LVGL and ARM2D for application development. Additionally, HoneyGUI provides a PC-based simulation environment, allowing developers to quickly develop and debug applications without relying on embedded hardware platforms. Furthermore, HoneyGUI can be used in conjunction with Realtek's proprietary front-end design tool, [RVD](/Glossary.rst#RVD), to achieve visual programming.
 
 Here are several common methods for APP development:
 
