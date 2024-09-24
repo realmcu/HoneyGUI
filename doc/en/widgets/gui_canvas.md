@@ -6,11 +6,11 @@ Sufficient memory is needed to open a framebuffer.
 ```
 
 ## Usage
-### Creat a canvas
-[gui_canvas_create(parent, name, addr, x, y, w, h)](#gui_canvas_create) creates a canvas. This `addr` can be a null pointer.
+### Creat Canvas
+[gui_canvas_create(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_canvas_create) creates a canvas. This `addr` can be a null pointer.
 
-### Add callback function
-[gui_canvas_set_canvas_cb(canvas, cb)](#gui_canvas_set_canvas_cb) sets the callback function for drawing specific shapes.
+### Add Callback Function
+[gui_canvas_set_canvas_cb(gui_canvas_t *this_widget, void (*cb)(gui_canvas_t *this_widget))](#gui_canvas_set_canvas_cb) sets the callback function for drawing specific shapes.
 
 ## Example
 ### Rounded Rectangle
@@ -47,7 +47,7 @@ static void app_ui_design(gui_app_t *app)
 <div style="text-align: center"><img width= "300" src="https://foruda.gitee.com/images/1698649650262539854/8b1a974f_10088396.png "></div>
 <br/>
 
-### Arc animation
+### Arc Animation
 
 An example of drawing an arc animation. ```arc_cb``` will be triggered every frame.
 
@@ -74,7 +74,7 @@ static void app_ui_design(gui_app_t *app)
 <br/>
 
 ## API
-### Vector graphics api
+### Vector Graphics Api
 Please refer to
 - [nanovg-introduction](https://openplanet.dev/docs/tutorials/nanovg-introduction) 
 - [nanovg github](https://github.com/memononen/nanovg)

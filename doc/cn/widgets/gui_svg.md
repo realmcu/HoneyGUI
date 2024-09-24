@@ -1,25 +1,25 @@
 # 可缩放矢量图形 (SVG)
 
-可缩放矢量图形（SVG）可以展示SVG格式的图像。
+可缩放矢量图形可以展示SVG格式的图像。
 - SVG是一种用于描述二维图形的 XML 标记语言，与位图图像不同，SVG图像以文本形式存储，并且可以缩放到任意大小而不会失真，因为它们基于数学描述而不是像素。
-- SVG图像可以直接打包到`root`文件夹。
+- SVG图像可以直接打包到 `root` 文件夹。
 
 ## 用法
 ### 创建控件
-使用[gui_svg_create_from_mem(parent, name, addr, size, x, y, w, h)](#gui_svg_create_from_mem)以从内存地址加载图像的方式创建一个SVG控件, 或者使用[gui_svg_create_from_file(parent, name, filename, x, y, w, h)](#gui_svg_create_from_file)以从文件系统路径加载图像的方式创建一个SVG控件。
-其中，`w/h`是SVG控件的宽度和高度，而不是要绘制的SVG图像的宽高，`size`是必须填写的SVG图像的绘制数据大小。
+使用 [gui_svg_create_from_mem(void *parent, const char *name, uint8_t *addr, uint32_t size, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_svg_create_from_mem) 以从内存地址加载图像的方式创建一个SVG控件, 或者使用 [gui_svg_create_from_file(void *parent, const char *name, const char *filename, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_svg_create_from_file) 以从文件系统路径加载图像的方式创建一个SVG控件。
+其中，`w/h` 是SVG控件的宽度和高度，而不是要绘制的SVG图像的宽高，`size` 是必须填写的SVG图像的绘制数据大小。
 
 ### 设置旋转
-使用[gui_svg_rotation(svg, degrees, c_x, c_y)](#gui_svg_rotation)将SVG图像旋转`degree`角度。其中，`(c_x, c_y)`是旋转中心。
+使用 [gui_svg_rotation(gui_svg_t *svg, float degrees, float c_x, float c_y)](#gui_svg_rotation) 将SVG图像旋转 `degree` 角度。其中， `(c_x, c_y)` 是旋转中心。
 
 ### 设置缩放
-如果需要更新SVG图像的大小，可以使用[gui_svg_scale(svg, scale_x, scale_y)](#gui_svg_scale)。
+如果需要更新SVG图像的大小，可以使用 [gui_svg_scale(gui_svg_t *svg, float scale_x, float scale_y)](#gui_svg_scale)。
 
 ### 设置平移
-使用[gui_svg_translate(svg, t_x, t_y)](#gui_svg_translate)平移SVG图像。
+使用 [gui_svg_translate(gui_svg_t *svg, float t_x, float t_y)](#gui_svg_translate) 平移SVG图像。
 
 ### 设置透明度
-使用[gui_svg_set_opacity(svg, opacity_value)](#gui_svg_set_opacity)设置SVG图像透明度。
+使用 [gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value)](#gui_svg_set_opacity) 设置SVG图像透明度。
 
 ## 示例
 

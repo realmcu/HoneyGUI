@@ -1,6 +1,6 @@
 # 画布（Canvas）
 
-画布（canvas）是一个使用nanovg绘制几何图形的控件。
+画布是一个使用nanovg绘制几何图形的控件。
 
 ```{限制}
 打开帧缓冲区需要足够的内存。
@@ -8,16 +8,16 @@
 
 ## 用法
 ### 创建控件
-使用[gui_canvas_create(parent, name, addr, x, y, w, h)](#gui_canvas_create)创建一个画布。其中，`addr`可以是一个空指针（NULL）。
+使用 [gui_canvas_create(void *parent, const char *name, void *addr, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_canvas_create) 创建一个画布。其中，`addr` 可以是一个空指针（NULL）。
 
 ### 添加回调函数
-使用[gui_canvas_set_canvas_cb(canvas, cb)](#gui_canvas_set_canvas_cb)设置绘制具体图形的回调函数。
+使用 [gui_canvas_set_canvas_cb(gui_canvas_t *this_widget, void (*cb)(gui_canvas_t *this_widget))](#gui_canvas_set_canvas_cb) 设置绘制具体图形的回调函数。
 
 ## 示例
 ### 圆角矩形
 
 以下是一个绘制三个不同颜色的圆角矩形的简单例子。
-- 其中，三种颜色参考[Colors' RGB Data](https://www.rapidtables.com/web/color/RGB_Color.html)
+- 其中，三种颜色参考 [Colors' RGB Data](https://www.rapidtables.com/web/color/RGB_Color.html)。
 - ```firebrick```
 - ```olive drab```
 - ```dodger blue``` 设置透明度为100。
@@ -50,7 +50,7 @@ static void app_ui_design(gui_app_t *app)
 
 ### 圆弧动画
 
-以下是一个绘制圆弧动画的例子，其中，屏幕刷新的每一帧都会触发```arc_cb```函数。
+以下是一个绘制圆弧动画的例子，其中，屏幕刷新的每一帧都会触发 ```arc_cb``` 函数。
 
 ```c
 #include "math.h"
