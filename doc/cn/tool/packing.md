@@ -40,7 +40,7 @@ RTL8763E是一个IC系列的名称，包含RTL8763EWE-VP和RTL8763EW-VC。RTL876
 ##  RTL8773E
 RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用户数据（userdata）打包处理过程如下
 
-### 生成用户数据（userdata）
+### 生成用户数据
 
 1. 将生成的图像`bin`文件复制到 `\src\app\watch\gui_application\root_image\root\8773e_watch`目录，并将生成的字体`bin`文件复制到 `\src\app\watch\gui_application\root_image\root\font`目录。
 2. 修改构建地址（`build address`）：开发者需要通过修改 `mkromfs_0x4400000.bat` 文件（python_bin_mkromfs_0x4400000.py --binary `--addr 0x238b400` root root(0x4400000).bin）。这里的 `--addr` 参数对应于闪存映射中的 userdata 地址加上 0x400（图像头部大小）。

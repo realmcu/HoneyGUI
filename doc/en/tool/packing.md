@@ -35,7 +35,7 @@ The process for generating user data is as follows:
 ##  RTL8773E
 RTL8773E is the name of a series IC type, including RTL8773EWE/RTL8773EWE-VP, The packaging process is as follows
 
-### Generate root bin
+### Generate Root Bin
 1. Copy generated images bin to this folder ```\src\app\watch\gui_application\root_image\root\8773e_watch``` and Copy generated font bin to this folder ```\src\app\watch\gui_application\root_image\root\font```.
 2. Modify build address: You need to adjust the address to ```0x238b400``` by modifying this file ```mkromfs_0x4400000.bat``` (python_bin_mkromfs_0x4400000.py --binary `--addr 0x238b400` root root(0x4400000).bin). The --addr corresponds to the flash map userdata address +0x400 (image header size)
 3. Double-click ```mkromfs_0x4400000.bat``` in the ```\src\app\watch\gui_application\root_image``` directory to execute the script and generate an image of the root folder. A new bin `root(0x4400000).bin` file and h file `ui_resource.h` will appear in the directory.
@@ -60,7 +60,7 @@ The generated ui_resource.h requires the following code to be added manually
 #endif
 ```
 
-### Generate userdata bin
+### Generate Userdata Bin
 It needs to use MPPGTOOL to generate user data Generate process as follows:
 <br/>
 <div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png"></div>
