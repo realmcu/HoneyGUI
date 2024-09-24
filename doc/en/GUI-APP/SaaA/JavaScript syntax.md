@@ -1,4 +1,4 @@
-# JavaScript syntax
+# JavaScript Syntax
 
 
 
@@ -11,7 +11,7 @@
 - When the window makes graphic transformations, such as panning and scaling, the nested widgets will make consistent transformations. 
 - This widget can monitor multiple gestures.
 
-### Hide a window
+### Hide A Window
 - This ```win``` variable is assigned the  ```win``` tag ```'heat_win'```'s handle
 - The variable ```hid``` is assigned the handle of the ```hidden``` attribute of the ```win``` tag.
 - The value of the ```hidden``` attribute is set to ```'hidden'``` to achieve hiding
@@ -23,7 +23,7 @@ if (!hid) {
     win.setAttribute("hidden", "hidden");
 }
 ```
-### Listen to gestures
+### Listen to Gestures
 - The ```win.onPress``` function enables the win widget to monitor the event of the finger touching the screen. If the finger touches the screen within the area of the window, the parameter function will be executed.
 - The ```win.onRelease``` function enables the win widget to monitor the event of the finger leaving the screen.
 - This ```winNromalOnPressFunc``` function will be executed when the finger touches the screen.
@@ -40,7 +40,7 @@ function winNromalOnReleaseFunc(params) {
 }
 win.onRelease(winNromalOnReleaseFunc)
 ```
-### Swap windows
+### Swap Windows
 * The implementation logic is that clicking the current window will hide the current window and display another window.
 * click to swap windows between ```'cool_win'``` and ```'heat_win'```
 * The ```win.onClick``` function enables the win widget to monitor the event of the finger clicking the screen.
@@ -87,7 +87,7 @@ win.onClick(hideHeat)
 
 
 ## Button
-### Monitor button press event
+### Monitor Button Press Event
 * Can be used to develop button press highlight effects or buttons that require quick response.
 * Listen to press gesture, the function ```iconNromalOnPressFunc``` will trigger when finger touchs screen within the area of the button.
 
@@ -115,7 +115,7 @@ icon.onPress(iconNromalOnPressFunc)
 
 ## Text
 
-### Change text content 
+### Change Text Content 
 * Using ```textbox.write``` function.
 
 ```javascript
@@ -130,7 +130,7 @@ icon.onPress(iconNromalOnPressFunc)
     setPosition : function (position : object) {}, //var position={x:0,y:0}
 ```
 ## Seekbar
-### Display current progress
+### Display Current Progress
 * Drag the progress bar and then the text shows the current progress.
 * ```seekbar.progress``` function can read and write the progress.
 * ```seekbar.onPressing``` function will listen for events where your finger is kept pressed on the screen. This parameter function will be executed in each frame, while the finger is in contact with the screen.
@@ -151,7 +151,7 @@ function seekbarOnPressing(params) {
 }
 seekbar.onPressing(seekbarOnPressing)
 ```
-### A seekbar animation that increases from 0 to 100%
+### A Seekbar Animation That Increases From 0 to 100%
 * the seekbar will display an animation that continuously progresses from start to finish and then loops back to the start, creating a perpetually moving progress bar.
 * ```seekbar.setAnimate```this function sets the frame animation of the seekbar, and the parameters passed are the frame animation callback and animation duration properties.
 * Define an object ```curtainAnimateTiming``` to specify the timing properties for an animation. ```duration``` sets the duration of one cycle of the animation in milliseconds. ```iterations``` is the number of times the animation should repeat, and -1 indicates the animation should repeat indefinitely.
@@ -186,7 +186,7 @@ seekbar.palyAnimate()
 ```
 ## Switch
 
-### Listen to 2 gestures
+### Listen to 2 Gestures
 * The switch control has two events, namely, being triggered by being turned on and being triggered by being turned off.
 * ```sw.onOn```This function is used to register the turned on event.
 * ```sw.onOff```This function is used to register the turned off event.
@@ -203,7 +203,7 @@ function swOnOffFunc(params) {
 sw.onOff(swOnOffFunc)
 sw.turnOn();
 ```
-### Turn on a led (P1_1)
+### Turn on A Led (P1_1)
 ```javascript
 var P1_1 = 9
 var LED1 = new Gpio(P1_1, 'out');

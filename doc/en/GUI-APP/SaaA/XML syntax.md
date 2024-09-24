@@ -1,4 +1,4 @@
-# XML syntax
+# XML Syntax
 ## Element
 - Element corresponding widget
 - Element's attributes corresponding widget's attributes (0 value can be ignored)
@@ -137,7 +137,7 @@ The nesting structure of elements is consistent with the nesting structure of ac
 | id2 |Secondary parameter|number|
 
 ## Example
-### win 
+### Win 
 ```xml
 <win
     x="0"
@@ -146,7 +146,7 @@ The nesting structure of elements is consistent with the nesting structure of ac
     h="480">cool_win
 </win>
 ```
-### img 
+### Img 
 ```xml
 <img
     x="80"

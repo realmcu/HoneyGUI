@@ -43,18 +43,18 @@ description on the ```JavaScript syntax``` page.
 progressbar.getElementById('tag name')
 var progress = progressbar.progress(0.7)
 ```
-#### Define a progressbar object
+#### Define A Progressbar Object
 In fact, this object is added to the global object. Using property of the global object does not require explicitly calling the global object.
 ```c
 jerry_value_t progress = jerry_create_object();
 js_set_property(global_obj, "progressbar", progress);
 ```
-#### Add 2 functions to the progressbar object
+#### Add 2 Functions to The Progressbar Object
 ```c
 REGISTER_METHOD(progress, progress);
 REGISTER_METHOD(progress, getElementById);
 ```
-#### Define 2 functions
+#### Define 2 Functions
 * The ```progress``` is used to write and read the progressbar's progress.
 * Input formal parameters are in the array ```args```. The first in it is the progress number. If this parameter exists, which means that the progress needs to be set. Using ```jerry_get_number_value()``` to convert javascript parameter to c language variable.
 * The return value is the progress you want to get, using ```jerry_create_number``` to convert c language variable to javascript variable. By the way, the form of these javascript variables in C language is an index of an unsigned integer.
@@ -96,7 +96,7 @@ DECLARE_HANDLER(getElementById)
     return jerry_create_undefined();
 }
 ```
- ### Light control
+### Light Control
 This page shows how the  UI switch corresponds to the peripheral switch.
 ```javascript
 //IO P1_1 is set to low level
@@ -104,7 +104,7 @@ var P1_1 = 9
 var LED1 = new Gpio(P1_1, 'out');
 LED1.writeSync(0)
 ```
-#### Light swtich data
+#### Light Swtich Data
 
 |data|value type|brief|
 |---|---|---|
@@ -113,14 +113,14 @@ LED1.writeSync(0)
 |write value|number|0 for turning off / 1 for turning on |
 
 - Refer to [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage) for more information.
-#### GPIO light Switch
+#### GPIO Light Switch
 - Get gpio index , direction, and write value;
 - Use gpio driver ```drv_pin_mode()``` & ```drv_pin_write()``` to operate it;
-#### MATTER light Switch
+#### MATTER Light Switch
 - Get gpio index, and write value;
 - Tramsform data to matter protocol;
 - Use ```matter_send_msg_to_app()``` to operate lights;
-#### MESH light Switch
+#### MESH Light Switch
 - Get gpio index, and write value;
 - Tramsform data to mesh protocol;
 - Use ```matter_send_msg_to_app()``` to operate lights;
