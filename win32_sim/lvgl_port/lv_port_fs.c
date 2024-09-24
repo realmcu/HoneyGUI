@@ -4,17 +4,21 @@
  */
 
 /*Copy this file as "lv_port_fs.c" and set this value to "1" to enable content*/
-#if 0
+#if 1
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_port_fs_template.h"
-#include "../../lvgl.h"
+#include "lv_port_fs.h"
+#include "lvgl.h"
+#include <stdio.h>
+#include <dirent.h>
 
 /*********************
  *      DEFINES
  *********************/
+
+#define LV_ROOT_PATH "gui_engine\\example\\screen_lvgl\\root\\"
 
 /**********************
  *      TYPEDEFS
@@ -70,7 +74,7 @@ void lv_port_fs_init(void)
     lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
-    fs_drv.letter = 'P';
+    fs_drv.letter = 'F';
     fs_drv.open_cb = fs_open;
     fs_drv.close_cb = fs_close;
     fs_drv.read_cb = fs_read;
@@ -107,25 +111,32 @@ static void fs_init(void)
 static void *fs_open(lv_fs_drv_t *drv, const char *path, lv_fs_mode_t mode)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+    char *root_folder = LV_ROOT_PATH;
+    char *file_path = gui_malloc(strlen(path) + strlen(root_folder) + 1);
 
     void *f = NULL;
 
+    sprintf(file_path, "%s%s", root_folder, path);
     if (mode == LV_FS_MODE_WR)
     {
         /*Open a file for write*/
-        f = ...         /*Add your code here*/
+        f = NULL;          /*Add your code here*/
     }
     else if (mode == LV_FS_MODE_RD)
     {
         /*Open a file for read*/
-        f = ...         /*Add your code here*/
+#ifndef O_BINARY
+#define O_BINARY 0100000
+#endif
+        f = open(file_path, O_BINARY);         /*Add your code here*/
     }
     else if (mode == (LV_FS_MODE_WR | LV_FS_MODE_RD))
     {
         /*Open a file for read and write*/
-        f = ...         /*Add your code here*/
+        f = NULL;          /*Add your code here*/
     }
 
+    gui_free(file_path);
     return f;
 }
 
@@ -140,7 +151,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p)
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
     /*Add your code here*/
-
+    res = close((int)file_p);
     return res;
 }
 
@@ -155,10 +166,10 @@ static lv_fs_res_t fs_close(lv_fs_drv_t *drv, void *file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t btr, uint32_t *br)
 {
-    lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+    lv_fs_res_t res = LV_FS_RES_OK;
 
     /*Add your code here*/
-
+    *br = read((int)file_p, buf, btr);
     return res;
 }
 
@@ -174,10 +185,10 @@ static lv_fs_res_t fs_read(lv_fs_drv_t *drv, void *file_p, void *buf, uint32_t b
 static lv_fs_res_t fs_write(lv_fs_drv_t *drv, void *file_p, const void *buf, uint32_t btw,
                             uint32_t  *bw)
 {
-    lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+    lv_fs_res_t res = LV_FS_RES_OK;
 
     /*Add your code here*/
-
+    *bw = write((int)file_p, buf, btw);
     return res;
 }
 
@@ -194,7 +205,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_w
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
     /*Add your code here*/
-
+    res = lseek((int)file_p, pos, whence);
     return res;
 }
 /**
@@ -223,8 +234,14 @@ static void *fs_dir_open(lv_fs_drv_t *drv, const char *path)
 {
     void *dir = NULL;
     /*Add your code here*/
-    dir = ...           /*Add your code here*/
-          return dir;
+    char *root_folder = LV_ROOT_PATH;
+    char *file_path = gui_malloc(strlen(path) + strlen(root_folder) + 1);
+
+    sprintf(file_path, "%s%s", root_folder, path);
+    DIR *fsDir = opendir(file_path);
+    dir = (void *)fsDir;
+    gui_free(file_path);
+    return dir;
 }
 
 /**
@@ -237,10 +254,15 @@ static void *fs_dir_open(lv_fs_drv_t *drv, const char *path)
  */
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *rddir_p, char *fn)
 {
-    lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+    lv_fs_res_t res = LV_FS_RES_OK;
 
     /*Add your code here*/
-
+    struct dirent *dir;
+    dir = readdir((DIR *)rddir_p);
+    if (fn && dir)
+    {
+        memcpy(fn, dir->d_name, dir->d_namlen);
+    }
     return res;
 }
 
@@ -252,10 +274,10 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t *drv, void *rddir_p, char *fn)
  */
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t *drv, void *rddir_p)
 {
-    lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+    lv_fs_res_t res = LV_FS_RES_OK;
 
     /*Add your code here*/
-
+    closedir(rddir_p);
     return res;
 }
 
