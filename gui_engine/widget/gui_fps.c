@@ -70,7 +70,13 @@
   * @{
   */
 static gui_text_t *t;
+static gui_text_t *widget_count;
 static char fps[10];
+static char widget_count_string[20];
+static gui_text_t *mem;
+static gui_text_t *low_mem;
+static char mem_string[20];
+static char low_mem_string[20];
 /** End of WIDGET_Exported_Variables
   * @}
   */
@@ -86,11 +92,16 @@ static void gui_fps_cb(void *p, void *this_widget, gui_animate_t *animate)
 
     int fps_num = gui_fps();
     sprintf(fps, "FPS:%d", fps_num);
-    //gui_log("%d\n",fps_num);
-    {
-        gui_text_content_set(t, fps, strlen(fps));
-    }
-
+    gui_text_content_set(t, fps, strlen(fps));
+    int widget_count_number = gui_get_obj_count();
+    sprintf(widget_count_string, "WIDGETS:%d", widget_count_number);
+    gui_text_content_set(widget_count, widget_count_string, strlen(widget_count_string));
+    uint32_t mem_number =  gui_mem_used();
+    uint32_t low_mem_number =  gui_low_mem_used();
+    sprintf(mem_string, "RAM:%dKB", (int)mem_number / 0x400);
+    gui_text_content_set(mem, mem_string, strlen(mem_string));
+    sprintf(low_mem_string, "lowRAM:%dKB", (int)low_mem_number / 0x400);
+    gui_text_content_set(low_mem, low_mem_string, strlen(low_mem_string));
 
 }
 
@@ -913,16 +924,30 @@ void gui_fps_create(void *parent)
     char *text;
     int font_size = 16;
     gui_canvas_rect_t *rect = gui_canvas_rect_create(parent, "WIDGET gui_fps_img",
-                                                     gui_get_screen_width() / 2 - 100 / 2, 0, 100, 50, APP_COLOR_GRAY_OPACITY(100));
+                                                     gui_get_screen_width() / 2 - 120 / 2, 0, 120, 65, APP_COLOR_GRAY_OPACITY(150));
     gui_win_t *win = gui_win_create(parent, 0, 0, 0, 454, 454);
     gui_win_set_animate(win, 500, -1, gui_fps_cb, win);
 
     sprintf(fps, "FPS:%d", 1000 / gui_spf());
     text = fps;
-    t = gui_text_create(rect, "WIDGET gui_fps_text", 35, 0, gui_get_screen_width(), font_size);
+    t = gui_text_create(rect, "WIDGET gui_fps_text", 0, 0, gui_get_screen_width(), font_size);
     gui_text_set(t, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
     gui_font_mem_init(addr1);
     gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
+    widget_count = gui_text_create(rect, "WIDGET gui_fps_text", 0, 16, gui_get_screen_width(),
+                                   font_size);
+    gui_text_set(widget_count, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_font_mem_init(addr1);
+    gui_text_type_set(widget_count, addr1, FONT_SRC_MEMADDR);
+    mem = gui_text_create(rect, "WIDGET gui_fps_text", 0, 16 * 2, gui_get_screen_width(), font_size);
+    gui_text_set(mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_font_mem_init(addr1);
+    gui_text_type_set(mem, addr1, FONT_SRC_MEMADDR);
+    low_mem = gui_text_create(rect, "WIDGET gui_fps_text", 0, 16 * 3, gui_get_screen_width(),
+                              font_size);
+    gui_text_set(low_mem, text, GUI_FONT_SRC_BMP, gui_rgb(255, 255, 255), strlen(text), font_size);
+    gui_font_mem_init(addr1);
+    gui_text_type_set(low_mem, addr1, FONT_SRC_MEMADDR);
 }
 
 /** End of WIDGET_Exported_Functions

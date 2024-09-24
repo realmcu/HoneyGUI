@@ -357,7 +357,13 @@ static void gui_walker(void *ptr, size_t size, int used, void *user)
     gui_log("\t%p %s size: %x; total = %d\n", ptr, used ? "used" : "free", (unsigned int)size,
             total_used_size);
 }
-
+static void walker(void *ptr, size_t size, int used, void *user)
+{
+    if (used)
+    {
+        total_used_size = total_used_size + size;
+    }
+}
 void gui_mem_debug(void)
 {
     total_used_size = 0;
@@ -368,7 +374,14 @@ void gui_mem_debug(void)
     gui_log("\t\n");
     total_used_size = 0;
 }
-
+uint32_t gui_mem_used(void)
+{
+    total_used_size = 0;
+    GUI_UNUSED(total_used_size);
+    GUI_ASSERT(tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(tlsf), walker, &total_used_size);
+    return total_used_size;
+}
 
 void *gui_lower_malloc(size_t n)
 {
@@ -407,7 +420,14 @@ void gui_lower_mem_debug(void)
     GUI_ASSERT(lower_tlsf != NULL);
     tlsf_walk_pool(tlsf_get_pool(lower_tlsf), NULL, NULL);
 }
-
+uint32_t gui_low_mem_used(void)
+{
+    total_used_size = 0;
+    GUI_UNUSED(total_used_size);
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(lower_tlsf), walker, &total_used_size);
+    return total_used_size;
+}
 void gui_sleep_cb(void)
 {
     if (os_api->gui_sleep_cb != NULL)

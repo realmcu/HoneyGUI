@@ -296,6 +296,18 @@ gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue);
  * @return fps
  */
 uint32_t gui_fps(void);
+/**
+ * @brief Get ram used in byte.
+ *
+ * @return uint32_t
+ */
+uint32_t gui_mem_used(void);
+/**
+ * @brief Get low ram (another ram) used in byte.
+ *
+ * @return uint32_t
+ */
+uint32_t gui_low_mem_used(void);
 /** End of SERVER_Exported_Functions
   * @}
   */

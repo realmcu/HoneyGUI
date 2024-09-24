@@ -715,6 +715,10 @@ void gui_inertial(int *speed, int end_speed, int *offset);
  * @param[in] obj Pointer to the GUI object root.
  */
 void gui_obj_tree_print_mmd(gui_obj_t *obj);
+/**
+ * @brief get widget count
+ */
+uint32_t gui_get_obj_count();
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
