@@ -61,8 +61,8 @@
     };
     ```
 
-- 在 `DC_SINGLE` 模式下，帧缓冲区的大小为 `fb_width*fb_height*bit_depth/8`。
-- 在 `DC_RAMLESS` 模式下，使用了两个部分帧缓冲区，大小为`fb_width*fb_height*bit_depth/8`，此时的`fb_height`是分段高度。
+- 在 `DC_SINGLE` 模式下，帧缓冲区的大小为 `screen_width * screen_height * bit_depth / 8`。
+- 在 `DC_RAMLESS` 模式下，使用了两个部分帧缓冲区，大小为`fb_width*fb_height * bit_depth / 8`，此时的`fb_height`是分段高度。
 
 ### 支持接口类型
 
@@ -75,7 +75,6 @@
 | [RTL8763E]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
 | [RTL8772G]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
 | [RTL8773E]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
-| RTL8772F                                                         |   Y   |  Y   |  Y  |  Y   |  Y  |
 
 ```{note}
 'Y' 表示驱动程序已包含在库中。
@@ -92,7 +91,6 @@
 | [RTL8763E]                                                      |   NA   |    NA    |    Y    |   NA   |    NA   |    NA   |   NA   |    NA    |    NA   |    Y    |    NA   |   NA   |    NA   |
 | [RTL8772G]                                                      |   Y    |    Y     |    Y    |   Y    |    Y    |    Y    |   Y    |    NA    |    NA   |    NA   |    NA   |   NA   |    NA   |
 | [RTL8773E]                                                      |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   NA   |    NA    |    Y    |    NA   |    NA   |   NA   |    NA   |
-| RTL8772F                                                       |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
 
 ```{note}
 'Y' 表示驱动程序已包含在库中。
@@ -151,16 +149,11 @@
 | [RTL8763E]                                                       |    NA   |    NA    |   NA   |   NA  |   NA   |     Y   |     Y  |
 | [RTL8772G]                                                       |    NA   |    NA    |   NA   |    Y  |    Y   |    NA   |    NA  |
 | [RTL8773E]                                                       |    Y    |    NA    |   NA   |    Y  |   NA   |    NA   |    NA  |
-| RTL8772F                                                         |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
 
 ```{note}
 'Y' 表示驱动程序已包含在库中。
 'NA' 表示驱动程序尚未包含在库中。
 ```
-
-### 物理按键
-
-### 编码器滚轮
 
 ## 操作系统
 

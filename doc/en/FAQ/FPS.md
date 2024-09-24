@@ -29,5 +29,5 @@ Almost all image compression reduces the refresh rate of the UI, so avoid using 
 
 ### Standard TTF Files
 
-* Using TTF files to display text is significantly slower than using BMP.
+* Using TTF files to display text is significantly slower than using BIN.
 * TTF files can be clipped through an open source solution.

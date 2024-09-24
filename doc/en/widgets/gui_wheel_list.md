@@ -1,10 +1,10 @@
-# Wheel list
+# Wheel List
 
 The wheel list widget is an application list interface, mainly composed of application icons arranged in multiple circular layers. Each layer can rotate independently, and each icon can have an associated callback.
 
 ## Usage
 
-### Create a wheel list
+### Create a Wheel List
 
 [gui_wheel_list_t *gui_wheel_list_create(void *parent, uint8_t layer, uint8_t radius, uint8_t distence)](#gui_wheel_list_create) creates a wheel list widget.
 
@@ -17,7 +17,7 @@ The wheel list widget is an application list interface, mainly composed of appli
 In Layer 0, there is a central icon, whose center is at the center of the screen. This point serves as the reference for calculating the positions of other icons.
 The number of icons in each layer is 6*n, where n represents the number of icon layers. Therefore, the closer to the outer layer, the more icons there are, and the smaller the angle between the centers of adjacent icons and the center of the screen on the same layer.
 
-### Add icon
+### Add Icon
 
 #### Default
 

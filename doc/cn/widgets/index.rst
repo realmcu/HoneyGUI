@@ -33,7 +33,7 @@
 `画布圆角矩形 (Canvas_round_rect)`_  显示一个圆角矩形
 `画布弧形 (Canvas_arc)`_             显示一个弧形
 `多级菜单 (Multi Level)`_            管理和操作多层子窗口
-`趣带特效 (LiteGFX)`_                第三方合作特效
+`趣戴特效 (LiteGFX)`_                第三方合作特效
 `2.5D足球 (2.5D Soccer)`_            2.5D足球特效
 ==================                   ==================
 
@@ -65,7 +65,7 @@
 .. _返回 (Return): gui_return.html
 .. _二维码或条形码 (Qbcode): qbcode.html
 .. _多级菜单 (Multi Level): gui_multi_level.html
-.. _趣带特效 (LiteGFX): gui_widget_litegfx.html
+.. _趣戴特效 (LiteGFX): gui_widget_litegfx.html
 .. _2.5D足球 (2.5D Soccer): gui_soccer.html
 
 .. csv-table:: 缩略语
@@ -143,5 +143,5 @@
     返回 (Return) <gui_return>
 	二维码或条形码 (Qbcode) <gui_qbcode>
     多级菜单 (Multi Level) <gui_multi_level>
-    趣带特效 (LiteGFX) <gui_widget_litegfx>
+    趣戴特效 (LiteGFX) <gui_widget_litegfx>
     2.5D足球 (2.5D Soccer) <gui_soccer>
