@@ -224,7 +224,6 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 return LV_RES_INV;
             }
 
-            //err = PPE_blend(&zoom, &target, &trans, mode);
             err = PPE_blend_rect(&zoom, &target, &trans, &blend_rect, mode);
             if (err == PPE_SUCCESS)
             {
@@ -239,7 +238,18 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
         {
             uint32_t extra_line = ceil(zoom_ratio);
             uint32_t zoom_line_num = buffer_size / (new_width * pixel_byte);
-            for (int y = 0; y < new_height; y += (zoom_line_num - extra_line))
+            uint32_t actual_inc = 0;
+            int32_t start_column = (0 - blend_rect.x1) / zoom_ratio;
+            int32_t end_column = ceil(blend_rect.x2 / zoom_ratio);
+            if (start_column < 0)
+            {
+                start_column = 0;
+            }
+            if (end_column >= source.width)
+            {
+                end_column = source.width - 1;
+            }
+            for (int y = 0; y < new_height; y += actual_inc)
             {
                 uint32_t start_line = y / zoom_ratio;
                 uint32_t end_line = (y + zoom_line_num - extra_line) / zoom_ratio;
@@ -247,19 +257,32 @@ lv_res_t lv_ppe_blit_transform(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t 
                 {
                     end_line = source_height - 1;
                 }
-                ppe_rect_t scale_rect = {.left = 0, .top = start_line, .bottom = end_line, .right = source.width - 1};
+                ppe_rect_t scale_rect = {.left = start_column, .top = start_line, .bottom = end_line, .right = end_column};
                 PPE_ERR err = PPE_Scale_Rect(&source, &zoom, zoom_ratio, zoom_ratio, &scale_rect);
                 if (err != PPE_SUCCESS)
                 {
                     return LV_RES_INV;
                 }
                 trans.y = new_start_point.y + y;
+                if (trans.x < 0)
+                {
+                    trans.x = 0;
+                }
+                if (y + zoom.height < new_height)
+                {
+                    actual_inc = zoom.height - extra_line;
+                }
+                else
+                {
+                    actual_inc = zoom.height;
+                }
+                zoom.height = actual_inc;
                 err = PPE_blend_rect(&zoom, &target, &trans, &blend_rect, mode);
                 if (err != PPE_SUCCESS)
                 {
                     return LV_RES_INV;
                 }
-                if ((trans.y + zoom_line_num - extra_line) > draw_ctx->buf_area->y2)
+                if ((int32_t)(trans.y + actual_inc) >= (int32_t)draw_ctx->buf_area->y2)
                 {
                     break;
                 }
