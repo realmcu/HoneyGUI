@@ -105,8 +105,9 @@ void app_dashboard_launcher_ui_design(gui_app_t *app)
     app_dashboard_initialize_data();
 
 }
-
+#if defined _WIN32
 uint8_t resource_root[1024 * 1024 * 20];
+#endif
 static int app_init(void)
 {
 #if defined _WIN32
