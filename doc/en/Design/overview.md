@@ -1,8 +1,8 @@
-# RealUI system overview
+# RealUI System
 
 RealUI system is an efficient embedded solution for display projects based on HoneyGUI.
 
-## RealUI workflow
+## RealUI Workflow
 
 The workflow of the RealUI system is mainly divided into four steps.
 
