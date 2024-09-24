@@ -111,6 +111,7 @@ figcaption, figcaption p{
     }
 
     /* fixed top nav setting */
+    .wy-nav-side.shift,
     .wy-grid-for-nav {
         top: 60px;
     }
@@ -123,6 +124,11 @@ figcaption, figcaption p{
     }
     .wy-nav-top i {
         float: right;
+    }
+
+    .wy-nav-content-wrap.shift {
+        position: initial;
+        height: auto;
     }
 }
 

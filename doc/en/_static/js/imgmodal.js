@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             imgModal.style.display = "flex";
+            imgModal.style.justifyContent = 'center';
+            imgModal.style.alignItems = 'center';
+
             imgInModal.src = this.src;
             initModalImageSize();
             document.documentElement.style.overflow = "hidden"; // Disable scrolling
