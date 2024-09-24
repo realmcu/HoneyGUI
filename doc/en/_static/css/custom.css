@@ -402,7 +402,7 @@ section[id*="deprecated-api"] dd dl {
     border-radius: 50%;
     box-shadow: 0 0 5px 0 rgba(0,0,0,.27);
     cursor: pointer;
-    z-index: 1000;
+    z-index: 900;
     transition: all .3s ease-out;
 }
  
@@ -432,6 +432,10 @@ section[id*="deprecated-api"] dd dl {
 
 .img-modal {
     display: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     left: 0;
     top: 0;
@@ -439,14 +443,6 @@ section[id*="deprecated-api"] dd dl {
     height: 100%;
     background-color: rgba(0,0,0,0.6);
     z-index: 1000;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-.modal-img-box {
-    max-width: 80%;
-    max-height: 80%;
-    margin: auto;
     overflow: auto;
 }
 @keyframes imgzoom {
@@ -454,16 +450,15 @@ section[id*="deprecated-api"] dd dl {
     to {transform: scale(1)}
 }
 .img-in-modal {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* 使图片适应容器的大小，同时保持图片的长宽比 */
-    transform-origin: top left; /* 设置缩放原点为左上角 */
-    transition: transform 0.4s ease;
+    max-width: 100%; /* 防止图片最大宽度限制 */
+    max-height: 100%; /* 防止图片最大高度限制 */
+    transform-origin: center center; /* 设置 transform 原点 */
     animation-name: imgzoom;
     animation-duration: 0.6s;
+    transition: transform 0.6s ease;
 }
 .img-modal-close {
-    position: absolute;
+    position: fixed;
     top: 2%;
     right: 4%;
     color: #fff;

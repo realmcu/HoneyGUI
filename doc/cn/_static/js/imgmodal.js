@@ -1,23 +1,36 @@
 document.addEventListener("DOMContentLoaded", function () {
     var imgModal = document.getElementById("imgModal");
     var imgInModal= document.getElementById("imgInModal");
-    var imgContainer = imgInModal.parentElement;
     var closeImgModal = document.getElementsByClassName("img-modal-close")[0];
     var currentScale = 1;
 
     // 初始化图片大小，使其适应容器
     function initModalImageSize() {
-        const containerWidth = imgContainer.clientWidth;
-        const containerHeight = imgContainer.clientHeight;
         const imgNaturalWidth = imgInModal.naturalWidth;
         const imgNaturalHeight = imgInModal.naturalHeight;
+        const imgRatio = imgNaturalWidth / imgNaturalHeight;
 
-        const widthRatio = containerWidth / imgNaturalWidth;
-        const heightRatio = containerHeight / imgNaturalHeight;
-        const initScale = Math.min(widthRatio, heightRatio);
+        const innerWidth = window.innerWidth;
+        const innerHeight = window.innerHeight;
+        const winRatio = innerWidth / innerHeight;
 
-        imgInModal.style.width = `${imgNaturalWidth * initScale}px`;
-        imgInModal.style.height = `${imgNaturalHeight * initScale}px`;
+        var imgRenderWidth = imgNaturalWidth;
+        var imgRenderHeight = imgNaturalHeight;
+        if(imgRatio >= winRatio) {
+            imgRenderWidth = Math.min(imgNaturalWidth, innerWidth);
+            imgRenderHeight = imgRenderWidth / imgRatio;
+        }
+        else {
+            imgRenderHeight = Math.min(imgNaturalHeight, innerHeight);
+            imgRenderWidth = imgRenderHeight * imgRatio;
+        }
+
+        imgInModal.style.width = `${imgRenderWidth}px`;
+        imgInModal.style.height = `${imgRenderHeight}px`;
+
+        imgInModal.style.transformOrigin = "center center";
+        imgInModal.style.transform = 'scale(1)'; // Reset scale and translation on each open
+        currentScale = 1; // Reset scale value
     }
 
     document.querySelectorAll('.rst-content img').forEach(function(imgItem) {
@@ -37,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    closeImgModal.onclick = function() { 
+    closeImgModal.onclick = function() {
         imgModal.style.display = "none";
         document.documentElement.style.overflow = "auto"; // Enable scrolling
     }
@@ -49,16 +62,45 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function listenImgModalcroll() {
+        const hasHorScrollBar = (imgInModal.clientWidth * currentScale) > imgModal.clientWidth;
+        const hasVerScrollBar = (imgInModal.clientHeight * currentScale) > imgModal.clientHeight;
+
+        if (hasHorScrollBar) {
+            imgModal.style.justifyContent = 'start';
+            if (hasVerScrollBar) {
+                imgModal.style.alignItems = 'start';
+                imgInModal.style.transformOrigin = 'left top';
+            } else {
+                imgModal.style.alignItems = 'center';
+                imgInModal.style.transformOrigin = 'left center';
+            }
+        }
+        else {
+            imgModal.style.justifyContent = 'center';
+            if (hasVerScrollBar) {
+                imgModal.style.alignItems = 'start';
+                imgInModal.style.transformOrigin = 'center top';
+            } else {
+                imgModal.style.alignItems = 'center';
+                imgInModal.style.transformOrigin = 'center center';
+            }
+        }
+    }
+
     // Zoom in/out
     imgInModal.addEventListener("wheel", function(event) {
         event.preventDefault();
+
         if (event.deltaY < 0) {
             // Scroll up (zoom in)
-            currentScale += 0.1;
+            currentScale = Math.min(3, currentScale + 0.06); // Avoid scaling below the original size
         } else {
             // Scroll down (zoom out)
-            currentScale = Math.max(1, currentScale - 0.1); // Avoid scaling below the original size
+            currentScale = Math.max(0.7, currentScale - 0.06); // Avoid scaling below the original size
         }
+
         imgInModal.style.transform = `scale(${currentScale})`;
+        listenImgModalcroll();
     });
 });
