@@ -308,6 +308,36 @@ uint32_t gui_mem_used(void);
  * @return uint32_t
  */
 uint32_t gui_low_mem_used(void);
+
+/**
+ * @brief Play the specified music file.
+ *
+ * This function starts playing the music file specified by the path `music_file`.
+ *
+ * @param[in] music_file The path to the music file to play.
+ *
+ * @return #GUI_SUCCESS if the operation was successful.
+ */
+gui_error_t gui_music_play(const char *music_file);
+
+/**
+ * @brief Stop the currently playing music.
+ *
+ * This function stops playback of any music currently being played.
+ *
+ * @return #GUI_SUCCESS if the music was successfully stopped.
+ */
+gui_error_t gui_music_stop(void);
+
+/**
+ * @brief Check if the music playback has completed.
+ *
+ * This function checks if the currently playing music has finished playing.
+ *
+ * @return true if the music playback has completed.
+ * @return false if the music is still playing.
+ */
+bool gui_music_completion_status(void);
 /** End of SERVER_Exported_Functions
   * @}
   */

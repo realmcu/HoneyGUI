@@ -540,6 +540,8 @@ _GUI_API_ASSIGN(gui_switch_t)
      .on_press = on_press,
       .animate = animate,
        .on_release = on_release,
+        .turn_off_no_event = gui_switch_is_off,
+         .turn_on_no_event = gui_switch_is_on,
 };
 /** End of WIDGET_Exported_Functions
   * @}

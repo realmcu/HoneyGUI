@@ -75,6 +75,7 @@ struct gui_switch
 
 _GUI_API_DEFINE(gui_switch_t)
 void (*turn_off)(gui_switch_t *sw);
+
 void (*turn_on)(gui_switch_t *sw);
 void (*on_turn_on)(gui_switch_t *this, void *cb, void *p);
 void (*on_turn_off)(gui_switch_t *this, void *cb, void *p);
@@ -87,6 +88,8 @@ void (*animate)(gui_switch_t *this,
                 int           repeat_count,
                 void         *callback,
                 void         *p);
+void (*turn_off_no_event)(gui_switch_t *sw);
+void (*turn_on_no_event)(gui_switch_t *sw);
 _GUI_API_DECLARE(gui_switch_t)
 
 

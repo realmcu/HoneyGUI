@@ -11,6 +11,7 @@
 #include "gui_multi_level.h"
 #include "gui_button.h"
 #include "gui_soccer.h"
+#include "gui_fps.h"
 #include<stdio.h>
 #include<time.h>
 //Please search app name macro for entry
@@ -1825,15 +1826,6 @@ GUI_APP_ENTRY(APP_CYCLE_TRACKING)
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)win);
 }
 
-GUI_APP_ENTRY(APP_MUSIC)
-{
-    gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "WIN", 0, 200, 0, 0);
-    //gui_win_set_animate(win, 1000, -1, music_win_cb, win);
-
-    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
-                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)win);
-}
-
 GUI_APP_ENTRY(APP_WEB)
 {
 #ifdef ENABLE_RTK_GUI_WEB
@@ -2848,4 +2840,12 @@ GUI_APP_ENTRY(APP_BOX2D_RING)
 #endif
     gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
                       sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+}
+GUI_APP_ENTRY(APP_MUSIC)
+{
+    extern void app_music_ui_design(gui_obj_t *obj);
+    app_music_ui_design(GUI_APP_ROOT_SCREEN);
+    gui_return_create(GUI_APP_ROOT_SCREEN, gui_app_return_array,
+                      sizeof(gui_app_return_array) / sizeof(uint32_t *), win_cb, (void *)0);
+    gui_fps_create(GUI_APP_ROOT_SCREEN);
 }

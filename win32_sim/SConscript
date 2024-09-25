@@ -14,6 +14,7 @@ CPPPATH = [cwd,
 #src = Glob('*.c')
 src = ['main.c']
 src += ['batch.cpp']
+src += ['music.cpp']
 if GetDepend('CONFIG_REALTEK_BUILD_LETTER_SHELL'):
     src += ['test_cmd.c']
 

@@ -879,3 +879,27 @@ gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
 
     return color;
 }
+gui_error_t gui_music_play(const char *music_file)
+{
+#if _WIN32
+    extern int win32_play_music(const char *music_file);
+    win32_play_music(music_file);
+#endif
+    return GUI_SUCCESS;
+}
+gui_error_t gui_music_stop()
+{
+#if _WIN32
+    extern int win32_stop_music(void);
+    win32_stop_music();
+#endif
+    return GUI_SUCCESS;
+}
+bool gui_music_completion_status()
+{
+#if _WIN32
+    extern bool win32_music_completion_status(void);
+    return win32_music_completion_status();
+#endif
+    return 0;
+}
