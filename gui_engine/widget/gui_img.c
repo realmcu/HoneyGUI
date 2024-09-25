@@ -1119,24 +1119,24 @@ void gui_img_tree_convert_to_img_root_size(gui_obj_t *obj, gui_matrix_t *matrix,
     gui_free(dc_bak);
     gui_free(matrix_bak);
 }
-void gui_img_append_animate(gui_img_t *this,
-                            uint32_t   dur,
-                            int        repeat_count,
-                            gui_animate_callback_t callback,
-                            void      *p,
-                            const char *name)
+void gui_img_append_animate(gui_img_t              *_this,
+                            uint32_t                dur,
+                            int                     repeat_count,
+                            gui_animate_callback_t  callback,
+                            void                   *p,
+                            const char             *name)
 {
-    if (this->animate_array_length == 0 && this->animate)
+    if (_this->animate_array_length == 0 && _this->animate)
     {
-        memset(this->animate, 0, sizeof(*this->animate));
-        gui_free(this->animate);
-        this->animate = 0;
+        memset(_this->animate, 0, sizeof(*_this->animate));
+        gui_free(_this->animate);
+        _this->animate = 0;
     }
-    this->animate_array_length++;
-    this->animate = gui_realloc(this->animate, sizeof(gui_animate_t) * this->animate_array_length);
-    ((gui_animate_t **)(this->animate))[this->animate_array_length - 1] = gui_malloc(sizeof(
-                                                                              gui_animate_t));
-    gui_animate_t *animate = ((gui_animate_t **)(this->animate))[this->animate_array_length - 1];
+    _this->animate_array_length++;
+    _this->animate = gui_realloc(_this->animate, sizeof(gui_animate_t) * _this->animate_array_length);
+    ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1] = gui_malloc(sizeof(
+                                                                                gui_animate_t));
+    gui_animate_t *animate = ((gui_animate_t **)(_this->animate))[_this->animate_array_length - 1];
 
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;

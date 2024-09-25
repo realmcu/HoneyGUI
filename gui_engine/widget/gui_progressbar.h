@@ -117,26 +117,26 @@ typedef struct gui_progressbar
   * @{
   */
 /**
- * @brief create a horizontal progressbar based on picture
+ * @brief create a horizontal progressbar based on picture.
  *
- * @param parent parent widget
- * @param picture the picture background
+ * @param parent parent widget.
+ * @param picture the picture background.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
- * @return gui_progressbar_t*
+ * @return gui_progressbar_t*.
  */
 gui_progressbar_t *gui_progressbar_img_h_create(void    *parent,
                                                 void    *picture,
                                                 int16_t  x,
                                                 int16_t  y);
 /**
- * @brief create a horizontal progressbar based on picture
+ * @brief create a horizontal progressbar based on picture.
  *
- * @param parent parent widget
- * @param picture the picture background, should be ftl addr
+ * @param parent parent widget.
+ * @param picture the picture background, should be ftl addr.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
- * @return gui_progressbar_t*
+ * @return gui_progressbar_t*.
  */
 gui_progressbar_t *gui_progressbar_img_h_create_from_ftl(void    *parent,
                                                          void    *picture,
@@ -144,13 +144,13 @@ gui_progressbar_t *gui_progressbar_img_h_create_from_ftl(void    *parent,
                                                          int16_t  y);
 
 /**
- * @brief create a vertical progressbar based on picture
+ * @brief create a vertical progressbar based on picture.
  *
- * @param parent parent widget
- * @param picture the picture background
+ * @param parent parent widget.
+ * @param picture the picture background.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
- * @return gui_progressbar_t*
+ * @return gui_progressbar_t*.
  */
 gui_progressbar_t *gui_progressbar_img_v_create(void    *parent,
                                                 void    *picture,
@@ -158,13 +158,13 @@ gui_progressbar_t *gui_progressbar_img_v_create(void    *parent,
                                                 int16_t  y);
 
 /**
- * @brief create a vertical progressbar based on picture
+ * @brief create a vertical progressbar based on picture.
  *
- * @param parent parent widget
- * @param picture the picture background, should be ftl addr
+ * @param parent parent widget.
+ * @param picture the picture background, should be ftl addr.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
- * @return gui_progressbar_t*
+ * @return gui_progressbar_t*.
  */
 gui_progressbar_t *gui_progressbar_img_v_create_from_ftl(void    *parent,
                                                          void    *picture,
@@ -174,12 +174,12 @@ gui_progressbar_t *gui_progressbar_img_v_create_from_ftl(void    *parent,
 /**
  * @brief create a frame progressbar based on pictures, file source is memory address.
  *
- * @param parent parent widget
- * @param picture_array the pictures frame memory address
- * @param array_length picture_array length
+ * @param parent parent widget.
+ * @param picture_array the pictures frame memory address.
+ * @param array_length picture_array length.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
- * @return gui_progressbar_t*
+ * @return gui_progressbar_t*.
  */
 gui_progressbar_t *gui_progressbar_movie_create(void      *parent,
                                                 void     **picture_array,
@@ -190,12 +190,12 @@ gui_progressbar_t *gui_progressbar_movie_create(void      *parent,
 /**
  * @brief create a frame progressbar based on pictures, file source is filesystem.
  *
- * @param parent parent widget
- * @param picture_array the pictures frame filepath
- * @param array_length picture_array length
+ * @param parent parent widget.
+ * @param picture_array the pictures frame filepath.
+ * @param array_length picture_array length.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
- * @return gui_progressbar_t*
+ * @return gui_progressbar_t*.
  */
 gui_progressbar_t *gui_progressbar_movie_create_from_fs(void      *parent,
                                                         void     **picture_array,
@@ -203,42 +203,42 @@ gui_progressbar_t *gui_progressbar_movie_create_from_fs(void      *parent,
                                                         int16_t    x,
                                                         int16_t    y);
 /**
- * @brief set progress
+ * @brief set progress.
  *
- * @param this
- * @param progress
+ * @param this widget object pointer.
+ * @param progress the progress of widget.
  */
 void gui_progressbar_set_progress(gui_progressbar_t *this, size_t progress);
 
 /**
- * @brief get_progress
+ * @brief get_progress.
  *
- * @param this
+ * @param this widget object pointer.
  * @return size_t
  */
 size_t gui_progressbar_get_progress(gui_progressbar_t *this);
 
 /**
- * @brief set_percentage
+ * @brief set_percentage.
  *
- * @param this
- * @param percentage
+ * @param this widget object pointer.
+ * @param percentage the percentage of widget.
  */
 void gui_progressbar_set_percentage(gui_progressbar_t *this, float percentage);
 
 /**
- * @brief get_percentage
+ * @brief get_percentage.
  *
- * @param this
- * @return float
+ * @param this widget object pointer.
+ * @return float.
  */
 float gui_progressbar_get_percentage(gui_progressbar_t *this);
 
 /**
- * @brief get_max
+ * @brief get_max.
  *
- * @param this
- * @return size_t
+ * @param this widget object pointer.
+ * @return size_t.
  */
 size_t gui_progressbar_get_max(gui_progressbar_t *this);
 

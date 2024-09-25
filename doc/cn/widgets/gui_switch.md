@@ -22,7 +22,7 @@
 
 ### 改变开关控件状态
 
-开发者可以调用 [gui_switch_change_state(gui_switch_t *this, bool ifon)](#gui_switch_change_state)来设置开关控件的状态并改变UI，但不会触发任何事件(由gui_obj_add_event_cb创建)。
+开发者可以调用 [gui_switch_change_state(gui_switch_t *this, bool ifon)](#gui_switch_change_state) 来设置开关控件的状态并改变UI，但不会触发任何事件(由gui_obj_add_event_cb创建)。
 
 ## 示例
 

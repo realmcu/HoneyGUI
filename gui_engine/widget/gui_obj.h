@@ -214,14 +214,13 @@ typedef struct _gui_obj_t
   * @{
   */
 /**
-  * @param  this_widget
-  * @param  parent switching events
-  * @param  filename how to trigger events
-  * @param  x left
-  * @param  y top
-  * @param  w width
-  * @param  h height
-  * @return void
+  * @param this_widget pointer to the GUI image object.
+  * @param parent the father widget it nested in.
+  * @param filename the obj widget name.
+  * @param x the X-axis coordinate of the widget.
+  * @param y the Y-axis coordinate of the widget.
+  * @param w the width of the widget.
+  * @param h the hight of the widget.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(void *parent, const char *name, int16_t x,
@@ -242,15 +241,15 @@ void gui_obj_ctor(gui_obj_t  *this_widget,
                   int16_t     h);
 
 /**
- * @brief
+ * @brief creat an obj widget.
  *
- * @param parent
- * @param filename
- * @param x
- * @param y
- * @param w
- * @param h
- * @return gui_obj_t*
+ * @param parent the father widget it nested in.
+ * @param filename the obj widget name.
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @param w the width of the widget.
+ * @param h the hight of the widget.
+ * @return gui_obj_t*.
  */
 gui_obj_t *gui_obj_create(void       *parent,
                           const char *name,
@@ -259,12 +258,11 @@ gui_obj_t *gui_obj_create(void       *parent,
                           int16_t     w,
                           int16_t     h);
 /**
-  * @brief create event widget
-  * @param  obj
-  * @param  event_cb switching events
-  * @param  filter how to trigger events
-  * @param  user_data
-  * @return void
+  * @brief create event widget.
+  * @param obj pointer to the GUI object.
+  * @param event_cb switching events.
+  * @param filter how to trigger events.
+  * @param user_data data to be transmitted.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(void *parent)
@@ -281,10 +279,9 @@ void gui_obj_add_event_cb(void           *obj,
                           void           *user_data);
 
 /**
-  * @brief    this_widget API only for Widget, not for Application
-  * @param  obj
-  * @param  event_code
-  * @return void
+  * @brief this_widget API only for Widget, not for Application.
+  * @param obj Pointer to the GUI object.
+  * @param event_code switching events.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_obj_t *obj)
@@ -297,9 +294,8 @@ void gui_obj_add_event_cb(void           *obj,
 void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code);
 
 /**
-  * @brief    free the widget tree recursively,from the root to the leaves.Preorder traversal.
-  * @param  obj the root of the widget tree.
-  * @return void
+  * @brief free the widget tree recursively,from the root to the leaves.Preorder traversal.
+  * @param obj the root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
@@ -313,9 +309,8 @@ void gui_obj_event_set(gui_obj_t *obj, gui_event_t event_code);
 void gui_obj_tree_free(void *obj);
 
 /**
-  * @brief    print the widget tree recursively,from the root to the leaves.Preorder traversal.
-  * @param  obj the root of the widget tree.
-  * @return void
+  * @brief print the widget tree recursively,from the root to the leaves.Preorder traversal.
+  * @param obj the root of the widget tree.
   * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
@@ -329,29 +324,24 @@ void gui_obj_tree_free(void *obj);
 void gui_obj_tree_print(gui_obj_t *obj);
 
 /**
-  * @brief  get count of one type on tree
-  * @param  obj the root of the widget tree.
-  * @param  type widget type.
-  * @param  count count result.
-  * @return void
+  * @brief get count of one type on tree.
+  * @param obj the root of the widget tree.
+  * @param type widget type.
+  * @param count count result.
   */
 void gui_obj_tree_count_by_type(gui_obj_t *obj, T_OBJ_TYPE type, int *count);
 
 /**
-  * @brief   show or hide the widget
-  * @param  obj the root of the widget tree.
-  * @param  enable true for show, false for hide.
-  * @return void
+  * @brief show or hide the widget.
+  * @param obj the root of the widget tree.
+  * @param enable true for show, false for hide.
   */
 void gui_obj_tree_show(gui_obj_t *obj, bool enable);
 
-
-
 /**
-  * @brief  set object show or not
-  * @param  obj
-  * @param  enable
-  * @return void
+  * @brief set object show or not.
+  * @param obj the root of the widget tree.
+  * @param enable true for show, false for hide.
   * * <b>Example usage</b>
   * \code{.c}
   * static void app_main_task(gui_app_t *app)
@@ -367,31 +357,31 @@ void gui_obj_tree_show(gui_obj_t *obj, bool enable);
 void gui_obj_show(void *obj, bool enable);
 
 /**
-  * @brief   show the root of this_widget tree
-  * @param  obj the root of the widget tree.
-  * @return gui_obj_t*
+  * @brief show the root of this_widget tree.
+  * @param obj the root of the widget tree.
+  * @return gui_obj_t*.
   */
 gui_obj_t *gui_obj_tree_get_root(gui_obj_t *obj);
 
 /**
-  * @brief   get child type
-  * @param  obj the root of the widget tree.
-  * @param  child_type
-  * @return gui_obj_t*
+  * @brief get child type.
+  * @param obj the root of the widget tree.
+  * @param child_type type of obj widget.
+  * @return gui_obj_t*.
   */
 gui_obj_t *gui_obj_get_child_handle(gui_obj_t *obj, T_OBJ_TYPE child_type);
 
 /**
- * @brief judge the obj if in range of this_widget rect
+ * @brief judge the obj if in range of this_widget rect.
  *
- * @param obj
- * @param x
- * @param y
- * @param w
- * @param h
- * @return true
- * @return false
- */
+ * @param obj pointer to the GUI object.
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @param w the width of the widget.
+ * @param h the hight of the widget.
+ * @return true.
+ * @return false.
+*/
 bool gui_obj_in_rect(gui_obj_t *obj,
                      int16_t    x,
                      int16_t    y,
@@ -399,182 +389,181 @@ bool gui_obj_in_rect(gui_obj_t *obj,
                      int16_t    h);
 
 /**
- * @brief skip all left slide hold actions of the parent object
+ * @brief skip all left slide hold actions of the parent object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_parent_left_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all left slide hold actions of the child object
+ * @brief skip all left slide hold actions of the child object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_left_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all left slide hold actions of the other object
+ * @brief skip all left slide hold actions of the other object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_left_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all right slide hold actions of the parent object
+ * @brief skip all right slide hold actions of the parent object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_parent_right_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all right slide hold actions of the child object
+ * @brief skip all right slide hold actions of the child object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_right_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all right slide hold actions of the other object
+ * @brief skip all right slide hold actions of the other object.
  *
- * @param obj
+ * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_right_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all down slide hold actions of the parent object
+ * @brief skip all down slide hold actions of the parent object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_parent_down_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all down slide hold actions of the child object
+ * @brief skip all down slide hold actions of the child object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_down_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all down slide hold actions of the other object
+ * @brief skip all down slide hold actions of the other object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_down_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all up slide hold actions of the parent object
+ * @brief skip all up slide hold actions of the parent object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_parent_up_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all up slide hold actions of the child object
+ * @brief skip all up slide hold actions of the child object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_up_hold(gui_obj_t *obj);
 
 /**
- * @brief skip all up slide hold actions of the other object
+ * @brief skip all up slide hold actions of the other object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_up_hold(gui_obj_t *obj);
 
-
 /**
- * @brief skip all short click actions of the child object
+ * @brief skip all short click actions of the child object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_short(gui_obj_t *obj);
 
 /**
- * @brief skip all short click actions of the other object
+ * @brief skip all short click actions of the other object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_short(gui_obj_t *obj);
 
-
 /**
- * @brief enable all short click actions from parent object to the root object
+ * @brief enable all short click actions from parent object to the root object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_enable_this_parent_short(gui_obj_t *obj);
 
 /**
- * @brief skip click actions of other objects of parent object
+ * @brief skip click actions of other objects of parent object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_parent_short(gui_obj_t *obj);
 
 /**
- * @brief skip all long click actions of the child object
+ * @brief skip all long click actions of the child object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_long(gui_obj_t *obj);
 
 /**
- * @brief skip all long click actions of the other object
+ * @brief skip all long click actions of the other object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_long(gui_obj_t *obj);
 
 /**
- * @brief enable all long press actions from parent object to the root object
+ * @brief enable all long press actions from parent object to the root object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_enable_this_parent_short(gui_obj_t *obj);
 
 /**
- * @brief skip long press actions of other objects of parent object
+ * @brief skip long press actions of other objects of parent object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_parent_short(gui_obj_t *obj);
 
 /**
- * @brief skip all pressed actions of the child object
+ * @brief skip all pressed actions of the child object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_all_child_pressed(gui_obj_t *obj);
 
 /**
- * @brief skip all pressed actions of the other object
+ * @brief skip all pressed actions of the other object.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_pressed(gui_obj_t *obj);
 
 /**
- * @brief skip long press actions of the other parent, only keep top layer widget serial parent
+ * @brief skip long press actions of the other parent, only keep top layer widget serial parent.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_parent_long(gui_obj_t *obj);
 
 /**
- * @brief skip pressed actions of the other parent, only keep top layer widget serial parent
+ * @brief skip pressed actions of the other parent, only keep top layer widget serial parent.
  *
  * @param obj the root of the widget tree.
  */
 void gui_obj_skip_other_parent_pressed(gui_obj_t *obj);
+
 /**
- * @brief get the area of this_widget obj
+ * @brief get the area of this_widget obj.
  *
- * @param obj
- * @param x
- * @param y
- * @param w
- * @param h
+ * @param obj pointer to the GUI object.
+ * @param x the X-axis coordinate of the widget.
+ * @param y the Y-axis coordinate of the widget.
+ * @param w the width of the widget.
+ * @param h the hight of the widget.
  */
 void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *x,
@@ -583,142 +572,154 @@ void gui_obj_get_area(gui_obj_t *obj,
                       int16_t   *h);
 
 /**
- * @brief judge the point if in range of this_widget obj rect
+ * @brief judge the point if in range of this_widget obj rect.
  *
- * @param obj
- * @param x
- * @param y
- * @return true
- * @return false
+ * @param obj widget object pointer.
+ * @param x the X-axis coordinate.
+ * @param y the Y-axis coordinate.
+ * @return true.
+ * @return false.
  */
 bool gui_obj_point_in_obj_rect(gui_obj_t *obj, int16_t x, int16_t y);
 
 /**
- * @brief
+ * @brief do crc check.
  *
- * @param seed
- * @param data
- * @param len
- * @return uint8_t
+ * @param seed the initial value to start the checksum calculation.
+ * @param data pointer to the array of bytes for which the checksum is to be calculated.
+ * @param len the number of bytes in the array.
+ * @return uint8_t.
  */
 uint8_t gui_obj_checksum(uint8_t seed, uint8_t *data, uint8_t len);
 
 /**
- * @brief  get widget in tree by name
+ * @brief get widget in tree by name.
  *
- * @param obj tree
- * @param name widget name
- * @param output widget
- * @return uint8_t
+ * @param obj tree.
+ * @param name widget name.
+ * @param output widget.
  */
 void gui_obj_tree_get_widget_by_name(gui_obj_t *obj, const char *name, gui_obj_t **output);
+
 /**
- * @brief  get widget in tree by type
+ * @brief get widget in tree by type.
  *
- * @param obj tree
- * @param type widget type
- * @param output widget
- * @return uint8_t
+ * @param root tree.
+ * @param type widget type.
+ * @param output widget.
+ * @return void.
  */
 void gui_obj_tree_get_widget_by_type(gui_obj_t *root, T_OBJ_TYPE type, gui_obj_t **output);
+
 /**
- * @brief  update animate on every frame
+ * @brief update animate on every frame.
  *
- * @param animate
- * @param obj widget
+ * @param animate widget object pointer.
+ * @param obj widget.
  */
 void animate_frame_update(gui_animate_t *animate, gui_obj_t *obj);
+
 /**
- * @brief  set animate
+ * @brief set animate.
  *
- * @param animate pointer
- * @param dur animation time cost in ms
- * @param repeat_count rounds to repeat
- * @param callback every frame callback
- * @param p callback's parameter
+ * @param animate pointer.
+ * @param dur animation time cost in ms.
+ * @param repeat_count rounds to repeat.
+ * @param callback every frame callback.
+ * @param p callback's parameter.
  */
 gui_animate_t *gui_obj_set_animate(gui_animate_t *animate,
                                    uint32_t      dur,
                                    int           repeat_count,
                                    void         *callback,
                                    void         *p);
+
 /**
- * @brief  print name by bfs order
+ * @brief print name by bfs order.
  *
- * @param root
+ * @param root tree.
  */
 void gui_obj_tree_print_bfs(gui_obj_t *root);
+
 /**
- * @brief  print name by bfs order
+ * @brief print name by bfs order.
  *
- * @param object widget pointer
- * @return gui_obj_t * root
+ * @param object widget pointer.
+ * @return gui_obj_t * root.
  */
 gui_obj_t *gui_get_root(gui_obj_t *object);
+
 /**
- * @brief Calculate the absolute coordinates of a GUI object.
+ * @brief calculate the absolute coordinates of a GUI object.
  *
  * This function calculates the absolute (global) X and Y coordinates
  * of a given GUI object based on its local position within the parent hierarchy.
  *
- * @param[in]  obj          Pointer to the GUI object for which to calculate absolute coordinates.
- * @param[out] absolute_x   Pointer to an integer where the absolute X coordinate will be stored.
- * @param[out] absolute_y   Pointer to an integer where the absolute Y coordinate will be stored.
+ * @param obj pointer to the GUI object for which to calculate absolute coordinates.
+ * @param absolute_x pointer to an integer where the absolute X coordinate will be stored.
+ * @param absolute_y pointer to an integer where the absolute Y coordinate will be stored.
  *
  * @note This function assumes that @p obj is a valid pointer and
  *       that @p absolute_x and @p absolute_y are valid pointers to integers.
  */
 void gui_obj_absolute_xy(gui_obj_t *obj, int *absolute_x, int *absolute_y);
+
 /**
- * @brief Set the visibility of a GUI object.
+ * @brief set the visibility of a GUI object.
  *
  * This function sets the visibility of a given GUI object by adjusting its hidden state.
  *
- * @param[in,out] obj Pointer to the GUI object that will be updated.
- * @param[in] hidden Boolean flag indicating whether the object should be hidden (true) or shown (false).
+ * @param obj pointer to the GUI object that will be updated.
+ * @param hidden boolean flag indicating whether the object should be hidden (true) or shown (false).
  */
 void gui_obj_hidden(gui_obj_t *obj, bool hidden);
+
 /**
- * @brief Set or retrieve the name of a GUI widget.
+ * @brief set or retrieve the name of a GUI widget.
  *
  * This function sets the name of a given GUI widget if the provided name is valid.
  * It returns the current name of the widget.
  *
- * @param[in,out] widget Pointer to the GUI widget whose name will be set or retrieved.
- * @param[in] name Pointer to a string containing the new name for the widget. If the name is valid, it will be set as the widget's name.
+ * @param widget pointer to the GUI widget whose name will be set or retrieved.
+ * @param name pointer to a string containing the new name for the widget. If the name is valid, it will be set as the widget's name.
  *
- * @return The current name of the widget.
+ * @return the current name of the widget.
  */
 const char *gui_widget_name(gui_obj_t *widget, const char *name);
+
 /**
- * @brief Update speed
+ * @brief update speed.
  *
  * This function updates the current speed and records the speed change history.
  *
- * @param[in,out] speed Pointer to the current speed, which will be updated by the function.
- * @param[out] speed_recode Array to record speed changes, which will be updated by the function.
+ * @param speed pointer to the current speed, which will be updated by the function.
+ * @param speed_recode array to record speed changes, which will be updated by the function.
  */
 void gui_update_speed(int *speed, int speed_recode[]);
+
 /**
- * @brief Inertial calculation
+ * @brief inertial calculation.
  *
  * This function performs inertial calculations based on the current speed, end speed, and offset.
  *
- * @param[in,out] speed Pointer to the current speed, which will be updated by the function.
- * @param[in] end_speed Target end speed.
- * @param[in,out] offset Pointer to the offset, which will be updated by the function.
+ * @param speed pointer to the current speed, which will be updated by the function.
+ * @param end_speed target end speed.
+ * @param offset pointer to the offset, which will be updated by the function.
  */
 void gui_inertial(int *speed, int end_speed, int *offset);
+
 /**
  * @brief tree print mermaid.
  *
- * @param[in] obj Pointer to the GUI object root.
+ * @param obj Pointer to the GUI object root.
  */
 void gui_obj_tree_print_mmd(gui_obj_t *obj);
+
 /**
- * @brief get widget count
+ * @brief get widget count.
  */
 uint32_t gui_get_obj_count();
+
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

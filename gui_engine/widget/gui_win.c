@@ -288,18 +288,18 @@ void gui_win_set_animate(gui_win_t *this,
     }
     GUI_SET_ANIMATE_HELPER
 }
-void gui_win_append_animate(gui_win_t *this,
-                            uint32_t   dur,
-                            int        repeat_count,
-                            void      *callback,
-                            void      *p,
+void gui_win_append_animate(gui_win_t  *win,
+                            uint32_t    dur,
+                            int         repeat_count,
+                            void       *callback,
+                            void       *p,
                             const char *name)
 {
-    this->animate_array_length++;
-    this->animate_array = gui_realloc(this->animate_array,
-                                      sizeof(gui_animate_t) * this->animate_array_length);
-    this->animate_array[this->animate_array_length - 1] = gui_malloc(sizeof(gui_animate_t));
-    gui_animate_t *animate = this->animate_array[this->animate_array_length - 1];
+    win->animate_array_length++;
+    win->animate_array = gui_realloc(win->animate_array,
+                                     sizeof(gui_animate_t) * win->animate_array_length);
+    win->animate_array[win->animate_array_length - 1] = gui_malloc(sizeof(gui_animate_t));
+    gui_animate_t *animate = win->animate_array[win->animate_array_length - 1];
 
     memset((animate), 0, sizeof(gui_animate_t));
     animate->animate = true;
@@ -381,7 +381,7 @@ gui_win_t *gui_win_create(void       *parent,
 
     return this;
 }
-float gui_win_get_aniamtion_progress_percent(gui_win_t *win)
+float gui_win_get_animation_progress_percent(gui_win_t *win)
 {
     if (win == NULL || win->animate == NULL)
     {

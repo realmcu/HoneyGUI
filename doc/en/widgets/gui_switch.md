@@ -9,16 +9,16 @@ Using [gui_switch_create(void *parent, int16_t x, int16_t y, int16_t w, int16_t 
 You can refer to the specific parameters of `gui_switch_t`, such as base, switch_picture, on_pic_addr, off_pic_addr, etc.
 
 
-### Turn on/off
-By using the following APIs, you can turn on or off the switch, and the event (created by gui_obj_add_event_cb) will be triggered.<br/>
+### Turn On/Off
+By using the following APIs, the switch can be turned on or off, and the event (created by gui_obj_add_event_cb) will be triggered.<br/>
 [gui_switch_turn_on(gui_switch_t *this)](#gui_switch_turn_on) and [gui_switch_turn_off(gui_switch_t *this)](#gui_switch_turn_off).
 
-### Update on/off state
-If the switch widget has been turned on somehow, you can use the following APIs to update the status to on or off.<br/>
+### Update On/Off State
+If the switch widget has been turned on somehow, the following APIs can be used to update the status to on or off.<br/>
 [gui_switch_is_on(gui_switch_t *this)](#gui_switch_is_on) and [gui_switch_is_off(gui_switch_t *this)](#gui_switch_is_off).
 
-### Change switch state
-You can use [gui_switch_change_state(gui_switch_t *this, bool ifon)](#gui_switch_change_state) to set the switch widget's state and change the UI and there won't be any event (created by gui_obj_add_event_cb) triggered.
+### Change Switch State
+Use [gui_switch_change_state(gui_switch_t *this, bool ifon)](#gui_switch_change_state) to set the switch widget's state and change the UI, and there won't be any event (created by gui_obj_add_event_cb) triggered.
 
 ## Example
 
@@ -150,7 +150,7 @@ void page_tb_control0(void *parent)
     gui_img_set_animate(img, 1000, 1, img_animate, img);
     img->animate->animate = false;
     img->base.not_show = true;
-    
+
     gui_obj_add_event_cb(sw_no_disturb, (gui_event_cb_t)callback_disturb_on, GUI_EVENT_1, NULL);
     gui_obj_add_event_cb(sw_no_disturb, (gui_event_cb_t)callback_disturb_off, GUI_EVENT_2, NULL);
     gui_obj_add_event_cb(sw_mute, (gui_event_cb_t)callback_mute_on, GUI_EVENT_1, NULL);

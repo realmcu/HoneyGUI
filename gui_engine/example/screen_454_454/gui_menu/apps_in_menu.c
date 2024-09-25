@@ -568,7 +568,7 @@ static void status_bar_ani(gui_obj_t *ignore_gesture)
 #include "math.h"
 static void menu_win_ani_cb(void *args, gui_win_t *win)
 {
-    float pro = gui_win_get_aniamtion_progress_percent(win);
+    float pro = gui_win_get_animation_progress_percent(win);
     gui_win_set_scale_rate(win, sinf(pro * (M_PI / 2 - 0.2f) + 0.2f),
                            sinf(pro * (M_PI / 2 - 0.2f) + 0.2f));
     gui_win_set_opacity(win, (pro) * UINT8_MAX);
@@ -580,7 +580,7 @@ static void menu_win_ani_cb(void *args, gui_win_t *win)
 #define APP_WATCH_WIN_NAME "menu win name"
 static void menu_win_ani_cb_return(void *args, gui_win_t *win)
 {
-    float pro = gui_win_get_aniamtion_progress_percent(win);
+    float pro = gui_win_get_animation_progress_percent(win);
     gui_win_set_opacity(win, (1.0f - pro) * UINT8_MAX);
     gui_win_set_scale_rate(win, cosf(pro * M_PI / 2), cosf(pro * M_PI / 2));
     if (gui_win_is_animation_end_frame(win))
@@ -590,7 +590,7 @@ static void menu_win_ani_cb_return(void *args, gui_win_t *win)
 }
 static void app_wathc_win_ani_cb_return(void *args, gui_win_t *win)
 {
-    float pro = gui_win_get_aniamtion_progress_percent(win);
+    float pro = gui_win_get_animation_progress_percent(win);
     gui_win_set_opacity(win, (pro) * UINT8_MAX);
     gui_win_set_scale_rate(win, 1 + cosf(pro * M_PI / 2), 1 + cosf(pro * M_PI / 2));
     if (gui_win_is_animation_end_frame(win))

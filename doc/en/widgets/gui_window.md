@@ -22,20 +22,59 @@ And the following widgets will take the Window's widget left-top corner as the i
 
 ### Create widget
 
-You can create a win widget by this API [`gui_win_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)`](#gui_win_create).
-This `w/h` are the width and height of the win widget.
+Create a win widget using this API [gui_win_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_win_create).
 
-### Add event
+### Set Animation
 
-To add an event of widget by this API [gui_obj_add_event_cb(void *obj, gui_event_cb_t event_cb, gui_event_t filter, void *user_data)](#gui_obj_add_event_cb).
-`obj` is the selected widget, `event_cb` is the switching events, `filter` is the way how to trigger event, and `user_data` is the data to transmit.
+Using this API [gui_win_set_animate(gui_win_t *_this, uint32_t dur, int repeat_count, void *callback, void *p)](#gui_win_set_animate) to set the animation and implement the animation effect in the corresponding callback function.
+
+### Register Callback Function
+
+Register the left/right/up/down slide event of the win widget using the following APIs: [gui_win_left(gui_win_t *_this, void *callback, void *parameter)](#gui_win_left) , [gui_win_right(gui_win_t *_this, void *callback, void *parameter)](#gui_win_right) , [gui_win_up(gui_win_t *_this, void *callback, void *parameter)](#gui_win_up) , [gui_win_down(gui_win_t *_this, void *callback, void *parameter)](#gui_win_down).<br/>
+And you can also register the press/release/long press/click event of the win widget by follow APIs: [gui_win_press(gui_win_t *_this, void *callback, void *parameter)](#gui_win_press) , [gui_win_release(gui_win_t *_this, void *callback, void *parameter)](#gui_win_release) , [gui_win_long(gui_win_t *_this, void *callback, void *parameter)](#gui_win_long) , [gui_win_click(gui_win_t *_this, void *callback, void *parameter)](#gui_win_click).
+
+### Set 'hold_tp' State
+
+Set the 'hold_tp' state by [gui_win_hold_tp(gui_win_t *_this, bool hold_tp)](#gui_win_hold_tp).
+
+### Get Progress
+
+Using [gui_win_get_animation_progress_percent(gui_win_t *win)](#gui_win_get_animation_progress_percent) to get the animation progress percentage.
+
+### Set Scale Rate
+
+Set the scale rate for the window both horizontally and vertically by [gui_win_set_scale_rate(gui_win_t *win, float scale_rate_horizontal, float scale_rate_vertical)](#gui_win_set_scale_rate).
+
+### Enable/Disable Scope
+
+Enable or disable the scope of the win widget using [gui_win_set_scope(gui_win_t *win, bool enable)](#gui_win_set_scope).
+
+### Set Opacity
+
+Set the opacity value for the win widget with [gui_win_set_opacity(gui_win_t *win, unsigned char opacity_value)](#gui_win_set_opacity).
+
+### Animation Check
+
+Check if the animation is at its end frame by [gui_win_is_animation_end_frame(gui_win_t *win)](#gui_win_is_animation_end_frame).
+
+### Start Animation
+
+Use [gui_win_start_animation(gui_win_t *win)](#gui_win_start_animation) to start the animation.
+
+### Stop Animation
+
+Stop the animation with [gui_win_stop_animation(gui_win_t *win)](#gui_win_stop_animation).
+
+### Prepare
+
+Win widget preparation in [gui_win_prepare(gui_obj_t *obj)](#gui_win_prepare).
+
+### Append An Animation
+
+Using [gui_win_append_animate(gui_win_t *win, uint32_t dur, int repeat_count, void *callback, void *p, const char *name)](#gui_win_append_animate) to append an animation to a GUI window.
 <br>
 
-<span id="api">
-
 ## API
-
-</span>
 
 ```eval_rst
 

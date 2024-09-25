@@ -82,7 +82,7 @@ static void gui_page_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
 void app_watch_mune_win_ani_cb(void *args, gui_win_t *win)
 {
     // Calculate the progress percentage of the animation
-    float pro = gui_win_get_aniamtion_progress_percent(win);
+    float pro = gui_win_get_animation_progress_percent(win);
 
     // Adjust the scale of the window based on sine function of the progress percentage
     // This will create a smooth scaling effect as the progress advances

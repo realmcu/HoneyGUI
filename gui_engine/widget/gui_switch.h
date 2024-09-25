@@ -197,7 +197,7 @@ gui_switch_t *gui_switch_create_from_fs(void    *parent,
                                         void    *off_pic,
                                         void    *on_pic);
 /**
- * @brief create a switch widget, file source is memory address
+ * @brief create a switch widget, file source is memory address.
  * @param parent the father widget it nested in.
  * @param x the X-axis coordinate of the widget.
  * @param y the Y-axis coordinate of the widget.
@@ -217,38 +217,38 @@ gui_switch_t *gui_switch_create_from_ftl(void    *parent,
                                          void    *on_pic);
 
 /**
- * @brief Turn on the switch, event will be triggered.
+ * @brief turn on the switch, event will be triggered.
  *
- * @param this
+ * @param this widget object pointer.
  */
 void gui_switch_turn_on(gui_switch_t *);
 
 /**
- * @brief Turn off the switch, event will be triggered.
+ * @brief turn off the switch, event will be triggered.
  *
- * @param this
+ * @param this widget object pointer.
  */
 void gui_switch_turn_off(gui_switch_t *);
 
 /**
- * @brief If the switch has been turned on somehow, it can upadte the status to on status.
+ * @brief if the switch has been turned on somehow, it can upadte the status to on status.
  *
- * @param this
+ * @param this widget object pointer.
  */
 void gui_switch_is_on(gui_switch_t *);
 
 /**
- * @brief If the switch has been turned off somehow, it can upadte the status to off status.
+ * @brief if the switch has been turned off somehow, it can upadte the status to off status.
  *
- * @param this
+ * @param this widget object pointer.
  */
 void gui_switch_is_off(gui_switch_t *);
 
 /**
  * @brief set sw state and change ui, NO event will be trigered.
  *
- * @param this
- * @param ifon set sw state
+ * @param this widget object pointer.
+ * @param ifon set sw state.
  */
 void gui_switch_change_state(gui_switch_t *, bool ifon);
 /** End of WIDGET_Exported_GUI_Functions

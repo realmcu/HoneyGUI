@@ -7,7 +7,7 @@
 
 ### 创建水平方向控件
 
-开发者可以使用API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_h_create)创建基于单张图片的水平方向进度条控件。 这是一个普通的单张图片进度条控件。
+开发者可以使用API [gui_progressbar_img_h_create(void *parent, void *picture, int16_t x, int16_t y)](#gui_progressbar_img_h_create) 创建基于单张图片的水平方向进度条控件。 这是一个普通的单张图片进度条控件。
 
 ### 创建垂直方向控件
 
@@ -15,7 +15,7 @@
 
 ### 创建电影风格控件
 
-与上述两种单张图片的进度条控件不同，电影风格的进度条控件由一系列的图片组成。开发者可以调用[gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create)从内存地址创建电影风格的进度条控件，或者调用 [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create_from_fs) 从文件系统创建电影风格的进度条控件。
+与上述两种单张图片的进度条控件不同，电影风格的进度条控件由一系列的图片组成。开发者可以调用 [gui_progressbar_movie_create(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create) 从内存地址创建电影风格的进度条控件，或者调用 [gui_progressbar_movie_create_from_fs(void *parent, void  **picture_array, uint16_t array_length, int16_t x, int16_t y)](#gui_progressbar_movie_create_from_fs) 从文件系统创建电影风格的进度条控件。
 在 0% 进度时显示第一张图片，在 100% 进度时显示最后一张图片。
 
 ### 进度
@@ -103,11 +103,8 @@ void page_tb_three(void *parent)
 
 <center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/widgets/progressbar.gif" /></center>
 
-<span id="api">
-
 ## API
 
-</span>
 
 ```eval_rst
 
