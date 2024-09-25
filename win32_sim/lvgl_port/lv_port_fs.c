@@ -206,7 +206,14 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t *drv, void *file_p, uint32_t pos, lv_fs_w
 
     /*Add your code here*/
     res = lseek((int)file_p, pos, whence);
-    return res;
+    if (res == -1)
+    {
+        return LV_FS_RES_UNKNOWN;
+    }
+    else
+    {
+        return LV_FS_RES_OK;
+    }
 }
 /**
  * Give the position of the read write pointer
