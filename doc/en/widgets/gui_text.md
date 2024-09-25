@@ -30,9 +30,9 @@ In order to draw text, font files containing glyph information need to be loaded
 
 The font file can be a standard .ttf file or a customized .bin file. The font file can be initialized ahead of time to avoid having to set the font type for each text widget.
 
-+ To initialize the new version customized bin font file, use [gui_font_mem_init(font_bin_addr)](#gui_font_mem_init).
++ To initialize the new version customized bin font file, use `gui_font_mem_init(font_bin_addr)`.
 
-+ To initialize the standard TTF file to draw text, use [gui_font_stb_init(font_ttf_addr)](#gui_font_stb_init).
++ To initialize the standard TTF file to draw text, use `gui_font_stb_init(font_ttf_addr)`.
 
 All customized bin font files are available from RTK technicians.
 

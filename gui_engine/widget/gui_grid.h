@@ -133,7 +133,7 @@ typedef struct gui_grid
  * @param col Columns number.
  * @param gap_col gap between two Columns.
  * @param gap_row gap between two Rows.
- * @return return the widget object pointer
+ * @return return the widget object pointer.
  * <b>Example usage</b>
  * \code{.c}
  * {
@@ -154,22 +154,23 @@ typedef struct gui_grid
  *   for (size_t i = 0; i < 6; i++)
  *   {
  *       gui_img_creat_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
- *   }}
+ *   }
+ * }
  * \endcode
  */
-gui_grid_t *gui_grid_create(void    *parent,
-                            int16_t  x,
-                            int16_t  y,
-                            int16_t  row,
-                            int16_t  col,
-                            uint16_t gap_col,
-                            uint16_t gap_row);
+gui_grid_t *gui_grid_create(void     *parent,
+                            int16_t   x,
+                            int16_t   y,
+                            int16_t   row,
+                            int16_t   col,
+                            uint16_t  gap_col,
+                            uint16_t  gap_row);
 
 /**
- * @brief config grid style
+ * @brief config grid style.
  *
- * @param grid grid wodget pointer
- * @param style GRID_CLASSIC, GRID_SCALE
+ * @param grid grid wodget pointer.
+ * @param style GRID_CLASSIC, GRID_SCALE.
  * <b>Example usage</b>
  * \code{.c}
  * {
@@ -191,7 +192,8 @@ gui_grid_t *gui_grid_create(void    *parent,
  *   for (size_t i = 0; i < 6; i++)
  *   {
  *       gui_img_creat_from_mem(grid, "grid_image", array[i], 0, 0, 0, 0);
- *   }}
+ *   }
+ * }
  * \endcode
  */
 void gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style);

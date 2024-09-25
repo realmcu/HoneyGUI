@@ -113,7 +113,7 @@ typedef struct
 
 
 /**
- * @brief create a card widget
+ * @brief create a card widget.
  * @param parent the father widget it nested in.
  * @param filename this tab widget's name.
  * @param x the X-axis coordinate of the widget.

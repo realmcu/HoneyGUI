@@ -130,7 +130,7 @@ typedef struct gui_cardview
   */
 
 /**
- * @brief cardview create
+ * @brief cardview create.
  *
  * @param parent the father widget it nested in.
  * @param name this tab widget's name.
@@ -148,65 +148,65 @@ gui_cardview_t *gui_cardview_create(void       *parent,
                                     int16_t     h);
 
 /**
- * @brief set animate to cardview widget
+ * @brief set animate to cardview widget.
  *
- * @param o widget object pointer
- * @param dur Animation duration
- * @param repeat_count Repeat play times, -1 means play on repeat forever
- * @param callback animate frame callback
- * @param p parameter
+ * @param o widget object pointer.
+ * @param dur Animation duration.
+ * @param repeat_count Repeat play times, -1 means play on repeat forever.
+ * @param callback animate frame callback.
+ * @param p parameter.
  */
 void gui_cardview_set_animate(gui_cardview_t *_this,
-                              uint32_t   dur,
-                              int        repeat_count,
-                              void      *callback,
-                              void      *p);
+                              uint32_t        dur,
+                              int             repeat_count,
+                              void           *callback,
+                              void           *p);
 
 /**
- * @brief set cardview style
+ * @brief set cardview style.
  *
- * @param this widget pointer
- * @param style refer to T_SLIDE_STYLE
+ * @param this widget pointer.
+ * @param style refer to T_SLIDE_STYLE.
  */
 void gui_cardview_set_style(gui_cardview_t *this, T_SLIDE_STYLE style);
 
 /**
- * @brief listen to cardview's event
+ * @brief listen to cardview's event.
  *
- * @param this widget pointer
- * @param cb callback to be triggered
+ * @param this widget pointer.
+ * @param cb callback to be triggered.
  */
 void gui_cardview_status_cb(gui_cardview_t *this, void (*cb)(gui_cardview_t *this));
 /**
- * @brief automatic center alignment
+ * @brief automatic center alignment.
  *
- * @param this widget pointer
- * @param align_height align height
+ * @param this widget pointer.
+ * @param align_height align height.
  */
 void gui_cardview_alignment(gui_cardview_t *this, int align_height);
 /**
- * @brief set bottom_space
+ * @brief set bottom_space.
  *
- * @param this widget pointer
- * @param bottom_space bottom_space_count
+ * @param this widget pointer.
+ * @param bottom_space bottom_space_count.
  */
 void gui_cardview_set_bottom_space(gui_cardview_t *this, uint8_t bottom_space);
 
 /**
- * @brief Add a callback function to the event of sliding the cardview upwards in the Y-axis direction
+ * @brief Add a callback function to the event of sliding the cardview upwards in the Y-axis direction.
  *
- * @param this widget pointer
- * @param callback callback to be triggered
- * @param parameter parameter of callback function
+ * @param this widget pointer.
+ * @param callback callback to be triggered.
+ * @param parameter parameter of callback function.
  */
 void gui_cardview_up(gui_cardview_t *this, void *callback, void *parameter);
 
 /**
- * @brief Add a callback function to the event of sliding the cardview downwards in the Y-axis direction
+ * @brief Add a callback function to the event of sliding the cardview downwards in the Y-axis direction.
  *
- * @param this widget pointer
- * @param callback callback to be triggered
- * @param parameter parameter of callback function
+ * @param this widget pointer.
+ * @param callback callback to be triggered.
+ * @param parameter parameter of callback function.
  */
 void gui_cardview_down(gui_cardview_t *this, void *callback, void *parameter);
 

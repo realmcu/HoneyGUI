@@ -191,18 +191,18 @@ typedef struct gui_text_line
 /**
  * @brief set textbox click event cb .
  *
- * @param this_widget      text widget
- * @param event_cb  cb function
- * @param parameter cb parameter
+ * @param this_widget      text widget.
+ * @param event_cb  cb function.
+ * @param parameter cb parameter.
  */
 void gui_text_click(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter);
 
 /**
  * @brief set textbox password done event cb, to handle password.
  *
- * @param this_widget      text widget
- * @param event_cb  cb function
- * @param parameter cb parameter
+ * @param this_widget      text widget.
+ * @param event_cb  cb function.
+ * @param parameter cb parameter.
  */
 void gui_text_pswd_done(gui_text_t *this_widget, gui_event_cb_t event_cb, void *parameter);
 
@@ -217,54 +217,54 @@ void gui_text_pswd_done(gui_text_t *this_widget, gui_event_cb_t event_cb, void *
 * @param font_size the text string's font size.
 * @return void
 */
-void gui_text_set(gui_text_t   *this_widget,
-                  void         *text,
-                  FONT_SRC_TYPE text_type,
-                  gui_color_t   color,
-                  uint16_t      length,
-                  uint8_t       font_size);
+void gui_text_set(gui_text_t    *this_widget,
+                  void          *text,
+                  FONT_SRC_TYPE  text_type,
+                  gui_color_t    color,
+                  uint16_t       length,
+                  uint8_t        font_size);
 
 /**
- * @brief set animate
+ * @brief set animate.
  *
- * @param o text widget
- * @param dur durtion. time length of the animate
- * @param repeat_count  0:one shoot -1:endless
- * @param callback happens at every frame
- * @param p callback's parameter
+ * @param o text widget.
+ * @param dur durtion. time length of the animate.
+ * @param repeat_count  0:one shoot -1:endless.
+ * @param callback happens at every frame.
+ * @param p callback's parameter.
  */
-void gui_text_set_animate(void    *o,
-                          uint32_t dur,
-                          int      repeat_count,
-                          void    *callback,
-                          void    *p);
+void gui_text_set_animate(void     *o,
+                          uint32_t  dur,
+                          int       repeat_count,
+                          void     *callback,
+                          void     *p);
 
 /**
- * @brief set text mode of this_widget text widget
- * @note if text line count was more than one, it will display on the left even if it was set lft or right
+ * @brief set text mode of this_widget text widget.
+ * @note if text line count was more than one, it will display on the left even if it was set lft or right.
  * @param this_widget the text widget pointer.
  * @param mode there was three mode: LEFT, CENTER and RIGHT.
  */
 void gui_text_mode_set(gui_text_t *this_widget, TEXT_MODE mode);
 
 /**
- * @brief set inputable
+ * @brief set inputable.
  *
  * @param this_widget he text box widget pointer.
- * @param inputable inputable
+ * @param inputable inputable.
  */
 void gui_text_input_set(gui_text_t *this_widget, bool inputable);
 
 /**
- * @brief set text min scale
+ * @brief set text min scale.
  *
  * @param this the text box widget pointer.
- * @param min_scale minimum scale
+ * @param min_scale minimum scale.
  */
 void gui_text_set_min_scale(gui_text_t *this_widget, float min_scale);
 
 /**
- * @brief move the text widget
+ * @brief move the text widget.
  *
  * @param this_widget the text box widget pointer.
  * @param x the X-axis coordinate of the text box.
@@ -273,8 +273,8 @@ void gui_text_set_min_scale(gui_text_t *this_widget, float min_scale);
 void gui_text_move(gui_text_t *this_widget, int16_t x, int16_t y);
 
 /**
- * @brief set font size or width and height
- * @note if use freetype, width and height is effective, else height will be applied as font size
+ * @brief set font size or width and height.
+ * @note if use freetype, width and height is effective, else height will be applied as font size.
  * @param this_widget the text widget pointer.
  * @param height font height or font size.
  * @param width font width(only be effective when freetype was used).
@@ -282,24 +282,24 @@ void gui_text_move(gui_text_t *this_widget, int16_t x, int16_t y);
 void gui_text_size_set(gui_text_t *this_widget, uint8_t height, uint8_t width);
 
 /**
- * @brief set text font mode
+ * @brief set text font mode.
  *
- * @param this_widget the text widget pointer
- * @param font_mode font source mode
+ * @param this_widget the text widget pointer.
+ * @param font_mode font source mode.
  */
 void gui_text_font_mode_set(gui_text_t *this_widget, FONT_SRC_MODE font_mode);
 
 /**
- * @brief set font type
+ * @brief set font type.
  * @note The type must match the font size!
- * @param this_widget the text widget pointer
- * @param font_source the addr of .ttf or .bin
- * @param font_mode font source mode
+ * @param this_widget the text widget pointer.
+ * @param font_source the addr of .ttf or .bin.
+ * @param font_mode font source mode.
  */
 void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE font_mode);
 
 /**
- * @brief Set emoji file path and emoji size
+ * @brief Set emoji file path and emoji size.
  * @note Need romfs.
  * @note Example of a full emoji image file path: "font/emoji/emoji_u1f30d.bin".
  * @param this The text widget pointer.
@@ -311,27 +311,27 @@ void gui_text_type_set(gui_text_t *this_widget, void *font_source, FONT_SRC_MODE
 void gui_text_emoji_set(gui_text_t *this_widget, uint8_t *path, uint8_t size);
 
 /**
- * @brief set font encoding
- * @note utf-8 or unicode
- * @param this_widget the text widget pointer
- * @param encoding_type encoding_type
+ * @brief set font encoding.
+ * @note utf-8 or unicode.
+ * @param this_widget the text widget pointer.
+ * @param encoding_type encoding_type.
  */
 void gui_text_encoding_set(gui_text_t *this_widget, TEXT_CHARSET charset);
 
 /**
- * @brief set text content
+ * @brief set text content.
  *
- * @param this_widget the text widget pointer
+ * @param this_widget the text widget pointer.
  * @param text the text string.
- * @param length the text string's length
+ * @param length the text string's length.
  */
 void gui_text_content_set(gui_text_t *this_widget, void *text, uint16_t length);
 
 /**
- * @brief to draw text by img, so that text can be scaled
+ * @brief to draw text by img, so that text can be scaled.
  *
- * @param this_widget the text widget pointer
- * @param font_img_type color format
+ * @param this_widget the text widget pointer.
+ * @param font_img_type color format.
  */
 void gui_text_convert_to_img(gui_text_t *this_widget, GUI_FormatType font_img_type);
 
@@ -344,7 +344,7 @@ void gui_text_convert_to_img(gui_text_t *this_widget, GUI_FormatType font_img_ty
  * @param y the Y-axis coordinate of the text box.
  * @param w the width of the text box.
  * @param h the hight of the text box.
- * @return return the widget object pointer
+ * @return return the widget object pointer.
  *
  */
 gui_text_t *gui_text_create(void       *parent,

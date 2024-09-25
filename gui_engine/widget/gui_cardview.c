@@ -493,10 +493,10 @@ static void gui_cardview_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
  *                           Public Functions
  *============================================================================*/
 void gui_cardview_set_animate(gui_cardview_t *this,
-                              uint32_t   dur,
-                              int        repeat_count,
-                              void      *callback,
-                              void      *p)
+                              uint32_t        dur,
+                              int             repeat_count,
+                              void           *callback,
+                              void           *p)
 {
     GUI_SET_ANIMATE_HELPER
 }
