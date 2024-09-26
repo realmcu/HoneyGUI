@@ -170,7 +170,7 @@ Arc widget, no gesture support yet. The properties are shown in the table below.
 
 <div id = "figure_2_2" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710817869829442326/90524d4c_12407535.png"/></div>
 
-#### Container widget
+#### Container Widget
 ##### Screen
 Screen widget, corresponding to the physical screen, is the root widget of a GUI project. The properties are shown in the table below.
 
@@ -385,7 +385,7 @@ Select the image folder, double-click, and enter a new name.
 #### Preview Images
 Select the image folder and all images in this folder will be displayed in the right area.
 
-<div id="figure_3_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1710824483098291044/697fd630_12407535.png"></div>
+<div id="figure_3_5" style="text-align:center;"><img src="https://foruda.gitee.com/images/1727330892031779189/262d761a_12407535.jpeg"></div>
 
 #### Refresh
 If the user locally operates the image resources, not via Tool, click ![icon](https://foruda.gitee.com/images/1710824483020058086/3ecd6f6d_12407535.png) to refresh.
@@ -489,6 +489,7 @@ If selecting RLE as the Compress Mode, RLE Level and RLE Run Length parameters a
 <div id="figure_4_6_a" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818028936954872/d4977120_12407535.png" width="350"></div>
 <br/>
 <div id="figure_4_6_b" style="text-align:center;"><img src="https://foruda.gitee.com/images/1726818316484821859/eeb87b7f_12407535.png" width="350"></div>
+<br/>
 
 | RLE Level | Description |
 |-----------|-------------|
