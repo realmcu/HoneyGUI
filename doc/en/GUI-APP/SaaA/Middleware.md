@@ -23,18 +23,18 @@ description on the ```XML syntax``` page.
 * According to the syntax protocol, this function ```foreach_create``` uses a recursive strategy to traverse each tag of xml and map the tag to the widget, configure the tag's attributes to the widget.
 * After the xml traversal is completed, a C-APP has actually been created in the firmware, which is no different from the result of directly using the C-APP api.
 * Then the JavaScript file mentioned in xml will be executed.
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939055906559343/0b59a527_10088396.png" alt ="xml.png"></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1727329150060233120/0353e15b_10088396.png" alt ="xml.png"></div><br/>
 
 ## JavaScript
 * JavaScript describes Customized behaviors, such as triggering behaviors of widget gesture events, peripheral operations, printing logs, etc.
 * Based on JerryScript engine on ```gui_engine\3rd\js``` for common syntax. Please refer to <https://jerryscript.net/> for details.
-* The implementation of the JavaScript parser is Files starting with js in this folder ```gui_engine\SaaA```. You can read the syntax 
+* The implementation of the JavaScript parser is files starting with js in this folder ```gui_engine\SaaA```. You can read the syntax 
 description on the ```JavaScript syntax``` page.
 * ```DECLARE_HANDLER``` is used to define a function as a C language implementation of a JavaScript function.
 * ```REGISTER_METHOD``` and ```REGISTER_METHOD_NAME``` are used to add a function to a javascript object, so you can call it in script.
 * In a javascript file, there are some variable definitions, function definitions, and function calls. When the app starts, as mentioned above, the JavaScript file will be executed at the end of the XML parsing, and the function calls in it will be executed, mainly some initialization behaviors and the registration of event listeners. 
 * The callback functions of those events will not be executed until the event occurs.
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939260331113428/b473228b_10088396.png" alt ="js.png"></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1727329518743167154/2b01e446_10088396.png" alt ="js.png"></div><br/>
 
 ## Example
 ### Progressbar API
@@ -106,7 +106,7 @@ LED1.writeSync(0)
 ```
 #### Light Swtich Data
 
-|data|value type|brief|
+|Data|Value type|Brief|
 |---|---|---|
 |gpio|number|index of light|
 |direction|out / in|direction of signal|
@@ -114,16 +114,16 @@ LED1.writeSync(0)
 
 - Refer to [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage) for more information.
 #### GPIO Light Switch
-- Get gpio index , direction, and write value;
-- Use gpio driver ```drv_pin_mode()``` & ```drv_pin_write()``` to operate it;
+- Get gpio index , direction, and write value.
+- Use gpio driver ```drv_pin_mode()``` & ```drv_pin_write()``` to operate it.
 #### MATTER Light Switch
-- Get gpio index, and write value;
-- Tramsform data to matter protocol;
-- Use ```matter_send_msg_to_app()``` to operate lights;
+- Get gpio index, and write value.
+- Tramsform data to matter protocol.
+- Use ```matter_send_msg_to_app()``` to operate lights.
 #### MESH Light Switch
-- Get gpio index, and write value;
-- Tramsform data to mesh protocol;
-- Use ```matter_send_msg_to_app()``` to operate lights;
+- Get gpio index, and write value.
+- Tramsform data to mesh protocol.
+- Use ```matter_send_msg_to_app()``` to operate lights.
 
 
 The following code example is the ```writeSync``` 's control light implementation for RTL87X2G. First get gpio value and direction value, then use specify driver API to operate light.

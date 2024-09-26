@@ -27,10 +27,10 @@
 .. mermaid::
  
   graph TD;
-      父节点 --> 子节点一;
-      父节点 --> 子节点二;
-      子节点二 --> 子节点三;
-      子节点二 --> 子节点四;
+      fatherName --> childName1;
+      fatherName --> childName2;
+      childName2 --> childName3;
+      childName2 --> childName4;
 
 .. raw:: html
 
@@ -73,7 +73,7 @@
 | onClick |type | to | id1 | id2 | 
 | backIcon |x | y | w | h | picture|highlightPicture|
 
-| Attribute | brief |  values |  |   |  | | | | | ||||||||
+| 属性 | 简介 |  值 |  |   |  | | | | | ||||||||
 |----------|:-----------|:-----------|:-----------|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
 | x |相对左坐标|number|
 | y |相对上坐标|number|

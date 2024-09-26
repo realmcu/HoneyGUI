@@ -1,8 +1,8 @@
 # XML Syntax
 ## Element
-- Element corresponding widget
-- Element's attributes corresponding widget's attributes (0 value can be ignored)
-- text content is the widget instance's name
+- Element corresponding widget.
+- Element's attributes corresponding widget's attributes (0 value can be ignored).
+- Text content is the widget instance's name.
 ```xml
 <type a1="xx" a2="xx" a3="xx" a4="xx">name</type> 
 ```

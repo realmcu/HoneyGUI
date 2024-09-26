@@ -12,9 +12,9 @@
 - This widget can monitor multiple gestures.
 
 ### Hide A Window
-- This ```win``` variable is assigned the  ```win``` tag ```'heat_win'```'s handle
+- This ```win``` variable is assigned the  ```win``` tag ```'heat_win'```'s handle.
 - The variable ```hid``` is assigned the handle of the ```hidden``` attribute of the ```win``` tag.
-- The value of the ```hidden``` attribute is set to ```'hidden'``` to achieve hiding
+- The value of the ```hidden``` attribute is set to ```'hidden'``` to achieve hiding.
 ``` javascript
 win.getElementById('heat_win') //win will become a handle for heat_win
 hid = win.getAttribute("hidden") //get attribute handle hid
@@ -27,7 +27,7 @@ if (!hid) {
 - The ```win.onPress``` function enables the win widget to monitor the event of the finger touching the screen. If the finger touches the screen within the area of the window, the parameter function will be executed.
 - The ```win.onRelease``` function enables the win widget to monitor the event of the finger leaving the screen.
 - This ```winNromalOnPressFunc``` function will be executed when the finger touches the screen.
-- This ```winNromalOnReleaseFunc``` function will be executed when the finger leaves the screen
+- This ```winNromalOnReleaseFunc``` function will be executed when the finger leaves the screen.
 ```javascript
 win.getElementById('tab7Win')
 function winNromalOnPressFunc(params) {
@@ -42,9 +42,9 @@ win.onRelease(winNromalOnReleaseFunc)
 ```
 ### Swap Windows
 * The implementation logic is that clicking the current window will hide the current window and display another window.
-* click to swap windows between ```'cool_win'``` and ```'heat_win'```
+* Click to swap windows between ```'cool_win'``` and ```'heat_win'```.
 * The ```win.onClick``` function enables the win widget to monitor the event of the finger clicking the screen.
-* ```win.removeAttribute``` This function is used to remove an attribute of the win tag.When the ```hidden``` attribute is removed, the widget corresponding to the ```win``` tag will be displayed.
+* This function ```win.removeAttribute``` is used to remove an attribute of the win tag.When the ```hidden``` attribute is removed, the widget corresponding to the ```win``` tag will be displayed.
 * On a touch device, a click event is typically triggered when a user touches an element and then lifts their finger in a short time within the win area.
 
 ```javascript
@@ -132,8 +132,8 @@ icon.onPress(iconNromalOnPressFunc)
 ## Seekbar
 ### Display Current Progress
 * Drag the progress bar and then the text shows the current progress.
-* ```seekbar.progress``` function can read and write the progress.
-* ```seekbar.onPressing``` function will listen for events where your finger is kept pressed on the screen. This parameter function will be executed in each frame, while the finger is in contact with the screen.
+* Function ```seekbar.progress```  can read and write the progress.
+* Function ```seekbar.onPressing``` will listen for events where your finger is kept pressed on the screen. This parameter function will be executed in each frame, while the finger is in contact with the screen.
 ```javascript
 seekbar.getElementById('tab10Seek1')
 function seekbarOnPress(params) {
@@ -152,8 +152,8 @@ function seekbarOnPressing(params) {
 seekbar.onPressing(seekbarOnPressing)
 ```
 ### A Seekbar Animation That Increases From 0 to 100%
-* the seekbar will display an animation that continuously progresses from start to finish and then loops back to the start, creating a perpetually moving progress bar.
-* ```seekbar.setAnimate```this function sets the frame animation of the seekbar, and the parameters passed are the frame animation callback and animation duration properties.
+* The seekbar will display an animation that continuously progresses from start to finish and then loops back to the start, creating a perpetually moving progress bar.
+* This function ```seekbar.setAnimate``` sets the frame animation of the seekbar, and the parameters passed are the frame animation callback and animation duration properties.
 * Define an object ```curtainAnimateTiming``` to specify the timing properties for an animation. ```duration``` sets the duration of one cycle of the animation in milliseconds. ```iterations``` is the number of times the animation should repeat, and -1 indicates the animation should repeat indefinitely.
 ```javascript
 var curtainAnimateTiming = {
@@ -188,8 +188,8 @@ seekbar.palyAnimate()
 
 ### Listen to 2 Gestures
 * The switch control has two events, namely, being triggered by being turned on and being triggered by being turned off.
-* ```sw.onOn```This function is used to register the turned on event.
-* ```sw.onOff```This function is used to register the turned off event.
+* This function ```sw.onOn``` is used to register the turned on event.
+* This function ```sw.onOff``` is used to register the turned off event.
 ```javascript
 
 sw.getElementById('tab8Switch')

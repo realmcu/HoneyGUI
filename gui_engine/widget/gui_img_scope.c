@@ -307,7 +307,7 @@ static void gui_img_scope_img_destory(gui_obj_t *obj)
     GUI_ASSERT(obj != NULL);
     gui_img_t *this = (gui_img_t *)obj;
 
-    gui_log("do obj %s free\n", obj->name);
+    //gui_log("do obj %s free\n", obj->name);
     if (this->src_mode == IMG_SRC_FILESYS)
     {
 #ifdef _WIN32

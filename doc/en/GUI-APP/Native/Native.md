@@ -1,4 +1,4 @@
-# C-APP
+# C-APP application
 
 - In this chapter, we will explore the creation and management of C-APPs within GUI framework. A C-APP is essentially a application that users can develop to craft interactive and visually appealing user interfaces. Each C-APP can be opened, closed, switched between, and can incorporate dynamic transition effects during switching.
 
@@ -60,40 +60,11 @@ The graph below shows the widget tree structure simplified:
       - MULTI_LEVEL:1_0: A sub-container within the multi-level container, for the stopwatch.
       - MULTI_LEVEL:1_1: Another sub-container within the multi-level container, for the countdown timer.
 
+<br>
 
-```eval_rst
+<center><img  src="https://foruda.gitee.com/images/1727332782414751516/5754a436_10088396.png" /></center>
+<br>
 
-.. raw:: html
-
-    <style>
-    .center {
-        display: flex;
-        justify-content: center;
-    }
-    </style>
-
-.. raw:: html
-
-    <div class="center">
-
-.. mermaid::
-
-    graph TB
-        A[SCREEN] --> B[WINDOW]
-        B[WINDOW] --> G[CANVAS_RECT]
-        B[WINDOW] --> F[TEXTBOX]
-        A[SCREEN] --> C[WINDOW]
-        C[WINDOW] --> D[CANVAS_RECT]
-        C[WINDOW] --> E[TEXTBOX]
-        A[SCREEN] --> H[MULTI_LEVEL]
-        H[MULTI_LEVEL] --> I[MULTI_LEVEL]
-        H[MULTI_LEVEL] --> J[MULTI_LEVEL]
-
-.. raw:: html
-
-    </div>
-
-```
 
 
 

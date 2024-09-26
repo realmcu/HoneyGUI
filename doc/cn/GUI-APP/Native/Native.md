@@ -6,7 +6,7 @@
 
 - 除了默认功能和效果外，C-APP内的控件提供了高度的自定义性。用户可以为控件设置自定义帧动画，并绑定事件以执行他们定义的操作。这种灵活性使得能够根据特定需求和要求创建高度动态和互动的用户界面。
 
-## 定义一个 C-APP 应用程序
+## 定义一个 C-APP
 
 - 使用特定名称通过 ```GUI_APP_DEFINE_NAME``` API定义应用程序句柄。
 
@@ -59,39 +59,10 @@
       - MULTI_LEVEL:1_0: 多级容器中的一个子容器，供秒表使用。
       - MULTI_LEVEL:1_1: 多级容器中的另一个子容器，供倒计时器使用。
 
-```eval_rst
+<br>
 
-.. raw:: html
-
-    <style>
-    .center {
-        display: flex;
-        justify-content: center;
-    }
-    </style>
-
-.. raw:: html
-
-    <div class="center">
-
-.. mermaid::
-
-    graph TB
-        A[SCREEN] --> B[WINDOW]
-        B[WINDOW] --> G[CANVAS_RECT]
-        B[WINDOW] --> F[TEXTBOX]
-        A[SCREEN] --> C[WINDOW]
-        C[WINDOW] --> D[CANVAS_RECT]
-        C[WINDOW] --> E[TEXTBOX]
-        A[SCREEN] --> H[MULTI_LEVEL]
-        H[MULTI_LEVEL] --> I[MULTI_LEVEL]
-        H[MULTI_LEVEL] --> J[MULTI_LEVEL]
-
-.. raw:: html
-
-    </div>
-
-```
+<center><img  src="https://foruda.gitee.com/images/1727332782414751516/5754a436_10088396.png" /></center>
+<br>
 
 
 

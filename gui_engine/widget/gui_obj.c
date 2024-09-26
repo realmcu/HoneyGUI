@@ -81,7 +81,7 @@
   */
 static void gui_obj_destory_cb(gui_obj_t *obj)
 {
-    gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
+    //gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
 
     if (obj->matrix != NULL)
     {
