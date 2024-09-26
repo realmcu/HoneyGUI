@@ -373,6 +373,7 @@ section[id*="deprecated-api"] dd dl {
 /* ========= Render Image Style ========= */
 .rst-content img{
     height: auto !important;
+    cursor: pointer;
 }
 .img-border {
     border: 1px solid #000;
