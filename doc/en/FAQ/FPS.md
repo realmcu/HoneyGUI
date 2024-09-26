@@ -8,11 +8,11 @@ Using RGBA/RGB images can get great display effects, but if the FPS is low, then
 
 Use hardware acceleration to render images instead of software acceleration whenever possible.Different chip models may have different GPU, please refer to the guidance document in the SDK for details.
 
-## Data transmission speed
+## Data Transmission Speed
 
 HoneyGUI supports image compression, and some chips have built-in hardware decompression modules. Using hardware decompression modules is very fast, but software decompression requires a certain amount of time. Compressed images can reduce the size of the original image resources, allowing more resources to be stored in user data, and will also reduce the time needed to read from flash.
 
-## UI design
+## UI Design
 
 Reducing complexity in the UI, as well as the number and size of images in a single interface, can increase the frame rate. Make sure that every pixel of the image data that needs to be loaded is useful.
 
