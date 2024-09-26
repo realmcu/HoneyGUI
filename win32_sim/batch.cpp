@@ -39,6 +39,8 @@ extern "C" {
     int ExecuteBatchFile()
     {
         ExecuteBatchFileInNewWindow("gui_engine\\example\\web\\tree\\run_server.bat");
+        std::cout << std::endl << "TREE: http://localhost:8000/gui_engine/example/web/tree/" << std::endl <<
+                  std::endl;
         return 0;
     }
 }

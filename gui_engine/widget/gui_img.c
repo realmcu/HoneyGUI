@@ -934,7 +934,6 @@ static struct gui_img_transform *get_transform(gui_img_t *this)
     GUI_WIDGET_TYPE_TRY_EXCEPT(this, IMAGE_FROM_MEM)
     if (this->transform == 0)
     {
-        gui_log("this->transform == 0\n");
         this->transform = gui_malloc(sizeof(*this->transform));
         if (this->transform)
         {

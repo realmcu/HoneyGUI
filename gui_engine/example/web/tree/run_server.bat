@@ -4,6 +4,13 @@ setlocal enabledelayedexpansion
 REM Set port number
 set PORT=8000
 
+REM Check if the port is already in use
+netstat -ano | findstr :%PORT% > nul
+if !errorlevel! == 0 (
+    echo Port %PORT% is already in use. Server might be already running.
+    goto :already_running
+)
+
 REM Use `where` command to find all Python interpreters in system PATH
 for /f "tokens=*" %%P in ('where python') do (
     echo Checking %%P...
@@ -36,6 +43,10 @@ for /f "tokens=*" %%P in ('where python') do (
 )
 
 echo No valid Python interpreter with http module found.
+goto :end
+
+:already_running
+REM Additional actions if the server is already running (optional)
 
 :end
 endlocal

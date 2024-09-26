@@ -72,7 +72,7 @@ doc/doxyxml/xml
 doc/output
 doc/build
 doc/_build
-
+gui_engine/example/web/tree/diagram.mmd
 # editor config
 .vscode/
 win32_sim/gui.bin
