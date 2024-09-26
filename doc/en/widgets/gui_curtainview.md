@@ -18,7 +18,7 @@ Once the curtain extension is finished, you can configure certain callback event
 
 ## Example
 
-Please refer to the section: [curtain](./gui_curtain.md)
+Please refer to the section: [Curtain](./gui_curtain.md)
 
 
 ## API

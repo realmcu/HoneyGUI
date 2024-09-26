@@ -43,7 +43,7 @@ The tabview loop function is a clever feature that allows users to easily naviga
 
 ## Example
 
-Please refer to the section: [tab](./gui_tab.md)
+Please refer to the section: [Tab](./gui_tab.md)
 
 
 ## API

@@ -23,11 +23,11 @@
 
 ### 二维码编码注释
 
-二维码的编码数据默认情况下可以超过最大字节数，这时可以将最大版本修改为15，版本的修改可以参照以下文档：https://www.qrcode.com/zh/about/version.html。
+二维码的编码数据默认情况下可以超过最大字节数，这时可以将最大版本修改为15，版本的修改可以参照以下文档：https://www.qrcode.com/zh/about/version.html
 
 ## 示例
 
-<details> <summary>二维码</summary>
+### 二维码
 
 ```c
 #include "gui_qbcode.h"
@@ -50,13 +50,11 @@ gui_qbcode_t * qrcode = gui_qbcode_create(parent,
 gui_qbcode_config(qrcode, str, strlen(str), 3);
 ```
 
-</details>
-
 <br>
 <center><img width= "300" src="https://foruda.gitee.com/images/1713239098192542999/e635ea60_10641540.jpeg" /></center>
 <br>
 
-<details> <summary>条形码</summary>
+### 条形码
 
 ```c
 #define BARCODE_WIDTH     (143 * 3)
@@ -77,9 +75,6 @@ gui_qbcode_t * barcode = gui_qbcode_create(parent,
 
 gui_qbcode_config(qrcode, str, strlen(str) + 1, 10);
 ```
-
-</details>
-
 <br>
 
 <center><img width= "300" src="https://foruda.gitee.com/images/1713341892058343798/70403721_10641540.jpeg" /></center>
