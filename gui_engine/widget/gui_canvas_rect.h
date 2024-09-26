@@ -52,6 +52,7 @@ typedef struct gui_canvas_rect
     draw_img_t *draw_img;
     gui_color_t color;
     uint8_t opacity_value;
+    uint8_t tp_block : 1;
 } gui_canvas_rect_t;
 
 /** End of WIDGET_Exported_Types
@@ -120,6 +121,16 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
                                           int          w,
                                           int          h,
                                           gui_color_t  color);
+
+
+/**
+ * @brief set cavas_rect as tp blocker, tp will not be recived by widget under cavas_rect.
+ *
+ * @param this the cavas_rect widget pointer.
+ * @param block block or not.
+ */
+void gui_canvas_rect_set_tp_block(gui_canvas_rect_t *this, bool block);
+
 
 /**
  * @brief
