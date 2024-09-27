@@ -75,11 +75,12 @@ void gui_font_get_dot_info(gui_text_t *text)
         table_offset = (uint32_t)(uintptr_t)((uint8_t *)font + font->head_length);
         dot_offset = (uintptr_t)text->path + font->head_length + font->index_area_size;
     }
-    if (font == NULL)
+    GUI_ASSERT(font != 0)
+    uint8_t rendor_mode = 0;
+    if (font != NULL)
     {
-        gui_assert_handler("font == NULL", __FUNCTION__, __LINE__);
+        rendor_mode = font->rendor_mode;
     }
-    uint8_t rendor_mode = font->rendor_mode;
     if (rendor_mode == 0)
     {
         rendor_mode = 1;
@@ -432,12 +433,19 @@ void gui_font_mem_load(gui_text_t *text, gui_text_rect_t *rect)
     }
     // if (text->layout_refresh)
     {
-        gui_font_mem_layout(text, rect);
+        if (text != NULL)
+        {
+            gui_font_mem_layout(text, rect);
+        }
     }
 }
 
 void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
 {
+    if (text == NULL || text->data == NULL)
+    {
+        return;
+    }
     mem_char_t *chr = text->data;
     int rect_w = rect->x2 - rect->x1 + 1;
     int rect_h = rect->y2 - rect->y1 + 1;
