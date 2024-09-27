@@ -87,6 +87,7 @@ if len(args) >= 1:
   if "mutil_version" in args: mutil_version = True
   if "release_build" in args: release_build = True
   if "Archive" in args: archive = True
+  if "record_time" in args: record_time = True
 
 output_path = "output"
 html_out = output_path + "/html_out"
