@@ -66,19 +66,19 @@ static void load_img_bin_file(void)
     lv_obj_set_pos(icon, 10, 10);
 }
 
-#include "../screen_lvgl/root/lv_font_harmony_32.c"
 static void load_font_c_file(void)
 {
     lv_obj_t *label = lv_label_create(lv_scr_act());
+    extern const lv_font_t lv_font_harmony_32;
     lv_obj_set_style_text_font(label, &lv_font_harmony_32, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_label_set_text(label, "Hello LVGL! By C file.");
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 60, 105);
 }
-#include "../screen_lvgl/root/lvgl_logo.c"
 static void load_img_c_file(void)
 {
+    LV_IMG_DECLARE(img_demo_lvgl_logo);
     lv_obj_t *icon = lv_img_create(lv_scr_act());
-    lv_img_set_src(icon, &lvgl_logo);
+    lv_img_set_src(icon, &img_demo_lvgl_logo);
     lv_obj_set_pos(icon, 10, 100);
 }
 static void lv_tool_file_test(void)
@@ -92,6 +92,17 @@ static void lv_tool_file_test(void)
     load_font_bin_file();
 }
 
+lv_img_dsc_t moto_800x480 =
+{
+    .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
+    .header.always_zero = 0,
+    .header.reserved = 0,
+    .header.w = 480,
+    .header.h = 272,
+    .data_size = 130560 * 3,
+    .data = (uint8_t *)(0x4600000 + 4),
+};
+
 static void app_dialing_ui_design(gui_app_t *app)
 {
     if (lv_is_initialized() == true)
@@ -103,17 +114,18 @@ static void app_dialing_ui_design(gui_app_t *app)
     lv_port_disp_init();
     lv_port_indev_init();
     lv_port_fs_init();
-#if LV_USE_DEMO_BENCHMARK
-    // LV_LOG("Running LVGL Benchmark... \n");
-    // LV_LOG("Please stand by... \n");
-    // LV_LOG("NOTE: You will NOT see anything until the end. \n");
 
-    // lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
-    // lv_demo_benchmark_set_max_speed(true);
-    // lv_demo_benchmark();
+#if LV_USE_DEMO_BENCHMARK
+    LV_LOG("Running LVGL Benchmark... \n");
+    LV_LOG("Please stand by... \n");
+    LV_LOG("NOTE: You will NOT see anything until the end. \n");
+
+    lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
+    lv_demo_benchmark_set_max_speed(true);
+    lv_demo_benchmark();
 #endif
 #if LV_USE_DEMO_WIDGETS
-    lv_demo_widgets();
+    // lv_demo_widgets();
     // lv_obj_t *btn2 = lv_btn_create(lv_scr_act());
     // lv_obj_add_event_cb(btn2, event_handler, LV_EVENT_ALL, NULL);
     // lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 40);
@@ -124,9 +136,65 @@ static void app_dialing_ui_design(gui_app_t *app)
     // lv_label_set_text(label, "Toggle");
     // lv_obj_center(label);
 #endif
-    // lv_example_arc_1();
+    // lv_example_arc_2();
+    // lv_example_img_1();
     // lv_example_btn_1();
     // lv_tool_file_test();
+    // lv_example_btn_2();
+    // lv_example_label_3();
+
+
+    lv_tool_file_test();
+    if (0)
+    {
+        lv_fs_file_t f;
+        lv_fs_res_t res;
+        res = lv_fs_open(&f, "F:/moto.bin", LV_FS_MODE_RD);
+        if (res != LV_FS_RES_OK)
+        {
+            gui_log("file open failed\n");
+        }
+
+        uint32_t read_num = 0;
+        uint8_t *buf = (uint8_t *)gui_malloc(moto_800x480.data_size + 4);
+        res = lv_fs_read(&f, buf, moto_800x480.data_size + 4, &read_num);
+        if (res != LV_FS_RES_OK || read_num != moto_800x480.data_size + 4)
+        {
+            gui_log("file read failed\n");
+        }
+
+        {
+            lv_fs_dir_t dir;
+            res = lv_fs_dir_open(&dir, "F:/test");
+            if (res != LV_FS_RES_OK)
+            {
+                gui_log("dir open failed\n");
+            }
+
+            char dir_name[256];
+            memset(dir_name, 0, 256);
+            lv_fs_dir_read(&dir, dir_name);
+            while (strlen(dir_name))
+            {
+                gui_log("dir read %s\n", dir_name);
+                memset(dir_name, 0, 256);
+                lv_fs_dir_read(&dir, dir_name);
+            }
+
+            res = lv_fs_dir_close(&dir);
+            if (res != LV_FS_RES_OK)
+            {
+                gui_log("dir close failed\n");
+            }
+        }
+
+        lv_obj_t *img1 = lv_img_create(lv_scr_act());
+        moto_800x480.data = buf + 4;
+        lv_img_set_src(img1, &moto_800x480);
+    }
+
+
+
 }
 
 

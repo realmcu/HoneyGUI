@@ -6,7 +6,7 @@ This example demostrates how to develop a RealUI 86BOX APP, from which you can l
 - APP package `gui_engine\example\screen_480_480\root\app\box`
 - UI Design project `RVisualDesigner-v1.0.5.0\Demo\480x480\box\box480x480.rtkprj`
 
-## UI design
+## UI Design
 ### RVisualDesigner
 - RealUI 86box utilizes `RVisualDesigner` to complete UI design. For the first-time usage of `RVisualDesigner`, please refer to `RVisualDesigner-v1.0.5.0\RTKIOT Visual Designer User Guide EN.pdf` to obtain a detailed development guide.
 

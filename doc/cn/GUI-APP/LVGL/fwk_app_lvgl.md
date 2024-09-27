@@ -66,7 +66,8 @@ HoneyGUI Dir
 |     |  |__ app_ui_lvgl.c               // 模拟器 LVGL UI 入口
 |     :
 |     :
-|     |__ screen_lvgl                     
+|     |__ screen_lvgl   
+|        |-- assets                       // LVGL 用户图片和字库 C 文件                 
 |        |-- root                         // LVGL 文件系统根目录
 |        |-- _bin_mkromfs.py
 |        |-- mkromfs_0x4600000.bat        // User Data 打包脚本
@@ -555,7 +556,7 @@ LVGL 的图片和字库需要借助工具转换为 LVGL 可以识别的格式，
 4. 选择输出图片的类型 (C array/bin file)
 5. 点击转换获取输出文件
 
-在文档 [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。
+在文档 [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) 中详细介绍了如何在 LVGL 中使用图片资源和图片转换工具，并提供了简单的使用范例。以 C array 生成的图片资源置于 `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
 
 值得一提的是，使用 bin 文件的图片资源时，bin 文件中数据的格式为 `4 Byte header + data`, 其中 `header` 中包含有 `Color format`, `width` 和 `height`，此时利用 `header` 信息来计算出 `data_size` 即可构建一个完整的 `lv_img_dsc_t ` 来描述图片。
 
@@ -597,7 +598,7 @@ typedef struct {
 6. 设定需要转换的字符 Unicode 范围，也可直接列出需要转换的字符
 
 
-在文档 [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 `lv_example_label_3()` 示例了如何为 label 控件配置指定的字库。
+在文档 [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) 中详细介绍了如何在 LVGL 中使用字库资源和字库转换工具，并提供了简单的使用范例。在 example 中 `lv_example_label_3()` 示例了如何为 label 控件配置指定的字库。以 C array 生成的字库资源置于 `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` 下即可被自动构建到工程中。 
 
 在 LVGL 中提供了内置的字库，以数组的形式保存在目录 `your HoneyGUI dir/lvgl/src/font/` 下，每份字库所包含的字符均注明在文件开头。内置字库中包含有一份汉字字库 `lv_font_simsun_16_cjk.c` cjk 16 号字库，但为单一字号，字符数有限。
 

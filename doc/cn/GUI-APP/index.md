@@ -16,9 +16,9 @@ HoneyGUI框架的结构图如下所示：
 .. toctree::
     :maxdepth: 2
 
-    C-APP应用程序 <Native/Native>
-    使用LVGL设计应用程序 <LVGL/fwk_app_lvgl>
-    使用ARM-2D设计应用程序 <ARM-2D/fwk_app_arm2d>
+    C-APP 应用程序 <Native/Native>
+    使用 LVGL 设计应用程序 <LVGL/fwk_app_lvgl>
+    使用 ARM-2D 设计应用程序 <ARM-2D/fwk_app_arm2d>
     使用脚本设计应用程序 <SaaA/index>
     应用程序切换 <Switch_APP/index>
 ```

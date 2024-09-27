@@ -66,8 +66,9 @@ HoneyGUI Dir
 |     |  |__ app_ui_lvgl.c               // simulator LVGL UI entrance
 |     :
 |     :
-|     |__ screen_lvgl                     
-|        |-- root                         // LVGL file system root floder
+|     |__ screen_lvgl    
+|        |-- assets                       // LVGL user image and font C files                   
+|        |-- root                         // LVGL file system root folder
 |        |-- _bin_mkromfs.py
 |        |-- mkromfs_0x4600000.bat        // User Data pack script
 |        |-- resource.h                   // resource files packed address
@@ -538,7 +539,7 @@ Please refer to the following steps for usage in [LVGL Overview Images - Online 
 4. Choose the type of output image (C array/bin file).
 5. Click "Convert" to obtain the output file.
 
-The [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples.
+The [LVGL Overview Images](https://docs.lvgl.io/8.3/overview/image.html) document provides detailed instructions on how to use image resources and the image conversion tool in LVGL, along with simple usage examples. To automatically build image resources generated as C arrays, place them under the directory `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` directory.
 
 It's worth mentioning that when using the bin file as an image resource, the data in the bin file follows the format of `4 Byte header + data`. The `header` contains information such as `Color format`, `width`, and `height`. To construct a complete `lv_img_dsc_t` to describe the image, you can calculate the `data_size` using the information from the `header`.
 
@@ -578,7 +579,7 @@ Please refer to the following steps for usage in [LVGL Overview Font - Add a new
 5. Select the font file (TTF/WOFF).
 6. Set the Unicode range of characters to convert, or directly list the characters that need to be converted.
 
-The [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, `lv_example_label_3()` demonstrates how to configure a specific font for a label control.
+The [LVGL Overview Fonts](https://docs.lvgl.io/8.3/overview/font.html) document provides detailed instructions on how to use font resources and the font conversion tool in LVGL, along with simple usage examples. In the example, `lv_example_label_3()` demonstrates how to configure a specific font for a label control. To automatically build font resources generated as C arrays, place them under the directory `your HoneyGUI dir/gui_engine/example/screen_lvgl/assets/` directory.
 
 LVGL provides built-in fonts, which are saved as arrays in the directory `your HoneyGUI dir/lvgl/src/font/`. Each font file specifies the included characters at the beginning of the file. The built-in fonts include a Chinese font, `lv_font_simsun_16_cjk.c`, which is a CJK (Chinese, Japanese, and Korean) 16px font, but it is a single font size with a limited character set.
 

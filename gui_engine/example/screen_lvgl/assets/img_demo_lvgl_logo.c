@@ -210,7 +210,7 @@ lvgl_logo_map[] =
 #endif
 };
 
-const lv_img_dsc_t lvgl_logo =
+const lv_img_dsc_t img_demo_lvgl_logo =
 {
     .header.cf = LV_IMG_CF_TRUE_COLOR,
     .header.always_zero = 0,
