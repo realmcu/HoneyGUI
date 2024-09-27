@@ -3,6 +3,7 @@
 import sys
 import os
 import re
+import time
 import shutil
 from conf_common import exclude_patterns
 
@@ -10,6 +11,7 @@ from conf_common import exclude_patterns
 # Change to script directory for consistency
 doc_path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(doc_path)
+gui_path = os.path.join(doc_path, "..")
 
 def cmd(s):
   print("")
@@ -54,6 +56,16 @@ RVisualDesigner Tool: :download:`RVisualDesigner Tool <../{}>`
   with open(index_file, mode='w+', newline='', errors='surrogateescape') as fd:
     fd.write(stream)
 
+def record_doc_generate_time(index_path):
+  nighty_date = time.strftime("%Y-%m-%d", time.localtime())
+  record_comment = "\n\n{} update by jenkins\n\n".format(nighty_date)
+  index_md = os.path.join(index_path, r'index.rst')
+  with open(index_md, mode='r', newline='', errors='surrogateescape') as fd:
+      stream = fd.read()
+      stream = re.sub(r'(=============\n)', lambda objs: objs.group(1) + record_comment, stream, count=1, flags=re.M)
+  with open(index_md, mode='w+', newline='', errors='surrogateescape') as fd:
+      fd.write(stream)
+
 
 #Enter pipenv
 #cmd("pipenv shell")
@@ -65,6 +77,8 @@ skip_latex = False
 skip_doxygen = False
 mutil_version = False
 release_build = False
+archive = False
+record_time = False
 args = sys.argv[1:]
 if len(args) >= 1:
   if "clean" in args: clean = 1
@@ -72,10 +86,12 @@ if len(args) >= 1:
   if "skip_doxygen" in args: skip_doxygen = True
   if "mutil_version" in args: mutil_version = True
   if "release_build" in args: release_build = True
+  if "Archive" in args: archive = True
 
 output_path = "output"
-cn_html_out = r'html_out/cn'
-en_html_out = r'html_out/en'
+html_out = output_path + "/html_out"
+cn_html_out = r'cn'
+en_html_out = r'en'
 latex_out = "latex_out"
 print("")
 print("****************")
@@ -99,7 +115,7 @@ cmd("python generate_jieba_dict.py ./cn ./cn/word_dict.txt")
 
 # BUILD HTML
 os.chdir(doc_path)
-en_cn_build = [(" -c ./en en ./{}/{} -D language=en".format(output_path, en_html_out), 'en'), (" -c ./cn cn ./{}/{} -D language=zh_CN".format(output_path, cn_html_out), 'cn')]
+en_cn_build = [(" -c ./en en ./{}/{} -D language=en".format(html_out, en_html_out), 'en'), (" -c ./cn cn ./{}/{} -D language=zh_CN".format(html_out, cn_html_out), 'cn')]
 for l, p in en_cn_build:
   l_doc_path = os.path.join(doc_path, p)
   # BUILD PDF
@@ -120,6 +136,9 @@ for l, p in en_cn_build:
   else:
     print("skipping latex build as requested")
 
+  if record_time:
+    record_doc_generate_time(l_doc_path)
+
   os.chdir(doc_path)
   if release_build:
     sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -132,10 +151,10 @@ for l, p in en_cn_build:
   exclude_patterns_ins = []
   exclude_patterns_ins.extend(exclude_patterns)
   if "en" in l:
-    html_out_path = os.path.join(doc_path, output_path, en_html_out)
+    html_out_path = os.path.join(doc_path, html_out, en_html_out)
     exclude_patterns_ins.append('cn')
   elif "cn" in l:
-    html_out_path = os.path.join(doc_path, output_path, cn_html_out)
+    html_out_path = os.path.join(doc_path, html_out, cn_html_out)
     exclude_patterns_ins.append('en')
   print("exclude_patterns_ins:",exclude_patterns_ins)
   ep = ",".join(exclude_patterns_ins)
@@ -148,5 +167,9 @@ for l, p in en_cn_build:
   print(cmd_line)
   cmd(cmd_line)
 
-
+if archive:
+  os.chdir(gui_path)
+  doc_zip_name = "doc-{}".format(os.environ['BRANCH_NAME'].replace("/", "-"))
+  shutil.make_archive(base_name=doc_zip_name, format='zip', root_dir=os.path.join(doc_path, html_out))
+  print(f"doc zip name: {doc_zip_name}")
 
