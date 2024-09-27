@@ -582,6 +582,7 @@ void gui_font_mem_layout(gui_text_t *text, gui_text_rect_t *rect)
             break;
         }
     case SCROLL_X:
+    case SCROLL_X_REVERSE:
         {
             text->char_line_sum = 1;
             for (uint16_t i = 0; i < text->font_len; i++)

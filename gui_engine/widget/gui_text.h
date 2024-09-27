@@ -65,6 +65,7 @@ typedef enum
     SCROLL_X           = 0x30,
     SCROLL_Y           = 0x31,
     SCROLL_Y_REVERSE   = 0x32,
+    SCROLL_X_REVERSE   = 0x33,
     /* VERTICAL */
     VERTICAL_LEFT      = 0x40,
     VERTICAL_RIGHT     = 0x41,
