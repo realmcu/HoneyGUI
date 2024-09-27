@@ -384,6 +384,9 @@ section[id*="deprecated-api"] dd dl {
 .red-text {
     color: red;
 }
+.glossary-highlighted {
+    background: #f1c40f;
+}
 /* ========= Render text color ========= */
 
 /* ========= Render text style ========= */
