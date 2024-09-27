@@ -5,11 +5,16 @@ function updateValue(id) {
 
 function sendData() {
     const data = {
-        temperature: [
+        weather: [
             {
                 low: parseInt(document.getElementById('tempLow').value),
                 high: parseInt(document.getElementById('tempHigh').value),
-                cur: parseInt(document.getElementById('tempCur').value)
+                cur: parseInt(document.getElementById('tempCur').value),
+                condition_1: document.getElementById('condition_1').value,
+                condition_2: document.getElementById('condition_2').value,
+                condition_3: document.getElementById('condition_3').value,
+                condition_4: document.getElementById('condition_4').value,
+                condition_5: document.getElementById('condition_5').value,
             }
         ],
         compass: [

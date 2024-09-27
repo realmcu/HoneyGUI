@@ -121,18 +121,18 @@ char *month[12] =
 };
 char *day[7] =
 {
-    "Sun",
-    "Mon",
-    "Tues",
-    "Wed",
-    "Thur",
-    "Fri",
-    "Sat"
+    "SUN",
+    "MON",
+    "TUE",
+    "WED",
+    "THU",
+    "FRI",
+    "SAT"
 };
 
-static struct tm *timeinfo;
-static char date_timecard_content[10] = "Thur 15", time_content[10] = "00:00",
-                                                                      date_content[20] = "October15\nThur";
+extern struct tm *timeinfo;
+static char time_content[10] = "00:00", date_content[20] = "October15\nThur";
+static char time_timecard_content[10] =  "00:00", date_timecard_content[10] = "Thur 15";
 static gui_text_t *timecard_date_text, *timecard_time_text, *date_text, *time_text;
 
 static void *font_size_96_bin_addr = SOURCEHANSANSSC_SIZE96_BITS4_FONT_BIN;
@@ -144,42 +144,25 @@ static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS4_FONT_BIN;
 
 static void display_time()
 {
-#if defined __WIN32
-    time_t rawtime;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    char temp[10];
-    sprintf(temp, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    if (!timeinfo)
+    {
+        return;
+    }
+    else
+    {
+        sprintf(time_timecard_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+        gui_text_content_set(timecard_time_text, time_timecard_content, strlen(time_timecard_content));
 
-    strcpy(time_content, temp);
-    gui_text_content_set(timecard_time_text, time_content, strlen(time_content));
-    gui_text_content_set(time_text, time_content, strlen(time_content));
+        sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
+        gui_text_content_set(timecard_date_text, date_timecard_content, strlen(date_timecard_content));
 
-    char temp_1[10];
-    sprintf(temp_1, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
-    strcpy(date_timecard_content, temp_1);
-    gui_text_content_set(timecard_date_text, date_timecard_content, strlen(date_timecard_content));
+        sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
+                day[timeinfo->tm_wday]);
+        gui_text_content_set(date_text, date_content, strlen(date_content));
 
-    char temp_2[20];
-    sprintf(temp_2, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday, day[timeinfo->tm_wday]);
-    strcpy(date_content, temp_2);
-    gui_text_content_set(date_text, date_content, strlen(date_content));
-#else
-    extern struct tm watch_time;
-    char temp[20];
-    sprintf(temp, "%02d:%02d", watch_time.tm_hour, watch_time.tm_min);
-    strcpy(time_content, temp);
-    gui_text_content_set(time_text, time_content, strlen(time_content));
-    gui_text_content_set(timecard_time_text, time_content, strlen(time_content));
-
-    sprintf(temp, "%s %d",  day[watch_time.tm_wday], watch_time.tm_mday);
-    strcpy(date_timecard_content, temp);
-    gui_text_content_set(timecard_date_text, date_timecard_content, strlen(date_timecard_content));
-
-    sprintf(temp, "%s%d\n%s", month[watch_time.tm_mon], watch_time.tm_mday, day[watch_time.tm_wday]);
-    strcpy(date_content, temp);
-    gui_text_content_set(date_text, date_content, strlen(date_content));
-#endif
+        sprintf(time_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+        gui_text_content_set(time_text, time_content, strlen(time_content));
+    }
 }
 
 static void canvas_cb_draw_bg(gui_canvas_t *canvas)
@@ -287,7 +270,7 @@ void curtain_down_design(void *parent_widget)
 
     gui_cardview_set_style(cv, REDUCTION);
     // change timecard img and canvas
-    gui_cardview_set_animate(cv, 10000, -1, cv_cb, cv);
+    gui_cardview_set_animate(cv, 2000, -1, cv_cb, cv);
     // gui_cardview_set_bottom_space(cv, 30);
 
     gui_card_t *cv_no_dispaly = gui_card_create(cv, "cv_no_dispaly", 0, 0, 0,
