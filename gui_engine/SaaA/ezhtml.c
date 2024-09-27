@@ -3452,12 +3452,12 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         if (!strcmp(type, "animatePause"))
                         {
 
-                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), pause_animation_cb,
+                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)pause_animation_cb,
                                                              (param));
                         }
                         else if (!strcmp(type, "animate"))
                         {
-                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), start_animation_cb,
+                            GUI_API(gui_switch_t).on_turn_on(GUI_TYPE(gui_switch_t, parent), (gui_event_cb_t)start_animation_cb,
                                                              param);
                         }
                     }
@@ -3497,12 +3497,14 @@ gui_obj_t *widget_create_handle(ezxml_t p, gui_obj_t *parent)
                         if (!strcmp(type, "animatePause"))
                         {
 
-                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), pause_animation_cb,
+                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                              (gui_event_cb_t)pause_animation_cb,
                                                               (param));
                         }
                         else if (!strcmp(type, "animate"))
                         {
-                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent), start_animation_cb,
+                            GUI_API(gui_switch_t).on_turn_off(GUI_TYPE(gui_switch_t, parent),
+                                                              (gui_event_cb_t)start_animation_cb,
                                                               param);
                         }
                     }

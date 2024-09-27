@@ -129,7 +129,7 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
  * @param this the cavas_rect widget pointer.
  * @param block block or not.
  */
-void gui_canvas_rect_set_tp_block(gui_canvas_rect_t *this, bool block);
+void gui_canvas_rect_set_tp_block(gui_canvas_rect_t *, bool block);
 
 
 /**
@@ -138,7 +138,7 @@ void gui_canvas_rect_set_tp_block(gui_canvas_rect_t *this, bool block);
  * @param this
  * @param opacity_value
  */
-void gui_canvas_rect_set_opacity(gui_canvas_rect_t *this, unsigned char opacity_value);
+void gui_canvas_rect_set_opacity(gui_canvas_rect_t *, unsigned char opacity_value);
 
 
 /**
@@ -147,7 +147,7 @@ void gui_canvas_rect_set_opacity(gui_canvas_rect_t *this, unsigned char opacity_
  * @param this
  * @param color
  */
-void gui_canvas_rect_set_color(gui_canvas_rect_t *this, gui_color_t  color);
+void gui_canvas_rect_set_color(gui_canvas_rect_t *, gui_color_t  color);
 
 
 /**
@@ -157,7 +157,7 @@ void gui_canvas_rect_set_color(gui_canvas_rect_t *this, gui_color_t  color);
  * @param start x
  * @param start y
  */
-void gui_canvas_rect_set_location(gui_canvas_rect_t *this, int x, int y);
+void gui_canvas_rect_set_location(gui_canvas_rect_t *, int x, int y);
 
 
 /**
@@ -167,7 +167,7 @@ void gui_canvas_rect_set_location(gui_canvas_rect_t *this, int x, int y);
  * @param width
  * @param heigh
  */
-void gui_canvas_rect_set_size(gui_canvas_rect_t *this, int w, int h);
+void gui_canvas_rect_set_size(gui_canvas_rect_t *, int w, int h);
 
 
 /** End of WIDGET_Exported_GUI_Functions

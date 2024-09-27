@@ -936,7 +936,7 @@ DECLARE_HANDLER(switch_on)
             cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
-        GUI_API(gui_switch_t).on_turn_on((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        GUI_API(gui_switch_t).on_turn_on((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();
@@ -964,7 +964,7 @@ DECLARE_HANDLER(switch_off)
             cb_arg->args_p[i] = args[i + 1];
         }
         cb_arg->func = args[0];
-        GUI_API(gui_switch_t).on_turn_off((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        GUI_API(gui_switch_t).on_turn_off((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();

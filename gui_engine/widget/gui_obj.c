@@ -616,9 +616,9 @@ void gui_obj_skip_all_child_left_hold(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o == 0)
+        if (o->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
             gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
             return;
         }
@@ -642,9 +642,9 @@ void gui_obj_skip_all_child_right_hold(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o == 0)
+        if (o->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
             gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
             return;
         }
@@ -668,9 +668,9 @@ void gui_obj_skip_all_child_up_hold(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o == 0)
+        if (o->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
             gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
             return;
         }
@@ -694,9 +694,9 @@ void gui_obj_skip_all_child_down_hold(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o == 0)
+        if (o->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
             gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
             return;
         }
@@ -765,9 +765,9 @@ void gui_obj_skip_all_child_short(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o == 0)
+        if (o->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
             gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
             return;
         }
@@ -815,9 +815,9 @@ void gui_obj_skip_all_child_long(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o == 0)
+        if (o->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
             gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
             return;
         }
@@ -866,9 +866,9 @@ void gui_obj_skip_all_child_pressed(gui_obj_t *obj)
     gui_list_for_each_safe(node, tmp, &obj->child_list)
     {
         gui_obj_t *o = gui_list_entry(node, gui_obj_t, brother_list);
-        if (o == 0)
+        if (o->magic != GUI_MAGIC_NUMBER)
         {
-            gui_log("list NULL @line:%d, @%x", __LINE__, obj);
+            gui_log("list NULL @line:%d, @%p", __LINE__, obj);
             gui_log("@name:%s, @type:%d\n", obj->name, obj->type);
             return;
         }

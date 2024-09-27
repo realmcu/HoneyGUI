@@ -77,13 +77,13 @@ _GUI_API_DEFINE(gui_switch_t)
 void (*turn_off)(gui_switch_t *sw);
 
 void (*turn_on)(gui_switch_t *sw);
-void (*on_turn_on)(gui_switch_t *this, void *cb, void *p);
-void (*on_turn_off)(gui_switch_t *this, void *cb, void *p);
-void (*on_press)(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter);
-void (*on_release)(gui_switch_t *this, gui_event_cb_t event_cb, void *parameter);
-void (*ctor)(gui_switch_t *this, gui_obj_t *parent, int16_t x,
+void (*on_turn_on)(gui_switch_t *, gui_event_cb_t cb, void *p);
+void (*on_turn_off)(gui_switch_t *, gui_event_cb_t cb, void *p);
+void (*on_press)(gui_switch_t *, gui_event_cb_t event_cb, void *parameter);
+void (*on_release)(gui_switch_t *, gui_event_cb_t event_cb, void *parameter);
+void (*ctor)(gui_switch_t *, gui_obj_t *parent, int16_t x,
              int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic);
-void (*animate)(gui_switch_t *this,
+void (*animate)(gui_switch_t *,
                 uint32_t      dur,
                 int           repeat_count,
                 void         *callback,
@@ -221,28 +221,28 @@ gui_switch_t *gui_switch_create_from_ftl(void    *parent,
  *
  * @param this
  */
-void gui_switch_turn_on(gui_switch_t *this);
+void gui_switch_turn_on(gui_switch_t *);
 
 /**
  * @brief Turn off the switch, event will be triggered.
  *
  * @param this
  */
-void gui_switch_turn_off(gui_switch_t *this);
+void gui_switch_turn_off(gui_switch_t *);
 
 /**
  * @brief If the switch has been turned on somehow, it can upadte the status to on status.
  *
  * @param this
  */
-void gui_switch_is_on(gui_switch_t *this);
+void gui_switch_is_on(gui_switch_t *);
 
 /**
  * @brief If the switch has been turned off somehow, it can upadte the status to off status.
  *
  * @param this
  */
-void gui_switch_is_off(gui_switch_t *this);
+void gui_switch_is_off(gui_switch_t *);
 
 /**
  * @brief set sw state and change ui, NO event will be trigered.
@@ -250,7 +250,7 @@ void gui_switch_is_off(gui_switch_t *this);
  * @param this
  * @param ifon set sw state
  */
-void gui_switch_change_state(gui_switch_t *this, bool ifon);
+void gui_switch_change_state(gui_switch_t *, bool ifon);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */

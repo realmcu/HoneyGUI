@@ -530,7 +530,10 @@ static void **get_image_pointers(const char *input, size_t *num_pointers,
                         gui_log("Failed to reallocate memory");
                     }
                 }
-                image_pointers[(*num_pointers)++] = img;
+                if (image_pointers)
+                {
+                    image_pointers[(*num_pointers)++] = img;
+                }
             }
         }
 

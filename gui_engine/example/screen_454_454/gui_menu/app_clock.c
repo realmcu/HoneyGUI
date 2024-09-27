@@ -202,8 +202,8 @@ static void stop_watch_ml1_0(gui_obj_t *parent)
     gui_img_set_mode(sw->switch_picture, IMG_SRC_OVER_MODE);
     GUI_BASE(sw->switch_picture)->y = -27;
     GUI_BASE(sw->switch_picture)->x = -30;
-    GUI_API(gui_switch_t).on_turn_on(sw, stopwatch_switch_on_cb, stop);
-    GUI_API(gui_switch_t).on_turn_off(sw, stopwatch_switch_off_cb, stop);
+    GUI_API(gui_switch_t).on_turn_on(sw, (gui_event_cb_t)stopwatch_switch_on_cb, stop);
+    GUI_API(gui_switch_t).on_turn_off(sw, (gui_event_cb_t)stopwatch_switch_off_cb, stop);
 }
 static void hour_destory_overwrite(gui_obj_t *obj)
 {
@@ -518,8 +518,8 @@ static void stop_watch_ml1_1(gui_obj_t *parent)
     gui_img_set_mode(sw->switch_picture, IMG_SRC_OVER_MODE);
     GUI_BASE(sw->switch_picture)->y = -27;
     GUI_BASE(sw->switch_picture)->x = -30;
-    GUI_API(gui_switch_t).on_turn_on(sw, switch_on_cb, 0);
-    GUI_API(gui_switch_t).on_turn_off(sw, switch_off_cb, 0);
+    GUI_API(gui_switch_t).on_turn_on(sw, (gui_event_cb_t)switch_on_cb, 0);
+    GUI_API(gui_switch_t).on_turn_off(sw, (gui_event_cb_t) switch_off_cb, 0);
 }
 static void win_stop_watch_cb(void *null1, void *null2, void *param)
 {
