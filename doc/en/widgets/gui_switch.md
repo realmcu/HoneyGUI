@@ -5,7 +5,7 @@ Switch is a custom switch button control, often used to enable or disable certai
 ## Usage
 
 ### Create widget
-Using [gui_switch_t * gui_switch_create(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create) or [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_ftl) to create switch widget from memory address, and [gui_switch_t * gui_switch_create_from_fs(parent, x, y, w, h, off_pic, on_pic)](#gui_switch_create_from_fs) to create switch widget from filesystem.
+Using [gui_switch_create(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create) or [gui_switch_create_from_ftl(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_ftl) to create switch widget from memory address, and [gui_switch_create_from_fs(void *parent, int16_t x, int16_t y, int16_t w, int16_t h, void *off_pic, void *on_pic)](#gui_switch_create_from_fs) to create switch widget from filesystem.
 You can refer to the specific parameters of `gui_switch_t`, such as base, switch_picture, on_pic_addr, off_pic_addr, etc.
 
 

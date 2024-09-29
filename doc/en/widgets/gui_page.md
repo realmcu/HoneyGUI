@@ -6,7 +6,7 @@ The page widget is a container widget that allow developers to create a page con
 
 ### Create Page Widget
 
-Developers can utilize the [gui_page_create(parent, filename, x, y, w, h)](#gui_page_create) function to establish a page widget. The page widget is a container oriented vertically, allowing the addition of other widgets to it. The height of the page widget is determined by the number of widgets added to it. As more widgets are added, its height increases.
+Developers can utilize the [gui_page_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_page_create) function to establish a page widget. The page widget is a container oriented vertically, allowing the addition of other widgets to it. The height of the page widget is determined by the number of widgets added to it. As more widgets are added, its height increases.
 
 ## Example
 

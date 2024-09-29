@@ -6,7 +6,7 @@
 
 ### 创建页面控件
 
-开发者可以使用 [gui_page_create(parent, filename, x, y, w, h)](#gui_page_create) 函数来创建一个页面控件。页面控件是一个垂直排列的容器，允许向其中添加其他控件。页面控件的高度由添加的控件数量决定，当添加的其他控件越多时，其高度也就越高。
+开发者可以使用 [gui_page_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_page_create) 函数来创建一个页面控件。页面控件是一个垂直排列的容器，允许向其中添加其他控件。页面控件的高度由添加的控件数量决定，当添加的其他控件越多时，其高度也就越高。
 
 ## 示例
 

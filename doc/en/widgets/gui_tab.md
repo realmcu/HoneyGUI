@@ -8,10 +8,10 @@ For an introduction to idx and idy, please refer to: [tabview](./gui_tabview.md)
 ## Usage
 
 ### Create Tab Widget
-[gui_tab_create(parent, x, y, w, h, idx, idy)](#gui_tab_create) is used to create a tab widget, where `idx` and `idy` represent the direction of the created tab.
+[gui_tab_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, int16_t idx, int16_t idy)](#gui_tab_create) is used to create a tab widget, where `idx` and `idy` represent the direction of the created tab.
 
 ### Set Tab Style
-If you want to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(this, style)](#gui_tab_set_style) to set it. By default, the classic style is employed. The available switching effects include the following:
+If you want to exhibit various switching effects when switching tabs, you can utilize the [gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style)](#gui_tab_set_style) to set it. By default, the classic style is employed. The available switching effects include the following:
 
 ```eval_rst
 
@@ -26,7 +26,7 @@ If you want to exhibit various switching effects when switching tabs, you can ut
 
 ### Tab
 
-The tab switching style can be customized, and developers can set the tab switching style using the function [gui_tab_set_style(this, style)](#gui_tab_create). Available styles include `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, and `TAB_PAGE`. The `FADE` style adjusts the tab's opacity during the switch, while the `REDUCTION_FADE` style changes both the size and opacity of the tab during the transition. In this example, the first three tabs are set to the `TAB_CUBE` style, and the last three tabs are set to the `REDUCTION` style, as shown in the animation below.
+The tab switching style can be customized, and developers can set the tab switching style using the function [gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style)](#gui_tab_create). Available styles include `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, and `TAB_PAGE`. The `FADE` style adjusts the tab's opacity during the switch, while the `REDUCTION_FADE` style changes both the size and opacity of the tab during the transition. In this example, the first three tabs are set to the `TAB_CUBE` style, and the last three tabs are set to the `REDUCTION` style, as shown in the animation below.
 
 ```c
 #include <gui_tabview.h>
@@ -83,7 +83,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 ### Tabview Rotate
 
-Unlike individual tab style changes, the tabview control allows you to set a uniform switching style for all tabs using the function `gui_tabview_set_style(this, style)`. For example, you can set all tabs to styles such as `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, or `TAB_PAGE`. The following example demonstrates how to switch to the `TAB_ROTATE` style, with `CLASSIC` being the default style.
+Unlike individual tab style changes, the tabview control allows you to set a uniform switching style for all tabs using the function [gui_tabview_set_style(gui_tabview_t *this, T_SLIDE_STYLE style)](#gui_tabview_set_style). For example, you can set all tabs to styles such as `REDUCTION`, `CLASSIC`, `FADE`, `REDUCTION_FADE`, `TAB_ROTATE`, `TAB_CUBE`, or `TAB_PAGE`. The following example demonstrates how to switch to the `TAB_ROTATE` style, with `CLASSIC` being the default style.
 
 
 ```c
@@ -134,7 +134,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 ### Tabview Loop
 
-In a tabview, you can use the function `gui_tabview_loop_x(tabview, loop)` (refer to tabview) to determine whether the tabs should loop continuously in the x-direction. Similarly, `gui_tabview_loop_y(tabview, loop)` determines whether the tabs should loop continuously in the y-direction. The loop parameter is a boolean that specifies whether to enable the looping feature. If set to true, the tabs will loop continuously; if set to false, they will not.
+In a tabview, you can use the function [gui_tabview_loop_x(gui_tabview_t *tabview, bool loop)](#gui_tabview_loop_x) to determine whether the tabs should loop continuously in the x-direction. Similarly, [gui_tabview_loop_y(gui_tabview_t *tabview, bool loop)](#gui_tabview_loop_y) determines whether the tabs should loop continuously in the y-direction. The loop parameter is a boolean that specifies whether to enable the looping feature. If set to true, the tabs will loop continuously; if set to false, they will not.
 
 
 ```c

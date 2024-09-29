@@ -5,10 +5,10 @@
 ## 用法
 
 ### 创建网格组件
-开发者可以通过[gui_grid_create(parent, x, y, row, col, gap, col, gap_row)](#gui_grid_create) 创建网格组件, 按照创建的顺序用控件填充网格。
+开发者可以通过[gui_grid_create(void *parent, int16_t x, int16_t y, int16_t row, int16_t col, uint16_t gap_col, uint16_t gap_row)](#gui_grid_create) 创建网格组件, 按照创建的顺序用控件填充网格。
 
 ### 设置网格样式
-开发者可以使用[gui_grid_style(grid, style)](#gui_grid_style) 进行设置样式，总共有以下两种样式。
+开发者可以使用[gui_grid_style(gui_grid_t *grid, T_GUI_GRID_STYLE style)](#gui_grid_style) 进行设置样式，总共有以下两种样式。
 
 ```eval_rst
 .. literalinclude:: ../../../gui_engine/widget/gui_grid.h

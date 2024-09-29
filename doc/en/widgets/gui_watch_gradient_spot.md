@@ -6,11 +6,11 @@ The watch gradientm spot widget allows you to create a pointer watchface with dy
 
 ### Create Widget
 
-You can create a watch gradient spot widget by calling the [gui_watch_gradient_spot_create(parent, name, x, y, w, h)](#gui_watch_gradient_spot_create).
+You can create a watch gradient spot widget by calling the [gui_watch_gradient_spot_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_watch_gradient_spot_create).
 
 ### Set Center
 
-The center position of the widget can be freely set by using the [gui_watch_gradient_spot_set_center(this, c_x, c_y)](#gui_watch_gradient_spot_set_center) function to change the center position, where `c_x` and `c_y` are the coordinate points of the central position.
+The center position of the widget can be freely set by using the [gui_watch_gradient_spot_set_center(gui_watch_gradient_spot_t *this, float c_x, float c_y)](#gui_watch_gradient_spot_set_center) function to change the center position, where `c_x` and `c_y` are the coordinate points of the central position.
 
 ## Example
 

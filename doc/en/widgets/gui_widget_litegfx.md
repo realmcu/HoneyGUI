@@ -13,7 +13,6 @@ To run the LiteGFX effects on the simulator, comment out the macro `CONFIG_REALT
 ### Notifications
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     extern void design_tab_app_notifications(void *parent);
@@ -29,7 +28,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### Energybox
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     extern void design_tab_app_energybox(void *parent);
@@ -45,7 +43,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### Prism
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     extern void design_tab_app_prsim_refl(void *parent);
@@ -61,7 +58,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### Digit Clock
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
@@ -79,7 +75,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### Butterfly
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
@@ -100,7 +95,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### Flowerfall
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
@@ -119,7 +113,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### Windmill
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);

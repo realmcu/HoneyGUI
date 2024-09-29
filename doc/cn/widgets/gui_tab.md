@@ -10,11 +10,11 @@
 
 ### 创建选项卡控件
 
-使用 [gui_tab_create(parent, x, y, w, h, idx, idy)](#gui_tab_create) 函数创建选项卡控件，其中 `idx` 和 `idy` 表示创建选项卡控件的方向。
+使用 [gui_tab_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h, int16_t idx, int16_t idy)](#gui_tab_create) 函数创建选项卡控件，其中 `idx` 和 `idy` 表示创建选项卡控件的方向。
 
 ### 设置选项卡切换风格
 
-如果想要在切换不同的选项卡控件时，展现不同的切换效果，可以使用 [gui_tab_set_style(this, style)](#gui_tab_set_style) 函数来设置。在默认情况下使用经典风格，切换效果有以下几种：
+如果想要在切换不同的选项卡控件时，展现不同的切换效果，可以使用 [gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style)](#gui_tab_set_style) 函数来设置。在默认情况下使用经典风格，切换效果有以下几种：
 
 ```eval_rst
 
@@ -29,7 +29,7 @@
 
 ### 选项卡控件
 
-选项卡切换的样式可以自定义，开发者可以使用 [gui_tab_set_style(this, style)](#gui_tab_set_style) 这个函数设置选项卡的切换风格。如 `REDUCTION`、`CLASSIC`、`FADE`、`REDUCTION_FADE`、`TAB_ROTATE`、`TAB_CUBE`、`TAB_PAGE`等。`FADE` 样式表示在切换过程中调整选项卡的透明度，而 `REDUCTION_FADE` 样式则可以在选项卡切换过程中同时改变图像大小和透明度。在这个例子中，我们将前三个选项卡指定为 `TAB_CUBE` 样式，后三个选项卡指定为 `REDUCTION` 样式。效果如下列动画所示。
+选项卡切换的样式可以自定义，开发者可以使用 [gui_tab_set_style(gui_tab_t *this, T_SLIDE_STYLE style)](#gui_tab_set_style) 这个函数设置选项卡的切换风格。如 `REDUCTION`、`CLASSIC`、`FADE`、`REDUCTION_FADE`、`TAB_ROTATE`、`TAB_CUBE`、`TAB_PAGE`等。`FADE` 样式表示在切换过程中调整选项卡的透明度，而 `REDUCTION_FADE` 样式则可以在选项卡切换过程中同时改变图像大小和透明度。在这个例子中，我们将前三个选项卡指定为 `TAB_CUBE` 样式，后三个选项卡指定为 `REDUCTION` 样式。效果如下列动画所示。
 
 ```c
 #include <gui_tabview.h>
@@ -86,7 +86,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 ### 选项卡容器控件翻转
 
-不同于单个选项卡的风格切换，在选项卡容器控件 (tabview) 中可以使用 `gui_tabview_set_style(this, style)` 来统一所有选项卡的切换样式。例如，可以将所有选项卡的样式统一设置为 `REDUCTION`、`CLASSIC`、`FADE`、`REDUCTION_FADE`、`TAB_ROTATE`、`TAB_CUBE`、`TAB_PAGE`等。下面的例子展示了如何切换到 `TAB_ROTATE`样式，默认情况下是 `CLASSIC`式。
+不同于单个选项卡的风格切换，在选项卡容器控件 (tabview) 中可以使用 [gui_tabview_set_style(gui_tabview_t *this, T_SLIDE_STYLE style)](#gui_tabview_set_style) 来统一所有选项卡的切换样式。例如，可以将所有选项卡的样式统一设置为 `REDUCTION`、`CLASSIC`、`FADE`、`REDUCTION_FADE`、`TAB_ROTATE`、`TAB_CUBE`、`TAB_PAGE`等。下面的例子展示了如何切换到 `TAB_ROTATE`样式，默认情况下是 `CLASSIC`式。
 
 
 ```c
@@ -137,7 +137,7 @@ static void app_hongkong_ui_design(gui_app_t *app)
 
 ### 选项卡循环显示
 
-在选项卡容器中，可以使用函数 `gui_tabview_loop_x(tabview, loop)` (请参考 tabview) 来决定选项卡是否连续在x方向上循环切换和显示。同理，`gui_tabview_loop_y(tabview, loop)` 决定选项卡是否连续在y方向上循环切换和显示。loop 参数是布尔类型，用于指定是否希望启用循环显示功能，如果是true，则选项卡将会循环显示，如果是false，则选项卡将不会循环显示。
+在选项卡容器中，可以使用函数 [gui_tabview_loop_x(gui_tabview_t *tabview, bool loop)](#gui_tabview_loop_x) 来决定选项卡是否连续在x方向上循环切换和显示。同理，[gui_tabview_loop_y(gui_tabview_t *tabview, bool loop)](#gui_tabview_loop_y) 决定选项卡是否连续在y方向上循环切换和显示。loop 参数是布尔类型，用于指定是否希望启用循环显示功能，如果是true，则选项卡将会循环显示，如果是false，则选项卡将不会循环显示。
 
 
 ```c

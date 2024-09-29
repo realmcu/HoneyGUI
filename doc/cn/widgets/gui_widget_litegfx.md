@@ -12,7 +12,6 @@ HoneyGUI 已经做好了趣戴特效控件层的封装，因此不需要单独�
 ### 通知
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     extern void design_tab_app_notifications(void *parent);
@@ -26,7 +25,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### 能量盒
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     extern void design_tab_app_energybox(void *parent);
@@ -41,7 +39,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### 棱镜
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     extern void design_tab_app_prsim_refl(void *parent);
@@ -57,7 +54,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### 数字时钟
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
@@ -76,7 +72,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### 蝴蝶
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
@@ -97,7 +92,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### 落樱
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);
@@ -114,7 +108,6 @@ static void design_app_watch_ui(gui_app_t *app)
 ### 风车
 
 ```c
-
 static void design_app_watch_ui(gui_app_t *app)
 {
     gui_tabview_t *tv = gui_tabview_create(&(app->screen), "tabview", 0, 0, 0, 0);

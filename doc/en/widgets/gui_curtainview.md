@@ -10,11 +10,11 @@ As illustrated in figure, the curtainview is composed of five curtains, arranged
 
 ### Create Curtainview Widget
 
-The function [gui_curtainview_create(parent, filename, x, y, w, h)](#gui_curtainview_create) is utilized to create a container that is capable of housing the curtain widget.
+The function [gui_curtainview_create(void *parent, const char *name, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_curtainview_create) is utilized to create a container that is capable of housing the curtain widget.
 
 ### Callback
 
-Once the curtain extension is finished, you can configure certain callback events through the use of  [gui_curtainview_set_done_cb (this, cb)](#gui_curtainview_set_done_cb).
+Once the curtain extension is finished, you can configure certain callback events through the use of  [gui_curtainview_set_done_cb(gui_curtainview_t *_this, void (*cb)(gui_curtainview_t *_this))](#gui_curtainview_set_done_cb).
 
 ## Example
 
