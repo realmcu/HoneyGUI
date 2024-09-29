@@ -22,7 +22,7 @@ RVD导出了SaaA包。固件需要解析和播放它。
 * 根据语法规定，函数 ```foreach_create``` 使用递归策略遍历XML的每个标签，并将标签映射到控件，将标签的属性配置给控件。
 * XML遍历完成后，在固件中实际上创建了一个C-APP，与直接使用C-APP API的结果没有区别。
 * 然后将执行XML中提到的JavaScript文件。
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939055906559343/0b59a527_10088396.png" alt ="xml.png"></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1727329150060233120/0353e15b_10088396.png" alt ="xml.png"></div><br/>
 
 ## JavaScript
 * JavaScript描述了自定义行为，例如触发控件手势事件、外围操作、打印日志等。
@@ -32,7 +32,7 @@ RVD导出了SaaA包。固件需要解析和播放它。
 * 使用 ```REGISTER_METHOD``` 和 ```REGISTER_METHOD_NAME``` 将函数添加到JavaScript对象中，以便在脚本中使用它。
 * 在JavaScript文件中，有一些变量定义、函数定义和函数调用。当应用程序启动时，如上所述，JavaScript文件将在XML解析结束时执行，其中的函数调用将被执行，主要是一些初始化行为和事件监听器的注册。
 * 直到事件发生，那些事件的回调函数才会被执行。
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939260331113428/b473228b_10088396.png" alt ="js.png"></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1727329518743167154/2b01e446_10088396.png" alt ="js.png"></div><br/>
 
 ## 示例
 ### 进度条 API

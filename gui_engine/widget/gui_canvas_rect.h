@@ -52,6 +52,7 @@ typedef struct gui_canvas_rect
     draw_img_t *draw_img;
     gui_color_t color;
     uint8_t opacity_value;
+    uint8_t tp_block : 1;
 } gui_canvas_rect_t;
 
 /** End of WIDGET_Exported_Types
@@ -121,13 +122,23 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
                                           int          h,
                                           gui_color_t  color);
 
+
+/**
+ * @brief set cavas_rect as tp blocker, tp will not be recived by widget under cavas_rect.
+ *
+ * @param this the cavas_rect widget pointer.
+ * @param block block or not.
+ */
+void gui_canvas_rect_set_tp_block(gui_canvas_rect_t *, bool block);
+
+
 /**
  * @brief
  *
  * @param this
  * @param opacity_value
  */
-void gui_canvas_rect_set_opacity(gui_canvas_rect_t *this, unsigned char opacity_value);
+void gui_canvas_rect_set_opacity(gui_canvas_rect_t *, unsigned char opacity_value);
 
 
 /**
@@ -136,7 +147,7 @@ void gui_canvas_rect_set_opacity(gui_canvas_rect_t *this, unsigned char opacity_
  * @param this
  * @param color
  */
-void gui_canvas_rect_set_color(gui_canvas_rect_t *this, gui_color_t  color);
+void gui_canvas_rect_set_color(gui_canvas_rect_t *, gui_color_t  color);
 
 
 /**
@@ -146,7 +157,7 @@ void gui_canvas_rect_set_color(gui_canvas_rect_t *this, gui_color_t  color);
  * @param start x
  * @param start y
  */
-void gui_canvas_rect_set_location(gui_canvas_rect_t *this, int x, int y);
+void gui_canvas_rect_set_location(gui_canvas_rect_t *, int x, int y);
 
 
 /**
@@ -156,7 +167,7 @@ void gui_canvas_rect_set_location(gui_canvas_rect_t *this, int x, int y);
  * @param width
  * @param heigh
  */
-void gui_canvas_rect_set_size(gui_canvas_rect_t *this, int w, int h);
+void gui_canvas_rect_set_size(gui_canvas_rect_t *, int w, int h);
 
 
 /** End of WIDGET_Exported_GUI_Functions

@@ -20,7 +20,6 @@
 #include <math.h>
 #include <string.h>
 #include "gui_seekbar.h"
-#include "gui_server.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
 

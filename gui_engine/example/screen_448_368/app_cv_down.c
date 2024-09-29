@@ -104,7 +104,7 @@
 #define SCREEN_H ((int)gui_get_screen_height())
 #define CARD_HEIGHT 157 + 10
 
-static char *month[12] =
+char *month[12] =
 {
     "January",
     "February",
@@ -121,18 +121,18 @@ static char *month[12] =
 };
 char *day[7] =
 {
-    "Sun",
-    "Mon",
-    "Tues",
-    "Wed",
-    "Thur",
-    "Fri",
-    "Sat"
+    "SUN",
+    "MON",
+    "TUE",
+    "WED",
+    "THU",
+    "FRI",
+    "SAT"
 };
 
-static struct tm *timeinfo;
-static char date_timecard_content[10] = "Thur 15", time_content[10] = "00:00",
-                                                                      date_content[20] = "October15\nThur";
+extern struct tm *timeinfo;
+static char time_content[10] = "00:00", date_content[20] = "October15\nThur";
+static char time_timecard_content[10] =  "00:00", date_timecard_content[10] = "Thur 15";
 static gui_text_t *timecard_date_text, *timecard_time_text, *date_text, *time_text;
 
 static void *font_size_96_bin_addr = SOURCEHANSANSSC_SIZE96_BITS4_FONT_BIN;
@@ -142,30 +142,27 @@ static void *font_size_40_bin_addr = SOURCEHANSANSSC_SIZE40_BITS4_FONT_BIN;
 static void *font_size_32_bin_addr = SOURCEHANSANSSC_SIZE32_BITS4_FONT_BIN;
 static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS4_FONT_BIN;
 
-static void display_date()
-{
-    char temp_1[10];
-    sprintf(temp_1, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
-    strcpy(date_timecard_content, temp_1);
-    gui_text_content_set(timecard_date_text, date_timecard_content, strlen(date_timecard_content));
-
-    char temp_2[20];
-    sprintf(temp_2, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday, day[timeinfo->tm_wday]);
-    strcpy(date_content, temp_2);
-    gui_text_content_set(date_text, date_content, strlen(date_content));
-}
-
 static void display_time()
 {
-    time_t rawtime;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    char temp[10];
-    sprintf(temp, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    if (!timeinfo)
+    {
+        return;
+    }
+    else
+    {
+        sprintf(time_timecard_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+        gui_text_content_set(timecard_time_text, time_timecard_content, strlen(time_timecard_content));
 
-    strcpy(time_content, temp);
-    gui_text_content_set(timecard_time_text, time_content, strlen(time_content));
-    gui_text_content_set(time_text, time_content, strlen(time_content));
+        sprintf(date_timecard_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
+        gui_text_content_set(timecard_date_text, date_timecard_content, strlen(date_timecard_content));
+
+        sprintf(date_content, "%s%d\n%s", month[timeinfo->tm_mon], timeinfo->tm_mday,
+                day[timeinfo->tm_wday]);
+        gui_text_content_set(date_text, date_content, strlen(date_content));
+
+        sprintf(time_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+        gui_text_content_set(time_text, time_content, strlen(time_content));
+    }
 }
 
 static void canvas_cb_draw_bg(gui_canvas_t *canvas)
@@ -190,14 +187,14 @@ static void draw_timecard(void *parent_widget)
     gui_canvas_set_canvas_cb(canvas_timecard, canvas_cb_draw_timecard);
 
     // text
-    timecard_date_text = gui_text_create(canvas_timecard, "",  15, 20, 0, 0);
+    timecard_date_text = gui_text_create(canvas_timecard, "timecard_date_1",  15, 20, 0, 0);
     gui_text_set(timecard_date_text, (void *)date_timecard_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(date_timecard_content),
                  32);
     gui_text_type_set(timecard_date_text, font_size_32_bin_addr, FONT_SRC_MEMADDR);
     gui_text_mode_set(timecard_date_text, LEFT);
 
-    timecard_time_text = gui_text_create(canvas_timecard, "",  -50, 20, 0, 0);
+    timecard_time_text = gui_text_create(canvas_timecard, "timecard_time",  -50, 20, 0, 0);
     gui_text_set(timecard_time_text, (void *)time_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(time_content),
                  32);
@@ -208,10 +205,10 @@ static void draw_timecard(void *parent_widget)
 
 static void cv_cb(gui_cardview_t *cv)
 {
-#if defined _WIN32
-    display_time();
-    display_date();
-#endif
+    if (cv->animate->Beginning_frame)
+    {
+        display_time();
+    }
     gui_canvas_t *canvas = 0;
     gui_img_t *img = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), __CANVAS_NAME, (void *)&canvas);
@@ -253,7 +250,7 @@ void curtain_down_design(void *parent_widget)
     gui_img_set_mode(img, IMG_SRC_OVER_MODE);
 
     // text
-    date_text = gui_text_create(img, "date_text",  0, 42, 0, 0);
+    date_text = gui_text_create(img, "timecard_date_2",  0, 42, 0, 0);
     gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
                  strlen(date_content),
                  40);
@@ -273,7 +270,7 @@ void curtain_down_design(void *parent_widget)
 
     gui_cardview_set_style(cv, REDUCTION);
     // change timecard img and canvas
-    gui_cardview_set_animate(cv, 1000, -1, cv_cb, cv);
+    gui_cardview_set_animate(cv, 2000, -1, cv_cb, cv);
     // gui_cardview_set_bottom_space(cv, 30);
 
     gui_card_t *cv_no_dispaly = gui_card_create(cv, "cv_no_dispaly", 0, 0, 0,

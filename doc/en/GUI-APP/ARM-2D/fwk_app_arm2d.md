@@ -6,7 +6,7 @@ Arm-2D is an open-source project for 2.5D image processing on Cortex-M processor
 - Initial Focus: Graphical User Interface (GUI) development.
 
 ## ARM-2D Introduction
-- [ARM-2D](https://github.com/ARM-software/Arm-2D) 
+- <a href="https://github.com/ARM-software/Arm-2D">ARM-2D</a>
 
 
 

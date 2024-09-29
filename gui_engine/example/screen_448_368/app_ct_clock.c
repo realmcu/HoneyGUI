@@ -9,6 +9,7 @@
 #include "gui_card.h"
 #include "gui_tab.h"
 #include "gui_app.h"
+#include "root_image_hongkong/cjson_data.txt"
 
 // gui_win_t *win_watch;
 // gui_img_t *img;
@@ -173,21 +174,29 @@ static void *font_size_24_bin_addr = SOURCEHANSANSSC_SIZE24_BITS4_FONT_BIN;
 
 static gui_win_t *win_watch;
 static gui_text_t *time_text, *date_text;
-// static char time_content[10] = "00:00", date_content[10] = "Thurs 15";
-static struct tm *timeinfo;
+static char time_text_content[10], date_text_content[10];
+static char weekday_content[30];
+static struct tm watch_time;
+struct tm *timeinfo;
 
+static gui_canvas_t *canvas_temperature;
 static gui_text_t *tempare_cur, *tempare_low, *tempare_high;
+static gui_text_t *weather_cur, *weather_range;
+static char content_cur[5];
+static char content_range[15];
+static char tempera_cur_content[3];
+static char tempera_low_content[3];
+static char tempera_high_content[3];
 
 static gui_img_t *compass_pointer;
 static gui_text_t *compass_degree, *compass_orien;
-static char degree_content[5] = "0°", *orien_content = "N";
+static char degree_content[5] = "0°", orien_content[3] = "N";
 
+char *cjson_content = NULL;
 #if defined __WIN32
 const char *filename =
-    "./gui_engine/example/web/peripheral_simulation/json/simulation_data.json"; //gui_engine\example\web\peripheral_simulation\json\simulation_data.json
-char *json_content;
-bool jason_mutex = 0;
-#endif
+    "./gui_engine/example/web/peripheral_simulation/json/simulation_data.json";
+
 /* read CJSON to string */
 char *read_file(const char *path)
 {
@@ -209,41 +218,63 @@ char *read_file(const char *path)
     fclose(file);
     return content;
 }
+#endif
+// char *cjson_weather = NULL;
+
 
 extern char *day[];
 static void refreash_time()
 {
-    time_t rawtime;
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
+    sprintf(time_text_content, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
+    gui_text_content_set(time_text, time_text_content, strlen(time_text_content));
+    // gui_text_convert_to_img(time_text, ARGB8888);
 
-    char temp[10];
-    sprintf(temp, "%02d:%02d", timeinfo->tm_hour, timeinfo->tm_min);
-    gui_text_content_set(time_text, temp, strlen(temp));
-    gui_text_convert_to_img(time_text, ARGB8888);
+    sprintf(date_text_content, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
+    gui_text_content_set(date_text, date_text_content, strlen(date_text_content));
+    // gui_text_convert_to_img(date_text, ARGB8888);
 
-    sprintf(temp, "%s %d",  day[timeinfo->tm_wday], timeinfo->tm_mday);
-    gui_text_content_set(date_text, temp, strlen(temp));
-    gui_text_convert_to_img(date_text, ARGB8888);
+    GUI_WIDGET_POINTER_BY_NAME(obj, "weather_text");
+    uint8_t index = timeinfo->tm_wday;
+
+    sprintf(weekday_content, "%s.  %s.  %s.  %s.", day[(index + 1) % 7], day[(index + 2) % 7],
+            day[(index + 3) % 7],
+            day[(index + 4) % 7]);
+    // gui_log("%s\r\n", weekday_content);
+    gui_text_content_set((gui_text_t *)obj, weekday_content, strlen(weekday_content));
 }
 
-static void win_clock_cb(void)
+static void win_clock_cb(gui_win_t *win)
 {
-#if defined _WIN32
-    refreash_time();
-    if (!jason_mutex)
+    if (win->animate->Beginning_frame)
     {
-        jason_mutex = 1;
-        char *temp = json_content;
-        json_content = read_file(filename);
-        free(temp);
-        if (!json_content)
+#if defined __WIN32
+        time_t rawtime;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        char *temp = cjson_content;
+        cjson_content = read_file(filename);
+        if (!cjson_content)
         {
+            cjson_content = temp;
             perror("fopen");
         }
-        jason_mutex = 0;
-    }
+        else
+        {
+            free(temp);
+        }
+#else
+#include "tuya_ble_feature_weather.h"
+#include "watch_clock.h"
+        watch_time = watch_clock_get();
+        timeinfo = &watch_time;
+        gui_log("time %d:%d\r\n", timeinfo->tm_hour, timeinfo->tm_min);
+        gui_log("date %d:%d\r\n", timeinfo->tm_mon + 1, timeinfo->tm_mday);
+
+        tuya_ble_feature_weather_data_request(WKT_TEMP | WKT_THIHG | WKT_TLOW | WKT_CONDITION, 5);
 #endif
+        refreash_time();
+    }
+
     // blur this curtain
     gui_curtainview_t *cv = 0;
     gui_obj_tree_get_widget_by_name(&(gui_current_app()->screen), "ct_clock",
@@ -260,6 +291,7 @@ static void win_clock_cb(void)
         }
     }
 
+    // enable slide card in ct_clock
     touch_info_t *tp = tp_get_info();
     static bool hold;
     if (tp->pressed)
@@ -320,429 +352,441 @@ static void win_clock_cb(void)
         }
     }
 }
-static void arc_activity_move_cb(gui_canvas_t *canvas)
+static void arc_activity_cb(gui_canvas_t *canvas)
 {
-#if defined __WIN32
-    if (jason_mutex)
+    cJSON *root;
+    if (!cjson_content)
     {
+        // automation
+        // static float progress_activity = 0;
+        // progress_activity += 0.001;
+        // if (progress_activity >= 2)
+        // {
+        //     progress_activity = 0;
+        // }
+        // nvgBeginPath(canvas->vg);
+        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2, M_PI * (progress_activity + 3 / 2),
+        //     NVG_CW);
+        // nvgStrokeWidth(canvas->vg, 8);
+        // nvgStrokeColor(canvas->vg, nvgRGB(230, 67, 79));
+        // nvgStroke(canvas->vg);
+
+        // nvgBeginPath(canvas->vg);
+        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2, M_PI * (progress_activity + 3 / 2),
+        //     NVG_CW);
+        // nvgStrokeWidth(canvas->vg, 8);
+        // nvgStrokeColor(canvas->vg, nvgRGB(186, 253, 79));
+        // nvgStroke(canvas->vg);
+
+        // nvgBeginPath(canvas->vg);
+        // nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2, M_PI * (progress_activity + 3 / 2),
+        //     NVG_CW);
+        // nvgStrokeWidth(canvas->vg, 8);
+        // nvgStrokeColor(canvas->vg, nvgRGB(117, 230, 229));
+        // nvgStroke(canvas->vg);
         return;
     }
     else
     {
-        // imitate external inputs
-        jason_mutex = 1;
-        cJSON *root = cJSON_Parse(json_content);
+        root = cJSON_Parse(cjson_content);
         if (!root)
         {
-            fprintf(stderr, "Error parsing JSON: %s\n", cJSON_GetErrorPtr());
-            jason_mutex = 0;
+            gui_log("Error parsing JSON!\r\n");
             return;
         }
-
-        // parse activity array
-        cJSON *activity = cJSON_GetObjectItemCaseSensitive(root, "activity");
-        if (cJSON_IsArray(activity))
+    }
+    // parse activity array
+    cJSON *activity_array = cJSON_GetObjectItemCaseSensitive(root, "activity");
+    if (cJSON_IsArray(activity_array))
+    {
+        cJSON *act = cJSON_GetArrayItem(activity_array, 0);
+        if (!act)
         {
-            cJSON *act = NULL;
-            cJSON_ArrayForEach(act, activity)
+            gui_log("get activity_array unsuccessful\n");
+        }
+        else
+        {
+            cJSON *move = cJSON_GetObjectItemCaseSensitive(act, "move");
+            cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "ex");
+            cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
+            nvgBeginPath(canvas->vg);
+            nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
+                   M_PI * (1.5f + 2.0f * move->valuedouble / 20000.0f), NVG_CW);  // cap 20000 steps
+            nvgStrokeWidth(canvas->vg, 8);
+            nvgStrokeColor(canvas->vg, nvgRGB(230, 67, 79));
+            nvgStroke(canvas->vg);
+
+            nvgBeginPath(canvas->vg);
+            nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
+                   M_PI * (1.5f + 2.0f * ex->valueint / 60.0f), NVG_CW);  // cap 60 min.
+            nvgStrokeWidth(canvas->vg, 8);
+            nvgStrokeColor(canvas->vg, nvgRGB(186, 253, 79));
+            nvgStroke(canvas->vg);
+
+            nvgBeginPath(canvas->vg);
+            nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
+                   M_PI * (1.5f + 2.0f * stand->valueint / 30.0f), NVG_CW); // cap 30 times
+            nvgStrokeWidth(canvas->vg, 8);
+            nvgStrokeColor(canvas->vg, nvgRGB(117, 230, 229));
+            nvgStroke(canvas->vg);
+        }
+    }
+    // clear
+    cJSON_Delete(root);
+}
+
+static void weather_cb(gui_img_t *parent)
+{
+    cJSON *root;
+    if (parent->animate->Beginning_frame)
+    {
+        if (!cjson_content)
+        {
+            return;
+        }
+        else
+        {
+            root = cJSON_Parse(cjson_content);
+            if (!root)
             {
-                cJSON *move = cJSON_GetObjectItemCaseSensitive(act, "move");
-                cJSON *ex = cJSON_GetObjectItemCaseSensitive(act, "ex");
-                cJSON *stand = cJSON_GetObjectItemCaseSensitive(act, "stand");
-                nvgBeginPath(canvas->vg);
-                nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2,
-                       M_PI * (1.5f + 2.0f * move->valuedouble / 5000.0f), NVG_CW);  // cap 5000 steps
-                nvgStrokeWidth(canvas->vg, 8);
-                nvgStrokeColor(canvas->vg, nvgRGB(230, 67, 79));
-                nvgStroke(canvas->vg);
-
-                nvgBeginPath(canvas->vg);
-                nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2,
-                       M_PI * (1.5f + 2.0f * ex->valueint / 30.0f), NVG_CW);  // cap 30 min.
-                nvgStrokeWidth(canvas->vg, 8);
-                nvgStrokeColor(canvas->vg, nvgRGB(186, 253, 79));
-                nvgStroke(canvas->vg);
-
-                nvgBeginPath(canvas->vg);
-                nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2,
-                       M_PI * (1.5f + 2.0f * stand->valueint / 12.0f), NVG_CW); // cap 6 times
-                nvgStrokeWidth(canvas->vg, 8);
-                nvgStrokeColor(canvas->vg, nvgRGB(117, 230, 229));
-                nvgStroke(canvas->vg);
+                gui_log("Error parsing JSON!\r\n");
+                return;
             }
         }
-        // clear
+        // parse weather array
+        cJSON *weather_array = cJSON_GetObjectItemCaseSensitive(root, "weather");
+        if (cJSON_IsArray(weather_array))
+        {
+            cJSON *weather = cJSON_GetArrayItem(weather_array, 0);
+            if (!weather)
+            {
+                gui_log("get weather_array unsuccessful\n");
+            }
+            else
+            {
+                cJSON *low = cJSON_GetObjectItemCaseSensitive(weather, "low");
+                cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
+                cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "cur");
+
+                sprintf(content_cur, "%d°", cur->valueint);
+                gui_text_content_set(weather_cur, content_cur, strlen(content_cur));
+                sprintf(content_range, "H:%d° L:%d°", high->valueint, low->valueint);
+                gui_text_content_set(weather_range, content_range, strlen(content_range));
+
+                for (uint8_t i = 1; i <= 5; i++)
+                {
+                    char key[15];
+                    sprintf(key, "condition_%d", i);
+                    // gui_log("%s\r\n", key);
+                    GUI_WIDGET_POINTER_BY_NAME(obj, key);
+                    cJSON *condition = cJSON_GetObjectItemCaseSensitive(weather, key);
+                    if (strcmp(condition->valuestring, "Sunny") == 0)
+                    {
+                        gui_img_set_attribute((gui_img_t *)obj, obj->name, UI_WEATHER_SUNNY_BIN, obj->x, obj->y);
+                    }
+                    else if (strcmp(condition->valuestring, "Light rain") == 0)
+                    {
+                        gui_img_set_attribute((gui_img_t *)obj, obj->name, UI_WEATHER_RAIN_S_BIN, obj->x, obj->y);
+                    }
+                    else if (strcmp(condition->valuestring, "Showers") == 0)
+                    {
+                        gui_img_set_attribute((gui_img_t *)obj, obj->name, UI_WEATHER_RAIN_S_BIN, obj->x, obj->y);
+                    }
+                    else if (strcmp(condition->valuestring, "Moderate rain") == 0)
+                    {
+                        gui_img_set_attribute((gui_img_t *)obj, obj->name, UI_WEATHER_RAIN_M_BIN, obj->x, obj->y);
+                    }
+                    else if (strcmp(condition->valuestring, "Heavy rain") == 0)
+                    {
+                        gui_img_set_attribute((gui_img_t *)obj, obj->name, UI_WEATHER_RAIN_L_BIN, obj->x, obj->y);
+                    }
+                    else if (strcmp(condition->valuestring, "Cloudy") == 0)
+                    {
+                        gui_img_set_attribute((gui_img_t *)obj, obj->name, UI_WEATHER_CLOUDY_BIN, obj->x, obj->y);
+                    }
+                    else // need to add more weather icon
+                    {
+                        gui_img_set_attribute((gui_img_t *)obj, obj->name, UI_WEATHER_CLOUDY_BIN, obj->x, obj->y);
+                    }
+                }
+            }
+        }
         cJSON_Delete(root);
-        jason_mutex = 0;
     }
-#else
-    // automation
-    static float progress = 0;
-    progress += 0.001;
-    if (progress >= 2)
-    {
-        progress = 0;
-    }
-    nvgBeginPath(canvas->vg);
-    nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 8, 3 * M_PI / 2, M_PI * (progress + 3 / 2), NVG_CW);
-    nvgStrokeWidth(canvas->vg, 8);
-    nvgStrokeColor(canvas->vg, nvgRGB(230, 67, 79));
-    nvgStroke(canvas->vg);
-
-    nvgBeginPath(canvas->vg);
-    nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 21, 3 * M_PI / 2, M_PI * (progress + 3 / 2), NVG_CW);
-    nvgStrokeWidth(canvas->vg, 8);
-    nvgStrokeColor(canvas->vg, nvgRGB(186, 253, 79));
-    nvgStroke(canvas->vg);
-
-    nvgBeginPath(canvas->vg);
-    nvgArc(canvas->vg, 16 + 100 / 2, 100 / 2, 50 - 33, 3 * M_PI / 2, M_PI * (progress + 3 / 2), NVG_CW);
-    nvgStrokeWidth(canvas->vg, 8);
-    nvgStrokeColor(canvas->vg, nvgRGB(117, 230, 229));
-    nvgStroke(canvas->vg);
-#endif
-
 }
 
 static void arc_temperature_cb(gui_canvas_t *canvas)
 {
     NVGcontext *vg = canvas->vg;
-#if defined __WIN32
-    if (jason_mutex)
+    cJSON *root;
+    if (!cjson_content)
     {
+        // automation
+        // float x = 100 / 2;
+        // float y = 100 / 2;
+        // float r = 50 - 8; // radius
+        // float r0 = M_PI * 5 / 6, r1 = M_PI * 13 / 6; // 5/6pi ~ 13/6pi CW
+        // NVGpaint paint = nvgLinearGradient(vg, x + cosf(r0) * r, y + sinf(r0) * r, x + cosf(r1) * r,
+        //                                    y + sinf(r1) * r, nvgRGB(191, 220, 48), nvgRGB(250, 17, 79));
+        // nvgMoveTo(vg, x, y);
+        // nvgLineTo(vg, x + cosf(r0) * r, y + sinf(r0) * r);
+        // nvgArc(vg, x, y, r, r0, r1, NVG_CW);
+        // nvgLineTo(vg, x, y);
+        // nvgFillPaint(vg, paint);
+        // nvgFill(vg);
+
+        // nvgBeginPath(vg);
+        // nvgArc(vg, x, y, r - 8.0f, 0, M_PI * 2.0f, NVG_CW);
+        // nvgFillColor(vg, nvgRGB(0, 0, 0));
+        // nvgFill(vg);
+
+        // r -= 4;
+        // nvgBeginPath(vg);
+        // nvgArc(vg, x + cosf(r0 + 0.02f) * r, y + sinf(r0 + 0.02f) * r, 4.0f, r0, r0 + M_PI, NVG_CCW);
+        // nvgFillColor(vg, nvgRGB(191, 220, 48));
+        // nvgFill(vg);
+
+        // nvgBeginPath(vg);
+        // nvgArc(vg, x + cosf(r1 - 0.02f) * r, y + sinf(r1 - 0.02f) * r, 4.0f, r1, r1 - M_PI, NVG_CW);
+        // nvgFillColor(vg, nvgRGB(250, 17, 79));
+        // nvgFill(vg);
+
+        // // moving dot
+        // static float a0 = M_PI * 5 / 6; // 5/6pi ~ 13/6pi CW
+        // float temp = (a0 - M_PI * 5 / 6) / (M_PI * 4 / 3);
+        // float ax, ay;
+        // nvgBeginPath(vg);
+        // ax = x + cosf(a0) * r;
+        // ay = y + sinf(a0) * r;
+        // nvgCircle(vg, ax, ay, 6.5f);
+        // nvgFillColor(vg, nvgRGB(0, 0, 0));
+        // nvgFill(vg);
+        // uint8_t dot_r = (int)(temp * (250 - 191) + 191 + 0.5);
+        // uint8_t dot_g = (int)(temp * (17 - 220) + 220 + 0.5);
+        // uint8_t dot_b = (int)(temp * (79 - 48) + 48 + 0.5);
+        // nvgBeginPath(vg);
+        // nvgCircle(vg, ax, ay, 5.0f);
+        // nvgFillColor(vg, nvgRGB(dot_r, dot_g, dot_b));
+        // nvgFill(vg);
+        // sprintf(tempera_cur_content, "%d", (int)(temp * (37 - 18) + 18 + 0.5));
+        // gui_text_content_set(tempare_cur, (void *)tempera_cur_content, strlen(tempera_cur_content));
         return;
     }
     else
     {
-        jason_mutex = 1;
-        cJSON *root = cJSON_Parse(json_content);
+        root = cJSON_Parse(cjson_content);
         if (!root)
         {
-            fprintf(stderr, "Error parsing JSON: %s\n", cJSON_GetErrorPtr());
-            jason_mutex = 0;
+            gui_log("Error parsing JSON!\r\n");
             return;
         }
-        // parse temperature array
-        cJSON *temperature = cJSON_GetObjectItemCaseSensitive(root, "temperature");
-        if (cJSON_IsArray(temperature))
+    }
+    // parse temperature array
+    cJSON *weather_array = cJSON_GetObjectItemCaseSensitive(root, "weather");
+    if (cJSON_IsArray(weather_array))
+    {
+        cJSON *weather = cJSON_GetArrayItem(weather_array, 0);
+        if (!weather)
         {
-            cJSON *temp = NULL;
-            cJSON_ArrayForEach(temp, temperature)
-            {
-                cJSON *low = cJSON_GetObjectItemCaseSensitive(temp, "low");
-                cJSON *high = cJSON_GetObjectItemCaseSensitive(temp, "high");
-                cJSON *cur = cJSON_GetObjectItemCaseSensitive(temp, "cur");
-                uint8_t low_val = low->valueint < 18 ? 18 : low->valueint;
-                uint8_t high_val = high->valueint > 37 ? 37 : high->valueint;
-                uint8_t cur_val = cur->valueint;
-
-                // draw arc
-                float x = 100 / 2; // x coordinate
-                float y = 100 / 2; // y coordinate
-                float r = 50 - 8; // radius
-                // 5/6pi ~ 13/6pi CW -->temperature range: 18 ~ 37
-                float r0 = M_PI * 5 / 6;
-                float r1 = M_PI * 13 / 6;
-
-                nvgArc(canvas->vg, x, y, r, r0, r1, NVG_CW);
-                nvgStrokeWidth(canvas->vg, 8);
-                // start:nvgRGB(191, 220, 48), stop:nvgRGB(250, 17, 79))
-                uint8_t start_r = (int)(191 + (250 - 191) * (low_val - 18) / (37 - 18));
-                uint8_t start_g = (int)(220 + (17 - 220) * (low_val - 18) / (37 - 18));
-                uint8_t start_b = (int)(48 + (79 - 48) * (low_val - 18) / (37 - 18));
-                uint8_t stop_r = (int)(191 + (250 - 191) * (high_val - 18) / (37 - 18));
-                uint8_t stop_g = (int)(220 + (17 - 220) * (high_val - 18) / (37 - 18));
-                uint8_t stop_b = (int)(48 + (79 - 48) * (high_val - 18) / (37 - 18));
-                NVGpaint paint = nvgLinearGradient(canvas->vg, x + cosf(r0) * r, y + sinf(r0) * r, x + cosf(r1) * r,
-                                                   y + sinf(r1) * r, nvgRGB(start_r, start_g, start_b), nvgRGB(stop_r, stop_g, stop_b));
-                nvgStrokePaint(canvas->vg, paint);
-                nvgStroke(canvas->vg);
-
-                // draw dot
-                float temp = ((float)cur_val - (float)low_val) / ((float)high_val - (float)low_val);
-                float a0 = M_PI * 5 / 6 + temp * 4 / 3 * M_PI; // 5/6pi ~ 13/6pi CW
-                float ax, ay;
-                nvgBeginPath(vg);
-                ax = x + cosf(a0) * r;
-                ay = y + sinf(a0) * r;
-                nvgCircle(vg, ax, ay, 6.5f);
-                nvgFillColor(vg, nvgRGB(0, 0, 0));
-                nvgFill(vg);
-
-                static char cur_content[2];
-                static char low_content[2];
-                static char high_content[2];
-                sprintf(cur_content, "%d", cur_val);
-                gui_text_content_set(tempare_cur, cur_content, strlen(cur_content));
-                sprintf(low_content, "%d", low_val);
-                gui_text_content_set(tempare_low, low_content, strlen(low_content));
-                sprintf(high_content, "%d", high_val);
-                // gui_log("%s %d\r\n", tempare_content, strlen(tempare_content));
-                gui_text_content_set(tempare_high, high_content, strlen(high_content));
-
-                uint8_t dot_r = (int)(temp * (stop_r - start_r) + start_r + 0.5);
-                uint8_t dot_g = (int)(temp * (stop_g - start_g) + start_g + 0.5);
-                uint8_t dot_b = (int)(temp * (stop_b - start_b) + start_b + 0.5);
-                nvgBeginPath(vg);
-                nvgCircle(vg, ax, ay, 5.0f);
-                nvgFillColor(vg, nvgRGB(dot_r, dot_g, dot_b));
-                nvgFill(vg);
-            }
+            gui_log("get weather_array unsuccessful\n");
         }
-        // clear
-        cJSON_Delete(root);
-        jason_mutex = 0;
-    }
-#else
-    // automation
-    float x = 100 / 2;
-    float y = 100 / 2;
-    float r = 50 - 8; // radius
-    float r0 = M_PI * 5 / 6, r1 = M_PI * 13 / 6; // 5/6pi ~ 13/6pi CW
-    nvgArc(canvas->vg, x, y, r, r0, r1, NVG_CW);
-    nvgStrokeWidth(canvas->vg, 8);
-    NVGpaint paint = nvgLinearGradient(canvas->vg, x + cosf(r0) * r, y + sinf(r0) * r, x + cosf(r1) * r,
-                                       y + sinf(r1) * r, nvgRGB(191, 220, 48), nvgRGB(250, 17, 79));
-    nvgStrokePaint(canvas->vg, paint);
-    nvgStroke(canvas->vg);
-
-    // moving dot
-    static bool increasing = true;
-    static float a0 = M_PI * 5 / 6; // 5/6pi ~ 13/6pi CW
-    float ax, ay;
-    nvgBeginPath(vg);
-    ax = x + cosf(a0) * r;
-    ay = y + sinf(a0) * r;
-    nvgCircle(vg, ax, ay, 6.5f);
-    nvgFillColor(vg, nvgRGB(0, 0, 0));
-    nvgFill(vg);
-
-    static char tempare_content[5];
-    float temp = (a0 - M_PI * 5 / 6) / (M_PI * 4 / 3);
-    sprintf(tempare_content, "%d", (int)(temp * (37 - 18) + 18 + 0.5));
-    gui_log("%s %d\r\n", tempare_content, strlen(tempare_content));
-    gui_text_content_set(tempare_cur, (void *)tempare_content, strlen(tempare_content));
-    uint8_t dot_r = (int)(temp * (250 - 191) + 191 + 0.5);
-    uint8_t dot_g = (int)(temp * (17 - 220) + 220 + 0.5);
-    uint8_t dot_b = (int)(temp * (79 - 48) + 48 + 0.5);
-    nvgBeginPath(vg);
-    nvgCircle(vg, ax, ay, 5.0f);
-    nvgFillColor(vg, nvgRGB(dot_r, dot_g, dot_b));
-    nvgFill(vg);
-    if (increasing)
-    {
-        a0 += 0.001;
-        if (a0 >= M_PI * 13 / 6)
+        else
         {
-            increasing = false;
-        }
-    }
-    else
-    {
-        a0 -= 0.001;
-        if (a0 <= M_PI * 5 / 6)
-        {
-            increasing = true;
-        }
-    }
-#endif
-}
-
-static void compass_cb(void)
-{
-#if defined __WIN32
-    if (jason_mutex)
-    {
-        return;
-    }
-    else
-    {
-        jason_mutex = 1;
-        cJSON *root = cJSON_Parse(json_content);
-        if (!root)
-        {
-            fprintf(stderr, "Error parsing JSON: %s\n", cJSON_GetErrorPtr());
-            jason_mutex = 0;
-            return;
-        }
-        // parse compass array
-        cJSON *compass = cJSON_GetObjectItemCaseSensitive(root, "compass");
-        if (cJSON_IsArray(compass))
-        {
-            cJSON *comp = NULL;
-            cJSON_ArrayForEach(comp, compass)
-            {
-                cJSON *degree = cJSON_GetObjectItemCaseSensitive(comp, "degree");
-                uint16_t degree_val = degree->valueint;
-                float x = 100 / 2;
-                float y = 100 / 2;
-                float r = 35; // radius
-                // moving triangle
-                float a0 = M_PI * degree_val / 360 * 2; // 0 ~ 2pi CW
-                float ax, ay;
-                ax = x + cosf(a0 + M_PI * 3 / 2) * r;
-                ay = y + sinf(a0 + M_PI * 3 / 2) * r;
-
-                gui_img_set_location(compass_pointer, (uint16_t)ax, (uint16_t)ay);
-                gui_img_rotation(compass_pointer, (float)degree_val, gui_img_get_width(compass_pointer) / 2,
-                                 gui_img_get_height(compass_pointer) / 2);
-                sprintf(degree_content, "%d", degree_val);
-                strcat(degree_content, "°");
-                gui_text_content_set(compass_degree, degree_content, strlen(degree_content));
-                if (degree_val == 0)                     {orien_content = "N"; }
-                else if (degree_val > 0 && degree_val < 90)    {orien_content = "NE";}
-                else if (degree_val == 90)               {orien_content = "E";}
-                else if (degree_val > 90 && degree_val < 180)  {orien_content = "SE";}
-                else if (degree_val == 180)               {orien_content = "S";}
-                else if (degree_val > 180 && degree_val < 270) {orien_content = "SW";}
-                else if (degree_val == 270)              {orien_content = "W";}
-                else if (degree_val > 270 && degree_val < 360) {orien_content = "NW";}
-                gui_text_content_set(compass_orien, orien_content, strlen(orien_content));
-            }
-        }
-        // clear
-        cJSON_Delete(root);
-        jason_mutex = 0;
-    }
-#else
-    // automation
-    float x = 100 / 2;
-    float y = 100 / 2;
-    float r = 35; // radius
-    // moving triangle
-    static uint16_t progress = 0;
-    float a0 = M_PI * (float)progress / 360 * 2; // 0 ~ 2pi CW
-    float ax, ay;
-    ax = x + cosf(a0 + M_PI * 3 / 2) * r;
-    ay = y + sinf(a0 + M_PI * 3 / 2) * r;
-
-    gui_img_set_location(compass_pointer, (uint16_t)ax, (uint16_t)ay);
-    gui_img_rotation(compass_pointer, (float)progress, gui_img_get_width(compass_pointer) / 2,
-                     gui_img_get_height(compass_pointer) / 2);
-    sprintf(degree_content, "%d", progress);
-    strcat(degree_content, "°");
-    gui_text_content_set(compass_degree, degree_content, strlen(degree_content));
-    if (progress == 0)                     {orien_content = "N"; }
-    else if (progress > 0 && progress < 90)    {orien_content = "NE";}
-    else if (progress == 90)               {orien_content = "E";}
-    else if (progress > 90 && progress < 180)  {orien_content = "SE";}
-    else if (progress == 180)               {orien_content = "S";}
-    else if (progress > 180 && progress < 270) {orien_content = "SW";}
-    else if (progress == 270)              {orien_content = "W";}
-    else if (progress > 270 && progress < 360) {orien_content = "NW";}
-    gui_text_content_set(compass_orien, orien_content, strlen(orien_content));
-    progress += 1;
-    if (progress >= 360)
-    {
-        progress = 0;
-    }
-#endif
-}
-
-void page_ct_clock(void *parent)
-{
-#if defined __WIN32
-    json_content = read_file(filename);
-    if (!json_content)
-    {
-        perror("fopen");
-        return;
-    }
-#endif
-    win_watch = gui_win_create(parent, "win_clock", 0, 0, 368, 448);
-
-    // temperature
-    gui_canvas_t *canvas_temperature = gui_canvas_create(win_watch, "CLOCK_ACTIVITY_ICON", 0, 16, 330,
-                                                         100, 100);
-    gui_canvas_set_canvas_cb(canvas_temperature, arc_temperature_cb);
-    char *content = "22";
-    tempare_cur = gui_text_create(canvas_temperature, "tempare_cur",  0, 16, 0, 0); //32
-    gui_text_set(tempare_cur, (void *)content, GUI_FONT_SRC_BMP,  APP_COLOR_WHITE,
-                 strlen(content),
-                 48);
-    gui_text_type_set(tempare_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(tempare_cur, CENTER);
-    // get range number's font color
-#if defined __WIN32
-    cJSON *root = cJSON_Parse(json_content);
-    if (!root)
-    {
-        fprintf(stderr, "Error parsing JSON: %s\n", cJSON_GetErrorPtr());
-        return;
-    }
-    cJSON *temperature = cJSON_GetObjectItemCaseSensitive(root, "temperature");
-    if (cJSON_IsArray(temperature))
-    {
-        cJSON *temp = NULL;
-        cJSON_ArrayForEach(temp, temperature)
-        {
-            cJSON *low = cJSON_GetObjectItemCaseSensitive(temp, "low");
-            cJSON *high = cJSON_GetObjectItemCaseSensitive(temp, "high");
+            cJSON *low = cJSON_GetObjectItemCaseSensitive(weather, "low");
+            cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
+            cJSON *cur = cJSON_GetObjectItemCaseSensitive(weather, "cur");
             uint8_t low_val = low->valueint < 18 ? 18 : low->valueint;
             uint8_t high_val = high->valueint > 37 ? 37 : high->valueint;
+            uint8_t cur_val = cur->valueint;
 
+            // draw arc
+            float x = 100 / 2; // x coordinate
+            float y = 100 / 2; // y coordinate
+            float r = 50 - 4; // radius 50 - 8
+            // 5/6pi ~ 13/6pi CW -->temperature range: 18 ~ 37
+            float r0 = M_PI * 5.0f / 6.0f;
+            float r1 = M_PI * 13.0f / 6.0f;
+
+            // nvgArc(vg, x, y, r, r0, r1, NVG_CW);
+            // nvgStrokeWidth(vg, 8);
+            // start:nvgRGB(191, 220, 48), stop:nvgRGB(250, 17, 79))
             uint8_t start_r = (int)(191 + (250 - 191) * (low_val - 18) / (37 - 18));
             uint8_t start_g = (int)(220 + (17 - 220) * (low_val - 18) / (37 - 18));
             uint8_t start_b = (int)(48 + (79 - 48) * (low_val - 18) / (37 - 18));
             uint8_t stop_r = (int)(191 + (250 - 191) * (high_val - 18) / (37 - 18));
             uint8_t stop_g = (int)(220 + (17 - 220) * (high_val - 18) / (37 - 18));
             uint8_t stop_b = (int)(48 + (79 - 48) * (high_val - 18) / (37 - 18));
-            content = "18";
-            tempare_low = gui_text_create(canvas_temperature, "tempare_left",  19, 70, 0, 0);
-            gui_text_set(tempare_low, (void *)content, GUI_FONT_SRC_BMP,  gui_rgba(start_r, start_g, start_b,
-                                                                                   UINT8_MAX),
-                         strlen(content),
-                         32);
-            gui_text_type_set(tempare_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-            gui_text_mode_set(tempare_low, LEFT);
+            NVGpaint paint = nvgLinearGradient(vg, x + cosf(r0) * r, y + sinf(r0) * r, x + cosf(r1) * r,
+                                               y + sinf(r1) * r, nvgRGB(start_r, start_g, start_b), nvgRGB(stop_r, stop_g, stop_b));
+            // nvgStrokePaint(vg, paint);
+            // nvgStroke(vg);
 
-            content = "37";
-            tempare_high = gui_text_create(canvas_temperature, "tempare_high",  56, 70, 0, 0);
-            gui_text_set(tempare_high, (void *)content, GUI_FONT_SRC_BMP,  gui_rgba(stop_r, stop_g, stop_b,
-                                                                                    UINT8_MAX),
-                         strlen(content),
-                         32);
-            gui_text_type_set(tempare_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-            gui_text_mode_set(tempare_high, LEFT);
+            // draw circular sector
+            nvgMoveTo(vg, x, y);
+            nvgLineTo(vg, x + cosf(r0) * r, y + sinf(r0) * r);
+            nvgArc(vg, x, y, r, r0, r1, NVG_CW);
+            nvgLineTo(vg, x, y);
+            nvgFillPaint(vg, paint);
+            nvgFill(vg);
+
+            // draw black circle to formate arc
+            nvgBeginPath(vg);
+            nvgArc(vg, x, y, r - 8.0f, 0, M_PI * 2.0f, NVG_CW);
+            nvgFillColor(vg, nvgRGB(0, 0, 0));
+            nvgFill(vg);
+
+            // draw edge semi_circle
+            r -= 4;
+            nvgBeginPath(vg);
+            nvgArc(vg, x + cosf(r0 + 0.02f) * r, y + sinf(r0 + 0.02f) * r, 4.0f, r0, r0 + M_PI, NVG_CCW);
+            nvgFillColor(vg, nvgRGB(start_r, start_g, start_b));
+            nvgFill(vg);
+
+            nvgBeginPath(vg);
+            nvgArc(vg, x + cosf(r1 - 0.02f) * r, y + sinf(r1 - 0.02f) * r, 4.0f, r1, r1 - M_PI, NVG_CW);
+            nvgFillColor(vg, nvgRGB(stop_r, stop_g, stop_b));
+            nvgFill(vg);
+
+            // draw dot
+            float temp = ((float)cur_val - (float)low_val) / ((float)high_val - (float)low_val);
+            float a0 = M_PI * 5.0f / 6.0f + temp * 4.0f / 3.0f * M_PI; // 5/6pi ~ 13/6pi CW
+            float ax, ay;
+            nvgBeginPath(vg);
+            ax = x + cosf(a0) * r;
+            ay = y + sinf(a0) * r;
+            nvgCircle(vg, ax, ay, 6.5f);
+            nvgFillColor(vg, nvgRGB(0, 0, 0));
+            nvgFill(vg);
+
+
+            sprintf(tempera_cur_content, "%d", cur_val);
+            gui_text_content_set(tempare_cur, tempera_cur_content, strlen(tempera_cur_content));
+            sprintf(tempera_low_content, "%d", low_val);
+            gui_text_content_set(tempare_low, tempera_low_content, strlen(tempera_low_content));
+            sprintf(tempera_high_content, "%d", high_val);
+            // gui_log("%s %d\r\n", tempare_content, strlen(tempare_content));
+            gui_text_content_set(tempare_high, tempera_high_content, strlen(tempera_high_content));
+
+            uint8_t dot_r = (int)(temp * (stop_r - start_r) + start_r + 0.5f);
+            uint8_t dot_g = (int)(temp * (stop_g - start_g) + start_g + 0.5f);
+            uint8_t dot_b = (int)(temp * (stop_b - start_b) + start_b + 0.5f);
+            nvgBeginPath(vg);
+            nvgCircle(vg, ax, ay, 5.0f);
+            nvgFillColor(vg, nvgRGB(dot_r, dot_g, dot_b));
+            nvgFill(vg);
         }
     }
+    // clear
+    cJSON_Delete(root);
+}
+
+static void compass_cb(void)
+{
+    cJSON *root;
+    if (!cjson_content)
+    {
+        // automation
+        // float x = 100 / 2;
+        // float y = 100 / 2;
+        // float r = 35; // radius
+        // // moving triangle
+        // static uint16_t progress_compass = 0;
+        // float a0 = M_PI * (float)progress_compass / 360 * 2; // 0 ~ 2pi CW
+        // float ax, ay;
+        // ax = x + cosf(a0 + M_PI * 3 / 2) * r;
+        // ay = y + sinf(a0 + M_PI * 3 / 2) * r;
+
+        // gui_img_set_location(compass_pointer, (uint16_t)ax, (uint16_t)ay);
+        // gui_img_rotation(compass_pointer, (float)progress_compass, gui_img_get_width(compass_pointer) / 2,
+        //                 gui_img_get_height(compass_pointer) / 2);
+        // sprintf(degree_content, "%d°", progress_compass);
+        // gui_text_content_set(compass_degree, degree_content, strlen(degree_content));
+
+        // if (progress_compass == 0)                                 {sprintf(orien_content, "N");}
+        // else if (progress_compass > 0 && progress_compass < 90)    {sprintf(orien_content, "NE");}
+        // else if (progress_compass == 90)                           {sprintf(orien_content, "E");}
+        // else if (progress_compass > 90 && progress_compass < 180)  {sprintf(orien_content, "SE");}
+        // else if (progress_compass == 180)                          {sprintf(orien_content, "S");}
+        // else if (progress_compass > 180 && progress_compass < 270) {sprintf(orien_content, "SW");}
+        // else if (progress_compass == 270)                          {sprintf(orien_content, "W");}
+        // else if (progress_compass > 270 && progress_compass < 360) {sprintf(orien_content, "NW");}
+        // gui_text_content_set(compass_orien, orien_content, strlen(orien_content));
+        // progress_compass += 1;
+        // if (progress_compass >= 360)
+        // {
+        //     progress_compass = 0;
+        // }
+        return;
+    }
+    else
+    {
+        root = cJSON_Parse(cjson_content);
+        if (!root)
+        {
+            gui_log("Error parsing JSON!\r\n");
+            return;
+        }
+    }
+    // parse compass array
+    cJSON *compass_array = cJSON_GetObjectItemCaseSensitive(root, "compass");
+    if (cJSON_IsArray(compass_array))
+    {
+        cJSON *comp = cJSON_GetArrayItem(compass_array, 0);
+        if (!comp)
+        {
+            gui_log("get compass_array unsuccessful\n");
+        }
+        else
+        {
+            cJSON *degree = cJSON_GetObjectItemCaseSensitive(comp, "degree");
+            uint16_t degree_val = degree->valueint;
+            float x = 100 / 2;
+            float y = 100 / 2;
+            float r = 35; // radius
+            // moving triangle
+            float a0 = M_PI * degree_val / 360 * 2; // 0 ~ 2pi CW
+            float ax, ay;
+            ax = x + cosf(a0 + M_PI * 3 / 2) * r;
+            ay = y + sinf(a0 + M_PI * 3 / 2) * r;
+
+            gui_img_set_location(compass_pointer, (uint16_t)ax, (uint16_t)ay);
+            gui_img_rotation(compass_pointer, (float)degree_val, gui_img_get_width(compass_pointer) / 2,
+                             gui_img_get_height(compass_pointer) / 2);
+            sprintf(degree_content, "%d°", degree_val);
+            gui_text_content_set(compass_degree, degree_content, strlen(degree_content));
+            uint16_t progress_compass = degree_val;
+            if (progress_compass == 0)                                 {sprintf(orien_content, "N");}
+            else if (progress_compass > 0 && progress_compass < 90)    {sprintf(orien_content, "NE");}
+            else if (progress_compass == 90)                           {sprintf(orien_content, "E");}
+            else if (progress_compass > 90 && progress_compass < 180)  {sprintf(orien_content, "SE");}
+            else if (progress_compass == 180)                          {sprintf(orien_content, "S");}
+            else if (progress_compass > 180 && progress_compass < 270) {sprintf(orien_content, "SW");}
+            else if (progress_compass == 270)                          {sprintf(orien_content, "W");}
+            else if (progress_compass > 270 && progress_compass < 360) {sprintf(orien_content, "NW");}
+            gui_text_content_set(compass_orien, orien_content, strlen(orien_content));
+        }
+    }
+    // clear
+    cJSON_Delete(root);
+}
+
+void page_ct_clock(void *parent)
+{
+#if defined __WIN32
+    cjson_content = read_file(filename);
+    if (!cjson_content)
+    {
+        perror("fopen");
+    }
 #else
-    content = "18";
-    tempare_low = gui_text_create(canvas_temperature, "tempare_left",  19, 70, 0, 0);
-    gui_text_set(tempare_low, (void *)content, GUI_FONT_SRC_BMP,  gui_rgba(191, 220, 48,
-                                                                           UINT8_MAX),
-                 strlen(content),
-                 32);
-    gui_text_type_set(tempare_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(tempare_low, LEFT);
-
-    content = "37";
-    tempare_high = gui_text_create(canvas_temperature, "tempare_high",  56, 70, 0, 0);
-    gui_text_set(tempare_high, (void *)content, GUI_FONT_SRC_BMP,  gui_rgba(250, 17, 79,
-                                                                            UINT8_MAX),
-                 strlen(content),
-                 32);
-    gui_text_type_set(tempare_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(tempare_high, LEFT);
+//     cJSON_Hooks cJSONhooks_freeRTOS;
+//     cJSONhooks_freeRTOS.malloc_fn = gui_malloc;
+//     cJSONhooks_freeRTOS.free_fn   = gui_free;
+//     cJSON_InitHooks(&cJSONhooks_freeRTOS);
+    extern unsigned char cjson_data[];
+    cjson_content = cjson_data;
 #endif
-    // gui_img_create_from_mem(win_watch, "CLOCK_TEMPERATURE_ICON", UI_CLOCK_TEMPERATURE_ICON_BIN, 17, 330,
-    //                         0, 0);
-
-    // date & time text
-    char *time_content = "00:00", *date_content = "Thurs 15";
-    date_text = gui_text_create(win_watch, "date_text",  -30, 15, 0, 0);
-    gui_text_set(date_text, (void *)date_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                 strlen(date_content),
-                 40);
-    gui_text_type_set(date_text, font_size_40_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(date_text, RIGHT);
-
-    time_text = gui_text_create(win_watch, "time_text",  -20, 50, 0, 0);
-    gui_text_set(time_text, (void *)time_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
-                 strlen(time_content),
-                 96);
-    gui_text_type_set(time_text, font_size_96_bin_addr, FONT_SRC_MEMADDR);
-    gui_text_mode_set(time_text, RIGHT);
+    win_watch = gui_win_create(parent, "win_clock", 0, 0, 368, 448);
 
     // card
     gui_tabview_t *tv = gui_tabview_create(win_watch, "clock_tv", 20, 160, 328, 150);
@@ -750,16 +794,156 @@ void page_ct_clock(void *parent)
     gui_tab_t *tb_1 = gui_tab_create(tv, "tb_1", 0, 0, 0, 0, 1, 0);
     gui_tab_t *tb_2 = gui_tab_create(tv, "tb_2", 0, 0, 0, 0, 2, 0);
     gui_tab_t *tb_3 = gui_tab_create(tv, "tb_3", 0, 0, 0, 0, 3, 0);
+    gui_tab_t *tb_4 = gui_tab_create(tv, "tb_4", 0, 0, 0, 0, 3, 0);
 
-    gui_img_create_from_mem(tb_0, "CLOCK_CARD_COMPASS", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_1, "CLOCK_CARD_MUSIC", UI_CLOCK_CARD_MUSIC_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_2, "CLOCK_CARD_ALARM", UI_CLOCK_CARD_ALARM_BIN, 0, 0, 0, 0);
-    gui_img_create_from_mem(tb_3, "CLOCK_CARD_WORKOUT", UI_CLOCK_CARD_WORKOUT_BIN, 0, 0, 0, 0);
+    gui_img_t *img_weather = gui_img_create_from_mem(tb_0, "CLOCK_CARD_WEATHER",
+                                                     UI_CLOCK_CARD_WEATHER_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(tb_1, "CLOCK_CARD_COMPASS", UI_CLOCK_CARD_COMPASS_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(tb_2, "CLOCK_CARD_MUSIC", UI_CLOCK_CARD_MUSIC_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(tb_3, "CLOCK_CARD_ALARM", UI_CLOCK_CARD_ALARM_BIN, 0, 0, 0, 0);
+    gui_img_create_from_mem(tb_4, "CLOCK_CARD_WORKOUT", UI_CLOCK_CARD_WORKOUT_BIN, 0, 0, 0, 0);
+    {
+        // weather condition
+        gui_img_create_from_mem(img_weather, "condition_1", UI_WEATHER_CLOUDY_BIN, 28, 73, 0, 0);
+        gui_img_create_from_mem(img_weather, "condition_2", UI_WEATHER_RAIN_L_BIN, 89, 73, 0, 0);
+        gui_img_create_from_mem(img_weather, "condition_3", UI_WEATHER_RAIN_S_BIN, 150, 73, 0, 0);
+        gui_img_create_from_mem(img_weather, "condition_4", UI_WEATHER_RAIN_M_BIN, 208, 73, 0, 0);
+        gui_img_create_from_mem(img_weather, "condition_5", UI_WEATHER_SUNNY_BIN, 272, 73, 0, 0);
+        char *weather_content = "TODAY";
+        gui_text_t *weather_text = gui_text_create(img_weather, "",  16, 110, 0, 0);
+        gui_text_set(weather_text, (void *)weather_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                     strlen(weather_content),
+                     24);
+        gui_text_type_set(weather_text, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(weather_text, LEFT);
+
+        sprintf(weekday_content, "TUE.  WED.  THU.  FRI.");
+        weather_text = gui_text_create(img_weather, "weather_text",  88, 110, 0, 0);
+        gui_text_set(weather_text, (void *)weekday_content, GUI_FONT_SRC_BMP, gui_rgba(242, 242, 242, 255),
+                     strlen(weekday_content),
+                     24);
+        gui_text_type_set(weather_text, font_size_24_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(weather_text, LEFT);
+
+        sprintf(content_cur, "22°");
+        weather_cur = gui_text_create(img_weather, "weather_cur",  37, 5, 0, 0);
+        gui_text_set(weather_cur, (void *)content_cur, GUI_FONT_SRC_BMP, gui_rgba(124, 199, 243, 255),
+                     strlen(content_cur),
+                     32);
+        gui_text_type_set(weather_cur, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(weather_cur, LEFT);
+
+        sprintf(content_range, "H:37° L:18°");
+        weather_range = gui_text_create(img_weather, "weather_range",  80, 5, 0, 0);
+        gui_text_set(weather_range, (void *)content_range, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                     strlen(content_range),
+                     32);
+        gui_text_type_set(weather_range, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+        gui_text_mode_set(weather_range, LEFT);
+    }
+    gui_img_set_animate(img_weather, 3000, -1, weather_cb, img_weather);
+
+    // temperature
+    canvas_temperature = gui_canvas_create(win_watch, "CLOCK_TEMPERATURE", 0, 16,
+                                           330,
+                                           100, 100);
+    gui_canvas_set_canvas_cb(canvas_temperature, arc_temperature_cb);
+    sprintf(tempera_cur_content, "22");
+    tempare_cur = gui_text_create(canvas_temperature, "tempare_cur",  0, 16, 0, 0); //32
+    gui_text_set(tempare_cur, (void *)tempera_cur_content, GUI_FONT_SRC_BMP,  APP_COLOR_WHITE,
+                 strlen(tempera_cur_content),
+                 48);
+    gui_text_type_set(tempare_cur, font_size_48_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(tempare_cur, CENTER);
+
+// #if defined __WIN32
+//     // set range number's font color
+//     cJSON *root = cJSON_Parse(cjson_content);
+//     if (!root)
+//     {
+//         // fprintf(stderr, "Error parsing JSON: %s\n", cJSON_GetErrorPtr());
+//         return;
+//     }
+//     cJSON *weather_array = cJSON_GetObjectItemCaseSensitive(root, "weather");
+//     if (cJSON_IsArray(weather_array))
+//     {
+//         cJSON *weather = cJSON_GetArrayItem(weather_array, 0);
+//         if (!weather)
+//             {
+//                 gui_log("get weather_array unsuccessful\n");
+//             }
+//             else
+//         {
+//             cJSON *low = cJSON_GetObjectItemCaseSensitive(weather, "low");
+//             cJSON *high = cJSON_GetObjectItemCaseSensitive(weather, "high");
+//             uint8_t low_val = low->valueint < 18 ? 18 : low->valueint;
+//             uint8_t high_val = high->valueint > 37 ? 37 : high->valueint;
+
+//             uint8_t start_r = (int)(191 + (250 - 191) * (low_val - 18) / (37 - 18));
+//             uint8_t start_g = (int)(220 + (17 - 220) * (low_val - 18) / (37 - 18));
+//             uint8_t start_b = (int)(48 + (79 - 48) * (low_val - 18) / (37 - 18));
+//             uint8_t stop_r = (int)(191 + (250 - 191) * (high_val - 18) / (37 - 18));
+//             uint8_t stop_g = (int)(220 + (17 - 220) * (high_val - 18) / (37 - 18));
+//             uint8_t stop_b = (int)(48 + (79 - 48) * (high_val - 18) / (37 - 18));
+//             content = "18";
+//             tempare_low = gui_text_create(canvas_temperature, "tempare_left",  19, 70, 0, 0);
+//             gui_text_set(tempare_low, (void *)content, GUI_FONT_SRC_BMP,  gui_rgba(start_r, start_g, start_b,
+//                                                                                    UINT8_MAX),
+//                          strlen(content),
+//                          32);
+//             gui_text_type_set(tempare_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+//             gui_text_mode_set(tempare_low, LEFT);
+
+//             content = "37";
+//             tempare_high = gui_text_create(canvas_temperature, "tempare_high",  56, 70, 0, 0);
+//             gui_text_set(tempare_high, (void *)content, GUI_FONT_SRC_BMP,  gui_rgba(stop_r, stop_g, stop_b,
+//                                                                                     UINT8_MAX),
+//                          strlen(content),
+//                          32);
+//             gui_text_type_set(tempare_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+//             gui_text_mode_set(tempare_high, LEFT);
+//         }
+//     }
+// #else
+    sprintf(tempera_low_content, "18");
+    tempare_low = gui_text_create(canvas_temperature, "tempare_low",  19, 70, 0, 0);
+    gui_text_set(tempare_low, (void *)tempera_low_content, GUI_FONT_SRC_BMP,
+                 APP_COLOR_WHITE, //gui_rgba(191, 220, 48, UINT8_MAX),
+                 strlen(tempera_low_content),
+                 32);
+    gui_text_type_set(tempare_low, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(tempare_low, LEFT);
+
+    sprintf(tempera_high_content, "37");
+    tempare_high = gui_text_create(canvas_temperature, "tempare_high",  56, 70, 0, 0);
+    gui_text_set(tempare_high, (void *)tempera_high_content, GUI_FONT_SRC_BMP,
+                 APP_COLOR_WHITE, //gui_rgba(250, 17, 79, UINT8_MAX),
+                 strlen(tempera_high_content),
+                 32);
+    gui_text_type_set(tempare_high, font_size_32_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(tempare_high, LEFT);
+// #endif
+
+    // date & time text
+    sprintf(date_text_content, "THU 15");
+    date_text = gui_text_create(win_watch, "date_text",  -30, 15, 0, 0);
+    gui_text_set(date_text, (void *)date_text_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                 strlen(date_text_content),
+                 40);
+    gui_text_type_set(date_text, font_size_40_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(date_text, RIGHT);
+    sprintf(time_text_content, "00:00");
+    time_text = gui_text_create(win_watch, "time_text",  -20, 50, 0, 0);
+    gui_text_set(time_text, (void *)time_text_content, GUI_FONT_SRC_BMP, APP_COLOR_WHITE,
+                 strlen(time_text_content),
+                 96);
+    gui_text_type_set(time_text, font_size_96_bin_addr, FONT_SRC_MEMADDR);
+    gui_text_mode_set(time_text, RIGHT);
 
     // activity icon
     gui_canvas_t *canvas_move_ring = gui_canvas_create(win_watch, "CLOCK_ACTIVITY_ICON", 0, 0, 50, 368,
                                                        100);
-    gui_canvas_set_canvas_cb(canvas_move_ring, arc_activity_move_cb);
+    gui_canvas_set_canvas_cb(canvas_move_ring, arc_activity_cb);
     // gui_img_create_from_mem(win_watch, "CLOCK_ACTIVITY_ICON", UI_CLOCK_ACTIVITY_ICON_BIN, 16, 50, 0, 0);
 
     // compass icon
@@ -786,5 +970,5 @@ void page_ct_clock(void *parent)
     gui_img_create_from_mem(win_watch, "CLOCK_HEARTRATE_ICON", UI_CLOCK_HEARTRATE_ICON_BIN, 251, 330, 0,
                             0);
 
-    gui_win_set_animate(win_watch, 1000, -1, win_clock_cb, NULL);
+    gui_win_set_animate(win_watch, 2000, -1, win_clock_cb, win_watch);
 }

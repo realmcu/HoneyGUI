@@ -1,6 +1,4 @@
-# 页面列表 (Page list)
-
-<br>
+# 页面列表 (Page List)
 
 页面列表控件具有与页面控件类似的功能，并且预计使用更少的内存。页面列表控件在 y 轴上表现得像一个滚动条。当它在 y 轴上移动时，其子节点也会随之移动。可以设置两个切换控件，分别指示第一个和最后一个位置，以及两个边界线，分别指示顶部和底部。当第一个切换控件到达顶部时，它将从顶部移动到底部。最后一个切换控件到达底部时，它将从底部移动到顶部。这一特性使得子控件看起来比实际创建的数量更多。
 
@@ -8,18 +6,18 @@
 
 ### 增加页面控件
 
-开发者可以通过 [gui_pagelist_increase_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_increase_real_list_max)来增加真实列表的数量。
+可以通过 [gui_pagelist_increase_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_increase_real_list_max) 来增加真实列表的数量。
 
 ### 减少页面控件
-开发者可以使用[gui_pagelist_decrease_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_decrease_real_list_max)来减少真实列表的数量。
+可以使用 [gui_pagelist_decrease_real_list_max(gui_pagelist_t *this, int16_t real_list_max)](#gui_pagelist_decrease_real_list_max) 来减少真实列表的数量。
 
 ### 添加回调函数
 
-此API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#gui_pagelist_add_list_update_cb) 用于在页列表上下滑动时添加更新回调，通常用于更新文本。
+此API [gui_pagelist_add_list_update_cb(gui_pagelist_t *this, gui_pagelist_update_cb_t list_first_cb, gui_pagelist_update_cb_t list_last_cb)](#gui_pagelist_add_list_update_cb) 用于在页面列表上下滑动时添加更新回调，通常用于更新文本。
 
 ### 设定属性
 
-开发者可以调用 [gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max, int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last)](#gui_pagelist_set_att)来设定页面列表控件的属性。
+可以使用 [gui_pagelist_set_att(gui_pagelist_t *this, int16_t real_list_max, int16_t show_list_max, int16_t list_gap_y, gui_switch_t *list_first, gui_switch_t *list_last)](#gui_pagelist_set_att) 来设定页面列表控件的属性。
 
 ### 增加图片
 
@@ -61,9 +59,9 @@ void design_pagelist_test(void *parent)
                             GUI_FONT_SRC_BMP, gui_rgb(UINT8_MAX, UINT8_MAX, UINT8_MAX), strlen(files_name_test[i]),
                             FONT_H_32);
         gui_scroll_text_scroll_set(scroll_text_pagelist_test[i], SCROLL_X, 0, 0, 5000, 0);
-        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_1,
+        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)switch_pagelist_touch_cb, GUI_EVENT_1,
                              NULL);
-        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)swtich_pagelist_touch_cb, GUI_EVENT_2,
+        gui_obj_add_event_cb(switch_pagelist_test[i], (gui_event_cb_t)switch_pagelist_touch_cb, GUI_EVENT_2,
                              NULL);
     }
     index_first = 0;

@@ -522,6 +522,7 @@ gui_tab_t *gui_tab_create(void       *parent,
     GET_BASE(this)->create_done = true;
     this->rte_obj = gui_obj_create(this, "tab_rte", this->base.x, this->base.y, this->base.w,
                                    this->base.h);
+    this->rte_obj->type = IMAGE_FROM_MEM;
     return this;
 }
 

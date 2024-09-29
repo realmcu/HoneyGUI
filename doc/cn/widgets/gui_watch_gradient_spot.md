@@ -1,5 +1,4 @@
-# 监视点渐变 (Watch gradient spot)
-<br>
+# 监视点渐变 (Watch Gradient Spot)
 
 监视点渐变是一个具有动态水滴效果的指针表盘控件。
 
@@ -11,7 +10,7 @@
 
 ### 设置中心位置
 
-控件的中心位置可以自由设置，使用[gui_watch_gradient_spot_set_center(this, c_x, c_y)](#gui_watch_gradient_spot_create) 函数改变中心位置，c_x, c_y 为中心位置的坐标点。
+控件的中心位置可以自由设置，使用[gui_watch_gradient_spot_set_center(this, c_x, c_y)](#gui_watch_gradient_spot_set_center) 函数改变中心位置，其中 `c_x` 和 `c_y` 为中心位置的坐标点。
 
 ## 示例
 

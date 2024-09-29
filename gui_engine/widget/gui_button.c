@@ -326,7 +326,7 @@ void gui_button_set_img(gui_button_t *this,
                         void                 *background_pic,
                         void                 *highlight_pic)
 {
-    if (background_pic && background_pic)
+    if (background_pic && highlight_pic)
     {
         this->off_pic_addr = background_pic;
         this->on_pic_addr = highlight_pic;

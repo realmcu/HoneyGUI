@@ -23,18 +23,18 @@ description on the ```XML syntax``` page.
 * According to the syntax protocol, this function ```foreach_create``` uses a recursive strategy to traverse each tag of xml and map the tag to the widget, configure the tag's attributes to the widget.
 * After the xml traversal is completed, a C-APP has actually been created in the firmware, which is no different from the result of directly using the C-APP api.
 * Then the JavaScript file mentioned in xml will be executed.
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939055906559343/0b59a527_10088396.png" alt ="xml.png"></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1727329150060233120/0353e15b_10088396.png" alt ="xml.png"></div><br/>
 
 ## JavaScript
 * JavaScript describes Customized behaviors, such as triggering behaviors of widget gesture events, peripheral operations, printing logs, etc.
 * Based on JerryScript engine on ```gui_engine\3rd\js``` for common syntax. Please refer to <https://jerryscript.net/> for details.
-* The implementation of the JavaScript parser is Files starting with js in this folder ```gui_engine\SaaA```. You can read the syntax 
+* The implementation of the JavaScript parser is files starting with js in this folder ```gui_engine\SaaA```. You can read the syntax 
 description on the ```JavaScript syntax``` page.
 * ```DECLARE_HANDLER``` is used to define a function as a C language implementation of a JavaScript function.
 * ```REGISTER_METHOD``` and ```REGISTER_METHOD_NAME``` are used to add a function to a javascript object, so you can call it in script.
 * In a javascript file, there are some variable definitions, function definitions, and function calls. When the app starts, as mentioned above, the JavaScript file will be executed at the end of the XML parsing, and the function calls in it will be executed, mainly some initialization behaviors and the registration of event listeners. 
 * The callback functions of those events will not be executed until the event occurs.
-<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1715939260331113428/b473228b_10088396.png" alt ="js.png"></div><br/>
+<div style="text-align: center"><img src ="https://foruda.gitee.com/images/1727329518743167154/2b01e446_10088396.png" alt ="js.png"></div><br/>
 
 ## Example
 ### Progressbar API
@@ -43,18 +43,18 @@ description on the ```JavaScript syntax``` page.
 progressbar.getElementById('tag name')
 var progress = progressbar.progress(0.7)
 ```
-#### Define a progressbar object
+#### Define A Progressbar Object
 In fact, this object is added to the global object. Using property of the global object does not require explicitly calling the global object.
 ```c
 jerry_value_t progress = jerry_create_object();
 js_set_property(global_obj, "progressbar", progress);
 ```
-#### Add 2 functions to the progressbar object
+#### Add 2 Functions to The Progressbar Object
 ```c
 REGISTER_METHOD(progress, progress);
 REGISTER_METHOD(progress, getElementById);
 ```
-#### Define 2 functions
+#### Define 2 Functions
 * The ```progress``` is used to write and read the progressbar's progress.
 * Input formal parameters are in the array ```args```. The first in it is the progress number. If this parameter exists, which means that the progress needs to be set. Using ```jerry_get_number_value()``` to convert javascript parameter to c language variable.
 * The return value is the progress you want to get, using ```jerry_create_number``` to convert c language variable to javascript variable. By the way, the form of these javascript variables in C language is an index of an unsigned integer.
@@ -96,7 +96,7 @@ DECLARE_HANDLER(getElementById)
     return jerry_create_undefined();
 }
 ```
- ### Light control
+### Light Control
 This page shows how the  UI switch corresponds to the peripheral switch.
 ```javascript
 //IO P1_1 is set to low level
@@ -104,26 +104,26 @@ var P1_1 = 9
 var LED1 = new Gpio(P1_1, 'out');
 LED1.writeSync(0)
 ```
-#### Light swtich data
+#### Light Swtich Data
 
-|data|value type|brief|
+|Data|Value type|Brief|
 |---|---|---|
 |gpio|number|index of light|
 |direction|out / in|direction of signal|
 |write value|number|0 for turning off / 1 for turning on |
 
 - Refer to [https://www.npmjs.com/package/onoff#usage](https://www.npmjs.com/package/onoff#usage) for more information.
-#### GPIO light Switch
-- Get gpio index , direction, and write value;
-- Use gpio driver ```drv_pin_mode()``` & ```drv_pin_write()``` to operate it;
-#### MATTER light Switch
-- Get gpio index, and write value;
-- Tramsform data to matter protocol;
-- Use ```matter_send_msg_to_app()``` to operate lights;
-#### MESH light Switch
-- Get gpio index, and write value;
-- Tramsform data to mesh protocol;
-- Use ```matter_send_msg_to_app()``` to operate lights;
+#### GPIO Light Switch
+- Get gpio index , direction, and write value.
+- Use gpio driver ```drv_pin_mode()``` & ```drv_pin_write()``` to operate it.
+#### MATTER Light Switch
+- Get gpio index, and write value.
+- Tramsform data to matter protocol.
+- Use ```matter_send_msg_to_app()``` to operate lights.
+#### MESH Light Switch
+- Get gpio index, and write value.
+- Tramsform data to mesh protocol.
+- Use ```matter_send_msg_to_app()``` to operate lights.
 
 
 The following code example is the ```writeSync``` 's control light implementation for RTL87X2G. First get gpio value and direction value, then use specify driver API to operate light.

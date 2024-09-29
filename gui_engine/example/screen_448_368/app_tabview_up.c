@@ -569,7 +569,7 @@ static void canvas_cb_draw_bg(gui_canvas_t *canvas)
 {
     nvgRoundedRect(canvas->vg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
                    50); // the X/Y-axis coordinate relative to parent widget
-    nvgFillColor(canvas->vg, nvgRGBA(255, 255, 255, 76));
+    nvgFillColor(canvas->vg, nvgRGBA(0, 0, 0, 255));
     nvgFill(canvas->vg);
     nvgBeginPath(canvas->vg);
 }

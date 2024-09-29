@@ -21,7 +21,6 @@
 #include "gui_switch.h"
 #include "gui_server.h"
 #include "gui_obj.h"
-#include "gui_win.h"
 #include "tp_algo.h"
 
 /** @defgroup WIDGET WIDGET
@@ -138,12 +137,12 @@ void gui_switch_is_off(gui_switch_t *this)
     gui_switch_change_state(this, false);
 }
 
-static void gui_switch_on(gui_switch_t *b, void *callback, void *parameter)
+static void gui_switch_on(gui_switch_t *b, gui_event_cb_t callback, void *parameter)
 {
     gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_ON, parameter);
 }
 
-static void gui_switch_off(gui_switch_t *b, void *callback, void *parameter)
+static void gui_switch_off(gui_switch_t *b, gui_event_cb_t callback, void *parameter)
 {
     gui_obj_add_event_cb(b, (gui_event_cb_t)callback, (gui_event_t)SWITCH_EVENT_TURN_OFF, parameter);
 }
@@ -541,6 +540,8 @@ _GUI_API_ASSIGN(gui_switch_t)
      .on_press = on_press,
       .animate = animate,
        .on_release = on_release,
+        .turn_off_no_event = gui_switch_is_off,
+         .turn_on_no_event = gui_switch_is_on,
 };
 /** End of WIDGET_Exported_Functions
   * @}

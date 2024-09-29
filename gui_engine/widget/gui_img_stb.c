@@ -23,7 +23,6 @@
 #include "draw_img.h"
 #include "tp_algo.h"
 #include "gui_img_stb.h"
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "acc_init.h"
 #ifdef TJPG

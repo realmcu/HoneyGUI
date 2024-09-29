@@ -75,11 +75,11 @@ static gui_wheel_port_data_t wheel_port_data = {0};
 
 int sim_screen_width = DRV_LCD_WIDTH;
 int sim_screen_hight = DRV_LCD_HIGHT;
-int32_t sim_get_width()
+int32_t sim_get_width(void)
 {
     return sim_screen_width;
 }
-int32_t sim_get_hight()
+int32_t sim_get_hight(void)
 {
     return sim_screen_hight;
 }

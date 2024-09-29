@@ -1,5 +1,5 @@
-#  Application switching
-## Application switching animation sample
+#  Application Switching
+## Application Switching Animation Sample
 - The first app has a list, and the second app has a grid. 
 - Clicking on the first app's button will switch to the second app. 
 - The first app will gradually become transparent until it disappears when switching, and the second app will enlarge to fill the screen. 
@@ -8,7 +8,7 @@
 <center><img width= "300" src="https://docs.realmcu.com/HoneyGUI/image/GUI-APP/Switch_APP/switch_app.gif" /></center>
 <br>
 
-### Source code
+### Source Code
 - In the animation frame callback, implement the animation effect of app switching (scaling and fading).
 - When the animation is finished, shut down the app.
 

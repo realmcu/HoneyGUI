@@ -21,7 +21,12 @@ static void *event_cb_param[MAX_EVENT_CNT];
 static void *event_obj[MAX_EVENT_CNT];
 static uint8_t event_cnt = 0;
 static bool fb_change = false;
-
+static uint32_t gui_obj_count;
+static uint32_t obj_count;
+uint32_t gui_get_obj_count()
+{
+    return gui_obj_count;
+}
 static void obj_reset_active(gui_obj_t *obj)
 {
     gui_list_t *node = NULL;
@@ -275,6 +280,7 @@ static void obj_draw_end(gui_obj_t *obj)
     gui_list_for_each(node, &obj->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
+        obj_count++;
         if (obj->has_end_cb)
         {
             obj->obj_cb(obj, OBJ_END);
@@ -458,6 +464,8 @@ void gui_fb_disp(gui_obj_t *root, bool enable_event)
     }
 
     obj_draw_end(root);
+    gui_obj_count = obj_count;
+    obj_count = 0;
     if (enable_event == true)
     {
         for (uint8_t i = 0; i < event_cnt; i++)

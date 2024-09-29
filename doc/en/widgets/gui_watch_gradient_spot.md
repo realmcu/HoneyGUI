@@ -1,16 +1,16 @@
-# Watch gradient spot
+# Watch Gradient Spot
 
 The watch gradientm spot widget allows you to create a pointer watchface with dynamic water drops in the center.
 
 ## Usage
 
-### Create watch_gradient_spot widget
+### Create Widget
 
 You can create a watch gradient spot widget by calling the [gui_watch_gradient_spot_create(parent, name, x, y, w, h)](#gui_watch_gradient_spot_create).
 
-### Set center
+### Set Center
 
-If you wish to modify the central position of this widget, you can utilize [gui_watch_gradient_spot_set_center(this, c_x, c_y)](#gui_watch_gradient_spot_create) to make the adjustment. The coordinate points for the central position are c_x and c_y.
+The center position of the widget can be freely set by using the [gui_watch_gradient_spot_set_center(this, c_x, c_y)](#gui_watch_gradient_spot_set_center) function to change the center position, where `c_x` and `c_y` are the coordinate points of the central position.
 
 ## Example
 

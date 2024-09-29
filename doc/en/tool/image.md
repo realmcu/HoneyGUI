@@ -1,8 +1,8 @@
 # Image Convert Tool
 
-## Image format conversion
+## Image Format Conversion
 Convert pictures in various formats into RGB raw pictures
-* Open the converter. Please refer to this section for the download link of the image conversion tool: [Tool](../index.md) 
+* Open the converter. Please refer to this section for the download link of the image conversion tool: [Tool](./index.md) 
 * The operation steps and detailed instructions are as follows:
 
 <br/>

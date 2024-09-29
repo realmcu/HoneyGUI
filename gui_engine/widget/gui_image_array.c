@@ -24,7 +24,6 @@
 #include <acc_init.h>
 #include <gui_matrix.h>
 #include "gui_image_array.h"
-#include "tp_algo.h"
 #include <math.h>
 #include "gui_fb.h"
 #include "gui_win.h"
@@ -349,7 +348,7 @@ void gui_image_array_write(gui_image_array_t *obj, void **image_data_array, int 
         gui_free(obj->image_data);
         obj->image_data = 0;
     }
-    obj->image_data = gui_malloc(array_length * sizeof(image_data_array));
+    obj->image_data = gui_malloc(array_length * sizeof(*image_data_array));
     memcpy(obj->image_data, image_data_array, array_length * sizeof(void *));
     obj->array_count = array_length;
 

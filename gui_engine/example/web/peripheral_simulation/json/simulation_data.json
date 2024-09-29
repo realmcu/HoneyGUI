@@ -1,20 +1,25 @@
 {
-    "temperature": [
+    "weather": [
         {
             "low": 18,
             "high": 37,
-            "cur": 28
+            "cur": 22,
+            "condition_1": "Sunny",
+            "condition_2": "Heavy rain",
+            "condition_3": "Cloudy",
+            "condition_4": "Cloudy",
+            "condition_5": "Cloudy"
         }
     ],
     "compass": [
         {
-            "degree": 106
+            "degree": 90
         }
     ],
     "activity": [
         {
-            "move": 3014,
-            "ex": 24,
+            "move": 1,
+            "ex": 1,
             "stand": 1
         }
     ]

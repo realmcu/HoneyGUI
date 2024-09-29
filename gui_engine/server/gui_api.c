@@ -357,7 +357,13 @@ static void gui_walker(void *ptr, size_t size, int used, void *user)
     gui_log("\t%p %s size: %x; total = %d\n", ptr, used ? "used" : "free", (unsigned int)size,
             total_used_size);
 }
-
+static void walker(void *ptr, size_t size, int used, void *user)
+{
+    if (used)
+    {
+        total_used_size = total_used_size + size;
+    }
+}
 void gui_mem_debug(void)
 {
     total_used_size = 0;
@@ -368,7 +374,14 @@ void gui_mem_debug(void)
     gui_log("\t\n");
     total_used_size = 0;
 }
-
+uint32_t gui_mem_used(void)
+{
+    total_used_size = 0;
+    GUI_UNUSED(total_used_size);
+    GUI_ASSERT(tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(tlsf), walker, &total_used_size);
+    return total_used_size;
+}
 
 void *gui_lower_malloc(size_t n)
 {
@@ -407,7 +420,14 @@ void gui_lower_mem_debug(void)
     GUI_ASSERT(lower_tlsf != NULL);
     tlsf_walk_pool(tlsf_get_pool(lower_tlsf), NULL, NULL);
 }
-
+uint32_t gui_low_mem_used(void)
+{
+    total_used_size = 0;
+    GUI_UNUSED(total_used_size);
+    GUI_ASSERT(lower_tlsf != NULL);
+    tlsf_walk_pool(tlsf_get_pool(lower_tlsf), walker, &total_used_size);
+    return total_used_size;
+}
 void gui_sleep_cb(void)
 {
     if (os_api->gui_sleep_cb != NULL)
@@ -858,4 +878,28 @@ gui_color_t gui_rgb(unsigned char red, unsigned char green, unsigned char blue)
     color.color.rgba.a = UINT8_MAX;
 
     return color;
+}
+gui_error_t gui_music_play(const char *music_file)
+{
+#if _WIN32
+    extern int win32_play_music(const char *music_file);
+    win32_play_music(music_file);
+#endif
+    return GUI_SUCCESS;
+}
+gui_error_t gui_music_stop()
+{
+#if _WIN32
+    extern int win32_stop_music(void);
+    win32_stop_music();
+#endif
+    return GUI_SUCCESS;
+}
+bool gui_music_completion_status()
+{
+#if _WIN32
+    extern bool win32_music_completion_status(void);
+    return win32_music_completion_status();
+#endif
+    return 0;
 }

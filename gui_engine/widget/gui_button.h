@@ -82,11 +82,11 @@ typedef struct gui_button
     uint8_t enable : 1;                 //!< enable function
 } gui_button_t;
 _GUI_API_DEFINE(gui_button_t)
-void (*on_click)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
-void (*on_press)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
-void (*on_long_press)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
-void (*on_release)(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
-void (*animate)(gui_button_t *this,
+void (*on_click)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+void (*on_press)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+void (*on_long_press)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+void (*on_release)(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
+void (*animate)(gui_button_t *,
                 uint32_t      dur,
                 int           repeat_count,
                 void         *callback,
@@ -209,7 +209,7 @@ gui_button_t *gui_button_create_from_fs(void             *parent,
  * @param this
  * @param event_cb
  */
-void gui_button_click(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void gui_button_click(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
  * @brief please use gui_obj_add_event_cb to set gesture trigger.
@@ -218,7 +218,7 @@ void gui_button_click(gui_button_t *this, gui_event_cb_t event_cb, void *paramet
  * @param event_cb
  * @param parameter
  */
-void gui_button_press(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void gui_button_press(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
  * @brief please use gui_obj_add_event_cb to set gesture trigger.
@@ -227,7 +227,7 @@ void gui_button_press(gui_button_t *this, gui_event_cb_t event_cb, void *paramet
  * @param event_cb
  * @param parameter
  */
-void gui_button_long(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void gui_button_long(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
  * @brief please use gui_obj_add_event_cb to set gesture trigger.
@@ -236,7 +236,7 @@ void gui_button_long(gui_button_t *this, gui_event_cb_t event_cb, void *paramete
  * @param event_cb
  * @param parameter
  */
-void gui_button_release(gui_button_t *this, gui_event_cb_t event_cb, void *parameter);
+void gui_button_release(gui_button_t *, gui_event_cb_t event_cb, void *parameter);
 
 /**
  * @brief Set the color of text which belongs to a button.
@@ -244,7 +244,7 @@ void gui_button_release(gui_button_t *this, gui_event_cb_t event_cb, void *param
  * @param this The pointer of this button widget.
  * @param color The color of text.
  */
-void gui_button_text_color(gui_button_t *this, gui_color_t color);
+void gui_button_text_color(gui_button_t *, gui_color_t color);
 
 /**
  * @brief Move the img of this button.
@@ -253,7 +253,7 @@ void gui_button_text_color(gui_button_t *this, gui_color_t color);
  * @param img_x The X value of img.
  * @param img_y The Y value of img.
  */
-void gui_button_img_move(gui_button_t *this, int16_t img_x, int16_t img_y);
+void gui_button_img_move(gui_button_t *, int16_t img_x, int16_t img_y);
 
 /**
  * @brief
@@ -262,7 +262,7 @@ void gui_button_img_move(gui_button_t *this, int16_t img_x, int16_t img_y);
  * @param text_x  The X relative coordinates value of text(left).
  * @param text_y The y relative coordinates value of text(up).
  */
-void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y);
+void gui_button_text_move(gui_button_t *, int16_t text_x, int16_t text_y);
 
 /**
  * @brief
@@ -273,7 +273,7 @@ void gui_button_text_move(gui_button_t *this, int16_t text_x, int16_t text_y);
  * @param callback
  * @param p
  */
-void gui_button_set_animate(gui_button_t *this,
+void gui_button_set_animate(gui_button_t *,
                             uint32_t      dur,
                             int           repeatCount,
                             void         *callback,
@@ -286,7 +286,7 @@ void gui_button_set_animate(gui_button_t *this,
  * @param background_pic The image shown when button was not pressed.
  * @param highlight_pic The image shown when button was pressed.
  */
-void gui_button_set_img(gui_button_t *this,
+void gui_button_set_img(gui_button_t *,
                         void                 *background_pic,
                         void                 *highlight_pic);
 
@@ -296,7 +296,7 @@ void gui_button_set_img(gui_button_t *this,
  * @param this The pointer of this button widget.
  * @param enable enable.
  */
-void gui_button_set_enable(gui_button_t *this, bool enable);
+void gui_button_set_enable(gui_button_t *, bool enable);
 /** End of WIDGET_Exported_GUI_Functions
   * @}
   */
@@ -304,5 +304,7 @@ void gui_button_set_enable(gui_button_t *this, bool enable);
 /** End of WIDGET
   * @}
   */
-
+#ifdef __cplusplus
+}
+#endif
 #endif

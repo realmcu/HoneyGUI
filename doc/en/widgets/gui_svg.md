@@ -5,25 +5,25 @@
 - SVG images **do not need to be converted into** `bin` format files using ImageConverter tools, but can be directly packaged in the `root` directory.
 
 ## Usage
-### Creat a svg widget
-You can use [gui_svg_create_from_mem(parent, name, addr, size, x, y, w, h)](#gui_svg_create_from_mem) to create an SVG widget from memory, or use [gui_svg_create_from_file(parent, name, filename, x, y, w, h)](#gui_svg_create_from_file) to create from file.
+### Creat Svg Widget
+You can use [gui_svg_create_from_mem(void *parent, const char *name, uint8_t *addr, uint32_t size, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_svg_create_from_mem) to create an SVG widget from memory, or use [gui_svg_create_from_file(void *parent, const char *name, const char *filename, int16_t x, int16_t y, int16_t w, int16_t h)](#gui_svg_create_from_file) to create from file.
 This `w/h` are the width and height of the SVG widget, not SVG image. This `size` is the data size of the SVG image that must be filled in.
 
-### SVG rotation
-Using the [gui_svg_rotation(svg, degrees, c_x, c_y)](#gui_svg_rotation) the image will be rotated by an angle of `degree`. The `(c_x, c_y)` is relative to the origin of the SVG widget, not the origin of the screen.
+### SVG Rotation
+Using the [gui_svg_rotation(gui_svg_t *svg, float degrees, float c_x, float c_y)](#gui_svg_rotation) the image will be rotated by an angle of `degree`. The `(c_x, c_y)` is relative to the origin of the SVG widget, not the origin of the screen.
 
-### SVG scale
-If you need the object size to be updated to transformed size set [gui_svg_scale(svg, scale_x, scale_y)](#gui_svg_scale).
+### SVG Scale
+If you need the object size to be updated to transformed size set [gui_svg_scale(gui_svg_t *svg, float scale_x, float scale_y)](#gui_svg_scale).
 
-### SVG translate
-The image will be translated by using the [gui_svg_translate(svg, t_x, t_y)](#gui_svg_translate).
+### SVG Translate
+The image will be translated by using the [gui_svg_translate(gui_svg_t *svg, float t_x, float t_y)](#gui_svg_translate).
 
 ### Opacity
-If you want the image to fade or opacity set [gui_svg_set_opacity(svg, opacity_value)](#gui_svg_set_opacity).
+If you want the image to fade or opacity set [gui_svg_set_opacity(gui_svg_t *svg, unsigned char opacity_value)](#gui_svg_set_opacity).
 
 ## Example
 
-### Creat a simple SVG
+### Creat Simple SVG
 ```cpp
 #include "gui_svg.h"
 #include "root_image_hongkong/ui_resource.h"
@@ -36,7 +36,7 @@ void page_tb_svg(void *parent)
 <div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598969684310669/2e2a68e7_13671125.png"/></div>
 <br/>
 
-### SVG rotation
+### SVG Rotation
 
 ```c
 #include "gui_svg.h"
@@ -51,7 +51,7 @@ void page_tb_svg(void *parent)
 <div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598974541085137/fcc74440_13671125.png"/></div>
 <br/>
 
-### SVG scale
+### SVG Scale
 
 ```c
 #include "gui_svg.h"
@@ -66,7 +66,7 @@ void page_tb_svg(void *parent)
 <div style="text-align: center"><img width="300" src ="https://foruda.gitee.com/images/1699598982107316449/af526d67_13671125.png"/></div>
 <br/>
 
-### SVG translate
+### SVG Translate
 
 ```c
 #include "gui_svg.h"

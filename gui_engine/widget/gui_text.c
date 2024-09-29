@@ -522,12 +522,12 @@ void gui_text_pswd_done(gui_text_t *this, gui_event_cb_t event_cb, void *paramet
     gui_obj_add_event_cb(this, event_cb, (gui_event_t)TXT_EVENT_PSWD_DONE, parameter);
 }
 
-void gui_text_set(gui_text_t   *this,
-                  void         *text,
-                  FONT_SRC_TYPE text_type,
-                  gui_color_t   color,
-                  uint16_t      length,
-                  uint8_t       font_size)
+void gui_text_set(gui_text_t    *this,
+                  void          *text,
+                  FONT_SRC_TYPE  text_type,
+                  gui_color_t    color,
+                  uint16_t       length,
+                  uint8_t        font_size)
 {
     this->font_type = text_type;
     this->content = (uint8_t *)text;
@@ -540,11 +540,11 @@ void gui_text_set(gui_text_t   *this,
     this->layout_refresh = true;
 }
 
-void gui_text_set_animate(void    *o,
-                          uint32_t dur,
-                          int      repeat_count,
-                          void    *callback,
-                          void    *p)
+void gui_text_set_animate(void     *o,
+                          uint32_t  dur,
+                          int       repeat_count,
+                          void     *callback,
+                          void     *p)
 {
     gui_text_t *this = o;
     GUI_SET_ANIMATE_HELPER

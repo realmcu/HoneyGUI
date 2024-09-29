@@ -84,6 +84,43 @@
   * @{
   */
 
+static void gui_canvas_rect_input_prepare(gui_obj_t *obj)
+{
+    touch_info_t *tp = tp_get_info();
+    gui_canvas_rect_t *this = (gui_canvas_rect_t *)obj;
+    GUI_UNUSED(tp);
+    GUI_UNUSED(this);
+
+    if ((gui_obj_in_rect(obj, 0, 0, gui_get_screen_width(), gui_get_screen_height()) == false) || \
+        (gui_obj_point_in_obj_rect(obj, tp->x, tp->y) == false))
+    {
+        return;
+    }
+
+    if (this->tp_block)
+    {
+
+        if (tp->pressed)
+        {
+            gui_obj_skip_other_parent_pressed(obj);
+        }
+
+        switch (tp->type)
+        {
+        case TOUCH_SHORT:
+            {
+                gui_obj_skip_other_parent_short(obj);
+            }
+            break;
+        case TOUCH_LONG:
+            {
+                gui_obj_skip_other_parent_long(obj);
+            }
+            break;
+        }
+    }
+}
+
 static void gui_canvas_rect_prepare(gui_canvas_rect_t *this)
 {
     touch_info_t *tp = tp_get_info();
@@ -178,6 +215,9 @@ static void gui_canvas_rect_cb(gui_obj_t *obj, T_OBJ_CB_TYPE cb_type)
     {
         switch (cb_type)
         {
+        case OBJ_INPUT_PREPARE:
+            gui_canvas_rect_input_prepare(obj);
+            break;
         case OBJ_PREPARE:
             gui_canvas_rect_prepare((gui_canvas_rect_t *)obj);
             break;
@@ -219,6 +259,7 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
     memset(canvas_rect, 0x00, sizeof(gui_canvas_rect_t));
     gui_obj_ctor((gui_obj_t *)canvas_rect, parent, name, x, y, w, h);
     GET_BASE(canvas_rect)->obj_cb = gui_canvas_rect_cb;
+    GET_BASE(canvas_rect)->has_input_prepare_cb = true;
     GET_BASE(canvas_rect)->has_prepare_cb = true;
     GET_BASE(canvas_rect)->has_draw_cb = true;
     GET_BASE(canvas_rect)->has_end_cb = true;
@@ -234,6 +275,17 @@ gui_canvas_rect_t *gui_canvas_rect_create(gui_obj_t   *parent,
     canvas_rect->color = color;
     canvas_rect->opacity_value = UINT8_MAX;
     return canvas_rect;
+}
+
+/**
+ * @brief
+ *
+ * @param this
+ * @param block
+ */
+void gui_canvas_rect_set_tp_block(gui_canvas_rect_t *this, bool block)
+{
+    this->tp_block = block;
 }
 
 /**

@@ -309,24 +309,27 @@ void gui_cube_add_click_cb(gui_cube_t *_this, gui_cube_cb_t cb_list);
 /**
  * @brief
  *
- * @param _this
- * @param interval
+ * @param _this widget pointer
+ * @param internal_ms rotation interval
+ * @param degree angle per rotation
  */
 void gui_cube_auto_rotation_by_x(gui_cube_t *_this, uint32_t internal_ms, float degree);
 
 /**
  * @brief
  *
- * @param _this
- * @param interval
+ * @param _this widget pointer
+ * @param internal_ms rotation interval
+ * @param degree angle per rotation
  */
 void gui_cube_auto_rotation_by_y(gui_cube_t *_this, uint32_t internal_ms, float degree);
 
 /**
  * @brief
  *
- * @param _this
- * @param interval
+ * @param _this widget pointer
+ * @param internal_ms rotation interval
+ * @param degree angle per rotation
  */
 void gui_cube_auto_rotation_by_z(gui_cube_t *_this, uint32_t internal_ms, float degree);
 

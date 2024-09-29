@@ -62,3 +62,9 @@
 
     TP
         Touch Pad
+
+
+
+.. raw:: html
+
+    <script type="text/javascript" src="_static/js/glossary.js"></script>

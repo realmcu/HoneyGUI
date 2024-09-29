@@ -98,7 +98,7 @@ static void tree_child_free(gui_obj_t *object)
         tree_child_free(obj);
         if (obj->type != MULTI_LEVEL)
         {
-            gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
+            //gui_log("do obj %s free(destory), line = %d\n", obj->name, __LINE__);
 
             if (obj->matrix != NULL)
             {

@@ -256,6 +256,20 @@ static void gui_scroll_text_draw(gui_obj_t *obj)
             draw_rect.y2 = draw_rect.y1 + obj->h - 1;
         }
     }
+    else if (text->base.mode == SCROLL_X_REVERSE)
+    {
+        offset = text->base.char_width_sum;
+        if (offset > obj->w)
+        {
+            index = (cur_time_ms - text->init_time_ms) % text->interval_time_ms;
+            text->cnt_value = (text->end_value + text->start_value + offset - obj->w) * index /
+                              text->interval_time_ms;
+            draw_rect.x1 = text->base.offset_x + text->cnt_value - text->start_value - obj->w;
+            draw_rect.x2 = draw_rect.x1 + offset - 1;
+            draw_rect.y1 = text->base.offset_y;
+            draw_rect.y2 = draw_rect.y1 + obj->h - 1;
+        }
+    }
     else if (text->base.mode == SCROLL_Y)
     {
         offset = text->base.char_line_sum * text->base.font_height;

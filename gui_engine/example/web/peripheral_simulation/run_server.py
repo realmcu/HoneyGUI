@@ -6,7 +6,7 @@ import json
 import subprocess
 import os
 
-PORT = 8000
+PORT = 8080
 
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -30,8 +30,8 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
                 data = json.loads(post_data)
                 
                 json_filename = 'json/simulation_data.json'
-                with open(json_filename, 'w') as json_file:
-                    json.dump(data, json_file, indent=4)
+                with open(json_filename, 'w', encoding='utf-8') as json_file:
+                    json.dump(data, json_file, ensure_ascii=False, indent=4)
 
                 # response client
                 self.send_response(200)

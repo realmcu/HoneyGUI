@@ -61,7 +61,7 @@ Currently, porting has been done on FreeRTOS, RT-Thread, and Windows for referen
     };
     ```
 
-- In `DC_SINGLE` mode, the framebuffer size is `fb_width * fb_height * bit_depth / 8`.
+- In `DC_SINGLE` mode, the framebuffer size is `screen_width * screen_height*bit_depth / 8`.
 - In `DC_RAMLESS` mode, two partial framebuffers are used, with size `fb_width * fb_height * bit_depth / 8`, where `fb_height` is the segmented height.
 
 ### Interface
@@ -75,7 +75,6 @@ The following table lists the LCD-related interfaces supported by mainstream  ch
 | [RTL8763E]                                                       |   Y   |  Y   |  NA |  NA  |  Y  |
 | [RTL8772G]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
 | [RTL8773E]                                                       |   Y   |  Y   |  Y  |  NA  |  Y  |
-| RTL8772F                                                         |   Y   |  Y   |  Y  |  Y   |  Y  |
 
 ```{note}
 'Y' means the driver already included in the library.
@@ -92,7 +91,6 @@ The following table lists the LCD-related driver IC supported by mainstream chip
 | [RTL8763E]                                                      |   NA   |    NA    |    Y    |   NA   |    NA   |    NA   |   NA   |    NA    |    NA   |    Y    |    NA   |   NA   |    NA   |
 | [RTL8772G]                                                      |   Y    |    Y     |    Y    |   Y    |    Y    |    Y    |   Y    |    NA    |    NA   |    NA   |    NA   |   NA   |    NA   |
 | [RTL8773E]                                                      |   NA   |    NA    |    NA   |   NA   |    NA   |    NA   |   NA   |    NA    |    Y    |    NA   |    NA   |   NA   |    NA   |
-| RTL8772F                                                        |   NA   |    Y     |    Y    |   NA   |    Y    |    NA   |   NA   |    Y     |    Y    |    Y    |    NA   |   NA   |    NA   |
 
 ```{note}
 'Y' means the driver already included in the library.
@@ -151,7 +149,6 @@ The following table lists the Touch-related IC supported by all chips. If you wa
 | [RTL8763E]                                                       |    NA   |    NA    |   NA   |   NA  |   NA   |     Y   |     Y  |
 | [RTL8772G]                                                       |    NA   |    NA    |   NA   |    Y  |    Y   |    NA   |    NA  |
 | [RTL8773E]                                                       |    Y    |    NA    |   NA   |    Y  |   NA   |    NA   |    NA  |
-| RTL8772F                                                         |    Y    |     Y    |    Y   |    Y  |   NA   |    NA   |    NA  |
 
 ```{note}
 'Y' means the driver already included in the library.

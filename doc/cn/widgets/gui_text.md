@@ -1,4 +1,4 @@
-# 文本控件 (Text)
+# 文本 (Text)
 
 文本控件是用于显示文本的基本小控件，可用于将不同字体、不同颜色和不同大小的文本输出到屏幕上。为了绘制文本，字体文件可以是标准的.ttf文件或自定义的.bin文件。
 
@@ -36,7 +36,7 @@
 
 所有自定义bin字体文件都可以从RTK FAE那里获得。
 
-`FONT_BIN`,`FONT_TTF` 这两个文件储存了flash中的文件地址。
+`FONT_BIN`, `FONT_TTF` 这两个文件储存了flash中的文件地址。
 
 ### 创建文本控件
 
@@ -60,7 +60,6 @@
 
 文本控件支持类型设置。开发者可以调用 [gui_text_type_set(this, type)](#gui_text_type_set) 来设置类型。类型为bin/ttf文件的地址。
 
-
 #### 文本内容
 
 开发者可以调用 [gui_text_content_set(this, text, length)](#gui_text_content_set) 来设置文本控件需要显示的内容。
@@ -77,11 +76,11 @@
 因为需要文本控件的内容和字体大小信息，所以应该在set text之后调用它。如果修改了文本的内容、字体大小、位置和其他属性，则需要重用此接口进行转换。
 ```
 
-### 文本输入设置
+#### 文本输入设置
 
 开发者可以使用函数 [gui_text_input_set(this, inputable)](#gui_text_input_set) 设置文本的输入。
 
-### 设置文本点击事件
+#### 设置文本点击事件
 
 开发者可以调用函数 [gui_text_click(this, event_cb, parameter)](#gui_text_click) 添加文本点击事件。
 
@@ -115,18 +114,17 @@
    :end-before: /** @brief  text mode enum end */
 ```
 
-### 文本移动
+#### 文本移动
 
 开发者可以调用函数 [gui_text_move(this, x, y)](#gui_text_move) 将文本移动到指定位置，但是x和y不能大于文本控件的w和h。
 
-### 设置动画
+#### 设置动画
 
 开发者可以调用函数 [gui_text_set_animate(o, dur, repeat_count, callback, p)](#gui_text_set_animate) 来设置动画并在相应的回调函数中实现动画效果。
 
 ## 示例
 
 ### 多文本控件
-
 
 <details> <summary>代码</summary>
 

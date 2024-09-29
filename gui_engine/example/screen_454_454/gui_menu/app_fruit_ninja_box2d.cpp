@@ -12,10 +12,11 @@
 #include <math.h>
 #include <stdint.h>
 
+#define SCREEN_WIDTH 454
+#define SCREEN_HEIGHT 454
+#define HEIGHT_OFFSET 100
 namespace app_fruit_ninja
 {
-const int SCREEN_WIDTH = 454;
-const int SCREEN_HEIGHT = 454 + 100;
 const float M2P =
     20; // A physical unit corresponds to 20 pixels, used to convert physical coordinates to pixel coordinates
 const float P2M = 1 / M2P; // A pixel corresponds to a physical unit
@@ -441,21 +442,21 @@ static void fruit_ninja_cb(gui_win_t *win)
         // Add dynamic bodys
         b2BodyDef ballBodyDef;
         ballBodyDef.type = b2_dynamicBody;
-        ballBodyDef.position.Set(4, SCREEN_HEIGHT * P2M);
+        ballBodyDef.position.Set(4, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
         ballBodyDef.angularVelocity = -314;    //-PI rad/s
         ballBodyDef.linearVelocity.Set(10, -20); // move up
         body_st = world.CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(8, SCREEN_HEIGHT * P2M);
+        ballBodyDef.position.Set(8, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
         body_ba = world.CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(12, SCREEN_HEIGHT * P2M);
+        ballBodyDef.position.Set(12, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
         body_pe = world.CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(16, SCREEN_HEIGHT * P2M);
+        ballBodyDef.position.Set(16, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
         body_wm = world.CreateBody(&ballBodyDef);
 
-        ballBodyDef.position.Set(20, SCREEN_HEIGHT * P2M);
+        ballBodyDef.position.Set(20, SCREEN_HEIGHT + HEIGHT_OFFSET * P2M);
         body_bomb = world.CreateBody(&ballBodyDef);
 
         //creat body shape and attach the shape to the Body
@@ -481,19 +482,22 @@ static void fruit_ninja_cb(gui_win_t *win)
         img_bg = gui_img_create_from_mem(win, "img_bg", FRUIT_NINJA_BG_BIN, 0, 0, 0,
                                          0); // if data of background is too big, decrease FPS
         img_strawberry = gui_img_create_from_mem(win, "img_strawberry", FRUIT_NINJA_STRAWBERRY_BIN, 0,
-                                                 SCREEN_HEIGHT, 0, 0);
+                                                 SCREEN_HEIGHT + HEIGHT_OFFSET, 0, 0);
         gui_img_set_mode(img_strawberry, IMG_SRC_OVER_MODE);
-        img_banana = gui_img_create_from_mem(win, "img_banana", FRUIT_NINJA_BANANA_BIN, 0, SCREEN_HEIGHT, 0,
+        img_banana = gui_img_create_from_mem(win, "img_banana", FRUIT_NINJA_BANANA_BIN, 0,
+                                             SCREEN_HEIGHT + HEIGHT_OFFSET, 0,
                                              0);
         gui_img_set_mode(img_banana, IMG_SRC_OVER_MODE);
-        img_peach = gui_img_create_from_mem(win, "img_peach", FRUIT_NINJA_PEACH_BIN, 0, SCREEN_HEIGHT, 0,
+        img_peach = gui_img_create_from_mem(win, "img_peach", FRUIT_NINJA_PEACH_BIN, 0,
+                                            SCREEN_HEIGHT + HEIGHT_OFFSET, 0,
                                             0);
         gui_img_set_mode(img_peach, IMG_SRC_OVER_MODE);
         img_watermelon = gui_img_create_from_mem(win, "img_watermelon", FRUIT_NINJA_WATERMELON_BIN, 0,
-                                                 SCREEN_HEIGHT, 0, 0);
+                                                 SCREEN_HEIGHT + HEIGHT_OFFSET, 0, 0);
         gui_img_set_mode(img_watermelon, IMG_SRC_OVER_MODE);
 
-        img_bomb = gui_img_create_from_mem(win, "img_bomb", FRUIT_NINJA_BOMB_BIN, 0, SCREEN_HEIGHT, 0, 0);
+        img_bomb = gui_img_create_from_mem(win, "img_bomb", FRUIT_NINJA_BOMB_BIN, 0,
+                                           SCREEN_HEIGHT + HEIGHT_OFFSET, 0, 0);
         gui_img_set_mode(img_watermelon, IMG_SRC_OVER_MODE);
 
         // Create half fruits for displaying on the window
@@ -574,7 +578,7 @@ static void fruit_ninja_cb(gui_win_t *win)
         position_refresh((int)(position.x * M2P - RADIUS_BB), (int)(position.y * M2P - RADIUS_BB), img_bomb,
                          body_bomb);
 
-        // refresh half-cut fruits pos
+        // Refresh half-cut fruits pos
         if (fruit_cut_flag[0])
         {
             gui_img_set_location(img_cut_arry[0],  GUI_BASE(img_strawberry)->x + 10,

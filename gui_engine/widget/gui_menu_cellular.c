@@ -20,7 +20,6 @@
 #include <math.h>
 #include <string.h>
 #include "gui_menu_cellular.h"
-#include "gui_server.h"
 #include "gui_obj.h"
 #include "tp_algo.h"
 #include "gui_img.h"
@@ -505,13 +504,7 @@ void gui_menu_cellular_on_click(gui_menu_cellular_t *menu_cellular,
     gui_list_for_each_safe(node, tmp, &object->child_list)
     {
         gui_obj_t *obj = gui_list_entry(node, gui_obj_t, brother_list);
-        if (obj == 0)
-        {
-            gui_log("list NULL @line:%d, @%x", __LINE__, object);
-            gui_log("@name:%s, @type:%d\n", object->name, object->type);
-            return;
-        }
-        else if (obj->type == IMAGE_FROM_MEM)
+        if (obj->magic == GUI_MAGIC_NUMBER && obj->type == IMAGE_FROM_MEM)
         {
             if (para_array && para_array[index].callback_function)
             {

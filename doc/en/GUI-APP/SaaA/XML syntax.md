@@ -1,8 +1,8 @@
-# XML syntax
+# XML Syntax
 ## Element
-- Element corresponding widget
-- Element's attributes corresponding widget's attributes (0 value can be ignored)
-- text content is the widget instance's name
+- Element corresponding widget.
+- Element's attributes corresponding widget's attributes (0 value can be ignored).
+- Text content is the widget instance's name.
 ```xml
 <type a1="xx" a2="xx" a3="xx" a4="xx">name</type> 
 ```
@@ -137,7 +137,7 @@ The nesting structure of elements is consistent with the nesting structure of ac
 | id2 |Secondary parameter|number|
 
 ## Example
-### win 
+### Win 
 ```xml
 <win
     x="0"
@@ -146,7 +146,7 @@ The nesting structure of elements is consistent with the nesting structure of ac
     h="480">cool_win
 </win>
 ```
-### img 
+### Img 
 ```xml
 <img
     x="80"

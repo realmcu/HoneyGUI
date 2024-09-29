@@ -7,8 +7,8 @@ Widgets                              Brief
 `Obj`_                               The root widget of the widget tree
 `Window`_                            A rectangular container widget
 `Img`_                               Display image on the screen
-`Simple img`_                        Simplified img
-`STB img`_                          use stb lib to decode standard image format files and display
+`Simple Img`_                        Simplified img
+`STB Img`_                          use stb lib to decode standard image format files and display
 `Text`_                              To display text, which can be used to output text in different fonts, different colors, and different sizes
 `Tabview`_                           The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
 `Tab`_                               The screen is extended from the screen in the cross direction, switch the currently displayed card by sliding
@@ -17,31 +17,31 @@ Widgets                              Brief
 `Cardview`_                          Display a 3d card set
 `Card`_                              Display a 3d card set
 `Page`_                              Swipe up and down to display the creation of controls in different vertical directions
-`Pagelist`_                          Slide like page widget, could use less ram to display child widget
+`Page List`_                          Slide like page widget, could use less ram to display child widget
 `Switch`_                            Listen to on and off gesture
 `Grid`_                              Display widgets set in a grid view(Evenly layout vertically and horizontally)
 `Progressbar`_                       Show progress by showing part of picture, or one frame of pictures, or drawing bar of specified length
 `Canvas`_                            using nanovg lib to draw 2d graphics
 `Cube`_                              Display a cube
-`Wheellist`_                         Wheel-shaped application list
+`Wheel List`_                         Wheel-shaped application list
 `Perspective`_                       Slide to extend and retract curtains
 `SVG`_
-`Menu_cellular`_                     Display icons set as a honeycomb shape menu
+`Menu Cellular`_                     Display icons set as a honeycomb shape menu
 `Return`_                            The bubble-shaped curve that can be dragged out
 `Qbcode`_                            Display qrcode and barcode
 `Canvas_rect`_                       Display a rectangular
 `Canvas_round_rect`_                 Display a round rectangular
 `Canvas_arc`_                        Display a arc
-`Multi_level`_                       Manage and manipulate multi-level subwindows
+`Multi Level`_                       Manage and manipulate multi-level subwindows
 `LiteGFX`_                           Third-Party Collaboration Special Effects
-`2.5D soccer`_                       2.5D Soccer Special Effects
+`2.5D Soccer`_                       2.5D Soccer Special Effects
 ==================                   ==================
 
 .. _Obj: gui_obj.html
 .. _Window: gui_window.html
 .. _Img: gui_img.html
-.. _Simple img: gui_simple_img.html
-.. _STB img: gui_img_stb.html
+.. _Simple Img: gui_simple_img.html
+.. _STB Img: gui_img_stb.html
 .. _Text: gui_text.html
 .. _Tabview: gui_tabview.html
 .. _Tab: gui_tab.html
@@ -50,23 +50,23 @@ Widgets                              Brief
 .. _Cardview: gui_cardview.html
 .. _Card: gui_card.html
 .. _Page: gui_page.html
-.. _Pagelist: gui_pagelist.html
+.. _Page List: gui_pagelist.html
 .. _Switch: gui_switch.html
 .. _Grid: gui_grid.html
 .. _Progressbar: gui_progressbar.html
 .. _Canvas: gui_canvas.html
 .. _Cube: gui_cube.html
-.. _Wheel list: gui_wheel_list.html
+.. _Wheel List: gui_wheel_list.html
 .. _Perspective: gui_perspective.html
 .. _SVG: gui_svg.html
-.. _Watch gradient spot: gui_watch_gradient_spot.html
-.. _Watchface gradient: gui_watchface_gradient.html
-.. _Menu cellular: gui_menu_cellular.html
+.. _Watch Gradient Spot: gui_watch_gradient_spot.html
+.. _Watchface Gradient: gui_watchface_gradient.html
+.. _Menu Cellular: gui_menu_cellular.html
 .. _Return: gui_return.html
 .. _Qbcode: qbcode.html
-.. _Multi_level: gui_multi_level.html
+.. _Multi Level: gui_multi_level.html
 .. _LiteGFX: gui_widget_litegfx.html
-.. _2.5D soccer: gui_soccer.html
+.. _2.5D Soccer: gui_soccer.html
 
 .. csv-table:: Abbreviation
    :header: Words,Definition
@@ -117,8 +117,8 @@ Widgets                              Brief
     Obj <gui_obj>
     Window <gui_window>
     Img <gui_img>
-    Simple img <gui_simple_img>
-    STB img <gui_img_stb>
+    Simple Img <gui_simple_img>
+    STB Img <gui_img_stb>
     Text <gui_text>
     Tabview <gui_tabview>
     Tab <gui_tab>
@@ -127,20 +127,20 @@ Widgets                              Brief
     Cardview <gui_cardview>
     Card <gui_card>
     Page <gui_page>
-    Pagelist <gui_pagelist>
+    Page List <gui_pagelist>
     Switch <gui_switch>
     Grid <gui_grid>
     Progressbar <gui_progressbar>
     Canvas <gui_canvas>
     Cube <gui_cube>
-    Wheel list <gui_wheel_list>
+    Wheel List <gui_wheel_list>
     Perspective <gui_perspective>
     SVG <gui_svg>
-    Watch gradient spot <gui_watch_gradient_spot>
-    Watchface gradient <gui_watchface_gradient>
-    Menu cellular <gui_menu_cellular>
+    Watch Gradient Spot <gui_watch_gradient_spot>
+    Watchface Gradient <gui_watchface_gradient>
+    Menu Cellular <gui_menu_cellular>
     Return <gui_return>
 	Qbcode <gui_qbcode>
-    Multi level <gui_multi_level>
+    Multi Level <gui_multi_level>
     LiteGFX <gui_widget_litegfx>
-    2.5D soccer <gui_soccer>
+    2.5D Soccer <gui_soccer>

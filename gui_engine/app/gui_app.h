@@ -195,6 +195,7 @@ struct gui_app
                                          .screen = \
                                                    { \
                                                      .name = #APP_NAME, /**< The screen name is set to the application name. */ \
+                                                     .magic = GUI_MAGIC_NUMBER, /**< check number. */ \
                                                    }, \
                                          .ui_design = _##APP_NAME##_ui_design, /**< The UI design function is assigned with the modified name. */ \
                                          .active_ms = 1000000, /**< The active duration is set to 1,000,000 milliseconds. */ \
