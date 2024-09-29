@@ -673,4 +673,97 @@ The LVGL blog is an important resource for developers to understand and master L
 ## FAQ
 - <a href="https://docs.lvgl.io/8.3/intro/index.html#faq">LVGL FAQ</a>
 
+### HoneyGUI vs LVGL Picture Drawing Frame Rate
+
+#### GRAM Screen (280x456) RAM Block Drawing
+Background: RGB565, uncompressed images, test for the performance of displaying a single image (HoneyGUI rectangle fill data is temporarily unavailable; LVGL has not adapted PPE hardware acceleration for image scaling yet).
+
+| Test Type        | HoneyGUI FPS (SW) | HoneyGUI FPS (PPE) | LVGL FPS (SW)  | LVGL FPS (PPE)  |
+|------------------|-------------------|--------------------|----------------|-----------------|
+| Draw Image       | 73 (280x456)      | 74 (280x456)       | 70 (280x456)   | 73 (280x456)    |
+| Fill Rectangle   | -                 | -                  | 74 (280x456)   | 74 (280x456)    |
+| Rotate Image 45° | 7 (280x456)       | 7 (280x456)        | 4 (280x456)    | 4 (280x456)     |
+| Scale Up 1.5x    | 3 (280x456)       | 31 (280x456)       | 3 (280x456)    | -               |
+| Scale Down 0.5x  | 9 (280x456)       | 73 (280x456)       | 12 (280x456)   | -               |
+
+RAM Block Drawing Test Data:
+
+| Section | HoneyGUI FPS | LVGL FPS |
+|---------|--------------|----------|
+| 10      | 70           | 45       |
+| 20      | 73           | 73       |
+| 30      | 74           | 73       |
+
+#### Analysis
+
+1. **Draw Image**:
+    - **HoneyGUI** achieves very close frame rates in SW and PPE modes, 73 and 74 FPS respectively.
+    - **LVGL** also performs well with 70 FPS in SW mode and 73 FPS in PPE mode.
+    - Both libraries demonstrate similar performances and can handle smooth image drawing.
+
+2. **Fill Rectangle**:
+    - **HoneyGUI** data is temporarily unavailable.
+    - **LVGL** achieves consistent 74 FPS in both SW and PPE modes, demonstrating stable performance.
+
+3. **Rotate Image**:
+    - **HoneyGUI** achieves 7 FPS in both SW and PPE modes, showing stable performance.
+    - **LVGL** achieves 4 FPS in SW mode, and PPE mode data is missing.
+    - HoneyGUI has a significant advantage over LVGL in this scenario.
+
+4. **Scale Up 1.5x**:
+    - **HoneyGUI** achieves 3 FPS in SW mode and significantly improves to 31 FPS in PPE mode.
+    - **LVGL** achieves 3 FPS in SW mode; PPE mode is not adapted yet.
+    - HoneyGUI shows excellent performance in hardware-accelerated mode (PPE).
+
+5. **Scale Down 0.5x**:
+    - **HoneyGUI** achieves 9 FPS in SW mode and 73 FPS in PPE mode.
+    - **LVGL** achieves 12 FPS in SW mode; PPE mode data is missing.
+    - HoneyGUI also excels in hardware-accelerated mode (PPE).
+
+#### PSRAM Full Frame Buffer Drawing (800x480)
+
+Background: RGB565, image size 315x316, uncompressed images, RGB screen, test for the performance of displaying a single image.
+
+| Test Type            | HoneyGUI SW (FPS) | HoneyGUI PPE (FPS) | LVGL SW (FPS)  | LVGL PPE (FPS) |
+|----------------------|-------------------|--------------------|----------------|----------------|
+| Draw Image           | 80 (316x315)      | 82 (316x315)       | 17 (316x315)   | 25 (316x315)   |
+| Fill Rectangle       | -                 | -                  | 25 (316x315)   | 26 (316x315)   |
+| Rotate Image         | 3 (316x315)       | 3 (316x315)        | 6 (316x315)    | 4 (316x315)    |
+| Center Scale Up 1.5x | 2 (316x315)       | 23 (316x315)       | 3 (316x315)    | 13 (316x315)   |
+| Center Scale Down 0.5x | 10 (316x315)   | 82 (316x315)       | 13 (316x315)   | 50 (316x315)   |
+
+#### Analysis
+
+Extra PSRAM is required for RGB screen as a cache buffer. LVGL uses PSRAM completely as its image cache buffer compared to HoneyGUI which combines RAM and PSRAM. LVGL performs worse overall.
+
+#### Conclusion
+
+- **Applicable Scenarios**: For large screen sizes (e.g., 800x480) and full-frame drawing, HoneyGUI is recommended. For frequent partial screen refresh projects, LVGL is recommended. For block drawing when RAM resources are tight, HoneyGUI is recommended, with section recommended parameters set to 10.
+- **Rotation, Scaling**: LVGL performs faster in 2D rendering using a 2x2 matrix compared to HoneyGUI's 3x3 matrix, which handles more data for 2D rendering. For 2.5D or pseudo-3D effects, HoneyGUI will perform better.
+- In practical projects, select the suitable framework based on specific frame rate requirements, system resources, and other functional needs. Conduct specific performance testing and evaluation if possible.
+
+This analysis provides valuable insights for selecting the appropriate display framework and assists decision-makers in making the best choice based on actual requirements.
+
+### HoneyGUI vs LVGL RAM Consumption
+
+#### GRAM Screen (280x456) Dynamic RAM Consumption
+
+| Test Type        | HoneyGUI (Bytes) | LVGL Widget Consumption (Bytes) | LVGL Total Consumption (Bytes) |
+|------------------|:----------------:|:-------------------------------:|:-------------------------------:|
+| Draw Image       | 156              | 176                             | 3248                            |
+| Fill Rectangle   | -                | 200                             | 3244                            |
+| Rotate Image     | 156              | 208                             | 5240                            |
+| Scale Up 1.5x    | 156              | 208                             | 3282                            |
+| Scale Down 0.5x  | 156              | 176                             | 3248                            |
+
+#### GRAM Screen (280x456) Static RAM Consumption
+
+| Test Type        | HoneyGUI (Bytes) | LVGL Widget Consumption (Bytes) |
+|------------------|:----------------:|:-------------------------------:|
+| Draw Image       | 41892 (40KB)     | 55300 (54KB)                    |
+| Fill Rectangle   | -                | 55300 (54KB)                    |
+| Rotate Image     | 41892 (40KB)     | 55300 (54KB)                    |
+| Scale Up 1.5x    | 41892 (40KB)     | 55300 (54KB)                    |
+| Scale Down 0.5x  | 41892 (40KB)     | 55300 (54KB)                    |
+
 
