@@ -61,8 +61,8 @@ HoneyGUI 是由 Realtek 自主研发的图形显示框架，它是一款专为�
 ### 通过VSCode启动
 
 #### 安装VSCode
-   - [下载VSCode](https://code.visualstudio.com/)
-   - [安装C/C++插件](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+- <a href="https://code.visualstudio.com/">下载VSCode</a>
+- [安装C/C++插件](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 
 #### 打开项目
    - 单击 `HoneyGUI.code-workspace` 文件

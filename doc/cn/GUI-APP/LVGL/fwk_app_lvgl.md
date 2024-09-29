@@ -1,7 +1,7 @@
 # 使用 LVGL 设计应用程序
 
 ## LVGL 简介
-- [LVGL 官网](https://lvgl.io/) 
+- <a href="https://lvgl.io/">LVGL 官网</a>
 - [LVGL 在线文档](https://docs.lvgl.io/master/intro/index.html) 
 - [LVGL 简介](https://docs.lvgl.io/8.3/intro/index.html) 
 
@@ -9,7 +9,7 @@ LVGL（Light and Versatile Graphics Library）是最受欢迎的免费开源嵌�
 
 LVGL 在其官网上展示了 Demo 效果以体现 LVGL 的 UI 构建能力。在线文档是 LVGL 的主要开发资料，其中详细介绍了 LVGL 的设计和运行逻辑、各个控件的使用方法、丰富的示例程序以及移植方法等。无论是新手还是有经验的开发者，都可以基于在线在线文档快速上手并深入理解LVGL的功能和特性。
 
-- [LVGL Demo](https://lvgl.io/demos)
+- <a href="https://lvgl.io/demos">LVGL Demo</a>
 - [LVGL Example](https://docs.lvgl.io/8.3/examples.html)
 
 
@@ -523,7 +523,7 @@ LVGL 基准测试的官方文档位于 `your HoneyGUI dir/lvgl/demos/benchmark/R
 
 
 ##  从 demo 入门开发
-- [LVGL Demo](https://lvgl.io/demos)
+- <a href="https://lvgl.io/demos">LVGL Demo</a>
 - [LVGL Example](https://docs.lvgl.io/8.3/examples.html)
 
 <!-- 控件API，按照demo (简单修改+引导到示例+文档)
@@ -605,7 +605,7 @@ typedef struct {
 ## 开发资源支持
 
 ### 在线文档
-- [LVGL 文档](https://docs.lvgl.io/master/intro/index.html) 
+- <a href="https://docs.lvgl.io/master/intro/index.html">LVGL 文档</a>
 
 LVGL 的[在线文档](https://docs.lvgl.io/master/intro/index.html) 提供了全面的技术文档和教程，帮助开发者更好地了解和使用 LVGL 图形库。该文档包含以下内容：
 - 概述和特性：文档介绍了 LVGL 的基本概念和特性，包括图形对象、屏幕管理、事件处理、主题样式等。用户可以通过阅读文档了解 LVGL 的核心功能和优势。
@@ -622,7 +622,7 @@ LVGL 的[在线文档](https://docs.lvgl.io/master/intro/index.html) 提供了�
 
 
 ### Github 仓库
-- [Github LVGL](https://github.com/lvgl/lvgl)
+- <a href="https://github.com/lvgl/lvgl">Github LVGL</a>
 
 LVGL 的 GitHub 仓库是开发者使用和贡献 LVGL 的重要平台：
 - 获取最新版本：LVGL 的 GitHub 仓库可以获得最新的 LVGL 版本和更新。开发者可以及时获取最新的功能更新、修复和改进，保持应用程序与 LVGL 的同步。
@@ -658,7 +658,7 @@ LVGL Designer 具有以下特点和功能：
 
 
 ### 论坛 
-- [LVGL Forum](https://forum.lvgl.io/)
+- <a href="https://forum.lvgl.io/">LVGL Forum</a>
 <!-- 开放提问，LVGL 开发者会回复。 -->
 
 LVGL 的官方论坛是一个开发者社区，致力于讨论和分享有关 LVGL 图形库的话题和资源。它提供了一个平台，供开发者之间交流、寻求帮助和分享他们的经验和项目。
@@ -674,7 +674,7 @@ LVGL 论坛对于使用 LVGL 的开发者来说，是获取支持、解决问题
 
 
 ### 博客
-- [LVGL Blog](https://blog.lvgl.io/)
+- <a href="https://blog.lvgl.io/">LVGL Blog</a>
 
 LVGL 的官方博客是一个定期更新的平台，提供关于 LVGL 图形库的最新信息、教程、案例研究和开发者见解。LVGL 的开发团队和社区成员经常在博客上发布有关 LVGL 的各种内容，这些内容可以使开发者更好地了解和使用 LVGL。
 
@@ -688,7 +688,7 @@ LVGL 的博客是一个重要的资源，对于 LVGL 的开发者来说是了解
 
 
 ## 常见问题
-- [LVGL FAQ](https://docs.lvgl.io/8.3/intro/index.html#faq)
+- <a href="https://docs.lvgl.io/8.3/intro/index.html#faq">LVGL FAQ</a>
 
 <!-- （引导+在线文档新增FAQ） -->
 

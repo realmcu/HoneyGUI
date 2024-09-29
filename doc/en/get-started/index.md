@@ -61,8 +61,8 @@ The `scons` command to perform the build process and then execute `gui.exe` to r
 ### Startup by VSCode
 
 #### Install VSCode
-   - [Download VSCode](https://code.visualstudio.com/)
-   - [Install C/C++ plug-in](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+- <a href="https://code.visualstudio.com/">Download VSCode</a>
+- [Install C/C++ plug-in](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 
 #### Open project
    - Click `HoneyGUI.code-workspace` file

@@ -8,37 +8,6 @@ RTKIOT GUI
 
 .. include_结束标签
 
-==================  ==================  ==================
-|入门指南|_         |GUI应用程序|_       |控件|_
-------------------  ------------------  ------------------
-`入门指南`_         `GUI应用程序`_       `控件`_
-==================  ==================  ==================
-
-==================  ==================  ==================
-|移植|_             |示例|_              |常见问题|_
-------------------  ------------------  ------------------
-`移植`_             `示例`_              `常见问题`_
-==================  ==================  ==================
-
-.. |入门指南| image:: ./_static/image/get_started.png
-.. _入门指南: get-started/index.html
-
-.. |GUI应用程序| image:: ./_static/image/app.png
-.. _GUI应用程序: GUI-APP/index.html
-
-.. |控件| image:: ./_static/image/widgets.png
-.. _控件: widgets/index.html
-
-.. |移植| image:: ./_static/image/porting.png
-.. _移植: get-started/index.html
-
-.. |示例| image:: ./_static/image/integration.png
-.. _示例: sample/index.html
-
-.. |常见问题| image:: ./_static/image/FAQ.png
-.. _常见问题: FAQ/index.html
-
-
 
 .. toctree::
    :maxdepth: 2

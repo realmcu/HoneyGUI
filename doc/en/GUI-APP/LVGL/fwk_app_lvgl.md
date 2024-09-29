@@ -2,7 +2,7 @@
 
 
 ## Overview
-- [LVGL Website](https://lvgl.io/) 
+- <a href="https://lvgl.io/">LVGL Website</a>
 - [LVGL Document](https://docs.lvgl.io/master/intro/index.html) 
 - [LVGL Intro](https://docs.lvgl.io/8.3/intro/index.html) 
 
@@ -11,7 +11,7 @@ LVGL (Light and Versatile Graphics Library) is the most popular free and open-so
 
 LVGL showcases Demo effects on its official website to demonstrate the UI building capabilities of LVGL. The online documentation serves as the primary development resource for LVGL, providing detailed information on the design and operational logic of LVGL, instructions on using various widgets, a wide range of example programs, and guidelines for porting LVGL. Whether you are a beginner or an experienced developer, you can quickly get started and gain a deep understanding of LVGL's functionality and features based on the online documentation.
 
-- [LVGL Demo](https://lvgl.io/demos)
+- <a href="https://lvgl.io/demos">LVGL Demo</a>
 - [LVGL Example](https://docs.lvgl.io/8.3/examples.html)
 
 
@@ -511,7 +511,7 @@ The official documentation for the LVGL benchmark test is located at `\lvgl\demo
 
 
 ##  Start with Demo
-- [LVGL Demo](https://lvgl.io/demos)
+- <a href="https://lvgl.io/demos">LVGL Demo</a>
 - [LVGL Example](https://docs.lvgl.io/8.3/examples.html)
 
 It is recommended for developers to read and understand the [LVGL Overview](https://docs.lvgl.io/8.3/overview/index.html) and [LVGL Widgets - Base object](https://docs.lvgl.io/8.3/widgets/obj.html) sections before starting development. This will help them grasp the design concepts and logic of LVGL.
@@ -585,7 +585,7 @@ LVGL provides built-in fonts, which are saved as arrays in the directory `your H
 ## Development Resources
 
 ### Online Doucument
-- [LVGL Online Documentation](https://docs.lvgl.io/master/intro/index.html) 
+- <a href="https://docs.lvgl.io/master/intro/index.html">LVGL Online Documentation</a>
 
 The LVGL [online documentation](https://docs.lvgl.io/master/intro/index.html) provides comprehensive technical documentation and tutorials to help developers better understand and use the LVGL graphics library. The documentation includes the following:
 
@@ -604,7 +604,7 @@ Users can access the LVGL online documentation through a web browser and browse 
 It is worth noting that while developing based on the documentation can complete most of the UI effects, the documentation may not be exhaustive. When there are omissions in the documentation, the code should be considered the most reliable source.
 
 ### Github Repo
-- [Github LVGL](https://github.com/lvgl/lvgl)
+- <a href="https://github.com/lvgl/lvgl">Github LVGL</a>
 
 The LVGL GitHub repository is an important platform for developers to use and contribute to LVGL:
 
@@ -641,7 +641,7 @@ Using the LVGL Designer greatly accelerates the design and development process o
 
 
 ### Forum
-- [LVGL Forum](https://forum.lvgl.io/)
+- <a href="https://forum.lvgl.io/">LVGL Forum</a>
 
 The official LVGL forum is a developer community dedicated to discussing and sharing topics and resources related to the LVGL graphics library. It provides a platform for developers to exchange ideas, seek help, and share their experiences and projects.
 
@@ -657,7 +657,7 @@ The LVGL forum is an important resource for developers using LVGL to receive sup
 
 
 ### Blog
-- [LVGL Blog](https://blog.lvgl.io/)
+- <a href="https://blog.lvgl.io/">LVGL Blog</a>
 
 The official LVGL blog is a regularly updated platform that provides the latest information, tutorials, case studies, and developer insights about the LVGL graphics library. The LVGL development team and community members frequently publish various content related to LVGL on the blog, helping developers better understand and use LVGL.
 
@@ -670,6 +670,6 @@ The LVGL blog covers the following content:
 The LVGL blog is an important resource for developers to understand and master LVGL. By reading the blog, developers can gain insights on the latest LVGL developments, learning materials, and technical insights, helping them utilize LVGL to build excellent graphical interfaces.
 
 ## FAQ
-- [LVGL FAQ](https://docs.lvgl.io/8.3/intro/index.html#faq)
+- <a href="https://docs.lvgl.io/8.3/intro/index.html#faq">LVGL FAQ</a>
 
 
