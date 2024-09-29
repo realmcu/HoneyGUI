@@ -38,7 +38,7 @@ RTL8763E是一个IC系列的名称，包含RTL8763EWE-VP和RTL8763EW-VC。RTL876
 
 
 ##  RTL8773E
-RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用户数据（userdata）打包处理过程如下
+RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用户数据打包处理过程如下：
 
 ### 生成用户数据
 
@@ -69,12 +69,12 @@ RTL8773E是一个IC系列的名称，包含RTL8773EWE和RTL8773EWE-VP等，用�
 ```
 
 ### 添加头部信息
-使用MPPGTOOL给用户数据文件添加头部信息，添加过程如下：
+使用MPPG工具给用户数据文件添加头部信息，添加过程如下：
 <br/>
 <div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png"></div>
 <br/>
 
-1.  在Tool菜单下选择`Prepend header for user data`。
+1.  在`Tool`菜单下选择`Prepend header for user data`。
 2. 添加`flash_map.ini`路径。
 3. 添加用户数据文件（`root_xx.bin`）路径。
 4. 生成可烧录的用户数据文件。

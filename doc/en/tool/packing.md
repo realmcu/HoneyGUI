@@ -2,7 +2,7 @@
 
 ## RTL87x2G and RTL8762D
 RTL87x2G is the abbreviation of a series IC type.
-Take RTL8762G as an example as follows.
+The packaging process for the RTL87x2G and RTL8762D is the same. Take RTL8762G as an example as follows.
 
 Before starting, select the appropriate demo under the sdk directory (`\subsys\gui\gui_engine\example\screen_800_480\root_image_800_480`), or create a new packaging directory based on the example. 
 Then copy the `bat and py scripts` to that directory, ensuring that the `root folder` and the `bat and py scripts` exist under the directory.
@@ -33,13 +33,14 @@ The process for generating user data is as follows:
 
 
 ##  RTL8773E
-RTL8773E is the name of a series IC type, including RTL8773EWE/RTL8773EWE-VP, The packaging process is as follows
+RTL8773E is the name of a series IC type, including RTL8773EWE/RTL8773EWE-VP. The user data packaging process is as follows:
 
 ### Generate Root Bin
 1. Copy generated images bin to this folder ```\src\app\watch\gui_application\root_image\root\8773e_watch``` and Copy generated font bin to this folder ```\src\app\watch\gui_application\root_image\root\font```.
 2. Modify build address: You need to adjust the address to ```0x238b400``` by modifying this file ```mkromfs_0x4400000.bat``` (python_bin_mkromfs_0x4400000.py --binary `--addr 0x238b400` root root(0x4400000).bin). The --addr corresponds to the flash map userdata address +0x400 (image header size)
 3. Double-click ```mkromfs_0x4400000.bat``` in the ```\src\app\watch\gui_application\root_image``` directory to execute the script and generate an image of the root folder. A new bin `root(0x4400000).bin` file and h file `ui_resource.h` will appear in the directory.
 4. Between them, `.bin` is the image file, and `.h` is the address offset of each file in the file system, which can be accessed directly without using the file system.
+
 <br/>
 <div style="text-align: center"><img width= "500" src="https://foruda.gitee.com/images/1726730908892819237/3349d8fb_13671125.png"></div>
 <br/>
@@ -60,13 +61,13 @@ The generated ui_resource.h requires the following code to be added manually
 #endif
 ```
 
-### Generate Userdata Bin
-It needs to use MPPGTOOL to generate user data Generate process as follows:
+### Adding Header Information
+Using the MPPG tool to add header information to user data files, the process is as follows:
 <br/>
 <div style="text-align: center"><img width= "700" src="https://foruda.gitee.com/images/1726127049302320776/d8bc86b8_13671125.png"></div>
 <br/>   
 
-1. In the Tool menu, select `Prepend header for user data`.
+1. In the `Tool` menu, select `Prepend header for user data`.
 2. Add the path to `flash_map.ini`.
 3. Add the path to the user data file (`root_xx.bin`).
 4. Generate the burnable user data file.
