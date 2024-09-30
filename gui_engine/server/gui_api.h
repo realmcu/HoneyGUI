@@ -338,6 +338,21 @@ gui_error_t gui_music_stop(void);
  * @return false if the music is still playing.
  */
 bool gui_music_completion_status(void);
+/**
+ * @brief Parses a CSS color string and converts it to a gui_color_t structure
+ *
+ * Supports the following formats:
+ * - Hex (#RRGGBB or #RRGGBBAA)
+ * - RGB (rgb(R, G, B))
+ * - RGBA (rgba(R, G, B, A))
+ * - HSL (hsl(H, S%, L%))
+ * - HSLA (hsla(H, S%, L%, A))
+ * - Named colors (e.g., "red", "blue")
+ *
+ * @param color_str CSS color string
+ * @return gui_color_t structure with the parsed color, or a structure with all components set to 0 if invalid
+ */
+gui_color_t gui_color_css(const char *color_str);
 /** End of SERVER_Exported_Functions
   * @}
   */

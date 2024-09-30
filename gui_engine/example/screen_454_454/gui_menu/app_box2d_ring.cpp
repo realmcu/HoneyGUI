@@ -151,7 +151,7 @@ bool init()
     // Set the animation function of the window
     gui_win_set_animate(win, 1000, -1, app_box2d_cb, win);
     gui_win_press(win, win_press_callback, win);
-    gui_win_release(win, (void *)win_release_callback, win);
+    gui_win_release(win, (gui_event_cb_t)win_release_callback, win);
     this_widget = gui_canvas_create(parent, "canvas", 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     if (!this_widget)
     {

@@ -65,7 +65,7 @@ void design_tab_perspective(void *parent)
 
     gui_win_t *win_switch_to_main_app = gui_win_create(parent, "win_switch_to_main_app", 0, 0,
                                                        454, 454);
-    gui_win_click(win_switch_to_main_app, win_switch_main_to_app_touch_cb, NULL);
+    gui_win_click(win_switch_to_main_app, (gui_event_cb_t)win_switch_main_to_app_touch_cb, NULL);
     gui_fb_change();
 
 }

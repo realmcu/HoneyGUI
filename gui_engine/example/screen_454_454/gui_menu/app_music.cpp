@@ -23,6 +23,7 @@
 #include "tp_algo.h"
 #include<iostream>
 #include "gui_page.h"
+#include <vector>
 namespace std
 {
 template<typename T, typename... Args>
@@ -40,7 +41,8 @@ constexpr int COVER_Y = 10;
 constexpr int COVER_W = 300;
 constexpr int MINIMIZE_WINDOW_HEIGHT = 60;
 constexpr int MINIMIZE_COVER_HEIGHT = 50;
-constexpr int LIST_COVER_H = 140;
+constexpr int LIST_COVER_H = 120;
+constexpr int LIST_SONG_H = 65;
 class MusicPlayer
 {
 public:
@@ -149,33 +151,42 @@ public:
     }
     void win_list_animation(void *p, void *this_widget, gui_animate_t *animate)
     {
+        std::cout << win_list_gesture_page_y << ";" << GUI_BASE(list_page)->y << std::endl;
+        GUI_BASE(list_page)->gesture = win_cover_gesture;
+
+
+        if (GUI_BASE(list_page)->y > win_list_gesture_page_y && !win_list_gesture)
+        {
+            win_list_gesture = true;
+        }
+
+        if (!win_list_gesture)
+        {
+            return;
+        }
+
         if (win_cover_y > 0)
         {
             gui_obj_hidden(GUI_BASE(list_cover_win), false);
-
-
-            touch_info_t *touch = tp_get_info();
-            gui_win_t *win = GUI_TYPE(gui_win_t, this_widget);
-            gui_obj_t *obj = GUI_BASE(this_widget);
-            if (touch->pressed)
+            win_list_cover_y = GUI_BASE(list_page)->y;
+            if (win_list_cover_y > 0)
             {
-                win_list_cover_y_history = win_list_cover_y;
+                win_list_cover_y = 0;
+            }
+            else if (win_list_cover_y < -LIST_COVER_H)
+            {
+                win_list_cover_y = -LIST_COVER_H;
+                win_list_gesture = false;
+                win_list_gesture_page_y = GUI_BASE(list_page)->y;
             }
 
-            if (touch->pressing)
-            {
-                win_list_cover_y = touch->deltaY + win_list_cover_y_history;
-                if (win_list_cover_y > 0)
-                {
-                    win_list_cover_y = 0;
-                }
-                else if (win_list_cover_y < -LIST_COVER_H)
-                {
-                    win_list_cover_y = -LIST_COVER_H;
-                }
-            }
             gui_set_location(GUI_BASE(list_cover_win), GUI_BASE(list_cover_win)->x, win_list_cover_y);
         }
+        else
+        {
+            gui_obj_hidden(GUI_BASE(list_cover_win), true);
+        }
+
 
 
     }
@@ -206,6 +217,8 @@ private:
     std::string albumName;
     gui_color_t color = APP_COLOR_WHITE;
     gui_color_t color_artistName = gui_rgb(230, 230, 230);
+    const gui_color_t color_list = gui_rgb(100, 100, 100);
+    const gui_color_t color_theme = gui_color_css("#892FE0");
     int progressbar_width = 50;
     int win_cover_y = 0;
     int win_list_cover_y = 0;
@@ -219,18 +232,22 @@ private:
     gui_win_t *list_win;
     gui_win_t *list_cover_win;
     bool win_cover_gesture = true;
+    bool win_list_gesture = true;
+    int win_list_gesture_page_y = 0;
+    gui_page_t *list_page;
+    int value;
     static void switchOnCallback(void *null1, void *null2, void *param)
     {
         gui_music_play("gui_engine\\example\\screen_454_454\\root_image\\root\\music_player\\sample_3s.mp3");
     }
     template<typename T>
-    T lerp(T start, T end, float progress)
+    T lerp(T start, T end, float progress) const
     {
         static_assert(std::is_arithmetic<T>::value, "T must be an arithmetic type");
         return (1 - progress) * start + progress * end;
     }
     template<typename T>
-    T calculate_center(T container_width, T item_width)
+    T calculate_center(T container_width, T item_width) const
     {
         static_assert(std::is_arithmetic<T>::value, "T must be an arithmetic type");
         return (container_width - item_width) / 2;
@@ -246,7 +263,20 @@ private:
             GUI_API(gui_switch_t).turn_off_no_event(static_cast<gui_switch_t *>(this_widget));
         }
     }
-    void displayText(gui_obj_t *parent,  const char *text_string, int x, int y, gui_color_t &color)
+    static void song_win_press(void *obj, gui_event_t e, void *param)
+    {
+        gui_obj_hidden(GUI_BASE(param), false);
+    }
+    static void song_win_release(void *obj, gui_event_t e, void *param)
+    {
+        gui_obj_hidden(GUI_BASE(param), true);
+    }
+    static void song_win_click(void *obj, gui_event_t e, void *param)
+    {
+        //gui_obj_hidden(param, false);
+    }
+    void displayText(gui_obj_t *parent,  const char *text_string, int x, int y,
+                     gui_color_t &color) const
     {
         // This function is to create text GUI element
         const char *text = text_string;
@@ -268,32 +298,25 @@ private:
         /*LIST WINDOW*/
         list_win = gui_win_create(parent, "win list", 0, 0, SCREEN_W, SCREEN_H);
         gui_win_set_animate(list_win, 1000, -1, list_animation, list_win);
-        gui_page_t *list_page = gui_page_create(list_win, "list_page", 0, LIST_COVER_H, SCREEN_W, 0);
+        gui_canvas_rect_create(GUI_BASE(list_win), 0, 0, 0, SCREEN_W, SCREEN_H, color_list);
+        list_page = gui_page_create(list_win, "list_page", 0, 0, SCREEN_W, 0);
+        std::vector<void *> img_file_vec = {GROUP1000000745_BIN, GROUP1000000744_BIN, GROUP1000000746_BIN, GROUP1000000747_BIN, GROUP1000000748_BIN, GROUP1000000749_BIN};
+        int list_count = 20;
+        for (size_t i = 0; i < list_count; i++)
         {
-            gui_img_t *img = gui_img_create_from_mem(list_page, 0, GROUP1000000745_BIN, 0, 0, 0, 0);
+            gui_win_t *win = gui_win_create(list_page, 0, 0, 65 * i + LIST_COVER_H + 50, SCREEN_W, LIST_SONG_H);
+            gui_canvas_rect_t *rect = gui_canvas_rect_create(GUI_BASE(win), 0, 0, 0, SCREEN_W, LIST_SONG_H,
+                                                             color_theme);
+            gui_obj_hidden(GUI_BASE(rect), true);
+            gui_img_t *img = gui_img_create_from_mem(GUI_BASE(win), 0, img_file_vec[i % img_file_vec.size()],
+                                                     calculate_center(SCREEN_W, 342), 0, 0, 0);
             gui_img_set_mode(img, IMG_SRC_OVER_MODE);
+            gui_win_press(win, song_win_press, rect);
+            gui_win_release(win, song_win_release, rect);
+            gui_win_click(win, song_win_click, rect);
         }
-        {
-            gui_img_t *img = gui_img_create_from_mem(list_page, 0, GROUP1000000744_BIN, 0, 65, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        }
-        {
-            gui_img_t *img = gui_img_create_from_mem(list_page, 0, GROUP1000000746_BIN, 0, 65 * 2, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        }
-        {
-            gui_img_t *img = gui_img_create_from_mem(list_page, 0, GROUP1000000747_BIN, 0, 65 * 3, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        }
-        {
-            gui_img_t *img = gui_img_create_from_mem(list_page, 0, GROUP1000000748_BIN, 0, 65 * 4, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        }
-        {
-            gui_img_t *img = gui_img_create_from_mem(list_page, 0, GROUP1000000749_BIN, 0, 65 * 5, 0, 0);
-            gui_img_set_mode(img, IMG_SRC_OVER_MODE);
-        }
-
+        gui_win_create(list_page, 0, 0, LIST_SONG_H * list_count + LIST_COVER_H + 50, SCREEN_W,
+                       MINIMIZE_WINDOW_HEIGHT);
         list_cover_win = gui_win_create(list_win, "win list cover", 0, 0, SCREEN_W, SCREEN_H);
         gui_obj_hidden(GUI_BASE(list_cover_win), true);
         {
@@ -327,10 +350,13 @@ private:
                                                    MINIMIZE_WINDOW_HEIGHT);
         gui_win_press(win_cover_head, win_cover_head_callback, win_cover_head);
         // Display artist, song, and album name
-        artistName = "You Right";
-        displayText(parent, artistName.c_str(), COVER_X, COVER_Y + COVER_W, color);
-        displayText(parent, "Doja Cat,", COVER_X, COVER_Y + COVER_W + 18, color_artistName);
-        displayText(parent, "The Weekend", COVER_X + 80, COVER_Y + COVER_W + 18, color_artistName);
+
+        artistName = "Doja Cat,";
+        albumName = "The Weekend";
+        songName = "You Right";
+        displayText(parent, songName.c_str(), COVER_X, COVER_Y + COVER_W, color);
+        displayText(parent, artistName.c_str(), COVER_X, COVER_Y + COVER_W + 18, color_artistName);
+        displayText(parent, albumName.c_str(), COVER_X + 80, COVER_Y + COVER_W + 18, color_artistName);
         gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, COVER_W, 3,
                                color_artistName);
         gui_canvas_rect_create(parent, 0, COVER_X, COVER_Y + COVER_W + 18 + 15 + 16, progressbar_width, 3,

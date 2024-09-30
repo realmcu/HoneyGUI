@@ -172,7 +172,7 @@ void design_tab_menu(void *parent)
 
         gui_win_t *button = gui_win_create(grid, 0, 0, 0, 400, 70);
         gui_win_press(button, (gui_event_cb_t)press_animate_cb, button);
-        gui_win_release(button, release_animate_callback, button);
+        gui_win_release(button, (gui_event_cb_t)release_animate_callback, button);
         //
         {
             gui_img_t *img = gui_img_create_from_mem(button, 0, RECT1_BIN, 0, 0, 0, 0);
@@ -197,23 +197,23 @@ void design_tab_menu(void *parent)
         void *addr1 = ARIALBD_SIZE16_BITS4_FONT_BIN;
         gui_text_type_set(t, addr1, FONT_SRC_MEMADDR);
     }
-    gui_win_click(button_array[0],  heart_rate_cb,     button_array[0]);
-    gui_win_click(button_array[1],  menu_cb,           button_array[1]);
-    gui_win_click(button_array[2],  stopwatch_cb,      button_array[2]);
-    gui_win_click(button_array[3],  map_cb,            button_array[3]);
-    gui_win_click(button_array[4],  card_cb,           button_array[4]);
-    gui_win_click(button_array[5],  box2d_cb,          button_array[5]);
-    gui_win_click(button_array[6],  compass_cb,        button_array[6]);
-    gui_win_click(button_array[7],  volume_cb,         button_array[7]);
-    gui_win_click(button_array[8],  cycle_tracking_cb, button_array[8]);
-    gui_win_click(button_array[9],  setting_cb,        button_array[9]);
-    gui_win_click(button_array[10], web_cb,            button_array[10]);
-    gui_win_click(button_array[11], block_cb,          button_array[11]);
-    gui_win_click(button_array[12], fruit_ninja_cb,    button_array[12]);
-    gui_win_click(button_array[13], calculator_cb,     button_array[13]);
-    gui_win_click(button_array[14], soccer_cb,         button_array[14]);
-    gui_win_click(button_array[15], box2d_ring_cb,     button_array[15]);
-    gui_win_click(button_array[16], music_cb,          button_array[16]);
+    gui_win_click(button_array[0], (gui_event_cb_t)heart_rate_cb,     button_array[0]);
+    gui_win_click(button_array[1], (gui_event_cb_t)menu_cb,           button_array[1]);
+    gui_win_click(button_array[2], (gui_event_cb_t)stopwatch_cb,      button_array[2]);
+    gui_win_click(button_array[3], (gui_event_cb_t)map_cb,            button_array[3]);
+    gui_win_click(button_array[4], (gui_event_cb_t)card_cb,           button_array[4]);
+    gui_win_click(button_array[5], (gui_event_cb_t)box2d_cb,          button_array[5]);
+    gui_win_click(button_array[6], (gui_event_cb_t)compass_cb,        button_array[6]);
+    gui_win_click(button_array[7], (gui_event_cb_t)volume_cb,         button_array[7]);
+    gui_win_click(button_array[8], (gui_event_cb_t)cycle_tracking_cb, button_array[8]);
+    gui_win_click(button_array[9], (gui_event_cb_t)setting_cb,        button_array[9]);
+    gui_win_click(button_array[10], (gui_event_cb_t)web_cb,            button_array[10]);
+    gui_win_click(button_array[11], (gui_event_cb_t)block_cb,          button_array[11]);
+    gui_win_click(button_array[12], (gui_event_cb_t)fruit_ninja_cb,    button_array[12]);
+    gui_win_click(button_array[13], (gui_event_cb_t)calculator_cb,     button_array[13]);
+    gui_win_click(button_array[14], (gui_event_cb_t)soccer_cb,         button_array[14]);
+    gui_win_click(button_array[15], (gui_event_cb_t)box2d_ring_cb,     button_array[15]);
+    gui_win_click(button_array[16], (gui_event_cb_t)music_cb,          button_array[16]);
 }
 
 static void press_callback(gui_win_t *button)

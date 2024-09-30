@@ -338,7 +338,7 @@ void gui_win_press(gui_win_t *this, gui_event_cb_t callback, void *parameter)
     gui_obj_add_event_cb(this, callback, GUI_EVENT_TOUCH_PRESSED, parameter);
 }
 
-void gui_win_release(gui_win_t *this, void *callback, void *parameter)
+void gui_win_release(gui_win_t *this, gui_event_cb_t callback, void *parameter)
 {
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_RELEASED, parameter);
 }
@@ -348,7 +348,7 @@ void gui_win_long(gui_win_t *this, void *callback, void *parameter)
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_LONG, parameter);
 }
 
-void gui_win_click(gui_win_t *this, void *callback, void *parameter)
+void gui_win_click(gui_win_t *this, gui_event_cb_t callback, void *parameter)
 {
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_CLICKED, parameter);
 }

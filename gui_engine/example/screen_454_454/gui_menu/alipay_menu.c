@@ -409,7 +409,7 @@ void alipay_menu_ui(gui_obj_t *parent)
     gui_multi_level_t *qrcode = gui_multi_level_create(parent, 0, qrcode_ui);
     gui_multi_level_t *menu = gui_multi_level_create(qrcode, 0, menu_ui);
     gui_win_t *win = gui_win_create(qrcode, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height());
-    gui_win_click(win, jump, qrcode);
+    gui_win_click(win, (gui_event_cb_t)jump, qrcode);
 
 }
 

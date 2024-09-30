@@ -722,7 +722,7 @@ void app_clock_ui_design(gui_obj_t *parent)
     gui_canvas_rect_create(GUI_BASE(win_stop_watch), STOPWATCH_RECT_NAME, 0, 0, SCREEN_W / 2,
                            win_height, APP_COLOR_SILVER);
     gui_win_press(win_stop_watch, (gui_event_cb_t)win_stop_watch_cb, ml0);
-    gui_win_release(win_stop_watch, win_release_cb, STOPWATCH_RECT_NAME);
+    gui_win_release(win_stop_watch, (gui_event_cb_t)win_release_cb, STOPWATCH_RECT_NAME);
     {
         char *text = "Stopwatch";
         int font_size = 16;
@@ -736,7 +736,7 @@ void app_clock_ui_design(gui_obj_t *parent)
     gui_canvas_rect_create(GUI_BASE(win_timer), TIMER_RECT_NAME, 0, 0, SCREEN_W / 2, win_height,
                            APP_COLOR_SILVER);
     gui_win_press(win_timer, (gui_event_cb_t)win_timer_cb, ml0);
-    gui_win_release(win_timer, win_release_cb, TIMER_RECT_NAME);
+    gui_win_release(win_timer, (gui_event_cb_t)win_release_cb, TIMER_RECT_NAME);
     {
         char *text = "Timer";
         int font_size = 16;

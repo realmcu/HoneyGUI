@@ -156,7 +156,7 @@ void gui_win_press(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
  * @param callback callback func (void *obj, gui_event_t e, void *param).
  * @param parameter callback parameter.
  */
-void gui_win_release(gui_win_t *_this, void *callback, void *parameter);
+void gui_win_release(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
  * @brief register a callback function for a long press event of the win widget.
@@ -174,7 +174,7 @@ void gui_win_long(gui_win_t *_this, void *callback, void *parameter);
  * @param callback callback func (void *obj, gui_event_t e, void *param).
  * @param parameter callback parameter.
  */
-void gui_win_click(gui_win_t *_this, void *callback, void *parameter);
+void gui_win_click(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
  * @brief set the hold_tp state.

@@ -7,7 +7,10 @@
 #include <gui_api.h>
 #include <stdarg.h>
 #include "tlsf.h"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <math.h>
 static struct gui_indev *indev = NULL;
 static struct gui_os_api *os_api = NULL;
 static struct gui_dispdev *dc = NULL;
@@ -903,3 +906,206 @@ bool gui_music_completion_status()
 #endif
     return 0;
 }
+
+
+
+gui_color_t gui_color_css(const char *color_str)
+{
+    gui_color_t color = { .color.argb_full = 0 };
+
+    if (color_str == NULL)
+    {
+        return color;
+    }
+    /**
+     * @brief Struct to map color names to hex strings
+     */
+    typedef struct
+    {
+        const char *name; /**< Color name */
+        const char *hex;  /**< Hex string representation of the color */
+    } color_name_t;
+    // Define the color name mapping table
+    static color_name_t color_names[] =
+    {
+        { "red",       "#FF0000FF" },
+        { "green",     "#00FF00FF" },
+        { "blue",      "#0000FFFF" },
+        { "black",     "#000000FF" },
+        { "white",     "#FFFFFFFF" },
+        { "yellow",    "#FFFF00FF" },
+        { "cyan",      "#00FFFFFF" },
+        { "magenta",   "#FF00FFFF" },
+        { "gray",      "#808080FF" },
+        { "grey",      "#808080FF" },
+        // Add more color names...
+    };
+
+#define COLOR_NAME_COUNT (sizeof(color_names) / sizeof(color_names[0]))
+
+    // Check for named colors and convert to hex representation
+    for (size_t i = 0; i < COLOR_NAME_COUNT; ++i)
+    {
+        if (strcmp(color_names[i].name, color_str) == 0)
+        {
+            color_str = color_names[i].hex;
+            break;
+        }
+    }
+
+    // Check for hex format (#RRGGBB or #RRGGBBAA)
+    if (color_str[0] == '#')
+    {
+        size_t len = strlen(color_str);
+        unsigned int red, green, blue, opacity;
+
+        if (len == 7)
+        {
+            // Parse the #RRGGBB format
+            if (sscanf(color_str, "#%2x%2x%2x", &red, &green, &blue) != 3)
+            {
+                return color;
+            }
+            opacity = 0xFF;  // Default to full opacity
+        }
+        else if (len == 9)
+        {
+            // Parse the #RRGGBBAA format
+            if (sscanf(color_str, "#%2x%2x%2x%2x", &red, &green, &blue, &opacity) != 4)
+            {
+                return color;
+            }
+        }
+        else
+        {
+            return color;
+        }
+
+        return gui_rgba((unsigned char)red,
+                        (unsigned char)green,
+                        (unsigned char)blue,
+                        (unsigned char)opacity);
+    }
+
+    // Check for rgb/rgba format
+    if (strncmp(color_str, "rgb", 3) == 0)
+    {
+        int red, green, blue;
+        float alpha = 1.0f;
+        if (color_str[3] == 'a')
+        {
+            if (sscanf(color_str, "rgba(%d, %d, %d, %f)", &red, &green, &blue, &alpha) == 4)
+            {
+                return gui_rgba((unsigned char)red,
+                                (unsigned char)green,
+                                (unsigned char)blue,
+                                (unsigned char)(alpha * 255));
+            }
+        }
+        else
+        {
+            if (sscanf(color_str, "rgb(%d, %d, %d)", &red, &green, &blue) == 3)
+            {
+                return gui_rgba((unsigned char)red,
+                                (unsigned char)green,
+                                (unsigned char)blue,
+                                0xFF);
+            }
+        }
+    }
+
+    // Check for hsl/hsla format
+    if (strncmp(color_str, "hsl", 3) == 0)
+    {
+        int hue, saturation, lightness;
+        float alpha = 1.0f;
+        if (color_str[3] == 'a')
+        {
+            if (sscanf(color_str, "hsla(%d, %d%%, %d%%, %f)", &hue, &saturation, &lightness, &alpha) == 4)
+            {
+                lightness /= 100.0;
+                saturation /= 100.0;
+                float c = (1 - abs(2 * lightness - 1)) * saturation;
+                float x = c * (1 - fabs(fmod(hue / 60.0, 2) - 1));
+                float m = lightness - c / 2;
+                float r, g, b;
+
+                if (hue >= 0 && hue < 60)
+                {
+                    r = c; g = x; b = 0;
+                }
+                else if (hue >= 60 && hue < 120)
+                {
+                    r = x; g = c; b = 0;
+                }
+                else if (hue >= 120 && hue < 180)
+                {
+                    r = 0; g = c; b = x;
+                }
+                else if (hue >= 180 && hue < 240)
+                {
+                    r = 0; g = x; b = c;
+                }
+                else if (hue >= 240 && hue < 300)
+                {
+                    r = x; g = 0; b = c;
+                }
+                else
+                {
+                    r = c; g = 0; b = x;
+                }
+
+                return gui_rgba((unsigned char)((r + m) * 255),
+                                (unsigned char)((g + m) * 255),
+                                (unsigned char)((b + m) * 255),
+                                (unsigned char)(alpha * 255));
+            }
+        }
+        else
+        {
+            if (sscanf(color_str, "hsl(%d, %d%%, %d%%)", &hue, &saturation, &lightness) == 3)
+            {
+                lightness /= 100.0;
+                saturation /= 100.0;
+                float c = (1 - abs(2 * lightness - 1)) * saturation;
+                float x = c * (1 - fabs(fmod(hue / 60.0, 2) - 1));
+                float m = lightness - c / 2;
+                float r, g, b;
+
+                if (hue >= 0 && hue < 60)
+                {
+                    r = c; g = x; b = 0;
+                }
+                else if (hue >= 60 && hue < 120)
+                {
+                    r = x; g = c; b = 0;
+                }
+                else if (hue >= 120 && hue < 180)
+                {
+                    r = 0; g = c; b = x;
+                }
+                else if (hue >= 180 && hue < 240)
+                {
+                    r = 0; g = x; b = c;
+                }
+                else if (hue >= 240 && hue < 300)
+                {
+                    r = x; g = 0; b = c;
+                }
+                else
+                {
+                    r = c; g = 0; b = x;
+                }
+
+                return gui_rgba((unsigned char)((r + m) * 255),
+                                (unsigned char)((g + m) * 255),
+                                (unsigned char)((b + m) * 255),
+                                0xFF);
+            }
+        }
+    }
+
+    // Error case, return color with all components set to 0
+    return color;
+}
+

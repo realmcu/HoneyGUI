@@ -933,12 +933,12 @@ static void ui_design_1_0(gui_obj_t *parent)
         args.parent = (void *)parent;
         args.level = 2;
         args.index = 0;
-        gui_win_click(win, multi_levle_button_cb, &args);
+        gui_win_click(win, (gui_event_cb_t)multi_levle_button_cb, &args);
         gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
                                                          GUI_BASE(win)->h,
                                                          APP_COLOR_WHITE);
         gui_win_press(win, (gui_event_cb_t)mydevice_button_press_cb, rect);
-        gui_win_release(win, mydevice_button_release_cb, rect);
+        gui_win_release(win, (gui_event_cb_t)mydevice_button_release_cb, rect);
         {
             char *text = "Device name";
             int font_size = 16;
@@ -979,12 +979,12 @@ static void ui_design_1_0(gui_obj_t *parent)
         args.parent = (void *)parent;
         args.level = 2;
         args.index = 1;
-        gui_win_click(win, multi_levle_button_cb, &args);
+        gui_win_click(win, (gui_event_cb_t)multi_levle_button_cb, &args);
         gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
                                                          GUI_BASE(win)->h,
                                                          APP_COLOR_WHITE);
         gui_win_press(win, (gui_event_cb_t)mydevice_button_press_cb, rect);
-        gui_win_release(win, mydevice_button_release_cb, rect);
+        gui_win_release(win, (gui_event_cb_t)mydevice_button_release_cb, rect);
         {
             char *text = "Storage";
             int font_size = 16;
