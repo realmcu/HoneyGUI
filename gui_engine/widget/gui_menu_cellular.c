@@ -418,7 +418,7 @@ gui_menu_cellular_t *gui_menu_cellular_create(void     *parent,
 #define _GUI_NEW_GUI_MENU_CELLULAR_PARAM this, parent
     GUI_CREATE_HELPER(gui_menu_cellular_t, gui_menu_cellular_ctor, _GUI_NEW_GUI_MENU_CELLULAR_PARAM)
     gui_win_t *win = &(this->base);
-    gui_win_set_animate(win, 1000, -1, gui_menu_cellular_wincb, win);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)gui_menu_cellular_wincb, win);
 #define ICON_SIZE (icon_size)
 #define WIDTH_GAP (ICON_SIZE)
 #define HEIGHT_GAP (ICON_SIZE-ICON_SIZE/7)

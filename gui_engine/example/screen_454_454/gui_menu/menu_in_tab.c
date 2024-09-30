@@ -104,7 +104,7 @@ void app_watch_mune_win_ani_cb(void *args, gui_win_t *win)
 void design_tab_menu(void *parent)
 {
     gui_win_t *win = gui_win_create(parent, MENU_WIN_NAME, 0, 0, 0, 0);
-    gui_win_set_animate(win, 2000, 0, app_watch_mune_win_ani_cb, 0);
+    gui_win_set_animate(win, 2000, 0, (gui_animate_callback_t)app_watch_mune_win_ani_cb, 0);
     gui_win_stop_animation(win);//aniamtion start to play until button click event
     /* app swap animation configration of the first app*/
     gui_canvas_rect_create((void *)win, "canvas_rect", 0, 0, gui_get_screen_width(),
@@ -171,7 +171,7 @@ void design_tab_menu(void *parent)
     {
 
         gui_win_t *button = gui_win_create(grid, 0, 0, 0, 400, 70);
-        gui_win_press(button, press_animate_cb, button);
+        gui_win_press(button, (gui_event_cb_t)press_animate_cb, button);
         gui_win_release(button, release_animate_callback, button);
         //
         {
@@ -245,7 +245,7 @@ static void press_callback(gui_win_t *button)
 }
 static void press_animate_cb(gui_win_t *button)
 {
-    gui_win_set_animate(button, 1000, 0, press_callback, button);
+    gui_win_set_animate(button, 1000, 0, (gui_animate_callback_t)press_callback, button);
 }
 static void release_callback(gui_win_t *button)
 {
@@ -273,7 +273,7 @@ static void release_callback(gui_win_t *button)
 }
 static void release_animate_callback(gui_win_t *button)
 {
-    gui_win_set_animate(button, 1000, 0, release_callback, button);
+    gui_win_set_animate(button, 1000, 0, (gui_animate_callback_t)release_callback, button);
 }
 static void deal_win_in_page(gui_obj_t *object, int page_y)
 {
@@ -819,7 +819,7 @@ static void page_scroll(gui_obj_t *parent)
     param[1] = win_list_array;
 
     // Set properties for the animated window: duration is 1000 ms, loop count is -1 (infinite loop), callback function is win_list_overwrite, with param as argument
-    gui_win_set_animate(win_animate, 1000, -1, win_list_overwrite, param);
+    gui_win_set_animate(win_animate, 1000, -1, (gui_animate_callback_t)win_list_overwrite, param);
 
     // Define the gap between windows
     int gap = win_list_gap;

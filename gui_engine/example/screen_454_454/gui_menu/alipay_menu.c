@@ -377,7 +377,7 @@ static void menu_ui(gui_obj_t *parent)
     time_array_size = TICKET_COUNT;
     gui_win_t *win = gui_win_create(parent, 0, 0, 0, gui_get_screen_width(), gui_get_screen_height());
     gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, 0, 0);
-    gui_win_set_animate(win, 1000, -1, override, timer1);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)override, timer1);
     for (size_t i = 0; i < count; i++)
     {
         gui_win_t *win = gui_win_create(timer1, 0, 0, i * gap, gui_get_screen_width(), gap);

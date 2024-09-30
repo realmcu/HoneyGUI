@@ -624,7 +624,7 @@ gui_scroll_wheel_new_t *gui_scroll_wheel_new_create(void    *parent,
     {
         gui_win_t *win = gui_win_create(this, 0, 0, -row_gap, w, row_gap * (row_count + 1));
         gui_win_t *timer1 = gui_win_create(win, 0, 0, 0, w, row_gap * (row_count + 1));
-        gui_win_set_animate(win, 1000, -1, override, timer1);
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)override, timer1);
         this->win = timer1;
 
     }

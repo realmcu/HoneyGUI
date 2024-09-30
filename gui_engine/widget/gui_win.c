@@ -279,7 +279,7 @@ void gui_win_ctor(gui_win_t  *this,
 void gui_win_set_animate(gui_win_t *this,
                          uint32_t   dur,
                          int        repeat_count,
-                         void      *callback,
+                         gui_animate_callback_t callback,
                          void      *p)
 {
     if (this->animate_array_length != 0)
@@ -333,9 +333,9 @@ void gui_win_down(gui_win_t *this, void *callback, void *parameter)
     gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_4, parameter);
 }
 
-void gui_win_press(gui_win_t *this, void *callback, void *parameter)
+void gui_win_press(gui_win_t *this, gui_event_cb_t callback, void *parameter)
 {
-    gui_obj_add_event_cb(this, (gui_event_cb_t)callback, GUI_EVENT_TOUCH_PRESSED, parameter);
+    gui_obj_add_event_cb(this, callback, GUI_EVENT_TOUCH_PRESSED, parameter);
 }
 
 void gui_win_release(gui_win_t *this, void *callback, void *parameter)

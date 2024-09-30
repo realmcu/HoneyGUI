@@ -181,7 +181,7 @@ static void stop_watch_ml1_0(gui_obj_t *parent)
 {
 
     gui_win_t *stop = gui_win_create(parent, 0, 0, 0, SCREEN_W, SCREEN_H);
-    gui_win_set_animate(stop, 1000, -1, stop_watch_win_ani_cb, 0);
+    gui_win_set_animate(stop, 1000, -1, (gui_animate_callback_t)stop_watch_win_ani_cb, 0);
     gui_win_stop_animation(stop);
     {
         char *text = "00:00:00";
@@ -657,7 +657,7 @@ static void timer_show_window_callback(gui_win_t *win)
         gui_obj_hidden(text4, 0);
         GUI_WIDGET_POINTER_BY_NAME(text5, TIMER_TEXT_NAME5);
         gui_obj_hidden(text5, 0);
-        gui_win_set_animate(win, 1000, -1, timer_start_window_callback, win);
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)timer_start_window_callback, win);
         enter = 0;
     }
 }
@@ -673,7 +673,8 @@ static void switch_off_cb()
 static void switch_on_cb(void *null1, void *null2, void *param)
 {
     GUI_WIDGET_POINTER_BY_NAME(win, SETTING_WIN_NAME);
-    gui_win_set_animate(GUI_TYPE(gui_win_t, win), 1000, 0, timer_show_window_callback, win);
+    gui_win_set_animate(GUI_TYPE(gui_win_t, win), 1000, 0,
+                        (gui_animate_callback_t)timer_show_window_callback, win);
     gui_obj_hidden(win, 1);
     GUI_WIDGET_POINTER_BY_NAME(win_timer, TIMER_WIN_NAME);
     gui_obj_hidden(win_timer, 0);
@@ -720,7 +721,7 @@ void app_clock_ui_design(gui_obj_t *parent)
     GUI_API(gui_multi_level_t).jump(ml0, 1, 0);
     gui_canvas_rect_create(GUI_BASE(win_stop_watch), STOPWATCH_RECT_NAME, 0, 0, SCREEN_W / 2,
                            win_height, APP_COLOR_SILVER);
-    gui_win_press(win_stop_watch, win_stop_watch_cb, ml0);
+    gui_win_press(win_stop_watch, (gui_event_cb_t)win_stop_watch_cb, ml0);
     gui_win_release(win_stop_watch, win_release_cb, STOPWATCH_RECT_NAME);
     {
         char *text = "Stopwatch";
@@ -734,7 +735,7 @@ void app_clock_ui_design(gui_obj_t *parent)
     }
     gui_canvas_rect_create(GUI_BASE(win_timer), TIMER_RECT_NAME, 0, 0, SCREEN_W / 2, win_height,
                            APP_COLOR_SILVER);
-    gui_win_press(win_timer, win_timer_cb, ml0);
+    gui_win_press(win_timer, (gui_event_cb_t)win_timer_cb, ml0);
     gui_win_release(win_timer, win_release_cb, TIMER_RECT_NAME);
     {
         char *text = "Timer";

@@ -21,7 +21,7 @@ bool cfg_mode = MODE_SOURCE;
 static gui_switch_t *switch_menu_buds = NULL;
 static gui_switch_t *switch_menu_phone = NULL;
 static gui_switch_t *switch_menu_setting = NULL;
-static void page_cb(gui_win_t *win);
+static GUI_ANIMATION_CALLBACK(page_cb);
 
 static void switch_menu_bluetooth_released_cb(void *obj, uint16_t event)
 {
@@ -227,8 +227,9 @@ void design_curtain_menu(void *parent)
     gui_img_create_from_mem(page, 0, A6_BIN, 0, 130 * 5, 0, 0);
 
 }
-static void page_cb(gui_win_t *win)
+static GUI_ANIMATION_CALLBACK(page_cb)
 {
+    gui_win_t *win = p;
     touch_info_t *tp = (touch_info_t *)(uintptr_t)tp_get_info();
     static bool hold;
     if (tp->pressed)

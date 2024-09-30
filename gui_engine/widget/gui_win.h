@@ -101,7 +101,7 @@ gui_win_t *gui_win_create(void       *parent,
 void gui_win_set_animate(gui_win_t *_this,
                          uint32_t   dur,
                          int        repeat_count,
-                         void      *callback,
+                         gui_animate_callback_t callback,
                          void      *p);
 
 /**
@@ -147,7 +147,7 @@ void gui_win_down(gui_win_t *_this, void *callback, void *parameter);
  * @param callback callback func.
  * @param parameter callback parameter.
  */
-void gui_win_press(gui_win_t *_this, void *callback, void *parameter);
+void gui_win_press(gui_win_t *_this, gui_event_cb_t callback, void *parameter);
 
 /**
  * @brief register a callback function for the release event of the win widget.

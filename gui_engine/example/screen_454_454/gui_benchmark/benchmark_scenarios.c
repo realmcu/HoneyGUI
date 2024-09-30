@@ -182,7 +182,8 @@ static void design_app_benchmark(gui_app_t *app)
 
     /*add switch scenario event*/
     gui_win_t *win_count_frame = gui_win_create(&(app->screen), "win_count_frame", 0, 0, 0, 0);
-    gui_win_set_animate(win_count_frame, 1, -1, win_count_frame_cb, win_count_frame);
+    gui_win_set_animate(win_count_frame, 1, -1, (gui_animate_callback_t)win_count_frame_cb,
+                        win_count_frame);
     gui_obj_add_event_cb(win_count_frame, (gui_event_cb_t)win_count_frame_update_frame_cost_cb,
                          (gui_event_t)GUI_EVENT_BENCHMARK_UPDATE_FRAME_COST, NULL);
     gui_obj_add_event_cb(win_count_frame, (gui_event_cb_t)win_count_frame_switch_scenario_cb,
@@ -371,7 +372,7 @@ void benchmark_perspective(void *parent)
 
     /*todo: add animate to rotate automaticlly*/
     gui_win_t *win = gui_win_create(ppp, "win_perspective_animate", 0, 0, 0, 0);
-    gui_win_set_animate(win, 1, -1, win_perspective_animate_cb, win);
+    gui_win_set_animate(win, 1, -1, (gui_animate_callback_t)win_perspective_animate_cb, win);
 
 
 }

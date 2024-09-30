@@ -18,8 +18,9 @@ b2Body *ballBody;
 gui_img_t *img;
 
 // App callback function
-void app_box2d_cb(gui_win_t *win)
+void app_box2d_cb(void *p, void *this_widget, gui_animate_t *animate)
 {
+    gui_win_t *win = (gui_win_t *)p;
     // Update the physics world
     world.Step(1 / 60.f, 8, 3);
 
@@ -50,7 +51,7 @@ void ui_design(gui_obj_t *obj)
                                     "APP_BOX2D", 0, 0, 0, 0);
 
     // Set the animation function of the window
-    gui_win_set_animate(win, 1000, -1, (void *)app_box2d_cb, win);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)app_box2d_cb, win);
 
     // Create an image for displaying on the window
     img = gui_img_create_from_mem(win, "img", ICON_BUDS_ON_BIN, 0, 0, 0, 0);

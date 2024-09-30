@@ -705,7 +705,7 @@ DECLARE_HANDLER(onPress_win)
             cb_arg->args_p[i] = js_string_to_value(js_value_to_string(args[i + 1]));
         }
         cb_arg->func = args[0];
-        gui_win_press((void *)obj, js_cb_with_args, (void *)(cb_arg));
+        gui_win_press((void *)obj, (gui_event_cb_t)js_cb_with_args, (void *)(cb_arg));
     }
 
     return jerry_create_undefined();

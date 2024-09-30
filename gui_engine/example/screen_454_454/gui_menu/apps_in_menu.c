@@ -87,7 +87,7 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_win_t *app_win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, SCREEN_W, 0, SCREEN_W, SCREEN_H);
     gui_canvas_rect_create((void *)app_win, HR_BK_RECT_NAME, 0, 0, SCREEN_W, SCREEN_H, gui_rgba(0, 0, 0,
                            255));
-    gui_win_set_animate(app_win, 1000, 0, app_win_cb, app_win);
+    gui_win_set_animate(app_win, 1000, 0, (gui_animate_callback_t)app_win_cb, app_win);
     gui_page_t *page = gui_page_create(app_win, PAGE_NAME, 0, 0, 0, 0);
     gui_page_set_animate(page, 1000, -1, page_cb, page);
     gui_page_center_alignment(page, SCREEN_H);
@@ -196,7 +196,7 @@ static void app_hr_ui_design(gui_app_t *app)
     gui_win_t *win = gui_win_create(app_win, 0, 0, 0, SCREEN_W, SCREEN_H);
     gui_img_t *heart_ani = gui_img_create_from_mem(win, HEART_ANI_NAME, HEARTRATE04_BIN,
                                                    (SCREEN_W - HEART_ANI_W) / 2, 100, 0, 0);
-    gui_win_set_animate(win, 1000, -1, heart_ani_cb, win);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)heart_ani_cb, win);
     gui_img_set_mode(heart_ani, IMG_BYPASS_MODE);
     {
         char *text = "Current";
@@ -345,7 +345,7 @@ static void status_bar(void *parent, gui_obj_t *ignore_gesture)
                                   COLOR_SILVER_OPACITY(230));
     GET_BASE(rect)->not_show = 1;
     gui_canvas_rect_set_opacity(rect, 0);
-    gui_win_set_animate(status_bar, 1000, -1, status_bar_ani, ignore_gesture);
+    gui_win_set_animate(status_bar, 1000, -1, (gui_animate_callback_t)status_bar_ani, ignore_gesture);
     {
         char *text = "07:55";
         int font_size = 48;
@@ -597,7 +597,8 @@ static void app_wathc_win_ani_cb_return(void *args, gui_win_t *win)
     {
         /*Overwrite app watch's aniamtion as the shut down animation*/
         extern void app_watch_mune_win_ani_cb(void *args, gui_win_t *win);
-        gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, app_watch_mune_win_ani_cb,
+        gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0,
+                            (gui_animate_callback_t)app_watch_mune_win_ani_cb,
                             0);
         gui_win_stop_animation(win);
     }
@@ -619,7 +620,8 @@ static void app_menu_win_cb(gui_obj_t *this)//this widget, event code, parameter
         if (win)
         {
             /*Overwrite app watch's aniamtion as the start animation*/
-            gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, app_wathc_win_ani_cb_return,
+            gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0,
+                                (gui_animate_callback_t)app_wathc_win_ani_cb_return,
                                 0);
         }
     }
@@ -628,7 +630,7 @@ static void app_menu_win_cb(gui_obj_t *this)//this widget, event code, parameter
                                     (void *)&win);
     if (win)
     {
-        gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, menu_win_ani_cb_return,
+        gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, (gui_animate_callback_t) menu_win_ani_cb_return,
                             0);
     }
 }
@@ -644,7 +646,7 @@ static void app_menu(gui_app_t *app)
      * @link https://docs.realmcu.com/Honeygui/latest/widgets/gui_menu_cellular.html#example
     */
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, APP_MENU_WIN_NAME, 0, 0, 0, 0);
-    gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, menu_win_ani_cb,
+    gui_win_set_animate(win, APP_SWAP_ANIMATION_DUR, 0, (gui_animate_callback_t)menu_win_ani_cb,
                         0);//aniamtion start to play at app startup
     /* app swap animation configration of the next app*/
     uint32_t *array[] =
@@ -935,7 +937,7 @@ static void ui_design_1_0(gui_obj_t *parent)
         gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
                                                          GUI_BASE(win)->h,
                                                          APP_COLOR_WHITE);
-        gui_win_press(win, mydevice_button_press_cb, rect);
+        gui_win_press(win, (gui_event_cb_t)mydevice_button_press_cb, rect);
         gui_win_release(win, mydevice_button_release_cb, rect);
         {
             char *text = "Device name";
@@ -981,7 +983,7 @@ static void ui_design_1_0(gui_obj_t *parent)
         gui_canvas_rect_t *rect = gui_canvas_rect_create((void *)win, 0, 0, 0, GUI_BASE(win)->w,
                                                          GUI_BASE(win)->h,
                                                          APP_COLOR_WHITE);
-        gui_win_press(win, mydevice_button_press_cb, rect);
+        gui_win_press(win, (gui_event_cb_t)mydevice_button_press_cb, rect);
         gui_win_release(win, mydevice_button_release_cb, rect);
         {
             char *text = "Storage";
@@ -1356,7 +1358,7 @@ GUI_APP_ENTRY(APP_COMPASS)
     static gui_img_t *img_array[4];
     img_array[0] = img;
     img_array[1] = img2;
-    gui_win_set_animate(win, 1000, -1, compass_win_cb, img_array);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)compass_win_cb, img_array);
     {
         char *text = "0";
         int font_size = 16;
@@ -1482,7 +1484,7 @@ GUI_APP_ENTRY(APP_VOLUME)
         gui_img_t *volume = gui_img_create_from_mem(win, 0, VOLUME_BIN, 0, 0, 0, 0);
         gui_img_set_mode(back, IMG_SRC_OVER_MODE);
         gui_img_set_mode(volume, IMG_SRC_OVER_MODE);
-        gui_win_set_animate(win, 1000, -1, volume_cb, volume);
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)volume_cb, volume);
         volume->scope_flag = 1;
         volume->scope_y1 = 200;
     }
@@ -1493,7 +1495,7 @@ GUI_APP_ENTRY(APP_VOLUME)
         gui_img_t *volume = gui_img_create_from_mem(win, 0, VOLUME2_BIN, 0, 0, 0, 0);
         gui_img_set_mode(back, IMG_SRC_OVER_MODE);
         gui_img_set_mode(volume, IMG_SRC_OVER_MODE);
-        gui_win_set_animate(win, 1000, -1, volume2_cb, volume);
+        gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)volume2_cb, volume);
         volume->scope_flag = 1;
         volume->scope_x2 = 100;
         {
@@ -1788,7 +1790,7 @@ static void cycle_tracking_win_cb(gui_win_t *win)
 GUI_APP_ENTRY(APP_CYCLE_TRACKING)
 {
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, "WIN", 0, 200, 0, 0);
-    gui_win_set_animate(win, 1000, -1, cycle_tracking_win_cb, win);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)cycle_tracking_win_cb, win);
     {
         gui_img_t *img = gui_img_create_from_mem(win, 0, KEHUZHOUQI_BIN, 0, 0, 0, 0);
         gui_img_set_mode(img, IMG_SRC_OVER_MODE);
@@ -2176,7 +2178,7 @@ static gui_win_t *block_render(gui_obj_t *parent, int idx, int idy, bool next)
         if (block_array[i].x == idx && block_array[i].y == idy)
         {
             gui_win_t *win = gui_win_create(parent, 0, 0, 0, 0, 0);
-            gui_win_set_animate(win, 1000, -1, block_win_cb, &block_array[i]);
+            gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)block_win_cb, &block_array[i]);
             ((void (*)(gui_obj_t *parent))(block_array[i].render))((gui_obj_t *)win);
             if (next)
             {
@@ -2706,7 +2708,7 @@ static void block_cb(gui_win_t *win)
 GUI_APP_ENTRY(APP_BLOCK)
 {
     gui_win_t *win = gui_win_create(GUI_APP_ROOT_SCREEN, 0, 0, 0, 0, 0);
-    gui_win_set_animate(win, 1000, -1, block_cb, win);
+    gui_win_set_animate(win, 1000, -1, (gui_animate_callback_t)block_cb, win);
     win_index = block_render((gui_obj_t *)win, 0, 0, 0);
 }
 /**

@@ -634,6 +634,7 @@ typedef int gui_error_t;
     animate->p = p;\
     this->animate = animate;
 #define GUI_STRINGS_EQUAL(string1, string2) (!strcmp(string1, string2))
+#define GUI_ANIMATION_CALLBACK(function_name) void function_name(void *p, void *this_widget, gui_animate_t *animate)
 /** End of SUBMOUDLE_Exported_Macros
   * @}
   */
