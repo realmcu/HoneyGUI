@@ -9,8 +9,6 @@
 #include "gui_queue.h"
 #include <unistd.h>
 #include <dirent.h>
-#include <fcntl.h>
-#include <sys/stat.h>
 
 static volatile uint32_t gui_tick;
 
@@ -50,13 +48,29 @@ static Queue q;
 static bool port_mq_create(void *handle, const char *name, uint32_t msg_size, uint32_t max_msgs)
 {
     void **queue = handle;
-    pthread_mutex_init(&port_mutex, NULL);
-    pthread_cond_init(&port_cond, NULL);
 
-    pthread_mutex_init(&queue_mutex, NULL);
+    if (pthread_mutex_init(&port_mutex, NULL) != 0)
+    {
+        return false;
+    }
+    if (pthread_cond_init(&port_cond, NULL) != 0)
+    {
+        pthread_mutex_destroy(&port_mutex);
+        return false;
+    }
+    if (pthread_mutex_init(&queue_mutex, NULL) != 0)
+    {
+        pthread_cond_destroy(&port_cond);
+        pthread_mutex_destroy(&port_mutex);
+        return false;
+    }
+
     QueueInit(&q);
     *queue = &q;
+
+    return true;
 }
+
 static bool port_mq_send(void *handle, void *buffer, uint32_t size, uint32_t timeout)
 {
     QuDataType data = {0};

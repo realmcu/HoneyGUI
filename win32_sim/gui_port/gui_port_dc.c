@@ -5,7 +5,6 @@
 #include <SDL.h>
 #include <pthread.h>
 #include "unistd.h"
-#include "time.h"
 #include "tp_algo.h"
 #include "kb_algo.h"
 
@@ -312,9 +311,11 @@ void *rtk_gui_sdl(void *arg)
                 kb_port_data.event = GUI_KB_EVENT_DOWN;
                 kb_port_data.timestamp_ms_press = gui_ms_get();
                 kb_port_data.timestamp_ms_pressing = gui_ms_get();
-                memset(kb_port_data.name, 0x00, 10);
-                memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
-                       strlen(SDL_GetKeyName(event.key.keysym.sym)));
+                memset(kb_port_data.name, 0x00, sizeof(kb_port_data.name));
+
+                const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
+                strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
+                kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
             }
             break;
         case SDL_KEYUP:
@@ -322,9 +323,11 @@ void *rtk_gui_sdl(void *arg)
                 // gui_log("[SDL_KEYUP]key %s up!\n", SDL_GetKeyName(event.key.keysym.sym));
                 kb_port_data.event = GUI_KB_EVENT_UP;
                 kb_port_data.timestamp_ms_release = gui_ms_get();
-                memset(kb_port_data.name, 0x00, 10);
-                memcpy(kb_port_data.name, SDL_GetKeyName(event.key.keysym.sym),
-                       strlen(SDL_GetKeyName(event.key.keysym.sym)));
+                memset(kb_port_data.name, 0x00, sizeof(kb_port_data.name));
+
+                const char *key_name = SDL_GetKeyName(event.key.keysym.sym);
+                strncpy(kb_port_data.name, key_name, sizeof(kb_port_data.name) - 1);
+                kb_port_data.name[sizeof(kb_port_data.name) - 1] = '\0';
             }
             break;
         case SDL_QUIT:
